@@ -1,27 +1,79 @@
-# Vue 3 + Typescript + Vite
+# OpenGraphica
 
-This template should help get you started developing with Vue 3 and Typescript in Vite.
+OpenGraphica is an upcoming raster and vector image editing program.
 
-## Recommended IDE Setup
+## Usage
 
-[VSCode](https://code.visualstudio.com/) + [Vetur](https://marketplace.visualstudio.com/items?itemName=octref.vetur). Make sure to enable `vetur.experimental.templateInterpolationService` in settings!
+The OpenGraphica editor assets are built into a filesystem of Javascript and CSS files. All of these files must be deployed together, since OpenGraphica dynamically loads them from the filesystem as needed.
 
-### If Using `<script setup>`
+To build OpenGraphica as a website, clone the repository then run the Node.js commands:
+```
+npm install
+npm run build:website
+```
+Production-ready files will output in the `www` folder. You may view the index.html in this folder as an example of how to instantiate the app if you wish to tweak it.
 
-[`<script setup>`](https://github.com/vuejs/rfcs/pull/227) is a feature that is currently in RFC stage. To get proper IDE support for the syntax, use [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) instead of Vetur (and disable Vetur).
+```
+<!-- OpenGraphica initialization example -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="js/vendors.js">
+        <script src="js/opengraphica.js">
+    </head>
+    <body class="ogr-full-page">
+        <div id="opengraphica"></div>
+        <script>
+            OpenGraphica.theme({
+                light: './css/main-light.css',
+                dark: './css/main-dark.css'
+            }).then(() => {
+                OpenGraphica.mount('#opengraphica');
+            });
+        </script>
+    </body>
+</html>
+```
 
-## Type Support For `.vue` Imports in TS
+As shown in the example above, you must first configure OpenGraphica with the the list of themes that the user will be able to pick from. The theme URLs are relative to the index.html page.
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can use the following:
+Afterwards, tell OpenGraphica where it should mount itself in the DOM. OpenGraphica is a Vue 3 application, and you can [view the Vue 3 documentation](https://v3.vuejs.org/guide/migration/global-api.html#mounting-app-instance) for complete details on working with a Vue 3 app.
 
-### If Using Volar
+## Contributing
 
-Run `Volar: Switch TS Plugin on/off` from VSCode command palette.
+### Development Workspace Setup
 
-### If Using Vetur
+1. Clone this repository and install https://nodejs.org/en/
+2. Open a terminal in the repository directory, and run:
+    
+    `npm install`
 
-1. Install and add `@vuedx/typescript-plugin-vue` to the [plugins section](https://www.typescriptlang.org/tsconfig#plugins) in `tsconfig.json`
-2. Delete `src/shims-vue.d.ts` as it is no longer needed to provide module info to Typescript
-3. Open `src/main.ts` in VSCode
-4. Open the VSCode command palette
-5. Search and run "Select TypeScript version" -> "Use workspace version"
+### Development Server
+
+Command to start the dev server:
+```
+npm run dev
+```
+
+Then open the link `http://localhost:8080/` in any web browser.
+
+CSS files are packaged separately. After modifying any file under the `src/css` directory, run:
+```
+npm run build:css
+```
+
+Afterwards, you may have to refresh your dev server manually to see changes.
+
+### Release Builds
+
+Build OpenGraphica as a standalone website:
+```
+npm run build:website
+```
+The result is stored in the `www` directory.
+
+Build OpenGraphica as a 3rd party library for consumption in 1st party applications (e.g. Angular/Vue):
+```
+npm run build:library
+```
+The result is stored in the `dist` directory.

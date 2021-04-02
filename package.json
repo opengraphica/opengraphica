@@ -1,10 +1,10 @@
 {
     "name": "opengraphica",
     "version": "0.0.0",
+    "private": true,
     "scripts": {
         "dev": "webpack serve --config ./webpack.config.dev.js",
-        "dev:vite": "vite",
-        "build": "npm run build:css && npm run build:js",
+        "build": "npm run build:website",
         "build:css": "node ./src/css/build.js",
         "build:library": "webpack --mode=production --config ./webpack.config.library.js",
         "build:website": "webpack --mode=production --config ./webpack.config.website.js",
