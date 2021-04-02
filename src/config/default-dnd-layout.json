@@ -1,0 +1,28 @@
+{
+    "dndLayout": {
+        "header": [
+            {
+                "type": "menuBar",
+                "actionGroupLayout": {
+                    "start": [
+                        "settings",
+                        "effects",
+                        "text",
+                        "selection",
+                        "transform"
+                    ],
+                    "center": [
+                        "search"
+                    ],
+                    "end": [
+                        "color",
+                        "draw",
+                        "deform",
+                        "erase",
+                        "layers"
+                    ]
+                }
+            }
+        ]
+    }
+}

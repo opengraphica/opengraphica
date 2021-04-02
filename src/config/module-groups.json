@@ -1,0 +1,16 @@
+{
+    "file": {
+        "name": "File Management",
+        "description": "Load and save images to your device.",
+        "modules": {
+            "new": {
+                "name": "New Image",
+                "description": "Create a new image with specified dimensions.",
+                "action": {
+                    "type": "ui",
+                    "target": "file-new"
+                }
+            }
+        }
+    }
+}

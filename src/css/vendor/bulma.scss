@@ -1,0 +1,29 @@
+@use "sass:meta";
+
+@mixin bulma {
+    @include meta.load-css("../../node_modules/bulma/sass/elements/container.sass");
+    @include meta.load-css("../../node_modules/bulma/sass/helpers/flexbox.sass");
+    @include meta.load-css("../../node_modules/bulma/sass/helpers/spacing.sass");
+    @include meta.load-css("../../node_modules/bulma/sass/helpers/typography.sass");
+    @include meta.load-css("../../node_modules/bulma/sass/helpers/visibility.sass");
+
+    .mt-auto, .my-auto, .m-auto {
+        margin-top: auto;
+    }
+    .mb-auto, .my-auto, .m-auto {
+        margin-bottom: auto;
+    }
+    .ml-auto, .mx-auto, .m-auto {
+        margin-left: auto;
+    }
+    .mr-auto, .mx-auto, .m-auto {
+        margin-right: auto;
+    }
+
+    .leading-none { line-height: 1; }
+    .leading-tight { line-height: 1.25; }
+    .leading-snug { line-height: 1.375; }
+    .leading-normal	{ line-height: 1.5; }
+    .leading-relaxed { line-height: 1.625; }
+    .leading-loose { line-height: 2; }
+}

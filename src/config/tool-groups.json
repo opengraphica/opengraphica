@@ -1,0 +1,13 @@
+{
+    "transform": {
+        "name": "Transform",
+        "description": "Tools for moving, rotating, scaling the layer.",
+        "tools": {
+            "freeTransform": {
+                "name": "Free Transform",
+                "description": "Move, rotate, or scale the selected layers.",
+                "controller": "free-transform"
+            }
+        }
+    }
+}

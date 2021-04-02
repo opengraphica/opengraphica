@@ -1,0 +1,52 @@
+@mixin element-plus-enhancements {
+    .el-tabs--icon-tabs {
+        .el-tabs__header {
+            padding-left: 0;
+            padding-right: 0;
+            padding-top: 0.25rem;
+            margin-bottom: 0.25rem;
+        }
+        .el-tabs__item {
+            height: auto !important;
+            padding: 0 0.75rem;
+
+            &.is-top:nth-child(2) {
+                padding-left: 1.25rem !important;
+            }
+            &.is-top:last-child {
+                padding-right: 1.25rem !important;
+            }
+        }
+    }
+
+    .el-menu {
+        &.el-menu--borderless {
+            border: none !important;
+        }
+        &.el-menu--medium {
+            .el-menu-item {
+                height: 2.5rem;
+                line-height: 2.5rem;
+            }
+            > .el-divider {
+                margin: 0.25rem 0;
+            }
+        }
+    }
+    .el-menu-item .bi {
+        font-size: 1.125rem;
+    }
+    .el-menu-item .bi,
+    .el-submenu .bi {
+        vertical-align: middle;
+        margin-right: 0.3125rem;
+        width: 1.5rem;
+        text-align: center;
+    }
+
+    .el-loading-spinner {
+        svg {
+            display: inline;
+        }
+    }
+}

@@ -1,0 +1,16 @@
+@use './opengraphica.scss';
+@use './vendor/element-plus-theme-chalk.css';
+@use './vendor/bulma.scss' as *;
+@use './element-plus-enhancements.scss' as *;
+
+:root {
+    --ogr-background-color: #fafafa;
+    --ogr-layout-menu-bar-border-color: #eaeefb;
+    --ogr-layout-menu-bar-background-color: white;
+    --ogr-working-image-border-color: #d0d5e8;
+}
+
+.opengraphica {
+    @include bulma;
+    @include element-plus-enhancements;
+}

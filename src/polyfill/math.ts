@@ -1,0 +1,8 @@
+
+interface Math {
+    DEGREES_TO_RADIANS: number;
+    RADIANS_TO_DEGREES: number;
+}
+
+Math.DEGREES_TO_RADIANS = 0.0174533;
+Math.RADIANS_TO_DEGREES = 57.2958;

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" href="/favicon.ico" />
+        <meta name="viewport" content="width=device-width, user-scalable=no" />
+        <title><%= htmlWebpackPlugin.options.title %></title>
+    </head>
+    <body class="ogr-full-page">
+        <noscript>This application does not work without Javascript. Please enable it to continue.</noscript>
+        <div id="opengraphica">
+            <style>
+                .ogr-app-spinner-center { position: absolute; top: 50vh; left: 50vw; transform: translate(-50%, -50%) }
+                .ogr-app-spinner { display: inline-block; width: 80px; height: 80px; }
+                .ogr-app-spinner:after { content: " "; display: block; width: 64px; height: 64px; margin: 8px; border-radius: 50%; border: 6px solid #409EFF; border-color: #409EFF transparent #409EFF transparent; animation: ogr-app-spinner 1.2s linear infinite; }
+                @keyframes ogr-app-spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            </style>
+            <div class="ogr-app-spinner-center"><div class="ogr-app-spinner"></div></div>
+        </div>
+        <script>
+            OpenGraphica.theme({
+                light: './css/main-light.css',
+                dark: './css/main-dark.css'
+            }).then(() => {
+                OpenGraphica.mount('#opengraphica');
+            })
+        </script>
+    </body>
+</html>

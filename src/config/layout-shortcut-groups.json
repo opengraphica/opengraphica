@@ -1,0 +1,148 @@
+{
+    "color": {
+        "name": "Pick Color",
+        "controls": [
+            {
+                "type": "button",
+                "icon": "bi-eyedropper",
+                "label": "Pick Color"
+            }
+        ],
+        "draggable": true
+    },
+    "deform": {
+        "name": "Deform",
+        "controls": [
+            {
+                "type": "button",
+                "icon": "bi-droplet",
+                "label": "Deform"
+            }
+        ],
+        "draggable": true
+    },
+    "draw": {
+        "name": "Draw",
+        "controls": [
+            {
+                "type": "button",
+                "icon": "bi-brush",
+                "label": "Draw"
+            }
+        ],
+        "draggable": true
+    },
+    "effects": {
+        "name": "Effects",
+        "controls": [
+            {
+                "type": "button",
+                "icon": "bi-stars",
+                "label": "Effects"
+            }
+        ],
+        "draggable": true
+    },
+    "erase": {
+        "name": "Erase",
+        "controls": [
+            {
+                "type": "button",
+                "icon": "bi-eraser",
+                "label": "Erase"
+            }
+        ],
+        "draggable": true
+    },
+    "history": {
+        "name": "History",
+        "controls": [
+            {
+                "type": "button",
+                "icon": "bi-arrow-counterclockwise",
+                "label": "Undo"
+            },
+            {
+                "type": "button",
+                "icon": "bi-arrow-clockwise",
+                "label": "Redo"
+            }
+        ],
+        "draggable": true
+    },
+    "layers": {
+        "name": "Layers",
+        "controls": [
+            {
+                "type": "button",
+                "icon": "bi-layers",
+                "label": "Layers"
+            }
+        ],
+        "draggable": true
+    },
+    "search": {
+        "name": "Search",
+        "controls": [
+            {
+                "type": "button",
+                "icon": "bi-search",
+                "label": "Search",
+                "expanded": true
+            }
+        ],
+        "draggable": true
+    },
+    "selection": {
+        "name": "Selection",
+        "controls": [
+            {
+                "type": "button",
+                "icon": "bi-bounding-box",
+                "label": "Selection"
+            }
+        ],
+        "draggable": true
+    },
+    "settings": {
+        "name": "Settings",
+        "controls": [
+            {
+                "type": "button",
+                "icon": "bi-gear",
+                "label": "Settings",
+                "action": {
+                    "type": "dock",
+                    "target": "settings"
+                }
+            }
+        ],
+        "draggable": true
+    },
+    "text": {
+        "name": "Text",
+        "controls": [
+            {
+                "type": "button",
+                "icon": "bi-type",
+                "label": "Text"
+            }
+        ],
+        "draggable": true
+    },
+    "transform": {
+        "name": "Move / Transform",
+        "controls": [
+            {
+                "type": "button",
+                "icon": "bi-cursor",
+                "label": "Move / Transform",
+                "action": {
+                    "type": "toolGroup",
+                    "target": "transform"
+                }
+            }
+        ],
+        "draggable": true
+    }
+}
