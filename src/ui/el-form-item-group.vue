@@ -5,15 +5,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, nextTick } from 'vue';
 
 export default defineComponent({
     name: 'ElFormItemGroup',
     setup(props, { emit }) {
         const el = ref<HTMLDivElement>();
 
-        onMounted(() => {
+        onMounted(async () => {
             if (el.value) {
+                await nextTick();
                 el.value.style.setProperty('--label-min-width', '0px');
                 let minWidth = 0;
                 el.value.querySelectorAll<HTMLLabelElement>('.el-form-item > .el-form-item__label').forEach((label) => {

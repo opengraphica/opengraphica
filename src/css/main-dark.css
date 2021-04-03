@@ -73830,23 +73830,26 @@ body.ogr-full-page {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
-.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-input,
-.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-input-group > *:last-child {
+.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-input > .el-input__inner,
+.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-input-group > *:last-child,
+.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__inner {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
 .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item:first-child .el-form-item__label {
   border-top-left-radius: var(--ogr-border-radius);
 }
-.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-input,
-.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-input-group > *:last-child {
+.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-input > .el-input__inner,
+.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-input-group > *:last-child,
+.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__inner {
   border-top-right-radius: var(--ogr-border-radius);
 }
 .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item:last-child .el-form-item__label {
   border-bottom-left-radius: var(--ogr-border-radius);
 }
-.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-input,
-.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-input-group > *:last-child {
+.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-input > .el-input__inner,
+.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-input-group > *:last-child,
+.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__inner {
   border-bottom-right-radius: var(--ogr-border-radius);
 }
 .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item + .el-form-item {
@@ -73869,28 +73872,39 @@ body.ogr-full-page {
   flex-grow: 1;
   margin: 0;
 }
-.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content .el-input, .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content .el-input__inner {
+.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-select .el-input__inner, .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-input .el-input__inner {
   background-color: var(--ogr-form-connected-label-background-color);
+}
+.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-select .el-input__inner:hover, .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-input .el-input__inner:hover {
+  background-color: var(--ogr-form-connected-label-input-hover-color);
+}
+.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-select .el-input__inner:hover + .el-input-group__append, .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-input .el-input__inner:hover + .el-input-group__append {
+  background-color: var(--ogr-form-connected-label-input-hover-color);
+}
+.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-select .el-input__inner:focus, .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-select .el-input__inner:hover:focus, .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-input .el-input__inner:focus, .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-input .el-input__inner:hover:focus {
+  background-color: var(--ogr-form-connected-label-input-focus-color);
+}
+.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-select .el-input__inner:focus + .el-input-group__append, .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-select .el-input__inner:hover:focus + .el-input-group__append, .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-input .el-input__inner:focus + .el-input-group__append, .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-input .el-input__inner:hover:focus + .el-input-group__append {
+  background-color: var(--ogr-form-connected-label-input-focus-color);
+}
+.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-select, .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content .el-input:not(.el-input-group) {
+  display: block;
+}
+.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-select .el-input__inner, .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content .el-input:not(.el-input-group) .el-input__inner {
+  display: block;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left-width: 0 !important;
+  border-top-color: var(--ogr-form-connected-label-border-color) !important;
+  border-bottom-color: var(--ogr-form-connected-label-border-color) !important;
+  border-right-color: var(--ogr-form-connected-label-border-color) !important;
+}
+.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content > .el-input.el-input-group > .el-input__inner {
   border-radius: 0;
   border-left-width: 0 !important;
   border-right-width: 0 !important;
   border-top-color: var(--ogr-form-connected-label-border-color) !important;
   border-bottom-color: var(--ogr-form-connected-label-border-color) !important;
-}
-.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content .el-input:hover, .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content .el-input__inner:hover {
-  background-color: var(--ogr-form-connected-label-input-hover-color);
-}
-.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content .el-input:hover + .el-input-group__append, .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content .el-input__inner:hover + .el-input-group__append {
-  background-color: var(--ogr-form-connected-label-input-hover-color);
-}
-.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content .el-input:focus, .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content .el-input:hover:focus, .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content .el-input__inner:focus, .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content .el-input__inner:hover:focus {
-  background-color: var(--ogr-form-connected-label-input-focus-color);
-}
-.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content .el-input:focus + .el-input-group__append, .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content .el-input:hover:focus + .el-input-group__append, .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content .el-input__inner:focus + .el-input-group__append, .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content .el-input__inner:hover:focus + .el-input-group__append {
-  background-color: var(--ogr-form-connected-label-input-focus-color);
-}
-.opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content .el-input > input, .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content .el-input__inner > input {
-  text-align: right;
 }
 .opengraphica .el-form--connected-labels .el-form-item-group .el-form-item .el-form-item__content .el-input-group__append {
   background-color: var(--ogr-form-connected-label-background-color);

@@ -1,7 +1,7 @@
 <template>
     <div class="ogr-dialogs">
         <template v-for="dialog of dialogs" :key="dialog.id">
-            <el-dialog :title="dialog.title" v-model="dialog.visible" @closed="onDialogClosed(dialog)">
+            <el-dialog :title="dialog.title" v-model="dialog.visible" destroy-on-close @closed="onDialogClosed(dialog)">
                 <template v-if="dialog.type === 'module'">
                     <module :name="dialog.module.name" @dialog-title="dialog.title = $event" />
                 </template>

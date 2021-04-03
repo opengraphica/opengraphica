@@ -16,8 +16,9 @@
                     border-top-left-radius: 0;
                     border-bottom-left-radius: 0;
                 }
-                .el-form-item__content > .el-input,
-                .el-form-item__content > .el-input-group > *:last-child {
+                .el-form-item__content > .el-input > .el-input__inner,
+                .el-form-item__content > .el-input-group > *:last-child,
+                .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__inner {
                     border-top-right-radius: 0;
                     border-bottom-right-radius: 0;
                 }
@@ -26,8 +27,9 @@
                     .el-form-item__label {
                         border-top-left-radius: var(--ogr-border-radius);
                     }
-                    .el-form-item__content > .el-input,
-                    .el-form-item__content > .el-input-group > *:last-child {
+                    .el-form-item__content > .el-input > .el-input__inner,
+                    .el-form-item__content > .el-input-group > *:last-child,
+                    .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__inner {
                         border-top-right-radius: var(--ogr-border-radius);
                     }
                 }
@@ -35,8 +37,9 @@
                     .el-form-item__label {
                         border-bottom-left-radius: var(--ogr-border-radius);
                     }
-                    .el-form-item__content > .el-input,
-                    .el-form-item__content > .el-input-group > *:last-child {
+                    .el-form-item__content > .el-input > .el-input__inner,
+                    .el-form-item__content > .el-input-group > *:last-child,
+                    .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__inner {
                         border-bottom-right-radius: var(--ogr-border-radius);
                     }
                 }
@@ -63,31 +66,48 @@
                     flex-grow: 1;
                     margin: 0;
     
-                    .el-input, .el-input__inner {
-                        background-color: var(--ogr-form-connected-label-background-color);
-                        border-radius: 0;
-                        border-left-width: 0 !important;
-                        border-right-width: 0 !important;
-                        border-top-color: var(--ogr-form-connected-label-border-color) !important;
-                        border-bottom-color: var(--ogr-form-connected-label-border-color) !important;
+                    > .el-select,  > .el-input {
+                        .el-input__inner {
+                            background-color: var(--ogr-form-connected-label-background-color);
 
-                        &:hover {
-                            background-color: var(--ogr-form-connected-label-input-hover-color);
-
-                            + .el-input-group__append {
+                            &:hover {
                                 background-color: var(--ogr-form-connected-label-input-hover-color);
-                            }
-                        }
-                        &:focus, &:hover:focus {
-                            background-color: var(--ogr-form-connected-label-input-focus-color);
 
-                            + .el-input-group__append {
+                                + .el-input-group__append {
+                                    background-color: var(--ogr-form-connected-label-input-hover-color);
+                                }
+                            }
+                            &:focus, &:hover:focus {
                                 background-color: var(--ogr-form-connected-label-input-focus-color);
+
+                                + .el-input-group__append {
+                                    background-color: var(--ogr-form-connected-label-input-focus-color);
+                                }
                             }
                         }
+                    }
 
-                        > input {
-                            text-align: right;
+                    > .el-select, .el-input:not(.el-input-group) {
+                        display: block;
+
+                        .el-input__inner {
+                            display: block;
+                            border-top-left-radius: 0;
+                            border-bottom-left-radius: 0;
+                            border-left-width: 0 !important;
+                            border-top-color: var(--ogr-form-connected-label-border-color) !important;
+                            border-bottom-color: var(--ogr-form-connected-label-border-color) !important;
+                            border-right-color: var(--ogr-form-connected-label-border-color) !important;
+                        }
+                    }
+
+                    > .el-input.el-input-group {
+                        > .el-input__inner {
+                            border-radius: 0;
+                            border-left-width: 0 !important;
+                            border-right-width: 0 !important;
+                            border-top-color: var(--ogr-form-connected-label-border-color) !important;
+                            border-bottom-color: var(--ogr-form-connected-label-border-color) !important;
                         }
                     }
 

@@ -4,10 +4,12 @@ import { RGBAColor, CanvasRenderingContext2DEnhanced, ColorModelName, WorkingFil
 interface WorkingFileState {
     activeLayer: WorkingFileLayer<RGBAColor> | null,
     colorModel: ColorModelName;
+    dpi: number;
     drawOriginX: number;
     drawOriginY: number;
     height: number;
     layers: WorkingFileLayer<RGBAColor>[];
+    measuringUnits: 'px' | 'mm' | 'cm' | 'in';
     width: number;
 }
 
@@ -22,10 +24,12 @@ const store = new PerformantStore<WorkingFileStore>({
     state: {
         activeLayer: null,
         colorModel: 'rgba',
+        dpi: 300,
         drawOriginX: 0,
         drawOriginY: 0,
         height: 892,
         layers: [],
+        measuringUnits: 'px',
         width: 818
     },
     readOnly: ['layers'],

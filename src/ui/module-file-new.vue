@@ -1,19 +1,32 @@
 <template>
     <el-form ref="form" class="el-form--connected-labels" label-position="left">
         <el-form-item-group>
+            <el-form-item label="Units">
+                <el-select v-model="formData.workingFile.measuringUnits">
+                    <el-option
+                        v-for="option in unitOptions"
+                        :key="option.value"
+                        :label="option.label"
+                        :value="option.value">
+                    </el-option>
+                </el-select>
+            </el-form-item>
             <el-form-item label="Width">
                 <el-input v-model="formData.workingFile.width">
                     <template #append>
-                        px
+                        {{ formData.workingFile.measuringUnits }}
                     </template>
                 </el-input>
             </el-form-item>
             <el-form-item label="Height">
-                <el-input class="has-text-right" v-model="formData.workingFile.height">
+                <el-input v-model="formData.workingFile.height">
                     <template #append>
-                        px
+                        {{ formData.workingFile.measuringUnits }}
                     </template>
                 </el-input>
+            </el-form-item>
+            <el-form-item label="DPI">
+                <el-input v-model="formData.workingFile.dpi"></el-input>
             </el-form-item>
         </el-form-item-group>
         <div class="has-text-right">
@@ -30,6 +43,8 @@ import ElForm from 'element-plus/lib/el-form';
 import ElFormItem from 'element-plus/lib/el-form-item';
 import ElFormItemGroup from '@/ui/el-form-item-group.vue';
 import ElInput from 'element-plus/lib/el-input';
+import ElOption from 'element-plus/lib/el-option';
+import ElSelect from 'element-plus/lib/el-select';
 
 export default defineComponent({
     name: 'ModuleFileNew',
@@ -38,21 +53,32 @@ export default defineComponent({
         ElForm,
         ElFormItem,
         ElFormItemGroup,
-        ElInput
+        ElInput,
+        ElOption,
+        ElSelect
     },
     emits: [
         'dialog-title'
     ],
     setup(props, { emit }) {
         emit('dialog-title', 'New File');
+        const unitOptions = [
+            { value: 'px', label: 'Pixels' },
+            { value: 'mm', label: 'Millimeters' },
+            { value: 'cm', label: 'Centimeters' },
+            { value: 'in', label: 'Inches' }
+        ];
         const formData = reactive({
             workingFile: {
+                measuringUnits: 'px',
                 width: 100,
-                height: 100
+                height: 100,
+                dpi: 300
             }
         });
         
         return {
+            unitOptions,
             formData
         };
     }
