@@ -1,5 +1,5 @@
 <template>
-    <div ref="root" class="opengraphica">
+    <div ref="root" class="opengraphica" @touchstart="onTouchStartRoot($event)">
         <app-canvas />
         <app-layout-dnd-container @dnd-ready="onDndLayoutReady($event)" />
         <app-dialogs />
@@ -26,6 +26,24 @@ export default defineComponent({
         const mainElement = ref<Element | null>(null);
 
         onMounted(() => {
+
+            // Full page fixes for quirks in browsers (Chrome)
+            if (document.body.classList.contains('ogr-full-page')) {
+                // Reset user zoom on some browsers
+                try {
+                    (document as any).firstElementChild.style.zoom = 'reset';
+                } catch (error) {}
+                // Chrome for some reason tries to retain scroll position even though the page wasn't scrolled
+                // When using two finger movements
+                const autoScrollFixIntervalHandle = setInterval(() => {
+                    window.document.documentElement.scrollTop = 0;
+                    window.document.documentElement.scrollLeft = 0;
+                }, 250);
+                setTimeout(() => {
+                    clearInterval(autoScrollFixIntervalHandle);
+                }, 10000);
+            }
+
             // Disable context menu inside the application
             document.addEventListener('contextmenu', onContextMenu);
 
@@ -60,6 +78,13 @@ export default defineComponent({
                 e.preventDefault();
             }
         }
+
+        function onTouchStartRoot(e: TouchEvent) {
+            if (e.touches.length > 1){
+                e.preventDefault();
+            }
+        }
+
         function onResizeWindow(e: Event) {
             canvasStore.set({
                 viewWidth: (rootElement.value as Element).clientWidth * (window.devicePixelRatio || 1),
@@ -76,7 +101,8 @@ export default defineComponent({
 
         return {
             root: rootElement,
-            onDndLayoutReady
+            onDndLayoutReady,
+            onTouchStartRoot
         };
     }
 })

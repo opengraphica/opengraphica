@@ -24,6 +24,7 @@ module.exports = setupConfig({
         new webpack.HotModuleReplacementPlugin(),
         new HtmlWebpackPlugin({
             filename: 'index.html',
+            template: 'index.dev.ejs',
             inject: true
         })
     ]
