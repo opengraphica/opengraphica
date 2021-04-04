@@ -41,15 +41,13 @@ body.ogr-full-page {
     -webkit-user-select: none;
     user-select: none;
 
-    @media screen and (max-width: 444px) {
-        .ogr-dialogs {
-            .el-dialog {
-                width: 400px !important;
-                max-width: 90%;
-            }
+    .ogr-dialogs {
+        .el-dialog.el-dialog--medium {
+            width: 25rem !important;
+            max-width: 90%;
         }
     }
-
+    
     .ogr-layout-dnd-container {
         display: flex;
         flex-direction: column;

@@ -1,0 +1,211 @@
+[
+    {
+        "name": "640x480 (SD 480p)",
+        "width": 640,
+        "height": 480,
+        "dimensionUnits": "px",
+        "resolutionX": 72,
+        "resolutionY": 72,
+        "resolutionUnits": "px/in",
+        "colorProfile": "sRGB",
+        "scaleFactor": 1
+    },
+    {
+        "name": "800x600 (SVGA)",
+        "width": 800,
+        "height": 600,
+        "dimensionUnits": "px",
+        "resolutionX": 72,
+        "resolutionY": 72,
+        "resolutionUnits": "px/in",
+        "colorProfile": "sRGB",
+        "scaleFactor": 1
+    },
+    {
+        "name": "1024x768 (XGA)",
+        "width": 1024,
+        "height": 768,
+        "dimensionUnits": "px",
+        "resolutionX": 72,
+        "resolutionY": 72,
+        "resolutionUnits": "px/in",
+        "colorProfile": "sRGB",
+        "scaleFactor": 1
+    },
+    {
+        "name": "1280x720 (HD 720p)",
+        "width": 1280,
+        "height": 720,
+        "dimensionUnits": "px",
+        "resolutionX": 72,
+        "resolutionY": 72,
+        "resolutionUnits": "px/in",
+        "colorProfile": "sRGB",
+        "scaleFactor": 1
+    },
+    {
+        "name": "1600x1200 (UXGA)",
+        "width": 1600,
+        "height": 1200,
+        "dimensionUnits": "px",
+        "resolutionX": 72,
+        "resolutionY": 72,
+        "resolutionUnits": "px/in",
+        "colorProfile": "sRGB",
+        "scaleFactor": 1
+    },
+    {
+        "name": "1920x1080 (Full HD 1080p)",
+        "width": 1920,
+        "height": 1080,
+        "dimensionUnits": "px",
+        "resolutionX": 72,
+        "resolutionY": 72,
+        "resolutionUnits": "px/in",
+        "colorProfile": "sRGB",
+        "scaleFactor": 1
+    },
+    {
+        "name": "3840x2160 (4K UHD)",
+        "width": 3840,
+        "height": 2160,
+        "dimensionUnits": "px",
+        "resolutionX": 72,
+        "resolutionY": 72,
+        "resolutionUnits": "px/in",
+        "colorProfile": "sRGB",
+        "scaleFactor": 1
+    },
+    {
+        "name": "iPhone 12 Pro Max",
+        "width": 1284,
+        "height": 2778,
+        "dimensionUnits": "in",
+        "resolutionX": 458,
+        "resolutionY": 458,
+        "resolutionUnits": "px/in",
+        "colorProfile": "sRGB",
+        "scaleFactor": 3
+    },
+    {
+        "name": "iPhone 12, 12 Pro",
+        "width": 1170,
+        "height": 2532,
+        "dimensionUnits": "in",
+        "resolutionX": 460,
+        "resolutionY": 460,
+        "resolutionUnits": "px/in",
+        "colorProfile": "sRGB",
+        "scaleFactor": 3
+    },
+    {
+        "name": "iPhone 12 Mini",
+        "width": 1080,
+        "height": 2340,
+        "dimensionUnits": "in",
+        "resolutionX": 476,
+        "resolutionY": 476,
+        "resolutionUnits": "px/in",
+        "colorProfile": "sRGB",
+        "scaleFactor": 3
+    },
+    {
+        "name": "iPhone 11 Pro Max, XS Max",
+        "width": 1242,
+        "height": 2688,
+        "dimensionUnits": "in",
+        "resolutionX": 458,
+        "resolutionY": 458,
+        "resolutionUnits": "px/in",
+        "colorProfile": "sRGB",
+        "scaleFactor": 3
+    },
+    {
+        "name": "iPhone 11 Pro, X, XS",
+        "width": 1125,
+        "height": 2436,
+        "dimensionUnits": "in",
+        "resolutionX": 458,
+        "resolutionY": 458,
+        "resolutionUnits": "px/in",
+        "colorProfile": "sRGB",
+        "scaleFactor": 3
+    },
+    {
+        "name": "iPhone 11, XR",
+        "width": 828,
+        "height": 1792,
+        "dimensionUnits": "in",
+        "resolutionX": 326,
+        "resolutionY": 326,
+        "resolutionUnits": "px/in",
+        "colorProfile": "sRGB",
+        "scaleFactor": 3
+    },
+    {
+        "name": "iPhone 11",
+        "width": 828,
+        "height": 1792,
+        "dimensionUnits": "in",
+        "resolutionX": 326,
+        "resolutionY": 326,
+        "resolutionUnits": "px/in",
+        "colorProfile": "sRGB",
+        "scaleFactor": 2
+    },
+    {
+        "name": "iPhone 8+, 7+, 6s+, 6+",
+        "width": 1242,
+        "height": 2208,
+        "dimensionUnits": "in",
+        "resolutionX": 401,
+        "resolutionY": 401,
+        "resolutionUnits": "px/in",
+        "colorProfile": "sRGB",
+        "scaleFactor": 3
+    },
+    {
+        "name": "iPhone 8, 7, 6s, 6",
+        "width": 750,
+        "height": 1334,
+        "dimensionUnits": "in",
+        "resolutionX": 326,
+        "resolutionY": 326,
+        "resolutionUnits": "px/in",
+        "colorProfile": "sRGB",
+        "scaleFactor": 2
+    },
+    {
+        "name": "iPhone 5s, 5c, 5",
+        "width": 640,
+        "height": 1136,
+        "dimensionUnits": "in",
+        "resolutionX": 326,
+        "resolutionY": 326,
+        "resolutionUnits": "px/in",
+        "colorProfile": "sRGB",
+        "scaleFactor": 2
+    },
+    {
+        "name": "iPhone 4s",
+        "width": 640,
+        "height": 960,
+        "dimensionUnits": "in",
+        "resolutionX": 326,
+        "resolutionY": 326,
+        "resolutionUnits": "px/in",
+        "colorProfile": "sRGB",
+        "scaleFactor": 2
+    },
+    {
+        "name": "iPhone 3GS, 3G, Gen 1",
+        "width": 320,
+        "height": 480,
+        "dimensionUnits": "in",
+        "resolutionX": 163,
+        "resolutionY": 163,
+        "resolutionUnits": "px/in",
+        "colorProfile": "sRGB",
+        "scaleFactor": 1
+    }
+]

@@ -1,7 +1,7 @@
 <template>
     <div class="ogr-dialogs">
         <template v-for="dialog of dialogs" :key="dialog.id">
-            <el-dialog :title="dialog.title" v-model="dialog.visible" destroy-on-close @closed="onDialogClosed(dialog)">
+            <el-dialog :title="dialog.title" :custom-class="'el-dialog--' + dialog.size" v-model="dialog.visible" destroy-on-close @closed="onDialogClosed(dialog)">
                 <template v-if="dialog.type === 'module'">
                     <module :name="dialog.module.name" @dialog-title="dialog.title = $event" />
                 </template>
@@ -20,6 +20,7 @@ interface DialogCommonDefinition {
     id: number;
     title: string;
     visible: boolean;
+    size: 'small' | 'medium' | 'large' | 'big'
 }
 
 interface ModuleDialogDefinition extends DialogCommonDefinition {
@@ -54,7 +55,8 @@ export default defineComponent({
                     id: dialogIdCounter++,
                     title: '',
                     visible: true,
-                    module: event
+                    module: event,
+                    size: 'medium'
                 });
             }
         }
