@@ -15,7 +15,7 @@
             </el-form-item-group>
             <el-form-item-group>
                 <el-form-item label="Width">
-                    <el-input v-model="formData.workingFile.width">
+                    <el-input-number v-model="formData.workingFile.width">
                         <template #append>
                             <el-select style="width: 6rem" v-model="formData.workingFile.dimensionUnits" :popper-append-to-body="false">
                                 <el-option
@@ -27,10 +27,10 @@
                                 </el-option>
                             </el-select>
                         </template>
-                    </el-input>
+                    </el-input-number>
                 </el-form-item>
                 <el-form-item label="Height">
-                    <el-input v-model="formData.workingFile.height">
+                    <el-input-number v-model="formData.workingFile.height">
                         <template #append>
                             <el-select style="width: 6rem" v-model="formData.workingFile.dimensionUnits" :popper-append-to-body="false">
                                 <el-option
@@ -42,10 +42,10 @@
                                 </el-option>
                             </el-select>
                         </template>
-                    </el-input>
+                    </el-input-number>
                 </el-form-item>
                 <el-form-item label="Resolution">
-                    <el-input v-model="formData.workingFile.resolution">
+                    <el-input-number v-model="formData.workingFile.resolution">
                         <template #append>
                             <el-select style="width: 6rem" v-model="formData.workingFile.resolutionUnits" :popper-append-to-body="false">
                                 <el-option
@@ -57,7 +57,7 @@
                                 </el-option>
                             </el-select>
                         </template>
-                    </el-input>
+                    </el-input-number>
                 </el-form-item>
                 <el-form-item label="Color Profile">
                     <el-select v-model="formData.workingFile.colorProfile" :popper-append-to-body="false">
@@ -70,11 +70,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="Scale Factor">
-                    <el-input v-model="formData.workingFile.scaleFactor">
-                        <template #append>
-                            %
-                        </template>
-                    </el-input>
+                    <el-input v-model="formData.workingFile.scaleFactor"></el-input>
                 </el-form-item>
             </el-form-item-group>
         </el-form-item-aligned-groups>
@@ -86,7 +82,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive } from 'vue';
+import { defineComponent, ref, reactive, watch } from 'vue';
 import defaultNewFilePresets from '@/config/default-new-file-presets.json';
 import ElButton from 'element-plus/lib/el-button';
 import ElForm from 'element-plus/lib/el-form';
@@ -94,6 +90,7 @@ import ElFormItem from 'element-plus/lib/el-form-item';
 import ElFormItemGroup from '@/ui/el-form-item-group.vue';
 import ElFormItemAlignedGroups from '@/ui/el-form-item-aligned-groups.vue';
 import ElInput from 'element-plus/lib/el-input';
+import ElInputNumber from '@/ui/el-input-number.vue';
 import ElOption from 'element-plus/lib/el-option';
 import ElSelect from 'element-plus/lib/el-select';
 import { convertUnits } from '@/lib/metrics';
@@ -107,6 +104,7 @@ export default defineComponent({
         ElFormItemGroup,
         ElFormItemAlignedGroups,
         ElInput,
+        ElInputNumber,
         ElOption,
         ElSelect
     },
@@ -143,6 +141,22 @@ export default defineComponent({
                 resolutionUnits: 'px/in',
                 colorProfile: 'sRGB',
                 scaleFactor: 1
+            }
+        });
+        let lastNonZeroResolution: number = 300;
+
+        watch(() => formData.workingFile.dimensionUnits, (newDimensionUnits: any, oldDimensionUnits: any) => {
+            formData.workingFile.width = convertUnits(formData.workingFile.width, oldDimensionUnits, newDimensionUnits, formData.workingFile.resolution, formData.workingFile.resolutionUnits as any);
+            formData.workingFile.height = convertUnits(formData.workingFile.height, oldDimensionUnits, newDimensionUnits, formData.workingFile.resolution, formData.workingFile.resolutionUnits as any);
+        });
+
+        watch(() => formData.workingFile.resolution, (newResolution, oldResolution) => {
+            if (oldResolution !== 0) {
+                lastNonZeroResolution = oldResolution;
+            }
+            if (formData.workingFile.dimensionUnits === 'px' && newResolution !== 0) {
+                formData.workingFile.width *= lastNonZeroResolution / newResolution;
+                formData.workingFile.height *= lastNonZeroResolution / newResolution;
             }
         });
         

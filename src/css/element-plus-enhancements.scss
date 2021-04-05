@@ -70,7 +70,8 @@
 
                 > .el-select,  > .el-input {
                     .el-input__inner {
-                        background-color: var(--ogr-form-connected-label-background-color);
+                        background-color: var(--ogr-form-connected-label-input-focus-color);
+                        /*
                         &:hover {
                             background-color: var(--ogr-form-connected-label-input-hover-color);
                             + .el-input-group__append {
@@ -83,8 +84,10 @@
                                 background-color: var(--ogr-form-connected-label-input-focus-color);
                             }
                         }
+                        */
                     }
                 }
+                /*
                 .el-select {
                     .el-input--suffix {
                         &:hover {
@@ -93,14 +96,15 @@
                                 background-color: var(--ogr-form-connected-label-input-hover-color);
                             }
                         }
-                        &:focus, &:hover:focus {
-                            background-color: var(--ogr-form-connected-label-input-focus-color);
+                        &:hover:focus {
+                            background-color: var(--ogr-form-connected-label-input-hover-color);
                             + .el-input-group__append {
-                                background-color: var(--ogr-form-connected-label-input-focus-color);
+                                background-color: var(--ogr-form-connected-label-input-hover-color);
                             }
                         }
                     }
                 }
+                */
 
                 > .el-select, .el-input:not(.el-input-group) {
                     display: block;
@@ -130,11 +134,11 @@
                 .el-input-group__append {
                     background-color: var(--ogr-form-connected-label-background-color);
                     box-sizing: border-box;
-                    padding-left: 0rem;
+                    padding-left: 0.9375rem;
                     padding-right: 0.9375rem;
 
                     > .el-select {
-                        margin-left: 0;
+                        margin-left: -1rem;
                         margin-right: -1rem;
 
                         .el-input__inner {

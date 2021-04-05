@@ -15,6 +15,7 @@
         "axios": "^0.21.1",
         "bootstrap-icons": "1.4.0",
         "element-plus": "1.0.2-beta.35",
+        "expr-eval": "^2.0.2",
         "mitt": "2.1.0",
         "resize-observer-polyfill": "^1.5.1",
         "vue": "3.0.7",
