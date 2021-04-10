@@ -4,13 +4,17 @@ import { RGBAColor, CanvasRenderingContext2DEnhanced, ColorModelName, WorkingFil
 interface WorkingFileState {
     activeLayer: WorkingFileLayer<RGBAColor> | null,
     colorModel: ColorModelName;
-    dpi: number;
+    colorSpace: string;
     drawOriginX: number;
     drawOriginY: number;
-    height: number;
+    height: number; // Always pixels
     layers: WorkingFileLayer<RGBAColor>[];
     measuringUnits: 'px' | 'mm' | 'cm' | 'in';
-    width: number;
+    resolutionUnits: 'px/in' | 'px/mm' | 'px/cm';
+    resolutionX: number;
+    resolutionY: number;
+    scaleFactor: number;
+    width: number; // Always pixels
 }
 
 interface WorkingFileStore {
@@ -18,23 +22,21 @@ interface WorkingFileStore {
     state: WorkingFileState;
 }
 
-// let dummyCanvas: any = document.createElement('canvas');
-
 const store = new PerformantStore<WorkingFileStore>({
     state: {
         activeLayer: null,
         colorModel: 'rgba',
-        dpi: 300,
+        colorSpace: 'sRGB',
         drawOriginX: 0,
         drawOriginY: 0,
-        height: 892,
+        height: 892, // Always pixels
         layers: [],
         measuringUnits: 'px',
-        width: 818
-    },
-    readOnly: ['layers'],
-    onDispatch(key: string, value: any, set) {
-        
+        resolutionUnits: 'px/in',
+        resolutionX: 300,
+        resolutionY: 300,
+        scaleFactor: 1,
+        width: 818 // Always pixels
     }
 });
 

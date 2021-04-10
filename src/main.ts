@@ -49,6 +49,9 @@ if ((window as any).webpackHotUpdateOpenGraphica) {
     }).then(() => {
         app.mount('#opengraphica');
     });
+    setTimeout(() => {
+        (window as any).OpenGraphica = app;
+    }, 50);
 }
 
 export default app;

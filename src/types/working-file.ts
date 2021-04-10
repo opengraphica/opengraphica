@@ -57,3 +57,15 @@ export interface WorkingFileTextLayer<T extends ColorModel> extends WorkingFileL
     type: 'text';
     data: {}; // TODO
 }
+
+export interface NewFilePreset {
+    name: string,
+    width: number,
+    height: number,
+    measuringUnits: 'px' | 'cm' | 'mm' | 'in',
+    resolutionX: number,
+    resolutionY: number,
+    resolutionUnits: 'px/in' | 'px/mm' | 'px/cm',
+    colorProfile: string,
+    scaleFactor: 1
+}

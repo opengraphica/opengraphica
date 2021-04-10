@@ -97,7 +97,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, inject } from 'vue';
+import { defineComponent, ref } from 'vue';
 import ElDivider from 'element-plus/lib/el-divider';
 import ElLoading from 'element-plus/lib/el-loading';
 import ElMenu from 'element-plus/lib/el-menu';

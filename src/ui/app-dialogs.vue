@@ -3,7 +3,7 @@
         <template v-for="dialog of dialogs" :key="dialog.id">
             <el-dialog :title="dialog.title" :custom-class="'el-dialog--' + dialog.size" v-model="dialog.visible" destroy-on-close @closed="onDialogClosed(dialog)">
                 <template v-if="dialog.type === 'module'">
-                    <module :name="dialog.module.name" @dialog-title="dialog.title = $event" />
+                    <module :name="dialog.module.name" @update:title="dialog.title = $event" @close="dialog.visible = false" />
                 </template>
             </el-dialog>
         </template>

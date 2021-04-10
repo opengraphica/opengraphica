@@ -2,8 +2,9 @@
 export class BaseAction {
     readonly id!: string;
     readonly description!: string;
-    protected done: boolean = false;
-    protected freeEstimates: { memory: number, database: number } = {
+    public done: boolean = false;
+    public thumbnail: string | undefined;
+    public freeEstimates: { memory: number, database: number } = {
         memory: 0, // Estimate of how much memory will be freed when the free() method is called (in bytes)
         database: 0 // Estimate of how much database space will be freed when the free() method is called (in bytes)
     };
@@ -22,10 +23,10 @@ export class BaseAction {
 		this.id = actionId;
 		this.description = actionDescription;
 	}
-	public do() {
+	public async do() {
 		this.done = true;
 	}
-	public undo() {
+	public async undo() {
 		this.done = false;
 	}
 	public free() {

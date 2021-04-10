@@ -2,7 +2,11 @@
     <div class="ogr-module">
         <suspense>
             <template #default>
-                <component :is="name" @dialog-title="onSetDialogTitle($event)" />
+                <component
+                    :is="name"
+                    @update:title="onSetTitle($event)"
+                    @close="onCloseModule($event)"
+                />
             </template>
             <template #fallback>
                 <div style="width: 100%; height: 5rem;" v-loading="true" element-loading-background="transparent"></div>
@@ -30,16 +34,22 @@ export default defineComponent({
         }
     },
     emits: [
-        'dialog-title'
+        'update:title',
+        'close'
     ],
     setup(props, { emit }) {
 
-        function onSetDialogTitle(title: string) {
-            emit('dialog-title', title);
+        function onCloseModule() {
+            emit('close', ...arguments);
+        }
+
+        function onSetTitle(title: string) {
+            emit('update:title', title);
         }
 
         return {
-            onSetDialogTitle
+            onCloseModule,
+            onSetTitle
         }
     }
 });

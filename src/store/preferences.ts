@@ -2,6 +2,7 @@ import { PerformantStore } from './performant-store';
 
 interface PreferencesState {
     enableBuffer: boolean;
+    historyStatesMax: number;
     multiTouchDownTimeout: number;
     multiTouchTapTimeout: number;
     pointerPressHoldTimeout: number;
@@ -15,6 +16,7 @@ interface PreferencesStore {
 const store = new PerformantStore<PreferencesStore>({
     state: {
         enableBuffer: false,
+        historyStatesMax: 50,
         multiTouchDownTimeout: 50,
         multiTouchTapTimeout: 50,
         pointerPressHoldTimeout: 500

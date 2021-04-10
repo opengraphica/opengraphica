@@ -31,6 +31,7 @@
         @focus="onFocus($event)"
         @change="onChange($event)"
         @input="onInput($event)"
+        @keydown="onKeyDown($event)"
         @clear="onClear($event)"
     >
         <template v-if="$slots['prefix']" v-slot:prefix>
@@ -49,7 +50,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, onMounted } from 'vue';
+import { defineComponent, ref, watch, PropType, onMounted } from 'vue';
 import ElInput from 'element-plus/lib/el-input';
 import { Parser as MathExpressionParser } from 'expr-eval';
 
@@ -61,6 +62,10 @@ export default defineComponent({
     props: {
         modelValue: {
             type: Number
+        },
+        modelModifiers: {
+            type: Object as PropType<any>,
+            default: () => ({})
         },
         maxlength: {
             type: Number
@@ -117,11 +122,11 @@ export default defineComponent({
         },
         max: {
             type: Number,
-            default: -Infinity
+            default: Infinity
         },
         min: {
             type: Number,
-            default: Infinity
+            default: -Infinity
         },
         step: {
             type: Number,
@@ -146,6 +151,9 @@ export default defineComponent({
         validateEvent: {
             type: Boolean,
             default: true
+        },
+        precision: {
+            type: Number
         }
     },
     emits: [
@@ -164,6 +172,7 @@ export default defineComponent({
         watch(() => props.modelValue, (modelValue) => {
             if (modelValue !== null && modelValue !== lastEvaluatedValue) {
                 lastEvaluatedValue = modelValue || 0;
+                lastEvaluatedValue = Math.max(props.min, Math.min(props.max, lastEvaluatedValue));
                 displayValue.value = '' + modelValue;
             }
         }, { immediate: true });
@@ -174,26 +183,37 @@ export default defineComponent({
         function onFocus(e: Event) {
             emit('focus', e);
         }
-        function onChange(e: number) {
-            const lastEvaluatedValuePrev = lastEvaluatedValue;
+        function onChange() {
             try {
                 lastEvaluatedValue = MathExpressionParser.evaluate(displayValue.value);
             } catch (error) {
                 // Do nothing.
             }
-            displayValue.value = lastEvaluatedValue + '';
-            if (lastEvaluatedValue !== lastEvaluatedValuePrev) {
-                emit('change', lastEvaluatedValue);
-                emit('update:modelValue', lastEvaluatedValue);
+            if (props.precision != null) {
+                lastEvaluatedValue = Math.round(Math.pow(10, props.precision) * lastEvaluatedValue) / Math.pow(10, props.precision);
             }
+            lastEvaluatedValue = Math.max(props.min, Math.min(props.max, lastEvaluatedValue));
+            displayValue.value = lastEvaluatedValue + '';
+            emit('change', lastEvaluatedValue);
+            emit('update:modelValue', lastEvaluatedValue);
         }
         function onInput(e: number) {
             try {
                 lastEvaluatedValue = MathExpressionParser.evaluate(displayValue.value);
                 emit('input', lastEvaluatedValue);
-                emit('update:modelValue', lastEvaluatedValue);
+                if (!(props.modelModifiers as any).lazy) {
+                    emit('update:modelValue', lastEvaluatedValue);
+                }
             } catch (error) {
                 // Do nothing.
+            }
+        }
+        function onKeyDown(e: KeyboardEvent) {
+            if (e.key === 'Enter') {
+                if (lastEvaluatedValue !== parseFloat(displayValue.value)) {
+                    e.preventDefault();
+                }
+                onChange();
             }
         }
         function onClear() {
@@ -226,6 +246,7 @@ export default defineComponent({
             onFocus,
             onChange,
             onInput,
+            onKeyDown,
             onClear
         };
     }

@@ -148,6 +148,16 @@
                         }
                     }
                 }
+
+                .el-form-item__error {
+                    background: #FFF4F4;
+                    border-right: 0.0625rem solid #FDD6D6;
+                    padding: 0.5rem 0.9375rem;
+                    position: static;
+                    top: 0;
+                    animation: none !important;
+                    transition: none !important;
+                }
             }
         }
     }

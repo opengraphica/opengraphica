@@ -5429,6 +5429,16 @@ body.ogr-full-page {
   padding: 0 !important;
   width: auto !important;
 }
+.opengraphica .ogr-canvas-area {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+}
 .opengraphica .ogr-canvas-container {
   display: block;
   position: absolute;
@@ -23116,6 +23126,15 @@ body.ogr-full-page {
   border-radius: 0;
   border-top: 0.0625rem solid var(--ogr-form-connected-label-border-color) !important;
   border-bottom: 0.0625rem solid var(--ogr-form-connected-label-border-color) !important;
+}
+.opengraphica .el-form-item-group .el-form-item .el-form-item__content .el-form-item__error {
+  background: #FFF4F4;
+  border-right: 0.0625rem solid #FDD6D6;
+  padding: 0.5rem 0.9375rem;
+  position: static;
+  top: 0;
+  animation: none !important;
+  transition: none !important;
 }
 .opengraphica .el-tabs--icon-tabs .el-tabs__header {
   padding-left: 0;

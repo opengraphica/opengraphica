@@ -47,7 +47,11 @@ export class PerformantStore<T extends StoreTypeMap> {
         this.state = shallowReadonly<T>(this.reactiveState) as any;
     }
 
-    private directSet<K extends keyof T['state']>(key: K, value: T['state'][K]) {
+    /**
+     * Not actually deprecated, use "set" instead if you don't know what you're doing.
+     * @deprecated
+     */
+    directSet<K extends keyof T['state']>(key: K, value: T['state'][K]) {
         (this.staticState as any)[key] = value;
         if (!this.nonReactiveProps.includes(key as string)) {
             this.reactiveState[key] = value;

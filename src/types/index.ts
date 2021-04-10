@@ -13,6 +13,6 @@ export {
     VectorPolylineShape, VectorPathShape
 } from './vector';
 export {
-    WorkingFileLayer, WorkingFileLayerBlendingMode, WorkingFileLayerType, WorkingFileLayerRenderer, WorkingFileGroupLayer,
+    NewFilePreset, WorkingFileLayer, WorkingFileLayerBlendingMode, WorkingFileLayerType, WorkingFileLayerRenderer, WorkingFileGroupLayer,
     WorkingFileRasterLayer, WorkingFileVectorLayer, WorkingFileTextLayer
 } from './working-file';

@@ -1,6 +1,8 @@
 <template>
-    <div ref="canvasContainer" class="ogr-canvas-container" :class="{ 'ogr-canvas-viewport-css': useCssViewport }">
-        <canvas ref="canvas" class="ogr-canvas" />
+    <div ref="canvasArea" class="ogr-canvas-area">
+        <div ref="canvasContainer" class="ogr-canvas-container" :class="{ 'ogr-canvas-viewport-css': useCssViewport }">
+            <canvas ref="canvas" class="ogr-canvas" />
+        </div>
     </div>
 </template>
 
@@ -18,6 +20,7 @@ export default defineComponent({
         const rootElement = inject<Ref<Element>>('rootElement');
         const mainElement = inject<Ref<Element>>('mainElement');
         const canvas = ref<HTMLCanvasElement>();
+        const canvasArea = ref<HTMLDivElement>();
         const canvasContainer = ref<HTMLDivElement>();
         const { useCssViewport, viewWidth: viewportWidth, viewHeight: viewportHeight } = toRefs(canvasStore.state);
         const { width: imageWidth, height: imageHeight } = toRefs(workingFileStore.state);
@@ -119,9 +122,9 @@ export default defineComponent({
 
         // Centers the canvas and displays at 1x zoom or the maximum width/height of the window, whichever is smaller. 
         function resetTransform() {
-            if (canvas.value && ctx && mainElement) {
+            if (canvasArea.value && ctx && mainElement) {
                 const devicePixelRatio = window.devicePixelRatio || 1;
-                const canvasRect = canvas.value.getBoundingClientRect();
+                const canvasAreaRect = canvasArea.value.getBoundingClientRect();
                 const mainRect = mainElement.value.getBoundingClientRect();
                 const imageWidth = workingFileStore.get('width');
                 const imageHeight = workingFileStore.get('height');
@@ -137,8 +140,8 @@ export default defineComponent({
                     scaledHeight = imageHeight / heightToDisplayRatio;
                     scaledWidth = scaledHeight * imageSizeRatio;
                 }
-                const centerX = (mainRect.left - canvasRect.left) + ((mainRect.right - mainRect.left) / 2) * devicePixelRatio;
-                const centerY = (mainRect.top - canvasRect.top) + ((mainRect.bottom - mainRect.top) / 2) * devicePixelRatio;
+                const centerX = (mainRect.left - canvasAreaRect.left) + ((mainRect.right - mainRect.left) / 2) * devicePixelRatio;
+                const centerY = (mainRect.top - canvasAreaRect.top) + ((mainRect.bottom - mainRect.top) / 2) * devicePixelRatio;
                 const transform = new DOMMatrix();
                 transform.translateSelf(Math.round(centerX - (scaledWidth / 2)), Math.round(centerY - (scaledHeight / 2)));
                 if (widthToDisplayRatio > 1 || heightToDisplayRatio > 1) {
@@ -180,6 +183,7 @@ export default defineComponent({
 
         return {
             canvas,
+            canvasArea,
             canvasContainer,
             useCssViewport
         };

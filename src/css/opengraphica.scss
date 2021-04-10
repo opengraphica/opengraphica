@@ -137,6 +137,17 @@ body.ogr-full-page {
         width: auto !important;
     }
 
+    .ogr-canvas-area {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+    }
+
     .ogr-canvas-container {
         display: block;
         position: absolute;
