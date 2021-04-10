@@ -243,8 +243,8 @@ export default defineComponent({
                     let convertedHeight = convertUnits(formData.workingFile.height, formData.workingFile.measuringUnits, 'px', formData.workingFile.resolution, formData.workingFile.resolutionUnits);
                     await createNewFile({
                         measuringUnits: formData.workingFile.measuringUnits,
-                        width: Math.min(1, convertedWidth % 1 < 0.0000000000000001 ? Math.floor(convertedWidth) : Math.ceil(convertedWidth)),
-                        height: Math.min(1, convertedHeight % 1 < 0.0000000000000001 ? Math.floor(convertedHeight) : Math.ceil(convertedHeight)),
+                        width: Math.max(1, convertedWidth % 1 < 0.0000000000000001 ? Math.floor(convertedWidth) : Math.ceil(convertedWidth)),
+                        height: Math.max(1, convertedHeight % 1 < 0.0000000000000001 ? Math.floor(convertedHeight) : Math.ceil(convertedHeight)),
                         resolutionX: formData.workingFile.resolution,
                         resolutionY: formData.workingFile.resolution,
                         resolutionUnits: formData.workingFile.resolutionUnits,
