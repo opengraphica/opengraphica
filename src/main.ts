@@ -52,6 +52,7 @@ if ((window as any).webpackHotUpdateOpenGraphica) {
     setTimeout(() => {
         (window as any).OpenGraphica = app;
     }, 50);
+    document.title = 'OpenGraphica - Dev'
 }
 
 export default app;

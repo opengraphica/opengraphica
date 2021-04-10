@@ -1,12 +1,14 @@
 # OpenGraphica
 
-OpenGraphica is an upcoming raster and vector image editing program.
+OpenGraphica is an upcoming raster and vector image editing program that runs in your web browser. It is free to use and open source under the MIT license, and works as an alternative to Photoshop for most common photo editing tasks.
 
-## Usage
+Use OpenGraphica at https://opengraphica.com/
 
-The OpenGraphica editor assets are built into a filesystem of Javascript and CSS files. All of these files must be deployed together, since OpenGraphica dynamically loads them from the filesystem as needed.
+## Deployment
 
-To build OpenGraphica as a website, clone the repository then run the Node.js commands:
+OpenGraphica may be integrated into existing web applications which require a photo editor.
+
+To build OpenGraphica as a website: install [Node.js](https://nodejs.org/en/), clone this repository, then run these Node.js commands in the repository folder:
 ```
 npm install
 npm run build:website
@@ -37,20 +39,21 @@ Production-ready files will output in the `www` folder. You may view the index.h
 
 As shown in the example above, you must first configure OpenGraphica with the the list of themes that the user will be able to pick from. The theme URLs are relative to the index.html page.
 
-Afterwards, tell OpenGraphica where it should mount itself in the DOM. OpenGraphica is a Vue 3 application, and you can [view the Vue 3 documentation](https://v3.vuejs.org/guide/migration/global-api.html#mounting-app-instance) for complete details on working with a Vue 3 app.
+Afterwards, the "mount" method tells OpenGraphica where it should be placed in the DOM. OpenGraphica is a Vue 3 application, and you can [view the Vue 3 documentation](https://v3.vuejs.org/guide/migration/global-api.html#mounting-app-instance) for complete details on working with a Vue 3 app.
 
 ## Contributing
 
 ### Development Workspace Setup
 
-1. Clone this repository and install https://nodejs.org/en/
+1. Clone this repository and install [Node.js](https://nodejs.org/en/)
 2. Open a terminal in the repository directory, and run:
     
     `npm install`
 
 ### Development Server
 
-Command to start the dev server:
+Start the development server with this command:
+
 ```
 npm run dev
 ```
@@ -58,6 +61,7 @@ npm run dev
 Then open the link `http://localhost:8080/` in any web browser.
 
 CSS files are packaged separately. After modifying any file under the `src/css` directory, run:
+
 ```
 npm run build:css
 ```
