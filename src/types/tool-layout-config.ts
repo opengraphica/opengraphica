@@ -72,6 +72,7 @@ export interface ModuleDefinition {
         type: 'ui' | 'function';
         target: string;
     };
+    preload?: boolean;
 }
 
 export interface ModuleGroupDefinition {

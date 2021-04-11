@@ -46,6 +46,14 @@ body.ogr-full-page {
     -webkit-user-select: none;
     user-select: none;
 
+    #ogr-tmp-file-input-container {
+        position: absolute;
+        opacity: 0.01;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+    }
+
     .ogr-dialogs {
         .el-dialog.el-dialog--medium {
             width: 25rem !important;

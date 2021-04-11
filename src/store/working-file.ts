@@ -8,6 +8,7 @@ interface WorkingFileState {
     drawOriginX: number;
     drawOriginY: number;
     height: number; // Always pixels
+    layerIdCounter: number;
     layers: WorkingFileLayer<RGBAColor>[];
     measuringUnits: 'px' | 'mm' | 'cm' | 'in';
     resolutionUnits: 'px/in' | 'px/mm' | 'px/cm';
@@ -30,6 +31,7 @@ const store = new PerformantStore<WorkingFileStore>({
         drawOriginX: 0,
         drawOriginY: 0,
         height: 892, // Always pixels
+        layerIdCounter: 0,
         layers: [],
         measuringUnits: 'px',
         resolutionUnits: 'px/in',

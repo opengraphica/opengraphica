@@ -10,6 +10,15 @@
                     "type": "ui",
                     "target": "file-new"
                 }
+            },
+            "open": {
+                "name": "Open Image",
+                "description": "Open an image or project file in a new workspace.",
+                "action": {
+                    "type": "function",
+                    "target": "file/open.openFromFileDialog"
+                },
+                "preload": true
             }
         }
     }

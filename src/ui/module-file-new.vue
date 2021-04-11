@@ -111,7 +111,7 @@ import { notifyInjector, unexpectedErrorMessage, validationSubmissionErrorMessag
 import { convertUnits } from '@/lib/metrics';
 import { NewFilePreset } from '@/types';
 import { Rules, RuleItem } from 'async-validator';
-import createNewFile from '@/modules/file/new';
+import { createNewFile } from '@/modules/file/new';
 
 const defaultNewFilePresets: NewFilePreset[] = defaultNewFilePresetsJson as any;
 

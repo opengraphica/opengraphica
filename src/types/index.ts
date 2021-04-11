@@ -15,5 +15,6 @@ export {
 } from './vector';
 export {
     NewFilePreset, WorkingFileLayer, WorkingFileLayerBlendingMode, WorkingFileLayerType, WorkingFileLayerRenderer, WorkingFileGroupLayer,
-    WorkingFileRasterLayer, WorkingFileVectorLayer, WorkingFileTextLayer
+    WorkingFileRasterLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer, InsertGroupLayerOptions, InsertRasterLayerOptions,
+    InsertVectorLayerOptions, InsertTextLayerOptions
 } from './working-file';

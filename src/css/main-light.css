@@ -5353,6 +5353,13 @@ body.ogr-full-page {
   -webkit-user-select: none;
   user-select: none;
 }
+.opengraphica #ogr-tmp-file-input-container {
+  position: absolute;
+  opacity: 0.01;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
 .opengraphica .ogr-dialogs .el-dialog.el-dialog--medium {
   width: 25rem !important;
   max-width: 90%;

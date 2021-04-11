@@ -1,5 +1,5 @@
 <template>
-    <div ref="root" class="opengraphica" @touchstart="onTouchStartRoot($event)">
+    <div ref="root" class="opengraphica" @touchstart="onTouchStartRoot($event)" v-loading="loading">
         <app-canvas />
         <app-layout-dnd-container @dnd-ready="onDndLayoutReady($event)" />
         <app-dialogs />
@@ -13,20 +13,25 @@ import AppDialogs from '@/ui/app-dialogs.vue';
 import AppLayoutDndContainer from '@/ui/app-layout-dnd-container.vue';
 import canvasStore from '@/store/canvas';
 import ResizeObserver from 'resize-observer-polyfill';
+import ElLoading from 'element-plus/lib/el-loading';
+import { preloadModules } from '@/modules';
 
 export default defineComponent({
     name: 'App',
+    directives: {
+        loading: ElLoading.directive
+    },
     components: {
         AppCanvas,
         AppDialogs,
         AppLayoutDndContainer
     },
     setup() {
+        const loading = ref<boolean>(true);
         const rootElement = ref<Element | null>(null);
         const mainElement = ref<Element | null>(null);
 
         onMounted(() => {
-
             // Full page fixes for quirks in browsers (Chrome)
             if (document.body.classList.contains('ogr-full-page')) {
                 // Reset user zoom on some browsers
@@ -65,12 +70,20 @@ export default defineComponent({
                 window.addEventListener('resize', onResizeWindow);
             }
 
+            asyncMountSetup();
         });
 
         onUnmounted(() => {
             document.removeEventListener('contextmenu', onContextMenu);
             window.removeEventListener('resize', onResizeWindow);
         });
+
+        async function asyncMountSetup() {
+            // Preload some modules which need to be executed immediately
+            await preloadModules();
+
+            loading.value = false;
+        }
 
         function onContextMenu(e: Event) {
             const target = e.target as Node;
@@ -100,6 +113,7 @@ export default defineComponent({
         provide('mainElement', mainElement);
 
         return {
+            loading,
             root: rootElement,
             onDndLayoutReady,
             onTouchStartRoot

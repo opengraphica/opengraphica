@@ -44,6 +44,7 @@ export interface WorkingFileRasterLayer<T extends ColorModel> extends WorkingFil
     type: 'raster';
     data: {
         sourceImage?: HTMLImageElement;
+        sourceImageIsObjectUrl?: boolean;
         draftImage?: HTMLCanvasElement;
     }
 }
@@ -56,6 +57,21 @@ export interface WorkingFileVectorLayer<T extends ColorModel> extends WorkingFil
 export interface WorkingFileTextLayer<T extends ColorModel> extends WorkingFileLayer<T> {
     type: 'text';
     data: {}; // TODO
+}
+
+export type WorkingFileAnyLayer<T extends ColorModel> = WorkingFileGroupLayer<T> | WorkingFileRasterLayer<T> | WorkingFileVectorLayer<T> | WorkingFileTextLayer<T>;
+
+export interface InsertGroupLayerOptions<T extends ColorModel> extends Partial<WorkingFileGroupLayer<T>> {
+    type: 'group';
+}
+export interface InsertRasterLayerOptions<T extends ColorModel> extends Partial<WorkingFileRasterLayer<T>> {
+    type: 'raster';
+}
+export interface InsertVectorLayerOptions<T extends ColorModel> extends Partial<WorkingFileVectorLayer<T>> {
+    type: 'vector';
+}
+export interface InsertTextLayerOptions<T extends ColorModel> extends Partial<WorkingFileTextLayer<T>> {
+    type: 'text';
 }
 
 export interface NewFilePreset {

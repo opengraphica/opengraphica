@@ -114,7 +114,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref, computed, nextTick } from 'vue';
 import ElDivider from 'element-plus/lib/el-divider';
 import ElForm from 'element-plus/lib/el-form';
 import ElFormItem from 'element-plus/lib/el-form-item';
@@ -178,6 +178,7 @@ export default defineComponent({
 
         async function onMenuSelect(group: string, index: string) {
             loading.value = true;
+            await nextTick();
             try {
                 switch (group) {
                     case 'file':
@@ -185,10 +186,14 @@ export default defineComponent({
                             case 'new':
                                 await runModule('file', 'new');
                                 break;
+                            case 'open':
+                                await runModule('file', 'open');
+                                break;
                         }
                     break;
                 }
             } catch (error) {
+                console.log(error);
                 $notify({
                     type: 'error',
                     title: 'An Error Occurred',

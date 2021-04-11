@@ -19,7 +19,7 @@ export class CreateNewFileAction extends BaseAction {
     private previousState: { [key: string]: any } = {};
 
     constructor(createFileOptions: CreateNewFileOptions) {
-        super('create-new-file', 'New File');
+        super('createNewFile', 'New File');
         this.createFileOptions = createFileOptions;
 	}
 	public async do() {
@@ -31,6 +31,7 @@ export class CreateNewFileAction extends BaseAction {
             drawOriginX: 0,
             drawOriginY: 0,
             height: this.createFileOptions.height,
+            layerIdCounter: 0,
             layers: [],
             measuringUnits: this.createFileOptions.measuringUnits || 'px',
             resolutionUnits: this.createFileOptions.resolutionUnits || 'px/in',

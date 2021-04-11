@@ -1,7 +1,12 @@
+import BaseLayerRenderer from './base';
 import RasterLayerRenderer from './raster';
 
 const renderers = {
-    raster: new RasterLayerRenderer()
+    base: new BaseLayerRenderer(),
+    group: new BaseLayerRenderer(),
+    raster: new RasterLayerRenderer(),
+    text: new BaseLayerRenderer(),
+    vector: new BaseLayerRenderer()
 };
 
 export default renderers;
