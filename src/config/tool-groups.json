@@ -1,4 +1,15 @@
 {
+    "draw": {
+        "name": "Draw",
+        "description": "Brushes, pencils, pens, and vector art drawing tools.",
+        "tools": {
+            "brush": {
+                "name": "Brush",
+                "description": "Brushes that draw on raster layers.",
+                "controller": "free-transform"
+            }
+        }
+    },
     "transform": {
         "name": "Transform",
         "description": "Tools for moving, rotating, scaling the layer.",

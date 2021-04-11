@@ -6,6 +6,7 @@
         label-position="left"
         :model="formData.workingFile"
         :rules="formValidationRules"
+        novalidate="novalidate"
         hide-required-asterisk
         @submit="onCreate">
         <el-form-item-aligned-groups>
@@ -238,6 +239,15 @@ export default defineComponent({
             try {
                 await form.value.validate();
                 loading.value = true;
+                // Remove focus from input so keyboard hides on mobile (without this, viewport calculation is off)
+                try {
+                    (document.activeElement as any).blur();
+                    await new Promise((resolve) => {
+                        setTimeout(resolve, 100);
+                    });
+                } catch (e) {
+                    // Do nothing
+                }
                 try {
                     let convertedWidth = convertUnits(formData.workingFile.width, formData.workingFile.measuringUnits, 'px', formData.workingFile.resolution, formData.workingFile.resolutionUnits);
                     let convertedHeight = convertUnits(formData.workingFile.height, formData.workingFile.measuringUnits, 'px', formData.workingFile.resolution, formData.workingFile.resolutionUnits);

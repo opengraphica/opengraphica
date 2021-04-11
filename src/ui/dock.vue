@@ -2,7 +2,7 @@
     <div class="ogr-dock">
         <suspense>
             <template #default>
-                <component :is="name" @close-popover="onClosePopover" />
+                <component :is="name" @close="onCloseDock" @update:title="onUpdateTitle" />
             </template>
             <template #fallback>
                 <div style="width: 5rem; height: 5rem;" v-loading="true" element-loading-background="transparent"></div>
@@ -24,7 +24,8 @@ export default defineComponent({
         'settings': defineAsyncComponent(() => import(/* webpackChunkName: 'dock-settings' */ `./dock-settings.vue`))
     },
     emits: [
-        'close-popover'
+        'close',
+        'update:title'
     ],
     props: {
         name: {
@@ -34,12 +35,17 @@ export default defineComponent({
     },
     setup(props, { emit }) {
 
-        function onClosePopover() {
-            emit('close-popover', ...arguments);
+        function onCloseDock() {
+            emit('close', ...arguments);
+        }
+
+        function onUpdateTitle() {
+            emit('update:title', ...arguments);
         }
         
         return {
-            onClosePopover
+            onCloseDock,
+            onUpdateTitle
         };
     }
 });

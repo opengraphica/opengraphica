@@ -20,6 +20,14 @@
                         "deform",
                         "erase",
                         "layers"
+                    ],
+                    "favorites": [
+                        "settings",
+                        "layers",
+                        "transform",
+                        "draw",
+                        "erase",
+                        "text"
                     ]
                 }
             }

@@ -1,8 +1,11 @@
 <template>
     <div class="ogr-dialogs">
         <template v-for="dialog of dialogs" :key="dialog.id">
-            <el-dialog :title="dialog.title" :custom-class="'el-dialog--' + dialog.size" v-model="dialog.visible" destroy-on-close @closed="onDialogClosed(dialog)">
-                <template v-if="dialog.type === 'module'">
+            <el-dialog :title="dialog.title" :custom-class="'el-dialog--' + dialog.size + ' el-dialog--ogr-' + dialog.type" v-model="dialog.visible" destroy-on-close @closed="onDialogClosed(dialog)">
+                <template v-if="dialog.type === 'dock'">
+                    <dock :name="dialog.dock.name" @update:title="dialog.title = $event" @close="dialog.visible = false" />
+                </template>
+                <template v-else-if="dialog.type === 'module'">
                     <module :name="dialog.module.name" @update:title="dialog.title = $event" @close="dialog.visible = false" />
                 </template>
             </el-dialog>
@@ -12,6 +15,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
+import Dock from './dock.vue';
 import Module from './module.vue';
 import appEmitter, { AppEmitterEvents } from '@/lib/emitter';
 import ElDialog from 'element-plus/lib/el-dialog';
@@ -20,19 +24,25 @@ interface DialogCommonDefinition {
     id: number;
     title: string;
     visible: boolean;
-    size: 'small' | 'medium' | 'large' | 'big'
+    size: 'small' | 'medium' | 'large' | 'big';
+}
+
+interface DockDialogDefinition extends DialogCommonDefinition {
+    type: 'dock';
+    dock: AppEmitterEvents['app.dialogs.openFromDock']
 }
 
 interface ModuleDialogDefinition extends DialogCommonDefinition {
-    type: 'module',
-    module: AppEmitterEvents['app.dialogs.openFromModule']
+    type: 'module';
+    module: AppEmitterEvents['app.dialogs.openFromModule'];
 }
 
-type DialogDefinition = ModuleDialogDefinition;
+type DialogDefinition = DockDialogDefinition | ModuleDialogDefinition;
 
 export default defineComponent({
     name: 'AppDialogs',
     components: {
+        Dock,
         ElDialog,
         Module
     },
@@ -41,12 +51,27 @@ export default defineComponent({
         const dialogs = ref<DialogDefinition[]>([]);
 
         onMounted(() => {
+            appEmitter.on('app.dialogs.openFromDock', handleDockOpen);
             appEmitter.on('app.dialogs.openFromModule', handleModuleOpen);
         });
 
         onUnmounted(() => {
+            appEmitter.off('app.dialogs.openFromDock', handleDockOpen);
             appEmitter.off('app.dialogs.openFromModule', handleModuleOpen);
         });
+
+        function handleDockOpen(event?: AppEmitterEvents['app.dialogs.openFromDock']) {
+            if (event) {
+                dialogs.value.push({
+                    type: 'dock',
+                    id: dialogIdCounter++,
+                    title: '',
+                    visible: true,
+                    dock: event,
+                    size: 'medium'
+                });
+            }
+        }
 
         function handleModuleOpen(event?: AppEmitterEvents['app.dialogs.openFromModule']) {
             if (event) {

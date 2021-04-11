@@ -1,6 +1,32 @@
 @mixin element-plus-enhancements {
-    .el-dialog__header + .el-dialog__body {
-        padding-top: 0.75rem;
+    .el-dialog {
+        &.el-dialog--ogr-dock {
+            .el-dialog__body {
+                padding: 0 !important;
+            }
+        }
+        .el-dialog__header + .el-dialog__body {
+            padding-top: 0.75rem;
+        }
+    }
+
+    .el-drawer {
+        .el-drawer__body {
+            position: relative;
+        }
+    }
+
+    .el-form-item {
+        &.el-form-item--menu-item {
+            display: flex;
+            padding: 0 1.25rem;
+            margin: 0;
+
+            > .el-form-item__label {
+                flex-grow: 1;
+                text-align: left;
+            }
+        }
     }
 
     .el-form-item-group {
@@ -205,6 +231,18 @@
         margin-right: 0.3125rem;
         width: 1.5rem;
         text-align: center;
+    }
+
+    .el-radio-button{ 
+        &.is-active {
+            cursor: default !important;
+            .el-radio-button__inner {
+                cursor: default !important;
+            }
+        }
+        .el-radio-button__orig-radio:disabled + .el-radio-button__inner {
+            cursor: default !important;
+        }
     }
 
     .el-loading-spinner {

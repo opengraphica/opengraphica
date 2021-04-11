@@ -3,6 +3,9 @@ import mitt, { Handler } from 'mitt';
 interface AppEmitterEvents {
     'app.canvas.resetTransform': undefined;
     'app.component.register': any;
+    'app.dialogs.openFromDock': {
+        name: string;
+    },
     'app.dialogs.openFromModule': {
         name: string;
     };

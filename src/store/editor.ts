@@ -10,6 +10,7 @@ interface EditorState {
     activeTheme: { name: string, linkElement: HTMLLinkElement } | null;
     activeTool: string | null;
     activeToolGroup: string | null;
+    loadingThemeName: string | null;
     themes: {
         [themeName: string]: string;
     };
@@ -37,6 +38,7 @@ const store = new PerformantStore<EditorStore>({
         activeTheme: null,
         activeTool: null,
         activeToolGroup: null,
+        loadingThemeName: null,
         themes: {},
         toolCanvasController: new BaseCanvasController()
     },
@@ -47,14 +49,17 @@ const store = new PerformantStore<EditorStore>({
                 const activeThemeName: string = value;
                 const themes = store.state.themes;
                 if (themes[activeThemeName]) {
+                    let oldLinkElement;
                     if (store.state.activeTheme) {
-                        const linkElement = store.state.activeTheme.linkElement;
-                        if (linkElement.parentNode) {
-                            linkElement.parentNode.removeChild(linkElement);
-                        }
+                        oldLinkElement = store.state.activeTheme.linkElement;
                     }
+                    set('loadingThemeName', activeThemeName);
                     const linkElement = await loadStylesheet(themes[activeThemeName]);
-                    set('activeTheme', { name: activeThemeName, linkElement });
+                    await set('activeTheme', { name: activeThemeName, linkElement });
+                    set('loadingThemeName', null);
+                    if (oldLinkElement && oldLinkElement.parentNode) {
+                        oldLinkElement.parentNode.removeChild(oldLinkElement);
+                    }
                 }
                 break;
 

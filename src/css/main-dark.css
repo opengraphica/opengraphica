@@ -5325,6 +5325,10 @@
   --ogr-border-radius: 0.25rem;
 }
 
+html {
+  overscroll-behavior-y: contain;
+}
+
 body.ogr-full-page {
   display: block;
   width: 100vw;
@@ -5332,6 +5336,7 @@ body.ogr-full-page {
   overflow: hidden;
   margin: 0;
   padding: 0;
+  overscroll-behavior-y: contain;
 }
 
 .opengraphica {
@@ -5405,6 +5410,10 @@ body.ogr-full-page {
   background: var(--ogr-layout-menu-bar-background-color);
   box-shadow: 0 0 0 0.063rem var(--ogr-layout-menu-bar-border-color);
 }
+.opengraphica .ogr-layout-menu-bar .is-flex > .menu-favorites {
+  flex: 1;
+  display: flex;
+}
 .opengraphica .ogr-layout-menu-bar .is-flex > .menu-start, .opengraphica .ogr-layout-menu-bar .is-flex > .menu-end {
   flex: 1;
   display: flex;
@@ -5426,8 +5435,25 @@ body.ogr-full-page {
 .opengraphica .ogr-dock-popover {
   min-width: 0 !important;
   max-width: 90vw;
+  max-height: calc(100vh - 5rem) !important;
   padding: 0 !important;
   width: auto !important;
+}
+.opengraphica .ogr-dock-popover > .ogr-dock {
+  max-height: calc(100vh - 5rem) !important;
+  overflow: hidden !important;
+}
+.opengraphica .ogr-dock-popover > .ogr-dock > .el-tabs {
+  max-height: calc(100vh - 5rem) !important;
+  overflow: hidden !important;
+}
+.opengraphica .ogr-dock-popover > .ogr-dock > .el-tabs > .el-tabs__content, .opengraphica .ogr-dock-popover > .ogr-dock > .el-tabs > .el-tabs__content > .el-tab-pane, .opengraphica .ogr-dock-popover > .ogr-dock > .el-tabs > .el-tabs__content > .el-tab-pane > .el-scrollbar {
+  max-height: calc(100vh - 10rem) !important;
+  overflow: hidden !important;
+}
+.opengraphica .ogr-dock-popover > .ogr-dock > .el-tabs > .el-tabs__content > .el-tab-pane > .el-scrollbar > .el-scrollbar__wrap {
+  max-height: calc(100vh - 10rem) !important;
+  overflow: auto !important;
 }
 .opengraphica .ogr-canvas-area {
   display: block;
@@ -72522,6 +72548,10 @@ body.ogr-full-page {
 
 :root {
   --ogr-background-color: #1f252d;
+  --ogr-form-connected-label-background-color: #232831;
+  --ogr-form-connected-label-border-color: #191d25;
+  --ogr-form-connected-label-input-hover-color: #f0f2f3;
+  --ogr-form-connected-label-input-focus-color: #272c37;
   --ogr-layout-menu-bar-border-color: #0e1014;
   --ogr-layout-menu-bar-background-color: #222933;
   --ogr-working-image-border-color: black;
@@ -73823,8 +73853,36 @@ body.ogr-full-page {
 .opengraphica .leading-loose {
   line-height: 2;
 }
-.opengraphica .el-dialog__header + .el-dialog__body {
+.opengraphica .is-fullheight {
+  height: 100%;
+}
+.opengraphica .is-fullwidth {
+  width: 100%;
+}
+.opengraphica .is-position-absolute-full {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.opengraphica .el-dialog.el-dialog--ogr-dock .el-dialog__body {
+  padding: 0 !important;
+}
+.opengraphica .el-dialog .el-dialog__header + .el-dialog__body {
   padding-top: 0.75rem;
+}
+.opengraphica .el-drawer .el-drawer__body {
+  position: relative;
+}
+.opengraphica .el-form-item.el-form-item--menu-item {
+  display: flex;
+  padding: 0 1.25rem;
+  margin: 0;
+}
+.opengraphica .el-form-item.el-form-item--menu-item > .el-form-item__label {
+  flex-grow: 1;
+  text-align: left;
 }
 .opengraphica .el-form-item-group {
   --label-min-width: 0px;
@@ -73996,6 +74054,15 @@ body.ogr-full-page {
   margin-right: 0.3125rem;
   width: 1.5rem;
   text-align: center;
+}
+.opengraphica .el-radio-button.is-active {
+  cursor: default !important;
+}
+.opengraphica .el-radio-button.is-active .el-radio-button__inner {
+  cursor: default !important;
+}
+.opengraphica .el-radio-button .el-radio-button__orig-radio:disabled + .el-radio-button__inner {
+  cursor: default !important;
 }
 .opengraphica .el-loading-spinner svg {
   display: inline;

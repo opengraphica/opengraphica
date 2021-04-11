@@ -140,8 +140,8 @@ export default defineComponent({
                     scaledHeight = imageHeight / heightToDisplayRatio;
                     scaledWidth = scaledHeight * imageSizeRatio;
                 }
-                const centerX = (mainRect.left - canvasAreaRect.left) + ((mainRect.right - mainRect.left) / 2) * devicePixelRatio;
-                const centerY = (mainRect.top - canvasAreaRect.top) + ((mainRect.bottom - mainRect.top) / 2) * devicePixelRatio;
+                const centerX = ((mainRect.left - canvasAreaRect.left) + ((mainRect.right - mainRect.left) / 2)) * devicePixelRatio;
+                const centerY = ((mainRect.top - canvasAreaRect.top) + ((mainRect.bottom - mainRect.top) / 2)) * devicePixelRatio;
                 const transform = new DOMMatrix();
                 transform.translateSelf(Math.round(centerX - (scaledWidth / 2)), Math.round(centerY - (scaledHeight / 2)));
                 if (widthToDisplayRatio > 1 || heightToDisplayRatio > 1) {

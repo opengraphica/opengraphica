@@ -9,6 +9,10 @@
     --ogr-border-radius: 0.25rem;
 }
 
+html {
+    overscroll-behavior-y: contain;
+}
+
 body.ogr-full-page {
     display: block;
     width: 100vw;
@@ -16,6 +20,7 @@ body.ogr-full-page {
     overflow: hidden;
     margin: 0;
     padding: 0;
+    overscroll-behavior-y: contain;
 }
 
 .opengraphica {
@@ -107,6 +112,11 @@ body.ogr-full-page {
         box-shadow: 0 0 0 0.063rem var(--ogr-layout-menu-bar-border-color);
 
         .is-flex {
+            > .menu-favorites {
+                flex: 1;
+                display: flex;
+            }
+
             > .menu-start, > .menu-end {
                 flex: 1;
                 display: flex;
@@ -133,8 +143,28 @@ body.ogr-full-page {
     .ogr-dock-popover {
         min-width: 0 !important;
         max-width: 90vw;
+        max-height: calc(100vh - 5rem) !important;
         padding: 0 !important;
         width: auto !important;
+
+        > .ogr-dock {
+            max-height: calc(100vh - 5rem) !important;
+            overflow: hidden !important;
+
+            > .el-tabs {
+                max-height: calc(100vh - 5rem) !important;
+                overflow: hidden !important;
+
+                > .el-tabs__content, > .el-tabs__content > .el-tab-pane, > .el-tabs__content > .el-tab-pane > .el-scrollbar {
+                    max-height: calc(100vh - 10rem) !important;
+                    overflow: hidden !important;
+                }
+                > .el-tabs__content > .el-tab-pane > .el-scrollbar > .el-scrollbar__wrap {
+                    max-height: calc(100vh - 10rem) !important;
+                    overflow: auto !important;
+                }
+            }
+        }
     }
 
     .ogr-canvas-area {

@@ -3,6 +3,7 @@ export {
     ColorModel, ColorModelName, CMYKAColor, RGBAColor, HSVAColor, HSLAColor,
     Gradient, LinearGradient, RadialGradient, GradientStop
 } from './color';
+export { FilterAugment } from './filter';
 export {
     LayoutShortcutGroupDefinition, LayoutShortcutGroupDefinitionControl, LayoutShortcutGroupDefinitionControlButton,
     ActionGroupControlEventHandler, DndLayout, DndLayoutComponent, DndLayoutDock, DndLayoutMenuBar, ToolDefinition, ToolGroupDefinition,

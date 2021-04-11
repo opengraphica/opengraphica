@@ -1,6 +1,6 @@
 <template>
     <div class="ogr-layout-menu-bar" @touchmove="onTouchMoveMenuBar($event)">
-        <div class="is-flex container mx-auto">
+        <div ref="flexContainer" class="is-flex container mx-auto">
             <div v-for="(actionGroupSection, actionGroupSectionName) of actionGroups" :key="actionGroupSectionName" class="py-2" :class="['menu-' + actionGroupSectionName, { 'px-3': actionGroupSectionName !== 'center' }]">
                 <template v-for="actionGroup of actionGroupSection" :key="actionGroup.id">
                     <component :is="actionGroup.controls.length === 1 ? 'div' : 'el-button-group'" :class="{ 'single-button-group': actionGroup.controls.length === 1 }">
@@ -38,11 +38,11 @@
                                 <template v-if="control.showDock">
                                     <dynamically-loaded-dock
                                         :name="control.action.target" :key="'dock-' + control.action.target"
-                                        @close-popover="control.popoverVisible = false"
+                                        @close="control.popoverVisible = false"
                                     />
                                 </template>
                                 <template v-else>
-                                    <div class="p-2">
+                                    <div class="px-3 py-2">
                                         {{ control.label }}
                                     </div>
                                 </template>
@@ -51,20 +51,78 @@
                     </component>
                 </template>
             </div>
+            <div v-if="displayMode === 'favorites'" class="menu-end py-2 px-3">
+                <div class="single-button-group">
+                    <el-popover
+                        v-model:visible="showMoreActionsTooltip"
+                        :trigger="showMoreActionsMenu ? 'manual' : 'hover'"
+                        effect="light"
+                        placement="bottom"
+                        :popper-class="'ogr-dock-popover'"
+                        :show-after="500"
+                        :append-to-body="false"
+                        :popper-options="{ boundariesElement: 'body' }">
+                        <template #reference>
+                            <el-button
+                                aria-label="More Tools"
+                                icon="bi bi-list"
+                                plain
+                                circle
+                                @click="showMoreActionsMenu = true; showMoreActionsTooltip = false"
+                            ></el-button>
+                        </template>
+                        <div class="px-3 py-2">
+                            More Tools
+                        </div>
+                    </el-popover>
+                </div>
+                <el-drawer
+                    v-model="showMoreActionsMenu"
+                    title="Tools and Settings"
+                    :size="300"
+                    :append-to-body="false">
+                    <div class="is-position-absolute-full">
+                        <el-scrollbar>
+                            <el-menu :default-active="activeToolGroup">
+                                <template v-for="(actionGroupSection, actionGroupSectionName) of allActionGroups" :key="actionGroupSectionName">
+                                    <template v-for="actionGroup of actionGroupSection" :key="actionGroup.id">
+                                        <template v-for="control of actionGroup.controls" :key="control.label">
+                                            <el-menu-item
+                                                v-if="actionGroup.id !== 'search'"
+                                                :index="control.action && control.action.type === 'toolGroup' ? actionGroup.id : null"
+                                                @click="onPressControlButton('modal', 0, control)"
+                                            >
+                                                <i :class="control.icon + ' mr-3'" aria-hidden="true"></i>
+                                                <span>{{ control.label }}</span>
+                                            </el-menu-item>
+                                        </template>
+                                    </template>
+                                </template>
+                            </el-menu>
+                        </el-scrollbar>
+                    </div>
+                </el-drawer>
+            </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, watch, PropType, ref, onMounted, onUnmounted, toRefs } from 'vue';
+import { defineComponent, computed, nextTick, watch, PropType, ref, onMounted, onUnmounted, toRefs } from 'vue';
 import ElButton from 'element-plus/lib/el-button';
 import ElButtonGroup from 'element-plus/lib/el-button-group';
+import ElDrawer from 'element-plus/lib/el-drawer';
+import ElMenu from 'element-plus/lib/el-menu';
+import ElMenuItem from 'element-plus/lib/el-menu-item';
 import ElPopover from 'element-plus/lib/el-popover';
+import ElScrollbar from 'element-plus/lib/el-scrollbar';
 import ElTag from 'element-plus/lib/el-tag';
 import { LayoutShortcutGroupDefinition, LayoutShortcutGroupDefinitionControlButton, DndLayoutMenuBar } from '@/types';
 import actionGroupsDefinition from '@/config/layout-shortcut-groups.json';
+import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import preferencesStore from '@/store/preferences';
+import appEmitter from '@/lib/emitter';
 import Dock from './dock.vue';
 
 export default defineComponent({
@@ -73,27 +131,80 @@ export default defineComponent({
         DynamicallyLoadedDock: Dock,
         ElButton,
         ElButtonGroup,
-        ElTag,
-        ElPopover
+        ElDrawer,
+        ElMenu,
+        ElMenuItem,
+        ElPopover,
+        ElScrollbar,
+        ElTag
     },
     props: {
         config: {
             type: Object as PropType<DndLayoutMenuBar>,
             required: true
+        },
+        direction: {
+            type: String as PropType<'horizontal' | 'vertical'>,
+            default: 'horizontal'
         }
     },
     setup(props, options) {
         let activeControlDock: LayoutShortcutGroupDefinitionControlButton | null = null;
+        let flexContainer = ref<HTMLDivElement>();
+        let displayMode = ref<'all' | 'favorites'>('all');
+        let showMoreActionsMenu = ref<boolean>(false);
+        let showMoreActionsTooltip = ref<boolean>(false);
+
+        let resizeDebounceHandle: number | undefined = undefined;
         let pointerDownElement: EventTarget | null = null;
         let pointerDownId: number;
         let pointerDownButton: number;
         let pointerDownShowDock: boolean = false;
         let pointerPressHoldTimeoutHandle: number | undefined;
+        const { viewWidth: viewportWidth, viewHeight: viewportHeight } = toRefs(canvasStore.state);
         const { activeToolGroup, activeTool } = toRefs(editorStore.state);
 
-        const actionGroups = ref((() => {
+        const actionGroups = ref<{ [key: string]: LayoutShortcutGroupDefinition[] }>(createActionGroups());
+        const allActionGroups = ref<{ [key: string]: LayoutShortcutGroupDefinition[] }>(createActionGroups('all'));
+
+        watch([displayMode], () => {
+            actionGroups.value = createActionGroups();
+            showMoreActionsMenu.value = false;
+        });
+
+        if (props.direction === 'horizontal') {
+            watch([viewportWidth], () => {
+                window.clearTimeout(resizeDebounceHandle);
+                window.setTimeout(async () => {
+                    displayMode.value = 'all';
+                    await nextTick();
+                    const flexContainerEl = flexContainer.value;
+                    if (flexContainerEl && flexContainerEl.scrollWidth > flexContainerEl.clientWidth) {
+                        displayMode.value = 'favorites';
+                    }
+                }, 100);
+            }, { immediate: true });
+        }
+
+        onMounted(() => {
+            window.addEventListener('mousedown', onMouseDownWindow);
+            window.addEventListener('mouseup', onMouseUpWindow);
+            window.addEventListener('touchstart', onTouchStartWindow);
+            window.addEventListener('touchend', onTouchEndWindow);
+        });
+
+        onUnmounted(() => {
+            window.removeEventListener('mousedown', onMouseDownWindow);
+            window.removeEventListener('mouseup', onMouseUpWindow);
+            window.removeEventListener('touchstart', onTouchStartWindow);
+            window.removeEventListener('touchend', onTouchEndWindow);
+        });
+
+        function createActionGroups(forceDisplayMode?: string): { [key: string]: LayoutShortcutGroupDefinition[] } {
+            forceDisplayMode = forceDisplayMode || displayMode.value;
             let actionGroups: { [key: string]: LayoutShortcutGroupDefinition[] } = {};
-            for (let section  of ['start', 'center', 'end'] as ('start' | 'center' | 'end')[]) {
+            const sectionNames = (forceDisplayMode === 'all' ? ['start', 'center', 'end'] : ['favorites']) as ('start' | 'center' | 'end' | 'favorites')[];
+            for (let section of sectionNames) {
                 if (props.config.actionGroupLayout[section]) {
                     const sectionActionGroups: LayoutShortcutGroupDefinition[] = [];
                     for (let tool of props.config.actionGroupLayout[section]) {
@@ -113,25 +224,11 @@ export default defineComponent({
                 }
             }
             return actionGroups;
-        })());
-
-        onMounted(() => {
-            window.addEventListener('mousedown', onMouseDownWindow);
-            window.addEventListener('mouseup', onMouseUpWindow);
-            window.addEventListener('touchstart', onTouchStartWindow);
-            window.addEventListener('touchend', onTouchEndWindow);
-        });
-
-        onUnmounted(() => {
-            window.removeEventListener('mousedown', onMouseDownWindow);
-            window.removeEventListener('mouseup', onMouseUpWindow);
-            window.removeEventListener('touchstart', onTouchStartWindow);
-            window.removeEventListener('touchend', onTouchEndWindow);
-        });
+        };
 
         function onKeyDownControlButton(event: KeyboardEvent, control: LayoutShortcutGroupDefinitionControlButton) {
             if (event.key === 'Enter') {
-                onPressControlButton(0, control);
+                onPressControlButton('popover', 0, control);
             }
         }
 
@@ -203,7 +300,7 @@ export default defineComponent({
             }
             const button = (event as MouseEvent).button || 0;
             if (pointerDownElement === event.target && pointerDownButton === button && pointerDownId === id) {
-                onPressControlButton(button, control);
+                onPressControlButton('popover', button, control);
                 pointerDownElement = null;
                 pointerDownButton = -1;
                 pointerDownId = -1;
@@ -236,21 +333,29 @@ export default defineComponent({
                 pointerDownId = -1;
             }
         }
-        async function onPressControlButton(button: number, control: LayoutShortcutGroupDefinitionControlButton) {
+        async function onPressControlButton(openTarget: 'popover' | 'modal', button: number, control: LayoutShortcutGroupDefinitionControlButton) {
             if (control.action) {
                 if (control.action.type === 'toolGroup') {
                     if (button === 0 && activeToolGroup.value !== control.action.target) {
                         editorStore.dispatch('setActiveTool', { group: control.action.target });
+                        if (openTarget === 'modal') {
+                            showMoreActionsMenu.value = false;
+                        }
                     } else {
                         
                     }
                 } else if (control.action.type === 'dock') {
-                    if (!pointerDownShowDock) {
-                        activeControlDock = control;
-                        control.showDock = true;
-                        control.popoverVisible = true;
-                    } else {
-                        control.popoverVisible = false;
+                    if (openTarget === 'popover') {
+                        if (!pointerDownShowDock) {
+                            activeControlDock = control;
+                            control.showDock = true;
+                            control.popoverVisible = true;
+                        } else {
+                            control.popoverVisible = false;
+                        }
+                    } else if (openTarget === 'modal') {
+                        appEmitter.emit('app.dialogs.openFromDock', { name: control.action.target });
+                        showMoreActionsMenu.value = false;
                     }
                 }
             }
@@ -265,7 +370,12 @@ export default defineComponent({
         }
 
         return {
+            showMoreActionsMenu,
+            showMoreActionsTooltip,
+            displayMode,
+            flexContainer,
             actionGroups,
+            allActionGroups,
             activeToolGroup,
             activeTool,
             onAfterLeavePopover,
@@ -275,7 +385,8 @@ export default defineComponent({
             onTouchMoveMenuBar,
             onMouseDownControlButton,
             onMouseUpControlButton,
-            onMouseLeaveControlButton
+            onMouseLeaveControlButton,
+            onPressControlButton
         };
     }
 });

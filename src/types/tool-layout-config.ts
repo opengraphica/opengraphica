@@ -4,6 +4,7 @@ export interface DndLayoutMenuBar {
         start: string[];
         center: string[];
         end: string[];
+        favorites: string[];
     }
 }
 

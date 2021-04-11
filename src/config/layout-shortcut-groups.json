@@ -4,7 +4,7 @@
         "controls": [
             {
                 "type": "button",
-                "icon": "bi-eyedropper",
+                "icon": "bi bi-eyedropper",
                 "label": "Pick Color"
             }
         ],
@@ -15,7 +15,7 @@
         "controls": [
             {
                 "type": "button",
-                "icon": "bi-droplet",
+                "icon": "bi bi-droplet",
                 "label": "Deform"
             }
         ],
@@ -26,8 +26,12 @@
         "controls": [
             {
                 "type": "button",
-                "icon": "bi-brush",
-                "label": "Draw"
+                "icon": "bi bi-brush",
+                "label": "Draw",
+                "action": {
+                    "type": "toolGroup",
+                    "target": "draw"
+                }
             }
         ],
         "draggable": true
@@ -37,7 +41,7 @@
         "controls": [
             {
                 "type": "button",
-                "icon": "bi-stars",
+                "icon": "bi bi-stars",
                 "label": "Effects"
             }
         ],
@@ -48,7 +52,7 @@
         "controls": [
             {
                 "type": "button",
-                "icon": "bi-eraser",
+                "icon": "bi bi-eraser",
                 "label": "Erase"
             }
         ],
@@ -59,12 +63,12 @@
         "controls": [
             {
                 "type": "button",
-                "icon": "bi-arrow-counterclockwise",
+                "icon": "bi bi-arrow-counterclockwise",
                 "label": "Undo"
             },
             {
                 "type": "button",
-                "icon": "bi-arrow-clockwise",
+                "icon": "bi bi-arrow-clockwise",
                 "label": "Redo"
             }
         ],
@@ -75,7 +79,7 @@
         "controls": [
             {
                 "type": "button",
-                "icon": "bi-layers",
+                "icon": "bi bi-layers",
                 "label": "Layers"
             }
         ],
@@ -86,7 +90,7 @@
         "controls": [
             {
                 "type": "button",
-                "icon": "bi-search",
+                "icon": "bi bi-search",
                 "label": "Search",
                 "expanded": true
             }
@@ -98,7 +102,7 @@
         "controls": [
             {
                 "type": "button",
-                "icon": "bi-bounding-box",
+                "icon": "bi bi-bounding-box",
                 "label": "Selection"
             }
         ],
@@ -109,7 +113,7 @@
         "controls": [
             {
                 "type": "button",
-                "icon": "bi-gear",
+                "icon": "bi bi-gear",
                 "label": "Settings",
                 "action": {
                     "type": "dock",
@@ -124,7 +128,7 @@
         "controls": [
             {
                 "type": "button",
-                "icon": "bi-type",
+                "icon": "bi bi-type",
                 "label": "Text"
             }
         ],
@@ -135,7 +139,7 @@
         "controls": [
             {
                 "type": "button",
-                "icon": "bi-cursor",
+                "icon": "bi bi-cursor",
                 "label": "Move / Transform",
                 "action": {
                     "type": "toolGroup",
