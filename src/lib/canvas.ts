@@ -169,7 +169,7 @@ export const ctxRectHalfPixelAligned = (ctx: CanvasRenderingContext2DEnhanced, x
 /**
  * Provides additional canvas utility methods.
  * Adapted from https://gist.github.com/dzhang123/2a3a611b3d75a45a3f41
- * @license MIT
+ * @license MIT https://codepen.io/techslides/pen/zowLd/license
  */
 export const trackCanvasTransforms = (vanillaCtx: CanvasRenderingContext2D): CanvasRenderingContext2DEnhanced => {
     const ctx = vanillaCtx as CanvasRenderingContext2DEnhanced;

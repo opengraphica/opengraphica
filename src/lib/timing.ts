@@ -7,7 +7,7 @@ export interface ThrottleOptions {
 /**
  * Throttles a callback with the specified wait time and callback options
  * https://stackoverflow.com/questions/27078285/simple-throttle-in-js
- * @license https://creativecommons.org/licenses/by-sa/4.0/
+ * @license CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/
  */
 export function throttle(func: any, wait: number, options?: ThrottleOptions) {
     var context: any, args: any, result: any;

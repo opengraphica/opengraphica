@@ -25,8 +25,8 @@ export default defineComponent({
         loading: ElLoading.directive
     },
     components: {
-        'file-export': defineAsyncComponent(() => import(/* webpackChunkName: 'module-file-export' */ `./module-file-export.vue`)),
-        'file-new': defineAsyncComponent(() => import(/* webpackChunkName: 'module-file-new' */ `./module-file-new.vue`))
+        'file-export': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-export' */ `./module-file-export.vue`)),
+        'file-new': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-new' */ `./module-file-new.vue`))
     },
     props: {
         name: {

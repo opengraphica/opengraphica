@@ -1,6 +1,6 @@
 /**
  * Parts of this file were adapted from miniPaint
- * @license https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
+ * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
 
 import {
