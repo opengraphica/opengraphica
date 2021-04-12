@@ -163,7 +163,7 @@ export default defineComponent({
                     const devicePixelRatio = window.devicePixelRatio;
                     const transform = canvasStore.get('transform');
                     const decomposedTransform = canvasStore.get('decomposedTransform');
-                    isPixelatedZoomLevel.value = decomposedTransform.scaleX / devicePixelRatio >= 1.5;
+                    isPixelatedZoomLevel.value = decomposedTransform.scaleX / devicePixelRatio >= 1.25;
                     const offsetX = transform.e / decomposedTransform.scaleX;
                     const offsetY = transform.f / decomposedTransform.scaleX;
                     const pixelRatioTransform = transform
