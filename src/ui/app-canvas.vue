@@ -1,6 +1,6 @@
 <template>
     <div ref="canvasArea" class="ogr-canvas-area">
-        <div ref="canvasContainer" class="ogr-canvas-container" :class="{ 'ogr-canvas-viewport-css': useCssViewport, 'ogr-canvas-viewport-css--fast': useCssViewport && preferFastViewport }">
+        <div ref="canvasContainer" class="ogr-canvas-container" :class="{ 'ogr-canvas-viewport-css': useCssViewport, 'ogr-canvas-viewport-css--pixelated': isPixelatedZoomLevel }">
             <canvas ref="canvas" class="ogr-canvas" />
         </div>
     </div>
@@ -25,7 +25,7 @@ export default defineComponent({
         const canvasContainer = ref<HTMLDivElement>();
         const { useCssViewport, viewWidth: viewportWidth, viewHeight: viewportHeight } = toRefs(canvasStore.state);
         const { width: imageWidth, height: imageHeight } = toRefs(workingFileStore.state);
-        const { preferFastViewport } = toRefs(preferencesStore.state);
+        const isPixelatedZoomLevel = ref<boolean>(false);
         let ctx: CanvasRenderingContext2DEnhanced | null = null;
 
         canvasStore.set('workingImageBorderColor', getComputedStyle(document.documentElement).getPropertyValue('--ogr-working-image-border-color'));
@@ -163,6 +163,7 @@ export default defineComponent({
                     const devicePixelRatio = window.devicePixelRatio;
                     const transform = canvasStore.get('transform');
                     const decomposedTransform = canvasStore.get('decomposedTransform');
+                    isPixelatedZoomLevel.value = decomposedTransform.scaleX / devicePixelRatio >= 1;
                     const offsetX = transform.e / decomposedTransform.scaleX;
                     const offsetY = transform.f / decomposedTransform.scaleX;
                     const pixelRatioTransform = transform
@@ -187,7 +188,7 @@ export default defineComponent({
             canvas,
             canvasArea,
             canvasContainer,
-            preferFastViewport,
+            isPixelatedZoomLevel,
             useCssViewport
         };
     }

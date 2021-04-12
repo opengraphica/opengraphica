@@ -205,12 +205,17 @@ body.ogr-full-page {
                 right: auto;
                 bottom: auto;
                 box-shadow: 0 0 1.25rem var(--ogr-working-image-border-color);
-                image-rendering: optimizeQuality;
+                image-rendering: auto;
+                image-rendering: smooth;
+                image-rendering: optimizequality;
+                image-rendering: high-quality;
             }
 
-            &.ogr-canvas-viewport-css--fast {
+            &.ogr-canvas-viewport-css--pixelated {
                 .ogr-canvas {
-                    image-rendering: optimizeSpeed;
+                    image-rendering: optimizespeed;
+                    image-rendering: crisp-edges;
+                    image-rendering: pixelated;
                 }
             }
         }
