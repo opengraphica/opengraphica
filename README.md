@@ -2,7 +2,7 @@
 
 OpenGraphica is an upcoming raster and vector image editing program that runs in your web browser. It is free to use and open source under the MIT license, and works as an alternative to Photoshop for most common photo editing tasks.
 
-> NOTE: OpenGraphica is in very early development, many features display but do nothing when clicked.
+**NOTE: OpenGraphica is in very early development, many features display but do nothing when clicked.**
 
 Use OpenGraphica at https://opengraphica.com/
 
