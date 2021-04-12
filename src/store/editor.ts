@@ -4,13 +4,22 @@ import toolGroupsConfig from '@/config/tool-groups.json';
 import { ToolGroupDefinition } from '@/types';
 import { loadStylesheet } from '@/lib/stylesheet';
 
+interface EditorDeferredTask {
+    name: string,
+    priority?: 'clearQueue' | 'filter' | 'last',
+    isCanceled?: boolean;
+    handler: (bridge: { isCanceled: () => boolean }) => void;
+}
+
 const toolGroups: { [key: string]: ToolGroupDefinition } = toolGroupsConfig;
 
 interface EditorState {
     activeTheme: { name: string, linkElement: HTMLLinkElement } | null;
     activeTool: string | null;
     activeToolGroup: string | null;
+    isTaskRunning: boolean;
     loadingThemeName: string | null;
+    tasks: EditorDeferredTask[],
     themes: {
         [themeName: string]: string;
     };
@@ -18,6 +27,7 @@ interface EditorState {
 }
 
 interface EditorDispatch {
+    scheduleTask: EditorDeferredTask,
     setActiveTheme: string;
     setActiveTool: {
         tool?: string;
@@ -33,18 +43,38 @@ interface EditorStore {
     state: EditorState;
 }
 
+let currentTaskRunId: number = 0;
+
 const store = new PerformantStore<EditorStore>({
     state: {
         activeTheme: null,
         activeTool: null,
         activeToolGroup: null,
+        isTaskRunning: false,
         loadingThemeName: null,
+        tasks: [],
         themes: {},
         toolCanvasController: new BaseCanvasController()
     },
     readOnly: ['activeTheme', 'activeTool', 'activeToolGroup', 'themes'],
     async onDispatch(actionName: string, value: any, set) {
         switch (actionName) {
+            case 'scheduleTask':
+                const newTask: EditorDeferredTask = value;
+                let tasks = store.get('tasks');
+                if (newTask.priority === 'clearQueue') {
+                    for (let task of tasks) {
+                        task.isCanceled = true;
+                    }
+                    set('isTaskRunning', false);
+                    tasks = [];
+                }
+                tasks.push(newTask);
+                if (tasks[0] === newTask) {
+                    runTasks(++currentTaskRunId, set);
+                }
+                set('tasks', tasks);
+
             case 'setActiveTheme':
                 const activeThemeName: string = value;
                 const themes = store.state.themes;
@@ -92,6 +122,30 @@ const store = new PerformantStore<EditorStore>({
         }
     }
 });
+
+async function runTasks(runId: number, set: PerformantStore<EditorStore>['directSet']) {
+    if (!store.get('isTaskRunning')) {
+        set('isTaskRunning', true);
+        let tasks = store.get('tasks');
+        while (tasks.length > 0) {
+            let runningTask = tasks[0];
+            await runningTask.handler({
+                isCanceled() {
+                    return tasks[0].isCanceled || false;
+                }
+            });
+            if (runId !== currentTaskRunId) {
+                return;
+            }
+            tasks = store.get('tasks');
+            if (runningTask === tasks[0]) {
+                tasks.shift();
+            }
+            set('tasks', tasks);
+        }
+        set('isTaskRunning', false);
+    }
+}
 
 export default store;
 

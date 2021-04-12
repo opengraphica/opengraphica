@@ -4,9 +4,7 @@
  */
 
 import {
-    RGBAColor, WorkingFileLayer,
-    WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer,
-    InsertGroupLayerOptions, InsertRasterLayerOptions, InsertVectorLayerOptions, InsertTextLayerOptions
+    RGBAColor, InsertRasterLayerOptions
 } from '@/types';
 import historyStore from '@/store/history';
 import { BundleAction } from '@/actions/bundle';
@@ -45,14 +43,16 @@ export async function openFromFileDialog(): Promise<void> {
                 reject();
             }
         });
-        fileInput.addEventListener('focus', async (e: Event) => {
+        const onFocusAway = () => {
             setTimeout(() => {
                 if (!isChangeFired) {
-                    reject();
+                    resolve();
                     temporaryFileInputContainer.removeChild(fileInput);
                 }
-            }, 300);
-        });
+            }, 500);
+            window.removeEventListener('focus', onFocusAway);
+        };
+        window.addEventListener('focus', onFocusAway);
         fileInput.click();
     });
 
@@ -148,6 +148,11 @@ export async function openFromFileList(files: FileList) {
             loadErrorMessages.push(readerSettle.reason);
         }
     }
+
+    await historyStore.dispatch('free', {
+        memorySize: Infinity,
+        databaseSize: Infinity
+    });
 
     await historyStore.dispatch('runAction', {
         action: new BundleAction('openFile', 'Open File', [

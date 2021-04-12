@@ -48,8 +48,8 @@ export class PerformantStore<T extends StoreTypeMap> {
     }
 
     /**
-     * Not actually deprecated, use "set" instead if you don't know what you're doing.
-     * @deprecated
+     * use "set" instead if you don't know what you're doing.
+     * @private
      */
     directSet<K extends keyof T['state']>(key: K, value: T['state'][K]) {
         (this.staticState as any)[key] = value;

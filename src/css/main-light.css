@@ -5491,6 +5491,10 @@ body.ogr-full-page {
   right: auto;
   bottom: auto;
   box-shadow: 0 0 1.25rem var(--ogr-working-image-border-color);
+  image-rendering: optimizeQuality;
+}
+.opengraphica .ogr-canvas-container.ogr-canvas-viewport-css.ogr-canvas-viewport-css--fast .ogr-canvas {
+  image-rendering: optimizeSpeed;
 }
 .opengraphica .ogr-canvas {
   display: block;
@@ -5505,6 +5509,19 @@ body.ogr-full-page {
   image-rendering: -webkit-crisp-edges;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+}
+.opengraphica .ogr-wait {
+  display: none;
+}
+.opengraphica .ogr-wait[aria-hidden=false] {
+  background: var(--ogr-background-color);
+  opacity: 0.8;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .opengraphica .el-breadcrumb::after, .opengraphica .el-button-group::after, .opengraphica .el-color-dropdown__main-wrapper::after, .opengraphica .el-form-item::after, .opengraphica .el-form-item__content::after, .opengraphica .el-menu::after, .opengraphica .el-pagination::after, .opengraphica .el-picker-panel__body-wrapper::after, .opengraphica .el-picker-panel__body::after, .opengraphica .el-row::after, .opengraphica .el-slider::after {

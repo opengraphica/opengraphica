@@ -42,7 +42,14 @@ export async function runModule(moduleGroupName: string, moduleName: string) {
                 const moduleName = modulePathSplit[1];
                 if (moduleGroup && moduleName && methodName) {
                     const importedModule = (await import(/* webpackChunkName: 'module-[request]' */ `./${moduleGroup}/${moduleName}.ts`));
+                    appEmitter.emit('app.wait.startBlocking', {
+                        id: 'runModule_' + moduleGroupName + '_' + moduleName,
+                        label: module.name
+                    });
                     await importedModule[methodName]();
+                    appEmitter.emit('app.wait.stopBlocking', {
+                        id: 'runModule_' + moduleGroupName + '_' + moduleName
+                    });
                 } else {
                     throw new Error('Module function identifier was malformed');        
                 }

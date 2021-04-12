@@ -3,6 +3,7 @@
         <app-canvas />
         <app-layout-dnd-container @dnd-ready="onDndLayoutReady($event)" />
         <app-dialogs />
+        <app-wait />
     </div>
 </template>
 
@@ -11,6 +12,7 @@ import { defineComponent, ref, provide, onMounted, onUnmounted } from 'vue';
 import AppCanvas from '@/ui/app-canvas.vue';
 import AppDialogs from '@/ui/app-dialogs.vue';
 import AppLayoutDndContainer from '@/ui/app-layout-dnd-container.vue';
+import AppWait from '@/ui/app-wait.vue';
 import canvasStore from '@/store/canvas';
 import ResizeObserver from 'resize-observer-polyfill';
 import ElLoading from 'element-plus/lib/el-loading';
@@ -24,7 +26,8 @@ export default defineComponent({
     components: {
         AppCanvas,
         AppDialogs,
-        AppLayoutDndContainer
+        AppLayoutDndContainer,
+        AppWait
     },
     setup() {
         const loading = ref<boolean>(true);

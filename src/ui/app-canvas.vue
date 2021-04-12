@@ -1,6 +1,6 @@
 <template>
     <div ref="canvasArea" class="ogr-canvas-area">
-        <div ref="canvasContainer" class="ogr-canvas-container" :class="{ 'ogr-canvas-viewport-css': useCssViewport }">
+        <div ref="canvasContainer" class="ogr-canvas-container" :class="{ 'ogr-canvas-viewport-css': useCssViewport, 'ogr-canvas-viewport-css--fast': useCssViewport && preferFastViewport }">
             <canvas ref="canvas" class="ogr-canvas" />
         </div>
     </div>
@@ -10,6 +10,7 @@
 import { defineComponent, ref, Ref, computed, watch, inject, toRefs, onMounted, onUnmounted } from 'vue';
 import canvasStore from '@/store/canvas';
 import workingFileStore from '@/store/working-file';
+import preferencesStore from '@/store/preferences';
 import { CanvasRenderingContext2DEnhanced } from '@/types';
 import { drawWorkingFileToCanvas,  trackCanvasTransforms } from '@/lib/canvas';
 import appEmitter from '@/lib/emitter';
@@ -24,6 +25,7 @@ export default defineComponent({
         const canvasContainer = ref<HTMLDivElement>();
         const { useCssViewport, viewWidth: viewportWidth, viewHeight: viewportHeight } = toRefs(canvasStore.state);
         const { width: imageWidth, height: imageHeight } = toRefs(workingFileStore.state);
+        const { preferFastViewport } = toRefs(preferencesStore.state);
         let ctx: CanvasRenderingContext2DEnhanced | null = null;
 
         canvasStore.set('workingImageBorderColor', getComputedStyle(document.documentElement).getPropertyValue('--ogr-working-image-border-color'));
@@ -185,6 +187,7 @@ export default defineComponent({
             canvas,
             canvasArea,
             canvasContainer,
+            preferFastViewport,
             useCssViewport
         };
     }

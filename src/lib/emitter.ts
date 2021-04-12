@@ -5,9 +5,16 @@ interface AppEmitterEvents {
     'app.component.register': any;
     'app.dialogs.openFromDock': {
         name: string;
-    },
+    };
     'app.dialogs.openFromModule': {
         name: string;
+    };
+    'app.wait.startBlocking': {
+        id: string;
+        label: string;
+    };
+    'app.wait.stopBlocking': {
+        id: string;
     };
 }
 
