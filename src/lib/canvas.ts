@@ -88,7 +88,7 @@ export const drawWorkingFileToCanvas = (canvas: HTMLCanvasElement, ctx: CanvasRe
         ctx.setTransform(transform.a, transform.b, transform.c, transform.d, transform.e, transform.f);
     }
     
-    ctx.imageSmoothingEnabled = decomposedTransform.scaleX / window.devicePixelRatio < 1;
+    ctx.imageSmoothingEnabled = decomposedTransform.scaleX / window.devicePixelRatio < 1.5;
 
     // Draw the image background and frame
     const imageWidth = workingFileStore.get('width');
