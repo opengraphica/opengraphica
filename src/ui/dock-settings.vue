@@ -189,6 +189,9 @@ export default defineComponent({
                             case 'open':
                                 await runModule('file', 'open');
                                 break;
+                            case 'export':
+                                await runModule('file', 'export');
+                                break;
                         }
                     break;
                 }

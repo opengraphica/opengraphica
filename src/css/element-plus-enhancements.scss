@@ -43,6 +43,8 @@
             }
             .el-form-item__content > .el-input > .el-input__inner,
             .el-form-item__content > .el-input-group > *:last-child,
+            .el-form-item__content > .el-row > .el-col > .el-input > .el-input__inner,
+            .el-form-item__content > .el-row > .el-col > .el-input-group > *:last-child,
             .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__inner,
             .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__inner {
                 border-top-right-radius: 0;
@@ -55,6 +57,7 @@
                 }
                 .el-form-item__content > .el-input > .el-input__inner,
                 .el-form-item__content > .el-input-group > *:last-child,
+                .el-form-item__content > .el-row > .el-col:last-child > .el-input-group > *:last-child,
                 .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__inner,
                 .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__inner {
                     border-top-right-radius: var(--ogr-border-radius);
@@ -66,6 +69,7 @@
                 }
                 .el-form-item__content > .el-input > .el-input__inner,
                 .el-form-item__content > .el-input-group > *:last-child,
+                .el-form-item__content > .el-row > .el-col:last-child > .el-input-group > *:last-child,
                 .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__inner,
                 .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__inner {
                     border-bottom-right-radius: var(--ogr-border-radius);
@@ -132,9 +136,27 @@
                 }
                 */
 
+                .el-slider {
+                    box-sizing: border-box;
+                    padding-left: 0.9375rem;
+                    padding-right: 0.9375rem;
+                    border-top: 0.0625rem solid var(--ogr-form-connected-label-border-color) !important;
+                    border-bottom: 0.0625rem solid var(--ogr-form-connected-label-border-color) !important;
+                }
+                > .el-slider {
+                    &:last-child {
+                        border-right: 0.0625rem solid var(--ogr-form-connected-label-border-color) !important;
+                    }
+                }
+                > .el-row > .el-col > .el-slider {
+                    height: 100%;
+                }
+                > .el-row > .el-col:last-child > .el-slider {
+                    border-right: 0.0625rem solid var(--ogr-form-connected-label-border-color) !important;
+                }
+
                 > .el-select, .el-input:not(.el-input-group) {
                     display: block;
-
 
                     .el-input__inner {
                         display: block;
@@ -147,13 +169,15 @@
                     }
                 }
 
-                > .el-input.el-input-group {
-                    > .el-input__inner {
-                        border-radius: 0;
-                        border-left-width: 0 !important;
-                        border-right-width: 0 !important;
-                        border-top-color: var(--ogr-form-connected-label-border-color) !important;
-                        border-bottom-color: var(--ogr-form-connected-label-border-color) !important;
+                &, & > .el-row > .el-col {
+                    > .el-input.el-input-group {
+                        > .el-input__inner {
+                            border-radius: 0;
+                            border-left-width: 0 !important;
+                            border-right-width: 0 !important;
+                            border-top-color: var(--ogr-form-connected-label-border-color) !important;
+                            border-bottom-color: var(--ogr-form-connected-label-border-color) !important;
+                        }
                     }
                 }
 
@@ -185,6 +209,22 @@
                     transition: none !important;
                 }
             }
+        }
+    }
+
+    .el-input--text-left {
+        > .el-input__inner {
+            text-align: left;
+        }
+    }
+    .el-input--text-right {
+        > .el-input__inner {
+            text-align: right;
+        }
+    }
+    .el-input--text-center {
+        > .el-input__inner {
+            text-align: center;
         }
     }
 
@@ -233,7 +273,7 @@
         text-align: center;
     }
 
-    .el-radio-button{ 
+    .el-radio-button { 
         &.is-active {
             cursor: default !important;
             .el-radio-button__inner {

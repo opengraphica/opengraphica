@@ -7,6 +7,7 @@ interface WorkingFileState {
     colorSpace: string;
     drawOriginX: number;
     drawOriginY: number;
+    fileName: string;
     height: number; // Always pixels
     layerIdCounter: number;
     layers: WorkingFileLayer<RGBAColor>[];
@@ -30,6 +31,7 @@ const store = new PerformantStore<WorkingFileStore>({
         colorSpace: 'sRGB',
         drawOriginX: 0,
         drawOriginY: 0,
+        fileName: '',
         height: 892, // Always pixels
         layerIdCounter: 0,
         layers: [],

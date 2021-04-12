@@ -19,6 +19,15 @@
                     "target": "file/open.openFromFileDialog"
                 },
                 "preload": true
+            },
+            "export": {
+                "name": "Export Image",
+                "description": "Save the image in a universal format that can be opened by other editors.",
+                "action": {
+                    "type": "ui",
+                    "target": "file-export"
+                },
+                "preload": true
             }
         }
     }

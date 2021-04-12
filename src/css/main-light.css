@@ -5523,6 +5523,25 @@ body.ogr-full-page {
   right: 0;
   bottom: 0;
 }
+.opengraphica .fade-enter-active,
+.opengraphica .fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.opengraphica .fade-enter-from,
+.opengraphica .fade-leave-to {
+  opacity: 0;
+}
+.opengraphica .scale-down-enter-active,
+.opengraphica .scale-down-leave-active {
+  transition: transform 0.5s ease, opacity 0.5s ease;
+  transform-origin: top left;
+}
+.opengraphica .scale-down-enter-from,
+.opengraphica .scale-down-leave-to {
+  transform: scale(1, 0);
+  transform-origin: top left;
+  opacity: 0;
+}
 
 .opengraphica .el-breadcrumb::after, .opengraphica .el-button-group::after, .opengraphica .el-color-dropdown__main-wrapper::after, .opengraphica .el-form-item::after, .opengraphica .el-form-item__content::after, .opengraphica .el-menu::after, .opengraphica .el-pagination::after, .opengraphica .el-picker-panel__body-wrapper::after, .opengraphica .el-picker-panel__body::after, .opengraphica .el-row::after, .opengraphica .el-slider::after {
   clear: both;
@@ -23093,6 +23112,8 @@ body.ogr-full-page {
 }
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-input > .el-input__inner,
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-input-group > *:last-child,
+.opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-row > .el-col > .el-input > .el-input__inner,
+.opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-row > .el-col > .el-input-group > *:last-child,
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__inner,
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__inner {
   border-top-right-radius: 0;
@@ -23103,6 +23124,7 @@ body.ogr-full-page {
 }
 .opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-input > .el-input__inner,
 .opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-input-group > *:last-child,
+.opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-row > .el-col:last-child > .el-input-group > *:last-child,
 .opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__inner,
 .opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__inner {
   border-top-right-radius: var(--ogr-border-radius);
@@ -23112,6 +23134,7 @@ body.ogr-full-page {
 }
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-input > .el-input__inner,
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-input-group > *:last-child,
+.opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-row > .el-col:last-child > .el-input-group > *:last-child,
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__inner,
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__inner {
   border-bottom-right-radius: var(--ogr-border-radius);
@@ -23171,6 +23194,22 @@ body.ogr-full-page {
   }
   */
 }
+.opengraphica .el-form-item-group .el-form-item .el-form-item__content .el-slider {
+  box-sizing: border-box;
+  padding-left: 0.9375rem;
+  padding-right: 0.9375rem;
+  border-top: 0.0625rem solid var(--ogr-form-connected-label-border-color) !important;
+  border-bottom: 0.0625rem solid var(--ogr-form-connected-label-border-color) !important;
+}
+.opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-slider:last-child {
+  border-right: 0.0625rem solid var(--ogr-form-connected-label-border-color) !important;
+}
+.opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-row > .el-col > .el-slider {
+  height: 100%;
+}
+.opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-row > .el-col:last-child > .el-slider {
+  border-right: 0.0625rem solid var(--ogr-form-connected-label-border-color) !important;
+}
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-select, .opengraphica .el-form-item-group .el-form-item .el-form-item__content .el-input:not(.el-input-group) {
   display: block;
 }
@@ -23183,7 +23222,7 @@ body.ogr-full-page {
   border-bottom-color: var(--ogr-form-connected-label-border-color) !important;
   border-right-color: var(--ogr-form-connected-label-border-color) !important;
 }
-.opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-input.el-input-group > .el-input__inner {
+.opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-input.el-input-group > .el-input__inner, .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-row > .el-col > .el-input.el-input-group > .el-input__inner {
   border-radius: 0;
   border-left-width: 0 !important;
   border-right-width: 0 !important;
@@ -23213,6 +23252,15 @@ body.ogr-full-page {
   top: 0;
   animation: none !important;
   transition: none !important;
+}
+.opengraphica .el-input--text-left > .el-input__inner {
+  text-align: left;
+}
+.opengraphica .el-input--text-right > .el-input__inner {
+  text-align: right;
+}
+.opengraphica .el-input--text-center > .el-input__inner {
+  text-align: center;
 }
 .opengraphica .el-tabs--icon-tabs .el-tabs__header {
   padding-left: 0;
