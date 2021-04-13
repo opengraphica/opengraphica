@@ -2,7 +2,11 @@ import { createApp, App } from 'vue';
 import '@/polyfill';
 import OpenGraphicaApp from '@/ui/app.vue';
 import appEmitter from '@/lib/emitter';
+import '@/store/canvas';
 import editorStore from '@/store/editor';
+import '@/store/history';
+import '@/store/preferences';
+import '@/store/working-file';
 import ElNotification from 'element-plus/lib/el-notification';
 
 export interface OpenGraphica extends App<Element> {

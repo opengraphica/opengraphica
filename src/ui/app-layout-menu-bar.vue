@@ -108,14 +108,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, nextTick, watch, PropType, ref, onMounted, onUnmounted, toRefs } from 'vue';
+import { defineComponent, computed, nextTick, watch, PropType, ref, onMounted, onUnmounted, toRefs, defineAsyncComponent } from 'vue';
 import ElButton from 'element-plus/lib/el-button';
 import ElButtonGroup from 'element-plus/lib/el-button-group';
-import ElDrawer from 'element-plus/lib/el-drawer';
-import ElMenu from 'element-plus/lib/el-menu';
-import ElMenuItem from 'element-plus/lib/el-menu-item';
 import ElPopover from 'element-plus/lib/el-popover';
-import ElScrollbar from 'element-plus/lib/el-scrollbar';
 import ElTag from 'element-plus/lib/el-tag';
 import { LayoutShortcutGroupDefinition, LayoutShortcutGroupDefinitionControlButton, DndLayoutMenuBar } from '@/types';
 import actionGroupsDefinition from '@/config/layout-shortcut-groups.json';
@@ -131,11 +127,11 @@ export default defineComponent({
         DynamicallyLoadedDock: Dock,
         ElButton,
         ElButtonGroup,
-        ElDrawer,
-        ElMenu,
-        ElMenuItem,
+        ElDrawer: defineAsyncComponent(() => import(`element-plus/lib/el-drawer`)),
+        ElMenu: defineAsyncComponent(() => import(`element-plus/lib/el-menu`)),
+        ElMenuItem: defineAsyncComponent(() => import(`element-plus/lib/el-menu-item`)),
         ElPopover,
-        ElScrollbar,
+        ElScrollbar: defineAsyncComponent(() => import(`element-plus/lib/el-scrollbar`)),
         ElTag
     },
     props: {

@@ -14,11 +14,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
+import { defineComponent, defineAsyncComponent, ref, onMounted, onUnmounted } from 'vue';
 import Dock from './dock.vue';
 import Module from './module.vue';
 import appEmitter, { AppEmitterEvents } from '@/lib/emitter';
-import ElDialog from 'element-plus/lib/el-dialog';
 
 interface DialogCommonDefinition {
     id: number;
@@ -43,7 +42,7 @@ export default defineComponent({
     name: 'AppDialogs',
     components: {
         Dock,
-        ElDialog,
+        ElDialog: defineAsyncComponent(() => import(`element-plus/lib/el-dialog`)),
         Module
     },
     setup() {

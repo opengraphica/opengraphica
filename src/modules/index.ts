@@ -18,7 +18,7 @@ export async function preloadModules() {
                 const moduleName = modulePathSplit[1];
                 if (moduleGroup && moduleName) {
                     moduleLoadPromises.push(
-                        import(/* webpackChunkName: 'module-[request]' */ `./${moduleGroup}/${moduleName}.ts`)
+                        import(/* webpackChunkName: 'module-preload-[request]' */ `./${moduleGroup}/${moduleName}.ts`)
                     );
                 }
             }

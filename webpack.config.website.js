@@ -1,6 +1,7 @@
 const path = require('path');
 const setupConfig = require('./webpack.config.shared.js');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = setupConfig({
     entry: {
@@ -16,6 +17,7 @@ module.exports = setupConfig({
         }
     },
     plugins: [
+        new BundleAnalyzerPlugin(),
         new HtmlWebpackPlugin({
             title: 'OpenGraphica Image Editor',
             template: 'index.ejs',
