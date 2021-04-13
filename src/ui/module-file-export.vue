@@ -11,7 +11,7 @@
         @submit="onCreate">
         <el-form-item-group>
             <el-form-item label="File Name" prop="fileName">
-                <el-input v-model="formData.workingFile.fileName" :min="1" :precision="0"></el-input>
+                <el-input v-model="formData.workingFile.fileName" clearable></el-input>
             </el-form-item>
             <el-form-item label="File Type" prop="fileType" >
                 <el-select v-model="formData.workingFile.fileType" :popper-append-to-body="false">
@@ -40,7 +40,7 @@
                             <el-slider v-model="formData.workingFile.quality" :show-tooltip="false"></el-slider>
                         </el-col>
                         <el-col :span="10">
-                            <el-input-number v-model="formData.workingFile.quality" class="el-input--text-right">
+                            <el-input-number v-model="formData.workingFile.quality" :min="0" :max="100" :precision="0" class="el-input--text-right">
                                 <template v-slot:append>%</template>
                             </el-input-number>
                         </el-col>
@@ -72,10 +72,9 @@ import ElSelect from 'element-plus/lib/el-select';
 import ElSlider from 'element-plus/lib/el-slider';
 import workingFileStore from '@/store/working-file';
 import { notifyInjector, unexpectedErrorMessage, validationSubmissionErrorMessage } from '@/lib/notify';
-import { convertUnits } from '@/lib/metrics';
 import { NewFilePreset } from '@/types';
 import { Rules, RuleItem } from 'async-validator';
-import { createNewFile } from '@/modules/file/new';
+import { exportAsImage, isfileFormatSupported } from '@/modules/file/export';
 
 const defaultNewFilePresets: NewFilePreset[] = defaultNewFilePresetsJson as any;
 
@@ -119,7 +118,9 @@ export default defineComponent({
             { value: 'gif', label: 'GIF' },
             { value: 'bmp', label: 'BMP' },
             { value: 'tiff', label: 'TIFF' }
-        ];
+        ].filter((option) => {
+            return isfileFormatSupported(option.value);
+        });
         const fileQualityTypes = ['jpg', 'webp'];
         
         const formData = reactive({
@@ -130,8 +131,7 @@ export default defineComponent({
                 quality: 100
             }
         });
-        const formValidationRules: Rules = {
-        };
+        const formValidationRules: Rules = {};
 
         function onCancel() {
             emit('close');
@@ -146,8 +146,12 @@ export default defineComponent({
                 loading.value = true;
                 try {
                     workingFileStore.set('fileName', formData.workingFile.fileName);
-
-                    // TODO
+                    await exportAsImage({
+                        fileName: formData.workingFile.fileName,
+                        fileType: formData.workingFile.fileType,
+                        layerSelection: formData.workingFile.layerSelection,
+                        quality: formData.workingFile.quality / 100
+                    });
                 } catch (error) {
                     $notify({
                         type: 'error',

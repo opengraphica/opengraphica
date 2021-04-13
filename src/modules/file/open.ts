@@ -65,6 +65,8 @@ export async function openFromFileList(files: FileList) {
 
     const readerPromises: Promise<FileReadResolve>[] = [];
 
+    let fileName: string = '';
+
     for (let fileIndex = 0; fileIndex < files.length; fileIndex++) {
         const file = files[fileIndex];
 
@@ -77,7 +79,9 @@ export async function openFromFileList(files: FileList) {
 
                 const fileReadType: FileReadType = (file.type === 'text/plain' || file.name.match(/\.json$/)) ? 'json' : 'image';
 
-                // TODO - set save file name
+                if (!fileName) {
+                    fileName = file.name;
+                }
 
                 const fileReader = new FileReader();
                 fileReader.onload = async () => {
@@ -157,6 +161,7 @@ export async function openFromFileList(files: FileList) {
     await historyStore.dispatch('runAction', {
         action: new BundleAction('openFile', 'Open File', [
             new CreateNewFileAction({
+                fileName,
                 width: largestWidth || 1,
                 height: largestHeight || 1
             }),

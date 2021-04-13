@@ -67,10 +67,14 @@ export const drawWorkingFileLayerToCanvas = (targetCanvas: HTMLCanvasElement, ta
     ctx.restore();
 };
 
+interface DrawWorkingFileOptions {
+    selectedLayersOnly?: boolean
+};
+
 /**
  * Draws everything in the working document to the specified canvas.
  */
-export const drawWorkingFileToCanvas = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2DEnhanced) => {
+export const drawWorkingFileToCanvas = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2DEnhanced, options: DrawWorkingFileOptions = {}) => {
 
     const now = performance.now();
 
@@ -171,7 +175,10 @@ export const ctxRectHalfPixelAligned = (ctx: CanvasRenderingContext2DEnhanced, x
  * Adapted from https://gist.github.com/dzhang123/2a3a611b3d75a45a3f41
  * @license MIT https://codepen.io/techslides/pen/zowLd/license
  */
-export const trackCanvasTransforms = (vanillaCtx: CanvasRenderingContext2D): CanvasRenderingContext2DEnhanced => {
+export const trackCanvasTransforms = (vanillaCtx: CanvasRenderingContext2D | null): CanvasRenderingContext2DEnhanced => {
+    if (!vanillaCtx) {
+        throw new Error('Canvas rendering context is missing (out of memory?)');
+    }
     const ctx = vanillaCtx as CanvasRenderingContext2DEnhanced;
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     let xform: DOMMatrix = svg.createSVGMatrix();
