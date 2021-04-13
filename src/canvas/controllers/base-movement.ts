@@ -1,5 +1,6 @@
 import BaseCanvasController, { PointerTracker } from './base';
 import canvasStore from '@/store/canvas';
+import preferencesStore from '@/store/preferences';
 import { throttle } from '@/lib/timing';
 import { pointDistance2d } from '@/lib/math';
 
@@ -113,12 +114,21 @@ export default class BaseCanvasMovementController extends BaseCanvasController {
                 this.moveTouchDistanceLatest = touchDistance;
                 const scaleFactor = touchDistance / this.moveTouchDistanceStart;
 
-                let touchAngle = this.moveTouchAngleLatest;
-                if (touches.length >= 2) {
-                    touchAngle = Math.atan2(touch1.y - touch0.y, touch1.x - touch0.x);
+                const touchRotation = preferencesStore.get('touchRotation');
+                let angleDifference: number = 0;
+                if (touchRotation === 'on' || touchRotation === 'snap') {
+                    let touchAngle = this.moveTouchAngleLatest;
+                    if (touches.length >= 2) {
+                        touchAngle = Math.atan2(touch1.y - touch0.y, touch1.x - touch0.x);
+                    }
+                    this.moveTouchAngleLatest = touchAngle;
+                    angleDifference = touchAngle - this.moveTouchAngleStart;
+                    if (touchRotation === 'snap') {
+                        let finalAngle = (this.moveRotationStart + angleDifference);
+                        finalAngle = Math.round(finalAngle / (Math.PI/24)) * (Math.PI/24);
+                        angleDifference = -this.moveRotationStart + finalAngle;
+                    }
                 }
-                this.moveTouchAngleLatest = touchAngle;
-                const angleDifference = touchAngle - this.moveTouchAngleStart;
 
                 // Apply
                 const point = new DOMPoint(this.lastCursorX * devicePixelRatio, this.lastCursorY * devicePixelRatio).matrixTransform(transform.inverse());

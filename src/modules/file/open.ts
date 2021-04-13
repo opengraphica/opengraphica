@@ -37,10 +37,14 @@ export async function openFromFileDialog(): Promise<void> {
             temporaryFileInputContainer.removeChild(fileInput);
             const files = (e.target as HTMLInputElement).files;
             if (files) {
-                await openFromFileList(files);
-                resolve();
+                try {
+                    await openFromFileList(files);
+                    resolve();
+                } catch (error) {
+                    reject(error);
+                }
             } else {
-                reject();
+                resolve();
             }
         });
         const onFocusAway = () => {
@@ -99,14 +103,14 @@ export async function openFromFileList(files: FileList) {
                             });
                             resolveReader({ type: 'image', result: image, file: file });
                         } catch (error) {
-                            rejectReader('An error occurred while loading the image for file "' + file.name + '"');
+                            rejectReader('An error occurred while loading the image for file "' + file.name + '".');
                         }
                     } else {
                         resolveReader({ type: 'json', result: fileReader.result as string, file: file });
                     }
                 };
                 fileReader.onerror = () => {
-                    rejectReader('An error occurred while reading the file "' + file.name + '"');
+                    rejectReader('An error occurred while reading the file "' + file.name + '".');
                 };
                 if (fileReadType === 'json') {
                     fileReader.readAsText(file);
@@ -123,10 +127,12 @@ export async function openFromFileList(files: FileList) {
 
     let largestWidth = 0;
     let largestHeight = 0;
+    let isAnyLayerLoaded: boolean = false;
 
     const settledReaderPromises = await Promise.allSettled(readerPromises);
     for (let readerSettle of settledReaderPromises) {
         if (readerSettle.status === 'fulfilled') {
+            isAnyLayerLoaded = true;
             if (readerSettle.value.type === 'image') {
                 const image = readerSettle.value.result;
                 if (image.width > largestWidth) {
@@ -153,19 +159,23 @@ export async function openFromFileList(files: FileList) {
         }
     }
 
-    await historyStore.dispatch('free', {
-        memorySize: Infinity,
-        databaseSize: Infinity
-    });
+    if (isAnyLayerLoaded) {
+        await historyStore.dispatch('free', {
+            memorySize: Infinity,
+            databaseSize: Infinity
+        });
 
-    await historyStore.dispatch('runAction', {
-        action: new BundleAction('openFile', 'Open File', [
-            new CreateNewFileAction({
-                fileName,
-                width: largestWidth || 1,
-                height: largestHeight || 1
-            }),
-            ...layerInsertActions
-        ])
-    });
+        await historyStore.dispatch('runAction', {
+            action: new BundleAction('openFile', 'Open File', [
+                new CreateNewFileAction({
+                    fileName,
+                    width: largestWidth || 1,
+                    height: largestHeight || 1
+                }),
+                ...layerInsertActions
+            ])
+        });
+    } else {
+        throw new Error('None of the files selected could be loaded.');
+    }
 }

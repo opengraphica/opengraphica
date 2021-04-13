@@ -7,6 +7,7 @@ interface PreferencesState {
     multiTouchTapTimeout: number;
     pointerPressHoldTimeout: number;
     preferFastViewport: boolean;
+    touchRotation: 'on' | 'snap' | 'off';
 }
 
 interface PreferencesStore {
@@ -21,7 +22,8 @@ const store = new PerformantStore<PreferencesStore>({
         multiTouchDownTimeout: 50,
         multiTouchTapTimeout: 50,
         pointerPressHoldTimeout: 500,
-        preferFastViewport: false
+        preferFastViewport: false,
+        touchRotation: 'on'
     }
 });
 

@@ -57,7 +57,6 @@
 
 <script lang="ts">
 import { defineComponent, ref, reactive, watch, nextTick } from 'vue';
-import defaultNewFilePresetsJson from '@/config/default-new-file-presets.json';
 import ElButton from 'element-plus/lib/el-button';
 import ElCol from 'element-plus/lib/el-col';
 import ElForm from 'element-plus/lib/el-form';
@@ -72,11 +71,8 @@ import ElSelect from 'element-plus/lib/el-select';
 import ElSlider from 'element-plus/lib/el-slider';
 import workingFileStore from '@/store/working-file';
 import { notifyInjector, unexpectedErrorMessage, validationSubmissionErrorMessage } from '@/lib/notify';
-import { NewFilePreset } from '@/types';
 import { Rules, RuleItem } from 'async-validator';
 import { exportAsImage, isfileFormatSupported } from '@/modules/file/export';
-
-const defaultNewFilePresets: NewFilePreset[] = defaultNewFilePresetsJson as any;
 
 export default defineComponent({
     name: 'ModuleFileExport',

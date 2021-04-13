@@ -46,18 +46,26 @@ export async function runModule(moduleGroupName: string, moduleName: string) {
                         id: 'runModule_' + moduleGroupName + '_' + moduleName,
                         label: module.name
                     });
-                    await importedModule[methodName]();
+                    let runModuleError;
+                    try {
+                        await importedModule[methodName]();
+                    } catch (error) {
+                        runModuleError = error;
+                    }
                     appEmitter.emit('app.wait.stopBlocking', {
                         id: 'runModule_' + moduleGroupName + '_' + moduleName
                     });
+                    if (runModuleError) {
+                        throw runModuleError;
+                    }
                 } else {
-                    throw new Error('Module function identifier was malformed');        
+                    throw new Error('Module function identifier was malformed.');        
                 }
             }
         } else {
-            throw new Error('Unknown module name');
+            throw new Error('Unknown module name.');
         }
     } else {
-        throw new Error('Unknown module group name');
+        throw new Error('Unknown module group name.');
     }
 }

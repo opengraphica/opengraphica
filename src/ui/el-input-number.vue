@@ -173,12 +173,20 @@ export default defineComponent({
         let lastEvaluatedValue: number = 0;
 
         watch(() => props.modelValue, (modelValue) => {
-            if (modelValue !== null && modelValue !== lastEvaluatedValue) {
-                lastEvaluatedValue = modelValue || 0;
-                lastEvaluatedValue = Math.max(props.min, Math.min(props.max, lastEvaluatedValue));
-                displayValue.value = '' + modelValue;
+            if (modelValue != null && modelValue !== lastEvaluatedValue) {
+                updateModelValue(modelValue);
             }
-        }, { immediate: true });
+        });
+
+        onMounted(() => {
+            updateModelValue(props.modelValue || 0);
+        });
+
+        function updateModelValue(modelValue: number) {
+            lastEvaluatedValue = modelValue;
+            lastEvaluatedValue = Math.max(props.min, Math.min(props.max, lastEvaluatedValue));
+            displayValue.value = '' + modelValue;
+        }
 
         function onBlur(e: Event) {
             emit('blur', e);

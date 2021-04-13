@@ -44,29 +44,31 @@
                     <div class="mb-3">Image</div>
                 </div>
             </template>
-            <el-menu class="el-menu--medium el-menu--borderless mb-1">
-                <el-menu-item index="cropResize">
-                    <i class="bi bi-crop"></i>
-                    <span>Crop and Resize</span>
-                </el-menu-item>
-                <el-divider />
-                <el-menu-item index="cut">
-                    <i class="bi bi-scissors"></i>
-                    <span>Cut</span>
-                </el-menu-item>
-                <el-menu-item index="copy">
-                    <i class="bi bi-files"></i>
-                    <span>Copy</span>
-                </el-menu-item>
-                <el-menu-item index="copyAll">
-                    <i class="bi bi-files"></i>
-                    <span>Copy All Layers</span>
-                </el-menu-item>
-                <el-menu-item index="paste">
-                    <i class="bi bi-clipboard"></i>
-                    <span>Paste</span>
-                </el-menu-item>
-            </el-menu>
+            <el-scrollbar>
+                <el-menu class="el-menu--medium el-menu--borderless mb-1">
+                    <el-menu-item index="cropResize">
+                        <i class="bi bi-crop"></i>
+                        <span>Crop and Resize</span>
+                    </el-menu-item>
+                    <el-divider />
+                    <el-menu-item index="cut">
+                        <i class="bi bi-scissors"></i>
+                        <span>Cut</span>
+                    </el-menu-item>
+                    <el-menu-item index="copy">
+                        <i class="bi bi-files"></i>
+                        <span>Copy</span>
+                    </el-menu-item>
+                    <el-menu-item index="copyAll">
+                        <i class="bi bi-files"></i>
+                        <span>Copy All Layers</span>
+                    </el-menu-item>
+                    <el-menu-item index="paste">
+                        <i class="bi bi-clipboard"></i>
+                        <span>Paste</span>
+                    </el-menu-item>
+                </el-menu>
+            </el-scrollbar>
         </el-tab-pane>
         <el-tab-pane>
             <template #label>
@@ -75,7 +77,58 @@
                     <div class="mb-3">View</div>
                 </div>
             </template>
-            View Stuff
+            <el-scrollbar>
+                <el-form novalidate="novalidate" action="javascript:void(0)" class="mb-1">
+                    <el-form-item class="el-form-item--menu-item" label="Zoom">
+                        <el-button-group>
+                            <el-button size="small" plain aria-label="Zoom Out">
+                                <i class="bi bi-zoom-out" aria-hidden="true" />
+                            </el-button>
+                            <el-input-number v-model.lazy="zoomLevel" size="small" class="el-input--text-center" style="width: 5rem" />
+                            <el-button size="small" plain aria-label="Zoom In">
+                                <i class="bi bi-zoom-in" aria-hidden="true" />
+                            </el-button>
+                        </el-button-group>
+                    </el-form-item>
+                    <el-form-item class="el-form-item--menu-item" label="Rotate">
+                        <el-button-group>
+                            <el-button size="small" plain aria-label="Rotate Counterclockwise">
+                                <i class="bi bi-arrow-counterclockwise" aria-hidden="true" />
+                            </el-button>
+                            <el-input-number v-model.lazy="rotationAngle" size="small" class="el-input--text-center" style="width: 5rem" />
+                            <el-button size="small" plain aria-label="Rotate Clockwise">
+                                <i class="bi bi-arrow-clockwise" aria-hidden="true" />
+                            </el-button>
+                        </el-button-group>
+                    </el-form-item>
+                    <el-form-item class="el-form-item--menu-item" label="Reset">
+                        <el-button-group>
+                            <el-button size="small" plain @click="onResetViewFit">
+                                Fit
+                            </el-button>
+                            <el-button size="small" plain>
+                                Zoom
+                            </el-button>
+                            <el-button size="small" plain>
+                                Rotate
+                            </el-button>
+                        </el-button-group>
+                    </el-form-item>
+                    <el-divider class="my-2" />
+                    <el-form-item class="el-form-item--menu-item" label="Touch Rotate">
+                        <el-radio-group
+                            v-model="touchRotationPreference"
+                            size="small">
+                            <el-radio-button
+                                v-for="option in touchRotationOptions"
+                                :key="option.value"
+                                :label="option.value">
+                                {{ option.label }}
+                            </el-radio-button>
+                        </el-radio-group>
+                    </el-form-item>
+                </el-form>
+            </el-scrollbar>
         </el-tab-pane>
         <el-tab-pane>
             <template #label>
@@ -84,7 +137,9 @@
                     <div class="mb-3">History</div>
                 </div>
             </template>
-            View Stuff
+            <el-scrollbar>
+                History Stuff
+            </el-scrollbar>
         </el-tab-pane>
         <el-tab-pane>
             <template #label>
@@ -93,41 +148,50 @@
                     <div class="mb-3">Prefs</div>
                 </div>
             </template>
-            <el-form class="mb-1">
-                <el-form-item class="el-form-item--menu-item" label="Theme">
-                    <el-radio-group
-                        v-model="activeTheme"
-                        :disabled="!!loadingThemeName"
-                        size="small">
-                        <el-radio-button
-                            v-for="option in themeOptions"
-                            v-loading="option.value === loadingThemeName"
-                            :key="option.value"
-                            :label="option.value">
-                            {{ option.label }}
-                        </el-radio-button>
-                    </el-radio-group>
-                </el-form-item>
-            </el-form>
+            <el-scrollbar>
+                <el-form novalidate="novalidate" action="javascript:void(0)" class="mb-1">
+                    <el-form-item class="el-form-item--menu-item" label="Theme">
+                        <el-radio-group
+                            v-model="activeTheme"
+                            :disabled="!!loadingThemeName"
+                            size="small">
+                            <el-radio-button
+                                v-for="option in themeOptions"
+                                v-loading="option.value === loadingThemeName"
+                                :key="option.value"
+                                :label="option.value">
+                                {{ option.label }}
+                            </el-radio-button>
+                        </el-radio-group>
+                    </el-form-item>
+                </el-form>
+            </el-scrollbar>
         </el-tab-pane>
     </el-tabs>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, computed, nextTick } from 'vue';
+import ElButton from 'element-plus/lib/el-button';
+import ElButtonGroup from 'element-plus/lib/el-button-group';
 import ElDivider from 'element-plus/lib/el-divider';
 import ElForm from 'element-plus/lib/el-form';
 import ElFormItem from 'element-plus/lib/el-form-item';
+import ElInputNumber from '@/ui/el-input-number.vue';
 import ElLoading from 'element-plus/lib/el-loading';
 import ElMenu from 'element-plus/lib/el-menu';
 import ElMenuItem from 'element-plus/lib/el-menu-item';
+import ElOption from 'element-plus/lib/el-option';
 import ElRadioButton from 'element-plus/lib/el-radio-button';
 import ElRadioGroup from 'element-plus/lib/el-radio-group';
 import ElScrollbar from 'element-plus/lib/el-scrollbar';
+import ElSelect from 'element-plus/lib/el-select';
 import ElTabs from 'element-plus/lib/el-tabs';
 import ElTabPane from 'element-plus/lib/el-tab-pane';
 import editorStore from '@/store/editor';
+import preferencesStore from '@/store/preferences';
 import { notifyInjector } from '@/lib/notify';
+import appEmitter from '@/lib/emitter';
 import { runModule } from '@/modules';
 import { format } from '@/format';
 import '@/format/title-case';
@@ -138,14 +202,19 @@ export default defineComponent({
         loading: ElLoading.directive
     },
     components: {
+        ElButton,
+        ElButtonGroup,
         ElDivider,
         ElForm,
         ElFormItem,
+        ElInputNumber,
         ElMenu,
         ElMenuItem,
+        ElOption,
         ElRadioButton,
         ElRadioGroup,
         ElScrollbar,
+        ElSelect,
         ElTabs,
         ElTabPane
     },
@@ -158,12 +227,42 @@ export default defineComponent({
         const $notify = notifyInjector('$notify');
         const loading = ref<boolean>(false);
 
+        // View zoom/pan/rotate
+        const zoomLevel = computed<number>({
+            get() {
+                return 0;
+            },
+            set() {}
+        });
+        const rotationAngle = computed<number>({
+            get() {
+                return 0;
+            },
+            set() {}
+        });
+        const touchRotationPreference = computed<'on' | 'off' | 'snap'>({
+            get() {
+                return preferencesStore.state.touchRotation;
+            },
+            set(newTouchRotation) {
+                preferencesStore.set('touchRotation', newTouchRotation);
+            }
+        });
+        const touchRotationOptions = [
+            { value: 'on', label: 'On' },
+            { value: 'snap', label: 'Snap' },
+            { value: 'off', label: 'Off' }
+        ];
+        function onResetViewFit() {
+            appEmitter.emit('app.canvas.resetTransform');
+        }
+
+        // Theme handling
         const themeOptions = computed<{ value: string, label: string }[]>(() => {
             return Object.keys(editorStore.state.themes).map((themeName) => {
                 return { value: themeName, label: format(themeName).asTitleCase().value };
             });
         });
-        
         const loadingThemeName = computed<string | null>(() => {
             return editorStore.state.loadingThemeName;
         });
@@ -176,6 +275,7 @@ export default defineComponent({
             }
         });
 
+        // Menu selection
         async function onMenuSelect(group: string, index: string) {
             loading.value = true;
             await nextTick();
@@ -196,11 +296,10 @@ export default defineComponent({
                     break;
                 }
             } catch (error) {
-                console.log(error);
                 $notify({
                     type: 'error',
                     title: 'An Error Occurred',
-                    message: 'The module could not be loaded.'
+                    message: error.toString()
                 });
             }
             loading.value = false;
@@ -211,6 +310,11 @@ export default defineComponent({
 
         return {
             loading,
+            rotationAngle,
+            zoomLevel,
+            touchRotationPreference,
+            touchRotationOptions,
+            onResetViewFit,
             themeOptions,
             loadingThemeName,
             activeTheme,

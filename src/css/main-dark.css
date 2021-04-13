@@ -73914,6 +73914,32 @@ body.ogr-full-page {
   right: 0;
   bottom: 0;
 }
+.opengraphica .el-button-group > .el-input {
+  float: left;
+  width: 6rem;
+  margin-right: -0.0625rem;
+}
+.opengraphica .el-button-group > .el-input > .el-input__inner {
+  border-radius: 0;
+  transition: none;
+}
+.opengraphica .el-button-group > .el-input:first-child > .el-input__inner {
+  border-top-left-radius: var(--ogr-border-radius);
+  border-bottom-left-radius: var(--ogr-border-radius);
+}
+.opengraphica .el-button-group > .el-input:last-child {
+  margin-right: 0;
+}
+.opengraphica .el-button-group > .el-input:last-child > .el-input__inner {
+  border-top-right-radius: var(--ogr-border-radius);
+  border-bottom-right-radius: var(--ogr-border-radius);
+}
+.opengraphica .el-button-group > .el-input:hover {
+  z-index: 1;
+}
+.opengraphica .el-button-group > .el-input:focus-within {
+  z-index: 1;
+}
 .opengraphica .el-dialog.el-dialog--ogr-dock .el-dialog__body {
   padding: 0 !important;
 }

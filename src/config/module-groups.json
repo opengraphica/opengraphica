@@ -26,8 +26,15 @@
                 "action": {
                     "type": "ui",
                     "target": "file-export"
-                },
-                "preload": true
+                }
+            },
+            "saveAs": {
+                "name": "Save Image As",
+                "description": "Saves the image in a project format that can be re-opened by OpenGraphica without losing any information.",
+                "action": {
+                    "type": "ui",
+                    "target": "file-save-as"
+                }
             }
         }
     }

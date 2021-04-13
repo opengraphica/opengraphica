@@ -1,4 +1,38 @@
 @mixin element-plus-enhancements {
+    .el-button-group {
+        > .el-input {
+            float: left;
+            width: 6rem;
+            margin-right: -0.0625rem;
+
+            > .el-input__inner {
+                border-radius: 0;
+                transition: none;
+            }
+            &:first-child {
+                > .el-input__inner {
+                    border-top-left-radius: var(--ogr-border-radius);
+                    border-bottom-left-radius: var(--ogr-border-radius);
+                }
+            }
+            &:last-child {
+                margin-right: 0;
+
+                > .el-input__inner {
+                    border-top-right-radius: var(--ogr-border-radius);
+                    border-bottom-right-radius: var(--ogr-border-radius);
+                }
+            }
+
+            &:hover {
+                z-index: 1;
+            }
+            &:focus-within {
+                z-index: 1;
+            }
+        }
+    }
+
     .el-dialog {
         &.el-dialog--ogr-dock {
             .el-dialog__body {
