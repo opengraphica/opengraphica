@@ -2,6 +2,7 @@
     <div ref="canvasArea" class="ogr-canvas-area">
         <div ref="canvasContainer" class="ogr-canvas-container" :class="{ 'ogr-canvas-viewport-css': useCssViewport, 'ogr-canvas-viewport-css--pixelated': isPixelatedZoomLevel }">
             <canvas ref="canvas" class="ogr-canvas" />
+            <canvas v-if="usePostProcess" ref="postProcessCanvas" class="ogr-post-process-canvas" />
         </div>
     </div>
 </template>
@@ -14,19 +15,31 @@ import preferencesStore from '@/store/preferences';
 import { CanvasRenderingContext2DEnhanced } from '@/types';
 import { drawWorkingFileToCanvas,  trackCanvasTransforms } from '@/lib/canvas';
 import appEmitter from '@/lib/emitter';
+import Pica from 'pica';
 
 export default defineComponent({
     name: 'AppCanvas',
     setup(props, { emit }) {
+        const pica = new Pica();
+
         const rootElement = inject<Ref<Element>>('rootElement');
         const mainElement = inject<Ref<Element>>('mainElement');
         const canvas = ref<HTMLCanvasElement>();
+        const postProcessCanvas = ref<HTMLCanvasElement>();
         const canvasArea = ref<HTMLDivElement>();
         const canvasContainer = ref<HTMLDivElement>();
         const { useCssViewport, viewWidth: viewportWidth, viewHeight: viewportHeight } = toRefs(canvasStore.state);
         const { width: imageWidth, height: imageHeight } = toRefs(workingFileStore.state);
         const isPixelatedZoomLevel = ref<boolean>(false);
         let ctx: CanvasRenderingContext2DEnhanced | null = null;
+
+        let postProcessCancel: ((reason?: any) => void) | null = null;
+        let drawPostProcessTimeoutHandle: number | undefined;
+        let lastCssDecomposedScale: number = 1;
+        const drawPostProcessWait: number = 50;
+        const usePostProcess = computed<boolean>(() => {
+            return preferencesStore.state.postProcessInterpolateImage;
+        });
 
         canvasStore.set('workingImageBorderColor', getComputedStyle(document.documentElement).getPropertyValue('--ogr-working-image-border-color'));
 
@@ -36,12 +49,20 @@ export default defineComponent({
             if (isUseCssViewport) {
                 canvasElement.width = workingFileStore.get('width');
                 canvasElement.height = workingFileStore.get('height');
-                bufferCanvas.width = 10;    
-                bufferCanvas.height = 10;    
+                if (postProcessCanvas.value) {
+                    postProcessCanvas.value.style.display = 'block';
+                    postProcessCanvas.value.width = canvasElement.width;
+                    postProcessCanvas.value.height = canvasElement.height;
+                }
+                bufferCanvas.width = 1;    
+                bufferCanvas.height = 1;    
             } else {
                 (canvasContainer.value as HTMLDivElement).style.transform = '';
                 canvasElement.width = viewportWidth.value;
                 canvasElement.height = viewportHeight.value;
+                if (postProcessCanvas.value) {
+                    postProcessCanvas.value.style.display = 'none';
+                }
                 bufferCanvas.width = workingFileStore.get('width');
                 bufferCanvas.height = workingFileStore.get('height');
             }
@@ -67,6 +88,10 @@ export default defineComponent({
             if (useCssViewport.value === true) {
                 canvasElement.width = newWidth;
                 canvasElement.height = newHeight;
+                if (postProcessCanvas.value) {
+                    postProcessCanvas.value.width = canvasElement.width;
+                    postProcessCanvas.value.height = canvasElement.height;
+                }
                 bufferCanvas.width = 10;    
                 bufferCanvas.height = 10;    
             } else {
@@ -92,9 +117,17 @@ export default defineComponent({
                 if (useCssViewport.value === false) {
                     canvas.value.width = viewportWidth.value;
                     canvas.value.height = viewportHeight.value;
+                    if (postProcessCanvas.value) {
+                        postProcessCanvas.value.style.display = 'none';
+                    }
                 } else {
                     canvas.value.width = imageWidth;
                     canvas.value.height = imageHeight;
+                    if (postProcessCanvas.value) {
+                        postProcessCanvas.value.style.display = 'block';
+                        postProcessCanvas.value.width = imageWidth;
+                        postProcessCanvas.value.height = imageHeight;
+                    }
                 }
 
                 appEmitter.on('app.canvas.resetTransform', resetTransform);
@@ -160,6 +193,7 @@ export default defineComponent({
             if (canvasStore.get('viewDirty')) {
                 canvasStore.set('viewDirty', false);
                 if (useCssViewport.value === true) {
+                    clearTimeout(drawPostProcessTimeoutHandle);
                     const devicePixelRatio = window.devicePixelRatio;
                     const transform = canvasStore.get('transform');
                     const decomposedTransform = canvasStore.get('decomposedTransform');
@@ -173,8 +207,24 @@ export default defineComponent({
                         .translate(offsetX, offsetY)
                         .rotate(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES);
                     (canvasContainer.value as HTMLDivElement).style.transform = `matrix(${pixelRatioTransform.a},${pixelRatioTransform.b},${pixelRatioTransform.c},${pixelRatioTransform.d},${pixelRatioTransform.e},${pixelRatioTransform.f})`;
+
+                    // Post process for better pixel interpolation
+                    if (postProcessCanvas.value) {
+                        if (decomposedTransform.scaleX >= 1) {
+                            postProcessCanvas.value.style.display = 'none';
+                        }
+                        else if (decomposedTransform.scaleX !== lastCssDecomposedScale) {
+                            drawPostProcess();
+                        }
+                    }
+                    lastCssDecomposedScale = decomposedTransform.scaleX;
                 } else if (canvasElement && ctx) {
                     drawWorkingFileToCanvas(canvasElement, ctx);
+
+                    // Hide post process canvas
+                    if (postProcessCanvas.value) {
+                        postProcessCanvas.value.style.display = 'none';
+                    }
                 }
             }
             if (canvasStore.get('dirty') && canvasElement && ctx) {
@@ -184,11 +234,38 @@ export default defineComponent({
             requestAnimationFrame(drawLoop);
         }
 
+        function drawPostProcess() {
+            const canvasElement = canvas.value;
+            const postProcessCanvasElement = postProcessCanvas.value;
+            if (canvasElement && postProcessCanvasElement) {
+                postProcessCanvasElement.style.display = 'none';
+                clearTimeout(drawPostProcessTimeoutHandle);
+                drawPostProcessTimeoutHandle = setTimeout(() => {
+                    const decomposedTransform = canvasStore.get('decomposedTransform');
+                    if (postProcessCancel) {
+                        postProcessCancel();
+                        postProcessCancel = null;
+                    }
+                    postProcessCanvasElement.width = Math.ceil(canvasElement.width * decomposedTransform.scaleX);
+                    postProcessCanvasElement.height = Math.ceil(canvasElement.height * decomposedTransform.scaleX);
+                    let postProcessCancelPromise = new Promise((resolve, reject) => { postProcessCancel = reject });
+                    pica.resize(canvasElement, postProcessCanvasElement, {
+                        cancelToken: postProcessCancelPromise
+                    }).then(() => {
+                        postProcessCanvasElement.style.display = 'block';
+                        postProcessCanvasElement.style.transform = `scale(${1 / decomposedTransform.scaleX})`;
+                    }).catch(() => {});
+                }, drawPostProcessWait);
+            }
+        }
+
         return {
             canvas,
             canvasArea,
             canvasContainer,
+            postProcessCanvas,
             isPixelatedZoomLevel,
+            usePostProcess,
             useCssViewport
         };
     }

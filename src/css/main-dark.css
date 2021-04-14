@@ -5485,23 +5485,28 @@ body.ogr-full-page {
 .opengraphica .ogr-canvas-container.ogr-canvas-viewport-css {
   transform-origin: 0 0;
 }
-.opengraphica .ogr-canvas-container.ogr-canvas-viewport-css .ogr-canvas {
+.opengraphica .ogr-canvas-container.ogr-canvas-viewport-css .ogr-canvas, .opengraphica .ogr-canvas-container.ogr-canvas-viewport-css .ogr-post-process-canvas {
   width: auto;
   height: auto;
   right: auto;
   bottom: auto;
-  box-shadow: 0 0 1.25rem var(--ogr-working-image-border-color);
   image-rendering: auto;
   image-rendering: smooth;
   image-rendering: optimizequality;
   image-rendering: high-quality;
+}
+.opengraphica .ogr-canvas-container.ogr-canvas-viewport-css .ogr-canvas {
+  box-shadow: 0 0 1.25rem var(--ogr-working-image-border-color);
+}
+.opengraphica .ogr-canvas-container.ogr-canvas-viewport-css .ogr-post-process-canvas {
+  transform-origin: top left;
 }
 .opengraphica .ogr-canvas-container.ogr-canvas-viewport-css.ogr-canvas-viewport-css--pixelated .ogr-canvas {
   image-rendering: optimizespeed;
   image-rendering: crisp-edges;
   image-rendering: pixelated;
 }
-.opengraphica .ogr-canvas {
+.opengraphica .ogr-canvas, .opengraphica .ogr-post-process-canvas {
   display: block;
   position: absolute;
   top: 0;

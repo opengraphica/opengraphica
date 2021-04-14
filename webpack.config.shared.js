@@ -15,6 +15,12 @@ module.exports = function setupConfig(config) {
                     loader: 'vue-loader'
                 },
                 {
+                    test: /\.worker\.(js|ts)$/,
+                    use: {
+                        loader: 'worker-loader'
+                    }
+                },
+                {
                     test: /\.ts$/,
                     loader: 'ts-loader',
                     options: {
@@ -203,7 +209,7 @@ module.exports = function setupConfig(config) {
                         name: 'polyfill'
                     },
                     vendor: {
-                        test: /[\\/]node_modules[\\/](lodash|dayjs|file-saver|mitt|normalize-wheel)/,
+                        test: /[\\/]node_modules[\\/](lodash|dayjs|file-saver|mitt|normalize-wheel|pica)/,
                         name: 'vendor'
                     },
                     vue: {

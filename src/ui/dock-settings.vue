@@ -107,10 +107,10 @@
                                 Fit
                             </el-button>
                             <el-button size="small" plain>
-                                Zoom
+                                1:1
                             </el-button>
                             <el-button size="small" plain>
-                                Rotate
+                                0°
                             </el-button>
                         </el-button-group>
                     </el-form-item>

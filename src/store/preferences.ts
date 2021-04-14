@@ -6,6 +6,7 @@ interface PreferencesState {
     multiTouchDownTimeout: number;
     multiTouchTapTimeout: number;
     pointerPressHoldTimeout: number;
+    postProcessInterpolateImage: boolean;
     preferFastViewport: boolean;
     touchRotation: 'on' | 'snap' | 'off';
 }
@@ -22,6 +23,7 @@ const store = new PerformantStore<PreferencesStore>({
         multiTouchDownTimeout: 50,
         multiTouchTapTimeout: 50,
         pointerPressHoldTimeout: 500,
+        postProcessInterpolateImage: true,
         preferFastViewport: false,
         touchRotation: 'on'
     }

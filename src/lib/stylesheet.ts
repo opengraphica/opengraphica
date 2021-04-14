@@ -7,7 +7,7 @@ export function loadStylesheet(url: string): Promise<HTMLLinkElement> {
         link.onload = () => {
             resolve(link);
         };
-        link.onerror = (error) => {
+        link.onerror = (error: any) => {
             reject(error);
         }
         link.href = url;

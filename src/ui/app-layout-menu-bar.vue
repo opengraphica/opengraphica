@@ -111,6 +111,7 @@
 import { defineComponent, computed, nextTick, watch, PropType, ref, onMounted, onUnmounted, toRefs, defineAsyncComponent } from 'vue';
 import ElButton from 'element-plus/lib/el-button';
 import ElButtonGroup from 'element-plus/lib/el-button-group';
+import ElLoading from 'element-plus/lib/el-loading';
 import ElPopover from 'element-plus/lib/el-popover';
 import ElTag from 'element-plus/lib/el-tag';
 import { LayoutShortcutGroupDefinition, LayoutShortcutGroupDefinitionControlButton, DndLayoutMenuBar } from '@/types';
@@ -123,6 +124,9 @@ import Dock from './dock.vue';
 
 export default defineComponent({
     name: 'AppLayoutMenuBar',
+    directives: {
+        loading: ElLoading.directive
+    },
     components: {
         DynamicallyLoadedDock: Dock,
         ElButton,

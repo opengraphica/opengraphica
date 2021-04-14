@@ -199,16 +199,22 @@ body.ogr-full-page {
         &.ogr-canvas-viewport-css {
             transform-origin: 0 0;
     
-            .ogr-canvas {
+            .ogr-canvas, .ogr-post-process-canvas {
                 width: auto;
                 height: auto;
                 right: auto;
                 bottom: auto;
-                box-shadow: 0 0 1.25rem var(--ogr-working-image-border-color);
                 image-rendering: auto;
                 image-rendering: smooth;
                 image-rendering: optimizequality;
                 image-rendering: high-quality;
+            }
+
+            .ogr-canvas {
+                box-shadow: 0 0 1.25rem var(--ogr-working-image-border-color);
+            }
+            .ogr-post-process-canvas {
+                transform-origin: top left;
             }
 
             &.ogr-canvas-viewport-css--pixelated {
@@ -221,7 +227,7 @@ body.ogr-full-page {
         }
     }
 
-    .ogr-canvas {
+    .ogr-canvas, .ogr-post-process-canvas {
         display: block;
         position: absolute;
         top: 0;

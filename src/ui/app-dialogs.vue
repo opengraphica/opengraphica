@@ -1,14 +1,21 @@
 <template>
     <div class="ogr-dialogs">
         <template v-for="dialog of dialogs" :key="dialog.id">
-            <el-dialog :title="dialog.title" :custom-class="'el-dialog--' + dialog.size + ' el-dialog--ogr-' + dialog.type" v-model="dialog.visible" destroy-on-close @closed="onDialogClosed(dialog)">
-                <template v-if="dialog.type === 'dock'">
-                    <dock :name="dialog.dock.name" @update:title="dialog.title = $event" @close="dialog.visible = false" />
+            <suspense>
+                <template #default>
+                    <el-dialog :title="dialog.title" :custom-class="'el-dialog--' + dialog.size + ' el-dialog--ogr-' + dialog.type" v-model="dialog.visible" destroy-on-close @closed="onDialogClosed(dialog)">
+                        <template v-if="dialog.type === 'dock'">
+                            <dock :name="dialog.dock.name" @update:title="dialog.title = $event" @close="dialog.visible = false" />
+                        </template>
+                        <template v-else-if="dialog.type === 'module'">
+                            <module :name="dialog.module.name" @update:title="dialog.title = $event" @close="dialog.visible = false" />
+                        </template>
+                    </el-dialog>
                 </template>
-                <template v-else-if="dialog.type === 'module'">
-                    <module :name="dialog.module.name" @update:title="dialog.title = $event" @close="dialog.visible = false" />
+                <template #fallback>
+                    <div class="is-position-absolute-full" v-loading="true"></div>
                 </template>
-            </el-dialog>
+            </suspense>
         </template>
     </div>
 </template>
@@ -17,6 +24,7 @@
 import { defineComponent, defineAsyncComponent, ref, onMounted, onUnmounted } from 'vue';
 import Dock from './dock.vue';
 import Module from './module.vue';
+import ElLoading from 'element-plus/lib/el-loading';
 import appEmitter, { AppEmitterEvents } from '@/lib/emitter';
 
 interface DialogCommonDefinition {
@@ -40,6 +48,9 @@ type DialogDefinition = DockDialogDefinition | ModuleDialogDefinition;
 
 export default defineComponent({
     name: 'AppDialogs',
+    directives: {
+        loading: ElLoading.directive
+    },
     components: {
         Dock,
         ElDialog: defineAsyncComponent(() => import(`element-plus/lib/el-dialog`)),
