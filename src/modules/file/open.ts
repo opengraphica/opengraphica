@@ -13,6 +13,8 @@ import { InsertLayerAction } from '@/actions/insert-layer';
 
 export async function openFromFileDialog(): Promise<void> {
 
+    // This container and the file input is purposely left in the dom after creation in order to avoid
+    // several bugs revolving around the fact that browsers give you no information if file selection is canceled.
     let temporaryFileInputContainer = document.getElementById('ogr-tmp-file-input-container') as HTMLDivElement;
     if (!temporaryFileInputContainer) {
         temporaryFileInputContainer = document.createElement('div');
@@ -51,7 +53,6 @@ export async function openFromFileDialog(): Promise<void> {
             setTimeout(() => {
                 if (!isChangeFired) {
                     resolve();
-                    temporaryFileInputContainer.removeChild(fileInput);
                 }
             }, 500);
             window.removeEventListener('focus', onFocusAway);

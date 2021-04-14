@@ -17,7 +17,6 @@ module.exports = setupConfig({
         }
     },
     plugins: [
-        new BundleAnalyzerPlugin(),
         new HtmlWebpackPlugin({
             title: 'OpenGraphica Image Editor',
             template: 'index.ejs',
