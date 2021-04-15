@@ -11,12 +11,14 @@
         <noscript>This application does not work without Javascript. Please enable it to continue.</noscript>
         <div id="opengraphica">
             <style>
-                .ogr-app-spinner-center { position: absolute; top: 50vh; left: 50vw; transform: translate(-50%, -50%) }
-                .ogr-app-spinner { display: inline-block; width: 80px; height: 80px; }
-                .ogr-app-spinner:after { content: " "; display: block; width: 64px; height: 64px; margin: 8px; border-radius: 50%; border: 6px solid #409EFF; border-color: #409EFF transparent #409EFF transparent; animation: ogr-app-spinner 1.2s linear infinite; }
+                .ogr-app-spinner-mask { position: absolute; z-index: 2000; background-color: rgba(255, 255, 255, 0.9); margin: 0; top: 0; right: 0; bottom: 0; left: 0; }
+                .ogr-app-spinner { top: 50%; margin-top: -1.3125rem; width: 100%; text-align: center; position: absolute; }
+                .ogr-app-spinner svg { height: 2.625rem; width: 2.625rem; animation: ogr-app-spinner 2s linear infinite; }
+                .ogr-app-spinner svg circle { animation: ogr-app-spinner-dash 1.5s ease-in-out infinite; stroke-dasharray: 90, 150; stroke-dashoffset: 0; stroke-width: 2; stroke: #409EFF; stroke-linecap: round; }
                 @keyframes ogr-app-spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+                @keyframes ogr-app-spinner-dash { 0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; } 50% { stroke-dasharray: 90, 150; stroke-dashoffset: -2.5rem; } 100% { stroke-dasharray: 90, 150; stroke-dashoffset: -7.5rem; } }
             </style>
-            <div class="ogr-app-spinner-center"><div class="ogr-app-spinner"></div></div>
+            <div class="ogr-app-spinner-mask"><div class="ogr-app-spinner"><svg viewBox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none"></circle></svg></svg></div></div>
         </div>
         <script>
             OpenGraphica.theme({

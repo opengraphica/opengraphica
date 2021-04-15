@@ -1,5 +1,5 @@
 <template>
-    <div ref="root" class="opengraphica" @touchstart="onTouchStartRoot($event)" v-loading="loading">
+    <div ref="root" class="opengraphica" @touchstart="onTouchStartRoot($event)" v-loading="true || loading">
         <app-canvas />
         <app-layout-dnd-container @dnd-ready="onDndLayoutReady($event)" />
         <app-dialogs />

@@ -256,8 +256,8 @@ export default defineComponent({
                         postProcessCancel();
                         postProcessCancel = null;
                     }
-                    postProcessCanvasElement.width = Math.ceil(canvasElement.width * decomposedTransform.scaleX);
-                    postProcessCanvasElement.height = Math.ceil(canvasElement.height * decomposedTransform.scaleX);
+                    postProcessCanvasElement.width = Math.round(canvasElement.width * decomposedTransform.scaleX);
+                    postProcessCanvasElement.height = Math.round(canvasElement.height * decomposedTransform.scaleX);
                     let postProcessCancelPromise = new Promise((resolve, reject) => { postProcessCancel = reject });
                     pica.resize(canvasElement, postProcessCanvasElement, {
                         cancelToken: postProcessCancelPromise
