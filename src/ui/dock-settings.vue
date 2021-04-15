@@ -149,8 +149,8 @@
                 </div>
             </template>
             <el-scrollbar>
-                <el-form novalidate="novalidate" action="javascript:void(0)" class="mb-1">
-                    <el-form-item class="el-form-item--menu-item" label="Theme">
+                <el-form novalidate="novalidate" action="javascript:void(0)">
+                    <el-form-item class="el-form-item--menu-item mb-1" label="Theme">
                         <el-radio-group
                             v-model="activeTheme"
                             :disabled="!!loadingThemeName"
@@ -164,6 +164,21 @@
                             </el-radio-button>
                         </el-radio-group>
                     </el-form-item>
+                    <el-collapse class="el-collapse--menu-item">
+                        <el-collapse-item title="Viewport">
+                            <el-form-item class="el-form-item--menu-item" label="Optimize for Low RAM">
+                                <el-switch v-model="preferenceOptimizeLowRam" />
+                            </el-form-item>
+                            <transition name="fade">
+                                <el-form-item v-if="preferenceOptimizeLowRam" class="el-form-item--menu-item" label="Fix Adjacent Layer Seams">
+                                    <el-switch v-model="performanceFixLayerSeams" />
+                                </el-form-item>
+                            </transition>
+                            <el-form-item class="el-form-item--menu-item" label="High Quality Scaling">
+                                <el-switch v-model="preferenceHighQualityScaling" />
+                            </el-form-item>
+                        </el-collapse-item>
+                    </el-collapse>
                 </el-form>
             </el-scrollbar>
         </el-tab-pane>
@@ -174,6 +189,8 @@
 import { defineComponent, ref, computed, nextTick } from 'vue';
 import ElButton from 'element-plus/lib/el-button';
 import ElButtonGroup from 'element-plus/lib/el-button-group';
+import ElCollapse from 'element-plus/lib/el-collapse';
+import ElCollapseItem from 'element-plus/lib/el-collapse-item';
 import ElDivider from 'element-plus/lib/el-divider';
 import ElForm from 'element-plus/lib/el-form';
 import ElFormItem from 'element-plus/lib/el-form-item';
@@ -186,8 +203,10 @@ import ElRadioButton from 'element-plus/lib/el-radio-button';
 import ElRadioGroup from 'element-plus/lib/el-radio-group';
 import ElScrollbar from 'element-plus/lib/el-scrollbar';
 import ElSelect from 'element-plus/lib/el-select';
+import ElSwitch from 'element-plus/lib/el-switch';
 import ElTabs from 'element-plus/lib/el-tabs';
 import ElTabPane from 'element-plus/lib/el-tab-pane';
+import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import preferencesStore from '@/store/preferences';
 import { notifyInjector } from '@/lib/notify';
@@ -204,6 +223,8 @@ export default defineComponent({
     components: {
         ElButton,
         ElButtonGroup,
+        ElCollapse,
+        ElCollapseItem,
         ElDivider,
         ElForm,
         ElFormItem,
@@ -215,6 +236,7 @@ export default defineComponent({
         ElRadioGroup,
         ElScrollbar,
         ElSelect,
+        ElSwitch,
         ElTabs,
         ElTabPane
     },
@@ -275,6 +297,34 @@ export default defineComponent({
             }
         });
 
+        // Preferences
+        const preferenceOptimizeLowRam = computed<boolean>({
+            get() {
+                return preferencesStore.state.preferCanvasViewport;
+            },
+            set(value) {
+                preferencesStore.set('preferCanvasViewport', value);
+                canvasStore.set('viewDirty', true);
+            }
+        });
+        const performanceFixLayerSeams = computed<boolean>({
+            get() {
+                return preferencesStore.state.enableMultiLayerBuffer;
+            },
+            set(value) {
+                preferencesStore.set('enableMultiLayerBuffer', value);
+                canvasStore.set('viewDirty', true);
+            }
+        });
+        const preferenceHighQualityScaling = computed<boolean>({
+            get() {
+                return preferencesStore.state.postProcessInterpolateImage;
+            },
+            set(value) {
+                preferencesStore.set('postProcessInterpolateImage', value);
+            }
+        });
+
         // Menu selection
         async function onMenuSelect(group: string, index: string) {
             loading.value = true;
@@ -318,6 +368,9 @@ export default defineComponent({
             themeOptions,
             loadingThemeName,
             activeTheme,
+            preferenceOptimizeLowRam,
+            performanceFixLayerSeams,
+            preferenceHighQualityScaling,
             onMenuSelect
         };
     }

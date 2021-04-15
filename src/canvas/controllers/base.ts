@@ -1,4 +1,5 @@
 import { CanvasRenderingContext2DEnhanced } from '@/types';
+import canvasStore from '@/store/canvas';
 import preferencesStore from '@/store/preferences';
 
 export interface PointerTracker {
@@ -82,6 +83,7 @@ export default class BaseCanvasController {
                 this.touches.push(pointer);
             }
         }
+        canvasStore.set('preventPostProcess', true);
     }
 
     onPointerMove(e: PointerEvent): void {
@@ -102,6 +104,9 @@ export default class BaseCanvasController {
             this.pointers.splice(pointerIndex, 1);
         }
         this.purgeTouches();
+        if (this.pointers.length === 0) {
+            canvasStore.set('preventPostProcess', false);
+        }
     }
 
     onWheel(e: WheelEvent): void {

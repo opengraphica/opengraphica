@@ -156,9 +156,9 @@ export default class BaseCanvasMovementController extends BaseCanvasController {
             if ((e.pointerType === 'mouse' && (e.button === 1 || e.button === 2))) {
                 this.moveTranslateStart = null;
                 canvasStore.set('cursor', null);
-                canvasStore.set('viewDirty', true);
             }
         }
+        canvasStore.set('viewDirty', true);
     }
 
     onWheel(e: WheelEvent): void {

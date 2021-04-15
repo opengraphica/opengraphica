@@ -23116,6 +23116,14 @@ body.ogr-full-page {
 .opengraphica .el-button-group > .el-input:focus-within {
   z-index: 1;
 }
+.opengraphica .el-collapse--menu-item .el-collapse-item__header {
+  font-size: 0.875rem;
+  padding-left: 1.25rem;
+  padding-right: 0.5rem;
+}
+.opengraphica .el-collapse--menu-item .el-collapse-item__content {
+  padding-bottom: 0.5rem;
+}
 .opengraphica .el-dialog.el-dialog--ogr-dock .el-dialog__body {
   padding: 0 !important;
 }

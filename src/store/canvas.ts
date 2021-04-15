@@ -1,6 +1,7 @@
 import { PerformantStore } from './performant-store';
 import { CanvasRenderingContext2DEnhanced } from '@/types';
 import { DecomposedMatrix, decomposeMatrix } from '@/lib/dom-matrix';
+import preferencesStore from './preferences';
 
 interface CanvasState {
     bufferCanvas: HTMLCanvasElement;
@@ -12,6 +13,7 @@ interface CanvasState {
     dirty: boolean;
     isBufferInUse: boolean;
     isDisplayingNonRasterLayer: boolean;
+    preventPostProcess: boolean;
     transform: DOMMatrix;
     useCssViewport: boolean;
     viewCanvas: HTMLCanvasElement;
@@ -40,6 +42,7 @@ const store = new PerformantStore<CanvasStore>({
         dirty: true,
         isBufferInUse: false,
         isDisplayingNonRasterLayer: false,
+        preventPostProcess: false,
         transform: new DOMMatrix(),
         useCssViewport: false,
         viewCanvas: dummyCanvas,
@@ -54,7 +57,10 @@ const store = new PerformantStore<CanvasStore>({
         if (key === 'transform') {
             const decomposedTransform = decomposeMatrix(value as DOMMatrix);
             set('decomposedTransform', decomposedTransform);
-            set('useCssViewport', !(store.get('isDisplayingNonRasterLayer') && decomposedTransform.scaleX > 1));
+            set('useCssViewport',
+                !preferencesStore.get('preferCanvasViewport') &&
+                !(store.get('isDisplayingNonRasterLayer') && decomposedTransform.scaleX > 1)
+            );
         }
     }
 });

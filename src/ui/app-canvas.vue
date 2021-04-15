@@ -15,12 +15,11 @@ import preferencesStore from '@/store/preferences';
 import { CanvasRenderingContext2DEnhanced } from '@/types';
 import { drawWorkingFileToCanvas,  trackCanvasTransforms } from '@/lib/canvas';
 import appEmitter from '@/lib/emitter';
-import Pica from 'pica';
 
 export default defineComponent({
     name: 'AppCanvas',
     setup(props, { emit }) {
-        const pica = new Pica();
+        let pica: any; // Can't import type definitions from dynamic modules imported later, wtf typescript!
 
         const rootElement = inject<Ref<Element>>('rootElement');
         const mainElement = inject<Ref<Element>>('mainElement');
@@ -105,8 +104,8 @@ export default defineComponent({
             resetTransform();
         }, { immediate: true });
 
-        onMounted(() => {
-            if (canvas.value) {
+        onMounted(async () => {
+            if (canvas.value) {                
                 const imageWidth = workingFileStore.get('width');
                 const imageHeight = workingFileStore.get('height');
 
@@ -148,6 +147,9 @@ export default defineComponent({
                     canvasStore.set('bufferCtx', bufferCtx);
                     drawLoop();
                 }
+
+                const Pica = (await import('pica')).default;
+                pica = new Pica();
             }
         });
 
@@ -194,6 +196,7 @@ export default defineComponent({
                 canvasStore.set('viewDirty', false);
                 if (useCssViewport.value === true) {
                     clearTimeout(drawPostProcessTimeoutHandle);
+
                     const devicePixelRatio = window.devicePixelRatio;
                     const transform = canvasStore.get('transform');
                     const decomposedTransform = canvasStore.get('decomposedTransform');
@@ -214,10 +217,17 @@ export default defineComponent({
                             postProcessCanvas.value.style.display = 'none';
                         }
                         else if (decomposedTransform.scaleX !== lastCssDecomposedScale) {
-                            drawPostProcess();
+                            if (canvasStore.get('preventPostProcess')) {
+                                lastCssDecomposedScale = -1;
+                                postProcessCanvas.value.width = 1;
+                                postProcessCanvas.value.height = 1;
+                                postProcessCanvas.value.style.display = 'none';
+                            } else {
+                                drawPostProcess();
+                                lastCssDecomposedScale = decomposedTransform.scaleX;
+                            }
                         }
                     }
-                    lastCssDecomposedScale = decomposedTransform.scaleX;
                 } else if (canvasElement && ctx) {
                     drawWorkingFileToCanvas(canvasElement, ctx);
 
@@ -237,7 +247,7 @@ export default defineComponent({
         function drawPostProcess() {
             const canvasElement = canvas.value;
             const postProcessCanvasElement = postProcessCanvas.value;
-            if (canvasElement && postProcessCanvasElement) {
+            if (pica && canvasElement && postProcessCanvasElement) {
                 postProcessCanvasElement.style.display = 'none';
                 clearTimeout(drawPostProcessTimeoutHandle);
                 drawPostProcessTimeoutHandle = setTimeout(() => {

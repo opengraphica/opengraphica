@@ -29,7 +29,7 @@ const cursorImages: { [key: string]: { data: string, image: HTMLImageElement | n
 export const drawWorkingFileLayerToCanvas = (targetCanvas: HTMLCanvasElement, targetCtx: CanvasRenderingContext2DEnhanced, layer: WorkingFileLayer<ColorModel>, decomposedTransform: DecomposedMatrix) => {
     let ctx = targetCtx;
     
-    if (preferencesStore.get('enableBuffer') && !canvasStore.get('useCssViewport') && decomposedTransform.scaleX < 1) {
+    if (preferencesStore.get('enableMultiLayerBuffer') && !canvasStore.get('useCssViewport') && decomposedTransform.scaleX < 1) {
         const isBufferInUse = canvasStore.get('isBufferInUse');
         if (layer.type === 'raster') {
             ctx = canvasStore.get('bufferCtx');

@@ -1,13 +1,13 @@
 import { PerformantStore } from './performant-store';
 
 interface PreferencesState {
-    enableBuffer: boolean;
+    enableMultiLayerBuffer: boolean;
     historyStatesMax: number;
     multiTouchDownTimeout: number;
     multiTouchTapTimeout: number;
     pointerPressHoldTimeout: number;
     postProcessInterpolateImage: boolean;
-    preferFastViewport: boolean;
+    preferCanvasViewport: boolean;
     touchRotation: 'on' | 'snap' | 'off';
 }
 
@@ -18,13 +18,13 @@ interface PreferencesStore {
 
 const store = new PerformantStore<PreferencesStore>({
     state: {
-        enableBuffer: false,
+        enableMultiLayerBuffer: true,
         historyStatesMax: 50,
         multiTouchDownTimeout: 50,
         multiTouchTapTimeout: 50,
         pointerPressHoldTimeout: 500,
         postProcessInterpolateImage: true,
-        preferFastViewport: false,
+        preferCanvasViewport: false,
         touchRotation: 'on'
     }
 });

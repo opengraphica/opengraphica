@@ -101,7 +101,7 @@ module.exports = function setupConfig(config) {
                         name: 'element-plus-checkbox'
                     },
                     elementPlusCollapse: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-collapse)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-collapse|el-collapse-item)[\\/]/,
                         name: 'element-plus-collapse'
                     },
                     elementPlusDialog: {
@@ -204,12 +204,16 @@ module.exports = function setupConfig(config) {
                         test: /[\\/]src[\\/]ui[\\/](el-form-item-group|el-form-item-aligned-groups)/,
                         name: 'ogr-element-form'
                     },
+                    pica: {
+                        test: /[\\/]node_modules[\\/]pica[\\/]/,
+                        name: 'pica',
+                    },
                     polyfill: {
                         test: /[\\/]node_modules[\\/](resize-observer-polyfill)[\\/]/,
                         name: 'polyfill'
                     },
                     vendor: {
-                        test: /[\\/]node_modules[\\/](lodash|dayjs|file-saver|mitt|normalize-wheel|pica)/,
+                        test: /[\\/]node_modules[\\/](lodash|dayjs|file-saver|mitt|normalize-wheel)/,
                         name: 'vendor'
                     },
                     vue: {

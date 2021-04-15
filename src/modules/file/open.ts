@@ -76,7 +76,7 @@ export async function openFromFileList(files: FileList) {
         const file = files[fileIndex];
 
         readerPromises.push(
-            new Promise((resolveReader, rejectReader) => {
+            new Promise(async (resolveReader, rejectReader) => {
                 if (!file.type.match(/^image\//) && !file.name.match(/\.json$/)) {
                     rejectReader('The file "' + file.name + '" is the wrong type. It must be an image or json file.');
                     return;
@@ -89,34 +89,28 @@ export async function openFromFileList(files: FileList) {
                 }
 
                 const fileReader = new FileReader();
-                fileReader.onload = async () => {
-                    if (fileReadType === 'image') {
-                        try {
-                            const image = await new Promise<HTMLImageElement>((resolveImage, rejectImage) => {
-                                const image = new Image();
-                                image.onload = () => {
-                                    resolveImage(image);
-                                };
-                                image.onerror = () => {
-                                    rejectImage();
-                                };
-                                image.src = fileReader.result as string;
-                            });
-                            resolveReader({ type: 'image', result: image, file: file });
-                        } catch (error) {
-                            rejectReader('An error occurred while loading the image for file "' + file.name + '".');
-                        }
-                    } else {
+
+                if (fileReadType === 'image') {
+                    const image = await new Promise<HTMLImageElement>((resolveImage, rejectImage) => {
+                        const image = new Image();
+                        image.onload = () => {
+                            resolveImage(image);
+                        };
+                        image.onerror = () => {
+                            rejectImage();
+                        };
+                        image.src = URL.createObjectURL(file) as string;
+                    });
+                    resolveReader({ type: 'image', result: image, file: file });
+                }
+                else if (fileReadType === 'json') {
+                    fileReader.onload = async () => {
                         resolveReader({ type: 'json', result: fileReader.result as string, file: file });
-                    }
-                };
-                fileReader.onerror = () => {
-                    rejectReader('An error occurred while reading the file "' + file.name + '".');
-                };
-                if (fileReadType === 'json') {
+                    };
+                    fileReader.onerror = () => {
+                        rejectReader('An error occurred while reading the file "' + file.name + '".');
+                    };
                     fileReader.readAsText(file);
-                } else if (fileReadType === 'image') {
-                    fileReader.readAsDataURL(file);
                 }
 
             })
@@ -150,7 +144,7 @@ export async function openFromFileList(files: FileList) {
                         height: image.height,
                         data: {
                             sourceImage: image,
-                            sourceImageIsObjectUrl: false
+                            sourceImageIsObjectUrl: true
                         }
                     })
                 );
