@@ -13,13 +13,15 @@ import canvasStore from '@/store/canvas';
 import workingFileStore from '@/store/working-file';
 import preferencesStore from '@/store/preferences';
 import { CanvasRenderingContext2DEnhanced } from '@/types';
-import { drawWorkingFileToCanvas,  trackCanvasTransforms } from '@/lib/canvas';
+import { drawWorkingFileToCanvas, trackCanvasTransforms } from '@/lib/canvas';
+import { notifyInjector } from '@/lib/notify';
 import appEmitter from '@/lib/emitter';
 
 export default defineComponent({
     name: 'AppCanvas',
     setup(props, { emit }) {
         let pica: any; // Can't import type definitions from dynamic modules imported later, wtf typescript!
+        const $notify = notifyInjector('$notify');
 
         const rootElement = inject<Ref<Element>>('rootElement');
         const mainElement = inject<Ref<Element>>('mainElement');
@@ -192,54 +194,77 @@ export default defineComponent({
 
         function drawLoop() {
             const canvasElement = canvas.value;
-            if (canvasStore.get('viewDirty')) {
-                canvasStore.set('viewDirty', false);
-                if (useCssViewport.value === true) {
-                    clearTimeout(drawPostProcessTimeoutHandle);
+            try {
+                if (canvasStore.get('viewDirty')) {
+                    canvasStore.set('viewDirty', false);
+                    if (useCssViewport.value === true) {
+                        clearTimeout(drawPostProcessTimeoutHandle);
 
-                    const devicePixelRatio = window.devicePixelRatio;
-                    const transform = canvasStore.get('transform');
-                    const decomposedTransform = canvasStore.get('decomposedTransform');
-                    isPixelatedZoomLevel.value = decomposedTransform.scaleX / devicePixelRatio >= 1.25;
-                    const offsetX = transform.e / decomposedTransform.scaleX;
-                    const offsetY = transform.f / decomposedTransform.scaleX;
-                    const pixelRatioTransform = transform
-                        .rotate(-decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
-                        .translate(-offsetX, -offsetY)
-                        .scale(1 / devicePixelRatio, 1 / devicePixelRatio)
-                        .translate(offsetX, offsetY)
-                        .rotate(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES);
-                    (canvasContainer.value as HTMLDivElement).style.transform = `matrix(${pixelRatioTransform.a},${pixelRatioTransform.b},${pixelRatioTransform.c},${pixelRatioTransform.d},${pixelRatioTransform.e},${pixelRatioTransform.f})`;
+                        const devicePixelRatio = window.devicePixelRatio;
+                        const transform = canvasStore.get('transform');
+                        const decomposedTransform = canvasStore.get('decomposedTransform');
+                        isPixelatedZoomLevel.value = decomposedTransform.scaleX / devicePixelRatio >= 1.25;
+                        const offsetX = transform.e / decomposedTransform.scaleX;
+                        const offsetY = transform.f / decomposedTransform.scaleX;
+                        const pixelRatioTransform = transform
+                            .rotate(-decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
+                            .translate(-offsetX, -offsetY)
+                            .scale(1 / devicePixelRatio, 1 / devicePixelRatio)
+                            .translate(offsetX, offsetY)
+                            .rotate(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES);
+                        (canvasContainer.value as HTMLDivElement).style.transform = `matrix(${pixelRatioTransform.a},${pixelRatioTransform.b},${pixelRatioTransform.c},${pixelRatioTransform.d},${pixelRatioTransform.e},${pixelRatioTransform.f})`;
 
-                    // Post process for better pixel interpolation
-                    if (postProcessCanvas.value) {
-                        if (decomposedTransform.scaleX >= 1) {
-                            postProcessCanvas.value.style.display = 'none';
-                        }
-                        else if (decomposedTransform.scaleX !== lastCssDecomposedScale) {
-                            if (canvasStore.get('preventPostProcess')) {
-                                lastCssDecomposedScale = -1;
-                                postProcessCanvas.value.width = 1;
-                                postProcessCanvas.value.height = 1;
+                        // Post process for better pixel interpolation
+                        if (postProcessCanvas.value) {
+                            if (decomposedTransform.scaleX >= 1) {
                                 postProcessCanvas.value.style.display = 'none';
-                            } else {
-                                drawPostProcess();
-                                lastCssDecomposedScale = decomposedTransform.scaleX;
+                            }
+                            else if (decomposedTransform.scaleX !== lastCssDecomposedScale) {
+                                if (canvasStore.get('preventPostProcess')) {
+                                    lastCssDecomposedScale = -1;
+                                    postProcessCanvas.value.width = 1;
+                                    postProcessCanvas.value.height = 1;
+                                    postProcessCanvas.value.style.display = 'none';
+                                } else {
+                                    drawPostProcess();
+                                    lastCssDecomposedScale = decomposedTransform.scaleX;
+                                }
                             }
                         }
-                    }
-                } else if (canvasElement && ctx) {
-                    drawWorkingFileToCanvas(canvasElement, ctx);
+                    } else if (canvasElement && ctx) {
+                        drawWorkingFileToCanvas(canvasElement, ctx);
 
-                    // Hide post process canvas
-                    if (postProcessCanvas.value) {
-                        postProcessCanvas.value.style.display = 'none';
+                        // Hide post process canvas
+                        if (postProcessCanvas.value) {
+                            postProcessCanvas.value.style.display = 'none';
+                        }
                     }
                 }
-            }
-            if (canvasStore.get('dirty') && canvasElement && ctx) {
-                canvasStore.set('dirty', false);
-                drawWorkingFileToCanvas(canvasElement, ctx);
+                if (canvasStore.get('dirty') && canvasElement && ctx) {
+                    canvasStore.set('dirty', false);
+                    drawWorkingFileToCanvas(canvasElement, ctx);
+                }
+            } catch (error) {
+                console.error(error);
+                if (preferencesStore.get('preferCanvasViewport') === false) {
+                    clearTimeout(drawPostProcessTimeoutHandle);
+                    preferencesStore.set('preferCanvasViewport', true);
+                    canvasStore.set('useCssViewport', false);
+                    canvasStore.set('viewDirty', false);
+                    canvasStore.set('dirty', false);
+                    $notify({
+                        type: 'info',
+                        message: 'The image could not be drawn, switching viewport to optimize for large images.'
+                    });
+                } else {
+                    canvasStore.set('viewDirty', false);
+                    canvasStore.set('dirty', false);
+                    $notify({
+                        type: 'error',
+                        title: 'Can\'t Draw Image',
+                        message: 'The image could be too large or some other error could have occurred.'
+                    });
+                }
             }
             requestAnimationFrame(drawLoop);
         }

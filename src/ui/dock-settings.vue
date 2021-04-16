@@ -166,15 +166,13 @@
                     </el-form-item>
                     <el-collapse class="el-collapse--menu-item">
                         <el-collapse-item title="Viewport">
-                            <el-form-item class="el-form-item--menu-item" label="Optimize for Low RAM">
-                                <el-switch v-model="preferenceOptimizeLowRam" />
+                            <el-form-item class="el-form-item--menu-item" label="Optimize for Large Image">
+                                <el-switch v-model="preferenceOptimizeLargeImages" />
                             </el-form-item>
-                            <transition name="fade">
-                                <el-form-item v-if="preferenceOptimizeLowRam" class="el-form-item--menu-item" label="Fix Adjacent Layer Seams">
-                                    <el-switch v-model="performanceFixLayerSeams" />
-                                </el-form-item>
-                            </transition>
-                            <el-form-item class="el-form-item--menu-item" label="High Quality Scaling">
+                            <el-form-item v-if="preferenceOptimizeLargeImages" class="el-form-item--menu-item" label="Fix Adjacent Layer Seams">
+                                <el-switch v-model="performanceFixLayerSeams" />
+                            </el-form-item>
+                            <el-form-item v-if="!preferenceOptimizeLargeImages" class="el-form-item--menu-item" label="High Quality Scaling">
                                 <el-switch v-model="preferenceHighQualityScaling" />
                             </el-form-item>
                         </el-collapse-item>
@@ -298,7 +296,7 @@ export default defineComponent({
         });
 
         // Preferences
-        const preferenceOptimizeLowRam = computed<boolean>({
+        const preferenceOptimizeLargeImages = computed<boolean>({
             get() {
                 return preferencesStore.state.preferCanvasViewport;
             },
@@ -368,7 +366,7 @@ export default defineComponent({
             themeOptions,
             loadingThemeName,
             activeTheme,
-            preferenceOptimizeLowRam,
+            preferenceOptimizeLargeImages,
             performanceFixLayerSeams,
             preferenceHighQualityScaling,
             onMenuSelect
