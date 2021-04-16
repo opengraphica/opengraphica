@@ -4,6 +4,11 @@ export {
     Gradient, LinearGradient, RadialGradient, GradientStop
 } from './color';
 export { FilterAugment } from './filter';
+export { MeasuringUnits, ResolutionUnits } from './metrics';
+export {
+    SerializedFile, SerializedFileGroupLayer, SerializedFileRasterLayer, SerializedFileVectorLayer, SerializedFileTextLayer,
+    SerializedFileLayer
+} from './serialized-file';
 export {
     LayoutShortcutGroupDefinition, LayoutShortcutGroupDefinitionControl, LayoutShortcutGroupDefinitionControlButton,
     ActionGroupControlEventHandler, DndLayout, DndLayoutComponent, DndLayoutDock, DndLayoutMenuBar, ToolDefinition, ToolGroupDefinition,

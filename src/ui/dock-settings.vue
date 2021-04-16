@@ -340,6 +340,9 @@ export default defineComponent({
                             case 'export':
                                 await runModule('file', 'export');
                                 break;
+                            case 'saveAs':
+                                await runModule('file', 'saveAs');
+                                break;
                         }
                     break;
                 }

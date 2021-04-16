@@ -10,7 +10,7 @@ export type WorkingFileLayerBlendingMode = 'color' | 'color-burn' | 'color-dodge
 export type WorkingFileLayerType = 'group' | 'raster' | 'vector' | 'text';
 
 export interface WorkingFileLayerFilter<T extends ColorModel> {
-    name: string
+    name: string;
 }
 
 export interface WorkingFileLayerRenderer<T extends ColorModel> {

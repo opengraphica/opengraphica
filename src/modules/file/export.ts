@@ -32,7 +32,7 @@ export async function exportAsImage(options: ExportOptions): Promise<void> {
         ctx.imageSmoothingEnabled = false;
         drawWorkingFileToCanvas(canvas, ctx, { selectedLayersOnly: options.layerSelection === 'selected' });
 
-        const fileName = (options.fileName || 'image').replace(/(\.(png|jpg|jpeg|webp|gif|bmp|tif|tiff))$/ig, '') + '.' + options.fileType;
+        const fileName = (options.fileName || 'image').replace(/(\.(json|png|jpg|jpeg|webp|gif|bmp|tif|tiff))$/ig, '') + '.' + options.fileType;
 
         const mimeType: string = extensionToMimeType[options.fileType];
 

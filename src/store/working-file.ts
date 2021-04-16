@@ -1,5 +1,5 @@
 import { PerformantStore } from './performant-store';
-import { RGBAColor, CanvasRenderingContext2DEnhanced, ColorModelName, WorkingFileLayer, WorkingFileRasterLayer } from '@/types';
+import { RGBAColor, MeasuringUnits, ResolutionUnits, ColorModelName, WorkingFileLayer } from '@/types';
 
 interface WorkingFileState {
     activeLayer: WorkingFileLayer<RGBAColor> | null,
@@ -11,8 +11,8 @@ interface WorkingFileState {
     height: number; // Always pixels
     layerIdCounter: number;
     layers: WorkingFileLayer<RGBAColor>[];
-    measuringUnits: 'px' | 'mm' | 'cm' | 'in';
-    resolutionUnits: 'px/in' | 'px/mm' | 'px/cm';
+    measuringUnits: MeasuringUnits;
+    resolutionUnits: ResolutionUnits;
     resolutionX: number;
     resolutionY: number;
     scaleFactor: number;
