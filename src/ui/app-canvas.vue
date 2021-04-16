@@ -250,12 +250,12 @@ export default defineComponent({
             if (pica && canvasElement && postProcessCanvasElement) {
                 postProcessCanvasElement.style.display = 'none';
                 clearTimeout(drawPostProcessTimeoutHandle);
+                if (postProcessCancel) {
+                    postProcessCancel();
+                    postProcessCancel = null;
+                }
                 drawPostProcessTimeoutHandle = setTimeout(() => {
                     const decomposedTransform = canvasStore.get('decomposedTransform');
-                    if (postProcessCancel) {
-                        postProcessCancel();
-                        postProcessCancel = null;
-                    }
                     postProcessCanvasElement.width = Math.round(canvasElement.width * decomposedTransform.scaleX);
                     postProcessCanvasElement.height = Math.round(canvasElement.height * decomposedTransform.scaleX);
                     let postProcessCancelPromise = new Promise((resolve, reject) => { postProcessCancel = reject });
@@ -264,7 +264,9 @@ export default defineComponent({
                     }).then(() => {
                         postProcessCanvasElement.style.display = 'block';
                         postProcessCanvasElement.style.transform = `scale(${1 / decomposedTransform.scaleX})`;
-                    }).catch(() => {});
+                    }).catch(() => {
+                        postProcessCanvasElement.style.display = 'none';
+                    });
                 }, drawPostProcessWait);
             }
         }

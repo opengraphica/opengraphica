@@ -18,7 +18,7 @@ interface PreferencesStore {
 
 const store = new PerformantStore<PreferencesStore>({
     state: {
-        enableMultiLayerBuffer: true,
+        enableMultiLayerBuffer: false,
         historyStatesMax: 50,
         multiTouchDownTimeout: 50,
         multiTouchTapTimeout: 50,
