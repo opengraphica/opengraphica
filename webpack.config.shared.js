@@ -88,6 +88,10 @@ module.exports = function setupConfig(config) {
                         test: /[\\/]node_modules[\\/](async-validator)[\\/]/,
                         name: 'async-validator'
                     },
+                    elementPlusAlert: {
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-alert)[\\/]/,
+                        name: 'element-plus-button'
+                    },
                     elementPlusButton: {
                         test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-button|el-button-group)[\\/]/,
                         name: 'element-plus-button'

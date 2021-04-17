@@ -9,6 +9,13 @@
         novalidate="novalidate"
         hide-required-asterisk
         @submit="onSave">
+        <el-alert
+            type="info"
+            title="If you wish to share or view the image in other programs, use &quot;Export&quot; instead."
+            show-icon
+            :closable="false"
+            class="mb-4">
+        </el-alert>
         <el-form-item-group>
             <el-form-item label="File Name" prop="fileName">
                 <el-input v-model="formData.workingFile.fileName" clearable></el-input>
@@ -23,6 +30,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, reactive, watch, nextTick } from 'vue';
+import ElAlert from 'element-plus/lib/el-alert';
 import ElButton from 'element-plus/lib/el-button';
 import ElForm from 'element-plus/lib/el-form';
 import ElFormItem from 'element-plus/lib/el-form-item';
@@ -40,6 +48,7 @@ export default defineComponent({
         loading: ElLoading.directive
     },
     components: {
+        ElAlert,
         ElButton,
         ElForm,
         ElFormItem,

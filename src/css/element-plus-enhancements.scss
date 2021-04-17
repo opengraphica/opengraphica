@@ -1,4 +1,8 @@
 @mixin element-plus-enhancements {
+    .el-alert--info.is-light {
+        color: #515356;
+    }
+
     .el-button-group {
         > .el-input {
             float: left;

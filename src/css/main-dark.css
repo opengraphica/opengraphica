@@ -5462,6 +5462,9 @@ body.ogr-full-page {
   max-height: calc(100vh - 10rem) !important;
   overflow: auto !important;
 }
+.opengraphica .ogr-module {
+  word-break: normal;
+}
 .opengraphica .ogr-canvas-area {
   display: block;
   position: absolute;
@@ -73918,6 +73921,9 @@ body.ogr-full-page {
   left: 0;
   right: 0;
   bottom: 0;
+}
+.opengraphica .el-alert--info.is-light {
+  color: #515356;
 }
 .opengraphica .el-button-group > .el-input {
   float: left;

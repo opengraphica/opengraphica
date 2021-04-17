@@ -175,6 +175,10 @@ body.ogr-full-page {
         }
     }
 
+    .ogr-module {
+        word-break: normal;
+    }
+
     .ogr-canvas-area {
         display: block;
         position: absolute;
