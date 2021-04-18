@@ -1,6 +1,6 @@
 @mixin element-plus-enhancements {
     .el-alert--info.is-light {
-        color: #515356;
+        color: var(--ogr-alert-info-color);
     }
 
     .el-button-group {

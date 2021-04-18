@@ -4,8 +4,11 @@
  */
 
 import {
-    RGBAColor, InsertRasterLayerOptions
+    SerializedFile, SerializedFileLayer, WorkingFileLayer, RGBAColor, InsertAnyLayerOptions, InsertRasterLayerOptions,
+    WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileVectorLayer, WorkingFileTextLayer,
+    SerializedFileGroupLayer, SerializedFileRasterLayer, SerializedFileVectorLayer, SerializedFileTextLayer, WorkingFileAnyLayer
 } from '@/types';
+import { WorkingFileState } from '@/store/working-file';
 import historyStore from '@/store/history';
 import { BundleAction } from '@/actions/bundle';
 import { CreateNewFileAction } from '@/actions/create-new-file';
@@ -117,12 +120,16 @@ export async function openFromFileList(files: FileList) {
         );
     }
 
-    const layerInsertActions: InsertLayerAction<any>[] = [];
+    let insertLayerActions: InsertLayerAction<any>[] = [];
     const loadErrorMessages: string[] = [];
 
     let largestWidth = 0;
     let largestHeight = 0;
     let isAnyLayerLoaded: boolean = false;
+
+    const newFileOptions: Partial<WorkingFileState> = {
+        fileName
+    };
 
     const settledReaderPromises = await Promise.allSettled(readerPromises);
     for (let readerSettle of settledReaderPromises) {
@@ -136,7 +143,7 @@ export async function openFromFileList(files: FileList) {
                 if (image.height > largestHeight) {
                     largestHeight = image.height;
                 }
-                layerInsertActions.push(
+                insertLayerActions.push(
                     new InsertLayerAction<InsertRasterLayerOptions<RGBAColor>>({
                         type: 'raster',
                         name: readerSettle.value.file.name,
@@ -148,6 +155,18 @@ export async function openFromFileList(files: FileList) {
                         }
                     })
                 );
+            } else if (readerSettle.value.type === 'json') {
+                const { workingFileDefinition, insertLayerActions: workingFileInsertLayerActions } = await parseSerializedFileToActions(JSON.parse(readerSettle.value.result));
+                for (let prop in workingFileDefinition) {
+                    if (prop === 'width') {
+                        newFileOptions.width = Math.max(newFileOptions.width || 1, workingFileDefinition.width || 1);
+                    } else if (prop === 'height') {
+                        newFileOptions.height = Math.max(newFileOptions.height || 1, workingFileDefinition.height || 1);
+                    } else {
+                        (newFileOptions as any)[prop as keyof WorkingFileState] = workingFileDefinition[prop as keyof WorkingFileState];
+                    }
+                }
+                insertLayerActions = insertLayerActions.concat(workingFileInsertLayerActions);
             }
         } else if (readerSettle.status === 'rejected') {
             loadErrorMessages.push(readerSettle.reason);
@@ -160,17 +179,118 @@ export async function openFromFileList(files: FileList) {
             databaseSize: Infinity
         });
 
+        if (!newFileOptions.width) {
+            newFileOptions.width = largestWidth || 1;
+        }
+        if (!newFileOptions.height) {
+            newFileOptions.height = largestHeight || 1;
+        }
+
         await historyStore.dispatch('runAction', {
             action: new BundleAction('openFile', 'Open File', [
-                new CreateNewFileAction({
-                    fileName,
-                    width: largestWidth || 1,
-                    height: largestHeight || 1
-                }),
-                ...layerInsertActions
+                new CreateNewFileAction(newFileOptions),
+                ...insertLayerActions
             ])
         });
+
+        (window as any).workingFileStore = await (await import('@/store/working-file')).default;
     } else {
         throw new Error('None of the files selected could be loaded.');
     }
+}
+
+async function parseSerializedFileToActions(serializedFile: SerializedFile<RGBAColor>): Promise<{ workingFileDefinition: Partial<WorkingFileState>, insertLayerActions: InsertLayerAction<any>[] }> {
+    const workingFileDefinition: Partial<WorkingFileState> = {
+        activeLayerId: serializedFile.activeLayerId,
+        colorModel: serializedFile.colorModel,
+        colorSpace: serializedFile.colorSpace,
+        drawOriginX: serializedFile.drawOriginX,
+        drawOriginY: serializedFile.drawOriginY,
+        height: serializedFile.height,
+        layerIdCounter: serializedFile.layerIdCounter,
+        measuringUnits: serializedFile.measuringUnits,
+        resolutionUnits: serializedFile.resolutionUnits,
+        resolutionX: serializedFile.resolutionX,
+        resolutionY: serializedFile.resolutionY,
+        scaleFactor: serializedFile.scaleFactor,
+        selectedLayerIds: serializedFile.selectedLayerIds,
+        width: serializedFile.width,
+    };
+    const insertLayerActions: InsertLayerAction<any>[] = await parseLayersToActions(serializedFile.layers);
+    return {
+        workingFileDefinition,
+        insertLayerActions
+    };
+}
+
+async function parseLayersToActions(layers: SerializedFileLayer<RGBAColor>[]): Promise<InsertLayerAction<any>[]> {
+    let insertLayerActions: InsertLayerAction<any>[] = [];
+    for (let layer of layers) {
+        let parsedLayer: Partial<WorkingFileLayer<RGBAColor>> = {
+            blendingMode: layer.blendingMode,
+            filters: layer.filters,
+            groupId: layer.groupId,
+            height: layer.height,
+            id: layer.id,
+            name: layer.name,
+            opacity: layer.opacity,
+            transform: new DOMMatrix(layer.transform),
+            type: layer.type,
+            visible: layer.visible,
+            width: layer.width,
+            x: layer.x,
+            y: layer.y
+        };
+        switch (layer.type) {
+            case 'group':
+                parsedLayer = {
+                    ...parsedLayer,
+                    type: 'group',
+                    layers: []
+                } as WorkingFileGroupLayer<RGBAColor>;
+                insertLayerActions = insertLayerActions.concat(await parseLayersToActions((layer as SerializedFileGroupLayer<RGBAColor>).layers));
+                break;
+            case 'raster':
+                const serializedLayer = layer as SerializedFileRasterLayer<RGBAColor>;
+                const image = new Image();
+                const base64Fetch = await fetch(serializedLayer.data.sourceImageSerialized || '');
+                const imageBlob = await base64Fetch.blob();
+                await new Promise<void>((resolve) => {
+                    image.onload = () => {
+                        resolve();
+                    };
+                    image.onerror = () => {
+                        resolve();
+                    };
+                    image.src = URL.createObjectURL(imageBlob);
+                });
+                parsedLayer = {
+                    ...parsedLayer,
+                    type: 'raster',
+                    data: {
+                        sourceImage: image,
+                        sourceImageIsObjectUrl: true
+                    }
+                } as WorkingFileRasterLayer<RGBAColor>;
+                break;
+            case 'vector':
+                parsedLayer = {
+                    ...parsedLayer,
+                    type: 'vector',
+                    data: (layer as SerializedFileVectorLayer<RGBAColor>).data,
+                } as WorkingFileVectorLayer<RGBAColor>;
+                break;
+            case 'text':
+                parsedLayer = {
+                    ...parsedLayer,
+                    type: 'text',
+                    data: (layer as SerializedFileTextLayer<RGBAColor>).data,
+                } as WorkingFileTextLayer<RGBAColor>;
+                break;
+        }
+        insertLayerActions.push(
+            new InsertLayerAction<InsertAnyLayerOptions<RGBAColor>>(parsedLayer as InsertAnyLayerOptions<RGBAColor>)
+        );
+    }
+    return insertLayerActions;
 }

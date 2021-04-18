@@ -2,7 +2,7 @@ import { PerformantStore } from './performant-store';
 import { RGBAColor, MeasuringUnits, ResolutionUnits, ColorModelName, WorkingFileLayer } from '@/types';
 
 interface WorkingFileState {
-    activeLayer: WorkingFileLayer<RGBAColor> | null,
+    activeLayerId: number | null,
     colorModel: ColorModelName;
     colorSpace: string;
     drawOriginX: number;
@@ -16,6 +16,7 @@ interface WorkingFileState {
     resolutionX: number;
     resolutionY: number;
     scaleFactor: number;
+    selectedLayerIds: string[];
     width: number; // Always pixels
 }
 
@@ -26,7 +27,7 @@ interface WorkingFileStore {
 
 const store = new PerformantStore<WorkingFileStore>({
     state: {
-        activeLayer: null,
+        activeLayerId: null,
         colorModel: 'rgba',
         colorSpace: 'sRGB',
         drawOriginX: 0,
@@ -40,6 +41,7 @@ const store = new PerformantStore<WorkingFileStore>({
         resolutionX: 300,
         resolutionY: 300,
         scaleFactor: 1,
+        selectedLayerIds: [],
         width: 818 // Always pixels
     }
 });

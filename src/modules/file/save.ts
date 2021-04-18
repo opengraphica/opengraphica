@@ -15,11 +15,16 @@ interface SaveImageAsOptions {
 }
 
 export async function saveImageAs(options: SaveImageAsOptions = {}) {
-    const activeLayer = workingFileStore.get('activeLayer');
-    const serializedFile: Partial<SerializedFile<RGBAColor>> = {
+    const serializedFile = serializeWorkingFile();
+    const fileName = (options.fileName || 'image').replace(/(\.(json|png|jpg|jpeg|webp|gif|bmp|tif|tiff))$/ig, '') + '.json';
+    saveAs(new Blob([JSON.stringify(serializedFile, null, "\t")], { type: 'text/plain' }), fileName);
+}
+
+function serializeWorkingFile(): SerializedFile<RGBAColor> {
+    const serializedFile: SerializedFile<RGBAColor> = {
         version: '0.0.1-ALPHA.1',
         date: new Date().toISOString(),
-        activeLayerId: activeLayer ? activeLayer.id : null,
+        activeLayerId: workingFileStore.get('activeLayerId'),
         colorModel: workingFileStore.get('colorModel'),
         colorSpace: workingFileStore.get('colorSpace'),
         drawOriginX: workingFileStore.get('drawOriginX'),
@@ -31,14 +36,14 @@ export async function saveImageAs(options: SaveImageAsOptions = {}) {
         resolutionX: workingFileStore.get('resolutionX'),
         resolutionY: workingFileStore.get('resolutionY'),
         scaleFactor: workingFileStore.get('scaleFactor'),
+        selectedLayerIds: workingFileStore.get('selectedLayerIds'),
         width: workingFileStore.get('width'),
-        layers: serializeLayers(workingFileStore.get('layers'))
+        layers: serializeWorkingFileLayers(workingFileStore.get('layers'))
     };
-    const fileName = (options.fileName || 'image').replace(/(\.(json|png|jpg|jpeg|webp|gif|bmp|tif|tiff))$/ig, '') + '.json';
-    saveAs(new Blob([JSON.stringify(serializedFile, null, "\t")], { type: 'text/plain' }), fileName);
+    return serializedFile;
 }
 
-function serializeLayers(layers: WorkingFileLayer<RGBAColor>[]): SerializedFileLayer<RGBAColor>[] {
+function serializeWorkingFileLayers(layers: WorkingFileLayer<RGBAColor>[]): SerializedFileLayer<RGBAColor>[] {
     let serializedLayers: SerializedFileLayer<RGBAColor>[] = [];
     for (let layer of layers) {
         let serializedLayer: SerializedFileLayer<RGBAColor> = {
@@ -61,7 +66,7 @@ function serializeLayers(layers: WorkingFileLayer<RGBAColor>[]): SerializedFileL
                 serializedLayer = {
                     ...serializedLayer,
                     type: 'group',
-                    layers: serializeLayers((layer as WorkingFileGroupLayer<RGBAColor>).layers)
+                    layers: serializeWorkingFileLayers((layer as WorkingFileGroupLayer<RGBAColor>).layers)
                 } as SerializedFileGroupLayer<RGBAColor>;
                 break;
             case 'raster':

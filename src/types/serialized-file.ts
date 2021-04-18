@@ -56,6 +56,7 @@ export interface SerializedFile<T extends ColorModel> {
     resolutionX: number;
     resolutionY: number;
     scaleFactor: number;
+    selectedLayerIds: string[];
     width: number; // Always pixels
     layers: SerializedFileLayer<T>[];
 }

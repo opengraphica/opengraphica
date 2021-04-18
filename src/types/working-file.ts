@@ -73,6 +73,7 @@ export interface InsertVectorLayerOptions<T extends ColorModel> extends Partial<
 export interface InsertTextLayerOptions<T extends ColorModel> extends Partial<WorkingFileTextLayer<T>> {
     type: 'text';
 }
+export type InsertAnyLayerOptions<T extends ColorModel> = InsertGroupLayerOptions<T> | InsertRasterLayerOptions<T> | InsertVectorLayerOptions<T> | InsertTextLayerOptions<T>;
 
 export interface NewFilePreset {
     name: string,

@@ -21782,6 +21782,7 @@ body.ogr-full-page {
   --ogr-layout-menu-bar-border-color: #eaeefb;
   --ogr-layout-menu-bar-background-color: white;
   --ogr-working-image-border-color: #d0d5e8;
+  --ogr-alert-info-color: #515356;
 }
 
 .opengraphica .container {
@@ -23094,7 +23095,7 @@ body.ogr-full-page {
   bottom: 0;
 }
 .opengraphica .el-alert--info.is-light {
-  color: #515356;
+  color: var(--ogr-alert-info-color);
 }
 .opengraphica .el-button-group > .el-input {
   float: left;
