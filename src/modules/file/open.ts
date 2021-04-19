@@ -8,13 +8,20 @@ import {
     WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileVectorLayer, WorkingFileTextLayer,
     SerializedFileGroupLayer, SerializedFileRasterLayer, SerializedFileVectorLayer, SerializedFileTextLayer, WorkingFileAnyLayer
 } from '@/types';
-import { WorkingFileState } from '@/store/working-file';
+import workingFileStore, { WorkingFileState } from '@/store/working-file';
 import historyStore from '@/store/history';
+import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
-import { CreateNewFileAction } from '@/actions/create-new-file';
+import { UpdateFileAction } from '@/actions/update-file';
+import { CreateFileAction } from '@/actions/create-file';
 import { InsertLayerAction } from '@/actions/insert-layer';
 
-export async function openFromFileDialog(): Promise<void> {
+interface FileDialogOpenOptions {
+    insert?: boolean;
+    accept?: string;
+}
+
+export async function openFromFileDialog(options: FileDialogOpenOptions = {}): Promise<void> {
 
     // This container and the file input is purposely left in the dom after creation in order to avoid
     // several bugs revolving around the fact that browsers give you no information if file selection is canceled.
@@ -34,6 +41,7 @@ export async function openFromFileDialog(): Promise<void> {
     let isChangeFired: boolean = false;
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
+    fileInput.setAttribute('accept', options.accept || '.json,image/*');
     fileInput.multiple = true;
     temporaryFileInputContainer.appendChild(fileInput);
     await new Promise<void>((resolve, reject) => {
@@ -43,7 +51,7 @@ export async function openFromFileDialog(): Promise<void> {
             const files = (e.target as HTMLInputElement).files;
             if (files) {
                 try {
-                    await openFromFileList(files);
+                    await openFromFileList(files, options);
                     resolve();
                 } catch (error) {
                     reject(error);
@@ -66,7 +74,14 @@ export async function openFromFileDialog(): Promise<void> {
 
 };
 
-export async function openFromFileList(files: FileList) {
+export async function insertFromFileDialog() {
+    return openFromFileDialog({
+        insert: true,
+        accept: 'image/*'
+    });
+}
+
+export async function openFromFileList(files: FileList, options: FileDialogOpenOptions = {}) {
 
     type FileReadType = 'json' | 'image';
     type FileReadResolve = { type: 'image', result: HTMLImageElement, file: File } | { type: 'json', result: string, file: File };
@@ -185,10 +200,26 @@ export async function openFromFileList(files: FileList) {
         if (!newFileOptions.height) {
             newFileOptions.height = largestHeight || 1;
         }
+        
+        const fileUpdateActions: BaseAction[] = [];
+        if (options.insert) {
+            if (workingFileStore.state.layers.length === 0) {
+                fileUpdateActions.push(
+                    new UpdateFileAction({
+                        width: largestWidth,
+                        height: largestHeight
+                    })
+                );
+            }
+        } else {
+            fileUpdateActions.push(
+                new CreateFileAction(newFileOptions)
+            );
+        }
 
         await historyStore.dispatch('runAction', {
             action: new BundleAction('openFile', 'Open File', [
-                new CreateNewFileAction(newFileOptions),
+                ...fileUpdateActions,
                 ...insertLayerActions
             ])
         });

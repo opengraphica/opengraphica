@@ -3,7 +3,7 @@ import { BaseAction } from './base';
 import workingFileStore, { WorkingFileState } from '@/store/working-file';
 import appEmitter from '@/lib/emitter';
 
-export interface CreateNewFileOptions {
+export interface CreateFileOptions {
     fileName?: string;
     height: number;
     measuringUnits?: 'px' | 'mm' | 'cm' | 'in';
@@ -14,7 +14,7 @@ export interface CreateNewFileOptions {
     width: number;
 }
 
-export class CreateNewFileAction extends BaseAction {
+export class CreateFileAction extends BaseAction {
 
     private createFileOptions!: Partial<WorkingFileState>;
     private previousState: { [key: string]: any } = {};

@@ -1,7 +1,7 @@
 import {
     RGBAColor, WorkingFileLayer,
     WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer,
-    InsertGroupLayerOptions, InsertRasterLayerOptions, InsertVectorLayerOptions, InsertTextLayerOptions
+    InsertAnyLayerOptions
 } from '@/types';
 import { BaseAction } from './base';
 import canvasStore from '@/store/canvas';
@@ -10,7 +10,7 @@ import layerRenderers from '@/canvas/renderers';
 
 let layerInsertCounter: number = 1;
 
-export class InsertLayerAction<GroupLayerOptions extends InsertGroupLayerOptions<RGBAColor> | InsertRasterLayerOptions<RGBAColor> | InsertVectorLayerOptions<RGBAColor> | InsertTextLayerOptions<RGBAColor>> extends BaseAction {
+export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<RGBAColor>> extends BaseAction {
 
     private insertLayerOptions: GroupLayerOptions | null = null;
     private insertedLayer: WorkingFileAnyLayer<RGBAColor> | null = null;

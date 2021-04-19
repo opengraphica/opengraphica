@@ -1,12 +1,12 @@
 import historyStore from '@/store/history';
-import { CreateNewFileAction, CreateNewFileOptions } from '@/actions/create-new-file';
+import { CreateFileAction, CreateFileOptions } from '@/actions/create-file';
 
-export async function createNewFile(options: CreateNewFileOptions) {
+export async function createNewFile(options: CreateFileOptions) {
     await historyStore.dispatch('free', {
         memorySize: Infinity,
         databaseSize: Infinity
     });
     await historyStore.dispatch('runAction', {
-        action: new CreateNewFileAction(options)
+        action: new CreateFileAction(options)
     });
 };

@@ -343,6 +343,9 @@ export default defineComponent({
                             case 'saveAs':
                                 await runModule('file', 'saveAs');
                                 break;
+                            case 'insertPhoto':
+                                await runModule('file', 'insertPhoto');
+                                break;
                         }
                     break;
                 }

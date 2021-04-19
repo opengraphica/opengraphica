@@ -35,6 +35,14 @@
                     "type": "ui",
                     "target": "file-save-as"
                 }
+            },
+            "insertPhoto": {
+                "name": "Insert a Photo",
+                "description": "Add a photo as a new layer in the currently opened image.",
+                "action": {
+                    "type": "function",
+                    "target": "file/open.insertFromFileDialog"
+                }
             }
         }
     }
