@@ -18,6 +18,11 @@
 </template>
 
 <script lang="ts">
+/**
+ * Parts of this file were adapted from miniPaint
+ * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
+ */
+
 import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
 import ElAlert from 'element-plus/lib/el-alert';
 import ElButton from 'element-plus/lib/el-button';
