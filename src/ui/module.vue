@@ -27,7 +27,8 @@ export default defineComponent({
     components: {
         'file-export': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-export' */ `./module-file-export.vue`)),
         'file-new': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-new' */ `./module-file-new.vue`)),
-        'file-save-as': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-save-as' */ `./module-file-save-as.vue`))
+        'file-save-as': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-save-as' */ `./module-file-save-as.vue`)),
+        'file-take-photo': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-take-photo' */ `./module-file-take-photo.vue`))
     },
     props: {
         name: {

@@ -243,9 +243,14 @@ export default defineComponent({
                 if (canvasStore.get('dirty') && canvasElement && ctx) {
                     canvasStore.set('dirty', false);
                     drawWorkingFileToCanvas(canvasElement, ctx);
+
+                    // Post process for better pixel interpolation
+                    if (postProcessCanvas.value) {
+                        postProcessCanvas.value.style.display = 'none';
+                        drawPostProcess();
+                    }
                 }
             } catch (error) {
-                console.error(error);
                 if (preferencesStore.get('preferCanvasViewport') === false) {
                     clearTimeout(drawPostProcessTimeoutHandle);
                     preferencesStore.set('preferCanvasViewport', true);

@@ -346,6 +346,9 @@ export default defineComponent({
                             case 'insertPhoto':
                                 await runModule('file', 'insertPhoto');
                                 break;
+                            case 'takePhoto':
+                                await runModule('file', 'takePhoto');
+                                break;
                         }
                     break;
                 }

@@ -43,6 +43,14 @@
                     "type": "function",
                     "target": "file/open.insertFromFileDialog"
                 }
+            },
+            "takePhoto": {
+                "name": "Take a Photo",
+                "description": "Take a photo from your camera and webcam and insert it into the image.",
+                "action": {
+                    "type": "ui",
+                    "target": "file-take-photo"
+                }
             }
         }
     }

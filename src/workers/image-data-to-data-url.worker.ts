@@ -4,7 +4,6 @@
  */
 /*
 const toDataURL = function (canvas: any) {
-    console.log("entering toDataURL function");
     var imageData = Array.prototype.slice.call(canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height).data);
     var w = canvas.width;
     var h = canvas.height;
