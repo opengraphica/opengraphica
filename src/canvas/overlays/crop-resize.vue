@@ -47,13 +47,16 @@
                 </svg>
             </div>
         </div>
+        <div v-show="previewXSnap != null" class="ogr-snap-preview ogr-snap-preview-vertical" :style="{ left: (previewXSnap - (1/zoom/2)) + 'px', width: (1/zoom) + 'px', height: fileHeight + 'px' }"></div>
+        <div v-show="previewYSnap != null" class="ogr-snap-preview ogr-snap-preview-horizontal" :style="{ top: (previewYSnap - (1/zoom/2)) + 'px', height: (1/zoom) + 'px', width: fileWidth + 'px' }"></div>
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { defineComponent, ref, computed, watch, onMounted, onUnmounted, toRefs } from 'vue';
 import canvasStore from '@/store/canvas';
-import { top, left, width, height, cropResizeEmitter } from '../store/crop-resize-state';
+import workingFileStore from '@/store/working-file';
+import { top, left, width, height, cropResizeEmitter, previewXSnap, previewYSnap } from '../store/crop-resize-state';
 
 export default defineComponent({
     name: 'CanvasOverlayCropResize',
@@ -64,6 +67,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const crop = ref<HTMLDivElement>(null as any);
         const zoom = ref<number>(1);
+        const { width: fileWidth, height: fileHeight } = toRefs(workingFileStore.state);
 
         const isSmallHandles = computed<boolean>(() => {
             return (zoom.value * width.value < 100) || (zoom.value * height.value < 100);
@@ -93,19 +97,19 @@ export default defineComponent({
 
         function setCrop(event?: { top?: number, left?: number, width?: number, height?: number }) {
             if (event) {
-                if (event.top) {
+                if (event.top != null) {
                     crop.value.style.top = top + 'px';
                     top.value = event.top;
                 }
-                if (event.left) {
+                if (event.left != null) {
                     crop.value.style.left = left + 'px';
                     left.value = event.left;
                 }
-                if (event.width) {
+                if (event.width != null) {
                     crop.value.style.width = width + 'px';
                     width.value = event.width;
                 }
-                if (event.height) {
+                if (event.height != null) {
                     crop.value.style.height = height + 'px';
                     height.value = event.height;
                 }
@@ -121,7 +125,11 @@ export default defineComponent({
             height,
             isSmallHandles,
             showVerticalHandles,
-            showHorizontalHandles
+            showHorizontalHandles,
+            previewXSnap,
+            previewYSnap,
+            fileWidth,
+            fileHeight
         };
     }
 });

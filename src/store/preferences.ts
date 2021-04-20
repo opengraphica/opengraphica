@@ -8,6 +8,7 @@ interface PreferencesState {
     pointerPressHoldTimeout: number;
     postProcessInterpolateImage: boolean;
     preferCanvasViewport: boolean;
+    snapSensitivity: number;
     touchRotation: 'on' | 'snap' | 'off';
 }
 
@@ -25,6 +26,7 @@ const store = new PerformantStore<PreferencesStore>({
         pointerPressHoldTimeout: 500,
         postProcessInterpolateImage: true,
         preferCanvasViewport: false,
+        snapSensitivity: 5,
         touchRotation: 'on'
     }
 });

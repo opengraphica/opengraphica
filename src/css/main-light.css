@@ -5533,6 +5533,51 @@ body.ogr-full-page {
   image-rendering: crisp-edges;
   image-rendering: pixelated;
 }
+.opengraphica .ogr-snap-preview {
+  position: absolute;
+  background: var(--ogr-snap-line-color);
+  box-shadow: white 0px 0px 0px 1px;
+}
+.opengraphica .ogr-snap-preview.ogr-snap-preview-vertical {
+  width: 0.0625rem;
+  top: 0;
+}
+.opengraphica .ogr-snap-preview.ogr-snap-preview-vertical:before, .opengraphica .ogr-snap-preview.ogr-snap-preview-vertical:after {
+  content: "";
+  display: block;
+  height: 4rem;
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+.opengraphica .ogr-snap-preview.ogr-snap-preview-vertical:before {
+  background: linear-gradient(to bottom, transparent 0%, var(--ogr-snap-line-color) 100%);
+  top: -4rem;
+}
+.opengraphica .ogr-snap-preview.ogr-snap-preview-vertical:after {
+  background: linear-gradient(to bottom, var(--ogr-snap-line-color) 0%, transparent 100%);
+  bottom: -4rem;
+}
+.opengraphica .ogr-snap-preview.ogr-snap-preview-horizontal {
+  height: 0.0625rem;
+  left: 0;
+}
+.opengraphica .ogr-snap-preview.ogr-snap-preview-horizontal:before, .opengraphica .ogr-snap-preview.ogr-snap-preview-horizontal:after {
+  content: "";
+  display: block;
+  width: 4rem;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+.opengraphica .ogr-snap-preview.ogr-snap-preview-horizontal:before {
+  background: linear-gradient(to right, transparent 0%, var(--ogr-snap-line-color) 100%);
+  left: -4rem;
+}
+.opengraphica .ogr-snap-preview.ogr-snap-preview-horizontal:after {
+  background: linear-gradient(to right, var(--ogr-snap-line-color) 0%, transparent 100%);
+  right: -4rem;
+}
 .opengraphica .ogr-crop {
   position: relative;
   outline: 999999px solid var(--ogr-overlay-background-color);
@@ -21914,6 +21959,7 @@ body.ogr-full-page {
   --ogr-working-image-border-color: #d0d5e8;
   --ogr-alert-info-color: #515356;
   --ogr-overlay-background-color: rgba(255, 255, 255, 0.8);
+  --ogr-snap-line-color: #66b1ff;
 }
 
 .opengraphica .container {

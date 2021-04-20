@@ -258,6 +258,55 @@ body.ogr-full-page {
         }
     }
 
+    .ogr-snap-preview {
+        position: absolute;
+        background: var(--ogr-snap-line-color);
+        box-shadow: white 0px 0px 0px 1px;
+
+        &.ogr-snap-preview-vertical {
+            width: 0.0625rem;
+            top: 0;
+
+            &:before, &:after {
+                content: '';
+                display: block;
+                height: 4rem;
+                position: absolute;
+                left: 0;
+                right: 0;
+            }
+            &:before {
+                background: linear-gradient(to bottom, transparent 0%, var(--ogr-snap-line-color) 100%); 
+                top: -4rem;
+            }
+            &:after {
+                background: linear-gradient(to bottom, var(--ogr-snap-line-color) 0%, transparent 100%); 
+                bottom: -4rem;
+            }
+        }
+        &.ogr-snap-preview-horizontal {
+            height: 0.0625rem;
+            left: 0;
+
+            &:before, &:after {
+                content: '';
+                display: block;
+                width: 4rem;
+                position: absolute;
+                top: 0;
+                bottom: 0;
+            }
+            &:before {
+                background: linear-gradient(to right, transparent 0%, var(--ogr-snap-line-color) 100%); 
+                left: -4rem;
+            }
+            &:after {
+                background: linear-gradient(to right, var(--ogr-snap-line-color) 0%, transparent 100%); 
+                right: -4rem;
+            }
+        }
+    }
+
     .ogr-crop {
         position: relative;
         outline: 999999px solid var(--ogr-overlay-background-color);
