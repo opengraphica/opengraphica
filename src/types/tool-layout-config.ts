@@ -55,6 +55,12 @@ export interface ToolDefinition {
     name: string;
     description: string;
     controller: string;
+    toolbar?: {
+        exclusive: boolean;
+        position?: 'top' | 'bottom';
+        target: string;
+    };
+    overlays: string[];
 }
 
 export interface ToolGroupDefinition {

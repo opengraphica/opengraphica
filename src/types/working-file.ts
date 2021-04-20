@@ -77,19 +77,15 @@ export type InsertAnyLayerOptions<T extends ColorModel> = InsertGroupLayerOption
 
 export interface UpdateGroupLayerOptions<T extends ColorModel> extends Partial<WorkingFileGroupLayer<T>> {
     id: number;
-    type: 'group';
 }
 export interface UpdateRasterLayerOptions<T extends ColorModel> extends Partial<WorkingFileRasterLayer<T>> {
     id: number;
-    type: 'raster';
 }
 export interface UpdateVectorLayerOptions<T extends ColorModel> extends Partial<WorkingFileVectorLayer<T>> {
     id: number;
-    type: 'vector';
 }
 export interface UpdateTextLayerOptions<T extends ColorModel> extends Partial<WorkingFileTextLayer<T>> {
     id: number;
-    type: 'text';
 }
 export type UpdateAnyLayerOptions<T extends ColorModel> = UpdateGroupLayerOptions<T> | UpdateRasterLayerOptions<T> | UpdateVectorLayerOptions<T> | UpdateTextLayerOptions<T>;
 

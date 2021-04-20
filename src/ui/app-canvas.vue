@@ -3,22 +3,30 @@
         <div ref="canvasContainer" class="ogr-canvas-container" :class="{ 'ogr-canvas-viewport-css': useCssViewport, 'ogr-canvas-viewport-css--pixelated': isPixelatedZoomLevel }">
             <canvas ref="canvas" class="ogr-canvas" />
             <canvas v-if="usePostProcess" ref="postProcessCanvas" class="ogr-post-process-canvas" />
+            <app-canvas-overlays v-if="useCssViewport" ref="canvasOverlays" />
         </div>
+        <app-canvas-overlays v-if="!useCssViewport" ref="canvasOverlays" />
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, Ref, computed, watch, inject, toRefs, onMounted, onUnmounted } from 'vue';
 import canvasStore from '@/store/canvas';
+import editorStore from '@/store/editor';
 import workingFileStore from '@/store/working-file';
 import preferencesStore from '@/store/preferences';
+import AppCanvasOverlays from '@/ui/app-canvas-overlays.vue';
 import { CanvasRenderingContext2DEnhanced } from '@/types';
 import { drawWorkingFileToCanvas, trackCanvasTransforms } from '@/lib/canvas';
 import { notifyInjector } from '@/lib/notify';
-import appEmitter from '@/lib/emitter';
+import appEmitter, { AppEmitterEvents } from '@/lib/emitter';
+import { DecomposedMatrix } from '@/lib/dom-matrix';
 
 export default defineComponent({
     name: 'AppCanvas',
+    components: {
+        AppCanvasOverlays
+    },
     setup(props, { emit }) {
         let pica: any; // Can't import type definitions from dynamic modules imported later, wtf typescript!
         const $notify = notifyInjector('$notify');
@@ -29,6 +37,7 @@ export default defineComponent({
         const postProcessCanvas = ref<HTMLCanvasElement>();
         const canvasArea = ref<HTMLDivElement>();
         const canvasContainer = ref<HTMLDivElement>();
+        const canvasOverlays = ref<HTMLDivElement>();
         const { useCssViewport, viewWidth: viewportWidth, viewHeight: viewportHeight } = toRefs(canvasStore.state);
         const { width: imageWidth, height: imageHeight } = toRefs(workingFileStore.state);
         const isPixelatedZoomLevel = ref<boolean>(false);
@@ -40,6 +49,10 @@ export default defineComponent({
         const drawPostProcessWait: number = 50;
         const usePostProcess = computed<boolean>(() => {
             return preferencesStore.state.postProcessInterpolateImage;
+        });
+
+        const hasCanvasOverlays = computed<boolean>(() => {
+            return editorStore.state.activeToolOverlays.length > 0;
         });
 
         canvasStore.set('workingImageBorderColor', getComputedStyle(document.documentElement).getPropertyValue('--ogr-working-image-border-color'));
@@ -160,7 +173,8 @@ export default defineComponent({
         });
 
         // Centers the canvas and displays at 1x zoom or the maximum width/height of the window, whichever is smaller. 
-        function resetTransform() {
+        function resetTransform(event?: AppEmitterEvents['app.canvas.resetTransform']) {
+            const margin: number = (event && event.margin) || 48;
             if (canvasArea.value && ctx && mainElement) {
                 const devicePixelRatio = window.devicePixelRatio || 1;
                 const canvasAreaRect = canvasArea.value.getBoundingClientRect();
@@ -170,8 +184,8 @@ export default defineComponent({
                 let scaledWidth = imageWidth;
                 let scaledHeight = imageHeight;
                 const imageSizeRatio = imageWidth / imageHeight;
-                const widthToDisplayRatio = imageWidth / (mainRect.width - 48) / devicePixelRatio;
-                const heightToDisplayRatio = imageHeight / (mainRect.height - 48) / devicePixelRatio;
+                const widthToDisplayRatio = imageWidth / (mainRect.width - margin) / devicePixelRatio;
+                const heightToDisplayRatio = imageHeight / (mainRect.height - margin) / devicePixelRatio;
                 if (widthToDisplayRatio > 1 && widthToDisplayRatio > heightToDisplayRatio) {
                     scaledWidth = imageWidth / widthToDisplayRatio;
                     scaledHeight = scaledWidth / imageSizeRatio;
@@ -195,24 +209,32 @@ export default defineComponent({
         function drawLoop() {
             const canvasElement = canvas.value;
             try {
-                if (canvasStore.get('viewDirty')) {
+                const isViewDirty = canvasStore.get('viewDirty');
+
+                let cssViewTransform: string = '';
+                let decomposedTransform: DecomposedMatrix = null as any;
+                if (isViewDirty && (useCssViewport.value === true || hasCanvasOverlays)) {
+                    const devicePixelRatio = window.devicePixelRatio;
+                    const transform = canvasStore.get('transform');
+                    decomposedTransform = canvasStore.get('decomposedTransform');
+                    isPixelatedZoomLevel.value = decomposedTransform.scaleX / devicePixelRatio >= 1.25;
+                    const offsetX = transform.e / decomposedTransform.scaleX;
+                    const offsetY = transform.f / decomposedTransform.scaleX;
+                    const pixelRatioTransform = transform
+                        .rotate(-decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
+                        .translate(-offsetX, -offsetY)
+                        .scale(1 / devicePixelRatio, 1 / devicePixelRatio)
+                        .translate(offsetX, offsetY)
+                        .rotate(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES);
+                    cssViewTransform = `matrix(${pixelRatioTransform.a},${pixelRatioTransform.b},${pixelRatioTransform.c},${pixelRatioTransform.d},${pixelRatioTransform.e},${pixelRatioTransform.f})`;
+                }
+
+                if (isViewDirty) {
                     canvasStore.set('viewDirty', false);
                     if (useCssViewport.value === true) {
                         clearTimeout(drawPostProcessTimeoutHandle);
 
-                        const devicePixelRatio = window.devicePixelRatio;
-                        const transform = canvasStore.get('transform');
-                        const decomposedTransform = canvasStore.get('decomposedTransform');
-                        isPixelatedZoomLevel.value = decomposedTransform.scaleX / devicePixelRatio >= 1.25;
-                        const offsetX = transform.e / decomposedTransform.scaleX;
-                        const offsetY = transform.f / decomposedTransform.scaleX;
-                        const pixelRatioTransform = transform
-                            .rotate(-decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
-                            .translate(-offsetX, -offsetY)
-                            .scale(1 / devicePixelRatio, 1 / devicePixelRatio)
-                            .translate(offsetX, offsetY)
-                            .rotate(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES);
-                        (canvasContainer.value as HTMLDivElement).style.transform = `matrix(${pixelRatioTransform.a},${pixelRatioTransform.b},${pixelRatioTransform.c},${pixelRatioTransform.d},${pixelRatioTransform.e},${pixelRatioTransform.f})`;
+                        (canvasContainer.value as HTMLDivElement).style.transform = cssViewTransform;
 
                         // Post process for better pixel interpolation
                         if (postProcessCanvas.value) {
@@ -233,6 +255,11 @@ export default defineComponent({
                         }
                     } else if (canvasElement && ctx) {
                         drawWorkingFileToCanvas(canvasElement, ctx);
+
+                        // Update overlay transform
+                        if (hasCanvasOverlays && canvasOverlays.value) {
+                            (canvasOverlays.value as any).$el.style.transform = cssViewTransform;
+                        }
 
                         // Hide post process canvas
                         if (postProcessCanvas.value) {
@@ -286,8 +313,8 @@ export default defineComponent({
                 }
                 drawPostProcessTimeoutHandle = setTimeout(() => {
                     const decomposedTransform = canvasStore.get('decomposedTransform');
-                    postProcessCanvasElement.width = Math.round(canvasElement.width * decomposedTransform.scaleX);
-                    postProcessCanvasElement.height = Math.round(canvasElement.height * decomposedTransform.scaleX);
+                    postProcessCanvasElement.width = Math.floor(canvasElement.width * decomposedTransform.scaleX);
+                    postProcessCanvasElement.height = Math.floor(canvasElement.height * decomposedTransform.scaleX);
                     let postProcessCancelPromise = new Promise((resolve, reject) => { postProcessCancel = reject });
                     pica.resize(canvasElement, postProcessCanvasElement, {
                         cancelToken: postProcessCancelPromise
@@ -305,6 +332,7 @@ export default defineComponent({
             canvas,
             canvasArea,
             canvasContainer,
+            canvasOverlays,
             postProcessCanvas,
             isPixelatedZoomLevel,
             usePostProcess,

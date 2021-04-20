@@ -1,6 +1,6 @@
 <template>
-    <el-tabs class="el-tabs--icon-tabs" v-loading="loading">
-        <el-tab-pane>
+    <el-tabs class="el-tabs--icon-tabs" v-model="activeTab" v-loading="loading">
+        <el-tab-pane name="file">
             <template #label>
                 <div class="leading-tight">
                     <i class="bi bi-archive leading-snug is-block has-text-centered is-size-5 mt-1"></i>
@@ -37,7 +37,7 @@
                 </el-menu>
             </el-scrollbar>
         </el-tab-pane>
-        <el-tab-pane>
+        <el-tab-pane name="image">
             <template #label>
                 <div class="leading-tight">
                     <i class="bi bi-image leading-snug is-block has-text-centered is-size-5 mt-1"></i>
@@ -45,7 +45,7 @@
                 </div>
             </template>
             <el-scrollbar>
-                <el-menu class="el-menu--medium el-menu--borderless mb-1">
+                <el-menu class="el-menu--medium el-menu--borderless mb-1" @select="onMenuSelect('image', $event)">
                     <el-menu-item index="cropResize">
                         <i class="bi bi-crop"></i>
                         <span>Crop and Resize</span>
@@ -70,7 +70,7 @@
                 </el-menu>
             </el-scrollbar>
         </el-tab-pane>
-        <el-tab-pane>
+        <el-tab-pane name="view">
             <template #label>
                 <div class="leading-tight">
                     <i class="bi bi-display leading-snug is-block has-text-centered is-size-5 mt-1"></i>
@@ -130,7 +130,7 @@
                 </el-form>
             </el-scrollbar>
         </el-tab-pane>
-        <el-tab-pane>
+        <el-tab-pane name="history">
             <template #label>
                 <div class="leading-tight">
                     <i class="bi bi-clock-history leading-snug is-block has-text-centered is-size-5 mt-1"></i>
@@ -141,7 +141,7 @@
                 History Stuff
             </el-scrollbar>
         </el-tab-pane>
-        <el-tab-pane>
+        <el-tab-pane name="prefs">
             <template #label>
                 <div class="leading-tight">
                     <i class="bi bi-toggle-on leading-snug is-block has-text-centered is-size-5 mt-1"></i>
@@ -212,6 +212,8 @@ import appEmitter from '@/lib/emitter';
 import { runModule } from '@/modules';
 import { format } from '@/format';
 import '@/format/title-case';
+
+const activeTab = ref<string>('file');
 
 export default defineComponent({
     name: 'DockSettings',
@@ -350,7 +352,17 @@ export default defineComponent({
                                 await runModule('file', 'takePhoto');
                                 break;
                         }
-                    break;
+                        break;
+                    case 'image':
+                        switch (index) {
+                            case 'cropResize':
+                                await editorStore.dispatch('setActiveTool', {
+                                    group: 'image',
+                                    tool: 'cropResize'
+                                });
+                                break;
+                        }
+                        break;
                 }
             } catch (error) {
                 $notify({
@@ -366,6 +378,7 @@ export default defineComponent({
         }
 
         return {
+            activeTab,
             loading,
             rotationAngle,
             zoomLevel,

@@ -36,7 +36,7 @@ export const translateTouchEventToPointerEvents = (type: string, e: TouchEvent):
                 eventPhase: e.eventPhase,
                 fromElement: null,
                 height: 23,
-                isPrimary: e.touches[0] === touch,
+                isPrimary: (e.touches[0] && e.touches[0].identifier === touch.identifier) || e.touches.length === 0,
                 isTrusted: e.isTrusted,
                 layerX: touch.pageX,
                 layerY: touch.pageY,

@@ -5465,6 +5465,14 @@ body.ogr-full-page {
 .opengraphica .ogr-module {
   word-break: normal;
 }
+.opengraphica .ogr-toolbar {
+  display: block;
+  transition: all 0.6s;
+  width: 100%;
+  max-width: 100%;
+  background: var(--ogr-layout-menu-bar-background-color);
+  box-shadow: 0 0 0 0.063rem var(--ogr-layout-menu-bar-border-color);
+}
 .opengraphica .ogr-canvas-area {
   display: block;
   position: absolute;
@@ -5474,6 +5482,22 @@ body.ogr-full-page {
   bottom: 0;
   width: 100%;
   height: 100%;
+}
+.opengraphica .ogr-canvas-overlays {
+  display: block;
+  position: absolute;
+  transform-origin: 0 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+}
+.opengraphica .ogr-canvas-overlays .ogr-canvas-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 .opengraphica .ogr-canvas-container {
   display: block;
@@ -5508,6 +5532,112 @@ body.ogr-full-page {
   image-rendering: optimizespeed;
   image-rendering: crisp-edges;
   image-rendering: pixelated;
+}
+.opengraphica .ogr-crop {
+  position: relative;
+  outline: 999999px solid var(--ogr-overlay-background-color);
+}
+.opengraphica .ogr-crop .ogr-crop-bounds {
+  border: 0.3rem solid rgba(235, 235, 235, 0.7);
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-top-left,
+.opengraphica .ogr-crop .ogr-crop-handle-top-right,
+.opengraphica .ogr-crop .ogr-crop-handle-bottom-left,
+.opengraphica .ogr-crop .ogr-crop-handle-bottom-right,
+.opengraphica .ogr-crop .ogr-crop-handle-top,
+.opengraphica .ogr-crop .ogr-crop-handle-left,
+.opengraphica .ogr-crop .ogr-crop-handle-bottom,
+.opengraphica .ogr-crop .ogr-crop-handle-right {
+  position: absolute;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-top-left svg,
+.opengraphica .ogr-crop .ogr-crop-handle-top-right svg,
+.opengraphica .ogr-crop .ogr-crop-handle-bottom-left svg,
+.opengraphica .ogr-crop .ogr-crop-handle-bottom-right svg,
+.opengraphica .ogr-crop .ogr-crop-handle-top svg,
+.opengraphica .ogr-crop .ogr-crop-handle-left svg,
+.opengraphica .ogr-crop .ogr-crop-handle-bottom svg,
+.opengraphica .ogr-crop .ogr-crop-handle-right svg {
+  display: block;
+  position: absolute;
+  height: 2rem;
+  width: 2rem;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-top-left {
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-top-left svg {
+  transform-origin: top left;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-top-right {
+  top: 0;
+  right: 0;
+  transform-origin: top right;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-top-right svg {
+  transform: rotate(90deg);
+  transform-origin: top left;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-bottom-right {
+  bottom: 0;
+  right: 0;
+  transform-origin: bottom right;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-bottom-right svg {
+  transform: rotate(180deg);
+  transform-origin: top left;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-bottom-left {
+  bottom: 0;
+  left: 0;
+  transform-origin: bottom left;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-bottom-left svg {
+  transform: rotate(270deg);
+  transform-origin: top left;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-top {
+  top: 0;
+  left: 50%;
+  transform-origin: top center;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-top svg {
+  transform: translateX(-50%);
+}
+.opengraphica .ogr-crop .ogr-crop-handle-right {
+  top: 50%;
+  right: 0;
+  transform-origin: right center;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-right svg {
+  transform: rotate(90deg) translate(-50%, 100%);
+  transform-origin: center;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-bottom {
+  bottom: 0;
+  right: 50%;
+  transform-origin: bottom center;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-bottom svg {
+  transform: rotate(180deg) translate(50%, 100%);
+  transform-origin: center;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-left {
+  top: 50%;
+  left: 0;
+  transform-origin: left center;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-left svg {
+  transform: rotate(270deg) translateY(-50%);
+  transform-origin: top center;
 }
 .opengraphica .ogr-canvas, .opengraphica .ogr-post-process-canvas {
   display: block;
@@ -72612,8 +72742,12 @@ body.ogr-full-page {
   --ogr-layout-menu-bar-background-color: #222933;
   --ogr-working-image-border-color: black;
   --ogr-alert-info-color: #ffffff;
+  --ogr-overlay-background-color: rgba(31, 37, 45, 0.8);
 }
 
+.opengraphica {
+  color: white;
+}
 .opengraphica .container {
   flex-grow: 1;
   margin: 0 auto;
@@ -73909,6 +74043,13 @@ body.ogr-full-page {
 }
 .opengraphica .leading-loose {
   line-height: 2;
+}
+.opengraphica .is-text-nowrap {
+  white-space: nowrap;
+}
+.opengraphica .is-text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .opengraphica .is-fullheight {
   height: 100%;

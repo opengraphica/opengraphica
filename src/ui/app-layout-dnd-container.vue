@@ -2,9 +2,10 @@
     <div class="ogr-layout-dnd-container">
         <header ref="header">
             <h1 class="is-sr-only">OpenGraphica</h1>
-            <template v-if="config.header">
+            <template v-if="!isActiveToolbarExclusive && config.header">
                 <app-layout-menu-bar v-for="(menuBarConfig, index) of config.header" :key="index" :config="menuBarConfig" />
             </template>
+            <toolbar v-if="activeToolbar && activeToolbarPosition === 'top'" :name="activeToolbar" />
         </header>
         <div class="ogr-layout-dnd-center">
             <aside aria-label="Left Sidebar" class="sidebar-left" ref="sidebarLeft"></aside>
@@ -23,8 +24,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, Ref, inject, onMounted, onUnmounted } from 'vue';
+import { defineComponent, ref, Ref, computed, onMounted, onUnmounted } from 'vue';
 import AppLayoutMenuBar from '@/ui/app-layout-menu-bar.vue';
+import Toolbar from '@/ui/toolbar.vue';
 import defaultDndLayoutConfig from '@/config/default-dnd-layout.json';
 import { translateTouchEventToPointerEvents } from '@/lib/events';
 import { CanvasRenderingContext2DEnhanced, DndLayout } from '@/types';
@@ -39,7 +41,8 @@ import BaseCanvasMovementController from '@/canvas/controllers/base-movement';
 export default defineComponent({
     name: 'AppLayoutDndContainer',
     components: {
-        AppLayoutMenuBar
+        AppLayoutMenuBar,
+        Toolbar
     },
     emits: ['dnd-ready'],
     setup(props, { emit }) {
@@ -47,6 +50,16 @@ export default defineComponent({
         const config = ref<DndLayout>(defaultDndLayoutConfig.dndLayout as DndLayout);
         const isPointerInsideMain = ref<boolean>(false);
         const isPointerEventsSupported: boolean = 'onpointerdown' in document.body;
+
+        const activeToolbar = computed<string | null>(() => {
+            return editorStore.state.activeToolbar;
+        });
+        const activeToolbarPosition = computed<string>(() => {
+            return editorStore.state.activeToolbarPosition;
+        });
+        const isActiveToolbarExclusive = computed<boolean>(() => {
+            return editorStore.state.isActiveToolbarExclusive;
+        });
 
         onMounted(() => {
             editorStore.dispatch('setActiveTool', { group: 'transform' });
@@ -106,6 +119,9 @@ export default defineComponent({
             main: mainElement,
             config,
             canvasState: canvasStore.state,
+            activeToolbar,
+            activeToolbarPosition,
+            isActiveToolbarExclusive,
             isPointerInsideMain,
             onPointerDownMain,
             onTouchStartMain,

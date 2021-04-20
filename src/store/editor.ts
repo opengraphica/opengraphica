@@ -11,12 +11,18 @@ interface EditorDeferredTask {
     handler: (bridge: { isCanceled: () => boolean }) => void;
 }
 
-const toolGroups: { [key: string]: ToolGroupDefinition } = toolGroupsConfig;
+const toolGroups: { [key: string]: ToolGroupDefinition } = toolGroupsConfig as any;
 
 interface EditorState {
     activeTheme: { name: string, linkElement: HTMLLinkElement } | null;
     activeTool: string | null;
     activeToolGroup: string | null;
+    activeToolGroupPrevious: string | null;
+    activeToolPrevious: string | null;
+    activeToolbar: string | null;
+    activeToolbarPosition: 'top' | 'bottom';
+    activeToolOverlays: string[];
+    isActiveToolbarExclusive: boolean;
     isTaskRunning: boolean;
     loadingThemeName: string | null;
     tasks: EditorDeferredTask[],
@@ -50,6 +56,12 @@ const store = new PerformantStore<EditorStore>({
         activeTheme: null,
         activeTool: null,
         activeToolGroup: null,
+        activeToolGroupPrevious: null,
+        activeToolPrevious: null,
+        activeToolbar: null,
+        activeToolbarPosition: 'top',
+        activeToolOverlays: [],
+        isActiveToolbarExclusive: false,
         isTaskRunning: false,
         loadingThemeName: null,
         tasks: [],
@@ -97,18 +109,44 @@ const store = new PerformantStore<EditorStore>({
                 let { tool, group } = value as EditorDispatch['setActiveTool'];
                 let activeTool = tool || null;
                 const activeGroup = store.get('activeToolGroup');
-                if (group !== activeGroup) {
-                    set('activeToolGroup', group);
+                if (!tool) {
                     activeTool = Object.keys(toolGroups[group].tools)[0];
                 }
-                if (activeTool !== store.get('activeTool') || group !== activeGroup) {
-                    if (toolGroups[group].tools[activeTool || '']) {
-                        const controllerName = toolGroups[group].tools[activeTool || ''].controller;
+                if (group !== activeGroup || activeTool !== store.get('activeTool')) {
+                    const toolDefinition = toolGroups[group].tools[activeTool || ''];
+                    let isActiveToolbarExclusive = false;
+                    let activeToolbar: string | null = null;
+                    let activeToolbarPosition = 'top';
+                    let activeToolOverlays: string[] = [];
+                    if (toolDefinition) {
+                        const controllerName = toolDefinition.controller;
                         const CanvasControllerGenericClass: typeof BaseCanvasController =
                             (await import(/* webpackChunkName: 'canvas-controller-[request]' */ `../canvas/controllers/${controllerName}.ts`)).default;
-                        set('toolCanvasController', new CanvasControllerGenericClass());
+                        const controller = new CanvasControllerGenericClass();
+                        try {
+                            controller.onLeave();
+                        } catch (error) {}
+                        set('toolCanvasController', controller);
+                        if (toolDefinition.toolbar) {
+                            isActiveToolbarExclusive = !!toolDefinition.toolbar.exclusive;
+                            activeToolbarPosition = toolDefinition.toolbar.position || 'top';
+                            activeToolbar = toolDefinition.toolbar.target;
+                        }
+                        if (toolDefinition.overlays) {
+                            activeToolOverlays = toolDefinition.overlays;
+                        }
                     }
+                    set('activeToolGroupPrevious', store.get('activeToolGroup'));
+                    set('activeToolGroup', group);
+                    set('activeToolbar', activeToolbar);
+                    set('isActiveToolbarExclusive', isActiveToolbarExclusive);
+                    set('activeToolbarPosition', activeToolbarPosition as any);
+                    set('activeToolPrevious', store.get('activeTool'));
+                    set('activeToolOverlays', activeToolOverlays);
                     set('activeTool', activeTool);
+                    try {
+                        store.get('toolCanvasController').onEnter();
+                    } catch (error) {}
                 }
                 break;
 

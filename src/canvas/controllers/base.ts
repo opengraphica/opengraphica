@@ -38,6 +38,23 @@ export default class BaseCanvasController {
     private multiTouchDownTimeoutHandle: number | undefined;
     private multiTouchTapTimeoutHandle: number | undefined;
 
+    /**
+     * Fires when switching to this controller.
+     */
+    onEnter(): void {
+        // Override
+    }
+
+    /**
+     * Fires right before switching to another controller.
+     */
+    onLeave(): void {
+        // Override
+    }
+
+    /**
+     * Fires when one or more finger is tapped at around the same time.
+     */
     onMultiTouchDown(): void {
         const touchCount = this.touches.length;
         this.multiTouchDownCount = this.touches.length;
@@ -78,7 +95,9 @@ export default class BaseCanvasController {
         if (e.pointerType === 'touch') {
             if (!this.multiTouchDownTimeoutHandle && this.touches.length === 0) {
                 this.touches = [pointer];
-                this.multiTouchDownTimeoutHandle = window.setTimeout(() => { this.onMultiTouchDown() }, preferencesStore.get('multiTouchDownTimeout'));
+                this.multiTouchDownTimeoutHandle = window.setTimeout(() => {
+                    this.onMultiTouchDown();
+                }, preferencesStore.get('multiTouchDownTimeout'));
             } else {
                 this.touches.push(pointer);
             }

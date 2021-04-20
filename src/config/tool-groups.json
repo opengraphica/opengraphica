@@ -10,6 +10,25 @@
             }
         }
     },
+    "image": {
+        "name": "Image",
+        "description": "General image resolution manipulation.",
+        "tools": {
+            "cropResize": {
+                "name": "Crop and Resize",
+                "description": "Crop, resize, change aspect ratio, or resample the image.",
+                "controller": "crop-resize",
+                "toolbar": {
+                    "exclusive": true,
+                    "position": "top",
+                    "target": "crop-resize"
+                },
+                "overlays": [
+                    "crop-resize"
+                ]
+            }
+        }
+    },
     "transform": {
         "name": "Transform",
         "description": "Tools for moving, rotating, scaling the layer.",

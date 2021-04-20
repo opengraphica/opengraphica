@@ -1,7 +1,9 @@
 import mitt, { Handler } from 'mitt';
 
 interface AppEmitterEvents {
-    'app.canvas.resetTransform': undefined;
+    'app.canvas.resetTransform': undefined | {
+        margin?: number;
+    };
     'app.component.register': any;
     'app.dialogs.openFromDock': {
         name: string;
