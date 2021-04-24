@@ -11,7 +11,9 @@
                                 effect="light"
                                 placement="bottom"
                                 :popper-class="'ogr-dock-popover'"
-                                :show-after="control.showDock ? 0 : 500"
+                                :show-after="0"
+                                :hide-after="0"
+                                :transition="control.showDock ? 'el-fade-in-linear' : 'none'"
                                 :append-to-body="false"
                                 :popper-options="{ boundariesElement: 'body' }"
                                 @after-leave="onAfterLeavePopover(control)">
@@ -59,7 +61,7 @@
                         effect="light"
                         placement="bottom"
                         :popper-class="'ogr-dock-popover'"
-                        :show-after="500"
+                        :show-after="0"
                         :append-to-body="false"
                         :popper-options="{ boundariesElement: 'body' }">
                         <template #reference>

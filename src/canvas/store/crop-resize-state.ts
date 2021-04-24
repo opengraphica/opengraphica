@@ -8,6 +8,7 @@ export const width = ref<number>(200);
 export const height = ref<number>(200);
 export const previewXSnap = ref<number | null>(null);
 export const previewYSnap = ref<number | null>(null);
+export const dragHandleHighlight = ref<number | null>(null);
 
 export const cropResizeEmitter = mitt();
 

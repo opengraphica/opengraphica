@@ -1,5 +1,6 @@
 import BaseCanvasMovementController from './base-movement';
-import { top, left, width, height, cropResizeEmitter, enableSnapping, previewXSnap, previewYSnap } from '../store/crop-resize-state';
+import { top, left, width, height, cropResizeEmitter, enableSnapping, dragHandleHighlight, previewXSnap, previewYSnap } from '../store/crop-resize-state';
+import { DecomposedMatrix } from '@/lib/dom-matrix';
 import canvasStore from '@/store/canvas';
 import preferencesStore from '@/store/preferences';
 import workingFileStore from '@/store/working-file';
@@ -42,7 +43,7 @@ export default class CanvasCropResizeontroller extends BaseCanvasMovementControl
 
     onPointerDown(e: PointerEvent): void {
         super.onPointerDown(e);
-        if (e.isPrimary && ['mouse', 'pen'].includes(e.pointerType)) {
+        if (e.isPrimary && ['mouse', 'pen'].includes(e.pointerType) && e.button === 0) {
             this.onCropDown();
         }
     }
@@ -55,28 +56,13 @@ export default class CanvasCropResizeontroller extends BaseCanvasMovementControl
         this.cropTranslateStart = point;
         this.cropStartDimensions = { top: top.value, left: left.value, width: width.value, height: height.value };
         this.snapSensitivity = preferencesStore.get('snapSensitivity') / decomposedTransform.scaleX * devicePixelRatio;
-        const handleSize = 2 * this.remToPx / decomposedTransform.scaleX * devicePixelRatio;
-        const halfHandleSize = handleSize / 2;
-        this.cropDragType = 0;
-        if (point.y >= top.value - halfHandleSize && point.y <= top.value + handleSize) {
-            this.cropDragType |= DRAG_TYPE_TOP;
-        }
-        if (point.y >= top.value + height.value - handleSize && point.y <= top.value + height.value + halfHandleSize) {
-            this.cropDragType |= DRAG_TYPE_BOTTOM;
-        }
-        if (point.x >= left.value - halfHandleSize && point.x <= left.value + handleSize) {
-            this.cropDragType |= DRAG_TYPE_LEFT;
-        }
-        if (point.x >= left.value + width.value - handleSize && point.x <= left.value + width.value + halfHandleSize) {
-            this.cropDragType |= DRAG_TYPE_RIGHT;
-        }
-        if (
-            point.x < left.value - halfHandleSize ||
-            point.x > left.value + width.value + halfHandleSize ||
-            point.y < top.value - halfHandleSize ||
-            point.y > top.value + height.value + halfHandleSize
-        ) {
+        let cropDragType = this.getCropDragType(point, decomposedTransform);
+        if (cropDragType != null) {
+            this.cropDragType = cropDragType;
+            dragHandleHighlight.value = cropDragType;
+        } else {
             this.cropTranslateStart = null;
+            dragHandleHighlight.value = null;
         }
     }
 
@@ -209,17 +195,58 @@ export default class CanvasCropResizeontroller extends BaseCanvasMovementControl
                 top, left, width, height
             });
         }
+        if (!this.cropTranslateStart && e.isPrimary && ['mouse', 'pen'].includes(e.pointerType)) {
+            const transform = canvasStore.get('transform');
+            const decomposedTransform = canvasStore.get('decomposedTransform');
+            const point = new DOMPoint(this.lastCursorX * devicePixelRatio, this.lastCursorY * devicePixelRatio).matrixTransform(transform.inverse());
+            let cropDragType = this.getCropDragType(point, decomposedTransform);
+            if (cropDragType != null) {
+                dragHandleHighlight.value = cropDragType;
+            } else {
+                dragHandleHighlight.value = null;
+            }
+        }
     }
 
     onPointerUp(e: PointerEvent): void {
         super.onPointerUp(e);
-        if (e.isPrimary && this.cropTranslateStart) {
-            width.value = Math.max(1, width.value);
-            height.value = Math.max(1, height.value);
-            previewXSnap.value = null;
-            previewYSnap.value = null;
-            this.cropTranslateStart = null;
+        if (e.isPrimary) {
+            if (this.cropTranslateStart) {
+                width.value = Math.max(1, width.value);
+                height.value = Math.max(1, height.value);
+                previewXSnap.value = null;
+                previewYSnap.value = null;
+                this.cropTranslateStart = null;
+            }
+            dragHandleHighlight.value = null;
         }
+    }
+
+    getCropDragType(point: DOMPoint, decomposedTransform: DecomposedMatrix): number | null {
+        let cropDragType: number | null = 0;
+        const handleSize = 2 * this.remToPx / decomposedTransform.scaleX * devicePixelRatio;
+        const halfHandleSize = handleSize / 2;
+        if (point.y >= top.value - halfHandleSize && point.y <= top.value + handleSize) {
+            cropDragType |= DRAG_TYPE_TOP;
+        }
+        if (point.y >= top.value + height.value - handleSize && point.y <= top.value + height.value + halfHandleSize) {
+            cropDragType |= DRAG_TYPE_BOTTOM;
+        }
+        if (point.x >= left.value - halfHandleSize && point.x <= left.value + handleSize) {
+            cropDragType |= DRAG_TYPE_LEFT;
+        }
+        if (point.x >= left.value + width.value - handleSize && point.x <= left.value + width.value + halfHandleSize) {
+            cropDragType |= DRAG_TYPE_RIGHT;
+        }
+        if (
+            point.x < left.value - halfHandleSize ||
+            point.x > left.value + width.value + halfHandleSize ||
+            point.y < top.value - halfHandleSize ||
+            point.y > top.value + height.value + halfHandleSize
+        ) {
+            cropDragType = null;
+        }
+        return cropDragType;
     }
 
     snapPointX(point: number): number | null {

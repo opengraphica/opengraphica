@@ -4,46 +4,70 @@
             <div class="ogr-crop-bounds" :style="{ borderWidth: (0.35/zoom) + 'rem' }"></div>
             <div class="ogr-crop-handle-top" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
-                    <path v-if="showHorizontalHandles" d="M1.5 1.5 L98.5 1.5 L98.5 25 L1.5 25 Z" fill="white" stroke="#ccc" stroke-width="3" />
+                    <path v-if="showHorizontalHandles" d="M1.5 1.5 L98.5 1.5 L98.5 25 L1.5 25 Z"
+                        :fill="dragHandleHighlight === DRAG_TYPE_TOP ? dragHandleHighlightColor : 'white'"
+                        :stroke="dragHandleHighlight === DRAG_TYPE_TOP ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
                 </svg>
             </div>
             <div class="ogr-crop-handle-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
-                    <path v-if="showVerticalHandles" d="M1.5 1.5 L98.5 1.5 L98.5 25 L1.5 25 Z" fill="white" stroke="#ccc" stroke-width="3" />
+                    <path v-if="showVerticalHandles" d="M1.5 1.5 L98.5 1.5 L98.5 25 L1.5 25 Z"
+                        :fill="dragHandleHighlight === DRAG_TYPE_LEFT ? dragHandleHighlightColor : 'white'"
+                        :stroke="dragHandleHighlight === DRAG_TYPE_LEFT ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
                 </svg>
             </div>
             <div class="ogr-crop-handle-bottom" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
-                    <path v-if="showHorizontalHandles" d="M1.5 1.5 L98.5 1.5 L98.5 25 L1.5 25 Z" fill="white" stroke="#ccc" stroke-width="3" />
+                    <path v-if="showHorizontalHandles" d="M1.5 1.5 L98.5 1.5 L98.5 25 L1.5 25 Z"
+                        :fill="dragHandleHighlight === DRAG_TYPE_BOTTOM ? dragHandleHighlightColor : 'white'" 
+                        :stroke="dragHandleHighlight === DRAG_TYPE_BOTTOM ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
                 </svg>
             </div>
             <div class="ogr-crop-handle-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
-                    <path v-if="showVerticalHandles" d="M1.5 1.5 L98.5 1.5 L98.5 25 L1.5 25 Z" fill="white" stroke="#ccc" stroke-width="3" />
+                    <path v-if="showVerticalHandles" d="M1.5 1.5 L98.5 1.5 L98.5 25 L1.5 25 Z"
+                        :fill="dragHandleHighlight === DRAG_TYPE_RIGHT ? dragHandleHighlightColor : 'white'"
+                        :stroke="dragHandleHighlight === DRAG_TYPE_RIGHT ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
                 </svg>
             </div>
             <div class="ogr-crop-handle-top-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
-                    <path v-if="isSmallHandles" d="M1.5 1.5 L25 1.5 L25 25 L1.5 25 Z" fill="white" stroke="#ccc" stroke-width="3" />
-                    <path v-else d="M1.5 1.5 L98.5 1.5 L98.5 25 L25 25 L25 98.5 L1.5 98.5 Z" fill="white" stroke="#ccc" stroke-width="3" />
+                    <path v-if="isSmallHandles" d="M1.5 1.5 L25 1.5 L25 25 L1.5 25 Z"
+                        :fill="dragHandleHighlight === (DRAG_TYPE_TOP | DRAG_TYPE_LEFT) ? dragHandleHighlightColor : 'white'"
+                        :stroke="dragHandleHighlight === (DRAG_TYPE_TOP | DRAG_TYPE_LEFT) ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
+                    <path v-else d="M1.5 1.5 L98.5 1.5 L98.5 25 L25 25 L25 98.5 L1.5 98.5 Z"
+                        :fill="dragHandleHighlight === (DRAG_TYPE_TOP | DRAG_TYPE_LEFT) ? dragHandleHighlightColor : 'white'"
+                        :stroke="dragHandleHighlight === (DRAG_TYPE_TOP | DRAG_TYPE_LEFT) ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
                 </svg>
             </div>
             <div class="ogr-crop-handle-top-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
-                    <path v-if="isSmallHandles" d="M1.5 1.5 L25 1.5 L25 25 L1.5 25 Z" fill="white" stroke="#ccc" stroke-width="3" />
-                    <path v-else d="M1.5 1.5 L98.5 1.5 L98.5 25 L25 25 L25 98.5 L1.5 98.5 Z" fill="white" stroke="#ccc" stroke-width="3" />
+                    <path v-if="isSmallHandles" d="M1.5 1.5 L25 1.5 L25 25 L1.5 25 Z"
+                        :fill="dragHandleHighlight === (DRAG_TYPE_TOP | DRAG_TYPE_RIGHT) ? dragHandleHighlightColor : 'white'"
+                        :stroke="dragHandleHighlight === (DRAG_TYPE_TOP | DRAG_TYPE_RIGHT) ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
+                    <path v-else d="M1.5 1.5 L98.5 1.5 L98.5 25 L25 25 L25 98.5 L1.5 98.5 Z"
+                        :fill="dragHandleHighlight === (DRAG_TYPE_TOP | DRAG_TYPE_RIGHT) ? dragHandleHighlightColor : 'white'"
+                        :stroke="dragHandleHighlight === (DRAG_TYPE_TOP | DRAG_TYPE_RIGHT) ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
                 </svg>
             </div>
             <div class="ogr-crop-handle-bottom-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
-                    <path v-if="isSmallHandles" d="M1.5 1.5 L25 1.5 L25 25 L1.5 25 Z" fill="white" stroke="#ccc" stroke-width="3" />
-                    <path v-else d="M1.5 1.5 L98.5 1.5 L98.5 25 L25 25 L25 98.5 L1.5 98.5 Z" fill="white" stroke="#ccc" stroke-width="3" />
+                    <path v-if="isSmallHandles" d="M1.5 1.5 L25 1.5 L25 25 L1.5 25 Z"
+                        :fill="dragHandleHighlight === (DRAG_TYPE_BOTTOM | DRAG_TYPE_LEFT) ? dragHandleHighlightColor : 'white'"
+                        :stroke="dragHandleHighlight === (DRAG_TYPE_BOTTOM | DRAG_TYPE_LEFT) ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
+                    <path v-else d="M1.5 1.5 L98.5 1.5 L98.5 25 L25 25 L25 98.5 L1.5 98.5 Z"
+                        :fill="dragHandleHighlight === (DRAG_TYPE_BOTTOM | DRAG_TYPE_LEFT) ? dragHandleHighlightColor : 'white'"
+                        :stroke="dragHandleHighlight === (DRAG_TYPE_BOTTOM | DRAG_TYPE_LEFT) ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
                 </svg>
             </div>
             <div class="ogr-crop-handle-bottom-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
-                    <path v-if="isSmallHandles" d="M1.5 1.5 L25 1.5 L25 25 L1.5 25 Z" fill="white" stroke="#ccc" stroke-width="3" />
-                    <path v-else d="M1.5 1.5 L98.5 1.5 L98.5 25 L25 25 L25 98.5 L1.5 98.5 Z" fill="white" stroke="#ccc" stroke-width="3" />
+                    <path v-if="isSmallHandles" d="M1.5 1.5 L25 1.5 L25 25 L1.5 25 Z"
+                        :fill="dragHandleHighlight === (DRAG_TYPE_BOTTOM | DRAG_TYPE_RIGHT) ? dragHandleHighlightColor : 'white'"
+                        :stroke="dragHandleHighlight === (DRAG_TYPE_BOTTOM | DRAG_TYPE_RIGHT) ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
+                    <path v-else d="M1.5 1.5 L98.5 1.5 L98.5 25 L25 25 L25 98.5 L1.5 98.5 Z"
+                        :fill="dragHandleHighlight === (DRAG_TYPE_BOTTOM | DRAG_TYPE_RIGHT) ? dragHandleHighlightColor : 'white'"
+                        :stroke="dragHandleHighlight === (DRAG_TYPE_BOTTOM | DRAG_TYPE_RIGHT) ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
                 </svg>
             </div>
         </div>
@@ -56,7 +80,7 @@
 import { defineComponent, ref, computed, watch, onMounted, onUnmounted, toRefs } from 'vue';
 import canvasStore from '@/store/canvas';
 import workingFileStore from '@/store/working-file';
-import { top, left, width, height, cropResizeEmitter, previewXSnap, previewYSnap } from '../store/crop-resize-state';
+import { top, left, width, height, cropResizeEmitter, dragHandleHighlight, previewXSnap, previewYSnap } from '../store/crop-resize-state';
 
 export default defineComponent({
     name: 'CanvasOverlayCropResize',
@@ -67,6 +91,8 @@ export default defineComponent({
     setup(props, { emit }) {
         const crop = ref<HTMLDivElement>(null as any);
         const zoom = ref<number>(1);
+        const dragHandleHighlightColor: string = '#ecf5ff';
+        const dragHandleHighlightBorderColor: string= '#b3d8ff';
         const { width: fileWidth, height: fileHeight } = toRefs(workingFileStore.state);
 
         const isSmallHandles = computed<boolean>(() => {
@@ -117,6 +143,11 @@ export default defineComponent({
         }
 
         return {
+            DRAG_TYPE_ALL: 0,
+            DRAG_TYPE_TOP: 1,
+            DRAG_TYPE_BOTTOM: 2,
+            DRAG_TYPE_LEFT: 4,
+            DRAG_TYPE_RIGHT: 8,
             crop,
             zoom,
             top,
@@ -126,6 +157,9 @@ export default defineComponent({
             isSmallHandles,
             showVerticalHandles,
             showHorizontalHandles,
+            dragHandleHighlightColor,
+            dragHandleHighlightBorderColor,
+            dragHandleHighlight,
             previewXSnap,
             previewYSnap,
             fileWidth,

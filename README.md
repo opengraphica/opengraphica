@@ -45,6 +45,8 @@ Afterwards, the "mount" method tells OpenGraphica where it should be placed in t
 
 ## Contributing
 
+**__By submitting a pull request for this project, you agree to license your contribution under the MIT license to this project.__**
+
 ### Development Workspace Setup
 
 1. Clone this repository and install [Node.js](https://nodejs.org/en/)
