@@ -164,7 +164,9 @@ export default defineComponent({
                 }
 
                 const Pica = (await import('pica')).default;
-                pica = new Pica();
+                pica = new Pica({
+                    features: ['wasm', 'ww']
+                });
             }
         });
 
