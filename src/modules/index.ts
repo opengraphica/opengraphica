@@ -18,7 +18,7 @@ export async function preloadModules() {
                 const moduleName = modulePathSplit[1];
                 if (moduleGroup && moduleName) {
                     moduleLoadPromises.push(
-                        import(/* webpackChunkName: 'module-preload-[request]' */ `./${moduleGroup}/${moduleName}.ts`)
+                        import(/* webpackChunkName: 'module-preload-[request]' */ `./${moduleGroup}/${moduleName}`)
                     );
                 }
             }
@@ -41,7 +41,7 @@ export async function runModule(moduleGroupName: string, moduleName: string) {
                 const moduleGroup = modulePathSplit[0];
                 const moduleName = modulePathSplit[1];
                 if (moduleGroup && moduleName && methodName) {
-                    const importedModule = (await import(/* webpackChunkName: 'module-[request]' */ `./${moduleGroup}/${moduleName}.ts`));
+                    const importedModule = (await import(/* webpackChunkName: 'module-[request]' */ `./${moduleGroup}/${moduleName}`));
                     appEmitter.emit('app.wait.startBlocking', {
                         id: 'runModule_' + moduleGroupName + '_' + moduleName,
                         label: module.name

@@ -69,6 +69,7 @@ module.exports = function setupConfig(config) {
             new CleanWebpackPlugin(),
             new CopyWebpackPlugin({
                 patterns: [
+                    { from: path.resolve(__dirname, 'src/assets/favicon'), to: '[name][ext]' },
                     { from: path.resolve(__dirname, 'src/css/main-*.css'), to: 'css/[name][ext]' },
                     { from: path.resolve(__dirname, 'src/assets/fonts'), to: 'css/fonts' },
                     { from: path.resolve(__dirname, 'node_modules/bootstrap-icons/font/fonts'), to: 'css/fonts' }

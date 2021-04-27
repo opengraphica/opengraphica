@@ -8,6 +8,7 @@ import '@/store/history';
 import '@/store/preferences';
 import '@/store/working-file';
 import ElNotification from 'element-plus/lib/el-notification';
+import '@/lib/keyboard';
 
 export interface OpenGraphica extends App<Element> {
     on: typeof appEmitter.on,
@@ -19,7 +20,11 @@ export interface OpenGraphica extends App<Element> {
 const app: OpenGraphica = createApp(OpenGraphicaApp) as OpenGraphica;
 app.use(ElNotification);
 
+// Notification toasts
 app.provide('$notify', app.config.globalProperties.$notify);
+appEmitter.on('app.notify', (options) => {
+    app.config.globalProperties.$notify(options);
+})
 
 // Expose events
 app.on = appEmitter.on;

@@ -361,6 +361,9 @@ export default defineComponent({
                                     tool: 'cropResize'
                                 });
                                 break;
+                            case 'copyAll':
+                                await runModule('image', 'copyAll');
+                                break;
                         }
                         break;
                 }

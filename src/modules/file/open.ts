@@ -17,8 +17,8 @@ import { CreateFileAction } from '@/actions/create-file';
 import { InsertLayerAction } from '@/actions/insert-layer';
 
 interface FileDialogOpenOptions {
-    insert?: boolean;
-    accept?: string;
+    insert?: boolean; // False will create a new document, true inserts into current document.
+    accept?: string; // Mime type of files to accept, same as input "accept" attribute.
 }
 
 export async function openFromFileDialog(options: FileDialogOpenOptions = {}): Promise<void> {
@@ -81,7 +81,7 @@ export async function insertFromFileDialog() {
     });
 }
 
-export async function openFromFileList(files: FileList, options: FileDialogOpenOptions = {}) {
+export async function openFromFileList(files: FileList | Array<File>, options: FileDialogOpenOptions = {}) {
 
     type FileReadType = 'json' | 'image';
     type FileReadResolve = { type: 'image', result: HTMLImageElement, file: File } | { type: 'json', result: string, file: File };

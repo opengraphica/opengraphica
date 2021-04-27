@@ -1,4 +1,5 @@
 import mitt, { Handler } from 'mitt';
+import { INotificationOptions } from 'element-plus/lib/el-notification/src/notification.type';
 
 interface AppEmitterEvents {
     'app.canvas.resetTransform': undefined | {
@@ -11,6 +12,7 @@ interface AppEmitterEvents {
     'app.dialogs.openFromModule': {
         name: string;
     };
+    'app.notify': INotificationOptions;
     'app.wait.startBlocking': {
         id: string;
         label: string;

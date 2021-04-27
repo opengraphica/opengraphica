@@ -53,5 +53,19 @@
                 }
             }
         }
+    },
+    "image": {
+        "name": "Image Canvas",
+        "description": "Operations that affect the image canvas.",
+        "modules": {
+            "copyAll": {
+                "name": "Copy All Layers",
+                "description": "Copy all layers on the canvas as a PNG image to the clipboard.",
+                "action": {
+                    "type": "function",
+                    "target": "image/copy.copyAllLayers"
+                }
+            }
+        }
     }
 }
