@@ -8,8 +8,9 @@ import {
     WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileVectorLayer, WorkingFileTextLayer,
     SerializedFileGroupLayer, SerializedFileRasterLayer, SerializedFileVectorLayer, SerializedFileTextLayer, WorkingFileAnyLayer
 } from '@/types';
-import workingFileStore, { WorkingFileState } from '@/store/working-file';
 import historyStore from '@/store/history';
+import preferencesStore from '@/store/preferences';
+import workingFileStore, { WorkingFileState } from '@/store/working-file';
 import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { UpdateFileAction } from '@/actions/update-file';
@@ -217,6 +218,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
             );
         }
 
+        preferencesStore.set('useCanvasViewport', preferencesStore.get('preferCanvasViewport'));
         await historyStore.dispatch('runAction', {
             action: new BundleAction('openFile', 'Open File', [
                 ...fileUpdateActions,

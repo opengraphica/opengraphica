@@ -10,6 +10,7 @@ interface PreferencesState {
     preferCanvasViewport: boolean;
     snapSensitivity: number;
     touchRotation: 'on' | 'snap' | 'off';
+    useCanvasViewport: boolean;
 }
 
 interface PreferencesStore {
@@ -27,7 +28,8 @@ const store = new PerformantStore<PreferencesStore>({
         postProcessInterpolateImage: true,
         preferCanvasViewport: false,
         snapSensitivity: 5,
-        touchRotation: 'on'
+        touchRotation: 'on',
+        useCanvasViewport: false
     }
 });
 

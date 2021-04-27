@@ -58,7 +58,7 @@ const store = new PerformantStore<CanvasStore>({
             const decomposedTransform = decomposeMatrix(value as DOMMatrix);
             set('decomposedTransform', decomposedTransform);
             set('useCssViewport',
-                !preferencesStore.get('preferCanvasViewport') &&
+                !preferencesStore.get('useCanvasViewport') &&
                 !(store.get('isDisplayingNonRasterLayer') && decomposedTransform.scaleX > 1)
             );
         }

@@ -48,7 +48,7 @@ export default defineComponent({
         let lastCssDecomposedScale: number = 1;
         const drawPostProcessWait: number = 50;
         const usePostProcess = computed<boolean>(() => {
-            return preferencesStore.state.postProcessInterpolateImage;
+            return preferencesStore.state.postProcessInterpolateImage && !preferencesStore.state.useCanvasViewport;
         });
 
         const hasCanvasOverlays = computed<boolean>(() => {
@@ -274,19 +274,25 @@ export default defineComponent({
                     // Post process for better pixel interpolation
                     if (postProcessCanvas.value) {
                         postProcessCanvas.value.style.display = 'none';
-                        drawPostProcess();
+                        if (canvasStore.get('preventPostProcess')) {
+                            lastCssDecomposedScale = -1;
+                            postProcessCanvas.value.width = 1;
+                            postProcessCanvas.value.height = 1;
+                        } else {
+                            drawPostProcess();
+                        }
                     }
                 }
             } catch (error) {
-                if (preferencesStore.get('preferCanvasViewport') === false) {
+                if (preferencesStore.get('useCanvasViewport') === false && (error || '').toString().includes('NS_ERROR_FAILURE')) {
                     clearTimeout(drawPostProcessTimeoutHandle);
-                    preferencesStore.set('preferCanvasViewport', true);
+                    preferencesStore.set('useCanvasViewport', true);
                     canvasStore.set('useCssViewport', false);
                     canvasStore.set('viewDirty', false);
                     canvasStore.set('dirty', false);
                     $notify({
                         type: 'info',
-                        message: 'The image could not be drawn, switching viewport to optimize for large images.'
+                        message: 'Switching viewport to optimize for large images. Some features such as high quality scaling are disabled.'
                     });
                 } else {
                     canvasStore.set('viewDirty', false);
