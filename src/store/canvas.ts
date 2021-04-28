@@ -24,8 +24,17 @@ interface CanvasState {
     workingImageBorderColor: string;
 }
 
+interface CanvasDispatch {
+    setTransformRotation: number; // Radians
+    setTransformScale: number;
+    setTransformTranslate: {
+        x: number;
+        y: number;
+    }
+}
+
 interface CanvasStore {
-    dispatch: {};
+    dispatch: CanvasDispatch;
     state: CanvasState;
 }
 
@@ -61,6 +70,45 @@ const store = new PerformantStore<CanvasStore>({
                 !preferencesStore.get('useCanvasViewport') &&
                 !(store.get('isDisplayingNonRasterLayer') && decomposedTransform.scaleX > 1)
             );
+        }
+    },
+    onDispatch(actionName: keyof CanvasDispatch, value: any, set) {
+        switch (actionName) {
+            case 'setTransformRotation':
+            case 'setTransformScale':
+            case 'setTransformTranslate':
+                const decomposedTransform = store.get('decomposedTransform');
+                let rotationDelta = 0;
+                let scaleDelta = 0;
+                if (actionName === 'setTransformRotation') {
+                    rotationDelta = (value - decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES;
+                } else if (actionName === 'setTransformScale') {
+                    scaleDelta = value / decomposedTransform.scaleX;
+                } else if (actionName === 'setTransformTranslate') {
+                    decomposedTransform.translateX = value.x;
+                    decomposedTransform.translateY = value.y;
+                }
+
+                const devicePixelRatio = window.devicePixelRatio || 1;
+                const transform = store.get('transform');
+
+                // TODO - Take sidebars into account
+                const handleX = store.get('viewWidth') / 2 * devicePixelRatio;
+                const handleY = store.get('viewHeight') / 2 * devicePixelRatio;
+
+                const point = new DOMPoint(handleX, handleY).matrixTransform(transform.inverse());
+                transform.translateSelf(point.x, point.y);
+                if (scaleDelta) {
+                    transform.scaleSelf(scaleDelta, scaleDelta);
+                }
+                if (rotationDelta) {
+                    transform.rotateSelf(rotationDelta);
+                }
+                transform.translateSelf(-point.x, -point.y);
+
+                store.set('transform', transform);
+                store.set('viewDirty', true);
+                break;
         }
     }
 });

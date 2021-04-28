@@ -2,7 +2,7 @@
 export interface DecomposedMatrix {
     translateX: number,
     translateY: number,
-    rotation: number,
+    rotation: number, // Radians
     skewX: number,
     scaleX: number,
     scaleY: number

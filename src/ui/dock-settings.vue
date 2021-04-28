@@ -81,22 +81,22 @@
                 <el-form novalidate="novalidate" action="javascript:void(0)" class="mb-1">
                     <el-form-item class="el-form-item--menu-item" label="Zoom">
                         <el-button-group class="el-button-group--flex">
-                            <el-button size="small" plain aria-label="Zoom Out">
+                            <el-button size="small" plain aria-label="Zoom Out" @click="zoomLevel *= 1/1.05">
                                 <i class="bi bi-zoom-out" aria-hidden="true" />
                             </el-button>
-                            <el-input-number v-model.lazy="zoomLevel" size="small" class="el-input--text-center" style="width: 5rem" />
-                            <el-button size="small" plain aria-label="Zoom In">
+                            <el-input-number v-model.lazy="zoomLevel" suffix-text="%" size="small" class="el-input--text-center" style="width: 5rem" />
+                            <el-button size="small" plain aria-label="Zoom In" @click="zoomLevel *= 1.05">
                                 <i class="bi bi-zoom-in" aria-hidden="true" />
                             </el-button>
                         </el-button-group>
                     </el-form-item>
                     <el-form-item class="el-form-item--menu-item" label="Rotate">
                         <el-button-group class="el-button-group--flex">
-                            <el-button size="small" plain aria-label="Rotate Counterclockwise">
+                            <el-button size="small" plain aria-label="Rotate Counterclockwise"  @click="rotationAngle -= 15">
                                 <i class="bi bi-arrow-counterclockwise" aria-hidden="true" />
                             </el-button>
-                            <el-input-number v-model.lazy="rotationAngle" size="small" class="el-input--text-center" style="width: 5rem" />
-                            <el-button size="small" plain aria-label="Rotate Clockwise">
+                            <el-input-number v-model.lazy="rotationAngle" suffix-text="°" size="small" class="el-input--text-center" style="width: 5rem" />
+                            <el-button size="small" plain aria-label="Rotate Clockwise" @click="rotationAngle += 15">
                                 <i class="bi bi-arrow-clockwise" aria-hidden="true" />
                             </el-button>
                         </el-button-group>
@@ -106,10 +106,10 @@
                             <el-button size="small" plain @click="onResetViewFit">
                                 Fit
                             </el-button>
-                            <el-button size="small" plain>
+                            <el-button size="small" plain @click="onResetViewZoom">
                                 1:1
                             </el-button>
-                            <el-button size="small" plain>
+                            <el-button size="small" plain @click="onResetViewRotation">
                                 0°
                             </el-button>
                         </el-button-group>
@@ -252,15 +252,21 @@ export default defineComponent({
         // View zoom/pan/rotate
         const zoomLevel = computed<number>({
             get() {
-                return 0;
+                const decomposedTransform = canvasStore.state.decomposedTransform;
+                return Math.round(decomposedTransform.scaleX * 100);
             },
-            set() {}
+            set(value) {
+                canvasStore.dispatch('setTransformScale', value / 100);
+            }
         });
         const rotationAngle = computed<number>({
             get() {
-                return 0;
+                const decomposedTransform = canvasStore.state.decomposedTransform;
+                return Math.round(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES);
             },
-            set() {}
+            set(value) {
+                canvasStore.dispatch('setTransformRotation', value * Math.DEGREES_TO_RADIANS);
+            }
         });
         const touchRotationPreference = computed<'on' | 'off' | 'snap'>({
             get() {
@@ -277,6 +283,12 @@ export default defineComponent({
         ];
         function onResetViewFit() {
             appEmitter.emit('app.canvas.resetTransform');
+        }
+        function onResetViewRotation() {
+            canvasStore.dispatch('setTransformRotation', 0);
+        }
+        function onResetViewZoom() {
+            canvasStore.dispatch('setTransformScale', 1);
         }
 
         // Theme handling
@@ -389,6 +401,8 @@ export default defineComponent({
             touchRotationPreference,
             touchRotationOptions,
             onResetViewFit,
+            onResetViewRotation,
+            onResetViewZoom,
             themeOptions,
             loadingThemeName,
             activeTheme,

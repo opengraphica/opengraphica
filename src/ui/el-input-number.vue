@@ -53,7 +53,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, PropType, onMounted } from 'vue';
+import { defineComponent, ref, watch, PropType, onMounted, nextTick } from 'vue';
 import ElInput from 'element-plus/lib/el-input';
 import { Parser as MathExpressionParser } from 'expr-eval';
 
@@ -102,6 +102,12 @@ export default defineComponent({
             type: String
         },
         suffixIcon: {
+            type: String
+        },
+        prefixText: {
+            type: String
+        },
+        suffixText: {
             type: String
         },
         rows: {
@@ -171,6 +177,7 @@ export default defineComponent({
         const input = ref();
         const displayValue = ref<string>('');
         let lastEvaluatedValue: number = 0;
+        let isFocused: boolean = false;
 
         watch(() => props.modelValue, (modelValue) => {
             if (modelValue != null && modelValue !== lastEvaluatedValue) {
@@ -186,12 +193,41 @@ export default defineComponent({
             lastEvaluatedValue = modelValue;
             lastEvaluatedValue = Math.max(props.min, Math.min(props.max, lastEvaluatedValue));
             displayValue.value = '' + modelValue;
+            if (!isFocused) {
+                addTextPrefixSuffix();
+            }
+        }
+
+        function addTextPrefixSuffix() {
+            if (props.prefixText || props.suffixText) {
+                displayValue.value = (props.prefixText || '') + displayValue.value + (props.suffixText || '');
+            }
+        }
+
+        function removeTextPrefixSuffix() {
+            if (props.prefixText || props.suffixText) {
+                const innerInput = input.value.$el.querySelector('input');
+                const selectionStart: number = (innerInput && innerInput.selectionStart) || 0;
+                if (props.prefixText && displayValue.value.slice(0, props.prefixText.length) === props.prefixText) {
+                    displayValue.value = displayValue.value.slice(0, props.prefixText.length);
+                }
+                if (props.suffixText && displayValue.value.slice(-props.suffixText.length) === props.suffixText) {
+                    displayValue.value = displayValue.value.slice(0, -props.suffixText.length);
+                }
+                nextTick(() => {
+                    innerInput.setSelectionRange(selectionStart, selectionStart);
+                });
+            }
         }
 
         function onBlur(e: Event) {
+            addTextPrefixSuffix();
+            isFocused = false;
             emit('blur', e);
         }
         function onFocus(e: Event) {
+            removeTextPrefixSuffix();
+            isFocused = true;
             emit('focus', e);
         }
         function onChange() {
