@@ -80,7 +80,7 @@
             <el-scrollbar>
                 <el-form novalidate="novalidate" action="javascript:void(0)" class="mb-1">
                     <el-form-item class="el-form-item--menu-item" label="Zoom">
-                        <el-button-group>
+                        <el-button-group class="el-button-group--flex">
                             <el-button size="small" plain aria-label="Zoom Out">
                                 <i class="bi bi-zoom-out" aria-hidden="true" />
                             </el-button>
@@ -91,7 +91,7 @@
                         </el-button-group>
                     </el-form-item>
                     <el-form-item class="el-form-item--menu-item" label="Rotate">
-                        <el-button-group>
+                        <el-button-group class="el-button-group--flex">
                             <el-button size="small" plain aria-label="Rotate Counterclockwise">
                                 <i class="bi bi-arrow-counterclockwise" aria-hidden="true" />
                             </el-button>

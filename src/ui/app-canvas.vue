@@ -28,7 +28,9 @@ export default defineComponent({
         AppCanvasOverlays
     },
     setup(props, { emit }) {
+        let Pica: any; // Can't import type definitions from dynamic modules imported later, wtf typescript!
         let pica: any; // Can't import type definitions from dynamic modules imported later, wtf typescript!
+        let isPicaSingleThreaded: boolean = false;
         const $notify = notifyInjector('$notify');
 
         const rootElement = inject<Ref<Element>>('rootElement');
@@ -163,9 +165,9 @@ export default defineComponent({
                     drawLoop();
                 }
 
-                const Pica = (await import('pica')).default;
+                Pica = (await import('@/lib/pica')).default;
                 pica = new Pica({
-                    features: ['wasm', 'ww']
+                    idle: 20000
                 });
             }
         });
@@ -324,15 +326,42 @@ export default defineComponent({
                     postProcessCanvasElement.width = Math.floor(canvasElement.width * decomposedTransform.scaleX);
                     postProcessCanvasElement.height = Math.floor(canvasElement.height * decomposedTransform.scaleX);
                     let postProcessCancelPromise = new Promise((resolve, reject) => { postProcessCancel = reject });
+                    const picaStartTime = window.performance.now();
+                    const timers = {
+                        processTile: 0
+                    };
                     pica.resize(canvasElement, postProcessCanvasElement, {
-                        cancelToken: postProcessCancelPromise
+                        cancelToken: postProcessCancelPromise,
+                        timers
                     }).then(() => {
                         postProcessCanvasElement.style.display = 'block';
                         postProcessCanvasElement.style.transform = `scale(${1 / decomposedTransform.scaleX})`;
+                        adjustPostProcess(timers);
                     }).catch(() => {
                         postProcessCanvasElement.style.display = 'none';
+                        adjustPostProcess(timers);
                     });
+                    
                 }, drawPostProcessWait);
+            }
+        }
+
+        // Check if Pica chunking performance in main thread is unacceptably slow and handle appropriately.
+        function adjustPostProcess(timers: { [key: string]: any }) {
+            if (timers.processTile && timers.processTile > 50) {
+                if (isPicaSingleThreaded) {
+                    preferencesStore.set('postProcessInterpolateImage', false);
+                    $notify({
+                        type: 'info',
+                        message: 'High quality scaling is slowing down the viewport. It was automatically disabled.'
+                    });
+                } else {
+                    console.warn('[WARNING] Pica main thread process took too long, defaulting to single thread.');
+                    isPicaSingleThreaded = true;
+                    pica = new Pica({
+                        concurrency: 1
+                    });
+                }
             }
         }
 

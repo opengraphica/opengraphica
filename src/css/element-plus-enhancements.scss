@@ -35,6 +35,18 @@
                 z-index: 1;
             }
         }
+
+        &.el-button-group--flex {
+            display: inline-flex;
+            flex-direction: row;
+            align-items: stretch;
+
+            > .el-input {
+                > .el-input__inner {
+                    height: 100%;
+                }
+            }
+        }
     }
 
     .el-collapse--menu-item {

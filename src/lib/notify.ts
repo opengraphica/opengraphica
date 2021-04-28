@@ -3,6 +3,10 @@ import { INotification, INotificationOptions, INotificationHandle } from 'elemen
 
 export function notifyInjector(injectName: string): INotification {
     const $notify = inject<INotification>(injectName) as INotification;
+    return notifyPolyfill($notify);
+}
+
+export function notifyPolyfill($notify: INotification): INotification {
     return (options?: INotificationOptions): INotificationHandle => {
         const notificationHandle = $notify(options);
         const notifications = document.querySelectorAll('body > .el-notification');

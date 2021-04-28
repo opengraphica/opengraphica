@@ -23307,6 +23307,14 @@ body.ogr-full-page {
 .opengraphica .el-button-group > .el-input:focus-within {
   z-index: 1;
 }
+.opengraphica .el-button-group.el-button-group--flex {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+.opengraphica .el-button-group.el-button-group--flex > .el-input > .el-input__inner {
+  height: 100%;
+}
 .opengraphica .el-collapse--menu-item .el-collapse-item__header {
   font-size: 0.875rem;
   padding-left: 1.25rem;

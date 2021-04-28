@@ -81,7 +81,9 @@ export default defineComponent({
 
         function onTouchStartMain(e: TouchEvent) {
             e.preventDefault();
-            editorStore.get('toolCanvasController').onPointerDown(translateTouchEventToPointerEvents('pointerdown', e)[0]);
+            for (const event of translateTouchEventToPointerEvents('pointerdown', e)) {
+                editorStore.get('toolCanvasController').onPointerDown(event);
+            }
             (document.body as any).focus();
             return false;
         };
@@ -91,7 +93,9 @@ export default defineComponent({
             }
         }
         function onTouchEndWindow(e: TouchEvent) {
-            editorStore.get('toolCanvasController').onPointerUp(translateTouchEventToPointerEvents('pointerup', e)[0]);
+            for (const event of translateTouchEventToPointerEvents('pointerup', e)) {
+                editorStore.get('toolCanvasController').onPointerUp(event);
+            }
         }
 
         function onPointerDownMain(e: PointerEvent) {

@@ -8,6 +8,7 @@ import '@/store/history';
 import '@/store/preferences';
 import '@/store/working-file';
 import ElNotification from 'element-plus/lib/el-notification';
+import { notifyPolyfill } from '@/lib/notify';
 import '@/lib/keyboard';
 
 export interface OpenGraphica extends App<Element> {
@@ -23,7 +24,7 @@ app.use(ElNotification);
 // Notification toasts
 app.provide('$notify', app.config.globalProperties.$notify);
 appEmitter.on('app.notify', (options) => {
-    app.config.globalProperties.$notify(options);
+    notifyPolyfill(app.config.globalProperties.$notify)(options);
 })
 
 // Expose events

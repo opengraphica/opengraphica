@@ -1,6 +1,7 @@
 import { CanvasRenderingContext2DEnhanced } from '@/types';
 import canvasStore from '@/store/canvas';
 import preferencesStore from '@/store/preferences';
+import appEmitter from '@/lib/emitter';
 
 export interface PointerTracker {
     id: number,
