@@ -5440,7 +5440,7 @@ body.ogr-full-page {
   padding: 0.6rem 0.8rem !important;
 }
 .opengraphica .ogr-layout-menu-bar .el-button--expanded-popover {
-  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.3);
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.3) inset;
 }
 .opengraphica .ogr-dock-popover {
   min-width: 0 !important;
