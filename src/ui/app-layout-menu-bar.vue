@@ -179,16 +179,8 @@ export default defineComponent({
 
         if (props.direction === 'horizontal') {
             watch([viewportWidth], () => {
-                window.clearTimeout(resizeDebounceHandle);
-                window.setTimeout(async () => {
-                    displayMode.value = 'all';
-                    await nextTick();
-                    const flexContainerEl = flexContainer.value;
-                    if (flexContainerEl && flexContainerEl.scrollWidth > flexContainerEl.clientWidth) {
-                        displayMode.value = 'favorites';
-                    }
-                }, 100);
-            }, { immediate: true });
+                toggleMobileView();
+            });
         }
 
         onMounted(() => {
@@ -196,6 +188,7 @@ export default defineComponent({
             window.addEventListener('mouseup', onMouseUpWindow);
             window.addEventListener('touchstart', onTouchStartWindow);
             window.addEventListener('touchend', onTouchEndWindow);
+            toggleMobileView();
         });
 
         onUnmounted(() => {
@@ -204,6 +197,18 @@ export default defineComponent({
             window.removeEventListener('touchstart', onTouchStartWindow);
             window.removeEventListener('touchend', onTouchEndWindow);
         });
+
+        function toggleMobileView() {
+            window.clearTimeout(resizeDebounceHandle);
+            resizeDebounceHandle = window.setTimeout(async () => {
+                displayMode.value = 'all';
+                await nextTick();
+                const flexContainerEl = flexContainer.value;
+                if (flexContainerEl && flexContainerEl.scrollWidth > flexContainerEl.clientWidth + 1) {
+                    displayMode.value = 'favorites';
+                }
+            }, 100);
+        }
 
         function createActionGroups(forceDisplayMode?: string): { [key: string]: LayoutShortcutGroupDefinition[] } {
             forceDisplayMode = forceDisplayMode || displayMode.value;

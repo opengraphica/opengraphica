@@ -14,6 +14,7 @@ export default defineComponent({
     setup() {
         const $notify = notifyInjector('$notify');
         const { waiting } = toRefs(editorStore.state);
+        const blockingNotificationMinDisplayTime = 400;
 
         let notifications: { [key: string]: any } = {};
 
@@ -40,9 +41,11 @@ export default defineComponent({
                         duration: 0,
                         showClose: false
                     });
+                    notifications[event.id].displayTime = window.performance.now();
                 } else {
                     notifications[event.id] = {
-                        close() {}
+                        close() {},
+                        displayTime: window.performance.now()
                     };
                 }
                 editorStore.set('waiting', true);
@@ -52,7 +55,15 @@ export default defineComponent({
         function stopBlocking(event?: AppEmitterEvents['app.wait.stopBlocking']) {
             if (event) {
                 if (notifications[event.id]) {
-                    notifications[event.id].close();
+                    const notification = notifications[event.id];
+                    const displayTimePassed = window.performance.now() - notification.displayTime;
+                    if (displayTimePassed >= blockingNotificationMinDisplayTime) {
+                        notification.close();
+                    } else {
+                        setTimeout(() => {
+                            notification.close();
+                        }, blockingNotificationMinDisplayTime - displayTimePassed);
+                    }
                     delete notifications[event.id];
                 }
                 if (Object.keys(notifications).length === 0) {
