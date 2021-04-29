@@ -4,15 +4,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
+import { defineComponent, toRefs, onMounted, onUnmounted } from 'vue';
 import appEmitter, { AppEmitterEvents } from '@/lib/emitter';
 import { notifyInjector } from '@/lib/notify';
+import editorStore from '@/store/editor';
 
 export default defineComponent({
     name: 'AppWait',
     setup() {
         const $notify = notifyInjector('$notify');
-        const waiting = ref<boolean>(false);
+        const { waiting } = toRefs(editorStore.state);
 
         let notifications: { [key: string]: any } = {};
 
@@ -32,13 +33,19 @@ export default defineComponent({
                     notifications[event.id].close();
                     delete notifications[event.id];
                 }
-                notifications[event.id] = $notify({
-                    title: event.label,
-                    message: 'Please wait...',
-                    duration: 0,
-                    showClose: false
-                });
-                waiting.value = true;
+                if (event.label) {
+                    notifications[event.id] = $notify({
+                        title: event.label,
+                        message: 'Please wait...',
+                        duration: 0,
+                        showClose: false
+                    });
+                } else {
+                    notifications[event.id] = {
+                        close() {}
+                    };
+                }
+                editorStore.set('waiting', true);
             }
         }
 
@@ -49,7 +56,7 @@ export default defineComponent({
                     delete notifications[event.id];
                 }
                 if (Object.keys(notifications).length === 0) {
-                    waiting.value = false;
+                    editorStore.set('waiting', false);
                 }
             }
         }

@@ -46,6 +46,7 @@ export default defineComponent({
         let ctx: CanvasRenderingContext2DEnhanced | null = null;
 
         let postProcessCancel: ((reason?: any) => void) | null = null;
+        let postProcessAverageLag: number = 0;
         let drawPostProcessTimeoutHandle: number | undefined;
         let lastCssDecomposedScale: number = 1;
         const drawPostProcessWait: number = 50;
@@ -348,19 +349,23 @@ export default defineComponent({
 
         // Check if Pica chunking performance in main thread is unacceptably slow and handle appropriately.
         function adjustPostProcess(timers: { [key: string]: any }) {
-            if (timers.processTile && timers.processTile > 50) {
-                if (isPicaSingleThreaded) {
-                    preferencesStore.set('postProcessInterpolateImage', false);
-                    $notify({
-                        type: 'info',
-                        message: 'High quality scaling is slowing down the viewport. It was automatically disabled.'
-                    });
-                } else {
-                    console.warn('[WARNING] Pica main thread process took too long, defaulting to single thread.');
-                    isPicaSingleThreaded = true;
-                    pica = new Pica({
-                        concurrency: 1
-                    });
+            if (timers.processTile) {
+                postProcessAverageLag = (postProcessAverageLag * .75) + (timers.processTile * .25);
+                if (postProcessAverageLag > 50) {
+                    if (isPicaSingleThreaded) {
+                        preferencesStore.set('postProcessInterpolateImage', false);
+                        $notify({
+                            type: 'info',
+                            message: 'High quality scaling is slowing down the viewport. It was automatically disabled.'
+                        });
+                    } else {
+                        console.warn('[WARNING] Pica main thread process took too long, defaulting to single thread.');
+                        postProcessAverageLag = 0;
+                        isPicaSingleThreaded = true;
+                        pica = new Pica({
+                            concurrency: 1
+                        });
+                    }
                 }
             }
         }

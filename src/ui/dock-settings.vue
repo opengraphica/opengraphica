@@ -81,22 +81,22 @@
                 <el-form novalidate="novalidate" action="javascript:void(0)" class="mb-1">
                     <el-form-item class="el-form-item--menu-item" label="Zoom">
                         <el-button-group class="el-button-group--flex">
-                            <el-button size="small" plain aria-label="Zoom Out" @click="zoomLevel *= 1/1.05">
+                            <el-button size="small" plain aria-label="Zoom Out" title="Zoom Out" @click="zoomLevel *= 1/1.1">
                                 <i class="bi bi-zoom-out" aria-hidden="true" />
                             </el-button>
                             <el-input-number v-model.lazy="zoomLevel" suffix-text="%" size="small" class="el-input--text-center" style="width: 5rem" />
-                            <el-button size="small" plain aria-label="Zoom In" @click="zoomLevel *= 1.05">
+                            <el-button size="small" plain aria-label="Zoom In" title="Zoom In" @click="zoomLevel *= 1.1">
                                 <i class="bi bi-zoom-in" aria-hidden="true" />
                             </el-button>
                         </el-button-group>
                     </el-form-item>
                     <el-form-item class="el-form-item--menu-item" label="Rotate">
                         <el-button-group class="el-button-group--flex">
-                            <el-button size="small" plain aria-label="Rotate Counterclockwise"  @click="rotationAngle -= 15">
+                            <el-button size="small" plain aria-label="Rotate Counterclockwise" title="Rotate Counterclockwise" @click="rotationAngle -= 15">
                                 <i class="bi bi-arrow-counterclockwise" aria-hidden="true" />
                             </el-button>
                             <el-input-number v-model.lazy="rotationAngle" suffix-text="°" size="small" class="el-input--text-center" style="width: 5rem" />
-                            <el-button size="small" plain aria-label="Rotate Clockwise" @click="rotationAngle += 15">
+                            <el-button size="small" plain aria-label="Rotate Clockwise" title="Rotate Clockwise" @click="rotationAngle += 15">
                                 <i class="bi bi-arrow-clockwise" aria-hidden="true" />
                             </el-button>
                         </el-button-group>
@@ -138,7 +138,45 @@
                 </div>
             </template>
             <el-scrollbar>
-                History Stuff
+                <div class="is-flex is-justify-content-center px-4 pt-2">
+                    <el-button-group>
+                        <el-button size="small" :disabled="!canUndo" round plain aria-label="Undo" @click="onHistoryUndo()">
+                            <i class="bi bi-arrow-90deg-left mr-1" aria-hidden="true" /> Undo
+                        </el-button>
+                        <el-button size="small" :disabled="!canRedo" round plain aria-label="Redo" @click="onHistoryRedo()">
+                            <i class="bi bi-arrow-90deg-right mr-1" aria-hidden="true" /> Redo
+                        </el-button>
+                    </el-button-group>
+                </div>
+                <div v-if="historyActionStack.length === 0" class="px-4 py-3">
+                    <el-alert
+                        type="info"
+                        title="No History Yet"
+                        show-icon
+                        :closable="false">
+                    </el-alert>
+                </div>
+                <el-timeline v-else class="px-5 pt-4">
+                    <el-timeline-item
+                        v-if="historyActionStack.length > 0"
+                        class="pb-1"
+                        type="primary"
+                        :icon="historyActionStackIndex === 0 ? 'bi bi-check' : null">
+                        <el-link type="primary" href="javascript:void(0)" @click="onGoHistory(0)">
+                            [Base Image]
+                        </el-link>
+                    </el-timeline-item>
+                    <el-timeline-item
+                        v-for="(action, index) of historyActionStack"
+                        :key="action.id + '_' + index"
+                        :icon="historyActionStackIndex == index + 1 ? 'bi bi-check' : null"
+                        :type="historyActionStackIndex > index ? 'primary' : null"
+                        class="pb-1">
+                        <el-link type="primary" href="javascript:void(0)" @click="onGoHistory(index + 1)">
+                            {{ action.description }}
+                        </el-link>
+                    </el-timeline-item>
+                </el-timeline>
             </el-scrollbar>
         </el-tab-pane>
         <el-tab-pane name="prefs">
@@ -184,7 +222,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, nextTick } from 'vue';
+import { defineComponent, ref, computed, toRefs, nextTick } from 'vue';
+import ElAlert from 'element-plus/lib/el-alert';
 import ElButton from 'element-plus/lib/el-button';
 import ElButtonGroup from 'element-plus/lib/el-button-group';
 import ElCollapse from 'element-plus/lib/el-collapse';
@@ -193,6 +232,7 @@ import ElDivider from 'element-plus/lib/el-divider';
 import ElForm from 'element-plus/lib/el-form';
 import ElFormItem from 'element-plus/lib/el-form-item';
 import ElInputNumber from '@/ui/el-input-number.vue';
+import ElLink from 'element-plus/lib/el-link';
 import ElLoading from 'element-plus/lib/el-loading';
 import ElMenu from 'element-plus/lib/el-menu';
 import ElMenuItem from 'element-plus/lib/el-menu-item';
@@ -204,10 +244,13 @@ import ElSelect from 'element-plus/lib/el-select';
 import ElSwitch from 'element-plus/lib/el-switch';
 import ElTabs from 'element-plus/lib/el-tabs';
 import ElTabPane from 'element-plus/lib/el-tab-pane';
+import ElTimeline from 'element-plus/lib/el-timeline';
+import ElTimelineItem from 'element-plus/lib/el-timeline-item';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
+import historyStore, { HistoryState } from '@/store/history';
 import preferencesStore from '@/store/preferences';
-import { notifyInjector } from '@/lib/notify';
+import { notifyInjector, unexpectedErrorMessage } from '@/lib/notify';
 import appEmitter from '@/lib/emitter';
 import { runModule } from '@/modules';
 import { format } from '@/format';
@@ -221,6 +264,7 @@ export default defineComponent({
         loading: ElLoading.directive
     },
     components: {
+        ElAlert,
         ElButton,
         ElButtonGroup,
         ElCollapse,
@@ -229,6 +273,7 @@ export default defineComponent({
         ElForm,
         ElFormItem,
         ElInputNumber,
+        ElLink,
         ElMenu,
         ElMenuItem,
         ElOption,
@@ -238,7 +283,9 @@ export default defineComponent({
         ElSelect,
         ElSwitch,
         ElTabs,
-        ElTabPane
+        ElTabPane,
+        ElTimeline,
+        ElTimelineItem
     },
     emits: [
         'close',
@@ -248,6 +295,7 @@ export default defineComponent({
         emit('update:title', 'Settings');
         const $notify = notifyInjector('$notify');
         const loading = ref<boolean>(false);
+        const { actionStackIndex: historyActionStackIndex, canRedo, canUndo } = toRefs(historyStore.state);
 
         // View zoom/pan/rotate
         const zoomLevel = computed<number>({
@@ -289,6 +337,67 @@ export default defineComponent({
         }
         function onResetViewZoom() {
             canvasStore.dispatch('setTransformScale', 1);
+        }
+
+        // History
+        const historyActionStack = computed<HistoryState['actionStack']>(() => {
+            return historyStore.state.actionStack;
+        });
+        async function onHistoryUndo() {
+            if (!editorStore.get('waiting')) {
+                appEmitter.emit('app.wait.startBlocking', { id: 'historyUndo' });
+                try {
+                    await historyStore.dispatch('undo');
+                } catch (error) {
+                    $notify({
+                        type: 'error',
+                        title: 'Undo Error',
+                        message: error
+                    });
+                }
+                appEmitter.emit('app.wait.stopBlocking', { id: 'historyUndo' });
+            }
+        }
+        async function onHistoryRedo() {
+            if (!editorStore.get('waiting')) {
+                appEmitter.emit('app.wait.startBlocking', { id: 'historyRedo' });
+                try {
+                    await historyStore.dispatch('redo');
+                } catch (error) {
+                    $notify({
+                        type: 'error',
+                        title: 'Redo Error',
+                        message: error
+                    });
+                }
+                appEmitter.emit('app.wait.stopBlocking', { id: 'historyRedo' });
+            }
+        }
+        async function onGoHistory(index: number) {
+            if (!editorStore.get('waiting')) {
+                appEmitter.emit('app.wait.startBlocking', { id: 'historyStep' });
+                try {
+                    const actionStackIndex = historyStore.get('actionStackIndex');
+                    if (index > actionStackIndex) {
+                        const count = Math.abs(index - actionStackIndex);
+                        for (let i = 0; i < count; i++) {
+                            await historyStore.dispatch('redo');
+                        }
+                    } else if (index < actionStackIndex) {
+                        const count = Math.abs(index - actionStackIndex);
+                        for (let i = 0; i < count; i++) {
+                            await historyStore.dispatch('undo');
+                        }
+                    }
+                } catch (error) {
+                    $notify({
+                        type: 'error',
+                        title: 'Undo/Redo Error',
+                        message: unexpectedErrorMessage
+                    });
+                }
+                appEmitter.emit('app.wait.stopBlocking', { id: 'historyStep' });
+            }
         }
 
         // Theme handling
@@ -403,6 +512,13 @@ export default defineComponent({
             onResetViewFit,
             onResetViewRotation,
             onResetViewZoom,
+            historyActionStack,
+            historyActionStackIndex,
+            canUndo,
+            canRedo,
+            onHistoryUndo,
+            onHistoryRedo,
+            onGoHistory,
             themeOptions,
             loadingThemeName,
             activeTheme,

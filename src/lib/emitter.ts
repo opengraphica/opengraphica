@@ -15,7 +15,7 @@ interface AppEmitterEvents {
     'app.notify': INotificationOptions;
     'app.wait.startBlocking': {
         id: string;
-        label: string;
+        label?: string;
     };
     'app.wait.stopBlocking': {
         id: string;

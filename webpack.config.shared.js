@@ -145,6 +145,10 @@ module.exports = function setupConfig(config) {
                         test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-loading)[\\/]/,
                         name: 'element-plus-loading'
                     },
+                    elementPlusLink: {
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-link)[\\/]/,
+                        name: 'element-plus-link'
+                    },
                     elementPlusMenu: {
                         test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-menu|el-menu-item)[\\/]/,
                         name: 'element-plus-menu'
@@ -184,6 +188,10 @@ module.exports = function setupConfig(config) {
                     elementPlusTag: {
                         test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-tag)[\\/]/,
                         name: 'element-plus-tag'
+                    },
+                    elementPlusTimeline: {
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-timeline|el-timeline-item)[\\/]/,
+                        name: 'element-plus-timeline'
                     },
                     elementPlusTransition: {
                         test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-transition)[\\/]/,

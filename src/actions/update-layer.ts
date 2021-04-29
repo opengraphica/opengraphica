@@ -25,7 +25,7 @@ export class UpdateLayerAction<GroupLayerOptions extends UpdateAnyLayerOptions<R
         }
         for (let prop in this.updateLayerOptions) {
             if (prop !== 'id') {
-                this.previousProps = (layer as any)[prop];
+                (this.previousProps as any)[prop] = (layer as any)[prop];
                 (layer as any)[prop] = this.updateLayerOptions[prop];
             }
         }

@@ -30,6 +30,7 @@ interface EditorState {
         [themeName: string]: string;
     };
     toolCanvasController: BaseCanvasController;
+    waiting: boolean;
 }
 
 interface EditorDispatch {
@@ -66,7 +67,8 @@ const store = new PerformantStore<EditorStore>({
         loadingThemeName: null,
         tasks: [],
         themes: {},
-        toolCanvasController: new BaseCanvasController()
+        toolCanvasController: new BaseCanvasController(),
+        waiting: false
     },
     readOnly: ['activeTheme', 'activeTool', 'activeToolGroup', 'themes'],
     async onDispatch(actionName: string, value: any, set) {

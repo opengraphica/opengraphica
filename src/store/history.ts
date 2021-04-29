@@ -6,6 +6,8 @@ import { BundleAction } from '@/actions/bundle';
 interface HistoryState {
     actionStack: BaseAction[];
     actionStackIndex: number;
+    canRedo: boolean;
+    canUndo: boolean;
 }
 
 interface HistoryDispatch {
@@ -13,10 +15,12 @@ interface HistoryDispatch {
         databaseSize?: number;
         memorySize?: number;
     };
+    redo: void;
     runAction: {
         action: BaseAction;
         mergeWithHistory?: string[] | string;
     };
+    undo: void;
 }
 
 interface HistoryStore {
@@ -27,18 +31,26 @@ interface HistoryStore {
 const store = new PerformantStore<HistoryStore>({
     state: {
         actionStack: [],
-        actionStackIndex: 0
+        actionStackIndex: 0,
+        canUndo: false,
+        canRedo: false
     },
     readOnly: ['actionStack'],
     async onDispatch(actionName: keyof HistoryDispatch, value: any, set) {
         switch (actionName) {
             case 'free':
                 return dispatchFree(value, set);
+            case 'redo':
+                return dispatchRedo(set);
             case 'runAction':
                 return dispatchRunAction(value, set);
+            case 'undo':
+                return dispatchUndo(set);
         }
     }
 });
+
+(window as any).historyStore = store;
 
 async function dispatchFree({ databaseSize, memorySize }: HistoryDispatch['free'], set: PerformantStore<HistoryStore>['directSet']) {
     let actionStack = store.get('actionStack');
@@ -82,6 +94,8 @@ async function dispatchFree({ databaseSize, memorySize }: HistoryDispatch['free'
     }
     set('actionStack', actionStack);
     set('actionStackIndex', actionStackIndex);
+    set('canUndo', actionStackIndex > 0);
+    set('canRedo', actionStackIndex < actionStack.length);
 
     return {
         totalMemoryFreed,
@@ -141,6 +155,8 @@ async function dispatchRunAction({ action, mergeWithHistory }: HistoryDispatch['
     }
     set('actionStack', actionStack);
     set('actionStackIndex', actionStackIndex);
+    set('canUndo', actionStackIndex > 0);
+    set('canRedo', actionStackIndex < actionStack.length);
 
     // Chrome arbitrary method to determine memory usage, but most people use Chrome so...
     const performance = window.performance as any;
@@ -150,6 +166,35 @@ async function dispatchRunAction({ action, mergeWithHistory }: HistoryDispatch['
         }
     }
     return { status: 'completed' };
+}
+
+async function dispatchUndo(set: PerformantStore<HistoryStore>['directSet']) {
+    if (store.get('canUndo')) {
+        const actionStack = store.get('actionStack');
+        let actionStackIndex = store.get('actionStackIndex');
+        actionStackIndex--;
+        await actionStack[actionStackIndex].undo();
+        set('actionStackIndex', actionStackIndex);
+        set('canUndo', actionStackIndex > 0);
+        set('canRedo', actionStackIndex < actionStack.length);
+    } else {
+        throw new Error('There\'s nothing to undo.');
+    }
+}
+
+async function dispatchRedo(set: PerformantStore<HistoryStore>['directSet']) {
+    if (store.get('canRedo')) {
+        const actionStack = store.get('actionStack');
+        let actionStackIndex = store.get('actionStackIndex');
+        const action = actionStack[actionStackIndex];
+        await action.do();
+        actionStackIndex++;
+        set('actionStackIndex', actionStackIndex);
+        set('canUndo', actionStackIndex > 0);
+        set('canRedo', actionStackIndex < actionStack.length);
+    } else {
+        throw new Error('There\'s nothing to redo.');
+    }
 }
 
 export default store;

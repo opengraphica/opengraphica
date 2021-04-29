@@ -88,6 +88,7 @@ export class PerformantStore<T extends StoreTypeMap> {
     }
 
     dispatch<K extends keyof T['dispatch']>(key: K, value: T['dispatch'][K]): Promise<any>;
+    dispatch<K extends keyof T['dispatch']>(key: K): Promise<any>;
     async dispatch(actionName: any, value?: any) {
         if (this.onDispatch) {
             return await this.onDispatch(actionName, value, this.directSet.bind(this));

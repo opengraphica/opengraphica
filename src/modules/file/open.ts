@@ -190,10 +190,6 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
     }
 
     if (isAnyLayerLoaded) {
-        await historyStore.dispatch('free', {
-            memorySize: Infinity,
-            databaseSize: Infinity
-        });
 
         if (!newFileOptions.width) {
             newFileOptions.width = largestWidth || 1;
@@ -224,6 +220,10 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                 ...fileUpdateActions,
                 ...insertLayerActions
             ])
+        });
+        await historyStore.dispatch('free', {
+            memorySize: Infinity,
+            databaseSize: Infinity
         });
 
         (window as any).workingFileStore = await (await import('@/store/working-file')).default;

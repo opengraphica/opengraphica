@@ -4,7 +4,8 @@
             v-if="hasCameraError"
             title="Camera Unavailable"
             type="warning"
-            show-icon>
+            show-icon
+            :closable="false">
             Either the device has no cameras or access to the camera was declined.
         </el-alert>
         <template v-else>
