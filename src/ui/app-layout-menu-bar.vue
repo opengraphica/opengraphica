@@ -21,11 +21,14 @@
                                     <el-button
                                         :aria-label="control.label"
                                         :icon="control.icon"
-                                        :type="activeToolGroup === (control.action && control.action.target) || control.showDock ? 'primary' : undefined"
+                                        :type="activeToolGroup === (control.action && control.action.target) ? 'primary' : undefined"
                                         plain
                                         :circle="!control.expanded"
                                         :round="control.expanded"
-                                        :class="{ 'el-button--expanded-group': control.expanded }"
+                                        :class="{
+                                            'el-button--expanded-group': control.expanded,
+                                            'el-button--expanded-popover': control.showDock
+                                        }"
                                         @touchstart="onTouchStartControlButton($event, control)"
                                         @touchend="onTouchEndControlButton($event, control)"
                                         @mousedown="onMouseDownControlButton($event, control)"

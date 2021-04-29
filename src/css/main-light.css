@@ -5439,6 +5439,9 @@ body.ogr-full-page {
 .opengraphica .ogr-layout-menu-bar .el-button--expanded-group {
   padding: 0.6rem 0.8rem !important;
 }
+.opengraphica .ogr-layout-menu-bar .el-button--expanded-popover {
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.3);
+}
 .opengraphica .ogr-dock-popover {
   min-width: 0 !important;
   max-width: 90vw;
@@ -5536,7 +5539,7 @@ body.ogr-full-page {
 .opengraphica .ogr-snap-preview {
   position: absolute;
   background: var(--ogr-snap-line-color);
-  box-shadow: white 0px 0px 0px 1px;
+  box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.5);
 }
 .opengraphica .ogr-snap-preview.ogr-snap-preview-vertical {
   width: 0.0625rem;
