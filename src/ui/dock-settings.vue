@@ -392,7 +392,7 @@ export default defineComponent({
                 } catch (error) {
                     $notify({
                         type: 'error',
-                        title: 'Undo/Redo Error',
+                        dangerouslyUseHTMLString: true,
                         message: unexpectedErrorMessage
                     });
                 }

@@ -30,49 +30,53 @@ const extensionToMimeType: { [key: string]: string } = {
 
 export async function exportAsImage(options: ExportOptions): Promise<void> {
     return await new Promise<void>(async (resolve, reject) => {
-        const canvas = document.createElement('canvas');
-        canvas.width = workingFileStore.get('width');
-        canvas.height = workingFileStore.get('height');
-        const ctx = trackCanvasTransforms(canvas.getContext('2d'));
-        ctx.imageSmoothingEnabled = false;
-        drawWorkingFileToCanvas(canvas, ctx, { selectedLayersOnly: options.layerSelection === 'selected' });
+        try {
+            const canvas = document.createElement('canvas');
+            canvas.width = workingFileStore.get('width');
+            canvas.height = workingFileStore.get('height');
+            const ctx = trackCanvasTransforms(canvas.getContext('2d'));
+            ctx.imageSmoothingEnabled = false;
+            drawWorkingFileToCanvas(canvas, ctx, { selectedLayersOnly: options.layerSelection === 'selected' });
 
-        const fileName = (options.fileName || 'image').replace(/(\.(json|png|jpg|jpeg|webp|gif|bmp|tif|tiff))$/ig, '') + '.' + options.fileType;
+            const fileName = (options.fileName || 'image').replace(/(\.(json|png|jpg|jpeg|webp|gif|bmp|tif|tiff))$/ig, '') + '.' + options.fileType;
 
-        const mimeType: string = extensionToMimeType[options.fileType];
+            const mimeType: string = extensionToMimeType[options.fileType];
 
-        if (!isfileFormatSupported(mimeType)) {
-            reject(new Error('File format not supported.'));
-            return;
-        }
+            if (!isfileFormatSupported(mimeType)) {
+                reject(new Error('File format not supported.'));
+                return;
+            }
 
-        if (options.toClipboard) {
-            if (await promptClipboardWritePermission()) {
-                canvas.toBlob(async (blob) => {
-                    if (blob) {
-                        try {
-                            const data = [new ClipboardItem({ [blob.type]: blob })];
-                            await (navigator.clipboard as any).write(data);
-                            resolve();
-                        } catch (error) {
-                            reject(new Error('Error writing to clipboard.'));
+            if (options.toClipboard) {
+                if (await promptClipboardWritePermission()) {
+                    canvas.toBlob(async (blob) => {
+                        if (blob) {
+                            try {
+                                const data = [new ClipboardItem({ [blob.type]: blob })];
+                                await (navigator.clipboard as any).write(data);
+                                resolve();
+                            } catch (error) {
+                                reject(new Error('Error writing to clipboard.'));
+                            }
+                        } else {
+                            reject(new Error('Image blob was not created.'));
                         }
+                    });
+                } else {
+                    reject(new Error('Clipboard copy not supported.'));
+                }
+            } else {
+                canvas.toBlob((blob) => {
+                    if (blob) {
+                        saveAs(blob, fileName);
+                        resolve();
                     } else {
                         reject(new Error('Image blob was not created.'));
                     }
-                });
-            } else {
-                reject(new Error('Clipboard copy not supported.'));
+                }, mimeType, options.quality);
             }
-        } else {
-            canvas.toBlob((blob) => {
-                if (blob) {
-                    saveAs(blob, fileName);
-                    resolve();
-                } else {
-                    reject(new Error('Image blob was not created.'));
-                }
-            }, mimeType, options.quality);
+        } catch (error) {
+            reject(new Error('An unexpected error occurred.'));
         }
     });
 }

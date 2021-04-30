@@ -74075,6 +74075,30 @@ body.ogr-full-page {
 .opengraphica .mr-auto, .opengraphica .mx-auto, .opengraphica .m-auto {
   margin-right: auto;
 }
+.opengraphica .ml-4\.5, .opengraphica .mx-4\.5 {
+  margin-left: 1.25rem;
+}
+.opengraphica .mr-4\.5, .opengraphica .mx-4\.5 {
+  margin-right: 1.25rem;
+}
+.opengraphica .mt-4\.5, .opengraphica .my-4\.5 {
+  margin-top: 1.25rem;
+}
+.opengraphica .mb-4\.5, .opengraphica .my-4\.5 {
+  margin-bottom: 1.25rem;
+}
+.opengraphica .pl-4\.5, .opengraphica .px-4\.5 {
+  padding-left: 1.25rem;
+}
+.opengraphica .pr-4\.5, .opengraphica .px-4\.5 {
+  padding-right: 1.25rem;
+}
+.opengraphica .pt-4\.5, .opengraphica .py-4\.5 {
+  padding-top: 1.25rem;
+}
+.opengraphica .pb-4\.5, .opengraphica .py-4\.5 {
+  padding-bottom: 1.25rem;
+}
 .opengraphica .leading-none {
   line-height: 1;
 }
