@@ -185,6 +185,20 @@ export default defineComponent({
             }
         });
 
+        watch(() => props.prefixText, (newValue, oldValue) => {
+            removeTextPrefixSuffix(oldValue);
+            if (!isFocused) {
+                addTextPrefixSuffix();
+            }
+        });
+
+        watch(() => props.suffixText, (newValue, oldValue) => {
+            removeTextPrefixSuffix(undefined, oldValue);
+            if (!isFocused) {
+                addTextPrefixSuffix();
+            }
+        });
+
         onMounted(() => {
             updateModelValue(props.modelValue || 0);
         });
@@ -200,23 +214,28 @@ export default defineComponent({
 
         function addTextPrefixSuffix() {
             if (props.prefixText || props.suffixText) {
+                removeTextPrefixSuffix();
                 displayValue.value = (props.prefixText || '') + displayValue.value + (props.suffixText || '');
             }
         }
 
-        function removeTextPrefixSuffix() {
+        function removeTextPrefixSuffix(oldPrefix?: string, oldSuffix?: string) {
             if (props.prefixText || props.suffixText) {
                 const innerInput = input.value.$el.querySelector('input');
                 const selectionStart: number = (innerInput && innerInput.selectionStart) || 0;
-                if (props.prefixText && displayValue.value.slice(0, props.prefixText.length) === props.prefixText) {
-                    displayValue.value = displayValue.value.slice(0, props.prefixText.length);
+                const suffixText = oldSuffix || props.suffixText;
+                const prefixText = oldPrefix || props.prefixText;
+                if (prefixText && displayValue.value.slice(0, prefixText.length) === prefixText) {
+                    displayValue.value = displayValue.value.slice(0, prefixText.length);
                 }
-                if (props.suffixText && displayValue.value.slice(-props.suffixText.length) === props.suffixText) {
-                    displayValue.value = displayValue.value.slice(0, -props.suffixText.length);
+                if (suffixText && displayValue.value.slice(-suffixText.length) === suffixText) {
+                    displayValue.value = displayValue.value.slice(0, -suffixText.length);
                 }
-                nextTick(() => {
-                    innerInput.setSelectionRange(selectionStart, selectionStart);
-                });
+                if (!isFocused) {
+                    nextTick(() => {
+                        innerInput.setSelectionRange(selectionStart, selectionStart);
+                    });
+                }
             }
         }
 

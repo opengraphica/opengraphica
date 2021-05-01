@@ -1,5 +1,5 @@
 import BaseCanvasMovementController from './base-movement';
-import { top, left, width, height, cropResizeEmitter, enableSnapping, dragHandleHighlight, previewXSnap, previewYSnap } from '../store/crop-resize-state';
+import { top, left, width, height, cropResizeEmitter, enableSnapping, dragHandleHighlight, previewXSnap, previewYSnap, dimensionLockRatio } from '../store/crop-resize-state';
 import { DecomposedMatrix } from '@/lib/dom-matrix';
 import canvasStore from '@/store/canvas';
 import preferencesStore from '@/store/preferences';
@@ -25,6 +25,7 @@ export default class CanvasCropResizeontroller extends BaseCanvasMovementControl
     onEnter(): void {
         super.onEnter();
         this.remToPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
+        dimensionLockRatio.value = null;
         top.value = 0;
         left.value = 0;
         width.value = workingFileStore.get('width');
@@ -138,6 +139,7 @@ export default class CanvasCropResizeontroller extends BaseCanvasMovementControl
                 }
             }
 
+            // Snapping
             if (enableSnapping.value) {
                 let xSnap: number | null = null;
                 let ySnap: number | null = null;
@@ -189,6 +191,19 @@ export default class CanvasCropResizeontroller extends BaseCanvasMovementControl
                 }
                 previewXSnap.value = xSnap;
                 previewYSnap.value = ySnap;
+            }
+
+            // Enforce Width/Height Ratio
+            if (dimensionLockRatio.value) {
+                if (!(isDragTop || isDragBottom)) {
+                    height = Math.round(width / dimensionLockRatio.value);
+                } else {
+                    let originalWidth = width;
+                    width = Math.round(height * dimensionLockRatio.value);
+                    if (isDragLeft) {
+                        left += originalWidth - width;
+                    }
+                }
             }
 
             cropResizeEmitter.emit('setCrop', {
