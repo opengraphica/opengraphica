@@ -28,18 +28,18 @@
                 </template>
                 <h2 class="mt-3 mx-4.5">Settings</h2>
                 <el-form novalidate="novalidate" action="javascript:void(0)">
-                    <el-form-item class="el-form-item--menu-item mb-1" label="Mode">
+                    <!--el-form-item class="el-form-item--menu-item mb-1" label="Mode">
                         <el-radio-group
                             v-model="mode"
                             size="small">
                             <el-radio-button label="crop">Crop</el-radio-button>
                             <el-radio-button label="resample">Resample</el-radio-button>
                         </el-radio-group>
-                    </el-form-item>
+                    </el-form-item-->
                     <div class="px-4.5 my-3">
                         <el-button-group class="el-button-group--flex is-fullwidth">
                             <el-input-number v-model="resizeInputWidth" size="small" class="is-flex-grow-1" :suffix-text="measuringUnits" @input="onInputResizeWidth" />
-                            <el-button size="small" aria-label="Link Width/Height" class="px-3" @click="isDimensionRatioLock = !isDimensionRatioLock">
+                            <el-button size="small" aria-label="Link Width/Height" class="px-3" :disabled="mode === 'resample'" @click="isDimensionRatioLock = !isDimensionRatioLock">
                                 <i :class="['bi', isDimensionRatioLock ? 'bi-lock-fill' : 'bi-unlock-fill']" aria-hidden="true" />
                             </el-button>
                             <el-input-number v-model="resizeInputHeight" size="small" class="is-flex-grow-1" :suffix-text="measuringUnits"  @input="onInputResizeHeight" />
@@ -107,6 +107,7 @@ import historyStore from '@/store/history';
 import workingFileStore, { WorkingFileState } from '@/store/working-file';
 import { top as cropTop, left as cropLeft, width as cropWidth, height as cropHeight, enableSnapping, dimensionLockRatio } from '@/canvas/store/crop-resize-state';
 import { WorkingFileLayer, WorkingFileGroupLayer, RGBAColor, UpdateAnyLayerOptions } from '@/types';
+import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { UpdateFileAction } from '@/actions/update-file';
 import { UpdateLayerAction } from '@/actions/update-layer';
@@ -183,11 +184,11 @@ export default defineComponent({
         });
         
         watch([cropWidth, cropHeight], ([cropWidth, cropHeight]) => {
-            if (!disableDimensionDragUpdate) {
+            if (!disableDimensionDragUpdate && mode.value === 'crop') {
                 resizeInputWidth.value = parseFloat(convertUnits(cropWidth, 'px', measuringUnits.value, resolutionX.value, resolutionUnits.value).toFixed(measuringUnits.value === 'px' ? 0 : 2));
                 resizeInputHeight.value = parseFloat(convertUnits(cropHeight, 'px', measuringUnits.value, resolutionY.value, resolutionUnits.value).toFixed(measuringUnits.value === 'px' ? 0 : 2));
             }
-        });
+        }, { immediate: true });
 
         watch([isDimensionRatioLock], ([isDimensionRatioLock]) => {
             if (isDimensionRatioLock) {
@@ -229,9 +230,13 @@ export default defineComponent({
 
         async function onInputResizeWidth(newWidth: number) {
             disableDimensionDragUpdate = true;
-            cropWidth.value = Math.ceil(convertUnits(newWidth, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value));
+            if (mode.value === 'crop') {
+                cropWidth.value = Math.ceil(convertUnits(newWidth, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value));
+            }
             if (dimensionLockRatio.value) {
-                cropHeight.value = Math.ceil(cropWidth.value / dimensionLockRatio.value);
+                if (mode.value === 'crop') {
+                    cropHeight.value = Math.ceil(cropWidth.value / dimensionLockRatio.value);
+                }
                 resizeInputHeight.value = parseFloat((newWidth / dimensionLockRatio.value).toFixed(measuringUnits.value === 'px' ? 0 : 2));
             }
             await nextTick();
@@ -240,9 +245,13 @@ export default defineComponent({
 
         async function onInputResizeHeight(newHeight: number) {
             disableDimensionDragUpdate = true;
-            cropHeight.value = Math.ceil(convertUnits(newHeight, measuringUnits.value, 'px', resolutionY.value, resolutionUnits.value));
+            if (mode.value === 'crop') {
+                cropHeight.value = Math.ceil(convertUnits(newHeight, measuringUnits.value, 'px', resolutionY.value, resolutionUnits.value));
+            }
             if (dimensionLockRatio.value) {
-                cropWidth.value = Math.ceil(cropHeight.value * dimensionLockRatio.value);
+                if (mode.value === 'crop') {
+                    cropWidth.value = Math.ceil(cropHeight.value * dimensionLockRatio.value);
+                }
                 resizeInputWidth.value = parseFloat((newHeight * dimensionLockRatio.value).toFixed(measuringUnits.value === 'px' ? 0 : 2));
             }
             await nextTick();
@@ -261,13 +270,17 @@ export default defineComponent({
             appEmitter.emit('app.wait.startBlocking', { id: 'toolCropResizeCalculating', label: 'Crop and Resize' });
             try {
                 const layers = workingFileStore.get('layers');
-                let layerUpdateActions: UpdateLayerAction<UpdateAnyLayerOptions<RGBAColor>>[] = await generateResizeLayerActions(layers);
+                let layerUpdateActions: BaseAction[] = await generateResizeLayerActions(layers);
                 await historyStore.dispatch('runAction', {
                     action: new BundleAction('moduleCropResize', 'Crop and Resize', [
                         ...layerUpdateActions,
                         new UpdateFileAction({
                             width: cropWidth.value,
-                            height: cropHeight.value
+                            height: cropHeight.value,
+                            measuringUnits: measuringUnits.value,
+                            resolutionX: resolutionX.value,
+                            resolutionY: resolutionY.value,
+                            resolutionUnits: resolutionUnits.value
                         })
                     ])
                 });
@@ -278,8 +291,8 @@ export default defineComponent({
             emit('close');
         }
 
-        async function generateResizeLayerActions(layers: WorkingFileLayer<RGBAColor>[]): Promise<UpdateLayerAction<UpdateAnyLayerOptions<RGBAColor>>[]> {
-            let actions: UpdateLayerAction<UpdateAnyLayerOptions<RGBAColor>>[] = [];
+        async function generateResizeLayerActions(layers: WorkingFileLayer<RGBAColor>[]): Promise<BaseAction[]> {
+            let actions: BaseAction[] = [];
             for (let layer of layers) {
                 if (layer.type === 'group') {
                     await generateResizeLayerActions((layer as WorkingFileGroupLayer<RGBAColor>).layers);
