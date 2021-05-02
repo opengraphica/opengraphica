@@ -143,28 +143,30 @@ export default class CanvasCropResizeontroller extends BaseCanvasMovementControl
             if (enableSnapping.value) {
                 let xSnap: number | null = null;
                 let ySnap: number | null = null;
-                if (isDragLeft || isDragAll) {
-                    xSnap = this.snapPointX(left);
-                    let difference = (xSnap != null ? xSnap : left) - left;
-                    left += difference;
-                    if (isDragAll) {
-                        const halfWidth = Math.floor(width / 2);
-                        let halfWidthXSnap = this.snapPointX(left + halfWidth);
-                        if (halfWidthXSnap != null) {
-                            xSnap = halfWidthXSnap;
-                            left = (xSnap != null ? xSnap : (left + halfWidth)) - halfWidth;
+                if (!dimensionLockRatio.value || !(isDragTop || isDragBottom)) {
+                    if (isDragLeft || isDragAll) {
+                        xSnap = this.snapPointX(left);
+                        let difference = (xSnap != null ? xSnap : left) - left;
+                        left += difference;
+                        if (isDragAll) {
+                            const halfWidth = Math.floor(width / 2);
+                            let halfWidthXSnap = this.snapPointX(left + halfWidth);
+                            if (halfWidthXSnap != null) {
+                                xSnap = halfWidthXSnap;
+                                left = (xSnap != null ? xSnap : (left + halfWidth)) - halfWidth;
+                            }
+                            let widthXSnap = this.snapPointX(left + width);
+                            if (widthXSnap != null) {
+                                xSnap = widthXSnap;
+                                left = (xSnap != null ? xSnap : (left + width)) - width;
+                            }
+                        } else {
+                            width -= difference;
                         }
-                        let widthXSnap = this.snapPointX(left + width);
-                        if (widthXSnap != null) {
-                            xSnap = widthXSnap;
-                            left = (xSnap != null ? xSnap : (left + width)) - width;
-                        }
-                    } else {
-                        width -= difference;
+                    } else if (isDragRight) {
+                        xSnap = this.snapPointX(left + width);
+                        width = (xSnap != null ? xSnap : (left + width)) - left;
                     }
-                } else if (isDragRight) {
-                    xSnap = this.snapPointX(left + width);
-                    width = (xSnap != null ? xSnap : (left + width)) - left;
                 }
                 if (isDragTop || isDragAll) {
                     ySnap = this.snapPointY(top);
@@ -193,7 +195,7 @@ export default class CanvasCropResizeontroller extends BaseCanvasMovementControl
                 previewYSnap.value = ySnap;
             }
 
-            // Enforce Width/Height Ratio
+            // Enforce Width/Height Ratio (After Snap)
             if (dimensionLockRatio.value) {
                 if (!(isDragTop || isDragBottom)) {
                     height = Math.round(width / dimensionLockRatio.value);

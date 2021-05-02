@@ -39,8 +39,8 @@
                     <div class="px-4.5 my-3">
                         <el-button-group class="el-button-group--flex is-fullwidth">
                             <el-input-number v-model="resizeInputWidth" size="small" class="is-flex-grow-1" :suffix-text="measuringUnits" @input="onInputResizeWidth" />
-                            <el-button size="small" aria-label="Link Width/Height" class="px-3" @click="sizeRatioLock = !sizeRatioLock">
-                                <i :class="['bi', sizeRatioLock ? 'bi-lock-fill' : 'bi-unlock-fill']" aria-hidden="true" />
+                            <el-button size="small" aria-label="Link Width/Height" class="px-3" @click="isDimensionRatioLock = !isDimensionRatioLock">
+                                <i :class="['bi', isDimensionRatioLock ? 'bi-lock-fill' : 'bi-unlock-fill']" aria-hidden="true" />
                             </el-button>
                             <el-input-number v-model="resizeInputHeight" size="small" class="is-flex-grow-1" :suffix-text="measuringUnits"  @input="onInputResizeHeight" />
                         </el-button-group>
@@ -142,7 +142,7 @@ export default defineComponent({
 
         let disableDimensionDragUpdate: boolean = false;
         const mode = ref<'crop' | 'resample'>('crop');
-        const sizeRatioLock = ref<boolean>(dimensionLockRatio.value != null);
+        const isDimensionRatioLock = ref<boolean>(dimensionLockRatio.value != null);
         const measuringUnits = ref<WorkingFileState['measuringUnits']>(workingFileStore.get('measuringUnits'));
         const resolutionX = ref<number>(workingFileStore.get('resolutionX'));
         const resolutionY = ref<number>(workingFileStore.get('resolutionY'));
@@ -189,8 +189,8 @@ export default defineComponent({
             }
         });
 
-        watch([sizeRatioLock], ([isSizeRatioLock]) => {
-            if (isSizeRatioLock) {
+        watch([isDimensionRatioLock], ([isDimensionRatioLock]) => {
+            if (isDimensionRatioLock) {
                 dimensionLockRatio.value = resizeInputWidth.value / resizeInputHeight.value;
             } else {
                 dimensionLockRatio.value = null;
@@ -203,7 +203,7 @@ export default defineComponent({
 
         watch([mode], async ([newMode]) => {
             if (newMode === 'resample') {
-                sizeRatioLock.value = false;
+                isDimensionRatioLock.value = false;
                 await nextTick();
                 resizeInputWidth.value = parseFloat(convertUnits(workingFileStore.get('width'), 'px', measuringUnits.value, resolutionX.value, resolutionUnits.value).toFixed(measuringUnits.value === 'px' ? 0 : 2));
                 resizeInputHeight.value = parseFloat(convertUnits(workingFileStore.get('height'), 'px', measuringUnits.value, resolutionY.value, resolutionUnits.value).toFixed(measuringUnits.value === 'px' ? 0 : 2));
@@ -211,9 +211,15 @@ export default defineComponent({
                 await onInputResizeHeight(resizeInputHeight.value);
                 cropTop.value = 0;
                 cropLeft.value = 0;
-                sizeRatioLock.value = true;
+                isDimensionRatioLock.value = true;
             } else {
-
+                resizeInputWidth.value = parseFloat(convertUnits(workingFileStore.get('width'), 'px', measuringUnits.value, resolutionX.value, resolutionUnits.value).toFixed(measuringUnits.value === 'px' ? 0 : 2));
+                resizeInputHeight.value = parseFloat(convertUnits(workingFileStore.get('height'), 'px', measuringUnits.value, resolutionY.value, resolutionUnits.value).toFixed(measuringUnits.value === 'px' ? 0 : 2));
+                await onInputResizeWidth(resizeInputWidth.value);
+                await onInputResizeHeight(resizeInputHeight.value);
+                cropTop.value = 0;
+                cropLeft.value = 0;
+                isDimensionRatioLock.value = false;
             }
         });
 
@@ -291,7 +297,7 @@ export default defineComponent({
         }
 
         return {
-            sizeRatioLock,
+            isDimensionRatioLock,
             measuringUnits,
             dimensionUnitOptions,
             resolutionUnitOptions,
