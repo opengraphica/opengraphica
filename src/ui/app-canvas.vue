@@ -352,7 +352,7 @@ export default defineComponent({
 
         // Check if Pica chunking performance in main thread is unacceptably slow and handle appropriately.
         function adjustPostProcess() {
-            if (postProcessAverageLag > 50) {
+            if (postProcessAverageLag > 5) {
                 if (isPicaSingleThreaded) {
                     preferencesStore.set('postProcessInterpolateImage', false);
                     $notify({

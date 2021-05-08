@@ -173,14 +173,14 @@ export default defineComponent({
                 scaleFactor: 1
             }
         });
-        const validateWidth: RuleItem['validator'] = (rule, value) => {
+        const validateWidth: RuleItem['validator'] = function (rule, value) {
             if (value <= 0) {
                 return new Error('Width must be greater than zero');
             } else {
                 return true;
             }
         };
-        const validateHeight: RuleItem['validator'] = (rule, value) => {
+        const validateHeight: RuleItem['validator'] = function (rule, value) {
             if (value <= 0) {
                 return new Error('Height must be greater than zero');
             } else {
