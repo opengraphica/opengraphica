@@ -173,18 +173,18 @@ export default defineComponent({
                 scaleFactor: 1
             }
         });
-        const validateWidth: RuleItem['validator'] = (rule, value, callback) => {
+        const validateWidth: RuleItem['validator'] = (rule, value) => {
             if (value <= 0) {
-                callback('Width must be greater than zero');
+                return new Error('Width must be greater than zero');
             } else {
-                callback();
+                return true;
             }
         };
-        const validateHeight: RuleItem['validator'] = (rule, value, callback) => {
+        const validateHeight: RuleItem['validator'] = (rule, value) => {
             if (value <= 0) {
-                callback('Height must be greater than zero');
+                return new Error('Height must be greater than zero');
             } else {
-                callback();
+                return true;
             }
         };
         const formValidationRules: Rules = {
