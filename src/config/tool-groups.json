@@ -36,7 +36,14 @@
             "freeTransform": {
                 "name": "Free Transform",
                 "description": "Move, rotate, or scale the selected layers.",
-                "controller": "free-transform"
+                "controller": "free-transform",
+                "toolbar": {
+                    "position": "bottom",
+                    "target": "free-transform"
+                },
+                "overlays": [
+                    "free-transform"
+                ]
             }
         }
     }

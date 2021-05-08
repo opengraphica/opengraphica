@@ -167,6 +167,13 @@ export default defineComponent({
                 }
 
                 Pica = (await import('@/lib/pica')).default;
+                const __extractTileData = Pica.prototype.__extractTileData;
+                Pica.prototype.__extractTileData = function() {
+                    const startTime = window.performance.now();
+                    const originalReturn = __extractTileData.apply(this, arguments);
+                    postProcessAverageLag = (postProcessAverageLag * .75) + ((window.performance.now() - startTime) * .25);
+                    return originalReturn;
+                };
                 pica = new Pica({
                     idle: 20000
                 });
@@ -328,19 +335,15 @@ export default defineComponent({
                     postProcessCanvasElement.height = Math.floor(canvasElement.height * decomposedTransform.scaleX);
                     let postProcessCancelPromise = new Promise((resolve, reject) => { postProcessCancel = reject });
                     const picaStartTime = window.performance.now();
-                    const timers = {
-                        processTile: 0
-                    };
                     pica.resize(canvasElement, postProcessCanvasElement, {
-                        cancelToken: postProcessCancelPromise,
-                        timers
+                        cancelToken: postProcessCancelPromise
                     }).then(() => {
                         postProcessCanvasElement.style.display = 'block';
                         postProcessCanvasElement.style.transform = `scale(${1 / decomposedTransform.scaleX})`;
-                        adjustPostProcess(timers);
+                        adjustPostProcess();
                     }).catch(() => {
                         postProcessCanvasElement.style.display = 'none';
-                        adjustPostProcess(timers);
+                        adjustPostProcess();
                     });
                     
                 }, drawPostProcessWait);
@@ -348,24 +351,21 @@ export default defineComponent({
         }
 
         // Check if Pica chunking performance in main thread is unacceptably slow and handle appropriately.
-        function adjustPostProcess(timers: { [key: string]: any }) {
-            if (timers.processTile) {
-                postProcessAverageLag = (postProcessAverageLag * .75) + (timers.processTile * .25);
-                if (postProcessAverageLag > 50) {
-                    if (isPicaSingleThreaded) {
-                        preferencesStore.set('postProcessInterpolateImage', false);
-                        $notify({
-                            type: 'info',
-                            message: 'High quality scaling is slowing down the viewport. It was automatically disabled.'
-                        });
-                    } else {
-                        console.warn('[WARNING] Pica main thread process took too long, defaulting to single thread.');
-                        postProcessAverageLag = 0;
-                        isPicaSingleThreaded = true;
-                        pica = new Pica({
-                            concurrency: 1
-                        });
-                    }
+        function adjustPostProcess() {
+            if (postProcessAverageLag > 50) {
+                if (isPicaSingleThreaded) {
+                    preferencesStore.set('postProcessInterpolateImage', false);
+                    $notify({
+                        type: 'info',
+                        message: 'High quality scaling is slowing down the viewport. It was automatically disabled.'
+                    });
+                } else {
+                    console.warn('[WARNING] Pica main thread process took too long, defaulting to single thread.');
+                    postProcessAverageLag = 0;
+                    isPicaSingleThreaded = true;
+                    pica = new Pica({
+                        concurrency: 1
+                    });
                 }
             }
         }
