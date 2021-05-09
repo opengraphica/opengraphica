@@ -5687,6 +5687,158 @@ body.ogr-full-page {
   transform: rotate(270deg) translateY(-50%);
   transform-origin: top center;
 }
+@keyframes ogr-free-transform-bounds {
+  0% {
+    outline-color: rgba(235, 235, 235, 0.9);
+  }
+  50% {
+    outline-color: rgba(205, 205, 205, 0.5);
+  }
+  100% {
+    outline-color: rgba(235, 235, 235, 0.9);
+  }
+}
+@keyframes ogr-free-transform-rotate-line {
+  0% {
+    background: rgba(235, 235, 235, 0.9);
+  }
+  50% {
+    background: rgba(205, 205, 205, 0.5);
+  }
+  100% {
+    background: rgba(235, 235, 235, 0.9);
+  }
+}
+.opengraphica .ogr-free-transform {
+  position: relative;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-bounds {
+  outline: 0.35rem solid rgba(235, 235, 235, 0.7);
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  animation: ogr-free-transform-bounds 2s linear infinite;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-rotate {
+  position: absolute;
+  top: 0;
+  left: 50%;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-rotate svg {
+  display: block;
+  position: absolute;
+  height: 0.85rem;
+  width: 0.85rem;
+  transform: translateX(-50%) rotate(180deg);
+  transform-origin: top center;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-rotate .ogr-free-transform-handle-rotate-line {
+  background: rgba(235, 235, 235, 0.7);
+  display: block;
+  position: absolute;
+  top: -0.5rem;
+  width: 0.25rem;
+  height: 2.25rem;
+  transform: translateX(-50%);
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-left,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-right,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-left,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-right,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-left,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-right {
+  position: absolute;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-left svg,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-right svg,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-left svg,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-right svg,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top svg,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-left svg,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom svg,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-right svg {
+  display: block;
+  position: absolute;
+  height: 0.75rem;
+  width: 0.75rem;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-left {
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-left svg {
+  transform: rotate(180deg);
+  transform-origin: top left;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-right {
+  top: 0;
+  right: 0;
+  transform-origin: top right;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-right svg {
+  transform: rotate(90deg);
+  transform-origin: top right;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-right {
+  bottom: 0;
+  right: 0;
+  transform-origin: bottom right;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-right svg {
+  transform: rotate(0deg);
+  transform-origin: bottom right;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-left {
+  bottom: 0;
+  left: 0;
+  transform-origin: bottom left;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-left svg {
+  transform: rotate(270deg);
+  transform-origin: bottom left;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top {
+  top: 0;
+  left: 50%;
+  transform-origin: top center;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top svg {
+  transform: translateX(-50%) rotate(180deg);
+  transform-origin: top center;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-right {
+  top: 50%;
+  right: 0;
+  transform-origin: right center;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-right svg {
+  transform: translate(0, -50%);
+  transform-origin: right center;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom {
+  bottom: 0;
+  right: 50%;
+  transform-origin: bottom center;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom svg {
+  transform: rotate(180deg) translate(50%, 100%);
+  transform-origin: bottom center;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-left {
+  top: 50%;
+  left: 0;
+  transform-origin: left center;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-left svg {
+  transform: rotate(270deg) translateY(-50%);
+  transform-origin: left center;
+}
 .opengraphica .ogr-canvas, .opengraphica .ogr-post-process-canvas {
   display: block;
   position: absolute;

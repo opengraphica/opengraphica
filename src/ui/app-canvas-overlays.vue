@@ -13,7 +13,8 @@ import editorStore from '@/store/editor';
 export default defineComponent({
     name: 'AppCanvasOverlays',
     components: {
-        'crop-resize': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-crop-resize' */ `../canvas/overlays/crop-resize.vue`))
+        'crop-resize': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-crop-resize' */ `../canvas/overlays/crop-resize.vue`)),
+        'free-transform': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-free-transform' */ `../canvas/overlays/free-transform.vue`))
     },
     setup(props, { emit }) {
         const overlays = computed<string[]>(() => {

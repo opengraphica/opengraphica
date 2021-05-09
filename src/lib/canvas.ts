@@ -55,13 +55,13 @@ export const drawWorkingFileLayerToCanvas = (targetCanvas: HTMLCanvasElement, ta
     ctx.save();
     ctx.globalAlpha = layer.opacity;
     ctx.globalCompositeOperation = layer.blendingMode;
-    const halfLayerWidth = layer.width / 2;
-    const halfLayerHeight = layer.height / 2;
     const isIdentity = layer.transform.isIdentity;
     if (!isIdentity) {
-        ctx.translate(-halfLayerWidth, -halfLayerHeight);
+        const originTranslateX = layer.transformOriginX * layer.width;
+        const originTranslateY = layer.transformOriginY * layer.height;
+        // ctx.translate(-originTranslateX, -originTranslateY);
         ctx.transform(layer.transform.a, layer.transform.b, layer.transform.c, layer.transform.d, layer.transform.e, layer.transform.f);
-        ctx.translate(halfLayerWidth, halfLayerHeight);
+        // ctx.translate(originTranslateX, originTranslateY);
     }
     layer.renderer.draw(ctx, layer);
     ctx.restore();
@@ -76,7 +76,7 @@ interface DrawWorkingFileOptions {
  */
 export const drawWorkingFileToCanvas = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2DEnhanced, options: DrawWorkingFileOptions = {}) => {
 
-    const now = performance.now();
+    let now = performance.now();
 
     // Clear the canvas
     ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -94,6 +94,9 @@ export const drawWorkingFileToCanvas = (canvas: HTMLCanvasElement, ctx: CanvasRe
     
     ctx.imageSmoothingEnabled = decomposedTransform.scaleX / window.devicePixelRatio < 1.25;
 
+    (window as any).averageTimeStart = ((performance.now() - now) * 0.1) + (((window as any).averageTimeStart || 0) * 0.9);
+    now = performance.now();
+
     // Draw the image background and frame
     const imageWidth = workingFileStore.get('width');
     const imageHeight = workingFileStore.get('height');
@@ -102,14 +105,19 @@ export const drawWorkingFileToCanvas = (canvas: HTMLCanvasElement, ctx: CanvasRe
     const canvasTopLeft = { x: 0, y: 0 };
     const canvasBottomRight = { x: imageWidth, y: imageHeight };
     ctx.rect(canvasTopLeft.x, canvasTopLeft.y, canvasBottomRight.x - canvasTopLeft.x, canvasBottomRight.y - canvasTopLeft.y);
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
-    ctx.shadowColor = canvasStore.get('workingImageBorderColor');
-    ctx.shadowBlur = 20;
+    if (!useCssViewport) {
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+        ctx.shadowColor = canvasStore.get('workingImageBorderColor');
+        ctx.shadowBlur = 20;
+    }
     ctx.lineWidth = canvasBorderSize;
     ctx.fillStyle = 'white';
     ctx.fill();
     ctx.shadowBlur = 0;
+
+    (window as any).averageTimeCanvas = ((performance.now() - now) * 0.1) + (((window as any).averageTimeCanvas || 0) * 0.9);
+    now = performance.now();
 
     // Clip the canvas
     if (!useCssViewport) {
@@ -119,11 +127,18 @@ export const drawWorkingFileToCanvas = (canvas: HTMLCanvasElement, ctx: CanvasRe
         ctx.clip();
     }
 
+    (window as any).averageTimeClip = ((performance.now() - now) * 0.1) + (((window as any).averageTimeClip || 0) * 0.9);
+    now = performance.now();
+
     // Draw layers
     const layers = workingFileStore.get('layers');
     for (const layer of layers) {
         drawWorkingFileLayerToCanvas(canvas, ctx, layer, decomposedTransform);
     }
+
+    (window as any).averageTimeLayers = ((performance.now() - now) * 0.1) + (((window as any).averageTimeLayers || 0) * 0.9);
+    now = performance.now();
+
     // If last layer was raster, draw the buffer.
     const isBufferInUse = canvasStore.get('isBufferInUse');
     if (isBufferInUse) {
@@ -136,6 +151,9 @@ export const drawWorkingFileToCanvas = (canvas: HTMLCanvasElement, ctx: CanvasRe
     if (!useCssViewport) {
         ctx.restore();
     }
+
+    (window as any).averageTimeRestore = ((performance.now() - now) * 0.1) + (((window as any).averageTimeRestore || 0) * 0.9);
+    now = performance.now();
 
     /* MOVE TO CSS
     // Draw cursor

@@ -165,6 +165,8 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                         name: readerSettle.value.file.name,
                         width: image.width,
                         height: image.height,
+                        transformOriginX: 0.5,
+                        transformOriginY: 0.5,
                         data: {
                             sourceImage: image,
                             sourceImageIsObjectUrl: true
@@ -271,8 +273,6 @@ async function parseLayersToActions(layers: SerializedFileLayer<RGBAColor>[]): P
             type: layer.type,
             visible: layer.visible,
             width: layer.width,
-            x: layer.x,
-            y: layer.y
         };
         switch (layer.type) {
             case 'group':

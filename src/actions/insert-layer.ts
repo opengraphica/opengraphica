@@ -5,7 +5,7 @@ import {
 } from '@/types';
 import { BaseAction } from './base';
 import canvasStore from '@/store/canvas';
-import workingFileStore, { WorkingFileState } from '@/store/working-file';
+import workingFileStore, { getGroupLayerById } from '@/store/working-file';
 import layerRenderers from '@/canvas/renderers';
 
 let layerInsertCounter: number = 1;
@@ -14,6 +14,7 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
 
     private insertLayerOptions: GroupLayerOptions | null = null;
     private insertedLayer: WorkingFileAnyLayer<RGBAColor> | null = null;
+    private previousActiveLayerId: number | null = null;
 
     constructor(insertLayerOptions: GroupLayerOptions) {
         super('insertLayer', 'Insert Layer');
@@ -21,6 +22,8 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
 	}
 	public async do() {
         super.do();
+
+        this.previousActiveLayerId = workingFileStore.get('activeLayerId');
 
         const layerId = workingFileStore.get('layerIdCounter');
         workingFileStore.set('layerIdCounter', layerId + 1);
@@ -40,9 +43,9 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
                 name: 'New Layer #' + (layerInsertCounter++),
                 opacity: 1,
                 transform: new DOMMatrix(),
+                transformOriginX: 0,
+                transformOriginY: 0,
                 visible: true,
-                x: 0,
-                y: 0,
                 renderer: layerRenderers.base
             }
 
@@ -90,13 +93,19 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
         const layers = workingFileStore.get('layers');
         let parent: WorkingFileLayer<RGBAColor>[] | null = layers;
         if (newLayer.groupId != null) {
-            parent = this.findGroupLayer(newLayer.groupId, parent);
+            const groupLayer = getGroupLayerById(newLayer.groupId, parent);
+            if (groupLayer) {
+                parent = groupLayer.layers;
+            }
         }
         if (parent) {
             parent.push(newLayer);
         } else {
             throw new Error('Parent group not found.');
         }
+
+        workingFileStore.set('activeLayerId', newLayer.id);
+
         workingFileStore.set('layers', layers);
         canvasStore.set('dirty', true);
 	}
@@ -107,7 +116,10 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
         const layers = workingFileStore.get('layers');
         let parent: WorkingFileLayer<RGBAColor>[] | null = layers;
         if (this.insertedLayer != null && this.insertedLayer.groupId != null) {
-            parent = this.findGroupLayer(this.insertedLayer.groupId, parent);
+            const groupLayer = getGroupLayerById(this.insertedLayer.groupId, parent);
+            if (groupLayer) {
+                parent = groupLayer.layers;
+            }
         }
         if (this.insertedLayer && parent) {
             let childIndex = parent.findIndex((layer) => layer.id === (this.insertedLayer as any).id);
@@ -115,6 +127,8 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
         }
         workingFileStore.set('layers', layers);
         workingFileStore.set('layerIdCounter', workingFileStore.get('layerIdCounter') - 1);
+        workingFileStore.set('activeLayerId', this.previousActiveLayerId);
+        this.previousActiveLayerId = null;
 
         canvasStore.set('dirty', true);
 	}
@@ -130,22 +144,6 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
         }
         this.insertedLayer = null;
         this.insertLayerOptions = null;
-    }
-
-    private findGroupLayer(id: number, parent: WorkingFileLayer<RGBAColor>[]): WorkingFileLayer<RGBAColor>[] | null {
-        for (let layer of parent) {
-            if (layer.type === 'group') {
-                if (layer.id === id) {
-                    return (layer as WorkingFileGroupLayer<RGBAColor>).layers;
-                } else {
-                    let foundGroupLayer = this.findGroupLayer(id, (layer as WorkingFileGroupLayer<RGBAColor>).layers);
-                    if (foundGroupLayer) {
-                        return foundGroupLayer;
-                    }
-                }
-            }
-        }
-        return null;
     }
 
 }

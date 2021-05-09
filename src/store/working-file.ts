@@ -1,5 +1,5 @@
 import { PerformantStore } from './performant-store';
-import { RGBAColor, MeasuringUnits, ResolutionUnits, ColorModelName, WorkingFileLayer } from '@/types';
+import { RGBAColor, MeasuringUnits, ResolutionUnits, ColorModelName, WorkingFileLayer, WorkingFileGroupLayer } from '@/types';
 
 interface WorkingFileState {
     activeLayerId: number | null,
@@ -16,7 +16,7 @@ interface WorkingFileState {
     resolutionX: number;
     resolutionY: number;
     scaleFactor: number;
-    selectedLayerIds: string[];
+    selectedLayerIds: number[];
     width: number; // Always pixels
 }
 
@@ -46,6 +46,31 @@ const store = new PerformantStore<WorkingFileStore>({
     }
 });
 
+function getLayerById(id: number, parent?: WorkingFileLayer<RGBAColor>[]): WorkingFileLayer<RGBAColor> | null {
+    if (parent == null) {
+        parent = store.get('layers');
+    }
+    for (let layer of parent) {
+        if (layer.id === id) {
+            return layer;
+        } else if (layer.type === 'group') {
+            let foundLayer = getLayerById(id, (layer as WorkingFileGroupLayer<RGBAColor>).layers);
+            if (foundLayer) {
+                return foundLayer;
+            }
+        }
+    }
+    return null;
+}
+
+function getGroupLayerById(id: number, parent: WorkingFileLayer<RGBAColor>[]): WorkingFileGroupLayer<RGBAColor> | null {
+    const layer = getLayerById(id, parent);
+    if (layer && layer.type === 'group') {
+        return layer as WorkingFileGroupLayer<RGBAColor>;
+    }
+    return null;
+}
+
 export default store;
 
-export { WorkingFileStore, WorkingFileState };
+export { WorkingFileStore, WorkingFileState, getLayerById, getGroupLayerById };

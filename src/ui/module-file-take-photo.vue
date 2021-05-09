@@ -121,6 +121,8 @@ export default defineComponent({
                                 name: 'Webcam #' + (webcamPhotoCount++),
                                 width,
                                 height,
+                                transformOriginX: 0.5,
+                                transformOriginY: 0.5,
                                 data: {
                                     sourceImage: image
                                 }

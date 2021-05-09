@@ -112,6 +112,7 @@ import { BundleAction } from '@/actions/bundle';
 import { UpdateFileAction } from '@/actions/update-file';
 import { UpdateLayerAction } from '@/actions/update-layer';
 import { convertUnits } from '@/lib/metrics';
+import { decomposeMatrix } from '@/lib/dom-matrix';
 
 export default defineComponent({
     name: 'ToolbarCropResize',
@@ -297,11 +298,11 @@ export default defineComponent({
                 if (layer.type === 'group') {
                     await generateResizeLayerActions((layer as WorkingFileGroupLayer<RGBAColor>).layers);
                 } else if (layer.type === 'raster') {
+                    const transform = new DOMMatrix().translateSelf(-cropLeft.value, -cropTop.value).multiplySelf(layer.transform);
                     actions.push(
                         new UpdateLayerAction<UpdateAnyLayerOptions<RGBAColor>>({
                             id: layer.id,
-                            x: layer.x - cropLeft.value,
-                            y: layer.y - cropTop.value
+                            transform
                         })
                     );
                 }

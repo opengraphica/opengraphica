@@ -57,6 +57,8 @@ export default class CanvasCropResizeontroller extends BaseCanvasMovementControl
         this.cropTranslateStart = point;
         this.cropStartDimensions = { top: top.value, left: left.value, width: width.value, height: height.value };
         this.snapSensitivity = preferencesStore.get('snapSensitivity') / decomposedTransform.scaleX * devicePixelRatio;
+
+        // Determine which dimensions to drag on
         let cropDragType = this.getCropDragType(point, decomposedTransform);
         if (cropDragType != null) {
             this.cropDragType = cropDragType;
@@ -240,6 +242,7 @@ export default class CanvasCropResizeontroller extends BaseCanvasMovementControl
     }
 
     getCropDragType(point: DOMPoint, decomposedTransform: DecomposedMatrix): number | null {
+        const devicePixelRatio = window.devicePixelRatio || 1;
         let cropDragType: number | null = 0;
         const handleSize = 2 * this.remToPx / decomposedTransform.scaleX * devicePixelRatio;
         const halfHandleSize = handleSize / 2;

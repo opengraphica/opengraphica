@@ -4,7 +4,7 @@ import {
 } from '@/types';
 import { BaseAction } from './base';
 import canvasStore from '@/store/canvas';
-import workingFileStore from '@/store/working-file';
+import workingFileStore, { getLayerById } from '@/store/working-file';
 
 export class UpdateLayerAction<GroupLayerOptions extends UpdateAnyLayerOptions<RGBAColor>> extends BaseAction {
 
@@ -19,7 +19,7 @@ export class UpdateLayerAction<GroupLayerOptions extends UpdateAnyLayerOptions<R
         super.do();
 
         const layers = workingFileStore.get('layers');
-        const layer = this.findLayer(this.updateLayerOptions.id, layers);
+        const layer = getLayerById(this.updateLayerOptions.id, layers);
         if (!layer) {
             throw new Error('Layer with specified id not found.');
         }
@@ -37,7 +37,7 @@ export class UpdateLayerAction<GroupLayerOptions extends UpdateAnyLayerOptions<R
         super.undo();
 
         const layers = workingFileStore.get('layers');
-        const layer = this.findLayer(this.updateLayerOptions.id, layers);
+        const layer = getLayerById(this.updateLayerOptions.id, layers);
         for (let prop in this.previousProps) {
             if (prop !== 'id') {
                 (layer as any)[prop] = (this.previousProps as any)[prop];
@@ -51,20 +51,6 @@ export class UpdateLayerAction<GroupLayerOptions extends UpdateAnyLayerOptions<R
         super.free();
         (this.updateLayerOptions as any) = null;
         (this.previousProps as any) = null;
-    }
-
-    private findLayer(id: number, parent: WorkingFileLayer<RGBAColor>[]): WorkingFileLayer<RGBAColor> | null {
-        for (let layer of parent) {
-            if (layer.id === id) {
-                return layer;
-            } else if (layer.type === 'group') {
-                let foundLayer = this.findLayer(id, (layer as WorkingFileGroupLayer<RGBAColor>).layers);
-                if (foundLayer) {
-                    return foundLayer;
-                }
-            }
-        }
-        return null;
     }
 
 }

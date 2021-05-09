@@ -28,11 +28,11 @@ export interface WorkingFileLayer<T extends ColorModel> {
     opacity: 1;
     renderer: WorkingFileLayerRenderer<T>;
     transform: DOMMatrix;
+    transformOriginX: number; // Range 0-1 where 0 is the left and 1 is the right edge of the layer.
+    transformOriginY: number; // Range 0-1 where 0 is the top and 1 is the bottom edge of the layer.
     type: WorkingFileLayerType;
     visible: boolean;
     width: number;
-    x: number;
-    y: number;
 }
 
 export interface WorkingFileGroupLayer<T extends ColorModel> extends WorkingFileLayer<T> {

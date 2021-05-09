@@ -414,6 +414,158 @@ body.ogr-full-page {
         }
     }
 
+    @keyframes ogr-free-transform-bounds {
+        0% {
+            outline-color: rgba(235, 235, 235, 0.9);
+        }
+        50% {
+            outline-color: rgba(205, 205, 205, 0.5);
+        }
+        100% {
+            outline-color: rgba(235, 235, 235, 0.9);
+        }
+    }
+
+    @keyframes ogr-free-transform-rotate-line {
+        0% {
+            background: rgba(235, 235, 235, 0.9);
+        }
+        50% {
+            background: rgba(205, 205, 205, 0.5);
+        }
+        100% {
+            background: rgba(235, 235, 235, 0.9);
+        }
+    }
+
+    .ogr-free-transform {
+        position: relative;
+
+        .ogr-free-transform-bounds {
+            outline: 0.35rem solid rgba(235, 235, 235, 0.7);
+            box-sizing: border-box;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            animation: ogr-free-transform-bounds 2s linear infinite;
+        }
+
+        .ogr-free-transform-handle-rotate {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            svg {
+                display: block;
+                position: absolute;
+                height: 0.85rem;
+                width: 0.85rem;
+                transform: translateX(-50%) rotate(180deg);
+                transform-origin: top center;
+            }
+            .ogr-free-transform-handle-rotate-line {
+                background: rgba(235, 235, 235, 0.7);
+                display: block;
+                position: absolute;
+                top: -0.5rem;
+                width: 0.25rem;
+                height: 2.25rem;
+                transform: translateX(-50%);
+            }
+        }
+
+        .ogr-free-transform-handle-top-left,
+        .ogr-free-transform-handle-top-right,
+        .ogr-free-transform-handle-bottom-left,
+        .ogr-free-transform-handle-bottom-right,
+        .ogr-free-transform-handle-top,
+        .ogr-free-transform-handle-left,
+        .ogr-free-transform-handle-bottom,
+        .ogr-free-transform-handle-right {
+            position: absolute;
+            svg {
+                display: block;
+                position: absolute;
+                height: 0.75rem;
+                width: 0.75rem;
+            }
+        }
+
+        .ogr-free-transform-handle-top-left {
+            top: 0;
+            left: 0;
+            transform-origin: top left;
+            svg {
+                transform: rotate(180deg);
+                transform-origin: top left;
+            }
+        }
+        .ogr-free-transform-handle-top-right {
+            top: 0;
+            right: 0;
+            transform-origin: top right;
+            svg {
+                transform: rotate(90deg);
+                transform-origin: top right;
+            }
+        }
+        .ogr-free-transform-handle-bottom-right {
+            bottom: 0;
+            right: 0;
+            transform-origin: bottom right;
+            svg {
+                transform: rotate(0deg);
+                transform-origin: bottom right;
+            }
+        }
+        .ogr-free-transform-handle-bottom-left {
+            bottom: 0;
+            left: 0;
+            transform-origin: bottom left;
+            svg {
+                transform: rotate(270deg);
+                transform-origin: bottom left;
+            }
+        }
+        .ogr-free-transform-handle-top {
+            top: 0;
+            left: 50%;
+            transform-origin: top center;
+            svg {
+                transform: translateX(-50%) rotate(180deg);
+                transform-origin: top center;
+            }
+        }
+        .ogr-free-transform-handle-right {
+            top: 50%;
+            right: 0;
+            transform-origin: right center;
+            svg {
+                transform: translate(0, -50%);
+                transform-origin: right center;
+            }
+        }
+        .ogr-free-transform-handle-bottom {
+            bottom: 0;
+            right: 50%;
+            transform-origin: bottom center;
+            svg {
+                transform: rotate(180deg) translate(50%, 100%);
+                transform-origin: bottom center;
+            }
+        }
+        .ogr-free-transform-handle-left {
+            top: 50%;
+            left: 0;
+            transform-origin: left center;
+            svg {
+                transform: rotate(270deg) translateY(-50%);
+                transform-origin: left center;
+            }
+        }
+    }
+
     .ogr-canvas, .ogr-post-process-canvas {
         display: block;
         position: absolute;

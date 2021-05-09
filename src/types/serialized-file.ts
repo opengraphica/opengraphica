@@ -15,8 +15,6 @@ export interface SerializedFileLayer<T extends ColorModel> {
     type: WorkingFileLayerType;
     visible: boolean;
     width: number;
-    x: number;
-    y: number;
 }
 
 export interface SerializedFileGroupLayer<T extends ColorModel> extends SerializedFileLayer<T> {
@@ -56,7 +54,7 @@ export interface SerializedFile<T extends ColorModel> {
     resolutionX: number;
     resolutionY: number;
     scaleFactor: number;
-    selectedLayerIds: string[];
+    selectedLayerIds: number[];
     width: number; // Always pixels
     layers: SerializedFileLayer<T>[];
 }

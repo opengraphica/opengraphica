@@ -58,8 +58,6 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<RGBAColor>[]): Seri
             type: layer.type,
             visible: layer.visible,
             width: layer.width,
-            x: layer.x,
-            y: layer.y
         };
         switch (layer.type) {
             case 'group':

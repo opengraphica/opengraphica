@@ -49,7 +49,7 @@ export default defineComponent({
         let postProcessAverageLag: number = 0;
         let drawPostProcessTimeoutHandle: number | undefined;
         let lastCssDecomposedScale: number = 1;
-        const drawPostProcessWait: number = 50;
+        const drawPostProcessWait: number = 100;
         const usePostProcess = computed<boolean>(() => {
             return preferencesStore.state.postProcessInterpolateImage && !preferencesStore.state.useCanvasViewport;
         });
@@ -334,7 +334,6 @@ export default defineComponent({
                     postProcessCanvasElement.width = Math.floor(canvasElement.width * decomposedTransform.scaleX);
                     postProcessCanvasElement.height = Math.floor(canvasElement.height * decomposedTransform.scaleX);
                     let postProcessCancelPromise = new Promise((resolve, reject) => { postProcessCancel = reject });
-                    const picaStartTime = window.performance.now();
                     pica.resize(canvasElement, postProcessCanvasElement, {
                         cancelToken: postProcessCancelPromise
                     }).then(() => {
