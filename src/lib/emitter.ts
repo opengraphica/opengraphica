@@ -20,6 +20,7 @@ interface AppEmitterEvents {
     'app.wait.stopBlocking': {
         id: string;
     };
+    'editor.history.step': undefined;
 }
 
 const emitter = mitt();

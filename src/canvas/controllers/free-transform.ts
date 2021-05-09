@@ -2,9 +2,13 @@ import { watch, WatchStopHandle } from 'vue';
 import BaseCanvasMovementController from './base-movement';
 import { freeTransformEmitter, top, left, width, height, rotation, transformOriginX, transformOriginY, dimensionLockRatio, previewXSnap, previewYSnap, dragHandleHighlight, rotateHandleHighlight } from '../store/free-transform-state';
 import canvasStore from '@/store/canvas';
+import historyStore from '@/store/history';
 import workingFileStore, { getLayerById } from '@/store/working-file';
-import { RGBAColor, WorkingFileLayer } from '@/types';
+import { RGBAColor, UpdateAnyLayerOptions, WorkingFileLayer } from '@/types';
 import { DecomposedMatrix, decomposeMatrix } from '@/lib/dom-matrix';
+import { UpdateLayerAction } from '@/actions/update-layer';
+import { BundleAction } from '@/actions/bundle';
+import appEmitter from '@/lib/emitter';
 
 const DRAG_TYPE_ALL = 0;
 const DRAG_TYPE_TOP = 1;
@@ -56,6 +60,8 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             }
             this.setBoundsFromSelectedLayers();
         }, { immediate: true });
+
+        appEmitter.on('editor.history.step', (this.onHistoryStep).bind(this));
     }
 
     onLeave(): void {
@@ -67,6 +73,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             this.selectedLayerIdsWatchStop();
             this.selectedLayerIdsWatchStop = null;
         }
+        appEmitter.off('editor.history.step', (this.onHistoryStep).bind(this));
     }
 
     onMultiTouchDown() {
@@ -294,9 +301,28 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 previewYSnap.value = [];
                 this.transformTranslateStart = null;
                 this.transformIsRotating = false;
+
+                const updateLayerActions: UpdateLayerAction<UpdateAnyLayerOptions<RGBAColor>>[] = [];
+                for (const [i, layer] of this.selectedLayers.entries()) {
+                    const newTransform = layer.transform;
+                    layer.transform = this.transformStartLayerData[i].transform;
+                    updateLayerActions.push(
+                        new UpdateLayerAction({
+                            id: layer.id,
+                            transform: newTransform
+                        })
+                    );
+                }
+                historyStore.dispatch('runAction', {
+                    action: new BundleAction('freeTransform', 'Free Transform', updateLayerActions)
+                });
             }
             dragHandleHighlight.value = null;
         }
+    }
+
+    private onHistoryStep() {
+        this.setBoundsFromSelectedLayers();
     }
 
     private getTransformedCursorInfo(): { viewTransformPoint: DOMPoint, transformBoundsPoint: DOMPoint, viewDecomposedTransform: DecomposedMatrix } {

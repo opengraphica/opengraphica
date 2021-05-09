@@ -2,6 +2,7 @@ import { PerformantStore } from './performant-store';
 import preferencesStore from './preferences';
 import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
+import appEmitter from '@/lib/emitter';
 
 interface HistoryState {
     actionStack: BaseAction[];
@@ -158,6 +159,8 @@ async function dispatchRunAction({ action, mergeWithHistory }: HistoryDispatch['
     set('canUndo', actionStackIndex > 0);
     set('canRedo', actionStackIndex < actionStack.length);
 
+    appEmitter.emit('editor.history.step');
+
     // Chrome arbitrary method to determine memory usage, but most people use Chrome so...
     const performance = window.performance as any;
     if (performance.memory) {
@@ -177,6 +180,7 @@ async function dispatchUndo(set: PerformantStore<HistoryStore>['directSet']) {
         set('actionStackIndex', actionStackIndex);
         set('canUndo', actionStackIndex > 0);
         set('canRedo', actionStackIndex < actionStack.length);
+        appEmitter.emit('editor.history.step');
     } else {
         throw new Error('There\'s nothing to undo.');
     }
@@ -192,6 +196,7 @@ async function dispatchRedo(set: PerformantStore<HistoryStore>['directSet']) {
         set('actionStackIndex', actionStackIndex);
         set('canUndo', actionStackIndex > 0);
         set('canRedo', actionStackIndex < actionStack.length);
+        appEmitter.emit('editor.history.step');
     } else {
         throw new Error('There\'s nothing to redo.');
     }
