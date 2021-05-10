@@ -27,6 +27,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     private transformDragType: number = 0;
     private transformIsRotating: boolean = false;
 
+    private setBoundsDebounceHandle: number | undefined;
     private activeLayer: WorkingFileLayer<RGBAColor> | null = null;
     private selectedLayers: WorkingFileLayer<RGBAColor>[] = [];
     private activeLayerIdWatchStop: WatchStopHandle | null = null;
@@ -399,28 +400,31 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     }
 
     private setBoundsFromSelectedLayers() {
-        if (this.activeLayer) {
-            const originPosX = this.activeLayer.width * transformOriginX.value;
-            const originPosY = this.activeLayer.height * transformOriginY.value;
-            const decomposedTransform = decomposeMatrix(this.activeLayer.transform);
-            const decomposedPositionTransform = decomposeMatrix(
-                DOMMatrix.fromMatrix(this.activeLayer.transform)
-                .translateSelf(originPosX, originPosY)
-                .scaleSelf(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY)
-                .rotateSelf(-decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
-                .scaleSelf(decomposedTransform.scaleX, decomposedTransform.scaleY)
-                .translateSelf(-originPosX, -originPosY)
-            );
-            freeTransformEmitter.emit('setDimensions', {
-                left: decomposedPositionTransform.translateX,
-                top: decomposedPositionTransform.translateY,
-                width: this.activeLayer.width * decomposedTransform.scaleX,
-                height: this.activeLayer.height * decomposedTransform.scaleY,
-                rotation: decomposedTransform.rotation,
-                transformOriginX: this.activeLayer.transformOriginX,
-                transformOriginY: this.activeLayer.transformOriginY
-            });
-        }
+        clearTimeout(this.setBoundsDebounceHandle);
+        this.setBoundsDebounceHandle = setTimeout(() => {
+            if (this.activeLayer) {
+                const originPosX = this.activeLayer.width * transformOriginX.value;
+                const originPosY = this.activeLayer.height * transformOriginY.value;
+                const decomposedTransform = decomposeMatrix(this.activeLayer.transform);
+                const decomposedPositionTransform = decomposeMatrix(
+                    DOMMatrix.fromMatrix(this.activeLayer.transform)
+                    .translateSelf(originPosX, originPosY)
+                    .scaleSelf(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY)
+                    .rotateSelf(-decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
+                    .scaleSelf(decomposedTransform.scaleX, decomposedTransform.scaleY)
+                    .translateSelf(-originPosX, -originPosY)
+                );
+                freeTransformEmitter.emit('setDimensions', {
+                    left: decomposedPositionTransform.translateX,
+                    top: decomposedPositionTransform.translateY,
+                    width: this.activeLayer.width * decomposedTransform.scaleX,
+                    height: this.activeLayer.height * decomposedTransform.scaleY,
+                    rotation: decomposedTransform.rotation,
+                    transformOriginX: this.activeLayer.transformOriginX,
+                    transformOriginY: this.activeLayer.transformOriginY
+                });
+            }
+        }, 0);
     }
 
 }
