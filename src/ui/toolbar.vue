@@ -22,7 +22,8 @@ export default defineComponent({
         loading: ElLoading.directive
     },
     components: {
-        'crop-resize': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-crop-resize' */ `./toolbar-crop-resize.vue`))
+        'crop-resize': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-crop-resize' */ `./toolbar-crop-resize.vue`)),
+        'free-transform': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-free-transform' */ `./toolbar-free-transform.vue`))
     },
     emits: [
     ],

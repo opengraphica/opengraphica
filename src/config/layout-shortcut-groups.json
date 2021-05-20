@@ -80,7 +80,11 @@
             {
                 "type": "button",
                 "icon": "bi bi-layers",
-                "label": "Layers"
+                "label": "Layers",
+                "action": {
+                    "type": "dock",
+                    "target": "layers"
+                }
             }
         ],
         "draggable": true

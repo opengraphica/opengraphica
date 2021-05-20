@@ -29,6 +29,7 @@ export class UpdateLayerAction<GroupLayerOptions extends UpdateAnyLayerOptions<R
                 (layer as any)[prop] = this.updateLayerOptions[prop];
             }
         }
+        layer.thumbnailImageSrc = null;
 
         canvasStore.set('dirty', true);
 	}
@@ -42,6 +43,9 @@ export class UpdateLayerAction<GroupLayerOptions extends UpdateAnyLayerOptions<R
             if (prop !== 'id') {
                 (layer as any)[prop] = (this.previousProps as any)[prop];
             }
+        }
+        if (layer) {
+            layer.thumbnailImageSrc = null;
         }
 
         canvasStore.set('dirty', true);

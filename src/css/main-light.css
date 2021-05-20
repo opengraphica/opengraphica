@@ -5364,6 +5364,51 @@ body.ogr-full-page {
   width: 25rem !important;
   max-width: 90%;
 }
+.opengraphica .ogr-layer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.opengraphica .ogr-layer-list .ogr-layer {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  height: 5rem;
+}
+.opengraphica .ogr-layer-list .ogr-layer:hover {
+  background: var(--ogr-layout-menu-bar-border-color);
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-thumbnail {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 5rem;
+  height: 100%;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-thumbnail img {
+  width: auto;
+  height: 100%;
+  box-sizing: border-box;
+  border: 0.25rem solid var(--ogr-layout-menu-bar-border-color);
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-thumbnail img.is-larger-width {
+  width: 100%;
+  height: auto;
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-name {
+  display: block;
+  padding: 0 0.5rem;
+  align-self: center;
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .opengraphica .ogr-layout-dnd-container {
   display: flex;
   flex-direction: column;
@@ -5449,6 +5494,12 @@ body.ogr-full-page {
   padding: 0 !important;
   width: auto !important;
 }
+.opengraphica .ogr-dock-popover > .ogr-dock-title {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 0.5rem 1rem 0.35rem 1rem;
+}
 .opengraphica .ogr-dock-popover > .ogr-dock {
   max-height: calc(100vh - 5rem) !important;
   overflow: hidden !important;
@@ -5475,6 +5526,20 @@ body.ogr-full-page {
   max-width: 100%;
   background: var(--ogr-layout-menu-bar-background-color);
   box-shadow: 0 0 0 0.063rem var(--ogr-layout-menu-bar-border-color);
+}
+.opengraphica .ogr-toolbar.is-overlay {
+  background: transparent;
+  box-shadow: none;
+}
+.opengraphica .ogr-toolbar .ogr-toolbar-overlay {
+  background: var(--ogr-layout-menu-bar-background-color);
+  box-shadow: 0 0 0 0.063rem var(--ogr-layout-menu-bar-border-color);
+}
+.opengraphica header .ogr-toolbar .ogr-toolbar-overlay {
+  border-radius: 0 0 1rem 1rem;
+}
+.opengraphica footer .ogr-toolbar .ogr-toolbar-overlay {
+  border-radius: 1rem 1rem 0 0;
 }
 .opengraphica .ogr-canvas-area {
   display: block;
@@ -23687,7 +23752,7 @@ body.ogr-full-page {
 .opengraphica .el-tabs--icon-tabs .el-tabs__header {
   padding-left: 0;
   padding-right: 0;
-  padding-top: 0.25rem;
+  padding-top: 0;
   margin-bottom: 0.25rem;
 }
 .opengraphica .el-tabs--icon-tabs .el-tabs__item {

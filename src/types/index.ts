@@ -1,4 +1,4 @@
-export { CanvasRenderingContext2DEnhanced } from './canvas';
+export { CanvasRenderingContext2DEnhanced, CanvasViewResetOptions } from './canvas';
 export {
     ColorModel, ColorModelName, CMYKAColor, RGBAColor, HSVAColor, HSLAColor,
     Gradient, LinearGradient, RadialGradient, GradientStop

@@ -5,7 +5,7 @@
             <template v-if="!isActiveToolbarExclusive && config.header">
                 <app-layout-menu-bar v-for="(menuBarConfig, index) of config.header" :key="index" :config="menuBarConfig" />
             </template>
-            <toolbar v-if="activeToolbar && activeToolbarPosition === 'top'" :name="activeToolbar" />
+            <toolbar v-if="activeToolbar && activeToolbarPosition === 'top'" :name="activeToolbar" :class="{ 'is-overlay': !isActiveToolbarExclusive }" />
         </header>
         <div class="ogr-layout-dnd-center">
             <aside aria-label="Left Sidebar" class="sidebar-left" ref="sidebarLeft"></aside>
@@ -19,6 +19,7 @@
             <aside aria-label="Right Sidebar" class="sidebar-right" ref="sidebarRight"></aside>
         </div>
         <footer ref="footer">
+            <toolbar v-if="activeToolbar && activeToolbarPosition === 'bottom'" :name="activeToolbar" :class="{ 'is-overlay': !isActiveToolbarExclusive }" />
         </footer>
     </div>
 </template>

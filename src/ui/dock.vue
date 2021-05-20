@@ -21,6 +21,7 @@ export default defineComponent({
         loading: ElLoading.directive
     },
     components: {
+        'layers': defineAsyncComponent(() => import(/* webpackChunkName: 'dock-layers' */ `./dock-layers.vue`)),
         'settings': defineAsyncComponent(() => import(/* webpackChunkName: 'dock-settings' */ `./dock-settings.vue`))
     },
     emits: [

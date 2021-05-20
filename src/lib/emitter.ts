@@ -1,10 +1,9 @@
 import mitt, { Handler } from 'mitt';
 import { INotificationOptions } from 'element-plus/lib/el-notification/src/notification.type';
+import { CanvasViewResetOptions } from '@/types';
 
 interface AppEmitterEvents {
-    'app.canvas.resetTransform': undefined | {
-        margin?: number;
-    };
+    'app.canvas.resetTransform': undefined | CanvasViewResetOptions;
     'app.component.register': any;
     'app.dialogs.openFromDock': {
         name: string;

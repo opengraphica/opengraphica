@@ -34,6 +34,7 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
         } else if (this.insertLayerOptions) {
             const sharedOptions: WorkingFileLayer<RGBAColor> = {
                 type: 'raster',
+                bakedImage: null,
                 blendingMode: 'source-over',
                 filters: [],
                 id: layerId,
@@ -42,6 +43,7 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
                 width: 1,
                 name: 'New Layer #' + (layerInsertCounter++),
                 opacity: 1,
+                thumbnailImageSrc: null,
                 transform: new DOMMatrix(),
                 transformOriginX: 0,
                 transformOriginY: 0,
@@ -54,6 +56,7 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
                     newLayer = {
                         ...sharedOptions,
                         layers: [],
+                        expanded: false,
                         renderer: layerRenderers.group,
                         ...this.insertLayerOptions
                     } as WorkingFileGroupLayer<RGBAColor>;

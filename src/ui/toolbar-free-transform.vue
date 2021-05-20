@@ -1,20 +1,32 @@
 <template>
-    <div class="is-flex container is-align-items-center is-justify-content-space-between mx-auto">
-        Test
+    <div class="is-flex container is-align-items-center is-justify-content-center mx-auto">
+        <!--
+        <div class="ogr-toolbar-overlay p-2">
+            <el-select aria-label="Layer Selection" v-model="layerPickMode" :popper-append-to-body="false" style="width: 6.5rem">
+                <el-option label="Current" value="current"></el-option>
+                <el-option label="Auto" value="auto"></el-option>
+            </el-select>
+            <el-button plain type="text" class="px-4" aria-label="Preferences">
+                <i class="bi bi-sliders"></i>
+            </el-button>
+        </div>
+        -->
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent, ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
-import ElLoading from 'element-plus/lib/el-loading';
+import { layerPickMode } from '@/canvas/store/free-transform-state';
+import ElButton from 'element-plus/lib/el-button';
+import ElOption from 'element-plus/lib/el-option';
+import ElSelect from 'element-plus/lib/el-select';
 
 export default defineComponent({
-    name: 'ToolbarCropResize',
-    directives: {
-        loading: ElLoading.directive
-    },
+    name: 'ToolbarFreeTransform',
     components: {
-
+        ElButton,
+        ElOption,
+        ElSelect
     },
     props: {
         
@@ -23,7 +35,9 @@ export default defineComponent({
         'close'
     ],
     setup(props, { emit }) {
-       
+       return {
+           layerPickMode
+       };
     }
 });
 </script>

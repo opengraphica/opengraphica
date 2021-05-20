@@ -18,7 +18,7 @@ export interface WorkingFileLayerRenderer<T extends ColorModel> {
 }
 
 export interface WorkingFileLayer<T extends ColorModel> {
-    bakedImage?: HTMLImageElement;
+    bakedImage: HTMLImageElement | null;
     blendingMode: WorkingFileLayerBlendingMode;
     filters: WorkingFileLayerFilter<T>[];
     groupId: number | null;
@@ -27,6 +27,7 @@ export interface WorkingFileLayer<T extends ColorModel> {
     name: string;
     opacity: 1;
     renderer: WorkingFileLayerRenderer<T>;
+    thumbnailImageSrc: string | null;
     transform: DOMMatrix;
     transformOriginX: number; // Range 0-1 where 0 is the left and 1 is the right edge of the layer.
     transformOriginY: number; // Range 0-1 where 0 is the top and 1 is the bottom edge of the layer.
@@ -37,6 +38,7 @@ export interface WorkingFileLayer<T extends ColorModel> {
 
 export interface WorkingFileGroupLayer<T extends ColorModel> extends WorkingFileLayer<T> {
     type: 'group';
+    expanded: boolean;
     layers: WorkingFileLayer<T>[];
 }
 

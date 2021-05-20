@@ -2,3 +2,7 @@ export interface CanvasRenderingContext2DEnhanced extends CanvasRenderingContext
     get2dTransformArray(): [number, number, number, number, number, number];
     transformedPoint(x: number, y: number): DOMPoint;
 }
+
+export interface CanvasViewResetOptions {
+    margin?: number;
+};

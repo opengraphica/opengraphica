@@ -43,7 +43,13 @@ export default class BaseCanvasController {
      * Fires when switching to this controller.
      */
     onEnter(): void {
-        // Override
+        // View can shift due to toolbar show/hiding. If it was previously reset, reset again for correct layout.
+        setTimeout(() => {
+            const canvasTransformResetOptions = canvasStore.get('transformResetOptions');
+            if (canvasTransformResetOptions) {
+                appEmitter.emit('app.canvas.resetTransform', canvasTransformResetOptions !== true ? canvasTransformResetOptions : undefined);
+            }
+        }, 0);
     }
 
     /**

@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, Ref, computed, watch, inject, toRefs, onMounted, onUnmounted } from 'vue';
+import { defineComponent, ref, Ref, computed, watch, inject, toRefs, onMounted, onUnmounted, nextTick } from 'vue';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import workingFileStore from '@/store/working-file';
@@ -185,7 +185,7 @@ export default defineComponent({
         });
 
         // Centers the canvas and displays at 1x zoom or the maximum width/height of the window, whichever is smaller. 
-        function resetTransform(event?: AppEmitterEvents['app.canvas.resetTransform']) {
+        async function resetTransform(event?: AppEmitterEvents['app.canvas.resetTransform']) {
             const margin: number = (event && event.margin) || 48;
             if (canvasArea.value && ctx && mainElement) {
                 const devicePixelRatio = window.devicePixelRatio || 1;
@@ -215,6 +215,7 @@ export default defineComponent({
                 }
                 canvasStore.set('transform', transform);
                 canvasStore.set('viewDirty', true);
+                canvasStore.set('transformResetOptions', event || true);
             }
         }
 

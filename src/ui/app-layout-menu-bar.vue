@@ -41,8 +41,10 @@
                                     </el-button>
                                 </template>
                                 <template v-if="control.showDock">
+                                    <div v-if="control.displayTitle" class="ogr-dock-title">{{ control.displayTitle }}</div>
                                     <dynamically-loaded-dock
                                         :name="control.action.target" :key="'dock-' + control.action.target"
+                                        @update:title="control.displayTitle = $event"
                                         @close="control.popoverVisible = false"
                                     />
                                 </template>
@@ -155,6 +157,7 @@ export default defineComponent({
     },
     setup(props, options) {
         let activeControlDock: LayoutShortcutGroupDefinitionControlButton | null = null;
+        let pendingActiveControlCall: IArguments | null = null;
         let flexContainer = ref<HTMLDivElement>();
         let displayMode = ref<'all' | 'favorites'>('all');
         let showMoreActionsMenu = ref<boolean>(false);
@@ -211,6 +214,8 @@ export default defineComponent({
         }
 
         function createActionGroups(forceDisplayMode?: string): { [key: string]: LayoutShortcutGroupDefinition[] } {
+            activeControlDock = null;
+            pendingActiveControlCall = null;
             forceDisplayMode = forceDisplayMode || displayMode.value;
             let actionGroups: { [key: string]: LayoutShortcutGroupDefinition[] } = {};
             const sectionNames = (forceDisplayMode === 'all' ? ['start', 'center', 'end'] : ['favorites']) as ('start' | 'center' | 'end' | 'favorites')[];
@@ -224,6 +229,7 @@ export default defineComponent({
                         }
                         if (actionGroup.controls) {
                             for (let control of actionGroup.controls) {
+                                control.displayTitle = '';
                                 control.popoverVisible = false;
                                 control.showDock = false;
                             }
@@ -285,6 +291,10 @@ export default defineComponent({
 
         function onPointerDownControlButton(event: TouchEvent | MouseEvent, control: LayoutShortcutGroupDefinitionControlButton) {
             event.preventDefault();
+            if (event.target && activeControlDock) {
+                const target = event.target as Element;
+                activeControlDock.popoverVisible = false;
+            }
             pointerDownElement = event.target;
             pointerDownId = (event as TouchEvent).touches ? (event as TouchEvent).touches[0].identifier : 0;
             pointerDownButton = (event as MouseEvent).button || 0;
@@ -344,28 +354,32 @@ export default defineComponent({
             }
         }
         async function onPressControlButton(openTarget: 'popover' | 'modal', button: number, control: LayoutShortcutGroupDefinitionControlButton) {
-            if (control.action) {
-                if (control.action.type === 'toolGroup') {
-                    if (button === 0 && activeToolGroup.value !== control.action.target) {
-                        editorStore.dispatch('setActiveTool', { group: control.action.target });
-                        if (openTarget === 'modal') {
+            if (activeControlDock) {
+                pendingActiveControlCall = arguments;
+            } else {
+                if (control.action) {
+                    if (control.action.type === 'toolGroup') {
+                        if (button === 0 && activeToolGroup.value !== control.action.target) {
+                            editorStore.dispatch('setActiveTool', { group: control.action.target });
+                            if (openTarget === 'modal') {
+                                showMoreActionsMenu.value = false;
+                            }
+                        } else {
+                            
+                        }
+                    } else if (control.action.type === 'dock') {
+                        if (openTarget === 'popover') {
+                            if (!pointerDownShowDock) {
+                                activeControlDock = control;
+                                control.showDock = true;
+                                control.popoverVisible = true;
+                            } else {
+                                control.popoverVisible = false;
+                            }
+                        } else if (openTarget === 'modal') {
+                            appEmitter.emit('app.dialogs.openFromDock', { name: control.action.target });
                             showMoreActionsMenu.value = false;
                         }
-                    } else {
-                        
-                    }
-                } else if (control.action.type === 'dock') {
-                    if (openTarget === 'popover') {
-                        if (!pointerDownShowDock) {
-                            activeControlDock = control;
-                            control.showDock = true;
-                            control.popoverVisible = true;
-                        } else {
-                            control.popoverVisible = false;
-                        }
-                    } else if (openTarget === 'modal') {
-                        appEmitter.emit('app.dialogs.openFromDock', { name: control.action.target });
-                        showMoreActionsMenu.value = false;
                     }
                 }
             }
@@ -375,8 +389,14 @@ export default defineComponent({
         }
 
         function onAfterLeavePopover(control: LayoutShortcutGroupDefinitionControlButton) {
-            activeControlDock = null;
-            control.showDock = false;
+            if (control === activeControlDock) {
+                activeControlDock = null;
+                control.showDock = false;
+                if (pendingActiveControlCall) {
+                    onPressControlButton.apply(window, pendingActiveControlCall as any);
+                    pendingActiveControlCall = null;
+                }
+            }
         }
 
         return {
