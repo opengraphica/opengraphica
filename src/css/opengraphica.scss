@@ -234,11 +234,11 @@ body.ogr-full-page {
                 overflow: hidden !important;
 
                 > .el-tabs__content, > .el-tabs__content > .el-tab-pane, > .el-tabs__content > .el-tab-pane > .el-scrollbar {
-                    max-height: calc(100vh - 10rem) !important;
+                    max-height: calc(100vh - 13rem) !important;
                     overflow: hidden !important;
                 }
                 > .el-tabs__content > .el-tab-pane > .el-scrollbar > .el-scrollbar__wrap {
-                    max-height: calc(100vh - 10rem) !important;
+                    max-height: calc(100vh - 13rem) !important;
                     overflow: auto !important;
                 }
             }

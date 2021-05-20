@@ -5,7 +5,11 @@
             {
                 "type": "button",
                 "icon": "bi bi-eyedropper",
-                "label": "Pick Color"
+                "label": "Pick Color",
+                "action": {
+                    "type": "runModule",
+                    "target": "tmp/notYetImplemented"
+                }
             }
         ],
         "draggable": true
@@ -16,7 +20,11 @@
             {
                 "type": "button",
                 "icon": "bi bi-droplet",
-                "label": "Deform"
+                "label": "Deform",
+                "action": {
+                    "type": "runModule",
+                    "target": "tmp/notYetImplemented"
+                }
             }
         ],
         "draggable": true
@@ -29,8 +37,8 @@
                 "icon": "bi bi-brush",
                 "label": "Draw",
                 "action": {
-                    "type": "toolGroup",
-                    "target": "draw"
+                    "type": "runModule",
+                    "target": "tmp/notYetImplemented"
                 }
             }
         ],
@@ -42,7 +50,11 @@
             {
                 "type": "button",
                 "icon": "bi bi-stars",
-                "label": "Effects"
+                "label": "Effects",
+                "action": {
+                    "type": "runModule",
+                    "target": "tmp/notYetImplemented"
+                }
             }
         ],
         "draggable": true
@@ -53,7 +65,11 @@
             {
                 "type": "button",
                 "icon": "bi bi-eraser",
-                "label": "Erase"
+                "label": "Erase",
+                "action": {
+                    "type": "runModule",
+                    "target": "tmp/notYetImplemented"
+                }
             }
         ],
         "draggable": true
@@ -64,12 +80,20 @@
             {
                 "type": "button",
                 "icon": "bi bi-arrow-counterclockwise",
-                "label": "Undo"
+                "label": "Undo",
+                "action": {
+                    "type": "runModule",
+                    "target": "tmp/notYetImplemented"
+                }
             },
             {
                 "type": "button",
                 "icon": "bi bi-arrow-clockwise",
-                "label": "Redo"
+                "label": "Redo",
+                "action": {
+                    "type": "runModule",
+                    "target": "tmp/notYetImplemented"
+                }
             }
         ],
         "draggable": true
@@ -96,7 +120,11 @@
                 "type": "button",
                 "icon": "bi bi-search",
                 "label": "Search",
-                "expanded": true
+                "expanded": true,
+                "action": {
+                    "type": "runModule",
+                    "target": "tmp/notYetImplemented"
+                }
             }
         ],
         "draggable": true
@@ -107,7 +135,11 @@
             {
                 "type": "button",
                 "icon": "bi bi-bounding-box",
-                "label": "Selection"
+                "label": "Selection",
+                "action": {
+                    "type": "runModule",
+                    "target": "tmp/notYetImplemented"
+                }
             }
         ],
         "draggable": true
@@ -133,7 +165,11 @@
             {
                 "type": "button",
                 "icon": "bi bi-type",
-                "label": "Text"
+                "label": "Text",
+                "action": {
+                    "type": "runModule",
+                    "target": "tmp/notYetImplemented"
+                }
             }
         ],
         "draggable": true

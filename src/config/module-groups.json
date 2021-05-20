@@ -67,5 +67,19 @@
                 }
             }
         }
+    },
+    "tmp": {
+        "name": "Temporary Modules",
+        "descriptions": "Modules that will only stick around during initial development.",
+        "modules": {
+            "notYetImplemented": {
+                "name": "Not Yet Implemented",
+                "description": "Show a warning.",
+                "action": {
+                    "type": "function",
+                    "target": "tmp/not-yet-implemented.notYetImplemented"
+                }
+            }
+        }
     }
 }

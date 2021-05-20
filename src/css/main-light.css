@@ -5512,11 +5512,11 @@ body.ogr-full-page {
   overflow: hidden !important;
 }
 .opengraphica .ogr-dock-popover > .ogr-dock > .el-tabs > .el-tabs__content, .opengraphica .ogr-dock-popover > .ogr-dock > .el-tabs > .el-tabs__content > .el-tab-pane, .opengraphica .ogr-dock-popover > .ogr-dock > .el-tabs > .el-tabs__content > .el-tab-pane > .el-scrollbar {
-  max-height: calc(100vh - 10rem) !important;
+  max-height: calc(100vh - 13rem) !important;
   overflow: hidden !important;
 }
 .opengraphica .ogr-dock-popover > .ogr-dock > .el-tabs > .el-tabs__content > .el-tab-pane > .el-scrollbar > .el-scrollbar__wrap {
-  max-height: calc(100vh - 10rem) !important;
+  max-height: calc(100vh - 13rem) !important;
   overflow: auto !important;
 }
 .opengraphica .ogr-module {

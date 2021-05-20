@@ -36,7 +36,7 @@ export interface LayoutShortcutGroupDefinitionControlButton {
     showDock?: boolean;
     popoverVisible?: boolean;
     action?: {
-        type: 'dock' | 'toolGroup';
+        type: 'dock' | 'toolGroup' | 'runModule';
         target: string;
     };
     onPrimaryClick?: ActionGroupControlEventHandler;

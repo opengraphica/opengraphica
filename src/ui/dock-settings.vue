@@ -483,8 +483,17 @@ export default defineComponent({
                                     tool: 'cropResize'
                                 });
                                 break;
+                            case 'cut':
+                                await runModule('tmp', 'notYetImplemented');
+                                break;
+                            case 'copy':
+                                await runModule('tmp', 'notYetImplemented');
+                                break;
                             case 'copyAll':
                                 await runModule('image', 'copyAll');
+                                break;
+                            case 'paste':
+                                await runModule('tmp', 'notYetImplemented');
                                 break;
                         }
                         break;

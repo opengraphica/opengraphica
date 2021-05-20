@@ -12,6 +12,9 @@ export async function copyAllLayers() {
             toClipboard: true
         });
     } catch (error) {
+        await new Promise<void>((resolve) => {
+            setTimeout(resolve, 1);
+        });
         appEmitter.emit('app.notify', {
             type: 'error',
             dangerouslyUseHTMLString: true,

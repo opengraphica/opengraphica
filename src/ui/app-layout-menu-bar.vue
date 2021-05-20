@@ -128,6 +128,7 @@ import editorStore from '@/store/editor';
 import preferencesStore from '@/store/preferences';
 import appEmitter from '@/lib/emitter';
 import Dock from './dock.vue';
+import { runModule } from '@/modules';
 
 export default defineComponent({
     name: 'AppLayoutMenuBar',
@@ -380,6 +381,9 @@ export default defineComponent({
                             appEmitter.emit('app.dialogs.openFromDock', { name: control.action.target });
                             showMoreActionsMenu.value = false;
                         }
+                    } else if (control.action.type === 'runModule') {
+                        const actionSplit = control.action.target.split('/');
+                        await runModule(actionSplit[0], actionSplit[1]);
                     }
                 }
             }
