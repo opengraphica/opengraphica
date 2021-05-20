@@ -279,6 +279,7 @@ async function parseLayersToActions(layers: SerializedFileLayer<RGBAColor>[]): P
                 parsedLayer = {
                     ...parsedLayer,
                     type: 'group',
+                    expanded: false,
                     layers: []
                 } as WorkingFileGroupLayer<RGBAColor>;
                 insertLayerActions = insertLayerActions.concat(await parseLayersToActions((layer as SerializedFileGroupLayer<RGBAColor>).layers));
