@@ -1,9 +1,9 @@
 <template>
     <div class="ogr-layout-menu-bar" @touchmove="onTouchMoveMenuBar($event)">
         <div ref="flexContainer" class="is-flex container mx-auto">
-            <div v-for="(actionGroupSection, actionGroupSectionName) of actionGroups" :key="actionGroupSectionName" class="py-2" :class="['menu-' + actionGroupSectionName, { 'px-3': actionGroupSectionName !== 'center' }]">
+            <div v-for="(actionGroupSection, actionGroupSectionName) of actionGroups" :key="actionGroupSectionName" class="ogr-menu-section py-2" :class="['ogr-menu-' + actionGroupSectionName, { 'px-3': actionGroupSectionName !== 'center' }]">
                 <template v-for="actionGroup of actionGroupSection" :key="actionGroup.id">
-                    <component :is="actionGroup.controls.length === 1 ? 'div' : 'el-button-group'" :class="{ 'single-button-group': actionGroup.controls.length === 1 }">
+                    <component :is="actionGroup.controls.length === 1 ? 'div' : 'el-button-group'" :class="{ 'ogr-single-button-group': actionGroup.controls.length === 1 }">
                         <template v-for="control of actionGroup.controls" :key="control.label">
                             <el-popover
                                 v-model:visible="control.popoverVisible"
@@ -58,8 +58,8 @@
                     </component>
                 </template>
             </div>
-            <div v-if="displayMode === 'favorites'" class="menu-end py-2 px-3">
-                <div class="single-button-group">
+            <div v-if="displayMode === 'favorites'" class="ogr-menu-section ogr-menu-end py-2 px-3">
+                <div class="ogr-single-button-group">
                     <el-popover
                         v-model:visible="showMoreActionsTooltip"
                         :trigger="showMoreActionsMenu ? 'manual' : 'hover'"
