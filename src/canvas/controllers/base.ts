@@ -1,3 +1,4 @@
+import { nextTick } from 'vue';
 import { CanvasRenderingContext2DEnhanced } from '@/types';
 import canvasStore from '@/store/canvas';
 import preferencesStore from '@/store/preferences';
@@ -44,7 +45,8 @@ export default class BaseCanvasController {
      */
     onEnter(): void {
         // View can shift due to toolbar show/hiding. If it was previously reset, reset again for correct layout.
-        setTimeout(() => {
+        setTimeout(async () => {
+            await nextTick();
             const canvasTransformResetOptions = canvasStore.get('transformResetOptions');
             if (canvasTransformResetOptions) {
                 appEmitter.emit('app.canvas.resetTransform', canvasTransformResetOptions !== true ? canvasTransformResetOptions : undefined);
