@@ -70,7 +70,7 @@
     },
     "tmp": {
         "name": "Temporary Modules",
-        "descriptions": "Modules that will only stick around during initial development.",
+        "description": "Modules that will only stick around during initial development.",
         "modules": {
             "notYetImplemented": {
                 "name": "Not Yet Implemented",
