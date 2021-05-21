@@ -1,6 +1,6 @@
 {
     "name": "opengraphica",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "private": true,
     "scripts": {
         "dev": "webpack serve --config ./webpack.config.dev.js",
