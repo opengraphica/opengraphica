@@ -5378,7 +5378,7 @@ body.ogr-full-page {
   height: 5rem;
 }
 .opengraphica .ogr-layer-list .ogr-layer:hover {
-  background: var(--ogr-layout-menu-bar-border-color);
+  background: var(--ogr-layer-list-background-color-hover);
 }
 .opengraphica .ogr-layer-list .ogr-layer .ogr-layer-thumbnail {
   display: flex;
@@ -22183,6 +22183,7 @@ body.ogr-full-page {
   --ogr-alert-info-color: #515356;
   --ogr-overlay-background-color: rgba(255, 255, 255, 0.8);
   --ogr-snap-line-color: #66b1ff;
+  --ogr-layer-list-background-color-hover: rgba(64, 158, 255, 0.1);
 }
 
 .opengraphica .container {

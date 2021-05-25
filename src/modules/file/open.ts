@@ -223,11 +223,12 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                 ...insertLayerActions
             ])
         });
-        await historyStore.dispatch('free', {
-            memorySize: Infinity,
-            databaseSize: Infinity
-        });
-
+        if (!options.insert) {
+            await historyStore.dispatch('free', {
+                memorySize: Infinity,
+                databaseSize: Infinity
+            });
+        }
         (window as any).workingFileStore = await (await import('@/store/working-file')).default;
     } else {
         throw new Error('None of the files selected could be loaded.');

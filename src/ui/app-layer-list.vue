@@ -4,6 +4,12 @@
             <li class="ogr-layer">
                 <app-layer-list-thumbnail :layer="layer" />
                 <span class="ogr-layer-name">{{ layer.name }}</span>
+                <el-button type="text" class="px-2">
+                    <i class="bi bi-eye" aria-hidden="true"></i>
+                </el-button>
+                <el-button type="text" class="pl-2 pr-4 m-0">
+                    <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
+                </el-button>
             </li>
             <template v-if="layer.layers && layer.expanded">
                 <app-layer-list :layers="layer.layers" />
@@ -14,6 +20,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, toRefs, nextTick, PropType } from 'vue';
+import ElButton from 'element-plus/lib/el-button';
 import ElLoading from 'element-plus/lib/el-loading';
 import workingFileStore from '@/store/working-file';
 import AppLayerListThumbnail from '@/ui/app-layer-list-thumbnail.vue';
@@ -25,7 +32,8 @@ export default defineComponent({
         loading: ElLoading.directive
     },
     components: {
-        AppLayerListThumbnail
+        AppLayerListThumbnail,
+        ElButton
     },
     props: {
         layers: {

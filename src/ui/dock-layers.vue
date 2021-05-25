@@ -1,5 +1,5 @@
 <template>
-    <div style="width: 300px; max-width: 100%">
+    <div style="width: 350px; max-width: 100%">
         <template v-if="layers.length > 0">
             <app-layer-list :layers="layers" />
         </template>
