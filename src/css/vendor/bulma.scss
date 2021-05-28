@@ -46,6 +46,23 @@
         padding-bottom: 1.25rem;
     }
 
+    .is-border-radius-attach-left {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+    .is-border-radius-attach-right {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    .is-border-radius-attach-top {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+    .is-border-radius-attach-bottom {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
     .leading-none { line-height: 1; }
     .leading-tight { line-height: 1.25; }
     .leading-snug { line-height: 1.375; }

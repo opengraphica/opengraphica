@@ -41,6 +41,7 @@ import workingFileStore from '@/store/working-file';
 import { notifyInjector, unexpectedErrorMessage, validationSubmissionErrorMessage } from '@/lib/notify';
 import { Rules, RuleItem } from 'async-validator';
 import { saveImageAs } from '@/modules/file/save';
+import { knownFileExtensions } from '@/lib/regex';
 
 export default defineComponent({
     name: 'ModuleFileSaveAs',
@@ -85,7 +86,7 @@ export default defineComponent({
                 await form.value.validate();
                 loading.value = true;
                 try {
-                    workingFileStore.set('fileName', formData.workingFile.fileName);
+                    workingFileStore.set('fileName', formData.workingFile.fileName.replace(knownFileExtensions, ''));
                     await saveImageAs({
                         fileName: formData.workingFile.fileName,
                     });

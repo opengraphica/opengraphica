@@ -70,55 +70,120 @@ body.ogr-full-page {
             list-style: none;
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-direction: row;
-            height: 4rem;
-
+            display: block;
+            
             &.is-dnd-hover {
                 background: var(--ogr-layer-list-background-color-hover);
             }
 
-            .ogr-layer-dnd-handle {
+            .ogr-layer-main {
                 display: flex;
                 flex-direction: row;
-                flex-grow: 1;
-            }
+                height: 4rem;
 
-            .ogr-layer-thumbnail {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                width: 4rem;
-                height: 100%;
-                padding: 0.5rem;
-                box-sizing: border-box;
-                flex-shrink: 0;
+                .ogr-layer-dnd-handle {
+                    cursor: pointer;
+                    display: flex;
+                    flex-direction: row;
+                    flex-grow: 1;
+                }
 
-                img {
-                    width: auto;
+                .ogr-layer-thumbnail {
+                    cursor: move;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    width: 4rem;
                     height: 100%;
+                    padding: 0.5rem;
                     box-sizing: border-box;
-                    border: .25rem solid var(--ogr-layout-menu-bar-border-color);
+                    flex-shrink: 0;
 
-                    &.is-larger-width {
-                        width: 100%;
-                        height: auto;
+                    img {
+                        width: auto;
+                        height: 100%;
+                        box-sizing: border-box;
+                        border: .25rem solid var(--ogr-layer-list-thumbnail-border-color);
+
+                        &.is-larger-width {
+                            width: 100%;
+                            height: auto;
+                        }
                     }
+                }
+
+                .ogr-layer-name {
+                    display: block;
+                    padding: 0 0.5rem 0 0;
+                    align-self: center;
+                    flex-grow: 1;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                .el-button:hover {
+                    background: var(--ogr-layer-list-background-color-hover);
                 }
             }
 
-            .ogr-layer-name {
+            .ogr-layer-attributes {
                 display: block;
-                padding: 0 0.5rem;
-                align-self: center;
-                flex-grow: 1;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
+                margin: 0 0.5rem 0 2rem;
+                // border-top: 0.0625rem solid var(--ogr-layer-list-border-color);
+                // border-bottom: 0.0625rem solid var(--ogr-layer-list-border-color);
+
+                /*
+                + .ogr-layer-attributes {
+                    margin-top: -0.0625rem;
+                }
+                */
+
+                .ogr-layer-attributes__title {
+                    display: block;
+                    padding: 0 0 0.25rem 0;
+                }
             }
 
-            .el-button:hover {
-                background: var(--ogr-layer-list-background-color-hover);
+            .ogr-layer-frames-list {
+                list-style: none;
+                margin: 0;
+                padding: 0 0 0.5rem 0;
+                display: flex;
+                flex-direction: row;
+
+                > li {
+                    list-style: none;
+                    margin: 0 0.5rem 0 0;
+                    padding: 0;
+
+                    .ogr-layer-thumbnail {
+                        cursor: pointer;
+                        display: block;
+                        width: auto;
+                        height: 3rem;
+                        box-sizing: border-box;
+    
+                        img {
+                            width: auto;
+                            height: 100%;
+                            margin: 0;
+                            padding: 0;
+                            box-sizing: border-box;
+                            border: .25rem solid var(--ogr-layer-list-thumbnail-border-color);
+                        }
+
+                        &.is-active {
+                            img {
+                                border-color: var(--ogr-layer-list-thumbnail-border-color-active);
+                            }
+                        }
+                    }
+
+                    &:last-child {
+                        margin-right: 0;
+                    }
+                }
             }
         }
     }

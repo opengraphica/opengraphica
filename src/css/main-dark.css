@@ -5373,19 +5373,24 @@ body.ogr-full-page {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: row;
-  height: 4rem;
+  display: block;
 }
 .opengraphica .ogr-layer-list .ogr-layer.is-dnd-hover {
   background: var(--ogr-layer-list-background-color-hover);
 }
-.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-dnd-handle {
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-main {
+  display: flex;
+  flex-direction: row;
+  height: 4rem;
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-main .ogr-layer-dnd-handle {
+  cursor: pointer;
   display: flex;
   flex-direction: row;
   flex-grow: 1;
 }
-.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-thumbnail {
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-main .ogr-layer-thumbnail {
+  cursor: move;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -5395,27 +5400,73 @@ body.ogr-full-page {
   box-sizing: border-box;
   flex-shrink: 0;
 }
-.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-thumbnail img {
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-main .ogr-layer-thumbnail img {
   width: auto;
   height: 100%;
   box-sizing: border-box;
-  border: 0.25rem solid var(--ogr-layout-menu-bar-border-color);
+  border: 0.25rem solid var(--ogr-layer-list-thumbnail-border-color);
 }
-.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-thumbnail img.is-larger-width {
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-main .ogr-layer-thumbnail img.is-larger-width {
   width: 100%;
   height: auto;
 }
-.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-name {
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-main .ogr-layer-name {
   display: block;
-  padding: 0 0.5rem;
+  padding: 0 0.5rem 0 0;
   align-self: center;
   flex-grow: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.opengraphica .ogr-layer-list .ogr-layer .el-button:hover {
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-main .el-button:hover {
   background: var(--ogr-layer-list-background-color-hover);
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-attributes {
+  display: block;
+  margin: 0 0.5rem 0 2rem;
+  /*
+  + .ogr-layer-attributes {
+      margin-top: -0.0625rem;
+  }
+  */
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-attributes .ogr-layer-attributes__title {
+  display: block;
+  padding: 0 0 0.25rem 0;
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-frames-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0.5rem 0;
+  display: flex;
+  flex-direction: row;
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-frames-list > li {
+  list-style: none;
+  margin: 0 0.5rem 0 0;
+  padding: 0;
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-frames-list > li .ogr-layer-thumbnail {
+  cursor: pointer;
+  display: block;
+  width: auto;
+  height: 3rem;
+  box-sizing: border-box;
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-frames-list > li .ogr-layer-thumbnail img {
+  width: auto;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border: 0.25rem solid var(--ogr-layer-list-thumbnail-border-color);
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-frames-list > li .ogr-layer-thumbnail.is-active img {
+  border-color: var(--ogr-layer-list-thumbnail-border-color-active);
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-frames-list > li:last-child {
+  margin-right: 0;
 }
 .opengraphica .ogr-layout-dnd-container {
   display: flex;
@@ -73021,6 +73072,9 @@ body.ogr-full-page {
   --ogr-overlay-background-color: rgba(31, 37, 45, 0.8);
   --ogr-snap-line-color: #66b1ff;
   --ogr-layer-list-background-color-hover: rgba(64, 158, 255, 0.1);
+  --ogr-layer-list-border-color: #0e1014;
+  --ogr-layer-list-thumbnail-border-color: #0e1014;
+  --ogr-layer-list-thumbnail-border-color-active: #333;
 }
 
 .opengraphica {
@@ -74327,6 +74381,22 @@ body.ogr-full-page {
 }
 .opengraphica .pb-4\.5, .opengraphica .py-4\.5 {
   padding-bottom: 1.25rem;
+}
+.opengraphica .is-border-radius-attach-left {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.opengraphica .is-border-radius-attach-right {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.opengraphica .is-border-radius-attach-top {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.opengraphica .is-border-radius-attach-bottom {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 .opengraphica .leading-none {
   line-height: 1;

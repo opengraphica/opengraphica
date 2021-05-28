@@ -419,9 +419,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                     top: decomposedPositionTransform.translateY,
                     width: this.activeLayer.width * decomposedTransform.scaleX,
                     height: this.activeLayer.height * decomposedTransform.scaleY,
-                    rotation: decomposedTransform.rotation,
-                    transformOriginX: this.activeLayer.transformOriginX,
-                    transformOriginY: this.activeLayer.transformOriginY
+                    rotation: decomposedTransform.rotation
                 });
             }
         }, 0);

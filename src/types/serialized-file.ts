@@ -3,6 +3,32 @@ import { VectorShape } from './vector';
 import { MeasuringUnits, ResolutionUnits } from './metrics';
 import { WorkingFileLayerBlendingMode, WorkingFileLayerFilter, WorkingFileLayerType } from './working-file';
 
+export interface SerializedFileTimelineKey {
+    timing: number[]; // Cubic beizer, array of 4
+    value: any;
+}
+
+export interface SerializedFileLayerTimelineFrame {
+    layerId: number;
+    start: number;
+    end: number | null;
+    keys: {
+        [key: string]: SerializedFileTimelineKey;
+    };
+}
+
+export type SerializedFileTimelineTrack = SerializedFileLayerTimelineFrame[];
+
+export interface SerializedFileTimeline {
+    id: number;
+    name: string;
+    start: number;
+    end: number;
+    tracks: {
+        [key: string]: SerializedFileTimelineTrack;
+    }
+}
+
 export interface SerializedFileLayer<T extends ColorModel> {
     blendingMode: WorkingFileLayerBlendingMode;
     filters: WorkingFileLayerFilter<T>[];
@@ -27,6 +53,19 @@ export interface SerializedFileRasterLayer<T extends ColorModel> extends Seriali
     data: {
         sourceImageSerialized?: string;
     }
+}
+
+export interface SerializedFileRasterSequenceLayerFrame<T extends ColorModel> {
+    start: number; // Milliseconds
+    end: number; // Milliseconds
+    image: SerializedFileRasterLayer<T>['data'];
+}
+
+export interface SerializedFileRasterSequenceLayer<T extends ColorModel> extends SerializedFileLayer<T> {
+    type: 'rasterSequence';
+    data: {
+        sequence: SerializedFileRasterSequenceLayerFrame<T>[];
+    };
 }
 
 export interface SerializedFileVectorLayer<T extends ColorModel> extends SerializedFileLayer<T> {

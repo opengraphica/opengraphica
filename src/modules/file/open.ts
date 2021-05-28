@@ -5,17 +5,19 @@
 
 import {
     SerializedFile, SerializedFileLayer, WorkingFileLayer, RGBAColor, InsertAnyLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions,
-    WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileVectorLayer, WorkingFileTextLayer,
-    SerializedFileGroupLayer, SerializedFileRasterLayer, SerializedFileVectorLayer, SerializedFileTextLayer, WorkingFileAnyLayer
+    WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer,
+    SerializedFileGroupLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileVectorLayer, SerializedFileTextLayer
 } from '@/types';
 import historyStore from '@/store/history';
 import preferencesStore from '@/store/preferences';
-import workingFileStore, { WorkingFileState } from '@/store/working-file';
+import workingFileStore, { WorkingFileState, getTimelineById } from '@/store/working-file';
 import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
+import layerRenderers from '@/canvas/renderers';
 import { UpdateFileAction } from '@/actions/update-file';
 import { CreateFileAction } from '@/actions/create-file';
 import { InsertLayerAction } from '@/actions/insert-layer';
+import { knownFileExtensions } from '@/lib/regex';
 
 interface FileDialogOpenOptions {
     insert?: boolean; // False will create a new document, true inserts into current document.
@@ -87,7 +89,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
     type FileReadType = 'json' | 'image';
     type FileReadResolve =
         { type: 'image', result: HTMLImageElement, file: File } |
-        { type: 'imageSequence', result: HTMLImageElement[], file: File } |
+        { type: 'imageSequence', result: { image: HTMLImageElement, duration: number }[], file: File } |
         { type: 'json', result: string, file: File };
 
     const readerPromises: Promise<FileReadResolve>[] = [];
@@ -107,7 +109,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                 const fileReadType: FileReadType = (file.type === 'text/plain' || file.name.match(/\.json$/)) ? 'json' : 'image';
 
                 if (!fileName) {
-                    fileName = file.name;
+                    fileName = file.name.replace(knownFileExtensions, '');
                 }
 
                 const fileReader = new FileReader();
@@ -124,7 +126,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                         image.src = URL.createObjectURL(file) as string;
                     });
                     if (file.type === 'image/gif') {
-                        const images: HTMLImageElement[] = [];
+                        const result: { image: HTMLImageElement, duration: number }[] = [];
                         await new Promise<void>(async (resolveImageFrames, rejectImageFrames) => {
                             // @ts-ignore
                             const SuperGif = (await import('libgif')).default;
@@ -147,7 +149,10 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                                                 image.src = URL.createObjectURL(blob) as string;
                                             });
                                         });
-                                        images.push(image);
+                                        result.push({
+                                            image,
+                                            duration: rub.get_duration_ms()
+                                        });
                                     } catch (error) {
                                         // TODO ?
                                     }
@@ -155,10 +160,10 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                                 resolveImageFrames();
                             });
                         });
-                        if (images.length === 1) {
-                            resolveReader({ type: 'image', result: images[0], file: file });
-                        } else if (images.length > 0) {
-                            resolveReader({ type: 'imageSequence', result: images, file: file });
+                        if (result.length === 1) {
+                            resolveReader({ type: 'image', result: result[0].image, file: file });
+                        } else if (result.length > 0) {
+                            resolveReader({ type: 'imageSequence', result, file: file });
                         } else {
                             rejectReader('No frames found in gif file "' + file.name + '".');
                         }
@@ -209,8 +214,6 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                         name: readerSettle.value.file.name,
                         width: image.width,
                         height: image.height,
-                        transformOriginX: 0.5,
-                        transformOriginY: 0.5,
                         data: {
                             sourceImage: image,
                             sourceImageIsObjectUrl: true
@@ -219,8 +222,8 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                 );
             }
             else if (readerSettle.value.type === 'imageSequence') {
-                const images = readerSettle.value.result;
-                const firstImage = images[0];
+                const results = readerSettle.value.result;
+                const firstImage = results[0].image;
                 if (firstImage.width > largestWidth) {
                     largestWidth = firstImage.width;
                 }
@@ -228,18 +231,18 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                     largestHeight = firstImage.height;
                 }
                 let timeIterator = 0;
-                const frameTime = 50;
-                const sequence = [];
-                for (let image of images) {
+                const sequence: WorkingFileRasterSequenceLayer<RGBAColor>['data']['sequence'] = [];
+                for (let result of results) {
                     sequence.push({
                         start: timeIterator,
-                        end: timeIterator + frameTime,
-                        frame: {
-                            sourceImage: image,
+                        end: timeIterator + result.duration,
+                        image: {
+                            sourceImage: result.image,
                             sourceImageIsObjectUrl: true
-                        }
+                        },
+                        thumbnailImageSrc: null
                     });
-                    timeIterator += frameTime;
+                    timeIterator += result.duration;
                 }
                 insertLayerActions.push(
                     new InsertLayerAction<InsertRasterSequenceLayerOptions<RGBAColor>>({
@@ -247,10 +250,8 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                         name: readerSettle.value.file.name,
                         width: firstImage.width,
                         height: firstImage.height,
-                        transformOriginX: 0.5,
-                        transformOriginY: 0.5,
                         data: {
-                            currentFrame: sequence[0].frame,
+                            currentFrame: sequence[0].image,
                             sequence
                         }
                     })
@@ -358,20 +359,44 @@ async function parseLayersToActions(layers: SerializedFileLayer<RGBAColor>[]): P
             visible: layer.visible,
             width: layer.width,
         };
-        switch (layer.type) {
-            case 'group':
-                parsedLayer = {
-                    ...parsedLayer,
-                    type: 'group',
-                    expanded: false,
-                    layers: []
-                } as WorkingFileGroupLayer<RGBAColor>;
-                insertLayerActions = insertLayerActions.concat(await parseLayersToActions((layer as SerializedFileGroupLayer<RGBAColor>).layers));
-                break;
-            case 'raster':
-                const serializedLayer = layer as SerializedFileRasterLayer<RGBAColor>;
+        if (layer.type === 'group') {
+            parsedLayer = {
+                ...parsedLayer,
+                type: 'group',
+                renderer: layerRenderers.group,
+                expanded: false,
+                layers: []
+            } as WorkingFileGroupLayer<RGBAColor>;
+            insertLayerActions = insertLayerActions.concat(await parseLayersToActions((layer as SerializedFileGroupLayer<RGBAColor>).layers));
+        } else if (layer.type === 'raster') {
+            const serializedLayer = layer as SerializedFileRasterLayer<RGBAColor>;
+            const image = new Image();
+            const base64Fetch = await fetch(serializedLayer.data.sourceImageSerialized || '');
+            const imageBlob = await base64Fetch.blob();
+            await new Promise<void>((resolve) => {
+                image.onload = () => {
+                    resolve();
+                };
+                image.onerror = () => {
+                    resolve();
+                };
+                image.src = URL.createObjectURL(imageBlob);
+            });
+            parsedLayer = {
+                ...parsedLayer,
+                type: 'raster',
+                renderer: layerRenderers.raster,
+                data: {
+                    sourceImage: image,
+                    sourceImageIsObjectUrl: true
+                }
+            } as WorkingFileRasterLayer<RGBAColor>;
+        } else if (layer.type === 'rasterSequence') {
+            const serializedLayer = layer as SerializedFileRasterSequenceLayer<RGBAColor>;
+            const parsedSequence: WorkingFileRasterSequenceLayer<RGBAColor>['data']['sequence'] = [];
+            for (let frame of serializedLayer.data.sequence) {
                 const image = new Image();
-                const base64Fetch = await fetch(serializedLayer.data.sourceImageSerialized || '');
+                const base64Fetch = await fetch(frame.image.sourceImageSerialized || '');
                 const imageBlob = await base64Fetch.blob();
                 await new Promise<void>((resolve) => {
                     image.onload = () => {
@@ -382,29 +407,40 @@ async function parseLayersToActions(layers: SerializedFileLayer<RGBAColor>[]): P
                     };
                     image.src = URL.createObjectURL(imageBlob);
                 });
-                parsedLayer = {
-                    ...parsedLayer,
-                    type: 'raster',
-                    data: {
+                parsedSequence.push({
+                    start: frame.start,
+                    end: frame.end,
+                    image: {
                         sourceImage: image,
                         sourceImageIsObjectUrl: true
-                    }
-                } as WorkingFileRasterLayer<RGBAColor>;
-                break;
-            case 'vector':
-                parsedLayer = {
-                    ...parsedLayer,
-                    type: 'vector',
-                    data: (layer as SerializedFileVectorLayer<RGBAColor>).data,
-                } as WorkingFileVectorLayer<RGBAColor>;
-                break;
-            case 'text':
-                parsedLayer = {
-                    ...parsedLayer,
-                    type: 'text',
-                    data: (layer as SerializedFileTextLayer<RGBAColor>).data,
-                } as WorkingFileTextLayer<RGBAColor>;
-                break;
+                    },
+                    thumbnailImageSrc: null
+                });
+            }
+            parsedLayer = {
+                ...parsedLayer,
+                type: 'rasterSequence',
+                renderer: layerRenderers.rasterSequence,
+                data: {
+                    currentFrame: parsedSequence[0]?.image,
+                    sequence: parsedSequence
+                }
+            } as WorkingFileRasterSequenceLayer<RGBAColor>;
+            (window as any).parsedLayer = parsedLayer;
+        } else if (layer.type === 'vector') {
+            parsedLayer = {
+                ...parsedLayer,
+                type: 'vector',
+                renderer: layerRenderers.vector,
+                data: (layer as SerializedFileVectorLayer<RGBAColor>).data,
+            } as WorkingFileVectorLayer<RGBAColor>;
+        } else if (layer.type === 'text') {
+            parsedLayer = {
+                ...parsedLayer,
+                type: 'text',
+                renderer: layerRenderers.text,
+                data: (layer as SerializedFileTextLayer<RGBAColor>).data,
+            } as WorkingFileTextLayer<RGBAColor>;
         }
         insertLayerActions.push(
             new InsertLayerAction<InsertAnyLayerOptions<RGBAColor>>(parsedLayer as InsertAnyLayerOptions<RGBAColor>)

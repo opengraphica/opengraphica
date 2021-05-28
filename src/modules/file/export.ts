@@ -6,6 +6,7 @@
 import workingFileStore from '@/store/working-file';
 import { drawWorkingFileToCanvas, trackCanvasTransforms } from '@/lib/canvas';
 import { saveAs } from 'file-saver';
+import { knownFileExtensions } from '@/lib/regex';
 
 declare class ClipboardItem {
     constructor(data: { [mimeType: string]: Blob });
@@ -38,7 +39,7 @@ export async function exportAsImage(options: ExportOptions): Promise<void> {
             ctx.imageSmoothingEnabled = false;
             drawWorkingFileToCanvas(canvas, ctx, { selectedLayersOnly: options.layerSelection === 'selected' });
 
-            const fileName = (options.fileName || 'image').replace(/(\.(json|png|jpg|jpeg|webp|gif|bmp|tif|tiff))$/ig, '') + '.' + options.fileType;
+            const fileName = (options.fileName || 'image').replace(knownFileExtensions, '') + '.' + options.fileType;
 
             const mimeType: string = extensionToMimeType[options.fileType];
 

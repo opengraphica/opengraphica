@@ -45,8 +45,6 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
                 opacity: 1,
                 thumbnailImageSrc: null,
                 transform: new DOMMatrix(),
-                transformOriginX: 0,
-                transformOriginY: 0,
                 visible: true,
                 renderer: layerRenderers.base
             }

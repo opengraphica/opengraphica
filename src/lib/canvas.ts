@@ -62,11 +62,7 @@ export const drawWorkingFileLayerToCanvas = (targetCanvas: HTMLCanvasElement, ta
         ctx.globalCompositeOperation = layer.blendingMode;
         const isIdentity = layer.transform.isIdentity;
         if (!isIdentity) {
-            const originTranslateX = layer.transformOriginX * layer.width;
-            const originTranslateY = layer.transformOriginY * layer.height;
-            // ctx.translate(-originTranslateX, -originTranslateY);
             ctx.transform(layer.transform.a, layer.transform.b, layer.transform.c, layer.transform.d, layer.transform.e, layer.transform.f);
-            // ctx.translate(originTranslateX, originTranslateY);
         }
         layer.renderer.draw(ctx, layer);
         ctx.restore();

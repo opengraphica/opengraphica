@@ -4,8 +4,8 @@
  */
 import {
     SerializedFile, SerializedFileLayer, WorkingFileLayer, RGBAColor,
-    SerializedFileGroupLayer, SerializedFileTextLayer, SerializedFileRasterLayer, SerializedFileVectorLayer,
-    WorkingFileGroupLayer, WorkingFileTextLayer, WorkingFileRasterLayer, WorkingFileVectorLayer
+    SerializedFileGroupLayer, SerializedFileTextLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileVectorLayer,
+    WorkingFileGroupLayer, WorkingFileTextLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer
 } from '@/types';
 import workingFileStore from '@/store/working-file';
 import { saveAs } from 'file-saver';
@@ -59,15 +59,41 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<RGBAColor>[]): Seri
             visible: layer.visible,
             width: layer.width,
         };
-        switch (layer.type) {
-            case 'group':
+        if (layer.type === 'group') {
+            serializedLayer = {
+                ...serializedLayer,
+                type: 'group',
+                layers: serializeWorkingFileLayers((layer as WorkingFileGroupLayer<RGBAColor>).layers)
+            } as SerializedFileGroupLayer<RGBAColor>;
+        } else if (layer.type === 'raster') {
+            const canvas = document.createElement('canvas');
+            canvas.width = layer.width;
+            canvas.height = layer.height;
+            const ctx = canvas.getContext('2d');
+            try {
+                if (!ctx) {
+                    throw new Error('Missing canvas context');
+                }
+                ctx.imageSmoothingEnabled = false;
+                ctx.drawImage((layer as WorkingFileRasterLayer<RGBAColor>).data.sourceImage as HTMLImageElement, 0, 0);
                 serializedLayer = {
                     ...serializedLayer,
-                    type: 'group',
-                    layers: serializeWorkingFileLayers((layer as WorkingFileGroupLayer<RGBAColor>).layers)
-                } as SerializedFileGroupLayer<RGBAColor>;
-                break;
-            case 'raster':
+                    type: 'raster',
+                    data: {
+                        sourceImageSerialized: canvas.toDataURL('image/png')
+                    }
+                } as SerializedFileRasterLayer<RGBAColor>;
+                canvas.width = 1;
+                canvas.height = 1;
+            } catch (error) {
+                canvas.width = 1;
+                canvas.height = 1;
+                throw error;
+            }
+        } else if (layer.type === 'rasterSequence') {
+            const memoryLayer = (layer as WorkingFileRasterSequenceLayer<RGBAColor>);
+            const serializedSequence: SerializedFileRasterSequenceLayer<RGBAColor>['data']['sequence'] = [];
+            for (let frame of memoryLayer.data.sequence) {
                 const canvas = document.createElement('canvas');
                 canvas.width = layer.width;
                 canvas.height = layer.height;
@@ -77,14 +103,14 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<RGBAColor>[]): Seri
                         throw new Error('Missing canvas context');
                     }
                     ctx.imageSmoothingEnabled = false;
-                    ctx.drawImage((layer as WorkingFileRasterLayer<RGBAColor>).data.sourceImage as HTMLImageElement, 0, 0);
-                    serializedLayer = {
-                        ...serializedLayer,
-                        type: 'raster',
-                        data: {
+                    ctx.drawImage(frame.image.sourceImage as HTMLImageElement, 0, 0);
+                    serializedSequence.push({
+                        start: frame.start,
+                        end: frame.end,
+                        image: {
                             sourceImageSerialized: canvas.toDataURL('image/png')
                         }
-                    } as SerializedFileRasterLayer<RGBAColor>;
+                    });
                     canvas.width = 1;
                     canvas.height = 1;
                 } catch (error) {
@@ -92,21 +118,26 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<RGBAColor>[]): Seri
                     canvas.height = 1;
                     throw error;
                 }
-                break;
-            case 'vector':
-                serializedLayer = {
-                    ...serializedLayer,
-                    type: 'vector',
-                    data: (layer as WorkingFileVectorLayer<RGBAColor>).data
-                } as SerializedFileVectorLayer<RGBAColor>;
-                break;
-            case 'text':
-                serializedLayer = {
-                    ...serializedLayer,
-                    type: 'text',
-                    data: (layer as WorkingFileTextLayer<RGBAColor>).data
-                } as SerializedFileTextLayer<RGBAColor>;
-                break;
+            }
+            serializedLayer = {
+                ...serializedLayer,
+                type: 'rasterSequence',
+                data: {
+                    sequence: serializedSequence
+                }
+            } as SerializedFileRasterSequenceLayer<RGBAColor>;
+        } else if (layer.type === 'vector') {
+            serializedLayer = {
+                ...serializedLayer,
+                type: 'vector',
+                data: (layer as WorkingFileVectorLayer<RGBAColor>).data
+            } as SerializedFileVectorLayer<RGBAColor>;
+        } else if (layer.type === 'text') {
+            serializedLayer = {
+                ...serializedLayer,
+                type: 'text',
+                data: (layer as WorkingFileTextLayer<RGBAColor>).data
+            } as SerializedFileTextLayer<RGBAColor>;
         }
         serializedLayers.push(serializedLayer);
     }

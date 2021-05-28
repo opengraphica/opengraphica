@@ -73,6 +73,7 @@ import workingFileStore from '@/store/working-file';
 import { notifyInjector, unexpectedErrorMessage, validationSubmissionErrorMessage } from '@/lib/notify';
 import { Rules, RuleItem } from 'async-validator';
 import { exportAsImage, isfileFormatSupported } from '@/modules/file/export';
+import { knownFileExtensions } from '@/lib/regex';
 
 export default defineComponent({
     name: 'ModuleFileExport',
@@ -141,7 +142,7 @@ export default defineComponent({
                 await form.value.validate();
                 loading.value = true;
                 try {
-                    workingFileStore.set('fileName', formData.workingFile.fileName);
+                    workingFileStore.set('fileName', formData.workingFile.fileName.replace(knownFileExtensions, ''));
                     await exportAsImage({
                         fileName: formData.workingFile.fileName,
                         fileType: formData.workingFile.fileType,

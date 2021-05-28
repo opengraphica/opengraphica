@@ -51,7 +51,7 @@ export default defineComponent({
         let lastCssDecomposedScale: number = 1;
         const drawPostProcessWait: number = 100;
         const usePostProcess = computed<boolean>(() => {
-            return preferencesStore.state.postProcessInterpolateImage && !preferencesStore.state.useCanvasViewport;
+            return preferencesStore.state.postProcessInterpolateImage && !preferencesStore.state.useCanvasViewport && canvasStore.state.decomposedTransform.scaleX < 1;
         });
 
         const hasCanvasOverlays = computed<boolean>(() => {
@@ -256,10 +256,7 @@ export default defineComponent({
                             }
                             else if (decomposedTransform.scaleX !== lastCssDecomposedScale) {
                                 if (canvasStore.get('preventPostProcess')) {
-                                    lastCssDecomposedScale = -1;
-                                    postProcessCanvas.value.width = 1;
-                                    postProcessCanvas.value.height = 1;
-                                    postProcessCanvas.value.style.display = 'none';
+                                    cancelPostProcess();
                                 } else {
                                     drawPostProcess();
                                     lastCssDecomposedScale = decomposedTransform.scaleX;
@@ -288,9 +285,7 @@ export default defineComponent({
                     if (postProcessCanvas.value) {
                         postProcessCanvas.value.style.display = 'none';
                         if (canvasStore.get('preventPostProcess')) {
-                            lastCssDecomposedScale = -1;
-                            postProcessCanvas.value.width = 1;
-                            postProcessCanvas.value.height = 1;
+                            cancelPostProcess();
                         } else {
                             drawPostProcess();
                         }
@@ -347,6 +342,20 @@ export default defineComponent({
                     });
                     
                 }, drawPostProcessWait);
+            }
+        }
+
+        function cancelPostProcess() {
+            lastCssDecomposedScale = -1;
+            if (postProcessCanvas.value) {
+                postProcessCanvas.value.style.display = 'none';
+                postProcessCanvas.value.width = 1;
+                postProcessCanvas.value.height = 1;
+            }
+            clearTimeout(drawPostProcessTimeoutHandle);
+            if (postProcessCancel) {
+                postProcessCancel();
+                postProcessCancel = null;
             }
         }
 

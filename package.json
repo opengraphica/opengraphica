@@ -14,7 +14,7 @@
     "dependencies": {
         "axios": "^0.21.1",
         "bootstrap-icons": "1.4.0",
-        "element-plus": "1.0.2-beta.41",
+        "element-plus": "^1.0.2-beta.45",
         "expr-eval": "^2.0.2",
         "file-saver": "^2.0.5",
         "libgif": "0.0.3",

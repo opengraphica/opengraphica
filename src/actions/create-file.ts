@@ -28,6 +28,7 @@ export class CreateFileAction extends BaseAction {
 
         const changes: Partial<WorkingFileState> | any = {
             activeLayerId: this.createFileOptions.activeLayerId || null,
+            activeTimelineId: this.createFileOptions.activeTimelineId || null,
             colorModel: this.createFileOptions.colorModel || 'rgba',
             drawOriginX: this.createFileOptions.drawOriginX || 0,
             drawOriginY: this.createFileOptions.drawOriginY || 0,
@@ -41,6 +42,8 @@ export class CreateFileAction extends BaseAction {
             resolutionY: this.createFileOptions.resolutionY || 300,
             scaleFactor: this.createFileOptions.scaleFactor || 1,
             selectedLayerIds: this.createFileOptions.selectedLayerIds || [],
+            timelineIdCounter: this.createFileOptions.timelineIdCounter || 0,
+            timelines: this.createFileOptions.timelines || [],
             width: this.createFileOptions.width
         };
 

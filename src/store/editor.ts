@@ -46,6 +46,7 @@ interface EditorDispatch {
     setThemes: {
         [themeName: string]: string;
     };
+    setTimelineCursor: number;
 }
 
 interface EditorStore {
@@ -210,8 +211,7 @@ function updateRasterSequenceLayerWithTimeline(layer: WorkingFileRasterSequenceL
     const timelineCursor = store.get('timelineCursor');
     for (let frame of layer.data.sequence) {
         if (frame.start <= timelineCursor && frame.end > timelineCursor) {
-            layer.data.currentFrame = frame.frame;
-            console.log(layer.data);
+            layer.data.currentFrame = frame.image;
             break;
         }
     }

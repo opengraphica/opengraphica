@@ -1,8 +1,9 @@
 import { PerformantStore } from './performant-store';
-import { RGBAColor, MeasuringUnits, ResolutionUnits, ColorModelName, WorkingFileLayer, WorkingFileGroupLayer } from '@/types';
+import { RGBAColor, MeasuringUnits, ResolutionUnits, ColorModelName, WorkingFileLayer, WorkingFileGroupLayer, WorkingFileTimeline } from '@/types';
 
 interface WorkingFileState {
     activeLayerId: number | null,
+    activeTimelineId: number | null,
     colorModel: ColorModelName;
     colorSpace: string;
     drawOriginX: number;
@@ -17,6 +18,8 @@ interface WorkingFileState {
     resolutionY: number;
     scaleFactor: number;
     selectedLayerIds: number[];
+    timelineIdCounter: 0,
+    timelines: WorkingFileTimeline[];
     width: number; // Always pixels
 }
 
@@ -28,6 +31,7 @@ interface WorkingFileStore {
 const store = new PerformantStore<WorkingFileStore>({
     state: {
         activeLayerId: null,
+        activeTimelineId: null,
         colorModel: 'rgba',
         colorSpace: 'sRGB',
         drawOriginX: 0,
@@ -42,6 +46,8 @@ const store = new PerformantStore<WorkingFileStore>({
         resolutionY: 300,
         scaleFactor: 1,
         selectedLayerIds: [],
+        timelineIdCounter: 0,
+        timelines: [],
         width: 818 // Always pixels
     }
 });
@@ -71,6 +77,16 @@ function getGroupLayerById(id: number, parent: WorkingFileLayer<RGBAColor>[]): W
     return null;
 }
 
+function getTimelineById(id: number): WorkingFileTimeline | null {
+    const timelines = store.get('timelines');
+    for (let timeline of timelines) {
+        if (timeline.id === id) {
+            return timeline;
+        }
+    }
+    return null;
+}
+
 export default store;
 
-export { WorkingFileStore, WorkingFileState, getLayerById, getGroupLayerById };
+export { WorkingFileStore, WorkingFileState, getLayerById, getGroupLayerById, getTimelineById };

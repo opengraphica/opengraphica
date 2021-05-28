@@ -6,8 +6,9 @@ export {
 export { FilterAugment } from './filter';
 export { MeasuringUnits, ResolutionUnits } from './metrics';
 export {
-    SerializedFile, SerializedFileGroupLayer, SerializedFileRasterLayer, SerializedFileVectorLayer, SerializedFileTextLayer,
-    SerializedFileLayer
+    SerializedFileTimeline, SerializedFileTimelineTrack, SerializedFileLayerTimelineFrame, SerializedFileTimelineKey,
+    SerializedFile, SerializedFileGroupLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileVectorLayer,
+    SerializedFileTextLayer, SerializedFileLayer
 } from './serialized-file';
 export {
     LayoutShortcutGroupDefinition, LayoutShortcutGroupDefinitionControl, LayoutShortcutGroupDefinitionControlButton,
@@ -20,7 +21,8 @@ export {
 } from './vector';
 export {
     NewFilePreset, WorkingFileLayer, WorkingFileLayerBlendingMode, WorkingFileLayerType, WorkingFileLayerRenderer, WorkingFileGroupLayer,
-    WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer,
+    WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer, WorkingFileRasterSequenceLayerFrame,
     InsertGroupLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions, InsertVectorLayerOptions, InsertTextLayerOptions, InsertAnyLayerOptions,
-    UpdateGroupLayerOptions, UpdateRasterLayerOptions, UpdateRasterSequenceLayerOptions, UpdateVectorLayerOptions, UpdateTextLayerOptions, UpdateAnyLayerOptions
+    UpdateGroupLayerOptions, UpdateRasterLayerOptions, UpdateRasterSequenceLayerOptions, UpdateVectorLayerOptions, UpdateTextLayerOptions, UpdateAnyLayerOptions,
+    WorkingFileTimeline, WorkingFileTimelineTrack, WorkingFileLayerTimelineFrame, WorkingFileTimelineKey
 } from './working-file';

@@ -34,7 +34,13 @@ export interface WorkingFileLayerTimelineFrame {
 export type WorkingFileTimelineTrack = WorkingFileLayerTimelineFrame[];
 
 export interface WorkingFileTimeline {
-    [key: string]: WorkingFileTimelineTrack;
+    id: number;
+    name: string;
+    start: number;
+    end: number;
+    tracks: {
+        [key: string]: WorkingFileTimelineTrack; // Mapping of layer id to frame list
+    }
 }
 
 export interface WorkingFileLayer<T extends ColorModel> {
@@ -49,8 +55,6 @@ export interface WorkingFileLayer<T extends ColorModel> {
     renderer: WorkingFileLayerRenderer<T>;
     thumbnailImageSrc: string | null;
     transform: DOMMatrix;
-    transformOriginX: number; // Range 0-1 where 0 is the left and 1 is the right edge of the layer.
-    transformOriginY: number; // Range 0-1 where 0 is the top and 1 is the bottom edge of the layer.
     type: WorkingFileLayerType;
     visible: boolean;
     width: number;
@@ -71,15 +75,18 @@ export interface WorkingFileRasterLayer<T extends ColorModel> extends WorkingFil
     }
 }
 
+export interface WorkingFileRasterSequenceLayerFrame<T extends ColorModel> {
+    start: number; // Milliseconds
+    end: number; // Milliseconds
+    image: WorkingFileRasterLayer<T>['data'];
+    thumbnailImageSrc: string | null;
+}
+
 export interface WorkingFileRasterSequenceLayer<T extends ColorModel> extends WorkingFileLayer<T> {
     type: 'rasterSequence';
     data: {
         currentFrame?: WorkingFileRasterLayer<T>['data'];
-        sequence: {
-            start: number; // Milliseconds
-            end: number; // Milliseconds
-            frame: WorkingFileRasterLayer<T>['data'];
-        }[];
+        sequence: WorkingFileRasterSequenceLayerFrame<T>[];
     };
 }
 
