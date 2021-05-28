@@ -72,17 +72,23 @@ body.ogr-full-page {
             padding: 0;
             display: flex;
             flex-direction: row;
-            height: 5rem;
+            height: 4rem;
 
-            &:hover {
+            &.is-dnd-hover {
                 background: var(--ogr-layer-list-background-color-hover);
+            }
+
+            .ogr-layer-dnd-handle {
+                display: flex;
+                flex-direction: row;
+                flex-grow: 1;
             }
 
             .ogr-layer-thumbnail {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                width: 5rem;
+                width: 4rem;
                 height: 100%;
                 padding: 0.5rem;
                 box-sizing: border-box;
@@ -109,6 +115,10 @@ body.ogr-full-page {
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+            }
+
+            .el-button:hover {
+                background: var(--ogr-layer-list-background-color-hover);
             }
         }
     }

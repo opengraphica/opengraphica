@@ -20,7 +20,7 @@ export {
 } from './vector';
 export {
     NewFilePreset, WorkingFileLayer, WorkingFileLayerBlendingMode, WorkingFileLayerType, WorkingFileLayerRenderer, WorkingFileGroupLayer,
-    WorkingFileRasterLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer, InsertGroupLayerOptions, InsertRasterLayerOptions,
-    InsertVectorLayerOptions, InsertTextLayerOptions, InsertAnyLayerOptions, UpdateGroupLayerOptions, UpdateRasterLayerOptions,
-    UpdateVectorLayerOptions, UpdateTextLayerOptions, UpdateAnyLayerOptions
+    WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer,
+    InsertGroupLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions, InsertVectorLayerOptions, InsertTextLayerOptions, InsertAnyLayerOptions,
+    UpdateGroupLayerOptions, UpdateRasterLayerOptions, UpdateRasterSequenceLayerOptions, UpdateVectorLayerOptions, UpdateTextLayerOptions, UpdateAnyLayerOptions
 } from './working-file';

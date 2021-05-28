@@ -1,8 +1,10 @@
 import { PerformantStore } from './performant-store';
 import BaseCanvasController from '@/canvas/controllers/base';
 import toolGroupsConfig from '@/config/tool-groups.json';
-import { ToolGroupDefinition } from '@/types';
+import { ToolGroupDefinition, WorkingFileLayer, WorkingFileGroupLayer, WorkingFileRasterSequenceLayer, RGBAColor } from '@/types';
 import { loadStylesheet } from '@/lib/stylesheet';
+import canvasStore from './canvas';
+import workingFileStore from './working-file';
 
 interface EditorDeferredTask {
     name: string,
@@ -29,6 +31,7 @@ interface EditorState {
     themes: {
         [themeName: string]: string;
     };
+    timelineCursor: number; // Milliseconds
     toolCanvasController: BaseCanvasController;
     waiting: boolean;
 }
@@ -67,10 +70,11 @@ const store = new PerformantStore<EditorStore>({
         loadingThemeName: null,
         tasks: [],
         themes: {},
+        timelineCursor: 0,
         toolCanvasController: new BaseCanvasController(),
         waiting: false
     },
-    readOnly: ['activeTheme', 'activeTool', 'activeToolGroup', 'themes'],
+    readOnly: ['activeTheme', 'activeTool', 'activeToolGroup', 'themes', 'timelineCursor'],
     async onDispatch(actionName: string, value: any, set) {
         switch (actionName) {
             case 'scheduleTask':
@@ -159,6 +163,10 @@ const store = new PerformantStore<EditorStore>({
                     await store.dispatch('setActiveTheme', themeNames[0]);
                 }
                 break;
+            case 'setTimelineCursor':
+                set('timelineCursor', value);
+                updateLayersWithTimeline();
+                canvasStore.set('dirty', true);
         }
     }
 });
@@ -187,6 +195,28 @@ async function runTasks(runId: number, set: PerformantStore<EditorStore>['direct
     }
 }
 
+function updateLayersWithTimeline(parentLayers?: WorkingFileLayer<RGBAColor>[]) {
+    parentLayers = parentLayers || workingFileStore.get('layers');
+    for (let layer of parentLayers) {
+        if (layer.type === 'rasterSequence') {
+            updateRasterSequenceLayerWithTimeline(layer as WorkingFileRasterSequenceLayer<RGBAColor>);
+        } else if (layer.type === 'group') {
+            updateLayersWithTimeline((layer as WorkingFileGroupLayer<RGBAColor>).layers);
+        }
+    }
+}
+
+function updateRasterSequenceLayerWithTimeline(layer: WorkingFileRasterSequenceLayer<RGBAColor>) {
+    const timelineCursor = store.get('timelineCursor');
+    for (let frame of layer.data.sequence) {
+        if (frame.start <= timelineCursor && frame.end > timelineCursor) {
+            layer.data.currentFrame = frame.frame;
+            console.log(layer.data);
+            break;
+        }
+    }
+}
+
 export default store;
 
-export { EditorStore, EditorState };
+export { EditorStore, EditorState, updateRasterSequenceLayerWithTimeline };

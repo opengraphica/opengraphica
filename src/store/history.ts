@@ -7,6 +7,7 @@ import appEmitter from '@/lib/emitter';
 interface HistoryState {
     actionStack: BaseAction[];
     actionStackIndex: number;
+    actionStackUpdateToggle: boolean;
     canRedo: boolean;
     canUndo: boolean;
 }
@@ -33,6 +34,7 @@ const store = new PerformantStore<HistoryStore>({
     state: {
         actionStack: [],
         actionStackIndex: 0,
+        actionStackUpdateToggle: false, // Toggles between true/false every history update for watchers
         canUndo: false,
         canRedo: false
     },
@@ -95,6 +97,7 @@ async function dispatchFree({ databaseSize, memorySize }: HistoryDispatch['free'
     }
     set('actionStack', actionStack);
     set('actionStackIndex', actionStackIndex);
+    set('actionStackUpdateToggle', !store.state.actionStackUpdateToggle);
     set('canUndo', actionStackIndex > 0);
     set('canRedo', actionStackIndex < actionStack.length);
 
@@ -156,6 +159,7 @@ async function dispatchRunAction({ action, mergeWithHistory }: HistoryDispatch['
     }
     set('actionStack', actionStack);
     set('actionStackIndex', actionStackIndex);
+    set('actionStackUpdateToggle', !store.state.actionStackUpdateToggle);
     set('canUndo', actionStackIndex > 0);
     set('canRedo', actionStackIndex < actionStack.length);
 
@@ -178,6 +182,7 @@ async function dispatchUndo(set: PerformantStore<HistoryStore>['directSet']) {
         actionStackIndex--;
         await actionStack[actionStackIndex].undo();
         set('actionStackIndex', actionStackIndex);
+        set('actionStackUpdateToggle', !store.state.actionStackUpdateToggle);
         set('canUndo', actionStackIndex > 0);
         set('canRedo', actionStackIndex < actionStack.length);
         appEmitter.emit('editor.history.step');
@@ -194,6 +199,7 @@ async function dispatchRedo(set: PerformantStore<HistoryStore>['directSet']) {
         await action.do();
         actionStackIndex++;
         set('actionStackIndex', actionStackIndex);
+        set('actionStackUpdateToggle', !store.state.actionStackUpdateToggle);
         set('canUndo', actionStackIndex > 0);
         set('canRedo', actionStackIndex < actionStack.length);
         appEmitter.emit('editor.history.step');

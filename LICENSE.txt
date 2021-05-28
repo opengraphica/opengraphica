@@ -1,5 +1,4 @@
-Copyright (c) 2020-2021 Opengraphica Project Developers
-See the contributors.txt file at the top-level directory of this distribution for a list of Opengraphica Project Developers.
+Copyright (c) 2020-2021 Opengraphica Project Developers (See the contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

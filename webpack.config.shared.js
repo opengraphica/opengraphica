@@ -205,6 +205,10 @@ module.exports = function setupConfig(config) {
                         test: /[\\/]node_modules[\\/](expr-eval)[\\/]/,
                         name: 'expr-eval'
                     },
+                    libgif: {
+                        test: /[\\/]node_modules[\\/]libgif[\\/]/,
+                        name: 'libgif'
+                    },
                     opengraphicaActions: {
                         test: /[\\/]src[\\/]actions[\\/]/,
                         name: 'actions'

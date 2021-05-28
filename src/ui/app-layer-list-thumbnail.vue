@@ -61,7 +61,9 @@ export default defineComponent({
                     skewX: 0,
                     scaleX: 1,
                     scaleY: 1
-                } as DecomposedMatrix);
+                } as DecomposedMatrix, {
+                    visible: true
+                });
                 props.layer.thumbnailImageSrc = canvas.toDataURL();
             }
             return props.layer.thumbnailImageSrc;

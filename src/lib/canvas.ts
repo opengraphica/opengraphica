@@ -26,45 +26,51 @@ const cursorImages: { [key: string]: { data: string, image: HTMLImageElement | n
     }
 })();
 
-export const drawWorkingFileLayerToCanvas = (targetCanvas: HTMLCanvasElement, targetCtx: CanvasRenderingContext2DEnhanced, layer: WorkingFileLayer<ColorModel>, decomposedTransform: DecomposedMatrix) => {
-    let ctx = targetCtx;
-    
-    if (preferencesStore.get('enableMultiLayerBuffer') && !canvasStore.get('useCssViewport') && decomposedTransform.scaleX < 1) {
-        const isBufferInUse = canvasStore.get('isBufferInUse');
-        if (layer.type === 'raster') {
-            ctx = canvasStore.get('bufferCtx');
-            if (!isBufferInUse) {
-                canvasStore.set('isBufferInUse', true);
-                // Clear the buffer
-                ctx.setTransform(1, 0, 0, 1, 0, 0);
-                ctx.clearRect(0, 0, workingFileStore.get('width'), workingFileStore.get('height'));
-            }
-        } else if (layer.type !== 'group') {
-            // No longer on a raster layer, draw the previous buffer to canvas before anything else.
-            if (isBufferInUse) {
-                canvasStore.set('isBufferInUse', false);
-                targetCtx.drawImage(canvasStore.get('bufferCanvas'), 0, 0);
+interface DrawWorkingFileLayerOptions {
+    visible?: boolean;
+}
+
+export const drawWorkingFileLayerToCanvas = (targetCanvas: HTMLCanvasElement, targetCtx: CanvasRenderingContext2DEnhanced, layer: WorkingFileLayer<ColorModel>, decomposedTransform: DecomposedMatrix, options: DrawWorkingFileLayerOptions = {}) => {
+    if (options.visible || layer.visible) {
+        let ctx = targetCtx;
+        
+        if (preferencesStore.get('enableMultiLayerBuffer') && !canvasStore.get('useCssViewport') && decomposedTransform.scaleX < 1) {
+            const isBufferInUse = canvasStore.get('isBufferInUse');
+            if (layer.type === 'raster') {
+                ctx = canvasStore.get('bufferCtx');
+                if (!isBufferInUse) {
+                    canvasStore.set('isBufferInUse', true);
+                    // Clear the buffer
+                    ctx.setTransform(1, 0, 0, 1, 0, 0);
+                    ctx.clearRect(0, 0, workingFileStore.get('width'), workingFileStore.get('height'));
+                }
+            } else if (layer.type !== 'group') {
+                // No longer on a raster layer, draw the previous buffer to canvas before anything else.
+                if (isBufferInUse) {
+                    canvasStore.set('isBufferInUse', false);
+                    targetCtx.drawImage(canvasStore.get('bufferCanvas'), 0, 0);
+                }
             }
         }
-    }
 
-    if (layer.type !== 'raster' && layer.type !== 'group') {
-        canvasStore.set('isDisplayingNonRasterLayer', true);
+        if (layer.type !== 'raster' && layer.type !== 'group') {
+            canvasStore.set('isDisplayingNonRasterLayer', true);
+        }
+        
+        ctx.save();
+        ctx.globalAlpha = layer.opacity;
+        ctx.globalCompositeOperation = layer.blendingMode;
+        const isIdentity = layer.transform.isIdentity;
+        if (!isIdentity) {
+            const originTranslateX = layer.transformOriginX * layer.width;
+            const originTranslateY = layer.transformOriginY * layer.height;
+            // ctx.translate(-originTranslateX, -originTranslateY);
+            ctx.transform(layer.transform.a, layer.transform.b, layer.transform.c, layer.transform.d, layer.transform.e, layer.transform.f);
+            // ctx.translate(originTranslateX, originTranslateY);
+        }
+        layer.renderer.draw(ctx, layer);
+        ctx.restore();
     }
-    
-    ctx.save();
-    ctx.globalAlpha = layer.opacity;
-    ctx.globalCompositeOperation = layer.blendingMode;
-    const isIdentity = layer.transform.isIdentity;
-    if (!isIdentity) {
-        const originTranslateX = layer.transformOriginX * layer.width;
-        const originTranslateY = layer.transformOriginY * layer.height;
-        // ctx.translate(-originTranslateX, -originTranslateY);
-        ctx.transform(layer.transform.a, layer.transform.b, layer.transform.c, layer.transform.d, layer.transform.e, layer.transform.f);
-        // ctx.translate(originTranslateX, originTranslateY);
-    }
-    layer.renderer.draw(ctx, layer);
-    ctx.restore();
 };
 
 interface DrawWorkingFileOptions {

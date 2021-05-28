@@ -7,7 +7,7 @@ export type WorkingFileLayerBlendingMode = 'color' | 'color-burn' | 'color-dodge
     'difference' | 'exclusion' | 'hard-light' | 'hue' | 'lighten' | 'lighter' | 'luminosity' | 
     'multiply' | 'overlay' | 'saturation' | 'screen' | 'soft-light' | 'source-atop' | 'source-in' | 
     'source-out' | 'source-over' | 'xor';
-export type WorkingFileLayerType = 'group' | 'raster' | 'vector' | 'text';
+export type WorkingFileLayerType = 'group' | 'raster' | 'rasterSequence' | 'vector' | 'text';
 
 export interface WorkingFileLayerFilter<T extends ColorModel> {
     name: string;
@@ -15,6 +15,26 @@ export interface WorkingFileLayerFilter<T extends ColorModel> {
 
 export interface WorkingFileLayerRenderer<T extends ColorModel> {
     draw(ctx: CanvasRenderingContext2DEnhanced, layer: WorkingFileLayer<T>): void;
+}
+
+export interface WorkingFileTimelineKey {
+    timing: number[]; // Cubic beizer, array of 4
+    value: any;
+}
+
+export interface WorkingFileLayerTimelineFrame {
+    layerId: number;
+    start: number; // Milliseconds
+    end: number | null; // Milliseconds
+    keys: {
+        [key: string]: WorkingFileTimelineKey;
+    };
+}
+
+export type WorkingFileTimelineTrack = WorkingFileLayerTimelineFrame[];
+
+export interface WorkingFileTimeline {
+    [key: string]: WorkingFileTimelineTrack;
 }
 
 export interface WorkingFileLayer<T extends ColorModel> {
@@ -51,6 +71,18 @@ export interface WorkingFileRasterLayer<T extends ColorModel> extends WorkingFil
     }
 }
 
+export interface WorkingFileRasterSequenceLayer<T extends ColorModel> extends WorkingFileLayer<T> {
+    type: 'rasterSequence';
+    data: {
+        currentFrame?: WorkingFileRasterLayer<T>['data'];
+        sequence: {
+            start: number; // Milliseconds
+            end: number; // Milliseconds
+            frame: WorkingFileRasterLayer<T>['data'];
+        }[];
+    };
+}
+
 export interface WorkingFileVectorLayer<T extends ColorModel> extends WorkingFileLayer<T> {
     type: 'vector';
     data: VectorShape<T>[];
@@ -61,7 +93,7 @@ export interface WorkingFileTextLayer<T extends ColorModel> extends WorkingFileL
     data: {}; // TODO
 }
 
-export type WorkingFileAnyLayer<T extends ColorModel> = WorkingFileGroupLayer<T> | WorkingFileRasterLayer<T> | WorkingFileVectorLayer<T> | WorkingFileTextLayer<T>;
+export type WorkingFileAnyLayer<T extends ColorModel> = WorkingFileGroupLayer<T> | WorkingFileRasterLayer<T> | WorkingFileRasterSequenceLayer<T> | WorkingFileVectorLayer<T> | WorkingFileTextLayer<T>;
 
 export interface InsertGroupLayerOptions<T extends ColorModel> extends Partial<WorkingFileGroupLayer<T>> {
     type: 'group';
@@ -69,18 +101,24 @@ export interface InsertGroupLayerOptions<T extends ColorModel> extends Partial<W
 export interface InsertRasterLayerOptions<T extends ColorModel> extends Partial<WorkingFileRasterLayer<T>> {
     type: 'raster';
 }
+export interface InsertRasterSequenceLayerOptions<T extends ColorModel> extends Partial<WorkingFileRasterSequenceLayer<T>> {
+    type: 'rasterSequence';
+}
 export interface InsertVectorLayerOptions<T extends ColorModel> extends Partial<WorkingFileVectorLayer<T>> {
     type: 'vector';
 }
 export interface InsertTextLayerOptions<T extends ColorModel> extends Partial<WorkingFileTextLayer<T>> {
     type: 'text';
 }
-export type InsertAnyLayerOptions<T extends ColorModel> = InsertGroupLayerOptions<T> | InsertRasterLayerOptions<T> | InsertVectorLayerOptions<T> | InsertTextLayerOptions<T>;
+export type InsertAnyLayerOptions<T extends ColorModel> = InsertGroupLayerOptions<T> | InsertRasterLayerOptions<T> | InsertRasterSequenceLayerOptions<T> | InsertVectorLayerOptions<T> | InsertTextLayerOptions<T>;
 
 export interface UpdateGroupLayerOptions<T extends ColorModel> extends Partial<WorkingFileGroupLayer<T>> {
     id: number;
 }
 export interface UpdateRasterLayerOptions<T extends ColorModel> extends Partial<WorkingFileRasterLayer<T>> {
+    id: number;
+}
+export interface UpdateRasterSequenceLayerOptions<T extends ColorModel> extends Partial<WorkingFileRasterSequenceLayer<T>> {
     id: number;
 }
 export interface UpdateVectorLayerOptions<T extends ColorModel> extends Partial<WorkingFileVectorLayer<T>> {
@@ -89,7 +127,7 @@ export interface UpdateVectorLayerOptions<T extends ColorModel> extends Partial<
 export interface UpdateTextLayerOptions<T extends ColorModel> extends Partial<WorkingFileTextLayer<T>> {
     id: number;
 }
-export type UpdateAnyLayerOptions<T extends ColorModel> = UpdateGroupLayerOptions<T> | UpdateRasterLayerOptions<T> | UpdateVectorLayerOptions<T> | UpdateTextLayerOptions<T>;
+export type UpdateAnyLayerOptions<T extends ColorModel> = UpdateGroupLayerOptions<T> | UpdateRasterLayerOptions<T> | UpdateRasterSequenceLayerOptions<T> | UpdateVectorLayerOptions<T> | UpdateTextLayerOptions<T>;
 
 export interface NewFilePreset {
     name: string,

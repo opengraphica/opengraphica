@@ -4,6 +4,12 @@ export interface ThrottleOptions {
     trailing?: boolean
 }
 
+const CUBIC_BEIZER_EASE = [.25, .1, .25, 1];
+const CUBIC_BEIZER_LINEAR = [0, 0, 1, 1];
+const CUBIC_BEIZER_EASE_IN = [.42, 0, 1, 1];
+const CUBIC_BEIZER_EASE_OUT = [0, 0, .58, 1];
+const CUBIC_BEIZER_EASE_IN_OUT = [.42, 0, .58, 1];
+
 /**
  * Throttles a callback with the specified wait time and callback options
  * https://stackoverflow.com/questions/27078285/simple-throttle-in-js

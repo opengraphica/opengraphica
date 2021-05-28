@@ -4,7 +4,7 @@
  */
 
 import {
-    SerializedFile, SerializedFileLayer, WorkingFileLayer, RGBAColor, InsertAnyLayerOptions, InsertRasterLayerOptions,
+    SerializedFile, SerializedFileLayer, WorkingFileLayer, RGBAColor, InsertAnyLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions,
     WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileVectorLayer, WorkingFileTextLayer,
     SerializedFileGroupLayer, SerializedFileRasterLayer, SerializedFileVectorLayer, SerializedFileTextLayer, WorkingFileAnyLayer
 } from '@/types';
@@ -85,7 +85,10 @@ export async function insertFromFileDialog() {
 export async function openFromFileList(files: FileList | Array<File>, options: FileDialogOpenOptions = {}) {
 
     type FileReadType = 'json' | 'image';
-    type FileReadResolve = { type: 'image', result: HTMLImageElement, file: File } | { type: 'json', result: string, file: File };
+    type FileReadResolve =
+        { type: 'image', result: HTMLImageElement, file: File } |
+        { type: 'imageSequence', result: HTMLImageElement[], file: File } |
+        { type: 'json', result: string, file: File };
 
     const readerPromises: Promise<FileReadResolve>[] = [];
 
@@ -120,7 +123,48 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                         };
                         image.src = URL.createObjectURL(file) as string;
                     });
-                    resolveReader({ type: 'image', result: image, file: file });
+                    if (file.type === 'image/gif') {
+                        const images: HTMLImageElement[] = [];
+                        await new Promise<void>(async (resolveImageFrames, rejectImageFrames) => {
+                            // @ts-ignore
+                            const SuperGif = (await import('libgif')).default;
+                            const gifParent = document.createElement('div');
+                            gifParent.appendChild(image);
+                            const rub = new SuperGif({ gif: image });
+                            rub.load(async () => {
+                                for (let i = 0; i < rub.get_length(); i++) {
+                                    rub.move_to(i);
+                                    try {
+                                        const image = await new Promise<HTMLImageElement>((resolveImage, rejectImage) => {
+                                            const image = new Image();
+                                            image.onload = () => {
+                                                resolveImage(image);
+                                            };
+                                            image.onerror = () => {
+                                                rejectImage();
+                                            };
+                                            rub.get_canvas().toBlob((blob: Blob) => {
+                                                image.src = URL.createObjectURL(blob) as string;
+                                            });
+                                        });
+                                        images.push(image);
+                                    } catch (error) {
+                                        // TODO ?
+                                    }
+                                }
+                                resolveImageFrames();
+                            });
+                        });
+                        if (images.length === 1) {
+                            resolveReader({ type: 'image', result: images[0], file: file });
+                        } else if (images.length > 0) {
+                            resolveReader({ type: 'imageSequence', result: images, file: file });
+                        } else {
+                            rejectReader('No frames found in gif file "' + file.name + '".');
+                        }
+                    } else {
+                        resolveReader({ type: 'image', result: image, file: file });
+                    }
                 }
                 else if (fileReadType === 'json') {
                     fileReader.onload = async () => {
@@ -173,7 +217,46 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                         }
                     })
                 );
-            } else if (readerSettle.value.type === 'json') {
+            }
+            else if (readerSettle.value.type === 'imageSequence') {
+                const images = readerSettle.value.result;
+                const firstImage = images[0];
+                if (firstImage.width > largestWidth) {
+                    largestWidth = firstImage.width;
+                }
+                if (firstImage.height > largestHeight) {
+                    largestHeight = firstImage.height;
+                }
+                let timeIterator = 0;
+                const frameTime = 50;
+                const sequence = [];
+                for (let image of images) {
+                    sequence.push({
+                        start: timeIterator,
+                        end: timeIterator + frameTime,
+                        frame: {
+                            sourceImage: image,
+                            sourceImageIsObjectUrl: true
+                        }
+                    });
+                    timeIterator += frameTime;
+                }
+                insertLayerActions.push(
+                    new InsertLayerAction<InsertRasterSequenceLayerOptions<RGBAColor>>({
+                        type: 'rasterSequence',
+                        name: readerSettle.value.file.name,
+                        width: firstImage.width,
+                        height: firstImage.height,
+                        transformOriginX: 0.5,
+                        transformOriginY: 0.5,
+                        data: {
+                            currentFrame: sequence[0].frame,
+                            sequence
+                        }
+                    })
+                );
+            }
+            else if (readerSettle.value.type === 'json') {
                 const { workingFileDefinition, insertLayerActions: workingFileInsertLayerActions } = await parseSerializedFileToActions(JSON.parse(readerSettle.value.result));
                 for (let prop in workingFileDefinition) {
                     if (prop === 'width') {

@@ -1,6 +1,6 @@
 import {
     RGBAColor, WorkingFileLayer,
-    WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer,
+    WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer,
     InsertAnyLayerOptions
 } from '@/types';
 import { BaseAction } from './base';
@@ -68,6 +68,14 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
                         renderer: layerRenderers.raster,
                         ...this.insertLayerOptions
                     } as WorkingFileRasterLayer<RGBAColor>;
+                    break;
+                case 'rasterSequence':
+                    newLayer = {
+                        ...sharedOptions,
+                        data: {},
+                        renderer: layerRenderers.rasterSequence,
+                        ...this.insertLayerOptions
+                    } as WorkingFileRasterSequenceLayer<RGBAColor>;
                     break;
                 case 'vector':
                     newLayer = {

@@ -5375,16 +5375,21 @@ body.ogr-full-page {
   padding: 0;
   display: flex;
   flex-direction: row;
-  height: 5rem;
+  height: 4rem;
 }
-.opengraphica .ogr-layer-list .ogr-layer:hover {
+.opengraphica .ogr-layer-list .ogr-layer.is-dnd-hover {
   background: var(--ogr-layer-list-background-color-hover);
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-dnd-handle {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
 }
 .opengraphica .ogr-layer-list .ogr-layer .ogr-layer-thumbnail {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 5rem;
+  width: 4rem;
   height: 100%;
   padding: 0.5rem;
   box-sizing: border-box;
@@ -5408,6 +5413,9 @@ body.ogr-full-page {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.opengraphica .ogr-layer-list .ogr-layer .el-button:hover {
+  background: var(--ogr-layer-list-background-color-hover);
 }
 .opengraphica .ogr-layout-dnd-container {
   display: flex;
