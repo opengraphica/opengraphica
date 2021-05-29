@@ -23,7 +23,7 @@ const store = new PerformantStore<PreferencesStore>({
         enableMultiLayerBuffer: false,
         historyStatesMax: 50,
         multiTouchDownTimeout: 50,
-        multiTouchTapTimeout: 50,
+        multiTouchTapTimeout: 200,
         pointerPressHoldTimeout: 500,
         postProcessInterpolateImage: true,
         preferCanvasViewport: false,

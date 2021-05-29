@@ -1,9 +1,16 @@
 <template>
     <ul class="ogr-layer-list">
         <template v-for="layer of reversedLayers" :key="layer.id">
-            <li class="ogr-layer" :class="{ 'is-dnd-hover': layer.id === hoveringLayerId, 'is-active': layer.id === activeLayerId }">
+            <li class="ogr-layer"
+                :class="{ 'is-dnd-hover': layer.id === hoveringLayerId, 'is-active': layer.id === activeLayerId }"
+                :data-layer-id="layer.id"
+            >
                 <span class="ogr-layer-main">
-                    <span class="ogr-layer-dnd-handle" @mouseenter="onMouseEnterDndHandle(layer)" @mouseleave="onMouseLeaveDndHandle(layer)">
+                    <span
+                        class="ogr-layer-dnd-handle"
+                        v-pointer.tap="onPointerTapDndHandle"
+                        @mouseenter="onMouseEnterDndHandle(layer)"
+                        @mouseleave="onMouseLeaveDndHandle(layer)">
                         <app-layer-list-thumbnail :layer="layer" />
                         <span class="ogr-layer-name">{{ layer.name }}</span>
                     </span>
@@ -46,6 +53,7 @@ import { defineComponent, ref, computed, watch, reactive, toRefs, nextTick, Prop
 import ElButton from 'element-plus/lib/el-button';
 import ElLoading from 'element-plus/lib/el-loading';
 import ElScrollbar from 'element-plus/lib/el-scrollbar';
+import pointerDirective from '@/directives/pointer';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
@@ -59,7 +67,8 @@ import { WorkingFileAnyLayer, RGBAColor, WorkingFileRasterSequenceLayer } from '
 export default defineComponent({
     name: 'AppLayerList',
     directives: {
-        loading: ElLoading.directive
+        loading: ElLoading.directive,
+        pointer: pointerDirective
     },
     components: {
         AppLayerListThumbnail,
@@ -95,6 +104,14 @@ export default defineComponent({
 
         function onMouseLeaveDndHandle(layer: WorkingFileAnyLayer<RGBAColor>) {
             hoveringLayerId.value = null;
+        }
+
+        function onPointerTapDndHandle(e: PointerEvent) {
+            const layerId: number = parseInt((e.target as Element)?.closest('.ogr-layer')?.getAttribute('data-layer-id') || '-1', 10);
+            workingFileStore.set('activeLayerId', layerId);
+        }
+        function onPointerDragStartDndHandle(layer: WorkingFileAnyLayer<RGBAColor>) {
+
         }
 
         function onToggleLayerVisibility(layer: WorkingFileAnyLayer<RGBAColor>) {
@@ -134,6 +151,8 @@ export default defineComponent({
             hoveringLayerId,
             onMouseEnterDndHandle,
             onMouseLeaveDndHandle,
+            onPointerTapDndHandle,
+            onPointerDragStartDndHandle,
             onToggleLayerVisibility,
             onSelectLayerFrame,
             onPlayRasterSequence,
