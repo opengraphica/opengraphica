@@ -76,8 +76,6 @@ export default defineComponent({
     emits: [
     ],
     setup(props, { emit }) {
-        const { ctx: vm } = getCurrentInstance() as any;
-
         const hoveringLayerId = ref<number | null>(null);
 
         const { playingAnimation } = toRefs(canvasStore.state);
@@ -88,10 +86,6 @@ export default defineComponent({
                 newLayersList.push(reactive(props.layers[i]));
             }
             return newLayersList;
-        });
-
-        watch(() => historyStore.state.actionStackUpdateToggle, () => {
-            vm.$forceUpdate();
         });
 
         function onMouseEnterDndHandle(layer: WorkingFileAnyLayer<RGBAColor>) {
@@ -144,6 +138,11 @@ export default defineComponent({
             onStopRasterSequence,
             reversedLayers
         };
+    },
+    mounted() {
+        this.$watch(() => historyStore.state.actionStackUpdateToggle, () => {
+            this.$forceUpdate();
+        });
     }
 });
 </script>
