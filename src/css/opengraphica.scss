@@ -71,7 +71,12 @@ body.ogr-full-page {
             margin: 0;
             padding: 0;
             display: block;
-            
+
+            &.is-active {
+                background: var(--ogr-layer-list-background-color-active);
+                box-shadow: 0.1875rem 0 0 var(--ogr-layer-list-thumbnail-border-color-active) inset;
+            }
+
             &.is-dnd-hover {
                 background: var(--ogr-layer-list-background-color-hover);
             }
@@ -100,6 +105,7 @@ body.ogr-full-page {
                     flex-shrink: 0;
 
                     img {
+                        background: white;
                         width: auto;
                         height: 100%;
                         box-sizing: border-box;
@@ -145,6 +151,12 @@ body.ogr-full-page {
                 }
             }
 
+            .ogr-layer-frames {
+                .el-scrollbar__view {
+                    display: inline-block;
+                }
+            }
+
             .ogr-layer-frames-list {
                 list-style: none;
                 margin: 0;
@@ -167,6 +179,7 @@ body.ogr-full-page {
                         position: relative;
     
                         img {
+                            background: white;
                             width: auto;
                             height: 100%;
                             margin: 0;

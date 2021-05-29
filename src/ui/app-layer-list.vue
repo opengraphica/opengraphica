@@ -1,7 +1,7 @@
 <template>
     <ul class="ogr-layer-list">
         <template v-for="layer of reversedLayers" :key="layer.id">
-            <li class="ogr-layer" :class="{ 'is-dnd-hover': layer.id === hoveringLayerId }">
+            <li class="ogr-layer" :class="{ 'is-dnd-hover': layer.id === hoveringLayerId, 'is-active': layer.id === activeLayerId }">
                 <span class="ogr-layer-main">
                     <span class="ogr-layer-dnd-handle" @mouseenter="onMouseEnterDndHandle(layer)" @mouseleave="onMouseLeaveDndHandle(layer)">
                         <app-layer-list-thumbnail :layer="layer" />
@@ -79,6 +79,7 @@ export default defineComponent({
         const hoveringLayerId = ref<number | null>(null);
 
         const { playingAnimation } = toRefs(canvasStore.state);
+        const { activeLayerId } = toRefs(workingFileStore.state);
 
         const reversedLayers = computed(() => {
             const newLayersList = [];
@@ -128,6 +129,7 @@ export default defineComponent({
         }
 
         return {
+            activeLayerId,
             playingAnimation,
             hoveringLayerId,
             onMouseEnterDndHandle,

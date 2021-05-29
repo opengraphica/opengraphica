@@ -5375,6 +5375,10 @@ body.ogr-full-page {
   padding: 0;
   display: block;
 }
+.opengraphica .ogr-layer-list .ogr-layer.is-active {
+  background: var(--ogr-layer-list-background-color-active);
+  box-shadow: 0.1875rem 0 0 var(--ogr-layer-list-thumbnail-border-color-active) inset;
+}
 .opengraphica .ogr-layer-list .ogr-layer.is-dnd-hover {
   background: var(--ogr-layer-list-background-color-hover);
 }
@@ -5401,6 +5405,7 @@ body.ogr-full-page {
   flex-shrink: 0;
 }
 .opengraphica .ogr-layer-list .ogr-layer .ogr-layer-main .ogr-layer-thumbnail img {
+  background: white;
   width: auto;
   height: 100%;
   box-sizing: border-box;
@@ -5435,6 +5440,9 @@ body.ogr-full-page {
   display: block;
   padding: 0 0 0.25rem 0;
 }
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-frames .el-scrollbar__view {
+  display: inline-block;
+}
 .opengraphica .ogr-layer-list .ogr-layer .ogr-layer-frames-list {
   list-style: none;
   margin: 0;
@@ -5457,6 +5465,7 @@ body.ogr-full-page {
   position: relative;
 }
 .opengraphica .ogr-layer-list .ogr-layer .ogr-layer-frames-list > li .ogr-layer-thumbnail img {
+  background: white;
   width: auto;
   height: 100%;
   margin: 0;
@@ -22256,6 +22265,7 @@ body.ogr-full-page {
   --ogr-overlay-background-color: rgba(255, 255, 255, 0.8);
   --ogr-snap-line-color: #66b1ff;
   --ogr-layer-list-background-color-hover: rgba(64, 158, 255, 0.1);
+  --ogr-layer-list-background-color-active: rgba(64, 158, 255, 0.05);
   --ogr-layer-list-border-color: #ebeef5;
   --ogr-layer-list-thumbnail-border-color: #ebeef5;
   --ogr-layer-list-thumbnail-border-color-active: #b5daff;
