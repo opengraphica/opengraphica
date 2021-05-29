@@ -32,6 +32,9 @@ interface EditorState {
         [themeName: string]: string;
     };
     timelineCursor: number; // Milliseconds
+    timelineEnd: number; // Milliseconds
+    timelinePlayStartTime: number; // Milliseconds
+    timelineStart: number; // Milliseconds
     toolCanvasController: BaseCanvasController;
     waiting: boolean;
 }
@@ -72,6 +75,9 @@ const store = new PerformantStore<EditorStore>({
         tasks: [],
         themes: {},
         timelineCursor: 0,
+        timelineEnd: 0,
+        timelinePlayStartTime: 0,
+        timelineStart: 0,
         toolCanvasController: new BaseCanvasController(),
         waiting: false
     },

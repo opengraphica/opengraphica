@@ -223,6 +223,7 @@ export default defineComponent({
             const canvasElement = canvas.value;
             try {
                 const isViewDirty = canvasStore.get('viewDirty');
+                const isPlayingAnimation = canvasStore.get('playingAnimation');
 
                 let cssViewTransform: string = '';
                 let decomposedTransform: DecomposedMatrix = null as any;
@@ -277,8 +278,17 @@ export default defineComponent({
                         }
                     }
                 }
-                if (canvasStore.get('dirty') && canvasElement && ctx) {
+                if ((canvasStore.get('dirty') || isPlayingAnimation) && canvasElement && ctx) {
                     canvasStore.set('dirty', false);
+
+                    if (isPlayingAnimation) {
+                        const now = performance.now();
+                        const { timelinePlayStartTime, timelineStart, timelineEnd } = editorStore.state;
+                        const timelineRange = timelineEnd - timelineStart;
+                        const cursor = ((now - timelinePlayStartTime) % timelineRange) + timelineStart;
+                        editorStore.dispatch('setTimelineCursor', cursor);
+                    }
+
                     drawWorkingFileToCanvas(canvasElement, ctx);
 
                     // Post process for better pixel interpolation
@@ -316,6 +326,9 @@ export default defineComponent({
         }
 
         function drawPostProcess() {
+            if (canvasStore.get('playingAnimation')) {
+                return;
+            }
             const canvasElement = canvas.value;
             const postProcessCanvasElement = postProcessCanvas.value;
             if (pica && canvasElement && postProcessCanvasElement) {

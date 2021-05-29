@@ -1,6 +1,7 @@
 <template>
     <div class="ogr-layer-thumbnail" :class="{ 'is-active': isActiveLayer }">
         <img :src="thumbnailImageSrc" alt="thumbnail" :class="{ 'is-larger-width': isLargerWidth }" />
+        <div class="ogr-layer-thumbnail__label">{{ sequenceIndex }}</div>
     </div>
 </template>
 

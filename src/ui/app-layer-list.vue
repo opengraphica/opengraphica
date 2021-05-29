@@ -15,7 +15,11 @@
                     </el-button>
                 </span>
                 <span v-if="layer.type === 'rasterSequence'" role="group" class="ogr-layer-attributes ogr-layer-frames">
-                    <span class="ogr-layer-attributes__title"><i class="bi bi-arrow-return-right" aria-hidden="true"></i> Frames</span>
+                    <span class="ogr-layer-attributes__title">
+                        <i class="bi bi-arrow-return-right" aria-hidden="true"></i> Frames
+                        <el-button v-if="!playingAnimation" type="text" class="p-0 ml-1" style="min-height: 0" aria-label="Play Animation" @click="onPlayRasterSequence(layer)"><i class="bi bi-play" aria-hidden="true"></i></el-button>
+                        <el-button v-else type="text" class="p-0 ml-1" style="min-height: 0" aria-label="Stop Animation" @click="onStopRasterSequence(layer)"><i class="bi bi-stop" aria-hidden="true"></i></el-button>
+                    </span>
                     <div class="is-flex">
                         <el-scrollbar>
                             <ul class="ogr-layer-frames-list">
@@ -42,6 +46,7 @@ import { defineComponent, ref, computed, watch, reactive, toRefs, nextTick, Prop
 import ElButton from 'element-plus/lib/el-button';
 import ElLoading from 'element-plus/lib/el-loading';
 import ElScrollbar from 'element-plus/lib/el-scrollbar';
+import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import workingFileStore from '@/store/working-file';
@@ -74,6 +79,8 @@ export default defineComponent({
         const { ctx: vm } = getCurrentInstance() as any;
 
         const hoveringLayerId = ref<number | null>(null);
+
+        const { playingAnimation } = toRefs(canvasStore.state);
 
         const reversedLayers = computed(() => {
             const newLayersList = [];
@@ -111,12 +118,30 @@ export default defineComponent({
             editorStore.dispatch('setTimelineCursor', layer.data.sequence[index].start);
         }
 
+        function onPlayRasterSequence(layer: WorkingFileRasterSequenceLayer<RGBAColor>) {
+            editorStore.set({
+                timelineEnd: layer.data.sequence[layer.data.sequence.length - 1].end,
+                timelinePlayStartTime: performance.now(),
+                timelineStart: layer.data.sequence[0].start
+            });
+            editorStore.dispatch('setTimelineCursor', layer.data.sequence[0].start);
+            canvasStore.set('playingAnimation', true);
+        }
+
+        function onStopRasterSequence() {
+            editorStore.dispatch('setTimelineCursor', 0);
+            canvasStore.set('playingAnimation', false);
+        }
+
         return {
+            playingAnimation,
             hoveringLayerId,
             onMouseEnterDndHandle,
             onMouseLeaveDndHandle,
             onToggleLayerVisibility,
             onSelectLayerFrame,
+            onPlayRasterSequence,
+            onStopRasterSequence,
             reversedLayers
         };
     }

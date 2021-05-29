@@ -134,6 +134,8 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                             gifParent.appendChild(image);
                             const rub = new SuperGif({ gif: image });
                             rub.load(async () => {
+                                const rubLength = rub.get_length();
+                                const frameDuration = rub.get_duration_ms() / rubLength;
                                 for (let i = 0; i < rub.get_length(); i++) {
                                     rub.move_to(i);
                                     try {
@@ -151,7 +153,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                                         });
                                         result.push({
                                             image,
-                                            duration: rub.get_duration_ms()
+                                            duration: frameDuration
                                         });
                                     } catch (error) {
                                         // TODO ?

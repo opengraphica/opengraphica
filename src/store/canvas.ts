@@ -13,6 +13,7 @@ interface CanvasState {
     dirty: boolean;
     isBufferInUse: boolean;
     isDisplayingNonRasterLayer: boolean;
+    playingAnimation: boolean;
     preventPostProcess: boolean;
     transform: DOMMatrix;
     transformResetOptions: undefined | true | CanvasViewResetOptions;
@@ -52,6 +53,7 @@ const store = new PerformantStore<CanvasStore>({
         dirty: true,
         isBufferInUse: false,
         isDisplayingNonRasterLayer: false,
+        playingAnimation: false,
         preventPostProcess: false,
         transform: new DOMMatrix(),
         transformResetOptions: undefined,

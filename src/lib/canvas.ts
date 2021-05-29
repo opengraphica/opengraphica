@@ -53,7 +53,7 @@ export const drawWorkingFileLayerToCanvas = (targetCanvas: HTMLCanvasElement, ta
             }
         }
 
-        if (layer.type !== 'raster' && layer.type !== 'group') {
+        if (layer.type !== 'raster' && layer.type !== 'rasterSequence' && layer.type !== 'group') {
             canvasStore.set('isDisplayingNonRasterLayer', true);
         }
         

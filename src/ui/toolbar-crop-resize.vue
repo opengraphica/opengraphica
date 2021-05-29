@@ -297,7 +297,7 @@ export default defineComponent({
             for (let layer of layers) {
                 if (layer.type === 'group') {
                     await generateResizeLayerActions((layer as WorkingFileGroupLayer<RGBAColor>).layers);
-                } else if (layer.type === 'raster') {
+                } else if (layer.type === 'raster' || layer.type === 'rasterSequence') {
                     const transform = new DOMMatrix().translateSelf(-cropLeft.value, -cropTop.value).multiplySelf(layer.transform);
                     actions.push(
                         new UpdateLayerAction<UpdateAnyLayerOptions<RGBAColor>>({

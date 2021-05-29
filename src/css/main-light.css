@@ -5439,10 +5439,11 @@ body.ogr-full-page {
   list-style: none;
   margin: 0;
   padding: 0 0 0.5rem 0;
-  display: flex;
-  flex-direction: row;
+  display: inline-flex;
+  white-space: nowrap;
 }
 .opengraphica .ogr-layer-list .ogr-layer .ogr-layer-frames-list > li {
+  display: inline-block;
   list-style: none;
   margin: 0 0.5rem 0 0;
   padding: 0;
@@ -5453,6 +5454,7 @@ body.ogr-full-page {
   width: auto;
   height: 3rem;
   box-sizing: border-box;
+  position: relative;
 }
 .opengraphica .ogr-layer-list .ogr-layer .ogr-layer-frames-list > li .ogr-layer-thumbnail img {
   width: auto;
@@ -5461,6 +5463,17 @@ body.ogr-full-page {
   padding: 0;
   box-sizing: border-box;
   border: 0.25rem solid var(--ogr-layer-list-thumbnail-border-color);
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-frames-list > li .ogr-layer-thumbnail .ogr-layer-thumbnail__label {
+  font-size: 0.85rem;
+  display: inline-block;
+  position: absolute;
+  bottom: 0.25rem;
+  right: 0.25rem;
+  background: rgba(255, 255, 255, 0.8);
+  color: #222;
+  padding: 0 0.25rem;
+  border-radius: 0.5rem 0 0 0;
 }
 .opengraphica .ogr-layer-list .ogr-layer .ogr-layer-frames-list > li .ogr-layer-thumbnail.is-active img {
   border-color: var(--ogr-layer-list-thumbnail-border-color-active);
