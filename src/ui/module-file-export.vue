@@ -34,7 +34,7 @@
                 </el-select>
             </el-form-item>
             <transition name="scale-down">
-                <el-form-item v-if="fileQualityTypes.includes(formData.workingFile.fileType)" label="Quality" prop="quality">
+                <el-form-item v-if="showQualitySetting" label="Quality" prop="quality">
                     <el-row>
                         <el-col :span="14">
                             <el-slider v-model="formData.workingFile.quality" :show-tooltip="false"></el-slider>
@@ -44,7 +44,19 @@
                                 <template v-slot:append>%</template>
                             </el-input-number>
                         </el-col>
-                    </el-row>                    
+                    </el-row>
+                </el-form-item>
+            </transition>
+            <transition name="scale-down">
+                <el-form-item v-if="showDitheringSetting" label="Dithering" prop="dithering">
+                    <el-select v-model="formData.workingFile.dithering" :popper-append-to-body="false">
+                        <el-option
+                            v-for="option in ditheringOptions"
+                            :key="option.value"
+                            :label="option.label"
+                            :value="option.value">
+                        </el-option>
+                    </el-select>
                 </el-form-item>
             </transition>
         </el-form-item-group>
@@ -56,7 +68,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, watch, nextTick } from 'vue';
+import { defineComponent, ref, reactive, computed, watch, nextTick } from 'vue';
 import ElButton from 'element-plus/lib/el-button';
 import ElCol from 'element-plus/lib/el-col';
 import ElForm from 'element-plus/lib/el-form';
@@ -118,14 +130,33 @@ export default defineComponent({
         ].filter((option) => {
             return isfileFormatSupported(option.value);
         });
-        const fileQualityTypes = ['jpg', 'webp'];
+        const ditheringOptions = [
+            { value: '', label: 'None' },
+            { value: 'Atkinson', label: 'Atkinson' },
+            { value: 'Atkinson-serpentine', label: 'Atkinson (serpentine)' },
+            { value: 'FloydSteinberg', label: 'Floyd Steinberg' },
+            { value: 'FloydSteinberg-serpentine', label: 'Floyd Steinberg (serpentine)' },
+            { value: 'FalseFloydSteinberg', label: 'False Floyd Steinberg' },
+            { value: 'FalseFloydSteinberg-serpentine', label: 'False Floyd Steinberg (serpentine)' },
+            { value: 'Stucki', label: 'Stucki' },
+            { value: 'Stucki-serpentine', label: 'Stucki (serpentine)' },
+        ];
+
+        const showQualitySetting = computed<boolean>(() => {
+            return ['jpg', 'gif', 'webp'].includes(formData.workingFile.fileType);
+        });
+
+        const showDitheringSetting = computed<boolean>(() => {
+            return ['gif'].includes(formData.workingFile.fileType);
+        });
         
         const formData = reactive({
             workingFile: {
                 fileName: workingFileStore.get('fileName'),
                 fileType: 'png' as 'png' | 'jpg' | 'webp' | 'gif' | 'bmp' | 'tiff',
                 layerSelection: 'all' as 'all' | 'selected',
-                quality: 100
+                quality: 100,
+                dithering: ''
             }
         });
         const formValidationRules: Rules = {};
@@ -147,7 +178,8 @@ export default defineComponent({
                         fileName: formData.workingFile.fileName,
                         fileType: formData.workingFile.fileType,
                         layerSelection: formData.workingFile.layerSelection,
-                        quality: formData.workingFile.quality / 100
+                        quality: formData.workingFile.quality / 100,
+                        dithering: formData.workingFile.dithering
                     });
                 } catch (error) {
                     $notify({
@@ -172,7 +204,9 @@ export default defineComponent({
             loading,
             layerSelectionOptions,
             fileTypeOptions,
-            fileQualityTypes,
+            ditheringOptions,
+            showQualitySetting,
+            showDitheringSetting,
             formData,
             formValidationRules,
             onCancel,

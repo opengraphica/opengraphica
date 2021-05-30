@@ -101,87 +101,125 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
 
         readerPromises.push(
             new Promise(async (resolveReader, rejectReader) => {
-                if (!file.type.match(/^image\//) && !file.name.match(/\.json$/)) {
-                    rejectReader('The file "' + file.name + '" is the wrong type. It must be an image or json file.');
-                    return;
-                }
-
-                const fileReadType: FileReadType = (file.type === 'text/plain' || file.name.match(/\.json$/)) ? 'json' : 'image';
-
-                if (!fileName) {
-                    fileName = file.name.replace(knownFileExtensions, '');
-                }
-
-                const fileReader = new FileReader();
-
-                if (fileReadType === 'image') {
-                    const image = await new Promise<HTMLImageElement>((resolveImage, rejectImage) => {
-                        const image = new Image();
-                        image.onload = () => {
-                            resolveImage(image);
-                        };
-                        image.onerror = () => {
-                            rejectImage();
-                        };
-                        image.src = URL.createObjectURL(file) as string;
-                    });
-                    if (file.type === 'image/gif') {
-                        const result: { image: HTMLImageElement, duration: number }[] = [];
-                        await new Promise<void>(async (resolveImageFrames, rejectImageFrames) => {
-                            // @ts-ignore
-                            const SuperGif = (await import('libgif')).default;
-                            const gifParent = document.createElement('div');
-                            gifParent.appendChild(image);
-                            const rub = new SuperGif({ gif: image });
-                            rub.load(async () => {
-                                const frames = rub.get_frames();
-                                for (let [i, frame] of frames.entries()) {
-                                    rub.move_to(i);
-                                    try {
-                                        const image = await new Promise<HTMLImageElement>((resolveImage, rejectImage) => {
-                                            const image = new Image();
-                                            image.onload = () => {
-                                                resolveImage(image);
-                                            };
-                                            image.onerror = () => {
-                                                rejectImage();
-                                            };
-                                            rub.get_canvas().toBlob((blob: Blob) => {
-                                                image.src = URL.createObjectURL(blob) as string;
-                                            });
-                                        });
-                                        result.push({
-                                            image,
-                                            duration: frame.delay * 10
-                                        });
-                                    } catch (error) {
-                                        // TODO ?
-                                    }
-                                }
-                                resolveImageFrames();
-                            });
-                        });
-                        if (result.length === 1) {
-                            resolveReader({ type: 'image', result: result[0].image, file: file });
-                        } else if (result.length > 0) {
-                            resolveReader({ type: 'imageSequence', result, file: file });
-                        } else {
-                            rejectReader('No frames found in gif file "' + file.name + '".');
-                        }
-                    } else {
-                        resolveReader({ type: 'image', result: image, file: file });
+                try {
+                    if (!file.type.match(/^image\//) && !file.name.match(/\.json$/)) {
+                        rejectReader('The file "' + file.name + '" is the wrong type. It must be an image or json file.');
+                        return;
                     }
-                }
-                else if (fileReadType === 'json') {
-                    fileReader.onload = async () => {
-                        resolveReader({ type: 'json', result: fileReader.result as string, file: file });
-                    };
-                    fileReader.onerror = () => {
-                        rejectReader('An error occurred while reading the file "' + file.name + '".');
-                    };
-                    fileReader.readAsText(file);
-                }
 
+                    const fileReadType: FileReadType = (file.type === 'text/plain' || file.name.match(/\.json$/)) ? 'json' : 'image';
+
+                    if (!fileName) {
+                        fileName = file.name.replace(knownFileExtensions, '');
+                    }
+
+                    const fileReader = new FileReader();
+
+                    if (fileReadType === 'image') {
+                        if (file.type === 'image/gif') {
+                            const result: { image: HTMLImageElement, duration: number }[] = [];
+                            const gifArrayBuffer = await new Promise<ArrayBuffer>((resolveArrayBuffer) => {
+                                fileReader.onload = async () => {
+                                    resolveArrayBuffer(fileReader.result as ArrayBuffer);
+                                };
+                                fileReader.onerror = () => {
+                                    rejectReader('An error occurred while reading the file "' + file.name + '".');
+                                };
+                                fileReader.readAsArrayBuffer(file);
+                            });
+                            const { Gif, GifPresenter } = await import('gifken');
+                            const gif = Gif.parse(gifArrayBuffer);
+                            let isNeedManualMerge: boolean = false;
+                            let gifSplit: Array<InstanceType<typeof Gif>>;
+                            try {
+                                gifSplit = gif.split(true);
+                            } catch (error) {
+                                isNeedManualMerge = true;
+                                gifSplit = gif.split(false);
+                            }
+                            const canvas = document.createElement("canvas");
+                            if (isNeedManualMerge) {
+                                canvas.width = gif.width;
+                                canvas.height = gif.height;
+                            }
+                            const ctx = canvas.getContext("2d");
+                            if (!ctx) {
+                                rejectReader('Not enough memory to parse the gif file "' + file.name + '".');
+                                return;
+                            }
+                            if (isNeedManualMerge) {
+                                ctx.clearRect(0, 0, gif.width, gif.height);
+                            }
+                            const gifFrameImage = new Image();
+                            for (let [i, frame] of gif.frames.entries()) {
+                                if (isNeedManualMerge) {
+                                    await new Promise<void>((resolveImage, rejectImage) => {
+                                        gifFrameImage.onload = () => {
+                                            resolveImage();
+                                        };
+                                        gifFrameImage.onerror = (error: any) => {
+                                            rejectImage();
+                                        };
+                                        gifFrameImage.src = GifPresenter.writeToDataUrl(gifSplit[i].writeToArrayBuffer());
+                                    });
+                                    ctx.drawImage(gifFrameImage, 0, 0);
+                                    gifFrameImage.src = '';
+                                }
+                                const image = await new Promise<HTMLImageElement>((resolveImage, rejectImage) => {
+                                    const image = new Image();
+                                    image.onload = () => {
+                                        resolveImage(image);
+                                    };
+                                    image.onerror = (error: any) => {
+                                        rejectImage();
+                                    };
+                                    if (isNeedManualMerge) {
+                                        canvas.toBlob((blob) => {
+                                            image.src = URL.createObjectURL(blob);
+                                        }, 'image/png');
+                                    } else {
+                                        image.src = URL.createObjectURL(GifPresenter.writeToBlob(gifSplit[i].writeToArrayBuffer()));
+                                    }
+                                });
+                                result.push({
+                                    image,
+                                    duration: frame.delayCentiSeconds * 10
+                                });
+                            }
+                            if (result.length === 1) {
+                                resolveReader({ type: 'image', result: result[0].image, file: file });
+                            } else if (result.length > 0) {
+                                resolveReader({ type: 'imageSequence', result, file: file });
+                            } else {
+                                rejectReader('No frames found in gif file "' + file.name + '".');
+                            }
+                        } else {
+                            const image = await new Promise<HTMLImageElement>((resolveImage, rejectImage) => {
+                                const image = new Image();
+                                image.onload = () => {
+                                    resolveImage(image);
+                                };
+                                image.onerror = () => {
+                                    rejectImage();
+                                };
+                                image.src = URL.createObjectURL(file) as string;
+                            });
+                            resolveReader({ type: 'image', result: image, file: file });
+                        }
+                    }
+                    else if (fileReadType === 'json') {
+                        fileReader.onload = async () => {
+                            resolveReader({ type: 'json', result: fileReader.result as string, file: file });
+                        };
+                        fileReader.onerror = () => {
+                            rejectReader('An error occurred while reading the file "' + file.name + '".');
+                        };
+                        fileReader.readAsText(file);
+                    }
+                } catch (error) {
+                    console.error(error);
+                    rejectReader('An error occurred while parsing the file.' + error);
+                }
             })
         );
     }

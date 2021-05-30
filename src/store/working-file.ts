@@ -75,6 +75,22 @@ function getGroupLayerById(id: number, parent: WorkingFileLayer<RGBAColor>[]): W
     return null;
 }
 
+function getLayersByType(type: string, parent?: WorkingFileLayer<RGBAColor>[]): WorkingFileLayer<RGBAColor>[] {
+    if (parent == null) {
+        parent = store.get('layers');
+    }
+    let layers: WorkingFileLayer<RGBAColor>[] = [];
+    for (let layer of parent) {
+        if (layer.type === type) {
+            layers.push(layer);
+        }
+        if (layer.type === 'group') {
+            layers = layers.concat(getLayersByType(type, (layer as WorkingFileGroupLayer<RGBAColor>).layers));
+        }
+    }
+    return layers;
+}
+
 function getTimelineById(id: number): WorkingFileTimeline | null {
     const timelines = store.get('timelines');
     for (let timeline of timelines) {
@@ -87,4 +103,4 @@ function getTimelineById(id: number): WorkingFileTimeline | null {
 
 export default store;
 
-export { WorkingFileStore, WorkingFileState, getLayerById, getGroupLayerById, getTimelineById };
+export { WorkingFileStore, WorkingFileState, getLayerById, getLayersByType, getGroupLayerById, getTimelineById };

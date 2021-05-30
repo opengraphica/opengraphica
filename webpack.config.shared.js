@@ -72,6 +72,7 @@ module.exports = function setupConfig(config) {
                     { from: path.resolve(__dirname, 'src/assets/favicon'), to: '[name][ext]' },
                     { from: path.resolve(__dirname, 'src/css/main-*.css'), to: 'css/[name][ext]' },
                     { from: path.resolve(__dirname, 'src/assets/fonts'), to: 'css/fonts' },
+                    { from: path.resolve(__dirname, 'src/workers'), to: 'js/workers' },
                     { from: path.resolve(__dirname, 'node_modules/bootstrap-icons/font/fonts'), to: 'css/fonts' }
                 ]
             }),
@@ -205,9 +206,9 @@ module.exports = function setupConfig(config) {
                         test: /[\\/]node_modules[\\/](expr-eval)[\\/]/,
                         name: 'expr-eval'
                     },
-                    libgif: {
-                        test: /[\\/]node_modules[\\/]libgif[\\/]/,
-                        name: 'libgif'
+                    gifken: {
+                        test: /[\\/]node_modules[\\/]gifken[\\/]/,
+                        name: 'gifken'
                     },
                     opengraphicaActions: {
                         test: /[\\/]src[\\/]actions[\\/]/,
