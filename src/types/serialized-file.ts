@@ -81,7 +81,6 @@ export interface SerializedFileTextLayer<T extends ColorModel> extends Serialize
 export interface SerializedFile<T extends ColorModel> {
     version: string;
     date: string;
-    activeLayerId: number | null;
     colorModel: ColorModelName;
     colorSpace: string;
     drawOriginX: number;

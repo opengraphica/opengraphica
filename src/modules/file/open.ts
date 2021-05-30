@@ -322,7 +322,6 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
 
 async function parseSerializedFileToActions(serializedFile: SerializedFile<RGBAColor>): Promise<{ workingFileDefinition: Partial<WorkingFileState>, insertLayerActions: InsertLayerAction<any>[] }> {
     const workingFileDefinition: Partial<WorkingFileState> = {
-        activeLayerId: serializedFile.activeLayerId,
         colorModel: serializedFile.colorModel,
         colorSpace: serializedFile.colorSpace,
         drawOriginX: serializedFile.drawOriginX,

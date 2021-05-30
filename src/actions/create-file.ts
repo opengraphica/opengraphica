@@ -27,7 +27,6 @@ export class CreateFileAction extends BaseAction {
         super.do();
 
         const changes: Partial<WorkingFileState> | any = {
-            activeLayerId: this.createFileOptions.activeLayerId || null,
             activeTimelineId: this.createFileOptions.activeTimelineId || null,
             colorModel: this.createFileOptions.colorModel || 'rgba',
             drawOriginX: this.createFileOptions.drawOriginX || 0,

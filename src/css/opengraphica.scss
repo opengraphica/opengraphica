@@ -91,6 +91,7 @@ body.ogr-full-page {
                     display: flex;
                     flex-direction: row;
                     flex-grow: 1;
+                    overflow: hidden;
                 }
 
                 .ogr-layer-thumbnail {

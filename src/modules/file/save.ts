@@ -24,7 +24,6 @@ function serializeWorkingFile(): SerializedFile<RGBAColor> {
     const serializedFile: SerializedFile<RGBAColor> = {
         version: '0.0.1-ALPHA.1',
         date: new Date().toISOString(),
-        activeLayerId: workingFileStore.get('activeLayerId'),
         colorModel: workingFileStore.get('colorModel'),
         colorSpace: workingFileStore.get('colorSpace'),
         drawOriginX: workingFileStore.get('drawOriginX'),

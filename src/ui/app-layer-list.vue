@@ -2,7 +2,7 @@
     <ul class="ogr-layer-list">
         <template v-for="layer of reversedLayers" :key="layer.id">
             <li class="ogr-layer"
-                :class="{ 'is-dnd-hover': layer.id === hoveringLayerId, 'is-active': layer.id === activeLayerId }"
+                :class="{ 'is-dnd-hover': layer.id === hoveringLayerId, 'is-active': selectedLayerIds.includes(layer.id) }"
                 :data-layer-id="layer.id"
             >
                 <span class="ogr-layer-main">
@@ -61,6 +61,7 @@ import workingFileStore from '@/store/working-file';
 import AppLayerListThumbnail from '@/ui/app-layer-list-thumbnail.vue';
 import AppLayerFrameThumbnail from '@/ui/app-layer-frame-thumbnail.vue';
 import { BundleAction } from '@/actions/bundle';
+import { SelectLayersAction } from '@/actions/select-layers';
 import { UpdateLayerAction } from '@/actions/update-layer';
 import { WorkingFileAnyLayer, RGBAColor, WorkingFileRasterSequenceLayer } from '@/types';
 
@@ -88,7 +89,7 @@ export default defineComponent({
         const hoveringLayerId = ref<number | null>(null);
 
         const { playingAnimation } = toRefs(canvasStore.state);
-        const { activeLayerId } = toRefs(workingFileStore.state);
+        const { selectedLayerIds } = toRefs(workingFileStore.state);
 
         const reversedLayers = computed(() => {
             const newLayersList = [];
@@ -108,7 +109,9 @@ export default defineComponent({
 
         function onPointerTapDndHandle(e: PointerEvent) {
             const layerId: number = parseInt((e.target as Element)?.closest('.ogr-layer')?.getAttribute('data-layer-id') || '-1', 10);
-            workingFileStore.set('activeLayerId', layerId);
+            historyStore.dispatch('runAction', {
+                action: new SelectLayersAction([layerId])
+            });
         }
         function onPointerDragStartDndHandle(layer: WorkingFileAnyLayer<RGBAColor>) {
 
@@ -146,7 +149,7 @@ export default defineComponent({
         }
 
         return {
-            activeLayerId,
+            selectedLayerIds,
             playingAnimation,
             hoveringLayerId,
             onMouseEnterDndHandle,

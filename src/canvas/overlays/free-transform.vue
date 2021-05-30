@@ -1,7 +1,7 @@
 <template>
     <div ref="overlay" class="ogr-canvas-overlay">
         <div ref="freeTransform"
-            v-show="activeLayerId !== null"
+            v-show="selectedLayerIds.length > 0"
             class="ogr-free-transform"
             :style="{
                 width: width + 'px',
@@ -92,7 +92,7 @@ export default defineComponent({
     props: {
     },
     setup(props, { emit }) {
-        const { activeLayerId } = toRefs(workingFileStore.state);
+        const { selectedLayerIds } = toRefs(workingFileStore.state);
         const freeTransform = ref<HTMLDivElement>(null as any);
         const zoom = ref<number>(1);
         const hideVerticalSideHandles = ref<boolean>(false);
@@ -176,7 +176,7 @@ export default defineComponent({
             DRAG_TYPE_BOTTOM: 2,
             DRAG_TYPE_LEFT: 4,
             DRAG_TYPE_RIGHT: 8,
-            activeLayerId,
+            selectedLayerIds,
             hideVerticalSideHandles,
             hideHorizontalSideHandles,
             freeTransform,

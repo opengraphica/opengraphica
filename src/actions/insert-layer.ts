@@ -4,6 +4,7 @@ import {
     InsertAnyLayerOptions
 } from '@/types';
 import { BaseAction } from './base';
+import { SelectLayersAction } from './select-layers';
 import canvasStore from '@/store/canvas';
 import workingFileStore, { getGroupLayerById } from '@/store/working-file';
 import layerRenderers from '@/canvas/renderers';
@@ -14,7 +15,7 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
 
     private insertLayerOptions: GroupLayerOptions | null = null;
     private insertedLayer: WorkingFileAnyLayer<RGBAColor> | null = null;
-    private previousActiveLayerId: number | null = null;
+    private selectLayersAction: SelectLayersAction | null = null;
 
     constructor(insertLayerOptions: GroupLayerOptions) {
         super('insertLayer', 'Insert Layer');
@@ -22,8 +23,6 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
 	}
 	public async do() {
         super.do();
-
-        this.previousActiveLayerId = workingFileStore.get('activeLayerId');
 
         const layerId = workingFileStore.get('layerIdCounter');
         workingFileStore.set('layerIdCounter', layerId + 1);
@@ -113,14 +112,23 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
             throw new Error('Parent group not found.');
         }
 
-        workingFileStore.set('activeLayerId', newLayer.id);
-
+        // Set the modified layer list
         workingFileStore.set('layers', layers);
+
+        // Select the new layer
+        this.selectLayersAction = new SelectLayersAction([newLayer.id]);
+        this.selectLayersAction.do();
+
         canvasStore.set('dirty', true);
 	}
 
 	public async undo() {
         super.undo();
+
+        if (this.selectLayersAction) {
+            this.selectLayersAction.undo();
+            this.selectLayersAction = null;
+        }
 
         const layers = workingFileStore.get('layers');
         let parent: WorkingFileLayer<RGBAColor>[] | null = layers;
@@ -136,14 +144,16 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
         }
         workingFileStore.set('layers', layers);
         workingFileStore.set('layerIdCounter', workingFileStore.get('layerIdCounter') - 1);
-        workingFileStore.set('activeLayerId', this.previousActiveLayerId);
-        this.previousActiveLayerId = null;
 
         canvasStore.set('dirty', true);
 	}
 
     public free() {
         super.free();
+        if (this.selectLayersAction) {
+            this.selectLayersAction.free();
+            this.selectLayersAction = null;
+        }
         if (this.insertedLayer && !this.isDone) {
             if (this.insertedLayer.type === 'raster') {
                 if (this.insertedLayer.data.sourceImage && this.insertedLayer.data.sourceImageIsObjectUrl) {

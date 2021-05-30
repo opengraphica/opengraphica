@@ -2,7 +2,6 @@ import { PerformantStore } from './performant-store';
 import { RGBAColor, MeasuringUnits, ResolutionUnits, ColorModelName, WorkingFileLayer, WorkingFileGroupLayer, WorkingFileTimeline } from '@/types';
 
 interface WorkingFileState {
-    activeLayerId: number | null,
     activeTimelineId: number | null,
     colorModel: ColorModelName;
     colorSpace: string;
@@ -30,7 +29,6 @@ interface WorkingFileStore {
 
 const store = new PerformantStore<WorkingFileStore>({
     state: {
-        activeLayerId: null,
         activeTimelineId: null,
         colorModel: 'rgba',
         colorSpace: 'sRGB',

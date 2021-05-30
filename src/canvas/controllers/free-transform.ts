@@ -28,9 +28,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     private transformIsRotating: boolean = false;
 
     private setBoundsDebounceHandle: number | undefined;
-    private activeLayer: WorkingFileLayer<RGBAColor> | null = null;
     private selectedLayers: WorkingFileLayer<RGBAColor>[] = [];
-    private activeLayerIdWatchStop: WatchStopHandle | null = null;
     private selectedLayerIdsWatchStop: WatchStopHandle | null = null;
 
     onEnter(): void {
@@ -38,27 +36,17 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         this.remToPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
         dimensionLockRatio.value = null;
 
-        this.activeLayerIdWatchStop = watch(() => workingFileStore.state.activeLayerId, (activeLayerId) => {
-            if (activeLayerId != null) {
-                const layer = getLayerById(activeLayerId);
-                this.activeLayer = layer;
-                if (this.activeLayer && workingFileStore.state.selectedLayerIds.length === 0) {
-                    this.selectedLayers = [this.activeLayer];
-                    this.setBoundsFromSelectedLayers();
-                }
-            }
-        }, { immediate: true });
-
         this.selectedLayerIdsWatchStop = watch(() => workingFileStore.state.selectedLayerIds, (selectedLayerIds) => {
+            const selectedLayers: WorkingFileLayer<RGBAColor>[] = [];
             if (selectedLayerIds.length > 0) {
-                const selectedLayers = [];
                 for (let id of selectedLayerIds) {
                     const layer = getLayerById(id);
-                    selectedLayers.push(layer);
+                    if (layer) {
+                        selectedLayers.push(layer);
+                    }
                 }
-            } else if (this.activeLayer) {
-                this.selectedLayers = [this.activeLayer];
             }
+            this.selectedLayers = selectedLayers;
             this.setBoundsFromSelectedLayers();
         }, { immediate: true });
 
@@ -66,10 +54,6 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     }
 
     onLeave(): void {
-        if (this.activeLayerIdWatchStop) {
-            this.activeLayerIdWatchStop();
-            this.activeLayerIdWatchStop = null;
-        }
         if (this.selectedLayerIdsWatchStop) {
             this.selectedLayerIdsWatchStop();
             this.selectedLayerIdsWatchStop = null;
@@ -402,12 +386,13 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     private setBoundsFromSelectedLayers() {
         clearTimeout(this.setBoundsDebounceHandle);
         this.setBoundsDebounceHandle = setTimeout(() => {
-            if (this.activeLayer) {
-                const originPosX = this.activeLayer.width * transformOriginX.value;
-                const originPosY = this.activeLayer.height * transformOriginY.value;
-                const decomposedTransform = decomposeMatrix(this.activeLayer.transform);
+            if (this.selectedLayers.length === 1) {
+                const activeLayer = this.selectedLayers[0];
+                const originPosX = activeLayer.width * transformOriginX.value;
+                const originPosY = activeLayer.height * transformOriginY.value;
+                const decomposedTransform = decomposeMatrix(activeLayer.transform);
                 const decomposedPositionTransform = decomposeMatrix(
-                    DOMMatrix.fromMatrix(this.activeLayer.transform)
+                    DOMMatrix.fromMatrix(activeLayer.transform)
                     .translateSelf(originPosX, originPosY)
                     .scaleSelf(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY)
                     .rotateSelf(-decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
@@ -417,8 +402,8 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 freeTransformEmitter.emit('setDimensions', {
                     left: decomposedPositionTransform.translateX,
                     top: decomposedPositionTransform.translateY,
-                    width: this.activeLayer.width * decomposedTransform.scaleX,
-                    height: this.activeLayer.height * decomposedTransform.scaleY,
+                    width: activeLayer.width * decomposedTransform.scaleX,
+                    height: activeLayer.height * decomposedTransform.scaleY,
                     rotation: decomposedTransform.rotation
                 });
             }
