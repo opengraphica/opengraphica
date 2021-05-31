@@ -48,7 +48,15 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
     fileInput.multiple = true;
     temporaryFileInputContainer.appendChild(fileInput);
     await new Promise<void>((resolve, reject) => {
+        let activeElement = document.activeElement;
+        const checkFocusInterval = setInterval(() => {
+            if (activeElement !== document.activeElement) {
+                onFocusAway();
+            }
+        }, 100);
         fileInput.addEventListener('change', async (e: Event) => {
+            clearInterval(checkFocusInterval);
+            window.removeEventListener('focus', onFocusAway);
             isChangeFired = true;
             temporaryFileInputContainer.removeChild(fileInput);
             const files = (e.target as HTMLInputElement).files;
@@ -64,6 +72,7 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
             }
         });
         const onFocusAway = () => {
+            clearInterval(checkFocusInterval);
             setTimeout(() => {
                 if (!isChangeFired) {
                     resolve();

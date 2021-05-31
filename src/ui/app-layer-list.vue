@@ -241,6 +241,7 @@ export default defineComponent({
             canvasStore.set('playingAnimation', false);
         }
 
+        // TODO - run when scroll
         function calculateDragOffsets() {
             dragItemOffsets = [];
             const layers = layerList.value.querySelectorAll(':scope > .ogr-layer:not(.is-dragging)');
