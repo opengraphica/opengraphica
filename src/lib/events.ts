@@ -1,4 +1,15 @@
 
+export function isInput(element: HTMLElement | any) {
+    if (!element) {
+        return false;
+    }
+    if (element.type == 'text' || element.tagName == 'INPUT' || element.type == 'textarea') {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 class PointerEventPolyfill {
     constructor(options: any) {
         for (let optionName in options) {

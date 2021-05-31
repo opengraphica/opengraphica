@@ -1,7 +1,9 @@
 <template>
     <div style="width: 350px; max-width: 100%">
         <template v-if="layers.length > 0">
-            <app-layer-list :layers="layers" />
+            <el-scrollbar>
+                <app-layer-list :layers="layers" :is-root="true" />
+            </el-scrollbar>
         </template>
         <template v-else>
             <p class="mx-4 has-text-centered">No Layers Yet.</p>
@@ -12,6 +14,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed, toRefs, nextTick } from 'vue';
 import ElLoading from 'element-plus/lib/el-loading';
+import ElScrollbar from 'element-plus/lib/el-scrollbar';
 import AppLayerList from '@/ui/app-layer-list.vue';
 import workingFileStore from '@/store/working-file';
 
@@ -23,7 +26,8 @@ export default defineComponent({
         loading: ElLoading.directive
     },
     components: {
-        AppLayerList
+        AppLayerList,
+        ElScrollbar
     },
     emits: [
         'close',
@@ -32,7 +36,7 @@ export default defineComponent({
     setup(props, { emit }) {
         emit('update:title', 'Layers');
 
-        const layers = workingFileStore.state.layers;
+        const { layers } = toRefs(workingFileStore.state);
 
         return {
             layers

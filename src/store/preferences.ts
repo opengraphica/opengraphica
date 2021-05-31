@@ -1,6 +1,7 @@
 import { PerformantStore } from './performant-store';
 
 interface PreferencesState {
+    dragStartRadius: number; // Pixels
     enableMultiLayerBuffer: boolean;
     historyStatesMax: number;
     multiTouchDownTimeout: number;
@@ -20,6 +21,7 @@ interface PreferencesStore {
 
 const store = new PerformantStore<PreferencesStore>({
     state: {
+        dragStartRadius: 5,
         enableMultiLayerBuffer: false,
         historyStatesMax: 50,
         multiTouchDownTimeout: 50,

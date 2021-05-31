@@ -5368,6 +5368,10 @@ body.ogr-full-page {
   list-style: none;
   margin: 0;
   padding: 0;
+  position: relative;
+}
+.opengraphica .ogr-layer-list.is-dnd-dragging > .ogr-layer > * {
+  pointer-events: none;
 }
 .opengraphica .ogr-layer-list .ogr-layer {
   list-style: none;
@@ -5382,6 +5386,44 @@ body.ogr-full-page {
 .opengraphica .ogr-layer-list .ogr-layer.is-dnd-hover {
   background: var(--ogr-layer-list-background-color-hover);
 }
+.opengraphica .ogr-layer-list .ogr-layer.is-dnd-placeholder {
+  visibility: hidden;
+}
+.opengraphica .ogr-layer-list .ogr-layer.is-dragging {
+  pointer-events: none;
+  position: absolute;
+  background: var(--ogr-layer-list-background-color-drag);
+  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.2);
+  left: 0;
+  right: 0;
+  user-select: none;
+}
+.opengraphica .ogr-layer-list .ogr-layer.is-drag-insert-bottom {
+  position: relative;
+}
+.opengraphica .ogr-layer-list .ogr-layer.is-drag-insert-bottom:after {
+  content: "";
+  display: block;
+  position: absolute;
+  background: var(--ogr-snap-line-color);
+  height: 0.25rem;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.opengraphica .ogr-layer-list .ogr-layer.is-drag-insert-top {
+  position: relative;
+}
+.opengraphica .ogr-layer-list .ogr-layer.is-drag-insert-top:after {
+  content: "";
+  display: block;
+  position: absolute;
+  background: var(--ogr-snap-line-color);
+  height: 0.25rem;
+  top: 0;
+  left: 0;
+  right: 0;
+}
 .opengraphica .ogr-layer-list .ogr-layer .ogr-layer-main {
   display: flex;
   flex-direction: row;
@@ -5392,6 +5434,7 @@ body.ogr-full-page {
   display: flex;
   flex-direction: row;
   flex-grow: 1;
+  overflow: hidden;
 }
 .opengraphica .ogr-layer-list .ogr-layer .ogr-layer-main .ogr-layer-thumbnail {
   cursor: move;
@@ -22266,6 +22309,7 @@ body.ogr-full-page {
   --ogr-snap-line-color: #66b1ff;
   --ogr-layer-list-background-color-hover: rgba(64, 158, 255, 0.1);
   --ogr-layer-list-background-color-active: rgba(64, 158, 255, 0.05);
+  --ogr-layer-list-background-color-drag: #f5faff;
   --ogr-layer-list-border-color: #ebeef5;
   --ogr-layer-list-thumbnail-border-color: #ebeef5;
   --ogr-layer-list-thumbnail-border-color-active: #b5daff;

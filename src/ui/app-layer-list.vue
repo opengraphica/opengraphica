@@ -1,8 +1,20 @@
 <template>
-    <ul class="ogr-layer-list">
+    <ul ref="layerList"
+        v-pointer.dragstart="onPointerDragStartList"
+        v-pointer.dragend="onPointerDragEndList"
+        v-pointer.move.window="onPointerMoveList"
+        class="ogr-layer-list"
+        :class="{ 'is-dnd-dragging': draggingLayerId != null }"
+    >
         <template v-for="layer of reversedLayers" :key="layer.id">
             <li class="ogr-layer"
-                :class="{ 'is-dnd-hover': layer.id === hoveringLayerId, 'is-active': selectedLayerIds.includes(layer.id) }"
+                :class="{
+                    'is-dnd-hover': layer.id === hoveringLayerId,
+                    'is-dnd-placeholder': layer.id === draggingLayerId,
+                    'is-active': selectedLayerIds.includes(layer.id),
+                    'is-drag-insert-top': dropTargetLayerId === layer.id && dropTargetPosition === 'before',
+                    'is-drag-insert-bottom': dropTargetLayerId === layer.id && dropTargetPosition === 'after'
+                }"
                 :data-layer-id="layer.id"
             >
                 <span class="ogr-layer-main">
@@ -45,6 +57,7 @@
                 <app-layer-list :layers="layer.layers" />
             </template>
         </template>
+        <li ref="draggingLayer" v-if="draggingLayerId != null" class="ogr-layer is-dragging" aria-hidden="true" v-html="draggingItemHtml"></li>
     </ul>
 </template>
 
@@ -63,6 +76,7 @@ import AppLayerFrameThumbnail from '@/ui/app-layer-frame-thumbnail.vue';
 import { BundleAction } from '@/actions/bundle';
 import { SelectLayersAction } from '@/actions/select-layers';
 import { UpdateLayerAction } from '@/actions/update-layer';
+import { ReorderLayersAction } from '@/actions/reorder-layers';
 import { WorkingFileAnyLayer, RGBAColor, WorkingFileRasterSequenceLayer } from '@/types';
 
 export default defineComponent({
@@ -78,6 +92,10 @@ export default defineComponent({
         ElScrollbar
     },
     props: {
+        isRoot: {
+            type: Boolean,
+            default: false
+        },
         layers: {
             type: Array as PropType<WorkingFileAnyLayer<RGBAColor>[]>,
             required: true
@@ -86,8 +104,16 @@ export default defineComponent({
     emits: [
     ],
     setup(props, { emit }) {
+        const layerList = ref<HTMLUListElement>(null as unknown as HTMLUListElement);
+        const draggingLayer = ref<HTMLLIElement | null>(null);
+        const dropTargetLayerId = ref<number | null>(null);
+        const dropTargetPosition = ref<'before' | 'inside' | 'after'>('before');
         const hoveringLayerId = ref<number | null>(null);
+        let draggingLayerPointerOffset: number = 0;
+        let draggingLayerHeight: number = 0;
+        let dragItemOffsets: { top: number; height: number; id: number; }[] = [];
 
+        const conditionalDragStartEventModifier: string = props.isRoot ? 'dragstart' : '';
         const { playingAnimation } = toRefs(canvasStore.state);
         const { selectedLayerIds } = toRefs(workingFileStore.state);
 
@@ -98,6 +124,9 @@ export default defineComponent({
             }
             return newLayersList;
         });
+
+        const draggingLayerId = ref<number | null>(null);
+        const draggingItemHtml = ref<string>('');
 
         function onMouseEnterDndHandle(layer: WorkingFileAnyLayer<RGBAColor>) {
             hoveringLayerId.value = layer.id;
@@ -113,8 +142,72 @@ export default defineComponent({
                 action: new SelectLayersAction([layerId])
             });
         }
-        function onPointerDragStartDndHandle(layer: WorkingFileAnyLayer<RGBAColor>) {
+        async function onPointerDragStartList(e: PointerEvent | MouseEvent | TouchEvent) {
+            const target = e.target || (e as TouchEvent).touches[0].target;
+            const pageY = (e as any).pageY || (e as TouchEvent).touches[0].pageY;
+            const layerElement: Element | null | undefined = (target as Element)?.closest('.ogr-layer-dnd-handle')?.closest('.ogr-layer');
+            const layerId: number = parseInt(layerElement?.getAttribute('data-layer-id') || '-1', 10);
+            if (layerId > -1 && layerElement) {
+                calculateDragOffsets();
 
+                draggingLayerId.value = layerId;
+                draggingItemHtml.value = layerElement.innerHTML;
+                await nextTick();
+                if (draggingLayer.value) {
+                    const layerElementClientRect = layerElement.getBoundingClientRect();
+                    const layerListTop = layerList.value.getBoundingClientRect().top + window.scrollY;
+                    const layerElementTop = layerElementClientRect.top + window.scrollY;
+                    draggingLayerPointerOffset = pageY - layerElementTop;
+                    draggingLayerHeight = layerElementClientRect.height;
+                    draggingLayer.value.style.top = (pageY - layerListTop - draggingLayerPointerOffset) + 'px';
+                }
+            }
+        }
+        function onPointerMoveList(e: PointerEvent | MouseEvent | TouchEvent) {
+            if (draggingLayerId.value != null) {
+                const pageY = (e as any).pageY || (e as TouchEvent).touches[0].pageY;
+                if (draggingLayer.value) {
+                    dropTargetLayerId.value = null;
+                    const layerListTop = layerList.value.getBoundingClientRect().top + window.scrollY;
+                    draggingLayer.value.style.top = pageY - layerListTop - draggingLayerPointerOffset + 'px';
+                    const dragItemTop = pageY - draggingLayerPointerOffset;
+                    const dragItemBottom = dragItemTop + draggingLayerHeight;
+                    let isMovingUp: boolean = true;
+                    let previousItemHalfHeight: number = 0;
+                    for (let i = 0; i < dragItemOffsets.length; i++) {
+                        let nextItemHalfHeight: number = 0;
+                        if (dragItemOffsets[i + 1]) {
+                            nextItemHalfHeight = dragItemOffsets[i + 1].height / 2;
+                        }
+                        const offsetInfo = dragItemOffsets[i];
+                        if (offsetInfo.id === draggingLayerId.value) {
+                            isMovingUp = false;
+                        }
+                        if (isMovingUp && dragItemTop < offsetInfo.top + (offsetInfo.height / 2) && dragItemTop > offsetInfo.top - previousItemHalfHeight) {
+                            if (offsetInfo.id !== draggingLayerId.value) {
+                                dropTargetLayerId.value = offsetInfo.id;
+                                dropTargetPosition.value = 'before';
+                            }
+                        } else if (!isMovingUp && dragItemBottom < offsetInfo.top + offsetInfo.height + nextItemHalfHeight && dragItemBottom > offsetInfo.top + (offsetInfo.height / 2)) {
+                            if (offsetInfo.id !== draggingLayerId.value) {
+                                dropTargetLayerId.value = offsetInfo.id;
+                                dropTargetPosition.value = 'after';
+                            }
+                        }
+                        previousItemHalfHeight = offsetInfo.height / 2;
+                    }
+                }
+            }
+        }
+        function onPointerDragEndList(e: PointerEvent | MouseEvent | TouchEvent) {
+            if (draggingLayerId.value != null && dropTargetLayerId.value != null) {
+                historyStore.dispatch('runAction', {
+                    action: new ReorderLayersAction([draggingLayerId.value], dropTargetLayerId.value, dropTargetPosition.value === 'before' ? 'after' : 'before')
+                });
+            }
+            draggingLayerId.value = null;
+            draggingItemHtml.value = '';
+            dropTargetLayerId.value = null;
         }
 
         function onToggleLayerVisibility(layer: WorkingFileAnyLayer<RGBAColor>) {
@@ -148,14 +241,36 @@ export default defineComponent({
             canvasStore.set('playingAnimation', false);
         }
 
+        function calculateDragOffsets() {
+            dragItemOffsets = [];
+            const layers = layerList.value.querySelectorAll(':scope > .ogr-layer:not(.is-dragging)');
+            layers.forEach((layerEl) => {
+                const clientRect = layerEl.getBoundingClientRect();
+                dragItemOffsets.push({
+                    top: clientRect.top + window.scrollY,
+                    height: clientRect.height,
+                    id: parseInt(layerEl.getAttribute('data-layer-id') + '', 10)
+                });
+            });
+        }
+
         return {
+            layerList,
+            draggingLayer,
+            conditionalDragStartEventModifier,
+            draggingLayerId,
+            dropTargetLayerId,
+            dropTargetPosition,
+            draggingItemHtml,
             selectedLayerIds,
             playingAnimation,
             hoveringLayerId,
             onMouseEnterDndHandle,
             onMouseLeaveDndHandle,
             onPointerTapDndHandle,
-            onPointerDragStartDndHandle,
+            onPointerDragStartList,
+            onPointerDragEndList,
+            onPointerMoveList,
             onToggleLayerVisibility,
             onSelectLayerFrame,
             onPlayRasterSequence,

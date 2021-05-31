@@ -4,17 +4,7 @@
  */
 
 import appEmitter from '@/lib/emitter';
-
-function isInput(element: HTMLElement | any) {
-    if (!element) {
-        return false;
-    }
-    if (element.type == 'text' || element.tagName == 'INPUT' || element.type == 'textarea') {
-        return true;
-    } else {
-        return false;
-    }
-}
+import { isInput } from '@/lib/events';
 
 function onDocumentKeyDown(e: KeyboardEvent) {
 
