@@ -67,7 +67,10 @@ function getLayerById(id: number, parent?: WorkingFileLayer<RGBAColor>[]): Worki
     return null;
 }
 
-function getGroupLayerById(id: number, parent: WorkingFileLayer<RGBAColor>[]): WorkingFileGroupLayer<RGBAColor> | null {
+function getGroupLayerById(id: number, parent?: WorkingFileLayer<RGBAColor>[]): WorkingFileGroupLayer<RGBAColor> | null {
+    if (parent == null) {
+        parent = store.get('layers');
+    }
     const layer = getLayerById(id, parent);
     if (layer && layer.type === 'group') {
         return layer as WorkingFileGroupLayer<RGBAColor>;

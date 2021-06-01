@@ -202,7 +202,7 @@ export default defineComponent({
         function onPointerDragEndList(e: PointerEvent | MouseEvent | TouchEvent) {
             if (draggingLayerId.value != null && dropTargetLayerId.value != null) {
                 historyStore.dispatch('runAction', {
-                    action: new ReorderLayersAction([draggingLayerId.value], dropTargetLayerId.value, dropTargetPosition.value === 'before' ? 'after' : 'before')
+                    action: new ReorderLayersAction([draggingLayerId.value], dropTargetLayerId.value, dropTargetPosition.value === 'before' ? 'above' : 'below')
                 });
             }
             draggingLayerId.value = null;
