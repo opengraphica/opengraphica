@@ -18,7 +18,6 @@ export class ReorderLayersAction extends BaseAction {
 
     constructor(insertLayerIds: number[], referenceLayerId: number, insertPosition: 'below' | 'above' | 'topChild' | 'bottomChild') {
         super('reorderLayers', 'Reorder Layers');
-        console.log(arguments);
         this.insertLayerIds = insertLayerIds;
         this.referenceLayerId = referenceLayerId;
         this.insertPosition = insertPosition;

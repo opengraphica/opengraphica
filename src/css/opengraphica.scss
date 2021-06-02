@@ -66,6 +66,7 @@ body.ogr-full-page {
         margin: 0;
         padding: 0;
         position: relative;
+        overflow: hidden; // Prevent scroll during dragging from increasing container size
 
         &.is-dnd-dragging {
             > .ogr-layer > * {
@@ -89,7 +90,25 @@ body.ogr-full-page {
             }
 
             &.is-dnd-placeholder {
-                visibility: hidden;
+                position: relative;
+                background: transparent;
+                box-shadow: none;
+
+                > * {
+                    visibility: hidden;
+                }
+                &:before {
+                    content: '';
+                    position: absolute;
+                    display: block;
+                    box-sizing: border-box;
+                    visibility: visible;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    border: 0.25rem dashed rgba(127, 127, 127, 0.2);
+                }
             }
 
             &.is-dragging {
@@ -100,6 +119,7 @@ body.ogr-full-page {
                 left: 0;
                 right: 0;
                 user-select: none;
+                opacity: 0.8;
             }
 
             &.is-drag-insert-bottom {
@@ -380,6 +400,20 @@ body.ogr-full-page {
         > .ogr-dock {
             max-height: calc(100vh - 5rem) !important;
             overflow: hidden !important;
+
+            > .ogr-dock-content {
+                width: 350px;
+                max-width: 100%;
+
+                > .el-scrollbar, > .el-scrollbar  {
+                    max-height: calc(100vh - 13rem) !important;
+                    overflow: hidden !important;
+
+                    > .el-scrollbar__wrap {
+                        max-height: calc(100vh - 13rem) !important;
+                    }
+                }
+            }
 
             > .el-tabs {
                 max-height: calc(100vh - 5rem) !important;

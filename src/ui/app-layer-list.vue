@@ -99,9 +99,18 @@ export default defineComponent({
         layers: {
             type: Array as PropType<WorkingFileAnyLayer<RGBAColor>[]>,
             required: true
+        },
+        scrollContainerHeight: {
+            type: Number,
+            default: 0
+        },
+        scrollTop: {
+            type: Number,
+            default: 0
         }
     },
     emits: [
+        'scroll-by'
     ],
     setup(props, { emit }) {
         const layerList = ref<HTMLUListElement>(null as unknown as HTMLUListElement);
@@ -112,6 +121,12 @@ export default defineComponent({
         let draggingLayerPointerOffset: number = 0;
         let draggingLayerHeight: number = 0;
         let dragItemOffsets: { top: number; height: number; id: number; }[] = [];
+        let dragItemOffsetCalculatedScrollTop: number = 0;
+        let lastDragPageY: number = 0;
+        let isDragMoveUp: boolean = false;
+        let dragScrollMargin: number = 20;
+        const draggingLayerId = ref<number | null>(null);
+        const draggingItemHtml = ref<string>('');
 
         const conditionalDragStartEventModifier: string = props.isRoot ? 'dragstart' : '';
         const { playingAnimation } = toRefs(canvasStore.state);
@@ -125,8 +140,13 @@ export default defineComponent({
             return newLayersList;
         });
 
-        const draggingLayerId = ref<number | null>(null);
-        const draggingItemHtml = ref<string>('');
+        watch(() => props.scrollTop, () => {
+            if (draggingLayerId.value != null) {
+                requestAnimationFrame(() => {
+                    calculateDropPosition(lastDragPageY);
+                });
+            }
+        });
 
         function onMouseEnterDndHandle(layer: WorkingFileAnyLayer<RGBAColor>) {
             hoveringLayerId.value = layer.id;
@@ -145,6 +165,7 @@ export default defineComponent({
         async function onPointerDragStartList(e: PointerEvent | MouseEvent | TouchEvent) {
             const target = e.target || (e as TouchEvent).touches[0].target;
             const pageY = (e as any).pageY || (e as TouchEvent).touches[0].pageY;
+            lastDragPageY = pageY;
             const layerElement: Element | null | undefined = (target as Element)?.closest('.ogr-layer-dnd-handle')?.closest('.ogr-layer');
             const layerId: number = parseInt(layerElement?.getAttribute('data-layer-id') || '-1', 10);
             if (layerId > -1 && layerElement) {
@@ -166,36 +187,64 @@ export default defineComponent({
         function onPointerMoveList(e: PointerEvent | MouseEvent | TouchEvent) {
             if (draggingLayerId.value != null) {
                 const pageY = (e as any).pageY || (e as TouchEvent).touches[0].pageY;
-                if (draggingLayer.value) {
-                    dropTargetLayerId.value = null;
-                    const layerListTop = layerList.value.getBoundingClientRect().top + window.scrollY;
-                    draggingLayer.value.style.top = pageY - layerListTop - draggingLayerPointerOffset + 'px';
-                    const dragItemTop = pageY - draggingLayerPointerOffset;
-                    const dragItemBottom = dragItemTop + draggingLayerHeight;
-                    let isMovingUp: boolean = true;
-                    let previousItemHalfHeight: number = 0;
-                    for (let i = 0; i < dragItemOffsets.length; i++) {
-                        let nextItemHalfHeight: number = 0;
-                        if (dragItemOffsets[i + 1]) {
-                            nextItemHalfHeight = dragItemOffsets[i + 1].height / 2;
-                        }
-                        const offsetInfo = dragItemOffsets[i];
-                        if (offsetInfo.id === draggingLayerId.value) {
-                            isMovingUp = false;
-                        }
-                        if (isMovingUp && dragItemTop < offsetInfo.top + (offsetInfo.height / 2) && dragItemTop > offsetInfo.top - previousItemHalfHeight) {
-                            if (offsetInfo.id !== draggingLayerId.value) {
-                                dropTargetLayerId.value = offsetInfo.id;
-                                dropTargetPosition.value = 'before';
-                            }
-                        } else if (!isMovingUp && dragItemBottom < offsetInfo.top + offsetInfo.height + nextItemHalfHeight && dragItemBottom > offsetInfo.top + (offsetInfo.height / 2)) {
-                            if (offsetInfo.id !== draggingLayerId.value) {
-                                dropTargetLayerId.value = offsetInfo.id;
-                                dropTargetPosition.value = 'after';
-                            }
-                        }
-                        previousItemHalfHeight = offsetInfo.height / 2;
+                calculateDropPosition(pageY);
+                lastDragPageY = pageY;
+            }
+        }
+        function calculateDropPosition(pageY: number) {
+            if (draggingLayer.value) {
+                dropTargetLayerId.value = null;
+                const layerListTop = layerList.value.getBoundingClientRect().top + window.scrollY;
+                draggingLayer.value.style.top = pageY - layerListTop - draggingLayerPointerOffset + 'px';
+                const dragItemTop = pageY - draggingLayerPointerOffset;
+                const dragItemBottom = dragItemTop + draggingLayerHeight;
+                const dragItemTopOffset = dragItemTop + (props.scrollTop - dragItemOffsetCalculatedScrollTop);
+                const dragItemBottomOffset = dragItemBottom + (props.scrollTop - dragItemOffsetCalculatedScrollTop)
+                if (pageY < lastDragPageY) {
+                    isDragMoveUp = true;
+                } else if (pageY > lastDragPageY) {
+                    isDragMoveUp = false;
+                }
+                let previousItemHalfHeight: number = 0;
+                let previousItemId: number = -1;
+                for (let i = 0; i < dragItemOffsets.length; i++) {
+                    let nextItemHalfHeight: number = 0;
+                    let nextItemId: number = -1;
+                    if (dragItemOffsets[i + 1]) {
+                        nextItemHalfHeight = dragItemOffsets[i + 1].height / 2;
+                        nextItemId = dragItemOffsets[i + 1].id;
                     }
+                    const offsetInfo = dragItemOffsets[i];
+                    if (isDragMoveUp &&
+                        (
+                            (dragItemTopOffset < offsetInfo.top + (offsetInfo.height / 2) && dragItemTopOffset > offsetInfo.top - previousItemHalfHeight) ||
+                            (i === 0 && dragItemTopOffset < offsetInfo.top + (offsetInfo.height / 2))
+                        )
+                    ) {
+                        if (offsetInfo.id !== draggingLayerId.value && previousItemId !== draggingLayerId.value) {
+                            dropTargetLayerId.value = offsetInfo.id;
+                            dropTargetPosition.value = 'before';
+                        }
+                    } else if (
+                        !isDragMoveUp &&
+                        (
+                            (dragItemBottomOffset < offsetInfo.top + offsetInfo.height + nextItemHalfHeight && dragItemBottomOffset > offsetInfo.top + (offsetInfo.height / 2)) ||
+                            (i === dragItemOffsets.length - 1 && dragItemBottomOffset > offsetInfo.top + (offsetInfo.height / 2))
+                        )
+                    ) {
+                        if (offsetInfo.id !== draggingLayerId.value  && nextItemId !== draggingLayerId.value) {
+                            dropTargetLayerId.value = offsetInfo.id;
+                            dropTargetPosition.value = 'after';
+                        }
+                    }
+                    previousItemHalfHeight = offsetInfo.height / 2;
+                    previousItemId = offsetInfo.id;
+                }
+                if (dragItemTop - layerListTop - props.scrollTop < dragScrollMargin) {
+                    emit('scroll-by', -5);
+                }
+                if (dragItemBottom - layerListTop - props.scrollTop > props.scrollContainerHeight - dragScrollMargin) {
+                    emit('scroll-by', 5);
                 }
             }
         }
@@ -241,8 +290,8 @@ export default defineComponent({
             canvasStore.set('playingAnimation', false);
         }
 
-        // TODO - run when scroll
         function calculateDragOffsets() {
+            dragItemOffsetCalculatedScrollTop = props.scrollTop;
             dragItemOffsets = [];
             const layers = layerList.value.querySelectorAll(':scope > .ogr-layer:not(.is-dragging)');
             layers.forEach((layerEl) => {
