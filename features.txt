@@ -1,0 +1,224 @@
+Modules
+    - File
+        - Export
+            [x] bmp
+            [x] jpeg
+            [x] gif
+            [ ] mp4
+            [x] png
+            [x] webp
+            [ ] webv
+        - New
+            [x] Width/Height
+            - Units
+                [x] pixels
+                [x] millimeters
+                [x] centimeters
+                [x] inches
+            - Resolution
+                [x] Same x/y Resolution
+                [ ] UI for different resolution
+            - Color Profile
+                [x] sRGB
+                [ ] Others?
+            [x] Scale factor
+        - Open
+            - File type support
+                [x] bmp
+                [x] jpeg
+                [x] gif
+                [ ] mp4
+                [x] png
+                [x] webp
+                [ ] webv
+        - Save
+            - File type support
+                [x] JSON
+    - Image
+        - Crop & Resize
+            [x] Resize visually to crop
+            [ ] Change crop handles to outside frame instead of inside
+            - Modes
+                [x] Crop
+                [ ] Resample
+            - Settings
+                [x] Width/Height
+                [x] Lock width/Height
+                [x] Change width/height Units
+                [x] Change resolution
+                [x] Change resolution units
+                [x] Toggle snapping
+        [ ] Cut (active layers)
+            [ ] Ctrl + X shortcut
+        [ ] Copy (active layers)
+            [ ] Ctrl + C shortcut
+        [x] Copy all layers (merge to clipboard)
+        [ ] Paste
+            [ ] Ctrl + V shortcut
+    - View
+        [x] Zoom
+            [ ] Fix center on mobile
+        [x] Rotate
+            [ ] Fix center on mobile
+        - Reset
+            [x] Fit
+            [x] 1:1
+            [x] Angle
+        - Touch Rotate Setting
+            [x] On
+            [x] Off
+            [x] Snap
+        [ ] Toggle ruler
+        [ ] Guidelines
+    - History
+        [x] Undo/Redo
+            [ ] Ctrl + Z, Ctrl + Shift + Z, Ctrl + Y shortcuts
+        [x] Past history list
+    - Preferences
+        [x] Toggle theme
+            [ ] Fix dark theme build process - some bugs cause not the Same
+    
+Tools
+    - Effects
+        [ ] Implement non-destructive effect layer process
+            [ ] Standard Input/Output API class
+            [ ] Web worker
+            [ ] UI to add/remove in layers dock
+            [ ] Wait for bake while exporting
+        [ ] Figure out effect categories
+        [ ] Create dock GUI for selecting effects
+        - Effects
+            [ ] Gaussian blur
+            [ ] Brightness
+            [ ] Contrast
+            [ ] Grayscale
+            [ ] Hue Rotate
+            [ ] Negative
+            [ ] Saturate
+            [ ] Sepia
+            [ ] Shadow
+            [ ] 1977
+            [ ] Aden
+            [ ] Clarendon
+            [ ] Gingham
+            [ ] Inkwell
+            [ ] Lo-fi
+            [ ] Toaster
+            [ ] Valencia
+            [ ] X-Pro II
+            [ ] Black & White
+            [ ] Borders
+            [ ] Blueprint
+            [ ] Box Blur
+            [ ] Denoise
+            [ ] Dither
+            [ ] Dot Screen
+            [ ] Edge
+            [ ] Emboss
+            [ ] Enrich
+            [ ] Grains
+            [ ] Heatmap
+            [ ] Mosaic
+            [ ] Night vision
+            [ ] Oil
+            [ ] Pencil
+            [ ] Sharpen
+            [ ] Solarize
+            [ ] Tilt Shift
+            [ ] Vignette
+            [ ] Vibrance
+            [ ] Vintage
+            [ ] Zoom blur
+    - Text
+        [ ] Port from opengraphica-text-editor
+    - Selection
+        - Design: selection works as a cutout on top of the entire canvas, all layers. If multiple layers selected they are all cut at same time
+        [ ] Integrate with drawing tools
+        [ ] Integrate with effects
+        [ ] Integrate with move/resize
+        [ ] Integrate with cut/copy/paste
+        - Toolbar
+            - Selection Modes
+                [ ] Box
+                [ ] Freeform
+            [ ] Invert selection
+    - Move / Transform
+        [x] Drag
+            [ ] Snapping
+        [x] Scale
+            [ ] Keyboard shortcut for locking to aspect ratio
+            [ ] UI toggle for locking to aspect ratio
+        [x] Rotate
+            [ ] Show visual indicator of degrees
+            [ ] Snap to whole numbers
+        - Toolbar
+            [ ] Auto select layer or work with current layer only
+            [ ] Mode toggle
+                [ ] Free Transform
+                [ ] Aspect ratio lock
+                [ ] 3d transform
+            [ ] Snapping toggle
+                - Settings for where to snap
+                    [ ] Canvas edges
+                    [ ] Canvas center
+                    [ ] Other layer edges
+                    [ ] Other layer center
+            [ ] Rotation origin selection
+            [ ] Manual Input
+                [ ] Scale to width/height
+                [ ] Lock width/height aspect ratio
+                [ ] Rotation angle
+                [ ] Position
+            [ ] Apply transform button
+    - Color picker
+        - Design: Background of icon will show current color. Icon color adjusts to be visible based on that. Clicking will bring up color dialog. Inside that dialog can pick color by conventional methods, or use color picker icon inside dialog to pick color from canvas
+        [ ] Background color of tool icon is selected color
+        [ ] Color dialog
+            [ ] Color gradient selection
+            [ ] Hex
+            [ ] RGBA sliders
+            [ ] HSL sliders
+            [ ] Pick color from canvas
+            [ ] Palettes
+    - Draw Brush
+        - Design: Draws on a raster layer. Bunch of settings.
+    - Draw Pen
+        - Design: Works similar to brush, but with vector graphics.
+    - Draw Shape
+        - Design: Adds pre-defined vector shape to layer.
+    - Deform Blur
+        - Design: Blurs raster layer data in concentrated area around pointer
+    - Deform Sharpen
+        - Design: Sharpens raster layer data in concentrated area around pointer
+    - Deform Bulge/Ping
+        - Design: expands/contracts raster layer data in concentrated area around pointer
+    - Deform Clone
+        - Design: Works like brush, except source image is based on selected area of canvas
+    - Erase
+        - Design: Sets pixel alpha to zero on raster layer, punches holes in vector layer.
+    - Layers
+        [x] Drag & Drop reorder
+        [x] Show/hide toggle
+        [ ] Change background solid/transparent grid
+        [ ] Expand layer Groups
+        [ ] Manipulate effect layers
+            [ ] Update image preview automatically
+        - More settings
+            [ ] Move up
+            [ ] Move down
+            [ ] Delete
+            [ ] Toggle as mask
+            - Lock
+                [ ] RGBA channels individually
+    - Search
+        [ ] Open with ctrl + k shortcut
+        [ ] Dock in modal, search select tool, module, or help article
+
+
+Editor Layout
+    - General
+        [ ] Drag & Drop files to Open
+    - Menu Bar
+        [ ] Fix it sometimes getting stuck in mobile mode after switching tools
+        [ ] Drag & Drop to reorder
+        [ ] Drag & Drop to pin to different edges of screen
