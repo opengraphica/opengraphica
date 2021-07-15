@@ -323,15 +323,20 @@
             }
         }
     }
-    .el-menu-item .bi {
+    .el-menu-item .bi,
+    .el-menu > .el-collapse .el-collapse-item__header .bi {
         font-size: 1.125rem;
     }
     .el-menu-item .bi,
-    .el-submenu .bi {
+    .el-submenu .bi,
+    .el-menu > .el-collapse .el-collapse-item__header .bi {
         vertical-align: middle;
         margin-right: 0.3125rem;
         width: 1.5rem;
         text-align: center;
+    }
+    .el-menu > .el-collapse .el-collapse-item__header .bi {
+        color: #909399;
     }
 
     .el-radio-button { 

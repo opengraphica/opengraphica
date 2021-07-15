@@ -3,6 +3,7 @@ import {
     WorkingFileGroupLayer, UpdateAnyLayerOptions
 } from '@/types';
 import { BaseAction } from './base';
+import { registerObjectUrlUser, revokeObjectUrlIfLastUser } from './data/memory-management';
 import canvasStore from '@/store/canvas';
 import workingFileStore, { getLayerById } from '@/store/working-file';
 
@@ -27,6 +28,20 @@ export class UpdateLayerAction<GroupLayerOptions extends UpdateAnyLayerOptions<R
             if (prop !== 'id') {
                 (this.previousProps as any)[prop] = (layer as any)[prop];
                 (layer as any)[prop] = this.updateLayerOptions[prop];
+            }
+            if (prop === 'data') {
+                if (layer.type === 'raster') {
+                    if (layer.data.sourceImage && layer.data.sourceImageIsObjectUrl) {
+                        registerObjectUrlUser(layer.data.sourceImage?.src, layer.id);
+                    }
+                }
+                else if (layer.type === 'rasterSequence') {
+                    for (let frame of layer.data.sequence) {
+                        if (frame.image.sourceImage && frame.image.sourceImageIsObjectUrl) {
+                            registerObjectUrlUser(frame.image.sourceImage.src, layer.id);
+                        }
+                    }
+                }
             }
         }
         layer.thumbnailImageSrc = null;
@@ -53,6 +68,26 @@ export class UpdateLayerAction<GroupLayerOptions extends UpdateAnyLayerOptions<R
 
     public free() {
         super.free();
+
+        if (this.previousProps && !this.isDone) {
+            const data = (this.previousProps as any).data;
+            const layer = getLayerById(this.updateLayerOptions.id);
+            if (data && layer) {
+                if (layer.type === 'raster') {
+                    if (data.sourceImage && data.sourceImageIsObjectUrl) {
+                        revokeObjectUrlIfLastUser(data.sourceImage.src, layer.id);
+                    }
+                }
+                else if (layer.type === 'rasterSequence') {
+                    for (let frame of data.sequence) {
+                        if (frame.image.sourceImage && frame.image.sourceImageIsObjectUrl) {
+                            revokeObjectUrlIfLastUser(frame.image.sourceImage.src, layer.id);
+                        }
+                    }
+                }
+            }
+        }
+
         (this.updateLayerOptions as any) = null;
         (this.previousProps as any) = null;
     }

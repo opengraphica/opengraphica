@@ -23954,15 +23954,20 @@ body.ogr-full-page {
 .opengraphica .el-menu.el-menu--medium > .el-divider {
   margin: 0.25rem 0;
 }
-.opengraphica .el-menu-item .bi {
+.opengraphica .el-menu-item .bi,
+.opengraphica .el-menu > .el-collapse .el-collapse-item__header .bi {
   font-size: 1.125rem;
 }
 .opengraphica .el-menu-item .bi,
-.opengraphica .el-submenu .bi {
+.opengraphica .el-submenu .bi,
+.opengraphica .el-menu > .el-collapse .el-collapse-item__header .bi {
   vertical-align: middle;
   margin-right: 0.3125rem;
   width: 1.5rem;
   text-align: center;
+}
+.opengraphica .el-menu > .el-collapse .el-collapse-item__header .bi {
+  color: #909399;
 }
 .opengraphica .el-radio-button.is-active {
   cursor: default !important;

@@ -5,6 +5,7 @@ import {
 } from '@/types';
 import { BaseAction } from './base';
 import { SelectLayersAction } from './select-layers';
+import { registerObjectUrlUser, revokeObjectUrlIfLastUser } from './data/memory-management';
 import canvasStore from '@/store/canvas';
 import workingFileStore, { getGroupLayerById } from '@/store/working-file';
 import layerRenderers from '@/canvas/renderers';
@@ -65,6 +66,9 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
                         renderer: layerRenderers.raster,
                         ...this.insertLayerOptions
                     } as WorkingFileRasterLayer<RGBAColor>;
+                    if (newLayer.data.sourceImageIsObjectUrl) {
+                        registerObjectUrlUser(newLayer.data.sourceImage?.src, layerId);
+                    }
                     break;
                 case 'rasterSequence':
                     newLayer = {
@@ -73,6 +77,11 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
                         renderer: layerRenderers.rasterSequence,
                         ...this.insertLayerOptions
                     } as WorkingFileRasterSequenceLayer<RGBAColor>;
+                    for (let frame of newLayer.data.sequence) {
+                        if (frame.image.sourceImageIsObjectUrl) {
+                            registerObjectUrlUser(frame.image.sourceImage?.src, layerId);
+                        }
+                    }
                     break;
                 case 'vector':
                     newLayer = {
@@ -157,7 +166,14 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
         if (this.insertedLayer && !this.isDone) {
             if (this.insertedLayer.type === 'raster') {
                 if (this.insertedLayer.data.sourceImage && this.insertedLayer.data.sourceImageIsObjectUrl) {
-                    URL.revokeObjectURL(this.insertedLayer.data.sourceImage.src);
+                    revokeObjectUrlIfLastUser(this.insertedLayer.data.sourceImage?.src, this.insertedLayer.id);
+                }
+            }
+            else if (this.insertedLayer.type === 'rasterSequence') {
+                for (let frame of this.insertedLayer.data.sequence) {
+                    if (frame.image.sourceImage && frame.image.sourceImageIsObjectUrl) {
+                        revokeObjectUrlIfLastUser(frame.image.sourceImage?.src, this.insertedLayer.id);
+                    }
                 }
             }
         }

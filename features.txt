@@ -48,6 +48,9 @@ Modules
                 [x] Change resolution
                 [x] Change resolution units
                 [x] Toggle snapping
+        - Convert layers
+            [x] to image sequence
+                [ ] selected layers only
         [ ] Cut (active layers)
             [ ] Ctrl + X shortcut
         [ ] Copy (active layers)

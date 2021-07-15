@@ -1,5 +1,5 @@
 import { PerformantStore } from './performant-store';
-import { RGBAColor, MeasuringUnits, ResolutionUnits, ColorModelName, WorkingFileLayer, WorkingFileGroupLayer, WorkingFileTimeline } from '@/types';
+import { RGBAColor, MeasuringUnits, ResolutionUnits, ColorModelName, WorkingFileLayer, WorkingFileAnyLayer, WorkingFileGroupLayer, WorkingFileTimeline } from '@/types';
 
 interface WorkingFileState {
     activeTimelineId: number | null,
@@ -50,13 +50,13 @@ const store = new PerformantStore<WorkingFileStore>({
     }
 });
 
-function getLayerById(id: number, parent?: WorkingFileLayer<RGBAColor>[]): WorkingFileLayer<RGBAColor> | null {
+function getLayerById(id: number, parent?: WorkingFileLayer<RGBAColor>[]): WorkingFileAnyLayer<RGBAColor> | null {
     if (parent == null) {
         parent = store.get('layers');
     }
     for (let layer of parent) {
         if (layer.id === id) {
-            return layer;
+            return layer as WorkingFileAnyLayer<RGBAColor>;
         } else if (layer.type === 'group') {
             let foundLayer = getLayerById(id, (layer as WorkingFileGroupLayer<RGBAColor>).layers);
             if (foundLayer) {
@@ -78,7 +78,7 @@ function getGroupLayerById(id: number, parent?: WorkingFileLayer<RGBAColor>[]): 
     return null;
 }
 
-function getLayersByType(type: string, parent?: WorkingFileLayer<RGBAColor>[]): WorkingFileLayer<RGBAColor>[] {
+function getLayersByType<T extends WorkingFileLayer<RGBAColor>>(type: string, parent?: WorkingFileLayer<RGBAColor>[]): T[] {
     if (parent == null) {
         parent = store.get('layers');
     }
@@ -91,7 +91,7 @@ function getLayersByType(type: string, parent?: WorkingFileLayer<RGBAColor>[]): 
             layers = layers.concat(getLayersByType(type, (layer as WorkingFileGroupLayer<RGBAColor>).layers));
         }
     }
-    return layers;
+    return layers as T[];
 }
 
 function getTimelineById(id: number): WorkingFileTimeline | null {

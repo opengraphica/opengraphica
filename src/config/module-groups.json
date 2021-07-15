@@ -58,6 +58,14 @@
         "name": "Image Canvas",
         "description": "Operations that affect the image canvas.",
         "modules": {
+            "convertLayersToImageSequence": {
+                "name": "Convert Layers to Image Sequence",
+                "description": "Converts the selected layers to an image sequence layer (animation).",
+                "action": {
+                    "type": "ui",
+                    "target": "image-convert-layers-to-image-sequence"
+                }
+            },
             "copyAll": {
                 "name": "Copy All Layers",
                 "description": "Copy all layers on the canvas as a PNG image to the clipboard.",

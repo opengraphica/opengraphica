@@ -50,7 +50,17 @@
                         <i class="bi bi-crop"></i>
                         <span>Crop and Resize</span>
                     </el-menu-item>
-                    <el-divider />
+                    <el-collapse class="el-collapse--menu-item my-1">
+                        <el-collapse-item>
+                            <template v-slot:title>
+                                Convert Layers...
+                            </template>
+                            <el-menu-item index="convertLayersToImageSequence">
+                                <i class="bi bi-arrow-return-right"></i>
+                                <span>To Image Sequence</span>
+                            </el-menu-item>
+                        </el-collapse-item>
+                    </el-collapse>
                     <el-menu-item index="cut">
                         <i class="bi bi-scissors"></i>
                         <span>Cut</span>
@@ -482,6 +492,9 @@ export default defineComponent({
                                     group: 'image',
                                     tool: 'cropResize'
                                 });
+                                break;
+                            case 'convertLayersToImageSequence':
+                                await runModule('image', 'convertLayersToImageSequence');
                                 break;
                             case 'cut':
                                 await runModule('tmp', 'notYetImplemented');
