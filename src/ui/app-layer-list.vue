@@ -29,10 +29,16 @@
                     <el-button type="text" class="px-2" aria-label="Toggle Layer Visibility" @click="onToggleLayerVisibility(layer)">
                         <i class="bi" :class="{ 'bi-eye': layer.visible, 'bi-eye-slash': !layer.visible }" aria-hidden="true"></i>
                     </el-button>
-                    <el-button type="text" aria-label="Layer Settings" class="px-2 mr-2 my-0 ml-0">
+                    <el-button type="text" aria-label="Layer Settings" class="px-2 mr-2 my-0 ml-0" @click="onToggleLayerSettings(layer)">
                         <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
                     </el-button>
                 </span>
+                <el-menu v-if="showLayerSettingsMenuFor === layer.id" class="el-menu--medium el-menu--borderless mb-1" @select="onLayerSettingsSelect(layer, $event)">
+                    <el-menu-item index="delete">
+                        <i class="bi bi-trash"></i>
+                        <span>Delete</span>
+                    </el-menu-item>
+                </el-menu>
                 <span v-if="layer.type === 'rasterSequence'" role="group" class="ogr-layer-attributes ogr-layer-frames">
                     <span class="ogr-layer-attributes__title">
                         <i class="bi bi-arrow-return-right" aria-hidden="true"></i> Frames
@@ -62,9 +68,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch, reactive, toRefs, nextTick, PropType, getCurrentInstance } from 'vue';
+import { defineComponent, ref, computed, watch, reactive, onMounted, toRefs, nextTick, PropType, getCurrentInstance } from 'vue';
 import ElButton from 'element-plus/lib/el-button';
 import ElLoading from 'element-plus/lib/el-loading';
+import ElMenu from 'element-plus/lib/el-menu';
+import ElMenuItem from 'element-plus/lib/el-menu-item';
+import ElPopover from 'element-plus/lib/el-popover';
 import ElScrollbar from 'element-plus/lib/el-scrollbar';
 import pointerDirective from '@/directives/pointer';
 import canvasStore from '@/store/canvas';
@@ -74,6 +83,7 @@ import workingFileStore from '@/store/working-file';
 import AppLayerListThumbnail from '@/ui/app-layer-list-thumbnail.vue';
 import AppLayerFrameThumbnail from '@/ui/app-layer-frame-thumbnail.vue';
 import { BundleAction } from '@/actions/bundle';
+import { DeleteLayersAction } from '@/actions/delete-layers';
 import { SelectLayersAction } from '@/actions/select-layers';
 import { UpdateLayerAction } from '@/actions/update-layer';
 import { ReorderLayersAction } from '@/actions/reorder-layers';
@@ -89,6 +99,9 @@ export default defineComponent({
         AppLayerListThumbnail,
         AppLayerFrameThumbnail,
         ElButton,
+        ElMenu,
+        ElMenuItem,
+        ElPopover,
         ElScrollbar
     },
     props: {
@@ -128,17 +141,13 @@ export default defineComponent({
         const draggingLayerId = ref<number | null>(null);
         const draggingItemHtml = ref<string>('');
 
+        const showLayerSettingsMenuFor = ref<number | null>(null);
+
         const conditionalDragStartEventModifier: string = props.isRoot ? 'dragstart' : '';
         const { playingAnimation } = toRefs(canvasStore.state);
         const { selectedLayerIds } = toRefs(workingFileStore.state);
 
-        const reversedLayers = computed(() => {
-            const newLayersList = [];
-            for (let i = props.layers.length - 1; i >= 0; i--) {
-                newLayersList.push(reactive(props.layers[i]));
-            }
-            return newLayersList;
-        });
+        const reversedLayers = ref<WorkingFileAnyLayer<RGBAColor>[]>([]);
 
         watch(() => props.scrollTop, () => {
             if (draggingLayerId.value != null) {
@@ -147,6 +156,20 @@ export default defineComponent({
                 });
             }
         });
+
+        onMounted(() => {
+            refreshLayerList();
+        });
+
+        async function onLayerSettingsSelect(layer: WorkingFileAnyLayer<RGBAColor>, action: string) {
+            if (action === 'delete') {
+                historyStore.dispatch('runAction', {
+                    action: new DeleteLayersAction([layer.id])
+                });
+                refreshLayerList();
+            }
+            showLayerSettingsMenuFor.value = null;
+        }
 
         function onMouseEnterDndHandle(layer: WorkingFileAnyLayer<RGBAColor>) {
             hoveringLayerId.value = layer.id;
@@ -259,6 +282,14 @@ export default defineComponent({
             dropTargetLayerId.value = null;
         }
 
+        function onToggleLayerSettings(layer: WorkingFileAnyLayer<RGBAColor>) {
+            if (showLayerSettingsMenuFor.value === layer.id) {
+                showLayerSettingsMenuFor.value = null;
+            } else {
+                showLayerSettingsMenuFor.value = layer.id;
+            }
+        }
+
         function onToggleLayerVisibility(layer: WorkingFileAnyLayer<RGBAColor>) {
             let visibility = layer.visible;
             historyStore.dispatch('runAction', {
@@ -304,6 +335,14 @@ export default defineComponent({
             });
         }
 
+        function refreshLayerList() {
+            const newLayersList = [];
+            for (let i = props.layers.length - 1; i >= 0; i--) {
+                newLayersList.push(reactive(props.layers[i]));
+            }
+            reversedLayers.value = newLayersList;
+        }
+
         return {
             layerList,
             draggingLayer,
@@ -315,12 +354,15 @@ export default defineComponent({
             selectedLayerIds,
             playingAnimation,
             hoveringLayerId,
+            showLayerSettingsMenuFor,
+            onLayerSettingsSelect,
             onMouseEnterDndHandle,
             onMouseLeaveDndHandle,
             onPointerTapDndHandle,
             onPointerDragStartList,
             onPointerDragEndList,
             onPointerMoveList,
+            onToggleLayerSettings,
             onToggleLayerVisibility,
             onSelectLayerFrame,
             onPlayRasterSequence,

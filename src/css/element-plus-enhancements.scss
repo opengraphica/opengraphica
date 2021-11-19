@@ -87,6 +87,23 @@
                 flex-grow: 1;
                 text-align: left;
             }
+
+            > .el-form-item__content {
+                > .el-button-group,
+                > .el-radio-group {
+                    overflow-wrap: normal;
+                    word-break: normal;
+                    white-space: nowrap;
+                }
+                > .el-button-group > .el-button {
+                    float: none;
+                }
+            }
+        }
+        &.el-form-item--has-content-right {
+            > .el-form-item__content {
+                text-align: right;
+            }
         }
     }
 
@@ -348,6 +365,17 @@
         }
         .el-radio-button__orig-radio:disabled + .el-radio-button__inner {
             cursor: default !important;
+        }
+    }
+
+    .el-switch {
+        &.is-checked {
+            .el-switch__core {
+                .el-switch__action {
+                    left: calc(100% - var(--el-switch-button-size) - 0.0625rem);
+                    margin-left: 0;
+                }
+            }
         }
     }
 

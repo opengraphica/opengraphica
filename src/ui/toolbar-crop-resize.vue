@@ -70,7 +70,7 @@
                             </el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item class="el-form-item--menu-item mb-1" label="Snapping">
+                    <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" label="Snapping">
                         <el-switch v-model="enableSnapping" />
                     </el-form-item>
                 </el-form>

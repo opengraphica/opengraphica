@@ -4,7 +4,7 @@
         v-loading="loading"
         action="javascript:void(0)"
         label-position="left"
-        :model="formData.workingFile"
+        :model="formData"
         :rules="formValidationRules"
         novalidate="novalidate"
         hide-required-asterisk

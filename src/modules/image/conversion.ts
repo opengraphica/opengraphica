@@ -26,37 +26,37 @@ export async function convertLayersToImageSequence(options: ConvertLayersToImage
         }
     };
     let start: number = 0;
-    for (let layer of combineLayers) {
-        let image = new Image();
-        await new Promise<void>((resolve, reject) => {
-            image.onload = () => {
-                resolve();
-            };
-            image.onerror = () => {
-                reject();
-            };
-            image.src = layer.data.sourceImage?.src || '';
+    if (combineLayers.length > 0) {
+        for (let layer of combineLayers) {
+            let image = new Image();
+            await new Promise<void>((resolve, reject) => {
+                image.onload = () => {
+                    resolve();
+                };
+                image.onerror = () => {
+                    reject();
+                };
+                image.src = layer.data.sourceImage?.src || '';
+            });
+            rasterSequenceLayer.data?.sequence.push({
+                start: start,
+                end: Math.floor(start + frameDelay),
+                image: {
+                    sourceImage: image,
+                    sourceImageIsObjectUrl: layer.data.sourceImageIsObjectUrl
+                },
+                thumbnailImageSrc: null
+            });
+            start = Math.floor(start + frameDelay);
+        }
+        rasterSequenceLayer.data && (rasterSequenceLayer.data.currentFrame = rasterSequenceLayer.data?.sequence[0].image);
+        editorStore.dispatch('setTimelineCursor', start);
+        updateRasterSequenceLayerWithTimeline(rasterSequenceLayer as any);
+        historyStore.dispatch('runAction', {
+            action: new BundleAction('convertLayersToImageSequence', 'Convert Layers to Image Sequence', [
+                new DeleteLayersAction(combineLayers.map((layer) => layer.id)),
+                new InsertLayerAction(rasterSequenceLayer)
+            ])
         });
-        rasterSequenceLayer.data?.sequence.push({
-            start: start,
-            end: Math.floor(start + frameDelay),
-            image: {
-                sourceImage: image,
-                sourceImageIsObjectUrl: layer.data.sourceImageIsObjectUrl
-            },
-            thumbnailImageSrc: null
-        });
-        start = Math.floor(start + frameDelay);
     }
-    rasterSequenceLayer.data && (rasterSequenceLayer.data.currentFrame = rasterSequenceLayer.data?.sequence[0].image);
-    editorStore.dispatch('setTimelineCursor', start);
-    updateRasterSequenceLayerWithTimeline(rasterSequenceLayer as any);
-    historyStore.dispatch('runAction', {
-        action: new BundleAction('convertLayersToImageSequence', 'Convert Layers to Image Sequence', [
-            new DeleteLayersAction(combineLayers.map((layer) => layer.id)),
-            new InsertLayerAction(rasterSequenceLayer)
-        ])
-    });
-    console.log(editorStore.state);
-    console.log(workingFileStore.state);
 }

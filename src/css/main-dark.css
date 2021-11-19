@@ -74596,6 +74596,18 @@ body.ogr-full-page {
   flex-grow: 1;
   text-align: left;
 }
+.opengraphica .el-form-item.el-form-item--menu-item > .el-form-item__content > .el-button-group,
+.opengraphica .el-form-item.el-form-item--menu-item > .el-form-item__content > .el-radio-group {
+  overflow-wrap: normal;
+  word-break: normal;
+  white-space: nowrap;
+}
+.opengraphica .el-form-item.el-form-item--menu-item > .el-form-item__content > .el-button-group > .el-button {
+  float: none;
+}
+.opengraphica .el-form-item.el-form-item--has-content-right > .el-form-item__content {
+  text-align: right;
+}
 .opengraphica .el-form-item-group {
   --label-min-width: 0px;
   margin-bottom: 1.375rem;
@@ -74809,6 +74821,10 @@ body.ogr-full-page {
 }
 .opengraphica .el-radio-button .el-radio-button__orig-radio:disabled + .el-radio-button__inner {
   cursor: default !important;
+}
+.opengraphica .el-switch.is-checked .el-switch__core .el-switch__action {
+  left: calc(100% - var(--el-switch-button-size) - 0.0625rem);
+  margin-left: 0;
 }
 .opengraphica .el-loading-spinner svg {
   display: inline;

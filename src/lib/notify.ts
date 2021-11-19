@@ -7,7 +7,7 @@ export function notifyInjector(injectName: string): INotification {
 }
 
 export function notifyPolyfill($notify: INotification): INotification {
-    return (options?: INotificationOptions): INotificationHandle => {
+    const notifyFn = (options?: INotificationOptions): INotificationHandle => {
         const notificationHandle = $notify(options);
         const notifications = document.querySelectorAll('body > .el-notification');
         (document.querySelector('.opengraphica') as Element).appendChild(
@@ -15,6 +15,10 @@ export function notifyPolyfill($notify: INotification): INotification {
         );
         return notificationHandle;
     };
+    notifyFn.closeAll = () => {
+        return $notify.closeAll();
+    }
+    return notifyFn;
 }
 
 export const unexpectedErrorMessage: string = 'An unexpected error occurred. If this error persists, please <a href="https://github.com/opengraphica/opengraphica/issues/new" target="_blank">report an issue on Github</a>.';

@@ -214,13 +214,13 @@
                     </el-form-item>
                     <el-collapse class="el-collapse--menu-item">
                         <el-collapse-item title="Viewport">
-                            <el-form-item class="el-form-item--menu-item" label="Optimize for Large Image">
+                            <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" label="Optimize for Large Image">
                                 <el-switch v-model="preferenceOptimizeLargeImages" />
                             </el-form-item>
-                            <el-form-item v-if="preferenceOptimizeLargeImages" class="el-form-item--menu-item" label="Fix Adjacent Layer Seams">
+                            <el-form-item v-if="preferenceOptimizeLargeImages" class="el-form-item--menu-item el-form-item--has-content-right" label="Fix Adjacent Layer Seams">
                                 <el-switch v-model="performanceFixLayerSeams" />
                             </el-form-item>
-                            <el-form-item v-if="!preferenceOptimizeLargeImages" class="el-form-item--menu-item" label="High Quality Scaling">
+                            <el-form-item v-if="!preferenceOptimizeLargeImages" class="el-form-item--menu-item el-form-item--has-content-right" label="High Quality Scaling">
                                 <el-switch v-model="preferenceHighQualityScaling" />
                             </el-form-item>
                         </el-collapse-item>

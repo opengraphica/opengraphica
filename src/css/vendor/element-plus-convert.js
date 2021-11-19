@@ -27,6 +27,7 @@ for (let { css, filename } of stylesheets) {
             prefix: '.opengraphica'
         }))
         .process(css).css
+        .replace(/\.opengraphica \:root\{/g, '.opengraphica{')
         .replace(/\[x\-placement\^\=/g, '[data-popper-placement^=')
         .replace(/\.popper\_\_arrow/g, '.el-popper__arrow');
 
