@@ -2,6 +2,7 @@
     <ul ref="layerList"
         v-pointer.dragstart="onPointerDragStartList"
         v-pointer.dragend="onPointerDragEndList"
+        v-pointer.press="onPointerPressList"
         v-pointer.move.window="onPointerMoveList"
         class="ogr-layer-list"
         :class="{ 'is-dnd-dragging': draggingLayerId != null }"
@@ -185,9 +186,19 @@ export default defineComponent({
                 action: new SelectLayersAction([layerId])
             });
         }
-        async function onPointerDragStartList(e: PointerEvent | MouseEvent | TouchEvent) {
-            const target = e.target || (e as TouchEvent).touches[0].target;
-            const pageY = (e as any).pageY || (e as TouchEvent).touches[0].pageY;
+        async function onPointerDragStartList(e: PointerEvent) {
+            if (e.pointerType != 'touch') {
+                handleDragStartList(e);
+            }
+        }
+        function onPointerPressList(e: PointerEvent) {
+            if (e.pointerType === 'touch') {
+                handleDragStartList(e);
+            }
+        }
+        async function handleDragStartList(e: PointerEvent) {
+            const target = e.target;
+            const pageY = e.pageY;
             lastDragPageY = pageY;
             const layerElement: Element | null | undefined = (target as Element)?.closest('.ogr-layer-dnd-handle')?.closest('.ogr-layer');
             const layerId: number = parseInt(layerElement?.getAttribute('data-layer-id') || '-1', 10);
@@ -207,9 +218,9 @@ export default defineComponent({
                 }
             }
         }
-        function onPointerMoveList(e: PointerEvent | MouseEvent | TouchEvent) {
+        function onPointerMoveList(e: PointerEvent) {
             if (draggingLayerId.value != null) {
-                const pageY = (e as any).pageY || (e as TouchEvent).touches[0].pageY;
+                const pageY = (e as any).pageY;
                 calculateDropPosition(pageY);
                 lastDragPageY = pageY;
             }
@@ -271,15 +282,16 @@ export default defineComponent({
                 }
             }
         }
-        function onPointerDragEndList(e: PointerEvent | MouseEvent | TouchEvent) {
+        async function onPointerDragEndList(e: PointerEvent | MouseEvent | TouchEvent) {
             if (draggingLayerId.value != null && dropTargetLayerId.value != null) {
-                historyStore.dispatch('runAction', {
+                await historyStore.dispatch('runAction', {
                     action: new ReorderLayersAction([draggingLayerId.value], dropTargetLayerId.value, dropTargetPosition.value === 'before' ? 'above' : 'below')
                 });
             }
             draggingLayerId.value = null;
             draggingItemHtml.value = '';
             dropTargetLayerId.value = null;
+            refreshLayerList();
         }
 
         function onToggleLayerSettings(layer: WorkingFileAnyLayer<RGBAColor>) {
@@ -362,6 +374,7 @@ export default defineComponent({
             onPointerDragStartList,
             onPointerDragEndList,
             onPointerMoveList,
+            onPointerPressList,
             onToggleLayerSettings,
             onToggleLayerVisibility,
             onSelectLayerFrame,

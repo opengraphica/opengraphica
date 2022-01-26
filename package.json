@@ -9,7 +9,7 @@
         "build:library": "webpack --mode=production --config ./webpack.config.library.js",
         "build:website": "webpack --mode=production --config ./webpack.config.website.js",
         "build:vite": "tsc --noEmit && vite build",
-        "serve": "vite preview"
+        "serve": "npm run dev"
     },
     "dependencies": {
         "axios": "^0.21.1",

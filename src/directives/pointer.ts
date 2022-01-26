@@ -4,7 +4,7 @@ import { translateTouchEventToPointerEvents, translateMouseEventToPointerEvent }
 import { isInput } from '@/lib/events';
 import { pointDistance2d } from '@/lib/math';
 
-const { multiTouchDownTimeout, multiTouchTapTimeout } = toRefs(preferencesStore.state);
+const { multiTouchDownTimeout, multiTouchTapTimeout, pointerPressHoldTimeout } = toRefs(preferencesStore.state);
 
 interface EventHandlerMap {
     [key: string]: { // Emulated event name
@@ -123,10 +123,129 @@ function handleTapEvent(el: any, binding: DirectiveBinding<any>) {
     eventHandlerMap.set(el, callbackHandles);
 }
 
+/* Press */
+function handlePressEvent(el: any, binding: DirectiveBinding<any>) {
+    const callbackHandles = eventHandlerMap.get(el) || {};
+    let pointerDownTimeoutHandle: number | undefined;
+    let pointerDownType: string = '';
+    let isPointerDownValid: boolean = false;
+    let pointerDownX: number = -1;
+    let pointerDownY: number = -1;
+    function onMouseDown(e: MouseEvent) {
+        pointerDownType = 'mouse';
+        isPointerDownValid = true;
+        pointerDownX = e.pageX;
+        pointerDownY = e.pageY;
+        clearTimeout(pointerDownTimeoutHandle);
+        pointerDownTimeoutHandle = setTimeout(() => {
+            isPointerDownValid = false;
+            runCallback(el, 'press', binding, translateMouseEventToPointerEvent('pointerdown', e));
+        }, pointerPressHoldTimeout.value);
+    }
+    function onMouseMoveWindow(e: MouseEvent) {
+        if (isPointerDownValid && pointerDownType === 'mouse') {
+            if (pointDistance2d(pointerDownX, pointerDownY, e.pageX, e.pageY) > preferencesStore.get('dragStartRadius')) {
+                clearTimeout(pointerDownTimeoutHandle);
+                isPointerDownValid = false;
+            }
+        }
+    }
+    function onMouseUp(e: MouseEvent) {
+        clearTimeout(pointerDownTimeoutHandle);
+        isPointerDownValid = false;
+    }
+    function onPointerDown(e: PointerEvent) {
+        if (e.pointerType === 'pen' && e.isPrimary) {
+            pointerDownType = 'pen';
+            isPointerDownValid = true;
+            pointerDownX = e.pageX;
+            pointerDownY = e.pageY;
+            clearTimeout(pointerDownTimeoutHandle);
+            pointerDownTimeoutHandle = setTimeout(() => {
+                isPointerDownValid = false;
+                runCallback(el, 'press', binding, e);
+            }, pointerPressHoldTimeout.value);
+        }
+    }
+    function onPointerMoveWindow(e: PointerEvent) {
+        if (isPointerDownValid && pointerDownType === 'pen' && e.isPrimary) {
+            if (pointDistance2d(pointerDownX, pointerDownY, e.pageX, e.pageY) > preferencesStore.get('dragStartRadius')) {
+                clearTimeout(pointerDownTimeoutHandle);
+                isPointerDownValid = false;
+            }
+        }
+    }
+    function onPointerUp(e: PointerEvent) {
+        if (e.pointerType === 'pen' && pointerDownType === 'pen' && isPointerDownValid) {
+            clearTimeout(pointerDownTimeoutHandle);
+            isPointerDownValid = false;
+        }
+    }
+    function onTouchStart(e: TouchEvent) {
+        for (let i = 0; i < e.changedTouches.length; i++) {
+            const touch = e.changedTouches[i];
+            if ((e.touches[0] && e.touches[0].identifier === touch.identifier) || e.touches.length === 0) {
+                pointerDownType = 'touch';
+                isPointerDownValid = true;
+                pointerDownX = e.touches[0].pageX;
+                pointerDownY = e.touches[0].pageY;
+                clearTimeout(pointerDownTimeoutHandle);
+                pointerDownTimeoutHandle = setTimeout(() => {
+                    isPointerDownValid = false;
+                    runCallback(el, 'press', binding, translateTouchEventToPointerEvents('pointerdown', e)[0]);
+                }, pointerPressHoldTimeout.value);
+            }
+        }
+    }
+    function onTouchMoveWindow(e: TouchEvent) {
+        if (isPointerDownValid && pointerDownType === 'touch') {
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                const touch = e.changedTouches[i];
+                if ((e.touches[0] && e.touches[0].identifier === touch.identifier) || e.touches.length === 0) {
+                    if (pointDistance2d(pointerDownX, pointerDownY, e.touches[0].pageX, e.touches[0].pageY) > preferencesStore.get('dragStartRadius')) {
+                        clearTimeout(pointerDownTimeoutHandle);
+                        isPointerDownValid = false;
+                    }
+                }
+            }
+        }
+    }
+    function onTouchEnd(e: TouchEvent) {
+        if (pointerDownType === 'touch' && isPointerDownValid) {
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                const touch = e.changedTouches[i];
+                if ((e.touches[0] && e.touches[0].identifier === touch.identifier) || e.touches.length === 0) {
+                    clearTimeout(pointerDownTimeoutHandle);
+                    isPointerDownValid = false;
+                    if (window.navigator.vibrate) {
+                        window.navigator.vibrate(200);
+                    }
+                }
+            }
+        }
+    }
+    callbackHandles.press = {
+        mousedown: [el, onMouseDown],
+        mousemove: [window, onMouseMoveWindow],
+        mouseup: [el, onMouseUp],
+        pointerdown: [el, onPointerDown],
+        pointermove: [window, onPointerMoveWindow],
+        pointerup: [el, onPointerUp],
+        touchstart: [el, onTouchStart],
+        touchmove: [el, onTouchMoveWindow],
+        touchend: [el, onTouchEnd]
+    };
+    for (let realEventName in callbackHandles.press) {
+        const callbackConfig = callbackHandles.press[realEventName];
+        callbackConfig[0].addEventListener(realEventName, callbackConfig[1] as any);
+    }
+    eventHandlerMap.set(el, callbackHandles);
+}
+
 /* Move */
 function handleMoveEvent(el: any, binding: DirectiveBinding<any>) {
     function onMouseMove(e: MouseEvent) {
-        runCallback(el, 'move', binding, e);
+        runCallback(el, 'move', binding, translateMouseEventToPointerEvent('pointermove', e));
     }
     function onPointerMove(e: PointerEvent) {
         if (e.type === 'pen') {
@@ -134,7 +253,10 @@ function handleMoveEvent(el: any, binding: DirectiveBinding<any>) {
         }
     }
     function onTouchMove(e: TouchEvent) {
-        runCallback(el, 'move', binding, e);
+        const events = translateTouchEventToPointerEvents('pointermove', e);
+        for (const event of events) {
+            runCallback(el, 'move', binding, event);
+        }
     }
     const callbackHandles = eventHandlerMap.get(el) || {};
     callbackHandles.move = {
@@ -182,7 +304,7 @@ function handleDragEvents(el: any, eventName: string, binding: DirectiveBinding<
         if (pointerDownType === 'mouse' && !isDragging) {
             if (pointDistance2d(pointerDownX, pointerDownY, e.pageX, e.pageY) > preferencesStore.get('dragStartRadius')) {
                 isDragging = true;
-                runCallback(el, 'dragstart', binding, pointerDownEvent);
+                runCallback(el, 'dragstart', binding, translateMouseEventToPointerEvent('pointerdown', pointerDownEvent as MouseEvent));
             }
         }
     }
@@ -191,7 +313,7 @@ function handleDragEvents(el: any, eventName: string, binding: DirectiveBinding<
             pointerDownType = null;
             if (isDragging) {
                 isDragging = false;
-                runCallback(el, 'dragend', binding, e);
+                runCallback(el, 'dragend', binding, translateMouseEventToPointerEvent('pointerup', e));
             }
         }
     }
@@ -244,7 +366,7 @@ function handleDragEvents(el: any, eventName: string, binding: DirectiveBinding<
                 if ((e.touches[0] && e.touches[0].identifier === touch.identifier) || e.touches.length === 0) {
                     if (pointDistance2d(pointerDownX, pointerDownY, e.touches[0].pageX, e.touches[0].pageY) > preferencesStore.get('dragStartRadius')) {
                         isDragging = true;
-                        runCallback(el, 'dragstart', binding, pointerDownEvent);
+                        runCallback(el, 'dragstart', binding, translateTouchEventToPointerEvents('pointerdown', pointerDownEvent as TouchEvent)[0]);
                     }
                 }
             }
@@ -257,7 +379,7 @@ function handleDragEvents(el: any, eventName: string, binding: DirectiveBinding<
                 pointerDownType = null;
                 if (isDragging) {
                     isDragging = false;
-                    runCallback(el, 'dragend', binding, e);
+                    runCallback(el, 'dragend', binding, translateTouchEventToPointerEvents('pointerup', e)[0]);
                 }
             }
         }
@@ -288,6 +410,8 @@ const PointerDirective: ObjectDirective = {
 
         if (eventName === 'tap') {
             handleTapEvent(el, binding);
+        } else if (eventName === 'press') {
+            handlePressEvent(el, binding);
         } else if (['dragstart', 'dragend'].includes(eventName)) {
             handleDragEvents(el, eventName, binding);
         } else if (eventName === 'move') {
