@@ -4,7 +4,7 @@ import { unexpectedErrorMessage } from '@/lib/notify';
 // For firefox, experiment with 
 // dom.events.asyncClipboard.clipboardItem
 
-export async function copyAllLayers() {
+export async function copyAllLayers(options = {}) {
     try {
         const { exportAsImage } = await import(/* webpackChunkName: 'module-file-export' */ '../file/export');
         await exportAsImage({

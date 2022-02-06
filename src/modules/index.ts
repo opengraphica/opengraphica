@@ -1,3 +1,4 @@
+import { ref } from 'vue';
 import moduleGroupConfig from '@/config/module-groups.json';
 import { ModuleGroupDefinition } from '@/types';
 import appEmitter from '@/lib/emitter';
@@ -42,18 +43,35 @@ export async function runModule(moduleGroupName: string, moduleName: string) {
                 const moduleName = modulePathSplit[1];
                 if (moduleGroup && moduleName && methodName) {
                     const importedModule = (await import(/* webpackChunkName: 'module-[request]' */ `./${moduleGroup}/${moduleName}`));
+                    const moduleRunId = 'runModule_' + moduleGroupName + '_' + moduleName;
+                    const cancelable = module.cancelable || false;
+                    const cancelRef = ref<boolean>(false);
+                    const cancelBlocking = (event?: any) => {
+                        if (event && event.id === moduleRunId) {
+                            cancelRef.value = true;
+                        }
+                    };
+                    const moduleRunArgs: any = {};
+                    if (cancelable) {
+                        appEmitter.on('app.wait.cancelBlocking', cancelBlocking);
+                        moduleRunArgs.cancelRef = cancelRef;
+                    }
                     appEmitter.emit('app.wait.startBlocking', {
-                        id: 'runModule_' + moduleGroupName + '_' + moduleName,
-                        label: module.name
+                        id: moduleRunId,
+                        label: module.name,
+                        cancelable: module.cancelable || false
                     });
                     let runModuleError;
                     try {
-                        await importedModule[methodName]();
+                        await importedModule[methodName](moduleRunArgs);
                     } catch (error: any) {
                         runModuleError = error;
                     }
+                    if (cancelable) {
+                        appEmitter.off('app.wait.cancelBlocking', cancelBlocking);
+                    }
                     appEmitter.emit('app.wait.stopBlocking', {
-                        id: 'runModule_' + moduleGroupName + '_' + moduleName
+                        id: moduleRunId
                     });
                     if (runModuleError) {
                         throw runModuleError;

@@ -3,6 +3,7 @@
  * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
 
+import { Ref } from 'vue';
 import {
     SerializedFile, SerializedFileLayer, WorkingFileLayer, RGBAColor, InsertAnyLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions,
     WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer,
@@ -22,6 +23,7 @@ import { knownFileExtensions } from '@/lib/regex';
 interface FileDialogOpenOptions {
     insert?: boolean; // False will create a new document, true inserts into current document.
     accept?: string; // Mime type of files to accept, same as input "accept" attribute.
+    cancelRef?: Ref<boolean>;
 }
 
 export async function openFromFileDialog(options: FileDialogOpenOptions = {}): Promise<void> {
@@ -87,15 +89,15 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
 
 };
 
-export async function insertFromFileDialog() {
+export async function insertFromFileDialog(options: FileDialogOpenOptions = {}) {
     return openFromFileDialog({
+        ...options,
         insert: true,
         accept: 'image/*'
     });
 }
 
 export async function openFromFileList(files: FileList | Array<File>, options: FileDialogOpenOptions = {}) {
-
     type FileReadType = 'json' | 'image';
     type FileReadResolve =
         { type: 'image', result: HTMLImageElement, file: File } |
@@ -124,15 +126,24 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                     if (fileReadType === 'image') {
                         if (file.type === 'image/gif') {
                             const result: { image: HTMLImageElement, duration: number }[] = [];
-                            const gifArrayBuffer = await new Promise<ArrayBuffer>((resolveArrayBuffer) => {
+                            const gifArrayBuffer = await new Promise<ArrayBuffer | null>((resolveArrayBuffer) => {
                                 fileReader.onload = async () => {
-                                    resolveArrayBuffer(fileReader.result as ArrayBuffer);
+                                    if (options.cancelRef && options.cancelRef.value === true) {
+                                        rejectReader('File open canceled.');
+                                        resolveArrayBuffer(null);
+                                    } else {
+                                        resolveArrayBuffer(fileReader.result as ArrayBuffer);
+                                    }
                                 };
                                 fileReader.onerror = () => {
                                     rejectReader('An error occurred while reading the file "' + file.name + '".');
+                                    resolveArrayBuffer(null);
                                 };
                                 fileReader.readAsArrayBuffer(file);
                             });
+                            if (gifArrayBuffer === null) {
+                                return;
+                            }
                             const { Gif, GifPresenter } = await import('gifken');
                             const gif = Gif.parse(gifArrayBuffer);
                             let isNeedManualMerge: boolean = false;
@@ -171,6 +182,10 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                                     ctx.drawImage(gifFrameImage, 0, 0);
                                     gifFrameImage.src = '';
                                 }
+                                if (options.cancelRef && options.cancelRef.value === true) {
+                                    rejectReader('File open canceled.');
+                                    return;
+                                }
                                 const image = await new Promise<HTMLImageElement>((resolveImage, rejectImage) => {
                                     const image = new Image();
                                     image.onload = () => {
@@ -189,6 +204,10 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                                         image.src = URL.createObjectURL(GifPresenter.writeToBlob(gifSplit[i].writeToArrayBuffer()));
                                     }
                                 });
+                                if (options.cancelRef && options.cancelRef.value === true) {
+                                    rejectReader('File open canceled.');
+                                    return;
+                                }
                                 result.push({
                                     image,
                                     duration: frame.delayCentiSeconds * 10
@@ -216,9 +235,12 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                             while ((video.duration === Infinity || isNaN(video.duration)) && video.readyState < 2) {
                                 await new Promise(r => setTimeout(r, 1000));
                                 video.currentTime = 10000000 * Math.random();
+                                if (options.cancelRef && options.cancelRef.value === true) {
+                                    rejectReader('File open canceled.');
+                                    return;
+                                }
                             }
-                            let duration = Math.min(3, video.duration);
-                            console.log(duration);
+                            let duration = Math.min(5, video.duration);
                             let canvas = document.createElement('canvas');
                             let ctx = canvas.getContext('2d');
                             if (!ctx) {
@@ -240,6 +262,10 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                                 let base64ImageData = canvas.toDataURL();
                                 frames.push(base64ImageData);
                                 currentTime += interval;
+                                if (options.cancelRef && options.cancelRef.value === true) {
+                                    rejectReader('File open canceled.');
+                                    return;
+                                }
                             }
                             for (let frame of frames) {
                                 const image = await new Promise<HTMLImageElement>((resolveImage, rejectImage) => {
@@ -252,6 +278,10 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                                     };
                                     image.src = frame;
                                 });
+                                if (options.cancelRef && options.cancelRef.value === true) {
+                                    rejectReader('File open canceled.');
+                                    return;
+                                }
                                 result.push({
                                     image,
                                     duration: 1000 / fps
@@ -280,7 +310,11 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                     }
                     else if (fileReadType === 'json') {
                         fileReader.onload = async () => {
-                            resolveReader({ type: 'json', result: fileReader.result as string, file: file });
+                            if (options.cancelRef && options.cancelRef.value === true) {
+                                rejectReader('File open canceled.');
+                            } else {
+                                resolveReader({ type: 'json', result: fileReader.result as string, file: file });
+                            }
                         };
                         fileReader.onerror = () => {
                             rejectReader('An error occurred while reading the file "' + file.name + '".');
@@ -425,7 +459,11 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
         }
         (window as any).workingFileStore = await (await import('@/store/working-file')).default;
     } else {
-        throw new Error('None of the files selected could be loaded.');
+        if (files.length > 1) {
+            throw new Error('None of the files selected could be loaded.');
+        } else {
+            throw new Error(loadErrorMessages[0] + '');
+        }
     }
 }
 

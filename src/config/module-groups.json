@@ -18,7 +18,8 @@
                     "type": "function",
                     "target": "file/open.openFromFileDialog"
                 },
-                "preload": true
+                "preload": true,
+                "cancelable": true
             },
             "export": {
                 "name": "Export Image",
@@ -42,7 +43,8 @@
                 "action": {
                     "type": "function",
                     "target": "file/open.insertFromFileDialog"
-                }
+                },
+                "cancelable": true
             },
             "takePhoto": {
                 "name": "Take a Photo",

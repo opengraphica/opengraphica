@@ -23,6 +23,10 @@ interface AppEmitterEvents {
     'app.wait.startBlocking': {
         id: string;
         label?: string;
+        cancelable?: boolean;
+    };
+    'app.wait.cancelBlocking': {
+        id: string;
     };
     'app.wait.stopBlocking': {
         id: string;

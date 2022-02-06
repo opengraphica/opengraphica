@@ -80,6 +80,7 @@ export interface ModuleDefinition {
         target: string;
     };
     preload?: boolean;
+    cancelable?: boolean;
 }
 
 export interface ModuleGroupDefinition {
