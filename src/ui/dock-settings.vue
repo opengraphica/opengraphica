@@ -45,7 +45,7 @@
                 </div>
             </template>
             <el-scrollbar>
-                <el-menu class="el-menu--medium el-menu--borderless mb-1 mt-1" @select="onMenuSelect('image', $event)">
+                <el-menu class="el-menu--medium el-menu--borderless mb-1" @select="onMenuSelect('image', $event)">
                     <el-menu-item index="cropResize">
                         <i class="bi bi-crop"></i>
                         <span>Crop and Resize</span>
@@ -88,7 +88,7 @@
                 </div>
             </template>
             <el-scrollbar>
-                <el-form novalidate="novalidate" action="javascript:void(0)" class="mb-1">
+                <el-form novalidate="novalidate" action="javascript:void(0)" class="mb-1 mt-1">
                     <el-form-item class="el-form-item--menu-item" label="Zoom">
                         <el-button-group class="el-button-group--flex">
                             <el-button size="small" plain aria-label="Zoom Out" title="Zoom Out" @click="zoomLevel *= 1/1.1">
