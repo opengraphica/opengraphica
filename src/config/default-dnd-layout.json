@@ -1,21 +1,18 @@
 {
     "dndLayout": {
-        "sidebarLeft": [
-            {
-                "type": "menuBar",
-                "actionGroupLayout": {
-                    "start": [
-                        "settings",
-                        "layers"
-                    ],
-                    "center": [
-                        "view",
-                        "transform"
-                    ],
-                    "end": [],
-                    "favorites": []
-                }
+        "menuBar": {
+            "actionGroupLayout": {
+                "start": [
+                    "settings",
+                    "layers"
+                ],
+                "center": [
+                    "view",
+                    "transform"
+                ],
+                "end": []
             }
-        ]
+        },
+        "sidebarLeft": []
     }
 }

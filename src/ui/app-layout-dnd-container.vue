@@ -2,15 +2,15 @@
     <div class="ogr-layout-dnd-container">
         <header ref="header">
             <h1 class="is-sr-only">OpenGraphica</h1>
-            <template v-if="!isActiveToolbarExclusive && config.header">
-                <app-layout-menu-bar v-for="(menuBarConfig, index) of config.header" :key="index" :config="menuBarConfig" layout-placement="top" />
+            <template v-if="!isActiveToolbarExclusive && config.menuBar && menuBarPosition === 'top'">
+                <app-layout-menu-bar :config="config.menuBar" layout-placement="top" />
             </template>
             <toolbar v-if="activeToolbar && activeToolbarPosition === 'top'" :name="activeToolbar" :class="{ 'is-overlay': !isActiveToolbarExclusive }" />
         </header>
         <div class="ogr-layout-dnd-center">
             <aside aria-label="Left Sidebar" class="sidebar-left" ref="sidebarLeft">
-                <template v-if="!isActiveToolbarExclusive && config.sidebarLeft">
-                    <app-layout-menu-bar v-for="(menuBarConfig, index) of config.sidebarLeft" :key="index" :config="menuBarConfig" direction="vertical" layout-placement="left" />
+                <template v-if="!isActiveToolbarExclusive && config.menuBar && menuBarPosition === 'left'">
+                    <app-layout-menu-bar :config="config.menuBar" layout-placement="left" />
                 </template>
             </aside>
             <main ref="main"
@@ -21,15 +21,15 @@
                 @wheel="onWheelMain"
             />
             <aside aria-label="Right Sidebar" class="sidebar-right" ref="sidebarRight">
-                <template v-if="!isActiveToolbarExclusive && config.sidebarRight">
-                    <app-layout-menu-bar v-for="(menuBarConfig, index) of config.sidebarRight" :key="index" :config="menuBarConfig" direction="vertical" layout-placement="right" />
+                <template v-if="!isActiveToolbarExclusive && config.menuBar && menuBarPosition === 'right'">
+                    <app-layout-menu-bar :config="config.menuBar" layout-placement="right" />
                 </template>
             </aside>
         </div>
         <footer ref="footer">
             <toolbar v-if="activeToolbar && activeToolbarPosition === 'bottom'" :name="activeToolbar" :class="{ 'is-overlay': !isActiveToolbarExclusive }" />
-            <template v-if="!isActiveToolbarExclusive && config.footer">
-                <app-layout-menu-bar v-for="(menuBarConfig, index) of config.footer" :key="index" :config="menuBarConfig" layout-placement="bottom" />
+            <template v-if="!isActiveToolbarExclusive && config.menuBar && menuBarPosition === 'bottom'">
+                <app-layout-menu-bar :config="config.menuBar" layout-placement="bottom" />
             </template>
         </footer>
     </div>
@@ -46,6 +46,7 @@ import { CanvasRenderingContext2DEnhanced, DndLayout } from '@/types';
 import { WorkingFileRasterLayer, RGBAColor } from '@/types';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
+import preferencesStore from '@/store/preferences';
 import workingFileStore from '@/store/working-file';
 import layerRenderers from '@/canvas/renderers';
 import BaseCanvasMovementController from '@/canvas/controllers/base-movement';
@@ -71,6 +72,9 @@ export default defineComponent({
         });
         const isActiveToolbarExclusive = computed<boolean>(() => {
             return editorStore.state.isActiveToolbarExclusive;
+        });
+        const menuBarPosition = computed<string>(() => {
+            return preferencesStore.state.menuBarPosition;
         });
 
         onMounted(() => {
@@ -139,6 +143,7 @@ export default defineComponent({
             activeToolbarPosition,
             isActiveToolbarExclusive,
             isPointerInsideMain,
+            menuBarPosition,
             onPointerDownMain,
             onTouchStartMain,
             onWheelMain

@@ -45,6 +45,7 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.setAttribute('accept', options.accept || '.json,image/*,video/*');
+    fileInput.setAttribute('aria-hidden', 'true');
     fileInput.multiple = true;
     temporaryFileInputContainer.appendChild(fileInput);
     await new Promise<void>((resolve, reject) => {

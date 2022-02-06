@@ -4,6 +4,7 @@ interface PreferencesState {
     dragStartRadius: number; // Pixels
     enableMultiLayerBuffer: boolean;
     historyStatesMax: number;
+    menuBarPosition: 'top' | 'bottom' | 'left' | 'right';
     multiTouchDownTimeout: number;
     multiTouchTapTimeout: number;
     pointerTapTimeout: number;
@@ -25,6 +26,7 @@ const store = new PerformantStore<PreferencesStore>({
         dragStartRadius: 5,
         enableMultiLayerBuffer: false,
         historyStatesMax: 50,
+        menuBarPosition: 'left',
         multiTouchDownTimeout: 75,
         multiTouchTapTimeout: 175,
         pointerTapTimeout: 150,
@@ -34,7 +36,18 @@ const store = new PerformantStore<PreferencesStore>({
         snapSensitivity: 5,
         touchRotation: 'on',
         useCanvasViewport: false
-    }
+    },
+    restore: [
+        'dragStartRadius',
+        'historyStatesMax',
+        'menuBarPosition',
+        'multiTouchDownTimeout',
+        'multiTouchTapTimeout',
+        'pointerTapTimeout',
+        'pointerPressHoldTimeout',
+        'snapSensitivity',
+        'touchRotation'
+    ]
 });
 
 export default store;

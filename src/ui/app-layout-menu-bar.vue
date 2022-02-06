@@ -1,14 +1,23 @@
 <template>
-    <div class="ogr-layout-menu-bar theme-dark" :class="{ 'is-vertical': direction === 'vertical' }" @touchmove="onTouchMoveMenuBar($event)">
+    <div
+        class="ogr-layout-menu-bar theme-dark"
+        :class="[
+            'is-positioned-' + layoutPlacement,
+            {
+                'is-vertical': direction === 'vertical',
+                'is-menu-drawer-open': activeMenuDrawerComponentName != null
+            }
+        ]"
+        @touchmove="onTouchMoveMenuBar($event)">
         <div ref="flexContainer" class="is-flex container mx-auto">
             <div v-for="(actionGroupSection, actionGroupSectionName) of actionGroups" :key="actionGroupSectionName" class="ogr-menu-section my-2" :class="['ogr-menu-' + actionGroupSectionName, { 'px-3': actionGroupSectionName !== 'center' }]">
                 <!-- <span v-if="actionGroupSectionName === 'start' && direction === 'vertical'" class="ogr-menu-section__title">
                     <img src="icons/logo-icon.svg">
                 </span> -->
-                <span v-if="actionGroupSectionName === 'center' && direction === 'vertical'" class="ogr-menu-section__title">
+                <span v-if="actionGroupSectionName === 'center'" class="ogr-menu-section__title">
                     Tools
                 </span>
-                <component :is="actionGroupSectionName === 'center' ? 'el-scrollbar' : 'div'">
+                <component :is="actionGroupSectionName === 'center' ? 'el-scrollbar' : 'v-fragment'">
                     <template v-for="actionGroup of actionGroupSection" :key="actionGroup.id">
                         <component :is="actionGroup.controls.length === 1 ? 'div' : 'el-button-group'" :class="{ 'ogr-single-button-group': actionGroup.controls.length === 1 }">
                             <template v-for="control of actionGroup.controls" :key="control.label">
@@ -136,6 +145,7 @@ import editorStore from '@/store/editor';
 import preferencesStore from '@/store/preferences';
 import appEmitter from '@/lib/emitter';
 import Dock from './dock.vue';
+import VFragment from './v-fragment.vue';
 import { runModule } from '@/modules';
 
 export default defineComponent({
@@ -152,16 +162,13 @@ export default defineComponent({
         ElMenuItem: defineAsyncComponent(async () => (await import(`element-plus/lib/components/menu/index`)).ElMenuItem),
         ElPopover,
         ElScrollbar: defineAsyncComponent(() => import(`element-plus/lib/components/scrollbar/index`)),
-        ElTag
+        ElTag,
+        VFragment
     },
     props: {
         config: {
             type: Object as PropType<DndLayoutMenuBar>,
             required: true
-        },
-        direction: {
-            type: String as PropType<'horizontal' | 'vertical'>,
-            default: 'horizontal'
         },
         layoutPlacement: {
             type: String as PropType<'top' | 'bottom' | 'left' | 'right'>,
@@ -175,6 +182,7 @@ export default defineComponent({
         let pendingActiveControlCall: IArguments | null = null;
         let flexContainer = ref<HTMLDivElement>();
         let displayMode = ref<'all' | 'favorites'>('all');
+        let direction = ref<'horizontal' | 'vertical'>('horizontal');
         let showMoreActionsMenu = ref<boolean>(false);
         let showMoreActionsTooltip = ref<boolean>(false);
         let popoverPlacement = ref<'top' | 'bottom' | 'left' | 'right'>('top');
@@ -191,11 +199,16 @@ export default defineComponent({
         const actionGroups = ref<{ [key: string]: LayoutShortcutGroupDefinition[] }>(createActionGroups());
         const allActionGroups = ref<{ [key: string]: LayoutShortcutGroupDefinition[] }>(createActionGroups('all'));
 
+        const activeMenuDrawerComponentName = computed<string | null>(() => {
+            return editorStore.state.activeMenuDrawerComponentName;
+        });
+
         watch([displayMode], () => {
             actionGroups.value = createActionGroups();
             showMoreActionsMenu.value = false;
         });
         watch(() => props.layoutPlacement, (layoutPlacement) => {
+            direction.value = ['left', 'right'].includes(layoutPlacement) ? 'vertical' : 'horizontal';
             popoverPlacement.value = {
                 bottom: 'top',
                 top: 'bottom',
@@ -203,12 +216,6 @@ export default defineComponent({
                 right: 'left'
             }[layoutPlacement] as any;
         }, { immediate: true });
-
-        if (props.direction === 'horizontal') {
-            watch([viewportWidth], () => {
-                toggleMobileView();
-            });
-        }
 
         onMounted(() => {
             window.addEventListener('mousedown', onMouseDownWindow);
@@ -443,10 +450,12 @@ export default defineComponent({
         }
 
         return {
+            activeMenuDrawerComponentName,
             showMoreActionsMenu,
             showMoreActionsTooltip,
             popoverPlacement,
             displayMode,
+            direction,
             flexContainer,
             actionGroups,
             allActionGroups,

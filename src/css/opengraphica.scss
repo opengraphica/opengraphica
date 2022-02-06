@@ -403,6 +403,69 @@ body.ogr-full-page {
         }
     }
 
+    @keyframes ogr-menu-drawer-slide-left-open {
+        0% {
+            transform: translateX(100%);
+            opacity: 0.5;
+        }
+        100% {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    @keyframes ogr-menu-drawer-slide-left-close {
+        0% {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        100% {
+            transform: translateX(100%);
+            opacity: 0.5;
+        }
+    }
+
+    @keyframes ogr-menu-drawer-slide-top-open {
+        0% {
+            transform: translateY(100%);
+            opacity: 0.5;
+        }
+        100% {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    @keyframes ogr-menu-drawer-slide-top-close {
+        0% {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(100%);
+            opacity: 0.5;
+        }
+    }
+
+    @keyframes ogr-menu-drawer-slide-bottom-open {
+        0% {
+            transform: translateY(-100%);
+            opacity: 0.5;
+        }
+        100% {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    @keyframes ogr-menu-drawer-slide-bottom-close {
+        0% {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(-100%);
+            opacity: 0.5;
+        }
+    }
+
     .ogr-menu-drawer {
         display: flex;
         flex-direction: column;
@@ -433,12 +496,46 @@ body.ogr-full-page {
         }
         &.is-open-left {
             padding-right: 4rem;
+            left: 3.5rem;
+            animation-name: ogr-menu-drawer-slide-left-open;
+
+            .ogr-menu-drawer__close {
+                right: auto;
+                left: -2.5rem;
+            }
+
+            &.is-closing {
+                animation-name: ogr-menu-drawer-slide-left-close;
+            }
         }
         &.is-open-top {
             padding-bottom: 4rem;
+            top: 3.5rem;
+            animation-name: ogr-menu-drawer-slide-top-open;
+
+            .ogr-menu-drawer__close {
+                top: -2.75rem;
+                right: .25rem;
+            }
+
+            &.is-closing {
+                animation-name: ogr-menu-drawer-slide-top-close;
+            }
         }
         &.is-open-bottom {
             padding-top: 4rem;
+            bottom: 3.5rem;
+            animation-name: ogr-menu-drawer-slide-bottom-open;
+
+            .ogr-menu-drawer__close {
+                top: auto;
+                bottom: -2.75rem;
+                right: .25rem;
+            }
+
+            &.is-closing {
+                animation-name: ogr-menu-drawer-slide-bottom-close;
+            }
         }
 
         > .el-scrollbar {
@@ -480,8 +577,34 @@ body.ogr-full-page {
         border-radius: 1rem;
         margin: .5rem;
         z-index: 10;
+        transition: border-radius 0.2s;
+
+        &.is-positioned-top.is-menu-drawer-open {
+            border-radius: 1rem 1rem 0 0;
+        }
+        &.is-positioned-bottom.is-menu-drawer-open {
+            border-radius: 0 0 1rem 1rem;
+        }
+        &.is-positioned-left.is-menu-drawer-open {
+            border-radius: 1rem 0 0 1rem;
+        }
+        &.is-positioned-right.is-menu-drawer-open {
+            border-radius: 0 1rem 1rem 0;
+        }
 
         > .is-flex {
+            .ogr-menu-section__title {
+                color: var(--el-text-color-regular);
+                font-size: .675rem;
+                margin: 0 .75rem 0 1rem;
+                text-transform: uppercase;
+                white-space: pre-wrap;
+                
+                img {
+                    width: 2.4rem;
+                }
+            }
+
             > .ogr-menu-favorites {
                 flex: 1;
                 display: flex;
@@ -490,7 +613,7 @@ body.ogr-full-page {
             > .ogr-menu-start, > .ogr-menu-end {
                 flex: 1;
                 display: flex;
-                justify-content: flex-end;
+                justify-content: flex-start;
                 min-width: -webkit-min-content; /* Workaround to Chrome bug */
             }
 
@@ -499,6 +622,16 @@ body.ogr-full-page {
                 flex-grow: 0;
                 display: flex;
                 overflow: hidden;
+
+                > .el-scrollbar {
+                    width: 100%;
+
+                    .el-scrollbar__view {
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+                    }
+                }
 
                 .el-button {
                     --el-button-background-color: transparent;
@@ -513,7 +646,7 @@ body.ogr-full-page {
             }
 
             > .ogr-menu-end {
-                justify-content: flex-start;
+                justify-content: flex-end;
             }
         }
 

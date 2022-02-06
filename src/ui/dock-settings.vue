@@ -45,7 +45,7 @@
                 </div>
             </template>
             <el-scrollbar>
-                <el-menu class="el-menu--medium el-menu--borderless mb-1" @select="onMenuSelect('image', $event)">
+                <el-menu class="el-menu--medium el-menu--borderless mb-1 mt-1" @select="onMenuSelect('image', $event)">
                     <el-menu-item index="cropResize">
                         <i class="bi bi-crop"></i>
                         <span>Crop and Resize</span>
@@ -220,6 +220,16 @@
                             </el-form-item>
                             <el-form-item v-if="!preferenceOptimizeLargeImages" class="el-form-item--menu-item el-form-item--has-content-right" label="High Quality Scaling">
                                 <el-switch v-model="preferenceHighQualityScaling" />
+                            </el-form-item>
+                        </el-collapse-item>
+                        <el-collapse-item title="Editor Layout">
+                            <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" label="Menu Bar Position">
+                                <el-select v-model="preferenceMenuBarPosition" style="width: 6.5rem;">
+                                    <el-option value="top" label="Top" />
+                                    <el-option value="bottom" label="Bottom" />
+                                    <el-option value="left" label="Left" />
+                                    <el-option value="right" label="Right" />
+                                </el-select>
                             </el-form-item>
                         </el-collapse-item>
                     </el-collapse>
@@ -446,6 +456,17 @@ export default defineComponent({
                 preferencesStore.set('postProcessInterpolateImage', value);
             }
         });
+        const preferenceMenuBarPosition = computed<'left' | 'right' | 'top' | 'bottom'>({
+            get() {
+                return preferencesStore.state.menuBarPosition;
+            },
+            async set(value) {
+                preferencesStore.set('menuBarPosition', value);
+                emit('close');
+                await nextTick();
+                appEmitter.emit('app.canvas.resetTransform');
+            }
+        });
 
         // Menu selection
         async function onMenuSelect(group: string, index: string) {
@@ -537,6 +558,7 @@ export default defineComponent({
             preferenceOptimizeLargeImages,
             performanceFixLayerSeams,
             preferenceHighQualityScaling,
+            preferenceMenuBarPosition,
             onMenuSelect
         };
     }

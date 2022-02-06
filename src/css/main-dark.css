@@ -5659,6 +5659,66 @@ body.ogr-full-page .opengraphica {
     opacity: 0.5;
   }
 }
+@keyframes ogr-menu-drawer-slide-left-open {
+  0% {
+    transform: translateX(100%);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes ogr-menu-drawer-slide-left-close {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0.5;
+  }
+}
+@keyframes ogr-menu-drawer-slide-top-open {
+  0% {
+    transform: translateY(100%);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes ogr-menu-drawer-slide-top-close {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0.5;
+  }
+}
+@keyframes ogr-menu-drawer-slide-bottom-open {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes ogr-menu-drawer-slide-bottom-close {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100%);
+    opacity: 0.5;
+  }
+}
 .opengraphica .ogr-menu-drawer {
   display: flex;
   flex-direction: column;
@@ -5687,12 +5747,40 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .ogr-menu-drawer.is-open-left {
   padding-right: 4rem;
+  left: 3.5rem;
+  animation-name: ogr-menu-drawer-slide-left-open;
+}
+.opengraphica .ogr-menu-drawer.is-open-left .ogr-menu-drawer__close {
+  right: auto;
+  left: -2.5rem;
+}
+.opengraphica .ogr-menu-drawer.is-open-left.is-closing {
+  animation-name: ogr-menu-drawer-slide-left-close;
 }
 .opengraphica .ogr-menu-drawer.is-open-top {
   padding-bottom: 4rem;
+  top: 3.5rem;
+  animation-name: ogr-menu-drawer-slide-top-open;
+}
+.opengraphica .ogr-menu-drawer.is-open-top .ogr-menu-drawer__close {
+  top: -2.75rem;
+  right: 0.25rem;
+}
+.opengraphica .ogr-menu-drawer.is-open-top.is-closing {
+  animation-name: ogr-menu-drawer-slide-top-close;
 }
 .opengraphica .ogr-menu-drawer.is-open-bottom {
   padding-top: 4rem;
+  bottom: 3.5rem;
+  animation-name: ogr-menu-drawer-slide-bottom-open;
+}
+.opengraphica .ogr-menu-drawer.is-open-bottom .ogr-menu-drawer__close {
+  top: auto;
+  bottom: -2.75rem;
+  right: 0.25rem;
+}
+.opengraphica .ogr-menu-drawer.is-open-bottom.is-closing {
+  animation-name: ogr-menu-drawer-slide-bottom-close;
 }
 .opengraphica .ogr-menu-drawer > .el-scrollbar {
   flex-grow: 1;
@@ -5729,6 +5817,29 @@ body.ogr-full-page .opengraphica {
   border-radius: 1rem;
   margin: 0.5rem;
   z-index: 10;
+  transition: border-radius 0.2s;
+}
+.opengraphica .ogr-layout-menu-bar.is-positioned-top.is-menu-drawer-open {
+  border-radius: 1rem 1rem 0 0;
+}
+.opengraphica .ogr-layout-menu-bar.is-positioned-bottom.is-menu-drawer-open {
+  border-radius: 0 0 1rem 1rem;
+}
+.opengraphica .ogr-layout-menu-bar.is-positioned-left.is-menu-drawer-open {
+  border-radius: 1rem 0 0 1rem;
+}
+.opengraphica .ogr-layout-menu-bar.is-positioned-right.is-menu-drawer-open {
+  border-radius: 0 1rem 1rem 0;
+}
+.opengraphica .ogr-layout-menu-bar > .is-flex .ogr-menu-section__title {
+  color: var(--el-text-color-regular);
+  font-size: 0.675rem;
+  margin: 0 0.75rem 0 1rem;
+  text-transform: uppercase;
+  white-space: pre-wrap;
+}
+.opengraphica .ogr-layout-menu-bar > .is-flex .ogr-menu-section__title img {
+  width: 2.4rem;
 }
 .opengraphica .ogr-layout-menu-bar > .is-flex > .ogr-menu-favorites {
   flex: 1;
@@ -5737,7 +5848,7 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-layout-menu-bar > .is-flex > .ogr-menu-start, .opengraphica .ogr-layout-menu-bar > .is-flex > .ogr-menu-end {
   flex: 1;
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   min-width: -webkit-min-content;
   /* Workaround to Chrome bug */
 }
@@ -5746,6 +5857,14 @@ body.ogr-full-page .opengraphica {
   flex-grow: 0;
   display: flex;
   overflow: hidden;
+}
+.opengraphica .ogr-layout-menu-bar > .is-flex > .ogr-menu-center > .el-scrollbar {
+  width: 100%;
+}
+.opengraphica .ogr-layout-menu-bar > .is-flex > .ogr-menu-center > .el-scrollbar .el-scrollbar__view {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 .opengraphica .ogr-layout-menu-bar > .is-flex > .ogr-menu-center .el-button {
   --el-button-background-color: transparent;
@@ -5757,7 +5876,7 @@ body.ogr-full-page .opengraphica {
   --el-button-font-color: var(--el-text-color-primary);
 }
 .opengraphica .ogr-layout-menu-bar > .is-flex > .ogr-menu-end {
-  justify-content: flex-start;
+  justify-content: flex-end;
 }
 .opengraphica .ogr-layout-menu-bar .ogr-menu-section .el-button-group, .opengraphica .ogr-layout-menu-bar .ogr-menu-section .ogr-single-button-group {
   width: max-content;

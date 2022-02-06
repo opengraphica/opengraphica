@@ -1,5 +1,7 @@
 import { reactive, shallowReadonly, Ref, UnwrapRef } from 'vue';
 
+const localStoragePrefix = 'openGraphicaStore_';
+
 interface StoreTypeMap {
     dispatch: Object;
     state: Object;
@@ -12,6 +14,7 @@ interface PerformantStoreOptions<T extends StoreTypeMap> {
     state: T['state']; // Object of state managed by this store
     nonReactive?: string[]; // List of prop names in state that shouldn't be added to the reactive state (usually because reactivity is too expensive or will break them),
     readOnly?: string[]; // List of prop names in state that can't be set after initialization, but can be modified in the 'onSet' callback.
+    restore?: string[]; // List of prop names that will be stored in localStorage.
     onSet?: OnSetCallback<T['state']>;
     onDispatch?: OnDispatchCallback<T>;
 }
@@ -21,6 +24,7 @@ export class PerformantStore<T extends StoreTypeMap> {
     private reactiveState!: any;
     private nonReactiveProps: string[] = [];
     private readOnlyProps: string[] = [];
+    private restoreProps: string[] = [];
     private onSet: OnSetCallback<T['state']> | undefined;
     private onDispatch: OnDispatchCallback<T> | undefined;
     public state!: Readonly<{ [K in keyof T['state']]: T['state'] extends Ref ? T['state'][K] : UnwrapRef<T['state'][K]>; }>;
@@ -29,6 +33,7 @@ export class PerformantStore<T extends StoreTypeMap> {
         this.staticState = options.state;
         this.nonReactiveProps = options.nonReactive || [];
         this.readOnlyProps = options.readOnly || [];
+        this.restoreProps = options.restore || [];
         if (options.onSet) {
             this.onSet = options.onSet;
         }
@@ -45,6 +50,27 @@ export class PerformantStore<T extends StoreTypeMap> {
         }
         this.reactiveState = reactive(reactiveState);
         this.state = shallowReadonly<T>(this.reactiveState) as any;
+
+        // Restore rembered props from localStorage
+        for (const restorePropName of this.restoreProps) {
+            let localStorageValue: string | null = null;
+            try {
+                localStorageValue = localStorage.getItem(localStoragePrefix + restorePropName);
+            } catch (error) {}
+            if (localStorageValue != null) {
+                const type: string = localStorageValue.split(';')[0];
+                let value: any = localStorageValue.replace(type + ';', '');
+                if (type === 'boolean') {
+                    value = value === 'true';
+                } else if (type === 'number') {
+                    value = parseFloat(value);
+                }
+                (this.staticState as any)[restorePropName] = value;
+                if (!this.nonReactiveProps.includes(restorePropName)) {
+                    this.reactiveState[restorePropName] = value;
+                }
+            }
+        }
     }
 
     /**
@@ -55,6 +81,13 @@ export class PerformantStore<T extends StoreTypeMap> {
         (this.staticState as any)[key] = value;
         if (!this.nonReactiveProps.includes(key as string)) {
             this.reactiveState[key] = value;
+        }
+        if (this.restoreProps.includes(key as string)) {
+            try {
+                localStorage.setItem(localStoragePrefix + key as string, typeof value + ';' + value);
+            } catch (error) {
+                // Does this matter?
+            }
         }
     }
 
