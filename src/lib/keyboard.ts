@@ -3,15 +3,32 @@
  * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
 
+import { ref } from 'vue';
 import appEmitter from '@/lib/emitter';
 import { isInput } from '@/lib/events';
 
-function onDocumentKeyDown(e: KeyboardEvent) {
+export const isCtrlKeyPressed = ref<boolean>(false);
+export const isShiftKeyPressed = ref<boolean>(false);
+export const isAltKeyPressed = ref<boolean>(false);
 
+function onDocumentKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Control') {
+        isCtrlKeyPressed.value = true;
+    } else if (e.key === 'Shift') {
+        isShiftKeyPressed.value = true;
+    } else if (e.key === 'Alt') {
+        isAltKeyPressed.value = true;
+    }
 }
 
 function onDocumentKeyUp(e: KeyboardEvent) {
-    
+    if (e.key === 'Control') {
+        isCtrlKeyPressed.value = false;
+    } else if (e.key === 'Shift') {
+        isShiftKeyPressed.value = false;
+    } else if (e.key === 'Alt') {
+        isAltKeyPressed.value = false;
+    }
 }
 
 let isPastingImage: boolean = false;

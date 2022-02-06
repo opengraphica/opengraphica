@@ -73,7 +73,6 @@ export default defineComponent({
                     const opengraphica = document.querySelector('.opengraphica');
                     if (opengraphica) {
                         popperContainer = document.querySelector('[id^="el-popper-container"]');
-                        // popperContainer.classList.add('theme-dark');
                         opengraphica.appendChild(popperContainer);
                     }
                 }

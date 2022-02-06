@@ -339,6 +339,20 @@
             text-align: center;
         }
     }
+    .el-input--small {
+        font-size: 0.8125rem;
+        line-height: 2rem;
+
+        .el-input__inner {
+            height: 2rem;
+            line-height: 2rem;
+        }
+    }
+
+    .el-loading-spinner {
+        margin: 0 !important;
+        transform: translate(0, -50%);
+    }
 
     .el-menu {
         &.el-menu--borderless {

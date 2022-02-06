@@ -46,5 +46,16 @@
                 ]
             }
         }
+    },
+    "view": {
+        "name": "View Display",
+        "description": "Tools for controlling the viewport display of the canvas.",
+        "tools": {
+            "zoom": {
+                "name": "Zoom",
+                "description": "Zoom in and out the canvas to control how much of the image you can see.",
+                "controller": "zoom"
+            }
+        }
     }
 }

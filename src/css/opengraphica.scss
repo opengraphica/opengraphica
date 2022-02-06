@@ -24,7 +24,8 @@ body.ogr-full-page {
 }
 
 .opengraphica {
-    background: var(--ogr-background-color);
+    background-color: var(--ogr-background-color);
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAMAAACeL25MAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRF////zsrFFOhhzwAAAA9JREFUeNpiYGTAAAABBgAAJwAC/BnsgQAAAABJRU5ErkJggg==');
     font-family: Roboto,
         system-ui,
         -apple-system, /* Firefox supports this but not yet `system-ui` */
@@ -435,6 +436,10 @@ body.ogr-full-page {
                     font-size: .675rem;
                     margin: .5rem 0;
                     text-transform: uppercase;
+                    
+                    img {
+                        width: 2.4rem;
+                    }
                 }
 
                 .el-button-group, .ogr-single-button-group {

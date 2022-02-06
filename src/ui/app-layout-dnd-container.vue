@@ -74,7 +74,7 @@ export default defineComponent({
         });
 
         onMounted(() => {
-            editorStore.dispatch('setActiveTool', { group: 'transform' });
+            editorStore.dispatch('setActiveTool', { group: 'view' });
 
             window.addEventListener('touchmove', onTouchMoveWindow);
             window.addEventListener('touchend', onTouchEndWindow);

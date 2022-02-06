@@ -9,25 +9,11 @@
                         "layers"
                     ],
                     "center": [
-                        "search",
-                        "effects",
-                        "text",
-                        "selection",
-                        "transform",
-                        "color",
-                        "draw",
-                        "deform",
-                        "erase"
+                        "view",
+                        "transform"
                     ],
                     "end": [],
-                    "favorites": [
-                        "settings",
-                        "layers",
-                        "transform",
-                        "draw",
-                        "erase",
-                        "text"
-                    ]
+                    "favorites": []
                 }
             }
         ]

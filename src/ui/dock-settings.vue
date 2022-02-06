@@ -170,8 +170,7 @@
                     <el-timeline-item
                         v-if="historyActionStack.length > 0"
                         class="pb-1"
-                        type="primary"
-                        :icon="historyActionStackIndex === 0 ? 'bi bi-check' : null">
+                        type="primary">
                         <el-link type="primary" href="javascript:void(0)" @click="onGoHistory(0)">
                             [Base Image]
                         </el-link>
@@ -179,7 +178,6 @@
                     <el-timeline-item
                         v-for="(action, index) of historyActionStack"
                         :key="action.id + '_' + index"
-                        :icon="historyActionStackIndex == index + 1 ? 'bi bi-check' : null"
                         :type="historyActionStackIndex > index ? 'primary' : null"
                         class="pb-1">
                         <el-link type="primary" href="javascript:void(0)" @click="onGoHistory(index + 1)">

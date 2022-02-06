@@ -6,6 +6,7 @@ interface PreferencesState {
     historyStatesMax: number;
     multiTouchDownTimeout: number;
     multiTouchTapTimeout: number;
+    pointerTapTimeout: number;
     pointerPressHoldTimeout: number;
     postProcessInterpolateImage: boolean;
     preferCanvasViewport: boolean;
@@ -24,8 +25,9 @@ const store = new PerformantStore<PreferencesStore>({
         dragStartRadius: 5,
         enableMultiLayerBuffer: false,
         historyStatesMax: 50,
-        multiTouchDownTimeout: 50,
-        multiTouchTapTimeout: 200,
+        multiTouchDownTimeout: 75,
+        multiTouchTapTimeout: 175,
+        pointerTapTimeout: 150,
         pointerPressHoldTimeout: 500,
         postProcessInterpolateImage: true,
         preferCanvasViewport: false,

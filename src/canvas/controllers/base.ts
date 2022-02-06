@@ -8,7 +8,9 @@ export interface PointerTracker {
     id: number,
     type: 'mouse' | 'pen' | 'touch',
     primary: boolean,
+    isDragging: boolean,
     down: PointerEvent,
+    downTimestamp: number,
     move?: PointerEvent,
     movePrev?: PointerEvent,
     up?: PointerEvent
@@ -39,6 +41,7 @@ export default class BaseCanvasController {
     
     private multiTouchDownTimeoutHandle: number | undefined;
     private multiTouchTapTimeoutHandle: number | undefined;
+    private dragStartRadius = preferencesStore.get('dragStartRadius');
 
     /**
      * Fires when switching to this controller.
@@ -65,15 +68,15 @@ export default class BaseCanvasController {
      * Fires when one or more finger is tapped at around the same time.
      */
     onMultiTouchDown(): void {
-        const touchCount = this.touches.length;
         this.multiTouchDownCount = this.touches.length;
+        const touches: PointerTracker[] = [...this.touches];
         clearTimeout(this.multiTouchTapTimeoutHandle);
         this.multiTouchTapTimeoutHandle = window.setTimeout(() => {
             this.multiTouchDownTimeoutHandle = undefined;
             this.multiTouchTapTimeoutHandle = undefined;
             this.purgeTouches();
             if (this.touches.length === 0) {
-                this.onMultiTouchTap(touchCount);
+                this.onMultiTouchTap(touches);
             }
         }, preferencesStore.get('multiTouchTapTimeout'));
     }
@@ -89,7 +92,7 @@ export default class BaseCanvasController {
      * Fires when multi-touch down and up happen in quick succession.
      * @param count - Number of touches in the tap. By the time this event fires, this.touches array will be empty.
      */
-    onMultiTouchTap(count: number): void {
+    onMultiTouchTap(touches: PointerTracker[]): void {
         // Override
     }
 
@@ -98,9 +101,12 @@ export default class BaseCanvasController {
             id: e.pointerId,
             type: e.pointerType as any,
             primary: e.isPrimary,
-            down: e
+            isDragging: false,
+            down: e,
+            downTimestamp: window.performance.now()
         };
         this.pointers.push(pointer as any);
+        this.dragStartRadius = preferencesStore.get('dragStartRadius');
         if (e.pointerType === 'touch') {
             if (!this.multiTouchDownTimeoutHandle && this.touches.length === 0) {
                 this.touches = [pointer];
@@ -119,6 +125,12 @@ export default class BaseCanvasController {
         if (pointer) {
             pointer.movePrev = pointer.move;
             pointer.move = e;
+            if (
+                Math.abs(pointer.down.pageX - pointer.move.pageX) >= this.dragStartRadius ||
+                Math.abs(pointer.down.pageY - pointer.move.pageY) >= this.dragStartRadius
+            ) {
+                pointer.isDragging = true;
+            }
         }
     }
 
@@ -127,6 +139,7 @@ export default class BaseCanvasController {
         if (pointer) {
             pointer.up = e;
         }
+        this.onPointerUpBeforePurge(e);
         const pointerIndex = this.pointers.findIndex((pointer) => pointer.id === e.pointerId);
         if (pointerIndex > -1) {
             this.pointers.splice(pointerIndex, 1);
@@ -135,6 +148,10 @@ export default class BaseCanvasController {
         if (this.pointers.length === 0) {
             canvasStore.set('preventPostProcess', false);
         }
+    }
+
+    onPointerUpBeforePurge(e: PointerEvent): void {
+        // Override
     }
 
     onWheel(e: WheelEvent): void {

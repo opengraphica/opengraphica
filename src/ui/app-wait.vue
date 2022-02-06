@@ -29,7 +29,6 @@ export default defineComponent({
         });
 
         function startBlocking(event?: AppEmitterEvents['app.wait.startBlocking']) {
-            console.log(event);
             if (event) {
                 if (notifications[event.id]) {
                     notifications[event.id].close();
@@ -42,7 +41,6 @@ export default defineComponent({
                         duration: 0,
                         showClose: false
                     });
-                    console.log(notifications[event.id]);
                     notifications[event.id].displayTime = window.performance.now();
                 } else {
                     notifications[event.id] = {

@@ -75,7 +75,7 @@
                     </el-form-item>
                 </el-form>
             </el-popover>
-            <el-button aria-label="Done" plain type="primary" @click="onDone">
+            <el-button aria-label="Done" plain type="primary" class="ml-0" @click="onDone">
                 <template v-if="isMobileView">
                     <i class="el-icon-check"></i>
                 </template>

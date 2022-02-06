@@ -2,6 +2,9 @@
     <div class="ogr-layout-menu-bar theme-dark" :class="{ 'is-vertical': direction === 'vertical' }" @touchmove="onTouchMoveMenuBar($event)">
         <div ref="flexContainer" class="is-flex container mx-auto">
             <div v-for="(actionGroupSection, actionGroupSectionName) of actionGroups" :key="actionGroupSectionName" class="ogr-menu-section my-2" :class="['ogr-menu-' + actionGroupSectionName, { 'px-3': actionGroupSectionName !== 'center' }]">
+                <!-- <span v-if="actionGroupSectionName === 'start' && direction === 'vertical'" class="ogr-menu-section__title">
+                    <img src="icons/logo-icon.svg">
+                </span> -->
                 <span v-if="actionGroupSectionName === 'center' && direction === 'vertical'" class="ogr-menu-section__title">
                     Tools
                 </span>
@@ -11,7 +14,7 @@
                             <template v-for="control of actionGroup.controls" :key="control.label">
                                 <el-popover
                                     v-model:visible="control.popoverVisible"
-                                    :trigger="control.showDock || control.expanded ? 'manual' : 'hover'"
+                                    :trigger="'manual'"
                                     effect="light"
                                     :placement="popoverPlacement"
                                     :popper-class="'ogr-dock-popover'"
@@ -36,7 +39,8 @@
                                             @touchend="onTouchEndControlButton($event, control)"
                                             @mousedown="onMouseDownControlButton($event, control)"
                                             @mouseup="onMouseUpControlButton($event, control)"
-                                            @mouseleave="onMouseLeaveControlButton($event)"
+                                            @mouseenter="onMouseEnterControlButton($event, control)"
+                                            @mouseleave="onMouseLeaveControlButton($event, control)"
                                             @keydown="onKeyDownControlButton($event, control)"
                                         >
                                             <span class="el-icon" :class="control.icon" aria-hidden="true" />
@@ -223,11 +227,11 @@ export default defineComponent({
             window.clearTimeout(resizeDebounceHandle);
             resizeDebounceHandle = window.setTimeout(async () => {
                 displayMode.value = 'all';
-                await nextTick();
-                const flexContainerEl = flexContainer.value;
-                if (flexContainerEl && flexContainerEl.scrollWidth > flexContainerEl.clientWidth + 1) {
-                    displayMode.value = 'favorites';
-                }
+                // await nextTick();
+                // const flexContainerEl = flexContainer.value;
+                // if (flexContainerEl && flexContainerEl.scrollWidth > flexContainerEl.clientWidth + 1) {
+                //     displayMode.value = 'favorites';
+                // }
             }, 100);
         }
 
@@ -297,7 +301,15 @@ export default defineComponent({
         function onMouseUpControlButton(event: MouseEvent, control: LayoutShortcutGroupDefinitionControlButton) {
             onPointerUpControlButton(event, control);
         }
-        function onMouseLeaveControlButton(event: MouseEvent) {
+        function onMouseEnterControlButton(event: MouseEvent, control: LayoutShortcutGroupDefinitionControlButton) {
+            if (!(control.showDock || control.expanded)) {
+                control.popoverVisible = true;
+            }
+        }
+        function onMouseLeaveControlButton(event: MouseEvent, control: LayoutShortcutGroupDefinitionControlButton) {
+            if (!(control.showDock || control.expanded)) {
+                control.popoverVisible = false;
+            }
             clearTimeout(pointerPressHoldTimeoutHandle);
         }
         function onMouseDownWindow(event: MouseEvent) {
@@ -437,6 +449,7 @@ export default defineComponent({
             onTouchMoveMenuBar,
             onMouseDownControlButton,
             onMouseUpControlButton,
+            onMouseEnterControlButton,
             onMouseLeaveControlButton,
             onPressControlButton
         };

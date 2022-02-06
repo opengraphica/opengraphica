@@ -149,7 +149,7 @@
             {
                 "type": "button",
                 "icon": "bi bi-gear",
-                "label": "Settings",
+                "label": "Canvas Settings",
                 "action": {
                     "type": "dock",
                     "target": "settings"
@@ -164,7 +164,7 @@
             {
                 "type": "button",
                 "icon": "bi bi-type",
-                "label": "Text",
+                "label": "Insert / Edit Text",
                 "action": {
                     "type": "runModule",
                     "target": "tmp/notYetImplemented"
@@ -179,10 +179,25 @@
             {
                 "type": "button",
                 "icon": "bi bi-cursor",
-                "label": "Move / Transform",
+                "label": "Move / Transform Layer",
                 "action": {
                     "type": "toolGroup",
                     "target": "transform"
+                }
+            }
+        ],
+        "draggable": true
+    },
+    "view": {
+        "name": "Canvas View",
+        "controls": [
+            {
+                "type": "button",
+                "icon": "bi bi-zoom-in",
+                "label": "Zoom / Pan View",
+                "action": {
+                    "type": "toolGroup",
+                    "target": "view"
                 }
             }
         ],

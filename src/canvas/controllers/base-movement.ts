@@ -170,7 +170,7 @@ export default class BaseCanvasMovementController extends BaseCanvasController {
         e.preventDefault();
     }
 
-    private zoomCanvas(clicks: number) {
+    protected zoomCanvas(clicks: number) {
         const devicePixelRatio = window.devicePixelRatio || 1;
         const scaleFactor: number = 1.1;
         const transform = canvasStore.get('transform');

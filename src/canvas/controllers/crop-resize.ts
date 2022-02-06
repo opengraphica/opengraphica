@@ -12,7 +12,7 @@ const DRAG_TYPE_BOTTOM = 2;
 const DRAG_TYPE_LEFT = 4;
 const DRAG_TYPE_RIGHT = 8;
 
-export default class CanvasCropResizeontroller extends BaseCanvasMovementController {
+export default class CanvasCropResizeController extends BaseCanvasMovementController {
 
     private remToPx: number = 16;
     private cropTranslateStart: DOMPoint | null = null;
@@ -32,7 +32,7 @@ export default class CanvasCropResizeontroller extends BaseCanvasMovementControl
         height.value = workingFileStore.get('height');
         this.xAxisSnap = [0, Math.floor(width.value / 2), width.value];
         this.yAxisSnap = [0, Math.floor(height.value / 2), height.value];
-        appEmitter.emit('app.canvas.resetTransform', { margin: Math.floor(Math.min(window.innerWidth, window.innerHeight) / 3) });
+        appEmitter.emit('app.canvas.resetTransform', { margin: Math.floor(Math.min(window.innerWidth, window.innerHeight) / 4) });
     }
 
     onMultiTouchDown() {

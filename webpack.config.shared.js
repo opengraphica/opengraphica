@@ -96,6 +96,8 @@ module.exports = function setupConfig(config) {
                     { from: path.resolve(__dirname, 'src/assets/favicon'), to: '[name][ext]' },
                     { from: path.resolve(__dirname, 'src/css/main-*.css'), to: 'css/[name][ext]' },
                     { from: path.resolve(__dirname, 'src/assets/fonts'), to: 'css/fonts' },
+                    { from: path.resolve(__dirname, 'src/assets/icons'), to: 'icons' },
+                    { from: path.resolve(__dirname, 'src/assets/images'), to: 'images' },
                     { from: path.resolve(__dirname, 'src/workers'), to: 'js/workers' },
                     { from: path.resolve(__dirname, 'node_modules/bootstrap-icons/font/fonts'), to: 'css/fonts' }
                 ]

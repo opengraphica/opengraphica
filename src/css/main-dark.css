@@ -5340,7 +5340,8 @@ body.ogr-full-page {
 }
 
 .opengraphica {
-  background: var(--ogr-background-color);
+  background-color: var(--ogr-background-color);
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAMAAACeL25MAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRF////zsrFFOhhzwAAAA9JREFUeNpiYGTAAAABBgAAJwAC/BnsgQAAAABJRU5ErkJggg==");
   font-family: Roboto, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   font-weight: 300;
   width: 100vw;
@@ -5678,6 +5679,9 @@ body.ogr-full-page {
   font-size: 0.675rem;
   margin: 0.5rem 0;
   text-transform: uppercase;
+}
+.opengraphica .ogr-layout-menu-bar.is-vertical > .is-flex .ogr-menu-section .ogr-menu-section__title img {
+  width: 2.4rem;
 }
 .opengraphica .ogr-layout-menu-bar.is-vertical > .is-flex .ogr-menu-section .el-button-group, .opengraphica .ogr-layout-menu-bar.is-vertical > .is-flex .ogr-menu-section .ogr-single-button-group {
   height: max-content;
@@ -74858,6 +74862,18 @@ body.ogr-full-page {
 }
 .opengraphica .el-input--text-center > .el-input__inner {
   text-align: center;
+}
+.opengraphica .el-input--small {
+  font-size: 0.8125rem;
+  line-height: 2rem;
+}
+.opengraphica .el-input--small .el-input__inner {
+  height: 2rem;
+  line-height: 2rem;
+}
+.opengraphica .el-loading-spinner {
+  margin: 0 !important;
+  transform: translate(0, -50%);
 }
 .opengraphica .el-menu.el-menu--borderless {
   border: none !important;
