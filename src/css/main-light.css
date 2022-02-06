@@ -5832,6 +5832,8 @@ body.ogr-full-page .opengraphica {
   border-radius: 0 1rem 1rem 0;
 }
 .opengraphica .ogr-layout-menu-bar > .is-flex .ogr-menu-section__title {
+  display: flex;
+  align-items: center;
   color: var(--el-text-color-regular);
   font-size: 0.675rem;
   margin: 0 0.75rem 0 1rem;
@@ -6376,18 +6378,41 @@ body.ogr-full-page .opengraphica {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
+@keyframes ogr-wait-fade-in {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
 .opengraphica .ogr-wait {
   display: none;
 }
 .opengraphica .ogr-wait[aria-hidden=false] {
   background: var(--ogr-background-color);
-  opacity: 0.8;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
+  z-index: 999999;
+  animation: ogr-wait-fade-in 0.2s ease-in forwards;
+}
+.opengraphica .ogr-wait[aria-hidden=false] strong {
+  font-weight: bold;
+}
+.opengraphica .ogr-wait[aria-hidden=false] .ogr-wait__center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 .opengraphica .fade-enter-active,
 .opengraphica .fade-leave-active {

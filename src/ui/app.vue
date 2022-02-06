@@ -76,6 +76,13 @@ export default defineComponent({
                 window.addEventListener('resize', onResizeWindow);
             }
 
+            // Breakfix for element plus popper styles
+            const opengraphica = document.querySelector('.opengraphica');
+            const popperContainer = document.querySelector('[id^="el-popper-container"]');
+            if (opengraphica && popperContainer) {
+                opengraphica.appendChild(popperContainer);
+            }
+
             asyncMountSetup();
         });
 

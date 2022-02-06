@@ -14,9 +14,7 @@
                 <!-- <span v-if="actionGroupSectionName === 'start' && direction === 'vertical'" class="ogr-menu-section__title">
                     <img src="icons/logo-icon.svg">
                 </span> -->
-                <span v-if="actionGroupSectionName === 'center'" class="ogr-menu-section__title">
-                    Tools
-                </span>
+                <span v-if="actionGroupSectionName === 'center'" class="ogr-menu-section__title">Tools</span>
                 <component :is="actionGroupSectionName === 'center' ? 'el-scrollbar' : 'v-fragment'">
                     <template v-for="actionGroup of actionGroupSection" :key="actionGroup.id">
                         <component :is="actionGroup.controls.length === 1 ? 'div' : 'el-button-group'" :class="{ 'ogr-single-button-group': actionGroup.controls.length === 1 }">

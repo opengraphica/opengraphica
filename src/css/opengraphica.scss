@@ -594,6 +594,8 @@ body.ogr-full-page {
 
         > .is-flex {
             .ogr-menu-section__title {
+                display: flex;
+                align-items: center;
                 color: var(--el-text-color-regular);
                 font-size: .675rem;
                 margin: 0 .75rem 0 1rem;
@@ -1192,18 +1194,44 @@ body.ogr-full-page {
         image-rendering: crisp-edges;
     }
 
+    @keyframes ogr-wait-fade-in {
+        0% {
+            opacity: 0;
+        }
+        20% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+
     .ogr-wait {
         display: none;
     }
     .ogr-wait[aria-hidden="false"] {
         background: var(--ogr-background-color);
-        opacity: 0.8;
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
+        z-index: 999999;
+        animation: ogr-wait-fade-in 0.2s ease-in forwards;
+
+        strong {
+            font-weight: bold;
+        }
+
+        .ogr-wait__center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
     }
 
     .fade-enter-active,
