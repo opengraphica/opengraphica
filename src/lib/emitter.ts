@@ -11,6 +11,14 @@ interface AppEmitterEvents {
     'app.dialogs.openFromModule': {
         name: string;
     };
+    'app.menuDrawer.openFromDock': {
+        name: string;
+        placement: 'top' | 'bottom' | 'left' | 'right';
+    },
+    'app.menuDrawer.openFromModule': {
+        name: string;
+        placement: 'top' | 'bottom' | 'left' | 'right';
+    },
     'app.notify': Partial<NotificationProps>;
     'app.wait.startBlocking': {
         id: string;

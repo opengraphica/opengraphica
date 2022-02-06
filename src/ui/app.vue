@@ -2,6 +2,7 @@
     <div ref="root" class="opengraphica" @touchstart="onTouchStartRoot($event)" v-loading="loading">
         <app-canvas />
         <app-layout-dnd-container @dnd-ready="onDndLayoutReady($event)" />
+        <app-menu-drawers />
         <app-dialogs />
         <app-wait />
     </div>
@@ -12,6 +13,7 @@ import { defineComponent, ref, provide, onMounted, onUnmounted } from 'vue';
 import AppCanvas from '@/ui/app-canvas.vue';
 import AppDialogs from '@/ui/app-dialogs.vue';
 import AppLayoutDndContainer from '@/ui/app-layout-dnd-container.vue';
+import AppMenuDrawers from '@/ui/app-menu-drawers.vue';
 import AppWait from '@/ui/app-wait.vue';
 import canvasStore from '@/store/canvas';
 import ResizeObserver from 'resize-observer-polyfill';
@@ -27,6 +29,7 @@ export default defineComponent({
         AppCanvas,
         AppDialogs,
         AppLayoutDndContainer,
+        AppMenuDrawers,
         AppWait
     },
     setup() {

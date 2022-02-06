@@ -5,7 +5,7 @@
                 <component :is="name" @close="onCloseDock" @update:title="onUpdateTitle" />
             </template>
             <template #fallback>
-                <div style="width: 5rem; height: 5rem;" v-loading="true" element-loading-background="transparent"></div>
+                <div style="width: 5rem; height: 5rem; margin: auto;" v-loading="true" element-loading-background="transparent"></div>
             </template>
         </suspense>
     </div>

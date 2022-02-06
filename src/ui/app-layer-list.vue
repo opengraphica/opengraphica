@@ -27,7 +27,7 @@
                         <app-layer-list-thumbnail :layer="layer" />
                         <span class="ogr-layer-name">{{ layer.name }}</span>
                     </span>
-                    <el-button type="text" class="px-2" aria-label="Toggle Layer Visibility" @click="onToggleLayerVisibility(layer)">
+                    <el-button type="text" class="px-2" title="Toggle Layer Visibility" @click="onToggleLayerVisibility(layer)">
                         <i class="bi" :class="{ 'bi-eye': layer.visible, 'bi-eye-slash': !layer.visible }" aria-hidden="true"></i>
                     </el-button>
                     <el-button type="text" aria-label="Layer Settings" class="px-2 mr-2 my-0 ml-0" @click="onToggleLayerSettings(layer)">

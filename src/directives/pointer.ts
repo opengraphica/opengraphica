@@ -217,9 +217,6 @@ function handlePressEvent(el: any, binding: DirectiveBinding<any>) {
                 if ((e.touches[0] && e.touches[0].identifier === touch.identifier) || e.touches.length === 0) {
                     clearTimeout(pointerDownTimeoutHandle);
                     isPointerDownValid = false;
-                    if (window.navigator.vibrate) {
-                        window.navigator.vibrate(200);
-                    }
                 }
             }
         }

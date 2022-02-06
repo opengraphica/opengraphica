@@ -16,6 +16,7 @@ interface EditorDeferredTask {
 const toolGroups: { [key: string]: ToolGroupDefinition } = toolGroupsConfig as any;
 
 interface EditorState {
+    activeMenuDrawerComponentName: string | null;
     activeTheme: { name: string, linkElement: HTMLLinkElement } | null;
     activeTool: string | null;
     activeToolGroup: string | null;
@@ -61,6 +62,7 @@ let currentTaskRunId: number = 0;
 
 const store = new PerformantStore<EditorStore>({
     state: {
+        activeMenuDrawerComponentName: null,
         activeTheme: null,
         activeTool: null,
         activeToolGroup: null,

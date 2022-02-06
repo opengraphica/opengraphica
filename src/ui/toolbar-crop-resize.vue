@@ -9,7 +9,7 @@
         <div class="py-2 px-3 is-text-nowrap">
             <el-button plain type="text" class="px-4" aria-label="Cancel" @click="onCancel">
                 <template v-if="isMobileView">
-                    <i class="el-icon-close"></i>
+                    <i class="bi bi-x"></i>
                 </template>
                 <template v-else>
                     Cancel
@@ -77,7 +77,7 @@
             </el-popover>
             <el-button aria-label="Done" plain type="primary" class="ml-0" @click="onDone">
                 <template v-if="isMobileView">
-                    <i class="el-icon-check"></i>
+                    <i class="bi bi-check"></i>
                 </template>
                 <template v-else>
                     Done

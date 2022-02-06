@@ -15,12 +15,17 @@ html {
 
 body.ogr-full-page {
     display: block;
-    width: 100vw;
-    height: 100vh;
+    position: fixed;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
     margin: 0;
     padding: 0;
     overscroll-behavior-y: contain;
+
+    .opengraphica {
+        position: absolute;
+    }
 }
 
 .opengraphica {
@@ -336,8 +341,137 @@ body.ogr-full-page {
         }
     }
 
+    @keyframes ogr-menu-drawers-fade-in {
+        0% {
+            display: none;
+            opacity: 0;
+        }
+        1% {
+            display: block;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+
+    @keyframes ogr-menu-drawers-fade-out {
+        0% {
+            opacity: 1;
+        }
+        99% {
+            display: block;
+        }
+        100% {
+            display: none;
+            opacity: 0;
+        }
+    }
+
+    .ogr-menu-drawers {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.1);
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        animation: ogr-menu-drawers-fade-in 0.15s ease-in;
+        animation-fill-mode: forwards;
+
+        &.is-fade-out {
+            animation: ogr-menu-drawers-fade-out 0.15s ease-in;
+        }
+    }
+
+    @keyframes ogr-menu-drawer-slide-right-open {
+        0% {
+            transform: translateX(-100%);
+            opacity: 0.5;
+        }
+        100% {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    @keyframes ogr-menu-drawer-slide-right-close {
+        0% {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        100% {
+            transform: translateX(-100%);
+            opacity: 0.5;
+        }
+    }
+
+    .ogr-menu-drawer {
+        display: flex;
+        flex-direction: column;
+        background: var(--ogr-menu-drawer-background-color);
+        border-radius: 1rem;
+        position: absolute;
+        top: .5rem;
+        bottom: .5rem;
+        left: .5rem;
+        right: .5rem;
+        animation-fill-mode: forwards;
+        animation-duration: 0.25s;
+        animation-timing-function: ease-in;
+        z-index: 5;
+
+        &.is-open-right {
+            padding-left: 4rem;
+            right: 3.5rem;
+            animation-name: ogr-menu-drawer-slide-right-open;
+
+            .ogr-menu-drawer__close {
+                right: -2.5rem;
+            }
+
+            &.is-closing {
+                animation-name: ogr-menu-drawer-slide-right-close;
+            }
+        }
+        &.is-open-left {
+            padding-right: 4rem;
+        }
+        &.is-open-top {
+            padding-bottom: 4rem;
+        }
+        &.is-open-bottom {
+            padding-top: 4rem;
+        }
+
+        > .el-scrollbar {
+            flex-grow: 1;
+        }
+    }
+    .ogr-menu-drawer__title {
+        margin: 1.5rem 0 .5rem 0;
+        padding: 0 1rem;
+        flex-grow: 0;
+        flex-shrink: 1;
+    }
+    .ogr-menu-drawer__close {
+        position: absolute;
+        top: 1.2rem;
+        right: 1.2rem;
+        color: var(--ogr-menu-drawer-close-icon-color);
+
+        &:hover {
+            color: var(--ogr-menu-drawer-close-icon-color-hover);
+        }
+
+        .bi {
+            font-size: 1.6rem;
+        }
+    }
+    .ogr-menu-drawer__content {
+        padding: .5rem 0;
+    }
+
     .ogr-layout-menu-bar {
         display: block;
+        position: relative; // Necessary for z-index
         transition: all 0.6s;
         width: calc(100% - 1rem);
         max-width: calc(100% - 1rem);
@@ -345,6 +479,7 @@ body.ogr-full-page {
         box-shadow: 0 0 0 0.063rem var(--ogr-layout-menu-bar-border-color);
         border-radius: 1rem;
         margin: .5rem;
+        z-index: 10;
 
         > .is-flex {
             > .ogr-menu-favorites {
@@ -404,50 +539,54 @@ body.ogr-full-page {
             box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.3) inset;
         }
 
-        &.is-vertical > .is-flex {
-            flex-direction: column;
-            height: calc(100vh - 1rem);
+        &.is-vertical {
+            height: calc(100% - 1rem);
 
-            > .ogr-menu-start {
-                justify-content: flex-start;
-            }
-            > .ogr-menu-end {
-                justify-content: flex-end;
-            }
-            > .ogr-menu-center {
-                > .el-scrollbar {
-                    width: 100%;
-
-                    .el-scrollbar__view {
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                    }
-                }
-            }
-            > .ogr-menu-start, > .ogr-menu-center, > .ogr-menu-end {
-                align-items: center;
+            > .is-flex {
                 flex-direction: column;
-            }
+                height: calc(100% - 1rem);
 
-            .ogr-menu-section {
-                .ogr-menu-section__title {
-                    color: var(--el-text-color-regular);
-                    font-size: .675rem;
-                    margin: .5rem 0;
-                    text-transform: uppercase;
-                    
-                    img {
-                        width: 2.4rem;
+                > .ogr-menu-start {
+                    justify-content: flex-start;
+                }
+                > .ogr-menu-end {
+                    justify-content: flex-end;
+                }
+                > .ogr-menu-center {
+                    > .el-scrollbar {
+                        width: 100%;
+
+                        .el-scrollbar__view {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                        }
                     }
                 }
+                > .ogr-menu-start, > .ogr-menu-center, > .ogr-menu-end {
+                    align-items: center;
+                    flex-direction: column;
+                }
 
-                .el-button-group, .ogr-single-button-group {
-                    height: max-content;
-    
-                    + .el-button-group, + .ogr-single-button-group {
-                        margin-left: 0;
-                        margin-top: 0.375rem;
+                .ogr-menu-section {
+                    .ogr-menu-section__title {
+                        color: var(--el-text-color-regular);
+                        font-size: .675rem;
+                        margin: .5rem 0;
+                        text-transform: uppercase;
+                        
+                        img {
+                            width: 2.4rem;
+                        }
+                    }
+
+                    .el-button-group, .ogr-single-button-group {
+                        height: max-content;
+        
+                        + .el-button-group, + .ogr-single-button-group {
+                            margin-left: 0;
+                            margin-top: 0.375rem;
+                        }
                     }
                 }
             }

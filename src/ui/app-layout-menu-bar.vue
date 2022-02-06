@@ -169,13 +169,15 @@ export default defineComponent({
         },
     },
     setup(props, options) {
+        const mobileWidth: number = 550;
+
         let activeControlDock: LayoutShortcutGroupDefinitionControlButton | null = null;
         let pendingActiveControlCall: IArguments | null = null;
         let flexContainer = ref<HTMLDivElement>();
         let displayMode = ref<'all' | 'favorites'>('all');
         let showMoreActionsMenu = ref<boolean>(false);
         let showMoreActionsTooltip = ref<boolean>(false);
-        let popoverPlacement = ref<'top' | 'bottom'>('top');
+        let popoverPlacement = ref<'top' | 'bottom' | 'left' | 'right'>('top');
 
         let resizeDebounceHandle: number | undefined = undefined;
         let pointerDownElement: EventTarget | null = null;
@@ -400,9 +402,17 @@ export default defineComponent({
                     } else if (control.action.type === 'dock') {
                         if (openTarget === 'popover') {
                             if (!pointerDownShowDock) {
-                                activeControlDock = control;
-                                control.showDock = true;
-                                control.popoverVisible = true;
+                                if (window.innerWidth < mobileWidth) {
+                                    control.popoverVisible = false;
+                                    appEmitter.emit('app.menuDrawer.openFromDock', {
+                                        name: control.action.target,
+                                        placement: popoverPlacement.value
+                                    });
+                                } else {
+                                    activeControlDock = control;
+                                    control.showDock = true;
+                                    control.popoverVisible = true;
+                                }
                             } else {
                                 control.popoverVisible = false;
                             }
