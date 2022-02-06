@@ -17,3 +17,29 @@ export const rotateHandleHighlight = ref<boolean>(false);
 export const dimensionLockRatio = ref<number | null>(null);
 
 export const freeTransformEmitter = mitt();
+
+freeTransformEmitter.on('setDimensions', (event?: { top?: number, left?: number, width?: number, height?: number, rotation?: number, transformOriginX?: number, transformOriginY?: number }) => {
+    if (event) {
+        if (event.transformOriginX != null) {
+            transformOriginX.value = event.transformOriginX;
+        }
+        if (event.transformOriginY != null) {
+            transformOriginY.value = event.transformOriginY;
+        }
+        if (event.rotation != null) {
+            rotation.value = event.rotation;
+        }
+        if (event.left != null) {
+            left.value = event.left;
+        }
+        if (event.top != null) {
+            top.value = event.top;
+        }
+        if (event.width != null) {
+            width.value = event.width;
+        }
+        if (event.height != null) {
+            height.value = event.height;
+        }
+    }
+});

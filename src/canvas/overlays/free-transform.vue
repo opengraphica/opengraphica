@@ -132,23 +132,8 @@ export default defineComponent({
        
         function setDimensions(event?: { top?: number, left?: number, width?: number, height?: number, rotation?: number, transformOriginX?: number, transformOriginY?: number }) {
             if (event) {
-                if (event.transformOriginX != null) {
-                    transformOriginX.value = event.transformOriginX;
-                }
-                if (event.transformOriginY != null) {
-                    transformOriginY.value = event.transformOriginY;
-                }
                 overlayTransformOrigin.value = `${transformOriginY.value * 100}% ${transformOriginX.value * 100}%`;
                 freeTransform.value.style.transformOrigin = overlayTransformOrigin.value;
-                if (event.rotation != null) {
-                    rotation.value = event.rotation;
-                }
-                if (event.left != null) {
-                    left.value = event.left;
-                }
-                if (event.top != null) {
-                    top.value = event.top;
-                }
                 const overlayTransformMatrix =
                     new DOMMatrix()
                     .translateSelf(left.value, top.value)
@@ -156,12 +141,10 @@ export default defineComponent({
                 overlayTransform.value = `matrix(${overlayTransformMatrix.a},${overlayTransformMatrix.b},${overlayTransformMatrix.c},${overlayTransformMatrix.d},${overlayTransformMatrix.e},${overlayTransformMatrix.f})`;
                 freeTransform.value.style.transform = overlayTransform.value;
                 if (event.width != null) {
-                    width.value = event.width;
                     overlayWidth.value = event.width;
                     freeTransform.value.style.width = overlayWidth + 'px';
                 }
                 if (event.height != null) {
-                    height.value = event.height;
                     overlayHeight.value = event.height;
                     freeTransform.value.style.height = overlayHeight + 'px';
                 }
