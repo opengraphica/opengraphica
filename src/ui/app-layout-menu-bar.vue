@@ -34,7 +34,7 @@
                                     <template #reference>
                                         <el-button
                                             :aria-label="control.label"
-                                            :type="activeToolGroup === (control.action && control.action.target) ? 'primary' : undefined"
+                                            :type="[activeToolGroup, activeMenuDrawerComponentName].includes(control.action && control.action.target) ? 'primary' : undefined"
                                             plain
                                             :circle="!control.expanded"
                                             :round="control.expanded"

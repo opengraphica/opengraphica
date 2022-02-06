@@ -4,6 +4,7 @@
         v-pointer.dragend="onPointerDragEndList"
         v-pointer.press="onPointerPressList"
         v-pointer.move.window="onPointerMoveList"
+        v-pointer.up.window="onPointerUpList"
         class="ogr-layer-list"
         :class="{ 'is-dnd-dragging': draggingLayerId != null }"
     >
@@ -138,6 +139,7 @@ export default defineComponent({
         let lastDragPageY: number = 0;
         let isDragMoveUp: boolean = false;
         let dragScrollMargin: number = 20;
+        let draggingLayerStartPointerId: number | null = null;
         const draggingLayerId = ref<number | null>(null);
         const draggingItemHtml = ref<string>('');
 
@@ -196,6 +198,7 @@ export default defineComponent({
             }
         }
         async function handleDragStartList(e: PointerEvent) {
+            draggingLayerStartPointerId = e.pointerId;
             const target = e.target;
             const pageY = e.pageY;
             lastDragPageY = pageY;
@@ -222,6 +225,11 @@ export default defineComponent({
                 const pageY = (e as any).pageY;
                 calculateDropPosition(pageY);
                 lastDragPageY = pageY;
+            }
+        }
+        function onPointerUpList(e: PointerEvent) {
+            if (e.pointerId === draggingLayerStartPointerId) {
+                onPointerDragEndList(e);
             }
         }
         function calculateDropPosition(pageY: number) {
@@ -373,6 +381,7 @@ export default defineComponent({
             onPointerDragStartList,
             onPointerDragEndList,
             onPointerMoveList,
+            onPointerUpList,
             onPointerPressList,
             onToggleLayerSettings,
             onToggleLayerVisibility,

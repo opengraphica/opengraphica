@@ -302,7 +302,7 @@ export default defineComponent({
         'update:title'
     ],
     setup(props, { emit }) {
-        emit('update:title', 'Settings');
+        emit('update:title', 'Canvas Settings');
         const $notify = notifyInjector('$notify');
         const loading = ref<boolean>(false);
         const { actionStackIndex: historyActionStackIndex, canRedo, canUndo } = toRefs(historyStore.state);
