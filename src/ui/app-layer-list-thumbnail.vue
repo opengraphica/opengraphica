@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, toRefs, nextTick, PropType } from 'vue';
-import ElLoading from 'element-plus/lib/el-loading';
+import ElLoading from 'element-plus/lib/components/loading/index';
 import workingFileStore from '@/store/working-file';
 import { drawWorkingFileLayerToCanvas } from '@/lib/canvas';
 import { DecomposedMatrix } from '@/lib/dom-matrix';

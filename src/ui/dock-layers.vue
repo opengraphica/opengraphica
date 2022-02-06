@@ -19,8 +19,8 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, toRefs, onMounted, nextTick } from 'vue';
-import ElLoading from 'element-plus/lib/el-loading';
-import ElScrollbar from 'element-plus/lib/el-scrollbar';
+import ElLoading from 'element-plus/lib/components/loading/index';
+import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
 import AppLayerList from '@/ui/app-layer-list.vue';
 import workingFileStore from '@/store/working-file';
 

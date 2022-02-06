@@ -24,7 +24,7 @@
 import { defineComponent, defineAsyncComponent, ref, onMounted, onUnmounted } from 'vue';
 import Dock from './dock.vue';
 import Module from './module.vue';
-import ElLoading from 'element-plus/lib/el-loading';
+import ElLoading from 'element-plus/lib/components/loading/index';
 import appEmitter, { AppEmitterEvents } from '@/lib/emitter';
 
 interface DialogCommonDefinition {
@@ -53,7 +53,7 @@ export default defineComponent({
     },
     components: {
         Dock,
-        ElDialog: defineAsyncComponent(() => import(`element-plus/lib/el-dialog`)),
+        ElDialog: defineAsyncComponent(() => import(`element-plus/lib/components/dialog/index`)),
         Module
     },
     setup() {

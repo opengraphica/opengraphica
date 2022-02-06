@@ -69,18 +69,16 @@
 
 <script lang="ts">
 import { defineComponent, ref, reactive, computed, watch, nextTick } from 'vue';
-import ElButton from 'element-plus/lib/el-button';
-import ElCol from 'element-plus/lib/el-col';
-import ElForm from 'element-plus/lib/el-form';
-import ElFormItem from 'element-plus/lib/el-form-item';
+import ElButton from 'element-plus/lib/components/button/index';
+import ElCol from 'element-plus/lib/components/col/index';
+import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElFormItemGroup from '@/ui/el-form-item-group.vue';
-import ElInput from 'element-plus/lib/el-input';
+import ElInput from 'element-plus/lib/components/input/index';
 import ElInputNumber from '@/ui/el-input-number.vue';
-import ElLoading from 'element-plus/lib/el-loading';
-import ElOption from 'element-plus/lib/el-option';
-import ElRow from 'element-plus/lib/el-row';
-import ElSelect from 'element-plus/lib/el-select';
-import ElSlider from 'element-plus/lib/el-slider';
+import ElLoading from 'element-plus/lib/components/loading/index';
+import ElRow from 'element-plus/lib/components/row/index';
+import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
+import ElSlider from 'element-plus/lib/components/slider/index';
 import workingFileStore from '@/store/working-file';
 import { notifyInjector, unexpectedErrorMessage, validationSubmissionErrorMessage } from '@/lib/notify';
 import { Rules, RuleItem } from 'async-validator';
@@ -181,7 +179,7 @@ export default defineComponent({
                         quality: formData.workingFile.quality / 100,
                         dithering: formData.workingFile.dithering
                     });
-                } catch (error) {
+                } catch (error: any) {
                     $notify({
                         type: 'error',
                         dangerouslyUseHTMLString: true,
@@ -190,7 +188,7 @@ export default defineComponent({
                 }
                 emit('close');
                 loading.value = false;
-            } catch (error) {
+            } catch (error: any) {
                 $notify({
                     type: 'error',
                     dangerouslyUseHTMLString: true,

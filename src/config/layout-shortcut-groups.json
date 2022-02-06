@@ -120,7 +120,6 @@
                 "type": "button",
                 "icon": "bi bi-search",
                 "label": "Search",
-                "expanded": true,
                 "action": {
                     "type": "runModule",
                     "target": "tmp/notYetImplemented"

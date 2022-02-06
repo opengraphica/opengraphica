@@ -62,7 +62,7 @@ export async function exportAsImage(options: ExportOptions): Promise<void> {
                                 const data = [new ClipboardItem({ [blob.type]: blob })];
                                 await (navigator.clipboard as any).write(data);
                                 resolve();
-                            } catch (error) {
+                            } catch (error: any) {
                                 reject(new Error('Error writing to clipboard.'));
                             }
                         } else {
@@ -91,7 +91,7 @@ export async function exportAsImage(options: ExportOptions): Promise<void> {
                     }
                 }, mimeType, options.quality);
             }
-        } catch (error) {
+        } catch (error: any) {
             reject(new Error('An unexpected error occurred.'));
         }
     });
@@ -120,7 +120,7 @@ export async function promptClipboardWritePermission(): Promise<boolean> {
         const { state } = await navigator.permissions.query({ name: 'clipboard-write' } as any);
         return state === 'granted';
     }
-    catch (error) {
+    catch (error: any) {
         if (error.toString() === `TypeError: 'clipboard-write' (value of 'name' member of PermissionDescriptor) is not a valid value for enumeration PermissionName.` && (window as any).ClipboardItem) {
             return true;
         }

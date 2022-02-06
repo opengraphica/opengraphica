@@ -1,62 +1,67 @@
 <template>
-    <div class="ogr-layout-menu-bar" @touchmove="onTouchMoveMenuBar($event)">
+    <div class="ogr-layout-menu-bar theme-dark" :class="{ 'is-vertical': direction === 'vertical' }" @touchmove="onTouchMoveMenuBar($event)">
         <div ref="flexContainer" class="is-flex container mx-auto">
-            <div v-for="(actionGroupSection, actionGroupSectionName) of actionGroups" :key="actionGroupSectionName" class="ogr-menu-section py-2" :class="['ogr-menu-' + actionGroupSectionName, { 'px-3': actionGroupSectionName !== 'center' }]">
-                <template v-for="actionGroup of actionGroupSection" :key="actionGroup.id">
-                    <component :is="actionGroup.controls.length === 1 ? 'div' : 'el-button-group'" :class="{ 'ogr-single-button-group': actionGroup.controls.length === 1 }">
-                        <template v-for="control of actionGroup.controls" :key="control.label">
-                            <el-popover
-                                v-model:visible="control.popoverVisible"
-                                :trigger="control.showDock || control.expanded ? 'manual' : 'hover'"
-                                effect="light"
-                                placement="bottom"
-                                :popper-class="'ogr-dock-popover'"
-                                :show-after="0"
-                                :hide-after="0"
-                                :transition="control.showDock ? 'el-fade-in-linear' : 'none'"
-                                :append-to-body="false"
-                                :popper-options="{ boundariesElement: 'body' }"
-                                @after-leave="onAfterLeavePopover(control)">
-                                <template #reference>
-                                    <el-button
-                                        :aria-label="control.label"
-                                        :icon="control.icon"
-                                        :type="activeToolGroup === (control.action && control.action.target) ? 'primary' : undefined"
-                                        plain
-                                        :circle="!control.expanded"
-                                        :round="control.expanded"
-                                        :class="{
-                                            'el-button--expanded-group': control.expanded,
-                                            'el-button--expanded-popover': control.showDock
-                                        }"
-                                        @touchstart="onTouchStartControlButton($event, control)"
-                                        @touchend="onTouchEndControlButton($event, control)"
-                                        @mousedown="onMouseDownControlButton($event, control)"
-                                        @mouseup="onMouseUpControlButton($event, control)"
-                                        @mouseleave="onMouseLeaveControlButton($event)"
-                                        @keydown="onKeyDownControlButton($event, control)"
-                                    >
-                                        <span v-if="control.expanded" class="ml-2">{{ control.label }}</span>
-                                        <el-tag v-if="control.expanded" size="mini" type="info" class="ml-2">Ctrl + K</el-tag>
-                                    </el-button>
-                                </template>
-                                <template v-if="control.showDock">
-                                    <div v-if="control.displayTitle" class="ogr-dock-title">{{ control.displayTitle }}</div>
-                                    <dynamically-loaded-dock
-                                        :name="control.action.target" :key="'dock-' + control.action.target"
-                                        @update:title="control.displayTitle = $event"
-                                        @close="control.popoverVisible = false"
-                                    />
-                                </template>
-                                <template v-else>
-                                    <div class="px-3 py-2">
-                                        {{ control.label }}
-                                    </div>
-                                </template>
-                            </el-popover>
-                        </template>
-                    </component>
-                </template>
+            <div v-for="(actionGroupSection, actionGroupSectionName) of actionGroups" :key="actionGroupSectionName" class="ogr-menu-section my-2" :class="['ogr-menu-' + actionGroupSectionName, { 'px-3': actionGroupSectionName !== 'center' }]">
+                <span v-if="actionGroupSectionName === 'center' && direction === 'vertical'" class="ogr-menu-section__title">
+                    Tools
+                </span>
+                <component :is="actionGroupSectionName === 'center' ? 'el-scrollbar' : 'div'">
+                    <template v-for="actionGroup of actionGroupSection" :key="actionGroup.id">
+                        <component :is="actionGroup.controls.length === 1 ? 'div' : 'el-button-group'" :class="{ 'ogr-single-button-group': actionGroup.controls.length === 1 }">
+                            <template v-for="control of actionGroup.controls" :key="control.label">
+                                <el-popover
+                                    v-model:visible="control.popoverVisible"
+                                    :trigger="control.showDock || control.expanded ? 'manual' : 'hover'"
+                                    effect="light"
+                                    :placement="popoverPlacement"
+                                    :popper-class="'ogr-dock-popover'"
+                                    :show-after="0"
+                                    :hide-after="0"
+                                    :transition="control.showDock ? 'el-fade-in-linear' : 'none'"
+                                    :popper-options="{ boundariesElement: 'body' }"
+                                    append-to=".opengraphica"
+                                    @after-leave="onAfterLeavePopover(control)">
+                                    <template #reference>
+                                        <el-button
+                                            :aria-label="control.label"
+                                            :type="activeToolGroup === (control.action && control.action.target) ? 'primary' : undefined"
+                                            plain
+                                            :circle="!control.expanded"
+                                            :round="control.expanded"
+                                            :class="{
+                                                'el-button--expanded-group': control.expanded,
+                                                'el-button--expanded-popover': control.showDock
+                                            }"
+                                            @touchstart="onTouchStartControlButton($event, control)"
+                                            @touchend="onTouchEndControlButton($event, control)"
+                                            @mousedown="onMouseDownControlButton($event, control)"
+                                            @mouseup="onMouseUpControlButton($event, control)"
+                                            @mouseleave="onMouseLeaveControlButton($event)"
+                                            @keydown="onKeyDownControlButton($event, control)"
+                                        >
+                                            <span class="el-icon" :class="control.icon" aria-hidden="true" />
+                                            <span v-if="control.expanded" class="ml-2">{{ control.label }}</span>
+                                            <el-tag v-if="control.expanded" type="info" class="ml-2 el-tag--mini">Ctrl + K</el-tag>
+                                        </el-button>
+                                    </template>
+                                    <template v-if="control.showDock">
+                                        <div v-if="control.displayTitle" class="ogr-dock-title">{{ control.displayTitle }}</div>
+                                        <dynamically-loaded-dock
+                                            :name="control.action.target" :key="'dock-' + control.action.target"
+                                            @update:title="control.displayTitle = $event"
+                                            @close="control.popoverVisible = false"
+                                        />
+                                    </template>
+                                    <template v-else>
+                                        <div class="px-3 py-2">
+                                            {{ control.label }}
+                                        </div>
+                                    </template>
+                                </el-popover>
+                            </template>
+                        </component>
+                    </template>
+                </component>
             </div>
             <div v-if="displayMode === 'favorites'" class="ogr-menu-section ogr-menu-end py-2 px-3">
                 <div class="ogr-single-button-group">
@@ -64,7 +69,7 @@
                         v-model:visible="showMoreActionsTooltip"
                         :trigger="showMoreActionsMenu ? 'manual' : 'hover'"
                         effect="light"
-                        placement="bottom"
+                        :placement="popoverPlacement"
                         :popper-class="'ogr-dock-popover'"
                         :show-after="0"
                         :append-to-body="false"
@@ -116,11 +121,10 @@
 
 <script lang="ts">
 import { defineComponent, computed, nextTick, watch, PropType, ref, onMounted, onUnmounted, toRefs, defineAsyncComponent } from 'vue';
-import ElButton from 'element-plus/lib/el-button';
-import ElButtonGroup from 'element-plus/lib/el-button-group';
-import ElLoading from 'element-plus/lib/el-loading';
-import ElPopover from 'element-plus/lib/el-popover';
-import ElTag from 'element-plus/lib/el-tag';
+import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
+import ElLoading from 'element-plus/lib/components/loading/index';
+import ElPopover from '@/ui/el-popover.vue';
+import ElTag from 'element-plus/lib/components/tag/index';
 import { LayoutShortcutGroupDefinition, LayoutShortcutGroupDefinitionControlButton, DndLayoutMenuBar } from '@/types';
 import actionGroupsDefinition from '@/config/layout-shortcut-groups.json';
 import canvasStore from '@/store/canvas';
@@ -139,11 +143,11 @@ export default defineComponent({
         DynamicallyLoadedDock: Dock,
         ElButton,
         ElButtonGroup,
-        ElDrawer: defineAsyncComponent(() => import(`element-plus/lib/el-drawer`)),
-        ElMenu: defineAsyncComponent(() => import(`element-plus/lib/el-menu`)),
-        ElMenuItem: defineAsyncComponent(() => import(`element-plus/lib/el-menu-item`)),
+        ElDrawer: defineAsyncComponent(() => import(`element-plus/lib/components/drawer/index`)),
+        ElMenu: defineAsyncComponent(() => import(`element-plus/lib/components/menu/index`)),
+        ElMenuItem: defineAsyncComponent(async () => (await import(`element-plus/lib/components/menu/index`)).ElMenuItem),
         ElPopover,
-        ElScrollbar: defineAsyncComponent(() => import(`element-plus/lib/el-scrollbar`)),
+        ElScrollbar: defineAsyncComponent(() => import(`element-plus/lib/components/scrollbar/index`)),
         ElTag
     },
     props: {
@@ -154,7 +158,11 @@ export default defineComponent({
         direction: {
             type: String as PropType<'horizontal' | 'vertical'>,
             default: 'horizontal'
-        }
+        },
+        layoutPlacement: {
+            type: String as PropType<'top' | 'bottom' | 'left' | 'right'>,
+            default: 'top'
+        },
     },
     setup(props, options) {
         let activeControlDock: LayoutShortcutGroupDefinitionControlButton | null = null;
@@ -163,6 +171,7 @@ export default defineComponent({
         let displayMode = ref<'all' | 'favorites'>('all');
         let showMoreActionsMenu = ref<boolean>(false);
         let showMoreActionsTooltip = ref<boolean>(false);
+        let popoverPlacement = ref<'top' | 'bottom'>('top');
 
         let resizeDebounceHandle: number | undefined = undefined;
         let pointerDownElement: EventTarget | null = null;
@@ -180,6 +189,14 @@ export default defineComponent({
             actionGroups.value = createActionGroups();
             showMoreActionsMenu.value = false;
         });
+        watch(() => props.layoutPlacement, (layoutPlacement) => {
+            popoverPlacement.value = {
+                bottom: 'top',
+                top: 'bottom',
+                left: 'right',
+                right: 'left'
+            }[layoutPlacement] as any;
+        }, { immediate: true });
 
         if (props.direction === 'horizontal') {
             watch([viewportWidth], () => {
@@ -406,6 +423,7 @@ export default defineComponent({
         return {
             showMoreActionsMenu,
             showMoreActionsTooltip,
+            popoverPlacement,
             displayMode,
             flexContainer,
             actionGroups,

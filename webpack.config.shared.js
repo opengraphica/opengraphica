@@ -1,4 +1,5 @@
 const path = require('path');
+const { ProgressPlugin } = require('webpack');
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const { VueLoaderPlugin } = require('vue-loader');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
@@ -8,6 +9,7 @@ module.exports = function setupConfig(config) {
     delete config.plugins;
 
     return {
+        context: path.join(__dirname, './'),
         module: {
             rules: [
                 {
@@ -28,19 +30,27 @@ module.exports = function setupConfig(config) {
                     }
                 },
                 {
+                    test: /\.mjs$/,
+                    resolve: {
+                        fullySpecified: false
+                    },
+                    include: /node_modules/,
+                    type: "javascript/auto"
+                },
+                {
                     test: /\.css$/i,
                     loader: 'css-loader'
                 },
                 {
                     test: /\.s[ac]ss$/i,
                     use: [
-                        "style-loader",
-                        "css-loader",
+                        'style-loader',
+                        'css-loader',
                         {
-                            loader: "sass-loader",
+                            loader: 'sass-loader',
                             options: {
                                 // Prefer `dart-sass`
-                                implementation: require("sass")
+                                implementation: require('sass')
                             }
                         }
                     ]
@@ -59,13 +69,27 @@ module.exports = function setupConfig(config) {
                 }
             ]
         },
+        resolveLoader: {
+            modules: [
+                path.join(__dirname, './node_modules')
+            ]
+        },
         resolve: {
+            roots: [
+                path.resolve(__dirname, './')
+            ],
+            modules: [
+                path.join(__dirname, './node_modules')
+            ],
             alias: {
                 '@': path.resolve(__dirname, 'src/')
             },
-            extensions: ['.js', '.ts', '.vue', '.json']
+            extensions: ['.js', '.mjs', '.ts', '.vue', '.json']
         },
         plugins: [
+            new ProgressPlugin({
+                activeModules: true
+            }),
             new CleanWebpackPlugin(),
             new CopyWebpackPlugin({
                 patterns: [
@@ -91,111 +115,111 @@ module.exports = function setupConfig(config) {
                         name: 'async-validator'
                     },
                     elementPlusAlert: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-alert)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](alert)[\\/]/,
                         name: 'element-plus-button'
                     },
                     elementPlusButton: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-button|el-button-group)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](button|button-group)[\\/]/,
                         name: 'element-plus-button'
                     },
                     elementPlusCard: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-card)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](card)[\\/]/,
                         name: 'element-plus-card'
                     },
                     elementPlusCheckbox: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-checkbox|element-plus-checkbox-button|element-plus-checkbox-group)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](checkbox|element-plus-checkbox-button|element-plus-checkbox-group)[\\/]/,
                         name: 'element-plus-checkbox'
                     },
                     elementPlusCollapse: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-collapse|el-collapse-item)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](collapse|collapse-item)[\\/]/,
                         name: 'element-plus-collapse'
                     },
                     elementPlusDialog: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-dialog|el-backdrop)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](dialog|backdrop)[\\/]/,
                         name: 'element-plus-dialog'
                     },
                     elementPlusDivider: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-divider)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](divider)[\\/]/,
                         name: 'element-plus-divider'
                     },
                     elementPlusDrawer: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-drawer|el-overlay)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](drawer|overlay)[\\/]/,
                         name: 'element-plus-drawer'
                     },
                     elementPlusDropdown: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-dropdown)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](dropdown)[\\/]/,
                         name: 'element-plus-dropdown'
                     },
                     elementPlusForm: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-form|el-form-item)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](form|form-item)[\\/]/,
                         name: 'element-plus-form'
                     },
                     elementPlusGrid: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-col|el-row)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](col|row)[\\/]/,
                         name: 'element-plus-grid'
                     },
                     elementPlusIcon: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-icon)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](icon)[\\/]/,
                         name: 'element-plus-icon'
                     },
                     elementPlusInput: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-input|el-input-number)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](input|input-number)[\\/]/,
                         name: 'element-plus-input'
                     },
                     elementPlusLoading: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-loading)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](loading)[\\/]/,
                         name: 'element-plus-loading'
                     },
                     elementPlusLink: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-link)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](link)[\\/]/,
                         name: 'element-plus-link'
                     },
                     elementPlusMenu: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-menu|el-menu-item)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](menu|menu-item)[\\/]/,
                         name: 'element-plus-menu'
                     },
                     elementPlusNotification: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-notification)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](notification)[\\/]/,
                         name: 'element-plus-notification'
                     },
                     elementPlusPopup: {
-                        test: /[\\/]node_modules[\\/]((element-plus)[\\/](lib)[\\/](el-popper|el-popover|el-tooltip)|\@popperjs)[\\/]/,
+                        test: /[\\/]node_modules[\\/]((element-plus)[\\/](lib)[\\/](components)[\\/](popper|popover|tooltip)|\@popperjs)[\\/]/,
                         name: 'element-plus-popup'
                     },
                     elementPlusRadio: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-radio|el-radio-button|el-radio-group)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](radio|radio-button|radio-group)[\\/]/,
                         name: 'element-plus-radio'
                     },
                     elementPlusScrollbar: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-scrollbar)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](scrollbar)[\\/]/,
                         name: 'element-plus-scrollbar'
                     },
                     elementPlusSelect: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-select|el-option)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](select|option)[\\/]/,
                         name: 'element-plus-select'
                     },
                     elementPlusSlider: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-slider)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](slider)[\\/]/,
                         name: 'element-plus-slider'
                     },
                     elementPlusSwitch: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-switch)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](switch)[\\/]/,
                         name: 'element-plus-switch'
                     },
                     elementPlusTabs: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-tabs|el-tab-pane)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](tabs|tab-pane)[\\/]/,
                         name: 'element-plus-tabs'
                     },
                     elementPlusTag: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-tag)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](tag)[\\/]/,
                         name: 'element-plus-tag'
                     },
                     elementPlusTimeline: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-timeline|el-timeline-item)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](timeline|timeline-item)[\\/]/,
                         name: 'element-plus-timeline'
                     },
                     elementPlusTransition: {
-                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](el-transition)[\\/]/,
+                        test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](transition)[\\/]/,
                         name: 'element-plus-transition'
                     },
                     elementPlusShared: {

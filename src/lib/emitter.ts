@@ -1,5 +1,5 @@
 import mitt, { Handler } from 'mitt';
-import { INotificationOptions } from 'element-plus/lib/el-notification/src/notification.type';
+import { NotificationProps } from 'element-plus/lib/components/notification/src/notification.d';
 import { CanvasViewResetOptions } from '@/types';
 
 interface AppEmitterEvents {
@@ -11,7 +11,7 @@ interface AppEmitterEvents {
     'app.dialogs.openFromModule': {
         name: string;
     };
-    'app.notify': INotificationOptions;
+    'app.notify': Partial<NotificationProps>;
     'app.wait.startBlocking': {
         id: string;
         label?: string;

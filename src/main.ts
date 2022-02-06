@@ -1,3 +1,4 @@
+
 import { createApp, App } from 'vue';
 import '@/polyfill';
 import OpenGraphicaApp from '@/ui/app.vue';
@@ -7,7 +8,7 @@ import editorStore from '@/store/editor';
 import '@/store/history';
 import '@/store/preferences';
 import '@/store/working-file';
-import ElNotification from 'element-plus/lib/el-notification';
+import ElNotification from 'element-plus/lib/components/notification/index';
 import { notifyPolyfill } from '@/lib/notify';
 import '@/lib/keyboard';
 
@@ -22,9 +23,9 @@ const app: OpenGraphica = createApp(OpenGraphicaApp) as OpenGraphica;
 app.use(ElNotification);
 
 // Notification toasts
-app.provide('$notify', app.config.globalProperties.$notify);
+app.provide('$notify', notifyPolyfill(app.config.globalProperties.$notify));
 appEmitter.on('app.notify', (options) => {
-    notifyPolyfill(app.config.globalProperties.$notify)(options);
+    return notifyPolyfill(app.config.globalProperties.$notify)(options);
 })
 
 // Expose events

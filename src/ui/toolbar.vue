@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import ElLoading from 'element-plus/lib/el-loading';
+import ElLoading from 'element-plus/lib/components/loading/index';
 import editorStore from '@/store/editor';
 
 export default defineComponent({

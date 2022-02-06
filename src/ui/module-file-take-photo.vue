@@ -25,9 +25,9 @@
  */
 
 import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
-import ElAlert from 'element-plus/lib/el-alert';
-import ElButton from 'element-plus/lib/el-button';
-import ElLoading from 'element-plus/lib/el-loading';
+import ElAlert from 'element-plus/lib/components/alert/index';
+import ElButton from 'element-plus/lib/components/button/index';
+import ElLoading from 'element-plus/lib/components/loading/index';
 import historyStore from '@/store/history';
 import workingFileStore from '@/store/working-file';
 import { notifyInjector, unexpectedErrorMessage } from '@/lib/notify';
@@ -68,7 +68,7 @@ export default defineComponent({
                 tracks.value = stream.getTracks();
                 activeTrack.value = tracks.value[0];
                 videoElement.srcObject = stream;
-            } catch (error) {
+            } catch (error: any) {
                 hasCameraError.value = true;
             }
             loading.value = false;

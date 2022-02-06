@@ -3,12 +3,16 @@
         <header ref="header">
             <h1 class="is-sr-only">OpenGraphica</h1>
             <template v-if="!isActiveToolbarExclusive && config.header">
-                <app-layout-menu-bar v-for="(menuBarConfig, index) of config.header" :key="index" :config="menuBarConfig" />
+                <app-layout-menu-bar v-for="(menuBarConfig, index) of config.header" :key="index" :config="menuBarConfig" layout-placement="top" />
             </template>
             <toolbar v-if="activeToolbar && activeToolbarPosition === 'top'" :name="activeToolbar" :class="{ 'is-overlay': !isActiveToolbarExclusive }" />
         </header>
         <div class="ogr-layout-dnd-center">
-            <aside aria-label="Left Sidebar" class="sidebar-left" ref="sidebarLeft"></aside>
+            <aside aria-label="Left Sidebar" class="sidebar-left" ref="sidebarLeft">
+                <template v-if="!isActiveToolbarExclusive && config.sidebarLeft">
+                    <app-layout-menu-bar v-for="(menuBarConfig, index) of config.sidebarLeft" :key="index" :config="menuBarConfig" direction="vertical" layout-placement="left" />
+                </template>
+            </aside>
             <main ref="main"
                 tabindex="0"
                 :class="{ 'ogr-custom-cursor': !!canvasState.cursor }"
@@ -16,10 +20,17 @@
                 @pointerdown="onPointerDownMain"
                 @wheel="onWheelMain"
             />
-            <aside aria-label="Right Sidebar" class="sidebar-right" ref="sidebarRight"></aside>
+            <aside aria-label="Right Sidebar" class="sidebar-right" ref="sidebarRight">
+                <template v-if="!isActiveToolbarExclusive && config.sidebarRight">
+                    <app-layout-menu-bar v-for="(menuBarConfig, index) of config.sidebarRight" :key="index" :config="menuBarConfig" direction="vertical" layout-placement="right" />
+                </template>
+            </aside>
         </div>
         <footer ref="footer">
             <toolbar v-if="activeToolbar && activeToolbarPosition === 'bottom'" :name="activeToolbar" :class="{ 'is-overlay': !isActiveToolbarExclusive }" />
+            <template v-if="!isActiveToolbarExclusive && config.footer">
+                <app-layout-menu-bar v-for="(menuBarConfig, index) of config.footer" :key="index" :config="menuBarConfig" layout-placement="bottom" />
+            </template>
         </footer>
     </div>
 </template>

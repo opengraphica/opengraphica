@@ -70,12 +70,11 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, watch, reactive, onMounted, toRefs, nextTick, PropType, getCurrentInstance } from 'vue';
-import ElButton from 'element-plus/lib/el-button';
-import ElLoading from 'element-plus/lib/el-loading';
-import ElMenu from 'element-plus/lib/el-menu';
-import ElMenuItem from 'element-plus/lib/el-menu-item';
-import ElPopover from 'element-plus/lib/el-popover';
-import ElScrollbar from 'element-plus/lib/el-scrollbar';
+import ElButton from 'element-plus/lib/components/button/index';
+import ElLoading from 'element-plus/lib/components/loading/index';
+import ElMenu, { ElMenuItem } from 'element-plus/lib/components/menu/index';
+import ElPopover from 'element-plus/lib/components/popover/index';
+import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
 import pointerDirective from '@/directives/pointer';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';

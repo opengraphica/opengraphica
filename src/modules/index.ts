@@ -49,7 +49,7 @@ export async function runModule(moduleGroupName: string, moduleName: string) {
                     let runModuleError;
                     try {
                         await importedModule[methodName]();
-                    } catch (error) {
+                    } catch (error: any) {
                         runModuleError = error;
                     }
                     appEmitter.emit('app.wait.stopBlocking', {

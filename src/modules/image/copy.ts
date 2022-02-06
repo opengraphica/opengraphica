@@ -11,7 +11,7 @@ export async function copyAllLayers() {
             fileType: 'png',
             toClipboard: true
         });
-    } catch (error) {
+    } catch (error: any) {
         await new Promise<void>((resolve) => {
             setTimeout(resolve, 1);
         });

@@ -127,7 +127,7 @@ export default defineComponent({
                 const imageWidth = workingFileStore.get('width');
                 const imageHeight = workingFileStore.get('height');
 
-                if (rootElement) {
+                if (rootElement?.value) {
                     canvasStore.set('viewWidth', rootElement.value.clientWidth * (window.devicePixelRatio || 1));
                     canvasStore.set('viewHeight', rootElement.value.clientHeight * (window.devicePixelRatio || 1));
                 }
@@ -301,7 +301,7 @@ export default defineComponent({
                         }
                     }
                 }
-            } catch (error) {
+            } catch (error: any) {
                 if (preferencesStore.get('useCanvasViewport') === false && (error || '').toString().includes('NS_ERROR_FAILURE')) {
                     clearTimeout(drawPostProcessTimeoutHandle);
                     preferencesStore.set('useCanvasViewport', true);

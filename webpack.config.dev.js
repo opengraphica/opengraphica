@@ -13,12 +13,13 @@ module.exports = setupConfig({
             type: 'var'
         }
     },
+    devtool: 'eval-cheap-source-map',
     devServer: {
-        contentBase: path.join(__dirname, './dev'),
+        static: path.join(__dirname, './dev'),
         host: '0.0.0.0',
         hot: true,
         port: 8080,
-        disableHostCheck: true
+        allowedHosts: 'all'
     },
     plugins: [
         new webpack.HotModuleReplacementPlugin(),

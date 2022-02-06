@@ -338,10 +338,12 @@ body.ogr-full-page {
     .ogr-layout-menu-bar {
         display: block;
         transition: all 0.6s;
-        width: 100%;
-        max-width: 100%;
+        width: calc(100% - 1rem);
+        max-width: calc(100% - 1rem);
         background: var(--ogr-layout-menu-bar-background-color);
         box-shadow: 0 0 0 0.063rem var(--ogr-layout-menu-bar-border-color);
+        border-radius: 1rem;
+        margin: .5rem;
 
         > .is-flex {
             > .ogr-menu-favorites {
@@ -352,16 +354,35 @@ body.ogr-full-page {
             > .ogr-menu-start, > .ogr-menu-end {
                 flex: 1;
                 display: flex;
+                justify-content: flex-end;
                 min-width: -webkit-min-content; /* Workaround to Chrome bug */
             }
 
+            > .ogr-menu-center {
+                flex-shrink: 1;
+                flex-grow: 0;
+                display: flex;
+                overflow: hidden;
+
+                .el-button {
+                    --el-button-background-color: transparent;
+
+                    .el-icon {
+                        color: var(--el-button-font-color);
+                    }
+                    &.el-button--primary.is-plain {
+                        --el-button-font-color: var(--el-text-color-primary);
+                    }
+                }
+            }
+
             > .ogr-menu-end {
-                justify-content: flex-end;
+                justify-content: flex-start;
             }
         }
 
         .ogr-menu-section {
-            > .el-button-group, > .ogr-single-button-group {
+            .el-button-group, .ogr-single-button-group {
                 width: max-content;
 
                 > .el-button {
@@ -380,6 +401,51 @@ body.ogr-full-page {
 
         .el-button--expanded-popover {
             box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.3) inset;
+        }
+
+        &.is-vertical > .is-flex {
+            flex-direction: column;
+            height: calc(100vh - 1rem);
+
+            > .ogr-menu-start {
+                justify-content: flex-start;
+            }
+            > .ogr-menu-end {
+                justify-content: flex-end;
+            }
+            > .ogr-menu-center {
+                > .el-scrollbar {
+                    width: 100%;
+
+                    .el-scrollbar__view {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                    }
+                }
+            }
+            > .ogr-menu-start, > .ogr-menu-center, > .ogr-menu-end {
+                align-items: center;
+                flex-direction: column;
+            }
+
+            .ogr-menu-section {
+                .ogr-menu-section__title {
+                    color: var(--el-text-color-regular);
+                    font-size: .675rem;
+                    margin: .5rem 0;
+                    text-transform: uppercase;
+                }
+
+                .el-button-group, .ogr-single-button-group {
+                    height: max-content;
+    
+                    + .el-button-group, + .ogr-single-button-group {
+                        margin-left: 0;
+                        margin-top: 0.375rem;
+                    }
+                }
+            }
         }
     }
 

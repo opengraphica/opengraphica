@@ -30,13 +30,12 @@
 
 <script lang="ts">
 import { defineComponent, ref, reactive, watch, nextTick } from 'vue';
-import ElAlert from 'element-plus/lib/el-alert';
-import ElButton from 'element-plus/lib/el-button';
-import ElForm from 'element-plus/lib/el-form';
-import ElFormItem from 'element-plus/lib/el-form-item';
+import ElAlert from 'element-plus/lib/components/alert/index';
+import ElButton from 'element-plus/lib/components/button/index';
+import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElFormItemGroup from '@/ui/el-form-item-group.vue';
-import ElInput from 'element-plus/lib/el-input';
-import ElLoading from 'element-plus/lib/el-loading';
+import ElInput from 'element-plus/lib/components/input/index';
+import ElLoading from 'element-plus/lib/components/loading/index';
 import workingFileStore from '@/store/working-file';
 import { notifyInjector, unexpectedErrorMessage, validationSubmissionErrorMessage } from '@/lib/notify';
 import { Rules, RuleItem } from 'async-validator';
@@ -90,7 +89,7 @@ export default defineComponent({
                     await saveImageAs({
                         fileName: formData.workingFile.fileName,
                     });
-                } catch (error) {
+                } catch (error: any) {
                     $notify({
                         type: 'error',
                         dangerouslyUseHTMLString: true,
@@ -99,7 +98,7 @@ export default defineComponent({
                 }
                 emit('close');
                 loading.value = false;
-            } catch (error) {
+            } catch (error: any) {
                 $notify({
                     type: 'error',
                     dangerouslyUseHTMLString: true,

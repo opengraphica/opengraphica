@@ -89,18 +89,14 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent, ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
-import ElButton from 'element-plus/lib/el-button';
-import ElButtonGroup from 'element-plus/lib/el-button-group';
-import ElForm from 'element-plus/lib/el-form';
-import ElFormItem from 'element-plus/lib/el-form-item';
+import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
+import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElInputNumber from '@/ui/el-input-number.vue';
-import ElLoading from 'element-plus/lib/el-loading';
-import ElOption from 'element-plus/lib/el-option';
-import ElPopover from 'element-plus/lib/el-popover';
-import ElRadioButton from 'element-plus/lib/el-radio-button';
-import ElRadioGroup from 'element-plus/lib/el-radio-group';
-import ElSelect from 'element-plus/lib/el-select';
-import ElSwitch from 'element-plus/lib/el-switch';
+import ElLoading from 'element-plus/lib/components/loading/index';
+import ElPopover from 'element-plus/lib/components/popover/index';
+import { ElRadioButton, ElRadioGroup } from 'element-plus/lib/components/radio/index';
+import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
+import ElSwitch from 'element-plus/lib/components/switch/index';
 import appEmitter from '@/lib/emitter';
 import canvasStore from '@/store/canvas';
 import historyStore from '@/store/history';
@@ -285,7 +281,7 @@ export default defineComponent({
                         })
                     ])
                 });
-            } catch (error) {
+            } catch (error: any) {
                 
             }
             appEmitter.emit('app.wait.stopBlocking', { id: 'toolCropResizeCalculating' });

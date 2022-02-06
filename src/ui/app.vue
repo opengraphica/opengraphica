@@ -15,7 +15,7 @@ import AppLayoutDndContainer from '@/ui/app-layout-dnd-container.vue';
 import AppWait from '@/ui/app-wait.vue';
 import canvasStore from '@/store/canvas';
 import ResizeObserver from 'resize-observer-polyfill';
-import ElLoading from 'element-plus/lib/el-loading';
+import ElLoading from 'element-plus/lib/components/loading/index';
 import { preloadModules } from '@/modules';
 
 export default defineComponent({
@@ -40,7 +40,7 @@ export default defineComponent({
                 // Reset user zoom on some browsers
                 try {
                     (document as any).firstElementChild.style.zoom = 'reset';
-                } catch (error) {}
+                } catch (error: any) {}
                 // Chrome for some reason tries to retain scroll position even though the page wasn't scrolled
                 // When using two finger movements
                 const autoScrollFixIntervalHandle = setInterval(() => {

@@ -54,7 +54,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, watch, PropType, onMounted, nextTick } from 'vue';
-import ElInput from 'element-plus/lib/el-input';
+import ElInput from 'element-plus/lib/components/input/index';
 import { Parser as MathExpressionParser } from 'expr-eval';
 
 export default defineComponent({
@@ -252,7 +252,7 @@ export default defineComponent({
         function onChange() {
             try {
                 lastEvaluatedValue = MathExpressionParser.evaluate(displayValue.value);
-            } catch (error) {
+            } catch (error: any) {
                 // Do nothing.
             }
             if (props.precision != null) {
@@ -270,7 +270,7 @@ export default defineComponent({
                 if (!(props.modelModifiers as any).lazy) {
                     emit('update:modelValue', lastEvaluatedValue);
                 }
-            } catch (error) {
+            } catch (error: any) {
                 // Do nothing.
             }
         }

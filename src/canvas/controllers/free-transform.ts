@@ -385,7 +385,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
     private setBoundsFromSelectedLayers() {
         clearTimeout(this.setBoundsDebounceHandle);
-        this.setBoundsDebounceHandle = setTimeout(() => {
+        this.setBoundsDebounceHandle = window.setTimeout(() => {
             if (this.selectedLayers.length === 1) {
                 const activeLayer = this.selectedLayers[0];
                 const originPosX = activeLayer.width * transformOriginX.value;

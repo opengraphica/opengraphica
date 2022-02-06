@@ -69,7 +69,7 @@ async function dispatchFree({ databaseSize, memorySize }: HistoryDispatch['free'
             totalDatabaseFreed += action.freeEstimates.database;
             try {
                 await action.free();
-            } catch (error) {
+            } catch (error: any) {
                 hasError = true;
             }
             if (totalMemoryFreed >= (memorySize || 0) && totalDatabaseFreed >= (databaseSize || 0)) {
@@ -86,7 +86,7 @@ async function dispatchFree({ databaseSize, memorySize }: HistoryDispatch['free'
             totalDatabaseFreed += action.freeEstimates.database;
             try {
                 await action.free();
-            } catch (error) {
+            } catch (error: any) {
                 hasError = true;
             }
             if (totalMemoryFreed >= (memorySize || 0) && totalDatabaseFreed >= (databaseSize || 0)) {
@@ -113,7 +113,7 @@ async function dispatchRunAction({ action, mergeWithHistory }: HistoryDispatch['
     let errorDuringFree: boolean = false;
     try {
         await action.do();
-    } catch (error) {
+    } catch (error: any) {
         // Action aborted. This is usually expected behavior as actions throw errors if they shouldn't run.
         return { status: 'aborted', reason: error };
     }
@@ -124,7 +124,7 @@ async function dispatchRunAction({ action, mergeWithHistory }: HistoryDispatch['
         for (let freedAction of freedActions) {
             try {
                 await freedAction.free();
-            } catch (error) {
+            } catch (error: any) {
                 errorDuringFree = true;
             }
         }
@@ -150,7 +150,7 @@ async function dispatchRunAction({ action, mergeWithHistory }: HistoryDispatch['
                 if (actionToFree) {
                     await actionToFree.free();
                 }
-            } catch (error) {
+            } catch (error: any) {
                 errorDuringFree = true;
             }
         } else {

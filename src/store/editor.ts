@@ -138,7 +138,7 @@ const store = new PerformantStore<EditorStore>({
                         const controller = new CanvasControllerGenericClass();
                         try {
                             controller.onLeave();
-                        } catch (error) {}
+                        } catch (error: any) {}
                         set('toolCanvasController', controller);
                         if (toolDefinition.toolbar) {
                             isActiveToolbarExclusive = !!toolDefinition.toolbar.exclusive;
@@ -159,7 +159,7 @@ const store = new PerformantStore<EditorStore>({
                     set('activeTool', activeTool);
                     try {
                         store.get('toolCanvasController').onEnter();
-                    } catch (error) {}
+                    } catch (error: any) {}
                 }
                 break;
 

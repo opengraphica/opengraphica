@@ -1,26 +1,25 @@
 {
     "dndLayout": {
-        "header": [
+        "sidebarLeft": [
             {
                 "type": "menuBar",
                 "actionGroupLayout": {
                     "start": [
                         "settings",
+                        "layers"
+                    ],
+                    "center": [
+                        "search",
                         "effects",
                         "text",
                         "selection",
-                        "transform"
-                    ],
-                    "center": [
-                        "search"
-                    ],
-                    "end": [
+                        "transform",
                         "color",
                         "draw",
                         "deform",
-                        "erase",
-                        "layers"
+                        "erase"
                     ],
+                    "end": [],
                     "favorites": [
                         "settings",
                         "layers",

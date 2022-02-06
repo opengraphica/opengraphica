@@ -71,7 +71,7 @@ export class PerformantStore<T extends StoreTypeMap> {
                     if (typeof newValue !== 'undefined') {
                         value = newValue;
                     }
-                } catch (error) {
+                } catch (error: any) {
                     return;
                 }
             }

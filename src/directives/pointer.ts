@@ -61,7 +61,7 @@ function handleTapEvent(el: any, binding: DirectiveBinding<any>) {
         pointerDownType = 'mouse';
         isPointerDownValid = true;
         clearTimeout(pointerDownTimeoutHandle);
-        pointerDownTimeoutHandle = setTimeout(() => {
+        pointerDownTimeoutHandle = window.setTimeout(() => {
             isPointerDownValid = false;
         }, multiTouchTapTimeout.value);
     }
@@ -75,7 +75,7 @@ function handleTapEvent(el: any, binding: DirectiveBinding<any>) {
             pointerDownType = 'pen';
             isPointerDownValid = true;
             clearTimeout(pointerDownTimeoutHandle);
-            pointerDownTimeoutHandle = setTimeout(() => {
+            pointerDownTimeoutHandle = window.setTimeout(() => {
                 isPointerDownValid = false;
             }, multiTouchTapTimeout.value);
         }
@@ -92,7 +92,7 @@ function handleTapEvent(el: any, binding: DirectiveBinding<any>) {
                 pointerDownType = 'touch';
                 isPointerDownValid = true;
                 clearTimeout(pointerDownTimeoutHandle);
-                pointerDownTimeoutHandle = setTimeout(() => {
+                pointerDownTimeoutHandle = window.setTimeout(() => {
                     isPointerDownValid = false;
                 }, multiTouchTapTimeout.value);
             }
@@ -137,7 +137,7 @@ function handlePressEvent(el: any, binding: DirectiveBinding<any>) {
         pointerDownX = e.pageX;
         pointerDownY = e.pageY;
         clearTimeout(pointerDownTimeoutHandle);
-        pointerDownTimeoutHandle = setTimeout(() => {
+        pointerDownTimeoutHandle = window.setTimeout(() => {
             isPointerDownValid = false;
             runCallback(el, 'press', binding, translateMouseEventToPointerEvent('pointerdown', e));
         }, pointerPressHoldTimeout.value);
@@ -161,7 +161,7 @@ function handlePressEvent(el: any, binding: DirectiveBinding<any>) {
             pointerDownX = e.pageX;
             pointerDownY = e.pageY;
             clearTimeout(pointerDownTimeoutHandle);
-            pointerDownTimeoutHandle = setTimeout(() => {
+            pointerDownTimeoutHandle = window.setTimeout(() => {
                 isPointerDownValid = false;
                 runCallback(el, 'press', binding, e);
             }, pointerPressHoldTimeout.value);
@@ -190,7 +190,7 @@ function handlePressEvent(el: any, binding: DirectiveBinding<any>) {
                 pointerDownX = e.touches[0].pageX;
                 pointerDownY = e.touches[0].pageY;
                 clearTimeout(pointerDownTimeoutHandle);
-                pointerDownTimeoutHandle = setTimeout(() => {
+                pointerDownTimeoutHandle = window.setTimeout(() => {
                     isPointerDownValid = false;
                     runCallback(el, 'press', binding, translateTouchEventToPointerEvents('pointerdown', e)[0]);
                 }, pointerPressHoldTimeout.value);

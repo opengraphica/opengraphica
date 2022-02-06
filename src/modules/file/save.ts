@@ -84,7 +84,7 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<RGBAColor>[]): Seri
                 } as SerializedFileRasterLayer<RGBAColor>;
                 canvas.width = 1;
                 canvas.height = 1;
-            } catch (error) {
+            } catch (error: any) {
                 canvas.width = 1;
                 canvas.height = 1;
                 throw error;
@@ -112,7 +112,7 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<RGBAColor>[]): Seri
                     });
                     canvas.width = 1;
                     canvas.height = 1;
-                } catch (error) {
+                } catch (error: any) {
                     canvas.width = 1;
                     canvas.height = 1;
                     throw error;

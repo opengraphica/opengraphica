@@ -233,29 +233,21 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, toRefs, nextTick } from 'vue';
-import ElAlert from 'element-plus/lib/el-alert';
-import ElButton from 'element-plus/lib/el-button';
-import ElButtonGroup from 'element-plus/lib/el-button-group';
-import ElCollapse from 'element-plus/lib/el-collapse';
-import ElCollapseItem from 'element-plus/lib/el-collapse-item';
-import ElDivider from 'element-plus/lib/el-divider';
-import ElForm from 'element-plus/lib/el-form';
-import ElFormItem from 'element-plus/lib/el-form-item';
+import ElAlert from 'element-plus/lib/components/alert/index';
+import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
+import ElCollapse, { ElCollapseItem } from 'element-plus/lib/components/collapse/index';
+import ElDivider from 'element-plus/lib/components/divider/index';
+import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElInputNumber from '@/ui/el-input-number.vue';
-import ElLink from 'element-plus/lib/el-link';
-import ElLoading from 'element-plus/lib/el-loading';
-import ElMenu from 'element-plus/lib/el-menu';
-import ElMenuItem from 'element-plus/lib/el-menu-item';
-import ElOption from 'element-plus/lib/el-option';
-import ElRadioButton from 'element-plus/lib/el-radio-button';
-import ElRadioGroup from 'element-plus/lib/el-radio-group';
-import ElScrollbar from 'element-plus/lib/el-scrollbar';
-import ElSelect from 'element-plus/lib/el-select';
-import ElSwitch from 'element-plus/lib/el-switch';
-import ElTabs from 'element-plus/lib/el-tabs';
-import ElTabPane from 'element-plus/lib/el-tab-pane';
-import ElTimeline from 'element-plus/lib/el-timeline';
-import ElTimelineItem from 'element-plus/lib/el-timeline-item';
+import ElLink from 'element-plus/lib/components/link/index';
+import ElLoading from 'element-plus/lib/components/loading/index';
+import ElMenu, { ElMenuItem } from 'element-plus/lib/components/menu/index';
+import { ElRadioButton, ElRadioGroup } from 'element-plus/lib/components/radio/index';
+import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
+import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
+import ElSwitch from 'element-plus/lib/components/switch/index';
+import ElTabs, { ElTabPane } from 'element-plus/lib/components/tabs/index';
+import ElTimeline, { ElTimelineItem } from 'element-plus/lib/components/timeline/index';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore, { HistoryState } from '@/store/history';
@@ -358,7 +350,7 @@ export default defineComponent({
                 appEmitter.emit('app.wait.startBlocking', { id: 'historyUndo' });
                 try {
                     await historyStore.dispatch('undo');
-                } catch (error) {
+                } catch (error: any) {
                     $notify({
                         type: 'error',
                         title: 'Undo Error',
@@ -373,7 +365,7 @@ export default defineComponent({
                 appEmitter.emit('app.wait.startBlocking', { id: 'historyRedo' });
                 try {
                     await historyStore.dispatch('redo');
-                } catch (error) {
+                } catch (error: any) {
                     $notify({
                         type: 'error',
                         title: 'Redo Error',
@@ -399,7 +391,7 @@ export default defineComponent({
                             await historyStore.dispatch('undo');
                         }
                     }
-                } catch (error) {
+                } catch (error: any) {
                     $notify({
                         type: 'error',
                         dangerouslyUseHTMLString: true,
@@ -511,7 +503,7 @@ export default defineComponent({
                         }
                         break;
                 }
-            } catch (error) {
+            } catch (error: any) {
                 $notify({
                     type: 'error',
                     title: 'An Error Occurred',

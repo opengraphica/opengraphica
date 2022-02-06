@@ -44,7 +44,7 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
     let isChangeFired: boolean = false;
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
-    fileInput.setAttribute('accept', options.accept || '.json,image/*');
+    fileInput.setAttribute('accept', options.accept || '.json,image/*,video/*');
     fileInput.multiple = true;
     temporaryFileInputContainer.appendChild(fileInput);
     await new Promise<void>((resolve, reject) => {
@@ -64,7 +64,7 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
                 try {
                     await openFromFileList(files, options);
                     resolve();
-                } catch (error) {
+                } catch (error: any) {
                     reject(error);
                 }
             } else {
@@ -111,11 +111,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
         readerPromises.push(
             new Promise(async (resolveReader, rejectReader) => {
                 try {
-                    if (!file.type.match(/^image\//) && !file.name.match(/\.json$/)) {
-                        rejectReader('The file "' + file.name + '" is the wrong type. It must be an image or json file.');
-                        return;
-                    }
-
+                    // Some images don't have the correct extension, which causes the browser to not recognize the type. Default to read as 'image';
                     const fileReadType: FileReadType = (file.type === 'text/plain' || file.name.match(/\.json$/)) ? 'json' : 'image';
 
                     if (!fileName) {
@@ -142,7 +138,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                             let gifSplit: Array<InstanceType<typeof Gif>>;
                             try {
                                 gifSplit = gif.split(true);
-                            } catch (error) {
+                            } catch (error: any) {
                                 isNeedManualMerge = true;
                                 gifSplit = gif.split(false);
                             }
@@ -184,7 +180,9 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                                     };
                                     if (isNeedManualMerge) {
                                         canvas.toBlob((blob) => {
-                                            image.src = URL.createObjectURL(blob);
+                                            if (blob) {
+                                                image.src = URL.createObjectURL(blob);
+                                            }
                                         }, 'image/png');
                                     } else {
                                         image.src = URL.createObjectURL(GifPresenter.writeToBlob(gifSplit[i].writeToArrayBuffer()));
@@ -201,6 +199,69 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                                 resolveReader({ type: 'imageSequence', result, file: file });
                             } else {
                                 rejectReader('No frames found in gif file "' + file.name + '".');
+                            }
+                        } else if (['video/mp4', 'video/webp'].includes(file.type)) {
+                            const result: { image: HTMLImageElement, duration: number }[] = [];
+                            let fps: number = 25;
+                            let videoObjectUrl = URL.createObjectURL(file);
+                            let video = document.createElement('video');
+                            let seekResolve: (value?: any) => void;
+                            video.addEventListener('seeked', async function() {
+                                if (seekResolve) {
+                                    seekResolve();
+                                }
+                            });
+                            video.src = videoObjectUrl;
+                            while ((video.duration === Infinity || isNaN(video.duration)) && video.readyState < 2) {
+                                await new Promise(r => setTimeout(r, 1000));
+                                video.currentTime = 10000000 * Math.random();
+                            }
+                            let duration = Math.min(3, video.duration);
+                            console.log(duration);
+                            let canvas = document.createElement('canvas');
+                            let ctx = canvas.getContext('2d');
+                            if (!ctx) {
+                                rejectReader('Not enough memory to parse the video file "' + file.name + '".');
+                                return;
+                            }
+                            let [w, h] = [video.videoWidth, video.videoHeight];
+                            canvas.width =  w;
+                            canvas.height = h;
+                            let frames = [];
+                            let interval = 1 / fps;
+                            let currentTime = 0;
+                            while (currentTime < duration) {
+                                video.currentTime = currentTime;
+                                await new Promise(resolveSeek => {
+                                    seekResolve = resolveSeek;
+                                });
+                                ctx.drawImage(video, 0, 0, w, h);
+                                let base64ImageData = canvas.toDataURL();
+                                frames.push(base64ImageData);
+                                currentTime += interval;
+                            }
+                            for (let frame of frames) {
+                                const image = await new Promise<HTMLImageElement>((resolveImage, rejectImage) => {
+                                    const image = new Image();
+                                    image.onload = () => {
+                                        resolveImage(image);
+                                    };
+                                    image.onerror = (error: any) => {
+                                        rejectImage();
+                                    };
+                                    image.src = frame;
+                                });
+                                result.push({
+                                    image,
+                                    duration: 1000 / fps
+                                });
+                            }
+                            if (result.length === 1) {
+                                resolveReader({ type: 'image', result: result[0].image, file: file });
+                            } else if (result.length > 0) {
+                                resolveReader({ type: 'imageSequence', result, file: file });
+                            } else {
+                                rejectReader('No frames found in video file "' + file.name + '".');
                             }
                         } else {
                             const image = await new Promise<HTMLImageElement>((resolveImage, rejectImage) => {
@@ -225,7 +286,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                         };
                         fileReader.readAsText(file);
                     }
-                } catch (error) {
+                } catch (error: any) {
                     console.error(error);
                     rejectReader('An error occurred while parsing the file.' + error);
                 }

@@ -97,16 +97,14 @@
 <script lang="ts">
 import { defineComponent, ref, reactive, watch, nextTick } from 'vue';
 import defaultNewFilePresetsJson from '@/config/default-new-file-presets.json';
-import ElButton from 'element-plus/lib/el-button';
-import ElForm from 'element-plus/lib/el-form';
-import ElFormItem from 'element-plus/lib/el-form-item';
+import ElButton from 'element-plus/lib/components/button/index';
+import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElFormItemGroup from '@/ui/el-form-item-group.vue';
 import ElFormItemAlignedGroups from '@/ui/el-form-item-aligned-groups.vue';
-import ElInput from 'element-plus/lib/el-input';
+import ElInput from 'element-plus/lib/components/input/index';
 import ElInputNumber from '@/ui/el-input-number.vue';
-import ElLoading from 'element-plus/lib/el-loading';
-import ElOption from 'element-plus/lib/el-option';
-import ElSelect from 'element-plus/lib/el-select';
+import ElLoading from 'element-plus/lib/components/loading/index';
+import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import { notifyInjector, unexpectedErrorMessage, validationSubmissionErrorMessage } from '@/lib/notify';
 import { convertUnits } from '@/lib/metrics';
 import { NewFilePreset } from '@/types';
@@ -260,7 +258,7 @@ export default defineComponent({
                         resolutionUnits: formData.workingFile.resolutionUnits,
                         scaleFactor: formData.workingFile.scaleFactor
                     });
-                } catch (error) {
+                } catch (error: any) {
                     $notify({
                         type: 'error',
                         dangerouslyUseHTMLString: true,
@@ -269,7 +267,7 @@ export default defineComponent({
                 }
                 emit('close');
                 loading.value = false;
-            } catch (error) {
+            } catch (error: any) {
                 $notify({
                     type: 'error',
                     dangerouslyUseHTMLString: true,

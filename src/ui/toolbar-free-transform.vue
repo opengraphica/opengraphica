@@ -17,9 +17,8 @@
 <script lang="ts">
 import { defineComponent, defineAsyncComponent, ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
 import { layerPickMode } from '@/canvas/store/free-transform-state';
-import ElButton from 'element-plus/lib/el-button';
-import ElOption from 'element-plus/lib/el-option';
-import ElSelect from 'element-plus/lib/el-select';
+import ElButton from 'element-plus/lib/components/button/index';
+import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 
 export default defineComponent({
     name: 'ToolbarFreeTransform',

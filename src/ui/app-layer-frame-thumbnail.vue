@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, watch, toRefs, nextTick, PropType } from 'vue';
-import ElLoading from 'element-plus/lib/el-loading';
+import ElLoading from 'element-plus/lib/components/loading/index';
 import editorStore from '@/store/editor';
 import { CanvasRenderingContext2DEnhanced, WorkingFileRasterSequenceLayer, RGBAColor } from '@/types';
 

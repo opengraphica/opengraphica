@@ -23,12 +23,11 @@
 
 <script lang="ts">
 import { defineComponent, ref, reactive, watch, nextTick } from 'vue';
-import ElButton from 'element-plus/lib/el-button';
-import ElForm from 'element-plus/lib/el-form';
-import ElFormItem from 'element-plus/lib/el-form-item';
+import ElButton from 'element-plus/lib/components/button/index';
+import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElFormItemGroup from '@/ui/el-form-item-group.vue';
 import ElInputNumber from '@/ui/el-input-number.vue';
-import ElLoading from 'element-plus/lib/el-loading';
+import ElLoading from 'element-plus/lib/components/loading/index';
 import workingFileStore from '@/store/working-file';
 import { notifyInjector, unexpectedErrorMessage, validationSubmissionErrorMessage } from '@/lib/notify';
 import { Rules, RuleItem } from 'async-validator';
@@ -78,7 +77,7 @@ export default defineComponent({
                     await convertLayersToImageSequence({
                         frameDelay: formData.frameDelay,
                     });
-                } catch (error) {
+                } catch (error: any) {
                     $notify({
                         type: 'error',
                         dangerouslyUseHTMLString: true,
@@ -87,7 +86,7 @@ export default defineComponent({
                 }
                 emit('close');
                 loading.value = false;
-            } catch (error) {
+            } catch (error: any) {
                 $notify({
                     type: 'error',
                     dangerouslyUseHTMLString: true,
