@@ -9,8 +9,8 @@ module.exports = setupConfig({
     },
     output: {
         path: path.resolve(__dirname, './www'),
-        filename: 'js/[name].js',
-        chunkFilename: 'js/[name].js',
+        filename: 'js/[name].[contenthash].js',
+        chunkFilename: 'js/[name].[contenthash].js',
         library: {
             name: 'OpenGraphica',
             type: 'var'
