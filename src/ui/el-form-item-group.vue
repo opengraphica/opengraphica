@@ -5,14 +5,29 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, nextTick } from 'vue';
+import { defineComponent, ref, onMounted, onUnmounted, nextTick } from 'vue';
 
 export default defineComponent({
     name: 'ElFormItemGroup',
     setup(props, { emit }) {
         const el = ref<HTMLDivElement>();
 
+        const slotObserver = new MutationObserver(calculateLabelMinWidth);
+
         onMounted(async () => {
+            if (el.value) {
+                slotObserver.observe(el.value, {
+                    childList: true
+                });
+            }
+            calculateLabelMinWidth();
+        });
+
+        onUnmounted(async () => {
+            slotObserver.disconnect();
+        });
+
+        async function calculateLabelMinWidth() {
             if (el.value) {
                 await nextTick();
                 el.value.style.setProperty('--label-min-width', '0px');
@@ -24,7 +39,7 @@ export default defineComponent({
                 });
                 el.value.style.setProperty('--label-min-width', minWidth + 'px');
             }
-        });
+        }
 
         return {
             el

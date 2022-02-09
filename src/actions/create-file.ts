@@ -31,6 +31,7 @@ export class CreateFileAction extends BaseAction {
             colorModel: this.createFileOptions.colorModel || 'rgba',
             drawOriginX: this.createFileOptions.drawOriginX || 0,
             drawOriginY: this.createFileOptions.drawOriginY || 0,
+            fileHandle: null,
             fileName: this.createFileOptions.fileName || '',
             height: this.createFileOptions.height,
             layerIdCounter: this.createFileOptions.layerIdCounter || 0,

@@ -8,7 +8,7 @@ import editorStore from '@/store/editor';
 import { drawWorkingFileToCanvas, trackCanvasTransforms } from '@/lib/canvas';
 import { saveAs } from 'file-saver';
 import { knownFileExtensions } from '@/lib/regex';
-import { WorkingFileRasterSequenceLayer, ColorModel } from '@/types';
+import { WorkingFileRasterSequenceLayer, FileSystemFileHandle, ColorModel } from '@/types';
 // @ts-ignore
 import GIF from '@/lib/gif.js';
 
@@ -16,12 +16,13 @@ declare class ClipboardItem {
     constructor(data: { [mimeType: string]: Blob });
 }
 
-interface ExportOptions {
+export interface ExportAsImageOptions {
     fileName?: string,
     fileType: 'png' | 'jpg' | 'webp' | 'gif' | 'bmp' | 'tiff',
     layerSelection?: 'all' | 'selected',
     quality?: number,
     toClipboard?: boolean,
+    toFileHandle?: FileSystemFileHandle | null,
     dithering?: string
 }
 
@@ -34,7 +35,7 @@ const extensionToMimeType: { [key: string]: string } = {
     tiff: 'image/tiff'
 };
 
-export async function exportAsImage(options: ExportOptions): Promise<void> {
+export async function exportAsImage(options: ExportAsImageOptions): Promise<void> {
     return await new Promise<void>(async (resolve, reject) => {
         try {
             const fileName = (options.fileName || 'image').replace(knownFileExtensions, '') + '.' + options.fileType;
@@ -75,7 +76,11 @@ export async function exportAsImage(options: ExportOptions): Promise<void> {
             } else if (mimeType === 'image/gif') {
                 convertCanvasToGifBlob(canvas, options).then((blob) => {
                     if (blob) {
-                        saveAs(blob, fileName);
+                        if (options.toFileHandle) {
+                            save(blob, options.toFileHandle);
+                        } else {
+                            saveAs(blob, fileName);
+                        }
                         resolve();
                     } else {
                         reject(new Error('Image blob was not created.'));
@@ -84,7 +89,11 @@ export async function exportAsImage(options: ExportOptions): Promise<void> {
             } else {
                 canvas.toBlob((blob) => {
                     if (blob) {
-                        saveAs(blob, fileName);
+                        if (options.toFileHandle) {
+                            save(blob, options.toFileHandle);
+                        } else {
+                            saveAs(blob, fileName);
+                        }
                         resolve();
                     } else {
                         reject(new Error('Image blob was not created.'));
@@ -95,6 +104,12 @@ export async function exportAsImage(options: ExportOptions): Promise<void> {
             reject(new Error('An unexpected error occurred.'));
         }
     });
+}
+
+async function save(blob: Blob, fileHandle: FileSystemFileHandle) {
+    const writable = await fileHandle.createWritable();
+    await writable.write(blob);
+    await writable.close();
 }
 
 export function isfileFormatSupported(extensionOrMimeType: string) {
@@ -129,7 +144,7 @@ export async function promptClipboardWritePermission(): Promise<boolean> {
     }
 }
 
-export async function convertCanvasToGifBlob(canvas: HTMLCanvasElement, options: ExportOptions): Promise<Blob> {
+export async function convertCanvasToGifBlob(canvas: HTMLCanvasElement, options: ExportAsImageOptions): Promise<Blob> {
     const quality = options.quality == null ? 1 : options.quality;
 
     const rasterSequenceLayers = getLayersByType('rasterSequence') as WorkingFileRasterSequenceLayer<ColorModel>[];

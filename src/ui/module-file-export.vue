@@ -9,20 +9,36 @@
         novalidate="novalidate"
         hide-required-asterisk
         @submit="onCreate">
+        <template v-if="canSaveBackDirectly">
+            <el-alert
+                type="info"
+                :title="'You have opened a file named ' + fileHandle.name + ''"
+                show-icon
+                :closable="false"
+                class="mb-4">
+            </el-alert>
+            <el-form-item label="Save back to the original file?">
+                <el-switch v-model="formData.workingFile.saveBackDirectly" active-text="Yes" inactive-text="No" />
+            </el-form-item>
+        </template>
         <el-form-item-group>
-            <el-form-item label="File Name" prop="fileName">
-                <el-input v-model="formData.workingFile.fileName" clearable></el-input>
-            </el-form-item>
-            <el-form-item label="File Type" prop="fileType" >
-                <el-select v-model="formData.workingFile.fileType" :popper-append-to-body="false">
-                    <el-option
-                        v-for="option in fileTypeOptions"
-                        :key="option.value"
-                        :label="option.label"
-                        :value="option.value">
-                    </el-option>
-                </el-select>
-            </el-form-item>
+            <transition name="scale-down">
+                <el-form-item v-if="!formData.workingFile.saveBackDirectly" label="File Name" prop="fileName">
+                    <el-input v-model="formData.workingFile.fileName" clearable></el-input>
+                </el-form-item>
+            </transition>
+            <transition name="scale-down">
+                <el-form-item v-if="!formData.workingFile.saveBackDirectly" label="File Type" prop="fileType" >
+                    <el-select v-model="formData.workingFile.fileType" :popper-append-to-body="false">
+                        <el-option
+                            v-for="option in fileTypeOptions"
+                            :key="option.value"
+                            :label="option.label"
+                            :value="option.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </transition>
             <el-form-item label="Layers" prop="layerSelection" >
                 <el-select v-model="formData.workingFile.layerSelection" :popper-append-to-body="false">
                     <el-option
@@ -69,6 +85,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, reactive, computed, watch, nextTick } from 'vue';
+import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton from 'element-plus/lib/components/button/index';
 import ElCol from 'element-plus/lib/components/col/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
@@ -79,10 +96,11 @@ import ElLoading from 'element-plus/lib/components/loading/index';
 import ElRow from 'element-plus/lib/components/row/index';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSlider from 'element-plus/lib/components/slider/index';
+import ElSwitch from 'element-plus/lib/components/switch/index';
 import workingFileStore from '@/store/working-file';
 import { notifyInjector, unexpectedErrorMessage, validationSubmissionErrorMessage } from '@/lib/notify';
 import { Rules, RuleItem } from 'async-validator';
-import { exportAsImage, isfileFormatSupported } from '@/modules/file/export';
+import { exportAsImage, ExportAsImageOptions, isfileFormatSupported } from '@/modules/file/export';
 import { knownFileExtensions } from '@/lib/regex';
 
 export default defineComponent({
@@ -91,6 +109,7 @@ export default defineComponent({
         loading: ElLoading.directive
     },
     components: {
+        ElAlert,
         ElButton,
         ElCol,
         ElForm,
@@ -101,7 +120,8 @@ export default defineComponent({
         ElOption,
         ElRow,
         ElSelect,
-        ElSlider
+        ElSlider,
+        ElSwitch
     },
     emits: [
         'update:title',
@@ -150,6 +170,7 @@ export default defineComponent({
         
         const formData = reactive({
             workingFile: {
+                saveBackDirectly: false,
                 fileName: workingFileStore.get('fileName'),
                 fileType: 'png' as 'png' | 'jpg' | 'webp' | 'gif' | 'bmp' | 'tiff',
                 layerSelection: 'all' as 'all' | 'selected',
@@ -158,6 +179,19 @@ export default defineComponent({
             }
         });
         const formValidationRules: Rules = {};
+
+        const fileHandle = workingFileStore.get('fileHandle');
+        let canSaveBackDirectly: boolean = false;
+        if (fileHandle) {
+            for (const fileTypeOption of fileTypeOptions) {
+                if (fileHandle.name.endsWith(fileTypeOption.value)) {
+                    canSaveBackDirectly = true;
+                    formData.workingFile.fileType = fileTypeOption.value as any;
+                    formData.workingFile.saveBackDirectly = true;
+                    break;
+                }
+            }
+        }
 
         function onCancel() {
             emit('close');
@@ -171,14 +205,19 @@ export default defineComponent({
                 await form.value.validate();
                 loading.value = true;
                 try {
-                    workingFileStore.set('fileName', formData.workingFile.fileName.replace(knownFileExtensions, ''));
-                    await exportAsImage({
-                        fileName: formData.workingFile.fileName,
+                    const exportOptions: ExportAsImageOptions = {
                         fileType: formData.workingFile.fileType,
                         layerSelection: formData.workingFile.layerSelection,
                         quality: formData.workingFile.quality / 100,
                         dithering: formData.workingFile.dithering
-                    });
+                    };
+                    if (formData.workingFile.saveBackDirectly) {
+                        exportOptions.toFileHandle = fileHandle;
+                    } else {
+                        workingFileStore.set('fileName', formData.workingFile.fileName.replace(knownFileExtensions, ''));
+                        exportOptions.fileName = formData.workingFile.fileName;
+                    }
+                    await exportAsImage(exportOptions);
                 } catch (error: any) {
                     $notify({
                         type: 'error',
@@ -200,6 +239,8 @@ export default defineComponent({
         return {
             form,
             loading,
+            canSaveBackDirectly,
+            fileHandle,
             layerSelectionOptions,
             fileTypeOptions,
             ditheringOptions,

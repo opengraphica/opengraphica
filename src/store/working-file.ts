@@ -1,12 +1,13 @@
 import { PerformantStore } from './performant-store';
-import { ColorModel, MeasuringUnits, ResolutionUnits, ColorModelName, WorkingFileLayer, WorkingFileAnyLayer, WorkingFileGroupLayer, WorkingFileTimeline } from '@/types';
+import { ColorModel, FileSystemFileHandle, MeasuringUnits, ResolutionUnits, ColorModelName, WorkingFileLayer, WorkingFileAnyLayer, WorkingFileGroupLayer, WorkingFileTimeline } from '@/types';
 
 interface WorkingFileState {
-    activeTimelineId: number | null,
+    activeTimelineId: number | null;
     colorModel: ColorModelName;
     colorSpace: string;
     drawOriginX: number;
     drawOriginY: number;
+    fileHandle: FileSystemFileHandle | null;
     fileName: string;
     height: number; // Always pixels
     layerIdCounter: number;
@@ -17,7 +18,7 @@ interface WorkingFileState {
     resolutionY: number;
     scaleFactor: number;
     selectedLayerIds: number[];
-    timelineIdCounter: 0,
+    timelineIdCounter: 0;
     timelines: WorkingFileTimeline[];
     width: number; // Always pixels
 }
@@ -34,6 +35,7 @@ const store = new PerformantStore<WorkingFileStore>({
         colorSpace: 'sRGB',
         drawOriginX: 0,
         drawOriginY: 0,
+        fileHandle: null,
         fileName: '',
         height: 892, // Always pixels
         layerIdCounter: 0,
@@ -47,7 +49,8 @@ const store = new PerformantStore<WorkingFileStore>({
         timelineIdCounter: 0,
         timelines: [],
         width: 818 // Always pixels
-    }
+    },
+    nonReactive: ['fileHandle']
 });
 
 function getLayerById(id: number, parent?: WorkingFileLayer<ColorModel>[]): WorkingFileAnyLayer<ColorModel> | null {

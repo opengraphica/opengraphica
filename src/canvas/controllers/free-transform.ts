@@ -122,6 +122,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         super.onPointerMove(e);
         if (e.isPrimary && this.transformTranslateStart) {
             const { viewTransformPoint } = this.getTransformedCursorInfo();
+            const { shouldMaintainAspectRatio, shouldScaleDuringResize, shouldSnapRotationDegrees } = this.getTransformOptions();
 
             // Rotation
             if (this.transformIsRotating) {
@@ -129,7 +130,12 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                     viewTransformPoint.y - (top.value + (height.value * transformOriginY.value)),
                     viewTransformPoint.x - (left.value + (width.value * transformOriginX.value))
                 );
-                const rotationDelta = handleRotation - this.transformStartDimensions.handleToRotationOrigin;
+                let rotationDelta = handleRotation - this.transformStartDimensions.handleToRotationOrigin;
+                if (shouldSnapRotationDegrees) {
+                    const targetRotation = this.transformStartDimensions.rotation + rotationDelta;
+                    const roundedTargetRotation = Math.round(targetRotation / (Math.PI / 18)) * (Math.PI / 18);
+                    rotationDelta -= targetRotation - roundedTargetRotation;
+                }
 
                 freeTransformEmitter.emit('setDimensions', {
                     rotation: this.transformStartDimensions.rotation + rotationDelta,
@@ -153,8 +159,6 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             }
             // Drag/Resize
             else {
-                let shouldScale = this.shouldScaleDuringResize();
-                let shouldMaintainAspectRatio = this.shouldMaintainAspectRatio();
 
                 const isDragAll = this.transformDragType === DRAG_TYPE_ALL;
                 let isDragLeft = Math.floor(this.transformDragType / DRAG_TYPE_LEFT) % 2 === 1;
@@ -260,14 +264,14 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 for (const [i, layer] of this.selectedLayers.entries()) {
                     const decomposedTransform = decomposeMatrix(this.transformStartLayerData[i].transform);
                     let transform = DOMMatrix.fromMatrix(this.transformStartLayerData[i].transform)
-                    if (shouldScale) {
+                    if (shouldScaleDuringResize) {
                         transform.scaleSelf(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY);
                     }
                     transform
                         .rotateSelf(-decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
                         .translateSelf(left - this.transformStartDimensions.left, top - this.transformStartDimensions.top)
                         .rotateSelf(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
-                    if (shouldScale) {
+                    if (shouldScaleDuringResize) {
                         transform.scaleSelf(decomposedTransform.scaleX * width / this.transformStartDimensions.width, decomposedTransform.scaleY * height / this.transformStartDimensions.height)
                     }
                     layer.transform = transform;
@@ -298,7 +302,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         super.onPointerUp(e);
         if (e.isPrimary) {
             if (this.transformTranslateStart) {
-                let shouldScale = this.shouldScaleDuringResize();
+                let { shouldScaleDuringResize } = this.getTransformOptions();
                 width.value = Math.max(1, width.value);
                 height.value = Math.max(1, height.value);
                 previewXSnap.value = [];
@@ -314,7 +318,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                         new UpdateLayerAction({
                             id: layer.id,
                             transform: newTransform,
-                            ...(shouldScale ? {} : {
+                            ...(shouldScaleDuringResize ? {} : {
                                 width: width.value,
                                 height: height.value
                             })
@@ -433,29 +437,22 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         }, 0);
     }
 
-    protected shouldMaintainAspectRatio() {
-        let shouldKeep: boolean = true;
+    protected getTransformOptions() {
+        let shouldMaintainAspectRatio: boolean = true;
+        let shouldScaleDuringResize: boolean = true;
+        let shouldSnapRotationDegrees: boolean = false;
         if (isShiftKeyPressed.value === true) {
-            shouldKeep = false;
+            shouldMaintainAspectRatio = false;
+            shouldSnapRotationDegrees = true;
         }
         if (this.selectedLayers.length === 1) {
             const firstLayer = this.selectedLayers[0];
             if (firstLayer.type === 'text') {
-                shouldKeep = false;
+                shouldMaintainAspectRatio = false;
+                shouldScaleDuringResize = false;
             }
         }
-        return shouldKeep;
-    }
-
-    protected shouldScaleDuringResize() {
-        let shouldScale: boolean = true;
-        if (this.selectedLayers.length === 1) {
-            const firstLayer = this.selectedLayers[0];
-            if (firstLayer.type === 'text') {
-                shouldScale = false;
-            }
-        }
-        return shouldScale;
+        return { shouldMaintainAspectRatio, shouldScaleDuringResize, shouldSnapRotationDegrees };
     }
 
 }

@@ -5,6 +5,7 @@
 
 import { Ref } from 'vue';
 import {
+    ShowOpenFilePicker, FileSystemFileHandle,
     SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel, InsertAnyLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions,
     WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer,
     SerializedFileGroupLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileVectorLayer, SerializedFileTextLayer
@@ -20,6 +21,10 @@ import { CreateFileAction } from '@/actions/create-file';
 import { InsertLayerAction } from '@/actions/insert-layer';
 import { knownFileExtensions } from '@/lib/regex';
 
+declare global {
+    var showOpenFilePicker: ShowOpenFilePicker;
+}
+
 interface FileDialogOpenOptions {
     insert?: boolean; // False will create a new document, true inserts into current document.
     accept?: string; // Mime type of files to accept, same as input "accept" attribute.
@@ -28,64 +33,99 @@ interface FileDialogOpenOptions {
 
 export async function openFromFileDialog(options: FileDialogOpenOptions = {}): Promise<void> {
 
-    // This container and the file input is purposely left in the dom after creation in order to avoid
-    // several bugs revolving around the fact that browsers give you no information if file selection is canceled.
-    let temporaryFileInputContainer = document.getElementById('ogr-tmp-file-input-container') as HTMLDivElement;
-    if (!temporaryFileInputContainer) {
-        temporaryFileInputContainer = document.createElement('div');
-        temporaryFileInputContainer.id = 'ogr-tmp-file-input-container';
-        temporaryFileInputContainer.style.position = 'absolute';
-        temporaryFileInputContainer.style.opacity = '0.01';
-        temporaryFileInputContainer.style.width = '1px';
-        temporaryFileInputContainer.style.height = '1px';
-        temporaryFileInputContainer.style.overflow = 'hidden';
-        document.body.appendChild(temporaryFileInputContainer);
-    }
-    temporaryFileInputContainer.innerHTML = '';
-
-    let isChangeFired: boolean = false;
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.setAttribute('accept', options.accept || '.json,image/*,video/*');
-    fileInput.setAttribute('aria-hidden', 'true');
-    fileInput.multiple = true;
-    temporaryFileInputContainer.appendChild(fileInput);
-    await new Promise<void>((resolve, reject) => {
-        let activeElement = document.activeElement;
-        const checkFocusInterval = setInterval(() => {
-            if (activeElement !== document.activeElement) {
-                onFocusAway();
-            }
-        }, 100);
-        fileInput.addEventListener('change', async (e: Event) => {
-            clearInterval(checkFocusInterval);
-            window.removeEventListener('focus', onFocusAway);
-            isChangeFired = true;
-            temporaryFileInputContainer.removeChild(fileInput);
-            const files = (e.target as HTMLInputElement).files;
-            if (files) {
-                try {
-                    await openFromFileList(files, options);
-                    resolve();
-                } catch (error: any) {
-                    reject(error);
+    // We're working with new APIs
+    if (window.isSecureContext && window.showOpenFilePicker) {
+        const fileHandles = await window.showOpenFilePicker({
+            types: [
+                {
+                    description: 'Images / Videos',
+                    accept: {
+                        'text/plain': ['.json'],
+                        'image/*': ['.*'],
+                        'video/*': ['.*']
+                    }
                 }
-            } else {
-                resolve();
-            }
+            ]
         });
-        const onFocusAway = () => {
-            clearInterval(checkFocusInterval);
-            setTimeout(() => {
-                if (!isChangeFired) {
+        const files = [];
+        let firstFileHandle: FileSystemFileHandle | null = null;
+        for (const fileHandle of fileHandles) {
+            if (fileHandle.kind === 'file') {
+                if (!firstFileHandle) {
+                    firstFileHandle = fileHandle as FileSystemFileHandle;
+                }
+                files.push(await (fileHandle as FileSystemFileHandle).getFile());
+            }
+        }
+        if (files.length > 0) {
+            await openFromFileList(files, options);
+            if (!options.insert && firstFileHandle) {
+                workingFileStore.set('fileHandle', firstFileHandle);
+            }
+        }
+    }
+
+    // Peasant old Javascript manual labor.
+    else {
+        // This container and the file input is purposely left in the dom after creation in order to avoid
+        // several bugs revolving around the fact that browsers give you no information if file selection is canceled.
+        let temporaryFileInputContainer = document.getElementById('ogr-tmp-file-input-container') as HTMLDivElement;
+        if (!temporaryFileInputContainer) {
+            temporaryFileInputContainer = document.createElement('div');
+            temporaryFileInputContainer.id = 'ogr-tmp-file-input-container';
+            temporaryFileInputContainer.style.position = 'absolute';
+            temporaryFileInputContainer.style.opacity = '0.01';
+            temporaryFileInputContainer.style.width = '1px';
+            temporaryFileInputContainer.style.height = '1px';
+            temporaryFileInputContainer.style.overflow = 'hidden';
+            document.body.appendChild(temporaryFileInputContainer);
+        }
+        temporaryFileInputContainer.innerHTML = '';
+
+        let isChangeFired: boolean = false;
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.setAttribute('accept', options.accept || '.json,image/*,video/*');
+        fileInput.setAttribute('aria-hidden', 'true');
+        fileInput.multiple = true;
+        temporaryFileInputContainer.appendChild(fileInput);
+        await new Promise<void>((resolve, reject) => {
+            let activeElement = document.activeElement;
+            const checkFocusInterval = setInterval(() => {
+                if (activeElement !== document.activeElement) {
+                    onFocusAway();
+                }
+            }, 100);
+            fileInput.addEventListener('change', async (e: Event) => {
+                clearInterval(checkFocusInterval);
+                window.removeEventListener('focus', onFocusAway);
+                isChangeFired = true;
+                temporaryFileInputContainer.removeChild(fileInput);
+                const files = (e.target as HTMLInputElement).files;
+                if (files) {
+                    try {
+                        await openFromFileList(files, options);
+                        resolve();
+                    } catch (error: any) {
+                        reject(error);
+                    }
+                } else {
                     resolve();
                 }
-            }, 500);
-            window.removeEventListener('focus', onFocusAway);
-        };
-        window.addEventListener('focus', onFocusAway);
-        fileInput.click();
-    });
+            });
+            const onFocusAway = () => {
+                clearInterval(checkFocusInterval);
+                setTimeout(() => {
+                    if (!isChangeFired) {
+                        resolve();
+                    }
+                }, 500);
+                window.removeEventListener('focus', onFocusAway);
+            };
+            window.addEventListener('focus', onFocusAway);
+            fileInput.click();
+        });
+    }
 
 };
 

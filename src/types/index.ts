@@ -3,6 +3,10 @@ export {
     ColorModel, ColorModelName, CMYKAColor, RGBAColor, HSVAColor, HSLAColor,
     Gradient, LinearGradient, RadialGradient, GradientStop
 } from './color';
+export {
+    FileSystemHandle, FileSystemDirectoryHandle, FileSystemFileHandle, FileSystemHandlePermissionDescriptor,
+    FileSystemWritableFileStream, ShowOpenFilePickerOptions, ShowOpenFilePicker
+} from './file-system-access';
 export { FilterAugment } from './filter';
 export { KeyboardMapConfigAction, KeyboardMapConfigCategory } from './keyboard-map';
 export { MeasuringUnits, ResolutionUnits } from './metrics';

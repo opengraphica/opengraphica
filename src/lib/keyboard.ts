@@ -72,6 +72,7 @@ function onDocumentKeyDown(e: KeyboardEvent) {
         isAltKeyPressed.value = true;
         isAnyModifierKeyPressed.value = true;
     } else if (isAnyModifierKeyPressed.value === true) {
+        if (isInput(e.target)) return;
         const shortcuts = shortcutKeyMap.get(e.key.toLowerCase());
         if (shortcuts) {
             for (const shortcut of shortcuts) {
@@ -80,6 +81,7 @@ function onDocumentKeyDown(e: KeyboardEvent) {
                     shortcut.ctrl === isCtrlKeyPressed.value &&
                     shortcut.shift === isShiftKeyPressed.value
                 ) {
+                    e.preventDefault();
                     if (shortcut.action.type === 'toolGroup') {
                         (async () => {
                             const editorStore = (await import('@/store/editor')).default;

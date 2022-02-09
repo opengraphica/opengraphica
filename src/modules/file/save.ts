@@ -3,7 +3,7 @@
  * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
 import {
-    SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel,
+    FileSystemFileHandle, SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel,
     SerializedFileGroupLayer, SerializedFileTextLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileVectorLayer,
     WorkingFileGroupLayer, WorkingFileTextLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer
 } from '@/types';
@@ -12,6 +12,13 @@ import { saveAs } from 'file-saver';
 
 interface SaveImageAsOptions {
     fileName?: string;
+}
+
+export async function saveImage(fileHandle: FileSystemFileHandle) {
+    const serializedFile = serializeWorkingFile();
+    const writable = await fileHandle.createWritable();
+    await writable.write(new Blob([JSON.stringify(serializedFile, null, "\t")], { type: 'text/plain' }));
+    await writable.close();
 }
 
 export async function saveImageAs(options: SaveImageAsOptions = {}) {
