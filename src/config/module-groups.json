@@ -56,6 +56,28 @@
             }
         }
     },
+    "history": {
+        "name": "Edit History",
+        "description": "Operations that control moving through the image edit history.",
+        "modules": {
+            "redo": {
+                "name": "History Redo",
+                "description": "Redo the last undone action.",
+                "action": {
+                    "type": "function",
+                    "target": "history/tracking.redo"
+                }
+            },
+            "undo": {
+                "name": "History Undo",
+                "description": "Undo the last action.",
+                "action": {
+                    "type": "function",
+                    "target": "history/tracking.undo"
+                }
+            }
+        }
+    },
     "image": {
         "name": "Image Canvas",
         "description": "Operations that affect the image canvas.",

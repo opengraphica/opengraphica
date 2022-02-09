@@ -88,7 +88,7 @@ import { DeleteLayersAction } from '@/actions/delete-layers';
 import { SelectLayersAction } from '@/actions/select-layers';
 import { UpdateLayerAction } from '@/actions/update-layer';
 import { ReorderLayersAction } from '@/actions/reorder-layers';
-import { WorkingFileAnyLayer, RGBAColor, WorkingFileRasterSequenceLayer } from '@/types';
+import { WorkingFileAnyLayer, ColorModel, WorkingFileRasterSequenceLayer } from '@/types';
 
 export default defineComponent({
     name: 'AppLayerList',
@@ -111,7 +111,7 @@ export default defineComponent({
             default: false
         },
         layers: {
-            type: Array as PropType<WorkingFileAnyLayer<RGBAColor>[]>,
+            type: Array as PropType<WorkingFileAnyLayer<ColorModel>[]>,
             required: true
         },
         scrollContainerHeight: {
@@ -149,7 +149,7 @@ export default defineComponent({
         const { playingAnimation } = toRefs(canvasStore.state);
         const { selectedLayerIds } = toRefs(workingFileStore.state);
 
-        const reversedLayers = ref<WorkingFileAnyLayer<RGBAColor>[]>([]);
+        const reversedLayers = ref<WorkingFileAnyLayer<ColorModel>[]>([]);
 
         watch(() => props.scrollTop, () => {
             if (draggingLayerId.value != null) {
@@ -163,7 +163,7 @@ export default defineComponent({
             refreshLayerList();
         });
 
-        async function onLayerSettingsSelect(layer: WorkingFileAnyLayer<RGBAColor>, action: string) {
+        async function onLayerSettingsSelect(layer: WorkingFileAnyLayer<ColorModel>, action: string) {
             if (action === 'delete') {
                 historyStore.dispatch('runAction', {
                     action: new DeleteLayersAction([layer.id])
@@ -173,11 +173,11 @@ export default defineComponent({
             showLayerSettingsMenuFor.value = null;
         }
 
-        function onMouseEnterDndHandle(layer: WorkingFileAnyLayer<RGBAColor>) {
+        function onMouseEnterDndHandle(layer: WorkingFileAnyLayer<ColorModel>) {
             hoveringLayerId.value = layer.id;
         }
 
-        function onMouseLeaveDndHandle(layer: WorkingFileAnyLayer<RGBAColor>) {
+        function onMouseLeaveDndHandle(layer: WorkingFileAnyLayer<ColorModel>) {
             hoveringLayerId.value = null;
         }
 
@@ -301,7 +301,7 @@ export default defineComponent({
             refreshLayerList();
         }
 
-        function onToggleLayerSettings(layer: WorkingFileAnyLayer<RGBAColor>) {
+        function onToggleLayerSettings(layer: WorkingFileAnyLayer<ColorModel>) {
             if (showLayerSettingsMenuFor.value === layer.id) {
                 showLayerSettingsMenuFor.value = null;
             } else {
@@ -309,7 +309,7 @@ export default defineComponent({
             }
         }
 
-        function onToggleLayerVisibility(layer: WorkingFileAnyLayer<RGBAColor>) {
+        function onToggleLayerVisibility(layer: WorkingFileAnyLayer<ColorModel>) {
             let visibility = layer.visible;
             historyStore.dispatch('runAction', {
                 action: new BundleAction('toggle_layer_visibility', 'Toggle Layer Visibility ' + (visibility ? 'Off' : 'On'), [
@@ -321,11 +321,11 @@ export default defineComponent({
             });
         }
 
-        function onSelectLayerFrame(layer: WorkingFileRasterSequenceLayer<RGBAColor>, index: number) {
+        function onSelectLayerFrame(layer: WorkingFileRasterSequenceLayer<ColorModel>, index: number) {
             editorStore.dispatch('setTimelineCursor', layer.data.sequence[index].start);
         }
 
-        function onPlayRasterSequence(layer: WorkingFileRasterSequenceLayer<RGBAColor>) {
+        function onPlayRasterSequence(layer: WorkingFileRasterSequenceLayer<ColorModel>) {
             editorStore.set({
                 timelineEnd: layer.data.sequence[layer.data.sequence.length - 1].end,
                 timelinePlayStartTime: performance.now(),

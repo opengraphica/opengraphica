@@ -224,7 +224,7 @@
                         </el-collapse-item>
                         <el-collapse-item title="Editor Layout">
                             <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" label="Menu Bar Position">
-                                <el-select v-model="preferenceMenuBarPosition" style="width: 6.5rem;">
+                                <el-select v-model="preferenceMenuBarPosition" size="small" style="width: 6rem;">
                                     <el-option value="top" label="Top" />
                                     <el-option value="bottom" label="Bottom" />
                                     <el-option value="left" label="Left" />

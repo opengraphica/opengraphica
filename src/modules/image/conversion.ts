@@ -1,7 +1,7 @@
 import workingFileStore, { WorkingFileState, getLayersByType } from '@/store/working-file';
 import historyStore from '@/store/history';
 import editorStore, { updateRasterSequenceLayerWithTimeline } from '@/store/editor';
-import { RGBAColor, WorkingFileRasterLayer, InsertRasterSequenceLayerOptions } from '@/types';
+import { ColorModel, WorkingFileRasterLayer, InsertRasterSequenceLayerOptions } from '@/types';
 import { BundleAction } from '@/actions/bundle';
 import { DeleteLayersAction } from '@/actions/delete-layers';
 import { InsertLayerAction } from '@/actions/insert-layer';
@@ -15,8 +15,8 @@ export async function convertLayersToImageSequence(options: ConvertLayersToImage
 
     // TODO - base on selected layers
 
-    const combineLayers = getLayersByType<WorkingFileRasterLayer<RGBAColor>>('raster');
-    const rasterSequenceLayer: InsertRasterSequenceLayerOptions<RGBAColor> = {
+    const combineLayers = getLayersByType<WorkingFileRasterLayer<ColorModel>>('raster');
+    const rasterSequenceLayer: InsertRasterSequenceLayerOptions<ColorModel> = {
         type: 'rasterSequence',
         height: workingFileStore.get('height'),
         name: 'New Image Sequence',

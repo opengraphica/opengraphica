@@ -1,0 +1,28 @@
+[
+    {
+        "name": "Edit History",
+        "actions": [
+            {
+                "action": {
+                    "type": "runModule",
+                    "target": "history/undo"
+                },
+                "name": "Undo",
+                "shortcuts": [
+                    "ctrl+z"
+                ]
+            },
+            {
+                "action": {
+                    "type": "runModule",
+                    "target": "history/redo"
+                },
+                "name": "Redo",
+                "shortcuts": [
+                    "ctrl+y",
+                    "ctrl+shift+z"
+                ]
+            }
+        ]
+    }
+]

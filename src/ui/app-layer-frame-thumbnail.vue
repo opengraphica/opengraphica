@@ -9,7 +9,7 @@
 import { defineComponent, ref, computed, watch, toRefs, nextTick, PropType } from 'vue';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import editorStore from '@/store/editor';
-import { CanvasRenderingContext2DEnhanced, WorkingFileRasterSequenceLayer, RGBAColor } from '@/types';
+import { CanvasRenderingContext2DEnhanced, WorkingFileRasterSequenceLayer, ColorModel } from '@/types';
 
 export default defineComponent({
     name: 'AppLayerFrameThumbnail',
@@ -21,7 +21,7 @@ export default defineComponent({
     },
     props: {
         layer: {
-            type: Object as PropType<WorkingFileRasterSequenceLayer<RGBAColor>>,
+            type: Object as PropType<WorkingFileRasterSequenceLayer<ColorModel>>,
             required: true
         },
         sequenceIndex: {

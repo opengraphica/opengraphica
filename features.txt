@@ -23,6 +23,7 @@ Modules
                 [ ] Others?
             [x] Scale factor
         - Open
+            - Integrate https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API
             - File type support
                 [x] bmp
                 [x] jpeg
@@ -31,7 +32,8 @@ Modules
                 [x] png
                 [x] webp
                 [ ] webv
-        - Save
+        - Save As
+            - If file opened with File System Access API, default to saving back to the same file.
             - File type support
                 [x] JSON
     - Image
@@ -209,7 +211,7 @@ Tools
         - More settings
             [ ] Move up
             [ ] Move down
-            [ ] Delete
+            [x] Delete
             [ ] Toggle as mask
             - Lock
                 [ ] RGBA channels individually
@@ -222,6 +224,6 @@ Editor Layout
     - General
         [ ] Drag & Drop files to Open
     - Menu Bar
-        [ ] Fix it sometimes getting stuck in mobile mode after switching tools
+        [x] Fix it sometimes getting stuck in mobile mode after switching tools
         [ ] Drag & Drop to reorder
-        [ ] Drag & Drop to pin to different edges of screen
+        [x] Setting to change position on screen

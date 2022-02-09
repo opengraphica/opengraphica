@@ -73,9 +73,49 @@ export interface SerializedFileVectorLayer<T extends ColorModel> extends Seriali
     data: VectorShape<T>[];
 }
 
+export interface SerializedFileTextLayerSpanMeta<T extends ColorModel> {
+    family?: string;
+    size?: number;
+    weight?: number;
+    style?: 'normal' | 'italic' | 'oblique';
+    obliqueAngle?: number;
+    underline?: null | 'solid' | 'wavy' | 'dashed';
+    underlineColor?: null | T;
+    underlineThickness?: number;
+    overline?: null | 'solid' | 'wavy' | 'dashed';
+    overlineColor?: null | T;
+    overlineThickness?: number;
+    strikethrough?: null | 'solid' | 'wavy' | 'dashed';
+    strikethroughColor?: null | T;
+    strikethroughThickness?: number;
+    fillColor?: T;
+    strokeColor?: T;
+    strokeSize?: number;
+    tracking?: number;
+    leading?: number;
+}
+
+export interface SerializedFileTextLayerSpan<T extends ColorModel> {
+    text: string;
+    meta: SerializedFileTextLayerSpanMeta<T>;
+}
+
+export interface SerializedFileTextLayerLine<T extends ColorModel> {
+    align: 'start' | 'center' | 'end';
+    spans: SerializedFileTextLayerSpan<T>[];
+}
+
 export interface SerializedFileTextLayer<T extends ColorModel> extends SerializedFileLayer<T> {
     type: 'text';
-    data: {}; // TODO
+    data: {
+        boundary: 'dynamic' | 'box';
+        kerning: 'metrics' | 'none';
+        textDirection: 'ltr' | 'rtl' | 'ttb' | 'btt';
+        wrapDirection: 'ltr' | 'rtl' | 'ttb' | 'btt';
+        wrapDirectionAlign: 'start' | 'center' | 'end';
+        wrapAt: 'word' | 'wordThenLetter';
+        lines: SerializedFileTextLayerLine<T>[];
+    }
 }
 
 export interface SerializedFile<T extends ColorModel> {

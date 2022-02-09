@@ -11,7 +11,7 @@ export interface DecomposedMatrix {
 /**
  * Extract individual transform values from the canvas transform matrix.
  */
-export const decomposeMatrix = (matrix: DOMMatrix): DecomposedMatrix => {
+export function decomposeMatrix(matrix: DOMMatrix): DecomposedMatrix {
     let a = matrix.a, b = matrix.b, c = matrix.c, d = matrix.d, e = matrix.e, f = matrix.f;
     let scaleX: number, scaleY: number, skewX: number;
     if (scaleX = Math.sqrt(a * a + b * b)) a /= scaleX, b /= scaleX;
@@ -31,7 +31,7 @@ export const decomposeMatrix = (matrix: DOMMatrix): DecomposedMatrix => {
 /**
  * Snaps the given x/y coordinates to the nearest half pixel on the screen. Prevents blurry lines when scaling a non-rotated image.
  */
- export const snapPointAtHalfPixel = (ctx: CanvasRenderingContext2D, x: number, y: number, xOffset: number = 0, yOffset: number = 0): DOMPoint => {
+ export function snapPointAtHalfPixel(ctx: CanvasRenderingContext2D, x: number, y: number, xOffset: number = 0, yOffset: number = 0): DOMPoint {
     let point = new DOMPoint(x, y);
     point = point.matrixTransform(ctx.getTransform());
     point.x = Math.round(point.x + 0.5) - 0.5 + xOffset;
@@ -43,7 +43,7 @@ export const decomposeMatrix = (matrix: DOMMatrix): DecomposedMatrix => {
 /**
  * Snaps the given x/y coordinates to the nearest pixel on the screen. Prevents blurry lines when scaling a non-rotated image.
  */
- export const snapPointAtPixel = (ctx: CanvasRenderingContext2D, x: number, y: number, xOffset: number = 0, yOffset: number = 0): DOMPoint => {
+ export function snapPointAtPixel(ctx: CanvasRenderingContext2D, x: number, y: number, xOffset: number = 0, yOffset: number = 0): DOMPoint {
     let point = new DOMPoint(x, y);
     point = point.matrixTransform(ctx.getTransform());
     point.x = Math.round(point.x) + xOffset;

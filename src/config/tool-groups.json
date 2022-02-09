@@ -29,6 +29,21 @@
             }
         }
     },
+    "text": {
+        "name": "Text",
+        "description": "Tools for manipulating text layers.",
+        "tools": {
+            "text": {
+                "name": "Text",
+                "description": "Create and edit text layers.",
+                "controller": "text",
+                "overlays": [
+                    "free-transform",
+                    "text"
+                ]
+            }
+        }
+    },
     "transform": {
         "name": "Transform",
         "description": "Tools for moving, rotating, scaling the layer.",
@@ -38,7 +53,7 @@
                 "description": "Move, rotate, or scale the selected layers.",
                 "controller": "free-transform",
                 "toolbar": {
-                    "position": "bottom",
+                    "position": "auto",
                     "target": "free-transform"
                 },
                 "overlays": [

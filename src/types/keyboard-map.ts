@@ -1,0 +1,13 @@
+export interface KeyboardMapConfigAction {
+    action: {
+        type: 'dock' | 'toolGroup' | 'runModule';
+        target: string;
+    };
+    name: string;
+    shortcuts: string[];
+}
+
+export interface KeyboardMapConfigCategory {
+    name: string;
+    actions: KeyboardMapConfigAction[];
+}

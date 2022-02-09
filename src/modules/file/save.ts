@@ -3,7 +3,7 @@
  * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
 import {
-    SerializedFile, SerializedFileLayer, WorkingFileLayer, RGBAColor,
+    SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel,
     SerializedFileGroupLayer, SerializedFileTextLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileVectorLayer,
     WorkingFileGroupLayer, WorkingFileTextLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer
 } from '@/types';
@@ -20,8 +20,8 @@ export async function saveImageAs(options: SaveImageAsOptions = {}) {
     saveAs(new Blob([JSON.stringify(serializedFile, null, "\t")], { type: 'text/plain' }), fileName);
 }
 
-function serializeWorkingFile(): SerializedFile<RGBAColor> {
-    const serializedFile: SerializedFile<RGBAColor> = {
+function serializeWorkingFile(): SerializedFile<ColorModel> {
+    const serializedFile: SerializedFile<ColorModel> = {
         version: '0.0.1-ALPHA.1',
         date: new Date().toISOString(),
         colorModel: workingFileStore.get('colorModel'),
@@ -42,10 +42,10 @@ function serializeWorkingFile(): SerializedFile<RGBAColor> {
     return serializedFile;
 }
 
-function serializeWorkingFileLayers(layers: WorkingFileLayer<RGBAColor>[]): SerializedFileLayer<RGBAColor>[] {
-    let serializedLayers: SerializedFileLayer<RGBAColor>[] = [];
+function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): SerializedFileLayer<ColorModel>[] {
+    let serializedLayers: SerializedFileLayer<ColorModel>[] = [];
     for (let layer of layers) {
-        let serializedLayer: SerializedFileLayer<RGBAColor> = {
+        let serializedLayer: SerializedFileLayer<ColorModel> = {
             blendingMode: layer.blendingMode,
             filters: layer.filters,
             groupId: layer.groupId,
@@ -62,8 +62,8 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<RGBAColor>[]): Seri
             serializedLayer = {
                 ...serializedLayer,
                 type: 'group',
-                layers: serializeWorkingFileLayers((layer as WorkingFileGroupLayer<RGBAColor>).layers)
-            } as SerializedFileGroupLayer<RGBAColor>;
+                layers: serializeWorkingFileLayers((layer as WorkingFileGroupLayer<ColorModel>).layers)
+            } as SerializedFileGroupLayer<ColorModel>;
         } else if (layer.type === 'raster') {
             const canvas = document.createElement('canvas');
             canvas.width = layer.width;
@@ -74,14 +74,14 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<RGBAColor>[]): Seri
                     throw new Error('Missing canvas context');
                 }
                 ctx.imageSmoothingEnabled = false;
-                ctx.drawImage((layer as WorkingFileRasterLayer<RGBAColor>).data.sourceImage as HTMLImageElement, 0, 0);
+                ctx.drawImage((layer as WorkingFileRasterLayer<ColorModel>).data.sourceImage as HTMLImageElement, 0, 0);
                 serializedLayer = {
                     ...serializedLayer,
                     type: 'raster',
                     data: {
                         sourceImageSerialized: canvas.toDataURL('image/png')
                     }
-                } as SerializedFileRasterLayer<RGBAColor>;
+                } as SerializedFileRasterLayer<ColorModel>;
                 canvas.width = 1;
                 canvas.height = 1;
             } catch (error: any) {
@@ -90,8 +90,8 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<RGBAColor>[]): Seri
                 throw error;
             }
         } else if (layer.type === 'rasterSequence') {
-            const memoryLayer = (layer as WorkingFileRasterSequenceLayer<RGBAColor>);
-            const serializedSequence: SerializedFileRasterSequenceLayer<RGBAColor>['data']['sequence'] = [];
+            const memoryLayer = (layer as WorkingFileRasterSequenceLayer<ColorModel>);
+            const serializedSequence: SerializedFileRasterSequenceLayer<ColorModel>['data']['sequence'] = [];
             for (let frame of memoryLayer.data.sequence) {
                 const canvas = document.createElement('canvas');
                 canvas.width = layer.width;
@@ -124,19 +124,19 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<RGBAColor>[]): Seri
                 data: {
                     sequence: serializedSequence
                 }
-            } as SerializedFileRasterSequenceLayer<RGBAColor>;
+            } as SerializedFileRasterSequenceLayer<ColorModel>;
         } else if (layer.type === 'vector') {
             serializedLayer = {
                 ...serializedLayer,
                 type: 'vector',
-                data: (layer as WorkingFileVectorLayer<RGBAColor>).data
-            } as SerializedFileVectorLayer<RGBAColor>;
+                data: (layer as WorkingFileVectorLayer<ColorModel>).data
+            } as SerializedFileVectorLayer<ColorModel>;
         } else if (layer.type === 'text') {
             serializedLayer = {
                 ...serializedLayer,
                 type: 'text',
-                data: (layer as WorkingFileTextLayer<RGBAColor>).data
-            } as SerializedFileTextLayer<RGBAColor>;
+                data: (layer as WorkingFileTextLayer<ColorModel>).data
+            } as SerializedFileTextLayer<ColorModel>;
         }
         serializedLayers.push(serializedLayer);
     }

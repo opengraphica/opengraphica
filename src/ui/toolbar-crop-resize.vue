@@ -102,7 +102,7 @@ import canvasStore from '@/store/canvas';
 import historyStore from '@/store/history';
 import workingFileStore, { WorkingFileState } from '@/store/working-file';
 import { top as cropTop, left as cropLeft, width as cropWidth, height as cropHeight, enableSnapping, dimensionLockRatio } from '@/canvas/store/crop-resize-state';
-import { WorkingFileLayer, WorkingFileGroupLayer, RGBAColor, UpdateAnyLayerOptions } from '@/types';
+import { WorkingFileLayer, WorkingFileGroupLayer, ColorModel, UpdateAnyLayerOptions } from '@/types';
 import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { UpdateFileAction } from '@/actions/update-file';
@@ -288,15 +288,15 @@ export default defineComponent({
             emit('close');
         }
 
-        async function generateResizeLayerActions(layers: WorkingFileLayer<RGBAColor>[]): Promise<BaseAction[]> {
+        async function generateResizeLayerActions(layers: WorkingFileLayer<ColorModel>[]): Promise<BaseAction[]> {
             let actions: BaseAction[] = [];
             for (let layer of layers) {
                 if (layer.type === 'group') {
-                    await generateResizeLayerActions((layer as WorkingFileGroupLayer<RGBAColor>).layers);
+                    await generateResizeLayerActions((layer as WorkingFileGroupLayer<ColorModel>).layers);
                 } else if (layer.type === 'raster' || layer.type === 'rasterSequence') {
                     const transform = new DOMMatrix().translateSelf(-cropLeft.value, -cropTop.value).multiplySelf(layer.transform);
                     actions.push(
-                        new UpdateLayerAction<UpdateAnyLayerOptions<RGBAColor>>({
+                        new UpdateLayerAction<UpdateAnyLayerOptions<ColorModel>>({
                             id: layer.id,
                             transform
                         })

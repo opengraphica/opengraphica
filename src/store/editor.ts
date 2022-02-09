@@ -1,7 +1,7 @@
 import { PerformantStore } from './performant-store';
 import BaseCanvasController from '@/canvas/controllers/base';
 import toolGroupsConfig from '@/config/tool-groups.json';
-import { ToolGroupDefinition, WorkingFileLayer, WorkingFileGroupLayer, WorkingFileRasterSequenceLayer, RGBAColor } from '@/types';
+import { ToolGroupDefinition, WorkingFileLayer, WorkingFileGroupLayer, WorkingFileRasterSequenceLayer, ColorModel } from '@/types';
 import { loadStylesheet } from '@/lib/stylesheet';
 import canvasStore from './canvas';
 import workingFileStore from './working-file';
@@ -204,18 +204,18 @@ async function runTasks(runId: number, set: PerformantStore<EditorStore>['direct
     }
 }
 
-function updateLayersWithTimeline(parentLayers?: WorkingFileLayer<RGBAColor>[]) {
+function updateLayersWithTimeline(parentLayers?: WorkingFileLayer<ColorModel>[]) {
     parentLayers = parentLayers || workingFileStore.get('layers');
     for (let layer of parentLayers) {
         if (layer.type === 'rasterSequence') {
-            updateRasterSequenceLayerWithTimeline(layer as WorkingFileRasterSequenceLayer<RGBAColor>);
+            updateRasterSequenceLayerWithTimeline(layer as WorkingFileRasterSequenceLayer<ColorModel>);
         } else if (layer.type === 'group') {
-            updateLayersWithTimeline((layer as WorkingFileGroupLayer<RGBAColor>).layers);
+            updateLayersWithTimeline((layer as WorkingFileGroupLayer<ColorModel>).layers);
         }
     }
 }
 
-function updateRasterSequenceLayerWithTimeline(layer: WorkingFileRasterSequenceLayer<RGBAColor>) {
+function updateRasterSequenceLayerWithTimeline(layer: WorkingFileRasterSequenceLayer<ColorModel>) {
     const timelineCursor = store.get('timelineCursor');
     for (let frame of layer.data.sequence) {
         if (frame.start <= timelineCursor && frame.end > timelineCursor) {

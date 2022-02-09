@@ -95,9 +95,49 @@ export interface WorkingFileVectorLayer<T extends ColorModel> extends WorkingFil
     data: VectorShape<T>[];
 }
 
+export interface WorkingFileTextLayerSpanMeta<T extends ColorModel> {
+    family?: string;
+    size?: number;
+    weight?: number;
+    style?: 'normal' | 'italic' | 'oblique';
+    obliqueAngle?: number;
+    underline?: null | 'solid' | 'wavy' | 'dashed';
+    underlineColor?: null | T;
+    underlineThickness?: number;
+    overline?: null | 'solid' | 'wavy' | 'dashed';
+    overlineColor?: null | T;
+    overlineThickness?: number;
+    strikethrough?: null | 'solid' | 'wavy' | 'dashed';
+    strikethroughColor?: null | T;
+    strikethroughThickness?: number;
+    fillColor?: T;
+    strokeColor?: T;
+    strokeSize?: number;
+    tracking?: number;
+    leading?: number;
+}
+
+export interface WorkingFileTextLayerSpan<T extends ColorModel> {
+    text: string;
+    meta: WorkingFileTextLayerSpanMeta<T>;
+}
+
+export interface WorkingFileTextLayerLine<T extends ColorModel> {
+    align: 'start' | 'center' | 'end';
+    spans: WorkingFileTextLayerSpan<T>[];
+}
+
 export interface WorkingFileTextLayer<T extends ColorModel> extends WorkingFileLayer<T> {
     type: 'text';
-    data: {}; // TODO
+    data: {
+        boundary: 'dynamic' | 'box';
+        kerning: 'metrics' | 'none';
+        textDirection: 'ltr' | 'rtl' | 'ttb' | 'btt';
+        wrapDirection: 'ltr' | 'rtl' | 'ttb' | 'btt';
+        wrapDirectionAlign: 'start' | 'center' | 'end';
+        wrapAt: 'word' | 'wordThenLetter';
+        lines: WorkingFileTextLayerLine<T>[];
+    }
 }
 
 export type WorkingFileAnyLayer<T extends ColorModel> = WorkingFileGroupLayer<T> | WorkingFileRasterLayer<T> | WorkingFileRasterSequenceLayer<T> | WorkingFileVectorLayer<T> | WorkingFileTextLayer<T>;

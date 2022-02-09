@@ -1,7 +1,7 @@
-import { CanvasRenderingContext2DEnhanced, WorkingFileRasterSequenceLayer, WorkingFileLayerRenderer, RGBAColor } from '@/types';
+import { CanvasRenderingContext2DEnhanced, WorkingFileRasterSequenceLayer, WorkingFileLayerRenderer, ColorModel } from '@/types';
 
-export default class RasterSequenceLayerRenderer implements WorkingFileLayerRenderer<RGBAColor> {
-    draw(ctx: CanvasRenderingContext2DEnhanced, layer: WorkingFileRasterSequenceLayer<RGBAColor>) {
+export default class RasterSequenceLayerRenderer implements WorkingFileLayerRenderer<ColorModel> {
+    draw(ctx: CanvasRenderingContext2DEnhanced, layer: WorkingFileRasterSequenceLayer<ColorModel>) {
         const frame = layer.data.currentFrame;
         if (frame) {
             ctx.drawImage(

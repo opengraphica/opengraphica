@@ -5,7 +5,7 @@
 
 import { Ref } from 'vue';
 import {
-    SerializedFile, SerializedFileLayer, WorkingFileLayer, RGBAColor, InsertAnyLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions,
+    SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel, InsertAnyLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions,
     WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer,
     SerializedFileGroupLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileVectorLayer, SerializedFileTextLayer
 } from '@/types';
@@ -353,7 +353,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                     largestHeight = image.height;
                 }
                 insertLayerActions.push(
-                    new InsertLayerAction<InsertRasterLayerOptions<RGBAColor>>({
+                    new InsertLayerAction<InsertRasterLayerOptions<ColorModel>>({
                         type: 'raster',
                         name: readerSettle.value.file.name,
                         width: image.width,
@@ -375,7 +375,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                     largestHeight = firstImage.height;
                 }
                 let timeIterator = 0;
-                const sequence: WorkingFileRasterSequenceLayer<RGBAColor>['data']['sequence'] = [];
+                const sequence: WorkingFileRasterSequenceLayer<ColorModel>['data']['sequence'] = [];
                 for (let result of results) {
                     sequence.push({
                         start: timeIterator,
@@ -389,7 +389,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                     timeIterator += result.duration;
                 }
                 insertLayerActions.push(
-                    new InsertLayerAction<InsertRasterSequenceLayerOptions<RGBAColor>>({
+                    new InsertLayerAction<InsertRasterSequenceLayerOptions<ColorModel>>({
                         type: 'rasterSequence',
                         name: readerSettle.value.file.name,
                         width: firstImage.width,
@@ -467,7 +467,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
     }
 }
 
-async function parseSerializedFileToActions(serializedFile: SerializedFile<RGBAColor>): Promise<{ workingFileDefinition: Partial<WorkingFileState>, insertLayerActions: InsertLayerAction<any>[] }> {
+async function parseSerializedFileToActions(serializedFile: SerializedFile<ColorModel>): Promise<{ workingFileDefinition: Partial<WorkingFileState>, insertLayerActions: InsertLayerAction<any>[] }> {
     const workingFileDefinition: Partial<WorkingFileState> = {
         colorModel: serializedFile.colorModel,
         colorSpace: serializedFile.colorSpace,
@@ -490,10 +490,10 @@ async function parseSerializedFileToActions(serializedFile: SerializedFile<RGBAC
     };
 }
 
-async function parseLayersToActions(layers: SerializedFileLayer<RGBAColor>[]): Promise<InsertLayerAction<any>[]> {
+async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): Promise<InsertLayerAction<any>[]> {
     let insertLayerActions: InsertLayerAction<any>[] = [];
     for (let layer of layers) {
-        let parsedLayer: Partial<WorkingFileLayer<RGBAColor>> = {
+        let parsedLayer: Partial<WorkingFileLayer<ColorModel>> = {
             blendingMode: layer.blendingMode,
             filters: layer.filters,
             groupId: layer.groupId,
@@ -513,10 +513,10 @@ async function parseLayersToActions(layers: SerializedFileLayer<RGBAColor>[]): P
                 renderer: layerRenderers.group,
                 expanded: false,
                 layers: []
-            } as WorkingFileGroupLayer<RGBAColor>;
-            insertLayerActions = insertLayerActions.concat(await parseLayersToActions((layer as SerializedFileGroupLayer<RGBAColor>).layers));
+            } as WorkingFileGroupLayer<ColorModel>;
+            insertLayerActions = insertLayerActions.concat(await parseLayersToActions((layer as SerializedFileGroupLayer<ColorModel>).layers));
         } else if (layer.type === 'raster') {
-            const serializedLayer = layer as SerializedFileRasterLayer<RGBAColor>;
+            const serializedLayer = layer as SerializedFileRasterLayer<ColorModel>;
             const image = new Image();
             const base64Fetch = await fetch(serializedLayer.data.sourceImageSerialized || '');
             const imageBlob = await base64Fetch.blob();
@@ -537,10 +537,10 @@ async function parseLayersToActions(layers: SerializedFileLayer<RGBAColor>[]): P
                     sourceImage: image,
                     sourceImageIsObjectUrl: true
                 }
-            } as WorkingFileRasterLayer<RGBAColor>;
+            } as WorkingFileRasterLayer<ColorModel>;
         } else if (layer.type === 'rasterSequence') {
-            const serializedLayer = layer as SerializedFileRasterSequenceLayer<RGBAColor>;
-            const parsedSequence: WorkingFileRasterSequenceLayer<RGBAColor>['data']['sequence'] = [];
+            const serializedLayer = layer as SerializedFileRasterSequenceLayer<ColorModel>;
+            const parsedSequence: WorkingFileRasterSequenceLayer<ColorModel>['data']['sequence'] = [];
             for (let frame of serializedLayer.data.sequence) {
                 const image = new Image();
                 const base64Fetch = await fetch(frame.image.sourceImageSerialized || '');
@@ -572,25 +572,25 @@ async function parseLayersToActions(layers: SerializedFileLayer<RGBAColor>[]): P
                     currentFrame: parsedSequence[0]?.image,
                     sequence: parsedSequence
                 }
-            } as WorkingFileRasterSequenceLayer<RGBAColor>;
+            } as WorkingFileRasterSequenceLayer<ColorModel>;
             (window as any).parsedLayer = parsedLayer;
         } else if (layer.type === 'vector') {
             parsedLayer = {
                 ...parsedLayer,
                 type: 'vector',
                 renderer: layerRenderers.vector,
-                data: (layer as SerializedFileVectorLayer<RGBAColor>).data,
-            } as WorkingFileVectorLayer<RGBAColor>;
+                data: (layer as SerializedFileVectorLayer<ColorModel>).data,
+            } as WorkingFileVectorLayer<ColorModel>;
         } else if (layer.type === 'text') {
             parsedLayer = {
                 ...parsedLayer,
                 type: 'text',
                 renderer: layerRenderers.text,
-                data: (layer as SerializedFileTextLayer<RGBAColor>).data,
-            } as WorkingFileTextLayer<RGBAColor>;
+                data: (layer as SerializedFileTextLayer<ColorModel>).data,
+            } as WorkingFileTextLayer<ColorModel>;
         }
         insertLayerActions.push(
-            new InsertLayerAction<InsertAnyLayerOptions<RGBAColor>>(parsedLayer as InsertAnyLayerOptions<RGBAColor>)
+            new InsertLayerAction<InsertAnyLayerOptions<ColorModel>>(parsedLayer as InsertAnyLayerOptions<ColorModel>)
         );
     }
     return insertLayerActions;

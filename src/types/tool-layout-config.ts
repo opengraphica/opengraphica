@@ -58,7 +58,7 @@ export interface ToolDefinition {
     controller: string;
     toolbar?: {
         exclusive: boolean;
-        position?: 'top' | 'bottom';
+        position?: 'auto' | 'top' | 'bottom';
         target: string;
     };
     overlays: string[];

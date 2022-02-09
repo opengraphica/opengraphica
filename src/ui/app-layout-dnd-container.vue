@@ -41,15 +41,11 @@ import AppLayoutMenuBar from '@/ui/app-layout-menu-bar.vue';
 import Toolbar from '@/ui/toolbar.vue';
 import defaultDndLayoutConfig from '@/config/default-dnd-layout.json';
 import { translateTouchEventToPointerEvents } from '@/lib/events';
-import { CanvasRenderingContext2DEnhanced, DndLayout } from '@/types';
+import { DndLayout } from '@/types';
 
-import { WorkingFileRasterLayer, RGBAColor } from '@/types';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import preferencesStore from '@/store/preferences';
-import workingFileStore from '@/store/working-file';
-import layerRenderers from '@/canvas/renderers';
-import BaseCanvasMovementController from '@/canvas/controllers/base-movement';
 
 export default defineComponent({
     name: 'AppLayoutDndContainer',

@@ -1,13 +1,17 @@
 export type ColorModelName = 'rgba' | 'cmyka' | 'hsla' | 'hsva';
 
-export interface RGBAColor {
+export interface GenericColor {
+    is: 'color';
+}
+
+export interface RGBAColor extends GenericColor {
     r: number;
     g: number;
     b: number;
     a: number;
 }
 
-export interface CMYKAColor {
+export interface CMYKAColor extends GenericColor {
     c: number;
     m: number;
     y: number;
@@ -15,14 +19,14 @@ export interface CMYKAColor {
     a: number;
 }
 
-export interface HSLAColor {
+export interface HSLAColor extends GenericColor {
     h: number;
     s: number;
     l: number;
     a: number;
 }
 
-export interface HSVAColor {
+export interface HSVAColor extends GenericColor {
     h: number;
     s: number;
     v: number;
@@ -37,6 +41,7 @@ export interface GradientStop<T extends ColorModel> {
 }
 
 export interface Gradient<T extends ColorModel> {
+    is: 'gradient';
     stops: GradientStop<T>[];
     type: 'linear' | 'radial';
 }
@@ -52,3 +57,5 @@ export interface RadialGradient<T extends ColorModel> extends Gradient<T> {
 }
 
 export type ColorOrGradient<T extends ColorModel> = T | LinearGradient<T> | RadialGradient<T>;
+
+

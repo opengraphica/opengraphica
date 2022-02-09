@@ -1,5 +1,5 @@
 import { PerformantStore } from './performant-store';
-import { RGBAColor, MeasuringUnits, ResolutionUnits, ColorModelName, WorkingFileLayer, WorkingFileAnyLayer, WorkingFileGroupLayer, WorkingFileTimeline } from '@/types';
+import { ColorModel, MeasuringUnits, ResolutionUnits, ColorModelName, WorkingFileLayer, WorkingFileAnyLayer, WorkingFileGroupLayer, WorkingFileTimeline } from '@/types';
 
 interface WorkingFileState {
     activeTimelineId: number | null,
@@ -10,7 +10,7 @@ interface WorkingFileState {
     fileName: string;
     height: number; // Always pixels
     layerIdCounter: number;
-    layers: WorkingFileLayer<RGBAColor>[];
+    layers: WorkingFileLayer<ColorModel>[];
     measuringUnits: MeasuringUnits;
     resolutionUnits: ResolutionUnits;
     resolutionX: number;
@@ -50,15 +50,15 @@ const store = new PerformantStore<WorkingFileStore>({
     }
 });
 
-function getLayerById(id: number, parent?: WorkingFileLayer<RGBAColor>[]): WorkingFileAnyLayer<RGBAColor> | null {
+function getLayerById(id: number, parent?: WorkingFileLayer<ColorModel>[]): WorkingFileAnyLayer<ColorModel> | null {
     if (parent == null) {
         parent = store.get('layers');
     }
     for (let layer of parent) {
         if (layer.id === id) {
-            return layer as WorkingFileAnyLayer<RGBAColor>;
+            return layer as WorkingFileAnyLayer<ColorModel>;
         } else if (layer.type === 'group') {
-            let foundLayer = getLayerById(id, (layer as WorkingFileGroupLayer<RGBAColor>).layers);
+            let foundLayer = getLayerById(id, (layer as WorkingFileGroupLayer<ColorModel>).layers);
             if (foundLayer) {
                 return foundLayer;
             }
@@ -67,28 +67,28 @@ function getLayerById(id: number, parent?: WorkingFileLayer<RGBAColor>[]): Worki
     return null;
 }
 
-function getGroupLayerById(id: number, parent?: WorkingFileLayer<RGBAColor>[]): WorkingFileGroupLayer<RGBAColor> | null {
+function getGroupLayerById(id: number, parent?: WorkingFileLayer<ColorModel>[]): WorkingFileGroupLayer<ColorModel> | null {
     if (parent == null) {
         parent = store.get('layers');
     }
     const layer = getLayerById(id, parent);
     if (layer && layer.type === 'group') {
-        return layer as WorkingFileGroupLayer<RGBAColor>;
+        return layer as WorkingFileGroupLayer<ColorModel>;
     }
     return null;
 }
 
-function getLayersByType<T extends WorkingFileLayer<RGBAColor>>(type: string, parent?: WorkingFileLayer<RGBAColor>[]): T[] {
+function getLayersByType<T extends WorkingFileLayer<ColorModel>>(type: string, parent?: WorkingFileLayer<ColorModel>[]): T[] {
     if (parent == null) {
         parent = store.get('layers');
     }
-    let layers: WorkingFileLayer<RGBAColor>[] = [];
+    let layers: WorkingFileLayer<ColorModel>[] = [];
     for (let layer of parent) {
         if (layer.type === type) {
             layers.push(layer);
         }
         if (layer.type === 'group') {
-            layers = layers.concat(getLayersByType(type, (layer as WorkingFileGroupLayer<RGBAColor>).layers));
+            layers = layers.concat(getLayersByType(type, (layer as WorkingFileGroupLayer<ColorModel>).layers));
         }
     }
     return layers as T[];

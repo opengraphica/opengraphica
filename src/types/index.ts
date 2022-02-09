@@ -4,10 +4,12 @@ export {
     Gradient, LinearGradient, RadialGradient, GradientStop
 } from './color';
 export { FilterAugment } from './filter';
+export { KeyboardMapConfigAction, KeyboardMapConfigCategory } from './keyboard-map';
 export { MeasuringUnits, ResolutionUnits } from './metrics';
 export {
     SerializedFileTimeline, SerializedFileTimelineTrack, SerializedFileLayerTimelineFrame, SerializedFileTimelineKey,
     SerializedFile, SerializedFileGroupLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileVectorLayer,
+    SerializedFileTextLayerSpanMeta, SerializedFileTextLayerSpan, SerializedFileTextLayerLine,
     SerializedFileTextLayer, SerializedFileLayer
 } from './serialized-file';
 export {
@@ -22,6 +24,7 @@ export {
 export {
     NewFilePreset, WorkingFileLayer, WorkingFileLayerBlendingMode, WorkingFileLayerType, WorkingFileLayerRenderer, WorkingFileGroupLayer,
     WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer, WorkingFileRasterSequenceLayerFrame,
+    WorkingFileTextLayerSpanMeta, WorkingFileTextLayerSpan, WorkingFileTextLayerLine,
     InsertGroupLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions, InsertVectorLayerOptions, InsertTextLayerOptions, InsertAnyLayerOptions,
     UpdateGroupLayerOptions, UpdateRasterLayerOptions, UpdateRasterSequenceLayerOptions, UpdateVectorLayerOptions, UpdateTextLayerOptions, UpdateAnyLayerOptions,
     WorkingFileTimeline, WorkingFileTimelineTrack, WorkingFileLayerTimelineFrame, WorkingFileTimelineKey

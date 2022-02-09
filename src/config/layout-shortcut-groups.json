@@ -166,8 +166,8 @@
                 "icon": "bi bi-type",
                 "label": "Insert / Edit Text",
                 "action": {
-                    "type": "runModule",
-                    "target": "tmp/notYetImplemented"
+                    "type": "toolGroup",
+                    "target": "text"
                 }
             }
         ],

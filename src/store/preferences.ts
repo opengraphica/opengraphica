@@ -1,9 +1,11 @@
+import { KeyboardMapConfigCategory } from '@/types';
 import { PerformantStore } from './performant-store';
 
 interface PreferencesState {
     dragStartRadius: number; // Pixels
     enableMultiLayerBuffer: boolean;
     historyStatesMax: number;
+    keyboardMapConfig: KeyboardMapConfigCategory[];
     menuBarPosition: 'top' | 'bottom' | 'left' | 'right';
     multiTouchDownTimeout: number;
     multiTouchTapTimeout: number;
@@ -26,6 +28,7 @@ const store = new PerformantStore<PreferencesStore>({
         dragStartRadius: 5,
         enableMultiLayerBuffer: false,
         historyStatesMax: 50,
+        keyboardMapConfig: [],
         menuBarPosition: 'left',
         multiTouchDownTimeout: 75,
         multiTouchTapTimeout: 175,

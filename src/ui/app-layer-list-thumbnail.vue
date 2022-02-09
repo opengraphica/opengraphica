@@ -10,7 +10,7 @@ import ElLoading from 'element-plus/lib/components/loading/index';
 import workingFileStore from '@/store/working-file';
 import { drawWorkingFileLayerToCanvas } from '@/lib/canvas';
 import { DecomposedMatrix } from '@/lib/dom-matrix';
-import { CanvasRenderingContext2DEnhanced, WorkingFileAnyLayer, RGBAColor } from '@/types';
+import { CanvasRenderingContext2DEnhanced, WorkingFileAnyLayer, ColorModel } from '@/types';
 
 export default defineComponent({
     name: 'AppLayerListThumbnail',
@@ -22,7 +22,7 @@ export default defineComponent({
     },
     props: {
         layer: {
-            type: Object as PropType<WorkingFileAnyLayer<RGBAColor>>,
+            type: Object as PropType<WorkingFileAnyLayer<ColorModel>>,
             required: true
         }
     },

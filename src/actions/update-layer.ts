@@ -1,5 +1,5 @@
 import {
-    RGBAColor, WorkingFileLayer, WorkingFileAnyLayer,
+    ColorModel, WorkingFileLayer, WorkingFileAnyLayer,
     WorkingFileGroupLayer, UpdateAnyLayerOptions
 } from '@/types';
 import { BaseAction } from './base';
@@ -7,10 +7,10 @@ import { registerObjectUrlUser, revokeObjectUrlIfLastUser } from './data/memory-
 import canvasStore from '@/store/canvas';
 import workingFileStore, { getLayerById } from '@/store/working-file';
 
-export class UpdateLayerAction<GroupLayerOptions extends UpdateAnyLayerOptions<RGBAColor>> extends BaseAction {
+export class UpdateLayerAction<GroupLayerOptions extends UpdateAnyLayerOptions<ColorModel>> extends BaseAction {
 
     private updateLayerOptions!: GroupLayerOptions;
-    private previousProps: Partial<WorkingFileAnyLayer<RGBAColor>> = {};
+    private previousProps: Partial<WorkingFileAnyLayer<ColorModel>> = {};
 
     constructor(updateLayerOptions: GroupLayerOptions) {
         super('updateLayer', 'Update Layer');

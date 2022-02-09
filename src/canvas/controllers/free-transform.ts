@@ -4,11 +4,12 @@ import { freeTransformEmitter, top, left, width, height, rotation, transformOrig
 import canvasStore from '@/store/canvas';
 import historyStore from '@/store/history';
 import workingFileStore, { getLayerById } from '@/store/working-file';
-import { RGBAColor, UpdateAnyLayerOptions, WorkingFileLayer } from '@/types';
+import { ColorModel, UpdateAnyLayerOptions, WorkingFileLayer } from '@/types';
 import { DecomposedMatrix, decomposeMatrix } from '@/lib/dom-matrix';
 import { UpdateLayerAction } from '@/actions/update-layer';
 import { BundleAction } from '@/actions/bundle';
 import appEmitter from '@/lib/emitter';
+import { isShiftKeyPressed } from '@/lib/keyboard';
 
 const DRAG_TYPE_ALL = 0;
 const DRAG_TYPE_TOP = 1;
@@ -28,7 +29,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     private transformIsRotating: boolean = false;
 
     private setBoundsDebounceHandle: number | undefined;
-    private selectedLayers: WorkingFileLayer<RGBAColor>[] = [];
+    private selectedLayers: WorkingFileLayer<ColorModel>[] = [];
     private selectedLayerIdsWatchStop: WatchStopHandle | null = null;
 
     onEnter(): void {
@@ -37,7 +38,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         dimensionLockRatio.value = null;
 
         this.selectedLayerIdsWatchStop = watch(() => workingFileStore.state.selectedLayerIds, (selectedLayerIds) => {
-            const selectedLayers: WorkingFileLayer<RGBAColor>[] = [];
+            const selectedLayers: WorkingFileLayer<ColorModel>[] = [];
             if (selectedLayerIds.length > 0) {
                 for (let id of selectedLayerIds) {
                     const layer = getLayerById(id);
@@ -152,6 +153,9 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             }
             // Drag/Resize
             else {
+                let shouldScale = this.shouldScaleDuringResize();
+                let shouldMaintainAspectRatio = this.shouldMaintainAspectRatio();
+
                 const isDragAll = this.transformDragType === DRAG_TYPE_ALL;
                 let isDragLeft = Math.floor(this.transformDragType / DRAG_TYPE_LEFT) % 2 === 1;
                 let isDragRight = Math.floor(this.transformDragType / DRAG_TYPE_RIGHT) % 2 === 1;
@@ -172,6 +176,15 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 }
                 if (isDragTop) {
                     offsetHeight = this.transformStartDimensions.height - ((xFactor * dy) - (yFactor * dx));
+                }
+                if (shouldMaintainAspectRatio) {
+                    const ratioOffsetWidth = offsetHeight * (this.transformStartDimensions.width / this.transformStartDimensions.height);
+                    const ratioOffsetHeight = offsetWidth * (this.transformStartDimensions.height / this.transformStartDimensions.width);
+                    if (offsetHeight > ratioOffsetHeight) {
+                        offsetWidth = ratioOffsetWidth;
+                    } else {
+                        offsetHeight = ratioOffsetHeight;
+                    }
                 }
     
                 // Determine dimensions
@@ -245,13 +258,17 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 });
                 for (const [i, layer] of this.selectedLayers.entries()) {
                     const decomposedTransform = decomposeMatrix(this.transformStartLayerData[i].transform);
-                    const transform =
-                        DOMMatrix.fromMatrix(this.transformStartLayerData[i].transform)
-                        .scaleSelf(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY)
+                    let transform = DOMMatrix.fromMatrix(this.transformStartLayerData[i].transform)
+                    if (shouldScale) {
+                        transform.scaleSelf(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY);
+                    }
+                    transform
                         .rotateSelf(-decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
                         .translateSelf(left - this.transformStartDimensions.left, top - this.transformStartDimensions.top)
                         .rotateSelf(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
-                        .scaleSelf(decomposedTransform.scaleX * width / this.transformStartDimensions.width, decomposedTransform.scaleY * height / this.transformStartDimensions.height)
+                    if (shouldScale) {
+                        transform.scaleSelf(decomposedTransform.scaleX * width / this.transformStartDimensions.width, decomposedTransform.scaleY * height / this.transformStartDimensions.height)
+                    }
                     layer.transform = transform;
                 }
             }
@@ -280,6 +297,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         super.onPointerUp(e);
         if (e.isPrimary) {
             if (this.transformTranslateStart) {
+                let shouldScale = this.shouldScaleDuringResize();
                 width.value = Math.max(1, width.value);
                 height.value = Math.max(1, height.value);
                 previewXSnap.value = [];
@@ -287,14 +305,18 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 this.transformTranslateStart = null;
                 this.transformIsRotating = false;
 
-                const updateLayerActions: UpdateLayerAction<UpdateAnyLayerOptions<RGBAColor>>[] = [];
+                const updateLayerActions: UpdateLayerAction<UpdateAnyLayerOptions<ColorModel>>[] = [];
                 for (const [i, layer] of this.selectedLayers.entries()) {
                     const newTransform = layer.transform;
                     layer.transform = this.transformStartLayerData[i].transform;
                     updateLayerActions.push(
                         new UpdateLayerAction({
                             id: layer.id,
-                            transform: newTransform
+                            transform: newTransform,
+                            ...(shouldScale ? {} : {
+                                width: width.value,
+                                height: height.value
+                            })
                         })
                     );
                 }
@@ -408,6 +430,31 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 });
             }
         }, 0);
+    }
+
+    protected shouldMaintainAspectRatio() {
+        let shouldKeep: boolean = true;
+        if (isShiftKeyPressed.value === true) {
+            shouldKeep = false;
+        }
+        if (this.selectedLayers.length === 1) {
+            const firstLayer = this.selectedLayers[0];
+            if (firstLayer.type === 'text') {
+                shouldKeep = false;
+            }
+        }
+        return shouldKeep;
+    }
+
+    protected shouldScaleDuringResize() {
+        let shouldScale: boolean = true;
+        if (this.selectedLayers.length === 1) {
+            const firstLayer = this.selectedLayers[0];
+            if (firstLayer.type === 'text') {
+                shouldScale = false;
+            }
+        }
+        return shouldScale;
     }
 
 }

@@ -1,5 +1,5 @@
 import {
-    RGBAColor, WorkingFileLayer,
+    ColorModel, WorkingFileLayer,
     WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer,
     InsertAnyLayerOptions
 } from '@/types';
@@ -26,7 +26,7 @@ export class ReorderLayersAction extends BaseAction {
         super.do();
 
         // Map ids to layer objects
-        let insertLayers: WorkingFileLayer<RGBAColor>[] = [];
+        let insertLayers: WorkingFileLayer<ColorModel>[] = [];
         for (let layerId of this.insertLayerIds) {
             const layer = getLayerById(layerId);
             if (!layer) {
@@ -62,7 +62,7 @@ export class ReorderLayersAction extends BaseAction {
                 layer.groupId = referenceParent.id;
             }
         } else {
-            const referenceGroupLayer = referenceLayer as WorkingFileGroupLayer<RGBAColor>;
+            const referenceGroupLayer = referenceLayer as WorkingFileGroupLayer<ColorModel>;
             if (!referenceGroupLayer) {
                 throw new Error('Reference layer is not a group layer.');
             }
@@ -77,7 +77,7 @@ export class ReorderLayersAction extends BaseAction {
         super.undo();
 
         // Map ids to layer objects
-        let insertedLayers: WorkingFileLayer<RGBAColor>[] = [];
+        let insertedLayers: WorkingFileLayer<ColorModel>[] = [];
         for (let layerId of this.insertLayerIds) {
             const layer = getLayerById(layerId);
             if (!layer) {
@@ -97,7 +97,7 @@ export class ReorderLayersAction extends BaseAction {
             let referenceParent = this.getLayerParent(this.referenceLayerId);
             referenceParent.layers.splice(referenceParent.layers.indexOf(referenceLayer) + (this.insertPosition === 'below' ? 0 : 1), insertedLayers.length);
         } else {
-            const referenceGroupLayer = referenceLayer as WorkingFileGroupLayer<RGBAColor>;
+            const referenceGroupLayer = referenceLayer as WorkingFileGroupLayer<ColorModel>;
             if (!referenceGroupLayer) {
                 throw new Error('Reference layer is not a group layer.');
             }
@@ -126,9 +126,9 @@ export class ReorderLayersAction extends BaseAction {
         super.free();
     }
 
-    private getLayerParent(id: number): { id: number | null, layers: WorkingFileLayer<RGBAColor>[] } {
+    private getLayerParent(id: number): { id: number | null, layers: WorkingFileLayer<ColorModel>[] } {
         const layers = workingFileStore.get('layers');
-        let parent: { id: number | null, layers: WorkingFileLayer<RGBAColor>[] } = {
+        let parent: { id: number | null, layers: WorkingFileLayer<ColorModel>[] } = {
             id: null,
             layers: layers
         };

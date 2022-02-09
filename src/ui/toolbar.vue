@@ -5,7 +5,7 @@
                 <component :is="name" @close="onCloseToolbar" />
             </template>
             <template #fallback>
-                <div style="width: 5rem; height: 5rem;" v-loading="true" element-loading-background="transparent"></div>
+                <div></div>
             </template>
         </suspense>
     </div>

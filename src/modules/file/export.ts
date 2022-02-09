@@ -8,7 +8,7 @@ import editorStore from '@/store/editor';
 import { drawWorkingFileToCanvas, trackCanvasTransforms } from '@/lib/canvas';
 import { saveAs } from 'file-saver';
 import { knownFileExtensions } from '@/lib/regex';
-import { WorkingFileRasterSequenceLayer, RGBAColor } from '@/types';
+import { WorkingFileRasterSequenceLayer, ColorModel } from '@/types';
 // @ts-ignore
 import GIF from '@/lib/gif.js';
 
@@ -132,7 +132,7 @@ export async function promptClipboardWritePermission(): Promise<boolean> {
 export async function convertCanvasToGifBlob(canvas: HTMLCanvasElement, options: ExportOptions): Promise<Blob> {
     const quality = options.quality == null ? 1 : options.quality;
 
-    const rasterSequenceLayers = getLayersByType('rasterSequence') as WorkingFileRasterSequenceLayer<RGBAColor>[];
+    const rasterSequenceLayers = getLayersByType('rasterSequence') as WorkingFileRasterSequenceLayer<ColorModel>[];
     let significantFramesSet = new Set<number>();
     for (let layer of rasterSequenceLayers) {
         for (let frame of layer.data.sequence) {

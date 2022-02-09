@@ -1,7 +1,7 @@
-import { CanvasRenderingContext2DEnhanced, WorkingFileLayer, WorkingFileLayerRenderer, RGBAColor } from '@/types';
+import { CanvasRenderingContext2DEnhanced, WorkingFileLayer, WorkingFileLayerRenderer, ColorModel } from '@/types';
 
-export default class BaseLayerRenderer implements WorkingFileLayerRenderer<RGBAColor> {
-    draw(ctx: CanvasRenderingContext2DEnhanced, layer: WorkingFileLayer<RGBAColor>) {
+export default class BaseLayerRenderer implements WorkingFileLayerRenderer<ColorModel> {
+    draw(ctx: CanvasRenderingContext2DEnhanced, layer: WorkingFileLayer<ColorModel>) {
         // Do nothing
     }
 }

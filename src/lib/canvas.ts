@@ -30,7 +30,7 @@ interface DrawWorkingFileLayerOptions {
     visible?: boolean;
 }
 
-export const drawWorkingFileLayerToCanvas = (targetCanvas: HTMLCanvasElement, targetCtx: CanvasRenderingContext2DEnhanced, layer: WorkingFileLayer<ColorModel>, decomposedTransform: DecomposedMatrix, options: DrawWorkingFileLayerOptions = {}) => {
+export function drawWorkingFileLayerToCanvas(targetCanvas: HTMLCanvasElement, targetCtx: CanvasRenderingContext2DEnhanced, layer: WorkingFileLayer<ColorModel>, decomposedTransform: DecomposedMatrix, options: DrawWorkingFileLayerOptions = {}) {
     if (options.visible || layer.visible) {
         let ctx = targetCtx;
         
@@ -67,16 +67,16 @@ export const drawWorkingFileLayerToCanvas = (targetCanvas: HTMLCanvasElement, ta
         layer.renderer.draw(ctx, layer);
         ctx.restore();
     }
-};
+}
 
 interface DrawWorkingFileOptions {
     selectedLayersOnly?: boolean
-};
+}
 
 /**
  * Draws everything in the working document to the specified canvas.
  */
-export const drawWorkingFileToCanvas = (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2DEnhanced, options: DrawWorkingFileOptions = {}) => {
+export function drawWorkingFileToCanvas(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2DEnhanced, options: DrawWorkingFileOptions = {}) {
 
     let now = performance.now();
 
@@ -171,12 +171,12 @@ export const drawWorkingFileToCanvas = (canvas: HTMLCanvasElement, ctx: CanvasRe
 
     (window as any).averageTime = ((performance.now() - now) * 0.1) + (((window as any).averageTime || 0) * 0.9)
 
-};
+}
 
 /**
  * Draws a rect path that when stroked will be aligned to pixels on the screen (when there is no rotation)
  */
-export const ctxRectHalfPixelAligned = (ctx: CanvasRenderingContext2DEnhanced, x: number, y: number, w: number, h: number, decomposedTransform: DecomposedMatrix) => {
+export function ctxRectHalfPixelAligned(ctx: CanvasRenderingContext2DEnhanced, x: number, y: number, w: number, h: number, decomposedTransform: DecomposedMatrix) {
     const scale = decomposedTransform.scaleX;
     let xOffset = - decomposedTransform.translateX % 1;
     let yOffset = - decomposedTransform.translateY % 1;
@@ -188,14 +188,14 @@ export const ctxRectHalfPixelAligned = (ctx: CanvasRenderingContext2DEnhanced, x
     w = (Math.round((x + w) * scale) - 0.5) * invScale - x;
     h = (Math.round((y + h) * scale) - 0.5) * invScale - y;
    ctx.rect(x, y, w, h);
-};
+}
 
 /**
  * Provides additional canvas utility methods.
  * Adapted from https://gist.github.com/dzhang123/2a3a611b3d75a45a3f41
  * @license MIT https://codepen.io/techslides/pen/zowLd/license
  */
-export const trackCanvasTransforms = (vanillaCtx: CanvasRenderingContext2D | null): CanvasRenderingContext2DEnhanced => {
+export function trackCanvasTransforms(vanillaCtx: CanvasRenderingContext2D | null): CanvasRenderingContext2DEnhanced {
     if (!vanillaCtx) {
         throw new Error('Canvas rendering context is missing (out of memory?)');
     }
@@ -280,4 +280,4 @@ export const trackCanvasTransforms = (vanillaCtx: CanvasRenderingContext2D | nul
     }
 
     return ctx;
-};
+}

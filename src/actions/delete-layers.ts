@@ -1,5 +1,5 @@
 import {
-    RGBAColor, WorkingFileAnyLayer
+    ColorModel, WorkingFileAnyLayer
 } from '@/types';
 import { BaseAction } from './base';
 import { SelectLayersAction } from './select-layers';
@@ -11,7 +11,7 @@ export class DeleteLayersAction extends BaseAction {
 
     private deleteLayerIds: number[] = [];
     private deletedLayers: {
-        layer: WorkingFileAnyLayer<RGBAColor>,
+        layer: WorkingFileAnyLayer<ColorModel>,
         parentIndex: number
     }[] = [];
     private selectLayersAction: SelectLayersAction | null = null;

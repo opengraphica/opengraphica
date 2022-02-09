@@ -1,11 +1,7 @@
 import { isCtrlKeyPressed } from '@/lib/keyboard';
 import { PointerTracker } from './base';
 import BaseCanvasMovementController from './base-movement';
-import { DecomposedMatrix } from '@/lib/dom-matrix';
 import canvasStore from '@/store/canvas';
-import preferencesStore from '@/store/preferences';
-import workingFileStore from '@/store/working-file';
-import appEmitter from '@/lib/emitter';
 
 const devicePixelRatio = window.devicePixelRatio || 1;
 

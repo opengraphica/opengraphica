@@ -1,5 +1,5 @@
 import {
-    RGBAColor, WorkingFileLayer,
+    ColorModel, WorkingFileLayer,
     WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer,
     InsertAnyLayerOptions
 } from '@/types';
@@ -12,10 +12,10 @@ import layerRenderers from '@/canvas/renderers';
 
 let layerInsertCounter: number = 1;
 
-export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<RGBAColor>> extends BaseAction {
+export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<ColorModel>> extends BaseAction {
 
     private insertLayerOptions: GroupLayerOptions | null = null;
-    private insertedLayer: WorkingFileAnyLayer<RGBAColor> | null = null;
+    private insertedLayer: WorkingFileAnyLayer<ColorModel> | null = null;
     private selectLayersAction: SelectLayersAction | null = null;
 
     constructor(insertLayerOptions: GroupLayerOptions) {
@@ -28,11 +28,11 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
         const layerId = workingFileStore.get('layerIdCounter');
         workingFileStore.set('layerIdCounter', layerId + 1);
 
-        let newLayer: WorkingFileAnyLayer<RGBAColor>;
+        let newLayer: WorkingFileAnyLayer<ColorModel>;
         if (this.insertedLayer) {
             newLayer = this.insertedLayer;
         } else if (this.insertLayerOptions) {
-            const sharedOptions: WorkingFileLayer<RGBAColor> = {
+            const sharedOptions: WorkingFileLayer<ColorModel> = {
                 type: 'raster',
                 bakedImage: null,
                 blendingMode: 'source-over',
@@ -57,7 +57,7 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
                         expanded: false,
                         renderer: layerRenderers.group,
                         ...this.insertLayerOptions
-                    } as WorkingFileGroupLayer<RGBAColor>;
+                    } as WorkingFileGroupLayer<ColorModel>;
                     break;
                 case 'raster':
                     newLayer = {
@@ -65,7 +65,7 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
                         data: {},
                         renderer: layerRenderers.raster,
                         ...this.insertLayerOptions
-                    } as WorkingFileRasterLayer<RGBAColor>;
+                    } as WorkingFileRasterLayer<ColorModel>;
                     if (newLayer.data.sourceImageIsObjectUrl) {
                         registerObjectUrlUser(newLayer.data.sourceImage?.src, layerId);
                     }
@@ -76,7 +76,7 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
                         data: {},
                         renderer: layerRenderers.rasterSequence,
                         ...this.insertLayerOptions
-                    } as WorkingFileRasterSequenceLayer<RGBAColor>;
+                    } as WorkingFileRasterSequenceLayer<ColorModel>;
                     for (let frame of newLayer.data.sequence) {
                         if (frame.image.sourceImageIsObjectUrl) {
                             registerObjectUrlUser(frame.image.sourceImage?.src, layerId);
@@ -89,7 +89,7 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
                         data: [],
                         renderer: layerRenderers.vector,
                         ...this.insertLayerOptions
-                    } as WorkingFileVectorLayer<RGBAColor>;
+                    } as WorkingFileVectorLayer<ColorModel>;
                     break;
                 case 'text':
                     newLayer = {
@@ -97,7 +97,7 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
                         data: {},
                         renderer: layerRenderers.text,
                         ...this.insertLayerOptions
-                    } as WorkingFileTextLayer<RGBAColor>;
+                    } as WorkingFileTextLayer<ColorModel>;
                     break;
             }
 
@@ -108,7 +108,7 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
         }
 
         const layers = workingFileStore.get('layers');
-        let parent: WorkingFileLayer<RGBAColor>[] | null = layers;
+        let parent: WorkingFileLayer<ColorModel>[] | null = layers;
         if (newLayer.groupId != null) {
             const groupLayer = getGroupLayerById(newLayer.groupId, parent);
             if (groupLayer) {
@@ -140,7 +140,7 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<R
         }
 
         const layers = workingFileStore.get('layers');
-        let parent: WorkingFileLayer<RGBAColor>[] | null = layers;
+        let parent: WorkingFileLayer<ColorModel>[] | null = layers;
         if (this.insertedLayer != null && this.insertedLayer.groupId != null) {
             const groupLayer = getGroupLayerById(this.insertedLayer.groupId, parent);
             if (groupLayer) {

@@ -23,7 +23,7 @@ let pointerIdCounter: number = 0;
 /**
  * Polyfill to translate mouse event to pointer event for browsers that do not support pointer events.
  */
- export const translateMouseEventToPointerEvent = (type: string, e: MouseEvent): PointerEvent => {
+ export function translateMouseEventToPointerEvent(type: string, e: MouseEvent): PointerEvent {
     let pointerEvent = new PointerEventPolyfill({
         altKey: e.altKey,
         altitudeAngle: 1.5707963267948966, // PI / 2
@@ -78,12 +78,12 @@ let pointerIdCounter: number = 0;
         y: e.clientY
     } as any) as unknown as PointerEvent
     return pointerEvent;
-};
+}
 
 /**
  * Polyfill to translate touch events to pointer events for mobile browsers that do not support pointer events.
  */
-export const translateTouchEventToPointerEvents = (type: string, e: TouchEvent): PointerEvent[] => {
+export function translateTouchEventToPointerEvents(type: string, e: TouchEvent): PointerEvent[] {
     const pointerEvents: PointerEvent[] = [];
     for (let i = 0; i < e.changedTouches.length; i++) {
         const touch = e.changedTouches[i];
@@ -144,4 +144,4 @@ export const translateTouchEventToPointerEvents = (type: string, e: TouchEvent):
         );
     }
     return pointerEvents;
-};
+}
