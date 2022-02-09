@@ -75044,6 +75044,9 @@ body.ogr-full-page .opengraphica {
   }
   */
 }
+.opengraphica .el-form-item-group .el-form-item .el-form-item__content .el-row {
+  width: 100%;
+}
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-select, .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-input {
   width: 100%;
 }
