@@ -323,6 +323,27 @@
         }
     }
 
+    .el-horizontal-scrollbar-arrows {
+        display: flex;
+        flex-direction: row;
+        overflow: hidden;
+        align-items: stretch;
+        height: 3.25rem;
+
+        > .el-scrollbar {
+            height: auto;
+            > * > .el-scrollbar__view {
+                display: flex;
+                height: 100%;
+            }
+        }
+
+        > .el-button {
+            box-shadow: 0 0 59px #dfdfdf;
+            z-index: 1;
+        }
+    }
+
     .el-input__inner {
         height: 2.5rem;
         line-height: 2.5rem;

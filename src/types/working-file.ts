@@ -2,6 +2,24 @@ import { CanvasRenderingContext2DEnhanced } from './canvas';
 import { ColorModel } from './color';
 import { VectorShape } from './vector';
 
+export interface DrawWorkingFileLayerOptions {
+    visible?: boolean;
+    selectionTest?: {
+        point: DOMPoint;
+        resultId?: number;
+        resultPixelTest?: Uint8ClampedArray;
+    };
+}
+
+export interface DrawWorkingFileOptions {
+    selectedLayersOnly?: boolean;
+    selectionTest?: {
+        point: DOMPoint;
+        resultId?: number;
+        resultPixelTest?: Uint8ClampedArray;
+    };
+}
+
 export type WorkingFileLayerBlendingMode = 'color' | 'color-burn' | 'color-dodge' | 'copy' | 
     'darken' | 'darker' | 'destination-atop' | 'destination-in' | 'destination-out' | 'destination-over' | 
     'difference' | 'exclusion' | 'hard-light' | 'hue' | 'lighten' | 'lighter' | 'luminosity' | 
@@ -14,7 +32,7 @@ export interface WorkingFileLayerFilter<T extends ColorModel> {
 }
 
 export interface WorkingFileLayerRenderer<T extends ColorModel> {
-    draw(ctx: CanvasRenderingContext2DEnhanced, layer: WorkingFileLayer<T>): void;
+    draw(ctx: CanvasRenderingContext2DEnhanced, layer: WorkingFileLayer<T>, options?: DrawWorkingFileLayerOptions): void;
 }
 
 export interface WorkingFileTimelineKey {

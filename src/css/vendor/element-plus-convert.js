@@ -13,10 +13,6 @@ const stylesheets = [
     {
         css: lightCss,
         filename: 'element-plus-theme-chalk.css'
-    },
-    {
-        css: darkCss,
-        filename: 'element-plus-theme-dark.css'
     }
 ];
 

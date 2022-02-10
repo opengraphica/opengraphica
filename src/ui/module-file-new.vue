@@ -15,7 +15,7 @@
                     <el-select
                         v-model="selectedPreset"
                         placeholder="Select (Optional)"
-                        clearable filterable :popper-append-to-body="false"
+                        clearable filterable
                         @change="onChangeSelectedPreset">
                         <el-option
                             v-for="option in presetOptions"
@@ -30,7 +30,7 @@
                 <el-form-item label="Width" prop="width">
                     <el-input-number :min="0" v-model="formData.workingFile.width" @input="onInputAny">
                         <template #append>
-                            <el-select style="width: 6rem" v-model="formData.workingFile.measuringUnits" :popper-append-to-body="false" @change="onInputAny">
+                            <el-select style="width: 6rem" v-model="formData.workingFile.measuringUnits" @change="onInputAny">
                                 <el-option
                                     v-for="option in dimensionUnitOptions"
                                     :key="option.value"
@@ -45,7 +45,7 @@
                 <el-form-item label="Height" prop="height">
                     <el-input-number :min="0" v-model="formData.workingFile.height" @input="onInputAny">
                         <template #append>
-                            <el-select style="width: 6rem" v-model="formData.workingFile.measuringUnits" :popper-append-to-body="false" @change="onInputAny">
+                            <el-select style="width: 6rem" v-model="formData.workingFile.measuringUnits" @change="onInputAny">
                                 <el-option
                                     v-for="option in dimensionUnitOptions"
                                     :key="option.value"
@@ -60,7 +60,7 @@
                 <el-form-item label="Resolution" prop="resolution">
                     <el-input-number v-model.lazy="formData.workingFile.resolution" :min="1" :precision="0" @input="onInputAny">
                         <template #append>
-                            <el-select style="width: 6rem" v-model="formData.workingFile.resolutionUnits" :popper-append-to-body="false" @change="onInputAny">
+                            <el-select style="width: 6rem" v-model="formData.workingFile.resolutionUnits" @change="onInputAny">
                                 <el-option
                                     v-for="option in resolutionUnitOptions"
                                     :key="option.value"
@@ -73,7 +73,7 @@
                     </el-input-number>
                 </el-form-item>
                 <el-form-item label="Color Profile" prop="colorProfile" >
-                    <el-select v-model="formData.workingFile.colorProfile" :popper-append-to-body="false" @change="onInputAny">
+                    <el-select v-model="formData.workingFile.colorProfile" @change="onInputAny">
                         <el-option
                             v-for="option in colorProfileOptions"
                             :key="option"

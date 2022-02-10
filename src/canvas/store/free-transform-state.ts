@@ -1,8 +1,8 @@
 import mitt from 'mitt';
 import { ref } from 'vue';
 
-export const layerPickMode = ref<'current' | 'auto'>('current');
-export const enableSnapping = ref<boolean>(true);
+export const layerPickMode = ref<'current' | 'auto'>('auto');
+export const useRotationSnapping = ref<boolean>(false);
 export const top = ref<number>(0);
 export const left = ref<number>(0);
 export const width = ref<number>(200);

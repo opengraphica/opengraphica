@@ -1,4 +1,4 @@
-import { CanvasRenderingContext2DEnhanced, ColorModel, WorkingFileLayer } from '@/types';
+import { CanvasRenderingContext2DEnhanced, ColorModel, DrawWorkingFileOptions, DrawWorkingFileLayerOptions, WorkingFileLayer } from '@/types';
 import canvasStore from '@/store/canvas';
 import preferencesStore from '@/store/preferences';
 import workingFileStore from '@/store/working-file';
@@ -25,10 +25,6 @@ const cursorImages: { [key: string]: { data: string, image: HTMLImageElement | n
         imageInfo.image = image;
     }
 })();
-
-interface DrawWorkingFileLayerOptions {
-    visible?: boolean;
-}
 
 export function drawWorkingFileLayerToCanvas(targetCanvas: HTMLCanvasElement, targetCtx: CanvasRenderingContext2DEnhanced, layer: WorkingFileLayer<ColorModel>, decomposedTransform: DecomposedMatrix, options: DrawWorkingFileLayerOptions = {}) {
     if (options.visible || layer.visible) {
@@ -64,13 +60,22 @@ export function drawWorkingFileLayerToCanvas(targetCanvas: HTMLCanvasElement, ta
         if (!isIdentity) {
             ctx.transform(layer.transform.a, layer.transform.b, layer.transform.c, layer.transform.d, layer.transform.e, layer.transform.f);
         }
-        layer.renderer.draw(ctx, layer);
+        layer.renderer.draw(ctx, layer, options);
+        if (options.selectionTest && layer.type !== 'group') {
+            const pixel = getPixelFastTest(targetCtx, options.selectionTest.point.x, options.selectionTest.point.y);
+            if (
+                !options.selectionTest.resultPixelTest ||
+                pixel[0] != options.selectionTest.resultPixelTest[0] ||
+                pixel[1] != options.selectionTest.resultPixelTest[1] ||
+                pixel[2] != options.selectionTest.resultPixelTest[2] ||
+                pixel[3] != options.selectionTest.resultPixelTest[3]
+            ) {
+                options.selectionTest.resultId = layer.id;
+                options.selectionTest.resultPixelTest = pixel;
+            }
+        }
         ctx.restore();
     }
-}
-
-interface DrawWorkingFileOptions {
-    selectedLayersOnly?: boolean
 }
 
 /**
@@ -118,6 +123,14 @@ export function drawWorkingFileToCanvas(canvas: HTMLCanvasElement, ctx: CanvasRe
     ctx.fill();
     ctx.shadowBlur = 0;
 
+    // Selection test
+    if (options.selectionTest) {
+        if (!useCssViewport) {
+            options.selectionTest.point = options.selectionTest.point.matrixTransform(transform);
+        }
+        options.selectionTest.resultPixelTest = getPixelFastTest(ctx, options.selectionTest.point.x, options.selectionTest.point.y);
+    }
+
     (window as any).averageTimeCanvas = ((performance.now() - now) * 0.1) + (((window as any).averageTimeCanvas || 0) * 0.9);
     now = performance.now();
 
@@ -135,7 +148,7 @@ export function drawWorkingFileToCanvas(canvas: HTMLCanvasElement, ctx: CanvasRe
     // Draw layers
     const layers = workingFileStore.get('layers');
     for (const layer of layers) {
-        drawWorkingFileLayerToCanvas(canvas, ctx, layer, decomposedTransform);
+        drawWorkingFileLayerToCanvas(canvas, ctx, layer, decomposedTransform, { selectionTest: options.selectionTest });
     }
 
     (window as any).averageTimeLayers = ((performance.now() - now) * 0.1) + (((window as any).averageTimeLayers || 0) * 0.9);
@@ -280,4 +293,12 @@ export function trackCanvasTransforms(vanillaCtx: CanvasRenderingContext2D | nul
     }
 
     return ctx;
+}
+
+/**
+ * Retrieve the rgba values at specified pixel in the canvas.
+ */
+function getPixelFastTest(ctx: CanvasRenderingContext2D, x: number, y: number) {
+    const imgData = ctx.getImageData(x, y, 1, 1);
+    return imgData.data.slice(0, 4);
 }

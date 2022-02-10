@@ -26,6 +26,7 @@ export {
     VectorPolylineShape, VectorPathShape
 } from './vector';
 export {
+    DrawWorkingFileLayerOptions, DrawWorkingFileOptions,
     NewFilePreset, WorkingFileLayer, WorkingFileLayerBlendingMode, WorkingFileLayerType, WorkingFileLayerRenderer, WorkingFileGroupLayer,
     WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer, WorkingFileRasterSequenceLayerFrame,
     WorkingFileTextLayerSpanMeta, WorkingFileTextLayerSpan, WorkingFileTextLayerLine,

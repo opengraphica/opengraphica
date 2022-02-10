@@ -15,7 +15,7 @@
                     Cancel
                 </template>
             </el-button>
-            <el-popover placement="bottom" :popper-class="'ogr-dock-popover'" trigger="click" :width="250" :append-to-body="false">
+            <el-popover placement="bottom" :popper-class="'ogr-dock-popover'" trigger="click" :width="250">
                 <template #reference>
                     <el-button plain type="text" class="px-4 ml-0 mr-2" aria-label="Settings">
                         <template v-if="isMobileView">
@@ -46,7 +46,7 @@
                         </el-button-group>
                     </div>
                     <el-form-item class="el-form-item--menu-item mb-1" label="Dimension Units">
-                        <el-select style="width: 5rem" size="small" v-model="measuringUnits" :popper-append-to-body="false">
+                        <el-select style="width: 5rem" size="small" v-model="measuringUnits">
                             <el-option
                                 v-for="option in dimensionUnitOptions"
                                 :key="option.value"
@@ -60,7 +60,7 @@
                         <el-input-number style="width: 6rem" size="small" v-model="resolution" />
                     </el-form-item>
                     <el-form-item class="el-form-item--menu-item mb-1" label="Resolution Units">
-                        <el-select style="width: 6rem" size="small" v-model="resolutionUnits" :popper-append-to-body="false">
+                        <el-select style="width: 6rem" size="small" v-model="resolutionUnits">
                             <el-option
                                 v-for="option in resolutionUnitOptions"
                                 :key="option.value"

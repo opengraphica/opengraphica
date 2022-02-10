@@ -241,7 +241,7 @@ module.exports = function setupConfig(config) {
                         name: 'actions'
                     },
                     opengraphicaElementInput: {
-                        test: /[\\/]src[\\/]ui[\\/]el-input-number/,
+                        test: /[\\/]src[\\/]ui[\\/](el-input-number|el-input-group)/,
                         name: 'ogr-element-input'
                     },
                     opengraphicaElementForm: {

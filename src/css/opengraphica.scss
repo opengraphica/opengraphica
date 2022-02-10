@@ -784,6 +784,17 @@ body.ogr-full-page {
         word-break: normal;
     }
 
+    @keyframes ogr-toolbar-overlay-fade-in {
+        0% {
+            opacity: 0;
+            transform: translateY(50%);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     .ogr-toolbar {
         display: block;
         transition: all 0.6s;
@@ -795,18 +806,62 @@ body.ogr-full-page {
         &.is-overlay {
             background: transparent;
             box-shadow: none;
-        }
+            position: absolute;
+            width: auto;
+            left: .5rem;
+            right: .5rem;
+            transition: none;
+            animation: ogr-toolbar-overlay-fade-in 0.2s ease-in forwards;
 
-        .ogr-toolbar-overlay {
-            background: var(--ogr-layout-menu-bar-background-color);
-            box-shadow: 0 0 0 0.063rem var(--ogr-layout-menu-bar-border-color);
+            .ogr-toolbar-overlay {
+                background: var(--ogr-layout-menu-bar-background-color);
+                box-shadow: 0 0 0 0.063rem var(--ogr-layout-menu-bar-border-color);
+                padding: 0;
+                overflow: hidden;
+                padding: 0;
+
+                > .el-scrollbar {
+                    > * > .el-scrollbar__view {
+                        padding: 0.75rem 0 0.5rem 0;
+                    }
+                }
+            }
+
+            &.is-bottom {
+                bottom: 0;
+                .ogr-toolbar-overlay {
+                    border-radius: 1rem 1rem 0 0;
+                }
+            }
+            &.is-top {
+                top: 0;
+                .ogr-toolbar-overlay {
+                    border-radius: 0 0 1rem 1rem;
+
+                    > .el-scrollbar {
+                        > * > .el-scrollbar__view {
+                            padding: 0.5rem 0 0.75rem 0;
+                        }
+                    }
+                }
+            }
+
+            &.is-menu-bar-left {
+                left: 5rem;
+            }
+            &.is-menu-bar-right {
+                right: 5rem;
+            }
+            &.is-menu-bar-bottom {
+                bottom: 3rem;
+                .ogr-toolbar-overlay {
+                    padding-bottom: 1.25rem;
+                }
+            }
+            &.is-menu-bar-top {
+                bottom: 0;
+            }
         }
-    }
-    header .ogr-toolbar .ogr-toolbar-overlay {
-        border-radius: 0 0 1rem 1rem;
-    }
-    footer .ogr-toolbar .ogr-toolbar-overlay {
-        border-radius: 1rem 1rem 0 0;
     }
 
     .ogr-canvas-area {
@@ -1256,6 +1311,19 @@ body.ogr-full-page {
 
     .scale-down-enter-from,
     .scale-down-leave-to {
+        transform: scale(1, 0);
+        transform-origin: top left;
+        opacity: 0;
+    }
+
+    .scale-up-enter-active,
+    .scale-up-leave-active {
+        transition: transform 0.5s ease, opacity 0.5s ease;
+        transform-origin: top left;
+    }
+
+    .scale-up-enter-from,
+    .scale-up-leave-to {
         transform: scale(1, 0);
         transform-origin: top left;
         opacity: 0;

@@ -29,7 +29,7 @@
             </transition>
             <transition name="scale-down">
                 <el-form-item v-if="!formData.workingFile.saveBackDirectly" label="File Type" prop="fileType" >
-                    <el-select v-model="formData.workingFile.fileType" :popper-append-to-body="false">
+                    <el-select v-model="formData.workingFile.fileType">
                         <el-option
                             v-for="option in fileTypeOptions"
                             :key="option.value"
@@ -40,7 +40,7 @@
                 </el-form-item>
             </transition>
             <el-form-item label="Layers" prop="layerSelection" >
-                <el-select v-model="formData.workingFile.layerSelection" :popper-append-to-body="false">
+                <el-select v-model="formData.workingFile.layerSelection">
                     <el-option
                         v-for="option in layerSelectionOptions"
                         :key="option.value"
@@ -65,7 +65,7 @@
             </transition>
             <transition name="scale-down">
                 <el-form-item v-if="showDitheringSetting" label="Dithering" prop="dithering">
-                    <el-select v-model="formData.workingFile.dithering" :popper-append-to-body="false">
+                    <el-select v-model="formData.workingFile.dithering">
                         <el-option
                             v-for="option in ditheringOptions"
                             :key="option.value"

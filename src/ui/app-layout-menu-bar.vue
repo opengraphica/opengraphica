@@ -83,7 +83,6 @@
                         :placement="popoverPlacement"
                         :popper-class="'ogr-dock-popover'"
                         :show-after="0"
-                        :append-to-body="false"
                         :popper-options="{ boundariesElement: 'body' }">
                         <template #reference>
                             <el-button
@@ -102,8 +101,7 @@
                 <el-drawer
                     v-model="showMoreActionsMenu"
                     title="Tools and Settings"
-                    :size="300"
-                    :append-to-body="false">
+                    :size="300">
                     <div class="is-position-absolute-full">
                         <el-scrollbar>
                             <el-menu :default-active="activeToolGroup">

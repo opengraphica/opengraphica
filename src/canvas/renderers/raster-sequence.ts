@@ -1,7 +1,7 @@
-import { CanvasRenderingContext2DEnhanced, WorkingFileRasterSequenceLayer, WorkingFileLayerRenderer, ColorModel } from '@/types';
+import { CanvasRenderingContext2DEnhanced, DrawWorkingFileLayerOptions, WorkingFileRasterSequenceLayer, WorkingFileLayerRenderer, ColorModel } from '@/types';
 
 export default class RasterSequenceLayerRenderer implements WorkingFileLayerRenderer<ColorModel> {
-    draw(ctx: CanvasRenderingContext2DEnhanced, layer: WorkingFileRasterSequenceLayer<ColorModel>) {
+    draw(ctx: CanvasRenderingContext2DEnhanced, layer: WorkingFileRasterSequenceLayer<ColorModel>, options: DrawWorkingFileLayerOptions = {}) {
         const frame = layer.data.currentFrame;
         if (frame) {
             ctx.drawImage(

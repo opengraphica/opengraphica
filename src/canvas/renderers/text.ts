@@ -1,4 +1,4 @@
-import { CanvasRenderingContext2DEnhanced, WorkingFileTextLayer, WorkingFileTextLayerSpan, WorkingFileLayerRenderer, ColorModel } from '@/types';
+import { CanvasRenderingContext2DEnhanced, DrawWorkingFileLayerOptions, WorkingFileTextLayer, WorkingFileTextLayerSpan, WorkingFileLayerRenderer, ColorModel } from '@/types';
 import { fontLoadedStatusMap, textLayerCache, textMetaDefaults, TextLayerCacheItem, TextLayerRenderInfoWrap } from '@/canvas/store/text-state';
 import { getFontMetrics, FontMetrics } from '@/lib/metrics';
 import { colorToScreenRgbaHex } from '@/lib/color';
@@ -261,7 +261,7 @@ export default class TextLayerRenderer implements WorkingFileLayerRenderer<Color
         return layerCacheItem;
     }
 
-    draw(ctx: CanvasRenderingContext2DEnhanced, layer: WorkingFileTextLayer<ColorModel>) {
+    draw(ctx: CanvasRenderingContext2DEnhanced, layer: WorkingFileTextLayer<ColorModel>, options: DrawWorkingFileLayerOptions = {}) {
         if (layer.bakedImage) {
             ctx.drawImage(
                 layer.bakedImage as HTMLImageElement,
