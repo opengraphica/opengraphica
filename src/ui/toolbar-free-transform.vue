@@ -40,15 +40,27 @@
                     </template>
                     <h2 class="mt-3 mx-4.5">Metrics</h2>
                     <el-form novalidate="novalidate" action="javascript:void(0)">
-                        <div class="px-4.5 my-3">
-                            <el-button-group class="el-button-group--flex is-fullwidth">
-                                <el-input-number v-model="resizeInputWidth" size="small" class="is-flex-grow-1" :suffix-text="measuringUnits" @input="onInputResizeWidth" />
-                                <el-button size="small" aria-label="Link Width/Height" class="px-3" @click="onToggleDimensionLockRatio()">
-                                    <i :class="['bi', dimensionLockRatio != null ? 'bi-lock-fill' : 'bi-unlock-fill']" aria-hidden="true" />
-                                </el-button>
-                                <el-input-number v-model="resizeInputHeight" size="small" class="is-flex-grow-1" :suffix-text="measuringUnits"  @input="onInputResizeHeight" />
-                            </el-button-group>
+                        <div class="px-4.5 my-3 is-flex">
+                            <el-input-number
+                                v-model="inputLeft" aria-label="X Position" size="small"
+                                class="el-input-group--plain is-flex-grow-1" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputLeft($event)" @blur="onChangeDragResizeInput()">
+                                <template #prepend>X</template>
+                            </el-input-number>
+                            <el-input-number
+                                v-model="inputTop" aria-label="Y Position" size="small"
+                                class="el-input-group--plain is-flex-grow-1 ml-3" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputTop($event)" @blur="onChangeDragResizeInput()">
+                                <template #prepend>Y</template>
+                            </el-input-number>
                         </div>
+                        <el-form-item class="el-form-item--menu-item mb-1" label="Width">
+                            <el-input-number v-model="inputWidth" style="width: 6rem" size="small" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputWidth($event)" @blur="onChangeDragResizeInput()" />
+                        </el-form-item>
+                        <el-form-item class="el-form-item--menu-item mb-1" label="Height">
+                            <el-input-number v-model="inputHeight" style="width: 6rem" size="small" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputHeight($event)" @blur="onChangeDragResizeInput()" />
+                        </el-form-item>
+                        <el-form-item class="el-form-item--menu-item mb-1" label="Rotation">
+                            <el-input-number v-model="inputRotation" style="width: 5rem" size="small" suffix-text="°" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputRotation($event)" @blur="onChangeRotationInput($event)" />
+                        </el-form-item>
                     </el-form>
                 </el-popover>
             </el-horizontal-scrollbar-arrows>
@@ -58,7 +70,7 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent, ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
-import { layerPickMode, useRotationSnapping, width, height } from '@/canvas/store/free-transform-state';
+import { freeTransformEmitter, layerPickMode, useRotationSnapping, top, left, width, height, rotation } from '@/canvas/store/free-transform-state';
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElHorizontalScrollbarArrows from '@/ui/el-horizontal-scrollbar-arrows.vue';
@@ -98,19 +110,33 @@ export default defineComponent({
         const resolutionUnits = ref<WorkingFileState['resolutionUnits']>(workingFileStore.get('resolutionUnits'));
         const dimensionLockRatio = ref<number | null>(null);
 
-        let disableDimensionDragUpdate: boolean = false;
+        let disableInputUpdate: boolean = false;
 
-        const resizeInputWidth = ref<number>(
-            convertUnits(width.value, 'px', measuringUnits.value, resolutionX.value, resolutionUnits.value)
-        );
-        const resizeInputHeight = ref<number>(
-            convertUnits(height.value, 'px', measuringUnits.value, resolutionY.value, resolutionUnits.value)
-        );
+        const inputLeft = ref<number>(0);
+        const inputTop = ref<number>(0);
+        const inputWidth = ref<number>(1);
+        const inputHeight = ref<number>(1);
+        const inputRotation = ref<number>(0);
 
+        watch([left], ([left]) => {
+            if (!disableInputUpdate) {
+                inputLeft.value = parseFloat(convertUnits(left, 'px', measuringUnits.value, resolutionX.value, resolutionUnits.value).toFixed(2));
+            }
+        }, { immediate: true });
+        watch([top], ([top]) => {
+            if (!disableInputUpdate) {
+                inputTop.value = parseFloat(convertUnits(top, 'px', measuringUnits.value, resolutionX.value, resolutionUnits.value).toFixed(2));
+            }
+        }, { immediate: true });
         watch([width, height], ([width, height]) => {
-            if (!disableDimensionDragUpdate) {
-                resizeInputWidth.value = parseFloat(convertUnits(width, 'px', measuringUnits.value, resolutionX.value, resolutionUnits.value).toFixed(measuringUnits.value === 'px' ? 0 : 2));
-                resizeInputHeight.value = parseFloat(convertUnits(height, 'px', measuringUnits.value, resolutionY.value, resolutionUnits.value).toFixed(measuringUnits.value === 'px' ? 0 : 2));
+            if (!disableInputUpdate) {
+                inputWidth.value = parseFloat(convertUnits(width, 'px', measuringUnits.value, resolutionX.value, resolutionUnits.value).toFixed(measuringUnits.value === 'px' ? 0 : 2));
+                inputHeight.value = parseFloat(convertUnits(height, 'px', measuringUnits.value, resolutionY.value, resolutionUnits.value).toFixed(measuringUnits.value === 'px' ? 0 : 2));
+            }
+        }, { immediate: true });
+        watch([rotation], ([rotation]) => {
+            if (!disableInputUpdate) {
+                inputRotation.value = parseFloat((rotation * Math.RADIANS_TO_DEGREES).toFixed(2));
             }
         }, { immediate: true });
 
@@ -122,38 +148,90 @@ export default defineComponent({
             }
         }
 
-        async function onInputResizeWidth(newWidth: number) {
-            disableDimensionDragUpdate = true;
-            width.value = Math.ceil(convertUnits(newWidth, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value));
-            if (dimensionLockRatio.value) {
-                height.value = Math.ceil(width.value / dimensionLockRatio.value);
-                resizeInputHeight.value = parseFloat((newWidth / dimensionLockRatio.value).toFixed(measuringUnits.value === 'px' ? 0 : 2));
-            }
-            await nextTick();
-            disableDimensionDragUpdate = false;
+        function onFocusAnyMetricInput() {
+            freeTransformEmitter.emit('storeTransformStart');
+            disableInputUpdate = true;
         }
 
-        async function onInputResizeHeight(newHeight: number) {
-            disableDimensionDragUpdate = true;
-            height.value = Math.ceil(convertUnits(newHeight, measuringUnits.value, 'px', resolutionY.value, resolutionUnits.value));
-            if (dimensionLockRatio.value) {
-                width.value = Math.ceil(height.value * dimensionLockRatio.value);
-                resizeInputWidth.value = parseFloat((newHeight * dimensionLockRatio.value).toFixed(measuringUnits.value === 'px' ? 0 : 2));
-            }
-            await nextTick();
-            disableDimensionDragUpdate = false;
+        function onInputLeft(left: number) {
+            freeTransformEmitter.emit('previewDragResizeChange', {
+                transform: {
+                    left: convertUnits(left, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+                    top: convertUnits(inputTop.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+                    width: convertUnits(inputWidth.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+                    height: convertUnits(inputHeight.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value)
+                }
+            });
+        }
+
+        function onInputTop(top: number) {
+            freeTransformEmitter.emit('previewDragResizeChange', {
+                transform: {
+                    left: convertUnits(inputLeft.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+                    top: convertUnits(top, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+                    width: convertUnits(inputWidth.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+                    height: convertUnits(inputHeight.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value)
+                }
+            });
+        }
+
+        function onInputWidth(width: number) {
+            freeTransformEmitter.emit('previewDragResizeChange', {
+                transform: {
+                    left: convertUnits(inputLeft.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+                    top: convertUnits(inputTop.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+                    width: convertUnits(width, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+                    height: convertUnits(inputHeight.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value)
+                }
+            });
+        }
+
+        function onInputHeight(height: number) {
+            freeTransformEmitter.emit('previewDragResizeChange', {
+                transform: {
+                    left: convertUnits(inputLeft.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+                    top: convertUnits(inputTop.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+                    width: convertUnits(inputWidth.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+                    height: convertUnits(height, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value)
+                }
+            });
+        }
+
+        function onInputRotation(rotation: number) {
+            freeTransformEmitter.emit('previewRotationChange', {
+                rotation: rotation * Math.DEGREES_TO_RADIANS
+            });
+        }
+
+        function onChangeDragResizeInput() {
+            disableInputUpdate = false;
+            freeTransformEmitter.emit('commitTransforms');
+        }
+
+        function onChangeRotationInput() {
+            disableInputUpdate = false;
+            freeTransformEmitter.emit('commitTransforms');
         }
 
         return {
-            resizeInputWidth,
-            resizeInputHeight,
+            inputLeft,
+            inputTop,
+            inputWidth,
+            inputHeight,
+            inputRotation,
             measuringUnits,
             layerPickMode,
             useRotationSnapping,
             dimensionLockRatio,
             onToggleDimensionLockRatio,
-            onInputResizeWidth,
-            onInputResizeHeight
+            onFocusAnyMetricInput,
+            onInputLeft,
+            onInputTop,
+            onInputWidth,
+            onInputHeight,
+            onInputRotation,
+            onChangeDragResizeInput,
+            onChangeRotationInput
         };
     }
 });

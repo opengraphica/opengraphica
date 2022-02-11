@@ -79,7 +79,7 @@ module.exports = function setupConfig(config) {
                 path.resolve(__dirname, './')
             ],
             modules: [
-                path.join(__dirname, './node_modules')
+                'node_modules'
             ],
             alias: {
                 '@': path.resolve(__dirname, 'src/')

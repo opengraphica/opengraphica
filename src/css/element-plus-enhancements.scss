@@ -368,9 +368,35 @@
         font-size: 0.8125rem;
         line-height: 2rem;
 
+        .el-input-group__prepend, .el-input-group__append {
+            padding: 0 .75rem;
+
+            + .el-input__inner {
+                height: 2.125rem;
+                line-height: 2.125rem;
+            }
+        }
+
         .el-input__inner {
             height: 2rem;
             line-height: 2rem;
+        }
+    }
+    .el-input-group--plain {
+        .el-input-group__prepend, .el-input-group__append {
+            background: transparent;
+            border-color: transparent;
+            color: var(--el-text-color-regular);
+
+            + .el-input__inner {
+                border-radius: var(--el-input-border-radius, var(--el-border-radius-base));
+            }
+        }
+        .el-input-group__prepend {
+            padding-left: 0;
+        }
+        .el-input-group__append {
+            padding-right: 0;
         }
     }
 

@@ -163,6 +163,10 @@ export default defineComponent({
         },
         precision: {
             type: Number
+        },
+        blurOnEnter: {
+            type: Boolean,
+            default: false
         }
     },
     emits: [
@@ -280,6 +284,9 @@ export default defineComponent({
                     e.preventDefault();
                 }
                 onChange();
+                if (props.blurOnEnter) {
+                    blur();
+                }
             }
         }
         function onClear() {

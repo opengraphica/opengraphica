@@ -3,6 +3,7 @@ import { CanvasRenderingContext2DEnhanced } from '@/types';
 import canvasStore from '@/store/canvas';
 import preferencesStore from '@/store/preferences';
 import appEmitter from '@/lib/emitter';
+import { isInput } from '@/lib/events';
 
 export interface PointerTracker {
     id: number,
@@ -97,6 +98,8 @@ export default class BaseCanvasController {
     }
 
     onPointerDown(e: PointerEvent): void {
+        if (isInput(e.target)) return;
+
         const pointer: PointerTracker = {
             id: e.pointerId,
             type: e.pointerType as any,
