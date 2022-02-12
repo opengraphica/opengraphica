@@ -11,6 +11,10 @@ interface CanvasState {
     cursorY: number;
     decomposedTransform: DecomposedMatrix;
     dirty: boolean;
+    dndAreaLeft: number; // devicePixelRatio IS applied.
+    dndAreaTop: number; // devicePixelRatio IS applied.
+    dndAreaWidth: number; // devicePixelRatio IS applied.
+    dndAreaHeight: number; // devicePixelRatio IS applied.
     isBufferInUse: boolean;
     isDisplayingNonRasterLayer: boolean;
     playingAnimation: boolean;
@@ -22,8 +26,8 @@ interface CanvasState {
     viewCanvas: HTMLCanvasElement;
     viewCtx: CanvasRenderingContext2DEnhanced;
     viewDirty: boolean;
-    viewHeight: number;
-    viewWidth: number;
+    viewHeight: number; // Maps to screen height; devicePixelRatio IS applied.
+    viewWidth: number; // Maps to screen width; devicePixelRatio IS applied.
     workingImageBorderColor: string;
 }
 
@@ -52,6 +56,10 @@ const store = new PerformantStore<CanvasStore>({
         cursorY: 0,
         decomposedTransform: decomposeMatrix(new DOMMatrix),
         dirty: true,
+        dndAreaLeft: 0, // devicePixelRatio IS applied.
+        dndAreaTop: 0,  // devicePixelRatio IS applied.
+        dndAreaWidth: 1,  // devicePixelRatio IS applied.
+        dndAreaHeight: 1,  // devicePixelRatio IS applied.
         isBufferInUse: false,
         isDisplayingNonRasterLayer: false,
         playingAnimation: false,
@@ -63,8 +71,8 @@ const store = new PerformantStore<CanvasStore>({
         viewCanvas: dummyCanvas,
         viewCtx: dummyCanvas.getContext('2d') as CanvasRenderingContext2DEnhanced,
         viewDirty: true,
-        viewHeight: 100, // Maps to screen height
-        viewWidth: 100, // Maps to screen width
+        viewHeight: 100, // Maps to screen height; devicePixelRatio IS applied.
+        viewWidth: 100, // Maps to screen width; devicePixelRatio IS applied.
         workingImageBorderColor: '#cccccc'
     },
     nonReactive: ['bufferCanvas', 'bufferCtx', 'isDisplayingNonRasterLayer', 'viewCanvas', 'viewCtx'],
@@ -96,12 +104,11 @@ const store = new PerformantStore<CanvasStore>({
                     decomposedTransform.translateY = value.y;
                 }
 
-                const devicePixelRatio = window.devicePixelRatio || 1;
                 const transform = store.get('transform');
 
                 // TODO - Take sidebars into account
-                const handleX = store.get('viewWidth') / 2 * devicePixelRatio;
-                const handleY = store.get('viewHeight') / 2 * devicePixelRatio;
+                const handleX = store.get('dndAreaLeft') + (store.get('dndAreaWidth') / 2);
+                const handleY = store.get('dndAreaTop') + (store.get('dndAreaHeight') / 2);
 
                 const point = new DOMPoint(handleX, handleY).matrixTransform(transform.inverse());
                 transform.translateSelf(point.x, point.y);

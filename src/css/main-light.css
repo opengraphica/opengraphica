@@ -24851,10 +24851,10 @@ body.ogr-full-page .opengraphica {
   border-radius: var(--el-input-border-radius, var(--el-border-radius-base));
 }
 .opengraphica .el-input-group--plain .el-input-group__prepend {
-  padding-left: 0;
+  padding-left: 0 !important;
 }
 .opengraphica .el-input-group--plain .el-input-group__append {
-  padding-right: 0;
+  padding-right: 0 !important;
 }
 .opengraphica .el-loading-spinner {
   margin: 0 !important;

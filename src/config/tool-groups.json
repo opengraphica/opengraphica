@@ -69,7 +69,11 @@
             "zoom": {
                 "name": "Zoom",
                 "description": "Zoom in and out the canvas to control how much of the image you can see.",
-                "controller": "zoom"
+                "controller": "zoom",
+                "toolbar": {
+                    "position": "auto",
+                    "target": "zoom"
+                }
             }
         }
     }

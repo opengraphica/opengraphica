@@ -1,5 +1,5 @@
 <template>
-    <div class="ogr-layout-dnd-container">
+    <div ref="dndContainer" class="ogr-layout-dnd-container">
         <header ref="header">
             <h1 class="is-sr-only">OpenGraphica</h1>
             <template v-if="!isActiveToolbarExclusive && config.menuBar && menuBarPosition === 'top'">
@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, Ref, computed, onMounted, onUnmounted } from 'vue';
+import { defineComponent, ref, Ref, toRefs, computed, watch, onMounted, onUnmounted } from 'vue';
 import AppLayoutMenuBar from '@/ui/app-layout-menu-bar.vue';
 import Toolbar from '@/ui/toolbar.vue';
 import defaultDndLayoutConfig from '@/config/default-dnd-layout.json';
@@ -54,10 +54,13 @@ export default defineComponent({
     },
     emits: ['dnd-ready'],
     setup(props, { emit }) {
+        const dndContainerElement = ref<Element>();
         const mainElement = ref<Element>();
         const config = ref<DndLayout>(defaultDndLayoutConfig.dndLayout as DndLayout);
         const isPointerInsideMain = ref<boolean>(false);
         const isPointerEventsSupported: boolean = 'onpointerdown' in document.body;
+
+        const { viewWidth, viewHeight } = toRefs(canvasStore.state);
 
         const activeToolbar = computed<string | null>(() => {
             return editorStore.state.activeToolbar;
@@ -70,6 +73,22 @@ export default defineComponent({
         });
         const menuBarPosition = computed<string>(() => {
             return preferencesStore.state.menuBarPosition;
+        });
+
+        let storeDndAreaDebounceHandle: number | undefined = undefined;
+        watch([viewWidth, viewHeight, menuBarPosition], () => {
+            clearTimeout(storeDndAreaDebounceHandle);
+            storeDndAreaDebounceHandle = window.setTimeout(() => {
+                if (dndContainerElement.value && mainElement.value) {
+                    const dndContainerRect = dndContainerElement.value.getBoundingClientRect();
+                    const mainRect = mainElement.value.getBoundingClientRect();
+                    const devicePixelRatio = window.devicePixelRatio || 1;
+                    canvasStore.set('dndAreaLeft', (mainRect.left - dndContainerRect.left) * devicePixelRatio);
+                    canvasStore.set('dndAreaTop', (mainRect.top - dndContainerRect.top) * devicePixelRatio);
+                    canvasStore.set('dndAreaWidth', mainRect.width * devicePixelRatio);
+                    canvasStore.set('dndAreaHeight', mainRect.height * devicePixelRatio);
+                }
+            }, 400);
         });
 
         onMounted(() => {
@@ -137,6 +156,7 @@ export default defineComponent({
         };
 
         return {
+            dndContainer: dndContainerElement,
             main: mainElement,
             config,
             canvasState: canvasStore.state,

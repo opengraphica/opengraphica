@@ -23,7 +23,8 @@ export default defineComponent({
     },
     components: {
         'crop-resize': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-crop-resize' */ `./toolbar-crop-resize.vue`)),
-        'free-transform': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-free-transform' */ `./toolbar-free-transform.vue`))
+        'free-transform': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-free-transform' */ `./toolbar-free-transform.vue`)),
+        'zoom': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-zoom' */ `./toolbar-zoom.vue`))
     },
     emits: [
     ],

@@ -40,6 +40,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     private transformStartDimensions: TransformInfo = { top: 0, left: 0, width: 0, height: 0, rotation: 0, handleToRotationOrigin: 0 };
     private transformStartLayerData: { transform: DOMMatrix }[] = [];
     private transformDragType: number = 0;
+    private transformIsDragging: boolean = false;
     private transformIsRotating: boolean = false;
 
     private setBoundsDebounceHandle: number | undefined;
@@ -104,6 +105,9 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
         this.storeTransformStart(viewTransformPoint);
 
+        this.transformIsRotating = false;
+        this.transformIsDragging = false;
+
         // Determine which dimensions to drag on
         if (this.isPointOnRotateHandle(transformBoundsPoint, viewDecomposedTransform)) {
             this.transformIsRotating = true;
@@ -115,7 +119,6 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             this.transformDragType = DRAG_TYPE_ALL;
             dragHandleHighlight.value = null;
         } else {
-            this.transformIsRotating = false;
             rotateHandleHighlight.value = false;
             let transformDragType = this.getTransformDragType(transformBoundsPoint, viewDecomposedTransform);
             if (transformDragType != null) {
@@ -126,6 +129,9 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 } else {
                     this.transformTranslateStart = null;
                 }
+            }
+            if (!transformDragType != null) {
+                this.transformIsDragging = true;
             }
             dragHandleHighlight.value = transformDragType;
         }
@@ -152,7 +158,6 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
     onPointerMove(e: PointerEvent) {
         super.onPointerMove(e);
-        if (isInput(e.target)) return;
         if (e.isPrimary && this.transformTranslateStart) {
             const { viewTransformPoint } = this.getTransformedCursorInfo();
             const { shouldMaintainAspectRatio, shouldScaleDuringResize, shouldSnapRotationDegrees } = this.getTransformOptions();
@@ -174,7 +179,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 this.previewRotationChange(this.transformStartDimensions.rotation + rotationDelta);
             }
             // Drag/Resize
-            else {
+            else if (this.transformIsDragging) {
 
                 const isDragAll = this.transformDragType === DRAG_TYPE_ALL;
                 let isDragLeft = Math.floor(this.transformDragType / DRAG_TYPE_LEFT) % 2 === 1;
@@ -264,7 +269,6 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         if (!this.transformTranslateStart && e.isPrimary && ['mouse', 'pen'].includes(e.pointerType)) {
             const { transformBoundsPoint, viewDecomposedTransform } = this.getTransformedCursorInfo();
             if (this.isPointOnRotateHandle(transformBoundsPoint, viewDecomposedTransform)) {
-                this.transformIsRotating = true;
                 rotateHandleHighlight.value = true;
                 dragHandleHighlight.value = null;
             } else {
@@ -420,6 +424,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         previewYSnap.value = [];
         this.transformTranslateStart = null;
         this.transformIsRotating = false;
+        this.transformIsDragging = false;
 
         if (
             left.value != this.transformStartDimensions.left ||
