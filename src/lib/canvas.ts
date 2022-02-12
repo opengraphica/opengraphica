@@ -116,7 +116,7 @@ export function drawWorkingFileToCanvas(canvas: HTMLCanvasElement, ctx: CanvasRe
         ctx.shadowOffsetX = 0;
         ctx.shadowOffsetY = 0;
         ctx.shadowColor = canvasStore.get('workingImageBorderColor');
-        ctx.shadowBlur = 20;
+        ctx.shadowBlur = 20 * decomposedTransform.scaleX;
     }
     ctx.lineWidth = canvasBorderSize;
     ctx.fillStyle = 'white';

@@ -3,6 +3,7 @@ import BaseCanvasMovementController from './base-movement';
 import { layerPickMode, useRotationSnapping, freeTransformEmitter, top, left, width, height, rotation, transformOriginX, transformOriginY, dimensionLockRatio, previewXSnap, previewYSnap, dragHandleHighlight, rotateHandleHighlight } from '../store/free-transform-state';
 import canvasStore from '@/store/canvas';
 import historyStore from '@/store/history';
+import preferencesStore from '@/store/preferences';
 import workingFileStore, { getLayerById } from '@/store/working-file';
 import { ColorModel, DrawWorkingFileOptions, UpdateAnyLayerOptions, WorkingFileLayer } from '@/types';
 import { DecomposedMatrix, decomposeMatrix } from '@/lib/dom-matrix';
@@ -141,6 +142,12 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 this.onTransformDown();
             }
         }
+
+        if (this.transformTranslateStart) {
+            preferencesStore.set('useCanvasViewport', true);
+            canvasStore.set('useCssViewport', false);
+            canvasStore.set('viewDirty', true);
+        }
     }
 
     onPointerMove(e: PointerEvent) {
@@ -277,6 +284,10 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         if (e.isPrimary) {
             if (this.transformTranslateStart) {
                 this.commitTransforms();
+                if (!preferencesStore.get('preferCanvasViewport')) {
+                    preferencesStore.set('useCanvasViewport', false);
+                    canvasStore.set('useCssViewport', true);
+                }
             }
             dragHandleHighlight.value = null;
         }

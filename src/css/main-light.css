@@ -24831,16 +24831,16 @@ body.ogr-full-page .opengraphica {
   font-size: 0.8125rem;
   line-height: 2rem;
 }
-.opengraphica .el-input--small .el-input-group__prepend, .opengraphica .el-input--small .el-input-group__append {
-  padding: 0 0.75rem;
-}
-.opengraphica .el-input--small .el-input-group__prepend + .el-input__inner, .opengraphica .el-input--small .el-input-group__append + .el-input__inner {
-  height: 2.125rem;
-  line-height: 2.125rem;
-}
 .opengraphica .el-input--small .el-input__inner {
   height: 2rem;
   line-height: 2rem;
+}
+.opengraphica .el-input--small.el-input-group .el-input-group__prepend, .opengraphica .el-input--small.el-input-group .el-input-group__append {
+  padding: 0 0.75rem;
+}
+.opengraphica .el-input--small.el-input-group .el-input__inner {
+  height: 2.125rem;
+  line-height: 2.125rem;
 }
 .opengraphica .el-input-group--plain .el-input-group__prepend, .opengraphica .el-input-group--plain .el-input-group__append {
   background: transparent;

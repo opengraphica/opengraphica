@@ -39,6 +39,7 @@ import AppLayoutMenuBar from '@/ui/app-layout-menu-bar.vue';
 import Toolbar from '@/ui/toolbar.vue';
 import defaultDndLayoutConfig from '@/config/default-dnd-layout.json';
 import { translateTouchEventToPointerEvents } from '@/lib/events';
+import { isInput } from '@/lib/events';
 import { DndLayout } from '@/types';
 
 import canvasStore from '@/store/canvas';
@@ -91,8 +92,14 @@ export default defineComponent({
 
         function onTouchStartMain(e: TouchEvent) {
             e.preventDefault();
-            for (const event of translateTouchEventToPointerEvents('pointerdown', e)) {
-                editorStore.get('toolCanvasController').onPointerDown(event);
+            if (e.target == mainElement.value) {
+                const activeElement: any = document.activeElement;
+                if (activeElement && activeElement?.blur && isInput(activeElement)) {
+                    activeElement?.blur();
+                }
+                for (const event of translateTouchEventToPointerEvents('pointerdown', e)) {
+                    editorStore.get('toolCanvasController').onPointerDown(event);
+                }
             }
             (document.body as any).focus();
             return false;

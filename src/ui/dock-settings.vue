@@ -436,6 +436,7 @@ export default defineComponent({
             set(value) {
                 preferencesStore.set('preferCanvasViewport', value);
                 preferencesStore.set('useCanvasViewport', value);
+                canvasStore.set('useCssViewport', !value);
                 canvasStore.set('viewDirty', true);
             }
         });

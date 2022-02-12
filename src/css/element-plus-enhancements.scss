@@ -368,18 +368,19 @@
         font-size: 0.8125rem;
         line-height: 2rem;
 
-        .el-input-group__prepend, .el-input-group__append {
-            padding: 0 .75rem;
-
-            + .el-input__inner {
-                height: 2.125rem;
-                line-height: 2.125rem;
-            }
-        }
-
         .el-input__inner {
             height: 2rem;
             line-height: 2rem;
+        }
+
+        &.el-input-group {
+            .el-input-group__prepend, .el-input-group__append {
+                padding: 0 .75rem;
+            }
+            .el-input__inner {
+                height: 2.125rem;
+                line-height: 2.125rem;
+            }
         }
     }
     .el-input-group--plain {

@@ -71,8 +71,8 @@ export default defineComponent({
                     postProcessCanvas.value.width = canvasElement.width;
                     postProcessCanvas.value.height = canvasElement.height;
                 }
-                bufferCanvas.width = 1;    
-                bufferCanvas.height = 1;    
+                bufferCanvas.width = 1;
+                bufferCanvas.height = 1;
             } else {
                 (canvasContainer.value as HTMLDivElement).style.transform = '';
                 canvasElement.width = viewportWidth.value;
@@ -338,7 +338,7 @@ export default defineComponent({
                     postProcessCancel();
                     postProcessCancel = null;
                 }
-                drawPostProcessTimeoutHandle = setTimeout(() => {
+                drawPostProcessTimeoutHandle = window.setTimeout(() => {
                     const decomposedTransform = canvasStore.get('decomposedTransform');
                     postProcessCanvasElement.width = Math.floor(canvasElement.width * decomposedTransform.scaleX);
                     postProcessCanvasElement.height = Math.floor(canvasElement.height * decomposedTransform.scaleX);

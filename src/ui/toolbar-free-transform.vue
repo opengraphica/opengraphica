@@ -39,29 +39,47 @@
                         </el-button>
                     </template>
                     <h2 class="mt-3 mx-4.5">Metrics</h2>
-                    <el-form novalidate="novalidate" action="javascript:void(0)">
-                        <div class="px-4.5 my-3 is-flex">
-                            <el-input-number
-                                v-model="inputLeft" aria-label="X Position" size="small"
-                                class="el-input-group--plain is-flex-grow-1" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputLeft($event)" @blur="onChangeDragResizeInput()">
-                                <template #prepend>X</template>
-                            </el-input-number>
-                            <el-input-number
-                                v-model="inputTop" aria-label="Y Position" size="small"
-                                class="el-input-group--plain is-flex-grow-1 ml-3" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputTop($event)" @blur="onChangeDragResizeInput()">
-                                <template #prepend>Y</template>
-                            </el-input-number>
+                    <template v-if="selectedLayerIds.length > 0">
+                        <el-form novalidate="novalidate" action="javascript:void(0)">
+                            <div class="px-4.5 my-3 is-flex">
+                                <el-input-number
+                                    v-model="inputLeft" aria-label="X Position" size="small"
+                                    class="el-input-group--plain is-flex-grow-1" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputLeft($event)" @blur="onChangeDragResizeInput()">
+                                    <template #prepend>X</template>
+                                </el-input-number>
+                                <el-input-number
+                                    v-model="inputTop" aria-label="Y Position" size="small"
+                                    class="el-input-group--plain is-flex-grow-1 ml-3" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputTop($event)" @blur="onChangeDragResizeInput()">
+                                    <template #prepend>Y</template>
+                                </el-input-number>
+                            </div>
+                            <el-form-item class="el-form-item--menu-item mb-1" label="Width">
+                                <el-input-number v-model="inputWidth" style="width: 6rem" size="small" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputWidth($event)" @blur="onChangeDragResizeInput()" />
+                            </el-form-item>
+                            <el-form-item class="el-form-item--menu-item mb-1" label="Height">
+                                <el-input-number v-model="inputHeight" style="width: 6rem" size="small" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputHeight($event)" @blur="onChangeDragResizeInput()" />
+                            </el-form-item>
+                            <el-form-item class="el-form-item--menu-item mb-1" label="Rotation">
+                                <el-input-number v-model="inputRotation" style="width: 6rem" size="small" suffix-text="°" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputRotation($event)" @blur="onChangeRotationInput($event)">
+                                    <template #append>
+                                        <el-button size="small" aria-label="Reset Rotation" @click="onResetRotation()">
+                                            <span class="bi bi-arrow-repeat" aria-hidden="true"></span>
+                                        </el-button>
+                                    </template>
+                                </el-input-number>
+                            </el-form-item>
+                        </el-form>
+                    </template>
+                    <template v-else>
+                        <div class="px-4.5 my-3">
+                            <el-alert
+                                type="info"
+                                title="No layer(s) selected."
+                                show-icon
+                                :closable="false">
+                            </el-alert>
                         </div>
-                        <el-form-item class="el-form-item--menu-item mb-1" label="Width">
-                            <el-input-number v-model="inputWidth" style="width: 6rem" size="small" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputWidth($event)" @blur="onChangeDragResizeInput()" />
-                        </el-form-item>
-                        <el-form-item class="el-form-item--menu-item mb-1" label="Height">
-                            <el-input-number v-model="inputHeight" style="width: 6rem" size="small" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputHeight($event)" @blur="onChangeDragResizeInput()" />
-                        </el-form-item>
-                        <el-form-item class="el-form-item--menu-item mb-1" label="Rotation">
-                            <el-input-number v-model="inputRotation" style="width: 5rem" size="small" suffix-text="°" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputRotation($event)" @blur="onChangeRotationInput($event)" />
-                        </el-form-item>
-                    </el-form>
+                    </template>
                 </el-popover>
             </el-horizontal-scrollbar-arrows>
         </div>
@@ -71,12 +89,13 @@
 <script lang="ts">
 import { defineComponent, defineAsyncComponent, ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
 import { freeTransformEmitter, layerPickMode, useRotationSnapping, top, left, width, height, rotation } from '@/canvas/store/free-transform-state';
+import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElHorizontalScrollbarArrows from '@/ui/el-horizontal-scrollbar-arrows.vue';
 import ElInputGroup from '@/ui/el-input-group.vue';
 import ElInputNumber from '@/ui/el-input-number.vue';
-import ElPopover from 'element-plus/lib/components/popover/index';
+import ElPopover from '@/ui/el-popover.vue';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSwitch from 'element-plus/lib/components/switch/index';
 import workingFileStore, { WorkingFileState } from '@/store/working-file';
@@ -85,6 +104,7 @@ import { convertUnits } from '@/lib/metrics';
 export default defineComponent({
     name: 'ToolbarFreeTransform',
     components: {
+        ElAlert,
         ElButton,
         ElButtonGroup,
         ElForm,
@@ -104,6 +124,7 @@ export default defineComponent({
         'close'
     ],
     setup(props, { emit }) {
+        const { selectedLayerIds } = toRefs(workingFileStore.state);
         const measuringUnits = ref<WorkingFileState['measuringUnits']>(workingFileStore.get('measuringUnits'));
         const resolutionX = ref<number>(workingFileStore.get('resolutionX'));
         const resolutionY = ref<number>(workingFileStore.get('resolutionY'));
@@ -213,6 +234,14 @@ export default defineComponent({
             freeTransformEmitter.emit('commitTransforms');
         }
 
+        function onResetRotation() {
+            freeTransformEmitter.emit('storeTransformStart');
+            freeTransformEmitter.emit('previewRotationChange', {
+                rotation: 0
+            });
+            freeTransformEmitter.emit('commitTransforms');
+        }
+
         return {
             inputLeft,
             inputTop,
@@ -223,6 +252,7 @@ export default defineComponent({
             layerPickMode,
             useRotationSnapping,
             dimensionLockRatio,
+            selectedLayerIds,
             onToggleDimensionLockRatio,
             onFocusAnyMetricInput,
             onInputLeft,
@@ -231,7 +261,8 @@ export default defineComponent({
             onInputHeight,
             onInputRotation,
             onChangeDragResizeInput,
-            onChangeRotationInput
+            onChangeRotationInput,
+            onResetRotation
         };
     }
 });

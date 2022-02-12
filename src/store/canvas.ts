@@ -17,6 +17,7 @@ interface CanvasState {
     preventPostProcess: boolean;
     transform: DOMMatrix;
     transformResetOptions: undefined | true | CanvasViewResetOptions;
+    useCssCanvas: boolean;
     useCssViewport: boolean;
     viewCanvas: HTMLCanvasElement;
     viewCtx: CanvasRenderingContext2DEnhanced;
@@ -57,6 +58,7 @@ const store = new PerformantStore<CanvasStore>({
         preventPostProcess: false,
         transform: new DOMMatrix(),
         transformResetOptions: undefined,
+        useCssCanvas: true,
         useCssViewport: false,
         viewCanvas: dummyCanvas,
         viewCtx: dummyCanvas.getContext('2d') as CanvasRenderingContext2DEnhanced,
