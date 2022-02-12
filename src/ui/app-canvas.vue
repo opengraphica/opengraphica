@@ -118,10 +118,6 @@ export default defineComponent({
             canvasStore.set('dirty', true);
         });
 
-        watch([mainElement], () => {
-            resetTransform();
-        }, { immediate: true });
-
         onMounted(async () => {
             if (canvas.value) {                
                 const imageWidth = workingFileStore.get('width');
@@ -186,6 +182,7 @@ export default defineComponent({
 
         // Centers the canvas and displays at 1x zoom or the maximum width/height of the window, whichever is smaller. 
         async function resetTransform(event?: AppEmitterEvents['app.canvas.resetTransform']) {
+            appEmitter.emit('app.canvas.calculateDndArea');
             const margin: number = (event && event.margin) || 48;
             if (canvasArea.value && ctx && mainElement) {
                 const devicePixelRatio = window.devicePixelRatio || 1;
@@ -196,8 +193,8 @@ export default defineComponent({
                 let scaledWidth = imageWidth;
                 let scaledHeight = imageHeight;
                 const imageSizeRatio = imageWidth / imageHeight;
-                const widthToDisplayRatio = imageWidth / (mainRect.width - margin) / devicePixelRatio;
-                const heightToDisplayRatio = imageHeight / (mainRect.height - margin) / devicePixelRatio;
+                const widthToDisplayRatio = imageWidth / (canvasStore.get('dndAreaWidth') / devicePixelRatio - margin) / devicePixelRatio;
+                const heightToDisplayRatio = imageHeight / (canvasStore.get('dndAreaHeight') / devicePixelRatio - margin) / devicePixelRatio;
                 if (widthToDisplayRatio > 1 && widthToDisplayRatio > heightToDisplayRatio) {
                     scaledWidth = imageWidth / widthToDisplayRatio;
                     scaledHeight = scaledWidth / imageSizeRatio;
@@ -205,8 +202,8 @@ export default defineComponent({
                     scaledHeight = imageHeight / heightToDisplayRatio;
                     scaledWidth = scaledHeight * imageSizeRatio;
                 }
-                const centerX = ((mainRect.left - canvasAreaRect.left) + ((mainRect.right - mainRect.left) / 2)) * devicePixelRatio;
-                const centerY = ((mainRect.top - canvasAreaRect.top) + ((mainRect.bottom - mainRect.top) / 2)) * devicePixelRatio;
+                const centerX = canvasStore.get('dndAreaLeft') + (canvasStore.get('dndAreaWidth') / 2);
+                const centerY = canvasStore.get('dndAreaTop') + (canvasStore.get('dndAreaHeight') / 2);
                 const transform = new DOMMatrix();
                 transform.translateSelf(Math.round(centerX - (scaledWidth / 2)), Math.round(centerY - (scaledHeight / 2)));
                 if (widthToDisplayRatio > 1 || heightToDisplayRatio > 1) {

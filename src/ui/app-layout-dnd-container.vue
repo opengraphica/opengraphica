@@ -27,17 +27,18 @@
             </aside>
         </div>
         <footer ref="footer">
-            <toolbar v-if="activeToolbar && ['bottom', 'auto'].includes(activeToolbarPosition)" :name="activeToolbar" :class="['is-bottom', 'is-menu-bar-' + menuBarPosition, { 'is-overlay': !isActiveToolbarExclusive }]" />
+            <toolbar ref="toolbar" v-if="activeToolbar && ['bottom', 'auto'].includes(activeToolbarPosition)" :name="activeToolbar" :class="['is-bottom', 'is-menu-bar-' + menuBarPosition, { 'is-overlay': !isActiveToolbarExclusive }]" />
             <app-layout-menu-bar v-if="!isActiveToolbarExclusive && config.menuBar && menuBarPosition === 'bottom'" :config="config.menuBar" layout-placement="bottom" />
         </footer>
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, Ref, toRefs, computed, watch, onMounted, onUnmounted } from 'vue';
+import { defineComponent, ref, Ref, toRefs, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import AppLayoutMenuBar from '@/ui/app-layout-menu-bar.vue';
 import Toolbar from '@/ui/toolbar.vue';
 import defaultDndLayoutConfig from '@/config/default-dnd-layout.json';
+import appEmitter from '@/lib/emitter';
 import { translateTouchEventToPointerEvents } from '@/lib/events';
 import { isInput } from '@/lib/events';
 import { DndLayout } from '@/types';
@@ -56,6 +57,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const dndContainerElement = ref<Element>();
         const mainElement = ref<Element>();
+        const toolbarComponent = ref<InstanceType<typeof Toolbar>>();
         const config = ref<DndLayout>(defaultDndLayoutConfig.dndLayout as DndLayout);
         const isPointerInsideMain = ref<boolean>(false);
         const isPointerEventsSupported: boolean = 'onpointerdown' in document.body;
@@ -76,38 +78,50 @@ export default defineComponent({
         });
 
         let storeDndAreaDebounceHandle: number | undefined = undefined;
-        watch([viewWidth, viewHeight, menuBarPosition], () => {
+        watch([viewWidth, viewHeight, menuBarPosition, activeToolbar], () => {
             clearTimeout(storeDndAreaDebounceHandle);
             storeDndAreaDebounceHandle = window.setTimeout(() => {
-                if (dndContainerElement.value && mainElement.value) {
-                    const dndContainerRect = dndContainerElement.value.getBoundingClientRect();
-                    const mainRect = mainElement.value.getBoundingClientRect();
-                    const devicePixelRatio = window.devicePixelRatio || 1;
-                    canvasStore.set('dndAreaLeft', (mainRect.left - dndContainerRect.left) * devicePixelRatio);
-                    canvasStore.set('dndAreaTop', (mainRect.top - dndContainerRect.top) * devicePixelRatio);
-                    canvasStore.set('dndAreaWidth', mainRect.width * devicePixelRatio);
-                    canvasStore.set('dndAreaHeight', mainRect.height * devicePixelRatio);
-                }
+                calculateDndArea();
             }, 400);
         });
 
-        onMounted(() => {
+        onMounted(async () => {
             editorStore.dispatch('setActiveTool', { group: 'view' });
 
+            appEmitter.on('app.canvas.calculateDndArea', calculateDndArea);
             window.addEventListener('touchmove', onTouchMoveWindow);
             window.addEventListener('touchend', onTouchEndWindow);
             window.addEventListener('pointerup', onPointerUpWindow);
             window.addEventListener('pointermove', onPointerMoveWindow);
 
             emit('dnd-ready', { mainElement: mainElement.value });
+            appEmitter.emit('app.canvas.resetTransform');
         });
 
         onUnmounted(() => {
+            appEmitter.off('app.canvas.calculateDndArea', calculateDndArea);
             window.removeEventListener('touchmove', onTouchMoveWindow);
             window.removeEventListener('touchend', onTouchEndWindow);
             window.removeEventListener('pointerup', onPointerUpWindow);
             window.removeEventListener('pointermove', onPointerMoveWindow);
         });
+
+        function calculateDndArea() {
+            if (dndContainerElement.value && mainElement.value) {
+                let toolbarHeight = 0;
+                const dndContainerRect = dndContainerElement.value.getBoundingClientRect();
+                const mainRect = mainElement.value.getBoundingClientRect();
+                if (toolbarComponent.value?.$el) {
+                    const toolbarRect = toolbarComponent.value.$el.getBoundingClientRect();
+                    toolbarHeight = toolbarRect.height;
+                }
+                const devicePixelRatio = window.devicePixelRatio || 1;
+                canvasStore.set('dndAreaLeft', (mainRect.left - dndContainerRect.left) * devicePixelRatio);
+                canvasStore.set('dndAreaTop', (mainRect.top - dndContainerRect.top) * devicePixelRatio);
+                canvasStore.set('dndAreaWidth', mainRect.width * devicePixelRatio);
+                canvasStore.set('dndAreaHeight', (mainRect.height - toolbarHeight) * devicePixelRatio);
+            }
+        }
 
         function onTouchStartMain(e: TouchEvent) {
             e.preventDefault();
@@ -158,6 +172,7 @@ export default defineComponent({
         return {
             dndContainer: dndContainerElement,
             main: mainElement,
+            toolbar: toolbarComponent,
             config,
             canvasState: canvasStore.state,
             activeToolbar,

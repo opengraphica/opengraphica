@@ -568,6 +568,24 @@ body.ogr-full-page {
     }
     .ogr-menu-drawer__content {
         padding: .5rem 0;
+        flex-grow: 1;
+        overflow: hidden;
+
+        .ogr-dock {
+            height: 100%;
+
+            > .el-tabs {
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+
+                > .el-tabs__content {
+                    > .el-tab-pane {
+                        height: 100%;
+                    }
+                }
+            }
+        }
     }
 
     .ogr-layout-menu-bar {
@@ -988,7 +1006,7 @@ body.ogr-full-page {
         outline: 999999px solid var(--ogr-overlay-background-color);
 
         .ogr-crop-bounds {
-            border: 0.3rem solid rgba(235, 235, 235, 0.7);
+            outline: 0.35rem solid rgba(235, 235, 235, 0.7);
             box-sizing: border-box;
             position: absolute;
             top: 0;

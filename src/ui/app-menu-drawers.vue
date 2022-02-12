@@ -6,16 +6,14 @@
                 <a href="javascript:void(0)" class="ogr-menu-drawer__close" title="Close" @click="onMenuDrawerClosed(menuDrawer)">
                     <span class="bi bi-x-circle-fill" aria-hidden="true" />
                 </a>
-                <el-scrollbar>
-                    <div class="ogr-menu-drawer__content">
-                        <template v-if="menuDrawer.type === 'dock'">
-                            <dock :name="menuDrawer.dock.name" @update:title="menuDrawer.title = $event" @close="onMenuDrawerClosed(menuDrawer)" />
-                        </template>
-                        <template v-else-if="menuDrawer.type === 'module'">
-                            <module :name="menuDrawer.module.name" @update:title="menuDrawer.title = $event" @close="onMenuDrawerClosed(menuDrawer)" />
-                        </template>
-                    </div>
-                </el-scrollbar>
+                <div class="ogr-menu-drawer__content">
+                    <template v-if="menuDrawer.type === 'dock'">
+                        <dock :name="menuDrawer.dock.name" @update:title="menuDrawer.title = $event" @close="onMenuDrawerClosed(menuDrawer)" />
+                    </template>
+                    <template v-else-if="menuDrawer.type === 'module'">
+                        <module :name="menuDrawer.module.name" @update:title="menuDrawer.title = $event" @close="onMenuDrawerClosed(menuDrawer)" />
+                    </template>
+                </div>
             </section>
         </template>
     </div>

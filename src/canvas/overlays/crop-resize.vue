@@ -1,7 +1,7 @@
 <template>
     <div class="ogr-canvas-overlay">
         <div ref="crop" class="ogr-crop" :style="{ top: top + 'px', left: left + 'px', width: width + 'px', height: height + 'px' }">
-            <div class="ogr-crop-bounds" :style="{ borderWidth: (0.35/zoom) + 'rem' }"></div>
+            <div class="ogr-crop-bounds" :style="{ outlineWidth: (0.35/zoom) + 'rem' }"></div>
             <div class="ogr-crop-handle-top" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
                     <path v-if="showHorizontalHandles" d="M1.5 1.5 L98.5 1.5 L98.5 25 L1.5 25 Z"

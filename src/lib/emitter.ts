@@ -3,6 +3,7 @@ import { NotificationProps } from 'element-plus/lib/components/notification/src/
 import { CanvasViewResetOptions } from '@/types';
 
 interface AppEmitterEvents {
+    'app.canvas.calculateDndArea': undefined;
     'app.canvas.resetTransform': undefined | CanvasViewResetOptions;
     'app.component.register': any;
     'app.dialogs.openFromDock': {
