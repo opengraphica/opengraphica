@@ -9,7 +9,16 @@
             Either the device has no cameras or access to the camera was declined.
         </el-alert>
         <template v-else>
-            <video ref="video" autoplay="true" style="width: 100%"></video>
+            <el-select v-if="trackList.length > 0" v-model="activeTrackId" class="mx-0 mt-0 mb-2 is-fullwidth" placeholder="Select Track">
+                <el-option
+                    v-for="item in trackList"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                >
+                </el-option>
+            </el-select>
+            <video ref="video" autoplay="true" class="is-fullwidth"></video>
             <div class="has-text-right mt-4">
                 <el-button @click="onCancel">Cancel</el-button>
                 <el-button type="primary" @click="onTake">Take</el-button>
@@ -24,10 +33,11 @@
  * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
 
-import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
+import { defineComponent, ref, computed, onMounted, onUnmounted } from 'vue';
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton from 'element-plus/lib/components/button/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
+import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import historyStore from '@/store/history';
 import workingFileStore from '@/store/working-file';
 import { notifyInjector, unexpectedErrorMessage } from '@/lib/notify';
@@ -44,7 +54,9 @@ export default defineComponent({
     },
     components: {
         ElAlert,
-        ElButton
+        ElButton,
+        ElOption,
+        ElSelect
     },
     emits: [
         'update:title',
@@ -56,18 +68,54 @@ export default defineComponent({
         const $notify = notifyInjector('$notify');
         const loading = ref<boolean>(true);
         const video = ref<HTMLVideoElement>();
+        const stream = ref<MediaStream | null>(null);
         const tracks = ref<MediaStreamTrack[]>();
-        const activeTrack = ref<MediaStreamTrack>();
+        const activeTrack = ref<MediaStreamTrack | null>(null);
         const hasCameraError = ref<boolean>(false);
         let videoElement: HTMLVideoElement;
+
+        const activeTrackId = computed<string | null>({
+            get() {
+                if (activeTrack.value) {
+                    return activeTrack.value.id;
+                } else {
+                    return null;
+                }
+            },
+            set(value) {
+                let active: MediaStreamTrack | null = null;
+                if (tracks.value) {
+                    for (const track of tracks.value) {
+                        if (track.id === value) {
+                            active = track;
+                            break;
+                        }
+                    }
+                }
+                activeTrack.value = active;
+            }
+        });
+
+        const trackList = computed<Array<{ value: string, label: string }>>(() => {
+            const list: Array<{ value: string, label: string }> = [];
+            if (tracks.value) {
+                for (const track of tracks.value) {
+                    list.push({
+                        value: track.id,
+                        label: track.label
+                    });
+                }
+            }
+            return list;
+        });
        
         onMounted(async () => {
             videoElement = video.value as HTMLVideoElement;
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: true });
-                tracks.value = stream.getTracks();
+                stream.value = await navigator.mediaDevices.getUserMedia({ audio: false, video: true });
+                tracks.value = stream.value.getTracks();
                 activeTrack.value = tracks.value[0];
-                videoElement.srcObject = stream;
+                videoElement.srcObject = stream.value;
             } catch (error: any) {
                 hasCameraError.value = true;
             }
@@ -143,6 +191,8 @@ export default defineComponent({
             hasCameraError,
             loading,
             video,
+            activeTrackId,
+            trackList,
             onCancel,
             onTake
         };

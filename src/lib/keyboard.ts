@@ -71,6 +71,8 @@ function onDocumentKeyDown(e: KeyboardEvent) {
     } else if (e.key === 'Alt') {
         isAltKeyPressed.value = true;
         isAnyModifierKeyPressed.value = true;
+    } else if (e.key === 'Escape') {
+        appEmitter.emit('editor.tool.cancelCurrentAction');
     } else if (isAnyModifierKeyPressed.value === true) {
         if (isInput(e.target)) return;
         const shortcuts = shortcutKeyMap.get(e.key.toLowerCase());

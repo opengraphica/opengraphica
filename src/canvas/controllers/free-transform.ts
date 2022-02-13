@@ -66,6 +66,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             this.setBoundsFromSelectedLayers();
         }, { immediate: true });
 
+        appEmitter.on('editor.tool.cancelCurrentAction', (this.onCancelCurrentAction).bind(this));
         appEmitter.on('editor.history.step', (this.onHistoryStep).bind(this));
         freeTransformEmitter.on('storeTransformStart', (this.onStoreTransformStart).bind(this));
         freeTransformEmitter.on('previewRotationChange', (this.onPreviewRotationChange).bind(this));
@@ -78,6 +79,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             this.selectedLayerIdsWatchStop();
             this.selectedLayerIdsWatchStop = null;
         }
+        appEmitter.off('editor.tool.cancelCurrentAction', (this.onCancelCurrentAction).bind(this));
         appEmitter.off('editor.history.step', (this.onHistoryStep).bind(this));
         freeTransformEmitter.off('storeTransformStart', (this.onStoreTransformStart).bind(this));
         freeTransformEmitter.off('previewRotatioffChange', (this.onPreviewRotationChange).bind(this));
@@ -294,6 +296,21 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 }
             }
             dragHandleHighlight.value = null;
+        }
+    }
+
+    private onCancelCurrentAction() {
+        if (this.transformStartDimensions) {
+            if (this.transformIsRotating) {
+                this.previewRotationChange(this.transformStartDimensions.rotation);
+            }
+            if (this.transformIsDragging) {
+                this.previewDragResizeChange(this.transformStartDimensions);
+            }
+            this.transformTranslateStart = null;
+            this.transformIsRotating = false;
+            this.transformIsDragging = false;
+            canvasStore.set('dirty', true);
         }
     }
 

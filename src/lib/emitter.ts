@@ -39,6 +39,7 @@ interface AppEmitterEvents {
     'app.workingFile.notifyImageLoadedFromClipboard': undefined;
     'app.workingFile.notifyImageLoadedFromDragAndDrop': undefined;
     'editor.history.step': undefined;
+    'editor.tool.cancelCurrentAction': undefined;
 }
 
 const emitter = mitt();
