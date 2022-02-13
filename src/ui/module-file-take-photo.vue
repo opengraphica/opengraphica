@@ -91,8 +91,8 @@ export default defineComponent({
                     audio: false,
                     video: {
                         facingMode: facingMode.value,
-                        width: { ideal: 9999 },
-                        height: { ideal: 9999 } 
+                        width: { ideal: 1920 },
+                        height: { ideal: 1920 } 
                     }
                 });
                 tracks.value = stream.value.getTracks();

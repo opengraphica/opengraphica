@@ -95,8 +95,18 @@ const store = new PerformantStore<CanvasStore>({
                 const decomposedTransform = store.get('decomposedTransform');
                 let rotationDelta = 0;
                 let scaleDelta = 0;
+
+                const transform = store.get('transform');
+                const inverseTransform = transform.inverse();
+
+                let handleX = store.get('dndAreaLeft') + (store.get('dndAreaWidth') / 2);
+                let handleY = store.get('dndAreaTop') + (store.get('dndAreaHeight') / 2);
+                let point = new DOMPoint(handleX, handleY).matrixTransform(inverseTransform);
+
                 if (actionName === 'setTransformRotation') {
                     rotationDelta = (value - decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES;
+                    const viewCanvas = store.get('viewCanvas');
+                    point = new DOMPoint(viewCanvas.width / 2, viewCanvas.height / 2);
                 } else if (actionName === 'setTransformScale') {
                     scaleDelta = value / decomposedTransform.scaleX;
                 } else if (actionName === 'setTransformTranslate') {
@@ -104,13 +114,6 @@ const store = new PerformantStore<CanvasStore>({
                     decomposedTransform.translateY = value.y;
                 }
 
-                const transform = store.get('transform');
-
-                // TODO - Take sidebars into account
-                const handleX = store.get('dndAreaLeft') + (store.get('dndAreaWidth') / 2);
-                const handleY = store.get('dndAreaTop') + (store.get('dndAreaHeight') / 2);
-
-                const point = new DOMPoint(handleX, handleY).matrixTransform(transform.inverse());
                 transform.translateSelf(point.x, point.y);
                 if (scaleDelta) {
                     transform.scaleSelf(scaleDelta, scaleDelta);
