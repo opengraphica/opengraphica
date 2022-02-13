@@ -90,7 +90,9 @@ export default defineComponent({
                 stream.value = await navigator.mediaDevices.getUserMedia({
                     audio: false,
                     video: {
-                        facingMode: facingMode.value
+                        facingMode: facingMode.value,
+                        width: { ideal: 9999 },
+                        height: { ideal: 9999 } 
                     }
                 });
                 tracks.value = stream.value.getTracks();
