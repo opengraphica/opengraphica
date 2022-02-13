@@ -117,10 +117,10 @@ export default defineComponent({
         }
 
         async function onTake() {
+            videoElement.pause();
             loading.value = true;
             await nextTick();
             try {
-                videoElement.pause();
                 const width = videoElement.videoWidth;
                 const height = videoElement.videoHeight;
                 const tmpCanvas = document.createElement('canvas');
