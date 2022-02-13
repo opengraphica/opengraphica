@@ -28,7 +28,7 @@
  * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
 
-import { defineComponent, ref, watch, onMounted, onUnmounted } from 'vue';
+import { defineComponent, ref, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton from 'element-plus/lib/components/button/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
@@ -118,7 +118,9 @@ export default defineComponent({
 
         async function onTake() {
             loading.value = true;
+            await nextTick();
             try {
+                videoElement.pause();
                 const width = videoElement.videoWidth;
                 const height = videoElement.videoHeight;
                 const tmpCanvas = document.createElement('canvas');
