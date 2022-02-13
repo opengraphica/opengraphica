@@ -132,6 +132,7 @@ async function onDocumentPaste(e: ClipboardEvent) {
                             await openFromFileList([file], { insert: true });
                             isPastingImage = false;
                             appEmitter.emit('app.wait.stopBlocking', { id: 'documentPasteImage' });
+                            appEmitter.emit('app.workingFile.notifyImageLoadedFromClipboard');
                         }
                     }
                 }

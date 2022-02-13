@@ -415,6 +415,7 @@ export default defineComponent({
                                     activeControlDock = control;
                                     control.showDock = true;
                                     control.popoverVisible = true;
+                                    appEmitter.emit('app.menuDrawer.closeAll');
                                 }
                             } else {
                                 control.popoverVisible = false;

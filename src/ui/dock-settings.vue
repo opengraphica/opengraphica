@@ -222,7 +222,7 @@
                                 <el-switch v-model="preferenceHighQualityScaling" />
                             </el-form-item>
                         </el-collapse-item>
-                        <el-collapse-item title="Editor Layout">
+                        <el-collapse-item title="Editor">
                             <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" label="Menu Bar Position">
                                 <el-select v-model="preferenceMenuBarPosition" size="small" style="width: 6rem;">
                                     <el-option value="top" label="Top" />
@@ -230,6 +230,9 @@
                                     <el-option value="left" label="Left" />
                                     <el-option value="right" label="Right" />
                                 </el-select>
+                            </el-form-item>
+                            <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" label="Show Welcome Screen">
+                                <el-switch v-model="showWelcomeScreenAtStart" />
                             </el-form-item>
                         </el-collapse-item>
                     </el-collapse>
@@ -468,6 +471,14 @@ export default defineComponent({
                 appEmitter.emit('app.canvas.resetTransform');
             }
         });
+        const showWelcomeScreenAtStart = computed<boolean>({
+            get() {
+                return preferencesStore.state.showWelcomeScreenAtStart;
+            },
+            set(value) {
+                preferencesStore.set('showWelcomeScreenAtStart', value);
+            }
+        });
 
         // Menu selection
         async function onMenuSelect(group: string, index: string) {
@@ -560,6 +571,7 @@ export default defineComponent({
             performanceFixLayerSeams,
             preferenceHighQualityScaling,
             preferenceMenuBarPosition,
+            showWelcomeScreenAtStart,
             onMenuSelect
         };
     }

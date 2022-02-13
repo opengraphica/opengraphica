@@ -13,6 +13,7 @@ interface PreferencesState {
     pointerPressHoldTimeout: number;
     postProcessInterpolateImage: boolean;
     preferCanvasViewport: boolean;
+    showWelcomeScreenAtStart: boolean;
     snapSensitivity: number;
     touchRotation: 'on' | 'snap' | 'off';
     useCanvasViewport: boolean;
@@ -36,6 +37,7 @@ const store = new PerformantStore<PreferencesStore>({
         pointerPressHoldTimeout: 500,
         postProcessInterpolateImage: true,
         preferCanvasViewport: false,
+        showWelcomeScreenAtStart: true,
         snapSensitivity: 5,
         touchRotation: 'on',
         useCanvasViewport: false
@@ -48,6 +50,7 @@ const store = new PerformantStore<PreferencesStore>({
         'multiTouchTapTimeout',
         'pointerTapTimeout',
         'pointerPressHoldTimeout',
+        'showWelcomeScreenAtStart',
         'snapSensitivity',
         'touchRotation'
     ]

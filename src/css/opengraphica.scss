@@ -64,6 +64,24 @@ body.ogr-full-page {
         overflow: hidden;
     }
 
+    .ogr-logo {
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 100;
+            margin: 0;
+
+            @media screen and (max-width: 550px) {
+                font-size: 2.5rem;
+            }
+            @media screen and (max-width: 450px) {
+                font-size: 1.75rem;
+            }
+        }
+        p {
+            margin: 0 0 1rem 0;
+        }
+    }
+
     .ogr-dialogs {
         .el-dialog.el-dialog--medium {
             width: 25rem !important;
@@ -485,6 +503,10 @@ body.ogr-full-page {
         animation-timing-function: ease-in;
         z-index: 5;
 
+        &.is-immediate {
+            animation: none;
+        }
+
         &.is-open-right {
             padding-left: 4rem;
             right: 3.5rem;
@@ -585,6 +607,10 @@ body.ogr-full-page {
                     }
                 }
             }
+        }
+
+        .ogr-module {
+            height: 100%;
         }
     }
 
@@ -1283,6 +1309,62 @@ body.ogr-full-page {
         }
     }
 
+    .ogr-dnd-drop-overlay {
+        background: white;
+        display: flex;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 800000;
+        align-items: center;
+        justify-content: center;
+        
+        .ogr-dnd-drop-overlay__center {
+            display: block;
+            pointer-events: none;
+        }
+
+        .ogr-dnd-drop-corner-top-left, .ogr-dnd-drop-corner-top-right, .ogr-dnd-drop-corner-bottom-left, .ogr-dnd-drop-corner-bottom-right {
+            position: absolute;
+            pointer-events: none;
+
+            svg {
+                width: 3rem;
+                height: 3rem;
+            }
+        }
+        .ogr-dnd-drop-corner-top-left {
+            top: 1rem;
+            left: 1rem;
+        }
+        .ogr-dnd-drop-corner-top-right {
+            top: 1rem;
+            right: 1rem;
+
+            svg {
+                transform: rotate(90deg);
+            }
+        }
+        .ogr-dnd-drop-corner-bottom-left {
+            bottom: 1rem;
+            left: 1rem;
+
+            svg {
+                transform: rotate(-90deg);
+            }
+        }
+        .ogr-dnd-drop-corner-bottom-right {
+            bottom: 1rem;
+            right: 1rem;
+
+            svg {
+                transform: rotate(180deg);
+            }
+        }
+    }
+
     .ogr-wait {
         display: none;
     }
@@ -1296,8 +1378,12 @@ body.ogr-full-page {
         left: 0;
         right: 0;
         bottom: 0;
-        z-index: 999999;
+        z-index: 900000;
         animation: ogr-wait-fade-in 0.2s ease-in forwards;
+
+        &.is-immediate {
+            animation: none !important;
+        }
 
         strong {
             font-weight: bold;

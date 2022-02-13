@@ -12,19 +12,23 @@ interface AppEmitterEvents {
     'app.dialogs.openFromModule': {
         name: string;
     };
+    'app.menuDrawer.closeAll': undefined;
     'app.menuDrawer.openFromDock': {
         name: string;
         placement: 'top' | 'bottom' | 'left' | 'right';
+        immediate?: boolean;
     },
     'app.menuDrawer.openFromModule': {
         name: string;
         placement: 'top' | 'bottom' | 'left' | 'right';
+        immediate?: boolean;
     },
     'app.notify': Partial<NotificationProps>;
     'app.wait.startBlocking': {
         id: string;
         label?: string;
         cancelable?: boolean;
+        immediate?: boolean;
     };
     'app.wait.cancelBlocking': {
         id: string;
@@ -32,6 +36,8 @@ interface AppEmitterEvents {
     'app.wait.stopBlocking': {
         id: string;
     };
+    'app.workingFile.notifyImageLoadedFromClipboard': undefined;
+    'app.workingFile.notifyImageLoadedFromDragAndDrop': undefined;
     'editor.history.step': undefined;
 }
 

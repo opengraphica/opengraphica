@@ -1,5 +1,5 @@
 <template>
-    <div class="ogr-wait" :aria-hidden="!waiting">
+    <div class="ogr-wait" :aria-hidden="!waiting" :class="{ 'is-immediate': isImmediate }">
         <div class="ogr-wait__center">
             <div style="width: 100%; height: 5rem;" v-loading="true" element-loading-background="transparent"></div>
             <strong>Please Wait</strong>
@@ -29,6 +29,7 @@ export default defineComponent({
         const $notify = notifyInjector('$notify');
         const { waiting } = toRefs(editorStore.state);
         const blockingNotificationMinDisplayTime = 400;
+        const isImmediate = ref<boolean>(false);
 
         const notifications = ref<{ [key: string]: any }>({});
 
@@ -54,6 +55,7 @@ export default defineComponent({
                     cancelable: event.cancelable || false
                 };
                 editorStore.set('waiting', true);
+                isImmediate.value = !!(event.immediate);
             }
         }
 
@@ -81,6 +83,7 @@ export default defineComponent({
         return {
             waiting,
             notifications,
+            isImmediate,
             onClickCancel
         };
     }

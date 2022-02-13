@@ -1,43 +1,51 @@
 <template>
-    <div ref="root" class="opengraphica" @touchstart="onTouchStartRoot($event)" v-loading="loading">
+    <div
+        ref="root" class="opengraphica"
+        @touchstart="onTouchStartRoot($event)"
+    >
         <app-canvas />
         <app-layout-dnd-container @dnd-ready="onDndLayoutReady($event)" />
         <app-menu-drawers />
         <app-dialogs />
         <app-wait />
+        <app-dnd-drop-overlay v-if="showDndDropOverlay" ref="dndDropOverlay" @click="showDndDropOverlay = false" />
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, provide, onMounted, onUnmounted } from 'vue';
+import { defineComponent, ref, provide, onMounted, onUnmounted, toRefs } from 'vue';
 import AppCanvas from '@/ui/app-canvas.vue';
 import AppDialogs from '@/ui/app-dialogs.vue';
+import AppDndDropOverlay from '@/ui/app-dnd-drop-overlay.vue';
 import AppLayoutDndContainer from '@/ui/app-layout-dnd-container.vue';
 import AppMenuDrawers from '@/ui/app-menu-drawers.vue';
 import AppWait from '@/ui/app-wait.vue';
 import canvasStore from '@/store/canvas';
 import ResizeObserver from 'resize-observer-polyfill';
 import ElLoading from 'element-plus/lib/components/loading/index';
-import { preloadModules } from '@/modules';
+import appEmitter from '@/lib/emitter';
+import preferencesStore from '@/store/preferences';
+import { getModuleDefinition, preloadModules } from '@/modules';
 
 export default defineComponent({
     name: 'App',
-    directives: {
-        loading: ElLoading.directive
-    },
     components: {
         AppCanvas,
         AppDialogs,
+        AppDndDropOverlay,
         AppLayoutDndContainer,
         AppMenuDrawers,
         AppWait
     },
     setup() {
-        const loading = ref<boolean>(true);
         const rootElement = ref<Element | null>(null);
         const mainElement = ref<Element | null>(null);
+        const showDndDropOverlay = ref<boolean>(false);
+        const dndDropOverlay = ref<InstanceType<typeof AppDndDropOverlay>>();
 
         onMounted(() => {
+            appEmitter.emit('app.wait.startBlocking', { id: 'appInitialLoad', immediate: true });
+
             // Full page fixes for quirks in browsers (Chrome)
             if (document.body.classList.contains('ogr-full-page')) {
                 // Reset user zoom on some browsers
@@ -76,6 +84,12 @@ export default defineComponent({
                 window.addEventListener('resize', onResizeWindow);
             }
 
+            // Drag & Drop
+            window.addEventListener('dragenter', onDragEnterRoot, true);
+            window.addEventListener('dragover', onDragOverRoot, true);
+            window.addEventListener('dragleave', onDragLeaveRoot, true);
+            window.addEventListener('drop', onDropRoot, true);
+
             // Breakfix for element plus popper styles
             const opengraphica = document.querySelector('.opengraphica');
             const popperContainer = document.querySelector('[id^="el-popper-container"]');
@@ -89,13 +103,33 @@ export default defineComponent({
         onUnmounted(() => {
             document.removeEventListener('contextmenu', onContextMenu);
             window.removeEventListener('resize', onResizeWindow);
+            window.removeEventListener('dragenter', onDragEnterRoot);
+            window.removeEventListener('dragover', onDragOverRoot);
+            window.removeEventListener('dragleave', onDragLeaveRoot);
+            window.removeEventListener('drop', onDropRoot);
         });
 
         async function asyncMountSetup() {
             // Preload some modules which need to be executed immediately
             await preloadModules();
 
-            loading.value = false;
+            if (preferencesStore.get('showWelcomeScreenAtStart')) {
+                const welcomeModule = getModuleDefinition('tutorial', 'welcome');
+                if (welcomeModule) {
+                    appEmitter.emit('app.menuDrawer.openFromModule', {
+                        name: welcomeModule.action.target,
+                        placement: {
+                            left: 'right',
+                            right: 'left',
+                            top: 'bottom',
+                            bottom: 'top'
+                        }[preferencesStore.get('menuBarPosition')] as any,
+                        immediate: true
+                    });
+                }
+            }
+
+            appEmitter.emit('app.wait.stopBlocking', { id: 'appInitialLoad' });
         }
 
         function onContextMenu(e: Event) {
@@ -108,6 +142,33 @@ export default defineComponent({
         function onTouchStartRoot(e: TouchEvent) {
             if (e.touches.length > 1){
                 e.preventDefault();
+            }
+        }
+
+        function onDragEnterRoot(e: DragEvent) {
+            showDndDropOverlay.value = true;
+            e.preventDefault();
+        }
+
+        function onDragOverRoot(e: DragEvent) {
+            e.preventDefault();
+        }
+
+        function onDragLeaveRoot(e: DragEvent) {
+            if (dndDropOverlay.value && e.target === dndDropOverlay.value.$el) {
+                showDndDropOverlay.value = false;
+            }
+        }
+
+        async function onDropRoot(e: DragEvent) {
+            e.preventDefault();
+            showDndDropOverlay.value = false;
+            if (e.dataTransfer && e.dataTransfer.files?.length > 0) {
+                appEmitter.emit('app.wait.startBlocking', { id: 'documentDropFiles', label: 'Loading Image' });
+                const { openFromFileList } = await import(/* webpackChunkName: 'module-file-open' */ '@/modules/file/open');
+                await openFromFileList(e.dataTransfer.files, { insert: true });
+                appEmitter.emit('app.wait.stopBlocking', { id: 'documentDropFiles' });
+                appEmitter.emit('app.workingFile.notifyImageLoadedFromDragAndDrop');
             }
         }
 
@@ -126,9 +187,10 @@ export default defineComponent({
         provide('mainElement', mainElement);
 
         return {
-            loading,
             root: rootElement,
             onDndLayoutReady,
+            showDndDropOverlay,
+            dndDropOverlay,
             onTouchStartRoot
         };
     }

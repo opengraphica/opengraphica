@@ -6802,6 +6802,24 @@ body.ogr-full-page .opengraphica {
   height: 1px;
   overflow: hidden;
 }
+.opengraphica .ogr-logo h1 {
+  font-size: 3.5rem;
+  font-weight: 100;
+  margin: 0;
+}
+@media screen and (max-width: 550px) {
+  .opengraphica .ogr-logo h1 {
+    font-size: 2.5rem;
+  }
+}
+@media screen and (max-width: 450px) {
+  .opengraphica .ogr-logo h1 {
+    font-size: 1.75rem;
+  }
+}
+.opengraphica .ogr-logo p {
+  margin: 0 0 1rem 0;
+}
 .opengraphica .ogr-dialogs .el-dialog.el-dialog--medium {
   width: 25rem !important;
   max-width: 90%;
@@ -7171,6 +7189,9 @@ body.ogr-full-page .opengraphica {
   animation-timing-function: ease-in;
   z-index: 5;
 }
+.opengraphica .ogr-menu-drawer.is-immediate {
+  animation: none;
+}
 .opengraphica .ogr-menu-drawer.is-open-right {
   padding-left: 4rem;
   right: 3.5rem;
@@ -7254,6 +7275,9 @@ body.ogr-full-page .opengraphica {
   flex-direction: column;
 }
 .opengraphica .ogr-menu-drawer__content .ogr-dock > .el-tabs > .el-tabs__content > .el-tab-pane {
+  height: 100%;
+}
+.opengraphica .ogr-menu-drawer__content .ogr-module {
   height: 100%;
 }
 .opengraphica .ogr-layout-menu-bar {
@@ -7885,6 +7909,55 @@ body.ogr-full-page .opengraphica {
     opacity: 1;
   }
 }
+.opengraphica .ogr-dnd-drop-overlay {
+  background: white;
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 800000;
+  align-items: center;
+  justify-content: center;
+}
+.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-overlay__center {
+  display: block;
+  pointer-events: none;
+}
+.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-top-left, .opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-top-right, .opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-left, .opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-right {
+  position: absolute;
+  pointer-events: none;
+}
+.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-top-left svg, .opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-top-right svg, .opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-left svg, .opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-right svg {
+  width: 3rem;
+  height: 3rem;
+}
+.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-top-left {
+  top: 1rem;
+  left: 1rem;
+}
+.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-top-right {
+  top: 1rem;
+  right: 1rem;
+}
+.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-top-right svg {
+  transform: rotate(90deg);
+}
+.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-left {
+  bottom: 1rem;
+  left: 1rem;
+}
+.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-left svg {
+  transform: rotate(-90deg);
+}
+.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-right {
+  bottom: 1rem;
+  right: 1rem;
+}
+.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-right svg {
+  transform: rotate(180deg);
+}
 .opengraphica .ogr-wait {
   display: none;
 }
@@ -7898,8 +7971,11 @@ body.ogr-full-page .opengraphica {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 999999;
+  z-index: 900000;
   animation: ogr-wait-fade-in 0.2s ease-in forwards;
+}
+.opengraphica .ogr-wait[aria-hidden=false].is-immediate {
+  animation: none !important;
 }
 .opengraphica .ogr-wait[aria-hidden=false] strong {
   font-weight: bold;

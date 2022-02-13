@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import moduleGroupConfig from '@/config/module-groups.json';
-import { ModuleGroupDefinition } from '@/types';
+import { ModuleGroupDefinition, ModuleDefinition } from '@/types';
 import appEmitter from '@/lib/emitter';
 
 const moduleGroups: { [key: string]: ModuleGroupDefinition } = moduleGroupConfig as { [key: string]: ModuleGroupDefinition };
@@ -26,6 +26,13 @@ export async function preloadModules() {
         }
     }
     await Promise.allSettled(moduleLoadPromises);
+}
+
+export function getModuleDefinition(moduleGroupName: string, moduleName: string): ModuleDefinition | null {
+    if (moduleGroups[moduleGroupName]) {
+        return moduleGroups[moduleGroupName].modules[moduleName] || null;
+    }
+    return null;
 }
 
 export async function runModule(moduleGroupName: string, moduleName: string) {

@@ -1,7 +1,7 @@
 <template>
     <div ref="drawerContainer" class="ogr-menu-drawers" :hidden="menuDrawers.length === 0" :class="{ 'is-fade-out': isAllDrawersClosing }" @animationend="onAnimationEndDrawers($event)" @click="onCloseAllDrawers($event)">
         <template v-for="menuDrawer of menuDrawers" :key="menuDrawer.id">
-            <section :ref="el => { drawers[menuDrawer.id] = el }" class="ogr-menu-drawer" :class="['is-open-' + menuDrawer.placement, { 'is-closing': !menuDrawer.visible }]">
+            <section :ref="el => { drawers[menuDrawer.id] = el }" class="ogr-menu-drawer" :class="['is-open-' + menuDrawer.placement, { 'is-closing': !menuDrawer.visible, 'is-immediate': menuDrawer.immediate }]">
                 <h1 class="ogr-menu-drawer__title">{{ menuDrawer.title }}</h1>
                 <a href="javascript:void(0)" class="ogr-menu-drawer__close" title="Close" @click="onMenuDrawerClosed(menuDrawer)">
                     <span class="bi bi-x-circle-fill" aria-hidden="true" />
@@ -33,6 +33,7 @@ interface MenuDrawerCommonDefinition {
     visible: boolean;
     placement: 'top' | 'bottom' | 'left' | 'right';
     size: 'small' | 'medium' | 'large' | 'big';
+    immediate: boolean;
 }
 
 interface DockMenuDrawerDefinition extends MenuDrawerCommonDefinition {
@@ -72,11 +73,13 @@ export default defineComponent({
         onMounted(() => {
             appEmitter.on('app.menuDrawer.openFromDock', handleDockOpen);
             appEmitter.on('app.menuDrawer.openFromModule', handleModuleOpen);
+            appEmitter.on('app.menuDrawer.closeAll', onCloseAllDrawers);
         });
 
         onUnmounted(() => {
             appEmitter.off('app.menuDrawer.openFromDock', handleDockOpen);
             appEmitter.off('app.menuDrawer.openFromModule', handleModuleOpen);
+            appEmitter.off('app.menuDrawer.closeAll', onCloseAllDrawers);
         });
 
         function handleDockOpen(event?: AppEmitterEvents['app.menuDrawer.openFromDock']) {
@@ -94,7 +97,8 @@ export default defineComponent({
                         dock: {
                             name: event.name
                         },
-                        size: 'medium'
+                        size: 'medium',
+                        immediate: !!event.immediate
                     });
                     editorStore.set('activeMenuDrawerComponentName', event.name);
                 }
@@ -116,7 +120,8 @@ export default defineComponent({
                         module: {
                             name: event.name
                         },
-                        size: 'medium'
+                        size: 'medium',
+                        immediate: !!event.immediate
                     });
                     editorStore.set('activeMenuDrawerComponentName', event.name);
                 }
