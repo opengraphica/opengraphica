@@ -9,14 +9,9 @@
             Either the device has no cameras or access to the camera was declined.
         </el-alert>
         <template v-else>
-            <el-select v-if="trackList.length > 0" v-model="activeTrackId" class="mx-0 mt-0 mb-2 is-fullwidth" placeholder="Select Track">
-                <el-option
-                    v-for="item in trackList"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                >
-                </el-option>
+            <el-select v-model="facingMode" class="mx-0 mt-0 mb-2 is-fullwidth" placeholder="Select Camera">
+                <el-option key="user" value="user" label="Front (User)" />
+                <el-option key="environment" value="environment" label="Rear (Environment)" />
             </el-select>
             <video ref="video" autoplay="true" class="is-fullwidth"></video>
             <div class="has-text-right mt-4">
@@ -33,7 +28,7 @@
  * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
 
-import { defineComponent, ref, computed, onMounted, onUnmounted } from 'vue';
+import { defineComponent, ref, watch, onMounted, onUnmounted } from 'vue';
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton from 'element-plus/lib/components/button/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
@@ -72,64 +67,48 @@ export default defineComponent({
         const tracks = ref<MediaStreamTrack[]>();
         const activeTrack = ref<MediaStreamTrack | null>(null);
         const hasCameraError = ref<boolean>(false);
+        const facingMode = ref<string>('environment');
         let videoElement: HTMLVideoElement;
 
-        const activeTrackId = computed<string | null>({
-            get() {
-                if (activeTrack.value) {
-                    return activeTrack.value.id;
-                } else {
-                    return null;
-                }
-            },
-            set(value) {
-                let active: MediaStreamTrack | null = null;
-                if (tracks.value) {
-                    for (const track of tracks.value) {
-                        if (track.id === value) {
-                            active = track;
-                            break;
-                        }
-                    }
-                }
-                activeTrack.value = active;
-            }
+        watch([facingMode], () => {
+            requestStream();
         });
 
-        const trackList = computed<Array<{ value: string, label: string }>>(() => {
-            const list: Array<{ value: string, label: string }> = [];
-            if (tracks.value) {
-                for (const track of tracks.value) {
-                    list.push({
-                        value: track.id,
-                        label: track.label
-                    });
-                }
-            }
-            return list;
-        });
-       
         onMounted(async () => {
             videoElement = video.value as HTMLVideoElement;
+            await requestStream();
+            loading.value = false;
+        });
+
+        onUnmounted(() => {
+            stopStream();
+        });
+
+        async function requestStream() {
+            stopStream();
             try {
-                stream.value = await navigator.mediaDevices.getUserMedia({ audio: false, video: true });
+                stream.value = await navigator.mediaDevices.getUserMedia({
+                    audio: false,
+                    video: {
+                        facingMode: facingMode.value
+                    }
+                });
                 tracks.value = stream.value.getTracks();
                 activeTrack.value = tracks.value[0];
                 videoElement.srcObject = stream.value;
             } catch (error: any) {
                 hasCameraError.value = true;
             }
-            loading.value = false;
-        });
+        }
 
-        onUnmounted(() => {
+        async function stopStream() {
             if (activeTrack.value != null){
                 activeTrack.value.stop();
             }
             videoElement.pause();
             videoElement.src = '';
             videoElement.load();
-        });
+        }
 
         function onCancel() {
             emit('close');
@@ -191,8 +170,7 @@ export default defineComponent({
             hasCameraError,
             loading,
             video,
-            activeTrackId,
-            trackList,
+            facingMode,
             onCancel,
             onTake
         };
