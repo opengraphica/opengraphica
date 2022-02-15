@@ -31,6 +31,15 @@
                         0°
                     </el-button>
                 </el-button-group>
+                <!-- Flipping the transform breaks a lot of things. Need research. -->
+                <!-- <el-button-group class="el-button-group--flex ml-3">
+                    <el-button size="small" plain @click="onFlipX">
+                        Flip X
+                    </el-button>
+                    <el-button size="small" plain @click="onFlipY">
+                        Flip Y
+                    </el-button>
+                </el-button-group> -->
             </el-horizontal-scrollbar-arrows>
         </div>
     </div>
@@ -100,13 +109,21 @@ export default defineComponent({
         function onResetViewZoom() {
             canvasStore.dispatch('setTransformScale', 1);
         }
+        function onFlipX() {
+            canvasStore.dispatch('setTransformFlipX', true);
+        }
+        function onFlipY() {
+            canvasStore.dispatch('setTransformFlipY', true);
+        }
 
         return {
             zoomLevel,
             rotationAngle,
             onResetViewFit,
             onResetViewRotation,
-            onResetViewZoom
+            onResetViewZoom,
+            onFlipX,
+            onFlipY
         };
     }
 });

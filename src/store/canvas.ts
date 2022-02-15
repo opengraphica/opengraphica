@@ -37,7 +37,9 @@ interface CanvasDispatch {
     setTransformTranslate: {
         x: number;
         y: number;
-    }
+    },
+    setTransformFlipX: boolean;
+    setTransformFlipY: boolean;
 }
 
 interface CanvasStore {
@@ -92,9 +94,13 @@ const store = new PerformantStore<CanvasStore>({
             case 'setTransformRotation':
             case 'setTransformScale':
             case 'setTransformTranslate':
+            case 'setTransformFlipX':
+            case 'setTransformFlipY':
+                const viewCanvas = store.get('viewCanvas');
                 const decomposedTransform = store.get('decomposedTransform');
                 let rotationDelta = 0;
-                let scaleDelta = 0;
+                let scaleDeltaX = 0;
+                let scaleDeltaY = 0;
 
                 const transform = store.get('transform');
                 const inverseTransform = transform.inverse();
@@ -102,21 +108,30 @@ const store = new PerformantStore<CanvasStore>({
                 let handleX = store.get('dndAreaLeft') + (store.get('dndAreaWidth') / 2);
                 let handleY = store.get('dndAreaTop') + (store.get('dndAreaHeight') / 2);
                 let point = new DOMPoint(handleX, handleY).matrixTransform(inverseTransform);
+                const centerPoint = new DOMPoint(viewCanvas.width / 2, viewCanvas.height / 2);
 
                 if (actionName === 'setTransformRotation') {
                     rotationDelta = (value - decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES;
-                    const viewCanvas = store.get('viewCanvas');
-                    point = new DOMPoint(viewCanvas.width / 2, viewCanvas.height / 2);
+                    point = centerPoint;
                 } else if (actionName === 'setTransformScale') {
-                    scaleDelta = value / decomposedTransform.scaleX;
+                    scaleDeltaX = value / decomposedTransform.scaleX;
+                    scaleDeltaY = scaleDeltaX;
                 } else if (actionName === 'setTransformTranslate') {
                     decomposedTransform.translateX = value.x;
                     decomposedTransform.translateY = value.y;
+                } else if (actionName === 'setTransformFlipX') {
+                    scaleDeltaX = -1;
+                    scaleDeltaY = 1;
+                    point = centerPoint;
+                } else if (actionName === 'setTransformFlipY') {
+                    scaleDeltaX = 1;
+                    scaleDeltaY = -1;
+                    point = centerPoint;
                 }
 
                 transform.translateSelf(point.x, point.y);
-                if (scaleDelta) {
-                    transform.scaleSelf(scaleDelta, scaleDelta);
+                if (scaleDeltaX || scaleDeltaY) {
+                    transform.scaleSelf(scaleDeltaX, scaleDeltaY);
                 }
                 if (rotationDelta) {
                     transform.rotateSelf(rotationDelta);

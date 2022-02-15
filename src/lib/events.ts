@@ -29,8 +29,8 @@ let pointerIdCounter: number = 0;
         altitudeAngle: 1.5707963267948966, // PI / 2
         azimuthAngle: 0,
         bubbles: e.bubbles,
-        button: 0,
-        buttons: 1,
+        button: e.button,
+        buttons: e.buttons,
         cancelBubble: e.cancelBubble,
         cancelable: e.cancelable,
         clientX: e.clientX,

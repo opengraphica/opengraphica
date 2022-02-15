@@ -136,8 +136,8 @@
                 "icon": "bi bi-bounding-box",
                 "label": "Selection",
                 "action": {
-                    "type": "runModule",
-                    "target": "tmp/notYetImplemented"
+                    "type": "toolGroup",
+                    "target": "selection"
                 }
             }
         ],

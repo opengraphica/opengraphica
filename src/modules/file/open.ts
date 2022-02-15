@@ -41,8 +41,8 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
                     description: 'Images / Videos',
                     accept: {
                         'text/plain': ['.json'],
-                        'image/*': ['.*'],
-                        'video/*': ['.*']
+                        'image/*': [],
+                        'video/*': []
                     }
                 }
             ]

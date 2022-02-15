@@ -39,7 +39,7 @@ const store = new PerformantStore<PreferencesStore>({
         preferCanvasViewport: false,
         showWelcomeScreenAtStart: true,
         snapSensitivity: 5,
-        touchRotation: 'on',
+        touchRotation: 'off',
         useCanvasViewport: false
     },
     restore: [
