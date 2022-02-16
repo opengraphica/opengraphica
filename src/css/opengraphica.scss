@@ -867,7 +867,7 @@ body.ogr-full-page {
                 flex-direction: row;
 
                 .ogr-toolbar-tool-selector {
-                    background: var(--el-color-info-lighter);
+                    background: var(--el-bg-color);
                     color: var(--el-text-color-primary);
                     box-sizing: border-box;
                     display: flex;
@@ -921,6 +921,9 @@ body.ogr-full-page {
                 bottom: 3rem;
                 .ogr-toolbar-overlay {
                     padding-bottom: 1.25rem;
+                }
+                .ogr-toolbar-tool-selector {
+                    border-radius: 0 0 1rem 0;
                 }
             }
             &.is-menu-bar-top {

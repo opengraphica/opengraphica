@@ -7397,7 +7397,7 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-layout-menu-bar.is-vertical > .is-flex .ogr-menu-section .ogr-menu-section__title {
   color: var(--el-text-color-regular);
   font-size: 0.675rem;
-  margin: 0.5rem 0;
+  margin: 0.75rem 0;
   text-transform: uppercase;
 }
 .opengraphica .ogr-layout-menu-bar.is-vertical > .is-flex .ogr-menu-section .ogr-menu-section__title img {
@@ -7491,7 +7491,7 @@ body.ogr-full-page .opengraphica {
   flex-direction: row;
 }
 .opengraphica .ogr-toolbar.is-overlay .ogr-toolbar-overlay .ogr-toolbar-tool-selector {
-  background: var(--el-color-info-lighter);
+  background: var(--el-bg-color);
   color: var(--el-text-color-primary);
   box-sizing: border-box;
   display: flex;
@@ -7536,6 +7536,9 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .ogr-toolbar.is-overlay.is-menu-bar-bottom .ogr-toolbar-overlay {
   padding-bottom: 1.25rem;
+}
+.opengraphica .ogr-toolbar.is-overlay.is-menu-bar-bottom .ogr-toolbar-tool-selector {
+  border-radius: 0 0 1rem 0;
 }
 .opengraphica .ogr-toolbar.is-overlay.is-menu-bar-top {
   bottom: 0;

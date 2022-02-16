@@ -220,7 +220,7 @@
                             </el-radio-group>
                         </el-form-item>
                         <el-collapse class="el-collapse--menu-item">
-                            <el-collapse-item title="Viewport">
+                            <el-collapse-item title="Performance">
                                 <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" label="Optimize for Large Image">
                                     <el-switch v-model="preferenceOptimizeLargeImages" />
                                 </el-form-item>
