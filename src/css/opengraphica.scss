@@ -755,7 +755,7 @@ body.ogr-full-page {
                     .ogr-menu-section__title {
                         color: var(--el-text-color-regular);
                         font-size: .675rem;
-                        margin: .5rem 0;
+                        margin: .75rem 0;
                         text-transform: uppercase;
                         
                         img {
@@ -863,6 +863,27 @@ body.ogr-full-page {
                 padding: 0;
                 overflow: hidden;
                 padding: 0;
+                display: flex;
+                flex-direction: row;
+
+                .ogr-toolbar-tool-selector {
+                    background: var(--el-color-info-lighter);
+                    color: var(--el-text-color-primary);
+                    box-sizing: border-box;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    min-width: 3.5rem;
+                    padding: 0 .5rem;
+
+                    .ogr-toolbar-tool-selector__description {
+                        display: block;
+                        font-size: .55rem;
+                        white-space: nowrap;
+                        text-transform: uppercase;
+                    }
+                }
 
                 > .el-scrollbar {
                     > * > .el-scrollbar__view {

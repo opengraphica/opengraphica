@@ -1,6 +1,10 @@
 <template>
     <div class="is-flex container is-align-items-center is-justify-content-center mx-auto">
         <div class="ogr-toolbar-overlay">
+            <div class="ogr-toolbar-tool-selector">
+                <span class="bi bi-zoom-in mb-1" aria-hidden="true"></span>
+                <span class="ogr-toolbar-tool-selector__description">Settings</span>
+            </div>
             <el-horizontal-scrollbar-arrows>
                 <el-button-group class="el-button-group--flex">
                     <el-button size="small" plain aria-label="Zoom Out" title="Zoom Out" @click="zoomLevel *= 1/1.1">
