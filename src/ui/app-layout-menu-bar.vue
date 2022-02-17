@@ -11,9 +11,6 @@
         @touchmove="onTouchMoveMenuBar($event)">
         <div ref="flexContainer" class="is-flex container mx-auto">
             <div v-for="(actionGroupSection, actionGroupSectionName) of actionGroups" :key="actionGroupSectionName" class="ogr-menu-section my-2" :class="['ogr-menu-' + actionGroupSectionName, { 'px-3': actionGroupSectionName !== 'center' }]">
-                <!-- <span v-if="actionGroupSectionName === 'start' && direction === 'vertical'" class="ogr-menu-section__title">
-                    <img src="icons/logo-icon.svg">
-                </span> -->
                 <span v-if="actionGroupSectionName === 'center'" class="ogr-menu-section__title">Tools</span>
                 <component :is="actionGroupSectionName === 'center' ? 'el-scrollbar' : 'v-fragment'">
                     <template v-for="actionGroup of actionGroupSection" :key="actionGroup.id">
@@ -73,56 +70,6 @@
                         </component>
                     </template>
                 </component>
-            </div>
-            <div v-if="displayMode === 'favorites'" class="ogr-menu-section ogr-menu-end py-2 px-3">
-                <div class="ogr-single-button-group">
-                    <el-popover
-                        v-model:visible="showMoreActionsTooltip"
-                        :trigger="showMoreActionsMenu ? 'manual' : 'hover'"
-                        effect="light"
-                        :placement="popoverPlacement"
-                        :popper-class="'ogr-dock-popover'"
-                        :show-after="0"
-                        :popper-options="{ boundariesElement: 'body' }">
-                        <template #reference>
-                            <el-button
-                                aria-label="More Tools"
-                                icon="bi bi-list"
-                                plain
-                                circle
-                                @click="showMoreActionsMenu = true; showMoreActionsTooltip = false"
-                            ></el-button>
-                        </template>
-                        <div class="px-3 py-2">
-                            More Tools
-                        </div>
-                    </el-popover>
-                </div>
-                <el-drawer
-                    v-model="showMoreActionsMenu"
-                    title="Tools and Settings"
-                    :size="300">
-                    <div class="is-position-absolute-full">
-                        <el-scrollbar>
-                            <el-menu :default-active="activeToolGroup">
-                                <template v-for="(actionGroupSection, actionGroupSectionName) of allActionGroups" :key="actionGroupSectionName">
-                                    <template v-for="actionGroup of actionGroupSection" :key="actionGroup.id">
-                                        <template v-for="control of actionGroup.controls" :key="control.label">
-                                            <el-menu-item
-                                                v-if="actionGroup.id !== 'search'"
-                                                :index="control.action && control.action.type === 'toolGroup' ? actionGroup.id : null"
-                                                @click="onPressControlButton('modal', 0, control)"
-                                            >
-                                                <i :class="control.icon + ' mr-3'" aria-hidden="true"></i>
-                                                <span>{{ control.label }}</span>
-                                            </el-menu-item>
-                                        </template>
-                                    </template>
-                                </template>
-                            </el-menu>
-                        </el-scrollbar>
-                    </div>
-                </el-drawer>
             </div>
         </div>
     </div>

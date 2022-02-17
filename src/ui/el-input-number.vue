@@ -237,7 +237,8 @@ export default defineComponent({
                 }
                 if (!isFocused) {
                     nextTick(() => {
-                        innerInput.setSelectionRange(selectionStart, selectionStart);
+                        // TODO - This line freezes Safari. Need to know what it fixes, and how to mitigate.
+                        // innerInput.setSelectionRange(selectionStart, selectionStart);
                     });
                 }
             }

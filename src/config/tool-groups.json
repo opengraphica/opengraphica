@@ -48,32 +48,17 @@
         "name": "Selection",
         "description": "Select areas of the active layer(s), any manipulations to the layer(s) only occur inside the selection.",
         "tools": {
-            "rectangleSelect": {
-                "name": "Rectangle Selection",
-                "description": "Select in a rectangle/square shape.",
-                "controller": "rectangle-selection",
+            "selection": {
+                "name": "Selection",
+                "description": "Select an area of the image for targeted editing.",
+                "controller": "selection",
                 "toolbar": {
                     "position": "auto",
-                    "target": "rectangle-selection"
+                    "target": "selection"
                 },
                 "overlays": [
                     "selection"
                 ]
-            },
-            "ellipseSelect": {
-                "name": "Ellipse Selection",
-                "description": "Select in a ellipse/circle shape.",
-                "controller": "ellipse-selection"
-            },
-            "freeSelect": {
-                "name": "Free Selection",
-                "description": "Select in a rectangle/square shape.",
-                "controller": "rectangle-selection"
-            },
-            "tonalAreaSelect": {
-                "name": "Tonal Area Selection",
-                "description": "Select a surrounding area based on similar tone/color values.",
-                "controller": "tonal-area-selection"
             }
         }
     },

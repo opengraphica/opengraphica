@@ -62,7 +62,7 @@ export interface VectorPathShape<T extends ColorModel> {
     type: 'path';
     fill: ColorOrGradient<T>;
     points: {
-        action: 'move' | 'line' | 'horizontalLine' | 'verticalLine' | 'curve' | 'smoothCurve' | 'quadraticBezierCurve' | 'smoothQuadraticBezierCurve' | 'ellipticalArc' | 'close'
+        action: 'move' | 'line' | 'horizontalLine' | 'verticalLine' | 'curve' | 'smoothCurve' | 'quadraticBezierCurve' | 'smoothQuadraticBezierCurve' | 'ellipticalArc' | 'close';
         x: number;
         y: number;
     }[];

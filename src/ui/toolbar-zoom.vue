@@ -7,11 +7,11 @@
             </div>
             <el-horizontal-scrollbar-arrows>
                 <el-button-group class="el-button-group--flex">
-                    <el-button size="small" plain aria-label="Zoom Out" title="Zoom Out" @click="zoomLevel *= 1/1.1">
+                    <el-button size="small" plain aria-label="Zoom Out" title="Zoom Out" @click="zoomLevel *= 1/1.25">
                         <i class="bi bi-zoom-out" aria-hidden="true" />
                     </el-button>
                     <el-input-number v-model.lazy="zoomLevel" :blur-on-enter="true" suffix-text="%" size="small" class="el-input--text-center" style="width: 4rem" />
-                    <el-button size="small" plain aria-label="Zoom In" title="Zoom In" @click="zoomLevel *= 1.1">
+                    <el-button size="small" plain aria-label="Zoom In" title="Zoom In" @click="zoomLevel *= 1.25">
                         <i class="bi bi-zoom-in" aria-hidden="true" />
                     </el-button>
                 </el-button-group>
@@ -51,22 +51,18 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent, ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
-import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElHorizontalScrollbarArrows from '@/ui/el-horizontal-scrollbar-arrows.vue';
 import ElInputGroup from '@/ui/el-input-group.vue';
 import ElInputNumber from '@/ui/el-input-number.vue';
 import ElPopover from '@/ui/el-popover.vue';
-import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
-import ElSwitch from 'element-plus/lib/components/switch/index';
 import appEmitter from '@/lib/emitter';
 import canvasStore from '@/store/canvas';
 
 export default defineComponent({
     name: 'ToolbarFreeTransform',
     components: {
-        ElAlert,
         ElButton,
         ElButtonGroup,
         ElForm,
@@ -74,10 +70,7 @@ export default defineComponent({
         ElHorizontalScrollbarArrows,
         ElInputGroup,
         ElInputNumber,
-        ElOption,
-        ElPopover,
-        ElSelect,
-        ElSwitch
+        ElPopover
     },
     props: {
         

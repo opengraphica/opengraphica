@@ -11,6 +11,8 @@ import { runModule } from '@/modules';
 import { KeyboardMapConfigCategory } from '@/types';
 
 export const isCtrlKeyPressed = ref<boolean>(false);
+export const isMetaKeyPressed = ref<boolean>(false);
+export const isCtrlOrMetaKeyPressed = ref<boolean>(false);
 export const isShiftKeyPressed = ref<boolean>(false);
 export const isAltKeyPressed = ref<boolean>(false);
 export const isAnyModifierKeyPressed = ref<boolean>(false);
@@ -64,6 +66,11 @@ buildShortcutKeyMap(defaultKeyboardMapConfig as any);
 function onDocumentKeyDown(e: KeyboardEvent) {
     if (e.key === 'Control') {
         isCtrlKeyPressed.value = true;
+        isCtrlOrMetaKeyPressed.value = true;
+        isAnyModifierKeyPressed.value = true;
+    } else if (e.key === 'Meta') {
+        isMetaKeyPressed.value = true;
+        isCtrlOrMetaKeyPressed.value = true;
         isAnyModifierKeyPressed.value = true;
     } else if (e.key === 'Shift') {
         isShiftKeyPressed.value = true;
@@ -80,7 +87,7 @@ function onDocumentKeyDown(e: KeyboardEvent) {
             for (const shortcut of shortcuts) {
                 if (
                     shortcut.alt === isAltKeyPressed.value &&
-                    shortcut.ctrl === isCtrlKeyPressed.value &&
+                    shortcut.ctrl === isCtrlOrMetaKeyPressed.value &&
                     shortcut.shift === isShiftKeyPressed.value
                 ) {
                     e.preventDefault();
@@ -105,12 +112,17 @@ function onDocumentKeyDown(e: KeyboardEvent) {
 function onDocumentKeyUp(e: KeyboardEvent) {
     if (e.key === 'Control') {
         isCtrlKeyPressed.value = false;
+    } else if (e.key === 'Meta') {
+        isMetaKeyPressed.value = false;
     } else if (e.key === 'Shift') {
         isShiftKeyPressed.value = false;
     } else if (e.key === 'Alt') {
         isAltKeyPressed.value = false;
     }
-    if (!isCtrlKeyPressed.value && !isShiftKeyPressed.value && !isAltKeyPressed.value) {
+    if (!isCtrlKeyPressed.value && !isMetaKeyPressed.value) {
+        isCtrlOrMetaKeyPressed.value = false;
+    }
+    if (!isCtrlKeyPressed.value && !isMetaKeyPressed.value && !isShiftKeyPressed.value && !isAltKeyPressed.value) {
         isAnyModifierKeyPressed.value = false;
     }
 }
@@ -144,6 +156,6 @@ async function onDocumentPaste(e: ClipboardEvent) {
     }
 } 
 
-document.addEventListener('keydown', onDocumentKeyDown, false);
-document.addEventListener('keyup', onDocumentKeyUp, false);
+document.addEventListener('keydown', onDocumentKeyDown, true);
+document.addEventListener('keyup', onDocumentKeyUp, true);
 document.addEventListener('paste', onDocumentPaste, false);

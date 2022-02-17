@@ -1,4 +1,4 @@
-import { isCtrlKeyPressed } from '@/lib/keyboard';
+import { isCtrlOrMetaKeyPressed } from '@/lib/keyboard';
 import { PointerTracker } from './base';
 import BaseCanvasMovementController from './base-movement';
 import canvasStore from '@/store/canvas';
@@ -50,7 +50,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                 canvasStore.set('cursor', null);
             } else {
                 if (e.isPrimary && ['mouse', 'pen'].includes(e.pointerType) && e.button === 0) {
-                    if (isCtrlKeyPressed.value === true) {
+                    if (isCtrlOrMetaKeyPressed.value === true) {
                         this.onZoomOut();
                     } else {
                         this.onZoomIn();
