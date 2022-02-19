@@ -19,6 +19,7 @@ interface CanvasState {
     isDisplayingNonRasterLayer: boolean;
     playingAnimation: boolean;
     preventPostProcess: boolean;
+    selectionMaskCanvas: HTMLCanvasElement;
     transform: DOMMatrix;
     transformResetOptions: undefined | true | CanvasViewResetOptions;
     useCssCanvas: boolean;
@@ -66,6 +67,7 @@ const store = new PerformantStore<CanvasStore>({
         isDisplayingNonRasterLayer: false,
         playingAnimation: false,
         preventPostProcess: false,
+        selectionMaskCanvas: dummyCanvas,
         transform: new DOMMatrix(),
         transformResetOptions: undefined,
         useCssCanvas: true,
@@ -77,7 +79,7 @@ const store = new PerformantStore<CanvasStore>({
         viewWidth: 100, // Maps to screen width; devicePixelRatio IS applied.
         workingImageBorderColor: '#cccccc'
     },
-    nonReactive: ['bufferCanvas', 'bufferCtx', 'isDisplayingNonRasterLayer', 'viewCanvas', 'viewCtx'],
+    nonReactive: ['bufferCanvas', 'bufferCtx', 'isDisplayingNonRasterLayer', 'selectionMaskCanvas', 'viewCanvas', 'viewCtx'],
     onSet(key, value, set) {
         if (key === 'transform') {
             const decomposedTransform = decomposeMatrix(value as DOMMatrix);

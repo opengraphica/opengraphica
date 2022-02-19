@@ -40,6 +40,7 @@ interface AppEmitterEvents {
     'app.workingFile.notifyImageLoadedFromDragAndDrop': undefined;
     'editor.history.step': undefined;
     'editor.tool.cancelCurrentAction': undefined;
+    'editor.tool.commitCurrentAction': undefined;
 }
 
 const emitter = mitt();

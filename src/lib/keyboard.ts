@@ -80,6 +80,8 @@ function onDocumentKeyDown(e: KeyboardEvent) {
         isAnyModifierKeyPressed.value = true;
     } else if (e.key === 'Escape') {
         appEmitter.emit('editor.tool.cancelCurrentAction');
+    } else if (e.key === 'Enter') {
+        appEmitter.emit('editor.tool.commitCurrentAction');
     } else if (isAnyModifierKeyPressed.value === true) {
         if (isInput(e.target)) return;
         const shortcuts = shortcutKeyMap.get(e.key.toLowerCase());

@@ -7046,6 +7046,8 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main {
   flex-grow: 1;
   touch-action: none;
+  position: relative;
+  z-index: 4;
 }
 .opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main:focus {
   outline: none;
@@ -7090,6 +7092,7 @@ body.ogr-full-page .opengraphica {
   bottom: 0;
   animation: ogr-menu-drawers-fade-in 0.15s ease-in;
   animation-fill-mode: forwards;
+  z-index: 5;
 }
 .opengraphica .ogr-menu-drawers.is-fade-out {
   animation: ogr-menu-drawers-fade-out 0.15s ease-in;
@@ -7187,7 +7190,6 @@ body.ogr-full-page .opengraphica {
   animation-fill-mode: forwards;
   animation-duration: 0.25s;
   animation-timing-function: ease-in;
-  z-index: 5;
 }
 .opengraphica .ogr-menu-drawer.is-immediate {
   animation: none;
@@ -7465,11 +7467,13 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .ogr-toolbar {
   display: block;
+  position: relative;
   transition: all 0.6s;
   width: 100%;
   max-width: 100%;
   background: var(--ogr-layout-menu-bar-background-color);
   box-shadow: 0 0 0 0.063rem var(--ogr-layout-menu-bar-border-color);
+  z-index: 4;
 }
 .opengraphica .ogr-toolbar.is-overlay {
   background: transparent;
@@ -7553,6 +7557,20 @@ body.ogr-full-page .opengraphica {
   width: 100%;
   height: 100%;
 }
+.opengraphica .ogr-canvas-selection-mask {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  image-rendering: optimizespeed;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}
 .opengraphica .ogr-canvas-overlays {
   display: block;
   position: absolute;
@@ -7563,11 +7581,16 @@ body.ogr-full-page .opengraphica {
   bottom: 0;
   width: 100%;
   height: 100%;
+  z-index: 2;
 }
 .opengraphica .ogr-canvas-overlays .ogr-canvas-overlay {
   position: absolute;
   top: 0;
   left: 0;
+}
+.opengraphica .ogr-canvas-overlays .ogr-canvas-overlay.is-full-canvas-area {
+  bottom: 0;
+  right: 0;
 }
 .opengraphica .ogr-canvas-container {
   display: block;
@@ -7906,6 +7929,43 @@ body.ogr-full-page .opengraphica {
   transform: rotate(270deg) translateY(-50%);
   transform-origin: left center;
 }
+@keyframes ogr-selection-path {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 16;
+  }
+}
+@keyframes ogr-selection-handle {
+  0% {
+    stroke: rgba(200, 200, 200, 0.9);
+  }
+  50% {
+    stroke: rgba(130, 130, 130, 0.5);
+  }
+  100% {
+    stroke: rgba(200, 200, 235, 0.9);
+  }
+}
+.opengraphica .ogr-selection {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+}
+.opengraphica .ogr-selection svg {
+  position: absolute;
+  transform-origin: top left;
+}
+.opengraphica .ogr-selection svg path {
+  animation: ogr-selection-path 1s linear infinite;
+}
+.opengraphica .ogr-selection svg rect, .opengraphica .ogr-selection svg ellipse {
+  fill: white;
+  animation: ogr-selection-handle 2s linear infinite;
+}
 .opengraphica .ogr-canvas, .opengraphica .ogr-post-process-canvas {
   display: block;
   position: absolute;
@@ -7915,6 +7975,7 @@ body.ogr-full-page .opengraphica {
   bottom: 0;
   width: 100%;
   height: 100%;
+  z-index: 0;
   image-rendering: -moz-crisp-edges;
   image-rendering: -webkit-crisp-edges;
   image-rendering: pixelated;

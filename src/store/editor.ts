@@ -28,7 +28,7 @@ interface EditorState {
     isActiveToolbarExclusive: boolean;
     isTaskRunning: boolean;
     loadingThemeName: string | null;
-    tasks: EditorDeferredTask[],
+    tasks: EditorDeferredTask[];
     themes: {
         [themeName: string]: string;
     };

@@ -31,9 +31,10 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                 const cursorX = e.pageX;
                 const cursorY = e.pageY;
                 let transform = canvasStore.get('transform');
-                const moveTranslateStart = new DOMPoint(lastCursorX * devicePixelRatio, lastCursorY * devicePixelRatio).matrixTransform(transform.inverse());
+                const transformInverse = transform.inverse();
+                const moveTranslateStart = new DOMPoint(lastCursorX * devicePixelRatio, lastCursorY * devicePixelRatio).matrixTransform(transformInverse);
                 // Pan View
-                const translateMove = new DOMPoint(cursorX * devicePixelRatio, cursorY * devicePixelRatio).matrixTransform(transform.inverse());
+                const translateMove = new DOMPoint(cursorX * devicePixelRatio, cursorY * devicePixelRatio).matrixTransform(transformInverse);
                 transform.translateSelf(translateMove.x - moveTranslateStart.x, translateMove.y - moveTranslateStart.y);
                 canvasStore.set('transform', transform);
                 canvasStore.set('viewDirty', true);

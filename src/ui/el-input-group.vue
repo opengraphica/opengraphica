@@ -1,6 +1,6 @@
 <template>
     <div class="el-input el-input-group el-input-group--prepend">
-        <el-tooltip v-if="prependTooltip" :content="prependTooltip" placement="top" :trigger="prependTooltip ? 'hover' : 'manual'">
+        <el-tooltip v-if="prependTooltip" :content="prependTooltip" placement="top" :trigger="prependTooltip ? 'hover' : 'manual'" :show-after="300">
             <div ref="prependEl" v-if="$slots.prepend" class="el-input-group__prepend px-2">
                 <slot name="prepend" />
             </div>

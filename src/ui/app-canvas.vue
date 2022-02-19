@@ -3,9 +3,10 @@
         <div ref="canvasContainer" class="ogr-canvas-container" :class="{ 'ogr-canvas-viewport-css': useCssViewport, 'ogr-canvas-viewport-css--pixelated': isPixelatedZoomLevel }">
             <canvas ref="canvas" class="ogr-canvas" />
             <canvas v-if="usePostProcess" ref="postProcessCanvas" class="ogr-post-process-canvas" />
-            <app-canvas-overlays v-if="useCssViewport" ref="canvasOverlays" />
         </div>
-        <app-canvas-overlays v-if="!useCssViewport" ref="canvasOverlays" />
+        <canvas ref="selectionMaskCanvas" class="ogr-canvas-selection-mask" />
+        <app-canvas-overlays ref="canvasOverlays" />
+        <app-canvas-overlays :ignore-transform="true" />
     </div>
 </template>
 
@@ -15,6 +16,7 @@ import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import workingFileStore from '@/store/working-file';
 import preferencesStore from '@/store/preferences';
+import { appliedSelectionMask, appliedSelectionMaskCanvasOffset } from '@/canvas/store/selection-state';
 import AppCanvasOverlays from '@/ui/app-canvas-overlays.vue';
 import { CanvasRenderingContext2DEnhanced } from '@/types';
 import { drawWorkingFileToCanvas, trackCanvasTransforms } from '@/lib/canvas';
@@ -36,6 +38,9 @@ export default defineComponent({
         const rootElement = inject<Ref<Element>>('rootElement');
         const mainElement = inject<Ref<Element>>('mainElement');
         const canvas = ref<HTMLCanvasElement>();
+        const selectionMaskCanvas = ref<HTMLCanvasElement>();
+        let selectionMaskCanvasCtx: CanvasRenderingContext2D | null = null;
+        const selectionMaskPattern = new Image();
         const postProcessCanvas = ref<HTMLCanvasElement>();
         const canvasArea = ref<HTMLDivElement>();
         const canvasContainer = ref<HTMLDivElement>();
@@ -174,6 +179,11 @@ export default defineComponent({
                     idle: 20000
                 });
             }
+            if (selectionMaskCanvas.value) {
+                canvasStore.set('selectionMaskCanvas', selectionMaskCanvas.value);
+                selectionMaskCanvasCtx = selectionMaskCanvas.value.getContext('2d');
+                selectionMaskPattern.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAABg2lDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV/TiiIVh3YQcchQnVoQFXHUKhShQqgVWnUwufQLmjQkKS6OgmvBwY/FqoOLs64OroIg+AHi6OSk6CIl/i8ptIjx4Lgf7+497t4BQrPKNCs0Dmi6bWZSSTGXXxV7XyEgghDiCMjMMuYkKQ3f8XWPAF/vEjzL/9yfY0AtWAwIiMSzzDBt4g3i6U3b4LxPHGVlWSU+J46bdEHiR64rHr9xLrks8Myomc3ME0eJxVIXK13MyqZGPEUcUzWd8oWcxyrnLc5atc7a9+QvDBf0lWWu0xxBCotYggQRCuqooAobCVp1UixkaD/p4x92/RK5FHJVwMixgBo0yK4f/A9+d2sVJye8pHAS6HlxnI9RoHcXaDUc5/vYcVonQPAZuNI7/loTmPkkvdHRYkfA4DZwcd3RlD3gcgcYejJkU3alIE2hWATez+ib8kDkFuhf83pr7+P0AchSV+kb4OAQGCtR9rrPu/u6e/v3TLu/Hx5FcoXj45C+AAAABmJLR0QATgBOAE714JEKAAAACXBIWXMAAC4jAAAuIwF4pT92AAAAB3RJTUUH5gITBDkEOkUYUQAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAAtSURBVAjXY/z//383AxT4+/szMCFzNm7cCBGAcRgYGBiYz58/7wbjMDAwMAAAGKUPRK2REh8AAAAASUVORK5CYII=';
+            }
         });
 
         onUnmounted(() => {
@@ -264,14 +274,33 @@ export default defineComponent({
                     } else if (canvasElement && ctx) {
                         drawWorkingFileToCanvas(canvasElement, ctx);
 
-                        // Update overlay transform
-                        if (hasCanvasOverlays && canvasOverlays.value) {
-                            (canvasOverlays.value as any).$el.style.transform = cssViewTransform;
-                        }
-
                         // Hide post process canvas
                         if (postProcessCanvas.value) {
                             postProcessCanvas.value.style.display = 'none';
+                        }
+                    }
+
+                    // Update overlay transform
+                    if (hasCanvasOverlays && canvasOverlays.value) {
+                        (canvasOverlays.value as any).$el.style.transform = cssViewTransform;
+                    }
+
+                    // Draw selection mask
+                    if (selectionMaskCanvas.value && selectionMaskCanvasCtx) {
+                        selectionMaskCanvas.value.width = viewportWidth.value;
+                        selectionMaskCanvas.value.height = viewportHeight.value;
+                        selectionMaskCanvasCtx.clearRect(0, 0, selectionMaskCanvas.value.width, selectionMaskCanvas.value.height);
+                        if (appliedSelectionMask.value) {
+                            const transform = canvasStore.get('transform');
+                            selectionMaskCanvasCtx.globalCompositeOperation = 'source-over';
+                            selectionMaskCanvasCtx.save();
+                            selectionMaskCanvasCtx.setTransform(transform.a, transform.b, transform.c, transform.d, transform.e, transform.f);
+                            selectionMaskCanvasCtx.drawImage(appliedSelectionMask.value, appliedSelectionMaskCanvasOffset.value.x, appliedSelectionMaskCanvasOffset.value.y);
+                            selectionMaskCanvasCtx.restore();
+                            selectionMaskCanvasCtx.globalCompositeOperation = 'source-out';
+                            const pattern = selectionMaskCanvasCtx.createPattern(selectionMaskPattern, 'repeat') || '#00000044';
+                            selectionMaskCanvasCtx.fillStyle = pattern;
+                            selectionMaskCanvasCtx.fillRect(0, 0, selectionMaskCanvas.value.width, selectionMaskCanvas.value.height);
                         }
                     }
                 }
@@ -394,6 +423,7 @@ export default defineComponent({
             canvasArea,
             canvasContainer,
             canvasOverlays,
+            selectionMaskCanvas,
             postProcessCanvas,
             isPixelatedZoomLevel,
             usePostProcess,

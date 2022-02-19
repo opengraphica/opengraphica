@@ -2,7 +2,7 @@
     <div class="is-flex container is-align-items-center is-justify-content-center mx-auto">
         <div class="ogr-toolbar-overlay">
             <div class="ogr-toolbar-tool-selector">
-                <span class="bi bi-cursor mb-1" aria-hidden="true"></span>
+                <span class="bi bi-cursor my-1" aria-hidden="true"></span>
                 <span class="ogr-toolbar-tool-selector__description">Settings</span>
             </div>
             <el-horizontal-scrollbar-arrows>
