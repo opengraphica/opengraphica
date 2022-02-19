@@ -1,160 +1,30 @@
 import BaseMovementController from './base-movement';
 import { PointerTracker } from './base';
-import { appliedSelectionMask, appliedSelectionMaskCanvasOffset, activeSelectionMask, isDrawingSelection, selectionAddShape, workingSelectionPath, selectionEmitter } from '../store/selection-state';
+import {
+    appliedSelectionMask, appliedSelectionMaskCanvasOffset, activeSelectionMask, activeSelectionMaskCanvasOffset, selectionMaskDrawMargin,
+    isDrawingSelection, selectionAddShape, workingSelectionPath, selectionEmitter, discardActiveSelectionMask, discardAppliedSelectionMask,
+    applyActiveSelection, previewActiveSelectionMask
+} from '../store/selection-state';
 import canvasStore from '@/store/canvas';
 import appEmitter from '@/lib/emitter';
+
+
 
 export default class SelectionController extends BaseMovementController {
     onEnter(): void {
         super.onEnter();
-        appEmitter.on('editor.tool.commitCurrentAction', this.commitActiveSelection.bind(this));
-        selectionEmitter.on('commitActiveSelection', this.commitActiveSelection.bind(this));
+        appEmitter.on('editor.tool.commitCurrentAction', this.applyActiveSelection.bind(this));
+        appEmitter.on('editor.tool.selectAll', this.clearSelection.bind(this));
+        selectionEmitter.on('applyActiveSelection', this.applyActiveSelection.bind(this));
         selectionEmitter.on('clearSelection', this.clearSelection.bind(this));
     }
 
     onLeave(): void {
         super.onLeave();
-        appEmitter.off('editor.tool.commitCurrentAction', this.commitActiveSelection.bind(this));
-        selectionEmitter.off('commitActiveSelection', this.commitActiveSelection.bind(this));
+        appEmitter.off('editor.tool.commitCurrentAction', this.applyActiveSelection.bind(this));
+        appEmitter.off('editor.tool.selectAll', this.clearSelection.bind(this));
+        selectionEmitter.off('applyActiveSelection', this.applyActiveSelection.bind(this));
         selectionEmitter.off('clearSelection', this.clearSelection.bind(this));
-    }
-
-    getActiveSelectionBounds(): { left: number; right: number; top: number; bottom: number; } {
-        let left = Infinity;
-        let right = -Infinity;
-        let top = Infinity;
-        let bottom = -Infinity;
-        for (const point of workingSelectionPath.value) {
-            if (point.x < left) {
-                left = point.x;
-            }
-            if (point.x > right) {
-                right = point.x;
-            }
-            if (point.y < top) {
-                top = point.y;
-            }
-            if (point.y > bottom) {
-                bottom = point.y;
-            }
-            if (point.type === 'quadraticBezierCurve') {
-                if (point.shx < left) {
-                    left = point.shx;
-                }
-                if (point.shx > right) {
-                    right = point.shx;
-                }
-                if (point.shy < top) {
-                    top = point.shy;
-                }
-                if (point.shy > bottom) {
-                    bottom = point.shy;
-                }
-                if (point.ehx < left) {
-                    left = point.ehx;
-                }
-                if (point.ehx > right) {
-                    right = point.ehx;
-                }
-                if (point.ehy < top) {
-                    top = point.ehy;
-                }
-                if (point.ehy > bottom) {
-                    bottom = point.ehy;
-                }
-            }
-        }
-        return { left, right, top, bottom };
-    }
-
-    async commitActiveSelection() {
-        const activeSelectionBounds = this.getActiveSelectionBounds();
-        if (appliedSelectionMask.value != null) {
-            if (appliedSelectionMaskCanvasOffset.value.x < activeSelectionBounds.left) {
-                activeSelectionBounds.left = appliedSelectionMaskCanvasOffset.value.x;
-            }
-            if (appliedSelectionMaskCanvasOffset.value.y < activeSelectionBounds.top) {
-                activeSelectionBounds.top = appliedSelectionMaskCanvasOffset.value.y;
-            }
-            if (appliedSelectionMaskCanvasOffset.value.x + appliedSelectionMask.value.width > activeSelectionBounds.right) {
-                activeSelectionBounds.right = appliedSelectionMaskCanvasOffset.value.x + appliedSelectionMask.value.width;
-            }
-            if (appliedSelectionMaskCanvasOffset.value.y + appliedSelectionMask.value.height > activeSelectionBounds.bottom) {
-                activeSelectionBounds.bottom = appliedSelectionMaskCanvasOffset.value.y + appliedSelectionMask.value.height;
-            }
-        }
-        let workingCanvas = document.createElement('canvas');
-        workingCanvas.width = activeSelectionBounds.right - activeSelectionBounds.left;
-        workingCanvas.height = activeSelectionBounds.bottom - activeSelectionBounds.top;
-        let ctx = workingCanvas.getContext('2d');
-        if (!ctx) throw new Error('Couldn\'t draw to a new canvas when trying to apply selection mask.');
-        ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height);
-        if (appliedSelectionMask.value != null) {
-            ctx.drawImage(appliedSelectionMask.value, appliedSelectionMaskCanvasOffset.value.x - activeSelectionBounds.left, appliedSelectionMaskCanvasOffset.value.y - activeSelectionBounds.top);            
-        }
-        ctx.beginPath();
-        for (const point of workingSelectionPath.value) {
-            if (point.type === 'move') {
-                ctx.moveTo(point.x - activeSelectionBounds.left, point.y - activeSelectionBounds.top);
-            } else if (point.type === 'line') {
-                ctx.lineTo(point.x - activeSelectionBounds.left, point.y - activeSelectionBounds.top);
-            } else if (point.type === 'quadraticBezierCurve') {
-                ctx.bezierCurveTo(
-                    point.shx - activeSelectionBounds.left,
-                    point.shy - activeSelectionBounds.top,
-                    point.ehx - activeSelectionBounds.left,
-                    point.ehy - activeSelectionBounds.top,
-                    point.x - activeSelectionBounds.left,
-                    point.y - activeSelectionBounds.top
-                );
-            }
-        }
-        ctx.closePath();
-        ctx.fillStyle = '#000000';
-        ctx.fill();
-        const newAppliedSelectionMask = await new Promise<InstanceType<typeof Image>>((resolve, reject) => {
-            try {
-                workingCanvas.toBlob((blob) => {
-                    if (blob) {
-                        let image = new Image();
-                        image.onload = () => {
-                            resolve(image);
-                            (image as any) = null;
-                        };
-                        image.onerror = (error) => {
-                            reject(error);
-                            (image as any) = null;
-                        };
-                        image.src = URL.createObjectURL(blob);
-                    } else {
-                        reject(new Error('Canvas blob not created when drawing new selection shape.'));
-                    }
-                });
-            } catch (error) {
-                reject(error);
-            }
-        });
-        if (appliedSelectionMask.value) {
-            URL.revokeObjectURL(appliedSelectionMask.value.src);
-        }
-        appliedSelectionMask.value = newAppliedSelectionMask;
-        appliedSelectionMaskCanvasOffset.value.x = activeSelectionBounds.left;
-        appliedSelectionMaskCanvasOffset.value.y = activeSelectionBounds.top;
-        workingSelectionPath.value = [];
-        canvasStore.set('viewDirty', true);
-        (workingCanvas as any) = null;
-        ctx = null;
-    }
-
-    clearSelection() {
-        if (appliedSelectionMask.value) {
-            URL.revokeObjectURL(appliedSelectionMask.value.src);
-        }
-        appliedSelectionMask.value = null;
-        appliedSelectionMaskCanvasOffset.value.x = 0;
-        appliedSelectionMaskCanvasOffset.value.y = 0;
-        workingSelectionPath.value = [];
-        canvasStore.set('viewDirty', true);
     }
 
     onMultiTouchDown() {
@@ -173,8 +43,14 @@ export default class SelectionController extends BaseMovementController {
         }
     }
 
-    onDragStart() {
-
+    async onPointerDragStart(e: PointerEvent) {
+        super.onPointerDragStart(e);
+        const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
+        if (pointer && (pointer.type !== 'touch' || this.multiTouchDownCount === 1)) {
+            if (e.isPrimary && pointer.down.button === 0) {
+                await this.applyActiveSelection();
+            }
+        }
     }
 
     onPointerMove(e: PointerEvent): void {
@@ -322,6 +198,7 @@ export default class SelectionController extends BaseMovementController {
         if (pointer && pointer.down.button === 0) {
             if (pointer.isDragging) {
                 isDrawingSelection.value = false;
+                this.previewActiveSelectionMask();
             } else {
                 if (e.isPrimary && ['mouse', 'pen'].includes(e.pointerType) && e.button === 0) {
                     if (this.canAddPoint()) {
@@ -338,5 +215,27 @@ export default class SelectionController extends BaseMovementController {
 
     private canAddPoint() {
         return selectionAddShape.value === 'free';
+    }
+
+    async applyActiveSelection() {
+        await applyActiveSelection();
+        canvasStore.set('viewDirty', true);
+    }
+
+    async discardActiveSelectionMaskPreview() {
+        discardActiveSelectionMask();
+        canvasStore.set('viewDirty', true);
+    }
+
+    async previewActiveSelectionMask() {
+        await previewActiveSelectionMask();
+        canvasStore.set('viewDirty', true);
+    }
+
+    clearSelection() {
+        discardActiveSelectionMask();
+        discardAppliedSelectionMask();
+        workingSelectionPath.value = [];
+        canvasStore.set('viewDirty', true);
     }
 }

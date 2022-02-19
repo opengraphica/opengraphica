@@ -22,7 +22,7 @@ interface ShortcutDefinition {
     ctrl: boolean;
     shift: boolean;
     action: {
-        type: 'dock' | 'toolGroup' | 'runModule';
+        type: 'dock' | 'toolGroup' | 'runModule' | 'appEmit';
         target: string;
     };
 }
@@ -103,6 +103,8 @@ function onDocumentKeyDown(e: KeyboardEvent) {
                     } else if (shortcut.action.type === 'runModule') {
                         const actionSplit = shortcut.action.target.split('/');
                         runModule(actionSplit[0], actionSplit[1]);
+                    } else if (shortcut.action.type === 'appEmit') {
+                        appEmitter.emit(shortcut.action.target as any);
                     }
                     break;
                 }

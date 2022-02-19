@@ -39,5 +39,20 @@
                 ]
             }
         ]
+    },
+    {
+        "name": "Selection",
+        "actions": [
+            {
+                "action": {
+                    "type": "appEmit",
+                    "target": "editor.tool.selectAll"
+                },
+                "name": "Select All",
+                "shortcuts": [
+                    "ctrl+a"
+                ]
+            }
+        ]
     }
 ]

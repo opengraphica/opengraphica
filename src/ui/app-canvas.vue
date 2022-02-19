@@ -16,7 +16,7 @@ import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import workingFileStore from '@/store/working-file';
 import preferencesStore from '@/store/preferences';
-import { appliedSelectionMask, appliedSelectionMaskCanvasOffset } from '@/canvas/store/selection-state';
+import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset } from '@/canvas/store/selection-state';
 import AppCanvasOverlays from '@/ui/app-canvas-overlays.vue';
 import { CanvasRenderingContext2DEnhanced } from '@/types';
 import { drawWorkingFileToCanvas, trackCanvasTransforms } from '@/lib/canvas';
@@ -102,6 +102,7 @@ export default defineComponent({
                     drawWorkingFileToCanvas(canvasElement, ctx);
                 }
             }
+            canvasStore.set('viewDirty', true);
         });
 
         watch([imageWidth, imageHeight], ([newWidth, newHeight]) => {
@@ -289,13 +290,18 @@ export default defineComponent({
                     if (selectionMaskCanvas.value && selectionMaskCanvasCtx) {
                         selectionMaskCanvas.value.width = viewportWidth.value;
                         selectionMaskCanvas.value.height = viewportHeight.value;
+                        selectionMaskCanvasCtx.imageSmoothingEnabled = false; // Disable for some decent antialiasing.
                         selectionMaskCanvasCtx.clearRect(0, 0, selectionMaskCanvas.value.width, selectionMaskCanvas.value.height);
-                        if (appliedSelectionMask.value) {
+                        if (appliedSelectionMask.value || activeSelectionMask.value) {
                             const transform = canvasStore.get('transform');
                             selectionMaskCanvasCtx.globalCompositeOperation = 'source-over';
                             selectionMaskCanvasCtx.save();
                             selectionMaskCanvasCtx.setTransform(transform.a, transform.b, transform.c, transform.d, transform.e, transform.f);
-                            selectionMaskCanvasCtx.drawImage(appliedSelectionMask.value, appliedSelectionMaskCanvasOffset.value.x, appliedSelectionMaskCanvasOffset.value.y);
+                            if (activeSelectionMask.value) {
+                                selectionMaskCanvasCtx.drawImage(activeSelectionMask.value, activeSelectionMaskCanvasOffset.value.x, activeSelectionMaskCanvasOffset.value.y);
+                            } else if (appliedSelectionMask.value) {
+                                selectionMaskCanvasCtx.drawImage(appliedSelectionMask.value, appliedSelectionMaskCanvasOffset.value.x, appliedSelectionMaskCanvasOffset.value.y);
+                            }
                             selectionMaskCanvasCtx.restore();
                             selectionMaskCanvasCtx.globalCompositeOperation = 'source-out';
                             const pattern = selectionMaskCanvasCtx.createPattern(selectionMaskPattern, 'repeat') || '#00000044';

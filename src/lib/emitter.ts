@@ -41,6 +41,7 @@ interface AppEmitterEvents {
     'editor.history.step': undefined;
     'editor.tool.cancelCurrentAction': undefined;
     'editor.tool.commitCurrentAction': undefined;
+    'editor.tool.selectAll': undefined;
 }
 
 const emitter = mitt();

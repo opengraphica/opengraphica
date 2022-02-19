@@ -123,6 +123,13 @@ export default class BaseCanvasController {
         canvasStore.set('preventPostProcess', true);
     }
 
+    /**
+     * Fires when a pointer is down and has moved outside the drag radius.
+     */
+    onPointerDragStart(e: PointerEvent): void {
+        // Override
+    }
+
     onPointerMove(e: PointerEvent): void {
         const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
         if (pointer) {
@@ -132,7 +139,10 @@ export default class BaseCanvasController {
                 Math.abs(pointer.down.pageX - pointer.move.pageX) >= this.dragStartRadius ||
                 Math.abs(pointer.down.pageY - pointer.move.pageY) >= this.dragStartRadius
             ) {
-                pointer.isDragging = true;
+                if (!pointer.isDragging) {
+                    pointer.isDragging = true;
+                    this.onPointerDragStart(e);
+                }
             }
         }
     }

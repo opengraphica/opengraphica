@@ -11,7 +11,7 @@
                         <span class="bi" aria-hidden="true" :class="{
                             'bi-square': selectionAddShape === 'rectangle',
                             'bi-circle': selectionAddShape === 'ellipse',
-                            'bi-brush': selectionAddShape === 'free',
+                            'bi-slash-lg': selectionAddShape === 'free',
                             'bi-magic': selectionAddShape === 'tonalArea'
                         }" />
                     </template>
@@ -23,30 +23,41 @@
                             <span class="bi bi-circle mr-1" aria-hidden="true" /> Ellipse
                         </el-option>
                         <el-option label="Free" value="free">
-                            <span class="bi bi-brush mr-1" aria-hidden="true" /> Free
+                            <span class="bi bi-slash-lg mr-1" aria-hidden="true" /> Free
                         </el-option>
                         <el-option label="Tonal Area" value="tonalArea">
                             <span class="bi bi-magic mr-1" aria-hidden="true" /> Tonal Area
                         </el-option>
                     </el-select>
                 </el-input-group>
-                <el-radio-group v-model="selectionCombineMode" class="ml-3 is-flex-wrap-nowrap" size="small">
-                    <el-tooltip content="Add to Selection" placement="top" :show-after="300">
-                        <el-radio-button label="add"><span class="bi bi-plus-circle" aria-hidden="true"></span></el-radio-button>
-                    </el-tooltip>
-                    <el-tooltip content="Subtract from Selection" placement="top" :show-after="300">
-                        <el-radio-button label="subtract"><span class="bi bi-dash-circle" aria-hidden="true"></span></el-radio-button>
-                    </el-tooltip>
-                    <el-tooltip content="Intersect with Selection" placement="top" :show-after="300">
-                        <el-radio-button label="intersect"><span class="bi bi-intersect" aria-hidden="true"></span></el-radio-button>
-                    </el-tooltip>
-                </el-radio-group>
-                <el-button class="ml-3" size="small" :disabled="!canClearSelection" @click="onClickClear">
-                    <span class="bi bi-x-lg mr-2" aria-hidden="true" /> Clear
-                </el-button>
-                <el-button class="ml-3" size="small" :disabled="!canApplySelection" @click="onClickApply">
-                    <span class="bi bi-check-lg mr-2" aria-hidden="true" /> Apply
-                </el-button>
+                <el-input-group prepend-tooltip="Selection Combine Mode" class="ml-3">
+                    <template #prepend>
+                        <span class="bi" aria-hidden="true" :class="{
+                            'bi-plus-circle': selectionCombineModeComputed === 'add',
+                            'bi-dash-circle': selectionCombineModeComputed === 'subtract',
+                            'bi-intersect': selectionCombineModeComputed === 'intersect'
+                        }" />
+                    </template>
+                    <el-select aria-label="Selection Shape" v-model="selectionCombineModeComputed" size="small" style="width: 5.5rem">
+                        <el-option label="Add" value="add">
+                            <span class="bi bi-plus-circle mr-1" aria-hidden="true" /> Add
+                        </el-option>
+                        <el-option label="Subtract" value="subtract">
+                            <span class="bi bi-dash-circle mr-1" aria-hidden="true" /> Subtract
+                        </el-option>
+                        <el-option label="Intersect" value="intersect">
+                            <span class="bi bi-intersect mr-1" aria-hidden="true" /> Intersect
+                        </el-option>
+                    </el-select>
+                </el-input-group>
+                <el-button-group class="is-flex ml-3">
+                    <el-button size="small" :disabled="!canClearSelection" @click="onClickClear">
+                        <span class="bi bi-x-circle-fill mr-2" aria-hidden="true" /> Clear
+                    </el-button>
+                    <el-button size="small" :disabled="!canApplySelection" @click="onClickApply">
+                        <span class="bi bi-check-circle-fill mr-2" aria-hidden="true" /> Apply
+                    </el-button>
+                </el-button-group>
             </el-horizontal-scrollbar-arrows>
         </div>
     </div>
@@ -66,7 +77,7 @@ import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElTooltip from 'element-plus/lib/components/tooltip/index';
 import appEmitter from '@/lib/emitter';
 import canvasStore from '@/store/canvas';
-import { appliedSelectionMask, selectionAddShape, selectionCombineMode, selectionEmitter, workingSelectionPath } from '@/canvas/store/selection-state';
+import { appliedSelectionMask, applyActiveSelection, selectionAddShape, selectionCombineMode, selectionEmitter, workingSelectionPath } from '@/canvas/store/selection-state';
 
 export default defineComponent({
     name: 'ToolbarFreeTransform',
@@ -102,17 +113,29 @@ export default defineComponent({
             return workingSelectionPath.value.length > 0;
         });
 
+        const selectionCombineModeComputed = computed<'replace' | 'add' | 'subtract' | 'intersect'>({
+            get() {
+                return selectionCombineMode.value;
+            },
+            async set(value) {
+                if (workingSelectionPath.value.length > 0) {
+                    await applyActiveSelection();
+                }
+                selectionCombineMode.value = value;
+            }
+        });
+
         function onClickClear() {
             selectionEmitter.emit('clearSelection');
         }
 
         function onClickApply() {
-            selectionEmitter.emit('commitActiveSelection');
+            selectionEmitter.emit('applyActiveSelection');
         }
 
         return {
             selectionAddShape,
-            selectionCombineMode,
+            selectionCombineModeComputed,
             canClearSelection,
             canApplySelection,
             onClickClear,

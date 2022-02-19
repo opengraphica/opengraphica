@@ -1,6 +1,6 @@
 export interface KeyboardMapConfigAction {
     action: {
-        type: 'dock' | 'toolGroup' | 'runModule';
+        type: 'dock' | 'toolGroup' | 'runModule' | 'appEmit';
         target: string;
     };
     name: string;
