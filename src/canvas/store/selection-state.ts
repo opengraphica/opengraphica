@@ -41,12 +41,12 @@ export const selectionEmitter = mitt();
 
 export interface SelectionBounds { left: number; right: number; top: number; bottom: number; };
 
-export function getActiveSelectionBounds(): SelectionBounds {
+export function getActiveSelectionBounds(workingSelectionPathOverride: Array<SelectionPathPoint> = workingSelectionPath.value): SelectionBounds {
     let left = Infinity;
     let right = -Infinity;
     let top = Infinity;
     let bottom = -Infinity;
-    for (const point of workingSelectionPath.value) {
+    for (const point of workingSelectionPathOverride) {
         if (point.x < left) {
             left = point.x;
         }
@@ -89,12 +89,13 @@ export function getActiveSelectionBounds(): SelectionBounds {
     return { left, right, top, bottom };
 }
 
-export async function applyActiveSelection() {
+export async function applyActiveSelection(workingSelectionPathOverride: Array<SelectionPathPoint> = workingSelectionPath.value, options: { doNotClear?: boolean } = {}) {
+    const isOverride = workingSelectionPathOverride !== workingSelectionPath.value;
     let drawMargin: number = selectionMaskDrawMargin.value;
-    const activeSelectionBounds = getActiveSelectionBounds();
+    const activeSelectionBounds = getActiveSelectionBounds(workingSelectionPathOverride);
     let newAppliedSelectionMask = null;
-    if (workingSelectionPath.value.length > 0) {
-        newAppliedSelectionMask = await createActiveSelectionMask(activeSelectionBounds);
+    if (workingSelectionPathOverride.length > 0) {
+        newAppliedSelectionMask = await createActiveSelectionMask(activeSelectionBounds, workingSelectionPathOverride);
     }
     if (appliedSelectionMask.value) {
         URL.revokeObjectURL(appliedSelectionMask.value.src);
@@ -104,13 +105,15 @@ export async function applyActiveSelection() {
         appliedSelectionMaskCanvasOffset.value.x = activeSelectionBounds.left - drawMargin;
         appliedSelectionMaskCanvasOffset.value.y = activeSelectionBounds.top - drawMargin;
     }
-    workingSelectionPath.value = [];
+    if (!options.doNotClear) {
+        workingSelectionPath.value = [];
+    }
 }
 
-export async function previewActiveSelectionMask() {
+export async function previewActiveSelectionMask(workingSelectionPathOverride: Array<SelectionPathPoint> = workingSelectionPath.value) {
     let drawMargin: number = selectionMaskDrawMargin.value;
-    const activeSelectionBounds = getActiveSelectionBounds();
-    const newActiveSelectionMask = await createActiveSelectionMask(activeSelectionBounds);
+    const activeSelectionBounds = getActiveSelectionBounds(workingSelectionPathOverride);
+    const newActiveSelectionMask = await createActiveSelectionMask(activeSelectionBounds, workingSelectionPathOverride);
     if (activeSelectionMask.value) {
         URL.revokeObjectURL(activeSelectionMask.value.src);
     }
@@ -137,7 +140,7 @@ export function discardActiveSelectionMask() {
     activeSelectionMaskCanvasOffset.value.y = 0;
 }
 
-export async function createActiveSelectionMask(activeSelectionBounds: SelectionBounds) {
+export async function createActiveSelectionMask(activeSelectionBounds: SelectionBounds, workingSelectionPathOverride: Array<SelectionPathPoint> = workingSelectionPath.value) {
     let drawMargin: number = selectionMaskDrawMargin.value;
 
     if (appliedSelectionMask.value != null) {
@@ -182,7 +185,7 @@ export async function createActiveSelectionMask(activeSelectionBounds: Selection
         ctx.globalCompositeOperation = 'destination-in';
     }
     ctx.beginPath();
-    for (const point of workingSelectionPath.value) {
+    for (const point of workingSelectionPathOverride) {
         if (point.type === 'move') {
             ctx.moveTo(point.x - activeSelectionBounds.left + drawMargin, point.y - activeSelectionBounds.top + drawMargin);
         } else if (point.type === 'line') {
