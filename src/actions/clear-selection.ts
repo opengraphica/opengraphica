@@ -6,6 +6,7 @@ import {
     activeSelectionPath, previewActiveSelectionMask, selectionCombineMode, SelectionPathPoint, SelectionCombineMode
 } from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
+import editorStore from '@/store/editor';
 
 export class ClearSelectionAction extends BaseAction {
 
@@ -110,6 +111,11 @@ export class ClearSelectionAction extends BaseAction {
             selectionCombineMode.value = this.oldSelectionCombineMode;
         }
         activeSelectionPath.value = [...this.oldActiveSelectionPath];
+        if (activeSelectionPath.value.length > 0) {
+            if (editorStore.get('activeToolGroup') !== 'selection') {
+                editorStore.dispatch('setActiveTool', { group: 'selection' });
+            }
+        }
 
         await previewActiveSelectionMask();
 

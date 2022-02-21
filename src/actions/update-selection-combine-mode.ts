@@ -1,4 +1,3 @@
-
 import { BaseAction } from './base';
 import { selectionCombineMode, SelectionCombineMode } from '@/canvas/store/selection-state';
 

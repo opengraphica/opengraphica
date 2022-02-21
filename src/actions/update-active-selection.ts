@@ -2,11 +2,11 @@
 import { BaseAction } from './base';
 import { activeSelectionPath, previewActiveSelectionMask, selectionCombineMode, SelectionPathPoint, SelectionCombineMode } from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
+import editorStore from '@/store/editor';
 
 export class UpdateActiveSelectionAction extends BaseAction {
 
     private newActiveSelectionPath: Array<SelectionPathPoint> = [];
-    // private newSelectionCombineMode: SelectionCombineMode;
     private oldActiveSelectionPath: Array<SelectionPathPoint> = [];
     private oldSelectionCombineMode: SelectionCombineMode | null = null;
 
@@ -18,15 +18,18 @@ export class UpdateActiveSelectionAction extends BaseAction {
         } else {
             this.oldActiveSelectionPath = [...activeSelectionPath.value];
         }
-        // this.newSelectionCombineMode = newSelectionCombineMode;
         this.oldSelectionCombineMode = selectionCombineMode.value;
 	}
 
 	public async do() {
         super.do();
 
-        // selectionCombineMode.value = this.newSelectionCombineMode;
         activeSelectionPath.value = this.newActiveSelectionPath;
+        if (activeSelectionPath.value.length > 0) {
+            if (editorStore.get('activeToolGroup') !== 'selection') {
+                editorStore.dispatch('setActiveTool', { group: 'selection' });
+            }
+        }
         await previewActiveSelectionMask();
         canvasStore.set('viewDirty', true);
     }
@@ -38,6 +41,11 @@ export class UpdateActiveSelectionAction extends BaseAction {
             selectionCombineMode.value = this.oldSelectionCombineMode;
         }
         activeSelectionPath.value = this.oldActiveSelectionPath;
+        if (activeSelectionPath.value.length > 0) {
+            if (editorStore.get('activeToolGroup') !== 'selection') {
+                editorStore.dispatch('setActiveTool', { group: 'selection' });
+            }
+        }
         await previewActiveSelectionMask();
         canvasStore.set('viewDirty', true);
     }
