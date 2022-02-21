@@ -2,17 +2,20 @@ import BaseMovementController from './base-movement';
 import { ref, watch } from 'vue';
 import { PointerTracker } from './base';
 import {
-    appliedSelectionMask, appliedSelectionMaskCanvasOffset, activeSelectionMask, activeSelectionMaskCanvasOffset, selectionMaskDrawMargin,
-    isDrawingSelection, selectionAddShape, workingSelectionPath, selectionEmitter, discardActiveSelectionMask, discardAppliedSelectionMask,
-    applyActiveSelection, previewActiveSelectionMask, SelectionPathPoint
+    isDrawingSelection, selectionAddShape, activeSelectionPath, selectionCombineMode, selectionEmitter, SelectionPathPoint
 } from '../store/selection-state';
 import canvasStore from '@/store/canvas';
+import historyStore from '@/store/history';
 import appEmitter from '@/lib/emitter';
+import { ApplyActiveSelectionAction } from '@/actions/apply-active-selection';
+import { ClearSelectionAction } from '@/actions/clear-selection';
+import { UpdateActiveSelectionAction } from '@/actions/update-active-selection';
+import { UpdateSelectionCombineModeAction } from '@/actions/update-selection-combine-mode';
 
 export default class SelectionController extends BaseMovementController {
     private asyncActionStack: Array<{ callback: (...args: any[]) => Promise<any>, args?: any[] }> = [];
     private currentAsyncAction: ({ callback: (...args: any[]) => Promise<any>, args?: any[] }) | undefined = undefined;
-    private hasStartedDragging: boolean = false;
+    private dragStartActiveSelectionPath: Array<SelectionPathPoint> | undefined = undefined;
 
     queueAsyncAction(callback: (...args: any[]) => Promise<any>, args?: any[]) {
         this.asyncActionStack.push({
@@ -43,6 +46,7 @@ export default class SelectionController extends BaseMovementController {
         appEmitter.on('editor.tool.selectAll', this.queueClearSelection.bind(this));
         selectionEmitter.on('applyActiveSelection', this.queueApplyActiveSelection.bind(this));
         selectionEmitter.on('clearSelection', this.queueClearSelection.bind(this));
+        selectionEmitter.on('updateSelectionCombineMode', this.queueUpdateSelectionCombineMode.bind(this));
     }
 
     onLeave(): void {
@@ -51,6 +55,7 @@ export default class SelectionController extends BaseMovementController {
         appEmitter.off('editor.tool.selectAll', this.queueClearSelection.bind(this));
         selectionEmitter.off('applyActiveSelection', this.queueApplyActiveSelection.bind(this));
         selectionEmitter.off('clearSelection', this.queueClearSelection.bind(this));
+        selectionEmitter.off('updateSelectionCombineMode', this.queueUpdateSelectionCombineMode.bind(this));
     }
 
     onMultiTouchDown() {
@@ -79,11 +84,13 @@ export default class SelectionController extends BaseMovementController {
         const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
         if (pointer && (pointer.type !== 'touch' || this.multiTouchDownCount === 1)) {
             if (pointer.isDragging && e.isPrimary && pointer.down.button === 0) {
-                if (!this.hasStartedDragging) {
-                    this.hasStartedDragging = true;
-                    this.queueAsyncAction((workingSelectionPathOverride: Array<SelectionPathPoint>) => {
-                        return this.applyActiveSelection(workingSelectionPathOverride, { doNotClear: true });
-                    }, [[...workingSelectionPath.value]]);
+                if (!this.dragStartActiveSelectionPath) {
+                    this.dragStartActiveSelectionPath = [];
+                    if (activeSelectionPath.value.length > 0) {
+                        this.queueAsyncAction((activeSelectionPathOverride: Array<SelectionPathPoint>) => {
+                            return this.applyActiveSelection(activeSelectionPathOverride, { doNotClearActiveSelection: true });
+                        }, [[...activeSelectionPath.value]]);
+                    }
                 }
                 isDrawingSelection.value = true;
                 const startCursorX = pointer.down.pageX;
@@ -115,7 +122,7 @@ export default class SelectionController extends BaseMovementController {
                     }
 
                     if (selectionAddShape.value === 'rectangle') {
-                        workingSelectionPath.value = [
+                        activeSelectionPath.value = [
                             {
                                 type: 'move',
                                 x: topLeft.x,
@@ -169,7 +176,7 @@ export default class SelectionController extends BaseMovementController {
                         const rightTopHandleY = rightY + ((topRight.y - rightY) * circularHandleOffset);
                         const rightBottomHandleX = rightX + ((bottomRight.x - rightX) * circularHandleOffset);
                         const rightBottomHandleY = rightY + ((bottomRight.y - rightY) * circularHandleOffset);
-                        workingSelectionPath.value = [
+                        activeSelectionPath.value = [
                             {
                                 type: 'move',
                                 x: topX,
@@ -224,11 +231,11 @@ export default class SelectionController extends BaseMovementController {
         const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
         if (pointer && pointer.down.button === 0) {
             if (pointer.isDragging) {
-                this.hasStartedDragging = false;
                 isDrawingSelection.value = false;
-                this.queueAsyncAction((workingSelectionPathOverride: Array<SelectionPathPoint>) => {
-                    return this.previewActiveSelectionMask(workingSelectionPathOverride);
-                }, [[...workingSelectionPath.value]]);
+                this.queueAsyncAction((newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) => {
+                    return this.updateActiveSelection(newPath, oldPath);
+                }, [activeSelectionPath.value, this.dragStartActiveSelectionPath]);
+                this.dragStartActiveSelectionPath = undefined;
             } else {
                 if (e.isPrimary && ['mouse', 'pen'].includes(e.pointerType) && e.button === 0) {
                     if (this.canAddPoint()) {
@@ -247,37 +254,42 @@ export default class SelectionController extends BaseMovementController {
         return selectionAddShape.value === 'free';
     }
 
-    async applyActiveSelection(workingSelectionPathOverride: Array<SelectionPathPoint> = workingSelectionPath.value, options?: any) {
-        await applyActiveSelection(workingSelectionPathOverride, options);
-        canvasStore.set('viewDirty', true);
+    async applyActiveSelection(activeSelectionPathOverride: Array<SelectionPathPoint> = activeSelectionPath.value, options?: any) {
+        await historyStore.dispatch('runAction', {
+            action: new ApplyActiveSelectionAction(activeSelectionPathOverride, options)
+        });
     }
 
     async queueApplyActiveSelection() {
-        this.queueAsyncAction((workingSelectionPathOverride: Array<SelectionPathPoint>) => {
-            return this.applyActiveSelection(workingSelectionPathOverride);
-        }, [[...workingSelectionPath.value]]);
+        this.queueAsyncAction((activeSelectionPathOverride: Array<SelectionPathPoint>) => {
+            return this.applyActiveSelection(activeSelectionPathOverride);
+        }, [[...activeSelectionPath.value]]);
     }
 
-    async discardActiveSelectionMaskPreview() {
-        discardActiveSelectionMask();
-        canvasStore.set('viewDirty', true);
-    }
-
-    async previewActiveSelectionMask(workingSelectionPathOverride: Array<SelectionPathPoint> = workingSelectionPath.value) {
-        await previewActiveSelectionMask(workingSelectionPathOverride);
-        canvasStore.set('viewDirty', true);
+    async updateActiveSelection(newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) {
+        await historyStore.dispatch('runAction', {
+            action: new UpdateActiveSelectionAction(newPath, oldPath)
+        });
     }
 
     async clearSelection() {
-        discardActiveSelectionMask();
-        discardAppliedSelectionMask();
-        workingSelectionPath.value = [];
-        canvasStore.set('viewDirty', true);
+        await historyStore.dispatch('runAction', {
+            action: new ClearSelectionAction()
+        });
     }
 
     async queueClearSelection() {
         this.queueAsyncAction(() => {
             return this.clearSelection();
+        });
+    }
+
+    async queueUpdateSelectionCombineMode(event: any) {
+        this.queueAsyncAction(async () => {
+            await historyStore.dispatch('runAction', {
+                action: new UpdateSelectionCombineModeAction(event, selectionCombineMode.value),
+                mergeWithHistory: ['applyActiveSelection']
+            });
         });
     }
 }

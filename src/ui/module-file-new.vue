@@ -163,8 +163,8 @@ export default defineComponent({
         const formData = reactive({
             workingFile: {
                 measuringUnits: 'px' as 'px' | 'mm' | 'cm' | 'in',
-                width: 100, // Always pixels
-                height: 100, // Always pixels
+                width: 1000, // Always pixels
+                height: 1000, // Always pixels
                 resolution: 300,
                 resolutionUnits: 'px/in' as 'px/in' | 'px/mm' | 'px/cm',
                 colorProfile: 'sRGB',

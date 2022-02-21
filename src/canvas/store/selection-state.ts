@@ -2,8 +2,11 @@ import mitt from 'mitt';
 import { ref, reactive } from 'vue';
 import workingFileStore from '@/store/working-file';
 
-export const selectionAddShape = ref<'rectangle' | 'ellipse' | 'free' | 'tonalArea'>('rectangle');
-export const selectionCombineMode = ref<'add' | 'subtract' | 'intersect' | 'replace'>('add');
+export type SelectionAddShape = 'rectangle' | 'ellipse' | 'free' | 'tonalArea';
+export type SelectionCombineMode = 'add' | 'subtract' | 'intersect' | 'replace';
+
+export const selectionAddShape = ref<SelectionAddShape>('rectangle');
+export const selectionCombineMode = ref<SelectionCombineMode>('add');
 export const isDrawingSelection = ref<boolean>(false);
 export const appliedSelectionMask = ref<InstanceType<typeof Image> | null>(null);
 export const appliedSelectionMaskCanvasOffset = ref<DOMPoint>(new DOMPoint());
@@ -35,18 +38,18 @@ export interface SelectionPathPointQuadraticBezierCurve extends SelectionPathPoi
 
 export type SelectionPathPoint = SelectionPathPointMove | SelectionPathPointLine | SelectionPathPointQuadraticBezierCurve;
 
-export const workingSelectionPath = ref<Array<SelectionPathPoint>>([]);
+export const activeSelectionPath = ref<Array<SelectionPathPoint>>([]);
 
 export const selectionEmitter = mitt();
 
 export interface SelectionBounds { left: number; right: number; top: number; bottom: number; };
 
-export function getActiveSelectionBounds(workingSelectionPathOverride: Array<SelectionPathPoint> = workingSelectionPath.value): SelectionBounds {
+export function getActiveSelectionBounds(activeSelectionPathOverride: Array<SelectionPathPoint> = activeSelectionPath.value): SelectionBounds {
     let left = Infinity;
     let right = -Infinity;
     let top = Infinity;
     let bottom = -Infinity;
-    for (const point of workingSelectionPathOverride) {
+    for (const point of activeSelectionPathOverride) {
         if (point.x < left) {
             left = point.x;
         }
@@ -89,37 +92,47 @@ export function getActiveSelectionBounds(workingSelectionPathOverride: Array<Sel
     return { left, right, top, bottom };
 }
 
-export async function applyActiveSelection(workingSelectionPathOverride: Array<SelectionPathPoint> = workingSelectionPath.value, options: { doNotClear?: boolean } = {}) {
-    const isOverride = workingSelectionPathOverride !== workingSelectionPath.value;
+export async function previewActiveSelectionMask(activeSelectionPathOverride: Array<SelectionPathPoint> = activeSelectionPath.value) {
     let drawMargin: number = selectionMaskDrawMargin.value;
-    const activeSelectionBounds = getActiveSelectionBounds(workingSelectionPathOverride);
-    let newAppliedSelectionMask = null;
-    if (workingSelectionPathOverride.length > 0) {
-        newAppliedSelectionMask = await createActiveSelectionMask(activeSelectionBounds, workingSelectionPathOverride);
+    if (activeSelectionPathOverride.length > 0) {
+        const activeSelectionBounds = getActiveSelectionBounds(activeSelectionPathOverride);
+        const newActiveSelectionMaskCanvas = await createActiveSelectionMask(activeSelectionBounds, activeSelectionPathOverride);
+        const newActiveSelectionMask = await new Promise<InstanceType<typeof Image>>((resolve, reject) => {
+            try {
+                newActiveSelectionMaskCanvas.toBlob((blob) => {
+                    if (blob) {
+                        let image = new Image();
+                        image.onload = () => {
+                            resolve(image);
+                            (image as any) = null;
+                        };
+                        image.onerror = (error) => {
+                            reject(error);
+                            (image as any) = null;
+                        };
+                        image.src = URL.createObjectURL(blob);
+                    } else {
+                        reject(new Error('Canvas blob not created when drawing new selection shape.'));
+                    }
+                }, 'image/png', 1);
+            } catch (error) {
+                reject(error);
+            }
+        });
+        if (activeSelectionMask.value) {
+            URL.revokeObjectURL(activeSelectionMask.value.src);
+        }
+        activeSelectionMask.value = newActiveSelectionMask;
+        activeSelectionMaskCanvasOffset.value.x = activeSelectionBounds.left - drawMargin;
+        activeSelectionMaskCanvasOffset.value.y = activeSelectionBounds.top - drawMargin;
+    } else {
+        if (activeSelectionMask.value) {
+            URL.revokeObjectURL(activeSelectionMask.value.src);
+        }
+        activeSelectionMask.value = null;
+        activeSelectionMaskCanvasOffset.value.x = 0;
+        activeSelectionMaskCanvasOffset.value.y = 0;
     }
-    if (appliedSelectionMask.value) {
-        URL.revokeObjectURL(appliedSelectionMask.value.src);
-    }
-    if (newAppliedSelectionMask) {
-        appliedSelectionMask.value = newAppliedSelectionMask;
-        appliedSelectionMaskCanvasOffset.value.x = activeSelectionBounds.left - drawMargin;
-        appliedSelectionMaskCanvasOffset.value.y = activeSelectionBounds.top - drawMargin;
-    }
-    if (!options.doNotClear) {
-        workingSelectionPath.value = [];
-    }
-}
-
-export async function previewActiveSelectionMask(workingSelectionPathOverride: Array<SelectionPathPoint> = workingSelectionPath.value) {
-    let drawMargin: number = selectionMaskDrawMargin.value;
-    const activeSelectionBounds = getActiveSelectionBounds(workingSelectionPathOverride);
-    const newActiveSelectionMask = await createActiveSelectionMask(activeSelectionBounds, workingSelectionPathOverride);
-    if (activeSelectionMask.value) {
-        URL.revokeObjectURL(activeSelectionMask.value.src);
-    }
-    activeSelectionMask.value = newActiveSelectionMask;
-    activeSelectionMaskCanvasOffset.value.x = activeSelectionBounds.left - drawMargin;
-    activeSelectionMaskCanvasOffset.value.y = activeSelectionBounds.top - drawMargin;
 }
 
 export function discardAppliedSelectionMask() {
@@ -140,7 +153,7 @@ export function discardActiveSelectionMask() {
     activeSelectionMaskCanvasOffset.value.y = 0;
 }
 
-export async function createActiveSelectionMask(activeSelectionBounds: SelectionBounds, workingSelectionPathOverride: Array<SelectionPathPoint> = workingSelectionPath.value) {
+export async function createActiveSelectionMask(activeSelectionBounds: SelectionBounds, activeSelectionPathOverride: Array<SelectionPathPoint> = activeSelectionPath.value): Promise<HTMLCanvasElement> {
     let drawMargin: number = selectionMaskDrawMargin.value;
 
     if (appliedSelectionMask.value != null) {
@@ -185,7 +198,7 @@ export async function createActiveSelectionMask(activeSelectionBounds: Selection
         ctx.globalCompositeOperation = 'destination-in';
     }
     ctx.beginPath();
-    for (const point of workingSelectionPathOverride) {
+    for (const point of activeSelectionPathOverride) {
         if (point.type === 'move') {
             ctx.moveTo(point.x - activeSelectionBounds.left + drawMargin, point.y - activeSelectionBounds.top + drawMargin);
         } else if (point.type === 'line') {
@@ -203,30 +216,5 @@ export async function createActiveSelectionMask(activeSelectionBounds: Selection
     }
     ctx.closePath();
     ctx.fill();
-    const newSelectionMask = await new Promise<InstanceType<typeof Image>>((resolve, reject) => {
-        try {
-            workingCanvas.toBlob((blob) => {
-                if (blob) {
-                    let image = new Image();
-                    image.onload = () => {
-                        resolve(image);
-                        (image as any) = null;
-                    };
-                    image.onerror = (error) => {
-                        reject(error);
-                        (image as any) = null;
-                    };
-                    image.src = URL.createObjectURL(blob);
-                } else {
-                    reject(new Error('Canvas blob not created when drawing new selection shape.'));
-                }
-            }, 'image/png', 1);
-        } catch (error) {
-            reject(error);
-        }
-    });
-
-    (workingCanvas as any) = null;
-    ctx = null;
-    return newSelectionMask;
+    return workingCanvas;
 }

@@ -2,14 +2,14 @@
     <div ref="overlay" class="ogr-canvas-overlay is-full-canvas-area">
         <div ref="selectionContainer" class="ogr-selection">
             <svg
-                v-if="transformedWorkingSelectionPath.length > 0"
+                v-if="transformedactiveSelectionPath.length > 0"
                 :width="svgBoundsWidth"
                 :height="svgBoundsHeight"
                 xmlns="http://www.w3.org/2000/svg">
                 <path :d="svgPathDraw" stroke="#333333" :stroke-width="svgPathStrokeWidth" fill="transparent"/>
                 <path :d="svgPathDraw" stroke="white" :stroke-width="svgPathStrokeWidth * .8" :stroke-dasharray="svgPathStrokeWidth * 2" fill="transparent"/>
                 <template v-if="!isDrawingSelection">
-                    <template v-for="(point, i) in transformedWorkingSelectionPath" :key="i + '_' + point.x + '_' + point.y">
+                    <template v-for="(point, i) in transformedactiveSelectionPath" :key="i + '_' + point.x + '_' + point.y">
                         {{ point.type }}
                         <template v-if="point.type === 'line'">
                             <rect :x="point.x - (svgHandleWidth * 1.4)" :y="point.y - (svgHandleWidth * 1.4)" :width="svgHandleWidth * 2.8" :height="svgHandleWidth * 2.8" :stroke-width="0" />
@@ -29,7 +29,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, watch, onMounted, onUnmounted, toRefs } from 'vue';
-import { isDrawingSelection, workingSelectionPath, SelectionPathPoint } from '../store/selection-state';
+import { isDrawingSelection, activeSelectionPath, SelectionPathPoint } from '../store/selection-state';
 import canvasStore from '@/store/canvas';
 import workingFileStore from '@/store/working-file';
 import { decomposeMatrix } from '@/lib/dom-matrix';
@@ -68,10 +68,10 @@ export default defineComponent({
             return viewHeight.value / devicePixelRatio;
         });
         
-        let transformedWorkingSelectionPath = ref<SelectionPathPoint[]>([]);
-        watch([workingSelectionPath, viewDirty], () => {
-            transformedWorkingSelectionPath.value = [];
-            for (const pathPoint of workingSelectionPath.value) {
+        let transformedactiveSelectionPath = ref<SelectionPathPoint[]>([]);
+        watch([activeSelectionPath, viewDirty], () => {
+            transformedactiveSelectionPath.value = [];
+            for (const pathPoint of activeSelectionPath.value) {
                 const position = new DOMPoint(pathPoint.x, pathPoint.y).matrixTransform(transform.value);
                 let startHandle = position;
                 let endHandle = position;
@@ -79,7 +79,7 @@ export default defineComponent({
                     startHandle = new DOMPoint(pathPoint.shx, pathPoint.shy).matrixTransform(transform.value);
                     endHandle = new DOMPoint(pathPoint.ehx, pathPoint.ehy).matrixTransform(transform.value);
                 }
-                transformedWorkingSelectionPath.value.push({
+                transformedactiveSelectionPath.value.push({
                     type: pathPoint.type,
                     x: position.x / devicePixelRatio,
                     y: position.y / devicePixelRatio,
@@ -92,7 +92,7 @@ export default defineComponent({
         });
 
         const svgPathDraw = computed<string>(() => {
-            const path = transformedWorkingSelectionPath.value;
+            const path = transformedactiveSelectionPath.value;
             let draw = 'M' + path[0].x + ' ' + path[0].y;
             for (let i = 1; i < path.length; i++) {
                 const point = path[i];
@@ -116,7 +116,7 @@ export default defineComponent({
 
         return {
             isDrawingSelection,
-            transformedWorkingSelectionPath,
+            transformedactiveSelectionPath,
             selectedLayerIds,
             selectionContainer,
             svgPathDraw,

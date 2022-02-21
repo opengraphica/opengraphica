@@ -2,7 +2,7 @@ import { nextTick } from 'vue';
 import { BaseAction } from './base';
 import workingFileStore, { WorkingFileState } from '@/store/working-file';
 import appEmitter from '@/lib/emitter';
-import { discardActiveSelectionMask, discardAppliedSelectionMask, workingSelectionPath } from '@/canvas/store/selection-state';
+import { discardActiveSelectionMask, discardAppliedSelectionMask, activeSelectionPath } from '@/canvas/store/selection-state';
 
 export interface CreateFileOptions {
     fileName?: string;
@@ -56,7 +56,7 @@ export class CreateFileAction extends BaseAction {
 
         discardAppliedSelectionMask();
         discardActiveSelectionMask();
-        workingSelectionPath.value = [];
+        activeSelectionPath.value = [];
 
         await nextTick();
         appEmitter.emit('app.canvas.resetTransform');
@@ -72,7 +72,7 @@ export class CreateFileAction extends BaseAction {
 
         discardAppliedSelectionMask();
         discardActiveSelectionMask();
-        workingSelectionPath.value = [];
+        activeSelectionPath.value = [];
 
         await nextTick();
         appEmitter.emit('app.canvas.resetTransform');

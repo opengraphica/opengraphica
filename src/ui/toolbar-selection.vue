@@ -75,9 +75,7 @@ import ElPopover from '@/ui/el-popover.vue';
 import { ElRadioGroup, ElRadioButton } from 'element-plus/lib/components/radio/index';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElTooltip from 'element-plus/lib/components/tooltip/index';
-import appEmitter from '@/lib/emitter';
-import canvasStore from '@/store/canvas';
-import { appliedSelectionMask, applyActiveSelection, selectionAddShape, selectionCombineMode, selectionEmitter, workingSelectionPath } from '@/canvas/store/selection-state';
+import { appliedSelectionMask, selectionAddShape, selectionCombineMode, selectionEmitter, activeSelectionPath } from '@/canvas/store/selection-state';
 
 export default defineComponent({
     name: 'ToolbarFreeTransform',
@@ -106,11 +104,11 @@ export default defineComponent({
     setup(props, { emit }) {
 
         const canClearSelection = computed<boolean>(() => {
-            return workingSelectionPath.value.length > 0 || appliedSelectionMask.value != null;
+            return activeSelectionPath.value.length > 0 || appliedSelectionMask.value != null;
         });
 
         const canApplySelection = computed<boolean>(() => {
-            return workingSelectionPath.value.length > 0;
+            return activeSelectionPath.value.length > 0;
         });
 
         const selectionCombineModeComputed = computed<'replace' | 'add' | 'subtract' | 'intersect'>({
@@ -118,10 +116,10 @@ export default defineComponent({
                 return selectionCombineMode.value;
             },
             async set(value) {
-                if (workingSelectionPath.value.length > 0) {
-                    await applyActiveSelection();
+                if (activeSelectionPath.value.length > 0) {
+                    selectionEmitter.emit('applyActiveSelection');
                 }
-                selectionCombineMode.value = value;
+                selectionEmitter.emit('updateSelectionCombineMode', value);
             }
         });
 
