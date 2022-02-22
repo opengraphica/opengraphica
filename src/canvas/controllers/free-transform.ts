@@ -1,16 +1,20 @@
 import { nextTick, watch, WatchStopHandle } from 'vue';
 import BaseCanvasMovementController from './base-movement';
 import { layerPickMode, useRotationSnapping, freeTransformEmitter, top, left, width, height, rotation, transformOriginX, transformOriginY, dimensionLockRatio, previewXSnap, previewYSnap, dragHandleHighlight, rotateHandleHighlight } from '../store/free-transform-state';
+import { appliedSelectionMask, appliedSelectionMaskCanvasOffset, activeSelectionMask, activeSelectionMaskCanvasOffset } from '../store/selection-state';
 import canvasStore from '@/store/canvas';
 import historyStore from '@/store/history';
 import preferencesStore from '@/store/preferences';
 import workingFileStore, { getLayerById } from '@/store/working-file';
 import { ColorModel, DrawWorkingFileOptions, UpdateAnyLayerOptions, WorkingFileLayer } from '@/types';
 import { DecomposedMatrix, decomposeMatrix } from '@/lib/dom-matrix';
+import { CreateNewLayersFromSelectionAction } from '@/actions/create-new-layers-from-selection';
+import { ClearSelectionAction } from '@/actions/clear-selection';
 import { SelectLayersAction } from '@/actions/select-layers';
 import { UpdateLayerAction } from '@/actions/update-layer';
 import { BundleAction } from '@/actions/bundle';
 import { drawWorkingFileToCanvas } from '@/lib/canvas';
+import { getImageDataFromImage, getImageDataEmptyBounds } from '@/lib/image';
 import { isInput } from '@/lib/events';
 import appEmitter from '@/lib/emitter';
 import { isShiftKeyPressed } from '@/lib/keyboard';
@@ -52,6 +56,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         this.remToPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
         dimensionLockRatio.value = null;
 
+        // Set transform bounds based on selected layer list.
         this.selectedLayerIdsWatchStop = watch(() => workingFileStore.state.selectedLayerIds, (selectedLayerIds) => {
             const selectedLayers: WorkingFileLayer<ColorModel>[] = [];
             if (selectedLayerIds.length > 0) {
@@ -103,6 +108,19 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     }
 
     async onTransformDown() {
+        if ((activeSelectionMask.value || appliedSelectionMask.value)) {
+            if (this.selectedLayers.length > 0) {
+                layerPickMode.value === 'current';
+                await historyStore.dispatch('runAction', {
+                    action: new CreateNewLayersFromSelectionAction({ clearSelection: true, selectNewLayers: 'replace' })
+                });
+            } else {
+                await historyStore.dispatch('runAction', {
+                    action: new ClearSelectionAction()
+                });
+            }
+        }
+
         const { transformBoundsPoint, viewTransformPoint, viewDecomposedTransform } = this.getTransformedCursorInfo();
 
         this.storeTransformStart(viewTransformPoint);
@@ -562,7 +580,21 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     }
 
     private setBoundsFromSelectedLayersImmediate() {
-        if (this.selectedLayers.length === 1) {
+        // If there's a current selection mask, match the bounds to the selection mask.
+        const selectionMask: HTMLImageElement | null = activeSelectionMask.value || appliedSelectionMask.value;
+        if (selectionMask) {
+            const selectionOffset: DOMPoint = (selectionMask === activeSelectionMask.value ? activeSelectionMaskCanvasOffset.value : appliedSelectionMaskCanvasOffset.value);
+            const selectionBounds = getImageDataEmptyBounds(getImageDataFromImage(selectionMask));
+            freeTransformEmitter.emit('setDimensions', {
+                left: selectionOffset.x + selectionBounds.left,
+                top: selectionOffset.y + selectionBounds.top,
+                width: selectionBounds.right - selectionBounds.left,
+                height: selectionBounds.bottom - selectionBounds.top,
+                rotation: 0
+            });
+        }
+        // For single layer selection, read transform data from that layer.
+        else if (this.selectedLayers.length === 1) {
             const activeLayer = this.selectedLayers[0];
             const originPosX = activeLayer.width * transformOriginX.value;
             const originPosY = activeLayer.height * transformOriginY.value;

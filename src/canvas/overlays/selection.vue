@@ -8,7 +8,7 @@
                 xmlns="http://www.w3.org/2000/svg">
                 <path :d="svgPathDraw" stroke="#333333" :stroke-width="svgPathStrokeWidth" fill="transparent"/>
                 <path :d="svgPathDraw" stroke="white" :stroke-width="svgPathStrokeWidth * .8" :stroke-dasharray="svgPathStrokeWidth * 2" fill="transparent"/>
-                <template v-if="!isDrawingSelection">
+                <template v-if="false && !isDrawingSelection">
                     <template v-for="(point, i) in transformedactiveSelectionPath" :key="i + '_' + point.x + '_' + point.y">
                         {{ point.type }}
                         <template v-if="point.type === 'line'">

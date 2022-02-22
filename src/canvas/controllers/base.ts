@@ -1,5 +1,4 @@
 import { nextTick } from 'vue';
-import { CanvasRenderingContext2DEnhanced } from '@/types';
 import canvasStore from '@/store/canvas';
 import preferencesStore from '@/store/preferences';
 import appEmitter from '@/lib/emitter';
@@ -35,7 +34,7 @@ export interface PointerTracker {
 export default class BaseCanvasController {
 
     protected canvas!: HTMLCanvasElement; 
-    protected ctx!: CanvasRenderingContext2DEnhanced;
+    protected ctx!: CanvasRenderingContext2D;
     protected pointers: PointerTracker[] = [];
     protected touches: PointerTracker[] = []; // Populated at onMultiTouchDown(), once the multi-touch tap timeout extinquishes.
     protected multiTouchDownCount: number = 0;

@@ -18,8 +18,7 @@ import workingFileStore from '@/store/working-file';
 import preferencesStore from '@/store/preferences';
 import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset } from '@/canvas/store/selection-state';
 import AppCanvasOverlays from '@/ui/app-canvas-overlays.vue';
-import { CanvasRenderingContext2DEnhanced } from '@/types';
-import { drawWorkingFileToCanvas, trackCanvasTransforms } from '@/lib/canvas';
+import { drawWorkingFileToCanvas } from '@/lib/canvas';
 import { notifyInjector } from '@/lib/notify';
 import appEmitter, { AppEmitterEvents } from '@/lib/emitter';
 import { DecomposedMatrix } from '@/lib/dom-matrix';
@@ -48,7 +47,7 @@ export default defineComponent({
         const { useCssViewport, viewWidth: viewportWidth, viewHeight: viewportHeight } = toRefs(canvasStore.state);
         const { width: imageWidth, height: imageHeight } = toRefs(workingFileStore.state);
         const isPixelatedZoomLevel = ref<boolean>(false);
-        let ctx: CanvasRenderingContext2DEnhanced | null = null;
+        let ctx: CanvasRenderingContext2D | null = null;
 
         let postProcessCancel: ((reason?: any) => void) | null = null;
         let postProcessAverageLag: number = 0;
@@ -155,14 +154,13 @@ export default defineComponent({
                 const bufferCanvas = document.createElement('canvas');
                 bufferCanvas.width = useCssViewport.value === true ? 10 : imageWidth;
                 bufferCanvas.height = useCssViewport.value === true ? 10 : imageHeight;
-                let bufferCtx: CanvasRenderingContext2DEnhanced = bufferCanvas.getContext('2d') as CanvasRenderingContext2DEnhanced;
+                let bufferCtx: CanvasRenderingContext2D = bufferCanvas.getContext('2d') as CanvasRenderingContext2D;
                 if (originalCtx && bufferCtx) {
                     // Assign view canvas
-                    ctx = trackCanvasTransforms(originalCtx);
+                    ctx = originalCtx;
                     canvasStore.set('viewCanvas', canvas.value);
                     canvasStore.set('viewCtx', ctx);
                     // Assign buffer canvas
-                    bufferCtx = trackCanvasTransforms(bufferCtx);
                     canvasStore.set('bufferCanvas', bufferCanvas);
                     canvasStore.set('bufferCtx', bufferCtx);
                     drawLoop();

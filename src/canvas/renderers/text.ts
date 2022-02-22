@@ -1,4 +1,4 @@
-import { CanvasRenderingContext2DEnhanced, DrawWorkingFileLayerOptions, WorkingFileTextLayer, WorkingFileTextLayerSpan, WorkingFileLayerRenderer, ColorModel } from '@/types';
+import { DrawWorkingFileLayerOptions, WorkingFileTextLayer, WorkingFileTextLayerSpan, WorkingFileLayerRenderer, ColorModel } from '@/types';
 import { fontLoadedStatusMap, textLayerCache, textMetaDefaults, TextLayerCacheItem, TextLayerRenderInfoWrap } from '@/canvas/store/text-state';
 import { getFontMetrics, FontMetrics } from '@/lib/metrics';
 import { colorToScreenRgbaHex } from '@/lib/color';
@@ -21,7 +21,7 @@ export default class TextLayerRenderer implements WorkingFileLayerRenderer<Color
     /**
      * All-important function that calculates and caches the position of all the letters in the text layer.
      */
-    calculateTextPlacement(ctx: CanvasRenderingContext2DEnhanced, layer: WorkingFileTextLayer<ColorModel>): TextLayerCacheItem<ColorModel> {
+    calculateTextPlacement(ctx: CanvasRenderingContext2D, layer: WorkingFileTextLayer<ColorModel>): TextLayerCacheItem<ColorModel> {
         const boundary = layer.data.boundary;
         const textDirection = layer.data.textDirection;
         const wrapDirection = layer.data.wrapDirection;
@@ -261,7 +261,7 @@ export default class TextLayerRenderer implements WorkingFileLayerRenderer<Color
         return layerCacheItem;
     }
 
-    draw(ctx: CanvasRenderingContext2DEnhanced, layer: WorkingFileTextLayer<ColorModel>, options: DrawWorkingFileLayerOptions = {}) {
+    draw(ctx: CanvasRenderingContext2D, layer: WorkingFileTextLayer<ColorModel>, options: DrawWorkingFileLayerOptions = {}) {
         if (layer.bakedImage) {
             ctx.drawImage(
                 layer.bakedImage as HTMLImageElement,

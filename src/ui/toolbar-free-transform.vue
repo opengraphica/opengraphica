@@ -6,13 +6,16 @@
                 <span class="ogr-toolbar-tool-selector__description">Settings</span>
             </div>
             <el-horizontal-scrollbar-arrows>
-                <el-input-group prepend-tooltip="Pick Layer">
+                <el-button v-if="hasSelection" size="small" @click="onClickClearSelection">
+                    <span class="bi bi-x-circle-fill mr-2" aria-hidden="true" /> Clear Selection
+                </el-button>
+                <el-input-group v-else prepend-tooltip="Pick Layer">
                     <template #prepend>
                         <span class="bi bi-cursor" aria-hidden="true" />
                     </template>
-                    <el-select aria-label="Layer Selection" v-model="layerPickMode" size="small" style="width: 5rem">
-                        <el-option label="Auto" value="auto"></el-option>
-                        <el-option label="Current" value="current"></el-option>
+                    <el-select aria-label="Pick Layer" v-model="layerPickMode" size="small" style="width: 5rem">
+                        <el-option label="Auto" value="auto" />
+                        <el-option label="Current" value="current" />
                     </el-select>
                 </el-input-group>
                 <el-popover
@@ -93,17 +96,21 @@
 <script lang="ts">
 import { defineComponent, defineAsyncComponent, ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
 import { freeTransformEmitter, layerPickMode, useRotationSnapping, top, left, width, height, rotation } from '@/canvas/store/free-transform-state';
+import { appliedSelectionMask, activeSelectionMask } from '@/canvas/store/selection-state';
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElHorizontalScrollbarArrows from '@/ui/el-horizontal-scrollbar-arrows.vue';
+import ElInput from 'element-plus/lib/components/input/index';
 import ElInputGroup from '@/ui/el-input-group.vue';
 import ElInputNumber from '@/ui/el-input-number.vue';
 import ElPopover from '@/ui/el-popover.vue';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSwitch from 'element-plus/lib/components/switch/index';
+import historyStore from '@/store/history';
 import workingFileStore, { WorkingFileState } from '@/store/working-file';
 import { convertUnits } from '@/lib/metrics';
+import { ClearSelectionAction } from '@/actions/clear-selection';
 
 export default defineComponent({
     name: 'ToolbarFreeTransform',
@@ -114,6 +121,7 @@ export default defineComponent({
         ElForm,
         ElFormItem,
         ElHorizontalScrollbarArrows,
+        ElInput,
         ElInputGroup,
         ElInputNumber,
         ElOption,
@@ -142,6 +150,10 @@ export default defineComponent({
         const inputWidth = ref<number>(1);
         const inputHeight = ref<number>(1);
         const inputRotation = ref<number>(0);
+
+        const hasSelection = computed<boolean>(() => {
+            return !(appliedSelectionMask.value == null && activeSelectionMask.value == null);
+        });
 
         watch([left], ([left]) => {
             if (!disableInputUpdate) {
@@ -246,7 +258,14 @@ export default defineComponent({
             freeTransformEmitter.emit('commitTransforms');
         }
 
+        async function onClickClearSelection() {
+            await historyStore.dispatch('runAction', {
+                action: new ClearSelectionAction()
+            });
+        }
+
         return {
+            hasSelection,
             inputLeft,
             inputTop,
             inputWidth,
@@ -266,7 +285,8 @@ export default defineComponent({
             onInputRotation,
             onChangeDragResizeInput,
             onChangeRotationInput,
-            onResetRotation
+            onResetRotation,
+            onClickClearSelection
         };
     }
 });

@@ -6807,6 +6807,10 @@ body.ogr-full-page .opengraphica {
   font-weight: 100;
   margin: 0;
 }
+.opengraphica .ogr-logo h1 img {
+  width: 100%;
+  max-width: 25rem;
+}
 @media screen and (max-width: 550px) {
   .opengraphica .ogr-logo h1 {
     font-size: 2.5rem;
@@ -7779,13 +7783,13 @@ body.ogr-full-page .opengraphica {
 }
 @keyframes ogr-free-transform-bounds {
   0% {
-    outline-color: rgba(235, 235, 235, 0.9);
+    outline-color: #ebebeb;
   }
   50% {
-    outline-color: rgba(205, 205, 205, 0.5);
+    outline-color: #c3c3c3;
   }
   100% {
-    outline-color: rgba(235, 235, 235, 0.9);
+    outline-color: #ebebeb;
   }
 }
 @keyframes ogr-free-transform-rotate-line {
@@ -7803,7 +7807,7 @@ body.ogr-full-page .opengraphica {
   position: relative;
 }
 .opengraphica .ogr-free-transform .ogr-free-transform-bounds {
-  outline: 0.35rem solid rgba(235, 235, 235, 0.7);
+  outline: 0.35rem solid white;
   box-sizing: border-box;
   position: absolute;
   top: 0;

@@ -10,7 +10,9 @@
                 transformOrigin: transformOrigin
             }"
         >
-            <div class="ogr-free-transform-bounds" :style="{ outlineWidth: (0.35/zoom) + 'rem' }"></div>
+            <div class="ogr-free-transform-bounds" :style="{
+                outlineWidth: (0.35/zoom) + 'rem'
+            }"></div>
             <div class="ogr-free-transform-handle-rotate" :style="{ transform: 'scale(' + (1/zoom) + ')', top: (-2 / zoom) + 'rem' }">
                 <div class="ogr-free-transform-handle-rotate-line"></div>
                 <svg viewBox="0 0 100 100">

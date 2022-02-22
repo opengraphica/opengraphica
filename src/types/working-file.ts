@@ -1,4 +1,3 @@
-import { CanvasRenderingContext2DEnhanced } from './canvas';
 import { ColorModel } from './color';
 import { VectorShape } from './vector';
 
@@ -32,7 +31,7 @@ export interface WorkingFileLayerFilter<T extends ColorModel> {
 }
 
 export interface WorkingFileLayerRenderer<T extends ColorModel> {
-    draw(ctx: CanvasRenderingContext2DEnhanced, layer: WorkingFileLayer<T>, options?: DrawWorkingFileLayerOptions): void;
+    draw(ctx: CanvasRenderingContext2D, layer: WorkingFileLayer<T>, options?: DrawWorkingFileLayerOptions): void;
 }
 
 export interface WorkingFileTimelineKey {

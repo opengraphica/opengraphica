@@ -9,7 +9,7 @@
 import { defineComponent, ref, computed, watch, toRefs, nextTick, PropType } from 'vue';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import editorStore from '@/store/editor';
-import { CanvasRenderingContext2DEnhanced, WorkingFileRasterSequenceLayer, ColorModel } from '@/types';
+import { WorkingFileRasterSequenceLayer, ColorModel } from '@/types';
 
 export default defineComponent({
     name: 'AppLayerFrameThumbnail',
@@ -58,7 +58,7 @@ export default defineComponent({
                 }
                 canvas.width = thumbnailWidth;
                 canvas.height = thumbnailHeight;
-                let ctx: CanvasRenderingContext2DEnhanced = canvas.getContext('2d') as CanvasRenderingContext2DEnhanced;
+                let ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
                 ctx.scale(thumbnailScale, thumbnailScale);
                 ctx.drawImage(frame.image.sourceImage, 0, 0);
                 frame.thumbnailImageSrc = canvas.toDataURL();

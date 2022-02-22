@@ -70,6 +70,11 @@ body.ogr-full-page {
             font-weight: 100;
             margin: 0;
 
+            img {
+                width: 100%;
+                max-width: 25rem;
+            }
+
             @media screen and (max-width: 550px) {
                 font-size: 2.5rem;
             }
@@ -1181,13 +1186,13 @@ body.ogr-full-page {
 
     @keyframes ogr-free-transform-bounds {
         0% {
-            outline-color: rgba(235, 235, 235, 0.9);
+            outline-color: rgba(235, 235, 235, 1);
         }
         50% {
-            outline-color: rgba(205, 205, 205, 0.5);
+            outline-color: rgba(195, 195, 195, 1);
         }
         100% {
-            outline-color: rgba(235, 235, 235, 0.9);
+            outline-color: rgba(235, 235, 235, 1);
         }
     }
 
@@ -1207,7 +1212,8 @@ body.ogr-full-page {
         position: relative;
 
         .ogr-free-transform-bounds {
-            outline: 0.35rem solid rgba(235, 235, 235, 0.7);
+            outline: 0.35rem solid white;
+            // border: 0.35rem solid white;
             box-sizing: border-box;
             position: absolute;
             top: 0;
@@ -1215,6 +1221,18 @@ body.ogr-full-page {
             right: 0;
             bottom: 0;
             animation: ogr-free-transform-bounds 2s linear infinite;
+
+            // &:after {
+            //     content: '';
+            //     display: block;
+            //     position: absolute;
+            //     top: 0;
+            //     left: 0;
+            //     right: 0;
+            //     bottom: 0;
+            //     outline: var(--ogr-free-transform-bound-inner-width) solid rgba(235, 235, 235, 0.7);
+            //     animation: ogr-free-transform-bounds 2s linear infinite;
+            // }
         }
 
         .ogr-free-transform-handle-rotate {

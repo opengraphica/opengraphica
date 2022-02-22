@@ -32,7 +32,7 @@
                                         <el-button
                                             :aria-label="control.label"
                                             :type="[activeToolGroup, activeMenuDrawerComponentName].includes(control.action && control.action.target) ? 'primary' : undefined"
-                                            plain
+                                            :plain="![activeToolGroup, activeMenuDrawerComponentName].includes(control.action && control.action.target)"
                                             :circle="!control.expanded"
                                             :round="control.expanded"
                                             :class="{

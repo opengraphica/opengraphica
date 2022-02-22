@@ -1,4 +1,4 @@
-import { CanvasRenderingContext2DEnhanced, ColorModel, DrawWorkingFileOptions, DrawWorkingFileLayerOptions, WorkingFileLayer } from '@/types';
+import { ColorModel, DrawWorkingFileOptions, DrawWorkingFileLayerOptions, WorkingFileLayer } from '@/types';
 import canvasStore from '@/store/canvas';
 import preferencesStore from '@/store/preferences';
 import workingFileStore from '@/store/working-file';
@@ -26,7 +26,7 @@ const cursorImages: { [key: string]: { data: string, image: HTMLImageElement | n
     }
 })();
 
-export function drawWorkingFileLayerToCanvas(targetCanvas: HTMLCanvasElement, targetCtx: CanvasRenderingContext2DEnhanced, layer: WorkingFileLayer<ColorModel>, decomposedTransform: DecomposedMatrix, options: DrawWorkingFileLayerOptions = {}) {
+export function drawWorkingFileLayerToCanvas(targetCanvas: HTMLCanvasElement, targetCtx: CanvasRenderingContext2D, layer: WorkingFileLayer<ColorModel>, decomposedTransform: DecomposedMatrix, options: DrawWorkingFileLayerOptions = {}) {
     if (options.visible || layer.visible) {
         let ctx = targetCtx;
         
@@ -81,7 +81,7 @@ export function drawWorkingFileLayerToCanvas(targetCanvas: HTMLCanvasElement, ta
 /**
  * Draws everything in the working document to the specified canvas.
  */
-export function drawWorkingFileToCanvas(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2DEnhanced, options: DrawWorkingFileOptions = {}) {
+export function drawWorkingFileToCanvas(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, options: DrawWorkingFileOptions = {}) {
 
     let now = performance.now();
 
@@ -189,7 +189,7 @@ export function drawWorkingFileToCanvas(canvas: HTMLCanvasElement, ctx: CanvasRe
 /**
  * Draws a rect path that when stroked will be aligned to pixels on the screen (when there is no rotation)
  */
-export function ctxRectHalfPixelAligned(ctx: CanvasRenderingContext2DEnhanced, x: number, y: number, w: number, h: number, decomposedTransform: DecomposedMatrix) {
+export function ctxRectHalfPixelAligned(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, decomposedTransform: DecomposedMatrix) {
     const scale = decomposedTransform.scaleX;
     let xOffset = - decomposedTransform.translateX % 1;
     let yOffset = - decomposedTransform.translateY % 1;
@@ -208,92 +208,92 @@ export function ctxRectHalfPixelAligned(ctx: CanvasRenderingContext2DEnhanced, x
  * Adapted from https://gist.github.com/dzhang123/2a3a611b3d75a45a3f41
  * @license MIT https://codepen.io/techslides/pen/zowLd/license
  */
-export function trackCanvasTransforms(vanillaCtx: CanvasRenderingContext2D | null): CanvasRenderingContext2DEnhanced {
-    if (!vanillaCtx) {
-        throw new Error('Canvas rendering context is missing (out of memory?)');
-    }
-    const ctx = vanillaCtx as CanvasRenderingContext2DEnhanced;
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    let xform: DOMMatrix = svg.createSVGMatrix();
+// export function trackCanvasTransforms(vanillaCtx: CanvasRenderingContext2D | null): CanvasRenderingContext2DEnhanced {
+//     if (!vanillaCtx) {
+//         throw new Error('Canvas rendering context is missing (out of memory?)');
+//     }
+//     const ctx = vanillaCtx as CanvasRenderingContext2DEnhanced;
+//     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+//     let xform: DOMMatrix = svg.createSVGMatrix();
 
-    ctx.getTransform = function(): DOMMatrix {
-        return new DOMMatrix([xform.a, xform.b, xform.c, xform.d, xform.e, xform.f]);
-    };
+//     ctx.getTransform = function(): DOMMatrix {
+//         return new DOMMatrix([xform.a, xform.b, xform.c, xform.d, xform.e, xform.f]);
+//     };
 
-    const savedTransforms: DOMMatrix[] = [];
-    const save = ctx.save;
-    ctx.save = function() {
-        savedTransforms.push(xform.translate(0, 0));
-        return save.call(ctx);
-    };
+//     const savedTransforms: DOMMatrix[] = [];
+//     const save = ctx.save;
+//     ctx.save = function() {
+//         savedTransforms.push(xform.translate(0, 0));
+//         return save.call(ctx);
+//     };
 
-    const restore = ctx.restore;
-    ctx.restore = function() {
-        xform = savedTransforms.pop() || svg.createSVGMatrix();
-        return restore.call(ctx);
-    };
+//     const restore = ctx.restore;
+//     ctx.restore = function() {
+//         xform = savedTransforms.pop() || svg.createSVGMatrix();
+//         return restore.call(ctx);
+//     };
 
-    const scale = ctx.scale;
-    ctx.scale = function(sx: number, sy: number) {
-        xform = xform.scale(sx, sy);
-        return scale.call(ctx, sx, sy);
-    };
+//     const scale = ctx.scale;
+//     ctx.scale = function(sx: number, sy: number) {
+//         xform = xform.scale(sx, sy);
+//         return scale.call(ctx, sx, sy);
+//     };
 
-    const rotate = ctx.rotate;
-    ctx.rotate = function(radians: number) {
-        xform = xform.rotate(radians);
-        return rotate.call(ctx, radians);
-    };
+//     const rotate = ctx.rotate;
+//     ctx.rotate = function(radians: number) {
+//         xform = xform.rotate(radians);
+//         return rotate.call(ctx, radians);
+//     };
 
-    const translate = ctx.translate;
-    ctx.translate = function(dx: number, dy: number) {
-        xform = xform.translate(dx, dy);
-        return translate.call(ctx, dx, dy);
-    }
+//     const translate = ctx.translate;
+//     ctx.translate = function(dx: number, dy: number) {
+//         xform = xform.translate(dx, dy);
+//         return translate.call(ctx, dx, dy);
+//     }
 
-    const transform = ctx.transform;
-    ctx.transform = function(a: number, b: number, c: number, d: number, e: number, f: number) {
-        const m2 = svg.createSVGMatrix();
-        m2.a = a; m2.b = b; m2.c = c; m2.d = d; m2.e = e; m2.f = f;
-        xform = xform.multiply(m2);
-        return transform.call(ctx, a, b, c, d, e, f);
-    }
+//     const transform = ctx.transform;
+//     ctx.transform = function(a: number, b: number, c: number, d: number, e: number, f: number) {
+//         const m2 = svg.createSVGMatrix();
+//         m2.a = a; m2.b = b; m2.c = c; m2.d = d; m2.e = e; m2.f = f;
+//         xform = xform.multiply(m2);
+//         return transform.call(ctx, a, b, c, d, e, f);
+//     }
 
-    const setTransform = ctx.setTransform as any;
-    ctx.setTransform = function(a: any, b?: any, c?: any, d?: any, e?: any, f?: any) {
-        const domMatrix = a instanceof DOMMatrix || a instanceof SVGMatrix ? a : null;
-        if (domMatrix) {
-            xform.a = domMatrix.a;
-            xform.b = domMatrix.b
-            xform.c = domMatrix.c;
-            xform.d = domMatrix.d;
-            xform.e = domMatrix.e;
-            xform.f = domMatrix.f;
-        } else {
-            xform.a = a;
-            xform.b = b;
-            xform.c = c;
-            xform.d = d;
-            xform.e = e;
-            xform.f = f;
-        }
-        return setTransform.call(ctx, xform.a, xform.b, xform.c, xform.d, xform.e, xform.f);
-    };
+//     const setTransform = ctx.setTransform as any;
+//     ctx.setTransform = function(a: any, b?: any, c?: any, d?: any, e?: any, f?: any) {
+//         const domMatrix = a instanceof DOMMatrix || a instanceof SVGMatrix ? a : null;
+//         if (domMatrix) {
+//             xform.a = domMatrix.a;
+//             xform.b = domMatrix.b
+//             xform.c = domMatrix.c;
+//             xform.d = domMatrix.d;
+//             xform.e = domMatrix.e;
+//             xform.f = domMatrix.f;
+//         } else {
+//             xform.a = a;
+//             xform.b = b;
+//             xform.c = c;
+//             xform.d = d;
+//             xform.e = e;
+//             xform.f = f;
+//         }
+//         return setTransform.call(ctx, xform.a, xform.b, xform.c, xform.d, xform.e, xform.f);
+//     };
 
-    const point = svg.createSVGPoint();
-    ctx.transformedPoint = function(x: number, y: number): DOMPoint {
-        point.x = x;
-        point.y = y;
-        return point.matrixTransform(xform.inverse());
-    };
+//     const point = svg.createSVGPoint();
+//     ctx.transformedPoint = function(x: number, y: number): DOMPoint {
+//         point.x = x;
+//         point.y = y;
+//         return point.matrixTransform(xform.inverse());
+//     };
 
-    ctx.get2dTransformArray = function(): [number, number, number, number, number, number] {
-        const transform = ctx.getTransform();
-        return [transform.a, transform.b, transform.c, transform.d, transform.e, transform.f];
-    }
+//     ctx.get2dTransformArray = function(): [number, number, number, number, number, number] {
+//         const transform = ctx.getTransform();
+//         return [transform.a, transform.b, transform.c, transform.d, transform.e, transform.f];
+//     }
 
-    return ctx;
-}
+//     return ctx;
+// }
 
 /**
  * Retrieve the rgba values at specified pixel in the canvas.

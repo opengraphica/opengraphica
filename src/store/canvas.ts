@@ -1,11 +1,11 @@
 import { PerformantStore } from './performant-store';
-import { CanvasRenderingContext2DEnhanced, CanvasViewResetOptions } from '@/types';
+import { CanvasViewResetOptions } from '@/types';
 import { DecomposedMatrix, decomposeMatrix } from '@/lib/dom-matrix';
 import preferencesStore from './preferences';
 
 interface CanvasState {
     bufferCanvas: HTMLCanvasElement;
-    bufferCtx: CanvasRenderingContext2DEnhanced;
+    bufferCtx: CanvasRenderingContext2D;
     cursor: string | null;
     cursorX: number;
     cursorY: number;
@@ -25,7 +25,7 @@ interface CanvasState {
     useCssCanvas: boolean;
     useCssViewport: boolean;
     viewCanvas: HTMLCanvasElement;
-    viewCtx: CanvasRenderingContext2DEnhanced;
+    viewCtx: CanvasRenderingContext2D;
     viewDirty: boolean;
     viewHeight: number; // Maps to screen height; devicePixelRatio IS applied.
     viewWidth: number; // Maps to screen width; devicePixelRatio IS applied.
@@ -53,7 +53,7 @@ let dummyCanvas: any = document.createElement('canvas');
 const store = new PerformantStore<CanvasStore>({
     state: {
         bufferCanvas: dummyCanvas,
-        bufferCtx: dummyCanvas.getContext('2d') as CanvasRenderingContext2DEnhanced,
+        bufferCtx: dummyCanvas.getContext('2d') as CanvasRenderingContext2D,
         cursor: null,
         cursorX: 0,
         cursorY: 0,
@@ -73,7 +73,7 @@ const store = new PerformantStore<CanvasStore>({
         useCssCanvas: true,
         useCssViewport: false,
         viewCanvas: dummyCanvas,
-        viewCtx: dummyCanvas.getContext('2d') as CanvasRenderingContext2DEnhanced,
+        viewCtx: dummyCanvas.getContext('2d') as CanvasRenderingContext2D,
         viewDirty: true,
         viewHeight: 100, // Maps to screen height; devicePixelRatio IS applied.
         viewWidth: 100, // Maps to screen width; devicePixelRatio IS applied.

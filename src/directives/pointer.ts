@@ -55,18 +55,21 @@ function runCallback(el: any, eventName: string, binding: DirectiveBinding<any>,
 function handleTapEvent(el: any, binding: DirectiveBinding<any>) {
     const callbackHandles = eventHandlerMap.get(el) || {};
     let pointerDownTimeoutHandle: number | undefined;
+    let mouseClickAfterUpTimeoutHandle: number | undefined;
     let pointerDownType: string = '';
     let isPointerDownValid: boolean = false;
+    let isMouseClickAfterUpValid: boolean = false;
     function onMouseDown(e: MouseEvent) {
         pointerDownType = 'mouse';
-        isPointerDownValid = true;
-        clearTimeout(pointerDownTimeoutHandle);
-        pointerDownTimeoutHandle = window.setTimeout(() => {
-            isPointerDownValid = false;
-        }, multiTouchTapTimeout.value);
     }
     function onMouseUp(e: MouseEvent) {
-        if (pointerDownType === 'mouse' && isPointerDownValid) {
+        isMouseClickAfterUpValid = true;
+        mouseClickAfterUpTimeoutHandle = window.setTimeout(() => {
+            isMouseClickAfterUpValid = false;
+        }, 100);
+    }
+    function onClick(e: MouseEvent) {
+        if (pointerDownType === 'mouse' && isMouseClickAfterUpValid) {
             runCallback(el, 'tap', binding, translateMouseEventToPointerEvent('pointerup', e));
         }
     }
@@ -111,6 +114,7 @@ function handleTapEvent(el: any, binding: DirectiveBinding<any>) {
     callbackHandles.tap = {
         mousedown: [el, onMouseDown],
         mouseup: [el, onMouseUp],
+        click: [el, onClick],
         pointerdown: [el, onPointerDown],
         pointerup: [el, onPointerUp],
         touchstart: [el, onTouchStart],

@@ -22,12 +22,12 @@
                         <el-option label="Ellipse" value="ellipse">
                             <span class="bi bi-circle mr-1" aria-hidden="true" /> Ellipse
                         </el-option>
-                        <el-option label="Free" value="free">
+                        <!-- <el-option label="Free" value="free">
                             <span class="bi bi-slash-lg mr-1" aria-hidden="true" /> Free
                         </el-option>
                         <el-option label="Tonal Area" value="tonalArea">
                             <span class="bi bi-magic mr-1" aria-hidden="true" /> Tonal Area
-                        </el-option>
+                        </el-option> -->
                     </el-select>
                 </el-input-group>
                 <el-input-group prepend-tooltip="Selection Combine Mode" class="ml-3">

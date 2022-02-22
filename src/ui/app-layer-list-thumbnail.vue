@@ -10,7 +10,7 @@ import ElLoading from 'element-plus/lib/components/loading/index';
 import workingFileStore from '@/store/working-file';
 import { drawWorkingFileLayerToCanvas } from '@/lib/canvas';
 import { DecomposedMatrix } from '@/lib/dom-matrix';
-import { CanvasRenderingContext2DEnhanced, WorkingFileAnyLayer, ColorModel } from '@/types';
+import { WorkingFileAnyLayer, ColorModel } from '@/types';
 
 export default defineComponent({
     name: 'AppLayerListThumbnail',
@@ -52,7 +52,7 @@ export default defineComponent({
                 }
                 canvas.width = thumbnailWidth;
                 canvas.height = thumbnailHeight;
-                let ctx: CanvasRenderingContext2DEnhanced = canvas.getContext('2d') as CanvasRenderingContext2DEnhanced;
+                let ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
                 ctx.scale(thumbnailScale, thumbnailScale);
                 drawWorkingFileLayerToCanvas(canvas, ctx, props.layer, {
                     translateX: 0,

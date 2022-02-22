@@ -5,7 +5,7 @@
 
 import workingFileStore, { getLayersByType } from '@/store/working-file';
 import editorStore from '@/store/editor';
-import { drawWorkingFileToCanvas, trackCanvasTransforms } from '@/lib/canvas';
+import { drawWorkingFileToCanvas } from '@/lib/canvas';
 import { saveAs } from 'file-saver';
 import { knownFileExtensions } from '@/lib/regex';
 import { WorkingFileRasterSequenceLayer, FileSystemFileHandle, ColorModel } from '@/types';
@@ -49,7 +49,7 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<void
             const canvas = document.createElement('canvas');
             canvas.width = workingFileStore.get('width');
             canvas.height = workingFileStore.get('height');
-            const ctx = trackCanvasTransforms(canvas.getContext('2d'));
+            const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
             ctx.imageSmoothingEnabled = false;
             if (!['image/gif'].includes(mimeType)) {
                 drawWorkingFileToCanvas(canvas, ctx, { selectedLayersOnly: options.layerSelection === 'selected' });
@@ -185,7 +185,7 @@ export async function convertCanvasToGifBlob(canvas: HTMLCanvasElement, options:
     };
     const gif = new GIF(gifSettings);
 
-    const ctx = trackCanvasTransforms(canvas.getContext('2d'));
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     const originalTimelineCursorPosition = editorStore.get('timelineCursor');
     ctx.imageSmoothingEnabled = false;
     for (let i = 0; i < frameTimes.length - 1; i++) {

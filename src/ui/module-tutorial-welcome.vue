@@ -2,10 +2,11 @@
     <div class="is-flex is-align-items-center is-justify-content-center" style="height:100%" v-loading="loading">
         <div>
             <div class="ogr-logo">
-                <h1 class="has-text-centered">OpenGraphica</h1>
-                <p class="has-text-centered">Image Editor</p>
+                <h1 class="px-6">
+                    <img src="images/logo-full.svg" alt="OpenGraphica">
+                </h1>
             </div>
-            <div class="is-flex is-justify-content-center mt-5">
+            <div class="is-flex is-justify-content-center mt-4">
                 <div class="is-inline-block">
                     <el-button type="text" class="m-0 is-block" @click="onNewImage()">
                         <span class="bi bi-file-earmark-plus mr-2" style="font-size: 1.2rem" aria-hidden="true" />

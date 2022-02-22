@@ -70,6 +70,23 @@ function getLayerById(id: number, parent?: WorkingFileLayer<ColorModel>[]): Work
     return null;
 }
 
+function getLayerGlobalTransform(layerOrId: WorkingFileLayer<ColorModel> | number): DOMMatrix {
+    let layer: WorkingFileLayer<ColorModel> | null = null;
+    if (typeof layerOrId === 'number') {
+        layer = getLayerById(layerOrId);
+    } else {
+        layer = layerOrId;
+    }
+    let transform = new DOMMatrix();
+    if (layer) {
+        if (layer.groupId != null) {
+            transform.multiplySelf(getLayerGlobalTransform(layer.groupId));
+        }
+        transform.multiplySelf(layer.transform);
+    }
+    return transform;
+}
+
 function getGroupLayerById(id: number, parent?: WorkingFileLayer<ColorModel>[]): WorkingFileGroupLayer<ColorModel> | null {
     if (parent == null) {
         parent = store.get('layers');
@@ -107,6 +124,11 @@ function getTimelineById(id: number): WorkingFileTimeline | null {
     return null;
 }
 
+function ensureUniqueLayerSiblingName(layerId: number, name: string): string {
+    // TODO TODO TODO
+    return name;
+}
+
 export default store;
 
-export { WorkingFileStore, WorkingFileState, getLayerById, getLayersByType, getGroupLayerById, getTimelineById };
+export { WorkingFileStore, WorkingFileState, getLayerById, getLayerGlobalTransform, getLayersByType, getGroupLayerById, getTimelineById, ensureUniqueLayerSiblingName };

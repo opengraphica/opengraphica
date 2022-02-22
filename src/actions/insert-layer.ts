@@ -12,21 +12,33 @@ import layerRenderers from '@/canvas/renderers';
 
 let layerInsertCounter: number = 1;
 
-export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<ColorModel>> extends BaseAction {
+type InsertPosition = 'top' | 'bottom' | 'above' | 'below'; // top, above = in front of other layers visibly.
 
-    private insertLayerOptions: GroupLayerOptions | null = null;
+export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorModel>> extends BaseAction {
+
+    public insertedLayerId: number = -1;
+
+    private insertLayerOptions: LayerOptions | null = null;
+    private insertPosition: InsertPosition = 'top';
+    private insertAroundLayerId: number = 0;
     private insertedLayer: WorkingFileAnyLayer<ColorModel> | null = null;
     private selectLayersAction: SelectLayersAction | null = null;
 
-    constructor(insertLayerOptions: GroupLayerOptions) {
+    constructor(insertLayerOptions: LayerOptions, insertPosition: InsertPosition = 'top', insertAroundLayerId?: number) {
         super('insertLayer', 'Insert Layer');
         this.insertLayerOptions = insertLayerOptions;
+        this.insertPosition = insertPosition;
+        if (insertAroundLayerId) {
+            this.insertAroundLayerId = insertAroundLayerId;
+        }
 	}
 	public async do() {
         super.do();
 
         const layerId = workingFileStore.get('layerIdCounter');
         workingFileStore.set('layerIdCounter', layerId + 1);
+
+        this.insertedLayerId = layerId;
 
         let newLayer: WorkingFileAnyLayer<ColorModel>;
         if (this.insertedLayer) {
@@ -116,7 +128,24 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<C
             }
         }
         if (parent) {
-            parent.push(newLayer);
+            if (['above', 'below'].includes(this.insertPosition)) {
+                let insertAroundIndex: number = -1;
+                for (let [i, layer] of parent.entries()) {
+                    if (layer.id === this.insertAroundLayerId) {
+                        insertAroundIndex = i;
+                        break;
+                    }
+                }
+                if (insertAroundIndex > -1) {
+                    parent.splice(insertAroundIndex + (this.insertPosition === 'above' ? 1 : 0), 0, newLayer);
+                } else {
+                    throw new Error('Referenced layer to insert around not found.');
+                }
+            } else if (this.insertPosition === 'top') {
+                parent.push(newLayer);
+            } else if (this.insertPosition === 'bottom') {
+                parent.unshift(newLayer);
+            }
         } else {
             throw new Error('Parent group not found.');
         }
@@ -153,6 +182,8 @@ export class InsertLayerAction<GroupLayerOptions extends InsertAnyLayerOptions<C
         }
         workingFileStore.set('layers', layers);
         workingFileStore.set('layerIdCounter', workingFileStore.get('layerIdCounter') - 1);
+
+        this.insertedLayerId = -1;
 
         canvasStore.set('dirty', true);
 	}

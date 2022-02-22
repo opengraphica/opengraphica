@@ -7,18 +7,19 @@ import {
 } from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
+import { createImageFromBlob } from '@/lib/image';
 
 export class ClearSelectionAction extends BaseAction {
 
     private oldActiveSelectionPath: Array<SelectionPathPoint> = [];
-
+    
     private oldAppliedMaskOffset: DOMPoint = new DOMPoint();
     private oldAppliedMaskDatabaseId: string | null = null;
     private oldAppliedMaskDatabaseSizeEstimate: number = 0;
     private oldSelectionCombineMode: SelectionCombineMode | null = null;
 
     constructor() {
-        super('clearSelection', 'ClearSelection');
+        super('clearSelection', 'Clear Selection');
 	}
 
 	public async do() {
@@ -37,13 +38,14 @@ export class ClearSelectionAction extends BaseAction {
                 throw new Error('Aborted - Error storing old selection mask.');
             }
             this.oldAppliedMaskOffset = new DOMPoint();
-            this.oldAppliedMaskOffset.x = appliedSelectionMaskCanvasOffset.value.x;
-            this.oldAppliedMaskOffset.y = appliedSelectionMaskCanvasOffset.value.y;
         }
+        this.oldAppliedMaskOffset.x = appliedSelectionMaskCanvasOffset.value.x;
+        this.oldAppliedMaskOffset.y = appliedSelectionMaskCanvasOffset.value.y;
 
         this.oldSelectionCombineMode = selectionCombineMode.value;
         this.oldActiveSelectionPath = [...activeSelectionPath.value];
 
+        // Reset all selection-based refs.
         if (activeSelectionMask.value) {
             URL.revokeObjectURL(activeSelectionMask.value.src);
         }
@@ -79,26 +81,7 @@ export class ClearSelectionAction extends BaseAction {
 			}
 		}
         if (oldMaskBlob) {
-            oldMaskImage = await new Promise<InstanceType<typeof Image>>((resolve, reject) => {
-                try {
-                    let image = new Image();
-                    image.onload = () => {
-                        resolve(image);
-                        (image as any) = null;
-                    };
-                    image.onerror = (error) => {
-                        reject(error);
-                        (image as any) = null;
-                    };
-                    if (oldMaskBlob) {
-                        image.src = URL.createObjectURL(oldMaskBlob);
-                    } else {
-                        reject(new Error('Aborted - Couldn\'t create image from non-existing blob.'));
-                    }
-                } catch (error) {
-                    reject(error);
-                }
-            });
+            oldMaskImage = await createImageFromBlob(oldMaskBlob);
         }
         if (appliedSelectionMask.value) {
             URL.revokeObjectURL(appliedSelectionMask.value.src);

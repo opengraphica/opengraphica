@@ -8,6 +8,7 @@ import {
 } from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
+import { createImageFromBlob } from '@/lib/image';
 
 export class ApplyActiveSelectionAction extends BaseAction {
 
@@ -94,26 +95,7 @@ export class ApplyActiveSelectionAction extends BaseAction {
 
         // Create HTMLImageElement from PNG blob.
         if (newMaskBlob) {
-            newMaskImage = await new Promise<InstanceType<typeof Image>>((resolve, reject) => {
-                try {
-                    let image = new Image();
-                    image.onload = () => {
-                        resolve(image);
-                        (image as any) = null;
-                    };
-                    image.onerror = (error) => {
-                        reject(error);
-                        (image as any) = null;
-                    };
-                    if (newMaskBlob) {
-                        image.src = URL.createObjectURL(newMaskBlob);
-                    } else {
-                        reject(new Error('Aborted - Couldn\'t create image from non-existing blob.'));
-                    }
-                } catch (error) {
-                    reject(error);
-                }
-            });
+            newMaskImage = await createImageFromBlob(newMaskBlob);
         }
         if (appliedSelectionMask.value) {
             URL.revokeObjectURL(appliedSelectionMask.value.src);
@@ -150,26 +132,7 @@ export class ApplyActiveSelectionAction extends BaseAction {
 			}
 		}
         if (oldMaskBlob) {
-            oldMaskImage = await new Promise<InstanceType<typeof Image>>((resolve, reject) => {
-                try {
-                    let image = new Image();
-                    image.onload = () => {
-                        resolve(image);
-                        (image as any) = null;
-                    };
-                    image.onerror = (error) => {
-                        reject(error);
-                        (image as any) = null;
-                    };
-                    if (oldMaskBlob) {
-                        image.src = URL.createObjectURL(oldMaskBlob);
-                    } else {
-                        reject(new Error('Aborted - Couldn\'t create image from non-existing blob.'));
-                    }
-                } catch (error) {
-                    reject(error);
-                }
-            });
+            oldMaskImage = await createImageFromBlob(oldMaskBlob);
         }
         if (appliedSelectionMask.value) {
             URL.revokeObjectURL(appliedSelectionMask.value.src);
