@@ -49,7 +49,7 @@ export class PerformantStore<T extends StoreTypeMap> {
             }
         }
         this.reactiveState = reactive(reactiveState);
-        this.state = shallowReadonly<T>(this.reactiveState) as any;
+        this.state = shallowReadonly<T>(this.reactiveState) as any; // Call .get function for modification. Shallow so it doesn't impact .get return.
 
         // Restore rembered props from localStorage
         for (const restorePropName of this.restoreProps) {
@@ -117,7 +117,7 @@ export class PerformantStore<T extends StoreTypeMap> {
     }
 
     get<K extends keyof T['state']>(key: K): T['state'][K] {
-        return this.staticState[key];
+        return this.reactiveState[key] || this.staticState[key];
     }
 
     dispatch<K extends keyof T['dispatch']>(key: K, value: T['dispatch'][K]): Promise<any>;

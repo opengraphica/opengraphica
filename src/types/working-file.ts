@@ -80,7 +80,7 @@ export interface WorkingFileLayer<T extends ColorModel> {
 export interface WorkingFileGroupLayer<T extends ColorModel> extends WorkingFileLayer<T> {
     type: 'group';
     expanded: boolean;
-    layers: WorkingFileLayer<T>[];
+    layers: WorkingFileAnyLayer<T>[];
 }
 
 export interface WorkingFileRasterLayer<T extends ColorModel> extends WorkingFileLayer<T> {

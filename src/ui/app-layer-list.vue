@@ -70,7 +70,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch, reactive, onMounted, toRefs, nextTick, PropType, getCurrentInstance } from 'vue';
+import { defineComponent, ref, watch, reactive, computed, onMounted, onUnmounted, toRefs, nextTick, PropType } from 'vue';
 import ElButton from 'element-plus/lib/components/button/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import ElMenu, { ElMenuItem } from 'element-plus/lib/components/menu/index';
@@ -81,6 +81,7 @@ import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import workingFileStore from '@/store/working-file';
+import appEmitter from '@/lib/emitter';
 import AppLayerListThumbnail from '@/ui/app-layer-list-thumbnail.vue';
 import AppLayerFrameThumbnail from '@/ui/app-layer-frame-thumbnail.vue';
 import { BundleAction } from '@/actions/bundle';
@@ -88,7 +89,7 @@ import { DeleteLayersAction } from '@/actions/delete-layers';
 import { SelectLayersAction } from '@/actions/select-layers';
 import { UpdateLayerAction } from '@/actions/update-layer';
 import { ReorderLayersAction } from '@/actions/reorder-layers';
-import { WorkingFileAnyLayer, ColorModel, WorkingFileRasterSequenceLayer } from '@/types';
+import { WorkingFileAnyLayer, WorkingFileGroupLayer, ColorModel, WorkingFileRasterSequenceLayer } from '@/types';
 
 export default defineComponent({
     name: 'AppLayerList',
@@ -149,7 +150,9 @@ export default defineComponent({
         const { playingAnimation } = toRefs(canvasStore.state);
         const { selectedLayerIds } = toRefs(workingFileStore.state);
 
-        const reversedLayers = ref<WorkingFileAnyLayer<ColorModel>[]>([]);
+        const reversedLayers = computed<WorkingFileAnyLayer<ColorModel>[]>(() => {
+            return reverseLayerList(props.layers);
+        });
 
         watch(() => props.scrollTop, () => {
             if (draggingLayerId.value != null) {
@@ -160,15 +163,27 @@ export default defineComponent({
         });
 
         onMounted(() => {
-            refreshLayerList();
         });
+
+        onUnmounted(() => {
+        });
+
+        function reverseLayerList(layerList: WorkingFileAnyLayer<ColorModel>[]): WorkingFileAnyLayer<ColorModel>[] {
+            const newLayersList = [];
+            for (let i = layerList.length - 1; i >= 0; i--) {
+                if ((layerList[i] as WorkingFileGroupLayer<ColorModel>).layers) {
+                    (layerList[i] as WorkingFileGroupLayer<ColorModel>).layers = reactive(reverseLayerList((layerList[i] as WorkingFileGroupLayer<ColorModel>).layers));
+                }
+                newLayersList.push(reactive(layerList[i]));
+            }
+            return newLayersList;
+        }
 
         async function onLayerSettingsSelect(layer: WorkingFileAnyLayer<ColorModel>, action: string) {
             if (action === 'delete') {
                 historyStore.dispatch('runAction', {
                     action: new DeleteLayersAction([layer.id])
                 });
-                refreshLayerList();
             }
             showLayerSettingsMenuFor.value = null;
         }
@@ -298,7 +313,6 @@ export default defineComponent({
             draggingLayerId.value = null;
             draggingItemHtml.value = '';
             dropTargetLayerId.value = null;
-            refreshLayerList();
         }
 
         function onToggleLayerSettings(layer: WorkingFileAnyLayer<ColorModel>) {
@@ -352,14 +366,6 @@ export default defineComponent({
                     id: parseInt(layerEl.getAttribute('data-layer-id') + '', 10)
                 });
             });
-        }
-
-        function refreshLayerList() {
-            const newLayersList = [];
-            for (let i = props.layers.length - 1; i >= 0; i--) {
-                newLayersList.push(reactive(props.layers[i]));
-            }
-            reversedLayers.value = newLayersList;
         }
 
         return {

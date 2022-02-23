@@ -26,7 +26,7 @@ export class ReorderLayersAction extends BaseAction {
         super.do();
 
         // Map ids to layer objects
-        let insertLayers: WorkingFileLayer<ColorModel>[] = [];
+        let insertLayers: WorkingFileAnyLayer<ColorModel>[] = [];
         for (let layerId of this.insertLayerIds) {
             const layer = getLayerById(layerId);
             if (!layer) {

@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, toRefs, onMounted, nextTick } from 'vue';
+import { defineComponent, ref, watch, toRef, toRefs, onMounted, nextTick, reactive } from 'vue';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
 import AppLayerList from '@/ui/app-layer-list.vue';
@@ -57,7 +57,7 @@ export default defineComponent({
             scrollTop.value = scrollbarWrap.scrollTop;
             scrollContainerHeight.value = scrollbarWrap.clientHeight;
         }
-
+        
         function onScrollByAmount(amount: number) {
             let newScrollTop = scrollbarWrap.scrollTop + amount;
             if (newScrollTop < 0) {

@@ -104,6 +104,8 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
             }
         }
 
+        const previousSelectedLayerIds = workingFileStore.get('selectedLayerIds');
+
         if (this.clearSelection && !this.clearSelectionAction) {
             this.clearSelectionAction = new ClearSelectionAction();
         }
@@ -128,9 +130,9 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
                 this.selectLayersAction = null;
             }
             if (this.selectNewLayers === 'replace') {
-                this.selectLayersAction = new SelectLayersAction(insertedLayerIds);
+                this.selectLayersAction = new SelectLayersAction(insertedLayerIds, previousSelectedLayerIds);
             } else {
-                this.selectLayersAction = new SelectLayersAction([ ...workingFileStore.get('selectedLayerIds'), ...insertedLayerIds ]);
+                this.selectLayersAction = new SelectLayersAction([ ...workingFileStore.get('selectedLayerIds'), ...insertedLayerIds ], previousSelectedLayerIds);
             }
         }
 

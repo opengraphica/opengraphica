@@ -6,15 +6,23 @@ export class SelectLayersAction extends BaseAction {
 
     private newSelectedLayerIds!: number[];
     private previousSelectedLayerIds: number[] = [];
+    private previousSelectedLayerIdsOverride: number[] | null = null;
 
-    constructor(selectedLayerIds: number[]) {
+    constructor(selectedLayerIds: number[], previousSelectedLayerIdsOverride?: number[]) {
         super('selectLayers', 'Select Layer(s)');
         this.newSelectedLayerIds = selectedLayerIds;
+        if (previousSelectedLayerIdsOverride) {
+            this.previousSelectedLayerIdsOverride = previousSelectedLayerIdsOverride;
+        }
 	}
 	public async do() {
         super.do();
 
-        this.previousSelectedLayerIds = workingFileStore.get('selectedLayerIds');
+        if (this.previousSelectedLayerIdsOverride) {
+            this.previousSelectedLayerIds = this.previousSelectedLayerIdsOverride;
+        } else {
+            this.previousSelectedLayerIds = workingFileStore.get('selectedLayerIds');
+        }
         workingFileStore.set('selectedLayerIds', [...this.newSelectedLayerIds]);
 
         canvasStore.set('dirty', true);
