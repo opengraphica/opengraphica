@@ -118,6 +118,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
     async onTransformDown() {
         this.isPointerDragging = false;
+        const { transformBoundsPoint, viewTransformPoint, viewDecomposedTransform } = this.getTransformedCursorInfo();
 
         if ((activeSelectionMask.value || appliedSelectionMask.value)) {
             if (this.selectedLayers.length > 0) {
@@ -131,8 +132,6 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 });
             }
         }
-
-        const { transformBoundsPoint, viewTransformPoint, viewDecomposedTransform } = this.getTransformedCursorInfo();
 
         this.storeTransformStart(viewTransformPoint);
 
