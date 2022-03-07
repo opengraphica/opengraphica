@@ -26,7 +26,8 @@ module.exports = function setupConfig(config) {
                     test: /\.ts$/,
                     loader: 'ts-loader',
                     options: {
-                        appendTsSuffixTo: [/\.vue$/]
+                        appendTsSuffixTo: [/\.vue$/],
+                        ignoreDiagnostics: [2322]
                     }
                 },
                 {
