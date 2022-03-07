@@ -50,6 +50,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     private isPointerDragging: boolean = false;
     private isTransformCommitting: boolean = false;
     private isIgnoreHistoryStep: boolean = false;
+    private transformDownCompletePromise: Promise<void> | null = null;
 
     private setBoundsDebounceHandle: number | undefined;
     private selectedLayers: WorkingFileLayer<ColorModel>[] = [];
@@ -105,7 +106,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     onMultiTouchDown() {
         super.onMultiTouchDown();
         if (this.touches.length === 1) {
-            this.onTransformDown();
+            this.transformDownCompletePromise = this.onTransformDown();
         }
     }
 
@@ -113,11 +114,12 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         super.onPointerDown(e);
         if (isInput(e.target)) return;
         if (e.isPrimary && ['mouse', 'pen'].includes(e.pointerType) && e.button === 0) {
-            this.onTransformDown();
+            this.transformDownCompletePromise = this.onTransformDown();
         }
     }
 
-    async onTransformDown() {
+    async onTransformDown(isRecursed: boolean = false) {
+        if (this.transformDownCompletePromise && !isRecursed) return;
         if (this.isTransformCommitting) return;
         this.isPointerDragging = false;
         const { transformBoundsPoint, viewTransformPoint, viewDecomposedTransform } = this.getTransformedCursorInfo();
@@ -181,7 +183,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 });
                 await nextTick();
                 this.setBoundsFromSelectedLayersImmediate();
-                this.onTransformDown();
+                await this.onTransformDown(true);
             }
         }
 
@@ -328,31 +330,36 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     async onPointerUp(e: PointerEvent): Promise<void> {
         super.onPointerUp(e);
         if (e.isPrimary) {
-            if (this.transformTranslateStart) {
+            if (!this.isTransformCommitting) {
                 this.isTransformCommitting = true;
-                try {
-                    await this.commitTransforms();
-                } catch (error) { /* Ignore */ }
-                if (!preferencesStore.get('preferCanvasViewport')) {
-                    preferencesStore.set('useCanvasViewport', false);
-                    canvasStore.set('useCssViewport', true);
+                if (this.transformDownCompletePromise) {
+                    await this.transformDownCompletePromise;
                 }
-                try {
-                    if (this.transformStartPickLayer != null && !this.isPointerDragging) {
-                        const layerId = this.transformStartPickLayer;
-                        if (layerId != workingFileStore.get('selectedLayerIds')[0]) {
-                            await historyStore.dispatch('runAction', {
-                                action: new SelectLayersAction([layerId])
-                            });
-                            await nextTick();
-                            this.setBoundsFromSelectedLayers();
-                        }
+                if (this.transformTranslateStart) {
+                    try {
+                        await this.commitTransforms();
+                    } catch (error) { /* Ignore */ }
+                    if (!preferencesStore.get('preferCanvasViewport')) {
+                        preferencesStore.set('useCanvasViewport', false);
+                        canvasStore.set('useCssViewport', true);
                     }
-                } catch (error) { /* Ignore */ }
-                this.transformStartPickLayer = null;
-                this.isTransformCommitting = false;
+                    try {
+                        if (this.transformStartPickLayer != null && !this.isPointerDragging) {
+                            const layerId = this.transformStartPickLayer;
+                            if (layerId != workingFileStore.get('selectedLayerIds')[0]) {
+                                await historyStore.dispatch('runAction', {
+                                    action: new SelectLayersAction([layerId])
+                                });
+                                await nextTick();
+                                this.setBoundsFromSelectedLayers();
+                            }
+                        }
+                    } catch (error) { /* Ignore */ }
+                    this.transformStartPickLayer = null;
+                }
+                dragHandleHighlight.value = null;
             }
-            dragHandleHighlight.value = null;
+            this.isTransformCommitting = false;
         }
     }
 
