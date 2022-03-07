@@ -76,6 +76,8 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             this.setBoundsFromSelectedLayers();
         }, { immediate: true });
 
+        this.pointerProcessStep = null;
+
         this.onCancelCurrentAction = this.onCancelCurrentAction.bind(this);
         this.onHistoryStep = this.onHistoryStep.bind(this);
         this.onStoreTransformStart = this.onStoreTransformStart.bind(this);
