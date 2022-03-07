@@ -13,13 +13,15 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
 
     private updateLayerOptions!: LayerOptions;
     private previousProps: Partial<WorkingFileAnyLayer<ColorModel>> = {};
+    private explicitPreviousProps: Partial<WorkingFileAnyLayer<ColorModel>> = {};
 
     private newRasterSourceImageDatabaseId: string | null = null;
     private oldRasterSourceImageDatabaseId: string | null = null;
 
-    constructor(updateLayerOptions: LayerOptions) {
+    constructor(updateLayerOptions: LayerOptions, explicitPreviousProps: Partial<WorkingFileAnyLayer<ColorModel>> = {}) {
         super('updateLayer', 'Update Layer');
         this.updateLayerOptions = updateLayerOptions;
+        this.explicitPreviousProps = explicitPreviousProps;
 	}
 	public async do() {
         super.do();
@@ -67,7 +69,11 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                 //     }
                 // }
             } else if (prop !== 'id') {
-                (this.previousProps as any)[prop] = (layer as any)[prop];
+                if ((this.explicitPreviousProps as any)[prop] !== undefined) {
+                    (this.previousProps as any)[prop] = (this.explicitPreviousProps as any)[prop];
+                } else {
+                    (this.previousProps as any)[prop] = (layer as any)[prop];
+                }
                 (layer as any)[prop] = this.updateLayerOptions[prop];
             }
         }

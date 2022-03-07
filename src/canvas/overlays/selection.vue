@@ -52,11 +52,7 @@ export default defineComponent({
         });
         const svgBoundsPadding = 10;
         const svgPathStrokeWidth = computed<number>(() => {
-            if (zoom.value > 1) {
-                return 4;
-            } else {
-                return 2;
-            }
+            return 2;
         });
         const svgHandleWidth = computed<number>(() => {
             return 5;

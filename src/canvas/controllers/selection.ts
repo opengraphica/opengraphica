@@ -1,11 +1,13 @@
 import BaseMovementController from './base-movement';
-import { ref, watch } from 'vue';
+import { ref, watch, toRefs, WatchStopHandle } from 'vue';
 import { PointerTracker } from './base';
 import {
-    isDrawingSelection, selectionAddShape, activeSelectionPath, selectionCombineMode, selectionEmitter, SelectionPathPoint
+    isDrawingSelection, selectionAddShape, activeSelectionPath, selectionCombineMode, selectionEmitter,
+    SelectionPathPoint, appliedSelectionMask, previewSelectedLayersSelectionMask, discardSelectedLayersSelectionMask
 } from '../store/selection-state';
 import canvasStore from '@/store/canvas';
 import historyStore from '@/store/history';
+import workingFileStore from '@/store/working-file';
 import appEmitter from '@/lib/emitter';
 import { ApplyActiveSelectionAction } from '@/actions/apply-active-selection';
 import { ClearSelectionAction } from '@/actions/clear-selection';
@@ -16,6 +18,7 @@ export default class SelectionController extends BaseMovementController {
     private asyncActionStack: Array<{ callback: (...args: any[]) => Promise<any>, args?: any[] }> = [];
     private currentAsyncAction: ({ callback: (...args: any[]) => Promise<any>, args?: any[] }) | undefined = undefined;
     private dragStartActiveSelectionPath: Array<SelectionPathPoint> | undefined = undefined;
+    private selectedLayerUnwatch: WatchStopHandle | null = null;
 
     queueAsyncAction(callback: (...args: any[]) => Promise<any>, args?: any[]) {
         this.asyncActionStack.push({
@@ -40,22 +43,35 @@ export default class SelectionController extends BaseMovementController {
         }
     }
 
-    onEnter(): void {
+    async onEnter(): Promise<void> {
         super.onEnter();
-        appEmitter.on('editor.tool.commitCurrentAction', this.queueApplyActiveSelection.bind(this));
-        appEmitter.on('editor.tool.selectAll', this.queueClearSelection.bind(this));
-        selectionEmitter.on('applyActiveSelection', this.queueApplyActiveSelection.bind(this));
-        selectionEmitter.on('clearSelection', this.queueClearSelection.bind(this));
-        selectionEmitter.on('updateSelectionCombineMode', this.queueUpdateSelectionCombineMode.bind(this));
+
+        this.queueApplyActiveSelection = this.queueApplyActiveSelection.bind(this);
+        this.queueClearSelection = this.queueClearSelection.bind(this);
+        this.queueUpdateSelectionCombineMode = this.queueUpdateSelectionCombineMode.bind(this);
+        appEmitter.on('editor.tool.commitCurrentAction', this.queueApplyActiveSelection);
+        appEmitter.on('editor.tool.selectAll', this.queueClearSelection);
+        selectionEmitter.on('applyActiveSelection', this.queueApplyActiveSelection);
+        selectionEmitter.on('clearSelection', this.queueClearSelection);
+        selectionEmitter.on('updateSelectionCombineMode', this.queueUpdateSelectionCombineMode);
+        this.selectedLayerUnwatch = watch([toRefs(workingFileStore.state).selectedLayerIds], async () => {
+            await previewSelectedLayersSelectionMask();
+            canvasStore.set('viewDirty', true);
+        }, { immediate: true });
     }
 
     onLeave(): void {
         super.onLeave();
-        appEmitter.off('editor.tool.commitCurrentAction', this.queueApplyActiveSelection.bind(this));
-        appEmitter.off('editor.tool.selectAll', this.queueClearSelection.bind(this));
-        selectionEmitter.off('applyActiveSelection', this.queueApplyActiveSelection.bind(this));
-        selectionEmitter.off('clearSelection', this.queueClearSelection.bind(this));
-        selectionEmitter.off('updateSelectionCombineMode', this.queueUpdateSelectionCombineMode.bind(this));
+        appEmitter.off('editor.tool.commitCurrentAction', this.queueApplyActiveSelection);
+        appEmitter.off('editor.tool.selectAll', this.queueClearSelection);
+        selectionEmitter.off('applyActiveSelection', this.queueApplyActiveSelection);
+        selectionEmitter.off('clearSelection', this.queueClearSelection);
+        selectionEmitter.off('updateSelectionCombineMode', this.queueUpdateSelectionCombineMode);
+        if (this.selectedLayerUnwatch) {
+            this.selectedLayerUnwatch();
+        }
+        discardSelectedLayersSelectionMask();
+        canvasStore.set('viewDirty', true);
     }
 
     onMultiTouchDown() {

@@ -16,7 +16,7 @@ import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import workingFileStore from '@/store/working-file';
 import preferencesStore from '@/store/preferences';
-import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset } from '@/canvas/store/selection-state';
+import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset, selectedLayersSelectionMaskPreview, selectedLayersSelectionMaskPreviewCanvasOffset } from '@/canvas/store/selection-state';
 import AppCanvasOverlays from '@/ui/app-canvas-overlays.vue';
 import { drawWorkingFileToCanvas } from '@/lib/canvas';
 import { notifyInjector } from '@/lib/notify';
@@ -290,7 +290,7 @@ export default defineComponent({
                         selectionMaskCanvas.value.height = viewportHeight.value;
                         selectionMaskCanvasCtx.imageSmoothingEnabled = false; // Disable for some decent antialiasing.
                         selectionMaskCanvasCtx.clearRect(0, 0, selectionMaskCanvas.value.width, selectionMaskCanvas.value.height);
-                        if (appliedSelectionMask.value || activeSelectionMask.value) {
+                        if (appliedSelectionMask.value || activeSelectionMask.value || selectedLayersSelectionMaskPreview.value) {
                             const transform = canvasStore.get('transform');
                             selectionMaskCanvasCtx.globalCompositeOperation = 'source-over';
                             selectionMaskCanvasCtx.save();
@@ -299,6 +299,8 @@ export default defineComponent({
                                 selectionMaskCanvasCtx.drawImage(activeSelectionMask.value, activeSelectionMaskCanvasOffset.value.x, activeSelectionMaskCanvasOffset.value.y);
                             } else if (appliedSelectionMask.value) {
                                 selectionMaskCanvasCtx.drawImage(appliedSelectionMask.value, appliedSelectionMaskCanvasOffset.value.x, appliedSelectionMaskCanvasOffset.value.y);
+                            } else if (selectedLayersSelectionMaskPreview.value) {
+                                selectionMaskCanvasCtx.drawImage(selectedLayersSelectionMaskPreview.value, selectedLayersSelectionMaskPreviewCanvasOffset.value.x, selectedLayersSelectionMaskPreviewCanvasOffset.value.y);
                             }
                             selectionMaskCanvasCtx.restore();
                             selectionMaskCanvasCtx.globalCompositeOperation = 'source-out';

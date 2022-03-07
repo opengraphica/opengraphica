@@ -172,6 +172,7 @@ async function dispatchRunAction({ action, mergeWithHistory }: HistoryDispatch['
             await store.dispatch('free', { memorySize: performance.memory.jsHeapSizeLimit * 0.2 });
         }
     }
+
     return { status: 'completed' };
 }
 

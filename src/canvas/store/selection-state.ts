@@ -1,6 +1,8 @@
 import mitt from 'mitt';
 import { ref, reactive } from 'vue';
 import workingFileStore from '@/store/working-file';
+import { drawWorkingFileToCanvas } from '@/lib/canvas';
+import { createImageFromCanvas, getImageDataEmptyBounds } from '@/lib/image';
 
 export type SelectionAddShape = 'rectangle' | 'ellipse' | 'free' | 'tonalArea';
 export type SelectionCombineMode = 'add' | 'subtract' | 'intersect' | 'replace';
@@ -10,8 +12,12 @@ export const selectionCombineMode = ref<SelectionCombineMode>('add');
 export const isDrawingSelection = ref<boolean>(false);
 export const appliedSelectionMask = ref<InstanceType<typeof Image> | null>(null);
 export const appliedSelectionMaskCanvasOffset = ref<DOMPoint>(new DOMPoint());
+// Active selection mask is a preview of what appliedSelectionMask will look like when the selection shape is applied. It is not tracked in history.
 export const activeSelectionMask = ref<InstanceType<typeof Image> | null>(null);
 export const activeSelectionMaskCanvasOffset = ref<DOMPoint>(new DOMPoint());
+// Selected layers selection mask is a preview of the selection mask including all the currently selected layers when the user enters the selection tool, for clarity. It is not tracked in history.
+export const selectedLayersSelectionMaskPreview = ref<InstanceType<typeof Image> | null>(null);
+export const selectedLayersSelectionMaskPreviewCanvasOffset = ref<DOMPoint>(new DOMPoint());
 export const selectionMaskDrawMargin = ref<number>(1);
 
 export interface SelectionPathPointBase {
@@ -133,6 +139,38 @@ export async function previewActiveSelectionMask(activeSelectionPathOverride: Ar
         activeSelectionMaskCanvasOffset.value.x = 0;
         activeSelectionMaskCanvasOffset.value.y = 0;
     }
+}
+
+export async function previewSelectedLayersSelectionMask() {
+    let drawMargin: number = selectionMaskDrawMargin.value;
+
+    let workingCanvas = document.createElement('canvas');
+    workingCanvas.width = workingFileStore.get('width');
+    workingCanvas.height = workingFileStore.get('height');
+    let ctx = workingCanvas.getContext('2d');
+    if (!ctx) throw new Error('Couldn\'t draw to a new canvas when trying to apply selection mask.');
+    ctx.imageSmoothingEnabled = false;
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, workingCanvas.width, workingCanvas.height);
+    ctx.globalCompositeOperation = 'destination-in';
+    drawWorkingFileToCanvas(workingCanvas, ctx, { selectedLayersOnly: true });
+    // TODO - perhaps trim mask image before storing to save memory, if not too much CPU cost.
+
+    if (selectedLayersSelectionMaskPreview.value) {
+        URL.revokeObjectURL(selectedLayersSelectionMaskPreview.value.src);
+    }
+    selectedLayersSelectionMaskPreview.value = await createImageFromCanvas(workingCanvas);
+    selectedLayersSelectionMaskPreviewCanvasOffset.value.x = 0;
+    selectedLayersSelectionMaskPreviewCanvasOffset.value.y = 0;
+}
+
+export function discardSelectedLayersSelectionMask() {
+    if (selectedLayersSelectionMaskPreview.value) {
+        URL.revokeObjectURL(selectedLayersSelectionMaskPreview.value.src);
+    }
+    selectedLayersSelectionMaskPreview.value = null;
+    selectedLayersSelectionMaskPreviewCanvasOffset.value.x = 0;
+    selectedLayersSelectionMaskPreviewCanvasOffset.value.y = 0;
 }
 
 export function discardAppliedSelectionMask() {

@@ -138,9 +138,13 @@ const store = new PerformantStore<EditorStore>({
                         const CanvasControllerGenericClass: typeof BaseCanvasController =
                             (await import(/* webpackChunkName: 'canvas-controller-[request]' */ `../canvas/controllers/${controllerName}.ts`)).default;
                         const controller = new CanvasControllerGenericClass();
-                        try {
-                            controller.onLeave();
-                        } catch (error: any) {}
+                        if (this.state.toolCanvasController) {
+                            try {
+                                this.state.toolCanvasController.onLeave();
+                            } catch (error: any) {
+                                console.error(error);
+                            }
+                        }
                         set('toolCanvasController', controller);
                         if (toolDefinition.toolbar) {
                             isActiveToolbarExclusive = !!toolDefinition.toolbar.exclusive;

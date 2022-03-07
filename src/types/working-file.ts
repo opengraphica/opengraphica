@@ -2,6 +2,7 @@ import { ColorModel } from './color';
 import { VectorShape } from './vector';
 
 export interface DrawWorkingFileLayerOptions {
+    selectedLayersOnly?: boolean;
     visible?: boolean;
     selectionTest?: {
         point: DOMPoint;

@@ -179,7 +179,7 @@
             {
                 "type": "button",
                 "icon": "bi bi-cursor",
-                "label": "Move / Transform Layer",
+                "label": "Move / Transform",
                 "action": {
                     "type": "toolGroup",
                     "target": "transform"

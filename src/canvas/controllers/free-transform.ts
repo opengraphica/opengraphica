@@ -43,9 +43,12 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     private transformTranslateStart: DOMPoint | null = null;
     private transformStartDimensions: TransformInfo = { top: 0, left: 0, width: 0, height: 0, rotation: 0, handleToRotationOrigin: 0 };
     private transformStartLayerData: { transform: DOMMatrix }[] = [];
+    private transformStartPickLayer: number | null = null;
     private transformDragType: number = 0;
     private transformIsDragging: boolean = false;
     private transformIsRotating: boolean = false;
+    private isPointerDragging: boolean = false;
+    private isIgnoreHistoryStep: boolean = false;
 
     private setBoundsDebounceHandle: number | undefined;
     private selectedLayers: WorkingFileLayer<ColorModel>[] = [];
@@ -71,12 +74,18 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             this.setBoundsFromSelectedLayers();
         }, { immediate: true });
 
-        appEmitter.on('editor.tool.cancelCurrentAction', (this.onCancelCurrentAction).bind(this));
-        appEmitter.on('editor.history.step', (this.onHistoryStep).bind(this));
-        freeTransformEmitter.on('storeTransformStart', (this.onStoreTransformStart).bind(this));
-        freeTransformEmitter.on('previewRotationChange', (this.onPreviewRotationChange).bind(this));
-        freeTransformEmitter.on('previewDragResizeChange', (this.onPreviewDragResizeChange).bind(this));
-        freeTransformEmitter.on('commitTransforms', (this.onCommitTransforms).bind(this));
+        this.onCancelCurrentAction = this.onCancelCurrentAction.bind(this);
+        this.onHistoryStep = this.onHistoryStep.bind(this);
+        this.onStoreTransformStart = this.onStoreTransformStart.bind(this);
+        this.onPreviewRotationChange = this.onPreviewRotationChange.bind(this);
+        this.onPreviewDragResizeChange = this.onPreviewDragResizeChange.bind(this);
+        this.onCommitTransforms = this.onCommitTransforms.bind(this);
+        appEmitter.on('editor.tool.cancelCurrentAction', this.onCancelCurrentAction);
+        appEmitter.on('editor.history.step', this.onHistoryStep);
+        freeTransformEmitter.on('storeTransformStart', this.onStoreTransformStart);
+        freeTransformEmitter.on('previewRotationChange', this.onPreviewRotationChange);
+        freeTransformEmitter.on('previewDragResizeChange', this.onPreviewDragResizeChange);
+        freeTransformEmitter.on('commitTransforms', this.onCommitTransforms);
     }
 
     onLeave(): void {
@@ -84,12 +93,12 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             this.selectedLayerIdsWatchStop();
             this.selectedLayerIdsWatchStop = null;
         }
-        appEmitter.off('editor.tool.cancelCurrentAction', (this.onCancelCurrentAction).bind(this));
-        appEmitter.off('editor.history.step', (this.onHistoryStep).bind(this));
-        freeTransformEmitter.off('storeTransformStart', (this.onStoreTransformStart).bind(this));
-        freeTransformEmitter.off('previewRotatioffChange', (this.onPreviewRotationChange).bind(this));
-        freeTransformEmitter.off('previewDragResiffeChange', (this.onPreviewDragResizeChange).bind(this));
-        freeTransformEmitter.off('commitTransforms', (this.onCommitTransforms).bind(this));
+        appEmitter.off('editor.tool.cancelCurrentAction', this.onCancelCurrentAction);
+        appEmitter.off('editor.history.step', this.onHistoryStep);
+        freeTransformEmitter.off('storeTransformStart', this.onStoreTransformStart);
+        freeTransformEmitter.off('previewRotatioffChange', this.onPreviewRotationChange);
+        freeTransformEmitter.off('previewDragResiffeChange', this.onPreviewDragResizeChange);
+        freeTransformEmitter.off('commitTransforms', this.onCommitTransforms);
     }
 
     onMultiTouchDown() {
@@ -108,6 +117,8 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     }
 
     async onTransformDown() {
+        this.isPointerDragging = false;
+
         if ((activeSelectionMask.value || appliedSelectionMask.value)) {
             if (this.selectedLayers.length > 0) {
                 layerPickMode.value === 'current';
@@ -157,8 +168,12 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         }
 
         // Auto select layer outside drag handles
+        if (layerPickMode.value === 'auto') {
+            this.transformStartPickLayer = this.pickLayer(viewTransformPoint);
+        }
         if (!this.transformTranslateStart && layerPickMode.value === 'auto') {
-            const layerId = this.pickLayer(viewTransformPoint);
+            const layerId = this.transformStartPickLayer;
+            this.transformStartPickLayer = null;
             if (layerId != null && layerId != workingFileStore.get('selectedLayerIds')[0]) {
                 await historyStore.dispatch('runAction', {
                     action: new SelectLayersAction([layerId])
@@ -178,9 +193,14 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
     onPointerMove(e: PointerEvent) {
         super.onPointerMove(e);
+        const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
         if (e.isPrimary && this.transformTranslateStart) {
             const { viewTransformPoint } = this.getTransformedCursorInfo();
             const { shouldMaintainAspectRatio, shouldScaleDuringResize, shouldSnapRotationDegrees } = this.getTransformOptions();
+
+            if (pointer.isDragging) {
+                this.isPointerDragging = true;
+            }
 
             // Rotation
             if (this.transformIsRotating) {
@@ -286,6 +306,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
             canvasStore.set('dirty', true);
         }
+        // Set handle highlights based on mouse hover
         if (!this.transformTranslateStart && e.isPrimary && ['mouse', 'pen'].includes(e.pointerType)) {
             const { transformBoundsPoint, viewDecomposedTransform } = this.getTransformedCursorInfo();
             if (this.isPointOnRotateHandle(transformBoundsPoint, viewDecomposedTransform)) {
@@ -303,15 +324,27 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         }
     }
 
-    onPointerUp(e: PointerEvent): void {
+    async onPointerUp(e: PointerEvent): Promise<void> {
         super.onPointerUp(e);
         if (e.isPrimary) {
             if (this.transformTranslateStart) {
-                this.commitTransforms();
+                const transformTranslateStart = this.transformTranslateStart;
+                await this.commitTransforms();
                 if (!preferencesStore.get('preferCanvasViewport')) {
                     preferencesStore.set('useCanvasViewport', false);
                     canvasStore.set('useCssViewport', true);
                 }
+                if (this.transformStartPickLayer != null && !this.isPointerDragging) {
+                    const layerId = this.transformStartPickLayer;
+                    if (layerId != workingFileStore.get('selectedLayerIds')[0]) {
+                        await historyStore.dispatch('runAction', {
+                            action: new SelectLayersAction([layerId])
+                        });
+                        await nextTick();
+                        this.setBoundsFromSelectedLayers();
+                    }
+                }
+                this.transformStartPickLayer = null;
             }
             dragHandleHighlight.value = null;
         }
@@ -451,42 +484,48 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         }
     }
 
-    private commitTransforms() {
-        let { shouldScaleDuringResize } = this.getTransformOptions();
-        width.value = Math.max(1, width.value);
-        height.value = Math.max(1, height.value);
-        previewXSnap.value = [];
-        previewYSnap.value = [];
+    private async commitTransforms() {
+        try {
+            let { shouldScaleDuringResize } = this.getTransformOptions();
+            width.value = Math.max(1, width.value);
+            height.value = Math.max(1, height.value);
+            previewXSnap.value = [];
+            previewYSnap.value = [];
+
+            if (
+                left.value != this.transformStartDimensions.left ||
+                top.value != this.transformStartDimensions.top ||
+                width.value != this.transformStartDimensions.width ||
+                height.value != this.transformStartDimensions.height ||
+                rotation.value != this.transformStartDimensions.rotation
+            ) {
+                const updateLayerActions: UpdateLayerAction<UpdateAnyLayerOptions<ColorModel>>[] = [];
+                for (const [i, layer] of this.selectedLayers.entries()) {
+                    updateLayerActions.push(
+                        new UpdateLayerAction({
+                            id: layer.id,
+                            transform: layer.transform,
+                            ...(shouldScaleDuringResize ? {} : {
+                                width: width.value,
+                                height: height.value
+                            })
+                        }, {
+                            transform: this.transformStartLayerData[i].transform
+                        })
+                    );
+                }
+                await historyStore.dispatch('runAction', {
+                    action: new BundleAction('freeTransform', 'Free Transform', updateLayerActions)
+                });
+            }
+        } catch (error) {
+            console.error(error);
+        }
         this.transformTranslateStart = null;
+        this.transformStartLayerData = [];
+        this.transformStartDimensions = { top: 0, left: 0, width: 0, height: 0, rotation: 0, handleToRotationOrigin: 0 };
         this.transformIsRotating = false;
         this.transformIsDragging = false;
-
-        if (
-            left.value != this.transformStartDimensions.left ||
-            top.value != this.transformStartDimensions.top ||
-            width.value != this.transformStartDimensions.width ||
-            height.value != this.transformStartDimensions.height ||
-            rotation.value != this.transformStartDimensions.rotation
-        ) {
-            const updateLayerActions: UpdateLayerAction<UpdateAnyLayerOptions<ColorModel>>[] = [];
-            for (const [i, layer] of this.selectedLayers.entries()) {
-                const newTransform = layer.transform;
-                layer.transform = this.transformStartLayerData[i].transform;
-                updateLayerActions.push(
-                    new UpdateLayerAction({
-                        id: layer.id,
-                        transform: newTransform,
-                        ...(shouldScaleDuringResize ? {} : {
-                            width: width.value,
-                            height: height.value
-                        })
-                    })
-                );
-            }
-            historyStore.dispatch('runAction', {
-                action: new BundleAction('freeTransform', 'Free Transform', updateLayerActions)
-            });
-        }
     }
 
     private getTransformedCursorInfo(): { viewTransformPoint: DOMPoint, transformBoundsPoint: DOMPoint, viewDecomposedTransform: DecomposedMatrix } {
@@ -514,14 +553,14 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         };
     }
 
-    private pickLayer(viewTransformPoint: DOMPoint): number | undefined {
+    private pickLayer(viewTransformPoint: DOMPoint): number | null {
         const selectionTest: DrawWorkingFileOptions['selectionTest'] = {
             point: viewTransformPoint,
             resultId: undefined,
             resultPixelTest: undefined
         };
         drawWorkingFileToCanvas(canvasStore.get('viewCanvas'), canvasStore.get('viewCtx'), { selectionTest });
-        return selectionTest.resultId;
+        return selectionTest.resultId != null ? selectionTest.resultId : null;
     }
 
     private isPointOnRotateHandle(point: DOMPoint, viewDecomposedTransform: DecomposedMatrix): boolean {
@@ -574,9 +613,13 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
     private setBoundsFromSelectedLayers() {
         clearTimeout(this.setBoundsDebounceHandle);
-        this.setBoundsDebounceHandle = window.setTimeout(() => {
-            this.setBoundsFromSelectedLayersImmediate();
-        }, 0);
+        const setBoundsDebounceHandle = window.setTimeout(async () => {
+            await nextTick();
+            if (setBoundsDebounceHandle === this.setBoundsDebounceHandle) {
+                this.setBoundsFromSelectedLayersImmediate();
+            }
+        }, 100);
+        this.setBoundsDebounceHandle = setBoundsDebounceHandle;
     }
 
     private setBoundsFromSelectedLayersImmediate() {

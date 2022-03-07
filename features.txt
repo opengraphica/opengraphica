@@ -138,14 +138,18 @@ Tools
         [ ] Port from opengraphica-text-editor
     - Selection
         - Design: selection works as a cutout on top of the entire canvas, all layers. If multiple layers selected they are all cut at same time
+        [ ] Resize selection by manipulating bezier points and handles
         [ ] Integrate with drawing tools
         [ ] Integrate with effects
-        [ ] Integrate with move/resize
+        [x] Integrate with move/resize
         [ ] Integrate with cut/copy/paste
+        [ ] Notify when active selection made was empty, because it was outside the bounds of the current selected layers.
         - Toolbar
             - Selection Modes
-                [ ] Box
+                [x] Rectangle
+                [x] Ellipse
                 [ ] Freeform
+                [ ] Auto
             [ ] Invert selection
     - Move / Transform
         [x] Drag
@@ -155,9 +159,9 @@ Tools
             [ ] UI toggle for locking to aspect ratio
         [x] Rotate
             [ ] Show visual indicator of degrees
-            [ ] Snap to whole numbers
+            [x] Snapping to 15 degree increments
         - Toolbar
-            [ ] Auto select layer or work with current layer only
+            [x] Auto select layer or work with current layer only
             [ ] Mode toggle
                 [ ] Free Transform
                 [ ] Aspect ratio lock
@@ -169,11 +173,11 @@ Tools
                     [ ] Other layer edges
                     [ ] Other layer center
             [ ] Rotation origin selection
-            [ ] Manual Input
+            [x] Manual Input
                 [ ] Scale to width/height
                 [ ] Lock width/height aspect ratio
-                [ ] Rotation angle
-                [ ] Position
+                [x] Rotation angle
+                [x] Position
             [ ] Apply transform button
     - Color picker
         - Design: Background of icon will show current color. Icon color adjusts to be visible based on that. Clicking will bring up color dialog. Inside that dialog can pick color by conventional methods, or use color picker icon inside dialog to pick color from canvas
@@ -222,7 +226,7 @@ Tools
 
 Editor Layout
     - General
-        [ ] Drag & Drop files to Open
+        [x] Drag & Drop files to Open
     - Menu Bar
         [x] Fix it sometimes getting stuck in mobile mode after switching tools
         [ ] Drag & Drop to reorder
