@@ -17,6 +17,7 @@ import { drawWorkingFileToCanvas } from '@/lib/canvas';
 import { getImageDataFromImage, getImageDataEmptyBounds } from '@/lib/image';
 import { isInput } from '@/lib/events';
 import appEmitter from '@/lib/emitter';
+import { AsyncCallbackQueue } from '@/lib/timing';
 import { isShiftKeyPressed } from '@/lib/keyboard';
 
 const DRAG_TYPE_ALL = 0;
@@ -50,7 +51,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     private transformIsDragging: boolean = false;
     private transformIsRotating: boolean = false;
     private isPointerDragging: boolean = false;
-    private pointerProcessStep: PointerProcessStep = null; 
+    private actionQueue: AsyncCallbackQueue = new AsyncCallbackQueue();
 
     private setBoundsDebounceHandle: number | undefined;
     private selectedLayers: WorkingFileLayer<ColorModel>[] = [];
@@ -75,8 +76,6 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             this.selectedLayers = selectedLayers;
             this.setBoundsFromSelectedLayers();
         }, { immediate: true });
-
-        this.pointerProcessStep = null;
 
         this.onCancelCurrentAction = this.onCancelCurrentAction.bind(this);
         this.onHistoryStep = this.onHistoryStep.bind(this);
@@ -122,7 +121,6 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
     onPointerMove(e: PointerEvent) {
         super.onPointerMove(e);
-        if (this.pointerProcessStep !== 'move') return;
         const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
         if (e.isPrimary && this.transformTranslateStart) {
             const { viewTransformPoint } = this.getTransformedCursorInfo();
@@ -257,124 +255,84 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     async onPointerUp(e: PointerEvent): Promise<void> {
         super.onPointerUp(e);
         if (e.isPrimary) {
-            const previousPointerProcessStep = this.pointerProcessStep;
-            this.pointerProcessStep = 'end';
-            if (previousPointerProcessStep === 'move') {
-                this.onTransformEnd();    
-            }
+            this.onTransformEnd();    
         }
     }
 
-    async onTransformStart(isRecursed: boolean = false) {
-        if (this.pointerProcessStep != null && !isRecursed) return;
-        this.pointerProcessStep = 'start' as PointerProcessStep; // Typescript static analysis doesn't account for awaits, huge glaring bug.
-
-        this.isPointerDragging = false;
-        const { transformBoundsPoint, viewTransformPoint, viewDecomposedTransform } = this.getTransformedCursorInfo();
-
-        if ((activeSelectionMask.value || appliedSelectionMask.value)) {
-            if (this.selectedLayers.length > 0) {
-                layerPickMode.value === 'current';
-                await historyStore.dispatch('runAction', {
-                    action: new CreateNewLayersFromSelectionAction({ clearSelection: true, selectNewLayers: 'replace' })
-                });
-            } else {
-                await historyStore.dispatch('runAction', {
-                    action: new ClearSelectionAction()
-                });
-            }
-        }
-
-        this.storeTransformStart(viewTransformPoint);
-
-        this.transformIsRotating = false;
-        this.transformIsDragging = false;
-
-        // Determine which dimensions to drag on
-        if (this.isPointOnRotateHandle(transformBoundsPoint, viewDecomposedTransform)) {
-            this.transformIsRotating = true;
-            rotateHandleHighlight.value = true;
-            this.transformStartDimensions.handleToRotationOrigin = Math.atan2(
-                viewTransformPoint.y - (top.value + (height.value * transformOriginY.value)),
-                viewTransformPoint.x - (left.value + (width.value * transformOriginX.value))
-            );
-            this.transformDragType = DRAG_TYPE_ALL;
-            dragHandleHighlight.value = null;
-        } else {
-            rotateHandleHighlight.value = false;
-            let transformDragType = this.getTransformDragType(transformBoundsPoint, viewDecomposedTransform);
-            if (transformDragType != null) {
-                this.transformDragType = transformDragType;
-            } else {
-                if (layerPickMode.value === 'current') {
-                    this.transformDragType = DRAG_TYPE_ALL;
+    async onTransformStart() {
+        this.actionQueue.push(async () => {
+            this.isPointerDragging = false;
+            let { transformBoundsPoint, viewTransformPoint, viewDecomposedTransform } = this.getTransformedCursorInfo();
+    
+            if ((activeSelectionMask.value || appliedSelectionMask.value)) {
+                if (this.selectedLayers.length > 0) {
+                    layerPickMode.value === 'current';
+                    await historyStore.dispatch('runAction', {
+                        action: new CreateNewLayersFromSelectionAction({ clearSelection: true, selectNewLayers: 'replace' })
+                    });
                 } else {
-                    this.transformTranslateStart = null;
+                    await historyStore.dispatch('runAction', {
+                        action: new ClearSelectionAction()
+                    });
                 }
             }
-            if (!transformDragType != null) {
-                this.transformIsDragging = true;
-            }
-            dragHandleHighlight.value = transformDragType;
-        }
 
-        // Auto select layer outside drag handles
-        if (layerPickMode.value === 'auto') {
-            this.transformStartPickLayer = this.pickLayer(viewTransformPoint);
-        }
-        if (!this.transformTranslateStart && layerPickMode.value === 'auto') {
-            const layerId = this.transformStartPickLayer;
-            this.transformStartPickLayer = null;
-            if (layerId != null && layerId != workingFileStore.get('selectedLayerIds')[0]) {
-                await historyStore.dispatch('runAction', {
-                    action: new SelectLayersAction([layerId])
-                });
-                await nextTick();
-                this.setBoundsFromSelectedLayersImmediate();
-                await this.onTransformStart(true);
+            // Figure out which resize/rotate handles were clicked on, or if clicked in empty space just to drag
+            this.determineDragRotateType(transformBoundsPoint, viewTransformPoint, viewDecomposedTransform);
+    
+            // Auto select layer outside drag handles
+            if (layerPickMode.value === 'auto') {
+                this.transformStartPickLayer = this.pickLayer(viewTransformPoint);
             }
-        }
-
-        if (this.transformTranslateStart) {
-            preferencesStore.set('useCanvasViewport', true);
-            canvasStore.set('useCssViewport', false);
-            canvasStore.set('viewDirty', true);
-        }
-
-        if (!isRecursed) {
-            if (this.pointerProcessStep === 'end') {
-                this.onTransformEnd();
-            } else {
-                this.pointerProcessStep = 'move';
+            if (!this.transformTranslateStart && layerPickMode.value === 'auto') {
+                const layerId = this.transformStartPickLayer;
+                this.transformStartPickLayer = null;
+                if (layerId != null && layerId != workingFileStore.get('selectedLayerIds')[0]) {
+                    await historyStore.dispatch('runAction', {
+                        action: new SelectLayersAction([layerId])
+                    });
+                    await nextTick();
+                    this.setBoundsFromSelectedLayersImmediate();
+                    let { transformBoundsPoint, viewTransformPoint, viewDecomposedTransform } = this.getTransformedCursorInfo();
+                    this.determineDragRotateType(transformBoundsPoint, viewTransformPoint, viewDecomposedTransform);
+                }
             }
-        }
+    
+            // If we're about to do some rotate/resize/drag, switch the viewport for better performance with large images.
+            if (this.transformTranslateStart) {
+                preferencesStore.set('useCanvasViewport', true);
+                canvasStore.set('useCssViewport', false);
+                canvasStore.set('viewDirty', true);
+            }
+        });
     }
 
     async onTransformEnd() {
-        if (this.transformTranslateStart) {
-            try {
-                await this.commitTransforms();
-            } catch (error) { /* Ignore */ }
-            if (!preferencesStore.get('preferCanvasViewport')) {
-                preferencesStore.set('useCanvasViewport', false);
-                canvasStore.set('useCssViewport', true);
-            }
-            try {
-                if (this.transformStartPickLayer != null && !this.isPointerDragging) {
-                    const layerId = this.transformStartPickLayer;
-                    if (layerId != workingFileStore.get('selectedLayerIds')[0]) {
-                        await historyStore.dispatch('runAction', {
-                            action: new SelectLayersAction([layerId])
-                        });
-                        await nextTick();
-                        this.setBoundsFromSelectedLayers();
-                    }
+        this.actionQueue.push(async () => {
+            if (this.transformTranslateStart) {
+                try {
+                    await this.commitTransforms();
+                } catch (error) { /* Ignore */ }
+                if (!preferencesStore.get('preferCanvasViewport')) {
+                    preferencesStore.set('useCanvasViewport', false);
+                    canvasStore.set('useCssViewport', true);
                 }
-            } catch (error) { /* Ignore */ }
-            this.transformStartPickLayer = null;
-        }
-        dragHandleHighlight.value = null;
-        this.pointerProcessStep = null;
+                try {
+                    if (this.transformStartPickLayer != null && !this.isPointerDragging) {
+                        const layerId = this.transformStartPickLayer;
+                        if (layerId != workingFileStore.get('selectedLayerIds')[0]) {
+                            await historyStore.dispatch('runAction', {
+                                action: new SelectLayersAction([layerId])
+                            });
+                            await nextTick();
+                            this.setBoundsFromSelectedLayers();
+                        }
+                    }
+                } catch (error) { /* Ignore */ }
+                this.transformStartPickLayer = null;
+            }
+            dragHandleHighlight.value = null;
+        });
     }
 
     private onCancelCurrentAction() {
@@ -437,6 +395,39 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             this.transformStartLayerData.push({
                 transform: layer.transform
             });
+        }
+    }
+
+    private determineDragRotateType(viewTransformPoint: DOMPoint, transformBoundsPoint: DOMPoint, viewDecomposedTransform: DecomposedMatrix) {
+        this.storeTransformStart(viewTransformPoint);
+        this.transformIsRotating = false;
+        this.transformIsDragging = false;
+        // Determine which dimensions to drag on
+        if (this.isPointOnRotateHandle(transformBoundsPoint, viewDecomposedTransform)) {
+            this.transformIsRotating = true;
+            rotateHandleHighlight.value = true;
+            this.transformStartDimensions.handleToRotationOrigin = Math.atan2(
+                viewTransformPoint.y - (top.value + (height.value * transformOriginY.value)),
+                viewTransformPoint.x - (left.value + (width.value * transformOriginX.value))
+            );
+            this.transformDragType = DRAG_TYPE_ALL;
+            dragHandleHighlight.value = null;
+        } else {
+            rotateHandleHighlight.value = false;
+            let transformDragType = this.getTransformDragType(transformBoundsPoint, viewDecomposedTransform);
+            if (transformDragType != null) {
+                this.transformDragType = transformDragType;
+            } else {
+                if (layerPickMode.value === 'current') {
+                    this.transformDragType = DRAG_TYPE_ALL;
+                } else {
+                    this.transformTranslateStart = null;
+                }
+            }
+            if (!transformDragType != null) {
+                this.transformIsDragging = true;
+            }
+            dragHandleHighlight.value = transformDragType;
         }
     }
 

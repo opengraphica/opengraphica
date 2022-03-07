@@ -47,3 +47,28 @@ export function throttle(func: any, wait: number, options?: ThrottleOptions) {
         return result;
     };
 };
+
+
+export class AsyncCallbackQueue {
+    private queue: Array<() => Promise<void>> = [];
+
+    public push(callback: () => Promise<void>) {
+        this.queue.push(callback);
+        if (this.queue.length === 1) {
+            this.runCallbacks();
+        }
+    }
+
+    private async runCallbacks() {
+        while (this.queue.length > 0) {
+            const callback = this.queue.shift();
+            if (callback) {
+                try {
+                    await callback();
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+        }
+    }
+}
