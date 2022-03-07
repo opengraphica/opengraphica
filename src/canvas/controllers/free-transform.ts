@@ -261,7 +261,6 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
     async onTransformStart() {
         this.actionQueue.push(async () => {
-            console.log('start');
             this.isPointerDragging = false;
             let { transformBoundsPoint, viewTransformPoint, viewDecomposedTransform } = this.getTransformedCursorInfo();
     
@@ -279,7 +278,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             }
 
             // Figure out which resize/rotate handles were clicked on, or if clicked in empty space just to drag
-            this.determineDragRotateType(transformBoundsPoint, viewTransformPoint, viewDecomposedTransform);
+            this.determineDragRotateType(viewTransformPoint, transformBoundsPoint, viewDecomposedTransform);
     
             // Auto select layer outside drag handles
             if (layerPickMode.value === 'auto') {
@@ -294,7 +293,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                     });
                     await nextTick();
                     this.setBoundsFromSelectedLayersImmediate();
-                    this.determineDragRotateType(transformBoundsPoint, viewTransformPoint, viewDecomposedTransform);
+                    this.determineDragRotateType(viewTransformPoint, transformBoundsPoint, viewDecomposedTransform);
                 }
             }
     
@@ -309,7 +308,6 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
     async onTransformEnd() {
         this.actionQueue.push(async () => {
-            console.log('end');
             if (this.transformTranslateStart) {
                 try {
                     await this.commitTransforms();
