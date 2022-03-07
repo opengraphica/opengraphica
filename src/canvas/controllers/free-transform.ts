@@ -48,6 +48,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     private transformIsDragging: boolean = false;
     private transformIsRotating: boolean = false;
     private isPointerDragging: boolean = false;
+    private isTransformCommitting: boolean = false;
     private isIgnoreHistoryStep: boolean = false;
 
     private setBoundsDebounceHandle: number | undefined;
@@ -117,6 +118,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     }
 
     async onTransformDown() {
+        if (this.isTransformCommitting) return;
         this.isPointerDragging = false;
         const { transformBoundsPoint, viewTransformPoint, viewDecomposedTransform } = this.getTransformedCursorInfo();
 
@@ -327,6 +329,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         super.onPointerUp(e);
         if (e.isPrimary) {
             if (this.transformTranslateStart) {
+                this.isTransformCommitting = true;
                 try {
                     await this.commitTransforms();
                 } catch (error) { /* Ignore */ }
@@ -334,17 +337,20 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                     preferencesStore.set('useCanvasViewport', false);
                     canvasStore.set('useCssViewport', true);
                 }
-                if (this.transformStartPickLayer != null && !this.isPointerDragging) {
-                    const layerId = this.transformStartPickLayer;
-                    if (layerId != workingFileStore.get('selectedLayerIds')[0]) {
-                        await historyStore.dispatch('runAction', {
-                            action: new SelectLayersAction([layerId])
-                        });
-                        await nextTick();
-                        this.setBoundsFromSelectedLayers();
+                try {
+                    if (this.transformStartPickLayer != null && !this.isPointerDragging) {
+                        const layerId = this.transformStartPickLayer;
+                        if (layerId != workingFileStore.get('selectedLayerIds')[0]) {
+                            await historyStore.dispatch('runAction', {
+                                action: new SelectLayersAction([layerId])
+                            });
+                            await nextTick();
+                            this.setBoundsFromSelectedLayers();
+                        }
                     }
-                }
+                } catch (error) { /* Ignore */ }
                 this.transformStartPickLayer = null;
+                this.isTransformCommitting = false;
             }
             dragHandleHighlight.value = null;
         }
