@@ -122,7 +122,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     onPointerMove(e: PointerEvent) {
         super.onPointerMove(e);
         const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
-        if (e.isPrimary && this.transformTranslateStart) {
+        if (pointer && e.isPrimary && this.transformTranslateStart) {
             const { viewTransformPoint } = this.getTransformedCursorInfo();
             const { shouldMaintainAspectRatio, shouldScaleDuringResize, shouldSnapRotationDegrees } = this.getTransformOptions();
 
@@ -261,6 +261,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
     async onTransformStart() {
         this.actionQueue.push(async () => {
+            console.log('start');
             this.isPointerDragging = false;
             let { transformBoundsPoint, viewTransformPoint, viewDecomposedTransform } = this.getTransformedCursorInfo();
     
@@ -293,7 +294,6 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                     });
                     await nextTick();
                     this.setBoundsFromSelectedLayersImmediate();
-                    let { transformBoundsPoint, viewTransformPoint, viewDecomposedTransform } = this.getTransformedCursorInfo();
                     this.determineDragRotateType(transformBoundsPoint, viewTransformPoint, viewDecomposedTransform);
                 }
             }
@@ -309,6 +309,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
     async onTransformEnd() {
         this.actionQueue.push(async () => {
+            console.log('end');
             if (this.transformTranslateStart) {
                 try {
                     await this.commitTransforms();

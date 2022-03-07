@@ -51,15 +51,17 @@ export function throttle(func: any, wait: number, options?: ThrottleOptions) {
 
 export class AsyncCallbackQueue {
     private queue: Array<() => Promise<void>> = [];
+    private isCallbacksRunning: boolean = false;
 
     public push(callback: () => Promise<void>) {
         this.queue.push(callback);
-        if (this.queue.length === 1) {
+        if (!this.isCallbacksRunning) {
             this.runCallbacks();
         }
     }
 
     private async runCallbacks() {
+        this.isCallbacksRunning = true;
         while (this.queue.length > 0) {
             const callback = this.queue.shift();
             if (callback) {
@@ -70,5 +72,6 @@ export class AsyncCallbackQueue {
                 }
             }
         }
+        this.isCallbacksRunning = false;
     }
 }
