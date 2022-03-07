@@ -200,6 +200,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
     onPointerMove(e: PointerEvent) {
         super.onPointerMove(e);
+        if (this.transformDownCompletePromise || this.isTransformCommitting) return;
         const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
         if (e.isPrimary && this.transformTranslateStart) {
             const { viewTransformPoint } = this.getTransformedCursorInfo();
