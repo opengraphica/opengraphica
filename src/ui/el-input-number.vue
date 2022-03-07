@@ -1,4 +1,4 @@
-<template>
+ <template>
     <el-input
         v-model="displayValue"
         ref="input"
@@ -53,6 +53,7 @@
 </template>
 
 <script lang="ts">
+// @ts-nocheck
 import { defineComponent, ref, watch, PropType, onMounted, nextTick } from 'vue';
 import ElInput from 'element-plus/lib/components/input/index';
 import { Parser as MathExpressionParser } from 'expr-eval';
