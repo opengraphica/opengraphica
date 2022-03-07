@@ -337,6 +337,9 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             preferencesStore.set('useCanvasViewport', true);
             canvasStore.set('useCssViewport', false);
             canvasStore.set('viewDirty', true);
+        }
+
+        if (!isRecursed) {
             if (this.pointerProcessStep === 'end') {
                 this.onTransformEnd();
             } else {
