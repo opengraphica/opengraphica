@@ -327,8 +327,9 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         super.onPointerUp(e);
         if (e.isPrimary) {
             if (this.transformTranslateStart) {
-                const transformTranslateStart = this.transformTranslateStart;
-                await this.commitTransforms();
+                try {
+                    await this.commitTransforms();
+                } catch (error) { /* Ignore */ }
                 if (!preferencesStore.get('preferCanvasViewport')) {
                     preferencesStore.set('useCanvasViewport', false);
                     canvasStore.set('useCssViewport', true);
@@ -553,12 +554,18 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     }
 
     private pickLayer(viewTransformPoint: DOMPoint): number | null {
+        const workingCanvas = document.createElement('canvas');
+        workingCanvas.width = 1;
+        workingCanvas.height = 1;
+        const ctx = workingCanvas.getContext('2d');
+        if (!ctx) return null;
+        const initialTransform = new DOMMatrix().translateSelf(-viewTransformPoint.x, -viewTransformPoint.y);
         const selectionTest: DrawWorkingFileOptions['selectionTest'] = {
-            point: viewTransformPoint,
+            point: new DOMPoint(),
             resultId: undefined,
             resultPixelTest: undefined
         };
-        drawWorkingFileToCanvas(canvasStore.get('viewCanvas'), canvasStore.get('viewCtx'), { selectionTest });
+        drawWorkingFileToCanvas(workingCanvas, ctx, { initialTransform, selectionTest });
         return selectionTest.resultId != null ? selectionTest.resultId : null;
     }
 

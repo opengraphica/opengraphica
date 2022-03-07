@@ -13,6 +13,7 @@ export interface DrawWorkingFileLayerOptions {
 
 export interface DrawWorkingFileOptions {
     selectedLayersOnly?: boolean;
+    initialTransform?: DOMMatrix;
     selectionTest?: {
         point: DOMPoint;
         resultId?: number;

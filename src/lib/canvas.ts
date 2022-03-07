@@ -91,14 +91,18 @@ export function drawWorkingFileToCanvas(canvas: HTMLCanvasElement, ctx: CanvasRe
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    if (options.initialTransform) {
+        ctx.transform(options.initialTransform.a, options.initialTransform.b, options.initialTransform.c, options.initialTransform.d, options.initialTransform.e, options.initialTransform.f);
+    }
+
     // Set canvas transform based on the current pan/zoom/rotation of the view
     const transform = canvasStore.get('transform');
     const decomposedTransform = canvasStore.get('decomposedTransform');
     const useCssViewport: boolean = canvasStore.get('useCssViewport');
     // canvasStore.set('isDisplayingNonRasterLayer', false);
 
-    if (!useCssViewport) {
-        ctx.setTransform(transform.a, transform.b, transform.c, transform.d, transform.e, transform.f);
+    if (!useCssViewport && !options.selectionTest) {
+        ctx.transform(transform.a, transform.b, transform.c, transform.d, transform.e, transform.f);
     }
     
     ctx.imageSmoothingEnabled = decomposedTransform.scaleX / window.devicePixelRatio < 1.25;
@@ -172,20 +176,7 @@ export function drawWorkingFileToCanvas(canvas: HTMLCanvasElement, ctx: CanvasRe
     (window as any).averageTimeRestore = ((performance.now() - now) * 0.1) + (((window as any).averageTimeRestore || 0) * 0.9);
     now = performance.now();
 
-    /* MOVE TO CSS
-    // Draw cursor
-    const cursorName = canvasStore.get('cursor');
-    if (cursorName) {
-        const cursorInfo = cursorImages[cursorName];
-        ctx.save();
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.drawImage(cursorInfo.image as HTMLImageElement, canvasStore.get('cursorX') + cursorInfo.offsetX, canvasStore.get('cursorY') + cursorInfo.offsetY);
-        ctx.restore();
-    }
-    */
-
     (window as any).averageTime = ((performance.now() - now) * 0.1) + (((window as any).averageTime || 0) * 0.9)
-
 }
 
 /**
