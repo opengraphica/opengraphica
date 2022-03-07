@@ -106,7 +106,9 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     onMultiTouchDown() {
         super.onMultiTouchDown();
         if (this.touches.length === 1) {
-            this.transformDownCompletePromise = this.onTransformDown();
+            this.transformDownCompletePromise = this.onTransformDown().then(() => {
+                this.transformDownCompletePromise = null;
+            });
         }
     }
 
@@ -114,7 +116,9 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         super.onPointerDown(e);
         if (isInput(e.target)) return;
         if (e.isPrimary && ['mouse', 'pen'].includes(e.pointerType) && e.button === 0) {
-            this.transformDownCompletePromise = this.onTransformDown();
+            this.transformDownCompletePromise = this.onTransformDown().then(() => {
+                this.transformDownCompletePromise = null;
+            });
         }
     }
 

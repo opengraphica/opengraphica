@@ -6,8 +6,8 @@
         "dev": "webpack serve --config ./webpack.config.dev.js",
         "build": "npm run build:website",
         "build:css": "node ./src/css/build.js",
-        "build:library": "webpack --mode=production --config ./webpack.config.library.js --stats verbose",
-        "build:website": "webpack --mode=production --config ./webpack.config.website.js --stats verbose",
+        "build:library": "webpack --mode=production --config ./webpack.config.library.js",
+        "build:website": "webpack --mode=production --config ./webpack.config.website.js",
         "build:website:inspect": "node --inspect webpack --config ./webpack.config.website.js --stats verbose",
         "serve": "npm run dev"
     },
