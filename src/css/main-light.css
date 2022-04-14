@@ -6829,8 +6829,17 @@ body.ogr-full-page .opengraphica {
   max-width: 90%;
 }
 @media screen and (max-width: 600px) {
-  .opengraphica .ogr-dialogs .el-dialog {
-    --el-dialog-margin-top: 5% !important;
+  .opengraphica .ogr-dialogs .el-dialog, .opengraphica .ogr-dialogs .el-dialog.el-dialog--medium {
+    margin: 0 !important;
+    height: 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .opengraphica .ogr-dialogs .el-dialog__body {
+    overflow: auto !important;
   }
 }
 .opengraphica .ogr-layer-list {
