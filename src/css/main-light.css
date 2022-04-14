@@ -7721,6 +7721,7 @@ body.ogr-full-page .opengraphica {
   transform-origin: top left;
 }
 .opengraphica .ogr-crop .ogr-crop-handle-top-left svg {
+  transform: translate(-25%, -25%);
   transform-origin: top left;
 }
 .opengraphica .ogr-crop .ogr-crop-handle-top-right {
@@ -7729,7 +7730,7 @@ body.ogr-full-page .opengraphica {
   transform-origin: top right;
 }
 .opengraphica .ogr-crop .ogr-crop-handle-top-right svg {
-  transform: rotate(90deg);
+  transform: rotate(90deg) translate(-25%, -25%);
   transform-origin: top left;
 }
 .opengraphica .ogr-crop .ogr-crop-handle-bottom-right {
@@ -7738,7 +7739,7 @@ body.ogr-full-page .opengraphica {
   transform-origin: bottom right;
 }
 .opengraphica .ogr-crop .ogr-crop-handle-bottom-right svg {
-  transform: rotate(180deg);
+  transform: rotate(180deg) translate(-25%, -25%);
   transform-origin: top left;
 }
 .opengraphica .ogr-crop .ogr-crop-handle-bottom-left {
@@ -7747,7 +7748,7 @@ body.ogr-full-page .opengraphica {
   transform-origin: bottom left;
 }
 .opengraphica .ogr-crop .ogr-crop-handle-bottom-left svg {
-  transform: rotate(270deg);
+  transform: rotate(270deg) translate(-25%, -25%);
   transform-origin: top left;
 }
 .opengraphica .ogr-crop .ogr-crop-handle-top {
@@ -7756,7 +7757,7 @@ body.ogr-full-page .opengraphica {
   transform-origin: top center;
 }
 .opengraphica .ogr-crop .ogr-crop-handle-top svg {
-  transform: translateX(-50%);
+  transform: translate(-50%, -100%);
 }
 .opengraphica .ogr-crop .ogr-crop-handle-right {
   top: 50%;
@@ -7764,7 +7765,7 @@ body.ogr-full-page .opengraphica {
   transform-origin: right center;
 }
 .opengraphica .ogr-crop .ogr-crop-handle-right svg {
-  transform: rotate(90deg) translate(-50%, 100%);
+  transform: rotate(90deg) translate(-50%, 0);
   transform-origin: center;
 }
 .opengraphica .ogr-crop .ogr-crop-handle-bottom {
@@ -7773,7 +7774,7 @@ body.ogr-full-page .opengraphica {
   transform-origin: bottom center;
 }
 .opengraphica .ogr-crop .ogr-crop-handle-bottom svg {
-  transform: rotate(180deg) translate(50%, 100%);
+  transform: rotate(180deg) translate(50%, 0);
   transform-origin: center;
 }
 .opengraphica .ogr-crop .ogr-crop-handle-left {
@@ -7782,7 +7783,7 @@ body.ogr-full-page .opengraphica {
   transform-origin: left center;
 }
 .opengraphica .ogr-crop .ogr-crop-handle-left svg {
-  transform: rotate(270deg) translateY(-50%);
+  transform: rotate(270deg) translate(-50%, -150%);
   transform-origin: top center;
 }
 @keyframes ogr-free-transform-bounds {

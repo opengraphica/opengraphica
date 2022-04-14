@@ -1122,6 +1122,7 @@ body.ogr-full-page {
             left: 0;
             transform-origin: top left;
             svg {
+                transform: translate(-25%, -25%);
                 transform-origin: top left;
             }
         }
@@ -1130,7 +1131,7 @@ body.ogr-full-page {
             right: 0;
             transform-origin: top right;
             svg {
-                transform: rotate(90deg);
+                transform: rotate(90deg) translate(-25%, -25%);
                 transform-origin: top left;
             }
         }
@@ -1139,7 +1140,7 @@ body.ogr-full-page {
             right: 0;
             transform-origin: bottom right;
             svg {
-                transform: rotate(180deg);
+                transform: rotate(180deg) translate(-25%, -25%);
                 transform-origin: top left;
             }
         }
@@ -1148,7 +1149,7 @@ body.ogr-full-page {
             left: 0;
             transform-origin: bottom left;
             svg {
-                transform: rotate(270deg);
+                transform: rotate(270deg) translate(-25%, -25%);
                 transform-origin: top left;
             }
         }
@@ -1157,7 +1158,7 @@ body.ogr-full-page {
             left: 50%;
             transform-origin: top center;
             svg {
-                transform: translateX(-50%);
+                transform: translate(-50%, -100%);
             }
         }
         .ogr-crop-handle-right {
@@ -1165,7 +1166,7 @@ body.ogr-full-page {
             right: 0;
             transform-origin: right center;
             svg {
-                transform: rotate(90deg) translate(-50%, 100%);
+                transform: rotate(90deg) translate(-50%, 0);
                 transform-origin: center;
             }
         }
@@ -1174,7 +1175,7 @@ body.ogr-full-page {
             right: 50%;
             transform-origin: bottom center;
             svg {
-                transform: rotate(180deg) translate(50%, 100%);
+                transform: rotate(180deg) translate(50%, 0);
                 transform-origin: center;
             }
         }
@@ -1183,7 +1184,7 @@ body.ogr-full-page {
             left: 0;
             transform-origin: left center;
             svg {
-                transform: rotate(270deg) translateY(-50%);
+                transform: rotate(270deg) translate(-50%, -150%);
                 transform-origin: top center;
             }
         }

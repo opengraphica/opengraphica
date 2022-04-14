@@ -4,28 +4,28 @@
             <div class="ogr-crop-bounds" :style="{ outlineWidth: (0.35/zoom) + 'rem' }"></div>
             <div class="ogr-crop-handle-top" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
-                    <path v-if="showHorizontalHandles" d="M1.5 1.5 L98.5 1.5 L98.5 25 L1.5 25 Z"
+                    <path v-if="showHorizontalHandles" d="M1.5 98.5 L98.5 98.5 L98.5 75 L1.5 75 Z"
                         :fill="dragHandleHighlight === DRAG_TYPE_TOP ? dragHandleHighlightColor : 'white'"
                         :stroke="dragHandleHighlight === DRAG_TYPE_TOP ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
                 </svg>
             </div>
             <div class="ogr-crop-handle-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
-                    <path v-if="showVerticalHandles" d="M1.5 1.5 L98.5 1.5 L98.5 25 L1.5 25 Z"
+                    <path v-if="showVerticalHandles" d="M1.5 98.5 L98.5 98.5 L98.5 75 L1.5 75 Z"
                         :fill="dragHandleHighlight === DRAG_TYPE_LEFT ? dragHandleHighlightColor : 'white'"
                         :stroke="dragHandleHighlight === DRAG_TYPE_LEFT ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
                 </svg>
             </div>
             <div class="ogr-crop-handle-bottom" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
-                    <path v-if="showHorizontalHandles" d="M1.5 1.5 L98.5 1.5 L98.5 25 L1.5 25 Z"
+                    <path v-if="showHorizontalHandles" d="M1.5 98.5 L98.5 98.5 L98.5 75 L1.5 75 Z"
                         :fill="dragHandleHighlight === DRAG_TYPE_BOTTOM ? dragHandleHighlightColor : 'white'" 
                         :stroke="dragHandleHighlight === DRAG_TYPE_BOTTOM ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
                 </svg>
             </div>
             <div class="ogr-crop-handle-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
-                    <path v-if="showVerticalHandles" d="M1.5 1.5 L98.5 1.5 L98.5 25 L1.5 25 Z"
+                    <path v-if="showVerticalHandles" d="M1.5 98.5 L98.5 98.5 L98.5 75 L1.5 75 Z"
                         :fill="dragHandleHighlight === DRAG_TYPE_RIGHT ? dragHandleHighlightColor : 'white'"
                         :stroke="dragHandleHighlight === DRAG_TYPE_RIGHT ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
                 </svg>
