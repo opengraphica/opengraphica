@@ -92,6 +92,12 @@ body.ogr-full-page {
             width: 25rem !important;
             max-width: 90%;
         }
+
+        @media screen and (max-width: 600px) {
+            .el-dialog {
+                --el-dialog-margin-top: 5% !important;
+            }
+        }
     }
 
     .ogr-layer-list {
