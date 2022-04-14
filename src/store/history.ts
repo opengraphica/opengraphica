@@ -163,7 +163,12 @@ async function dispatchRunAction({ action, mergeWithHistory }: HistoryDispatch['
     set('canUndo', actionStackIndex > 0);
     set('canRedo', actionStackIndex < actionStack.length);
 
-    appEmitter.emit('editor.history.step');
+    appEmitter.emit('editor.history.step', {
+        trigger: 'do',
+        action: {
+            id: action.id
+        }
+    });
 
     // Chrome arbitrary method to determine memory usage, but most people use Chrome so...
     const performance = window.performance as any;
@@ -186,7 +191,12 @@ async function dispatchUndo(set: PerformantStore<HistoryStore>['directSet']) {
         set('actionStackUpdateToggle', !store.state.actionStackUpdateToggle);
         set('canUndo', actionStackIndex > 0);
         set('canRedo', actionStackIndex < actionStack.length);
-        appEmitter.emit('editor.history.step');
+        appEmitter.emit('editor.history.step', {
+            trigger: 'undo',
+            action: {
+                id: actionStack[actionStackIndex].id
+            }
+        });
     } else {
         throw new Error('There\'s nothing to undo.');
     }
@@ -203,7 +213,12 @@ async function dispatchRedo(set: PerformantStore<HistoryStore>['directSet']) {
         set('actionStackUpdateToggle', !store.state.actionStackUpdateToggle);
         set('canUndo', actionStackIndex > 0);
         set('canRedo', actionStackIndex < actionStack.length);
-        appEmitter.emit('editor.history.step');
+        appEmitter.emit('editor.history.step', {
+            trigger: 'redo',
+            action: {
+                id: action.id
+            }
+        });
     } else {
         throw new Error('There\'s nothing to redo.');
     }

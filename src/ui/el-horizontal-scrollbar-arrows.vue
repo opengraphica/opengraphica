@@ -82,11 +82,11 @@ export default defineComponent({
         }
 
         function onClickScrollLeft() {
-            scrollbar.value!.setScrollLeft(scrollLeft.value - (scrollContentEl.value!.clientWidth * .6));
+            scrollbar.value!.setScrollLeft(scrollLeft.value - (scrollbar.value!.$el.clientWidth * .6));
         }
 
         function onClickScrollRight() {
-            scrollbar.value!.setScrollLeft(scrollLeft.value + (scrollContentEl.value!.clientWidth * .6));
+            scrollbar.value!.setScrollLeft(scrollLeft.value + (scrollbar.value!.$el.clientWidth * .6));
         }
 
         return {

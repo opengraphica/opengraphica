@@ -1,7 +1,7 @@
 <template>
     <div ref="overlay" class="ogr-canvas-overlay">
         <div ref="freeTransform"
-            v-show="selectedLayerIds.length > 0"
+            v-show="selectedLayerIds.length > 0 && !isBoundsIndeterminate"
             class="ogr-free-transform"
             :style="{
                 width: width + 'px',
@@ -82,7 +82,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, watch, onMounted, onUnmounted, toRefs } from 'vue';
-import { freeTransformEmitter, left, top, width, height, rotation, transformOriginX, transformOriginY, dragHandleHighlight, rotateHandleHighlight } from '../store/free-transform-state';
+import { isBoundsIndeterminate, freeTransformEmitter, left, top, width, height, rotation, transformOriginX, transformOriginY, dragHandleHighlight, rotateHandleHighlight } from '../store/free-transform-state';
 import canvasStore from '@/store/canvas';
 import workingFileStore from '@/store/working-file';
 import { decomposeMatrix } from '@/lib/dom-matrix';
@@ -161,6 +161,7 @@ export default defineComponent({
             DRAG_TYPE_BOTTOM: 2,
             DRAG_TYPE_LEFT: 4,
             DRAG_TYPE_RIGHT: 8,
+            isBoundsIndeterminate,
             selectedLayerIds,
             hideVerticalSideHandles,
             hideHorizontalSideHandles,

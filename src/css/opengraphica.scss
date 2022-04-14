@@ -872,7 +872,7 @@ body.ogr-full-page {
 
             .ogr-toolbar-overlay {
                 background: var(--ogr-layout-menu-bar-background-color);
-                box-shadow: 0 0 0 0.063rem var(--ogr-layout-menu-bar-border-color);
+                box-shadow: 0 0 0px 1px var(--ogr-layout-menu-bar-border-color), 0 .3rem 3rem var(--ogr-layout-menu-bar-border-color);
                 padding: 0;
                 overflow: hidden;
                 padding: 0;
@@ -906,15 +906,15 @@ body.ogr-full-page {
             }
 
             &.is-bottom {
-                bottom: 0;
+                bottom: .5rem;
                 .ogr-toolbar-overlay {
-                    border-radius: 1rem 1rem 0 0;
+                    border-radius: 1rem;
                 }
             }
             &.is-top {
-                top: 0;
+                top: .5rem;
                 .ogr-toolbar-overlay {
-                    border-radius: 0 0 1rem 1rem;
+                    border-radius: 1rem;
 
                     > .el-scrollbar {
                         > * > .el-scrollbar__view {
@@ -933,6 +933,7 @@ body.ogr-full-page {
             &.is-menu-bar-bottom {
                 bottom: 3rem;
                 .ogr-toolbar-overlay {
+                    border-radius: 1rem 1rem 0 0;
                     padding-bottom: 1.25rem;
                 }
                 .ogr-toolbar-tool-selector {
@@ -940,7 +941,7 @@ body.ogr-full-page {
                 }
             }
             &.is-menu-bar-top {
-                bottom: 0;
+                bottom: .5rem;
             }
         }
     }

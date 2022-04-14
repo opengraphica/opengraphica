@@ -1,6 +1,7 @@
 import mitt from 'mitt';
 import { ref } from 'vue';
 
+export const isBoundsIndeterminate = ref<boolean>(false);
 export const layerPickMode = ref<'current' | 'auto'>('auto');
 export const useRotationSnapping = ref<boolean>(false);
 export const top = ref<number>(0);

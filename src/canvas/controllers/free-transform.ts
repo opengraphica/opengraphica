@@ -1,6 +1,6 @@
 import { nextTick, watch, WatchStopHandle } from 'vue';
 import BaseCanvasMovementController from './base-movement';
-import { layerPickMode, useRotationSnapping, freeTransformEmitter, top, left, width, height, rotation, transformOriginX, transformOriginY, dimensionLockRatio, previewXSnap, previewYSnap, dragHandleHighlight, rotateHandleHighlight } from '../store/free-transform-state';
+import { isBoundsIndeterminate, layerPickMode, useRotationSnapping, freeTransformEmitter, top, left, width, height, rotation, transformOriginX, transformOriginY, dimensionLockRatio, previewXSnap, previewYSnap, dragHandleHighlight, rotateHandleHighlight } from '../store/free-transform-state';
 import { appliedSelectionMask, appliedSelectionMaskCanvasOffset, activeSelectionMask, activeSelectionMaskCanvasOffset } from '../store/selection-state';
 import canvasStore from '@/store/canvas';
 import historyStore from '@/store/history';
@@ -16,7 +16,7 @@ import { BundleAction } from '@/actions/bundle';
 import { drawWorkingFileToCanvas } from '@/lib/canvas';
 import { getImageDataFromImage, getImageDataEmptyBounds } from '@/lib/image';
 import { isInput } from '@/lib/events';
-import appEmitter from '@/lib/emitter';
+import appEmitter, { AppEmitterEvents } from '@/lib/emitter';
 import { AsyncCallbackQueue } from '@/lib/timing';
 import { isShiftKeyPressed } from '@/lib/keyboard';
 
@@ -63,6 +63,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         dimensionLockRatio.value = null;
 
         // Set transform bounds based on selected layer list.
+        isBoundsIndeterminate.value = true;
         this.selectedLayerIdsWatchStop = watch(() => workingFileStore.state.selectedLayerIds, (selectedLayerIds) => {
             const selectedLayers: WorkingFileLayer<ColorModel>[] = [];
             if (selectedLayerIds.length > 0) {
@@ -323,8 +324,6 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                             await historyStore.dispatch('runAction', {
                                 action: new SelectLayersAction([layerId])
                             });
-                            await nextTick();
-                            this.setBoundsFromSelectedLayers();
                         }
                     }
                 } catch (error) { /* Ignore */ }
@@ -349,8 +348,11 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         }
     }
 
-    private onHistoryStep() {
-        this.setBoundsFromSelectedLayers();
+    private onHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
+        if (event?.trigger != 'do') {
+            isBoundsIndeterminate.value = true;
+            this.setBoundsFromSelectedLayers();
+        }
     }
 
     private onStoreTransformStart(event?: { viewTransformPoint?: DOMPoint }) {
@@ -646,6 +648,8 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     }
 
     private setBoundsFromSelectedLayersImmediate() {
+        isBoundsIndeterminate.value = false;
+
         // If there's a current selection mask, match the bounds to the selection mask.
         const selectionMask: HTMLImageElement | null = activeSelectionMask.value || appliedSelectionMask.value;
         if (selectionMask) {

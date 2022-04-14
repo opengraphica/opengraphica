@@ -38,7 +38,12 @@ interface AppEmitterEvents {
     };
     'app.workingFile.notifyImageLoadedFromClipboard': undefined;
     'app.workingFile.notifyImageLoadedFromDragAndDrop': undefined;
-    'editor.history.step': undefined;
+    'editor.history.step': {
+        trigger: 'do' | 'undo' | 'redo';
+        action: {
+            id: string;
+        }
+    };
     'editor.tool.cancelCurrentAction': undefined;
     'editor.tool.commitCurrentAction': undefined;
     'editor.tool.selectAll': undefined;
