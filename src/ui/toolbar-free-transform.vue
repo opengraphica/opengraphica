@@ -251,11 +251,15 @@ export default defineComponent({
         }
 
         function onResetRotation() {
-            freeTransformEmitter.emit('storeTransformStart');
-            freeTransformEmitter.emit('previewRotationChange', {
-                rotation: 0
-            });
-            freeTransformEmitter.emit('commitTransforms');
+            try {
+                freeTransformEmitter.emit('storeTransformStart');
+                freeTransformEmitter.emit('previewRotationChange', {
+                    rotation: 0
+                });
+                freeTransformEmitter.emit('commitTransforms');
+            } catch (error) {
+                console.log(error);
+            }
         }
 
         async function onClickClearSelection() {
