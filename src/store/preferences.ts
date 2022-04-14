@@ -6,6 +6,7 @@ interface PreferencesState {
     enableMultiLayerBuffer: boolean;
     historyStatesMax: number;
     keyboardMapConfig: KeyboardMapConfigCategory[];
+    imageSmoothingZoomRatio: number;
     menuBarPosition: 'top' | 'bottom' | 'left' | 'right';
     multiTouchDownTimeout: number;
     multiTouchTapTimeout: number;
@@ -29,6 +30,7 @@ const store = new PerformantStore<PreferencesStore>({
         dragStartRadius: 5,
         enableMultiLayerBuffer: false,
         historyStatesMax: 50,
+        imageSmoothingZoomRatio: 1.25,
         keyboardMapConfig: [],
         menuBarPosition: 'left',
         multiTouchDownTimeout: 75,

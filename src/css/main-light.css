@@ -7062,6 +7062,15 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor {
   cursor: none;
 }
+.opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor.ogr-custom-cursor--grabbing {
+  cursor: grabbing;
+}
+.opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor.ogr-custom-cursor--zoom-in {
+  cursor: zoom-in;
+}
+.opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor.ogr-custom-cursor--zoom-out {
+  cursor: zoom-out;
+}
 .opengraphica .ogr-layout-dnd-container > footer {
   flex-grow: 0;
   touch-action: none;

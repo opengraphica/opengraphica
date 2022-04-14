@@ -1,3 +1,4 @@
+import { watch, WatchStopHandle } from 'vue';
 import { isCtrlOrMetaKeyPressed } from '@/lib/keyboard';
 import { PointerTracker } from './base';
 import BaseCanvasMovementController from './base-movement';
@@ -7,8 +8,22 @@ const devicePixelRatio = window.devicePixelRatio || 1;
 
 export default class CanvasZoomController extends BaseCanvasMovementController {
 
+    private ctrlKeyUnwatch: WatchStopHandle | null = null;
+    private isDragging: boolean = false;
+
     onEnter(): void {
         super.onEnter();
+        this.ctrlKeyUnwatch = watch([isCtrlOrMetaKeyPressed], ([isCtrlOrMetaKeyPressed]) => {
+            this.handleCursorIcon();
+        });
+    }
+
+    onLeave(): void {
+        super.onLeave();
+        if (this.ctrlKeyUnwatch) {
+            this.ctrlKeyUnwatch();
+            this.ctrlKeyUnwatch = null;
+        }
     }
 
     onMultiTouchTap(touches: PointerTracker[]) {
@@ -25,7 +40,8 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
         if (pointer && (pointer.type !== 'touch' || this.multiTouchDownCount === 1)) {
             if (pointer.isDragging && e.isPrimary && pointer.down.button === 0) {
-                canvasStore.set('cursor', 'grabbing');
+                this.isDragging = true;
+                this.handleCursorIcon();
                 const lastCursorX = (pointer.movePrev || pointer.down).pageX;
                 const lastCursorY = (pointer.movePrev || pointer.down).pageY;
                 const cursorX = e.pageX;
@@ -48,7 +64,8 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
         if (pointer && pointer.down.button === 0) {
             if (pointer.isDragging) {
-                canvasStore.set('cursor', null);
+                this.isDragging = false;
+                this.handleCursorIcon();
             } else {
                 if (e.isPrimary && ['mouse', 'pen'].includes(e.pointerType) && e.button === 0) {
                     if (isCtrlOrMetaKeyPressed.value === true) {
@@ -67,5 +84,20 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
 
     onZoomOut() {
         this.zoomCanvas(-3);
+    }
+
+    protected handleCursorIcon() {
+        let newIcon = super.handleCursorIcon();
+        if (!newIcon) {
+            if (this.isDragging) {
+                newIcon = 'grabbing';
+            } else if (isCtrlOrMetaKeyPressed.value) {
+                newIcon = 'zoom-out';
+            } else {
+                newIcon = 'zoom-in';
+            }
+        }
+        canvasStore.set('cursor', newIcon);
+        return newIcon;
     }
 }

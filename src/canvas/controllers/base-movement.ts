@@ -33,7 +33,7 @@ export default class BaseCanvasMovementController extends BaseCanvasController {
         if (e.pointerType === 'mouse' && (e.button === 1 || e.button === 2)) {
             const transform = canvasStore.get('transform');
             this.moveTranslateStart = new DOMPoint(this.lastCursorX * devicePixelRatio, this.lastCursorY * devicePixelRatio).matrixTransform(transform.inverse());
-            canvasStore.set('cursor', 'grabbing');
+            this.handleCursorIcon();
             canvasStore.set('cursorX', e.pageX * devicePixelRatio);
             canvasStore.set('cursorY', e.pageY * devicePixelRatio);
             canvasStore.set('viewDirty', true);
@@ -155,7 +155,7 @@ export default class BaseCanvasMovementController extends BaseCanvasController {
         if (this.moveTranslateStart) {
             if ((e.pointerType === 'mouse' && (e.button === 1 || e.button === 2))) {
                 this.moveTranslateStart = null;
-                canvasStore.set('cursor', null);
+                this.handleCursorIcon();
             }
         }
         canvasStore.set('viewDirty', true);
@@ -181,6 +181,17 @@ export default class BaseCanvasMovementController extends BaseCanvasController {
         transform.translateSelf(-point.x, -point.y);
         canvasStore.set('transform', transform);
         canvasStore.set('viewDirty', true);
+    }
+
+    protected handleCursorIcon() {
+        let newIcon = super.handleCursorIcon();
+        if (!newIcon) {
+            if (this.moveTranslateStart) {
+                newIcon = 'grabbing';
+            }
+        }
+        canvasStore.set('cursor', newIcon);
+        return newIcon;
     }
 
 }

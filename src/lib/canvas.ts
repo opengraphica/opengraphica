@@ -4,6 +4,8 @@ import preferencesStore from '@/store/preferences';
 import workingFileStore from '@/store/working-file';
 import { DecomposedMatrix, decomposeMatrix, snapPointAtHalfPixel, snapPointAtPixel } from './dom-matrix';
 
+const imageSmoothingZoomRatio = preferencesStore.get('imageSmoothingZoomRatio');
+
 /**
  * List of custom cursor images
  */
@@ -58,11 +60,18 @@ export function drawWorkingFileLayerToCanvas(targetCanvas: HTMLCanvasElement, ta
         ctx.save();
         ctx.globalAlpha = layer.opacity;
         ctx.globalCompositeOperation = layer.blendingMode;
+        const wasImageSmoothingEnabled = ctx.imageSmoothingEnabled;
+        if (wasImageSmoothingEnabled) {
+            ctx.imageSmoothingEnabled = false;
+        }
         const isIdentity = layer.transform.isIdentity;
         if (!isIdentity) {
             ctx.transform(layer.transform.a, layer.transform.b, layer.transform.c, layer.transform.d, layer.transform.e, layer.transform.f);
         }
         layer.renderer.draw(ctx, layer, options);
+        if (wasImageSmoothingEnabled) {
+            ctx.imageSmoothingEnabled = true;
+        }
         if (options.selectionTest && layer.type !== 'group') {
             const pixel = getPixelFastTest(targetCtx, options.selectionTest.point.x, options.selectionTest.point.y);
             if (
@@ -105,7 +114,7 @@ export function drawWorkingFileToCanvas(canvas: HTMLCanvasElement, ctx: CanvasRe
         ctx.transform(transform.a, transform.b, transform.c, transform.d, transform.e, transform.f);
     }
     
-    ctx.imageSmoothingEnabled = decomposedTransform.scaleX / window.devicePixelRatio < 1.25;
+    ctx.imageSmoothingEnabled = decomposedTransform.scaleX / window.devicePixelRatio < imageSmoothingZoomRatio;
 
     (window as any).averageTimeStart = ((performance.now() - now) * 0.1) + (((window as any).averageTimeStart || 0) * 0.9);
     now = performance.now();

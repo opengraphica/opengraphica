@@ -15,7 +15,7 @@
             </aside>
             <main ref="main"
                 tabindex="0"
-                :class="{ 'ogr-custom-cursor': !!canvasState.cursor }"
+                :class="[{ 'ogr-custom-cursor': !!canvasState.cursor }, canvasState.cursor ? 'ogr-custom-cursor--' + canvasState.cursor : null]"
                 @touchstart="onTouchStartMain"
                 @pointerdown="onPointerDownMain"
                 @wheel="onWheelMain"

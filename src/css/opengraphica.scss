@@ -365,6 +365,18 @@ body.ogr-full-page {
     
                 &.ogr-custom-cursor {
                     cursor: none;
+
+                    &.ogr-custom-cursor--grabbing {
+                        cursor: grabbing;
+                    }
+
+                    &.ogr-custom-cursor--zoom-in {
+                        cursor: zoom-in;
+                    }
+
+                    &.ogr-custom-cursor--zoom-out {
+                        cursor: zoom-out;
+                    }
                 }
             }
         }

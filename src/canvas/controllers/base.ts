@@ -48,6 +48,7 @@ export default class BaseCanvasController {
      */
     onEnter(): void {
         // View can shift due to toolbar show/hiding. If it was previously reset, reset again for correct layout.
+        this.handleCursorIcon();
         setTimeout(async () => {
             await nextTick();
             const canvasTransformResetOptions = canvasStore.get('transformResetOptions');
@@ -62,6 +63,7 @@ export default class BaseCanvasController {
      */
     onLeave(): void {
         // Override
+        canvasStore.set('cursor', null);
     }
 
     /**
@@ -190,6 +192,11 @@ export default class BaseCanvasController {
                 this.multiTouchDownCount = 0; // <- Must occur after the callback for information purposes.
             }
         }
+    }
+
+    protected handleCursorIcon(): string | null {
+        // Override
+        return null;
     }
 
 }

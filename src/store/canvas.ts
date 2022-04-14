@@ -3,6 +3,8 @@ import { CanvasViewResetOptions } from '@/types';
 import { DecomposedMatrix, decomposeMatrix } from '@/lib/dom-matrix';
 import preferencesStore from './preferences';
 
+const imageSmoothingZoomRatio = preferencesStore.get('imageSmoothingZoomRatio');
+
 interface CanvasState {
     bufferCanvas: HTMLCanvasElement;
     bufferCtx: CanvasRenderingContext2D;
@@ -82,6 +84,7 @@ const store = new PerformantStore<CanvasStore>({
     nonReactive: ['bufferCanvas', 'bufferCtx', 'isDisplayingNonRasterLayer', 'selectionMaskCanvas', 'viewCanvas', 'viewCtx'],
     onSet(key, value, set) {
         if (key === 'transform') {
+            const previousDecomposedTransform = store.state.decomposedTransform;
             const decomposedTransform = decomposeMatrix(value as DOMMatrix);
             set('decomposedTransform', decomposedTransform);
             set('useCssViewport',
@@ -89,6 +92,13 @@ const store = new PerformantStore<CanvasStore>({
                 !(store.get('isDisplayingNonRasterLayer') && decomposedTransform.scaleX > 1)
             );
             set('transformResetOptions', undefined);
+            const imageSmoothingZoomRatioDevice = imageSmoothingZoomRatio * window.devicePixelRatio;
+            if (
+                (previousDecomposedTransform.scaleX > imageSmoothingZoomRatioDevice && decomposedTransform.scaleX <= imageSmoothingZoomRatioDevice) ||
+                (previousDecomposedTransform.scaleX <= imageSmoothingZoomRatioDevice && decomposedTransform.scaleX > imageSmoothingZoomRatioDevice)
+            ) {
+                set('dirty', true);
+            }
         }
     },
     onDispatch(actionName: keyof CanvasDispatch, value: any, set) {

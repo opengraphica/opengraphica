@@ -1,6 +1,10 @@
 import appEmitter from '@/lib/emitter';
 import { unexpectedErrorMessage } from '@/lib/notify';
 
+export async function copySelectedLayers() {
+    
+}
+
 // For firefox, experiment with 
 // dom.events.asyncClipboard.clipboardItem
 
