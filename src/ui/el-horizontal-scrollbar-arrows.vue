@@ -25,6 +25,7 @@ import { defineComponent, ref, onMounted, toRefs, watch, onUnmounted } from 'vue
 import ElButton from 'element-plus/lib/components/button/index';
 import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
 import ResizeObserver from 'resize-observer-polyfill';
+import { lerp } from '@/lib/math';
 import canvasStore from '@/store/canvas';
 
 export default defineComponent({
@@ -45,6 +46,9 @@ export default defineComponent({
         const scrollLeft = ref<number>(0);
         const canScrollLeft = ref<boolean>(true);
         const canScrollRight = ref<boolean>(true);
+
+        let scrollLeftTarget: number | null = null;
+        let isScrollAnimating: boolean = false;
 
         let resizeObserver: ResizeObserver | null = null;
 
@@ -76,17 +80,50 @@ export default defineComponent({
             handleScrollChange();
         }
 
+        function getScrollLeftMin() {
+            return 0;
+        }
+
+        function getScrollLeftMax() {
+            return scrollContentEl.value!.clientWidth - scrollbar.value!.scrollbar$!.clientWidth;
+        }
+
         function handleScrollChange() {
-            canScrollLeft.value = scrollLeft.value > 0;
-            canScrollRight.value = scrollLeft.value < scrollContentEl.value!.clientWidth - scrollbar.value!.scrollbar$!.clientWidth;
+            canScrollLeft.value = scrollLeft.value > getScrollLeftMin();
+            canScrollRight.value = scrollLeft.value < getScrollLeftMax();
         }
 
         function onClickScrollLeft() {
-            scrollbar.value!.setScrollLeft(scrollLeft.value - (scrollbar.value!.$el.clientWidth * .6));
+            scrollLeftTarget = scrollLeft.value - (scrollbar.value!.$el.clientWidth * .6);
+            if (!isScrollAnimating) {
+                scrollAnimate();
+            }
         }
 
         function onClickScrollRight() {
-            scrollbar.value!.setScrollLeft(scrollLeft.value + (scrollbar.value!.$el.clientWidth * .6));
+            scrollLeftTarget = scrollLeft.value + (scrollbar.value!.$el.clientWidth * .6);
+            if (!isScrollAnimating) {
+                scrollAnimate();
+            }
+        }
+
+        function scrollAnimate() {
+            if (scrollLeftTarget == null) {
+                isScrollAnimating = false;
+                return;
+            }
+            isScrollAnimating = true;
+            scrollLeft.value = lerp(scrollLeft.value, scrollLeftTarget, 0.15);
+            scrollbar.value!.setScrollLeft(scrollLeft.value);
+            if (Math.abs(scrollLeft.value - scrollLeftTarget) < 1 || scrollLeft.value < getScrollLeftMin() + 1 || scrollLeft.value > getScrollLeftMax() + 1) {
+                scrollbar.value!.setScrollLeft(scrollLeftTarget);
+                scrollLeftTarget = null;
+                isScrollAnimating = false;
+                return;
+            } else {
+                requestAnimationFrame(scrollAnimate);
+
+            }
         }
 
         return {
