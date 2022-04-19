@@ -16,6 +16,7 @@
             <main ref="main"
                 tabindex="0"
                 :class="[{ 'ogr-custom-cursor': !!canvasState.cursor }, canvasState.cursor ? 'ogr-custom-cursor--' + canvasState.cursor : null]"
+                :style="{ 'pointer-events': isCanvasInteractable ? null : 'none' }"
                 @touchstart="onTouchStartMain"
                 @pointerdown="onPointerDownMain"
                 @wheel="onWheelMain"
@@ -72,6 +73,9 @@ export default defineComponent({
         });
         const isActiveToolbarExclusive = computed<boolean>(() => {
             return editorStore.state.isActiveToolbarExclusive;
+        });
+        const isCanvasInteractable = computed<boolean>(() => {
+            return editorStore.state.activePopoverIds.length === 0;
         });
         const menuBarPosition = computed<string>(() => {
             return preferencesStore.state.menuBarPosition;
@@ -130,43 +134,57 @@ export default defineComponent({
                 if (activeElement && activeElement?.blur && isInput(activeElement)) {
                     activeElement?.blur();
                 }
-                for (const event of translateTouchEventToPointerEvents('pointerdown', e)) {
-                    editorStore.get('toolCanvasController').onPointerDown(event);
+                if (isCanvasInteractable.value === true) {
+                    for (const event of translateTouchEventToPointerEvents('pointerdown', e)) {
+                        editorStore.get('toolCanvasController').onPointerDown(event);
+                    }
                 }
             }
             (document.body as any).focus();
             return false;
         };
         function onTouchMoveWindow(e: TouchEvent) {
-            for (const event of translateTouchEventToPointerEvents('pointermove', e)) {
-                editorStore.get('toolCanvasController').onPointerMove(event);
+            if (isCanvasInteractable.value === true) {
+                for (const event of translateTouchEventToPointerEvents('pointermove', e)) {
+                    editorStore.get('toolCanvasController').onPointerMove(event);
+                }
             }
         }
         function onTouchEndWindow(e: TouchEvent) {
-            for (const event of translateTouchEventToPointerEvents('pointerup', e)) {
-                editorStore.get('toolCanvasController').onPointerUp(event);
+            if (isCanvasInteractable.value === true) {
+                for (const event of translateTouchEventToPointerEvents('pointerup', e)) {
+                    editorStore.get('toolCanvasController').onPointerUp(event);
+                }
             }
         }
 
         function onPointerDownMain(e: PointerEvent) {
             if (e.pointerType !== 'touch') {
-                editorStore.get('toolCanvasController').onPointerDown(e);
+                if (isCanvasInteractable.value === true) {
+                    editorStore.get('toolCanvasController').onPointerDown(e);
+                }
                 (document.body as any).focus();
                 return false;
             }
         };
         function onPointerMoveWindow(e: PointerEvent) {
             if (e.pointerType !== 'touch') {
-                editorStore.get('toolCanvasController').onPointerMove(e);
+                if (isCanvasInteractable.value === true) {
+                    editorStore.get('toolCanvasController').onPointerMove(e);
+                }
             }
         };
         function onPointerUpWindow(e: PointerEvent) {
             if (e.pointerType !== 'touch') {
-                editorStore.get('toolCanvasController').onPointerUp(e);
+                if (isCanvasInteractable.value === true) {
+                    editorStore.get('toolCanvasController').onPointerUp(e);
+                }
             }
         };
         function onWheelMain(e: WheelEvent) {
-            editorStore.get('toolCanvasController').onWheel(e);
+            if (isCanvasInteractable.value === true) {
+                editorStore.get('toolCanvasController').onWheel(e);
+            }
         };
 
         return {
@@ -177,6 +195,7 @@ export default defineComponent({
             canvasState: canvasStore.state,
             activeToolbar,
             activeToolbarPosition,
+            isCanvasInteractable,
             isActiveToolbarExclusive,
             isPointerInsideMain,
             menuBarPosition,

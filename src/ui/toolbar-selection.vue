@@ -78,7 +78,7 @@ import ElTooltip from 'element-plus/lib/components/tooltip/index';
 import { appliedSelectionMask, selectionAddShape, selectionCombineMode, selectionEmitter, activeSelectionPath } from '@/canvas/store/selection-state';
 
 export default defineComponent({
-    name: 'ToolbarFreeTransform',
+    name: 'ToolbarSelection',
     components: {
         ElAlert,
         ElButton,

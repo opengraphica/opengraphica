@@ -246,23 +246,23 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
         let cropDragType: number | null = 0;
         const handleSize = 2 * this.remToPx / decomposedTransform.scaleX * devicePixelRatio;
         const halfHandleSize = handleSize / 2;
-        if (point.y >= top.value - halfHandleSize && point.y <= top.value + handleSize) {
+        if (point.y >= top.value - handleSize && point.y <= top.value + handleSize) {
             cropDragType |= DRAG_TYPE_TOP;
         }
-        if (point.y >= top.value + height.value - handleSize && point.y <= top.value + height.value + halfHandleSize) {
+        if (point.y >= top.value + height.value - handleSize && point.y <= top.value + height.value + handleSize) {
             cropDragType |= DRAG_TYPE_BOTTOM;
         }
-        if (point.x >= left.value - halfHandleSize && point.x <= left.value + handleSize) {
+        if (point.x >= left.value - handleSize && point.x <= left.value + handleSize) {
             cropDragType |= DRAG_TYPE_LEFT;
         }
-        if (point.x >= left.value + width.value - handleSize && point.x <= left.value + width.value + halfHandleSize) {
+        if (point.x >= left.value + width.value - handleSize && point.x <= left.value + width.value + handleSize) {
             cropDragType |= DRAG_TYPE_RIGHT;
         }
         if (
-            point.x < left.value - halfHandleSize ||
-            point.x > left.value + width.value + halfHandleSize ||
-            point.y < top.value - halfHandleSize ||
-            point.y > top.value + height.value + halfHandleSize
+            point.x < left.value - handleSize ||
+            point.x > left.value + width.value + handleSize ||
+            point.y < top.value - handleSize ||
+            point.y > top.value + height.value + handleSize
         ) {
             cropDragType = null;
         }

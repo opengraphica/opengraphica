@@ -151,9 +151,8 @@ export interface WorkingFileTextLayer<T extends ColorModel> extends WorkingFileL
     data: {
         boundary: 'dynamic' | 'box';
         kerning: 'metrics' | 'none';
-        textDirection: 'ltr' | 'rtl' | 'ttb' | 'btt';
+        baseDirection: 'ltr' | 'rtl' | 'ttb' | 'btt';
         wrapDirection: 'ltr' | 'rtl' | 'ttb' | 'btt';
-        wrapDirectionAlign: 'start' | 'center' | 'end';
         wrapAt: 'word' | 'wordThenLetter';
         lines: WorkingFileTextLayerLine<T>[];
     }

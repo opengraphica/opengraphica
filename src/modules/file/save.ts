@@ -27,6 +27,16 @@ export async function saveImageAs(options: SaveImageAsOptions = {}) {
     saveAs(new Blob([JSON.stringify(serializedFile, null, "\t")], { type: 'text/plain' }), fileName);
 }
 
+export async function saveImageToTemporaryStorage() {
+    const serializedFile = serializeWorkingFile();
+    try {
+        localStorage.setItem('openGraphicaSave_0', JSON.stringify(serializedFile));
+    } catch (error) {
+        console.warn(error);
+        throw new Error('Could not save file. It may be too large.');
+    }
+}
+
 function serializeWorkingFile(): SerializedFile<ColorModel> {
     const serializedFile: SerializedFile<ColorModel> = {
         version: '0.0.1-ALPHA.1',

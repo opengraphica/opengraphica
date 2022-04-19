@@ -3,13 +3,33 @@
         "name": "File",
         "actions": [
             {
+                "name": "Open File",
                 "action": {
                     "type": "runModule",
                     "target": "file/open"
                 },
-                "name": "Open File",
                 "shortcuts": [
                     "ctrl+o"
+                ]
+            },
+            {
+                "name": "Quick Save",
+                "action": {
+                    "type": "runModule",
+                    "target": "file/quickSave"
+                },
+                "shortcuts": [
+                    "ctrl+alt+s"
+                ]
+            },
+            {
+                "name": "Quick Load",
+                "action": {
+                    "type": "runModule",
+                    "target": "file/quickLoad"
+                },
+                "shortcuts": [
+                    "ctrl+alt+o"
                 ]
             }
         ]
@@ -18,21 +38,21 @@
         "name": "Edit History",
         "actions": [
             {
+                "name": "Undo",
                 "action": {
                     "type": "runModule",
                     "target": "history/undo"
                 },
-                "name": "Undo",
                 "shortcuts": [
                     "ctrl+z"
                 ]
             },
             {
+                "name": "Redo",
                 "action": {
                     "type": "runModule",
                     "target": "history/redo"
                 },
-                "name": "Redo",
                 "shortcuts": [
                     "ctrl+y",
                     "ctrl+shift+z"
@@ -44,11 +64,11 @@
         "name": "Selection",
         "actions": [
             {
+                "name": "Select All",
                 "action": {
                     "type": "appEmit",
                     "target": "editor.tool.selectAll"
                 },
-                "name": "Select All",
                 "shortcuts": [
                     "ctrl+a"
                 ]

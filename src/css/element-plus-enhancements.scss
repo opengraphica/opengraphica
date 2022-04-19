@@ -368,7 +368,8 @@
         font-size: 0.8125rem;
         line-height: 2rem;
 
-        .el-input__inner {
+        .el-input__inner,
+        .el-color-picker {
             height: 2rem;
             line-height: 2rem;
         }
@@ -377,10 +378,24 @@
             .el-input-group__prepend, .el-input-group__append {
                 padding: 0 .75rem;
             }
-            .el-input__inner {
+            .el-input__inner,
+            .el-color-picker {
                 height: 2.125rem;
                 line-height: 2.125rem;
             }
+        }
+    }
+    .el-input-group {
+        .el-color-picker .el-color-picker__trigger {
+            border-radius: 0;
+        }
+        .el-color-picker:first-child .el-color-picker__trigger {
+            border-top-left-radius: var(--el-input-border-radius, var(--el-border-radius-base));
+            border-bottom-left-radius: var(--el-input-border-radius, var(--el-border-radius-base));
+        }
+        .el-color-picker:last-child .el-color-picker__trigger {
+            border-top-right-radius: var(--el-input-border-radius, var(--el-border-radius-base));
+            border-bottom-right-radius: var(--el-input-border-radius, var(--el-border-radius-base));
         }
     }
     .el-input-group--plain {
@@ -389,7 +404,8 @@
             border-color: transparent;
             color: var(--el-text-color-regular);
 
-            + .el-input__inner {
+            + .el-input__inner,
+            + .el-color-picker {
                 border-radius: var(--el-input-border-radius, var(--el-border-radius-base));
             }
         }

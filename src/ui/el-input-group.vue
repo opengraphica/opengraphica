@@ -5,6 +5,11 @@
                 <slot name="prepend" />
             </div>
         </el-tooltip>
+        <template v-else>
+            <div ref="prependEl" v-if="$slots.prepend" class="el-input-group__prepend px-2">
+                <slot name="prepend" />
+            </div>
+        </template>
         <slot />
         <div v-if="$slots.append" class="el-input-group__append px-2">
             <slot name="append" />

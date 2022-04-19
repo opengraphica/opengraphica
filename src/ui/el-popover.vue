@@ -28,12 +28,13 @@
     </el-tooltip>
 </template>
 <script lang="ts">
-import { defineComponent, computed, ref, unref, watch } from 'vue';
+import { defineComponent, computed, ref, unref, watch, onMounted, onUnmounted } from 'vue';
 import ElTooltip from 'element-plus/lib/components/tooltip/index';
 import { isString } from 'element-plus/lib/utils/util';
 import { usePopoverProps } from 'element-plus/lib/components/popover/src/popover';
 import { useTooltipContentProps } from 'element-plus/lib/components/tooltip/src/tooltip';
 import { POPPER_CONTAINER_SELECTOR } from 'element-plus/lib/components/popper/src/container';
+import editorStore from '@/store/editor';
 
 import type { StyleValue } from 'vue';
 
@@ -42,6 +43,7 @@ const emits = ['update:visible', 'after-enter', 'after-leave'];
 const NAME = 'ElPopover';
 
 let popperContainer: any = null;
+let popoverCounter: number = 0;
 
 export default defineComponent({
     name: NAME,
@@ -55,6 +57,8 @@ export default defineComponent({
     },
     emits,
     setup(props, { emit }) {
+        let isMounted: boolean = false;
+        const trackingId: number = popoverCounter++;
         
         const tooltipRef = ref<InstanceType<typeof ElTooltip> | null>(null);
         const popperRef = computed(() => {
@@ -67,17 +71,15 @@ export default defineComponent({
             return `${props.width}px`;
         });
 
-        if (!popperContainer) {
-            watch(() => props.visible, (newValue) => {
-                if (!popperContainer) {
-                    const opengraphica = document.querySelector('.opengraphica');
-                    if (opengraphica) {
-                        popperContainer = document.querySelector('[id^="el-popper-container"]');
-                        opengraphica.appendChild(popperContainer);
-                    }
+        watch(() => props.visible, (newValue) => {
+            if (!popperContainer) {
+                const opengraphica = document.querySelector('.opengraphica');
+                if (opengraphica) {
+                    popperContainer = document.querySelector('[id^="el-popper-container"]');
+                    opengraphica.appendChild(popperContainer);
                 }
-            });
-        }
+            }
+        });
 
         const style = computed(() => {
             return [
@@ -96,16 +98,31 @@ export default defineComponent({
             ];
         });
 
+        onMounted(() => {
+            isMounted = true;
+        });
+
+        onUnmounted(() => {
+            isMounted = false;
+            editorStore.set('activePopoverIds', editorStore.get('activePopoverIds').filter(id => id !== trackingId));
+        });
+
         const hide = () => {
             tooltipRef.value?.hide();
         };
 
         const afterEnter = () => {
-            emit('after-enter')
+            const activePopoverIds = editorStore.get('activePopoverIds');
+            if (!activePopoverIds.includes(trackingId) && isMounted) {
+                activePopoverIds.push(trackingId);
+                editorStore.set('activePopoverIds', activePopoverIds);
+            }
+            emit('after-enter');
         }
 
         const afterLeave = () => {
-            emit('after-leave')
+            editorStore.set('activePopoverIds', editorStore.get('activePopoverIds').filter(id => id !== trackingId));
+            emit('after-leave');
         }
 
         return {

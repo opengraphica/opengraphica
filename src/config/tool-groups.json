@@ -29,21 +29,6 @@
             }
         }
     },
-    "text": {
-        "name": "Text",
-        "description": "Tools for manipulating text layers.",
-        "tools": {
-            "text": {
-                "name": "Text",
-                "description": "Create and edit text layers.",
-                "controller": "text",
-                "overlays": [
-                    "free-transform",
-                    "text"
-                ]
-            }
-        }
-    },
     "selection": {
         "name": "Selection",
         "description": "Select areas of the active layer(s), any manipulations to the layer(s) only occur inside the selection.",
@@ -58,6 +43,25 @@
                 },
                 "overlays": [
                     "selection"
+                ]
+            }
+        }
+    },
+    "text": {
+        "name": "Text",
+        "description": "Tools for manipulating text layers.",
+        "tools": {
+            "text": {
+                "name": "Text",
+                "description": "Create and edit text layers.",
+                "controller": "text",
+                "toolbar": {
+                    "position": "auto",
+                    "target": "text"
+                },
+                "overlays": [
+                    "free-transform",
+                    "text"
                 ]
             }
         }

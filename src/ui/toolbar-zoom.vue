@@ -61,7 +61,7 @@ import appEmitter from '@/lib/emitter';
 import canvasStore from '@/store/canvas';
 
 export default defineComponent({
-    name: 'ToolbarFreeTransform',
+    name: 'ToolbarZoom',
     components: {
         ElButton,
         ElButtonGroup,

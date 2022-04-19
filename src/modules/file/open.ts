@@ -129,6 +129,20 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
 
 };
 
+export async function openFromTemporaryStorage() {
+    let savedJson: string | null = null;
+    try {
+        savedJson = localStorage.getItem('openGraphicaSave_0');
+        if (!savedJson) {
+            throw new Error('File does not exist.');
+        }
+    } catch (error) {
+        console.warn(error);
+        throw new Error('Could load file. It may not exist.');
+    }
+    await openFromFileList([new File([savedJson], "quicksave.json", { type: "text/plain" })]);
+}
+
 export async function insertFromFileDialog(options: FileDialogOpenOptions = {}) {
     return openFromFileDialog({
         ...options,

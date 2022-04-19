@@ -6837,6 +6837,7 @@ body.ogr-full-page .opengraphica {
     overflow: hidden !important;
     display: flex !important;
     flex-direction: column !important;
+    justify-content: center !important;
   }
   .opengraphica .ogr-dialogs .el-dialog__body {
     overflow: auto !important;
@@ -7078,6 +7079,9 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor.ogr-custom-cursor--grabbing {
   cursor: grabbing;
+}
+.opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor.ogr-custom-cursor--text {
+  cursor: text;
 }
 .opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor.ogr-custom-cursor--zoom-in {
   cursor: zoom-in;
@@ -25036,23 +25040,38 @@ body.ogr-full-page .opengraphica {
   font-size: 0.8125rem;
   line-height: 2rem;
 }
-.opengraphica .el-input--small .el-input__inner {
+.opengraphica .el-input--small .el-input__inner,
+.opengraphica .el-input--small .el-color-picker {
   height: 2rem;
   line-height: 2rem;
 }
 .opengraphica .el-input--small.el-input-group .el-input-group__prepend, .opengraphica .el-input--small.el-input-group .el-input-group__append {
   padding: 0 0.75rem;
 }
-.opengraphica .el-input--small.el-input-group .el-input__inner {
+.opengraphica .el-input--small.el-input-group .el-input__inner,
+.opengraphica .el-input--small.el-input-group .el-color-picker {
   height: 2.125rem;
   line-height: 2.125rem;
+}
+.opengraphica .el-input-group .el-color-picker .el-color-picker__trigger {
+  border-radius: 0;
+}
+.opengraphica .el-input-group .el-color-picker:first-child .el-color-picker__trigger {
+  border-top-left-radius: var(--el-input-border-radius, var(--el-border-radius-base));
+  border-bottom-left-radius: var(--el-input-border-radius, var(--el-border-radius-base));
+}
+.opengraphica .el-input-group .el-color-picker:last-child .el-color-picker__trigger {
+  border-top-right-radius: var(--el-input-border-radius, var(--el-border-radius-base));
+  border-bottom-right-radius: var(--el-input-border-radius, var(--el-border-radius-base));
 }
 .opengraphica .el-input-group--plain .el-input-group__prepend, .opengraphica .el-input-group--plain .el-input-group__append {
   background: transparent;
   border-color: transparent;
   color: var(--el-text-color-regular);
 }
-.opengraphica .el-input-group--plain .el-input-group__prepend + .el-input__inner, .opengraphica .el-input-group--plain .el-input-group__append + .el-input__inner {
+.opengraphica .el-input-group--plain .el-input-group__prepend + .el-input__inner,
+.opengraphica .el-input-group--plain .el-input-group__prepend + .el-color-picker, .opengraphica .el-input-group--plain .el-input-group__append + .el-input__inner,
+.opengraphica .el-input-group--plain .el-input-group__append + .el-color-picker {
   border-radius: var(--el-input-border-radius, var(--el-border-radius-base));
 }
 .opengraphica .el-input-group--plain .el-input-group__prepend {

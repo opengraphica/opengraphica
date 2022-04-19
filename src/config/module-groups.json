@@ -53,6 +53,22 @@
                     "type": "ui",
                     "target": "file-take-photo"
                 }
+            },
+            "quickSave": {
+                "name": "Quick Save",
+                "description": "Saves the current file to temporary storage.",
+                "action": {
+                    "type": "function",
+                    "target": "file/save.saveImageToTemporaryStorage"
+                }
+            },
+            "quickLoad": {
+                "name": "Quick Load",
+                "description": "Load the file saved by quick save.",
+                "action": {
+                    "type": "function",
+                    "target": "file/open.openFromTemporaryStorage"
+                }
             }
         }
     },

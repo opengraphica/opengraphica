@@ -17,6 +17,7 @@ const toolGroups: { [key: string]: ToolGroupDefinition } = toolGroupsConfig as a
 
 interface EditorState {
     activeMenuDrawerComponentName: string | null;
+    activePopoverIds: number[],
     activeTheme: { name: string, linkElement: HTMLLinkElement } | null;
     activeTool: string | null;
     activeToolGroup: string | null;
@@ -63,6 +64,7 @@ let currentTaskRunId: number = 0;
 const store = new PerformantStore<EditorStore>({
     state: {
         activeMenuDrawerComponentName: null,
+        activePopoverIds: [],
         activeTheme: null,
         activeTool: null,
         activeToolGroup: null,

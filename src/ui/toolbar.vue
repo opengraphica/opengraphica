@@ -2,7 +2,7 @@
     <div class="ogr-toolbar">
         <suspense>
             <template #default>
-                <component :is="name" @close="onCloseToolbar" />
+                <component :is="'toolbar-' + name" @close="onCloseToolbar" />
             </template>
             <template #fallback>
                 <div></div>
@@ -22,10 +22,11 @@ export default defineComponent({
         loading: ElLoading.directive
     },
     components: {
-        'crop-resize': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-crop-resize' */ `./toolbar-crop-resize.vue`)),
-        'selection': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-selection' */ `./toolbar-selection.vue`)),
-        'free-transform': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-free-transform' */ `./toolbar-free-transform.vue`)),
-        'zoom': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-zoom' */ `./toolbar-zoom.vue`))
+        'toolbar-crop-resize': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-crop-resize' */ `./toolbar-crop-resize.vue`)),
+        'toolbar-selection': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-selection' */ `./toolbar-selection.vue`)),
+        'toolbar-free-transform': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-free-transform' */ `./toolbar-free-transform.vue`)),
+        'toolbar-text': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-text' */ `./toolbar-text.vue`)),
+        'toolbar-zoom': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-zoom' */ `./toolbar-zoom.vue`))
     },
     emits: [
     ],

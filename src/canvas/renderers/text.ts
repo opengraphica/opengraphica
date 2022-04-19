@@ -19,13 +19,12 @@ export default class TextLayerRenderer implements WorkingFileLayerRenderer<Color
     }
 
     /**
-     * All-important function that calculates and caches the position of all the letters in the text layer.
+     * Calculates and caches the position of all the letters in the text layer so subsequent rendering is faster.
      */
     calculateTextPlacement(ctx: CanvasRenderingContext2D, layer: WorkingFileTextLayer<ColorModel>): TextLayerCacheItem<ColorModel> {
         const boundary = layer.data.boundary;
-        const textDirection = layer.data.textDirection;
+        const textDirection = layer.data.baseDirection;
         const wrapDirection = layer.data.wrapDirection;
-        const wrapDirectionAlign = layer.data.wrapDirectionAlign;
         const isHorizontalTextDirection: boolean = ['ltr', 'rtl'].includes(textDirection);
         const isNegativeTextDirection: boolean = ['rtl', 'btt'].includes(textDirection);
 
@@ -284,7 +283,7 @@ export default class TextLayerRenderer implements WorkingFileLayerRenderer<Color
                 const boundary = layer.data.boundary;
                 let drawOffsetTop: number = 0;
                 let drawOffsetLeft: number = 0;
-                const textDirection = layer.data.textDirection;
+                const textDirection = layer.data.baseDirection;
                 const wrapDirection = layer.data.wrapDirection;
                 const isHorizontalTextDirection = ['ltr', 'rtl'].includes(textDirection);
                 const isNegativeTextDirection = ['rtl', 'btt'].includes(textDirection);

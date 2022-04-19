@@ -102,6 +102,7 @@ body.ogr-full-page {
                 overflow: hidden !important;
                 display: flex !important;
                 flex-direction: column !important;
+                justify-content: center !important;
             }
             .el-dialog__body {
                 overflow: auto !important;
@@ -383,6 +384,10 @@ body.ogr-full-page {
 
                     &.ogr-custom-cursor--grabbing {
                         cursor: grabbing;
+                    }
+
+                    &.ogr-custom-cursor--text {
+                        cursor: text;
                     }
 
                     &.ogr-custom-cursor--zoom-in {
