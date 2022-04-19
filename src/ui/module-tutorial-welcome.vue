@@ -32,8 +32,9 @@ import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
 import ElButton from 'element-plus/lib/components/button/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import appEmitter from '@/lib/emitter';
-import { notifyInjector, unexpectedErrorMessage } from '@/lib/notify';
+import { scheduleTutorialNotification } from '@/lib/tutorial';
 import { runModule } from '@/modules';
+import editorStore from '@/store/editor';
 
 export default defineComponent({
     name: 'ModuleWelcome',
@@ -50,7 +51,6 @@ export default defineComponent({
     setup(props, { emit }) {
         emit('update:title', '');
 
-        const $notify = notifyInjector('$notify');
         const loading = ref<boolean>(false);
        
         onMounted(async () => {
@@ -61,6 +61,27 @@ export default defineComponent({
         onUnmounted(() => {
             appEmitter.off('app.workingFile.notifyImageLoadedFromClipboard', onCancel);
             appEmitter.off('app.workingFile.notifyImageLoadedFromDragAndDrop', onCancel);
+
+            if (!editorStore.state.tutorialFlags.explainCanvasViewportControls) {
+                let message = `
+                    <p class="mb-3">No matter which tool is selected, you can control the canvas view.</p>
+                    <p class="mb-3">When <strong class="has-text-weight-bold">any tool</strong> is selected:</p>
+                `;
+                scheduleTutorialNotification({
+                    flag: 'explainCanvasViewportControls',
+                    title: 'Moving the Canvas',
+                    message: {
+                        touch: message + `
+                            <p class="mb-3"><strong class="has-text-weight-bold"><span class="bi bi-zoom-in"></span> Zooming</strong> - Use two fingers and pinch to zoom in and out.</p>
+                            <p><strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> Panning</strong> - Use two fingers and slide them together to move the canvas.</p>
+                        `,
+                        mouse: message + `
+                            <p class="mb-3"><strong class="has-text-weight-bold"><span class="bi bi-zoom-in"></span> Zooming</strong> - Use the <em>Mouse Wheel</em> to zoom in and out.</p>
+                            <p><strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> Panning</strong> - Click and drag with the <em>Right Mouse Button</em> to move the canvas.</p>
+                        `
+                    }
+                })
+            }
         });
 
         async function onNewImage() {

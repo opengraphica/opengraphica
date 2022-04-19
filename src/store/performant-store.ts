@@ -60,11 +60,15 @@ export class PerformantStore<T extends StoreTypeMap> {
             if (localStorageValue != null) {
                 const type: string = localStorageValue.split(';')[0];
                 let value: any = localStorageValue.replace(type + ';', '');
-                if (type === 'boolean') {
-                    value = value === 'true';
-                } else if (type === 'number') {
-                    value = parseFloat(value);
-                }
+                try {
+                    if (type === 'boolean') {
+                        value = value === 'true';
+                    } else if (type === 'number') {
+                        value = parseFloat(value);
+                    } else if (['array', 'object'].includes(type)) {
+                        value = JSON.parse(value);
+                    }
+                } catch (error) {}
                 (this.staticState as any)[restorePropName] = value;
                 if (!this.nonReactiveProps.includes(restorePropName)) {
                     this.reactiveState[restorePropName] = value;
@@ -84,7 +88,12 @@ export class PerformantStore<T extends StoreTypeMap> {
         }
         if (this.restoreProps.includes(key as string)) {
             try {
-                localStorage.setItem(localStoragePrefix + key as string, typeof value + ';' + value);
+                const valueType = typeof value;
+                let serializedValue: string = value + '';
+                if (['object', 'array'].includes(valueType)) {
+                    serializedValue = JSON.stringify(value);
+                }
+                localStorage.setItem(localStoragePrefix + key as string, valueType + ';' + serializedValue);
             } catch (error) {
                 // Does this matter?
             }

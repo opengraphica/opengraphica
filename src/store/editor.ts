@@ -13,6 +13,13 @@ interface EditorDeferredTask {
     handler: (bridge: { isCanceled: () => boolean }) => void;
 }
 
+interface TutorialFlags {
+    explainCanvasViewportControls?: boolean;
+    zoomToolIntroduction?: boolean;
+    freeTransformToolIntroduction?: boolean;
+    selectionToolIntroduction?: boolean;
+}
+
 const toolGroups: { [key: string]: ToolGroupDefinition } = toolGroupsConfig as any;
 
 interface EditorState {
@@ -28,6 +35,7 @@ interface EditorState {
     activeToolOverlays: string[];
     isActiveToolbarExclusive: boolean;
     isTaskRunning: boolean;
+    isTouchUser: boolean;
     loadingThemeName: string | null;
     tasks: EditorDeferredTask[];
     themes: {
@@ -38,10 +46,12 @@ interface EditorState {
     timelinePlayStartTime: number; // Milliseconds
     timelineStart: number; // Milliseconds
     toolCanvasController: BaseCanvasController;
+    tutorialFlags: TutorialFlags;
     waiting: boolean;
 }
 
 interface EditorDispatch {
+    addTutorialFlag: keyof EditorState['tutorialFlags'],
     scheduleTask: EditorDeferredTask,
     setActiveTheme: string;
     setActiveTool: {
@@ -75,6 +85,7 @@ const store = new PerformantStore<EditorStore>({
         activeToolOverlays: [],
         isActiveToolbarExclusive: false,
         isTaskRunning: false,
+        isTouchUser: true,
         loadingThemeName: null,
         tasks: [],
         themes: {},
@@ -83,11 +94,21 @@ const store = new PerformantStore<EditorStore>({
         timelinePlayStartTime: 0,
         timelineStart: 0,
         toolCanvasController: new BaseCanvasController(),
+        tutorialFlags: {},
         waiting: false
     },
     readOnly: ['activeTheme', 'activeTool', 'activeToolGroup', 'themes', 'timelineCursor'],
+    restore: ['isTouchUser', 'tutorialFlags'],
     async onDispatch(actionName: string, value: any, set) {
         switch (actionName) {
+            case 'addTutorialFlag':
+                const tutorialFlags = store.state.tutorialFlags;
+                if (!(tutorialFlags as any)[value]) {
+                    (tutorialFlags as any)[value] = true;
+                    set('tutorialFlags', tutorialFlags);
+                }
+                break;
+
             case 'scheduleTask':
                 const newTask: EditorDeferredTask = value;
                 let tasks = store.get('tasks');
@@ -103,6 +124,7 @@ const store = new PerformantStore<EditorStore>({
                     runTasks(++currentTaskRunId, set);
                 }
                 set('tasks', tasks);
+                break;
 
             case 'setActiveTheme':
                 const activeThemeName: string = value;
@@ -178,10 +200,12 @@ const store = new PerformantStore<EditorStore>({
                     await store.dispatch('setActiveTheme', themeNames[0]);
                 }
                 break;
+
             case 'setTimelineCursor':
                 set('timelineCursor', value);
                 updateLayersWithTimeline();
                 canvasStore.set('dirty', true);
+                break;
         }
     }
 });
@@ -233,4 +257,4 @@ function updateRasterSequenceLayerWithTimeline(layer: WorkingFileRasterSequenceL
 
 export default store;
 
-export { EditorStore, EditorState, updateRasterSequenceLayerWithTimeline };
+export { EditorStore, EditorState, TutorialFlags, updateRasterSequenceLayerWithTimeline };

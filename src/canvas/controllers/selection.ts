@@ -6,9 +6,11 @@ import {
     SelectionPathPoint, appliedSelectionMask, previewSelectedLayersSelectionMask, discardSelectedLayersSelectionMask
 } from '../store/selection-state';
 import canvasStore from '@/store/canvas';
+import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import workingFileStore from '@/store/working-file';
 import appEmitter from '@/lib/emitter';
+import { scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import { ApplyActiveSelectionAction } from '@/actions/apply-active-selection';
 import { ClearSelectionAction } from '@/actions/clear-selection';
 import { UpdateActiveSelectionAction } from '@/actions/update-active-selection';
@@ -58,6 +60,31 @@ export default class SelectionController extends BaseMovementController {
             await previewSelectedLayersSelectionMask();
             canvasStore.set('viewDirty', true);
         }, { immediate: true });
+
+        // Tutorial message
+        if (!editorStore.state.tutorialFlags.selectionToolIntroduction) {
+            waitForNoOverlays().then(() => {
+                let messageStart = `
+                    <p class="mb-3">The selection tool allows you to select specific parts of the image to restrict where editing occurs.</p>
+                `;
+                let messageEnd = `
+                    <p class="mb-3"><strong class="has-text-weight-bold"><span class="bi bi-square"></span> Selection Shape</strong> - What shape is used to draw the selection.<p>
+                    <p><strong class="has-text-weight-bold"><span class="bi bi-plus-circle-dotted"></span> Selection Combine Mode</strong> - How the current selection combines with the existing selection.<p>
+                `;
+                scheduleTutorialNotification({
+                    flag: 'selectionToolIntroduction',
+                    title: 'Selection Tool',
+                    message: {
+                        touch: messageStart + `
+                            <p class="mb-3"><strong class="has-text-weight-bold"><span class="bi bi-bounding-box"></span> Create Selection</strong> - Draw with one finger to create a selection.</p>
+                        ` + messageEnd,
+                        mouse: messageStart + `
+                            <p class="mb-3"><strong class="has-text-weight-bold"><span class="bi bi-bounding-box"></span> Create Selection</strong> - Click and drag with <em>Left Click</em> to create a selection.</p>
+                        ` + messageEnd
+                    }
+                });
+            });
+        }
     }
 
     onLeave(): void {

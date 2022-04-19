@@ -243,6 +243,9 @@
                                 <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" label="Show Welcome Screen">
                                     <el-switch v-model="showWelcomeScreenAtStart" />
                                 </el-form-item>
+                                <div class="px-4.5 pt-2">
+                                    <el-button size="small" class="is-fullwidth" @click="onClickResetSttings">Reset Settings</el-button>
+                                </div>
                             </el-collapse-item>
                         </el-collapse>
                     </el-form>
@@ -495,6 +498,16 @@ export default defineComponent({
                 preferencesStore.set('showWelcomeScreenAtStart', value);
             }
         });
+        function onClickResetSttings() {
+            for (let key in localStorage) {
+                if (key.startsWith('openGraphica')) {
+                    try {
+                        localStorage.removeItem(key);
+                    } catch (error) {}
+                }
+            }
+            window.location.reload();
+        }
 
         // Menu selection
         async function onMenuSelect(group: string, index: string) {
@@ -589,6 +602,7 @@ export default defineComponent({
             preferenceHighQualityScaling,
             preferenceMenuBarPosition,
             showWelcomeScreenAtStart,
+            onClickResetSttings,
             onMenuSelect
         };
     }

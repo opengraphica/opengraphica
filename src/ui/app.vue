@@ -21,6 +21,7 @@ import AppLayoutDndContainer from '@/ui/app-layout-dnd-container.vue';
 import AppMenuDrawers from '@/ui/app-menu-drawers.vue';
 import AppWait from '@/ui/app-wait.vue';
 import canvasStore from '@/store/canvas';
+import editorStore from '@/store/editor';
 import ResizeObserver from 'resize-observer-polyfill';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import appEmitter from '@/lib/emitter';
@@ -89,6 +90,10 @@ export default defineComponent({
             window.addEventListener('dragover', onDragOverRoot, true);
             window.addEventListener('dragleave', onDragLeaveRoot, true);
             window.addEventListener('drop', onDropRoot, true);
+
+            // Determine if mouse user
+            editorStore.set('isTouchUser', false);
+            window.addEventListener('touchstart', onTouchStartWindowTouchTest, true);
 
             // Breakfix for element plus popper styles
             const opengraphica = document.querySelector('.opengraphica');
@@ -170,6 +175,11 @@ export default defineComponent({
                 appEmitter.emit('app.wait.stopBlocking', { id: 'documentDropFiles' });
                 appEmitter.emit('app.workingFile.notifyImageLoadedFromDragAndDrop');
             }
+        }
+
+        function onTouchStartWindowTouchTest(e: Event) {
+            window.removeEventListener('touchstart', onTouchStartWindowTouchTest);
+            editorStore.set('isTouchUser', true);
         }
 
         function onResizeWindow(e: Event) {

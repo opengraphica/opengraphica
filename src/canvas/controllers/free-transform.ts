@@ -3,11 +3,13 @@ import BaseCanvasMovementController from './base-movement';
 import { isBoundsIndeterminate, layerPickMode, useRotationSnapping, freeTransformEmitter, top, left, width, height, rotation, transformOriginX, transformOriginY, dimensionLockRatio, previewXSnap, previewYSnap, dragHandleHighlight, rotateHandleHighlight } from '../store/free-transform-state';
 import { appliedSelectionMask, appliedSelectionMaskCanvasOffset, activeSelectionMask, activeSelectionMaskCanvasOffset } from '../store/selection-state';
 import canvasStore from '@/store/canvas';
+import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import preferencesStore from '@/store/preferences';
 import workingFileStore, { getLayerById } from '@/store/working-file';
 import { ColorModel, DrawWorkingFileOptions, UpdateAnyLayerOptions, WorkingFileLayer } from '@/types';
 import { DecomposedMatrix, decomposeMatrix } from '@/lib/dom-matrix';
+import { scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import { CreateNewLayersFromSelectionAction } from '@/actions/create-new-layers-from-selection';
 import { ClearSelectionAction } from '@/actions/clear-selection';
 import { SelectLayersAction } from '@/actions/select-layers';
@@ -90,6 +92,32 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         freeTransformEmitter.on('previewRotationChange', this.onPreviewRotationChange);
         freeTransformEmitter.on('previewDragResizeChange', this.onPreviewDragResizeChange);
         freeTransformEmitter.on('commitTransforms', this.onCommitTransforms);
+
+        // Tutorial message
+        if (!editorStore.state.tutorialFlags.freeTransformToolIntroduction) {
+            waitForNoOverlays().then(() => {
+                let message = `
+                    <p class="mb-3">This tool moves, resizes, and rotates layers. A boundary box shows around the selected layer(s).</p>
+                    <p class="mb-3">In <strong class="has-text-weight-bold">auto mode</strong>:</p>
+                `;
+                scheduleTutorialNotification({
+                    flag: 'freeTransformToolIntroduction',
+                    title: 'Free Transform Tool',
+                    message: {
+                        touch: message + `
+                            <p class="mb-3"><strong class="has-text-weight-bold"><span class="bi bi-cursor"></span> Selection</strong> - Tap on a layer to select it.</p>
+                            <p class="mb-3"><strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> Moving</strong> - Tap on a layer and drag to move it.</p>
+                            <p><strong class="has-text-weight-bold"><span class="bi bi-bounding-box"></span> Resizing</strong> - Use one finger to drag resize handles.</p>
+                        `,
+                        mouse: message + `
+                            <p class="mb-3"><strong class="has-text-weight-bold"><span class="bi bi-cursor"></span> Selection</strong> - <em>Left Click</em> on a layer to select it.</p>
+                            <p class="mb-3"><strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> Moving</strong> - <em>Left Click</em> on a layer and drag to move it.</p>
+                            <p><strong class="has-text-weight-bold"><span class="bi bi-bounding-box"></span> Resizing</strong> - <em>Left Click</em> and drag resize handles.</p>
+                        `
+                    }
+                });
+            });
+        }
     }
 
     onLeave(): void {
