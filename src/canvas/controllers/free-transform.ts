@@ -128,8 +128,8 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         appEmitter.off('editor.tool.cancelCurrentAction', this.onCancelCurrentAction);
         appEmitter.off('editor.history.step', this.onHistoryStep);
         freeTransformEmitter.off('storeTransformStart', this.onStoreTransformStart);
-        freeTransformEmitter.off('previewRotatioffChange', this.onPreviewRotationChange);
-        freeTransformEmitter.off('previewDragResiffeChange', this.onPreviewDragResizeChange);
+        freeTransformEmitter.off('previewRotationChange', this.onPreviewRotationChange);
+        freeTransformEmitter.off('previewDragResizeChange', this.onPreviewDragResizeChange);
         freeTransformEmitter.off('commitTransforms', this.onCommitTransforms);
 
         // Tutorial Message
