@@ -173,7 +173,7 @@ export default defineComponent({
             window.addEventListener('touchstart', onTouchStartWindow);
             window.addEventListener('touchend', onTouchEndWindow);
             
-            displayMode.value = viewportWidth.value > preferencesStore.state.dockHideBreakpoint ? 'tools' : 'all';
+            displayMode.value = viewportWidth.value / (window.devicePixelRatio || 1) > preferencesStore.state.dockHideBreakpoint ? 'tools' : 'all';
 
             emit('resize');
         });
@@ -188,7 +188,7 @@ export default defineComponent({
         function toggleMobileView() {
             window.clearTimeout(resizeDebounceHandle);
             resizeDebounceHandle = window.setTimeout(async () => {
-                displayMode.value = viewportWidth.value > preferencesStore.state.dockHideBreakpoint ? 'tools' : 'all';
+                displayMode.value = viewportWidth.value / (window.devicePixelRatio || 1) > preferencesStore.state.dockHideBreakpoint ? 'tools' : 'all';
             }, 400);
         }
 

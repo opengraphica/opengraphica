@@ -104,7 +104,7 @@ export default defineComponent({
         watch([viewWidth, viewHeight, menuBarPosition, activeToolbar], () => {
             clearTimeout(resizeDebounceHandle);
             resizeDebounceHandle = window.setTimeout(async () => {
-                showDock.value = viewWidth.value > preferencesStore.state.dockHideBreakpoint;
+                showDock.value = viewWidth.value / (window.devicePixelRatio || 1) > preferencesStore.state.dockHideBreakpoint;
                 await nextTick();
                 calculateDndArea();
                 onResizeLayout();
@@ -116,7 +116,7 @@ export default defineComponent({
                 editorStore.dispatch('setActiveTool', { group: editorStore.state.activeToolGroupRestore });
             }
 
-            showDock.value = viewWidth.value > preferencesStore.state.dockHideBreakpoint;
+            showDock.value = viewWidth.value / (window.devicePixelRatio || 1) > preferencesStore.state.dockHideBreakpoint;
 
             appEmitter.on('app.canvas.calculateDndArea', calculateDndArea);
             window.addEventListener('touchmove', onTouchMoveWindow);
