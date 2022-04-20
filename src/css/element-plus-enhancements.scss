@@ -435,6 +435,9 @@
                 margin: 0.25rem 0;
             }
         }
+        &.el-menu--inactivated {
+            --el-menu-active-color: var(--el-menu-text-color);
+        }
     }
     .el-menu-item .bi,
     .el-menu > .el-collapse .el-collapse-item__header .bi {
@@ -450,6 +453,15 @@
     }
     .el-menu > .el-collapse .el-collapse-item__header .bi {
         color: #909399;
+    }
+
+    .el-notification {
+        &.right {
+            right: calc(var(--ogr-sidebar-right-size, .5rem) + .5rem);
+        }
+        &.left {
+            left: calc(var(--ogr-sidebar-left-size, .5rem) + .5rem);
+        }
     }
 
     .el-radio-button { 

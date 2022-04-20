@@ -10,7 +10,7 @@ import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import workingFileStore from '@/store/working-file';
 import appEmitter from '@/lib/emitter';
-import { scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
+import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import { ApplyActiveSelectionAction } from '@/actions/apply-active-selection';
 import { ClearSelectionAction } from '@/actions/clear-selection';
 import { UpdateActiveSelectionAction } from '@/actions/update-active-selection';
@@ -65,7 +65,7 @@ export default class SelectionController extends BaseMovementController {
         if (!editorStore.state.tutorialFlags.selectionToolIntroduction) {
             waitForNoOverlays().then(() => {
                 let messageStart = `
-                    <p class="mb-3">The selection tool allows you to select specific parts of the image to restrict where editing occurs.</p>
+                    <p class="mb-3">The selection tool allows you to select specific parts of the image to restrict what editing affects.</p>
                 `;
                 let messageEnd = `
                     <p class="mb-3"><strong class="has-text-weight-bold"><span class="bi bi-square"></span> Selection Shape</strong> - What shape is used to draw the selection.<p>
@@ -99,6 +99,11 @@ export default class SelectionController extends BaseMovementController {
         }
         discardSelectedLayersSelectionMask();
         canvasStore.set('viewDirty', true);
+
+        // Tutorial Message
+        if (!editorStore.state.tutorialFlags.selectionToolIntroduction) {
+            dismissTutorialNotification('selectionToolIntroduction');
+        }
     }
 
     onMultiTouchDown() {

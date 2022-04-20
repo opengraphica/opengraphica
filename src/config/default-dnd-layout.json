@@ -1,19 +1,23 @@
 {
     "dndLayout": {
         "menuBar": {
-            "actionGroupLayout": {
-                "start": [
+            "layout": {
+                "docks": [
                     "settings",
                     "layers"
                 ],
-                "center": [
+                "tools": [
                     "view",
                     "transform",
                     "selection"
-                ],
-                "end": []
+                ]
             }
         },
-        "sidebarLeft": []
+        "dock": {
+            "layout": [
+                { "name": "settings", "ratio": 0.4 },
+                { "name": "layers", "ratio": 0.6 }
+            ]
+        }
     }
 }

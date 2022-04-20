@@ -1,5 +1,7 @@
 import appEmitter from '@/lib/emitter';
+import { NotificationHandle } from 'element-plus/lib/components/notification/src/notification.d';
 import editorStore, { TutorialFlags } from '@/store/editor';
+import preferencesStore from '@/store/preferences';
 
 interface TutorialNotification {
     flag: keyof TutorialFlags;
@@ -9,7 +11,8 @@ interface TutorialNotification {
 
 const tutorialNotificationStack: TutorialNotification[] = [];
 let notificationCanShowIntervalHandle: number | undefined = undefined;
-let isCurrentlyShowingTutorialNotification: boolean = false;
+let currentlyShowingTutorialNotification: string | null = null;
+let currentlyShowingTutorialNotificationHandle: NotificationHandle | null = null;
 
 export function waitForNoOverlays(): Promise<void> {
     return new Promise<void>((resolve) => {
@@ -24,8 +27,9 @@ export function waitForNoOverlays(): Promise<void> {
 }
 
 export function scheduleTutorialNotification(notification: TutorialNotification) {
+    if (!preferencesStore.state.showTutorialNotifications) return;
     tutorialNotificationStack.push(notification);
-    if (notificationCanShowIntervalHandle == null && !isCurrentlyShowingTutorialNotification) {
+    if (notificationCanShowIntervalHandle == null && !currentlyShowingTutorialNotification) {
         notificationCanShowIntervalHandle = window.setInterval(() => {
             const preventableElement = document.querySelector('.ogr-menu-drawers > .ogr-menu-drawer, .ogr-dialogs > .el-overlay');
             if (preventableElement == null) {
@@ -37,13 +41,26 @@ export function scheduleTutorialNotification(notification: TutorialNotification)
     }
 }
 
+export function dismissTutorialNotification(flag: keyof TutorialFlags) {
+    if (currentlyShowingTutorialNotification === flag && currentlyShowingTutorialNotificationHandle) {
+        currentlyShowingTutorialNotificationHandle.close();
+    } else {
+        for (const [i, tutorialNotification] of tutorialNotificationStack.entries()) {
+            if (tutorialNotification.flag === flag) {
+                tutorialNotificationStack.splice(i, 1);
+                return;
+            }
+        }
+    }
+}
+
 function showNextTutorialNotification() {
     const notification = tutorialNotificationStack.shift();
     if (notification) {
         if (editorStore.state.tutorialFlags[notification.flag]) {
             showNextTutorialNotification();
         } else {
-            isCurrentlyShowingTutorialNotification = true;
+            currentlyShowingTutorialNotification = notification.flag;
             let message = '';
             if (typeof notification.message === 'string') {
                 message = notification.message;
@@ -56,8 +73,12 @@ function showNextTutorialNotification() {
                 message,
                 dangerouslyUseHTMLString: true,
                 duration: 0,
+                onCreated(handle) {
+                    currentlyShowingTutorialNotificationHandle = handle;
+                },
                 onClose() {
-                    isCurrentlyShowingTutorialNotification = false;
+                    currentlyShowingTutorialNotification = null;
+                    currentlyShowingTutorialNotificationHandle = null;
                     editorStore.dispatch('addTutorialFlag', notification.flag);
                     showNextTutorialNotification();
                 }

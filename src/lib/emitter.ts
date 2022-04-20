@@ -1,5 +1,5 @@
 import mitt, { Handler } from 'mitt';
-import { NotificationProps } from 'element-plus/lib/components/notification/src/notification.d';
+import { NotificationProps, NotificationHandle } from 'element-plus/lib/components/notification/src/notification.d';
 import { CanvasViewResetOptions } from '@/types';
 
 interface AppEmitterEvents {
@@ -23,7 +23,7 @@ interface AppEmitterEvents {
         placement: 'top' | 'bottom' | 'left' | 'right';
         immediate?: boolean;
     },
-    'app.notify': Partial<NotificationProps>;
+    'app.notify': Partial<NotificationProps> & { onCreated?: (handle: NotificationHandle) => void; };
     'app.wait.startBlocking': {
         id: string;
         label?: string;

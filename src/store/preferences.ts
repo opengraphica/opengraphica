@@ -2,6 +2,8 @@ import { KeyboardMapConfigCategory } from '@/types';
 import { PerformantStore } from './performant-store';
 
 interface PreferencesState {
+    dockHideBreakpoint: number;
+    dockPosition: 'left' | 'right';
     dragStartRadius: number; // Pixels
     enableMultiLayerBuffer: boolean;
     historyStatesMax: number;
@@ -14,6 +16,7 @@ interface PreferencesState {
     pointerPressHoldTimeout: number;
     postProcessInterpolateImage: boolean;
     preferCanvasViewport: boolean;
+    showTutorialNotifications: boolean;
     showWelcomeScreenAtStart: boolean;
     snapSensitivity: number;
     touchRotation: 'on' | 'snap' | 'off';
@@ -27,6 +30,8 @@ interface PreferencesStore {
 
 const store = new PerformantStore<PreferencesStore>({
     state: {
+        dockHideBreakpoint: 1000,
+        dockPosition: 'right',
         dragStartRadius: 5,
         enableMultiLayerBuffer: false,
         historyStatesMax: 50,
@@ -39,12 +44,14 @@ const store = new PerformantStore<PreferencesStore>({
         pointerPressHoldTimeout: 500,
         postProcessInterpolateImage: true,
         preferCanvasViewport: false,
+        showTutorialNotifications: true,
         showWelcomeScreenAtStart: true,
         snapSensitivity: 5,
         touchRotation: 'off',
         useCanvasViewport: false
     },
     restore: [
+        'dockPosition',
         'dragStartRadius',
         'historyStatesMax',
         'menuBarPosition',
@@ -52,6 +59,7 @@ const store = new PerformantStore<PreferencesStore>({
         'multiTouchTapTimeout',
         'pointerTapTimeout',
         'pointerPressHoldTimeout',
+        'showTutorialNotifications',
         'showWelcomeScreenAtStart',
         'snapSensitivity',
         'touchRotation'

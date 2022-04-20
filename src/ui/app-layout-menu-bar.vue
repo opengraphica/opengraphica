@@ -10,9 +10,9 @@
         ]"
         @touchmove="onTouchMoveMenuBar($event)">
         <div ref="flexContainer" class="is-flex container mx-auto">
-            <div v-for="(actionGroupSection, actionGroupSectionName) of actionGroups" :key="actionGroupSectionName" class="ogr-menu-section my-2" :class="['ogr-menu-' + actionGroupSectionName, { 'px-3': actionGroupSectionName !== 'center' }]">
-                <span v-if="actionGroupSectionName === 'center'" class="ogr-menu-section__title">Tools</span>
-                <component :is="actionGroupSectionName === 'center' ? 'el-scrollbar' : 'v-fragment'">
+            <div v-for="(actionGroupSection, actionGroupSectionName) of actionGroups" :key="actionGroupSectionName" class="ogr-menu-section my-2" :class="['ogr-menu-' + actionGroupSectionName, { 'px-3': actionGroupSectionName !== 'tools' }]">
+                <span v-if="actionGroupSectionName === 'tools'" class="ogr-menu-section__title">Tools</span>
+                <component v-if="displayMode === 'all' || actionGroupSectionName === 'tools'" :is="actionGroupSectionName === 'tools' ? 'el-scrollbar' : 'v-fragment'">
                     <template v-for="actionGroup of actionGroupSection" :key="actionGroup.id">
                         <component :is="actionGroup.controls.length === 1 ? 'div' : 'el-button-group'" :class="{ 'ogr-single-button-group': actionGroup.controls.length === 1 }">
                             <template v-for="control of actionGroup.controls" :key="control.label">
@@ -71,6 +71,11 @@
                     </template>
                 </component>
             </div>
+            <div class="ogr-menu-end px-3" style="height: 0px; overflow: hidden; visibility: hidden;">
+                <el-button aria-hidden="true" circle round>
+                    <span class="el-icon" aria-hidden="true" />
+                </el-button>
+            </div>
         </div>
     </div>
 </template>
@@ -118,13 +123,14 @@ export default defineComponent({
             default: 'top'
         },
     },
-    setup(props, options) {
+    emit: ['resize'],
+    setup(props, { emit }) {
         const mobileWidth: number = 550;
 
         let activeControlDock: LayoutShortcutGroupDefinitionControlButton | null = null;
         let pendingActiveControlCall: IArguments | null = null;
         let flexContainer = ref<HTMLDivElement>();
-        let displayMode = ref<'all' | 'favorites'>('all');
+        let displayMode = ref<'all' | 'tools'>('all');
         let direction = ref<'horizontal' | 'vertical'>('horizontal');
         let showMoreActionsMenu = ref<boolean>(false);
         let showMoreActionsTooltip = ref<boolean>(false);
@@ -140,14 +146,15 @@ export default defineComponent({
         const { activeToolGroup, activeTool } = toRefs(editorStore.state);
 
         const actionGroups = ref<{ [key: string]: LayoutShortcutGroupDefinition[] }>(createActionGroups());
-        const allActionGroups = ref<{ [key: string]: LayoutShortcutGroupDefinition[] }>(createActionGroups('all'));
 
         const activeMenuDrawerComponentName = computed<string | null>(() => {
             return editorStore.state.activeMenuDrawerComponentName;
         });
 
+        watch([viewportWidth], () => {
+            toggleMobileView();
+        });
         watch([displayMode], () => {
-            actionGroups.value = createActionGroups();
             showMoreActionsMenu.value = false;
         });
         watch(() => props.layoutPlacement, (layoutPlacement) => {
@@ -165,7 +172,10 @@ export default defineComponent({
             window.addEventListener('mouseup', onMouseUpWindow);
             window.addEventListener('touchstart', onTouchStartWindow);
             window.addEventListener('touchend', onTouchEndWindow);
-            toggleMobileView();
+            
+            displayMode.value = viewportWidth.value > preferencesStore.state.dockHideBreakpoint ? 'tools' : 'all';
+
+            emit('resize');
         });
 
         onUnmounted(() => {
@@ -178,13 +188,8 @@ export default defineComponent({
         function toggleMobileView() {
             window.clearTimeout(resizeDebounceHandle);
             resizeDebounceHandle = window.setTimeout(async () => {
-                displayMode.value = 'all';
-                // await nextTick();
-                // const flexContainerEl = flexContainer.value;
-                // if (flexContainerEl && flexContainerEl.scrollWidth > flexContainerEl.clientWidth + 1) {
-                //     displayMode.value = 'favorites';
-                // }
-            }, 100);
+                displayMode.value = viewportWidth.value > preferencesStore.state.dockHideBreakpoint ? 'tools' : 'all';
+            }, 400);
         }
 
         function createActionGroups(forceDisplayMode?: string): { [key: string]: LayoutShortcutGroupDefinition[] } {
@@ -192,11 +197,11 @@ export default defineComponent({
             pendingActiveControlCall = null;
             forceDisplayMode = forceDisplayMode || displayMode.value;
             let actionGroups: { [key: string]: LayoutShortcutGroupDefinition[] } = {};
-            const sectionNames = (forceDisplayMode === 'all' ? ['start', 'center', 'end'] : ['favorites']) as ('start' | 'center' | 'end' | 'favorites')[];
+            const sectionNames = ['docks', 'tools'] as ('docks' | 'tools')[];
             for (let section of sectionNames) {
-                if (props.config.actionGroupLayout[section]) {
+                if (props.config.layout[section]) {
                     const sectionActionGroups: LayoutShortcutGroupDefinition[] = [];
-                    for (let tool of props.config.actionGroupLayout[section]) {
+                    for (let tool of props.config.layout[section] || []) {
                         const actionGroup = {
                             id: tool,
                             ...(actionGroupsDefinition as { [key: string]: LayoutShortcutGroupDefinition })[tool]
@@ -402,7 +407,6 @@ export default defineComponent({
             direction,
             flexContainer,
             actionGroups,
-            allActionGroups,
             activeToolGroup,
             activeTool,
             onAfterLeavePopover,

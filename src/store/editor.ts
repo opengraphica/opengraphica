@@ -1,5 +1,6 @@
 import { PerformantStore } from './performant-store';
 import BaseCanvasController from '@/canvas/controllers/base';
+import BaseCanvasMovementController from '@/canvas/controllers/base-movement';
 import toolGroupsConfig from '@/config/tool-groups.json';
 import { ToolGroupDefinition, WorkingFileLayer, WorkingFileGroupLayer, WorkingFileRasterSequenceLayer, ColorModel } from '@/types';
 import { loadStylesheet } from '@/lib/stylesheet';
@@ -29,6 +30,7 @@ interface EditorState {
     activeTool: string | null;
     activeToolGroup: string | null;
     activeToolGroupPrevious: string | null;
+    activeToolGroupRestore: string | null;
     activeToolPrevious: string | null;
     activeToolbar: string | null;
     activeToolbarPosition: 'top' | 'bottom';
@@ -55,7 +57,7 @@ interface EditorDispatch {
     scheduleTask: EditorDeferredTask,
     setActiveTheme: string;
     setActiveTool: {
-        tool?: string;
+        tool?: string | null;
         group: string;
     };
     setThemes: {
@@ -79,6 +81,7 @@ const store = new PerformantStore<EditorStore>({
         activeTool: null,
         activeToolGroup: null,
         activeToolGroupPrevious: null,
+        activeToolGroupRestore: null,
         activeToolPrevious: null,
         activeToolbar: null,
         activeToolbarPosition: 'top',
@@ -93,12 +96,12 @@ const store = new PerformantStore<EditorStore>({
         timelineEnd: 0,
         timelinePlayStartTime: 0,
         timelineStart: 0,
-        toolCanvasController: new BaseCanvasController(),
+        toolCanvasController: new BaseCanvasMovementController(),
         tutorialFlags: {},
         waiting: false
     },
     readOnly: ['activeTheme', 'activeTool', 'activeToolGroup', 'themes', 'timelineCursor'],
-    restore: ['isTouchUser', 'tutorialFlags'],
+    restore: ['activeToolGroupRestore', 'isTouchUser', 'tutorialFlags'],
     async onDispatch(actionName: string, value: any, set) {
         switch (actionName) {
             case 'addTutorialFlag':
@@ -181,6 +184,7 @@ const store = new PerformantStore<EditorStore>({
                     }
                     set('activeToolGroupPrevious', store.get('activeToolGroup'));
                     set('activeToolGroup', group);
+                    set('activeToolGroupRestore', group);
                     set('activeToolbar', activeToolbar);
                     set('isActiveToolbarExclusive', isActiveToolbarExclusive);
                     set('activeToolbarPosition', activeToolbarPosition as any);

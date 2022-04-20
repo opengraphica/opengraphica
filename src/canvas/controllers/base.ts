@@ -132,13 +132,14 @@ export default class BaseCanvasController {
     }
 
     onPointerMove(e: PointerEvent): void {
+        const devicePixelRatio = window.devicePixelRatio || 1;
         const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
         if (pointer) {
             pointer.movePrev = pointer.move;
             pointer.move = e;
             if (
-                Math.abs(pointer.down.pageX - pointer.move.pageX) >= this.dragStartRadius ||
-                Math.abs(pointer.down.pageY - pointer.move.pageY) >= this.dragStartRadius
+                Math.abs(pointer.down.pageX - pointer.move.pageX) >= this.dragStartRadius * devicePixelRatio ||
+                Math.abs(pointer.down.pageY - pointer.move.pageY) >= this.dragStartRadius * devicePixelRatio
             ) {
                 if (!pointer.isDragging) {
                     pointer.isDragging = true;

@@ -25,7 +25,10 @@ app.use(ElNotification);
 // Notification toasts
 app.provide('$notify', notifyPolyfill(app.config.globalProperties.$notify));
 appEmitter.on('app.notify', (options) => {
-    return notifyPolyfill(app.config.globalProperties.$notify)(options);
+    const instance = notifyPolyfill(app.config.globalProperties.$notify)(options);
+    if (options?.onCreated) {
+        options.onCreated(instance);
+    }
 })
 
 // Expose events

@@ -149,7 +149,7 @@
             {
                 "type": "button",
                 "icon": "bi bi-gear",
-                "label": "Canvas Settings",
+                "label": "Actions",
                 "action": {
                     "type": "dock",
                     "target": "settings"

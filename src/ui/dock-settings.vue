@@ -9,7 +9,7 @@
             </template>
             <template v-if="visitedTabs['file'] === true">
                 <el-scrollbar>
-                    <el-menu class="el-menu--medium el-menu--borderless mb-1" @select="onMenuSelect('file', $event)">
+                    <el-menu class="el-menu--medium el-menu--borderless el-menu--inactivated mb-1" @select="onMenuSelect('file', $event)">
                         <el-menu-item index="new">
                             <i class="bi bi-file-earmark-plus"></i>
                             <span>New</span>
@@ -48,7 +48,7 @@
             </template>
             <template v-if="visitedTabs['image'] === true">
                 <el-scrollbar>
-                    <el-menu class="el-menu--medium el-menu--borderless mb-1" @select="onMenuSelect('image', $event)">
+                    <el-menu class="el-menu--medium el-menu--borderless el-menu--inactivated mb-1" @select="onMenuSelect('image', $event)">
                         <el-menu-item index="cropResize">
                             <i class="bi bi-crop"></i>
                             <span>Crop and Resize</span>
@@ -243,6 +243,9 @@
                                 <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" label="Show Welcome Screen">
                                     <el-switch v-model="showWelcomeScreenAtStart" />
                                 </el-form-item>
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" label="Show Tips">
+                                    <el-switch v-model="showTutorialNotifications" />
+                                </el-form-item>
                                 <div class="px-4.5 pt-2">
                                     <el-button size="small" class="is-fullwidth" @click="onClickResetSttings">Reset Settings</el-button>
                                 </div>
@@ -318,7 +321,7 @@ export default defineComponent({
         'update:title'
     ],
     setup(props, { emit }) {
-        emit('update:title', 'Canvas Settings');
+        emit('update:title', 'Actions');
         const $notify = notifyInjector('$notify');
         const loading = ref<boolean>(false);
         const { actionStackIndex: historyActionStackIndex, canRedo, canUndo } = toRefs(historyStore.state);
@@ -490,6 +493,14 @@ export default defineComponent({
                 appEmitter.emit('app.canvas.resetTransform');
             }
         });
+        const showTutorialNotifications = computed<boolean>({
+            get() {
+                return preferencesStore.state.showTutorialNotifications;
+            },
+            set(value) {
+                preferencesStore.set('showTutorialNotifications', value);
+            }
+        });
         const showWelcomeScreenAtStart = computed<boolean>({
             get() {
                 return preferencesStore.state.showWelcomeScreenAtStart;
@@ -601,6 +612,7 @@ export default defineComponent({
             performanceFixLayerSeams,
             preferenceHighQualityScaling,
             preferenceMenuBarPosition,
+            showTutorialNotifications,
             showWelcomeScreenAtStart,
             onClickResetSttings,
             onMenuSelect

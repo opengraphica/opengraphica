@@ -1,25 +1,23 @@
 export interface DndLayoutMenuBar {
-    type: 'menuBar';
-    actionGroupLayout: {
-        start: string[];
-        center: string[];
-        end: string[];
-        favorites: string[];
+    layout: {
+        docks: string[];
+        tools: string[];
     }
 }
 
 export interface DndLayoutDock {
-    type: 'dock';
-    dockLayout: string[];
+    layout: {
+        name: string;
+        ratio: number;
+        title?: string;
+    }[];
 }
 
 export type DndLayoutComponent = DndLayoutMenuBar | DndLayoutDock;
 
 export interface DndLayout {
-    header?: DndLayoutMenuBar[];
-    footer?: DndLayoutMenuBar[];
-    sidebarLeft?: DndLayoutComponent[];
-    sidebarRight?: DndLayoutComponent[];
+    menuBar: DndLayoutMenuBar;
+    dock: DndLayoutDock;
 }
 
 export interface ActionGroupControlEventHandler {

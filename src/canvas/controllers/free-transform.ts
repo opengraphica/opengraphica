@@ -9,7 +9,7 @@ import preferencesStore from '@/store/preferences';
 import workingFileStore, { getLayerById } from '@/store/working-file';
 import { ColorModel, DrawWorkingFileOptions, UpdateAnyLayerOptions, WorkingFileLayer } from '@/types';
 import { DecomposedMatrix, decomposeMatrix } from '@/lib/dom-matrix';
-import { scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
+import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import { CreateNewLayersFromSelectionAction } from '@/actions/create-new-layers-from-selection';
 import { ClearSelectionAction } from '@/actions/clear-selection';
 import { SelectLayersAction } from '@/actions/select-layers';
@@ -131,6 +131,11 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         freeTransformEmitter.off('previewRotatioffChange', this.onPreviewRotationChange);
         freeTransformEmitter.off('previewDragResiffeChange', this.onPreviewDragResizeChange);
         freeTransformEmitter.off('commitTransforms', this.onCommitTransforms);
+
+        // Tutorial Message
+        if (!editorStore.state.tutorialFlags.freeTransformToolIntroduction) {
+            dismissTutorialNotification('freeTransformToolIntroduction');
+        }
     }
 
     onMultiTouchDown() {

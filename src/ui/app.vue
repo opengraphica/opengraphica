@@ -1,10 +1,11 @@
 <template>
     <div
         ref="root" class="opengraphica"
+        :style="{ '--ogr-sidebar-left-size': sidebarLeftSize + 'px', '--ogr-sidebar-right-size': sidebarRightSize + 'px' }"
         @touchstart="onTouchStartRoot($event)"
     >
         <app-canvas />
-        <app-layout-dnd-container @dnd-ready="onDndLayoutReady($event)" />
+        <app-layout-dnd-container @dnd-ready="onDndLayoutReady($event)" @resize="onResizeLayoutContainer($event)" />
         <app-menu-drawers />
         <app-dialogs />
         <app-wait />
@@ -43,6 +44,8 @@ export default defineComponent({
         const mainElement = ref<Element | null>(null);
         const showDndDropOverlay = ref<boolean>(false);
         const dndDropOverlay = ref<InstanceType<typeof AppDndDropOverlay>>();
+        const sidebarLeftSize = ref<number>(0);
+        const sidebarRightSize = ref<number>(0);
 
         onMounted(() => {
             appEmitter.emit('app.wait.startBlocking', { id: 'appInitialLoad', immediate: true });
@@ -193,12 +196,20 @@ export default defineComponent({
             mainElement.value = main;
         }
 
+        function onResizeLayoutContainer({ sidebarLeftSize: newSidebarLeftSize, sidebarRightSize: newSidebarRightSize }: any) {
+            sidebarLeftSize.value = newSidebarLeftSize;
+            sidebarRightSize.value = newSidebarRightSize;
+        }
+
         provide('rootElement', rootElement);
         provide('mainElement', mainElement);
 
         return {
             root: rootElement,
+            sidebarLeftSize,
+            sidebarRightSize,
             onDndLayoutReady,
+            onResizeLayoutContainer,
             showDndDropOverlay,
             dndDropOverlay,
             onTouchStartRoot

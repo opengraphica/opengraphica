@@ -360,14 +360,19 @@ body.ogr-full-page {
             display: flex;
             flex-direction: row;
             flex-grow: 1;
+            max-height: 100%;
     
             > .sidebar-left {
+                display: flex;
                 flex-grow: 0;
                 touch-action: pan-y;
+                max-height: 100%;
             }
             > .sidebar-right {
+                display: flex;
                 flex-grow: 0;
                 touch-action: pan-y;
+                max-height: 100%;
             }
             > main {
                 flex-grow: 1;
@@ -404,6 +409,58 @@ body.ogr-full-page {
             flex-grow: 0;     
             touch-action: none;   
         }
+    }
+
+    .ogr-layout-dock {
+        position: relative;
+        margin: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        height: calc(100% - 1rem);
+        z-index: 4;
+
+        .ogr-layout-dock__container {
+            background: var(--ogr-layout-menu-bar-background-color);
+            box-shadow: 0 0 0px 1px var(--ogr-layout-menu-bar-border-color), 0 0.3rem 2rem var(--ogr-layout-menu-bar-border-color);
+            border-radius: 1rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+
+            > .ogr-dock-title {
+                padding: 0.75rem 1rem 0.35rem 1rem;
+                text-align: center;
+                flex-shrink: 1;
+            }
+
+            > .ogr-dock {
+                flex-grow: 1;
+                overflow: hidden;
+
+                > .el-tabs {
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+
+                    > .el-tabs__header {
+                        flex-shrink: 1;
+                    }
+
+                    > .el-tabs__content {
+                        flex-grow: 1;
+
+                        > .el-tab-pane {
+                            height: 100%;
+                        }
+                    }
+                }
+            }
+
+            + .ogr-layout-dock__container {
+                margin-top: .5rem;
+            }
+        }
+
     }
 
     @keyframes ogr-menu-drawers-fade-in {
@@ -703,14 +760,14 @@ body.ogr-full-page {
                 display: flex;
             }
 
-            > .ogr-menu-start, > .ogr-menu-end {
+            > .ogr-menu-docks, > .ogr-menu-end {
                 flex: 1;
                 display: flex;
                 justify-content: flex-start;
                 min-width: -webkit-min-content; /* Workaround to Chrome bug */
             }
 
-            > .ogr-menu-center {
+            > .ogr-menu-tools {
                 flex-shrink: 1;
                 flex-grow: 0;
                 display: flex;
@@ -772,13 +829,13 @@ body.ogr-full-page {
                 flex-direction: column;
                 height: calc(100% - 1rem);
 
-                > .ogr-menu-start {
+                > .ogr-menu-docks {
                     justify-content: flex-start;
                 }
                 > .ogr-menu-end {
                     justify-content: flex-end;
                 }
-                > .ogr-menu-center {
+                > .ogr-menu-tools {
                     > .el-scrollbar {
                         width: 100%;
 
@@ -789,7 +846,7 @@ body.ogr-full-page {
                         }
                     }
                 }
-                > .ogr-menu-start, > .ogr-menu-center, > .ogr-menu-end {
+                > .ogr-menu-docks, > .ogr-menu-tools, > .ogr-menu-end {
                     align-items: center;
                     flex-direction: column;
                 }
@@ -882,6 +939,17 @@ body.ogr-full-page {
         }
     }
 
+    @keyframes ogr-toolbar-overlay-fade-out {
+        0% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(50%);
+        }
+    }
+
     .ogr-toolbar {
         display: block;
         position: relative;
@@ -897,10 +965,18 @@ body.ogr-full-page {
             box-shadow: none;
             position: absolute;
             width: auto;
-            left: .5rem;
-            right: .5rem;
+            left: #{"max(.5rem, var(--ogr-sidebar-left-size, .5rem))"};
+            right: #{"max(.5rem, var(--ogr-sidebar-right-size, .5rem))"};
             transition: none;
             animation: ogr-toolbar-overlay-fade-in 0.2s ease-in forwards;
+
+            &.is-swap-out {
+                animation: ogr-toolbar-overlay-fade-out 0.2s ease-in forwards;
+            }
+
+            &.is-swap-in {
+                animation: ogr-toolbar-overlay-fade-in 0.2s ease-in forwards;
+            }
 
             .ogr-toolbar-overlay {
                 background: var(--ogr-layout-menu-bar-background-color);
@@ -956,12 +1032,12 @@ body.ogr-full-page {
                 }
             }
 
-            &.is-menu-bar-left {
-                left: 5rem;
-            }
-            &.is-menu-bar-right {
-                right: 5rem;
-            }
+            // &.is-menu-bar-left {
+            //     left: 5rem;
+            // }
+            // &.is-menu-bar-right {
+            //     right: 5rem;
+            // }
             &.is-menu-bar-bottom {
                 bottom: 3rem;
                 .ogr-toolbar-overlay {

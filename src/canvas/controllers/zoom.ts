@@ -2,7 +2,7 @@ import { watch, WatchStopHandle } from 'vue';
 import { isCtrlOrMetaKeyPressed } from '@/lib/keyboard';
 import { PointerTracker } from './base';
 import BaseCanvasMovementController from './base-movement';
-import { scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
+import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 
@@ -48,6 +48,11 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         if (this.ctrlKeyUnwatch) {
             this.ctrlKeyUnwatch();
             this.ctrlKeyUnwatch = null;
+        }
+
+        // Tutorial Message
+        if (!editorStore.state.tutorialFlags.zoomToolIntroduction) {
+            dismissTutorialNotification('zoomToolIntroduction');
         }
     }
 

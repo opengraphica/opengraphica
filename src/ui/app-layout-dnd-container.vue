@@ -1,16 +1,22 @@
 <template>
-    <div ref="dndContainer" class="ogr-layout-dnd-container">
+    <div
+        ref="dndContainer" class="ogr-layout-dnd-container"
+        :style="{ '--ogr-sidebar-left-size': sidebarLeftSize + 'px', '--ogr-sidebar-right-size': sidebarRightSize + 'px' }"
+    >
         <header ref="header">
             <h1 class="is-sr-only">OpenGraphica</h1>
             <template v-if="!isActiveToolbarExclusive && config.menuBar && menuBarPosition === 'top'">
-                <app-layout-menu-bar :config="config.menuBar" layout-placement="top" />
+                <app-layout-menu-bar :config="config.menuBar" layout-placement="top" @resize="onResizeLayout" />
             </template>
             <toolbar v-if="activeToolbar && activeToolbarPosition === 'top'" :name="activeToolbar" :class="['is-top', { 'is-overlay': !isActiveToolbarExclusive }]" />
         </header>
         <div class="ogr-layout-dnd-center">
             <aside aria-label="Left Sidebar" class="sidebar-left" ref="sidebarLeft">
                 <template v-if="!isActiveToolbarExclusive && config.menuBar && menuBarPosition === 'left'">
-                    <app-layout-menu-bar :config="config.menuBar" layout-placement="left" />
+                    <app-layout-menu-bar :config="config.menuBar" layout-placement="left" @resize="onResizeLayout" />
+                </template>
+                <template v-if="showDock && !isActiveToolbarExclusive && config.dock && dockPosition === 'left'">
+                    <app-layout-dock :config="config.dock" layout-placement="left"  @resize="onResizeLayout" />
                 </template>
             </aside>
             <main ref="main"
@@ -22,20 +28,24 @@
                 @wheel="onWheelMain"
             />
             <aside aria-label="Right Sidebar" class="sidebar-right" ref="sidebarRight">
+                <template v-if="showDock && !isActiveToolbarExclusive && config.dock && dockPosition === 'right'">
+                    <app-layout-dock :config="config.dock" layout-placement="right" @resize="onResizeLayout" />
+                </template>
                 <template v-if="!isActiveToolbarExclusive && config.menuBar && menuBarPosition === 'right'">
-                    <app-layout-menu-bar :config="config.menuBar" layout-placement="right" />
+                    <app-layout-menu-bar :config="config.menuBar" layout-placement="right"  @resize="onResizeLayout" />
                 </template>
             </aside>
         </div>
         <footer ref="footer">
             <toolbar ref="toolbar" v-if="activeToolbar && ['bottom', 'auto'].includes(activeToolbarPosition)" :name="activeToolbar" :class="['is-bottom', 'is-menu-bar-' + menuBarPosition, { 'is-overlay': !isActiveToolbarExclusive }]" />
-            <app-layout-menu-bar v-if="!isActiveToolbarExclusive && config.menuBar && menuBarPosition === 'bottom'" :config="config.menuBar" layout-placement="bottom" />
+            <app-layout-menu-bar v-if="!isActiveToolbarExclusive && config.menuBar && menuBarPosition === 'bottom'" :config="config.menuBar" layout-placement="bottom"  @resize="onResizeLayout" />
         </footer>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, Ref, toRefs, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
+import AppLayoutDock from '@/ui/app-layout-dock.vue';
 import AppLayoutMenuBar from '@/ui/app-layout-menu-bar.vue';
 import Toolbar from '@/ui/toolbar.vue';
 import defaultDndLayoutConfig from '@/config/default-dnd-layout.json';
@@ -51,17 +61,23 @@ import preferencesStore from '@/store/preferences';
 export default defineComponent({
     name: 'AppLayoutDndContainer',
     components: {
+        AppLayoutDock,
         AppLayoutMenuBar,
         Toolbar
     },
-    emits: ['dnd-ready'],
+    emits: ['dnd-ready', 'resize'],
     setup(props, { emit }) {
         const dndContainerElement = ref<Element>();
         const mainElement = ref<Element>();
+        const sidebarLeftElement = ref<Element>();
+        const sidebarRightElement = ref<Element>();
         const toolbarComponent = ref<InstanceType<typeof Toolbar>>();
         const config = ref<DndLayout>(defaultDndLayoutConfig.dndLayout as DndLayout);
         const isPointerInsideMain = ref<boolean>(false);
         const isPointerEventsSupported: boolean = 'onpointerdown' in document.body;
+        const sidebarLeftSize = ref<number>(0);
+        const sidebarRightSize = ref<number>(0);
+        const showDock = ref<boolean>(true);
 
         const { viewWidth, viewHeight } = toRefs(canvasStore.state);
 
@@ -70,6 +86,9 @@ export default defineComponent({
         });
         const activeToolbarPosition = computed<string>(() => {
             return editorStore.state.activeToolbarPosition;
+        });
+        const dockPosition = computed<string>(() => {
+            return preferencesStore.state.dockPosition;
         });
         const isActiveToolbarExclusive = computed<boolean>(() => {
             return editorStore.state.isActiveToolbarExclusive;
@@ -81,16 +100,23 @@ export default defineComponent({
             return preferencesStore.state.menuBarPosition;
         });
 
-        let storeDndAreaDebounceHandle: number | undefined = undefined;
+        let resizeDebounceHandle: number | undefined = undefined;
         watch([viewWidth, viewHeight, menuBarPosition, activeToolbar], () => {
-            clearTimeout(storeDndAreaDebounceHandle);
-            storeDndAreaDebounceHandle = window.setTimeout(() => {
+            clearTimeout(resizeDebounceHandle);
+            resizeDebounceHandle = window.setTimeout(async () => {
+                showDock.value = viewWidth.value > preferencesStore.state.dockHideBreakpoint;
+                await nextTick();
                 calculateDndArea();
+                onResizeLayout();
             }, 400);
         });
 
         onMounted(async () => {
-            editorStore.dispatch('setActiveTool', { group: 'view' });
+            if (editorStore.state.activeToolGroupRestore) {
+                editorStore.dispatch('setActiveTool', { group: editorStore.state.activeToolGroupRestore });
+            }
+
+            showDock.value = viewWidth.value > preferencesStore.state.dockHideBreakpoint;
 
             appEmitter.on('app.canvas.calculateDndArea', calculateDndArea);
             window.addEventListener('touchmove', onTouchMoveWindow);
@@ -187,20 +213,33 @@ export default defineComponent({
             }
         };
 
+        function onResizeLayout() {
+            sidebarLeftSize.value = sidebarLeftElement.value?.clientWidth || 0;
+            sidebarRightSize.value = sidebarRightElement.value?.clientWidth || 0;
+            emit('resize', { sidebarLeftSize: sidebarLeftSize.value, sidebarRightSize: sidebarRightSize.value });
+        }
+
         return {
             dndContainer: dndContainerElement,
             main: mainElement,
+            sidebarLeft: sidebarLeftElement,
+            sidebarLeftSize,
+            sidebarRightSize,
+            sidebarRight: sidebarRightElement,
+            showDock,
             toolbar: toolbarComponent,
             config,
             canvasState: canvasStore.state,
             activeToolbar,
             activeToolbarPosition,
+            dockPosition,
             isCanvasInteractable,
             isActiveToolbarExclusive,
             isPointerInsideMain,
             menuBarPosition,
             onPointerDownMain,
             onTouchStartMain,
+            onResizeLayout,
             onWheelMain
         };
     }
