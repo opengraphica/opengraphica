@@ -43,8 +43,13 @@ export interface SerializedFileLayer<T extends ColorModel> {
     width: number;
 }
 
+export interface SerializedFileEmptyLayer<T extends ColorModel> extends SerializedFileLayer<T> {
+    type: 'empty';
+}
+
 export interface SerializedFileGroupLayer<T extends ColorModel> extends SerializedFileLayer<T> {
     type: 'group';
+    expanded: boolean;
     layers: SerializedFileLayer<T>[];
 }
 
@@ -120,6 +125,10 @@ export interface SerializedFileTextLayer<T extends ColorModel> extends Serialize
 export interface SerializedFile<T extends ColorModel> {
     version: string;
     date: string;
+    background: {
+        visible: boolean;
+        color: T;
+    };
     colorModel: ColorModelName;
     colorSpace: string;
     drawOriginX: number;

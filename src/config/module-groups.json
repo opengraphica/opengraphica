@@ -1,19 +1,19 @@
 {
     "file": {
-        "name": "File Management",
-        "description": "Load and save images to your device.",
+        "name": "moduleGroup.file.name",
+        "description": "moduleGroup.file.description",
         "modules": {
             "new": {
-                "name": "New Image",
-                "description": "Create a new image with specified dimensions.",
+                "name": "moduleGroup.file.modules.new.name",
+                "description": "moduleGroup.file.modules.new.description",
                 "action": {
                     "type": "ui",
                     "target": "file-new"
                 }
             },
             "open": {
-                "name": "Open Image",
-                "description": "Open an image or project file in a new workspace.",
+                "name": "moduleGroup.file.modules.open.name",
+                "description": "moduleGroup.file.modules.open.description",
                 "action": {
                     "type": "function",
                     "target": "file/open.openFromFileDialog"
@@ -22,24 +22,24 @@
                 "cancelable": true
             },
             "export": {
-                "name": "Export Image",
-                "description": "Save the image in a universal format that can be opened by other editors.",
+                "name": "moduleGroup.file.modules.export.name",
+                "description": "moduleGroup.file.modules.export.description",
                 "action": {
                     "type": "ui",
                     "target": "file-export"
                 }
             },
             "saveAs": {
-                "name": "Save Image As",
-                "description": "Saves the image in a project format that can be re-opened by OpenGraphica without losing any information.",
+                "name": "moduleGroup.file.modules.saveAs.name",
+                "description": "moduleGroup.file.modules.saveAs.description",
                 "action": {
                     "type": "ui",
                     "target": "file-save-as"
                 }
             },
             "insertPhoto": {
-                "name": "Insert a Photo",
-                "description": "Add a photo as a new layer in the currently opened image.",
+                "name": "moduleGroup.file.modules.insertPhoto.name",
+                "description": "moduleGroup.file.modules.insertPhoto.description",
                 "action": {
                     "type": "function",
                     "target": "file/open.insertFromFileDialog"
@@ -47,24 +47,24 @@
                 "cancelable": true
             },
             "takePhoto": {
-                "name": "Take a Photo",
-                "description": "Take a photo from your camera and webcam and insert it into the image.",
+                "name": "moduleGroup.file.modules.takePhoto.name",
+                "description": "moduleGroup.file.modules.takePhoto.description",
                 "action": {
                     "type": "ui",
                     "target": "file-take-photo"
                 }
             },
             "quickSave": {
-                "name": "Quick Save",
-                "description": "Saves the current file to temporary storage.",
+                "name": "moduleGroup.file.modules.quickSave.name",
+                "description": "moduleGroup.file.modules.quickSave.description",
                 "action": {
                     "type": "function",
                     "target": "file/save.saveImageToTemporaryStorage"
                 }
             },
             "quickLoad": {
-                "name": "Quick Load",
-                "description": "Load the file saved by quick save.",
+                "name": "moduleGroup.file.modules.quickLoad.name",
+                "description": "moduleGroup.file.modules.quickLoad.description",
                 "action": {
                     "type": "function",
                     "target": "file/open.openFromTemporaryStorage"
@@ -73,20 +73,20 @@
         }
     },
     "history": {
-        "name": "Edit History",
-        "description": "Operations that control moving through the image edit history.",
+        "name": "moduleGroup.history.name",
+        "description": "moduleGroup.history.description",
         "modules": {
             "redo": {
-                "name": "History Redo",
-                "description": "Redo the last undone action.",
+                "name": "moduleGroup.history.modules.redo.name",
+                "description": "moduleGroup.history.modules.redo.description",
                 "action": {
                     "type": "function",
                     "target": "history/tracking.redo"
                 }
             },
             "undo": {
-                "name": "History Undo",
-                "description": "Undo the last action.",
+                "name": "moduleGroup.history.modules.undo.name",
+                "description": "moduleGroup.history.modules.undo.description",
                 "action": {
                     "type": "function",
                     "target": "history/tracking.undo"
@@ -95,20 +95,20 @@
         }
     },
     "image": {
-        "name": "Image Canvas",
-        "description": "Operations that affect the image canvas.",
+        "name": "ImoduleGroup.image.name",
+        "description": "moduleGroup.image.description",
         "modules": {
             "convertLayersToImageSequence": {
-                "name": "Convert Layers to Image Sequence",
-                "description": "Converts the selected layers to an image sequence layer (animation).",
+                "name": "moduleGroup.image.modules.convertLayersToImageSequence.name",
+                "description": "moduleGroup.image.modules.convertLayersToImageSequence.description",
                 "action": {
                     "type": "ui",
                     "target": "image-convert-layers-to-image-sequence"
                 }
             },
             "copyAll": {
-                "name": "Copy All Layers",
-                "description": "Copy all layers on the canvas as a PNG image to the clipboard.",
+                "name": "moduleGroup.image.modules.copyAll.name",
+                "description": "moduleGroup.image.modules.copyAll.description",
                 "action": {
                     "type": "function",
                     "target": "image/copy.copyAllLayers"
@@ -117,12 +117,12 @@
         }
     },
     "tutorial": {
-        "name": "Tutorials",
-        "description": "Learn how to use OpenGraphica.",
+        "name": "moduleGroup.tutorial.name",
+        "description": "moduleGroup.tutorial.description",
         "modules": {
             "welcome": {
-                "name": "Welcome",
-                "description": "Start working on an image.",
+                "name": "moduleGroup.tutorial.modules.welcome.name",
+                "description": "moduleGroup.tutorial.modules.welcome.description",
                 "action": {
                     "type": "ui",
                     "target": "tutorial-welcome"
@@ -131,12 +131,12 @@
         }
     },
     "tmp": {
-        "name": "Temporary Modules",
-        "description": "Modules that will only stick around during initial development.",
+        "name": "moduleGroup.tmp.name",
+        "description": "moduleGroup.tmp.description",
         "modules": {
             "notYetImplemented": {
-                "name": "Not Yet Implemented",
-                "description": "Show a warning.",
+                "name": "moduleGroup.tmp.modules.notYetImplemented.name",
+                "description": "moduleGroup.tmp.modules.notYetImplemented.description",
                 "action": {
                     "type": "function",
                     "target": "tmp/not-yet-implemented.notYetImplemented"

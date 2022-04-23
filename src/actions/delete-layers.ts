@@ -17,7 +17,7 @@ export class DeleteLayersAction extends BaseAction {
     private selectLayersAction: SelectLayersAction | null = null;
 
     constructor(layerIds: number[]) {
-        super('insertLayer', 'Delete Layers');
+        super('deleteLayers', 'action.deleteLayers');
         this.deleteLayerIds = layerIds;
 	}
 	public async do() {
@@ -33,8 +33,8 @@ export class DeleteLayersAction extends BaseAction {
             const layer = getLayerById(layerId);
             if (layer) {
                 let parentList = layers;
-                if (layer.groupId) {
-                    parentList = getGroupLayerById(layer.groupId)?.layers || layers;
+                if (layer.groupId != null) {
+                    parentList = getGroupLayerById(layer.groupId, layers)?.layers || layers;
                 }
                 let parentListIndex = parentList.indexOf(layer);
                 if (parentListIndex > -1) {
@@ -61,7 +61,7 @@ export class DeleteLayersAction extends BaseAction {
         for (let deletedLayerInfo of this.deletedLayers) {
             const layer = deletedLayerInfo.layer;
             let parentList = layers;
-            if (layer.groupId) {
+            if (layer.groupId != null) {
                 parentList = getGroupLayerById(layer.groupId)?.layers || layers;
             }
             parentList.splice(deletedLayerInfo.parentIndex, 0, layer);

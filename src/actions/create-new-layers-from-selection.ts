@@ -24,7 +24,7 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
     private selectLayersAction: SelectLayersAction | null = null;
 
     constructor(options: CreateNewLayersFromSelectionOptions = {}) {
-        super('createNewLayersFromSelection', 'Create Layers From Selection');
+        super('createNewLayersFromSelection', 'action.createNewLayersFromSelection');
         if (options.clearSelection) {
             this.clearSelection = options.clearSelection;
         }
@@ -69,6 +69,8 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
             }
             ctx.imageSmoothingEnabled = false;
 
+            const decomposedTransform = canvasStore.get('decomposedTransform');
+
             // Create new layer for each of the selected layers.
             for (let layer of selectedLayers) {
                 if (['raster', 'rasterSequence'].includes(layer.type)) {
@@ -79,9 +81,9 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
                     const transform = getLayerGlobalTransform(layer);
                     ctx.transform(transform.a, transform.b, transform.c, transform.d, transform.e, transform.f);
                     if (layer.type === 'raster') {
-                        renderers.raster.draw(ctx, layer as WorkingFileRasterLayer<ColorModel>);
+                        renderers.raster.draw(ctx, layer as WorkingFileRasterLayer<ColorModel>, decomposedTransform);
                     } else {
-                        renderers.rasterSequence.draw(ctx, layer as WorkingFileRasterSequenceLayer<ColorModel>);
+                        renderers.rasterSequence.draw(ctx, layer as WorkingFileRasterSequenceLayer<ColorModel>, decomposedTransform);
                     }
                     ctx.restore();
                     ctx.globalCompositeOperation = 'destination-in';
@@ -152,7 +154,7 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
         this.freeEstimates.memory = 0;
         this.freeEstimates.database = 0;
 
-        for (const insertLayerAction of this.insertLayerActions.reverse()) {
+        for (const insertLayerAction of this.insertLayerActions.slice().reverse()) {
             await insertLayerAction.undo();
             this.freeEstimates.memory += insertLayerAction.freeEstimates.memory;
             this.freeEstimates.database += insertLayerAction.freeEstimates.database;

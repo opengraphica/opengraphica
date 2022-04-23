@@ -10,13 +10,13 @@
         hide-required-asterisk
         @submit="onSave">
         <el-form-item-group>
-            <el-form-item label="Frame Delay" prop="frameDelay">
+            <el-form-item :label="$t('module.imageConvertLayersToImageSequence.frameDelay')" prop="frameDelay">
                 <el-input-number v-model="formData.frameDelay" :min="0.001" suffix-text="ms"></el-input-number>
             </el-form-item>
         </el-form-item-group>
         <div class="has-text-right">
-            <el-button @click="onCancel">Cancel</el-button>
-            <el-button type="primary" native-type="submit">Convert</el-button>
+            <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
+            <el-button type="primary" native-type="submit">{{ $t('button.convert') }}</el-button>
         </div>
     </el-form>
 </template>
@@ -35,7 +35,7 @@ import { convertLayersToImageSequence } from '@/modules/image/conversion';
 import { knownFileExtensions } from '@/lib/regex';
 
 export default defineComponent({
-    name: 'ModuleFileSaveAs',
+    name: 'ModuleImageConvertLayersToImageSequence',
     directives: {
         loading: ElLoading.directive
     },
@@ -51,7 +51,7 @@ export default defineComponent({
         'close'
     ],
     setup(props, { emit }) {
-        emit('update:title', 'Convert Layers to Image Sequence');
+        emit('update:title', 'module.imageConvertLayersToImageSequence.title');
 
         const $notify = notifyInjector('$notify');
         const form = ref<typeof ElForm>();

@@ -1,7 +1,9 @@
 import { ColorModel } from './color';
 import { VectorShape } from './vector';
+import { DecomposedMatrix } from '@/lib/dom-matrix';
 
 export interface DrawWorkingFileLayerOptions {
+    isEditorPreview?: boolean;
     selectedLayersOnly?: boolean;
     visible?: boolean;
     selectionTest?: {
@@ -12,6 +14,7 @@ export interface DrawWorkingFileLayerOptions {
 }
 
 export interface DrawWorkingFileOptions {
+    isEditorPreview?: boolean;
     selectedLayersOnly?: boolean;
     initialTransform?: DOMMatrix;
     selectionTest?: {
@@ -26,14 +29,14 @@ export type WorkingFileLayerBlendingMode = 'color' | 'color-burn' | 'color-dodge
     'difference' | 'exclusion' | 'hard-light' | 'hue' | 'lighten' | 'lighter' | 'luminosity' | 
     'multiply' | 'overlay' | 'saturation' | 'screen' | 'soft-light' | 'source-atop' | 'source-in' | 
     'source-out' | 'source-over' | 'xor';
-export type WorkingFileLayerType = 'group' | 'raster' | 'rasterSequence' | 'vector' | 'text';
+export type WorkingFileLayerType = 'empty' | 'group' | 'raster' | 'rasterSequence' | 'vector' | 'text';
 
 export interface WorkingFileLayerFilter<T extends ColorModel> {
     name: string;
 }
 
 export interface WorkingFileLayerRenderer<T extends ColorModel> {
-    draw(ctx: CanvasRenderingContext2D, layer: WorkingFileLayer<T>, options?: DrawWorkingFileLayerOptions): void;
+    draw(ctx: CanvasRenderingContext2D, layer: WorkingFileLayer<T>, decomposedTransform: DecomposedMatrix, options?: DrawWorkingFileLayerOptions): void;
 }
 
 export interface WorkingFileTimelineKey {
@@ -77,6 +80,10 @@ export interface WorkingFileLayer<T extends ColorModel> {
     type: WorkingFileLayerType;
     visible: boolean;
     width: number;
+}
+
+export interface WorkingFileEmptyLayer<T extends ColorModel> extends WorkingFileLayer<T> {
+    type: 'empty';
 }
 
 export interface WorkingFileGroupLayer<T extends ColorModel> extends WorkingFileLayer<T> {
@@ -158,8 +165,11 @@ export interface WorkingFileTextLayer<T extends ColorModel> extends WorkingFileL
     }
 }
 
-export type WorkingFileAnyLayer<T extends ColorModel> = WorkingFileGroupLayer<T> | WorkingFileRasterLayer<T> | WorkingFileRasterSequenceLayer<T> | WorkingFileVectorLayer<T> | WorkingFileTextLayer<T>;
+export type WorkingFileAnyLayer<T extends ColorModel> = WorkingFileEmptyLayer<T> | WorkingFileGroupLayer<T> | WorkingFileRasterLayer<T> | WorkingFileRasterSequenceLayer<T> | WorkingFileVectorLayer<T> | WorkingFileTextLayer<T>;
 
+export interface InsertEmptyLayerOptions<T extends ColorModel> extends Partial<WorkingFileEmptyLayer<T>> {
+    type: 'empty';
+}
 export interface InsertGroupLayerOptions<T extends ColorModel> extends Partial<WorkingFileGroupLayer<T>> {
     type: 'group';
 }
@@ -175,8 +185,11 @@ export interface InsertVectorLayerOptions<T extends ColorModel> extends Partial<
 export interface InsertTextLayerOptions<T extends ColorModel> extends Partial<WorkingFileTextLayer<T>> {
     type: 'text';
 }
-export type InsertAnyLayerOptions<T extends ColorModel> = InsertGroupLayerOptions<T> | InsertRasterLayerOptions<T> | InsertRasterSequenceLayerOptions<T> | InsertVectorLayerOptions<T> | InsertTextLayerOptions<T>;
+export type InsertAnyLayerOptions<T extends ColorModel> = InsertEmptyLayerOptions<T> | InsertGroupLayerOptions<T> | InsertRasterLayerOptions<T> | InsertRasterSequenceLayerOptions<T> | InsertVectorLayerOptions<T> | InsertTextLayerOptions<T>;
 
+export interface UpdateEmptyLayerOptions<T extends ColorModel> extends Partial<WorkingFileEmptyLayer<T>> {
+    id: number;
+}
 export interface UpdateGroupLayerOptions<T extends ColorModel> extends Partial<WorkingFileGroupLayer<T>> {
     id: number;
 }
@@ -192,7 +205,7 @@ export interface UpdateVectorLayerOptions<T extends ColorModel> extends Partial<
 export interface UpdateTextLayerOptions<T extends ColorModel> extends Partial<WorkingFileTextLayer<T>> {
     id: number;
 }
-export type UpdateAnyLayerOptions<T extends ColorModel> = UpdateGroupLayerOptions<T> | UpdateRasterLayerOptions<T> | UpdateRasterSequenceLayerOptions<T> | UpdateVectorLayerOptions<T> | UpdateTextLayerOptions<T>;
+export type UpdateAnyLayerOptions<T extends ColorModel> = UpdateEmptyLayerOptions<T> | UpdateGroupLayerOptions<T> | UpdateRasterLayerOptions<T> | UpdateRasterSequenceLayerOptions<T> | UpdateVectorLayerOptions<T> | UpdateTextLayerOptions<T>;
 
 export interface NewFilePreset {
     name: string,

@@ -26,7 +26,7 @@ export class ApplyActiveSelectionAction extends BaseAction {
     private oldSelectionCombineMode: SelectionCombineMode | null = null;
 
     constructor(activeSelectionPathOverride: Array<SelectionPathPoint> = activeSelectionPath.value, options: { doNotClearActiveSelection?: boolean } = {}) {
-        super('applyActiveSelection', 'Apply Active Selection');
+        super('applyActiveSelection', 'action.applyActiveSelection');
         this.activeSelectionPath = activeSelectionPathOverride;
         this.drawMargin = selectionMaskDrawMargin.value;
         this.doNotClearActiveSelection = options.doNotClearActiveSelection || false;

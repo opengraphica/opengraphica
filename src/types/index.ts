@@ -12,7 +12,7 @@ export { KeyboardMapConfigAction, KeyboardMapConfigCategory } from './keyboard-m
 export { MeasuringUnits, ResolutionUnits } from './metrics';
 export {
     SerializedFileTimeline, SerializedFileTimelineTrack, SerializedFileLayerTimelineFrame, SerializedFileTimelineKey,
-    SerializedFile, SerializedFileGroupLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileVectorLayer,
+    SerializedFile, SerializedFileEmptyLayer, SerializedFileGroupLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileVectorLayer,
     SerializedFileTextLayerSpanMeta, SerializedFileTextLayerSpan, SerializedFileTextLayerLine,
     SerializedFileTextLayer, SerializedFileLayer
 } from './serialized-file';
@@ -27,10 +27,10 @@ export {
 } from './vector';
 export {
     DrawWorkingFileLayerOptions, DrawWorkingFileOptions,
-    NewFilePreset, WorkingFileLayer, WorkingFileLayerBlendingMode, WorkingFileLayerType, WorkingFileLayerRenderer, WorkingFileGroupLayer,
+    NewFilePreset, WorkingFileLayer, WorkingFileLayerBlendingMode, WorkingFileLayerType, WorkingFileLayerRenderer, WorkingFileEmptyLayer, WorkingFileGroupLayer,
     WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer, WorkingFileRasterSequenceLayerFrame,
     WorkingFileTextLayerSpanMeta, WorkingFileTextLayerSpan, WorkingFileTextLayerLine,
-    InsertGroupLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions, InsertVectorLayerOptions, InsertTextLayerOptions, InsertAnyLayerOptions,
-    UpdateGroupLayerOptions, UpdateRasterLayerOptions, UpdateRasterSequenceLayerOptions, UpdateVectorLayerOptions, UpdateTextLayerOptions, UpdateAnyLayerOptions,
+    InsertEmptyLayerOptions, InsertGroupLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions, InsertVectorLayerOptions, InsertTextLayerOptions, InsertAnyLayerOptions,
+    UpdateEmptyLayerOptions, UpdateGroupLayerOptions, UpdateRasterLayerOptions, UpdateRasterSequenceLayerOptions, UpdateVectorLayerOptions, UpdateTextLayerOptions, UpdateAnyLayerOptions,
     WorkingFileTimeline, WorkingFileTimelineTrack, WorkingFileLayerTimelineFrame, WorkingFileTimelineKey
 } from './working-file';

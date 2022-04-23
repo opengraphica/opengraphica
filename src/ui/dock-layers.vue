@@ -1,5 +1,18 @@
 <template>
-    <div class="ogr-dock-content">
+    <div class="ogr-dock-header">
+        <div class="is-flex is-align-items-center is-justify-content-center">
+            <strong class="has-text-color-regular mr-3">{{ $t('dock.layers.add') }}:</strong>
+            <el-button type="text" class="px-0" @click="onAddLayer">
+                <span class="bi bi-plus-circle mr-1" aria-hidden="true"></span>
+                {{ $t('dock.layers.layer') }}
+            </el-button>
+            <el-button type="text" class="px-0" @click="onAddGroup">
+                <span class="bi bi-images mr-1" aria-hidden="true"></span>
+                {{ $t('dock.layers.group') }}
+            </el-button>
+        </div>
+    </div>
+    <div class="ogr-dock-content is-spaced-between">
         <el-scrollbar ref="scrollbar" @scroll="onScrollLayerList">
             <template v-if="layers.length > 0">
                 <app-layer-list
@@ -11,18 +24,53 @@
                 />
             </template>
             <template v-else>
-                <p class="mx-4 has-text-centered">No Layers Yet.</p>
+                <el-alert
+                    type="info"
+                    :title="$t('dock.layers.noLayers')"
+                    show-icon
+                    :closable="false"
+                    class="is-justify-content-center">
+                </el-alert>
             </template>
+            <ul class="ogr-layer-list">
+                <li class="ogr-layer is-background" :class="{ 'is-dnd-hover': isHoveringBackground }">
+                    <span class="ogr-layer-main">
+                        <span
+                            class="ogr-layer-dnd-handle"
+                            @mouseenter="isHoveringBackground = true"
+                            @mouseleave="isHoveringBackground = false"
+                            @click="onChangeBackgroundColor()"
+                        >
+                            <div class="ogr-layer-thumbnail">
+                                <div class="ogr-layer-thumbnail-custom-img" />
+                            </div>
+                            <span class="ogr-layer-name" v-t="'dock.layers.background'" />
+                        </span>
+                        <el-button type="text" class="px-2  mr-2" :aria-label="$t('dock.layers.toggleBackgroundVisibility')" @click="isBackgroundVisible = !isBackgroundVisible">
+                            <i class="bi" :class="{ 'bi-eye-fill': isBackgroundVisible, 'bi-eye-slash': !isBackgroundVisible }" aria-hidden="true"></i>
+                        </el-button>
+                    </span>
+                </li>
+            </ul>
         </el-scrollbar>
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, toRef, toRefs, onMounted, nextTick, reactive } from 'vue';
+import { defineComponent, ref, computed, watch, toRef, toRefs, onMounted, nextTick, reactive } from 'vue';
+import ElAlert from 'element-plus/lib/components/alert/index';
+import ElButton from 'element-plus/lib/components/button/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
+import ElTooltip from 'element-plus/lib/components/tooltip/index';
 import AppLayerList from '@/ui/app-layer-list.vue';
-import workingFileStore from '@/store/working-file';
+import canvasStore from '@/store/canvas';
+import historyStore from '@/store/history';
+import preferencesStore from '@/store/preferences';
+import workingFileStore, { ensureUniqueLayerSiblingName, getLayerById } from '@/store/working-file';
+import { InsertLayerAction } from '@/actions/insert-layer';
+import { InsertEmptyLayerOptions, InsertGroupLayerOptions, ColorModel } from '@/types';
+import { runModule } from '@/modules';
 
 const activeTab = ref<string>('file');
 
@@ -33,25 +81,71 @@ export default defineComponent({
     },
     components: {
         AppLayerList,
-        ElScrollbar
+        ElAlert,
+        ElButton,
+        ElScrollbar,
+        ElTooltip
     },
     emits: [
         'close',
         'update:title'
     ],
     setup(props, { emit }) {
-        emit('update:title', 'Layers');
+        emit('update:title', 'dock.layers.title');
 
         const { layers } = toRefs(workingFileStore.state);
         const scrollbar = ref<typeof ElScrollbar>(null as unknown as typeof ElScrollbar);
         const scrollContainerHeight = ref<number>(0);
         const scrollTop = ref<number>(0);
+        const isHoveringBackground = ref<boolean>(false);
         
         let scrollbarWrap = document.createElement('div');
+
+        const isBackgroundVisible = computed<boolean>({
+            get() {
+                return workingFileStore.state.background.visible;
+            },
+            set(visible) {
+                const background = workingFileStore.state.background;
+                background.visible = visible;
+                workingFileStore.set('background', background);
+                canvasStore.set('dirty', true);
+            }
+        });
         
         onMounted(() => {
             scrollbarWrap = scrollbar.value.$el.querySelector('.el-scrollbar__wrap');
         });
+
+        async function onAddLayerOrGroup(type: 'Layer' | 'Group') {
+            let selectedLayerIds = workingFileStore.get('selectedLayerIds')
+            if (selectedLayerIds.length === 0) {
+                selectedLayerIds = [-1];
+            }
+            for (let layerId of selectedLayerIds) {
+                const referenceLayer = getLayerById(layerId);
+                const isReferenceLayerGroup = referenceLayer?.type === 'group' && referenceLayer?.expanded;
+                await historyStore.dispatch('runAction', {
+                    action: new InsertLayerAction<InsertEmptyLayerOptions<ColorModel> | InsertGroupLayerOptions<ColorModel>>({
+                        type: type === 'Layer' ? 'empty' : 'group',
+                        groupId: isReferenceLayerGroup ? layerId : referenceLayer?.groupId,
+                        name: ensureUniqueLayerSiblingName(isReferenceLayerGroup ? referenceLayer.layers[0]?.id : layerId, 'New ' + type)
+                    }, referenceLayer && !isReferenceLayerGroup ? 'above' : 'top', referenceLayer && !isReferenceLayerGroup ? layerId : undefined)
+                });
+            }
+        }
+
+        async function onAddLayer() {
+            await onAddLayerOrGroup('Layer');
+        }
+
+        async function onAddGroup() {
+            await onAddLayerOrGroup('Group');
+        }
+
+        function onChangeBackgroundColor() {
+            runModule('tmp', 'notYetImplemented');
+        }
 
         function onScrollLayerList() {
             scrollTop.value = scrollbarWrap.scrollTop;
@@ -75,6 +169,12 @@ export default defineComponent({
             scrollbar,
             scrollContainerHeight,
             scrollTop,
+            tooltipShowDelay: preferencesStore.state.tooltipShowDelay,
+            isBackgroundVisible,
+            isHoveringBackground,
+            onAddLayer,
+            onAddGroup,
+            onChangeBackgroundColor,
             onScrollLayerList,
             onScrollByAmount
         };

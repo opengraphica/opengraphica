@@ -19,7 +19,7 @@ export class ClearSelectionAction extends BaseAction {
     private oldSelectionCombineMode: SelectionCombineMode | null = null;
 
     constructor() {
-        super('clearSelection', 'Clear Selection');
+        super('clearSelection', 'action.clearSelection');
 	}
 
 	public async do() {

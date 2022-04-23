@@ -6844,6 +6844,7 @@ body.ogr-full-page .opengraphica {
   }
 }
 .opengraphica .ogr-layer-list {
+  --layer-group-indent: 0px;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -6854,21 +6855,24 @@ body.ogr-full-page .opengraphica {
   pointer-events: none;
 }
 .opengraphica .ogr-layer-list .ogr-layer {
+  background: var(--ogr-layout-menu-bar-background-color);
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0 0 0 var(--layer-group-indent, 0);
   display: block;
 }
 .opengraphica .ogr-layer-list .ogr-layer.is-active {
-  background: var(--ogr-layer-list-background-color-active);
+  position: relative;
+  background-color: var(--ogr-layout-menu-bar-background-color);
+  background-image: linear-gradient(var(--ogr-layer-list-background-color-active), var(--ogr-layer-list-background-color-active));
   box-shadow: 0.1875rem 0 0 var(--ogr-layer-list-thumbnail-border-color-active) inset;
 }
 .opengraphica .ogr-layer-list .ogr-layer.is-dnd-hover {
   background: var(--ogr-layer-list-background-color-hover);
 }
 .opengraphica .ogr-layer-list .ogr-layer.is-dnd-placeholder {
+  background: var(--ogr-layout-menu-bar-background-color);
   position: relative;
-  background: transparent;
   box-shadow: none;
 }
 .opengraphica .ogr-layer-list .ogr-layer.is-dnd-placeholder > * {
@@ -6896,10 +6900,19 @@ body.ogr-full-page .opengraphica {
   user-select: none;
   opacity: 0.8;
 }
-.opengraphica .ogr-layer-list .ogr-layer.is-drag-insert-bottom {
+.opengraphica .ogr-layer-list .ogr-layer.is-background {
+  border-top: 1px solid var(--el-border-color-base);
+}
+.opengraphica .ogr-layer-list .ogr-layer.is-background > .ogr-layer-main {
+  height: 3.5rem;
+}
+.opengraphica .ogr-layer-list .ogr-layer.is-background > .ogr-layer-main .ogr-layer-thumbnail {
+  cursor: pointer !important;
+}
+.opengraphica .ogr-layer-list .ogr-layer.is-drag-insert-below {
   position: relative;
 }
-.opengraphica .ogr-layer-list .ogr-layer.is-drag-insert-bottom:after {
+.opengraphica .ogr-layer-list .ogr-layer.is-drag-insert-below:after {
   content: "";
   display: block;
   position: absolute;
@@ -6909,10 +6922,10 @@ body.ogr-full-page .opengraphica {
   left: 0;
   right: 0;
 }
-.opengraphica .ogr-layer-list .ogr-layer.is-drag-insert-top {
+.opengraphica .ogr-layer-list .ogr-layer.is-drag-insert-above {
   position: relative;
 }
-.opengraphica .ogr-layer-list .ogr-layer.is-drag-insert-top:after {
+.opengraphica .ogr-layer-list .ogr-layer.is-drag-insert-above:after {
   content: "";
   display: block;
   position: absolute;
@@ -6922,22 +6935,37 @@ body.ogr-full-page .opengraphica {
   left: 0;
   right: 0;
 }
+.opengraphica .ogr-layer-list .ogr-layer.is-drag-insert-inside > .ogr-layer-list, .opengraphica .ogr-layer-list .ogr-layer.is-drag-insert-inside > .el-alert {
+  position: relative;
+}
+.opengraphica .ogr-layer-list .ogr-layer.is-drag-insert-inside > .ogr-layer-list:after, .opengraphica .ogr-layer-list .ogr-layer.is-drag-insert-inside > .el-alert:after {
+  content: "";
+  display: block;
+  box-sizing: border-box;
+  position: absolute;
+  border: 0.25rem solid var(--ogr-snap-line-color);
+  bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+}
 .opengraphica .ogr-layer-list .ogr-layer .el-menu {
   background: transparent;
 }
-.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-main {
+.opengraphica .ogr-layer-list .ogr-layer > .ogr-layer-main {
   display: flex;
   flex-direction: row;
   height: 4rem;
+  transition: height 0.3s;
 }
-.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-main .ogr-layer-dnd-handle {
+.opengraphica .ogr-layer-list .ogr-layer > .ogr-layer-main .ogr-layer-dnd-handle {
   cursor: pointer;
   display: flex;
   flex-direction: row;
   flex-grow: 1;
   overflow: hidden;
 }
-.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-main .ogr-layer-thumbnail {
+.opengraphica .ogr-layer-list .ogr-layer > .ogr-layer-main .ogr-layer-thumbnail {
   cursor: move;
   display: flex;
   justify-content: center;
@@ -6948,18 +6976,25 @@ body.ogr-full-page .opengraphica {
   box-sizing: border-box;
   flex-shrink: 0;
 }
-.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-main .ogr-layer-thumbnail img {
+.opengraphica .ogr-layer-list .ogr-layer > .ogr-layer-main .ogr-layer-thumbnail img {
   background: white;
   width: auto;
   height: 100%;
   box-sizing: border-box;
   border: 0.25rem solid var(--ogr-layer-list-thumbnail-border-color);
 }
-.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-main .ogr-layer-thumbnail img.is-larger-width {
+.opengraphica .ogr-layer-list .ogr-layer > .ogr-layer-main .ogr-layer-thumbnail img.is-larger-width {
   width: 100%;
   height: auto;
 }
-.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-main .ogr-layer-name {
+.opengraphica .ogr-layer-list .ogr-layer > .ogr-layer-main .ogr-layer-thumbnail .ogr-layer-thumbnail-custom-img {
+  background: white;
+  width: 4rem;
+  height: 100%;
+  box-sizing: border-box;
+  border: 0.25rem solid var(--ogr-layer-list-thumbnail-border-color);
+}
+.opengraphica .ogr-layer-list .ogr-layer > .ogr-layer-main .ogr-layer-name {
   display: block;
   padding: 0 0.5rem 0 0;
   align-self: center;
@@ -6968,8 +7003,20 @@ body.ogr-full-page .opengraphica {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-main .el-button:hover {
+.opengraphica .ogr-layer-list .ogr-layer > .ogr-layer-main .ogr-layer-group-arrow {
+  color: var(--el-text-color-secondary);
+  align-self: center;
+  padding-right: 0.5rem;
+}
+.opengraphica .ogr-layer-list .ogr-layer > .ogr-layer-main .el-button:hover {
   background: var(--ogr-layer-list-background-color-hover);
+}
+.opengraphica .ogr-layer-list .ogr-layer.is-expanded > .ogr-layer-main {
+  height: 2.75rem;
+}
+.opengraphica .ogr-layer-list .ogr-layer.is-expanded > .ogr-layer-main .ogr-layer-thumbnail img.is-larger-width {
+  width: auto;
+  height: 100%;
 }
 .opengraphica .ogr-layer-list .ogr-layer .ogr-layer-attributes {
   display: block;
@@ -7120,8 +7167,23 @@ body.ogr-full-page .opengraphica {
   flex-shrink: 1;
 }
 .opengraphica .ogr-layout-dock .ogr-layout-dock__container > .ogr-dock {
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
   overflow: hidden;
+}
+.opengraphica .ogr-layout-dock .ogr-layout-dock__container > .ogr-dock > .ogr-dock-header {
+  border-bottom: 2px solid var(--el-border-color-light);
+}
+.opengraphica .ogr-layout-dock .ogr-layout-dock__container > .ogr-dock > .ogr-dock-content {
+  flex-grow: 1;
+  overflow: hidden;
+}
+.opengraphica .ogr-layout-dock .ogr-layout-dock__container > .ogr-dock > .ogr-dock-content.is-spaced-between > .el-scrollbar > .el-scrollbar__wrap > .el-scrollbar__view {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 .opengraphica .ogr-layout-dock .ogr-layout-dock__container > .ogr-dock > .el-tabs {
   height: 100%;
@@ -7352,6 +7414,9 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-menu-drawer__content .ogr-dock {
   height: 100%;
 }
+.opengraphica .ogr-menu-drawer__content .ogr-dock > .ogr-dock-header {
+  border-bottom: 2px solid var(--el-border-color-light);
+}
 .opengraphica .ogr-menu-drawer__content .ogr-dock > .el-tabs {
   height: 100%;
   display: flex;
@@ -7510,6 +7575,9 @@ body.ogr-full-page .opengraphica {
   max-height: calc(100vh - 5rem) !important;
   overflow: hidden !important;
 }
+.opengraphica .ogr-dock-popover > .ogr-dock > .ogr-dock-header {
+  border-bottom: 2px solid var(--el-border-color-light);
+}
 .opengraphica .ogr-dock-popover > .ogr-dock > .ogr-dock-content {
   width: 350px;
   max-width: 100%;
@@ -7648,6 +7716,11 @@ body.ogr-full-page .opengraphica {
   bottom: 0;
   width: 100%;
   height: 100%;
+}
+.opengraphica .ogr-canvas-background {
+  transform-origin: 0 0;
+  background-image: url("../images/transparency-bg.png");
+  background-repeat: repeat;
 }
 .opengraphica .ogr-canvas-selection-mask {
   display: block;
@@ -24799,6 +24872,18 @@ body.ogr-full-page .opengraphica {
   right: 0;
   bottom: 0;
 }
+.opengraphica .has-text-color-primary {
+  color: var(--el-text-color-primary);
+}
+.opengraphica .has-text-color-regular {
+  color: var(--el-text-color-regular);
+}
+.opengraphica .has-text-color-secondary {
+  color: var(--el-text-color-secondary);
+}
+.opengraphica .has-text-color-placeholder {
+  color: var(--el-text-color-placeholder);
+}
 .opengraphica .el-alert--info.is-light {
   color: var(--ogr-alert-info-color);
 }
@@ -25275,6 +25360,7 @@ body.ogr-full-page .opengraphica {
   --el-border-color-lighter: #1d232e;
   --el-border-color-extra-light: #F2F6FC;
   --el-bg-color: #272c37;
+  color: var(--el-color-black);
 }
 .opengraphica .theme-dark .el-button--primary.is-plain {
   --el-button-font-color: #009cff;

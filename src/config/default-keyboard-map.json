@@ -1,9 +1,9 @@
 [
     {
-        "name": "File",
+        "name": "keyboardMap.file.name",
         "actions": [
             {
-                "name": "Open File",
+                "name": "keyboardMap.file.actions.open",
                 "action": {
                     "type": "runModule",
                     "target": "file/open"
@@ -13,7 +13,7 @@
                 ]
             },
             {
-                "name": "Quick Save",
+                "name": "keyboardMap.file.actions.quickSave",
                 "action": {
                     "type": "runModule",
                     "target": "file/quickSave"
@@ -23,7 +23,7 @@
                 ]
             },
             {
-                "name": "Quick Load",
+                "name": "keyboardMap.file.actions.quickLoad",
                 "action": {
                     "type": "runModule",
                     "target": "file/quickLoad"
@@ -35,10 +35,10 @@
         ]
     },
     {
-        "name": "Edit History",
+        "name": "keyboardMap.history.name",
         "actions": [
             {
-                "name": "Undo",
+                "name": "keyboardMap.history.actions.undo",
                 "action": {
                     "type": "runModule",
                     "target": "history/undo"
@@ -48,7 +48,7 @@
                 ]
             },
             {
-                "name": "Redo",
+                "name": "keyboardMap.history.actions.redo",
                 "action": {
                     "type": "runModule",
                     "target": "history/redo"
@@ -61,10 +61,10 @@
         ]
     },
     {
-        "name": "Selection",
+        "name": "keyboardMap.selection.name",
         "actions": [
             {
-                "name": "Select All",
+                "name": "keyboardMap.selection.actions.selectAll",
                 "action": {
                     "type": "appEmit",
                     "target": "editor.tool.selectAll"

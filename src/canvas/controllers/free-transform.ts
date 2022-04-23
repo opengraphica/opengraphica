@@ -1,6 +1,6 @@
 import { nextTick, watch, WatchStopHandle } from 'vue';
 import BaseCanvasMovementController from './base-movement';
-import { isBoundsIndeterminate, layerPickMode, useRotationSnapping, freeTransformEmitter, top, left, width, height, rotation, transformOriginX, transformOriginY, dimensionLockRatio, previewXSnap, previewYSnap, dragHandleHighlight, rotateHandleHighlight } from '../store/free-transform-state';
+import { isBoundsIndeterminate, layerPickMode, useRotationSnapping, freeTransformEmitter, top, left, width, height, rotation, transformOriginX, transformOriginY, dimensionLockRatio, previewXSnap, previewYSnap, dragHandleHighlight, rotateHandleHighlight, selectedLayers } from '../store/free-transform-state';
 import { appliedSelectionMask, appliedSelectionMaskCanvasOffset, activeSelectionMask, activeSelectionMaskCanvasOffset } from '../store/selection-state';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
@@ -56,7 +56,6 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     private actionQueue: AsyncCallbackQueue = new AsyncCallbackQueue();
 
     private setBoundsDebounceHandle: number | undefined;
-    private selectedLayers: WorkingFileLayer<ColorModel>[] = [];
     private selectedLayerIdsWatchStop: WatchStopHandle | null = null;
 
     onEnter(): void {
@@ -67,16 +66,16 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         // Set transform bounds based on selected layer list.
         isBoundsIndeterminate.value = true;
         this.selectedLayerIdsWatchStop = watch(() => workingFileStore.state.selectedLayerIds, (selectedLayerIds) => {
-            const selectedLayers: WorkingFileLayer<ColorModel>[] = [];
+            const newSelectedLayers: WorkingFileLayer<ColorModel>[] = [];
             if (selectedLayerIds.length > 0) {
                 for (let id of selectedLayerIds) {
                     const layer = getLayerById(id);
-                    if (layer) {
-                        selectedLayers.push(layer);
+                    if (layer && !['group', 'empty'].includes(layer.type)) {
+                        newSelectedLayers.push(layer);
                     }
                 }
             }
-            this.selectedLayers = selectedLayers;
+            selectedLayers.value = newSelectedLayers;
             this.setBoundsFromSelectedLayers();
         }, { immediate: true });
 
@@ -299,7 +298,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             let { transformBoundsPoint, viewTransformPoint, viewDecomposedTransform } = this.getTransformedCursorInfo();
     
             if ((activeSelectionMask.value || appliedSelectionMask.value)) {
-                if (this.selectedLayers.length > 0) {
+                if (selectedLayers.value.length > 0) {
                     layerPickMode.value === 'current';
                     await historyStore.dispatch('runAction', {
                         action: new CreateNewLayersFromSelectionAction({ clearSelection: true, selectNewLayers: 'replace' })
@@ -425,7 +424,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         };
         this.transformStartLayerData = [];
 
-        for (let layer of this.selectedLayers) {
+        for (let layer of selectedLayers.value) {
             this.transformStartLayerData.push({
                 transform: layer.transform
             });
@@ -472,7 +471,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             transformOriginX: transformOriginX.value,
             transformOriginY: transformOriginY.value
         });
-        for (const [i, layer] of this.selectedLayers.entries()) {
+        for (const [i, layer] of selectedLayers.value.entries()) {
             const layerTransformOriginX = left.value + (transformOriginX.value * width.value);
             const layerTransformOriginY = top.value + (transformOriginY.value * height.value);
             const layerTransformOrigin = new DOMPoint(layerTransformOriginX, layerTransformOriginY).matrixTransform(this.transformStartLayerData[i].transform.inverse());
@@ -519,7 +518,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             width: newTransform.width,
             height: newTransform.height
         });
-        for (const [i, layer] of this.selectedLayers.entries()) {
+        for (const [i, layer] of selectedLayers.value.entries()) {
             const decomposedTransform = decomposeMatrix(this.transformStartLayerData[i].transform);
             let transform = DOMMatrix.fromMatrix(this.transformStartLayerData[i].transform)
             if (shouldScaleDuringResize) {
@@ -544,15 +543,13 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             previewXSnap.value = [];
             previewYSnap.value = [];
 
-            if (
-                left.value != this.transformStartDimensions.left ||
-                top.value != this.transformStartDimensions.top ||
-                width.value != this.transformStartDimensions.width ||
-                height.value != this.transformStartDimensions.height ||
-                rotation.value != this.transformStartDimensions.rotation
-            ) {
+            const isTranslate = left.value != this.transformStartDimensions.left || top.value != this.transformStartDimensions.top;
+            const isScale = width.value != this.transformStartDimensions.width || height.value != this.transformStartDimensions.height;
+            const isRotate = rotation.value != this.transformStartDimensions.rotation;
+
+            if (isTranslate || isScale || isRotate) {
                 const updateLayerActions: UpdateLayerAction<UpdateAnyLayerOptions<ColorModel>>[] = [];
-                for (const [i, layer] of this.selectedLayers.entries()) {
+                for (const [i, layer] of selectedLayers.value.entries()) {
                     updateLayerActions.push(
                         new UpdateLayerAction({
                             id: layer.id,
@@ -567,7 +564,11 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                     );
                 }
                 await historyStore.dispatch('runAction', {
-                    action: new BundleAction('freeTransform', 'Free Transform', updateLayerActions)
+                    action: new BundleAction('freeTransform', [
+                        ...(isRotate ? ['action.freeTransformRotate'] : []),
+                        ...(isScale ? ['action.freeTransformScale'] : []),
+                        ...(isTranslate ? ['action.freeTransformTranslate'] : [])
+                    ][0], updateLayerActions)
                 });
             }
         } catch (error) {
@@ -697,8 +698,8 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             });
         }
         // For single layer selection, read transform data from that layer.
-        else if (this.selectedLayers.length === 1) {
-            const activeLayer = this.selectedLayers[0];
+        else if (selectedLayers.value.length === 1) {
+            const activeLayer = selectedLayers.value[0];
             const originPosX = activeLayer.width * transformOriginX.value;
             const originPosY = activeLayer.height * transformOriginY.value;
             const decomposedTransform = decomposeMatrix(activeLayer.transform);
@@ -728,8 +729,8 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             shouldMaintainAspectRatio = false;
             shouldSnapRotationDegrees = !useRotationSnapping.value;
         }
-        if (this.selectedLayers.length === 1) {
-            const firstLayer = this.selectedLayers[0];
+        if (selectedLayers.value.length === 1) {
+            const firstLayer = selectedLayers.value[0];
             if (firstLayer.type === 'text') {
                 shouldMaintainAspectRatio = false;
                 shouldScaleDuringResize = false;

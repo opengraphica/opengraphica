@@ -1,6 +1,7 @@
 import {
     ColorModel, WorkingFileLayer,
-    WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer,
+    WorkingFileEmptyLayer, WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer,
+    WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer,
     InsertAnyLayerOptions
 } from '@/types';
 import { BaseAction } from './base';
@@ -25,21 +26,27 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
     private selectLayersAction: SelectLayersAction | null = null;
 
     constructor(insertLayerOptions: LayerOptions, insertPosition: InsertPosition = 'top', insertAroundLayerId?: number) {
-        super('insertLayer', 'Insert Layer');
+        super('insertLayer', 'action.insertLayer');
         this.insertLayerOptions = insertLayerOptions;
         this.insertPosition = insertPosition;
-        if (insertAroundLayerId) {
+        if (insertAroundLayerId != null) {
             this.insertAroundLayerId = insertAroundLayerId;
         }
 	}
 	public async do() {
         super.do();
 
-        const layerId = workingFileStore.get('layerIdCounter');
-        workingFileStore.set('layerIdCounter', layerId + 1);
+        let layerId = -1;
+        if (this.insertLayerOptions?.id != null) { // Only file open code should provide an explicit ID.
+            layerId = this.insertLayerOptions.id;
+        } else {
+            layerId = workingFileStore.get('layerIdCounter');
+            workingFileStore.set('layerIdCounter', layerId + 1);
+        }
 
         this.insertedLayerId = layerId;
 
+        // Create new layer object if not already created (do vs redo)
         let newLayer: WorkingFileAnyLayer<ColorModel>;
         if (this.insertedLayer) {
             newLayer = this.insertedLayer;
@@ -62,6 +69,13 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
             }
 
             switch (this.insertLayerOptions.type) {
+                case 'empty':
+                    newLayer = {
+                        ...sharedOptions,
+                        renderer: layerRenderers.empty,
+                        ...this.insertLayerOptions
+                    } as WorkingFileEmptyLayer<ColorModel>;
+                    break;
                 case 'group':
                     newLayer = {
                         ...sharedOptions,
@@ -119,6 +133,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
             throw new Error('Layer definition for insertion not found.');
         }
 
+        // Insert new layer into existing layers array
         const layers = workingFileStore.get('layers');
         let parent: WorkingFileLayer<ColorModel>[] | null = layers;
         if (newLayer.groupId != null) {

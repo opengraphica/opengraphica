@@ -4,7 +4,7 @@
             <template #label>
                 <div class="leading-tight">
                     <i class="bi bi-archive leading-snug is-block has-text-centered is-size-5 mt-1"></i>
-                    <div class="mb-3">File</div>
+                    <div class="mb-3" v-t="'dock.settings.file.tabTitle'"></div>
                 </div>
             </template>
             <template v-if="visitedTabs['file'] === true">
@@ -12,28 +12,28 @@
                     <el-menu class="el-menu--medium el-menu--borderless el-menu--inactivated mb-1" @select="onMenuSelect('file', $event)">
                         <el-menu-item index="new">
                             <i class="bi bi-file-earmark-plus"></i>
-                            <span>New</span>
+                            <span v-t="'dock.settings.file.menu.new'"></span>
                         </el-menu-item>
                         <el-menu-item index="open">
                             <i class="bi bi-folder2-open"></i>
-                            <span>Open</span>
+                            <span v-t="'dock.settings.file.menu.open'"></span>
                         </el-menu-item>
                         <el-menu-item index="export">
                             <i class="bi bi-box-arrow-up"></i>
-                            <span>Export</span>
+                            <span v-t="'dock.settings.file.menu.export'"></span>
                         </el-menu-item>
                         <el-menu-item index="saveAs">
                             <i class="bi bi-download"></i>
-                            <span>Save As</span>
+                            <span v-t="'dock.settings.file.menu.saveAs'"></span>
                         </el-menu-item>
                         <el-divider />
                         <el-menu-item index="insertPhoto">
                             <i class="bi bi-plus-circle"></i>
-                            <span>Insert a Photo</span>
+                            <span v-t="'dock.settings.file.menu.insertPhoto'"></span>
                         </el-menu-item>
                         <el-menu-item index="takePhoto">
                             <i class="bi bi-camera"></i>
-                            <span>Take a Photo</span>
+                            <span v-t="'dock.settings.file.menu.takePhoto'"></span>
                         </el-menu-item>
                     </el-menu>
                 </el-scrollbar>
@@ -43,7 +43,7 @@
             <template #label>
                 <div class="leading-tight">
                     <i class="bi bi-image leading-snug is-block has-text-centered is-size-5 mt-1"></i>
-                    <div class="mb-3">Image</div>
+                    <div class="mb-3" v-t="'dock.settings.image.tabTitle'"></div>
                 </div>
             </template>
             <template v-if="visitedTabs['image'] === true">
@@ -51,34 +51,34 @@
                     <el-menu class="el-menu--medium el-menu--borderless el-menu--inactivated mb-1" @select="onMenuSelect('image', $event)">
                         <el-menu-item index="cropResize">
                             <i class="bi bi-crop"></i>
-                            <span>Crop and Resize</span>
+                            <span v-t="'dock.settings.image.menu.cropResize'"></span>
                         </el-menu-item>
                         <el-collapse class="el-collapse--menu-item my-1">
                             <el-collapse-item>
                                 <template v-slot:title>
-                                    Convert Layers...
+                                    {{ $t('dock.settings.image.menu.convertLayers.groupTitle') }}
                                 </template>
                                 <el-menu-item index="convertLayersToImageSequence">
                                     <i class="bi bi-arrow-return-right"></i>
-                                    <span>To Image Sequence</span>
+                                    <span v-t="'dock.settings.image.menu.convertLayers.toImageSequence'"></span>
                                 </el-menu-item>
                             </el-collapse-item>
                         </el-collapse>
                         <el-menu-item index="cut">
                             <i class="bi bi-scissors"></i>
-                            <span>Cut</span>
+                            <span v-t="'dock.settings.image.menu.cut'"></span>
                         </el-menu-item>
                         <el-menu-item index="copy">
                             <i class="bi bi-files"></i>
-                            <span>Copy</span>
+                            <span v-t="'dock.settings.image.menu.copy'"></span>
                         </el-menu-item>
                         <el-menu-item index="copyAll">
                             <i class="bi bi-files"></i>
-                            <span>Copy All Layers</span>
+                            <span v-t="'dock.settings.image.menu.copyAllLayers'"></span>
                         </el-menu-item>
                         <el-menu-item index="paste">
                             <i class="bi bi-clipboard"></i>
-                            <span>Paste</span>
+                            <span v-t="'dock.settings.image.menu.paste'"></span>
                         </el-menu-item>
                     </el-menu>
                 </el-scrollbar>
@@ -88,49 +88,43 @@
             <template #label>
                 <div class="leading-tight">
                     <i class="bi bi-display leading-snug is-block has-text-centered is-size-5 mt-1"></i>
-                    <div class="mb-3">View</div>
+                    <div class="mb-3" v-t="'dock.settings.view.tabTitle'"></div>
                 </div>
             </template>
             <template v-if="visitedTabs['view'] === true">
                 <el-scrollbar>
                     <el-form novalidate="novalidate" action="javascript:void(0)" class="mb-1 mt-1">
-                        <el-form-item class="el-form-item--menu-item" label="Zoom">
+                        <el-form-item class="el-form-item--menu-item" :label="$t('dock.settings.view.zoom')">
                             <el-button-group class="el-button-group--flex">
-                                <el-button size="small" plain aria-label="Zoom Out" title="Zoom Out" @click="zoomLevel *= 1/1.1">
+                                <el-button size="small" plain :aria-label="$t('dock.settings.view.zoomOut')" :title="$t('dock.settings.view.zoomOut')" @click="zoomLevel *= 1/1.1">
                                     <i class="bi bi-zoom-out" aria-hidden="true" />
                                 </el-button>
                                 <el-input-number v-model.lazy="zoomLevel" suffix-text="%" size="small" class="el-input--text-center" style="width: 5rem" />
-                                <el-button size="small" plain aria-label="Zoom In" title="Zoom In" @click="zoomLevel *= 1.1">
+                                <el-button size="small" plain :aria-label="$t('dock.settings.view.zoomIn')" :title="$t('dock.settings.view.zoomIn')" @click="zoomLevel *= 1.1">
                                     <i class="bi bi-zoom-in" aria-hidden="true" />
                                 </el-button>
                             </el-button-group>
                         </el-form-item>
-                        <el-form-item class="el-form-item--menu-item" label="Rotate">
+                        <el-form-item class="el-form-item--menu-item" :label="$t('dock.settings.view.rotate')">
                             <el-button-group class="el-button-group--flex">
-                                <el-button size="small" plain aria-label="Rotate Counterclockwise" title="Rotate Counterclockwise" @click="rotationAngle -= 15">
+                                <el-button size="small" plain :aria-label="$t('dock.settings.view.rotateCounterClockwise')" :title="$t('dock.settings.view.rotateCounterClockwise')" @click="rotationAngle -= 15">
                                     <i class="bi bi-arrow-counterclockwise" aria-hidden="true" />
                                 </el-button>
                                 <el-input-number v-model.lazy="rotationAngle" suffix-text="°" size="small" class="el-input--text-center" style="width: 5rem" />
-                                <el-button size="small" plain aria-label="Rotate Clockwise" title="Rotate Clockwise" @click="rotationAngle += 15">
+                                <el-button size="small" plain :aria-label="$t('dock.settings.view.rotateClockwise')" :title="$t('dock.settings.view.rotateClockwise')" @click="rotationAngle += 15">
                                     <i class="bi bi-arrow-clockwise" aria-hidden="true" />
                                 </el-button>
                             </el-button-group>
                         </el-form-item>
-                        <el-form-item class="el-form-item--menu-item" label="Reset">
+                        <el-form-item class="el-form-item--menu-item" :label="$t('dock.settings.view.reset')">
                             <el-button-group>
-                                <el-button size="small" plain @click="onResetViewFit">
-                                    Fit
-                                </el-button>
-                                <el-button size="small" plain @click="onResetViewZoom">
-                                    1:1
-                                </el-button>
-                                <el-button size="small" plain @click="onResetViewRotation">
-                                    0°
-                                </el-button>
+                                <el-button size="small" plain @click="onResetViewFit" v-t="'dock.settings.view.fit'" />
+                                <el-button size="small" plain @click="onResetViewZoom">1:1</el-button>
+                                <el-button size="small" plain @click="onResetViewRotation">0°</el-button>
                             </el-button-group>
                         </el-form-item>
                         <el-divider class="my-2" />
-                        <el-form-item class="el-form-item--menu-item" label="Touch Rotate">
+                        <el-form-item class="el-form-item--menu-item" :label="$t('dock.settings.view.touchRotate.label')">
                             <el-radio-group
                                 v-model="touchRotationPreference"
                                 size="small">
@@ -138,7 +132,7 @@
                                     v-for="option in touchRotationOptions"
                                     :key="option.value"
                                     :label="option.value">
-                                    {{ option.label }}
+                                    {{ $t(option.label) }}
                                 </el-radio-button>
                             </el-radio-group>
                         </el-form-item>
@@ -150,7 +144,7 @@
             <template #label>
                 <div class="leading-tight">
                     <i class="bi bi-clock-history leading-snug is-block has-text-centered is-size-5 mt-1"></i>
-                    <div class="mb-3">History</div>
+                    <div class="mb-3" v-t="'dock.settings.history.tabTitle'"></div>
                 </div>
             </template>
             <template v-if="visitedTabs['history'] === true">
@@ -158,17 +152,17 @@
                     <div class="is-flex is-justify-content-center px-4 pt-2">
                         <el-button-group>
                             <el-button size="small" :disabled="!canUndo" round plain aria-label="Undo" @click="onHistoryUndo()">
-                                <i class="bi bi-arrow-90deg-left mr-1" aria-hidden="true" /> Undo
+                                <i class="bi bi-arrow-90deg-left mr-1" aria-hidden="true" /> {{ $t('dock.settings.history.undo') }}
                             </el-button>
                             <el-button size="small" :disabled="!canRedo" round plain aria-label="Redo" @click="onHistoryRedo()">
-                                <i class="bi bi-arrow-90deg-right mr-1" aria-hidden="true" /> Redo
+                                <i class="bi bi-arrow-90deg-right mr-1" aria-hidden="true" /> {{ $t('dock.settings.history.redo') }}
                             </el-button>
                         </el-button-group>
                     </div>
                     <div v-if="historyActionStack.length === 0" class="px-4 py-3">
                         <el-alert
                             type="info"
-                            title="No History Yet"
+                            :title="$t('dock.settings.history.noHistory')"
                             show-icon
                             :closable="false">
                         </el-alert>
@@ -179,7 +173,7 @@
                             class="pb-1"
                             type="primary">
                             <el-link type="primary" href="javascript:void(0)" @click="onGoHistory(0)">
-                                [Base Image]
+                                [{{ $t('dock.settings.history.baseImage') }}]
                             </el-link>
                         </el-timeline-item>
                         <el-timeline-item
@@ -187,9 +181,7 @@
                             :key="action.id + '_' + index"
                             :type="historyActionStackIndex > index ? 'primary' : null"
                             class="pb-1">
-                            <el-link type="primary" href="javascript:void(0)" @click="onGoHistory(index + 1)">
-                                {{ action.description }}
-                            </el-link>
+                            <el-link type="primary" href="javascript:void(0)" @click="onGoHistory(index + 1)" v-t="action.description" />
                         </el-timeline-item>
                     </el-timeline>
                 </el-scrollbar>
@@ -199,13 +191,13 @@
             <template #label>
                 <div class="leading-tight">
                     <i class="bi bi-toggle-on leading-snug is-block has-text-centered is-size-5 mt-1"></i>
-                    <div class="mb-3">Prefs</div>
+                    <div class="mb-3" v-t="'dock.settings.prefs.tabTitle'"></div>
                 </div>
             </template>
             <template v-if="visitedTabs['prefs'] === true">
                 <el-scrollbar>
                     <el-form novalidate="novalidate" action="javascript:void(0)">
-                        <el-form-item class="el-form-item--menu-item mb-1" label="Theme">
+                        <el-form-item class="el-form-item--menu-item mb-1" :label="$t('dock.settings.prefs.theme')">
                             <el-radio-group
                                 v-model="activeTheme"
                                 :disabled="!!loadingThemeName"
@@ -215,39 +207,39 @@
                                     v-loading="option.value === loadingThemeName"
                                     :key="option.value"
                                     :label="option.value">
-                                    {{ option.label }}
+                                    {{ $t(option.label) }}
                                 </el-radio-button>
                             </el-radio-group>
                         </el-form-item>
                         <el-collapse class="el-collapse--menu-item">
-                            <el-collapse-item title="Performance">
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" label="Optimize for Large Image">
+                            <el-collapse-item :title="$t('dock.settings.prefs.performance.groupTitle')">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.performance.optimizeLargeImage')">
                                     <el-switch v-model="preferenceOptimizeLargeImages" />
                                 </el-form-item>
-                                <el-form-item v-if="preferenceOptimizeLargeImages" class="el-form-item--menu-item el-form-item--has-content-right" label="Fix Adjacent Layer Seams">
+                                <el-form-item v-if="preferenceOptimizeLargeImages" class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.performance.fixAdjacentLayerSeams')">
                                     <el-switch v-model="performanceFixLayerSeams" />
                                 </el-form-item>
-                                <el-form-item v-if="!preferenceOptimizeLargeImages" class="el-form-item--menu-item el-form-item--has-content-right" label="High Quality Scaling">
+                                <el-form-item v-if="!preferenceOptimizeLargeImages" class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.performance.highQualityScaling')">
                                     <el-switch v-model="preferenceHighQualityScaling" />
                                 </el-form-item>
                             </el-collapse-item>
-                            <el-collapse-item title="Editor">
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" label="Menu Bar Position">
+                            <el-collapse-item :title="$t('dock.settings.prefs.editor.groupTitle')">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.editor.menuBarPosition')">
                                     <el-select v-model="preferenceMenuBarPosition" size="small" style="width: 6rem;">
-                                        <el-option value="top" label="Top" />
-                                        <el-option value="bottom" label="Bottom" />
-                                        <el-option value="left" label="Left" />
-                                        <el-option value="right" label="Right" />
+                                        <el-option value="top" :label="$t('option.top')" />
+                                        <el-option value="bottom" :label="$t('option.bottom')" />
+                                        <el-option value="left" :label="$t('option.left')" />
+                                        <el-option value="right" :label="$t('option.right')" />
                                     </el-select>
                                 </el-form-item>
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" label="Show Welcome Screen">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.editor.showWelcomeScreen')">
                                     <el-switch v-model="showWelcomeScreenAtStart" />
                                 </el-form-item>
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" label="Show Tips">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.editor.showTips')">
                                     <el-switch v-model="showTutorialNotifications" />
                                 </el-form-item>
                                 <div class="px-4.5 pt-2">
-                                    <el-button size="small" class="is-fullwidth" @click="onClickResetSttings">Reset Settings</el-button>
+                                    <el-button size="small" class="is-fullwidth" @click="onClickResetSttings" v-t="'dock.settings.prefs.editor.resetSettings'" />
                                 </div>
                             </el-collapse-item>
                         </el-collapse>
@@ -321,7 +313,7 @@ export default defineComponent({
         'update:title'
     ],
     setup(props, { emit }) {
-        emit('update:title', 'Actions');
+        emit('update:title', 'dock.settings.title');
         const $notify = notifyInjector('$notify');
         const loading = ref<boolean>(false);
         const { actionStackIndex: historyActionStackIndex, canRedo, canUndo } = toRefs(historyStore.state);
@@ -360,9 +352,9 @@ export default defineComponent({
             }
         });
         const touchRotationOptions = [
-            { value: 'on', label: 'On' },
-            { value: 'snap', label: 'Snap' },
-            { value: 'off', label: 'Off' }
+            { value: 'on', label: 'dock.settings.view.touchRotate.on' },
+            { value: 'snap', label: 'dock.settings.view.touchRotate.snap' },
+            { value: 'off', label: 'dock.settings.view.touchRotate.off' }
         ];
         function onResetViewFit() {
             appEmitter.emit('app.canvas.resetTransform');
@@ -438,7 +430,7 @@ export default defineComponent({
         // Theme handling
         const themeOptions = computed<{ value: string, label: string }[]>(() => {
             return Object.keys(editorStore.state.themes).map((themeName) => {
-                return { value: themeName, label: format(themeName).asTitleCase().value };
+                return { value: themeName, label: 'theme.' + themeName };
             });
         });
         const loadingThemeName = computed<string | null>(() => {

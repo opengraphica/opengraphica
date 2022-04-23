@@ -3,30 +3,30 @@
         <div class="py-2 pl-4 is-text-nowrap is-text-ellipsis">
             <div class="is-block my-2 is-text-ellipsis">
                 <i class="bi bi-crop" aria-hidden="true" />
-                Crop and Resize
+                {{ $t('toolbar.cropResize.title') }}
             </div>
         </div>
         <div class="py-2 px-3 is-text-nowrap">
-            <el-button plain type="text" class="px-4" aria-label="Cancel" @click="onCancel">
+            <el-button plain type="text" class="px-4" :aria-label="$t('button.cancel')" @click="onCancel">
                 <template v-if="isMobileView">
                     <i class="bi bi-x"></i>
                 </template>
                 <template v-else>
-                    Cancel
+                    {{ $t('button.cancel') }}
                 </template>
             </el-button>
             <el-popover placement="bottom" :popper-class="'ogr-dock-popover'" trigger="click" :width="250">
                 <template #reference>
-                    <el-button plain type="text" class="px-4 ml-0 mr-2" aria-label="Settings">
+                    <el-button plain type="text" class="px-4 ml-0 mr-2" :aria-label="$t('button.settings')">
                         <template v-if="isMobileView">
                             <i class="bi bi-sliders"></i>
                         </template>
                         <template v-else>
-                            Settings
+                            {{ $t('button.settings') }}
                         </template>
                     </el-button>
                 </template>
-                <h2 class="mt-3 mx-4.5">Settings</h2>
+                <h2 class="mt-3 mx-4.5" v-t="'button.settings'" />
                 <el-form novalidate="novalidate" action="javascript:void(0)">
                     <!--el-form-item class="el-form-item--menu-item mb-1" label="Mode">
                         <el-radio-group
@@ -38,49 +38,49 @@
                     </el-form-item-->
                     <div class="px-4.5 my-3">
                         <el-button-group class="el-button-group--flex is-fullwidth">
-                            <el-input-number v-model="resizeInputWidth" size="small" class="is-flex-grow-1" :suffix-text="measuringUnits" @input="onInputResizeWidth" />
-                            <el-button size="small" aria-label="Link Width/Height" class="px-3" :disabled="mode === 'resample'" @click="isDimensionRatioLock = !isDimensionRatioLock">
+                            <el-input-number v-model="resizeInputWidth" :aria-label="$t('toolbar.cropResize.width')" size="small" class="is-flex-grow-1" :suffix-text="measuringUnits" @input="onInputResizeWidth" />
+                            <el-button size="small" :aria-label="$t('toolbar.cropResize.linkWidthHeight')" class="px-3" :disabled="mode === 'resample'" @click="isDimensionRatioLock = !isDimensionRatioLock">
                                 <i :class="['bi', isDimensionRatioLock ? 'bi-lock-fill' : 'bi-unlock-fill']" aria-hidden="true" />
                             </el-button>
-                            <el-input-number v-model="resizeInputHeight" size="small" class="is-flex-grow-1" :suffix-text="measuringUnits"  @input="onInputResizeHeight" />
+                            <el-input-number v-model="resizeInputHeight" :aria-label="$t('toolbar.cropResize.height')" size="small" class="is-flex-grow-1" :suffix-text="measuringUnits"  @input="onInputResizeHeight" />
                         </el-button-group>
                     </div>
-                    <el-form-item class="el-form-item--menu-item mb-1" label="Dimension Units">
+                    <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.cropResize.dimensionUnits')">
                         <el-select style="width: 5rem" size="small" v-model="measuringUnits">
                             <el-option
                                 v-for="option in dimensionUnitOptions"
                                 :key="option.value"
                                 :label="option.value"
                                 :value="option.value">
-                                {{ option.label }}
+                                {{ $t(option.label) }}
                             </el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item class="el-form-item--menu-item mb-1" label="Resolution">
+                    <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.cropResize.resolution')">
                         <el-input-number style="width: 6rem" size="small" v-model="resolution" />
                     </el-form-item>
-                    <el-form-item class="el-form-item--menu-item mb-1" label="Resolution Units">
+                    <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.cropResize.resolutionUnits')">
                         <el-select style="width: 6rem" size="small" v-model="resolutionUnits">
                             <el-option
                                 v-for="option in resolutionUnitOptions"
                                 :key="option.value"
                                 :label="option.value"
                                 :value="option.value">
-                                {{ option.label }}
+                                {{ $t(option.label) }}
                             </el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" label="Snapping">
+                    <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="$t('toolbar.cropResize.snapping')">
                         <el-switch v-model="enableSnapping" />
                     </el-form-item>
                 </el-form>
             </el-popover>
-            <el-button aria-label="Done" plain type="primary" class="ml-0" @click="onDone">
+            <el-button :aria-label="$t('button.done')" plain type="primary" class="ml-0" @click="onDone">
                 <template v-if="isMobileView">
                     <i class="bi bi-check"></i>
                 </template>
                 <template v-else>
-                    Done
+                    {{ $t('button.done') }}
                 </template>
             </el-button>
         </div>
@@ -154,15 +154,15 @@ export default defineComponent({
         );
 
         const dimensionUnitOptions = [
-            { value: 'px', label: 'Pixels' },
-            { value: 'mm', label: 'Millimeters' },
-            { value: 'cm', label: 'Centimeters' },
-            { value: 'in', label: 'Inches' }
+            { value: 'px', label: 'measurement.pixels' },
+            { value: 'mm', label: 'measurement.millimeters' },
+            { value: 'cm', label: 'measurement.centimeters' },
+            { value: 'in', label: 'measurement.inches' }
         ];
         const resolutionUnitOptions = [
-            { value: 'px/in', label: 'Pixels/Inch' },
-            { value: 'px/mm', label: 'Pixels/Millimeter' },
-            { value: 'px/cm', label: 'Pixels/Centimeter' }
+            { value: 'px/in', label: 'measurement.pixelsPerInch' },
+            { value: 'px/mm', label: 'measurement.pixelsPerMillimeter' },
+            { value: 'px/cm', label: 'measurement.pixelsPerCentimeter' }
         ];
 
         const resolution = computed<number>({
@@ -264,12 +264,12 @@ export default defineComponent({
         }
 
         async function onDone() {
-            appEmitter.emit('app.wait.startBlocking', { id: 'toolCropResizeCalculating', label: 'Crop and Resize' });
+            appEmitter.emit('app.wait.startBlocking', { id: 'toolCropResizeCalculating', label: 'canvas.toolbar.cropResize.waitLabel' });
             try {
                 const layers = workingFileStore.get('layers');
                 let layerUpdateActions: BaseAction[] = await generateResizeLayerActions(layers);
                 await historyStore.dispatch('runAction', {
-                    action: new BundleAction('moduleCropResize', 'Crop and Resize', [
+                    action: new BundleAction('moduleCropResize', 'action.moduleCropResize', [
                         ...layerUpdateActions,
                         new UpdateFileAction({
                             width: cropWidth.value,

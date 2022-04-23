@@ -9,7 +9,7 @@ export class UpdateFileAction extends BaseAction {
     private previousState: { [key: string]: any } = {};
 
     constructor(updateFileOptions: Partial<WorkingFileState>) {
-        super('updateLayer', 'Update Layer');
+        super('updateFile', 'action.updateFile');
         this.updateFileOptions = updateFileOptions;
 	}
 	public async do() {

@@ -2,6 +2,7 @@ export type ColorModelName = 'rgba' | 'cmyka' | 'hsla' | 'hsva';
 
 export interface GenericColor {
     is: 'color';
+    hex: string;
 }
 
 export interface RGBAColor extends GenericColor {

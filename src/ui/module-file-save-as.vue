@@ -12,19 +12,19 @@
         <template v-if="canSaveBackDirectly">
             <el-alert
                 type="info"
-                :title="'You have opened a project file named ' + fileHandle.name + ''"
+                :title="$t('module.fileSaveAs.saveBackIntroduction', { fileName: fileHandle.name })"
                 show-icon
                 :closable="false"
                 class="mb-4">
             </el-alert>
-            <el-form-item label="Save back to the original file?">
-                <el-switch v-model="formData.workingFile.saveBackDirectly" active-text="Yes" inactive-text="No" />
+            <el-form-item :label="$t('module.fileSaveAs.saveBackQuestion')">
+                <el-switch v-model="formData.workingFile.saveBackDirectly" :active-text="$t('button.yes')" :inactive-text="$t('button.no')" />
             </el-form-item>
         </template>
         <template v-else>
             <el-alert
                 type="info"
-                title="If you wish to share or view the image in other programs, use &quot;Export&quot; instead."
+                :title="$t('module.fileSaveAs.exportDisclaimer')"
                 show-icon
                 :closable="false"
                 class="mb-4">
@@ -32,14 +32,14 @@
         </template>
         <transition name="scale-down">
             <el-form-item-group v-if="!formData.workingFile.saveBackDirectly">
-                <el-form-item label="File Name" prop="fileName">
+                <el-form-item :label="$t('module.fileSaveAs.fileName')" prop="fileName">
                     <el-input v-model="formData.workingFile.fileName" clearable></el-input>
                 </el-form-item>
             </el-form-item-group>
         </transition>
         <div class="has-text-right">
-            <el-button @click="onCancel">Cancel</el-button>
-            <el-button type="primary" native-type="submit">Save</el-button>
+            <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
+            <el-button type="primary" native-type="submit">{{ $t('button.save') }}</el-button>
         </div>
     </el-form>
 </template>
@@ -78,7 +78,7 @@ export default defineComponent({
         'close'
     ],
     setup(props, { emit }) {
-        emit('update:title', 'Save Image As');
+        emit('update:title', 'module.fileSaveAs.title');
 
         const $notify = notifyInjector('$notify');
         const form = ref<typeof ElForm>();

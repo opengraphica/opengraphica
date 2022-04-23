@@ -1,5 +1,5 @@
 const path = require('path');
-const { ProgressPlugin } = require('webpack');
+const { DefinePlugin, ProgressPlugin } = require('webpack');
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const { VueLoaderPlugin } = require('vue-loader');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
@@ -83,11 +83,19 @@ module.exports = function setupConfig(config) {
                 'node_modules'
             ],
             alias: {
-                '@': path.resolve(__dirname, 'src/')
+                '@': path.resolve(__dirname, 'src/'),
+                'vue-i18n': 'vue-i18n/dist/vue-i18n.esm-bundler.js'
             },
             extensions: ['.js', '.mjs', '.ts', '.vue', '.json']
         },
         plugins: [
+            new DefinePlugin({
+                __VUE_OPTIONS_API__: true,
+                __VUE_PROD_DEVTOOLS__: false,
+                __VUE_I18N_FULL_INSTALL__: true,
+                __VUE_I18N_LEGACY_API__: true,
+                __INTLIFY_PROD_DEVTOOLS__: false
+            }),
             new ProgressPlugin({
                 activeModules: true
             }),
@@ -265,6 +273,10 @@ module.exports = function setupConfig(config) {
                         test: /[\\/]node_modules[\\/](\@vue|vue)[\\/]/,
                         name: 'vue'
                     },
+                    vueI18n: {
+                        test: /[\\/]node_modules[\\/]vue-i18n[\\/]/,
+                        name: 'vue-i18n'
+                    }
                 }
             }
         },

@@ -25,6 +25,7 @@
         "unplugin-element-plus": "0.2.0",
         "uuid": "8.3.2",
         "vue": "3.2.29",
+        "vue-i18n": "^9.1.9",
         "vuex": "4.0.0"
     },
     "devDependencies": {

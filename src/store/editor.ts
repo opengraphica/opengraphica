@@ -152,35 +152,38 @@ const store = new PerformantStore<EditorStore>({
                 let activeTool = tool || null;
                 const activeGroup = store.get('activeToolGroup');
                 if (!tool) {
-                    activeTool = Object.keys(toolGroups[group].tools)[0];
+                    activeTool = Object.keys(toolGroups[group]?.tools || [])[0];
                 }
                 if (group !== activeGroup || activeTool !== store.get('activeTool')) {
-                    const toolDefinition = toolGroups[group].tools[activeTool || ''];
+                    const toolDefinition = toolGroups[group]?.tools[activeTool || ''];
                     let isActiveToolbarExclusive = false;
                     let activeToolbar: string | null = null;
                     let activeToolbarPosition = 'top';
                     let activeToolOverlays: string[] = [];
-                    if (toolDefinition) {
-                        const controllerName = toolDefinition.controller;
-                        const CanvasControllerGenericClass: typeof BaseCanvasController =
-                            (await import(/* webpackChunkName: 'canvas-controller-[request]' */ `../canvas/controllers/${controllerName}.ts`)).default;
-                        const controller = new CanvasControllerGenericClass();
-                        if (this.state.toolCanvasController) {
-                            try {
-                                this.state.toolCanvasController.onLeave();
-                            } catch (error: any) {
-                                console.error(error);
-                            }
+                    let controller;
+
+                    let controllerName = 'base-movement';
+                    if (toolDefinition?.controller) {
+                        controllerName = toolDefinition.controller;
+                    }
+                    const CanvasControllerGenericClass: typeof BaseCanvasController =
+                        (await import(/* webpackChunkName: 'canvas-controller-[request]' */ `../canvas/controllers/${controllerName}.ts`)).default;
+                    controller = new CanvasControllerGenericClass();
+                    if (this.state.toolCanvasController) {
+                        try {
+                            this.state.toolCanvasController.onLeave();
+                        } catch (error: any) {
+                            console.error(error);
                         }
-                        set('toolCanvasController', controller);
-                        if (toolDefinition.toolbar) {
-                            isActiveToolbarExclusive = !!toolDefinition.toolbar.exclusive;
-                            activeToolbarPosition = toolDefinition.toolbar.position || 'top';
-                            activeToolbar = toolDefinition.toolbar.target;
-                        }
-                        if (toolDefinition.overlays) {
-                            activeToolOverlays = toolDefinition.overlays;
-                        }
+                    }
+                    set('toolCanvasController', controller);
+                    if (toolDefinition?.toolbar) {
+                        isActiveToolbarExclusive = !!toolDefinition.toolbar.exclusive;
+                        activeToolbarPosition = toolDefinition.toolbar.position || 'top';
+                        activeToolbar = toolDefinition.toolbar.target;
+                    }
+                    if (toolDefinition?.overlays) {
+                        activeToolOverlays = toolDefinition.overlays;
                     }
                     set('activeToolGroupPrevious', store.get('activeToolGroup'));
                     set('activeToolGroup', group);

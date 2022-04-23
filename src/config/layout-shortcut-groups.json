@@ -1,11 +1,11 @@
 {
     "color": {
-        "name": "Pick Color",
+        "name": "layoutShortcutGroup.color.name",
         "controls": [
             {
                 "type": "button",
                 "icon": "bi bi-eyedropper",
-                "label": "Pick Color",
+                "label": "layoutShortcutGroup.color.controls.default.label",
                 "action": {
                     "type": "runModule",
                     "target": "tmp/notYetImplemented"
@@ -15,12 +15,12 @@
         "draggable": true
     },
     "deform": {
-        "name": "Deform",
+        "name": "layoutShortcutGroup.deform.name",
         "controls": [
             {
                 "type": "button",
                 "icon": "bi bi-droplet",
-                "label": "Deform",
+                "label": "layoutShortcutGroup.deform.controls.default.label",
                 "action": {
                     "type": "runModule",
                     "target": "tmp/notYetImplemented"
@@ -30,12 +30,12 @@
         "draggable": true
     },
     "draw": {
-        "name": "Draw",
+        "name": "layoutShortcutGroup.draw.name",
         "controls": [
             {
                 "type": "button",
                 "icon": "bi bi-brush",
-                "label": "Draw",
+                "label": "layoutShortcutGroup.draw.controls.default.label",
                 "action": {
                     "type": "runModule",
                     "target": "tmp/notYetImplemented"
@@ -45,12 +45,12 @@
         "draggable": true
     },
     "effects": {
-        "name": "Effects",
+        "name": "layoutShortcutGroup.effects.name",
         "controls": [
             {
                 "type": "button",
                 "icon": "bi bi-stars",
-                "label": "Effects",
+                "label": "layoutShortcutGroup.effects.controls.default.label",
                 "action": {
                     "type": "runModule",
                     "target": "tmp/notYetImplemented"
@@ -60,12 +60,12 @@
         "draggable": true
     },
     "erase": {
-        "name": "Erase",
+        "name": "layoutShortcutGroup.erase.name",
         "controls": [
             {
                 "type": "button",
                 "icon": "bi bi-eraser",
-                "label": "Erase",
+                "label": "layoutShortcutGroup.erase.controls.default.label",
                 "action": {
                     "type": "runModule",
                     "target": "tmp/notYetImplemented"
@@ -75,12 +75,12 @@
         "draggable": true
     },
     "history": {
-        "name": "History",
+        "name": "layoutShortcutGroup.history.name",
         "controls": [
             {
                 "type": "button",
                 "icon": "bi bi-arrow-counterclockwise",
-                "label": "Undo",
+                "label": "layoutShortcutGroup.history.controls.undo.label",
                 "action": {
                     "type": "runModule",
                     "target": "tmp/notYetImplemented"
@@ -89,7 +89,7 @@
             {
                 "type": "button",
                 "icon": "bi bi-arrow-clockwise",
-                "label": "Redo",
+                "label": "layoutShortcutGroup.history.controls.redo.label",
                 "action": {
                     "type": "runModule",
                     "target": "tmp/notYetImplemented"
@@ -99,12 +99,12 @@
         "draggable": true
     },
     "layers": {
-        "name": "Layers",
+        "name": "layoutShortcutGroup.layers.name",
         "controls": [
             {
                 "type": "button",
                 "icon": "bi bi-layers",
-                "label": "Layers",
+                "label": "layoutShortcutGroup.layers.controls.default.label",
                 "action": {
                     "type": "dock",
                     "target": "layers"
@@ -114,12 +114,12 @@
         "draggable": true
     },
     "search": {
-        "name": "Search",
+        "name": "layoutShortcutGroup.search.name",
         "controls": [
             {
                 "type": "button",
                 "icon": "bi bi-search",
-                "label": "Search",
+                "label": "layoutShortcutGroup.search.controls.default.label",
                 "action": {
                     "type": "runModule",
                     "target": "tmp/notYetImplemented"
@@ -129,12 +129,12 @@
         "draggable": true
     },
     "selection": {
-        "name": "Selection",
+        "name": "layoutShortcutGroup.selection.name",
         "controls": [
             {
                 "type": "button",
                 "icon": "bi bi-bounding-box",
-                "label": "Selection",
+                "label": "layoutShortcutGroup.selection.controls.default.label",
                 "action": {
                     "type": "toolGroup",
                     "target": "selection"
@@ -144,12 +144,12 @@
         "draggable": true
     },
     "settings": {
-        "name": "Settings",
+        "name": "layoutShortcutGroup.settings.name",
         "controls": [
             {
                 "type": "button",
                 "icon": "bi bi-gear",
-                "label": "Actions",
+                "label": "layoutShortcutGroup.settings.controls.default.label",
                 "action": {
                     "type": "dock",
                     "target": "settings"
@@ -159,12 +159,12 @@
         "draggable": true
     },
     "text": {
-        "name": "Text",
+        "name": "layoutShortcutGroup.text.name",
         "controls": [
             {
                 "type": "button",
                 "icon": "bi bi-type",
-                "label": "Insert / Edit Text",
+                "label": "layoutShortcutGroup.text.controls.default.label",
                 "action": {
                     "type": "toolGroup",
                     "target": "text"
@@ -174,12 +174,12 @@
         "draggable": true
     },
     "transform": {
-        "name": "Move / Transform",
+        "name": "layoutShortcutGroup.transform.name",
         "controls": [
             {
                 "type": "button",
                 "icon": "bi bi-cursor",
-                "label": "Move / Transform",
+                "label": "layoutShortcutGroup.transform.controls.default.label",
                 "action": {
                     "type": "toolGroup",
                     "target": "transform"
@@ -189,12 +189,12 @@
         "draggable": true
     },
     "view": {
-        "name": "Canvas View",
+        "name": "layoutShortcutGroup.view.name",
         "controls": [
             {
                 "type": "button",
                 "icon": "bi bi-zoom-in",
-                "label": "Zoom / Pan View",
+                "label": "layoutShortcutGroup.view.controls.default.label",
                 "action": {
                     "type": "toolGroup",
                     "target": "view"

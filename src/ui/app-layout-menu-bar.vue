@@ -11,7 +11,7 @@
         @touchmove="onTouchMoveMenuBar($event)">
         <div ref="flexContainer" class="is-flex container mx-auto">
             <div v-for="(actionGroupSection, actionGroupSectionName) of actionGroups" :key="actionGroupSectionName" class="ogr-menu-section my-2" :class="['ogr-menu-' + actionGroupSectionName, { 'px-3': actionGroupSectionName !== 'tools' }]">
-                <span v-if="actionGroupSectionName === 'tools'" class="ogr-menu-section__title">Tools</span>
+                <span v-if="actionGroupSectionName === 'tools'" class="ogr-menu-section__title">{{ $t('menuBar.toolsHeading') }}</span>
                 <component v-if="displayMode === 'all' || actionGroupSectionName === 'tools'" :is="actionGroupSectionName === 'tools' ? 'el-scrollbar' : 'v-fragment'">
                     <template v-for="actionGroup of actionGroupSection" :key="actionGroup.id">
                         <component :is="actionGroup.controls.length === 1 ? 'div' : 'el-button-group'" :class="{ 'ogr-single-button-group': actionGroup.controls.length === 1 }">
@@ -30,7 +30,7 @@
                                     @after-leave="onAfterLeavePopover(control)">
                                     <template #reference>
                                         <el-button
-                                            :aria-label="control.label"
+                                            :aria-label="$t(control.label)"
                                             :type="[activeToolGroup, activeMenuDrawerComponentName].includes(control.action && control.action.target) ? 'primary' : undefined"
                                             :plain="![activeToolGroup, activeMenuDrawerComponentName].includes(control.action && control.action.target)"
                                             :circle="!control.expanded"
@@ -48,7 +48,7 @@
                                             @keydown="onKeyDownControlButton($event, control)"
                                         >
                                             <span class="el-icon" :class="control.icon" aria-hidden="true" />
-                                            <span v-if="control.expanded" class="ml-2">{{ control.label }}</span>
+                                            <span v-if="control.expanded" class="ml-2">{{ $t(control.label) }}</span>
                                             <el-tag v-if="control.expanded" type="info" class="ml-2 el-tag--mini">Ctrl + K</el-tag>
                                         </el-button>
                                     </template>
@@ -62,7 +62,7 @@
                                     </template>
                                     <template v-else>
                                         <div class="px-3 py-2">
-                                            {{ control.label }}
+                                            {{ $t(control.label) }}
                                         </div>
                                     </template>
                                 </el-popover>

@@ -7,7 +7,7 @@ import { Ref } from 'vue';
 import {
     ShowOpenFilePicker, FileSystemFileHandle,
     SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel, InsertAnyLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions,
-    WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer,
+    WorkingFileEmptyLayer, WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer,
     SerializedFileGroupLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileVectorLayer, SerializedFileTextLayer
 } from '@/types';
 import historyStore from '@/store/history';
@@ -481,7 +481,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
         if (!newFileOptions.height) {
             newFileOptions.height = largestHeight || 1;
         }
-        
+
         const fileUpdateActions: BaseAction[] = [];
         if (options.insert) {
             if (workingFileStore.state.layers.length === 0) {
@@ -500,7 +500,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
 
         preferencesStore.set('useCanvasViewport', preferencesStore.get('preferCanvasViewport'));
         await historyStore.dispatch('runAction', {
-            action: new BundleAction('openFile', 'Open File', [
+            action: new BundleAction('openFile', 'action.openFile', [
                 ...fileUpdateActions,
                 ...insertLayerActions
             ])
@@ -523,6 +523,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
 
 async function parseSerializedFileToActions(serializedFile: SerializedFile<ColorModel>): Promise<{ workingFileDefinition: Partial<WorkingFileState>, insertLayerActions: InsertLayerAction<any>[] }> {
     const workingFileDefinition: Partial<WorkingFileState> = {
+        background: serializedFile.background,
         colorModel: serializedFile.colorModel,
         colorSpace: serializedFile.colorSpace,
         drawOriginX: serializedFile.drawOriginX,
@@ -546,6 +547,7 @@ async function parseSerializedFileToActions(serializedFile: SerializedFile<Color
 
 async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): Promise<InsertLayerAction<any>[]> {
     let insertLayerActions: InsertLayerAction<any>[] = [];
+    let groupInsertLayerActions: InsertLayerAction<any>[] = [];
     for (let layer of layers) {
         let parsedLayer: Partial<WorkingFileLayer<ColorModel>> = {
             blendingMode: layer.blendingMode,
@@ -560,15 +562,21 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
             visible: layer.visible,
             width: layer.width,
         };
-        if (layer.type === 'group') {
+        if (layer.type === 'empty') {
+            parsedLayer = {
+                ...parsedLayer,
+                type: 'empty',
+                renderer: layerRenderers.empty
+            } as WorkingFileEmptyLayer<ColorModel>;
+        } else if (layer.type === 'group') {
             parsedLayer = {
                 ...parsedLayer,
                 type: 'group',
                 renderer: layerRenderers.group,
-                expanded: false,
+                expanded: (layer as SerializedFileGroupLayer<ColorModel>).expanded,
                 layers: []
             } as WorkingFileGroupLayer<ColorModel>;
-            insertLayerActions = insertLayerActions.concat(await parseLayersToActions((layer as SerializedFileGroupLayer<ColorModel>).layers));
+            groupInsertLayerActions = groupInsertLayerActions.concat(await parseLayersToActions((layer as SerializedFileGroupLayer<ColorModel>).layers));
         } else if (layer.type === 'raster') {
             const serializedLayer = layer as SerializedFileRasterLayer<ColorModel>;
             const image = new Image();
@@ -647,5 +655,6 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
             new InsertLayerAction<InsertAnyLayerOptions<ColorModel>>(parsedLayer as InsertAnyLayerOptions<ColorModel>)
         );
     }
+    insertLayerActions = insertLayerActions.concat(groupInsertLayerActions);
     return insertLayerActions;
 }

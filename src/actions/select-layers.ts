@@ -9,7 +9,7 @@ export class SelectLayersAction extends BaseAction {
     private previousSelectedLayerIdsOverride: number[] | null = null;
 
     constructor(selectedLayerIds: number[], previousSelectedLayerIdsOverride?: number[]) {
-        super('selectLayers', 'Select Layer(s)');
+        super('selectLayers', 'action.selectLayers');
         this.newSelectedLayerIds = selectedLayerIds;
         if (previousSelectedLayerIdsOverride) {
             this.previousSelectedLayerIdsOverride = previousSelectedLayerIdsOverride;

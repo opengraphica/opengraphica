@@ -7,7 +7,7 @@ import imageStore from './data/image-store';
 import { registerObjectUrlUser, revokeObjectUrlIfLastUser } from './data/memory-management';
 import { createImageFromBlob } from '@/lib/image';
 import canvasStore from '@/store/canvas';
-import workingFileStore, { getLayerById } from '@/store/working-file';
+import workingFileStore, { getGroupLayerById, getLayerById } from '@/store/working-file';
 
 export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorModel>> extends BaseAction {
 
@@ -19,7 +19,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
     private oldRasterSourceImageDatabaseId: string | null = null;
 
     constructor(updateLayerOptions: LayerOptions, explicitPreviousProps: Partial<WorkingFileAnyLayer<ColorModel>> = {}) {
-        super('updateLayer', 'Update Layer');
+        super('updateLayer', 'action.updateLayer');
         this.updateLayerOptions = updateLayerOptions;
         this.explicitPreviousProps = explicitPreviousProps;
 	}
@@ -77,7 +77,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                 (layer as any)[prop] = this.updateLayerOptions[prop];
             }
         }
-        layer.thumbnailImageSrc = null;
+        this.regenerateThumbnail(layer);
 
         canvasStore.set('dirty', true);
 	}
@@ -93,7 +93,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                     (layer as any)[prop] = (this.previousProps as any)[prop];
                 }
             }
-            layer.thumbnailImageSrc = null;
+            this.regenerateThumbnail(layer);
             if (layer.type === 'raster') {
                 if (this.oldRasterSourceImageDatabaseId != null) {
                     const oldImageIsObjectUrl = layer.data.sourceImageIsObjectUrl;
@@ -146,6 +146,18 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
 
         (this.updateLayerOptions as any) = null;
         (this.previousProps as any) = null;
+    }
+    
+    private regenerateThumbnail(layer: WorkingFileAnyLayer<ColorModel>) {
+        let parent: WorkingFileAnyLayer<ColorModel> | null = layer;
+        while (parent != null) {
+            parent.thumbnailImageSrc = null;
+            if (parent.groupId != null) {
+                parent = getGroupLayerById(parent.groupId);
+            } else {
+                parent = null;
+            }
+        }
     }
 
 }

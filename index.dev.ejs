@@ -5,6 +5,23 @@
         <link rel="icon" href="/favicon.ico" />
         <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1" />
         <title><%= htmlWebpackPlugin.options.title %></title>
+        <script>
+            (() => {
+                const warn = console.warn;
+                console.warn = function(message) {
+                    if (message?.includes) {
+                        if (
+                            message.includes('You are running the esm-bundler build of vue-i18n') ||
+                            message.includes('__VUE_OPTIONS_API__')
+                        ) {
+                            return;
+                        }
+                    }
+                    console.trace();
+                    return warn.call(console, ...arguments);
+                };
+            })();
+        </script>
     </head>
     <body class="ogr-full-page">
         

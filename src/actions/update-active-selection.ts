@@ -11,7 +11,7 @@ export class UpdateActiveSelectionAction extends BaseAction {
     private oldSelectionCombineMode: SelectionCombineMode | null = null;
 
     constructor(newActiveSelectionPath: Array<SelectionPathPoint>, oldActiveSelectionPath?: Array<SelectionPathPoint>) {
-        super('updateActiveSelection', 'Update Active Selection');
+        super('updateActiveSelection', 'action.updateActiveSelection');
         this.newActiveSelectionPath = newActiveSelectionPath;
         if (oldActiveSelectionPath) {
             this.oldActiveSelectionPath = oldActiveSelectionPath;

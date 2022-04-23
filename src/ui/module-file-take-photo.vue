@@ -2,21 +2,21 @@
     <div v-loading="loading">
         <el-alert
             v-if="hasCameraError"
-            title="Camera Unavailable"
+            :title="$t('module.fileTakePhoto.noCameraError.title')"
             type="warning"
             show-icon
             :closable="false">
-            Either the device has no cameras or access to the camera was declined.
+            {{ $t('module.fileTakePhoto.noCameraError.message') }}
         </el-alert>
         <template v-else>
-            <el-select v-model="facingMode" class="mx-0 mt-0 mb-2 is-fullwidth" placeholder="Select Camera">
-                <el-option key="user" value="user" label="Front (User)" />
-                <el-option key="environment" value="environment" label="Rear (Environment)" />
+            <el-select v-model="facingMode" class="mx-0 mt-0 mb-2 is-fullwidth" :placeholder="$t('module.fileTakePhoto.selectCamera.placeholder')">
+                <el-option key="user" value="user" :label="$t('module.fileTakePhoto.selectCamera.user')" />
+                <el-option key="environment" value="environment" :label="$t('module.fileTakePhoto.selectCamera.environment')" />
             </el-select>
             <video ref="video" autoplay="true" class="is-fullwidth"></video>
             <div class="has-text-right mt-4">
-                <el-button @click="onCancel">Cancel</el-button>
-                <el-button type="primary" @click="onTake">Take</el-button>
+                <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
+                <el-button type="primary" @click="onTake">{{ $t('button.take') }}</el-button>
             </div>
         </template>
     </div>
@@ -58,7 +58,7 @@ export default defineComponent({
         'close'
     ],
     setup(props, { emit }) {
-        emit('update:title', 'Take Photo');
+        emit('update:title', 'module.fileTakePhoto.title');
 
         const $notify = notifyInjector('$notify');
         const loading = ref<boolean>(true);
@@ -140,7 +140,7 @@ export default defineComponent({
                         image.src = tmpCanvas.toDataURL('image/png');
                     });
                     await historyStore.dispatch('runAction', {
-                        action: new BundleAction('fileTakePhoto', 'Take a Photo', [
+                        action: new BundleAction('fileTakePhoto', 'action.fileTakePhoto', [
                             ...(workingFileStore.get('layers').length === 0 ? [
                                 new UpdateFileAction({
                                     width,

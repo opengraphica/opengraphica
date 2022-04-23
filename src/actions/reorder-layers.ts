@@ -17,7 +17,7 @@ export class ReorderLayersAction extends BaseAction {
     private insertLayerPreviousPositions: { groupId: number | null, index: number }[] = [];
 
     constructor(insertLayerIds: number[], referenceLayerId: number, insertPosition: 'below' | 'above' | 'topChild' | 'bottomChild') {
-        super('reorderLayers', 'Reorder Layers');
+        super('reorderLayers', 'action.reorderLayers');
         this.insertLayerIds = insertLayerIds;
         this.referenceLayerId = referenceLayerId;
         this.insertPosition = insertPosition;
@@ -67,6 +67,9 @@ export class ReorderLayersAction extends BaseAction {
                 throw new Error('Reference layer is not a group layer.');
             }
             referenceGroupLayer.layers.splice(this.insertPosition === 'bottomChild' ? 0 : referenceGroupLayer.layers.length, 0, ...insertLayers);
+            for (let layer of insertLayers) {
+                layer.groupId = referenceGroupLayer.id;
+            }
         }
 
         workingFileStore.set('layers', [...workingFileStore.get('layers')]);
@@ -95,18 +98,18 @@ export class ReorderLayersAction extends BaseAction {
         // Remove layers from inserted positions
         if (this.insertPosition === 'below' || this.insertPosition === 'above') {
             let referenceParent = this.getLayerParent(this.referenceLayerId);
-            referenceParent.layers.splice(referenceParent.layers.indexOf(referenceLayer) + (this.insertPosition === 'below' ? 0 : 1), insertedLayers.length);
+            referenceParent.layers.splice(referenceParent.layers.indexOf(referenceLayer) + (this.insertPosition === 'below' ? -1 : 1), insertedLayers.length);
         } else {
             const referenceGroupLayer = referenceLayer as WorkingFileGroupLayer<ColorModel>;
             if (!referenceGroupLayer) {
                 throw new Error('Reference layer is not a group layer.');
             }
-            referenceGroupLayer.layers.splice(this.insertPosition === 'bottomChild' ? 0 : referenceGroupLayer.layers.length, insertedLayers.length);
+            referenceGroupLayer.layers.splice(this.insertPosition === 'bottomChild' ? 0 : referenceGroupLayer.layers.length - 1, insertedLayers.length);
         }
 
         // Place inserted layers back in their original positions
-        let previousPositions = this.insertLayerPreviousPositions.reverse();
-        for (let [i, layer] of insertedLayers.reverse().entries()) {
+        let previousPositions = this.insertLayerPreviousPositions.slice().reverse();
+        for (let [i, layer] of insertedLayers.slice().reverse().entries()) {
             if (layer) {
                 const groupId = previousPositions[i].groupId;
                 const layerParent = groupId == null ? workingFileStore.get('layers') : getGroupLayerById(groupId)?.layers;
@@ -127,17 +130,17 @@ export class ReorderLayersAction extends BaseAction {
     }
 
     private getLayerParent(id: number): { id: number | null, layers: WorkingFileLayer<ColorModel>[] } {
-        const layers = workingFileStore.get('layers');
         let parent: { id: number | null, layers: WorkingFileLayer<ColorModel>[] } = {
             id: null,
-            layers: layers
+            layers: workingFileStore.get('layers')
         };
-        if (id != null) {
-            const groupLayer = getGroupLayerById(id, parent.layers);
-            if (groupLayer) {
+        const layer = getLayerById(id);
+        if (layer && layer.groupId != null) {
+            const parentGroupLayer = getGroupLayerById(layer.groupId, parent.layers);
+            if (parentGroupLayer) {
                 parent = {
-                    id: groupLayer.id,
-                    layers: groupLayer.layers
+                    id: parentGroupLayer.id,
+                    layers: parentGroupLayer.layers
                 };
             }
         }

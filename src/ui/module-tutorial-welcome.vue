@@ -10,15 +10,15 @@
                 <div class="is-inline-block">
                     <el-button type="text" class="m-0 is-block" @click="onNewImage()">
                         <span class="bi bi-file-earmark-plus mr-2" style="font-size: 1.2rem" aria-hidden="true" />
-                        Create New Image
+                        {{ $t('button.createNewImage') }}
                     </el-button>
                     <el-button type="text" class="m-0 is-block" @click="onOpenImage()">
                         <span class="bi bi-folder2-open mr-2" style="font-size: 1.2rem" aria-hidden="true" />
-                        Open Image
+                        {{ $t('button.openImage') }}
                     </el-button>
                     <el-button type="text" class="m-0 is-block" @click="onTakePhoto()">
                         <span class="bi bi-camera mr-2" style="font-size: 1.2rem" aria-hidden="true" />
-                        Take Photo
+                        {{ $t('button.takePhoto') }}
                     </el-button>
                 </div>
             </div>
@@ -37,7 +37,7 @@ import { runModule } from '@/modules';
 import editorStore from '@/store/editor';
 
 export default defineComponent({
-    name: 'ModuleWelcome',
+    name: 'ModuleTutorialWelcome',
     directives: {
         loading: ElLoading.directive
     },
@@ -49,7 +49,7 @@ export default defineComponent({
         'close'
     ],
     setup(props, { emit }) {
-        emit('update:title', '');
+        emit('update:title', 'empty');
 
         const loading = ref<boolean>(false);
        

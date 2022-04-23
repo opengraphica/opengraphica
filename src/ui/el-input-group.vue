@@ -1,6 +1,6 @@
 <template>
     <div class="el-input el-input-group el-input-group--prepend">
-        <el-tooltip v-if="prependTooltip" :content="prependTooltip" placement="top" :trigger="prependTooltip ? 'hover' : 'manual'" :show-after="300">
+        <el-tooltip v-if="prependTooltip" :content="prependTooltip" placement="top" :trigger="prependTooltip ? 'hover' : 'manual'" :show-after="tooltipShowDelay">
             <div ref="prependEl" v-if="$slots.prepend" class="el-input-group__prepend px-2">
                 <slot name="prepend" />
             </div>
@@ -20,6 +20,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, onUnmounted, nextTick } from 'vue';
 import ElTooltip from 'element-plus/lib/components/tooltip/index';
+import preferencesStore from '@/store/preferences';
 
 export default defineComponent({
     name: 'ElInputGroup',
@@ -35,6 +36,7 @@ export default defineComponent({
         const prependEl = ref<HTMLDivElement>();
 
         return {
+            tooltipShowDelay: preferencesStore.state.tooltipShowDelay,
             prependEl
         };
     }

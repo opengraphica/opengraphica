@@ -1,7 +1,7 @@
 <template>
     <div ref="dockLayout" class="ogr-layout-dock" :style="{ width: '320px' }">
         <div v-for="dockDefinition of config.layout" :key="dockDefinition.name" class="ogr-layout-dock__container" :style="{ 'height': (dockDefinition.ratio * 100) + '%' }">
-            <div class="ogr-dock-title">{{ dockDefinition.title }}</div>
+            <div v-if="dockDefinition.title" class="ogr-dock-title" v-t="dockDefinition.title"></div>
             <dock :name="dockDefinition.name" @update:title="dockDefinition.title = $event" />
         </div>
     </div>

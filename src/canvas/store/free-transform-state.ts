@@ -1,5 +1,6 @@
 import mitt from 'mitt';
 import { ref } from 'vue';
+import { WorkingFileLayer, ColorModel } from '@/types';
 
 export const isBoundsIndeterminate = ref<boolean>(false);
 export const layerPickMode = ref<'current' | 'auto'>('auto');
@@ -16,6 +17,7 @@ export const previewYSnap = ref<number[]>([]);
 export const dragHandleHighlight = ref<number | null>(null);
 export const rotateHandleHighlight = ref<boolean>(false);
 export const dimensionLockRatio = ref<number | null>(null);
+export const selectedLayers = ref<WorkingFileLayer<ColorModel>[]>([]);
 
 export const freeTransformEmitter = mitt();
 

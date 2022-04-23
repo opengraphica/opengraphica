@@ -11,10 +11,10 @@
         @submit="onCreate">
         <el-form-item-aligned-groups>
             <el-form-item-group>
-                <el-form-item label="Preset">
+                <el-form-item :label="$t('module.fileNew.preset')">
                     <el-select
                         v-model="selectedPreset"
-                        placeholder="Select (Optional)"
+                        :placeholder="$t('module.fileNew.presetPlaceholder')"
                         clearable filterable
                         @change="onChangeSelectedPreset">
                         <el-option
@@ -27,7 +27,7 @@
                 </el-form-item>
             </el-form-item-group>
             <el-form-item-group>
-                <el-form-item label="Width" prop="width">
+                <el-form-item :label="$t('module.fileNew.width')" prop="width">
                     <el-input-number :min="0" v-model="formData.workingFile.width" @input="onInputAny">
                         <template #append>
                             <el-select style="width: 6rem" v-model="formData.workingFile.measuringUnits" @change="onInputAny">
@@ -36,13 +36,13 @@
                                     :key="option.value"
                                     :label="option.value"
                                     :value="option.value">
-                                    {{ option.label }}
+                                    {{ $t(option.label) }}
                                 </el-option>
                             </el-select>
                         </template>
                     </el-input-number>
                 </el-form-item>
-                <el-form-item label="Height" prop="height">
+                <el-form-item :label="$t('module.fileNew.height')" prop="height">
                     <el-input-number :min="0" v-model="formData.workingFile.height" @input="onInputAny">
                         <template #append>
                             <el-select style="width: 6rem" v-model="formData.workingFile.measuringUnits" @change="onInputAny">
@@ -51,13 +51,13 @@
                                     :key="option.value"
                                     :label="option.value"
                                     :value="option.value">
-                                    {{ option.label }}
+                                    {{ $t(option.label) }}
                                 </el-option>
                             </el-select>
                         </template>
                     </el-input-number>
                 </el-form-item>
-                <el-form-item label="Resolution" prop="resolution">
+                <el-form-item :label="$t('module.fileNew.resolution')" prop="resolution">
                     <el-input-number v-model.lazy="formData.workingFile.resolution" :min="1" :precision="0" @input="onInputAny">
                         <template #append>
                             <el-select style="width: 6rem" v-model="formData.workingFile.resolutionUnits" @change="onInputAny">
@@ -66,13 +66,13 @@
                                     :key="option.value"
                                     :label="option.value"
                                     :value="option.value">
-                                    {{ option.label }}
+                                    {{ $t(option.label) }}
                                 </el-option>
                             </el-select>
                         </template>
                     </el-input-number>
                 </el-form-item>
-                <el-form-item label="Color Profile" prop="colorProfile" >
+                <el-form-item :label="$t('module.fileNew.colorProfile')" prop="colorProfile" >
                     <el-select v-model="formData.workingFile.colorProfile" @change="onInputAny">
                         <el-option
                             v-for="option in colorProfileOptions"
@@ -82,14 +82,14 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="Scale Factor" prop="scaleFactor">
+                <el-form-item :label="$t('module.fileNew.scaleFactor')" prop="scaleFactor">
                     <el-input-number v-model="formData.workingFile.scaleFactor" :min="1" :precision="0"></el-input-number>
                 </el-form-item>
             </el-form-item-group>
         </el-form-item-aligned-groups>
         <div class="has-text-right">
-            <el-button @click="onCancel">Cancel</el-button>
-            <el-button type="primary" native-type="submit">Create</el-button>
+            <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
+            <el-button type="primary" native-type="submit">{{ $t('button.create') }}</el-button>
         </div>
     </el-form>
 </template>
@@ -134,7 +134,7 @@ export default defineComponent({
         'close'
     ],
     setup(props, { emit }) {
-        emit('update:title', 'New Image');
+        emit('update:title', 'module.fileNew.title');
 
         const $notify = notifyInjector('$notify');
         const form = ref<typeof ElForm>();
@@ -142,15 +142,15 @@ export default defineComponent({
         let isLoadingPreset: boolean = false;
 
         const dimensionUnitOptions = [
-            { value: 'px', label: 'Pixels' },
-            { value: 'mm', label: 'Millimeters' },
-            { value: 'cm', label: 'Centimeters' },
-            { value: 'in', label: 'Inches' }
+            { value: 'px', label: 'measurement.pixels' },
+            { value: 'mm', label: 'measurement.millimeters' },
+            { value: 'cm', label: 'measurement.centimeters' },
+            { value: 'in', label: 'measurement.inches' }
         ];
         const resolutionUnitOptions = [
-            { value: 'px/in', label: 'Pixels/Inch' },
-            { value: 'px/mm', label: 'Pixels/Millimeter' },
-            { value: 'px/cm', label: 'Pixels/Centimeter' }
+            { value: 'px/in', label: 'measurement.pixelsPerInch' },
+            { value: 'px/mm', label: 'measurement.pixelsPerMillimeter' },
+            { value: 'px/cm', label: 'measurement.pixelsPerCentimeter' }
         ];
         const presetOptions = reactive(defaultNewFilePresets.map((preset) => {
             return {

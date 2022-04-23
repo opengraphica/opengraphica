@@ -4,7 +4,7 @@ Modules
             [x] bmp
             [x] jpeg
             [x] gif
-            [ ] mp4
+            [ ] mp4 (https://github.com/ffmpegwasm/ffmpeg.wasm)
             [x] png
             [x] webp
             [ ] webv
@@ -39,7 +39,7 @@ Modules
     - Image
         - Crop & Resize
             [x] Resize visually to crop
-            [ ] Change crop handles to outside frame instead of inside
+            [x] Change crop handles to outside frame instead of inside
             - Modes
                 [x] Crop
                 [ ] Resample
@@ -208,8 +208,10 @@ Tools
     - Layers
         [x] Drag & Drop reorder
         [x] Show/hide toggle
-        [ ] Change background solid/transparent grid
-        [ ] Expand layer Groups
+        [ ] Background
+            [x] Show/hide
+            [ ] Change color with color picker
+        [x] Expand layer Groups
         [ ] Manipulate effect layers
             [ ] Update image preview automatically
         - More settings

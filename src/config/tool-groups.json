@@ -1,22 +1,22 @@
 {
     "draw": {
-        "name": "Draw",
-        "description": "Brushes, pencils, pens, and vector art drawing tools.",
+        "name": "toolGroup.draw.name",
+        "description": "toolGroup.draw.description",
         "tools": {
             "brush": {
-                "name": "Brush",
-                "description": "Brushes that draw on raster layers.",
+                "name": "toolGroup.draw.tools.brush.name",
+                "description": "toolGroup.draw.tools.brush.description",
                 "controller": "free-transform"
             }
         }
     },
     "image": {
-        "name": "Image",
-        "description": "General image resolution manipulation.",
+        "name": "toolGroup.image.name",
+        "description": "toolGroup.image.description",
         "tools": {
             "cropResize": {
-                "name": "Crop and Resize",
-                "description": "Crop, resize, change aspect ratio, or resample the image.",
+                "name": "toolGroup.image.tools.cropResize.name",
+                "description": "toolGroup.image.tools.cropResize.description",
                 "controller": "crop-resize",
                 "toolbar": {
                     "exclusive": true,
@@ -30,12 +30,12 @@
         }
     },
     "selection": {
-        "name": "Selection",
-        "description": "Select areas of the active layer(s), any manipulations to the layer(s) only occur inside the selection.",
+        "name": "toolGroup.selection.name",
+        "description": "toolGroup.selection.description",
         "tools": {
             "selection": {
-                "name": "Selection",
-                "description": "Select an area of the image for targeted editing.",
+                "name": "toolGroup.selection.tools.selection.name",
+                "description": "toolGroup.selection.tools.selection.description",
                 "controller": "selection",
                 "toolbar": {
                     "position": "auto",
@@ -48,12 +48,12 @@
         }
     },
     "text": {
-        "name": "Text",
-        "description": "Tools for manipulating text layers.",
+        "name": "toolGroup.text.name",
+        "description": "toolGroup.text.description",
         "tools": {
             "text": {
-                "name": "Text",
-                "description": "Create and edit text layers.",
+                "name": "toolGroup.text.tools.text.name",
+                "description": "toolGroup.text.tools.text.description",
                 "controller": "text",
                 "toolbar": {
                     "position": "auto",
@@ -67,12 +67,12 @@
         }
     },
     "transform": {
-        "name": "Transform",
-        "description": "Tools for moving, rotating, scaling the layer.",
+        "name": "toolGroup.transform.name",
+        "description": "toolGroup.transform.description",
         "tools": {
             "freeTransform": {
-                "name": "Free Transform",
-                "description": "Move, rotate, or scale the selected layers.",
+                "name": "toolGroup.transform.tools.freeTransform.name",
+                "description": "toolGroup.transform.tools.freeTransform.description",
                 "controller": "free-transform",
                 "toolbar": {
                     "position": "auto",
@@ -85,12 +85,12 @@
         }
     },
     "view": {
-        "name": "View Display",
-        "description": "Tools for controlling the viewport display of the canvas.",
+        "name": "toolGroup.view.name",
+        "description": "toolGroup.view.description",
         "tools": {
             "zoom": {
-                "name": "Zoom",
-                "description": "Zoom in and out the canvas to control how much of the image you can see.",
+                "name": "toolGroup.view.tools.zoom.name",
+                "description": "toolGroup.view.tools.zoom.description",
                 "controller": "zoom",
                 "toolbar": {
                     "position": "auto",

@@ -1,4 +1,17 @@
 @mixin element-plus-enhancements {
+    .has-text-color-primary {
+        color: var(--el-text-color-primary);
+    }
+    .has-text-color-regular {
+        color: var(--el-text-color-regular);
+    }
+    .has-text-color-secondary {
+        color: var(--el-text-color-secondary);
+    }
+    .has-text-color-placeholder {
+        color: var(--el-text-color-placeholder);
+    }
+
     .el-alert--info.is-light {
         color: var(--ogr-alert-info-color);
     }

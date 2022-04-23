@@ -1,5 +1,6 @@
 <template>
     <div ref="canvasArea" class="ogr-canvas-area">
+        <div v-if="useCanvasBackground" ref="canvasBackground" class="ogr-canvas-background"></div>
         <div ref="canvasContainer" class="ogr-canvas-container" :class="{ 'ogr-canvas-viewport-css': useCssViewport, 'ogr-canvas-viewport-css--pixelated': isPixelatedZoomLevel }">
             <canvas ref="canvas" class="ogr-canvas" />
             <canvas v-if="usePostProcess" ref="postProcessCanvas" class="ogr-post-process-canvas" />
@@ -40,6 +41,7 @@ export default defineComponent({
         const selectionMaskCanvas = ref<HTMLCanvasElement>();
         let selectionMaskCanvasCtx: CanvasRenderingContext2D | null = null;
         const selectionMaskPattern = new Image();
+        const canvasBackground = ref<HTMLDivElement>();
         const postProcessCanvas = ref<HTMLCanvasElement>();
         const canvasArea = ref<HTMLDivElement>();
         const canvasContainer = ref<HTMLDivElement>();
@@ -56,6 +58,10 @@ export default defineComponent({
         const drawPostProcessWait: number = 100;
         const usePostProcess = computed<boolean>(() => {
             return preferencesStore.state.postProcessInterpolateImage && !preferencesStore.state.useCanvasViewport && canvasStore.state.decomposedTransform.scaleX < 1;
+        });
+
+        const useCanvasBackground = computed<boolean>(() => {
+            return !workingFileStore.state.background.visible || workingFileStore.state.background.color.a < 1;
         });
 
         const hasCanvasOverlays = computed<boolean>(() => {
@@ -98,7 +104,7 @@ export default defineComponent({
                     canvasElement.height = newHeight;
                 }
                 if (ctx) {
-                    drawWorkingFileToCanvas(canvasElement, ctx);
+                    drawWorkingFileToCanvas(canvasElement, ctx, { isEditorPreview: true });
                 }
             }
             canvasStore.set('viewDirty', true);
@@ -271,12 +277,20 @@ export default defineComponent({
                             }
                         }
                     } else if (canvasElement && ctx) {
-                        drawWorkingFileToCanvas(canvasElement, ctx);
+                        drawWorkingFileToCanvas(canvasElement, ctx, { isEditorPreview: true });
 
                         // Hide post process canvas
                         if (postProcessCanvas.value) {
                             postProcessCanvas.value.style.display = 'none';
                         }
+                    }
+
+                    // Update background transform
+                    if (canvasBackground.value) {
+                        canvasBackground.value.style.width = imageWidth.value + 'px';
+                        canvasBackground.value.style.height = imageHeight.value + 'px';
+                        canvasBackground.value.style.transform = cssViewTransform;
+                        canvasBackground.value.style.backgroundSize = (16 * 1 / decomposedTransform.scaleX) + 'px';
                     }
 
                     // Update overlay transform
@@ -321,7 +335,7 @@ export default defineComponent({
                         editorStore.dispatch('setTimelineCursor', cursor);
                     }
 
-                    drawWorkingFileToCanvas(canvasElement, ctx);
+                    drawWorkingFileToCanvas(canvasElement, ctx, { isEditorPreview: true });
 
                     // Post process for better pixel interpolation
                     if (postProcessCanvas.value) {
@@ -358,7 +372,7 @@ export default defineComponent({
         }
 
         function drawPostProcess() {
-            if (canvasStore.get('playingAnimation')) {
+            if (canvasStore.get('playingAnimation') || useCanvasBackground) {
                 return;
             }
             const canvasElement = canvas.value;
@@ -427,11 +441,13 @@ export default defineComponent({
         return {
             canvas,
             canvasArea,
+            canvasBackground,
             canvasContainer,
             canvasOverlays,
             selectionMaskCanvas,
             postProcessCanvas,
             isPixelatedZoomLevel,
+            useCanvasBackground,
             usePostProcess,
             useCssViewport
         };

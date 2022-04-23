@@ -30,6 +30,7 @@
         :label="label"
         :tabindex="tabindex"
         :validate-event="validateEvent"
+        :aria-label="ariaLabel"
         @blur="onBlur($event)"
         @focus="onFocus($event)"
         @change="onChange($event)"
@@ -168,6 +169,10 @@ export default defineComponent({
         blurOnEnter: {
             type: Boolean,
             default: false
+        },
+        ariaLabel: {
+            type: String,
+            default: ''
         }
     },
     emits: [

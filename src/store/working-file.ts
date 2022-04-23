@@ -3,6 +3,10 @@ import { ColorModel, FileSystemFileHandle, MeasuringUnits, ResolutionUnits, Colo
 
 interface WorkingFileState {
     activeTimelineId: number | null;
+    background: {
+        visible: boolean;
+        color: ColorModel;
+    };
     colorModel: ColorModelName;
     colorSpace: string;
     drawOriginX: number;
@@ -31,6 +35,10 @@ interface WorkingFileStore {
 const store = new PerformantStore<WorkingFileStore>({
     state: {
         activeTimelineId: null,
+        background: {
+            visible: true,
+            color: { is: 'color', r: 1, g: 1, b: 1, a: 1, hex: '#ffffff' }
+        },
         colorModel: 'rgba',
         colorSpace: 'sRGB',
         drawOriginX: 0,
@@ -124,8 +132,34 @@ function getTimelineById(id: number): WorkingFileTimeline | null {
     return null;
 }
 
-function ensureUniqueLayerSiblingName(layerId: number, name: string): string {
-    // TODO TODO TODO
+function ensureUniqueLayerSiblingName(layerId: number | null | undefined, name: string): string {
+    if (layerId != null) {
+        let siblings: WorkingFileLayer<ColorModel>[] = [];
+        const referenceLayer = getLayerById(layerId);
+        if (referenceLayer?.groupId != null) {
+            siblings = getGroupLayerById(referenceLayer.groupId)?.layers || [];
+        } else {
+            siblings = store.get('layers');
+        }
+        let largestNumber = -1;
+        name = name.replace(/\s#[0-9]{1,}$/g, '');
+        for (let sibling of siblings) {
+            const siblingName = sibling.name.replace(/\s#[0-9]{1,}$/g, '');
+            if (siblingName === name) {
+                let numberPart = sibling.name.split('#').pop() + '';
+                let number = 0;
+                if (/^[0-9]{1,}$/g.test(numberPart)) {
+                    number = parseInt(numberPart);
+                }
+                if (number > largestNumber) {
+                    largestNumber = number;
+                }
+            }
+        }
+        if (largestNumber >= 0) {
+            name = name + ' #' + (largestNumber + 1);
+        }
+    }
     return name;
 }
 

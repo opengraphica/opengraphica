@@ -28,6 +28,9 @@ const cursorImages: { [key: string]: { data: string, image: HTMLImageElement | n
     }
 })();
 
+/**
+ * Draws a single layer to the canvas
+ */
 export function drawWorkingFileLayerToCanvas(targetCanvas: HTMLCanvasElement, targetCtx: CanvasRenderingContext2D, layer: WorkingFileLayer<ColorModel>, decomposedTransform: DecomposedMatrix, options: DrawWorkingFileLayerOptions = {}) {
     if ((options.visible || layer.visible) && (!options.selectedLayersOnly || workingFileStore.get('selectedLayerIds').includes(layer.id))) {
         let ctx = targetCtx;
@@ -56,6 +59,13 @@ export function drawWorkingFileLayerToCanvas(targetCanvas: HTMLCanvasElement, ta
         if (layer.type !== 'raster' && layer.type !== 'rasterSequence' && layer.type !== 'group') {
             canvasStore.set('isDisplayingNonRasterLayer', true);
         }
+
+        if (options.selectionTest) {
+            ctx.save();
+            ctx.setTransform(new DOMMatrix());
+            ctx.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
+            ctx.restore();
+        }
         
         ctx.save();
         ctx.globalAlpha = layer.opacity;
@@ -68,7 +78,7 @@ export function drawWorkingFileLayerToCanvas(targetCanvas: HTMLCanvasElement, ta
         if (!isIdentity) {
             ctx.transform(layer.transform.a, layer.transform.b, layer.transform.c, layer.transform.d, layer.transform.e, layer.transform.f);
         }
-        layer.renderer.draw(ctx, layer, options);
+        layer.renderer.draw(ctx, layer, decomposedTransform, options);
         if (wasImageSmoothingEnabled) {
             ctx.imageSmoothingEnabled = true;
         }
@@ -76,10 +86,7 @@ export function drawWorkingFileLayerToCanvas(targetCanvas: HTMLCanvasElement, ta
             const pixel = getPixelFastTest(targetCtx, options.selectionTest.point.x, options.selectionTest.point.y);
             if (
                 !options.selectionTest.resultPixelTest ||
-                pixel[0] != options.selectionTest.resultPixelTest[0] ||
-                pixel[1] != options.selectionTest.resultPixelTest[1] ||
-                pixel[2] != options.selectionTest.resultPixelTest[2] ||
-                pixel[3] != options.selectionTest.resultPixelTest[3]
+                pixel[3] > 0
             ) {
                 options.selectionTest.resultId = layer.id;
                 options.selectionTest.resultPixelTest = pixel;
@@ -120,6 +127,7 @@ export function drawWorkingFileToCanvas(canvas: HTMLCanvasElement, ctx: CanvasRe
     now = performance.now();
 
     // Draw the image background and frame
+    const background = workingFileStore.get('background');
     const imageWidth = workingFileStore.get('width');
     const imageHeight = workingFileStore.get('height');
     ctx.beginPath();
@@ -134,15 +142,12 @@ export function drawWorkingFileToCanvas(canvas: HTMLCanvasElement, ctx: CanvasRe
         ctx.shadowBlur = 20 * decomposedTransform.scaleX;
     }
     ctx.lineWidth = canvasBorderSize;
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = background.visible ? background.color.hex : 'transparent';
     ctx.fill();
     ctx.shadowBlur = 0;
 
     // Selection test
     if (options.selectionTest) {
-        if (!useCssViewport) {
-            options.selectionTest.point = options.selectionTest.point.matrixTransform(transform);
-        }
         options.selectionTest.resultPixelTest = getPixelFastTest(ctx, options.selectionTest.point.x, options.selectionTest.point.y);
     }
 

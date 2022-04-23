@@ -2,12 +2,10 @@
     <div class="ogr-wait" :aria-hidden="!waiting" :class="{ 'is-immediate': isImmediate }">
         <div class="ogr-wait__center">
             <div style="width: 100%; height: 5rem;" v-loading="true" element-loading-background="transparent"></div>
-            <strong>Please Wait</strong>
+            <strong v-t="'app.wait.pleaseWait'"></strong>
             <template v-for="(notification, notificationId) in notifications" :key="notification">
-                <p>
-                    {{ notification.label }}
-                </p>
-                <button v-if="notification.cancelable" type="button" size="small" class="el-button" @click="onClickCancel(notificationId)">Cancel</button>
+                <p v-if="notification.label" v-t="notification.label"></p>
+                <button v-if="notification.cancelable" type="button" size="small" class="el-button" @click="onClickCancel(notificationId)" v-t="'app.wait.cancel'"></button>
             </template>
         </div>
     </div>

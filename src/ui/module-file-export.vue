@@ -12,23 +12,23 @@
         <template v-if="canSaveBackDirectly">
             <el-alert
                 type="info"
-                :title="'You have opened a file named ' + fileHandle.name + ''"
+                :title="$t('module.fileExport.saveBackIntroduction', { fileName: fileHandle.name })"
                 show-icon
                 :closable="false"
                 class="mb-4">
             </el-alert>
-            <el-form-item label="Save back to the original file?">
-                <el-switch v-model="formData.workingFile.saveBackDirectly" active-text="Yes" inactive-text="No" />
+            <el-form-item :label="$t('module.fileExport.saveBackQuestion')">
+                <el-switch v-model="formData.workingFile.saveBackDirectly" :active-text="$t('button.yes')" :inactive-text="$t('button.no')" />
             </el-form-item>
         </template>
         <el-form-item-group>
             <transition name="scale-down">
-                <el-form-item v-if="!formData.workingFile.saveBackDirectly" label="File Name" prop="fileName">
+                <el-form-item v-if="!formData.workingFile.saveBackDirectly" :label="$t('module.fileExport.fileName')" prop="fileName">
                     <el-input v-model="formData.workingFile.fileName" clearable></el-input>
                 </el-form-item>
             </transition>
             <transition name="scale-down">
-                <el-form-item v-if="!formData.workingFile.saveBackDirectly" label="File Type" prop="fileType" >
+                <el-form-item v-if="!formData.workingFile.saveBackDirectly" :label="$t('module.fileExport.fileType')" prop="fileType" >
                     <el-select v-model="formData.workingFile.fileType">
                         <el-option
                             v-for="option in fileTypeOptions"
@@ -39,7 +39,7 @@
                     </el-select>
                 </el-form-item>
             </transition>
-            <el-form-item label="Layers" prop="layerSelection" >
+            <el-form-item :label="$t('module.fileExport.layers')" prop="layerSelection" >
                 <el-select v-model="formData.workingFile.layerSelection">
                     <el-option
                         v-for="option in layerSelectionOptions"
@@ -50,7 +50,7 @@
                 </el-select>
             </el-form-item>
             <transition name="scale-down">
-                <el-form-item v-if="showQualitySetting" label="Quality" prop="quality">
+                <el-form-item v-if="showQualitySetting" :label="$t('module.fileExport.quality')" prop="quality">
                     <el-row>
                         <el-col :span="14">
                             <el-slider v-model="formData.workingFile.quality" :show-tooltip="false"></el-slider>
@@ -64,12 +64,12 @@
                 </el-form-item>
             </transition>
             <transition name="scale-down">
-                <el-form-item v-if="showDitheringSetting" label="Dithering" prop="dithering">
+                <el-form-item v-if="showDitheringSetting" :label="$t('module.fileExport.dithering')" prop="dithering">
                     <el-select v-model="formData.workingFile.dithering">
                         <el-option
                             v-for="option in ditheringOptions"
                             :key="option.value"
-                            :label="option.label"
+                            :label="$t(option.label)"
                             :value="option.value">
                         </el-option>
                     </el-select>
@@ -77,8 +77,8 @@
             </transition>
         </el-form-item-group>
         <div class="has-text-right">
-            <el-button @click="onCancel">Cancel</el-button>
-            <el-button type="primary" native-type="submit">Export</el-button>
+            <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
+            <el-button type="primary" native-type="submit">{{ $t('button.export') }}</el-button>
         </div>
     </el-form>
 </template>
@@ -128,7 +128,7 @@ export default defineComponent({
         'close'
     ],
     setup(props, { emit }) {
-        emit('update:title', 'Export Image');
+        emit('update:title', 'module.fileExport.title');
 
         const $notify = notifyInjector('$notify');
         const form = ref<typeof ElForm>();
@@ -149,15 +149,15 @@ export default defineComponent({
             return isfileFormatSupported(option.value);
         });
         const ditheringOptions = [
-            { value: '', label: 'None' },
-            { value: 'Atkinson', label: 'Atkinson' },
-            { value: 'Atkinson-serpentine', label: 'Atkinson (serpentine)' },
-            { value: 'FloydSteinberg', label: 'Floyd Steinberg' },
-            { value: 'FloydSteinberg-serpentine', label: 'Floyd Steinberg (serpentine)' },
-            { value: 'FalseFloydSteinberg', label: 'False Floyd Steinberg' },
-            { value: 'FalseFloydSteinberg-serpentine', label: 'False Floyd Steinberg (serpentine)' },
-            { value: 'Stucki', label: 'Stucki' },
-            { value: 'Stucki-serpentine', label: 'Stucki (serpentine)' },
+            { value: '', label: 'module.fileExport.ditheringOption.none' },
+            { value: 'Atkinson', label: 'module.fileExport.ditheringOption.atkinson' },
+            { value: 'Atkinson-serpentine', label: 'module.fileExport.ditheringOption.atkinsonSerpentine' },
+            { value: 'FloydSteinberg', label: 'module.fileExport.ditheringOption.floydSteinberg' },
+            { value: 'FloydSteinberg-serpentine', label: 'module.fileExport.ditheringOption.floydSteinbergSerpentine' },
+            { value: 'FalseFloydSteinberg', label: 'module.fileExport.ditheringOption.falseFloydSteinberg' },
+            { value: 'FalseFloydSteinberg-serpentine', label: 'module.fileExport.ditheringOption.falseFloydSteinbergSerpentine' },
+            { value: 'Stucki', label: 'module.fileExport.ditheringOption.stucki' },
+            { value: 'Stucki-serpentine', label: 'module.fileExport.ditheringOption.stuckiSerpentine' },
         ];
 
         const showQualitySetting = computed<boolean>(() => {

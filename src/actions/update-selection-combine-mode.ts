@@ -7,7 +7,7 @@ export class UpdateSelectionCombineModeAction extends BaseAction {
     private oldSelectionCombineMode: SelectionCombineMode;
 
     constructor(newSelectionCombineMode: SelectionCombineMode, oldSelectionCombineMode?: SelectionCombineMode) {
-        super('updateSelectionCombineMode', 'Update Selection Combine Mode');
+        super('updateSelectionCombineMode', 'action.updateSelectionCombineMode');
         this.newSelectionCombineMode = newSelectionCombineMode;
         this.oldSelectionCombineMode = oldSelectionCombineMode || selectionCombineMode.value;
 	}

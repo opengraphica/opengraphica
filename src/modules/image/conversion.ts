@@ -53,7 +53,7 @@ export async function convertLayersToImageSequence(options: ConvertLayersToImage
         editorStore.dispatch('setTimelineCursor', start);
         updateRasterSequenceLayerWithTimeline(rasterSequenceLayer as any);
         historyStore.dispatch('runAction', {
-            action: new BundleAction('convertLayersToImageSequence', 'Convert Layers to Image Sequence', [
+            action: new BundleAction('convertLayersToImageSequence', 'action.convertLayersToImageSequence', [
                 new DeleteLayersAction(combineLayers.map((layer) => layer.id)),
                 new InsertLayerAction(rasterSequenceLayer)
             ])

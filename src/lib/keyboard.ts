@@ -144,7 +144,7 @@ async function onDocumentPaste(e: ClipboardEvent) {
                     if (item.type.indexOf("image") !== -1) {
                         const file = item.getAsFile();
                         if (file) {
-                            appEmitter.emit('app.wait.startBlocking', { id: 'documentPasteImage', label: 'Loading Image' });
+                            appEmitter.emit('app.wait.startBlocking', { id: 'documentPasteImage', label: 'app.wait.loadingImage' });
                             isPastingImage = true;
                             const { openFromFileList } = await import(/* webpackChunkName: 'module-file-open' */ '@/modules/file/open');
                             await openFromFileList([file], { insert: true });

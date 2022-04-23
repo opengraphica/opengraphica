@@ -1,5 +1,6 @@
 
 import { createApp, App } from 'vue';
+import i18n from '@/i18n';
 import '@/polyfill';
 import OpenGraphicaApp from '@/ui/app.vue';
 import appEmitter from '@/lib/emitter';
@@ -20,9 +21,12 @@ export interface OpenGraphica extends App<Element> {
 }
 
 const app: OpenGraphica = createApp(OpenGraphicaApp) as OpenGraphica;
-app.use(ElNotification);
+
+// Setup Localization
+app.use(i18n);
 
 // Notification toasts
+app.use(ElNotification);
 app.provide('$notify', notifyPolyfill(app.config.globalProperties.$notify));
 appEmitter.on('app.notify', (options) => {
     const instance = notifyPolyfill(app.config.globalProperties.$notify)(options);

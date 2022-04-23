@@ -3,19 +3,19 @@
         <div class="ogr-toolbar-overlay">
             <div class="ogr-toolbar-tool-selector">
                 <span class="bi bi-cursor my-1" aria-hidden="true"></span>
-                <span class="ogr-toolbar-tool-selector__description">Settings</span>
+                <span class="ogr-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
             </div>
             <el-horizontal-scrollbar-arrows>
                 <el-button v-if="hasSelection" size="small" @click="onClickClearSelection">
-                    <span class="bi bi-x-circle-fill mr-2" aria-hidden="true" /> Clear Selection
+                    <span class="bi bi-x-circle-fill mr-2" aria-hidden="true" /> {{ $t('toolbar.freeTransform.clearSelection') }}
                 </el-button>
-                <el-input-group v-else prepend-tooltip="Pick Layer">
+                <el-input-group v-else :prepend-tooltip="$t('toolbar.freeTransform.pickLayer.label')">
                     <template #prepend>
                         <span class="bi bi-cursor" aria-hidden="true" />
                     </template>
-                    <el-select aria-label="Pick Layer" v-model="layerPickMode" size="small" style="width: 5rem">
-                        <el-option label="Auto" value="auto" />
-                        <el-option label="Current" value="current" />
+                    <el-select :aria-label="$t('toolbar.freeTransform.pickLayer.label')" v-model="layerPickMode" size="small" style="width: 5rem">
+                        <el-option :label="$t('toolbar.freeTransform.pickLayer.auto')" value="auto" />
+                        <el-option :label="$t('toolbar.freeTransform.pickLayer.current')" value="current" />
                     </el-select>
                 </el-input-group>
                 <el-popover
@@ -25,12 +25,12 @@
                     :width="250">
                     <template #reference>
                         <el-button size="small" class="ml-3">
-                            <span class="bi bi-magnet-fill mr-2" aria-hidden="true" /> Snapping
+                            <span class="bi bi-magnet-fill mr-2" aria-hidden="true" /> {{ $t('toolbar.freeTransform.snapping.title') }}
                         </el-button>
                     </template>
-                    <h2 class="mt-3 mx-4.5">Snapping</h2>
+                    <h2 class="mt-3 mx-4.5" v-t="'toolbar.freeTransform.snapping.title'" />
                     <el-form novalidate="novalidate" action="javascript:void(0)">
-                        <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" label="Rotation Snap">
+                        <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="$t('toolbar.freeTransform.snapping.rotationSnap')">
                             <el-switch v-model="useRotationSnapping" />
                         </el-form-item>
                     </el-form>
@@ -42,34 +42,34 @@
                     :width="250">
                     <template #reference>
                         <el-button size="small" class="ml-3">
-                            <span class="bi bi-clipboard-data-fill mr-2" aria-hidden="true" /> Metrics
+                            <span class="bi bi-clipboard-data-fill mr-2" aria-hidden="true" /> {{ $t('toolbar.freeTransform.metrics.title') }}
                         </el-button>
                     </template>
-                    <h2 class="mt-3 mx-4.5">Metrics</h2>
+                    <h2 class="mt-3 mx-4.5" v-t="'toolbar.freeTransform.metrics.title'" />
                     <template v-if="selectedLayerIds.length > 0">
                         <el-form novalidate="novalidate" action="javascript:void(0)">
                             <div class="px-4.5 my-3 is-flex">
                                 <el-input-number
-                                    v-model="inputLeft" aria-label="X Position" size="small"
+                                    v-model="inputLeft" :aria-label="'X ' + $t('toolbar.freeTransform.metrics.position')" size="small"
                                     class="el-input-group--plain is-flex-grow-1" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputLeft($event)" @blur="onChangeDragResizeInput()">
                                     <template #prepend>X</template>
                                 </el-input-number>
                                 <el-input-number
-                                    v-model="inputTop" aria-label="Y Position" size="small"
+                                    v-model="inputTop" :aria-label="'Y ' + $t('toolbar.freeTransform.metrics.position')" size="small"
                                     class="el-input-group--plain is-flex-grow-1 ml-3" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputTop($event)" @blur="onChangeDragResizeInput()">
                                     <template #prepend>Y</template>
                                 </el-input-number>
                             </div>
-                            <el-form-item class="el-form-item--menu-item mb-1" label="Width">
+                            <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.freeTransform.metrics.width')">
                                 <el-input-number v-model="inputWidth" style="width: 6rem" size="small" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputWidth($event)" @blur="onChangeDragResizeInput()" />
                             </el-form-item>
-                            <el-form-item class="el-form-item--menu-item mb-1" label="Height">
+                            <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.freeTransform.metrics.height')">
                                 <el-input-number v-model="inputHeight" style="width: 6rem" size="small" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputHeight($event)" @blur="onChangeDragResizeInput()" />
                             </el-form-item>
-                            <el-form-item class="el-form-item--menu-item mb-1" label="Rotation">
+                            <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.freeTransform.metrics.rotation')">
                                 <el-input-number v-model="inputRotation" style="width: 6rem" size="small" suffix-text="°" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputRotation($event)" @blur="onChangeRotationInput($event)">
                                     <template #append>
-                                        <el-button size="small" aria-label="Reset Rotation" @click="onResetRotation()">
+                                        <el-button size="small" :aria-label="$t('toolbar.freeTransform.metrics.resetRotation')" @click="onResetRotation()">
                                             <span class="bi bi-arrow-repeat" aria-hidden="true"></span>
                                         </el-button>
                                     </template>
@@ -81,7 +81,7 @@
                         <div class="px-4.5 my-3">
                             <el-alert
                                 type="info"
-                                title="No layer(s) selected."
+                                :title="$t('toolbar.freeTransform.metrics.noLayers')"
                                 show-icon
                                 :closable="false">
                             </el-alert>

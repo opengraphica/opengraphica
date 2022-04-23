@@ -41,6 +41,7 @@ function serializeWorkingFile(): SerializedFile<ColorModel> {
     const serializedFile: SerializedFile<ColorModel> = {
         version: '0.0.1-ALPHA.1',
         date: new Date().toISOString(),
+        background: workingFileStore.get('background'),
         colorModel: workingFileStore.get('colorModel'),
         colorSpace: workingFileStore.get('colorSpace'),
         drawOriginX: workingFileStore.get('drawOriginX'),
@@ -79,6 +80,7 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
             serializedLayer = {
                 ...serializedLayer,
                 type: 'group',
+                expanded: (layer as WorkingFileGroupLayer<ColorModel>).expanded,
                 layers: serializeWorkingFileLayers((layer as WorkingFileGroupLayer<ColorModel>).layers)
             } as SerializedFileGroupLayer<ColorModel>;
         } else if (layer.type === 'raster') {

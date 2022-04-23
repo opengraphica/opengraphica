@@ -3,30 +3,30 @@
         <div class="ogr-toolbar-overlay">
             <div class="ogr-toolbar-tool-selector">
                 <span class="bi bi-zoom-in my-1" aria-hidden="true"></span>
-                <span class="ogr-toolbar-tool-selector__description">Settings</span>
+                <span class="ogr-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
             </div>
             <el-horizontal-scrollbar-arrows>
                 <el-button-group class="el-button-group--flex">
-                    <el-button size="small" plain aria-label="Zoom Out" title="Zoom Out" @click="zoomLevel *= 1/1.25">
+                    <el-button size="small" plain :aria-label="$t('toolbar.zoom.zoomOut')" :title="$t('toolbar.zoom.zoomOut')" @click="zoomLevel *= 1/1.25">
                         <i class="bi bi-zoom-out" aria-hidden="true" />
                     </el-button>
                     <el-input-number v-model.lazy="zoomLevel" :blur-on-enter="true" suffix-text="%" size="small" class="el-input--text-center" style="width: 4rem" />
-                    <el-button size="small" plain aria-label="Zoom In" title="Zoom In" @click="zoomLevel *= 1.25">
+                    <el-button size="small" plain :aria-label="$t('toolbar.zoom.zoomIn')" :title="$t('toolbar.zoom.zoomIn')" @click="zoomLevel *= 1.25">
                         <i class="bi bi-zoom-in" aria-hidden="true" />
                     </el-button>
                 </el-button-group>
                 <el-button-group class="el-button-group--flex ml-3">
-                    <el-button size="small" plain aria-label="Rotate Counterclockwise" title="Rotate Counterclockwise" @click="rotationAngle -= 15">
+                    <el-button size="small" plain :aria-label="$t('toolbar.zoom.rotateCounterClockwise')" :title="$t('toolbar.zoom.rotateCounterClockwise')" @click="rotationAngle -= 15">
                         <i class="bi bi-arrow-counterclockwise" aria-hidden="true" />
                     </el-button>
                     <el-input-number v-model.lazy="rotationAngle" :blur-on-enter="true" suffix-text="°" size="small" class="el-input--text-center" style="width: 4rem" />
-                    <el-button size="small" plain aria-label="Rotate Clockwise" title="Rotate Clockwise" @click="rotationAngle += 15">
+                    <el-button size="small" plain :aria-label="$t('toolbar.zoom.rotateClockwise')" :title="$t('toolbar.zoom.rotateClockwise')" @click="rotationAngle += 15">
                         <i class="bi bi-arrow-clockwise" aria-hidden="true" />
                     </el-button>
                 </el-button-group>
                 <el-button-group class="el-button-group--flex ml-3">
                     <el-button size="small" plain @click="onResetViewFit">
-                        Fit
+                        {{ $t('toolbar.zoom.fit') }}
                     </el-button>
                     <el-button size="small" plain @click="onResetViewZoom">
                         1:1
@@ -38,10 +38,10 @@
                 <!-- Flipping the transform breaks a lot of things. Need research. -->
                 <!-- <el-button-group class="el-button-group--flex ml-3">
                     <el-button size="small" plain @click="onFlipX">
-                        Flip X
+                        {{ $t('toolbar.zoom.flip') }} X
                     </el-button>
                     <el-button size="small" plain @click="onFlipY">
-                        Flip Y
+                        {{ $t('toolbar.zoom.flip') }} Y
                     </el-button>
                 </el-button-group> -->
             </el-horizontal-scrollbar-arrows>

@@ -1,0 +1,583 @@
+{
+    "empty": "",
+    "action": {
+        "applyActiveSelection": "Apply Active Selection",
+        "clearSelection": "Clear Selection",
+        "convertLayersToImageSequence": "Convert Layers to Image Sequence",
+        "createNewFile": "New File",
+        "createNewLayersFromSelection": "Create Layers From Selection",
+        "deleteLayers": "Delete Layer(s)",
+        "fileTakePhoto": "Take a Photo",
+        "freeTransformRotate": "Free Transform (Rotate)",
+        "freeTransformScale": "Free Transform (Resize)",
+        "freeTransformTranslate": "Free Transform (Move)",
+        "insertLayer": "Insert Layer",
+        "moduleCropResize": "Crop and Resize",
+        "openFile": "Open File",
+        "reorderLayers": "Reorder Layer(s)",
+        "selectLayers": "Select Layer(s)",
+        "toggleLayerVisibilityOn": "Toggle Layer Visibility On",
+        "toggleLayerVisibilityOff": "Toggle Layer Visibility Off",
+        "updateActiveSelection": "Update Active Selection",
+        "updateFile": "Update File",
+        "updateLayer": "Update Layer",
+        "updateSelectionCombineMode": "Update Selection Combine Mode"
+    },
+    "app": {
+        "dndDropOverlay": {
+            "addImage": "Add Image"
+        },
+        "layerList": {
+            "toggleLayerVisibility": "Toggle Layer Visibility",
+            "layerSettings": "Layer Settings",
+            "delete": "Delete",
+            "frames": "Frames",
+            "playAnimation": "Play Animation",
+            "stopAnimation": "Stop Animation",
+            "editFrames": "Edit Frames",
+            "emptyGroup": "Group is Empty."
+        },
+        "wait": {
+            "loadingImage": "Loading Image",
+            "pleaseWait": "Please Wait",
+            "cancel": "Cancel"
+        }
+    },
+    "button": {
+        "apply": "Apply",
+        "cancel": "Cancel",
+        "clear": "Clear",
+        "convert": "Convert",
+        "create": "Create",
+        "createNewImage": "Create New Image",
+        "done": "Done",
+        "export": "Export",
+        "no": "No",
+        "openImage": "Open Image",
+        "save": "Save",
+        "settings": "Settings",
+        "take": "Take",
+        "takePhoto": "Take Photo",
+        "yes": "Yes"
+    },
+    "canvas": {
+        "toolbar": {
+            "cropResize": {
+                "waitLabel": "Crop and Resize"
+            }
+        }
+    },
+    "dock": {
+        "layers": {
+            "title": "Layers",
+            "add": "Add",
+            "layer": "Layer",
+            "group": "Group",
+            "background": "Background",
+            "toggleBackgroundVisibility": "Toggle Background Visibility",
+            "noLayers": "No Layers Yet."
+        },
+        "settings": {
+            "title": "Actions",
+            "file": {
+                "tabTitle": "File",
+                "menu": {
+                    "new": "New",
+                    "open": "Open",
+                    "export": "Export",
+                    "saveAs": "Save As",
+                    "insertPhoto": "Insert a Photo",
+                    "takePhoto": "Take a Photo"
+                }
+            },
+            "image": {
+                "tabTitle": "Image",
+                "menu": {
+                    "cropResize": "Crop and Resize",
+                    "convertLayers": {
+                        "groupTitle": "Convert Layers...",
+                        "toImageSequence": "To Image Sequence"
+                    },
+                    "cut": "Cut",
+                    "copy": "Copy",
+                    "copyAllLayers": "Copy All Layers",
+                    "paste": "Paste"
+                }
+            },
+            "view": {
+                "tabTitle": "View",
+                "zoom": "Zoom",
+                "zoomOut": "Zoom Out",
+                "zoomIn": "Zoom In",
+                "rotate": "Rotate",
+                "rotateCounterClockwise": "Rotate Counterclockwise",
+                "rotateClockwise": "Rotate Clockwise",
+                "reset": "Reset",
+                "fit": "Fit",
+                "touchRotate": {
+                    "label": "Touch Rotate",
+                    "on": "On",
+                    "snap": "Snap",
+                    "off": "Off"
+                }
+            },
+            "history": {
+                "tabTitle": "History",
+                "undo": "Undo",
+                "redo": "Redo",
+                "noHistory": "No History Yet.",
+                "baseImage": "Base Image"
+            },
+            "prefs": {
+                "tabTitle": "Prefs",
+                "theme": "Theme",
+                "performance": {
+                    "groupTitle": "Performance",
+                    "optimizeLargeImage": "Optimize for Large Image",
+                    "highQualityScaling": "High Quality Scaling",
+                    "fixAdjacentLayerSeams": "Fix Adjacent Layer Seams"
+                },
+                "editor": {
+                    "groupTitle": "Editor",
+                    "menuBarPosition": "Menu Bar Position",
+                    "showWelcomeScreen": "Show Welcome Screen",
+                    "showTips": "Show Tips",
+                    "resetSettings": "Reset Settings"
+                }
+            }
+        }
+    },
+    "el": {
+        "horizontalScrollbarArrows": {
+            "scrollLeft": "Scroll Left",
+            "scrollRight": "Scroll Right"
+        }
+    },
+    "keyboardMap": {
+        "file": {
+            "name": "File",
+            "actions": {
+                "open": "Open File",
+                "quickLoad": "Quick Load",
+                "quickSave": "Quick Save"
+            }
+        },
+        "history": {
+            "name": "Editing History",
+            "actions": {
+                "undo": "Undo",
+                "redo": "Redo"
+            }
+        },
+        "selection": {
+            "name": "Selection",
+            "actions": {
+                "selectAll": "Select All"
+            }
+        }
+    },
+    "layoutShortcutGroup": {
+        "color": {
+            "name": "Pick Color",
+            "controls": {
+                "default": {
+                    "label": "Pick Color"
+                }
+            }
+        },
+        "deform": {
+            "name": "Deform",
+            "controls": {
+                "default": {
+                    "label": "Deform"
+                }
+            }
+        },
+        "draw": {
+            "name": "Draw",
+            "controls": {
+                "default": {
+                    "label": "Draw"
+                }
+            }
+        },
+        "effects": {
+            "name": "Effects",
+            "controls": {
+                "default": {
+                    "label": "Effects"
+                }
+            }
+        },
+        "erase": {
+            "name": "Erase",
+            "controls": {
+                "default": {
+                    "label": "Erase"
+                }
+            }
+        },
+        "history": {
+            "name": "History",
+            "controls": {
+                "undo": {
+                    "label": "Undo"
+                },
+                "redo": {
+                    "label": "Redo"
+                }
+            }
+        },
+        "layers": {
+            "name": "Layers",
+            "controls": {
+                "default": {
+                    "label": "Layers"
+                }
+            }
+        },
+        "search": {
+            "name": "Search",
+            "controls": {
+                "default": {
+                    "label": "Search"
+                }
+            }
+        },
+        "selection": {
+            "name": "Selection",
+            "controls": {
+                "default": {
+                    "label": "Selection"
+                }
+            }
+        },
+        "settings": {
+            "name": "Actions",
+            "controls": {
+                "default": {
+                    "label": "Actions"
+                }
+            }
+        },
+        "text": {
+            "name": "Text",
+            "controls": {
+                "default": {
+                    "label": "Insert / Edit Text"
+                }
+            }
+        },
+        "transform": {
+            "name": "Move / Transform",
+            "controls": {
+                "default": {
+                    "label": "Move / Transform"
+                }
+            }
+        },
+        "view": {
+            "name": "Canvas Viewport",
+            "controls": {
+                "default": {
+                    "label": "Zoom / Pan View"
+                }
+            }
+        }
+    },
+    "measurement": {
+        "pixels": "Pixels",
+        "millimeters": "Millimeters",
+        "centimeters": "Centimeters",
+        "inches": "Inches",
+        "pixelsPerInch": "Pixels/Inch",
+        "pixelsPerMillimeter": "Pixels/Millimeter",
+        "pixelsPerCentimeter": "Pixels/Centimeter"
+    },
+    "menuBar": {
+        "toolsHeading": "Tools"
+    },
+    "module": {
+        "fileExport": {
+            "title": "Export Image",
+            "saveBackIntroduction": "You have opened a file named {fileName}.",
+            "saveBackQuestion": "Save back to the original file?",
+            "fileName": "File Name",
+            "fileType": "File Type",
+            "layers": "Layers",
+            "quality": "Quality",
+            "dithering": "Dithering",
+            "ditheringOption": {
+                "none": "None",
+                "atkinson": "Atkinson",
+                "atkinsonSerpentine": "Atkinson (serpentine)",
+                "floydSteinberg": "Floyd Steinberg",
+                "floydSteinbergSerpentine": "Floyd Steinberg (serpentine)",
+                "falseFloydSteinberg": "False Floyd Steinberg",
+                "falseFloydSteinbergSerpentine": "False Floyd Steinberg (serpentine)",
+                "stucki": "Stucki",
+                "stuckiSerpentine": "Stucki (serpentine)"
+            }
+        },
+        "fileNew": {
+            "title": "New Image",
+            "preset": "Preset",
+            "presetPlaceholder": "Select (Optional)",
+            "width": "Width",
+            "height": "Height",
+            "resolution": "Resolution",
+            "colorProfile": "Color Profile",
+            "scaleFactor": "Scale Factor"
+        },
+        "fileSaveAs": {
+            "title": "Save Image As",
+            "saveBackIntroduction": "You have opened a file named {fileName}.",
+            "saveBackQuestion": "Save back to the original file?",
+            "exportDisclaimer": "If you wish to share or view the image in other programs, use \"Export\" instead.",
+            "fileName": "File Name"
+        },
+        "fileTakePhoto": {
+            "title": "Take Photo",
+            "noCameraError": {
+                "title": "Camera Unavailable",
+                "message": "Either the device has no cameras or access to the camera was declined."
+            },
+            "selectCamera": {
+                "placeholder": "Select Camera",
+                "user": "Front (User)",
+                "environment": "Rear (Environment)"
+            }
+        },
+        "imageConvertLayersToImageSequence": {
+            "title": "Convert Layers to Image Sequence",
+            "frameDelay": "Frame Delay"
+        }
+    },
+    "moduleGroup": {
+        "file": {
+            "name": "File Management",
+            "description": "Load and save images to your device.",
+            "modules": {
+                "export": {
+                    "name": "Export Image",
+                    "description": "Save the image in a universal format that can be opened by other editors."
+                },
+                "insertPhoto": {
+                    "name": "Insert a Photo",
+                    "description": "Add a photo as a new layer in the currently opened image."
+                },
+                "new": {
+                    "name": "New Image",
+                    "description": "Create a new image with specified dimensions."
+                },
+                "open": {
+                    "name": "Open Image",
+                    "description": "Open an image or project file in a new workspace."
+                },
+                "quickLoad": {
+                    "name": "Quick Load",
+                    "description": "Load the file saved by quick save."
+                },
+                "quickSave": {
+                    "name": "Quick Save",
+                    "description": "Saves the current file to temporary storage."
+                },
+                "saveAs": {
+                    "name": "Save Image As",
+                    "description": "Saves the image in a project format that can be re-opened by OpenGraphica without losing any information."
+                },
+                "takePhoto": {
+                    "name": "Take a Photo",
+                    "description": "Take a photo from your camera and webcam and insert it into the image."
+                }
+            }
+        },
+        "history": {
+            "name": "Editing History",
+            "description": "Operations that control moving through the history of image edits.",
+            "modules": {
+                "redo": {
+                    "name": "History Redo",
+                    "description": "Redo the last undone action."
+                },
+                "undo": {
+                    "name": "History Undo",
+                    "description": "Undo the last action."
+                }
+            }
+        },
+        "image": {
+            "name": "Image Canvas",
+            "description": "Operations that affect the image canvas.",
+            "modules": {
+                "convertLayersToImageSequence": {
+                    "name": "Convert Layers to Image Sequence",
+                    "description": "Converts the selected layers to an image sequence layer (animation)."
+                },
+                "copyAll": {
+                    "name": "Copy All Layers",
+                    "description": "Copy all layers on the canvas as a PNG image to the clipboard."
+                }
+            }
+        },
+        "tmp": {
+            "name": "Temporary Modules",
+            "description": "Modules that will only stick around during initial development.",
+            "modules": {
+                "notYetImplemented": {
+                    "name": "Not Yet Implemented",
+                    "description": "Show a warning."
+                }
+            }
+        },
+        "tutorial": {
+            "name": "Tutorials",
+            "description": "Learn how to use OpenGraphica.",
+            "modules": {
+                "welcome": {
+                    "name": "Welcome",
+                    "description": "Start working on an image."
+                }
+            }
+        }
+    },
+    "option": {
+        "bottom": "Bottom",
+        "left": "Left",
+        "right": "Right",
+        "top": "Top"
+    },
+    "theme": {
+        "light": "Light",
+        "dark": "Dark"
+    },
+    "toolbar": {
+        "cropResize": {
+            "title": "Crop and Resize",
+            "linkWidthHeight": "Link Width/Height",
+            "width": "Width",
+            "height": "Height",
+            "dimensionUnits": "Dimension Units",
+            "resolution": "Resolution",
+            "resolutionUnits": "Resolution Units",
+            "snapping": "Snapping"
+        },
+        "freeTransform": {
+            "clearSelection": "Clear Selection",
+            "pickLayer": {
+                "label": "Pick Layer",
+                "auto": "Auto",
+                "current": "Current"
+            },
+            "snapping": {
+                "title": "Snapping",
+                "rotationSnap": "Rotation Snap"
+            },
+            "metrics": {
+                "title": "Metrics",
+                "position": "Position",
+                "width": "Width",
+                "height": "Height",
+                "rotation": "Rotation",
+                "resetRotation": "Reset Rotation",
+                "noLayers": "No layer(s) selected."
+            }
+        },
+        "general": {
+            "settings": "Settings"
+        },
+        "selection": {
+            "selectionShape": {
+                "label": "Selection Shape",
+                "rectangle": "Rectangle",
+                "ellipse": "Ellipse",
+                "free": "Free",
+                "tonalArea": "Tonal Area"
+            },
+            "selectionCombineMode": {
+                "label": "Selection Combine Mode",
+                "add": "Add",
+                "subtract": "Subtract",
+                "intersect": "Intersect"
+            }
+        },
+        "text": {
+            "font": "Font",
+            "size": "Size",
+            "bold": "Bold",
+            "italic": "Italic",
+            "strikethrough": "Strikethrough",
+            "underline": "Underline",
+            "fill": "Fill",
+            "fillTooltip": "Color that shows inside the edges of the letter(s)"
+        },
+        "zoom": {
+            "zoomOut": "Zoom Out",
+            "zoomIn": "Zoom In",
+            "rotateCounterClockwise": "Rotate Counterclockwise",
+            "rotateClockwise": "Rotate Clockwise",
+            "fit": "Fit",
+            "flip": "Flip"
+        }
+    },
+    "toolGroup": {
+        "draw": {
+            "name": "Draw",
+            "description": "Brushes, pencils, pens, and vector art drawing tools.",
+            "tools": {
+                "brush": {
+                    "name": "Brush",
+                    "description": "Brushes that draw on raster layers."
+                }
+            }
+        },
+        "image": {
+            "name": "Image",
+            "description": "General image resolution manipulation.",
+            "tools": {
+                "cropResize": {
+                    "name": "Crop and Resize",
+                    "description": "Crop, resize, change aspect ratio, or resample the image."
+                }
+            }
+        },
+        "selection": {
+            "name": "Selection",
+            "description": "Select areas of the active layer(s), any manipulations to the layer(s) only occur inside the selection.",
+            "tools": {
+                "selection": {
+                    "name": "Selection",
+                    "description": "Select an area of the image for targeted editing."
+                }
+            }
+        },
+        "text": {
+            "name": "Text",
+            "description": "Tools for manipulating text layers.",
+            "tools": {
+                "text": {
+                    "name": "Text",
+                    "description": "Create and edit text layers."
+                }
+            }
+        },
+        "transform": {
+            "name": "Transform",
+            "description": "Tools for moving, rotating, scaling the layer.",
+            "tools": {
+                "freeTransform": {
+                    "name": "Free Transform",
+                    "description": "Move, rotate, or scale the selected layers."
+                }
+            }
+        },
+        "view": {
+            "name": "Viewport Display",
+            "description": "Tools for controlling the viewport display of the canvas.",
+            "tools": {
+                "name": "Zoom",
+                "description": "Zoom in and out the canvas to control how much of the image you can see."
+            }
+        }
+    }
+}

@@ -172,7 +172,7 @@ export default defineComponent({
             e.preventDefault();
             showDndDropOverlay.value = false;
             if (e.dataTransfer && e.dataTransfer.files?.length > 0) {
-                appEmitter.emit('app.wait.startBlocking', { id: 'documentDropFiles', label: 'Loading Image' });
+                appEmitter.emit('app.wait.startBlocking', { id: 'documentDropFiles', label: 'app.wait.loadingImage' });
                 const { openFromFileList } = await import(/* webpackChunkName: 'module-file-open' */ '@/modules/file/open');
                 await openFromFileList(e.dataTransfer.files, { insert: true });
                 appEmitter.emit('app.wait.stopBlocking', { id: 'documentDropFiles' });
