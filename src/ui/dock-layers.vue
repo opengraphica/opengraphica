@@ -165,6 +165,7 @@ export default defineComponent({
                         const background = workingFileStore.state.background;
                         background.color = event.color;
                         workingFileStore.set('background', background);
+                        canvasStore.set('dirty', true);
                     }
                 }
             })
