@@ -42,7 +42,7 @@
                             @click="onChangeBackgroundColor()"
                         >
                             <div class="ogr-layer-thumbnail">
-                                <div class="ogr-layer-thumbnail-custom-img" />
+                                <div class="ogr-layer-thumbnail-custom-img" :style="{ background: backgroundStyle }" />
                             </div>
                             <span class="ogr-layer-name" v-t="'dock.layers.background'" />
                         </span>
@@ -71,6 +71,7 @@ import workingFileStore, { ensureUniqueLayerSiblingName, getLayerById } from '@/
 import { InsertLayerAction } from '@/actions/insert-layer';
 import { InsertEmptyLayerOptions, InsertGroupLayerOptions, ColorModel } from '@/types';
 import { runModule } from '@/modules';
+import appEmitter from '@/lib/emitter';
 
 const activeTab = ref<string>('file');
 
@@ -86,6 +87,12 @@ export default defineComponent({
         ElScrollbar,
         ElTooltip
     },
+    props: {
+        isDialog: {
+            type: Boolean,
+            default: false
+        }
+    },
     emits: [
         'close',
         'update:title'
@@ -100,6 +107,10 @@ export default defineComponent({
         const isHoveringBackground = ref<boolean>(false);
         
         let scrollbarWrap = document.createElement('div');
+
+        const backgroundStyle = computed<string>(() => {
+            return workingFileStore.state.background.color.style;
+        });
 
         const isBackgroundVisible = computed<boolean>({
             get() {
@@ -144,7 +155,19 @@ export default defineComponent({
         }
 
         function onChangeBackgroundColor() {
-            runModule('tmp', 'notYetImplemented');
+            appEmitter.emit('app.dialogs.openFromDock', {
+                name: 'color-picker',
+                props: {
+                    color: workingFileStore.state.background.color
+                },
+                onClose: (event?: any) => {
+                    if (event?.color) {
+                        const background = workingFileStore.state.background;
+                        background.color = event.color;
+                        workingFileStore.set('background', background);
+                    }
+                }
+            })
         }
 
         function onScrollLayerList() {
@@ -172,6 +195,7 @@ export default defineComponent({
             tooltipShowDelay: preferencesStore.state.tooltipShowDelay,
             isBackgroundVisible,
             isHoveringBackground,
+            backgroundStyle,
             onAddLayer,
             onAddGroup,
             onChangeBackgroundColor,

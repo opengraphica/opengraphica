@@ -5,10 +5,10 @@
                 <template #default>
                     <el-dialog :title="$t(dialog.title || 'empty')" :custom-class="'el-dialog--' + dialog.size + ' el-dialog--ogr-' + dialog.type" v-model="dialog.visible" destroy-on-close @closed="onDialogClosed(dialog)">
                         <template v-if="dialog.type === 'dock'">
-                            <dock :name="dialog.dock.name" @update:title="dialog.title = $event" @close="dialog.visible = false" />
+                            <dock :name="dialog.dock.name" :is-dialog="true" :props="dialog.props" @update:title="dialog.title = $event" @close="onCloseDialog(dialog, $event)" />
                         </template>
                         <template v-else-if="dialog.type === 'module'">
-                            <module :name="dialog.module.name" @update:title="dialog.title = $event" @close="dialog.visible = false" />
+                            <module :name="dialog.module.name" :is-dialog="true" :props="dialog.props" @update:title="dialog.title = $event" @close="onCloseDialog(dialog, $event)" />
                         </template>
                     </el-dialog>
                 </template>
@@ -32,6 +32,9 @@ interface DialogCommonDefinition {
     title: string;
     visible: boolean;
     size: 'small' | 'medium' | 'large' | 'big';
+    props?: any;
+    onClose?: (event: any) => void;
+    closeEventData?: any;
 }
 
 interface DockDialogDefinition extends DialogCommonDefinition {
@@ -78,7 +81,9 @@ export default defineComponent({
                     title: '',
                     visible: true,
                     dock: event,
-                    size: 'medium'
+                    size: 'medium',
+                    props: event.props,
+                    onClose: event.onClose
                 });
             }
         }
@@ -91,17 +96,31 @@ export default defineComponent({
                     title: '',
                     visible: true,
                     module: event,
-                    size: 'medium'
+                    size: 'medium',
+                    props: event.props,
+                    onClose: event.onClose
                 });
             }
         }
 
+        function onCloseDialog(dialog: DialogDefinition, event?: any) {
+            dialog.visible = false;
+            dialog.closeEventData = event;
+            if (dialog.closeEventData && dialog.onClose) {
+                dialog.onClose(dialog.closeEventData);
+            }
+        }
+
         function onDialogClosed(dialog: DialogDefinition) {
+            if (!dialog.closeEventData && dialog.onClose) {
+                dialog.onClose(dialog.closeEventData);
+            }
             dialogs.value.splice(dialogs.value.indexOf(dialog), 1);
         }
 
         return {
             dialogs,
+            onCloseDialog,
             onDialogClosed
         };
     }

@@ -1,7 +1,7 @@
 import { DrawWorkingFileLayerOptions, WorkingFileTextLayer, WorkingFileTextLayerSpan, WorkingFileLayerRenderer, ColorModel } from '@/types';
 import { fontLoadedStatusMap, textLayerCache, textMetaDefaults, TextLayerCacheItem, TextLayerRenderInfoWrap } from '@/canvas/store/text-state';
 import { getFontMetrics, FontMetrics } from '@/lib/metrics';
-import { colorToScreenRgbaHex } from '@/lib/color';
+import { generateColorStyle } from '@/lib/color';
 import { DecomposedMatrix } from '@/lib/dom-matrix';
 import workingFileStore from '@/store/working-file';
 
@@ -331,7 +331,7 @@ export default class TextLayerRenderer implements WorkingFileLayerRenderer<Color
                                 ' ' + (weight ? weight : '') +
                                 ' ' + Math.round(span.meta.size || textMetaDefaults.size) + 'px' +
                                 ' ' + family;
-                            const fillColor: string = colorToScreenRgbaHex(span.meta.fillColor || textMetaDefaults.fillColor as ColorModel, workingFileStore.state.colorModel, workingFileStore.state.colorSpace);
+                            const fillColor: string = generateColorStyle(span.meta.fillColor || textMetaDefaults.fillColor as ColorModel, workingFileStore.state.colorModel, workingFileStore.state.colorSpace);
                             let fillStyle: string = '';
                             if (fillColor.startsWith('#')) {
                                 fillStyle = fillColor;
@@ -339,7 +339,7 @@ export default class TextLayerRenderer implements WorkingFileLayerRenderer<Color
                             const strokeSize = ((span.meta.strokeSize != null) ? span.meta.strokeSize : textMetaDefaults.strokeSize);
                             let strokeStyle: string = '';
                             if (strokeSize) {
-                                const strokeColor: string = colorToScreenRgbaHex(span.meta.strokeColor || textMetaDefaults.strokeColor as ColorModel, workingFileStore.state.colorModel, workingFileStore.state.colorSpace);
+                                const strokeColor: string = generateColorStyle(span.meta.strokeColor || textMetaDefaults.strokeColor as ColorModel, workingFileStore.state.colorModel, workingFileStore.state.colorSpace);
                                 if (strokeColor.startsWith('#')) {
                                     strokeStyle = strokeColor;
                                 }

@@ -24,6 +24,10 @@
         "updateSelectionCombineMode": "Update Selection Combine Mode"
     },
     "app": {
+        "colorPickerGradient": {
+            "hueSlider": "Hue Slider",
+            "opacitySlider": "Opacity Slider"
+        },
         "dndDropOverlay": {
             "addImage": "Add Image"
         },
@@ -53,6 +57,7 @@
         "done": "Done",
         "export": "Export",
         "no": "No",
+        "ok": "OK",
         "openImage": "Open Image",
         "save": "Save",
         "settings": "Settings",
@@ -68,6 +73,11 @@
         }
     },
     "dock": {
+        "colorPicker": {
+            "title": "Color Picker",
+            "pickColorFromImage": "Pick Color From Image",
+            "hexCode": "Hex Code"
+        },
         "layers": {
             "title": "Layers",
             "add": "Add",

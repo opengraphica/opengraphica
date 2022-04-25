@@ -308,6 +308,12 @@ export default defineComponent({
         ElTimeline,
         ElTimelineItem
     },
+    props: {
+        isDialog: {
+            type: Boolean,
+            default: false
+        }
+    },
     emits: [
         'close',
         'update:title'

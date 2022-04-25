@@ -125,6 +125,10 @@ module.exports = function setupConfig(config) {
                         test: /[\\/]node_modules[\\/](async-validator)[\\/]/,
                         name: 'async-validator'
                     },
+                    colorNamer: {
+                        test: /[\\/]node_modules[\\/](color-namer)[\\/]/,
+                        name: 'color-namer'
+                    },
                     elementPlusAlert: {
                         test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](components)[\\/](alert)[\\/]/,
                         name: 'element-plus-button'

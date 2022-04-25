@@ -142,7 +142,7 @@ export function drawWorkingFileToCanvas(canvas: HTMLCanvasElement, ctx: CanvasRe
         ctx.shadowBlur = 20 * decomposedTransform.scaleX;
     }
     ctx.lineWidth = canvasBorderSize;
-    ctx.fillStyle = background.visible ? background.color.hex : 'transparent';
+    ctx.fillStyle = background.visible ? background.color.style : 'transparent';
     ctx.fill();
     ctx.shadowBlur = 0;
 

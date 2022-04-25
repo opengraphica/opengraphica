@@ -4,6 +4,8 @@
             <template #default>
                 <component
                     :is="name"
+                    :is-dialog="isDialog"
+                    v-bind:="props"
                     @update:title="onSetTitle($event)"
                     @close="onCloseModule($event)"
                 />
@@ -33,9 +35,16 @@ export default defineComponent({
         'tutorial-welcome': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-tutorial-welcome' */ `./module-tutorial-welcome.vue`))
     },
     props: {
+        isDialog: {
+            type: Boolean,
+            default: false
+        },
         name: {
             type: String,
             required: true
+        },
+        props: {
+            type: Object
         }
     },
     emits: [

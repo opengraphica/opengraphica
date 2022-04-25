@@ -6756,6 +6756,7 @@
 }
 :root {
   --ogr-border-radius: 0.25rem;
+  --ogr-modal-collapse-mobile: 600px;
 }
 
 html {
@@ -6794,6 +6795,9 @@ body.ogr-full-page .opengraphica {
   -moz-user-select: none;
   -webkit-user-select: none;
   user-select: none;
+  /***************************\
+  | Vue Transition Animations |
+  \***************************/
 }
 .opengraphica #ogr-tmp-file-input-container {
   position: absolute;
@@ -6802,27 +6806,334 @@ body.ogr-full-page .opengraphica {
   height: 1px;
   overflow: hidden;
 }
-.opengraphica .ogr-logo h1 {
-  font-size: 3.5rem;
-  font-weight: 100;
-  margin: 0;
-}
-.opengraphica .ogr-logo h1 img {
+.opengraphica .ogr-canvas, .opengraphica .ogr-post-process-canvas {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   width: 100%;
-  max-width: 25rem;
+  height: 100%;
+  z-index: 0;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
-@media screen and (max-width: 550px) {
-  .opengraphica .ogr-logo h1 {
-    font-size: 2.5rem;
-  }
+.opengraphica .ogr-canvas-area {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
 }
-@media screen and (max-width: 450px) {
-  .opengraphica .ogr-logo h1 {
-    font-size: 1.75rem;
-  }
+.opengraphica .ogr-canvas-background {
+  transform-origin: 0 0;
+  background-image: url("../images/transparency-bg.png");
+  background-repeat: repeat;
 }
-.opengraphica .ogr-logo p {
-  margin: 0 0 1rem 0;
+.opengraphica .ogr-canvas-container {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+}
+.opengraphica .ogr-canvas-container.ogr-canvas-viewport-css {
+  transform-origin: 0 0;
+}
+.opengraphica .ogr-canvas-container.ogr-canvas-viewport-css .ogr-canvas, .opengraphica .ogr-canvas-container.ogr-canvas-viewport-css .ogr-post-process-canvas {
+  width: auto;
+  height: auto;
+  right: auto;
+  bottom: auto;
+  image-rendering: auto;
+  image-rendering: smooth;
+  image-rendering: optimizequality;
+  image-rendering: high-quality;
+}
+.opengraphica .ogr-canvas-container.ogr-canvas-viewport-css .ogr-canvas {
+  box-shadow: 0 0 1.25rem var(--ogr-working-image-border-color);
+}
+.opengraphica .ogr-canvas-container.ogr-canvas-viewport-css .ogr-post-process-canvas {
+  transform-origin: top left;
+}
+.opengraphica .ogr-canvas-container.ogr-canvas-viewport-css.ogr-canvas-viewport-css--pixelated .ogr-canvas {
+  image-rendering: optimizespeed;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}
+.opengraphica .ogr-canvas-overlays {
+  display: block;
+  position: absolute;
+  transform-origin: 0 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+.opengraphica .ogr-canvas-overlays .ogr-canvas-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.opengraphica .ogr-canvas-overlays .ogr-canvas-overlay.is-full-canvas-area {
+  bottom: 0;
+  right: 0;
+}
+.opengraphica .ogr-canvas-selection-mask {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  image-rendering: optimizespeed;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}
+.opengraphica .ogr-color-picker-gradient {
+  position: relative;
+  width: 100%;
+  margin: 0.5rem 0;
+}
+.opengraphica .ogr-color-picker-gradient .el-slider {
+  position: relative;
+  height: 1.25rem;
+  --el-slider-height: 1.25rem;
+  --el-slider-button-wrapper-offset: 0;
+  --el-slider-button-wrapper-size: 1.25rem;
+  --el-slider-button-size: 1.25rem;
+  --el-slider-border-radius: 0;
+}
+.opengraphica .ogr-color-picker-gradient .el-slider:before {
+  content: "";
+  position: absolute;
+  background-image: url("../images/transparency-bg.png");
+  background-repeat: repeat;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.opengraphica .ogr-color-picker-gradient .el-slider__bar {
+  display: none;
+}
+.opengraphica .ogr-color-picker-gradient .el-slider__button {
+  background: transparent;
+  border-color: white;
+  position: relative;
+}
+.opengraphica .ogr-color-picker-gradient .el-slider__button:before {
+  content: "";
+  display: block;
+  position: absolute;
+  height: 1rem;
+  width: 1rem;
+  border: 0.15rem solid #999;
+  border-radius: 1000px;
+  box-sizing: border-box;
+}
+.opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__hue {
+  background: red;
+  padding: 0 0.625rem;
+}
+.opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__hue .el-slider__runway {
+  background: rgba(0, 0, 0, 0) linear-gradient(to right, red 0%, yellow 17%, lime 33%, aqua 50%, blue 67%, fuchsia 83%, red 100%) repeat scroll 0% 0%;
+}
+.opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__opacity {
+  background: linear-gradient(to right, white 50%, var(--ogr-color-pick-opaque) 51%);
+  padding: 0 0.625rem;
+}
+.opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__opacity .el-slider__runway {
+  background: rgba(0, 0, 0, 0) linear-gradient(to right, rgba(0, 0, 0, 0) 0%, var(--ogr-color-pick-opaque) 100%) repeat scroll 0% 0%;
+}
+.opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__saturation-value {
+  position: relative;
+  min-height: 14rem;
+  cursor: pointer;
+}
+.opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__saturation-gradient {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(to left, var(--ogr-color-pick-hue) 0.625rem, rgba(204, 154, 129, 0) calc(100% - .625rem));
+}
+.opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__value-gradient {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(to top, #000 0.625rem, rgba(204, 154, 129, 0) calc(100% - .625rem));
+}
+.opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__saturation-value-handle-container {
+  position: absolute;
+  left: 0.625rem;
+  right: 0.625rem;
+  top: 0.625rem;
+  bottom: 0.625rem;
+}
+.opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__saturation-value-handle {
+  position: absolute;
+  left: 0;
+  right: auto;
+  top: 0;
+  bottom: auto;
+  cursor: grab;
+  transition: transform var(--el-transition-duration-fast);
+}
+.opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__saturation-value-handle:before {
+  content: "";
+  display: block;
+  position: absolute;
+  left: -0.575rem;
+  top: -0.575rem;
+  height: 1.15rem;
+  width: 1.15rem;
+  border: 0.2rem solid #999;
+  border-radius: 1000px;
+  box-sizing: border-box;
+}
+.opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__saturation-value-handle:after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: -0.625rem;
+  top: -0.625rem;
+  height: 1.25rem;
+  width: 1.25rem;
+  border: 0.125rem solid white;
+  border-radius: 1000px;
+  box-sizing: border-box;
+}
+.opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__saturation-value-handle:hover {
+  transform: scale(1.2);
+}
+.opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__saturation-value-handle.is-grabbing {
+  cursor: grabbing;
+}
+.opengraphica .ogr-crop {
+  position: relative;
+  outline: 999999px solid var(--ogr-overlay-background-color);
+}
+.opengraphica .ogr-crop .ogr-crop-bounds {
+  outline: 0.35rem solid rgba(235, 235, 235, 0.7);
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-top-left,
+.opengraphica .ogr-crop .ogr-crop-handle-top-right,
+.opengraphica .ogr-crop .ogr-crop-handle-bottom-left,
+.opengraphica .ogr-crop .ogr-crop-handle-bottom-right,
+.opengraphica .ogr-crop .ogr-crop-handle-top,
+.opengraphica .ogr-crop .ogr-crop-handle-left,
+.opengraphica .ogr-crop .ogr-crop-handle-bottom,
+.opengraphica .ogr-crop .ogr-crop-handle-right {
+  position: absolute;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-top-left svg,
+.opengraphica .ogr-crop .ogr-crop-handle-top-right svg,
+.opengraphica .ogr-crop .ogr-crop-handle-bottom-left svg,
+.opengraphica .ogr-crop .ogr-crop-handle-bottom-right svg,
+.opengraphica .ogr-crop .ogr-crop-handle-top svg,
+.opengraphica .ogr-crop .ogr-crop-handle-left svg,
+.opengraphica .ogr-crop .ogr-crop-handle-bottom svg,
+.opengraphica .ogr-crop .ogr-crop-handle-right svg {
+  display: block;
+  position: absolute;
+  height: 2rem;
+  width: 2rem;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-top-left {
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-top-left svg {
+  transform: translate(-25%, -25%);
+  transform-origin: top left;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-top-right {
+  top: 0;
+  right: 0;
+  transform-origin: top right;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-top-right svg {
+  transform: rotate(90deg) translate(-25%, -25%);
+  transform-origin: top left;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-bottom-right {
+  bottom: 0;
+  right: 0;
+  transform-origin: bottom right;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-bottom-right svg {
+  transform: rotate(180deg) translate(-25%, -25%);
+  transform-origin: top left;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-bottom-left {
+  bottom: 0;
+  left: 0;
+  transform-origin: bottom left;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-bottom-left svg {
+  transform: rotate(270deg) translate(-25%, -25%);
+  transform-origin: top left;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-top {
+  top: 0;
+  left: 50%;
+  transform-origin: top center;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-top svg {
+  transform: translate(-50%, -100%);
+}
+.opengraphica .ogr-crop .ogr-crop-handle-right {
+  top: 50%;
+  right: 0;
+  transform-origin: right center;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-right svg {
+  transform: rotate(90deg) translate(-50%, 0);
+  transform-origin: center;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-bottom {
+  bottom: 0;
+  right: 50%;
+  transform-origin: bottom center;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-bottom svg {
+  transform: rotate(180deg) translate(50%, 0);
+  transform-origin: center;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-left {
+  top: 50%;
+  left: 0;
+  transform-origin: left center;
+}
+.opengraphica .ogr-crop .ogr-crop-handle-left svg {
+  transform: rotate(270deg) translate(0, -150%);
+  transform-origin: top center;
 }
 .opengraphica .ogr-dialogs .el-dialog.el-dialog--medium {
   width: 25rem !important;
@@ -6842,6 +7153,256 @@ body.ogr-full-page .opengraphica {
   .opengraphica .ogr-dialogs .el-dialog__body {
     overflow: auto !important;
   }
+}
+@media screen and (max-width: 600px) {
+  .opengraphica .ogr-dialogs .ogr-dock-mobile-edge-padding {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+.opengraphica .ogr-dnd-drop-overlay {
+  background: white;
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 800000;
+  align-items: center;
+  justify-content: center;
+}
+.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-overlay__center {
+  display: block;
+  pointer-events: none;
+}
+.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-top-left, .opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-top-right, .opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-left, .opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-right {
+  position: absolute;
+  pointer-events: none;
+}
+.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-top-left svg, .opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-top-right svg, .opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-left svg, .opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-right svg {
+  width: 3rem;
+  height: 3rem;
+}
+.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-top-left {
+  top: 1rem;
+  left: 1rem;
+}
+.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-top-right {
+  top: 1rem;
+  right: 1rem;
+}
+.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-top-right svg {
+  transform: rotate(90deg);
+}
+.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-left {
+  bottom: 1rem;
+  left: 1rem;
+}
+.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-left svg {
+  transform: rotate(-90deg);
+}
+.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-right {
+  bottom: 1rem;
+  right: 1rem;
+}
+.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-right svg {
+  transform: rotate(180deg);
+}
+.opengraphica .ogr-dock-popover {
+  min-width: 0 !important;
+  max-width: 90vw;
+  max-height: calc(100vh - 5rem) !important;
+  padding: 0 !important;
+  width: auto !important;
+}
+.opengraphica .ogr-dock-popover > .ogr-dock-title {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 0.5rem 1rem 0.35rem 1rem;
+}
+.opengraphica .ogr-dock-popover > .ogr-dock {
+  max-height: calc(100vh - 5rem) !important;
+  overflow: hidden !important;
+}
+.opengraphica .ogr-dock-popover > .ogr-dock > .ogr-dock-header {
+  border-bottom: 2px solid var(--el-border-color-light);
+}
+.opengraphica .ogr-dock-popover > .ogr-dock > .ogr-dock-content {
+  width: 350px;
+  max-width: 100%;
+}
+.opengraphica .ogr-dock-popover > .ogr-dock > .ogr-dock-content > .el-scrollbar, .opengraphica .ogr-dock-popover > .ogr-dock > .ogr-dock-content > .el-scrollbar {
+  max-height: calc(100vh - 13rem) !important;
+  overflow: hidden !important;
+}
+.opengraphica .ogr-dock-popover > .ogr-dock > .ogr-dock-content > .el-scrollbar > .el-scrollbar__wrap, .opengraphica .ogr-dock-popover > .ogr-dock > .ogr-dock-content > .el-scrollbar > .el-scrollbar__wrap {
+  max-height: calc(100vh - 13rem) !important;
+}
+.opengraphica .ogr-dock-popover > .ogr-dock > .el-tabs {
+  max-height: calc(100vh - 5rem) !important;
+  overflow: hidden !important;
+}
+.opengraphica .ogr-dock-popover > .ogr-dock > .el-tabs > .el-tabs__content, .opengraphica .ogr-dock-popover > .ogr-dock > .el-tabs > .el-tabs__content > .el-tab-pane, .opengraphica .ogr-dock-popover > .ogr-dock > .el-tabs > .el-tabs__content > .el-tab-pane > .el-scrollbar {
+  max-height: calc(100vh - 13rem) !important;
+  overflow: hidden !important;
+}
+.opengraphica .ogr-dock-popover > .ogr-dock > .el-tabs > .el-tabs__content > .el-tab-pane > .el-scrollbar > .el-scrollbar__wrap {
+  max-height: calc(100vh - 13rem) !important;
+  overflow: auto !important;
+}
+.opengraphica .ogr-free-transform {
+  position: relative;
+}
+@keyframes ogr-free-transform-bounds {
+  0% {
+    outline-color: #ebebeb;
+  }
+  50% {
+    outline-color: #c3c3c3;
+  }
+  100% {
+    outline-color: #ebebeb;
+  }
+}
+@keyframes ogr-free-transform-rotate-line {
+  0% {
+    background: rgba(235, 235, 235, 0.9);
+  }
+  50% {
+    background: rgba(205, 205, 205, 0.5);
+  }
+  100% {
+    background: rgba(235, 235, 235, 0.9);
+  }
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-bounds {
+  outline: 0.35rem solid white;
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  animation: ogr-free-transform-bounds 2s linear infinite;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-rotate {
+  position: absolute;
+  top: 0;
+  left: 50%;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-rotate svg {
+  display: block;
+  position: absolute;
+  height: 0.85rem;
+  width: 0.85rem;
+  transform: translateX(-50%) rotate(180deg);
+  transform-origin: top center;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-rotate .ogr-free-transform-handle-rotate-line {
+  background: rgba(235, 235, 235, 0.7);
+  display: block;
+  position: absolute;
+  top: -0.5rem;
+  width: 0.25rem;
+  height: 2.25rem;
+  transform: translateX(-50%);
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-left,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-right,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-left,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-right,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-left,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-right {
+  position: absolute;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-left svg,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-right svg,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-left svg,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-right svg,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top svg,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-left svg,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom svg,
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-right svg {
+  display: block;
+  position: absolute;
+  height: 0.75rem;
+  width: 0.75rem;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-left {
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-left svg {
+  transform: rotate(180deg);
+  transform-origin: top left;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-right {
+  top: 0;
+  right: 0;
+  transform-origin: top right;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-right svg {
+  transform: rotate(90deg);
+  transform-origin: top right;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-right {
+  bottom: 0;
+  right: 0;
+  transform-origin: bottom right;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-right svg {
+  transform: rotate(0deg);
+  transform-origin: bottom right;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-left {
+  bottom: 0;
+  left: 0;
+  transform-origin: bottom left;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-left svg {
+  transform: rotate(270deg);
+  transform-origin: bottom left;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top {
+  top: 0;
+  left: 50%;
+  transform-origin: top center;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-top svg {
+  transform: translateX(-50%) rotate(180deg);
+  transform-origin: top center;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-right {
+  top: 50%;
+  right: 0;
+  transform-origin: right center;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-right svg {
+  transform: translate(0, -50%);
+  transform-origin: right center;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom {
+  bottom: 0;
+  right: 50%;
+  transform-origin: bottom center;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom svg {
+  transform: rotate(180deg) translate(50%, 100%);
+  transform-origin: bottom center;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-left {
+  top: 50%;
+  left: 0;
+  transform-origin: left center;
+}
+.opengraphica .ogr-free-transform .ogr-free-transform-handle-left svg {
+  transform: rotate(270deg) translateY(-50%);
+  transform-origin: left center;
 }
 .opengraphica .ogr-layer-list {
   --layer-group-indent: 0px;
@@ -7202,232 +7763,6 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-layout-dock .ogr-layout-dock__container + .ogr-layout-dock__container {
   margin-top: 0.5rem;
 }
-@keyframes ogr-menu-drawers-fade-in {
-  0% {
-    display: none;
-    opacity: 0;
-  }
-  1% {
-    display: block;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-@keyframes ogr-menu-drawers-fade-out {
-  0% {
-    opacity: 1;
-  }
-  99% {
-    display: block;
-  }
-  100% {
-    display: none;
-    opacity: 0;
-  }
-}
-.opengraphica .ogr-menu-drawers {
-  position: absolute;
-  background: rgba(0, 0, 0, 0.1);
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  animation: ogr-menu-drawers-fade-in 0.15s ease-in;
-  animation-fill-mode: forwards;
-  z-index: 5;
-}
-.opengraphica .ogr-menu-drawers.is-fade-out {
-  animation: ogr-menu-drawers-fade-out 0.15s ease-in;
-}
-@keyframes ogr-menu-drawer-slide-right-open {
-  0% {
-    transform: translateX(-100%);
-    opacity: 0.5;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-@keyframes ogr-menu-drawer-slide-right-close {
-  0% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(-100%);
-    opacity: 0.5;
-  }
-}
-@keyframes ogr-menu-drawer-slide-left-open {
-  0% {
-    transform: translateX(100%);
-    opacity: 0.5;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-@keyframes ogr-menu-drawer-slide-left-close {
-  0% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(100%);
-    opacity: 0.5;
-  }
-}
-@keyframes ogr-menu-drawer-slide-top-open {
-  0% {
-    transform: translateY(100%);
-    opacity: 0.5;
-  }
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-@keyframes ogr-menu-drawer-slide-top-close {
-  0% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(100%);
-    opacity: 0.5;
-  }
-}
-@keyframes ogr-menu-drawer-slide-bottom-open {
-  0% {
-    transform: translateY(-100%);
-    opacity: 0.5;
-  }
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-@keyframes ogr-menu-drawer-slide-bottom-close {
-  0% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(-100%);
-    opacity: 0.5;
-  }
-}
-.opengraphica .ogr-menu-drawer {
-  display: flex;
-  flex-direction: column;
-  background: var(--ogr-menu-drawer-background-color);
-  border-radius: 1rem;
-  position: absolute;
-  top: 0.5rem;
-  bottom: 0.5rem;
-  left: 0.5rem;
-  right: 0.5rem;
-  animation-fill-mode: forwards;
-  animation-duration: 0.25s;
-  animation-timing-function: ease-in;
-}
-.opengraphica .ogr-menu-drawer.is-immediate {
-  animation: none;
-}
-.opengraphica .ogr-menu-drawer.is-open-right {
-  padding-left: 4rem;
-  right: 3.5rem;
-  animation-name: ogr-menu-drawer-slide-right-open;
-}
-.opengraphica .ogr-menu-drawer.is-open-right .ogr-menu-drawer__close {
-  right: -2.5rem;
-}
-.opengraphica .ogr-menu-drawer.is-open-right.is-closing {
-  animation-name: ogr-menu-drawer-slide-right-close;
-}
-.opengraphica .ogr-menu-drawer.is-open-left {
-  padding-right: 4rem;
-  left: 3.5rem;
-  animation-name: ogr-menu-drawer-slide-left-open;
-}
-.opengraphica .ogr-menu-drawer.is-open-left .ogr-menu-drawer__close {
-  right: auto;
-  left: -2.5rem;
-}
-.opengraphica .ogr-menu-drawer.is-open-left.is-closing {
-  animation-name: ogr-menu-drawer-slide-left-close;
-}
-.opengraphica .ogr-menu-drawer.is-open-top {
-  padding-bottom: 4rem;
-  top: 3.5rem;
-  animation-name: ogr-menu-drawer-slide-top-open;
-}
-.opengraphica .ogr-menu-drawer.is-open-top .ogr-menu-drawer__close {
-  top: -2.75rem;
-  right: 0.25rem;
-}
-.opengraphica .ogr-menu-drawer.is-open-top.is-closing {
-  animation-name: ogr-menu-drawer-slide-top-close;
-}
-.opengraphica .ogr-menu-drawer.is-open-bottom {
-  padding-top: 4rem;
-  bottom: 3.5rem;
-  animation-name: ogr-menu-drawer-slide-bottom-open;
-}
-.opengraphica .ogr-menu-drawer.is-open-bottom .ogr-menu-drawer__close {
-  top: auto;
-  bottom: -2.75rem;
-  right: 0.25rem;
-}
-.opengraphica .ogr-menu-drawer.is-open-bottom.is-closing {
-  animation-name: ogr-menu-drawer-slide-bottom-close;
-}
-.opengraphica .ogr-menu-drawer > .el-scrollbar {
-  flex-grow: 1;
-}
-.opengraphica .ogr-menu-drawer__title {
-  margin: 1.5rem 0 0.5rem 0;
-  padding: 0 1rem;
-  flex-grow: 0;
-  flex-shrink: 1;
-}
-.opengraphica .ogr-menu-drawer__close {
-  position: absolute;
-  top: 1.2rem;
-  right: 1.2rem;
-  color: var(--ogr-menu-drawer-close-icon-color);
-}
-.opengraphica .ogr-menu-drawer__close:hover {
-  color: var(--ogr-menu-drawer-close-icon-color-hover);
-}
-.opengraphica .ogr-menu-drawer__close .bi {
-  font-size: 1.6rem;
-}
-.opengraphica .ogr-menu-drawer__content {
-  padding: 0.5rem 0;
-  flex-grow: 1;
-  overflow: hidden;
-}
-.opengraphica .ogr-menu-drawer__content .ogr-dock {
-  height: 100%;
-}
-.opengraphica .ogr-menu-drawer__content .ogr-dock > .ogr-dock-header {
-  border-bottom: 2px solid var(--el-border-color-light);
-}
-.opengraphica .ogr-menu-drawer__content .ogr-dock > .el-tabs {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-.opengraphica .ogr-menu-drawer__content .ogr-dock > .el-tabs > .el-tabs__content > .el-tab-pane {
-  height: 100%;
-}
-.opengraphica .ogr-menu-drawer__content .ogr-module {
-  height: 100%;
-}
 .opengraphica .ogr-layout-menu-bar {
   display: block;
   position: relative;
@@ -7558,51 +7893,266 @@ body.ogr-full-page .opengraphica {
   margin-left: 0;
   margin-top: 0.375rem;
 }
-.opengraphica .ogr-dock-popover {
-  min-width: 0 !important;
-  max-width: 90vw;
-  max-height: calc(100vh - 5rem) !important;
-  padding: 0 !important;
-  width: auto !important;
+.opengraphica .ogr-logo h1 {
+  font-size: 3.5rem;
+  font-weight: 100;
+  margin: 0;
 }
-.opengraphica .ogr-dock-popover > .ogr-dock-title {
-  text-align: center;
-  font-size: 1rem;
-  font-weight: bold;
-  padding: 0.5rem 1rem 0.35rem 1rem;
+.opengraphica .ogr-logo h1 img {
+  width: 100%;
+  max-width: 25rem;
 }
-.opengraphica .ogr-dock-popover > .ogr-dock {
-  max-height: calc(100vh - 5rem) !important;
-  overflow: hidden !important;
+@media screen and (max-width: 550px) {
+  .opengraphica .ogr-logo h1 {
+    font-size: 2.5rem;
+  }
 }
-.opengraphica .ogr-dock-popover > .ogr-dock > .ogr-dock-header {
+@media screen and (max-width: 450px) {
+  .opengraphica .ogr-logo h1 {
+    font-size: 1.75rem;
+  }
+}
+.opengraphica .ogr-logo p {
+  margin: 0 0 1rem 0;
+}
+.opengraphica .ogr-menu-drawers {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.1);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  animation: ogr-menu-drawers-fade-in 0.15s ease-in;
+  animation-fill-mode: forwards;
+  z-index: 5;
+}
+@keyframes ogr-menu-drawers-fade-in {
+  0% {
+    display: none;
+    opacity: 0;
+  }
+  1% {
+    display: block;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes ogr-menu-drawers-fade-out {
+  0% {
+    opacity: 1;
+  }
+  99% {
+    display: block;
+  }
+  100% {
+    display: none;
+    opacity: 0;
+  }
+}
+@keyframes ogr-menu-drawer-slide-right-open {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes ogr-menu-drawer-slide-right-close {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-100%);
+    opacity: 0.5;
+  }
+}
+@keyframes ogr-menu-drawer-slide-left-open {
+  0% {
+    transform: translateX(100%);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes ogr-menu-drawer-slide-left-close {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0.5;
+  }
+}
+@keyframes ogr-menu-drawer-slide-top-open {
+  0% {
+    transform: translateY(100%);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes ogr-menu-drawer-slide-top-close {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0.5;
+  }
+}
+@keyframes ogr-menu-drawer-slide-bottom-open {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes ogr-menu-drawer-slide-bottom-close {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100%);
+    opacity: 0.5;
+  }
+}
+.opengraphica .ogr-menu-drawers.is-fade-out {
+  animation: ogr-menu-drawers-fade-out 0.15s ease-in;
+}
+.opengraphica .ogr-menu-drawer {
+  display: flex;
+  flex-direction: column;
+  background: var(--ogr-menu-drawer-background-color);
+  border-radius: 1rem;
+  position: absolute;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  right: 0.5rem;
+  animation-fill-mode: forwards;
+  animation-duration: 0.25s;
+  animation-timing-function: ease-in;
+}
+.opengraphica .ogr-menu-drawer.is-immediate {
+  animation: none;
+}
+.opengraphica .ogr-menu-drawer.is-open-right {
+  padding-left: 4rem;
+  right: 3.5rem;
+  animation-name: ogr-menu-drawer-slide-right-open;
+}
+.opengraphica .ogr-menu-drawer.is-open-right .ogr-menu-drawer__close {
+  right: -2.5rem;
+}
+.opengraphica .ogr-menu-drawer.is-open-right.is-closing {
+  animation-name: ogr-menu-drawer-slide-right-close;
+}
+.opengraphica .ogr-menu-drawer.is-open-left {
+  padding-right: 4rem;
+  left: 3.5rem;
+  animation-name: ogr-menu-drawer-slide-left-open;
+}
+.opengraphica .ogr-menu-drawer.is-open-left .ogr-menu-drawer__close {
+  right: auto;
+  left: -2.5rem;
+}
+.opengraphica .ogr-menu-drawer.is-open-left.is-closing {
+  animation-name: ogr-menu-drawer-slide-left-close;
+}
+.opengraphica .ogr-menu-drawer.is-open-top {
+  padding-bottom: 4rem;
+  top: 3.5rem;
+  animation-name: ogr-menu-drawer-slide-top-open;
+}
+.opengraphica .ogr-menu-drawer.is-open-top .ogr-menu-drawer__close {
+  top: -2.75rem;
+  right: 0.25rem;
+}
+.opengraphica .ogr-menu-drawer.is-open-top.is-closing {
+  animation-name: ogr-menu-drawer-slide-top-close;
+}
+.opengraphica .ogr-menu-drawer.is-open-bottom {
+  padding-top: 4rem;
+  bottom: 3.5rem;
+  animation-name: ogr-menu-drawer-slide-bottom-open;
+}
+.opengraphica .ogr-menu-drawer.is-open-bottom .ogr-menu-drawer__close {
+  top: auto;
+  bottom: -2.75rem;
+  right: 0.25rem;
+}
+.opengraphica .ogr-menu-drawer.is-open-bottom.is-closing {
+  animation-name: ogr-menu-drawer-slide-bottom-close;
+}
+.opengraphica .ogr-menu-drawer > .el-scrollbar {
+  flex-grow: 1;
+}
+.opengraphica .ogr-menu-drawer__title {
+  margin: 1.5rem 0 0.5rem 0;
+  padding: 0 1rem;
+  flex-grow: 0;
+  flex-shrink: 1;
+}
+.opengraphica .ogr-menu-drawer__close {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  color: var(--ogr-menu-drawer-close-icon-color);
+}
+.opengraphica .ogr-menu-drawer__close:hover {
+  color: var(--ogr-menu-drawer-close-icon-color-hover);
+}
+.opengraphica .ogr-menu-drawer__close .bi {
+  font-size: 1.6rem;
+}
+.opengraphica .ogr-menu-drawer__content {
+  padding: 0.5rem 0;
+  flex-grow: 1;
+  overflow: hidden;
+}
+.opengraphica .ogr-menu-drawer__content .ogr-dock {
+  height: 100%;
+}
+.opengraphica .ogr-menu-drawer__content .ogr-dock > .ogr-dock-header {
   border-bottom: 2px solid var(--el-border-color-light);
 }
-.opengraphica .ogr-dock-popover > .ogr-dock > .ogr-dock-content {
-  width: 350px;
-  max-width: 100%;
+.opengraphica .ogr-menu-drawer__content .ogr-dock > .el-tabs {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
-.opengraphica .ogr-dock-popover > .ogr-dock > .ogr-dock-content > .el-scrollbar, .opengraphica .ogr-dock-popover > .ogr-dock > .ogr-dock-content > .el-scrollbar {
-  max-height: calc(100vh - 13rem) !important;
-  overflow: hidden !important;
+.opengraphica .ogr-menu-drawer__content .ogr-dock > .el-tabs > .el-tabs__content > .el-tab-pane {
+  height: 100%;
 }
-.opengraphica .ogr-dock-popover > .ogr-dock > .ogr-dock-content > .el-scrollbar > .el-scrollbar__wrap, .opengraphica .ogr-dock-popover > .ogr-dock > .ogr-dock-content > .el-scrollbar > .el-scrollbar__wrap {
-  max-height: calc(100vh - 13rem) !important;
-}
-.opengraphica .ogr-dock-popover > .ogr-dock > .el-tabs {
-  max-height: calc(100vh - 5rem) !important;
-  overflow: hidden !important;
-}
-.opengraphica .ogr-dock-popover > .ogr-dock > .el-tabs > .el-tabs__content, .opengraphica .ogr-dock-popover > .ogr-dock > .el-tabs > .el-tabs__content > .el-tab-pane, .opengraphica .ogr-dock-popover > .ogr-dock > .el-tabs > .el-tabs__content > .el-tab-pane > .el-scrollbar {
-  max-height: calc(100vh - 13rem) !important;
-  overflow: hidden !important;
-}
-.opengraphica .ogr-dock-popover > .ogr-dock > .el-tabs > .el-tabs__content > .el-tab-pane > .el-scrollbar > .el-scrollbar__wrap {
-  max-height: calc(100vh - 13rem) !important;
-  overflow: auto !important;
+.opengraphica .ogr-menu-drawer__content .ogr-module {
+  height: 100%;
 }
 .opengraphica .ogr-module {
   word-break: normal;
+}
+.opengraphica .ogr-toolbar {
+  display: block;
+  position: relative;
+  transition: all 0.6s;
+  width: 100%;
+  max-width: 100%;
+  background: var(--ogr-layout-menu-bar-background-color);
+  box-shadow: 0 0 0 0.063rem var(--ogr-layout-menu-bar-border-color);
+  z-index: 4;
 }
 @keyframes ogr-toolbar-overlay-fade-in {
   0% {
@@ -7623,16 +8173,6 @@ body.ogr-full-page .opengraphica {
     opacity: 0;
     transform: translateY(50%);
   }
-}
-.opengraphica .ogr-toolbar {
-  display: block;
-  position: relative;
-  transition: all 0.6s;
-  width: 100%;
-  max-width: 100%;
-  background: var(--ogr-layout-menu-bar-background-color);
-  box-shadow: 0 0 0 0.063rem var(--ogr-layout-menu-bar-border-color);
-  z-index: 4;
 }
 .opengraphica .ogr-toolbar.is-overlay {
   background: transparent;
@@ -7707,89 +8247,42 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-toolbar.is-overlay.is-menu-bar-top {
   bottom: 0.5rem;
 }
-.opengraphica .ogr-canvas-area {
-  display: block;
+.opengraphica .ogr-selection {
   position: absolute;
   top: 0;
-  left: 0;
   right: 0;
+  left: 0;
   bottom: 0;
-  width: 100%;
-  height: 100%;
 }
-.opengraphica .ogr-canvas-background {
-  transform-origin: 0 0;
-  background-image: url("../images/transparency-bg.png");
-  background-repeat: repeat;
+@keyframes ogr-selection-path {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 16;
+  }
 }
-.opengraphica .ogr-canvas-selection-mask {
-  display: block;
+@keyframes ogr-selection-handle {
+  0% {
+    stroke: rgba(200, 200, 200, 0.9);
+  }
+  50% {
+    stroke: rgba(130, 130, 130, 0.5);
+  }
+  100% {
+    stroke: rgba(200, 200, 235, 0.9);
+  }
+}
+.opengraphica .ogr-selection svg {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  image-rendering: optimizespeed;
-  image-rendering: crisp-edges;
-  image-rendering: pixelated;
-}
-.opengraphica .ogr-canvas-overlays {
-  display: block;
-  position: absolute;
-  transform-origin: 0 0;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
-}
-.opengraphica .ogr-canvas-overlays .ogr-canvas-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-.opengraphica .ogr-canvas-overlays .ogr-canvas-overlay.is-full-canvas-area {
-  bottom: 0;
-  right: 0;
-}
-.opengraphica .ogr-canvas-container {
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-}
-.opengraphica .ogr-canvas-container.ogr-canvas-viewport-css {
-  transform-origin: 0 0;
-}
-.opengraphica .ogr-canvas-container.ogr-canvas-viewport-css .ogr-canvas, .opengraphica .ogr-canvas-container.ogr-canvas-viewport-css .ogr-post-process-canvas {
-  width: auto;
-  height: auto;
-  right: auto;
-  bottom: auto;
-  image-rendering: auto;
-  image-rendering: smooth;
-  image-rendering: optimizequality;
-  image-rendering: high-quality;
-}
-.opengraphica .ogr-canvas-container.ogr-canvas-viewport-css .ogr-canvas {
-  box-shadow: 0 0 1.25rem var(--ogr-working-image-border-color);
-}
-.opengraphica .ogr-canvas-container.ogr-canvas-viewport-css .ogr-post-process-canvas {
   transform-origin: top left;
 }
-.opengraphica .ogr-canvas-container.ogr-canvas-viewport-css.ogr-canvas-viewport-css--pixelated .ogr-canvas {
-  image-rendering: optimizespeed;
-  image-rendering: crisp-edges;
-  image-rendering: pixelated;
+.opengraphica .ogr-selection svg path {
+  animation: ogr-selection-path 1s linear infinite;
+}
+.opengraphica .ogr-selection svg rect, .opengraphica .ogr-selection svg ellipse {
+  fill: white;
+  animation: ogr-selection-handle 2s linear infinite;
 }
 .opengraphica .ogr-snap-preview {
   position: absolute;
@@ -7836,316 +8329,8 @@ body.ogr-full-page .opengraphica {
   background: linear-gradient(to right, var(--ogr-snap-line-color) 0%, transparent 100%);
   right: -4rem;
 }
-.opengraphica .ogr-crop {
-  position: relative;
-  outline: 999999px solid var(--ogr-overlay-background-color);
-}
-.opengraphica .ogr-crop .ogr-crop-bounds {
-  outline: 0.35rem solid rgba(235, 235, 235, 0.7);
-  box-sizing: border-box;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-.opengraphica .ogr-crop .ogr-crop-handle-top-left,
-.opengraphica .ogr-crop .ogr-crop-handle-top-right,
-.opengraphica .ogr-crop .ogr-crop-handle-bottom-left,
-.opengraphica .ogr-crop .ogr-crop-handle-bottom-right,
-.opengraphica .ogr-crop .ogr-crop-handle-top,
-.opengraphica .ogr-crop .ogr-crop-handle-left,
-.opengraphica .ogr-crop .ogr-crop-handle-bottom,
-.opengraphica .ogr-crop .ogr-crop-handle-right {
-  position: absolute;
-}
-.opengraphica .ogr-crop .ogr-crop-handle-top-left svg,
-.opengraphica .ogr-crop .ogr-crop-handle-top-right svg,
-.opengraphica .ogr-crop .ogr-crop-handle-bottom-left svg,
-.opengraphica .ogr-crop .ogr-crop-handle-bottom-right svg,
-.opengraphica .ogr-crop .ogr-crop-handle-top svg,
-.opengraphica .ogr-crop .ogr-crop-handle-left svg,
-.opengraphica .ogr-crop .ogr-crop-handle-bottom svg,
-.opengraphica .ogr-crop .ogr-crop-handle-right svg {
-  display: block;
-  position: absolute;
-  height: 2rem;
-  width: 2rem;
-}
-.opengraphica .ogr-crop .ogr-crop-handle-top-left {
-  top: 0;
-  left: 0;
-  transform-origin: top left;
-}
-.opengraphica .ogr-crop .ogr-crop-handle-top-left svg {
-  transform: translate(-25%, -25%);
-  transform-origin: top left;
-}
-.opengraphica .ogr-crop .ogr-crop-handle-top-right {
-  top: 0;
-  right: 0;
-  transform-origin: top right;
-}
-.opengraphica .ogr-crop .ogr-crop-handle-top-right svg {
-  transform: rotate(90deg) translate(-25%, -25%);
-  transform-origin: top left;
-}
-.opengraphica .ogr-crop .ogr-crop-handle-bottom-right {
-  bottom: 0;
-  right: 0;
-  transform-origin: bottom right;
-}
-.opengraphica .ogr-crop .ogr-crop-handle-bottom-right svg {
-  transform: rotate(180deg) translate(-25%, -25%);
-  transform-origin: top left;
-}
-.opengraphica .ogr-crop .ogr-crop-handle-bottom-left {
-  bottom: 0;
-  left: 0;
-  transform-origin: bottom left;
-}
-.opengraphica .ogr-crop .ogr-crop-handle-bottom-left svg {
-  transform: rotate(270deg) translate(-25%, -25%);
-  transform-origin: top left;
-}
-.opengraphica .ogr-crop .ogr-crop-handle-top {
-  top: 0;
-  left: 50%;
-  transform-origin: top center;
-}
-.opengraphica .ogr-crop .ogr-crop-handle-top svg {
-  transform: translate(-50%, -100%);
-}
-.opengraphica .ogr-crop .ogr-crop-handle-right {
-  top: 50%;
-  right: 0;
-  transform-origin: right center;
-}
-.opengraphica .ogr-crop .ogr-crop-handle-right svg {
-  transform: rotate(90deg) translate(-50%, 0);
-  transform-origin: center;
-}
-.opengraphica .ogr-crop .ogr-crop-handle-bottom {
-  bottom: 0;
-  right: 50%;
-  transform-origin: bottom center;
-}
-.opengraphica .ogr-crop .ogr-crop-handle-bottom svg {
-  transform: rotate(180deg) translate(50%, 0);
-  transform-origin: center;
-}
-.opengraphica .ogr-crop .ogr-crop-handle-left {
-  top: 50%;
-  left: 0;
-  transform-origin: left center;
-}
-.opengraphica .ogr-crop .ogr-crop-handle-left svg {
-  transform: rotate(270deg) translate(0, -150%);
-  transform-origin: top center;
-}
-@keyframes ogr-free-transform-bounds {
-  0% {
-    outline-color: #ebebeb;
-  }
-  50% {
-    outline-color: #c3c3c3;
-  }
-  100% {
-    outline-color: #ebebeb;
-  }
-}
-@keyframes ogr-free-transform-rotate-line {
-  0% {
-    background: rgba(235, 235, 235, 0.9);
-  }
-  50% {
-    background: rgba(205, 205, 205, 0.5);
-  }
-  100% {
-    background: rgba(235, 235, 235, 0.9);
-  }
-}
-.opengraphica .ogr-free-transform {
-  position: relative;
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-bounds {
-  outline: 0.35rem solid white;
-  box-sizing: border-box;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  animation: ogr-free-transform-bounds 2s linear infinite;
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-rotate {
-  position: absolute;
-  top: 0;
-  left: 50%;
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-rotate svg {
-  display: block;
-  position: absolute;
-  height: 0.85rem;
-  width: 0.85rem;
-  transform: translateX(-50%) rotate(180deg);
-  transform-origin: top center;
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-rotate .ogr-free-transform-handle-rotate-line {
-  background: rgba(235, 235, 235, 0.7);
-  display: block;
-  position: absolute;
-  top: -0.5rem;
-  width: 0.25rem;
-  height: 2.25rem;
-  transform: translateX(-50%);
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-left,
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-right,
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-left,
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-right,
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-top,
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-left,
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom,
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-right {
-  position: absolute;
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-left svg,
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-right svg,
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-left svg,
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-right svg,
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-top svg,
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-left svg,
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom svg,
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-right svg {
-  display: block;
-  position: absolute;
-  height: 0.75rem;
-  width: 0.75rem;
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-left {
-  top: 0;
-  left: 0;
-  transform-origin: top left;
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-left svg {
-  transform: rotate(180deg);
-  transform-origin: top left;
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-right {
-  top: 0;
-  right: 0;
-  transform-origin: top right;
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-top-right svg {
-  transform: rotate(90deg);
-  transform-origin: top right;
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-right {
-  bottom: 0;
-  right: 0;
-  transform-origin: bottom right;
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-right svg {
-  transform: rotate(0deg);
-  transform-origin: bottom right;
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-left {
-  bottom: 0;
-  left: 0;
-  transform-origin: bottom left;
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-left svg {
-  transform: rotate(270deg);
-  transform-origin: bottom left;
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-top {
-  top: 0;
-  left: 50%;
-  transform-origin: top center;
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-top svg {
-  transform: translateX(-50%) rotate(180deg);
-  transform-origin: top center;
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-right {
-  top: 50%;
-  right: 0;
-  transform-origin: right center;
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-right svg {
-  transform: translate(0, -50%);
-  transform-origin: right center;
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom {
-  bottom: 0;
-  right: 50%;
-  transform-origin: bottom center;
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom svg {
-  transform: rotate(180deg) translate(50%, 100%);
-  transform-origin: bottom center;
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-left {
-  top: 50%;
-  left: 0;
-  transform-origin: left center;
-}
-.opengraphica .ogr-free-transform .ogr-free-transform-handle-left svg {
-  transform: rotate(270deg) translateY(-50%);
-  transform-origin: left center;
-}
-@keyframes ogr-selection-path {
-  0% {
-    stroke-dashoffset: 0;
-  }
-  100% {
-    stroke-dashoffset: 16;
-  }
-}
-@keyframes ogr-selection-handle {
-  0% {
-    stroke: rgba(200, 200, 200, 0.9);
-  }
-  50% {
-    stroke: rgba(130, 130, 130, 0.5);
-  }
-  100% {
-    stroke: rgba(200, 200, 235, 0.9);
-  }
-}
-.opengraphica .ogr-selection {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  bottom: 0;
-}
-.opengraphica .ogr-selection svg {
-  position: absolute;
-  transform-origin: top left;
-}
-.opengraphica .ogr-selection svg path {
-  animation: ogr-selection-path 1s linear infinite;
-}
-.opengraphica .ogr-selection svg rect, .opengraphica .ogr-selection svg ellipse {
-  fill: white;
-  animation: ogr-selection-handle 2s linear infinite;
-}
-.opengraphica .ogr-canvas, .opengraphica .ogr-post-process-canvas {
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: -webkit-crisp-edges;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
+.opengraphica .ogr-wait {
+  display: none;
 }
 @keyframes ogr-wait-fade-in {
   0% {
@@ -8157,58 +8342,6 @@ body.ogr-full-page .opengraphica {
   100% {
     opacity: 1;
   }
-}
-.opengraphica .ogr-dnd-drop-overlay {
-  background: white;
-  display: flex;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 800000;
-  align-items: center;
-  justify-content: center;
-}
-.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-overlay__center {
-  display: block;
-  pointer-events: none;
-}
-.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-top-left, .opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-top-right, .opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-left, .opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-right {
-  position: absolute;
-  pointer-events: none;
-}
-.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-top-left svg, .opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-top-right svg, .opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-left svg, .opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-right svg {
-  width: 3rem;
-  height: 3rem;
-}
-.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-top-left {
-  top: 1rem;
-  left: 1rem;
-}
-.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-top-right {
-  top: 1rem;
-  right: 1rem;
-}
-.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-top-right svg {
-  transform: rotate(90deg);
-}
-.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-left {
-  bottom: 1rem;
-  left: 1rem;
-}
-.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-left svg {
-  transform: rotate(-90deg);
-}
-.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-right {
-  bottom: 1rem;
-  right: 1rem;
-}
-.opengraphica .ogr-dnd-drop-overlay .ogr-dnd-drop-corner-bottom-right svg {
-  transform: rotate(180deg);
-}
-.opengraphica .ogr-wait {
-  display: none;
 }
 .opengraphica .ogr-wait[aria-hidden=false] {
   background: var(--ogr-background-color);

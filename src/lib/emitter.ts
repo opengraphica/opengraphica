@@ -8,9 +8,13 @@ interface AppEmitterEvents {
     'app.component.register': any;
     'app.dialogs.openFromDock': {
         name: string;
+        props?: any;
+        onClose?: (event?: any) => void;
     };
     'app.dialogs.openFromModule': {
         name: string;
+        props?: any;
+        onClose?: (event?: any) => void;
     };
     'app.menuDrawer.closeAll': undefined;
     'app.menuDrawer.openFromDock': {

@@ -122,7 +122,7 @@ function handleTapEvent(el: any, binding: DirectiveBinding<any>) {
     };
     for (let realEventName in callbackHandles.tap) {
         const callbackConfig = callbackHandles.tap[realEventName];
-        callbackConfig[0].addEventListener(realEventName, callbackConfig[1] as any);
+        callbackConfig[0].addEventListener(realEventName, callbackConfig[1] as any, true);
     }
     eventHandlerMap.set(el, callbackHandles);
 }
@@ -238,7 +238,46 @@ function handlePressEvent(el: any, binding: DirectiveBinding<any>) {
     };
     for (let realEventName in callbackHandles.press) {
         const callbackConfig = callbackHandles.press[realEventName];
-        callbackConfig[0].addEventListener(realEventName, callbackConfig[1] as any);
+        callbackConfig[0].addEventListener(realEventName, callbackConfig[1] as any, true);
+    }
+    eventHandlerMap.set(el, callbackHandles);
+}
+
+/* Pointer Down */
+function handleDownEvent(el: any, binding: DirectiveBinding<any>) {
+    const callbackHandles = eventHandlerMap.get(el) || {};
+
+    function onMouseDown(e: MouseEvent) {
+        runCallback(el, 'down', binding, translateMouseEventToPointerEvent('pointerdown', e));
+    }
+    function onPointerDown(e: PointerEvent) {
+        if (e.pointerType === 'pen') {
+            runCallback(el, 'down', binding, e);
+        }
+    }
+    function onTouchStart(e: TouchEvent) {
+        for (let i = 0; i < e.changedTouches.length; i++) {
+            runCallback(el, 'down', binding, translateTouchEventToPointerEvents('pointerdown', e)[0]);
+        }
+    }
+
+    if (binding.modifiers.window) {
+        callbackHandles.down = {
+            mousedown: [window, onMouseDown],
+            pointerdown: [window, onPointerDown],
+            touchstart: [window, onTouchStart]
+        };
+    } else {
+        callbackHandles.down = {
+            mousedown: [el, onMouseDown],
+            pointerdown: [el, onPointerDown],
+            touchstart: [el, onTouchStart]
+        };
+    }
+
+    for (let realEventName in callbackHandles.down) {
+        const callbackConfig = callbackHandles.down[realEventName];
+        callbackConfig[0].addEventListener(realEventName, callbackConfig[1] as any, true);
     }
     eventHandlerMap.set(el, callbackHandles);
 }
@@ -267,7 +306,7 @@ function handleMoveEvent(el: any, binding: DirectiveBinding<any>) {
     };
     for (let realEventName in callbackHandles.move) {
         const callbackConfig = callbackHandles.move[realEventName];
-        callbackConfig[0].addEventListener(realEventName, callbackConfig[1] as any);
+        callbackConfig[0].addEventListener(realEventName, callbackConfig[1] as any, true);
     }
     eventHandlerMap.set(el, callbackHandles);
 }
@@ -399,7 +438,7 @@ function handleDragEvents(el: any, eventName: string, binding: DirectiveBinding<
     };
     for (let realEventName in callbackHandles[eventName]) {
         const callbackConfig = callbackHandles[eventName][realEventName];
-        callbackConfig[0].addEventListener(realEventName, callbackConfig[1] as any);
+        callbackConfig[0].addEventListener(realEventName, callbackConfig[1] as any, true);
     }
     eventHandlerMap.set(el, callbackHandles);
 }
@@ -438,7 +477,7 @@ function handleUpEvent(el: any, binding: DirectiveBinding<any>) {
     }
     for (let realEventName in callbackHandles.up) {
         const callbackConfig = callbackHandles.up[realEventName];
-        callbackConfig[0].addEventListener(realEventName, callbackConfig[1] as any);
+        callbackConfig[0].addEventListener(realEventName, callbackConfig[1] as any, true);
     }
     eventHandlerMap.set(el, callbackHandles);
 }
@@ -454,6 +493,8 @@ const PointerDirective: ObjectDirective = {
             handlePressEvent(el, binding);
         } else if (['dragstart', 'dragend'].includes(eventName)) {
             handleDragEvents(el, eventName, binding);
+        } else if (eventName === 'down') {
+            handleDownEvent(el, binding);
         } else if (eventName === 'move') {
             handleMoveEvent(el, binding);
         } else if (eventName === 'up') {
@@ -471,7 +512,12 @@ const PointerDirective: ObjectDirective = {
             const eventDef = callbackHandles[eventName][realEventName];
             eventDef[0].removeEventListener(realEventName, eventDef[1] as any);
         }
-        eventHandlerMap.delete(el);
+        delete callbackHandles[eventName];
+        if (Object.keys(callbackHandles).length === 0) {
+            eventHandlerMap.delete(el);
+        } else {
+            eventHandlerMap.set(el, callbackHandles);
+        }
     }
 };
 

@@ -2,7 +2,7 @@ export type ColorModelName = 'rgba' | 'cmyka' | 'hsla' | 'hsva';
 
 export interface GenericColor {
     is: 'color';
-    hex: string;
+    style: string; // CSS or canvas style statement that takes the conversion of image color space to the screen color space into account.
 }
 
 export interface RGBAColor extends GenericColor {

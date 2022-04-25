@@ -37,7 +37,7 @@ const store = new PerformantStore<WorkingFileStore>({
         activeTimelineId: null,
         background: {
             visible: true,
-            color: { is: 'color', r: 1, g: 1, b: 1, a: 1, hex: '#ffffff' }
+            color: { is: 'color', r: 1, g: 1, b: 1, a: 1, style: '#ffffff' }
         },
         colorModel: 'rgba',
         colorSpace: 'sRGB',

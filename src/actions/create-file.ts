@@ -29,7 +29,7 @@ export class CreateFileAction extends BaseAction {
 
         const changes: Partial<WorkingFileState> | any = {
             activeTimelineId: this.createFileOptions.activeTimelineId || null,
-            background: this.createFileOptions.background || { visible: true, color: { is: 'color', r: 1, g: 1, b: 1, a: 1, hex: '#ffffff' } },
+            background: this.createFileOptions.background || { visible: true, color: { is: 'color', r: 1, g: 1, b: 1, a: 1, style: '#ffffff' } },
             colorModel: this.createFileOptions.colorModel || 'rgba',
             drawOriginX: this.createFileOptions.drawOriginX || 0,
             drawOriginY: this.createFileOptions.drawOriginY || 0,
