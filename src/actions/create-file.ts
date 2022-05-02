@@ -3,6 +3,7 @@ import { BaseAction } from './base';
 import workingFileStore, { WorkingFileState } from '@/store/working-file';
 import appEmitter from '@/lib/emitter';
 import { discardActiveSelectionMask, discardAppliedSelectionMask, activeSelectionPath } from '@/canvas/store/selection-state';
+import { WorkingFileLayer, ColorModel, WorkingFileGroupLayer } from '@/types';
 
 export interface CreateFileOptions {
     fileName?: string;
@@ -53,6 +54,9 @@ export class CreateFileAction extends BaseAction {
         for (let key in changes) {
             this.previousState[key] = workingFileStore.get(key as keyof WorkingFileState);
             workingFileStore.set(key as keyof WorkingFileState, changes[key]);
+            if (key === 'layers') {
+                this.detachLayerRenderers(this.previousState[key]);
+            }
         }
 
         discardAppliedSelectionMask();
@@ -68,6 +72,9 @@ export class CreateFileAction extends BaseAction {
 
         for (let key in this.previousState) {
             workingFileStore.set(key as keyof WorkingFileState, this.previousState[key]);
+            if (key === 'layers') {
+                this.attachLayerRenderers(this.previousState[key]);
+            }
         }
         this.previousState = {};
 
@@ -78,5 +85,23 @@ export class CreateFileAction extends BaseAction {
         await nextTick();
         appEmitter.emit('app.canvas.resetTransform');
 	}
+
+    private attachLayerRenderers(layers: WorkingFileLayer<ColorModel>[]) {
+        for (const layer of layers) {
+            if (layer.type === 'group') {
+                this.attachLayerRenderers((layer as WorkingFileGroupLayer<ColorModel>).layers);
+            }
+            layer.renderer.attach(layer);
+        }
+    }
+
+    private detachLayerRenderers(layers: WorkingFileLayer<ColorModel>[]) {
+        for (const layer of layers) {
+            if (layer.type === 'group') {
+                this.detachLayerRenderers((layer as WorkingFileGroupLayer<ColorModel>).layers);
+            }
+            layer.renderer.detach();
+        }
+    }
 
 }

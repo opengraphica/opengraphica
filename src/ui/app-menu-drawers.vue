@@ -2,7 +2,7 @@
     <div ref="drawerContainer" class="ogr-menu-drawers" :hidden="menuDrawers.length === 0" :class="{ 'is-fade-out': isAllDrawersClosing }" @animationend="onAnimationEndDrawers($event)" @click="onCloseAllDrawers($event)">
         <template v-for="menuDrawer of menuDrawers" :key="menuDrawer.id">
             <section :ref="el => { drawers[menuDrawer.id] = el }" class="ogr-menu-drawer" :class="['is-open-' + menuDrawer.placement, { 'is-closing': !menuDrawer.visible, 'is-immediate': menuDrawer.immediate }]">
-                <h1 class="ogr-menu-drawer__title">{{ menuDrawer.title }}</h1>
+                <h1 class="ogr-menu-drawer__title" v-t="menuDrawer.title || 'empty'" />
                 <a href="javascript:void(0)" class="ogr-menu-drawer__close" title="Close" @click="onMenuDrawerClosed(menuDrawer)">
                     <span class="bi bi-x-circle-fill" aria-hidden="true" />
                 </a>

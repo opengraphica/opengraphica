@@ -36,7 +36,25 @@ export interface WorkingFileLayerFilter<T extends ColorModel> {
 }
 
 export interface WorkingFileLayerRenderer<T extends ColorModel> {
-    draw(ctx: CanvasRenderingContext2D, layer: WorkingFileLayer<T>, decomposedTransform: DecomposedMatrix, options?: DrawWorkingFileLayerOptions): void;
+    attach(layer: WorkingFileLayer<ColorModel>): void;
+    onAttach(layer: WorkingFileLayer<ColorModel>): void;
+    detach(): void;
+    onDetach(): void;
+    update(updates: Partial<WorkingFileLayer<ColorModel>>): void;
+    onUpdate(updates: Partial<WorkingFileLayer<ColorModel>>): void;
+    draw(
+        ctx: CanvasRenderingContext2D | WebGLRenderingContext | WebGL2RenderingContext,
+        layer: WorkingFileLayer<T>,
+        options?: DrawWorkingFileLayerOptions
+    ): void;
+    onDraw(
+        ctx: CanvasRenderingContext2D | WebGLRenderingContext | WebGL2RenderingContext,
+        layer: WorkingFileLayer<T>,
+        options?: DrawWorkingFileLayerOptions
+    ): void;
+}
+export declare var WorkingFileLayerRenderer: {
+    new (layer: WorkingFileLayer<ColorModel>): void;
 }
 
 export interface WorkingFileTimelineKey {

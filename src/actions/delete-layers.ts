@@ -44,6 +44,7 @@ export class DeleteLayersAction extends BaseAction {
                         parentIndex: parentListIndex
                     });
                 }
+                layer.renderer.detach();
             }
         }
 
@@ -65,6 +66,7 @@ export class DeleteLayersAction extends BaseAction {
                 parentList = getGroupLayerById(layer.groupId)?.layers || layers;
             }
             parentList.splice(deletedLayerInfo.parentIndex, 0, layer);
+            layer.renderer.attach(layer);
         }
         this.deletedLayers = [];
 

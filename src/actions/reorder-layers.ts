@@ -1,13 +1,10 @@
 import {
     ColorModel, WorkingFileLayer,
-    WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer,
-    InsertAnyLayerOptions
+    WorkingFileGroupLayer,  WorkingFileAnyLayer
 } from '@/types';
 import { BaseAction } from './base';
-import { SelectLayersAction } from './select-layers';
 import canvasStore from '@/store/canvas';
 import workingFileStore, { getLayerById, getGroupLayerById } from '@/store/working-file';
-import layerRenderers from '@/canvas/renderers';
 
 export class ReorderLayersAction extends BaseAction {
 

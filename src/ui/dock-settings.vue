@@ -213,6 +213,12 @@
                         </el-form-item>
                         <el-collapse class="el-collapse--menu-item">
                             <el-collapse-item :title="$t('dock.settings.prefs.performance.groupTitle')">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.performance.renderer.label')">
+                                    <el-select v-model="preferenceRenderer" size="small" style="width: 6rem;">
+                                        <el-option value="2d" :label="$t('dock.settings.prefs.performance.renderer.2d')" />
+                                        <el-option value="webgl" :label="$t('dock.settings.prefs.performance.renderer.webgl')" />
+                                    </el-select>
+                                </el-form-item>
                                 <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.performance.optimizeLargeImage')">
                                     <el-switch v-model="preferenceOptimizeLargeImages" />
                                 </el-form-item>
@@ -239,7 +245,7 @@
                                     <el-switch v-model="showTutorialNotifications" />
                                 </el-form-item>
                                 <div class="px-4.5 pt-2">
-                                    <el-button size="small" class="is-fullwidth" @click="onClickResetSttings" v-t="'dock.settings.prefs.editor.resetSettings'" />
+                                    <el-button size="small" class="is-fullwidth" @click="onClickResetSettings" v-t="'dock.settings.prefs.editor.resetSettings'" />
                                 </div>
                             </el-collapse-item>
                         </el-collapse>
@@ -270,7 +276,7 @@ import ElTimeline, { ElTimelineItem } from 'element-plus/lib/components/timeline
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore, { HistoryState } from '@/store/history';
-import preferencesStore from '@/store/preferences';
+import preferencesStore, { PreferencesState } from '@/store/preferences';
 import { notifyInjector, unexpectedErrorMessage } from '@/lib/notify';
 import appEmitter from '@/lib/emitter';
 import { runModule } from '@/modules';
@@ -452,6 +458,15 @@ export default defineComponent({
         });
 
         // Preferences
+        const preferenceRenderer = computed<PreferencesState['renderer']>({
+            get() {
+                return preferencesStore.state.renderer;
+            },
+            set(value) {
+                preferencesStore.set('renderer', value);
+                window.location.reload();
+            }
+        });
         const preferenceOptimizeLargeImages = computed<boolean>({
             get() {
                 return preferencesStore.state.preferCanvasViewport;
@@ -507,7 +522,7 @@ export default defineComponent({
                 preferencesStore.set('showWelcomeScreenAtStart', value);
             }
         });
-        function onClickResetSttings() {
+        function onClickResetSettings() {
             for (let key in localStorage) {
                 if (key.startsWith('openGraphica')) {
                     try {
@@ -589,6 +604,7 @@ export default defineComponent({
             activeTab,
             visitedTabs,
             loading,
+
             rotationAngle,
             zoomLevel,
             touchRotationPreference,
@@ -596,6 +612,7 @@ export default defineComponent({
             onResetViewFit,
             onResetViewRotation,
             onResetViewZoom,
+
             historyActionStack,
             historyActionStackIndex,
             canUndo,
@@ -606,13 +623,16 @@ export default defineComponent({
             themeOptions,
             loadingThemeName,
             activeTheme,
+
+            preferenceRenderer,
             preferenceOptimizeLargeImages,
             performanceFixLayerSeams,
             preferenceHighQualityScaling,
             preferenceMenuBarPosition,
             showTutorialNotifications,
             showWelcomeScreenAtStart,
-            onClickResetSttings,
+
+            onClickResetSettings,
             onMenuSelect
         };
     }

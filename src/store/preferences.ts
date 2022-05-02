@@ -16,6 +16,7 @@ interface PreferencesState {
     pointerPressHoldTimeout: number;
     postProcessInterpolateImage: boolean;
     preferCanvasViewport: boolean;
+    renderer: '2d' | 'webgl'; // The preferred renderer. May not be the active renderer if unavailable.
     showTutorialNotifications: boolean;
     showWelcomeScreenAtStart: boolean;
     snapSensitivity: number;
@@ -45,6 +46,7 @@ const store = new PerformantStore<PreferencesStore>({
         pointerPressHoldTimeout: 500,
         postProcessInterpolateImage: true,
         preferCanvasViewport: false,
+        renderer: '2d',
         showTutorialNotifications: true,
         showWelcomeScreenAtStart: true,
         snapSensitivity: 5,
@@ -61,6 +63,7 @@ const store = new PerformantStore<PreferencesStore>({
         'multiTouchTapTimeout',
         'pointerTapTimeout',
         'pointerPressHoldTimeout',
+        'renderer',
         'showTutorialNotifications',
         'showWelcomeScreenAtStart',
         'snapSensitivity',

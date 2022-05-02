@@ -9,7 +9,7 @@
 import { defineComponent, ref, computed, toRefs, nextTick, PropType } from 'vue';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import workingFileStore from '@/store/working-file';
-import { drawWorkingFileLayerToCanvas } from '@/lib/canvas';
+import renderers from '@/canvas/renderers';
 import { DecomposedMatrix } from '@/lib/dom-matrix';
 import { WorkingFileAnyLayer, ColorModel } from '@/types';
 
@@ -55,16 +55,7 @@ export default defineComponent({
                 canvas.height = thumbnailHeight;
                 let ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
                 ctx.scale(thumbnailScale, thumbnailScale);
-                drawWorkingFileLayerToCanvas(canvas, ctx, props.layer, {
-                    translateX: 0,
-                    translateY: 0,
-                    rotation: 0,
-                    skewX: 0,
-                    scaleX: 1,
-                    scaleY: 1
-                } as DecomposedMatrix, {
-                    visible: true
-                });
+                new renderers['2d'][props.layer.type]().draw(ctx, props.layer, { visible: true });
                 props.layer.thumbnailImageSrc = canvas.toDataURL();
             }
             return props.layer.thumbnailImageSrc;

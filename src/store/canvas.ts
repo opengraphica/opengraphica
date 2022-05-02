@@ -2,6 +2,7 @@ import { PerformantStore } from './performant-store';
 import { CanvasViewResetOptions } from '@/types';
 import { DecomposedMatrix, decomposeMatrix } from '@/lib/dom-matrix';
 import preferencesStore from './preferences';
+import type { OrthographicCamera, Scene, WebGLRenderer } from 'three';
 
 const imageSmoothingZoomRatio = preferencesStore.get('imageSmoothingZoomRatio');
 
@@ -21,13 +22,17 @@ interface CanvasState {
     isDisplayingNonRasterLayer: boolean;
     playingAnimation: boolean;
     preventPostProcess: boolean;
+    renderer: '2d' | 'webgl'; // The active renderer. See preferences store for preferred renderer.
     selectionMaskCanvas: HTMLCanvasElement;
+    threejsCamera: OrthographicCamera | null;
+    threejsRenderer: WebGLRenderer | null;
+    threejsScene: Scene | null;
     transform: DOMMatrix;
     transformResetOptions: undefined | true | CanvasViewResetOptions;
     useCssCanvas: boolean;
     useCssViewport: boolean;
     viewCanvas: HTMLCanvasElement;
-    viewCtx: CanvasRenderingContext2D;
+    viewCtx: CanvasRenderingContext2D | WebGLRenderingContext | WebGL2RenderingContext;
     viewDirty: boolean;
     viewHeight: number; // Maps to screen height; devicePixelRatio IS applied.
     viewWidth: number; // Maps to screen width; devicePixelRatio IS applied.
@@ -69,13 +74,17 @@ const store = new PerformantStore<CanvasStore>({
         isDisplayingNonRasterLayer: false,
         playingAnimation: false,
         preventPostProcess: false,
+        renderer: '2d',
         selectionMaskCanvas: dummyCanvas,
+        threejsCamera: null,
+        threejsRenderer: null,
+        threejsScene: null,
         transform: new DOMMatrix(),
         transformResetOptions: undefined,
         useCssCanvas: true,
         useCssViewport: false,
         viewCanvas: dummyCanvas,
-        viewCtx: dummyCanvas.getContext('2d') as CanvasRenderingContext2D,
+        viewCtx: dummyCanvas.getContext('2d') as CanvasRenderingContext2D | WebGLRenderingContext | WebGL2RenderingContext,
         viewDirty: true,
         viewHeight: 100, // Maps to screen height; devicePixelRatio IS applied.
         viewWidth: 100, // Maps to screen width; devicePixelRatio IS applied.
@@ -88,8 +97,11 @@ const store = new PerformantStore<CanvasStore>({
             const decomposedTransform = decomposeMatrix(value as DOMMatrix);
             set('decomposedTransform', decomposedTransform);
             set('useCssViewport',
-                !preferencesStore.get('useCanvasViewport') &&
-                !(store.get('isDisplayingNonRasterLayer') && decomposedTransform.scaleX > 1)
+                store.state.renderer !== '2d' ||
+                (
+                    !preferencesStore.get('useCanvasViewport') &&
+                    !(store.get('isDisplayingNonRasterLayer') && decomposedTransform.scaleX > 1)
+                )
             );
             set('transformResetOptions', undefined);
             const imageSmoothingZoomRatioDevice = imageSmoothingZoomRatio * window.devicePixelRatio;

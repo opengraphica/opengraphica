@@ -15,7 +15,7 @@ import { ClearSelectionAction } from '@/actions/clear-selection';
 import { SelectLayersAction } from '@/actions/select-layers';
 import { UpdateLayerAction } from '@/actions/update-layer';
 import { BundleAction } from '@/actions/bundle';
-import { drawWorkingFileToCanvas } from '@/lib/canvas';
+import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
 import { getImageDataFromImage, getImageDataEmptyBounds } from '@/lib/image';
 import { isInput } from '@/lib/events';
 import appEmitter, { AppEmitterEvents } from '@/lib/emitter';
@@ -618,7 +618,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             resultId: undefined,
             resultPixelTest: undefined
         };
-        drawWorkingFileToCanvas(workingCanvas, ctx, { initialTransform, selectionTest });
+        drawWorkingFileToCanvas2d(workingCanvas, ctx, { initialTransform, selectionTest });
         return selectionTest.resultId != null ? selectionTest.resultId : null;
     }
 

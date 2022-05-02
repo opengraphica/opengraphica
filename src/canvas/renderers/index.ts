@@ -1,17 +1,34 @@
-import BaseLayerRenderer from './base';
-import GroupLayerRenderer from './group';
-import RasterLayerRenderer from './raster';
-import RasterSequenceLayerRenderer from './raster-sequence';
-import TextLayerRenderer from './text';
+import BaseLayerRenderer2d from './2d/base';
+import GroupLayerRenderer2d from './2d/group';
+import RasterLayerRenderer2d from './2d/raster';
+import RasterSequenceLayerRenderer2d from './2d/raster-sequence';
+import TextLayerRenderer2d from './2d/text';
+
+import BaseLayerRendererWebgl from './webgl/base';
+import GroupLayerRendererWebgl from './webgl/group';
+import RasterLayerRendererWebgl from './webgl/raster';
+import RasterSequenceLayerRendererWebgl from './webgl/raster-sequence';
+import TextLayerRendererWebgl from './webgl/text';
 
 const renderers = {
-    base: new BaseLayerRenderer(),
-    empty: new BaseLayerRenderer(),
-    group: new GroupLayerRenderer(),
-    raster: new RasterLayerRenderer(),
-    rasterSequence: new RasterSequenceLayerRenderer(),
-    text: new TextLayerRenderer(),
-    vector: new BaseLayerRenderer()
+    '2d': {
+        base: BaseLayerRenderer2d,
+        empty: BaseLayerRenderer2d,
+        group: GroupLayerRenderer2d,
+        raster: RasterLayerRenderer2d,
+        rasterSequence: RasterSequenceLayerRenderer2d,
+        text: TextLayerRenderer2d,
+        vector: BaseLayerRenderer2d
+    },
+    webgl: {
+        base: BaseLayerRendererWebgl,
+        empty: BaseLayerRendererWebgl,
+        group: GroupLayerRendererWebgl,
+        raster: RasterLayerRendererWebgl,
+        rasterSequence: RasterSequenceLayerRendererWebgl,
+        text: TextLayerRendererWebgl,
+        vector: BaseLayerRendererWebgl
+    }
 };
 
 export default renderers;

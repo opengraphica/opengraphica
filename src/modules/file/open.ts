@@ -15,7 +15,6 @@ import preferencesStore from '@/store/preferences';
 import workingFileStore, { WorkingFileState, getTimelineById } from '@/store/working-file';
 import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
-import layerRenderers from '@/canvas/renderers';
 import { UpdateFileAction } from '@/actions/update-file';
 import { CreateFileAction } from '@/actions/create-file';
 import { InsertLayerAction } from '@/actions/insert-layer';
@@ -566,13 +565,11 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
             parsedLayer = {
                 ...parsedLayer,
                 type: 'empty',
-                renderer: layerRenderers.empty
             } as WorkingFileEmptyLayer<ColorModel>;
         } else if (layer.type === 'group') {
             parsedLayer = {
                 ...parsedLayer,
                 type: 'group',
-                renderer: layerRenderers.group,
                 expanded: (layer as SerializedFileGroupLayer<ColorModel>).expanded,
                 layers: []
             } as WorkingFileGroupLayer<ColorModel>;
@@ -594,7 +591,6 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
             parsedLayer = {
                 ...parsedLayer,
                 type: 'raster',
-                renderer: layerRenderers.raster,
                 data: {
                     sourceImage: image,
                     sourceImageIsObjectUrl: true
@@ -629,7 +625,6 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
             parsedLayer = {
                 ...parsedLayer,
                 type: 'rasterSequence',
-                renderer: layerRenderers.rasterSequence,
                 data: {
                     currentFrame: parsedSequence[0]?.image,
                     sequence: parsedSequence
@@ -640,14 +635,12 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
             parsedLayer = {
                 ...parsedLayer,
                 type: 'vector',
-                renderer: layerRenderers.vector,
                 data: (layer as SerializedFileVectorLayer<ColorModel>).data,
             } as WorkingFileVectorLayer<ColorModel>;
         } else if (layer.type === 'text') {
             parsedLayer = {
                 ...parsedLayer,
                 type: 'text',
-                renderer: layerRenderers.text,
                 data: (layer as SerializedFileTextLayer<ColorModel>).data,
             } as WorkingFileTextLayer<ColorModel>;
         }

@@ -1,3 +1,4 @@
+import type { Camera, Scene, WebGLRenderer } from 'three';
 import { ColorModel, DrawWorkingFileOptions, DrawWorkingFileLayerOptions, WorkingFileLayer } from '@/types';
 import canvasStore from '@/store/canvas';
 import preferencesStore from '@/store/preferences';
@@ -29,77 +30,9 @@ const cursorImages: { [key: string]: { data: string, image: HTMLImageElement | n
 })();
 
 /**
- * Draws a single layer to the canvas
- */
-export function drawWorkingFileLayerToCanvas(targetCanvas: HTMLCanvasElement, targetCtx: CanvasRenderingContext2D, layer: WorkingFileLayer<ColorModel>, decomposedTransform: DecomposedMatrix, options: DrawWorkingFileLayerOptions = {}) {
-    if ((options.visible || layer.visible) && (!options.selectedLayersOnly || workingFileStore.get('selectedLayerIds').includes(layer.id))) {
-        let ctx = targetCtx;
-        
-        // In some browsers you can see visible seams between drawImage calls that are otherwise pixel perfect aligned in certain view transforms.
-        // Optionally, drawing subsequent raster layers to a buffer canvas first then applying the transform eliminates this issue at a performance cost.
-        if (preferencesStore.get('enableMultiLayerBuffer') && !canvasStore.get('useCssViewport') && decomposedTransform.scaleX < 1) {
-            const isBufferInUse = canvasStore.get('isBufferInUse');
-            if (layer.type === 'raster') {
-                ctx = canvasStore.get('bufferCtx');
-                if (!isBufferInUse) {
-                    canvasStore.set('isBufferInUse', true);
-                    // Clear the buffer
-                    ctx.setTransform(1, 0, 0, 1, 0, 0);
-                    ctx.clearRect(0, 0, workingFileStore.get('width'), workingFileStore.get('height'));
-                }
-            } else if (layer.type !== 'group') {
-                // No longer on a raster layer, draw the previous buffer to canvas before anything else.
-                if (isBufferInUse) {
-                    canvasStore.set('isBufferInUse', false);
-                    targetCtx.drawImage(canvasStore.get('bufferCanvas'), 0, 0);
-                }
-            }
-        }
-
-        if (layer.type !== 'raster' && layer.type !== 'rasterSequence' && layer.type !== 'group') {
-            canvasStore.set('isDisplayingNonRasterLayer', true);
-        }
-
-        if (options.selectionTest) {
-            ctx.save();
-            ctx.setTransform(new DOMMatrix());
-            ctx.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
-            ctx.restore();
-        }
-        
-        ctx.save();
-        ctx.globalAlpha = layer.opacity;
-        ctx.globalCompositeOperation = layer.blendingMode;
-        const wasImageSmoothingEnabled = ctx.imageSmoothingEnabled;
-        if (wasImageSmoothingEnabled) {
-            ctx.imageSmoothingEnabled = false;
-        }
-        const isIdentity = layer.transform.isIdentity;
-        if (!isIdentity) {
-            ctx.transform(layer.transform.a, layer.transform.b, layer.transform.c, layer.transform.d, layer.transform.e, layer.transform.f);
-        }
-        layer.renderer.draw(ctx, layer, decomposedTransform, options);
-        if (wasImageSmoothingEnabled) {
-            ctx.imageSmoothingEnabled = true;
-        }
-        if (options.selectionTest && layer.type !== 'group') {
-            const pixel = getPixelFastTest(targetCtx, options.selectionTest.point.x, options.selectionTest.point.y);
-            if (
-                !options.selectionTest.resultPixelTest ||
-                pixel[3] > 0
-            ) {
-                options.selectionTest.resultId = layer.id;
-                options.selectionTest.resultPixelTest = pixel;
-            }
-        }
-        ctx.restore();
-    }
-}
-
-/**
  * Draws everything in the working document to the specified canvas.
  */
-export function drawWorkingFileToCanvas(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, options: DrawWorkingFileOptions = {}) {
+export function drawWorkingFileToCanvas2d(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, options: DrawWorkingFileOptions = {}) {
 
     let now = performance.now();
 
@@ -148,7 +81,8 @@ export function drawWorkingFileToCanvas(canvas: HTMLCanvasElement, ctx: CanvasRe
 
     // Selection test
     if (options.selectionTest) {
-        options.selectionTest.resultPixelTest = getPixelFastTest(ctx, options.selectionTest.point.x, options.selectionTest.point.y);
+        const imgData = ctx.getImageData(options.selectionTest.point.x, options.selectionTest.point.y, 1, 1);
+        options.selectionTest.resultPixelTest = imgData.data.slice(0, 4);
     }
 
     (window as any).averageTimeCanvas = ((performance.now() - now) * 0.1) + (((window as any).averageTimeCanvas || 0) * 0.9);
@@ -168,7 +102,7 @@ export function drawWorkingFileToCanvas(canvas: HTMLCanvasElement, ctx: CanvasRe
     // Draw layers
     const layers = workingFileStore.get('layers');
     for (const layer of layers) {
-        drawWorkingFileLayerToCanvas(canvas, ctx, layer, decomposedTransform, options);
+        layer.renderer.draw(ctx, layer, options);
     }
 
     (window as any).averageTimeLayers = ((performance.now() - now) * 0.1) + (((window as any).averageTimeLayers || 0) * 0.9);
@@ -193,27 +127,10 @@ export function drawWorkingFileToCanvas(canvas: HTMLCanvasElement, ctx: CanvasRe
     (window as any).averageTime = ((performance.now() - now) * 0.1) + (((window as any).averageTime || 0) * 0.9)
 }
 
-/**
- * Draws a rect path that when stroked will be aligned to pixels on the screen (when there is no rotation)
- */
-export function ctxRectHalfPixelAligned(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, decomposedTransform: DecomposedMatrix) {
-    const scale = decomposedTransform.scaleX;
-    let xOffset = - decomposedTransform.translateX % 1;
-    let yOffset = - decomposedTransform.translateY % 1;
-    xOffset = xOffset <= -0.5 ? 1 + xOffset : xOffset;
-    yOffset = yOffset <= -0.5 ? 1 + yOffset : yOffset;
-    const invScale = 1 / scale;
-    x = (Math.round(x * scale) + 0.5) * invScale;
-    y = (Math.round(y * scale) + 0.5) * invScale;
-    w = (Math.round((x + w) * scale) - 0.5) * invScale - x;
-    h = (Math.round((y + h) * scale) - 0.5) * invScale - y;
-   ctx.rect(x, y, w, h);
-}
 
 /**
- * Retrieve the rgba values at specified pixel in the canvas.
+ * Draws everything in the working document to the threejs renderer.
  */
-function getPixelFastTest(ctx: CanvasRenderingContext2D, x: number, y: number) {
-    const imgData = ctx.getImageData(x, y, 1, 1);
-    return imgData.data.slice(0, 4);
+export function drawWorkingFileToCanvasWebgl(renderer: WebGLRenderer, scene: Scene, camera: Camera, options: DrawWorkingFileOptions = {}) {
+    renderer.render(scene, camera);
 }

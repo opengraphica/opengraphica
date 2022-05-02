@@ -143,6 +143,11 @@
                 "theme": "Theme",
                 "performance": {
                     "groupTitle": "Performance",
+                    "renderer": {
+                        "label": "Renderer",
+                        "2d": "Canvas 2D",
+                        "webgl": "WebGL"
+                    },
                     "optimizeLargeImage": "Optimize for Large Image",
                     "highQualityScaling": "High Quality Scaling",
                     "fixAdjacentLayerSeams": "Fix Adjacent Layer Seams"

@@ -1,7 +1,7 @@
 import mitt from 'mitt';
 import { ref, reactive } from 'vue';
 import workingFileStore from '@/store/working-file';
-import { drawWorkingFileToCanvas } from '@/lib/canvas';
+import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
 import { createImageFromCanvas, getImageDataEmptyBounds } from '@/lib/image';
 
 export type SelectionAddShape = 'rectangle' | 'ellipse' | 'free' | 'tonalArea';
@@ -153,7 +153,7 @@ export async function previewSelectedLayersSelectionMask() {
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, workingCanvas.width, workingCanvas.height);
     ctx.globalCompositeOperation = 'destination-in';
-    drawWorkingFileToCanvas(workingCanvas, ctx, { selectedLayersOnly: true });
+    drawWorkingFileToCanvas2d(workingCanvas, ctx, { selectedLayersOnly: true });
     // TODO - perhaps trim mask image before storing to save memory, if not too much CPU cost.
 
     if (selectedLayersSelectionMaskPreview.value) {

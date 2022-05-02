@@ -4,8 +4,9 @@ import { getFontMetrics, FontMetrics } from '@/lib/metrics';
 import { generateColorStyle } from '@/lib/color';
 import { DecomposedMatrix } from '@/lib/dom-matrix';
 import workingFileStore from '@/store/working-file';
+import BaseLayerRenderer from './base';
 
-export default class TextLayerRenderer implements WorkingFileLayerRenderer<ColorModel> {
+export default class TextLayerRenderer extends BaseLayerRenderer {
 
     /**
      * Returns the text string at a given line wrap (ignores formatting).
@@ -261,7 +262,7 @@ export default class TextLayerRenderer implements WorkingFileLayerRenderer<Color
         return layerCacheItem;
     }
 
-    draw(ctx: CanvasRenderingContext2D, layer: WorkingFileTextLayer<ColorModel>, decomposedTransform: DecomposedMatrix, options: DrawWorkingFileLayerOptions = {}) {
+    onDraw(ctx: CanvasRenderingContext2D, layer: WorkingFileTextLayer<ColorModel>, options: DrawWorkingFileLayerOptions = {}) {
         if (layer.bakedImage) {
             ctx.drawImage(
                 layer.bakedImage as HTMLImageElement,

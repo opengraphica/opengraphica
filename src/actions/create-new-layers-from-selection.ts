@@ -81,9 +81,9 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
                     const transform = getLayerGlobalTransform(layer);
                     ctx.transform(transform.a, transform.b, transform.c, transform.d, transform.e, transform.f);
                     if (layer.type === 'raster') {
-                        renderers.raster.draw(ctx, layer as WorkingFileRasterLayer<ColorModel>, decomposedTransform);
+                        new renderers['2d'].raster().draw(ctx, layer as WorkingFileRasterLayer<ColorModel>);
                     } else {
-                        renderers.rasterSequence.draw(ctx, layer as WorkingFileRasterSequenceLayer<ColorModel>, decomposedTransform);
+                        new renderers['2d'].rasterSequence().draw(ctx, layer as WorkingFileRasterSequenceLayer<ColorModel>);
                     }
                     ctx.restore();
                     ctx.globalCompositeOperation = 'destination-in';

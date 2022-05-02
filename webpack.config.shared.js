@@ -269,6 +269,22 @@ module.exports = function setupConfig(config) {
                         test: /[\\/]node_modules[\\/](resize-observer-polyfill)[\\/]/,
                         name: 'polyfill'
                     },
+                    threeCameras: {
+                        test: /[\\/]node_modules[\\/](three)[\\/](cameras)[\\/]/,
+                        name: 'three-cameras'
+                    },
+                    threeMath: {
+                        test: /[\\/]node_modules[\\/](three)[\\/](math)[\\/]/,
+                        name: 'three-math'
+                    },
+                    threeRenderers: {
+                        test: /[\\/]node_modules[\\/](three)[\\/](renderers)[\\/]/,
+                        name: 'three-renderers'
+                    },
+                    threeScenes: {
+                        test: /[\\/]node_modules[\\/](three)[\\/](scenes)[\\/]/,
+                        name: 'three-scenes'
+                    },
                     vendor: {
                         test: /[\\/]node_modules[\\/](lodash|dayjs|file-saver|mitt|normalize-wheel)/,
                         name: 'vendor'

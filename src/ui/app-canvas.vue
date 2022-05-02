@@ -12,17 +12,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, Ref, computed, watch, inject, toRefs, onMounted, onUnmounted, nextTick } from 'vue';
+import { defineComponent, ref, Ref, computed, watch, watchEffect, inject, toRefs, onMounted, onUnmounted, nextTick } from 'vue';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import workingFileStore from '@/store/working-file';
 import preferencesStore from '@/store/preferences';
 import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset, selectedLayersSelectionMaskPreview, selectedLayersSelectionMaskPreviewCanvasOffset } from '@/canvas/store/selection-state';
 import AppCanvasOverlays from '@/ui/app-canvas-overlays.vue';
-import { drawWorkingFileToCanvas } from '@/lib/canvas';
+import { drawWorkingFileToCanvas2d, drawWorkingFileToCanvasWebgl } from '@/lib/canvas';
 import { notifyInjector } from '@/lib/notify';
 import appEmitter, { AppEmitterEvents } from '@/lib/emitter';
 import { DecomposedMatrix } from '@/lib/dom-matrix';
+import { isWebGLAvailable, isWebGL2Available } from '@/lib/webgl';
+import { colorToRgba, getColorModelName } from '@/lib/color';
 
 export default defineComponent({
     name: 'AppCanvas',
@@ -46,16 +48,27 @@ export default defineComponent({
         const canvasArea = ref<HTMLDivElement>();
         const canvasContainer = ref<HTMLDivElement>();
         const canvasOverlays = ref<HTMLDivElement>();
-        const { useCssViewport, viewWidth: viewportWidth, viewHeight: viewportHeight } = toRefs(canvasStore.state);
+        const { viewWidth: viewportWidth, viewHeight: viewportHeight } = toRefs(canvasStore.state);
         const { width: imageWidth, height: imageHeight } = toRefs(workingFileStore.state);
         const isPixelatedZoomLevel = ref<boolean>(false);
-        let ctx: CanvasRenderingContext2D | null = null;
+        let ctx: CanvasRenderingContext2D | WebGLRenderingContext | WebGL2RenderingContext | null = null;
 
         let postProcessCancel: ((reason?: any) => void) | null = null;
         let postProcessAverageLag: number = 0;
         let drawPostProcessTimeoutHandle: number | undefined;
         let lastCssDecomposedScale: number = 1;
         const drawPostProcessWait: number = 100;
+
+        let renderMainCanvas = () => {
+            if (canvas!.value && ctx) {
+                drawWorkingFileToCanvas2d(canvas!.value!, ctx as CanvasRenderingContext2D, { isEditorPreview: true });
+            }
+        };
+
+        const useCssViewport = computed<boolean>(() => {
+            return canvasStore.state.renderer === 'webgl' || canvasStore.state.useCssViewport;
+        });
+
         const usePostProcess = computed<boolean>(() => {
             return preferencesStore.state.postProcessInterpolateImage && !preferencesStore.state.useCanvasViewport && canvasStore.state.decomposedTransform.scaleX < 1;
         });
@@ -69,6 +82,26 @@ export default defineComponent({
         });
 
         canvasStore.set('workingImageBorderColor', getComputedStyle(document.documentElement).getPropertyValue('--ogr-working-image-border-color'));
+
+        // Change background color in three.js webgl renderer
+        watchEffect(async () => {
+            if (canvasStore.state.renderer === 'webgl') {
+                const threejsRenderer = canvasStore.get('threejsRenderer');
+                const threejsScene = canvasStore.get('threejsScene');
+                if (threejsScene && threejsRenderer) {
+                    const { r, g, b, a } = colorToRgba(
+                        workingFileStore.state.background.color,
+                        getColorModelName(workingFileStore.state.background.color)
+                    );
+                    threejsRenderer.setClearColor(
+                        new (await import('three/src/math/Color')).Color().setRGB(r, g, b),
+                        a
+                    )
+                    threejsScene.background = null;
+                }
+                canvasStore.set('dirty', true);
+            }
+        });
 
         watch([useCssViewport], ([isUseCssViewport]) => {
             const canvasElement = canvasStore.get('viewCanvas');
@@ -103,9 +136,7 @@ export default defineComponent({
                     canvasElement.width = newWidth;
                     canvasElement.height = newHeight;
                 }
-                if (ctx) {
-                    drawWorkingFileToCanvas(canvasElement, ctx, { isEditorPreview: true });
-                }
+                renderMainCanvas();
             }
             canvasStore.set('viewDirty', true);
         });
@@ -113,6 +144,7 @@ export default defineComponent({
         watch([imageWidth, imageHeight], ([newWidth, newHeight]) => {
             const canvasElement = canvasStore.get('viewCanvas');
             const bufferCanvas = canvasStore.get('bufferCanvas');
+            const renderer = canvasStore.get('renderer');
             if (useCssViewport.value === true) {
                 canvasElement.width = newWidth;
                 canvasElement.height = newHeight;
@@ -126,14 +158,20 @@ export default defineComponent({
                 bufferCanvas.width = newWidth;
                 bufferCanvas.height = newHeight;
             }
+            if (renderer === 'webgl') {
+                updateThreejsImageSize(newWidth, newHeight);
+            }
             canvasStore.set('dirty', true);
         });
 
         onMounted(async () => {
+            appEmitter.on('app.canvas.resetTransform', resetTransform);
+
             if (canvas.value) {                
                 const imageWidth = workingFileStore.get('width');
                 const imageHeight = workingFileStore.get('height');
 
+                // Set up canvas width/height based on view
                 if (rootElement?.value) {
                     canvasStore.set('viewWidth', rootElement.value.clientWidth * (window.devicePixelRatio || 1));
                     canvasStore.set('viewHeight', rootElement.value.clientHeight * (window.devicePixelRatio || 1));
@@ -154,24 +192,63 @@ export default defineComponent({
                     }
                 }
 
-                appEmitter.on('app.canvas.resetTransform', resetTransform);
+                // Set up renderer
+                let renderer: typeof canvasStore.state.renderer = '2d';
+                const preferredRenderer = preferencesStore.get('renderer');
+                if (preferredRenderer === 'webgl' && isWebGLAvailable()) {
+                    renderer = 'webgl';
+                }
+                if (renderer === 'webgl') {
+                    const { WebGLRenderer } = await import('three/src/renderers/WebGLRenderer');
+                    const { Scene } = await import('three/src/scenes/Scene');
+                    const { OrthographicCamera } = await import('three/src/cameras/OrthographicCamera');
+                    try {
+                        const threejsRenderer = new WebGLRenderer({
+                            alpha: true,
+                            canvas: canvas.value
+                        });
+                        threejsRenderer.setSize(1, 1);
+                        canvasStore.set('threejsRenderer', threejsRenderer);
+                        const threejsScene = new Scene();
+                        canvasStore.set('threejsScene', threejsScene);
+                        const threejsCamera = new OrthographicCamera(-1, 1, 1, -1, 1, 10000);
+                        canvasStore.set('threejsCamera', threejsCamera);
+                        canvasStore.set('renderer', 'webgl');
+                        updateThreejsImageSize(imageWidth, imageHeight);
+                        renderMainCanvas = () => {
+                            drawWorkingFileToCanvasWebgl(threejsRenderer, threejsScene, threejsCamera, { isEditorPreview: true });
+                        };
+                        renderMainCanvas();
+                        ctx = threejsRenderer.context;
 
-                const originalCtx = canvas.value.getContext('2d');
-                const bufferCanvas = document.createElement('canvas');
-                bufferCanvas.width = useCssViewport.value === true ? 10 : imageWidth;
-                bufferCanvas.height = useCssViewport.value === true ? 10 : imageHeight;
-                let bufferCtx: CanvasRenderingContext2D = bufferCanvas.getContext('2d') as CanvasRenderingContext2D;
-                if (originalCtx && bufferCtx) {
-                    // Assign view canvas
-                    ctx = originalCtx;
-                    canvasStore.set('viewCanvas', canvas.value);
-                    canvasStore.set('viewCtx', ctx);
-                    // Assign buffer canvas
-                    canvasStore.set('bufferCanvas', bufferCanvas);
-                    canvasStore.set('bufferCtx', bufferCtx);
-                    drawLoop();
+                        canvasStore.set('useCssViewport', true);
+                    } catch (error) {
+                        console.log(error);
+                    }
+                }
+                // Above can fail and default back to 2d.
+                if (renderer === '2d') {
+                    // Set up buffer canvas
+                    const originalCtx = canvas.value.getContext('2d');
+                    const bufferCanvas = document.createElement('canvas');
+                    bufferCanvas.width = useCssViewport.value === true ? 10 : imageWidth;
+                    bufferCanvas.height = useCssViewport.value === true ? 10 : imageHeight;
+                    let bufferCtx: CanvasRenderingContext2D = bufferCanvas.getContext('2d') as CanvasRenderingContext2D;
+                    if (originalCtx && bufferCtx) {
+                        // Assign view canvas
+                        ctx = originalCtx;
+                        // Assign buffer canvas
+                        canvasStore.set('bufferCanvas', bufferCanvas);
+                        canvasStore.set('bufferCtx', bufferCtx);
+                    }
                 }
 
+                ctx && canvasStore.set('viewCtx', ctx);
+                canvasStore.set('viewCanvas', canvas.value);
+
+                drawLoop();
+
+                // Set up pica image rescaler
                 Pica = (await import('@/lib/pica')).default;
                 const __extractTileData = Pica.prototype.__extractTileData;
                 Pica.prototype.__extractTileData = function() {
@@ -195,11 +272,28 @@ export default defineComponent({
             appEmitter.off('app.canvas.resetTransform', resetTransform);
         });
 
+        // Update for threejs scene when image size is adjusted.
+        function updateThreejsImageSize(imageWidth: number, imageHeight: number) {
+            const threejsRenderer = canvasStore.get('threejsRenderer');
+            const threejsCamera = canvasStore.get('threejsCamera');
+            if (threejsRenderer) {
+                threejsRenderer.setSize(imageWidth / (window.devicePixelRatio || 1), imageHeight / (window.devicePixelRatio || 1), true);
+            }
+            if (threejsCamera) {
+                threejsCamera.position.z = 1;
+                threejsCamera.left = 0;
+                threejsCamera.right = imageWidth;
+                threejsCamera.top = 0;
+                threejsCamera.bottom = imageHeight;
+                threejsCamera.updateProjectionMatrix();
+            }
+        }
+
         // Centers the canvas and displays at 1x zoom or the maximum width/height of the window, whichever is smaller. 
         async function resetTransform(event?: AppEmitterEvents['app.canvas.resetTransform']) {
             appEmitter.emit('app.canvas.calculateDndArea');
             const margin: number = (event && event.margin) || 48;
-            if (canvasArea.value && ctx && mainElement) {
+            if (canvasArea.value && mainElement) {
                 const devicePixelRatio = window.devicePixelRatio || 1;
                 const canvasAreaRect = canvasArea.value.getBoundingClientRect();
                 const mainRect = mainElement.value.getBoundingClientRect();
@@ -276,8 +370,8 @@ export default defineComponent({
                                 }
                             }
                         }
-                    } else if (canvasElement && ctx) {
-                        drawWorkingFileToCanvas(canvasElement, ctx, { isEditorPreview: true });
+                    } else {
+                        renderMainCanvas();
 
                         // Hide post process canvas
                         if (postProcessCanvas.value) {
@@ -324,7 +418,8 @@ export default defineComponent({
                         }
                     }
                 }
-                if ((canvasStore.get('dirty') || isPlayingAnimation) && canvasElement && ctx) {
+
+                if ((canvasStore.get('dirty') || isPlayingAnimation)) {
                     canvasStore.set('dirty', false);
 
                     if (isPlayingAnimation) {
@@ -335,7 +430,7 @@ export default defineComponent({
                         editorStore.dispatch('setTimelineCursor', cursor);
                     }
 
-                    drawWorkingFileToCanvas(canvasElement, ctx, { isEditorPreview: true });
+                    renderMainCanvas();
 
                     // Post process for better pixel interpolation
                     if (postProcessCanvas.value) {

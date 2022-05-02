@@ -1,8 +1,9 @@
 import { DrawWorkingFileLayerOptions, WorkingFileRasterSequenceLayer, WorkingFileLayerRenderer, ColorModel } from '@/types';
 import { DecomposedMatrix } from '@/lib/dom-matrix';
+import BaseLayerRenderer from './base';
 
-export default class RasterSequenceLayerRenderer implements WorkingFileLayerRenderer<ColorModel> {
-    draw(ctx: CanvasRenderingContext2D, layer: WorkingFileRasterSequenceLayer<ColorModel>, decomposedTransform: DecomposedMatrix, options: DrawWorkingFileLayerOptions = {}) {
+export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
+    onDraw(ctx: CanvasRenderingContext2D, layer: WorkingFileRasterSequenceLayer<ColorModel>, options: DrawWorkingFileLayerOptions = {}) {
         const frame = layer.data.currentFrame;
         if (frame) {
             ctx.drawImage(

@@ -44,7 +44,7 @@
                 <el-menu v-if="showLayerSettingsMenuFor === layer.id" class="el-menu--medium el-menu--borderless mb-1" @select="onLayerSettingsSelect(layer, $event)">
                     <el-menu-item index="delete">
                         <i class="bi bi-trash"></i>
-                        <span v-t="app.layerList.delete"></span>
+                        <span v-t="'app.layerList.delete'"></span>
                     </el-menu-item>
                 </el-menu>
                 <span v-if="layer.type === 'rasterSequence'" role="group" class="ogr-layer-attributes ogr-layer-frames">

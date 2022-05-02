@@ -1,3 +1,4 @@
+import { reactive } from 'vue';
 import {
     ColorModel, WorkingFileLayer,
     WorkingFileEmptyLayer, WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer,
@@ -46,6 +47,8 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
 
         this.insertedLayerId = layerId;
 
+        const renderer = canvasStore.get('renderer');
+
         // Create new layer object if not already created (do vs redo)
         let newLayer: WorkingFileAnyLayer<ColorModel>;
         if (this.insertedLayer) {
@@ -65,14 +68,14 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                 thumbnailImageSrc: null,
                 transform: new DOMMatrix(),
                 visible: true,
-                renderer: layerRenderers.base
+                renderer: new layerRenderers[renderer].base()
             }
 
             switch (this.insertLayerOptions.type) {
                 case 'empty':
                     newLayer = {
                         ...sharedOptions,
-                        renderer: layerRenderers.empty,
+                        renderer: new layerRenderers[renderer].empty(),
                         ...this.insertLayerOptions
                     } as WorkingFileEmptyLayer<ColorModel>;
                     break;
@@ -81,16 +84,16 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                         ...sharedOptions,
                         layers: [],
                         expanded: false,
-                        renderer: layerRenderers.group,
+                        renderer: new layerRenderers[renderer].group(),
                         ...this.insertLayerOptions
                     } as WorkingFileGroupLayer<ColorModel>;
                     break;
                 case 'raster':
                     newLayer = {
                         ...sharedOptions,
+                        renderer: new layerRenderers[renderer].raster(),
                         data: {},
-                        renderer: layerRenderers.raster,
-                        ...this.insertLayerOptions
+                        ...this.insertLayerOptions,
                     } as WorkingFileRasterLayer<ColorModel>;
                     if (newLayer.data.sourceImageIsObjectUrl) {
                         registerObjectUrlUser(newLayer.data.sourceImage?.src, layerId);
@@ -100,7 +103,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                     newLayer = {
                         ...sharedOptions,
                         data: {},
-                        renderer: layerRenderers.rasterSequence,
+                        renderer: new layerRenderers[renderer].rasterSequence(),
                         ...this.insertLayerOptions
                     } as WorkingFileRasterSequenceLayer<ColorModel>;
                     for (let frame of newLayer.data.sequence) {
@@ -113,7 +116,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                     newLayer = {
                         ...sharedOptions,
                         data: [],
-                        renderer: layerRenderers.vector,
+                        renderer: new layerRenderers[renderer].vector(),
                         ...this.insertLayerOptions
                     } as WorkingFileVectorLayer<ColorModel>;
                     break;
@@ -121,11 +124,13 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                     newLayer = {
                         ...sharedOptions,
                         data: {},
-                        renderer: layerRenderers.text,
+                        renderer: new layerRenderers[renderer].text(),
                         ...this.insertLayerOptions
                     } as WorkingFileTextLayer<ColorModel>;
                     break;
             }
+
+            newLayer = reactive(newLayer);
 
             this.insertedLayer = newLayer;
             this.insertLayerOptions = null;
@@ -165,6 +170,9 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
             throw new Error('Parent group not found.');
         }
 
+        // Attach the renderer (needed for webgl)
+        newLayer.renderer.attach(newLayer)
+
         // Set the modified layer list
         workingFileStore.set('layers', layers);
 
@@ -195,6 +203,13 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
             let childIndex = parent.findIndex((layer) => layer.id === (this.insertedLayer as any).id);
             parent.splice(childIndex, 1);
         }
+
+        // Detach the renderer (needed for webgl)
+        if (this.insertedLayer) {
+            this.insertedLayer.renderer.detach()
+        }
+
+        // Set modified layer list
         workingFileStore.set('layers', layers);
         workingFileStore.set('layerIdCounter', workingFileStore.get('layerIdCounter') - 1);
 

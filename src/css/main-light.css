@@ -7216,6 +7216,9 @@ body.ogr-full-page .opengraphica {
   padding: 0 !important;
   width: auto !important;
 }
+.opengraphica .ogr-dock-popover.ogr-dock-popper--singleton {
+  transition: transform 0.15s var(--el-transition-function-fast-bezier), opacity 0.15s var(--el-transition-function-fast-bezier);
+}
 .opengraphica .ogr-dock-popover > .ogr-dock-title {
   text-align: center;
   font-size: 1rem;
@@ -7716,7 +7719,7 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .ogr-layout-dock .ogr-layout-dock__container {
   background: var(--ogr-layout-menu-bar-background-color);
-  box-shadow: 0 0 0px 1px var(--ogr-layout-menu-bar-border-color), 0 0.3rem 2rem var(--ogr-layout-menu-bar-border-color);
+  box-shadow: 0 0 0px 1px var(--ogr-layout-menu-bar-border-color), 0 0.3rem 1.5rem var(--ogr-layout-menu-bar-border-color);
   border-radius: 1rem;
   overflow: hidden;
   display: flex;
