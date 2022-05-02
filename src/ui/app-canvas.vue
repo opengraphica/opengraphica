@@ -277,7 +277,7 @@ export default defineComponent({
             const threejsRenderer = canvasStore.get('threejsRenderer');
             const threejsCamera = canvasStore.get('threejsCamera');
             if (threejsRenderer) {
-                threejsRenderer.setSize(imageWidth / (window.devicePixelRatio || 1), imageHeight / (window.devicePixelRatio || 1), true);
+                threejsRenderer.setSize(imageWidth, imageHeight, true);
             }
             if (threejsCamera) {
                 threejsCamera.position.z = 1;
