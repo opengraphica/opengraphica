@@ -4,6 +4,7 @@ import canvasStore from '@/store/canvas';
 import preferencesStore from '@/store/preferences';
 import workingFileStore from '@/store/working-file';
 import { DecomposedMatrix, decomposeMatrix, snapPointAtHalfPixel, snapPointAtPixel } from './dom-matrix';
+import layerRenderers from '@/canvas/renderers';
 
 const imageSmoothingZoomRatio = preferencesStore.get('imageSmoothingZoomRatio');
 
@@ -33,6 +34,9 @@ const cursorImages: { [key: string]: { data: string, image: HTMLImageElement | n
  * Draws everything in the working document to the specified canvas.
  */
 export function drawWorkingFileToCanvas2d(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, options: DrawWorkingFileOptions = {}) {
+    if (options.selectionTest) {
+        options.force2dRenderer = true;
+    }
 
     let now = performance.now();
 
@@ -102,7 +106,11 @@ export function drawWorkingFileToCanvas2d(canvas: HTMLCanvasElement, ctx: Canvas
     // Draw layers
     const layers = workingFileStore.get('layers');
     for (const layer of layers) {
-        layer.renderer.draw(ctx, layer, options);
+        if (options.force2dRenderer) {
+            new layerRenderers['2d'][layer.type]().draw(ctx, layer, options);
+        } else {
+            layer.renderer.draw(ctx, layer, options);
+        }
     }
 
     (window as any).averageTimeLayers = ((performance.now() - now) * 0.1) + (((window as any).averageTimeLayers || 0) * 0.9);

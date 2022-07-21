@@ -59,6 +59,7 @@ export default defineComponent({
         let lastCssDecomposedScale: number = 1;
         const drawPostProcessWait: number = 100;
 
+        // This function is overwritten by webgl implementation below if that is enabled.
         let renderMainCanvas = () => {
             if (canvas!.value && ctx) {
                 drawWorkingFileToCanvas2d(canvas!.value!, ctx as CanvasRenderingContext2D, { isEditorPreview: true });

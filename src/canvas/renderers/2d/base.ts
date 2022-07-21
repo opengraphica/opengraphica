@@ -28,6 +28,9 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
 
     draw(ctx: CanvasRenderingContext2D, layer: WorkingFileLayer<ColorModel>, options: DrawWorkingFileLayerOptions = {}) {
         if ((options.visible || layer.visible) && (!options.selectedLayersOnly || workingFileStore.get('selectedLayerIds').includes(layer.id))) {
+            if (options.selectionTest) {
+                options.force2dRenderer = true;
+            }
             const canvas = ctx.canvas;
             
             // In some browsers you can see visible seams between drawImage calls that are otherwise pixel perfect aligned in certain view transforms.

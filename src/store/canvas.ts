@@ -171,9 +171,23 @@ const store = new PerformantStore<CanvasStore>({
 
 dummyCanvas = null;
 
+function getCanvasRenderingContext(canvas: HTMLCanvasElement) {
+    if (store.state.renderer === '2d') {
+        return canvas.getContext('2d');
+    } else if (store.state.renderer === 'webgl') {
+        if (store.state.threejsRenderer?.capabilities.isWebGL2) {
+            return canvas.getContext('webgl2');
+        } else {
+            return canvas.getContext('webgl');
+        }
+    }
+    return null;
+}
+
 export default store;
 
 export {
     CanvasStore,
-    CanvasState
+    CanvasState,
+    getCanvasRenderingContext
 };

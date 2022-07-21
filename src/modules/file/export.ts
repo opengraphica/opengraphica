@@ -4,6 +4,7 @@
  */
 
 import workingFileStore, { getLayersByType } from '@/store/working-file';
+import { getCanvasRenderingContext } from '@/store/canvas';
 import editorStore from '@/store/editor';
 import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
 import { saveAs } from 'file-saver';
@@ -52,7 +53,10 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<void
             const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
             ctx.imageSmoothingEnabled = false;
             if (!['image/gif'].includes(mimeType)) {
-                drawWorkingFileToCanvas2d(canvas, ctx, { selectedLayersOnly: options.layerSelection === 'selected' });
+                drawWorkingFileToCanvas2d(canvas, ctx, {
+                    force2dRenderer: true,
+                    selectedLayersOnly: options.layerSelection === 'selected'
+                });
             }
 
             if (options.toClipboard) {
@@ -193,7 +197,10 @@ export async function convertCanvasToGifBlob(canvas: HTMLCanvasElement, options:
         const delay = frameTimes[i + 1] - frameTimes[i];
         editorStore.dispatch('setTimelineCursor', frameTime);
         ctx.clearRect(0, 0, gifSettings.width, gifSettings.height);
-        drawWorkingFileToCanvas2d(canvas, ctx, { selectedLayersOnly: options.layerSelection === 'selected' });
+        drawWorkingFileToCanvas2d(canvas, ctx, {
+            force2dRenderer: true,
+            selectedLayersOnly: options.layerSelection === 'selected'
+        });
         gif.addFrame(ctx, { copy: true, delay: delay });
     }
     editorStore.dispatch('setTimelineCursor', originalTimelineCursorPosition);

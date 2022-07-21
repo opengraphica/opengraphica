@@ -1,12 +1,11 @@
 import { toRefs, watch, type WatchStopHandle } from 'vue';
-import { DrawWorkingFileLayerOptions, WorkingFileRasterLayer, ColorModel } from '@/types';
+import { WorkingFileRasterLayer, ColorModel } from '@/types';
 import canvasStore from '@/store/canvas';
 import BaseLayerRenderer from './base';
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
 import { MeshBasicMaterial } from 'three/src/materials/MeshBasicMaterial';
 import { DoubleSide, NearestFilter } from 'three/src/constants';
 import { Mesh } from 'three/src/objects/Mesh';
-import { Color } from 'three/src/math/Color';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { Texture } from 'three/src/textures/Texture';
 import { CanvasTexture } from 'three/src/textures/CanvasTexture';

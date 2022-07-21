@@ -6,6 +6,7 @@ export interface DrawWorkingFileLayerOptions {
     isEditorPreview?: boolean;
     selectedLayersOnly?: boolean;
     visible?: boolean;
+    force2dRenderer?: boolean;
     selectionTest?: {
         point: DOMPoint;
         resultId?: number;
@@ -17,6 +18,7 @@ export interface DrawWorkingFileOptions {
     isEditorPreview?: boolean;
     selectedLayersOnly?: boolean;
     initialTransform?: DOMMatrix;
+    force2dRenderer?: boolean;
     selectionTest?: {
         point: DOMPoint;
         resultId?: number;
