@@ -203,7 +203,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 if (isDragTop) {
                     offsetHeight = this.transformStartDimensions.height - ((xFactor * dy) - (yFactor * dx));
                 }
-                // @ts-ignore
+                // @ts-ignore 2365
                 if (shouldMaintainAspectRatio && (isDragLeft + isDragRight + isDragTop + isDragBottom > 1)) {
                     const ratioOffsetWidth = offsetHeight * (this.transformStartDimensions.width / this.transformStartDimensions.height);
                     const ratioOffsetHeight = offsetWidth * (this.transformStartDimensions.height / this.transformStartDimensions.width);

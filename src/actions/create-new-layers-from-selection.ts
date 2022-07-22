@@ -78,8 +78,11 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
                     ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height);
                     ctx.save();
                     ctx.translate(-selectionOffset.x - selectionBounds.left, -selectionOffset.y - selectionBounds.top);
-                    const transform = getLayerGlobalTransform(layer);
-                    ctx.transform(transform.a, transform.b, transform.c, transform.d, transform.e, transform.f);
+
+                    // Why did I have this here in the first place? Seems to mess everything up when any transform is applied.
+                    // const transform = getLayerGlobalTransform(layer);
+                    // ctx.transform(transform.a, transform.b, transform.c, transform.d, transform.e, transform.f);
+
                     if (layer.type === 'raster') {
                         new renderers['2d'].raster().draw(ctx, layer as WorkingFileRasterLayer<ColorModel>);
                     } else {
