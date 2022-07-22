@@ -34,9 +34,7 @@ const cursorImages: { [key: string]: { data: string, image: HTMLImageElement | n
  * Draws everything in the working document to the specified canvas.
  */
 export function drawWorkingFileToCanvas2d(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, options: DrawWorkingFileOptions = {}) {
-    if (options.selectionTest) {
-        options.force2dRenderer = true;
-    }
+    options.force2dRenderer = true;
 
     let now = performance.now();
 

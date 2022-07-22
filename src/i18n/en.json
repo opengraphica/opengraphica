@@ -300,6 +300,14 @@
             }
         }
     },
+    "lib": {
+        "tutorial": {
+            "notification": {
+                "gotIt": "Got It",
+                "dontShowTips": "Don't Show Tips"
+            }
+        }
+    },
     "measurement": {
         "pixels": "Pixels",
         "millimeters": "Millimeters",
