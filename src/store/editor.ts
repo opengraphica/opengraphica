@@ -35,6 +35,10 @@ interface EditorState {
     activeToolbar: string | null;
     activeToolbarPosition: 'top' | 'bottom';
     activeToolOverlays: string[];
+    clipboardBufferImageHash: string | null;
+    clipboardBufferLayers: WorkingFileLayer<ColorModel>[];
+    clipboardBufferUpdateTimestamp: number;
+    hasClipboardUpdateSupport: boolean;
     isActiveToolbarExclusive: boolean;
     isTaskRunning: boolean;
     isTouchUser: boolean;
@@ -86,6 +90,10 @@ const store = new PerformantStore<EditorStore>({
         activeToolbar: null,
         activeToolbarPosition: 'top',
         activeToolOverlays: [],
+        clipboardBufferImageHash: null,
+        clipboardBufferLayers: [],
+        clipboardBufferUpdateTimestamp: 0,
+        hasClipboardUpdateSupport: false,
         isActiveToolbarExclusive: false,
         isTaskRunning: false,
         isTouchUser: true,

@@ -95,7 +95,7 @@
         }
     },
     "image": {
-        "name": "ImoduleGroup.image.name",
+        "name": "moduleGroup.image.name",
         "description": "moduleGroup.image.description",
         "modules": {
             "convertLayersToImageSequence": {
@@ -106,12 +106,36 @@
                     "target": "image-convert-layers-to-image-sequence"
                 }
             },
+            "copy": {
+                "name": "moduleGroup.image.modules.copy.name",
+                "description": "moduleGroup.image.modules.copy.description",
+                "action": {
+                    "type": "function",
+                    "target": "image/copy.copySelectedLayers"
+                }
+            },
             "copyAll": {
                 "name": "moduleGroup.image.modules.copyAll.name",
                 "description": "moduleGroup.image.modules.copyAll.description",
                 "action": {
                     "type": "function",
                     "target": "image/copy.copyAllLayers"
+                }
+            },
+            "cut": {
+                "name": "moduleGroup.image.modules.cut.name",
+                "description": "moduleGroup.image.modules.cut.description",
+                "action": {
+                    "type": "function",
+                    "target": "image/copy.cutSelectedLayers"
+                }
+            },
+            "paste": {
+                "name": "moduleGroup.image.modules.paste.name",
+                "description": "moduleGroup.image.modules.paste.description",
+                "action": {
+                    "type": "function",
+                    "target": "image/paste.paste"
                 }
             }
         }

@@ -35,6 +35,31 @@
         ]
     },
     {
+        "name": "keyboardMap.image.name",
+        "actions": [
+            {
+                "name": "keyboardMap.image.actions.copy",
+                "action": {
+                    "type": "runModule",
+                    "target": "image/copy"
+                },
+                "shortcuts": [
+                    "ctrl+c"
+                ]
+            },
+            {
+                "name": "keyboardMap.image.actions.cut",
+                "action": {
+                    "type": "runModule",
+                    "target": "image/cut"
+                },
+                "shortcuts": [
+                    "ctrl+x"
+                ]
+            }
+        ]
+    },
+    {
         "name": "keyboardMap.history.name",
         "actions": [
             {

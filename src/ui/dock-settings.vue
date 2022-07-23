@@ -573,16 +573,16 @@ export default defineComponent({
                                 await runModule('image', 'convertLayersToImageSequence');
                                 break;
                             case 'cut':
-                                await runModule('tmp', 'notYetImplemented');
+                                await runModule('image', 'cut');
                                 break;
                             case 'copy':
-                                await runModule('tmp', 'notYetImplemented');
+                                await runModule('image', 'copy');
                                 break;
                             case 'copyAll':
                                 await runModule('image', 'copyAll');
                                 break;
                             case 'paste':
-                                await runModule('tmp', 'notYetImplemented');
+                                await runModule('image', 'paste');
                                 break;
                         }
                         break;

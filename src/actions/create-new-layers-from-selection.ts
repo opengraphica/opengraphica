@@ -1,7 +1,7 @@
 import { BaseAction } from './base';
 import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset, selectionMaskDrawMargin } from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
-import workingFileStore, { getLayerById, getLayerGlobalTransform, ensureUniqueLayerSiblingName } from '@/store/working-file';
+import workingFileStore, { getSelectedLayers, ensureUniqueLayerSiblingName } from '@/store/working-file';
 import { createImageFromCanvas, getImageDataFromImage, getImageDataEmptyBounds } from '@/lib/image';
 import { ClearSelectionAction } from './clear-selection';
 import { InsertLayerAction } from './insert-layer';
@@ -42,16 +42,7 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
         if (this.insertLayerActions.length === 0) {
 
             // Get list of currently selected layers.
-            const selectedLayers: WorkingFileLayer<ColorModel>[] = [];
-            const selectedLayerIds = workingFileStore.get('selectedLayerIds');
-            if (selectedLayerIds.length > 0) {
-                for (let id of selectedLayerIds) {
-                    const layer = getLayerById(id);
-                    if (layer) {
-                        selectedLayers.push(layer);
-                    }
-                }
-            }
+            const selectedLayers = getSelectedLayers();
 
             // Get selection mask info
             const selectionMask: HTMLImageElement | null = activeSelectionMask.value || appliedSelectionMask.value;

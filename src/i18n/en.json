@@ -14,6 +14,7 @@
         "insertLayer": "Insert Layer",
         "moduleCropResize": "Crop and Resize",
         "openFile": "Open File",
+        "pasteLayers": "Paste Layers",
         "reorderLayers": "Reorder Layer(s)",
         "selectLayers": "Select Layer(s)",
         "toggleLayerVisibilityOn": "Toggle Layer Visibility On",
@@ -175,6 +176,14 @@
                 "open": "Open File",
                 "quickLoad": "Quick Load",
                 "quickSave": "Quick Save"
+            }
+        },
+        "image": {
+            "name": "Image",
+            "actions": {
+                "cut": "Cut",
+                "copy": "Copy",
+                "paste": "Paste"
             }
         },
         "history": {
@@ -437,9 +446,21 @@
                     "name": "Convert Layers to Image Sequence",
                     "description": "Converts the selected layers to an image sequence layer (animation)."
                 },
+                "copy": {
+                    "name": "Copy Selected Layers",
+                    "description": "Copy the currently selected layers to the clipboard."
+                },
                 "copyAll": {
                     "name": "Copy All Layers",
                     "description": "Copy all layers on the canvas as a PNG image to the clipboard."
+                },
+                "cut": {
+                    "name": "Cut",
+                    "description": "Remove the currently selected layers and copy them to the clipboard."
+                },
+                "paste": {
+                    "name": "Paste",
+                    "description": "Insert images on to the canvas from the clipboard."
                 }
             }
         },

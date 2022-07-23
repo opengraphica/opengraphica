@@ -122,6 +122,20 @@ function getLayersByType<T extends WorkingFileLayer<ColorModel>>(type: string, p
     return layers as T[];
 }
 
+function getSelectedLayers(): WorkingFileLayer<ColorModel>[] {
+    const selectedLayers: WorkingFileLayer<ColorModel>[] = [];
+    const selectedLayerIds = store.get('selectedLayerIds');
+    if (selectedLayerIds.length > 0) {
+        for (let id of selectedLayerIds) {
+            const layer = getLayerById(id);
+            if (layer) {
+                selectedLayers.push(layer);
+            }
+        }
+    }
+    return selectedLayers;
+}
+
 function getTimelineById(id: number): WorkingFileTimeline | null {
     const timelines = store.get('timelines');
     for (let timeline of timelines) {
@@ -165,4 +179,14 @@ function ensureUniqueLayerSiblingName(layerId: number | null | undefined, name: 
 
 export default store;
 
-export { WorkingFileStore, WorkingFileState, getLayerById, getLayerGlobalTransform, getLayersByType, getGroupLayerById, getTimelineById, ensureUniqueLayerSiblingName };
+export {
+    WorkingFileStore,
+    WorkingFileState,
+    getLayerById,
+    getLayerGlobalTransform,
+    getLayersByType,
+    getGroupLayerById,
+    getSelectedLayers,
+    getTimelineById,
+    ensureUniqueLayerSiblingName
+};

@@ -4,11 +4,18 @@
  */
 
 import defaultKeyboardMapConfig from '@/config/default-keyboard-map.json';
+import cloneDeep from 'lodash/cloneDeep';
 import { ref } from 'vue';
+import editorStore from '@/store/editor';
+import historyStore from '@/store/history';
+import workingFileStore, { ensureUniqueLayerSiblingName } from '@/store/working-file';
 import appEmitter from '@/lib/emitter';
 import { isInput } from '@/lib/events';
+import { generateImageBlobHash } from '@/lib/hash';
 import { runModule } from '@/modules';
 import { KeyboardMapConfigCategory } from '@/types';
+import { BundleAction } from '@/actions/bundle';
+import { InsertLayerAction } from '@/actions/insert-layer';
 
 export const isCtrlKeyPressed = ref<boolean>(false);
 export const isMetaKeyPressed = ref<boolean>(false);
@@ -146,8 +153,23 @@ async function onDocumentPaste(e: ClipboardEvent) {
                         if (file) {
                             appEmitter.emit('app.wait.startBlocking', { id: 'documentPasteImage', label: 'app.wait.loadingImage' });
                             isPastingImage = true;
-                            const { openFromFileList } = await import(/* webpackChunkName: 'module-file-open' */ '@/modules/file/open');
-                            await openFromFileList([file], { insert: true });
+
+                            let isUseFile: boolean = true;
+                            if (editorStore.state.hasClipboardUpdateSupport) {
+                                const pastedImageHash = await generateImageBlobHash(file);
+                                isUseFile = editorStore.state.clipboardBufferImageHash !== pastedImageHash;
+                            } else {
+                                isUseFile = file.lastModified > editorStore.state.clipboardBufferUpdateTimestamp;
+                            }
+
+                            if (isUseFile) {
+                                const { openFromFileList } = await import(/* webpackChunkName: 'module-file-open' */ '@/modules/file/open');
+                                await openFromFileList([file], { insert: true });
+                            } else {
+                                const { pasteFromEditorCopyBuffer } = await import('@/modules/image/paste');
+                                await pasteFromEditorCopyBuffer();
+                            }
+
                             isPastingImage = false;
                             appEmitter.emit('app.wait.stopBlocking', { id: 'documentPasteImage' });
                             appEmitter.emit('app.workingFile.notifyImageLoadedFromClipboard');

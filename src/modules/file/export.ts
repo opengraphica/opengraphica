@@ -7,6 +7,7 @@ import workingFileStore, { getLayersByType } from '@/store/working-file';
 import { getCanvasRenderingContext } from '@/store/canvas';
 import editorStore from '@/store/editor';
 import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
+import { generateImageBlobHash } from '@/lib/hash';
 import { saveAs } from 'file-saver';
 import { knownFileExtensions } from '@/lib/regex';
 import { WorkingFileRasterSequenceLayer, FileSystemFileHandle, ColorModel } from '@/types';
@@ -24,7 +25,12 @@ export interface ExportAsImageOptions {
     quality?: number,
     toClipboard?: boolean,
     toFileHandle?: FileSystemFileHandle | null,
-    dithering?: string
+    dithering?: string,
+    generateImageHash?: boolean
+}
+
+export interface ExportAsImageResults {
+    generatedImageHash: string;
 }
 
 const extensionToMimeType: { [key: string]: string } = {
@@ -36,8 +42,11 @@ const extensionToMimeType: { [key: string]: string } = {
     tiff: 'image/tiff'
 };
 
-export async function exportAsImage(options: ExportAsImageOptions): Promise<void> {
-    return await new Promise<void>(async (resolve, reject) => {
+export async function exportAsImage(options: ExportAsImageOptions): Promise<ExportAsImageResults> {
+    let results: ExportAsImageResults = {
+        generatedImageHash: ''
+    };
+    return await new Promise<ExportAsImageResults>(async (resolve, reject) => {
         try {
             const fileName = (options.fileName || 'image').replace(knownFileExtensions, '') + '.' + options.fileType;
             const mimeType: string = extensionToMimeType[options.fileType];
@@ -66,7 +75,14 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<void
                             try {
                                 const data = [new ClipboardItem({ [blob.type]: blob })];
                                 await (navigator.clipboard as any).write(data);
-                                resolve();
+                                if (options.generateImageHash) {
+                                    try {
+                                        results.generatedImageHash = await generateImageBlobHash(blob);
+                                    } catch (error) {
+                                        // Ignore hash generation
+                                    }
+                                }
+                                resolve(results);
                             } catch (error: any) {
                                 reject(new Error('Error writing to clipboard.'));
                             }
@@ -85,7 +101,7 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<void
                         } else {
                             saveAs(blob, fileName);
                         }
-                        resolve();
+                        resolve(results);
                     } else {
                         reject(new Error('Image blob was not created.'));
                     }
@@ -98,7 +114,7 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<void
                         } else {
                             saveAs(blob, fileName);
                         }
-                        resolve();
+                        resolve(results);
                     } else {
                         reject(new Error('Image blob was not created.'));
                     }
