@@ -30,7 +30,8 @@ export async function pasteFromEditorCopyBuffer() {
             'action.pasteLayers',
             editorStore.state.clipboardBufferLayers.map((layer) => {
                 delete (layer as any).id;
-                layer.name = ensureUniqueLayerSiblingName(positionAfterLayer ?? workingFileStore.state.layers[0].id, layer.name);
+                const firstLayer = workingFileStore.state.layers[0];
+                layer.name = ensureUniqueLayerSiblingName(positionAfterLayer ?? firstLayer ? firstLayer.id : undefined, layer.name);
                 return new InsertLayerAction(cloneDeep(layer), positionAfterLayer == null ? 'top' : 'above', positionAfterLayer);
             })
         )
@@ -38,7 +39,7 @@ export async function pasteFromEditorCopyBuffer() {
 }
 
 export async function paste() {
-    if (await promptClipboardReadPermission()) {
+    if (await promptClipboardReadPermission() && navigator.clipboard?.read) {
         const clipboardContents = await navigator.clipboard.read();
         for (const item of clipboardContents) {
             let blob: Blob | undefined;
