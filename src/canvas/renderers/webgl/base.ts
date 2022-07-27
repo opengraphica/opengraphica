@@ -3,6 +3,13 @@ import { DrawWorkingFileLayerOptions, WorkingFileLayer, WorkingFileLayerRenderer
 
 export default class BaseLayerRenderer implements WorkingFileLayerRenderer<ColorModel> {
 
+    reorder(order: number) {
+        this.onReorder(order);
+    }
+    onReorder(order: number) {
+        // Override
+    }
+
     attach(layer: WorkingFileLayer<ColorModel>) {
         this.onAttach(layer);
     }

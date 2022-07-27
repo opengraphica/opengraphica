@@ -42,6 +42,8 @@ export interface WorkingFileLayerRenderer<T extends ColorModel> {
     onAttach(layer: WorkingFileLayer<ColorModel>): void;
     detach(): void;
     onDetach(): void;
+    reorder(order: number): void;
+    onReorder(order: number): void;
     update(updates: Partial<WorkingFileLayer<ColorModel>>): void;
     onUpdate(updates: Partial<WorkingFileLayer<ColorModel>>): void;
     draw(

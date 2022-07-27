@@ -18,6 +18,13 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
         // Override
     }
 
+    reorder(order: number) {
+        this.onReorder(order);
+    }
+    onReorder(order: number) {
+        // Override
+    }
+
     update(updates: Partial<WorkingFileLayer<ColorModel>>) {
         this.onUpdate(updates);
         canvasStore.set('dirty', true);

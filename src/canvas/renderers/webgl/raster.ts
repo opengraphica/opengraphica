@@ -46,6 +46,12 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
         }, { deep: true, immediate: true });
     }
 
+    onReorder(order: number) {
+        if (this.plane) {
+            this.plane.renderOrder = order;
+        }
+    }
+
     update(updates: Partial<WorkingFileRasterLayer<ColorModel>>) {
         super.update(updates);
     }

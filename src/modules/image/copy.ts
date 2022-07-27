@@ -4,6 +4,7 @@ import historyStore from '@/store/history';
 import workingFileStore, { getSelectedLayers } from '@/store/working-file';
 import appEmitter from '@/lib/emitter';
 import { unexpectedErrorMessage } from '@/lib/notify';
+import { BundleAction } from '@/actions/bundle';
 import { DeleteLayersAction } from '@/actions/delete-layers';
 
 export async function copySelectedLayers() {
@@ -29,7 +30,9 @@ export async function copySelectedLayers() {
 export async function cutSelectedLayers() {
     await copySelectedLayers();
     await historyStore.dispatch('runAction', {
-        action: new DeleteLayersAction(workingFileStore.state.selectedLayerIds)
+        action: new BundleAction('cutLayers', 'action.cutLayers', [
+            new DeleteLayersAction(workingFileStore.state.selectedLayerIds)
+        ])
     });
 }
 

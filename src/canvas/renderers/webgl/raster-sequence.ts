@@ -59,6 +59,12 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
             this.update({ data: layer.data });
         }, { deep: true, immediate: true });
     }
+    
+    onReorder(order: number) {
+        if (this.plane) {
+            this.plane.renderOrder = order;
+        }
+    }
 
     update(updates: Partial<WorkingFileRasterSequenceLayer<ColorModel>>) {
         super.update(updates);

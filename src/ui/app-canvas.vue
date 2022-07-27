@@ -224,7 +224,7 @@ export default defineComponent({
 
                         canvasStore.set('useCssViewport', true);
                     } catch (error) {
-                        console.log(error);
+                        console.error(error);
                     }
                 }
                 // Above can fail and default back to 2d.
@@ -327,7 +327,6 @@ export default defineComponent({
         }
 
         function drawLoop() {
-            const canvasElement = canvas.value;
             try {
                 const isViewDirty = canvasStore.get('viewDirty');
                 const isPlayingAnimation = canvasStore.get('playingAnimation');

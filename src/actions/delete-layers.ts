@@ -5,7 +5,7 @@ import { BaseAction } from './base';
 import { SelectLayersAction } from './select-layers';
 import { revokeObjectUrlIfLastUser } from './data/memory-management';
 import canvasStore from '@/store/canvas';
-import workingFileStore, { getLayerById, getGroupLayerById } from '@/store/working-file';
+import workingFileStore, { calculateLayerOrder, getLayerById, getGroupLayerById } from '@/store/working-file';
 
 export class DeleteLayersAction extends BaseAction {
 
@@ -51,6 +51,7 @@ export class DeleteLayersAction extends BaseAction {
         // Set the modified layer list
         workingFileStore.set('layers', layers);
 
+        calculateLayerOrder();
         canvasStore.set('dirty', true);
 	}
 
@@ -79,6 +80,7 @@ export class DeleteLayersAction extends BaseAction {
             this.selectLayersAction = null;
         }
 
+        calculateLayerOrder();
         canvasStore.set('dirty', true);
 	}
 

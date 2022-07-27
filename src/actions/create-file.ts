@@ -1,6 +1,6 @@
 import { nextTick } from 'vue';
 import { BaseAction } from './base';
-import workingFileStore, { WorkingFileState } from '@/store/working-file';
+import workingFileStore, { calculateLayerOrder, WorkingFileState } from '@/store/working-file';
 import appEmitter from '@/lib/emitter';
 import { discardActiveSelectionMask, discardAppliedSelectionMask, activeSelectionPath } from '@/canvas/store/selection-state';
 import { WorkingFileLayer, ColorModel, WorkingFileGroupLayer } from '@/types';
@@ -63,6 +63,8 @@ export class CreateFileAction extends BaseAction {
         discardActiveSelectionMask();
         activeSelectionPath.value = [];
 
+        calculateLayerOrder();
+
         await nextTick();
         appEmitter.emit('app.canvas.resetTransform');
 	}
@@ -81,6 +83,8 @@ export class CreateFileAction extends BaseAction {
         discardAppliedSelectionMask();
         discardActiveSelectionMask();
         activeSelectionPath.value = [];
+
+        calculateLayerOrder();
 
         await nextTick();
         appEmitter.emit('app.canvas.resetTransform');

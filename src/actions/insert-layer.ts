@@ -9,7 +9,7 @@ import { BaseAction } from './base';
 import { SelectLayersAction } from './select-layers';
 import { registerObjectUrlUser, revokeObjectUrlIfLastUser } from './data/memory-management';
 import canvasStore from '@/store/canvas';
-import workingFileStore, { getGroupLayerById } from '@/store/working-file';
+import workingFileStore, { calculateLayerOrder, getGroupLayerById } from '@/store/working-file';
 import layerRenderers from '@/canvas/renderers';
 
 let layerInsertCounter: number = 1;
@@ -180,6 +180,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
         this.selectLayersAction = new SelectLayersAction([newLayer.id]);
         this.selectLayersAction.do();
 
+        calculateLayerOrder();
         canvasStore.set('dirty', true);
 	}
 
@@ -215,6 +216,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
 
         this.insertedLayerId = -1;
 
+        calculateLayerOrder();
         canvasStore.set('dirty', true);
 	}
 

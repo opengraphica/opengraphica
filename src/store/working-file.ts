@@ -61,6 +61,20 @@ const store = new PerformantStore<WorkingFileStore>({
     nonReactive: ['fileHandle']
 });
 
+function calculateLayerOrder(parent?: WorkingFileLayer<ColorModel>[], order: number = 0): number {
+    if (!parent) {
+        parent = store.get('layers');
+    }
+    for (const layer of parent) {
+        layer.renderer.reorder(order);
+        order++;
+        if (layer.type === 'group') {
+            order = calculateLayerOrder((layer as WorkingFileGroupLayer<ColorModel>).layers, order);
+        }
+    }
+    return order;
+}
+
 function getLayerById(id: number, parent?: WorkingFileLayer<ColorModel>[]): WorkingFileAnyLayer<ColorModel> | null {
     if (parent == null) {
         parent = store.get('layers');
@@ -182,6 +196,7 @@ export default store;
 export {
     WorkingFileStore,
     WorkingFileState,
+    calculateLayerOrder,
     getLayerById,
     getLayerGlobalTransform,
     getLayersByType,

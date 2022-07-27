@@ -4,7 +4,7 @@ import {
 } from '@/types';
 import { BaseAction } from './base';
 import canvasStore from '@/store/canvas';
-import workingFileStore, { getLayerById, getGroupLayerById } from '@/store/working-file';
+import workingFileStore, { calculateLayerOrder, getLayerById, getGroupLayerById } from '@/store/working-file';
 
 export class ReorderLayersAction extends BaseAction {
 
@@ -70,6 +70,7 @@ export class ReorderLayersAction extends BaseAction {
         }
 
         workingFileStore.set('layers', [...workingFileStore.get('layers')]);
+        calculateLayerOrder();
         canvasStore.set('dirty', true);
 	}
 
@@ -119,6 +120,7 @@ export class ReorderLayersAction extends BaseAction {
         }
 
         workingFileStore.set('layers', [...workingFileStore.get('layers')]);
+        calculateLayerOrder();
         canvasStore.set('dirty', true);
 	}
 

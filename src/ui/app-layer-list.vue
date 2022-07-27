@@ -445,10 +445,11 @@ export default defineComponent({
             reversedLayers
         };
     },
-    mounted() {
-        this.$watch(() => historyStore.state.actionStackUpdateToggle, () => {
-            this.$forceUpdate();
-        });
-    }
+    // Remove force update, not sure why it was added, but it breaks the reactivity of layer updates when using webgl renderer
+    // mounted() {
+    //     this.$watch(() => historyStore.state.actionStackUpdateToggle, () => {
+    //         this.$forceUpdate();
+    //     });
+    // }
 });
 </script>
