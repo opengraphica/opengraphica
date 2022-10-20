@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkOpenGraphica=self.webpackChunkOpenGraphica||[]).push([[9640],{75877:(e,r,n)=>{n.r(r),n.d(r,{default:()=>t});var s=n(56742),a=n(91648);class t extends s.default{onEnter(){super.onEnter()}handleCursorIcon(){let e=super.handleCursorIcon();return e||(e="text"),a.Z.set("cursor",e),e}}}}]);

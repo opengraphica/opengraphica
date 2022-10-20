@@ -1,0 +1,19 @@
+/**
+ * Parts of this file were adapted from miniPaint
+ * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
+ *
+ * Also mjackson's diff
+ * @website https://gist.github.com/mjackson/5311256
+ * @license CC BY-SA 3.0 https://creativecommons.org/licenses/by-sa/3.0/deed.en
+ */
+
+/**
+ * Parts of this file were adapted from miniPaint
+ * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
+ */
+
+/**
+ * Throttles a callback with the specified wait time and callback options
+ * https://stackoverflow.com/questions/27078285/simple-throttle-in-js
+ * @license CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/
+ */

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkOpenGraphica=self.webpackChunkOpenGraphica||[]).push([[7741],{13302:(a,n,c)=>{c.r(n),c.d(n,{undo:()=>t,redo:()=>s});var e=c(8778);async function t(){e.Z.state.canUndo&&await e.Z.dispatch("undo")}async function s(){e.Z.state.canRedo&&await e.Z.dispatch("redo")}}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkOpenGraphica=self.webpackChunkOpenGraphica||[]).push([[8341],{98341:(p,e,i)=>{i.d(e,{z:()=>n});const n=/(\.(txt|json|png|jpg|jpeg|webp|gif|bmp|tif|tiff))$/gi}}]);

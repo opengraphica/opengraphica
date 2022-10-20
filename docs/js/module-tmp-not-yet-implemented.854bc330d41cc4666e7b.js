@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkOpenGraphica=self.webpackChunkOpenGraphica||[]).push([[7943],{43966:(e,t,n)=>{n.r(t),n.d(t,{notYetImplemented:()=>p});var a=n(95452);async function p(){await new Promise((e=>{setTimeout(e,1)})),a.Z.emit("app.notify",{type:"error",title:"Not Yet Implemented",message:"This feature is not yet implemented, future development task."})}}}]);

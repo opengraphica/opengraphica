@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkOpenGraphica=self.webpackChunkOpenGraphica||[]).push([[8416],{85804:(e,a,r)=>{r.r(a),r.d(a,{default:()=>t});var s=r(66252);const n={class:"ogr-canvas-overlay"},p=(0,s.aZ)({name:"CanvasOverlayText",emits:[],props:{},setup(e,{emit:a}){}}),t=(0,r(83744).Z)(p,[["render",function(e,a,r,p,t,c){return(0,s.wg)(),(0,s.iD)("div",n)}]])}}]);

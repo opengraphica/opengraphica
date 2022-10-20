@@ -1,0 +1,32 @@
+/*!
+   gifken
+   Copyright (c) 2013 aaharu
+   This software is released under the MIT License.
+   https://raw.github.com/aaharu/gifken/master/LICENSE
+
+   This product includes following software:
+   * GifWriter.js
+   - Copyright (c) 2013 NOBUOKA Yu
+   - https://github.com/nobuoka/GifWriter.js
+   - https://raw.github.com/nobuoka/GifWriter.js/master/LICENSE.txt
+   */
+
+/*!
+   gifken
+   Copyright (c) 2013 aaharu
+   This software is released under the MIT License.
+   https://raw.github.com/aaharu/gifken/master/LICENSE
+
+   This product includes following software:
+   * jsgif
+   - Copyright (c) 2011 Shachaf Ben-Kiki
+   - https://github.com/shachaf/jsgif
+   - https://raw.github.com/shachaf/jsgif/master/LICENSE
+   */
+
+/*!
+   gifken
+   Copyright (c) 2013 aaharu
+   This software is released under the MIT License.
+   https://raw.github.com/aaharu/gifken/master/LICENSE
+   */

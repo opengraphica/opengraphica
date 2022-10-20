@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkOpenGraphica=self.webpackChunkOpenGraphica||[]).push([[7063],{71401:(e,a,i)=>{i.r(a),i.d(a,{createNewFile:()=>r});var t=i(8778),n=i(22053),p=i(71045);async function r(e){n.Z.set("useCanvasViewport",n.Z.get("preferCanvasViewport")),await t.Z.dispatch("runAction",{action:new p.p(e)}),await t.Z.dispatch("free",{memorySize:1/0,databaseSize:1/0})}}}]);
