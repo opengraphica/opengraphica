@@ -221,8 +221,10 @@ export default defineComponent({
             }
         });
 
-        onMounted(() => {
+        onMounted(async () => {
             toggleMobileView();
+            await nextTick();
+            appEmitter.emit('app.canvas.resetTransform', { margin: Math.floor(Math.min(window.innerWidth, window.innerHeight) / 4) });
         });
 
         async function onInputResizeWidth(newWidth: number) {

@@ -53,13 +53,13 @@ Modules
         - Convert layers
             [x] to image sequence
                 [ ] selected layers only
-        [ ] Cut (active layers)
-            [ ] Ctrl + X shortcut
-        [ ] Copy (active layers)
-            [ ] Ctrl + C shortcut
+        [x] Cut (active layers)
+            [x] Ctrl + X shortcut
+        [x] Copy (active layers)
+            [x] Ctrl + C shortcut
         [x] Copy all layers (merge to clipboard)
-        [ ] Paste
-            [ ] Ctrl + V shortcut
+        [x] Paste
+            [x] Ctrl + V shortcut
     - View
         [x] Zoom
             [ ] Fix center on mobile

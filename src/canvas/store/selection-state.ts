@@ -10,6 +10,7 @@ export type SelectionCombineMode = 'add' | 'subtract' | 'intersect' | 'replace';
 export const selectionAddShape = ref<SelectionAddShape>('rectangle');
 export const selectionCombineMode = ref<SelectionCombineMode>('add');
 export const isDrawingSelection = ref<boolean>(false);
+// Applied selection mask is the selection that has already been applied by the user. It does not include the path the user is currently working on selecting.
 export const appliedSelectionMask = ref<InstanceType<typeof Image> | null>(null);
 export const appliedSelectionMaskCanvasOffset = ref<DOMPoint>(new DOMPoint());
 // Active selection mask is a preview of what appliedSelectionMask will look like when the selection shape is applied. It is not tracked in history.
@@ -213,10 +214,10 @@ export async function createActiveSelectionMask(activeSelectionBounds: Selection
         activeSelectionBounds.right = workingFileStore.get('width');
         activeSelectionBounds.bottom = workingFileStore.get('height');
     }
-    let workingCanvas = document.createElement('canvas');
+    const workingCanvas = document.createElement('canvas');
     workingCanvas.width = (activeSelectionBounds.right - activeSelectionBounds.left) + (drawMargin * 2);
     workingCanvas.height = (activeSelectionBounds.bottom - activeSelectionBounds.top) + (drawMargin * 2);
-    let ctx = workingCanvas.getContext('2d');
+    const ctx = workingCanvas.getContext('2d');
     if (!ctx) throw new Error('Couldn\'t draw to a new canvas when trying to apply selection mask.');
     ctx.imageSmoothingEnabled = false;
     ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height);
@@ -254,5 +255,32 @@ export async function createActiveSelectionMask(activeSelectionBounds: Selection
     }
     ctx.closePath();
     ctx.fill();
+    return workingCanvas;
+}
+
+export async function blitActiveSelectionMask(toImage: HTMLImageElement | HTMLCanvasElement, layerTransform: DOMMatrix, compositeOperation = 'source-in'): Promise<HTMLCanvasElement> {
+    return blitSpecifiedSelectionMask(
+        activeSelectionMask.value,
+        activeSelectionMaskCanvasOffset.value,
+        toImage,
+        layerTransform,
+        compositeOperation
+    );
+}
+
+export async function blitSpecifiedSelectionMask(selectionMask: HTMLImageElement | null, selectionMaskCanvasOffset: DOMPoint, toImage: HTMLImageElement | HTMLCanvasElement, layerTransform: DOMMatrix, compositeOperation = 'source-in'): Promise<HTMLCanvasElement> {
+    if (selectionMask == null) throw new Error('Active selection mask does not exist.');
+    const workingCanvas = document.createElement('canvas');
+    workingCanvas.width = toImage.width;
+    workingCanvas.height = toImage.height;
+    const ctx = workingCanvas.getContext('2d');
+    if (!ctx) throw new Error('Couldn\'t draw to a new canvas when trying to blit selection mask.');
+    const tranformInverse = layerTransform.inverse();
+    ctx.transform(tranformInverse.a, tranformInverse.b, tranformInverse.c, tranformInverse.d, tranformInverse.e, tranformInverse.f);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.drawImage(selectionMask, selectionMaskCanvasOffset.x, selectionMaskCanvasOffset.y);
+    ctx.transform(layerTransform.a, layerTransform.b, layerTransform.c, layerTransform.d, layerTransform.e, layerTransform.f);
+    ctx.globalCompositeOperation = compositeOperation;
+    ctx.drawImage(toImage, 0, 0);
     return workingCanvas;
 }

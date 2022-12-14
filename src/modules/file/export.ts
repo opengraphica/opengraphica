@@ -11,6 +11,7 @@ import { generateImageBlobHash } from '@/lib/hash';
 import { saveAs } from 'file-saver';
 import { knownFileExtensions } from '@/lib/regex';
 import { WorkingFileRasterSequenceLayer, FileSystemFileHandle, ColorModel } from '@/types';
+import { activeSelectionMask, blitActiveSelectionMask } from '@/canvas/store/selection-state';
 // @ts-ignore
 import GIF from '@/lib/gif.js';
 
@@ -22,6 +23,7 @@ export interface ExportAsImageOptions {
     fileName?: string,
     fileType: 'png' | 'jpg' | 'webp' | 'gif' | 'bmp' | 'tiff',
     layerSelection?: 'all' | 'selected',
+    blitActiveSelectionMask?: boolean,
     quality?: number,
     toClipboard?: boolean,
     toFileHandle?: FileSystemFileHandle | null,
@@ -56,7 +58,7 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                 return;
             }
 
-            const canvas = document.createElement('canvas');
+            let canvas = document.createElement('canvas');
             canvas.width = workingFileStore.get('width');
             canvas.height = workingFileStore.get('height');
             const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -66,6 +68,9 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                     force2dRenderer: true,
                     selectedLayersOnly: options.layerSelection === 'selected'
                 });
+            }
+            if (options.blitActiveSelectionMask && activeSelectionMask.value != null) {
+                canvas = await blitActiveSelectionMask(canvas, new DOMMatrix(), 'source-in');
             }
 
             if (options.toClipboard) {

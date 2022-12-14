@@ -37,6 +37,8 @@ interface EditorState {
     activeToolOverlays: string[];
     clipboardBufferImageHash: string | null;
     clipboardBufferLayers: WorkingFileLayer<ColorModel>[];
+    clipboardBufferSelectionMask: HTMLImageElement | null;
+    clipboardBufferSelectionMaskCanvasOffset: DOMPoint;
     clipboardBufferUpdateTimestamp: number;
     hasClipboardUpdateSupport: boolean;
     isActiveToolbarExclusive: boolean;
@@ -92,6 +94,8 @@ const store = new PerformantStore<EditorStore>({
         activeToolOverlays: [],
         clipboardBufferImageHash: null,
         clipboardBufferLayers: [],
+        clipboardBufferSelectionMask: null,
+        clipboardBufferSelectionMaskCanvasOffset: new DOMPoint,
         clipboardBufferUpdateTimestamp: 0,
         hasClipboardUpdateSupport: false,
         isActiveToolbarExclusive: false,

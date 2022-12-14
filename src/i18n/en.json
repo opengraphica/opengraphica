@@ -185,7 +185,8 @@
             "actions": {
                 "cut": "Cut",
                 "copy": "Copy",
-                "paste": "Paste"
+                "paste": "Paste",
+                "delete": "Delete"
             }
         },
         "history": {

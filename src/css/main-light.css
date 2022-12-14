@@ -25036,6 +25036,11 @@ body.ogr-full-page .opengraphica {
   padding: 0.5625rem 0.9375rem;
   font-size: 0.75rem;
 }
+.opengraphica .el-button--no-hover:hover, .opengraphica .el-button--no-hover:focus {
+  --el-button-hover-text-color: var(--el-button-text-color);
+  --el-button-hover-border-color: var(--el-button-border-color);
+  --el-button-hover-bg-color: var(--el-button-bg-color);
+}
 .opengraphica .el-button-group > .el-input {
   float: left;
   width: 6rem;

@@ -10,7 +10,12 @@
         ]"
         @touchmove="onTouchMoveMenuBar($event)">
         <div ref="flexContainer" class="is-flex container mx-auto">
-            <div v-for="(actionGroupSection, actionGroupSectionName) of actionGroups" :key="actionGroupSectionName" class="ogr-menu-section my-2" :class="['ogr-menu-' + actionGroupSectionName, { 'px-3': actionGroupSectionName !== 'tools' }]">
+            <div
+                v-for="(actionGroupSection, actionGroupSectionName) of actionGroups"
+                :key="actionGroupSectionName"
+                class="ogr-menu-section my-2"
+                :class="['ogr-menu-' + actionGroupSectionName, { 'px-3': actionGroupSectionName !== 'tools' }]"
+            >
                 <span v-if="actionGroupSectionName === 'tools'" class="ogr-menu-section__title">{{ $t('menuBar.toolsHeading') }}</span>
                 <component v-if="displayMode === 'all' || actionGroupSectionName === 'tools'" :is="actionGroupSectionName === 'tools' ? 'el-scrollbar' : 'v-fragment'">
                     <template v-for="actionGroup of actionGroupSection" :key="actionGroup.id">
@@ -71,7 +76,12 @@
                     </template>
                 </component>
             </div>
-            <div class="ogr-menu-end px-3" style="height: 0px; overflow: hidden; visibility: hidden;">
+            <div v-if="isTouchUser" class="ogr-menu-end px-3">
+                <el-button circle round class="el-button--no-hover" :aria-label="$t('dock.settings.history.undo')" @click="onClickUndo">
+                    <span class="el-icon bi bi-arrow-counterclockwise" aria-hidden="true" />
+                </el-button>
+            </div>
+            <div v-else class="ogr-menu-end px-3" style="height: 0px; overflow: hidden; visibility: hidden;">
                 <el-button aria-hidden="true" circle round>
                     <span class="el-icon" aria-hidden="true" />
                 </el-button>
@@ -92,9 +102,9 @@ import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import preferencesStore from '@/store/preferences';
 import appEmitter from '@/lib/emitter';
+import { runModule } from '@/modules';
 import Dock from './dock.vue';
 import VFragment from './v-fragment.vue';
-import { runModule } from '@/modules';
 
 export default defineComponent({
     name: 'AppLayoutMenuBar',
@@ -149,6 +159,10 @@ export default defineComponent({
 
         const activeMenuDrawerComponentName = computed<string | null>(() => {
             return editorStore.state.activeMenuDrawerComponentName;
+        });
+
+        const isTouchUser = computed<boolean>(() => {
+            return editorStore.state.isTouchUser;
         });
 
         watch([viewportWidth], () => {
@@ -398,6 +412,10 @@ export default defineComponent({
             }
         }
 
+        function onClickUndo() {
+            runModule('history', 'undo');
+        }
+
         return {
             activeMenuDrawerComponentName,
             showMoreActionsMenu,
@@ -409,6 +427,7 @@ export default defineComponent({
             actionGroups,
             activeToolGroup,
             activeTool,
+            isTouchUser,
             onAfterLeavePopover,
             onKeyDownControlButton,
             onTouchStartControlButton,
@@ -418,7 +437,8 @@ export default defineComponent({
             onMouseUpControlButton,
             onMouseEnterControlButton,
             onMouseLeaveControlButton,
-            onPressControlButton
+            onPressControlButton,
+            onClickUndo
         };
     }
 });

@@ -5,6 +5,9 @@ import historyStore from '@/store/history';
 import workingFileStore, { ensureUniqueLayerSiblingName } from '@/store/working-file';
 import { BundleAction } from '@/actions/bundle';
 import { InsertLayerAction } from '@/actions/insert-layer';
+import { blitSpecifiedSelectionMask } from '@/canvas/store/selection-state';
+import { createImageFromCanvas } from '@/lib/image';
+import type { ColorModel, WorkingFileRasterLayer } from '@/types';
 
 export async function promptClipboardReadPermission(): Promise<boolean> {
     try {
@@ -28,12 +31,32 @@ export async function pasteFromEditorCopyBuffer() {
         action: new BundleAction(
             'pasteLayers',
             'action.pasteLayers',
-            editorStore.state.clipboardBufferLayers.map((layer) => {
+            await Promise.all(editorStore.state.clipboardBufferLayers.map(async (layer) => {
                 delete (layer as any).id;
                 const firstLayer = workingFileStore.state.layers[0];
                 layer.name = ensureUniqueLayerSiblingName(positionAfterLayer ?? firstLayer ? firstLayer.id : undefined, layer.name);
+                if (editorStore.state.clipboardBufferSelectionMask != null) {
+                    if (layer.type === 'raster') {
+                        const rasterLayer = layer as WorkingFileRasterLayer<ColorModel>;
+                        if (rasterLayer.data.sourceImage) {
+                            rasterLayer.thumbnailImageSrc = null;
+                            rasterLayer.data = {
+                                sourceImage: await createImageFromCanvas(
+                                    await blitSpecifiedSelectionMask(
+                                        editorStore.state.clipboardBufferSelectionMask,
+                                        editorStore.state.clipboardBufferSelectionMaskCanvasOffset,
+                                        rasterLayer.data.sourceImage,
+                                        rasterLayer.transform,
+                                        'source-in'
+                                    )
+                                ),
+                                sourceImageIsObjectUrl: true
+                            };
+                        }
+                    }
+                }
                 return new InsertLayerAction(cloneDeep(layer), positionAfterLayer == null ? 'top' : 'above', positionAfterLayer);
-            })
+            }))
         )
     });
 }

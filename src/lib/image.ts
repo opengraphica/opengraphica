@@ -151,6 +151,23 @@ export function getImageDataEmptyBounds(imageData: ImageData, options: GetImageD
 }
 
 /**
+ * Creates an Blob containing a PNG image from the image currently drawn on the HTMLCanvasElement.
+ * @param canvas The source HTMLCanvasElement that holds the image to extract.
+ * @returns The new Blob.
+ */
+export async function createImageBlobFromCanvas(canvas: HTMLCanvasElement): Promise<Blob> {
+    return await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob(async (blob) => {
+            if (blob) {
+                resolve(blob);
+            } else {
+                reject(new Error('Canvas blob not created when converting image from canvas.'));
+            }
+        }, 'image/png', 1);
+    });
+}
+
+/**
  * Creates an HTMLImageElement from the image currently drawn on the HTMLCanvasElement. By default, the image points to an object URL.
  * @param canvas The source HTMLCanvasElement that holds the image to extract.
  * @param options Additional options.
@@ -166,7 +183,7 @@ export async function createImageFromCanvas(canvas: HTMLCanvasElement, options: 
                     reject(error);
                 }
             } else {
-                reject(new Error('Canvas blob not created when drawing new selection shape.'));
+                reject(new Error('Canvas blob not created when converting image from canvas.'));
             }
         }, 'image/png', 1);
     });

@@ -30,6 +30,13 @@
         padding: 0.5625rem 0.9375rem;
         font-size: 0.75rem;
     }
+    .el-button--no-hover {
+        &:hover, &:focus {
+            --el-button-hover-text-color: var(--el-button-text-color);
+            --el-button-hover-border-color: var(--el-button-border-color);
+            --el-button-hover-bg-color: var(--el-button-bg-color);
+        }
+    }
 
     .el-button-group {
         > .el-input {

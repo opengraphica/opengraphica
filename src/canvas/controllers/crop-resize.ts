@@ -32,7 +32,6 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
         height.value = workingFileStore.get('height');
         this.xAxisSnap = [0, Math.floor(width.value / 2), width.value];
         this.yAxisSnap = [0, Math.floor(height.value / 2), height.value];
-        appEmitter.emit('app.canvas.resetTransform', { margin: Math.floor(Math.min(window.innerWidth, window.innerHeight) / 4) });
     }
 
     onMultiTouchDown() {
