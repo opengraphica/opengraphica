@@ -75,7 +75,7 @@ export class CreateFileAction extends BaseAction {
         for (let key in this.previousState) {
             workingFileStore.set(key as keyof WorkingFileState, this.previousState[key]);
             if (key === 'layers') {
-                this.attachLayerRenderers(this.previousState[key]);
+                await this.attachLayerRenderers(this.previousState[key]);
             }
         }
         this.previousState = {};
@@ -90,12 +90,12 @@ export class CreateFileAction extends BaseAction {
         appEmitter.emit('app.canvas.resetTransform');
 	}
 
-    private attachLayerRenderers(layers: WorkingFileLayer<ColorModel>[]) {
+    private async attachLayerRenderers(layers: WorkingFileLayer<ColorModel>[]) {
         for (const layer of layers) {
             if (layer.type === 'group') {
                 this.attachLayerRenderers((layer as WorkingFileGroupLayer<ColorModel>).layers);
             }
-            layer.renderer.attach(layer);
+            await layer.renderer.attach(layer);
         }
     }
 

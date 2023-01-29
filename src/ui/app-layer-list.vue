@@ -34,10 +34,10 @@
                         <span class="ogr-layer-name">{{ layer.name }}</span>
                         <span v-if="layer.type === 'group'" class="ogr-layer-group-arrow bi" :class="{ 'bi-chevron-right': !layer.expanded, 'bi-chevron-down': layer.expanded }" aria-hidden="true"></span>
                     </span>
-                    <el-button type="text" class="px-2" :aria-label="$t('app.layerList.toggleLayerVisibility')" @click="onToggleLayerVisibility(layer)">
+                    <el-button type="text" class="px-2 my-1" :aria-label="$t('app.layerList.toggleLayerVisibility')" @click="onToggleLayerVisibility(layer)">
                         <i class="bi" :class="{ 'bi-eye-fill': layer.visible, 'bi-eye-slash': !layer.visible }" aria-hidden="true"></i>
                     </el-button>
-                    <el-button type="text" class="px-2 mr-2 my-0 ml-0" :aria-label="$t('app.layerList.layerSettings')" @click="onToggleLayerSettings(layer)">
+                    <el-button type="text" class="px-2 mr-2 my-1 ml-0" :aria-label="$t('app.layerList.layerSettings')" @click="onToggleLayerSettings(layer)">
                         <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
                     </el-button>
                 </span>
@@ -65,6 +65,25 @@
                             <i class="bi bi-pencil-square" aria-hidden="true"></i>
                         </el-button>
                     </div>
+                </span>
+                <span v-if="layer.filters?.length > 0" role="group" class="ogr-layer-attributes">
+                    <span class="ogr-layer-attributes__title">
+                        <i class="bi bi-arrow-return-right" aria-hidden="true"></i> {{ $t('app.layerList.effects') }}
+                    </span>
+                    <ul class="ogr-layer-effect-stack">
+                        <li v-for="(filter, filterIndex) of layer.filters" :key="filterIndex">
+                            <el-button type="text" @click="onEditLayerFilter(layer, filterIndex)">
+                                <i class="bi bi-pencil-square mr-1" aria-hidden="true"></i>
+                                <span v-t="`layerFilter.${filter.name}.name`"></span>
+                            </el-button>
+                            <el-button type="text" class="px-2 my-0 ml-0" :aria-label="$t('app.layerList.moveEffectUp')">
+                                <i class="bi bi-chevron-up" aria-hidden="true"></i>
+                            </el-button>
+                            <el-button type="text" class="px-2 my-0 ml-0" :aria-label="$t('app.layerList.moveEffectDown')">
+                                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                            </el-button>
+                        </li>
+                    </ul>
                 </span>
                 <el-alert
                     v-if="layer.layers && layer.expanded && layer.layers.length === 0"
@@ -105,7 +124,9 @@ import { DeleteLayersAction } from '@/actions/delete-layers';
 import { SelectLayersAction } from '@/actions/select-layers';
 import { UpdateLayerAction } from '@/actions/update-layer';
 import { ReorderLayersAction } from '@/actions/reorder-layers';
-import { WorkingFileAnyLayer, WorkingFileGroupLayer, ColorModel, WorkingFileRasterSequenceLayer } from '@/types';
+import { runModule } from '@/modules';
+
+import type { WorkingFileAnyLayer, WorkingFileGroupLayer, ColorModel, WorkingFileRasterSequenceLayer } from '@/types';
 
 export default defineComponent({
     name: 'AppLayerList',
@@ -401,6 +422,13 @@ export default defineComponent({
             canvasStore.set('playingAnimation', false);
         }
 
+        function onEditLayerFilter(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
+            runModule('image', 'layerEffectEdit', {
+                layerId: layer.id,
+                filterIndex
+            })
+        }
+
         function calculateDragOffsets() {
             dragItemOffsetCalculatedScrollTop = props.scrollTop;
             dragItemOffsets = [];
@@ -442,6 +470,7 @@ export default defineComponent({
             onSelectLayerFrame,
             onPlayRasterSequence,
             onStopRasterSequence,
+            onEditLayerFilter,
             reversedLayers
         };
     },

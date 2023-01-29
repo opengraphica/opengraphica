@@ -1,0 +1,38 @@
+{
+    "colorCorrection": {
+        "name": "layerFilter.colorCorrection.name",
+        "group": "color"
+    },
+    "brightness": {
+        "name": "layerFilter.brightness.name",
+        "group": "color"
+    },
+    "contrast": {
+        "name": "layerFilter.contrast.name",
+        "group": "color"
+    },
+    "decreaseColorDepth": {
+        "name": "layerFilter.decreaseColorDepth.name",
+        "group": "color"
+    },
+    "grayscale": {
+        "name": "layerFilter.grayscale.name",
+        "group": "color"
+    },
+    "hueRotate": {
+        "name": "layerFilter.hueRotate.name",
+        "group": "color"
+    },
+    "negative": {
+        "name": "layerFilter.negative.name",
+        "group": "color"
+    },
+    "saturation": {
+        "name": "layerFilter.saturation.name",
+        "group": "color"
+    },
+    "sepia": {
+        "name": "layerFilter.sepia.name",
+        "group": "color"
+    }
+}

@@ -53,17 +53,7 @@
                             <i class="bi bi-crop"></i>
                             <span v-t="'dock.settings.image.menu.cropResize'"></span>
                         </el-menu-item>
-                        <el-collapse class="el-collapse--menu-item my-1">
-                            <el-collapse-item>
-                                <template v-slot:title>
-                                    {{ $t('dock.settings.image.menu.convertLayers.groupTitle') }}
-                                </template>
-                                <el-menu-item index="convertLayersToImageSequence">
-                                    <i class="bi bi-arrow-return-right"></i>
-                                    <span v-t="'dock.settings.image.menu.convertLayers.toImageSequence'"></span>
-                                </el-menu-item>
-                            </el-collapse-item>
-                        </el-collapse>
+                        <el-divider />
                         <el-menu-item index="cut">
                             <i class="bi bi-scissors"></i>
                             <span v-t="'dock.settings.image.menu.cut'"></span>
@@ -80,6 +70,17 @@
                             <i class="bi bi-clipboard"></i>
                             <span v-t="'dock.settings.image.menu.paste'"></span>
                         </el-menu-item>
+                        <el-collapse class="el-collapse--menu-item my-1">
+                            <el-collapse-item>
+                                <template v-slot:title>
+                                    {{ $t('dock.settings.image.menu.convertLayers.groupTitle') }}
+                                </template>
+                                <el-menu-item index="convertLayersToImageSequence">
+                                    <i class="bi bi-arrow-return-right"></i>
+                                    <span v-t="'dock.settings.image.menu.convertLayers.toImageSequence'"></span>
+                                </el-menu-item>
+                            </el-collapse-item>
+                        </el-collapse>
                     </el-menu>
                 </el-scrollbar>
             </template>

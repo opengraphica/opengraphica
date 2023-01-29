@@ -1,6 +1,8 @@
 {
     "empty": "",
     "action": {
+        "addLayerFilter": "Add Effect to Layer",
+        "addLayerFilterMultiple": "Add Effect to Layer(s)",
         "applyActiveSelection": "Apply Active Selection",
         "clearSelection": "Clear Selection",
         "convertLayersToImageSequence": "Convert Layers to Image Sequence",
@@ -24,6 +26,7 @@
         "updateActiveSelection": "Update Active Selection",
         "updateFile": "Update File",
         "updateLayer": "Update Layer",
+        "updateLayerFilterParams": "Update Layer Effect",
         "updateSelectionCombineMode": "Update Selection Combine Mode"
     },
     "app": {
@@ -42,7 +45,10 @@
             "playAnimation": "Play Animation",
             "stopAnimation": "Stop Animation",
             "editFrames": "Edit Frames",
-            "emptyGroup": "Group is Empty."
+            "emptyGroup": "Group is Empty.",
+            "effects": "Effects",
+            "moveEffectUp": "Move Effect Up",
+            "moveEffectDown": "Move Effect Down"
         },
         "wait": {
             "loadingImage": "Loading Image",
@@ -86,6 +92,7 @@
             "add": "Add",
             "layer": "Layer",
             "group": "Group",
+            "effect": "Effect",
             "background": "Background",
             "toggleBackgroundVisibility": "Toggle Background Visibility",
             "noLayers": "No Layers Yet."
@@ -201,6 +208,55 @@
             "actions": {
                 "selectAll": "Select All"
             }
+        }
+    },
+    "layerFilter": {
+        "colorCorrection": {
+            "name": "Color Correction"
+        },
+        "decreaseColorDepth": {
+            "name": "Decrease Color Depth"
+        },
+        "brightness": {
+            "name": "Brightness"
+        },
+        "contrast": {
+            "name": "Contrast"
+        },
+        "grayscale": {
+            "name": "Grayscale"
+        },
+        "hueRotate": {
+            "name": "Hue Rotate"
+        },
+        "negative": {
+            "name": "Negative"
+        },
+        "saturation": {
+            "name": "Saturation"
+        },
+        "sepia": {
+            "name": "Sepia"
+        }
+    },
+    "layerFilterGroup": {
+        "blur": {
+            "name": "Blur"
+        },
+        "color": {
+            "name": "Color"
+        },
+        "distort": {
+            "name": "Distort"
+        },
+        "instagramFilter": {
+            "name": "Instagram Filter"
+        },
+        "photography": {
+            "name": "Photography"
+        },
+        "sharpen": {
+            "name": "Sharpen"
         }
     },
     "layoutShortcutGroup": {
@@ -386,6 +442,21 @@
         "imageConvertLayersToImageSequence": {
             "title": "Convert Layers to Image Sequence",
             "frameDelay": "Frame Delay"
+        },
+        "layerEffectBrowser": {
+            "title": "Effect Browser",
+            "description": "Choose an effect to add to the layer. Effects generally manipulate the colors of a layer or add special patterns like blurring effects.",
+            "loading": "Generating Previews...",
+            "generationErrorGeneral": "An error occurred when generating effect previews for the selected layer.",
+            "generationErrorUnsupportedType": "The layer you have selected is unable to have filters applied to it.",
+            "generationErrorNoLayer": "Please select one or more layers in the layers dock in order to add effects to them."
+        },
+        "layerEffectEdit": {
+            "title": "Edit Effect",
+            "description": "Edit the effect for a specific layer.",
+            "loading": "Generating Previews...",
+            "generalError": "Something went wrong. If you keep seeing this message, please report this as a bug.",
+            "deleteEffect": "Delete Effect"
         }
     },
     "moduleGroup": {
@@ -464,6 +535,10 @@
                 "paste": {
                     "name": "Paste",
                     "description": "Insert images on to the canvas from the clipboard."
+                },
+                "layerEffectBrowser": {
+                    "name": "Effect Browser",
+                    "description": "Adds image effects to the currently selected layer(s) or layer group(s)."
                 }
             }
         },

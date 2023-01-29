@@ -1,4 +1,4 @@
-import { reactive } from 'vue';
+import { reactive, markRaw } from 'vue';
 import {
     ColorModel, WorkingFileLayer,
     WorkingFileEmptyLayer, WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer,
@@ -68,14 +68,14 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                 thumbnailImageSrc: null,
                 transform: new DOMMatrix(),
                 visible: true,
-                renderer: new layerRenderers[renderer].base()
+                renderer: markRaw(new layerRenderers[renderer].base())
             }
 
             switch (this.insertLayerOptions.type) {
                 case 'empty':
                     newLayer = {
                         ...sharedOptions,
-                        renderer: new layerRenderers[renderer].empty(),
+                        renderer: markRaw(new layerRenderers[renderer].empty()),
                         ...this.insertLayerOptions
                     } as WorkingFileEmptyLayer<ColorModel>;
                     break;
@@ -84,14 +84,14 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                         ...sharedOptions,
                         layers: [],
                         expanded: false,
-                        renderer: new layerRenderers[renderer].group(),
+                        renderer: markRaw(new layerRenderers[renderer].group()),
                         ...this.insertLayerOptions
                     } as WorkingFileGroupLayer<ColorModel>;
                     break;
                 case 'raster':
                     newLayer = {
                         ...sharedOptions,
-                        renderer: new layerRenderers[renderer].raster(),
+                        renderer: markRaw(new layerRenderers[renderer].raster()),
                         data: {},
                         ...this.insertLayerOptions,
                     } as WorkingFileRasterLayer<ColorModel>;
@@ -103,7 +103,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                     newLayer = {
                         ...sharedOptions,
                         data: {},
-                        renderer: new layerRenderers[renderer].rasterSequence(),
+                        renderer: markRaw(new layerRenderers[renderer].rasterSequence()),
                         ...this.insertLayerOptions
                     } as WorkingFileRasterSequenceLayer<ColorModel>;
                     for (let frame of newLayer.data.sequence) {
@@ -116,7 +116,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                     newLayer = {
                         ...sharedOptions,
                         data: [],
-                        renderer: new layerRenderers[renderer].vector(),
+                        renderer: markRaw(new layerRenderers[renderer].vector()),
                         ...this.insertLayerOptions
                     } as WorkingFileVectorLayer<ColorModel>;
                     break;
@@ -124,7 +124,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                     newLayer = {
                         ...sharedOptions,
                         data: {},
-                        renderer: new layerRenderers[renderer].text(),
+                        renderer: markRaw(new layerRenderers[renderer].text()),
                         ...this.insertLayerOptions
                     } as WorkingFileTextLayer<ColorModel>;
                     break;
@@ -171,7 +171,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
         }
 
         // Attach the renderer (needed for webgl)
-        newLayer.renderer.attach(newLayer)
+        await newLayer.renderer.attach(newLayer)
 
         // Set the modified layer list
         workingFileStore.set('layers', layers);

@@ -6,3 +6,32 @@ export interface CanvasRenderingContext2DEnhanced extends CanvasRenderingContext
 export interface CanvasViewResetOptions {
     margin?: number;
 };
+
+export interface CanvasFilterEditConfigFloat {
+    type: 'float';
+    default: number;
+    preview?: number;
+    min?: number;
+    max?: number;
+}
+
+export interface CanvasFilterEditConfigPercentage {
+    type: 'percentage';
+    default: number;
+    preview?: number;
+    min?: number;
+    max?: number;
+}
+
+export interface CanvasFilterEditConfig {
+    [key: string]: CanvasFilterEditConfigFloat | CanvasFilterEditConfigPercentage;
+}
+
+export interface CanvasFilter<T extends Object = Record<string, unknown>> {
+    name: string;
+    params: T;
+    getEditConfig(): CanvasFilterEditConfig;
+    getFragmentShader(): string | undefined;
+    getVertexShader(): string | undefined;
+    fragment(sourceImageData: Uint8ClampedArray, targetImageData: Uint8ClampedArray, dataPosition: number): void;
+}

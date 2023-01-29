@@ -16,6 +16,17 @@
         color: var(--ogr-alert-info-color);
     }
 
+    .el-auto-grid {
+        --item-desired-width: 10rem;
+
+        display: grid;
+        flex-direction: row;
+        grid-auto-rows: max-content;
+        grid-template-columns: repeat(auto-fit, minmax(var(--item-desired-width, 10rem), 1fr));
+        column-gap: var(--column-gap, 0px);
+        row-gap: var(--row-gap, 0px);
+    }
+
     .el-button {
         height: auto;
         min-height: 2.5rem;
@@ -81,6 +92,15 @@
                     height: 100%;
                 }
             }
+        }
+    }
+
+    .el-card--link {
+        cursor: pointer;
+
+        &:hover {
+            transform: scale(102.5%);
+            transition: transform 0.3s;
         }
     }
 

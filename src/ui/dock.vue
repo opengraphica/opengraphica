@@ -2,7 +2,14 @@
     <div class="ogr-dock">
         <suspense>
             <template #default>
-                <component :is="name" :is-dialog="isDialog" v-bind:="props" @close="onCloseDock" @update:title="onUpdateTitle" />
+                <component
+                    :is="name"
+                    :is-dialog="isDialog"
+                    v-bind:="props"
+                    @close="onCloseDock"
+                    @update:dialogSize="onUpdateDialogSize"
+                    @update:title="onUpdateTitle"
+                />
             </template>
             <template #fallback>
                 <div style="width: 5rem; height: 5rem; margin: auto;" v-loading="true" element-loading-background="transparent"></div>
@@ -27,6 +34,7 @@ export default defineComponent({
     },
     emits: [
         'close',
+        'update:dialogSize',
         'update:title'
     ],
     props: {
@@ -48,12 +56,17 @@ export default defineComponent({
             emit('close', ...arguments);
         }
 
+        function onUpdateDialogSize() {
+            emit('update:dialogSize', ...arguments);
+        }
+
         function onUpdateTitle() {
             emit('update:title', ...arguments);
         }
         
         return {
             onCloseDock,
+            onUpdateDialogSize,
             onUpdateTitle
         };
     }

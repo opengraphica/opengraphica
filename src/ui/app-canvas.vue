@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, Ref, computed, watch, watchEffect, inject, toRefs, onMounted, onUnmounted, nextTick } from 'vue';
+import { defineComponent, ref, Ref, computed, watch, watchEffect, inject, toRefs, onMounted, onUnmounted, markRaw } from 'vue';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import workingFileStore from '@/store/working-file';
@@ -90,14 +90,34 @@ export default defineComponent({
                 const threejsRenderer = canvasStore.get('threejsRenderer');
                 const threejsScene = canvasStore.get('threejsScene');
                 if (threejsScene && threejsRenderer) {
-                    const { r, g, b, a } = colorToRgba(
-                        workingFileStore.state.background.color,
-                        getColorModelName(workingFileStore.state.background.color)
-                    );
-                    threejsRenderer.setClearColor(
-                        new (await import('three/src/math/Color')).Color().setRGB(r, g, b),
-                        a
-                    )
+                    const threejsBackground = canvasStore.get('threejsBackground');
+                    if (threejsBackground) {
+                        if (!workingFileStore.state.background.visible) {
+                            // These imports intentionally run after the store access for the `watchEffect` to work correctly.
+                            const { MeshBasicMaterial } = await import('three/src/materials/MeshBasicMaterial');
+                            const { DoubleSide } = await import('three/src/constants');
+                            threejsBackground.material = new MeshBasicMaterial({
+                                color: 0xffffff,
+                                opacity: 0,
+                                transparent: true,
+                                side: DoubleSide
+                            });
+                        } else {
+                            const { r, g, b, a } = colorToRgba(
+                                workingFileStore.state.background.color,
+                                getColorModelName(workingFileStore.state.background.color)
+                            );
+                            // These imports intentionally run after the store access for the `watchEffect` to work correctly.
+                            const { MeshBasicMaterial } = await import('three/src/materials/MeshBasicMaterial');
+                            const { DoubleSide } = await import('three/src/constants');
+                            threejsBackground.material = new MeshBasicMaterial({
+                                color: new (await import('three/src/math/Color')).Color().setRGB(r, g, b),
+                                opacity: a,
+                                transparent: true,
+                                side: DoubleSide
+                            });
+                        }
+                    }
                     threejsScene.background = null;
                 }
                 canvasStore.set('dirty', true);
@@ -142,7 +162,8 @@ export default defineComponent({
             canvasStore.set('viewDirty', true);
         });
 
-        watch([imageWidth, imageHeight], ([newWidth, newHeight]) => {
+        watch([imageWidth, imageHeight], async ([newWidth, newHeight]) => {
+
             const canvasElement = canvasStore.get('viewCanvas');
             const bufferCanvas = canvasStore.get('bufferCanvas');
             const renderer = canvasStore.get('renderer');
@@ -162,6 +183,13 @@ export default defineComponent({
             if (renderer === 'webgl') {
                 updateThreejsImageSize(newWidth, newHeight);
             }
+
+            const threejsBackground = canvasStore.get('threejsBackground');
+            if (threejsBackground) {
+                const { PlaneGeometry } = await import('three/src/geometries/PlaneGeometry');
+                threejsBackground.geometry = new PlaneGeometry(newWidth * 2.1, newHeight * 2.1);
+            }
+
             canvasStore.set('dirty', true);
         });
 
@@ -203,6 +231,10 @@ export default defineComponent({
                     const { WebGLRenderer } = await import('three/src/renderers/WebGLRenderer');
                     const { Scene } = await import('three/src/scenes/Scene');
                     const { OrthographicCamera } = await import('three/src/cameras/OrthographicCamera');
+                    const { PlaneGeometry } = await import('three/src/geometries/PlaneGeometry');
+                    const { MeshBasicMaterial } = await import('three/src/materials/MeshBasicMaterial');
+                    const { Mesh } = await import('three/src/objects/Mesh');
+                    const { DoubleSide } = await import('three/src/constants');
                     try {
                         const threejsRenderer = new WebGLRenderer({
                             alpha: true,
@@ -210,8 +242,14 @@ export default defineComponent({
                         });
                         threejsRenderer.setSize(1, 1);
                         canvasStore.set('threejsRenderer', threejsRenderer);
-                        const threejsScene = new Scene();
+                        const threejsScene = markRaw(new Scene());
                         canvasStore.set('threejsScene', threejsScene);
+                        const backgroundGeometry = new PlaneGeometry(workingFileStore.state.width * 2.1, workingFileStore.state.height * 2.1);
+                        const backgroundMaterial = new MeshBasicMaterial({ color: 0xffffff, transparent: true, side: DoubleSide });
+                        const threejsBackground = new Mesh(backgroundGeometry, backgroundMaterial);
+                        threejsBackground.renderOrder = -1;
+                        threejsScene.add(threejsBackground);
+                        canvasStore.set('threejsBackground', markRaw(threejsBackground));
                         const threejsCamera = new OrthographicCamera(-1, 1, 1, -1, 1, 10000);
                         canvasStore.set('threejsCamera', threejsCamera);
                         canvasStore.set('renderer', 'webgl');

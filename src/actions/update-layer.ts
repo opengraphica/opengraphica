@@ -7,7 +7,7 @@ import imageStore from './data/image-store';
 import { registerObjectUrlUser, revokeObjectUrlIfLastUser } from './data/memory-management';
 import { createImageFromBlob } from '@/lib/image';
 import canvasStore from '@/store/canvas';
-import workingFileStore, { getGroupLayerById, getLayerById } from '@/store/working-file';
+import workingFileStore, { getGroupLayerById, getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
 
 export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorModel>> extends BaseAction {
 
@@ -23,6 +23,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
         this.updateLayerOptions = updateLayerOptions;
         this.explicitPreviousProps = explicitPreviousProps;
 	}
+
 	public async do() {
         super.do();
 
@@ -77,7 +78,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                 (layer as any)[prop] = this.updateLayerOptions[prop];
             }
         }
-        this.regenerateThumbnail(layer);
+        regenerateLayerThumbnail(layer);
 
         canvasStore.set('dirty', true);
 	}
@@ -93,7 +94,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                     (layer as any)[prop] = (this.previousProps as any)[prop];
                 }
             }
-            this.regenerateThumbnail(layer);
+            regenerateLayerThumbnail(layer);
             if (layer.type === 'raster') {
                 if (this.oldRasterSourceImageDatabaseId != null) {
                     const oldImageIsObjectUrl = layer.data.sourceImageIsObjectUrl;
@@ -146,18 +147,6 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
 
         (this.updateLayerOptions as any) = null;
         (this.previousProps as any) = null;
-    }
-    
-    private regenerateThumbnail(layer: WorkingFileAnyLayer<ColorModel>) {
-        let parent: WorkingFileAnyLayer<ColorModel> | null = layer;
-        while (parent != null) {
-            parent.thumbnailImageSrc = null;
-            if (parent.groupId != null) {
-                parent = getGroupLayerById(parent.groupId);
-            } else {
-                parent = null;
-            }
-        }
     }
 
 }

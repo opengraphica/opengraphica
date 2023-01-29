@@ -6905,58 +6905,92 @@ body.ogr-full-page .opengraphica {
   image-rendering: crisp-edges;
   image-rendering: pixelated;
 }
+.opengraphica .ogr-color-picker-preview {
+  display: inline-flex;
+  flex-direction: row;
+}
+.opengraphica .ogr-color-picker-preview .ogr-color-picker-preview__color {
+  display: block;
+  box-sizing: border-box;
+  position: relative;
+  height: 100%;
+  width: 3rem;
+  background-image: url("../images/transparency-bg.png");
+  background-repeat: repeat;
+  border: 1px solid var(--el-border-color-base);
+  border-right: none;
+  border-radius: var(--el-input-border-radius, var(--el-border-radius-base)) 0 0 var(--el-input-border-radius, var(--el-border-radius-base));
+  --preview-color: #ffffff;
+}
+.opengraphica .ogr-color-picker-preview .ogr-color-picker-preview__color:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--preview-color);
+}
+.opengraphica .ogr-color-picker-preview .ogr-color-picker-preview__color + .el-input {
+  height: 100%;
+}
+.opengraphica .ogr-color-picker-preview .ogr-color-picker-preview__color + .el-input > .el-input__inner {
+  height: 100%;
+  border-radius: 0 var(--el-input-border-radius, var(--el-border-radius-base)) var(--el-input-border-radius, var(--el-border-radius-base)) 0;
+}
 .opengraphica .ogr-color-picker-gradient {
   position: relative;
   width: 100%;
   margin: 0.5rem 0;
+  --el-slider-button-half-size: .925rem;
 }
 .opengraphica .ogr-color-picker-gradient .el-slider {
   position: relative;
-  height: 1.25rem;
-  --el-slider-height: 1.25rem;
+  height: 1.85rem;
+  --el-slider-height: 1.85rem;
   --el-slider-button-wrapper-offset: 0;
-  --el-slider-button-wrapper-size: 1.25rem;
-  --el-slider-button-size: 1.25rem;
+  --el-slider-button-wrapper-size: 1.85rem;
+  --el-slider-button-size: 1.85rem;
   --el-slider-border-radius: 0;
-}
-.opengraphica .ogr-color-picker-gradient .el-slider:before {
-  content: "";
-  position: absolute;
-  background-image: url("../images/transparency-bg.png");
-  background-repeat: repeat;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
 }
 .opengraphica .ogr-color-picker-gradient .el-slider__bar {
   display: none;
 }
 .opengraphica .ogr-color-picker-gradient .el-slider__button {
-  background: transparent;
-  border-color: white;
   position: relative;
+  border: none;
+  background-color: transparent;
+  background-image: url("../images/color-picker-cursor.svg");
+  background-size: 100%;
 }
 .opengraphica .ogr-color-picker-gradient .el-slider__button:before {
-  content: "";
-  display: block;
-  position: absolute;
-  height: 1rem;
-  width: 1rem;
-  border: 0.15rem solid #999;
-  border-radius: 1000px;
-  box-sizing: border-box;
+  display: none;
+}
+.opengraphica .ogr-color-picker-gradient .el-slider__button.dragging, .opengraphica .ogr-color-picker-gradient .el-slider__button:hover {
+  transform: scale(1.1);
 }
 .opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__hue {
   background: red;
-  padding: 0 0.625rem;
+  padding: 0 var(--el-slider-button-half-size);
 }
 .opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__hue .el-slider__runway {
   background: rgba(0, 0, 0, 0) linear-gradient(to right, red 0%, yellow 17%, lime 33%, aqua 50%, blue 67%, fuchsia 83%, red 100%) repeat scroll 0% 0%;
 }
 .opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__opacity {
+  background-image: url("../images/transparency-bg.png");
+  background-repeat: repeat;
+  padding: 0 var(--el-slider-button-half-size);
+  position: relative;
+}
+.opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__opacity:before {
+  content: "";
+  position: absolute;
   background: linear-gradient(to right, white 50%, var(--ogr-color-pick-opaque) 51%);
-  padding: 0 0.625rem;
+  top: 0;
+  left: auto;
+  right: 0;
+  bottom: 0;
+  width: calc(var(--el-slider-button-half-size) * 2);
 }
 .opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__opacity .el-slider__runway {
   background: rgba(0, 0, 0, 0) linear-gradient(to right, rgba(0, 0, 0, 0) 0%, var(--ogr-color-pick-opaque) 100%) repeat scroll 0% 0%;
@@ -6980,14 +7014,14 @@ body.ogr-full-page .opengraphica {
   right: 0;
   top: 0;
   bottom: 0;
-  background: linear-gradient(to top, #000 0.625rem, rgba(204, 154, 129, 0) calc(100% - .625rem));
+  background: linear-gradient(to top, #000 0.925rem, rgba(204, 154, 129, 0) calc(100% - .925rem));
 }
 .opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__saturation-value-handle-container {
   position: absolute;
-  left: 0.625rem;
-  right: 0.625rem;
-  top: 0.625rem;
-  bottom: 0.625rem;
+  left: 0.925rem;
+  right: 0.925rem;
+  top: 0.925rem;
+  bottom: 0.925rem;
 }
 .opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__saturation-value-handle {
   position: absolute;
@@ -7000,30 +7034,18 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__saturation-value-handle:before {
   content: "";
+  background-image: url("../images/color-picker-cursor.svg");
+  background-size: 100%;
   display: block;
   position: absolute;
-  left: -0.575rem;
-  top: -0.575rem;
-  height: 1.15rem;
-  width: 1.15rem;
-  border: 0.2rem solid #999;
-  border-radius: 1000px;
-  box-sizing: border-box;
-}
-.opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__saturation-value-handle:after {
-  content: "";
-  display: block;
-  position: absolute;
-  left: -0.625rem;
-  top: -0.625rem;
-  height: 1.25rem;
-  width: 1.25rem;
-  border: 0.125rem solid white;
-  border-radius: 1000px;
+  left: -0.925rem;
+  top: -0.925rem;
+  height: 1.85rem;
+  width: 1.85rem;
   box-sizing: border-box;
 }
 .opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__saturation-value-handle:hover {
-  transform: scale(1.2);
+  transform: scale(1.1);
 }
 .opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__saturation-value-handle.is-grabbing {
   cursor: grabbing;
@@ -7139,8 +7161,28 @@ body.ogr-full-page .opengraphica {
   width: 25rem !important;
   max-width: 90%;
 }
+.opengraphica .ogr-dialogs .el-dialog.el-dialog--medium-large {
+  width: 35rem !important;
+  max-width: 90%;
+}
+.opengraphica .ogr-dialogs .el-dialog.el-dialog--large {
+  width: 50rem !important;
+  max-width: 90%;
+}
+.opengraphica .ogr-dialogs .el-dialog.el-dialog--big {
+  width: 75rem !important;
+  max-width: 90%;
+}
+.opengraphica .ogr-dialogs .el-dialog.el-dialog--huge {
+  width: 100rem !important;
+  max-width: 90%;
+}
 @media screen and (max-width: 600px) {
-  .opengraphica .ogr-dialogs .el-dialog, .opengraphica .ogr-dialogs .el-dialog.el-dialog--medium {
+  .opengraphica .ogr-dialogs .el-dialog,
+.opengraphica .ogr-dialogs .el-dialog.el-dialog--medium,
+.opengraphica .ogr-dialogs .el-dialog.el-dialog--large,
+.opengraphica .ogr-dialogs .el-dialog.el-dialog--big,
+.opengraphica .ogr-dialogs .el-dialog.el-dialog--huge {
     margin: 0 !important;
     height: 100% !important;
     width: 100% !important;
@@ -7422,7 +7464,7 @@ body.ogr-full-page .opengraphica {
   background: var(--ogr-layout-menu-bar-background-color);
   list-style: none;
   margin: 0;
-  padding: 0 0 0 var(--layer-group-indent, 0);
+  padding: 0;
   display: block;
 }
 .opengraphica .ogr-layer-list .ogr-layer.is-active {
@@ -7521,6 +7563,7 @@ body.ogr-full-page .opengraphica {
   flex-direction: row;
   height: 4rem;
   transition: height 0.3s;
+  padding: 0 0 0 var(--layer-group-indent, 0);
 }
 .opengraphica .ogr-layer-list .ogr-layer > .ogr-layer-main .ogr-layer-dnd-handle {
   cursor: pointer;
@@ -7572,6 +7615,9 @@ body.ogr-full-page .opengraphica {
   align-self: center;
   padding-right: 0.5rem;
 }
+.opengraphica .ogr-layer-list .ogr-layer > .ogr-layer-main .el-button {
+  min-height: 0;
+}
 .opengraphica .ogr-layer-list .ogr-layer > .ogr-layer-main .el-button:hover {
   background: var(--ogr-layer-list-background-color-hover);
 }
@@ -7584,7 +7630,7 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .ogr-layer-list .ogr-layer .ogr-layer-attributes {
   display: block;
-  margin: 0 0.5rem 0 2rem;
+  margin: 0 0.5rem 0 calc(2rem + var(--layer-group-indent, 0rem));
   /*
   + .ogr-layer-attributes {
       margin-top: -0.0625rem;
@@ -7594,6 +7640,39 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-layer-list .ogr-layer .ogr-layer-attributes .ogr-layer-attributes__title {
   display: block;
   padding: 0 0 0.25rem 0;
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-effect-stack {
+  display: block;
+  list-style: none;
+  padding: 0 0 0.25rem 0;
+  margin: 0;
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-effect-stack > li {
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+  margin: 0;
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-effect-stack > li .el-button {
+  padding: 0.5rem 1.25rem;
+  min-height: 2em;
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-effect-stack > li .el-button:first-child {
+  flex-grow: 1;
+  flex-shrink: 1;
+  text-align: left;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-effect-stack > li .el-button:first-child > span {
+  overflow: hidden;
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-effect-stack > li .el-button:first-child > span > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer-effect-stack > li .el-button:not(.is-disabled):hover {
+  background: var(--ogr-layer-list-background-color-hover);
 }
 .opengraphica .ogr-layer-list .ogr-layer .ogr-layer-frames .el-scrollbar__view {
   display: inline-block;
@@ -7644,6 +7723,9 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .ogr-layer-list .ogr-layer .ogr-layer-frames-list > li:last-child {
   margin-right: 0;
+}
+.opengraphica .ogr-menu-drawer__content .ogr-layer-list:last-child {
+  border-bottom-right-radius: 0.8rem;
 }
 .opengraphica .ogr-layout-dnd-container {
   display: flex;
@@ -8128,10 +8210,21 @@ body.ogr-full-page .opengraphica {
   overflow: hidden;
 }
 .opengraphica .ogr-menu-drawer__content .ogr-dock {
+  display: flex;
+  flex-direction: column;
   height: 100%;
 }
 .opengraphica .ogr-menu-drawer__content .ogr-dock > .ogr-dock-header {
   border-bottom: 2px solid var(--el-border-color-light);
+}
+.opengraphica .ogr-menu-drawer__content .ogr-dock > .ogr-dock-content {
+  flex-grow: 1;
+}
+.opengraphica .ogr-menu-drawer__content .ogr-dock > .ogr-dock-content > .el-scrollbar > .el-scrollbar__wrap > .el-scrollbar__view {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100%;
 }
 .opengraphica .ogr-menu-drawer__content .ogr-dock > .el-tabs {
   height: 100%;
@@ -25023,6 +25116,15 @@ body.ogr-full-page .opengraphica {
 .opengraphica .el-alert--info.is-light {
   color: var(--ogr-alert-info-color);
 }
+.opengraphica .el-auto-grid {
+  --item-desired-width: 10rem;
+  display: grid;
+  flex-direction: row;
+  grid-auto-rows: max-content;
+  grid-template-columns: repeat(auto-fit, minmax(var(--item-desired-width, 10rem), 1fr));
+  column-gap: var(--column-gap, 0px);
+  row-gap: var(--row-gap, 0px);
+}
 .opengraphica .el-button {
   height: auto;
   min-height: 2.5rem;
@@ -25074,6 +25176,13 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .el-button-group.el-button-group--flex > .el-input > .el-input__inner {
   height: 100%;
+}
+.opengraphica .el-card--link {
+  cursor: pointer;
+}
+.opengraphica .el-card--link:hover {
+  transform: scale(102.5%);
+  transition: transform 0.3s;
 }
 .opengraphica .el-collapse--menu-item .el-collapse-item__header {
   font-size: 0.875rem;

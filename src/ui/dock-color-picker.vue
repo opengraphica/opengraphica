@@ -5,12 +5,15 @@
         </div>
         <h2 class="px-4.5 my-4 has-text-centered">{{ colorName }}</h2>
         <div class="px-4.5 my-4 is-flex is-justify-content-center">
-            <el-input
-                v-model.lazy="hexCode" style="width: 7rem"
-                :aria-label="$t('dock.colorPicker.hexCode')"
-                :placeholder="$t('dock.colorPicker.hexCode')"
-                @change="onChangeHexCode"
-            ></el-input>
+            <div class="ogr-color-picker-preview">
+                <div class="ogr-color-picker-preview__color" :style="{ '--preview-color': workingColor.style }" />
+                <el-input
+                    v-model.lazy="hexCode" style="width: 7rem"
+                    :aria-label="$t('dock.colorPicker.hexCode')"
+                    :placeholder="$t('dock.colorPicker.hexCode')"
+                    @change="onChangeHexCode"
+                />
+            </div>
             <el-button :aria-label="$t('dock.colorPicker.pickColorFromImage')" class="ml-3" @click="onPickColorFromImage">
                 <span class="bi bi-eyedropper" aria-hidden="true" />
             </el-button>

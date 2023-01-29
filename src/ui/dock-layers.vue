@@ -10,6 +10,10 @@
                 <span class="bi bi-images mr-1" aria-hidden="true"></span>
                 {{ $t('dock.layers.group') }}
             </el-button>
+            <el-button type="text" class="px-0" @click="onAddEffect">
+                <span class="bi bi-magic mr-1" aria-hidden="true"></span>
+                {{ $t('dock.layers.effect') }}
+            </el-button>
         </div>
     </div>
     <div class="ogr-dock-content is-spaced-between">
@@ -154,6 +158,10 @@ export default defineComponent({
             await onAddLayerOrGroup('Group');
         }
 
+        async function onAddEffect() {
+            await runModule('image', 'layerEffectBrowser');
+        }
+
         function onChangeBackgroundColor() {
             appEmitter.emit('app.dialogs.openFromDock', {
                 name: 'color-picker',
@@ -199,6 +207,7 @@ export default defineComponent({
             backgroundStyle,
             onAddLayer,
             onAddGroup,
+            onAddEffect,
             onChangeBackgroundColor,
             onScrollLayerList,
             onScrollByAmount

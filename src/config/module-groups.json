@@ -137,6 +137,22 @@
                     "type": "function",
                     "target": "image/paste.paste"
                 }
+            },
+            "layerEffectBrowser": {
+                "name": "moduleGroup.image.modules.layerEffectBrowser.name",
+                "description": "moduleGroup.image.modules.layerEffectBrowser.description",
+                "action": {
+                    "type": "ui",
+                    "target": "layer-effect-browser"
+                }
+            },
+            "layerEffectEdit": {
+                "name": "moduleGroup.image.modules.layerEffectEdit.name",
+                "description": "moduleGroup.image.modules.layerEffectEdit.description",
+                "action": {
+                    "type": "ui",
+                    "target": "layer-effect-edit"
+                }
             }
         }
     },

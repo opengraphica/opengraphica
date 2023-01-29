@@ -67,7 +67,7 @@ export class DeleteLayersAction extends BaseAction {
                 parentList = getGroupLayerById(layer.groupId)?.layers || layers;
             }
             parentList.splice(deletedLayerInfo.parentIndex, 0, layer);
-            layer.renderer.attach(layer);
+            await layer.renderer.attach(layer);
         }
         this.deletedLayers = [];
 

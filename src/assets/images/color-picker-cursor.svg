@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="12"
+   height="12"
+   viewBox="0 0 12 12"
+   version="1.1"
+   id="svg1415"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01, custom)"
+   sodipodi:docname="color-picker-cursor.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1417"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     showgrid="true"
+     inkscape:zoom="48.462402"
+     inkscape:cx="6.3141732"
+     inkscape:cy="7.9958893"
+     inkscape:window-width="1848"
+     inkscape:window-height="1016"
+     inkscape:window-x="72"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3797"
+       originx="0"
+       originy="0" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1412" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="path3807"
+       style="fill:#ffffff;fill-opacity:1;stroke:#38ff41;stroke-width:0;stroke-dasharray:none"
+       d="M 6 0 A 6 5.9999995 0 0 0 0 6 A 6 5.9999995 0 0 0 6 12 A 6 5.9999995 0 0 0 12 6 A 6 5.9999995 0 0 0 6 0 z M 6 1 A 4.9999995 4.9999995 0 0 1 11 6 A 4.9999995 4.9999995 0 0 1 6 11 A 4.9999995 4.9999995 0 0 1 1 6 A 4.9999995 4.9999995 0 0 1 6 1 z " />
+    <path
+       id="path12285"
+       style="fill:#bbbbbb;fill-opacity:1;stroke:#d5d5d5;stroke-width:0;stroke-dasharray:none;stroke-opacity:1"
+       d="M 6 1 A 5 5 0 0 0 1 6 A 5 5 0 0 0 6 11 A 5 5 0 0 0 11 6 A 5 5 0 0 0 6 1 z M 6 2 A 4 4 0 0 1 10 6 A 4 4 0 0 1 6 10 A 4 4 0 0 1 2 6 A 4 4 0 0 1 6 2 z " />
+  </g>
+</svg>

@@ -2,7 +2,7 @@ import { PerformantStore } from './performant-store';
 import { CanvasViewResetOptions } from '@/types';
 import { DecomposedMatrix, decomposeMatrix } from '@/lib/dom-matrix';
 import preferencesStore from './preferences';
-import type { OrthographicCamera, Scene, WebGLRenderer } from 'three';
+import type { Mesh, OrthographicCamera, Scene, WebGLRenderer } from 'three';
 
 const imageSmoothingZoomRatio = preferencesStore.get('imageSmoothingZoomRatio');
 
@@ -24,6 +24,7 @@ interface CanvasState {
     preventPostProcess: boolean;
     renderer: '2d' | 'webgl'; // The active renderer. See preferences store for preferred renderer.
     selectionMaskCanvas: HTMLCanvasElement;
+    threejsBackground: Mesh | null;
     threejsCamera: OrthographicCamera | null;
     threejsRenderer: WebGLRenderer | null;
     threejsScene: Scene | null;
@@ -76,6 +77,7 @@ const store = new PerformantStore<CanvasStore>({
         preventPostProcess: false,
         renderer: '2d',
         selectionMaskCanvas: dummyCanvas,
+        threejsBackground: null,
         threejsCamera: null,
         threejsRenderer: null,
         threejsScene: null,

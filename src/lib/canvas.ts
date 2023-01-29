@@ -1,10 +1,12 @@
-import type { Camera, Scene, WebGLRenderer } from 'three';
-import { ColorModel, DrawWorkingFileOptions, DrawWorkingFileLayerOptions, WorkingFileLayer } from '@/types';
+import { toRaw } from 'vue';
+import { ColorModel, DrawWorkingFileOptions, DrawWorkingFileLayerOptions, WorkingFileLayer, WorkingFileGroupLayer } from '@/types';
 import canvasStore from '@/store/canvas';
 import preferencesStore from '@/store/preferences';
 import workingFileStore from '@/store/working-file';
 import { DecomposedMatrix, decomposeMatrix, snapPointAtHalfPixel, snapPointAtPixel } from './dom-matrix';
 import layerRenderers from '@/canvas/renderers';
+
+import type { Camera, Scene, WebGLRenderer } from 'three';
 
 const imageSmoothingZoomRatio = preferencesStore.get('imageSmoothingZoomRatio');
 
@@ -138,5 +140,16 @@ export function drawWorkingFileToCanvas2d(canvas: HTMLCanvasElement, ctx: Canvas
  * Draws everything in the working document to the threejs renderer.
  */
 export function drawWorkingFileToCanvasWebgl(renderer: WebGLRenderer, scene: Scene, camera: Camera, options: DrawWorkingFileOptions = {}) {
-    renderer.render(scene, camera);
+    try {
+        const layers = workingFileStore.get('layers');
+        for (const layer of layers) {
+            if (layer.type === 'group') {
+                layer.renderer.renderGroup(renderer, camera, layer as WorkingFileGroupLayer<ColorModel>);
+            }
+        }
+        renderer.render(scene, camera);
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 }

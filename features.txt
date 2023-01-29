@@ -57,6 +57,7 @@ Modules
             [x] Ctrl + X shortcut
         [x] Copy (active layers)
             [x] Ctrl + C shortcut
+            [ ] Fix copy groups
         [x] Copy all layers (merge to clipboard)
         [x] Paste
             [x] Ctrl + V shortcut
@@ -82,6 +83,7 @@ Modules
     - Preferences
         [x] Toggle theme
             [ ] Fix dark theme build process - some bugs cause not the Same
+        [ ] Scroll expandable sections into view when expanded
     
 Tools
     - Effects

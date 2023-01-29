@@ -35,12 +35,15 @@ export function getModuleDefinition(moduleGroupName: string, moduleName: string)
     return null;
 }
 
-export async function runModule(moduleGroupName: string, moduleName: string) {
+export async function runModule(moduleGroupName: string, moduleName: string, moduleProperties?: Record<string, unknown>) {
     if (moduleGroups[moduleGroupName]) {
         const module = moduleGroups[moduleGroupName].modules[moduleName];
         if (module) {
             if (module.action.type === 'ui') {
-                appEmitter.emit('app.dialogs.openFromModule', { name: module.action.target });
+                appEmitter.emit('app.dialogs.openFromModule', {
+                    name: module.action.target,
+                    props: moduleProperties
+                });
             } else if (module.action.type === 'function') {
                 const moduleIdentifierSplit = module.action.target.split('.');
                 const modulePath = moduleIdentifierSplit[0];
@@ -58,7 +61,9 @@ export async function runModule(moduleGroupName: string, moduleName: string) {
                             cancelRef.value = true;
                         }
                     };
-                    const moduleRunArgs: any = {};
+                    const moduleRunArgs: any = {
+                        ...(moduleProperties ?? {})
+                    };
                     if (cancelable) {
                         appEmitter.on('app.wait.cancelBlocking', cancelBlocking);
                         moduleRunArgs.cancelRef = cancelRef;

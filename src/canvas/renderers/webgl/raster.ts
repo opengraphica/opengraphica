@@ -3,35 +3,48 @@ import { WorkingFileRasterLayer, ColorModel } from '@/types';
 import canvasStore from '@/store/canvas';
 import BaseLayerRenderer from './base';
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
-import { MeshBasicMaterial } from 'three/src/materials/MeshBasicMaterial';
+import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { DoubleSide, NearestFilter } from 'three/src/constants';
 import { Mesh } from 'three/src/objects/Mesh';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { Texture } from 'three/src/textures/Texture';
 import { CanvasTexture } from 'three/src/textures/CanvasTexture';
+import { createFiltersFromLayerConfig, combineShaders } from '../../filters';
 
 export default class RasterLayerRenderer extends BaseLayerRenderer {
     private stopWatchVisible: WatchStopHandle | undefined;
     private stopWatchSize: WatchStopHandle | undefined;
     private stopWatchTransform: WatchStopHandle | undefined;
+    private stopWatchFilters: WatchStopHandle | undefined;
     private stopWatchData: WatchStopHandle | undefined;
     private planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
-    private material: InstanceType<typeof MeshBasicMaterial> | undefined;
+    private material: InstanceType<typeof ShaderMaterial> | undefined;
     private plane: InstanceType<typeof Mesh> | undefined;
     private draftTexture: InstanceType<typeof Texture> | undefined;
     private bakedTexture: InstanceType<typeof Texture> | undefined;
     private sourceTexture: InstanceType<typeof Texture> | undefined;
 
-    onAttach(layer: WorkingFileRasterLayer<ColorModel>): void {
-        this.material = new MeshBasicMaterial({
+    async onAttach(layer: WorkingFileRasterLayer<ColorModel>) {
+        const combinedShaderResult = combineShaders(
+            await createFiltersFromLayerConfig(layer.filters)
+        );
+        this.material = new ShaderMaterial({
             transparent: true,
-            side: DoubleSide
+            side: DoubleSide,
+            depthTest: false,
+            vertexShader: combinedShaderResult.vertexShader,
+            fragmentShader: combinedShaderResult.fragmentShader,
+            uniforms: {
+                map: { value: null },
+                ...combinedShaderResult.uniforms
+            }
         });
         this.plane = new Mesh(this.planeGeometry, this.material);
+        this.plane.renderOrder = this.order + 0.1;
         this.plane.matrixAutoUpdate = false;
-        canvasStore.get('threejsScene')?.add(this.plane);
+        (this.threejsScene ?? canvasStore.get('threejsScene'))?.add(this.plane);
 
-        const { visible, width, height, transform, data } = toRefs(layer);
+        const { visible, width, height, transform, filters, data } = toRefs(layer);
         this.stopWatchVisible = watch([visible], ([visible]) => {
             this.update({ visible });
         }, { immediate: true });
@@ -41,6 +54,10 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
         this.stopWatchTransform = watch([transform], ([transform]) => {
             this.update({ transform });
         }, { immediate: true });
+        this.stopWatchFilters = watch([filters], async ([filters]) => {
+            await createFiltersFromLayerConfig(filters);
+            this.update({ filters });
+        }, { deep: true, immediate: false });
         this.stopWatchData = watch([data], () => {
             this.update({ data: layer.data });
         }, { deep: true, immediate: true });
@@ -48,7 +65,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
 
     onReorder(order: number) {
         if (this.plane) {
-            this.plane.renderOrder = order;
+            this.plane.renderOrder = order + 0.1;
         }
     }
 
@@ -56,7 +73,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
         super.update(updates);
     }
 
-    onUpdate(updates: Partial<WorkingFileRasterLayer<ColorModel>>) {
+    async onUpdate(updates: Partial<WorkingFileRasterLayer<ColorModel>>) {
         if (updates.visible != null) {
             this.plane && (this.plane.visible = updates.visible);
         }
@@ -77,12 +94,30 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                 updates.transform.m14, updates.transform.m24, updates.transform.m34, updates.transform.m44
             );
         }
+        if (updates.filters) {
+            const combinedShaderResult = combineShaders(
+                await createFiltersFromLayerConfig(updates.filters)
+            );
+            const newMaterial = new ShaderMaterial({
+                transparent: true,
+                side: DoubleSide,
+                depthTest: false,
+                vertexShader: combinedShaderResult.vertexShader,
+                fragmentShader: combinedShaderResult.fragmentShader,
+                uniforms: {
+                    map: { value: this.material?.uniforms.map },
+                    ...combinedShaderResult.uniforms
+                }
+            });
+            this.material?.dispose();
+            this.material = newMaterial;
+        }
         if (updates.data) {
             if (updates.data.draftImage) {
                 this.draftTexture?.dispose();
                 this.draftTexture = new CanvasTexture(updates.data.draftImage);
                 this.draftTexture.magFilter = NearestFilter;
-                this.material && (this.material.map = this.draftTexture);
+                this.material && (this.material.uniforms.map.value = this.draftTexture);
             } else {
                 if (this.draftTexture) {
                     this.draftTexture.dispose();
@@ -97,13 +132,13 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                         }
                     );
                     this.sourceTexture.magFilter = NearestFilter;
-                    this.material && (this.material.map = this.sourceTexture);
+                    this.material && (this.material.uniforms.map.value = this.sourceTexture);
                 } else {
                     if (this.sourceTexture) {
                         this.sourceTexture.dispose();
                         this.sourceTexture = undefined;
                     }
-                    this.material && (this.material.map = null);
+                    this.material && (this.material.uniforms.map.value = null);
                 }
             }
         }
@@ -112,8 +147,9 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
     onDetach(): void {
         this.planeGeometry?.dispose();
         this.planeGeometry = undefined;
-        this.plane && canvasStore.get('threejsScene')?.remove(this.plane);
+        this.plane && (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(this.plane);
         this.plane = undefined;
+        this.material?.dispose();
         this.material = undefined;
         this.draftTexture?.dispose();
         this.draftTexture = undefined;
@@ -122,6 +158,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
         this.stopWatchVisible?.();
         this.stopWatchSize?.();
         this.stopWatchTransform?.();
+        this.stopWatchFilters?.();
         this.stopWatchData?.();
     }
 }

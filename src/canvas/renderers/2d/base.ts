@@ -1,24 +1,45 @@
-import { DrawWorkingFileLayerOptions, WorkingFileLayer, WorkingFileLayerRenderer, ColorModel } from '@/types';
+import { DrawWorkingFileLayerOptions, WorkingFileLayer, WorkingFileLayerRenderer, ColorModel, WorkingFileGroupLayer } from '@/types';
 import canvasStore from '@/store/canvas';
 import preferencesStore from '@/store/preferences';
 import workingFileStore from '@/store/working-file';
 
+import type { Camera, WebGLRenderer } from 'three';
+
 export default class BaseLayerRenderer implements WorkingFileLayerRenderer<ColorModel> {
-    attach(layer: WorkingFileLayer<ColorModel>) {
-        this.onAttach(layer);
+    threejsScene = undefined;
+    isAttached: boolean = false;
+    order: number = 0;
+
+    async attach(layer: WorkingFileLayer<ColorModel>) {
+        if (!this.isAttached) {
+            try {
+                await this.onAttach(layer);
+            } catch (error) {
+                console.error(error);
+            }
+            this.isAttached = true;
+        }
     }
     onAttach(layer: WorkingFileLayer<ColorModel>) {
         // Override
     }
 
     detach() {
-        this.onDetach();
+        if (this.isAttached) {
+            try {
+                this.onDetach();
+            } catch (error) {
+                console.error(error);
+            }
+            this.isAttached = false;
+        }
     }
     onDetach() {
         // Override
     }
 
     reorder(order: number) {
+        this.order = order;
         this.onReorder(order);
     }
     onReorder(order: number) {
@@ -102,6 +123,13 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
         }
     }
     onDraw(ctx: CanvasRenderingContext2D, layer: WorkingFileLayer<ColorModel>, options: DrawWorkingFileLayerOptions = {}) {
+        // Override
+    }
+
+    renderGroup(renderer: WebGLRenderer, camera: Camera, layer: WorkingFileGroupLayer<ColorModel>) {
+        this.onRenderGroup(renderer, camera, layer);
+    }
+    onRenderGroup(renderer: WebGLRenderer, camera: Camera, layer: WorkingFileGroupLayer<ColorModel>) {
         // Override
     }
 }

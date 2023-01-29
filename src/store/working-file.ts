@@ -191,6 +191,18 @@ function ensureUniqueLayerSiblingName(layerId: number | null | undefined, name: 
     return name;
 }
 
+function regenerateLayerThumbnail(layer: WorkingFileAnyLayer<ColorModel>) {
+    let parent: WorkingFileAnyLayer<ColorModel> | null = layer;
+    while (parent != null) {
+        parent.thumbnailImageSrc = null;
+        if (parent.groupId != null) {
+            parent = getGroupLayerById(parent.groupId);
+        } else {
+            parent = null;
+        }
+    }
+}
+
 export default store;
 
 export {
@@ -203,5 +215,6 @@ export {
     getGroupLayerById,
     getSelectedLayers,
     getTimelineById,
-    ensureUniqueLayerSiblingName
+    ensureUniqueLayerSiblingName,
+    regenerateLayerThumbnail
 };

@@ -13,6 +13,10 @@ module.exports = function setupConfig(config) {
         module: {
             rules: [
                 {
+                    test: /\.(vert|frag)$/i,
+                    type: 'asset/source',
+                },
+                {
                     test: /\.vue$/,
                     loader: 'vue-loader'
                 },

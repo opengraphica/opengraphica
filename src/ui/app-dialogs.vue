@@ -5,10 +5,10 @@
                 <template #default>
                     <el-dialog :title="$t(dialog.title || 'empty')" :custom-class="'el-dialog--' + dialog.size + ' el-dialog--ogr-' + dialog.type" v-model="dialog.visible" destroy-on-close @closed="onDialogClosed(dialog)">
                         <template v-if="dialog.type === 'dock'">
-                            <dock :name="dialog.dock.name" :is-dialog="true" :props="dialog.props" @update:title="dialog.title = $event" @close="onCloseDialog(dialog, $event)" />
+                            <dock :name="dialog.dock.name" :is-dialog="true" :props="dialog.props" @update:title="dialog.title = $event" @update:dialogSize="dialog.size = $event" @close="onCloseDialog(dialog, $event)" />
                         </template>
                         <template v-else-if="dialog.type === 'module'">
-                            <module :name="dialog.module.name" :is-dialog="true" :props="dialog.props" @update:title="dialog.title = $event" @close="onCloseDialog(dialog, $event)" />
+                            <module :name="dialog.module.name" :is-dialog="true" :props="dialog.props" @update:title="dialog.title = $event" @update:dialogSize="dialog.size = $event" @close="onCloseDialog(dialog, $event)" />
                         </template>
                     </el-dialog>
                 </template>

@@ -6,6 +6,7 @@
                     :is="name"
                     :is-dialog="isDialog"
                     v-bind:="props"
+                    @update:dialogSize="onSetDialogSize($event)"
                     @update:title="onSetTitle($event)"
                     @close="onCloseModule($event)"
                 />
@@ -32,6 +33,8 @@ export default defineComponent({
         'file-save-as': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-save-as' */ `./module-file-save-as.vue`)),
         'file-take-photo': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-take-photo' */ `./module-file-take-photo.vue`)),
         'image-convert-layers-to-image-sequence': defineAsyncComponent(() => import(/* webpackChunkName: 'module-image-convert-layers-to-image-sequence' */ `./module-image-convert-layers-to-image-sequence.vue`)),
+        'layer-effect-browser': defineAsyncComponent(() => import(/* webpackChunkName: 'module-layer-effect-browser' */ `./module-layer-effect-browser.vue`)),
+        'layer-effect-edit': defineAsyncComponent(() => import(/* webpackChunkName: 'module-layer-effect-edit' */ `./module-layer-effect-edit.vue`)),
         'tutorial-welcome': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-tutorial-welcome' */ `./module-tutorial-welcome.vue`))
     },
     props: {
@@ -49,6 +52,7 @@ export default defineComponent({
     },
     emits: [
         'update:title',
+        'update:dialogSize',
         'close'
     ],
     setup(props, { emit }) {
@@ -57,12 +61,17 @@ export default defineComponent({
             emit('close', ...arguments);
         }
 
+        function onSetDialogSize(size: string) {
+            emit('update:dialogSize', size);
+        }
+
         function onSetTitle(title: string) {
             emit('update:title', title);
         }
 
         return {
             onCloseModule,
+            onSetDialogSize,
             onSetTitle
         }
     }
