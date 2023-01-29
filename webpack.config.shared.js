@@ -3,6 +3,7 @@ const { DefinePlugin, ProgressPlugin } = require('webpack');
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const { VueLoaderPlugin } = require('vue-loader');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 module.exports = function setupConfig(config) {
     const plugins = config.plugins;
@@ -14,20 +15,24 @@ module.exports = function setupConfig(config) {
             rules: [
                 {
                     test: /\.(vert|frag)$/i,
+                    // include: path.resolve(__dirname, 'src'),
                     type: 'asset/source',
                 },
                 {
                     test: /\.vue$/,
+                    // include: path.resolve(__dirname, 'src'),
                     loader: 'vue-loader'
                 },
                 {
                     test: /\.worker\.(js|ts)$/,
+                    // include: path.resolve(__dirname, 'src'),
                     use: {
                         loader: 'worker-loader'
                     }
                 },
                 {
                     test: /\.ts$/,
+                    // include: path.resolve(__dirname, 'src'),
                     loader: 'ts-loader',
                     options: {
                         appendTsSuffixTo: [/\.vue$/],
@@ -44,10 +49,12 @@ module.exports = function setupConfig(config) {
                 },
                 {
                     test: /\.css$/i,
+                    // include: path.resolve(__dirname, 'src'),
                     loader: 'css-loader'
                 },
                 {
                     test: /\.s[ac]ss$/i,
+                    // include: path.resolve(__dirname, 'src'),
                     use: [
                         'style-loader',
                         'css-loader',
@@ -62,6 +69,7 @@ module.exports = function setupConfig(config) {
                 },
                 {
                     test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+                    // include: path.resolve(__dirname, 'src'),
                     use: [
                         {
                             loader: 'file-loader',
@@ -100,6 +108,7 @@ module.exports = function setupConfig(config) {
                 __VUE_I18N_LEGACY_API__: true,
                 __INTLIFY_PROD_DEVTOOLS__: false
             }),
+            new ForkTsCheckerWebpackPlugin(),
             new ProgressPlugin({
                 activeModules: true
             }),
@@ -118,8 +127,14 @@ module.exports = function setupConfig(config) {
             new VueLoaderPlugin(),
             ...plugins
         ],
+        watchOptions: {
+            ignored: /node_modules/
+        },
         optimization: {
             runtimeChunk: 'single',
+            // removeAvailableModules: false,
+            // removeEmptyChunks: false,
+            // splitChunks: false,
             splitChunks: {
                 chunks: 'all',
                 maxInitialRequests: Infinity,
@@ -274,20 +289,60 @@ module.exports = function setupConfig(config) {
                         name: 'polyfill'
                     },
                     threeCameras: {
-                        test: /[\\/]node_modules[\\/](three)[\\/](cameras)[\\/]/,
+                        test: /[\\/]node_modules[\\/](three)[\\/](src)[\\/](cameras)[\\/]/,
                         name: 'three-cameras'
                     },
+                    threeCore: {
+                        test: /[\\/]node_modules[\\/](three)[\\/](src)[\\/](core)[\\/]/,
+                        name: 'three-core'
+                    },
+                    threeExtras: {
+                        test: /[\\/]node_modules[\\/](three)[\\/](src)[\\/](extras)[\\/]/,
+                        name: 'three-extras'
+                    },
+                    threeGeometries: {
+                        test: /[\\/]node_modules[\\/](three)[\\/](src)[\\/](geometries)[\\/]/,
+                        name: 'three-geometries'
+                    },
+                    threeHelpers: {
+                        test: /[\\/]node_modules[\\/](three)[\\/](src)[\\/](helpers)[\\/]/,
+                        name: 'three-helpers'
+                    },
+                    threeLights: {
+                        test: /[\\/]node_modules[\\/](three)[\\/](src)[\\/](lights)[\\/]/,
+                        name: 'three-lights'
+                    },
+                    threeLoaders: {
+                        test: /[\\/]node_modules[\\/](three)[\\/](src)[\\/](loaders)[\\/]/,
+                        name: 'three-loaders'
+                    },
+                    threeMaterials: {
+                        test: /[\\/]node_modules[\\/](three)[\\/](src)[\\/](materials)[\\/]/,
+                        name: 'three-materials'
+                    },
                     threeMath: {
-                        test: /[\\/]node_modules[\\/](three)[\\/](math)[\\/]/,
+                        test: /[\\/]node_modules[\\/](three)[\\/](src)[\\/](math)[\\/]/,
                         name: 'three-math'
                     },
+                    threeObjects: {
+                        test: /[\\/]node_modules[\\/](three)[\\/](src)[\\/](objects)[\\/]/,
+                        name: 'three-objects'
+                    },
                     threeRenderers: {
-                        test: /[\\/]node_modules[\\/](three)[\\/](renderers)[\\/]/,
+                        test: /[\\/]node_modules[\\/](three)[\\/](src)[\\/](renderers)[\\/]/,
                         name: 'three-renderers'
                     },
                     threeScenes: {
-                        test: /[\\/]node_modules[\\/](three)[\\/](scenes)[\\/]/,
+                        test: /[\\/]node_modules[\\/](three)[\\/](src)[\\/](scenes)[\\/]/,
                         name: 'three-scenes'
+                    },
+                    threeTextures: {
+                        test: /[\\/]node_modules[\\/](three)[\\/](src)[\\/](textures)[\\/]/,
+                        name: 'three-textures'
+                    },
+                    threeConstants: {
+                        test: /[\\/]node_modules[\\/](three)[\\/](src)[\\/](constants)/,
+                        name: 'three-constants'
                     },
                     vendor: {
                         test: /[\\/]node_modules[\\/](lodash|dayjs|file-saver|mitt|normalize-wheel)/,

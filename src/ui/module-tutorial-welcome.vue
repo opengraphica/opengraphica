@@ -8,15 +8,15 @@
             </div>
             <div class="is-flex is-justify-content-center mt-4">
                 <div class="is-inline-block">
-                    <el-button type="text" class="m-0 is-block" @click="onNewImage()">
+                    <el-button link type="primary" class="m-0 is-block" @click="onNewImage()">
                         <span class="bi bi-file-earmark-plus mr-2" style="font-size: 1.2rem" aria-hidden="true" />
                         {{ $t('button.createNewImage') }}
                     </el-button>
-                    <el-button type="text" class="m-0 is-block" @click="onOpenImage()">
+                    <el-button link type="primary" class="m-0 is-block" @click="onOpenImage()">
                         <span class="bi bi-folder2-open mr-2" style="font-size: 1.2rem" aria-hidden="true" />
                         {{ $t('button.openImage') }}
                     </el-button>
-                    <el-button type="text" class="m-0 is-block" @click="onTakePhoto()">
+                    <el-button link type="primary" class="m-0 is-block" @click="onTakePhoto()">
                         <span class="bi bi-camera mr-2" style="font-size: 1.2rem" aria-hidden="true" />
                         {{ $t('button.takePhoto') }}
                     </el-button>

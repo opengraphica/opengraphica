@@ -7,7 +7,7 @@
             </div>
         </div>
         <div class="py-2 px-3 is-text-nowrap">
-            <el-button plain type="text" class="px-4" :aria-label="$t('button.cancel')" @click="onCancel">
+            <el-button plain link type="primary" class="px-4" :aria-label="$t('button.cancel')" @click="onCancel">
                 <template v-if="isMobileView">
                     <i class="bi bi-x"></i>
                 </template>
@@ -17,7 +17,7 @@
             </el-button>
             <el-popover placement="bottom" :popper-class="'ogr-dock-popover'" trigger="click" :width="250">
                 <template #reference>
-                    <el-button plain type="text" class="px-4 ml-0 mr-2" :aria-label="$t('button.settings')">
+                    <el-button plain link type="primary" class="px-4 ml-0 mr-2" :aria-label="$t('button.settings')">
                         <template v-if="isMobileView">
                             <i class="bi bi-sliders"></i>
                         </template>

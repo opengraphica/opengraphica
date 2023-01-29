@@ -4,12 +4,14 @@
         :style="{ '--ogr-sidebar-left-size': sidebarLeftSize + 'px', '--ogr-sidebar-right-size': sidebarRightSize + 'px' }"
         @touchstart="onTouchStartRoot($event)"
     >
-        <app-canvas />
-        <app-layout-dnd-container @dnd-ready="onDndLayoutReady($event)" @resize="onResizeLayoutContainer($event)" />
-        <app-menu-drawers />
-        <app-dialogs />
-        <app-wait />
-        <app-dnd-drop-overlay v-if="showDndDropOverlay" ref="dndDropOverlay" @click="showDndDropOverlay = false" />
+        <template v-if="isMounted">
+            <app-canvas />
+            <app-layout-dnd-container @dnd-ready="onDndLayoutReady($event)" @resize="onResizeLayoutContainer($event)" />
+            <app-menu-drawers />
+            <app-dialogs />
+            <app-wait />
+            <app-dnd-drop-overlay v-if="showDndDropOverlay" ref="dndDropOverlay" @click="showDndDropOverlay = false" />
+        </template>
     </div>
 </template>
 
@@ -42,12 +44,14 @@ export default defineComponent({
     setup() {
         const rootElement = ref<Element | null>(null);
         const mainElement = ref<Element | null>(null);
+        const isMounted = ref<boolean>(false);
         const showDndDropOverlay = ref<boolean>(false);
         const dndDropOverlay = ref<InstanceType<typeof AppDndDropOverlay>>();
         const sidebarLeftSize = ref<number>(0);
         const sidebarRightSize = ref<number>(0);
 
         onMounted(() => {
+            isMounted.value = true;
             appEmitter.emit('app.wait.startBlocking', { id: 'appInitialLoad', immediate: true });
 
             // Full page fixes for quirks in browsers (Chrome)
@@ -206,6 +210,7 @@ export default defineComponent({
 
         return {
             root: rootElement,
+            isMounted,
             sidebarLeftSize,
             sidebarRightSize,
             onDndLayoutReady,

@@ -28,7 +28,7 @@ export interface DrawWorkingFileOptions {
 }
 
 export type WorkingFileLayerBlendingMode = 'color' | 'color-burn' | 'color-dodge' | 'copy' | 
-    'darken' | 'darker' | 'destination-atop' | 'destination-in' | 'destination-out' | 'destination-over' | 
+    'darken' | 'destination-atop' | 'destination-in' | 'destination-out' | 'destination-over' | 
     'difference' | 'exclusion' | 'hard-light' | 'hue' | 'lighten' | 'lighter' | 'luminosity' | 
     'multiply' | 'overlay' | 'saturation' | 'screen' | 'soft-light' | 'source-atop' | 'source-in' | 
     'source-out' | 'source-over' | 'xor';

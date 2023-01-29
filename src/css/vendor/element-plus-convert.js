@@ -3,7 +3,7 @@ var postcss = require('postcss');
 var pxtorem = require('postcss-pxtorem');
 var prefixer = require('postcss-prefix-selector');
 var lightCss = fs.readFileSync('element-plus-theme-chalk-original.css', 'utf8');
-var darkCss = fs.readFileSync('element-plus-theme-dark-original.css', 'utf8');
+// var darkCss = fs.readFileSync('element-plus-theme-dark-original.css', 'utf8');
 var options = {
     propList: ['*'],
     replace: true

@@ -2,14 +2,30 @@
     <el-tooltip
         ref="tooltipRef"
         v-bind="$attrs"
+        :trigger="trigger"
+        :placement="placement"
+        :disabled="disabled"
+        :visible="visible"
+        :transition="transition"
+        :popper-options="popperOptions"
+        :tabindex="tabindex"
+        :content="content"
+        :offset="offset"
+        :show-after="showAfter"
+        :hide-after="hideAfter"
+        :auto-close="autoClose"
+        :show-arrow="showArrow"
         :aria-label="title"
         :effect="effect"
         :enterable="enterable"
         :popper-class="kls"
         :popper-style="style"
-        :append-to="appendTo"
-        :visible="visible"
-        persistent
+        :teleported="teleported"
+        :persistent="persistent"
+        :gpu-acceleration="gpuAcceleration"
+        @update:visible="onUpdateVisible"
+        @before-show="beforeEnter"
+        @before-hide="beforeLeave"
         @show="afterEnter"
         @hide="afterLeave"
     >
@@ -18,7 +34,7 @@
         </template>
 
         <template #content>
-            <div v-if="title" class="el-popover__title" role="title">
+            <div v-if="title" :class="ns.e('title')" role="title">
                 {{ title }}
             </div>
             <slot>
@@ -27,113 +43,119 @@
         </template>
     </el-tooltip>
 </template>
+
 <script lang="ts">
-import { defineComponent, computed, ref, unref, watch, onMounted, onUnmounted } from 'vue';
-import ElTooltip from 'element-plus/lib/components/tooltip/index';
-import { isString } from 'element-plus/lib/utils/util';
-import { usePopoverProps } from 'element-plus/lib/components/popover/src/popover';
-import { useTooltipContentProps } from 'element-plus/lib/components/tooltip/src/tooltip';
-import { POPPER_CONTAINER_SELECTOR } from 'element-plus/lib/components/popper/src/container';
+import { computed, ref, unref, defineComponent, watch, onMounted, onUnmounted } from 'vue';
+import { ElTooltip } from 'element-plus/lib/components/tooltip/index';
+import { addUnit } from 'element-plus/lib/utils/index';
+import { useNamespace } from 'element-plus/lib/hooks/index';
+import { popoverEmits, popoverProps } from 'element-plus/lib/components/popover/index';
 import editorStore from '@/store/editor';
 
-import type { StyleValue } from 'vue';
+import type { TooltipInstance } from 'element-plus/lib/components/tooltip/index';
 
-const emits = ['update:visible', 'after-enter', 'after-leave'];
-
-const NAME = 'ElPopover';
-
-let popperContainer: any = null;
-let popoverCounter: number = 0;
+let popperContainer: any = null; // Opengraphica Custom
+let popoverCounter: number = 0;  // Opengraphica Custom
 
 export default defineComponent({
-    name: NAME,
+    name: 'ElPopover',
+    props: popoverProps,
+    emits: popoverEmits,
     components: {
-        ElTooltip,
+        ElTooltip
     },
-    props: {
-        appendTo: useTooltipContentProps.appendTo,
-        visible: useTooltipContentProps.visible,
-        ...usePopoverProps
-    },
-    emits,
-    setup(props, { emit }) {
-        let isMounted: boolean = false;
-        const trackingId: number = popoverCounter++;
-        
-        const tooltipRef = ref<InstanceType<typeof ElTooltip> | null>(null);
+    setup(props, { expose, emit }) {
+        let isMounted: boolean = false; // Opengraphica Custom
+        const trackingId: number = popoverCounter++; // Opengraphica Custom
+
+        const updateEventKeyRaw = `onUpdate:visible` as const;
+        const onUpdateVisible = computed(() => {
+            return props[updateEventKeyRaw];
+        });
+        const ns = useNamespace('popover');
+        const tooltipRef = ref<TooltipInstance>();
         const popperRef = computed(() => {
             return unref(tooltipRef)?.popperRef;
         });
-        const width = computed(() => {
-            if (isString(props.width)) {
-                return props.width as string;
-            }
-            return `${props.width}px`;
-        });
 
-        watch(() => props.visible, (newValue) => {
-            if (!popperContainer) {
-                const opengraphica = document.querySelector('.opengraphica');
-                if (opengraphica) {
-                    popperContainer = document.querySelector('[id^="el-popper-container"]');
-                    opengraphica.appendChild(popperContainer);
-                }
-            }
-        });
+        watch(() => props.visible, (newValue) => { // Opengraphica Custom
+            popperContainer = document.querySelector('body > div[id^="el-popper-container"]');
+            if (popperContainer) { // Opengraphica Custom
+                const opengraphica = document.querySelector('.opengraphica'); // Opengraphica Custom
+                if (opengraphica) { // Opengraphica Custom
+                    opengraphica.appendChild(popperContainer); // Opengraphica Custom
+                } // Opengraphica Custom
+            } // Opengraphica Custom
+        }, { immediate: true }); // Opengraphica Custom
 
         const style = computed(() => {
             return [
                 {
-                    width: width.value,
+                    width: addUnit(props.width),
                 },
-                props.popperStyle,
-            ] as StyleValue;
-        });
-
-        const kls = computed(() => {
-            return [
-                { 'el-popover--plain': !!props.content },
-                'el-popover',
-                props.popperClass,
+                props.popperStyle!,
             ];
         });
-
-        onMounted(() => {
-            isMounted = true;
+        const kls = computed(() => {
+            return [ns.b(), props.popperClass!, { [ns.m('plain')]: !!props.content }];
+        });
+        const gpuAcceleration = computed(() => {
+            return props.transition === `${ns.namespace.value}-fade-in-linear`;
         });
 
-        onUnmounted(() => {
-            isMounted = false;
-            editorStore.set('activePopoverIds', editorStore.get('activePopoverIds').filter(id => id !== trackingId));
-        });
+        onMounted(() => { // Opengraphica Custom
+            isMounted = true; // Opengraphica Custom
+        }); // Opengraphica Custom
+        onUnmounted(() => { // Opengraphica Custom
+            isMounted = false; // Opengraphica Custom
+            editorStore.set('activePopoverIds', editorStore.get('activePopoverIds').filter(id => id !== trackingId)); // Opengraphica Custom
+        }); // Opengraphica Custom
 
         const hide = () => {
             tooltipRef.value?.hide();
         };
-
+        const beforeEnter = () => {
+            emit('before-enter');
+        };
+        const beforeLeave = () => {
+            emit('before-leave');
+        };
         const afterEnter = () => {
-            const activePopoverIds = editorStore.get('activePopoverIds');
-            if (!activePopoverIds.includes(trackingId) && isMounted) {
-                activePopoverIds.push(trackingId);
-                editorStore.set('activePopoverIds', activePopoverIds);
-            }
+            const activePopoverIds = editorStore.get('activePopoverIds'); // Opengraphica Custom
+            if (!activePopoverIds.includes(trackingId) && isMounted) { // Opengraphica Custom
+                activePopoverIds.push(trackingId); // Opengraphica Custom
+                editorStore.set('activePopoverIds', activePopoverIds); // Opengraphica Custom
+            } // Opengraphica Custom
+
             emit('after-enter');
-        }
-
+        };
         const afterLeave = () => {
-            editorStore.set('activePopoverIds', editorStore.get('activePopoverIds').filter(id => id !== trackingId));
-            emit('after-leave');
-        }
+            editorStore.set('activePopoverIds', editorStore.get('activePopoverIds').filter(id => id !== trackingId)); // Opengraphica Custom
 
+            emit('update:visible', false);
+            emit('after-leave');
+        };
+        expose({
+            /** @description popper ref */
+            popperRef,
+            /** @description hide popover */
+            hide,
+        });
         return {
-            kls,
-            style,
+            updateEventKeyRaw,
+            onUpdateVisible,
+            ns,
             tooltipRef,
             popperRef,
+            style,
+            kls,
+            gpuAcceleration,
             hide,
+            beforeEnter,
+            beforeLeave,
             afterEnter,
-            afterLeave,
-        };
-    },
+            afterLeave
+        }
+    }
 });
 </script>

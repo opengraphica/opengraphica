@@ -3,7 +3,7 @@
         <template v-for="dialog of dialogs" :key="dialog.id">
             <suspense>
                 <template #default>
-                    <el-dialog :title="$t(dialog.title || 'empty')" :custom-class="'el-dialog--' + dialog.size + ' el-dialog--ogr-' + dialog.type" v-model="dialog.visible" destroy-on-close @closed="onDialogClosed(dialog)">
+                    <el-dialog :title="$t(dialog.title || 'empty')" :class="'el-dialog--' + dialog.size + ' el-dialog--ogr-' + dialog.type" v-model="dialog.visible" destroy-on-close @closed="onDialogClosed(dialog)">
                         <template v-if="dialog.type === 'dock'">
                             <dock :name="dialog.dock.name" :is-dialog="true" :props="dialog.props" @update:title="dialog.title = $event" @update:dialogSize="dialog.size = $event" @close="onCloseDialog(dialog, $event)" />
                         </template>

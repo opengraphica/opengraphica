@@ -93,7 +93,7 @@ export class PerformantStore<T extends StoreTypeMap> {
                 if (['object', 'array'].includes(valueType)) {
                     serializedValue = JSON.stringify(value);
                 }
-                localStorage.setItem(localStoragePrefix + key as string, valueType + ';' + serializedValue);
+                localStorage.setItem(localStoragePrefix + (key as string), valueType + ';' + serializedValue);
             } catch (error) {
                 // Does this matter?
             }

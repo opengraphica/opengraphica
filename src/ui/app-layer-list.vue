@@ -34,10 +34,10 @@
                         <span class="ogr-layer-name">{{ layer.name }}</span>
                         <span v-if="layer.type === 'group'" class="ogr-layer-group-arrow bi" :class="{ 'bi-chevron-right': !layer.expanded, 'bi-chevron-down': layer.expanded }" aria-hidden="true"></span>
                     </span>
-                    <el-button type="text" class="px-2 my-1" :aria-label="$t('app.layerList.toggleLayerVisibility')" @click="onToggleLayerVisibility(layer)">
+                    <el-button link type="primary" class="px-2 my-1" :aria-label="$t('app.layerList.toggleLayerVisibility')" @click="onToggleLayerVisibility(layer)">
                         <i class="bi" :class="{ 'bi-eye-fill': layer.visible, 'bi-eye-slash': !layer.visible }" aria-hidden="true"></i>
                     </el-button>
-                    <el-button type="text" class="px-2 mr-2 my-1 ml-0" :aria-label="$t('app.layerList.layerSettings')" @click="onToggleLayerSettings(layer)">
+                    <el-button link type="primary" class="px-2 mr-2 my-1 ml-0" :aria-label="$t('app.layerList.layerSettings')" @click="onToggleLayerSettings(layer)">
                         <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
                     </el-button>
                 </span>
@@ -50,8 +50,8 @@
                 <span v-if="layer.type === 'rasterSequence'" role="group" class="ogr-layer-attributes ogr-layer-frames">
                     <span class="ogr-layer-attributes__title">
                         <i class="bi bi-arrow-return-right" aria-hidden="true"></i> {{ $t('app.layerList.frames') }}
-                        <el-button v-if="!playingAnimation" type="text" class="p-0 ml-1" style="min-height: 0" :aria-label="$t('app.layerList.playAnimation')" @click="onPlayRasterSequence(layer)"><i class="bi bi-play" aria-hidden="true"></i></el-button>
-                        <el-button v-else type="text" class="p-0 ml-1" style="min-height: 0" :aria-label="$t('app.layerList.stopAnimation')" @click="onStopRasterSequence(layer)"><i class="bi bi-stop" aria-hidden="true"></i></el-button>
+                        <el-button v-if="!playingAnimation" link type="primary" class="p-0 ml-1" style="min-height: 0" :aria-label="$t('app.layerList.playAnimation')" @click="onPlayRasterSequence(layer)"><i class="bi bi-play" aria-hidden="true"></i></el-button>
+                        <el-button v-else link type="primary" class="p-0 ml-1" style="min-height: 0" :aria-label="$t('app.layerList.stopAnimation')" @click="onStopRasterSequence(layer)"><i class="bi bi-stop" aria-hidden="true"></i></el-button>
                     </span>
                     <div class="is-flex">
                         <el-scrollbar>
@@ -72,14 +72,14 @@
                     </span>
                     <ul class="ogr-layer-effect-stack">
                         <li v-for="(filter, filterIndex) of layer.filters" :key="filterIndex">
-                            <el-button type="text" @click="onEditLayerFilter(layer, filterIndex)">
+                            <el-button link type="primary" @click="onEditLayerFilter(layer, filterIndex)">
                                 <i class="bi bi-pencil-square mr-1" aria-hidden="true"></i>
                                 <span v-t="`layerFilter.${filter.name}.name`"></span>
                             </el-button>
-                            <el-button type="text" class="px-2 my-0 ml-0" :aria-label="$t('app.layerList.moveEffectUp')">
+                            <el-button link type="primary" class="px-2 my-0 ml-0" :aria-label="$t('app.layerList.moveEffectUp')">
                                 <i class="bi bi-chevron-up" aria-hidden="true"></i>
                             </el-button>
-                            <el-button type="text" class="px-2 my-0 ml-0" :aria-label="$t('app.layerList.moveEffectDown')">
+                            <el-button link type="primary" class="px-2 my-0 ml-0" :aria-label="$t('app.layerList.moveEffectDown')">
                                 <i class="bi bi-chevron-down" aria-hidden="true"></i>
                             </el-button>
                         </li>

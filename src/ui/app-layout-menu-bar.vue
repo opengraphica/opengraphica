@@ -58,7 +58,7 @@
                                         </el-button>
                                     </template>
                                     <template v-if="control.showDock">
-                                        <div v-if="control.displayTitle" class="ogr-dock-title">{{ control.displayTitle }}</div>
+                                        <div v-if="control.displayTitle" class="ogr-dock-title" v-t="control.displayTitle" />
                                         <dynamically-loaded-dock
                                             :name="control.action.target" :key="'dock-' + control.action.target"
                                             @update:title="control.displayTitle = $event"

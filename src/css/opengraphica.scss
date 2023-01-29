@@ -190,9 +190,10 @@ body.ogr-full-page {
             width: 3rem;
             background-image: url("../images/transparency-bg.png");
             background-repeat: repeat;
-            border: 1px solid var(--el-border-color-base);
+            border: 1px solid var(--el-border-color);
             border-right: none;
-            border-radius: var(--el-input-border-radius, var(--el-border-radius-base)) 0 0 var(--el-input-border-radius, var(--el-border-radius-base));
+            border-radius: var(--el-border-radius-base) 0 0 var(--el-border-radius-base);
+            overflow: hidden;
             --preview-color: #ffffff;
             
             &:before {
@@ -208,7 +209,7 @@ body.ogr-full-page {
             + .el-input {
                 height: 100%;
 
-                > .el-input__inner {
+                > .el-input__wrapper {
                     height: 100%;
                     border-radius: 0 var(--el-input-border-radius, var(--el-border-radius-base)) var(--el-input-border-radius, var(--el-border-radius-base)) 0;
                 }
@@ -842,7 +843,7 @@ body.ogr-full-page {
             }
 
             &.is-background {
-                border-top: 1px solid var(--el-border-color-base);
+                border-top: 1px solid var(--el-border-color);
 
                 > .ogr-layer-main {
                     height: 3.5rem;
@@ -1334,8 +1335,6 @@ body.ogr-full-page {
                 }
 
                 .el-button {
-                    --el-button-background-color: transparent;
-
                     .el-icon {
                         color: var(--el-button-font-color);
                     }
@@ -1352,14 +1351,15 @@ body.ogr-full-page {
 
         .ogr-menu-section {
             .el-button-group, .ogr-single-button-group {
+                margin: 0 0 0 0.375rem;
                 width: max-content;
+
+                &:last-child {
+                    margin-right: 0.375rem;
+                }
 
                 > .el-button {
                     border-width: 0 !important;
-                }
-
-                + .el-button-group, + .ogr-single-button-group {
-                    margin-left: 0.375rem;
                 }
             }
         }
@@ -1414,11 +1414,11 @@ body.ogr-full-page {
                     }
 
                     .el-button-group, .ogr-single-button-group {
+                        margin: 0.375rem 0 0 0;
                         height: max-content;
-        
-                        + .el-button-group, + .ogr-single-button-group {
-                            margin-left: 0;
-                            margin-top: 0.375rem;
+
+                        &:last-child {
+                            margin-bottom: 0.375rem;
                         }
                     }
                 }
@@ -1781,7 +1781,7 @@ body.ogr-full-page {
                 flex-direction: row;
 
                 .ogr-toolbar-tool-selector {
-                    background: var(--el-bg-color);
+                    background: var(--el-bg-color-page);
                     color: var(--el-text-color-primary);
                     box-sizing: border-box;
                     display: flex;

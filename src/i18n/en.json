@@ -456,7 +456,8 @@
             "description": "Edit the effect for a specific layer.",
             "loading": "Generating Previews...",
             "generalError": "Something went wrong. If you keep seeing this message, please report this as a bug.",
-            "deleteEffect": "Delete Effect"
+            "deleteEffect": "Delete Effect",
+            "enableToggle": "Enable"
         }
     },
     "moduleGroup": {

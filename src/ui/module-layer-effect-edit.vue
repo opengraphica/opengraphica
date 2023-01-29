@@ -9,9 +9,14 @@
         <el-divider />
         <div class="is-flex is-flex-row is-align-items-center is-justify-content-space-between">
             <h2 v-t="currentFilterName" class="m-0" />
-            <div class="is-flex-shrink-1">
-                <el-button type="text">
-                    <span class="bi bi-trash mr-1" aria-hidden="true" />
+            <div class="is-flex is-flex-row is-align-items-center is-flex-shrink-1">
+                <el-switch
+                    v-model="currentFilterEnabled"
+                    :active-text="$t('module.layerEffectEdit.enableToggle')"
+                    class="mr-4 el-switch--label-align-fix-sm-above"
+                />
+                <el-button link type="danger" class="el-text-alignment-fix--below">
+                    <span class="bi bi-trash mr-1 el-text-alignment-fix--above" aria-hidden="true" />
                     <span v-t="'module.layerEffectEdit.deleteEffect'" />
                 </el-button>
             </div>
@@ -28,6 +33,7 @@ import ElButton from 'element-plus/lib/components/button/index';
 import ElCard from 'element-plus/lib/components/card/index';
 import ElDivider from 'element-plus/lib/components/divider/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
+import ElSwitch from 'element-plus/lib/components/switch/index';
 import historyStore from '@/store/history';
 import workingFileStore, { getLayerById } from '@/store/working-file';
 import { notifyInjector } from '@/lib/notify';
@@ -60,7 +66,8 @@ export default defineComponent({
         ElAutoGrid,
         ElButton,
         ElCard,
-        ElDivider
+        ElDivider,
+        ElSwitch
     },
     emits: [
         'update:title',
@@ -87,6 +94,8 @@ export default defineComponent({
         const loading = ref(true);
         const beforeEffectCanvas = ref<HTMLCanvasElement>();
         const afterEffectCanvas = ref<HTMLCanvasElement>();
+
+        const currentFilterEnabled = ref(true);
 
         const layer = computed(() => {
             return getLayerById(props.layerId);
@@ -155,6 +164,7 @@ export default defineComponent({
             afterEffectCanvas,
             currentFilterConfig,
             currentFilterName,
+            currentFilterEnabled,
             onCancel,
         };
     }

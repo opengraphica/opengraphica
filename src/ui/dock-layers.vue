@@ -2,15 +2,15 @@
     <div class="ogr-dock-header">
         <div class="is-flex is-align-items-center is-justify-content-center">
             <strong class="has-text-color-regular mr-3">{{ $t('dock.layers.add') }}:</strong>
-            <el-button type="text" class="px-0" @click="onAddLayer">
+            <el-button link type="primary" class="px-0" @click="onAddLayer">
                 <span class="bi bi-plus-circle mr-1" aria-hidden="true"></span>
                 {{ $t('dock.layers.layer') }}
             </el-button>
-            <el-button type="text" class="px-0" @click="onAddGroup">
+            <el-button link type="primary" class="px-0" @click="onAddGroup">
                 <span class="bi bi-images mr-1" aria-hidden="true"></span>
                 {{ $t('dock.layers.group') }}
             </el-button>
-            <el-button type="text" class="px-0" @click="onAddEffect">
+            <el-button link type="primary" class="px-0" @click="onAddEffect">
                 <span class="bi bi-magic mr-1" aria-hidden="true"></span>
                 {{ $t('dock.layers.effect') }}
             </el-button>
@@ -50,7 +50,7 @@
                             </div>
                             <span class="ogr-layer-name" v-t="'dock.layers.background'" />
                         </span>
-                        <el-button type="text" class="px-2  mr-2" :aria-label="$t('dock.layers.toggleBackgroundVisibility')" @click="isBackgroundVisible = !isBackgroundVisible">
+                        <el-button link type="primary" class="px-2  mr-2" :aria-label="$t('dock.layers.toggleBackgroundVisibility')" @click="isBackgroundVisible = !isBackgroundVisible">
                             <i class="bi" :class="{ 'bi-eye-fill': isBackgroundVisible, 'bi-eye-slash': !isBackgroundVisible }" aria-hidden="true"></i>
                         </el-button>
                     </span>

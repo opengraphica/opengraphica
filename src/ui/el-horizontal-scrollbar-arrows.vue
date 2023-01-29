@@ -1,7 +1,7 @@
 <template>
     <div ref="rootEl" class="el-horizontal-scrollbar-arrows">
         <el-button
-            type="text" class="is-flex-grow-0 is-border-radius-attach-right px-2 py-0"
+            link type="primary" class="is-flex-grow-0 is-border-radius-attach-right px-2 py-0"
             :aria-label="$t('el.horizontalScrollbarArrows.scrollLeft')" :style="{ visibility: canScrollLeft ? '' : 'hidden' }"
             @click="onClickScrollLeft()">
             <span class="bi bi-chevron-left" aria-hidden="true" />
@@ -12,7 +12,7 @@
             </div>
         </el-scrollbar>
         <el-button
-            type="text" class="is-flex-grow-0 is-border-radius-attach-left px-2 py-0"
+            link type="primary" class="is-flex-grow-0 is-border-radius-attach-left px-2 py-0"
             :aria-label="$t('el.horizontalScrollbarArrows.scrollRight')" :style="{ visibility: canScrollRight ? '' : 'hidden' }"
             @click="onClickScrollRight()">
             <span class="bi bi-chevron-right" aria-hidden="true" />
@@ -85,7 +85,7 @@ export default defineComponent({
         }
 
         function getScrollLeftMax() {
-            return scrollContentEl.value!.clientWidth - scrollbar.value!.scrollbar$!.clientWidth;
+            return scrollContentEl.value!.clientWidth - (scrollbar.value?.wrapRef?.clientWidth ?? 0);
         }
 
         function handleScrollChange() {

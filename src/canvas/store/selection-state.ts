@@ -4,6 +4,8 @@ import workingFileStore from '@/store/working-file';
 import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
 import { createImageFromCanvas, getImageDataEmptyBounds } from '@/lib/image';
 
+import type { WorkingFileLayerBlendingMode } from '@/types';
+
 export type SelectionAddShape = 'rectangle' | 'ellipse' | 'free' | 'tonalArea';
 export type SelectionCombineMode = 'add' | 'subtract' | 'intersect' | 'replace';
 
@@ -258,7 +260,7 @@ export async function createActiveSelectionMask(activeSelectionBounds: Selection
     return workingCanvas;
 }
 
-export async function blitActiveSelectionMask(toImage: HTMLImageElement | HTMLCanvasElement, layerTransform: DOMMatrix, compositeOperation = 'source-in'): Promise<HTMLCanvasElement> {
+export async function blitActiveSelectionMask(toImage: HTMLImageElement | HTMLCanvasElement, layerTransform: DOMMatrix, compositeOperation: WorkingFileLayerBlendingMode = 'source-in'): Promise<HTMLCanvasElement> {
     return blitSpecifiedSelectionMask(
         activeSelectionMask.value,
         activeSelectionMaskCanvasOffset.value,
@@ -268,7 +270,7 @@ export async function blitActiveSelectionMask(toImage: HTMLImageElement | HTMLCa
     );
 }
 
-export async function blitSpecifiedSelectionMask(selectionMask: HTMLImageElement | null, selectionMaskCanvasOffset: DOMPoint, toImage: HTMLImageElement | HTMLCanvasElement, layerTransform: DOMMatrix, compositeOperation = 'source-in'): Promise<HTMLCanvasElement> {
+export async function blitSpecifiedSelectionMask(selectionMask: HTMLImageElement | null, selectionMaskCanvasOffset: DOMPoint, toImage: HTMLImageElement | HTMLCanvasElement, layerTransform: DOMMatrix, compositeOperation: WorkingFileLayerBlendingMode = 'source-in'): Promise<HTMLCanvasElement> {
     if (selectionMask == null) throw new Error('Active selection mask does not exist.');
     const workingCanvas = document.createElement('canvas');
     workingCanvas.width = toImage.width;
