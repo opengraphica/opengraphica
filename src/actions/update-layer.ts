@@ -8,6 +8,7 @@ import { registerObjectUrlUser, revokeObjectUrlIfLastUser } from './data/memory-
 import { createImageFromBlob } from '@/lib/image';
 import canvasStore from '@/store/canvas';
 import workingFileStore, { getGroupLayerById, getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
+import { updateBakedImageForLayer } from './baking';
 
 export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorModel>> extends BaseAction {
 
@@ -79,6 +80,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
             }
         }
         regenerateLayerThumbnail(layer);
+        updateBakedImageForLayer(layer);
 
         canvasStore.set('dirty', true);
 	}
@@ -95,6 +97,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                 }
             }
             regenerateLayerThumbnail(layer);
+            updateBakedImageForLayer(layer);
             if (layer.type === 'raster') {
                 if (this.oldRasterSourceImageDatabaseId != null) {
                     const oldImageIsObjectUrl = layer.data.sourceImageIsObjectUrl;

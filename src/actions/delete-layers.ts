@@ -6,6 +6,7 @@ import { SelectLayersAction } from './select-layers';
 import { revokeObjectUrlIfLastUser } from './data/memory-management';
 import canvasStore from '@/store/canvas';
 import workingFileStore, { calculateLayerOrder, getLayerById, getGroupLayerById } from '@/store/working-file';
+import { updateBakedImageForLayer } from './baking';
 
 export class DeleteLayersAction extends BaseAction {
 
@@ -45,6 +46,7 @@ export class DeleteLayersAction extends BaseAction {
                     });
                 }
                 layer.renderer.detach();
+                layer.bakedImage = null;
             }
         }
 
@@ -68,6 +70,7 @@ export class DeleteLayersAction extends BaseAction {
             }
             parentList.splice(deletedLayerInfo.parentIndex, 0, layer);
             await layer.renderer.attach(layer);
+            updateBakedImageForLayer(layer);
         }
         this.deletedLayers = [];
 

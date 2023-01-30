@@ -1,6 +1,9 @@
 import { BaseAction } from './base';
 import canvasStore from '@/store/canvas';
 import workingFileStore, { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
+import { updateBakedImageForLayer } from './baking';
+
+import { saveAs } from 'file-saver'; // TODO - REMOVE
 
 export class UpdateLayerFilterParamsAction extends BaseAction {
 
@@ -34,6 +37,7 @@ export class UpdateLayerFilterParamsAction extends BaseAction {
         filter.params = { ...this.newParams };
 
         regenerateLayerThumbnail(layer);
+        updateBakedImageForLayer(layer);
 
         canvasStore.set('dirty', true);
 	}
@@ -55,6 +59,7 @@ export class UpdateLayerFilterParamsAction extends BaseAction {
         filter.params = { ...this.oldParams };
 
         regenerateLayerThumbnail(layer);
+        updateBakedImageForLayer(layer);
 
         canvasStore.set('dirty', true);
 	}

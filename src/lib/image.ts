@@ -21,27 +21,6 @@ export interface CreateImageFromOptions {
 }
 
 /**
- * Converts HTMLImageElement to ImageData.
- * @param image The HTMLImageElement to convert.
- * @returns The resulting ImageData.
- */
-export function getImageDataFromImage(image: HTMLImageElement): ImageData {
-    let workingCanvas = document.createElement('canvas');
-    workingCanvas.width = image.width;
-    workingCanvas.height = image.height;
-    let ctx = workingCanvas.getContext('2d');
-    if (!ctx) {
-        (workingCanvas as any) = null;
-        return new ImageData(image.width, image.height);
-    }
-    ctx.drawImage(image, 0, 0);
-    const imageData = ctx.getImageData(0, 0, image.width, image.height);
-    (workingCanvas as any) = null;
-    ctx = null;
-    return imageData;
-}
-
-/**
  * Function used to identify bounds for trimming empty/white space.
  * @param imageData ImageData object that holds the image to check.
  * @param options Additional options.
@@ -148,6 +127,61 @@ export function getImageDataEmptyBounds(imageData: ImageData, options: GetImageD
     }
 
     return bounds;
+}
+
+/**
+ * Converts HTMLImageElement to ImageData.
+ * @param image The HTMLImageElement to convert.
+ * @returns The resulting ImageData.
+ */
+export function getImageDataFromImage(image: HTMLImageElement): ImageData {
+    let workingCanvas = document.createElement('canvas');
+    workingCanvas.width = image.width;
+    workingCanvas.height = image.height;
+    let ctx = workingCanvas.getContext('2d');
+    if (!ctx) {
+        (workingCanvas as any) = null;
+        return new ImageData(image.width, image.height);
+    }
+    ctx.drawImage(image, 0, 0);
+    const imageData = ctx.getImageData(0, 0, image.width, image.height);
+    (workingCanvas as any) = null;
+    ctx = null;
+    return imageData;
+}
+
+/**
+ * Converts ImageData to HTMLImageElement.
+ * @param imageData The image data to convert.
+ * @returns The resulting image.
+ */
+export async function createImageFromImageData(imageData: ImageData): Promise<HTMLImageElement> {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        return new Image(imageData.width, imageData.height);
+    }
+    canvas.width = imageData.width;
+    canvas.height = imageData.height;
+    ctx.putImageData(imageData, 0, 0);
+    return await createImageFromCanvas(canvas);
+}
+
+/**
+ * Converts ImageData to HTMLImageElement.
+ * @param imageData The image data to convert.
+ * @returns The resulting image.
+ */
+ export async function createImageBlobFromImageData(imageData: ImageData): Promise<Blob> {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        return new Blob();
+    }
+    canvas.width = imageData.width;
+    canvas.height = imageData.height;
+    ctx.putImageData(imageData, 0, 0);
+    return await createImageBlobFromCanvas(canvas);
 }
 
 /**

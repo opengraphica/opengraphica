@@ -284,7 +284,10 @@ export default defineComponent({
                             if (layerRenderers['2d'][selectedLayer?.type]) {
                                 const layerRenderer = new layerRenderers['2d'][selectedLayer.type]();
                                 await layerRenderer.attach(selectedLayer);
+                                const bakedImage = selectedLayer.bakedImage;
+                                selectedLayer.bakedImage = null;
                                 await layerRenderer.draw(beforeCanvasCtx, selectedLayer, { visible: true, force2dRenderer: true });
+                                selectedLayer.bakedImage = bakedImage;
                             } else {
                                 throw new Error('module.layerEffectBrowser.generationErrorUnsupportedType');
                             }

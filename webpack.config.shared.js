@@ -24,13 +24,6 @@ module.exports = function setupConfig(config) {
                     loader: 'vue-loader'
                 },
                 {
-                    test: /\.worker\.(js|ts)$/,
-                    // include: path.resolve(__dirname, 'src'),
-                    use: {
-                        loader: 'worker-loader'
-                    }
-                },
-                {
                     test: /\.ts$/,
                     // include: path.resolve(__dirname, 'src'),
                     loader: 'ts-loader',
@@ -52,9 +45,9 @@ module.exports = function setupConfig(config) {
                     // include: path.resolve(__dirname, 'src'),
                     loader: 'css-loader'
                 },
-                {
+                /*{
                     test: /\.s[ac]ss$/i,
-                    // include: path.resolve(__dirname, 'src'),
+                    include: path.resolve(__dirname, 'src'),
                     use: [
                         'style-loader',
                         'css-loader',
@@ -66,7 +59,7 @@ module.exports = function setupConfig(config) {
                             }
                         }
                     ]
-                },
+                },*/
                 {
                     test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
                     // include: path.resolve(__dirname, 'src'),
@@ -132,9 +125,6 @@ module.exports = function setupConfig(config) {
         },
         optimization: {
             runtimeChunk: 'single',
-            // removeAvailableModules: false,
-            // removeEmptyChunks: false,
-            // splitChunks: false,
             splitChunks: {
                 chunks: 'all',
                 maxInitialRequests: Infinity,

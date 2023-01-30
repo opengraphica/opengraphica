@@ -11,6 +11,7 @@ import { registerObjectUrlUser, revokeObjectUrlIfLastUser } from './data/memory-
 import canvasStore from '@/store/canvas';
 import workingFileStore, { calculateLayerOrder, getGroupLayerById } from '@/store/working-file';
 import layerRenderers from '@/canvas/renderers';
+import { updateBakedImageForLayer } from './baking';
 
 let layerInsertCounter: number = 1;
 
@@ -181,6 +182,8 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
         this.selectLayersAction.do();
 
         calculateLayerOrder();
+        updateBakedImageForLayer(newLayer);
+
         canvasStore.set('dirty', true);
 	}
 
@@ -208,6 +211,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
         // Detach the renderer (needed for webgl)
         if (this.insertedLayer) {
             this.insertedLayer.renderer.detach()
+            this.insertedLayer.bakedImage = null;
         }
 
         // Set modified layer list

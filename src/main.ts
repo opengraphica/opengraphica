@@ -12,6 +12,7 @@ import '@/store/working-file';
 import ElNotification from 'element-plus/lib/components/notification/index';
 import { notifyPolyfill } from '@/lib/notify';
 import '@/lib/keyboard';
+import '@/workers';
 
 export interface OpenGraphica extends App<Element> {
     on: typeof appEmitter.on,

@@ -1,6 +1,7 @@
 import { BaseAction } from './base';
 import canvasStore from '@/store/canvas';
 import workingFileStore, { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
+import { updateBakedImageForLayer } from './baking';
 
 import type { WorkingFileLayerFilter } from '@/types';
 
@@ -28,6 +29,7 @@ export class DeleteLayerFilterAction extends BaseAction {
         this.deletedFilter = layer.filters.splice(this.filterIndex, 1)[0];
 
         regenerateLayerThumbnail(layer);
+        updateBakedImageForLayer(layer);
 
         canvasStore.set('dirty', true);
 	}
@@ -47,6 +49,7 @@ export class DeleteLayerFilterAction extends BaseAction {
         layer.filters.splice(this.filterIndex, 0, this.deletedFilter);
 
         regenerateLayerThumbnail(layer);
+        updateBakedImageForLayer(layer);
 
         canvasStore.set('dirty', true);
 	}
