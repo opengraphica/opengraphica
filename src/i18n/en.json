@@ -10,7 +10,10 @@
         "createNewLayersFromSelection": "Create Layers From Selection",
         "cutLayers": "Cut Layer(s)",
         "deleteLayers": "Delete Layer(s)",
+        "deleteLayerFilter": "Delete Effect",
         "deleteLayerSelectionArea": "Delete Selection",
+        "disableLayerFilter": "Disable Layer Effect",
+        "enableLayerFilter": "Enable Layer Effect",
         "fileTakePhoto": "Take a Photo",
         "freeTransformRotate": "Free Transform (Rotate)",
         "freeTransformScale": "Free Transform (Resize)",
@@ -224,7 +227,10 @@
             "name": "Contrast"
         },
         "grayscale": {
-            "name": "Grayscale"
+            "name": "Grayscale",
+            "param": {
+                "percentage": "Percentage"
+            }
         },
         "hueRotate": {
             "name": "Hue Rotate"
@@ -457,7 +463,10 @@
             "loading": "Generating Previews...",
             "generalError": "Something went wrong. If you keep seeing this message, please report this as a bug.",
             "deleteEffect": "Delete Effect",
-            "enableToggle": "Enable"
+            "enableToggle": "Enable",
+            "deleting": "Deleting effect...",
+            "deleteFilterError": "An error occurred while attempting to delete the filter. If you keep seeing this message, please report this as a bug.",
+            "applyFilterError": "An error occurred while attempting to apply the filter changes. If you keep seeing this message, please report this as a bug."
         }
     },
     "moduleGroup": {

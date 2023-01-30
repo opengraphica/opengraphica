@@ -487,6 +487,10 @@ body.ogr-full-page {
                 flex-direction: column !important;
                 justify-content: center !important;
             }
+            .el-dialog__header {
+                position: relative !important;
+                margin-right: 0 !important;
+            }
             .el-dialog__body {
                 overflow: auto !important;
             }

@@ -112,19 +112,21 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
             const combinedShaderResult = combineShaders(
                 await createFiltersFromLayerConfig(updates.filters)
             );
-            const newMaterial = new ShaderMaterial({
+            const map = this.material?.uniforms.map;
+            delete this.material?.uniforms.map;
+            this.material?.dispose();
+            this.material = new ShaderMaterial({
                 transparent: true,
                 side: DoubleSide,
                 depthTest: false,
                 vertexShader: combinedShaderResult.vertexShader,
                 fragmentShader: combinedShaderResult.fragmentShader,
                 uniforms: {
-                    map: { value: this.material?.uniforms.map },
+                    map: { value: map?.value },
                     ...combinedShaderResult.uniforms
                 }
             });
-            this.material?.dispose();
-            this.material = newMaterial;
+            this.plane && (this.plane.material = this.material);
         }
         if (updates.data) {
             if (!this.textureCtx) return;

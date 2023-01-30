@@ -17,7 +17,7 @@ export default class GrayscaleCanvasFilter implements CanvasFilter<GrayscaleCanv
                 default: 1,
                 preview: 1,
                 min: 0,
-                max: 0
+                max: 1
             }
             /*
                 Luminance
@@ -55,9 +55,9 @@ export default class GrayscaleCanvasFilter implements CanvasFilter<GrayscaleCanv
     public fragment(sourceImageData: Uint8ClampedArray, targetImageData: Uint8ClampedArray, dataPosition: number) {
         const percentage = this.params.percentage ?? 0;
         var intensity = percentage * ((sourceImageData[dataPosition] * 19595 + sourceImageData[dataPosition + 1] * 38470 + sourceImageData[dataPosition + 2] * 7471) >> 16);
-        targetImageData[dataPosition] = intensity;
-        targetImageData[dataPosition + 1] = intensity;
-        targetImageData[dataPosition + 2] = intensity;
+        targetImageData[dataPosition] = (sourceImageData[dataPosition] * (1 - percentage)) + intensity;
+        targetImageData[dataPosition + 1] = (sourceImageData[dataPosition + 1] * (1 - percentage)) + intensity;
+        targetImageData[dataPosition + 2] = (sourceImageData[dataPosition + 2] * (1 - percentage)) + intensity;
         targetImageData[dataPosition + 3] = sourceImageData[dataPosition + 3];
     }
 }

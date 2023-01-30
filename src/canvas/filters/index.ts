@@ -11,12 +11,18 @@ export async function getCanvasFilterClass(name: string): Promise<new (...args: 
     return (await import(/* webpackChunkName: 'layer-filter-[request]' */ `./${kebabCaseName}/${kebabCaseName}`)).default;
 }
 
-export async function createFiltersFromLayerConfig(filterConfigs: WorkingFileLayerFilter[]): Promise<CanvasFilter[]> {
+interface CreateFiltersOptions {
+    createDisabled?: boolean;
+}
+
+export async function createFiltersFromLayerConfig(filterConfigs: WorkingFileLayerFilter[], options: CreateFiltersOptions = {}): Promise<CanvasFilter[]> {
     const canvasFilters: CanvasFilter[] = [];
     for (const filterConfig of filterConfigs) {
-        const canvasFilter = new (await getCanvasFilterClass(filterConfig.name))();
-        canvasFilter.params = filterConfig.params ?? {};
-        canvasFilters.push(canvasFilter);
+        if (!filterConfig.disabled || options.createDisabled) {
+            const canvasFilter = new (await getCanvasFilterClass(filterConfig.name))();
+            canvasFilter.params = filterConfig.params ?? {};
+            canvasFilters.push(canvasFilter);
+        }
     }
     return canvasFilters;
 }

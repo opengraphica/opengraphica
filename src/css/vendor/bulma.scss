@@ -75,6 +75,9 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+    .is-strikethrough {
+        text-decoration: line-through;
+    }
 
     .is-fullheight { height: 100%; }
     .is-fullwidth { width: 100%; }

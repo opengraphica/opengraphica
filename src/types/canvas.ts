@@ -23,8 +23,10 @@ export interface CanvasFilterEditConfigPercentage {
     max?: number;
 }
 
+export type CanvasFilterEditConfigField = CanvasFilterEditConfigFloat | CanvasFilterEditConfigPercentage;
+
 export interface CanvasFilterEditConfig {
-    [key: string]: CanvasFilterEditConfigFloat | CanvasFilterEditConfigPercentage;
+    [key: string]: CanvasFilterEditConfigField;
 }
 
 export interface CanvasFilter<T extends Object = Record<string, unknown>> {

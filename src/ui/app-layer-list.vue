@@ -72,7 +72,7 @@
                     </span>
                     <ul class="ogr-layer-effect-stack">
                         <li v-for="(filter, filterIndex) of layer.filters" :key="filterIndex">
-                            <el-button link type="primary" @click="onEditLayerFilter(layer, filterIndex)">
+                            <el-button link :type="filter.disabled ? undefined : 'primary'" @click="onEditLayerFilter(layer, filterIndex)">
                                 <i class="bi bi-pencil-square mr-1" aria-hidden="true"></i>
                                 <span v-t="`layerFilter.${filter.name}.name`"></span>
                             </el-button>

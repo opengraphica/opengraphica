@@ -7193,6 +7193,10 @@ body.ogr-full-page .opengraphica {
     flex-direction: column !important;
     justify-content: center !important;
   }
+  .opengraphica .ogr-dialogs .el-dialog__header {
+    position: relative !important;
+    margin-right: 0 !important;
+  }
   .opengraphica .ogr-dialogs .el-dialog__body {
     overflow: auto !important;
   }
@@ -26389,6 +26393,9 @@ body.ogr-full-page .opengraphica {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.opengraphica .is-strikethrough {
+  text-decoration: line-through;
+}
 .opengraphica .is-fullheight {
   height: 100%;
 }
@@ -26425,6 +26432,15 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .has-text-color-placeholder {
   color: var(--el-text-color-placeholder);
+}
+.opengraphica .has-text-color-fill {
+  color: var(--el-fill-color);
+}
+.opengraphica .has-text-color-fill-dark {
+  color: var(--el-fill-color-dark);
+}
+.opengraphica .has-text-color-fill-darker {
+  color: var(--el-fill-color-darker);
 }
 .opengraphica .el-alert--info.is-light {
   color: var(--ogr-alert-info-color);
@@ -26652,6 +26668,9 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-row > .el-col:last-child > .el-slider {
   border-right: 0.0625rem solid var(--ogr-form-connected-label-border-color) !important;
+}
+.opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-row:first-child > .el-col:first-child > .el-slider {
+  border-left: 0.0625rem solid var(--ogr-form-connected-label-border-color) !important;
 }
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-select, .opengraphica .el-form-item-group .el-form-item .el-form-item__content .el-input:not(.el-input-group) {
   display: block;

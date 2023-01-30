@@ -36,6 +36,7 @@ export type WorkingFileLayerType = 'empty' | 'group' | 'raster' | 'rasterSequenc
 
 export interface WorkingFileLayerFilter<T extends ColorModel = ColorModel> {
     name: string;
+    disabled?: boolean;
     params: Record<string, unknown>;
 }
 

@@ -24,6 +24,15 @@
     .has-text-color-placeholder {
         color: var(--el-text-color-placeholder);
     }
+    .has-text-color-fill {
+        color: var(--el-fill-color);
+    }
+    .has-text-color-fill-dark {
+        color: var(--el-fill-color-dark);
+    }
+    .has-text-color-fill-darker {
+        color: var(--el-fill-color-darker);
+    }
 
     .el-alert--info.is-light {
         color: var(--ogr-alert-info-color);
@@ -311,6 +320,9 @@
                 }
                 > .el-row > .el-col:last-child > .el-slider {
                     border-right: 0.0625rem solid var(--ogr-form-connected-label-border-color) !important;
+                }
+                > .el-row:first-child > .el-col:first-child > .el-slider {
+                    border-left: 0.0625rem solid var(--ogr-form-connected-label-border-color) !important;
                 }
 
                 > .el-select, .el-input:not(.el-input-group) {
