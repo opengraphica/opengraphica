@@ -102,6 +102,7 @@ export interface WorkingFileLayer<T extends ColorModel = ColorModel> {
     groupId: number | null;
     height: number;
     id: number;
+    isBaking?: boolean;
     name: string;
     opacity: 1;
     renderer: WorkingFileLayerRenderer<T>;

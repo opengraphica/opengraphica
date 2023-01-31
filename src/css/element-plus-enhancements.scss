@@ -12,6 +12,9 @@
         margin-bottom: 0.1em;
     }
 
+    .has-color-primary {
+        color: var(--el-color-primary);
+    }
     .has-text-color-primary {
         color: var(--el-text-color-primary);
     }

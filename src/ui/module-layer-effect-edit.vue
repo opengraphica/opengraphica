@@ -3,9 +3,9 @@
     <div v-else-if="isDeleting" v-loading="true" :element-loading-text="$t('module.layerEffectEdit.deleting')" style="height: 15rem" />
     <div v-else v-loading="loading" :element-loading-text="$t('module.layerEffectEdit.loading')">
         <div class="is-flex is-flex-row is-align-items-center">
-            <canvas ref="beforeEffectCanvas" style="width: 100%; height: auto; max-height: 40vh; background-image: url('../images/transparency-bg.png')" />
+            <canvas ref="beforeEffectCanvas" style="width: 100%; min-width: 0; height: auto; max-height: 40vh; background-image: url('../images/transparency-bg.png')" />
             <span class="bi bi-arrow-right-short is-flex-shrink-1 is-size-1 has-text-color-fill-darker" :style="{ visibility: currentFilterEnabled ? undefined : 'hidden' }" aria-hidden="true" />
-            <canvas ref="afterEffectCanvas" style="width: 100%; height: auto; max-height: 40vh; background-image: url('../images/transparency-bg.png')" :style="{ visibility: currentFilterEnabled ? undefined : 'hidden' }" />
+            <canvas ref="afterEffectCanvas" style="width: 100%; min-width: 0; height: auto; max-height: 40vh; background-image: url('../images/transparency-bg.png')" :style="{ visibility: currentFilterEnabled ? undefined : 'hidden' }" />
         </div>
         <el-divider />
         <div class="is-flex is-flex-row is-align-items-center is-justify-content-space-between">
@@ -105,6 +105,7 @@ import { UpdateLayerFilterParamsAction } from '@/actions/update-layer-filter-par
 import { DeleteLayerFilterAction } from '@/actions/delete-layer-filter';
 import { BundleAction } from '@/actions/bundle';
 import { Rules, RuleItem } from 'async-validator';
+import { bakeCanvasFilters } from '@/workers';
 
 import { Scene } from 'three/src/scenes/Scene';
 import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer';
@@ -239,17 +240,25 @@ export default defineComponent({
             [canvasFilters, beforeEffectCanvasCtx, afterEffectCanvas, afterEffectCanvasCtx],
             async ([canvasFilters, beforeEffectCanvasCtx, afterEffectCanvas, afterEffectCanvasCtx]) => {
             if (canvasFilters.length > 0 && beforeEffectCanvasCtx && afterEffectCanvas) {
-                let beforeImageData = beforeEffectCanvasCtx.getImageData(0, 0, beforeEffectCanvasCtx.canvas.width, beforeEffectCanvasCtx.canvas.height);
-                for (let i = 0; i < props.filterIndex; i++) {
-                    beforeImageData = applyCanvasFilter(beforeImageData, canvasFilters[i]);
+                try {
+                    let beforeImageData = beforeEffectCanvasCtx.getImageData(0, 0, beforeEffectCanvasCtx.canvas.width, beforeEffectCanvasCtx.canvas.height);
+                    const filterConfigurations = [...(layer.value?.filters ?? [])].slice(0, props.filterIndex);
+                    beforeImageData = await bakeCanvasFilters(beforeImageData, 999999999 + Math.floor(Math.random() * 1000), filterConfigurations);
+                    // for (let i = 0; i < props.filterIndex; i++) {
+                        // beforeImageData = applyCanvasFilter(beforeImageData, canvasFilters[i]);
+                    // }
+                    beforeEffectCanvasCtx.putImageData(beforeImageData, 0, 0);
+                    if (isUseWebGlPreview) {
+                        await initializeThreejs(afterEffectCanvas);
+                    } else if (afterEffectCanvasCtx) {
+                        afterEffectCanvasCtx.putImageData(beforeImageData, 0, 0);
+                    }
+                    updatePreview();
+                    loading.value = false;
+                } catch (error) {
+                    console.error(error);
+                    hasError.value = true;
                 }
-                beforeEffectCanvasCtx.putImageData(beforeImageData, 0, 0);
-                if (isUseWebGlPreview) {
-                    await initializeThreejs(afterEffectCanvas);
-                } else if (afterEffectCanvasCtx) {
-                    afterEffectCanvasCtx.putImageData(beforeImageData, 0, 0);
-                }
-                updatePreview();
             }
         }, { immediate: true });
 
@@ -293,7 +302,6 @@ export default defineComponent({
                             }
                             beforeEffectCanvasCtx.value =  beforeCanvasCtx;
                             afterEffectCanvasCtx.value = afterCanvasCtx;
-                            loading.value = false;
                         } else {
                             throw new Error('Canvas refs not found.');
                         }

@@ -3,8 +3,6 @@ import canvasStore from '@/store/canvas';
 import workingFileStore, { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
 import { updateBakedImageForLayer } from './baking';
 
-import { saveAs } from 'file-saver'; // TODO - REMOVE
-
 export class UpdateLayerFilterParamsAction extends BaseAction {
 
     private layerId!: number;

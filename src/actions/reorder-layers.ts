@@ -27,7 +27,7 @@ export class ReorderLayersAction extends BaseAction {
         for (let layerId of this.insertLayerIds) {
             const layer = getLayerById(layerId);
             if (!layer) {
-                throw new Error('Cannot find insert layer.');
+                throw new Error('Aborted - Cannot find insert layer.');
             }
             insertLayers.push(layer);
         }
@@ -48,7 +48,7 @@ export class ReorderLayersAction extends BaseAction {
         // Get layer object for reference layer inserting around
         let referenceLayer = getLayerById(this.referenceLayerId);
         if (!referenceLayer) {
-            throw new Error('Cannot find reference layer.');
+            throw new Error('Aborted - Cannot find reference layer.');
         }
 
         // Insert the layers and change group IDs
@@ -61,7 +61,7 @@ export class ReorderLayersAction extends BaseAction {
         } else {
             const referenceGroupLayer = referenceLayer as WorkingFileGroupLayer<ColorModel>;
             if (!referenceGroupLayer) {
-                throw new Error('Reference layer is not a group layer.');
+                throw new Error('Aborted - Reference layer is not a group layer.');
             }
             referenceGroupLayer.layers.splice(this.insertPosition === 'bottomChild' ? 0 : referenceGroupLayer.layers.length, 0, ...insertLayers);
             for (let layer of insertLayers) {
@@ -82,7 +82,7 @@ export class ReorderLayersAction extends BaseAction {
         for (let layerId of this.insertLayerIds) {
             const layer = getLayerById(layerId);
             if (!layer) {
-                throw new Error('Cannot find insert layer.');
+                throw new Error('Aborted - Cannot find insert layer.');
             }
             insertedLayers.push(layer);
         }
@@ -90,19 +90,19 @@ export class ReorderLayersAction extends BaseAction {
         // Get layer object for reference layer inserting around
         let referenceLayer = getLayerById(this.referenceLayerId);
         if (!referenceLayer) {
-            throw new Error('Cannot find reference layer.');
+            throw new Error('Aborted - Cannot find reference layer.');
         }
 
         // Remove layers from inserted positions
         if (this.insertPosition === 'below' || this.insertPosition === 'above') {
             let referenceParent = this.getLayerParent(this.referenceLayerId);
-            referenceParent.layers.splice(referenceParent.layers.indexOf(referenceLayer) + (this.insertPosition === 'below' ? -1 : 1), insertedLayers.length);
+            referenceParent.layers.splice(referenceParent.layers.indexOf(referenceLayer) + (this.insertPosition === 'below' ? -insertedLayers.length : 1), insertedLayers.length);
         } else {
             const referenceGroupLayer = referenceLayer as WorkingFileGroupLayer<ColorModel>;
             if (!referenceGroupLayer) {
-                throw new Error('Reference layer is not a group layer.');
+                throw new Error('Aborted - Reference layer is not a group layer.');
             }
-            referenceGroupLayer.layers.splice(this.insertPosition === 'bottomChild' ? 0 : referenceGroupLayer.layers.length - 1, insertedLayers.length);
+            referenceGroupLayer.layers.splice(this.insertPosition === 'bottomChild' ? 0 : referenceGroupLayer.layers.length - insertedLayers.length, insertedLayers.length);
         }
 
         // Place inserted layers back in their original positions
@@ -112,7 +112,7 @@ export class ReorderLayersAction extends BaseAction {
                 const groupId = previousPositions[i].groupId;
                 const layerParent = groupId == null ? workingFileStore.get('layers') : getGroupLayerById(groupId)?.layers;
                 if (!layerParent) {
-                    throw new Error('Could not find layer parent.')
+                    throw new Error('Aborted - Could not find layer parent.')
                 }
                 layerParent.splice(previousPositions[i].index, 0, layer);
                 layer.groupId = groupId;

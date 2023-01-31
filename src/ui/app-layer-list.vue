@@ -68,7 +68,16 @@
                 </span>
                 <span v-if="layer.filters?.length > 0" role="group" class="ogr-layer-attributes">
                     <span class="ogr-layer-attributes__title">
-                        <i class="bi bi-arrow-return-right" aria-hidden="true"></i> {{ $t('app.layerList.effects') }}
+                        <span class="is-flex is-flex-direction-row">
+                            <i class="bi bi-arrow-return-right mr-1" aria-hidden="true"></i>
+                            {{ $t('app.layerList.effects') }}
+                            <transition name="fade">
+                                <img v-if="layer.isBaking" src="../assets/images/loading-spinner.svg" class="is-align-self-center ml-3 mr-1" style="width: 1rem" />
+                            </transition>
+                            <transition name="fade">
+                                <span v-if="layer.isBaking" v-t="'app.layerList.recalculatingEffect'" class="has-color-primary" />
+                            </transition>
+                        </span>
                     </span>
                     <ul class="ogr-layer-effect-stack">
                         <li v-for="(filter, filterIndex) of layer.filters" :key="filterIndex">
@@ -76,10 +85,18 @@
                                 <i class="bi bi-pencil-square mr-1" aria-hidden="true"></i>
                                 <span v-t="`layerFilter.${filter.name}.name`"></span>
                             </el-button>
-                            <el-button link type="primary" class="px-2 my-0 ml-0" :aria-label="$t('app.layerList.moveEffectUp')">
+                            <el-button
+                                link type="primary" class="px-2 my-0 ml-0"
+                                :disabled="filterIndex === 0" :aria-label="$t('app.layerList.moveEffectUp')"
+                                @click="onMoveLayerFilterUp(layer, filterIndex)"
+                            >
                                 <i class="bi bi-chevron-up" aria-hidden="true"></i>
                             </el-button>
-                            <el-button link type="primary" class="px-2 my-0 ml-0" :aria-label="$t('app.layerList.moveEffectDown')">
+                            <el-button
+                                link type="primary" class="px-2 my-0 ml-0"
+                                :disabled="filterIndex === layer.filters.length - 1" :aria-label="$t('app.layerList.moveEffectDown')"
+                                @click="onMoveLayerFilterDown(layer, filterIndex)"
+                            >
                                 <i class="bi bi-chevron-down" aria-hidden="true"></i>
                             </el-button>
                         </li>
@@ -124,6 +141,7 @@ import { DeleteLayersAction } from '@/actions/delete-layers';
 import { SelectLayersAction } from '@/actions/select-layers';
 import { UpdateLayerAction } from '@/actions/update-layer';
 import { ReorderLayersAction } from '@/actions/reorder-layers';
+import { ReorderLayerFiltersAction } from '@/actions/reorder-layer-filters';
 import { runModule } from '@/modules';
 
 import type { WorkingFileAnyLayer, WorkingFileGroupLayer, ColorModel, WorkingFileRasterSequenceLayer } from '@/types';
@@ -429,6 +447,18 @@ export default defineComponent({
             })
         }
 
+        function onMoveLayerFilterUp(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
+            historyStore.dispatch('runAction', {
+                action: new ReorderLayerFiltersAction(layer.id, [filterIndex], filterIndex - 1, 'before')
+            });
+        }
+
+        function onMoveLayerFilterDown(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
+            historyStore.dispatch('runAction', {
+                action: new ReorderLayerFiltersAction(layer.id, [filterIndex], filterIndex + 1, 'after')
+            });
+        }
+
         function calculateDragOffsets() {
             dragItemOffsetCalculatedScrollTop = props.scrollTop;
             dragItemOffsets = [];
@@ -471,6 +501,8 @@ export default defineComponent({
             onPlayRasterSequence,
             onStopRasterSequence,
             onEditLayerFilter,
+            onMoveLayerFilterUp,
+            onMoveLayerFilterDown,
             reversedLayers
         };
     },

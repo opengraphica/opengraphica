@@ -7,7 +7,7 @@ import imageStore from './data/image-store';
 import { registerObjectUrlUser, revokeObjectUrlIfLastUser } from './data/memory-management';
 import { createImageFromBlob } from '@/lib/image';
 import canvasStore from '@/store/canvas';
-import workingFileStore, { getGroupLayerById, getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
+import workingFileStore, { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
 import { updateBakedImageForLayer } from './baking';
 
 export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorModel>> extends BaseAction {
@@ -28,6 +28,8 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
 	public async do() {
         super.do();
 
+        let requiresBaking: boolean = false;
+
         const layers = workingFileStore.get('layers');
         const layer = getLayerById(this.updateLayerOptions.id, layers);
         if (!layer) {
@@ -42,6 +44,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                             await imageStore.get(this.newRasterSourceImageDatabaseId) as Blob
                         );
                         layer.data.sourceImageIsObjectUrl = true;
+                        requiresBaking = true;
                     } else if (newData?.sourceImage) {
                         if (layer.data.sourceImage) {
                             try {
@@ -61,6 +64,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                         layer.data.sourceImage = newData.sourceImage;
                         layer.data.sourceImageIsObjectUrl = newData.sourceImageIsObjectUrl;
                         registerObjectUrlUser(layer.data.sourceImage.src, layer.id);
+                        requiresBaking = true;
                     }
                 }
                 // else if (layer.type === 'rasterSequence') {
@@ -80,7 +84,9 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
             }
         }
         regenerateLayerThumbnail(layer);
-        updateBakedImageForLayer(layer);
+        if (requiresBaking) {
+            updateBakedImageForLayer(layer);
+        }
 
         canvasStore.set('dirty', true);
 	}

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid" style="" viewBox="0 0 16 16" width="1rem" height="1rem">
+    <circle r="0" fill="none" stroke="#409eff" stroke-width="1" cx="8" cy="8">
+        <animate attributeName="r" repeatCount="indefinite" dur="1s" keyTimes="0;1" keySplines="0 0.2 0.8 1" calcMode="spline" begin="0s" values="0;8"></animate>
+        <animate attributeName="opacity" repeatCount="indefinite" dur="1s" values="1;0" keyTimes="0;1" keySplines="0.2 0 0.8 1" calcMode="spline" begin="0s"></animate>
+    </circle>
+    <circle r="0" fill="none" stroke-width="1" cx="8" cy="8" stroke="#409eff">
+        <animate attributeName="r" repeatCount="indefinite" dur="1s" keyTimes="0;1" keySplines="0 0.2 0.8 1" calcMode="spline" begin="-0.5s" values="0;8"></animate>
+        <animate attributeName="opacity" repeatCount="indefinite" dur="1s" values="1;0" keyTimes="0;1" keySplines="0.2 0 0.8 1" calcMode="spline" begin="-0.5s"></animate>
+    </circle>
+</svg>

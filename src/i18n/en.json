@@ -23,6 +23,7 @@
         "openFile": "Open File",
         "pasteLayers": "Paste Layer(s)",
         "reorderLayers": "Reorder Layer(s)",
+        "reorderLayerFilters": "Reorder Effect(s)",
         "selectLayers": "Select Layer(s)",
         "toggleLayerVisibilityOn": "Toggle Layer Visibility On",
         "toggleLayerVisibilityOff": "Toggle Layer Visibility Off",
@@ -50,6 +51,7 @@
             "editFrames": "Edit Frames",
             "emptyGroup": "Group is Empty.",
             "effects": "Effects",
+            "recalculatingEffect": "Processing...",
             "moveEffectUp": "Move Effect Up",
             "moveEffectDown": "Move Effect Down"
         },
@@ -221,7 +223,10 @@
             "name": "Decrease Color Depth"
         },
         "brightness": {
-            "name": "Brightness"
+            "name": "Brightness",
+            "param": {
+                "brightness": "Brightness"
+            }
         },
         "contrast": {
             "name": "Contrast"

@@ -1,6 +1,6 @@
 import { markRaw } from 'vue';
 import canvasStore from '@/store/canvas';
-import { getLayerById } from '@/store/working-file';
+import { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
 import { getImageDataFromImage, createImageFromImageData } from '@/lib/image';
 import { bakeCanvasFilters } from '@/workers';
 
@@ -14,12 +14,17 @@ export async function updateBakedImageForLayer(layerOrLayerId: WorkingFileAnyLay
         if (!layer.data.sourceImage) return;
         const sourceImageData = getImageDataFromImage(layer.data.sourceImage);
         try {
+            setTimeout(() => {
+                layer.isBaking = true;
+            }, 0);
             const newImageData = await bakeCanvasFilters(sourceImageData, layer.id, layer.filters);
             const bakedImage = await createImageFromImageData(newImageData);
             layer.bakedImage = markRaw(bakedImage);
+            layer.isBaking = false;
+            regenerateLayerThumbnail(layer);
             canvasStore.set('dirty', true);
         } catch (error) {
-            // Ignore
+            layer.isBaking = false;
         }
     }
 }

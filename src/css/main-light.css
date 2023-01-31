@@ -26421,6 +26421,9 @@ body.ogr-full-page .opengraphica {
 .opengraphica .el-text-alignment-fix--below {
   margin-bottom: 0.1em;
 }
+.opengraphica .has-color-primary {
+  color: var(--el-color-primary);
+}
 .opengraphica .has-text-color-primary {
   color: var(--el-text-color-primary);
 }

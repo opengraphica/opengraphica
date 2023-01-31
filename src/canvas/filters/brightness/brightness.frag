@@ -1,5 +1,5 @@
-uniform float brightness;
+uniform float pBrightness;
 
-void main() {
-    gl_FragColor = vec4(color.rgb * brightness, color.a);
+vec4 processBrightness(vec4 color) {
+    return vec4(color.rgb + pBrightness, color.a);
 }

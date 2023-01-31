@@ -40,6 +40,11 @@ export function bakeCanvasFilters(imageData: ImageData, layerId: number, filterC
         instructionQueue.splice(existingQueueIndex, 1);
     }
 
+    // Remove proxies from Vue config
+    for (let i = 0; i < filterConfigurations.length; i++) {
+        filterConfigurations[i] = toRaw(filterConfigurations[i]);
+    }
+
     return new Promise<ImageData>((resolve, reject) => {
         // Create new request for this layer.
         const queueId = queueIdCounter++;
@@ -54,7 +59,7 @@ export function bakeCanvasFilters(imageData: ImageData, layerId: number, filterC
             type: 'NEW_FILTER_BAKE',
             queueId,
             layerId,
-            imageData,
+            imageData: toRaw(imageData),
             filterConfigurations: toRaw(filterConfigurations)
         } as FilterNewBakeRequest);
     });
