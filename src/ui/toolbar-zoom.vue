@@ -59,6 +59,7 @@ import ElInputNumber from '@/ui/el-input-number.vue';
 import ElPopover from '@/ui/el-popover.vue';
 import appEmitter from '@/lib/emitter';
 import canvasStore from '@/store/canvas';
+import { throttle } from '@/lib/timing';
 
 export default defineComponent({
     name: 'ToolbarZoom',
@@ -79,10 +80,19 @@ export default defineComponent({
         'close'
     ],
     setup(props, { emit }) {
+        const { decomposedTransform } = toRefs(canvasStore.state);
+
+        const decomposedScaleX = ref(decomposedTransform.value.scaleX);
+        const decomposedRotation = ref(decomposedTransform.value.rotation);
+
+        watch([decomposedTransform], throttle(([decomposedTransform]) => {
+            decomposedScaleX.value = decomposedTransform.scaleX;
+            decomposedRotation.value = decomposedTransform.rotation;
+        }, 100), { immediate: true });
+
         const zoomLevel = computed<number>({
             get() {
-                const decomposedTransform = canvasStore.state.decomposedTransform;
-                return Math.round(decomposedTransform.scaleX * 100);
+                return Math.round(decomposedScaleX.value * 100);
             },
             set(value) {
                 canvasStore.dispatch('setTransformScale', value / 100);
@@ -90,8 +100,7 @@ export default defineComponent({
         });
         const rotationAngle = computed<number>({
             get() {
-                const decomposedTransform = canvasStore.state.decomposedTransform;
-                return Math.round(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES);
+                return Math.round(decomposedRotation.value * Math.RADIANS_TO_DEGREES);
             },
             set(value) {
                 canvasStore.dispatch('setTransformRotation', value * Math.DEGREES_TO_RADIANS);

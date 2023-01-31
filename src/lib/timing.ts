@@ -15,7 +15,7 @@ const CUBIC_BEIZER_EASE_IN_OUT = [.42, 0, .58, 1];
  * https://stackoverflow.com/questions/27078285/simple-throttle-in-js
  * @license CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/
  */
-export function throttle(func: any, wait: number, options?: ThrottleOptions) {
+export function throttle(func: (...args: any) => void, wait: number, options?: ThrottleOptions) {
     var context: any, args: any, result: any;
     var timeout: number | null = null;
     var previous = 0;
