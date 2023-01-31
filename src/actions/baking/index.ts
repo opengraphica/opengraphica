@@ -9,7 +9,10 @@ import type { WorkingFileAnyLayer, ColorModel } from '@/types';
 export async function updateBakedImageForLayer(layerOrLayerId: WorkingFileAnyLayer<ColorModel> | number) {
     const layer = typeof layerOrLayerId === 'number' ? getLayerById(layerOrLayerId) : layerOrLayerId;
     if (!layer) return;
-    if (!layer.filters || layer.filters.length === 0) return;
+    if (!layer.filters || layer.filters.length === 0) {
+        layer.bakedImage = null;
+        return;
+    }
     if (layer.type === 'raster') {
         if (!layer.data.sourceImage) return;
         const sourceImageData = getImageDataFromImage(layer.data.sourceImage);

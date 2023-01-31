@@ -244,9 +244,6 @@ export default defineComponent({
                     let beforeImageData = beforeEffectCanvasCtx.getImageData(0, 0, beforeEffectCanvasCtx.canvas.width, beforeEffectCanvasCtx.canvas.height);
                     const filterConfigurations = [...(layer.value?.filters ?? [])].slice(0, props.filterIndex);
                     beforeImageData = await bakeCanvasFilters(beforeImageData, 999999999 + Math.floor(Math.random() * 1000), filterConfigurations);
-                    // for (let i = 0; i < props.filterIndex; i++) {
-                        // beforeImageData = applyCanvasFilter(beforeImageData, canvasFilters[i]);
-                    // }
                     beforeEffectCanvasCtx.putImageData(beforeImageData, 0, 0);
                     if (isUseWebGlPreview) {
                         await initializeThreejs(afterEffectCanvas);
