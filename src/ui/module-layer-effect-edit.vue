@@ -33,9 +33,9 @@
             class="mt-3"
             @submit="onConfirm"
         >
-            <template v-for="(editConfigField, paramName) in currentFilterEditConfig" :key="paramName">
-                <el-form-item-group>
-                    <el-form-item :label="$t(`layerFilter.${currentFilterName}.param.${paramName}`)">
+            <el-form-item-group>
+                <template v-for="(editConfigField, paramName) in currentFilterEditConfig" :key="paramName">
+                    <el-form-item v-if="!editConfigField.hidden" :label="$t(`layerFilter.${currentFilterName}.param.${paramName}`)">
                         <template v-if="editConfigField.type === 'percentage'">
                             <el-row>
                                 <el-col :span="16" :xs="14">
@@ -61,9 +61,19 @@
                                 </el-col>
                             </el-row>
                         </template>
+                        <template v-else-if="editConfigField.type === 'integer' && editConfigField.options">
+                            <el-select v-model="formData.filterParams[paramName]">
+                                <el-option
+                                    v-for="option of editConfigField.options"
+                                    :key="option.key"
+                                    :label="$t(`layerFilter.${currentFilterName}.param.${paramName}Options.${option.key}`)"
+                                    :value="option.value"
+                                />
+                            </el-select>
+                        </template>
                     </el-form-item>
-                </el-form-item-group>
-            </template>
+                </template>
+            </el-form-item-group>
         </el-form>
         <div class="has-text-right">
             <el-divider />
@@ -90,6 +100,7 @@ import ElFormItemGroup from '@/ui/el-form-item-group.vue';
 import ElInputNumber from '@/ui/el-input-number.vue';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import ElSlider from 'element-plus/lib/components/slider/index';
+import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSwitch from 'element-plus/lib/components/switch/index';
 import ElRow from 'element-plus/lib/components/row/index';
 import historyStore from '@/store/history';
@@ -99,7 +110,7 @@ import { throttle } from '@/lib/timing';
 import layerRenderers from '@/canvas/renderers';
 import { createImageBlobFromCanvas } from '@/lib/image';
 import { isWebGLAvailable } from '@/lib/webgl';
-import { createFiltersFromLayerConfig, getCanvasFilterClass, applyCanvasFilter, buildCanvasFilterPreviewParams, generateShaderUniforms, combineShaders } from '@/canvas/filters';
+import { buildCanvasFilterParamsFromFormData, createFiltersFromLayerConfig, applyCanvasFilter, generateShaderUniformsAndDefines, combineShaders } from '@/canvas/filters';
 import { UpdateLayerFilterDisabledAction } from '@/actions/update-layer-filter-disabled';
 import { UpdateLayerFilterParamsAction } from '@/actions/update-layer-filter-params';
 import { DeleteLayerFilterAction } from '@/actions/delete-layer-filter';
@@ -136,7 +147,9 @@ export default defineComponent({
         ElFormItem,
         ElFormItemGroup,
         ElInputNumber,
+        ElOption,
         ElRow,
+        ElSelect,
         ElSlider,
         ElSwitch
     },
@@ -230,7 +243,8 @@ export default defineComponent({
             if (currentFilterEditConfig && currentFilter) {
                 formData.filterParams = {};
                 for (const paramName in currentFilterEditConfig) {
-                    formData.filterParams[paramName] = currentFilter.params[paramName] ?? currentFilterEditConfig[paramName].default;
+                    const paramConfig = currentFilterEditConfig[paramName];
+                    formData.filterParams[paramName] = currentFilter.params[paramName] ?? paramConfig.default;
                 }
             }
         }, { immediate: true });
@@ -354,6 +368,7 @@ export default defineComponent({
                 vertexShader: combinedShaderResult.vertexShader,
                 fragmentShader: combinedShaderResult.fragmentShader,
                 side: DoubleSide,
+                defines: combinedShaderResult.defines,
                 uniforms: {
                     map: { value: previewTexture },
                     ...combinedShaderResult.uniforms
@@ -409,13 +424,11 @@ export default defineComponent({
         }
 
         function buildEditParamsFromFromData(): Record<string, unknown> {
-            const params: Record<string, unknown> = {};
-            if (currentFilterEditConfig.value) {
-                for (const paramName in currentFilterEditConfig.value) {
-                    params[paramName] = formData.filterParams[paramName];
-                }
+            if (currentFilter.value) {
+                return buildCanvasFilterParamsFromFormData(currentFilter.value, formData.filterParams);
+            } else {
+                return {};
             }
-            return params;
         }
 
         const updatePreview = throttle(function () {
@@ -425,7 +438,10 @@ export default defineComponent({
             if (isUseWebGlPreview) {
                 if (threejsRenderer && previewMaterial) {
                     currentFilter.value.params = buildEditParamsFromFromData();
-                    const newUniforms = generateShaderUniforms([currentFilter.value]);
+                    const { uniforms: newUniforms, defines: newDefines } = generateShaderUniformsAndDefines([currentFilter.value]);
+                    for (const defineName in newDefines) {
+                        previewMaterial.defines[defineName] = newDefines[defineName];
+                    }
                     for (const uniformName in newUniforms) {
                         previewMaterial.uniforms[uniformName] = newUniforms[uniformName];
                     }

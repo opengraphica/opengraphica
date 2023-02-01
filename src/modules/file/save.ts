@@ -30,6 +30,7 @@ export async function saveImageAs(options: SaveImageAsOptions = {}) {
 export async function saveImageToTemporaryStorage() {
     const serializedFile = serializeWorkingFile();
     try {
+        localStorage.removeItem('openGraphicaSave_0');
         localStorage.setItem('openGraphicaSave_0', JSON.stringify(serializedFile));
     } catch (error) {
         console.warn(error);

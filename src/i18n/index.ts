@@ -9,5 +9,7 @@ const i18n = createI18n({
     }
 });
 
+export const { t } = i18n.global;
+
 export { useI18n } from 'vue-i18n';
 export default i18n;

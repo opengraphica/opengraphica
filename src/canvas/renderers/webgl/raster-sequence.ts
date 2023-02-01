@@ -35,6 +35,7 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
             depthTest: false,
             vertexShader: combinedShaderResult.vertexShader,
             fragmentShader: combinedShaderResult.fragmentShader,
+            defines: combinedShaderResult.defines,
             uniforms: {
                 map: { value: null },
                 ...combinedShaderResult.uniforms
@@ -121,6 +122,7 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
                 depthTest: false,
                 vertexShader: combinedShaderResult.vertexShader,
                 fragmentShader: combinedShaderResult.fragmentShader,
+                defines: combinedShaderResult.defines,
                 uniforms: {
                     map: { value: map?.value },
                     ...combinedShaderResult.uniforms

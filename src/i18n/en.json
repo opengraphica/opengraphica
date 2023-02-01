@@ -216,20 +216,38 @@
         }
     },
     "layerFilter": {
-        "colorCorrection": {
-            "name": "Color Correction"
-        },
-        "decreaseColorDepth": {
-            "name": "Decrease Color Depth"
-        },
         "brightness": {
             "name": "Brightness",
             "param": {
                 "brightness": "Brightness"
             }
         },
+        "colorBlindness": {
+            "name": "Color Blindness",
+            "param": {
+                "method": "Simulation Method",
+                "methodOptions": {
+                    "brettel": "Brettel 1997",
+                    "vienot": "Viénot 1999"
+                },
+                "type": "Blindness Type",
+                "typeOptions": {
+                    "protan": "Protanopia / Protanomaly (Red-Blind)",
+                    "deuteran": "Deuteranopia / Deuteranomaly (Green-Blind)",
+                    "tritan": "Tritanopia / Tritanomaly (Blue-Blind)",
+                    "achroma": "Achromatomaly / Achromatopsia (Red/Green/Blue-Blind)"
+                },
+                "severity": "Severity"
+            }
+        },
+        "colorCorrection": {
+            "name": "Color Correction"
+        },
         "contrast": {
             "name": "Contrast"
+        },
+        "decreaseColorDepth": {
+            "name": "Decrease Color Depth"
         },
         "grayscale": {
             "name": "Grayscale",

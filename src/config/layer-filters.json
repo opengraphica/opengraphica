@@ -34,5 +34,9 @@
     "sepia": {
         "name": "layerFilter.sepia.name",
         "group": "color"
+    },
+    "colorBlindness": {
+        "name": "layerFilter.colorBlindness.name",
+        "group": "color"
     }
 }

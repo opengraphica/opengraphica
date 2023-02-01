@@ -16,6 +16,7 @@ import { runModule } from '@/modules';
 import { KeyboardMapConfigCategory } from '@/types';
 import { BundleAction } from '@/actions/bundle';
 import { InsertLayerAction } from '@/actions/insert-layer';
+import { t } from '@/i18n';
 
 export const isCtrlKeyPressed = ref<boolean>(false);
 export const isMetaKeyPressed = ref<boolean>(false);
@@ -70,7 +71,7 @@ export function buildShortcutKeyMap(keyboardMapConfig: KeyboardMapConfigCategory
 }
 buildShortcutKeyMap(defaultKeyboardMapConfig as any);
 
-function onDocumentKeyDown(e: KeyboardEvent) {
+async function onDocumentKeyDown(e: KeyboardEvent) {
     if (e.key === 'Control') {
         isCtrlKeyPressed.value = true;
         isCtrlOrMetaKeyPressed.value = true;
@@ -109,7 +110,15 @@ function onDocumentKeyDown(e: KeyboardEvent) {
                         appEmitter.emit('app.dialogs.openFromDock', { name: shortcut.action.target });
                     } else if (shortcut.action.type === 'runModule') {
                         const actionSplit = shortcut.action.target.split('/');
-                        runModule(actionSplit[0], actionSplit[1]);
+                        try {
+                            await runModule(actionSplit[0], actionSplit[1]);
+                        } catch (error) {
+                            appEmitter.emit('app.notify', {
+                                title: t(`moduleGroup.${actionSplit[0]}.modules.${actionSplit[1]}.name`),
+                                message: 'Error running action: ' + error,
+                                duration: 5000
+                            });
+                        }
                     } else if (shortcut.action.type === 'appEmit') {
                         appEmitter.emit(shortcut.action.target as any);
                     }

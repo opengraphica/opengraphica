@@ -7,23 +7,48 @@ export interface CanvasViewResetOptions {
     margin?: number;
 };
 
-export interface CanvasFilterEditConfigFloat {
+export interface CanvasFilterEditConfigFieldCommon {
+    isConstant?: boolean;
+    hidden?: boolean;
+    min?: number;
+    max?: number;
+}
+
+export interface CanvasFilterEditConfigIntegerOption {
+    key: string;
+    value: number;
+}
+
+export interface CanvasFilterEditConfigInteger extends CanvasFilterEditConfigFieldCommon {
+    type: 'integer';
+    default: number;
+    preview?: number;
+    options?: CanvasFilterEditConfigIntegerOption[];
+}
+
+export interface CanvasFilterEditConfigFloat extends CanvasFilterEditConfigFieldCommon {
     type: 'float';
     default: number;
     preview?: number;
-    min?: number;
-    max?: number;
 }
 
-export interface CanvasFilterEditConfigPercentage {
+export interface CanvasFilterEditConfigComputedFloat extends CanvasFilterEditConfigFieldCommon {
+    type: 'computedFloat';
+    default: number;
+    preview?: number;
+    valueMap: {
+        referenceParam: string;
+        map: { [key: number]: number };
+    }
+}
+
+export interface CanvasFilterEditConfigPercentage extends CanvasFilterEditConfigFieldCommon {
     type: 'percentage';
     default: number;
     preview?: number;
-    min?: number;
-    max?: number;
 }
 
-export type CanvasFilterEditConfigField = CanvasFilterEditConfigFloat | CanvasFilterEditConfigPercentage;
+export type CanvasFilterEditConfigField = CanvasFilterEditConfigInteger | CanvasFilterEditConfigFloat | CanvasFilterEditConfigPercentage | CanvasFilterEditConfigComputedFloat;
 
 export interface CanvasFilterEditConfig {
     [key: string]: CanvasFilterEditConfigField;

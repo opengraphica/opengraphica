@@ -51,6 +51,7 @@ export default class GroupLayerRenderer extends BaseLayerRenderer {
             depthTest: false,
             vertexShader: combinedShaderResult.vertexShader,
             fragmentShader: combinedShaderResult.fragmentShader,
+            defines: combinedShaderResult.defines,
             uniforms: {
                 map: { value: texture },
                 ...combinedShaderResult.uniforms
