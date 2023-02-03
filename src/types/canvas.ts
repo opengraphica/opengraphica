@@ -24,6 +24,7 @@ export interface CanvasFilterEditConfigInteger extends CanvasFilterEditConfigFie
     default: number;
     preview?: number;
     options?: CanvasFilterEditConfigIntegerOption[];
+    optionsHaveDescriptions?: boolean;
 }
 
 export interface CanvasFilterEditConfigFloat extends CanvasFilterEditConfigFieldCommon {

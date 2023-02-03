@@ -226,12 +226,12 @@
             "name": "Color Blindness",
             "param": {
                 "method": "Simulation Method",
-                "methodOptions": {
+                "methodOption": {
                     "brettel": "Brettel 1997",
                     "vienot": "Viénot 1999"
                 },
                 "type": "Blindness Type",
-                "typeOptions": {
+                "typeOption": {
                     "protan": "Protanopia / Protanomaly (Red-Blind)",
                     "deuteran": "Deuteranopia / Deuteranomaly (Green-Blind)",
                     "tritan": "Tritanopia / Tritanomaly (Blue-Blind)",
@@ -244,7 +244,11 @@
             "name": "Color Correction"
         },
         "contrast": {
-            "name": "Contrast"
+            "name": "Contrast",
+            "param": {
+                "contrast": "Contrast",
+                "middleGray": "Middle Gray"
+            }
         },
         "decreaseColorDepth": {
             "name": "Decrease Color Depth"
@@ -252,7 +256,22 @@
         "grayscale": {
             "name": "Grayscale",
             "param": {
-                "percentage": "Percentage"
+                "mode": "Mode",
+                "modeOption": {
+                    "luminance": "Luminance",
+                    "luma": "Luma",
+                    "lightness": "Lightness (HSL)",
+                    "average": "Average (HSI Intensity)",
+                    "value": "Value (HSV)"
+                },
+                "modeOptionDescription": {
+                    "luminance": "= (0.22 × R) + (0.72 × G) + (0.06 × B) as linearized RGB",
+                    "luma": "= (0.22 × R) + (0.72 × G) + (0.06 × B) as non-linearized RGB",
+                    "lightness": "= ½ × (max(R,G,B) + min(R,G,B))",
+                    "average": "= (R + G + B) ÷ 3",
+                    "value": "= max(R,G,B)"
+                },
+                "mix": "Mix"
             }
         },
         "hueRotate": {
@@ -487,6 +506,7 @@
             "generalError": "Something went wrong. If you keep seeing this message, please report this as a bug.",
             "deleteEffect": "Delete Effect",
             "enableToggle": "Enable",
+            "resetField": "Reset Field",
             "deleting": "Deleting effect...",
             "deleteFilterError": "An error occurred while attempting to delete the filter. If you keep seeing this message, please report this as a bug.",
             "applyFilterError": "An error occurred while attempting to apply the filter changes. If you keep seeing this message, please report this as a bug."

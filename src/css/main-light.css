@@ -7732,6 +7732,9 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-menu-drawer__content .ogr-layer-list:last-child {
   border-bottom-right-radius: 0.8rem;
 }
+.opengraphica .ogr-menu-bar-button--hover-title {
+  position: relative;
+}
 .opengraphica .ogr-layout-dnd-container {
   display: flex;
   flex-direction: column;
@@ -26716,6 +26719,18 @@ body.ogr-full-page .opengraphica {
   animation: none !important;
   transition: none !important;
 }
+.opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content {
+  position: relative;
+}
+.opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content > .el-row, .opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content > .el-input, .opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content > .el-select {
+  width: calc(100% - 2rem);
+}
+.opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content .el-button.el-button--form-item-reset {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
 .opengraphica .el-horizontal-scrollbar-arrows {
   display: flex;
   flex-direction: row;
@@ -26854,6 +26869,9 @@ body.ogr-full-page .opengraphica {
   padding: 0.5625rem 0.9375rem;
   font-size: 0.75rem;
   border-radius: 0;
+}
+.opengraphica .el-select-dropdown--unlocked-option-height .el-select-dropdown__item {
+  height: auto !important;
 }
 .opengraphica .el-switch.is-checked .el-switch__core .el-switch__action {
   left: calc(100% - var(--el-switch-button-size) - 0.0625rem);

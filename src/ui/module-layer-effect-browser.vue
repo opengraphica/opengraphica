@@ -35,13 +35,14 @@ import ElAutoGrid from './el-auto-grid.vue';
 import ElCard from 'element-plus/lib/components/card/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import historyStore from '@/store/history';
-import workingFileStore, { getSelectedLayers } from '@/store/working-file';
+import workingFileStore, { getLayerById, getSelectedLayers } from '@/store/working-file';
 import { notifyInjector } from '@/lib/notify';
 import layerRenderers from '@/canvas/renderers';
 import { createImageBlobFromCanvas } from '@/lib/image';
 import { getCanvasFilterClass, applyCanvasFilter, buildCanvasFilterPreviewParams } from '@/canvas/filters';
 import { AddLayerFilterAction } from '@/actions/add-layer-filter';
 import { BundleAction } from '@/actions/bundle';
+import { runModule } from '@/modules';
 
 import type { WorkingFileLayerFilter } from '@/types';
 
@@ -179,6 +180,12 @@ export default defineComponent({
             historyStore.dispatch('runAction', {
                 action: new BundleAction('addLayerFilterMultiple', 'action.addLayerFilterMultiple', addFilterActions)
             });
+            setTimeout(() => {
+                runModule('image', 'layerEffectEdit', {
+                    layerId: selectedLayerIds[0],
+                    filterIndex: (getLayerById(selectedLayerIds[0])?.filters.length ?? 1) - 1
+                });
+            }, 0)
             emit('close');
         }
         

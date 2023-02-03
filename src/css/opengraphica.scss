@@ -1119,6 +1119,19 @@ body.ogr-full-page {
     .ogr-menu-drawer__content .ogr-layer-list:last-child {
         border-bottom-right-radius: .8rem;
     }
+    .ogr-menu-bar-button--hover-title {
+        position: relative;
+        // &:hover::before {
+        //     content: attr(aria-label);
+        //     position: absolute;
+        //     border-radius: 100rem;
+        //     padding-left: 3rem;
+        //     top: 0;
+        //     left: 0;
+        //     bottom: 0;
+        //     width: auto;
+        // }
+    }
     
     .ogr-layout-dnd-container {
         display: flex;

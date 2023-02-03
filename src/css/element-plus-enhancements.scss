@@ -381,6 +381,25 @@
                 }
             }
         }
+
+        &.el-form-item-group--resetable {
+            .el-form-item {
+                > .el-form-item__content {
+                    position: relative;
+
+                    > .el-row, > .el-input, > .el-select {
+                        width: calc(100% - 2rem);
+                    }
+
+                    .el-button.el-button--form-item-reset {
+                        position: absolute;
+                        right: 0;
+                        top: 0;
+                        bottom: 0;
+                    }
+                }
+            }
+        }
     }
 
     .el-horizontal-scrollbar-arrows {
@@ -556,6 +575,12 @@
             padding: 0.5625rem 0.9375rem;
             font-size: 0.75rem;
             border-radius: 0;
+        }
+    }
+
+    .el-select-dropdown--unlocked-option-height {
+        .el-select-dropdown__item {
+            height: auto !important;
         }
     }
 

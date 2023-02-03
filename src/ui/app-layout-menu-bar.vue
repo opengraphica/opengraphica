@@ -23,7 +23,7 @@
                             <template v-for="control of actionGroup.controls" :key="control.label">
                                 <el-popover
                                     v-model:visible="control.popoverVisible"
-                                    :trigger="'manual'"
+                                    :trigger="[]"
                                     effect="light"
                                     :placement="popoverPlacement"
                                     :popper-class="'ogr-dock-popover'"
@@ -41,6 +41,7 @@
                                             :circle="!control.expanded"
                                             :round="control.expanded"
                                             :class="{
+                                                'ogr-menu-bar-button--hover-title': !control.expanded,
                                                 'el-button--expanded-group': control.expanded,
                                                 'el-button--expanded-popover': control.showDock
                                             }"
@@ -273,14 +274,18 @@ export default defineComponent({
             onPointerUpControlButton(event, control);
         }
         function onMouseEnterControlButton(event: MouseEvent, control: LayoutShortcutGroupDefinitionControlButton) {
-            if (!(control.showDock || control.expanded)) {
-                control.popoverVisible = true;
-            }
+            // if (!(control.showDock || control.expanded)) {
+            //     if (!control.popoverVisible) {
+            //         control.popoverVisible = true;
+            //     }
+            // }
         }
         function onMouseLeaveControlButton(event: MouseEvent, control: LayoutShortcutGroupDefinitionControlButton) {
-            if (!(control.showDock || control.expanded)) {
-                control.popoverVisible = false;
-            }
+            // if (!(control.showDock || control.expanded)) {
+            //     if (control.popoverVisible) {
+            //         control.popoverVisible = false;
+            //     }
+            // }
             clearTimeout(pointerPressHoldTimeoutHandle);
         }
         function onMouseDownWindow(event: MouseEvent) {
@@ -380,7 +385,9 @@ export default defineComponent({
                                 } else {
                                     activeControlDock = control;
                                     control.showDock = true;
-                                    control.popoverVisible = true;
+                                    if (!control.popoverVisible) {
+                                        control.popoverVisible = true;
+                                    }
                                     appEmitter.emit('app.menuDrawer.closeAll');
                                 }
                             } else {

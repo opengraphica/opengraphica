@@ -33,7 +33,7 @@
             class="mt-3"
             @submit="onConfirm"
         >
-            <el-form-item-group>
+            <el-form-item-group class="el-form-item-group--resetable">
                 <template v-for="(editConfigField, paramName) in currentFilterEditConfig" :key="paramName">
                     <el-form-item v-if="!editConfigField.hidden" :label="$t(`layerFilter.${currentFilterName}.param.${paramName}`)">
                         <template v-if="editConfigField.type === 'percentage'">
@@ -60,16 +60,37 @@
                                     </el-input-number>
                                 </el-col>
                             </el-row>
+                            <el-button
+                                link type="primary" class="el-button--form-item-reset"
+                                :disabled="isFilterParamDefault(paramName, editConfigField)"
+                                :aria-label="$t('module.layerEffectEdit.resetField')"
+                                @click="resetFilterParam(paramName, editConfigField)">
+                                <span class="bi bi-arrow-repeat" aria-hidden="true" />
+                            </el-button>
                         </template>
                         <template v-else-if="editConfigField.type === 'integer' && editConfigField.options">
-                            <el-select v-model="formData.filterParams[paramName]">
+                            <el-select v-model="formData.filterParams[paramName]" popper-class="el-select-dropdown--unlocked-option-height">
                                 <el-option
                                     v-for="option of editConfigField.options"
                                     :key="option.key"
-                                    :label="$t(`layerFilter.${currentFilterName}.param.${paramName}Options.${option.key}`)"
+                                    :label="$t(`layerFilter.${currentFilterName}.param.${paramName}Option.${option.key}`)"
                                     :value="option.value"
-                                />
+                                >
+                                    <div style="line-height: 1.4em" class="py-2">
+                                        <div>{{ $t(`layerFilter.${currentFilterName}.param.${paramName}Option.${option.key}`) }}</div>
+                                        <div v-if="editConfigField.optionsHaveDescriptions" class="has-text-color-placeholder">
+                                            {{ $t(`layerFilter.${currentFilterName}.param.${paramName}OptionDescription.${option.key}`) }}
+                                        </div>
+                                    </div>
+                                </el-option>
                             </el-select>
+                            <el-button
+                                link type="primary" class="el-button--form-item-reset"
+                                :disabled="isFilterParamDefault(paramName, editConfigField)"
+                                :aria-label="$t('module.layerEffectEdit.resetField')"
+                                @click="resetFilterParam(paramName, editConfigField)">
+                                <span class="bi bi-arrow-repeat" aria-hidden="true" />
+                            </el-button>
                         </template>
                     </el-form-item>
                 </template>
@@ -338,6 +359,14 @@ export default defineComponent({
             return editConfig.max ?? 1;
         }
 
+        function isFilterParamDefault(fieldName: string, editConfig: CanvasFilterEditConfigField) {
+            return formData.filterParams[fieldName] === editConfig.default;
+        }
+
+        function resetFilterParam(fieldName: string, editConfig: CanvasFilterEditConfigField) {
+            formData.filterParams[fieldName] = editConfig.default;
+        }
+
         async function initializeThreejs(canvas: HTMLCanvasElement) {
             if (!currentFilter.value || !beforeEffectCanvas.value) return;
             const width = canvas.width;
@@ -478,16 +507,17 @@ export default defineComponent({
 
         async function onConfirm() {
             if (layer.value && currentFilterConfig.value) {
+                const layerId = layer.value.id;
                 let actions = [];
                 if ((currentFilterEnabled.value === true) !== ((!currentFilterConfig.value.disabled) === true)) {
                     actions.push(
-                        new UpdateLayerFilterDisabledAction(layer.value.id, props.filterIndex, !currentFilterEnabled.value)
+                        new UpdateLayerFilterDisabledAction(layerId, props.filterIndex, !currentFilterEnabled.value)
                     );
                 }
                 const newParams = buildEditParamsFromFromData();
                 if (isParamsChanged(currentFilterConfig.value.params, newParams)) {
                     actions.push(
-                        new UpdateLayerFilterParamsAction(layer.value.id, props.filterIndex, newParams)
+                        new UpdateLayerFilterParamsAction(layerId, props.filterIndex, newParams)
                     );
                 }
                 if (actions.length > 0) {
@@ -519,6 +549,8 @@ export default defineComponent({
             formValidationRules,
             getEditConfigMin,
             getEditConfigMax,
+            isFilterParamDefault,
+            resetFilterParam,
             onDelete,
             onCancel,
             onConfirm
