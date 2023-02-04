@@ -1,4 +1,5 @@
 import fragmentShader from './brightness.frag';
+import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData } from '../color-space';
 
 import type { CanvasFilter, CanvasFilterEditConfig } from '@/types';
 

@@ -4,12 +4,13 @@ import canvasStore from '@/store/canvas';
 import BaseLayerRenderer from './base';
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
-import { DoubleSide, NearestFilter } from 'three/src/constants';
+import { DoubleSide, NearestFilter, sRGBEncoding } from 'three/src/constants';
 import { Mesh } from 'three/src/objects/Mesh';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { Texture } from 'three/src/textures/Texture';
 import { CanvasTexture } from 'three/src/textures/CanvasTexture';
 import { createFiltersFromLayerConfig, combineShaders } from '../../filters';
+import { createRasterShaderMaterial } from './shaders';
 
 export default class RasterLayerRenderer extends BaseLayerRenderer {
     private stopWatchVisible: WatchStopHandle | undefined;
@@ -26,20 +27,10 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
 
     async onAttach(layer: WorkingFileRasterLayer<ColorModel>) {
         const combinedShaderResult = combineShaders(
-            await createFiltersFromLayerConfig(layer.filters)
+            await createFiltersFromLayerConfig(layer.filters),
+            layer
         );
-        this.material = new ShaderMaterial({
-            transparent: true,
-            side: DoubleSide,
-            depthTest: false,
-            vertexShader: combinedShaderResult.vertexShader,
-            fragmentShader: combinedShaderResult.fragmentShader,
-            defines: combinedShaderResult.defines,
-            uniforms: {
-                map: { value: null },
-                ...combinedShaderResult.uniforms
-            }
-        });
+        this.material = createRasterShaderMaterial(null, combinedShaderResult);
         this.plane = new Mesh(this.planeGeometry, this.material);
         this.plane.renderOrder = this.order + 0.1;
         this.plane.matrixAutoUpdate = false;
@@ -97,29 +88,20 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
         }
         if (updates.filters) {
             const combinedShaderResult = combineShaders(
-                await createFiltersFromLayerConfig(updates.filters)
+                await createFiltersFromLayerConfig(updates.filters),
+                { width: this.sourceTexture?.image.width, height: this.sourceTexture?.image.height }
             );
             const map = this.material?.uniforms.map;
             delete this.material?.uniforms.map;
             this.material?.dispose();
-            this.material = new ShaderMaterial({
-                transparent: true,
-                side: DoubleSide,
-                depthTest: false,
-                vertexShader: combinedShaderResult.vertexShader,
-                fragmentShader: combinedShaderResult.fragmentShader,
-                defines: combinedShaderResult.defines,
-                uniforms: {
-                    map: { value: map?.value },
-                    ...combinedShaderResult.uniforms
-                }
-            });
+            this.material = createRasterShaderMaterial(map?.value, combinedShaderResult);
             this.plane && (this.plane.material = this.material);
         }
         if (updates.data) {
             if (updates.data.draftImage) {
                 this.draftTexture?.dispose();
                 this.draftTexture = new CanvasTexture(updates.data.draftImage);
+                this.draftTexture.encoding = sRGBEncoding;
                 this.draftTexture.magFilter = NearestFilter;
                 this.material && (this.material.uniforms.map.value = this.draftTexture);
             } else {
@@ -135,6 +117,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                             canvasStore.set('dirty', true);
                         }
                     );
+                    this.sourceTexture.encoding = sRGBEncoding;
                     this.sourceTexture.magFilter = NearestFilter;
                     this.material && (this.material.uniforms.map.value = this.sourceTexture);
                 } else {

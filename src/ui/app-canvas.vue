@@ -15,7 +15,7 @@
 import { defineComponent, ref, Ref, computed, watch, watchEffect, inject, toRefs, onMounted, onUnmounted, markRaw } from 'vue';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
-import workingFileStore from '@/store/working-file';
+import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import preferencesStore from '@/store/preferences';
 import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset, selectedLayersSelectionMaskPreview, selectedLayersSelectionMaskPreviewCanvasOffset } from '@/canvas/store/selection-state';
 import AppCanvasOverlays from '@/ui/app-canvas-overlays.vue';
@@ -234,12 +234,13 @@ export default defineComponent({
                     const { PlaneGeometry } = await import('three/src/geometries/PlaneGeometry');
                     const { MeshBasicMaterial } = await import('three/src/materials/MeshBasicMaterial');
                     const { Mesh } = await import('three/src/objects/Mesh');
-                    const { DoubleSide } = await import('three/src/constants');
+                    const { DoubleSide, sRGBEncoding } = await import('three/src/constants');
                     try {
                         const threejsRenderer = new WebGLRenderer({
                             alpha: true,
                             canvas: canvas.value
                         });
+                        threejsRenderer.outputEncoding = sRGBEncoding;
                         threejsRenderer.setSize(1, 1);
                         canvasStore.set('threejsRenderer', threejsRenderer);
                         const threejsScene = markRaw(new Scene());
@@ -268,11 +269,11 @@ export default defineComponent({
                 // Above can fail and default back to 2d.
                 if (renderer === '2d') {
                     // Set up buffer canvas
-                    const originalCtx = canvas.value.getContext('2d');
+                    const originalCtx = canvas.value.getContext('2d', getCanvasRenderingContext2DSettings());
                     const bufferCanvas = document.createElement('canvas');
                     bufferCanvas.width = useCssViewport.value === true ? 10 : imageWidth;
                     bufferCanvas.height = useCssViewport.value === true ? 10 : imageHeight;
-                    let bufferCtx: CanvasRenderingContext2D = bufferCanvas.getContext('2d') as CanvasRenderingContext2D;
+                    let bufferCtx: CanvasRenderingContext2D = bufferCanvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
                     if (originalCtx && bufferCtx) {
                         // Assign view canvas
                         ctx = originalCtx;
@@ -302,7 +303,7 @@ export default defineComponent({
             }
             if (selectionMaskCanvas.value) {
                 canvasStore.set('selectionMaskCanvas', selectionMaskCanvas.value);
-                selectionMaskCanvasCtx = selectionMaskCanvas.value.getContext('2d');
+                selectionMaskCanvasCtx = selectionMaskCanvas.value.getContext('2d', getCanvasRenderingContext2DSettings());
                 selectionMaskPattern.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAABg2lDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV/TiiIVh3YQcchQnVoQFXHUKhShQqgVWnUwufQLmjQkKS6OgmvBwY/FqoOLs64OroIg+AHi6OSk6CIl/i8ptIjx4Lgf7+497t4BQrPKNCs0Dmi6bWZSSTGXXxV7XyEgghDiCMjMMuYkKQ3f8XWPAF/vEjzL/9yfY0AtWAwIiMSzzDBt4g3i6U3b4LxPHGVlWSU+J46bdEHiR64rHr9xLrks8Myomc3ME0eJxVIXK13MyqZGPEUcUzWd8oWcxyrnLc5atc7a9+QvDBf0lWWu0xxBCotYggQRCuqooAobCVp1UixkaD/p4x92/RK5FHJVwMixgBo0yK4f/A9+d2sVJye8pHAS6HlxnI9RoHcXaDUc5/vYcVonQPAZuNI7/loTmPkkvdHRYkfA4DZwcd3RlD3gcgcYejJkU3alIE2hWATez+ib8kDkFuhf83pr7+P0AchSV+kb4OAQGCtR9rrPu/u6e/v3TLu/Hx5FcoXj45C+AAAABmJLR0QATgBOAE714JEKAAAACXBIWXMAAC4jAAAuIwF4pT92AAAAB3RJTUUH5gITBDkEOkUYUQAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAAtSURBVAjXY/z//383AxT4+/szMCFzNm7cCBGAcRgYGBiYz58/7wbjMDAwMAAAGKUPRK2REh8AAAAASUVORK5CYII=';
             }
         });

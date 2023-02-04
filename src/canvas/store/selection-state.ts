@@ -1,6 +1,6 @@
 import mitt from 'mitt';
 import { ref, reactive } from 'vue';
-import workingFileStore from '@/store/working-file';
+import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
 import { createImageFromCanvas, getImageDataEmptyBounds } from '@/lib/image';
 
@@ -150,7 +150,7 @@ export async function previewSelectedLayersSelectionMask() {
     let workingCanvas = document.createElement('canvas');
     workingCanvas.width = workingFileStore.get('width');
     workingCanvas.height = workingFileStore.get('height');
-    let ctx = workingCanvas.getContext('2d');
+    let ctx = workingCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
     if (!ctx) throw new Error('Couldn\'t draw to a new canvas when trying to apply selection mask.');
     ctx.imageSmoothingEnabled = false;
     ctx.fillStyle = '#000000';
@@ -219,7 +219,7 @@ export async function createActiveSelectionMask(activeSelectionBounds: Selection
     const workingCanvas = document.createElement('canvas');
     workingCanvas.width = (activeSelectionBounds.right - activeSelectionBounds.left) + (drawMargin * 2);
     workingCanvas.height = (activeSelectionBounds.bottom - activeSelectionBounds.top) + (drawMargin * 2);
-    const ctx = workingCanvas.getContext('2d');
+    const ctx = workingCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
     if (!ctx) throw new Error('Couldn\'t draw to a new canvas when trying to apply selection mask.');
     ctx.imageSmoothingEnabled = false;
     ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height);
@@ -275,7 +275,7 @@ export async function blitSpecifiedSelectionMask(selectionMask: HTMLImageElement
     const workingCanvas = document.createElement('canvas');
     workingCanvas.width = toImage.width;
     workingCanvas.height = toImage.height;
-    const ctx = workingCanvas.getContext('2d');
+    const ctx = workingCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
     if (!ctx) throw new Error('Couldn\'t draw to a new canvas when trying to blit selection mask.');
     const tranformInverse = layerTransform.inverse();
     ctx.transform(tranformInverse.a, tranformInverse.b, tranformInverse.c, tranformInverse.d, tranformInverse.e, tranformInverse.f);

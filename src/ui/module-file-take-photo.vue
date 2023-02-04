@@ -34,7 +34,7 @@ import ElButton from 'element-plus/lib/components/button/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import historyStore from '@/store/history';
-import workingFileStore from '@/store/working-file';
+import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { notifyInjector, unexpectedErrorMessage } from '@/lib/notify';
 import { BundleAction } from '@/actions/bundle';
 import { InsertLayerAction } from '@/actions/insert-layer';
@@ -124,7 +124,7 @@ export default defineComponent({
                 const width = videoElement.videoWidth;
                 const height = videoElement.videoHeight;
                 const tmpCanvas = document.createElement('canvas');
-                const tmpCanvasCtx = tmpCanvas.getContext('2d');
+                const tmpCanvasCtx = tmpCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
                 if (tmpCanvasCtx) {
                     tmpCanvas.width = width;
                     tmpCanvas.height = height;

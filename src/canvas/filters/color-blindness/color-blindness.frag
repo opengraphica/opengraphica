@@ -65,35 +65,17 @@ const mat3 ColorBlindnessVienotTritanRgbCvd = mat3(
 
 uniform float pSeverity;
 
-float processColorBlindnessSRgbToLinearRgb(float value) {
-    float calculatedValue = 0.0;
-    calculatedValue += step(value, 0.04045) * value / 12.92;
-    calculatedValue += step(0.04045, value) * pow((value + 0.055) / 1.055, 2.4);
-    return calculatedValue;
-}
-
-float processColorBlindnessLinearRgbToSRgb(float value) {
-    float calculatedValue = 0.0;
-    calculatedValue += step(value, 0.0031308) * value * 12.92;
-    calculatedValue += step(0.0031308, value) * (pow(value, 1.0 / 2.4) * 1.055 - 0.055);
-    return clamp(calculatedValue, 0.0, 1.0);
-}
-
 vec4 processColorBlindness(vec4 color) {
-    vec3 rgb = vec3(
-        processColorBlindnessSRgbToLinearRgb(color.r),
-        processColorBlindnessSRgbToLinearRgb(color.g),
-        processColorBlindnessSRgbToLinearRgb(color.b)
-    );
+    vec3 rgb = color.rgb;
     vec3 rgbCvd = vec3(0.0);
 
     if (cType == ColorBlindnessTypeAchroma) {
-        rgb = color.rgb;
+        rgb = linearSrgbToSrgb(color.rgb);
         float intensity = rgb.r * 0.212656 + rgb.g * 0.715158 + rgb.b * 0.072186;
         rgbCvd.r = ( (rgb.r * (1.0 - pSeverity)) + (intensity * pSeverity) );
         rgbCvd.g = ( (rgb.g * (1.0 - pSeverity)) + (intensity * pSeverity) );
         rgbCvd.b = ( (rgb.b * (1.0 - pSeverity)) + (intensity * pSeverity) );
-        return vec4(rgbCvd, color.a);
+        return vec4(srgbToLinearSrgb(rgbCvd), color.a);
     } else {
         if (cMethod == ColorBlindnessSimulationMethodBrettel) {
             mat3 rgbCvd1;
@@ -148,11 +130,7 @@ vec4 processColorBlindness(vec4 color) {
         }
     }
     return vec4(
-        vec3(
-            processColorBlindnessLinearRgbToSRgb(rgbCvd.r),
-            processColorBlindnessLinearRgbToSRgb(rgbCvd.g),
-            processColorBlindnessLinearRgbToSRgb(rgbCvd.b)
-        ),
+        rgbCvd.rgb,
         color.a
     );
     

@@ -35,7 +35,7 @@ import ElAutoGrid from './el-auto-grid.vue';
 import ElCard from 'element-plus/lib/components/card/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import historyStore from '@/store/history';
-import workingFileStore, { getLayerById, getSelectedLayers } from '@/store/working-file';
+import workingFileStore, { getCanvasRenderingContext2DSettings, getLayerById, getSelectedLayers } from '@/store/working-file';
 import { notifyInjector } from '@/lib/notify';
 import layerRenderers from '@/canvas/renderers';
 import { createImageBlobFromCanvas } from '@/lib/image';
@@ -121,7 +121,7 @@ export default defineComponent({
                     const targetHeight = targetWidth * (layerHeight / layerWidth);
                     previewCanvas.width = targetWidth;
                     previewCanvas.height = targetHeight;
-                    const previewCtx = previewCanvas.getContext('2d');
+                    const previewCtx = previewCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
                     if (!previewCtx) {
                         throw new Error('module.layerEffectBrowser.generationErrorGeneral');
                     }

@@ -7,7 +7,7 @@ import {
     SerializedFileGroupLayer, SerializedFileTextLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileVectorLayer,
     WorkingFileGroupLayer, WorkingFileTextLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer
 } from '@/types';
-import workingFileStore from '@/store/working-file';
+import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { saveAs } from 'file-saver';
 
 interface SaveImageAsOptions {
@@ -88,7 +88,7 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
             const canvas = document.createElement('canvas');
             canvas.width = layer.width;
             canvas.height = layer.height;
-            const ctx = canvas.getContext('2d');
+            const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
             try {
                 if (!ctx) {
                     throw new Error('Missing canvas context');
@@ -116,7 +116,7 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
                 const canvas = document.createElement('canvas');
                 canvas.width = layer.width;
                 canvas.height = layer.height;
-                const ctx = canvas.getContext('2d');
+                const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
                 try {
                     if (!ctx) {
                         throw new Error('Missing canvas context');

@@ -253,6 +253,14 @@
         "decreaseColorDepth": {
             "name": "Decrease Color Depth"
         },
+        "gaussianBlur": {
+            "name": "Gaussian Blur",
+            "param": {
+                "size": "Size",
+                "xIntensity": "X Intensity",
+                "yIntensity": "Y Intensity"
+            }
+        },
         "grayscale": {
             "name": "Grayscale",
             "param": {
@@ -274,8 +282,11 @@
                 "mix": "Mix"
             }
         },
-        "hueRotate": {
-            "name": "Hue Rotate"
+        "hue": {
+            "name": "Hue",
+            "param": {
+                "rotate": "Rotate"
+            }
         },
         "negative": {
             "name": "Negative"

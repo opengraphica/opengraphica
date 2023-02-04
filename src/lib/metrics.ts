@@ -1,3 +1,4 @@
+import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 
 type DimensionUnit = 'px' | 'mm' | 'cm' | 'in';
 type ResolutionUnit = 'px/in' | 'px/mm' | 'px/cm';
@@ -136,7 +137,7 @@ export class FontMetrics {
             FontMetrics.kerningTestCanvas.height = 10;
             FontMetrics.kerningTestCanvas.setAttribute('style', 'font-kerning: normal; text-rendering: optimizeLegibility;');
             try {
-                FontMetrics.kerningTestCtx = FontMetrics.kerningTestCanvas.getContext('2d');
+                FontMetrics.kerningTestCtx = FontMetrics.kerningTestCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
             } catch (error) {}
         }
         return {

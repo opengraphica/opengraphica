@@ -8,7 +8,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed, toRefs, nextTick, PropType } from 'vue';
 import ElLoading from 'element-plus/lib/components/loading/index';
-import workingFileStore from '@/store/working-file';
+import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import renderers from '@/canvas/renderers';
 import { DecomposedMatrix } from '@/lib/dom-matrix';
 import { WorkingFileAnyLayer, ColorModel } from '@/types';
@@ -53,7 +53,7 @@ export default defineComponent({
                 }
                 canvas.width = thumbnailWidth;
                 canvas.height = thumbnailHeight;
-                let ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
+                let ctx: CanvasRenderingContext2D = canvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
                 ctx.scale(thumbnailScale, thumbnailScale);
                 new renderers['2d'][props.layer.type]().draw(ctx, props.layer, { visible: true });
                 props.layer.thumbnailImageSrc = canvas.toDataURL();

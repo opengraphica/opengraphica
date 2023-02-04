@@ -1,7 +1,7 @@
 // import { BaseAction } from './base';
 // import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset, selectionMaskDrawMargin } from '@/canvas/store/selection-state';
 // import canvasStore from '@/store/canvas';
-// import workingFileStore, { getSelectedLayers, ensureUniqueLayerSiblingName, getLayerById } from '@/store/working-file';
+// import workingFileStore, { getCanvasRenderingContext2DSettings, getSelectedLayers, ensureUniqueLayerSiblingName, getLayerById } from '@/store/working-file';
 // import { createImageFromCanvas, getImageDataFromImage, getImageDataEmptyBounds } from '@/lib/image';
 // import { ClearSelectionAction } from './clear-selection';
 // import { InsertLayerAction } from './insert-layer';
@@ -61,7 +61,7 @@
         
 //         workingCanvas.width = selectionBounds.right - selectionBounds.left;
 //         workingCanvas.height = selectionBounds.bottom - selectionBounds.top;
-//         const ctx = workingCanvas.getContext('2d');
+//         const ctx = workingCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
 //         if (!ctx) {
 //             throw new Error('Aborted - Couldn\'t create canvas context.');
 //         }

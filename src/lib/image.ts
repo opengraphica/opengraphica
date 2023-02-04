@@ -2,6 +2,7 @@
  * Parts of this file were adapted from miniPaint
  * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
+import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 
 export interface ImageDataEmptyBounds {
     left: number;
@@ -138,7 +139,7 @@ export function getImageDataFromImage(image: HTMLImageElement): ImageData {
     let workingCanvas = document.createElement('canvas');
     workingCanvas.width = image.width;
     workingCanvas.height = image.height;
-    let ctx = workingCanvas.getContext('2d');
+    let ctx = workingCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
     if (!ctx) {
         (workingCanvas as any) = null;
         return new ImageData(image.width, image.height);
@@ -157,7 +158,7 @@ export function getImageDataFromImage(image: HTMLImageElement): ImageData {
  */
 export async function createImageFromImageData(imageData: ImageData): Promise<HTMLImageElement> {
     const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
     if (!ctx) {
         return new Image(imageData.width, imageData.height);
     }
@@ -174,7 +175,7 @@ export async function createImageFromImageData(imageData: ImageData): Promise<HT
  */
  export async function createImageBlobFromImageData(imageData: ImageData): Promise<Blob> {
     const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
     if (!ctx) {
         return new Blob();
     }

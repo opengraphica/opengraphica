@@ -1,4 +1,5 @@
 import fragmentShader from './grayscale.frag';
+import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData, transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData, linearSrgbChannelToSrgbChannel } from '../color-space';
 
 import type { CanvasFilter, CanvasFilterEditConfig } from '@/types';
 
@@ -23,7 +24,7 @@ export default class GrayscaleCanvasFilter implements CanvasFilter<GrayscaleCanv
         return {
             mode: {
                 type: 'integer',
-                isConstant: true,
+                constant: true,
                 default: GrayscaleDesaturationMode.LUMINANCE,
                 options: [
                     { key: 'luminance', value: GrayscaleDesaturationMode.LUMINANCE },
@@ -55,33 +56,30 @@ export default class GrayscaleCanvasFilter implements CanvasFilter<GrayscaleCanv
         const mode = this.params.mode ?? 0;
         const percentage = this.params.mix ?? 0;
 
-        const rgb = [
-            sourceImageData[dataPosition + 0] / 255,
-            sourceImageData[dataPosition + 1] / 255,
-            sourceImageData[dataPosition + 2] / 255
-        ];
+        let rgba: { r: number, g: number, b: number, a: number };
 
         var intensity = 0;
         if (mode === GrayscaleDesaturationMode.LUMINANCE) {
-            intensity = this.linearRgbToSRgb(
-                this.sRgbToLinearRgb(rgb[0]) * 0.22 +
-                this.sRgbToLinearRgb(rgb[1]) * 0.72 +
-                this.sRgbToLinearRgb(rgb[2]) * 0.06
-            );
-        } else if (mode === GrayscaleDesaturationMode.LUMA) {
-            intensity = rgb[0] * 0.22 + rgb[1] * 0.72 + rgb[2] * 0.06;
-        } else if (mode === GrayscaleDesaturationMode.LIGHTNESS) {
-            intensity = 0.5 * (Math.max(rgb[0], rgb[1], rgb[2]) + Math.min(rgb[0], rgb[1], rgb[2]));
-        } else if (mode === GrayscaleDesaturationMode.AVERAGE) {
-            intensity = (rgb[0] + rgb[1] + rgb[2]) / 3.0;
-        } else if (mode === GrayscaleDesaturationMode.VALUE) {
-            intensity = Math.max(rgb[0], rgb[1], rgb[2]);
+            rgba = transfer8BitImageDataToLinearSrgb(sourceImageData, dataPosition);
+            intensity = linearSrgbChannelToSrgbChannel(rgba.r * 0.22 + rgba.g * 0.72 + rgba.b * 0.06);
+        } else {
+            rgba = transfer8BitImageDataToSrgb(sourceImageData, dataPosition);
+            if (mode === GrayscaleDesaturationMode.LUMA) {
+                intensity = rgba.r * 0.22 + rgba.g * 0.72 + rgba.b * 0.06;
+            } else if (mode === GrayscaleDesaturationMode.LIGHTNESS) {
+                intensity = 0.5 * (Math.max(rgba.r, rgba.g, rgba.b) + Math.min(rgba.r, rgba.g, rgba.b));
+            } else if (mode === GrayscaleDesaturationMode.AVERAGE) {
+                intensity = (rgba.r + rgba.g + rgba.b) / 3.0;
+            } else if (mode === GrayscaleDesaturationMode.VALUE) {
+                intensity = Math.max(rgba.r, rgba.g, rgba.b);
+            }
         }
 
-        targetImageData[dataPosition] = (sourceImageData[dataPosition] * (1 - percentage)) + (intensity * percentage * 255);
-        targetImageData[dataPosition + 1] = (sourceImageData[dataPosition + 1] * (1 - percentage)) + (intensity * percentage * 255);
-        targetImageData[dataPosition + 2] = (sourceImageData[dataPosition + 2] * (1 - percentage)) + (intensity * percentage * 255);
-        targetImageData[dataPosition + 3] = sourceImageData[dataPosition + 3];
+        rgba.r = (rgba.r * (1 - percentage)) + (intensity * percentage);
+        rgba.g = (rgba.g * (1 - percentage)) + (intensity * percentage);
+        rgba.b = (rgba.b * (1 - percentage)) + (intensity * percentage);
+
+        return transferSrgbTo8BitImageData(rgba, targetImageData, dataPosition);
     }
 
     private sRgbToLinearRgb(value: number): number {

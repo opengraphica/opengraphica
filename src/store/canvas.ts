@@ -173,14 +173,15 @@ const store = new PerformantStore<CanvasStore>({
 
 dummyCanvas = null;
 
-function getCanvasRenderingContext(canvas: HTMLCanvasElement) {
+async function getCanvasRenderingContext(canvas: HTMLCanvasElement) {
+    const { getCanvasRenderingContext2DSettings, getWebGLContextAttributes } = await import('@/store/working-file');
     if (store.state.renderer === '2d') {
-        return canvas.getContext('2d');
+        return canvas.getContext('2d', getCanvasRenderingContext2DSettings());
     } else if (store.state.renderer === 'webgl') {
         if (store.state.threejsRenderer?.capabilities.isWebGL2) {
-            return canvas.getContext('webgl2');
+            return canvas.getContext('webgl2', getWebGLContextAttributes());
         } else {
-            return canvas.getContext('webgl');
+            return canvas.getContext('webgl', getWebGLContextAttributes());
         }
     }
     return null;

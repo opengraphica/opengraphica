@@ -1,4 +1,5 @@
 import { createImageFromBlob } from './image';
+import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 
 type HashAlgorithm = 'SHA-1' | 'SHA-256' | 'SHA-384' | 'SHA-512';
 type HashEncoding = 'base64' | 'hex';
@@ -31,7 +32,7 @@ export async function generateImageBlobHash(blob: Blob): Promise<string> {
     }
     temporaryCanvas.width = imageComparisonResolution;
     temporaryCanvas.height = imageComparisonResolution / image.width * image.height;
-    const ctx = temporaryCanvas.getContext('2d');
+    const ctx = temporaryCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
     if (ctx) {
         ctx.clearRect(0, 0, temporaryCanvas.width, temporaryCanvas.height);
         ctx.scale(imageComparisonResolution / image.width, imageComparisonResolution / image.width);

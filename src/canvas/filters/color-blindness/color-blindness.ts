@@ -5,6 +5,7 @@
  */
 
 import fragmentShader from './color-blindness.frag';
+import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData, transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData } from '../color-space';
 
 import type { CanvasFilter, CanvasFilterEditConfig } from '@/types';
 
@@ -100,7 +101,7 @@ export default class ColorBlindnessCanvasFilter implements CanvasFilter<ColorBli
         return {
             method: {
                 type: 'integer',
-                isConstant: true,
+                constant: true,
                 default: ColorBlindnessSimulationMethod.BRETTEL,
                 options: [
                     { key: 'brettel', value: ColorBlindnessSimulationMethod.BRETTEL },
@@ -109,7 +110,7 @@ export default class ColorBlindnessCanvasFilter implements CanvasFilter<ColorBli
             },
             type: {
                 type: 'integer',
-                isConstant: true,
+                constant: true,
                 default: ColorBlindnessType.PROTAN,
                 options: [
                     { key: 'protan', value: ColorBlindnessType.PROTAN },
@@ -140,74 +141,54 @@ export default class ColorBlindnessCanvasFilter implements CanvasFilter<ColorBli
         const method = this.params.method ?? 0;
         const severity = this.params.severity ?? 1;
 
-        const rgb = [
-            this.sRgbToLinearRgb(sourceImageData[dataPosition + 0] / 255.0),
-            this.sRgbToLinearRgb(sourceImageData[dataPosition + 1] / 255.0),
-            this.sRgbToLinearRgb(sourceImageData[dataPosition + 2] / 255.0)
-        ];
-
-        let rgbCvd!: number[];
+        let rgbCvd!: { r: number, g: number, b: number, a: number };
 
         if (type === ColorBlindnessType.ACHROMA) {
-            rgb[0] = sourceImageData[dataPosition + 0] / 255.0;
-            rgb[1] = sourceImageData[dataPosition + 1] / 255.0;
-            rgb[2] = sourceImageData[dataPosition + 2] / 255.0;
-            const intensity = rgb[0] * 0.212656 + rgb[1] * 0.715158 + rgb[2] * 0.072186;
-            targetImageData[dataPosition + 0] = 255.0 * ( (rgb[0] * (1 - severity)) + (intensity * severity) );
-            targetImageData[dataPosition + 1] = 255.0 * ( (rgb[1] * (1 - severity)) + (intensity * severity) );
-            targetImageData[dataPosition + 2] = 255.0 * ( (rgb[2] * (1 - severity)) + (intensity * severity) );
-            targetImageData[dataPosition + 3] = sourceImageData[dataPosition + 3];
+            const rgba = transfer8BitImageDataToSrgb(sourceImageData, dataPosition);
+            const intensity = rgba.r * 0.212656 + rgba.g * 0.715158 + rgba.b * 0.072186;
+            rgba.r = (rgba.r * (1 - severity)) + (intensity * severity);
+            rgba.g = (rgba.g * (1 - severity)) + (intensity * severity);
+            rgba.b = (rgba.b * (1 - severity)) + (intensity * severity);
+            transferSrgbTo8BitImageData(rgba, targetImageData, dataPosition);
             return;
         }
+
+        const rgba = transfer8BitImageDataToLinearSrgb(sourceImageData, dataPosition);
 
         if (method === ColorBlindnessSimulationMethod.BRETTEL) {
             const deficiencyParams = brettelParams[type];
             
             const n = deficiencyParams.separationPlaneNormalInRgb;
-            const dotWithSepPlane = rgb[0] * n[0] + rgb[1] * n[1] + rgb[2] * n[2];
+            const dotWithSepPlane = rgba.r * n[0] + rgba.g * n[1] + rgba.b * n[2];
             const rgbCvdFromRgb = (dotWithSepPlane >= 0 ? deficiencyParams.rgbCvdFromRgb1 : deficiencyParams.rgbCvdFromRgb2);
-            rgbCvd = [
-                rgbCvdFromRgb[0] * rgb[0] + rgbCvdFromRgb[1] * rgb[1] + rgbCvdFromRgb[2] * rgb[2],
-                rgbCvdFromRgb[3] * rgb[0] + rgbCvdFromRgb[4] * rgb[1] + rgbCvdFromRgb[5] * rgb[2],
-                rgbCvdFromRgb[6] * rgb[0] + rgbCvdFromRgb[7] * rgb[1] + rgbCvdFromRgb[8] * rgb[2]
-            ];
-            rgbCvd[0] = rgbCvd[0] * severity + rgb[0] * (1 - severity);
-            rgbCvd[1] = rgbCvd[1] * severity + rgb[1] * (1 - severity);
-            rgbCvd[2] = rgbCvd[2] * severity + rgb[2] * (1 - severity);
+            rgbCvd = {
+                r: rgbCvdFromRgb[0] * rgba.r + rgbCvdFromRgb[1] * rgba.g + rgbCvdFromRgb[2] * rgba.b,
+                g: rgbCvdFromRgb[3] * rgba.r + rgbCvdFromRgb[4] * rgba.g + rgbCvdFromRgb[5] * rgba.b,
+                b: rgbCvdFromRgb[6] * rgba.r + rgbCvdFromRgb[7] * rgba.g + rgbCvdFromRgb[8] * rgba.b,
+                a: rgba.a
+            };
+            rgbCvd.r = rgbCvd.r * severity + rgba.r * (1 - severity);
+            rgbCvd.g = rgbCvd.g * severity + rgba.g * (1 - severity);
+            rgbCvd.b = rgbCvd.b * severity + rgba.b * (1 - severity);
         }
 
         if (method === ColorBlindnessSimulationMethod.VIENOT) {
             const rgbCvdFromRgb = vienotParams[type];
 
-            rgbCvd = [
-                rgbCvdFromRgb[0] * rgb[0] + rgbCvdFromRgb[1] * rgb[1] + rgbCvdFromRgb[2] * rgb[2],
-                rgbCvdFromRgb[3] * rgb[0] + rgbCvdFromRgb[4] * rgb[1] + rgbCvdFromRgb[5] * rgb[2],
-                rgbCvdFromRgb[6] * rgb[0] + rgbCvdFromRgb[7] * rgb[1] + rgbCvdFromRgb[8] * rgb[2]
-            ];
+            rgbCvd = {
+                r: rgbCvdFromRgb[0] * rgba.r + rgbCvdFromRgb[1] * rgba.g + rgbCvdFromRgb[2] * rgba.b,
+                g: rgbCvdFromRgb[3] * rgba.r + rgbCvdFromRgb[4] * rgba.g + rgbCvdFromRgb[5] * rgba.b,
+                b: rgbCvdFromRgb[6] * rgba.r + rgbCvdFromRgb[7] * rgba.g + rgbCvdFromRgb[8] * rgba.b,
+                a: rgba.a
+            };
 
             if (severity < 0.999) {
-                rgbCvd[0] = severity * rgbCvd[0] + (1 - severity) * rgb[0];
-                rgbCvd[1] = severity * rgbCvd[1] + (1 - severity) * rgb[1];
-                rgbCvd[2] = severity * rgbCvd[2] + (1 - severity) * rgb[2];
+                rgbCvd.r = severity * rgbCvd.r + (1 - severity) * rgba.r;
+                rgbCvd.g = severity * rgbCvd.g + (1 - severity) * rgba.g;
+                rgbCvd.b = severity * rgbCvd.b + (1 - severity) * rgba.b;
             }
         }
 
-        targetImageData[dataPosition + 0] = this.linearRgbToSRgb(rgbCvd[0]) * 255;
-        targetImageData[dataPosition + 1] = this.linearRgbToSRgb(rgbCvd[1]) * 255;
-        targetImageData[dataPosition + 2] = this.linearRgbToSRgb(rgbCvd[2]) * 255;
-        targetImageData[dataPosition + 3] = sourceImageData[dataPosition + 3];
+        transferLinearSrgbTo8BitImageData(rgbCvd, targetImageData, dataPosition);
     }
-
-    private sRgbToLinearRgb(value: number): number {
-        if (value < 0.04045) return value / 12.92;
-        return Math.pow((value + 0.055) / 1.055, 2.4);
-    }
-
-    private linearRgbToSRgb(value: number): number {
-        if (value <= 0) return 0;
-        if (value >= 1) return 1;
-        if (value < 0.0031308) return (value * 12.92);
-        return (Math.pow(value, 1 / 2.4) * 1.055 - 0.055);
-    }
-
 }

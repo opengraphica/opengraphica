@@ -3,7 +3,7 @@
  * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
 
-import workingFileStore, { getLayersByType } from '@/store/working-file';
+import workingFileStore, { getCanvasRenderingContext2DSettings, getLayersByType } from '@/store/working-file';
 import { getCanvasRenderingContext } from '@/store/canvas';
 import editorStore from '@/store/editor';
 import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
@@ -61,7 +61,7 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
             let canvas = document.createElement('canvas');
             canvas.width = workingFileStore.get('width');
             canvas.height = workingFileStore.get('height');
-            const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+            const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
             ctx.imageSmoothingEnabled = false;
             if (!['image/gif'].includes(mimeType)) {
                 drawWorkingFileToCanvas2d(canvas, ctx, {
@@ -210,7 +210,7 @@ export async function convertCanvasToGifBlob(canvas: HTMLCanvasElement, options:
     };
     const gif = new GIF(gifSettings);
 
-    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
     const originalTimelineCursorPosition = editorStore.get('timelineCursor');
     ctx.imageSmoothingEnabled = false;
     for (let i = 0; i < frameTimes.length - 1; i++) {

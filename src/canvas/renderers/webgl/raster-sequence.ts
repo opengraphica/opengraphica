@@ -1,15 +1,17 @@
 import { toRefs, watch, type WatchStopHandle } from 'vue';
 import { DrawWorkingFileLayerOptions, WorkingFileRasterSequenceLayer, ColorModel } from '@/types';
 import canvasStore from '@/store/canvas';
+import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import BaseLayerRenderer from './base';
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
-import { DoubleSide, NearestFilter } from 'three/src/constants';
+import { DoubleSide, NearestFilter, sRGBEncoding } from 'three/src/constants';
 import { Mesh } from 'three/src/objects/Mesh';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { Texture } from 'three/src/textures/Texture';
 import { CanvasTexture } from 'three/src/textures/CanvasTexture';
 import { createFiltersFromLayerConfig, combineShaders } from '../../filters';
+import { createRasterShaderMaterial } from './shaders';
 
 export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
     private stopWatchVisible: WatchStopHandle | undefined;
@@ -27,20 +29,10 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
 
     async onAttach(layer: WorkingFileRasterSequenceLayer<ColorModel>) {
         const combinedShaderResult = combineShaders(
-            await createFiltersFromLayerConfig(layer.filters)
+            await createFiltersFromLayerConfig(layer.filters),
+            layer
         );
-        this.material = new ShaderMaterial({
-            transparent: true,
-            side: DoubleSide,
-            depthTest: false,
-            vertexShader: combinedShaderResult.vertexShader,
-            fragmentShader: combinedShaderResult.fragmentShader,
-            defines: combinedShaderResult.defines,
-            uniforms: {
-                map: { value: null },
-                ...combinedShaderResult.uniforms
-            }
-        });
+        this.material = createRasterShaderMaterial(null, combinedShaderResult);
         this.plane = new Mesh(this.planeGeometry, this.material);
         this.plane.renderOrder = this.order;
         this.plane.matrixAutoUpdate = false;
@@ -49,7 +41,7 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
         this.textureCanvas = document.createElement('canvas');
         this.textureCanvas.width = layer.data.currentFrame?.sourceImage?.width || 10;
         this.textureCanvas.height = layer.data.currentFrame?.sourceImage?.height || 10;
-        this.textureCtx = this.textureCanvas.getContext('2d') || undefined;
+        this.textureCtx = this.textureCanvas.getContext('2d', getCanvasRenderingContext2DSettings()) || undefined;
         if (this.textureCtx) {
             this.textureCtx.imageSmoothingEnabled = false;
         }
@@ -57,6 +49,7 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
         this.texture?.dispose();
         this.texture = new CanvasTexture(this.textureCanvas);
         this.texture.magFilter = NearestFilter;
+        this.texture.encoding = sRGBEncoding;
         this.material && (this.material.uniforms.map.value = this.texture);
 
         const { visible, width, height, transform, filters, data } = toRefs(layer);
@@ -111,23 +104,13 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
         }
         if (updates.filters) {
             const combinedShaderResult = combineShaders(
-                await createFiltersFromLayerConfig(updates.filters)
+                await createFiltersFromLayerConfig(updates.filters),
+                { width: this.texture?.image.width, height: this.texture?.image.height }
             );
             const map = this.material?.uniforms.map;
             delete this.material?.uniforms.map;
             this.material?.dispose();
-            this.material = new ShaderMaterial({
-                transparent: true,
-                side: DoubleSide,
-                depthTest: false,
-                vertexShader: combinedShaderResult.vertexShader,
-                fragmentShader: combinedShaderResult.fragmentShader,
-                defines: combinedShaderResult.defines,
-                uniforms: {
-                    map: { value: map?.value },
-                    ...combinedShaderResult.uniforms
-                }
-            });
+            this.material = createRasterShaderMaterial(map?.value, combinedShaderResult);
             this.plane && (this.plane.material = this.material);
         }
         if (updates.data) {

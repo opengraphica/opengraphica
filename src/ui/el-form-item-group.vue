@@ -34,7 +34,7 @@ export default defineComponent({
                 let minWidth = 0;
                 el.value.querySelectorAll<HTMLLabelElement>('.el-form-item > .el-form-item__label').forEach((label) => {
                     if (label.offsetWidth > minWidth) {
-                        minWidth = label.offsetWidth;
+                        minWidth = label.offsetWidth + 1;
                     }
                 });
                 el.value.style.setProperty('--label-min-width', minWidth + 'px');

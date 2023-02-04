@@ -12,7 +12,7 @@ import {
 } from '@/types';
 import historyStore from '@/store/history';
 import preferencesStore from '@/store/preferences';
-import workingFileStore, { WorkingFileState, getTimelineById } from '@/store/working-file';
+import workingFileStore, { getCanvasRenderingContext2DSettings, WorkingFileState, getTimelineById } from '@/store/working-file';
 import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { UpdateFileAction } from '@/actions/update-file';
@@ -207,12 +207,12 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                                 isNeedManualMerge = true;
                                 gifSplit = gif.split(false);
                             }
-                            const canvas = document.createElement("canvas");
+                            const canvas = document.createElement('canvas');
                             if (isNeedManualMerge) {
                                 canvas.width = gif.width;
                                 canvas.height = gif.height;
                             }
-                            const ctx = canvas.getContext("2d");
+                            const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
                             if (!ctx) {
                                 rejectReader('Not enough memory to parse the gif file "' + file.name + '".');
                                 return;
@@ -295,7 +295,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                             }
                             let duration = Math.min(5, video.duration);
                             let canvas = document.createElement('canvas');
-                            let ctx = canvas.getContext('2d');
+                            let ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
                             if (!ctx) {
                                 rejectReader('Not enough memory to parse the video file "' + file.name + '".');
                                 return;

@@ -125,12 +125,13 @@ import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSwitch from 'element-plus/lib/components/switch/index';
 import ElRow from 'element-plus/lib/components/row/index';
 import historyStore from '@/store/history';
-import workingFileStore, { getLayerById } from '@/store/working-file';
+import workingFileStore, { getCanvasRenderingContext2DSettings, getLayerById } from '@/store/working-file';
 import { notifyInjector } from '@/lib/notify';
 import { throttle } from '@/lib/timing';
 import layerRenderers from '@/canvas/renderers';
 import { createImageBlobFromCanvas } from '@/lib/image';
 import { isWebGLAvailable } from '@/lib/webgl';
+import { createRasterShaderMaterial } from '@/canvas/renderers/webgl/shaders';
 import { buildCanvasFilterParamsFromFormData, createFiltersFromLayerConfig, applyCanvasFilter, generateShaderUniformsAndDefines, combineShaders } from '@/canvas/filters';
 import { UpdateLayerFilterDisabledAction } from '@/actions/update-layer-filter-disabled';
 import { UpdateLayerFilterParamsAction } from '@/actions/update-layer-filter-params';
@@ -143,7 +144,7 @@ import { Scene } from 'three/src/scenes/Scene';
 import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer';
 import { ImagePlaneGeometry } from '@/canvas/renderers/webgl/geometries/image-plane-geometry';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
-import { DoubleSide, NearestFilter } from 'three/src/constants';
+import { DoubleSide, NearestFilter, sRGBEncoding } from 'three/src/constants';
 import { Mesh } from 'three/src/objects/Mesh';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { Texture } from 'three/src/textures/Texture';
@@ -313,10 +314,10 @@ export default defineComponent({
                             beforeEffectCanvas.value.height = targetHeight;
                             afterEffectCanvas.value.width = targetWidth;
                             afterEffectCanvas.value.height = targetHeight;
-                            const beforeCanvasCtx = beforeEffectCanvas.value.getContext('2d');
+                            const beforeCanvasCtx = beforeEffectCanvas.value.getContext('2d', getCanvasRenderingContext2DSettings());
                             let afterCanvasCtx;
                             if (!isUseWebGlPreview) {
-                                afterCanvasCtx = afterEffectCanvas.value.getContext('2d') ?? undefined;
+                                afterCanvasCtx = afterEffectCanvas.value.getContext('2d', getCanvasRenderingContext2DSettings()) ?? undefined;
                             }
                             if (!beforeCanvasCtx) {
                                 throw new Error('module.layerEffectBrowser.generationErrorGeneral');
@@ -388,25 +389,16 @@ export default defineComponent({
                     () => reject()
                 );
                 previewTexture.magFilter = NearestFilter;
+                previewTexture.encoding = sRGBEncoding;
             });
 
-            const combinedShaderResult = combineShaders([currentFilter.value]);
-            previewMaterial = new ShaderMaterial({
-                transparent: true,
-                depthTest: false,
-                vertexShader: combinedShaderResult.vertexShader,
-                fragmentShader: combinedShaderResult.fragmentShader,
-                side: DoubleSide,
-                defines: combinedShaderResult.defines,
-                uniforms: {
-                    map: { value: previewTexture },
-                    ...combinedShaderResult.uniforms
-                }
-            });
+            const combinedShaderResult = combineShaders([currentFilter.value], layer.value!);
+            previewMaterial = createRasterShaderMaterial(previewTexture, combinedShaderResult);
 
             previewMesh = new Mesh(previewPlaneGeometry, previewMaterial);
             threejsScene.add(previewMesh);
             threejsRenderer.setSize(width, height, false);
+            threejsRenderer.outputEncoding = sRGBEncoding;
             threejsCamera = new OrthographicCamera(-1, 1, 1, -1, 1, 10000);
             threejsCamera.position.z = 1;
             threejsCamera.left = 0;
@@ -467,7 +459,7 @@ export default defineComponent({
             if (isUseWebGlPreview) {
                 if (threejsRenderer && previewMaterial) {
                     currentFilter.value.params = buildEditParamsFromFromData();
-                    const { uniforms: newUniforms, defines: newDefines } = generateShaderUniformsAndDefines([currentFilter.value]);
+                    const { uniforms: newUniforms, defines: newDefines } = generateShaderUniformsAndDefines([currentFilter.value], layer.value!);
                     for (const defineName in newDefines) {
                         previewMaterial.defines[defineName] = newDefines[defineName];
                     }

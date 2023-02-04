@@ -6,7 +6,7 @@ import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import preferencesStore from '@/store/preferences';
-import workingFileStore, { getLayerById } from '@/store/working-file';
+import workingFileStore, { getCanvasRenderingContext2DSettings, getLayerById } from '@/store/working-file';
 import { ColorModel, DrawWorkingFileOptions, UpdateAnyLayerOptions, WorkingFileLayer } from '@/types';
 import { DecomposedMatrix, decomposeMatrix } from '@/lib/dom-matrix';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
@@ -610,7 +610,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         const workingCanvas = document.createElement('canvas');
         workingCanvas.width = 1;
         workingCanvas.height = 1;
-        const ctx = workingCanvas.getContext('2d');
+        const ctx = workingCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
         if (!ctx) return null;
         const initialTransform = new DOMMatrix().translateSelf(-viewTransformPoint.x, -viewTransformPoint.y);
         const selectionTest: DrawWorkingFileOptions['selectionTest'] = {

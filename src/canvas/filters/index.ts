@@ -1,10 +1,12 @@
 import { camelCaseToKebabCase } from "@/lib/string";
 
-import basicMaterialVertexShader from '../renderers/webgl/shaders/basic-material.vert';
-import basicMaterialFragmentShader from '../renderers/webgl/shaders/basic-material.frag';
+import basicMaterialVertexShaderSetup from '../renderers/webgl/shaders/basic-material.setup.vert';
+import basicMaterialVertexShaderMain from '../renderers/webgl/shaders/basic-material.main.vert';
+import basicMaterialFragmentShaderSetup from '../renderers/webgl/shaders/basic-material.setup.frag';
+import basicMaterialFragmentShaderMain from '../renderers/webgl/shaders/basic-material.main.frag';
 
 import type { IUniform } from 'three/src/renderers/shaders/UniformsLib';
-import type { CanvasFilter, WorkingFileLayerFilter } from '@/types';
+import type { CanvasFilter, WorkingFileAnyLayer, WorkingFileLayerFilter } from '@/types';
 
 export async function getCanvasFilterClass(name: string): Promise<new (...args: any) => CanvasFilter> {
     const kebabCaseName = camelCaseToKebabCase(name);
@@ -69,26 +71,46 @@ export function buildCanvasFilterPreviewParams(canvasFilter: CanvasFilter): Reco
     return previewParams;
 }
 
-interface CombinedShaderResult {
+export interface CombinedShaderResult {
     fragmentShader: string,
     vertexShader: string,
     uniforms: Record<string, IUniform>,
     defines: Record<string, unknown>
 }
 
-export function generateShaderUniformsAndDefines(canvasFilters: CanvasFilter[]): { uniforms: Record<string, IUniform>, defines: Record<string, unknown> } {
+export function generateShaderUniformsAndDefines(canvasFilters: CanvasFilter[], layer: Partial<WorkingFileAnyLayer>): { uniforms: Record<string, IUniform>, defines: Record<string, unknown> } {
     const defines: Record<string, unknown> = {};
     const uniforms: Record<string, IUniform> = {};
     for (const [index, canvasFilter] of canvasFilters.entries()) {
         const editConfig = canvasFilter.getEditConfig();
+        const computedParamNames: string[] = [];
+        const paramValues: Record<string, unknown> = {};
         for (const editParamName in editConfig) {
-            if (editConfig[editParamName].isConstant) {
+            const paramValue = canvasFilter.params[editParamName] ?? editConfig[editParamName].default;
+            paramValues[editParamName] = paramValue;
+            if (editConfig[editParamName].computedValue) {
+                computedParamNames.push(editParamName);
+            } else {
+                if (editConfig[editParamName].constant) {
+                    const replaceDefineName = 'constant' + index + '_' + editParamName;
+                    defines[replaceDefineName] = paramValue;
+                } else {
+                    const replaceParamName = 'param' + index + '_' + editParamName;
+                    uniforms[replaceParamName] = {
+                        value: paramValue
+                    };
+                }
+            }
+        }
+        for (const editParamName of computedParamNames) {
+            const paramValue = editConfig[editParamName].computedValue?.(paramValues, { layerWidth: layer.width ?? 0, layerHeight: layer.height ?? 0 });
+            if (editConfig[editParamName].constant) {
                 const replaceDefineName = 'constant' + index + '_' + editParamName;
-                defines[replaceDefineName] = canvasFilter.params[editParamName] ?? editConfig[editParamName].default;
+                defines[replaceDefineName] = paramValue;
             } else {
                 const replaceParamName = 'param' + index + '_' + editParamName;
                 uniforms[replaceParamName] = {
-                    value: canvasFilter.params[editParamName] ?? editConfig[editParamName].default
+                    value: paramValue
                 };
             }
         }
@@ -96,11 +118,11 @@ export function generateShaderUniformsAndDefines(canvasFilters: CanvasFilter[]):
     return { defines, uniforms };
 }
 
-export function combineShaders(canvasFilters: CanvasFilter[]): CombinedShaderResult {
+export function combineShaders(canvasFilters: CanvasFilter[], layer: Partial<WorkingFileAnyLayer>): CombinedShaderResult {
     let vertexShader = '';
     let fragmentShader = '';
-    const uniforms: Record<string, IUniform> = {};
-    const defines: Record<string, unknown> = {};
+
+    const { uniforms, defines } = generateShaderUniformsAndDefines(canvasFilters, layer);
 
     let vertexShaderMainCalls: string[] = [];
     let fragmentShaderMainCalls: string[] = [];
@@ -120,8 +142,9 @@ export function combineShaders(canvasFilters: CanvasFilter[]): CombinedShaderRes
                 fragmentShaderMainCalls.push('    filterColorResult = ' + searchFunctionName + '(filterColorResult);');
             }
         }
+        
         for (const editParamName in editConfig) {
-            const isConstant = (editConfig[editParamName].isConstant);
+            const isConstant = (editConfig[editParamName].constant);
             const searchParamName = isConstant
                 ? 'c' + editParamName[0].toUpperCase() + editParamName.slice(1)
                 : 'p' + editParamName[0].toUpperCase() + editParamName.slice(1);
@@ -134,13 +157,6 @@ export function combineShaders(canvasFilters: CanvasFilter[]): CombinedShaderRes
             }
             if (filterFragmentShader) {
                 filterFragmentShader = filterFragmentShader.replaceAll(searchParamName, replaceParamName);
-            }
-            if (isConstant) {
-                defines[replaceParamName] = canvasFilter.params[editParamName] ?? editConfig[editParamName].default
-            } else {
-                uniforms[replaceParamName] = {
-                    value: canvasFilter.params[editParamName] ?? editConfig[editParamName].default
-                };
             }
         }
         if (filterVertexShader) {
@@ -160,8 +176,8 @@ export function combineShaders(canvasFilters: CanvasFilter[]): CombinedShaderRes
         fragmentFilterCode += 'vec4 filterColorResult = gl_FragColor;\n' + fragmentShaderMainCalls.join('\n') + '\n    gl_FragColor = filterColorResult;';
     }
 
-    vertexShader += '\n' + basicMaterialVertexShader.replace('//[INJECT_FILTERS_HERE]', vertexFilterCode);
-    fragmentShader += '\n' + basicMaterialFragmentShader.replace('//[INJECT_FILTERS_HERE]', fragmentFilterCode);
+    vertexShader = basicMaterialVertexShaderSetup + '\n' + vertexShader + '\n' + basicMaterialVertexShaderMain.replace('//[INJECT_FILTERS_HERE]', vertexFilterCode);
+    fragmentShader = basicMaterialFragmentShaderSetup + '\n' + fragmentShader + '\n' + basicMaterialFragmentShaderMain.replace('//[INJECT_FILTERS_HERE]', fragmentFilterCode);
 
     return {
         vertexShader,

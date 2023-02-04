@@ -1,7 +1,7 @@
 uniform float pBrightness;
 
 vec4 processBrightness(vec4 color) {
-    vec3 rgb = color.rgb;
+    vec3 rgb = linearSrgbToSrgb(color.rgb);
     float darknessMultiplier = abs(pBrightness);
     rgb -= step(pBrightness, 0.0) * vec3(
         rgb.r * darknessMultiplier,
@@ -13,5 +13,5 @@ vec4 processBrightness(vec4 color) {
         ((1.0 - rgb.g) * pBrightness),
         ((1.0 - rgb.b) * pBrightness)
     );
-    return vec4(rgb.rgb, color.a);
+    return vec4(srgbToLinearSrgb(rgb.rgb), color.a);
 }

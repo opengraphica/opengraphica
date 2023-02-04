@@ -11,16 +11,12 @@
         "name": "layerFilter.contrast.name",
         "group": "color"
     },
-    "decreaseColorDepth": {
-        "name": "layerFilter.decreaseColorDepth.name",
-        "group": "color"
-    },
     "grayscale": {
         "name": "layerFilter.grayscale.name",
         "group": "color"
     },
-    "hueRotate": {
-        "name": "layerFilter.hueRotate.name",
+    "hue": {
+        "name": "layerFilter.hue.name",
         "group": "color"
     },
     "negative": {
@@ -38,5 +34,10 @@
     "colorBlindness": {
         "name": "layerFilter.colorBlindness.name",
         "group": "color"
+    },
+
+    "gaussianBlur": {
+        "name": "layerFilter.gaussianBlur.name",
+        "group": "blur"
     }
 }

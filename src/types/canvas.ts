@@ -8,10 +8,11 @@ export interface CanvasViewResetOptions {
 };
 
 export interface CanvasFilterEditConfigFieldCommon {
-    isConstant?: boolean;
+    constant?: boolean;
     hidden?: boolean;
     min?: number;
     max?: number;
+    computedValue?: (params: Record<string, unknown>, info: { layerWidth: number; layerHeight: number; }) => unknown;
 }
 
 export interface CanvasFilterEditConfigIntegerOption {

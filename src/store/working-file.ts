@@ -75,6 +75,23 @@ function calculateLayerOrder(parent?: WorkingFileLayer<ColorModel>[], order: num
     return order;
 }
 
+function getCanvasColorSpace(): 'srgb' | 'display-p3' {
+    if (store.state.colorSpace === 'Display P3') {
+        return 'display-p3';
+    }
+    return 'srgb';
+}
+
+function getCanvasRenderingContext2DSettings(): CanvasRenderingContext2DSettings {
+    return {
+        colorSpace: getCanvasColorSpace()
+    }
+}
+
+function getWebGLContextAttributes(): WebGLContextAttributes {
+    return {};
+}
+
 function getLayerById(id: number, parent?: WorkingFileLayer<ColorModel>[]): WorkingFileAnyLayer<ColorModel> | null {
     if (parent == null) {
         parent = store.get('layers');
@@ -209,6 +226,9 @@ export {
     WorkingFileStore,
     WorkingFileState,
     calculateLayerOrder,
+    getCanvasColorSpace,
+    getCanvasRenderingContext2DSettings,
+    getWebGLContextAttributes,
     getLayerById,
     getLayerGlobalTransform,
     getLayersByType,

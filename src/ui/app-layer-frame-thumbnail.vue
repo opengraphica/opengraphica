@@ -9,6 +9,7 @@
 import { defineComponent, ref, computed, watch, toRefs, nextTick, PropType } from 'vue';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import editorStore from '@/store/editor';
+import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { WorkingFileRasterSequenceLayer, ColorModel } from '@/types';
 
 export default defineComponent({
@@ -58,7 +59,7 @@ export default defineComponent({
                 }
                 canvas.width = thumbnailWidth;
                 canvas.height = thumbnailHeight;
-                let ctx: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
+                let ctx: CanvasRenderingContext2D = canvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
                 ctx.scale(thumbnailScale, thumbnailScale);
                 ctx.drawImage(frame.image.sourceImage, 0, 0);
                 frame.thumbnailImageSrc = canvas.toDataURL();

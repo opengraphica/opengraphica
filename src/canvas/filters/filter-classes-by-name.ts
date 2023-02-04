@@ -7,9 +7,9 @@ import { default as brightness } from './brightness/brightness';
 import { default as colorBlindness } from './color-blindness/color-blindness';
 import { default as colorCorrection } from './color-correction/color-correction';
 import { default as contrast } from './contrast/contrast';
-import { default as decreaseColorDepth } from './decrease-color-depth/decrease-color-depth';
+import { default as gaussianBlur } from './gaussian-blur/gaussian-blur';
 import { default as grayscale } from './grayscale/grayscale';
-import { default as hueRotate } from './hue-rotate/hue-rotate';
+import { default as hue } from './hue/hue';
 import { default as negative } from './negative/negative';
 import { default as saturation } from './saturation/saturation';
 import { default as sepia } from './sepia/sepia';
@@ -19,9 +19,9 @@ export default {
     colorBlindness,
     colorCorrection,
     contrast,
-    decreaseColorDepth,
+    gaussianBlur,
     grayscale,
-    hueRotate,
+    hue,
     negative,
     saturation,
     sepia
