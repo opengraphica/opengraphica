@@ -7,6 +7,7 @@ import { DecomposedMatrix, decomposeMatrix, snapPointAtHalfPixel, snapPointAtPix
 import layerRenderers from '@/canvas/renderers';
 
 import type { Camera, Scene, WebGLRenderer } from 'three';
+import type { EffectComposer } from '@/canvas/renderers/webgl/three/postprocessing/EffectComposer';
 
 const imageSmoothingZoomRatio = preferencesStore.get('imageSmoothingZoomRatio');
 
@@ -139,7 +140,7 @@ export function drawWorkingFileToCanvas2d(canvas: HTMLCanvasElement, ctx: Canvas
 /**
  * Draws everything in the working document to the threejs renderer.
  */
-export function drawWorkingFileToCanvasWebgl(renderer: WebGLRenderer, scene: Scene, camera: Camera, options: DrawWorkingFileOptions = {}) {
+export function drawWorkingFileToCanvasWebgl(composer: EffectComposer, renderer: WebGLRenderer, scene: Scene, camera: Camera, options: DrawWorkingFileOptions = {}) {
     try {
         const layers = workingFileStore.get('layers');
         for (const layer of layers) {
@@ -147,7 +148,7 @@ export function drawWorkingFileToCanvasWebgl(renderer: WebGLRenderer, scene: Sce
                 layer.renderer.renderGroup(renderer, camera, layer as WorkingFileGroupLayer<ColorModel>);
             }
         }
-        renderer.render(scene, camera);
+        composer.render();
     } catch (error) {
         console.error(error);
         throw error;

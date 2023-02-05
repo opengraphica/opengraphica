@@ -110,8 +110,10 @@ export default defineComponent({
                             // These imports intentionally run after the store access for the `watchEffect` to work correctly.
                             const { MeshBasicMaterial } = await import('three/src/materials/MeshBasicMaterial');
                             const { DoubleSide } = await import('three/src/constants');
+                            const color = new (await import('three/src/math/Color')).Color().setRGB(r, g, b);
+                            color.convertSRGBToLinear();
                             threejsBackground.material = new MeshBasicMaterial({
-                                color: new (await import('three/src/math/Color')).Color().setRGB(r, g, b),
+                                color,
                                 opacity: a,
                                 transparent: true,
                                 side: DoubleSide
@@ -235,6 +237,10 @@ export default defineComponent({
                     const { MeshBasicMaterial } = await import('three/src/materials/MeshBasicMaterial');
                     const { Mesh } = await import('three/src/objects/Mesh');
                     const { DoubleSide, sRGBEncoding } = await import('three/src/constants');
+                    const { EffectComposer } = await import('@/canvas/renderers/webgl/three/postprocessing/EffectComposer');
+                    const { RenderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/RenderPass');
+                    const { ShaderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/ShaderPass');
+                    const { GammaCorrectionShader } = await import('@/canvas/renderers/webgl/three/shaders/GammaCorrectionShader');
                     try {
                         const threejsRenderer = new WebGLRenderer({
                             alpha: true,
@@ -243,20 +249,30 @@ export default defineComponent({
                         threejsRenderer.outputEncoding = sRGBEncoding;
                         threejsRenderer.setSize(1, 1);
                         canvasStore.set('threejsRenderer', threejsRenderer);
+
                         const threejsScene = markRaw(new Scene());
                         canvasStore.set('threejsScene', threejsScene);
+
                         const backgroundGeometry = new PlaneGeometry(workingFileStore.state.width * 2.1, workingFileStore.state.height * 2.1);
                         const backgroundMaterial = new MeshBasicMaterial({ color: 0xffffff, transparent: true, side: DoubleSide });
                         const threejsBackground = new Mesh(backgroundGeometry, backgroundMaterial);
                         threejsBackground.renderOrder = -1;
                         threejsScene.add(threejsBackground);
                         canvasStore.set('threejsBackground', markRaw(threejsBackground));
+
                         const threejsCamera = new OrthographicCamera(-1, 1, 1, -1, 1, 10000);
                         canvasStore.set('threejsCamera', threejsCamera);
+
+                        const threejsComposer = new EffectComposer(threejsRenderer);
+                        const renderPass = new RenderPass(threejsScene, threejsCamera);
+                        threejsComposer.addPass(renderPass);
+                        threejsComposer.addPass(new ShaderPass(GammaCorrectionShader));
+                        canvasStore.set('threejsComposer', markRaw(threejsComposer));
+
                         canvasStore.set('renderer', 'webgl');
                         updateThreejsImageSize(imageWidth, imageHeight);
                         renderMainCanvas = () => {
-                            drawWorkingFileToCanvasWebgl(threejsRenderer, threejsScene, threejsCamera, { isEditorPreview: true });
+                            drawWorkingFileToCanvasWebgl(threejsComposer, threejsRenderer, threejsScene, threejsCamera, { isEditorPreview: true });
                         };
                         renderMainCanvas();
                         ctx = threejsRenderer.context;
@@ -315,9 +331,13 @@ export default defineComponent({
         // Update for threejs scene when image size is adjusted.
         function updateThreejsImageSize(imageWidth: number, imageHeight: number) {
             const threejsRenderer = canvasStore.get('threejsRenderer');
+            const threejsComposer = canvasStore.get('threejsComposer');
             const threejsCamera = canvasStore.get('threejsCamera');
             if (threejsRenderer) {
                 threejsRenderer.setSize(imageWidth, imageHeight, true);
+            }
+            if (threejsComposer) {
+                threejsComposer.setSize(imageWidth, imageHeight);
             }
             if (threejsCamera) {
                 threejsCamera.position.z = 1;

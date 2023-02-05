@@ -2,7 +2,9 @@ import { PerformantStore } from './performant-store';
 import { CanvasViewResetOptions } from '@/types';
 import { DecomposedMatrix, decomposeMatrix } from '@/lib/dom-matrix';
 import preferencesStore from './preferences';
+
 import type { Mesh, OrthographicCamera, Scene, WebGLRenderer } from 'three';
+import type { EffectComposer } from '@/canvas/renderers/webgl/three/postprocessing/EffectComposer';
 
 const imageSmoothingZoomRatio = preferencesStore.get('imageSmoothingZoomRatio');
 
@@ -26,6 +28,7 @@ interface CanvasState {
     selectionMaskCanvas: HTMLCanvasElement;
     threejsBackground: Mesh | null;
     threejsCamera: OrthographicCamera | null;
+    threejsComposer: EffectComposer | null;
     threejsRenderer: WebGLRenderer | null;
     threejsScene: Scene | null;
     transform: DOMMatrix;
@@ -79,6 +82,7 @@ const store = new PerformantStore<CanvasStore>({
         selectionMaskCanvas: dummyCanvas,
         threejsBackground: null,
         threejsCamera: null,
+        threejsComposer: null,
         threejsRenderer: null,
         threejsScene: null,
         transform: new DOMMatrix(),
