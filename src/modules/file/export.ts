@@ -4,7 +4,7 @@
  */
 
 import workingFileStore, { getCanvasRenderingContext2DSettings, getLayersByType } from '@/store/working-file';
-import { getCanvasRenderingContext } from '@/store/canvas';
+import canvasStore, { getCanvasRenderingContext } from '@/store/canvas';
 import editorStore from '@/store/editor';
 import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
 import { generateImageBlobHash } from '@/lib/hash';
@@ -64,10 +64,14 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
             const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
             ctx.imageSmoothingEnabled = false;
             if (!['image/gif'].includes(mimeType)) {
-                drawWorkingFileToCanvas2d(canvas, ctx, {
-                    force2dRenderer: true,
-                    selectedLayersOnly: options.layerSelection === 'selected'
-                });
+                if (canvasStore.state.renderer === '2d' || options.layerSelection === 'selected') {
+                    drawWorkingFileToCanvas2d(canvas, ctx, {
+                        force2dRenderer: true,
+                        selectedLayersOnly: options.layerSelection === 'selected'
+                    });
+                } else {
+                    ctx.drawImage(canvasStore.get('viewCanvas'), 0, 0);
+                }
             }
             if (options.blitActiveSelectionMask && activeSelectionMask.value != null) {
                 canvas = await blitActiveSelectionMask(canvas, new DOMMatrix(), 'source-in');

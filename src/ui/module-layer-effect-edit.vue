@@ -380,7 +380,9 @@ export default defineComponent({
 
             threejsRenderer = new WebGLRenderer({
                 alpha: true,
-                canvas
+                canvas,
+                premultipliedAlpha: false,
+                powerPreference: 'low-power'
             });
             threejsScene = new Scene();
             previewPlaneGeometry = new ImagePlaneGeometry(width, height);
