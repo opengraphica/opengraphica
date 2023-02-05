@@ -6,7 +6,7 @@
 import workingFileStore, { getCanvasRenderingContext2DSettings, getLayersByType } from '@/store/working-file';
 import canvasStore, { getCanvasRenderingContext } from '@/store/canvas';
 import editorStore from '@/store/editor';
-import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
+import { drawWorkingFileToCanvas2d, drawWorkingFileToCanvasWebgl } from '@/lib/canvas';
 import { generateImageBlobHash } from '@/lib/hash';
 import { saveAs } from 'file-saver';
 import { knownFileExtensions } from '@/lib/regex';
@@ -70,6 +70,12 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                         selectedLayersOnly: options.layerSelection === 'selected'
                     });
                 } else {
+                    drawWorkingFileToCanvasWebgl(
+                        canvasStore.get('threejsComposer')!,
+                        canvasStore.get('threejsRenderer')!,
+                        canvasStore.get('threejsScene')!,
+                        canvasStore.get('threejsCamera')!
+                    );
                     ctx.drawImage(canvasStore.get('viewCanvas'), 0, 0);
                 }
             }

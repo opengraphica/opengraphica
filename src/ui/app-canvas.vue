@@ -247,8 +247,7 @@ export default defineComponent({
                             alpha: true,
                             canvas: canvas.value,
                             premultipliedAlpha: false,
-                            powerPreference: 'high-performance',
-                            preserveDrawingBuffer: true
+                            powerPreference: 'high-performance'
                         });
                         threejsRenderer.outputEncoding = sRGBEncoding;
                         threejsRenderer.setSize(1, 1);
