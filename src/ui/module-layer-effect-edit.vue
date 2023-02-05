@@ -149,6 +149,10 @@ import { Mesh } from 'three/src/objects/Mesh';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { Texture } from 'three/src/textures/Texture';
 import { OrthographicCamera } from 'three/src/cameras/OrthographicCamera';
+import { EffectComposer } from '@/canvas/renderers/webgl/three/postprocessing/EffectComposer';
+import { RenderPass } from '@/canvas/renderers/webgl/three/postprocessing/RenderPass';
+import { ShaderPass } from '@/canvas/renderers/webgl/three/postprocessing/ShaderPass';
+import { GammaCorrectionShader } from '@/canvas/renderers/webgl/three/shaders/GammaCorrectionShader';
 
 import type { WorkingFileLayerFilter, CanvasFilter, CanvasFilterEditConfig, CanvasFilterEditConfigField } from '@/types';
 
@@ -210,6 +214,7 @@ export default defineComponent({
         const canvasFilters = ref<CanvasFilter[]>([]);
 
         let threejsRenderer: WebGLRenderer;
+        let threejsComposer: EffectComposer;
         let threejsScene: Scene;
         let threejsCamera: OrthographicCamera;
         let previewImageUrl: string;
@@ -397,8 +402,10 @@ export default defineComponent({
 
             previewMesh = new Mesh(previewPlaneGeometry, previewMaterial);
             threejsScene.add(previewMesh);
+
             threejsRenderer.setSize(width, height, false);
             threejsRenderer.outputEncoding = sRGBEncoding;
+
             threejsCamera = new OrthographicCamera(-1, 1, 1, -1, 1, 10000);
             threejsCamera.position.z = 1;
             threejsCamera.left = 0;
@@ -406,7 +413,13 @@ export default defineComponent({
             threejsCamera.top = 0;
             threejsCamera.bottom = height;
             threejsCamera.updateProjectionMatrix();
-            threejsRenderer.render(threejsScene, threejsCamera);
+
+            threejsComposer = new EffectComposer(threejsRenderer);
+            const renderPass = new RenderPass(threejsScene, threejsCamera);
+            threejsComposer.addPass(renderPass);
+            threejsComposer.addPass(new ShaderPass(GammaCorrectionShader));
+
+            threejsComposer.render();
         }
 
         function cleanupThreejs() {
@@ -457,7 +470,7 @@ export default defineComponent({
             const afterCtx = afterEffectCanvasCtx.value;
             if (!currentFilter.value) return;
             if (isUseWebGlPreview) {
-                if (threejsRenderer && previewMaterial) {
+                if (threejsComposer && previewMaterial) {
                     currentFilter.value.params = buildEditParamsFromFromData();
                     const { uniforms: newUniforms, defines: newDefines } = generateShaderUniformsAndDefines([currentFilter.value], layer.value!);
                     for (const defineName in newDefines) {
@@ -466,7 +479,7 @@ export default defineComponent({
                     for (const uniformName in newUniforms) {
                         previewMaterial.uniforms[uniformName] = newUniforms[uniformName];
                     }
-                    threejsRenderer.render(threejsScene, threejsCamera);
+                    threejsComposer.render();
                 }
             } else {
                 if (currentFilter.value && beforeCtx && afterCtx) {

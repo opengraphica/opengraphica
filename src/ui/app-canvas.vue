@@ -241,10 +241,13 @@ export default defineComponent({
                     const { RenderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/RenderPass');
                     const { ShaderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/ShaderPass');
                     const { GammaCorrectionShader } = await import('@/canvas/renderers/webgl/three/shaders/GammaCorrectionShader');
+                    const { CopyShader } = await import('@/canvas/renderers/webgl/three/shaders/CopyShader');
                     try {
                         const threejsRenderer = new WebGLRenderer({
                             alpha: true,
-                            canvas: canvas.value
+                            canvas: canvas.value,
+                            premultipliedAlpha: false,
+                            powerPreference: 'high-performance'
                         });
                         threejsRenderer.outputEncoding = sRGBEncoding;
                         threejsRenderer.setSize(1, 1);

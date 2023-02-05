@@ -31,7 +31,7 @@ const CopyShader = {
 		void main() {
 
 			gl_FragColor = texture2D( tDiffuse, vUv );
-			// gl_FragColor.a *= opacity;
+			gl_FragColor.a *= opacity;
 
 
 		}`
