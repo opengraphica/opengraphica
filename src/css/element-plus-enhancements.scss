@@ -221,7 +221,8 @@
             .el-form-item__content > .el-row > .el-col > .el-input > .el-input__wrapper,
             .el-form-item__content > .el-row > .el-col > .el-input-group > *:last-child,
             .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__wrapper,
-            .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper {
+            .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper,
+            .el-form-item__content > .el-switch {
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
             }
@@ -234,7 +235,8 @@
                 .el-form-item__content > .el-input-group > *:last-child,
                 .el-form-item__content > .el-row > .el-col:last-child > .el-input-group > *:last-child,
                 .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__wrapper,
-                .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper {
+                .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper,
+                .el-form-item__content > .el-switch {
                     border-top-right-radius: var(--ogr-border-radius);
                 }
             }
@@ -246,7 +248,8 @@
                 .el-form-item__content > .el-input-group > *:last-child,
                 .el-form-item__content > .el-row > .el-col:last-child > .el-input-group > *:last-child,
                 .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__wrapper,
-                .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper {
+                .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper,
+                .el-form-item__content > .el-switch {
                     border-bottom-right-radius: var(--ogr-border-radius);
                 }
             }
@@ -328,6 +331,14 @@
                     border-left: 0.0625rem solid var(--ogr-form-connected-label-border-color) !important;
                 }
 
+                > .el-switch {
+                    box-sizing: border-box;
+                    border: 0.0625rem solid var(--ogr-form-connected-label-border-color);
+                    height: 100%;
+                    padding: 0 0.5rem;
+                    width: 100%;
+                }
+
                 > .el-select, .el-input:not(.el-input-group) {
                     display: block;
 
@@ -387,7 +398,10 @@
                 > .el-form-item__content {
                     position: relative;
 
-                    > .el-row, > .el-input, > .el-select {
+                    > .el-row,
+                    > .el-input,
+                    > .el-select,
+                    > .el-switch {
                         width: calc(100% - 2rem);
                     }
 

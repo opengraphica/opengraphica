@@ -88,112 +88,112 @@ function hueToRgb(p: number, q: number, t: number) {
     return p;
 }
 
-export function colorToRgba(color: ColorModel, colorModelName: ColorModelName): RGBAColor {
+export function colorToRgba(color: Partial<ColorModel>, colorModelName: ColorModelName): RGBAColor {
     if (colorModelName === 'hsla') {
         const { h, s, l, a, style } = color as HSLAColor;
         let r, g, b;
-		if (s == 0) {
-			r = g = b = l; // achromatic
-		}
-		else {
-			let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-			let p = 2 * l - q;
-			r = hueToRgb(p, q, h + 1 / 3);
-			g = hueToRgb(p, q, h);
-			b = hueToRgb(p, q, h - 1 / 3);
-		}
+        if (s == 0) {
+            r = g = b = l; // achromatic
+        }
+        else {
+            let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            let p = 2 * l - q;
+            r = hueToRgb(p, q, h + 1 / 3);
+            g = hueToRgb(p, q, h);
+            b = hueToRgb(p, q, h - 1 / 3);
+        }
 
-		return { is: 'color', r, g, b, a, style };
+        return { is: 'color', r, g, b, a, style };
     } else if (colorModelName === 'hsva') {
         const { h, s, v, a, style } = color as HSVAColor;
         let r = 0, g = 0, b = 0;
-	
-		const i = Math.floor(h * 6);
-		const f = h * 6 - i;
-		const p = v * (1 - s);
-		const q = v * (1 - f * s);
-		const t = v * (1 - (1 - f) * s);
-	
-		switch (i % 6) {
+    
+        const i = Math.floor(h * 6);
+        const f = h * 6 - i;
+        const p = v * (1 - s);
+        const q = v * (1 - f * s);
+        const t = v * (1 - (1 - f) * s);
+    
+        switch (i % 6) {
             case 0: r = v, g = t, b = p; break;
             case 1: r = q, g = v, b = p; break;
             case 2: r = p, g = v, b = t; break;
             case 3: r = p, g = q, b = v; break;
             case 4: r = t, g = p, b = v; break;
             case 5: r = v, g = p, b = q; break;
-		}
-	
-		return { is: 'color', r, g, b, a, style };
+        }
+    
+        return { is: 'color', r, g, b, a, style };
     } else {
         return color as RGBAColor;
     }
 }
 
-export function colorToHsla(color: ColorModel, colorModelName: ColorModelName): HSLAColor {
+export function colorToHsla(color: Partial<ColorModel>, colorModelName: ColorModelName): HSLAColor {
     if (colorModelName === 'hsva') {
         const { h, s, v, a, style } = color as HSVAColor;
         let h2;
         return {
             is: 'color',
-			h,
-			s: s * v / Math.max(0.00000001, ((h2 = (2 - s) * v) < 1 ? h2 : 2 - h2)), 
-			l: h / 2,
+            h,
+            s: s * v / Math.max(0.00000001, ((h2 = (2 - s) * v) < 1 ? h2 : 2 - h2)), 
+            l: h / 2,
             a,
             style
-		};
+        };
     } else if (colorModelName === 'rgba') {
         const { r, g, b, a, style } = color as RGBAColor;
-		const max = Math.max(r, g, b), min = Math.min(r, g, b);
-		let h = 0, s = 0, l = (max + min) / 2;
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        let h = 0, s = 0, l = (max + min) / 2;
 
-		if (max == min) {
-			h = s = 0; // achromatic
-		}
-		else {
-			const d = max - min;
-			s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-			switch (max) {
-				case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-				case g: h = (b - r) / d + 2; break;
-				case b: h = (r - g) / d + 4; break;
-			}
-			h /= 6;
-		}
-		return { is: 'color', h, s, l, a, style };
+        if (max == min) {
+            h = s = 0; // achromatic
+        }
+        else {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+        return { is: 'color', h, s, l, a, style };
     } else {
         return color as HSLAColor;
     }
 }
 
-export function colorToHsva(color: ColorModel, colorModelName: ColorModelName): HSVAColor {
+export function colorToHsva(color: Partial<ColorModel>, colorModelName: ColorModelName): HSVAColor {
     if (colorModelName === 'hsla') {
         const { h, s, l, a, style } = color as HSLAColor;
         let s2 = s * (l < .5 ? l : 1 - l);
-		return {
+        return {
             is: 'color',
-			h,
-			s: 2 * s2 / Math.max(0.00000001, (l + s2)),
-			v: l + s2,
+            h,
+            s: 2 * s2 / Math.max(0.00000001, (l + s2)),
+            v: l + s2,
             a,
             style
-		};
+        };
     } else if (colorModelName === 'rgba') {
         const { r, g, b, a, style } = color as RGBAColor;
         const max = Math.max(r, g, b), min = Math.min(r, g, b);
-		let h = 0, s = 0, v = max;
-		const d = max - min;
-		s = max == 0 ? 0 : d / max;
-		if (max == min) {
-			h = 0; // achromatic
-		} else {
-			switch (max) {
-				case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-				case g: h = (b - r) / d + 2; break;
-				case b: h = (r - g) / d + 4; break;
-			}
-			h /= 6;
-		}
-		return { is: 'color', h, s, v, a, style };
+        let h = 0, s = 0, v = max;
+        const d = max - min;
+        s = max == 0 ? 0 : d / max;
+        if (max == min) {
+            h = 0; // achromatic
+        } else {
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+        return { is: 'color', h, s, v, a, style };
     } else {
         return color as HSVAColor;
     }

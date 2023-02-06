@@ -86,7 +86,10 @@ export function generateShaderUniformsAndDefines(canvasFilters: CanvasFilter[], 
         const computedParamNames: string[] = [];
         const paramValues: Record<string, unknown> = {};
         for (const editParamName in editConfig) {
-            const paramValue = canvasFilter.params[editParamName] ?? editConfig[editParamName].default;
+            let paramValue = canvasFilter.params[editParamName] ?? editConfig[editParamName].default;
+            if (editConfig[editParamName].type === 'boolean') {
+                paramValue = paramValue === true ? 1 : 0;
+            }
             paramValues[editParamName] = paramValue;
             if (editConfig[editParamName].computedValue) {
                 computedParamNames.push(editParamName);
@@ -103,7 +106,10 @@ export function generateShaderUniformsAndDefines(canvasFilters: CanvasFilter[], 
             }
         }
         for (const editParamName of computedParamNames) {
-            const paramValue = editConfig[editParamName].computedValue?.(paramValues, { layerWidth: layer.width ?? 0, layerHeight: layer.height ?? 0 });
+            let paramValue = editConfig[editParamName].computedValue?.(paramValues, { layerWidth: layer.width ?? 0, layerHeight: layer.height ?? 0 });
+            if (editConfig[editParamName].type === 'boolean') {
+                paramValue = paramValue === true ? 1 : 0;
+            }
             if (editConfig[editParamName].constant) {
                 const replaceDefineName = 'constant' + index + '_' + editParamName;
                 defines[replaceDefineName] = paramValue;

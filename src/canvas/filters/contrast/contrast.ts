@@ -16,7 +16,7 @@ export default class ContrastCanvasFilter implements CanvasFilter<ContrastCanvas
             contrast: {
                 type: 'percentage',
                 default: 0,
-                preview: 0.5,
+                preview: 0.3,
                 min: -1,
                 max: 1
             },

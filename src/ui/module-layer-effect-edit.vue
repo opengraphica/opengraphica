@@ -92,6 +92,16 @@
                                 <span class="bi bi-arrow-repeat" aria-hidden="true" />
                             </el-button>
                         </template>
+                        <template v-else-if="editConfigField.type === 'boolean'">
+                            <el-switch v-model="formData.filterParams[paramName]" />
+                            <el-button
+                                link type="primary" class="el-button--form-item-reset"
+                                :disabled="isFilterParamDefault(paramName, editConfigField)"
+                                :aria-label="$t('module.layerEffectEdit.resetField')"
+                                @click="resetFilterParam(paramName, editConfigField)">
+                                <span class="bi bi-arrow-repeat" aria-hidden="true" />
+                            </el-button>
+                        </template>
                     </el-form-item>
                 </template>
             </el-form-item-group>

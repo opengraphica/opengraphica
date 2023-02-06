@@ -20,6 +20,12 @@ export interface CanvasFilterEditConfigIntegerOption {
     value: number;
 }
 
+export interface CanvasFilterEditConfigBoolean extends CanvasFilterEditConfigFieldCommon {
+    type: 'boolean';
+    default: boolean;
+    preview?: boolean;
+}
+
 export interface CanvasFilterEditConfigInteger extends CanvasFilterEditConfigFieldCommon {
     type: 'integer';
     default: number;
@@ -50,7 +56,7 @@ export interface CanvasFilterEditConfigPercentage extends CanvasFilterEditConfig
     preview?: number;
 }
 
-export type CanvasFilterEditConfigField = CanvasFilterEditConfigInteger | CanvasFilterEditConfigFloat | CanvasFilterEditConfigPercentage | CanvasFilterEditConfigComputedFloat;
+export type CanvasFilterEditConfigField = CanvasFilterEditConfigBoolean | CanvasFilterEditConfigInteger | CanvasFilterEditConfigFloat | CanvasFilterEditConfigPercentage | CanvasFilterEditConfigComputedFloat;
 
 export interface CanvasFilterEditConfig {
     [key: string]: CanvasFilterEditConfigField;

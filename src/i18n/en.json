@@ -289,7 +289,18 @@
             }
         },
         "negative": {
-            "name": "Negative"
+            "name": "Negative",
+            "param": {
+                "colorSpace": "Color Space",
+                "colorSpaceOption": {
+                    "perceptualRgb": "Perceptual RGB",
+                    "linearRgb": "Linear RGB"
+                },
+                "invertRed": "Invert Red Channel",
+                "invertGreen": "Invert Green Channel",
+                "invertBlue": "Invert Blue Channel",
+                "invertValue": "Invert Value"
+            }
         },
         "saturation": {
             "name": "Saturation"

@@ -26591,7 +26591,8 @@ body.ogr-full-page .opengraphica {
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-row > .el-col > .el-input > .el-input__wrapper,
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-row > .el-col > .el-input-group > *:last-child,
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__wrapper,
-.opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper {
+.opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper,
+.opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-switch {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
@@ -26602,7 +26603,8 @@ body.ogr-full-page .opengraphica {
 .opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-input-group > *:last-child,
 .opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-row > .el-col:last-child > .el-input-group > *:last-child,
 .opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__wrapper,
-.opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper {
+.opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper,
+.opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-switch {
   border-top-right-radius: var(--ogr-border-radius);
 }
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__label {
@@ -26612,7 +26614,8 @@ body.ogr-full-page .opengraphica {
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-input-group > *:last-child,
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-row > .el-col:last-child > .el-input-group > *:last-child,
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__wrapper,
-.opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper {
+.opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper,
+.opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-switch {
   border-bottom-right-radius: var(--ogr-border-radius);
 }
 .opengraphica .el-form-item-group .el-form-item + .el-form-item {
@@ -26678,6 +26681,13 @@ body.ogr-full-page .opengraphica {
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-row:first-child > .el-col:first-child > .el-slider {
   border-left: 0.0625rem solid var(--ogr-form-connected-label-border-color) !important;
 }
+.opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-switch {
+  box-sizing: border-box;
+  border: 0.0625rem solid var(--ogr-form-connected-label-border-color);
+  height: 100%;
+  padding: 0 0.5rem;
+  width: 100%;
+}
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-select, .opengraphica .el-form-item-group .el-form-item .el-form-item__content .el-input:not(.el-input-group) {
   display: block;
 }
@@ -26722,7 +26732,10 @@ body.ogr-full-page .opengraphica {
 .opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content {
   position: relative;
 }
-.opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content > .el-row, .opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content > .el-input, .opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content > .el-select {
+.opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content > .el-row,
+.opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content > .el-input,
+.opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content > .el-select,
+.opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content > .el-switch {
   width: calc(100% - 2rem);
 }
 .opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content .el-button.el-button--form-item-reset {
