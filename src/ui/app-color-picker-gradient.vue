@@ -71,7 +71,7 @@ export default defineComponent({
         const hueSliderContainer = ref<HTMLDivElement>();
         const opacitySliderContainer = ref<HTMLDivElement>();
 
-        const pickedColor = ref<HSVAColor>({ is: 'color', h: 0, s: 0, v: 0, a: 1, style: '#000000' });
+        const pickedColor = ref<HSVAColor>({ is: 'color', h: 0, s: 0, v: 0, alpha: 1, style: '#000000' });
         const pickedColorOpaqueStyle = ref<string>('rgb(0, 0, 0)');
         let outputColorModelName: ColorModelName = 'rgba';
 
@@ -89,14 +89,14 @@ export default defineComponent({
                     (newPickedColor.h !== oldPickedColor.h && newPickedColor.v !== 0) ||
                     (newPickedColor.s !== oldPickedColor.s && newPickedColor.v !== 0) ||
                     newPickedColor.v !== oldPickedColor.v ||
-                    newPickedColor.a !== oldPickedColor.a
+                    newPickedColor.alpha !== oldPickedColor.alpha
                 ) {
                     pickedColor.value = newPickedColor;
                     if (newPickedColor.s > 0) {
                         hue.value = pickedColor.value.h;
                         saturationValueGradientColorStyle.value = createColor('hsva', { h: hue.value, s: 1, v: 1, a: 1 }, workingFileStore.state.colorSpace).style;
                     }
-                    opacity.value = pickedColor.value.a;
+                    opacity.value = pickedColor.value.alpha;
                     pickedColorOpaqueStyle.value = generateColorStyle({ ...pickedColor.value, a: 1 }, 'hsva', workingFileStore.state.colorSpace);
                 }
             }
@@ -158,14 +158,14 @@ export default defineComponent({
         }
 
         function onInputOpacitySlider(value: number) {
-            pickedColor.value.a = value;
+            pickedColor.value.alpha = value;
             const outputColor = generateOutputColor();
             emit('update:modelValue', outputColor);
             emit('input', outputColor);
         }
 
         function onChangeOpacitySlider(value: number) {
-            pickedColor.value.a = value;
+            pickedColor.value.alpha = value;
             const outputColor = generateOutputColor();
             emit('update:modelValue', outputColor);
             emit('change', outputColor);

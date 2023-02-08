@@ -75,7 +75,7 @@ export default defineComponent({
         });
 
         const useCanvasBackground = computed<boolean>(() => {
-            return !workingFileStore.state.background.visible || workingFileStore.state.background.color.a < 1;
+            return !workingFileStore.state.background.visible || workingFileStore.state.background.color.alpha < 1;
         });
 
         const hasCanvasOverlays = computed<boolean>(() => {
@@ -103,7 +103,7 @@ export default defineComponent({
                                 side: DoubleSide
                             });
                         } else {
-                            const { r, g, b, a } = colorToRgba(
+                            const { r, g, b, alpha } = colorToRgba(
                                 workingFileStore.state.background.color,
                                 getColorModelName(workingFileStore.state.background.color)
                             );
@@ -114,7 +114,7 @@ export default defineComponent({
                             color.convertSRGBToLinear();
                             threejsBackground.material = new MeshBasicMaterial({
                                 color,
-                                opacity: a,
+                                opacity: alpha,
                                 transparent: true,
                                 side: DoubleSide
                             });

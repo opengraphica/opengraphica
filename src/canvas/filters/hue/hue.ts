@@ -1,6 +1,7 @@
 import fragmentShader from './hue.frag';
-
+import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData } from '../color-space';
 import { colorToRgba, colorToHsla } from '@/lib/color';
+
 import type { CanvasFilter, CanvasFilterEditConfig } from '@/types';
 
 interface HueCanvasFilterParams {
@@ -33,20 +34,13 @@ export default class HueCanvasFilter implements CanvasFilter<HueCanvasFilterPara
 
     public fragment(sourceImageData: Uint8ClampedArray, targetImageData: Uint8ClampedArray, dataPosition: number) {
         const rotate = this.params.rotate ?? 0;
-        const hsla = colorToHsla({
-            is: 'color',
-            style: '',
-            r: sourceImageData[dataPosition + 0] / 255,
-            g: sourceImageData[dataPosition + 1] / 255,
-            b: sourceImageData[dataPosition + 2] / 255,
-            a: 1.0
-        }, 'rgba');
-        hsla.h += rotate;
-        const rgba = colorToRgba(hsla, 'hsla');
 
-        targetImageData[dataPosition + 0] = rgba.r * 255;
-        targetImageData[dataPosition + 1] = rgba.g * 255;
-        targetImageData[dataPosition + 2] = rgba.b * 255;
-        targetImageData[dataPosition + 3] = sourceImageData[dataPosition + 3];
+        let rgba = transfer8BitImageDataToLinearSrgb(sourceImageData, dataPosition);
+
+        const hsla = colorToHsla(rgba, 'rgba');
+        hsla.h += rotate;
+        rgba = colorToRgba(hsla, 'hsla');
+
+        transferLinearSrgbTo8BitImageData(rgba, targetImageData, dataPosition);
     }
 }

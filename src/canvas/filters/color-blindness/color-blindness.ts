@@ -141,7 +141,7 @@ export default class ColorBlindnessCanvasFilter implements CanvasFilter<ColorBli
         const method = this.params.method ?? 0;
         const severity = this.params.severity ?? 1;
 
-        let rgbCvd!: { r: number, g: number, b: number, a: number };
+        let rgbCvd!: { r: number, g: number, b: number, alpha: number };
 
         if (type === ColorBlindnessType.ACHROMA) {
             const rgba = transfer8BitImageDataToSrgb(sourceImageData, dataPosition);
@@ -165,7 +165,7 @@ export default class ColorBlindnessCanvasFilter implements CanvasFilter<ColorBli
                 r: rgbCvdFromRgb[0] * rgba.r + rgbCvdFromRgb[1] * rgba.g + rgbCvdFromRgb[2] * rgba.b,
                 g: rgbCvdFromRgb[3] * rgba.r + rgbCvdFromRgb[4] * rgba.g + rgbCvdFromRgb[5] * rgba.b,
                 b: rgbCvdFromRgb[6] * rgba.r + rgbCvdFromRgb[7] * rgba.g + rgbCvdFromRgb[8] * rgba.b,
-                a: rgba.a
+                alpha: rgba.alpha
             };
             rgbCvd.r = rgbCvd.r * severity + rgba.r * (1 - severity);
             rgbCvd.g = rgbCvd.g * severity + rgba.g * (1 - severity);
@@ -179,7 +179,7 @@ export default class ColorBlindnessCanvasFilter implements CanvasFilter<ColorBli
                 r: rgbCvdFromRgb[0] * rgba.r + rgbCvdFromRgb[1] * rgba.g + rgbCvdFromRgb[2] * rgba.b,
                 g: rgbCvdFromRgb[3] * rgba.r + rgbCvdFromRgb[4] * rgba.g + rgbCvdFromRgb[5] * rgba.b,
                 b: rgbCvdFromRgb[6] * rgba.r + rgbCvdFromRgb[7] * rgba.g + rgbCvdFromRgb[8] * rgba.b,
-                a: rgba.a
+                alpha: rgba.alpha
             };
 
             if (severity < 0.999) {

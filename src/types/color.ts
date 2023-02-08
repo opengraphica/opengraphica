@@ -1,4 +1,4 @@
-export type ColorModelName = 'rgba' | 'cmyka' | 'hsla' | 'hsva';
+export type ColorModelName = 'rgba' | 'cmyka' | 'hsla' | 'hsva' | 'laba' | 'lcha';
 
 export interface GenericColor {
     is: 'color';
@@ -9,7 +9,7 @@ export interface RGBAColor extends GenericColor {
     r: number;
     g: number;
     b: number;
-    a: number;
+    alpha: number;
 }
 
 export interface CMYKAColor extends GenericColor {
@@ -17,24 +17,38 @@ export interface CMYKAColor extends GenericColor {
     m: number;
     y: number;
     k: number;
-    a: number;
+    alpha: number;
 }
 
 export interface HSLAColor extends GenericColor {
     h: number;
     s: number;
     l: number;
-    a: number;
+    alpha: number;
 }
 
 export interface HSVAColor extends GenericColor {
     h: number;
     s: number;
     v: number;
-    a: number;
+    alpha: number;
 }
 
-export type ColorModel = RGBAColor | CMYKAColor | HSLAColor | HSVAColor;
+export interface LABAColor extends GenericColor {
+    l: number;
+    a: number;
+    b: number;
+    alpha: number;
+}
+
+export interface LCHAColor extends GenericColor {
+    l: number;
+    c: number;
+    h: number;
+    alpha: number;
+}
+
+export type ColorModel = RGBAColor | CMYKAColor | HSLAColor | HSVAColor | LABAColor | LCHAColor;
 
 export interface GradientStop<T extends ColorModel> {
     percent: number;

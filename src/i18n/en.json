@@ -222,6 +222,12 @@
                 "brightness": "Brightness"
             }
         },
+        "chroma": {
+            "name": "Chroma",
+            "param": {
+                "chroma": "Chroma"
+            }
+        },
         "colorBlindness": {
             "name": "Color Blindness",
             "param": {
@@ -303,7 +309,10 @@
             }
         },
         "saturation": {
-            "name": "Saturation"
+            "name": "Saturation",
+            "param": {
+                "saturation": "Saturation"
+            }
         },
         "sepia": {
             "name": "Sepia"

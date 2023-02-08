@@ -1,5 +1,5 @@
 import fragmentShader from './grayscale.frag';
-import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData, transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData, linearSrgbChannelToSrgbChannel } from '../color-space';
+import { transfer8BitImageDataToLinearSrgb, transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData, linearSrgbChannelToSrgbChannel } from '../color-space';
 
 import type { CanvasFilter, CanvasFilterEditConfig } from '@/types';
 
@@ -56,7 +56,7 @@ export default class GrayscaleCanvasFilter implements CanvasFilter<GrayscaleCanv
         const mode = this.params.mode ?? 0;
         const percentage = this.params.mix ?? 0;
 
-        let rgba: { r: number, g: number, b: number, a: number };
+        let rgba: { r: number, g: number, b: number, alpha: number };
 
         var intensity = 0;
         if (mode === GrayscaleDesaturationMode.LUMINANCE) {
@@ -80,17 +80,5 @@ export default class GrayscaleCanvasFilter implements CanvasFilter<GrayscaleCanv
         rgba.b = (rgba.b * (1 - percentage)) + (intensity * percentage);
 
         return transferSrgbTo8BitImageData(rgba, targetImageData, dataPosition);
-    }
-
-    private sRgbToLinearRgb(value: number): number {
-        if (value < 0.04045) return value / 12.92;
-        return Math.pow((value + 0.055) / 1.055, 2.4);
-    }
-
-    private linearRgbToSRgb(value: number): number {
-        if (value <= 0) return 0;
-        if (value >= 1) return 1;
-        if (value < 0.0031308) return (value * 12.92);
-        return (Math.pow(value, 1 / 2.4) * 1.055 - 0.055);
     }
 }

@@ -1,23 +1,23 @@
-import fragmentShader from './saturation.frag';
+import fragmentShader from './chroma.frag';
 import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData } from '../color-space';
 import { linearRgbaToOklab, oklabToLinearRgba, lchaToLaba, labaToLcha } from '@/lib/color';
 
 import type { CanvasFilter, CanvasFilterEditConfig } from '@/types';
 
-interface SaturationCanvasFilterParams {
-    saturation?: number;
+interface ChromaCanvasFilterParams {
+    chroma?: number;
 }
 
-export default class SaturationCanvasFilter implements CanvasFilter<SaturationCanvasFilterParams> {
-    public name = 'saturation';
-    public params: SaturationCanvasFilterParams = {};
+export default class ChromaCanvasFilter implements CanvasFilter<ChromaCanvasFilterParams> {
+    public name = 'chroma';
+    public params: ChromaCanvasFilterParams = {};
 
     public getEditConfig() {
         return {
-            saturation: {
+            chroma: {
                 type: 'percentage',
                 default: 0,
-                preview: 0.5,
+                preview: 0.25,
                 min: -1,
                 max: 1
             }
@@ -33,24 +33,15 @@ export default class SaturationCanvasFilter implements CanvasFilter<SaturationCa
     }
 
     public fragment(sourceImageData: Uint8ClampedArray, targetImageData: Uint8ClampedArray, dataPosition: number) {
-        const saturation = (this.params.saturation ?? 0.0);
+        const chroma = -1.0 + Math.tan((Math.min(0.9999, this.params.chroma ?? 0.0) + 1.0) * Math.PI / 4.0)
 
         let rgba = transfer8BitImageDataToLinearSrgb(sourceImageData, dataPosition);
         const laba = linearRgbaToOklab(rgba);
         const lcha = labaToLcha(laba);
-        // let s = Math.sqrt(laba.a * laba.a + laba.b * laba.b) / laba.l;
-        // const { l, c } = lcha;
-        // if (saturation > 0) {
-        //     s = s + (1.0 - s) * saturation;
-        // } else {
-        //     s = s * (1.0 - Math.abs(saturation));
-        // }
-        // lcha.c = Math.abs(l * s) / (Math.sqrt(s * s - saturation * saturation));
-        // lcha.l = Math.abs((c * Math.sqrt(-(s*s) + saturation * saturation)) / s);
-        if (saturation > 0) {
-            lcha.c = lcha.c + (1.0 - lcha.c) * saturation;
+        if (chroma > 0) {
+            lcha.c = lcha.c + (1.0 - lcha.c) * chroma / 4.0;
         } else {
-            lcha.c = lcha.c * (1.0 - Math.abs(saturation));
+            lcha.c = lcha.c * (1.0 - Math.abs(chroma));
         }
         lcha.c = Math.min(1.0, Math.max(0.0, lcha.c));
         rgba = oklabToLinearRgba(lchaToLaba(lcha));

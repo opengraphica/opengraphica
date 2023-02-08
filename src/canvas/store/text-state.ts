@@ -41,8 +41,8 @@ export const textMetaDefaults = Object.freeze({
     strikethrough: null,
     strikethroughColor: null,
     strikethroughThickness: 1,
-    fillColor: { is: 'color', r: 0, g: 0, b: 0, a: 1, style: '#000000' },
-    strokeColor: { is: 'color', r: 0, g: 0, b: 0, a: 1, style: '#000000' },
+    fillColor: { is: 'color', r: 0, g: 0, b: 0, alpha: 1, style: '#000000' },
+    strokeColor: { is: 'color', r: 0, g: 0, b: 0, alpha: 1, style: '#000000' },
     strokeSize: 0,
     tracking: 0,
     leading: 0

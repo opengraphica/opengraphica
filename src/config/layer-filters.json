@@ -7,6 +7,10 @@
         "name": "layerFilter.brightness.name",
         "group": "color"
     },
+    "chroma": {
+        "name": "layerFilter.chroma.name",
+        "group": "color"
+    },
     "contrast": {
         "name": "layerFilter.contrast.name",
         "group": "color"

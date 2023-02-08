@@ -7,7 +7,7 @@
  * @license CC BY-SA 3.0 https://creativecommons.org/licenses/by-sa/3.0/deed.en 
  */
 
-import { ColorModelName, ColorModel, RGBAColor, CMYKAColor, HSLAColor, HSVAColor } from '@/types';
+import { ColorModelName, ColorModel, RGBAColor, CMYKAColor, HSLAColor, HSVAColor, LABAColor, LCHAColor } from '@/types';
 
 export function getColorModelName(color: ColorModel): ColorModelName {
     if ((color as RGBAColor).r != null) {
@@ -39,7 +39,7 @@ export function colorToHex(color: ColorModel, colorModelName: ColorModelName): s
     if (colorModelName !== 'rgba') {
         rgbaColor = colorToRgba(color, colorModelName);
     }
-    return ('#' + componentToHex(Math.round(rgbaColor.r * 255)) + componentToHex(Math.round(rgbaColor.g * 255)) + componentToHex(Math.round(rgbaColor.b * 255)) + (rgbaColor.a < 1 ? componentToHex(Math.round(rgbaColor.a * 255)) : '')).toUpperCase();
+    return ('#' + componentToHex(Math.round(rgbaColor.r * 255)) + componentToHex(Math.round(rgbaColor.g * 255)) + componentToHex(Math.round(rgbaColor.b * 255)) + (rgbaColor.alpha < 1 ? componentToHex(Math.round(rgbaColor.alpha * 255)) : '')).toUpperCase();
 }
 
 export function hexToColor(hex: string, colorModelName: 'rgba'): RGBAColor;
@@ -57,7 +57,7 @@ export function hexToColor(hex: string, colorModelName: ColorModelName): ColorMo
         r: parseInt(redHex, 16) / 255,
         g: parseInt(greenHex, 16) / 255,
         b: parseInt(blueHex, 16) / 255,
-        a: parseInt(alphaHex, 16) / 255
+        alpha: parseInt(alphaHex, 16) / 255
     }, 'sRGB');
     if (isNaN(rgbaColor.r)) {
         rgbaColor.r = 0;
@@ -68,8 +68,8 @@ export function hexToColor(hex: string, colorModelName: ColorModelName): ColorMo
     if (isNaN(rgbaColor.b)) {
         rgbaColor.b = 0;
     }
-    if (isNaN(rgbaColor.a)) {
-        rgbaColor.a = 1;
+    if (isNaN(rgbaColor.alpha)) {
+        rgbaColor.alpha = 1;
     }
     return convertColorModel(rgbaColor, colorModelName);
 }
@@ -90,7 +90,7 @@ function hueToRgb(p: number, q: number, t: number) {
 
 export function colorToRgba(color: Partial<ColorModel>, colorModelName: ColorModelName): RGBAColor {
     if (colorModelName === 'hsla') {
-        const { h, s, l, a, style } = color as HSLAColor;
+        const { h, s, l, alpha, style } = color as HSLAColor;
         let r, g, b;
         if (s == 0) {
             r = g = b = l; // achromatic
@@ -103,9 +103,9 @@ export function colorToRgba(color: Partial<ColorModel>, colorModelName: ColorMod
             b = hueToRgb(p, q, h - 1 / 3);
         }
 
-        return { is: 'color', r, g, b, a, style };
+        return { is: 'color', r, g, b, alpha, style };
     } else if (colorModelName === 'hsva') {
-        const { h, s, v, a, style } = color as HSVAColor;
+        const { h, s, v, alpha, style } = color as HSVAColor;
         let r = 0, g = 0, b = 0;
     
         const i = Math.floor(h * 6);
@@ -123,7 +123,7 @@ export function colorToRgba(color: Partial<ColorModel>, colorModelName: ColorMod
             case 5: r = v, g = p, b = q; break;
         }
     
-        return { is: 'color', r, g, b, a, style };
+        return { is: 'color', r, g, b, alpha, style };
     } else {
         return color as RGBAColor;
     }
@@ -131,18 +131,18 @@ export function colorToRgba(color: Partial<ColorModel>, colorModelName: ColorMod
 
 export function colorToHsla(color: Partial<ColorModel>, colorModelName: ColorModelName): HSLAColor {
     if (colorModelName === 'hsva') {
-        const { h, s, v, a, style } = color as HSVAColor;
+        const { h, s, v, alpha, style } = color as HSVAColor;
         let h2;
         return {
             is: 'color',
             h,
             s: s * v / Math.max(0.00000001, ((h2 = (2 - s) * v) < 1 ? h2 : 2 - h2)), 
             l: h / 2,
-            a,
+            alpha,
             style
         };
     } else if (colorModelName === 'rgba') {
-        const { r, g, b, a, style } = color as RGBAColor;
+        const { r, g, b, alpha, style } = color as RGBAColor;
         const max = Math.max(r, g, b), min = Math.min(r, g, b);
         let h = 0, s = 0, l = (max + min) / 2;
 
@@ -159,7 +159,7 @@ export function colorToHsla(color: Partial<ColorModel>, colorModelName: ColorMod
             }
             h /= 6;
         }
-        return { is: 'color', h, s, l, a, style };
+        return { is: 'color', h, s, l, alpha, style };
     } else {
         return color as HSLAColor;
     }
@@ -167,18 +167,18 @@ export function colorToHsla(color: Partial<ColorModel>, colorModelName: ColorMod
 
 export function colorToHsva(color: Partial<ColorModel>, colorModelName: ColorModelName): HSVAColor {
     if (colorModelName === 'hsla') {
-        const { h, s, l, a, style } = color as HSLAColor;
+        const { h, s, l, alpha, style } = color as HSLAColor;
         let s2 = s * (l < .5 ? l : 1 - l);
         return {
             is: 'color',
             h,
             s: 2 * s2 / Math.max(0.00000001, (l + s2)),
             v: l + s2,
-            a,
+            alpha,
             style
         };
     } else if (colorModelName === 'rgba') {
-        const { r, g, b, a, style } = color as RGBAColor;
+        const { r, g, b, alpha, style } = color as RGBAColor;
         const max = Math.max(r, g, b), min = Math.min(r, g, b);
         let h = 0, s = 0, v = max;
         const d = max - min;
@@ -193,16 +193,121 @@ export function colorToHsva(color: Partial<ColorModel>, colorModelName: ColorMod
             }
             h /= 6;
         }
-        return { is: 'color', h, s, v, a, style };
+        return { is: 'color', h, s, v, alpha, style };
     } else {
         return color as HSVAColor;
     }
 }
 
-export function createColor(colorModelName: 'rgba', definition: { r: number, g: number, b: number, a: number }, colorSpace: string): RGBAColor;
-export function createColor(colorModelName: 'hsva', definition: { h: number, s: number, v: number, a: number }, colorSpace: string): HSVAColor;
-export function createColor(colorModelName: 'hsla', definition: { h: number, s: number, l: number, a: number }, colorSpace: string): HSLAColor;
-export function createColor(colorModelName: 'cmyka', definition: { c: number, m: number, y: number, k: number, a: number }, colorSpace: string): CMYKAColor;
+/**
+ * Adapted from https://github.com/Evercoder/culori/blob/main/src/oklab/convertLrgbToOklab.js
+ * @license MIT https://github.com/Evercoder/culori/blob/main/LICENSE
+ */
+export function linearRgbaToOklab(color: Partial<RGBAColor>): LABAColor {
+    const { r, g, b, alpha, style } = color as RGBAColor;
+    const L = Math.cbrt(
+        0.41222147079999993 * r + 0.5363325363 * g + 0.0514459929 * b
+    );
+    const M = Math.cbrt(
+        0.2119034981999999 * r + 0.6806995450999999 * g + 0.1073969566 * b
+    );
+    const S = Math.cbrt(
+        0.08830246189999998 * r + 0.2817188376 * g + 0.6299787005000002 * b
+    );
+    return {
+        is: 'color',
+        l: 0.2104542553 * L + 0.793617785 * M - 0.0040720468 * S,
+        a: 1.9779984951 * L - 2.428592205 * M + 0.4505937099 * S,
+        b: 0.0259040371 * L + 0.7827717662 * M - 0.808675766 * S,
+        alpha,
+        style
+    };
+}
+
+/**
+ * Adapted from https://github.com/Evercoder/culori/blob/main/src/oklab/convertOklabToLrgb.js
+ * @license MIT https://github.com/Evercoder/culori/blob/main/LICENSE
+ */
+export function oklabToLinearRgba(color: Partial<LABAColor>): RGBAColor {
+    const { l, a, b, alpha, style } = color as LABAColor;
+    let L = Math.pow(
+        l * 0.99999999845051981432 +
+            0.39633779217376785678 * a +
+            0.21580375806075880339 * b,
+        3
+    );
+    let M = Math.pow(
+        l * 1.0000000088817607767 -
+            0.1055613423236563494 * a -
+            0.063854174771705903402 * b,
+        3
+    );
+    let S = Math.pow(
+        l * 1.0000000546724109177 -
+            0.089484182094965759684 * a -
+            1.2914855378640917399 * b,
+        3
+    );
+
+    return {
+        is: 'color',
+        r:
+            +4.076741661347994 * L -
+            3.307711590408193 * M +
+            0.230969928729428 * S,
+        g:
+            -1.2684380040921763 * L +
+            2.6097574006633715 * M -
+            0.3413193963102197 * S,
+        b:
+            -0.004196086541837188 * L -
+            0.7034186144594493 * M +
+            1.7076147009309444 * S,
+        alpha,
+        style
+    };
+}
+
+/**
+ * Adapted from https://github.com/Evercoder/culori/blob/main/src/lch/convertLchToLab.js
+ * @license MIT https://github.com/Evercoder/culori/blob/main/LICENSE
+ */
+export function lchaToLaba(color: Partial<LCHAColor>): LABAColor {
+    const { l, c, h, alpha, style } = color as LCHAColor;
+    return {
+        is: 'color',
+        l,
+        a: c ? c * Math.cos((h / 180) * Math.PI) : 0,
+        b: c ? c * Math.sin((h / 180) * Math.PI) : 0,
+        alpha,
+        style
+    };
+}
+
+/**
+ * Adapted from https://github.com/Evercoder/culori/blob/main/src/lch/convertLabToLch.js
+ * @license MIT https://github.com/Evercoder/culori/blob/main/LICENSE
+ */
+function normalizeHue(hue: number) { return ((hue = hue % 360) < 0 ? hue + 360 : hue) }
+export function labaToLcha(color: Partial<LABAColor>): LCHAColor {
+    const { l, a, b, alpha, style } = color as LABAColor;
+    let c = Math.sqrt(a * a + b * b) ?? 0;
+    return {
+        is: 'color',
+        l,
+        c: (isNaN(c)) ? 0 : c,
+        h: (isNaN(c)) ? 0 : normalizeHue((Math.atan2(b, a) * 180) / Math.PI),
+        alpha,
+        style
+    }
+};
+
+export function createColor(colorModelName: 'rgba', definition: { r: number, g: number, b: number, alpha: number }, colorSpace: string): RGBAColor;
+export function createColor(colorModelName: 'hsva', definition: { h: number, s: number, v: number, alpha: number }, colorSpace: string): HSVAColor;
+export function createColor(colorModelName: 'hsla', definition: { h: number, s: number, l: number, alpha: number }, colorSpace: string): HSLAColor;
+export function createColor(colorModelName: 'cmyka', definition: { c: number, m: number, y: number, k: number, alpha: number }, colorSpace: string): CMYKAColor;
+export function createColor(colorModelName: 'laba', definition: { l: number, a: number, b: number, alpha: number }, colorSpace: string): LABAColor;
+export function createColor(colorModelName: 'lcha', definition: { l: number, c: number, h: number, alpha: number }, colorSpace: string): LCHAColor;
 export function createColor(colorModelName: ColorModelName, definition: any, colorSpace: string): ColorModel {
     const color: ColorModel = {
         is: 'color',

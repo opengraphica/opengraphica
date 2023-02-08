@@ -58,7 +58,7 @@ export default defineComponent({
     props: {
         color: {
             type: Object as PropType<ColorModel>,
-            default: { is: 'color', r: 0, g: 0, b: 0, a: 1, style: '#000000' }
+            default: { is: 'color', r: 0, g: 0, b: 0, alpha: 1, style: '#000000' }
         },
         isDialog: {
             type: Boolean,
@@ -72,7 +72,7 @@ export default defineComponent({
     setup(props, { emit }) {
         emit('update:title', 'dock.colorPicker.title');
 
-        const workingColor = ref<RGBAColor>({ is: 'color', r: 0, g: 0, b: 0, a: 1, style: '#000000' });
+        const workingColor = ref<RGBAColor>({ is: 'color', r: 0, g: 0, b: 0, alpha: 1, style: '#000000' });
         let outputColorModelName: ColorModelName = 'rgba';
 
         const hexCode = ref<string>();
