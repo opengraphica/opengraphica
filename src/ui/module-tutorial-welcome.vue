@@ -38,6 +38,7 @@ import editorStore from '@/store/editor';
 
 export default defineComponent({
     name: 'ModuleTutorialWelcome',
+    inheritAttrs: false,
     directives: {
         loading: ElLoading.directive
     },

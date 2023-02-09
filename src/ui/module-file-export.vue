@@ -105,6 +105,7 @@ import { knownFileExtensions } from '@/lib/regex';
 
 export default defineComponent({
     name: 'ModuleFileExport',
+    inheritAttrs: false,
     directives: {
         loading: ElLoading.directive
     },

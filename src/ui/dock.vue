@@ -5,6 +5,7 @@
                 <component
                     :is="name"
                     :is-dialog="isDialog"
+                    :dialog-opened="dialogOpened"
                     v-bind:="props"
                     @close="onCloseDock"
                     @update:dialogSize="onUpdateDialogSize"
@@ -39,6 +40,10 @@ export default defineComponent({
     ],
     props: {
         isDialog: {
+            type: Boolean,
+            default: false
+        },
+        dialogOpened: {
             type: Boolean,
             default: false
         },

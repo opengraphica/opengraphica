@@ -11,6 +11,10 @@
         "name": "layerFilter.chroma.name",
         "group": "color"
     },
+    "colorBlindness": {
+        "name": "layerFilter.colorBlindness.name",
+        "group": "color"
+    },
     "contrast": {
         "name": "layerFilter.contrast.name",
         "group": "color"
@@ -26,22 +30,5 @@
     "negative": {
         "name": "layerFilter.negative.name",
         "group": "color"
-    },
-    "saturation": {
-        "name": "layerFilter.saturation.name",
-        "group": "color"
-    },
-    "sepia": {
-        "name": "layerFilter.sepia.name",
-        "group": "color"
-    },
-    "colorBlindness": {
-        "name": "layerFilter.colorBlindness.name",
-        "group": "color"
-    },
-
-    "gaussianBlur": {
-        "name": "layerFilter.gaussianBlur.name",
-        "group": "blur"
     }
 }

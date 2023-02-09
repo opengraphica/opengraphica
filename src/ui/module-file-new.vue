@@ -115,6 +115,7 @@ const defaultNewFilePresets: NewFilePreset[] = defaultNewFilePresetsJson as any;
 
 export default defineComponent({
     name: 'ModuleFileNew',
+    inheritAttrs: false,
     directives: {
         loading: ElLoading.directive
     },

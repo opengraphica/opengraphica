@@ -56,7 +56,7 @@ export default defineComponent({
     props: {
         modelValue: {
             type: Object as PropType<ColorModel>,
-            default: { is: 'color', r: 0, g: 0, b: 0, a: 1, style: '#000000' }
+            default: { is: 'color', r: 0, g: 0, b: 0, alpha: 1, style: '#000000' }
         }
     },
     emits: [
@@ -94,17 +94,17 @@ export default defineComponent({
                     pickedColor.value = newPickedColor;
                     if (newPickedColor.s > 0) {
                         hue.value = pickedColor.value.h;
-                        saturationValueGradientColorStyle.value = createColor('hsva', { h: hue.value, s: 1, v: 1, a: 1 }, workingFileStore.state.colorSpace).style;
+                        saturationValueGradientColorStyle.value = createColor('hsva', { h: hue.value, s: 1, v: 1, alpha: 1 }, workingFileStore.state.colorSpace).style;
                     }
                     opacity.value = pickedColor.value.alpha;
-                    pickedColorOpaqueStyle.value = generateColorStyle({ ...pickedColor.value, a: 1 }, 'hsva', workingFileStore.state.colorSpace);
+                    pickedColorOpaqueStyle.value = generateColorStyle({ ...pickedColor.value, alpha: 1 }, 'hsva', workingFileStore.state.colorSpace);
                 }
             }
         }, { immediate: true });
 
         function generateOutputColor(): ColorModel {
             const outputColor = convertColorModel(pickedColor.value, outputColorModelName);
-            pickedColorOpaqueStyle.value = generateColorStyle({ ...outputColor, a: 1 }, outputColorModelName, workingFileStore.state.colorSpace);
+            pickedColorOpaqueStyle.value = generateColorStyle({ ...outputColor, alpha: 1 }, outputColorModelName, workingFileStore.state.colorSpace);
             generateColorStyle(outputColor, outputColorModelName, workingFileStore.state.colorSpace);
             pickedColor.value.style = outputColor.style;
             return outputColor;
@@ -143,7 +143,7 @@ export default defineComponent({
         function onInputHueSlider(value: number) {
             pickedColor.value.h = value;
 
-            saturationValueGradientColorStyle.value = createColor('hsva', { h: hue.value, s: 1, v: 1, a: 1 }, workingFileStore.state.colorSpace).style;
+            saturationValueGradientColorStyle.value = createColor('hsva', { h: hue.value, s: 1, v: 1, alpha: 1 }, workingFileStore.state.colorSpace).style;
 
             const outputColor = generateOutputColor();
             emit('update:modelValue', outputColor);

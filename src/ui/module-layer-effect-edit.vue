@@ -117,9 +117,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted, onUnmounted, nextTick, reactive, watch } from 'vue';
-import layerFilterList from '@/config/layer-filters.json';
-import { useI18n } from '@/i18n';
+import { defineComponent, ref, computed, onMounted, onUnmounted, nextTick, reactive, watch, WatchStopHandle } from 'vue';
+import { Rules } from 'async-validator';
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElAutoGrid from './el-auto-grid.vue';
 import ElButton from 'element-plus/lib/components/button/index';
@@ -134,6 +133,8 @@ import ElSlider from 'element-plus/lib/components/slider/index';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSwitch from 'element-plus/lib/components/switch/index';
 import ElRow from 'element-plus/lib/components/row/index';
+
+import { useI18n } from '@/i18n';
 import historyStore from '@/store/history';
 import workingFileStore, { getCanvasRenderingContext2DSettings, getLayerById } from '@/store/working-file';
 import { notifyInjector } from '@/lib/notify';
@@ -147,7 +148,6 @@ import { UpdateLayerFilterDisabledAction } from '@/actions/update-layer-filter-d
 import { UpdateLayerFilterParamsAction } from '@/actions/update-layer-filter-params';
 import { DeleteLayerFilterAction } from '@/actions/delete-layer-filter';
 import { BundleAction } from '@/actions/bundle';
-import { Rules, RuleItem } from 'async-validator';
 import { bakeCanvasFilters } from '@/workers';
 
 import { Scene } from 'three/src/scenes/Scene';
@@ -195,6 +195,14 @@ export default defineComponent({
         'close'
     ],
     props: {
+        isDialog: {
+            type: Boolean,
+            default: false
+        },
+        dialogOpened: {
+            type: Boolean,
+            default: false
+        },
         layerId: {
             type: Number,
             required: true
@@ -202,6 +210,10 @@ export default defineComponent({
         filterIndex: {
             type: Number,
             default: 0
+        },
+        isFilterJustAdded: {
+            type: Boolean,
+            default: false
         }
     },
     setup(props, { emit }) {
@@ -212,6 +224,7 @@ export default defineComponent({
         const $notify = notifyInjector('$notify');
 
         const isUseWebGlPreview = isWebGLAvailable();
+        const isCanceling = ref(false);
         const isDeleting = ref(false);
         const hasError = ref(false);
         const loading = ref(true);
@@ -288,17 +301,19 @@ export default defineComponent({
 
         // Draw previous effects to first canvas, as soon as canvas filter objects and canvases are constructed.
         watch(
-            [canvasFilters, beforeEffectCanvasCtx, afterEffectCanvas, afterEffectCanvasCtx],
-            async ([canvasFilters, beforeEffectCanvasCtx, afterEffectCanvas, afterEffectCanvasCtx]) => {
-            if (canvasFilters.length > 0 && beforeEffectCanvasCtx && afterEffectCanvas) {
+            [canvasFilters, beforeEffectCanvasCtx, beforeEffectCanvas, afterEffectCanvas, afterEffectCanvasCtx],
+            async ([canvasFilters, beforeEffectCanvasCtx, beforeEffectCanvas, afterEffectCanvas, afterEffectCanvasCtx]) => {
+            if (canvasFilters.length > 0 && beforeEffectCanvasCtx && beforeEffectCanvas && afterEffectCanvas) {
                 try {
                     let beforeImageData = beforeEffectCanvasCtx.getImageData(0, 0, beforeEffectCanvasCtx.canvas.width, beforeEffectCanvasCtx.canvas.height);
                     const filterConfigurations = [...(layer.value?.filters ?? [])].slice(0, props.filterIndex);
-                    beforeImageData = await bakeCanvasFilters(beforeImageData, 999999999 + Math.floor(Math.random() * 1000), filterConfigurations);
-                    beforeEffectCanvasCtx.putImageData(beforeImageData, 0, 0);
                     if (isUseWebGlPreview) {
+                        beforeEffectCanvasCtx.putImageData(beforeImageData, 0, 0);
+                        await calculateBeforeImageWithThreejs(beforeEffectCanvas, beforeEffectCanvasCtx, filterConfigurations);
                         await initializeThreejs(afterEffectCanvas);
                     } else if (afterEffectCanvasCtx) {
+                        beforeImageData = await bakeCanvasFilters(beforeImageData, 999999999 + Math.floor(Math.random() * 1000), filterConfigurations);
+                        beforeEffectCanvasCtx.putImageData(beforeImageData, 0, 0);
                         afterEffectCanvasCtx.putImageData(beforeImageData, 0, 0);
                     }
                     updatePreview();
@@ -317,55 +332,72 @@ export default defineComponent({
 
         onMounted(async () => {
             nextTick(async () => {
-                try {
-                    if (layer.value) {
-                        if (beforeEffectCanvas.value && afterEffectCanvas.value) {
-                            const selectedLayer = layer.value;
-                            const layerWidth = selectedLayer.type === 'group' ? workingFileStore.state.width : selectedLayer.width;
-                            const layerHeight = selectedLayer.type === 'group' ? workingFileStore.state.height : selectedLayer.height;
-                            const targetWidth = 400;
-                            const targetHeight = targetWidth * (layerHeight / layerWidth);
-                            beforeEffectCanvas.value.width = targetWidth;
-                            beforeEffectCanvas.value.height = targetHeight;
-                            afterEffectCanvas.value.width = targetWidth;
-                            afterEffectCanvas.value.height = targetHeight;
-                            const beforeCanvasCtx = beforeEffectCanvas.value.getContext('2d', getCanvasRenderingContext2DSettings());
-                            let afterCanvasCtx;
-                            if (!isUseWebGlPreview) {
-                                afterCanvasCtx = afterEffectCanvas.value.getContext('2d', getCanvasRenderingContext2DSettings()) ?? undefined;
-                            }
-                            if (!beforeCanvasCtx) {
-                                throw new Error('module.layerEffectBrowser.generationErrorGeneral');
-                            }
-                            beforeCanvasCtx.setTransform(selectedLayer.transform.scale(layerWidth / targetWidth, layerHeight / targetHeight).invertSelf());
-                            if (layerRenderers['2d'][selectedLayer?.type]) {
-                                const layerRenderer = new layerRenderers['2d'][selectedLayer.type]();
-                                await layerRenderer.attach(selectedLayer);
-                                const bakedImage = selectedLayer.bakedImage;
-                                selectedLayer.bakedImage = null;
-                                await layerRenderer.draw(beforeCanvasCtx, selectedLayer, { visible: true, force2dRenderer: true });
-                                selectedLayer.bakedImage = bakedImage;
-                            } else {
-                                throw new Error('module.layerEffectBrowser.generationErrorUnsupportedType');
-                            }
-                            beforeEffectCanvasCtx.value =  beforeCanvasCtx;
-                            afterEffectCanvasCtx.value = afterCanvasCtx;
-                        } else {
-                            throw new Error('Canvas refs not found.');
+                if (props.isDialog) {
+                    let stopWatch: WatchStopHandle;
+                    stopWatch = watch(() => props.dialogOpened, (dialogOpened) => {
+                        if (dialogOpened) {
+                            stopWatch?.();
+                            initialSetup();
                         }
-                    } else {
-                        throw new Error('Layer not found.');
-                    }
-                } catch (error) {
-                    console.error(error);
-                    hasError.value = true;
+                    }, { immediate: true });
+                } else {
+                    initialSetup();
                 }
             });
         });
 
         onUnmounted(() => {
             cleanupThreejs();
+            if (isCanceling.value && props.isFilterJustAdded) {
+                historyStore.dispatch('undo');
+            }
         });
+
+        async function initialSetup() {
+            try {
+                if (layer.value) {
+                    if (beforeEffectCanvas.value && afterEffectCanvas.value) {
+                        const selectedLayer = layer.value;
+                        const layerWidth = selectedLayer.type === 'group' ? workingFileStore.state.width : selectedLayer.width;
+                        const layerHeight = selectedLayer.type === 'group' ? workingFileStore.state.height : selectedLayer.height;
+                        const targetWidth = 400;
+                        const targetHeight = targetWidth * (layerHeight / layerWidth);
+                        beforeEffectCanvas.value.width = targetWidth;
+                        beforeEffectCanvas.value.height = targetHeight;
+                        afterEffectCanvas.value.width = targetWidth;
+                        afterEffectCanvas.value.height = targetHeight;
+                        const beforeCanvasCtx = beforeEffectCanvas.value.getContext('2d', getCanvasRenderingContext2DSettings());
+                        let afterCanvasCtx;
+                        if (!isUseWebGlPreview) {
+                            afterCanvasCtx = afterEffectCanvas.value.getContext('2d', getCanvasRenderingContext2DSettings()) ?? undefined;
+                        }
+                        if (!beforeCanvasCtx) {
+                            throw new Error('module.layerEffectBrowser.generationErrorGeneral');
+                        }
+                        beforeCanvasCtx.setTransform(selectedLayer.transform.scale(layerWidth / targetWidth, layerHeight / targetHeight).invertSelf());
+                        if (layerRenderers['2d'][selectedLayer?.type]) {
+                            const layerRenderer = new layerRenderers['2d'][selectedLayer.type]();
+                            await layerRenderer.attach(selectedLayer);
+                            const bakedImage = selectedLayer.bakedImage;
+                            selectedLayer.bakedImage = null;
+                            await layerRenderer.draw(beforeCanvasCtx, selectedLayer, { visible: true, force2dRenderer: true });
+                            selectedLayer.bakedImage = bakedImage;
+                        } else {
+                            throw new Error('module.layerEffectBrowser.generationErrorUnsupportedType');
+                        }
+                        beforeEffectCanvasCtx.value =  beforeCanvasCtx;
+                        afterEffectCanvasCtx.value = afterCanvasCtx;
+                    } else {
+                        throw new Error('Canvas refs not found.');
+                    }
+                } else {
+                    throw new Error('Layer not found.');
+                }
+            } catch (error) {
+                console.error(error);
+                hasError.value = true;
+            }
+        }
 
         function getEditConfigMin(editConfig: CanvasFilterEditConfigField) {
             return editConfig.min ?? 0;
@@ -383,14 +415,100 @@ export default defineComponent({
             formData.filterParams[fieldName] = editConfig.default;
         }
 
-        async function initializeThreejs(canvas: HTMLCanvasElement) {
+        async function calculateBeforeImageWithThreejs(beforeCanvas: HTMLCanvasElement, beforeEffectCanvasCtx: CanvasRenderingContext2D, beforeFilterConfigs: WorkingFileLayerFilter[]) {
+            const width = beforeCanvas.width;
+            const height = beforeCanvas.height;
+            let renderer!: WebGLRenderer;
+            let scene!: Scene;
+            let imagePlaneGeometry!: ImagePlaneGeometry;
+            let beforeImageUrl!: string;
+            let beforeTexture!: Texture;
+            let material!: ShaderMaterial;
+            let mesh!: Mesh;
+            let camera!: OrthographicCamera;
+            let composer!: EffectComposer;
+            let encounteredError: unknown;
+
+            try {
+                const bakingCanvas = document.createElement('canvas');
+                bakingCanvas.width = width;
+                bakingCanvas.height = height;
+
+                renderer = new WebGLRenderer({
+                    alpha: true,
+                    canvas: bakingCanvas,
+                    premultipliedAlpha: false,
+                    powerPreference: 'low-power'
+                });
+                scene = new Scene();
+                imagePlaneGeometry = new ImagePlaneGeometry(width, height);
+
+                beforeImageUrl = URL.createObjectURL(
+                    await createImageBlobFromCanvas(beforeCanvas)
+                );
+                await new Promise<void>(async (resolve, reject) => {
+                    beforeTexture = new TextureLoader().load(
+                        beforeImageUrl,
+                        () => resolve(),
+                        undefined,
+                        () => reject()
+                    );
+                    beforeTexture.magFilter = NearestFilter;
+                    beforeTexture.encoding = sRGBEncoding;
+                });
+
+                const combinedShaderResult = combineShaders(await createFiltersFromLayerConfig(beforeFilterConfigs), layer.value!);
+                material = createRasterShaderMaterial(beforeTexture, combinedShaderResult);
+
+                mesh = new Mesh(imagePlaneGeometry, material);
+                scene.add(mesh);
+
+                renderer.setSize(width, height, false);
+                renderer.outputEncoding = sRGBEncoding;
+
+                camera = new OrthographicCamera(-1, 1, 1, -1, 1, 10000);
+                camera.position.z = 1;
+                camera.left = 0;
+                camera.right = width;
+                camera.top = 0;
+                camera.bottom = height;
+                camera.updateProjectionMatrix();
+
+                composer = new EffectComposer(renderer);
+                const renderPass = new RenderPass(scene, camera);
+                composer.addPass(renderPass);
+                composer.addPass(new ShaderPass(GammaCorrectionShader));
+                composer.render();
+
+                beforeEffectCanvasCtx.setTransform(new DOMMatrix());
+                beforeEffectCanvasCtx.clearRect(0, 0, width, height);
+                beforeEffectCanvasCtx.drawImage(bakingCanvas, 0, 0);
+            } catch (error) {
+                encounteredError = error;
+            }
+            
+            composer?.dispose();
+            renderer?.dispose();
+            if (beforeImageUrl) {
+                URL.revokeObjectURL(beforeImageUrl);
+            }
+            beforeTexture?.dispose();
+            imagePlaneGeometry?.dispose();
+            material?.dispose();
+            
+            if (encounteredError) {
+                throw encounteredError;
+            }
+        }
+
+        async function initializeThreejs(afterCanvas: HTMLCanvasElement) {
             if (!currentFilter.value || !beforeEffectCanvas.value) return;
-            const width = canvas.width;
-            const height = canvas.height;
+            const width = afterCanvas.width;
+            const height = afterCanvas.height;
 
             threejsRenderer = new WebGLRenderer({
                 alpha: true,
-                canvas,
+                canvas: afterCanvas,
                 premultipliedAlpha: false,
                 powerPreference: 'low-power'
             });
@@ -450,6 +568,8 @@ export default defineComponent({
             previewMaterial?.dispose();
             (previewMaterial as any) = undefined;
             (previewMesh as any) = undefined;
+            threejsComposer?.dispose();
+            (threejsComposer as any) = undefined;
         }
 
         function isParamsChanged(oldParams: Record<string, unknown>, newParams: Record<string, unknown>) {
@@ -519,6 +639,7 @@ export default defineComponent({
         }
         
         function onCancel() {
+            isCanceling.value = true;
             emit('close');
         }
 

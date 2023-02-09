@@ -36,6 +36,7 @@ import { knownFileExtensions } from '@/lib/regex';
 
 export default defineComponent({
     name: 'ModuleImageConvertLayersToImageSequence',
+    inheritAttrs: false,
     directives: {
         loading: ElLoading.directive
     },

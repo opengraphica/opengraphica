@@ -44,6 +44,7 @@ let webcamPhotoCount: number = 1;
 
 export default defineComponent({
     name: 'ModuleFileTakePhoto',
+    inheritAttrs: false,
     directives: {
         loading: ElLoading.directive
     },

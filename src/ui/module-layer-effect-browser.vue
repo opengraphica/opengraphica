@@ -4,7 +4,7 @@
     <template v-else>
         <template v-for="category of categorizedFilters" :key="category.name">
             <h3 v-t="category.name" />
-            <el-auto-grid>
+            <el-auto-grid :breakpoints="[{ maxWidth: 525, itemWidth: '6rem' }]">
                 <template
                     v-for="filter of category.filters"
                     :key="filter.name"
@@ -182,6 +182,7 @@ export default defineComponent({
             });
             setTimeout(() => {
                 runModule('image', 'layerEffectEdit', {
+                    isFilterJustAdded: true,
                     layerId: selectedLayerIds[0],
                     filterIndex: (getLayerById(selectedLayerIds[0])?.filters.length ?? 1) - 1
                 });

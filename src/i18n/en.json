@@ -225,7 +225,12 @@
         "chroma": {
             "name": "Chroma",
             "param": {
-                "chroma": "Chroma"
+                "chroma": "Chroma",
+                "mode": "Mode",
+                "modeOption": {
+                    "multiply": "Adjust Chroma Contrast",
+                    "shift": "Evenly Adjust Chroma"
+                }
             }
         },
         "colorBlindness": {

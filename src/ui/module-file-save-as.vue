@@ -61,6 +61,7 @@ import { knownFileExtensions } from '@/lib/regex';
 
 export default defineComponent({
     name: 'ModuleFileSaveAs',
+    inheritAttrs: false,
     directives: {
         loading: ElLoading.directive
     },

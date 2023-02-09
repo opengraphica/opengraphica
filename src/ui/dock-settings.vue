@@ -288,6 +288,7 @@ const activeTab = ref<string>('file');
 
 export default defineComponent({
     name: 'DockSettings',
+    inheritAttrs: false,
     directives: {
         loading: ElLoading.directive
     },
