@@ -46,7 +46,7 @@ const store = new PerformantStore<PreferencesStore>({
         pointerPressHoldTimeout: 500,
         postProcessInterpolateImage: true,
         preferCanvasViewport: false,
-        renderer: '2d',
+        renderer: 'webgl',
         showTutorialNotifications: true,
         showWelcomeScreenAtStart: true,
         snapSensitivity: 5,
