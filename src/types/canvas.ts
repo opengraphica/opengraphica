@@ -56,7 +56,13 @@ export interface CanvasFilterEditConfigPercentage extends CanvasFilterEditConfig
     preview?: number;
 }
 
-export type CanvasFilterEditConfigField = CanvasFilterEditConfigBoolean | CanvasFilterEditConfigInteger | CanvasFilterEditConfigFloat | CanvasFilterEditConfigPercentage | CanvasFilterEditConfigComputedFloat;
+export interface CanvasFilterEditConfigPercentageRange extends CanvasFilterEditConfigFieldCommon {
+    type: 'percentageRange';
+    default: number[];
+    preview?: number[];
+}
+
+export type CanvasFilterEditConfigField = CanvasFilterEditConfigBoolean | CanvasFilterEditConfigInteger | CanvasFilterEditConfigFloat | CanvasFilterEditConfigPercentage | CanvasFilterEditConfigPercentageRange | CanvasFilterEditConfigComputedFloat;
 
 export interface CanvasFilterEditConfig {
     [key: string]: CanvasFilterEditConfigField;

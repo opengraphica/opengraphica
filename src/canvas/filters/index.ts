@@ -1,4 +1,5 @@
 import { camelCaseToKebabCase } from "@/lib/string";
+import { Vector2 } from 'three/src/math/Vector2';
 
 import basicMaterialVertexShaderSetup from '../renderers/webgl/shaders/basic-material.setup.vert';
 import basicMaterialVertexShaderMain from '../renderers/webgl/shaders/basic-material.main.vert';
@@ -6,7 +7,7 @@ import basicMaterialFragmentShaderSetup from '../renderers/webgl/shaders/basic-m
 import basicMaterialFragmentShaderMain from '../renderers/webgl/shaders/basic-material.main.frag';
 
 import type { IUniform } from 'three/src/renderers/shaders/UniformsLib';
-import type { CanvasFilter, WorkingFileAnyLayer, WorkingFileLayerFilter } from '@/types';
+import type { CanvasFilter, CanvasFilterEditConfig, WorkingFileAnyLayer, WorkingFileLayerFilter } from '@/types';
 
 export async function getCanvasFilterClass(name: string): Promise<new (...args: any) => CanvasFilter> {
     const kebabCaseName = camelCaseToKebabCase(name);
@@ -78,6 +79,16 @@ export interface CombinedShaderResult {
     defines: Record<string, unknown>
 }
 
+function translateParamToUniformValue(paramValue: any, editConfig: CanvasFilterEditConfig, editParamName: string) {
+    const type = editConfig[editParamName].type;
+    if (type === 'boolean') {
+        paramValue = paramValue === true ? 1 : 0;
+    } else if (type === 'percentageRange') {
+        paramValue = new Vector2(paramValue[0], paramValue[1]);
+    }
+    return paramValue;
+}
+
 export function generateShaderUniformsAndDefines(canvasFilters: CanvasFilter[], layer: Partial<WorkingFileAnyLayer>): { uniforms: Record<string, IUniform>, defines: Record<string, unknown> } {
     const defines: Record<string, unknown> = {};
     const uniforms: Record<string, IUniform> = {};
@@ -87,10 +98,7 @@ export function generateShaderUniformsAndDefines(canvasFilters: CanvasFilter[], 
         const paramValues: Record<string, unknown> = {};
         for (const editParamName in editConfig) {
             let paramValue = canvasFilter.params[editParamName] ?? editConfig[editParamName].default;
-            if (editConfig[editParamName].type === 'boolean') {
-                paramValue = paramValue === true ? 1 : 0;
-            }
-            paramValues[editParamName] = paramValue;
+            paramValues[editParamName] = translateParamToUniformValue(paramValue, editConfig, editParamName);
             if (editConfig[editParamName].computedValue) {
                 computedParamNames.push(editParamName);
             } else {
@@ -107,9 +115,7 @@ export function generateShaderUniformsAndDefines(canvasFilters: CanvasFilter[], 
         }
         for (const editParamName of computedParamNames) {
             let paramValue = editConfig[editParamName].computedValue?.(paramValues, { layerWidth: layer.width ?? 0, layerHeight: layer.height ?? 0 });
-            if (editConfig[editParamName].type === 'boolean') {
-                paramValue = paramValue === true ? 1 : 0;
-            }
+            paramValue = translateParamToUniformValue(paramValue, editConfig, editParamName);
             if (editConfig[editParamName].constant) {
                 const replaceDefineName = 'constant' + index + '_' + editParamName;
                 defines[replaceDefineName] = paramValue;

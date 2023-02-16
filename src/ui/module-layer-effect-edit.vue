@@ -38,7 +38,7 @@
                     <el-form-item v-if="!editConfigField.hidden" :label="$t(`layerFilter.${currentFilterName}.param.${paramName}`)">
                         <template v-if="editConfigField.type === 'percentage'">
                             <el-row>
-                                <el-col :span="16" :xs="14">
+                                <el-col :span="20" :xs="18">
                                     <el-slider
                                         v-model="formData.filterParams[paramName]"
                                         :min="getEditConfigMin(editConfigField)"
@@ -47,16 +47,61 @@
                                         :show-tooltip="false"
                                     />
                                 </el-col>
-                                <el-col :span="8" :xs="10">
+                                <el-col :span="4" :xs="6">
                                     <el-input-number
                                         :modelValue="Math.floor(formData.filterParams[paramName] * 100)"
                                         :min="getEditConfigMin(editConfigField) * 100"
                                         :max="getEditConfigMax(editConfigField) * 100"
                                         :precision="0"
+                                        suffixText="%"
                                         class="el-input--text-right"
                                         @update:modelValue="formData.filterParams[paramName] = $event / 100"
                                     >
-                                        <template v-slot:append>%</template>
+                                    </el-input-number>
+                                </el-col>
+                            </el-row>
+                            <el-button
+                                link type="primary" class="el-button--form-item-reset"
+                                :disabled="isFilterParamDefault(paramName, editConfigField)"
+                                :aria-label="$t('module.layerEffectEdit.resetField')"
+                                @click="resetFilterParam(paramName, editConfigField)">
+                                <span class="bi bi-arrow-repeat" aria-hidden="true" />
+                            </el-button>
+                        </template>
+                        <template v-if="editConfigField.type === 'percentageRange'">
+                            <el-row>
+                                <el-col :span="4" :xs="6">
+                                    <el-input-number
+                                        :modelValue="Math.floor(formData.filterParams[paramName][0] * 100)"
+                                        :min="getEditConfigMin(editConfigField) * 100"
+                                        :max="getEditConfigMax(editConfigField) * 100"
+                                        :precision="0"
+                                        suffixText="%"
+                                        class="el-input--text-right"
+                                        @update:modelValue="formData.filterParams[paramName][0] = $event / 100"
+                                    >
+                                    </el-input-number>
+                                </el-col>
+                                <el-col :span="16" :xs="12">
+                                    <el-slider
+                                        v-model="formData.filterParams[paramName]"
+                                        range
+                                        :min="getEditConfigMin(editConfigField)"
+                                        :max="getEditConfigMax(editConfigField)"
+                                        :step="0.01"
+                                        :show-tooltip="false"
+                                    />
+                                </el-col>
+                                <el-col :span="4" :xs="6">
+                                    <el-input-number
+                                        :modelValue="Math.floor(formData.filterParams[paramName][1] * 100)"
+                                        :min="getEditConfigMin(editConfigField) * 100"
+                                        :max="getEditConfigMax(editConfigField) * 100"
+                                        :precision="0"
+                                        suffixText="%"
+                                        class="el-input--text-right"
+                                        @update:modelValue="formData.filterParams[paramName][1] = $event / 100"
+                                    >
                                     </el-input-number>
                                 </el-col>
                             </el-row>

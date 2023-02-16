@@ -61,6 +61,7 @@ vec3 rgbToHsv(vec3 rgb) {
     if (max == min) {
         hsv.x = 0.0;
     } else {
+        
         if (rgb.r == max) {
             hsv.x = (rgb.g - rgb.b) / d;
             if (rgb.g < rgb.b) {

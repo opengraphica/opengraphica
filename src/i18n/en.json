@@ -219,7 +219,14 @@
         "brightness": {
             "name": "Brightness",
             "param": {
-                "brightness": "Brightness"
+                "mode": "Mode",
+                "modeOption": {
+                    "gamma": "Adjust Gamma",
+                    "shift": "Black/White Shift"
+                },
+                "brightness": "Brightness",
+                "effectiveRange": "Range",
+                "effectiveRangeFeather": "Feather"
             }
         },
         "chroma": {

@@ -1,8 +1,4 @@
 {
-    "colorCorrection": {
-        "name": "layerFilter.colorCorrection.name",
-        "group": "color"
-    },
     "brightness": {
         "name": "layerFilter.brightness.name",
         "group": "color"
