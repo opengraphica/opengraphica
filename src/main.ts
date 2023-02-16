@@ -4,11 +4,11 @@ import i18n from '@/i18n';
 import '@/polyfill';
 import OpenGraphicaApp from '@/ui/app.vue';
 import appEmitter from '@/lib/emitter';
-import '@/store/canvas';
+import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
-import '@/store/history';
-import '@/store/preferences';
-import '@/store/working-file';
+import historyStore from '@/store/history';
+import preferencesStore from '@/store/preferences';
+import workingFileStore from '@/store/working-file';
 import ElNotification from 'element-plus/lib/components/notification/index';
 import { notifyPolyfill } from '@/lib/notify';
 import '@/lib/keyboard';
@@ -46,6 +46,14 @@ app.theme = async (themes: { [themeName: string]: string }): Promise<OpenGraphic
     await editorStore.dispatch('setThemes', themes);
     return app;
 };
+
+(app as any).store = {
+    canvas: canvasStore,
+    editor: editorStore,
+    history: historyStore,
+    preferences: preferencesStore,
+    workingFile: workingFileStore
+}
 
 // Register global Vue component at runtime
 const registeredComponentList: string[] = [];

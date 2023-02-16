@@ -33,6 +33,7 @@ export async function pasteFromEditorCopyBuffer() {
             'action.pasteLayers',
             await Promise.all(editorStore.state.clipboardBufferLayers.map(async (layer) => {
                 delete (layer as any).id;
+                delete (layer as any).renderer;
                 const firstLayer = workingFileStore.state.layers[0];
                 layer.name = ensureUniqueLayerSiblingName(positionAfterLayer ?? firstLayer ? firstLayer.id : undefined, layer.name);
                 if (editorStore.state.clipboardBufferSelectionMask != null) {

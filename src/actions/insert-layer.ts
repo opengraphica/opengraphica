@@ -50,6 +50,8 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
 
         const renderer = canvasStore.get('renderer');
 
+        console.log('insert layer');
+
         // Create new layer object if not already created (do vs redo)
         let newLayer: WorkingFileAnyLayer<ColorModel>;
         if (this.insertedLayer) {
@@ -171,8 +173,10 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
             throw new Error('Parent group not found.');
         }
 
+        console.log('before attach', newLayer.renderer);
+
         // Attach the renderer (needed for webgl)
-        await newLayer.renderer.attach(newLayer)
+        await newLayer.renderer.attach(newLayer);
 
         // Set the modified layer list
         workingFileStore.set('layers', layers);

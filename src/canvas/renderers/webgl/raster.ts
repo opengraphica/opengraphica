@@ -26,6 +26,8 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
     private sourceTexture: InstanceType<typeof Texture> | undefined;
 
     async onAttach(layer: WorkingFileRasterLayer<ColorModel>) {
+        console.log('attach');
+
         const combinedShaderResult = combineShaders(
             await createFiltersFromLayerConfig(layer.filters),
             layer
@@ -98,6 +100,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
             this.plane && (this.plane.material = this.material);
         }
         if (updates.data) {
+            console.log('data', updates.data);
             if (updates.data.draftImage) {
                 this.draftTexture?.dispose();
                 this.draftTexture = new CanvasTexture(updates.data.draftImage);
