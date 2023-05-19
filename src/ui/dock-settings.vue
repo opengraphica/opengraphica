@@ -137,6 +137,17 @@
                                 </el-radio-button>
                             </el-radio-group>
                         </el-form-item>
+                        <el-divider class="my-2" />
+                        <el-form-item class="el-form-item--menu-item" :label="$t('dock.settings.view.window')">
+                            <el-button v-if="isFullscreen" size="small" plain @click="onExitFullscreen()">
+                                <i class="bi bi-fullscreen-exit mr-2" aria-hidden="true" />
+                                {{ $t('dock.settings.view.exitFullscreen') }}
+                            </el-button>
+                            <el-button v-else size="small" plain @click="onEnterFullscreen()">
+                                <i class="bi bi-fullscreen mr-2" aria-hidden="true" />
+                                {{ $t('dock.settings.view.enterFullscreen') }}
+                            </el-button>
+                        </el-form-item>
                     </el-form>
                 </el-scrollbar>
             </template>
@@ -258,7 +269,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch, toRefs, nextTick } from 'vue';
+import { defineComponent, ref, computed, watch, toRefs, nextTick, onMounted, onUnmounted } from 'vue';
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
 import ElCollapse, { ElCollapseItem } from 'element-plus/lib/components/collapse/index';
@@ -378,6 +389,32 @@ export default defineComponent({
         }
         function onResetViewZoom() {
             canvasStore.dispatch('setTransformScale', 1);
+        }
+
+        // Handle Fullscreen
+        const isFullscreen = ref<boolean>(false);
+        function onFullscreenChange() {
+            if (document.fullscreenElement) {
+                isFullscreen.value = true;
+            } else {
+                isFullscreen.value = false;
+            }
+        }
+        onMounted(() => {
+            document.addEventListener('fullscreenchange', onFullscreenChange, false);
+        });
+        onUnmounted(() => {
+            document.removeEventListener('fullscreenchange', onFullscreenChange, false);
+        });
+        async function onEnterFullscreen() {
+            await document.body.requestFullscreen({
+                navigationUI: 'hide'
+            });
+            isFullscreen.value = true;
+        }
+        function onExitFullscreen() {
+            document.exitFullscreen();
+            isFullscreen.value = false;
         }
 
         // History
@@ -614,6 +651,10 @@ export default defineComponent({
             onResetViewFit,
             onResetViewRotation,
             onResetViewZoom,
+
+            isFullscreen,
+            onEnterFullscreen,
+            onExitFullscreen,
 
             historyActionStack,
             historyActionStackIndex,

@@ -144,7 +144,10 @@
                     "on": "On",
                     "snap": "Snap",
                     "off": "Off"
-                }
+                },
+                "window": "Window",
+                "enterFullscreen": "Enter Fullscreen",
+                "exitFullscreen": "Exit Fullscreen"
             },
             "history": {
                 "tabTitle": "History",
