@@ -72,22 +72,52 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
             let canvas = document.createElement('canvas');
             canvas.width = workingFileStore.get('width');
             canvas.height = workingFileStore.get('height');
-            const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
-            ctx.imageSmoothingEnabled = false;
             if (!['image/gif'].includes(mimeType)) {
                 if (canvasStore.state.renderer === '2d' || options.layerSelection === 'selected') {
+                    const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
+                    ctx.imageSmoothingEnabled = false;
                     drawWorkingFileToCanvas2d(canvas, ctx, {
                         force2dRenderer: true,
                         selectedLayersOnly: options.layerSelection === 'selected'
                     });
                 } else {
+                    const { WebGLRenderer } = await import('three/src/renderers/WebGLRenderer');
+                    const { sRGBEncoding } = await import('three/src/constants');
+                    const { EffectComposer } = await import('@/canvas/renderers/webgl/three/postprocessing/EffectComposer');
+                    const { RenderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/RenderPass');
+                    const { ShaderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/ShaderPass');
+                    const { GammaCorrectionShader } = await import('@/canvas/renderers/webgl/three/shaders/GammaCorrectionShader');
+
+                    const threejsScene = canvasStore.get('threejsScene')!;
+                    const threejsCamera = canvasStore.get('threejsCamera')!;
+
+                    const threejsRenderer = new WebGLRenderer({
+                        alpha: true,
+                        canvas: canvas,
+                        premultipliedAlpha: false,
+                        preserveDrawingBuffer: true,
+                        powerPreference: 'high-performance'
+                    });
+                    threejsRenderer.outputEncoding = sRGBEncoding;
+                    threejsRenderer.setSize(workingFileStore.get('width'), workingFileStore.get('height'));
+
+                    const threejsComposer = new EffectComposer(threejsRenderer);
+                    const renderPass = new RenderPass(threejsScene, threejsCamera);
+                    const gammaCorrectionPass = new ShaderPass(GammaCorrectionShader);
+                    threejsComposer.addPass(renderPass);
+                    threejsComposer.addPass(gammaCorrectionPass);
+
                     drawWorkingFileToCanvasWebgl(
-                        canvasStore.get('threejsComposer')!,
-                        canvasStore.get('threejsRenderer')!,
-                        canvasStore.get('threejsScene')!,
-                        canvasStore.get('threejsCamera')!
+                        threejsComposer,
+                        threejsRenderer,
+                        threejsScene,
+                        threejsCamera
                     );
-                    ctx.drawImage(canvasStore.get('viewCanvas'), 0, 0);
+
+                    threejsRenderer.dispose();
+                    threejsComposer.dispose();
+                    renderPass.dispose();
+                    gammaCorrectionPass.dispose();
                 }
             }
             if (options.blitActiveSelectionMask && activeSelectionMask.value != null) {
