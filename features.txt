@@ -1,3 +1,6 @@
+Bugs
+    - Expanding editor section in tools dock on chrome seems to push bottom of view outside the visible boundry
+
 Modules
     - File
         - Export

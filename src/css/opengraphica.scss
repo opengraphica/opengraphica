@@ -287,6 +287,7 @@ body.ogr-full-page {
             position: relative;
             min-height: 14rem;
             cursor: pointer;
+            touch-action: none;
         }
 
         .ogr-color-picker-gradient__saturation-gradient {
@@ -1332,6 +1333,7 @@ body.ogr-full-page {
                 flex: 1;
                 display: flex;
                 justify-content: flex-start;
+                align-items: center;
                 min-width: -webkit-min-content; /* Workaround to Chrome bug */
             }
 
@@ -1381,6 +1383,10 @@ body.ogr-full-page {
             }
         }
 
+        .el-button {
+            height: fit-content;
+        }
+
         .el-button--expanded-group {
             padding: .6rem .8rem !important;
         }
@@ -1391,6 +1397,7 @@ body.ogr-full-page {
 
         &.is-vertical {
             height: calc(100% - 1rem);
+            width: auto;
 
             > .is-flex {
                 flex-direction: column;

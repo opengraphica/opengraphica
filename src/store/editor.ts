@@ -19,6 +19,7 @@ interface TutorialFlags {
     zoomToolIntroduction?: boolean;
     freeTransformToolIntroduction?: boolean;
     selectionToolIntroduction?: boolean;
+    drawToolIntroduction?: boolean;
 }
 
 const toolGroups: { [key: string]: ToolGroupDefinition } = toolGroupsConfig as any;

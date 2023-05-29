@@ -79,6 +79,10 @@
                                     <i class="bi bi-arrow-return-right"></i>
                                     <span v-t="'dock.settings.image.menu.convertLayers.toImageSequence'"></span>
                                 </el-menu-item>
+                                <el-menu-item index="convertLayersFlatten">
+                                    <i class="bi bi-arrow-return-right"></i>
+                                    <span v-t="'dock.settings.image.menu.convertLayers.flatten'"></span>
+                                </el-menu-item>
                             </el-collapse-item>
                         </el-collapse>
                     </el-menu>
@@ -608,9 +612,6 @@ export default defineComponent({
                                     tool: 'cropResize'
                                 });
                                 break;
-                            case 'convertLayersToImageSequence':
-                                await runModule('image', 'convertLayersToImageSequence');
-                                break;
                             case 'cut':
                                 await runModule('image', 'cut');
                                 break;
@@ -622,6 +623,12 @@ export default defineComponent({
                                 break;
                             case 'paste':
                                 await runModule('image', 'paste');
+                                break;
+                            case 'convertLayersToImageSequence':
+                                await runModule('image', 'convertLayersToImageSequence');
+                                break;
+                            case 'convertLayersFlatten':
+                                await runModule('image', 'convertLayersFlatten');
                                 break;
                         }
                         break;

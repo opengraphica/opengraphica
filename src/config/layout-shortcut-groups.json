@@ -34,11 +34,11 @@
         "controls": [
             {
                 "type": "button",
-                "icon": "bi bi-brush",
+                "icon": "bi bi-pencil",
                 "label": "layoutShortcutGroup.draw.controls.default.label",
                 "action": {
-                    "type": "runModule",
-                    "target": "tmp/notYetImplemented"
+                    "type": "toolGroup",
+                    "target": "draw"
                 }
             }
         ],

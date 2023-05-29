@@ -121,7 +121,8 @@
                     "cropResize": "Crop and Resize",
                     "convertLayers": {
                         "groupTitle": "Convert Layers...",
-                        "toImageSequence": "To Image Sequence"
+                        "toImageSequence": "To Image Sequence",
+                        "flatten": "Flatten To New Layer"
                     },
                     "cut": "Cut",
                     "copy": "Copy",
@@ -618,6 +619,10 @@
                 "convertLayersToImageSequence": {
                     "name": "Convert Layers to Image Sequence",
                     "description": "Converts the selected layers to an image sequence layer (animation)."
+                },
+                "convertLayersFlatten": {
+                    "name": "Convert Layers to Flattened Image",
+                    "description": "Merges all layers to a single image layer and adds it to the top of the layer stack."
                 },
                 "copy": {
                     "name": "Copy Selected Layers",

@@ -163,7 +163,8 @@ export default defineComponent({
         });
 
         const isTouchUser = computed<boolean>(() => {
-            return editorStore.state.isTouchUser;
+            return true;
+            // return editorStore.state.isTouchUser;
         });
 
         watch([viewportWidth], () => {

@@ -7,20 +7,20 @@ vec4 processNegative(vec4 color) {
         rgb = linearSrgbToSrgb(rgb);
     }
 
-    if (cInvertRed == 1) {
+    #ifdef cInvertRed
         rgb.r = 1.0 - rgb.r;
-    }
-    if (cInvertGreen == 1) {
+    #endif
+    #ifdef cInvertGreen
         rgb.g = 1.0 - rgb.g;
-    }
-    if (cInvertBlue == 1) {
+    #endif
+    #ifdef cInvertBlue
         rgb.b = 1.0 - rgb.b;
-    }
-    if (cInvertValue == 1) {
+    #endif
+    #ifdef cInvertValue
         vec3 hsv = rgbToHsv(rgb);
         hsv.z = 1.0 - hsv.z;
         rgb = hsvToRgb(hsv);
-    }
+    #endif
 
     if (cColorSpace == NegativeInvertColorSpacePerceptualRgb) {
         rgb = srgbToLinearSrgb(rgb);

@@ -3,11 +3,21 @@
  * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
 
-import workingFileStore, { getCanvasRenderingContext2DSettings, getLayersByType } from '@/store/working-file';
+import workingFileStore, {
+    getCanvasRenderingContext2DSettings,
+    getLayersByType,
+    ensureUniqueLayerSiblingName
+} from '@/store/working-file';
 import canvasStore, { getCanvasRenderingContext } from '@/store/canvas';
 import editorStore from '@/store/editor';
+import historyStore from '@/store/history';
+
 import { drawWorkingFileToCanvas2d, drawWorkingFileToCanvasWebgl } from '@/lib/canvas';
 import { generateImageBlobHash } from '@/lib/hash';
+import { createImageFromCanvas } from '@/lib/image';
+
+import { InsertLayerAction } from '@/actions/insert-layer';
+
 import { saveAs } from 'file-saver';
 import { knownFileExtensions } from '@/lib/regex';
 import { WorkingFileRasterSequenceLayer, FileSystemFileHandle, ColorModel } from '@/types';
@@ -27,6 +37,7 @@ export interface ExportAsImageOptions {
     quality?: number,
     toClipboard?: boolean,
     toFileHandle?: FileSystemFileHandle | null,
+    toNewLayer?: boolean,
     dithering?: string,
     generateImageHash?: boolean
 }
@@ -83,7 +94,21 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                 canvas = await blitActiveSelectionMask(canvas, new DOMMatrix(), 'source-in');
             }
 
-            if (options.toClipboard) {
+            if (options.toNewLayer) {
+                historyStore.dispatch('runAction', {
+                    action: new InsertLayerAction({
+                        type: 'raster',
+                        name: ensureUniqueLayerSiblingName(workingFileStore.state.layers[0]?.id, 'Flattened Image'),
+                        width: canvas.width,
+                        height: canvas.height,
+                        data: {
+                            sourceImage: await createImageFromCanvas(canvas),
+                            sourceImageIsObjectUrl: true
+                        }
+                    })
+                })
+            }
+            else if (options.toClipboard) {
                 if (await promptClipboardWritePermission()) {
                     canvas.toBlob(async (blob) => {
                         if (blob) {
@@ -241,5 +266,12 @@ export async function convertCanvasToGifBlob(canvas: HTMLCanvasElement, options:
             resolve(blob);
         });
         gif.render();
+    });
+}
+
+export function flattenToNewLayer() {
+    exportAsImage({
+        fileType: 'png',
+        toNewLayer: true
     });
 }

@@ -7000,6 +7000,7 @@ body.ogr-full-page .opengraphica {
   position: relative;
   min-height: 14rem;
   cursor: pointer;
+  touch-action: none;
 }
 .opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__saturation-gradient {
   position: absolute;
@@ -7901,6 +7902,7 @@ body.ogr-full-page .opengraphica {
   flex: 1;
   display: flex;
   justify-content: flex-start;
+  align-items: center;
   min-width: -webkit-min-content;
   /* Workaround to Chrome bug */
 }
@@ -7937,6 +7939,9 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-layout-menu-bar .ogr-menu-section .el-button-group > .el-button, .opengraphica .ogr-layout-menu-bar .ogr-menu-section .ogr-single-button-group > .el-button {
   border-width: 0 !important;
 }
+.opengraphica .ogr-layout-menu-bar .el-button {
+  height: fit-content;
+}
 .opengraphica .ogr-layout-menu-bar .el-button--expanded-group {
   padding: 0.6rem 0.8rem !important;
 }
@@ -7945,6 +7950,7 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .ogr-layout-menu-bar.is-vertical {
   height: calc(100% - 1rem);
+  width: auto;
 }
 .opengraphica .ogr-layout-menu-bar.is-vertical > .is-flex {
   flex-direction: column;
