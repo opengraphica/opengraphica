@@ -125,6 +125,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                     );
                     this.sourceTexture.encoding = sRGBEncoding;
                     this.sourceTexture.magFilter = NearestFilter;
+                    this.sourceTexture.minFilter = NearestFilter;
                     this.material && (this.material.uniforms.map.value = this.sourceTexture);
                 } else {
                     if (this.sourceTexture) {

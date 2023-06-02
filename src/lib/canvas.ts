@@ -140,7 +140,7 @@ export function drawWorkingFileToCanvas2d(canvas: HTMLCanvasElement, ctx: Canvas
 /**
  * Draws everything in the working document to the threejs renderer.
  */
-export function drawWorkingFileToCanvasWebgl(composer: EffectComposer, renderer: WebGLRenderer, scene: Scene, camera: Camera, options: DrawWorkingFileOptions = {}) {
+export function drawWorkingFileToCanvasWebgl(composer: EffectComposer | undefined, renderer: WebGLRenderer, scene: Scene, camera: Camera, options: DrawWorkingFileOptions = {}) {
     try {
         const layers = workingFileStore.get('layers');
         for (const layer of layers) {
@@ -148,7 +148,11 @@ export function drawWorkingFileToCanvasWebgl(composer: EffectComposer, renderer:
                 layer.renderer.renderGroup(renderer, camera, layer as WorkingFileGroupLayer<ColorModel>);
             }
         }
-        composer.render();
+        if (composer) {
+            composer.render();
+        } else {
+            renderer.render(scene, camera);
+        }
     } catch (error) {
         console.error(error);
         throw error;

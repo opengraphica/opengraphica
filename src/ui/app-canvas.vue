@@ -300,7 +300,8 @@ export default defineComponent({
                             if (canvasStore.get('useCssViewport')) {
                                 cameraTransform = new DOMMatrix().inverse().translate(0, 0, 1);
                             } else {
-                                cameraTransform = canvasStore.get('transform').inverse().translate(0, 0, 1);
+                                const devicePixelRatio = window.devicePixelRatio || 1;
+                                cameraTransform = canvasStore.get('transform').inverse().scale(devicePixelRatio).translate(0, 0, 1);
                             }
                             const matrix = new Matrix4();
                             matrix.set(
@@ -505,7 +506,7 @@ export default defineComponent({
                 let cssViewTransform: string = '';
                 let decomposedTransform: DecomposedMatrix = null as any;
                 if (isViewDirty && (useCssViewport.value === true || hasCanvasOverlays)) {
-                    const devicePixelRatio = window.devicePixelRatio;
+                    const devicePixelRatio = window.devicePixelRatio || 1;
                     const transform = canvasStore.get('transform');
                     decomposedTransform = canvasStore.get('decomposedTransform');
                     isPixelatedZoomLevel.value = decomposedTransform.scaleX / devicePixelRatio >= 1.25;
