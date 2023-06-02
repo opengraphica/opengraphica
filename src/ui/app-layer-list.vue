@@ -24,6 +24,7 @@
                 }"
                 :data-layer-id="layer.id"
             >
+                <!-- Name, View, Options -->
                 <span class="ogr-layer-main">
                     <span
                         class="ogr-layer-dnd-handle"
@@ -37,16 +38,24 @@
                     <el-button link type="primary" class="px-2 my-1" :aria-label="$t('app.layerList.toggleLayerVisibility')" @click="onToggleLayerVisibility(layer)">
                         <i class="bi" :class="{ 'bi-eye-fill': layer.visible, 'bi-eye-slash': !layer.visible }" aria-hidden="true"></i>
                     </el-button>
-                    <el-button link type="primary" class="px-2 mr-2 my-1 ml-0" :aria-label="$t('app.layerList.layerSettings')" @click="onToggleLayerSettings(layer)">
-                        <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
-                    </el-button>
+                    <el-popover
+                        trigger="click"
+                        popper-class="p-0"
+                    >
+                        <template #reference>
+                            <el-button link type="primary" class="px-2 mr-2 my-1 ml-0" :aria-label="$t('app.layerList.layerSettings')">
+                                <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
+                            </el-button>
+                        </template>
+                        <el-menu class="el-menu--medium el-menu--borderless my-1" @select="onLayerSettingsSelect(layer, $event)">
+                            <el-menu-item index="delete">
+                                <i class="bi bi-trash"></i>
+                                <span v-t="'app.layerList.delete'"></span>
+                            </el-menu-item>
+                        </el-menu>
+                    </el-popover>
                 </span>
-                <el-menu v-if="showLayerSettingsMenuFor === layer.id" class="el-menu--medium el-menu--borderless mb-1" @select="onLayerSettingsSelect(layer, $event)">
-                    <el-menu-item index="delete">
-                        <i class="bi bi-trash"></i>
-                        <span v-t="'app.layerList.delete'"></span>
-                    </el-menu-item>
-                </el-menu>
+                <!-- Raster Sequence Frames -->
                 <span v-if="layer.type === 'rasterSequence'" role="group" class="ogr-layer-attributes ogr-layer-frames">
                     <span class="ogr-layer-attributes__title">
                         <i class="bi bi-arrow-return-right" aria-hidden="true"></i> {{ $t('app.layerList.frames') }}
@@ -66,6 +75,7 @@
                         </el-button>
                     </div>
                 </span>
+                <!-- Effects -->
                 <span v-if="layer.filters?.length > 0" role="group" class="ogr-layer-attributes">
                     <span class="ogr-layer-attributes__title">
                         <span class="is-flex is-flex-direction-row">
@@ -102,6 +112,7 @@
                         </li>
                     </ul>
                 </span>
+                <!-- No Layers Alert -->
                 <el-alert
                     v-if="layer.layers && layer.expanded && layer.layers.length === 0"
                     type="info"

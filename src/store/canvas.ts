@@ -28,6 +28,7 @@ interface CanvasState {
     selectionMaskCanvas: HTMLCanvasElement;
     threejsBackground: Mesh | null;
     threejsCamera: OrthographicCamera | null;
+    threejsCanvasMargin: Mesh | null;
     threejsComposer: EffectComposer | null;
     threejsRenderer: WebGLRenderer | null;
     threejsScene: Scene | null;
@@ -82,6 +83,7 @@ const store = new PerformantStore<CanvasStore>({
         selectionMaskCanvas: dummyCanvas,
         threejsBackground: null,
         threejsCamera: null,
+        threejsCanvasMargin: null,
         threejsComposer: null,
         threejsRenderer: null,
         threejsScene: null,
@@ -103,7 +105,7 @@ const store = new PerformantStore<CanvasStore>({
             const decomposedTransform = decomposeMatrix(value as DOMMatrix);
             set('decomposedTransform', decomposedTransform);
             set('useCssViewport',
-                store.state.renderer !== '2d' ||
+                /* store.state.renderer !== '2d' || */
                 (
                     !preferencesStore.get('useCanvasViewport') &&
                     !(store.get('isDisplayingNonRasterLayer') && decomposedTransform.scaleX > 1)

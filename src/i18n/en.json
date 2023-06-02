@@ -6,6 +6,7 @@
         "applyActiveSelection": "Apply Active Selection",
         "clearSelection": "Clear Selection",
         "convertLayersToImageSequence": "Convert Layers to Image Sequence",
+        "createDrawLayer": "Create Draw Layer",
         "createNewFile": "New File",
         "createNewLayersFromSelection": "Create Layers From Selection",
         "cutLayers": "Cut Layer(s)",
@@ -59,6 +60,19 @@
             "loadingImage": "Loading Image",
             "pleaseWait": "Please Wait",
             "cancel": "Cancel"
+        }
+    },
+    "brushCategory": {
+        "simple": {
+            "name": "Simple Brushes",
+            "brushes": {
+                "circle": {
+                    "name": "Circle"
+                }
+            }
+        },
+        "shapes": {
+            "name": "Shapes"
         }
     },
     "button": {
@@ -687,6 +701,9 @@
             "resolution": "Resolution",
             "resolutionUnits": "Resolution Units",
             "snapping": "Snapping"
+        },
+        "draw": {
+            "selectColor": "Select Color"
         },
         "freeTransform": {
             "clearSelection": "Clear Selection",

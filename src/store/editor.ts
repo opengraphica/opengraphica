@@ -43,6 +43,7 @@ interface EditorState {
     clipboardBufferUpdateTimestamp: number;
     hasClipboardUpdateSupport: boolean;
     isActiveToolbarExclusive: boolean;
+    isPenUser: boolean;
     isTaskRunning: boolean;
     isTouchUser: boolean;
     loadingThemeName: string | null;
@@ -100,6 +101,7 @@ const store = new PerformantStore<EditorStore>({
         clipboardBufferUpdateTimestamp: 0,
         hasClipboardUpdateSupport: false,
         isActiveToolbarExclusive: false,
+        isPenUser: false,
         isTaskRunning: false,
         isTouchUser: true,
         loadingThemeName: null,

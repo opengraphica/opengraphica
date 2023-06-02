@@ -83,13 +83,17 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                 } else {
                     const { WebGLRenderer } = await import('three/src/renderers/WebGLRenderer');
                     const { sRGBEncoding } = await import('three/src/constants');
+                    const { OrthographicCamera } = await import('three/src/cameras/OrthographicCamera');
                     const { EffectComposer } = await import('@/canvas/renderers/webgl/three/postprocessing/EffectComposer');
                     const { RenderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/RenderPass');
                     const { ShaderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/ShaderPass');
                     const { GammaCorrectionShader } = await import('@/canvas/renderers/webgl/three/shaders/GammaCorrectionShader');
 
                     const threejsScene = canvasStore.get('threejsScene')!;
-                    const threejsCamera = canvasStore.get('threejsCamera')!;
+
+                    const threejsCamera = new OrthographicCamera(0, workingFileStore.get('width'), 0, workingFileStore.get('height'), 0.1, 10000);
+                    threejsCamera.position.z = 1;
+                    threejsCamera.updateProjectionMatrix();
 
                     const threejsRenderer = new WebGLRenderer({
                         alpha: true,

@@ -257,3 +257,18 @@ export function createImageFromBlob(blob: Blob, options: CreateImageFromOptions 
         }
     });
 }
+
+/**
+ * Creates an HTMLImageElement with the given dimensions. By default, the image points to an object URL.
+ * @param width The image width.
+ * @param height The image height.
+ * @returns The new HTMLImageElement.
+ */
+ export async function createEmptyImage(width: number, height: number): Promise<HTMLImageElement> {
+    let canvas: HTMLCanvasElement | undefined = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const image = await createImageFromCanvas(canvas);
+    canvas = undefined;
+    return image;
+}

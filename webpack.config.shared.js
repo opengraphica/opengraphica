@@ -134,6 +134,10 @@ module.exports = function setupConfig(config) {
                         test: /[\\/]node_modules[\\/](async-validator)[\\/]/,
                         name: 'async-validator'
                     },
+                    bezierJs: {
+                        test: /[\\/]node_modules[\\/](bezier-js)[\\/]/,
+                        name: 'bezier-js'
+                    },
                     colorNamer: {
                         test: /[\\/]node_modules[\\/](color-namer)[\\/]/,
                         name: 'color-namer'

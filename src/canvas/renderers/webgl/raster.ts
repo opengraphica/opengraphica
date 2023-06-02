@@ -12,6 +12,8 @@ import { CanvasTexture } from 'three/src/textures/CanvasTexture';
 import { createFiltersFromLayerConfig, combineShaders } from '../../filters';
 import { createRasterShaderMaterial } from './shaders';
 
+import type { DrawWorkingFileLayerOptions } from '@/types';
+
 export default class RasterLayerRenderer extends BaseLayerRenderer {
     private stopWatchVisible: WatchStopHandle | undefined;
     private stopWatchSize: WatchStopHandle | undefined;
@@ -35,6 +37,9 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
         this.plane = new Mesh(this.planeGeometry, this.material);
         this.plane.renderOrder = this.order + 0.1;
         this.plane.matrixAutoUpdate = false;
+        this.plane.onBeforeRender = () => {
+            this.draftTexture && (this.draftTexture.needsUpdate = true);
+        };
         (this.threejsScene ?? canvasStore.get('threejsScene'))?.add(this.plane);
 
         const { visible, width, height, transform, filters, data } = toRefs(layer);

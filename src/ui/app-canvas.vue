@@ -67,7 +67,7 @@ export default defineComponent({
         };
 
         const useCssViewport = computed<boolean>(() => {
-            return canvasStore.state.renderer === 'webgl' || canvasStore.state.useCssViewport;
+            return /* canvasStore.state.renderer === 'webgl' || */ canvasStore.state.useCssViewport;
         });
 
         const usePostProcess = computed<boolean>(() => {
@@ -149,6 +149,10 @@ export default defineComponent({
                 bufferCanvas.width = workingFileStore.get('width');
                 bufferCanvas.height = workingFileStore.get('height');
             }
+            const renderer = canvasStore.get('renderer');
+            if (renderer === 'webgl') {
+                updateThreejsImageSize(imageWidth.value, imageHeight.value, viewportWidth.value, viewportHeight.value);
+            }
             canvasStore.set('dirty', true);
         });
 
@@ -158,6 +162,10 @@ export default defineComponent({
                 if (useCssViewport.value === false) {
                     canvasElement.width = newWidth;
                     canvasElement.height = newHeight;
+                }
+                const renderer = canvasStore.get('renderer');
+                if (renderer === 'webgl') {
+                    updateThreejsImageSize(imageWidth.value, imageHeight.value, newWidth, newHeight);
                 }
                 renderMainCanvas();
             }
@@ -183,13 +191,16 @@ export default defineComponent({
                 bufferCanvas.height = newHeight;
             }
             if (renderer === 'webgl') {
-                updateThreejsImageSize(newWidth, newHeight);
+                updateThreejsImageSize(newWidth, newHeight, viewportWidth.value, viewportHeight.value);
+                updateThreejsCanvasMargin(newWidth, newHeight);
             }
 
             const threejsBackground = canvasStore.get('threejsBackground');
             if (threejsBackground) {
                 const { PlaneGeometry } = await import('three/src/geometries/PlaneGeometry');
-                threejsBackground.geometry = new PlaneGeometry(newWidth * 2.1, newHeight * 2.1);
+                threejsBackground.geometry = new PlaneGeometry(newWidth, newHeight);
+                threejsBackground.position.x = newWidth / 2;
+                threejsBackground.position.y = newHeight / 2;
             }
 
             canvasStore.set('dirty', true);
@@ -236,13 +247,16 @@ export default defineComponent({
                     const { PlaneGeometry } = await import('three/src/geometries/PlaneGeometry');
                     const { MeshBasicMaterial } = await import('three/src/materials/MeshBasicMaterial');
                     const { Mesh } = await import('three/src/objects/Mesh');
+                    const { Matrix4 } = await import('three/src/math/Matrix4');
                     const { DoubleSide, sRGBEncoding } = await import('three/src/constants');
                     const { EffectComposer } = await import('@/canvas/renderers/webgl/three/postprocessing/EffectComposer');
                     const { RenderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/RenderPass');
                     const { ShaderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/ShaderPass');
                     const { GammaCorrectionShader } = await import('@/canvas/renderers/webgl/three/shaders/GammaCorrectionShader');
-                    const { CopyShader } = await import('@/canvas/renderers/webgl/three/shaders/CopyShader');
                     try {
+                        const workingFileWidth = workingFileStore.state.width;
+                        const workingFileHeight = workingFileStore.state.height;
+
                         const threejsRenderer = new WebGLRenderer({
                             alpha: true,
                             canvas: canvas.value,
@@ -256,14 +270,19 @@ export default defineComponent({
                         const threejsScene = markRaw(new Scene());
                         canvasStore.set('threejsScene', threejsScene);
 
-                        const backgroundGeometry = new PlaneGeometry(workingFileStore.state.width * 2.1, workingFileStore.state.height * 2.1);
+                        const backgroundGeometry = new PlaneGeometry(workingFileWidth, workingFileHeight);
                         const backgroundMaterial = new MeshBasicMaterial({ color: 0xffffff, transparent: true, side: DoubleSide });
                         const threejsBackground = new Mesh(backgroundGeometry, backgroundMaterial);
+                        threejsBackground.position.x = workingFileWidth / 2;
+                        threejsBackground.position.y = workingFileHeight / 2;
                         threejsBackground.renderOrder = -1;
                         threejsScene.add(threejsBackground);
                         canvasStore.set('threejsBackground', markRaw(threejsBackground));
 
-                        const threejsCamera = new OrthographicCamera(-1, 1, 1, -1, 1, 10000);
+                        await updateThreejsCanvasMargin(workingFileWidth, workingFileHeight);
+
+                        const threejsCamera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 10000);
+                        threejsCamera.matrixAutoUpdate = false;
                         canvasStore.set('threejsCamera', threejsCamera);
 
                         const threejsComposer = new EffectComposer(threejsRenderer);
@@ -273,14 +292,30 @@ export default defineComponent({
                         canvasStore.set('threejsComposer', markRaw(threejsComposer));
 
                         canvasStore.set('renderer', 'webgl');
-                        updateThreejsImageSize(imageWidth, imageHeight);
+                        updateThreejsImageSize(imageWidth, imageHeight, viewportWidth.value, viewportHeight.value);
+
+                        // Assign new render function
                         renderMainCanvas = () => {
+                            let cameraTransform: DOMMatrix;
+                            if (canvasStore.get('useCssViewport')) {
+                                cameraTransform = new DOMMatrix().inverse().translate(0, 0, 1);
+                            } else {
+                                cameraTransform = canvasStore.get('transform').inverse().translate(0, 0, 1);
+                            }
+                            const matrix = new Matrix4();
+                            matrix.set(
+                                cameraTransform.m11, cameraTransform.m21, cameraTransform.m31, cameraTransform.m41,
+                                cameraTransform.m12, cameraTransform.m22, cameraTransform.m32, cameraTransform.m42,
+                                cameraTransform.m13, cameraTransform.m23, cameraTransform.m33, cameraTransform.m43,
+                                cameraTransform.m14, cameraTransform.m24, cameraTransform.m34, cameraTransform.m44
+                            );
+                            threejsCamera.matrix = matrix;
+                            threejsCamera.updateMatrixWorld(true);
+                            threejsCamera.updateProjectionMatrix();
                             drawWorkingFileToCanvasWebgl(threejsComposer, threejsRenderer, threejsScene, threejsCamera, { isEditorPreview: true });
                         };
                         renderMainCanvas();
                         ctx = threejsRenderer.context;
-
-                        canvasStore.set('useCssViewport', true);
                     } catch (error) {
                         console.error(error);
                     }
@@ -332,24 +367,98 @@ export default defineComponent({
         });
 
         // Update for threejs scene when image size is adjusted.
-        function updateThreejsImageSize(imageWidth: number, imageHeight: number) {
+        function updateThreejsImageSize(imageWidth: number, imageHeight: number, canvasWidth: number, canvasHeight: number) {
+            let width = canvasWidth;
+            let height = canvasHeight;
+            if (useCssViewport.value) {
+                width = imageWidth;
+                height = imageHeight;
+            }
             const threejsRenderer = canvasStore.get('threejsRenderer');
             const threejsComposer = canvasStore.get('threejsComposer');
             const threejsCamera = canvasStore.get('threejsCamera');
             if (threejsRenderer) {
-                threejsRenderer.setSize(imageWidth, imageHeight, true);
+                threejsRenderer.setSize(width, height, true);
             }
             if (threejsComposer) {
-                threejsComposer.setSize(imageWidth, imageHeight);
+                threejsComposer.setSize(width, height);
             }
             if (threejsCamera) {
-                threejsCamera.position.z = 1;
                 threejsCamera.left = 0;
-                threejsCamera.right = imageWidth;
+                threejsCamera.right = width;
                 threejsCamera.top = 0;
-                threejsCamera.bottom = imageHeight;
+                threejsCamera.bottom = height;
                 threejsCamera.updateProjectionMatrix();
             }
+        }
+
+        // Updates the canvas empty space geometry size (it hides objects outside canvas bounds)
+        async function updateThreejsCanvasMargin(imageWidth: number, imageHeight: number) {
+            const { BufferGeometry } = await import('three/src/core/BufferGeometry');
+            const { BufferAttribute } = await import('three/src/core/BufferAttribute');
+            const { MeshBasicMaterial } = await import('three/src/materials/MeshBasicMaterial');
+            const { Mesh } = await import('three/src/objects/Mesh');
+            const { CustomBlending, ZeroFactor, OneFactor, DstColorFactor } = await import('three/src/constants');
+
+            const threejsScene = canvasStore.get('threejsScene');
+            if (!threejsScene) return;
+            const existingThreejsCanvasMargin = canvasStore.get('threejsCanvasMargin');
+            if (existingThreejsCanvasMargin) {
+                threejsScene.remove(existingThreejsCanvasMargin);
+                existingThreejsCanvasMargin.geometry.dispose();
+            }
+            const canvasMarginGeometry = new BufferGeometry();
+            const marginSize = Math.max(imageWidth, imageHeight) * 2;
+            const z = 0.5;
+            const vertices = new Float32Array([
+                -marginSize, -marginSize, z,
+                0.0, imageHeight + marginSize, z,
+                0.0, -marginSize, z,
+
+                -marginSize, -marginSize, z,
+                -marginSize, imageHeight + marginSize, z,
+                0.0, imageHeight + marginSize, z,
+
+                imageWidth, -marginSize, z,
+                imageWidth + marginSize, imageHeight + marginSize, z,
+                imageWidth + marginSize, -marginSize, z,
+
+                imageWidth, -marginSize, z,
+                imageWidth, imageHeight + marginSize, z,
+                imageWidth + marginSize, imageHeight + marginSize, z,
+
+                -marginSize, -marginSize, z,
+                -marginSize, 0.0, z,
+                imageWidth + marginSize, 0.0, z,
+
+                -marginSize, -marginSize, z,
+                imageWidth + marginSize, 0.0, z,
+                imageWidth + marginSize, -marginSize, z,
+
+                -marginSize, imageHeight, z,
+                -marginSize, imageHeight + marginSize, z,
+                imageWidth + marginSize, imageHeight + marginSize, z,
+
+                -marginSize, imageHeight, z,
+                imageWidth + marginSize, imageHeight + marginSize, z,
+                imageWidth + marginSize, imageHeight, z,
+            ]);
+            canvasMarginGeometry.setAttribute('position', new BufferAttribute(vertices, 3));
+            const canvasMarginMaterial = new MeshBasicMaterial({
+                color: 0x000000,
+                alphaTest: -1,
+                opacity: 0,
+                transparent: true,
+                depthTest: false,
+                blending: CustomBlending,
+                blendDst: ZeroFactor,
+                blendSrc: OneFactor
+            });
+            const threejsCanvasMargin = new Mesh(canvasMarginGeometry, canvasMarginMaterial);
+            threejsScene.add(threejsCanvasMargin);
+            threejsCanvasMargin.renderOrder = 9999;
+            console.log(threejsScene);
+            canvasStore.set('threejsCanvasMargin', markRaw(threejsCanvasMargin));
         }
 
         // Centers the canvas and displays at 1x zoom or the maximum width/height of the window, whichever is smaller. 

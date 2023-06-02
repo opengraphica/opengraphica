@@ -1,0 +1,11 @@
+{
+    "simple": {
+        "name": "brushCategory.simple.name",
+        "brushes": {
+            "circle": {
+                "name": "brushCategory.simple.brushes.circle.name",
+                "shape": "M 1,0.5 A 0.5,0.5 0 0 1 0.5,1 0.5,0.5 0 0 1 0,0.5 0.5,0.5 0 0 1 0.5,0 0.5,0.5 0 0 1 1,0.5 Z"
+            }
+        }
+    }
+}

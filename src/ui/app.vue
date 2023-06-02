@@ -98,9 +98,11 @@ export default defineComponent({
             window.addEventListener('dragleave', onDragLeaveRoot, true);
             window.addEventListener('drop', onDropRoot, true);
 
-            // Determine if mouse user
+            // Determine if touchscreen/pen user
             editorStore.set('isTouchUser', false);
             window.addEventListener('touchstart', onTouchStartWindowTouchTest, true);
+            editorStore.set('isPenUser', false);
+            window.addEventListener('pointerdown', onPointerDownWindowPenTest, true);
 
             // Breakfix for element plus popper styles
             const opengraphica = document.querySelector('.opengraphica');
@@ -187,6 +189,13 @@ export default defineComponent({
         function onTouchStartWindowTouchTest(e: Event) {
             window.removeEventListener('touchstart', onTouchStartWindowTouchTest);
             editorStore.set('isTouchUser', true);
+        }
+
+        function onPointerDownWindowPenTest(e: PointerEvent) {
+            if (e.pointerType === 'pen') {
+                window.removeEventListener('pointerdown', onPointerDownWindowPenTest);
+                editorStore.set('isPenUser', true);
+            }
         }
 
         function onResizeWindow(e: Event) {

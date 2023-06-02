@@ -45,14 +45,14 @@ const store = new PerformantStore<PreferencesStore>({
         pointerTapTimeout: 150,
         pointerPressHoldTimeout: 500,
         postProcessInterpolateImage: true,
-        preferCanvasViewport: false,
+        preferCanvasViewport: true,
         renderer: 'webgl',
         showTutorialNotifications: true,
         showWelcomeScreenAtStart: true,
         snapSensitivity: 5,
         tooltipShowDelay: 300,
         touchRotation: 'off',
-        useCanvasViewport: false
+        useCanvasViewport: true
     },
     restore: [
         'dockPosition',
