@@ -72,8 +72,8 @@ body.ogr-full-page {
         left: 0;
         right: 0;
         bottom: 0;
-        width: 100%;
-        height: 100%;
+        width: 100% !important;
+        height: 100% !important;
         z-index: 0;
         image-rendering: -moz-crisp-edges;
         image-rendering: -webkit-crisp-edges;
@@ -116,6 +116,8 @@ body.ogr-full-page {
                 height: auto;
                 right: auto;
                 bottom: auto;
+                width: initial !important;
+                height: initial !important;
                 image-rendering: auto;
                 image-rendering: smooth;
                 image-rendering: optimizequality;

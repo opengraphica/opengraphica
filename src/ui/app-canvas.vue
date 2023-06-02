@@ -301,7 +301,7 @@ export default defineComponent({
                                 cameraTransform = new DOMMatrix().inverse().translate(0, 0, 1);
                             } else {
                                 const devicePixelRatio = window.devicePixelRatio || 1;
-                                cameraTransform = canvasStore.get('transform').inverse().scale(devicePixelRatio).translate(0, 0, 1);
+                                cameraTransform = canvasStore.get('transform').inverse().translate(0, 0, 1);
                             }
                             const matrix = new Matrix4();
                             matrix.set(
@@ -368,7 +368,7 @@ export default defineComponent({
         });
 
         // Update for threejs scene when image size is adjusted.
-        function updateThreejsImageSize(imageWidth: number, imageHeight: number, canvasWidth: number, canvasHeight: number) {
+        async function updateThreejsImageSize(imageWidth: number, imageHeight: number, canvasWidth: number, canvasHeight: number) {
             let width = canvasWidth;
             let height = canvasHeight;
             if (useCssViewport.value) {
