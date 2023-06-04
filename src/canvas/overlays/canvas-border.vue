@@ -4,7 +4,8 @@
             ref="canvasBorder"
             class="ogr-canvas-border"
             :style="{
-                top: '0px', left: '0px', width: width + 'px', height: height + 'px',
+                position: 'absolute',
+                top: '-1px', left: '-1px', width: width + 'px', height: height + 'px',
                 '--ogr-canvas-border-width': 1 / zoom * 0.0625 + 'rem'
             }"
         >
