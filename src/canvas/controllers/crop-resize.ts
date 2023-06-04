@@ -32,6 +32,11 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
         height.value = workingFileStore.get('height');
         this.xAxisSnap = [0, Math.floor(width.value / 2), width.value];
         this.yAxisSnap = [0, Math.floor(height.value / 2), height.value];
+        canvasStore.set('showAreaOutsideWorkingFile', true);
+    }
+
+    onLeave(): void {
+        canvasStore.set('showAreaOutsideWorkingFile', false);
     }
 
     onMultiTouchDown() {

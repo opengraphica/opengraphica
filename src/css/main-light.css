@@ -6821,6 +6821,12 @@ body.ogr-full-page .opengraphica {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
+.opengraphica .ogr-canvas-border {
+  border-width: var(--ogr-canvas-border-width, 1px);
+  border-style: solid;
+  border-color: var(--ogr-working-image-border-color, #cccccc);
+  box-shadow: white 0px 0px 0px 2px #ffffff88;
+}
 .opengraphica .ogr-canvas-area {
   display: block;
   position: absolute;
@@ -6860,9 +6866,6 @@ body.ogr-full-page .opengraphica {
   image-rendering: smooth;
   image-rendering: optimizequality;
   image-rendering: high-quality;
-}
-.opengraphica .ogr-canvas-container.ogr-canvas-viewport-css .ogr-canvas {
-  box-shadow: 0 0 1.25rem var(--ogr-working-image-border-color);
 }
 .opengraphica .ogr-canvas-container.ogr-canvas-viewport-css .ogr-post-process-canvas {
   transform-origin: top left;

@@ -4,7 +4,7 @@ import canvasStore from '@/store/canvas';
 import BaseLayerRenderer from './base';
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
-import { DoubleSide, NearestFilter, sRGBEncoding } from 'three/src/constants';
+import { DoubleSide, NearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, sRGBEncoding } from 'three/src/constants';
 import { Mesh } from 'three/src/objects/Mesh';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { Texture } from 'three/src/textures/Texture';
@@ -125,7 +125,9 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                     );
                     this.sourceTexture.encoding = sRGBEncoding;
                     this.sourceTexture.magFilter = NearestFilter;
-                    this.sourceTexture.minFilter = NearestFilter;
+                    // TODO - maybe use a combination of LinearMipmapLinearFilter and LinearMipmapNearestFilter
+                    // depending on the zoom level, one can appear sharper than the other.
+                    this.sourceTexture.minFilter = LinearMipmapLinearFilter;
                     this.material && (this.material.uniforms.map.value = this.sourceTexture);
                 } else {
                     if (this.sourceTexture) {

@@ -13,6 +13,7 @@ import editorStore from '@/store/editor';
 export default defineComponent({
     name: 'AppCanvasOverlays',
     components: {
+        'overlay-canvas-border': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-canvas-border' */ `../canvas/overlays/canvas-border.vue`)),
         'overlay-crop-resize': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-crop-resize' */ `../canvas/overlays/crop-resize.vue`)),
         'overlay-draw': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-draw' */ `../canvas/overlays/draw.vue`)),
         'overlay-free-transform': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-free-transform' */ `../canvas/overlays/free-transform.vue`)),
@@ -32,6 +33,9 @@ export default defineComponent({
 
         const overlays = computed<string[]>(() => {
             const overlayList: string[] = [];
+            if (!props.ignoreTransform) {
+                overlayList.push('canvas-border');
+            }
             for (const overlay of editorStore.state.activeToolOverlays) {
                 if (props.ignoreTransform) {
                     if (ignoreTransformWith.includes(overlay)) {

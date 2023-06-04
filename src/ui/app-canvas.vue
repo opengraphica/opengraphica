@@ -126,6 +126,15 @@ export default defineComponent({
             }
         });
 
+        // Toggle visibility of area outside the working file boundary
+        watchEffect(async () => {
+            const showAreaOutsideWorkingFile = canvasStore.state.showAreaOutsideWorkingFile;
+            const threejsCanvasMargin = canvasStore.get('threejsCanvasMargin');
+            if (threejsCanvasMargin) {
+                threejsCanvasMargin.visible = !showAreaOutsideWorkingFile;
+            }
+        });
+
         watch([useCssViewport], ([isUseCssViewport]) => {
             const canvasElement = canvasStore.get('viewCanvas');
             const bufferCanvas = canvasStore.get('bufferCanvas');
@@ -458,7 +467,6 @@ export default defineComponent({
             const threejsCanvasMargin = new Mesh(canvasMarginGeometry, canvasMarginMaterial);
             threejsScene.add(threejsCanvasMargin);
             threejsCanvasMargin.renderOrder = 9999;
-            console.log(threejsScene);
             canvasStore.set('threejsCanvasMargin', markRaw(threejsCanvasMargin));
         }
 

@@ -26,6 +26,7 @@ interface CanvasState {
     preventPostProcess: boolean;
     renderer: '2d' | 'webgl'; // The active renderer. See preferences store for preferred renderer.
     selectionMaskCanvas: HTMLCanvasElement;
+    showAreaOutsideWorkingFile: boolean;
     threejsBackground: Mesh | null;
     threejsCamera: OrthographicCamera | null;
     threejsCanvasMargin: Mesh | null;
@@ -81,6 +82,7 @@ const store = new PerformantStore<CanvasStore>({
         preventPostProcess: false,
         renderer: '2d',
         selectionMaskCanvas: dummyCanvas,
+        showAreaOutsideWorkingFile: false,
         threejsBackground: null,
         threejsCamera: null,
         threejsCanvasMargin: null,

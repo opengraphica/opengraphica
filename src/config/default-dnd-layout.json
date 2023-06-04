@@ -9,8 +9,7 @@
                 "tools": [
                     "view",
                     "transform",
-                    "selection",
-                    "draw"
+                    "selection"
                 ]
             }
         },

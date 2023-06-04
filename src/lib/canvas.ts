@@ -73,16 +73,9 @@ export function drawWorkingFileToCanvas2d(canvas: HTMLCanvasElement, ctx: Canvas
     const canvasTopLeft = { x: 0, y: 0 };
     const canvasBottomRight = { x: imageWidth, y: imageHeight };
     ctx.rect(canvasTopLeft.x, canvasTopLeft.y, canvasBottomRight.x - canvasTopLeft.x, canvasBottomRight.y - canvasTopLeft.y);
-    if (!useCssViewport) {
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
-        ctx.shadowColor = canvasStore.get('workingImageBorderColor');
-        ctx.shadowBlur = 20 * decomposedTransform.scaleX;
-    }
     ctx.lineWidth = canvasBorderSize;
     ctx.fillStyle = background.visible ? background.color.style : 'transparent';
     ctx.fill();
-    ctx.shadowBlur = 0;
 
     // Selection test
     if (options.selectionTest) {
