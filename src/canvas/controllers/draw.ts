@@ -118,112 +118,28 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         }
     }
 
-    async onPointerDown(e: PointerEvent) {
+    onPointerDown(e: PointerEvent) {
         super.onPointerDown(e);
+
         if (e.pointerType === 'pen' || !editorStore.state.isPenUser) {
             cursorHoverPosition.value = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
                 this.lastCursorY * devicePixelRatio
             ).matrixTransform(canvasStore.state.transform.inverse());
-
-            if (e.isPrimary && e.button === 0) {
-                this.drawingPointerId = e.pointerId;
-
-                // Create layer if one does not exist
-                const { width, height } = workingFileStore.state;
-                let selectedLayers = getSelectedLayers();
-                let layerActions = [];
-                if (selectedLayers.length === 0) {
-                    layerActions.push(new InsertLayerAction<InsertRasterLayerOptions>({
-                        type: 'raster',
-                        name: 'New Paint',
-                        width,
-                        height,
-                        data: {
-                            sourceImage: await createEmptyImage(width, height),
-                            sourceImageIsObjectUrl: true,
-                        }
-                    }));
-                }
-                for (let i = selectedLayers.length - 1; i >= 0; i--) {
-                    const selectedLayer = selectedLayers[i];
-                    if (selectedLayer.type === 'empty') {
-                        layerActions.push(
-                            // Switch layer type
-                            new UpdateLayerAction<UpdateRasterLayerOptions>({
-                                id: selectedLayer.id,
-                                type: 'raster',
-                                width,
-                                height,
-                                data: {}
-                            }),
-                            // Update data separately, the action will have issues with the type change otherwise
-                            new UpdateLayerAction<UpdateRasterLayerOptions>({
-                                id: selectedLayer.id,
-                                data: {
-                                    sourceImage: await createEmptyImage(width, height),
-                                    sourceImageIsObjectUrl: true,
-                                }
-                            })
-                        );
-                    } else if (selectedLayer.type !== 'raster') {
-                        selectedLayers.splice(i, 1);
-                    }
-                }
-                if (layerActions.length > 0) {
-                    await historyStore.dispatch('runAction', {
-                        action: new BundleAction('createDrawLayer', 'action.createDrawLayer', layerActions)
-                    });
-                }
-
-                // Create a draft image for each of the selected layers
-                selectedLayers = getSelectedLayers();
-                this.drawingOnLayers = selectedLayers as WorkingFileAnyLayer[];
-                this.drawingOnLayerScales = [];
-                for (const layer of this.drawingOnLayers) {
-                    const layerGlobalTransformSelfExcluded = getLayerGlobalTransform(layer, { excludeSelf: true });
-                    const layerGlobalTransform = decomposeMatrix(getLayerGlobalTransform(layer));
-                    const viewTransform = canvasStore.get('decomposedTransform');
-                    let scaleX = viewTransform.scaleX * layerGlobalTransform.scaleX;
-                    let scaleY = viewTransform.scaleY * layerGlobalTransform.scaleY;
-                    const width = workingFileStore.get('width');
-                    const height = workingFileStore.get('height');
-                    const logicalWidth = Math.min(width, workingFileStore.get('width') * viewTransform.scaleX);
-                    const logicalHeight = Math.min(height, workingFileStore.get('height') * viewTransform.scaleY);
-                    if (layer.type === 'raster') {
-                        layer.draft = {
-                            width,
-                            height,
-                            logicalWidth,
-                            logicalHeight,
-                            transform: layerGlobalTransformSelfExcluded.inverse(),
-                            updateChunks: []
-                        };
-                    }
-                    this.drawingOnLayerScales.push({
-                        x: scaleX,
-                        y: scaleY,
-                    });
-                }
-
-                // Create a draft canvas
-                this.drawingDraftCanvas = document.createElement('canvas');
-                this.drawingDraftCanvas.width = width;
-                this.drawingDraftCanvas.height = height;
-
-                // Populate first drawing point
-                this.drawingPoints = [
-                    new DOMPoint(
-                        this.lastCursorX * devicePixelRatio,
-                        this.lastCursorY * devicePixelRatio
-                    ).matrixTransform(canvasStore.state.transform.inverse())
-                ];
-
-                // Generate draw preview
-                this.drawPreview();
-            }
         }
 
+        if ((e.pointerType === 'pen' || (!editorStore.state.isPenUser && e.pointerType === 'mouse')) && e.isPrimary && e.button === 0) {
+            this.drawingPointerId = e.pointerId;
+            this.onDrawStart();
+        }
+    }
+
+    onMultiTouchDown() {
+        super.onMultiTouchDown();
+        if (this.touches.length === 1) {
+            this.drawingPointerId = this.touches[0].id;
+            this.onDrawStart();
+        }
     }
 
     onMultiTouchTap(touches: PointerTracker[]) {
@@ -319,6 +235,101 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         }
     }
 
+    protected async onDrawStart() {
+        // Create layer if one does not exist
+        const { width, height } = workingFileStore.state;
+        let selectedLayers = getSelectedLayers();
+        let layerActions = [];
+        if (selectedLayers.length === 0) {
+            layerActions.push(new InsertLayerAction<InsertRasterLayerOptions>({
+                type: 'raster',
+                name: 'New Paint',
+                width,
+                height,
+                data: {
+                    sourceImage: await createEmptyImage(width, height),
+                    sourceImageIsObjectUrl: true,
+                }
+            }));
+        }
+        for (let i = selectedLayers.length - 1; i >= 0; i--) {
+            const selectedLayer = selectedLayers[i];
+            if (selectedLayer.type === 'empty') {
+                layerActions.push(
+                    // Switch layer type
+                    new UpdateLayerAction<UpdateRasterLayerOptions>({
+                        id: selectedLayer.id,
+                        type: 'raster',
+                        width,
+                        height,
+                        data: {}
+                    }),
+                    // Update data separately, the action will have issues with the type change otherwise
+                    new UpdateLayerAction<UpdateRasterLayerOptions>({
+                        id: selectedLayer.id,
+                        data: {
+                            sourceImage: await createEmptyImage(width, height),
+                            sourceImageIsObjectUrl: true,
+                        }
+                    })
+                );
+            } else if (selectedLayer.type !== 'raster') {
+                selectedLayers.splice(i, 1);
+            }
+        }
+        if (layerActions.length > 0) {
+            await historyStore.dispatch('runAction', {
+                action: new BundleAction('createDrawLayer', 'action.createDrawLayer', layerActions)
+            });
+        }
+
+        // Create a draft image for each of the selected layers
+        selectedLayers = getSelectedLayers();
+        this.drawingOnLayers = selectedLayers as WorkingFileAnyLayer[];
+        this.drawingOnLayerScales = [];
+        for (const layer of this.drawingOnLayers) {
+            const layerGlobalTransformSelfExcluded = getLayerGlobalTransform(layer, { excludeSelf: true });
+            const layerGlobalTransform = decomposeMatrix(getLayerGlobalTransform(layer));
+            const viewTransform = canvasStore.get('decomposedTransform');
+            let scaleX = viewTransform.scaleX * layerGlobalTransform.scaleX;
+            let scaleY = viewTransform.scaleY * layerGlobalTransform.scaleY;
+            const width = workingFileStore.get('width');
+            const height = workingFileStore.get('height');
+            const logicalWidth = Math.min(width, workingFileStore.get('width') * viewTransform.scaleX);
+            const logicalHeight = Math.min(height, workingFileStore.get('height') * viewTransform.scaleY);
+            if (layer.type === 'raster') {
+                layer.draft = {
+                    width,
+                    height,
+                    logicalWidth,
+                    logicalHeight,
+                    transform: layerGlobalTransformSelfExcluded.inverse(),
+                    updateChunks: []
+                };
+            }
+            this.drawingOnLayerScales.push({
+                x: scaleX,
+                y: scaleY,
+            });
+        }
+
+        // Create a draft canvas
+        this.drawingDraftCanvas = document.createElement('canvas');
+        this.drawingDraftCanvas.width = width;
+        this.drawingDraftCanvas.height = height;
+
+        // Populate first drawing point
+        this.drawingPoints = [
+            new DOMPoint(
+                this.lastCursorX * devicePixelRatio,
+                this.lastCursorY * devicePixelRatio
+            ).matrixTransform(canvasStore.state.transform.inverse())
+        ];
+
+        // Generate draw preview
+        this.drawPreview();
+    }
+
     protected handleCursorIcon() {
         let newIcon = super.handleCursorIcon();
         canvasStore.set('cursor', newIcon);
@@ -362,8 +373,8 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
 
             const points = this.smoothPoints(this.drawingPoints);
 
-            const previewRatioX = canvasStore.get('decomposedTransform').scaleX;
-            const previewRatioY = canvasStore.get('decomposedTransform').scaleY;
+            const previewRatioX = Math.min(1, canvasStore.get('decomposedTransform').scaleX);
+            const previewRatioY = Math.min(1, canvasStore.get('decomposedTransform').scaleY);
 
             const chunkSize = Math.max(64, nearestPowerOf2(this.drawingDraftChunkSize * previewRatioX));
             const previewBrushSize = brushSize.value * previewRatioX;
