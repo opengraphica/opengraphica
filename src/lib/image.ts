@@ -268,6 +268,11 @@ export function createImageFromBlob(blob: Blob, options: CreateImageFromOptions 
     let canvas: HTMLCanvasElement | undefined = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
+
+    // TODO - remove, for testing only
+    // canvas.getContext('2d')!.fillStyle = '#ff00ff';
+    // canvas.getContext('2d')!.fillRect(0, 0, width, height);
+
     const image = await createImageFromCanvas(canvas);
     canvas = undefined;
     return image;

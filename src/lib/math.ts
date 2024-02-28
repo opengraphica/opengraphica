@@ -23,3 +23,7 @@ export function lineIntersectsLine2d(x1: number, y1: number, x2: number, y2: num
     const y = y1 + ua * (y2 - y1);
     return new DOMPoint(x, y);
 }
+
+export function nearestPowerOf2(value: number) {
+    return Math.ceil(Math.log(value) / Math.log(2));
+}

@@ -31,6 +31,7 @@
         "updateActiveSelection": "Update Active Selection",
         "updateFile": "Update File",
         "updateLayer": "Update Layer",
+        "updateDrawLayer": "Draw on Layer",
         "updateLayerFilterParams": "Update Layer Effect",
         "updateSelectionCombineMode": "Update Selection Combine Mode"
     },

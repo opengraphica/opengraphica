@@ -20,6 +20,7 @@ export interface DrawWorkingFileOptions {
     selectedLayersOnly?: boolean;
     initialTransform?: DOMMatrix;
     force2dRenderer?: boolean;
+    disableViewportTransform?: boolean;
     selectionTest?: {
         point: DOMPoint;
         resultId?: number;
@@ -95,9 +96,28 @@ export interface WorkingFileTimeline {
     }
 }
 
+
+export interface WorkingFileLayerDraftChunk {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    data: HTMLCanvasElement;
+}
+
+export interface WorkingFileLayerDraft {
+    height: number; // The actual height drawn across on the canvas
+    logicalHeight: number; // The pixel height of the preview data, stretched to `height`
+    logicalWidth: number; // The pixel width of the preview data, stretched to `width`
+    transform: DOMMatrix; // Should be an inverse transform to undo the global transform
+    updateChunks: WorkingFileLayerDraftChunk[];
+    width: number; // The actual width drawn across the canvas
+}
+
 export interface WorkingFileLayer<T extends ColorModel = ColorModel> {
     bakedImage: HTMLImageElement | null;
     blendingMode: WorkingFileLayerBlendingMode;
+    draft: WorkingFileLayerDraft | null;
     filters: WorkingFileLayerFilter<T>[];
     groupId: number | null;
     height: number;
@@ -128,7 +148,7 @@ export interface WorkingFileRasterLayer<T extends ColorModel = ColorModel> exten
     data: {
         sourceImage?: HTMLImageElement;
         sourceImageIsObjectUrl?: boolean;
-        draftImage?: HTMLCanvasElement;
+        draftImage?: HTMLCanvasElement; // Replaces sourceImage visually while provided
     }
 }
 

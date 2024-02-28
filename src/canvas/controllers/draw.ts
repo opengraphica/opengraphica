@@ -5,15 +5,16 @@ import { PointerTracker } from './base';
 import BaseCanvasMovementController from './base-movement';
 import { cursorHoverPosition, brushShape, brushColor, brushSize } from '../store/draw-state';
 
+import { decomposeMatrix } from '@/lib/dom-matrix';
 import { isCtrlOrMetaKeyPressed } from '@/lib/keyboard';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
-import { createEmptyImage, createImageFromBlob } from '@/lib/image';
-import { lineIntersectsLine2d, pointDistance2d } from '@/lib/math';
+import { createEmptyImage, createImageFromBlob, createImageFromCanvas } from '@/lib/image';
+import { pointDistance2d, nearestPowerOf2 } from '@/lib/math';
 
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
-import workingFileStore, { getSelectedLayers, ensureUniqueLayerSiblingName } from '@/store/working-file';
+import workingFileStore, { getSelectedLayers, ensureUniqueLayerSiblingName, getLayerGlobalTransform } from '@/store/working-file';
 
 import { BundleAction } from '@/actions/bundle';
 import { InsertLayerAction } from '@/actions/insert-layer';
@@ -26,10 +27,14 @@ const devicePixelRatio = window.devicePixelRatio || 1;
 export default class CanvasZoomController extends BaseCanvasMovementController {
 
     private brushShapeUnwatch: WatchStopHandle | null = null;
+    private brushSizeUnwatch: WatchStopHandle | null = null;
     private ctrlKeyUnwatch: WatchStopHandle | null = null;
 
+    private drawingDraftChunkSize: number = 64;
+    private drawingDraftCanvases: HTMLCanvasElement[] = [];
     private drawingPointerId: number | null = null;
     private drawingOnLayers: WorkingFileAnyLayer[] = [];
+    private drawingOnLayerScales: { x: number; y: number }[] = [];
     private drawingDraftCanvas: HTMLCanvasElement | null = null;
     private drawingPoints: DOMPoint[] = [];
 
@@ -55,6 +60,22 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                     <path d="${brushShape}" fill="${brushColor.style}" />
                 </svg>`;
             this.brushShapeImage = await createImageFromBlob(new Blob([svg], { type: 'image/svg+xml' }));
+        }, { immediate: true });
+
+        this.brushSizeUnwatch = watch([brushSize], ([brushSize]) => {
+            this.drawingDraftChunkSize = Math.max(64, nearestPowerOf2(brushSize / 4));
+            this.drawingDraftCanvases = (this.drawingDraftCanvases ?? []).slice(0, 9);
+            for (let i = 0; i < 9; i++) {
+                let draftCanvas = this.drawingDraftCanvases[i];
+                if (!draftCanvas) {
+                    draftCanvas = document.createElement('canvas');
+                }
+                draftCanvas.width = this.drawingDraftChunkSize;
+                draftCanvas.height = this.drawingDraftChunkSize;
+                const ctx = draftCanvas.getContext('2d');
+                ctx?.clearRect(0, 0, this.drawingDraftChunkSize, this.drawingDraftChunkSize);
+                this.drawingDraftCanvases[i] = draftCanvas;
+            }
         }, { immediate: true });
 
         cursorHoverPosition.value = new DOMPoint(
@@ -84,8 +105,12 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         super.onLeave();
         this.brushShapeUnwatch?.();
         this.brushShapeUnwatch = null;
+        this.brushSizeUnwatch?.();
+        this.brushSizeUnwatch = null;
         this.ctrlKeyUnwatch?.();
         this.ctrlKeyUnwatch = null;
+
+        this.drawingDraftCanvases = [];
 
         // Tutorial Message
         if (!editorStore.state.tutorialFlags.drawToolIntroduction) {
@@ -150,8 +175,36 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                         action: new BundleAction('createDrawLayer', 'action.createDrawLayer', layerActions)
                     });
                 }
+
+                // Create a draft image for each of the selected layers
                 selectedLayers = getSelectedLayers();
                 this.drawingOnLayers = selectedLayers as WorkingFileAnyLayer[];
+                this.drawingOnLayerScales = [];
+                for (const layer of this.drawingOnLayers) {
+                    const layerGlobalTransformSelfExcluded = getLayerGlobalTransform(layer, { excludeSelf: true });
+                    const layerGlobalTransform = decomposeMatrix(getLayerGlobalTransform(layer));
+                    const viewTransform = canvasStore.get('decomposedTransform');
+                    let scaleX = viewTransform.scaleX * layerGlobalTransform.scaleX;
+                    let scaleY = viewTransform.scaleY * layerGlobalTransform.scaleY;
+                    const width = workingFileStore.get('width');
+                    const height = workingFileStore.get('height');
+                    const logicalWidth = Math.min(width, workingFileStore.get('width') * viewTransform.scaleX);
+                    const logicalHeight = Math.min(height, workingFileStore.get('height') * viewTransform.scaleY);
+                    if (layer.type === 'raster') {
+                        layer.draft = {
+                            width,
+                            height,
+                            logicalWidth,
+                            logicalHeight,
+                            transform: layerGlobalTransformSelfExcluded.inverse(),
+                            updateChunks: []
+                        };
+                    }
+                    this.drawingOnLayerScales.push({
+                        x: scaleX,
+                        y: scaleY,
+                    });
+                }
 
                 // Create a draft canvas
                 this.drawingDraftCanvas = document.createElement('canvas');
@@ -205,64 +258,69 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
 
             this.drawPreview();
         }
-
-        // if (pointer && (pointer.type !== 'touch' || this.multiTouchDownCount === 1)) {
-        //     if (pointer.isDragging && e.isPrimary && pointer.down.button === 0) {
-        //         this.isDragging = true;
-        //         this.handleCursorIcon();
-        //         const lastCursorX = (pointer.movePrev || pointer.down).pageX;
-        //         const lastCursorY = (pointer.movePrev || pointer.down).pageY;
-        //         const cursorX = e.pageX;
-        //         const cursorY = e.pageY;
-        //         let transform = canvasStore.get('transform');
-        //         const transformInverse = transform.inverse();
-        //         const moveTranslateStart = new DOMPoint(lastCursorX * devicePixelRatio, lastCursorY * devicePixelRatio).matrixTransform(transformInverse);
-        //         // Pan View
-        //         const translateMove = new DOMPoint(cursorX * devicePixelRatio, cursorY * devicePixelRatio).matrixTransform(transformInverse);
-        //         transform.translateSelf(translateMove.x - moveTranslateStart.x, translateMove.y - moveTranslateStart.y);
-        //         canvasStore.set('transform', transform);
-        //         canvasStore.set('viewDirty', true);
-        //     }
-        // }
     }
 
-    onPointerUpBeforePurge(e: PointerEvent): void {
+    async onPointerUpBeforePurge(e: PointerEvent): Promise<void> {
         super.onPointerUpBeforePurge(e);
 
         if (this.drawingPointerId === e.pointerId) {
+
+            const layerActions = [];
+
+            const previewRatioX = canvasStore.get('decomposedTransform').scaleX;
+            const previewRatioY = canvasStore.get('decomposedTransform').scaleY;
+            const previewBrushSize = brushSize.value * previewRatioX;
+
+            for (const layer of this.drawingOnLayers) {
+                if (layer.type === 'raster') {
+
+                    const layerUpdateCanvas = document.createElement('canvas');
+                    layerUpdateCanvas.width = layer.width;
+                    layerUpdateCanvas.height = layer.height;
+                    const layerUpdateCtx = layerUpdateCanvas.getContext('2d');
+                    if (!layerUpdateCtx) continue;
+                    if (layer.data.sourceImage) {
+                        layerUpdateCtx.drawImage(layer.data.sourceImage, 0, 0);
+                    }
+                    // TODO - transform layer before draw
+                    layerUpdateCtx.save();
+                    const layerGlobalTransform = getLayerGlobalTransform(layer);
+                    const decomposedCanvasTransform = decomposeMatrix(canvasStore.state.transform.inverse());
+                    const layerTransform = layerGlobalTransform.inverse().scale(decomposedCanvasTransform.scaleX, decomposedCanvasTransform.scaleY);
+                    layerUpdateCtx.transform(layerTransform.a, layerTransform.b, layerTransform.c, layerTransform.d, layerTransform.e, layerTransform.f);
+                    this.drawPreviewPoints(this.drawingPoints, layerUpdateCtx, previewRatioX, previewRatioY, previewBrushSize);
+                    layerUpdateCtx.restore();
+
+                    layerActions.push(
+                        new UpdateLayerAction<UpdateRasterLayerOptions>({
+                            id: layer.id,
+                            data: {
+                                sourceImage: await createImageFromCanvas(layerUpdateCanvas),
+                                sourceImageIsObjectUrl: true,
+                            }
+                        })
+                    );
+                }
+            }
+
+            if (layerActions.length > 0) {
+                await historyStore.dispatch('runAction', {
+                    action: new BundleAction('updateDrawLayer', 'action.updateDrawLayer', layerActions)
+                });
+
+                for (const layer of this.drawingOnLayers) {
+                    layer.draft = null;
+                }
+            }
+
             this.drawingPoints = [];
             this.drawingOnLayers = [];
             this.drawingDraftCanvas = null;
         }
-
-        // const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
-        // if (pointer && pointer.down.button === 0) {
-        //     if (pointer.isDragging) {
-        //         this.isDragging = false;
-        //         this.handleCursorIcon();
-        //     } else {
-        //         if (e.isPrimary && ['mouse', 'pen'].includes(e.pointerType) && e.button === 0) {
-        //             if (isCtrlOrMetaKeyPressed.value === true) {
-        //                 this.onZoomOut();
-        //             } else {
-        //                 this.onZoomIn();
-        //             }
-        //         }
-        //     }
-        // }
     }
 
     protected handleCursorIcon() {
         let newIcon = super.handleCursorIcon();
-        // if (!newIcon) {
-        //     if (this.isDragging) {
-        //         newIcon = 'grabbing';
-        //     } else if (isCtrlOrMetaKeyPressed.value) {
-        //         newIcon = 'zoom-out';
-        //     } else {
-        //         newIcon = 'zoom-in';
-        //     }
-        // }
         canvasStore.set('cursor', newIcon);
         return newIcon;
     }
@@ -297,8 +355,6 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
     private drawPreview() {
         if (this.drawingOnLayers.length > 0 && this.drawingDraftCanvas && this.brushShapeImage) {
 
-            const time = window.performance.now();
-
             const canvas = this.drawingDraftCanvas;
             canvas.id = 'bar';
             const ctx = canvas.getContext('2d');
@@ -306,57 +362,131 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
 
             const points = this.smoothPoints(this.drawingPoints);
 
-            
-            // ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.beginPath();
-            ctx.moveTo(points[0].x, points[0].y);
-            // const lookAroundLength = 2;
-            // const previousStack = [];
-            // const nextStack = [];
-            // for (let i = 1; i < points.length; i++) {
-            //     let previousPoint1 = points[i - 1];
-            //     let previousPoint2 = points[i - 2] ?? previousPoint1;
-            //     let nextPoint1 = points[i];
-            //     let nextPoint2 = points[i + 1] ?? nextPoint1;
-            //     const averageX = (previousPoint1.x + nextPoint1.x) / 2;
-            //     const averageY = (previousPoint1.y + nextPoint1.y) / 2;
-            //     ctx.quadraticCurveTo(previousPoint1.x, previousPoint1.y, averageX, averageY);
-            // }
-            // ctx.lineWidth = brushSize.value;
-            // ctx.stroke();
+            const previewRatioX = canvasStore.get('decomposedTransform').scaleX;
+            const previewRatioY = canvasStore.get('decomposedTransform').scaleY;
 
-            console.log(window.performance.now() - time);
+            const chunkSize = Math.max(64, nearestPowerOf2(this.drawingDraftChunkSize * previewRatioX));
+            const previewBrushSize = brushSize.value * previewRatioX;
 
-            
-            // for (const point of this.drawingPoints) {
-
-                // ctx.save();
-                // ctx.translate(point.x, point.y);
-                // ctx.scale(brushSize.value, brushSize.value);
-                // ctx.translate(-1.5, -1.5);
-                // ctx.drawImage(this.brushShapeImage, 0, 0);
-                // ctx.restore();
-            // }
-
-            for (const layer of this.drawingOnLayers) {
-                if (layer.type === 'raster') {
-                    let draftImage = layer.data.draftImage;
-                    if (!draftImage) {
-                        draftImage = document.createElement('canvas');
-                        draftImage.width = layer.width;
-                        draftImage.height = layer.height;
-                        layer.data.draftImage = draftImage;
-                    }
-
-                    const layerDraftCanvasCtx = draftImage.getContext('2d');
-                    if (!layerDraftCanvasCtx) continue;
-                    // layerDraftCanvasCtx.clearRect(0, 0, layer.width, layer.height);
-                    // layerDraftCanvasCtx.drawImage(canvas, 0, 0);
+            // For area of the canvas that the line between the last few drawn points affect,
+            // Determine the range of subdivided canvas chunks we need to replace
+            let minQuadrantX = Infinity;
+            let maxQuadrantX = -Infinity;
+            let minQuadrantY = Infinity;
+            let maxQuadrantY = -Infinity;
+            for (let i = Math.max(0, points.length - 3); i < points.length; i++) {
+                const offsetPoint = new DOMPoint(
+                    points[i].x * previewRatioX,
+                    points[i].y * previewRatioY
+                );
+                const minX = Math.floor((offsetPoint.x - previewBrushSize / 2) / chunkSize);
+                const maxX = Math.floor((offsetPoint.x + previewBrushSize / 2) / chunkSize);
+                const minY = Math.floor((offsetPoint.y - previewBrushSize / 2) / chunkSize);
+                const maxY = Math.floor((offsetPoint.y + previewBrushSize / 2) / chunkSize);
+                if (minX < minQuadrantX) {
+                    minQuadrantX = minX;
+                }
+                if (maxX > maxQuadrantX) {
+                    maxQuadrantX = maxX;
+                }
+                if (minY < minQuadrantY) {
+                    minQuadrantY = minY;
+                }
+                if (maxY > maxQuadrantY) {
+                    maxQuadrantY = maxY;
                 }
             }
 
+            // Draw the line to each canvas chunk
+            try {
+                let draftCanvasIndex = 0;
+                for (let quadrantX = minQuadrantX; quadrantX <= maxQuadrantX; quadrantX++) {
+                    for (let quadrantY = minQuadrantY; quadrantY <= maxQuadrantY; quadrantY++) {
+                        let draftCanvas = this.drawingDraftCanvases[draftCanvasIndex];
+                        if (!draftCanvas) {
+                            draftCanvas = document.createElement('canvas');
+                            draftCanvas.width = chunkSize;
+                            draftCanvas.height = chunkSize;
+                            this.drawingDraftCanvases[draftCanvasIndex] = draftCanvas;
+                        }
+                        const ctx = draftCanvas.getContext('2d');
+                        if (!ctx) throw new Error('Couldn\'t create a canvas chunk.');
+                        ctx.clearRect(0, 0, chunkSize, chunkSize);
+
+                        // Draw the line
+                        this.drawPreviewPoints(points, ctx, previewRatioX, previewRatioY, previewBrushSize, -quadrantX * chunkSize, -quadrantY * chunkSize);
+
+                        draftCanvasIndex++;
+                    }
+                }
+            } catch (error) {
+                console.log(error);
+                // TODO - fallback
+            }
+
+            for (const [layerIndex, layer] of this.drawingOnLayers.entries()) {
+                const layerScale = this.drawingOnLayerScales[layerIndex];
+                if (layer.type === 'raster') {
+                    if (!layer.draft) continue;
+                    // let draftImage = layer.data.draftImage;
+
+                    // const screenTexelWidth = layer.width * layerScale.x * devicePixelRatio;
+                    // const screenTexelHeight = layer.height * layerScale.y * devicePixelRatio;
+
+                    let layerDraftCanvasCtx: CanvasRenderingContext2D | null = null;
+
+                    // if (!draftImage) {
+                    //     draftImage = document.createElement('canvas');
+                    //     draftImage.width = Math.ceil(screenTexelWidth);
+                    //     draftImage.height = Math.ceil(screenTexelHeight);
+                    //     layer.data.draftImage = draftImage;
+                    // }
+
+                    // layerDraftCanvasCtx = draftImage.getContext('2d');
+                    // if (!layerDraftCanvasCtx) continue;
+
+                    let draftCanvasIndex = 0;
+                    for (let quadrantX = minQuadrantX; quadrantX <= maxQuadrantX; quadrantX++) {
+                        for (let quadrantY = minQuadrantY; quadrantY <= maxQuadrantY; quadrantY++) {
+                            layer.draft.updateChunks.push({
+                                x: quadrantX * chunkSize,
+                                y: quadrantY * chunkSize,
+                                width: chunkSize,
+                                height: chunkSize,
+                                data: this.drawingDraftCanvases[draftCanvasIndex]
+                            });
+
+                            draftCanvasIndex++;
+                        }
+                    }
+                }
+            }
 
             canvasStore.set('dirty', true);
         }
+    }
+
+    private drawPreviewPoints(points: DOMPoint[], ctx: CanvasRenderingContext2D, previewRatioX: number, previewRatioY: number, lineWidth: number, offsetX: number = 0, offsetY: number = 0) {
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(points[0].x * previewRatioX + offsetX, points[0].y * previewRatioY + offsetY);
+        let averageX = 0;
+        let averageY = 0;
+        for (let i = 1; i < points.length; i++) {
+            let previousPoint1 = {
+                x: points[i - 1].x * previewRatioX + offsetX,
+                y: points[i - 1].y * previewRatioY + offsetY,
+            };
+            let nextPoint1 = {
+                x: points[i].x * previewRatioX + offsetX,
+                y: points[i].y * previewRatioY + offsetY,
+            };
+            averageX = (previousPoint1.x + nextPoint1.x) / 2;
+            averageY = (previousPoint1.y + nextPoint1.y) / 2;
+            ctx.quadraticCurveTo(previousPoint1.x, previousPoint1.y, averageX, averageY);
+        }
+        ctx.lineWidth = lineWidth;
+        ctx.stroke();
     }
 }

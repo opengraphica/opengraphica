@@ -55,7 +55,7 @@ export function drawWorkingFileToCanvas2d(canvas: HTMLCanvasElement, ctx: Canvas
     const useCssViewport: boolean = canvasStore.get('useCssViewport');
     // canvasStore.set('isDisplayingNonRasterLayer', false);
 
-    if (!useCssViewport && !options.selectionTest) {
+    if (!useCssViewport && !options.selectionTest && !options.disableViewportTransform) {
         ctx.transform(transform.a, transform.b, transform.c, transform.d, transform.e, transform.f);
     }
     

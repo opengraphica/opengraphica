@@ -109,7 +109,7 @@ function getLayerById(id: number, parent?: WorkingFileLayer<ColorModel>[]): Work
     return null;
 }
 
-function getLayerGlobalTransform(layerOrId: WorkingFileLayer<ColorModel> | number): DOMMatrix {
+function getLayerGlobalTransform(layerOrId: WorkingFileLayer<ColorModel> | number, options?: { excludeSelf?: boolean }): DOMMatrix {
     let layer: WorkingFileLayer<ColorModel> | null = null;
     if (typeof layerOrId === 'number') {
         layer = getLayerById(layerOrId);
@@ -121,7 +121,9 @@ function getLayerGlobalTransform(layerOrId: WorkingFileLayer<ColorModel> | numbe
         if (layer.groupId != null) {
             transform.multiplySelf(getLayerGlobalTransform(layer.groupId));
         }
-        transform.multiplySelf(layer.transform);
+        if (!options?.excludeSelf) {
+            transform.multiplySelf(layer.transform);
+        }
     }
     return transform;
 }
