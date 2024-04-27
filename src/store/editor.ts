@@ -82,6 +82,7 @@ interface EditorStore {
 let currentTaskRunId: number = 0;
 
 const store = new PerformantStore<EditorStore>({
+    name: 'editorStore',
     state: {
         activeMenuDrawerComponentName: null,
         activePopoverIds: [],

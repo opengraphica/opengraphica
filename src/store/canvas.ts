@@ -64,6 +64,7 @@ interface CanvasStore {
 let dummyCanvas: any = document.createElement('canvas');
 
 const store = new PerformantStore<CanvasStore>({
+    name: 'canvasStore',
     state: {
         bufferCanvas: dummyCanvas,
         bufferCtx: dummyCanvas.getContext('2d') as CanvasRenderingContext2D,

@@ -1,4 +1,4 @@
-import { reactive, shallowReadonly, Ref, UnwrapRef } from 'vue';
+import { computed, reactive, shallowReadonly, Ref, UnwrapRef, WritableComputedRef } from 'vue';
 
 const localStoragePrefix = 'openGraphicaStore_';
 
@@ -11,6 +11,7 @@ type OnSetCallback<T extends Object> = <K extends keyof T>(key: K, value: T[K], 
 type OnDispatchCallback<T extends StoreTypeMap> = <K extends keyof T['dispatch']>(actionName: K, value: T[K], set: <K extends keyof T['state']>(key: K, value: T['state'][K]) => void) => void;
 
 interface PerformantStoreOptions<T extends StoreTypeMap> {
+    name: string; // Used for localStorage
     state: T['state']; // Object of state managed by this store
     nonReactive?: string[]; // List of prop names in state that shouldn't be added to the reactive state (usually because reactivity is too expensive or will break them),
     readOnly?: string[]; // List of prop names in state that can't be set after initialization, but can be modified in the 'onSet' callback.
@@ -20,6 +21,7 @@ interface PerformantStoreOptions<T extends StoreTypeMap> {
 }
 
 export class PerformantStore<T extends StoreTypeMap> {
+    private name: string = '';
     private staticState!: T['state'];
     private reactiveState!: any;
     private nonReactiveProps: string[] = [];
@@ -30,6 +32,7 @@ export class PerformantStore<T extends StoreTypeMap> {
     public state!: Readonly<{ [K in keyof T['state']]: T['state'] extends Ref ? T['state'][K] : UnwrapRef<T['state'][K]>; }>;
 
     constructor(options: PerformantStoreOptions<T>) {
+        this.name = options.name ?? '';
         this.staticState = options.state;
         this.nonReactiveProps = options.nonReactive || [];
         this.readOnlyProps = options.readOnly || [];
@@ -55,7 +58,7 @@ export class PerformantStore<T extends StoreTypeMap> {
         for (const restorePropName of this.restoreProps) {
             let localStorageValue: string | null = null;
             try {
-                localStorageValue = localStorage.getItem(localStoragePrefix + restorePropName);
+                localStorageValue = localStorage.getItem(localStoragePrefix + this.name + '_' + restorePropName);
             } catch (error) {}
             if (localStorageValue != null) {
                 const type: string = localStorageValue.split(';')[0];
@@ -93,7 +96,7 @@ export class PerformantStore<T extends StoreTypeMap> {
                 if (['object', 'array'].includes(valueType)) {
                     serializedValue = JSON.stringify(value);
                 }
-                localStorage.setItem(localStoragePrefix + (key as string), valueType + ';' + serializedValue);
+                localStorage.setItem(localStoragePrefix + this.name + '_' + (key as string), valueType + ';' + serializedValue);
             } catch (error) {
                 // Does this matter?
             }
@@ -135,5 +138,16 @@ export class PerformantStore<T extends StoreTypeMap> {
         if (this.onDispatch) {
             return await this.onDispatch(actionName, value, this.directSet.bind(this));
         }
+    }
+
+    getWritableRef<K extends keyof T['state']>(key: K): WritableComputedRef<T['state'][K]> {
+        return computed({
+            set: (value) => {
+                this.set(key, value);
+            },
+            get: () => {
+                return this.get(key);
+            }
+        });
     }
 }

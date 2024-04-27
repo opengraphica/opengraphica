@@ -6,19 +6,35 @@
                 <span class="ogr-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
             </div>
             <el-horizontal-scrollbar-arrows>
-                <el-button
-                    round
-                    size="small"
-                    :aria-label="$t('toolbar.draw.selectColor')"
-                    :style="{
-                        backgroundColor: brushColor.style,
-                        color: isBrushColorLight ? '#000000' : '#ffffff',
-                        borderColor: isBrushColorLight ? undefined : 'transparent'
-                    }"
-                    @click="onPickColor()"
+                <el-tooltip
+                    :content="$t('toolbar.draw.brushColor')"
+                    placement="top"
                 >
-                    <i class="bi bi-palette-fill" aria-hidden="true" />
-                </el-button>
+                    <el-button
+                        round
+                        size="small"
+                        :aria-label="$t('toolbar.draw.brushColor')"
+                        :style="{
+                            backgroundColor: brushColor.style,
+                            color: isBrushColorLight ? '#000000' : '#ffffff',
+                            borderColor: isBrushColorLight ? undefined : 'transparent'
+                        }"
+                        @click="onPickColor()"
+                    >
+                        <i class="bi bi-palette-fill" aria-hidden="true" />
+                    </el-button>
+                </el-tooltip>
+                <div class="is-flex is-align-items-center px-3">
+                    <label for="toolbar-draw-brush-size-slider" v-t="'toolbar.draw.brushSize'" class="mr-3" />
+                    <el-slider
+                        id="toolbar-draw-brush-size-slider"
+                        v-model="brushSize"
+                        :min="minBrushSize"
+                        :max="maxBrushSize"
+                        :format-tooltip="formatBrushSizeTooltip"
+                        style="width: 10rem"
+                    />
+                </div>
             </el-horizontal-scrollbar-arrows>
         </div>
     </div>
@@ -26,7 +42,7 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent, ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
-import { brushColor } from '@/canvas/store/draw-state';
+import { brushColor, brushSize } from '@/canvas/store/draw-state';
 import { appliedSelectionMask, activeSelectionMask } from '@/canvas/store/selection-state';
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
@@ -37,7 +53,8 @@ import ElInputGroup from '@/ui/el-input-group.vue';
 import ElInputNumber from '@/ui/el-input-number.vue';
 import ElPopover from '@/ui/el-popover.vue';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
-import ElSwitch from 'element-plus/lib/components/switch/index';
+import ElSlider from 'element-plus/lib/components/slider/index';
+import ElTooltip from 'element-plus/lib/components/tooltip/index';
 import historyStore from '@/store/history';
 import workingFileStore, { WorkingFileState } from '@/store/working-file';
 import { ClearSelectionAction } from '@/actions/clear-selection';
@@ -61,7 +78,8 @@ export default defineComponent({
         ElOption,
         ElPopover,
         ElSelect,
-        ElSwitch
+        ElSlider,
+        ElTooltip,
     },
     props: {
         
@@ -100,7 +118,17 @@ export default defineComponent({
             })
         }
 
-        
+        /*----------*\
+        | Brush Size |
+        \*----------*/
+
+        const minBrushSize = ref(1);
+        const maxBrushSize = ref(500);
+
+        function formatBrushSizeTooltip(value: number) {
+            const percentage = (value - minBrushSize.value) / (maxBrushSize.value - minBrushSize.value);
+            return `${(100 * percentage).toFixed(0)}% - ${value}px`;
+        }
 
         return {
             selectedLayerIds,
@@ -109,6 +137,11 @@ export default defineComponent({
             brushColor,
             isBrushColorLight,
             onPickColor,
+
+            brushSize,
+            minBrushSize,
+            maxBrushSize,
+            formatBrushSizeTooltip,
         };
     }
 });

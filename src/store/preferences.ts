@@ -31,6 +31,7 @@ interface PreferencesStore {
 }
 
 const store = new PerformantStore<PreferencesStore>({
+    name: 'preferencesStore',
     state: {
         dockHideBreakpoint: 1000,
         dockPosition: 'right',

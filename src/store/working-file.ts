@@ -33,6 +33,7 @@ interface WorkingFileStore {
 }
 
 const store = new PerformantStore<WorkingFileStore>({
+    name: 'workingFileStore',
     state: {
         activeTimelineId: null,
         background: {

@@ -704,7 +704,8 @@
             "snapping": "Snapping"
         },
         "draw": {
-            "selectColor": "Select Color"
+            "brushColor": "Brush Color",
+            "brushSize": "Size"
         },
         "freeTransform": {
             "clearSelection": "Clear Selection",

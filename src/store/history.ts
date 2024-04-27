@@ -31,6 +31,7 @@ interface HistoryStore {
 }
 
 const store = new PerformantStore<HistoryStore>({
+    name: 'historyStore',
     state: {
         actionStack: [],
         actionStackIndex: 0,

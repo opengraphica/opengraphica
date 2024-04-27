@@ -480,6 +480,12 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
     private drawPreviewPoints(points: DOMPoint[], ctx: CanvasRenderingContext2D, previewRatioX: number, previewRatioY: number, lineWidth: number, offsetX: number = 0, offsetY: number = 0) {
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
+        ctx.fillStyle = brushColor.value.style;
+        if (points.length === 1) {
+            ctx.beginPath();
+            ctx.arc(points[0].x * previewRatioX + offsetX, points[0].y * previewRatioY + offsetY, lineWidth / 2, 0, 1.999999 * Math.PI);
+            ctx.fill();
+        }
         ctx.beginPath();
         ctx.moveTo(points[0].x * previewRatioX + offsetX, points[0].y * previewRatioY + offsetY);
         let averageX = 0;
@@ -498,6 +504,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
             ctx.quadraticCurveTo(previousPoint1.x, previousPoint1.y, averageX, averageY);
         }
         ctx.lineWidth = lineWidth;
+        ctx.strokeStyle = brushColor.value.style;
         ctx.stroke();
     }
 }

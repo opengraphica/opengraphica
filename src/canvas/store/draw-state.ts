@@ -1,6 +1,7 @@
 import mitt from 'mitt';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import defaultBrushDefinitions from '@/config/default-brushes.json';
+import { PerformantStore } from '@/store/performant-store';
 
 import type { RGBAColor } from '@/types';
 
@@ -24,15 +25,6 @@ export const selectedBrushCategory = ref<string>('simple');
 export const selectedBrush = ref<string>('circle');
 
 export const brushShape = ref<string>('');
-export const brushSize = ref<number>(100);
-export const brushColor = ref<RGBAColor>({
-    is: 'color',
-    r: 0,
-    g: 0,
-    b: 0,
-    alpha: 1,
-    style: '#000000'
-});
 
 export const cursorHoverPosition = ref<DOMPoint>(new DOMPoint());
 
@@ -41,5 +33,28 @@ watch(() => [selectedBrushCategory.value, selectedBrush.value], ([category, brus
     brushShape.value = brushDefinition.shape;
 }, { immediate: true });
 
-
 export const drawEmitter = mitt();
+
+interface PermanentStorageState {
+    brushSize: number;
+    brushColor: RGBAColor;
+}
+
+const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentStorageState }>({
+    name: 'drawStateStore',
+    state: {
+        brushSize: 100,
+        brushColor: {
+            is: 'color',
+            r: 0,
+            g: 0,
+            b: 0,
+            alpha: 1,
+            style: '#000000'
+        },
+    },
+    restore: ['brushSize', 'brushColor']
+});
+
+export const brushSize = permanentStorage.getWritableRef('brushSize');
+export const brushColor = permanentStorage.getWritableRef('brushColor');

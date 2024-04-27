@@ -96,7 +96,6 @@ export interface WorkingFileTimeline {
     }
 }
 
-
 export interface WorkingFileLayerDraftChunk {
     x: number;
     y: number;
@@ -110,7 +109,7 @@ export interface WorkingFileLayerDraft {
     logicalHeight: number; // The pixel height of the preview data, stretched to `height`
     logicalWidth: number; // The pixel width of the preview data, stretched to `width`
     transform: DOMMatrix; // Should be an inverse transform to undo the global transform
-    updateChunks: WorkingFileLayerDraftChunk[];
+    updateChunks: WorkingFileLayerDraftChunk[]; // List of canvas chunks to update a raster image preview
     width: number; // The actual width drawn across the canvas
 }
 
