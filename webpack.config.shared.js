@@ -254,6 +254,10 @@ module.exports = function setupConfig(config) {
                         test: /[\\/]node_modules[\\/](element-plus)[\\/](lib)[\\/](hooks|locale|utils|directives)[\\/]/,
                         name: 'element-plus-shared'
                     },
+                    eruda: {
+                        test: /[\\/]node_modules[\\/](eruda)[\\/]/,
+                        name: 'eruda'
+                    },
                     exprEval: {
                         test: /[\\/]node_modules[\\/](expr-eval)[\\/]/,
                         name: 'expr-eval'

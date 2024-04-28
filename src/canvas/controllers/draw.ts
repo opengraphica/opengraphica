@@ -1,4 +1,4 @@
-import { watch, WatchStopHandle } from 'vue';
+import { nextTick, watch, WatchStopHandle } from 'vue';
 import { Bezier } from 'bezier-js';
 
 import { PointerTracker } from './base';
@@ -63,7 +63,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         }, { immediate: true });
 
         this.brushSizeUnwatch = watch([brushSize], ([brushSize]) => {
-            this.drawingDraftChunkSize = Math.max(64, nearestPowerOf2(brushSize / 4));
+            this.drawingDraftChunkSize = 64; // Math.max(64, nearestPowerOf2(brushSize / 4));
             this.drawingDraftCanvases = (this.drawingDraftCanvases ?? []).slice(0, 9);
             for (let i = 0; i < 9; i++) {
                 let draftCanvas = this.drawingDraftCanvases[i];
@@ -130,12 +130,14 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
 
         if ((e.pointerType === 'pen' || (!editorStore.state.isPenUser && e.pointerType === 'mouse')) && e.isPrimary && e.button === 0) {
             this.drawingPointerId = e.pointerId;
+            console.log('pen touch down');
             this.onDrawStart();
         }
     }
 
     onMultiTouchDown() {
         super.onMultiTouchDown();
+        console.log('multi touch down');
         if (this.touches.length === 1) {
             this.drawingPointerId = this.touches[0].id;
             this.onDrawStart();
@@ -189,6 +191,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
 
             for (const layer of this.drawingOnLayers) {
                 if (layer.type === 'raster') {
+                    // TODO - START - This is fairly slow, speed it up?
 
                     const layerUpdateCanvas = document.createElement('canvas');
                     layerUpdateCanvas.width = layer.width;
@@ -198,7 +201,6 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                     if (layer.data.sourceImage) {
                         layerUpdateCtx.drawImage(layer.data.sourceImage, 0, 0);
                     }
-                    // TODO - transform layer before draw
                     layerUpdateCtx.save();
                     const layerGlobalTransform = getLayerGlobalTransform(layer);
                     const decomposedCanvasTransform = decomposeMatrix(canvasStore.state.transform.inverse());
@@ -207,15 +209,19 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                     this.drawPreviewPoints(this.drawingPoints, layerUpdateCtx, previewRatioX, previewRatioY, previewBrushSize);
                     layerUpdateCtx.restore();
 
+                    let sourceImage = await createImageFromCanvas(layerUpdateCanvas);
+
                     layerActions.push(
                         new UpdateLayerAction<UpdateRasterLayerOptions>({
                             id: layer.id,
                             data: {
-                                sourceImage: await createImageFromCanvas(layerUpdateCanvas),
+                                sourceImage,
                                 sourceImageIsObjectUrl: true,
                             }
                         })
                     );
+
+                    // TODO - END - This is fairly slow, speed it up?
                 }
             }
 
@@ -249,28 +255,22 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                 data: {
                     sourceImage: await createEmptyImage(width, height),
                     sourceImageIsObjectUrl: true,
-                }
+                },
             }));
         }
         for (let i = selectedLayers.length - 1; i >= 0; i--) {
             const selectedLayer = selectedLayers[i];
             if (selectedLayer.type === 'empty') {
                 layerActions.push(
-                    // Switch layer type
                     new UpdateLayerAction<UpdateRasterLayerOptions>({
                         id: selectedLayer.id,
                         type: 'raster',
                         width,
                         height,
-                        data: {}
-                    }),
-                    // Update data separately, the action will have issues with the type change otherwise
-                    new UpdateLayerAction<UpdateRasterLayerOptions>({
-                        id: selectedLayer.id,
                         data: {
                             sourceImage: await createEmptyImage(width, height),
                             sourceImageIsObjectUrl: true,
-                        }
+                        },
                     })
                 );
             } else if (selectedLayer.type !== 'raster') {
@@ -282,6 +282,8 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                 action: new BundleAction('createDrawLayer', 'action.createDrawLayer', layerActions)
             });
         }
+
+        await nextTick();
 
         // Create a draft image for each of the selected layers
         selectedLayers = getSelectedLayers();
@@ -371,7 +373,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
             const ctx = canvas.getContext('2d');
             if (!ctx) return;
 
-            const points = this.smoothPoints(this.drawingPoints);
+            const points = this.drawingPoints;
 
             const previewRatioX = Math.min(1, canvasStore.get('decomposedTransform').scaleX);
             const previewRatioY = Math.min(1, canvasStore.get('decomposedTransform').scaleY);
@@ -486,6 +488,41 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
             ctx.arc(points[0].x * previewRatioX + offsetX, points[0].y * previewRatioY + offsetY, lineWidth / 2, 0, 1.999999 * Math.PI);
             ctx.fill();
         }
+        
+        // let startX = points[0].x * previewRatioX + offsetX;
+        // let startY = points[0].y * previewRatioY + offsetY;
+        // let averageX = 0;
+        // let averageY = 0;
+        // for (let i = 1; i < points.length; i++) {
+        //     let previousPoint1 = {
+        //         x: points[i - 1].x * previewRatioX + offsetX,
+        //         y: points[i - 1].y * previewRatioY + offsetY,
+        //     };
+        //     let nextPoint1 = {
+        //         x: points[i].x * previewRatioX + offsetX,
+        //         y: points[i].y * previewRatioY + offsetY,
+        //     };
+        //     averageX = (previousPoint1.x + nextPoint1.x) / 2;
+        //     averageY = (previousPoint1.y + nextPoint1.y) / 2;
+        //     const quadraticLine = new Bezier(startX, startY, previousPoint1.x, previousPoint1.y, averageX, averageY);
+        //     const renderShapes = quadraticLine.outline(lineWidth / 2);
+        //     if (renderShapes.curves.length > 0) {
+        //         ctx.beginPath();
+        //         ctx.moveTo(renderShapes.curves[0].points[0].x, renderShapes.curves[0].points[0].y);
+        //         for (let curve of renderShapes.curves) {
+        //             if (curve.points.length == 4) {
+        //                 ctx.bezierCurveTo(curve.points[1].x, curve.points[1].y, curve.points[2].x, curve.points[2].y, curve.points[3].x, curve.points[3].y);
+        //             } else if (curve.points.length == 3) {
+        //                 ctx.quadraticCurveTo(curve.points[1].x, curve.points[1].y, curve.points[2].x, curve.points[2].y);
+        //             }
+        //         }
+        //         ctx.fill();
+        //     }
+        //     startX = averageX;
+        //     startY = averageY;
+        // }
+
+
         ctx.beginPath();
         ctx.moveTo(points[0].x * previewRatioX + offsetX, points[0].y * previewRatioY + offsetY);
         let averageX = 0;

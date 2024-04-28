@@ -1,3 +1,5 @@
+import type { WorkingFileLayerRenderer, ColorModel } from '@/types';
+
 import BaseLayerRenderer2d from './2d/base';
 import GroupLayerRenderer2d from './2d/group';
 import RasterLayerRenderer2d from './2d/raster';
@@ -10,7 +12,15 @@ import RasterLayerRendererWebgl from './webgl/raster';
 import RasterSequenceLayerRendererWebgl from './webgl/raster-sequence';
 import TextLayerRendererWebgl from './webgl/text';
 
-const renderers = {
+type ClassOfInterface<I, Args extends any[] = any[]> = new(...args: Args) => I;
+
+interface Renderers {
+    [key: string]: {
+        [key: string]: ClassOfInterface<WorkingFileLayerRenderer<ColorModel>>;
+    };
+}
+
+const renderers: Renderers = {
     '2d': {
         base: BaseLayerRenderer2d,
         empty: BaseLayerRenderer2d,

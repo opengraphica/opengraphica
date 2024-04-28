@@ -264,6 +264,11 @@
                                     <el-button size="small" class="is-fullwidth" @click="onClickResetSettings" v-t="'dock.settings.prefs.editor.resetSettings'" />
                                 </div>
                             </el-collapse-item>
+                            <el-collapse-item :title="$t('dock.settings.prefs.debugging.groupTitle')">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.debugging.useMobileDebugger')">
+                                    <el-switch v-model="useMobileDebugger" />
+                                </el-form-item>
+                            </el-collapse-item>
                         </el-collapse>
                     </el-form>
                 </el-scrollbar>
@@ -575,6 +580,14 @@ export default defineComponent({
             }
             window.location.reload();
         }
+        const useMobileDebugger = computed<boolean>({
+            get() {
+                return preferencesStore.state.useMobileDebugger;
+            },
+            set(value) {
+                preferencesStore.set('useMobileDebugger', value);
+            }
+        });
 
         // Menu selection
         async function onMenuSelect(group: string, index: string) {
@@ -681,9 +694,10 @@ export default defineComponent({
             preferenceMenuBarPosition,
             showTutorialNotifications,
             showWelcomeScreenAtStart,
-
             onClickResetSettings,
-            onMenuSelect
+            useMobileDebugger,
+
+            onMenuSelect,
         };
     }
 });

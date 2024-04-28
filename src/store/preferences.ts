@@ -23,6 +23,7 @@ interface PreferencesState {
     tooltipShowDelay: number;
     touchRotation: 'on' | 'snap' | 'off';
     useCanvasViewport: boolean;
+    useMobileDebugger: boolean;
 }
 
 interface PreferencesStore {
@@ -53,7 +54,8 @@ const store = new PerformantStore<PreferencesStore>({
         snapSensitivity: 5,
         tooltipShowDelay: 300,
         touchRotation: 'off',
-        useCanvasViewport: true
+        useCanvasViewport: true,
+        useMobileDebugger: false,
     },
     restore: [
         'dockPosition',
@@ -69,8 +71,9 @@ const store = new PerformantStore<PreferencesStore>({
         'showWelcomeScreenAtStart',
         'snapSensitivity',
         'tooltipShowDelay',
-        'touchRotation'
-    ]
+        'touchRotation',
+        'useMobileDebugger',
+    ],
 });
 
 export default store;

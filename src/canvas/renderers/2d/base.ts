@@ -53,6 +53,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
     onUpdate(updates: Partial<WorkingFileLayer<ColorModel>>) {
         // Override
     }
+    async nextUpdate() {}
 
     draw(ctx: CanvasRenderingContext2D, layer: WorkingFileLayer<ColorModel>, options: DrawWorkingFileLayerOptions = {}) {
         if ((options.visible || layer.visible) && (!options.selectedLayersOnly || workingFileStore.get('selectedLayerIds').includes(layer.id))) {

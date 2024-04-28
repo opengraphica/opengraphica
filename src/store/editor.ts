@@ -114,7 +114,7 @@ const store = new PerformantStore<EditorStore>({
         timelineStart: 0,
         toolCanvasController: new BaseCanvasMovementController(),
         tutorialFlags: {},
-        waiting: false
+        waiting: false,
     },
     readOnly: ['activeTheme', 'activeTool', 'activeToolGroup', 'themes', 'timelineCursor'],
     restore: ['activeToolGroupRestore', 'isTouchUser', 'tutorialFlags'],
@@ -230,7 +230,7 @@ const store = new PerformantStore<EditorStore>({
                 canvasStore.set('dirty', true);
                 break;
         }
-    }
+    },
 });
 
 async function runTasks(runId: number, set: PerformantStore<EditorStore>['directSet']) {

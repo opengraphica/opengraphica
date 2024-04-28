@@ -109,7 +109,15 @@ export default class BaseCanvasController {
             down: e,
             downTimestamp: window.performance.now()
         };
+
+        const isRecentPenDown = !!this.pointers.find((pointer) => {
+            return pointer.type === 'pen' && (window.performance.now() - pointer.downTimestamp) < 50;
+        });
+
+        if (isRecentPenDown && pointer.type === 'touch') return;
+
         this.pointers.push(pointer as any);
+
         this.dragStartRadius = preferencesStore.get('dragStartRadius');
         if (e.pointerType === 'touch') {
             if (!this.multiTouchDownTimeoutHandle && this.touches.length === 0) {

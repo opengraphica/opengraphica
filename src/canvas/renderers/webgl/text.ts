@@ -2,7 +2,7 @@ import { DrawWorkingFileLayerOptions, WorkingFileLayer, ColorModel } from '@/typ
 import BaseLayerRenderer from './base';
 
 export default class TextLayerRenderer extends BaseLayerRenderer {
-    onUpdate(updates: Partial<WorkingFileLayer<ColorModel>>) {
+    async onUpdate(updates: Partial<WorkingFileLayer<ColorModel>>) {
         // Override
     }
 

@@ -2,6 +2,7 @@ import {
     ColorModel, WorkingFileAnyLayer,
     UpdateAnyLayerOptions, UpdateRasterLayerOptions
 } from '@/types';
+import { markRaw } from 'vue';
 import { BaseAction } from './base';
 import imageStore from './data/image-store';
 import { registerObjectUrlUser, revokeObjectUrlIfLastUser } from './data/memory-management';
@@ -9,6 +10,7 @@ import { createImageFromBlob } from '@/lib/image';
 import canvasStore from '@/store/canvas';
 import workingFileStore, { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
 import { updateBakedImageForLayer } from './baking';
+import layerRenderers from '@/canvas/renderers';
 
 export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorModel>> extends BaseAction {
 
@@ -35,9 +37,22 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
         if (!layer) {
             throw new Error('Aborted - Layer with specified id not found.');
         }
-        for (let prop in this.updateLayerOptions) {
+
+        const renderer = canvasStore.get('renderer');
+
+        const layerUpdateProps = Object.keys(this.updateLayerOptions).sort((aKey, bKey) => {
+            if (aKey === 'type' && bKey !== 'type') return -1;
+            if (aKey !== 'type' && bKey === 'type') return 1;
+            if (aKey === 'draft' && bKey !== 'draft') return 1;
+            if (aKey !== 'draft' && bKey === 'draft') return -1;
+            return 0;
+        }) as Array<keyof LayerOptions>;
+        for (let prop of layerUpdateProps) {
             if (prop === 'data') {
                 if (layer.type === 'raster') {
+                    if (!layer.data) {
+                        layer.data = {};
+                    }
                     const newData = this.updateLayerOptions[prop] as UpdateRasterLayerOptions<ColorModel>['data'];
                     if (this.newRasterSourceImageDatabaseId != null) {
                         layer.data.sourceImage = await createImageFromBlob(
@@ -75,6 +90,17 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                 //     }
                 // }
             } else if (prop !== 'id') {
+                if (prop === 'type') {
+                    if (layer.renderer) {
+                        layer.renderer.detach();
+                    }
+                    layer.renderer = markRaw(new layerRenderers[renderer][this.updateLayerOptions['type'] as string]());
+                    if (layer.renderer) {
+                        layer.renderer.attach(layer);
+                    }
+                }
+
+                // Store old values and assign new values
                 if ((this.explicitPreviousProps as any)[prop] !== undefined) {
                     (this.previousProps as any)[prop] = (this.explicitPreviousProps as any)[prop];
                 } else {
@@ -83,6 +109,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                 (layer as any)[prop] = this.updateLayerOptions[prop];
             }
         }
+        await layer.renderer.nextUpdate();
         regenerateLayerThumbnail(layer);
         if (requiresBaking) {
             updateBakedImageForLayer(layer);
@@ -96,10 +123,21 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
 
         const layers = workingFileStore.get('layers');
         const layer = getLayerById(this.updateLayerOptions.id, layers);
+        const renderer = canvasStore.get('renderer');
         if (layer) {
             for (let prop in this.previousProps) {
                 if (prop !== 'id') {
                     (layer as any)[prop] = (this.previousProps as any)[prop];
+
+                    if (prop === 'type') {
+                        if (layer.renderer) {
+                            layer.renderer.detach();
+                        }
+                        layer.renderer = markRaw(new layerRenderers[renderer][(layer as any)[prop] as string]());
+                        if (layer.renderer) {
+                            layer.renderer.attach(layer);
+                        }
+                    }
                 }
             }
             regenerateLayerThumbnail(layer);

@@ -53,6 +53,7 @@ export interface WorkingFileLayerRenderer<T extends ColorModel = ColorModel> {
     onReorder(order: number): void;
     update(updates: Partial<WorkingFileLayer<ColorModel>>): void;
     onUpdate(updates: Partial<WorkingFileLayer<ColorModel>>): void;
+    nextUpdate(): Promise<void>;
     draw(
         ctx: CanvasRenderingContext2D | WebGLRenderingContext | WebGL2RenderingContext,
         layer: WorkingFileLayer<T>,

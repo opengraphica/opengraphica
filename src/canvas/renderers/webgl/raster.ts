@@ -116,19 +116,25 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                     this.draftTexture = undefined;
                 }
                 if (updates.data.sourceImage) {
+                    const newSourceTexture: Texture = await new Promise((resolve, reject) => {
+                        if (updates.data?.sourceImage) {
+                            const texture = new TextureLoader().load(
+                                updates.data.sourceImage.src,
+                                () => { resolve(texture); },
+                                undefined,
+                                () => { reject(); }
+                            );
+                        } else { reject(); }
+                    });
                     this.sourceTexture?.dispose();
-                    this.sourceTexture = new TextureLoader().load(
-                        updates.data.sourceImage.src,
-                        () => {
-                            canvasStore.set('dirty', true);
-                        }
-                    );
+                    this.sourceTexture = newSourceTexture;
                     this.sourceTexture.encoding = sRGBEncoding;
                     this.sourceTexture.magFilter = NearestFilter;
                     // TODO - maybe use a combination of LinearMipmapLinearFilter and LinearMipmapNearestFilter
                     // depending on the zoom level, one can appear sharper than the other.
                     this.sourceTexture.minFilter = LinearMipmapLinearFilter;
                     this.material && (this.material.uniforms.map.value = this.sourceTexture);
+                    canvasStore.set('dirty', true);
                 } else {
                     if (this.sourceTexture) {
                         this.sourceTexture.dispose();

@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, provide, onMounted, onUnmounted, toRefs } from 'vue';
+import { defineComponent, ref, provide, onMounted, onUnmounted, watch } from 'vue';
 import AppCanvas from '@/ui/app-canvas.vue';
 import AppDialogs from '@/ui/app-dialogs.vue';
 import AppDndDropOverlay from '@/ui/app-dnd-drop-overlay.vue';
@@ -25,11 +25,12 @@ import AppMenuDrawers from '@/ui/app-menu-drawers.vue';
 import AppWait from '@/ui/app-wait.vue';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
-import ResizeObserver from 'resize-observer-polyfill';
-import ElLoading from 'element-plus/lib/components/loading/index';
-import appEmitter from '@/lib/emitter';
 import preferencesStore from '@/store/preferences';
+import ResizeObserver from 'resize-observer-polyfill';
+import appEmitter from '@/lib/emitter';
 import { getModuleDefinition, preloadModules } from '@/modules';
+
+import type { Eruda } from 'eruda';
 
 export default defineComponent({
     name: 'App',
@@ -49,6 +50,19 @@ export default defineComponent({
         const dndDropOverlay = ref<InstanceType<typeof AppDndDropOverlay>>();
         const sidebarLeftSize = ref<number>(0);
         const sidebarRightSize = ref<number>(0);
+
+        let erudaDebuggerInstance: Eruda | null = null;
+
+        watch(() => preferencesStore.state.useMobileDebugger, async (useMobileDebugger) => {
+            if (useMobileDebugger) {
+                if (!erudaDebuggerInstance) {
+                    erudaDebuggerInstance = (await import('eruda')).default;
+                }
+                erudaDebuggerInstance?.init();
+            } else {
+                erudaDebuggerInstance?.destroy();
+            }
+        }, { immediate: true });
 
         onMounted(() => {
             isMounted.value = true;

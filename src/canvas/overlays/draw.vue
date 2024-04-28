@@ -12,8 +12,8 @@
                     top: cursorHoverPosition.y + 'px'
                 }"
                 xmlns="http://www.w3.org/2000/svg">
-                <path :d="brushShape" stroke="#333333" :stroke-width="drawPreviewStrokeWidth" fill="transparent"/>
-                <path :d="brushShape" stroke="white" :stroke-width="drawPreviewStrokeWidth * .8" stroke-dasharray="2%" fill="transparent"/>
+                <path :d="brushShape" stroke="#333333" :stroke-width="drawPreviewStrokeWidth / brushSize" fill="transparent"/>
+                <path :d="brushShape" stroke="white" :stroke-width="drawPreviewStrokeWidth / brushSize * .8" stroke-dasharray="2%" fill="transparent"/>
             </svg>
         </div>
     </div>
@@ -39,7 +39,7 @@ export default defineComponent({
         });
 
         const drawPreviewStrokeWidth = computed<number>(() => {
-            return 0.015 / zoom.value;
+            return 1.25 / zoom.value;
         });
 
         onMounted(() => {
