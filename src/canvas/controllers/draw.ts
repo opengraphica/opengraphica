@@ -13,7 +13,7 @@ import { pointDistance2d, nearestPowerOf2 } from '@/lib/math';
 
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
-import historyStore from '@/store/history';
+import historyStore, { createHistoryReserveToken, historyReserveQueueFree } from '@/store/history';
 import workingFileStore, { getSelectedLayers, ensureUniqueLayerSiblingName, getLayerGlobalTransform } from '@/store/working-file';
 
 import { BundleAction } from '@/actions/bundle';
@@ -63,7 +63,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         }, { immediate: true });
 
         this.brushSizeUnwatch = watch([brushSize], ([brushSize]) => {
-            this.drawingDraftChunkSize = 64; // Math.max(64, nearestPowerOf2(brushSize / 4));
+            this.drawingDraftChunkSize = Math.max(64, nearestPowerOf2(brushSize / 4));
             this.drawingDraftCanvases = (this.drawingDraftCanvases ?? []).slice(0, 9);
             for (let i = 0; i < 9; i++) {
                 let draftCanvas = this.drawingDraftCanvases[i];
@@ -130,14 +130,12 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
 
         if ((e.pointerType === 'pen' || (!editorStore.state.isPenUser && e.pointerType === 'mouse')) && e.isPrimary && e.button === 0) {
             this.drawingPointerId = e.pointerId;
-            console.log('pen touch down');
             this.onDrawStart();
         }
     }
 
     onMultiTouchDown() {
         super.onMultiTouchDown();
-        console.log('multi touch down');
         if (this.touches.length === 1) {
             this.drawingPointerId = this.touches[0].id;
             this.onDrawStart();
@@ -182,6 +180,18 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         super.onPointerUpBeforePurge(e);
 
         if (this.drawingPointerId === e.pointerId) {
+            const points = this.drawingPoints.slice();
+            const drawingOnLayers = this.drawingOnLayers.slice();
+
+            this.drawingPoints = [];
+            this.drawingOnLayers = [];
+            this.drawingDraftCanvas = null;
+            this.drawingPointerId = null;
+
+            await historyReserveQueueFree();
+
+            const updateLayerReserveToken = createHistoryReserveToken();
+            await historyStore.dispatch('reserve', { token: updateLayerReserveToken });
 
             const layerActions = [];
 
@@ -189,7 +199,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
             const previewRatioY = canvasStore.get('decomposedTransform').scaleY;
             const previewBrushSize = brushSize.value * previewRatioX;
 
-            for (const layer of this.drawingOnLayers) {
+            for (const layer of drawingOnLayers) {
                 if (layer.type === 'raster') {
                     // TODO - START - This is fairly slow, speed it up?
 
@@ -206,7 +216,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                     const decomposedCanvasTransform = decomposeMatrix(canvasStore.state.transform.inverse());
                     const layerTransform = layerGlobalTransform.inverse().scale(decomposedCanvasTransform.scaleX, decomposedCanvasTransform.scaleY);
                     layerUpdateCtx.transform(layerTransform.a, layerTransform.b, layerTransform.c, layerTransform.d, layerTransform.e, layerTransform.f);
-                    this.drawPreviewPoints(this.drawingPoints, layerUpdateCtx, previewRatioX, previewRatioY, previewBrushSize);
+                    this.drawPreviewPoints(points, layerUpdateCtx, previewRatioX, previewRatioY, previewBrushSize);
                     layerUpdateCtx.restore();
 
                     let sourceImage = await createImageFromCanvas(layerUpdateCanvas);
@@ -227,22 +237,24 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
 
             if (layerActions.length > 0) {
                 await historyStore.dispatch('runAction', {
-                    action: new BundleAction('updateDrawLayer', 'action.updateDrawLayer', layerActions)
+                    action: new BundleAction('updateDrawLayer', 'action.updateDrawLayer', layerActions),
+                    reserveToken: updateLayerReserveToken,
                 });
 
-                for (const layer of this.drawingOnLayers) {
+                for (const layer of drawingOnLayers) {
                     layer.draft = null;
                 }
+            } else {
+                await historyStore.dispatch('unreserve', { token: updateLayerReserveToken });
             }
-
-            this.drawingPoints = [];
-            this.drawingOnLayers = [];
-            this.drawingDraftCanvas = null;
         }
     }
 
     protected async onDrawStart() {
         // Create layer if one does not exist
+        const startDrawReserveToken = createHistoryReserveToken();
+        await historyStore.dispatch('reserve', { token: startDrawReserveToken });
+
         const { width, height } = workingFileStore.state;
         let selectedLayers = getSelectedLayers();
         let layerActions = [];
@@ -279,8 +291,11 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         }
         if (layerActions.length > 0) {
             await historyStore.dispatch('runAction', {
-                action: new BundleAction('createDrawLayer', 'action.createDrawLayer', layerActions)
+                action: new BundleAction('createDrawLayer', 'action.createDrawLayer', layerActions),
+                reserveToken: startDrawReserveToken,
             });
+        } else {
+            await historyStore.dispatch('unreserve', { token: startDrawReserveToken });
         }
 
         await nextTick();

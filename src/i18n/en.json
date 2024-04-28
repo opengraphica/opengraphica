@@ -23,6 +23,7 @@
         "moduleCropResize": "Crop and Resize",
         "openFile": "Open File",
         "pasteLayers": "Paste Layer(s)",
+        "placeholder": "Placeholder",
         "reorderLayers": "Reorder Layer(s)",
         "reorderLayerFilters": "Reorder Effect(s)",
         "selectLayers": "Select Layer(s)",

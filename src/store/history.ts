@@ -3,8 +3,16 @@ import preferencesStore from './preferences';
 import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import appEmitter from '@/lib/emitter';
+import { v4 as uuidv4 } from 'uuid';
+
+interface ReservedAction {
+    token: string;
+    promise: Promise<void>;
+    resolve: () => void;
+}
 
 interface HistoryState {
+    actionReserveQueue: ReservedAction[];
     actionStack: BaseAction[];
     actionStackIndex: number;
     actionStackUpdateToggle: boolean;
@@ -18,8 +26,15 @@ interface HistoryDispatch {
         memorySize?: number;
     };
     redo: void;
+    reserve: {
+        token: string;
+    };
+    unreserve: {
+        token: string;
+    };
     runAction: {
         action: BaseAction;
+        reserveToken?: string;
         mergeWithHistory?: string[] | string;
     };
     undo: void;
@@ -33,19 +48,24 @@ interface HistoryStore {
 const store = new PerformantStore<HistoryStore>({
     name: 'historyStore',
     state: {
+        actionReserveQueue: [],
         actionStack: [],
         actionStackIndex: 0,
         actionStackUpdateToggle: false, // Toggles between true/false every history update for watchers
         canUndo: false,
         canRedo: false
     },
-    readOnly: ['actionStack'],
+    readOnly: ['actionReserveQueue', 'actionStack', 'actionStackIndex', 'canUndo', 'canRedo'],
     async onDispatch(actionName: keyof HistoryDispatch, value: any, set) {
         switch (actionName) {
             case 'free':
                 return dispatchFree(value, set);
             case 'redo':
                 return dispatchRedo(set);
+            case 'reserve':
+                return dispatchReserve(value, set);
+            case 'unreserve':
+                return dispatchUnreserve(value, set);
             case 'runAction':
                 return dispatchRunAction(value, set);
             case 'undo':
@@ -108,7 +128,57 @@ async function dispatchFree({ databaseSize, memorySize }: HistoryDispatch['free'
     };
 }
 
-async function dispatchRunAction({ action, mergeWithHistory }: HistoryDispatch['runAction'], set: PerformantStore<HistoryStore>['directSet']) {
+async function dispatchReserve({ token }: HistoryDispatch['reserve'], set: PerformantStore<HistoryStore>['directSet']) {
+    let actionReserveQueue = store.get('actionReserveQueue');
+    let resolve!: () => void;
+    let promise = new Promise<void>((promiseResolve) => {
+        resolve = promiseResolve;
+    });
+    actionReserveQueue.push({ token, promise, resolve });
+    set('actionReserveQueue', actionReserveQueue);
+}
+
+async function dispatchUnreserve({ token }: HistoryDispatch['unreserve'], set: PerformantStore<HistoryStore>['directSet']) {
+    let actionReserveQueue = store.get('actionReserveQueue');
+    const reserveIndex = actionReserveQueue.findIndex(reserve => reserve.token === token);
+    if (reserveIndex > -1) {
+        const reserve = actionReserveQueue[reserveIndex];
+        actionReserveQueue.splice(reserveIndex, 1);
+        set('actionReserveQueue', actionReserveQueue);
+        try { reserve.resolve(); } catch (error) {}
+    }
+}
+
+async function dispatchRunAction({ action, mergeWithHistory, reserveToken }: HistoryDispatch['runAction'], set: PerformantStore<HistoryStore>['directSet']) {
+
+    // Wait for reserved actions to complete
+    let actionReserveQueue = store.get('actionReserveQueue');
+    while (actionReserveQueue.length > 0) {
+        let reserveIgnoreResolve!: () => void;
+        let reserveIgnorePromise = new Promise<void>(resolve => { reserveIgnoreResolve = resolve; });
+        let reserveIgnoreTimeoutHandle = setTimeout(async () => {
+            actionReserveQueue = store.get('actionReserveQueue');
+            const reserve = actionReserveQueue.shift();
+            set('actionReserveQueue', actionReserveQueue);
+            try { reserve?.resolve(); } catch (error) {}
+            reserveIgnoreResolve();
+        }, 5000);
+        await Promise.any([
+            (async () => {
+                const reserveQueueItem = actionReserveQueue[0];
+                if (reserveQueueItem.token === reserveToken) {
+                    await dispatchUnreserve({ token: reserveToken }, set);
+                } else {
+                    await reserveQueueItem.promise;
+                }
+            })(),
+            reserveIgnorePromise,
+        ]);
+        clearTimeout(reserveIgnoreTimeoutHandle);
+        actionReserveQueue = store.get('actionReserveQueue');
+    }
+
+    // Run the action
     let actionStack = store.get('actionStack');
     let actionStackIndex = store.get('actionStackIndex');
     let errorDuringFree: boolean = false;
@@ -225,6 +295,19 @@ async function dispatchRedo(set: PerformantStore<HistoryStore>['directSet']) {
     }
 }
 
+function createHistoryReserveToken() {
+    return uuidv4();
+}
+
+async function historyReserveQueueFree() {
+    let actionReserveQueue = store.get('actionReserveQueue');
+    while (actionReserveQueue.length > 0) {
+        const reserveQueueItem = actionReserveQueue[0];
+        await reserveQueueItem.promise;
+        actionReserveQueue = store.get('actionReserveQueue');
+    }
+}
+
 export default store;
 
-export { HistoryStore, HistoryState };
+export { HistoryStore, HistoryState, createHistoryReserveToken, historyReserveQueueFree };
