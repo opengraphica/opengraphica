@@ -182,6 +182,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         if (this.drawingPointerId === e.pointerId) {
             const points = this.drawingPoints.slice();
             const drawingOnLayers = this.drawingOnLayers.slice();
+            const updateHistoryStartTimestamp = window.performance.now();
 
             this.drawingPoints = [];
             this.drawingOnLayers = [];
@@ -242,7 +243,9 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                 });
 
                 for (const layer of drawingOnLayers) {
-                    layer.draft = null;
+                    if (layer?.draft?.lastUpdateTimestamp ?? 0 < updateHistoryStartTimestamp) {
+                        layer.draft = null;
+                    }
                 }
             } else {
                 await historyStore.dispatch('unreserve', { token: updateLayerReserveToken });
@@ -315,14 +318,26 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
             const logicalWidth = Math.min(width, workingFileStore.get('width') * viewTransform.scaleX);
             const logicalHeight = Math.min(height, workingFileStore.get('height') * viewTransform.scaleY);
             if (layer.type === 'raster') {
-                layer.draft = {
-                    width,
-                    height,
-                    logicalWidth,
-                    logicalHeight,
-                    transform: layerGlobalTransformSelfExcluded.inverse(),
-                    updateChunks: []
-                };
+                if (!layer.draft) {
+                    layer.draft = {
+                        lastUpdateTimestamp: window.performance.now(),
+                        width,
+                        height,
+                        logicalWidth,
+                        logicalHeight,
+                        transform: layerGlobalTransformSelfExcluded.inverse(),
+                        updateChunks: [],
+                    };
+                } else {
+                    Object.assign(layer.draft, {
+                        lastUpdateTimestamp: window.performance.now(),
+                        width,
+                        height,
+                        logicalWidth,
+                        logicalHeight,
+                        transform: layerGlobalTransformSelfExcluded.inverse(),
+                    });
+                }
             }
             this.drawingOnLayerScales.push({
                 x: scaleX,
@@ -487,6 +502,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                             draftCanvasIndex++;
                         }
                     }
+                    layer.draft.lastUpdateTimestamp = window.performance.now();
                 }
             }
 

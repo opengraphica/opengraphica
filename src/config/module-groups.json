@@ -145,18 +145,32 @@
                     "type": "function",
                     "target": "image/paste.paste"
                 }
+            }
+        }
+    },
+    "layer": {
+        "name": "moduleGroup.layer.name",
+        "description": "moduleGroup.layer.description",
+        "modules": {
+            "rename": {
+                "name": "moduleGroup.layer.modules.rename.name",
+                "description": "moduleGroup.layer.modules.rename.description",
+                "action": {
+                    "type": "ui",
+                    "target": "rename-layer"
+                }
             },
             "layerEffectBrowser": {
-                "name": "moduleGroup.image.modules.layerEffectBrowser.name",
-                "description": "moduleGroup.image.modules.layerEffectBrowser.description",
+                "name": "moduleGroup.layer.modules.layerEffectBrowser.name",
+                "description": "moduleGroup.layer.modules.layerEffectBrowser.description",
                 "action": {
                     "type": "ui",
                     "target": "layer-effect-browser"
                 }
             },
             "layerEffectEdit": {
-                "name": "moduleGroup.image.modules.layerEffectEdit.name",
-                "description": "moduleGroup.image.modules.layerEffectEdit.description",
+                "name": "moduleGroup.layer.modules.layerEffectEdit.name",
+                "description": "moduleGroup.layer.modules.layerEffectEdit.description",
                 "action": {
                     "type": "ui",
                     "target": "layer-effect-edit"

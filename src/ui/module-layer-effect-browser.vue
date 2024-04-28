@@ -181,7 +181,7 @@ export default defineComponent({
                 action: new BundleAction('addLayerFilterMultiple', 'action.addLayerFilterMultiple', addFilterActions)
             });
             setTimeout(() => {
-                runModule('image', 'layerEffectEdit', {
+                runModule('layer', 'layerEffectEdit', {
                     isFilterJustAdded: true,
                     layerId: selectedLayerIds[0],
                     filterIndex: (getLayerById(selectedLayerIds[0])?.filters.length ?? 1) - 1

@@ -36,6 +36,7 @@ export default defineComponent({
         'image-convert-layers-to-image-sequence': defineAsyncComponent(() => import(/* webpackChunkName: 'module-image-convert-layers-to-image-sequence' */ `./module-image-convert-layers-to-image-sequence.vue`)),
         'layer-effect-browser': defineAsyncComponent(() => import(/* webpackChunkName: 'module-layer-effect-browser' */ `./module-layer-effect-browser.vue`)),
         'layer-effect-edit': defineAsyncComponent(() => import(/* webpackChunkName: 'module-layer-effect-edit' */ `./module-layer-effect-edit.vue`)),
+        'rename-layer': defineAsyncComponent(() => import(/* webpackChunkName: 'module-rename-layer' */ `./module-rename-layer.vue`)),
         'tutorial-welcome': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-tutorial-welcome' */ `./module-tutorial-welcome.vue`))
     },
     props: {

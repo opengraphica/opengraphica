@@ -106,6 +106,7 @@ export interface WorkingFileLayerDraftChunk {
 }
 
 export interface WorkingFileLayerDraft {
+    lastUpdateTimestamp?: number;
     height: number; // The actual height drawn across on the canvas
     logicalHeight: number; // The pixel height of the preview data, stretched to `height`
     logicalWidth: number; // The pixel width of the preview data, stretched to `width`

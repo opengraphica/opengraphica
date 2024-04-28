@@ -8,7 +8,7 @@
         class="ogr-layer-list"
         :class="{ 'is-dnd-dragging': draggingLayerId != null }"
     >
-        <template v-for="layer of reversedLayers" :key="layer.id">
+        <template v-for="(layer, layerIndex) of reversedLayers" :key="layer.id">
             <li class="ogr-layer"
                 :class="{
                     'is-dnd-hover': layer.id === hoveringLayerId,
@@ -30,7 +30,7 @@
                         class="ogr-layer-dnd-handle"
                         v-pointer.tap="onPointerTapDndHandle"
                         @mouseenter="onMouseEnterDndHandle(layer)"
-                        @mouseleave="onMouseLeaveDndHandle(layer)">
+                        @mouselealayerSettingsVisibilityve="onMouseLeaveDndHandle(layer)">
                         <app-layer-list-thumbnail :layer="layer" />
                         <span class="ogr-layer-name">{{ layer.name }}</span>
                         <span v-if="layer.type === 'group'" class="ogr-layer-group-arrow bi" :class="{ 'bi-chevron-right': !layer.expanded, 'bi-chevron-down': layer.expanded }" aria-hidden="true"></span>
@@ -39,6 +39,7 @@
                         <i class="bi" :class="{ 'bi-eye-fill': layer.visible, 'bi-eye-slash': !layer.visible }" aria-hidden="true"></i>
                     </el-button>
                     <el-popover
+                        v-model:visible="layerSettingsVisibility[layerIndex]"
                         trigger="click"
                         popper-class="p-0"
                     >
@@ -47,7 +48,11 @@
                                 <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
                             </el-button>
                         </template>
-                        <el-menu class="el-menu--medium el-menu--borderless my-1" @select="onLayerSettingsSelect(layer, $event)">
+                        <el-menu class="el-menu--medium el-menu--borderless my-1" :default-active="layerSettingsActiveIndex" @select="onLayerSettingsSelect(layer, layerIndex, $event)">
+                            <el-menu-item index="rename">
+                                <i class="bi bi-alphabet"></i>
+                                <span v-t="'app.layerList.rename'"></span>
+                            </el-menu-item>
                             <el-menu-item index="delete">
                                 <i class="bi bi-trash"></i>
                                 <span v-t="'app.layerList.delete'"></span>
@@ -215,7 +220,9 @@ export default defineComponent({
         const draggingLayerId = ref<number | null>(null);
         const draggingItemHtml = ref<string>('');
 
+        const layerSettingsVisibility = ref<boolean[]>([]);
         const showLayerSettingsMenuFor = ref<number | null>(null);
+        const layerSettingsActiveIndex = ref('');
 
         const conditionalDragStartEventModifier: string = props.isRoot ? 'dragstart' : '';
         const { playingAnimation } = toRefs(canvasStore.state);
@@ -224,6 +231,12 @@ export default defineComponent({
         const reversedLayers = computed<WorkingFileAnyLayer<ColorModel>[]>(() => {
             return reverseLayerList(props.layers);
         });
+
+        watch(() => props.layers.length, async (newLength, oldLength) => {
+            if (newLength != oldLength) {
+                layerSettingsVisibility.value = new Array(newLength).fill(false);
+            }
+        }, { immediate: true });
 
         watch(() => props.scrollTop, () => {
             if (draggingLayerId.value != null) {
@@ -247,13 +260,21 @@ export default defineComponent({
             return newLayersList;
         }
 
-        async function onLayerSettingsSelect(layer: WorkingFileAnyLayer<ColorModel>, action: string) {
-            if (action === 'delete') {
+        async function onLayerSettingsSelect(layer: WorkingFileAnyLayer<ColorModel>, layerIndex: number, action: string) {
+            if (action === 'rename') {
+                runModule('layer', 'rename', {
+                    layerId: layer.id,
+                })
+            } else if (action === 'delete') {
                 historyStore.dispatch('runAction', {
                     action: new DeleteLayersAction([layer.id])
                 });
             }
             showLayerSettingsMenuFor.value = null;
+            layerSettingsActiveIndex.value = ' ';
+            await nextTick();
+            layerSettingsActiveIndex.value = '';
+            layerSettingsVisibility.value[layerIndex] = false;
         }
 
         function onMouseEnterDndHandle(layer: WorkingFileAnyLayer<ColorModel>) {
@@ -452,10 +473,10 @@ export default defineComponent({
         }
 
         function onEditLayerFilter(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
-            runModule('image', 'layerEffectEdit', {
+            runModule('layer', 'layerEffectEdit', {
                 layerId: layer.id,
                 filterIndex
-            })
+            });
         }
 
         function onMoveLayerFilterUp(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
@@ -496,7 +517,9 @@ export default defineComponent({
             selectedLayerIds,
             playingAnimation,
             hoveringLayerId,
+            layerSettingsVisibility,
             showLayerSettingsMenuFor,
+            layerSettingsActiveIndex,
             onLayerSettingsSelect,
             onMouseEnterDndHandle,
             onMouseLeaveDndHandle,

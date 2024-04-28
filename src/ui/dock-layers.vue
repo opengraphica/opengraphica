@@ -160,7 +160,7 @@ export default defineComponent({
         }
 
         async function onAddEffect() {
-            await runModule('image', 'layerEffectBrowser');
+            await runModule('layer', 'layerEffectBrowser');
         }
 
         function onChangeBackgroundColor() {

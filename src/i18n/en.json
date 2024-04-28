@@ -24,6 +24,7 @@
         "openFile": "Open File",
         "pasteLayers": "Paste Layer(s)",
         "placeholder": "Placeholder",
+        "renameLayer": "Rename Layer",
         "reorderLayers": "Reorder Layer(s)",
         "reorderLayerFilters": "Reorder Effect(s)",
         "selectLayers": "Select Layer(s)",
@@ -47,6 +48,7 @@
         "layerList": {
             "toggleLayerVisibility": "Toggle Layer Visibility",
             "layerSettings": "Layer Settings",
+            "rename": "Rename",
             "delete": "Delete",
             "frames": "Frames",
             "playAnimation": "Play Animation",
@@ -577,6 +579,10 @@
             "deleting": "Deleting effect...",
             "deleteFilterError": "An error occurred while attempting to delete the filter. If you keep seeing this message, please report this as a bug.",
             "applyFilterError": "An error occurred while attempting to apply the filter changes. If you keep seeing this message, please report this as a bug."
+        },
+        "renameLayer": {
+            "title": "Rename Layer",
+            "layerName": "New Name"
         }
     },
     "moduleGroup": {
@@ -659,6 +665,16 @@
                 "paste": {
                     "name": "Paste",
                     "description": "Insert images on to the canvas from the clipboard."
+                }
+            }
+        },
+        "layer": {
+            "name": "Layers",
+            "description": "Operations that affect layers.",
+            "modules": {
+                "rename": {
+                    "name": "Rename Layer",
+                    "description": "Change the name of a layer"
                 },
                 "layerEffectBrowser": {
                     "name": "Effect Browser",
