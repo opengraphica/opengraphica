@@ -34,6 +34,7 @@ import ElButton from 'element-plus/lib/components/button/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import historyStore from '@/store/history';
+import { createStoredImage } from '@/store/image';
 import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { notifyInjector, unexpectedErrorMessage } from '@/lib/notify';
 import { BundleAction } from '@/actions/bundle';
@@ -154,7 +155,7 @@ export default defineComponent({
                                 width,
                                 height,
                                 data: {
-                                    sourceImage: image
+                                    sourceUuid: await createStoredImage(image),
                                 }
                             })
                         ])

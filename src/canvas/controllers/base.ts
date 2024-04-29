@@ -110,8 +110,8 @@ export default class BaseCanvasController {
             downTimestamp: window.performance.now()
         };
 
-        const isRecentPenDown = !!this.pointers.find((pointer) => {
-            return pointer.type === 'pen' && (window.performance.now() - pointer.downTimestamp) < 50;
+        const isRecentPenDown = !!this.pointers.find((existingPointer) => {
+            return existingPointer.type === 'pen' && Math.abs(pointer.downTimestamp - existingPointer.downTimestamp) < 50;
         });
 
         if (isRecentPenDown && pointer.type === 'touch') return;

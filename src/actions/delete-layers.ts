@@ -3,8 +3,8 @@ import {
 } from '@/types';
 import { BaseAction } from './base';
 import { SelectLayersAction } from './select-layers';
-import { revokeObjectUrlIfLastUser } from './data/memory-management';
 import canvasStore from '@/store/canvas';
+import { unreserveStoredImage } from '@/store/image';
 import workingFileStore, { calculateLayerOrder, getLayerById, getGroupLayerById } from '@/store/working-file';
 import { updateBakedImageForLayer } from './baking';
 
@@ -93,14 +93,14 @@ export class DeleteLayersAction extends BaseAction {
         for (let deletedLayerInfo of this.deletedLayers) {
             const layer = deletedLayerInfo.layer;
             if (layer.type === 'raster') {
-                if (layer.data.sourceImage && layer.data.sourceImageIsObjectUrl) {
-                    revokeObjectUrlIfLastUser(layer.data.sourceImage.src, layer.id);
+                if (layer.data.sourceUuid) {
+                    unreserveStoredImage(layer.data.sourceUuid, `${layer.id}`);
                 }
             }
             if (layer.type === 'rasterSequence') {
                 for (let frame of layer.data.sequence) {
-                    if (frame.image.sourceImage && frame.image.sourceImageIsObjectUrl) {
-                        revokeObjectUrlIfLastUser(frame.image.sourceImage.src, layer.id);
+                    if (frame.image.sourceUuid) {
+                        unreserveStoredImage(frame.image.sourceUuid, `${layer.id}`);
                     }
                 }
             }

@@ -103,6 +103,7 @@ export interface WorkingFileLayerDraftChunk {
     width: number;
     height: number;
     data: HTMLCanvasElement;
+    mode?: 'replace' | 'overlay';
 }
 
 export interface WorkingFileLayerDraft {
@@ -147,9 +148,9 @@ export interface WorkingFileGroupLayer<T extends ColorModel = ColorModel> extend
 export interface WorkingFileRasterLayer<T extends ColorModel = ColorModel> extends WorkingFileLayer<T> {
     type: 'raster';
     data: {
-        sourceImage?: HTMLImageElement;
-        sourceImageIsObjectUrl?: boolean;
-        draftImage?: HTMLCanvasElement; // Replaces sourceImage visually while provided
+        sourceUuid?: string;
+        updateChunks?: WorkingFileLayerDraftChunk[];
+        chunkUpdateId?: string; // This value changes every chunk update to trigger a re-render
     }
 }
 

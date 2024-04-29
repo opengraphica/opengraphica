@@ -2,6 +2,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { generateImageBlobHash } from '@/lib/hash';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
+import { getStoredImageOrCanvas, createStoredImage } from '@/store/image';
 import workingFileStore, { ensureUniqueLayerSiblingName } from '@/store/working-file';
 import { BundleAction } from '@/actions/bundle';
 import { InsertLayerAction } from '@/actions/insert-layer';
@@ -39,19 +40,19 @@ export async function pasteFromEditorCopyBuffer() {
                 if (editorStore.state.clipboardBufferSelectionMask != null) {
                     if (layer.type === 'raster') {
                         const rasterLayer = layer as WorkingFileRasterLayer<ColorModel>;
-                        if (rasterLayer.data.sourceImage) {
+                        const sourceImage = getStoredImageOrCanvas();
+                        if (sourceImage) {
                             rasterLayer.thumbnailImageSrc = null;
                             rasterLayer.data = {
-                                sourceImage: await createImageFromCanvas(
+                                sourceUuid: await createStoredImage(
                                     await blitSpecifiedSelectionMask(
                                         editorStore.state.clipboardBufferSelectionMask,
                                         editorStore.state.clipboardBufferSelectionMaskCanvasOffset,
-                                        rasterLayer.data.sourceImage,
+                                        sourceImage,
                                         rasterLayer.transform,
                                         'source-in'
                                     )
                                 ),
-                                sourceImageIsObjectUrl: true
                             };
                         }
                     }

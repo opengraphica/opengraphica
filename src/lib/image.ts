@@ -152,6 +152,21 @@ export function getImageDataFromImage(image: HTMLImageElement): ImageData {
 }
 
 /**
+ * Converts HTMLCanvasElement to ImageData.
+ * @param image The HTMLCanvasElement to convert.
+ * @returns The resulting ImageData.
+ */
+export function getImageDataFromCanvas(canvas: HTMLCanvasElement): ImageData {
+    let ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
+    if (!ctx) {
+        return new ImageData(canvas.width, canvas.height);
+    }
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    ctx = null;
+    return imageData;
+}
+
+/**
  * Converts ImageData to HTMLImageElement.
  * @param imageData The image data to convert.
  * @returns The resulting image.
@@ -166,6 +181,20 @@ export async function createImageFromImageData(imageData: ImageData): Promise<HT
     canvas.height = imageData.height;
     ctx.putImageData(imageData, 0, 0);
     return await createImageFromCanvas(canvas);
+}
+
+/**
+ * Converts HTMLImageElement to Blob.
+ * @param image The image to convert
+ */
+export async function createImageBlobFromImage(image: HTMLImageElement): Promise<Blob> {
+    try {
+        const response = await fetch(image.src);
+        if (response.ok) {
+            return await response.blob();
+        }
+    } catch (error) {}
+    return new Blob();
 }
 
 /**
@@ -276,4 +305,49 @@ export function createImageFromBlob(blob: Blob, options: CreateImageFromOptions 
     const image = await createImageFromCanvas(canvas);
     canvas = undefined;
     return image;
+}
+
+/**
+ * Creates an HTMLCanvasElement with the given dimensions.
+ * @param width The image width.
+ * @param height The image height.
+ * @returns The new HTMLCanvasElement.
+ */
+export function createEmptyCanvas(width: number, height: number): HTMLCanvasElement {
+    let canvas: HTMLCanvasElement | undefined = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    return canvas;
+}
+
+/**
+ * Creates an HTMLCanvasElement and 2D rendering context with the given dimensions.
+ * @param width The image width.
+ * @param height The image height.
+ * @returns The new HTMLCanvasElement and context object.
+ */
+export function createEmptyCanvasWith2dContext(width: number, height: number): { canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D | null } {
+    let canvas: HTMLCanvasElement | undefined = document.createElement('canvas');
+    canvas.width = Math.floor(width);
+    canvas.height = Math.floor(height);
+    const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
+    if (ctx) {
+        ctx.imageSmoothingEnabled = false;
+    }
+    return { canvas, ctx };
+}
+
+/**
+ * Creates an HTMLCanvasElement from the given HTMLImageElement.
+ * @param image 
+ */
+export async function createCanvasFromImage(image: HTMLImageElement): Promise<HTMLCanvasElement> {
+    let canvas = document.createElement('canvas');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
+    if (!ctx) throw new Error('Could not create canvas context');
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(image, 0, 0);
+    return canvas;
 }

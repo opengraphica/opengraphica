@@ -9,6 +9,7 @@ import {
 } from '@/types';
 import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { saveAs } from 'file-saver';
+import { getStoredImageOrCanvas } from '@/store/image';
 
 interface SaveImageAsOptions {
     fileName?: string;
@@ -94,7 +95,7 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
                     throw new Error('Missing canvas context');
                 }
                 ctx.imageSmoothingEnabled = false;
-                ctx.drawImage((layer as WorkingFileRasterLayer<ColorModel>).data.sourceImage as HTMLImageElement, 0, 0);
+                ctx.drawImage(getStoredImageOrCanvas((layer as WorkingFileRasterLayer<ColorModel>).data.sourceUuid) as HTMLImageElement, 0, 0);
                 serializedLayer = {
                     ...serializedLayer,
                     type: 'raster',
@@ -122,7 +123,7 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
                         throw new Error('Missing canvas context');
                     }
                     ctx.imageSmoothingEnabled = false;
-                    ctx.drawImage(frame.image.sourceImage as HTMLImageElement, 0, 0);
+                    ctx.drawImage(getStoredImageOrCanvas(frame.image.sourceUuid) as HTMLImageElement, 0, 0);
                     serializedSequence.push({
                         start: frame.start,
                         end: frame.end,

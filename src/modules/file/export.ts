@@ -10,6 +10,7 @@ import workingFileStore, {
 } from '@/store/working-file';
 import canvasStore, { getCanvasRenderingContext } from '@/store/canvas';
 import editorStore from '@/store/editor';
+import { createStoredImage } from '@/store/image';
 import historyStore from '@/store/history';
 
 import { drawWorkingFileToCanvas2d, drawWorkingFileToCanvasWebgl } from '@/lib/canvas';
@@ -136,8 +137,7 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                         width: canvas.width,
                         height: canvas.height,
                         data: {
-                            sourceImage: await createImageFromCanvas(canvas),
-                            sourceImageIsObjectUrl: true
+                            sourceUuid: await createStoredImage(canvas),
                         }
                     })
                 })

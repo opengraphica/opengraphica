@@ -28,22 +28,11 @@ export async function convertLayersToImageSequence(options: ConvertLayersToImage
     let start: number = 0;
     if (combineLayers.length > 0) {
         for (let layer of combineLayers) {
-            let image = new Image();
-            await new Promise<void>((resolve, reject) => {
-                image.onload = () => {
-                    resolve();
-                };
-                image.onerror = () => {
-                    reject();
-                };
-                image.src = layer.data.sourceImage?.src || '';
-            });
             rasterSequenceLayer.data?.sequence.push({
                 start: start,
                 end: Math.floor(start + frameDelay),
                 image: {
-                    sourceImage: image,
-                    sourceImageIsObjectUrl: layer.data.sourceImageIsObjectUrl
+                    sourceUuid: layer.data.sourceUuid,
                 },
                 thumbnailImageSrc: null
             });

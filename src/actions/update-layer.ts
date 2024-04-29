@@ -1,14 +1,15 @@
 import {
     ColorModel, WorkingFileAnyLayer,
-    UpdateAnyLayerOptions, UpdateRasterLayerOptions
+    UpdateAnyLayerOptions, UpdateRasterLayerOptions, WorkingFileRasterLayer, WorkingFileLayerDraftChunk
 } from '@/types';
+import { v4 as uuidv4 } from 'uuid';
 import { markRaw } from 'vue';
 import { BaseAction } from './base';
 import imageStore from './data/image-store';
-import { registerObjectUrlUser, revokeObjectUrlIfLastUser } from './data/memory-management';
-import { createImageFromBlob } from '@/lib/image';
+import { createEmptyCanvasWith2dContext } from '@/lib/image';
 import canvasStore from '@/store/canvas';
-import workingFileStore, { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
+import { prepareStoredImageForEditing, reserveStoredImage, unreserveStoredImage } from '@/store/image';
+import workingFileStore, { getLayerById, regenerateLayerThumbnail, getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { updateBakedImageForLayer } from './baking';
 import layerRenderers from '@/canvas/renderers';
 
@@ -18,8 +19,9 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
     private previousProps: Partial<WorkingFileAnyLayer<ColorModel>> = {};
     private explicitPreviousProps: Partial<WorkingFileAnyLayer<ColorModel>> = {};
 
-    private newRasterSourceImageDatabaseId: string | null = null;
-    private oldRasterSourceImageDatabaseId: string | null = null;
+    private oldRasterSourceImageId: string | null = null;
+    private oldRasterUpdateChunks: WorkingFileLayerDraftChunk[] = [];
+    private newRasterUpdateChunks: WorkingFileLayerDraftChunk[] = [];
 
     constructor(updateLayerOptions: LayerOptions, explicitPreviousProps: Partial<WorkingFileAnyLayer<ColorModel>> = {}) {
         super('updateLayer', 'action.updateLayer');
@@ -51,41 +53,47 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
             if (prop === 'data') {
                 if (layer.type === 'raster') {
                     if (!layer.data) {
-                        layer.data = {};
+                        layer.data = { sourceUuid: '' };
                     }
                     const newData = this.updateLayerOptions[prop] as UpdateRasterLayerOptions<ColorModel>['data'];
-                    if (this.newRasterSourceImageDatabaseId != null) {
-                        layer.data.sourceImage = await createImageFromBlob(
-                            await imageStore.get(this.newRasterSourceImageDatabaseId) as Blob
-                        );
-                        layer.data.sourceImageIsObjectUrl = true;
+                    const newSourceUuid = newData?.sourceUuid ?? '';
+                    const oldSourceUuid = layer.data.sourceUuid ?? '';
+                    if (newSourceUuid && newSourceUuid !== oldSourceUuid) {
+                        layer.data.sourceUuid = newSourceUuid;
+                        this.oldRasterSourceImageId = oldSourceUuid;
+                        reserveStoredImage(newSourceUuid, `${layer.id}`);
                         requiresBaking = true;
-                    } else if (newData?.sourceImage) {
-                        if (layer.data.sourceImage) {
-                            try {
-                                this.oldRasterSourceImageDatabaseId = await imageStore.add(
-                                    await fetch(layer.data.sourceImage.src).then(result => result.blob())
-                                );
-                                this.newRasterSourceImageDatabaseId = await imageStore.add(
-                                    await fetch(newData.sourceImage.src).then(result => result.blob())
-                                );
-                                if (layer.data.sourceImageIsObjectUrl) {
-                                    revokeObjectUrlIfLastUser(layer.data.sourceImage.src, layer.id);
-                                }
-                            } catch (error) {
-                                throw new Error('Aborted - Error storing old image.');
+                    }
+                    updateSourceImageWithChunks:
+                    if (newData?.updateChunks) {
+                        const sourceCanvas = await prepareStoredImageForEditing(layer.data.sourceUuid);
+                        if (!sourceCanvas) break updateSourceImageWithChunks;
+                        const sourceCtx = sourceCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
+                        if (!sourceCtx) break updateSourceImageWithChunks;
+                        this.newRasterUpdateChunks = newData.updateChunks;
+                        if (this.oldRasterUpdateChunks.length != this.newRasterUpdateChunks.length) {
+                            this.oldRasterUpdateChunks = [];
+                            for (const updateChunk of this.newRasterUpdateChunks) {
+                                const { canvas: oldChunkCanvas, ctx: oldChunkCtx } = createEmptyCanvasWith2dContext(updateChunk.width, updateChunk.height);
+                                if (!oldChunkCtx) break;
+                                oldChunkCtx.drawImage(sourceCanvas, -updateChunk.x, -updateChunk.y);
+                                this.oldRasterUpdateChunks.push({ data: oldChunkCanvas, x: updateChunk.x, y: updateChunk.y, width: updateChunk.width, height: updateChunk.height });
+                                if (updateChunk.mode !== 'overlay') sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
+                                sourceCtx.drawImage(updateChunk.data, updateChunk.x, updateChunk.y);
+                            }
+                        } else {
+                            for (const updateChunk of this.newRasterUpdateChunks) {
+                                if (updateChunk.mode !== 'overlay') sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
+                                sourceCtx.drawImage(updateChunk.data, updateChunk.x, updateChunk.y);
                             }
                         }
-                        layer.data.sourceImage = newData.sourceImage;
-                        layer.data.sourceImageIsObjectUrl = newData.sourceImageIsObjectUrl;
-                        registerObjectUrlUser(layer.data.sourceImage.src, layer.id);
-                        requiresBaking = true;
+                        layer.data.chunkUpdateId = uuidv4();
                     }
                 }
                 // else if (layer.type === 'rasterSequence') {
                 //     for (let frame of layer.data.sequence) {
-                //         if (frame.image.sourceImage && frame.image.sourceImageIsObjectUrl) {
-                //             registerObjectUrlUser(frame.image.sourceImage.src, layer.id);
+                //         if (frame.image.sourceUuid) {
+                //             reserveStoredImage(frame.image.sourceUuid, `${layer.id}`);
                 //         }
                 //     }
                 // }
@@ -140,22 +148,25 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                     }
                 }
             }
-            regenerateLayerThumbnail(layer);
-            updateBakedImageForLayer(layer);
             if (layer.type === 'raster') {
-                if (this.oldRasterSourceImageDatabaseId != null) {
-                    const oldImageIsObjectUrl = layer.data.sourceImageIsObjectUrl;
-                    const oldImageSrc = layer.data.sourceImage?.src;
-                    layer.data.sourceImage = await createImageFromBlob(
-                        await imageStore.get(this.oldRasterSourceImageDatabaseId) as Blob
-                    );
-                    layer.data.sourceImageIsObjectUrl = true;
-                    registerObjectUrlUser(layer.data.sourceImage.src, layer.id);
-                    if (oldImageIsObjectUrl) {
-                        revokeObjectUrlIfLastUser(oldImageSrc, layer.id);
+                if (this.oldRasterSourceImageId != null && this.oldRasterSourceImageId !== layer.data.sourceUuid) {
+                    layer.data.sourceUuid = this.oldRasterSourceImageId;
+                }
+                updateSourceImageWithChunks:
+                if (this.oldRasterUpdateChunks.length > 0) {
+                    const sourceCanvas = await prepareStoredImageForEditing(layer.data.sourceUuid);
+                    if (!sourceCanvas) break updateSourceImageWithChunks;
+                    const sourceCtx = sourceCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
+                    if (!sourceCtx) break updateSourceImageWithChunks;
+                    for (const updateChunk of this.oldRasterUpdateChunks) {
+                        sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
+                        sourceCtx.drawImage(updateChunk.data, updateChunk.x, updateChunk.y);
                     }
+                    layer.data.chunkUpdateId = uuidv4();
                 }
             }
+            regenerateLayerThumbnail(layer);
+            updateBakedImageForLayer(layer);
         }
 
         canvasStore.set('dirty', true);
@@ -164,36 +175,27 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
     public free() {
         super.free();
 
-        if (this.previousProps && !this.isDone) {
-            const data = (this.previousProps as any).data;
-            const layer = getLayerById(this.updateLayerOptions.id);
-            if (data && layer) {
-                if (layer.type === 'raster') {
-                    if (data.sourceImage && data.sourceImageIsObjectUrl) {
-                        revokeObjectUrlIfLastUser(data.sourceImage.src, layer.id);
-                    }
-                }
-                else if (layer.type === 'rasterSequence') {
-                    for (let frame of data.sequence) {
-                        if (frame.image.sourceImage && frame.image.sourceImageIsObjectUrl) {
-                            revokeObjectUrlIfLastUser(frame.image.sourceImage.src, layer.id);
-                        }
-                    }
-                }
+        // This is in the undo history
+        if (this.isDone) {
+            // For raster layer, if the image source id was changed, free the old one.
+            if (this.oldRasterSourceImageId != null && this.oldRasterSourceImageId !== (this.updateLayerOptions as UpdateRasterLayerOptions<ColorModel>)?.data?.sourceUuid) {
+                unreserveStoredImage(this.oldRasterSourceImageId, `${this.previousProps.id}`);
             }
         }
-
-        if (this.newRasterSourceImageDatabaseId != null) {
-            imageStore.delete(this.newRasterSourceImageDatabaseId);
-            this.newRasterSourceImageDatabaseId = null;
-        }
-        if (this.oldRasterSourceImageDatabaseId != null) {
-            imageStore.delete(this.oldRasterSourceImageDatabaseId);
-            this.oldRasterSourceImageDatabaseId = null;
+        // This is in the redo history
+        if (!this.isDone) {
+            // For raster layer, if the image source id was changed, free the new one.
+            const rasterUpdateLayerOptions = (this.updateLayerOptions as UpdateRasterLayerOptions<ColorModel>);
+            const layer = getLayerById(this.updateLayerOptions.id) as WorkingFileRasterLayer<ColorModel>;
+            if (rasterUpdateLayerOptions.data?.sourceUuid && rasterUpdateLayerOptions.data?.sourceUuid !== layer?.data?.sourceUuid) {
+                unreserveStoredImage(rasterUpdateLayerOptions.data.sourceUuid, `${layer.id}`);
+            }
         }
 
         (this.updateLayerOptions as any) = null;
         (this.previousProps as any) = null;
+        this.newRasterUpdateChunks = [];
+        this.oldRasterUpdateChunks = [];
     }
 
 }

@@ -13,7 +13,7 @@
                 />
             </template>
             <template #fallback>
-                <div style="width: 100%; height: 5rem;" v-loading="true" element-loading-background="transparent"></div>
+                <div style="width: 100%; height: 100%; min-height: 5rem;" v-loading="true" element-loading-background="transparent"></div>
             </template>
         </suspense>
     </div>

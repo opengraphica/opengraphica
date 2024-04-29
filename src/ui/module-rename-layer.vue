@@ -100,10 +100,6 @@ export default defineComponent({
         });
         const formValidationRules = ref<Rules>({});
 
-        const layer = computed(() => {
-            return getLayerById(props.layerId);
-        });
-
         onMounted(async () => {
             nextTick(async () => {
                 if (props.isDialog) {

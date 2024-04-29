@@ -1,7 +1,8 @@
 import { markRaw } from 'vue';
 import canvasStore from '@/store/canvas';
+import { getStoredImageOrCanvas } from '@/store/image';
 import { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
-import { getImageDataFromImage, createImageFromImageData } from '@/lib/image';
+import { getImageDataFromImage, getImageDataFromCanvas, createImageFromImageData } from '@/lib/image';
 import { bakeCanvasFilters } from '@/workers';
 
 import type { WorkingFileAnyLayer, ColorModel } from '@/types';
@@ -14,8 +15,11 @@ export async function updateBakedImageForLayer(layerOrLayerId: WorkingFileAnyLay
         return;
     }
     if (layer.type === 'raster') {
-        if (!layer.data.sourceImage) return;
-        const sourceImageData = getImageDataFromImage(layer.data.sourceImage);
+        const sourceImage = getStoredImageOrCanvas(layer.data.sourceUuid ?? '');
+        if (!sourceImage) return;
+        const sourceImageData = (sourceImage instanceof HTMLImageElement)
+            ? getImageDataFromImage(sourceImage)
+            : getImageDataFromCanvas(sourceImage);
         try {
             setTimeout(() => {
                 layer.isBaking = true;

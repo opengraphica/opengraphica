@@ -249,6 +249,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
         if (!draft || !this.draftPlaneTexture || !this.draftPlaneTextureRenderingContext) return;
         renderer = renderer ?? canvasStore.get('threejsRenderer')!;
         for (const chunk of draft.updateChunks) {
+            this.draftPlaneTextureRenderingContext.clearRect(chunk.x, chunk.y, chunk.width, chunk.height);
             this.draftPlaneTextureRenderingContext.drawImage(chunk.data, chunk.x, chunk.y);
             this.draftPlaneTexture.needsUpdate = true;
         }

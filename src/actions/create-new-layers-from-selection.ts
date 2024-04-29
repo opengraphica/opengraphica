@@ -1,6 +1,7 @@
 import { BaseAction } from './base';
 import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset, selectionMaskDrawMargin } from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
+import { createStoredImage } from '@/store/image';
 import workingFileStore, { getCanvasRenderingContext2DSettings, getSelectedLayers, ensureUniqueLayerSiblingName } from '@/store/working-file';
 import { createImageFromCanvas, getImageDataFromImage, getImageDataEmptyBounds } from '@/lib/image';
 import { ClearSelectionAction } from './clear-selection';
@@ -83,6 +84,8 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
                     ctx.globalCompositeOperation = 'destination-in';
                     ctx.drawImage(selectionMask, -selectionBounds.left, -selectionBounds.top);
                     
+                    const sourceUuid = await createStoredImage(workingCanvas);
+
                     this.insertLayerActions.push(
                         new InsertLayerAction<InsertRasterLayerOptions<ColorModel>>({
                             type: 'raster',
@@ -91,8 +94,7 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
                             height: workingCanvas.height,
                             transform: new DOMMatrix().translateSelf(selectionOffset.x + selectionBounds.left, selectionOffset.y + selectionBounds.top),
                             data: {
-                                sourceImage: await createImageFromCanvas(workingCanvas),
-                                sourceImageIsObjectUrl: true
+                                sourceUuid,
                             }
                         })
                     );

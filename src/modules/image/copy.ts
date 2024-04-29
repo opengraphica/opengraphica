@@ -1,6 +1,7 @@
 import cloneDeep from 'lodash/cloneDeep';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
+import { getStoredImageOrCanvas, createStoredImage } from '@/store/image';
 import workingFileStore, { getSelectedLayers } from '@/store/working-file';
 import appEmitter from '@/lib/emitter';
 import { unexpectedErrorMessage } from '@/lib/notify';
@@ -45,16 +46,16 @@ export async function cutSelectedLayers() {
         for (const layer of selectedLayers) {
             if (layer.type === 'raster') {
                 const rasterLayer = layer as WorkingFileRasterLayer<ColorModel>;
-                if (rasterLayer.data.sourceImage) {
+                const sourceImage = getStoredImageOrCanvas(rasterLayer.data.sourceUuid);
+                if (sourceImage) {
                     const newImage = await createImageFromCanvas(
-                        await blitActiveSelectionMask(rasterLayer.data.sourceImage, rasterLayer.transform, 'source-out')
+                        await blitActiveSelectionMask(sourceImage, rasterLayer.transform, 'source-out')
                     );
                     updateLayerActions.push(
                         new UpdateLayerAction({
                             id: rasterLayer.id,
                             data: {
-                                sourceImage: newImage,
-                                sourceImageIsObjectUrl: true
+                                sourceUuid: createStoredImage(newImage),
                             }
                         })
                     );

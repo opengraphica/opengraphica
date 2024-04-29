@@ -11,6 +11,7 @@ import {
     SerializedFileGroupLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileVectorLayer, SerializedFileTextLayer
 } from '@/types';
 import historyStore from '@/store/history';
+import { createStoredImage } from '@/store/image';
 import preferencesStore from '@/store/preferences';
 import workingFileStore, { getCanvasRenderingContext2DSettings, WorkingFileState, getTimelineById } from '@/store/working-file';
 import { BaseAction } from '@/actions/base';
@@ -412,8 +413,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                         width: image.width,
                         height: image.height,
                         data: {
-                            sourceImage: image,
-                            sourceImageIsObjectUrl: true
+                            sourceUuid: await createStoredImage(image),
                         }
                     })
                 );
@@ -434,8 +434,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                         start: timeIterator,
                         end: timeIterator + result.duration,
                         image: {
-                            sourceImage: result.image,
-                            sourceImageIsObjectUrl: true
+                            sourceUuid: await createStoredImage(result.image),
                         },
                         thumbnailImageSrc: null
                     });
@@ -592,8 +591,7 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
                 ...parsedLayer,
                 type: 'raster',
                 data: {
-                    sourceImage: image,
-                    sourceImageIsObjectUrl: true
+                    sourceUuid: await createStoredImage(image),
                 }
             } as WorkingFileRasterLayer<ColorModel>;
         } else if (layer.type === 'rasterSequence') {
@@ -616,8 +614,7 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
                     start: frame.start,
                     end: frame.end,
                     image: {
-                        sourceImage: image,
-                        sourceImageIsObjectUrl: true
+                        sourceUuid: await createStoredImage(image),
                     },
                     thumbnailImageSrc: null
                 });

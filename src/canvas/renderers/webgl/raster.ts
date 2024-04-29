@@ -1,6 +1,7 @@
 import { toRefs, watch, type WatchStopHandle } from 'vue';
 import { WorkingFileRasterLayer, ColorModel } from '@/types';
 import canvasStore from '@/store/canvas';
+import { getStoredImageOrCanvas } from '@/store/image';
 import BaseLayerRenderer from './base';
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
@@ -104,44 +105,41 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
             this.plane && (this.plane.material = this.material);
         }
         if (updates.data) {
-            if (updates.data.draftImage) {
-                this.draftTexture?.dispose();
-                this.draftTexture = new CanvasTexture(updates.data.draftImage);
-                this.draftTexture.encoding = sRGBEncoding;
-                this.draftTexture.magFilter = NearestFilter;
-                this.material && (this.material.uniforms.map.value = this.draftTexture);
-            } else {
-                if (this.draftTexture) {
-                    this.draftTexture.dispose();
-                    this.draftTexture = undefined;
-                }
-                if (updates.data.sourceImage) {
-                    const newSourceTexture: Texture = await new Promise((resolve, reject) => {
-                        if (updates.data?.sourceImage) {
-                            const texture = new TextureLoader().load(
-                                updates.data.sourceImage.src,
-                                () => { resolve(texture); },
-                                undefined,
-                                () => { reject(); }
-                            );
-                        } else { reject(); }
+            if (this.draftTexture) {
+                this.draftTexture.dispose();
+                this.draftTexture = undefined;
+            }
+            const sourceImage = getStoredImageOrCanvas(updates.data.sourceUuid ?? '');
+            if (sourceImage) {
+                let newSourceTexture: Texture;
+                if (sourceImage instanceof HTMLImageElement) {
+                    newSourceTexture = await new Promise((resolve, reject) => {
+                        const texture = new TextureLoader().load(
+                            sourceImage.src,
+                            () => { resolve(texture); },
+                            undefined,
+                            () => { reject(); }
+                        );
                     });
-                    this.sourceTexture?.dispose();
-                    this.sourceTexture = newSourceTexture;
-                    this.sourceTexture.encoding = sRGBEncoding;
-                    this.sourceTexture.magFilter = NearestFilter;
-                    // TODO - maybe use a combination of LinearMipmapLinearFilter and LinearMipmapNearestFilter
-                    // depending on the zoom level, one can appear sharper than the other.
-                    this.sourceTexture.minFilter = LinearMipmapLinearFilter;
-                    this.material && (this.material.uniforms.map.value = this.sourceTexture);
-                    canvasStore.set('dirty', true);
                 } else {
-                    if (this.sourceTexture) {
-                        this.sourceTexture.dispose();
-                        this.sourceTexture = undefined;
-                    }
-                    this.material && (this.material.uniforms.map.value = null);
+                    newSourceTexture = new CanvasTexture(sourceImage);
                 }
+                this.sourceTexture?.dispose();
+                this.sourceTexture = newSourceTexture;
+                this.sourceTexture.encoding = sRGBEncoding;
+                this.sourceTexture.magFilter = NearestFilter;
+                // TODO - maybe use a combination of LinearMipmapLinearFilter and LinearMipmapNearestFilter
+                // depending on the zoom level, one can appear sharper than the other.
+                this.sourceTexture.minFilter = LinearMipmapLinearFilter;
+                this.sourceTexture.needsUpdate = true;
+                this.material && (this.material.uniforms.map.value = this.sourceTexture);
+                canvasStore.set('dirty', true);
+            } else {
+                if (this.sourceTexture) {
+                    this.sourceTexture.dispose();
+                    this.sourceTexture = undefined;
+                }
+                this.material && (this.material.uniforms.map.value = null);
             }
         }
     }

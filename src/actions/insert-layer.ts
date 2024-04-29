@@ -7,8 +7,8 @@ import {
 } from '@/types';
 import { BaseAction } from './base';
 import { SelectLayersAction } from './select-layers';
-import { registerObjectUrlUser, revokeObjectUrlIfLastUser } from './data/memory-management';
 import canvasStore from '@/store/canvas';
+import { reserveStoredImage, unreserveStoredImage } from '@/store/image';
 import workingFileStore, { calculateLayerOrder, getGroupLayerById } from '@/store/working-file';
 import layerRenderers from '@/canvas/renderers';
 import { updateBakedImageForLayer } from './baking';
@@ -97,8 +97,8 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                         data: {},
                         ...this.insertLayerOptions,
                     } as WorkingFileRasterLayer<ColorModel>;
-                    if (newLayer.data.sourceImageIsObjectUrl) {
-                        registerObjectUrlUser(newLayer.data.sourceImage?.src, layerId);
+                    if (newLayer.data.sourceUuid) {
+                        reserveStoredImage(newLayer.data.sourceUuid, `${layerId}`);
                     }
                     break;
                 case 'rasterSequence':
@@ -109,8 +109,8 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                         ...this.insertLayerOptions
                     } as WorkingFileRasterSequenceLayer<ColorModel>;
                     for (let frame of newLayer.data.sequence) {
-                        if (frame.image.sourceImageIsObjectUrl) {
-                            registerObjectUrlUser(frame.image.sourceImage?.src, layerId);
+                        if (frame.image.sourceUuid) {
+                            reserveStoredImage(frame.image.sourceUuid, `${layerId}`);
                         }
                     }
                     break;
@@ -233,14 +233,14 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
         }
         if (this.insertedLayer && !this.isDone) {
             if (this.insertedLayer.type === 'raster') {
-                if (this.insertedLayer.data.sourceImage && this.insertedLayer.data.sourceImageIsObjectUrl) {
-                    revokeObjectUrlIfLastUser(this.insertedLayer.data.sourceImage?.src, this.insertedLayer.id);
+                if (this.insertedLayer.data.sourceUuid) {
+                    unreserveStoredImage(this.insertedLayer.data.sourceUuid, `${this.insertedLayer.id}`);
                 }
             }
             else if (this.insertedLayer.type === 'rasterSequence') {
                 for (let frame of this.insertedLayer.data.sequence) {
-                    if (frame.image.sourceImage && frame.image.sourceImageIsObjectUrl) {
-                        revokeObjectUrlIfLastUser(frame.image.sourceImage?.src, this.insertedLayer.id);
+                    if (frame.image.sourceUuid) {
+                        unreserveStoredImage(frame.image.sourceUuid, `${this.insertedLayer.id}`);
                     }
                 }
             }

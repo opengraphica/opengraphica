@@ -8,14 +8,16 @@ import { cursorHoverPosition, brushShape, brushColor, brushSize } from '../store
 import { decomposeMatrix } from '@/lib/dom-matrix';
 import { isCtrlOrMetaKeyPressed } from '@/lib/keyboard';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
-import { createEmptyImage, createImageFromBlob, createImageFromCanvas } from '@/lib/image';
+import { createEmptyImage, createImageFromBlob, createEmptyCanvas, createEmptyCanvasWith2dContext } from '@/lib/image';
 import { pointDistance2d, nearestPowerOf2 } from '@/lib/math';
 
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
+import { getStoredImageOrCanvas, createStoredImage, prepareStoredImageForArchival, prepareStoredImageForEditing } from '@/store/image';
 import historyStore, { createHistoryReserveToken, historyReserveQueueFree } from '@/store/history';
-import workingFileStore, { getSelectedLayers, ensureUniqueLayerSiblingName, getLayerGlobalTransform } from '@/store/working-file';
+import workingFileStore, { getSelectedLayers, getLayerById, getLayerGlobalTransform } from '@/store/working-file';
 
+import type { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { InsertLayerAction } from '@/actions/insert-layer';
 import { UpdateLayerAction } from '@/actions/update-layer';
@@ -29,19 +31,42 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
     private brushShapeUnwatch: WatchStopHandle | null = null;
     private brushSizeUnwatch: WatchStopHandle | null = null;
     private ctrlKeyUnwatch: WatchStopHandle | null = null;
+    private selectedLayerIdsUnwatch: WatchStopHandle | null = null;
 
     private drawingDraftChunkSize: number = 64;
     private drawingDraftCanvases: HTMLCanvasElement[] = [];
     private drawingPointerId: number | null = null;
     private drawingOnLayers: WorkingFileAnyLayer[] = [];
     private drawingOnLayerScales: { x: number; y: number }[] = [];
-    private drawingDraftCanvas: HTMLCanvasElement | null = null;
     private drawingPoints: DOMPoint[] = [];
 
     private brushShapeImage: HTMLImageElement | null = null;
 
+    private updateChunkBounds = {
+        minX: Infinity,
+        maxX: -Infinity,
+        minY: Infinity,
+        maxY: -Infinity,
+    };
+
     onEnter(): void {
         super.onEnter();
+
+        this.selectedLayerIdsUnwatch = watch(() => workingFileStore.state.selectedLayerIds, (newIds, oldIds) => {
+            const unusedOldIds = oldIds?.filter(id => newIds.indexOf(id) === -1) ?? [];
+            for (const layerId of unusedOldIds) {
+                const layer = getLayerById(layerId);
+                if (layer?.type === 'raster') {
+                    prepareStoredImageForArchival(layer.data.sourceUuid);
+                }
+            }
+            for (const layerId of newIds) {
+                const layer = getLayerById(layerId);
+                if (layer?.type === 'raster') {
+                    prepareStoredImageForEditing(layer.data.sourceUuid);
+                }
+            }
+        }, { immediate: true });
 
         this.ctrlKeyUnwatch = watch([isCtrlOrMetaKeyPressed], ([isCtrlOrMetaKeyPressed]) => {
             this.handleCursorIcon();
@@ -109,8 +134,16 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         this.brushSizeUnwatch = null;
         this.ctrlKeyUnwatch?.();
         this.ctrlKeyUnwatch = null;
+        this.selectedLayerIdsUnwatch?.();
+        this.selectedLayerIdsUnwatch = null;
 
         this.drawingDraftCanvases = [];
+
+        for (const layer of getSelectedLayers()) {
+            if (layer.type === 'raster') {
+                prepareStoredImageForArchival(layer.data.sourceUuid);
+            }
+        }
 
         // Tutorial Message
         if (!editorStore.state.tutorialFlags.drawToolIntroduction) {
@@ -128,7 +161,14 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
             ).matrixTransform(canvasStore.state.transform.inverse());
         }
 
-        if ((e.pointerType === 'pen' || (!editorStore.state.isPenUser && e.pointerType === 'mouse')) && e.isPrimary && e.button === 0) {
+        if (
+            this.drawingPointerId == null && e.isPrimary && e.button === 0 &&
+            (
+                e.pointerType === 'pen' ||
+                e.pointerType === 'touch' ||
+                (!editorStore.state.isPenUser && e.pointerType === 'mouse')
+            )
+        ) {
             this.drawingPointerId = e.pointerId;
             this.onDrawStart();
         }
@@ -136,9 +176,14 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
 
     onMultiTouchDown() {
         super.onMultiTouchDown();
-        if (this.touches.length === 1) {
-            this.drawingPointerId = this.touches[0].id;
-            this.onDrawStart();
+        if (this.touches.length > 1) {
+            this.drawingPointerId = null;
+            this.drawingPoints = [];
+            for (const layer of getSelectedLayers()) {
+                layer.draft = null;
+            }
+            // this.drawingPointerId = this.touches[0].id;
+            // this.onDrawStart();
         }
     }
 
@@ -186,15 +231,14 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
 
             this.drawingPoints = [];
             this.drawingOnLayers = [];
-            this.drawingDraftCanvas = null;
             this.drawingPointerId = null;
+            const updateLayerReserveToken = createHistoryReserveToken();
 
             await historyReserveQueueFree();
 
-            const updateLayerReserveToken = createHistoryReserveToken();
             await historyStore.dispatch('reserve', { token: updateLayerReserveToken });
 
-            const layerActions = [];
+            const layerActions: BaseAction[] = [];
 
             const previewRatioX = canvasStore.get('decomposedTransform').scaleX;
             const previewRatioY = canvasStore.get('decomposedTransform').scaleY;
@@ -204,30 +248,56 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                 if (layer.type === 'raster') {
                     // TODO - START - This is fairly slow, speed it up?
 
-                    const layerUpdateCanvas = document.createElement('canvas');
-                    layerUpdateCanvas.width = layer.width;
-                    layerUpdateCanvas.height = layer.height;
-                    const layerUpdateCtx = layerUpdateCanvas.getContext('2d');
-                    if (!layerUpdateCtx) continue;
-                    if (layer.data.sourceImage) {
-                        layerUpdateCtx.drawImage(layer.data.sourceImage, 0, 0);
-                    }
-                    layerUpdateCtx.save();
-                    const layerGlobalTransform = getLayerGlobalTransform(layer);
                     const decomposedCanvasTransform = decomposeMatrix(canvasStore.state.transform.inverse());
-                    const layerTransform = layerGlobalTransform.inverse().scale(decomposedCanvasTransform.scaleX, decomposedCanvasTransform.scaleY);
+                    const layerGlobalTransform = getLayerGlobalTransform(layer);
+                    const layerSpaceTransform = layerGlobalTransform.inverse();
+
+                    let minX = Infinity;
+                    let maxX = -Infinity;
+                    let minY = Infinity;
+                    let maxY = -Infinity;
+                    const updateChunkBoundsPoints = [
+                        new DOMPoint(this.updateChunkBounds.minX, this.updateChunkBounds.minY).matrixTransform(layerSpaceTransform),
+                        new DOMPoint(this.updateChunkBounds.minX, this.updateChunkBounds.maxY).matrixTransform(layerSpaceTransform),
+                        new DOMPoint(this.updateChunkBounds.maxX, this.updateChunkBounds.minY).matrixTransform(layerSpaceTransform),
+                        new DOMPoint(this.updateChunkBounds.maxX, this.updateChunkBounds.maxY).matrixTransform(layerSpaceTransform),
+                    ];
+                    for (const point of updateChunkBoundsPoints) {
+                        if (point.x < minX) minX = point.x;
+                        if (point.x > maxX) maxX = point.x;
+                        if (point.y < minY) minY = point.y;
+                        if (point.y > maxY) maxY = point.y;
+                    }
+                    minX = Math.max(0, Math.floor(minX));
+                    minY = Math.max(0, Math.floor(minY));
+                    maxX = Math.min(layer.width, Math.ceil(maxX));
+                    maxY = Math.min(layer.height, Math.ceil(maxY));
+
+                    const updateChunkWidth = maxX - minX;
+                    const updateChunkHeight = maxY - minY;
+
+                    const { canvas: layerUpdateCanvas, ctx: layerUpdateCtx } = createEmptyCanvasWith2dContext(updateChunkWidth, updateChunkHeight);
+                    if (!layerUpdateCtx) continue;
+                    layerUpdateCtx.save();
+
+                    const layerTransform = new DOMMatrix().translate(-minX, -minY).multiply(layerGlobalTransform.inverse())
+                        .scale(decomposedCanvasTransform.scaleX, decomposedCanvasTransform.scaleY);
                     layerUpdateCtx.transform(layerTransform.a, layerTransform.b, layerTransform.c, layerTransform.d, layerTransform.e, layerTransform.f);
                     this.drawPreviewPoints(points, layerUpdateCtx, previewRatioX, previewRatioY, previewBrushSize);
                     layerUpdateCtx.restore();
-
-                    let sourceImage = await createImageFromCanvas(layerUpdateCanvas);
 
                     layerActions.push(
                         new UpdateLayerAction<UpdateRasterLayerOptions>({
                             id: layer.id,
                             data: {
-                                sourceImage,
-                                sourceImageIsObjectUrl: true,
+                                updateChunks: [{
+                                    x: minX,
+                                    y: minY,
+                                    width: updateChunkWidth,
+                                    height: updateChunkHeight,
+                                    data: layerUpdateCanvas,
+                                    mode: 'overlay',
+                                }],
                             }
                         })
                     );
@@ -241,14 +311,13 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                     action: new BundleAction('updateDrawLayer', 'action.updateDrawLayer', layerActions),
                     reserveToken: updateLayerReserveToken,
                 });
-
-                for (const layer of drawingOnLayers) {
-                    if (layer?.draft?.lastUpdateTimestamp ?? 0 < updateHistoryStartTimestamp) {
-                        layer.draft = null;
-                    }
-                }
             } else {
                 await historyStore.dispatch('unreserve', { token: updateLayerReserveToken });
+            }
+            for (const layer of drawingOnLayers) {
+                if (layer?.draft?.lastUpdateTimestamp ?? 0 < updateHistoryStartTimestamp) {
+                    layer.draft = null;
+                }
             }
         }
     }
@@ -257,6 +326,13 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         // Create layer if one does not exist
         const startDrawReserveToken = createHistoryReserveToken();
         await historyStore.dispatch('reserve', { token: startDrawReserveToken });
+
+        this.updateChunkBounds = {
+            minX: Infinity,
+            maxX: -Infinity,
+            minY: Infinity,
+            maxY: -Infinity,
+        }
 
         const { width, height } = workingFileStore.state;
         let selectedLayers = getSelectedLayers();
@@ -268,8 +344,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                 width,
                 height,
                 data: {
-                    sourceImage: await createEmptyImage(width, height),
-                    sourceImageIsObjectUrl: true,
+                    sourceUuid: await createStoredImage(createEmptyCanvas(width, height)),
                 },
             }));
         }
@@ -283,8 +358,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                         width,
                         height,
                         data: {
-                            sourceImage: await createEmptyImage(width, height),
-                            sourceImageIsObjectUrl: true,
+                            sourceUuid: await createStoredImage(createEmptyCanvas(width, height)),
                         },
                     })
                 );
@@ -345,11 +419,6 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
             });
         }
 
-        // Create a draft canvas
-        this.drawingDraftCanvas = document.createElement('canvas');
-        this.drawingDraftCanvas.width = width;
-        this.drawingDraftCanvas.height = height;
-
         // Populate first drawing point
         this.drawingPoints = [
             new DOMPoint(
@@ -368,40 +437,8 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         return newIcon;
     }
 
-    private smoothPoints(pointListSource: DOMPoint[]) {
-        const pointList = [...pointListSource];
-        const smoothedPoints: DOMPoint[] = [];
-        for (let i = 1; i < pointList.length - 1; i++) {
-            const point1 = pointList[i - 1];
-            const point2 = pointList[i];
-            if (pointDistance2d(point1.x, point1.y, point2.x, point2.y) < 30) {
-                pointList.splice(i, 1);
-                i--;
-            }
-        }
-
-        if (pointList.length < 4) return pointListSource;
-
-        smoothedPoints.push(pointList[0]);
-
-        for (let i = 1; i < pointList.length - 2; i++) {
-            smoothedPoints.push(pointList[i]);
-
-            // smoothedPoints.push(Vector2.CatmullRom(pointList[i - 1], pointList[i], pointList[i + 1], pointList[i + 2], .5f));
-        }
-
-        smoothedPoints.push(pointList[pointList.length - 2]);
-        smoothedPoints.push(pointList[pointList.length - 1]);
-        return smoothedPoints;
-    }
-
     private drawPreview() {
-        if (this.drawingOnLayers.length > 0 && this.drawingDraftCanvas && this.brushShapeImage) {
-
-            const canvas = this.drawingDraftCanvas;
-            canvas.id = 'bar';
-            const ctx = canvas.getContext('2d');
-            if (!ctx) return;
+        if (this.drawingOnLayers.length > 0 && this.brushShapeImage) {
 
             const points = this.drawingPoints;
 
@@ -439,6 +476,23 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                     maxQuadrantY = maxY;
                 }
             }
+            
+            const globalMinX = (minQuadrantX * chunkSize) * (1 / previewRatioX);
+            const globalMaxX = ((maxQuadrantX * chunkSize) + (chunkSize * 3)) * (1 / previewRatioX);
+            const globalMinY = (minQuadrantY * chunkSize) * (1 / previewRatioX);
+            const globalMaxY = ((maxQuadrantY * chunkSize) + (chunkSize * 3)) * (1 / previewRatioX);
+            if (globalMinX < this.updateChunkBounds.minX) {
+                this.updateChunkBounds.minX = globalMinX;
+            }
+            if (globalMaxX > this.updateChunkBounds.maxX) {
+                this.updateChunkBounds.maxX = globalMaxX;
+            }
+            if (globalMinY < this.updateChunkBounds.minY) {
+                this.updateChunkBounds.minY = globalMinY;
+            }
+            if (globalMaxY > this.updateChunkBounds.maxY) {
+                this.updateChunkBounds.maxY = globalMaxY;
+            }
 
             // Draw the line to each canvas chunk
             try {
@@ -463,7 +517,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                     }
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
                 // TODO - fallback
             }
 
@@ -471,23 +525,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                 const layerScale = this.drawingOnLayerScales[layerIndex];
                 if (layer.type === 'raster') {
                     if (!layer.draft) continue;
-                    // let draftImage = layer.data.draftImage;
-
-                    // const screenTexelWidth = layer.width * layerScale.x * devicePixelRatio;
-                    // const screenTexelHeight = layer.height * layerScale.y * devicePixelRatio;
-
-                    let layerDraftCanvasCtx: CanvasRenderingContext2D | null = null;
-
-                    // if (!draftImage) {
-                    //     draftImage = document.createElement('canvas');
-                    //     draftImage.width = Math.ceil(screenTexelWidth);
-                    //     draftImage.height = Math.ceil(screenTexelHeight);
-                    //     layer.data.draftImage = draftImage;
-                    // }
-
-                    // layerDraftCanvasCtx = draftImage.getContext('2d');
-                    // if (!layerDraftCanvasCtx) continue;
-
+                    
                     let draftCanvasIndex = 0;
                     for (let quadrantX = minQuadrantX; quadrantX <= maxQuadrantX; quadrantX++) {
                         for (let quadrantY = minQuadrantY; quadrantY <= maxQuadrantY; quadrantY++) {

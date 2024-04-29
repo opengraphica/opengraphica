@@ -1,6 +1,7 @@
 import { toRefs, watch, type WatchStopHandle } from 'vue';
 import { DrawWorkingFileLayerOptions, WorkingFileRasterSequenceLayer, ColorModel } from '@/types';
 import canvasStore from '@/store/canvas';
+import { getStoredImageOrCanvas } from '@/store/image';
 import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import BaseLayerRenderer from './base';
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
@@ -39,8 +40,9 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
         (this.threejsScene ?? canvasStore.get('threejsScene'))?.add(this.plane);
 
         this.textureCanvas = document.createElement('canvas');
-        this.textureCanvas.width = layer.data.currentFrame?.sourceImage?.width || 10;
-        this.textureCanvas.height = layer.data.currentFrame?.sourceImage?.height || 10;
+        const sourceImage = getStoredImageOrCanvas(layer.data.currentFrame?.sourceUuid ?? '');
+        this.textureCanvas.width = sourceImage?.width || 10;
+        this.textureCanvas.height = sourceImage?.height || 10;
         this.textureCtx = this.textureCanvas.getContext('2d', getCanvasRenderingContext2DSettings()) || undefined;
         if (this.textureCtx) {
             this.textureCtx.imageSmoothingEnabled = false;
@@ -117,10 +119,9 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
             if (!this.textureCtx) return;
             this.textureCtx.clearRect(0, 0, this.textureCtx.canvas.width, this.textureCtx.canvas.height);
             if (updates.data.currentFrame) {
-                if (updates.data.currentFrame.draftImage) {
-                    this.textureCtx.drawImage(updates.data.currentFrame.draftImage, 0, 0);
-                } else if (updates.data.currentFrame.sourceImage) {
-                    this.textureCtx.drawImage(updates.data.currentFrame.sourceImage, 0, 0);
+                const sourceImage = getStoredImageOrCanvas(updates.data.currentFrame?.sourceUuid ?? '');
+                if (sourceImage) {
+                    this.textureCtx.drawImage(sourceImage, 0, 0);
                 }
                 if (this.material?.uniforms.map.value) {
                     this.material.uniforms.map.value.needsUpdate = true;
