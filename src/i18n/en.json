@@ -329,6 +329,12 @@
         "hue": {
             "name": "Hue",
             "param": {
+                "colorSpace": "Color Space",
+                "colorSpaceOption": {
+                    "oklab": "Oklab",
+                    "perceptualRgb": "Perceptual RGB",
+                    "linearRgb": "Linear RGB"
+                },
                 "rotate": "Rotate"
             }
         },

@@ -252,6 +252,8 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                     const layerGlobalTransform = getLayerGlobalTransform(layer);
                     const layerSpaceTransform = layerGlobalTransform.inverse();
 
+                    // Project the drawing preview box bounds to the layer's coordinates,
+                    // and determine min/max update coordinates for updating the layer image.
                     let minX = Infinity;
                     let maxX = -Infinity;
                     let minY = Infinity;
@@ -276,6 +278,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                     const updateChunkWidth = maxX - minX;
                     const updateChunkHeight = maxY - minY;
 
+                    // Draw the line to a new canvas which will be merged with the existing layer's canvas
                     const { canvas: layerUpdateCanvas, ctx: layerUpdateCtx } = createEmptyCanvasWith2dContext(updateChunkWidth, updateChunkHeight);
                     if (!layerUpdateCtx) continue;
                     layerUpdateCtx.save();

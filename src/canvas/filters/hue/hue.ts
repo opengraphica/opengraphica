@@ -1,10 +1,17 @@
 import fragmentShader from './hue.frag';
-import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData } from '../color-space';
-import { colorToRgba, colorToHsla } from '@/lib/color';
+import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData, transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData } from '../color-space';
+import { colorToRgba, colorToHsla, linearRgbaToOklab, oklabToLinearRgba, lchaToLaba, labaToLcha } from '@/lib/color';
 
 import type { CanvasFilter, CanvasFilterEditConfig } from '@/types';
 
+enum HueColorSpace {
+    OKLAB = 0,
+    PERCEPTUAL_RGB = 1,
+    LINEAR_RGB = 2,
+}
+
 interface HueCanvasFilterParams {
+    colorSpace?: HueColorSpace;
     rotate?: number;
 }
 
@@ -14,12 +21,22 @@ export default class HueCanvasFilter implements CanvasFilter<HueCanvasFilterPara
 
     public getEditConfig() {
         return {
+            colorSpace: {
+                type: 'integer',
+                constant: true,
+                default: HueColorSpace.OKLAB,
+                options: [
+                    { key: 'oklab', value: HueColorSpace.OKLAB },
+                    { key: 'perceptualRgb', value: HueColorSpace.PERCEPTUAL_RGB },
+                    { key: 'linearRgb', value: HueColorSpace.LINEAR_RGB }
+                ]
+            },
             rotate: {
                 type: 'percentage',
                 default: 0,
                 preview: 0.3,
                 min: -0.5,
-                max: 0.5
+                max: 0.5,
             }
         } as CanvasFilterEditConfig;
     }
@@ -35,12 +52,24 @@ export default class HueCanvasFilter implements CanvasFilter<HueCanvasFilterPara
     public fragment(sourceImageData: Uint8ClampedArray, targetImageData: Uint8ClampedArray, dataPosition: number) {
         const rotate = this.params.rotate ?? 0;
 
-        let rgba = transfer8BitImageDataToLinearSrgb(sourceImageData, dataPosition);
+        let rgba = this.params.colorSpace === HueColorSpace.PERCEPTUAL_RGB
+            ? transfer8BitImageDataToSrgb(sourceImageData, dataPosition)
+            : transfer8BitImageDataToLinearSrgb(sourceImageData, dataPosition);
 
-        const hsla = colorToHsla(rgba, 'rgba');
-        hsla.h += rotate;
-        rgba = colorToRgba(hsla, 'hsla');
+        if (this.params.colorSpace === HueColorSpace.OKLAB) {
+            const lcha = labaToLcha(linearRgbaToOklab(rgba));
+            lcha.h += rotate * 360;
+            rgba = oklabToLinearRgba(lchaToLaba(lcha));
+        } else {
+            const hsla = colorToHsla(rgba, 'rgba');
+            hsla.h += rotate;
+            rgba = colorToRgba(hsla, 'hsla');
+        }
 
-        transferLinearSrgbTo8BitImageData(rgba, targetImageData, dataPosition);
+        if (this.params.colorSpace === HueColorSpace.PERCEPTUAL_RGB) {
+            transferSrgbTo8BitImageData(rgba, targetImageData, dataPosition);
+        } else {
+            transferLinearSrgbTo8BitImageData(rgba, targetImageData, dataPosition);
+        }
     }
 }

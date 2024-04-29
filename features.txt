@@ -81,7 +81,7 @@ Modules
         [ ] Guidelines
     - History
         [x] Undo/Redo
-            [ ] Ctrl + Z, Ctrl + Shift + Z, Ctrl + Y shortcuts
+            [x] Ctrl + Z, Ctrl + Shift + Z, Ctrl + Y shortcuts
         [x] Past history list
     - Preferences
         [x] Toggle theme
@@ -90,13 +90,13 @@ Modules
     
 Tools
     - Effects
-        [ ] Implement non-destructive effect layer process
-            [ ] Standard Input/Output API class
-            [ ] Web worker
-            [ ] UI to add/remove in layers dock
+        [x] Implement non-destructive effect layer process
+            [x] Standard Input/Output API class
+            [x] Web worker
+            [x] UI to add/remove in layers dock
             [ ] Wait for bake while exporting
         [ ] Figure out effect categories
-        [ ] Create dock GUI for selecting effects
+        [x] Create dock GUI for selecting effects
         - Effects
             [ ] Gaussian blur
             [ ] Brightness
@@ -147,7 +147,7 @@ Tools
         [ ] Integrate with drawing tools
         [ ] Integrate with effects
         [x] Integrate with move/resize
-        [ ] Integrate with cut/copy/paste
+        [x] Integrate with cut/copy/paste
         [ ] Notify when active selection made was empty, because it was outside the bounds of the current selected layers.
         - Toolbar
             - Selection Modes
@@ -186,13 +186,13 @@ Tools
             [ ] Apply transform button
     - Color picker
         - Design: Background of icon will show current color. Icon color adjusts to be visible based on that. Clicking will bring up color dialog. Inside that dialog can pick color by conventional methods, or use color picker icon inside dialog to pick color from canvas
-        [ ] Background color of tool icon is selected color
-        [ ] Color dialog
+        [x] Background color of tool icon is selected color
+        [x] Color dialog
             [ ] Color gradient selection
-            [ ] Hex
+            [x] Hex
             [ ] RGBA sliders
             [ ] HSL sliders
-            [ ] Pick color from canvas
+            [x] Pick color from canvas
             [ ] Palettes
     - Draw Brush
         - Design: Draws on a raster layer. Bunch of settings.
@@ -213,15 +213,16 @@ Tools
     - Layers
         [x] Drag & Drop reorder
         [x] Show/hide toggle
-        [ ] Background
+        [x] Background
             [x] Show/hide
-            [ ] Change color with color picker
+            [x] Change color with color picker
         [x] Expand layer Groups
-        [ ] Manipulate effect layers
-            [ ] Update image preview automatically
+        [x] Manipulate effect layers
+            [x] Update image preview automatically
         - More settings
             [ ] Move up
             [ ] Move down
+            [x] Rename
             [x] Delete
             [ ] Toggle as mask
             - Lock
