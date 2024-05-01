@@ -131,6 +131,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                 // TODO - maybe use a combination of LinearMipmapLinearFilter and LinearMipmapNearestFilter
                 // depending on the zoom level, one can appear sharper than the other.
                 this.sourceTexture.minFilter = LinearMipmapLinearFilter;
+
                 this.sourceTexture.needsUpdate = true;
                 this.material && (this.material.uniforms.map.value = this.sourceTexture);
                 canvasStore.set('dirty', true);

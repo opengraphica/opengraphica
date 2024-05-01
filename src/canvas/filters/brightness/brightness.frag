@@ -1,5 +1,6 @@
-const int BrightnessModeGamma = 0;
-const int BrightnessModeShift = 1;
+const int BrightnessModeLuminance = 0;
+const int BrightnessModeGamma = 1;
+const int BrightnessModeShift = 2;
 
 uniform float pBrightness;
 uniform vec2 pEffectiveRange;
@@ -38,6 +39,10 @@ vec4 processBrightness(vec4 color) {
             ((1.0 - rgb.g) * pBrightness),
             ((1.0 - rgb.b) * pBrightness)
         );
+    } else if (cMode == BrightnessModeLuminance) {
+        vec3 lch = labToLch(rgbToOklab(color.rgb));
+        lch.x = max(0.0, lch.x + pBrightness);
+        newRgb = oklabToRgb(lchToLab(lch));
     }
 
     // Apply effective range

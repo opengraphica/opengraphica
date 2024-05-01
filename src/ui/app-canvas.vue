@@ -269,7 +269,7 @@ export default defineComponent({
                         const threejsRenderer = new WebGLRenderer({
                             alpha: true,
                             canvas: canvas.value,
-                            premultipliedAlpha: false,
+                            premultipliedAlpha: true,
                             powerPreference: 'high-performance'
                         });
                         threejsRenderer.outputEncoding = sRGBEncoding;

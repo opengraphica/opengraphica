@@ -1,13 +1,16 @@
-import { toRaw } from 'vue';
 import { ColorModel, DrawWorkingFileOptions, DrawWorkingFileLayerOptions, WorkingFileLayer, WorkingFileGroupLayer } from '@/types';
 import canvasStore from '@/store/canvas';
 import preferencesStore from '@/store/preferences';
 import workingFileStore from '@/store/working-file';
-import { DecomposedMatrix, decomposeMatrix, snapPointAtHalfPixel, snapPointAtPixel } from './dom-matrix';
 import layerRenderers from '@/canvas/renderers';
 
-import type { Camera, Scene, WebGLRenderer } from 'three';
+import type {
+    Camera, Scene, WebGLRenderer, TextureEncoding, OrthographicCamera, Mesh, MeshBasicMaterial, CanvasTexture, TextureFilter, WebGLRenderTarget,
+} from 'three';
+import type { ImagePlaneGeometry } from '@/canvas/renderers/webgl/geometries/image-plane-geometry';
+import type { RenderPass } from '@/canvas/renderers/webgl/three/postprocessing/RenderPass';
 import type { EffectComposer } from '@/canvas/renderers/webgl/three/postprocessing/EffectComposer';
+import type { ClassType } from '@/types';
 
 const imageSmoothingZoomRatio = preferencesStore.get('imageSmoothingZoomRatio');
 
@@ -150,4 +153,266 @@ export function drawWorkingFileToCanvasWebgl(composer: EffectComposer | undefine
         console.error(error);
         throw error;
     }
+}
+
+
+
+/**
+ * Draws an image to a canvas using WebGL, which allows for alpha blending in linear RGB color space.
+ */
+const drawImageToCanvas2dWebglCache = {
+    threejsCanvas: undefined as HTMLCanvasElement | undefined,
+    threejsRenderer: undefined as WebGLRenderer | undefined,
+    threejsScene: undefined as Scene | undefined,
+    threejsCamera: undefined as OrthographicCamera | undefined,
+    threejsOverlayRenderTarget: undefined as WebGLRenderTarget | undefined,
+    NearestFilter: undefined as TextureFilter | undefined,
+    sRGBEncoding: undefined as TextureEncoding | undefined,
+    Mesh: undefined as ClassType<Mesh> | undefined,
+    ImagePlaneGeometry: undefined as ClassType<ImagePlaneGeometry> | undefined,
+    MeshBasicMaterial: undefined as ClassType<MeshBasicMaterial> | undefined,
+    CanvasTexture: undefined as ClassType<CanvasTexture> | undefined,
+    threejsComposer: undefined as EffectComposer | undefined,
+    renderPass: undefined as RenderPass | undefined,
+    gammaCorrectionPass: undefined as any | undefined,
+};
+export async function drawImageToCanvas2d(targetCanvas: HTMLCanvasElement, sourceImage: HTMLCanvasElement, x: number, y: number) {
+    const targetImageCtx = targetCanvas.getContext('2d');
+    if (!targetImageCtx) return;
+
+    let {
+        threejsCanvas, threejsRenderer, threejsScene, NearestFilter, sRGBEncoding, threejsCamera, threejsOverlayRenderTarget,
+        Mesh, ImagePlaneGeometry, MeshBasicMaterial, CanvasTexture, threejsComposer, renderPass, gammaCorrectionPass,
+    } = drawImageToCanvas2dWebglCache;
+
+    if (!NearestFilter || !sRGBEncoding) {
+        ({ NearestFilter, sRGBEncoding } = await import('three/src/constants'));
+        drawImageToCanvas2dWebglCache.NearestFilter = NearestFilter;
+        drawImageToCanvas2dWebglCache.sRGBEncoding = sRGBEncoding;
+    }
+    if (!Mesh) {
+        ({ Mesh } = await import('three/src/objects/Mesh'));
+        drawImageToCanvas2dWebglCache.Mesh = Mesh;
+    }
+    if (!ImagePlaneGeometry) {
+        ({ ImagePlaneGeometry } = await import('@/canvas/renderers/webgl/geometries/image-plane-geometry'));
+        drawImageToCanvas2dWebglCache.ImagePlaneGeometry = ImagePlaneGeometry;
+    }
+    if (!MeshBasicMaterial) {
+        ({ MeshBasicMaterial } = await import('three/src/materials/MeshBasicMaterial'));
+        drawImageToCanvas2dWebglCache.MeshBasicMaterial = MeshBasicMaterial;
+    }
+    if (!CanvasTexture) {
+        ({ CanvasTexture } = await import('three/src/textures/CanvasTexture'));
+        drawImageToCanvas2dWebglCache.CanvasTexture = CanvasTexture;
+    }
+
+    if (!threejsCanvas) {
+        threejsCanvas = document.createElement('canvas');
+        drawImageToCanvas2dWebglCache.threejsCanvas = threejsCanvas;
+    }
+    threejsCanvas.width = sourceImage.width;
+    threejsCanvas.height = sourceImage.height;
+
+    if (!threejsOverlayRenderTarget) {
+        const { WebGLRenderTarget } = await import('three/src/renderers/WebGLRenderTarget');
+        threejsOverlayRenderTarget = new WebGLRenderTarget(sourceImage.width, sourceImage.height, {
+            depthBuffer: false,
+            stencilBuffer: false,
+        });
+    }
+    threejsOverlayRenderTarget.setSize(sourceImage.width, sourceImage.height);
+
+    if (!threejsRenderer) {
+        const { WebGLRenderer } = await import('three/src/renderers/WebGLRenderer');
+        threejsRenderer = new WebGLRenderer({
+            alpha: true,
+            canvas: threejsCanvas,
+            premultipliedAlpha: false,
+            preserveDrawingBuffer: true,
+            powerPreference: 'high-performance',
+        });
+        threejsRenderer.setClearColor(0x000000, 0);
+        threejsRenderer.outputEncoding = sRGBEncoding;
+        drawImageToCanvas2dWebglCache.threejsRenderer = threejsRenderer;
+    }
+    threejsRenderer.setSize(sourceImage.width, sourceImage.height, false);
+
+    if (!threejsScene) {
+        const { Scene } = await import('three/src/scenes/Scene');
+        threejsScene = new Scene();
+        drawImageToCanvas2dWebglCache.threejsScene = threejsScene;
+    }
+
+    if (!threejsCamera) {
+        const { OrthographicCamera } = await import('three/src/cameras/OrthographicCamera');
+        threejsCamera = new OrthographicCamera(0, sourceImage.width, 0, sourceImage.height, 0.1, 10000);
+        threejsCamera.position.z = 1;
+        drawImageToCanvas2dWebglCache.threejsCamera = threejsCamera;
+    } else {
+        threejsCamera.right = sourceImage.width;
+        threejsCamera.bottom = sourceImage.height;
+    }
+    threejsCamera.updateProjectionMatrix();
+
+    const targetImageTexture = new CanvasTexture(targetCanvas);
+    targetImageTexture.generateMipmaps = false;
+    targetImageTexture.encoding = sRGBEncoding;
+    targetImageTexture.minFilter = NearestFilter;
+    targetImageTexture.magFilter = NearestFilter;
+
+    const { CustomBlending, OneFactor, SrcAlphaFactor, ZeroFactor } = await import('three/src/constants');
+
+    const targetImageMaterial = new MeshBasicMaterial({
+        transparent: true,
+        depthTest: false,
+        map: targetImageTexture,
+        // blending: CustomBlending,
+        // blendSrcAlpha: OneFactor,
+        // blendDstAlpha: ZeroFactor,
+    });
+
+    const targetImageBgMaterial = new MeshBasicMaterial({
+        transparent: false,
+        depthTest: false,
+        map: targetImageTexture,
+    });
+
+    const targetImageGeometry = new ImagePlaneGeometry(targetCanvas.width, targetCanvas.height);
+
+    const targetImageBgPlane = new Mesh(targetImageGeometry, targetImageBgMaterial);
+    targetImageBgPlane.renderOrder = 1;
+    targetImageBgPlane.translateX(-x);
+    targetImageBgPlane.translateY(-y);
+
+    const targetImagePlane = new Mesh(targetImageGeometry, targetImageMaterial);
+    targetImagePlane.renderOrder = 3;
+    targetImagePlane.translateX(-x);
+    targetImagePlane.translateY(-y);
+
+    const sourceImageTexture = new CanvasTexture(sourceImage);
+    sourceImageTexture.generateMipmaps = false;
+    sourceImageTexture.encoding = sRGBEncoding;
+    sourceImageTexture.minFilter = NearestFilter;
+    sourceImageTexture.magFilter = NearestFilter;
+
+    const sourceImageMaterial = new MeshBasicMaterial({
+        transparent: true,
+        depthTest: false,
+        map: sourceImageTexture,
+    });
+
+    const sourceImageBgMaterial = new MeshBasicMaterial({
+        transparent: false,
+        alphaTest: 0.00001,
+        opacity: 1,
+        depthTest: false,
+        map: sourceImageTexture,
+    });
+
+    const sourceImageGeometry = new ImagePlaneGeometry(sourceImage.width, sourceImage.height);
+
+    const sourceImageBgPlane = new Mesh(sourceImageGeometry, sourceImageBgMaterial);
+    sourceImageBgPlane.renderOrder = 2;
+
+    const sourceImagePlane = new Mesh(sourceImageGeometry, sourceImageMaterial);
+    sourceImagePlane.renderOrder = 4;
+
+    // threejsScene.add(targetImageBgPlane);
+    // threejsScene.add(sourceImageBgPlane);
+    // threejsScene.add(targetImagePlane);
+    // threejsScene.add(sourceImagePlane);
+
+    // if (!threejsComposer) {
+    //     const { EffectComposer } = await import('@/canvas/renderers/webgl/three/postprocessing/EffectComposer');
+    //     threejsComposer = new EffectComposer(threejsRenderer);
+    //     drawImageToCanvas2dWebglCache.threejsComposer = threejsComposer;
+    // }
+    // threejsComposer.setSize(sourceImage.width, sourceImage.height);
+    // if (!renderPass) {
+    //     const { RenderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/RenderPass');
+    //     renderPass = new RenderPass(threejsScene, threejsCamera);
+    //     threejsComposer.addPass(renderPass);
+    //     drawImageToCanvas2dWebglCache.renderPass = renderPass;
+    // }
+    // if (!gammaCorrectionPass) {
+    //     const { ShaderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/ShaderPass');
+    //     const { GammaCorrectionShader } = await import('@/canvas/renderers/webgl/three/shaders/GammaCorrectionShader');
+    //     gammaCorrectionPass = new ShaderPass(GammaCorrectionShader);
+    //     threejsComposer.addPass(gammaCorrectionPass);
+    //     drawImageToCanvas2dWebglCache.gammaCorrectionPass = gammaCorrectionPass;
+    // }
+    
+    // threejsComposer.render();
+
+    threejsScene.add(targetImagePlane);
+    threejsScene.add(sourceImagePlane);
+    threejsRenderer.setRenderTarget(threejsOverlayRenderTarget);
+    threejsRenderer.render(threejsScene, threejsCamera);
+    threejsRenderer.setRenderTarget(null);
+    threejsScene.clear();
+
+    const combinedSourceTargetAlphaMaterial = new MeshBasicMaterial({
+        transparent: true,
+        map: threejsOverlayRenderTarget.texture,
+        blending: CustomBlending,
+        blendSrc: ZeroFactor,
+        blendDst: OneFactor,
+        blendSrcAlpha: OneFactor,
+        blendDstAlpha: ZeroFactor,
+    });
+    const combinedSourceTargetAlphaPlane = new Mesh(sourceImageGeometry, combinedSourceTargetAlphaMaterial);
+    combinedSourceTargetAlphaPlane.renderOrder = 4;
+    const combinedSourceTargetColorMaterial = new MeshBasicMaterial({
+        map: threejsOverlayRenderTarget.texture,
+        alphaTest: 1,
+    });
+    const combinedSourceTargetColorPlane = new Mesh(sourceImageGeometry, combinedSourceTargetColorMaterial);
+    combinedSourceTargetColorPlane.renderOrder = 5;
+
+    threejsScene.add(targetImageBgPlane);
+    threejsScene.add(sourceImageBgPlane);
+    threejsScene.add(combinedSourceTargetAlphaPlane);
+    threejsScene.add(combinedSourceTargetColorPlane);
+    // threejsScene.add(targetImagePlane);
+    threejsRenderer.render(threejsScene, threejsCamera);
+
+    targetImageTexture.dispose();
+    targetImageMaterial.dispose();
+    targetImageBgMaterial.dispose();
+    targetImageGeometry.dispose();
+    sourceImageTexture.dispose();
+    sourceImageMaterial.dispose();
+    sourceImageBgMaterial.dispose();
+    sourceImageGeometry.dispose();
+
+    threejsScene.clear();
+
+    targetImageCtx.imageSmoothingEnabled = false;
+    targetImageCtx.clearRect(x, y, sourceImage.width, sourceImage.height);
+    targetImageCtx.drawImage(threejsCanvas, x, y);
+}
+
+export function cleanDrawImageToCanvas2dCache() {
+    let {
+        threejsRenderer, threejsComposer, renderPass, gammaCorrectionPass,
+    } = drawImageToCanvas2dWebglCache;
+
+    threejsRenderer?.dispose();
+    threejsComposer?.dispose();
+    renderPass?.dispose();
+    gammaCorrectionPass?.dispose();
+
+    drawImageToCanvas2dWebglCache.threejsCanvas = undefined;
+    drawImageToCanvas2dWebglCache.threejsRenderer = undefined;
+    drawImageToCanvas2dWebglCache.threejsScene = undefined;
+    drawImageToCanvas2dWebglCache.sRGBEncoding = undefined;
+    drawImageToCanvas2dWebglCache.threejsCamera = undefined;
+    drawImageToCanvas2dWebglCache.Mesh = undefined;
+    drawImageToCanvas2dWebglCache.ImagePlaneGeometry = undefined;
+    drawImageToCanvas2dWebglCache.MeshBasicMaterial = undefined;
+    drawImageToCanvas2dWebglCache.CanvasTexture = undefined;
+    drawImageToCanvas2dWebglCache.threejsComposer = undefined;
+    drawImageToCanvas2dWebglCache.renderPass = undefined;
+    drawImageToCanvas2dWebglCache.gammaCorrectionPass = undefined;
 }

@@ -85,6 +85,7 @@ function getCanvasColorSpace(): 'srgb' | 'display-p3' {
 
 function getCanvasRenderingContext2DSettings(): CanvasRenderingContext2DSettings {
     return {
+        alpha: true,
         colorSpace: getCanvasColorSpace()
     }
 }

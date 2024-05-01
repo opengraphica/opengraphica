@@ -49,6 +49,7 @@
             "toggleLayerVisibility": "Toggle Layer Visibility",
             "layerSettings": "Layer Settings",
             "rename": "Rename",
+            "addEffect": "Add Effect",
             "delete": "Delete",
             "frames": "Frames",
             "playAnimation": "Play Animation",
@@ -115,7 +116,6 @@
             "add": "Add",
             "layer": "Layer",
             "group": "Group",
-            "effect": "Effect",
             "background": "Background",
             "toggleBackgroundVisibility": "Toggle Background Visibility",
             "noLayers": "No Layers Yet."
@@ -248,7 +248,8 @@
                 "mode": "Mode",
                 "modeOption": {
                     "gamma": "Adjust Gamma",
-                    "shift": "Black/White Shift"
+                    "shift": "Black/White Shift",
+                    "luminance": "Adjust Luminance"
                 },
                 "brightness": "Brightness",
                 "effectiveRange": "Range",

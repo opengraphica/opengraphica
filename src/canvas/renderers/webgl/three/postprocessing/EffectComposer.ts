@@ -143,7 +143,7 @@ class EffectComposer {
         this.renderer.setRenderTarget(currentRenderTarget);
     }
 
-    reset(renderTarget: WebGLRenderTarget) {
+    reset(renderTarget?: WebGLRenderTarget) {
         if (renderTarget === undefined) {
             const size = this.renderer.getSize(new Vector2());
             this._pixelRatio = this.renderer.getPixelRatio();

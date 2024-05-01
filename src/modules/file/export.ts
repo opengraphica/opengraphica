@@ -89,10 +89,14 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                     const { RenderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/RenderPass');
                     const { ShaderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/ShaderPass');
                     const { GammaCorrectionShader } = await import('@/canvas/renderers/webgl/three/shaders/GammaCorrectionShader');
+                    const { WebGLRenderTarget } = await import('three/src/renderers/WebGLRenderTarget');
 
                     const threejsScene = canvasStore.get('threejsScene')!;
 
-                    const threejsCamera = new OrthographicCamera(0, workingFileStore.get('width'), 0, workingFileStore.get('height'), 0.1, 10000);
+                    const width = workingFileStore.get('width');
+                    const height = workingFileStore.get('height');
+
+                    const threejsCamera = new OrthographicCamera(0, width, 0, height, 0.1, 10000);
                     threejsCamera.position.z = 1;
                     threejsCamera.updateProjectionMatrix();
 
@@ -103,11 +107,15 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                         preserveDrawingBuffer: true,
                         powerPreference: 'high-performance'
                     });
+                    threejsRenderer.setClearColor(0x000000, 0);
                     threejsRenderer.outputEncoding = sRGBEncoding;
-                    threejsRenderer.setSize(workingFileStore.get('width'), workingFileStore.get('height'));
+                    threejsRenderer.setSize(width, height);
+
+                    // const renderTarget = new WebGLRenderTarget(width, height);
+                    // threejsRenderer.setRenderTarget(renderTarget);
 
                     const threejsComposer = new EffectComposer(threejsRenderer);
-                    const renderPass = new RenderPass(threejsScene, threejsCamera);
+                    const renderPass = new RenderPass(threejsScene, threejsCamera, undefined, undefined, 1);
                     const gammaCorrectionPass = new ShaderPass(GammaCorrectionShader);
                     threejsComposer.addPass(renderPass);
                     threejsComposer.addPass(gammaCorrectionPass);
@@ -119,10 +127,20 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                         threejsCamera
                     );
 
+                    // const pixels = new Uint8Array(width * height * 4);
+                    // threejsRenderer.readRenderTargetPixels(renderTarget, 0, 0, width, height, pixels);
+                    // console.log(pixels);
+
                     threejsRenderer.dispose();
                     threejsComposer.dispose();
                     renderPass.dispose();
                     gammaCorrectionPass.dispose();
+
+                    // canvas = document.createElement('canvas');
+                    // canvas.width = width;
+                    // canvas.height = height;
+                    // const ctx = canvas.getContext('2d')!;
+                    // ctx.putImageData(new ImageData(Uint8ClampedArray.from(pixels), width, height), 0, 0);
                 }
             }
             if (options.blitActiveSelectionMask && activeSelectionMask.value != null) {
@@ -148,7 +166,11 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                         if (blob) {
                             try {
                                 const data = [new ClipboardItem({ [blob.type]: blob })];
-                                await (navigator.clipboard as any).write(data);
+                                try {
+                                    await (navigator.clipboard as any).write(data);
+                                } catch (error) {
+                                    console.log(error);
+                                }
                                 if (options.generateImageHash) {
                                     try {
                                         results.generatedImageHash = await generateImageBlobHash(blob);

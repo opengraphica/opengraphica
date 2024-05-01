@@ -53,6 +53,10 @@
                                 <i class="bi bi-alphabet"></i>
                                 <span v-t="'app.layerList.rename'"></span>
                             </el-menu-item>
+                            <el-menu-item index="effect">
+                                <i class="bi bi-magic"></i>
+                                <span v-t="'app.layerList.addEffect'"></span>
+                            </el-menu-item>
                             <el-menu-item index="delete">
                                 <i class="bi bi-trash"></i>
                                 <span v-t="'app.layerList.delete'"></span>
@@ -265,6 +269,8 @@ export default defineComponent({
                 runModule('layer', 'rename', {
                     layerId: layer.id,
                 })
+            } else if (action === 'effect') {
+                await runModule('layer', 'layerEffectBrowser', { layerId: layer.id });
             } else if (action === 'delete') {
                 historyStore.dispatch('runAction', {
                     action: new DeleteLayersAction([layer.id])

@@ -10,10 +10,6 @@
                 <span class="bi bi-folder-plus el-text-alignment-fix--above mr-1" aria-hidden="true"></span>
                 {{ $t('dock.layers.group') }}
             </el-button>
-            <el-button link type="primary" class="px-0" @click="onAddEffect">
-                <span class="bi bi-magic mr-1" aria-hidden="true"></span>
-                {{ $t('dock.layers.effect') }}
-            </el-button>
         </div>
     </div>
     <div class="ogr-dock-content is-spaced-between">
@@ -74,7 +70,6 @@ import preferencesStore from '@/store/preferences';
 import workingFileStore, { ensureUniqueLayerSiblingName, getLayerById } from '@/store/working-file';
 import { InsertLayerAction } from '@/actions/insert-layer';
 import { InsertEmptyLayerOptions, InsertGroupLayerOptions, ColorModel } from '@/types';
-import { runModule } from '@/modules';
 import appEmitter from '@/lib/emitter';
 
 const activeTab = ref<string>('file');
@@ -159,10 +154,6 @@ export default defineComponent({
             await onAddLayerOrGroup('Group');
         }
 
-        async function onAddEffect() {
-            await runModule('layer', 'layerEffectBrowser');
-        }
-
         function onChangeBackgroundColor() {
             appEmitter.emit('app.dialogs.openFromDock', {
                 name: 'color-picker',
@@ -208,7 +199,6 @@ export default defineComponent({
             backgroundStyle,
             onAddLayer,
             onAddGroup,
-            onAddEffect,
             onChangeBackgroundColor,
             onScrollLayerList,
             onScrollByAmount

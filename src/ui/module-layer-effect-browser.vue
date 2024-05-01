@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
+import { defineComponent, ref, computed, onMounted, onUnmounted, nextTick, type PropType } from 'vue';
 import layerFilterList from '@/config/layer-filters.json';
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElAutoGrid from './el-auto-grid.vue';
@@ -72,6 +72,12 @@ export default defineComponent({
         'update:dialogSize',
         'close'
     ],
+    props: {
+        layerId: {
+            type: Number,
+            default: undefined,
+        }
+    },
     setup(props, { emit }) {
         emit('update:title', 'module.layerEffectBrowser.title');
         emit('update:dialogSize', 'big');
@@ -110,7 +116,7 @@ export default defineComponent({
         onMounted(() => {
             nextTick(async () => {
                 try {
-                    const selectedLayer = getSelectedLayers()[0];
+                    const selectedLayer = props.layerId != null ? getLayerById(props.layerId) : getSelectedLayers()[0];
                     if (!selectedLayer) {
                         throw new Error('module.layerEffectBrowser.generationErrorNoLayer');
                     }
@@ -162,7 +168,7 @@ export default defineComponent({
         });
 
         async function onSelectFilter(filterName: string) {
-            const selectedLayerIds = workingFileStore.get('selectedLayerIds');
+            const selectedLayerIds = props.layerId != null ? [props.layerId] : workingFileStore.get('selectedLayerIds');
             const canvasFilter = new (await getCanvasFilterClass(filterName))();
             const addFilterActions = [];
             for (const id of selectedLayerIds) {

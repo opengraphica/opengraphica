@@ -7,6 +7,7 @@ import { markRaw } from 'vue';
 import { BaseAction } from './base';
 import imageStore from './data/image-store';
 import { createEmptyCanvasWith2dContext } from '@/lib/image';
+import { drawImageToCanvas2d } from '@/lib/canvas';
 import canvasStore from '@/store/canvas';
 import { prepareStoredImageForEditing, reserveStoredImage, unreserveStoredImage } from '@/store/image';
 import workingFileStore, { getLayerById, regenerateLayerThumbnail, getCanvasRenderingContext2DSettings } from '@/store/working-file';
@@ -78,13 +79,15 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                                 if (!oldChunkCtx) break;
                                 oldChunkCtx.drawImage(sourceCanvas, -updateChunk.x, -updateChunk.y);
                                 this.oldRasterUpdateChunks.push({ data: oldChunkCanvas, x: updateChunk.x, y: updateChunk.y, width: updateChunk.width, height: updateChunk.height });
-                                if (updateChunk.mode !== 'overlay') sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
-                                sourceCtx.drawImage(updateChunk.data, updateChunk.x, updateChunk.y);
+                                await drawImageToCanvas2d(sourceCanvas, updateChunk.data, updateChunk.x, updateChunk.y);
+                                // if (updateChunk.mode !== 'overlay') sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
+                                // sourceCtx.drawImage(updateChunk.data, updateChunk.x, updateChunk.y);
                             }
                         } else {
                             for (const updateChunk of this.newRasterUpdateChunks) {
-                                if (updateChunk.mode !== 'overlay') sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
-                                sourceCtx.drawImage(updateChunk.data, updateChunk.x, updateChunk.y);
+                                await drawImageToCanvas2d(sourceCanvas, updateChunk.data, updateChunk.x, updateChunk.y);
+                                // if (updateChunk.mode !== 'overlay') sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
+                                // sourceCtx.drawImage(updateChunk.data, updateChunk.x, updateChunk.y);
                             }
                         }
                         layer.data.chunkUpdateId = uuidv4();

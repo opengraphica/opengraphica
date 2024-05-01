@@ -6,5 +6,6 @@ export * from './keyboard-map';
 export * from './metrics';
 export * from './serialized-file';
 export * from './tool-layout-config';
+export * from './typescript-language';
 export * from './vector';
 export * from './working-file';
