@@ -1,7 +1,7 @@
 import { ColorModel, DrawWorkingFileOptions, DrawWorkingFileLayerOptions, WorkingFileLayer, WorkingFileGroupLayer } from '@/types';
 import canvasStore from '@/store/canvas';
 import preferencesStore from '@/store/preferences';
-import workingFileStore from '@/store/working-file';
+import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import layerRenderers from '@/canvas/renderers';
 
 import type {
@@ -179,6 +179,13 @@ export async function drawImageToCanvas2d(targetCanvas: HTMLCanvasElement, sourc
     const targetImageCtx = targetCanvas.getContext('2d');
     if (!targetImageCtx) return;
 
+    const sourceCroppedTargetCanvas = document.createElement('canvas');
+    sourceCroppedTargetCanvas.width = sourceImage.width;
+    sourceCroppedTargetCanvas.height = sourceImage.height;
+    const sourceCroppedTargetCtx = sourceCroppedTargetCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
+    if (!sourceCroppedTargetCtx) return;
+    sourceCroppedTargetCtx.drawImage(targetCanvas, -x, -y);
+
     let {
         threejsCanvas, threejsRenderer, threejsScene, NearestFilter, sRGBEncoding, threejsCamera, threejsOverlayRenderTarget,
         Mesh, ImagePlaneGeometry, MeshBasicMaterial, CanvasTexture, threejsRasterOverlayShaderMaterial,
@@ -245,7 +252,8 @@ export async function drawImageToCanvas2d(targetCanvas: HTMLCanvasElement, sourc
     }
     threejsCamera.updateProjectionMatrix();
 
-    const targetImageTexture = new CanvasTexture(targetCanvas);
+    // const targetImageTexture = new CanvasTexture(targetCanvas);
+    const targetImageTexture = new CanvasTexture(sourceCroppedTargetCanvas);
     targetImageTexture.generateMipmaps = false;
     targetImageTexture.encoding = sRGBEncoding;
     targetImageTexture.minFilter = NearestFilter;
@@ -259,12 +267,12 @@ export async function drawImageToCanvas2d(targetCanvas: HTMLCanvasElement, sourc
 
     if (!threejsRasterOverlayShaderMaterial) {
         const { createRasterOverlayShaderMaterial } = await import('@/canvas/renderers/webgl/shaders');
-        threejsRasterOverlayShaderMaterial = createRasterOverlayShaderMaterial(targetImageTexture, sourceImageTexture, x, y);
+        threejsRasterOverlayShaderMaterial = createRasterOverlayShaderMaterial(targetImageTexture, sourceImageTexture, 0, 0);
         threejsRasterOverlayShaderMaterial.needsUpdate = true;
         drawImageToCanvas2dWebglCache.threejsRasterOverlayShaderMaterial = threejsRasterOverlayShaderMaterial;
     } else {
         const { updateRasterOverlayShaderMaterial } = await import('@/canvas/renderers/webgl/shaders');
-        updateRasterOverlayShaderMaterial(threejsRasterOverlayShaderMaterial, targetImageTexture, sourceImageTexture, x, y);
+        updateRasterOverlayShaderMaterial(threejsRasterOverlayShaderMaterial, targetImageTexture, sourceImageTexture, 0, 0);
     }
 
     const imageGeometry = new ImagePlaneGeometry(sourceImage.width, sourceImage.height);
@@ -278,7 +286,7 @@ export async function drawImageToCanvas2d(targetCanvas: HTMLCanvasElement, sourc
     targetImageTexture.dispose();
     sourceImageTexture.dispose();
     imageGeometry.dispose();
-    
+
     targetImageCtx.imageSmoothingEnabled = false;
     targetImageCtx.clearRect(x, y, sourceImage.width, sourceImage.height);
     targetImageCtx.drawImage(threejsCanvas, x, y);

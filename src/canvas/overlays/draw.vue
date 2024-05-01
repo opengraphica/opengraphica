@@ -8,8 +8,8 @@
                 :style="{
                     transform: 'scale(' + brushSize + ',' + brushSize + ')',
                     position: 'absolute',
-                    left: cursorHoverPosition.x + 'px',
-                    top: cursorHoverPosition.y + 'px'
+                    left: cursorHoverPosition.x - 1 + 'px',
+                    top: cursorHoverPosition.y - 1 + 'px'
                 }"
                 xmlns="http://www.w3.org/2000/svg">
                 <path :d="brushShape" stroke="#333333" :stroke-width="drawPreviewStrokeWidth / brushSize" fill="transparent"/>

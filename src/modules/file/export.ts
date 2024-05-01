@@ -166,11 +166,7 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                         if (blob) {
                             try {
                                 const data = [new ClipboardItem({ [blob.type]: blob })];
-                                try {
-                                    await (navigator.clipboard as any).write(data);
-                                } catch (error) {
-                                    console.log(error);
-                                }
+                                await (navigator.clipboard as any).write(data);
                                 if (options.generateImageHash) {
                                     try {
                                         results.generatedImageHash = await generateImageBlobHash(blob);
