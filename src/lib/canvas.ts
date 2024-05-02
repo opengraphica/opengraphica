@@ -252,7 +252,6 @@ export async function drawImageToCanvas2d(targetCanvas: HTMLCanvasElement, sourc
     }
     threejsCamera.updateProjectionMatrix();
 
-    // const targetImageTexture = new CanvasTexture(targetCanvas);
     const targetImageTexture = new CanvasTexture(sourceCroppedTargetCanvas);
     targetImageTexture.generateMipmaps = false;
     targetImageTexture.encoding = sRGBEncoding;

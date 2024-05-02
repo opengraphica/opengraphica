@@ -17,12 +17,15 @@ import { getStoredImageOrCanvas, createStoredImage, prepareStoredImageForArchiva
 import historyStore, { createHistoryReserveToken, historyReserveQueueFree } from '@/store/history';
 import workingFileStore, { getSelectedLayers, getLayerById, getLayerGlobalTransform } from '@/store/working-file';
 
+import DrawableCanvas from '@/canvas/renderers/drawable/canvas';
+
 import type { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { InsertLayerAction } from '@/actions/insert-layer';
 import { UpdateLayerAction } from '@/actions/update-layer';
 
 import type { InsertRasterLayerOptions, UpdateRasterLayerOptions, WorkingFileAnyLayer } from '@/types';
+import type { BrushStrokeData } from '@/canvas/drawables/brush-stroke';
 
 const devicePixelRatio = window.devicePixelRatio || 1;
 
@@ -40,6 +43,9 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
     private drawingOnLayerScales: { x: number; y: number }[] = [];
     private drawingPoints: DOMPoint[] = [];
 
+    private drawablePreviewCanvas: DrawableCanvas | null = null;
+    private brushStrokeDrawableUuid: string | null = null;
+
     private brushShapeImage: HTMLImageElement | null = null;
 
     private updateChunkBounds = {
@@ -51,6 +57,23 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
 
     onEnter(): void {
         super.onEnter();
+
+        this.drawablePreviewCanvas = new DrawableCanvas({ updateChunkSize: this.drawingDraftChunkSize });
+        this.drawablePreviewCanvas.onDrawn((event) => {
+            for (const [layerIndex, layer] of this.drawingOnLayers.entries()) {
+                if (!layer.draft) continue;
+                layer.draft.updateChunks.push({
+                    x: event.sourceX,
+                    y: event.sourceY,
+                    width: this.drawingDraftChunkSize,
+                    height: this.drawingDraftChunkSize,
+                    data: event.canvas,
+                });
+                layer.draft.lastUpdateTimestamp = window.performance.now();
+                canvasStore.set('dirty', true);
+            }
+        });
+        this.brushStrokeDrawableUuid = this.drawablePreviewCanvas.add('brushStroke');
 
         this.selectedLayerIdsUnwatch = watch(() => workingFileStore.state.selectedLayerIds, (newIds, oldIds) => {
             const unusedOldIds = oldIds?.filter(id => newIds.indexOf(id) === -1) ?? [];
@@ -128,6 +151,10 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
 
     onLeave(): void {
         super.onLeave();
+
+        this.drawablePreviewCanvas?.dispose();
+        this.drawablePreviewCanvas = null;
+
         this.brushShapeUnwatch?.();
         this.brushShapeUnwatch = null;
         this.brushSizeUnwatch?.();
@@ -179,9 +206,12 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         if (this.touches.length > 1) {
             this.drawingPointerId = null;
             this.drawingPoints = [];
-            for (const layer of getSelectedLayers()) {
-                layer.draft = null;
-            }
+            (async () => {
+                await historyReserveQueueFree();
+                for (const layer of getSelectedLayers()) {
+                    layer.draft = null;
+                }
+            })();
             // this.drawingPointerId = this.touches[0].id;
             // this.onDrawStart();
         }
@@ -498,6 +528,24 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
             }
 
             // Draw the line to each canvas chunk
+
+            this.drawablePreviewCanvas?.draw([
+                {
+                    uuid: this.brushStrokeDrawableUuid!,
+                    data: {
+                        color: brushColor.value.style,
+                        points: points.map(point => ({
+                            x: point.x,
+                            y: point.y,
+                            size: brushSize.value,
+                            tiltX: 0,
+                            tiltY: 0,
+                            twist: 0,
+                        }))
+                    } as BrushStrokeData,
+                }
+            ]);
+
             try {
                 let draftCanvasIndex = 0;
                 for (let quadrantX = minQuadrantX; quadrantX <= maxQuadrantX; quadrantX++) {
@@ -514,7 +562,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                         ctx.clearRect(0, 0, chunkSize, chunkSize);
 
                         // Draw the line
-                        this.drawPreviewPoints(points, ctx, previewRatioX, previewRatioY, previewBrushSize, -quadrantX * chunkSize, -quadrantY * chunkSize);
+                        // this.drawPreviewPoints(points, ctx, previewRatioX, previewRatioY, previewBrushSize, -quadrantX * chunkSize, -quadrantY * chunkSize);
 
                         draftCanvasIndex++;
                     }
@@ -524,30 +572,30 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                 // TODO - fallback
             }
 
-            for (const [layerIndex, layer] of this.drawingOnLayers.entries()) {
-                const layerScale = this.drawingOnLayerScales[layerIndex];
-                if (layer.type === 'raster') {
-                    if (!layer.draft) continue;
+            // for (const [layerIndex, layer] of this.drawingOnLayers.entries()) {
+            //     const layerScale = this.drawingOnLayerScales[layerIndex];
+            //     if (layer.type === 'raster') {
+            //         if (!layer.draft) continue;
                     
-                    let draftCanvasIndex = 0;
-                    for (let quadrantX = minQuadrantX; quadrantX <= maxQuadrantX; quadrantX++) {
-                        for (let quadrantY = minQuadrantY; quadrantY <= maxQuadrantY; quadrantY++) {
-                            layer.draft.updateChunks.push({
-                                x: quadrantX * chunkSize,
-                                y: quadrantY * chunkSize,
-                                width: chunkSize,
-                                height: chunkSize,
-                                data: this.drawingDraftCanvases[draftCanvasIndex]
-                            });
+            //         let draftCanvasIndex = 0;
+            //         for (let quadrantX = minQuadrantX; quadrantX <= maxQuadrantX; quadrantX++) {
+            //             for (let quadrantY = minQuadrantY; quadrantY <= maxQuadrantY; quadrantY++) {
+            //                 layer.draft.updateChunks.push({
+            //                     x: quadrantX * chunkSize,
+            //                     y: quadrantY * chunkSize,
+            //                     width: chunkSize,
+            //                     height: chunkSize,
+            //                     data: this.drawingDraftCanvases[draftCanvasIndex]
+            //                 });
 
-                            draftCanvasIndex++;
-                        }
-                    }
-                    layer.draft.lastUpdateTimestamp = window.performance.now();
-                }
-            }
+            //                 draftCanvasIndex++;
+            //             }
+            //         }
+            //         layer.draft.lastUpdateTimestamp = window.performance.now();
+            //     }
+            // }
 
-            canvasStore.set('dirty', true);
+            // canvasStore.set('dirty', true);
         }
     }
 

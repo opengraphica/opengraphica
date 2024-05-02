@@ -2,18 +2,6 @@ import { v4 as uuidv4 } from 'uuid';
 import imageDatabase from './data/image-database';
 import { createImageBlobFromCanvas, createImageBlobFromImage, createImageFromBlob, createCanvasFromImage } from '@/lib/image';
 
-// Get a unique id to identify this tab's history in the database
-let tabUuid: string | null = null;
-try {
-    tabUuid = sessionStorage.getItem('openGraphica_historyTabUuid');
-} catch (error) {}
-if (!tabUuid) {
-    tabUuid = uuidv4();
-    try {
-        sessionStorage.setItem('openGraphica_historyTabUuid', tabUuid + '');
-    } catch (error) {}
-}
-
 // Map of uuid to image store data
 
 interface StoredImage {
