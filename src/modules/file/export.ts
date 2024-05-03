@@ -129,7 +129,6 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
 
                     // const pixels = new Uint8Array(width * height * 4);
                     // threejsRenderer.readRenderTargetPixels(renderTarget, 0, 0, width, height, pixels);
-                    // console.log(pixels);
 
                     threejsRenderer.dispose();
                     threejsComposer.dispose();

@@ -13,7 +13,7 @@ export interface BrushStrokePoint {
 export interface BrushStrokeData {
     color?: string; // Hex code
     points?: BrushStrokePoint[];
-    smoothing?: number; // Number of points to check for line smoothing
+    smoothing?: number; // Number of historical points to check for line smoothing. A value of 1 averages 3 points: previous, current, next.
 }
 
 export default class BrushStroke implements Drawable<BrushStrokeData> {
@@ -29,6 +29,27 @@ export default class BrushStroke implements Drawable<BrushStrokeData> {
         this.color = data?.color ?? '#000000';
         this.points = data?.points ?? [];
         this.smoothing = data?.smoothing ?? 0;
+
+        let left = Infinity;
+        let top = Infinity;
+        let right = -Infinity;
+        let bottom = -Infinity;
+
+        for (let i = this.points.length - 1; i >= Math.max(0, this.points.length - 3 - this.smoothing); i--) {
+            const { x, y, size } = this.points[i];
+            const drawMargin = size + 16;
+            if (x - drawMargin < left) left = x - drawMargin;
+            if (x + drawMargin > right) right = x + drawMargin;
+            if (y - drawMargin < top) top = y - drawMargin;
+            if (y + drawMargin > bottom) bottom = y + drawMargin;
+        }
+
+        return {
+            left,
+            right,
+            top,
+            bottom,
+        };
     }
 
     draw2d(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) {

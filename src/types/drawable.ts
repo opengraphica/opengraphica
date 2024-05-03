@@ -27,16 +27,19 @@ export interface DrawableUpdate<T = DefaultDrawableData> {
 
 export type DrawableOptions<T = DefaultDrawableData> = DrawableOptions2d<T> | DrawableOptionsWebgl<T>;
 
+export interface DrawableUpdateBounds {
+    left: number;
+    right: number;
+    top: number;
+    bottom: number;
+}
+
 export interface Drawable<T = DefaultDrawableData> {
-    update: (data: T) => void;
+    update: (data: T) => DrawableUpdateBounds;
     draw2d: (context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) => void;
     drawWebgl: () => void;
     dispose: () => void;
 }
 export interface DrawableConstructor {
     new (options: DrawableOptions): Drawable;
-}
-
-export interface DrawableCanvasOptions {
-    updateChunkSize?: number;
 }

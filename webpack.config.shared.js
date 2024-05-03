@@ -114,6 +114,7 @@ module.exports = function setupConfig(config) {
                     { from: path.resolve(__dirname, 'src/assets/icons'), to: 'icons' },
                     { from: path.resolve(__dirname, 'src/assets/images'), to: 'images' },
                     { from: path.resolve(__dirname, 'src/workers'), to: 'js/workers' },
+                    { from: path.resolve(__dirname, 'src/lib/feature-detection/workers'), to: 'js/lib/feature-detection/workers' },
                     { from: path.resolve(__dirname, 'node_modules/bootstrap-icons/font/fonts'), to: 'css/fonts' }
                 ]
             }),

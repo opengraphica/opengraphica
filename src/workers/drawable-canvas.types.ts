@@ -2,7 +2,14 @@ import type { DrawableUpdate } from '@/types';
 
 export interface CreateCanvasRequest {
     type: 'CREATE_CANVAS';
-    canvas: OffscreenCanvas;
+    canvas1: OffscreenCanvas;
+    canvas2: OffscreenCanvas;
+    renderScale: number;
+}
+
+export interface SetCanvasRenderScaleRequest {
+    type: 'SET_CANVAS_RENDER_SCALE',
+    renderScale: number;
 }
 
 export interface AddDrawableRequest {
@@ -22,14 +29,21 @@ export interface DrawCanvasRequest {
     drawableUpdates: DrawableUpdate[],
 }
 
+export interface DrawCompleteAcknowledgedRequest {
+    type: 'DRAW_COMPLETE_ACKNOWLEDGED'
+}
+
 export interface TerminateRequest {
     type: 'TERMINATE';
 }
 
-export type DrawQueueRequest = CreateCanvasRequest | AddDrawableRequest | RemoveDrawableRequest | DrawCanvasRequest | TerminateRequest;
+export type DrawQueueRequest = CreateCanvasRequest | SetCanvasRenderScaleRequest | AddDrawableRequest | RemoveDrawableRequest | DrawCanvasRequest | TerminateRequest | DrawCompleteAcknowledgedRequest;
 
 export interface DrawCompleteResult {
     type: 'DRAW_COMPLETE_RESULT';
+    buffer: number;
+    sourceX: number;
+    sourceY: number;
 }
 
 export type DrawQueueResult = DrawCompleteResult;

@@ -1,48 +1,135 @@
+/*
+ * This class provides an interface to draw objects called "Drawables" (inside the src/canvas/drawables) folder
+ * to a HTML canvas efficiently. It makes use of the OffscreenCanvas API if available, and only renders the areas
+ * of the image which have been updated in the current draw frame.
+ */
+
 import { v4 as uuidv4 } from 'uuid';
-import { createDrawableCanvas, addDrawable, removeDrawable, renderDrawableCanvas, destroyDrawableCanvas } from '@/workers/drawable-canvas.interface';
-import type { DrawableCanvasOptions, DefaultDrawableData, DrawableUpdate } from '@/types';
+import canvasStore from '@/store/canvas';
+import {
+    createDrawableCanvas, setDrawableCanvasScale, addDrawable, removeDrawable, renderDrawableCanvas, destroyDrawableCanvas,
+} from '@/workers/drawable-canvas.interface';
+import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
+import { isOffscreenCanvasSupported } from '@/lib/feature-detection/offscreen-canvas';
+import { nearestPowerOf2 } from '@/lib/math';
+import type { DefaultDrawableData, Drawable, DrawableConstructor, DrawableRenderMode, DrawableUpdate } from '@/types';
+
+export interface DrawableCanvasOptions {
+    width?: number;
+    height?: number;
+    scale?: number;
+}
 
 interface DrawableInfo {
     name: string;
     data: any;
+    drawable?: Drawable;
 }
 
-interface DrawnCallbackEvent {
+export interface DrawnCallbackEvent {
     canvas: HTMLCanvasElement;
     sourceX: number;
     sourceY: number;
 }
 
 export default class DrawableCanvas {
-    private updateChunkSize: number;
+    private isInitialized: boolean = false;
+    private renderMode: DrawableRenderMode;
+    private scale: number;
     private drawables = new Map<string, DrawableInfo>();
-    private canvas: HTMLCanvasElement;
+    private drawableClassMap: Record<string, DrawableConstructor> = {};
+    private mainThreadCanvas: HTMLCanvasElement | undefined = undefined;
+    private mainThreadCanvasCtx2d: CanvasRenderingContext2D | undefined = undefined;
     private offscreenCanvasUuid: string | undefined = undefined;
+    private isWaitingOnOffscreenCanvasResult = false;
+    private pendingDrawUpdates: DrawableUpdate[] | undefined = undefined;
     private onDrawnCallback: ((event: DrawnCallbackEvent) => void) | undefined = undefined;
 
     constructor(options: DrawableCanvasOptions) {
-        this.updateChunkSize = options.updateChunkSize ?? 64;
+        this.renderMode = '2d';
+        this.scale = options.scale ?? 1;
+        this.init();
+    }
 
-        this.canvas = document.createElement('canvas');
-        this.canvas.width = this.updateChunkSize;
-        this.canvas.height = this.updateChunkSize;
-
-        if (window.OffscreenCanvas) {
+    private async init() {
+        const canUseOffscrenCanvas = await isOffscreenCanvasSupported();
+        if (canUseOffscrenCanvas) {
             try {
                 this.offscreenCanvasUuid = createDrawableCanvas({
-                    onscreenCanvas: this.canvas,
                     onDrawn: (event) => {
-                        this.onDrawnCallback?.({
-                            canvas: this.canvas,
-                            sourceX: event.sourceX,
-                            sourceY: event.sourceY,
-                        });
+                        if (!canvasStore.state.dirty) {
+                            this.onOffscreenCanvasDrawn(event);
+                        } else {
+                            requestAnimationFrame(() => {
+                                this.onOffscreenCanvasDrawn(event);
+                            });
+                        }
                     }
                 });
             } catch (error) {
                 console.error('DrawableCanvas: error setting up OffscreenCanvas. ', error);
-                // Default to main thread canvas
             }
+        }
+        if (!this.offscreenCanvasUuid) {
+            this.mainThreadCanvas = document.createElement('canvas');
+            this.mainThreadCanvas.width = 64;
+            this.mainThreadCanvas.height = 64;
+            if (this.renderMode === '2d') {
+                this.mainThreadCanvasCtx2d = this.mainThreadCanvas.getContext('2d', getCanvasRenderingContext2DSettings()) ?? undefined;
+            }
+        }
+
+        if (!this.offscreenCanvasUuid) {
+            this.drawableClassMap = (await import('@/canvas/drawables')).default;
+        }
+
+        this.isInitialized = true;
+
+        // Setup offscreen canvas state if some properties were modified before initialization.
+        if (this.offscreenCanvasUuid) {
+            setDrawableCanvasScale(this.offscreenCanvasUuid, this.scale);
+            for (const [uuid, { name, data }] of this.drawables.entries()) {
+                addDrawable(this.offscreenCanvasUuid, uuid, name, data);
+            }
+        } else {
+            for (const uuid of this.drawables.keys()) {
+                this.initializeDrawable(uuid);
+            }
+        }
+    }
+
+    private initializeDrawable(uuid: string) {
+        if (!this.offscreenCanvasUuid) {
+            const drawableInfo = this.drawables.get(uuid);
+            if (!drawableInfo) return;
+            const { name } = drawableInfo;
+            drawableInfo.drawable = new this.drawableClassMap[name]({
+                renderMode: this.renderMode,
+                scene: undefined as never,
+            });
+        }
+    }
+
+    private onOffscreenCanvasDrawn(event: DrawnCallbackEvent) {
+        this.isWaitingOnOffscreenCanvasResult = false;
+        this.onDrawnCallback?.({
+            canvas: event.canvas,
+            sourceX: event.sourceX,
+            sourceY: event.sourceY,
+        });
+        const pendingDrawUpdates = this.pendingDrawUpdates;
+        if (pendingDrawUpdates) {
+            this.pendingDrawUpdates = undefined;
+            this.draw(pendingDrawUpdates);
+        }
+    }
+
+    setScale(newScale: number) {
+        if (newScale == this.scale) return;
+        this.scale = newScale;
+        if (!this.isInitialized) return;
+        if (this.offscreenCanvasUuid) {
+            setDrawableCanvasScale(this.offscreenCanvasUuid, newScale);
         }
     }
 
@@ -52,8 +139,11 @@ export default class DrawableCanvas {
             name,
             data,
         });
-        if (this.offscreenCanvasUuid) {
-            addDrawable(this.offscreenCanvasUuid, uuid, name, data);
+        if (this.isInitialized) {
+            if (this.offscreenCanvasUuid) {
+                addDrawable(this.offscreenCanvasUuid, uuid, name, data);
+            }
+            this.initializeDrawable(uuid);
         }
         return uuid;
     }
@@ -61,16 +151,78 @@ export default class DrawableCanvas {
     remove(uuid: string) {
         const drawableInfo = this.drawables.get(uuid);
         if (!drawableInfo) return;
+        this.drawables.delete(uuid);
+        if (!this.isInitialized) return;
         if (this.offscreenCanvasUuid) {
             removeDrawable(this.offscreenCanvasUuid, uuid);
         }
-        this.drawables.delete(uuid);
     }
 
-    draw(updates: DrawableUpdate[]) {
+    draw(drawableUpdates: DrawableUpdate[]) {
         if (this.offscreenCanvasUuid) {
-            renderDrawableCanvas(this.offscreenCanvasUuid, updates);
+            if (!this.isWaitingOnOffscreenCanvasResult) {
+                this.isWaitingOnOffscreenCanvasResult = true;
+                renderDrawableCanvas(this.offscreenCanvasUuid, drawableUpdates);
+            } else {
+                this.pendingDrawUpdates = drawableUpdates;
+            }
+        } else if (this.renderMode === '2d') {
+            this.draw2d(drawableUpdates);
+        } else if (this.renderMode === 'webgl') {
+            this.drawWebgl(drawableUpdates);
         }
+    }
+
+    draw2d(drawableUpdates: DrawableUpdate[]) {
+        if (!this.mainThreadCanvasCtx2d) return;
+        const ctx = this.mainThreadCanvasCtx2d;
+        const canvas = ctx.canvas;
+        const renderScale = this.scale;
+
+        let left = Infinity;
+        let top = Infinity;
+        let right = -Infinity;
+        let bottom = -Infinity;
+
+        for (const drawableUpdate of drawableUpdates) {
+            const drawableInfo = this.drawables.get(drawableUpdate.uuid);
+            if (!drawableInfo?.drawable) continue;
+            const drawingBounds = drawableInfo.drawable.update(drawableUpdate.data);
+            if (drawingBounds.left < left) left = drawingBounds.left;
+            if (drawingBounds.right > right) right = drawingBounds.right;
+            if (drawingBounds.top < top) top = drawingBounds.top;
+            if (drawingBounds.bottom > bottom) bottom = drawingBounds.bottom;
+        }
+
+        let drawX = left == Infinity ? 0 : Math.max(0, Math.floor(left * renderScale));
+        let drawY = top == Infinity ? 0 : Math.max(0, Math.floor(top * renderScale));
+
+        const newCanvasWidth = Math.pow(2, nearestPowerOf2((right - left) * renderScale));
+        const newCanvasHeight = Math.pow(2, nearestPowerOf2((bottom - top) * renderScale));
+        if (newCanvasWidth && newCanvasHeight && (newCanvasWidth != canvas.width || newCanvasHeight != canvas.height)) {
+            canvas.width = newCanvasWidth;
+            canvas.height = newCanvasHeight;
+        }
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.save();
+        ctx.translate(-drawX, -drawY);
+        ctx.scale(renderScale, renderScale);
+        for (const { drawable } of this.drawables.values()) {
+            if (!drawable) continue;
+            drawable.draw2d(ctx);
+        }
+        ctx.restore();
+
+        this.onDrawnCallback?.({
+            canvas,
+            sourceX: drawX,
+            sourceY: drawY,
+        });
+    }
+
+    drawWebgl(drawableUpdates: DrawableUpdate[]) {
+        // TODO
     }
 
     onDrawn(callback: (event: DrawnCallbackEvent) => void) {
@@ -78,6 +230,8 @@ export default class DrawableCanvas {
     }
 
     dispose() {
+        this.onDrawnCallback = undefined;
+        this.drawables.clear();
         if (this.offscreenCanvasUuid) {
             destroyDrawableCanvas(this.offscreenCanvasUuid);
         }
