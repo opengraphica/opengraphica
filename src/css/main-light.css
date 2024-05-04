@@ -8311,6 +8311,9 @@ body.ogr-full-page .opengraphica {
   width: 100%;
   height: 100%;
 }
+.opengraphica .ogr-canvas-area--loading > * {
+  visibility: hidden;
+}
 .opengraphica .ogr-canvas-background {
   transform-origin: 0 0;
   background-image: url("../images/transparency-bg.png");

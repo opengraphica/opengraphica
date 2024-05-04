@@ -3,8 +3,10 @@ import drawableClassMap from '@/canvas/drawables';
 import type { Drawable, DrawableRenderMode } from '@/types';
 import type {
     CreateCanvasRequest, AddDrawableRequest, RemoveDrawableRequest, DrawCanvasRequest,
-    DrawQueueRequest, DrawCompleteResult, SetCanvasRenderScaleRequest,
+    DrawQueueRequest, DrawCompleteResult, SetCanvasRenderScaleRequest, InitializedResult,
 } from './drawable-canvas.types';
+
+self.postMessage({ type: 'INITIALIZED' } as InitializedResult);
 
 interface DrawableInfo {
     drawable: Drawable;
@@ -41,10 +43,6 @@ self.onmessage = ({ data }: { data: DrawQueueRequest }) => {
         self.close();
     }
 };
-
-function log(message: any) {
-    self.postMessage({ type: 'LOG', message: JSON.stringify(message, null, 2) });
-}
 
 function nearestPowerOf2(value: number) {
     return Math.ceil(Math.log(value) / Math.log(2));
@@ -90,15 +88,17 @@ function drawCanvas(request: DrawCanvasRequest) {
     const canvasCtx = currentBuffer === 1 ? canvas1Ctx2d : canvas2Ctx2d;
     currentBuffer = currentBuffer === 1 ? 2 : 1;
 
+    const { updates: drawableUpdates, refresh } = request.options;
+
     let left = Infinity;
     let top = Infinity;
     let right = -Infinity;
     let bottom = -Infinity;
 
-    for (const drawableUpdate of request.drawableUpdates) {
+    for (const drawableUpdate of drawableUpdates) {
         const drawableInfo = drawableMap.get(drawableUpdate.uuid);
         if (!drawableInfo) continue;
-        const drawingBounds = drawableInfo.drawable.update(drawableUpdate.data);
+        const drawingBounds = drawableInfo.drawable.update(drawableUpdate.data, { refresh });
         if (drawingBounds.left < left) left = drawingBounds.left;
         if (drawingBounds.right > right) right = drawingBounds.right;
         if (drawingBounds.top < top) top = drawingBounds.top;

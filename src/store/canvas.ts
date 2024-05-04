@@ -7,6 +7,7 @@ import type { Mesh, OrthographicCamera, Scene, WebGLRenderer } from 'three';
 import type { EffectComposer } from '@/canvas/renderers/webgl/three/postprocessing/EffectComposer';
 
 const imageSmoothingZoomRatio = preferencesStore.get('imageSmoothingZoomRatio');
+let nextRenderFrameCallbacks: Array<() => void> = [];
 
 interface CanvasState {
     bufferCanvas: HTMLCanvasElement;
@@ -20,6 +21,7 @@ interface CanvasState {
     dndAreaTop: number; // devicePixelRatio IS applied.
     dndAreaWidth: number; // devicePixelRatio IS applied.
     dndAreaHeight: number; // devicePixelRatio IS applied.
+    drawing: boolean;
     isBufferInUse: boolean;
     isDisplayingNonRasterLayer: boolean;
     playingAnimation: boolean;
@@ -77,6 +79,7 @@ const store = new PerformantStore<CanvasStore>({
         dndAreaTop: 0,  // devicePixelRatio IS applied.
         dndAreaWidth: 1,  // devicePixelRatio IS applied.
         dndAreaHeight: 1,  // devicePixelRatio IS applied.
+        drawing: false,
         isBufferInUse: false,
         isDisplayingNonRasterLayer: false,
         playingAnimation: false,
@@ -196,10 +199,35 @@ async function getCanvasRenderingContext(canvas: HTMLCanvasElement) {
     return null;
 }
 
+function nextRenderFrame(): Promise<void>;
+function nextRenderFrame(callback: () => void): void;
+function nextRenderFrame(callback?: () => void): Promise<void> | void {
+    if (callback) {
+        nextRenderFrameCallbacks.push(callback);
+    } else {
+        return new Promise((resolve) => {
+            nextRenderFrameCallbacks.push(resolve);
+        });
+    }
+}
+
+function notifyNextRenderFrame() {
+    for (const callback of nextRenderFrameCallbacks) {
+        try {
+            callback();
+        } catch (error) {
+            console.error('[src/store/canvas.ts] Error on render frame callback:', error);
+        }
+    }
+    nextRenderFrameCallbacks = [];
+}
+
 export default store;
 
 export {
     CanvasStore,
     CanvasState,
-    getCanvasRenderingContext
+    getCanvasRenderingContext,
+    nextRenderFrame,
+    notifyNextRenderFrame,
 };

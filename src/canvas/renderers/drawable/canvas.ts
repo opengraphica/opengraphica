@@ -12,7 +12,7 @@ import {
 import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { isOffscreenCanvasSupported } from '@/lib/feature-detection/offscreen-canvas';
 import { nearestPowerOf2 } from '@/lib/math';
-import type { DefaultDrawableData, Drawable, DrawableConstructor, DrawableRenderMode, DrawableUpdate } from '@/types';
+import type { DefaultDrawableData, Drawable, DrawableDrawOptions, DrawableConstructor, DrawableRenderMode, DrawableUpdate } from '@/types';
 
 export interface DrawableCanvasOptions {
     width?: number;
@@ -42,8 +42,9 @@ export default class DrawableCanvas {
     private mainThreadCanvasCtx2d: CanvasRenderingContext2D | undefined = undefined;
     private offscreenCanvasUuid: string | undefined = undefined;
     private isWaitingOnOffscreenCanvasResult = false;
-    private pendingDrawUpdates: DrawableUpdate[] | undefined = undefined;
+    private pendingDrawOptions: DrawableDrawOptions | undefined = undefined;
     private onDrawnCallback: ((event: DrawnCallbackEvent) => void) | undefined = undefined;
+    private onDrawCompleteCallbacks: Array<((event: DrawnCallbackEvent) => void)> = [];
 
     constructor(options: DrawableCanvasOptions) {
         this.renderMode = '2d';
@@ -55,15 +56,15 @@ export default class DrawableCanvas {
         const canUseOffscrenCanvas = await isOffscreenCanvasSupported();
         if (canUseOffscrenCanvas) {
             try {
-                this.offscreenCanvasUuid = createDrawableCanvas({
+                this.offscreenCanvasUuid = await createDrawableCanvas({
                     onDrawn: (event) => {
-                        if (!canvasStore.state.dirty) {
+                        // TODO: Improve performance. This syncs the canvas updates with the main thread rendering,
+                        // but is probably unnecessarily slow. Already waiting on requestAnimationFrame() from inside
+                        // the worker before this code runs. I tried checking canvasStore.state.dirty to render
+                        // immediately, but that ends up with artifacts sometimes where canvas chunks go missing.
+                        requestAnimationFrame(() => {
                             this.onOffscreenCanvasDrawn(event);
-                        } else {
-                            requestAnimationFrame(() => {
-                                this.onOffscreenCanvasDrawn(event);
-                            });
-                        }
+                        });
                     }
                 });
             } catch (error) {
@@ -112,15 +113,20 @@ export default class DrawableCanvas {
 
     private onOffscreenCanvasDrawn(event: DrawnCallbackEvent) {
         this.isWaitingOnOffscreenCanvasResult = false;
-        this.onDrawnCallback?.({
+        const callbackData = {
             canvas: event.canvas,
             sourceX: event.sourceX,
             sourceY: event.sourceY,
-        });
-        const pendingDrawUpdates = this.pendingDrawUpdates;
-        if (pendingDrawUpdates) {
-            this.pendingDrawUpdates = undefined;
-            this.draw(pendingDrawUpdates);
+        };
+        this.onDrawnCallback?.(callbackData);
+        for (const callbackHandler of this.onDrawCompleteCallbacks) {
+            callbackHandler(callbackData);
+        }
+        this.onDrawCompleteCallbacks = [];
+        const pendingDrawOptions = this.pendingDrawOptions;
+        if (pendingDrawOptions) {
+            this.pendingDrawOptions = undefined;
+            this.draw(pendingDrawOptions);
         }
     }
 
@@ -158,23 +164,32 @@ export default class DrawableCanvas {
         }
     }
 
-    draw(drawableUpdates: DrawableUpdate[]) {
+    draw(options: DrawableDrawOptions) {
         if (this.offscreenCanvasUuid) {
             if (!this.isWaitingOnOffscreenCanvasResult) {
                 this.isWaitingOnOffscreenCanvasResult = true;
-                renderDrawableCanvas(this.offscreenCanvasUuid, drawableUpdates);
+                renderDrawableCanvas(this.offscreenCanvasUuid, options);
             } else {
-                this.pendingDrawUpdates = drawableUpdates;
+                this.pendingDrawOptions = options;
             }
         } else if (this.renderMode === '2d') {
-            this.draw2d(drawableUpdates);
+            this.draw2d(options);
         } else if (this.renderMode === 'webgl') {
-            this.drawWebgl(drawableUpdates);
+            this.drawWebgl(options);
         }
     }
 
-    draw2d(drawableUpdates: DrawableUpdate[]) {
+    async drawComplete() {
+        if (this.isWaitingOnOffscreenCanvasResult) {
+            await new Promise<DrawnCallbackEvent>((resolve) => {
+                this.onDrawCompleteCallbacks.push(resolve);
+            });
+        }
+    }
+
+    draw2d(options: DrawableDrawOptions) {
         if (!this.mainThreadCanvasCtx2d) return;
+        const { refresh, updates: drawableUpdates } = options;
         const ctx = this.mainThreadCanvasCtx2d;
         const canvas = ctx.canvas;
         const renderScale = this.scale;
@@ -187,7 +202,7 @@ export default class DrawableCanvas {
         for (const drawableUpdate of drawableUpdates) {
             const drawableInfo = this.drawables.get(drawableUpdate.uuid);
             if (!drawableInfo?.drawable) continue;
-            const drawingBounds = drawableInfo.drawable.update(drawableUpdate.data);
+            const drawingBounds = drawableInfo.drawable.update(drawableUpdate.data, { refresh });
             if (drawingBounds.left < left) left = drawingBounds.left;
             if (drawingBounds.right > right) right = drawingBounds.right;
             if (drawingBounds.top < top) top = drawingBounds.top;
@@ -221,7 +236,7 @@ export default class DrawableCanvas {
         });
     }
 
-    drawWebgl(drawableUpdates: DrawableUpdate[]) {
+    drawWebgl(options: DrawableDrawOptions) {
         // TODO
     }
 

@@ -20,6 +20,15 @@ export interface DrawableOptionsWebgl<T = DefaultDrawableData> extends DrawableO
     scene: Scene;
 }
 
+export interface DrawableDrawOptions {
+    refresh?: boolean;
+    updates: DrawableUpdate[];
+}
+
+export interface DrawableUpdateOptions {
+    refresh?: boolean;
+}
+
 export interface DrawableUpdate<T = DefaultDrawableData> {
     uuid: string;
     data: T;
@@ -35,7 +44,7 @@ export interface DrawableUpdateBounds {
 }
 
 export interface Drawable<T = DefaultDrawableData> {
-    update: (data: T) => DrawableUpdateBounds;
+    update: (data: T, options: DrawableUpdateOptions) => DrawableUpdateBounds;
     draw2d: (context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) => void;
     drawWebgl: () => void;
     dispose: () => void;

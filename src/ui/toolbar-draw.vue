@@ -28,9 +28,10 @@
                     <label for="toolbar-draw-brush-size-slider" v-t="'toolbar.draw.brushSize'" class="mr-3" />
                     <el-slider
                         id="toolbar-draw-brush-size-slider"
-                        v-model="brushSize"
-                        :min="minBrushSize"
-                        :max="maxBrushSize"
+                        v-model="selectionBrushSize"
+                        :min="0"
+                        :max="1"
+                        :step="0.01"
                         :format-tooltip="formatBrushSizeTooltip"
                         style="width: 10rem"
                     />
@@ -41,7 +42,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, defineAsyncComponent, ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
+import { defineComponent, ref, computed, toRefs, watch } from 'vue';
 import { brushColor, brushSize } from '@/canvas/store/draw-state';
 import { appliedSelectionMask, activeSelectionMask } from '@/canvas/store/selection-state';
 import ElAlert from 'element-plus/lib/components/alert/index';
@@ -123,9 +124,21 @@ export default defineComponent({
         \*----------*/
 
         const minBrushSize = ref(1);
-        const maxBrushSize = ref(500);
+        const maxBrushSize = ref(1000);
 
-        function formatBrushSizeTooltip(value: number) {
+        const selectionBrushSize = computed<number>({
+            set(value) {
+                const easingValue = value * value;
+                brushSize.value = Math.round(minBrushSize.value + easingValue * (maxBrushSize.value - minBrushSize.value));
+            },
+            get() {
+                const scaledBrushSize = (brushSize.value - minBrushSize.value) / (maxBrushSize.value - minBrushSize.value);
+                return Math.sqrt(scaledBrushSize);
+            }
+        });
+
+        function formatBrushSizeTooltip() {
+            const value = brushSize.value;
             const percentage = (value - minBrushSize.value) / (maxBrushSize.value - minBrushSize.value);
             return `${(100 * percentage).toFixed(0)}% - ${value}px`;
         }
@@ -138,7 +151,7 @@ export default defineComponent({
             isBrushColorLight,
             onPickColor,
 
-            brushSize,
+            selectionBrushSize,
             minBrushSize,
             maxBrushSize,
             formatBrushSizeTooltip,

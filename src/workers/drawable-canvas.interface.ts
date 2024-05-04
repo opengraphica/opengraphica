@@ -3,7 +3,7 @@ import type {
     CreateCanvasRequest, AddDrawableRequest, RemoveDrawableRequest, DrawCanvasRequest,
     TerminateRequest, DrawQueueResult, SetCanvasRenderScaleRequest, DrawCompleteAcknowledgedRequest
 } from './drawable-canvas.types';
-import type { DrawableUpdate } from '@/types';
+import type { DrawableDrawOptions } from '@/types';
 
 interface CanvasWorkerInfo {
     worker: Worker;
@@ -26,7 +26,7 @@ interface CreateDrawableCanvasOptions {
 
 const canvasWorkerMap = new Map<string, CanvasWorkerInfo>();
 
-export function createDrawableCanvas(options: CreateDrawableCanvasOptions): string {
+export async function createDrawableCanvas(options: CreateDrawableCanvasOptions): Promise<string> {
     const { renderScale, onDrawn } = options;
     const uuid = uuidv4();
 
@@ -42,6 +42,13 @@ export function createDrawableCanvas(options: CreateDrawableCanvasOptions): stri
     const offscreenCanvas1 = onscreenBuffer1.transferControlToOffscreen();
     const offscreenCanvas2 = onscreenBuffer2.transferControlToOffscreen();
 
+    let initializeResolve!: (uuid: string) => void;
+    let initializeReject!: () => void;
+    const initializedPromise = new Promise<string>((resolve, reject) => {
+        initializeResolve = resolve;
+        initializeReject = reject;
+    });
+
     worker.onmessage = ({ data }: { data: DrawQueueResult }) => {
         const workerInfo = canvasWorkerMap.get(uuid);
         if (!workerInfo) return;
@@ -53,8 +60,8 @@ export function createDrawableCanvas(options: CreateDrawableCanvasOptions): stri
                 sourceX,
                 sourceY,
             });
-        } else if (data.type === 'LOG') {
-            console.log((data as any).message);
+        } else if (data.type === 'INITIALIZED') {
+            initializeResolve(uuid);
         }
     };
     worker.onmessageerror = (error) => {
@@ -76,7 +83,7 @@ export function createDrawableCanvas(options: CreateDrawableCanvasOptions): stri
         renderScale: renderScale ?? 1,
     } as CreateCanvasRequest, [offscreenCanvas1, offscreenCanvas2]);
 
-    return uuid;
+    return initializedPromise;
 }
 
 export function setDrawableCanvasScale(workerUuid: string, newScale: number) {
@@ -111,13 +118,13 @@ export function removeDrawable(workerUuid: string, drawableUuid: string) {
     } as RemoveDrawableRequest);
 }
 
-export function renderDrawableCanvas(uuid: string, drawableUpdates: DrawableUpdate[]) {
+export function renderDrawableCanvas(uuid: string, options: DrawableDrawOptions) {
     const workerInfo = canvasWorkerMap.get(uuid);
     if (!workerInfo) return;
     const { worker } = workerInfo;
     worker.postMessage({
         type: 'DRAW_CANVAS',
-        drawableUpdates,
+        options,
     } as DrawCanvasRequest);
 }
 

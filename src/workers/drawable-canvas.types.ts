@@ -1,4 +1,4 @@
-import type { DrawableUpdate } from '@/types';
+import type { DrawableDrawOptions } from '@/types';
 
 export interface CreateCanvasRequest {
     type: 'CREATE_CANVAS';
@@ -26,7 +26,7 @@ export interface RemoveDrawableRequest {
 
 export interface DrawCanvasRequest {
     type: 'DRAW_CANVAS',
-    drawableUpdates: DrawableUpdate[],
+    options: DrawableDrawOptions,
 }
 
 export interface DrawCompleteAcknowledgedRequest {
@@ -39,6 +39,10 @@ export interface TerminateRequest {
 
 export type DrawQueueRequest = CreateCanvasRequest | SetCanvasRenderScaleRequest | AddDrawableRequest | RemoveDrawableRequest | DrawCanvasRequest | TerminateRequest | DrawCompleteAcknowledgedRequest;
 
+export interface InitializedResult {
+    type: 'INITIALIZED'
+}
+
 export interface DrawCompleteResult {
     type: 'DRAW_COMPLETE_RESULT';
     buffer: number;
@@ -46,5 +50,5 @@ export interface DrawCompleteResult {
     sourceY: number;
 }
 
-export type DrawQueueResult = DrawCompleteResult;
+export type DrawQueueResult = InitializedResult | DrawCompleteResult;
 

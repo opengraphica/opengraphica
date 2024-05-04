@@ -316,6 +316,29 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                     const layerTransform = new DOMMatrix().translate(-minX, -minY).multiply(layerGlobalTransform.inverse())
                         .scale(decomposedCanvasTransform.scaleX, decomposedCanvasTransform.scaleY);
                     layerUpdateCtx.transform(layerTransform.a, layerTransform.b, layerTransform.c, layerTransform.d, layerTransform.e, layerTransform.f);
+                    
+                    // this.drawablePreviewCanvas?.setScale(previewRatioX);
+                    // await this.drawablePreviewCanvas?.draw({
+                    //     refresh: true,
+                    //     updates: [
+                    //         {
+                    //             uuid: this.brushStrokeDrawableUuid!,
+                    //             data: {
+                    //                 color: brushColor.value.style,
+                    //                 points: points.map(point => ({
+                    //                     x: point.x,
+                    //                     y: point.y,
+                    //                     size: brushSize.value,
+                    //                     tiltX: 0,
+                    //                     tiltY: 0,
+                    //                     twist: 0,
+                    //                 }))
+                    //             } as BrushStrokeData,
+                    //         }
+                    //     ],
+                    // });
+                    // const { canvas: layerUpdateCanvas } = await this.drawablePreviewCanvas?.drawComplete();
+
                     this.drawPreviewPoints(points, layerUpdateCtx, previewRatioX, previewRatioY, previewBrushSize);
                     layerUpdateCtx.restore();
 
@@ -461,7 +484,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         ];
 
         // Generate draw preview
-        this.drawPreview();
+        this.drawPreview(true);
     }
 
     protected handleCursorIcon() {
@@ -470,7 +493,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         return newIcon;
     }
 
-    private drawPreview() {
+    private drawPreview(refresh = false) {
         if (this.drawingOnLayers.length > 0 && this.brushShapeImage) {
 
             const points = this.drawingPoints;
@@ -530,22 +553,25 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
             // Draw the line to each canvas chunk
 
             this.drawablePreviewCanvas?.setScale(previewRatioX);
-            this.drawablePreviewCanvas?.draw([
-                {
-                    uuid: this.brushStrokeDrawableUuid!,
-                    data: {
-                        color: brushColor.value.style,
-                        points: points.map(point => ({
-                            x: point.x,
-                            y: point.y,
-                            size: brushSize.value,
-                            tiltX: 0,
-                            tiltY: 0,
-                            twist: 0,
-                        }))
-                    } as BrushStrokeData,
-                }
-            ]);
+            this.drawablePreviewCanvas?.draw({
+                refresh,
+                updates: [
+                    {
+                        uuid: this.brushStrokeDrawableUuid!,
+                        data: {
+                            color: brushColor.value.style,
+                            points: points.map(point => ({
+                                x: point.x,
+                                y: point.y,
+                                size: brushSize.value,
+                                tiltX: 0,
+                                tiltY: 0,
+                                twist: 0,
+                            }))
+                        } as BrushStrokeData,
+                    }
+                ],
+            });
         }
     }
 

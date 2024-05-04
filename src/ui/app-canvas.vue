@@ -1,5 +1,5 @@
 <template>
-    <div ref="canvasArea" class="ogr-canvas-area">
+    <div ref="canvasArea" class="ogr-canvas-area" :class="{ 'ogr-canvas-area--loading': loading }">
         <div v-if="useCanvasBackground" ref="canvasBackground" class="ogr-canvas-background"></div>
         <div ref="canvasContainer" class="ogr-canvas-container" :class="{ 'ogr-canvas-viewport-css': useCssViewport, 'ogr-canvas-viewport-css--pixelated': isPixelatedZoomLevel }">
             <canvas ref="canvas" class="ogr-canvas" />
@@ -8,6 +8,7 @@
         <canvas ref="selectionMaskCanvas" class="ogr-canvas-selection-mask" />
         <app-canvas-overlays ref="canvasOverlays" />
         <app-canvas-overlays :ignore-transform="true" />
+        <div v-if="loading" v-loading="true" class="ogr-canvas-area__loading-animation"></div>
     </div>
 </template>
 
@@ -19,6 +20,7 @@ import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/w
 import preferencesStore from '@/store/preferences';
 import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset, selectedLayersSelectionMaskPreview, selectedLayersSelectionMaskPreviewCanvasOffset } from '@/canvas/store/selection-state';
 import AppCanvasOverlays from '@/ui/app-canvas-overlays.vue';
+import ElLoading from 'element-plus/lib/components/loading/index';
 import { drawWorkingFileToCanvas2d, drawWorkingFileToCanvasWebgl } from '@/lib/canvas';
 import { notifyInjector } from '@/lib/notify';
 import appEmitter, { AppEmitterEvents } from '@/lib/emitter';
@@ -28,6 +30,9 @@ import { colorToRgba, getColorModelName } from '@/lib/color';
 
 export default defineComponent({
     name: 'AppCanvas',
+    directives: {
+        loading: ElLoading.directive
+    },
     components: {
         AppCanvasOverlays
     },
@@ -36,6 +41,8 @@ export default defineComponent({
         let pica: any; // Can't import type definitions from dynamic modules imported later, wtf typescript!
         let isPicaSingleThreaded: boolean = false;
         const $notify = notifyInjector('$notify');
+
+        const loading = ref(false);
 
         const rootElement = inject<Ref<Element>>('rootElement');
         const mainElement = inject<Ref<Element>>('mainElement');
@@ -216,6 +223,7 @@ export default defineComponent({
         });
 
         onMounted(async () => {
+            loading.value = true;
             appEmitter.on('app.canvas.resetTransform', resetTransform);
 
             if (canvas.value) {                
@@ -370,6 +378,7 @@ export default defineComponent({
                 selectionMaskCanvasCtx = selectionMaskCanvas.value.getContext('2d', getCanvasRenderingContext2DSettings());
                 selectionMaskPattern.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAABg2lDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV/TiiIVh3YQcchQnVoQFXHUKhShQqgVWnUwufQLmjQkKS6OgmvBwY/FqoOLs64OroIg+AHi6OSk6CIl/i8ptIjx4Lgf7+497t4BQrPKNCs0Dmi6bWZSSTGXXxV7XyEgghDiCMjMMuYkKQ3f8XWPAF/vEjzL/9yfY0AtWAwIiMSzzDBt4g3i6U3b4LxPHGVlWSU+J46bdEHiR64rHr9xLrks8Myomc3ME0eJxVIXK13MyqZGPEUcUzWd8oWcxyrnLc5atc7a9+QvDBf0lWWu0xxBCotYggQRCuqooAobCVp1UixkaD/p4x92/RK5FHJVwMixgBo0yK4f/A9+d2sVJye8pHAS6HlxnI9RoHcXaDUc5/vYcVonQPAZuNI7/loTmPkkvdHRYkfA4DZwcd3RlD3gcgcYejJkU3alIE2hWATez+ib8kDkFuhf83pr7+P0AchSV+kb4OAQGCtR9rrPu/u6e/v3TLu/Hx5FcoXj45C+AAAABmJLR0QATgBOAE714JEKAAAACXBIWXMAAC4jAAAuIwF4pT92AAAAB3RJTUUH5gITBDkEOkUYUQAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAAtSURBVAjXY/z//383AxT4+/szMCFzNm7cCBGAcRgYGBiYz58/7wbjMDAwMAAAGKUPRK2REh8AAAAASUVORK5CYII=';
             }
+            loading.value = false;
         });
 
         onUnmounted(() => {
@@ -418,7 +427,7 @@ export default defineComponent({
                 existingThreejsCanvasMargin.geometry.dispose();
             }
             const canvasMarginGeometry = new BufferGeometry();
-            const marginSize = Math.max(imageWidth, imageHeight) * 2;
+            const marginSize = Math.max(imageWidth, imageHeight) * 10;
             const z = 0.5;
             const vertices = new Float32Array([
                 -marginSize, -marginSize, z,
@@ -601,6 +610,7 @@ export default defineComponent({
 
                 if ((canvasStore.get('dirty') || isPlayingAnimation)) {
                     canvasStore.set('dirty', false);
+                    canvasStore.set('drawing', true);
 
                     if (isPlayingAnimation) {
                         const now = performance.now();
@@ -621,6 +631,7 @@ export default defineComponent({
                             drawPostProcess();
                         }
                     }
+                    canvasStore.set('drawing', false);
                 }
             } catch (error: any) {
                 if (preferencesStore.get('useCanvasViewport') === false && (error || '').toString().includes('NS_ERROR_FAILURE')) {
@@ -714,6 +725,7 @@ export default defineComponent({
         }
 
         return {
+            loading,
             canvas,
             canvasArea,
             canvasBackground,
