@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, toRef, computed, watch, PropType } from 'vue';
+import { defineComponent, onMounted, onUnmounted, ref, toRef, watch, PropType } from 'vue';
 import ElButton from 'element-plus/lib/components/button/index';
 import ElDivider from 'element-plus/lib/components/divider/index';
 import ElInput from 'element-plus/lib/components/input/index';
@@ -37,10 +37,12 @@ import ElLoading from 'element-plus/lib/components/loading/index';
 import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
 import ElTooltip from 'element-plus/lib/components/tooltip/index';
 import AppColorPickerGradient from '@/ui/app-color-picker-gradient.vue';
+import { isWorkerSupported } from '@/lib/feature-detection/worker';
 import { colorToRgba, colorToHex, hexToColor, getColorModelName } from '@/lib/color';
 import { ColorModel, ColorModelName, RGBAColor } from '@/types';
-import colorNamer from 'color-namer';
+import { createColorNamer, getColorName, destroyColorNamer } from '@/workers/color-namer.interface';
 import { runModule } from '@/modules';
+import colorNamer from 'color-namer';
 
 export default defineComponent({
     name: 'DockColorPicker',
@@ -76,7 +78,10 @@ export default defineComponent({
         let outputColorModelName: ColorModelName = 'rgba';
 
         const hexCode = ref<string>();
-        const colorName = ref<string>();
+        const colorName = ref<string>('\u00A0');
+        const isFadeInColorName = ref<boolean>(false);
+
+        let colorNamerWorkerUuid: string | null = null;
 
         watch([toRef(props, 'color')], ([inputColor]) => {
             outputColorModelName = getColorModelName(inputColor);
@@ -85,8 +90,28 @@ export default defineComponent({
 
         watch([workingColor], () => {
             hexCode.value = colorToHex(workingColor.value, 'rgba');
-            colorName.value = colorNamer(hexCode.value, { pick: ['ntc'] }).ntc[0]?.name;
+            nameColor(hexCode.value);
         }, { immediate: true });
+
+        onMounted(async () => {
+            if (await isWorkerSupported()) {
+                colorNamerWorkerUuid = createColorNamer();
+            }
+        });
+
+        onUnmounted(() => {
+            if (colorNamerWorkerUuid) {
+                destroyColorNamer(colorNamerWorkerUuid);
+            }
+        });
+
+        async function nameColor(hexColor: string) {
+            if (colorNamerWorkerUuid) {
+                colorName.value = await getColorName(colorNamerWorkerUuid, hexColor);
+            } else if (colorNamer) {
+                colorName.value = colorNamer(hexColor, { pick: ['ntc'] }).ntc[0]?.name;
+            }
+        }
 
         function onChangeHexCode(newHexCode: string) {
             workingColor.value = hexToColor(newHexCode, 'rgba');
@@ -108,6 +133,7 @@ export default defineComponent({
             workingColor,
             hexCode,
             colorName,
+            isFadeInColorName,
             onChangeHexCode,
             onPickColorFromImage,
             onCancel,

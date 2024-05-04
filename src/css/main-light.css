@@ -8272,6 +8272,9 @@ body.ogr-full-page .opengraphica {
   /***************************\
   | Vue Transition Animations |
   \***************************/
+  /********************\
+  | General Animations |
+  \********************/
 }
 .opengraphica #ogr-tmp-file-input-container {
   position: absolute;
@@ -9987,6 +9990,29 @@ body.ogr-full-page .opengraphica {
   transform: scale(1, 0);
   transform-origin: top left;
   opacity: 0;
+}
+@keyframes ogr-animate-fade-in {
+  from {
+    opacity: 0%;
+  }
+  to {
+    opacity: 100%;
+  }
+}
+.opengraphica .ogr-animate-fast {
+  animation-duration: 0.2s !important;
+}
+.opengraphica .ogr-animate-moderate {
+  animation-duration: 0.5s !important;
+}
+.opengraphica .ogr-animate-slow {
+  animation-duration: 1s !important;
+}
+.opengraphica .ogr-animate-very-slow {
+  animation-duration: 2s !important;
+}
+.opengraphica .ogr-animate-fade-in {
+  animation: ogr-animate-fade-in 0.2s ease-in forwards;
 }
 
 .opengraphica {

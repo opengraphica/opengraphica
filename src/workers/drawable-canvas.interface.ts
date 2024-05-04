@@ -65,7 +65,7 @@ export async function createDrawableCanvas(options: CreateDrawableCanvasOptions)
         }
     };
     worker.onmessageerror = (error) => {
-        console.error('Error received from drawableCanvasWorker', error);
+        console.error('[src/workers/drawable-canvas.interface.ts] Error received from drawableCanvasWorker', error);
     };
 
     canvasWorkerMap.set(uuid, {

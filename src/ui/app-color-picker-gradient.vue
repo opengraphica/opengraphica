@@ -41,7 +41,7 @@
 import { defineComponent, ref, PropType, watch, toRef, nextTick } from 'vue';
 import ElSlider from 'element-plus/lib/components/slider/index';
 import { colorToHsva, getColorModelName, convertColorModel, generateColorStyle, createColor } from '@/lib/color';
-import { ColorModel, ColorModelName, HSVAColor, RGBAColor } from '@/types';
+import { ColorModel, ColorModelName, HSVAColor } from '@/types';
 import pointerDirective from '@/directives/pointer';
 import workingFileStore from '@/store/working-file';
 
