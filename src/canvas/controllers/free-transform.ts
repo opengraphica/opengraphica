@@ -55,6 +55,8 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     private isPointerDragging: boolean = false;
     private actionQueue: AsyncCallbackQueue = new AsyncCallbackQueue();
 
+    private previewRotation: number | null = null;
+
     private setBoundsDebounceHandle: number | undefined;
     private selectedLayerIdsWatchStop: WatchStopHandle | null = null;
 
@@ -283,6 +285,8 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 }
             }
         }
+
+        this.handleCursorIcon();
     }
 
     async onPointerUp(e: PointerEvent): Promise<void> {
@@ -361,7 +365,9 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 } catch (error) { /* Ignore */ }
                 this.transformStartPickLayer = null;
             }
+            this.previewRotation = null;
             dragHandleHighlight.value = null;
+            this.handleCursorIcon();
         });
     }
 
@@ -465,6 +471,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     }
 
     private previewRotationChange(newRotation: number) {
+        this.previewRotation = newRotation;
         const rotationDelta = newRotation - this.transformStartDimensions.rotation;
         freeTransformEmitter.emit('setDimensions', {
             rotation: newRotation,
@@ -737,6 +744,57 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             }
         }
         return { shouldMaintainAspectRatio, shouldScaleDuringResize, shouldSnapRotationDegrees };
+    }
+
+    protected handleCursorIcon() {
+        let newIcon = super.handleCursorIcon();
+        if (!newIcon) {
+            const dragHandle = dragHandleHighlight.value;
+            determineResizeHandleIcon:
+            if (dragHandle != null) {
+                let handleRotation = 0;
+                if (dragHandle === DRAG_TYPE_RIGHT) handleRotation = 0;
+                else if (dragHandle === (DRAG_TYPE_BOTTOM | DRAG_TYPE_RIGHT)) handleRotation = Math.PI / 4;
+                else if (dragHandle === DRAG_TYPE_BOTTOM) handleRotation = Math.PI / 2;
+                else if (dragHandle === (DRAG_TYPE_BOTTOM | DRAG_TYPE_LEFT)) handleRotation = 3 * Math.PI / 4;
+                else if (dragHandle === DRAG_TYPE_LEFT) handleRotation = Math.PI;
+                else if (dragHandle === (DRAG_TYPE_TOP | DRAG_TYPE_LEFT)) handleRotation = 5 * Math.PI / 4;
+                else if (dragHandle === DRAG_TYPE_TOP) handleRotation = 3 * Math.PI / 2;
+                else if (dragHandle === (DRAG_TYPE_TOP | DRAG_TYPE_RIGHT)) handleRotation = 7 * Math.PI / 4;
+                else {
+                    newIcon = 'move';
+                    break determineResizeHandleIcon;
+                }
+                handleRotation += this.previewRotation ?? rotation.value;
+                if (handleRotation > 0) handleRotation = (2 * Math.PI) - (handleRotation % (2 * Math.PI));
+                else handleRotation = Math.abs(handleRotation % (2 * Math.PI));
+                if (handleRotation < Math.PI / 6 || handleRotation > 11 * Math.PI / 6) newIcon = 'ew-resize';
+                else if (handleRotation < Math.PI / 3) newIcon = 'nesw-resize';
+                else if (handleRotation < 2 * Math.PI / 3) newIcon = 'ns-resize';
+                else if (handleRotation < 5 * Math.PI / 6) newIcon = 'nwse-resize';
+                else if (handleRotation < 7 * Math.PI / 6) newIcon = 'ew-resize';
+                else if (handleRotation < 4 * Math.PI / 3) newIcon = 'nesw-resize';
+                else if (handleRotation < 5 * Math.PI / 3) newIcon = 'ns-resize';
+                else newIcon = 'nwse-resize';
+            }
+            const rotateHandle = rotateHandleHighlight.value;
+            if (rotateHandle === true) {
+                let handleRotation = 0;
+                handleRotation += this.previewRotation ?? rotation.value;
+                if (handleRotation > 0) handleRotation = (2 * Math.PI) - (handleRotation % (2 * Math.PI));
+                else handleRotation = Math.abs(handleRotation % (2 * Math.PI));
+                if (handleRotation < Math.PI / 6 || handleRotation > 11 * Math.PI / 6) newIcon = 'ew-resize';
+                else if (handleRotation < Math.PI / 3) newIcon = 'nesw-resize';
+                else if (handleRotation < 2 * Math.PI / 3) newIcon = 'ns-resize';
+                else if (handleRotation < 5 * Math.PI / 6) newIcon = 'nwse-resize';
+                else if (handleRotation < 7 * Math.PI / 6) newIcon = 'ew-resize';
+                else if (handleRotation < 4 * Math.PI / 3) newIcon = 'nesw-resize';
+                else if (handleRotation < 5 * Math.PI / 3) newIcon = 'ns-resize';
+                else newIcon = 'nwse-resize';
+            }
+        }
+        canvasStore.set('cursor', newIcon);
+        return newIcon;
     }
 
 }

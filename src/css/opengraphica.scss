@@ -1192,8 +1192,16 @@ body.ogr-full-page {
                 &.ogr-custom-cursor {
                     cursor: none;
 
+                    &.ogr-custom-cursor--crosshair {
+                        cursor: crosshair;
+                    }
+
                     &.ogr-custom-cursor--grabbing {
                         cursor: grabbing;
+                    }
+
+                    &.ogr-custom-cursor--move {
+                        cursor: move;
                     }
 
                     &.ogr-custom-cursor--text {
@@ -1206,6 +1214,22 @@ body.ogr-full-page {
 
                     &.ogr-custom-cursor--zoom-out {
                         cursor: zoom-out;
+                    }
+
+                    &.ogr-custom-cursor--ns-resize {
+                        cursor: ns-resize;
+                    }
+
+                    &.ogr-custom-cursor--ew-resize {
+                        cursor: ew-resize;
+                    }
+
+                    &.ogr-custom-cursor--nesw-resize {
+                        cursor: nesw-resize;
+                    }
+
+                    &.ogr-custom-cursor--nwse-resize {
+                        cursor: nwse-resize;
                     }
                 }
             }

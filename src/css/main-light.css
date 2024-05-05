@@ -9269,8 +9269,14 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor {
   cursor: none;
 }
+.opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor.ogr-custom-cursor--crosshair {
+  cursor: crosshair;
+}
 .opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor.ogr-custom-cursor--grabbing {
   cursor: grabbing;
+}
+.opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor.ogr-custom-cursor--move {
+  cursor: move;
 }
 .opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor.ogr-custom-cursor--text {
   cursor: text;
@@ -9280,6 +9286,18 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor.ogr-custom-cursor--zoom-out {
   cursor: zoom-out;
+}
+.opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor.ogr-custom-cursor--ns-resize {
+  cursor: ns-resize;
+}
+.opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor.ogr-custom-cursor--ew-resize {
+  cursor: ew-resize;
+}
+.opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor.ogr-custom-cursor--nesw-resize {
+  cursor: nesw-resize;
+}
+.opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor.ogr-custom-cursor--nwse-resize {
+  cursor: nwse-resize;
 }
 .opengraphica .ogr-layout-dnd-container > footer {
   flex-grow: 0;
