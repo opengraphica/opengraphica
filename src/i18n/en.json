@@ -199,6 +199,10 @@
                 "debugging": {
                     "groupTitle": "Debugging",
                     "useMobileDebugger": "Load Mobile Debugger"
+                },
+                "help": {
+                    "groupTitle": "Help",
+                    "reportIssue": "Report an Issue"
                 }
             }
         }

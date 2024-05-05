@@ -71,7 +71,7 @@
                             <span v-t="'dock.settings.image.menu.paste'"></span>
                         </el-menu-item>
                         <el-collapse class="el-collapse--menu-item my-1">
-                            <el-collapse-item>
+                            <el-collapse-item v-el-collapse-item-smart-scroll>
                                 <template v-slot:title>
                                     {{ $t('dock.settings.image.menu.convertLayers.groupTitle') }}
                                 </template>
@@ -228,7 +228,7 @@
                             </el-radio-group>
                         </el-form-item>
                         <el-collapse class="el-collapse--menu-item">
-                            <el-collapse-item :title="$t('dock.settings.prefs.performance.groupTitle')">
+                            <el-collapse-item v-el-collapse-item-smart-scroll :title="$t('dock.settings.prefs.performance.groupTitle')">
                                 <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.performance.renderer.label')">
                                     <el-select v-model="preferenceRenderer" size="small" style="width: 6rem;">
                                         <el-option value="2d" :label="$t('dock.settings.prefs.performance.renderer.2d')" />
@@ -245,7 +245,7 @@
                                     <el-switch v-model="preferenceHighQualityScaling" />
                                 </el-form-item>
                             </el-collapse-item>
-                            <el-collapse-item :title="$t('dock.settings.prefs.editor.groupTitle')">
+                            <el-collapse-item v-el-collapse-item-smart-scroll :title="$t('dock.settings.prefs.editor.groupTitle')">
                                 <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.editor.menuBarPosition')">
                                     <el-select v-model="preferenceMenuBarPosition" size="small" style="width: 6rem;">
                                         <el-option value="top" :label="$t('option.top')" />
@@ -264,10 +264,18 @@
                                     <el-button size="small" class="is-fullwidth" @click="onClickResetSettings" v-t="'dock.settings.prefs.editor.resetSettings'" />
                                 </div>
                             </el-collapse-item>
-                            <el-collapse-item :title="$t('dock.settings.prefs.debugging.groupTitle')">
+                            <el-collapse-item v-el-collapse-item-smart-scroll :title="$t('dock.settings.prefs.debugging.groupTitle')">
                                 <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.debugging.useMobileDebugger')">
                                     <el-switch v-model="useMobileDebugger" />
                                 </el-form-item>
+                            </el-collapse-item>
+                            <el-collapse-item v-el-collapse-item-smart-scroll :title="$t('dock.settings.prefs.help.groupTitle')">
+                                <div class="el-form-item el-form-item--menu-item">
+                                    <el-link href="https://github.com/opengraphica/opengraphica/issues/" type="primary" target="_blank">
+                                        <span v-t="'dock.settings.prefs.help.reportIssue'"></span>
+                                        <i class="bi bi-box-arrow-up-right ml-2"></i>
+                                    </el-link>
+                                </div>
                             </el-collapse-item>
                         </el-collapse>
                     </el-form>
@@ -294,6 +302,9 @@ import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSwitch from 'element-plus/lib/components/switch/index';
 import ElTabs, { ElTabPane } from 'element-plus/lib/components/tabs/index';
 import ElTimeline, { ElTimelineItem } from 'element-plus/lib/components/timeline/index';
+
+import elCollapseItemSmartScrollDirective from '@/directives/el-collapse-item-smart-scroll';
+
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore, { HistoryState } from '@/store/history';
@@ -310,6 +321,7 @@ export default defineComponent({
     name: 'DockSettings',
     inheritAttrs: false,
     directives: {
+        'el-collapse-item-smart-scroll': elCollapseItemSmartScrollDirective,
         loading: ElLoading.directive
     },
     components: {
