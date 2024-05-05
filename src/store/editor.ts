@@ -46,6 +46,7 @@ interface EditorState {
     isPenUser: boolean;
     isTaskRunning: boolean;
     isTouchUser: boolean;
+    lastActiveThemeName: string | null;
     loadingThemeName: string | null;
     tasks: EditorDeferredTask[];
     themes: {
@@ -105,6 +106,7 @@ const store = new PerformantStore<EditorStore>({
         isPenUser: false,
         isTaskRunning: false,
         isTouchUser: true,
+        lastActiveThemeName: null,
         loadingThemeName: null,
         tasks: [],
         themes: {},
@@ -117,7 +119,7 @@ const store = new PerformantStore<EditorStore>({
         waiting: false,
     },
     readOnly: ['activeTheme', 'activeTool', 'activeToolGroup', 'themes', 'timelineCursor'],
-    restore: ['activeToolGroupRestore', 'isTouchUser', 'tutorialFlags'],
+    restore: ['activeToolGroupRestore', 'isTouchUser', 'lastActiveThemeName', 'tutorialFlags'],
     async onDispatch(actionName: string, value: any, set) {
         switch (actionName) {
             case 'addTutorialFlag':
@@ -160,6 +162,7 @@ const store = new PerformantStore<EditorStore>({
                     if (oldLinkElement && oldLinkElement.parentNode) {
                         oldLinkElement.parentNode.removeChild(oldLinkElement);
                     }
+                    set('lastActiveThemeName', activeThemeName);
                 }
                 break;
 
@@ -220,7 +223,9 @@ const store = new PerformantStore<EditorStore>({
                 set('themes', value);
                 const themeNames = Object.keys(value);
                 if (themeNames.length > 0) {
-                    await store.dispatch('setActiveTheme', themeNames[0]);
+                    let lastActiveThemeName = store.get('lastActiveThemeName');
+                    if (!themeNames.includes(lastActiveThemeName ?? '')) lastActiveThemeName = null;
+                    await store.dispatch('setActiveTheme', lastActiveThemeName ?? themeNames[0]);
                 }
                 break;
 

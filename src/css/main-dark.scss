@@ -1,0 +1,102 @@
+@use './opengraphica.scss';
+@use './vendor/element-plus-theme-chalk.css';
+@use './vendor/bulma.scss' as *;
+@use './element-plus-enhancements.scss' as *;
+
+:root {
+    --ogr-background-color: #1f252d;
+    --ogr-body-background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAMAAACeL25MAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRF////zsrFFOhhzwAAAA9JREFUeNpiYGTAAAABBgAAJwAC/BnsgQAAAABJRU5ErkJggg==');
+    --ogr-form-connected-label-background-color: #232831;
+    --ogr-form-connected-label-border-color: #191d25;
+    --ogr-form-connected-label-input-hover-color: #f0f2f3;
+    --ogr-form-connected-label-input-focus-color: #272c37;
+    --ogr-layout-menu-bar-border-color: transparent;
+    --ogr-layout-menu-bar-background-color: #222933;
+    --ogr-menu-drawers-background-color: rgba(0, 0, 0, 0.4);
+    --ogr-menu-drawer-background-color: #1f252d;
+    --ogr-menu-drawer-close-icon-color: #ffffffc4;
+    --ogr-menu-drawer-close-icon-color-hover: #8f949f;
+    --ogr-working-image-border-color: #e4e7f2;
+    --ogr-alert-info-color: #ffffff;
+    --ogr-overlay-background-color: rgba(31, 37, 45, 0.8);
+    --ogr-snap-line-color: #66b1ff;
+    --ogr-layer-list-background-color-hover: rgba(64, 158, 255, 0.1);
+    --ogr-layer-list-background-color-active: rgba(64, 158, 255, 0.05);
+    --ogr-layer-list-background-color-drag: #66b1ff;
+    --ogr-layer-list-border-color: #0e1014;
+    --ogr-layer-list-thumbnail-border-color: #0e1014;
+    --ogr-layer-list-thumbnail-border-color-active: #333;
+}
+
+.opengraphica {
+    @include bulma;
+    @include element-plus-enhancements;
+
+    --el-bg-color: #272c37;
+    --el-bg-color-page: #1f252d;
+    --el-bg-color-overlay: #272c37;
+    --el-border-color: #3e4548;
+    --el-border-color-base: #3e4548;
+    --el-border-color-light: #3e4548;
+    --el-border-color-lighter: #3e4548;
+    --el-border-color-extra-light: #191d25;
+    --el-color-white: #272c37;
+    --el-color-black: #eeeeee;
+    --el-color-primary: #009cff;
+    --el-color-primary-light-1: #53a8ff;
+    --el-color-primary-light-2: #66b1ff;
+    --el-color-primary-light-3: #79bbff;
+    --el-color-primary-light-4: #8cc5ff;
+    --el-color-primary-light-5: #a0cfff;
+    --el-color-primary-light-6: #b3d8ff;
+    --el-color-primary-light-7: #c6e2ff;
+    --el-color-primary-light-8: #d9ecff;
+    --el-color-primary-light-9: #ecf5ff;
+    --el-color-info-light-1: #2d3340;
+    --el-color-info-light-2: #2d3340;
+    --el-color-info-light-3: #2d3340;
+    --el-color-info-light-4: #2d3340;
+    --el-color-info-light-5: #2d3340;
+    --el-color-info-light-6: #2d3340;
+    --el-color-info-light-7: #2d3340;
+    --el-color-info-light-8: #2d3340;
+    --el-color-info-light-9: #2d3340;
+    --el-color-success: #2ad43d;
+    --el-color-warning: #eba62c;
+    --el-color-danger: #ff5562;
+    --el-color-info: #8f9198;
+    --el-color-success-light: mix(--el-color-white, --el-color-success, 80%);
+    --el-color-warning-light: mix(--el-color-white, --el-color-warning, 80%);
+    --el-color-danger-light: mix(--el-color-white, --el-color-danger, 80%);
+    --el-color-info-light: mix(--el-color-white, --el-color-info, 80%);
+    --el-color-success-lighter: mix(--el-color-white, --el-color-success, 90%);
+    --el-color-warning-lighter: mix(--el-color-white, --el-color-warning, 90%);
+    --el-color-danger-lighter: mix(--el-color-white, --el-color-danger, 90%);
+    --el-color-info-lighter: mix(--el-color-white, --el-color-info, 90%);
+    --el-fill-color-blank: #272c37;
+    --el-fill-color-light: #343a46;
+    --el-menu-hover-bg-color: rgba(64, 158, 255, 0.1);
+    --el-switch-button-size: 1rem;
+    --el-text-color-primary: #ffffff;
+    --el-text-color-regular: #eeeeee;
+    --el-text-color-secondary: #cccccc;
+    --el-text-color-placeholder: #dddddd;
+
+    .el-button--primary {
+        --el-button-bg-color: var(--el-color-primary);
+        --el-button-border-color: var(--el-color-primary);
+        --el-button-hover-bg-color: rgb(102, 177, 255);
+        --el-button-hover-border-color: rgb(102, 177, 255);
+        --el-button-active-bg-color: rgb(58, 142, 230);
+        --el-button-active-border-color: rgb(58, 142, 230);
+        --el-button-hover-link-text-color: #2e8ae9;
+        &.is-plain {
+            --el-button-font-color: #009cff;
+            --el-button-bg-color: #23374b;
+            --el-fill-color-blank: #23374b;
+            --el-button-border-color: #175987;
+        }
+    }
+
+    color: var(--el-color-black);
+}

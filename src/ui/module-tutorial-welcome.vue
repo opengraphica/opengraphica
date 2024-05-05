@@ -3,7 +3,7 @@
         <div>
             <div class="ogr-logo">
                 <h1 class="px-6">
-                    <img src="images/logo-full.svg" alt="OpenGraphica">
+                    <img :src="`images/logo-full-${logoThemeColor}.svg`" alt="OpenGraphica">
                 </h1>
             </div>
             <div class="is-flex is-justify-content-center mt-4">
@@ -28,7 +28,7 @@
 
 <script lang="ts">
 
-import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
+import { defineComponent, computed, ref, onMounted, onUnmounted } from 'vue';
 import ElButton from 'element-plus/lib/components/button/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import appEmitter from '@/lib/emitter';
@@ -53,6 +53,10 @@ export default defineComponent({
         emit('update:title', 'empty');
 
         const loading = ref<boolean>(false);
+
+        const logoThemeColor = computed<string>(() => {
+            return (editorStore.state.activeTheme?.name === 'dark') ? 'light' : 'dark';
+        });
        
         onMounted(async () => {
             appEmitter.on('app.workingFile.notifyImageLoadedFromClipboard', onCancel);
@@ -112,6 +116,7 @@ export default defineComponent({
         
         return {
             loading,
+            logoThemeColor,
             onNewImage,
             onOpenImage,
             onTakePhoto,

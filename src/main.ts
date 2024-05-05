@@ -71,7 +71,8 @@ if ((window as any).webpackHotUpdateOpenGraphica) {
     document.body.append(mount);
     document.body.className = 'ogr-full-page';
     app.theme({
-        light: './css/main-light.css'
+        light: './css/main-light.css',
+        dark: './css/main-dark.css',
     }).then(() => {
         app.mount('#opengraphica');
     });

@@ -26560,32 +26560,81 @@ body.ogr-full-page .opengraphica {
 }
 
 :root {
-  --ogr-background-color: #fafafa;
+  --ogr-background-color: #1f252d;
   --ogr-body-background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAMAAACeL25MAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRF////zsrFFOhhzwAAAA9JREFUeNpiYGTAAAABBgAAJwAC/BnsgQAAAABJRU5ErkJggg==");
-  --ogr-form-connected-label-background-color: #F8F9FB;
-  --ogr-form-connected-label-border-color: #DCDFE6;
+  --ogr-form-connected-label-background-color: #232831;
+  --ogr-form-connected-label-border-color: #191d25;
   --ogr-form-connected-label-input-hover-color: #f0f2f3;
-  --ogr-form-connected-label-input-focus-color: #ffffff;
-  --ogr-layout-menu-bar-border-color: #dadeeaee;
-  --ogr-layout-menu-bar-background-color: white;
-  --ogr-menu-drawers-background-color: rgba(0, 0, 0, 0.1);
-  --ogr-menu-drawer-background-color: white;
-  --ogr-menu-drawer-close-icon-color: #a4a8b3c4;
+  --ogr-form-connected-label-input-focus-color: #272c37;
+  --ogr-layout-menu-bar-border-color: transparent;
+  --ogr-layout-menu-bar-background-color: #222933;
+  --ogr-menu-drawers-background-color: rgba(0, 0, 0, 0.4);
+  --ogr-menu-drawer-background-color: #1f252d;
+  --ogr-menu-drawer-close-icon-color: #ffffffc4;
   --ogr-menu-drawer-close-icon-color-hover: #8f949f;
   --ogr-working-image-border-color: #e4e7f2;
-  --ogr-alert-info-color: #515356;
-  --ogr-overlay-background-color: rgba(255, 255, 255, 0.8);
+  --ogr-alert-info-color: #ffffff;
+  --ogr-overlay-background-color: rgba(31, 37, 45, 0.8);
   --ogr-snap-line-color: #66b1ff;
-  --ogr-layer-list-background-color-hover: rgba(64, 158, 255, 0.15);
-  --ogr-layer-list-background-color-active: rgba(64, 158, 255, 0.1);
-  --ogr-layer-list-background-color-drag: #f5faff;
-  --ogr-layer-list-border-color: #ebeef5;
-  --ogr-layer-list-thumbnail-border-color: #ebeef5;
-  --ogr-layer-list-thumbnail-border-color-active: rgba(64, 158, 255, 0.6);
+  --ogr-layer-list-background-color-hover: rgba(64, 158, 255, 0.1);
+  --ogr-layer-list-background-color-active: rgba(64, 158, 255, 0.05);
+  --ogr-layer-list-background-color-drag: #66b1ff;
+  --ogr-layer-list-border-color: #0e1014;
+  --ogr-layer-list-thumbnail-border-color: #0e1014;
+  --ogr-layer-list-thumbnail-border-color-active: #333;
 }
 
 .opengraphica {
+  --el-bg-color: #272c37;
+  --el-bg-color-page: #1f252d;
+  --el-bg-color-overlay: #272c37;
+  --el-border-color: #3e4548;
+  --el-border-color-base: #3e4548;
+  --el-border-color-light: #3e4548;
+  --el-border-color-lighter: #3e4548;
+  --el-border-color-extra-light: #191d25;
+  --el-color-white: #272c37;
+  --el-color-black: #eeeeee;
+  --el-color-primary: #009cff;
+  --el-color-primary-light-1: #53a8ff;
+  --el-color-primary-light-2: #66b1ff;
+  --el-color-primary-light-3: #79bbff;
+  --el-color-primary-light-4: #8cc5ff;
+  --el-color-primary-light-5: #a0cfff;
+  --el-color-primary-light-6: #b3d8ff;
+  --el-color-primary-light-7: #c6e2ff;
+  --el-color-primary-light-8: #d9ecff;
+  --el-color-primary-light-9: #ecf5ff;
+  --el-color-info-light-1: #2d3340;
+  --el-color-info-light-2: #2d3340;
+  --el-color-info-light-3: #2d3340;
+  --el-color-info-light-4: #2d3340;
+  --el-color-info-light-5: #2d3340;
+  --el-color-info-light-6: #2d3340;
+  --el-color-info-light-7: #2d3340;
+  --el-color-info-light-8: #2d3340;
+  --el-color-info-light-9: #2d3340;
+  --el-color-success: #2ad43d;
+  --el-color-warning: #eba62c;
+  --el-color-danger: #ff5562;
+  --el-color-info: #8f9198;
+  --el-color-success-light: mix(--el-color-white, --el-color-success, 80%);
+  --el-color-warning-light: mix(--el-color-white, --el-color-warning, 80%);
+  --el-color-danger-light: mix(--el-color-white, --el-color-danger, 80%);
+  --el-color-info-light: mix(--el-color-white, --el-color-info, 80%);
+  --el-color-success-lighter: mix(--el-color-white, --el-color-success, 90%);
+  --el-color-warning-lighter: mix(--el-color-white, --el-color-warning, 90%);
+  --el-color-danger-lighter: mix(--el-color-white, --el-color-danger, 90%);
+  --el-color-info-lighter: mix(--el-color-white, --el-color-info, 90%);
+  --el-fill-color-blank: #272c37;
+  --el-fill-color-light: #343a46;
+  --el-menu-hover-bg-color: rgba(64, 158, 255, 0.1);
   --el-switch-button-size: 1rem;
+  --el-text-color-primary: #ffffff;
+  --el-text-color-regular: #eeeeee;
+  --el-text-color-secondary: #cccccc;
+  --el-text-color-placeholder: #dddddd;
+  color: var(--el-color-black);
 }
 .opengraphica .container {
   flex-grow: 1;
@@ -28459,65 +28508,6 @@ body.ogr-full-page .opengraphica {
   --el-button-hover-link-text-color: #2e8ae9;
 }
 .opengraphica .el-button--primary.is-plain {
-  --el-button-bg-color: var(--el-color-primary-light-9);
-  --el-fill-color-blank: var(--el-color-primary-light-9);
-  --el-button-border-color: var(--el-color-primary-light-6);
-}
-.opengraphica .theme-dark {
-  --ogr-background-color: #1f252d;
-  --ogr-form-connected-label-background-color: #232831;
-  --ogr-form-connected-label-border-color: #191d25;
-  --ogr-form-connected-label-input-hover-color: #f0f2f3;
-  --ogr-form-connected-label-input-focus-color: #272c37;
-  --ogr-layout-menu-bar-border-color: transparent;
-  --ogr-layout-menu-bar-background-color: #222933;
-  --ogr-working-image-border-color: black;
-  --ogr-alert-info-color: #ffffff;
-  --ogr-overlay-background-color: rgba(31, 37, 45, 0.8);
-  --ogr-snap-line-color: #66b1ff;
-  --ogr-layer-list-background-color-hover: rgba(64, 158, 255, 0.1);
-  --ogr-layer-list-background-color-active: rgba(64, 158, 255, 0.05);
-  --ogr-layer-list-background-color-drag: #66b1ff;
-  --ogr-layer-list-border-color: #0e1014;
-  --ogr-layer-list-thumbnail-border-color: #0e1014;
-  --ogr-layer-list-thumbnail-border-color-active: #333;
-  --el-color-white: #272c37;
-  --el-color-black: #eeeeee;
-  --el-color-primary: #009cff;
-  --el-color-primary-light-1: #53a8ff;
-  --el-color-primary-light-2: #66b1ff;
-  --el-color-primary-light-3: #79bbff;
-  --el-color-primary-light-4: #8cc5ff;
-  --el-color-primary-light-5: #a0cfff;
-  --el-color-primary-light-6: #b3d8ff;
-  --el-color-primary-light-7: #c6e2ff;
-  --el-color-primary-light-8: #d9ecff;
-  --el-color-primary-light-9: #ecf5ff;
-  --el-color-success: #2ad43d;
-  --el-color-warning: #eba62c;
-  --el-color-danger: #ff5562;
-  --el-color-info: #8f9198;
-  --el-color-success-light: mix(--el-color-white, --el-color-success, 80%);
-  --el-color-warning-light: mix(--el-color-white, --el-color-warning, 80%);
-  --el-color-danger-light: mix(--el-color-white, --el-color-danger, 80%);
-  --el-color-info-light: mix(--el-color-white, --el-color-info, 80%);
-  --el-color-success-lighter: mix(--el-color-white, --el-color-success, 90%);
-  --el-color-warning-lighter: mix(--el-color-white, --el-color-warning, 90%);
-  --el-color-danger-lighter: mix(--el-color-white, --el-color-danger, 90%);
-  --el-color-info-lighter: mix(--el-color-white, --el-color-info, 90%);
-  --el-fill-color-blank: #272c37;
-  --el-text-color-primary: #ffffff;
-  --el-text-color-regular: #eeeeee;
-  --el-text-color-secondary: #cccccc;
-  --el-text-color-placeholder: #dddddd;
-  --el-border-color-base: #191d25;
-  --el-border-color-light: #1c212b;
-  --el-border-color-lighter: #1d232e;
-  --el-border-color-extra-light: #F2F6FC;
-  --el-bg-color: #272c37;
-  color: var(--el-color-black);
-}
-.opengraphica .theme-dark .el-button--primary.is-plain {
   --el-button-font-color: #009cff;
   --el-button-bg-color: #23374b;
   --el-fill-color-blank: #23374b;

@@ -35,7 +35,7 @@ body.ogr-full-page {
 
 .opengraphica {
     background-color: var(--ogr-background-color);
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAMAAACeL25MAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRF////zsrFFOhhzwAAAA9JREFUeNpiYGTAAAABBgAAJwAC/BnsgQAAAABJRU5ErkJggg==');
+    background-image: var(--ogr-body-background-image);
     font-family: Roboto,
         system-ui,
         -apple-system, /* Firefox supports this but not yet `system-ui` */
@@ -293,6 +293,7 @@ body.ogr-full-page {
         }
 
         .ogr-color-picker-gradient__saturation-value {
+            background: white;
             position: relative;
             min-height: 14rem;
             cursor: pointer;
@@ -1508,7 +1509,7 @@ body.ogr-full-page {
 
     .ogr-menu-drawers {
         position: absolute;
-        background: rgba(0, 0, 0, 0.1);
+        background: var(--ogr-menu-drawers-background-color);
         top: 0;
         left: 0;
         right: 0;
