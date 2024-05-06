@@ -59,6 +59,10 @@ interface AppEmitterEvents {
     'editor.tool.cancelCurrentAction': undefined;
     'editor.tool.commitCurrentAction': undefined;
     'editor.tool.selectAll': undefined;
+    'store.setPreference': {
+        key: string;
+        value: any;
+    };
 }
 
 const emitter = mitt();

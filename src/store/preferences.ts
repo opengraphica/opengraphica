@@ -1,5 +1,6 @@
 import { KeyboardMapConfigCategory } from '@/types';
 import { PerformantStore } from './performant-store';
+import appEmitter from '@/lib/emitter';
 
 interface PreferencesState {
     dockHideBreakpoint: number;
@@ -75,6 +76,13 @@ const store = new PerformantStore<PreferencesStore>({
         'useMobileDebugger',
     ],
 });
+
+appEmitter.on('store.setPreference', (event) => {
+    if (!event) return;
+    if (Object.keys(store.state).includes(event.key)) {
+        store.set(event.key as keyof PreferencesState, event.value);
+    }
+})
 
 export default store;
 
