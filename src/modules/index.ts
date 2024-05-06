@@ -109,7 +109,7 @@ appEmitter.on('app.runModule', (event) => {
     const { action, groupName, moduleName, props, onSuccess, onError } = event;
     if (action) {
         runModuleByDefinition({
-            name: 'Loading',
+            name: 'app.wait.pleaseWait',
             description: '',
             action,
         }, props).then((result) => {
