@@ -37,6 +37,7 @@ export interface ExportAsImageOptions {
     blitActiveSelectionMask?: boolean,
     quality?: number,
     toClipboard?: boolean,
+    toBlob?: boolean,
     toFileHandle?: FileSystemFileHandle | null,
     toNewLayer?: boolean,
     dithering?: string,
@@ -44,6 +45,7 @@ export interface ExportAsImageOptions {
 }
 
 export interface ExportAsImageResults {
+    blob?: Blob;
     generatedImageHash: string;
 }
 
@@ -200,7 +202,9 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
             } else {
                 canvas.toBlob((blob) => {
                     if (blob) {
-                        if (options.toFileHandle) {
+                        if (options.toBlob) {
+                            results.blob = blob;
+                        } else if (options.toFileHandle) {
                             save(blob, options.toFileHandle);
                         } else {
                             saveAs(blob, fileName);

@@ -363,8 +363,8 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                                 image.onload = () => {
                                     resolveImage(image);
                                 };
-                                image.onerror = () => {
-                                    rejectImage();
+                                image.onerror = (error) => {
+                                    rejectImage(error);
                                 };
                                 image.src = URL.createObjectURL(file) as string;
                             });
@@ -386,7 +386,7 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                     }
                 } catch (error: any) {
                     console.error(error);
-                    rejectReader('An error occurred while parsing the file.' + error);
+                    rejectReader('An error occurred while parsing the file. ' + error);
                 }
             })
         );
