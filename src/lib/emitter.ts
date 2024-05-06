@@ -5,6 +5,7 @@ import { CanvasViewResetOptions, ModuleDefinition } from '@/types';
 interface AppEmitterEvents {
     'app.canvas.calculateDndArea': undefined;
     'app.canvas.resetTransform': undefined | CanvasViewResetOptions;
+    'app.canvas.ready': undefined;
     'app.component.register': any;
     'app.dialogs.openFromDock': {
         name: string;
