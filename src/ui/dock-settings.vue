@@ -18,14 +18,22 @@
                             <i class="bi bi-folder2-open"></i>
                             <span v-t="'dock.settings.file.menu.open'"></span>
                         </el-menu-item>
-                        <el-menu-item index="export">
-                            <i class="bi bi-box-arrow-up"></i>
-                            <span v-t="'dock.settings.file.menu.export'"></span>
-                        </el-menu-item>
-                        <el-menu-item index="saveAs">
-                            <i class="bi bi-download"></i>
-                            <span v-t="'dock.settings.file.menu.saveAs'"></span>
-                        </el-menu-item>
+                        <template v-if="vendorCustomSaveCallback">
+                            <el-menu-item index="save">
+                                <i class="bi bi-download"></i>
+                                <span v-t="'dock.settings.file.menu.save'"></span>
+                            </el-menu-item>
+                        </template>
+                        <template v-else>
+                            <el-menu-item index="export">
+                                <i class="bi bi-box-arrow-up"></i>
+                                <span v-t="'dock.settings.file.menu.export'"></span>
+                            </el-menu-item>
+                            <el-menu-item index="saveAs">
+                                <i class="bi bi-download"></i>
+                                <span v-t="'dock.settings.file.menu.saveAs'"></span>
+                            </el-menu-item>
+                        </template>
                         <el-divider />
                         <el-menu-item index="insertPhoto">
                             <i class="bi bi-plus-circle"></i>
@@ -370,6 +378,10 @@ export default defineComponent({
             visitedTabs.value[newActiveTab] = true;
         }, { immediate: true });
 
+        // File operations
+
+        const { vendorCustomSaveCallback } = toRefs(preferencesStore.state);
+
         // View zoom/pan/rotate
         const zoomLevel = computed<number>({
             get() {
@@ -618,6 +630,11 @@ export default defineComponent({
                             case 'export':
                                 await runModule('file', 'export');
                                 break;
+                            case 'save':
+                                if (vendorCustomSaveCallback.value) {
+                                    vendorCustomSaveCallback.value();
+                                }
+                                break;
                             case 'saveAs':
                                 await runModule('file', 'saveAs');
                                 break;
@@ -675,6 +692,8 @@ export default defineComponent({
             activeTab,
             visitedTabs,
             loading,
+
+            vendorCustomSaveCallback,
 
             rotationAngle,
             zoomLevel,

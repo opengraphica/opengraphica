@@ -25,6 +25,7 @@ interface PreferencesState {
     touchRotation: 'on' | 'snap' | 'off';
     useCanvasViewport: boolean;
     useMobileDebugger: boolean;
+    vendorCustomSaveCallback: (() => void) | null;
 }
 
 interface PreferencesStore {
@@ -57,6 +58,7 @@ const store = new PerformantStore<PreferencesStore>({
         touchRotation: 'off',
         useCanvasViewport: true,
         useMobileDebugger: false,
+        vendorCustomSaveCallback: null,
     },
     restore: [
         'dockPosition',
