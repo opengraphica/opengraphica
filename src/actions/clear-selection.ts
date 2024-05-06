@@ -1,6 +1,6 @@
 
 import { BaseAction } from './base';
-import imageStore from './data/image-store';
+import imageDatabase from '@/store/data/image-database';
 import {
     activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset,
     activeSelectionPath, previewActiveSelectionMask, selectionCombineMode, SelectionPathPoint, SelectionCombineMode
@@ -30,7 +30,7 @@ export class ClearSelectionAction extends BaseAction {
             try {
                 let oldMaskBlob: Blob | null = await fetch(appliedSelectionMask.value.src).then(result => result.blob());
                 if (oldMaskBlob) {
-                    this.oldAppliedMaskDatabaseId = await imageStore.add(oldMaskBlob);
+                    this.oldAppliedMaskDatabaseId = await imageDatabase.add(oldMaskBlob);
                     this.oldAppliedMaskDatabaseSizeEstimate = oldMaskBlob.size;
                 }
                 oldMaskBlob = null;
@@ -75,7 +75,7 @@ export class ClearSelectionAction extends BaseAction {
         let oldMaskBlob: Blob | null = null;
 		if (this.oldAppliedMaskDatabaseId != null) {
 			try {
-				oldMaskBlob = await imageStore.get(this.oldAppliedMaskDatabaseId) as Blob;
+				oldMaskBlob = await imageDatabase.get(this.oldAppliedMaskDatabaseId) as Blob;
 			} catch (error) {
 				throw new Error('Aborted - Failed to retrieve image from store');
 			}
@@ -109,7 +109,7 @@ export class ClearSelectionAction extends BaseAction {
         super.free();
 
         if (this.oldAppliedMaskDatabaseId) {
-            imageStore.delete(this.oldAppliedMaskDatabaseId);
+            imageDatabase.delete(this.oldAppliedMaskDatabaseId);
         }
 
         (this.oldActiveSelectionPath as any) = null;

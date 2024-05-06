@@ -89,6 +89,7 @@ module.exports = function setupConfig(config) {
             ],
             alias: {
                 '@': path.resolve(__dirname, 'src/'),
+                'paper': 'paper/dist/paper-core.js',
                 'vue-i18n': 'vue-i18n/dist/vue-i18n.esm-bundler.js'
             },
             extensions: ['.js', '.mjs', '.ts', '.vue', '.json']
@@ -282,6 +283,10 @@ module.exports = function setupConfig(config) {
                     pica: {
                         test: /[\\/]node_modules[\\/]pica[\\/]/,
                         name: 'pica',
+                    },
+                    paper: {
+                        test: /[\\/]node_modules[\\/](paper)[\\/](dist)[\\/](paper-core)/,
+                        name: 'paper'
                     },
                     polyfill: {
                         test: /[\\/]node_modules[\\/](resize-observer-polyfill)[\\/]/,

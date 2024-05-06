@@ -5,7 +5,6 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { markRaw } from 'vue';
 import { BaseAction } from './base';
-import imageStore from './data/image-store';
 import { createEmptyCanvasWith2dContext } from '@/lib/image';
 import { drawImageToCanvas2d } from '@/lib/canvas';
 import canvasStore from '@/store/canvas';

@@ -25,6 +25,7 @@ interface IDBDatabaseEnhanced extends IDBDatabase {
 
 let imageIdCounter: number = 0;
 let database: IDBDatabaseEnhanced | MemoryStore | null = null;
+let databaseBackup: MemoryStore;
 let databaseInitPromise: Promise<void> | null = null;
 const tabPingInterval: number = 60000;
 const assumeTabIsClosedTimeout: number = 300000; // Inactive tabs setInterval is slowed down in most browsers, this should be significantly higher than tabPingInterval
@@ -91,8 +92,12 @@ export default {
                 } catch (error) {
                     database = {
                         isMemory: true,
-                        images: {}
+                        images: {},
                     };
+                }
+                databaseBackup = {
+                    isMemory: true,
+                    images: {},
                 }
                 resolveInit();
             });
@@ -115,20 +120,27 @@ export default {
             database.images[imageId] = imageData;
         } else {
             await new Promise<void>((resolve, reject) => {
-                const transaction = (database as IDBDatabaseEnhanced).transaction('images', 'readwrite');
-                const images = transaction.objectStore('images');
-                const image = {
-                    id: imageId,
-                    tabUuid,
-                    data: imageData
-                }
-                const request = images.add(image);
-                request.onsuccess = function() {
+                try {
+                    const transaction = (database as IDBDatabaseEnhanced).transaction('images', 'readwrite');
+                    const images = transaction.objectStore('images');
+                    const image = {
+                        id: imageId,
+                        tabUuid,
+                        data: imageData
+                    }
+                    const request = images.add(image);
+                    request.onsuccess = function() {
+                        resolve();
+                    };
+                    request.onerror = function() {
+                        console.warn('[src/store/data/image-database.ts] Failed to store image in IndexedDB. Falling back to memory.');
+                        databaseBackup.images[imageId] = imageData;
+                        resolve();
+                    };
+                } catch (error) {
+                    databaseBackup.images[imageId] = imageData;
                     resolve();
-                };
-                request.onerror = function() {
-                    reject(request.error);
-                };
+                }
             });
         }
         return imageId;
@@ -146,15 +158,27 @@ export default {
             return database.images[imageId] as never;
         } else {
             return new Promise((resolve, reject) => {
-                const transaction = (database as IDBDatabaseEnhanced).transaction('images', 'readonly');
-                const images = transaction.objectStore('images');
-                const request = images.get(imageId);
-                request.onsuccess = function() {
-                    resolve(request.result && request.result.data);
-                };
-                request.onerror = function() {
-                    reject(request.error);
-                };
+                try {
+                    const transaction = (database as IDBDatabaseEnhanced).transaction('images', 'readonly');
+                    const images = transaction.objectStore('images');
+                    const request = images.get(imageId);
+                    request.onsuccess = function() {
+                        resolve(request.result && request.result.data);
+                    };
+                    request.onerror = function() {
+                        if (databaseBackup.images[imageId]) {
+                            resolve(databaseBackup.images[imageId] as never);
+                        } else {
+                            reject(request.error);
+                        }
+                    };
+                } catch (error) {
+                    if (databaseBackup.images[imageId]) {
+                        resolve(databaseBackup.images[imageId] as never);
+                    } else {
+                        reject(error);
+                    }
+                }
             });
         }
     },
@@ -170,6 +194,7 @@ export default {
         if (database?.isMemory) {
             delete database.images[imageId];
         } else {
+            delete databaseBackup.images[imageId];
             return new Promise((resolve, reject) => {
                 const transaction = (database as IDBDatabaseEnhanced).transaction('images', 'readwrite');
                 const images = transaction.objectStore('images');
@@ -194,6 +219,7 @@ export default {
         if (database?.isMemory) {
             database.images = {};
         } else {
+            databaseBackup.images = {};
             return new Promise<void>((resolve, reject) => {
                 const transaction = (database as IDBDatabaseEnhanced).transaction('images', 'readwrite');
                 const images = transaction.objectStore('images');
