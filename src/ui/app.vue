@@ -194,7 +194,7 @@ export default defineComponent({
             if (e.dataTransfer && e.dataTransfer.files?.length > 0) {
                 appEmitter.emit('app.wait.startBlocking', { id: 'documentDropFiles', label: 'app.wait.loadingImage' });
                 const { openFromFileList } = await import(/* webpackChunkName: 'module-file-open' */ '@/modules/file/open');
-                await openFromFileList(e.dataTransfer.files, { insert: true });
+                await openFromFileList({ files: e.dataTransfer.files, dialogOptions: { insert: true } });
                 appEmitter.emit('app.wait.stopBlocking', { id: 'documentDropFiles' });
                 appEmitter.emit('app.workingFile.notifyImageLoadedFromDragAndDrop');
             }

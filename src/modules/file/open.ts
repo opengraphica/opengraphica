@@ -31,6 +31,11 @@ interface FileDialogOpenOptions {
     cancelRef?: Ref<boolean>;
 }
 
+interface FileListOpenOptions {
+    files?: FileList | Array<File>;
+    dialogOptions?: FileDialogOpenOptions;
+}
+
 export async function openFromFileDialog(options: FileDialogOpenOptions = {}): Promise<void> {
 
     // We're working with new APIs
@@ -58,7 +63,7 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
             }
         }
         if (files.length > 0) {
-            await openFromFileList(files, options);
+            await openFromFileList({ files, dialogOptions: options });
             if (!options.insert && firstFileHandle) {
                 workingFileStore.set('fileHandle', firstFileHandle);
             }
@@ -104,7 +109,7 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
                 const files = (e.target as HTMLInputElement).files;
                 if (files) {
                     try {
-                        await openFromFileList(files, options);
+                        await openFromFileList({ files, dialogOptions: options });
                         resolve();
                     } catch (error: any) {
                         reject(error);
@@ -140,7 +145,7 @@ export async function openFromTemporaryStorage() {
         console.warn(error);
         throw new Error('Could load file. It may not exist.');
     }
-    await openFromFileList([new File([savedJson], "quicksave.json", { type: "text/plain" })]);
+    await openFromFileList({ files: [new File([savedJson], "quicksave.json", { type: "text/plain" })] });
 }
 
 export async function insertFromFileDialog(options: FileDialogOpenOptions = {}) {
@@ -151,7 +156,10 @@ export async function insertFromFileDialog(options: FileDialogOpenOptions = {}) 
     });
 }
 
-export async function openFromFileList(files: FileList | Array<File>, options: FileDialogOpenOptions = {}) {
+export async function openFromFileList({ files, dialogOptions }: FileListOpenOptions = {}) {
+    if (!files) return;
+    if (!dialogOptions) dialogOptions = {};
+
     type FileReadType = 'json' | 'image';
     type FileReadResolve =
         { type: 'image', result: HTMLImageElement, file: File } |
@@ -182,7 +190,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                             const result: { image: HTMLImageElement, duration: number }[] = [];
                             const gifArrayBuffer = await new Promise<ArrayBuffer | null>((resolveArrayBuffer) => {
                                 fileReader.onload = async () => {
-                                    if (options.cancelRef && options.cancelRef.value === true) {
+                                    if (dialogOptions?.cancelRef?.value === true) {
                                         rejectReader('File open canceled.');
                                         resolveArrayBuffer(null);
                                     } else {
@@ -236,7 +244,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                                     ctx.drawImage(gifFrameImage, 0, 0);
                                     gifFrameImage.src = '';
                                 }
-                                if (options.cancelRef && options.cancelRef.value === true) {
+                                if (dialogOptions?.cancelRef?.value === true) {
                                     rejectReader('File open canceled.');
                                     return;
                                 }
@@ -258,7 +266,8 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                                         image.src = URL.createObjectURL(GifPresenter.writeToBlob(gifSplit[i].writeToArrayBuffer()));
                                     }
                                 });
-                                if (options.cancelRef && options.cancelRef.value === true) {
+                                // @ts-ignore 2365
+                                if (dialogOptions?.cancelRef?.value === true) {
                                     rejectReader('File open canceled.');
                                     return;
                                 }
@@ -289,7 +298,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                             while ((video.duration === Infinity || isNaN(video.duration)) && video.readyState < 2) {
                                 await new Promise(r => setTimeout(r, 1000));
                                 video.currentTime = 10000000 * Math.random();
-                                if (options.cancelRef && options.cancelRef.value === true) {
+                                if (dialogOptions?.cancelRef?.value === true) {
                                     rejectReader('File open canceled.');
                                     return;
                                 }
@@ -316,7 +325,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                                 let base64ImageData = canvas.toDataURL();
                                 frames.push(base64ImageData);
                                 currentTime += interval;
-                                if (options.cancelRef && options.cancelRef.value === true) {
+                                if (dialogOptions?.cancelRef?.value === true) {
                                     rejectReader('File open canceled.');
                                     return;
                                 }
@@ -332,7 +341,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                                     };
                                     image.src = frame;
                                 });
-                                if (options.cancelRef && options.cancelRef.value === true) {
+                                if (dialogOptions?.cancelRef?.value === true) {
                                     rejectReader('File open canceled.');
                                     return;
                                 }
@@ -364,7 +373,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                     }
                     else if (fileReadType === 'json') {
                         fileReader.onload = async () => {
-                            if (options.cancelRef && options.cancelRef.value === true) {
+                            if (dialogOptions?.cancelRef?.value === true) {
                                 rejectReader('File open canceled.');
                             } else {
                                 resolveReader({ type: 'json', result: fileReader.result as string, file: file });
@@ -481,7 +490,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
         }
 
         const fileUpdateActions: BaseAction[] = [];
-        if (options.insert) {
+        if (dialogOptions.insert) {
             if (workingFileStore.state.layers.length === 0) {
                 fileUpdateActions.push(
                     new UpdateFileAction({
@@ -503,7 +512,7 @@ export async function openFromFileList(files: FileList | Array<File>, options: F
                 ...insertLayerActions
             ])
         });
-        if (!options.insert) {
+        if (!dialogOptions.insert) {
             await historyStore.dispatch('free', {
                 memorySize: Infinity,
                 databaseSize: Infinity

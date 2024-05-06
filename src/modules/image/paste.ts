@@ -81,9 +81,12 @@ export async function paste() {
 
             if (isUseFile && blob) {
                 const { openFromFileList } = await import(/* webpackChunkName: 'module-file-open' */ '@/modules/file/open');
-                await openFromFileList([
-                    new File([blob], 'image.png')
-                ], { insert: true });
+                await openFromFileList({
+                        files: [
+                        new File([blob], 'image.png')
+                    ],
+                    dialogOptions: { insert: true },
+                });
             } else {
                 const { pasteFromEditorCopyBuffer } = await import('@/modules/image/paste');
                 await pasteFromEditorCopyBuffer();

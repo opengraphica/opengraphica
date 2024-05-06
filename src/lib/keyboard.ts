@@ -173,7 +173,7 @@ async function onDocumentPaste(e: ClipboardEvent) {
 
                             if (isUseFile) {
                                 const { openFromFileList } = await import(/* webpackChunkName: 'module-file-open' */ '@/modules/file/open');
-                                await openFromFileList([file], { insert: true });
+                                await openFromFileList({ files: [file], dialogOptions: { insert: true } });
                             } else {
                                 const { pasteFromEditorCopyBuffer } = await import('@/modules/image/paste');
                                 await pasteFromEditorCopyBuffer();

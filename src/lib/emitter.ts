@@ -1,6 +1,6 @@
 import mitt, { Handler } from 'mitt';
 import { NotificationProps, NotificationHandle } from 'element-plus/lib/components/notification/src/notification.d';
-import { CanvasViewResetOptions } from '@/types';
+import { CanvasViewResetOptions, ModuleDefinition } from '@/types';
 
 interface AppEmitterEvents {
     'app.canvas.calculateDndArea': undefined;
@@ -28,6 +28,14 @@ interface AppEmitterEvents {
         immediate?: boolean;
     },
     'app.notify': Partial<NotificationProps> & { onCreated?: (handle: NotificationHandle) => void; };
+    'app.runModule': {
+        action?: ModuleDefinition['action'];
+        groupName?: string;
+        moduleName?: string;
+        props?: any;
+        onSuccess?: (event?: any) => void;
+        onError?: (error?: any) => void;
+    },
     'app.wait.startBlocking': {
         id: string;
         label?: string;
