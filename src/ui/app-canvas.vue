@@ -238,16 +238,20 @@ export default defineComponent({
         ) => {
             const { TextureLoader } = await import('three/src/loaders/TextureLoader');
             const { Texture } = await import('three/src/textures/Texture');
-            const { Matrix4 } = await import('three/src/math/Matrix4');
             const { ClampToEdgeWrapping } = await import('three/src/constants');
 
             const newSelectionMask = newActiveSelectionMask ?? newAppliedSelectionMask ?? newSelectedLayersSelectionMaskPreview;
             const oldSelectionMask = oldActiveSelectionMask ?? oldAppliedSelectionMask ?? oldSelectedLayersSelectionMaskPreview;
             const newCanvasOffset = newActiveSelectionMask ? newActiveSelectionMaskCanvasOffset : (newAppliedSelectionMask ? newAppliedSelectionMaskCanvasOffset : newSelectedLayersSelectionMaskPreviewCanvasOffset);
 
+            // TODO - check if new mask is always re-assigned a reference, may want to use canvas instead of image for performance...
+
             const threejsCamera = canvasStore.get('threejsCamera');
             const threejsSelectionMask = canvasStore.get('threejsSelectionMask');
             if (!threejsCamera || !threejsSelectionMask) return;
+
+            threejsSelectionMask.material.uniforms.selectedMaskMap.value?.dispose();
+            threejsSelectionMask.material.uniforms.selectedMaskMap.value = undefined;
 
             if (newSelectionMask) {
                 const selectionMaskTexture = await new Promise<InstanceType<typeof Texture> | undefined>((resolve) => {
@@ -267,7 +271,6 @@ export default defineComponent({
                 }
                 threejsSelectionMask.visible = true;
             } else {
-                threejsSelectionMask.material.uniforms.selectedMaskMap.value = undefined;
                 threejsSelectionMask.material.uniforms.selectedMaskSize.value = [1, 1];
                 threejsSelectionMask.visible = false;
             }
@@ -360,7 +363,6 @@ export default defineComponent({
             const { default: selectionMaskMaterialVertexShader } = await import('@/canvas/renderers/webgl/shaders/selection-mask-material.vert');
             const workingFileWidth = workingFileStore.state.width;
             const workingFileHeight = workingFileStore.state.height;
-
 
             const threejsRenderer = new WebGLRenderer({
                 alpha: true,
