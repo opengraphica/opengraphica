@@ -133,7 +133,7 @@ export default {
                         resolve();
                     };
                     request.onerror = function() {
-                        console.warn('[src/store/data/image-database.ts] Failed to store image in IndexedDB. Falling back to memory.');
+                        console.warn('[src/store/data/image-database.ts] Failed to store image in IndexedDB. Falling back to memory.', request.error);
                         databaseBackup.images[imageId] = imageData;
                         resolve();
                     };

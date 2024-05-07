@@ -25,7 +25,7 @@ imageBakeWorker.onmessage = ({ data }: { data: FilterBakeResult }) => {
     }
 };
 imageBakeWorker.onmessageerror = (error) => {
-    console.error('Error received from imageBakeWorker', error);
+    console.error('[src/workers/image-bake.interface.ts] Error received from imageBakeWorker', error);
 };
 
 export function bakeCanvasFilters(imageData: ImageData, layerId: number, filterConfigurations: WorkingFileLayerFilter[]): Promise<ImageData> {

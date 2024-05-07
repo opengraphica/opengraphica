@@ -579,7 +579,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 });
             }
         } catch (error) {
-            console.error(error);
+            console.error('[src/canvas/controllers/free-transform.ts] Error while committing transform action. ', error);
         }
         this.transformTranslateStart = null;
         this.transformStartLayerData = [];
@@ -748,7 +748,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
     protected handleCursorIcon() {
         let newIcon = super.handleCursorIcon();
-        if (!newIcon) {
+        if (!newIcon && workingFileStore.state.selectedLayerIds.length > 0) {
             const dragHandle = dragHandleHighlight.value;
             determineResizeHandleIcon:
             if (dragHandle != null) {

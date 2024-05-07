@@ -15,7 +15,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
             try {
                 await this.onAttach(layer);
             } catch (error) {
-                console.error(error);
+                console.error('[src/canvas/renderers/2d/base.test] Error during layer attach. ', error);
             }
             this.isAttached = true;
         }
@@ -29,7 +29,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
             try {
                 this.onDetach();
             } catch (error) {
-                console.error(error);
+                console.error('[src/canvas/renderers/2d/base.test] Error during layer detach. ', error);
             }
             this.isAttached = false;
         }

@@ -50,6 +50,7 @@ export default defineComponent({
         const selectionMaskCanvas = ref<HTMLCanvasElement>();
         let selectionMaskCanvasCtx: CanvasRenderingContext2D | null = null;
         const selectionMaskPattern = new Image();
+        const selectionMaskPatternSrc = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAABg2lDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV/TiiIVh3YQcchQnVoQFXHUKhShQqgVWnUwufQLmjQkKS6OgmvBwY/FqoOLs64OroIg+AHi6OSk6CIl/i8ptIjx4Lgf7+497t4BQrPKNCs0Dmi6bWZSSTGXXxV7XyEgghDiCMjMMuYkKQ3f8XWPAF/vEjzL/9yfY0AtWAwIiMSzzDBt4g3i6U3b4LxPHGVlWSU+J46bdEHiR64rHr9xLrks8Myomc3ME0eJxVIXK13MyqZGPEUcUzWd8oWcxyrnLc5atc7a9+QvDBf0lWWu0xxBCotYggQRCuqooAobCVp1UixkaD/p4x92/RK5FHJVwMixgBo0yK4f/A9+d2sVJye8pHAS6HlxnI9RoHcXaDUc5/vYcVonQPAZuNI7/loTmPkkvdHRYkfA4DZwcd3RlD3gcgcYejJkU3alIE2hWATez+ib8kDkFuhf83pr7+P0AchSV+kb4OAQGCtR9rrPu/u6e/v3TLu/Hx5FcoXj45C+AAAABmJLR0QATgBOAE714JEKAAAACXBIWXMAAC4jAAAuIwF4pT92AAAAB3RJTUUH5gITBDkEOkUYUQAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAAtSURBVAjXY/z//383AxT4+/szMCFzNm7cCBGAcRgYGBiYz58/7wbjMDAwMAAAGKUPRK2REh8AAAAASUVORK5CYII=';
         const canvasBackground = ref<HTMLDivElement>();
         const postProcessCanvas = ref<HTMLCanvasElement>();
         const canvasArea = ref<HTMLDivElement>();
@@ -142,6 +143,7 @@ export default defineComponent({
             }
         });
 
+        // Toggle between CSS and 2D canvas-rendered viewport
         watch([useCssViewport], ([isUseCssViewport]) => {
             const canvasElement = canvasStore.get('viewCanvas');
             const bufferCanvas = canvasStore.get('bufferCanvas');
@@ -172,6 +174,7 @@ export default defineComponent({
             canvasStore.set('dirty', true);
         });
 
+        // Update canvas on browser window resize
         watch([viewportWidth, viewportHeight], ([newWidth, newHeight]) => {
             const canvasElement = canvas.value;
             if (canvasElement) {
@@ -188,8 +191,8 @@ export default defineComponent({
             canvasStore.set('viewDirty', true);
         });
 
+        // Update canvas on working file resize
         watch([imageWidth, imageHeight], async ([newWidth, newHeight]) => {
-
             const canvasElement = canvasStore.get('viewCanvas');
             const bufferCanvas = canvasStore.get('bufferCanvas');
             const renderer = canvasStore.get('renderer');
@@ -222,13 +225,62 @@ export default defineComponent({
             canvasStore.set('dirty', true);
         });
 
+        // Update selection mask images in GPU memory
+        watch([
+            activeSelectionMask, activeSelectionMaskCanvasOffset,
+            appliedSelectionMask, appliedSelectionMaskCanvasOffset,
+            selectedLayersSelectionMaskPreview, selectedLayersSelectionMaskPreviewCanvasOffset,
+        ], async (
+            [newActiveSelectionMask, newActiveSelectionMaskCanvasOffset, newAppliedSelectionMask, newAppliedSelectionMaskCanvasOffset,
+            newSelectedLayersSelectionMaskPreview, newSelectedLayersSelectionMaskPreviewCanvasOffset],
+            [oldActiveSelectionMask, oldActiveSelectionMaskCanvasOffset, oldAppliedSelectionMask, oldAppliedSelectionMaskCanvasOffset,
+            oldSelectedLayersSelectionMaskPreview, oldSelectedLayersSelectionMaskPreviewCanvasOffset]
+        ) => {
+            const { TextureLoader } = await import('three/src/loaders/TextureLoader');
+            const { Texture } = await import('three/src/textures/Texture');
+            const { Matrix4 } = await import('three/src/math/Matrix4');
+            const { ClampToEdgeWrapping } = await import('three/src/constants');
+
+            const newSelectionMask = newActiveSelectionMask ?? newAppliedSelectionMask ?? newSelectedLayersSelectionMaskPreview;
+            const oldSelectionMask = oldActiveSelectionMask ?? oldAppliedSelectionMask ?? oldSelectedLayersSelectionMaskPreview;
+            const newCanvasOffset = newActiveSelectionMask ? newActiveSelectionMaskCanvasOffset : (newAppliedSelectionMask ? newAppliedSelectionMaskCanvasOffset : newSelectedLayersSelectionMaskPreviewCanvasOffset);
+
+            const threejsCamera = canvasStore.get('threejsCamera');
+            const threejsSelectionMask = canvasStore.get('threejsSelectionMask');
+            if (!threejsCamera || !threejsSelectionMask) return;
+
+            if (newSelectionMask) {
+                const selectionMaskTexture = await new Promise<InstanceType<typeof Texture> | undefined>((resolve) => {
+                    const texture = new TextureLoader().load(
+                        newSelectionMask.src,
+                        () => { resolve(texture); },
+                        undefined,
+                        () => { resolve(undefined); }
+                    );
+                });
+                if (selectionMaskTexture) {
+                    selectionMaskTexture.wrapS = ClampToEdgeWrapping;
+                    selectionMaskTexture.wrapT = ClampToEdgeWrapping;
+                    threejsSelectionMask.material.uniforms.selectedMaskMap.value = selectionMaskTexture;
+                    threejsSelectionMask.material.uniforms.selectedMaskSize.value = [selectionMaskTexture.image.width, selectionMaskTexture.image.height];
+                    threejsSelectionMask.material.uniforms.selectedMaskOffset.value = [newCanvasOffset.x, newCanvasOffset.y];
+                }
+                threejsSelectionMask.visible = true;
+            } else {
+                threejsSelectionMask.material.uniforms.selectedMaskMap.value = undefined;
+                threejsSelectionMask.material.uniforms.selectedMaskSize.value = [1, 1];
+                threejsSelectionMask.visible = false;
+            }
+            threejsSelectionMask.material.uniforms.inverseProjectionMatrix.value = threejsCamera.projectionMatrixInverse.elements;
+            threejsSelectionMask.material.needsUpdate = true;
+            canvasStore.set('dirty', true);
+        });
+
         onMounted(async () => {
             loading.value = true;
             appEmitter.on('app.canvas.resetTransform', resetTransform);
 
             if (canvas.value) {                
-                const imageWidth = workingFileStore.get('width');
-                const imageHeight = workingFileStore.get('height');
 
                 // Set up canvas width/height based on view
                 if (rootElement?.value) {
@@ -242,12 +294,12 @@ export default defineComponent({
                         postProcessCanvas.value.style.display = 'none';
                     }
                 } else {
-                    canvas.value.width = imageWidth;
-                    canvas.value.height = imageHeight;
+                    canvas.value.width = imageWidth.value;
+                    canvas.value.height = imageHeight.value;
                     if (postProcessCanvas.value) {
                         postProcessCanvas.value.style.display = 'block';
-                        postProcessCanvas.value.width = imageWidth;
-                        postProcessCanvas.value.height = imageHeight;
+                        postProcessCanvas.value.width = imageWidth.value;
+                        postProcessCanvas.value.height = imageHeight.value;
                     }
                 }
 
@@ -258,101 +310,16 @@ export default defineComponent({
                     renderer = 'webgl';
                 }
                 if (renderer === 'webgl') {
-                    const { WebGLRenderer } = await import('three/src/renderers/WebGLRenderer');
-                    const { Scene } = await import('three/src/scenes/Scene');
-                    const { OrthographicCamera } = await import('three/src/cameras/OrthographicCamera');
-                    const { PlaneGeometry } = await import('three/src/geometries/PlaneGeometry');
-                    const { MeshBasicMaterial } = await import('three/src/materials/MeshBasicMaterial');
-                    const { Mesh } = await import('three/src/objects/Mesh');
-                    const { Matrix4 } = await import('three/src/math/Matrix4');
-                    const { DoubleSide, sRGBEncoding } = await import('three/src/constants');
-                    const { EffectComposer } = await import('@/canvas/renderers/webgl/three/postprocessing/EffectComposer');
-                    const { RenderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/RenderPass');
-                    const { ShaderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/ShaderPass');
-                    const { GammaCorrectionShader } = await import('@/canvas/renderers/webgl/three/shaders/GammaCorrectionShader');
                     try {
-                        const workingFileWidth = workingFileStore.state.width;
-                        const workingFileHeight = workingFileStore.state.height;
-
-                        const threejsRenderer = new WebGLRenderer({
-                            alpha: true,
-                            canvas: canvas.value,
-                            premultipliedAlpha: true,
-                            powerPreference: 'high-performance'
-                        });
-                        threejsRenderer.outputEncoding = sRGBEncoding;
-                        threejsRenderer.setSize(1, 1);
-                        canvasStore.set('threejsRenderer', threejsRenderer);
-
-                        const threejsScene = markRaw(new Scene());
-                        canvasStore.set('threejsScene', threejsScene);
-
-                        const backgroundGeometry = new PlaneGeometry(workingFileWidth, workingFileHeight);
-                        const backgroundMaterial = new MeshBasicMaterial({ color: 0xffffff, transparent: true, side: DoubleSide });
-                        const threejsBackground = new Mesh(backgroundGeometry, backgroundMaterial);
-                        threejsBackground.position.x = workingFileWidth / 2;
-                        threejsBackground.position.y = workingFileHeight / 2;
-                        threejsBackground.renderOrder = -1;
-                        threejsScene.add(threejsBackground);
-                        canvasStore.set('threejsBackground', markRaw(threejsBackground));
-
-                        await updateThreejsCanvasMargin(workingFileWidth, workingFileHeight);
-
-                        const threejsCamera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 10000);
-                        threejsCamera.matrixAutoUpdate = false;
-                        canvasStore.set('threejsCamera', threejsCamera);
-
-                        const threejsComposer = new EffectComposer(threejsRenderer);
-                        const renderPass = new RenderPass(threejsScene, threejsCamera);
-                        threejsComposer.addPass(renderPass);
-                        threejsComposer.addPass(new ShaderPass(GammaCorrectionShader));
-                        canvasStore.set('threejsComposer', markRaw(threejsComposer));
-
-                        canvasStore.set('renderer', 'webgl');
-                        updateThreejsImageSize(imageWidth, imageHeight, viewportWidth.value, viewportHeight.value);
-
-                        // Assign new render function
-                        renderMainCanvas = () => {
-                            let cameraTransform: DOMMatrix;
-                            if (canvasStore.get('useCssViewport')) {
-                                cameraTransform = new DOMMatrix().inverse().translate(0, 0, 1);
-                            } else {
-                                const devicePixelRatio = window.devicePixelRatio || 1;
-                                cameraTransform = canvasStore.get('transform').inverse().translate(0, 0, 1);
-                            }
-                            const matrix = new Matrix4();
-                            matrix.set(
-                                cameraTransform.m11, cameraTransform.m21, cameraTransform.m31, cameraTransform.m41,
-                                cameraTransform.m12, cameraTransform.m22, cameraTransform.m32, cameraTransform.m42,
-                                cameraTransform.m13, cameraTransform.m23, cameraTransform.m33, cameraTransform.m43,
-                                cameraTransform.m14, cameraTransform.m24, cameraTransform.m34, cameraTransform.m44
-                            );
-                            threejsCamera.matrix = matrix;
-                            threejsCamera.updateMatrixWorld(true);
-                            threejsCamera.updateProjectionMatrix();
-                            drawWorkingFileToCanvasWebgl(threejsComposer, threejsRenderer, threejsScene, threejsCamera, { isEditorPreview: true });
-                        };
-                        renderMainCanvas();
-                        ctx = threejsRenderer.context;
+                        await initializeThreejsRenderer();
                     } catch (error) {
-                        console.error(error);
+                        renderer = '2d';
+                        console.error('[src/ui/app-canvas.vue] Error setting up threejs renderer. ', error);
                     }
                 }
                 // Above can fail and default back to 2d.
                 if (renderer === '2d') {
-                    // Set up buffer canvas
-                    const originalCtx = canvas.value.getContext('2d', getCanvasRenderingContext2DSettings());
-                    const bufferCanvas = document.createElement('canvas');
-                    bufferCanvas.width = useCssViewport.value === true ? 10 : imageWidth;
-                    bufferCanvas.height = useCssViewport.value === true ? 10 : imageHeight;
-                    let bufferCtx: CanvasRenderingContext2D = bufferCanvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
-                    if (originalCtx && bufferCtx) {
-                        // Assign view canvas
-                        ctx = originalCtx;
-                        // Assign buffer canvas
-                        canvasStore.set('bufferCanvas', bufferCanvas);
-                        canvasStore.set('bufferCtx', bufferCtx);
-                    }
+                    await initializeCanvas2dRenderer();
                 }
 
                 ctx && canvasStore.set('viewCtx', ctx);
@@ -361,23 +328,9 @@ export default defineComponent({
                 drawLoop();
 
                 // Set up pica image rescaler
-                Pica = (await import('@/lib/pica')).default;
-                const __extractTileData = Pica.prototype.__extractTileData;
-                Pica.prototype.__extractTileData = function() {
-                    const startTime = window.performance.now();
-                    const originalReturn = __extractTileData.apply(this, arguments);
-                    postProcessAverageLag = (postProcessAverageLag * .75) + ((window.performance.now() - startTime) * .25);
-                    return originalReturn;
-                };
-                pica = new Pica({
-                    idle: 20000
-                });
+                await initializePica();
             }
-            if (selectionMaskCanvas.value) {
-                canvasStore.set('selectionMaskCanvas', selectionMaskCanvas.value);
-                selectionMaskCanvasCtx = selectionMaskCanvas.value.getContext('2d', getCanvasRenderingContext2DSettings());
-                selectionMaskPattern.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAABg2lDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV/TiiIVh3YQcchQnVoQFXHUKhShQqgVWnUwufQLmjQkKS6OgmvBwY/FqoOLs64OroIg+AHi6OSk6CIl/i8ptIjx4Lgf7+497t4BQrPKNCs0Dmi6bWZSSTGXXxV7XyEgghDiCMjMMuYkKQ3f8XWPAF/vEjzL/9yfY0AtWAwIiMSzzDBt4g3i6U3b4LxPHGVlWSU+J46bdEHiR64rHr9xLrks8Myomc3ME0eJxVIXK13MyqZGPEUcUzWd8oWcxyrnLc5atc7a9+QvDBf0lWWu0xxBCotYggQRCuqooAobCVp1UixkaD/p4x92/RK5FHJVwMixgBo0yK4f/A9+d2sVJye8pHAS6HlxnI9RoHcXaDUc5/vYcVonQPAZuNI7/loTmPkkvdHRYkfA4DZwcd3RlD3gcgcYejJkU3alIE2hWATez+ib8kDkFuhf83pr7+P0AchSV+kb4OAQGCtR9rrPu/u6e/v3TLu/Hx5FcoXj45C+AAAABmJLR0QATgBOAE714JEKAAAACXBIWXMAAC4jAAAuIwF4pT92AAAAB3RJTUUH5gITBDkEOkUYUQAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAAtSURBVAjXY/z//383AxT4+/szMCFzNm7cCBGAcRgYGBiYz58/7wbjMDAwMAAAGKUPRK2REh8AAAAASUVORK5CYII=';
-            }
+            
             loading.value = false;
             appEmitter.emit('app.canvas.ready');
         });
@@ -385,6 +338,171 @@ export default defineComponent({
         onUnmounted(() => {
             appEmitter.off('app.canvas.resetTransform', resetTransform);
         });
+
+        // Set up canvas for webgl rendering
+        async function initializeThreejsRenderer() {
+            const { WebGLRenderer } = await import('three/src/renderers/WebGLRenderer');
+            const { Scene } = await import('three/src/scenes/Scene');
+            const { OrthographicCamera } = await import('three/src/cameras/OrthographicCamera');
+            const { PlaneGeometry } = await import('three/src/geometries/PlaneGeometry');
+            const { MeshBasicMaterial } = await import('three/src/materials/MeshBasicMaterial');
+            const { ShaderMaterial } = await import('three/src/materials/ShaderMaterial');
+            const { TextureLoader } = await import('three/src/loaders/TextureLoader');
+            const { Texture } = await import('three/src/textures/Texture');
+            const { Mesh } = await import('three/src/objects/Mesh');
+            const { Matrix4 } = await import('three/src/math/Matrix4');
+            const { DoubleSide, sRGBEncoding, RepeatWrapping } = await import('three/src/constants');
+            const { EffectComposer } = await import('@/canvas/renderers/webgl/three/postprocessing/EffectComposer');
+            const { RenderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/RenderPass');
+            const { ShaderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/ShaderPass');
+            const { GammaCorrectionShader } = await import('@/canvas/renderers/webgl/three/shaders/GammaCorrectionShader');
+            const { default: selectionMaskMaterialFragmentShader } = await import('@/canvas/renderers/webgl/shaders/selection-mask-material.frag');
+            const { default: selectionMaskMaterialVertexShader } = await import('@/canvas/renderers/webgl/shaders/selection-mask-material.vert');
+            const workingFileWidth = workingFileStore.state.width;
+            const workingFileHeight = workingFileStore.state.height;
+
+
+            const threejsRenderer = new WebGLRenderer({
+                alpha: true,
+                canvas: canvas.value,
+                premultipliedAlpha: true,
+                powerPreference: 'high-performance'
+            });
+            threejsRenderer.outputEncoding = sRGBEncoding;
+            threejsRenderer.setSize(1, 1);
+            canvasStore.set('threejsRenderer', threejsRenderer);
+
+            const threejsScene = markRaw(new Scene());
+            canvasStore.set('threejsScene', threejsScene);
+
+            const threejsCamera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 10000);
+            threejsCamera.matrixAutoUpdate = false;
+            canvasStore.set('threejsCamera', threejsCamera);
+
+            const backgroundGeometry = new PlaneGeometry(workingFileWidth, workingFileHeight);
+            const backgroundMaterial = new MeshBasicMaterial({ color: 0xffffff, transparent: true, side: DoubleSide });
+            const threejsBackground = new Mesh(backgroundGeometry, backgroundMaterial);
+            threejsBackground.position.x = workingFileWidth / 2;
+            threejsBackground.position.y = workingFileHeight / 2;
+            threejsBackground.renderOrder = -1;
+            threejsScene.add(threejsBackground);
+            canvasStore.set('threejsBackground', markRaw(threejsBackground));
+
+            const selectionMaskTexture = await new Promise<InstanceType<typeof Texture> | undefined>((resolve) => {
+                const texture = new TextureLoader().load(
+                    selectionMaskPatternSrc,
+                    () => { resolve(texture); },
+                    undefined,
+                    (error) => { resolve(undefined); }
+                );
+            });
+            if (selectionMaskTexture) {
+                selectionMaskTexture.wrapS = RepeatWrapping;
+                selectionMaskTexture.wrapT = RepeatWrapping;
+            }
+            const selectionMaskGeometry = new PlaneGeometry(2, 2); //viewportWidth.value, viewportHeight.value);
+            const selectionMaskMaterial = new ShaderMaterial({
+                transparent: true,
+                depthTest: false,
+                vertexShader: selectionMaskMaterialVertexShader,
+                fragmentShader: selectionMaskMaterialFragmentShader,
+                side: DoubleSide,
+                defines: {
+                },
+                uniforms: {
+                    unselectedMaskMap: { value: selectionMaskTexture },
+                    selectedMaskMap: { value: undefined },
+                    selectedMaskSize: { value: [1, 1] },
+                    selectedMaskOffset: { value: [0, 0] },
+                    viewportWidth: { value: viewportWidth.value },
+                    viewportHeight: { value: viewportHeight.value },
+                    inverseProjectionMatrix: { value: threejsCamera.projectionMatrixInverse.elements },
+                },
+            });
+            const threejsSelectionMask = new Mesh(selectionMaskGeometry, selectionMaskMaterial);
+            threejsSelectionMask.renderOrder = 9999999999999;
+            threejsSelectionMask.position.z = 0.2;
+            threejsSelectionMask.frustumCulled = false;
+            threejsSelectionMask.visible = false;
+            threejsScene.add(threejsSelectionMask);
+            canvasStore.set('threejsSelectionMask', markRaw(threejsSelectionMask));
+
+            await updateThreejsCanvasMargin(workingFileWidth, workingFileHeight);
+
+            const threejsComposer = new EffectComposer(threejsRenderer);
+            const renderPass = new RenderPass(threejsScene, threejsCamera);
+            threejsComposer.addPass(renderPass);
+            threejsComposer.addPass(new ShaderPass(GammaCorrectionShader));
+            canvasStore.set('threejsComposer', markRaw(threejsComposer));
+
+            canvasStore.set('renderer', 'webgl');
+            updateThreejsImageSize(imageWidth.value, imageHeight.value, viewportWidth.value, viewportHeight.value);
+
+            // Assign new render function
+            renderMainCanvas = () => {
+                let cameraTransform: DOMMatrix;
+                if (canvasStore.get('useCssViewport')) {
+                    cameraTransform = new DOMMatrix().inverse().translate(0, 0, 1);
+                } else {
+                    const devicePixelRatio = window.devicePixelRatio || 1;
+                    cameraTransform = canvasStore.get('transform').inverse().translate(0, 0, 1);
+                }
+                const matrix = new Matrix4();
+                matrix.set(
+                    cameraTransform.m11, cameraTransform.m21, cameraTransform.m31, cameraTransform.m41,
+                    cameraTransform.m12, cameraTransform.m22, cameraTransform.m32, cameraTransform.m42,
+                    cameraTransform.m13, cameraTransform.m23, cameraTransform.m33, cameraTransform.m43,
+                    cameraTransform.m14, cameraTransform.m24, cameraTransform.m34, cameraTransform.m44
+                );
+                threejsCamera.matrix = matrix;
+                threejsCamera.updateMatrixWorld(true);
+                threejsCamera.updateProjectionMatrix();
+                drawWorkingFileToCanvasWebgl(threejsComposer, threejsRenderer, threejsScene, threejsCamera, { isEditorPreview: true });
+            };
+            renderMainCanvas();
+            ctx = threejsRenderer.context;
+        }
+
+        // Set up canvas for 2d context rendering
+        async function initializeCanvas2dRenderer() {
+            if (!canvas.value) return;
+
+            // Set up buffer canvas
+            const originalCtx = canvas.value.getContext('2d', getCanvasRenderingContext2DSettings());
+            const bufferCanvas = document.createElement('canvas');
+            bufferCanvas.width = useCssViewport.value === true ? 10 : imageWidth.value;
+            bufferCanvas.height = useCssViewport.value === true ? 10 : imageHeight.value;
+            let bufferCtx: CanvasRenderingContext2D = bufferCanvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
+            if (originalCtx && bufferCtx) {
+                // Assign view canvas
+                ctx = originalCtx;
+                // Assign buffer canvas
+                canvasStore.set('bufferCanvas', bufferCanvas);
+                canvasStore.set('bufferCtx', bufferCtx);
+            }
+
+            if (!selectionMaskCanvas.value) return;
+            canvasStore.set('selectionMaskCanvas', selectionMaskCanvas.value);
+            selectionMaskCanvasCtx = selectionMaskCanvas.value.getContext('2d', getCanvasRenderingContext2DSettings());
+            selectionMaskPattern.src = selectionMaskPatternSrc;
+        }
+
+        // Set up the image rescaler
+        async function initializePica() {
+            if (canvasStore.state.renderer !== '2d') return;
+
+            Pica = (await import('@/lib/pica')).default;
+            const __extractTileData = Pica.prototype.__extractTileData;
+            Pica.prototype.__extractTileData = function() {
+                const startTime = window.performance.now();
+                const originalReturn = __extractTileData.apply(this, arguments);
+                postProcessAverageLag = (postProcessAverageLag * .75) + ((window.performance.now() - startTime) * .25);
+                return originalReturn;
+            };
+            pica = new Pica({
+                idle: 20000
+            });
+        }
 
         // Update for threejs scene when image size is adjusted.
         async function updateThreejsImageSize(imageWidth: number, imageHeight: number, canvasWidth: number, canvasHeight: number) {
@@ -583,30 +701,7 @@ export default defineComponent({
                     }
 
                     // Draw selection mask
-                    if (selectionMaskCanvas.value && selectionMaskCanvasCtx) {
-                        selectionMaskCanvas.value.width = viewportWidth.value;
-                        selectionMaskCanvas.value.height = viewportHeight.value;
-                        selectionMaskCanvasCtx.imageSmoothingEnabled = false; // Disable for some decent antialiasing.
-                        selectionMaskCanvasCtx.clearRect(0, 0, selectionMaskCanvas.value.width, selectionMaskCanvas.value.height);
-                        if (appliedSelectionMask.value || activeSelectionMask.value || selectedLayersSelectionMaskPreview.value) {
-                            const transform = canvasStore.get('transform');
-                            selectionMaskCanvasCtx.globalCompositeOperation = 'source-over';
-                            selectionMaskCanvasCtx.save();
-                            selectionMaskCanvasCtx.setTransform(transform.a, transform.b, transform.c, transform.d, transform.e, transform.f);
-                            if (activeSelectionMask.value) {
-                                selectionMaskCanvasCtx.drawImage(activeSelectionMask.value, activeSelectionMaskCanvasOffset.value.x, activeSelectionMaskCanvasOffset.value.y);
-                            } else if (appliedSelectionMask.value) {
-                                selectionMaskCanvasCtx.drawImage(appliedSelectionMask.value, appliedSelectionMaskCanvasOffset.value.x, appliedSelectionMaskCanvasOffset.value.y);
-                            } else if (selectedLayersSelectionMaskPreview.value) {
-                                selectionMaskCanvasCtx.drawImage(selectedLayersSelectionMaskPreview.value, selectedLayersSelectionMaskPreviewCanvasOffset.value.x, selectedLayersSelectionMaskPreviewCanvasOffset.value.y);
-                            }
-                            selectionMaskCanvasCtx.restore();
-                            selectionMaskCanvasCtx.globalCompositeOperation = 'source-out';
-                            const pattern = selectionMaskCanvasCtx.createPattern(selectionMaskPattern, 'repeat') || '#00000044';
-                            selectionMaskCanvasCtx.fillStyle = pattern;
-                            selectionMaskCanvasCtx.fillRect(0, 0, selectionMaskCanvas.value.width, selectionMaskCanvas.value.height);
-                        }
-                    }
+                    updateSelectionMaskForViewportDirty();
                 }
 
                 if ((canvasStore.get('dirty') || isPlayingAnimation)) {
@@ -721,6 +816,39 @@ export default defineComponent({
                     pica = new Pica({
                         concurrency: 1
                     });
+                }
+            }
+        }
+
+        function updateSelectionMaskForViewportDirty() {
+            if (canvasStore.state.renderer === 'webgl') {
+                const threejsSelectionMask = canvasStore.get('threejsSelectionMask');
+                // if (!threejsSelectionMask) return;
+                // threejsSelectionMask.geometry?.dispose();
+
+            }
+            else if (selectionMaskCanvas.value && selectionMaskCanvasCtx) {
+                selectionMaskCanvas.value.width = viewportWidth.value;
+                selectionMaskCanvas.value.height = viewportHeight.value;
+                selectionMaskCanvasCtx.imageSmoothingEnabled = false; // Disable for some decent antialiasing.
+                selectionMaskCanvasCtx.clearRect(0, 0, selectionMaskCanvas.value.width, selectionMaskCanvas.value.height);
+                if (appliedSelectionMask.value || activeSelectionMask.value || selectedLayersSelectionMaskPreview.value) {
+                    const transform = canvasStore.get('transform');
+                    selectionMaskCanvasCtx.globalCompositeOperation = 'source-over';
+                    selectionMaskCanvasCtx.save();
+                    selectionMaskCanvasCtx.setTransform(transform.a, transform.b, transform.c, transform.d, transform.e, transform.f);
+                    if (activeSelectionMask.value) {
+                        selectionMaskCanvasCtx.drawImage(activeSelectionMask.value, activeSelectionMaskCanvasOffset.value.x, activeSelectionMaskCanvasOffset.value.y);
+                    } else if (appliedSelectionMask.value) {
+                        selectionMaskCanvasCtx.drawImage(appliedSelectionMask.value, appliedSelectionMaskCanvasOffset.value.x, appliedSelectionMaskCanvasOffset.value.y);
+                    } else if (selectedLayersSelectionMaskPreview.value) {
+                        selectionMaskCanvasCtx.drawImage(selectedLayersSelectionMaskPreview.value, selectedLayersSelectionMaskPreviewCanvasOffset.value.x, selectedLayersSelectionMaskPreviewCanvasOffset.value.y);
+                    }
+                    selectionMaskCanvasCtx.restore();
+                    selectionMaskCanvasCtx.globalCompositeOperation = 'source-out';
+                    const pattern = selectionMaskCanvasCtx.createPattern(selectionMaskPattern, 'repeat') || '#00000044';
+                    selectionMaskCanvasCtx.fillStyle = pattern;
+                    selectionMaskCanvasCtx.fillRect(0, 0, selectionMaskCanvas.value.width, selectionMaskCanvas.value.height);
                 }
             }
         }

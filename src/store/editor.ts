@@ -192,7 +192,7 @@ const store = new PerformantStore<EditorStore>({
                         try {
                             this.state.toolCanvasController.onLeave();
                         } catch (error: any) {
-                            console.error(error);
+                            console.error('[src/store/editor.ts] Error while leaving tool. ', error);
                         }
                     }
                     set('toolCanvasController', controller);

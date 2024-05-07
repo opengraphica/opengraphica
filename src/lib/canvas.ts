@@ -151,7 +151,7 @@ export function drawWorkingFileToCanvasWebgl(composer: EffectComposer | undefine
             renderer.render(scene, camera);
         }
     } catch (error) {
-        console.error(error);
+        console.error('[src/lib/canvas.ts] Error drawing webgl canvas. ', error);
         throw error;
     }
 }

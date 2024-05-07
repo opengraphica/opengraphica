@@ -68,7 +68,7 @@ export default class DrawableCanvas {
                     }
                 });
             } catch (error) {
-                console.error('DrawableCanvas: error setting up OffscreenCanvas. ', error);
+                console.error('[src/canvas/renderers/drawable/canvas.ts] Error setting up OffscreenCanvas. ', error);
             }
         }
         if (!this.offscreenCanvasUuid) {

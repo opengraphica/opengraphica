@@ -123,7 +123,7 @@ export default defineComponent({
                     formData.layerName = layer.name;
                 }
             } catch (error) {
-                console.error(error);
+                console.error('[src/ui/module-rename-layer.vue] Error during initial setup. ', error);
             }
         }
         function onCancel() {

@@ -3,14 +3,29 @@ import { ref, reactive } from 'vue';
 import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
 import { createImageFromCanvas, getImageDataEmptyBounds } from '@/lib/image';
+import { PerformantStore } from '@/store/performant-store';
 
 import type { WorkingFileLayerBlendingMode } from '@/types';
 
 export type SelectionAddShape = 'rectangle' | 'ellipse' | 'free' | 'tonalArea';
 export type SelectionCombineMode = 'add' | 'subtract' | 'intersect' | 'replace';
 
-export const selectionAddShape = ref<SelectionAddShape>('rectangle');
-export const selectionCombineMode = ref<SelectionCombineMode>('add');
+interface PermanentStorageState {
+    selectionAddShape: SelectionAddShape;
+    selectionCombineMode: SelectionCombineMode;
+}
+
+const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentStorageState }>({
+    name: 'selectionStateStore',
+    state: {
+        selectionAddShape: 'rectangle',
+        selectionCombineMode: 'add',
+    },
+    restore: ['selectionAddShape', 'selectionCombineMode']
+});
+
+export const selectionAddShape = permanentStorage.getWritableRef('selectionAddShape');
+export const selectionCombineMode = permanentStorage.getWritableRef('selectionCombineMode');
 export const isDrawingSelection = ref<boolean>(false);
 // Applied selection mask is the selection that has already been applied by the user. It does not include the path the user is currently working on selecting.
 export const appliedSelectionMask = ref<InstanceType<typeof Image> | null>(null);

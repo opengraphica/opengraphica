@@ -364,7 +364,7 @@ export default defineComponent({
                     updatePreview();
                     loading.value = false;
                 } catch (error) {
-                    console.error(error);
+                    console.error('[src/ui/module-layer-effect-edit.ts] Error setting up webgl preview. ', error);
                     hasError.value = true;
                 }
             }
@@ -439,7 +439,7 @@ export default defineComponent({
                     throw new Error('Layer not found.');
                 }
             } catch (error) {
-                console.error(error);
+                console.error('[src/ui/module-layer-effect-edit.vue] Error setting up preview canvas. ', error);
                 hasError.value = true;
             }
         }

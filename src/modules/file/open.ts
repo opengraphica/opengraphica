@@ -385,7 +385,6 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                         fileReader.readAsText(file);
                     }
                 } catch (error: any) {
-                    console.error(error);
                     rejectReader('An error occurred while parsing the file. ' + error);
                 }
             })

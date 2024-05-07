@@ -52,17 +52,17 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
             try {
                 this.onAttach(layer);
             } catch (error) {
-                console.error(error);
+                console.error('[src/canvas/renderers/webgl/base.ts] Error during layer attach. ', error);
             }
 
             // Handle draft logic
             try {
-                const { draft, filters } = toRefs(layer);
+                const { draft } = toRefs(layer);
                 this.stopWatchBaseDraft = watch([draft], ([draft]) => {
                     this.update({ draft });
                 }, { immediate: true, deep: true });
             } catch (error) {
-                console.error(error);
+                console.error('[src/canvas/renderers/webgl/base.ts] Error setting up draft update watcher. ', error);
             }
 
             this.isAttached = true;
@@ -77,7 +77,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
             try {
                 this.onDetach();
             } catch (error) {
-                console.error(error);
+                console.error('[src/canvas/renderers/webgl/base.ts] Error during layer detach. ', error);
             }
 
             // Handle draft logic
@@ -92,7 +92,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
                 this.draftPlane = undefined;
                 this.stopWatchBaseDraft?.();
             } catch (error) {
-                console.error(error);
+                console.error('[src/canvas/renderers/webgl/base.ts] Error disposing draft assets. ', error);
             }
 
             this.isAttached = false;

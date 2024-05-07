@@ -118,7 +118,7 @@ export class ApplyActiveSelectionAction extends BaseAction {
 
             this.freeEstimates.database = this.newMaskDatabaseSizeEstimate + this.oldMaskDatabaseSizeEstimate;
         } catch (error) {
-            console.error(error);
+            console.error('[src/actions/apply-active-selection.ts]', error);
         }
 
         canvasStore.set('viewDirty', true);

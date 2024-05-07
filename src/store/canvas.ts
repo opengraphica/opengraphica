@@ -3,7 +3,7 @@ import { CanvasViewResetOptions } from '@/types';
 import { DecomposedMatrix, decomposeMatrix } from '@/lib/dom-matrix';
 import preferencesStore from './preferences';
 
-import type { Mesh, OrthographicCamera, Scene, WebGLRenderer } from 'three';
+import type { Mesh, PlaneGeometry, ShaderMaterial, OrthographicCamera, Scene, WebGLRenderer } from 'three';
 import type { EffectComposer } from '@/canvas/renderers/webgl/three/postprocessing/EffectComposer';
 
 const imageSmoothingZoomRatio = preferencesStore.get('imageSmoothingZoomRatio');
@@ -35,6 +35,7 @@ interface CanvasState {
     threejsComposer: EffectComposer | null;
     threejsRenderer: WebGLRenderer | null;
     threejsScene: Scene | null;
+    threejsSelectionMask: Mesh<PlaneGeometry, ShaderMaterial> | null;
     transform: DOMMatrix;
     transformResetOptions: undefined | true | CanvasViewResetOptions;
     useCssCanvas: boolean;
@@ -93,6 +94,7 @@ const store = new PerformantStore<CanvasStore>({
         threejsComposer: null,
         threejsRenderer: null,
         threejsScene: null,
+        threejsSelectionMask: null,
         transform: new DOMMatrix(),
         transformResetOptions: undefined,
         useCssCanvas: true,
@@ -104,7 +106,7 @@ const store = new PerformantStore<CanvasStore>({
         viewWidth: 100, // Maps to screen width; devicePixelRatio IS applied.
         workingImageBorderColor: '#cccccc'
     },
-    nonReactive: ['bufferCanvas', 'bufferCtx', 'isDisplayingNonRasterLayer', 'selectionMaskCanvas', 'viewCanvas', 'viewCtx'],
+    nonReactive: ['bufferCanvas', 'bufferCtx', 'isDisplayingNonRasterLayer', 'selectionMaskCanvas', 'threejsCamera', 'threejsComposer', 'threejsSelectionMask', 'viewCanvas', 'viewCtx'],
     onSet(key, value, set) {
         if (key === 'transform') {
             const previousDecomposedTransform = store.state.decomposedTransform;

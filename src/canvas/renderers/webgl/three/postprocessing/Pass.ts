@@ -31,7 +31,7 @@ class Pass {
 	setSize(width: number, height: number) {}
 
 	render(renderer: any, writeBuffer?: any, readBuffer?: any, deltaTime?: any, maskActive?: any) {
-		console.error('THREE.Pass: .render() must be implemented in derived pass.');
+		console.error('[src/canvas/renderers/webgl/three/postprocessing/Pass.ts] .render() must be implemented in derived pass.');
 	}
 
 	dispose() {}

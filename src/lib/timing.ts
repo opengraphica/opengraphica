@@ -68,7 +68,7 @@ export class AsyncCallbackQueue {
                 try {
                     await callback();
                 } catch (error) {
-                    console.error(error);
+                    console.error('[src/lib/timing.ts] Error running async callback cue callback. ', error);
                 }
             }
         }
