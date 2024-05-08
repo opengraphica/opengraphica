@@ -39,7 +39,7 @@ export const selectedLayersSelectionMaskPreviewCanvasOffset = ref<DOMPoint>(new 
 export const selectionMaskDrawMargin = ref<number>(1);
 
 export interface SelectionPathPointBase {
-    type: 'move' | 'line' | 'quadraticBezierCurve';
+    type: 'move' | 'line' | 'bezierCurve';
     x: number;
     y: number;
     editorShapeIntent?: 'rectangle' | 'ellipse' | 'free';
@@ -53,15 +53,15 @@ export interface SelectionPathPointLine extends SelectionPathPointBase {
     type: 'line';
 }
 
-export interface SelectionPathPointQuadraticBezierCurve extends SelectionPathPointBase {
-    type: 'quadraticBezierCurve';
+export interface SelectionPathPointBezierCurve extends SelectionPathPointBase {
+    type: 'bezierCurve';
     shx: number; // Point for bezier curve starting handle, x axis
     shy: number; // Point for bezier curve starting handle, y axis
     ehx: number; // Point for bezier curve ending handle, x axis
     ehy: number; // Point for bezier curve ending handle, y axis
 }
 
-export type SelectionPathPoint = SelectionPathPointMove | SelectionPathPointLine | SelectionPathPointQuadraticBezierCurve;
+export type SelectionPathPoint = SelectionPathPointMove | SelectionPathPointLine | SelectionPathPointBezierCurve;
 
 export const activeSelectionPath = ref<Array<SelectionPathPoint>>([]);
 
@@ -87,7 +87,7 @@ export function getActiveSelectionBounds(activeSelectionPathOverride: Array<Sele
         if (point.y > bottom) {
             bottom = point.y;
         }
-        if (point.type === 'quadraticBezierCurve') {
+        if (point.type === 'bezierCurve') {
             if (point.shx < left) {
                 left = point.shx;
             }
@@ -260,7 +260,7 @@ export async function createActiveSelectionMask(activeSelectionBounds: Selection
             ctx.moveTo(point.x - activeSelectionBounds.left + drawMargin, point.y - activeSelectionBounds.top + drawMargin);
         } else if (point.type === 'line') {
             ctx.lineTo(point.x - activeSelectionBounds.left + drawMargin, point.y - activeSelectionBounds.top + drawMargin);
-        } else if (point.type === 'quadraticBezierCurve') {
+        } else if (point.type === 'bezierCurve') {
             ctx.bezierCurveTo(
                 point.shx - activeSelectionBounds.left + drawMargin,
                 point.shy - activeSelectionBounds.top + drawMargin,

@@ -15,11 +15,11 @@
                             <rect :x="point.x - (svgHandleWidth * 1.4)" :y="point.y - (svgHandleWidth * 1.4)" :width="svgHandleWidth * 2.8" :height="svgHandleWidth * 2.8" :stroke-width="0" />
                             <rect :x="point.x - (svgHandleWidth)" :y="point.y - (svgHandleWidth)" :width="svgHandleWidth * 2" :height="svgHandleWidth * 2" :stroke-width="svgHandleWidth * .3" />
                         </template>
-                        <template v-else-if="point.type === 'quadraticBezierCurve'">
+                        <template v-else-if="point.type === 'bezierCurve'">
                             <ellipse :cx="point.x" :cy="point.y" :rx="svgHandleWidth * 1.45" :ry="svgHandleWidth * 1.45" :stroke-width="0" />
                             <ellipse :cx="point.x" :cy="point.y" :rx="svgHandleWidth" :ry="svgHandleWidth" :stroke-width="svgHandleWidth * .4" />
-                            <!-- <ellipse :cx="point.shx" :cy="point.shy" :rx="svgHandleWidth" :ry="svgHandleWidth" :stroke-width="svgHandleWidth * .5" />
-                            <ellipse :cx="point.ehx" :cy="point.ehy" :rx="svgHandleWidth" :ry="svgHandleWidth" :stroke-width="svgHandleWidth * .5" /> -->
+                            <!-- <ellipse :cx="point.shx" :cy="point.shy" :rx="svgHandleWidth" :ry="svgHandleWidth" stroke="#ff0000" :stroke-width="svgHandleWidth * .5" />
+                            <ellipse :cx="point.ehx" :cy="point.ehy" :rx="svgHandleWidth" :ry="svgHandleWidth" stroke="#ff0000" :stroke-width="svgHandleWidth * .5" /> -->
                         </template>
                     </template>
                 </template>
@@ -72,7 +72,7 @@ export default defineComponent({
                 const position = new DOMPoint(pathPoint.x, pathPoint.y).matrixTransform(transform.value);
                 let startHandle = position;
                 let endHandle = position;
-                if (pathPoint.type === 'quadraticBezierCurve') {
+                if (pathPoint.type === 'bezierCurve') {
                     startHandle = new DOMPoint(pathPoint.shx, pathPoint.shy).matrixTransform(transform.value);
                     endHandle = new DOMPoint(pathPoint.ehx, pathPoint.ehy).matrixTransform(transform.value);
                 }
@@ -95,7 +95,7 @@ export default defineComponent({
                 const point = path[i];
                 if (point.type === 'line') {
                     draw += ' L ' + point.x + ' ' + point.y;
-                } else if (point.type === 'quadraticBezierCurve') {
+                } else if (point.type === 'bezierCurve') {
                     draw += ' C ' + point.shx + ' ' + point.shy +
                         ', ' + point.ehx + ' ' + point.ehy +
                         ', ' + point.x + ' ' + point.y;

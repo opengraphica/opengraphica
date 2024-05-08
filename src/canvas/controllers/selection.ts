@@ -3,14 +3,15 @@ import { ref, watch, toRefs, WatchStopHandle } from 'vue';
 import { PointerTracker } from './base';
 import {
     isDrawingSelection, selectionAddShape, activeSelectionPath, selectionCombineMode, selectionEmitter,
-    SelectionPathPoint, appliedSelectionMask, previewSelectedLayersSelectionMask, discardSelectedLayersSelectionMask
+    SelectionPathPoint, appliedSelectionMask, previewSelectedLayersSelectionMask, discardSelectedLayersSelectionMask,
+    type SelectionPathPointBezierCurve,
 } from '../store/selection-state';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import workingFileStore from '@/store/working-file';
 import appEmitter from '@/lib/emitter';
-import { normalizedDirectionVector2d, lineIntersectsLine2d } from '@/lib/math';
+import { normalizedDirectionVector2d, rotateDirectionVector2d, pointDistance2d, lineIntersectsLine2d } from '@/lib/math';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import { ApplyActiveSelectionAction } from '@/actions/apply-active-selection';
 import { ClearSelectionAction } from '@/actions/clear-selection';
@@ -24,6 +25,7 @@ export default class SelectionController extends BaseMovementController {
     private dragStartHandleIndex: number = -1;
     private dragStartRectangleOriginToLeftDirection: { x: number, y: number } | null = null; 
     private dragStartRectangleOriginToRightDirection: { x: number, y: number } | null = null;
+    private dragStartEllipsePerpendicularRadius: number | null = null;
     private selectedLayerUnwatch: WatchStopHandle | null = null;
 
     private hoveringActiveSelectionPathIndex: number = -1;
@@ -168,6 +170,8 @@ export default class SelectionController extends BaseMovementController {
                 // Drag handle of active path
                 if (this.dragStartHandleIndex > -1 && activeSelectionPath.value.length - 1 >= this.dragStartHandleIndex && this.dragStartActiveSelectionPath) {
                     const editorShapeIntent = activeSelectionPath.value[0]?.editorShapeIntent;
+
+                    // Resize rectangle
                     if (editorShapeIntent === 'rectangle') {
                         const dragHandle = activeSelectionPath.value[this.dragStartHandleIndex];
                         let staticHandleIndex = this.dragStartHandleIndex + 2;
@@ -190,6 +194,8 @@ export default class SelectionController extends BaseMovementController {
                             );
                         }
                         const newDragHandlePosition = new DOMPoint(cursorX * devicePixelRatio, cursorY * devicePixelRatio).matrixTransform(transformInverse);
+                        newDragHandlePosition.x = Math.round(newDragHandlePosition.x);
+                        newDragHandlePosition.y = Math.round(newDragHandlePosition.y);
                         const leftIntersection = lineIntersectsLine2d(
                             staticHandle.x, staticHandle.y, staticHandle.x + this.dragStartRectangleOriginToLeftDirection.x, staticHandle.y + this.dragStartRectangleOriginToLeftDirection.y,
                             newDragHandlePosition.x, newDragHandlePosition.y, newDragHandlePosition.x + this.dragStartRectangleOriginToRightDirection.x, newDragHandlePosition.y + this.dragStartRectangleOriginToRightDirection.y
@@ -201,18 +207,73 @@ export default class SelectionController extends BaseMovementController {
                         if (leftIntersection != null && rightIntersection != null) {
                             dragHandle.x = newDragHandlePosition.x;
                             dragHandle.y = newDragHandlePosition.y;
-                            leftHandle.x = leftIntersection.x;
-                            leftHandle.y = leftIntersection.y;
-                            rightHandle.x = rightIntersection.x;
-                            rightHandle.y = rightIntersection.y;
+                            leftHandle.x = Math.round(leftIntersection.x);
+                            leftHandle.y = Math.round(leftIntersection.y);
+                            rightHandle.x = Math.round(rightIntersection.x);
+                            rightHandle.y = Math.round(rightIntersection.y);
                             activeSelectionPath.value[0].x = activeSelectionPath.value[4].x;
                             activeSelectionPath.value[0].y = activeSelectionPath.value[4].y;
                             activeSelectionPath.value = [...activeSelectionPath.value];
                         }
-                    } else if (editorShapeIntent === 'ellipse') {
-                        console.log('drag ellipse');
-                    } else {
-                        // Free
+                    }
+
+                    // Resize ellipse
+                    else if (editorShapeIntent === 'ellipse') {
+                        const dragHandle = activeSelectionPath.value[this.dragStartHandleIndex] as SelectionPathPointBezierCurve;
+                        let staticHandleIndex = this.dragStartHandleIndex + 2;
+                        if (staticHandleIndex > activeSelectionPath.value.length - 1) staticHandleIndex -= 4;
+                        const staticHandle = activeSelectionPath.value[staticHandleIndex] as SelectionPathPointBezierCurve;
+                        let leftHandleIndex = this.dragStartHandleIndex - 1;
+                        if (leftHandleIndex < 1) leftHandleIndex += 4;
+                        const leftHandle = activeSelectionPath.value[leftHandleIndex] as SelectionPathPointBezierCurve;
+                        let rightHandleIndex = this.dragStartHandleIndex + 1;
+                        if (rightHandleIndex > activeSelectionPath.value.length - 1) rightHandleIndex -= 4;
+                        const rightHandle = activeSelectionPath.value[rightHandleIndex] as SelectionPathPointBezierCurve;
+                        if (this.dragStartEllipsePerpendicularRadius == null) {
+                            const oldMiddlePoint = { x: (dragHandle.x + staticHandle.x) / 2, y: (dragHandle.y + staticHandle.y) / 2 };
+                            this.dragStartEllipsePerpendicularRadius = pointDistance2d(oldMiddlePoint.x, oldMiddlePoint.y, leftHandle.x, leftHandle.y);
+                        }
+                        const newDragHandlePosition = new DOMPoint(cursorX * devicePixelRatio, cursorY * devicePixelRatio).matrixTransform(transformInverse);
+                        const middlePoint = { x: (newDragHandlePosition.x + staticHandle.x) / 2, y: (newDragHandlePosition.y + staticHandle.y) / 2 };
+                        const parallelRadius = pointDistance2d(middlePoint.x, middlePoint.y, staticHandle.x, staticHandle.y);
+                        const staticToDragBearing = normalizedDirectionVector2d(staticHandle.x, staticHandle.y, newDragHandlePosition.x, newDragHandlePosition.y);
+                        const middleToRightBearing = rotateDirectionVector2d(staticToDragBearing.x, staticToDragBearing.y, Math.PI / 2);
+                        const middleToLeftBearing = rotateDirectionVector2d(staticToDragBearing.x, staticToDragBearing.y, -Math.PI / 2);
+                        dragHandle.x = newDragHandlePosition.x;
+                        dragHandle.y = newDragHandlePosition.y;
+                        leftHandle.x = middlePoint.x + (middleToLeftBearing.x * this.dragStartEllipsePerpendicularRadius);
+                        leftHandle.y = middlePoint.y + (middleToLeftBearing.y * this.dragStartEllipsePerpendicularRadius);
+                        rightHandle.x = middlePoint.x + (middleToRightBearing.x * this.dragStartEllipsePerpendicularRadius);
+                        rightHandle.y = middlePoint.y + (middleToRightBearing.y * this.dragStartEllipsePerpendicularRadius);
+                        activeSelectionPath.value[0].x = activeSelectionPath.value[4].x;
+                        activeSelectionPath.value[0].y = activeSelectionPath.value[4].y;
+                        const circularHandleOffset = 0.552284749831;
+                        // Handles around static point
+                        staticHandle.ehx = staticHandle.x + (middleToRightBearing.x * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
+                        staticHandle.ehy = staticHandle.y + (middleToRightBearing.y * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
+                        leftHandle.shx = staticHandle.x + (middleToLeftBearing.x * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
+                        leftHandle.shy = staticHandle.y + (middleToLeftBearing.y * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
+                        // Handles around drag point
+                        dragHandle.ehx = dragHandle.x + (middleToLeftBearing.x * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
+                        dragHandle.ehy = dragHandle.y + (middleToLeftBearing.y * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
+                        rightHandle.shx = dragHandle.x + (middleToRightBearing.x * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
+                        rightHandle.shy = dragHandle.y + (middleToRightBearing.y * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
+                        // Handles around left point
+                        leftHandle.ehx = leftHandle.x + (-staticToDragBearing.x * parallelRadius * circularHandleOffset);
+                        leftHandle.ehy = leftHandle.y + (-staticToDragBearing.y * parallelRadius * circularHandleOffset);
+                        dragHandle.shx = leftHandle.x + (staticToDragBearing.x * parallelRadius * circularHandleOffset);
+                        dragHandle.shy = leftHandle.y + (staticToDragBearing.y * parallelRadius * circularHandleOffset);
+                        // Handles around right point
+                        rightHandle.ehx = rightHandle.x + (staticToDragBearing.x * parallelRadius * circularHandleOffset);
+                        rightHandle.ehy = rightHandle.y + (staticToDragBearing.y * parallelRadius * circularHandleOffset);
+                        staticHandle.shx = rightHandle.x + (-staticToDragBearing.x * parallelRadius * circularHandleOffset);
+                        staticHandle.shy = rightHandle.y + (-staticToDragBearing.y * parallelRadius * circularHandleOffset);
+                        activeSelectionPath.value = [...activeSelectionPath.value];
+                    }
+                    
+                    // Modify free select handle placement
+                    else {
+                        // TODO
                     }
                 }
                 else { // Create a shape
@@ -240,6 +301,7 @@ export default class SelectionController extends BaseMovementController {
                             bottomRight.y = Math.round(bottomRight.y);
                         }
 
+                        // Create a rectangle
                         if (selectionAddShape.value === 'rectangle') {
                             activeSelectionPath.value = [
                                 {
@@ -269,7 +331,10 @@ export default class SelectionController extends BaseMovementController {
                                     y: topLeft.y
                                 }
                             ];
-                        } else { // Ellipse
+                        }
+                        
+                        // Create an ellipse
+                        else {
                             // https://stackoverflow.com/questions/1734745/how-to-create-circle-with-b%C3%A9zier-curves
                             const circularHandleOffset = 0.552284749831;
                             const topX = topLeft.x + ((topRight.x - topLeft.x) / 2);
@@ -304,7 +369,7 @@ export default class SelectionController extends BaseMovementController {
                                     y: topY
                                 },
                                 {
-                                    type: 'quadraticBezierCurve',
+                                    type: 'bezierCurve',
                                     x: rightX,
                                     y: rightY,
                                     shx: topRightHandleX,
@@ -313,7 +378,7 @@ export default class SelectionController extends BaseMovementController {
                                     ehy: rightTopHandleY
                                 },
                                 {
-                                    type: 'quadraticBezierCurve',
+                                    type: 'bezierCurve',
                                     x: bottomX,
                                     y: bottomY,
                                     shx: rightBottomHandleX,
@@ -322,7 +387,7 @@ export default class SelectionController extends BaseMovementController {
                                     ehy: bottomRightHandleY
                                 },
                                 {
-                                    type: 'quadraticBezierCurve',
+                                    type: 'bezierCurve',
                                     x: leftX,
                                     y: leftY,
                                     shx: bottomLeftHandleX,
@@ -331,7 +396,7 @@ export default class SelectionController extends BaseMovementController {
                                     ehy: leftBottomHandleY
                                 },
                                 {
-                                    type: 'quadraticBezierCurve',
+                                    type: 'bezierCurve',
                                     x: topX,
                                     y: topY,
                                     shx: leftTopHandleX,
@@ -371,6 +436,7 @@ export default class SelectionController extends BaseMovementController {
                 this.dragStartHandleIndex = -1;
                 this.dragStartRectangleOriginToLeftDirection = null;
                 this.dragStartRectangleOriginToRightDirection = null;
+                this.dragStartEllipsePerpendicularRadius = null;
             } else {
                 if (e.isPrimary && ['mouse', 'pen'].includes(e.pointerType) && e.button === 0) {
                     if (this.canAddPoint()) {
@@ -389,7 +455,7 @@ export default class SelectionController extends BaseMovementController {
         const cursor = new DOMPoint(x * devicePixelRatio, y * devicePixelRatio).matrixTransform(transformInverse);
 
         for (const [pathPointIndex, pathPoint] of activeSelectionPath.value.entries()) {
-            if (pathPoint.type === 'line' || pathPoint.type === 'quadraticBezierCurve') {
+            if (pathPoint.type === 'line' || pathPoint.type === 'bezierCurve') {
                 if (
                     Math.abs(cursor.x - pathPoint.x) < this.dragHandleRadius * devicePixelRatio / decomposedTransform.scaleX &&
                     Math.abs(cursor.y - pathPoint.y) < this.dragHandleRadius * devicePixelRatio / decomposedTransform.scaleY
