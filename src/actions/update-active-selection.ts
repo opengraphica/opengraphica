@@ -12,9 +12,9 @@ export class UpdateActiveSelectionAction extends BaseAction {
 
     constructor(newActiveSelectionPath: Array<SelectionPathPoint>, oldActiveSelectionPath?: Array<SelectionPathPoint>) {
         super('updateActiveSelection', 'action.updateActiveSelection');
-        this.newActiveSelectionPath = newActiveSelectionPath;
+        this.newActiveSelectionPath = JSON.parse(JSON.stringify(newActiveSelectionPath));
         if (oldActiveSelectionPath) {
-            this.oldActiveSelectionPath = oldActiveSelectionPath;
+            this.oldActiveSelectionPath = JSON.parse(JSON.stringify(oldActiveSelectionPath));
         } else {
             this.oldActiveSelectionPath = [...activeSelectionPath.value];
         }
@@ -24,7 +24,7 @@ export class UpdateActiveSelectionAction extends BaseAction {
 	public async do() {
         super.do();
 
-        activeSelectionPath.value = this.newActiveSelectionPath;
+        activeSelectionPath.value = JSON.parse(JSON.stringify(this.newActiveSelectionPath));
         if (activeSelectionPath.value.length > 0) {
             if (editorStore.get('activeToolGroup') !== 'selection') {
                 editorStore.dispatch('setActiveTool', { group: 'selection' });

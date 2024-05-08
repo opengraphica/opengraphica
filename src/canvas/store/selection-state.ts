@@ -42,6 +42,7 @@ export interface SelectionPathPointBase {
     type: 'move' | 'line' | 'quadraticBezierCurve';
     x: number;
     y: number;
+    editorShapeIntent?: 'rectangle' | 'ellipse' | 'free';
 }
 
 export interface SelectionPathPointMove extends SelectionPathPointBase {

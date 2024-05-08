@@ -238,7 +238,7 @@ export default defineComponent({
         ) => {
             const { TextureLoader } = await import('three/src/loaders/TextureLoader');
             const { Texture } = await import('three/src/textures/Texture');
-            const { ClampToEdgeWrapping } = await import('three/src/constants');
+            const { ClampToEdgeWrapping, NearestFilter, LinearFilter } = await import('three/src/constants');
 
             const newSelectionMask = newActiveSelectionMask ?? newAppliedSelectionMask ?? newSelectedLayersSelectionMaskPreview;
             const oldSelectionMask = oldActiveSelectionMask ?? oldAppliedSelectionMask ?? oldSelectedLayersSelectionMaskPreview;
@@ -250,8 +250,7 @@ export default defineComponent({
             const threejsSelectionMask = canvasStore.get('threejsSelectionMask');
             if (!threejsCamera || !threejsSelectionMask) return;
 
-            threejsSelectionMask.material.uniforms.selectedMaskMap.value?.dispose();
-            threejsSelectionMask.material.uniforms.selectedMaskMap.value = undefined;
+            const oldSelectedMaskTexture = threejsSelectionMask.material.uniforms.selectedMaskMap.value;
 
             if (newSelectionMask) {
                 const selectionMaskTexture = await new Promise<InstanceType<typeof Texture> | undefined>((resolve) => {
@@ -263,6 +262,8 @@ export default defineComponent({
                     );
                 });
                 if (selectionMaskTexture) {
+                    selectionMaskTexture.magFilter = NearestFilter;
+                    selectionMaskTexture.minFilter = LinearFilter;
                     selectionMaskTexture.wrapS = ClampToEdgeWrapping;
                     selectionMaskTexture.wrapT = ClampToEdgeWrapping;
                     threejsSelectionMask.material.uniforms.selectedMaskMap.value = selectionMaskTexture;
@@ -276,6 +277,7 @@ export default defineComponent({
             }
             threejsSelectionMask.material.uniforms.inverseProjectionMatrix.value = threejsCamera.projectionMatrixInverse.elements;
             threejsSelectionMask.material.needsUpdate = true;
+            oldSelectedMaskTexture?.dispose();
             canvasStore.set('dirty', true);
         });
 
