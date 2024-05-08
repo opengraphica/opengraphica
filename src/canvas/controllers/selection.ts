@@ -362,13 +362,11 @@ export default class SelectionController extends BaseMovementController {
         if (pointer && pointer.down.button === 0) {
             if (pointer.isDragging) {
                 isDrawingSelection.value = false;
-                // if (this.dragStartHandleIndex > -1) {
-                //     // TODO ?
-                // } else {
+                if (this.dragStartHandleIndex > -1 || this.dragStartActiveSelectionPath) {
                     this.queueAsyncAction((newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) => {
                         return this.updateActiveSelection(newPath, oldPath);
                     }, [activeSelectionPath.value, this.dragStartActiveSelectionPath]);
-                // }
+                }
                 this.dragStartActiveSelectionPath = undefined;
                 this.dragStartHandleIndex = -1;
                 this.dragStartRectangleOriginToLeftDirection = null;
