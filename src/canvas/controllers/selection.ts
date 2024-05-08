@@ -384,12 +384,16 @@ export default class SelectionController extends BaseMovementController {
     private getDragHandleIndexAtPagePoint(x: number, y: number) {
         let pointIndex = -1;
         const transform = canvasStore.get('transform');
+        const decomposedTransform = canvasStore.get('decomposedTransform');
         const transformInverse = transform.inverse();
         const cursor = new DOMPoint(x * devicePixelRatio, y * devicePixelRatio).matrixTransform(transformInverse);
 
         for (const [pathPointIndex, pathPoint] of activeSelectionPath.value.entries()) {
             if (pathPoint.type === 'line' || pathPoint.type === 'quadraticBezierCurve') {
-                if (Math.abs(cursor.x - pathPoint.x) < this.dragHandleRadius * devicePixelRatio && Math.abs(cursor.y - pathPoint.y) < this.dragHandleRadius * devicePixelRatio) {
+                if (
+                    Math.abs(cursor.x - pathPoint.x) < this.dragHandleRadius * devicePixelRatio / decomposedTransform.scaleX &&
+                    Math.abs(cursor.y - pathPoint.y) < this.dragHandleRadius * devicePixelRatio / decomposedTransform.scaleY
+                ) {
                     pointIndex = pathPointIndex;
                     break;
                 }
