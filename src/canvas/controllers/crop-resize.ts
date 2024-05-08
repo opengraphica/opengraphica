@@ -2,6 +2,7 @@ import BaseCanvasMovementController from './base-movement';
 import { top, left, width, height, cropResizeEmitter, enableSnapping, dragHandleHighlight, previewXSnap, previewYSnap, dimensionLockRatio } from '../store/crop-resize-state';
 import { DecomposedMatrix } from '@/lib/dom-matrix';
 import canvasStore from '@/store/canvas';
+import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset } from '@/canvas/store/selection-state';
 import preferencesStore from '@/store/preferences';
 import workingFileStore from '@/store/working-file';
 import appEmitter from '@/lib/emitter';
@@ -33,6 +34,14 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
         this.xAxisSnap = [0, Math.floor(width.value / 2), width.value];
         this.yAxisSnap = [0, Math.floor(height.value / 2), height.value];
         canvasStore.set('showAreaOutsideWorkingFile', true);
+
+        const selectionMask = activeSelectionMask.value ?? appliedSelectionMask.value;
+        if (selectionMask) {
+            top.value = activeSelectionMask.value ? activeSelectionMaskCanvasOffset.value.y : appliedSelectionMaskCanvasOffset.value.y;
+            left.value = activeSelectionMask.value ? activeSelectionMaskCanvasOffset.value.x : appliedSelectionMaskCanvasOffset.value.x;
+            width.value = selectionMask.width;
+            height.value = selectionMask.height;
+        }
     }
 
     onLeave(): void {

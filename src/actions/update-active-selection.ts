@@ -12,11 +12,11 @@ export class UpdateActiveSelectionAction extends BaseAction {
 
     constructor(newActiveSelectionPath: Array<SelectionPathPoint>, oldActiveSelectionPath?: Array<SelectionPathPoint>) {
         super('updateActiveSelection', 'action.updateActiveSelection');
-        this.newActiveSelectionPath = JSON.parse(JSON.stringify(newActiveSelectionPath));
+        this.newActiveSelectionPath = newActiveSelectionPath;
         if (oldActiveSelectionPath) {
-            this.oldActiveSelectionPath = JSON.parse(JSON.stringify(oldActiveSelectionPath));
+            this.oldActiveSelectionPath = oldActiveSelectionPath;
         } else {
-            this.oldActiveSelectionPath = [...activeSelectionPath.value];
+            this.oldActiveSelectionPath = JSON.parse(JSON.stringify(activeSelectionPath.value));
         }
         this.oldSelectionCombineMode = selectionCombineMode.value;
 	}
