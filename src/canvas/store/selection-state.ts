@@ -278,8 +278,8 @@ export async function createActiveSelectionMask(activeSelectionBounds: Selection
 
 export async function blitActiveSelectionMask(toImage: HTMLImageElement | HTMLCanvasElement, layerTransform: DOMMatrix, compositeOperation: WorkingFileLayerBlendingMode = 'source-in'): Promise<HTMLCanvasElement> {
     return blitSpecifiedSelectionMask(
-        activeSelectionMask.value,
-        activeSelectionMaskCanvasOffset.value,
+        activeSelectionMask.value ?? appliedSelectionMask.value,
+        activeSelectionMask.value ? activeSelectionMaskCanvasOffset.value : appliedSelectionMaskCanvasOffset.value,
         toImage,
         layerTransform,
         compositeOperation

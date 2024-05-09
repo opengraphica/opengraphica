@@ -40,7 +40,7 @@ export async function pasteFromEditorCopyBuffer() {
                 if (editorStore.state.clipboardBufferSelectionMask != null) {
                     if (layer.type === 'raster') {
                         const rasterLayer = layer as WorkingFileRasterLayer<ColorModel>;
-                        const sourceImage = getStoredImageOrCanvas();
+                        const sourceImage = getStoredImageOrCanvas(rasterLayer.data.sourceUuid);
                         if (sourceImage) {
                             rasterLayer.thumbnailImageSrc = null;
                             rasterLayer.data = {

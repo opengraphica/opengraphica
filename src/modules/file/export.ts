@@ -22,7 +22,7 @@ import { InsertLayerAction } from '@/actions/insert-layer';
 import { saveAs } from 'file-saver';
 import { knownFileExtensions } from '@/lib/regex';
 import { WorkingFileRasterSequenceLayer, FileSystemFileHandle, ColorModel } from '@/types';
-import { activeSelectionMask, blitActiveSelectionMask } from '@/canvas/store/selection-state';
+import { activeSelectionMask, appliedSelectionMask, blitActiveSelectionMask } from '@/canvas/store/selection-state';
 // @ts-ignore
 import GIF from '@/lib/gif.js';
 
@@ -81,7 +81,9 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                     ctx.imageSmoothingEnabled = false;
                     drawWorkingFileToCanvas2d(canvas, ctx, {
                         force2dRenderer: true,
-                        selectedLayersOnly: options.layerSelection === 'selected'
+                        selectedLayersOnly: options.layerSelection === 'selected',
+                        initialTransform: new DOMMatrix(),
+                        disableViewportTransform: true,
                     });
                 } else {
                     const { WebGLRenderer } = await import('three/src/renderers/WebGLRenderer');
@@ -91,7 +93,7 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                     const { RenderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/RenderPass');
                     const { ShaderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/ShaderPass');
                     const { GammaCorrectionShader } = await import('@/canvas/renderers/webgl/three/shaders/GammaCorrectionShader');
-                    const { WebGLRenderTarget } = await import('three/src/renderers/WebGLRenderTarget');
+                    // const { WebGLRenderTarget } = await import('three/src/renderers/WebGLRenderTarget');
 
                     const threejsScene = canvasStore.get('threejsScene')!;
 
@@ -122,12 +124,22 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                     threejsComposer.addPass(renderPass);
                     threejsComposer.addPass(gammaCorrectionPass);
 
+                    const threejsSelectionMask = canvasStore.get('threejsSelectionMask');
+                    const selectionMaskWasVisible = !!(threejsSelectionMask?.visible);
+                    if (threejsSelectionMask) {
+                        threejsSelectionMask.visible = false;
+                    }
+
                     drawWorkingFileToCanvasWebgl(
                         threejsComposer,
                         threejsRenderer,
                         threejsScene,
                         threejsCamera
                     );
+
+                    if (selectionMaskWasVisible && threejsSelectionMask) {
+                        threejsSelectionMask.visible = false;
+                    }
 
                     // const pixels = new Uint8Array(width * height * 4);
                     // threejsRenderer.readRenderTargetPixels(renderTarget, 0, 0, width, height, pixels);
@@ -144,7 +156,7 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                     // ctx.putImageData(new ImageData(Uint8ClampedArray.from(pixels), width, height), 0, 0);
                 }
             }
-            if (options.blitActiveSelectionMask && activeSelectionMask.value != null) {
+            if (options.blitActiveSelectionMask && (activeSelectionMask.value != null || appliedSelectionMask.value != null)) {
                 canvas = await blitActiveSelectionMask(canvas, new DOMMatrix(), 'source-in');
             }
 
@@ -215,7 +227,8 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                     }
                 }, mimeType, options.quality);
             }
-        } catch (error: any) {
+        } catch (error) {
+            console.error('[src/modules/file/export.ts]', error);
             reject(new Error('An unexpected error occurred.'));
         }
     });

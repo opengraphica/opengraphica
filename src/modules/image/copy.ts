@@ -10,7 +10,7 @@ import { BundleAction } from '@/actions/bundle';
 import { ClearSelectionAction } from '@/actions/clear-selection';
 import { DeleteLayersAction } from '@/actions/delete-layers';
 import { UpdateLayerAction } from '@/actions/update-layer';
-import { activeSelectionMask, activeSelectionMaskCanvasOffset, blitActiveSelectionMask } from '@/canvas/store/selection-state';
+import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset, blitActiveSelectionMask } from '@/canvas/store/selection-state';
 import type {
     ColorModel, UpdateAnyLayerOptions, WorkingFileRasterLayer
 } from '@/types';
@@ -19,8 +19,10 @@ export async function copySelectedLayers() {
     editorStore.set('clipboardBufferLayers',
         cloneDeep(getSelectedLayers())
     );
-    editorStore.set('clipboardBufferSelectionMask', activeSelectionMask.value);
-    editorStore.set('clipboardBufferSelectionMaskCanvasOffset', new DOMPoint(activeSelectionMaskCanvasOffset.value.x, activeSelectionMaskCanvasOffset.value.y));
+    const selectionMask = activeSelectionMask.value ?? appliedSelectionMask.value;
+    const selectionMaskCanvasOffset = activeSelectionMask.value ? activeSelectionMaskCanvasOffset.value : appliedSelectionMaskCanvasOffset.value;
+    editorStore.set('clipboardBufferSelectionMask', selectionMask);
+    editorStore.set('clipboardBufferSelectionMaskCanvasOffset', new DOMPoint(selectionMaskCanvasOffset.x, selectionMaskCanvasOffset.y));
     try {
         const { exportAsImage } = await import(/* webpackChunkName: 'module-file-export' */ '../file/export');
         const exportResults = await exportAsImage({
@@ -31,8 +33,10 @@ export async function copySelectedLayers() {
             generateImageHash: true
         });
         editorStore.set('hasClipboardUpdateSupport', true);
+        console.log(exportResults.generatedImageHash);
         editorStore.set('clipboardBufferImageHash', exportResults.generatedImageHash);
-    } catch (error: any) {
+    } catch (error) {
+        console.error('[src/modules/image/copy.ts]', error);
         editorStore.set('clipboardBufferImageHash', null);
         editorStore.set('clipboardBufferUpdateTimestamp', new Date().getTime());
     }
@@ -48,14 +52,12 @@ export async function cutSelectedLayers() {
                 const rasterLayer = layer as WorkingFileRasterLayer<ColorModel>;
                 const sourceImage = getStoredImageOrCanvas(rasterLayer.data.sourceUuid);
                 if (sourceImage) {
-                    const newImage = await createImageFromCanvas(
-                        await blitActiveSelectionMask(sourceImage, rasterLayer.transform, 'source-out')
-                    );
+                    const newImage = await blitActiveSelectionMask(sourceImage, rasterLayer.transform, 'source-out');
                     updateLayerActions.push(
                         new UpdateLayerAction({
                             id: rasterLayer.id,
                             data: {
-                                sourceUuid: createStoredImage(newImage),
+                                sourceUuid: await createStoredImage(newImage),
                             }
                         })
                     );
