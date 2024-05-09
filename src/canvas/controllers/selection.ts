@@ -562,13 +562,16 @@ export default class SelectionController extends BaseMovementController {
 
     private addPoint(pointer: PointerTracker) {
         if (
-            // Active path is a different shape
-            (activeSelectionPath.value.length > 0 && activeSelectionPath.value[0]?.editorShapeIntent !== 'freePolygon') ||
-            // Active path is an already closed path
-            this.isActiveSelectionPathClosed()
+            activeSelectionPath.value.length > 0 &&
+            (
+                // Active path is a different shape
+                (activeSelectionPath.value[0]?.editorShapeIntent !== 'freePolygon') ||
+                // Active path is an already closed path
+                this.isActiveSelectionPathClosed()
+            )
         ) {
             this.queueAsyncAction((activeSelectionPathOverride: Array<SelectionPathPoint>) => {
-                return this.applyActiveSelection(activeSelectionPathOverride, { doNotClearActiveSelection: true });
+                return this.applyActiveSelection(activeSelectionPathOverride);
             }, [JSON.parse(JSON.stringify(activeSelectionPath.value))]);
             this.freePathStartActiveSelectionPath = [];
             activeSelectionPath.value = [];
