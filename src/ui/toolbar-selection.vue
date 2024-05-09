@@ -22,10 +22,10 @@
                         <el-option label="Ellipse" value="ellipse">
                             <span class="bi bi-circle mr-1" aria-hidden="true" /> {{ $t('toolbar.selection.selectionShape.ellipse') }}
                         </el-option>
-                        <!-- <el-option label="Free" value="free">
+                        <el-option label="Free" value="free">
                             <span class="bi bi-slash-lg mr-1" aria-hidden="true" /> {{ $t('toolbar.selection.selectionShape.free') }}
                         </el-option>
-                        <el-option label="Tonal Area" value="tonalArea">
+                        <!-- <el-option label="Tonal Area" value="tonalArea">
                             <span class="bi bi-magic mr-1" aria-hidden="true" /> {{ $t('toolbar.selection.selectionShape.tonalArea') }}
                         </el-option> -->
                     </el-select>

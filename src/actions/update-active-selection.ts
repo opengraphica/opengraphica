@@ -4,13 +4,18 @@ import { activeSelectionPath, previewActiveSelectionMask, selectionCombineMode, 
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 
+interface UpdateActiveSelectionOptions {
+    updatePreview?: boolean;
+}
+
 export class UpdateActiveSelectionAction extends BaseAction {
 
     private newActiveSelectionPath: Array<SelectionPathPoint> = [];
     private oldActiveSelectionPath: Array<SelectionPathPoint> = [];
     private oldSelectionCombineMode: SelectionCombineMode | null = null;
+    private updatePreview: boolean = true;
 
-    constructor(newActiveSelectionPath: Array<SelectionPathPoint>, oldActiveSelectionPath?: Array<SelectionPathPoint>) {
+    constructor(newActiveSelectionPath: Array<SelectionPathPoint>, oldActiveSelectionPath?: Array<SelectionPathPoint>, options?: UpdateActiveSelectionOptions) {
         super('updateActiveSelection', 'action.updateActiveSelection');
         this.newActiveSelectionPath = newActiveSelectionPath;
         if (oldActiveSelectionPath) {
@@ -18,6 +23,7 @@ export class UpdateActiveSelectionAction extends BaseAction {
         } else {
             this.oldActiveSelectionPath = JSON.parse(JSON.stringify(activeSelectionPath.value));
         }
+        this.updatePreview = options?.updatePreview === false ? false : true;
         this.oldSelectionCombineMode = selectionCombineMode.value;
 	}
 
@@ -30,7 +36,9 @@ export class UpdateActiveSelectionAction extends BaseAction {
                 editorStore.dispatch('setActiveTool', { group: 'selection' });
             }
         }
-        await previewActiveSelectionMask();
+        if (this.updatePreview) {
+            await previewActiveSelectionMask();
+        }
         canvasStore.set('viewDirty', true);
     }
 
@@ -46,6 +54,7 @@ export class UpdateActiveSelectionAction extends BaseAction {
                 editorStore.dispatch('setActiveTool', { group: 'selection' });
             }
         }
+        // Do not check updatePreview flag for this. Will mess up undo steps.
         await previewActiveSelectionMask();
         canvasStore.set('viewDirty', true);
     }

@@ -9279,6 +9279,9 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor.ogr-custom-cursor--move {
   cursor: move;
 }
+.opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor.ogr-custom-cursor--pointer {
+  cursor: pointer;
+}
 .opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor.ogr-custom-cursor--text {
   cursor: text;
 }

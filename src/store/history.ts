@@ -36,6 +36,7 @@ interface HistoryDispatch {
         action: BaseAction;
         reserveToken?: string;
         mergeWithHistory?: string[] | string;
+        replaceHistory?: string[] | string;
     };
     undo: void;
 }
@@ -149,7 +150,7 @@ async function dispatchUnreserve({ token }: HistoryDispatch['unreserve'], set: P
     }
 }
 
-async function dispatchRunAction({ action, mergeWithHistory, reserveToken }: HistoryDispatch['runAction'], set: PerformantStore<HistoryStore>['directSet']) {
+async function dispatchRunAction({ action, mergeWithHistory, replaceHistory, reserveToken }: HistoryDispatch['runAction'], set: PerformantStore<HistoryStore>['directSet']) {
 
     // Wait for reserved actions to complete
     let actionReserveQueue = store.get('actionReserveQueue');
@@ -202,6 +203,7 @@ async function dispatchRunAction({ action, mergeWithHistory, reserveToken }: His
     }
     // Add the new action to history
     const lastAction = actionStack[actionStack.length - 1];
+    let shouldPushAction = true;
     if (mergeWithHistory && lastAction) {
         if (typeof mergeWithHistory === 'string') {
             mergeWithHistory = [mergeWithHistory];
@@ -212,8 +214,19 @@ async function dispatchRunAction({ action, mergeWithHistory, reserveToken }: His
                 lastAction.description,
                 [lastAction, action]
             );
+            shouldPushAction = false;
         }
-    } else {
+    } else if (replaceHistory && lastAction) {
+        if (typeof replaceHistory === 'string') {
+            replaceHistory = [replaceHistory];
+        }
+        if (replaceHistory.includes(lastAction.id)) {
+            actionStack[actionStack.length - 1] = action;
+            shouldPushAction = false;
+            try { await lastAction.free(); } catch (error) { }
+        }
+    }
+    if (shouldPushAction) {
         actionStack.push(action);
         if (actionStack.length > preferencesStore.get('historyStatesMax')) {
             let actionToFree = actionStack.shift();

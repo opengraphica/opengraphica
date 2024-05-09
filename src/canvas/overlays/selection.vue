@@ -10,16 +10,21 @@
                 <path :d="svgPathDraw" stroke="white" :stroke-width="svgPathStrokeWidth * .8" :stroke-dasharray="svgPathStrokeWidth * 2" fill="transparent"/>
                 <template v-if="!isDrawingSelection">
                     <template v-for="(point, i) in transformedactiveSelectionPath" :key="i + '_' + point.x + '_' + point.y">
-                        {{ point.type }}
                         <template v-if="point.type === 'line'">
                             <rect :x="point.x - (svgHandleWidth * 1.4)" :y="point.y - (svgHandleWidth * 1.4)" :width="svgHandleWidth * 2.8" :height="svgHandleWidth * 2.8" :stroke-width="0" />
                             <rect :x="point.x - (svgHandleWidth)" :y="point.y - (svgHandleWidth)" :width="svgHandleWidth * 2" :height="svgHandleWidth * 2" :stroke-width="svgHandleWidth * .3" />
                         </template>
                         <template v-else-if="point.type === 'bezierCurve'">
-                            <ellipse :cx="point.x" :cy="point.y" :rx="svgHandleWidth * 1.45" :ry="svgHandleWidth * 1.45" :stroke-width="0" />
-                            <ellipse :cx="point.x" :cy="point.y" :rx="svgHandleWidth" :ry="svgHandleWidth" :stroke-width="svgHandleWidth * .4" />
+                            <rect :x="point.x - (svgHandleWidth * 1.4)" :y="point.y - (svgHandleWidth * 1.4)" :width="svgHandleWidth * 2.8" :height="svgHandleWidth * 2.8" :stroke-width="0" />
+                            <rect :x="point.x - (svgHandleWidth)" :y="point.y - (svgHandleWidth)" :width="svgHandleWidth * 2" :height="svgHandleWidth * 2" :stroke-width="svgHandleWidth * .3" />
+                            <!-- <ellipse :cx="point.x" :cy="point.y" :rx="svgHandleWidth * 1.45" :ry="svgHandleWidth * 1.45" :stroke-width="0" />
+                            <ellipse :cx="point.x" :cy="point.y" :rx="svgHandleWidth" :ry="svgHandleWidth" :stroke-width="svgHandleWidth * .4" /> -->
                             <!-- <ellipse :cx="point.shx" :cy="point.shy" :rx="svgHandleWidth" :ry="svgHandleWidth" stroke="#ff0000" :stroke-width="svgHandleWidth * .5" />
                             <ellipse :cx="point.ehx" :cy="point.ehy" :rx="svgHandleWidth" :ry="svgHandleWidth" stroke="#ff0000" :stroke-width="svgHandleWidth * .5" /> -->
+                        </template>
+                        <template v-else-if="point.type === 'move' && activeSelectionPathEditorShape === 'free'">
+                            <rect :x="point.x - (svgHandleWidth * 1.4)" :y="point.y - (svgHandleWidth * 1.4)" :width="svgHandleWidth * 2.8" :height="svgHandleWidth * 2.8" :stroke-width="0" />
+                            <rect :x="point.x - (svgHandleWidth)" :y="point.y - (svgHandleWidth)" :width="svgHandleWidth * 2" :height="svgHandleWidth * 2" :stroke-width="svgHandleWidth * .3" />
                         </template>
                     </template>
                 </template>
@@ -88,6 +93,10 @@ export default defineComponent({
             }
         });
 
+        const activeSelectionPathEditorShape = computed<string>(() => {
+            return activeSelectionPath.value?.[0]?.editorShapeIntent ?? '';
+        });
+
         const svgPathDraw = computed<string>(() => {
             const path = transformedactiveSelectionPath.value;
             let draw = 'M' + path[0].x + ' ' + path[0].y;
@@ -101,7 +110,9 @@ export default defineComponent({
                         ', ' + point.x + ' ' + point.y;
                 }
             }
-            draw += ' z';
+            if (activeSelectionPathEditorShape.value !== 'free') {
+                draw += ' z';
+            }
             return draw;
         });
 
@@ -113,6 +124,7 @@ export default defineComponent({
 
         return {
             isDrawingSelection,
+            activeSelectionPathEditorShape,
             transformedactiveSelectionPath,
             selectedLayerIds,
             selectionContainer,

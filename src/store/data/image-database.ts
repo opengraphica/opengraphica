@@ -115,7 +115,7 @@ export default {
      */
     async add(imageData: DatabaseImageData): Promise<string> {
         await this.init();
-        let imageId = tabUuid + '-' + (imageIdCounter++);
+        let imageId = tabUuid + '_' + uuidv4() + '_' + (imageIdCounter++);
         if (database?.isMemory) {
             database.images[imageId] = imageData;
         } else {

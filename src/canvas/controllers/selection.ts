@@ -1,6 +1,5 @@
 import BaseMovementController from './base-movement';
 import { ref, watch, toRefs, WatchStopHandle } from 'vue';
-import { PointerTracker } from './base';
 import {
     isDrawingSelection, selectionAddShape, activeSelectionPath, selectionCombineMode, selectionEmitter,
     SelectionPathPoint, appliedSelectionMask, previewSelectedLayersSelectionMask, discardSelectedLayersSelectionMask,
@@ -14,22 +13,28 @@ import appEmitter from '@/lib/emitter';
 import { normalizedDirectionVector2d, rotateDirectionVector2d, pointDistance2d, lineIntersectsLine2d } from '@/lib/math';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import { ApplyActiveSelectionAction } from '@/actions/apply-active-selection';
+import { BundleAction } from '@/actions/bundle';
 import { ClearSelectionAction } from '@/actions/clear-selection';
 import { UpdateActiveSelectionAction } from '@/actions/update-active-selection';
 import { UpdateSelectionCombineModeAction } from '@/actions/update-selection-combine-mode';
+
+import type { PointerTracker } from './base';
 
 export default class SelectionController extends BaseMovementController {
     private asyncActionStack: Array<{ callback: (...args: any[]) => Promise<any>, args?: any[] }> = [];
     private currentAsyncAction: ({ callback: (...args: any[]) => Promise<any>, args?: any[] }) | undefined = undefined;
     private dragStartActiveSelectionPath: Array<SelectionPathPoint> | undefined = undefined;
+    private dragStartActiveSelectionPathIsClosed: boolean = false;
     private dragStartHandleIndex: number = -1;
     private dragStartRectangleOriginToLeftDirection: { x: number, y: number } | null = null; 
     private dragStartRectangleOriginToRightDirection: { x: number, y: number } | null = null;
     private dragStartEllipsePerpendicularRadius: number | null = null;
+    private freePathStartActiveSelectionPath: Array<SelectionPathPoint> | undefined = undefined;
     private selectedLayerUnwatch: WatchStopHandle | null = null;
 
     private hoveringActiveSelectionPathIndex: number = -1;
     private dragHandleRadius: number = 6;
+    private dragHandleRadiusTouch: number = 10;
 
     queueAsyncAction(callback: (...args: any[]) => Promise<any>, args?: any[]) {
         this.asyncActionStack.push({
@@ -115,26 +120,39 @@ export default class SelectionController extends BaseMovementController {
         }
     }
 
-    onMultiTouchDown() {
-        super.onMultiTouchDown();
-        if (this.touches.length === 1) {
-            // this.isListenToTouchMove = true;
-        }
-    }
+    onPointerDown(e: PointerEvent): void {
+        super.onPointerDown(e);
 
-    onMultiTouchUp() {
-        super.onMultiTouchUp();
-        // this.isListenToTouchMove = false;
-    }
-    
-    onMultiTouchTap(touches: PointerTracker[]) {
-        super.onMultiTouchTap(touches);
-        if (touches.length === 1) {
-            if (this.canAddPoint()) {
-                this.addPoint();
+        const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
+        if (pointer && pointer.down.isPrimary && pointer.type !== 'touch' && pointer.down.button === 0) {
+            const dragHandleIndex = this.getDragHandleIndexAtPagePoint(e.pageX, e.pageY);
+            if (pointer && dragHandleIndex === -1 && this.canAddPoint()) {
+                this.addPoint(pointer);
             }
         }
     }
+
+    onMultiTouchDown() {
+        super.onMultiTouchDown();
+        if (this.touches.length === 1) {
+            const dragHandleIndex = this.getDragHandleIndexAtPagePoint(this.touches[0].down.pageX, this.touches[0].down.pageY);
+            if (dragHandleIndex === -1 && this.canAddPoint()) {
+                this.addPoint(this.touches[0]);
+            }
+        }
+    }
+
+    // onMultiTouchUp() {
+    //     super.onMultiTouchUp();
+    //     // this.isListenToTouchMove = false;
+    // }
+    
+    // onMultiTouchTap(touches: PointerTracker[]) {
+    //     super.onMultiTouchTap(touches);
+    //     if (touches.length === 1) {
+            
+    //     }
+    // }
 
     onPointerMove(e: PointerEvent): void {
         super.onPointerMove(e);
@@ -148,6 +166,7 @@ export default class SelectionController extends BaseMovementController {
                 // Create selection path or find drag handle
                 if (!this.dragStartActiveSelectionPath && this.dragStartHandleIndex == -1) {
                     this.dragStartHandleIndex = this.getDragHandleIndexAtPagePoint(pointer.down.pageX, pointer.down.pageY);
+                    this.dragStartActiveSelectionPathIsClosed = this.isActiveSelectionPathClosed();
                     if (this.dragStartHandleIndex === -1) {
                         this.dragStartActiveSelectionPath = [];
                         if (activeSelectionPath.value.length > 0) {
@@ -273,7 +292,18 @@ export default class SelectionController extends BaseMovementController {
                     
                     // Modify free select handle placement
                     else {
-                        // TODO
+                        const newDragHandlePosition = new DOMPoint(cursorX * devicePixelRatio, cursorY * devicePixelRatio).matrixTransform(transformInverse);
+                        const dragHandle = activeSelectionPath.value[this.dragStartHandleIndex];
+                        dragHandle.x = newDragHandlePosition.x;
+                        dragHandle.y = newDragHandlePosition.y;
+                        if (this.dragStartHandleIndex === 0 && this.dragStartActiveSelectionPathIsClosed) {
+                            activeSelectionPath.value[activeSelectionPath.value.length - 1].x = newDragHandlePosition.x;
+                            activeSelectionPath.value[activeSelectionPath.value.length - 1].y = newDragHandlePosition.y;
+                        } else if (this.dragStartHandleIndex === activeSelectionPath.value.length - 1 && this.dragStartActiveSelectionPathIsClosed) {
+                            activeSelectionPath.value[0].x = newDragHandlePosition.x;
+                            activeSelectionPath.value[0].y = newDragHandlePosition.y;
+                        }
+                        activeSelectionPath.value = [...activeSelectionPath.value];
                     }
                 }
                 else { // Create a shape
@@ -424,13 +454,53 @@ export default class SelectionController extends BaseMovementController {
         super.onPointerUpBeforePurge(e);
 
         const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
-        if (pointer && pointer.down.button === 0) {
+        if (pointer && pointer.down.isPrimary && pointer.down.button === 0) {
             if (pointer.isDragging) {
                 isDrawingSelection.value = false;
                 if (this.dragStartHandleIndex > -1 || this.dragStartActiveSelectionPath) {
-                    this.queueAsyncAction((newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) => {
-                        return this.updateActiveSelection(newPath, oldPath);
-                    }, [activeSelectionPath.value, this.dragStartActiveSelectionPath]);
+                    // Update active selection path in history
+                    if (activeSelectionPath.value[0]?.editorShapeIntent === 'free') {
+                        let isFinished = false;
+                        if (activeSelectionPath.value.length > 2) {
+                            if (this.dragStartHandleIndex === activeSelectionPath.value.length - 1) {
+                                const dragHandleIndex = this.getDragHandleIndexAtPagePoint(pointer.up?.pageX ?? pointer.down.pageX, pointer.up?.pageY ?? pointer.down.pageX, activeSelectionPath.value.length - 1);
+                                if (dragHandleIndex === 0) {
+                                    activeSelectionPath.value[activeSelectionPath.value.length - 1].x = activeSelectionPath.value[0].x;
+                                    activeSelectionPath.value[activeSelectionPath.value.length - 1].y = activeSelectionPath.value[0].y;
+                                    activeSelectionPath.value = [...activeSelectionPath.value];
+                                    isFinished = true;
+                                }
+                            } else if (this.dragStartHandleIndex === 0) {
+                                const dragHandleIndex = this.getDragHandleIndexAtPagePoint(pointer.up?.pageX ?? pointer.down.pageX, pointer.up?.pageY ?? pointer.down.pageX, 0);
+                                if (dragHandleIndex === activeSelectionPath.value.length - 1) {
+                                    activeSelectionPath.value[0].x = activeSelectionPath.value[activeSelectionPath.value.length - 1].x;
+                                    activeSelectionPath.value[0].y = activeSelectionPath.value[activeSelectionPath.value.length - 1].y;
+                                    activeSelectionPath.value = [...activeSelectionPath.value];
+                                    isFinished = true;
+                                }
+                            }
+                            if (
+                                !isFinished &&
+                                this.isActiveSelectionPathClosed()
+                            ) {
+                                isFinished = true;
+                            }
+                        }
+                        if (isFinished) {
+                            this.queueAsyncAction((newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) => {
+                                return this.updateActiveSelectionContinuousFinish(newPath, oldPath);
+                            }, [activeSelectionPath.value, this.dragStartActiveSelectionPath]);
+                            this.freePathStartActiveSelectionPath = undefined;
+                        } else {
+                            this.queueAsyncAction((newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) => {
+                                return this.updateActiveSelectionContinuous(newPath, oldPath);
+                            }, [activeSelectionPath.value, this.freePathStartActiveSelectionPath ?? []]);
+                        }
+                    } else {
+                        this.queueAsyncAction((newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) => {
+                            return this.updateActiveSelection(newPath, oldPath);
+                        }, [activeSelectionPath.value, this.dragStartActiveSelectionPath]);
+                    }
                 }
                 this.dragStartActiveSelectionPath = undefined;
                 this.dragStartHandleIndex = -1;
@@ -438,38 +508,106 @@ export default class SelectionController extends BaseMovementController {
                 this.dragStartRectangleOriginToRightDirection = null;
                 this.dragStartEllipsePerpendicularRadius = null;
             } else {
-                if (e.isPrimary && ['mouse', 'pen'].includes(e.pointerType) && e.button === 0) {
-                    if (this.canAddPoint()) {
-                        this.addPoint();
-                    }
+                // Close free select path 
+                const dragHandleIndex = this.getDragHandleIndexAtPagePoint(pointer.down.pageX, pointer.down.pageY);
+                if (activeSelectionPath.value.length > 2 && activeSelectionPath.value[0]?.editorShapeIntent === 'free' && dragHandleIndex === 0) {
+                    activeSelectionPath.value.push({
+                        type: 'line',
+                        x: activeSelectionPath.value[0].x,
+                        y: activeSelectionPath.value[0].y,
+                    })
+                    this.queueAsyncAction((newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) => {
+                        return this.updateActiveSelectionContinuousFinish(newPath, oldPath);
+                    }, [activeSelectionPath.value, this.freePathStartActiveSelectionPath ?? []]);
+                    this.freePathStartActiveSelectionPath = undefined;
                 }
             }
+
+            this.handleCursorIcon();
         }
     }
 
-    private getDragHandleIndexAtPagePoint(x: number, y: number) {
+    private getDragHandleIndexAtPagePoint(x: number, y: number, excludeIndex?: number) {
+        const isTouch = this.pointers.filter((pointer) => pointer.down.isPrimary)[0]?.type === 'touch';
+
         let pointIndex = -1;
         const transform = canvasStore.get('transform');
         const decomposedTransform = canvasStore.get('decomposedTransform');
         const transformInverse = transform.inverse();
         const cursor = new DOMPoint(x * devicePixelRatio, y * devicePixelRatio).matrixTransform(transformInverse);
 
+        const dragHandleRadius = isTouch ? this.dragHandleRadiusTouch : this.dragHandleRadius ;
+
         for (const [pathPointIndex, pathPoint] of activeSelectionPath.value.entries()) {
-            if (pathPoint.type === 'line' || pathPoint.type === 'bezierCurve') {
+            if (
+                (pathPoint.type === 'move' && pathPoint.editorShapeIntent === 'free') ||
+                pathPoint.type === 'line' ||
+                pathPoint.type === 'bezierCurve'
+            ) {
                 if (
-                    Math.abs(cursor.x - pathPoint.x) < this.dragHandleRadius * devicePixelRatio / decomposedTransform.scaleX &&
-                    Math.abs(cursor.y - pathPoint.y) < this.dragHandleRadius * devicePixelRatio / decomposedTransform.scaleY
+                    Math.abs(cursor.x - pathPoint.x) < dragHandleRadius * devicePixelRatio / decomposedTransform.scaleX &&
+                    Math.abs(cursor.y - pathPoint.y) < dragHandleRadius * devicePixelRatio / decomposedTransform.scaleY
                 ) {
-                    pointIndex = pathPointIndex;
-                    break;
+                    if (pathPointIndex === excludeIndex) {
+                        continue;
+                    } else {
+                        pointIndex = pathPointIndex;
+                        break;
+                    }
                 }
             }
         }
         return pointIndex;
     }
 
-    private addPoint() {
-        // TODO
+    private addPoint(pointer: PointerTracker) {
+        if (
+            // Active path is a different shape
+            (activeSelectionPath.value.length > 0 && activeSelectionPath.value[0]?.editorShapeIntent !== 'free') ||
+            // Active path is an already closed path
+            this.isActiveSelectionPathClosed()
+        ) {
+            this.queueAsyncAction((activeSelectionPathOverride: Array<SelectionPathPoint>) => {
+                return this.applyActiveSelection(activeSelectionPathOverride, { doNotClearActiveSelection: true });
+            }, [JSON.parse(JSON.stringify(activeSelectionPath.value))]);
+            this.freePathStartActiveSelectionPath = [];
+            activeSelectionPath.value = [];
+        }
+
+        const transformInverse = canvasStore.get('transform').inverse();
+        const cursor = new DOMPoint(pointer.down.pageX * devicePixelRatio, pointer.down.pageY * devicePixelRatio).matrixTransform(transformInverse);
+
+        if (activeSelectionPath.value.length < 1) {
+            activeSelectionPath.value = [
+                {
+                    type: 'move',
+                    editorShapeIntent: 'free',
+                    x: cursor.x,
+                    y: cursor.y,
+                }
+            ];
+        } else {
+            activeSelectionPath.value.push({
+                type: 'line',
+                x: cursor.x,
+                y: cursor.y,
+            });
+        }
+
+        this.queueAsyncAction((newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) => {
+            return this.updateActiveSelectionContinuous(newPath, oldPath);
+        }, [activeSelectionPath.value, this.freePathStartActiveSelectionPath ?? []]);
+    }
+
+    private isActiveSelectionPathClosed() {
+        if (activeSelectionPath.value[0]?.editorShapeIntent === 'free') {
+            return (
+                activeSelectionPath.value.length > 2 &&
+                activeSelectionPath.value[activeSelectionPath.value.length - 1].x === activeSelectionPath.value[0].x &&
+                activeSelectionPath.value[activeSelectionPath.value.length - 1].y === activeSelectionPath.value[0].y
+            );
+        }
+        return true;
     }
 
     private canAddPoint() {
@@ -491,6 +629,24 @@ export default class SelectionController extends BaseMovementController {
     async updateActiveSelection(newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) {
         await historyStore.dispatch('runAction', {
             action: new UpdateActiveSelectionAction(newPath, oldPath)
+        });
+    }
+
+    async updateActiveSelectionContinuous(newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) {
+        await historyStore.dispatch('runAction', {
+            action: new BundleAction('createFreeSelectPath', 'action.updateActiveSelection', [
+                new UpdateActiveSelectionAction(newPath, oldPath, { updatePreview: false })
+            ]),
+            replaceHistory: 'createFreeSelectPath',
+        });
+    }
+
+    async updateActiveSelectionContinuousFinish(newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) {
+        await historyStore.dispatch('runAction', {
+            action: new BundleAction('finishFreeSelectPath', 'action.updateActiveSelection', [
+                new UpdateActiveSelectionAction(newPath, oldPath, { updatePreview: true })
+            ]),
+            replaceHistory: 'createFreeSelectPath',
         });
     }
 
@@ -519,7 +675,16 @@ export default class SelectionController extends BaseMovementController {
         let newIcon = super.handleCursorIcon();
         if (!newIcon) {
             if (this.hoveringActiveSelectionPathIndex > -1) {
-                newIcon = 'grabbing';
+                if (
+                    this.hoveringActiveSelectionPathIndex === 0 &&
+                    activeSelectionPath.value.length > 2 &&
+                    activeSelectionPath.value[0]?.editorShapeIntent === 'free' &&
+                    !this.isActiveSelectionPathClosed()
+                ) {
+                    newIcon = 'pointer';
+                } else {
+                    newIcon = 'grabbing';
+                }
             } else {
                 newIcon = 'crosshair';
             }
