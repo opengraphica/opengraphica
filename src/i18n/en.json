@@ -769,7 +769,8 @@
                 "label": "Selection Shape",
                 "rectangle": "Rectangle",
                 "ellipse": "Ellipse",
-                "free": "Free",
+                "freePolygon": "Free Polygon",
+                "freePolygonShort": "Free Poly",
                 "tonalArea": "Tonal Area"
             },
             "selectionCombineMode": {

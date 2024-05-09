@@ -22,7 +22,7 @@
                             <!-- <ellipse :cx="point.shx" :cy="point.shy" :rx="svgHandleWidth" :ry="svgHandleWidth" stroke="#ff0000" :stroke-width="svgHandleWidth * .5" />
                             <ellipse :cx="point.ehx" :cy="point.ehy" :rx="svgHandleWidth" :ry="svgHandleWidth" stroke="#ff0000" :stroke-width="svgHandleWidth * .5" /> -->
                         </template>
-                        <template v-else-if="point.type === 'move' && activeSelectionPathEditorShape === 'free'">
+                        <template v-else-if="point.type === 'move' && activeSelectionPathEditorShape === 'freePolygon'">
                             <rect :x="point.x - (svgHandleWidth * 1.4)" :y="point.y - (svgHandleWidth * 1.4)" :width="svgHandleWidth * 2.8" :height="svgHandleWidth * 2.8" :stroke-width="0" />
                             <rect :x="point.x - (svgHandleWidth)" :y="point.y - (svgHandleWidth)" :width="svgHandleWidth * 2" :height="svgHandleWidth * 2" :stroke-width="svgHandleWidth * .3" />
                         </template>
@@ -110,7 +110,7 @@ export default defineComponent({
                         ', ' + point.x + ' ' + point.y;
                 }
             }
-            if (activeSelectionPathEditorShape.value !== 'free') {
+            if (activeSelectionPathEditorShape.value !== 'freePolygon') {
                 draw += ' z';
             }
             return draw;

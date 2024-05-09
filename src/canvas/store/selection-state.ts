@@ -7,7 +7,7 @@ import { PerformantStore } from '@/store/performant-store';
 
 import type { WorkingFileLayerBlendingMode } from '@/types';
 
-export type SelectionAddShape = 'rectangle' | 'ellipse' | 'free' | 'tonalArea';
+export type SelectionAddShape = 'rectangle' | 'ellipse' | 'freePolygon' | 'tonalArea';
 export type SelectionCombineMode = 'add' | 'subtract' | 'intersect' | 'replace';
 
 interface PermanentStorageState {
@@ -42,7 +42,7 @@ export interface SelectionPathPointBase {
     type: 'move' | 'line' | 'bezierCurve';
     x: number;
     y: number;
-    editorShapeIntent?: 'rectangle' | 'ellipse' | 'free';
+    editorShapeIntent?: 'rectangle' | 'ellipse' | 'freePolygon';
 }
 
 export interface SelectionPathPointMove extends SelectionPathPointBase {

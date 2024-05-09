@@ -459,7 +459,7 @@ export default class SelectionController extends BaseMovementController {
                 isDrawingSelection.value = false;
                 if (this.dragStartHandleIndex > -1 || this.dragStartActiveSelectionPath) {
                     // Update active selection path in history
-                    if (activeSelectionPath.value[0]?.editorShapeIntent === 'free') {
+                    if (activeSelectionPath.value[0]?.editorShapeIntent === 'freePolygon') {
                         let isFinished = false;
                         if (activeSelectionPath.value.length > 2) {
                             if (this.dragStartHandleIndex === activeSelectionPath.value.length - 1) {
@@ -510,7 +510,7 @@ export default class SelectionController extends BaseMovementController {
             } else {
                 // Close free select path 
                 const dragHandleIndex = this.getDragHandleIndexAtPagePoint(pointer.down.pageX, pointer.down.pageY);
-                if (activeSelectionPath.value.length > 2 && activeSelectionPath.value[0]?.editorShapeIntent === 'free' && dragHandleIndex === 0) {
+                if (activeSelectionPath.value.length > 2 && activeSelectionPath.value[0]?.editorShapeIntent === 'freePolygon' && dragHandleIndex === 0) {
                     activeSelectionPath.value.push({
                         type: 'line',
                         x: activeSelectionPath.value[0].x,
@@ -540,7 +540,7 @@ export default class SelectionController extends BaseMovementController {
 
         for (const [pathPointIndex, pathPoint] of activeSelectionPath.value.entries()) {
             if (
-                (pathPoint.type === 'move' && pathPoint.editorShapeIntent === 'free') ||
+                (pathPoint.type === 'move' && pathPoint.editorShapeIntent === 'freePolygon') ||
                 pathPoint.type === 'line' ||
                 pathPoint.type === 'bezierCurve'
             ) {
@@ -563,7 +563,7 @@ export default class SelectionController extends BaseMovementController {
     private addPoint(pointer: PointerTracker) {
         if (
             // Active path is a different shape
-            (activeSelectionPath.value.length > 0 && activeSelectionPath.value[0]?.editorShapeIntent !== 'free') ||
+            (activeSelectionPath.value.length > 0 && activeSelectionPath.value[0]?.editorShapeIntent !== 'freePolygon') ||
             // Active path is an already closed path
             this.isActiveSelectionPathClosed()
         ) {
@@ -581,7 +581,7 @@ export default class SelectionController extends BaseMovementController {
             activeSelectionPath.value = [
                 {
                     type: 'move',
-                    editorShapeIntent: 'free',
+                    editorShapeIntent: 'freePolygon',
                     x: cursor.x,
                     y: cursor.y,
                 }
@@ -600,7 +600,7 @@ export default class SelectionController extends BaseMovementController {
     }
 
     private isActiveSelectionPathClosed() {
-        if (activeSelectionPath.value[0]?.editorShapeIntent === 'free') {
+        if (activeSelectionPath.value[0]?.editorShapeIntent === 'freePolygon') {
             return (
                 activeSelectionPath.value.length > 2 &&
                 activeSelectionPath.value[activeSelectionPath.value.length - 1].x === activeSelectionPath.value[0].x &&
@@ -611,7 +611,7 @@ export default class SelectionController extends BaseMovementController {
     }
 
     private canAddPoint() {
-        return selectionAddShape.value === 'free';
+        return selectionAddShape.value === 'freePolygon';
     }
 
     async applyActiveSelection(activeSelectionPathOverride: Array<SelectionPathPoint> = activeSelectionPath.value, options?: any) {
@@ -678,7 +678,7 @@ export default class SelectionController extends BaseMovementController {
                 if (
                     this.hoveringActiveSelectionPathIndex === 0 &&
                     activeSelectionPath.value.length > 2 &&
-                    activeSelectionPath.value[0]?.editorShapeIntent === 'free' &&
+                    activeSelectionPath.value[0]?.editorShapeIntent === 'freePolygon' &&
                     !this.isActiveSelectionPathClosed()
                 ) {
                     newIcon = 'pointer';

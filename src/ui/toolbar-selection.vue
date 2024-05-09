@@ -11,19 +11,19 @@
                         <span class="bi" aria-hidden="true" :class="{
                             'bi-square': selectionAddShape === 'rectangle',
                             'bi-circle': selectionAddShape === 'ellipse',
-                            'bi-slash-lg': selectionAddShape === 'free',
+                            'bi-hexagon': selectionAddShape === 'freePolygon',
                             'bi-magic': selectionAddShape === 'tonalArea'
                         }" />
                     </template>
-                    <el-select aria-label="Selection Shape" v-model="selectionAddShape" size="small" style="width: 6rem">
-                        <el-option label="Rectangle" value="rectangle">
+                    <el-select :aria-label="$t('toolbar.selection.selectionShape.label')" v-model="selectionAddShape" size="small" style="width: 6rem">
+                        <el-option :label="$t('toolbar.selection.selectionShape.rectangle')" value="rectangle">
                             <span class="bi bi-square mr-1" aria-hidden="true" /> {{ $t('toolbar.selection.selectionShape.rectangle') }}
                         </el-option>
-                        <el-option label="Ellipse" value="ellipse">
+                        <el-option :label="$t('toolbar.selection.selectionShape.ellipse')" value="ellipse">
                             <span class="bi bi-circle mr-1" aria-hidden="true" /> {{ $t('toolbar.selection.selectionShape.ellipse') }}
                         </el-option>
-                        <el-option label="Free" value="free">
-                            <span class="bi bi-slash-lg mr-1" aria-hidden="true" /> {{ $t('toolbar.selection.selectionShape.free') }}
+                        <el-option :label="$t('toolbar.selection.selectionShape.freePolygonShort')" value="freePolygon">
+                            <span class="bi bi-hexagon mr-1" aria-hidden="true" /> {{ $t('toolbar.selection.selectionShape.freePolygon') }}
                         </el-option>
                         <!-- <el-option label="Tonal Area" value="tonalArea">
                             <span class="bi bi-magic mr-1" aria-hidden="true" /> {{ $t('toolbar.selection.selectionShape.tonalArea') }}
