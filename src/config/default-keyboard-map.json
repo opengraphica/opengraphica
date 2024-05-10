@@ -13,6 +13,16 @@
                 ]
             },
             {
+                "name": "keyboardMap.file.actions.export",
+                "action": {
+                    "type": "runModule",
+                    "target": "file/export"
+                },
+                "shortcuts": [
+                    "ctrl+e"
+                ]
+            },
+            {
                 "name": "keyboardMap.file.actions.quickSave",
                 "action": {
                     "type": "runModule",

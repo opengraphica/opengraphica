@@ -2,7 +2,7 @@ import BaseMovementController from './base-movement';
 import { ref, watch, toRefs, WatchStopHandle } from 'vue';
 import {
     isDrawingSelection, selectionAddShape, activeSelectionPath, selectionCombineMode, selectionEmitter,
-    SelectionPathPoint, appliedSelectionMask, previewSelectedLayersSelectionMask, discardSelectedLayersSelectionMask,
+    SelectionPathPoint, activeSelectionMask ,appliedSelectionMask, previewSelectedLayersSelectionMask, discardSelectedLayersSelectionMask,
     type SelectionPathPointBezierCurve,
 } from '../store/selection-state';
 import canvasStore from '@/store/canvas';
@@ -15,6 +15,7 @@ import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOve
 import { ApplyActiveSelectionAction } from '@/actions/apply-active-selection';
 import { BundleAction } from '@/actions/bundle';
 import { ClearSelectionAction } from '@/actions/clear-selection';
+import { DeleteLayerSelectionAreaAction } from '@/actions/delete-layer-selection-area';
 import { UpdateActiveSelectionAction } from '@/actions/update-active-selection';
 import { UpdateSelectionCombineModeAction } from '@/actions/update-selection-combine-mode';
 
@@ -35,6 +36,8 @@ export default class SelectionController extends BaseMovementController {
     private hoveringActiveSelectionPathIndex: number = -1;
     private dragHandleRadius: number = 6;
     private dragHandleRadiusTouch: number = 10;
+
+    private deleteSelectionHandler: (() => Promise<void>) | null = null;
 
     queueAsyncAction(callback: (...args: any[]) => Promise<any>, args?: any[]) {
         this.asyncActionStack.push({
@@ -66,6 +69,8 @@ export default class SelectionController extends BaseMovementController {
         this.queueClearSelection = this.queueClearSelection.bind(this);
         this.queueUpdateSelectionCombineMode = this.queueUpdateSelectionCombineMode.bind(this);
         appEmitter.on('editor.tool.commitCurrentAction', this.queueApplyActiveSelection);
+        this.deleteSelectionHandler = this.queueDeleteSelection.bind(this);
+        appEmitter.on('editor.tool.delete', this.deleteSelectionHandler);
         appEmitter.on('editor.tool.selectAll', this.queueClearSelection);
         selectionEmitter.on('applyActiveSelection', this.queueApplyActiveSelection);
         selectionEmitter.on('clearSelection', this.queueClearSelection);
@@ -104,6 +109,9 @@ export default class SelectionController extends BaseMovementController {
     onLeave(): void {
         super.onLeave();
         appEmitter.off('editor.tool.commitCurrentAction', this.queueApplyActiveSelection);
+        if (this.deleteSelectionHandler) {
+            appEmitter.off('editor.tool.delete', this.deleteSelectionHandler);
+        }
         appEmitter.off('editor.tool.selectAll', this.queueClearSelection);
         selectionEmitter.off('applyActiveSelection', this.queueApplyActiveSelection);
         selectionEmitter.off('clearSelection', this.queueClearSelection);
@@ -662,6 +670,20 @@ export default class SelectionController extends BaseMovementController {
     async queueClearSelection() {
         this.queueAsyncAction(() => {
             return this.clearSelection();
+        });
+    }
+
+    async deleteSelection() {
+        if (activeSelectionMask.value || appliedSelectionMask.value) {
+            await historyStore.dispatch('runAction', {
+                action: new DeleteLayerSelectionAreaAction(),
+            });
+        }
+    }
+
+    async queueDeleteSelection() {
+        this.queueAsyncAction(() => {
+            return this.deleteSelection();
         });
     }
 

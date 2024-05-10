@@ -6,6 +6,10 @@ OpenGraphica is an upcoming raster and vector image editing program that runs in
 
 Use OpenGraphica at https://opengraphica.com/
 
+## User Guide
+
+Visit the [Wiki page on github](https://github.com/opengraphica/opengraphica/wiki) for all sorts of information from how to use the application, to deployment and development.
+
 ## Deployment
 
 OpenGraphica may be integrated into existing web applications which require a photo editor.

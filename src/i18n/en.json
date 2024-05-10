@@ -219,6 +219,7 @@
             "name": "File",
             "actions": {
                 "open": "Open File",
+                "export": "Export File",
                 "quickLoad": "Quick Load",
                 "quickSave": "Quick Save"
             }
@@ -242,7 +243,8 @@
         "selection": {
             "name": "Selection",
             "actions": {
-                "selectAll": "Select All"
+                "selectAll": "Select All",
+                "deleteSelection": "Delete Selection"
             }
         }
     },

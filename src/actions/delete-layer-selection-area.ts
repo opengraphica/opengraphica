@@ -1,196 +1,119 @@
-// import { BaseAction } from './base';
-// import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset, selectionMaskDrawMargin } from '@/canvas/store/selection-state';
-// import canvasStore from '@/store/canvas';
-// import workingFileStore, { getCanvasRenderingContext2DSettings, getSelectedLayers, ensureUniqueLayerSiblingName, getLayerById } from '@/store/working-file';
-// import { createImageFromCanvas, getImageDataFromImage, getImageDataEmptyBounds } from '@/lib/image';
-// import { ClearSelectionAction } from './clear-selection';
-// import { InsertLayerAction } from './insert-layer';
-// import { SelectLayersAction } from './select-layers';
-// import renderers from '@/canvas/renderers';
-// import { WorkingFileLayer, ColorModel, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, InsertRasterLayerOptions } from '@/types';
+import { BaseAction } from './base';
+import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset, blitActiveSelectionMask } from '@/canvas/store/selection-state';
+import canvasStore from '@/store/canvas';
+import workingFileStore, { getCanvasRenderingContext2DSettings, getSelectedLayers, ensureUniqueLayerSiblingName, getLayerById } from '@/store/working-file';
+import { createImageFromCanvas, getImageDataFromImage, getImageDataEmptyBounds } from '@/lib/image';
+import { ClearSelectionAction } from './clear-selection';
+import { UpdateLayerAction } from './update-layer';
+import { SelectLayersAction } from './select-layers';
+import renderers from '@/canvas/renderers';
+import { getStoredImageOrCanvas, createStoredImage } from '@/store/image';
 
-// interface DeleteLayerSelectionAreaOptions {
-//     clearSelection?: boolean;
-// }
+import type {
+    ColorModel, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, InsertRasterLayerOptions, UpdateAnyLayerOptions
+} from '@/types';
 
-// export class DeleteLayerSelectionAreaAction extends BaseAction {
+interface DeleteLayerSelectionAreaOptions {
+    clearSelection?: boolean;
+}
 
-//     private layerIds: number[];
-//     private clearSelection: boolean = false;
+export class DeleteLayerSelectionAreaAction extends BaseAction {
 
-//     private clearSelectionAction: ClearSelectionAction | null = null;
+    private layerIds: number[];
+    private clearSelection: boolean = false;
 
-//     constructor(layerIds: number[] = workingFileStore.state.selectedLayerIds, options?: DeleteLayerSelectionAreaOptions) {
-//         super('deleteLayerSelectionArea', 'action.deleteLayerSelectionArea');
-//         this.layerIds = layerIds;
-//         if (options?.clearSelection) {
-//             this.clearSelection = options.clearSelection;
-//         }
-// 	}
+    private clearSelectionAction: ClearSelectionAction | null = null;
+    private updateLayerActions: UpdateLayerAction<UpdateAnyLayerOptions<ColorModel>>[] = [];
 
-// 	public async do() {
-//         super.do();
+    constructor(layerIds: number[] = workingFileStore.state.selectedLayerIds, options?: DeleteLayerSelectionAreaOptions) {
+        super('deleteLayerSelectionArea', 'action.deleteLayerSelectionArea');
+        this.layerIds = layerIds;
 
-//         this.freeEstimates.memory = 0;
-//         this.freeEstimates.database = 0;
+        this.clearSelection = (options?.clearSelection === false) ? false : true;
+	}
 
-//         const layersToModify = [];
-//         for (const layerId of this.layerIds) {
-//             const layer = getLayerById(layerId);
-//             if (layer) {
-//                 layersToModify.push(layer);
-//             }
-//         }
+	public async do() {
+        super.do();
 
-//         // Get selection mask info
-//         const selectionMask: HTMLImageElement | null = activeSelectionMask.value || appliedSelectionMask.value;
-//         if (!selectionMask) {
-//             throw new Error('Aborted - No selection mask exists.');
-//         }
-//         const selectionOffset: DOMPoint = (selectionMask === activeSelectionMask.value ? activeSelectionMaskCanvasOffset.value : appliedSelectionMaskCanvasOffset.value);
-//         const selectionBounds = getImageDataEmptyBounds(getImageDataFromImage(selectionMask));
+        this.freeEstimates.memory = 0;
+        this.freeEstimates.database = 0;
 
-//         // Edit image data for each layer
-//         const workingCanvas = document.createElement('canvas');
-//         for (const layer of layersToModify) {
-//             if (layer.type === 'raster') {
-                
-//             }
-//         }
+        const layersToModify = [];
+        for (const layerId of this.layerIds) {
+            const layer = getLayerById(layerId);
+            if (layer) {
+                layersToModify.push(layer);
+            }
+        }
 
+        // Edit image data for each layer
+        this.updateLayerActions = [];
+        for (const layer of layersToModify) {
+            if (layer.type === 'raster') {
+                const sourceImage = getStoredImageOrCanvas(layer.data.sourceUuid);
+                if (sourceImage) {
+                    const newImage = await blitActiveSelectionMask(sourceImage, layer.transform, 'source-out');
+                    const updateLayerAction = new UpdateLayerAction({
+                        id: layer.id,
+                        data: {
+                            sourceUuid: await createStoredImage(newImage),
+                        }
+                    });
+                    await updateLayerAction.do();
+                    this.freeEstimates.memory += updateLayerAction.freeEstimates.memory;
+                    this.freeEstimates.database += updateLayerAction.freeEstimates.database;
+                    this.updateLayerActions.push(updateLayerAction);
+                }
+            }
+        }
         
-//         workingCanvas.width = selectionBounds.right - selectionBounds.left;
-//         workingCanvas.height = selectionBounds.bottom - selectionBounds.top;
-//         const ctx = workingCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
-//         if (!ctx) {
-//             throw new Error('Aborted - Couldn\'t create canvas context.');
-//         }
-//         ctx.imageSmoothingEnabled = false;
+        if (this.clearSelection && !this.clearSelectionAction) {
+            this.clearSelectionAction = new ClearSelectionAction();
+        }
 
+        if (this.clearSelectionAction) {
+            await this.clearSelectionAction.do();
+            this.freeEstimates.memory += this.clearSelectionAction.freeEstimates.memory;
+            this.freeEstimates.database += this.clearSelectionAction.freeEstimates.database;
+        }
 
-//             // Create new layer for each of the selected layers.
-//             for (let layer of selectedLayers) {
-//                 if (['raster', 'rasterSequence'].includes(layer.type)) {
-//                     ctx.globalCompositeOperation = 'source-over';
-//                     ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height);
-//                     ctx.save();
-//                     ctx.translate(-selectionOffset.x - selectionBounds.left, -selectionOffset.y - selectionBounds.top);
+        canvasStore.set('dirty', true);
+        canvasStore.set('viewDirty', true);
+    }
 
-//                     // Why did I have this here in the first place? Seems to mess everything up when any transform is applied.
-//                     // const transform = getLayerGlobalTransform(layer);
-//                     // ctx.transform(transform.a, transform.b, transform.c, transform.d, transform.e, transform.f);
+    public async undo() {
+        super.undo();
 
-//                     if (layer.type === 'raster') {
-//                         new renderers['2d'].raster().draw(ctx, layer as WorkingFileRasterLayer<ColorModel>);
-//                     } else {
-//                         new renderers['2d'].rasterSequence().draw(ctx, layer as WorkingFileRasterSequenceLayer<ColorModel>);
-//                     }
-//                     ctx.restore();
-//                     ctx.globalCompositeOperation = 'destination-in';
-//                     ctx.drawImage(selectionMask, -selectionBounds.left, -selectionBounds.top);
-//                     ctx.globalCompositeOperation = 'source-over';
-                    
-//                     this.insertLayerActions.push(
-//                         new InsertLayerAction<InsertRasterLayerOptions<ColorModel>>({
-//                             type: 'raster',
-//                             name: ensureUniqueLayerSiblingName(layer.id, layer.name + ' - Selection Copy'),
-//                             width: workingCanvas.width,
-//                             height: workingCanvas.height,
-//                             transform: new DOMMatrix().translateSelf(selectionOffset.x + selectionBounds.left, selectionOffset.y + selectionBounds.top),
-//                             data: {
-//                                 sourceImage: await createImageFromCanvas(workingCanvas),
-//                                 sourceImageIsObjectUrl: true
-//                             }
-//                         })
-//                     );
-//                 }
-//             }
-//         }
+        this.freeEstimates.memory = 0;
+        this.freeEstimates.database = 0;
 
-//         const previousSelectedLayerIds = workingFileStore.get('selectedLayerIds');
+        if (this.clearSelectionAction) {
+            await this.clearSelectionAction.undo();
+            this.freeEstimates.memory += this.clearSelectionAction.freeEstimates.memory;
+            this.freeEstimates.database += this.clearSelectionAction.freeEstimates.database;
+        }
 
-//         if (this.clearSelection && !this.clearSelectionAction) {
-//             this.clearSelectionAction = new ClearSelectionAction();
-//         }
+        for (const updateLayerAction of this.updateLayerActions) {
+            await updateLayerAction.undo();
+            this.freeEstimates.memory += updateLayerAction.freeEstimates.memory;
+            this.freeEstimates.database += updateLayerAction.freeEstimates.database;
+        }
 
-//         if (this.clearSelectionAction) {
-//             await this.clearSelectionAction.do();
-//             this.freeEstimates.memory += this.clearSelectionAction.freeEstimates.memory;
-//             this.freeEstimates.database += this.clearSelectionAction.freeEstimates.database;
-//         }
+        canvasStore.set('dirty', true);
+        canvasStore.set('viewDirty', true);
+    }
 
-//         let insertedLayerIds = [];
-//         for (const insertLayerAction of this.insertLayerActions) {
-//             await insertLayerAction.do();
-//             insertedLayerIds.push(insertLayerAction.insertedLayerId);
-//             this.freeEstimates.memory += insertLayerAction.freeEstimates.memory;
-//             this.freeEstimates.database += insertLayerAction.freeEstimates.database;
-//         }
+    public async free() {
+        super.free();
 
-//         if (this.selectNewLayers !== 'none') {
-//             if (this.selectLayersAction) {
-//                 this.selectLayersAction.free();
-//                 this.selectLayersAction = null;
-//             }
-//             if (this.selectNewLayers === 'replace') {
-//                 this.selectLayersAction = new SelectLayersAction(insertedLayerIds, previousSelectedLayerIds);
-//             } else {
-//                 this.selectLayersAction = new SelectLayersAction([ ...workingFileStore.get('selectedLayerIds'), ...insertedLayerIds ], previousSelectedLayerIds);
-//             }
-//         }
+        if (this.clearSelectionAction) {
+            this.clearSelectionAction.free();
+            this.clearSelectionAction = null;
+        }
 
-//         if (this.selectLayersAction) {
-//             await this.selectLayersAction.do();
-//             this.freeEstimates.memory += this.selectLayersAction.freeEstimates.memory;
-//             this.freeEstimates.database += this.selectLayersAction.freeEstimates.database;
-//         }
-
-//         canvasStore.set('dirty', true);
-//         canvasStore.set('viewDirty', true);
-//     }
-
-//     public async undo() {
-//         super.undo();
-
-//         // this.freeEstimates.memory = 0;
-//         // this.freeEstimates.database = 0;
-
-//         // for (const insertLayerAction of this.insertLayerActions.slice().reverse()) {
-//         //     await insertLayerAction.undo();
-//         //     this.freeEstimates.memory += insertLayerAction.freeEstimates.memory;
-//         //     this.freeEstimates.database += insertLayerAction.freeEstimates.database;
-//         // }
-
-//         // if (this.clearSelectionAction) {
-//         //     await this.clearSelectionAction.undo();
-//         //     this.freeEstimates.memory += this.clearSelectionAction.freeEstimates.memory;
-//         //     this.freeEstimates.database += this.clearSelectionAction.freeEstimates.database;
-//         // }
-
-//         // if (this.selectLayersAction) {
-//         //     await this.selectLayersAction.undo();
-//         //     this.freeEstimates.memory += this.selectLayersAction.freeEstimates.memory;
-//         //     this.freeEstimates.database += this.selectLayersAction.freeEstimates.database;
-//         // }
-
-//         canvasStore.set('dirty', true);
-//         canvasStore.set('viewDirty', true);
-//     }
-
-//     public async free() {
-//         super.free();
-
-//         // for (const insertLayerAction of this.insertLayerActions) {
-//         //     insertLayerAction.free();
-//         // }
-//         // if (this.selectLayersAction) {
-//         //     this.selectLayersAction.free();
-//         //     this.selectLayersAction = null;
-//         // }
-//         // if (this.clearSelectionAction) {
-//         //     this.clearSelectionAction.free();
-//         //     this.clearSelectionAction = null;
-//         // }
-//         // (this.insertLayerActions as any) = null;
-//     }
-// }
+        for (const updateLayerAction of this.updateLayerActions) {
+            updateLayerAction.free();
+        }
+        (this.updateLayerActions as any) = null;
+    }
+}

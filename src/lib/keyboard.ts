@@ -87,9 +87,14 @@ async function onDocumentKeyDown(e: KeyboardEvent) {
         isAltKeyPressed.value = true;
         isAnyModifierKeyPressed.value = true;
     } else if (e.key === 'Escape') {
+        if (isInput(e.target)) return;
         appEmitter.emit('editor.tool.cancelCurrentAction');
     } else if (e.key === 'Enter') {
+        if (isInput(e.target)) return;
         appEmitter.emit('editor.tool.commitCurrentAction');
+    } else if (e.key === 'Delete') {
+        if (isInput(e.target)) return;
+        appEmitter.emit('editor.tool.delete');
     } else if (isAnyModifierKeyPressed.value === true) {
         if (isInput(e.target)) return;
         const shortcuts = shortcutKeyMap.get(e.key.toLowerCase());

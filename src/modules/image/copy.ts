@@ -43,7 +43,7 @@ export async function copySelectedLayers() {
 
 export async function cutSelectedLayers() {
     await copySelectedLayers();
-    if (activeSelectionMask.value != null) {
+    if (activeSelectionMask.value != null || appliedSelectionMask.value != null) {
         const updateLayerActions: UpdateLayerAction<UpdateAnyLayerOptions<ColorModel>>[] = [];
         const selectedLayers = getSelectedLayers();
         for (const layer of selectedLayers) {
