@@ -88,6 +88,7 @@
 //                     ctx.restore();
 //                     ctx.globalCompositeOperation = 'destination-in';
 //                     ctx.drawImage(selectionMask, -selectionBounds.left, -selectionBounds.top);
+//                     ctx.globalCompositeOperation = 'source-over';
                     
 //                     this.insertLayerActions.push(
 //                         new InsertLayerAction<InsertRasterLayerOptions<ColorModel>>({

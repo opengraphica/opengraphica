@@ -79,8 +79,8 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                                 oldChunkCtx.drawImage(sourceCanvas, -updateChunk.x, -updateChunk.y);
                                 this.oldRasterUpdateChunks.push({ data: oldChunkCanvas, x: updateChunk.x, y: updateChunk.y, width: updateChunk.width, height: updateChunk.height });
                                 await drawImageToCanvas2d(sourceCanvas, updateChunk.data, updateChunk.x, updateChunk.y);
-                                // if (updateChunk.mode !== 'overlay') sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
-                                // sourceCtx.drawImage(updateChunk.data, updateChunk.x, updateChunk.y);
+                                if (updateChunk.mode !== 'overlay') sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
+                                sourceCtx.drawImage(updateChunk.data, updateChunk.x, updateChunk.y);
                             }
                         } else {
                             for (const updateChunk of this.newRasterUpdateChunks) {

@@ -197,7 +197,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
             )
         ) {
             this.drawingPointerId = e.pointerId;
-            this.onDrawStart();
+            this.drawStart();
         }
     }
 
@@ -213,7 +213,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                 }
             })();
             // this.drawingPointerId = this.touches[0].id;
-            // this.onDrawStart();
+            // this.drawStart();
         }
     }
 
@@ -254,131 +254,10 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
     async onPointerUpBeforePurge(e: PointerEvent): Promise<void> {
         super.onPointerUpBeforePurge(e);
 
-        if (this.drawingPointerId === e.pointerId) {
-            const points = this.drawingPoints.slice();
-            const drawingOnLayers = this.drawingOnLayers.slice();
-            const updateHistoryStartTimestamp = window.performance.now();
-
-            this.drawingPoints = [];
-            this.drawingOnLayers = [];
-            this.drawingPointerId = null;
-            const updateLayerReserveToken = createHistoryReserveToken();
-
-            await historyReserveQueueFree();
-
-            await historyStore.dispatch('reserve', { token: updateLayerReserveToken });
-
-            const layerActions: BaseAction[] = [];
-
-            const previewRatioX = canvasStore.get('decomposedTransform').scaleX;
-            const previewRatioY = canvasStore.get('decomposedTransform').scaleY;
-            const previewBrushSize = brushSize.value * previewRatioX;
-
-            for (const layer of drawingOnLayers) {
-                if (layer.type === 'raster') {
-                    // TODO - START - This is fairly slow, speed it up?
-
-                    const decomposedCanvasTransform = decomposeMatrix(canvasStore.state.transform.inverse());
-                    const layerGlobalTransform = getLayerGlobalTransform(layer);
-                    const layerSpaceTransform = layerGlobalTransform.inverse();
-
-                    // Project the drawing preview box bounds to the layer's coordinates,
-                    // and determine min/max update coordinates for updating the layer image.
-                    let minX = Infinity;
-                    let maxX = -Infinity;
-                    let minY = Infinity;
-                    let maxY = -Infinity;
-                    const updateChunkBoundsPoints = [
-                        new DOMPoint(this.updateChunkBounds.minX, this.updateChunkBounds.minY).matrixTransform(layerSpaceTransform),
-                        new DOMPoint(this.updateChunkBounds.minX, this.updateChunkBounds.maxY).matrixTransform(layerSpaceTransform),
-                        new DOMPoint(this.updateChunkBounds.maxX, this.updateChunkBounds.minY).matrixTransform(layerSpaceTransform),
-                        new DOMPoint(this.updateChunkBounds.maxX, this.updateChunkBounds.maxY).matrixTransform(layerSpaceTransform),
-                    ];
-                    for (const point of updateChunkBoundsPoints) {
-                        if (point.x < minX) minX = point.x;
-                        if (point.x > maxX) maxX = point.x;
-                        if (point.y < minY) minY = point.y;
-                        if (point.y > maxY) maxY = point.y;
-                    }
-                    minX = Math.max(0, Math.floor(minX));
-                    minY = Math.max(0, Math.floor(minY));
-                    maxX = Math.min(layer.width, Math.ceil(maxX));
-                    maxY = Math.min(layer.height, Math.ceil(maxY));
-
-                    const updateChunkWidth = maxX - minX;
-                    const updateChunkHeight = maxY - minY;
-
-                    // Draw the line to a new canvas which will be merged with the existing layer's canvas
-                    const { canvas: layerUpdateCanvas, ctx: layerUpdateCtx } = createEmptyCanvasWith2dContext(updateChunkWidth, updateChunkHeight);
-                    if (!layerUpdateCtx) continue;
-                    layerUpdateCtx.save();
-
-                    const layerTransform = new DOMMatrix().translate(-minX, -minY).multiply(layerGlobalTransform.inverse())
-                        .scale(decomposedCanvasTransform.scaleX, decomposedCanvasTransform.scaleY);
-                    layerUpdateCtx.transform(layerTransform.a, layerTransform.b, layerTransform.c, layerTransform.d, layerTransform.e, layerTransform.f);
-                    
-                    // this.drawablePreviewCanvas?.setScale(previewRatioX);
-                    // await this.drawablePreviewCanvas?.draw({
-                    //     refresh: true,
-                    //     updates: [
-                    //         {
-                    //             uuid: this.brushStrokeDrawableUuid!,
-                    //             data: {
-                    //                 color: brushColor.value.style,
-                    //                 points: points.map(point => ({
-                    //                     x: point.x,
-                    //                     y: point.y,
-                    //                     size: brushSize.value,
-                    //                     tiltX: 0,
-                    //                     tiltY: 0,
-                    //                     twist: 0,
-                    //                 }))
-                    //             } as BrushStrokeData,
-                    //         }
-                    //     ],
-                    // });
-                    // const { canvas: layerUpdateCanvas } = await this.drawablePreviewCanvas?.drawComplete();
-
-                    this.drawPreviewPoints(points, layerUpdateCtx, previewRatioX, previewRatioY, previewBrushSize);
-                    layerUpdateCtx.restore();
-
-                    layerActions.push(
-                        new UpdateLayerAction<UpdateRasterLayerOptions>({
-                            id: layer.id,
-                            data: {
-                                updateChunks: [{
-                                    x: minX,
-                                    y: minY,
-                                    width: updateChunkWidth,
-                                    height: updateChunkHeight,
-                                    data: layerUpdateCanvas,
-                                    mode: 'overlay',
-                                }],
-                            }
-                        })
-                    );
-
-                    // TODO - END - This is fairly slow, speed it up?
-                }
-            }
-
-            if (layerActions.length > 0) {
-                await historyStore.dispatch('runAction', {
-                    action: new BundleAction('updateDrawLayer', 'action.updateDrawLayer', layerActions),
-                    reserveToken: updateLayerReserveToken,
-                });
-            } else {
-                await historyStore.dispatch('unreserve', { token: updateLayerReserveToken });
-            }
-            for (const layer of drawingOnLayers) {
-                if (layer?.draft?.lastUpdateTimestamp ?? 0 < updateHistoryStartTimestamp) {
-                    layer.draft = null;
-                }
-            }
-        }
+        this.drawEnd(e);
     }
 
-    protected async onDrawStart() {
+    protected async drawStart() {
         // Create layer if one does not exist
         const startDrawReserveToken = createHistoryReserveToken();
         await historyStore.dispatch('reserve', { token: startDrawReserveToken });
@@ -485,12 +364,6 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
 
         // Generate draw preview
         this.drawPreview(true);
-    }
-
-    protected handleCursorIcon() {
-        let newIcon = super.handleCursorIcon();
-        canvasStore.set('cursor', newIcon);
-        return newIcon;
     }
 
     private drawPreview(refresh = false) {
@@ -639,5 +512,136 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         ctx.lineWidth = lineWidth;
         ctx.strokeStyle = brushColor.value.style;
         ctx.stroke();
+    }
+
+    private async drawEnd(e: PointerEvent) {
+        if (this.drawingPointerId === e.pointerId) {
+            const points = this.drawingPoints.slice();
+            const drawingOnLayers = this.drawingOnLayers.slice();
+            const updateHistoryStartTimestamp = window.performance.now();
+
+            this.drawingPoints = [];
+            this.drawingOnLayers = [];
+            this.drawingPointerId = null;
+            const updateLayerReserveToken = createHistoryReserveToken();
+
+            await historyReserveQueueFree();
+
+            await historyStore.dispatch('reserve', { token: updateLayerReserveToken });
+
+            const layerActions: BaseAction[] = [];
+
+            const previewRatioX = canvasStore.get('decomposedTransform').scaleX;
+            const previewRatioY = canvasStore.get('decomposedTransform').scaleY;
+            const previewBrushSize = brushSize.value * previewRatioX;
+
+            for (const layer of drawingOnLayers) {
+                if (layer.type === 'raster') {
+                    // TODO - START - This is fairly slow, speed it up?
+
+                    const decomposedCanvasTransform = decomposeMatrix(canvasStore.state.transform.inverse());
+                    const layerGlobalTransform = getLayerGlobalTransform(layer);
+                    const layerSpaceTransform = layerGlobalTransform.inverse();
+
+                    // Project the drawing preview box bounds to the layer's coordinates,
+                    // and determine min/max update coordinates for updating the layer image.
+                    let minX = Infinity;
+                    let maxX = -Infinity;
+                    let minY = Infinity;
+                    let maxY = -Infinity;
+                    const updateChunkBoundsPoints = [
+                        new DOMPoint(this.updateChunkBounds.minX, this.updateChunkBounds.minY).matrixTransform(layerSpaceTransform),
+                        new DOMPoint(this.updateChunkBounds.minX, this.updateChunkBounds.maxY).matrixTransform(layerSpaceTransform),
+                        new DOMPoint(this.updateChunkBounds.maxX, this.updateChunkBounds.minY).matrixTransform(layerSpaceTransform),
+                        new DOMPoint(this.updateChunkBounds.maxX, this.updateChunkBounds.maxY).matrixTransform(layerSpaceTransform),
+                    ];
+                    for (const point of updateChunkBoundsPoints) {
+                        if (point.x < minX) minX = point.x;
+                        if (point.x > maxX) maxX = point.x;
+                        if (point.y < minY) minY = point.y;
+                        if (point.y > maxY) maxY = point.y;
+                    }
+                    minX = Math.max(0, Math.floor(minX));
+                    minY = Math.max(0, Math.floor(minY));
+                    maxX = Math.min(layer.width, Math.ceil(maxX));
+                    maxY = Math.min(layer.height, Math.ceil(maxY));
+
+                    const updateChunkWidth = maxX - minX;
+                    const updateChunkHeight = maxY - minY;
+
+                    // Draw the line to a new canvas which will be merged with the existing layer's canvas
+                    const { canvas: layerUpdateCanvas, ctx: layerUpdateCtx } = createEmptyCanvasWith2dContext(updateChunkWidth, updateChunkHeight);
+                    if (!layerUpdateCtx) continue;
+                    layerUpdateCtx.save();
+
+                    const layerTransform = new DOMMatrix().translate(-minX, -minY).multiply(layerGlobalTransform.inverse())
+                        .scale(decomposedCanvasTransform.scaleX, decomposedCanvasTransform.scaleY);
+                    layerUpdateCtx.transform(layerTransform.a, layerTransform.b, layerTransform.c, layerTransform.d, layerTransform.e, layerTransform.f);
+                    
+                    // this.drawablePreviewCanvas?.setScale(previewRatioX);
+                    // await this.drawablePreviewCanvas?.draw({
+                    //     refresh: true,
+                    //     updates: [
+                    //         {
+                    //             uuid: this.brushStrokeDrawableUuid!,
+                    //             data: {
+                    //                 color: brushColor.value.style,
+                    //                 points: points.map(point => ({
+                    //                     x: point.x,
+                    //                     y: point.y,
+                    //                     size: brushSize.value,
+                    //                     tiltX: 0,
+                    //                     tiltY: 0,
+                    //                     twist: 0,
+                    //                 }))
+                    //             } as BrushStrokeData,
+                    //         }
+                    //     ],
+                    // });
+                    // const { canvas: layerUpdateCanvas } = await this.drawablePreviewCanvas?.drawComplete();
+
+                    this.drawPreviewPoints(points, layerUpdateCtx, previewRatioX, previewRatioY, previewBrushSize);
+                    layerUpdateCtx.restore();
+
+                    layerActions.push(
+                        new UpdateLayerAction<UpdateRasterLayerOptions>({
+                            id: layer.id,
+                            data: {
+                                updateChunks: [{
+                                    x: minX,
+                                    y: minY,
+                                    width: updateChunkWidth,
+                                    height: updateChunkHeight,
+                                    data: layerUpdateCanvas,
+                                    mode: 'overlay',
+                                }],
+                            }
+                        })
+                    );
+
+                    // TODO - END - This is fairly slow, speed it up?
+                }
+            }
+
+            if (layerActions.length > 0) {
+                await historyStore.dispatch('runAction', {
+                    action: new BundleAction('updateDrawLayer', 'action.updateDrawLayer', layerActions),
+                    reserveToken: updateLayerReserveToken,
+                });
+            } else {
+                await historyStore.dispatch('unreserve', { token: updateLayerReserveToken });
+            }
+            for (const layer of drawingOnLayers) {
+                if (layer?.draft?.lastUpdateTimestamp ?? 0 < updateHistoryStartTimestamp) {
+                    layer.draft = null;
+                }
+            }
+        }
+    }
+
+    protected handleCursorIcon() {
+        let newIcon = super.handleCursorIcon();
+        canvasStore.set('cursor', newIcon);
+        return newIcon;
     }
 }

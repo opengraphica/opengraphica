@@ -176,7 +176,7 @@ const drawImageToCanvas2dWebglCache = {
     CanvasTexture: undefined as ClassType<CanvasTexture> | undefined,
 };
 export async function drawImageToCanvas2d(targetCanvas: HTMLCanvasElement, sourceImage: HTMLCanvasElement, x: number, y: number) {
-    const targetImageCtx = targetCanvas.getContext('2d');
+    const targetImageCtx = targetCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
     if (!targetImageCtx) return;
 
     const sourceCroppedTargetCanvas = document.createElement('canvas');

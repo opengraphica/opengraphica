@@ -854,6 +854,7 @@ export default defineComponent({
                     selectionMaskCanvasCtx.fillStyle = pattern;
                     selectionMaskCanvasCtx.fillRect(0, 0, selectionMaskCanvas.value.width, selectionMaskCanvas.value.height);
                 }
+                selectionMaskCanvasCtx.globalCompositeOperation = 'source-over';
             }
         }
 

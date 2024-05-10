@@ -173,6 +173,7 @@ export async function previewSelectedLayersSelectionMask() {
     ctx.fillRect(0, 0, workingCanvas.width, workingCanvas.height);
     ctx.globalCompositeOperation = 'destination-in';
     drawWorkingFileToCanvas2d(workingCanvas, ctx, { disableViewportTransform: true, selectedLayersOnly: true });
+    ctx.globalCompositeOperation = 'source-over';
     // TODO - perhaps trim mask image before storing to save memory, if not too much CPU cost.
 
     if (selectedLayersSelectionMaskPreview.value) {
@@ -273,6 +274,7 @@ export async function createActiveSelectionMask(activeSelectionBounds: Selection
     }
     ctx.closePath();
     ctx.fill();
+    ctx.globalCompositeOperation = 'source-over';
     return workingCanvas;
 }
 
@@ -300,5 +302,6 @@ export async function blitSpecifiedSelectionMask(selectionMask: HTMLImageElement
     ctx.transform(layerTransform.a, layerTransform.b, layerTransform.c, layerTransform.d, layerTransform.e, layerTransform.f);
     ctx.globalCompositeOperation = compositeOperation;
     ctx.drawImage(toImage, 0, 0);
+    ctx.globalCompositeOperation = 'source-over';
     return workingCanvas;
 }

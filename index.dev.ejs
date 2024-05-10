@@ -12,7 +12,8 @@
                     if (message?.includes) {
                         if (
                             message.includes('You are running the esm-bundler build of vue-i18n') ||
-                            message.includes('__VUE_OPTIONS_API__')
+                            message.includes('__VUE_OPTIONS_API__') ||
+                            message.startsWith('[HMR]')
                         ) {
                             return;
                         }

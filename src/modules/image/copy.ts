@@ -33,7 +33,6 @@ export async function copySelectedLayers() {
             generateImageHash: true
         });
         editorStore.set('hasClipboardUpdateSupport', true);
-        console.log(exportResults.generatedImageHash);
         editorStore.set('clipboardBufferImageHash', exportResults.generatedImageHash);
     } catch (error) {
         console.error('[src/modules/image/copy.ts]', error);

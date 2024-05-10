@@ -83,6 +83,7 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
                     ctx.restore();
                     ctx.globalCompositeOperation = 'destination-in';
                     ctx.drawImage(selectionMask, -selectionBounds.left, -selectionBounds.top);
+                    ctx.globalCompositeOperation = 'source-over';
                     
                     const sourceUuid = await createStoredImage(workingCanvas);
 
