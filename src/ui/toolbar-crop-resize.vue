@@ -1,13 +1,13 @@
 <template>
     <div class="is-flex container is-align-items-center is-justify-content-space-between mx-auto">
-        <div class="py-2 pl-4 is-text-nowrap is-text-ellipsis">
+        <div class="py-2 pl-el-scrollbar-arrow-size is-text-nowrap is-text-ellipsis">
             <div class="is-block my-2 is-text-ellipsis">
                 <i class="bi bi-crop" aria-hidden="true" />
                 {{ $t('toolbar.cropResize.title') }}
             </div>
         </div>
-        <div class="py-2 px-3 is-text-nowrap">
-            <el-button plain link type="primary" class="px-4" :aria-label="$t('button.cancel')" @click="onCancel">
+        <div class="py-2 pl-3 pr-el-scrollbar-arrow-size is-text-nowrap">
+            <el-button plain link type="primary" class="px-4 mr-2" :aria-label="$t('button.cancel')" @click="onCancel">
                 <template v-if="isMobileView">
                     <i class="bi bi-x"></i>
                 </template>
@@ -15,66 +15,6 @@
                     {{ $t('button.cancel') }}
                 </template>
             </el-button>
-            <el-popover placement="bottom" :popper-class="'ogr-dock-popover'" trigger="click" :width="250">
-                <template #reference>
-                    <el-button plain link type="primary" class="px-4 ml-0 mr-2" :aria-label="$t('button.settings')">
-                        <template v-if="isMobileView">
-                            <i class="bi bi-sliders"></i>
-                        </template>
-                        <template v-else>
-                            {{ $t('button.settings') }}
-                        </template>
-                    </el-button>
-                </template>
-                <h2 class="mt-3 mx-4.5" v-t="'button.settings'" />
-                <el-form novalidate="novalidate" action="javascript:void(0)">
-                    <!--el-form-item class="el-form-item--menu-item mb-1" label="Mode">
-                        <el-radio-group
-                            v-model="mode"
-                            size="small">
-                            <el-radio-button label="crop">Crop</el-radio-button>
-                            <el-radio-button label="resample">Resample</el-radio-button>
-                        </el-radio-group>
-                    </el-form-item-->
-                    <div class="px-4.5 my-3">
-                        <el-button-group class="el-button-group--flex is-fullwidth">
-                            <el-input-number v-model="resizeInputWidth" :aria-label="$t('toolbar.cropResize.width')" size="small" class="is-flex-grow-1" :suffix-text="measuringUnits" @input="onInputResizeWidth" />
-                            <el-button size="small" :aria-label="$t('toolbar.cropResize.linkWidthHeight')" class="px-3" :disabled="mode === 'resample'" @click="isDimensionRatioLock = !isDimensionRatioLock">
-                                <i :class="['bi', isDimensionRatioLock ? 'bi-lock-fill' : 'bi-unlock-fill']" aria-hidden="true" />
-                            </el-button>
-                            <el-input-number v-model="resizeInputHeight" :aria-label="$t('toolbar.cropResize.height')" size="small" class="is-flex-grow-1" :suffix-text="measuringUnits"  @input="onInputResizeHeight" />
-                        </el-button-group>
-                    </div>
-                    <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.cropResize.dimensionUnits')">
-                        <el-select style="width: 5rem" size="small" v-model="measuringUnits">
-                            <el-option
-                                v-for="option in dimensionUnitOptions"
-                                :key="option.value"
-                                :label="option.value"
-                                :value="option.value">
-                                {{ $t(option.label) }}
-                            </el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.cropResize.resolution')">
-                        <el-input-number style="width: 6rem" size="small" v-model="resolution" />
-                    </el-form-item>
-                    <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.cropResize.resolutionUnits')">
-                        <el-select style="width: 6rem" size="small" v-model="resolutionUnits">
-                            <el-option
-                                v-for="option in resolutionUnitOptions"
-                                :key="option.value"
-                                :label="option.value"
-                                :value="option.value">
-                                {{ $t(option.label) }}
-                            </el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="$t('toolbar.cropResize.snapping')">
-                        <el-switch v-model="enableSnapping" />
-                    </el-form-item>
-                </el-form>
-            </el-popover>
             <el-button :aria-label="$t('button.done')" plain type="primary" class="ml-0" @click="onDone">
                 <template v-if="isMobileView">
                     <i class="bi bi-check"></i>
@@ -85,12 +25,89 @@
             </el-button>
         </div>
     </div>
+    <div style="background: var(--ogr-background-color)">
+        <div class="container mx-auto">
+            <el-horizontal-scrollbar-arrows>
+                <!-- <el-form-item class="el-form-item--small-label" label="Mode">
+                    <el-radio-group
+                        v-model="mode"
+                        size="small">
+                        <el-radio-button label="crop">Crop</el-radio-button>
+                        <el-radio-button label="resample">Resample</el-radio-button>
+                    </el-radio-group>
+                </el-form-item> -->
+                <el-form-item :label="$t('toolbar.cropResize.size')" class="ml-5 el-form-item--small-label">
+                    <el-button-group class="el-button-group--flex">
+                        <el-input-number v-model="resizeInputWidth" :aria-label="$t('toolbar.cropResize.width')" size="small" class="is-flex-grow-1" style="width: 5rem" @input="onInputResizeWidth" />
+                        <el-button size="small" :aria-label="$t('toolbar.cropResize.linkWidthHeight')" class="px-3" :disabled="mode === 'resample'" @click="isDimensionRatioLock = !isDimensionRatioLock">
+                            <i :class="['bi', isDimensionRatioLock ? 'bi-lock-fill' : 'bi-unlock-fill']" aria-hidden="true" />
+                        </el-button>
+                        <el-input-number v-model="resizeInputHeight" :aria-label="$t('toolbar.cropResize.height')" size="small" class="is-flex-grow-1" style="width: 5rem" @input="onInputResizeHeight" />
+                        <el-select v-model="measuringUnits" :aria-label="$t('toolbar.cropResize.dimensionUnits')" size="small" style="width: 3.75rem">
+                            <el-option
+                                v-for="option in dimensionUnitOptions"
+                                :key="option.value"
+                                :label="option.value"
+                                :value="option.value">
+                                {{ $t(option.label) }}
+                            </el-option>
+                        </el-select>
+                    </el-button-group>
+                </el-form-item>
+                <el-form-item :label="$t('toolbar.cropResize.resolution')" class="ml-5 el-form-item--small-label">
+                    <el-button-group class="el-button-group--flex">
+                        <el-input-number v-model="resolution" :aria-label="$t('toolbar.cropResize.resolution')" style="width: 4rem" size="small" />
+                        <el-select v-model="resolutionUnits" :aria-label="$t('toolbar.cropResize.resolutionUnits')" style="width: 5rem" size="small">
+                            <el-option
+                                v-for="option in resolutionUnitOptions"
+                                :key="option.value"
+                                :label="option.value"
+                                :value="option.value">
+                                {{ $t(option.label) }}
+                            </el-option>
+                        </el-select>
+                    </el-button-group>
+                </el-form-item>
+                <el-popover
+                    placement="bottom"
+                    popper-class="ogr-dock-popover"
+                    :virtual-ref="popoverButtonRef"
+                    trigger="click"
+                    :width="250"
+                    :popper-options="{
+                        modifiers: [
+                            {
+                                name: 'computeStyles',
+                                options: {
+                                    adaptive: false,
+                                    enabled: false
+                                }
+                            }
+                        ]
+                    }">
+                    <template #reference>
+                        <el-button size="small" class="ml-5">
+                            <span class="bi bi-magnet-fill mr-2" aria-hidden="true" /> {{ $t('toolbar.freeTransform.snapping.title') }}
+                        </el-button>
+                    </template>
+                    <h2 class="ogr-dock-title" v-t="'toolbar.cropResize.snapping.title'" />
+                    <el-form novalidate="novalidate" action="javascript:void(0)">
+                        <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="$t('toolbar.cropResize.snapping.enable')">
+                            <el-switch v-model="enableSnapping" />
+                        </el-form-item>
+                    </el-form>
+                </el-popover>
+            </el-horizontal-scrollbar-arrows>
+        </div>
+    </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent, ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
+import ElDivider from 'element-plus/lib/components/divider/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
+import ElHorizontalScrollbarArrows from '@/ui/el-horizontal-scrollbar-arrows.vue';
 import ElInputNumber from '@/ui/el-input-number.vue';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import ElPopover from 'element-plus/lib/components/popover/index';
@@ -118,8 +135,10 @@ export default defineComponent({
     components: {
         ElButton,
         ElButtonGroup,
+        ElDivider,
         ElForm,
         ElFormItem,
+        ElHorizontalScrollbarArrows,
         ElInputNumber,
         ElOption,
         ElPopover,

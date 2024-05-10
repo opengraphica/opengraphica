@@ -107,6 +107,39 @@
             }
         }
 
+        > .el-select {
+            float: left;
+            width: 6rem;
+            margin-right: -0.0625rem;
+
+            > .select-trigger > .el-input > .el-input__wrapper {
+                border-radius: 0;
+                transition: none;
+            }
+
+            &:first-child {
+                > .select-trigger > .el-input > .el-input__wrapper {
+                    border-top-left-radius: var(--ogr-border-radius);
+                    border-bottom-left-radius: var(--ogr-border-radius);
+                }
+            }
+            &:last-child {
+                margin-right: 0;
+
+                > .select-trigger > .el-input > .el-input__wrapper {
+                    border-top-right-radius: var(--ogr-border-radius);
+                    border-bottom-right-radius: var(--ogr-border-radius);
+                }
+            }
+
+            &:hover {
+                z-index: 1;
+            }
+            &:focus-within {
+                z-index: 1;
+            }
+        }
+
         &.el-button-group--flex {
             display: inline-flex;
             flex-direction: row;
@@ -201,6 +234,10 @@
             > .el-form-item__content {
                 text-align: right;
             }
+        }
+
+        &.el-form-item--small-label {
+            --el-form-label-font-size: 0.8125rem;
         }
     }
 
@@ -428,6 +465,15 @@
             > * > .el-scrollbar__view {
                 display: flex;
                 height: 100%;
+
+                .el-form-item {
+                    margin-top: 0;
+                    margin-bottom: 0;
+                }
+
+                .el-radio-group {
+                    flex-wrap: nowrap;
+                }
             }
         }
 
@@ -435,6 +481,12 @@
             box-shadow: 0 0 59px #dfdfdf;
             z-index: 1;
         }
+    }
+    .pl-el-scrollbar-arrow-size {
+        padding-left: 2rem !important;
+    }
+    .pr-el-scrollbar-arrow-size {
+        padding-right: 2rem !important;
     }
 
     .el-input__wrapper {

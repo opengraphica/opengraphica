@@ -8758,6 +8758,7 @@ body.ogr-full-page .opengraphica {
   font-size: 1rem;
   font-weight: bold;
   padding: 0.5rem 1rem 0.35rem 1rem;
+  margin: 0.25rem 0 0 0;
 }
 .opengraphica .ogr-dock-popover > .ogr-dock {
   max-height: calc(100vh - 5rem) !important;
@@ -28090,6 +28091,32 @@ body.ogr-full-page .opengraphica {
 .opengraphica .el-button-group > .el-input:focus-within {
   z-index: 1;
 }
+.opengraphica .el-button-group > .el-select {
+  float: left;
+  width: 6rem;
+  margin-right: -0.0625rem;
+}
+.opengraphica .el-button-group > .el-select > .select-trigger > .el-input > .el-input__wrapper {
+  border-radius: 0;
+  transition: none;
+}
+.opengraphica .el-button-group > .el-select:first-child > .select-trigger > .el-input > .el-input__wrapper {
+  border-top-left-radius: var(--ogr-border-radius);
+  border-bottom-left-radius: var(--ogr-border-radius);
+}
+.opengraphica .el-button-group > .el-select:last-child {
+  margin-right: 0;
+}
+.opengraphica .el-button-group > .el-select:last-child > .select-trigger > .el-input > .el-input__wrapper {
+  border-top-right-radius: var(--ogr-border-radius);
+  border-bottom-right-radius: var(--ogr-border-radius);
+}
+.opengraphica .el-button-group > .el-select:hover {
+  z-index: 1;
+}
+.opengraphica .el-button-group > .el-select:focus-within {
+  z-index: 1;
+}
 .opengraphica .el-button-group.el-button-group--flex {
   display: inline-flex;
   flex-direction: row;
@@ -28159,6 +28186,9 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .el-form-item.el-form-item--has-content-right > .el-form-item__content {
   text-align: right;
+}
+.opengraphica .el-form-item.el-form-item--small-label {
+  --el-form-label-font-size: 0.8125rem;
 }
 .opengraphica .el-form-item-group {
   --label-min-width: 0px;
@@ -28344,9 +28374,22 @@ body.ogr-full-page .opengraphica {
   display: flex;
   height: 100%;
 }
+.opengraphica .el-horizontal-scrollbar-arrows > .el-scrollbar > * > .el-scrollbar__view .el-form-item {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.opengraphica .el-horizontal-scrollbar-arrows > .el-scrollbar > * > .el-scrollbar__view .el-radio-group {
+  flex-wrap: nowrap;
+}
 .opengraphica .el-horizontal-scrollbar-arrows > .el-button {
   box-shadow: 0 0 59px #dfdfdf;
   z-index: 1;
+}
+.opengraphica .pl-el-scrollbar-arrow-size {
+  padding-left: 2rem !important;
+}
+.opengraphica .pr-el-scrollbar-arrow-size {
+  padding-right: 2rem !important;
 }
 .opengraphica .el-input__wrapper {
   height: 2.5rem;

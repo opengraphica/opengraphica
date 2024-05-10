@@ -731,12 +731,16 @@
         "cropResize": {
             "title": "Crop and Resize",
             "linkWidthHeight": "Link Width/Height",
+            "size": "Size",
             "width": "Width",
             "height": "Height",
             "dimensionUnits": "Dimension Units",
             "resolution": "Resolution",
             "resolutionUnits": "Resolution Units",
-            "snapping": "Snapping"
+            "snapping": {
+                "title": "Snapping",
+                "enable": "Enable Snapping"
+            }
         },
         "draw": {
             "brushColor": "Brush Color",
