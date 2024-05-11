@@ -28,14 +28,14 @@
     <div style="background: var(--ogr-background-color)">
         <div class="container mx-auto">
             <el-horizontal-scrollbar-arrows>
-                <!-- <el-form-item class="el-form-item--small-label" label="Mode">
+                <el-form-item class="el-form-item--small-label" label="Mode">
                     <el-radio-group
                         v-model="mode"
                         size="small">
                         <el-radio-button label="crop">Crop</el-radio-button>
                         <el-radio-button label="resample">Resample</el-radio-button>
                     </el-radio-group>
-                </el-form-item> -->
+                </el-form-item>
                 <el-form-item :label="$t('toolbar.cropResize.size')" class="ml-5 el-form-item--small-label">
                     <el-button-group class="el-button-group--flex">
                         <el-input-number v-model="resizeInputWidth" :aria-label="$t('toolbar.cropResize.width')" size="small" class="is-flex-grow-1" style="width: 5rem" @input="onInputResizeWidth" />
@@ -56,8 +56,8 @@
                 </el-form-item>
                 <el-form-item :label="$t('toolbar.cropResize.resolution')" class="ml-5 el-form-item--small-label">
                     <el-button-group class="el-button-group--flex">
-                        <el-input-number v-model="resolution" :aria-label="$t('toolbar.cropResize.resolution')" style="width: 4rem" size="small" />
-                        <el-select v-model="resolutionUnits" :aria-label="$t('toolbar.cropResize.resolutionUnits')" style="width: 5rem" size="small">
+                        <el-input-number v-model="resolution" :aria-label="$t('toolbar.cropResize.resolution')" style="width: 4rem" size="small" @change="onChangeResolution()" />
+                        <el-select v-model="resolutionUnits" :aria-label="$t('toolbar.cropResize.resolutionUnits')" style="width: 5rem" size="small" @change="onChangeResolutionUnits()">
                             <el-option
                                 v-for="option in resolutionUnitOptions"
                                 :key="option.value"
@@ -71,7 +71,6 @@
                 <el-popover
                     placement="bottom"
                     popper-class="ogr-dock-popover"
-                    :virtual-ref="popoverButtonRef"
                     trigger="click"
                     :width="250"
                     :popper-options="{
@@ -276,6 +275,20 @@ export default defineComponent({
             disableDimensionDragUpdate = false;
         }
 
+        async function onChangeResolution() {
+            await nextTick();
+            resizeInputWidth.value = parseFloat(
+                convertUnits(cropWidth.value, 'px', measuringUnits.value, resolutionX.value, resolutionUnits.value).toFixed(measuringUnits.value === 'px' ? 0 : 2)
+            );
+            resizeInputHeight.value = parseFloat(
+                convertUnits(cropHeight.value, 'px', measuringUnits.value, resolutionX.value, resolutionUnits.value).toFixed(measuringUnits.value === 'px' ? 0 : 2)
+            );
+        }
+
+        async function onChangeResolutionUnits() {
+            onChangeResolution();
+        }
+
         function toggleMobileView() {
             isMobileView.value = viewportWidth.value < 500;
         }
@@ -288,13 +301,17 @@ export default defineComponent({
             appEmitter.emit('app.wait.startBlocking', { id: 'toolCropResizeCalculating', label: 'canvas.toolbar.cropResize.waitLabel' });
             try {
                 const layers = workingFileStore.get('layers');
-                let layerUpdateActions: BaseAction[] = await generateResizeLayerActions(layers);
+                const resizePxWidth = convertUnits(resizeInputWidth.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value);
+                const resizePxHeight = convertUnits(resizeInputHeight.value, measuringUnits.value, 'px', resolutionY.value, resolutionUnits.value);
+                const widthRatio = resizePxWidth / cropWidth.value;
+                const heightRatio = resizePxHeight / cropHeight.value;
+                let layerUpdateActions: BaseAction[] = await generateResizeLayerActions(layers, widthRatio, heightRatio);
                 await historyStore.dispatch('runAction', {
                     action: new BundleAction('moduleCropResize', 'action.moduleCropResize', [
                         ...layerUpdateActions,
                         new UpdateFileAction({
-                            width: cropWidth.value,
-                            height: cropHeight.value,
+                            width: mode.value === 'crop' ? cropWidth.value : resizePxWidth,
+                            height: mode.value === 'crop' ? cropHeight.value : resizePxHeight,
                             measuringUnits: measuringUnits.value,
                             resolutionX: resolutionX.value,
                             resolutionY: resolutionY.value,
@@ -309,13 +326,22 @@ export default defineComponent({
             emit('close');
         }
 
-        async function generateResizeLayerActions(layers: WorkingFileLayer<ColorModel>[]): Promise<BaseAction[]> {
+        async function generateResizeLayerActions(
+            layers: WorkingFileLayer<ColorModel>[],
+            widthRatio: number,
+            heightRatio: number,
+        ): Promise<BaseAction[]> {
             let actions: BaseAction[] = [];
             for (let layer of layers) {
                 if (layer.type === 'group') {
-                    await generateResizeLayerActions((layer as WorkingFileGroupLayer<ColorModel>).layers);
+                    await generateResizeLayerActions((layer as WorkingFileGroupLayer<ColorModel>).layers, widthRatio, heightRatio);
                 } else if (layer.type === 'raster' || layer.type === 'rasterSequence') {
-                    const transform = new DOMMatrix().translateSelf(-cropLeft.value, -cropTop.value).multiplySelf(layer.transform);
+                    let transform = layer.transform;
+                    if (mode.value === 'crop') {
+                        transform = new DOMMatrix().translateSelf(-cropLeft.value, -cropTop.value).multiplySelf(layer.transform);
+                    } else {
+                        transform = new DOMMatrix().translateSelf(-cropLeft.value * widthRatio, -cropTop.value * heightRatio).scaleSelf(widthRatio, heightRatio).multiplySelf(layer.transform);
+                    }
                     actions.push(
                         new UpdateLayerAction<UpdateAnyLayerOptions<ColorModel>>({
                             id: layer.id,
@@ -338,6 +364,8 @@ export default defineComponent({
             resizeInputHeight,
             onInputResizeWidth,
             onInputResizeHeight,
+            onChangeResolution,
+            onChangeResolutionUnits,
             isMobileView,
             mode,
             enableSnapping,

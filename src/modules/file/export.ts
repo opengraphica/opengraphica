@@ -138,7 +138,7 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                     );
 
                     if (selectionMaskWasVisible && threejsSelectionMask) {
-                        threejsSelectionMask.visible = false;
+                        threejsSelectionMask.visible = true;
                     }
 
                     // const pixels = new Uint8Array(width * height * 4);

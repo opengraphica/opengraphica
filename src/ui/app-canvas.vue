@@ -214,6 +214,7 @@ export default defineComponent({
                 updateThreejsCanvasMargin(newWidth, newHeight);
             }
 
+            // Update background size
             const threejsBackground = canvasStore.get('threejsBackground');
             if (threejsBackground) {
                 const { PlaneGeometry } = await import('three/src/geometries/PlaneGeometry');
@@ -392,17 +393,17 @@ export default defineComponent({
             threejsScene.add(threejsBackground);
             canvasStore.set('threejsBackground', markRaw(threejsBackground));
 
-            const selectionMaskTexture = await new Promise<InstanceType<typeof Texture> | undefined>((resolve) => {
+            const selectionMaskUnselectedPatternTexture = await new Promise<InstanceType<typeof Texture> | undefined>((resolve) => {
                 const texture = new TextureLoader().load(
                     selectionMaskPatternSrc,
                     () => { resolve(texture); },
                     undefined,
-                    (error) => { resolve(undefined); }
+                    () => { resolve(undefined); }
                 );
             });
-            if (selectionMaskTexture) {
-                selectionMaskTexture.wrapS = RepeatWrapping;
-                selectionMaskTexture.wrapT = RepeatWrapping;
+            if (selectionMaskUnselectedPatternTexture) {
+                selectionMaskUnselectedPatternTexture.wrapS = RepeatWrapping;
+                selectionMaskUnselectedPatternTexture.wrapT = RepeatWrapping;
             }
             const selectionMaskGeometry = new PlaneGeometry(2, 2); //viewportWidth.value, viewportHeight.value);
             const selectionMaskMaterial = new ShaderMaterial({
@@ -411,10 +412,8 @@ export default defineComponent({
                 vertexShader: selectionMaskMaterialVertexShader,
                 fragmentShader: selectionMaskMaterialFragmentShader,
                 side: DoubleSide,
-                defines: {
-                },
                 uniforms: {
-                    unselectedMaskMap: { value: selectionMaskTexture },
+                    unselectedMaskMap: { value: selectionMaskUnselectedPatternTexture },
                     selectedMaskMap: { value: undefined },
                     selectedMaskSize: { value: [1, 1] },
                     selectedMaskOffset: { value: [0, 0] },
@@ -705,7 +704,7 @@ export default defineComponent({
                     }
 
                     // Draw selection mask
-                    updateSelectionMaskForViewportDirty();
+                    updateSelectionMaskWhenViewportIsDirty();
                 }
 
                 if ((canvasStore.get('dirty') || isPlayingAnimation)) {
@@ -824,12 +823,9 @@ export default defineComponent({
             }
         }
 
-        function updateSelectionMaskForViewportDirty() {
+        function updateSelectionMaskWhenViewportIsDirty() {
             if (canvasStore.state.renderer === 'webgl') {
-                const threejsSelectionMask = canvasStore.get('threejsSelectionMask');
-                // if (!threejsSelectionMask) return;
-                // threejsSelectionMask.geometry?.dispose();
-
+                // Handled in selection mask watcher.
             }
             else if (selectionMaskCanvas.value && selectionMaskCanvasCtx) {
                 selectionMaskCanvas.value.width = viewportWidth.value;
