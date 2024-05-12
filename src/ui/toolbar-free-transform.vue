@@ -140,16 +140,14 @@
                             <i class="bi bi-check-circle-fill"></i>
                             <span v-t="'toolbar.freeTransform.actions.applyTransform'"></span>
                         </el-menu-item>
-                        <!--
-                        <el-menu-item index="expandToImageSize">
+                        <!-- <el-menu-item index="expandToImageSize">
                             <i class="bi bi-fullscreen"></i>
                             <span v-t="'toolbar.freeTransform.actions.expandToImageSize'"></span>
-                        </el-menu-item>
+                        </el-menu-item> -->
                         <el-menu-item index="trimEmptySpace">
                             <i class="bi bi-scissors"></i>
                             <span v-t="'toolbar.freeTransform.actions.trimEmptySpace'"></span>
                         </el-menu-item>
-                        -->
                     </el-menu>
                 </el-popover>
             </el-horizontal-scrollbar-arrows>
@@ -161,7 +159,7 @@
 import { defineComponent, defineAsyncComponent, ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
 import {
     freeTransformEmitter, layerPickMode, useRotationSnapping, top, left, width, height, rotation,
-    applyTransform,
+    applyTransform, trimEmptySpace,
 } from '@/canvas/store/free-transform-state';
 import { appliedSelectionMask, activeSelectionMask } from '@/canvas/store/selection-state';
 import ElAlert from 'element-plus/lib/components/alert/index';
@@ -343,7 +341,7 @@ export default defineComponent({
             } else if (action === 'expandToImageSize') {
                 console.log('Expand');
             } else if (action === 'trimEmptySpace') {
-                console.log('Shrink');
+                await trimEmptySpace();
             }
             actionActiveIndex.value = ' ';
             await nextTick();

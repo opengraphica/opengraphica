@@ -5,6 +5,7 @@ import historyStore from '@/store/history';
 import workingFileStore from '@/store/working-file';
 import { ApplyLayerTransformAction } from '@/actions/apply-layer-transform';
 import { BundleAction } from '@/actions/bundle';
+import { TrimLayerEmptySpaceAction } from '@/actions/trim-layer-empty-space';
 
 import type { WorkingFileLayer, ColorModel } from '@/types';
 
@@ -54,7 +55,7 @@ freeTransformEmitter.on('setDimensions', (event?: { top?: number, left?: number,
 });
 
 export async function applyTransform() {
-    appEmitter.emit('app.wait.startBlocking', { id: 'freeTransformApply' });
+    appEmitter.emit('app.wait.startBlocking', { id: 'freeTransformApply', label: 'app.wait.applyLayerTransform' });
         try {
         const actions: ApplyLayerTransformAction[] = [];
         for (const layerId of workingFileStore.state.selectedLayerIds) {
@@ -64,7 +65,21 @@ export async function applyTransform() {
             action: new BundleAction('applyLayerTransform', 'action.applyLayerTransform', actions)
         });
     } catch (error) {
-        console.error('[src/canvas/store/free-transform-state.ts] Error occurred during apply transform.');
+        console.error('[src/canvas/store/free-transform-state.ts] Error occurred during apply transform.', error);
     }
     appEmitter.emit('app.wait.stopBlocking', { id: 'freeTransformApply' });
+}
+
+export async function trimEmptySpace() {
+    try {
+        const actions: TrimLayerEmptySpaceAction[] = [];
+        for (const layerId of workingFileStore.state.selectedLayerIds) {
+            actions.push(new TrimLayerEmptySpaceAction(layerId));
+        }
+        await historyStore.dispatch('runAction', {
+            action: new BundleAction('trimLayerEmptySpace', 'action.trimLayerEmptySpace', actions)
+        });
+    } catch (error) {
+        console.error('[src/canvas/store/free-transform-state.ts] Error occurred during trim empty space.', error);
+    }
 }

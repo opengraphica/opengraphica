@@ -31,6 +31,7 @@
         "selectLayers": "Select Layer(s)",
         "toggleLayerVisibilityOn": "Toggle Layer Visibility On",
         "toggleLayerVisibilityOff": "Toggle Layer Visibility Off",
+        "trimLayerEmptySpace": "Trim Layer Empty Space",
         "updateActiveSelection": "Update Active Selection",
         "updateFile": "Update File",
         "updateLayer": "Update Layer",
@@ -63,8 +64,10 @@
             "moveEffectDown": "Move Effect Down"
         },
         "wait": {
+            "applyLayerTransform": "Applying Layer Transform",
             "loadingImage": "Loading Image",
             "pleaseWait": "Please Wait",
+            "trimLayerEmptySpace": "Trimming Empty Space",
             "cancel": "Cancel"
         }
     },
