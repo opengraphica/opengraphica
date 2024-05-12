@@ -1,4 +1,6 @@
 @mixin element-plus-enhancements {
+    --el-transition-duration-fast: 0.1s;
+
     .el-text-alignment-fix--sm--above {
         margin-top: 0.05em;
     }
@@ -596,6 +598,13 @@
                 margin: 0.25rem 0;
             }
         }
+        &.el-menu--medium-icons {
+            .el-menu-item {
+                .bi {
+                    font-size: 1em;
+                }
+            }
+        }
         &.el-menu--inactivated {
             --el-menu-active-color: var(--el-menu-text-color);
         }
@@ -616,6 +625,15 @@
         color: #909399;
     }
 
+    .el-no-transition-enter-active, .el-no-transition-leave-active {
+        transition: none !important;
+        opacity: 0 !important;
+    }
+      
+    .el-no-transition-enter-from, .el-no-transition-leave-to {
+        opacity: 0 !important;
+    }
+      
     .el-notification {
         &.right {
             right: calc(var(--ogr-sidebar-right-size, .5rem) + .5rem);

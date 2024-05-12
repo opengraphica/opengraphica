@@ -26589,6 +26589,7 @@ body.ogr-full-page .opengraphica {
 }
 
 .opengraphica {
+  --el-transition-duration-fast: 0.1s;
   --el-bg-color: #272c37;
   --el-bg-color-page: #1f252d;
   --el-bg-color-overlay: #272c37;
@@ -28474,6 +28475,9 @@ body.ogr-full-page .opengraphica {
 .opengraphica .el-menu.el-menu--medium > .el-divider {
   margin: 0.25rem 0;
 }
+.opengraphica .el-menu.el-menu--medium-icons .el-menu-item .bi {
+  font-size: 1em;
+}
 .opengraphica .el-menu.el-menu--inactivated {
   --el-menu-active-color: var(--el-menu-text-color);
 }
@@ -28491,6 +28495,13 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .el-menu > .el-collapse .el-collapse-item__header .bi {
   color: #909399;
+}
+.opengraphica .el-no-transition-enter-active, .opengraphica .el-no-transition-leave-active {
+  transition: none !important;
+  opacity: 0 !important;
+}
+.opengraphica .el-no-transition-enter-from, .opengraphica .el-no-transition-leave-to {
+  opacity: 0 !important;
 }
 .opengraphica .el-notification.right {
   right: calc(var(--ogr-sidebar-right-size, .5rem) + .5rem);

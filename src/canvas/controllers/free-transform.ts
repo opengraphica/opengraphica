@@ -1,6 +1,10 @@
 import { nextTick, watch, WatchStopHandle } from 'vue';
 import BaseCanvasMovementController from './base-movement';
-import { isBoundsIndeterminate, layerPickMode, useRotationSnapping, freeTransformEmitter, top, left, width, height, rotation, transformOriginX, transformOriginY, dimensionLockRatio, previewXSnap, previewYSnap, dragHandleHighlight, rotateHandleHighlight, selectedLayers } from '../store/free-transform-state';
+import {
+    isBoundsIndeterminate, layerPickMode, useRotationSnapping, freeTransformEmitter, top, left, width, height, rotation,
+    transformOriginX, transformOriginY, dimensionLockRatio, previewXSnap, previewYSnap, dragHandleHighlight, rotateHandleHighlight, selectedLayers,
+    applyTransform,
+} from '../store/free-transform-state';
 import { appliedSelectionMask, appliedSelectionMaskCanvasOffset, activeSelectionMask, activeSelectionMaskCanvasOffset } from '../store/selection-state';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
@@ -82,12 +86,14 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         }, { immediate: true });
 
         this.onCancelCurrentAction = this.onCancelCurrentAction.bind(this);
+        this.onCommitCurrentAction = this.onCommitCurrentAction.bind(this);
         this.onHistoryStep = this.onHistoryStep.bind(this);
         this.onStoreTransformStart = this.onStoreTransformStart.bind(this);
         this.onPreviewRotationChange = this.onPreviewRotationChange.bind(this);
         this.onPreviewDragResizeChange = this.onPreviewDragResizeChange.bind(this);
         this.onCommitTransforms = this.onCommitTransforms.bind(this);
         appEmitter.on('editor.tool.cancelCurrentAction', this.onCancelCurrentAction);
+        appEmitter.on('editor.tool.commitCurrentAction', this.onCommitCurrentAction);
         appEmitter.on('editor.history.step', this.onHistoryStep);
         freeTransformEmitter.on('storeTransformStart', this.onStoreTransformStart);
         freeTransformEmitter.on('previewRotationChange', this.onPreviewRotationChange);
@@ -127,6 +133,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             this.selectedLayerIdsWatchStop = null;
         }
         appEmitter.off('editor.tool.cancelCurrentAction', this.onCancelCurrentAction);
+        appEmitter.off('editor.tool.commitCurrentAction', this.onCommitCurrentAction);
         appEmitter.off('editor.history.step', this.onHistoryStep);
         freeTransformEmitter.off('storeTransformStart', this.onStoreTransformStart);
         freeTransformEmitter.off('previewRotationChange', this.onPreviewRotationChange);
@@ -386,8 +393,14 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         }
     }
 
+    private onCommitCurrentAction() {
+        if (!this.transformIsRotating && !this.transformIsDragging) {
+            applyTransform();
+        }
+    }
+
     private onHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
-        if (event?.trigger != 'do') {
+        if (event?.trigger != 'do' || event?.action.id === 'applyLayerTransform') {
             isBoundsIndeterminate.value = true;
             this.setBoundsFromSelectedLayers();
         }

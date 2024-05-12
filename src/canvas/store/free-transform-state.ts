@@ -1,6 +1,12 @@
 import mitt from 'mitt';
 import { ref } from 'vue';
-import { WorkingFileLayer, ColorModel } from '@/types';
+import appEmitter from '@/lib/emitter';
+import historyStore from '@/store/history';
+import workingFileStore from '@/store/working-file';
+import { ApplyLayerTransformAction } from '@/actions/apply-layer-transform';
+import { BundleAction } from '@/actions/bundle';
+
+import type { WorkingFileLayer, ColorModel } from '@/types';
 
 export const isBoundsIndeterminate = ref<boolean>(false);
 export const layerPickMode = ref<'current' | 'auto'>('auto');
@@ -46,3 +52,19 @@ freeTransformEmitter.on('setDimensions', (event?: { top?: number, left?: number,
         }
     }
 });
+
+export async function applyTransform() {
+    appEmitter.emit('app.wait.startBlocking', { id: 'freeTransformApply' });
+        try {
+        const actions: ApplyLayerTransformAction[] = [];
+        for (const layerId of workingFileStore.state.selectedLayerIds) {
+            actions.push(new ApplyLayerTransformAction(layerId));
+        }
+        await historyStore.dispatch('runAction', {
+            action: new BundleAction('applyLayerTransform', 'action.applyLayerTransform', actions)
+        });
+    } catch (error) {
+        console.error('[src/canvas/store/free-transform-state.ts] Error occurred during apply transform.');
+    }
+    appEmitter.emit('app.wait.stopBlocking', { id: 'freeTransformApply' });
+}

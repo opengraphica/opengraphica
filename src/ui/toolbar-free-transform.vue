@@ -18,18 +18,10 @@
                         <el-option :label="$t('toolbar.freeTransform.pickLayer.current')" value="current" />
                     </el-select>
                 </el-input-group>
-                <el-button size="small" class="ml-3" @mouseover="onMouseOverPopoverButton($event, 'snapping')" @click="onClickPopoverButton($event, 'snapping')">
-                    <span class="bi bi-magnet-fill mr-2" aria-hidden="true" /> {{ $t('toolbar.freeTransform.snapping.title') }}
-                </el-button>
-                <el-button size="small" class="ml-3" @mouseover="onMouseOverPopoverButton($event, 'metrics')" @click="onClickPopoverButton($event, 'metrics')">
-                    <span class="bi bi-clipboard-data-fill mr-2" aria-hidden="true" /> {{ $t('toolbar.freeTransform.metrics.title') }}
-                </el-button>
                 <el-popover
                     placement="top"
-                    popper-class="ogr-dock-popover ogr-dock-popper--singleton"
-                    :virtual-ref="popoverButtonRef"
+                    popper-class="ogr-dock-popover"
                     trigger="click"
-                    virtual-triggering
                     :width="250"
                     :popper-options="{
                         modifiers: [
@@ -41,59 +33,124 @@
                                 }
                             }
                         ]
-                    }">
-                    <template v-if="currentPopoverName === 'snapping'">
-                        <h2 class="mt-3 mx-4.5" v-t="'toolbar.freeTransform.snapping.title'" />
-                        <el-form novalidate="novalidate" action="javascript:void(0)">
-                            <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="$t('toolbar.freeTransform.snapping.rotationSnap')">
-                                <el-switch v-model="useRotationSnapping" />
+                    }"
+                >
+                    <template #reference>
+                        <el-button size="small" class="ml-3">
+                            <span class="bi bi-magnet-fill mr-2" aria-hidden="true" /> {{ $t('toolbar.freeTransform.snapping.title') }}
+                        </el-button>
+                    </template>
+                    <h2 class="ogr-dock-title" v-t="'toolbar.freeTransform.snapping.title'" />
+                    <el-form novalidate="novalidate" action="javascript:void(0)">
+                        <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="$t('toolbar.freeTransform.snapping.rotationSnap')">
+                            <el-switch v-model="useRotationSnapping" />
+                        </el-form-item>
+                    </el-form>
+                </el-popover>
+                <el-popover
+                    placement="top"
+                    popper-class="ogr-dock-popover"
+                    trigger="click"
+                    :width="250"
+                    :popper-options="{
+                        modifiers: [
+                            {
+                                name: 'computeStyles',
+                                options: {
+                                    adaptive: false,
+                                    enabled: false
+                                }
+                            }
+                        ]
+                    }"
+                >
+                    <template #reference>
+                        <el-button size="small" class="ml-3">
+                            <span class="bi bi-clipboard-data-fill mr-2" aria-hidden="true" /> {{ $t('toolbar.freeTransform.metrics.title') }}
+                        </el-button>
+                    </template>
+                    <h2 class="ogr-dock-title" v-t="'toolbar.freeTransform.metrics.title'" />
+                    <template v-if="selectedLayerIds.length > 0">
+                        <el-form novalidate="novalidate" action="javascript:void(0)" style="max-width: 15rem;">
+                            <div class="px-4.5 my-3 is-flex">
+                                <el-input-number
+                                    v-model="inputLeft" :aria-label="'X ' + $t('toolbar.freeTransform.metrics.position')" size="small"
+                                    class="el-input-group--plain is-flex-grow-1" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputLeft($event)" @blur="onChangeDragResizeInput()">
+                                    <template #prepend>X</template>
+                                </el-input-number>
+                                <el-input-number
+                                    v-model="inputTop" :aria-label="'Y ' + $t('toolbar.freeTransform.metrics.position')" size="small"
+                                    class="el-input-group--plain is-flex-grow-1 ml-3" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputTop($event)" @blur="onChangeDragResizeInput()">
+                                    <template #prepend>Y</template>
+                                </el-input-number>
+                            </div>
+                            <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.freeTransform.metrics.width')">
+                                <el-input-number v-model="inputWidth" style="width: 6rem" size="small" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputWidth($event)" @blur="onChangeDragResizeInput()" />
+                            </el-form-item>
+                            <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.freeTransform.metrics.height')">
+                                <el-input-number v-model="inputHeight" style="width: 6rem" size="small" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputHeight($event)" @blur="onChangeDragResizeInput()" />
+                            </el-form-item>
+                            <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.freeTransform.metrics.rotation')">
+                                <el-input-number v-model="inputRotation" style="width: 6rem" size="small" suffix-text="°" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputRotation($event)" @blur="onChangeRotationInput($event)">
+                                    <template #append>
+                                        <el-button size="small" :aria-label="$t('toolbar.freeTransform.metrics.resetRotation')" @click="onResetRotation()">
+                                            <span class="bi bi-arrow-repeat" aria-hidden="true"></span>
+                                        </el-button>
+                                    </template>
+                                </el-input-number>
                             </el-form-item>
                         </el-form>
                     </template>
-                    <template v-else-if="currentPopoverName === 'metrics'">
-                        <h2 class="mt-3 mx-4.5" v-t="'toolbar.freeTransform.metrics.title'" />
-                        <template v-if="selectedLayerIds.length > 0">
-                            <el-form novalidate="novalidate" action="javascript:void(0)" style="max-width: 15rem;">
-                                <div class="px-4.5 my-3 is-flex">
-                                    <el-input-number
-                                        v-model="inputLeft" :aria-label="'X ' + $t('toolbar.freeTransform.metrics.position')" size="small"
-                                        class="el-input-group--plain is-flex-grow-1" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputLeft($event)" @blur="onChangeDragResizeInput()">
-                                        <template #prepend>X</template>
-                                    </el-input-number>
-                                    <el-input-number
-                                        v-model="inputTop" :aria-label="'Y ' + $t('toolbar.freeTransform.metrics.position')" size="small"
-                                        class="el-input-group--plain is-flex-grow-1 ml-3" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputTop($event)" @blur="onChangeDragResizeInput()">
-                                        <template #prepend>Y</template>
-                                    </el-input-number>
-                                </div>
-                                <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.freeTransform.metrics.width')">
-                                    <el-input-number v-model="inputWidth" style="width: 6rem" size="small" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputWidth($event)" @blur="onChangeDragResizeInput()" />
-                                </el-form-item>
-                                <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.freeTransform.metrics.height')">
-                                    <el-input-number v-model="inputHeight" style="width: 6rem" size="small" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputHeight($event)" @blur="onChangeDragResizeInput()" />
-                                </el-form-item>
-                                <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.freeTransform.metrics.rotation')">
-                                    <el-input-number v-model="inputRotation" style="width: 6rem" size="small" suffix-text="°" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputRotation($event)" @blur="onChangeRotationInput($event)">
-                                        <template #append>
-                                            <el-button size="small" :aria-label="$t('toolbar.freeTransform.metrics.resetRotation')" @click="onResetRotation()">
-                                                <span class="bi bi-arrow-repeat" aria-hidden="true"></span>
-                                            </el-button>
-                                        </template>
-                                    </el-input-number>
-                                </el-form-item>
-                            </el-form>
-                        </template>
-                        <template v-else>
-                            <div class="px-4.5 my-3">
-                                <el-alert
-                                    type="info"
-                                    :title="$t('toolbar.freeTransform.metrics.noLayers')"
-                                    show-icon
-                                    :closable="false">
-                                </el-alert>
-                            </div>
-                        </template>
+                    <template v-else>
+                        <div class="px-4.5 my-3">
+                            <el-alert
+                                type="info"
+                                :title="$t('toolbar.freeTransform.metrics.noLayers')"
+                                show-icon
+                                :closable="false">
+                            </el-alert>
+                        </div>
                     </template>
+                </el-popover>
+                <el-popover
+                    v-model:visible="isActionPopoverVisible"
+                    placement="top"
+                    popper-class="ogr-dock-popover"
+                    trigger="click"
+                    :width="250"
+                    :popper-options="{
+                        modifiers: [
+                            {
+                                name: 'computeStyles',
+                                options: {
+                                    adaptive: false,
+                                    enabled: false
+                                }
+                            }
+                        ]
+                    }"
+                >
+                    <template #reference>
+                        <el-button size="small" class="ml-3">
+                            <span class="bi bi-gear-fill mr-2" aria-hidden="true" /> {{ $t('toolbar.freeTransform.actions.title') }}
+                        </el-button>
+                    </template>
+                    <el-menu class="el-menu--medium el-menu--medium-icons el-menu--borderless my-1" :default-active="actionActiveIndex" @select="onActionSelect($event)">
+                        <el-menu-item index="applyTransform">
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span v-t="'toolbar.freeTransform.actions.applyTransform'"></span>
+                        </el-menu-item>
+                        <!--
+                        <el-menu-item index="expandToImageSize">
+                            <i class="bi bi-fullscreen"></i>
+                            <span v-t="'toolbar.freeTransform.actions.expandToImageSize'"></span>
+                        </el-menu-item>
+                        <el-menu-item index="trimEmptySpace">
+                            <i class="bi bi-scissors"></i>
+                            <span v-t="'toolbar.freeTransform.actions.trimEmptySpace'"></span>
+                        </el-menu-item>
+                        -->
+                    </el-menu>
                 </el-popover>
             </el-horizontal-scrollbar-arrows>
         </div>
@@ -102,7 +159,10 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent, ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
-import { freeTransformEmitter, layerPickMode, useRotationSnapping, top, left, width, height, rotation } from '@/canvas/store/free-transform-state';
+import {
+    freeTransformEmitter, layerPickMode, useRotationSnapping, top, left, width, height, rotation,
+    applyTransform,
+} from '@/canvas/store/free-transform-state';
 import { appliedSelectionMask, activeSelectionMask } from '@/canvas/store/selection-state';
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
@@ -111,6 +171,7 @@ import ElHorizontalScrollbarArrows from '@/ui/el-horizontal-scrollbar-arrows.vue
 import ElInput from 'element-plus/lib/components/input/index';
 import ElInputGroup from '@/ui/el-input-group.vue';
 import ElInputNumber from '@/ui/el-input-number.vue';
+import ElMenu, { ElMenuItem } from 'element-plus/lib/components/menu/index';
 import ElPopover from '@/ui/el-popover.vue';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSwitch from 'element-plus/lib/components/switch/index';
@@ -131,6 +192,8 @@ export default defineComponent({
         ElInput,
         ElInputGroup,
         ElInputNumber,
+        ElMenu,
+        ElMenuItem,
         ElOption,
         ElPopover,
         ElSelect,
@@ -150,8 +213,8 @@ export default defineComponent({
         const resolutionUnits = ref<WorkingFileState['resolutionUnits']>(workingFileStore.get('resolutionUnits'));
         const dimensionLockRatio = ref<number | null>(null);
 
-        const popoverButtonRef = ref<HTMLElement | null>();
-        const currentPopoverName = ref<string>();
+        const actionActiveIndex = ref<string>('');
+        const isActionPopoverVisible = ref<boolean>(false);
 
         let disableInputUpdate: boolean = false;
 
@@ -186,16 +249,6 @@ export default defineComponent({
                 inputRotation.value = parseFloat((rotation * Math.RADIANS_TO_DEGREES).toFixed(2));
             }
         }, { immediate: true });
-
-        function onMouseOverPopoverButton(event: MouseEvent, name: string) {
-            popoverButtonRef.value = (event.target as HTMLElement | null)?.closest('button');
-            currentPopoverName.value = name;
-        }
-
-        function onClickPopoverButton(event: MouseEvent, name: string) {
-            popoverButtonRef.value = (event.target as HTMLElement | null)?.closest('button');
-            currentPopoverName.value = name;
-        }
 
         function onToggleDimensionLockRatio() {
             if (dimensionLockRatio.value == null) {
@@ -284,10 +337,22 @@ export default defineComponent({
             });
         }
 
+        async function onActionSelect(action: string) {
+            if (action === 'applyTransform') {
+                await applyTransform();
+            } else if (action === 'expandToImageSize') {
+                console.log('Expand');
+            } else if (action === 'trimEmptySpace') {
+                console.log('Shrink');
+            }
+            actionActiveIndex.value = ' ';
+            await nextTick();
+            actionActiveIndex.value = '';
+            isActionPopoverVisible.value = false;
+        }
+
         return {
             hasSelection,
-            popoverButtonRef,
-            currentPopoverName,
             inputLeft,
             inputTop,
             inputWidth,
@@ -298,8 +363,8 @@ export default defineComponent({
             useRotationSnapping,
             dimensionLockRatio,
             selectedLayerIds,
-            onMouseOverPopoverButton,
-            onClickPopoverButton,
+            actionActiveIndex,
+            isActionPopoverVisible,
             onToggleDimensionLockRatio,
             onFocusAnyMetricInput,
             onInputLeft,
@@ -310,7 +375,8 @@ export default defineComponent({
             onChangeDragResizeInput,
             onChangeRotationInput,
             onResetRotation,
-            onClickClearSelection
+            onClickClearSelection,
+            onActionSelect,
         };
     }
 });

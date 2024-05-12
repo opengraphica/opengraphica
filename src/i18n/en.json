@@ -4,6 +4,7 @@
         "addLayerFilter": "Add Effect to Layer",
         "addLayerFilterMultiple": "Add Effect to Layer(s)",
         "applyActiveSelection": "Apply Active Selection",
+        "applyLayerTransform": "Apply Layer Transform",
         "clearSelection": "Clear Selection",
         "convertLayersToImageSequence": "Convert Layers to Image Sequence",
         "createDrawLayer": "Create Draw Layer",
@@ -765,6 +766,12 @@
                 "rotation": "Rotation",
                 "resetRotation": "Reset Rotation",
                 "noLayers": "No layer(s) selected."
+            },
+            "actions": {
+                "title": "Actions",
+                "applyTransform": "Apply Transform",
+                "expandToImageSize": "Bounds to Image Size",
+                "trimEmptySpace": "Trim Empty Space"
             }
         },
         "general": {

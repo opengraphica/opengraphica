@@ -54,3 +54,25 @@ export function lineIntersectsLine2d(x1: number, y1: number, x2: number, y2: num
 export function nearestPowerOf2(value: number) {
     return Math.ceil(Math.log(value) / Math.log(2));
 }
+
+// Finds the bounding box, given a list of points.
+export function findPointListBounds(points: Array<DOMPoint | { x: number, y: number }>) {
+    let left = Infinity;
+    let right = -Infinity;
+    let top = Infinity;
+    let bottom = -Infinity;
+
+    for (const point of points) {
+        if (point.x < left) left = point.x;
+        if (point.x > right) right = point.x;
+        if (point.y < top) top = point.y;
+        if (point.y > bottom) bottom = point.y;
+    }
+
+    return {
+        left,
+        right,
+        top,
+        bottom,
+    }
+}
