@@ -1,12 +1,9 @@
 
 import { BaseAction } from './base';
-import imageDatabase from '@/store/data/image-database';
 import canvasStore from '@/store/canvas';
-import editorStore from '@/store/editor';
 import { createStoredImage, prepareStoredImageForEditing, prepareStoredImageForArchival } from '@/store/image';
 import { getLayerById, getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { getImageDataEmptyBounds, getImageDataFromCanvas } from '@/lib/image';
-import { decomposeMatrix } from '@/lib/dom-matrix';
 import { findPointListBounds } from '@/lib/math';
 import { UpdateLayerAction } from './update-layer';
 

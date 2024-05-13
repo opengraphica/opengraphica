@@ -5,6 +5,7 @@ import historyStore from '@/store/history';
 import workingFileStore from '@/store/working-file';
 import { ApplyLayerTransformAction } from '@/actions/apply-layer-transform';
 import { BundleAction } from '@/actions/bundle';
+import { SetLayerBoundsToWorkingFileBoundsAction } from '@/actions/set-layer-bounds-to-working-file-bounds';
 import { TrimLayerEmptySpaceAction } from '@/actions/trim-layer-empty-space';
 
 import type { WorkingFileLayer, ColorModel } from '@/types';
@@ -56,7 +57,7 @@ freeTransformEmitter.on('setDimensions', (event?: { top?: number, left?: number,
 
 export async function applyTransform() {
     appEmitter.emit('app.wait.startBlocking', { id: 'freeTransformApply', label: 'app.wait.applyLayerTransform' });
-        try {
+    try {
         const actions: ApplyLayerTransformAction[] = [];
         for (const layerId of workingFileStore.state.selectedLayerIds) {
             actions.push(new ApplyLayerTransformAction(layerId));
@@ -82,4 +83,20 @@ export async function trimEmptySpace() {
     } catch (error) {
         console.error('[src/canvas/store/free-transform-state.ts] Error occurred during trim empty space.', error);
     }
+}
+
+export async function layerToImageBounds() {
+    appEmitter.emit('app.wait.startBlocking', { id: 'setLayerBoundsToWorkingFileBounds', label: 'app.wait.applyLayerTransform' });
+    try {
+        const actions: SetLayerBoundsToWorkingFileBoundsAction[] = [];
+        for (const layerId of workingFileStore.state.selectedLayerIds) {
+            actions.push(new SetLayerBoundsToWorkingFileBoundsAction(layerId));
+        }
+        await historyStore.dispatch('runAction', {
+            action: new BundleAction('setLayerBoundsToWorkingFileBounds', 'action.setLayerBoundsToWorkingFileBounds', actions)
+        });
+    } catch (error) {
+        console.error('[src/canvas/store/free-transform-state.ts] Error occurred during trim empty space.', error);
+    }
+    appEmitter.emit('app.wait.stopBlocking', { id: 'setLayerBoundsToWorkingFileBounds' });
 }

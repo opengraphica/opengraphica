@@ -29,6 +29,7 @@
         "reorderLayers": "Reorder Layer(s)",
         "reorderLayerFilters": "Reorder Effect(s)",
         "selectLayers": "Select Layer(s)",
+        "setLayerBoundsToWorkingFileBounds": "Layer Bounds to Image Size",
         "toggleLayerVisibilityOn": "Toggle Layer Visibility On",
         "toggleLayerVisibilityOff": "Toggle Layer Visibility Off",
         "trimLayerEmptySpace": "Trim Layer Empty Space",
@@ -773,7 +774,7 @@
             "actions": {
                 "title": "Actions",
                 "applyTransform": "Apply Transform",
-                "expandToImageSize": "Bounds to Image Size",
+                "expandToImageSize": "Layer Bounds to Image Size",
                 "trimEmptySpace": "Trim Empty Space"
             }
         },
