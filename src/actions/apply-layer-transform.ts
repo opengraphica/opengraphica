@@ -40,6 +40,9 @@ export class ApplyLayerTransformAction extends BaseAction {
         ]);
         let newWidth = Math.ceil(afterEmptyCropBounds.right - afterEmptyCropBounds.left);
         let newHeight = Math.ceil(afterEmptyCropBounds.bottom - afterEmptyCropBounds.top);
+
+        if (newWidth < 1 || newHeight < 1) return;
+
         const croppedTransform = new DOMMatrix().translateSelf(-afterEmptyCropBounds.left, -afterEmptyCropBounds.top).multiplySelf(layer.transform);
         const decomposedCroppedTransform = decomposeMatrix(croppedTransform);
 

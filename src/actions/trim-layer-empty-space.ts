@@ -48,6 +48,8 @@ export class TrimLayerEmptySpaceAction extends BaseAction {
         const newWidth = Math.ceil(emptyCropBounds.right - emptyCropBounds.left);
         const newHeight = Math.ceil(emptyCropBounds.bottom - emptyCropBounds.top);
 
+        if (newWidth < 1 || newHeight < 1) return;
+
         const workingCanvas = document.createElement('canvas');
         workingCanvas.width = newWidth;
         workingCanvas.height = newHeight;

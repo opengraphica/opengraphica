@@ -1,8 +1,10 @@
 import { toRefs, watch, type WatchStopHandle } from 'vue';
 import { WorkingFileRasterLayer, ColorModel } from '@/types';
 import canvasStore from '@/store/canvas';
-import { getStoredImageOrCanvas } from '@/store/image';
+import { getStoredImageCanvas, getStoredImageOrCanvas } from '@/store/image';
+import { createThreejsTextureFromImage } from '@/lib/canvas';
 import BaseLayerRenderer from './base';
+
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { DoubleSide, NearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, sRGBEncoding } from 'three/src/constants';
@@ -10,7 +12,8 @@ import { Mesh } from 'three/src/objects/Mesh';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { Texture } from 'three/src/textures/Texture';
 import { CanvasTexture } from 'three/src/textures/CanvasTexture';
-import { createFiltersFromLayerConfig, combineShaders } from '../../filters';
+
+import { createFiltersFromLayerConfig, combineShaders } from '@/canvas/filters';
 import { createRasterShaderMaterial } from './shaders';
 
 import type { DrawWorkingFileLayerOptions } from '@/types';
@@ -109,21 +112,9 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                 this.draftTexture.dispose();
                 this.draftTexture = undefined;
             }
-            const sourceImage = getStoredImageOrCanvas(updates.data.sourceUuid ?? '');
+            const sourceImage = await getStoredImageCanvas(updates.data.sourceUuid ?? '');
             if (sourceImage) {
-                let newSourceTexture: Texture;
-                if (sourceImage instanceof HTMLImageElement) {
-                    newSourceTexture = await new Promise((resolve, reject) => {
-                        const texture = new TextureLoader().load(
-                            sourceImage.src,
-                            () => { resolve(texture); },
-                            undefined,
-                            () => { reject(); }
-                        );
-                    });
-                } else {
-                    newSourceTexture = new CanvasTexture(sourceImage);
-                }
+                let newSourceTexture: Texture = await createThreejsTextureFromImage(sourceImage);
                 this.sourceTexture?.dispose();
                 this.sourceTexture = newSourceTexture;
                 this.sourceTexture.encoding = sRGBEncoding;

@@ -2,6 +2,8 @@ import { v4 as uuidv4 } from 'uuid';
 import imageDatabase from './data/image-database';
 import { createImageBlobFromCanvas, createImageBlobFromImage, createImageFromBlob, createCanvasFromImage } from '@/lib/image';
 
+import type { Texture } from 'three/src/textures/Texture';
+
 // Map of uuid to image store data
 
 interface StoredImage {
@@ -59,6 +61,20 @@ export async function createStoredImage(imageOrCanvas: HTMLCanvasElement | HTMLI
 export function getStoredImageOrCanvas(uuid?: string): HTMLImageElement | HTMLCanvasElement | null {
     const storedImage = imageUuidMap.get(uuid);
     return storedImage?.sourceCanvas ?? storedImage?.sourceImage ?? null;
+}
+
+/**
+ * Returns the stored image as a canvas element, but does not guarantee it is the original canvas. So don't try to edit it.
+ * @param uuid - ID of the database entry for the image
+ * @returns The image canvas, or null if somehow it doesn't exist
+ */
+export async function getStoredImageCanvas(uuid?: string): Promise<HTMLCanvasElement | null> {
+    const storedImage = imageUuidMap.get(uuid);
+    const image = storedImage?.sourceCanvas ?? storedImage?.sourceImage ?? null;
+    if (image instanceof HTMLImageElement) {
+        return await createCanvasFromImage(image);
+    }
+    return image ?? null;
 }
 
 /**
