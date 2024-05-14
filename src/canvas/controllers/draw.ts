@@ -36,11 +36,8 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
     private ctrlKeyUnwatch: WatchStopHandle | null = null;
     private selectedLayerIdsUnwatch: WatchStopHandle | null = null;
 
-    private drawingDraftChunkSize: number = 64;
-    private drawingDraftCanvases: HTMLCanvasElement[] = [];
     private drawingPointerId: number | null = null;
     private drawingOnLayers: WorkingFileAnyLayer[] = [];
-    private drawingOnLayerScales: { x: number; y: number }[] = [];
     private drawingPoints: DOMPoint[] = [];
 
     private drawablePreviewCanvas: DrawableCanvas | null = null;
@@ -110,22 +107,6 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
             this.brushShapeImage = await createImageFromBlob(new Blob([svg], { type: 'image/svg+xml' }));
         }, { immediate: true });
 
-        this.brushSizeUnwatch = watch([brushSize], ([brushSize]) => {
-            this.drawingDraftChunkSize = Math.max(64, nearestPowerOf2(brushSize / 4));
-            this.drawingDraftCanvases = (this.drawingDraftCanvases ?? []).slice(0, 9);
-            for (let i = 0; i < 9; i++) {
-                let draftCanvas = this.drawingDraftCanvases[i];
-                if (!draftCanvas) {
-                    draftCanvas = document.createElement('canvas');
-                }
-                draftCanvas.width = this.drawingDraftChunkSize;
-                draftCanvas.height = this.drawingDraftChunkSize;
-                const ctx = draftCanvas.getContext('2d');
-                ctx?.clearRect(0, 0, this.drawingDraftChunkSize, this.drawingDraftChunkSize);
-                this.drawingDraftCanvases[i] = draftCanvas;
-            }
-        }, { immediate: true });
-
         cursorHoverPosition.value = new DOMPoint(
             -100000000000,
             -100000000000
@@ -163,8 +144,6 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         this.ctrlKeyUnwatch = null;
         this.selectedLayerIdsUnwatch?.();
         this.selectedLayerIdsUnwatch = null;
-
-        this.drawingDraftCanvases = [];
 
         for (const layer of getSelectedLayers()) {
             if (layer.type === 'raster') {
@@ -315,13 +294,9 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         // Create a draft image for each of the selected layers
         selectedLayers = getSelectedLayers();
         this.drawingOnLayers = selectedLayers as WorkingFileAnyLayer[];
-        this.drawingOnLayerScales = [];
         for (const layer of this.drawingOnLayers) {
             const layerGlobalTransformSelfExcluded = getLayerGlobalTransform(layer, { excludeSelf: true });
-            const layerGlobalTransform = decomposeMatrix(getLayerGlobalTransform(layer));
             const viewTransform = canvasStore.get('decomposedTransform');
-            let scaleX = viewTransform.scaleX * layerGlobalTransform.scaleX;
-            let scaleY = viewTransform.scaleY * layerGlobalTransform.scaleY;
             const width = workingFileStore.get('width');
             const height = workingFileStore.get('height');
             const logicalWidth = Math.min(width, workingFileStore.get('width') * viewTransform.scaleX);
@@ -348,10 +323,6 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                     });
                 }
             }
-            this.drawingOnLayerScales.push({
-                x: scaleX,
-                y: scaleY,
-            });
         }
 
         // Populate first drawing point
@@ -372,57 +343,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
             const points = this.drawingPoints;
 
             const previewRatioX = Math.min(1, canvasStore.get('decomposedTransform').scaleX);
-            const previewRatioY = Math.min(1, canvasStore.get('decomposedTransform').scaleY);
-
-            const chunkSize = Math.max(64, nearestPowerOf2(this.drawingDraftChunkSize * previewRatioX));
-            const previewBrushSize = brushSize.value * previewRatioX;
-
-            // For area of the canvas that the line between the last few drawn points affect,
-            // Determine the range of subdivided canvas chunks we need to replace
-            let minQuadrantX = Infinity;
-            let maxQuadrantX = -Infinity;
-            let minQuadrantY = Infinity;
-            let maxQuadrantY = -Infinity;
-            for (let i = Math.max(0, points.length - 3); i < points.length; i++) {
-                const offsetPoint = new DOMPoint(
-                    points[i].x * previewRatioX,
-                    points[i].y * previewRatioY
-                );
-                const minX = Math.floor((offsetPoint.x - previewBrushSize / 2) / chunkSize);
-                const maxX = Math.floor((offsetPoint.x + previewBrushSize / 2) / chunkSize);
-                const minY = Math.floor((offsetPoint.y - previewBrushSize / 2) / chunkSize);
-                const maxY = Math.floor((offsetPoint.y + previewBrushSize / 2) / chunkSize);
-                if (minX < minQuadrantX) {
-                    minQuadrantX = minX;
-                }
-                if (maxX > maxQuadrantX) {
-                    maxQuadrantX = maxX;
-                }
-                if (minY < minQuadrantY) {
-                    minQuadrantY = minY;
-                }
-                if (maxY > maxQuadrantY) {
-                    maxQuadrantY = maxY;
-                }
-            }
-            
-            const globalMinX = (minQuadrantX * chunkSize) * (1 / previewRatioX);
-            const globalMaxX = ((maxQuadrantX * chunkSize) + (chunkSize * 3)) * (1 / previewRatioX);
-            const globalMinY = (minQuadrantY * chunkSize) * (1 / previewRatioX);
-            const globalMaxY = ((maxQuadrantY * chunkSize) + (chunkSize * 3)) * (1 / previewRatioX);
-            if (globalMinX < this.updateChunkBounds.minX) {
-                this.updateChunkBounds.minX = globalMinX;
-            }
-            if (globalMaxX > this.updateChunkBounds.maxX) {
-                this.updateChunkBounds.maxX = globalMaxX;
-            }
-            if (globalMinY < this.updateChunkBounds.minY) {
-                this.updateChunkBounds.minY = globalMinY;
-            }
-            if (globalMaxY > this.updateChunkBounds.maxY) {
-                this.updateChunkBounds.maxY = globalMaxY;
-            }
-
+  
             // Draw the line to each canvas chunk
 
             this.drawablePreviewCanvas?.setScale(previewRatioX);
@@ -448,72 +369,6 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         }
     }
 
-    private drawPreviewPoints(points: DOMPoint[], ctx: CanvasRenderingContext2D, previewRatioX: number, previewRatioY: number, lineWidth: number, offsetX: number = 0, offsetY: number = 0) {
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.fillStyle = brushColor.value.style;
-        if (points.length === 1) {
-            ctx.beginPath();
-            ctx.arc(points[0].x * previewRatioX + offsetX, points[0].y * previewRatioY + offsetY, lineWidth / 2, 0, 1.999999 * Math.PI);
-            ctx.fill();
-        }
-        
-        // let startX = points[0].x * previewRatioX + offsetX;
-        // let startY = points[0].y * previewRatioY + offsetY;
-        // let averageX = 0;
-        // let averageY = 0;
-        // for (let i = 1; i < points.length; i++) {
-        //     let previousPoint1 = {
-        //         x: points[i - 1].x * previewRatioX + offsetX,
-        //         y: points[i - 1].y * previewRatioY + offsetY,
-        //     };
-        //     let nextPoint1 = {
-        //         x: points[i].x * previewRatioX + offsetX,
-        //         y: points[i].y * previewRatioY + offsetY,
-        //     };
-        //     averageX = (previousPoint1.x + nextPoint1.x) / 2;
-        //     averageY = (previousPoint1.y + nextPoint1.y) / 2;
-        //     const quadraticLine = new Bezier(startX, startY, previousPoint1.x, previousPoint1.y, averageX, averageY);
-        //     const renderShapes = quadraticLine.outline(lineWidth / 2);
-        //     if (renderShapes.curves.length > 0) {
-        //         ctx.beginPath();
-        //         ctx.moveTo(renderShapes.curves[0].points[0].x, renderShapes.curves[0].points[0].y);
-        //         for (let curve of renderShapes.curves) {
-        //             if (curve.points.length == 4) {
-        //                 ctx.bezierCurveTo(curve.points[1].x, curve.points[1].y, curve.points[2].x, curve.points[2].y, curve.points[3].x, curve.points[3].y);
-        //             } else if (curve.points.length == 3) {
-        //                 ctx.quadraticCurveTo(curve.points[1].x, curve.points[1].y, curve.points[2].x, curve.points[2].y);
-        //             }
-        //         }
-        //         ctx.fill();
-        //     }
-        //     startX = averageX;
-        //     startY = averageY;
-        // }
-
-
-        ctx.beginPath();
-        ctx.moveTo(points[0].x * previewRatioX + offsetX, points[0].y * previewRatioY + offsetY);
-        let averageX = 0;
-        let averageY = 0;
-        for (let i = 1; i < points.length; i++) {
-            let previousPoint1 = {
-                x: points[i - 1].x * previewRatioX + offsetX,
-                y: points[i - 1].y * previewRatioY + offsetY,
-            };
-            let nextPoint1 = {
-                x: points[i].x * previewRatioX + offsetX,
-                y: points[i].y * previewRatioY + offsetY,
-            };
-            averageX = (previousPoint1.x + nextPoint1.x) / 2;
-            averageY = (previousPoint1.y + nextPoint1.y) / 2;
-            ctx.quadraticCurveTo(previousPoint1.x, previousPoint1.y, averageX, averageY);
-        }
-        ctx.lineWidth = lineWidth;
-        ctx.strokeStyle = brushColor.value.style;
-        ctx.stroke();
-    }
-
     private async drawEnd(e: PointerEvent) {
         if (this.drawingPointerId === e.pointerId) {
             const points = this.drawingPoints.slice();
@@ -531,93 +386,64 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
 
             const layerActions: BaseAction[] = [];
 
-            const previewRatioX = canvasStore.get('decomposedTransform').scaleX;
-            const previewRatioY = canvasStore.get('decomposedTransform').scaleY;
-            const previewBrushSize = brushSize.value * previewRatioX;
-
             for (const layer of drawingOnLayers) {
                 if (layer.type === 'raster') {
                     // TODO - START - This is fairly slow, speed it up?
 
-                    const decomposedCanvasTransform = decomposeMatrix(canvasStore.state.transform.inverse());
                     const layerGlobalTransform = getLayerGlobalTransform(layer);
-                    const layerSpaceTransform = layerGlobalTransform.inverse();
 
-                    // Project the drawing preview box bounds to the layer's coordinates,
-                    // and determine min/max update coordinates for updating the layer image.
-                    let minX = Infinity;
-                    let maxX = -Infinity;
-                    let minY = Infinity;
-                    let maxY = -Infinity;
-                    const updateChunkBoundsPoints = [
-                        new DOMPoint(this.updateChunkBounds.minX, this.updateChunkBounds.minY).matrixTransform(layerSpaceTransform),
-                        new DOMPoint(this.updateChunkBounds.minX, this.updateChunkBounds.maxY).matrixTransform(layerSpaceTransform),
-                        new DOMPoint(this.updateChunkBounds.maxX, this.updateChunkBounds.minY).matrixTransform(layerSpaceTransform),
-                        new DOMPoint(this.updateChunkBounds.maxX, this.updateChunkBounds.maxY).matrixTransform(layerSpaceTransform),
-                    ];
-                    for (const point of updateChunkBoundsPoints) {
-                        if (point.x < minX) minX = point.x;
-                        if (point.x > maxX) maxX = point.x;
-                        if (point.y < minY) minY = point.y;
-                        if (point.y > maxY) maxY = point.y;
+                    const layerTransform = new DOMMatrix().multiply(layerGlobalTransform.inverse());
+
+                    let drawableCanvas = new DrawableCanvas({ forceOnscreen: true, scale: 1 });
+                    let layerUpdateCanvas: HTMLCanvasElement | undefined = undefined;
+                    let sourceX = 0;
+                    let sourceY = 0;
+                    try {
+                        await drawableCanvas.initialized();
+                        const brushStrokeUuid = drawableCanvas.add('brushStroke');
+                        await drawableCanvas.draw({
+                            refresh: true,
+                            transform: layerTransform,
+                            updates: [
+                                {
+                                    uuid: brushStrokeUuid,
+                                    data: {
+                                        color: brushColor.value.style,
+                                        points: points.map(point => ({
+                                            x: point.x,
+                                            y: point.y,
+                                            size: brushSize.value,
+                                            tiltX: 0,
+                                            tiltY: 0,
+                                            twist: 0,
+                                        }))
+                                    } as BrushStrokeData,
+                                }
+                            ],
+                        });
+                        ({ canvas: layerUpdateCanvas, sourceX, sourceY } = await drawableCanvas.drawComplete());
+                    } catch (error) {
+                        console.error(error);
                     }
-                    minX = Math.max(0, Math.floor(minX));
-                    minY = Math.max(0, Math.floor(minY));
-                    maxX = Math.min(layer.width, Math.ceil(maxX));
-                    maxY = Math.min(layer.height, Math.ceil(maxY));
-
-                    const updateChunkWidth = maxX - minX;
-                    const updateChunkHeight = maxY - minY;
-
-                    // Draw the line to a new canvas which will be merged with the existing layer's canvas
-                    const { canvas: layerUpdateCanvas, ctx: layerUpdateCtx } = createEmptyCanvasWith2dContext(updateChunkWidth, updateChunkHeight);
-                    if (!layerUpdateCtx) continue;
-                    layerUpdateCtx.save();
-
-                    const layerTransform = new DOMMatrix().translate(-minX, -minY).multiply(layerGlobalTransform.inverse())
-                        .scale(decomposedCanvasTransform.scaleX, decomposedCanvasTransform.scaleY);
-                    layerUpdateCtx.transform(layerTransform.a, layerTransform.b, layerTransform.c, layerTransform.d, layerTransform.e, layerTransform.f);
+                    drawableCanvas.dispose();
                     
-                    // this.drawablePreviewCanvas?.setScale(previewRatioX);
-                    // await this.drawablePreviewCanvas?.draw({
-                    //     refresh: true,
-                    //     updates: [
-                    //         {
-                    //             uuid: this.brushStrokeDrawableUuid!,
-                    //             data: {
-                    //                 color: brushColor.value.style,
-                    //                 points: points.map(point => ({
-                    //                     x: point.x,
-                    //                     y: point.y,
-                    //                     size: brushSize.value,
-                    //                     tiltX: 0,
-                    //                     tiltY: 0,
-                    //                     twist: 0,
-                    //                 }))
-                    //             } as BrushStrokeData,
-                    //         }
-                    //     ],
-                    // });
-                    // const { canvas: layerUpdateCanvas } = await this.drawablePreviewCanvas?.drawComplete();
-
-                    this.drawPreviewPoints(points, layerUpdateCtx, previewRatioX, previewRatioY, previewBrushSize);
-                    layerUpdateCtx.restore();
-
-                    layerActions.push(
-                        new UpdateLayerAction<UpdateRasterLayerOptions>({
-                            id: layer.id,
-                            data: {
-                                updateChunks: [{
-                                    x: minX,
-                                    y: minY,
-                                    width: updateChunkWidth,
-                                    height: updateChunkHeight,
-                                    data: layerUpdateCanvas,
-                                    mode: 'overlay',
-                                }],
-                            }
-                        })
-                    );
+                    if (layerUpdateCanvas) {
+                        layerActions.push(
+                            new UpdateLayerAction<UpdateRasterLayerOptions>({
+                                id: layer.id,
+                                data: {
+                                    updateChunks: [{
+                                        x: sourceX,
+                                        y: sourceY,
+                                        width: layerUpdateCanvas.width,
+                                        height: layerUpdateCanvas.height,
+                                        data: layerUpdateCanvas,
+                                        mode: 'overlay',
+                                    }],
+                                }
+                            })
+                        );
+                    }
 
                     // TODO - END - This is fairly slow, speed it up?
                 }

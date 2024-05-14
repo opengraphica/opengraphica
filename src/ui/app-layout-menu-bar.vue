@@ -14,10 +14,17 @@
                 v-for="(actionGroupSection, actionGroupSectionName) of actionGroups"
                 :key="actionGroupSectionName"
                 class="ogr-menu-section my-2"
-                :class="['ogr-menu-' + actionGroupSectionName, { 'px-3': actionGroupSectionName !== 'tools' }]"
+                :class="['ogr-menu-' + actionGroupSectionName, {
+                    'pl-3 pr-0': actionGroupSectionName === 'docks' && direction === 'horizontal',
+                    'px-3': actionGroupSectionName !== 'tools' && direction === 'vertical',
+                }]"
             >
                 <span v-if="actionGroupSectionName === 'tools'" class="ogr-menu-section__title">{{ $t('menuBar.toolsHeading') }}</span>
-                <component v-if="displayMode === 'all' || actionGroupSectionName === 'tools'" :is="actionGroupSectionName === 'tools' ? 'el-scrollbar' : 'v-fragment'">
+                <component
+                    v-if="displayMode === 'all' || actionGroupSectionName === 'tools'"
+                    :is="actionGroupSectionName === 'tools' ? (direction === 'vertical' ? 'el-scrollbar' : 'el-horizontal-scrollbar-arrows') : 'v-fragment'"
+                    style="height: auto"
+                >
                     <template v-for="actionGroup of actionGroupSection" :key="actionGroup.id">
                         <component :is="actionGroup.controls.length === 1 ? 'div' : 'el-button-group'" :class="{ 'ogr-single-button-group': actionGroup.controls.length === 1 }">
                             <template v-for="control of actionGroup.controls" :key="control.label">
@@ -77,7 +84,14 @@
                     </template>
                 </component>
             </div>
-            <div v-if="isTouchUser" class="ogr-menu-end px-3">
+            <div
+                v-if="isTouchUser"
+                class="ogr-menu-end"
+                :class="{
+                    'pr-3': direction === 'horizontal',
+                    'px-3': direction === 'vertical',
+                }"
+            >
                 <el-button circle round class="el-button--no-hover" :aria-label="$t('dock.settings.history.undo')" @click="onClickUndo">
                     <span class="el-icon bi bi-arrow-counterclockwise" aria-hidden="true" />
                 </el-button>
@@ -94,6 +108,7 @@
 <script lang="ts">
 import { defineComponent, computed, nextTick, watch, PropType, ref, onMounted, onUnmounted, toRefs, defineAsyncComponent } from 'vue';
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
+import ElHorizontalScrollbarArrows from '@/ui/el-horizontal-scrollbar-arrows.vue';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import ElPopover from '@/ui/el-popover.vue';
 import ElTag from 'element-plus/lib/components/tag/index';
@@ -117,6 +132,7 @@ export default defineComponent({
         ElButton,
         ElButtonGroup,
         ElDrawer: defineAsyncComponent(() => import(`element-plus/lib/components/drawer/index`)),
+        ElHorizontalScrollbarArrows,
         ElMenu: defineAsyncComponent(() => import(`element-plus/lib/components/menu/index`)),
         ElMenuItem: defineAsyncComponent(async () => (await import(`element-plus/lib/components/menu/index`)).ElMenuItem),
         ElPopover,
@@ -297,7 +313,9 @@ export default defineComponent({
         }
 
         function onPointerDownControlButton(event: TouchEvent | MouseEvent, control: LayoutShortcutGroupDefinitionControlButton) {
-            event.preventDefault();
+            if (control.action?.type !== 'toolGroup') {
+                event.preventDefault();
+            }
             if (event.target && activeControlDock) {
                 const target = event.target as Element;
                 activeControlDock.popoverVisible = false;

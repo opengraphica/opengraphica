@@ -1,6 +1,6 @@
 import drawableClassMap from '@/canvas/drawables';
 
-import type { Drawable, DrawableRenderMode } from '@/types';
+import type { Drawable, DrawableRenderMode, DrawableDrawOptions } from '@/types';
 import type {
     CreateCanvasRequest, AddDrawableRequest, RemoveDrawableRequest, DrawCanvasRequest,
     DrawQueueRequest, DrawCompleteResult, SetCanvasRenderScaleRequest, InitializedResult,
@@ -99,10 +99,26 @@ function drawCanvas(request: DrawCanvasRequest) {
         const drawableInfo = drawableMap.get(drawableUpdate.uuid);
         if (!drawableInfo) continue;
         const drawingBounds = drawableInfo.drawable.update(drawableUpdate.data, { refresh });
-        if (drawingBounds.left < left) left = drawingBounds.left;
-        if (drawingBounds.right > right) right = drawingBounds.right;
-        if (drawingBounds.top < top) top = drawingBounds.top;
-        if (drawingBounds.bottom > bottom) bottom = drawingBounds.bottom;
+        const { transform } = request.options;
+        if (transform) {
+            const transformedPoints = [
+                new DOMPoint(drawingBounds.left, drawingBounds.top).matrixTransform(transform),
+                new DOMPoint(drawingBounds.left, drawingBounds.bottom).matrixTransform(transform),
+                new DOMPoint(drawingBounds.right, drawingBounds.bottom).matrixTransform(transform),
+                new DOMPoint(drawingBounds.right, drawingBounds.top).matrixTransform(transform),
+            ];
+            for (const transformedPoint of transformedPoints) {
+                if (transformedPoint.x < left) left = transformedPoint.x;
+                if (transformedPoint.x > right) right = transformedPoint.x;
+                if (transformedPoint.y < top) top = transformedPoint.y;
+                if (transformedPoint.y > bottom) bottom = transformedPoint.y;
+            }
+        } else {
+            if (drawingBounds.left < left) left = drawingBounds.left;
+            if (drawingBounds.right > right) right = drawingBounds.right;
+            if (drawingBounds.top < top) top = drawingBounds.top;
+            if (drawingBounds.bottom > bottom) bottom = drawingBounds.bottom;
+        }
     }
 
     drawX = left == Infinity ? 0 : Math.max(0, Math.floor(left * renderScale));
@@ -116,7 +132,7 @@ function drawCanvas(request: DrawCanvasRequest) {
     }
 
     if (renderMode === '2d') {
-        draw2d(canvas, canvasCtx);
+        draw2d(canvas, canvasCtx, request.options);
     }
 
     requestAnimationFrame(() => {
@@ -130,11 +146,15 @@ function drawCanvas(request: DrawCanvasRequest) {
     });
 }
 
-function draw2d(canvas: OffscreenCanvas, ctx: OffscreenCanvasRenderingContext2D) {
+function draw2d(canvas: OffscreenCanvas, ctx: OffscreenCanvasRenderingContext2D, options: DrawableDrawOptions) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
     ctx.translate(-drawX, -drawY);
     ctx.scale(renderScale, renderScale);
+    if (options.transform) {
+        const { transform } = options;
+        ctx.transform(transform.a, transform.b, transform.c, transform.d, transform.e, transform.f);
+    }
     for (const value of drawableMap.values()) {
         value.drawable.draw2d(ctx);
     }

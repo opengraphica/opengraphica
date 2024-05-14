@@ -9238,7 +9238,6 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .ogr-layout-dnd-container > header {
   flex-grow: 0;
-  background: linear-gradient(to bottom, var(--ogr-background-color) 50%, rgba(255, 255, 255, 0) 100%);
   touch-action: none;
 }
 .opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center {
@@ -9402,6 +9401,11 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-layout-menu-bar > .is-flex .ogr-menu-section__title img {
   width: 2.4rem;
 }
+@media screen and (max-width: 600px) {
+  .opengraphica .ogr-layout-menu-bar > .is-flex .ogr-menu-section__title {
+    display: none !important;
+  }
+}
 .opengraphica .ogr-layout-menu-bar > .is-flex > .ogr-menu-favorites {
   flex: 1;
   display: flex;
@@ -9490,6 +9494,11 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .ogr-layout-menu-bar.is-vertical > .is-flex .ogr-menu-section .ogr-menu-section__title img {
   width: 2.4rem;
+}
+@media screen and (max-height: 600px) {
+  .opengraphica .ogr-layout-menu-bar.is-vertical > .is-flex .ogr-menu-section .ogr-menu-section__title {
+    display: none !important;
+  }
 }
 .opengraphica .ogr-layout-menu-bar.is-vertical > .is-flex .ogr-menu-section .el-button-group, .opengraphica .ogr-layout-menu-bar.is-vertical > .is-flex .ogr-menu-section .ogr-single-button-group {
   margin: 0.375rem 0 0 0;
@@ -27893,6 +27902,9 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .pb-4\.5, .opengraphica .py-4\.5 {
   padding-bottom: 1.25rem;
+}
+.opengraphica .is-border-radius-0 {
+  border-radius: 0;
 }
 .opengraphica .is-border-radius-attach-left {
   border-top-left-radius: 0;

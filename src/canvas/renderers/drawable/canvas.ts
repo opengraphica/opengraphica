@@ -18,6 +18,7 @@ export interface DrawableCanvasOptions {
     width?: number;
     height?: number;
     scale?: number;
+    forceOnscreen?: boolean;
 }
 
 interface DrawableInfo {
@@ -36,24 +37,35 @@ export default class DrawableCanvas {
     private isInitialized: boolean = false;
     private renderMode: DrawableRenderMode;
     private scale: number;
+    private forceOnscreen: boolean;
+
     private drawables = new Map<string, DrawableInfo>();
     private drawableClassMap: Record<string, DrawableConstructor> = {};
+
     private mainThreadCanvas: HTMLCanvasElement | undefined = undefined;
     private mainThreadCanvasCtx2d: CanvasRenderingContext2D | undefined = undefined;
+    private lastDrawX: number = 0;
+    private lastDrawY: number = 0;
+
     private offscreenCanvasUuid: string | undefined = undefined;
+    private offscreenCanvasLastCallbackData: DrawnCallbackEvent | undefined = undefined;
     private isWaitingOnOffscreenCanvasResult = false;
+
     private pendingDrawOptions: DrawableDrawOptions | undefined = undefined;
+
+    private onInitializedCallbacks: Array<() => void>= [];
     private onDrawnCallback: ((event: DrawnCallbackEvent) => void) | undefined = undefined;
     private onDrawCompleteCallbacks: Array<((event: DrawnCallbackEvent) => void)> = [];
 
     constructor(options: DrawableCanvasOptions) {
         this.renderMode = '2d';
         this.scale = options.scale ?? 1;
+        this.forceOnscreen = options.forceOnscreen ?? false;
         this.init();
     }
 
     private async init() {
-        const canUseOffscrenCanvas = await isOffscreenCanvasSupported();
+        const canUseOffscrenCanvas = this.forceOnscreen ? false : await isOffscreenCanvasSupported();
         if (canUseOffscrenCanvas) {
             try {
                 this.offscreenCanvasUuid = await createDrawableCanvas({
@@ -96,6 +108,22 @@ export default class DrawableCanvas {
             for (const uuid of this.drawables.keys()) {
                 this.initializeDrawable(uuid);
             }
+        }
+
+        // Run callbacks
+        for (const initializedCallback of this.onInitializedCallbacks) {
+            initializedCallback();
+        }
+        this.onInitializedCallbacks = [];
+    }
+
+    async initialized() {
+        if (this.isInitialized) {
+            return;
+        } else {
+            return await new Promise<void>((resolve) => {
+                this.onInitializedCallbacks.push(resolve);
+            });
         }
     }
 
@@ -179,11 +207,19 @@ export default class DrawableCanvas {
         }
     }
 
-    async drawComplete() {
+    async drawComplete(): Promise<DrawnCallbackEvent> {
         if (this.isWaitingOnOffscreenCanvasResult) {
-            await new Promise<DrawnCallbackEvent>((resolve) => {
+            return await new Promise<DrawnCallbackEvent>((resolve) => {
                 this.onDrawCompleteCallbacks.push(resolve);
             });
+        } else if (this.offscreenCanvasUuid) {
+            return this.offscreenCanvasLastCallbackData!;
+        } else {
+            return {
+                canvas: this.mainThreadCanvas!,
+                sourceX: this.lastDrawX,
+                sourceY: this.lastDrawY,
+            };
         }
     }
 
@@ -203,10 +239,26 @@ export default class DrawableCanvas {
             const drawableInfo = this.drawables.get(drawableUpdate.uuid);
             if (!drawableInfo?.drawable) continue;
             const drawingBounds = drawableInfo.drawable.update(drawableUpdate.data, { refresh });
-            if (drawingBounds.left < left) left = drawingBounds.left;
-            if (drawingBounds.right > right) right = drawingBounds.right;
-            if (drawingBounds.top < top) top = drawingBounds.top;
-            if (drawingBounds.bottom > bottom) bottom = drawingBounds.bottom;
+            const { transform } = options;
+            if (transform) {
+                const transformedPoints = [
+                    new DOMPoint(drawingBounds.left, drawingBounds.top).matrixTransform(transform),
+                    new DOMPoint(drawingBounds.left, drawingBounds.bottom).matrixTransform(transform),
+                    new DOMPoint(drawingBounds.right, drawingBounds.bottom).matrixTransform(transform),
+                    new DOMPoint(drawingBounds.right, drawingBounds.top).matrixTransform(transform),
+                ];
+                for (const transformedPoint of transformedPoints) {
+                    if (transformedPoint.x < left) left = transformedPoint.x;
+                    if (transformedPoint.x > right) right = transformedPoint.x;
+                    if (transformedPoint.y < top) top = transformedPoint.y;
+                    if (transformedPoint.y > bottom) bottom = transformedPoint.y;
+                }
+            } else {
+                if (drawingBounds.left < left) left = drawingBounds.left;
+                if (drawingBounds.right > right) right = drawingBounds.right;
+                if (drawingBounds.top < top) top = drawingBounds.top;
+                if (drawingBounds.bottom > bottom) bottom = drawingBounds.bottom;
+            }
         }
 
         let drawX = left == Infinity ? 0 : Math.max(0, Math.floor(left * renderScale));
@@ -223,12 +275,18 @@ export default class DrawableCanvas {
         ctx.save();
         ctx.translate(-drawX, -drawY);
         ctx.scale(renderScale, renderScale);
+        if (options.transform) {
+            const { transform } = options;
+            ctx.transform(transform.a, transform.b, transform.c, transform.d, transform.e, transform.f);
+        }
         for (const { drawable } of this.drawables.values()) {
             if (!drawable) continue;
             drawable.draw2d(ctx);
         }
         ctx.restore();
 
+        this.lastDrawX = drawX;
+        this.lastDrawY = drawY;
         this.onDrawnCallback?.({
             canvas,
             sourceX: drawX,

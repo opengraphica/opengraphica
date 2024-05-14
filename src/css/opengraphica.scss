@@ -1160,7 +1160,7 @@ body.ogr-full-page {
     
         > header {
             flex-grow: 0;
-            background: linear-gradient(to bottom, var(--ogr-background-color) 50%, rgba(255, 255, 255, 0.0) 100%);
+            // background: linear-gradient(to bottom, var(--ogr-background-color) 50%, rgba(255, 255, 255, 0.0) 100%);
             touch-action: none;
         }
         > .ogr-layout-dnd-center {
@@ -1361,6 +1361,10 @@ body.ogr-full-page {
                 img {
                     width: 2.4rem;
                 }
+
+                @media screen and (max-width: 600px) {
+                    display: none !important;
+                }
             }
 
             > .ogr-menu-favorites {
@@ -1473,6 +1477,10 @@ body.ogr-full-page {
                         
                         img {
                             width: 2.4rem;
+                        }
+
+                        @media screen and (max-height: 600px) {
+                            display: none !important;
                         }
                     }
 

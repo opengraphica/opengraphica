@@ -22,6 +22,7 @@ export interface DrawableOptionsWebgl<T = DefaultDrawableData> extends DrawableO
 
 export interface DrawableDrawOptions {
     refresh?: boolean;
+    transform?: DOMMatrix;
     updates: DrawableUpdate[];
 }
 
