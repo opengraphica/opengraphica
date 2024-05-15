@@ -8,7 +8,7 @@ import { BaseAction } from './base';
 import { createEmptyCanvasWith2dContext } from '@/lib/image';
 import { drawImageToCanvas2d } from '@/lib/canvas';
 import canvasStore from '@/store/canvas';
-import { prepareStoredImageForEditing, reserveStoredImage, unreserveStoredImage } from '@/store/image';
+import { prepareStoredImageForEditing, prepareStoredImageForArchival, reserveStoredImage, unreserveStoredImage } from '@/store/image';
 import workingFileStore, { getLayerById, regenerateLayerThumbnail, getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { updateBakedImageForLayer } from './baking';
 import layerRenderers from '@/canvas/renderers';
@@ -64,6 +64,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                         reserveStoredImage(newSourceUuid, `${layer.id}`);
                         requiresBaking = true;
                     }
+
                     updateSourceImageWithChunks:
                     if (newData?.updateChunks) {
                         const sourceCanvas = await prepareStoredImageForEditing(layer.data.sourceUuid);
@@ -76,17 +77,33 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                             for (const updateChunk of this.newRasterUpdateChunks) {
                                 const { canvas: oldChunkCanvas, ctx: oldChunkCtx } = createEmptyCanvasWith2dContext(updateChunk.width, updateChunk.height);
                                 if (!oldChunkCtx) break;
+                                oldChunkCtx.globalCompositeOperation = 'copy';
                                 oldChunkCtx.drawImage(sourceCanvas, -updateChunk.x, -updateChunk.y);
                                 this.oldRasterUpdateChunks.push({ data: oldChunkCanvas, x: updateChunk.x, y: updateChunk.y, width: updateChunk.width, height: updateChunk.height });
-                                await drawImageToCanvas2d(sourceCanvas, updateChunk.data, updateChunk.x, updateChunk.y);
+                                if (updateChunk.mode === 'replace') {
+                                    sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.data.width, updateChunk.data.height);
+                                    sourceCtx.drawImage(updateChunk.data, updateChunk.x, updateChunk.y);
+                                } else {
+                                    await drawImageToCanvas2d(sourceCanvas, updateChunk.data, updateChunk.x, updateChunk.y);
+                                }
                             }
                         } else {
                             for (const updateChunk of this.newRasterUpdateChunks) {
-                                await drawImageToCanvas2d(sourceCanvas, updateChunk.data, updateChunk.x, updateChunk.y);
+                                if (updateChunk.mode === 'replace') {
+                                    sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.data.width, updateChunk.data.height);
+                                    sourceCtx.drawImage(updateChunk.data, updateChunk.x, updateChunk.y);
+                                } else {
+                                    await drawImageToCanvas2d(sourceCanvas, updateChunk.data, updateChunk.x, updateChunk.y);
+                                }
                             }
                         }
+                        prepareStoredImageForArchival(layer.data.sourceUuid);
                         layer.data.chunkUpdateId = uuidv4();
+                        layer.data.updateChunks = newData.updateChunks;
+                    } else {
+                        delete layer.data.updateChunks;
                     }
+
                 }
                 // else if (layer.type === 'rasterSequence') {
                 //     for (let frame of layer.data.sequence) {
@@ -160,6 +177,8 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                         sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
                         sourceCtx.drawImage(updateChunk.data, updateChunk.x, updateChunk.y);
                     }
+                    prepareStoredImageForArchival(layer.data.sourceUuid);
+                    layer.data.updateChunks = this.oldRasterUpdateChunks;
                     layer.data.chunkUpdateId = uuidv4();
                 }
             }

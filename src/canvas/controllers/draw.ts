@@ -394,7 +394,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
 
                     const layerTransform = new DOMMatrix().multiply(layerGlobalTransform.inverse());
 
-                    let drawableCanvas = new DrawableCanvas({ forceOnscreen: true, scale: 1 });
+                    let drawableCanvas = new DrawableCanvas({ forceDrawOnMainThread: true, scale: 1 });
                     let layerUpdateCanvas: HTMLCanvasElement | undefined = undefined;
                     let sourceX = 0;
                     let sourceY = 0;
@@ -438,7 +438,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                                         width: layerUpdateCanvas.width,
                                         height: layerUpdateCanvas.height,
                                         data: layerUpdateCanvas,
-                                        mode: 'overlay',
+                                        mode: 'source-over',
                                     }],
                                 }
                             })

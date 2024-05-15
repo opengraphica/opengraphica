@@ -12,11 +12,13 @@ import { Mesh } from 'three/src/objects/Mesh';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { Texture } from 'three/src/textures/Texture';
 import { CanvasTexture } from 'three/src/textures/CanvasTexture';
+import { Vector2 } from 'three/src/math/Vector2';
 
 import { createFiltersFromLayerConfig, combineShaders } from '@/canvas/filters';
 import { createRasterShaderMaterial } from './shaders';
 
 import type { DrawWorkingFileLayerOptions } from '@/types';
+import { createEmptyCanvasWith2dContext } from '@/lib/image';
 
 export default class RasterLayerRenderer extends BaseLayerRenderer {
     private stopWatchVisible: WatchStopHandle | undefined;
@@ -30,9 +32,11 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
     private draftTexture: InstanceType<typeof Texture> | undefined;
     private bakedTexture: InstanceType<typeof Texture> | undefined;
     private sourceTexture: InstanceType<typeof Texture> | undefined;
+    private lastChunkUpdateId: string | undefined = undefined;
 
     async onAttach(layer: WorkingFileRasterLayer<ColorModel>) {
 
+        this.lastChunkUpdateId = layer.data.chunkUpdateId;
         const combinedShaderResult = combineShaders(
             await createFiltersFromLayerConfig(layer.filters),
             layer
@@ -112,26 +116,68 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                 this.draftTexture.dispose();
                 this.draftTexture = undefined;
             }
-            const sourceImage = await getStoredImageCanvas(updates.data.sourceUuid ?? '');
-            if (sourceImage) {
-                let newSourceTexture: Texture = await createThreejsTextureFromImage(sourceImage);
-                this.sourceTexture?.dispose();
-                this.sourceTexture = newSourceTexture;
-                this.sourceTexture.encoding = sRGBEncoding;
-                this.sourceTexture.magFilter = NearestFilter;
-                // TODO - maybe use a combination of LinearMipmapLinearFilter and LinearMipmapNearestFilter
-                // depending on the zoom level, one can appear sharper than the other.
-                this.sourceTexture.minFilter = LinearMipmapLinearFilter;
 
-                this.sourceTexture.needsUpdate = true;
-                this.material && (this.material.uniforms.map.value = this.sourceTexture);
-                canvasStore.set('dirty', true);
-            } else {
-                if (this.sourceTexture) {
-                    this.sourceTexture.dispose();
-                    this.sourceTexture = undefined;
+            // Only pieces of the image have updated - shortcut.
+            if (this.sourceTexture && updates.data.chunkUpdateId !== this.lastChunkUpdateId && updates.data.updateChunks) {
+                this.lastChunkUpdateId = updates.data.chunkUpdateId;
+                const renderer = canvasStore.get('threejsRenderer');
+                if (renderer) {
+                    let sourceCanvas: HTMLCanvasElement | null = null;
+                    const { width: sourceWidth, height: sourceHeight } = this.sourceTexture.image;
+                    for (const updateChunk of updates.data.updateChunks) {
+                        let { x: updateX, y: updateY, width: updateWidth, height: updateHeight, data: updateCanvas } = updateChunk;
+                        // Clip update data to destination image bounds, or use original image if not replace mode.
+                        if (updateX < 0 || updateY < 0 || updateX + updateWidth > sourceWidth || updateY + updateHeight > sourceHeight || updateChunk.mode !== 'replace') {
+                            const shiftX = Math.min(0, updateX);
+                            const shiftY = Math.min(0, updateY);
+                            updateX = Math.max(0, updateX);
+                            updateY = Math.max(0, updateY);
+                            let newUpdateWidth = Math.min(updateWidth + shiftX, sourceWidth - updateX);
+                            let newUpdateHeight = Math.min(updateHeight + shiftY, sourceHeight - updateY);
+                            if (newUpdateWidth < 1 || newUpdateHeight < 1) continue;
+                            const { canvas: newUpdateCanvas, ctx: newUpdateCanvasCtx } = createEmptyCanvasWith2dContext(newUpdateWidth, newUpdateHeight);
+                            if (!newUpdateCanvasCtx) continue;
+                            if (updateChunk.mode !== 'replace') {
+                                if (!sourceCanvas) sourceCanvas = await getStoredImageCanvas(updates.data.sourceUuid);
+                                if (!sourceCanvas) continue;
+                                newUpdateCanvasCtx.drawImage(sourceCanvas, updateX + shiftX, updateY + shiftY, newUpdateWidth, newUpdateHeight, 0, 0, newUpdateWidth, newUpdateHeight);
+                            } else {
+                                newUpdateCanvasCtx.drawImage(updateCanvas, shiftX, shiftY);
+                            }
+                            updateWidth = newUpdateWidth;
+                            updateHeight = newUpdateHeight;
+                            updateCanvas = newUpdateCanvas;
+                        }
+                        // Copy update data to existing texture.
+                        const updateChunkTexture = await createThreejsTextureFromImage(updateCanvas);
+                        renderer.copyTextureToTexture(new Vector2(updateX, sourceHeight - updateY - updateHeight), updateChunkTexture, this.sourceTexture);
+                        updateChunkTexture.dispose();
+                    }
                 }
-                this.material && (this.material.uniforms.map.value = null);
+            }
+            // Re-upload the full image texture to the GPU, discard the old texture.
+            else {
+                const sourceImage = await getStoredImageCanvas(updates.data.sourceUuid ?? '');
+                if (sourceImage) {
+                    let newSourceTexture: Texture = await createThreejsTextureFromImage(sourceImage);
+                    this.sourceTexture?.dispose();
+                    this.sourceTexture = newSourceTexture;
+                    this.sourceTexture.encoding = sRGBEncoding;
+                    this.sourceTexture.magFilter = NearestFilter;
+                    // TODO - maybe use a combination of LinearMipmapLinearFilter and LinearMipmapNearestFilter
+                    // depending on the zoom level, one can appear sharper than the other.
+                    this.sourceTexture.minFilter = LinearMipmapLinearFilter;
+
+                    this.sourceTexture.needsUpdate = true;
+                    this.material && (this.material.uniforms.map.value = this.sourceTexture);
+                    canvasStore.set('dirty', true);
+                } else {
+                    if (this.sourceTexture) {
+                        this.sourceTexture.dispose();
+                        this.sourceTexture = undefined;
+                    }
+                    this.material && (this.material.uniforms.map.value = null);
+                }
             }
         }
     }

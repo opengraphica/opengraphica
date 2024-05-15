@@ -90,6 +90,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
                 this.draftPlaneTexture = undefined;
                 this.draftPlane && (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(this.draftPlane)
                 this.draftPlane = undefined;
+                this.threejsScene = undefined;
                 this.stopWatchBaseDraft?.();
             } catch (error) {
                 console.error('[src/canvas/renderers/webgl/base.ts] Error disposing draft assets. ', error);

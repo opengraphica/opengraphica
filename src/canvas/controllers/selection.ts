@@ -2,7 +2,7 @@ import BaseMovementController from './base-movement';
 import { ref, watch, toRefs, WatchStopHandle } from 'vue';
 import {
     isDrawingSelection, selectionAddShape, activeSelectionPath, selectionCombineMode, selectionEmitter,
-    SelectionPathPoint, activeSelectionMask ,appliedSelectionMask, previewSelectedLayersSelectionMask, discardSelectedLayersSelectionMask,
+    SelectionPathPoint, activeSelectionMask, appliedSelectionMask, previewSelectedLayersSelectionMask, discardSelectedLayersSelectionMask,
     type SelectionPathPointBezierCurve,
 } from '../store/selection-state';
 import canvasStore from '@/store/canvas';
@@ -76,7 +76,7 @@ export default class SelectionController extends BaseMovementController {
         selectionEmitter.on('clearSelection', this.queueClearSelection);
         selectionEmitter.on('updateSelectionCombineMode', this.queueUpdateSelectionCombineMode);
         this.selectedLayerUnwatch = watch([toRefs(workingFileStore.state).selectedLayerIds], async () => {
-            await previewSelectedLayersSelectionMask();
+            // await previewSelectedLayersSelectionMask();
             canvasStore.set('viewDirty', true);
         }, { immediate: true });
 

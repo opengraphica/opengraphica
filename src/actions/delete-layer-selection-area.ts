@@ -1,8 +1,8 @@
 import { BaseAction } from './base';
 import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset, blitActiveSelectionMask } from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
-import workingFileStore, { getCanvasRenderingContext2DSettings, getSelectedLayers, ensureUniqueLayerSiblingName, getLayerById } from '@/store/working-file';
-import { createImageFromCanvas, getImageDataFromImage, getImageDataEmptyBounds } from '@/lib/image';
+import workingFileStore, { getLayerById, getLayerGlobalTransform } from '@/store/working-file';
+import { createImageFromCanvas, getImageDataFromImage, getImageDataEmptyBounds, createEmptyCanvasWith2dContext } from '@/lib/image';
 import { ClearSelectionAction } from './clear-selection';
 import { UpdateLayerAction } from './update-layer';
 import { SelectLayersAction } from './select-layers';
@@ -10,7 +10,7 @@ import renderers from '@/canvas/renderers';
 import { getStoredImageOrCanvas, createStoredImage } from '@/store/image';
 
 import type {
-    ColorModel, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, InsertRasterLayerOptions, UpdateAnyLayerOptions
+    ColorModel, UpdateAnyLayerOptions, UpdateRasterLayerOptions,
 } from '@/types';
 
 interface DeleteLayerSelectionAreaOptions {
@@ -52,12 +52,39 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
             if (layer.type === 'raster') {
                 const sourceImage = getStoredImageOrCanvas(layer.data.sourceUuid);
                 if (sourceImage) {
-                    const newImage = await blitActiveSelectionMask(sourceImage, layer.transform, 'source-out');
-                    const updateLayerAction = new UpdateLayerAction({
+                    const selectionMask = activeSelectionMask.value ?? appliedSelectionMask.value;
+                    if (!selectionMask) continue;
+                    const selectionMaskOffset = activeSelectionMask.value ? activeSelectionMaskCanvasOffset.value : appliedSelectionMaskCanvasOffset.value;
+                    const layerTransform = getLayerGlobalTransform(layer.id);
+                    const p0 = selectionMaskOffset.matrixTransform(layerTransform.inverse());
+                    const p1 = new DOMPoint(selectionMaskOffset.x + selectionMask.width, selectionMaskOffset.y).matrixTransform(layerTransform.inverse());
+                    const p2 = new DOMPoint(selectionMaskOffset.x, selectionMaskOffset.y + selectionMask.height).matrixTransform(layerTransform.inverse());
+                    const p3 = new DOMPoint(selectionMaskOffset.x + selectionMask.width, selectionMaskOffset.y + selectionMask.height).matrixTransform(layerTransform.inverse());
+                    const topLeft = new DOMPoint(Math.min(p0.x, p1.x, p2.x, p3.x), Math.min(p0.y, p1.y, p2.y, p3.y));
+                    topLeft.x = Math.max(0, Math.floor(topLeft.x - 1));
+                    topLeft.y = Math.max(0, Math.floor(topLeft.y - 1));
+                    const bottomRight = new DOMPoint(Math.max(p0.x, p1.x, p2.x, p3.x), Math.max(p0.y, p1.y, p2.y, p3.y));
+                    bottomRight.x = Math.min(sourceImage.width, Math.ceil(bottomRight.x + 1));
+                    bottomRight.y = Math.min(sourceImage.height, Math.ceil(bottomRight.y + 1));
+                    const updateChunkImage = await blitActiveSelectionMask(sourceImage, layerTransform, 'source-out', {
+                        sx: topLeft.x,
+                        sy: topLeft.y,
+                        sWidth: bottomRight.x - topLeft.x,
+                        sHeight: bottomRight.y - topLeft.y,
+                    });
+
+                    const updateLayerAction = new UpdateLayerAction<UpdateRasterLayerOptions>({
                         id: layer.id,
                         data: {
-                            sourceUuid: await createStoredImage(newImage),
-                        }
+                            updateChunks: [{
+                                x: topLeft.x,
+                                y: topLeft.y,
+                                width: updateChunkImage.width,
+                                height: updateChunkImage.height,
+                                data: updateChunkImage,
+                                mode: 'replace',
+                            }],
+                        },
                     });
                     await updateLayerAction.do();
                     this.freeEstimates.memory += updateLayerAction.freeEstimates.memory;
@@ -66,7 +93,7 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
                 }
             }
         }
-        
+
         if (this.clearSelection && !this.clearSelectionAction) {
             this.clearSelectionAction = new ClearSelectionAction();
         }
@@ -76,6 +103,7 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
             this.freeEstimates.memory += this.clearSelectionAction.freeEstimates.memory;
             this.freeEstimates.database += this.clearSelectionAction.freeEstimates.database;
         }
+
 
         canvasStore.set('dirty', true);
         canvasStore.set('viewDirty', true);

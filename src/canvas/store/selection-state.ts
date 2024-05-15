@@ -278,30 +278,56 @@ export async function createActiveSelectionMask(activeSelectionBounds: Selection
     return workingCanvas;
 }
 
-export async function blitActiveSelectionMask(toImage: HTMLImageElement | HTMLCanvasElement, layerTransform: DOMMatrix, compositeOperation: WorkingFileLayerBlendingMode = 'source-in'): Promise<HTMLCanvasElement> {
+interface SourceImageCropOptions {
+    sx: number;
+    sy: number;
+    sWidth: number;
+    sHeight: number;
+}
+
+export async function blitActiveSelectionMask(
+    sourceImage: HTMLImageElement | HTMLCanvasElement,
+    layerTransform: DOMMatrix,
+    compositeOperation: WorkingFileLayerBlendingMode = 'source-in',
+    sourceCropOptions?: SourceImageCropOptions
+): Promise<HTMLCanvasElement> {
     return blitSpecifiedSelectionMask(
         activeSelectionMask.value ?? appliedSelectionMask.value,
         activeSelectionMask.value ? activeSelectionMaskCanvasOffset.value : appliedSelectionMaskCanvasOffset.value,
-        toImage,
+        sourceImage,
         layerTransform,
-        compositeOperation
+        compositeOperation,
+        sourceCropOptions
     );
 }
 
-export async function blitSpecifiedSelectionMask(selectionMask: HTMLImageElement | null, selectionMaskCanvasOffset: DOMPoint, toImage: HTMLImageElement | HTMLCanvasElement, layerTransform: DOMMatrix, compositeOperation: WorkingFileLayerBlendingMode = 'source-in'): Promise<HTMLCanvasElement> {
+export async function blitSpecifiedSelectionMask(
+    selectionMask: HTMLImageElement | null,
+    selectionMaskCanvasOffset: DOMPoint,
+    sourceImage: HTMLImageElement | HTMLCanvasElement,
+    layerTransform: DOMMatrix,
+    compositeOperation: WorkingFileLayerBlendingMode = 'source-in',
+    sourceCropOptions?: SourceImageCropOptions
+): Promise<HTMLCanvasElement> {
     if (selectionMask == null) throw new Error('Active selection mask does not exist.');
     const workingCanvas = document.createElement('canvas');
-    workingCanvas.width = toImage.width;
-    workingCanvas.height = toImage.height;
+    workingCanvas.width = sourceCropOptions?.sWidth ?? sourceImage.width;
+    workingCanvas.height = sourceCropOptions?.sHeight ?? sourceImage.height;
     const ctx = workingCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
     if (!ctx) throw new Error('Couldn\'t draw to a new canvas when trying to blit selection mask.');
     const tranformInverse = layerTransform.inverse();
+    ctx.save();
+    ctx.translate(-(sourceCropOptions?.sx ?? 0), -(sourceCropOptions?.sy ?? 0));
     ctx.transform(tranformInverse.a, tranformInverse.b, tranformInverse.c, tranformInverse.d, tranformInverse.e, tranformInverse.f);
     ctx.globalCompositeOperation = 'source-over';
     ctx.drawImage(selectionMask, selectionMaskCanvasOffset.x, selectionMaskCanvasOffset.y);
-    ctx.transform(layerTransform.a, layerTransform.b, layerTransform.c, layerTransform.d, layerTransform.e, layerTransform.f);
+    ctx.restore();
     ctx.globalCompositeOperation = compositeOperation;
-    ctx.drawImage(toImage, 0, 0);
+    if (sourceCropOptions) {
+        ctx.drawImage(sourceImage, sourceCropOptions.sx, sourceCropOptions.sy, sourceCropOptions.sWidth, sourceCropOptions.sHeight, 0, 0, sourceCropOptions.sWidth, sourceCropOptions.sHeight);
+    } else {
+        ctx.drawImage(sourceImage, 0, 0);
+    }
     ctx.globalCompositeOperation = 'source-over';
     return workingCanvas;
 }

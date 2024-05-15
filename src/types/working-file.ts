@@ -103,7 +103,7 @@ export interface WorkingFileLayerDraftChunk {
     width: number;
     height: number;
     data: HTMLCanvasElement;
-    mode?: 'replace' | 'overlay';
+    mode?: 'replace' | 'source-over';
 }
 
 export interface WorkingFileLayerDraft {

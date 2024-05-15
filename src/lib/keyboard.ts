@@ -152,6 +152,15 @@ function onDocumentKeyUp(e: KeyboardEvent) {
     }
 }
 
+function onWindowBlur() {
+    isCtrlKeyPressed.value = false;
+    isMetaKeyPressed.value = false;
+    isShiftKeyPressed.value = false;
+    isAltKeyPressed.value = false;
+    isCtrlOrMetaKeyPressed.value = false;
+    isAnyModifierKeyPressed.value = false;
+}
+
 let isPastingImage: boolean = false;
 async function onDocumentPaste(e: ClipboardEvent) {
     if (isInput(e.target)) return;
@@ -196,6 +205,7 @@ async function onDocumentPaste(e: ClipboardEvent) {
     }
 } 
 
+window.addEventListener('blur', onWindowBlur, true);
 document.addEventListener('keydown', onDocumentKeyDown, true);
 document.addEventListener('keyup', onDocumentKeyUp, true);
 document.addEventListener('paste', onDocumentPaste, false);

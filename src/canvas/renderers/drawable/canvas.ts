@@ -18,7 +18,7 @@ export interface DrawableCanvasOptions {
     width?: number;
     height?: number;
     scale?: number;
-    forceOnscreen?: boolean;
+    forceDrawOnMainThread?: boolean;
 }
 
 interface DrawableInfo {
@@ -37,7 +37,7 @@ export default class DrawableCanvas {
     private isInitialized: boolean = false;
     private renderMode: DrawableRenderMode;
     private scale: number;
-    private forceOnscreen: boolean;
+    private forceDrawOnMainThread: boolean;
 
     private drawables = new Map<string, DrawableInfo>();
     private drawableClassMap: Record<string, DrawableConstructor> = {};
@@ -60,12 +60,12 @@ export default class DrawableCanvas {
     constructor(options: DrawableCanvasOptions) {
         this.renderMode = '2d';
         this.scale = options.scale ?? 1;
-        this.forceOnscreen = options.forceOnscreen ?? false;
+        this.forceDrawOnMainThread = options.forceDrawOnMainThread ?? false;
         this.init();
     }
 
     private async init() {
-        const canUseOffscrenCanvas = this.forceOnscreen ? false : await isOffscreenCanvasSupported();
+        const canUseOffscrenCanvas = this.forceDrawOnMainThread ? false : await isOffscreenCanvasSupported();
         if (canUseOffscrenCanvas) {
             try {
                 this.offscreenCanvasUuid = await createDrawableCanvas({
