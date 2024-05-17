@@ -1,5 +1,6 @@
 import mitt from 'mitt';
 import { ref, reactive } from 'vue';
+import canvasStore from '@/store/canvas';
 import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
 import { createImageFromCanvas, getImageDataEmptyBounds } from '@/lib/image';
@@ -323,10 +324,20 @@ export async function blitSpecifiedSelectionMask(
     ctx.drawImage(selectionMask, selectionMaskCanvasOffset.x, selectionMaskCanvasOffset.y);
     ctx.restore();
     ctx.globalCompositeOperation = compositeOperation;
+    const isFlipY = canvasStore.get('renderer') === 'webgl' && sourceImage instanceof ImageBitmap;
+    if (isFlipY) {
+        ctx.save();
+        ctx.translate(0, -workingCanvas.height / 2);
+        ctx.scale(1, -1);
+        ctx.translate(0, workingCanvas.height / 2);
+    }
     if (sourceCropOptions) {
         ctx.drawImage(sourceImage, sourceCropOptions.sx, sourceCropOptions.sy, sourceCropOptions.sWidth, sourceCropOptions.sHeight, 0, 0, sourceCropOptions.sWidth, sourceCropOptions.sHeight);
     } else {
         ctx.drawImage(sourceImage, 0, 0);
+    }
+    if (isFlipY) {
+        ctx.restore();
     }
     ctx.globalCompositeOperation = 'source-over';
     return workingCanvas;

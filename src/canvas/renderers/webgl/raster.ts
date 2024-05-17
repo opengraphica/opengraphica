@@ -36,7 +36,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
 
     async onAttach(layer: WorkingFileRasterLayer<ColorModel>) {
 
-        this.lastChunkUpdateId = layer.data.chunkUpdateId;
+        this.lastChunkUpdateId = layer.data?.chunkUpdateId;
         const combinedShaderResult = combineShaders(
             await createFiltersFromLayerConfig(layer.filters),
             layer

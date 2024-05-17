@@ -196,7 +196,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                         sourceCtx.setTransform(1, 0, 0, 1, 0, 0);
                         sourceCtx.globalCompositeOperation = 'source-over';
                         sourceCtx.imageSmoothingEnabled = false;
-                        sourceCtx.fillRect(updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
+                        sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
                         sourceCtx.drawImage(updateChunk.data, 0, 0, updateChunk.width, updateChunk.height, updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
                     }
                     prepareStoredImageForArchival(layer.data.sourceUuid);
