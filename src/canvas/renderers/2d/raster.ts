@@ -4,12 +4,23 @@ import BaseLayerRenderer from './base';
 
 export default class RasterLayerRenderer extends BaseLayerRenderer {
     onDraw(ctx: CanvasRenderingContext2D, layer: WorkingFileRasterLayer<ColorModel>, options: DrawWorkingFileLayerOptions = {}) {
+        const image = layer.bakedImage || getStoredImageOrCanvas(layer.data.sourceUuid ?? '') as ImageBitmap;
+        const isFlipY = layer.renderer.renderMode === 'webgl' && image instanceof ImageBitmap;
+        if (isFlipY) {
+            ctx.save();
+            ctx.translate(0, layer.width / 2);
+            ctx.scale(1, -1);
+            ctx.translate(0, -layer.width);
+        }
         ctx.drawImage(
-            layer.bakedImage || getStoredImageOrCanvas(layer.data.sourceUuid ?? '') as HTMLImageElement,
+            image,
             0,
             0,
             layer.width,
             layer.height
         );
+        if (isFlipY) {
+            ctx.restore();
+        }
     }
 }

@@ -43,6 +43,7 @@ export interface WorkingFileLayerFilter<T extends ColorModel = ColorModel> {
 
 export interface WorkingFileLayerRenderer<T extends ColorModel = ColorModel> {
     threejsScene: Scene | undefined;
+    renderMode: '2d' | 'webgl';
     isAttached: boolean;
     order: number;
     attach(layer: WorkingFileLayer<ColorModel>): void;

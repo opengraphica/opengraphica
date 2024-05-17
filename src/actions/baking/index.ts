@@ -2,7 +2,7 @@ import { markRaw } from 'vue';
 import canvasStore from '@/store/canvas';
 import { getStoredImageOrCanvas } from '@/store/image';
 import { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
-import { getImageDataFromImage, getImageDataFromCanvas, createImageFromImageData } from '@/lib/image';
+import { getImageDataFromImage, getImageDataFromCanvas, getImageDataFromImageBitmap, createImageFromImageData } from '@/lib/image';
 import { bakeCanvasFilters } from '@/workers';
 
 import type { WorkingFileAnyLayer, ColorModel } from '@/types';
@@ -19,7 +19,7 @@ export async function updateBakedImageForLayer(layerOrLayerId: WorkingFileAnyLay
         if (!sourceImage) return;
         const sourceImageData = (sourceImage instanceof HTMLImageElement)
             ? getImageDataFromImage(sourceImage)
-            : getImageDataFromCanvas(sourceImage);
+            : (sourceImage instanceof ImageBitmap) ? getImageDataFromImageBitmap(sourceImage) : getImageDataFromCanvas(sourceImage);
         try {
             setTimeout(() => {
                 layer.isBaking = true;

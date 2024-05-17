@@ -18,6 +18,7 @@ import type {
 } from '@/types';
 
 export default class BaseLayerRenderer implements WorkingFileLayerRenderer<ColorModel> {
+    renderMode: '2d' | 'webgl' = 'webgl';
     threejsScene: Scene | undefined;
     isAttached: boolean = false;
     order: number = 0;

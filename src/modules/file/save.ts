@@ -95,7 +95,7 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
                     throw new Error('Missing canvas context');
                 }
                 ctx.imageSmoothingEnabled = false;
-                ctx.drawImage(getStoredImageOrCanvas((layer as WorkingFileRasterLayer<ColorModel>).data.sourceUuid) as HTMLImageElement, 0, 0);
+                ctx.drawImage(getStoredImageOrCanvas((layer as WorkingFileRasterLayer<ColorModel>).data.sourceUuid) as ImageBitmap, 0, 0);
                 serializedLayer = {
                     ...serializedLayer,
                     type: 'raster',
@@ -123,7 +123,7 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
                         throw new Error('Missing canvas context');
                     }
                     ctx.imageSmoothingEnabled = false;
-                    ctx.drawImage(getStoredImageOrCanvas(frame.image.sourceUuid) as HTMLImageElement, 0, 0);
+                    ctx.drawImage(getStoredImageOrCanvas(frame.image.sourceUuid) as ImageBitmap, 0, 0);
                     serializedSequence.push({
                         start: frame.start,
                         end: frame.end,

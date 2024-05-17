@@ -349,13 +349,13 @@ export async function drawImageToCanvas2d(targetCanvas: HTMLCanvasElement, sourc
  * of the visible pixels they sit nearby. This avoids mip-map artifacts.
  * @param image HTML canvas to take image from.
  */
-export async function createThreejsTextureFromImage(image: HTMLCanvasElement): Promise<Texture> {
+export async function createThreejsTextureFromImage(image: HTMLCanvasElement | ImageBitmap): Promise<Texture> {
     let {
         threejsCanvas, threejsRenderer, threejsScene, NearestFilter, sRGBEncoding, threejsCamera,
         Mesh, ImagePlaneGeometry, CanvasTexture, threejsPrepareGpuTextureShaderMaterial,
     } = await setupThreejsRenderer(image.width, image.height);
 
-    const imageTexture = new CanvasTexture(image);
+    let imageTexture = new CanvasTexture(image);
     imageTexture.generateMipmaps = false;
     imageTexture.encoding = sRGBEncoding;
     imageTexture.minFilter = NearestFilter;
@@ -393,5 +393,6 @@ export async function createThreejsTextureFromImage(image: HTMLCanvasElement): P
     preparedImageCtx.globalCompositeOperation = 'copy';
     preparedImageCtx.drawImage(threejsCanvas, 0, 0);
     preparedImageCtx.globalCompositeOperation = 'source-over';
+
     return new CanvasTexture(preparedImage);
 }

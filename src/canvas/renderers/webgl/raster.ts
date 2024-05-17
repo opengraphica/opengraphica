@@ -122,7 +122,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                 this.lastChunkUpdateId = updates.data.chunkUpdateId;
                 const renderer = canvasStore.get('threejsRenderer');
                 if (renderer) {
-                    let sourceCanvas: HTMLCanvasElement | null = null;
+                    let sourceCanvas: HTMLCanvasElement | ImageBitmap | null = null;
                     const { width: sourceWidth, height: sourceHeight } = this.sourceTexture.image;
                     for (const updateChunk of updates.data.updateChunks) {
                         let { x: updateX, y: updateY, width: updateWidth, height: updateHeight, data: updateCanvas } = updateChunk;
@@ -138,7 +138,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                             const { canvas: newUpdateCanvas, ctx: newUpdateCanvasCtx } = createEmptyCanvasWith2dContext(newUpdateWidth, newUpdateHeight);
                             if (!newUpdateCanvasCtx) continue;
                             if (updateChunk.mode !== 'replace') {
-                                if (!sourceCanvas) sourceCanvas = await getStoredImageCanvas(updates.data.sourceUuid);
+                                if (!sourceCanvas) sourceCanvas = await getStoredImageOrCanvas(updates.data.sourceUuid);
                                 if (!sourceCanvas) continue;
                                 newUpdateCanvasCtx.drawImage(sourceCanvas, updateX + shiftX, updateY + shiftY, newUpdateWidth, newUpdateHeight, 0, 0, newUpdateWidth, newUpdateHeight);
                             } else {
@@ -157,7 +157,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
             }
             // Re-upload the full image texture to the GPU, discard the old texture.
             else {
-                const sourceImage = await getStoredImageCanvas(updates.data.sourceUuid ?? '');
+                const sourceImage = await getStoredImageOrCanvas(updates.data.sourceUuid ?? '');
                 if (sourceImage) {
                     let newSourceTexture: Texture = await createThreejsTextureFromImage(sourceImage);
                     this.sourceTexture?.dispose();

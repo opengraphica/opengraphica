@@ -286,7 +286,7 @@ interface SourceImageCropOptions {
 }
 
 export async function blitActiveSelectionMask(
-    sourceImage: HTMLImageElement | HTMLCanvasElement,
+    sourceImage: HTMLImageElement | HTMLCanvasElement | ImageBitmap,
     layerTransform: DOMMatrix,
     compositeOperation: WorkingFileLayerBlendingMode = 'source-in',
     sourceCropOptions?: SourceImageCropOptions
@@ -304,7 +304,7 @@ export async function blitActiveSelectionMask(
 export async function blitSpecifiedSelectionMask(
     selectionMask: HTMLImageElement | null,
     selectionMaskCanvasOffset: DOMPoint,
-    sourceImage: HTMLImageElement | HTMLCanvasElement,
+    sourceImage: HTMLImageElement | HTMLCanvasElement | ImageBitmap,
     layerTransform: DOMMatrix,
     compositeOperation: WorkingFileLayerBlendingMode = 'source-in',
     sourceCropOptions?: SourceImageCropOptions

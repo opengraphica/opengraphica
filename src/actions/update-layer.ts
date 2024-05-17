@@ -5,7 +5,7 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { markRaw } from 'vue';
 import { BaseAction } from './base';
-import { createEmptyCanvasWith2dContext } from '@/lib/image';
+import { createEmptyCanvasWith2dContext, createImageFromCanvas } from '@/lib/image';
 import { drawImageToCanvas2d } from '@/lib/canvas';
 import canvasStore from '@/store/canvas';
 import { prepareStoredImageForEditing, prepareStoredImageForArchival, reserveStoredImage, unreserveStoredImage } from '@/store/image';
@@ -72,26 +72,45 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                         const sourceCtx = sourceCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
                         if (!sourceCtx) break updateSourceImageWithChunks;
                         this.newRasterUpdateChunks = newData.updateChunks;
+
+                        // Generate undo history raster chunks if don't exist
                         if (this.oldRasterUpdateChunks.length != this.newRasterUpdateChunks.length) {
-                            this.oldRasterUpdateChunks = [];
+                            this.oldRasterUpdateChunks = markRaw([]);
                             for (const updateChunk of this.newRasterUpdateChunks) {
                                 const { canvas: oldChunkCanvas, ctx: oldChunkCtx } = createEmptyCanvasWith2dContext(updateChunk.width, updateChunk.height);
                                 if (!oldChunkCtx) break;
-                                oldChunkCtx.globalCompositeOperation = 'copy';
-                                oldChunkCtx.drawImage(sourceCanvas, -updateChunk.x, -updateChunk.y);
+                                // Need to wait before accessing sourceCanvas image data (ctx.drawImage) in order to prevent rendering bug in Firefox.
+                                await new Promise<void>((resolve, reject) => {
+                                    setTimeout(() => {
+                                        try {
+                                            oldChunkCtx.globalCompositeOperation = 'source-over';
+                                            oldChunkCtx.imageSmoothingEnabled = false;
+                                            oldChunkCtx.drawImage(sourceCanvas, updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height, 0, 0, updateChunk.width, updateChunk.height);
+                                            resolve();
+                                        } catch (error) {
+                                            reject();
+                                        }
+                                    }, 0);
+                                });
                                 this.oldRasterUpdateChunks.push({ data: oldChunkCanvas, x: updateChunk.x, y: updateChunk.y, width: updateChunk.width, height: updateChunk.height });
                                 if (updateChunk.mode === 'replace') {
-                                    sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.data.width, updateChunk.data.height);
-                                    sourceCtx.drawImage(updateChunk.data, updateChunk.x, updateChunk.y);
+                                    sourceCtx.globalCompositeOperation = 'source-over';
+                                    sourceCtx.imageSmoothingEnabled = false;
+                                    sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
+                                    sourceCtx.drawImage(updateChunk.data, 0, 0, updateChunk.width, updateChunk.height, updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
                                 } else {
                                     await drawImageToCanvas2d(sourceCanvas, updateChunk.data, updateChunk.x, updateChunk.y);
                                 }
                             }
-                        } else {
+                        }
+                        // Undo history already generated; just draw the new update chunks.
+                        else {
                             for (const updateChunk of this.newRasterUpdateChunks) {
                                 if (updateChunk.mode === 'replace') {
-                                    sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.data.width, updateChunk.data.height);
-                                    sourceCtx.drawImage(updateChunk.data, updateChunk.x, updateChunk.y);
+                                    sourceCtx.globalCompositeOperation = 'source-over';
+                                    sourceCtx.imageSmoothingEnabled = false;
+                                    sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
+                                    sourceCtx.drawImage(updateChunk.data, 0, 0, updateChunk.width, updateChunk.height, updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
                                 } else {
                                     await drawImageToCanvas2d(sourceCanvas, updateChunk.data, updateChunk.x, updateChunk.y);
                                 }
@@ -174,11 +193,14 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                     const sourceCtx = sourceCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
                     if (!sourceCtx) break updateSourceImageWithChunks;
                     for (const updateChunk of this.oldRasterUpdateChunks) {
-                        sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
-                        sourceCtx.drawImage(updateChunk.data, updateChunk.x, updateChunk.y);
+                        sourceCtx.setTransform(1, 0, 0, 1, 0, 0);
+                        sourceCtx.globalCompositeOperation = 'source-over';
+                        sourceCtx.imageSmoothingEnabled = false;
+                        sourceCtx.fillRect(updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
+                        sourceCtx.drawImage(updateChunk.data, 0, 0, updateChunk.width, updateChunk.height, updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
                     }
                     prepareStoredImageForArchival(layer.data.sourceUuid);
-                    layer.data.updateChunks = this.oldRasterUpdateChunks;
+                    layer.data.updateChunks = [...this.oldRasterUpdateChunks];
                     layer.data.chunkUpdateId = uuidv4();
                 }
             }

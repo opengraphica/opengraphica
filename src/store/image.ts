@@ -1,14 +1,16 @@
 import { v4 as uuidv4 } from 'uuid';
 import imageDatabase from './data/image-database';
-import { createImageBlobFromCanvas, createImageBlobFromImage, createImageFromBlob, createCanvasFromImage } from '@/lib/image';
+import canvasStore from './canvas';
+import { createImageBlobFromCanvas, createImageBlobFromImageBitmap, createImageFromBlob, createCanvasFromImage } from '@/lib/image';
 
 import type { Texture } from 'three/src/textures/Texture';
+import { saveAs } from 'file-saver';
 
 // Map of uuid to image store data
 
 interface StoredImage {
     sourceCanvas: HTMLCanvasElement | null; // This is used during editing
-    sourceImage: HTMLImageElement | null; // This is used when not editing, to save on memory
+    sourceBitmap: ImageBitmap | null; // This is used when not editing, to save on memory
     previewCanvas: HTMLCanvasElement | null; // This is used to store a lower resolution canvas for performance intensive editing
     lockedForEditing: boolean;
     databaseUuid: string | null; // Can be null if failed to store a backup in the database
@@ -34,16 +36,27 @@ async function isObjectUrlValid(url: string): Promise<boolean> {
  * @returns uuid that can be used to retrieve it later
  */
 export async function createStoredImage(imageOrCanvas: HTMLCanvasElement | HTMLImageElement): Promise<string> {
-    let sourceCanvas = imageOrCanvas instanceof HTMLCanvasElement ? imageOrCanvas : null;
-    let sourceImage = imageOrCanvas instanceof HTMLImageElement ? imageOrCanvas : null;
+    let sourceCanvas: HTMLCanvasElement | null = null;
+    let sourceBitmap: ImageBitmap | null = null;
+    if (imageOrCanvas instanceof HTMLCanvasElement) {
+        sourceCanvas = imageOrCanvas;
+    } else {
+        sourceBitmap = await createImageBitmap(imageOrCanvas, 0, 0, imageOrCanvas.width, imageOrCanvas.height, {
+            imageOrientation: canvasStore.get('renderer') === '2d' ? 'none' : 'flipY',
+            premultiplyAlpha: 'none',
+        });
+        if (imageOrCanvas instanceof HTMLImageElement) {
+            URL.revokeObjectURL(imageOrCanvas.src);
+        }
+    }
     const storedImage: StoredImage = {
         sourceCanvas,
-        sourceImage,
+        sourceBitmap,
         previewCanvas: null,
         lockedForEditing: false,
         databaseUuid: null,
     };
-    (sourceCanvas ? createImageBlobFromCanvas(sourceCanvas) : createImageBlobFromImage(sourceImage!)).then((imageBlob) => {
+    (sourceCanvas ? createImageBlobFromCanvas(sourceCanvas) : createImageBlobFromImageBitmap(sourceBitmap!)).then((imageBlob) => {
         imageDatabase.add(imageBlob).then((databaseUuid) => {
             storedImage.databaseUuid = databaseUuid;
         });
@@ -58,9 +71,9 @@ export async function createStoredImage(imageOrCanvas: HTMLCanvasElement | HTMLI
  * @param uuid - ID of the database entry for the image
  * @returns The image, or null if somehow it doesn't exist
  */
-export function getStoredImageOrCanvas(uuid?: string): HTMLImageElement | HTMLCanvasElement | null {
+export function getStoredImageOrCanvas(uuid?: string): ImageBitmap | HTMLCanvasElement | null {
     const storedImage = imageUuidMap.get(uuid);
-    return storedImage?.sourceCanvas ?? storedImage?.sourceImage ?? null;
+    return storedImage?.sourceCanvas ?? storedImage?.sourceBitmap ?? null;
 }
 
 /**
@@ -70,8 +83,8 @@ export function getStoredImageOrCanvas(uuid?: string): HTMLImageElement | HTMLCa
  */
 export async function getStoredImageCanvas(uuid?: string): Promise<HTMLCanvasElement | null> {
     const storedImage = imageUuidMap.get(uuid);
-    const image = storedImage?.sourceCanvas ?? storedImage?.sourceImage ?? null;
-    if (image instanceof HTMLImageElement) {
+    const image = storedImage?.sourceCanvas ?? storedImage?.sourceBitmap ?? null;
+    if (image instanceof ImageBitmap) {
         return await createCanvasFromImage(image);
     }
     return image ?? null;
@@ -86,17 +99,36 @@ export async function prepareStoredImageForEditing(uuid?: string): Promise<HTMLC
     const storedImage = imageUuidMap.get(uuid);
     if (!storedImage) return null;
     if (storedImage.sourceCanvas == null) {
-        let sourceImage: HTMLImageElement | undefined = undefined;
-        if (storedImage.sourceImage?.src && await isObjectUrlValid(storedImage.sourceImage.src)) {
-            sourceImage = storedImage.sourceImage;
-        } else if (storedImage.databaseUuid) {
-            sourceImage = await createImageFromBlob(await imageDatabase.get<Blob>(storedImage.databaseUuid));
+        let sourceBitmap = storedImage.sourceBitmap;
+        if (!sourceBitmap && storedImage.databaseUuid) {
+            const imageBlob = await imageDatabase.get<Blob>(storedImage.databaseUuid);
+            let width = 1;
+            let height = 1;
+            const imageBlobUrl = URL.createObjectURL(imageBlob);
+            await new Promise<void>((resolve) => {
+                const image = new Image();
+                image.src = imageBlobUrl;
+                image.onload = () => {
+                    width = image.width;
+                    height = image.height;
+                    resolve();
+                };
+                image.onerror = () => {
+                    resolve();
+                }
+            });
+            URL.revokeObjectURL(imageBlobUrl);
+            sourceBitmap = await createImageBitmap(
+                await imageDatabase.get<Blob>(storedImage.databaseUuid),
+                0, 0, width, height, {
+                    imageOrientation: canvasStore.get('renderer') === '2d' ? 'none' : 'flipY',
+                    premultiplyAlpha: 'none',
+                }
+            );
         }
-        if (!sourceImage) return null;
+        if (!sourceBitmap) return null;
         try {
-            const canvas = await createCanvasFromImage(sourceImage);
-            URL.revokeObjectURL(sourceImage.src);
-            storedImage.sourceImage = null;
+            const canvas = await createCanvasFromImage(sourceBitmap, { imageOrientation: 'flipY' });
             storedImage.sourceCanvas = canvas;
         } catch (error) {
             return null;
@@ -130,9 +162,9 @@ export async function prepareStoredImageForArchival(uuid?: string) {
     if (storedImage.previewCanvas) {
         storedImage.previewCanvas = null;
     }
-    if (storedImage.sourceImage) {
-        URL.revokeObjectURL(storedImage.sourceImage.src);
-        storedImage.sourceImage = null;
+    if (storedImage.sourceBitmap) {
+        storedImage.sourceBitmap.close();
+        storedImage.sourceBitmap = null;
     }
     if (storedImage.databaseUuid) {
         imageDatabase.delete(storedImage.databaseUuid);

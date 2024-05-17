@@ -224,6 +224,9 @@ const store = new PerformantStore<EditorStore>({
                 const themeNames = Object.keys(value);
                 if (themeNames.length > 0) {
                     let lastActiveThemeName = store.get('lastActiveThemeName');
+                    if (!lastActiveThemeName) {
+                        lastActiveThemeName = window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                    }
                     if (!themeNames.includes(lastActiveThemeName ?? '')) lastActiveThemeName = null;
                     await store.dispatch('setActiveTheme', lastActiveThemeName ?? themeNames[0]);
                 }

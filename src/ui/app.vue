@@ -2,6 +2,7 @@
     <div
         ref="root" class="opengraphica"
         :style="{ '--ogr-sidebar-left-size': sidebarLeftSize + 'px', '--ogr-sidebar-right-size': sidebarRightSize + 'px' }"
+        @scroll="onScrollRoot($event)"
         @touchstart="onTouchStartRoot($event)"
     >
         <template v-if="isMounted">
@@ -167,6 +168,12 @@ export default defineComponent({
             }
         }
 
+        function onScrollRoot(e: WheelEvent) {
+            if (e.target && (e.target as HTMLElement).scrollTop) {
+                (e.target as HTMLElement).scrollTop = 0;
+            }
+        }
+
         function onTouchStartRoot(e: TouchEvent) {
             if (e.touches.length > 1){
                 e.preventDefault();
@@ -240,6 +247,7 @@ export default defineComponent({
             onResizeLayoutContainer,
             showDndDropOverlay,
             dndDropOverlay,
+            onScrollRoot,
             onTouchStartRoot
         };
     }

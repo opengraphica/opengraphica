@@ -167,6 +167,15 @@ export function getImageDataFromCanvas(canvas: HTMLCanvasElement): ImageData {
 }
 
 /**
+ * Converts ImageBitmap to ImageData.
+ * @param bitmap The bitmap to convert.
+ * @returns The resulting ImageData.
+ */
+export function getImageDataFromImageBitmap(bitmap: ImageBitmap): ImageData {
+    return getImageDataFromCanvas(createCanvasFromImage(bitmap));
+}
+
+/**
  * Converts ImageData to HTMLImageElement.
  * @param imageData The image data to convert.
  * @returns The resulting image.
@@ -229,6 +238,26 @@ export async function createImageBlobFromCanvas(canvas: HTMLCanvasElement): Prom
             }
         }, 'image/png', 1);
     });
+}
+
+/**
+ * Converts an image bitmap to a PNG image blob.
+ * @param bitmap The image bitmap to convert
+ * @returns The new blob.
+ */
+export async function createImageBlobFromImageBitmap(bitmap: ImageBitmap): Promise<Blob> {
+    let canvas = document.createElement('canvas');
+    canvas.width = bitmap.width;
+    canvas.height = bitmap.height;
+    let ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
+    if (!ctx) {
+        return new Blob();
+    }
+    ctx.drawImage(bitmap, 0, 0);
+    const blob = await createImageBlobFromCanvas(canvas);
+    (canvas as unknown) = null;
+    ctx = null;
+    return blob;
 }
 
 /**
@@ -341,13 +370,23 @@ export function createEmptyCanvasWith2dContext(width: number, height: number): {
  * Creates an HTMLCanvasElement from the given HTMLImageElement.
  * @param image 
  */
-export async function createCanvasFromImage(image: HTMLImageElement): Promise<HTMLCanvasElement> {
+interface CreateCanvasFromImageOptions {
+    imageOrientation: 'none' | 'flipY';
+}
+export function createCanvasFromImage(image: HTMLImageElement | ImageBitmap, options?: CreateCanvasFromImageOptions): HTMLCanvasElement {
     let canvas = document.createElement('canvas');
     canvas.width = image.width;
     canvas.height = image.height;
     const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
     if (!ctx) throw new Error('Could not create canvas context');
     ctx.imageSmoothingEnabled = false;
+    ctx.save();
+    if (options?.imageOrientation === 'flipY') {
+        ctx.translate(0, image.height / 2);
+        ctx.scale(1, -1);
+        ctx.translate(0, -image.height / 2);
+    }
     ctx.drawImage(image, 0, 0);
+    ctx.restore();
     return canvas;
 }

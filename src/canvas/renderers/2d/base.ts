@@ -6,6 +6,7 @@ import workingFileStore from '@/store/working-file';
 import type { Camera, WebGLRenderer } from 'three';
 
 export default class BaseLayerRenderer implements WorkingFileLayerRenderer<ColorModel> {
+    renderMode: '2d' | 'webgl' = '2d';
     threejsScene = undefined;
     isAttached: boolean = false;
     order: number = 0;
