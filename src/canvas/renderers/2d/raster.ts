@@ -8,9 +8,9 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
         const isFlipY = layer.renderer.renderMode === 'webgl' && image instanceof ImageBitmap;
         if (isFlipY) {
             ctx.save();
-            ctx.translate(0, layer.width / 2);
+            ctx.translate(0, layer.height / 2);
             ctx.scale(1, -1);
-            ctx.translate(0, -layer.width);
+            ctx.translate(0, -layer.height / 2);
         }
         ctx.drawImage(
             image,

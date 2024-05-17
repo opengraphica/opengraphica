@@ -47,13 +47,6 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
 
     private brushShapeImage: HTMLImageElement | null = null;
 
-    private updateChunkBounds = {
-        minX: Infinity,
-        maxX: -Infinity,
-        minY: Infinity,
-        maxY: -Infinity,
-    };
-
     onEnter(): void {
         super.onEnter();
 
@@ -246,13 +239,6 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         // Create layer if one does not exist
         const startDrawReserveToken = createHistoryReserveToken();
         await historyStore.dispatch('reserve', { token: startDrawReserveToken });
-
-        this.updateChunkBounds = {
-            minX: Infinity,
-            maxX: -Infinity,
-            minY: Infinity,
-            maxY: -Infinity,
-        }
 
         const { width, height } = workingFileStore.state;
         let selectedLayers = getSelectedLayers();
