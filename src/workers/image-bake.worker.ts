@@ -14,6 +14,7 @@ self.onmessage = ({ data }: { data: FilterNewBakeRequest | FilterCancelBakeReque
             )
         });
         if (queueIndex > -1) {
+            // TODO - is this causing the queue to get hung up? Need to send a message back to main thread?
             instructionQueue.splice(queueIndex, 1);
         }
         instructionQueue.push(data);

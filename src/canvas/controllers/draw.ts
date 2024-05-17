@@ -6,6 +6,7 @@ import BaseCanvasMovementController from './base-movement';
 import { cursorHoverPosition, brushShape, brushColor, brushSize } from '../store/draw-state';
 
 import { decomposeMatrix } from '@/lib/dom-matrix';
+import { isOffscreenCanvasSupported } from '@/lib/feature-detection';
 import { isCtrlOrMetaKeyPressed } from '@/lib/keyboard';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import { createEmptyImage, createImageFromBlob, createEmptyCanvas, createEmptyCanvasWith2dContext } from '@/lib/image';
@@ -18,6 +19,7 @@ import historyStore, { createHistoryReserveToken, historyReserveQueueFree } from
 import workingFileStore, { getSelectedLayers, getLayerById, getLayerGlobalTransform } from '@/store/working-file';
 
 import DrawableCanvas from '@/canvas/renderers/drawable/canvas';
+import { prepareTextureCompositor } from '@/workers/texture-compositor.interface';
 
 import type { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
@@ -54,6 +56,10 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
 
     onEnter(): void {
         super.onEnter();
+
+        isOffscreenCanvasSupported().then((isSupported) => {
+            isSupported && prepareTextureCompositor();
+        });
 
         this.drawablePreviewCanvas = new DrawableCanvas({ scale: 1 });
         this.drawablePreviewCanvas.onDrawn((event) => {

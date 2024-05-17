@@ -153,6 +153,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                         renderer.copyTextureToTexture(new Vector2(updateX, sourceHeight - updateY - updateHeight), updateChunkTexture, this.sourceTexture);
                         updateChunkTexture.dispose();
                     }
+                    canvasStore.set('dirty', true);
                 }
             }
             // Re-upload the full image texture to the GPU, discard the old texture.

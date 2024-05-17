@@ -3,13 +3,14 @@ import canvasStore from '@/store/canvas';
 import preferencesStore from '@/store/preferences';
 import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import layerRenderers from '@/canvas/renderers';
+import { isOffscreenCanvasSupported } from '@/lib/feature-detection/offscreen-canvas';
+import { createCompositeTexture2d, prepareThreejsTexture } from '@/workers/texture-compositor.interface';
 
 import type {
     Camera, Scene, WebGLRenderer, TextureEncoding, OrthographicCamera, Mesh, Texture,
     MeshBasicMaterial, CanvasTexture, TextureFilter, WebGLRenderTarget, ShaderMaterial,
 } from 'three';
 import type { ImagePlaneGeometry } from '@/canvas/renderers/webgl/geometries/image-plane-geometry';
-import type { RenderPass } from '@/canvas/renderers/webgl/three/postprocessing/RenderPass';
 import type { EffectComposer } from '@/canvas/renderers/webgl/three/postprocessing/EffectComposer';
 import type { ClassType } from '@/types';
 
@@ -164,7 +165,7 @@ const drawImageWebglCache = {
     threejsRenderer: undefined as WebGLRenderer | undefined,
     threejsScene: undefined as Scene | undefined,
     threejsCamera: undefined as OrthographicCamera | undefined,
-    threejsRasterTextureMergeShaderMaterial: undefined as ShaderMaterial | undefined,
+    threejsRasterTextureCompositorShaderMaterial: undefined as ShaderMaterial | undefined,
     threejsPrepareGpuTextureShaderMaterial: undefined as ShaderMaterial | undefined,
     NearestFilter: undefined as TextureFilter | undefined,
     sRGBEncoding: undefined as TextureEncoding | undefined,
@@ -183,7 +184,7 @@ async function setupThreejsRenderer(width: number, height: number) {
     let {
         threejsCanvas, threejsRenderer, threejsScene, NearestFilter, sRGBEncoding, threejsCamera,
         Mesh, ImagePlaneGeometry, MeshBasicMaterial, CanvasTexture,
-        threejsRasterTextureMergeShaderMaterial, threejsPrepareGpuTextureShaderMaterial,
+        threejsRasterTextureCompositorShaderMaterial, threejsPrepareGpuTextureShaderMaterial,
     } = drawImageWebglCache;
 
     if (!NearestFilter || !sRGBEncoding) {
@@ -259,7 +260,7 @@ async function setupThreejsRenderer(width: number, height: number) {
     return {
         threejsCanvas, threejsRenderer, threejsScene, NearestFilter, sRGBEncoding, threejsCamera,
         Mesh, ImagePlaneGeometry, MeshBasicMaterial, CanvasTexture,
-        threejsRasterTextureMergeShaderMaterial, threejsPrepareGpuTextureShaderMaterial,
+        threejsRasterTextureCompositorShaderMaterial, threejsPrepareGpuTextureShaderMaterial,
     };
 }
 
@@ -276,7 +277,7 @@ export function cleanDrawImageWebglCache() {
     drawImageWebglCache.threejsCanvas = undefined;
     drawImageWebglCache.threejsRenderer = undefined;
     drawImageWebglCache.threejsScene = undefined;
-    drawImageWebglCache.threejsRasterTextureMergeShaderMaterial = undefined;
+    drawImageWebglCache.threejsRasterTextureCompositorShaderMaterial = undefined;
     drawImageWebglCache.threejsPrepareGpuTextureShaderMaterial = undefined;
     drawImageWebglCache.sRGBEncoding = undefined;
     drawImageWebglCache.threejsCamera = undefined;
@@ -289,9 +290,28 @@ export function cleanDrawImageWebglCache() {
 /**
  * Draws an image to a canvas using WebGL, which allows for alpha blending in linear RGB color space.
  */
-export async function drawImageToCanvas2d(targetCanvas: HTMLCanvasElement, sourceImage: HTMLCanvasElement, x: number, y: number) {
+export async function drawImageToCanvas2d(targetCanvas: HTMLCanvasElement, sourceImage: HTMLCanvasElement, x: number, y: number, blendMode: string = 'source-over') {
     const targetImageCtx = targetCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
     if (!targetImageCtx) return;
+
+    try {
+        if (await isOffscreenCanvasSupported()) {
+            const compositeBitmap = await createCompositeTexture2d(
+                targetCanvas,
+                sourceImage,
+                x,
+                y,
+                blendMode,
+            );
+            targetImageCtx.imageSmoothingEnabled = false;
+            targetImageCtx.clearRect(x, y, sourceImage.width, sourceImage.height);
+            targetImageCtx.drawImage(compositeBitmap, x, y);
+            return;
+        }
+    } catch (error) {
+        console.error(error);
+        // Continue to main thread flow below...
+    }
 
     const sourceCroppedTargetCanvas = document.createElement('canvas');
     sourceCroppedTargetCanvas.width = sourceImage.width;
@@ -302,7 +322,7 @@ export async function drawImageToCanvas2d(targetCanvas: HTMLCanvasElement, sourc
 
     let {
         threejsCanvas, threejsRenderer, threejsScene, NearestFilter, sRGBEncoding, threejsCamera,
-        Mesh, ImagePlaneGeometry, CanvasTexture, threejsRasterTextureMergeShaderMaterial,
+        Mesh, ImagePlaneGeometry, CanvasTexture, threejsRasterTextureCompositorShaderMaterial,
     } = await setupThreejsRenderer(sourceImage.width, sourceImage.height);
 
     const targetImageTexture = new CanvasTexture(sourceCroppedTargetCanvas);
@@ -317,19 +337,19 @@ export async function drawImageToCanvas2d(targetCanvas: HTMLCanvasElement, sourc
     sourceImageTexture.minFilter = NearestFilter;
     sourceImageTexture.magFilter = NearestFilter;
 
-    if (!threejsRasterTextureMergeShaderMaterial) {
-        const { createRasterTextureMergeShaderMaterial } = await import('@/canvas/renderers/webgl/shaders');
-        threejsRasterTextureMergeShaderMaterial = createRasterTextureMergeShaderMaterial(targetImageTexture, sourceImageTexture, 0, 0);
-        threejsRasterTextureMergeShaderMaterial.needsUpdate = true;
-        drawImageWebglCache.threejsRasterTextureMergeShaderMaterial = threejsRasterTextureMergeShaderMaterial;
+    if (!threejsRasterTextureCompositorShaderMaterial) {
+        const { createRasterTextureCompositorShaderMaterial } = await import('@/canvas/renderers/webgl/shaders');
+        threejsRasterTextureCompositorShaderMaterial = createRasterTextureCompositorShaderMaterial(targetImageTexture, sourceImageTexture, 0, 0, blendMode);
+        threejsRasterTextureCompositorShaderMaterial.needsUpdate = true;
+        drawImageWebglCache.threejsRasterTextureCompositorShaderMaterial = threejsRasterTextureCompositorShaderMaterial;
     } else {
-        const { updateRasterTextureMergeShaderMaterial } = await import('@/canvas/renderers/webgl/shaders');
-        updateRasterTextureMergeShaderMaterial(threejsRasterTextureMergeShaderMaterial, targetImageTexture, sourceImageTexture, 0, 0);
+        const { updateRasterTextureCompositorShaderMaterial } = await import('@/canvas/renderers/webgl/shaders');
+        updateRasterTextureCompositorShaderMaterial(threejsRasterTextureCompositorShaderMaterial, targetImageTexture, sourceImageTexture, 0, 0, blendMode);
     }
 
     const imageGeometry = new ImagePlaneGeometry(sourceImage.width, sourceImage.height);
 
-    const imagePlane = new Mesh(imageGeometry, threejsRasterTextureMergeShaderMaterial);
+    const imagePlane = new Mesh(imageGeometry, threejsRasterTextureCompositorShaderMaterial);
 
     threejsScene.add(imagePlane);
     threejsRenderer.render(threejsScene, threejsCamera);
@@ -350,6 +370,22 @@ export async function drawImageToCanvas2d(targetCanvas: HTMLCanvasElement, sourc
  * @param image HTML canvas to take image from.
  */
 export async function createThreejsTextureFromImage(image: HTMLCanvasElement | ImageBitmap): Promise<Texture> {
+
+    try {
+        if (await isOffscreenCanvasSupported()) {
+            const compositeBitmap = await prepareThreejsTexture(image);
+            let CanvasTexture = drawImageWebglCache.CanvasTexture;
+            if (!CanvasTexture) {
+                ({ CanvasTexture } = await import('three/src/textures/CanvasTexture'));
+                drawImageWebglCache.CanvasTexture = CanvasTexture;
+            }
+            return new CanvasTexture(compositeBitmap);
+        }
+    } catch (error) {
+        console.error(error);
+        // Continue to main thread flow below...
+    }
+
     let {
         threejsCanvas, threejsRenderer, threejsScene, NearestFilter, sRGBEncoding, threejsCamera,
         Mesh, ImagePlaneGeometry, CanvasTexture, threejsPrepareGpuTextureShaderMaterial,
