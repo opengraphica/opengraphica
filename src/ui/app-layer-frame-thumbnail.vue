@@ -9,6 +9,7 @@
 import { defineComponent, ref, computed, watch, toRefs, nextTick, PropType } from 'vue';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import editorStore from '@/store/editor';
+import { getStoredImageOrCanvas } from '@/store/image';
 import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { WorkingFileRasterSequenceLayer, ColorModel } from '@/types';
 
@@ -41,7 +42,7 @@ export default defineComponent({
 
         const thumbnailImageSrc = computed<string>(() => {
             const frame = props.layer.data.sequence[props.sequenceIndex];
-            if (!frame.thumbnailImageSrc && frame.image.sourceImage) {
+            if (!frame.thumbnailImageSrc && frame.image.sourceUuid) {
                 const canvas = document.createElement('canvas');
                 const layerWidth = props.layer.width;
                 const layerHeight = props.layer.height;
@@ -61,7 +62,7 @@ export default defineComponent({
                 canvas.height = thumbnailHeight;
                 let ctx: CanvasRenderingContext2D = canvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
                 ctx.scale(thumbnailScale, thumbnailScale);
-                ctx.drawImage(frame.image.sourceImage, 0, 0);
+                ctx.drawImage(getStoredImageOrCanvas(frame.image.sourceUuid), 0, 0);
                 frame.thumbnailImageSrc = canvas.toDataURL();
             }
             return frame.thumbnailImageSrc || '';

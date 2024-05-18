@@ -26,6 +26,7 @@ let isDrawingBuffer: { [key: number]: boolean } = {
 let canvas1Ctx2d: OffscreenCanvasRenderingContext2D;
 let canvas2Ctx2d: OffscreenCanvasRenderingContext2D;
 const drawableMap = new Map<string, DrawableInfo>();
+let pendingDrawRequest: DrawCanvasRequest | null = null;
 
 self.onmessage = ({ data }: { data: DrawQueueRequest }) => {
     if (data.type === 'CREATE_CANVAS') {
@@ -82,7 +83,11 @@ function removeDrawable(request: RemoveDrawableRequest) {
 
 function drawCanvas(request: DrawCanvasRequest) {
     const buffer = currentBuffer;
-    if (isDrawingBuffer[buffer]) return;
+    if (isDrawingBuffer[buffer]) {
+        pendingDrawRequest = request;
+        return;
+    }
+    pendingDrawRequest = null;
     isDrawingBuffer[buffer] = true;
     const canvas = currentBuffer === 1 ? canvas1 : canvas2;
     const canvasCtx = currentBuffer === 1 ? canvas1Ctx2d : canvas2Ctx2d;
@@ -143,6 +148,12 @@ function drawCanvas(request: DrawCanvasRequest) {
             sourceX: drawX,
             sourceY: drawY,
         } as DrawCompleteResult);
+
+        if (pendingDrawRequest) {
+            const drawRequest = pendingDrawRequest;
+            pendingDrawRequest = null;
+            drawCanvas(drawRequest);
+        }
     });
 }
 

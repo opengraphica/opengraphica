@@ -161,22 +161,19 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                 const sourceImage = await getStoredImageOrCanvas(updates.data.sourceUuid ?? '');
                 if (sourceImage) {
                     let newSourceTexture: Texture = await createThreejsTextureFromImage(sourceImage);
-                    this.sourceTexture?.dispose();
+                    this.disposeSourceTexture();
                     this.sourceTexture = newSourceTexture;
-                    this.sourceTexture.encoding = sRGBEncoding;
-                    this.sourceTexture.magFilter = NearestFilter;
+                    // this.sourceTexture.encoding = sRGBEncoding;
+                    // this.sourceTexture.magFilter = NearestFilter;
                     // TODO - maybe use a combination of LinearMipmapLinearFilter and LinearMipmapNearestFilter
                     // depending on the zoom level, one can appear sharper than the other.
-                    this.sourceTexture.minFilter = LinearMipmapLinearFilter;
+                    // this.sourceTexture.minFilter = LinearMipmapLinearFilter;
 
                     this.sourceTexture.needsUpdate = true;
                     this.material && (this.material.uniforms.map.value = this.sourceTexture);
                     canvasStore.set('dirty', true);
                 } else {
-                    if (this.sourceTexture) {
-                        this.sourceTexture.dispose();
-                        this.sourceTexture = undefined;
-                    }
+                    this.disposeSourceTexture();
                     this.material && (this.material.uniforms.map.value = null);
                 }
             }
@@ -192,12 +189,21 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
         this.material = undefined;
         this.draftTexture?.dispose();
         this.draftTexture = undefined;
-        this.sourceTexture?.dispose();
-        this.sourceTexture = undefined;
+        this.disposeSourceTexture();
         this.stopWatchVisible?.();
         this.stopWatchSize?.();
         this.stopWatchTransform?.();
         this.stopWatchFilters?.();
         this.stopWatchData?.();
+    }
+
+    private disposeSourceTexture() {
+        if (this.sourceTexture) {
+            if (this.sourceTexture.userData.shouldDisposeBitmap) {
+                this.sourceTexture.image?.close();
+            }
+            this.sourceTexture.dispose();
+            this.sourceTexture = undefined;
+        }
     }
 }

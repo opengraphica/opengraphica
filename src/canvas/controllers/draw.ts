@@ -370,6 +370,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
             this.drawingPoints = [];
             this.drawingOnLayers = [];
             this.drawingPointerId = null;
+
             const updateLayerReserveToken = createHistoryReserveToken();
 
             await historyReserveQueueFree();
