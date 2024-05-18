@@ -494,6 +494,9 @@ export async function createThreejsTextureFromImage(image: HTMLCanvasElement | I
                 threejsRenderer.setRenderTarget(null);
                 threejsScene.clear();
 
+                if (!isUseOriginalImage) {
+                    (chunkImage as ImageBitmap).close();
+                }
                 imageTexture.dispose();
 
                 const pixelBuffer = new Uint8Array(fittedChunkWidth * fittedChunkHeight * 4);

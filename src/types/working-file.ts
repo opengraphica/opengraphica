@@ -108,6 +108,7 @@ export interface WorkingFileLayerDraftChunk {
 }
 
 export interface WorkingFileLayerDraft {
+    uuid: string;
     lastUpdateTimestamp?: number;
     height: number; // The actual height drawn across on the canvas
     logicalHeight: number; // The pixel height of the preview data, stretched to `height`
@@ -120,7 +121,7 @@ export interface WorkingFileLayerDraft {
 export interface WorkingFileLayer<T extends ColorModel = ColorModel> {
     bakedImage: HTMLImageElement | null;
     blendingMode: WorkingFileLayerBlendingMode;
-    draft: WorkingFileLayerDraft | null;
+    drafts: WorkingFileLayerDraft[] | null;
     filters: WorkingFileLayerFilter<T>[];
     groupId: number | null;
     height: number;

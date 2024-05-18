@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { nextTick, watch, WatchStopHandle } from 'vue';
 import { Bezier } from 'bezier-js';
 
@@ -42,6 +43,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
     private drawingOnLayers: WorkingFileAnyLayer[] = [];
     private drawingPoints: DOMPoint[] = [];
 
+    private activeDraftUuid: string | null = null;
     private drawablePreviewCanvas: DrawableCanvas | null = null;
     private brushStrokeDrawableUuid: string | null = null;
 
@@ -57,15 +59,16 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         this.drawablePreviewCanvas = new DrawableCanvas({ scale: 1 });
         this.drawablePreviewCanvas.onDrawn((event) => {
             for (const layer of this.drawingOnLayers) {
-                if (!layer.draft) continue;
-                layer.draft.updateChunks.push({
+                const draftIndex = layer.drafts?.findIndex((draft) => draft.uuid === this.activeDraftUuid) ?? -1;
+                if (!layer.drafts?.[draftIndex]) continue;
+                layer.drafts[draftIndex].updateChunks.push({
                     x: event.sourceX,
                     y: event.sourceY,
                     width: event.canvas.width,
                     height: event.canvas.height,
                     data: event.canvas,
                 });
-                layer.draft.lastUpdateTimestamp = window.performance.now();
+                layer.drafts[draftIndex].lastUpdateTimestamp = window.performance.now();
             }
             canvasStore.set('dirty', true);
         });
@@ -187,7 +190,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
             (async () => {
                 await historyReserveQueueFree();
                 for (const layer of getSelectedLayers()) {
-                    layer.draft = null;
+                    layer.drafts = null;
                 }
             })();
             // this.drawingPointerId = this.touches[0].id;
@@ -294,26 +297,18 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
             const logicalWidth = Math.min(width, workingFileStore.get('width') * viewTransform.scaleX);
             const logicalHeight = Math.min(height, workingFileStore.get('height') * viewTransform.scaleY);
             if (layer.type === 'raster') {
-                if (!layer.draft) {
-                    layer.draft = {
-                        lastUpdateTimestamp: window.performance.now(),
-                        width,
-                        height,
-                        logicalWidth,
-                        logicalHeight,
-                        transform: layerGlobalTransformSelfExcluded.inverse(),
-                        updateChunks: [],
-                    };
-                } else {
-                    Object.assign(layer.draft, {
-                        lastUpdateTimestamp: window.performance.now(),
-                        width,
-                        height,
-                        logicalWidth,
-                        logicalHeight,
-                        transform: layerGlobalTransformSelfExcluded.inverse(),
-                    });
-                }
+                if (!layer.drafts) layer.drafts = [];
+                this.activeDraftUuid = uuidv4();
+                layer.drafts.push({
+                    uuid: this.activeDraftUuid,
+                    lastUpdateTimestamp: window.performance.now(),
+                    width,
+                    height,
+                    logicalWidth,
+                    logicalHeight,
+                    transform: layerGlobalTransformSelfExcluded.inverse(),
+                    updateChunks: [],
+                });
             }
         }
 
@@ -366,10 +361,12 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
             const points = this.drawingPoints.slice();
             const drawingOnLayers = this.drawingOnLayers.slice();
             const updateHistoryStartTimestamp = window.performance.now();
+            const draftId = this.activeDraftUuid;
 
             this.drawingPoints = [];
             this.drawingOnLayers = [];
             this.drawingPointerId = null;
+            this.activeDraftUuid = null;
 
             const updateLayerReserveToken = createHistoryReserveToken();
 
@@ -451,8 +448,9 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                 await historyStore.dispatch('unreserve', { token: updateLayerReserveToken });
             }
             for (const layer of drawingOnLayers) {
-                if (layer?.draft?.lastUpdateTimestamp ?? 0 < updateHistoryStartTimestamp) {
-                    layer.draft = null;
+                const draftIndex = layer.drafts?.findIndex((draft) => draft.uuid === draftId) ?? -1;
+                if (draftIndex > -1) {
+                    layer?.drafts?.splice(draftIndex, 1);
                 }
             }
         }

@@ -1,4 +1,4 @@
-import { nextTick, toRefs, watch, type WatchStopHandle } from 'vue';
+import { markRaw, nextTick, toRefs, watch, type WatchStopHandle } from 'vue';
 
 import canvasStore from '@/store/canvas';
 
@@ -17,21 +17,26 @@ import type {
     WorkingFileLayerFilter, WorkingFileLayerDraft
 } from '@/types';
 
+interface DraftAssets {
+    planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
+    planeMaterial: InstanceType<typeof ShaderMaterial> | undefined;
+    planeTexture: InstanceType<typeof CanvasTexture> | undefined;
+    planeTextureRenderingContext: CanvasRenderingContext2D | undefined;
+    plane: InstanceType<typeof Mesh> | undefined;
+    draftDestroyTimeoutHandle: number | undefined;
+    latestDraftUpdate: WorkingFileLayerDraft | null | undefined;
+}
+
 export default class BaseLayerRenderer implements WorkingFileLayerRenderer<ColorModel> {
     renderMode: '2d' | 'webgl' = 'webgl';
     threejsScene: Scene | undefined;
     isAttached: boolean = false;
     order: number = 0;
 
-    private stopWatchBaseDraft: WatchStopHandle | undefined;
-    protected draftPlaneGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
-    protected draftPlaneMaterial: InstanceType<typeof ShaderMaterial> | undefined;
-    protected draftPlaneTexture: InstanceType<typeof CanvasTexture> | undefined;
-    protected draftPlaneTextureRenderingContext: CanvasRenderingContext2D | undefined;
-    protected draftPlane: InstanceType<typeof Mesh> | undefined;
-    protected draftPlaneUseFilters: WorkingFileLayerFilter[] | undefined;
-    private draftDestroyTimeoutHandle: number | undefined;
-    private latestDraftUpdate: WorkingFileLayerDraft | null | undefined;
+    private stopWatchBaseDrafts: WatchStopHandle | undefined;
+    private draftPlaneUseFilters: WorkingFileLayerFilter[] = [];
+    private draftAssetMap: Map<string, DraftAssets> = markRaw(new Map());
+    private recycledDraftAssets: DraftAssets | null = null;
 
     private nextUpdatePromises: Array<Promise<void>> = [];
 
@@ -40,8 +45,12 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
         this.onReorder(order);
 
         // Handle draft logic
-        if (this.draftPlane) {
-            this.draftPlane.renderOrder = order + 0.2;
+        let orderIterator = 0;
+        for (const draft of this.draftAssetMap.values()) {
+            if (draft.plane) {
+                draft.plane.renderOrder = order + 0.2 + orderIterator;
+            }
+            orderIterator += 0.01;
         }
     }
     onReorder(order: number) {
@@ -58,9 +67,9 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
 
             // Handle draft logic
             try {
-                const { draft } = toRefs(layer);
-                this.stopWatchBaseDraft = watch([draft], ([draft]) => {
-                    this.update({ draft });
+                const { drafts } = toRefs(layer);
+                this.stopWatchBaseDrafts = watch([drafts], ([drafts]) => {
+                    this.update({ drafts });
                 }, { immediate: true, deep: true });
             } catch (error) {
                 console.error('[src/canvas/renderers/webgl/base.ts] Error setting up draft update watcher. ', error);
@@ -81,21 +90,10 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
                 console.error('[src/canvas/renderers/webgl/base.ts] Error during layer detach. ', error);
             }
 
-            // Handle draft logic
-            try {
-                this.draftPlaneGeometry?.dispose();
-                this.draftPlaneGeometry = undefined;
-                this.draftPlaneMaterial?.dispose();
-                this.draftPlaneMaterial = undefined;
-                this.draftPlaneTexture?.dispose();
-                this.draftPlaneTexture = undefined;
-                this.draftPlane && (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(this.draftPlane)
-                this.draftPlane = undefined;
-                this.threejsScene = undefined;
-                this.stopWatchBaseDraft?.();
-            } catch (error) {
-                console.error('[src/canvas/renderers/webgl/base.ts] Error disposing draft assets. ', error);
-            }
+            this.disposeAllDrafts();
+            this.draftAssetMap.clear();
+            this.threejsScene = undefined;
+            this.stopWatchBaseDrafts?.();
 
             this.isAttached = false;
         }
@@ -114,101 +112,104 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
             this.draftPlaneUseFilters = updates.filters;
             // TODO - could update the draft plane material here, but not really
             // expecting this to possibly change mid-draft creation?
-            this.draftPlaneMaterial?.dispose();
-            this.draftPlaneMaterial = undefined;
+            for (const draft of this.draftAssetMap.values()) {
+                draft.planeMaterial?.dispose();
+                draft.planeMaterial = undefined;
+            }
         }
 
         // Handle draft logic
-        if (updates.draft !== undefined) {
-            this.latestDraftUpdate = updates.draft;
-            window.clearTimeout(this.draftDestroyTimeoutHandle);
-            if (updates.draft == null) {
-                this.draftPlaneTextureRenderingContext?.clearRect(0, 0, this.draftPlaneTexture?.image?.width ?? 1, this.draftPlaneTexture?.image?.height ?? 1);
-                if (this.draftPlaneTexture) this.draftPlaneTexture.needsUpdate = true;
-                this.draftDestroyTimeoutHandle = window.setTimeout(() => {
-                    this.draftPlaneGeometry?.dispose();
-                    this.draftPlaneGeometry = undefined;
-                    this.draftPlaneMaterial?.dispose();
-                    this.draftPlaneMaterial = undefined;
-                    this.draftPlaneTexture?.dispose();
-                    this.draftPlaneTexture = undefined;
-                    this.draftPlaneTextureRenderingContext = undefined;
-                    this.draftPlane && (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(this.draftPlane)
-                    this.draftPlane = undefined;
-                }, 60000);
-            } else {
-                if (!this.draftPlaneMaterial) {
+        updateDrafts:
+        if (updates.drafts !== undefined) {
+            if (updates.drafts == null) {
+                this.disposeAllDrafts();
+                break updateDrafts;
+            }
+
+            let usedDraftIds = [];
+            let orderIterator = 0;
+            for (const draftUpdate of updates.drafts) {
+                usedDraftIds.push(draftUpdate.uuid);
+                let draftAssets = this.draftAssetMap.get(draftUpdate.uuid)!;
+
+                if (!draftAssets) {
+                    draftAssets = this.createDraftAssets();
+                    this.draftAssetMap.set(draftUpdate.uuid, draftAssets);
+                }
+
+                draftAssets.latestDraftUpdate = draftUpdate;
+
+                if (!draftAssets.planeMaterial) {
                     createFiltersFromLayerConfig(this.draftPlaneUseFilters ?? []).then((filterClasses) => {
                         const combinedShaderResult = combineShaders(
                             filterClasses,
-                            { width: updates.draft?.logicalWidth, height: updates.draft?.logicalHeight }
+                            { width: draftUpdate.logicalWidth, height: draftUpdate.logicalHeight }
                         );
-                        this.draftPlaneMaterial = createRasterShaderMaterial(null, combinedShaderResult);
-                        if (this.draftPlaneTexture) {
-                            this.draftPlaneMaterial.uniforms.map.value = this.draftPlaneTexture
+                        draftAssets.planeMaterial = createRasterShaderMaterial(null, combinedShaderResult);
+                        if (draftAssets.planeTexture) {
+                            draftAssets.planeMaterial.uniforms.map.value = draftAssets.planeTexture
                         }
-                        if (this.draftPlane) {
-                            this.draftPlane.material = this.draftPlaneMaterial;
+                        if (draftAssets.plane) {
+                            draftAssets.plane.material = draftAssets.planeMaterial;
                         }
-
                         canvasStore.set('dirty', true);
                     });
                 }
 
                 if (
-                    !this.draftPlaneGeometry ||
-                    (this.draftPlaneGeometry?.parameters.width !== updates.draft.width) ||
-                    (this.draftPlaneGeometry?.parameters.height !== updates.draft.height)
+                    !draftAssets.planeGeometry ||
+                    (draftAssets.planeGeometry?.parameters.width !== draftUpdate.width) ||
+                    (draftAssets.planeGeometry?.parameters.height !== draftUpdate.height)
                 ) {
-                    this.draftPlaneGeometry?.dispose();
-                    this.draftPlaneGeometry = new ImagePlaneGeometry(updates.draft.width, updates.draft.height);
-                    if (this.draftPlane) {
-                        this.draftPlane.geometry = this.draftPlaneGeometry;
+                    draftAssets.planeGeometry?.dispose();
+                    draftAssets.planeGeometry = new ImagePlaneGeometry(draftUpdate.width, draftUpdate.height);
+                    if (draftAssets.plane) {
+                        draftAssets.plane.geometry = draftAssets.planeGeometry;
                     }
 
                     canvasStore.set('dirty', true);
                 }
 
-                if (!this.draftPlane) {
-                    this.draftPlane = new Mesh(this.draftPlaneGeometry, this.draftPlaneMaterial);
-                    this.draftPlane.renderOrder = this.order + 0.2;
-                    this.draftPlane.matrixAutoUpdate = false;
-                    this.draftPlane.onBeforeRender = (renderer) => {
-                        this.applyDraftUpdateChunks(renderer);
+                if (!draftAssets.plane) {
+                    draftAssets.plane = new Mesh(draftAssets.planeGeometry, draftAssets.planeMaterial);
+                    draftAssets.plane.renderOrder = this.order + 0.2;
+                    draftAssets.plane.matrixAutoUpdate = false;
+                    draftAssets.plane.onBeforeRender = (renderer) => {
+                        this.applyDraftUpdateChunks(renderer, draftUpdate.uuid);
                     };
-                    (this.threejsScene ?? canvasStore.get('threejsScene'))?.add(this.draftPlane);
+                    (this.threejsScene ?? canvasStore.get('threejsScene'))?.add(draftAssets.plane);
 
                     canvasStore.set('dirty', true);
                 }
 
-                const logicalWidth = Math.round(updates.draft.logicalWidth);
-                const logicalHeight = Math.round(updates.draft.logicalHeight);
+                const logicalWidth = Math.round(draftUpdate.logicalWidth);
+                const logicalHeight = Math.round(draftUpdate.logicalHeight);
 
                 if (
-                    !this.draftPlaneTexture ||
-                    (this.draftPlaneTexture?.image?.width !== logicalWidth) ||
-                    (this.draftPlaneTexture?.image?.height !== logicalHeight)
+                    !draftAssets.planeTexture ||
+                    (draftAssets.planeTexture?.image?.width !== logicalWidth) ||
+                    (draftAssets.planeTexture?.image?.height !== logicalHeight)
                 ) {
                     const draftPlaneCanvas = document.createElement('canvas');
                     draftPlaneCanvas.width = logicalWidth;
                     draftPlaneCanvas.height = logicalHeight;
-                    this.draftPlaneTextureRenderingContext = draftPlaneCanvas.getContext('2d') ?? undefined;
+                    draftAssets.planeTextureRenderingContext = draftPlaneCanvas.getContext('2d') ?? undefined;
 
-                    if (this.draftPlaneTextureRenderingContext) {
-                        this.draftPlaneTexture = new CanvasTexture(draftPlaneCanvas);
-                        this.draftPlaneTexture.generateMipmaps = false;
-                        this.draftPlaneTexture.encoding = sRGBEncoding;
-                        this.draftPlaneTexture.magFilter = NearestFilter;
-                        this.draftPlaneTexture.minFilter = LinearMipmapLinearFilter;
-                        this.draftPlaneMaterial && (this.draftPlaneMaterial.uniforms.map.value = this.draftPlaneTexture);
+                    if (draftAssets.planeTextureRenderingContext) {
+                        draftAssets.planeTexture = new CanvasTexture(draftPlaneCanvas);
+                        draftAssets.planeTexture.generateMipmaps = false;
+                        draftAssets.planeTexture.encoding = sRGBEncoding;
+                        draftAssets.planeTexture.magFilter = NearestFilter;
+                        draftAssets.planeTexture.minFilter = LinearMipmapLinearFilter;
+                        draftAssets.planeMaterial && (draftAssets.planeMaterial.uniforms.map.value = draftAssets.planeTexture);
 
                         canvasStore.set('dirty', true);
                     }
                 }
 
-                if (updates.draft.transform) {
-                    const transform = updates.draft.transform;
-                    this.draftPlane?.matrix.set(
+                if (draftUpdate.transform) {
+                    const transform = draftUpdate.transform;
+                    draftAssets.plane?.matrix.set(
                         transform.m11, transform.m21, transform.m31, transform.m41,
                         transform.m12, transform.m22, transform.m32, transform.m42,
                         transform.m13, transform.m23, transform.m33, transform.m43, 
@@ -216,8 +217,22 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
                     );
                 }
 
-                if (updates.draft.updateChunks.length > 0) {
+                if (draftUpdate.updateChunks.length > 0) {
                     canvasStore.set('dirty', true);
+                }
+
+                if (draftAssets.plane) {
+                    draftAssets.plane.renderOrder = this.order + 0.2 + orderIterator;
+                }
+                orderIterator += 0.01;
+            }
+
+            // Remove unused drafts.
+            for (const uuid of this.draftAssetMap.keys()) {
+                if (!usedDraftIds.includes(uuid)) {
+                    setTimeout(() => {
+                        this.recycleDraftById(uuid);
+                    }, 0);
                 }
             }
         }
@@ -246,16 +261,92 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
         // Override
     }
 
-    private applyDraftUpdateChunks(renderer?: WebGLRenderer) {
-        const draft = this.latestDraftUpdate;
-        if (!draft || !this.draftPlaneTexture || !this.draftPlaneTextureRenderingContext) return;
+    private applyDraftUpdateChunks(renderer: WebGLRenderer, draftUuid: string) {
+        const draftAssets = this.draftAssetMap.get(draftUuid);
+        if (!draftAssets) return;
+        const draft = draftAssets.latestDraftUpdate;
+        if (!draft || !draftAssets.planeTexture || !draftAssets.planeTextureRenderingContext) return;
         renderer = renderer ?? canvasStore.get('threejsRenderer')!;
         for (const chunk of draft.updateChunks) {
-            this.draftPlaneTextureRenderingContext.clearRect(chunk.x, chunk.y, chunk.width, chunk.height);
-            this.draftPlaneTextureRenderingContext.drawImage(chunk.data, chunk.x, chunk.y);
-            this.draftPlaneTexture.needsUpdate = true;
+            draftAssets.planeTextureRenderingContext.clearRect(chunk.x, chunk.y, chunk.width, chunk.height);
+            draftAssets.planeTextureRenderingContext.drawImage(chunk.data, chunk.x, chunk.y);
+            draftAssets.planeTexture.needsUpdate = true;
         }
         draft.updateChunks = [];
+    }
+
+    private createDraftAssets(): DraftAssets {
+        if (this.recycledDraftAssets) {
+            const draftAssets = this.recycledDraftAssets;
+            window.clearTimeout(draftAssets.draftDestroyTimeoutHandle);
+            draftAssets.draftDestroyTimeoutHandle = undefined;
+            this.recycledDraftAssets = null;
+            return draftAssets;
+        }
+        return {
+            planeGeometry: undefined,
+            planeMaterial: undefined,
+            planeTexture: undefined,
+            planeTextureRenderingContext: undefined,
+            plane: undefined,
+            draftDestroyTimeoutHandle: undefined,
+            latestDraftUpdate: undefined,
+        };
+    }
+
+    private disposeAllDrafts() {
+        for (const uuid of this.draftAssetMap.keys()) {
+            this.disposeDraftById(uuid);
+        }
+        if (this.recycledDraftAssets) {
+            this.disposeDraft(this.recycledDraftAssets);
+            this.recycledDraftAssets = null;
+        }
+    }
+
+    private recycleDraftById(uuid: string) {
+        if (!this.recycledDraftAssets) {
+            this.recycledDraftAssets = this.draftAssetMap.get(uuid) ?? null;
+            if (this.recycledDraftAssets) {
+                const recycledAssets = this.recycledDraftAssets;
+                recycledAssets.planeTextureRenderingContext?.clearRect(0, 0, recycledAssets.planeTexture?.image?.width ?? 1, recycledAssets.planeTexture?.image?.height ?? 1);
+                if (recycledAssets.planeTexture) recycledAssets.planeTexture.needsUpdate = true;
+                recycledAssets.latestDraftUpdate = null;
+                recycledAssets.plane && (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(recycledAssets.plane)
+                recycledAssets.plane = undefined;
+                recycledAssets.draftDestroyTimeoutHandle = window.setTimeout(() => {
+                    this.disposeDraft(recycledAssets);
+                    if (this.recycledDraftAssets === recycledAssets) {
+                        this.recycledDraftAssets = null;
+                    }
+                }, 60000);
+            }
+            this.draftAssetMap.delete(uuid);
+        } else {
+            this.disposeDraftById(uuid);
+        }
+    }
+
+    private disposeDraftById(uuid: string) {
+        try {
+            const draft = this.draftAssetMap.get(uuid);
+            if (draft) {
+                this.disposeDraft(draft);
+                this.draftAssetMap.delete(uuid);
+            }
+        } catch (error) {
+            console.error('[src/canvas/renderers/webgl/base.ts] Error disposing draft assets. ', error);
+        }
+    }
+
+    private disposeDraft(draftAssets: DraftAssets) {
+        draftAssets.planeGeometry?.dispose();
+        (draftAssets.planeGeometry as unknown) = undefined;
+        draftAssets.planeMaterial?.dispose();
+        draftAssets.planeMaterial = undefined;
+        draftAssets.planeTexture?.dispose();
+        (draftAssets.planeTexture as unknown) = undefined;
+        draftAssets.plane && (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(draftAssets.plane)
     }
 
 }

@@ -59,7 +59,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                 type: 'raster',
                 bakedImage: null,
                 blendingMode: 'source-over',
-                draft: null,
+                drafts: null,
                 filters: [],
                 id: layerId,
                 groupId: null,
