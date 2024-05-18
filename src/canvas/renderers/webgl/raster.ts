@@ -150,9 +150,16 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                         }
                         // Copy update data to existing texture.
                         const updateChunkTexture = await createThreejsTextureFromImage(updateCanvas);
+
                         renderer.copyTextureToTexture(new Vector2(updateX, sourceHeight - updateY - updateHeight), updateChunkTexture, this.sourceTexture);
                         updateChunkTexture.dispose();
                     }
+                    // Update the image source of the texture, needed for exporting. Don't mark as needsUpdate so not to trigger a re-upload.
+                    if (this.sourceTexture.userData.shouldDisposeBitmap && this.sourceTexture.image instanceof ImageBitmap) {
+                        this.sourceTexture.image.close();
+                        this.sourceTexture.userData.shouldDisposeBitmap = false;
+                    }
+                    this.sourceTexture.image = sourceCanvas ?? await getStoredImageOrCanvas(updates.data.sourceUuid);
                     canvasStore.set('dirty', true);
                 }
             }

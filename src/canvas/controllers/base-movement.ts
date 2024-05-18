@@ -8,6 +8,7 @@ export default class BaseCanvasMovementController extends BaseCanvasController {
 
     protected lastCursorX: number = 0;
     protected lastCursorY: number = 0;
+
     protected moveTranslateStart: DOMPoint | null = null;
     protected moveTouchDistanceStart: number = 0;
     protected moveTouchDistanceLatest: number = 0;
@@ -19,7 +20,7 @@ export default class BaseCanvasMovementController extends BaseCanvasController {
 
     constructor() {
         super();
-        this.zoomCanvas = throttle(this.zoomCanvas, 20);
+        // this.zoomCanvas = throttle(this.zoomCanvas, 40);
     }
 
     onPointerDown(e: PointerEvent): void {
@@ -163,11 +164,64 @@ export default class BaseCanvasMovementController extends BaseCanvasController {
 
     onWheel(e: WheelEvent): void {
         super.onWheel(e);
-        const delta = e.deltaY ? e.deltaY/40 : -e.detail ? e.detail : 0;
+
+        const wheelSpeed = this.normalizeWheel(e);
+
+        const delta = wheelSpeed.pixelY;
+
         if (delta) {
-            this.zoomCanvas(-delta / Math.abs(delta));
+            this.zoomCanvas(-delta / 80.0);
         }
+
         e.preventDefault();
+    }
+
+    protected normalizeWheel(event: WheelEvent | any) {
+        let pixelStep = 10;
+        let lineHeight = 40;
+        let pageHeight = 800;
+    
+        let sX = 0, sY = 0, // spinX, spinY
+            pX = 0, pY = 0; // pixelX, pixelY
+    
+        // Legacy
+        if ('detail' in event) { sY = event.detail; }
+        if ('wheelDelta' in event) { sY = -event.wheelDelta / 120; }
+        if ('wheelDeltaY' in event) { sY = -event.wheelDeltaY / 120; }
+        if ('wheelDeltaX' in event) { sX = -event.wheelDeltaX / 120; }
+    
+        // Side scrolling on FF with DOMMouseScroll
+        if ('axis' in event && event.axis === event.HORIZONTAL_AXIS) {
+            sX = sY;
+            sY = 0;
+        }
+    
+        pX = sX * pixelStep;
+        pY = sY * pixelStep;
+    
+        if ('deltaY' in event) { pY = event.deltaY; }
+        if ('deltaX' in event) { pX = event.deltaX; }
+    
+        if ((pX || pY) && event.deltaMode) {
+            if (event.deltaMode == 1) { // delta in LINE units
+                pX *= lineHeight;
+                pY *= lineHeight;
+            } else { // delta in PAGE units
+                pX *= pageHeight;
+                pY *= pageHeight;
+            }
+        }
+    
+        // Fall-back if spin cannot be determined
+        if (pX && !sX) { sX = (pX < 1) ? -1 : 1; }
+        if (pY && !sY) { sY = (pY < 1) ? -1 : 1; }
+    
+        return {
+            spinX: sX,
+            spinY: sY,
+            pixelX: pX,
+            pixelY: pY
+        };
     }
 
     protected zoomCanvas(clicks: number) {
