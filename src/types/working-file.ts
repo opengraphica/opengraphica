@@ -101,8 +101,6 @@ export interface WorkingFileTimeline {
 export interface WorkingFileLayerDraftChunk {
     x: number;
     y: number;
-    width: number;
-    height: number;
     data: HTMLCanvasElement;
     mode?: 'replace' | 'source-over';
 }

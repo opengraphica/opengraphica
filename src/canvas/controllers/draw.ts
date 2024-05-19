@@ -5,6 +5,7 @@ import { Bezier } from 'bezier-js';
 import { PointerTracker } from './base';
 import BaseCanvasMovementController from './base-movement';
 import { cursorHoverPosition, brushShape, brushColor, brushSize } from '../store/draw-state';
+import { blitActiveSelectionMask, activeSelectionMask, appliedSelectionMask } from '../store/selection-state';
 
 import { decomposeMatrix } from '@/lib/dom-matrix';
 import { isOffscreenCanvasSupported } from '@/lib/feature-detection';
@@ -65,8 +66,6 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                 layer.drafts[draftIndex].updateChunks.push({
                     x: event.sourceX,
                     y: event.sourceY,
-                    width: event.canvas.width,
-                    height: event.canvas.height,
                     data: event.canvas,
                 });
                 layer.drafts[draftIndex].lastUpdateTimestamp = window.performance.now();
@@ -419,6 +418,12 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                     drawableCanvas.dispose();
                     
                     if (layerUpdateCanvas) {
+                        if (activeSelectionMask.value || appliedSelectionMask.value) {
+                            const layerGlobalTransform = getLayerGlobalTransform(layer.id);
+                            const layerTransform = new DOMMatrix().translateSelf(sourceX, sourceY).multiplySelf(layerGlobalTransform);
+                            layerUpdateCanvas = await blitActiveSelectionMask(layerUpdateCanvas, layerTransform);
+                        }
+
                         layerActions.push(
                             new UpdateLayerAction<UpdateRasterLayerOptions>({
                                 id: layer.id,
@@ -426,8 +431,6 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                                     updateChunks: [{
                                         x: sourceX,
                                         y: sourceY,
-                                        width: layerUpdateCanvas.width,
-                                        height: layerUpdateCanvas.height,
                                         data: layerUpdateCanvas,
                                         mode: 'source-over',
                                     }],

@@ -77,7 +77,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                         if (this.oldRasterUpdateChunks.length != this.newRasterUpdateChunks.length) {
                             this.oldRasterUpdateChunks = markRaw([]);
                             for (const updateChunk of this.newRasterUpdateChunks) {
-                                const { canvas: oldChunkCanvas, ctx: oldChunkCtx } = createEmptyCanvasWith2dContext(updateChunk.width, updateChunk.height);
+                                const { canvas: oldChunkCanvas, ctx: oldChunkCtx } = createEmptyCanvasWith2dContext(updateChunk.data.width, updateChunk.data.height);
                                 if (!oldChunkCtx) break;
                                 // Need to wait before accessing sourceCanvas image data (ctx.drawImage) in order to prevent rendering bug in Firefox.
                                 await new Promise<void>((resolve, reject) => {
@@ -85,19 +85,19 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                                         try {
                                             oldChunkCtx.globalCompositeOperation = 'source-over';
                                             oldChunkCtx.imageSmoothingEnabled = false;
-                                            oldChunkCtx.drawImage(sourceCanvas, updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height, 0, 0, updateChunk.width, updateChunk.height);
+                                            oldChunkCtx.drawImage(sourceCanvas, updateChunk.x, updateChunk.y, updateChunk.data.width, updateChunk.data.height, 0, 0, updateChunk.data.width, updateChunk.data.height);
                                             resolve();
                                         } catch (error) {
                                             reject();
                                         }
                                     }, 0);
                                 });
-                                this.oldRasterUpdateChunks.push({ data: oldChunkCanvas, x: updateChunk.x, y: updateChunk.y, width: updateChunk.width, height: updateChunk.height });
+                                this.oldRasterUpdateChunks.push({ data: oldChunkCanvas, x: updateChunk.x, y: updateChunk.y });
                                 if (updateChunk.mode === 'replace') {
                                     sourceCtx.globalCompositeOperation = 'source-over';
                                     sourceCtx.imageSmoothingEnabled = false;
-                                    sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
-                                    sourceCtx.drawImage(updateChunk.data, 0, 0, updateChunk.width, updateChunk.height, updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
+                                    sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.data.width, updateChunk.data.height);
+                                    sourceCtx.drawImage(updateChunk.data, 0, 0, updateChunk.data.width, updateChunk.data.height, updateChunk.x, updateChunk.y, updateChunk.data.width, updateChunk.data.height);
                                 } else {
                                     await drawImageToCanvas2d(sourceCanvas, updateChunk.data, updateChunk.x, updateChunk.y);
                                 }
@@ -109,8 +109,8 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                                 if (updateChunk.mode === 'replace') {
                                     sourceCtx.globalCompositeOperation = 'source-over';
                                     sourceCtx.imageSmoothingEnabled = false;
-                                    sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
-                                    sourceCtx.drawImage(updateChunk.data, 0, 0, updateChunk.width, updateChunk.height, updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
+                                    sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.data.width, updateChunk.data.height);
+                                    sourceCtx.drawImage(updateChunk.data, 0, 0, updateChunk.data.width, updateChunk.data.height, updateChunk.x, updateChunk.y, updateChunk.data.width, updateChunk.data.height);
                                 } else {
                                     await drawImageToCanvas2d(sourceCanvas, updateChunk.data, updateChunk.x, updateChunk.y);
                                 }
@@ -196,8 +196,8 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                         sourceCtx.setTransform(1, 0, 0, 1, 0, 0);
                         sourceCtx.globalCompositeOperation = 'source-over';
                         sourceCtx.imageSmoothingEnabled = false;
-                        sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
-                        sourceCtx.drawImage(updateChunk.data, 0, 0, updateChunk.width, updateChunk.height, updateChunk.x, updateChunk.y, updateChunk.width, updateChunk.height);
+                        sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateChunk.data.width, updateChunk.data.height);
+                        sourceCtx.drawImage(updateChunk.data, 0, 0, updateChunk.data.width, updateChunk.data.height, updateChunk.x, updateChunk.y, updateChunk.data.width, updateChunk.data.height);
                     }
                     prepareStoredImageForArchival(layer.data.sourceUuid);
                     layer.data.updateChunks = [...this.oldRasterUpdateChunks];

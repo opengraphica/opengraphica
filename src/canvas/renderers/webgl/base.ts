@@ -4,6 +4,7 @@ import canvasStore from '@/store/canvas';
 
 import { createRasterShaderMaterial } from './shaders';
 import { createFiltersFromLayerConfig, combineShaders } from '../../filters';
+import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 
 import { NearestFilter, LinearEncoding, LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, sRGBEncoding, RGBAFormat, UnsignedByteType } from 'three/src/constants';
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
@@ -197,7 +198,6 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
                     draftPlaneCanvas.height = logicalHeight;
                     draftAssets.planeTextureRenderingContext = draftPlaneCanvas.getContext('2d') ?? undefined;
 
-                    // if (draftAssets.planeTextureRenderingContext) {
                     draftAssets.planeTexture = new CanvasTexture(draftPlaneCanvas);
                     draftAssets.planeTexture.premultiplyAlpha = false;
                     draftAssets.planeTexture.generateMipmaps = false;
@@ -208,7 +208,6 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
                     draftAssets.planeMaterial && (draftAssets.planeMaterial.uniforms.map.value = draftAssets.planeTexture);
 
                     canvasStore.set('dirty', true);
-                    // }
                 }
 
                 if (draftUpdate.transform) {
@@ -277,17 +276,28 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
         for (const chunk of draft.updateChunks) {
             let chunkImage: HTMLCanvasElement | ImageBitmap = chunk.data;
 
+            if (chunk.x > draftWidth || chunk.y > draftHeight) continue;
+
             let shouldCloseChunkImage = false;
-            let chunkWidth = chunk.width;
-            let chunkHeight = chunk.height;
-            if (chunk.x + chunk.width > draftWidth || chunk.y + chunk.height > draftHeight) {
-                chunkWidth = Math.min(chunk.width, draftWidth - chunk.x);
-                chunkHeight = Math.min(chunk.height, draftHeight - chunk.y);
-                chunkImage = await createImageBitmap(chunkImage, 0, 0, chunkWidth, chunkHeight, {
-                    imageOrientation: 'flipY',
-                    premultiplyAlpha: 'none',
-                })
-                shouldCloseChunkImage = true;
+            let chunkWidth = chunk.data.width;
+            let chunkHeight = chunk.data.height;
+            if (chunk.x + chunk.data.width > draftWidth || chunk.y + chunk.data.height > draftHeight) {
+                chunkWidth = Math.min(chunk.data.width, draftWidth - chunk.x);
+                chunkHeight = Math.min(chunk.data.height, draftHeight - chunk.y);
+                const canvas = document.createElement('canvas');
+                canvas.width = chunkWidth;
+                canvas.height = chunkHeight;
+                const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
+                if (!ctx) {
+                    chunkImage = await createImageBitmap(chunkImage, 0, 0, chunkWidth, chunkHeight, {
+                        imageOrientation: 'flipY',
+                        premultiplyAlpha: 'none',
+                    });
+                    shouldCloseChunkImage = true;
+                } else {
+                    ctx.drawImage(chunkImage, 0, 0);
+                    chunkImage = canvas;
+                }
             }
 
             const chunkTexture = new CanvasTexture(chunkImage);
@@ -298,6 +308,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
             chunkTexture.minFilter = NearestFilter;
             chunkTexture.magFilter = NearestFilter;
 
+            // This will re-upload entire texture to GPU. Slow.
             // draftAssets.planeTextureRenderingContext.clearRect(chunk.x, chunk.y, chunk.width, chunk.height);
             // draftAssets.planeTextureRenderingContext.drawImage(chunk.data, chunk.x, chunk.y);
             // draftAssets.planeTexture.needsUpdate = true;

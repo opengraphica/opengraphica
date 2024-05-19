@@ -125,7 +125,9 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                     let sourceCanvas: HTMLCanvasElement | ImageBitmap | null = null;
                     const { width: sourceWidth, height: sourceHeight } = this.sourceTexture.image;
                     for (const updateChunk of updates.data.updateChunks) {
-                        let { x: updateX, y: updateY, width: updateWidth, height: updateHeight, data: updateCanvas } = updateChunk;
+                        let { x: updateX, y: updateY, data: updateCanvas } = updateChunk;
+                        let updateWidth = updateCanvas.width;
+                        let updateHeight = updateCanvas.height;
                         // Clip update data to destination image bounds, or use original image if not replace mode.
                         if (updateX < 0 || updateY < 0 || updateX + updateWidth > sourceWidth || updateY + updateHeight > sourceHeight || updateChunk.mode !== 'replace') {
                             const shiftX = Math.min(0, updateX);
@@ -149,7 +151,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                             updateCanvas = newUpdateCanvas;
                         }
                         // Copy update data to existing texture.
-                        const updateChunkTexture = await createThreejsTextureFromImage(updateCanvas);
+                        const updateChunkTexture = await createThreejsTextureFromImage(updateCanvas, { preferWorkerThread: true });
                         renderer.copyTextureToTexture(new Vector2(updateX, sourceHeight - updateY - updateHeight), updateChunkTexture, this.sourceTexture);
                         updateChunkTexture.dispose();
                     }

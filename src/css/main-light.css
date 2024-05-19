@@ -9803,6 +9803,7 @@ body.ogr-full-page .opengraphica {
   background: transparent;
   box-shadow: none;
   position: absolute;
+  pointer-events: none;
   width: auto;
   left: max(.5rem, var(--ogr-sidebar-left-size, .5rem));
   right: max(.5rem, var(--ogr-sidebar-right-size, .5rem));
@@ -9815,10 +9816,14 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-toolbar.is-overlay.is-swap-in {
   animation: ogr-toolbar-overlay-fade-in 0.2s ease-in forwards;
 }
+.opengraphica .ogr-toolbar.is-overlay > .container {
+  pointer-events: none;
+}
 .opengraphica .ogr-toolbar.is-overlay .ogr-toolbar-overlay {
   background: var(--ogr-layout-menu-bar-background-color);
   box-shadow: 0 0 0px 1px var(--ogr-layout-menu-bar-border-color), 0 0.3rem 2rem var(--ogr-layout-menu-bar-border-color);
   padding: 0;
+  pointer-events: all;
   overflow: hidden;
   padding: 0;
   display: flex;

@@ -79,8 +79,6 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
                             updateChunks: [{
                                 x: topLeft.x,
                                 y: topLeft.y,
-                                width: updateChunkImage.width,
-                                height: updateChunkImage.height,
                                 data: updateChunkImage,
                                 mode: 'replace',
                             }],

@@ -395,23 +395,28 @@ export async function drawImageToCanvas2d(targetCanvas: HTMLCanvasElement, sourc
  * of the visible pixels they sit nearby. This avoids mip-map artifacts.
  * @param image HTML canvas to take image from.
  */
-export async function createThreejsTextureFromImage(image: HTMLCanvasElement | ImageBitmap): Promise<Texture> {
+interface CreateThreejsTextureFromImageOptions {
+    preferWorkerThread?: boolean;
+}
+export async function createThreejsTextureFromImage(image: HTMLCanvasElement | ImageBitmap, options?: CreateThreejsTextureFromImageOptions): Promise<Texture> {
 
     // This offscreen dilation is way too slow
-    // try {
-    //     if (await isOffscreenCanvasSupported()) {
-    //         const compositeBitmap = await prepareThreejsTexture(image);
-    //         let CanvasTexture = drawImageWebglCache.CanvasTexture;
-    //         if (!CanvasTexture) {
-    //             ({ CanvasTexture } = await import('three/src/textures/CanvasTexture'));
-    //             drawImageWebglCache.CanvasTexture = CanvasTexture;
-    //         }
-    //         return new CanvasTexture(compositeBitmap);
-    //     }
-    // } catch (error) {
-    //     console.error(error);
-    //     // Continue to main thread flow below...
-    // }
+    if (options?.preferWorkerThread) {
+        try {
+            if (await isOffscreenCanvasSupported()) {
+                const compositeBitmap = await prepareThreejsTexture(image);
+                let CanvasTexture = drawImageWebglCache.CanvasTexture;
+                if (!CanvasTexture) {
+                    ({ CanvasTexture } = await import('three/src/textures/CanvasTexture'));
+                    drawImageWebglCache.CanvasTexture = CanvasTexture;
+                }
+                return new CanvasTexture(compositeBitmap);
+            }
+        } catch (error) {
+            console.error(error);
+            // Continue to main thread flow below...
+        }
+    }
 
     let preparedImage!: ImageBitmap | HTMLCanvasElement;
 
