@@ -70,13 +70,7 @@ export default class DrawableCanvas {
             try {
                 this.offscreenCanvasUuid = await createDrawableCanvas({
                     onDrawn: (event) => {
-                        // TODO: Improve performance. This syncs the canvas updates with the main thread rendering,
-                        // but is probably unnecessarily slow. Already waiting on requestAnimationFrame() from inside
-                        // the worker before this code runs. I tried checking canvasStore.state.dirty to render
-                        // immediately, but that ends up with artifacts sometimes where canvas chunks go missing.
-                        requestAnimationFrame(() => {
-                            this.onOffscreenCanvasDrawn(event);
-                        });
+                        this.onOffscreenCanvasDrawn(event);
                     }
                 });
             } catch (error) {

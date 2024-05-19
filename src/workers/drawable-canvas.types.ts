@@ -46,6 +46,7 @@ export interface InitializedResult {
 export interface DrawCompleteResult {
     type: 'DRAW_COMPLETE_RESULT';
     buffer: number;
+    bitmap: ImageBitmap;
     sourceX: number;
     sourceY: number;
 }

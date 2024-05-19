@@ -5,13 +5,14 @@ import canvasStore from '@/store/canvas';
 import { createRasterShaderMaterial } from './shaders';
 import { createFiltersFromLayerConfig, combineShaders } from '../../filters';
 
-import { NearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, sRGBEncoding, RGBAFormat, UnsignedByteType } from 'three/src/constants';
+import { NearestFilter, LinearEncoding, LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, sRGBEncoding, RGBAFormat, UnsignedByteType } from 'three/src/constants';
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { Mesh } from 'three/src/objects/Mesh';
 import { CanvasTexture } from 'three/src/textures/CanvasTexture';
+import { Vector2 } from 'three/src/math/Vector2';
 
-import type { Camera, Scene, WebGLRenderer } from 'three';
+import { Camera, Scene, WebGLRenderer } from 'three';
 import type {
     DrawWorkingFileLayerOptions, WorkingFileLayer, WorkingFileLayerRenderer, WorkingFileGroupLayer, ColorModel,
     WorkingFileLayerFilter, WorkingFileLayerDraft
@@ -196,16 +197,18 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
                     draftPlaneCanvas.height = logicalHeight;
                     draftAssets.planeTextureRenderingContext = draftPlaneCanvas.getContext('2d') ?? undefined;
 
-                    if (draftAssets.planeTextureRenderingContext) {
-                        draftAssets.planeTexture = new CanvasTexture(draftPlaneCanvas);
-                        draftAssets.planeTexture.generateMipmaps = false;
-                        draftAssets.planeTexture.encoding = sRGBEncoding;
-                        draftAssets.planeTexture.magFilter = NearestFilter;
-                        draftAssets.planeTexture.minFilter = LinearMipmapLinearFilter;
-                        draftAssets.planeMaterial && (draftAssets.planeMaterial.uniforms.map.value = draftAssets.planeTexture);
+                    // if (draftAssets.planeTextureRenderingContext) {
+                    draftAssets.planeTexture = new CanvasTexture(draftPlaneCanvas);
+                    draftAssets.planeTexture.premultiplyAlpha = false;
+                    draftAssets.planeTexture.generateMipmaps = false;
+                    draftAssets.planeTexture.format = RGBAFormat;
+                    draftAssets.planeTexture.encoding = sRGBEncoding;
+                    draftAssets.planeTexture.magFilter = NearestFilter;
+                    draftAssets.planeTexture.minFilter = NearestFilter;
+                    draftAssets.planeMaterial && (draftAssets.planeMaterial.uniforms.map.value = draftAssets.planeTexture);
 
-                        canvasStore.set('dirty', true);
-                    }
+                    canvasStore.set('dirty', true);
+                    // }
                 }
 
                 if (draftUpdate.transform) {
@@ -263,16 +266,51 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
         // Override
     }
 
-    private applyDraftUpdateChunks(renderer: WebGLRenderer, draftUuid: string) {
+    private async applyDraftUpdateChunks(renderer: WebGLRenderer, draftUuid: string) {
         const draftAssets = this.draftAssetMap.get(draftUuid);
         if (!draftAssets) return;
         const draft = draftAssets.latestDraftUpdate;
         if (!draft || !draftAssets.planeTexture || !draftAssets.planeTextureRenderingContext) return;
         renderer = renderer ?? canvasStore.get('threejsRenderer')!;
+        const draftWidth = draftAssets.planeTexture.image.width;
+        const draftHeight = draftAssets.planeTexture.image.height;
         for (const chunk of draft.updateChunks) {
-            draftAssets.planeTextureRenderingContext.clearRect(chunk.x, chunk.y, chunk.width, chunk.height);
-            draftAssets.planeTextureRenderingContext.drawImage(chunk.data, chunk.x, chunk.y);
-            draftAssets.planeTexture.needsUpdate = true;
+            let chunkImage: HTMLCanvasElement | ImageBitmap = chunk.data;
+
+            let shouldCloseChunkImage = false;
+            let chunkWidth = chunk.width;
+            let chunkHeight = chunk.height;
+            if (chunk.x + chunk.width > draftWidth || chunk.y + chunk.height > draftHeight) {
+                chunkWidth = Math.min(chunk.width, draftWidth - chunk.x);
+                chunkHeight = Math.min(chunk.height, draftHeight - chunk.y);
+                chunkImage = await createImageBitmap(chunkImage, 0, 0, chunkWidth, chunkHeight, {
+                    imageOrientation: 'flipY',
+                    premultiplyAlpha: 'none',
+                })
+                shouldCloseChunkImage = true;
+            }
+
+            const chunkTexture = new CanvasTexture(chunkImage);
+            chunkTexture.premultiplyAlpha = true;
+            chunkTexture.generateMipmaps = false;
+            chunkTexture.format = RGBAFormat;
+            chunkTexture.encoding = sRGBEncoding;
+            chunkTexture.minFilter = NearestFilter;
+            chunkTexture.magFilter = NearestFilter;
+
+            // draftAssets.planeTextureRenderingContext.clearRect(chunk.x, chunk.y, chunk.width, chunk.height);
+            // draftAssets.planeTextureRenderingContext.drawImage(chunk.data, chunk.x, chunk.y);
+            // draftAssets.planeTexture.needsUpdate = true;
+            
+            renderer.copyTextureToTexture(
+                new Vector2(chunk.x, draftAssets.planeTexture.image.height - chunk.y - chunkHeight),
+                chunkTexture,
+                draftAssets.planeTexture
+            );
+            if (shouldCloseChunkImage) {
+                (chunkImage as ImageBitmap).close();
+            }
+            chunkTexture.dispose();
         }
         draft.updateChunks = [];
     }

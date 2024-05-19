@@ -4,6 +4,7 @@ import type {
     TerminateRequest, DrawQueueResult, SetCanvasRenderScaleRequest, DrawCompleteAcknowledgedRequest
 } from './drawable-canvas.types';
 import type { DrawableDrawOptions } from '@/types';
+import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 
 interface CanvasWorkerInfo {
     worker: Worker;
@@ -53,8 +54,14 @@ export async function createDrawableCanvas(options: CreateDrawableCanvasOptions)
         const workerInfo = canvasWorkerMap.get(uuid);
         if (!workerInfo) return;
         if (data.type === 'DRAW_COMPLETE_RESULT') {
-            const { buffer, sourceX, sourceY } = data;
-            const canvas = buffer === 1 ? onscreenBuffer1 : onscreenBuffer2;
+            const { bitmap, sourceX, sourceY } = data;
+            const canvas = document.createElement('canvas');
+            canvas.width = bitmap.width;
+            canvas.height = bitmap.height;
+            const ctx = canvas.getContext('bitmaprenderer');
+            if (!ctx) return;
+            ctx.transferFromImageBitmap(bitmap);
+            bitmap.close();
             onDrawn({
                 canvas,
                 sourceX,

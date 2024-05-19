@@ -1,4 +1,5 @@
 import drawableClassMap from '@/canvas/drawables';
+import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 
 import type { Drawable, DrawableRenderMode, DrawableDrawOptions } from '@/types';
 import type {
@@ -53,8 +54,14 @@ function createCanvas(request: CreateCanvasRequest) {
     canvas1 = request.canvas1;
     canvas2 = request.canvas2;
     if (renderMode === '2d') {
-        canvas1Ctx2d = canvas1.getContext('2d')!;
-        canvas2Ctx2d = canvas2.getContext('2d')!;
+        canvas1Ctx2d = canvas1.getContext('2d', {
+            alpha: true,
+            colorSpace: 'srgb',
+        })!;
+        canvas2Ctx2d = canvas2.getContext('2d', {
+            alpha: true,
+            colorSpace: 'srgb',
+        })!;
     }
 }
 
@@ -145,6 +152,7 @@ function drawCanvas(request: DrawCanvasRequest) {
         self.postMessage({
             type: 'DRAW_COMPLETE_RESULT',
             buffer,
+            bitmap: canvas.transferToImageBitmap(),
             sourceX: drawX,
             sourceY: drawY,
         } as DrawCompleteResult);
