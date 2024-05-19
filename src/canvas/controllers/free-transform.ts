@@ -762,6 +762,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     protected handleCursorIcon() {
         let newIcon = super.handleCursorIcon();
         if (!newIcon && workingFileStore.state.selectedLayerIds.length > 0) {
+            const decomposedViewTransform = canvasStore.get('decomposedTransform');
             const dragHandle = dragHandleHighlight.value;
             determineResizeHandleIcon:
             if (dragHandle != null) {
@@ -779,6 +780,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                     break determineResizeHandleIcon;
                 }
                 handleRotation += this.previewRotation ?? rotation.value;
+                handleRotation += decomposedViewTransform.rotation;
                 if (handleRotation > 0) handleRotation = (2 * Math.PI) - (handleRotation % (2 * Math.PI));
                 else handleRotation = Math.abs(handleRotation % (2 * Math.PI));
                 if (handleRotation < Math.PI / 6 || handleRotation > 11 * Math.PI / 6) newIcon = 'ew-resize';
@@ -794,6 +796,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             if (rotateHandle === true) {
                 let handleRotation = 0;
                 handleRotation += this.previewRotation ?? rotation.value;
+                handleRotation += decomposedViewTransform.rotation;
                 if (handleRotation > 0) handleRotation = (2 * Math.PI) - (handleRotation % (2 * Math.PI));
                 else handleRotation = Math.abs(handleRotation % (2 * Math.PI));
                 if (handleRotation < Math.PI / 6 || handleRotation > 11 * Math.PI / 6) newIcon = 'ew-resize';
