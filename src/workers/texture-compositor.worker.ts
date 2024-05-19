@@ -134,7 +134,10 @@ async function workNewTextureComposite(queueItem: TextureCompositeRequest) {
         overlayImageTexture.dispose();
         imageGeometry.dispose();
 
-        const compositeBitmap = await createImageBitmap(threejsCanvas);
+        const compositeBitmap = await createImageBitmap((threejsCanvas as unknown as ImageBitmapSource), 0, 0, threejsCanvas.width, threejsCanvas.height, {
+            imageOrientation: 'none',
+            premultiplyAlpha: 'none',
+        });
 
         self.postMessage({
             type: 'TEXTURE_COMPOSITE_RESULT',
@@ -212,6 +215,7 @@ async function workNewPrepareThreejsTexture(queueItem: PrepareThreejsTextureRequ
     
         const compositeBitmap = await createImageBitmap(threejsCanvas as unknown as ImageBitmapSource, 0, 0, threejsCanvas.width, threejsCanvas.height, {
             imageOrientation: 'flipY',
+            premultiplyAlpha: 'none',
         });
 
         self.postMessage({

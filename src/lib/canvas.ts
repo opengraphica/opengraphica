@@ -469,7 +469,12 @@ export async function createThreejsTextureFromImage(image: HTMLCanvasElement | I
                     threejsScene, threejsRenderer, threejsRenderTarget, threejsCamera
                 } = await setupThreejsRenderer(fittedChunkWidth, fittedChunkHeight);
 
-                let chunkImage = isUseOriginalImage ? image : await createImageBitmap(image, x, y, fittedChunkWidth, fittedChunkHeight);
+                let chunkImage = isUseOriginalImage ? image : await createImageBitmap(
+                    image, x, y, fittedChunkWidth, fittedChunkHeight, {
+                        imageOrientation: 'none',
+                        premultiplyAlpha: 'none',
+                    }
+                );
                 let imageTexture = new CanvasTexture(chunkImage);
                 imageTexture.generateMipmaps = false;
                 imageTexture.encoding = sRGBEncoding;
@@ -501,7 +506,13 @@ export async function createThreejsTextureFromImage(image: HTMLCanvasElement | I
 
                 const pixelBuffer = new Uint8Array(fittedChunkWidth * fittedChunkHeight * 4);
                 threejsRenderer.readRenderTargetPixels(threejsRenderTarget, 0, 0, fittedChunkWidth, fittedChunkHeight, pixelBuffer);
-                const chunkBitmap = await createImageBitmap(new ImageData(new Uint8ClampedArray(pixelBuffer), fittedChunkWidth, fittedChunkHeight));
+                const chunkBitmap = await createImageBitmap(
+                    new ImageData(new Uint8ClampedArray(pixelBuffer), fittedChunkWidth, fittedChunkHeight),
+                    0, 0, fittedChunkWidth, fittedChunkHeight, {
+                        imageOrientation: 'none',
+                        premultiplyAlpha: 'none',
+                    }
+                );
                 const chunkTexture = new CanvasTexture(chunkBitmap);
                 chunkTexture.premultiplyAlpha = false;
                 chunkTexture.generateMipmaps = true;

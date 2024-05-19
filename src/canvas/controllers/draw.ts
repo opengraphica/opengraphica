@@ -58,6 +58,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
 
         this.drawablePreviewCanvas = new DrawableCanvas({ scale: 1 });
         this.drawablePreviewCanvas.onDrawn((event) => {
+            if (this.activeDraftUuid == null) return;
             for (const layer of this.drawingOnLayers) {
                 const draftIndex = layer.drafts?.findIndex((draft) => draft.uuid === this.activeDraftUuid) ?? -1;
                 if (!layer.drafts?.[draftIndex]) continue;

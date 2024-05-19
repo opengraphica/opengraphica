@@ -123,6 +123,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
         if (updates.drafts !== undefined) {
             if (updates.drafts == null) {
                 this.disposeAllDrafts();
+                canvasStore.set('dirty', true);
                 break updateDrafts;
             }
 
@@ -230,6 +231,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
             // Remove unused drafts.
             for (const uuid of this.draftAssetMap.keys()) {
                 if (!usedDraftIds.includes(uuid)) {
+                    canvasStore.set('dirty', true);
                     setTimeout(() => {
                         this.recycleDraftById(uuid);
                     }, 0);
@@ -320,6 +322,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
                         this.recycledDraftAssets = null;
                     }
                 }, 60000);
+                canvasStore.set('dirty', true);
             }
             this.draftAssetMap.delete(uuid);
         } else {

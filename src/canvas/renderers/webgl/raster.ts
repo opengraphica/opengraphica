@@ -150,7 +150,6 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                         }
                         // Copy update data to existing texture.
                         const updateChunkTexture = await createThreejsTextureFromImage(updateCanvas);
-
                         renderer.copyTextureToTexture(new Vector2(updateX, sourceHeight - updateY - updateHeight), updateChunkTexture, this.sourceTexture);
                         updateChunkTexture.dispose();
                     }
@@ -170,11 +169,6 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                     let newSourceTexture: Texture = await createThreejsTextureFromImage(sourceImage);
                     this.disposeSourceTexture();
                     this.sourceTexture = newSourceTexture;
-                    // this.sourceTexture.encoding = sRGBEncoding;
-                    // this.sourceTexture.magFilter = NearestFilter;
-                    // TODO - maybe use a combination of LinearMipmapLinearFilter and LinearMipmapNearestFilter
-                    // depending on the zoom level, one can appear sharper than the other.
-                    // this.sourceTexture.minFilter = LinearMipmapLinearFilter;
 
                     this.sourceTexture.needsUpdate = true;
                     this.material && (this.material.uniforms.map.value = this.sourceTexture);
