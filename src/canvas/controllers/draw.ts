@@ -420,7 +420,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                     if (layerUpdateCanvas) {
                         if (activeSelectionMask.value || appliedSelectionMask.value) {
                             const layerGlobalTransform = getLayerGlobalTransform(layer.id);
-                            const layerTransform = new DOMMatrix().translateSelf(sourceX, sourceY).multiplySelf(layerGlobalTransform);
+                            const layerTransform = new DOMMatrix().multiplySelf(layerGlobalTransform).translateSelf(sourceX, sourceY);
                             layerUpdateCanvas = await blitActiveSelectionMask(layerUpdateCanvas, layerTransform);
                         }
 
