@@ -56,19 +56,18 @@ freeTransformEmitter.on('setDimensions', (event?: { top?: number, left?: number,
 });
 
 export async function applyTransform() {
-    appEmitter.emit('app.wait.startBlocking', { id: 'freeTransformApply', label: 'app.wait.applyLayerTransform' });
     try {
         const actions: ApplyLayerTransformAction[] = [];
         for (const layerId of workingFileStore.state.selectedLayerIds) {
             actions.push(new ApplyLayerTransformAction(layerId));
         }
         await historyStore.dispatch('runAction', {
-            action: new BundleAction('applyLayerTransform', 'action.applyLayerTransform', actions)
+            action: new BundleAction('applyLayerTransform', 'action.applyLayerTransform', actions),
+            blockInteraction: true,
         });
     } catch (error) {
         console.error('[src/canvas/store/free-transform-state.ts] Error occurred during apply transform.', error);
     }
-    appEmitter.emit('app.wait.stopBlocking', { id: 'freeTransformApply' });
 }
 
 export async function trimEmptySpace() {
@@ -78,7 +77,8 @@ export async function trimEmptySpace() {
             actions.push(new TrimLayerEmptySpaceAction(layerId));
         }
         await historyStore.dispatch('runAction', {
-            action: new BundleAction('trimLayerEmptySpace', 'action.trimLayerEmptySpace', actions)
+            action: new BundleAction('trimLayerEmptySpace', 'action.trimLayerEmptySpace', actions),
+            blockInteraction: true,
         });
     } catch (error) {
         console.error('[src/canvas/store/free-transform-state.ts] Error occurred during trim empty space.', error);
@@ -86,17 +86,16 @@ export async function trimEmptySpace() {
 }
 
 export async function layerToImageBounds() {
-    appEmitter.emit('app.wait.startBlocking', { id: 'setLayerBoundsToWorkingFileBounds', label: 'app.wait.applyLayerTransform' });
     try {
         const actions: SetLayerBoundsToWorkingFileBoundsAction[] = [];
         for (const layerId of workingFileStore.state.selectedLayerIds) {
             actions.push(new SetLayerBoundsToWorkingFileBoundsAction(layerId));
         }
         await historyStore.dispatch('runAction', {
-            action: new BundleAction('setLayerBoundsToWorkingFileBounds', 'action.setLayerBoundsToWorkingFileBounds', actions)
+            action: new BundleAction('setLayerBoundsToWorkingFileBounds', 'action.setLayerBoundsToWorkingFileBounds', actions),
+            blockInteraction: true,
         });
     } catch (error) {
         console.error('[src/canvas/store/free-transform-state.ts] Error occurred during trim empty space.', error);
     }
-    appEmitter.emit('app.wait.stopBlocking', { id: 'setLayerBoundsToWorkingFileBounds' });
 }

@@ -51,10 +51,19 @@ interface AppEmitterEvents {
     };
     'app.workingFile.notifyImageLoadedFromClipboard': undefined;
     'app.workingFile.notifyImageLoadedFromDragAndDrop': undefined;
+    'editor.history.startBlocking': {
+        trigger: 'do' | 'undo' | 'redo';
+        actions: Array<{
+            id: string;
+            description: string;
+        }>;
+    };
+    'editor.history.stopBlocking': undefined;
     'editor.history.step': {
         trigger: 'do' | 'undo' | 'redo';
         action: {
             id: string;
+            description: string;
         }
     };
     'editor.tool.cancelCurrentAction': undefined;

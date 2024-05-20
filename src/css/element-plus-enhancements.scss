@@ -636,10 +636,10 @@
       
     .el-notification {
         &.right {
-            right: calc(var(--ogr-sidebar-right-size, .5rem) + .5rem);
+            right: calc(var(--ogr-sidebar-right-width, .5rem) + .5rem);
         }
         &.left {
-            left: calc(var(--ogr-sidebar-left-size, .5rem) + .5rem);
+            left: calc(var(--ogr-sidebar-left-width, .5rem) + .5rem);
         }
     }
 

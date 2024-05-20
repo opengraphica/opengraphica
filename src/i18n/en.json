@@ -25,6 +25,7 @@
         "openFile": "Open File",
         "pasteLayers": "Paste Layer(s)",
         "placeholder": "Placeholder",
+        "pleaseWait": "Please Wait...",
         "renameLayer": "Rename Layer",
         "reorderLayers": "Reorder Layer(s)",
         "reorderLayerFilters": "Reorder Effect(s)",
@@ -47,6 +48,22 @@
         },
         "dndDropOverlay": {
             "addImage": "Add Image"
+        },
+        "historyNotification": {
+            "title": {
+                "do": {
+                    "inProgress": "Running Action...",
+                    "complete": "Complete"
+                },
+                "undo": {
+                    "inProgress": "Undo...",
+                    "complete": "Undo Complete"
+                },
+                "redo": {
+                    "inProgress": "Redo...",
+                    "complete": "Redo Complete"
+                }
+            }
         },
         "layerList": {
             "toggleLayerVisibility": "Toggle Layer Visibility",

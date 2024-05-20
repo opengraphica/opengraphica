@@ -456,7 +456,6 @@ export default defineComponent({
         });
         async function onHistoryUndo() {
             if (!editorStore.get('waiting')) {
-                appEmitter.emit('app.wait.startBlocking', { id: 'historyUndo' });
                 try {
                     await historyStore.dispatch('undo');
                 } catch (error: any) {
@@ -466,12 +465,10 @@ export default defineComponent({
                         message: error
                     });
                 }
-                appEmitter.emit('app.wait.stopBlocking', { id: 'historyUndo' });
             }
         }
         async function onHistoryRedo() {
             if (!editorStore.get('waiting')) {
-                appEmitter.emit('app.wait.startBlocking', { id: 'historyRedo' });
                 try {
                     await historyStore.dispatch('redo');
                 } catch (error: any) {
@@ -481,12 +478,10 @@ export default defineComponent({
                         message: error
                     });
                 }
-                appEmitter.emit('app.wait.stopBlocking', { id: 'historyRedo' });
             }
         }
         async function onGoHistory(index: number) {
             if (!editorStore.get('waiting')) {
-                appEmitter.emit('app.wait.startBlocking', { id: 'historyStep' });
                 try {
                     const actionStackIndex = historyStore.get('actionStackIndex');
                     if (index > actionStackIndex) {
@@ -507,7 +502,6 @@ export default defineComponent({
                         message: unexpectedErrorMessage
                     });
                 }
-                appEmitter.emit('app.wait.stopBlocking', { id: 'historyStep' });
             }
         }
 

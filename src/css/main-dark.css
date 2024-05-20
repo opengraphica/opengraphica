@@ -8231,6 +8231,9 @@
 :root {
   --ogr-border-radius: 0.25rem;
   --ogr-modal-collapse-mobile: 600px;
+  --ogr-dnd-drop-overlay-z-index: 800000;
+  --ogr-history-notification-overlay-z-index: 850000;
+  --ogr-wait-z-index: 900000;
 }
 
 html {
@@ -8702,7 +8705,7 @@ body.ogr-full-page .opengraphica {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 800000;
+  z-index: var(--ogr-dnd-drop-overlay-z-index);
   align-items: center;
   justify-content: center;
 }
@@ -8941,6 +8944,85 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-free-transform .ogr-free-transform-handle-left svg {
   transform: rotate(270deg) translateY(-50%);
   transform-origin: left center;
+}
+@keyframes ogr-history-notification-highlight {
+  0% {
+    outline: 0.25rem solid var(--el-color-warning);
+    background: var(--ogr-history-notification-background-color-highlight);
+  }
+  100% {
+    outline: 0.25rem solid transparent;
+    background: var(--ogr-history-notification-background-color);
+  }
+}
+@keyframes ogr-history-notification-fade-out {
+  0% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, 1rem);
+  }
+}
+.opengraphica .ogr-history-notification-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--ogr-history-notification-overlay-z-index);
+}
+.opengraphica .ogr-history-notification-overlay.ogr-history-notification-overlay--completed {
+  pointer-events: none;
+}
+.opengraphica .ogr-history-notification-overlay.ogr-history-notification-overlay--completed .ogr-history-notification {
+  animation: ogr-history-notification-fade-out 1.5s forwards !important;
+}
+.opengraphica .ogr-history-notification-container {
+  position: absolute;
+  left: max(1rem, var(--ogr-sidebar-left-width, 1rem));
+  right: max(1rem, var(--ogr-sidebar-right-width, 1rem));
+  bottom: var(--ogr-footer-height);
+  padding: 0 0 1rem 0;
+}
+.opengraphica .ogr-history-notification {
+  border-radius: 1rem;
+  background: var(--ogr-history-notification-background-color);
+  box-shadow: 0 0 0px 1px var(--ogr-history-notification-border-color), 0 0.3rem 2rem var(--ogr-history-notification-border-color);
+  overflow: hidden;
+  padding: 1rem 1.25rem;
+  display: flex;
+  max-width: 25rem;
+  margin: 0 auto;
+}
+.opengraphica .ogr-history-notification .bi {
+  font-size: 2rem;
+  align-self: center;
+  margin-right: 1rem;
+}
+.opengraphica .ogr-history-notification .bi.bi-clock-history {
+  color: var(--el-color-warning);
+}
+.opengraphica .ogr-history-notification .bi.bi-check-circle {
+  color: var(--el-color-success);
+}
+.opengraphica .ogr-history-notification h2 {
+  margin: 0 0 0.1rem 0;
+  font-size: 1rem;
+  font-weight: bold;
+}
+.opengraphica .ogr-history-notification p {
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.opengraphica .ogr-history-notification.ogr-history-notification--highlight {
+  animation: ogr-history-notification-highlight 1s forwards;
 }
 .opengraphica .ogr-layer-list {
   --layer-group-indent: 0px;
@@ -9805,8 +9887,8 @@ body.ogr-full-page .opengraphica {
   position: absolute;
   pointer-events: none;
   width: auto;
-  left: max(.5rem, var(--ogr-sidebar-left-size, .5rem));
-  right: max(.5rem, var(--ogr-sidebar-right-size, .5rem));
+  left: max(.5rem, var(--ogr-sidebar-left-width, .5rem));
+  right: max(.5rem, var(--ogr-sidebar-right-width, .5rem));
   transition: none;
   animation: ogr-toolbar-overlay-fade-in 0.2s ease-in forwards;
 }
@@ -9983,7 +10065,7 @@ body.ogr-full-page .opengraphica {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 900000;
+  z-index: var(--ogr-wait-z-index);
   animation: ogr-wait-fade-in 0.2s ease-in forwards;
 }
 .opengraphica .ogr-wait[aria-hidden=false].is-immediate {
@@ -26584,6 +26666,9 @@ body.ogr-full-page .opengraphica {
   --ogr-form-connected-label-border-color: #191d25;
   --ogr-form-connected-label-input-hover-color: #f0f2f3;
   --ogr-form-connected-label-input-focus-color: #272c37;
+  --ogr-history-notification-border-color: #dadeeaee;
+  --ogr-history-notification-background-color: #222933;
+  --ogr-history-notification-background-color-highlight: #424c58;
   --ogr-layout-menu-bar-border-color: transparent;
   --ogr-layout-menu-bar-background-color: #222933;
   --ogr-menu-drawers-background-color: rgba(0, 0, 0, 0.4);
@@ -28521,10 +28606,10 @@ body.ogr-full-page .opengraphica {
   opacity: 0 !important;
 }
 .opengraphica .el-notification.right {
-  right: calc(var(--ogr-sidebar-right-size, .5rem) + .5rem);
+  right: calc(var(--ogr-sidebar-right-width, .5rem) + .5rem);
 }
 .opengraphica .el-notification.left {
-  left: calc(var(--ogr-sidebar-left-size, .5rem) + .5rem);
+  left: calc(var(--ogr-sidebar-left-width, .5rem) + .5rem);
 }
 .opengraphica .el-radio-button.is-active {
   cursor: default !important;

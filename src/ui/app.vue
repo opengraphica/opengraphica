@@ -1,7 +1,7 @@
 <template>
     <div
         ref="root" class="opengraphica"
-        :style="{ '--ogr-sidebar-left-size': sidebarLeftSize + 'px', '--ogr-sidebar-right-size': sidebarRightSize + 'px' }"
+        :style="{ '--ogr-sidebar-left-width': sidebarLeftSize + 'px', '--ogr-sidebar-right-width': sidebarRightSize + 'px' }"
         @scroll="onScrollRoot($event)"
         @touchstart="onTouchStartRoot($event)"
     >
