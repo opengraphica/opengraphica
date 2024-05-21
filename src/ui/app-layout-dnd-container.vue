@@ -305,6 +305,7 @@ export default defineComponent({
         }
 
         function showHistoryNotification(event?: AppEmitterEvents['editor.history.startBlocking']) {
+            calculateFooterHeight();
             historyNotificationActionTrigger.value = event?.trigger ?? 'do';
             currentHistoryStepActionDescription.value = event?.actions[0].description ?? 'pleaseWait';
             isShowHistoryNotification.value = true;

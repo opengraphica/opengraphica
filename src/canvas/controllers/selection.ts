@@ -18,6 +18,7 @@ import { ClearSelectionAction } from '@/actions/clear-selection';
 import { DeleteLayerSelectionAreaAction } from '@/actions/delete-layer-selection-area';
 import { UpdateActiveSelectionAction } from '@/actions/update-active-selection';
 import { UpdateSelectionCombineModeAction } from '@/actions/update-selection-combine-mode';
+import { t, tm, rt } from '@/i18n';
 
 import type { PointerTracker } from './base';
 
@@ -83,23 +84,30 @@ export default class SelectionController extends BaseMovementController {
         // Tutorial message
         if (!editorStore.state.tutorialFlags.selectionToolIntroduction) {
             waitForNoOverlays().then(() => {
-                let messageStart = `
-                    <p class="mb-3">The selection tool allows you to select specific parts of the image to restrict what editing affects.</p>
-                `;
-                let messageEnd = `
-                    <p class="mb-3"><strong class="has-text-weight-bold"><span class="bi bi-square"></span> Selection Shape</strong> - What shape is used to draw the selection.<p>
-                    <p><strong class="has-text-weight-bold"><span class="bi bi-plus-circle-dotted"></span> Selection Combine Mode</strong> - How the current selection combines with the existing selection.<p>
-                `;
+                let messageStart = (tm('tutorialTip.selectionToolIntroduction.introduction') as string[]).map((message) => {
+                    return `<p class="mb-3">${rt(message)}</p>`;
+                }).join('');
+                let messageEnd = (tm('tutorialTip.selectionToolIntroduction.body.end') as string[]).map((message) => {
+                    return `<p class="mb-3">${rt(message, {
+                        selectionShape: `<strong class="has-text-weight-bold"><span class="bi bi-square"></span> ${t('tutorialTip.selectionToolIntroduction.bodyTitle.selectionShape')}</strong>`,
+                        selectionCombineMode: `<strong class="has-text-weight-bold"><span class="bi bi-plus-circle-dotted"></span> ${t('tutorialTip.selectionToolIntroduction.bodyTitle.selectionCombineMode')}</strong>`
+                    })}</p>`;
+                }).join('');
                 scheduleTutorialNotification({
                     flag: 'selectionToolIntroduction',
-                    title: 'Selection Tool',
+                    title: t('tutorialTip.selectionToolIntroduction.title'),
                     message: {
-                        touch: messageStart + `
-                            <p class="mb-3"><strong class="has-text-weight-bold"><span class="bi bi-bounding-box"></span> Create Selection</strong> - Draw with one finger to create a selection.</p>
-                        ` + messageEnd,
-                        mouse: messageStart + `
-                            <p class="mb-3"><strong class="has-text-weight-bold"><span class="bi bi-bounding-box"></span> Create Selection</strong> - Click and drag with <em>Left Click</em> to create a selection.</p>
-                        ` + messageEnd
+                        touch: messageStart + (tm('tutorialTip.selectionToolIntroduction.body.touch') as string[]).map((message) => {
+                            return `<p class="mb-3">${rt(message, {
+                                createSelection: `<strong class="has-text-weight-bold"><span class="bi bi-bounding-box"></span> ${t('tutorialTip.selectionToolIntroduction.bodyTitle.createSelection')}</strong>`,
+                            })}</p>`
+                        }).join('') + messageEnd,
+                        mouse: messageStart + (tm('tutorialTip.selectionToolIntroduction.body.mouse') as string[]).map((message) => {
+                            return `<p class="mb-3">${rt(message, {
+                                createSelection: `<strong class="has-text-weight-bold"><span class="bi bi-bounding-box"></span> ${t('tutorialTip.selectionToolIntroduction.bodyTitle.createSelection')}</strong>`,
+                                leftClick: `<em>${t('tutorialTip.selectionToolIntroduction.bodyTitle.leftClick')}</em>`,
+                            })}</p>`
+                        }).join('') + messageEnd,
                     }
                 });
             });

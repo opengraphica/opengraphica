@@ -221,6 +221,7 @@
             <template v-if="visitedTabs['prefs'] === true">
                 <el-scrollbar>
                     <el-form novalidate="novalidate" action="javascript:void(0)">
+                        <!-- Prefs: Theme -->
                         <el-form-item class="el-form-item--menu-item mb-1" :label="$t('dock.settings.prefs.theme')">
                             <el-radio-group
                                 v-model="activeTheme"
@@ -236,7 +237,28 @@
                             </el-radio-group>
                         </el-form-item>
                         <el-collapse class="el-collapse--menu-item">
-                            <el-collapse-item v-el-collapse-item-smart-scroll :title="$t('dock.settings.prefs.performance.groupTitle')">
+                            <!-- Prefs: Editor -->
+                            <el-collapse-item v-el-collapse-item-smart-scroll :title="$t('dock.settings.prefs.editor.groupTitle')">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.editor.menuBarPosition')">
+                                    <el-select v-model="preferenceMenuBarPosition" size="small" style="width: 6rem;">
+                                        <el-option value="top" :label="$t('option.top')" />
+                                        <el-option value="bottom" :label="$t('option.bottom')" />
+                                        <el-option value="left" :label="$t('option.left')" />
+                                        <el-option value="right" :label="$t('option.right')" />
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.editor.showWelcomeScreen')">
+                                    <el-switch v-model="showWelcomeScreenAtStart" />
+                                </el-form-item>
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.editor.showTips')">
+                                    <el-switch v-model="showTutorialNotifications" />
+                                </el-form-item>
+                            </el-collapse-item>
+                            <!-- Prefs: Debugging -->
+                            <el-collapse-item v-el-collapse-item-smart-scroll :title="$t('dock.settings.prefs.debugging.groupTitle')">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.debugging.useMobileDebugger')">
+                                    <el-switch v-model="useMobileDebugger" />
+                                </el-form-item>
                                 <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.performance.renderer.label')">
                                     <el-select v-model="preferenceRenderer" size="small" style="width: 6rem;">
                                         <el-option value="2d" :label="$t('dock.settings.prefs.performance.renderer.2d')" />
@@ -253,30 +275,7 @@
                                     <el-switch v-model="preferenceHighQualityScaling" />
                                 </el-form-item>
                             </el-collapse-item>
-                            <el-collapse-item v-el-collapse-item-smart-scroll :title="$t('dock.settings.prefs.editor.groupTitle')">
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.editor.menuBarPosition')">
-                                    <el-select v-model="preferenceMenuBarPosition" size="small" style="width: 6rem;">
-                                        <el-option value="top" :label="$t('option.top')" />
-                                        <el-option value="bottom" :label="$t('option.bottom')" />
-                                        <el-option value="left" :label="$t('option.left')" />
-                                        <el-option value="right" :label="$t('option.right')" />
-                                    </el-select>
-                                </el-form-item>
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.editor.showWelcomeScreen')">
-                                    <el-switch v-model="showWelcomeScreenAtStart" />
-                                </el-form-item>
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.editor.showTips')">
-                                    <el-switch v-model="showTutorialNotifications" />
-                                </el-form-item>
-                                <div class="px-4.5 pt-2">
-                                    <el-button size="small" class="is-fullwidth" @click="onClickResetSettings" v-t="'dock.settings.prefs.editor.resetSettings'" />
-                                </div>
-                            </el-collapse-item>
-                            <el-collapse-item v-el-collapse-item-smart-scroll :title="$t('dock.settings.prefs.debugging.groupTitle')">
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.debugging.useMobileDebugger')">
-                                    <el-switch v-model="useMobileDebugger" />
-                                </el-form-item>
-                            </el-collapse-item>
+                            <!-- Prefs: Help -->
                             <el-collapse-item v-el-collapse-item-smart-scroll :title="$t('dock.settings.prefs.help.groupTitle')">
                                 <div class="el-form-item el-form-item--menu-item">
                                     <el-link href="https://github.com/opengraphica/opengraphica/issues/" type="primary" target="_blank">
@@ -286,6 +285,10 @@
                                 </div>
                             </el-collapse-item>
                         </el-collapse>
+                        <!-- Prefs: Reset -->
+                        <div class="px-4.5 pt-4">
+                            <el-button size="small" class="is-fullwidth" @click="onClickResetSettings" v-t="'dock.settings.prefs.editor.resetSettings'" />
+                        </div>
                     </el-form>
                 </el-scrollbar>
             </template>

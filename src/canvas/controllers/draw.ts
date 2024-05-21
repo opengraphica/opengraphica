@@ -13,6 +13,7 @@ import { isCtrlOrMetaKeyPressed } from '@/lib/keyboard';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import { createEmptyImage, createImageFromBlob, createEmptyCanvas, createEmptyCanvasWith2dContext } from '@/lib/image';
 import { pointDistance2d, nearestPowerOf2 } from '@/lib/math';
+import { t, tm, rt } from '@/i18n';
 
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
@@ -115,14 +116,14 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         )
 
         // Tutorial message
-        if (!editorStore.state.tutorialFlags.zoomToolIntroduction) {
+        if (!editorStore.state.tutorialFlags.drawToolIntroduction) {
             waitForNoOverlays().then(() => {
-                let message = `
-                    <p class="mb-3">The draw tool lets you create lines and shapes.</p>
-                `;
+                let message = (tm('tutorialTip.drawToolIntroduction.introduction') as string[]).map((message) => {
+                    return `<p class="mb-3">${rt(message)}</p>`;
+                }).join('');
                 scheduleTutorialNotification({
                     flag: 'drawToolIntroduction',
-                    title: 'Draw Tool',
+                    title: t('tutorialTip.drawToolIntroduction.title'),
                     message: {
                         touch: message,
                         mouse: message

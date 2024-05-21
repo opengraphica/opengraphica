@@ -3,6 +3,10 @@ import moduleGroupConfig from '@/config/module-groups.json';
 import { ModuleGroupDefinition, ModuleDefinition } from '@/types';
 import appEmitter from '@/lib/emitter';
 
+interface RunModuleOptions {
+    hideWaitAnimation?: boolean;
+}
+
 const moduleGroups: { [key: string]: ModuleGroupDefinition } = moduleGroupConfig as { [key: string]: ModuleGroupDefinition };
 
 export async function preloadModules() {
@@ -35,7 +39,7 @@ export function getModuleDefinition(moduleGroupName: string, moduleName: string)
     return null;
 }
 
-async function runModuleByDefinition(module: ModuleDefinition, moduleProperties?: Record<string, unknown>) {
+async function runModuleByDefinition(module: ModuleDefinition, moduleProperties?: Record<string, unknown>, options: RunModuleOptions = {}) {
     if (module.action.type === 'ui') {
         appEmitter.emit('app.dialogs.openFromModule', {
             name: module.action.target,
@@ -65,11 +69,13 @@ async function runModuleByDefinition(module: ModuleDefinition, moduleProperties?
                 appEmitter.on('app.wait.cancelBlocking', cancelBlocking);
                 moduleRunArgs.cancelRef = cancelRef;
             }
-            appEmitter.emit('app.wait.startBlocking', {
-                id: moduleRunId,
-                label: module.name,
-                cancelable: module.cancelable || false
-            });
+            if (!options.hideWaitAnimation) {
+                appEmitter.emit('app.wait.startBlocking', {
+                    id: moduleRunId,
+                    label: module.name,
+                    cancelable: module.cancelable || false
+                });
+            }
             let runModuleError;
             try {
                 await importedModule[methodName](moduleRunArgs);
@@ -79,9 +85,11 @@ async function runModuleByDefinition(module: ModuleDefinition, moduleProperties?
             if (cancelable) {
                 appEmitter.off('app.wait.cancelBlocking', cancelBlocking);
             }
-            appEmitter.emit('app.wait.stopBlocking', {
-                id: moduleRunId
-            });
+            if (!options.hideWaitAnimation) {
+                appEmitter.emit('app.wait.stopBlocking', {
+                    id: moduleRunId
+                });
+            }
             if (runModuleError) {
                 throw runModuleError;
             }
@@ -91,11 +99,14 @@ async function runModuleByDefinition(module: ModuleDefinition, moduleProperties?
     }
 }
 
-export async function runModule(moduleGroupName: string, moduleName: string, moduleProperties?: Record<string, unknown>) {
+export async function runModule(moduleGroupName: string, moduleName: string, moduleProperties?: Record<string, unknown>, options: RunModuleOptions = {}) {
     if (moduleGroups[moduleGroupName]) {
         const module = moduleGroups[moduleGroupName].modules[moduleName];
         if (module) {
-            await runModuleByDefinition(module, moduleProperties);
+            if (moduleGroupName === 'history') {
+                options.hideWaitAnimation = true;
+            }
+            await runModuleByDefinition(module, moduleProperties, options);
         } else {
             throw new Error('Unknown module name.');
         }

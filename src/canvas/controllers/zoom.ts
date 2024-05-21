@@ -5,6 +5,7 @@ import BaseCanvasMovementController from './base-movement';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
+import { t, tm, rt } from '@/i18n';
 
 const devicePixelRatio = window.devicePixelRatio || 1;
 
@@ -22,21 +23,28 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         // Tutorial message
         if (!editorStore.state.tutorialFlags.zoomToolIntroduction) {
             waitForNoOverlays().then(() => {
-                let message = `
-                    <p class="mb-3">This tool lets you zoom in to the image, and move the view around.</p>
-                `;
+                let message = (tm('tutorialTip.zoomToolIntroduction.introduction') as string[]).map((message) => {
+                    return `<p class="mb-3">${rt(message)}</p>`;
+                }).join('');
                 scheduleTutorialNotification({
                     flag: 'zoomToolIntroduction',
-                    title: 'Zoom/Pan Tool',
+                    title: t('tutorialTip.zoomToolIntroduction.title'),
                     message: {
-                        touch: message + `
-                            <p class="mb-3"><strong class="has-text-weight-bold"><span class="bi bi-zoom-in"></span> Zooming</strong> - Tap with one finger to zoom in. Tap with two fingers to zoom out.</p>
-                            <p><strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> Panning</strong> - Tap and drag with one finger to move the canvas.</p>
-                        `,
-                        mouse: message + `
-                            <p class="mb-3"><strong class="has-text-weight-bold"><span class="bi bi-zoom-in"></span> Zooming</strong> - <em>Left Click</em> to zoom in; <em>Ctrl + Left Click</em> to zoom out.</p>
-                            <p><strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> Panning</strong> - Click and drag with the <em>Left Mouse Button</em> to move the canvas.</p>
-                        `
+                        touch: message + (tm('tutorialTip.zoomToolIntroduction.body.touch') as string[]).map((message) => {
+                            return `<p class="mb-3">${rt(message, {
+                                zooming: `<strong class="has-text-weight-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.zoomToolIntroduction.bodyTitle.zooming')}</strong>`,
+                                panning: `<strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.zoomToolIntroduction.bodyTitle.panning')}</strong>`,
+                            })}</p>`
+                        }).join(''),
+                        mouse: message + (tm('tutorialTip.zoomToolIntroduction.body.mouse') as string[]).map((message) => {
+                            return `<p class="mb-3">${rt(message, {
+                                zooming: `<strong class="has-text-weight-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.zoomToolIntroduction.bodyTitle.zooming')}</strong>`,
+                                panning: `<strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.zoomToolIntroduction.bodyTitle.panning')}</strong>`,
+                                leftClick: `<em>${t('tutorialTip.zoomToolIntroduction.bodyTitle.leftClick')}</em>`,
+                                ctrlLeftClick: `<em>${t('tutorialTip.zoomToolIntroduction.bodyTitle.ctrlLeftClick')}</em>`,
+                                leftMouseButton: `<em>${t('tutorialTip.zoomToolIntroduction.bodyTitle.leftMouseButton')}</em>`,
+                            })}</p>`
+                        }).join(''),
                     }
                 });
             });

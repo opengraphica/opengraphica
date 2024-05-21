@@ -1,7 +1,7 @@
 <template>
     <div
         ref="root" class="opengraphica"
-        :style="{ '--ogr-sidebar-left-width': sidebarLeftSize + 'px', '--ogr-sidebar-right-width': sidebarRightSize + 'px' }"
+        :style="{ '--ogr-sidebar-left-width': sidebarLeftWidth + 'px', '--ogr-sidebar-right-width': sidebarRightWidth + 'px' }"
         @scroll="onScrollRoot($event)"
         @touchstart="onTouchStartRoot($event)"
     >
@@ -49,8 +49,8 @@ export default defineComponent({
         const isMounted = ref<boolean>(false);
         const showDndDropOverlay = ref<boolean>(false);
         const dndDropOverlay = ref<InstanceType<typeof AppDndDropOverlay>>();
-        const sidebarLeftSize = ref<number>(0);
-        const sidebarRightSize = ref<number>(0);
+        const sidebarLeftWidth = ref<number>(0);
+        const sidebarRightWidth = ref<number>(0);
 
         let erudaDebuggerInstance: Eruda | null = null;
 
@@ -230,9 +230,9 @@ export default defineComponent({
             mainElement.value = main;
         }
 
-        function onResizeLayoutContainer({ sidebarLeftSize: newSidebarLeftSize, sidebarRightSize: newSidebarRightSize }: any) {
-            sidebarLeftSize.value = newSidebarLeftSize;
-            sidebarRightSize.value = newSidebarRightSize;
+        function onResizeLayoutContainer({ sidebarLeftWidth: newSidebarLeftWidth, sidebarRightWidth: newSidebarRightWidth }: any) {
+            sidebarLeftWidth.value = newSidebarLeftWidth;
+            sidebarRightWidth.value = newSidebarRightWidth;
         }
 
         provide('rootElement', rootElement);
@@ -241,8 +241,8 @@ export default defineComponent({
         return {
             root: rootElement,
             isMounted,
-            sidebarLeftSize,
-            sidebarRightSize,
+            sidebarLeftWidth,
+            sidebarRightWidth,
             onDndLayoutReady,
             onResizeLayoutContainer,
             showDndDropOverlay,

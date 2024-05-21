@@ -25,6 +25,7 @@ import { isInput } from '@/lib/events';
 import appEmitter, { AppEmitterEvents } from '@/lib/emitter';
 import { AsyncCallbackQueue } from '@/lib/timing';
 import { isShiftKeyPressed } from '@/lib/keyboard';
+import { t, tm, rt } from '@/i18n';
 
 const DRAG_TYPE_ALL = 0;
 const DRAG_TYPE_TOP = 1;
@@ -103,24 +104,31 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         // Tutorial message
         if (!editorStore.state.tutorialFlags.freeTransformToolIntroduction) {
             waitForNoOverlays().then(() => {
-                let message = `
-                    <p class="mb-3">This tool moves, resizes, and rotates layers. A boundary box shows around the selected layer(s).</p>
-                    <p class="mb-3">In <strong class="has-text-weight-bold">auto mode</strong>:</p>
-                `;
+                let message = (tm('tutorialTip.freeTransformToolIntroduction.introduction') as string[]).map((message) => {
+                    return `<p class="mb-3">${rt(message, {
+                        autoMode: `<strong class="has-text-weight-bold">${t('tutorialTip.freeTransformToolIntroduction.autoMode')}</strong>`
+                    })}</p>`;
+                }).join('');
                 scheduleTutorialNotification({
                     flag: 'freeTransformToolIntroduction',
-                    title: 'Free Transform Tool',
+                    title: t('tutorialTip.freeTransformToolIntroduction.title'),
                     message: {
-                        touch: message + `
-                            <p class="mb-3"><strong class="has-text-weight-bold"><span class="bi bi-cursor"></span> Selection</strong> - Tap on a layer to select it.</p>
-                            <p class="mb-3"><strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> Moving</strong> - Tap on a layer and drag to move it.</p>
-                            <p><strong class="has-text-weight-bold"><span class="bi bi-bounding-box"></span> Resizing</strong> - Use one finger to drag resize handles.</p>
-                        `,
-                        mouse: message + `
-                            <p class="mb-3"><strong class="has-text-weight-bold"><span class="bi bi-cursor"></span> Selection</strong> - <em>Left Click</em> on a layer to select it.</p>
-                            <p class="mb-3"><strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> Moving</strong> - <em>Left Click</em> on a layer and drag to move it.</p>
-                            <p><strong class="has-text-weight-bold"><span class="bi bi-bounding-box"></span> Resizing</strong> - <em>Left Click</em> and drag resize handles.</p>
-                        `
+                        touch: message + (tm('tutorialTip.freeTransformToolIntroduction.body.touch') as string[]).map((message) => {
+                            return `<p class="mb-3">${rt(message, {
+                                selection: `<strong class="has-text-weight-bold"><span class="bi bi-cursor"></span> ${t('tutorialTip.freeTransformToolIntroduction.bodyTitle.selection')}</strong>`,
+                                moving: `<strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.freeTransformToolIntroduction.bodyTitle.moving')}</strong>`,
+                                resizing: `<strong class="has-text-weight-bold"><span class="bi bi-bounding-box"></span> ${t('tutorialTip.freeTransformToolIntroduction.bodyTitle.resizing')}</strong>`,
+                                leftClick: `<em>${t('tutorialTip.freeTransformToolIntroduction.bodyTitle.leftClick')}</em>`,
+                            })}</p>`
+                        }).join(''),
+                        mouse: message + (tm('tutorialTip.freeTransformToolIntroduction.body.mouse') as string[]).map((message) => {
+                            return `<p class="mb-3">${rt(message, {
+                                selection: `<strong class="has-text-weight-bold"><span class="bi bi-cursor"></span> ${t('tutorialTip.freeTransformToolIntroduction.bodyTitle.selection')}</strong>`,
+                                moving: `<strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.freeTransformToolIntroduction.bodyTitle.moving')}</strong>`,
+                                resizing: `<strong class="has-text-weight-bold"><span class="bi bi-bounding-box"></span> ${t('tutorialTip.freeTransformToolIntroduction.bodyTitle.resizing')}</strong>`,
+                                leftClick: `<em>${t('tutorialTip.freeTransformToolIntroduction.bodyTitle.leftClick')}</em>`,
+                            })}</p>`
+                        }).join(''),
                     }
                 });
             });

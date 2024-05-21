@@ -35,6 +35,7 @@ import appEmitter from '@/lib/emitter';
 import { scheduleTutorialNotification } from '@/lib/tutorial';
 import { runModule } from '@/modules';
 import editorStore from '@/store/editor';
+import { t, tm, rt } from '@/i18n';
 
 export default defineComponent({
     name: 'ModuleTutorialWelcome',
@@ -68,22 +69,29 @@ export default defineComponent({
             appEmitter.off('app.workingFile.notifyImageLoadedFromDragAndDrop', onCancel);
 
             if (!editorStore.state.tutorialFlags.explainCanvasViewportControls) {
-                let message = `
-                    <p class="mb-3">No matter which tool is selected, you can control the canvas view.</p>
-                    <p class="mb-3">When <strong class="has-text-weight-bold">any tool</strong> is selected:</p>
-                `;
+                let message = (tm('tutorialTip.explainCanvasViewportControls.introduction') as string[]).map((message) => {
+                    return `<p class="mb-3">${rt(message, {
+                        anyTool: `<strong class="has-text-weight-bold">${t('tutorialTip.explainCanvasViewportControls.anyTool')}</strong>`
+                    })}</p>`;
+                }).join('');
                 scheduleTutorialNotification({
                     flag: 'explainCanvasViewportControls',
-                    title: 'Moving the Canvas',
+                    title: t('tutorialTip.explainCanvasViewportControls.title'),
                     message: {
-                        touch: message + `
-                            <p class="mb-3"><strong class="has-text-weight-bold"><span class="bi bi-zoom-in"></span> Zooming</strong> - Use two fingers and pinch to zoom in and out.</p>
-                            <p><strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> Panning</strong> - Use two fingers and slide them together to move the canvas.</p>
-                        `,
-                        mouse: message + `
-                            <p class="mb-3"><strong class="has-text-weight-bold"><span class="bi bi-zoom-in"></span> Zooming</strong> - Use the <em>Mouse Wheel</em> to zoom in and out.</p>
-                            <p><strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> Panning</strong> - Click and drag with the <em>Right Mouse Button</em> to move the canvas.</p>
-                        `
+                        touch: message + (tm('tutorialTip.explainCanvasViewportControls.body.touch') as string[]).map((message) => {
+                            return `<p class="mb-3">${rt(message, {
+                                zooming: `<strong class="has-text-weight-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.zooming')}</strong>`,
+                                panning: `<strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.panning')}</strong>`,
+                            })}</p>`
+                        }).join(''),
+                        mouse: message + (tm('tutorialTip.explainCanvasViewportControls.body.mouse') as string[]).map((message) => {
+                            return `<p class="mb-3">${rt(message, {
+                                zooming: `<strong class="has-text-weight-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.zooming')}</strong>`,
+                                panning: `<strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.panning')}</strong>`,
+                                mouseWheel: `<em>${t('tutorialTip.explainCanvasViewportControls.bodyTitle.mouseWheel')}</em>`,
+                                rightMouseButton: `<em>${t('tutorialTip.explainCanvasViewportControls.bodyTitle.rightMouseButton')}</em>`,
+                            })}</p>`
+                        }).join(''),
                     }
                 })
             }

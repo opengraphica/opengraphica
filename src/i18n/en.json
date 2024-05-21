@@ -892,5 +892,110 @@
                 "description": "Zoom in and out the canvas to control how much of the image you can see."
             }
         }
+    },
+    "tutorialTip": {
+        "drawToolIntroduction": {
+            "title": "Draw Tool",
+            "introduction": [
+                "The draw tool lets you create lines and shapes."
+            ]
+        },
+        "explainCanvasViewportControls": {
+            "title": "Moving the Canvas",
+            "introduction": [
+                "No matter which tool is selected, you can control the canvas view.",
+                "When {anyTool} is selected:"
+            ],
+            "anyTool": "any tool",
+            "body": {
+                "mouse": [
+                    "{zooming} - Use the {mouseWheel} to zoom in and out.",
+                    "{panning} - Click and drag with the {rightMouseButton} to move the canvas."
+                ],
+                "touch": [
+                    "{zooming} - Use two fingers and pinch to zoom in and out.",
+                    "{panning} - Use two fingers and slide them together to move the canvas."
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "Zooming",
+                "panning": "Panning",
+                "mouseWheel": "Mouse Wheel",
+                "rightMouseButton": "Right Mouse Button"
+            }
+        },
+        "freeTransformToolIntroduction": {
+            "title": "Free Transform Tool",
+            "introduction": [
+                "This tool moves, resizes, and rotates layers. A boundary box shows around the selected layer(s).",
+                "In {autoMode}:"
+            ],
+            "autoMode": "auto mode",
+            "body": {
+                "mouse": [
+                    "{selection} - {leftClick} on a layer to select it.",
+                    "{moving} - {leftClick} on a layer and drag to move it.",
+                    "{resizing} - {leftClick} and drag resize handles."
+                ],
+                "touch": [
+                    "{selection} - Tap on a layer to select it.",
+                    "{moving} - Tap on a layer and drag to move it.",
+                    "{resizing} - Use one finger to drag resize handles."
+                ]
+            },
+            "bodyTitle": {
+                "selection": "Selection",
+                "moving": "Moving",
+                "resizing": "Resizing",
+                "leftClick": "Left Click"
+            }
+        },
+        "selectionToolIntroduction": {
+            "title": "Selection Tool",
+            "introduction": [
+                "The selection tool allows you to select specific parts of the image to restrict what editing affects."
+            ],
+            "body": {
+                "mouse": [
+                    "{createSelection} - Click and drag with {leftClick} to create a selection."
+                ],
+                "touch": [
+                    "{createSelection} - Draw with one finger to create a selection."
+                ],
+                "end": [
+                    "{selectionShape} - What shape is used to draw the selection.",
+                    "{selectionCombineMode} - How the current selection combines with the existing selection."
+                ]
+            },
+            "bodyTitle": {
+                "createSelection": "Create Selection",
+                "leftClick": "Left Click",
+                "selectionShape": "Selection Shape",
+                "selectionCombineMode": "Selection Combine Mode"
+            }
+        },
+        "zoomToolIntroduction": {
+            "title": "Zoom/Pan Tool",
+            "introduction": [
+                "This tool lets you zoom in to the image, and move the view around."
+            ],
+            "body": {
+                "mouse": [
+                    "{zooming} - {leftClick} to zoom in; {ctrlLeftClick} to zoom out.",
+                    "{panning} - Click and drag with the {leftMouseButton} to move the canvas."
+                ],
+                "touch": [
+                    "{zooming} - Tap with one finger to zoom in. Tap with two fingers to zoom out.",
+                    "{panning} - Tap and drag with one finger to move the canvas."
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "Zooming",
+                "panning": "Panning",
+                "leftClick": "Left Click",
+                "ctrlLeftClick": "Ctrl + Left Click",
+                "leftMouseButton": "Left Mouse Button"
+            }
+        }
     }
 }
