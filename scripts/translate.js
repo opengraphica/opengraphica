@@ -144,7 +144,8 @@ async function init() {
     await execAsync(`git commit -m "Auto-translate script run."`, { cwd: __dirname });
     let newCommitId = (await execAsync('git rev-parse HEAD', { cwd: __dirname })).stdout.trim();
     await fs.writeFile(path.join(__dirname, '../src/i18n/last-auto-translate-commit.txt'), newCommitId);
-    // await execAsync(`git commit -m "Auto-translate script run."`, { cwd: __dirname });
+    await execAsync(`git add .`, { cwd: __dirname });
+    await execAsync(`git commit -m "Auto-translate script update last run commit."`, { cwd: __dirname });
 
 }
 
