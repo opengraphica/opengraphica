@@ -17,6 +17,18 @@ function execAsync(command, options = {}) {
 
 async function translate(targetLanguage, text) {
     return new Promise((resolve, reject) => {
+        const templateMatches = text.match(/\{[a-zA-Z0-9].*?\}/g);
+        let noTranslateMap = {};
+        if (templateMatches) {
+            const noTranslateRandom = '7QagXIHZ9fSnirhiYiUR';
+            let noTranslateIterator = 0;
+            for (const templateMatch of Array.from(templateMatches)) {
+                const noTranslateReplacement = noTranslateRandom + ('' +(noTranslateIterator++)).padStart(5, '0');
+                noTranslateMap[noTranslateReplacement] = templateMatch;
+                text = text.replace(templateMatch, noTranslateReplacement);
+            }
+        }
+
         const requestBody = JSON.stringify({
             q: text,
             source: 'en',
@@ -40,7 +52,25 @@ async function translate(targetLanguage, text) {
             });
             res.on('end', () => {
                 try {
-                    resolve(JSON.parse(data).translatedText);
+                    let translatedText = JSON.parse(data).translatedText;
+                    if (translatedText == null) {
+                        reject(new Error('Translation service failed (undefined result).'));
+                    } else {
+                        let isReplacementError = false;
+                        for (const noTranslateReplacement in noTranslateMap) {
+                            if (translatedText.includes(noTranslateReplacement)) {
+                                translatedText = translatedText.replace(noTranslateReplacement, noTranslateMap[noTranslateReplacement])
+                            } else {
+                                isReplacementError = true;
+                                break;
+                            }
+                        }
+                        if (isReplacementError) {
+                            reject(new Error('Translation replaced one of the non-translatable replacement strings.'));
+                        } else {
+                            resolve(translatedText);
+                        }
+                    }
                 } catch (error) {
                     reject(error);
                 }
@@ -87,10 +117,15 @@ async function translateRecursive(en, oldEn, language, target) {
                 await translateRecursive(en[key], oldEn[key], language, target[key]);
             }
             if (needsTranslate) {
-                if (en[key] == '') target[key] = '';
-                else target[key] = await translate(language, en[key]);
-                console.log(`Translate to ${language}: "${en[key]}"`);
-                console.log(`Result: "${target[key]}"`);
+                console.info(`Translate to ${language}: "${en[key]}"`);
+                try {
+                    if (en[key] == '') target[key] = '';
+                    else target[key] = await translate(language, en[key]);
+                    console.info(`Result: "${target[key]}"`);
+                } catch (error) {
+                    console.info(`Error translating.`, error?.toString());
+                    delete target[key];
+                }
             }
         }
         if (enType === '[object Array]') {
@@ -135,20 +170,20 @@ async function init() {
     for (const language of languages) {
         const languageFile = await fs.readFile(path.join(__dirname, `../src/i18n/${language}.json`));
         const languageMessages = JSON.parse(languageFile);
-        await translateRecursive(en, lastAutoTranslateEn, language, languageMessages);
+        await translateRecursive(en, JSON.parse(JSON.stringify(lastAutoTranslateEn)), language, languageMessages);
         await fs.writeFile(path.join(__dirname, `../src/i18n/${language}.json`), JSON.stringify(languageMessages, null, '    '));
     }
 
     // Create a new git commit and store it as last translated commit.
-    await execAsync(`git add .`, { cwd: path.join(__dirname, '../') });
-    await execAsync(`git commit -m "Auto-translate script run."`, { cwd: path.join(__dirname, '../') });
-    let newCommitId = (await execAsync('git rev-parse HEAD', { cwd: path.join(__dirname, '../') })).stdout.trim();
-    await fs.writeFile(path.join(__dirname, '../src/i18n/last-auto-translate-commit.txt'), newCommitId);
-    await execAsync(`git add .`, { cwd: path.join(__dirname, '../') });
-    await execAsync(`git commit -m "Auto-translate script update last run commit."`, { cwd: path.join(__dirname, '../') });
+    // await execAsync(`git add .`, { cwd: path.join(__dirname, '../src/i18n') });
+    // await execAsync(`git commit -m "Auto-translate script run."`, { cwd: path.join(__dirname, '../') });
+    // let newCommitId = (await execAsync('git rev-parse HEAD', { cwd: path.join(__dirname, '../') })).stdout.trim();
+    // await fs.writeFile(path.join(__dirname, '../src/i18n/last-auto-translate-commit.txt'), newCommitId);
+    // await execAsync(`git add .`, { cwd: path.join(__dirname, '../src/i18n') });
+    // await execAsync(`git commit -m "Auto-translate script update last run commit."`, { cwd: path.join(__dirname, '../') });
 
 }
 
-console.log('This script assumes you have a local LibreTranslate server running at http://localhost:5000');
-console.log('Info on how to install here: https://github.com/LibreTranslate/LibreTranslate');
+console.info('This script assumes you have a local LibreTranslate server running at http://localhost:5000');
+console.info('Info on how to install here: https://github.com/LibreTranslate/LibreTranslate');
 init();

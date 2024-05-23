@@ -1,0 +1,996 @@
+{
+    "empty": "",
+    "action": {
+        "addLayerFilter": "向图层添加效果",
+        "addLayerFilterMultiple": "添加到图层中的效果",
+        "applyActiveSelection": "应用活动选择",
+        "applyLayerTransform": "应用图层变换",
+        "clearSelection": "清除选择",
+        "convertLayersToImageSequence": "将图层转换为图像序列",
+        "createDrawLayer": "创建绘图图层",
+        "createNewFile": "新建文件",
+        "createNewLayersFromSelection": "从选中区域创建图层",
+        "cutLayers": "剪切图层",
+        "deleteLayers": "删除图层",
+        "deleteLayerFilter": "删除效果",
+        "deleteLayerSelectionArea": "删除选择",
+        "disableLayerFilter": "禁用图层效果",
+        "enableLayerFilter": "启用图层效果",
+        "fileTakePhoto": "照张相",
+        "freeTransformRotate": "自由变形( 旋转)",
+        "freeTransformScale": "自由变形( 恢复)",
+        "freeTransformTranslate": "自由变形( 移动)",
+        "insertLayer": "插入图层",
+        "moduleCropResize": "作物和调整大小",
+        "openFile": "打开文件",
+        "pasteLayers": "粘贴图层",
+        "placeholder": "占位符",
+        "pleaseWait": "请等一下...",
+        "renameLayer": "重命名图层",
+        "reorderLayers": "重排图层",
+        "reorderLayerFilters": "重排效果",
+        "selectLayers": "选择层",
+        "setLayerBoundsToWorkingFileBounds": "图层边界到图像大小",
+        "toggleLayerVisibilityOn": "切换图层可见度 打开",
+        "toggleLayerVisibilityOff": "切换可见层",
+        "trimLayerEmptySpace": "调整层空格",
+        "updateActiveSelection": "更新活动选择",
+        "updateFile": "更新文件",
+        "updateLayer": "更新图层",
+        "updateDrawLayer": "绘制图层",
+        "updateLayerFilterParams": "更新图层效果",
+        "updateSelectionCombineMode": "更新选择组合模式"
+    },
+    "app": {
+        "colorPickerGradient": {
+            "hueSlider": "色调滑动器",
+            "opacitySlider": "不透明滑动器"
+        },
+        "dndDropOverlay": {
+            "addImage": "添加图像"
+        },
+        "historyNotification": {
+            "title": {
+                "do": {
+                    "inProgress": "运行动作...",
+                    "complete": "完成"
+                },
+                "undo": {
+                    "inProgress": "撤销...",
+                    "complete": "撤销完成"
+                },
+                "redo": {
+                    "inProgress": "重来...",
+                    "complete": "重做完成"
+                }
+            }
+        },
+        "layerList": {
+            "toggleLayerVisibility": "切换图层可见度",
+            "layerSettings": "层设置",
+            "rename": "重命名",
+            "addEffect": "添加效果",
+            "delete": "删除",
+            "frames": "框架",
+            "playAnimation": "播放动画",
+            "stopAnimation": "停止动画",
+            "editFrames": "编辑框架",
+            "emptyGroup": "组为空 .",
+            "effects": "效果",
+            "recalculatingEffect": "正在处理...",
+            "moveEffectUp": "向上移动效果",
+            "moveEffectDown": "向下移动效果"
+        },
+        "wait": {
+            "applyLayerTransform": "应用图层变换",
+            "loadingImage": "正在装入图像",
+            "pleaseWait": "请等一下",
+            "trimLayerEmptySpace": "缩放空格",
+            "cancel": "取消"
+        }
+    },
+    "brushCategory": {
+        "simple": {
+            "name": "简单的布鲁什语Name",
+            "brushes": {
+                "circle": {
+                    "name": "圆形"
+                }
+            }
+        },
+        "shapes": {
+            "name": "形状"
+        }
+    },
+    "button": {
+        "apply": "应用",
+        "cancel": "取消",
+        "clear": "清除",
+        "convert": "转换",
+        "create": "创建",
+        "createNewImage": "创建新图像",
+        "done": "完成",
+        "export": "导出",
+        "no": "没有",
+        "ok": "",
+        "openImage": "打开图像",
+        "save": "保存",
+        "settings": "设置",
+        "take": "拿着",
+        "takePhoto": "拍摄照片",
+        "yes": "对"
+    },
+    "canvas": {
+        "toolbar": {
+            "cropResize": {
+                "waitLabel": "作物和调整大小"
+            }
+        }
+    },
+    "dock": {
+        "colorPicker": {
+            "title": "颜色拾取器",
+            "pickColorFromImage": "从图像中选择颜色",
+            "hexCode": "十六进制码"
+        },
+        "layers": {
+            "title": "层",
+            "add": "添加",
+            "layer": "层",
+            "group": "组",
+            "background": "背景情况",
+            "toggleBackgroundVisibility": "切换背景 可见度",
+            "noLayers": "还没有层层."
+        },
+        "settings": {
+            "title": "行动",
+            "file": {
+                "tabTitle": "文件",
+                "menu": {
+                    "new": "新设",
+                    "open": "打开",
+                    "export": "导出",
+                    "save": "保存",
+                    "saveAs": "另存为",
+                    "insertPhoto": "插入相片",
+                    "takePhoto": "照张相"
+                }
+            },
+            "image": {
+                "tabTitle": "图像",
+                "menu": {
+                    "cropResize": "作物和调整大小",
+                    "convertLayers": {
+                        "groupTitle": "转换图层...",
+                        "toImageSequence": "到图像序列",
+                        "flatten": "平移到新层"
+                    },
+                    "cut": "剪切",
+                    "copy": "复制",
+                    "copyAllLayers": "复制所有图层",
+                    "paste": "粘贴"
+                }
+            },
+            "view": {
+                "tabTitle": "视图",
+                "zoom": "缩放",
+                "zoomOut": "缩小",
+                "zoomIn": "缩放",
+                "rotate": "旋转",
+                "rotateCounterClockwise": "逆时针旋转",
+                "rotateClockwise": "顺时针旋转",
+                "reset": "重设",
+                "fit": "适应",
+                "touchRotate": {
+                    "label": "触摸旋转",
+                    "on": "打开",
+                    "snap": "坐标",
+                    "off": "关闭"
+                },
+                "window": "窗口",
+                "enterFullscreen": "输入全屏",
+                "exitFullscreen": "退出全屏幕"
+            },
+            "history": {
+                "tabTitle": "历史",
+                "undo": "撤销",
+                "redo": "重做( R)",
+                "noHistory": "没有历史.",
+                "baseImage": "基础图像"
+            },
+            "prefs": {
+                "tabTitle": "预览",
+                "theme": "主题",
+                "language": "语言",
+                "default": "默认",
+                "performance": {
+                    "groupTitle": "业绩",
+                    "renderer": {
+                        "label": "渲染器",
+                        "2d": "二维相机",
+                        "webgl": "网络GL"
+                    },
+                    "optimizeLargeImage": "大图像优化",
+                    "highQualityScaling": "高质量放大",
+                    "fixAdjacentLayerSeams": "修复相邻的地层"
+                },
+                "editor": {
+                    "groupTitle": "编辑器",
+                    "menuBarPosition": "菜单栏位置",
+                    "showWelcomeScreen": "显示欢迎屏幕",
+                    "showTips": "显示提示",
+                    "resetSettings": "重置设置"
+                },
+                "debugging": {
+                    "groupTitle": "调试",
+                    "useMobileDebugger": "装入移动调试器"
+                },
+                "help": {
+                    "groupTitle": "帮助",
+                    "reportIssue": "报告一个问题"
+                }
+            }
+        }
+    },
+    "el": {
+        "horizontalScrollbarArrows": {
+            "scrollLeft": "向左滚动",
+            "scrollRight": "向右滚动"
+        }
+    },
+    "keyboardMap": {
+        "file": {
+            "name": "文件",
+            "actions": {
+                "open": "打开文件",
+                "export": "导出文件",
+                "quickLoad": "快速装入",
+                "quickSave": "快速保存"
+            }
+        },
+        "image": {
+            "name": "图像",
+            "actions": {
+                "cut": "剪切",
+                "copy": "复制",
+                "paste": "粘贴",
+                "delete": "删除"
+            }
+        },
+        "history": {
+            "name": "编辑历史",
+            "actions": {
+                "undo": "撤销",
+                "redo": "重做( R)"
+            }
+        },
+        "selection": {
+            "name": "选择",
+            "actions": {
+                "selectAll": "全部选择",
+                "deleteSelection": "删除选择"
+            }
+        }
+    },
+    "layerFilter": {
+        "brightness": {
+            "name": "亮度",
+            "param": {
+                "mode": "模式",
+                "modeOption": {
+                    "gamma": "调整伽马",
+                    "shift": "黑白移动",
+                    "luminance": "调整亮度"
+                },
+                "brightness": "亮度",
+                "effectiveRange": "范围",
+                "effectiveRangeFeather": "羽毛"
+            }
+        },
+        "chroma": {
+            "name": "克罗玛",
+            "param": {
+                "chroma": "克罗玛",
+                "mode": "模式",
+                "modeOption": {
+                    "multiply": "调整色相对比度",
+                    "shift": "平衡调整色相"
+                }
+            }
+        },
+        "colorBlindness": {
+            "name": "颜色盲度",
+            "param": {
+                "method": "模拟方法",
+                "methodOption": {
+                    "brettel": "布雷特尔 1997年"
+                },
+                "type": "失明类型",
+                "typeOption": {
+                    "protan": "克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克克",
+                    "deuteran": "Deuteranopia / Deuteranomaly (绿色- Blind) (英语)",
+                    "tritan": "特立塔诺皮亚/特立塔诺梅利(蓝色-布林德)",
+                    "achroma": "红/绿/蓝-布林德"
+                },
+                "severity": "严重性"
+            }
+        },
+        "colorCorrection": {
+            "name": "颜色校正"
+        },
+        "contrast": {
+            "name": "对比度",
+            "param": {
+                "contrast": "对比度",
+                "middleGray": "中灰色"
+            }
+        },
+        "decreaseColorDepth": {
+            "name": "减少颜色深度"
+        },
+        "gaussianBlur": {
+            "name": "高斯模糊度",
+            "param": {
+                "size": "大小",
+                "xIntensity": "X 强度",
+                "yIntensity": "Y 强度"
+            }
+        },
+        "grayscale": {
+            "name": "灰度",
+            "param": {
+                "mode": "模式",
+                "modeOption": {
+                    "luminance": "光芒",
+                    "luma": "露玛",
+                    "lightness": "光度( HSL)",
+                    "average": "平均(HSI强度)",
+                    "value": "数值(HSV)"
+                },
+                "modeOptionDescription": {
+                    "value": "=最大值(R,G,B)"
+                },
+                "mix": "混合"
+            }
+        },
+        "hue": {
+            "name": "色调",
+            "param": {
+                "colorSpace": "颜色空间",
+                "colorSpaceOption": {
+                    "oklab": "奥克勒",
+                    "perceptualRgb": "概念 RGB",
+                    "linearRgb": "线性 RGB"
+                },
+                "rotate": "旋转"
+            }
+        },
+        "negative": {
+            "name": "负数",
+            "param": {
+                "colorSpace": "颜色空间",
+                "colorSpaceOption": {
+                    "perceptualRgb": "概念 RGB",
+                    "linearRgb": "线性 RGB"
+                },
+                "invertRed": "倒转红道",
+                "invertGreen": "倒转绿色频道",
+                "invertBlue": "倒转蓝色频道",
+                "invertValue": "倒转值"
+            }
+        },
+        "saturation": {
+            "name": "饱和度",
+            "param": {
+                "saturation": "饱和度"
+            }
+        },
+        "sepia": {
+            "name": "塞皮亚"
+        }
+    },
+    "layerFilterGroup": {
+        "blur": {
+            "name": "模糊"
+        },
+        "color": {
+            "name": "颜色"
+        },
+        "distort": {
+            "name": "扭曲"
+        },
+        "instagramFilter": {
+            "name": "Instagram 过滤器"
+        },
+        "photography": {
+            "name": "摄影"
+        },
+        "sharpen": {
+            "name": "锐化"
+        }
+    },
+    "layoutShortcutGroup": {
+        "color": {
+            "name": "选择颜色",
+            "controls": {
+                "default": {
+                    "label": "选择颜色"
+                }
+            }
+        },
+        "deform": {
+            "name": "变形",
+            "controls": {
+                "default": {
+                    "label": "变形"
+                }
+            }
+        },
+        "draw": {
+            "name": "绘制",
+            "controls": {
+                "default": {
+                    "label": "绘制"
+                }
+            }
+        },
+        "effects": {
+            "name": "效果",
+            "controls": {
+                "default": {
+                    "label": "效果"
+                }
+            }
+        },
+        "erase": {
+            "name": "擦除",
+            "controls": {
+                "default": {
+                    "label": "擦除"
+                }
+            }
+        },
+        "history": {
+            "name": "历史",
+            "controls": {
+                "undo": {
+                    "label": "撤销"
+                },
+                "redo": {
+                    "label": "重做( R)"
+                }
+            }
+        },
+        "layers": {
+            "name": "层",
+            "controls": {
+                "default": {
+                    "label": "层"
+                }
+            }
+        },
+        "search": {
+            "name": "搜索",
+            "controls": {
+                "default": {
+                    "label": "搜索"
+                }
+            }
+        },
+        "selection": {
+            "name": "选择",
+            "controls": {
+                "default": {
+                    "label": "选择"
+                }
+            }
+        },
+        "settings": {
+            "name": "行动",
+            "controls": {
+                "default": {
+                    "label": "行动"
+                }
+            }
+        },
+        "text": {
+            "name": "文本",
+            "controls": {
+                "default": {
+                    "label": "插入/ 编辑文本"
+                }
+            }
+        },
+        "transform": {
+            "name": "移动/ 转换",
+            "controls": {
+                "default": {
+                    "label": "移动/ 转换"
+                }
+            }
+        },
+        "view": {
+            "name": "扫描屏视图端口",
+            "controls": {
+                "default": {
+                    "label": "缩放/ 泛视图"
+                }
+            }
+        }
+    },
+    "lib": {
+        "tutorial": {
+            "notification": {
+                "gotIt": "笵",
+                "dontShowTips": "不要显示提示"
+            }
+        }
+    },
+    "measurement": {
+        "pixels": "像素",
+        "millimeters": "毫米数",
+        "centimeters": "厘米",
+        "inches": "英寸",
+        "pixelsPerInch": "像素/印记",
+        "pixelsPerMillimeter": "像素/毫米",
+        "pixelsPerCentimeter": "像素/计时器"
+    },
+    "menuBar": {
+        "toolsHeading": "工具"
+    },
+    "module": {
+        "fileExport": {
+            "title": "导出图像",
+            "saveBackQuestion": "保存到原始文件吗 ?",
+            "fileName": "文件名称",
+            "fileType": "文件类型",
+            "layers": "层",
+            "quality": "质量",
+            "dithering": "抖动",
+            "ditheringOption": {
+                "none": "无",
+                "atkinson": "亚特金森",
+                "atkinsonSerpentine": "阿特金森 (铁松)",
+                "floydSteinberg": "弗洛伊德·斯泰因贝格",
+                "floydSteinbergSerpentine": "弗洛伊德·斯泰因伯格(英语:Floyd Steinberg (serpentine))",
+                "falseFloydSteinberg": "虚伪的弗洛伊德·斯坦伯格",
+                "falseFloydSteinbergSerpentine": "False Floyd Steinberg (蛇门) (蛇门花花)",
+                "stucki": "斯图克",
+                "stuckiSerpentine": "Stucki (蛇门)"
+            }
+        },
+        "fileNew": {
+            "title": "新图像",
+            "preset": "预设",
+            "presetPlaceholder": "选择( 可选)",
+            "width": "宽度",
+            "height": "高度",
+            "resolution": "决议",
+            "colorProfile": "颜色配置文件",
+            "scaleFactor": "缩放因数"
+        },
+        "fileSaveAs": {
+            "title": "另存图像为",
+            "saveBackQuestion": "保存到原始文件吗 ?",
+            "exportDisclaimer": "如果您想在其他程序中共享或查看图像,请使用\"Export\"代替.",
+            "fileName": "文件名称"
+        },
+        "fileTakePhoto": {
+            "title": "拍摄照片",
+            "noCameraError": {
+                "title": "相机无可用",
+                "message": "设备要么没有相机,要么无法进入相机."
+            },
+            "selectCamera": {
+                "placeholder": "选择相机",
+                "user": "前 (用户)",
+                "environment": "后 (环境)"
+            }
+        },
+        "imageConvertLayersToImageSequence": {
+            "title": "将图层转换为图像序列",
+            "frameDelay": "框架延迟"
+        },
+        "layerEffectBrowser": {
+            "title": "效果浏览器",
+            "description": "选择要添加到层中的效果 。 效果一般会操纵一层的颜色,或者增加像模糊效果这样的特殊模式.",
+            "loading": "正在生成预览...",
+            "generationErrorGeneral": "生成选定层的效果预览时发生错误 .",
+            "generationErrorUnsupportedType": "您选择的图层无法应用过滤器 .",
+            "generationErrorNoLayer": "请在层对接中选择一个或多个层, 以便添加效果 ."
+        },
+        "layerEffectEdit": {
+            "title": "编辑效果",
+            "description": "编辑特定层的效果.",
+            "loading": "正在生成预览...",
+            "generalError": "出了点事 如果您继续看到此消息, 请将此报告为错误 .",
+            "deleteEffect": "删除效果",
+            "enableToggle": "启用",
+            "resetField": "重设字段",
+            "deleting": "删除效果...",
+            "deleteFilterError": "试图删除过滤器时出错 。 如果您继续看到此消息, 请将此报告为错误 .",
+            "applyFilterError": "尝试应用过滤器更改时发生错误 。 如果您继续看到此消息, 请将此报告为错误 ."
+        },
+        "renameLayer": {
+            "title": "重命名图层",
+            "layerName": "新名称"
+        }
+    },
+    "moduleGroup": {
+        "file": {
+            "name": "文件管理",
+            "description": "装入并保存图像到设备中 .",
+            "modules": {
+                "export": {
+                    "name": "导出图像",
+                    "description": "以通用格式保存图像,其他编辑器可以打开."
+                },
+                "insertPhoto": {
+                    "name": "插入相片",
+                    "description": "在当前打开的图像中添加一张照片作为新图层 ."
+                },
+                "new": {
+                    "name": "新图像",
+                    "description": "创建一个带有指定维度的新图像 ."
+                },
+                "open": {
+                    "name": "打开图像",
+                    "description": "在新工作空间打开图像或工程文件 ."
+                },
+                "quickLoad": {
+                    "name": "快速装入",
+                    "description": "装入快速保存保存的文件 ."
+                },
+                "quickSave": {
+                    "name": "快速保存",
+                    "description": "将当前文件保存到临时存储."
+                },
+                "saveAs": {
+                    "name": "另存图像为",
+                    "description": "保存图像为工程格式,由OpenGraphica重新打开而不会丢失任何信息."
+                },
+                "takePhoto": {
+                    "name": "照张相",
+                    "description": "从相机和网络相机中取出相机并插入到图像中."
+                }
+            }
+        },
+        "history": {
+            "name": "编辑历史",
+            "description": "控制图像编辑历史的操作 .",
+            "modules": {
+                "redo": {
+                    "name": "历史重做",
+                    "description": "重做最后一个未完成的动作 ."
+                },
+                "undo": {
+                    "name": "历史撤消",
+                    "description": "撤销最后的动作 ."
+                }
+            }
+        },
+        "image": {
+            "name": "图像相片",
+            "description": "影响图像画布的操作.",
+            "modules": {
+                "convertLayersToImageSequence": {
+                    "name": "将图层转换为图像序列",
+                    "description": "将选定的地层转换成图像序列地层(动画)."
+                },
+                "convertLayersFlatten": {
+                    "name": "将图层转换为平板图像",
+                    "description": "将所有地层合并到一个单一的图像地层并添加到地层堆栈上方."
+                },
+                "copy": {
+                    "name": "复制所选图层",
+                    "description": "将当前选中的地层复制到剪贴板 ."
+                },
+                "copyAll": {
+                    "name": "复制所有图层",
+                    "description": "将画布上的所有图层复制为 PNG 映像到剪贴板 ."
+                },
+                "cut": {
+                    "name": "剪切",
+                    "description": "删除当前选中的地层并将其复制到剪贴板."
+                },
+                "paste": {
+                    "name": "粘贴",
+                    "description": "从剪贴板上将图像插入画布 ."
+                }
+            }
+        },
+        "layer": {
+            "name": "层",
+            "description": "影响地层的操作.",
+            "modules": {
+                "rename": {
+                    "name": "重命名图层",
+                    "description": "更改层名"
+                },
+                "layerEffectBrowser": {
+                    "name": "效果浏览器",
+                    "description": "将图像效果添加到当前选定的层或层组中."
+                }
+            }
+        },
+        "tmp": {
+            "name": "临时模块",
+            "description": "初始开发时只能坚持的模块.",
+            "modules": {
+                "notYetImplemented": {
+                    "name": "尚未执行",
+                    "description": "显示警告."
+                }
+            }
+        },
+        "tutorial": {
+            "name": "教学",
+            "description": "学会如何使用OpenGraphica.",
+            "modules": {
+                "welcome": {
+                    "name": "欢迎",
+                    "description": "开始研究一个图像."
+                }
+            }
+        }
+    },
+    "option": {
+        "bottom": "底层",
+        "left": "左边",
+        "right": "对",
+        "top": "顶"
+    },
+    "theme": {
+        "light": "光线",
+        "dark": "阴暗"
+    },
+    "toolbar": {
+        "cropResize": {
+            "title": "作物和调整大小",
+            "linkWidthHeight": "链接宽度/ 重度",
+            "size": "大小",
+            "width": "宽度",
+            "height": "高度",
+            "dimensionUnits": "尺寸单位",
+            "resolution": "决议",
+            "resolutionUnits": "分辨率单位",
+            "snapping": {
+                "title": "抓取",
+                "enable": "启用抓取"
+            }
+        },
+        "draw": {
+            "brushColor": "笔刷颜色",
+            "brushSize": "大小"
+        },
+        "freeTransform": {
+            "clearSelection": "清除选择",
+            "pickLayer": {
+                "label": "选择图层",
+                "auto": "自动",
+                "current": "当前"
+            },
+            "snapping": {
+                "title": "抓取",
+                "rotationSnap": "旋转同步"
+            },
+            "metrics": {
+                "title": "计量",
+                "position": "职位",
+                "width": "宽度",
+                "height": "高度",
+                "rotation": "旋转",
+                "resetRotation": "重置旋转",
+                "noLayers": "未选择图层 ."
+            },
+            "actions": {
+                "title": "行动",
+                "applyTransform": "应用变形",
+                "expandToImageSize": "图层边界到图像大小",
+                "trimEmptySpace": "缩放空格"
+            }
+        },
+        "general": {
+            "settings": "设置"
+        },
+        "selection": {
+            "selectionShape": {
+                "label": "选择形状",
+                "rectangle": "矩形",
+                "ellipse": "椭圆",
+                "freePolygon": "自由多边形",
+                "freePolygonShort": "免费保利",
+                "tonalArea": "直线区域"
+            },
+            "selectionCombineMode": {
+                "label": "选择组合模式",
+                "add": "添加",
+                "subtract": "减法",
+                "intersect": "交叉"
+            }
+        },
+        "text": {
+            "font": "字体",
+            "size": "大小",
+            "bold": "粗体",
+            "italic": "斜体",
+            "strikethrough": "切换",
+            "underline": "下划线",
+            "fill": "填充",
+            "fillTooltip": "显示字母边缘内的颜色"
+        },
+        "zoom": {
+            "zoomOut": "缩小",
+            "zoomIn": "缩放",
+            "rotateCounterClockwise": "逆时针旋转",
+            "rotateClockwise": "顺时针旋转",
+            "fit": "适应",
+            "flip": "翻转"
+        }
+    },
+    "toolGroup": {
+        "draw": {
+            "name": "绘制",
+            "description": "布鲁什,铅笔,笔和矢量艺术绘图工具.",
+            "tools": {
+                "brush": {
+                    "name": "笔刷",
+                    "description": "Brushes 画出光栅层."
+                }
+            }
+        },
+        "image": {
+            "name": "图像",
+            "description": "一般图像分辨率操纵.",
+            "tools": {
+                "cropResize": {
+                    "name": "作物和调整大小",
+                    "description": "裁剪, 调整大小, 改变宽比, 或重现图像 ."
+                }
+            }
+        },
+        "selection": {
+            "name": "选择",
+            "description": "选择活动图层的区域,任何对图层的操作只发生在选择范围内.",
+            "tools": {
+                "selection": {
+                    "name": "选择",
+                    "description": "选择图像的指定编辑区域."
+                }
+            }
+        },
+        "text": {
+            "name": "文本",
+            "description": "用于操纵文本层的工具.",
+            "tools": {
+                "text": {
+                    "name": "文本",
+                    "description": "创建并编辑文本层."
+                }
+            }
+        },
+        "transform": {
+            "name": "变形",
+            "description": "用于移动,旋转,缩放层的工具.",
+            "tools": {
+                "freeTransform": {
+                    "name": "自由变形",
+                    "description": "移动、旋转或缩放选定的地层."
+                }
+            }
+        },
+        "view": {
+            "name": "视图端口显示",
+            "description": "用于控制画布的视图显示的工具 .",
+            "tools": {
+                "name": "缩放",
+                "description": "缩放出画布来控制你能看到多少图像."
+            }
+        }
+    },
+    "tutorialTip": {
+        "drawToolIntroduction": {
+            "title": "绘制工具",
+            "introduction": [
+                "绘图工具允许您创建行和形状."
+            ]
+        },
+        "explainCanvasViewportControls": {
+            "title": "移动相机",
+            "introduction": [
+                "无论选择哪一个工具,都可以控制画布视图.",
+                null
+            ],
+            "anyTool": "任何工具",
+            "body": {
+                "mouse": [
+                    null,
+                    null
+                ],
+                "touch": [
+                    null,
+                    null
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "缩放",
+                "panning": "平稳",
+                "mouseWheel": "鼠标轮",
+                "rightMouseButton": "鼠标右键"
+            }
+        },
+        "freeTransformToolIntroduction": {
+            "title": "自由变换工具",
+            "introduction": [
+                "此工具会移动,调整大小并旋转地层. 选定地层周围的边框.",
+                null
+            ],
+            "autoMode": "自动模式",
+            "body": {
+                "mouse": [
+                    null,
+                    null,
+                    null
+                ],
+                "touch": [
+                    null,
+                    null,
+                    null
+                ]
+            },
+            "bodyTitle": {
+                "selection": "选择",
+                "moving": "移动",
+                "resizing": "调整大小",
+                "leftClick": "左键点击"
+            }
+        },
+        "selectionToolIntroduction": {
+            "title": "选择工具",
+            "introduction": [
+                "选择工具允许您选择图像的特定部分来限制编辑影响的内容."
+            ],
+            "body": {
+                "mouse": [
+                    null
+                ],
+                "touch": [
+                    null
+                ],
+                "end": [
+                    null,
+                    null
+                ]
+            },
+            "bodyTitle": {
+                "createSelection": "创建选择",
+                "leftClick": "左键点击",
+                "selectionShape": "选择形状",
+                "selectionCombineMode": "选择组合模式"
+            }
+        },
+        "zoomToolIntroduction": {
+            "title": "缩放/ Pan 工具",
+            "introduction": [
+                "这个工具可以让您放大到图像,然后将视图移动到周围."
+            ],
+            "body": {
+                "mouse": [
+                    null,
+                    null
+                ],
+                "touch": [
+                    null,
+                    null
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "缩放",
+                "panning": "平稳",
+                "leftClick": "左键点击",
+                "ctrlLeftClick": "Ctrl + 左键点击",
+                "leftMouseButton": "鼠标左键"
+            }
+        }
+    }
+}

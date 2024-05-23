@@ -1,0 +1,998 @@
+{
+    "empty": "",
+    "action": {
+        "addLayerFilter": "परत में प्रभाव जोड़ें",
+        "addLayerFilterMultiple": "परत के लिए प्रभाव जोड़ें",
+        "applyActiveSelection": "सक्रिय चयन लागू करें",
+        "applyLayerTransform": "लेयर ट्रांसफॉर्म",
+        "clearSelection": "स्पष्ट चयन",
+        "convertLayersToImageSequence": "परतों को छवि अनुक्रम में कनवर्ट करें",
+        "createDrawLayer": "ड्रॉ लेयर बनाएं",
+        "createNewFile": "नई फाइल",
+        "createNewLayersFromSelection": "चयन से परतें बनाएं",
+        "cutLayers": "कट परत",
+        "deleteLayers": "लेयर(s)",
+        "deleteLayerFilter": "निष्क्रिय प्रभाव",
+        "deleteLayerSelectionArea": "चयन हटाएं",
+        "disableLayerFilter": "अक्षम परत प्रभाव",
+        "enableLayerFilter": "सक्षम परत प्रभाव",
+        "fileTakePhoto": "फोटो",
+        "freeTransformRotate": "फ्री ट्रांसफॉर्मर (रोटेट)",
+        "freeTransformScale": "फ्री ट्रांसफॉर्मर (Resize)",
+        "freeTransformTranslate": "फ्री ट्रांसफॉर्मर (Move)",
+        "insertLayer": "परत डालें",
+        "moduleCropResize": "फसल और आकार",
+        "openFile": "ओपन फाइल",
+        "pasteLayers": "पेस्ट परत",
+        "placeholder": "स्थानधारक",
+        "pleaseWait": "कृपया प्रतीक्षा करें.",
+        "renameLayer": "परत का नाम बदलें",
+        "reorderLayers": "Reorder परतें (s)",
+        "reorderLayerFilters": "Reorder Effect(s)",
+        "selectLayers": "चुनें परत(s)",
+        "setLayerBoundsToWorkingFileBounds": "लेयर बाउंड्स टू इमेज साइज",
+        "toggleLayerVisibilityOn": "टॉगल परत दृश्यता पर",
+        "toggleLayerVisibilityOff": "Toggle परत दृश्यता बंद",
+        "trimLayerEmptySpace": "ट्रिम परत खाली अंतरिक्ष",
+        "updateActiveSelection": "सक्रिय चयन अद्यतन करें",
+        "updateFile": "फ़ाइल अद्यतन करें",
+        "updateLayer": "अद्यतन परत",
+        "updateDrawLayer": "परत पर खींचो",
+        "updateLayerFilterParams": "अद्यतन परत प्रभाव",
+        "updateSelectionCombineMode": "अद्यतन चयन संयोजन मोड"
+    },
+    "app": {
+        "colorPickerGradient": {
+            "hueSlider": "Hue स्लाइडर",
+            "opacitySlider": "Opacity स्लाइडर"
+        },
+        "dndDropOverlay": {
+            "addImage": "छवि जोड़ें"
+        },
+        "historyNotification": {
+            "title": {
+                "do": {
+                    "inProgress": "कार्य चल रहा है...",
+                    "complete": "पूरा"
+                },
+                "undo": {
+                    "inProgress": "......",
+                    "complete": "पूर्ण"
+                },
+                "redo": {
+                    "inProgress": "रेडो...",
+                    "complete": "रेडो पूर्ण"
+                }
+            }
+        },
+        "layerList": {
+            "toggleLayerVisibility": "टॉगल परत दृश्यता",
+            "layerSettings": "परत सेटिंग",
+            "rename": "नाम बदलें",
+            "addEffect": "प्रभाव जोड़ें",
+            "delete": "डिलीट",
+            "frames": "फ्रेम",
+            "playAnimation": "एनीमेशन",
+            "stopAnimation": "बंद करें एनिमेशन",
+            "editFrames": "फ़्रेम संपादित करें",
+            "emptyGroup": "ग्रुप खाली है।.",
+            "effects": "प्रभाव",
+            "recalculatingEffect": "प्रसंस्करण...",
+            "moveEffectUp": "प्रभाव ऊपर उठाना",
+            "moveEffectDown": "प्रभाव नीचे ले जाएँ"
+        },
+        "wait": {
+            "applyLayerTransform": "लेयर ट्रांसफॉर्म लागू करना",
+            "loadingImage": "छवि लोड करना",
+            "pleaseWait": "कृपया प्रतीक्षा करें",
+            "trimLayerEmptySpace": "ट्रिमिंग खाली स्पेस",
+            "cancel": "रद्द करना"
+        }
+    },
+    "brushCategory": {
+        "simple": {
+            "name": "सरल ब्रश",
+            "brushes": {
+                "circle": {
+                    "name": "सर्कल"
+                }
+            }
+        },
+        "shapes": {
+            "name": "आकृति"
+        }
+    },
+    "button": {
+        "apply": "आवेदन",
+        "cancel": "रद्द करना",
+        "clear": "स्पष्ट",
+        "convert": "बदलना",
+        "create": "बनाना",
+        "createNewImage": "नई छवि बनाएँ",
+        "done": "दान",
+        "export": "निर्यात",
+        "no": "नहीं",
+        "ok": "ठीक",
+        "openImage": "ओपन छवि",
+        "save": "सहेजें",
+        "settings": "सेटिंग्स",
+        "take": "लेना",
+        "takePhoto": "फोटो",
+        "yes": "हाँ"
+    },
+    "canvas": {
+        "toolbar": {
+            "cropResize": {
+                "waitLabel": "फसल और आकार"
+            }
+        }
+    },
+    "dock": {
+        "colorPicker": {
+            "title": "रंग पिकर",
+            "pickColorFromImage": "छवि से रंग चुनें",
+            "hexCode": "हेक्स कोड"
+        },
+        "layers": {
+            "title": "परत",
+            "add": "जोड़ें",
+            "layer": "परत",
+            "group": "समूह",
+            "background": "पृष्ठभूमि",
+            "toggleBackgroundVisibility": "Toggle पृष्ठभूमि दृश्यता",
+            "noLayers": "अभी तक कोई स्तर नहीं है।."
+        },
+        "settings": {
+            "title": "कार्य",
+            "file": {
+                "tabTitle": "फ़ाइल",
+                "menu": {
+                    "new": "नया",
+                    "open": "खुला",
+                    "export": "निर्यात",
+                    "save": "सहेजें",
+                    "saveAs": "सहेजें",
+                    "insertPhoto": "फोटो डालें",
+                    "takePhoto": "फोटो"
+                }
+            },
+            "image": {
+                "tabTitle": "छवि",
+                "menu": {
+                    "cropResize": "फसल और आकार",
+                    "convertLayers": {
+                        "groupTitle": "कन्वर्ट परतें...",
+                        "toImageSequence": "छवि अनुक्रम",
+                        "flatten": "Flatten to New Layer"
+                    },
+                    "cut": "कट",
+                    "copy": "कॉपी",
+                    "copyAllLayers": "सभी परतों की प्रतिलिपि बनाएँ",
+                    "paste": "पेस्ट"
+                }
+            },
+            "view": {
+                "tabTitle": "देखें",
+                "zoom": "ज़ूम",
+                "zoomOut": "ज़ूम आउट",
+                "zoomIn": "ज़ूम इन",
+                "rotate": "हिंदी",
+                "rotateCounterClockwise": "बारी-बारी से",
+                "rotateClockwise": "रोटेट क्लॉकवे",
+                "reset": "रीसेट करें",
+                "fit": "फिट",
+                "touchRotate": {
+                    "label": "टच रोटेट",
+                    "on": "पर",
+                    "snap": "स्नैप",
+                    "off": "बंद"
+                },
+                "window": "विंडो",
+                "enterFullscreen": "फुलस्क्रीन दर्ज करें",
+                "exitFullscreen": "एक्सिट फुलस्क्रीन"
+            },
+            "history": {
+                "tabTitle": "इतिहास",
+                "undo": "हिन्दी",
+                "redo": "रेडो",
+                "noHistory": "अभी तक कोई इतिहास नहीं।.",
+                "baseImage": "आधार छवि"
+            },
+            "prefs": {
+                "tabTitle": "प्रान्त",
+                "theme": "विषय",
+                "language": "भाषा",
+                "default": "डिफ़ॉल्ट",
+                "performance": {
+                    "groupTitle": "प्रदर्शन",
+                    "renderer": {
+                        "label": "रेंडर",
+                        "2d": "कैनवास 2D",
+                        "webgl": "वेब"
+                    },
+                    "optimizeLargeImage": "बड़ी छवि के लिए ऑप्टिमाइज़",
+                    "highQualityScaling": "उच्च गुणवत्ता Scaling",
+                    "fixAdjacentLayerSeams": "Adjacent लेयर सीम को ठीक करें"
+                },
+                "editor": {
+                    "groupTitle": "संपादक",
+                    "menuBarPosition": "मेनू बार स्थिति",
+                    "showWelcomeScreen": "स्वागत स्क्रीन दिखाएँ",
+                    "showTips": "टिप्स",
+                    "resetSettings": "सेटिंग रीसेट करें"
+                },
+                "debugging": {
+                    "groupTitle": "डिबगिंग",
+                    "useMobileDebugger": "लोड मोबाइल डिबगर"
+                },
+                "help": {
+                    "groupTitle": "सहायता",
+                    "reportIssue": "एक मुद्दे की रिपोर्ट करें"
+                }
+            }
+        }
+    },
+    "el": {
+        "horizontalScrollbarArrows": {
+            "scrollLeft": "स्क्रॉल लेफ्ट",
+            "scrollRight": "स्क्रॉल राइट"
+        }
+    },
+    "keyboardMap": {
+        "file": {
+            "name": "फ़ाइल",
+            "actions": {
+                "open": "ओपन फाइल",
+                "export": "फाइल निर्यात करें",
+                "quickLoad": "त्वरित लोड",
+                "quickSave": "क्विक सेव"
+            }
+        },
+        "image": {
+            "name": "छवि",
+            "actions": {
+                "cut": "कट",
+                "copy": "कॉपी",
+                "paste": "पेस्ट",
+                "delete": "डिलीट"
+            }
+        },
+        "history": {
+            "name": "संपादन इतिहास",
+            "actions": {
+                "undo": "हिन्दी",
+                "redo": "रेडो"
+            }
+        },
+        "selection": {
+            "name": "चयन",
+            "actions": {
+                "selectAll": "सभी का चयन करें",
+                "deleteSelection": "चयन हटाएं"
+            }
+        }
+    },
+    "layerFilter": {
+        "brightness": {
+            "name": "चमक",
+            "param": {
+                "mode": "मोड",
+                "modeOption": {
+                    "gamma": "Gamma समायोजित करें",
+                    "shift": "ब्लैक / व्हाइट शिफ्ट",
+                    "luminance": "सम्पर्क करने का विवरण"
+                },
+                "brightness": "चमक",
+                "effectiveRange": "रेंज",
+                "effectiveRangeFeather": "पंख"
+            }
+        },
+        "chroma": {
+            "name": "Chroma",
+            "param": {
+                "chroma": "Chroma",
+                "mode": "मोड",
+                "modeOption": {
+                    "multiply": "Chroma Contrast समायोजित करें",
+                    "shift": "समान रूप से Chroma समायोजित करें"
+                }
+            }
+        },
+        "colorBlindness": {
+            "name": "रंग अंधापन",
+            "param": {
+                "method": "सिमुलेशन विधि",
+                "methodOption": {
+                    "brettel": "ब्रेटटेल 1997"
+                },
+                "type": "अंधापन प्रकार",
+                "typeOption": {
+                    "protan": "Protanopia / Protanomaly (Red-Blind)",
+                    "deuteran": "Deuteranopia / Deuteranomaly (Green-Blind)",
+                    "tritan": "Tritanopia / Tritanomaly (Blue-Blind)",
+                    "achroma": "Achromatomaly / Achromatopsia (Red/Green/Blue-Blind)"
+                },
+                "severity": "गंभीरता"
+            }
+        },
+        "colorCorrection": {
+            "name": "रंग सुधार"
+        },
+        "contrast": {
+            "name": "कंट्रास्ट",
+            "param": {
+                "contrast": "कंट्रास्ट",
+                "middleGray": "मध्य ग्रे"
+            }
+        },
+        "decreaseColorDepth": {
+            "name": "रंग गहराई"
+        },
+        "gaussianBlur": {
+            "name": "गौसियन ब्लर",
+            "param": {
+                "size": "आकार",
+                "xIntensity": "एक्स तीव्रता",
+                "yIntensity": "Y तीव्रता"
+            }
+        },
+        "grayscale": {
+            "name": "ग्रे स्केल",
+            "param": {
+                "mode": "मोड",
+                "modeOption": {
+                    "luminance": "चमक",
+                    "luma": "लूमा",
+                    "lightness": "प्रकाश (HSL)",
+                    "average": "औसत (HSI तीव्रता)",
+                    "value": "मान (HSV)"
+                },
+                "modeOptionDescription": {
+                    "value": "= अधिकतम (R,G,B)"
+                },
+                "mix": "मिक्स"
+            }
+        },
+        "hue": {
+            "name": "ह्यू",
+            "param": {
+                "colorSpace": "कलर स्पेस",
+                "colorSpaceOption": {
+                    "oklab": "ओकला",
+                    "perceptualRgb": "क्रमिक आरजीबी",
+                    "linearRgb": "रैखिक आरजीबी"
+                },
+                "rotate": "हिंदी"
+            }
+        },
+        "negative": {
+            "name": "नकारात्मक",
+            "param": {
+                "colorSpace": "कलर स्पेस",
+                "colorSpaceOption": {
+                    "perceptualRgb": "क्रमिक आरजीबी",
+                    "linearRgb": "रैखिक आरजीबी"
+                },
+                "invertRed": "इन्वर्ट रेड चैनल",
+                "invertGreen": "इन्वर्ट ग्रीन चैनल",
+                "invertBlue": "ब्लू चैनल",
+                "invertValue": "Invert मूल्य"
+            }
+        },
+        "saturation": {
+            "name": "संतृप्ति",
+            "param": {
+                "saturation": "संतृप्ति"
+            }
+        },
+        "sepia": {
+            "name": "सिपाही"
+        }
+    },
+    "layerFilterGroup": {
+        "blur": {
+            "name": "ब्लर"
+        },
+        "color": {
+            "name": "रंग"
+        },
+        "distort": {
+            "name": "विरूपण"
+        },
+        "instagramFilter": {
+            "name": "इंस्टाग्राम फिल्टर"
+        },
+        "photography": {
+            "name": "फोटोग्राफी"
+        },
+        "sharpen": {
+            "name": "Sharpen"
+        }
+    },
+    "layoutShortcutGroup": {
+        "color": {
+            "name": "रंग चुनें",
+            "controls": {
+                "default": {
+                    "label": "रंग चुनें"
+                }
+            }
+        },
+        "deform": {
+            "name": "विकृत",
+            "controls": {
+                "default": {
+                    "label": "विकृत"
+                }
+            }
+        },
+        "draw": {
+            "name": "ड्रा",
+            "controls": {
+                "default": {
+                    "label": "ड्रा"
+                }
+            }
+        },
+        "effects": {
+            "name": "प्रभाव",
+            "controls": {
+                "default": {
+                    "label": "प्रभाव"
+                }
+            }
+        },
+        "erase": {
+            "name": "एरेस",
+            "controls": {
+                "default": {
+                    "label": "एरेस"
+                }
+            }
+        },
+        "history": {
+            "name": "इतिहास",
+            "controls": {
+                "undo": {
+                    "label": "हिन्दी"
+                },
+                "redo": {
+                    "label": "रेडो"
+                }
+            }
+        },
+        "layers": {
+            "name": "परत",
+            "controls": {
+                "default": {
+                    "label": "परत"
+                }
+            }
+        },
+        "search": {
+            "name": "खोज",
+            "controls": {
+                "default": {
+                    "label": "खोज"
+                }
+            }
+        },
+        "selection": {
+            "name": "चयन",
+            "controls": {
+                "default": {
+                    "label": "चयन"
+                }
+            }
+        },
+        "settings": {
+            "name": "कार्य",
+            "controls": {
+                "default": {
+                    "label": "कार्य"
+                }
+            }
+        },
+        "text": {
+            "name": "पाठ",
+            "controls": {
+                "default": {
+                    "label": "पाठ डालें / संपादित करें"
+                }
+            }
+        },
+        "transform": {
+            "name": "मूव / ट्रांसफॉर्म",
+            "controls": {
+                "default": {
+                    "label": "मूव / ट्रांसफॉर्म"
+                }
+            }
+        },
+        "view": {
+            "name": "कैनवास Viewport",
+            "controls": {
+                "default": {
+                    "label": "ज़ूम / पैन व्यू"
+                }
+            }
+        }
+    },
+    "lib": {
+        "tutorial": {
+            "notification": {
+                "gotIt": "यह",
+                "dontShowTips": "नहीं दिखाएँ युक्तियाँ"
+            }
+        }
+    },
+    "measurement": {
+        "pixels": "पिक्सेल",
+        "millimeters": "मिलीमीटर",
+        "centimeters": "सेंटीमीटर",
+        "inches": "इंच",
+        "pixelsPerInch": "पिक्सेल / इंच",
+        "pixelsPerMillimeter": "पिक्सेल / मिलीमीटर",
+        "pixelsPerCentimeter": "पिक्सेल / सेन्टमीटर"
+    },
+    "menuBar": {
+        "toolsHeading": "उपकरण"
+    },
+    "module": {
+        "fileExport": {
+            "title": "निर्यात छवि",
+            "saveBackIntroduction": "आपने {fileName} नामक एक फ़ाइल खोला है।.",
+            "saveBackQuestion": "मूल फ़ाइल में वापस सहेजें?",
+            "fileName": "फाईल का नाम",
+            "fileType": "फ़ाइल का प्रकार",
+            "layers": "परत",
+            "quality": "गुणवत्ता",
+            "dithering": "डच",
+            "ditheringOption": {
+                "none": "कोई नहीं",
+                "atkinson": "Atkinson",
+                "atkinsonSerpentine": "Atkinson (serpentine)",
+                "floydSteinberg": "Floyd Steinberg",
+                "floydSteinbergSerpentine": "फ्लॉइड स्टेनबर्ग (serpentine)",
+                "falseFloydSteinberg": "False Floyd Steinberg",
+                "falseFloydSteinbergSerpentine": "False Floyd Steinberg (serpentine)",
+                "stucki": "स्टुकी",
+                "stuckiSerpentine": "Stucki (serpentine)"
+            }
+        },
+        "fileNew": {
+            "title": "नई छवि",
+            "preset": "प्रीसेट",
+            "presetPlaceholder": "चयन (वैकल्पिक)",
+            "width": "चौड़ाई",
+            "height": "ऊंचाई",
+            "resolution": "संकल्प",
+            "colorProfile": "रंग प्रोफ़ाइल",
+            "scaleFactor": "स्केल फैक्टर"
+        },
+        "fileSaveAs": {
+            "title": "छवि सहेजें",
+            "saveBackIntroduction": "आपने {fileName} नामक एक फ़ाइल खोला है।.",
+            "saveBackQuestion": "मूल फ़ाइल में वापस सहेजें?",
+            "exportDisclaimer": "यदि आप अन्य कार्यक्रमों में छवि साझा करना चाहते हैं, तो इसके बजाय \"Export\" का उपयोग करें।.",
+            "fileName": "फाईल का नाम"
+        },
+        "fileTakePhoto": {
+            "title": "फोटो",
+            "noCameraError": {
+                "title": "कैमरा Unable",
+                "message": "किसी भी डिवाइस में कैमरे या कैमरे तक पहुंच नहीं है।."
+            },
+            "selectCamera": {
+                "placeholder": "कैमरा चुनें",
+                "user": "फ्रंट (User)",
+                "environment": "रियर (पर्यावरण)"
+            }
+        },
+        "imageConvertLayersToImageSequence": {
+            "title": "परतों को छवि अनुक्रम में कनवर्ट करें",
+            "frameDelay": "फ्रेम विलंब"
+        },
+        "layerEffectBrowser": {
+            "title": "प्रभाव ब्राउज़र",
+            "description": "परत में जोड़ने के लिए एक प्रभाव चुनें। प्रभाव आम तौर पर एक परत के रंगों में हेरफेर करते हैं या विशेष पैटर्न जैसे धुंधला प्रभाव जोड़ते हैं।.",
+            "loading": "जनरेटिंग पूर्वावलोकन ...",
+            "generationErrorGeneral": "चयनित परत के लिए प्रभाव पूर्वावलोकन उत्पन्न करते समय एक त्रुटि हुई।.",
+            "generationErrorUnsupportedType": "जिस परत को आपने चुना है वह उस पर लागू फिल्टर करने में असमर्थ है।.",
+            "generationErrorNoLayer": "कृपया उन पर प्रभाव जोड़ने के लिए परतों डॉक में एक या अधिक परतों का चयन करें।."
+        },
+        "layerEffectEdit": {
+            "title": "प्रभाव",
+            "description": "एक विशिष्ट परत के लिए प्रभाव संपादित करें।.",
+            "loading": "जनरेटिंग पूर्वावलोकन ...",
+            "generalError": "कुछ गलत हो गया। यदि आप इस संदेश को देख रहे हैं, तो कृपया इसे एक बग के रूप में रिपोर्ट करें।.",
+            "deleteEffect": "निष्क्रिय प्रभाव",
+            "enableToggle": "सक्षम",
+            "resetField": "फील्ड रीसेट करें",
+            "deleting": "हटाने प्रभाव...",
+            "deleteFilterError": "फ़िल्टर को हटाने का प्रयास करते समय त्रुटि हुई। यदि आप इस संदेश को देख रहे हैं, तो कृपया इसे एक बग के रूप में रिपोर्ट करें।.",
+            "applyFilterError": "फ़िल्टर परिवर्तन लागू करने का प्रयास करते समय त्रुटि हुई। यदि आप इस संदेश को देख रहे हैं, तो कृपया इसे एक बग के रूप में रिपोर्ट करें।."
+        },
+        "renameLayer": {
+            "title": "परत का नाम बदलें",
+            "layerName": "नया नाम"
+        }
+    },
+    "moduleGroup": {
+        "file": {
+            "name": "फ़ाइल प्रबंधन",
+            "description": "छवियों को अपने डिवाइस पर लोड और सेव करें।.",
+            "modules": {
+                "export": {
+                    "name": "निर्यात छवि",
+                    "description": "छवि को एक सार्वभौमिक प्रारूप में सहेजें जिसे अन्य संपादकों द्वारा खोला जा सकता है।."
+                },
+                "insertPhoto": {
+                    "name": "फोटो डालें",
+                    "description": "वर्तमान में खुलने वाली छवि में एक नई परत के रूप में एक तस्वीर जोड़ें।."
+                },
+                "new": {
+                    "name": "नई छवि",
+                    "description": "निर्दिष्ट आयामों के साथ एक नई छवि बनाएं।."
+                },
+                "open": {
+                    "name": "ओपन छवि",
+                    "description": "एक नए कार्यक्षेत्र में एक छवि या परियोजना फ़ाइल खोलें।."
+                },
+                "quickLoad": {
+                    "name": "त्वरित लोड",
+                    "description": "त्वरित बचत द्वारा सहेजी गई फ़ाइल को लोड करें।."
+                },
+                "quickSave": {
+                    "name": "क्विक सेव",
+                    "description": "वर्तमान फ़ाइल को अस्थायी भंडारण में बचाता है।."
+                },
+                "saveAs": {
+                    "name": "छवि सहेजें",
+                    "description": "एक परियोजना प्रारूप में छवि को बचाता है जिसे किसी भी जानकारी को खोए बिना OpenGraphica द्वारा फिर से खोला जा सकता है।."
+                },
+                "takePhoto": {
+                    "name": "फोटो",
+                    "description": "अपने कैमरे और कैमरे से एक तस्वीर लें और इसे छवि में डालें।."
+                }
+            }
+        },
+        "history": {
+            "name": "संपादन इतिहास",
+            "description": "संचालन जो छवि संपादन के इतिहास के माध्यम से चल रहे हैं।.",
+            "modules": {
+                "redo": {
+                    "name": "इतिहास Redo",
+                    "description": "पिछले undone कार्रवाई को फिर से करें।."
+                },
+                "undo": {
+                    "name": "इतिहास Undo",
+                    "description": "आखिरी कार्रवाई करें।."
+                }
+            }
+        },
+        "image": {
+            "name": "छवि कैनवास",
+            "description": "ऑपरेशन जो छवि कैनवास को प्रभावित करते हैं।.",
+            "modules": {
+                "convertLayersToImageSequence": {
+                    "name": "परतों को छवि अनुक्रम में कनवर्ट करें",
+                    "description": "चयनित परतों को एक छवि अनुक्रम परत (एनीमेशन) में कनवर्ट करता है।."
+                },
+                "convertLayersFlatten": {
+                    "name": "परतों को फ़्लैटन छवि में कनवर्ट करें",
+                    "description": "सभी परतों को एक छवि परत में मर्ज करता है और इसे परत स्टैक के शीर्ष पर जोड़ता है।."
+                },
+                "copy": {
+                    "name": "चयनित परतों की प्रतिलिपि",
+                    "description": "वर्तमान में चयनित परतों को क्लिपबोर्ड पर कॉपी करें।."
+                },
+                "copyAll": {
+                    "name": "सभी परतों की प्रतिलिपि बनाएँ",
+                    "description": "कैनवास पर सभी परतों को क्लिपबोर्ड पर पीएनजी छवि के रूप में कॉपी करें।."
+                },
+                "cut": {
+                    "name": "कट",
+                    "description": "वर्तमान में चयनित परतों को हटा दें और उन्हें क्लिपबोर्ड पर कॉपी करें।."
+                },
+                "paste": {
+                    "name": "पेस्ट",
+                    "description": "क्लिपबोर्ड से कैनवास पर चित्र डालें।."
+                }
+            }
+        },
+        "layer": {
+            "name": "परत",
+            "description": "संचालन जो परतों को प्रभावित करते हैं।.",
+            "modules": {
+                "rename": {
+                    "name": "परत का नाम बदलें",
+                    "description": "एक परत का नाम बदलें"
+                },
+                "layerEffectBrowser": {
+                    "name": "प्रभाव ब्राउज़र",
+                    "description": "वर्तमान में चयनित परत (s) या परत समूह के लिए छवि प्रभाव जोड़ता है।."
+                }
+            }
+        },
+        "tmp": {
+            "name": "अस्थायी मॉड्यूल",
+            "description": "मॉड्यूल जो प्रारंभिक विकास के दौरान केवल चारों ओर चिपक जाएंगे।.",
+            "modules": {
+                "notYetImplemented": {
+                    "name": "अभी तक लागू नहीं",
+                    "description": "चेतावनी दें।."
+                }
+            }
+        },
+        "tutorial": {
+            "name": "ट्यूटोरियल",
+            "description": "OpenGraphica का उपयोग कैसे करें।.",
+            "modules": {
+                "welcome": {
+                    "name": "स्वागत",
+                    "description": "एक छवि पर काम करना शुरू करें।."
+                }
+            }
+        }
+    },
+    "option": {
+        "bottom": "नीचे",
+        "left": "बाएं",
+        "right": "अधिकार",
+        "top": "शीर्ष"
+    },
+    "theme": {
+        "light": "प्रकाश",
+        "dark": "अंधेरा"
+    },
+    "toolbar": {
+        "cropResize": {
+            "title": "फसल और आकार",
+            "linkWidthHeight": "लिंक चौड़ाई / ऊंचाई",
+            "size": "आकार",
+            "width": "चौड़ाई",
+            "height": "ऊंचाई",
+            "dimensionUnits": "आयाम इकाई",
+            "resolution": "संकल्प",
+            "resolutionUnits": "संकल्प इकाई",
+            "snapping": {
+                "title": "स्नैप करना",
+                "enable": "स्नैपिंग सक्षम करें"
+            }
+        },
+        "draw": {
+            "brushColor": "ब्रश रंग",
+            "brushSize": "आकार"
+        },
+        "freeTransform": {
+            "clearSelection": "स्पष्ट चयन",
+            "pickLayer": {
+                "label": "पिक लेयर",
+                "auto": "ऑटो",
+                "current": "वर्तमान"
+            },
+            "snapping": {
+                "title": "स्नैप करना",
+                "rotationSnap": "रोटेशन स्नैप"
+            },
+            "metrics": {
+                "title": "मीट्रिक",
+                "position": "स्थिति",
+                "width": "चौड़ाई",
+                "height": "ऊंचाई",
+                "rotation": "रोटेशन",
+                "resetRotation": "रोटेशन रीसेट करें",
+                "noLayers": "चयनित कोई परत नहीं।."
+            },
+            "actions": {
+                "title": "कार्य",
+                "applyTransform": "बदलना",
+                "expandToImageSize": "लेयर बाउंड्स टू इमेज साइज",
+                "trimEmptySpace": "ट्रिम खाली स्पेस"
+            }
+        },
+        "general": {
+            "settings": "सेटिंग्स"
+        },
+        "selection": {
+            "selectionShape": {
+                "label": "चयन आकार",
+                "rectangle": "आयत",
+                "ellipse": "Ellipse",
+                "freePolygon": "फ्री बहुभुज",
+                "freePolygonShort": "फ्री पाली",
+                "tonalArea": "टोनल एरिया"
+            },
+            "selectionCombineMode": {
+                "label": "चयन संयोजन मोड",
+                "add": "जोड़ें",
+                "subtract": "घटाना",
+                "intersect": "अंतर"
+            }
+        },
+        "text": {
+            "font": "फ़ॉन्ट",
+            "size": "आकार",
+            "bold": "बोल्ड",
+            "italic": "इटालिक",
+            "strikethrough": "स्ट्राइकथ्रू",
+            "underline": "अंडरलाइन",
+            "fill": "भरना",
+            "fillTooltip": "रंग जो अक्षरों के किनारों के अंदर दिखाता है"
+        },
+        "zoom": {
+            "zoomOut": "ज़ूम आउट",
+            "zoomIn": "ज़ूम इन",
+            "rotateCounterClockwise": "बारी-बारी से",
+            "rotateClockwise": "रोटेट क्लॉकवे",
+            "fit": "फिट",
+            "flip": "फ्लिप"
+        }
+    },
+    "toolGroup": {
+        "draw": {
+            "name": "ड्रा",
+            "description": "ब्रश, पेंसिल, कलम और वेक्टर कला ड्राइंग उपकरण।.",
+            "tools": {
+                "brush": {
+                    "name": "ब्रश",
+                    "description": "ब्रश जो रास्टर परतों पर आकर्षित होते हैं।."
+                }
+            }
+        },
+        "image": {
+            "name": "छवि",
+            "description": "सामान्य छवि संकल्प हेरफेर।.",
+            "tools": {
+                "cropResize": {
+                    "name": "फसल और आकार",
+                    "description": "फसल, आकार बदलें, पहलू अनुपात बदलें, या छवि का आकार बदलें।."
+                }
+            }
+        },
+        "selection": {
+            "name": "चयन",
+            "description": "सक्रिय परत (s) के क्षेत्रों का चयन करें, परत (s) के लिए किसी भी जोड़तोड़ केवल चयन के अंदर होती है।.",
+            "tools": {
+                "selection": {
+                    "name": "चयन",
+                    "description": "लक्षित संपादन के लिए छवि का एक क्षेत्र चुनें।."
+                }
+            }
+        },
+        "text": {
+            "name": "पाठ",
+            "description": "पाठ परतों में हेरफेर करने के लिए उपकरण।.",
+            "tools": {
+                "text": {
+                    "name": "पाठ",
+                    "description": "पाठ परतों को बनाएं और संपादित करें।."
+                }
+            }
+        },
+        "transform": {
+            "name": "रूपांतरण",
+            "description": "चलती, घूर्णन, परत को स्केल करने के लिए उपकरण।.",
+            "tools": {
+                "freeTransform": {
+                    "name": "फ्री ट्रांसफॉर्म",
+                    "description": "चयनित परतों को ले जाएँ, घुमाएं या स्केल करें।."
+                }
+            }
+        },
+        "view": {
+            "name": "Viewport प्रदर्शन",
+            "description": "कैनवास के व्यूपोर्ट प्रदर्शन को नियंत्रित करने के लिए उपकरण।.",
+            "tools": {
+                "name": "ज़ूम",
+                "description": "में ज़ूम और बाहर कैनवास को नियंत्रित करने के लिए कितनी छवि आप देख सकते हैं।."
+            }
+        }
+    },
+    "tutorialTip": {
+        "drawToolIntroduction": {
+            "title": "उपकरण",
+            "introduction": [
+                "ड्रॉ टूल आपको लाइनों और आकारों को बनाने देता है।."
+            ]
+        },
+        "explainCanvasViewportControls": {
+            "title": "कैनवास चल रहा है",
+            "introduction": [
+                "कोई फर्क नहीं पड़ता कि कौन सा उपकरण चुना गया है, आप कैनवास दृश्य को नियंत्रित कर सकते हैं।.",
+                "जब {anyTool} का चयन किया जाता है:"
+            ],
+            "anyTool": "कोई उपकरण",
+            "body": {
+                "mouse": [
+                    "{zooming} - ज़ूम इन और आउट करने के लिए {mouseWheel} का उपयोग करें।.",
+                    "{panning} - कैनवास को स्थानांतरित करने के लिए {rightMouseButton} के साथ क्लिक करें और खींचें।."
+                ],
+                "touch": [
+                    "{zooming} - अंदर और बाहर ज़ूम करने के लिए दो उंगलियों और चुटकी का उपयोग करें।.",
+                    "{panning} - दो उंगलियों का उपयोग करें और कैनवास को स्थानांतरित करने के लिए उन्हें एक साथ स्लाइड करें।."
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "ज़ूम करना",
+                "panning": "पैनिंग",
+                "mouseWheel": "माउस व्हील",
+                "rightMouseButton": "दायां माउस बटन"
+            }
+        },
+        "freeTransformToolIntroduction": {
+            "title": "फ्री ट्रांसफॉर्म टूल",
+            "introduction": [
+                "यह उपकरण परतों को स्थानांतरित, आकार देता है और घुमाता है। एक सीमा बॉक्स चयनित परत (s) के आसपास दिखाता है।.",
+                "{autoMode} में:"
+            ],
+            "autoMode": "ऑटो मोड",
+            "body": {
+                "mouse": [
+                    "{selection} - {leftClick} इसे चुनने के लिए एक परत पर।.",
+                    "{moving} - {leftClick} एक परत पर और इसे स्थानांतरित करने के लिए खींचें।.",
+                    "{resizing} - {leftClick} और ड्रैग रीसाइज हैंडल।."
+                ],
+                "touch": [
+                    "{selection} - इसे चुनने के लिए एक परत पर टैप करें।.",
+                    "{moving} - एक परत पर टैप करें और इसे स्थानांतरित करने के लिए खींचें।.",
+                    "{resizing} - रीसाइज हैंडल को खींचने के लिए एक उंगली का उपयोग करें।."
+                ]
+            },
+            "bodyTitle": {
+                "selection": "चयन",
+                "moving": "चलती",
+                "resizing": "आकार देना",
+                "leftClick": "लेफ्ट क्लिक"
+            }
+        },
+        "selectionToolIntroduction": {
+            "title": "चयन उपकरण",
+            "introduction": [
+                "चयन उपकरण आपको छवि के विशिष्ट भागों का चयन करने की अनुमति देता है जो संपादन को प्रभावित करता है।."
+            ],
+            "body": {
+                "mouse": [
+                    "{createSelection} - चयन करने के लिए {leftClick} के साथ क्लिक करें और खींचें।."
+                ],
+                "touch": [
+                    "{createSelection} - चयन करने के लिए एक उंगली के साथ खींचें।."
+                ],
+                "end": [
+                    "{selectionShape} - चयन को आकर्षित करने के लिए किस आकार का उपयोग किया जाता है।.",
+                    "{selectionCombineMode} - वर्तमान चयन मौजूदा चयन के साथ कैसे जुड़ता है।."
+                ]
+            },
+            "bodyTitle": {
+                "createSelection": "चयन करें",
+                "leftClick": "लेफ्ट क्लिक",
+                "selectionShape": "चयन आकार",
+                "selectionCombineMode": "चयन संयोजन मोड"
+            }
+        },
+        "zoomToolIntroduction": {
+            "title": "ज़ूम/पैन टूल",
+            "introduction": [
+                "यह उपकरण आपको छवि में ज़ूम करने देता है और दृश्य को चारों ओर ले जाता है।."
+            ],
+            "body": {
+                "mouse": [
+                    "{zooming} - {leftClick} ज़ूम इन करने के लिए; {ctrlLeftClick} ज़ूम आउट करने के लिए।.",
+                    "{panning} - कैनवास को स्थानांतरित करने के लिए {leftMouseButton} के साथ क्लिक करें और खींचें।."
+                ],
+                "touch": [
+                    "{zooming} - ज़ूम करने के लिए एक उंगली के साथ टैप करें। जूम आउट करने के लिए दो उंगलियों के साथ टैप करें।.",
+                    "{panning} - कैनवास को स्थानांतरित करने के लिए एक उंगली के साथ टैप और खींचें।."
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "ज़ूम करना",
+                "panning": "पैनिंग",
+                "leftClick": "लेफ्ट क्लिक",
+                "ctrlLeftClick": "Ctrl + लेफ्ट क्लिक",
+                "leftMouseButton": "बाएं माउस बटन"
+            }
+        }
+    }
+}

@@ -1,0 +1,62 @@
+[
+    {
+        "code": "ar",
+        "description": "اَلْعَرَبِيَّةُ"
+    },
+    {
+        "code": "bn",
+        "description": "বাংলা"
+    },
+    {
+        "code": "de",
+        "description": "Deutsch"
+    },
+    {
+        "code": "en",
+        "description": "English"
+    },
+    {
+        "code": "es",
+        "description": "Español"
+    },
+    {
+        "code": "fa",
+        "description": "فارسی"
+    },
+    {
+        "code": "fr",
+        "description": "Français"
+    },
+    {
+        "code": "hi",
+        "description": "हिन्दी"
+    },
+    {
+        "code": "it",
+        "description": "italiano"
+    },
+    {
+        "code": "ja",
+        "description": "日本語"
+    },
+    {
+        "code": "ko",
+        "description": "한국어"
+    },
+    {
+        "code": "pt",
+        "description": "Português"
+    },
+    {
+        "code": "ru",
+        "description": "русский"
+    },
+    {
+        "code": "tr",
+        "description": "Türkçe"
+    },
+    {
+        "code": "zh",
+        "description": "汉语"
+    }
+]

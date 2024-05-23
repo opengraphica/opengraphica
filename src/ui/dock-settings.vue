@@ -236,6 +236,22 @@
                                 </el-radio-button>
                             </el-radio-group>
                         </el-form-item>
+                        <!-- Prefs: Language -->
+                        <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.language')">
+                            <el-select v-model="languageOverride" size="small" style="width: 6rem;">
+                                <el-option-group>
+                                    <el-option value="" :label="'[' + $t('dock.settings.prefs.default') + ']'" />
+                                </el-option-group>
+                                <el-option-group>
+                                    <el-option
+                                        v-for="option in languageOptions"
+                                        :key="option.value"
+                                        :value="option.value"
+                                        :label="option.label"
+                                    />
+                                </el-option-group>
+                            </el-select>
+                        </el-form-item>
                         <el-collapse class="el-collapse--menu-item">
                             <!-- Prefs: Editor -->
                             <el-collapse-item v-el-collapse-item-smart-scroll :title="$t('dock.settings.prefs.editor.groupTitle')">
@@ -309,13 +325,15 @@ import ElLoading from 'element-plus/lib/components/loading/index';
 import ElMenu, { ElMenuItem } from 'element-plus/lib/components/menu/index';
 import { ElRadioButton, ElRadioGroup } from 'element-plus/lib/components/radio/index';
 import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
-import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
+import ElSelect, { ElOption, ElOptionGroup } from 'element-plus/lib/components/select/index';
 import ElSwitch from 'element-plus/lib/components/switch/index';
 import ElTabs, { ElTabPane } from 'element-plus/lib/components/tabs/index';
 import ElTimeline, { ElTimelineItem } from 'element-plus/lib/components/timeline/index';
 
 import elCollapseItemSmartScrollDirective from '@/directives/el-collapse-item-smart-scroll';
 
+import languages from '@/config/languages.json';
+import { setEditorLanguage } from '@/i18n';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore, { HistoryState } from '@/store/history';
@@ -349,6 +367,7 @@ export default defineComponent({
         ElMenu,
         ElMenuItem,
         ElOption,
+        ElOptionGroup,
         ElRadioButton,
         ElRadioGroup,
         ElScrollbar,
@@ -527,6 +546,17 @@ export default defineComponent({
         });
 
         // Preferences
+        const languageOptions: Array<{ value: string | null, label: string }>
+            = languages.map((language) => ({ value: language.code, label: language.description }));
+        const languageOverride = computed<string>({
+            get() {
+                return preferencesStore.state.languageOverride;
+            },
+            set(value) {
+                preferencesStore.set('languageOverride', value);
+                setEditorLanguage(value);
+            }
+        });
         const preferenceRenderer = computed<PreferencesState['renderer']>({
             get() {
                 return preferencesStore.state.renderer;
@@ -715,6 +745,8 @@ export default defineComponent({
             loadingThemeName,
             activeTheme,
 
+            languageOptions,
+            languageOverride,
             preferenceRenderer,
             preferenceOptimizeLargeImages,
             performanceFixLayerSeams,

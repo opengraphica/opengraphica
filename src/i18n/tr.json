@@ -1,0 +1,998 @@
+{
+    "empty": "",
+    "action": {
+        "addLayerFilter": "Katmana Etkisi Ekle",
+        "addLayerFilterMultiple": "Katmana Etkisi (s)",
+        "applyActiveSelection": "Active Selection",
+        "applyLayerTransform": "Uygulama Katmanı Dönüştürüm",
+        "clearSelection": "Clear Selection",
+        "convertLayersToImageSequence": "Image Sequences'a dönüştürülür",
+        "createDrawLayer": "Create Draw Katman",
+        "createNewFile": "Yeni Dosya",
+        "createNewLayersFromSelection": "Seçmenlerden Katmanlar Oluşturun",
+        "cutLayers": "Cut Katman(s)",
+        "deleteLayers": "Delete Katman(s)",
+        "deleteLayerFilter": "Delete Etkisi",
+        "deleteLayerSelectionArea": "Delete Selection",
+        "disableLayerFilter": "Disable Katman Etkisi",
+        "enableLayerFilter": "Enable Katman Etkisi",
+        "fileTakePhoto": "Bir Fotoğraflar Alın",
+        "freeTransformRotate": "Ücretsiz Dönüşüm (Rotate)",
+        "freeTransformScale": "Ücretsiz Dönüşüm (Resize)",
+        "freeTransformTranslate": "Ücretsiz Dönüşüm (Move)",
+        "insertLayer": "Katman",
+        "moduleCropResize": "Ek ve Resize",
+        "openFile": "Open File",
+        "pasteLayers": "Paste Katman(s)",
+        "placeholder": "Placeholder",
+        "pleaseWait": "Lütfen bekleyin...",
+        "renameLayer": "Rename Katmanı",
+        "reorderLayers": "Reorder Katman(s)",
+        "reorderLayerFilters": "Reorder Etkisi (s)",
+        "selectLayers": "Katman(s) seçin",
+        "setLayerBoundsToWorkingFileBounds": "Katman Görüntü Boyutu",
+        "toggleLayerVisibilityOn": "Toggle Katman Viability Onda",
+        "toggleLayerVisibilityOff": "Toggle Katman Viability Off",
+        "trimLayerEmptySpace": "Trim Katman Boş Uzay",
+        "updateActiveSelection": "Update Active Selection",
+        "updateFile": "Update File",
+        "updateLayer": "Güncelleme Katmanı",
+        "updateDrawLayer": "Katman üzerinde çizin",
+        "updateLayerFilterParams": "Update Katman Etkisi",
+        "updateSelectionCombineMode": "Update Selection Mode"
+    },
+    "app": {
+        "colorPickerGradient": {
+            "hueSlider": "Hue Slider",
+            "opacitySlider": "Opakity Slider"
+        },
+        "dndDropOverlay": {
+            "addImage": "Add Image"
+        },
+        "historyNotification": {
+            "title": {
+                "do": {
+                    "inProgress": "Run Action...",
+                    "complete": "Tamam"
+                },
+                "undo": {
+                    "inProgress": "Undo...",
+                    "complete": "Undo Complete"
+                },
+                "redo": {
+                    "inProgress": "Redo...",
+                    "complete": "Redo Complete"
+                }
+            }
+        },
+        "layerList": {
+            "toggleLayerVisibility": "Toggle Katman Viability",
+            "layerSettings": "Katman Ayarları",
+            "rename": "Rename",
+            "addEffect": "Add Etkisi Ekle",
+            "delete": "Delete",
+            "frames": "Frames",
+            "playAnimation": "Play Animation",
+            "stopAnimation": "Animasyon Dur",
+            "editFrames": "Edit Frames",
+            "emptyGroup": "Grup boş.",
+            "effects": "Etkileri",
+            "recalculatingEffect": "İşleme...",
+            "moveEffectUp": "Move Etkisi Up",
+            "moveEffectDown": "Move Etkisi Down"
+        },
+        "wait": {
+            "applyLayerTransform": "Katmanı Uygulayın",
+            "loadingImage": "Yükleniyor Image",
+            "pleaseWait": "Lütfen bekleyin",
+            "trimLayerEmptySpace": "Boş Uzay",
+            "cancel": "Cancel"
+        }
+    },
+    "brushCategory": {
+        "simple": {
+            "name": "Basit Fırçalar",
+            "brushes": {
+                "circle": {
+                    "name": "Circle"
+                }
+            }
+        },
+        "shapes": {
+            "name": "Şekiller"
+        }
+    },
+    "button": {
+        "apply": "Başvuru",
+        "cancel": "Cancel",
+        "clear": "Clear",
+        "convert": "Convert",
+        "create": "Create",
+        "createNewImage": "Create New Image",
+        "done": "Done",
+        "export": "İhracat İhracatı",
+        "no": "Hayır hayır hayır",
+        "ok": "TAMAM TAMAM",
+        "openImage": "Open Image",
+        "save": "Kaydet",
+        "settings": "Ayarlar",
+        "take": "Take",
+        "takePhoto": "Fotoğraflar alın",
+        "yes": "Evet"
+    },
+    "canvas": {
+        "toolbar": {
+            "cropResize": {
+                "waitLabel": "Ek ve Resize"
+            }
+        }
+    },
+    "dock": {
+        "colorPicker": {
+            "title": "Color Picker",
+            "pickColorFromImage": "Color From Image",
+            "hexCode": "Hex Code"
+        },
+        "layers": {
+            "title": "Katmanlar",
+            "add": "Add",
+            "layer": "Katman",
+            "group": "Grup Grup Grup Grubu",
+            "background": "Arka plan arka plan arka plan",
+            "toggleBackgroundVisibility": "Toggle background Viability",
+            "noLayers": "Yine de Katmanlar yok."
+        },
+        "settings": {
+            "title": "Eylemler",
+            "file": {
+                "tabTitle": "Dosya",
+                "menu": {
+                    "new": "Yeni",
+                    "open": "Open",
+                    "export": "İhracat İhracatı",
+                    "save": "Kaydet",
+                    "saveAs": "Kaydet As Save As Kaydet",
+                    "insertPhoto": "Bir Fotoğraf Ekle",
+                    "takePhoto": "Bir Fotoğraflar Alın"
+                }
+            },
+            "image": {
+                "tabTitle": "Image",
+                "menu": {
+                    "cropResize": "Ek ve Resize",
+                    "convertLayers": {
+                        "groupTitle": "Convert Katmanlar...",
+                        "toImageSequence": "Image Sequence",
+                        "flatten": "Flatten To New Katman"
+                    },
+                    "cut": "Cut",
+                    "copy": "Kopya kopya",
+                    "copyAllLayers": "Tüm Katmanları kopyalayın",
+                    "paste": "Paste"
+                }
+            },
+            "view": {
+                "tabTitle": "View",
+                "zoom": "Zoom",
+                "zoomOut": "Zoom Out Off",
+                "zoomIn": "Zoom In",
+                "rotate": "Rotate",
+                "rotateCounterClockwise": "Rotate Counterhourwise",
+                "rotateClockwise": "Rotate Clockwise",
+                "reset": "Reset",
+                "fit": "Fit",
+                "touchRotate": {
+                    "label": "Touch Rotate",
+                    "on": "Onda",
+                    "snap": "Snap",
+                    "off": "Off"
+                },
+                "window": "Pencere",
+                "enterFullscreen": "Fullscreen",
+                "exitFullscreen": "Çıkış Fullscreen"
+            },
+            "history": {
+                "tabTitle": "Tarih Tarihi",
+                "undo": "Undo",
+                "redo": "Redo",
+                "noHistory": "Ancak tarih yok.",
+                "baseImage": "Base Image"
+            },
+            "prefs": {
+                "tabTitle": "Prefs",
+                "theme": "Tema",
+                "language": "Dil Dili",
+                "default": "Varsayılan olarak",
+                "performance": {
+                    "groupTitle": "Performans",
+                    "renderer": {
+                        "label": "Renderer",
+                        "2d": "2D",
+                        "webgl": "WebGL"
+                    },
+                    "optimizeLargeImage": "Büyük Image için optimize",
+                    "highQualityScaling": "Yüksek kaliteli Scaling",
+                    "fixAdjacentLayerSeams": "Fix Adjacent Katman Seams"
+                },
+                "editor": {
+                    "groupTitle": "Editor",
+                    "menuBarPosition": "Menu Bar Position",
+                    "showWelcomeScreen": "Show Welcome Ekran",
+                    "showTips": "Göster ipuçları",
+                    "resetSettings": "Sıfır Ayarları"
+                },
+                "debugging": {
+                    "groupTitle": "Debugging",
+                    "useMobileDebugger": "Load Mobile Debugger"
+                },
+                "help": {
+                    "groupTitle": "Yardım",
+                    "reportIssue": "Rapor an Issue"
+                }
+            }
+        }
+    },
+    "el": {
+        "horizontalScrollbarArrows": {
+            "scrollLeft": "Sol",
+            "scrollRight": "Doğru Sayfa"
+        }
+    },
+    "keyboardMap": {
+        "file": {
+            "name": "Dosya",
+            "actions": {
+                "open": "Open File",
+                "export": "Export File",
+                "quickLoad": "Hızlı Yük",
+                "quickSave": "Hızlı Kaydet"
+            }
+        },
+        "image": {
+            "name": "Image",
+            "actions": {
+                "cut": "Cut",
+                "copy": "Kopya kopya",
+                "paste": "Paste",
+                "delete": "Delete"
+            }
+        },
+        "history": {
+            "name": "Tarih",
+            "actions": {
+                "undo": "Undo",
+                "redo": "Redo"
+            }
+        },
+        "selection": {
+            "name": "Seçme",
+            "actions": {
+                "selectAll": "All Select All",
+                "deleteSelection": "Delete Selection"
+            }
+        }
+    },
+    "layerFilter": {
+        "brightness": {
+            "name": "Sarmal",
+            "param": {
+                "mode": "Mode",
+                "modeOption": {
+                    "gamma": "Gamma",
+                    "shift": "Black/White Shift",
+                    "luminance": "Luminance"
+                },
+                "brightness": "Sarmal",
+                "effectiveRange": "Range",
+                "effectiveRangeFeather": "Tüy"
+            }
+        },
+        "chroma": {
+            "name": "Chroma",
+            "param": {
+                "chroma": "Chroma",
+                "mode": "Mode",
+                "modeOption": {
+                    "multiply": "Chroma Contrast",
+                    "shift": "Hatta tamamen Chroma'yı Uyum"
+                }
+            }
+        },
+        "colorBlindness": {
+            "name": "Renk Körlüğü",
+            "param": {
+                "method": "Simülasyon Yöntemi",
+                "methodOption": {
+                    "brettel": "Brettel 1997"
+                },
+                "type": "Körlük Tipi",
+                "typeOption": {
+                    "protan": "Protanopia / Protanomaly (Red-Blind)",
+                    "deuteran": "Deuteranopia / Deuteranomaly (Green-Blind)",
+                    "tritan": "Tritanopia / Tritanomaly (Mavi-Blind)",
+                    "achroma": "Ahromatomaly / Achromatopsia (Red/Green/Mavi-Blind)"
+                },
+                "severity": "Şiddetlilık"
+            }
+        },
+        "colorCorrection": {
+            "name": "Renkli Düzeltme"
+        },
+        "contrast": {
+            "name": "Contrast",
+            "param": {
+                "contrast": "Contrast",
+                "middleGray": "Orta Gray"
+            }
+        },
+        "decreaseColorDepth": {
+            "name": "Renk Derinliği"
+        },
+        "gaussianBlur": {
+            "name": "Gaussian Blur",
+            "param": {
+                "size": "Boyut Boyutu",
+                "xIntensity": "X Intensity",
+                "yIntensity": "Y Intensity"
+            }
+        },
+        "grayscale": {
+            "name": "Grayscale",
+            "param": {
+                "mode": "Mode",
+                "modeOption": {
+                    "luminance": "Luminance",
+                    "luma": "Luma",
+                    "lightness": "Işık (HSL)",
+                    "average": "Ortalama (HSI Intensity)",
+                    "value": "Değer (HSV)"
+                },
+                "modeOptionDescription": {
+                    "value": "= max (R,G,B)"
+                },
+                "mix": "Mix"
+            }
+        },
+        "hue": {
+            "name": "Hue",
+            "param": {
+                "colorSpace": "Renkli Uzay",
+                "colorSpaceOption": {
+                    "oklab": "Oklab",
+                    "perceptualRgb": "Perceptual RGB",
+                    "linearRgb": "Linear RGB"
+                },
+                "rotate": "Rotate"
+            }
+        },
+        "negative": {
+            "name": "Negatif",
+            "param": {
+                "colorSpace": "Renkli Uzay",
+                "colorSpaceOption": {
+                    "perceptualRgb": "Perceptual RGB",
+                    "linearRgb": "Linear RGB"
+                },
+                "invertRed": "Red Channel",
+                "invertGreen": "Invert Green Channel",
+                "invertBlue": "Invert Blue Channel",
+                "invertValue": "Invert Value"
+            }
+        },
+        "saturation": {
+            "name": "Saturation",
+            "param": {
+                "saturation": "Saturation"
+            }
+        },
+        "sepia": {
+            "name": "Sepia"
+        }
+    },
+    "layerFilterGroup": {
+        "blur": {
+            "name": "Blur"
+        },
+        "color": {
+            "name": "Renkli Renk"
+        },
+        "distort": {
+            "name": "Distort"
+        },
+        "instagramFilter": {
+            "name": "Instagram Filtre"
+        },
+        "photography": {
+            "name": "Fotoğraflar"
+        },
+        "sharpen": {
+            "name": "Sharpen"
+        }
+    },
+    "layoutShortcutGroup": {
+        "color": {
+            "name": "Renk seçin",
+            "controls": {
+                "default": {
+                    "label": "Renk seçin"
+                }
+            }
+        },
+        "deform": {
+            "name": "Deform",
+            "controls": {
+                "default": {
+                    "label": "Deform"
+                }
+            }
+        },
+        "draw": {
+            "name": "Çizim",
+            "controls": {
+                "default": {
+                    "label": "Çizim"
+                }
+            }
+        },
+        "effects": {
+            "name": "Etkileri",
+            "controls": {
+                "default": {
+                    "label": "Etkileri"
+                }
+            }
+        },
+        "erase": {
+            "name": "Erase",
+            "controls": {
+                "default": {
+                    "label": "Erase"
+                }
+            }
+        },
+        "history": {
+            "name": "Tarih Tarihi",
+            "controls": {
+                "undo": {
+                    "label": "Undo"
+                },
+                "redo": {
+                    "label": "Redo"
+                }
+            }
+        },
+        "layers": {
+            "name": "Katmanlar",
+            "controls": {
+                "default": {
+                    "label": "Katmanlar"
+                }
+            }
+        },
+        "search": {
+            "name": "Arama",
+            "controls": {
+                "default": {
+                    "label": "Arama"
+                }
+            }
+        },
+        "selection": {
+            "name": "Seçme",
+            "controls": {
+                "default": {
+                    "label": "Seçme"
+                }
+            }
+        },
+        "settings": {
+            "name": "Eylemler",
+            "controls": {
+                "default": {
+                    "label": "Eylemler"
+                }
+            }
+        },
+        "text": {
+            "name": "Text",
+            "controls": {
+                "default": {
+                    "label": "Ekle / Edit Text"
+                }
+            }
+        },
+        "transform": {
+            "name": "Move / Dönüşüm",
+            "controls": {
+                "default": {
+                    "label": "Move / Dönüşüm"
+                }
+            }
+        },
+        "view": {
+            "name": "Blood Viewport",
+            "controls": {
+                "default": {
+                    "label": "Zoom / Pan View"
+                }
+            }
+        }
+    },
+    "lib": {
+        "tutorial": {
+            "notification": {
+                "gotIt": "Got It Got It",
+                "dontShowTips": "İpuçları göster"
+            }
+        }
+    },
+    "measurement": {
+        "pixels": "Pixels",
+        "millimeters": "Millimeters",
+        "centimeters": "Centimeters",
+        "inches": "Inches",
+        "pixelsPerInch": "Pixels /Inch",
+        "pixelsPerMillimeter": "Pixels/Millimeter",
+        "pixelsPerCentimeter": "Pixels/Centimeter"
+    },
+    "menuBar": {
+        "toolsHeading": "Araçlar"
+    },
+    "module": {
+        "fileExport": {
+            "title": "Export Image",
+            "saveBackIntroduction": "{fileName} adında bir dosya açtınız.",
+            "saveBackQuestion": "Orijinal dosyaya geri dön?",
+            "fileName": "Dosya Adı",
+            "fileType": "Dosya Türü",
+            "layers": "Katmanlar",
+            "quality": "Kalite kalitesi",
+            "dithering": "Dithering",
+            "ditheringOption": {
+                "none": "Hiçbir şey yok",
+                "atkinson": "Atkinson",
+                "atkinsonSerpentine": "Atkinson (serpentine)",
+                "floydSteinberg": "Floyd Steinberg",
+                "floydSteinbergSerpentine": "Floyd Steinberg (serpentine)",
+                "falseFloydSteinberg": "Yanlış Floyd Steinberg",
+                "falseFloydSteinbergSerpentine": "Yanlış Floyd Steinberg (serpentine)",
+                "stucki": "Stucki",
+                "stuckiSerpentine": "Stucki (serpentine)"
+            }
+        },
+        "fileNew": {
+            "title": "New Image",
+            "preset": "Preset",
+            "presetPlaceholder": "Select (Optional)",
+            "width": "Genişlik genişliği Genişlik genişliği",
+            "height": "Yükseklik",
+            "resolution": "Karar",
+            "colorProfile": "Renkli Profil",
+            "scaleFactor": "Scale Factor"
+        },
+        "fileSaveAs": {
+            "title": "Save Image As Kaydet",
+            "saveBackIntroduction": "{fileName} adında bir dosya açtınız.",
+            "saveBackQuestion": "Orijinal dosyaya geri dön?",
+            "exportDisclaimer": "Diğer programlarda görüntüyü paylaşmak veya görüntülemek istiyorsanız, bunun yerine \"Export\" kullanın.",
+            "fileName": "Dosya Adı"
+        },
+        "fileTakePhoto": {
+            "title": "Fotoğraflar alın",
+            "noCameraError": {
+                "title": "Kamera Un available",
+                "message": "Ya cihaz kameraya kameraya kameraya hiçbir kameraya sahip değildir."
+            },
+            "selectCamera": {
+                "placeholder": "Kamera Seç",
+                "user": "Front (User)",
+                "environment": "Arka (Environment)"
+            }
+        },
+        "imageConvertLayersToImageSequence": {
+            "title": "Image Sequences'a dönüştürülür",
+            "frameDelay": "Frame Gecikme"
+        },
+        "layerEffectBrowser": {
+            "title": "Etkisi",
+            "description": "Katmana eklemek için bir etki seçin. Etkileri genellikle bir tabakanın rengini manipüle eder veya bulanık etkiler gibi özel desenler ekleyin.",
+            "loading": "Öpücükler...",
+            "generationErrorGeneral": "Seçilmiş katman için etki önizlemelerini oluştururken bir hata meydana geldi.",
+            "generationErrorUnsupportedType": "Seçilmiş olduğunuz katman, buna uygulanan filtrelere sahip olamaz.",
+            "generationErrorNoLayer": "Lütfen onlara etkileri eklemek için tabakalarda bir veya daha fazla tabaka seçin."
+        },
+        "layerEffectEdit": {
+            "title": "Edit Etkisi",
+            "description": "Belirli bir tabaka için etkisini analiz edin.",
+            "loading": "Öpücükler...",
+            "generalError": "Bir şey yanlış gitti. Bu mesajı görmeye devam ederseniz, lütfen bunu bir boğa olarak rapor edin.",
+            "deleteEffect": "Delete Etkisi",
+            "enableToggle": "Enable",
+            "resetField": "Tamam Field",
+            "deleting": "Deleting effect...",
+            "deleteFilterError": "Bir hata, filtreyi silmeye çalışırken gerçekleşti. Bu mesajı görmeye devam ederseniz, lütfen bunu bir boğa olarak rapor edin.",
+            "applyFilterError": "Filtre değişikliklerini uygulamaya çalışırken bir hata meydana geldi. Bu mesajı görmeye devam ederseniz, lütfen bunu bir boğa olarak rapor edin."
+        },
+        "renameLayer": {
+            "title": "Rename Katmanı",
+            "layerName": "Yeni İsim"
+        }
+    },
+    "moduleGroup": {
+        "file": {
+            "name": "Dosya Yönetimi",
+            "description": "Yükleme ve görüntülerinizi cihazınıza kurtarın.",
+            "modules": {
+                "export": {
+                    "name": "Export Image",
+                    "description": "Görüntüyü diğer editörler tarafından açılabilecek evrensel bir formatta kurtarın."
+                },
+                "insertPhoto": {
+                    "name": "Bir Fotoğraf Ekle",
+                    "description": "Şu anda açılan görüntüde yeni bir katman olarak bir fotoğraf ekleyin."
+                },
+                "new": {
+                    "name": "New Image",
+                    "description": "Belirtilen boyutlarda yeni bir görüntü oluşturun."
+                },
+                "open": {
+                    "name": "Open Image",
+                    "description": "Yeni bir çalışma alanında bir görüntü veya proje dosyası açın."
+                },
+                "quickLoad": {
+                    "name": "Hızlı Yük",
+                    "description": "Dosyayı hızlıca kurtararak kurtarın."
+                },
+                "quickSave": {
+                    "name": "Hızlı Kaydet",
+                    "description": "Mevcut dosyayı geçici depolamaya kurtarın."
+                },
+                "saveAs": {
+                    "name": "Save Image As Kaydet",
+                    "description": "Herhangi bir bilgi kaybetmeden OpenGraphica tarafından yeniden açılabilecek bir proje formatında görüntüyü kurtarın."
+                },
+                "takePhoto": {
+                    "name": "Bir Fotoğraflar Alın",
+                    "description": "Kameranız ve web kameranızdan bir fotoğraf alın ve onu görüntüye ekleyin."
+                }
+            }
+        },
+        "history": {
+            "name": "Tarih",
+            "description": "Görüntü düzenlemelerinin tarihi aracılığıyla hareket eden operasyonlar.",
+            "modules": {
+                "redo": {
+                    "name": "Tarih Redoo",
+                    "description": "Redo son geri alınan eylem."
+                },
+                "undo": {
+                    "name": "Tarih Undo",
+                    "description": "Son eylemden habersiz."
+                }
+            }
+        },
+        "image": {
+            "name": "Image Blood",
+            "description": "Görüntü tuvalini etkileyen operasyonlar.",
+            "modules": {
+                "convertLayersToImageSequence": {
+                    "name": "Image Sequences'a dönüştürülür",
+                    "description": "Seçilen tabakaları bir görüntü katmanına dönüştürür (animation)."
+                },
+                "convertLayersFlatten": {
+                    "name": "Katmanları Flattened Image",
+                    "description": "Merges tüm katmanları tek bir görüntü katmanına çeker ve onu tabaka yığınının üstüne ekler."
+                },
+                "copy": {
+                    "name": "Seçilmiş Katmanlar",
+                    "description": "Şu anda seçilen tabakaları klip odasına kopyalayın."
+                },
+                "copyAll": {
+                    "name": "Tüm Katmanları kopyalayın",
+                    "description": "Tüm katmanları tuvalde bir PNG görüntüsü olarak panboard'a kopyalayın."
+                },
+                "cut": {
+                    "name": "Cut",
+                    "description": "Şu anda seçilmiş katmanları çıkarın ve onları panboard'a kopyalayın."
+                },
+                "paste": {
+                    "name": "Paste",
+                    "description": "Kutudan tuvale resim çizin."
+                }
+            }
+        },
+        "layer": {
+            "name": "Katmanlar",
+            "description": "Katmanları etkileyen operasyonlar.",
+            "modules": {
+                "rename": {
+                    "name": "Rename Katmanı",
+                    "description": "Bir tabakanın adını değiştirin"
+                },
+                "layerEffectBrowser": {
+                    "name": "Etkisi",
+                    "description": "Şu anda seçilmiş tabakaya (s) veya tabaka grubuna görüntü etkilerini ekleyin (s)."
+                }
+            }
+        },
+        "tmp": {
+            "name": "Geçici Modüller",
+            "description": "Sadece ilk gelişim sırasında etrafında kalacak olan modüller.",
+            "modules": {
+                "notYetImplemented": {
+                    "name": "Yine de uygulanmadı",
+                    "description": "Bir uyarı gösterin."
+                }
+            }
+        },
+        "tutorial": {
+            "name": "Yardımlar",
+            "description": "OpenGraphica'yı nasıl kullanacağınızı öğrenin.",
+            "modules": {
+                "welcome": {
+                    "name": "Hoşgeldiniz Welcome Welcome Hoşgeldiniz",
+                    "description": "Bir görüntü üzerinde çalışmaya başlayın."
+                }
+            }
+        }
+    },
+    "option": {
+        "bottom": "Alt",
+        "left": "Sol sol sol",
+        "right": "Doğru",
+        "top": "Top"
+    },
+    "theme": {
+        "light": "Işık Işığı",
+        "dark": "Dark"
+    },
+    "toolbar": {
+        "cropResize": {
+            "title": "Ek ve Resize",
+            "linkWidthHeight": "Link Genişlik/Height",
+            "size": "Boyut Boyutu",
+            "width": "Genişlik genişliği Genişlik genişliği",
+            "height": "Yükseklik",
+            "dimensionUnits": "Boyut Birimleri",
+            "resolution": "Karar",
+            "resolutionUnits": "Çözüm Birimleri",
+            "snapping": {
+                "title": "Snapping",
+                "enable": "Enable Snapping"
+            }
+        },
+        "draw": {
+            "brushColor": "Fırça Renkleri",
+            "brushSize": "Boyut Boyutu"
+        },
+        "freeTransform": {
+            "clearSelection": "Clear Selection",
+            "pickLayer": {
+                "label": "Take Katman",
+                "auto": "Auto",
+                "current": "Şimdiki akım"
+            },
+            "snapping": {
+                "title": "Snapping",
+                "rotationSnap": "Rotation Snap"
+            },
+            "metrics": {
+                "title": "Metriks",
+                "position": "Pozisyon pozisyonu",
+                "width": "Genişlik genişliği Genişlik genişliği",
+                "height": "Yükseklik",
+                "rotation": "Rotation",
+                "resetRotation": "Reset Rotation",
+                "noLayers": "Hiçbir katman (s) seçilir."
+            },
+            "actions": {
+                "title": "Eylemler",
+                "applyTransform": "Uygulama Dönüştürü",
+                "expandToImageSize": "Katman Görüntü Boyutu",
+                "trimEmptySpace": "Trim Boş Uzay"
+            }
+        },
+        "general": {
+            "settings": "Ayarlar"
+        },
+        "selection": {
+            "selectionShape": {
+                "label": "Seçim Şekilleri",
+                "rectangle": "Rect",
+                "ellipse": "Ellipse",
+                "freePolygon": "Ücretsiz Polygon",
+                "freePolygonShort": "Ücretsiz Poly",
+                "tonalArea": "Tonal Alan"
+            },
+            "selectionCombineMode": {
+                "label": "Seçilmiş Modu",
+                "add": "Add",
+                "subtract": "Subtract",
+                "intersect": "Intersect"
+            }
+        },
+        "text": {
+            "font": "Font",
+            "size": "Boyut Boyutu",
+            "bold": "Bold",
+            "italic": "Italicic",
+            "strikethrough": "Grev",
+            "underline": "Underline",
+            "fill": "Doldurun",
+            "fillTooltip": "Mektupların kenarlarında gösteren renkler (s)"
+        },
+        "zoom": {
+            "zoomOut": "Zoom Out Off",
+            "zoomIn": "Zoom In",
+            "rotateCounterClockwise": "Rotate Counterhourwise",
+            "rotateClockwise": "Rotate Clockwise",
+            "fit": "Fit",
+            "flip": "Flip"
+        }
+    },
+    "toolGroup": {
+        "draw": {
+            "name": "Çizim",
+            "description": "Fırçalar, kalemler, kalemler ve vektör sanat çizim araçları.",
+            "tools": {
+                "brush": {
+                    "name": "Fırça",
+                    "description": "Bulucu tabakalarda çizen fırçalar."
+                }
+            }
+        },
+        "image": {
+            "name": "Image",
+            "description": "Genel görüntü çözünürlüğü manipülasyonu.",
+            "tools": {
+                "cropResize": {
+                    "name": "Ek ve Resize",
+                    "description": "Ek olarak, yeniden boyut, değişim yönü oranı veya görüntüyü resample."
+                }
+            }
+        },
+        "selection": {
+            "name": "Seçme",
+            "description": "Aktif tabaka (s), herhangi bir manipülasyonlar sadece seçim içinde meydana gelir.",
+            "tools": {
+                "selection": {
+                    "name": "Seçme",
+                    "description": "Hedef düzenleme için görüntünün bir alanı seçin."
+                }
+            }
+        },
+        "text": {
+            "name": "Text",
+            "description": "Metin tabakalarını manipüle etmek için araçlar.",
+            "tools": {
+                "text": {
+                    "name": "Text",
+                    "description": "Create and edit text katmanları."
+                }
+            }
+        },
+        "transform": {
+            "name": "Dönüşüm Dönüşüm Dönüşümü",
+            "description": "Hareket etmek için araçlar, dönen, tabakayı ölçeklendirmek.",
+            "tools": {
+                "freeTransform": {
+                    "name": "Ücretsiz Dönüşüm",
+                    "description": "Hareket, döndürme veya seçilen tabakaları ölçeklendirmek."
+                }
+            }
+        },
+        "view": {
+            "name": "Viewport Display",
+            "description": "Tuvalin görüntü gösterimini kontrol etmek için araçlar.",
+            "tools": {
+                "name": "Zoom",
+                "description": "Görebileceğiniz görüntünün ne kadarını kontrol etmek ve tuvali dışarı çıkarın."
+            }
+        }
+    },
+    "tutorialTip": {
+        "drawToolIntroduction": {
+            "title": "Draw Tool",
+            "introduction": [
+                "Çizim aracı hatları ve şekilleri oluşturmanıza olanak tanır."
+            ]
+        },
+        "explainCanvasViewportControls": {
+            "title": "Blood'u hareket ettirin",
+            "introduction": [
+                "Hangi araç seçilirse, tuval görünümünü kontrol edebilirsiniz.",
+                "{anyTool} seçilir:"
+            ],
+            "anyTool": "herhangi bir alet",
+            "body": {
+                "mouse": [
+                    "{zooming} - {mouseWheel}'i ve dışarı çıkmak için.",
+                    "{panning} - {rightMouseButton} ile tuvali hareket etmek için tıklayın."
+                ],
+                "touch": [
+                    "{zooming} - İki parmağınızı kullanın ve yakınlaştırmak için pinch kullanın.",
+                    "{panning} - tuvali taşımak için birlikte iki parmağı kullanın."
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "Zooming",
+                "panning": "Panning",
+                "mouseWheel": "Mouse",
+                "rightMouseButton": "Doğru Mouse Düğme"
+            }
+        },
+        "freeTransformToolIntroduction": {
+            "title": "Ücretsiz Dönüşüm Aracı",
+            "introduction": [
+                "Bu araç hareket eder, tekrarlar ve tabakaları döndürür. Bir sınır kutusu seçilen tabakanın etrafında gösterir (s).",
+                "{autoMode}:"
+            ],
+            "autoMode": "otomatik mod",
+            "body": {
+                "mouse": [
+                    "{selection} - {leftClick} onu seçmek için bir katmanda.",
+                    "{moving} - {leftClick} bir tabakada ve onu hareket etmeye sürükleyin.",
+                    "{resizing} - {leftClick} ve yeniden boyutlandırmak."
+                ],
+                "touch": [
+                    "{selection} - Onu seçmek için bir katmana dokunun.",
+                    "{moving} - Bir tabakaya dokunun ve onu hareket etmeye sürükleyin.",
+                    "{resizing} - Yeniden boyutlandırmak için bir parmağı kullanın."
+                ]
+            },
+            "bodyTitle": {
+                "selection": "Seçme",
+                "moving": "Hareketliliğe Geçiş",
+                "resizing": "Yeniden yapılandırma",
+                "leftClick": "Sol Click Click Click"
+            }
+        },
+        "selectionToolIntroduction": {
+            "title": "Seçenme Aracı",
+            "introduction": [
+                "Seçim aracı, düzenlemenin neyi etkilediğini kısıtlamak için görüntünün belirli kısımlarını seçmenize izin verir."
+            ],
+            "body": {
+                "mouse": [
+                    "{createSelection} - {leftClick} bir seçim oluşturmak için."
+                ],
+                "touch": [
+                    "{createSelection} - Bir seçim oluşturmak için bir parmağı ile çizin."
+                ],
+                "end": [
+                    "{selectionShape} - seçimi çekmek için hangi şekil kullanılır.",
+                    "{selectionCombineMode} - Mevcut seçim mevcut seçimle nasıl birleştirir."
+                ]
+            },
+            "bodyTitle": {
+                "createSelection": "Create Selection",
+                "leftClick": "Sol Click Click Click",
+                "selectionShape": "Seçim Şekilleri",
+                "selectionCombineMode": "Seçilmiş Modu"
+            }
+        },
+        "zoomToolIntroduction": {
+            "title": "Zoom/Pan Tool",
+            "introduction": [
+                "Bu araç, görüntüye yakın olmanızı sağlar ve etrafındaki manzarayı hareket eder."
+            ],
+            "body": {
+                "mouse": [
+                    "{zooming} - {leftClick} Yakınlarda; {ctrlLeftClick}'yi yakınlaştırmak için.",
+                    "{panning} - {leftMouseButton} ile tuvali hareket etmek için tıklayın."
+                ],
+                "touch": [
+                    "{zooming} - Bir parmakla yakınlaştırın. İki parmakla yakınlaştırın.",
+                    "{panning} - Tap ve tuvali hareket etmek için bir parmağıyla sürüklen."
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "Zooming",
+                "panning": "Panning",
+                "leftClick": "Sol Click Click Click",
+                "ctrlLeftClick": "Ctrl + Left Click",
+                "leftMouseButton": "Sol Mouse"
+            }
+        }
+    }
+}

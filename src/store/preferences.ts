@@ -10,6 +10,7 @@ interface PreferencesState {
     historyStatesMax: number;
     keyboardMapConfig: KeyboardMapConfigCategory[];
     imageSmoothingZoomRatio: number;
+    languageOverride: string;
     menuBarPosition: 'top' | 'bottom' | 'left' | 'right';
     multiTouchDownTimeout: number;
     multiTouchTapTimeout: number;
@@ -43,6 +44,7 @@ const store = new PerformantStore<PreferencesStore>({
         historyStatesMax: 50,
         imageSmoothingZoomRatio: 1.25,
         keyboardMapConfig: [],
+        languageOverride: '',
         menuBarPosition: 'left',
         multiTouchDownTimeout: 75,
         multiTouchTapTimeout: 175,
@@ -64,6 +66,7 @@ const store = new PerformantStore<PreferencesStore>({
         'dockPosition',
         'dragStartRadius',
         'historyStatesMax',
+        'languageOverride',
         'menuBarPosition',
         'multiTouchDownTimeout',
         'multiTouchTapTimeout',

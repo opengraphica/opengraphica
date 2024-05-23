@@ -1,0 +1,996 @@
+{
+    "empty": "",
+    "action": {
+        "addLayerFilter": "اضافه کردن اثر به Layer",
+        "addLayerFilterMultiple": "اضافه کردن اثر به Layer (s)",
+        "applyActiveSelection": "گزینه Active Selection",
+        "applyLayerTransform": "استفاده از Layer Transform",
+        "clearSelection": "انتخاب واضح",
+        "convertLayersToImageSequence": "تبدیل لایه ها به Image Sequence",
+        "createDrawLayer": "Create Layer",
+        "createNewFile": "فایل جدید",
+        "createNewLayersFromSelection": "ایجاد لایه از انتخاب",
+        "cutLayers": "لایه برش (s)",
+        "deleteLayers": "لایه حذف (ها)",
+        "deleteLayerFilter": "حذف اثر",
+        "deleteLayerSelectionArea": "انتخاب حذف",
+        "disableLayerFilter": "اثرات لایه ای Disable Layer Effect",
+        "enableLayerFilter": "قابلیت Layer Effect",
+        "fileTakePhoto": "یک عکس بگیرید",
+        "freeTransformRotate": "Free Transform (Rotate)",
+        "freeTransformScale": "Free Transform (Resize)",
+        "freeTransformTranslate": "Free Transform (Move)",
+        "insertLayer": "لایه Insert Layer",
+        "moduleCropResize": "Crop و Resize",
+        "openFile": "Open File",
+        "pasteLayers": "لایه Paste Layer (s)",
+        "placeholder": "Placeholder",
+        "pleaseWait": "لطفا صبر کنید ...",
+        "renameLayer": "لایه Rename Layer",
+        "reorderLayers": "Reorder Layer (s)",
+        "reorderLayerFilters": "Reorder Effect (بازدید کنندگان)",
+        "selectLayers": "لایه (بازدید کنندگان)",
+        "setLayerBoundsToWorkingFileBounds": "لایه Bounds به اندازه تصویر",
+        "toggleLayerVisibilityOn": "ویژگی های Layer Visibility On On",
+        "toggleLayerVisibilityOff": "دانلود بازی Layer Visibility Off",
+        "trimLayerEmptySpace": "فضای خالی لایه",
+        "updateActiveSelection": "به روز رسانی Active Selection",
+        "updateFile": "Update File",
+        "updateLayer": "به روز رسانی Layer",
+        "updateDrawLayer": "روی Layer",
+        "updateLayerFilterParams": "به روز رسانی Layer Effect",
+        "updateSelectionCombineMode": "گزینه Update Selection Mode"
+    },
+    "app": {
+        "colorPickerGradient": {
+            "hueSlider": "Hue Slider",
+            "opacitySlider": "Opacity Slider"
+        },
+        "dndDropOverlay": {
+            "addImage": "Add Image"
+        },
+        "historyNotification": {
+            "title": {
+                "do": {
+                    "inProgress": "دویدن ...",
+                    "complete": "کامل"
+                },
+                "undo": {
+                    "inProgress": "Undo ...",
+                    "complete": "کامل Undo"
+                },
+                "redo": {
+                    "inProgress": "سرخ ...",
+                    "complete": "Redocomplete"
+                }
+            }
+        },
+        "layerList": {
+            "toggleLayerVisibility": "ویژگی های Layer Visibility",
+            "layerSettings": "Layer Settings",
+            "rename": "Rename",
+            "addEffect": "اضافه کردن اثر",
+            "delete": "حذف",
+            "frames": "فریم ها",
+            "playAnimation": "بازی انیمیشن",
+            "stopAnimation": "دانلود فیلم Stop Animation",
+            "editFrames": "فریم های Edit",
+            "emptyGroup": "گروه خالی است.",
+            "effects": "اثرات",
+            "recalculatingEffect": "پردازش ...",
+            "moveEffectUp": "حرکت اثر بالا",
+            "moveEffectDown": "حرکت اثر Down"
+        },
+        "wait": {
+            "applyLayerTransform": "استفاده از Layer Transform",
+            "loadingImage": "بارگذاری تصویر",
+            "pleaseWait": "لطفا صبر کنید",
+            "trimLayerEmptySpace": "فضایی خالی",
+            "cancel": "لغو"
+        }
+    },
+    "brushCategory": {
+        "simple": {
+            "name": "Simple Brushes",
+            "brushes": {
+                "circle": {
+                    "name": "Circle"
+                }
+            }
+        },
+        "shapes": {
+            "name": "شکل ها"
+        }
+    },
+    "button": {
+        "apply": "درخواست",
+        "cancel": "لغو",
+        "clear": "وضوح روشن",
+        "convert": "تبدیل",
+        "create": "ایجاد آفرینش",
+        "createNewImage": "ایجاد تصویر جدید",
+        "done": "انجام کارها",
+        "export": "صادرات",
+        "no": "هیچ",
+        "ok": "OK",
+        "openImage": "تصویر باز",
+        "save": "Save",
+        "settings": "تنظیمات",
+        "take": "Take",
+        "takePhoto": "عکس بگیرید",
+        "yes": "بله"
+    },
+    "canvas": {
+        "toolbar": {
+            "cropResize": {
+                "waitLabel": "Crop و Resize"
+            }
+        }
+    },
+    "dock": {
+        "colorPicker": {
+            "title": "Color Picker",
+            "pickColorFromImage": "انتخاب رنگ از تصویر",
+            "hexCode": "Hex Code"
+        },
+        "layers": {
+            "title": "لایه ها",
+            "add": "Add",
+            "layer": "لایه Layer Layer Layer",
+            "group": "گروه Group",
+            "background": "پس زمینه",
+            "toggleBackgroundVisibility": "شرح زیر قابلیت مشاهده",
+            "noLayers": "اما هیچ لایه ای وجود ندارد."
+        },
+        "settings": {
+            "title": "اقدامات",
+            "file": {
+                "tabTitle": "File",
+                "menu": {
+                    "new": "جدید",
+                    "open": "Open",
+                    "export": "صادرات",
+                    "save": "Save",
+                    "saveAs": "صرفه جویی در",
+                    "insertPhoto": "وارد کردن یک عکس",
+                    "takePhoto": "یک عکس بگیرید"
+                }
+            },
+            "image": {
+                "tabTitle": "تصویر",
+                "menu": {
+                    "cropResize": "Crop و Resize",
+                    "convertLayers": {
+                        "groupTitle": "لایه های تبدیل ...",
+                        "toImageSequence": "تصویر Sequence",
+                        "flatten": "تخت تا لایه جدید"
+                    },
+                    "cut": "Cut",
+                    "copy": "کپی رایت",
+                    "copyAllLayers": "کپی تمام لایه ها",
+                    "paste": "پاستور"
+                }
+            },
+            "view": {
+                "tabTitle": "View",
+                "zoom": "Zoom",
+                "zoomOut": "برگرفته از:",
+                "zoomIn": "زوم در",
+                "rotate": "چرخش",
+                "rotateCounterClockwise": "دانلود بازی Turne Against Time",
+                "rotateClockwise": "چرخش ساعت",
+                "reset": "تنظیم مجدد",
+                "fit": "Fit",
+                "touchRotate": {
+                    "label": "لمسی",
+                    "on": "On",
+                    "snap": "Snap",
+                    "off": "Off"
+                },
+                "window": "پنجره",
+                "enterFullscreen": "ورودی Fullscreen",
+                "exitFullscreen": "خروجی Fullscreen"
+            },
+            "history": {
+                "tabTitle": "تاریخ",
+                "undo": "Undo",
+                "redo": "Redo",
+                "noHistory": "هنوز تاریخ نیست.",
+                "baseImage": "تصویر پایه"
+            },
+            "prefs": {
+                "tabTitle": "Prefs",
+                "theme": "Theme",
+                "language": "زبان",
+                "default": "شکست",
+                "performance": {
+                    "groupTitle": "عملکرد Performance",
+                    "renderer": {
+                        "label": "Renderer",
+                        "2d": "بوم 2D",
+                        "webgl": "WebGL"
+                    },
+                    "optimizeLargeImage": "بهینه سازی برای تصویر بزرگ",
+                    "highQualityScaling": "High Quality Scaling",
+                    "fixAdjacentLayerSeams": "دانلود بازی Adjacent Layer Seams"
+                },
+                "editor": {
+                    "groupTitle": "ویرایشگر",
+                    "menuBarPosition": "منوی Bar Position",
+                    "showWelcomeScreen": "نمایش Welcome Screen",
+                    "showTips": "نشان دادن نکات",
+                    "resetSettings": "تنظیمات Reset Settings"
+                },
+                "debugging": {
+                    "groupTitle": "دانلود بازی Debu",
+                    "useMobileDebugger": "Load Mobile Debugger"
+                },
+                "help": {
+                    "groupTitle": "کمک به کمک",
+                    "reportIssue": "گزارش یک مسئله"
+                }
+            }
+        }
+    },
+    "el": {
+        "horizontalScrollbarArrows": {
+            "scrollLeft": "سمت چپ",
+            "scrollRight": "سمت راست"
+        }
+    },
+    "keyboardMap": {
+        "file": {
+            "name": "File",
+            "actions": {
+                "open": "Open File",
+                "export": "صادرات فایل",
+                "quickLoad": "Quick Load",
+                "quickSave": "Quick Save"
+            }
+        },
+        "image": {
+            "name": "تصویر",
+            "actions": {
+                "cut": "Cut",
+                "copy": "کپی رایت",
+                "paste": "پاستور",
+                "delete": "حذف"
+            }
+        },
+        "history": {
+            "name": "ویرایش تاریخ",
+            "actions": {
+                "undo": "Undo",
+                "redo": "Redo"
+            }
+        },
+        "selection": {
+            "name": "انتخاب",
+            "actions": {
+                "selectAll": "انتخاب همه",
+                "deleteSelection": "انتخاب حذف"
+            }
+        }
+    },
+    "layerFilter": {
+        "brightness": {
+            "name": "روشنایی",
+            "param": {
+                "mode": "حالت Mode Mode",
+                "modeOption": {
+                    "gamma": "تنظیم گاما",
+                    "shift": "Black / White Shift",
+                    "luminance": "تنظیم Luminance"
+                },
+                "brightness": "روشنایی",
+                "effectiveRange": "محدوده",
+                "effectiveRangeFeather": "دانلود آهنگ Britney"
+            }
+        },
+        "chroma": {
+            "name": "کروموزوم",
+            "param": {
+                "chroma": "کروموزوم",
+                "mode": "حالت Mode Mode",
+                "modeOption": {
+                    "multiply": "تنظیم Chroma کنتراست",
+                    "shift": "تنظیم کننده Chroma"
+                }
+            }
+        },
+        "colorBlindness": {
+            "name": "نابینایی رنگی",
+            "param": {
+                "method": "روش شبیه سازی Method",
+                "methodOption": {
+                    "brettel": "دانلود فیلم Bertel 1997"
+                },
+                "type": "نوع نابینایی",
+                "typeOption": {
+                    "protan": "Protanopia / Protanomaly (Red-Blind)",
+                    "deuteran": "Deuteranopia / Deuteranomaly (Green-Blind)",
+                    "tritan": "Tritanopia / Tritanomaly (Blue-Blind)",
+                    "achroma": "Achromatomaly / Achromatopsia (Red/Green/Blue-Blind)"
+                },
+                "severity": "جاودانگی"
+            }
+        },
+        "colorCorrection": {
+            "name": "اصلاح رنگ"
+        },
+        "contrast": {
+            "name": "کنتراست",
+            "param": {
+                "contrast": "کنتراست",
+                "middleGray": "گریس میانه"
+            }
+        },
+        "decreaseColorDepth": {
+            "name": "کاهش عمق رنگ"
+        },
+        "gaussianBlur": {
+            "name": "Gaussian Blur",
+            "param": {
+                "size": "اندازه",
+                "xIntensity": "X",
+                "yIntensity": "شدت Y"
+            }
+        },
+        "grayscale": {
+            "name": "Grayscale",
+            "param": {
+                "mode": "حالت Mode Mode",
+                "modeOption": {
+                    "luminance": "Luminance",
+                    "luma": "Luma",
+                    "lightness": "روشنایی (HSL)",
+                    "average": "متوسط (HSI شدت)",
+                    "value": "ارزش (HSV)"
+                },
+                "modeOptionDescription": {
+                    "value": "حداکثر (R,G,B)"
+                },
+                "mix": "مخلوط"
+            }
+        },
+        "hue": {
+            "name": "Hue",
+            "param": {
+                "colorSpace": "فضای رنگی",
+                "colorSpaceOption": {
+                    "oklab": "Oklab",
+                    "perceptualRgb": "Perceptual RGB",
+                    "linearRgb": "خطی RGB"
+                },
+                "rotate": "چرخش"
+            }
+        },
+        "negative": {
+            "name": "منفی",
+            "param": {
+                "colorSpace": "فضای رنگی",
+                "colorSpaceOption": {
+                    "perceptualRgb": "Perceptual RGB",
+                    "linearRgb": "خطی RGB"
+                },
+                "invertRed": "کانال قرمز Invert",
+                "invertGreen": "کانال سبز",
+                "invertBlue": "کانال آبی Invert Blue Channel",
+                "invertValue": "ارزش Invert Value"
+            }
+        },
+        "saturation": {
+            "name": "Saturation",
+            "param": {
+                "saturation": "Saturation"
+            }
+        },
+        "sepia": {
+            "name": "سپتامبرia"
+        }
+    },
+    "layerFilterGroup": {
+        "blur": {
+            "name": "Blur"
+        },
+        "color": {
+            "name": "رنگ رنگی"
+        },
+        "distort": {
+            "name": "Distort"
+        },
+        "instagramFilter": {
+            "name": "Instagram Filter"
+        },
+        "photography": {
+            "name": "عکاسی"
+        },
+        "sharpen": {
+            "name": "شارپ"
+        }
+    },
+    "layoutShortcutGroup": {
+        "color": {
+            "name": "انتخاب رنگ",
+            "controls": {
+                "default": {
+                    "label": "انتخاب رنگ"
+                }
+            }
+        },
+        "deform": {
+            "name": "Deform",
+            "controls": {
+                "default": {
+                    "label": "Deform"
+                }
+            }
+        },
+        "draw": {
+            "name": "Draw",
+            "controls": {
+                "default": {
+                    "label": "Draw"
+                }
+            }
+        },
+        "effects": {
+            "name": "اثرات",
+            "controls": {
+                "default": {
+                    "label": "اثرات"
+                }
+            }
+        },
+        "erase": {
+            "name": "Erase",
+            "controls": {
+                "default": {
+                    "label": "Erase"
+                }
+            }
+        },
+        "history": {
+            "name": "تاریخ",
+            "controls": {
+                "undo": {
+                    "label": "Undo"
+                },
+                "redo": {
+                    "label": "Redo"
+                }
+            }
+        },
+        "layers": {
+            "name": "لایه ها",
+            "controls": {
+                "default": {
+                    "label": "لایه ها"
+                }
+            }
+        },
+        "search": {
+            "name": "جستجو",
+            "controls": {
+                "default": {
+                    "label": "جستجو"
+                }
+            }
+        },
+        "selection": {
+            "name": "انتخاب",
+            "controls": {
+                "default": {
+                    "label": "انتخاب"
+                }
+            }
+        },
+        "settings": {
+            "name": "اقدامات",
+            "controls": {
+                "default": {
+                    "label": "اقدامات"
+                }
+            }
+        },
+        "text": {
+            "name": "متن",
+            "controls": {
+                "default": {
+                    "label": "Insert / Edit Text"
+                }
+            }
+        },
+        "transform": {
+            "name": "حرکت / Transform",
+            "controls": {
+                "default": {
+                    "label": "حرکت / Transform"
+                }
+            }
+        },
+        "view": {
+            "name": "معرفی بازی Canvas Viewport",
+            "controls": {
+                "default": {
+                    "label": "زوم / Pan View"
+                }
+            }
+        }
+    },
+    "lib": {
+        "tutorial": {
+            "notification": {
+                "gotIt": "It Got It",
+                "dontShowTips": "نکات را نشان ندهید"
+            }
+        }
+    },
+    "measurement": {
+        "pixels": "Pixels",
+        "millimeters": "ورزشکاران",
+        "centimeters": "Centimeters",
+        "inches": "Inches",
+        "pixelsPerInch": "Pixels / Inch",
+        "pixelsPerMillimeter": "Pixels/Millimeter",
+        "pixelsPerCentimeter": "Pixels / Centimeter"
+    },
+    "menuBar": {
+        "toolsHeading": "ابزار"
+    },
+    "module": {
+        "fileExport": {
+            "title": "تصویر صادرات",
+            "saveBackQuestion": "بازگشت به فایل اصلی?",
+            "fileName": "نام فایل",
+            "fileType": "نوع فایل",
+            "layers": "لایه ها",
+            "quality": "کیفیت",
+            "dithering": "Dithering",
+            "ditheringOption": {
+                "none": "هیچ",
+                "atkinson": "اتکینزon",
+                "atkinsonSerpentine": "اتکینز (serpentine)",
+                "floydSteinberg": "فلوید Steinberg",
+                "floydSteinbergSerpentine": "فلوید اشتاینبرگ (serpentine)",
+                "falseFloydSteinberg": "True Floyd Steinberg",
+                "falseFloydSteinbergSerpentine": "False Floyd Steinberg (serpentine)",
+                "stucki": "Stucki",
+                "stuckiSerpentine": "Stucki (serpentine)"
+            }
+        },
+        "fileNew": {
+            "title": "تصویر جدید",
+            "preset": "Preset",
+            "presetPlaceholder": "انتخاب (اختیاری)",
+            "width": "عرض",
+            "height": "ارتفاع بلندی ارتفاع",
+            "resolution": "قطعنامه",
+            "colorProfile": "مشخصات رنگی",
+            "scaleFactor": "مقیاس فاکتور"
+        },
+        "fileSaveAs": {
+            "title": "Save Image",
+            "saveBackQuestion": "بازگشت به فایل اصلی?",
+            "exportDisclaimer": "اگر می خواهید تصویر را در برنامه های دیگر به اشتراک بگذارید یا مشاهده کنید، به جای آن از “Export” استفاده کنید.",
+            "fileName": "نام فایل"
+        },
+        "fileTakePhoto": {
+            "title": "عکس بگیرید",
+            "noCameraError": {
+                "title": "دوربین Unavailable",
+                "message": "یا دستگاه هیچ دوربین یا دسترسی به دوربین را ندارد."
+            },
+            "selectCamera": {
+                "placeholder": "انتخاب دوربین",
+                "user": "Front (User)",
+                "environment": "عقب (Environment)"
+            }
+        },
+        "imageConvertLayersToImageSequence": {
+            "title": "تبدیل لایه ها به Image Sequence",
+            "frameDelay": "تاخیر فریم"
+        },
+        "layerEffectBrowser": {
+            "title": "تأثیر Browser",
+            "description": "یک اثر را برای اضافه کردن به لایه انتخاب کنید. اثرات به طور کلی رنگ های یک لایه را دستکاری می کنند یا الگوهای خاصی مانند اثرات مبهم را اضافه می کنند.",
+            "loading": "تولید پیش نمایش ...",
+            "generationErrorGeneral": "یک خطا زمانی رخ داد که پیش نمایش های اثر را برای لایه انتخاب شده ایجاد کرد.",
+            "generationErrorUnsupportedType": "لایه ای که انتخاب کرده اید قادر به فیلترهایی است که به آن اعمال شده اند.",
+            "generationErrorNoLayer": "لطفا یک یا چند لایه را در لوله انتخاب کنید تا اثرات آن را به آنها اضافه کنید."
+        },
+        "layerEffectEdit": {
+            "title": "ویرایش اثر",
+            "description": "اثر را برای یک لایه خاص ویرایش کنید.",
+            "loading": "تولید پیش نمایش ...",
+            "generalError": "چیزی اشتباه کرد. اگر این پیام را می بینید، لطفا این را به عنوان یک مشکل گزارش کنید.",
+            "deleteEffect": "حذف اثر",
+            "enableToggle": "گزینه Enable",
+            "resetField": "Reset Field",
+            "deleting": "کاهش تاثیر ...",
+            "deleteFilterError": "یک خطا در هنگام تلاش برای حذف فیلتر رخ داد. اگر این پیام را می بینید، لطفا این را به عنوان یک مشکل گزارش کنید.",
+            "applyFilterError": "یک خطا در هنگام تلاش برای اعمال تغییرات فیلتر رخ داد. اگر این پیام را می بینید، لطفا این را به عنوان یک مشکل گزارش کنید."
+        },
+        "renameLayer": {
+            "title": "لایه Rename Layer",
+            "layerName": "نام جدید"
+        }
+    },
+    "moduleGroup": {
+        "file": {
+            "name": "مدیریت فایل",
+            "description": "بارگذاری و ذخیره تصاویر به دستگاه شما.",
+            "modules": {
+                "export": {
+                    "name": "تصویر صادرات",
+                    "description": "تصویر را در یک فرمت جهانی ذخیره کنید که می تواند توسط سایر ویراستاران باز شود."
+                },
+                "insertPhoto": {
+                    "name": "وارد کردن یک عکس",
+                    "description": "یک عکس را به عنوان یک لایه جدید در تصویر باز شده در حال حاضر اضافه کنید."
+                },
+                "new": {
+                    "name": "تصویر جدید",
+                    "description": "یک تصویر جدید با ابعاد مشخص ایجاد کنید."
+                },
+                "open": {
+                    "name": "تصویر باز",
+                    "description": "یک تصویر یا فایل پروژه را در یک فضای کاری جدید باز کنید."
+                },
+                "quickLoad": {
+                    "name": "Quick Load",
+                    "description": "فایل را با ذخیره سازی سریع بارگذاری کنید."
+                },
+                "quickSave": {
+                    "name": "Quick Save",
+                    "description": "فایل فعلی را برای ذخیره سازی موقت ذخیره می کند."
+                },
+                "saveAs": {
+                    "name": "Save Image",
+                    "description": "تصویر را در یک فرمت پروژه ذخیره می کند که می تواند توسط OpenGraphica بدون از دست دادن هر گونه اطلاعات باز شود."
+                },
+                "takePhoto": {
+                    "name": "یک عکس بگیرید",
+                    "description": "یک عکس از دوربین و وب سایت خود بگیرید و آن را در تصویر قرار دهید."
+                }
+            }
+        },
+        "history": {
+            "name": "ویرایش تاریخ",
+            "description": "عملیات که کنترل حرکت از طریق تاریخ ویرایش تصویر.",
+            "modules": {
+                "redo": {
+                    "name": "تاریخ Redo",
+                    "description": "آخرین اقدام بی پایان."
+                },
+                "undo": {
+                    "name": "تاریخ Undo",
+                    "description": "آخرین اقدام را انجام دهید."
+                }
+            }
+        },
+        "image": {
+            "name": "تصویر بوم",
+            "description": "عملیات که بر بوم تصویر تأثیر می گذارد.",
+            "modules": {
+                "convertLayersToImageSequence": {
+                    "name": "تبدیل لایه ها به Image Sequence",
+                    "description": "تبدیل لایه های انتخاب شده به یک لایه توالی تصویر (animation)."
+                },
+                "convertLayersFlatten": {
+                    "name": "تبدیل لایه ها به تصویر مسطح",
+                    "description": "تمام لایه ها را به یک لایه تصویر منفرد تقسیم می کند و آن را به بالای لایه لایه اضافه می کند."
+                },
+                "copy": {
+                    "name": "لایه های انتخاب شده کپی رایت",
+                    "description": "لایه های انتخاب شده در حال حاضر را به تخته کپی کنید."
+                },
+                "copyAll": {
+                    "name": "کپی تمام لایه ها",
+                    "description": "تمام لایه ها را بر روی بوم به عنوان یک تصویر PNG به کلیپboard کپی کنید."
+                },
+                "cut": {
+                    "name": "Cut",
+                    "description": "لایه های انتخاب شده در حال حاضر را حذف کنید و آنها را به تخته کپی کنید."
+                },
+                "paste": {
+                    "name": "پاستور",
+                    "description": "تصاویر را روی بوم از کلیپبورد قرار دهید."
+                }
+            }
+        },
+        "layer": {
+            "name": "لایه ها",
+            "description": "عملیات که بر لایه ها تاثیر می گذارد.",
+            "modules": {
+                "rename": {
+                    "name": "لایه Rename Layer",
+                    "description": "تغییر نام یک لایه"
+                },
+                "layerEffectBrowser": {
+                    "name": "تأثیر Browser",
+                    "description": "اضافه کردن اثرات تصویر به لایه انتخاب شده در حال حاضر (بازدید کنندگان) یا گروه لایه (ها)."
+                }
+            }
+        },
+        "tmp": {
+            "name": "ماژول های موقت",
+            "description": "ماژول هایی که فقط در طول توسعه اولیه قرار می گیرند.",
+            "modules": {
+                "notYetImplemented": {
+                    "name": "اما هنوز اجرا نشده است",
+                    "description": "هشدار را نشان دهید."
+                }
+            }
+        },
+        "tutorial": {
+            "name": "آموزش",
+            "description": "یاد بگیرید چگونه از OpenGraphica استفاده کنید.",
+            "modules": {
+                "welcome": {
+                    "name": "خوش آمدید خوش آمدید",
+                    "description": "شروع به کار بر روی یک تصویر کنید."
+                }
+            }
+        }
+    },
+    "option": {
+        "bottom": "پایین",
+        "left": "چپ",
+        "right": "حق راست",
+        "top": "Top"
+    },
+    "theme": {
+        "light": "نور",
+        "dark": "تاریکی تاریک"
+    },
+    "toolbar": {
+        "cropResize": {
+            "title": "Crop و Resize",
+            "linkWidthHeight": "Link عرض / h8",
+            "size": "اندازه",
+            "width": "عرض",
+            "height": "ارتفاع بلندی ارتفاع",
+            "dimensionUnits": "واحدها",
+            "resolution": "قطعنامه",
+            "resolutionUnits": "واحد های قطعنامه",
+            "snapping": {
+                "title": "Snapping",
+                "enable": "قابلیت Snapping"
+            }
+        },
+        "draw": {
+            "brushColor": "Brush Color",
+            "brushSize": "اندازه"
+        },
+        "freeTransform": {
+            "clearSelection": "انتخاب واضح",
+            "pickLayer": {
+                "label": "انتخاب Layer",
+                "auto": "Auto",
+                "current": "جریان فعلی"
+            },
+            "snapping": {
+                "title": "Snapping",
+                "rotationSnap": "Snap"
+            },
+            "metrics": {
+                "title": "متریک ها",
+                "position": "موقعیت مکانی",
+                "width": "عرض",
+                "height": "ارتفاع بلندی ارتفاع",
+                "rotation": "تنظیمات",
+                "resetRotation": "Redirect",
+                "noLayers": "هیچ لایه ای انتخاب نشد."
+            },
+            "actions": {
+                "title": "اقدامات",
+                "applyTransform": "استفاده از Transform",
+                "expandToImageSize": "لایه Bounds به اندازه تصویر",
+                "trimEmptySpace": "فضای خالی"
+            }
+        },
+        "general": {
+            "settings": "تنظیمات"
+        },
+        "selection": {
+            "selectionShape": {
+                "label": "انتخاب Shape",
+                "rectangle": "درگیری",
+                "ellipse": "Ellipse",
+                "freePolygon": "دانلود رایگان Polygon",
+                "freePolygonShort": "Free Poly",
+                "tonalArea": "منطقه داخلی"
+            },
+            "selectionCombineMode": {
+                "label": "انتخاب Mode",
+                "add": "Add",
+                "subtract": "Subtract",
+                "intersect": "تداخل"
+            }
+        },
+        "text": {
+            "font": "فونت",
+            "size": "اندازه",
+            "bold": "Bold",
+            "italic": "Italic",
+            "strikethrough": "اعتصاب از طریق اعتصاب",
+            "underline": "زیر خط",
+            "fill": "پر کردن",
+            "fillTooltip": "رنگی که در لبه های نامه (ها) نشان می دهد"
+        },
+        "zoom": {
+            "zoomOut": "برگرفته از:",
+            "zoomIn": "زوم در",
+            "rotateCounterClockwise": "دانلود بازی Turne Against Time",
+            "rotateClockwise": "چرخش ساعت",
+            "fit": "Fit",
+            "flip": "Flip"
+        }
+    },
+    "toolGroup": {
+        "draw": {
+            "name": "Draw",
+            "description": "قلم، مداد، قلم و ابزار نقاشی هنر بردار.",
+            "tools": {
+                "brush": {
+                    "name": "مسواک",
+                    "description": "قلم هایی که روی لایه های raster کشیده می شوند."
+                }
+            }
+        },
+        "image": {
+            "name": "تصویر",
+            "description": "دستکاری وضوح تصویر عمومی.",
+            "tools": {
+                "cropResize": {
+                    "name": "Crop و Resize",
+                    "description": "Crop، resize، نسبت ابعاد تغییر، یا دوباره تصویر را باز می کند."
+                }
+            }
+        },
+        "selection": {
+            "name": "انتخاب",
+            "description": "مناطق لایه فعال (ها) را انتخاب کنید، هر گونه دستکاری در لایه (ها) تنها در داخل انتخاب رخ می دهد.",
+            "tools": {
+                "selection": {
+                    "name": "انتخاب",
+                    "description": "یک منطقه از تصویر را برای ویرایش هدفمند انتخاب کنید."
+                }
+            }
+        },
+        "text": {
+            "name": "متن",
+            "description": "ابزارهای دستکاری لایه های متنی.",
+            "tools": {
+                "text": {
+                    "name": "متن",
+                    "description": "ایجاد و ویرایش لایه های متنی."
+                }
+            }
+        },
+        "transform": {
+            "name": "تغییر تحول",
+            "description": "ابزار برای حرکت، چرخش، اندازه گیری لایه.",
+            "tools": {
+                "freeTransform": {
+                    "name": "Free Transform",
+                    "description": "حرکت، چرخش یا مقیاس لایه های انتخاب شده."
+                }
+            }
+        },
+        "view": {
+            "name": "Viewport Display",
+            "description": "ابزارهای کنترل نمایش Viewport از بوم.",
+            "tools": {
+                "name": "Zoom",
+                "description": "زوم در داخل و خارج از بوم برای کنترل میزان تصویر که می توانید ببینید."
+            }
+        }
+    },
+    "tutorialTip": {
+        "drawToolIntroduction": {
+            "title": "ابزار Draw Tool",
+            "introduction": [
+                "ابزار قرعه کشی به شما اجازه می دهد خطوط و اشکال ایجاد کنید."
+            ]
+        },
+        "explainCanvasViewportControls": {
+            "title": "حرکت بوم",
+            "introduction": [
+                "مهم نیست که کدام ابزار انتخاب شده است، شما می توانید نمای بوم را کنترل کنید.",
+                null
+            ],
+            "anyTool": "هر ابزار",
+            "body": {
+                "mouse": [
+                    null,
+                    null
+                ],
+                "touch": [
+                    null,
+                    null
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "زوم کردن",
+                "panning": "Panning",
+                "mouseWheel": "چرخ موش",
+                "rightMouseButton": "دکمه راست ماوس"
+            }
+        },
+        "freeTransformToolIntroduction": {
+            "title": "Free Transform Tool",
+            "introduction": [
+                "این ابزار حرکت می کند، تغییر می کند و لایه ها را می چرخاند. یک جعبه مرزی در اطراف لایه انتخاب شده (ها) نشان می دهد.",
+                null
+            ],
+            "autoMode": "حالت خودکار",
+            "body": {
+                "mouse": [
+                    null,
+                    null,
+                    null
+                ],
+                "touch": [
+                    null,
+                    null,
+                    null
+                ]
+            },
+            "bodyTitle": {
+                "selection": "انتخاب",
+                "moving": "حرکت در",
+                "resizing": "پاسخگویی",
+                "leftClick": "گزینه Left Click"
+            }
+        },
+        "selectionToolIntroduction": {
+            "title": "انتخاب ابزار",
+            "introduction": [
+                "ابزار انتخاب به شما اجازه می دهد تا بخش های خاصی از تصویر را انتخاب کنید تا آنچه که ویرایش بر آن تأثیر می گذارد را محدود کنید."
+            ],
+            "body": {
+                "mouse": [
+                    null
+                ],
+                "touch": [
+                    null
+                ],
+                "end": [
+                    null,
+                    null
+                ]
+            },
+            "bodyTitle": {
+                "createSelection": "ایجاد انتخاب",
+                "leftClick": "گزینه Left Click",
+                "selectionShape": "انتخاب Shape",
+                "selectionCombineMode": "انتخاب Mode"
+            }
+        },
+        "zoomToolIntroduction": {
+            "title": "ابزار Zoom/Pan Tool",
+            "introduction": [
+                "این ابزار به شما اجازه می دهد تا به تصویر زوم کنید و نمای اطراف را حرکت دهید."
+            ],
+            "body": {
+                "mouse": [
+                    null,
+                    null
+                ],
+                "touch": [
+                    null,
+                    null
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "زوم کردن",
+                "panning": "Panning",
+                "leftClick": "گزینه Left Click",
+                "ctrlLeftClick": "Ctrl + Left Click",
+                "leftMouseButton": "دکمه چپ"
+            }
+        }
+    }
+}

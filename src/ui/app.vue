@@ -7,17 +7,33 @@
     >
         <template v-if="isMounted">
             <app-canvas />
-            <app-layout-dnd-container @dnd-ready="onDndLayoutReady($event)" @resize="onResizeLayoutContainer($event)" />
-            <app-menu-drawers />
-            <app-dialogs />
-            <app-wait />
-            <app-dnd-drop-overlay v-if="showDndDropOverlay" ref="dndDropOverlay" @click="showDndDropOverlay = false" />
+            <template v-if="isLoaded">
+                <app-layout-dnd-container
+                    :key="'app-layout-dnd-container-' + languageOverride"
+                    @dnd-ready="onDndLayoutReady($event)"
+                    @resize="onResizeLayoutContainer($event)"
+                />
+                <app-menu-drawers
+                    :key="'app-menu-drawers-' + languageOverride"
+                />
+                <app-dialogs
+                    :key="'app-dialogs-' + languageOverride"
+                />
+                <app-wait
+                    :key="'wait-' + languageOverride"
+                />
+                <app-dnd-drop-overlay
+                    v-if="showDndDropOverlay"
+                    ref="dndDropOverlay"
+                    @click="showDndDropOverlay = false"
+                />
+            </template>
         </template>
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, provide, onMounted, onUnmounted, watch } from 'vue';
+import { computed, defineComponent, ref, provide, onMounted, onUnmounted, watch } from 'vue';
 import AppCanvas from '@/ui/app-canvas.vue';
 import AppDialogs from '@/ui/app-dialogs.vue';
 import AppDndDropOverlay from '@/ui/app-dnd-drop-overlay.vue';
@@ -29,6 +45,7 @@ import editorStore from '@/store/editor';
 import preferencesStore from '@/store/preferences';
 import ResizeObserver from 'resize-observer-polyfill';
 import appEmitter from '@/lib/emitter';
+import { initializeI18n } from '@/i18n';
 import { getModuleDefinition, preloadModules } from '@/modules';
 
 import type { Eruda } from 'eruda';
@@ -47,12 +64,15 @@ export default defineComponent({
         const rootElement = ref<Element | null>(null);
         const mainElement = ref<Element | null>(null);
         const isMounted = ref<boolean>(false);
+        const isLoaded = ref<boolean>(false);
         const showDndDropOverlay = ref<boolean>(false);
         const dndDropOverlay = ref<InstanceType<typeof AppDndDropOverlay>>();
         const sidebarLeftWidth = ref<number>(0);
         const sidebarRightWidth = ref<number>(0);
 
         let erudaDebuggerInstance: Eruda | null = null;
+
+        const languageOverride = computed(() => preferencesStore.state.languageOverride);
 
         watch(() => preferencesStore.state.useMobileDebugger, async (useMobileDebugger) => {
             if (useMobileDebugger) {
@@ -141,6 +161,11 @@ export default defineComponent({
         async function asyncMountSetup() {
             // Preload some modules which need to be executed immediately
             await preloadModules();
+
+            // Initialize i18n user language
+            await initializeI18n();
+
+            isLoaded.value = true;
 
             if (preferencesStore.get('showWelcomeScreenAtStart')) {
                 const welcomeModule = getModuleDefinition('tutorial', 'welcome');
@@ -241,6 +266,8 @@ export default defineComponent({
         return {
             root: rootElement,
             isMounted,
+            isLoaded,
+            languageOverride,
             sidebarLeftWidth,
             sidebarRightWidth,
             onDndLayoutReady,

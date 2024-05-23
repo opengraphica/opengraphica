@@ -201,6 +201,8 @@
             "prefs": {
                 "tabTitle": "Prefs",
                 "theme": "Theme",
+                "language": "Language",
+                "default": "Default",
                 "performance": {
                     "groupTitle": "Performance",
                     "renderer": {

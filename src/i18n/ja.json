@@ -157,7 +157,7 @@
                 }
             },
             "image": {
-                "tabTitle": "サイトマップ",
+                "tabTitle": "画像",
                 "menu": {
                     "cropResize": "クロップとリサイズ",
                     "convertLayers": {
@@ -172,7 +172,7 @@
                 }
             },
             "view": {
-                "tabTitle": "ニュース",
+                "tabTitle": "見方",
                 "zoom": "ズーム",
                 "zoomOut": "ズームアウト",
                 "zoomIn": "ズームイン",
@@ -192,14 +192,14 @@
                 "exitFullscreen": "出口のフルスクリーン"
             },
             "history": {
-                "tabTitle": "プロフィール",
+                "tabTitle": "履歴",
                 "undo": "ログイン",
                 "redo": "ログイン",
                 "noHistory": "歴史はありません.",
                 "baseImage": "ベースイメージ"
             },
             "prefs": {
-                "tabTitle": "採用情報",
+                "tabTitle": "環境設定",
                 "theme": "テーマ:",
                 "performance": {
                     "groupTitle": "パフォーマンス",
@@ -226,7 +226,9 @@
                 "help": {
                     "groupTitle": "お問い合わせ",
                     "reportIssue": "課題報告"
-                }
+                },
+                "language": "用語集",
+                "default": "デフォルト"
             }
         }
     },
@@ -539,7 +541,7 @@
     "module": {
         "fileExport": {
             "title": "輸出イメージ",
-            "saveBackIntroduction": "{fileName} という名前のファイルを開きます.",
+            "saveBackIntroduction": "{fileName}という名前のファイルを開きます.",
             "saveBackQuestion": "元のファイルに保存しますか?",
             "fileName": "ファイル名",
             "fileType": "ファイルの種類",
@@ -570,7 +572,7 @@
         },
         "fileSaveAs": {
             "title": "保存イメージとして",
-            "saveBackIntroduction": "{fileName} という名前のファイルを開きます.",
+            "saveBackIntroduction": "{fileName}という名前のファイルを開きます.",
             "saveBackQuestion": "元のファイルに保存しますか?",
             "exportDisclaimer": "他のプログラムで画像を共有したり表示したりしたい場合、代わりに「エクスポート」を使用してください.",
             "fileName": "ファイル名"
@@ -735,13 +737,13 @@
         }
     },
     "option": {
-        "bottom": "ボトム",
-        "left": "ふりがな",
-        "right": "アクセス",
-        "top": "トップページ"
+        "bottom": "下",
+        "left": "左",
+        "right": "右",
+        "top": "上"
     },
     "theme": {
-        "light": "ライトライト",
+        "light": "ライト",
         "dark": "ダーク"
     },
     "toolbar": {
@@ -899,7 +901,7 @@
             "title": "キャンバスの移動",
             "introduction": [
                 "どのツールを選択しても、キャンバスビューをコントロールできます.",
-                "{anyTool} が選択されている場合:"
+                "{anyTool}が選択されるとき:"
             ],
             "anyTool": "任意のツール",
             "body": {
@@ -908,8 +910,8 @@
                     "{panning} - {rightMouseButton}をクリックしてキャンバスを移動する."
                 ],
                 "touch": [
-                    "{zooming} - 2本の指とピンチを使用してズームインとアウトします.",
-                    "{panning} - 2本の指を使ってキャンバスを動かすためにそれらを一緒に滑らせて下さい."
+                    "{zooming} - 2本の指とピンチを使用してズームアウトします.",
+                    "{panning} - 2本の指を使用してキャンバスを動かすためにそれらを一緒に滑らせて下さい."
                 ]
             },
             "bodyTitle": {
@@ -923,19 +925,19 @@
             "title": "無料変換ツール",
             "introduction": [
                 "このツールは、レイヤーを移動、サイズ変更、回転させます。 選択したレイヤーの周りの境界ボックスが表示されます.",
-                "で {autoMode}:"
+                "{autoMode}で:"
             ],
             "autoMode": "自動モード",
             "body": {
                 "mouse": [
-                    "{selection} - レイヤーの{leftClick} を選択して選択します.",
-                    "{moving} - レイヤーの{左クリック}とドラッグして移動します.",
-                    "{resizing} - {leftClick} とリサイズハンドルをドラッグします."
+                    "{selection} - {leftClick} レイヤーで選択します.",
+                    "{moving} - {leftClick}をレイヤーにし、ドラッグして移動します.",
+                    "{resizing} - {leftClick}およびドラッグのサイズのハンドル."
                 ],
                 "touch": [
                     "{selection} - レイヤーをタップして選択します.",
                     "{moving} - レイヤーをタップしてドラッグして移動します.",
-                    "{resizing} - 1つの指を使用して、リサイズハンドルをドラッグします."
+                    "{resizing} - 1本の指を使用して、ハンドルのサイズを変更します."
                 ]
             },
             "bodyTitle": {
@@ -945,30 +947,6 @@
                 "leftClick": "左クリック"
             }
         },
-        "selectionToolIntroduction": {
-            "title": "選択ツール",
-            "introduction": [
-                "選択ツールを使用すると、画像の特定の部分を選択して、編集の影響を制限することができます."
-            ],
-            "body": {
-                "mouse": [
-                    "{createSelection} - クリックして {左にドラッグ Click} をクリックして選択を作成します."
-                ],
-                "touch": [
-                    "{createSelection} - 1本の指で描画して選択を作成します."
-                ],
-                "end": [
-                    "お問い合わせ 形状} - 選択を引くためにどのような形状が使用されます.",
-                    "{selectionCombineMode} - 現在の選択は、既存の選択と組み合わせる方法."
-                ]
-            },
-            "bodyTitle": {
-                "createSelection": "選択の作成",
-                "leftClick": "左クリック",
-                "selectionShape": "選択の形",
-                "selectionCombineMode": "選択 結合モード"
-            }
-        },
         "zoomToolIntroduction": {
             "title": "ズーム/パンツール",
             "introduction": [
@@ -976,11 +954,11 @@
             ],
             "body": {
                 "mouse": [
-                    "{zooming} - {leftClick} をズームイン、 {ctrlLeftClick} をズームアウトします.",
-                    "{panning} - キャンバスを移動する {leftMouseButton} をクリックしてドラッグします."
+                    "{zooming} - {leftClick} ズームイン; {ctrlLeftClick} ズームアウトします.",
+                    "{panning} - {leftMouseButton}をクリックしてキャンバスを移動する."
                 ],
                 "touch": [
-                    "{zooming} - 1つの指でタップしてズームインします。 2本の指でタップしてズームアウトします.",
+                    "{zooming} - 1本の指でズームインをタップします。 2本の指でタップしてズームアウトします.",
                     "{panning} - 1本の指でタップしてドラッグしてキャンバスを動かす."
                 ]
             },
@@ -991,6 +969,30 @@
                 "ctrlLeftClick": "Ctrl + 左クリック",
                 "leftMouseButton": "左マウスボタン"
             }
+        },
+        "selectionToolIntroduction": {
+            "introduction": [
+                "選択ツールを使用すると、画像の特定の部分を選択して、編集の影響を制限することができます."
+            ],
+            "body": {
+                "mouse": [
+                    "{createSelection} - {leftClick}をクリックして選択を作成します."
+                ],
+                "touch": [
+                    "{createSelection} - 選択を作成するために1本の指で引く."
+                ],
+                "end": [
+                    "{selectionShape} - 選択を引くためにどのような形が使用されるか.",
+                    "{selectionCombineMode} - 現在の選択は、既存の選択と組み合わせる方法."
+                ]
+            },
+            "bodyTitle": {
+                "createSelection": "選択の作成",
+                "leftClick": "左クリック",
+                "selectionShape": "選択の形",
+                "selectionCombineMode": "選択 結合モード"
+            },
+            "title": "選択ツール"
         }
     }
 }

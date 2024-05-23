@@ -1,0 +1,998 @@
+{
+    "empty": "",
+    "action": {
+        "addLayerFilter": "إضافة أثر إلى لاير",
+        "addLayerFilterMultiple": "مضافا إليه:",
+        "applyActiveSelection": "الاختيار الفعلي",
+        "applyLayerTransform": "Apply Layer Transform",
+        "clearSelection": "اختيار واضح",
+        "convertLayersToImageSequence": "Convert Layers to Image Sequence",
+        "createDrawLayer": "Create Draw Layer",
+        "createNewFile": "جديدة",
+        "createNewLayersFromSelection": "Create Layers From Selection",
+        "cutLayers": "مقطوفة",
+        "deleteLayers": "تحذف لاير (أصحاب)",
+        "deleteLayerFilter": "يحذف الأثر",
+        "deleteLayerSelectionArea": "يحذف الاختيار",
+        "disableLayerFilter": "Disable Layer Effect",
+        "enableLayerFilter": "Enable Layer Effect",
+        "fileTakePhoto": "خذ الصورة",
+        "freeTransformRotate": "التحول الحر (التناوب)",
+        "freeTransformScale": "التحول الحر (Resize)",
+        "freeTransformTranslate": "Transform (Move)",
+        "insertLayer": "Insert Layer",
+        "moduleCropResize": "Crop and Resize",
+        "openFile": "فتحة",
+        "pasteLayers": "Paste Layer(s)",
+        "placeholder": "مالك المكان",
+        "pleaseWait": "من فضلك انتظر.",
+        "renameLayer": "Rename Layer",
+        "reorderLayers": "Reorder Layer(s)",
+        "reorderLayerFilters": "Reorder Effect(s)",
+        "selectLayers": "Select Layer(s)",
+        "setLayerBoundsToWorkingFileBounds": "Bounds to Image Size",
+        "toggleLayerVisibilityOn": "Toggle Layer Visibility على",
+        "toggleLayerVisibilityOff": "Toggle Layer Visibility Off",
+        "trimLayerEmptySpace": "Trim Layer Empty Space",
+        "updateActiveSelection": "Update Active Selection",
+        "updateFile": "Update File",
+        "updateLayer": "Update Layer",
+        "updateDrawLayer": "سحب على لاير",
+        "updateLayerFilterParams": "Update Layer Effect",
+        "updateSelectionCombineMode": "Update Selection Combine Mode"
+    },
+    "app": {
+        "colorPickerGradient": {
+            "hueSlider": "Hue Slider",
+            "opacitySlider": "معدل الوفيات"
+        },
+        "dndDropOverlay": {
+            "addImage": "مضافا إليه:"
+        },
+        "historyNotification": {
+            "title": {
+                "do": {
+                    "inProgress": "....",
+                    "complete": "اكتمل"
+                },
+                "undo": {
+                    "inProgress": "فك ...",
+                    "complete": "Undo Complete"
+                },
+                "redo": {
+                    "inProgress": "إعادة...",
+                    "complete": "Redo Complete"
+                }
+            }
+        },
+        "layerList": {
+            "toggleLayerVisibility": "Toggle Layer Visibility",
+            "layerSettings": "Layer Settings",
+            "rename": "الاسم",
+            "addEffect": "مضافا إليه:",
+            "delete": "تحذف",
+            "frames": "Frames",
+            "playAnimation": "اللعب",
+            "stopAnimation": "توقف عن التصويب",
+            "editFrames": "Edit Frames",
+            "emptyGroup": "المجموعة فارغة.",
+            "effects": "الآثار",
+            "recalculatingEffect": "تجهيز...",
+            "moveEffectUp": "تحرك",
+            "moveEffectDown": "تحرك"
+        },
+        "wait": {
+            "applyLayerTransform": "Applying Layer Transform",
+            "loadingImage": "صور الإقامة",
+            "pleaseWait": "من فضلك",
+            "trimLayerEmptySpace": "الفضاء الخارجي",
+            "cancel": "إلغاء"
+        }
+    },
+    "brushCategory": {
+        "simple": {
+            "name": "بسيطة",
+            "brushes": {
+                "circle": {
+                    "name": "الدائرة"
+                }
+            }
+        },
+        "shapes": {
+            "name": "Shapes"
+        }
+    },
+    "button": {
+        "apply": "التطبيق",
+        "cancel": "إلغاء",
+        "clear": "آمن",
+        "convert": "منحرف",
+        "create": "الإبداع",
+        "createNewImage": "خلق صورة جديدة",
+        "done": "تم",
+        "export": "الصادرات",
+        "no": "لا",
+        "ok": "حسنا",
+        "openImage": "الصورة المفتوحة",
+        "save": "أنقذ",
+        "settings": "الترتيبات",
+        "take": "خذ",
+        "takePhoto": "خذ الصورة",
+        "yes": "نعم"
+    },
+    "canvas": {
+        "toolbar": {
+            "cropResize": {
+                "waitLabel": "Crop and Resize"
+            }
+        }
+    },
+    "dock": {
+        "colorPicker": {
+            "title": "كولور بيكر",
+            "pickColorFromImage": "اختر اللون من الصورة",
+            "hexCode": "Hex Code"
+        },
+        "layers": {
+            "title": "Layers",
+            "add": "مضافا إليها",
+            "layer": "Layer",
+            "group": "المجموعة",
+            "background": "معلومات أساسية",
+            "toggleBackgroundVisibility": "ألف - معلومات أساسية الرؤية",
+            "noLayers": "لا يوجد لايرز بعد."
+        },
+        "settings": {
+            "title": "الإجراءات",
+            "file": {
+                "tabTitle": "File",
+                "menu": {
+                    "new": "جديدة",
+                    "open": "مفتوح",
+                    "export": "الصادرات",
+                    "save": "أنقذ",
+                    "saveAs": "أنقذني",
+                    "insertPhoto": "Insert a Photo",
+                    "takePhoto": "خذ الصورة"
+                }
+            },
+            "image": {
+                "tabTitle": "الصورة",
+                "menu": {
+                    "cropResize": "Crop and Resize",
+                    "convertLayers": {
+                        "groupTitle": "(المخادعون).",
+                        "toImageSequence": "إلى معادلة الصور",
+                        "flatten": "(فلاطين) إلى (نيو لاير)"
+                    },
+                    "cut": "قطع",
+                    "copy": "نسخ",
+                    "copyAllLayers": "(عُلم)",
+                    "paste": "Paste"
+                }
+            },
+            "view": {
+                "tabTitle": "View",
+                "zoom": "زوم",
+                "zoomOut": "زوم",
+                "zoomIn": "Zoom In",
+                "rotate": "المعدل",
+                "rotateCounterClockwise": "مدار الساعة",
+                "rotateClockwise": "Rotate Clockwise",
+                "reset": "إعادة التوطين",
+                "fit": "Fit",
+                "touchRotate": {
+                    "label": "Touch Rotate",
+                    "on": "على",
+                    "snap": "Snap",
+                    "off": "قبالة"
+                },
+                "window": "Window",
+                "enterFullscreen": "Enter Fullscreen",
+                "exitFullscreen": "Exit Fullscreen"
+            },
+            "history": {
+                "tabTitle": "التاريخ",
+                "undo": "Undo",
+                "redo": "Redo",
+                "noHistory": "لا تاريخ بعد.",
+                "baseImage": "الصورة الأساسية"
+            },
+            "prefs": {
+                "tabTitle": "القوام",
+                "theme": "الموضوع",
+                "language": "اللغة",
+                "default": "التقصير",
+                "performance": {
+                    "groupTitle": "الأداء",
+                    "renderer": {
+                        "label": "Renderer",
+                        "2d": "2D",
+                        "webgl": "WebGL"
+                    },
+                    "optimizeLargeImage": "Optimize for Large Image",
+                    "highQualityScaling": "ارتفاع الجودة",
+                    "fixAdjacentLayerSeams": "Fix Adjacent Layer Seams"
+                },
+                "editor": {
+                    "groupTitle": "محرر",
+                    "menuBarPosition": "Menu Bar Position",
+                    "showWelcomeScreen": "\"أظهروا مرحباً بكم في \"كرين",
+                    "showTips": "النمر",
+                    "resetSettings": "Reset Settings"
+                },
+                "debugging": {
+                    "groupTitle": "الديون",
+                    "useMobileDebugger": "Load Mobile Debugger"
+                },
+                "help": {
+                    "groupTitle": "النجدة",
+                    "reportIssue": "Report an Issue"
+                }
+            }
+        }
+    },
+    "el": {
+        "horizontalScrollbarArrows": {
+            "scrollLeft": "اليسار",
+            "scrollRight": "الحق"
+        }
+    },
+    "keyboardMap": {
+        "file": {
+            "name": "File",
+            "actions": {
+                "open": "فتحة",
+                "export": "التصدير",
+                "quickLoad": "بسرعة",
+                "quickSave": "بسرعة"
+            }
+        },
+        "image": {
+            "name": "الصورة",
+            "actions": {
+                "cut": "قطع",
+                "copy": "نسخ",
+                "paste": "Paste",
+                "delete": "تحذف"
+            }
+        },
+        "history": {
+            "name": "تاريخ تحرير",
+            "actions": {
+                "undo": "Undo",
+                "redo": "Redo"
+            }
+        },
+        "selection": {
+            "name": "الاختيار",
+            "actions": {
+                "selectAll": "بيع",
+                "deleteSelection": "يحذف الاختيار"
+            }
+        }
+    },
+    "layerFilter": {
+        "brightness": {
+            "name": "الصدق",
+            "param": {
+                "mode": "Mode",
+                "modeOption": {
+                    "gamma": "(جاما)",
+                    "shift": "Black/White Shift",
+                    "luminance": "Adjust Luminance"
+                },
+                "brightness": "الصدق",
+                "effectiveRange": "Range",
+                "effectiveRangeFeather": "ريش"
+            }
+        },
+        "chroma": {
+            "name": "Chroma",
+            "param": {
+                "chroma": "Chroma",
+                "mode": "Mode",
+                "modeOption": {
+                    "multiply": "Adjust Chroma Contrast",
+                    "shift": "في نهاية المطاف"
+                }
+            }
+        },
+        "colorBlindness": {
+            "name": "العمود",
+            "param": {
+                "method": "طريقة المحاكاة",
+                "methodOption": {
+                    "brettel": "Brettel 1997"
+                },
+                "type": "نوع العمى",
+                "typeOption": {
+                    "protan": "Protanopia / Protanomaly (Red-Blind)",
+                    "deuteran": "Deuteranopia / Deuteranomaly (Green-Blind)",
+                    "tritan": "Tritanopia / Tritanomaly (Blue-Blind)",
+                    "achroma": "Achromatomaly / Achromatopsia (Red/Green/Blue-Blind)"
+                },
+                "severity": "الشدة"
+            }
+        },
+        "colorCorrection": {
+            "name": "تصحيح اللون"
+        },
+        "contrast": {
+            "name": "Contrast",
+            "param": {
+                "contrast": "Contrast",
+                "middleGray": "Middle Gray"
+            }
+        },
+        "decreaseColorDepth": {
+            "name": "Decrease Color Depth"
+        },
+        "gaussianBlur": {
+            "name": "Gaussian Blur",
+            "param": {
+                "size": "الحجم",
+                "xIntensity": "X Intensity",
+                "yIntensity": "نعم"
+            }
+        },
+        "grayscale": {
+            "name": "Grayscale",
+            "param": {
+                "mode": "Mode",
+                "modeOption": {
+                    "luminance": "اللوم",
+                    "luma": "لوما",
+                    "lightness": "النور",
+                    "average": "متوسط (كثافة)",
+                    "value": "القيمة (HSV)"
+                },
+                "modeOptionDescription": {
+                    "value": "= max(R,G,B)"
+                },
+                "mix": "Mix"
+            }
+        },
+        "hue": {
+            "name": "Hue",
+            "param": {
+                "colorSpace": "Color Space",
+                "colorSpaceOption": {
+                    "oklab": "Oklab",
+                    "perceptualRgb": "المنظور الجنساني",
+                    "linearRgb": "Linear RGB"
+                },
+                "rotate": "المعدل"
+            }
+        },
+        "negative": {
+            "name": "سلبي",
+            "param": {
+                "colorSpace": "Color Space",
+                "colorSpaceOption": {
+                    "perceptualRgb": "المنظور الجنساني",
+                    "linearRgb": "Linear RGB"
+                },
+                "invertRed": "Invert Red Channel",
+                "invertGreen": "Invert Green Channel",
+                "invertBlue": "Invert Blue Channel",
+                "invertValue": "القيمة المعكوسة"
+            }
+        },
+        "saturation": {
+            "name": "الاضطرابات",
+            "param": {
+                "saturation": "الاضطرابات"
+            }
+        },
+        "sepia": {
+            "name": "سيبيا"
+        }
+    },
+    "layerFilterGroup": {
+        "blur": {
+            "name": "Blur"
+        },
+        "color": {
+            "name": "Color"
+        },
+        "distort": {
+            "name": "Distort"
+        },
+        "instagramFilter": {
+            "name": "Instagram Filter"
+        },
+        "photography": {
+            "name": "الصور"
+        },
+        "sharpen": {
+            "name": "شاربن"
+        }
+    },
+    "layoutShortcutGroup": {
+        "color": {
+            "name": "المخلول",
+            "controls": {
+                "default": {
+                    "label": "المخلول"
+                }
+            }
+        },
+        "deform": {
+            "name": "الشكل",
+            "controls": {
+                "default": {
+                    "label": "الشكل"
+                }
+            }
+        },
+        "draw": {
+            "name": "Draw",
+            "controls": {
+                "default": {
+                    "label": "Draw"
+                }
+            }
+        },
+        "effects": {
+            "name": "الآثار",
+            "controls": {
+                "default": {
+                    "label": "الآثار"
+                }
+            }
+        },
+        "erase": {
+            "name": "Erase",
+            "controls": {
+                "default": {
+                    "label": "Erase"
+                }
+            }
+        },
+        "history": {
+            "name": "التاريخ",
+            "controls": {
+                "undo": {
+                    "label": "Undo"
+                },
+                "redo": {
+                    "label": "Redo"
+                }
+            }
+        },
+        "layers": {
+            "name": "Layers",
+            "controls": {
+                "default": {
+                    "label": "Layers"
+                }
+            }
+        },
+        "search": {
+            "name": "البحث",
+            "controls": {
+                "default": {
+                    "label": "البحث"
+                }
+            }
+        },
+        "selection": {
+            "name": "الاختيار",
+            "controls": {
+                "default": {
+                    "label": "الاختيار"
+                }
+            }
+        },
+        "settings": {
+            "name": "الإجراءات",
+            "controls": {
+                "default": {
+                    "label": "الإجراءات"
+                }
+            }
+        },
+        "text": {
+            "name": "النص",
+            "controls": {
+                "default": {
+                    "label": "Insert/ Edit Text"
+                }
+            }
+        },
+        "transform": {
+            "name": "النقل/التحول",
+            "controls": {
+                "default": {
+                    "label": "النقل/التحول"
+                }
+            }
+        },
+        "view": {
+            "name": "Canvas Viewport",
+            "controls": {
+                "default": {
+                    "label": "زوم/بان فيو"
+                }
+            }
+        }
+    },
+    "lib": {
+        "tutorial": {
+            "notification": {
+                "gotIt": "حصلت عليه",
+                "dontShowTips": "لا تظهر تيبس"
+            }
+        }
+    },
+    "measurement": {
+        "pixels": "Pixels",
+        "millimeters": "ميليميتر",
+        "centimeters": "Centimeters",
+        "inches": "Inches",
+        "pixelsPerInch": "Pixels/Inch",
+        "pixelsPerMillimeter": "Pixels/Milmeter",
+        "pixelsPerCentimeter": "Pixels/Centimeter"
+    },
+    "menuBar": {
+        "toolsHeading": "الأدوات"
+    },
+    "module": {
+        "fileExport": {
+            "title": "رسوم التصدير",
+            "saveBackIntroduction": "لقد فتحت ملفاً اسمه {fileName}.",
+            "saveBackQuestion": "أحتفظ بالملف الأصلي؟?",
+            "fileName": "اسم الملف",
+            "fileType": "الشكل",
+            "layers": "Layers",
+            "quality": "النوعية",
+            "dithering": "التفرق",
+            "ditheringOption": {
+                "none": "لا",
+                "atkinson": "Atkinson",
+                "atkinsonSerpentine": "أتكينسون (سربنتين)",
+                "floydSteinberg": "Floyd Steinberg",
+                "floydSteinbergSerpentine": "فلويد ستينبيرغ (سربنتين)",
+                "falseFloydSteinberg": "فلاس فلويد ستينبرغ",
+                "falseFloydSteinbergSerpentine": "False Floyd Steinberg (serpentine)",
+                "stucki": "Stucki",
+                "stuckiSerpentine": "ستوكي (سريبين)"
+            }
+        },
+        "fileNew": {
+            "title": "الصورة الجديدة",
+            "preset": "Preset",
+            "presetPlaceholder": "مختارة (اختيارية)",
+            "width": "Width",
+            "height": "مرتفع",
+            "resolution": "القرار",
+            "colorProfile": "Color Profile",
+            "scaleFactor": "Scale Factor"
+        },
+        "fileSaveAs": {
+            "title": "أنقذ التصوير",
+            "saveBackIntroduction": "لقد فتحت ملفاً اسمه {fileName}.",
+            "saveBackQuestion": "أحتفظ بالملف الأصلي؟?",
+            "exportDisclaimer": "إذا كنت ترغب في مشاركة أو مشاهدة الصورة في البرامج الأخرى، استخدام \"الإرسال\" بدلا من ذلك.",
+            "fileName": "اسم الملف"
+        },
+        "fileTakePhoto": {
+            "title": "خذ الصورة",
+            "noCameraError": {
+                "title": "آلة تصوير غير متاحة",
+                "message": "إما أن الجهاز ليس لديه كاميرات أو تم رفض الوصول إلى الكاميرا."
+            },
+            "selectCamera": {
+                "placeholder": "آلة تصوير مختارة",
+                "user": "الجبهة (User)",
+                "environment": "(البيئة)"
+            }
+        },
+        "imageConvertLayersToImageSequence": {
+            "title": "Convert Layers to Image Sequence",
+            "frameDelay": "Frame Delay"
+        },
+        "layerEffectBrowser": {
+            "title": "Effect Browser",
+            "description": "اختر تأثير لإضافة طبقة التأثيرات تتلاعب عموماً بألوان طبقة أو تضيف أنماطاً خاصة مثل التأثيرات الضبابية.",
+            "loading": "....",
+            "generationErrorGeneral": "وحدث خطأ عند إحداث آثار على طبقة مختارة.",
+            "generationErrorUnsupportedType": "الطبقة التي اخترتها غير قادرة على تطبيقها.",
+            "generationErrorNoLayer": "يرجى اختيار طبقة أو أكثر في رصيف الطبقات من أجل إضافة آثار لها."
+        },
+        "layerEffectEdit": {
+            "title": "Edit Effect",
+            "description": "قم بتأثير طبقة محددة.",
+            "loading": "....",
+            "generalError": "حدث شيء خاطئ إذا استمريت في رؤية هذه الرسالة، يرجى الإبلاغ عن هذا كحشرة.",
+            "deleteEffect": "يحذف الأثر",
+            "enableToggle": "التمكين",
+            "resetField": "ميدان إعادة التوطين",
+            "deleting": "إزالة التأثير...",
+            "deleteFilterError": "حدث خطأ في محاولة حذف التصفية إذا استمريت في رؤية هذه الرسالة، يرجى الإبلاغ عن هذا كحشرة.",
+            "applyFilterError": "وحدث خطأ أثناء محاولة تطبيق تغييرات التصفية. إذا استمريت في رؤية هذه الرسالة، يرجى الإبلاغ عن هذا كحشرة."
+        },
+        "renameLayer": {
+            "title": "Rename Layer",
+            "layerName": "الاسم الجديد"
+        }
+    },
+    "moduleGroup": {
+        "file": {
+            "name": "إدارة الملفات",
+            "description": "ضعوا الصور على جهازكم.",
+            "modules": {
+                "export": {
+                    "name": "رسوم التصدير",
+                    "description": "وفر الصورة في شكل عالمي يمكن أن يفتحه المحررون الآخرون."
+                },
+                "insertPhoto": {
+                    "name": "Insert a Photo",
+                    "description": "أضف صورة كطبقة جديدة في الصورة المفتوحة حالياً."
+                },
+                "new": {
+                    "name": "الصورة الجديدة",
+                    "description": "خلق صورة جديدة ذات أبعاد محددة."
+                },
+                "open": {
+                    "name": "الصورة المفتوحة",
+                    "description": "فتح صورة أو ملف مشروع في مكان عمل جديد."
+                },
+                "quickLoad": {
+                    "name": "بسرعة",
+                    "description": "ضع الملف الذي تم إنقاذه بسرعة."
+                },
+                "quickSave": {
+                    "name": "بسرعة",
+                    "description": "يحفظ الملف الحالي للتخزين المؤقت."
+                },
+                "saveAs": {
+                    "name": "أنقذ التصوير",
+                    "description": "ويحتفظ بالصورة في شكل مشروع يمكن إعادة فتحه من قبل شركة OpenGraphica دون فقدان أي معلومات."
+                },
+                "takePhoto": {
+                    "name": "خذ الصورة",
+                    "description": "خذ صورة من الكاميرا وكاميرا الإنترنت وأدخلها في الصورة."
+                }
+            }
+        },
+        "history": {
+            "name": "تاريخ تحرير",
+            "description": "العمليات التي تتحكم بالتحرك من خلال تاريخ التصوير.",
+            "modules": {
+                "redo": {
+                    "name": "التاريخ",
+                    "description": "أعد آخر عمل غير مقصود."
+                },
+                "undo": {
+                    "name": "التاريخ",
+                    "description": "فك آخر عمل."
+                }
+            }
+        },
+        "image": {
+            "name": "قناة الصور",
+            "description": "عمليات تؤثر على الصور.",
+            "modules": {
+                "convertLayersToImageSequence": {
+                    "name": "Convert Layers to Image Sequence",
+                    "description": "Converts the selected layers to an image sequence layer (animation)."
+                },
+                "convertLayersFlatten": {
+                    "name": "Convert Layers to Flattened Image",
+                    "description": "يدمجون كل الطبقات في طبقة صور واحدة ويضيفونها إلى أعلى كومة طبقة."
+                },
+                "copy": {
+                    "name": "نسخة مقتبسة",
+                    "description": "عُلم الطبقات المُختارة حالياً إلى اللوحة."
+                },
+                "copyAll": {
+                    "name": "(عُلم)",
+                    "description": "نُسخْ كُلّ طبقاتِ على الشموعِ كa صورة PNG إلى مشبكِ."
+                },
+                "cut": {
+                    "name": "قطع",
+                    "description": "ننقل الطبقات المختارة حالياً ونقلها إلى لوح المشبك."
+                },
+                "paste": {
+                    "name": "Paste",
+                    "description": "ضع صوراً على اللوحة من على اللوح."
+                }
+            }
+        },
+        "layer": {
+            "name": "Layers",
+            "description": "عمليات تؤثر على الطبقات.",
+            "modules": {
+                "rename": {
+                    "name": "Rename Layer",
+                    "description": "تغيير اسم طبقة"
+                },
+                "layerEffectBrowser": {
+                    "name": "Effect Browser",
+                    "description": "يضيف آثار الصور إلى طبقة (طبقات) مختارة حالياً أو مجموعة (مجموعات)."
+                }
+            }
+        },
+        "tmp": {
+            "name": "الطرائق المؤقتة",
+            "description": "Modules that will only stick around during initial development.",
+            "modules": {
+                "notYetImplemented": {
+                    "name": "لم تنفذ بعد",
+                    "description": "أظهر تحذيراً."
+                }
+            }
+        },
+        "tutorial": {
+            "name": "التعليم",
+            "description": "تعلّم كيفية استخدام (ابنغرافيكا).",
+            "modules": {
+                "welcome": {
+                    "name": "مرحباً",
+                    "description": "بدء العمل على صورة."
+                }
+            }
+        }
+    },
+    "option": {
+        "bottom": "الجزء السفلي",
+        "left": "يسار",
+        "right": "الحق",
+        "top": "القمة"
+    },
+    "theme": {
+        "light": "الضوء",
+        "dark": "الظلام"
+    },
+    "toolbar": {
+        "cropResize": {
+            "title": "Crop and Resize",
+            "linkWidthHeight": "لينك ويدث/هايت",
+            "size": "الحجم",
+            "width": "Width",
+            "height": "مرتفع",
+            "dimensionUnits": "وحدات البعد",
+            "resolution": "القرار",
+            "resolutionUnits": "وحدات القرار",
+            "snapping": {
+                "title": "Snapping",
+                "enable": "التمكين"
+            }
+        },
+        "draw": {
+            "brushColor": "Brush Color",
+            "brushSize": "الحجم"
+        },
+        "freeTransform": {
+            "clearSelection": "اختيار واضح",
+            "pickLayer": {
+                "label": "اختر لاير",
+                "auto": "Auto",
+                "current": "الحالي"
+            },
+            "snapping": {
+                "title": "Snapping",
+                "rotationSnap": "خط التناوب"
+            },
+            "metrics": {
+                "title": "مقاييس",
+                "position": "المنصب",
+                "width": "Width",
+                "height": "مرتفع",
+                "rotation": "التناوب",
+                "resetRotation": "التناوب",
+                "noLayers": "لم يتم اختيار طبقة (طبقات)."
+            },
+            "actions": {
+                "title": "الإجراءات",
+                "applyTransform": "Transform",
+                "expandToImageSize": "Bounds to Image Size",
+                "trimEmptySpace": "الفضاء الخارجي"
+            }
+        },
+        "general": {
+            "settings": "الترتيبات"
+        },
+        "selection": {
+            "selectionShape": {
+                "label": "Selection Shape",
+                "rectangle": "Rectangle",
+                "ellipse": "Ellipse",
+                "freePolygon": "Polygon",
+                "freePolygonShort": "الحرة",
+                "tonalArea": "منطقة طنجة"
+            },
+            "selectionCombineMode": {
+                "label": "Selection Combine Mode",
+                "add": "مضافا إليها",
+                "subtract": "العقود من الباطن",
+                "intersect": "التداخل"
+            }
+        },
+        "text": {
+            "font": "Font",
+            "size": "الحجم",
+            "bold": "Bold",
+            "italic": "Italic",
+            "strikethrough": "Strikethrough",
+            "underline": "العنوان",
+            "fill": "Fill",
+            "fillTooltip": "Color that shows inside the edges of the letter(s)"
+        },
+        "zoom": {
+            "zoomOut": "زوم",
+            "zoomIn": "Zoom In",
+            "rotateCounterClockwise": "مدار الساعة",
+            "rotateClockwise": "Rotate Clockwise",
+            "fit": "Fit",
+            "flip": "Flip"
+        }
+    },
+    "toolGroup": {
+        "draw": {
+            "name": "Draw",
+            "description": "بروشات، أقلام رصاص، أقلام، وأدوات رسم فن الناقل.",
+            "tools": {
+                "brush": {
+                    "name": "Brush",
+                    "description": "(بروس) التي ترسم على طبقات (راسستر)."
+                }
+            }
+        },
+        "image": {
+            "name": "الصورة",
+            "description": "تلاعب بالصورة العامة.",
+            "tools": {
+                "cropResize": {
+                    "name": "Crop and Resize",
+                    "description": "كبش، إحياء، نسبة جانب التغيير، أو تجديد الصورة."
+                }
+            }
+        },
+        "selection": {
+            "name": "الاختيار",
+            "description": "ولا تحدث أي تلاعب في الطبقات (الطبقات) إلا في إطار الاختيار.",
+            "tools": {
+                "selection": {
+                    "name": "الاختيار",
+                    "description": "اختيار منطقة من الصورة للتحرير الموجه."
+                }
+            }
+        },
+        "text": {
+            "name": "النص",
+            "description": "أدوات للتلاعب بطبقات النص.",
+            "tools": {
+                "text": {
+                    "name": "النص",
+                    "description": "خلق وحرر طبقات النص."
+                }
+            }
+        },
+        "transform": {
+            "name": "Transform",
+            "description": "أدوات للتحرك، التناوب، رفع الطبقة.",
+            "tools": {
+                "freeTransform": {
+                    "name": "Free Transform",
+                    "description": "تحرك أو تناوب أو ضخ طبقات مختارة."
+                }
+            }
+        },
+        "view": {
+            "name": "Viewport Display",
+            "description": "أدوات للسيطرة على عرض المنظر.",
+            "tools": {
+                "name": "زوم",
+                "description": "تكبير داخل وخارج الكنفاس للسيطرة على كم الصورة التي يمكنك رؤيتها."
+            }
+        }
+    },
+    "tutorialTip": {
+        "drawToolIntroduction": {
+            "title": "Draw Tool",
+            "introduction": [
+                "أداة الرسم تسمح لك بصنع خطوط و أشكال."
+            ]
+        },
+        "explainCanvasViewportControls": {
+            "title": "ننتقل إلى كانفاس",
+            "introduction": [
+                "لا يهم أيّ أداة يتم اختيارها، يمكنك التحكم في مشهد التفاح.",
+                null
+            ],
+            "anyTool": "أي أداة",
+            "body": {
+                "mouse": [
+                    null,
+                    "{panning} - Click and drag with the {rightMouseButton} to move the canvas."
+                ],
+                "touch": [
+                    "{zooming} - Use two fingers and fatch to zoom in and out.",
+                    "{panning} - Use two fingers and slip them together to move the canvas."
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "زوم",
+                "panning": "الصاعقة",
+                "mouseWheel": "ماوس ويل",
+                "rightMouseButton": "(ماوس بوتون)"
+            }
+        },
+        "freeTransformToolIntroduction": {
+            "title": "Free Transform Tool",
+            "introduction": [
+                "هذه الأداة تتحرّك، تُعادل، وتدور الطبقات. A boundary box shows around the selected layer(s).",
+                "In {autoMode}:"
+            ],
+            "autoMode": "وضع السيارات",
+            "body": {
+                "mouse": [
+                    null,
+                    null,
+                    null
+                ],
+                "touch": [
+                    "{selection} - Tap on a layer to select it.",
+                    "{moving} - Tap on a layer and drag to move it.",
+                    "{resizing} - Use one finger to drag resize handles."
+                ]
+            },
+            "bodyTitle": {
+                "selection": "الاختيار",
+                "moving": "التحرك",
+                "resizing": "إعادة التشكيل",
+                "leftClick": "يسار Click"
+            }
+        },
+        "selectionToolIntroduction": {
+            "title": "Selection Tool",
+            "introduction": [
+                "أداة الاختيار تتيح لك اختيار أجزاء محددة من الصورة لتقييد ما يؤثر التحرير."
+            ],
+            "body": {
+                "mouse": [
+                    "{createSelection} - Click and drag with {leftClick} to create a selection."
+                ],
+                "touch": [
+                    "{createSelection} - Draw with one finger to create a selection."
+                ],
+                "end": [
+                    "{selectionShape} - What shape is used to draw the selection.",
+                    "{selectionCombineMode} - How the current selection combines with the existing selection."
+                ]
+            },
+            "bodyTitle": {
+                "createSelection": "الانتقاء",
+                "leftClick": "يسار Click",
+                "selectionShape": "Selection Shape",
+                "selectionCombineMode": "Selection Combine Mode"
+            }
+        },
+        "zoomToolIntroduction": {
+            "title": "زوم/بان تول",
+            "introduction": [
+                "هذه الأداة تجعلك تتقيأ على الصورة و تحرك النظر حولها."
+            ],
+            "body": {
+                "mouse": [
+                    "{zooming} - {leftClick} to zoom in; {ctrlLeftClick} to zoom out.",
+                    "{panning} - Click and drag with the {leftMouseButton} to move the canvas."
+                ],
+                "touch": [
+                    "{zooming} - Tap with one finger to zoom in. تابوت مع اثنين من الأصابع لتكبيرها.",
+                    "{panning} - Tap and drag with one finger to move the canvas."
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "زوم",
+                "panning": "الصاعقة",
+                "leftClick": "يسار Click",
+                "ctrlLeftClick": "Ctrl + left Click",
+                "leftMouseButton": "موسى بوتون"
+            }
+        }
+    }
+}

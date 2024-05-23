@@ -1,0 +1,998 @@
+{
+    "empty": "",
+    "action": {
+        "addLayerFilter": "Aggiungi effetto al livello",
+        "addLayerFilterMultiple": "Aggiungi effetto al livello(i)",
+        "applyActiveSelection": "Applicare la selezione attiva",
+        "applyLayerTransform": "Applicare la trasformazione del livello",
+        "clearSelection": "Selezione chiara",
+        "convertLayersToImageSequence": "Convertire strati in sequenza di immagini",
+        "createDrawLayer": "Crea un piano di disegno",
+        "createNewFile": "Nuovo file",
+        "createNewLayersFromSelection": "Crea livelli da selezione",
+        "cutLayers": "Strato di taglio(i)",
+        "deleteLayers": "Elimina livello(i)",
+        "deleteLayerFilter": "Eliminare l'effetto",
+        "deleteLayerSelectionArea": "Elimina selezione",
+        "disableLayerFilter": "Disattivare l'effetto del livello",
+        "enableLayerFilter": "Abilitare l'effetto del livello",
+        "fileTakePhoto": "Prendere una foto",
+        "freeTransformRotate": "Trasformazione libera (Rotato)",
+        "freeTransformScale": "Trasformazione gratuita (ridimensiona)",
+        "freeTransformTranslate": "Trasformazione libera (Mova)",
+        "insertLayer": "Inserisci il livello",
+        "moduleCropResize": "Ridimensionare e ritagliare",
+        "openFile": "Aprire il file",
+        "pasteLayers": "Paste Layer(s)",
+        "placeholder": "Portaoggetti",
+        "pleaseWait": "Aspetta...",
+        "renameLayer": "Rinomina Layer",
+        "reorderLayers": "Reorder Layer(s)",
+        "reorderLayerFilters": "Effetto di riordine(i)",
+        "selectLayers": "Seleziona livello(i)",
+        "setLayerBoundsToWorkingFileBounds": "Tubi da lavoro a dimensione immagine",
+        "toggleLayerVisibilityOn": "Visibilità del livello Su",
+        "toggleLayerVisibilityOff": "Toggle Layer Visibilità Off",
+        "trimLayerEmptySpace": "Trim Layer spazio vuoto",
+        "updateActiveSelection": "Aggiornamento Selezione attiva",
+        "updateFile": "Aggiornamento del file",
+        "updateLayer": "Aggiornamento del livello",
+        "updateDrawLayer": "Disegnare su Layer",
+        "updateLayerFilterParams": "Effetto del livello di aggiornamento",
+        "updateSelectionCombineMode": "Aggiornamento Selezione Modalità Combinazione"
+    },
+    "app": {
+        "colorPickerGradient": {
+            "hueSlider": "Scivolo di Hue",
+            "opacitySlider": "Slider di Opacità"
+        },
+        "dndDropOverlay": {
+            "addImage": "Aggiungi immagine"
+        },
+        "historyNotification": {
+            "title": {
+                "do": {
+                    "inProgress": "Azione in esecuzione...",
+                    "complete": "Completa"
+                },
+                "undo": {
+                    "inProgress": "Undo...",
+                    "complete": "Annulla completa"
+                },
+                "redo": {
+                    "inProgress": "Redo...",
+                    "complete": "Redo Complete"
+                }
+            }
+        },
+        "layerList": {
+            "toggleLayerVisibility": "Visibilità del livello",
+            "layerSettings": "Impostazioni del livello",
+            "rename": "Nome",
+            "addEffect": "Aggiungere l'effetto",
+            "delete": "Cancella",
+            "frames": "Cornici",
+            "playAnimation": "Gioca Animazione",
+            "stopAnimation": "Stop Animation",
+            "editFrames": "Modifica delle cornici",
+            "emptyGroup": "Il gruppo è vuoto.",
+            "effects": "Effetti",
+            "recalculatingEffect": "Elaborazione...",
+            "moveEffectUp": "Spostare l'effetto",
+            "moveEffectDown": "Spostare l'effetto"
+        },
+        "wait": {
+            "applyLayerTransform": "Applicare la trasformazione del livello",
+            "loadingImage": "Immagine di caricamento",
+            "pleaseWait": "Aspetta",
+            "trimLayerEmptySpace": "Trimming spazio vuoto",
+            "cancel": "Annulla"
+        }
+    },
+    "brushCategory": {
+        "simple": {
+            "name": "Pennelli semplici",
+            "brushes": {
+                "circle": {
+                    "name": "Circolo"
+                }
+            }
+        },
+        "shapes": {
+            "name": "Forma"
+        }
+    },
+    "button": {
+        "apply": "Applicare",
+        "cancel": "Annulla",
+        "clear": "Libero",
+        "convert": "Convertire",
+        "create": "Creare",
+        "createNewImage": "Crea nuova immagine",
+        "done": "Fatto",
+        "export": "Esportazione",
+        "no": "No",
+        "ok": "OK",
+        "openImage": "Immagine aperta",
+        "save": "Salva",
+        "settings": "Impostazioni impostazioni",
+        "take": "Prendi",
+        "takePhoto": "Prendere la foto",
+        "yes": "Sì"
+    },
+    "canvas": {
+        "toolbar": {
+            "cropResize": {
+                "waitLabel": "Ridimensionare e ritagliare"
+            }
+        }
+    },
+    "dock": {
+        "colorPicker": {
+            "title": "Picker di colore",
+            "pickColorFromImage": "Scegli colore da immagine",
+            "hexCode": "Codice Hex"
+        },
+        "layers": {
+            "title": "Livelli",
+            "add": "Aggiungi",
+            "layer": "Livello",
+            "group": "Gruppo",
+            "background": "Contesto",
+            "toggleBackgroundVisibility": "Toggle Backgrounds Visibilità",
+            "noLayers": "Ancora niente strati."
+        },
+        "settings": {
+            "title": "Azioni",
+            "file": {
+                "tabTitle": "File",
+                "menu": {
+                    "new": "Nuovo",
+                    "open": "Aperto",
+                    "export": "Esportazione",
+                    "save": "Salva",
+                    "saveAs": "Salvare come",
+                    "insertPhoto": "Inserisci una foto",
+                    "takePhoto": "Prendere una foto"
+                }
+            },
+            "image": {
+                "tabTitle": "Immagine",
+                "menu": {
+                    "cropResize": "Ridimensionare e ritagliare",
+                    "convertLayers": {
+                        "groupTitle": "Convertire Livelli...",
+                        "toImageSequence": "Sequenza di immagine",
+                        "flatten": "Piatto a nuovo strato"
+                    },
+                    "cut": "Taglio",
+                    "copy": "Copia",
+                    "copyAllLayers": "Copia tutti i livelli",
+                    "paste": "Paste"
+                }
+            },
+            "view": {
+                "tabTitle": "Vista",
+                "zoom": "Zoom",
+                "zoomOut": "Zoom fuori",
+                "zoomIn": "Primo piano",
+                "rotate": "Ruotare",
+                "rotateCounterClockwise": "Ruotare in senso orario",
+                "rotateClockwise": "Ruotare in senso orario",
+                "reset": "Ripristino",
+                "fit": "Adattamento",
+                "touchRotate": {
+                    "label": "Touch Rotate",
+                    "on": "Su",
+                    "snap": "Snap",
+                    "off": "Fuori"
+                },
+                "window": "Finestra",
+                "enterFullscreen": "Inserisci schermo intero",
+                "exitFullscreen": "Uscita schermo intero"
+            },
+            "history": {
+                "tabTitle": "Storia",
+                "undo": "Undo",
+                "redo": "Redo",
+                "noHistory": "Ancora nessuna storia.",
+                "baseImage": "Immagine di base"
+            },
+            "prefs": {
+                "tabTitle": "Prefs",
+                "theme": "Tema",
+                "language": "Lingua",
+                "default": "Predefinito",
+                "performance": {
+                    "groupTitle": "Prestazioni",
+                    "renderer": {
+                        "label": "Rendere",
+                        "2d": "Tela 2D",
+                        "webgl": "WebGL"
+                    },
+                    "optimizeLargeImage": "Ottimizzazione per grande immagine",
+                    "highQualityScaling": "Scala di alta qualità",
+                    "fixAdjacentLayerSeams": "Risolvere le cuciture dei livelli adiacenti"
+                },
+                "editor": {
+                    "groupTitle": "Editore",
+                    "menuBarPosition": "Menu Bar Posizione",
+                    "showWelcomeScreen": "Mostra lo schermo di benvenuto",
+                    "showTips": "Mostra consigli",
+                    "resetSettings": "Ripristina impostazioni"
+                },
+                "debugging": {
+                    "groupTitle": "Debug",
+                    "useMobileDebugger": "Caricatore mobile Debugger"
+                },
+                "help": {
+                    "groupTitle": "Aiuto",
+                    "reportIssue": "Segnala un problema"
+                }
+            }
+        }
+    },
+    "el": {
+        "horizontalScrollbarArrows": {
+            "scrollLeft": "Scroll sinistro",
+            "scrollRight": "Scroll destra"
+        }
+    },
+    "keyboardMap": {
+        "file": {
+            "name": "File",
+            "actions": {
+                "open": "Aprire il file",
+                "export": "Esporta file",
+                "quickLoad": "Caricamento rapido",
+                "quickSave": "Salvare"
+            }
+        },
+        "image": {
+            "name": "Immagine",
+            "actions": {
+                "cut": "Taglio",
+                "copy": "Copia",
+                "paste": "Paste",
+                "delete": "Cancella"
+            }
+        },
+        "history": {
+            "name": "Modifica della storia",
+            "actions": {
+                "undo": "Undo",
+                "redo": "Redo"
+            }
+        },
+        "selection": {
+            "name": "Selezione",
+            "actions": {
+                "selectAll": "Seleziona tutto",
+                "deleteSelection": "Elimina selezione"
+            }
+        }
+    },
+    "layerFilter": {
+        "brightness": {
+            "name": "Luminosità",
+            "param": {
+                "mode": "Modalità",
+                "modeOption": {
+                    "gamma": "Regolare Gamma",
+                    "shift": "Bianco e nero Shift",
+                    "luminance": "Regolare la luminanza"
+                },
+                "brightness": "Luminosità",
+                "effectiveRange": "Ampiezza",
+                "effectiveRangeFeather": "Piuma"
+            }
+        },
+        "chroma": {
+            "name": "Cromatura",
+            "param": {
+                "chroma": "Cromatura",
+                "mode": "Modalità",
+                "modeOption": {
+                    "multiply": "Regolare il contrasto cromato",
+                    "shift": "Regolare uniformemente Chroma"
+                }
+            }
+        },
+        "colorBlindness": {
+            "name": "Colore Cieco",
+            "param": {
+                "method": "Metodo di simulazione",
+                "methodOption": {
+                    "brettel": "Brettel 1997"
+                },
+                "type": "Tipo di cintura",
+                "typeOption": {
+                    "protan": "Protanopia / Protanomaly (Red-Blind)",
+                    "deuteran": "Deuteranopia / Deuteranomaly (Green-Blind)",
+                    "tritan": "Tritanopia / Tritanomaly (blu-blind)",
+                    "achroma": "Achromatomaly / Achromatopsia (Red/Green/Blue-Blind)"
+                },
+                "severity": "Severo"
+            }
+        },
+        "colorCorrection": {
+            "name": "Correzione del colore"
+        },
+        "contrast": {
+            "name": "Contrasto",
+            "param": {
+                "contrast": "Contrasto",
+                "middleGray": "Medio grigio"
+            }
+        },
+        "decreaseColorDepth": {
+            "name": "Diminuzione della profondità di colore"
+        },
+        "gaussianBlur": {
+            "name": "Bluss Gaussian",
+            "param": {
+                "size": "Dimensione",
+                "xIntensity": "X Intensità",
+                "yIntensity": "Y Intensità"
+            }
+        },
+        "grayscale": {
+            "name": "Scala di grigi",
+            "param": {
+                "mode": "Modalità",
+                "modeOption": {
+                    "luminance": "Luminance",
+                    "luma": "Luma",
+                    "lightness": "Luce (HSL)",
+                    "average": "Media (intensità HSI)",
+                    "value": "Valore (HSV)"
+                },
+                "modeOptionDescription": {
+                    "value": "= max(R,G,B)"
+                },
+                "mix": "Miscela"
+            }
+        },
+        "hue": {
+            "name": "Hue",
+            "param": {
+                "colorSpace": "Spazio colore",
+                "colorSpaceOption": {
+                    "oklab": "Oklab",
+                    "perceptualRgb": "RGB percettivo",
+                    "linearRgb": "RGB lineare"
+                },
+                "rotate": "Ruotare"
+            }
+        },
+        "negative": {
+            "name": "Negativo",
+            "param": {
+                "colorSpace": "Spazio colore",
+                "colorSpaceOption": {
+                    "perceptualRgb": "RGB percettivo",
+                    "linearRgb": "RGB lineare"
+                },
+                "invertRed": "Invertire il canale rosso",
+                "invertGreen": "Invertire il canale verde",
+                "invertBlue": "Invertire il canale blu",
+                "invertValue": "Valore invertito"
+            }
+        },
+        "saturation": {
+            "name": "Saturazione",
+            "param": {
+                "saturation": "Saturazione"
+            }
+        },
+        "sepia": {
+            "name": "Seppia"
+        }
+    },
+    "layerFilterGroup": {
+        "blur": {
+            "name": "Blu"
+        },
+        "color": {
+            "name": "Colore"
+        },
+        "distort": {
+            "name": "Distorcere"
+        },
+        "instagramFilter": {
+            "name": "Filtro Instagram"
+        },
+        "photography": {
+            "name": "Fotografia"
+        },
+        "sharpen": {
+            "name": "Sharpen"
+        }
+    },
+    "layoutShortcutGroup": {
+        "color": {
+            "name": "Colore della scelta",
+            "controls": {
+                "default": {
+                    "label": "Colore della scelta"
+                }
+            }
+        },
+        "deform": {
+            "name": "Deformità",
+            "controls": {
+                "default": {
+                    "label": "Deformità"
+                }
+            }
+        },
+        "draw": {
+            "name": "Disegno",
+            "controls": {
+                "default": {
+                    "label": "Disegno"
+                }
+            }
+        },
+        "effects": {
+            "name": "Effetti",
+            "controls": {
+                "default": {
+                    "label": "Effetti"
+                }
+            }
+        },
+        "erase": {
+            "name": "Cancellazione",
+            "controls": {
+                "default": {
+                    "label": "Cancellazione"
+                }
+            }
+        },
+        "history": {
+            "name": "Storia",
+            "controls": {
+                "undo": {
+                    "label": "Undo"
+                },
+                "redo": {
+                    "label": "Redo"
+                }
+            }
+        },
+        "layers": {
+            "name": "Livelli",
+            "controls": {
+                "default": {
+                    "label": "Livelli"
+                }
+            }
+        },
+        "search": {
+            "name": "Ricerca",
+            "controls": {
+                "default": {
+                    "label": "Ricerca"
+                }
+            }
+        },
+        "selection": {
+            "name": "Selezione",
+            "controls": {
+                "default": {
+                    "label": "Selezione"
+                }
+            }
+        },
+        "settings": {
+            "name": "Azioni",
+            "controls": {
+                "default": {
+                    "label": "Azioni"
+                }
+            }
+        },
+        "text": {
+            "name": "Testo",
+            "controls": {
+                "default": {
+                    "label": "Inserisci / Modifica testo"
+                }
+            }
+        },
+        "transform": {
+            "name": "Spostare / trasformare",
+            "controls": {
+                "default": {
+                    "label": "Spostare / trasformare"
+                }
+            }
+        },
+        "view": {
+            "name": "Vista su tela",
+            "controls": {
+                "default": {
+                    "label": "Zoom / Vista panoramica"
+                }
+            }
+        }
+    },
+    "lib": {
+        "tutorial": {
+            "notification": {
+                "gotIt": "Preso",
+                "dontShowTips": "Non mostrare consigli"
+            }
+        }
+    },
+    "measurement": {
+        "pixels": "Pixel",
+        "millimeters": "Millimetri",
+        "centimeters": "Centimetri",
+        "inches": "Pollici",
+        "pixelsPerInch": "Pixel/Inch",
+        "pixelsPerMillimeter": "Pixel/Millimetro",
+        "pixelsPerCentimeter": "Pixel/Centimetro"
+    },
+    "menuBar": {
+        "toolsHeading": "Strumenti"
+    },
+    "module": {
+        "fileExport": {
+            "title": "Immagine di esportazione",
+            "saveBackIntroduction": "Hai aperto un file di nome {fileName}.",
+            "saveBackQuestion": "Salvare il file originale?",
+            "fileName": "Nome del file",
+            "fileType": "Tipo di file",
+            "layers": "Livelli",
+            "quality": "Qualità",
+            "dithering": "Dithering",
+            "ditheringOption": {
+                "none": "Nessuno",
+                "atkinson": "Atkinson",
+                "atkinsonSerpentine": "Atkinson (serpentine)",
+                "floydSteinberg": "Floyd Steinberg",
+                "floydSteinbergSerpentine": "Floyd Steinberg (serpentine)",
+                "falseFloydSteinberg": "Falso Floyd Steinberg",
+                "falseFloydSteinbergSerpentine": "Falso Floyd Steinberg (serpentine)",
+                "stucki": "Stucki",
+                "stuckiSerpentine": "Stucki (serpentine)"
+            }
+        },
+        "fileNew": {
+            "title": "Nuova immagine",
+            "preset": "Preset",
+            "presetPlaceholder": "Seleziona (opzionale)",
+            "width": "Larghezza",
+            "height": "Altezza",
+            "resolution": "Risoluzione",
+            "colorProfile": "Profilo di colore",
+            "scaleFactor": "Fattore di scala"
+        },
+        "fileSaveAs": {
+            "title": "Salva immagine come",
+            "saveBackIntroduction": "Hai aperto un file di nome {fileName}.",
+            "saveBackQuestion": "Salvare il file originale?",
+            "exportDisclaimer": "Se si desidera condividere o visualizzare l'immagine in altri programmi, utilizzare \"Esporta\" invece.",
+            "fileName": "Nome del file"
+        },
+        "fileTakePhoto": {
+            "title": "Prendere la foto",
+            "noCameraError": {
+                "title": "Macchina fotografica Non disponibile",
+                "message": "O il dispositivo non ha telecamere o l'accesso alla fotocamera è stato rifiutato."
+            },
+            "selectCamera": {
+                "placeholder": "Selezionare la fotocamera",
+                "user": "Fronte (User)",
+                "environment": "Posteriore (Ambiente)"
+            }
+        },
+        "imageConvertLayersToImageSequence": {
+            "title": "Convertire strati in sequenza di immagini",
+            "frameDelay": "Delay della struttura"
+        },
+        "layerEffectBrowser": {
+            "title": "Effetto Browser",
+            "description": "Scegliere un effetto da aggiungere allo strato. Effetti generalmente manipolare i colori di uno strato o aggiungere modelli speciali come gli effetti sfocatura.",
+            "loading": "Generando Anteprime...",
+            "generationErrorGeneral": "Un errore si è verificato quando si genera l'effetto prevede per lo strato selezionato.",
+            "generationErrorUnsupportedType": "Lo strato selezionato non è in grado di avere filtri applicati ad esso.",
+            "generationErrorNoLayer": "Si prega di selezionare uno o più strati nel bacino strati per aggiungere effetti a loro."
+        },
+        "layerEffectEdit": {
+            "title": "Modifica",
+            "description": "Modificare l'effetto per uno strato specifico.",
+            "loading": "Generando Anteprime...",
+            "generalError": "Qualcosa è andato storto. Se continui a vedere questo messaggio, per favore segnalalo come un bug.",
+            "deleteEffect": "Eliminare l'effetto",
+            "enableToggle": "Abilitare",
+            "resetField": "Reset Field",
+            "deleting": "Effetto di delezione...",
+            "deleteFilterError": "Si è verificato un errore durante il tentativo di eliminare il filtro. Se continui a vedere questo messaggio, per favore segnalalo come un bug.",
+            "applyFilterError": "Si è verificato un errore durante il tentativo di applicare le modifiche del filtro. Se continui a vedere questo messaggio, per favore segnalalo come un bug."
+        },
+        "renameLayer": {
+            "title": "Rinomina Layer",
+            "layerName": "Nuovo nome"
+        }
+    },
+    "moduleGroup": {
+        "file": {
+            "name": "Gestione dei file",
+            "description": "Carica e salva le immagini sul tuo dispositivo.",
+            "modules": {
+                "export": {
+                    "name": "Immagine di esportazione",
+                    "description": "Salvare l'immagine in un formato universale che può essere aperto da altri editor."
+                },
+                "insertPhoto": {
+                    "name": "Inserisci una foto",
+                    "description": "Aggiungi una foto come un nuovo strato nell'immagine attualmente aperta."
+                },
+                "new": {
+                    "name": "Nuova immagine",
+                    "description": "Creare una nuova immagine con dimensioni specificate."
+                },
+                "open": {
+                    "name": "Immagine aperta",
+                    "description": "Aprire un file immagine o progetto in un nuovo spazio di lavoro."
+                },
+                "quickLoad": {
+                    "name": "Caricamento rapido",
+                    "description": "Caricare il file salvato salvando rapidamente."
+                },
+                "quickSave": {
+                    "name": "Salvare",
+                    "description": "Salva il file corrente nello storage temporaneo."
+                },
+                "saveAs": {
+                    "name": "Salva immagine come",
+                    "description": "Salva l'immagine in un formato di progetto che può essere riaperto da OpenGraphica senza perdere alcuna informazione."
+                },
+                "takePhoto": {
+                    "name": "Prendere una foto",
+                    "description": "Fai una foto dalla fotocamera e dalla webcam e inseriscila nell'immagine."
+                }
+            }
+        },
+        "history": {
+            "name": "Modifica della storia",
+            "description": "Operazioni che controllano passare attraverso la storia delle modifiche dell'immagine.",
+            "modules": {
+                "redo": {
+                    "name": "Storia Redo",
+                    "description": "Redo l'ultima azione annullata."
+                },
+                "undo": {
+                    "name": "Storia",
+                    "description": "Annulla l'ultima azione."
+                }
+            }
+        },
+        "image": {
+            "name": "Immagine",
+            "description": "Operazioni che influiscono sulla tela dell'immagine.",
+            "modules": {
+                "convertLayersToImageSequence": {
+                    "name": "Convertire strati in sequenza di immagini",
+                    "description": "Converte gli strati selezionati in uno strato di sequenza di immagine (animazione)."
+                },
+                "convertLayersFlatten": {
+                    "name": "Convertire strati in immagini appiattite",
+                    "description": "Memorizza tutti gli strati su un unico strato di immagine e lo aggiunge alla parte superiore dello stack di strato."
+                },
+                "copy": {
+                    "name": "Copia i livelli selezionati",
+                    "description": "Copiare gli strati attualmente selezionati nella clipboard."
+                },
+                "copyAll": {
+                    "name": "Copia tutti i livelli",
+                    "description": "Copiare tutti gli strati sulla tela come un'immagine PNG alla clipboard."
+                },
+                "cut": {
+                    "name": "Taglio",
+                    "description": "Rimuovere gli strati attualmente selezionati e copiarli nella clipboard."
+                },
+                "paste": {
+                    "name": "Paste",
+                    "description": "Inserire le immagini sulla tela dalla clipboard."
+                }
+            }
+        },
+        "layer": {
+            "name": "Livelli",
+            "description": "Operazioni che influiscono sugli strati.",
+            "modules": {
+                "rename": {
+                    "name": "Rinomina Layer",
+                    "description": "Cambia il nome di uno strato"
+                },
+                "layerEffectBrowser": {
+                    "name": "Effetto Browser",
+                    "description": "Aggiunge gli effetti dell'immagine ai livelli o ai gruppi di strati attualmente selezionati."
+                }
+            }
+        },
+        "tmp": {
+            "name": "Moduli temporanei",
+            "description": "Moduli che si attiveranno solo durante lo sviluppo iniziale.",
+            "modules": {
+                "notYetImplemented": {
+                    "name": "Non ancora implementato",
+                    "description": "Mostra un avvertimento."
+                }
+            }
+        },
+        "tutorial": {
+            "name": "Tutorial",
+            "description": "Scopri come utilizzare OpenGraphica.",
+            "modules": {
+                "welcome": {
+                    "name": "Benvenuto",
+                    "description": "Inizia a lavorare su un'immagine."
+                }
+            }
+        }
+    },
+    "option": {
+        "bottom": "Fondo",
+        "left": "Sinistra",
+        "right": "Giusto",
+        "top": "Top"
+    },
+    "theme": {
+        "light": "Luce",
+        "dark": "Oscuro"
+    },
+    "toolbar": {
+        "cropResize": {
+            "title": "Ridimensionare e ritagliare",
+            "linkWidthHeight": "Larghezza di collegamento/altezza",
+            "size": "Dimensione",
+            "width": "Larghezza",
+            "height": "Altezza",
+            "dimensionUnits": "Unità di dimensionamento",
+            "resolution": "Risoluzione",
+            "resolutionUnits": "Unità di risoluzione",
+            "snapping": {
+                "title": "Snapping",
+                "enable": "Attivare Snapping"
+            }
+        },
+        "draw": {
+            "brushColor": "Colore della spazzola",
+            "brushSize": "Dimensione"
+        },
+        "freeTransform": {
+            "clearSelection": "Selezione chiara",
+            "pickLayer": {
+                "label": "Pick Layer",
+                "auto": "Auto",
+                "current": "Corrente"
+            },
+            "snapping": {
+                "title": "Snapping",
+                "rotationSnap": "Rotazione di scatto"
+            },
+            "metrics": {
+                "title": "Metrica",
+                "position": "Posizione",
+                "width": "Larghezza",
+                "height": "Altezza",
+                "rotation": "Rotazione",
+                "resetRotation": "Reset Rotazione",
+                "noLayers": "Nessun strato(i) selezionato."
+            },
+            "actions": {
+                "title": "Azioni",
+                "applyTransform": "Applicare la trasformazione",
+                "expandToImageSize": "Tubi da lavoro a dimensione immagine",
+                "trimEmptySpace": "Trim spazio vuoto"
+            }
+        },
+        "general": {
+            "settings": "Impostazioni impostazioni"
+        },
+        "selection": {
+            "selectionShape": {
+                "label": "Forma di selezione",
+                "rectangle": "Rettangolo",
+                "ellipse": "Ellipse",
+                "freePolygon": "Poligono libero",
+                "freePolygonShort": "Poli libero",
+                "tonalArea": "Area tonale"
+            },
+            "selectionCombineMode": {
+                "label": "Modalità di combinazione di selezione",
+                "add": "Aggiungi",
+                "subtract": "Sottratto",
+                "intersect": "Intersect"
+            }
+        },
+        "text": {
+            "font": "Fonti",
+            "size": "Dimensione",
+            "bold": "Bullone",
+            "italic": "Italica",
+            "strikethrough": "Attaccamento",
+            "underline": "Sottolineo",
+            "fill": "Riempi",
+            "fillTooltip": "Colore che mostra all'interno dei bordi della lettera"
+        },
+        "zoom": {
+            "zoomOut": "Zoom fuori",
+            "zoomIn": "Primo piano",
+            "rotateCounterClockwise": "Ruotare in senso orario",
+            "rotateClockwise": "Ruotare in senso orario",
+            "fit": "Adattamento",
+            "flip": "Flip"
+        }
+    },
+    "toolGroup": {
+        "draw": {
+            "name": "Disegno",
+            "description": "Pennelli, matite, penne e strumenti di disegno arte vettoriale.",
+            "tools": {
+                "brush": {
+                    "name": "Spazzola",
+                    "description": "Spazzole che disegnano su strati raster."
+                }
+            }
+        },
+        "image": {
+            "name": "Immagine",
+            "description": "Manipolazione generale della risoluzione delle immagini.",
+            "tools": {
+                "cropResize": {
+                    "name": "Ridimensionare e ritagliare",
+                    "description": "Ritagliare, ridimensionare, modificare il rapporto di aspetto, o riscuotere l'immagine."
+                }
+            }
+        },
+        "selection": {
+            "name": "Selezione",
+            "description": "Seleziona le aree dello strato attivo(i), qualsiasi manipolazione allo strato(i) si verifica solo all'interno della selezione.",
+            "tools": {
+                "selection": {
+                    "name": "Selezione",
+                    "description": "Selezionare un'area dell'immagine per la modifica mirata."
+                }
+            }
+        },
+        "text": {
+            "name": "Testo",
+            "description": "Strumenti per manipolare strati di testo.",
+            "tools": {
+                "text": {
+                    "name": "Testo",
+                    "description": "Creare e modificare strati di testo."
+                }
+            }
+        },
+        "transform": {
+            "name": "Trasformazione",
+            "description": "Strumenti per spostare, ruotare, scalare lo strato.",
+            "tools": {
+                "freeTransform": {
+                    "name": "Trasformazione libera",
+                    "description": "Spostare, ruotare o scalare gli strati selezionati."
+                }
+            }
+        },
+        "view": {
+            "name": "Visualizza visualizzazione",
+            "description": "Strumenti per il controllo del display viewport della tela.",
+            "tools": {
+                "name": "Zoom",
+                "description": "Zoom dentro e fuori la tela per controllare quanto dell'immagine si può vedere."
+            }
+        }
+    },
+    "tutorialTip": {
+        "drawToolIntroduction": {
+            "title": "Strumento di disegno",
+            "introduction": [
+                "Lo strumento di disegno consente di creare linee e forme."
+            ]
+        },
+        "explainCanvasViewportControls": {
+            "title": "Trasferire la tela",
+            "introduction": [
+                "Non importa quale strumento è selezionato, è possibile controllare la vista della tela.",
+                "Quando viene selezionato {anyTool}:"
+            ],
+            "anyTool": "qualsiasi strumento",
+            "body": {
+                "mouse": [
+                    "{zooming} - Utilizzare il {mouseWheel} per zoomare dentro e fuori.",
+                    "{panning} - Fai clic e trascina con il {rightMouseButton} per spostare la tela."
+                ],
+                "touch": [
+                    "{zooming} - Utilizzare due dita e pizzicare per ingrandire dentro e fuori.",
+                    "{panning} - Utilizzare due dita e farli scorrere insieme per spostare la tela."
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "Zoom",
+                "panning": "Pannella",
+                "mouseWheel": "Ruota del mouse",
+                "rightMouseButton": "Pulsante destro del mouse"
+            }
+        },
+        "freeTransformToolIntroduction": {
+            "title": "Strumento di trasformazione libero",
+            "introduction": [
+                "Questo strumento si muove, ridimensiona e ruota gli strati. Una casella di confine mostra intorno allo strato selezionato.",
+                "In {autoMode}:"
+            ],
+            "autoMode": "modalità auto",
+            "body": {
+                "mouse": [
+                    "{selection} - {leftClick} su uno strato per selezionarlo.",
+                    "{moving} - {leftClick} su uno strato e trascinare per spostarlo.",
+                    "{resizing} - {leftClick} e trascinare le maniglie di ridimensionamento."
+                ],
+                "touch": [
+                    "{selection} - Toccare uno strato per selezionarlo.",
+                    "{moving} - Toccare uno strato e trascinare per spostarlo.",
+                    "{resizing} - Utilizzare un dito per trascinare le maniglie di ridimensionamento."
+                ]
+            },
+            "bodyTitle": {
+                "selection": "Selezione",
+                "moving": "Muoversi",
+                "resizing": "Ridimensionamento",
+                "leftClick": "Clic sinistro"
+            }
+        },
+        "selectionToolIntroduction": {
+            "title": "Strumento di selezione",
+            "introduction": [
+                "Lo strumento di selezione consente di selezionare parti specifiche dell'immagine per limitare ciò che la modifica influisce."
+            ],
+            "body": {
+                "mouse": [
+                    "{createSelection} - Fai clic e trascina con {leftClick} per creare una selezione."
+                ],
+                "touch": [
+                    "{createSelection} - Disegna con un dito per creare una selezione."
+                ],
+                "end": [
+                    "{selectionShape} - Quale forma viene utilizzata per disegnare la selezione.",
+                    "{selectionCombineMode} - Come la selezione corrente si combina con la selezione esistente."
+                ]
+            },
+            "bodyTitle": {
+                "createSelection": "Crea selezione",
+                "leftClick": "Clic sinistro",
+                "selectionShape": "Forma di selezione",
+                "selectionCombineMode": "Modalità di combinazione di selezione"
+            }
+        },
+        "zoomToolIntroduction": {
+            "title": "Strumento Zoom/Pan",
+            "introduction": [
+                "Questo strumento consente di ingrandire l'immagine e spostare la vista intorno."
+            ],
+            "body": {
+                "mouse": [
+                    "{zooming} - {leftClick} per ingrandire; {ctrlLeftClick} per ingrandire.",
+                    "{panning} - Fai clic e trascina con il {leftMouseButton} per spostare la tela."
+                ],
+                "touch": [
+                    "{zooming} - Toccare con un dito per ingrandire. Toccare con due dita per ingrandire.",
+                    "{panning} - Toccare e trascinare con un dito per spostare la tela."
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "Zoom",
+                "panning": "Pannella",
+                "leftClick": "Clic sinistro",
+                "ctrlLeftClick": "Ctrl + Clic sinistro",
+                "leftMouseButton": "Pulsante sinistro del mouse"
+            }
+        }
+    }
+}

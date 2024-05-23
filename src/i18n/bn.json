@@ -1,0 +1,996 @@
+{
+    "empty": "",
+    "action": {
+        "addLayerFilter": "আবহ স্তরতে ইফেক্ট যোগ করুন",
+        "addLayerFilterMultiple": "স্তরতে ইফেক্ট যোগ করুন",
+        "applyActiveSelection": "সক্রিয় নির্বাচন প্রয়োগ করুন",
+        "applyLayerTransform": "স্তর রূপান্তরের অনুকরণ করুন",
+        "clearSelection": "নির্বাচিত মান বাতিল করা হবে",
+        "convertLayersToImageSequence": "স্তর রূপান্তর করো",
+        "createDrawLayer": "খেলার স্তর তৈরি করো",
+        "createNewFile": "নতুন ফাইল",
+        "createNewLayersFromSelection": "নির্বাচনের স্তর তৈরি করো",
+        "cutLayers": "স্তর কাট করুন",
+        "deleteLayers": "স্তর মুছে ফেলুন",
+        "deleteLayerFilter": "ইফেক্ট মুছে ফেলা হবে",
+        "deleteLayerSelectionArea": "নির্বাচিত অংশ মুছে ফেলুন",
+        "disableLayerFilter": "আবহ ইফেক্ট নিষ্ক্রিয় করা হবে",
+        "enableLayerFilter": "ইফেক্ট সক্রিয় করুন",
+        "fileTakePhoto": "একটি ফটো নিন",
+        "freeTransformRotate": "ফ্রি- রূপান্তরের অনুকরণ করা হবে (R)",
+        "freeTransformScale": "ফ্রি- ট্রান্স-ফর্ম (z)",
+        "freeTransformTranslate": "মুক্ত ট্রান্সফর্ম (ফাইল স্থানান্তর)",
+        "insertLayer": "স্তর সন্নিবেশ করুন",
+        "moduleCropResize": "মাপ পরিবর্তন ও মাপ পরিবর্তন",
+        "openFile": "ফাইল খুলুন",
+        "pasteLayers": "& স্তর",
+        "placeholder": "অবস্থান:",
+        "pleaseWait": "অনুগ্রহ করে অপেক্ষা করুন...",
+        "renameLayer": "স্তরের নাম পরিবর্তন করুন",
+        "reorderLayers": "স্তর",
+        "reorderLayerFilters": "ইফেক্ট",
+        "selectLayers": "স্তর বেছে নিন",
+        "setLayerBoundsToWorkingFileBounds": "চিত্রের আকার",
+        "toggleLayerVisibilityOn": "শাস্ত প্রদর্শনের মোড পাল্টাও চালু করুন",
+        "toggleLayerVisibilityOff": "ফোকাসের প্রদর্শন বন্ধ করুন",
+        "trimLayerEmptySpace": "ট্রিম স্তর ফাঁকা স্থান",
+        "updateActiveSelection": "সক্রিয় অবস্থা আপডেট করুন",
+        "updateFile": "ফাইল আপডেট করুন",
+        "updateLayer": "আপডেট",
+        "updateDrawLayer": "স্তর সহ আঁকো",
+        "updateLayerFilterParams": "ইফেক্ট আপডেট করা হবে",
+        "updateSelectionCombineMode": "আপডেট করার মোড"
+    },
+    "app": {
+        "colorPickerGradient": {
+            "hueSlider": "হিউ স্লাইডার",
+            "opacitySlider": "স্বচ্ছতার স্লাইডার"
+        },
+        "dndDropOverlay": {
+            "addImage": "হেডার যোগ করো"
+        },
+        "historyNotification": {
+            "title": {
+                "do": {
+                    "inProgress": "কর্ম সঞ্চালন...",
+                    "complete": "পুরোদমে"
+                },
+                "undo": {
+                    "inProgress": "বাতিল করো...",
+                    "complete": "পূর্বাবস্থা"
+                },
+                "redo": {
+                    "inProgress": "পুনরায়...",
+                    "complete": "পুনরায় পুনরাবৃত্তি করুন"
+                }
+            }
+        },
+        "layerList": {
+            "toggleLayerVisibility": "শাস্ত প্রদর্শনের মোড পাল্টাও",
+            "layerSettings": "স্তর সংক্রান্ত বৈশিষ্ট্য",
+            "rename": "পুনরায় নামকরণ",
+            "addEffect": "ইফেক্ট যোগ করুন",
+            "delete": "মুছে ফেলুন",
+            "frames": "ফ্রেম",
+            "playAnimation": "অ্যানিমেশন চালান",
+            "stopAnimation": "অ্যানিমেশন বন্ধ করুন",
+            "editFrames": "ফ্রেম সম্পাদনা করুন",
+            "emptyGroup": "গ্রুপ ফাঁকা।.",
+            "effects": "ইফেক্ট",
+            "recalculatingEffect": "প্রসেস করা হচ্ছে...",
+            "moveEffectUp": "উপর থেকে ওঠাও",
+            "moveEffectDown": "ইফেক্ট বিহীন"
+        },
+        "wait": {
+            "applyLayerTransform": "স্তর রূপান্তর করা হচ্ছে",
+            "loadingImage": "ছবি লোড করা হচ্ছে",
+            "pleaseWait": "অনুগ্রহ করে অপেক্ষা করুন",
+            "trimLayerEmptySpace": "ফাঁকা স্থান",
+            "cancel": "বাতিল"
+        }
+    },
+    "brushCategory": {
+        "simple": {
+            "name": "সহজ বিন্দু",
+            "brushes": {
+                "circle": {
+                    "name": "বৃত্ত"
+                }
+            }
+        },
+        "shapes": {
+            "name": "আকার"
+        }
+    },
+    "button": {
+        "apply": "প্রয়োগ করুন",
+        "cancel": "বাতিল",
+        "clear": "পরিষ্কার",
+        "convert": "রূপান্তর করো",
+        "create": "তৈরি করুন (_r)",
+        "createNewImage": "নতুন ছবি তৈরি করো",
+        "done": "সম্পন্ন",
+        "export": "এক্সপোর্ট করুন",
+        "no": "না",
+        "ok": "ঠিক আছে",
+        "openImage": "চিত্র লোড করা হোক",
+        "save": "সংরক্ষণ",
+        "settings": "বৈশিষ্ট্য",
+        "take": "নিয়ে যাও",
+        "takePhoto": "ফটো নিন",
+        "yes": "হ্যাঁ"
+    },
+    "canvas": {
+        "toolbar": {
+            "cropResize": {
+                "waitLabel": "মাপ পরিবর্তন ও মাপ পরিবর্তন"
+            }
+        }
+    },
+    "dock": {
+        "colorPicker": {
+            "title": "রঙের স্কিম",
+            "pickColorFromImage": "চিত্র থেকে রং নির্বাচন করুন",
+            "hexCode": "হেক্স কোড"
+        },
+        "layers": {
+            "title": "স্তর",
+            "add": "যোগ করুন",
+            "layer": "স্তর",
+            "group": "দল",
+            "background": "পটভূমি",
+            "toggleBackgroundVisibility": "পটভূমি প্রদর্শনের মোড পাল্টাও দৃষ্টিগ্রাহ্যতা",
+            "noLayers": "কোন স্তর নেই।."
+        },
+        "settings": {
+            "title": "কাজ",
+            "file": {
+                "tabTitle": "ফাইল",
+                "menu": {
+                    "new": "নতুন",
+                    "open": "খুলুন",
+                    "export": "এক্সপোর্ট করুন",
+                    "save": "সংরক্ষণ",
+                    "saveAs": "নতুন নামে সংরক্ষণ",
+                    "insertPhoto": "একটি ছবি সন্নিবেশ করুন",
+                    "takePhoto": "একটি ফটো নিন"
+                }
+            },
+            "image": {
+                "tabTitle": "ছবি",
+                "menu": {
+                    "cropResize": "মাপ পরিবর্তন ও মাপ পরিবর্তন",
+                    "convertLayers": {
+                        "groupTitle": "স্তর রূপান্তর করো...",
+                        "toImageSequence": "ক্রমপর্যায়ের",
+                        "flatten": "সমতল"
+                    },
+                    "cut": "কাট করুন",
+                    "copy": "কপি করুন",
+                    "copyAllLayers": "সকল স্তর কপি করুন",
+                    "paste": "পেস্ট করুন"
+                }
+            },
+            "view": {
+                "tabTitle": "প্রদর্শন",
+                "zoom": "প্রদর্শনের মাপ",
+                "zoomOut": "ছোট করে প্রদর্শন",
+                "zoomIn": "বড় করে প্রদর্শন",
+                "rotate": "আবর্তন",
+                "rotateCounterClockwise": "ঘড়ির কাঁটার দিকে ঘোরান",
+                "rotateClockwise": "আবর্তন",
+                "reset": "পুনরায় নির্ধারণ",
+                "fit": "মানানসই",
+                "touchRotate": {
+                    "label": "স্পর্শের আবর্তন",
+                    "on": "চালু করুন",
+                    "snap": "উজ্জ্বল",
+                    "off": "বন্ধ"
+                },
+                "window": "উইন্ডো",
+                "enterFullscreen": "সম্পূর্ণ পর্দা জুড়ে প্রদর্শন",
+                "exitFullscreen": "সম্পূর্ণ পর্দায় প্রদর্শন বন্ধ করুন"
+            },
+            "history": {
+                "tabTitle": "ব্রাউজ-ইতিহাস",
+                "undo": "পূর্বাবস্থা",
+                "redo": "পুনরাবৃত্তি",
+                "noHistory": "কোন ইতিহাস নেই।.",
+                "baseImage": "বেস ছবি"
+            },
+            "prefs": {
+                "tabTitle": "উপদেশ",
+                "theme": "থিম",
+                "language": "ভাষা",
+                "default": "ডিফল্ট",
+                "performance": {
+                    "groupTitle": "কর্মক্ষমতা",
+                    "renderer": {
+                        "label": "স্পিনার",
+                        "2d": "ক্যানভাস দ্বিমাত্রিক",
+                        "webgl": "ওয়েব ইন্সপেক্টর"
+                    },
+                    "optimizeLargeImage": "বড় ছবির জন্য কোয়েরি",
+                    "highQualityScaling": "উচ্চ গুণমানের হার",
+                    "fixAdjacentLayerSeams": "উচ্চ পর্যায়ের স্তর সংশোধন করো"
+                },
+                "editor": {
+                    "groupTitle": "সম্পাদক",
+                    "menuBarPosition": "মেনু বার অবস্থান",
+                    "showWelcomeScreen": "পর্দার অনুলিপি তৈরি করা হবে",
+                    "showTips": "টিপ প্রদর্শন করা হয়",
+                    "resetSettings": "পুনরুদ্ধার সংক্রান্ত বৈশিষ্ট্য"
+                },
+                "debugging": {
+                    "groupTitle": "ডিবাগ ব্যবস্থা",
+                    "useMobileDebugger": "মোবাইল ডিবাগার লোড করুন"
+                },
+                "help": {
+                    "groupTitle": "সাহায্য",
+                    "reportIssue": "একটি ইস্যু প্রতিবেদন"
+                }
+            }
+        }
+    },
+    "el": {
+        "horizontalScrollbarArrows": {
+            "scrollLeft": "স্ক্রোলিং ব্যবস্থা",
+            "scrollRight": "স্ক্রোলিং ব্যবস্থা"
+        }
+    },
+    "keyboardMap": {
+        "file": {
+            "name": "ফাইল",
+            "actions": {
+                "open": "ফাইল খুলুন",
+                "export": "ফাইলের মধ্যে এক্সপোর্ট করুন",
+                "quickLoad": "দ্রুত ভার",
+                "quickSave": "দ্রুত সংরক্ষণ করুন"
+            }
+        },
+        "image": {
+            "name": "ছবি",
+            "actions": {
+                "cut": "কাট করুন",
+                "copy": "কপি করুন",
+                "paste": "পেস্ট করুন",
+                "delete": "মুছে ফেলুন"
+            }
+        },
+        "history": {
+            "name": "ব্রাউজ-ইতিহাস সম্পাদনা",
+            "actions": {
+                "undo": "পূর্বাবস্থা",
+                "redo": "পুনরাবৃত্তি"
+            }
+        },
+        "selection": {
+            "name": "নির্বাচন",
+            "actions": {
+                "selectAll": "সমগ্র নির্বাচন",
+                "deleteSelection": "নির্বাচিত অংশ মুছে ফেলুন"
+            }
+        }
+    },
+    "layerFilter": {
+        "brightness": {
+            "name": "উজ্জ্বলতা",
+            "param": {
+                "mode": "মোড (Mode)",
+                "modeOption": {
+                    "gamma": "গামা পরিবর্তন করুন",
+                    "shift": "কালো/সাদা",
+                    "luminance": "লুমিনেশন"
+                },
+                "brightness": "উজ্জ্বলতা",
+                "effectiveRange": "সীমা",
+                "effectiveRangeFeather": "ফ্যাদার"
+            }
+        },
+        "chroma": {
+            "name": "ক্রোমোয়া",
+            "param": {
+                "chroma": "ক্রোমোয়া",
+                "mode": "মোড (Mode)",
+                "modeOption": {
+                    "multiply": "ক্রোমাডা বৈসাদৃশ্য পরিবর্তন করুন",
+                    "shift": "ত্রোয়া"
+                }
+            }
+        },
+        "colorBlindness": {
+            "name": "গাঢ় তারতম্য",
+            "param": {
+                "method": "পদ্ধতি",
+                "methodOption": {
+                    "brettel": "ব্রেট ১৯৯৭"
+                },
+                "type": "অন্ধত্ব",
+                "typeOption": {
+                    "protan": "প্রোটোপিয়া / প্রোটানমালি (লাল-বুদ)",
+                    "deuteran": "Deuserdia / Deuserrancia (গ্রীন ইঞ্জিন)",
+                    "tritan": "ট্রিটিনোপিয়া / ট্রাইটানমালি (ব্লিন)",
+                    "achroma": "অ্যাক্রোমামাডে/চোমাতিয়া"
+                },
+                "severity": "গুরুত্ব: (v)"
+            }
+        },
+        "colorCorrection": {
+            "name": "রঙ যাচাইকারী"
+        },
+        "contrast": {
+            "name": "বৈপরিত্য",
+            "param": {
+                "contrast": "বৈপরিত্য",
+                "middleGray": "মধ্যম গ্রে"
+            }
+        },
+        "decreaseColorDepth": {
+            "name": "রঙের গভীরতা হ্রাস করুন"
+        },
+        "gaussianBlur": {
+            "name": "রোম",
+            "param": {
+                "size": "মাপ",
+                "xIntensity": "এক্স- অক্ষ",
+                "yIntensity": "ওয়াই- অক্ষ:"
+            }
+        },
+        "grayscale": {
+            "name": "গ্রে-স্কেল",
+            "param": {
+                "mode": "মোড (Mode)",
+                "modeOption": {
+                    "luminance": "ফন্ট কপি করো",
+                    "luma": "লুমা",
+                    "lightness": "হালকা তারতম্য (HSL)",
+                    "average": "গড় সময় (HITE)",
+                    "value": "মান"
+                },
+                "modeOptionDescription": {
+                    "value": "= সর্বাধিক, জি"
+                },
+                "mix": "মিল"
+            }
+        },
+        "hue": {
+            "name": "হিউ",
+            "param": {
+                "colorSpace": "কালার স্পেস",
+                "colorSpaceOption": {
+                    "oklab": "ঠিক আছে",
+                    "perceptualRgb": "পার্সেল RGB",
+                    "linearRgb": "লিনিয়ার আর্গন"
+                },
+                "rotate": "আবর্তন"
+            }
+        },
+        "negative": {
+            "name": "ঋণাত্মক",
+            "param": {
+                "colorSpace": "কালার স্পেস",
+                "colorSpaceOption": {
+                    "perceptualRgb": "পার্সেল RGB",
+                    "linearRgb": "লিনিয়ার আর্গন"
+                },
+                "invertRed": "CJK চ্যানেল",
+                "invertGreen": "সবুজ চ্যানেল",
+                "invertBlue": "নীল চ্যানেল বিপরীত করা হবে",
+                "invertValue": "বিপরীত মান"
+            }
+        },
+        "saturation": {
+            "name": "স্যাচুরেশন",
+            "param": {
+                "saturation": "স্যাচুরেশন"
+            }
+        },
+        "sepia": {
+            "name": "সেপ্টেম্বরিয়া"
+        }
+    },
+    "layerFilterGroup": {
+        "blur": {
+            "name": "Bluer"
+        },
+        "color": {
+            "name": "রঙ"
+        },
+        "distort": {
+            "name": "রেজোলিউশন"
+        },
+        "instagramFilter": {
+            "name": "ইনস্টাগ্রাম ফিল্টার"
+        },
+        "photography": {
+            "name": "আলোকচিত্রবিদ্যা"
+        },
+        "sharpen": {
+            "name": "শেয়ার:"
+        }
+    },
+    "layoutShortcutGroup": {
+        "color": {
+            "name": "লিংকের রং",
+            "controls": {
+                "default": {
+                    "label": "লিংকের রং"
+                }
+            }
+        },
+        "deform": {
+            "name": "ডিফর্ম",
+            "controls": {
+                "default": {
+                    "label": "ডিফর্ম"
+                }
+            }
+        },
+        "draw": {
+            "name": "অঙ্কন",
+            "controls": {
+                "default": {
+                    "label": "অঙ্কন"
+                }
+            }
+        },
+        "effects": {
+            "name": "ইফেক্ট",
+            "controls": {
+                "default": {
+                    "label": "ইফেক্ট"
+                }
+            }
+        },
+        "erase": {
+            "name": "মুছে ফেলুন",
+            "controls": {
+                "default": {
+                    "label": "মুছে ফেলুন"
+                }
+            }
+        },
+        "history": {
+            "name": "ব্রাউজ-ইতিহাস",
+            "controls": {
+                "undo": {
+                    "label": "পূর্বাবস্থা"
+                },
+                "redo": {
+                    "label": "পুনরাবৃত্তি"
+                }
+            }
+        },
+        "layers": {
+            "name": "স্তর",
+            "controls": {
+                "default": {
+                    "label": "স্তর"
+                }
+            }
+        },
+        "search": {
+            "name": "অনুসন্ধান",
+            "controls": {
+                "default": {
+                    "label": "অনুসন্ধান"
+                }
+            }
+        },
+        "selection": {
+            "name": "নির্বাচন",
+            "controls": {
+                "default": {
+                    "label": "নির্বাচন"
+                }
+            }
+        },
+        "settings": {
+            "name": "কাজ",
+            "controls": {
+                "default": {
+                    "label": "কাজ"
+                }
+            }
+        },
+        "text": {
+            "name": "টেক্সট",
+            "controls": {
+                "default": {
+                    "label": "টেক্সট সম্পাদনা"
+                }
+            }
+        },
+        "transform": {
+            "name": "/ করছিলাম",
+            "controls": {
+                "default": {
+                    "label": "/ করছিলাম"
+                }
+            }
+        },
+        "view": {
+            "name": "ক্যানভাস সংরক্ষণ করো",
+            "controls": {
+                "default": {
+                    "label": "ক্ষুদ্র প্রদর্শন"
+                }
+            }
+        }
+    },
+    "lib": {
+        "tutorial": {
+            "notification": {
+                "gotIt": "পেয়েছি",
+                "dontShowTips": "টিপ প্রদর্শন করা হবে না"
+            }
+        }
+    },
+    "measurement": {
+        "pixels": "পিক্সেল",
+        "millimeters": "মিলিমিটার",
+        "centimeters": "মিলিমিটার",
+        "inches": "ইঞ্চি",
+        "pixelsPerInch": "হেডারের মধ্যে পিক্সেল",
+        "pixelsPerMillimeter": "পিক্সেল/মিওয়াল",
+        "pixelsPerCentimeter": "অনুচ্ছেদ"
+    },
+    "menuBar": {
+        "toolsHeading": "সরঞ্জাম"
+    },
+    "module": {
+        "fileExport": {
+            "title": "ছবি রপ্তানি",
+            "saveBackQuestion": "মূল ফাইলটি কি পুনরায় লোড করা হবে?",
+            "fileName": "ফাইলের নাম",
+            "fileType": "ফাইলের ধরন",
+            "layers": "স্তর",
+            "quality": "গুণমান",
+            "dithering": "ওর নাম:",
+            "ditheringOption": {
+                "none": "শূণ্য",
+                "atkinson": "অ্যাকিনসন",
+                "atkinsonSerpentine": "অ্যাকিনসন (পেইন্টাইন)",
+                "floydSteinberg": "ফ্লয়েড স্টেইনবার্গ",
+                "floydSteinbergSerpentine": "ফ্লয়েড স্টেইনবার্গ",
+                "falseFloydSteinberg": "নকল ফ্লয়েড স্টেইনবার্গ",
+                "falseFloydSteinbergSerpentine": "নকল ফ্লয়েড স্টেইনবার্গ (সুপারেন্ট)",
+                "stucki": "স্থগিত রাখো",
+                "stuckiSerpentine": "স্থগিত রাখো"
+            }
+        },
+        "fileNew": {
+            "title": "নতুন ছবি",
+            "preset": "পূর্বনির্ধারিত",
+            "presetPlaceholder": "নির্বাচন করুন",
+            "width": "প্রস্থ",
+            "height": "উচ্চতা",
+            "resolution": "রেসোলিউশন",
+            "colorProfile": "রঙের প্রোফাইল",
+            "scaleFactor": "গৌনিক"
+        },
+        "fileSaveAs": {
+            "title": "নতুন রূপে ছবি সংরক্ষণ করা হবে",
+            "saveBackQuestion": "মূল ফাইলটি কি পুনরায় লোড করা হবে?",
+            "exportDisclaimer": "অন্য প্রোগ্রামের সাথে ছবি শেয়ার করতে অথবা প্রদর্শন করতে ইচ্ছুক হলে, পরিবর্তে \"Export\" ব্যবহার করুন।.",
+            "fileName": "ফাইলের নাম"
+        },
+        "fileTakePhoto": {
+            "title": "ফটো নিন",
+            "noCameraError": {
+                "title": "ক্যামেরা উপলব্ধ নয়",
+                "message": "হয় ডিভাইসের মধ্যে কোনো ক্যামেরা বা ক্যামেরা নেই।."
+            },
+            "selectCamera": {
+                "placeholder": "ক্যামেরা নির্বাচন করুন",
+                "user": "সামনে (Not)",
+                "environment": "পিছনে পিছনে"
+            }
+        },
+        "imageConvertLayersToImageSequence": {
+            "title": "স্তর রূপান্তর করো",
+            "frameDelay": "ফ্রেমের মধ্যবর্তী বিরতি"
+        },
+        "layerEffectBrowser": {
+            "title": "ইফেক্ট ব্রাউজার",
+            "description": "স্তরতে যোগ করার জন্য একটি প্রভাব বেছে নিন। সাধারণ প্রভাব.",
+            "loading": "পূর্বরূপ প্রদর্শন...",
+            "generationErrorGeneral": "নির্বাচিত স্তরের জন্য একটি সমস্যা উৎপন্ন হয়েছে ।.",
+            "generationErrorUnsupportedType": "আপনার নির্বাচিত স্তরকে এখন প্রয়োগ করা যায়নি ।.",
+            "generationErrorNoLayer": "এক অথবা একাধিক স্তর তৈরির জন্য অনুগ্রহ করে তাদের উপর ক্লিক করুন।."
+        },
+        "layerEffectEdit": {
+            "title": "ইফেক্ট সম্পাদনা",
+            "description": "একটি বিশেষ স্তর জন্য প্রভাব সম্পাদনা করুন ।.",
+            "loading": "পূর্বরূপ প্রদর্শন...",
+            "generalError": "কিছু একটা হয়েছে। আপনি যদি এই বার্তাটি দেখে থাকেন, অনুগ্রহ করে এটি বাগ রূপে প্রেরণ করুন।.",
+            "deleteEffect": "ইফেক্ট মুছে ফেলা হবে",
+            "enableToggle": "সক্রিয় করুন",
+            "resetField": "ফিল্ড রিসেট করো",
+            "deleting": "মুছে ফেলা হচ্ছে...",
+            "deleteFilterError": "ফিল্টার করাকালীন একটি ত্রুটি ঘটেছে ।% 1 আপনি যদি এই বার্তাটি দেখে থাকেন, অনুগ্রহ করে এটি বাগ রূপে প্রেরণ করুন।.",
+            "applyFilterError": "ফিল্টার প্রয়োগ করতে সমস্যা হয়েছে । আপনি যদি এই বার্তাটি দেখে থাকেন, অনুগ্রহ করে এটি বাগ রূপে প্রেরণ করুন।."
+        },
+        "renameLayer": {
+            "title": "স্তরের নাম পরিবর্তন করুন",
+            "layerName": "নতুন নাম"
+        }
+    },
+    "moduleGroup": {
+        "file": {
+            "name": "ফাইল ব্যবস্থাপনা",
+            "description": "আপনার ডিভাইসের মধ্যে ছবি সংরক্ষণ করে বার্ন করুন।.",
+            "modules": {
+                "export": {
+                    "name": "ছবি রপ্তানি",
+                    "description": "একটি সার্বজনীন বিন্যাসে ছবিটি সংরক্ষণ করুন যা অন্যান্য সম্পাদক দ্বারা খোলা যাবে।."
+                },
+                "insertPhoto": {
+                    "name": "একটি ছবি সন্নিবেশ করুন",
+                    "description": "বর্তমানে খোলা ছবিটির মধ্যে নতুন একটি ছবি যোগ করা হবে ।."
+                },
+                "new": {
+                    "name": "নতুন ছবি",
+                    "description": "নির্দিষ্ট মাত্রা অনুযায়ী একটি নতুন ইমেজ তৈরি করুন।."
+                },
+                "open": {
+                    "name": "চিত্র লোড করা হোক",
+                    "description": "নতুন একটি কর্মক্ষেত্রের মধ্যে ছবি অথবা প্রজেক্ট খুলুন."
+                },
+                "quickLoad": {
+                    "name": "দ্রুত ভার",
+                    "description": "দ্রুত ফাইল সংরক্ষণ করো."
+                },
+                "quickSave": {
+                    "name": "দ্রুত সংরক্ষণ করুন",
+                    "description": "বর্তমান ফাইলটি সংরক্ষণ করুন."
+                },
+                "saveAs": {
+                    "name": "নতুন রূপে ছবি সংরক্ষণ করা হবে",
+                    "description": "একটি প্রকল্পে ছবি সংরক্ষণ করে যা ওপেনগ্রাফিকাকে কোন তথ্য না হারিয়ে পুনরায় খোলা করতে পারে।."
+                },
+                "takePhoto": {
+                    "name": "একটি ফটো নিন",
+                    "description": "ক্যামেরা থেকে একটি ছবি নিন এবং একটি ফটো তুলুন ও সেটিকে ছবিতে প্রবেশ করান।."
+                }
+            }
+        },
+        "history": {
+            "name": "ব্রাউজ-ইতিহাস সম্পাদনা",
+            "description": "...যে নিজের উপর নিয়ন্ত্রণ করে... ... ছবির সম্পাদনার ইতিহাস.",
+            "modules": {
+                "redo": {
+                    "name": "পূর্ববর্তী তথ্য",
+                    "description": "বাতিল করা কর্ম পুনরায় করুন।."
+                },
+                "undo": {
+                    "name": "পূর্বাবস্থায় ফিরে যান",
+                    "description": "শেষ কাজটি বাতিল করা হবে."
+                }
+            }
+        },
+        "image": {
+            "name": "ছবি ক্যানভাস",
+            "description": "কাজ যা ছবিটি ক্যানভাসের উপর প্রভাব ফেলে।.",
+            "modules": {
+                "convertLayersToImageSequence": {
+                    "name": "স্তর রূপান্তর করো",
+                    "description": "নির্বাচিত স্তরকে একটি ছবি ক্রমের ওপর দিয়ে রূপান্তর করুন।."
+                },
+                "convertLayersFlatten": {
+                    "name": "সমতল স্তর রূপান্তর করো",
+                    "description": "সবগুলো স্তর একটি চিত্র স্তরকে একত্রিত করে এবং এটিকে স্তরগুলোর উপরে যোগ করে।."
+                },
+                "copy": {
+                    "name": "নির্বাচিত স্তর কপি করুন",
+                    "description": "নির্বাচিত অংশ ক্লিপবোর্ডে কপি করা হবে."
+                },
+                "copyAll": {
+                    "name": "সকল স্তর কপি করুন",
+                    "description": "ক্লিপবোর্ডে তথ্য কপি করুন।."
+                },
+                "cut": {
+                    "name": "কাট করুন",
+                    "description": "বর্তমানে নির্বাচিত স্তরটি সরান এবং সেগুলিকে ক্লিপবোর্ডে কপি করুন ।."
+                },
+                "paste": {
+                    "name": "পেস্ট করুন",
+                    "description": "ক্লিপ-বোর্ডে ছবি সন্নিবেশ করুন।."
+                }
+            }
+        },
+        "layer": {
+            "name": "স্তর",
+            "description": "এটা স্তরকে প্রভাবিত করে.",
+            "modules": {
+                "rename": {
+                    "name": "স্তরের নাম পরিবর্তন করুন",
+                    "description": "স্তরর নাম পরিবর্তন করুন"
+                },
+                "layerEffectBrowser": {
+                    "name": "ইফেক্ট ব্রাউজার",
+                    "description": "বর্তমানে নির্বাচিত স্তর অথবা স্তরগুলোর ক্ষেত্রে ছবির প্রভাব যোগ করুন ।."
+                }
+            }
+        },
+        "tmp": {
+            "name": "অস্থায়ী মডিউল",
+            "description": "প্রাথমিক উন্নয়নের সময় যে মডিউলগুলো ব্যবহার করা হবে, সেগুলো শুধু পেছনেই থাকবে।.",
+            "modules": {
+                "notYetImplemented": {
+                    "name": "বাস্তাবায়িত হয়নি",
+                    "description": "সাবধান।."
+                }
+            }
+        },
+        "tutorial": {
+            "name": "প্রশিক্ষণ- পর্ব",
+            "description": "Openগ্রাফিকা কিভাবে ব্যবহার করতে হয় তা জানুন।.",
+            "modules": {
+                "welcome": {
+                    "name": "স্বাগতম",
+                    "description": "একটি চিত্রে কাজ শুরু করো।."
+                }
+            }
+        }
+    },
+    "option": {
+        "bottom": "নীচে",
+        "left": "বাঁদিকে",
+        "right": "ডানদিকে",
+        "top": "উপরে"
+    },
+    "theme": {
+        "light": "সাদা",
+        "dark": "কালো"
+    },
+    "toolbar": {
+        "cropResize": {
+            "title": "মাপ পরিবর্তন ও মাপ পরিবর্তন",
+            "linkWidthHeight": "লিঙ্কের প্রস্থ/ পিক্সেল",
+            "size": "মাপ",
+            "width": "প্রস্থ",
+            "height": "উচ্চতা",
+            "dimensionUnits": "ডাইমেনশন একক",
+            "resolution": "রেসোলিউশন",
+            "resolutionUnits": "রেজোলিউশন",
+            "snapping": {
+                "title": "উজ্জ্বল",
+                "enable": "Sylink মোড সক্রিয় করো"
+            }
+        },
+        "draw": {
+            "brushColor": "ইস্পাতের রং",
+            "brushSize": "মাপ"
+        },
+        "freeTransform": {
+            "clearSelection": "নির্বাচিত মান বাতিল করা হবে",
+            "pickLayer": {
+                "label": "স্তর বেছে নিন",
+                "auto": "স্বয়ংক্রিয়",
+                "current": "বর্তমান"
+            },
+            "snapping": {
+                "title": "উজ্জ্বল",
+                "rotationSnap": "আবর্তনের স্ন্যাপ"
+            },
+            "metrics": {
+                "title": "মেট্রিক",
+                "position": "অবস্থান",
+                "width": "প্রস্থ",
+                "height": "উচ্চতা",
+                "rotation": "আবর্তন",
+                "resetRotation": "আবর্তন পুনরায় নির্ধারণ",
+                "noLayers": "কোনো স্তর নেই ।."
+            },
+            "actions": {
+                "title": "কাজ",
+                "applyTransform": "রূপান্তর করুন",
+                "expandToImageSize": "চিত্রের আকার",
+                "trimEmptySpace": "ট্রিম ফাঁকা স্থান"
+            }
+        },
+        "general": {
+            "settings": "বৈশিষ্ট্য"
+        },
+        "selection": {
+            "selectionShape": {
+                "label": "নির্বাচন",
+                "rectangle": "চতুষ্কোণ",
+                "ellipse": "উপবৃত্ত",
+                "freePolygon": "একটি বহুভুজ",
+                "freePolygonShort": "মুক্ত পলিক",
+                "tonalArea": "অঞ্চল"
+            },
+            "selectionCombineMode": {
+                "label": "নির্বাচনের মোড",
+                "add": "যোগ করুন",
+                "subtract": "বিয়োগ [",
+                "intersect": "ছেদ করে"
+            }
+        },
+        "text": {
+            "font": "ফন্ট",
+            "size": "মাপ",
+            "bold": "গাঢ়",
+            "italic": "ইতালিয়",
+            "strikethrough": "মধ্যে রেখাঙ্কিত",
+            "underline": "নিম্নরেখাঙ্কিত",
+            "fill": "ভরাটকরণ",
+            "fillTooltip": "অক্ষরের প্রান্তে প্রদর্শিত রং"
+        },
+        "zoom": {
+            "zoomOut": "ছোট করে প্রদর্শন",
+            "zoomIn": "বড় করে প্রদর্শন",
+            "rotateCounterClockwise": "ঘড়ির কাঁটার দিকে ঘোরান",
+            "rotateClockwise": "আবর্তন",
+            "fit": "মানানসই",
+            "flip": "উল্টানো"
+        }
+    },
+    "toolGroup": {
+        "draw": {
+            "name": "অঙ্কন",
+            "description": "পেন্সিল, পেন্সিল, কলম এবং ভেক্টর আর্ট টুল।.",
+            "tools": {
+                "brush": {
+                    "name": "সনাক্তকারী",
+                    "description": "ছাদের স্তরগুলো আঁকা হয়েছে।."
+                }
+            }
+        },
+        "image": {
+            "name": "ছবি",
+            "description": "সাধারণ ছবি রিফর্ম করা হয়েছে।.",
+            "tools": {
+                "cropResize": {
+                    "name": "মাপ পরিবর্তন ও মাপ পরিবর্তন",
+                    "description": "ছবির মাপ পরিবর্তন, মাপ পরিবর্তন, বা পরিবর্তন করুন।."
+                }
+            }
+        },
+        "selection": {
+            "name": "নির্বাচন",
+            "description": "সক্রিয় স্তরগুলোর যে কোন ক্ষেত্র( সমূহ) নির্বাচন করা হবে তা বেছে নিন ।.",
+            "tools": {
+                "selection": {
+                    "name": "নির্বাচন",
+                    "description": "লক্ষ্য সম্পাদনা করার উদ্দেশ্যে ছবির ক্ষেত্র নির্বাচন করুন।."
+                }
+            }
+        },
+        "text": {
+            "name": "টেক্সট",
+            "description": "টেক্সট স্তর পরিবর্তনের জন্য ব্যবহৃত টুল।.",
+            "tools": {
+                "text": {
+                    "name": "টেক্সট",
+                    "description": "টেক্সট স্তর সম্পাদন এবং তৈরি করুন।."
+                }
+            }
+        },
+        "transform": {
+            "name": "রূপান্তর",
+            "description": "চলন্ত, আবর্তনের জন্য সরঞ্জাম, স্তর পরিবর্তন করুন ।.",
+            "tools": {
+                "freeTransform": {
+                    "name": "মুক্ত ট্রান্স-ফর্ম",
+                    "description": "আবর্তন, বা নির্বাচিত স্তরগুলো পরিমাপ করুন ।."
+                }
+            }
+        },
+        "view": {
+            "name": "ভিউ প্রদর্শন করা হবে",
+            "description": "ক্যানভাসের প্রদর্শন নিয়ন্ত্রণ করার জন্য সরঞ্জাম।.",
+            "tools": {
+                "name": "প্রদর্শনের মাপ",
+                "description": "ক্যানভাসের ভেতরে এবং বাইরে কিভাবে আপনি ছবি দেখতে পারেন, তা নিয়ন্ত্রণ করতে পারেন।."
+            }
+        }
+    },
+    "tutorialTip": {
+        "drawToolIntroduction": {
+            "title": "সরঞ্জাম আঁকো",
+            "introduction": [
+                "আকৃতি তৈরি করতে এবং আপনাকে আকৃতি তৈরি করতে দেয়।."
+            ]
+        },
+        "explainCanvasViewportControls": {
+            "title": "বিশ্ব নিরীক্ষা",
+            "introduction": [
+                "যাই হোক না কেন, আপনি ক্যানভাস প্রদর্শন নিয়ন্ত্রণ করতে পারেন ।.",
+                null
+            ],
+            "anyTool": "কোনো সরঞ্জাম",
+            "body": {
+                "mouse": [
+                    null,
+                    null
+                ],
+                "touch": [
+                    null,
+                    null
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "বড় করে প্রদর্শন",
+                "panning": "বরফ",
+                "mouseWheel": "মাউস নিয়ন্ত্রণ",
+                "rightMouseButton": "ডান মাউস বোতাম"
+            }
+        },
+        "freeTransformToolIntroduction": {
+            "title": "ফ্রী ট্রান্সফর্ম টুল",
+            "introduction": [
+                "এই সরঞ্জাম দ্বারা মাপ পরিবর্তন, আকার ও আবর্তন নির্ধারিত হয়। নির্বাচিত স্তরগুলোর চারপাশে একটি সীমা দেখায় ।.",
+                null
+            ],
+            "autoMode": "স্বয়ংক্রিয় মোড",
+            "body": {
+                "mouse": [
+                    null,
+                    null,
+                    null
+                ],
+                "touch": [
+                    null,
+                    null,
+                    null
+                ]
+            },
+            "bodyTitle": {
+                "selection": "নির্বাচন",
+                "moving": "স্থানান্তর করা হচ্ছে",
+                "resizing": "আকার পরিবর্তন",
+                "leftClick": "বাম ক্লিক"
+            }
+        },
+        "selectionToolIntroduction": {
+            "title": "নির্বাচনের সামগ্রী",
+            "introduction": [
+                "নির্বাচন টুলটি আপনি ছবির কিছু অংশ নির্বাচন করতে পারবেন যা প্রভাব প্রভাব সৃষ্টি করবে।."
+            ],
+            "body": {
+                "mouse": [
+                    null
+                ],
+                "touch": [
+                    null
+                ],
+                "end": [
+                    null,
+                    null
+                ]
+            },
+            "bodyTitle": {
+                "createSelection": "নির্বাচন তৈরি করো",
+                "leftClick": "বাম ক্লিক",
+                "selectionShape": "নির্বাচন",
+                "selectionCombineMode": "নির্বাচনের মোড"
+            }
+        },
+        "zoomToolIntroduction": {
+            "title": "ছোট/Pner টুল",
+            "introduction": [
+                "এই সরঞ্জামের সাহায্যে ছবি প্রদর্শনের মাত্রা হ্রাস পাবে, এবং পর্দার পাশে প্রদর্শনযোগ্য স্থান পরিবর্তন করতে পারবেন।."
+            ],
+            "body": {
+                "mouse": [
+                    null,
+                    null
+                ],
+                "touch": [
+                    null,
+                    null
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "বড় করে প্রদর্শন",
+                "panning": "বরফ",
+                "leftClick": "বাম ক্লিক",
+                "ctrlLeftClick": "Ctrl+ বাঁদিকের ক্লিক",
+                "leftMouseButton": "বাম মাউস বোতাম"
+            }
+        }
+    }
+}
