@@ -175,12 +175,12 @@ async function init() {
     }
 
     // Create a new git commit and store it as last translated commit.
-    // await execAsync(`git add .`, { cwd: path.join(__dirname, '../src/i18n') });
-    // await execAsync(`git commit -m "Auto-translate script run."`, { cwd: path.join(__dirname, '../') });
-    // let newCommitId = (await execAsync('git rev-parse HEAD', { cwd: path.join(__dirname, '../') })).stdout.trim();
-    // await fs.writeFile(path.join(__dirname, '../src/i18n/last-auto-translate-commit.txt'), newCommitId);
-    // await execAsync(`git add .`, { cwd: path.join(__dirname, '../src/i18n') });
-    // await execAsync(`git commit -m "Auto-translate script update last run commit."`, { cwd: path.join(__dirname, '../') });
+    await execAsync(`git add .`, { cwd: path.join(__dirname, '../src/i18n') });
+    await execAsync(`git commit -m "Auto-translate script run."`, { cwd: path.join(__dirname, '../') });
+    let newCommitId = (await execAsync('git rev-parse HEAD', { cwd: path.join(__dirname, '../') })).stdout.trim();
+    await fs.writeFile(path.join(__dirname, '../src/i18n/last-auto-translate-commit.txt'), newCommitId);
+    await execAsync(`git add .`, { cwd: path.join(__dirname, '../src/i18n') });
+    await execAsync(`git commit -m "Auto-translate script update last run commit."`, { cwd: path.join(__dirname, '../') });
 
 }
 
