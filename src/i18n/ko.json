@@ -1,0 +1,998 @@
+{
+    "empty": "",
+    "action": {
+        "addLayerFilter": "층에 효과 추가",
+        "addLayerFilterMultiple": "층 (s)에 효력을 추가하십시오",
+        "applyActiveSelection": "Active Selection 적용",
+        "applyLayerTransform": "레이어 Transform 적용",
+        "clearSelection": "자주 묻는 질문",
+        "convertLayersToImageSequence": "층을 이미지 속으로 변환",
+        "createDrawLayer": "Draw 레이어 만들기",
+        "createNewFile": "새 파일",
+        "createNewLayersFromSelection": "선택에서 레이어 만들기",
+        "cutLayers": "컷 레이어(s)",
+        "deleteLayers": "레이어 삭제(s)",
+        "deleteLayerFilter": "삭제 효과",
+        "deleteLayerSelectionArea": "자주 묻는 질문",
+        "disableLayerFilter": "공급 능력",
+        "enableLayerFilter": "Enable 층 효력",
+        "fileTakePhoto": "사진 찍기",
+        "freeTransformRotate": "무료 트랜스폼 (Rotate)",
+        "freeTransformScale": "무료 트랜스폼 (Resize)",
+        "freeTransformTranslate": "무료 트랜스폼 (Move)",
+        "insertLayer": "삽입 층",
+        "moduleCropResize": "자르기 및 크기",
+        "openFile": "파일 열기",
+        "pasteLayers": "풀 층 (s)",
+        "placeholder": "회사연혁",
+        "pleaseWait": "자세히보기.",
+        "renameLayer": "이름 층",
+        "reorderLayers": "주문 층 (s)",
+        "reorderLayerFilters": "주문 효력 (s)",
+        "selectLayers": "레이어 선택(s)",
+        "setLayerBoundsToWorkingFileBounds": "Layer Bounds로 이미지 크기",
+        "toggleLayerVisibilityOn": "연락처 으로",
+        "toggleLayerVisibilityOff": "연락처 세부 사항",
+        "trimLayerEmptySpace": "손질 층 빈 공간",
+        "updateActiveSelection": "업데이트 Active Selection",
+        "updateFile": "업데이트 파일",
+        "updateLayer": "업데이트 층",
+        "updateDrawLayer": "층에 끌기",
+        "updateLayerFilterParams": "레이어 효과 업데이트",
+        "updateSelectionCombineMode": "업데이트 선택 Combine 모드"
+    },
+    "app": {
+        "colorPickerGradient": {
+            "hueSlider": "Hue 슬라이더",
+            "opacitySlider": "Opacity 슬라이더"
+        },
+        "dndDropOverlay": {
+            "addImage": "이미지 추가"
+        },
+        "historyNotification": {
+            "title": {
+                "do": {
+                    "inProgress": "실행 활동...",
+                    "complete": "지원하다"
+                },
+                "undo": {
+                    "inProgress": "한국어.",
+                    "complete": "취소 완료"
+                },
+                "redo": {
+                    "inProgress": "레드 ...",
+                    "complete": "Redo 완료"
+                }
+            }
+        },
+        "layerList": {
+            "toggleLayerVisibility": "연락처",
+            "layerSettings": "층 설정",
+            "rename": "이름 *",
+            "addEffect": "추가 효과",
+            "delete": "기타 제품",
+            "frames": "제품정보",
+            "playAnimation": "애니메이션",
+            "stopAnimation": "공지사항",
+            "editFrames": "편집 프레임",
+            "emptyGroup": "그룹은 빈입니다.",
+            "effects": "제품정보",
+            "recalculatingEffect": "기타...",
+            "moveEffectUp": "이동 효과",
+            "moveEffectDown": "아래로 이동 효력"
+        },
+        "wait": {
+            "applyLayerTransform": "층 Transform 적용",
+            "loadingImage": "회사연혁",
+            "pleaseWait": "오시는 길",
+            "trimLayerEmptySpace": "트리밍 빈 공간",
+            "cancel": "이름 *"
+        }
+    },
+    "brushCategory": {
+        "simple": {
+            "name": "간단한 솔",
+            "brushes": {
+                "circle": {
+                    "name": "한국어"
+                }
+            }
+        },
+        "shapes": {
+            "name": "연락처"
+        }
+    },
+    "button": {
+        "apply": "지원하다",
+        "cancel": "이름 *",
+        "clear": "뚱 베어",
+        "convert": "지원하다",
+        "create": "이름 *",
+        "createNewImage": "새 이미지 만들기",
+        "done": "한국어",
+        "export": "수출입",
+        "no": "없음",
+        "ok": "이름 *",
+        "openImage": "본문 바로가기",
+        "save": "제품 정보",
+        "settings": "계정 설정",
+        "take": "기타",
+        "takePhoto": "본문 바로가기",
+        "yes": "이름 *"
+    },
+    "canvas": {
+        "toolbar": {
+            "cropResize": {
+                "waitLabel": "자르기 및 크기"
+            }
+        }
+    },
+    "dock": {
+        "colorPicker": {
+            "title": "색깔 피커",
+            "pickColorFromImage": "색깔 선택",
+            "hexCode": "육 부호"
+        },
+        "layers": {
+            "title": "사이트맵",
+            "add": "기타 제품",
+            "layer": "제품정보",
+            "group": "그룹",
+            "background": "기타",
+            "toggleBackgroundVisibility": "회사소개 제품정보",
+            "noLayers": "층 없음."
+        },
+        "settings": {
+            "title": "팟캐스트",
+            "file": {
+                "tabTitle": "파일 형식",
+                "menu": {
+                    "new": "- 한국어",
+                    "open": "기타",
+                    "export": "수출입",
+                    "save": "제품 정보",
+                    "saveAs": "구매하기",
+                    "insertPhoto": "사진 삽입",
+                    "takePhoto": "사진 찍기"
+                }
+            },
+            "image": {
+                "tabTitle": "(주)",
+                "menu": {
+                    "cropResize": "자르기 및 크기",
+                    "convertLayers": {
+                        "groupTitle": "층 변환 ...",
+                        "toImageSequence": "본문 바로가기",
+                        "flatten": "평평한 에 새로운 층"
+                    },
+                    "cut": "사이트맵",
+                    "copy": "관련 기사",
+                    "copyAllLayers": "모든 레이어 복사",
+                    "paste": "이름 *"
+                }
+            },
+            "view": {
+                "tabTitle": "- 연혁",
+                "zoom": "주 메뉴",
+                "zoomOut": "줌 아웃",
+                "zoomIn": "줌 에",
+                "rotate": "제품정보",
+                "rotateCounterClockwise": "연락처",
+                "rotateClockwise": "연락처",
+                "reset": "지원하다",
+                "fit": "제품 정보",
+                "touchRotate": {
+                    "label": "접촉 Rotate",
+                    "on": "으로",
+                    "snap": "기본 정보",
+                    "off": "내 계정"
+                },
+                "window": "창세기",
+                "enterFullscreen": "본문 바로가기",
+                "exitFullscreen": "Fullscreen 출구"
+            },
+            "history": {
+                "tabTitle": "- 연혁",
+                "undo": "이름 *",
+                "redo": "레드오",
+                "noHistory": "아니 역사 Yet.",
+                "baseImage": "기본 이미지"
+            },
+            "prefs": {
+                "tabTitle": "뚱 베어",
+                "theme": "이름 *",
+                "language": "* 이름",
+                "default": "기본 정보",
+                "performance": {
+                    "groupTitle": "- 연혁",
+                    "renderer": {
+                        "label": "회사연혁",
+                        "2d": "캔버스 2D",
+                        "webgl": "웹GL"
+                    },
+                    "optimizeLargeImage": "큰 이미지에 최적화",
+                    "highQualityScaling": "높은 품질 Scaling",
+                    "fixAdjacentLayerSeams": "고침 Adjacent 층 솔기"
+                },
+                "editor": {
+                    "groupTitle": "한국어",
+                    "menuBarPosition": "메뉴 바 위치",
+                    "showWelcomeScreen": "쇼 환영 화면",
+                    "showTips": "쇼 팁",
+                    "resetSettings": "재설정 설정"
+                },
+                "debugging": {
+                    "groupTitle": "관련 링크",
+                    "useMobileDebugger": "부하 모바일 Debugger"
+                },
+                "help": {
+                    "groupTitle": "지원하다",
+                    "reportIssue": "자주 묻는 질문"
+                }
+            }
+        }
+    },
+    "el": {
+        "horizontalScrollbarArrows": {
+            "scrollLeft": "스크롤 왼쪽",
+            "scrollRight": "공지사항"
+        }
+    },
+    "keyboardMap": {
+        "file": {
+            "name": "파일 형식",
+            "actions": {
+                "open": "파일 열기",
+                "export": "수출 파일",
+                "quickLoad": "빠른 부하",
+                "quickSave": "빠른 저장"
+            }
+        },
+        "image": {
+            "name": "(주)",
+            "actions": {
+                "cut": "사이트맵",
+                "copy": "관련 기사",
+                "paste": "이름 *",
+                "delete": "기타 제품"
+            }
+        },
+        "history": {
+            "name": "편집 역사",
+            "actions": {
+                "undo": "이름 *",
+                "redo": "레드오"
+            }
+        },
+        "selection": {
+            "name": "제품정보",
+            "actions": {
+                "selectAll": "모두 보기",
+                "deleteSelection": "자주 묻는 질문"
+            }
+        }
+    },
+    "layerFilter": {
+        "brightness": {
+            "name": "사이트맵",
+            "param": {
+                "mode": "주요 특징",
+                "modeOption": {
+                    "gamma": "Gamma 조정",
+                    "shift": "검정/백색 교대",
+                    "luminance": "조정 Luminance"
+                },
+                "brightness": "사이트맵",
+                "effectiveRange": "제품정보",
+                "effectiveRangeFeather": "뚱 베어"
+            }
+        },
+        "chroma": {
+            "name": "크롬",
+            "param": {
+                "chroma": "크롬",
+                "mode": "주요 특징",
+                "modeOption": {
+                    "multiply": "Chroma Contrast를 조정하십시오",
+                    "shift": "균등하게 Chroma를 조정하십시오"
+                }
+            }
+        },
+        "colorBlindness": {
+            "name": "색깔 맹목",
+            "param": {
+                "method": "시뮬레이션 방법",
+                "methodOption": {
+                    "brettel": "Brettel 1997년"
+                },
+                "type": "Blindness 유형",
+                "typeOption": {
+                    "protan": "Protanopia / Protanomaly (빨간색)",
+                    "deuteran": "Deuteranopia / Deuteranomaly (그린 블린드)",
+                    "tritan": "Tritanopia / Tritanomaly (블루 블린드)",
+                    "achroma": "크롬/Achromatopsia (빨강/녹색/파란)"
+                },
+                "severity": "더 보기"
+            }
+        },
+        "colorCorrection": {
+            "name": "색깔 개정"
+        },
+        "contrast": {
+            "name": "한국어",
+            "param": {
+                "contrast": "한국어",
+                "middleGray": "중간 회색"
+            }
+        },
+        "decreaseColorDepth": {
+            "name": "색깔 깊이를 결정하십시오"
+        },
+        "gaussianBlur": {
+            "name": "Gaussian 블루",
+            "param": {
+                "size": "크기 (mm)",
+                "xIntensity": "X 강렬",
+                "yIntensity": "Y 강렬"
+            }
+        },
+        "grayscale": {
+            "name": "회색 가늠자",
+            "param": {
+                "mode": "주요 특징",
+                "modeOption": {
+                    "luminance": "운영 정보",
+                    "luma": "뚱 베어",
+                    "lightness": "가벼움 (HSL)",
+                    "average": "평균 (HSI 강렬)",
+                    "value": "가치 (HSV)"
+                },
+                "modeOptionDescription": {
+                    "value": "최대 = (R, G, B)"
+                },
+                "mix": "팟캐스트"
+            }
+        },
+        "hue": {
+            "name": "Hue 조명",
+            "param": {
+                "colorSpace": "색깔 공간",
+                "colorSpaceOption": {
+                    "oklab": "오크랩",
+                    "perceptualRgb": "영원한 RGB",
+                    "linearRgb": "선형 RGB"
+                },
+                "rotate": "제품정보"
+            }
+        },
+        "negative": {
+            "name": "이름 *",
+            "param": {
+                "colorSpace": "색깔 공간",
+                "colorSpaceOption": {
+                    "perceptualRgb": "영원한 RGB",
+                    "linearRgb": "선형 RGB"
+                },
+                "invertRed": "Invert 빨간 채널",
+                "invertGreen": "Invert 녹색 채널",
+                "invertBlue": "Invert 블루 채널",
+                "invertValue": "Invert 가치"
+            }
+        },
+        "saturation": {
+            "name": "관련 기사",
+            "param": {
+                "saturation": "관련 기사"
+            }
+        },
+        "sepia": {
+            "name": "인기 카테고리"
+        }
+    },
+    "layerFilterGroup": {
+        "blur": {
+            "name": "뚱 베어"
+        },
+        "color": {
+            "name": "색깔: 백색"
+        },
+        "distort": {
+            "name": "팟캐스트"
+        },
+        "instagramFilter": {
+            "name": "Instagram 필터"
+        },
+        "photography": {
+            "name": "사진 갤러리"
+        },
+        "sharpen": {
+            "name": "스낵 바"
+        }
+    },
+    "layoutShortcutGroup": {
+        "color": {
+            "name": "색깔 선택",
+            "controls": {
+                "default": {
+                    "label": "색깔 선택"
+                }
+            }
+        },
+        "deform": {
+            "name": "제품정보",
+            "controls": {
+                "default": {
+                    "label": "제품정보"
+                }
+            }
+        },
+        "draw": {
+            "name": "드로잉",
+            "controls": {
+                "default": {
+                    "label": "드로잉"
+                }
+            }
+        },
+        "effects": {
+            "name": "제품정보",
+            "controls": {
+                "default": {
+                    "label": "제품정보"
+                }
+            }
+        },
+        "erase": {
+            "name": "언어 선택",
+            "controls": {
+                "default": {
+                    "label": "언어 선택"
+                }
+            }
+        },
+        "history": {
+            "name": "- 연혁",
+            "controls": {
+                "undo": {
+                    "label": "이름 *"
+                },
+                "redo": {
+                    "label": "레드오"
+                }
+            }
+        },
+        "layers": {
+            "name": "사이트맵",
+            "controls": {
+                "default": {
+                    "label": "사이트맵"
+                }
+            }
+        },
+        "search": {
+            "name": "제품정보",
+            "controls": {
+                "default": {
+                    "label": "제품정보"
+                }
+            }
+        },
+        "selection": {
+            "name": "제품정보",
+            "controls": {
+                "default": {
+                    "label": "제품정보"
+                }
+            }
+        },
+        "settings": {
+            "name": "팟캐스트",
+            "controls": {
+                "default": {
+                    "label": "팟캐스트"
+                }
+            }
+        },
+        "text": {
+            "name": "이름 *",
+            "controls": {
+                "default": {
+                    "label": "삽입 / 편집 텍스트"
+                }
+            }
+        },
+        "transform": {
+            "name": "이동/변환",
+            "controls": {
+                "default": {
+                    "label": "이동/변환"
+                }
+            }
+        },
+        "view": {
+            "name": "캔버스 Viewport",
+            "controls": {
+                "default": {
+                    "label": "줌 / 팬 뷰"
+                }
+            }
+        }
+    },
+    "lib": {
+        "tutorial": {
+            "notification": {
+                "gotIt": "뚱 베어",
+                "dontShowTips": "팁을 표시하지 마십시오"
+            }
+        }
+    },
+    "measurement": {
+        "pixels": "픽셀 수",
+        "millimeters": "밀리미터",
+        "centimeters": "센티미터",
+        "inches": "이름 *",
+        "pixelsPerInch": "화소/인치",
+        "pixelsPerMillimeter": "화소/밀리미터",
+        "pixelsPerCentimeter": "화소/미터"
+    },
+    "menuBar": {
+        "toolsHeading": "제품정보"
+    },
+    "module": {
+        "fileExport": {
+            "title": "수출 이미지",
+            "saveBackIntroduction": "{fileName}라는 파일을 열었습니다.",
+            "saveBackQuestion": "원래 파일로 다시 저장?",
+            "fileName": "파일 이름",
+            "fileType": "파일 형식",
+            "layers": "사이트맵",
+            "quality": "품질 관리",
+            "dithering": "더 보기",
+            "ditheringOption": {
+                "none": "이름 *",
+                "atkinson": "아킨슨",
+                "atkinsonSerpentine": "앗킨슨 (스펜틴)",
+                "floydSteinberg": "Floyd 스린버그",
+                "floydSteinbergSerpentine": "Floyd Steinberg (스펜틴)",
+                "falseFloydSteinberg": "프로모션",
+                "falseFloydSteinbergSerpentine": "False Floyd Steinberg (스펜틴)",
+                "stucki": "뚱 베어",
+                "stuckiSerpentine": "Stucki (스펜틴)"
+            }
+        },
+        "fileNew": {
+            "title": "새로운 이미지",
+            "preset": "기타 제품",
+            "presetPlaceholder": "선택 (선택 사항)",
+            "width": "폭 (mm)",
+            "height": "고도:",
+            "resolution": "제품 설명",
+            "colorProfile": "색깔 단면도",
+            "scaleFactor": "가늠자 요인"
+        },
+        "fileSaveAs": {
+            "title": "이미지 저장",
+            "saveBackIntroduction": "{fileName}라는 파일을 열었습니다.",
+            "saveBackQuestion": "원래 파일로 다시 저장?",
+            "exportDisclaimer": "다른 프로그램에서 이미지를 공유하거나 볼 경우 대신 \"Export\"를 사용하십시오.",
+            "fileName": "파일 이름"
+        },
+        "fileTakePhoto": {
+            "title": "본문 바로가기",
+            "noCameraError": {
+                "title": "카메라 사용",
+                "message": "장치에는 카메라가 없거나 카메라에 액세스 할 수 없습니다."
+            },
+            "selectCamera": {
+                "placeholder": "카메라 선택",
+                "user": "Front (사용자)",
+                "environment": "후방 (환경)"
+            }
+        },
+        "imageConvertLayersToImageSequence": {
+            "title": "층을 이미지 속으로 변환",
+            "frameDelay": "프레임 지연"
+        },
+        "layerEffectBrowser": {
+            "title": "비밀번호",
+            "description": "층에 추가하는 효력을 선택하십시오. 효과는 일반적으로 층의 색상을 조작하거나 blurring 효과와 같은 특수 패턴을 추가합니다.",
+            "loading": "미리보기 생성 ...",
+            "generationErrorGeneral": "오류는 선택한 레이어에 대한 효과 미리보기를 생성 할 때 발생했습니다.",
+            "generationErrorUnsupportedType": "선택한 층은 필터가 적용 할 수 없습니다.",
+            "generationErrorNoLayer": "층 도크에 1 개 이상의 레이어를 선택하여 효과 추가하십시오."
+        },
+        "layerEffectEdit": {
+            "title": "편집 효과",
+            "description": "특정 층의 효과를 편집합니다.",
+            "loading": "미리보기 생성 ...",
+            "generalError": "뭔가 잘못되었습니다. 이 메시지를 보시려면이 버그로보고하십시오.",
+            "deleteEffect": "삭제 효과",
+            "enableToggle": "이름 *",
+            "resetField": "재설정 필드",
+            "deleting": "공급 업체.",
+            "deleteFilterError": "필터를 삭제하려고 하는 동안 오류가 발생했습니다. 이 메시지를 보시려면이 버그로보고하십시오.",
+            "applyFilterError": "오류는 필터 변경을 적용하려고하는 동안 발생했습니다. 이 메시지를 보시려면이 버그로보고하십시오."
+        },
+        "renameLayer": {
+            "title": "이름 층",
+            "layerName": "새로운 이름"
+        }
+    },
+    "moduleGroup": {
+        "file": {
+            "name": "파일 관리",
+            "description": "당신의 장치에 이미지를 적재하고 저장하십시오.",
+            "modules": {
+                "export": {
+                    "name": "수출 이미지",
+                    "description": "다른 편집기에 의해 열 수 있는 범용 형식으로 이미지를 저장합니다."
+                },
+                "insertPhoto": {
+                    "name": "사진 삽입",
+                    "description": "현재 열린 이미지에 새로운 레이어로 사진을 추가합니다."
+                },
+                "new": {
+                    "name": "새로운 이미지",
+                    "description": "지정된 크기로 새로운 이미지를 만듭니다."
+                },
+                "open": {
+                    "name": "본문 바로가기",
+                    "description": "새로운 작업 공간에서 이미지 또는 프로젝트 파일을 엽니다."
+                },
+                "quickLoad": {
+                    "name": "빠른 부하",
+                    "description": "빠른 저장에 의해 저장된 파일을로드합니다."
+                },
+                "quickSave": {
+                    "name": "빠른 저장",
+                    "description": "임시 저장에 현재 파일을 저장합니다."
+                },
+                "saveAs": {
+                    "name": "이미지 저장",
+                    "description": "모든 정보를 잃지 않고 OpenGraphica에 의해 다시 열 수 있는 프로젝트 형식으로 이미지를 저장합니다."
+                },
+                "takePhoto": {
+                    "name": "사진 찍기",
+                    "description": "카메라와 웹캠에서 사진을 찍고 이미지를 삽입합니다."
+                }
+            }
+        },
+        "history": {
+            "name": "편집 역사",
+            "description": "이미지 편집의 역사를 통해 움직이는 조작.",
+            "modules": {
+                "redo": {
+                    "name": "역사 Redo",
+                    "description": "Redo 마지막 undone 활동."
+                },
+                "undo": {
+                    "name": "역사 Undo",
+                    "description": "마지막 동작을 하지 마십시오."
+                }
+            }
+        },
+        "image": {
+            "name": "이미지 캔버스",
+            "description": "이미지 캔버스에 영향을 미치는 작업.",
+            "modules": {
+                "convertLayersToImageSequence": {
+                    "name": "층을 이미지 속으로 변환",
+                    "description": "선택된 층을 이미지 순서 층 (animation)로 변환합니다."
+                },
+                "convertLayersFlatten": {
+                    "name": "층을 Flattened 이미지로 변환",
+                    "description": "단일 이미지 레이어에 모든 레이어를 병합하고 레이어 스택의 상단에 추가합니다."
+                },
+                "copy": {
+                    "name": "선택된 층 복사",
+                    "description": "현재 선택된 레이어를 클립보드에 복사합니다."
+                },
+                "copyAll": {
+                    "name": "모든 레이어 복사",
+                    "description": "캔버스에 모든 레이어를 클립보드에 PNG 이미지로 복사합니다."
+                },
+                "cut": {
+                    "name": "사이트맵",
+                    "description": "현재 선택된 레이어를 제거하고 클립보드에 복사합니다."
+                },
+                "paste": {
+                    "name": "이름 *",
+                    "description": "클립보드에서 캔버스에 이미지를 삽입합니다."
+                }
+            }
+        },
+        "layer": {
+            "name": "사이트맵",
+            "description": "층에 영향을 미치는 작업.",
+            "modules": {
+                "rename": {
+                    "name": "이름 층",
+                    "description": "층의 이름을 변경"
+                },
+                "layerEffectBrowser": {
+                    "name": "비밀번호",
+                    "description": "현재 선택된 층(s) 또는 층 그룹(s)에 이미지 효과를 추가합니다."
+                }
+            }
+        },
+        "tmp": {
+            "name": "임시 단위",
+            "description": "초기 개발 중에만 찌르는 모듈.",
+            "modules": {
+                "notYetImplemented": {
+                    "name": "Yet 구현",
+                    "description": "경고 표시."
+                }
+            }
+        },
+        "tutorial": {
+            "name": "다운로드",
+            "description": "OpenGraphica를 사용하는 방법을 알아보십시오.",
+            "modules": {
+                "welcome": {
+                    "name": "제품 정보",
+                    "description": "이미지에서 작업 시작."
+                }
+            }
+        }
+    },
+    "option": {
+        "bottom": "제품정보",
+        "left": "왼쪽",
+        "right": "지원하다",
+        "top": "이름 *"
+    },
+    "theme": {
+        "light": "제품 정보",
+        "dark": "한국어"
+    },
+    "toolbar": {
+        "cropResize": {
+            "title": "자르기 및 크기",
+            "linkWidthHeight": "연결 폭/높이",
+            "size": "크기 (mm)",
+            "width": "폭 (mm)",
+            "height": "고도:",
+            "dimensionUnits": "차원 단위",
+            "resolution": "제품 설명",
+            "resolutionUnits": "해결책 단위",
+            "snapping": {
+                "title": "기타 제품",
+                "enable": "사용 약관"
+            }
+        },
+        "draw": {
+            "brushColor": "솔 색깔",
+            "brushSize": "크기 (mm)"
+        },
+        "freeTransform": {
+            "clearSelection": "자주 묻는 질문",
+            "pickLayer": {
+                "label": "공급 업체",
+                "auto": "제품정보",
+                "current": "현재 위치"
+            },
+            "snapping": {
+                "title": "기타 제품",
+                "rotationSnap": "회전 스냅"
+            },
+            "metrics": {
+                "title": "미터",
+                "position": "주요 특징",
+                "width": "폭 (mm)",
+                "height": "고도:",
+                "rotation": "회전 속도",
+                "resetRotation": "재설정 회전",
+                "noLayers": "선택된 층 없음."
+            },
+            "actions": {
+                "title": "팟캐스트",
+                "applyTransform": "Transform 적용",
+                "expandToImageSize": "Layer Bounds로 이미지 크기",
+                "trimEmptySpace": "트림 빈 공간"
+            }
+        },
+        "general": {
+            "settings": "계정 설정"
+        },
+        "selection": {
+            "selectionShape": {
+                "label": "선택 모양",
+                "rectangle": "연락처",
+                "ellipse": "엘립스",
+                "freePolygon": "무료 Polygon",
+                "freePolygonShort": "무료 폴리",
+                "tonalArea": "톤 지역"
+            },
+            "selectionCombineMode": {
+                "label": "선택 Combine 형태",
+                "add": "기타 제품",
+                "subtract": "기타 제품",
+                "intersect": "회사연혁"
+            }
+        },
+        "text": {
+            "font": "이름 *",
+            "size": "크기 (mm)",
+            "bold": "지원하다",
+            "italic": "인기 카테고리",
+            "strikethrough": "스트라이크",
+            "underline": "이름 *",
+            "fill": "제품정보",
+            "fillTooltip": "편지의 가장자리 안쪽에 보여주는 색깔 (s)"
+        },
+        "zoom": {
+            "zoomOut": "줌 아웃",
+            "zoomIn": "줌 에",
+            "rotateCounterClockwise": "연락처",
+            "rotateClockwise": "연락처",
+            "fit": "제품 정보",
+            "flip": "팟캐스트"
+        }
+    },
+    "toolGroup": {
+        "draw": {
+            "name": "드로잉",
+            "description": "브러시, 연필, 펜 및 벡터 아트 도면 도구.",
+            "tools": {
+                "brush": {
+                    "name": "제품정보",
+                    "description": "래스터 레이어에 그리는 브러쉬."
+                }
+            }
+        },
+        "image": {
+            "name": "(주)",
+            "description": "일반 이미지 해상도 조작.",
+            "tools": {
+                "cropResize": {
+                    "name": "자르기 및 크기",
+                    "description": "자르기, 크기, 변화 종횡비, 또는 이미지를 재 샘플."
+                }
+            }
+        },
+        "selection": {
+            "name": "제품정보",
+            "description": "활성 층 (s)의 영역을 선택, 층 (s)에 어떤 조작은 선택 내부에서만 발생합니다.",
+            "tools": {
+                "selection": {
+                    "name": "제품정보",
+                    "description": "대상 편집을 위한 이미지의 영역을 선택합니다."
+                }
+            }
+        },
+        "text": {
+            "name": "이름 *",
+            "description": "텍스트 레이어를 조작하기위한 도구.",
+            "tools": {
+                "text": {
+                    "name": "이름 *",
+                    "description": "텍스트 레이어를 만들고 편집합니다."
+                }
+            }
+        },
+        "transform": {
+            "name": "관련 기사",
+            "description": "움직이는 공구, 회전, 층을 스케일링.",
+            "tools": {
+                "freeTransform": {
+                    "name": "무료 Transform",
+                    "description": "이동, 회전, 또는 선택된 층을 스케일링."
+                }
+            }
+        },
+        "view": {
+            "name": "Viewport 전시",
+            "description": "캔버스의 전망 표시를 제어하기위한 도구.",
+            "tools": {
+                "name": "주 메뉴",
+                "description": "줌에서 캔버스를 제어하는 방법의 이미지를 볼 수 있습니다."
+            }
+        }
+    },
+    "tutorialTip": {
+        "drawToolIntroduction": {
+            "title": "Draw 공구",
+            "introduction": [
+                "그리기 도구는 줄과 모양을 만들 수 있습니다."
+            ]
+        },
+        "explainCanvasViewportControls": {
+            "title": "캔버스 이동",
+            "introduction": [
+                "어떤 도구가 선택되지 않습니다, 당신은 캔버스보기를 제어 할 수 있습니다.",
+                "{anyTool}이 선택된 경우:"
+            ],
+            "anyTool": "모든 도구",
+            "body": {
+                "mouse": [
+                    "{zooming} - {mouseWheel}을 사용하여 확대하고 밖으로.",
+                    "{panning} - 캔버스를 이동하려면 {rightMouseButton}로 클릭하고 드래그하십시오."
+                ],
+                "touch": [
+                    "{zooming} - 2개의 손가락 및 꼬집음을 사용하여 줌 및 밖으로.",
+                    "{panning} - 두 개의 손가락을 사용하고 캔버스를 이동하기 위해 함께 슬라이드합니다."
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "채용 정보",
+                "panning": "팟캐스트",
+                "mouseWheel": "쥐 바퀴",
+                "rightMouseButton": "마우스 오른쪽 버튼"
+            }
+        },
+        "freeTransformToolIntroduction": {
+            "title": "무료 Transform 도구",
+            "introduction": [
+                "이 공구는, 크기를 이동하고, 층을 자전합니다. 경계 상자는 선택한 층 (s)의 주위에 보여줍니다.",
+                "{autoMode}에서:"
+            ],
+            "autoMode": "자동 모드",
+            "body": {
+                "mouse": [
+                    "{selection} - {leftClick} 레이어에서 선택.",
+                    "{moving} - 층에 {leftClick} 및 이동으로 드래그하십시오.",
+                    "{resizing} - {leftClick} 및 드래그 크기 핸들."
+                ],
+                "touch": [
+                    "{selection} - 레이어를 탭하여 선택합니다.",
+                    "{moving} - 층을 탭하고 이동하도록 드래그하십시오.",
+                    "{resizing} - 크기 손잡이를 드래그하기 위해 손가락을 사용합니다."
+                ]
+            },
+            "bodyTitle": {
+                "selection": "제품정보",
+                "moving": "기타",
+                "resizing": "제품 설명",
+                "leftClick": "왼쪽 클릭"
+            }
+        },
+        "selectionToolIntroduction": {
+            "title": "선택 도구",
+            "introduction": [
+                "선택 도구는 이미지의 특정 부분을 선택하여 편집 영향을 제한 할 수 있습니다."
+            ],
+            "body": {
+                "mouse": [
+                    "{createSelection} - {leftClick}로 클릭하고 드래그하여 선택을 만듭니다."
+                ],
+                "touch": [
+                    "{createSelection} - 선택을 창조하기 위하여 1개의 손가락으로 끌기."
+                ],
+                "end": [
+                    "{selectionShape} - 어떤 모양은 선택을 끌기 위하여 이용됩니다.",
+                    "{selectionCombineMode} - 현재 선택은 기존 선택과 결합하는 방법."
+                ]
+            },
+            "bodyTitle": {
+                "createSelection": "선택하기",
+                "leftClick": "왼쪽 클릭",
+                "selectionShape": "선택 모양",
+                "selectionCombineMode": "선택 Combine 형태"
+            }
+        },
+        "zoomToolIntroduction": {
+            "title": "Zoom/Pan 공구",
+            "introduction": [
+                "이 도구는 이미지를 줌으로써 주변을 움직입니다."
+            ],
+            "body": {
+                "mouse": [
+                    "{zooming} - {leftClick} 안으로 급상승에; {ctrlLeftClick}는 밖으로 급상승합니다.",
+                    "{panning} - 캔버스를 이동하려면 {leftMouseButton}로 클릭하고 드래그하십시오."
+                ],
+                "touch": [
+                    "{zooming} - 안으로 급상승에 1개의 손가락을 가진 꼭지. 두 손가락으로 탭하여 확대합니다.",
+                    "{panning} - 캔버스를 이동 한 손가락으로 탭하고 드래그하십시오."
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "채용 정보",
+                "panning": "팟캐스트",
+                "leftClick": "왼쪽 클릭",
+                "ctrlLeftClick": "Ctrl + 왼쪽 클릭",
+                "leftMouseButton": "왼쪽 마우스 버튼"
+            }
+        }
+    }
+}

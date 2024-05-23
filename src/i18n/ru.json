@@ -1,0 +1,998 @@
+{
+    "empty": "",
+    "action": {
+        "addLayerFilter": "Добавить эффект в слой",
+        "addLayerFilterMultiple": "Добавить эффект в слой(ы)",
+        "applyActiveSelection": "Активный выбор Apply",
+        "applyLayerTransform": "Обсуждение Layer Transform",
+        "clearSelection": "Четкий выбор",
+        "convertLayersToImageSequence": "Преобразование слоев в последовательность изображений",
+        "createDrawLayer": "Создайте слой рисунка",
+        "createNewFile": "Новый файл",
+        "createNewLayersFromSelection": "Создание слоев из выбора",
+        "cutLayers": "Cut Layer(s)",
+        "deleteLayers": "Удалить слой(ы)",
+        "deleteLayerFilter": "Удалить эффект",
+        "deleteLayerSelectionArea": "Удалить выбор",
+        "disableLayerFilter": "Эффект инвалидного слоя",
+        "enableLayerFilter": "Включить Layer Effect",
+        "fileTakePhoto": "Сделать фото",
+        "freeTransformRotate": "Свободная трансформация (Rotate)",
+        "freeTransformScale": "Свободная трансформация (размер)",
+        "freeTransformTranslate": "Свободная трансформация (Move)",
+        "insertLayer": "Включить слой",
+        "moduleCropResize": "Посадка и размер",
+        "openFile": "Открытый файл",
+        "pasteLayers": "Пастовый слой(ы)",
+        "placeholder": "Владелец",
+        "pleaseWait": "Пожалуйста, подождите...",
+        "renameLayer": "Название Layer",
+        "reorderLayers": "Reorder Layer(s)",
+        "reorderLayerFilters": "Reorder Effect(s)",
+        "selectLayers": "Выберите слой(ы)",
+        "setLayerBoundsToWorkingFileBounds": "Лайерные границы для размера изображения",
+        "toggleLayerVisibilityOn": "Видимость слоя Toggle На",
+        "toggleLayerVisibilityOff": "Отключить видимость слоя",
+        "trimLayerEmptySpace": "Пустое пространство Trim Layer",
+        "updateActiveSelection": "Обновление Active Selection",
+        "updateFile": "Обновление файла",
+        "updateLayer": "Обновление уровня",
+        "updateDrawLayer": "Рисуем на слое",
+        "updateLayerFilterParams": "Обновление Layer Effect",
+        "updateSelectionCombineMode": "Обновление Selection Combine Mode"
+    },
+    "app": {
+        "colorPickerGradient": {
+            "hueSlider": "Хюэ Слайдер",
+            "opacitySlider": "Слайдер Opacity"
+        },
+        "dndDropOverlay": {
+            "addImage": "Добавить изображение"
+        },
+        "historyNotification": {
+            "title": {
+                "do": {
+                    "inProgress": "Запуск акции...",
+                    "complete": "Полный"
+                },
+                "undo": {
+                    "inProgress": "Ундо...",
+                    "complete": "Undo Полный"
+                },
+                "redo": {
+                    "inProgress": "Редо...",
+                    "complete": "Redo Complete"
+                }
+            }
+        },
+        "layerList": {
+            "toggleLayerVisibility": "Видимость слоя Toggle",
+            "layerSettings": "Настройки слоев",
+            "rename": "Имя",
+            "addEffect": "Добавить эффект",
+            "delete": "Исключить",
+            "frames": "Каркас",
+            "playAnimation": "Играть в анимацию",
+            "stopAnimation": "Остановить анимацию",
+            "editFrames": "Редактировать кадры",
+            "emptyGroup": "Группа пуста.",
+            "effects": "Последствия",
+            "recalculatingEffect": "Обработка...",
+            "moveEffectUp": "Эффект движения вверх",
+            "moveEffectDown": "Эффект движения вниз"
+        },
+        "wait": {
+            "applyLayerTransform": "Использование Layer Transform",
+            "loadingImage": "Загрузка изображения",
+            "pleaseWait": "Подождите, пожалуйста",
+            "trimLayerEmptySpace": "Обрезка пустого пространства",
+            "cancel": "Отменить"
+        }
+    },
+    "brushCategory": {
+        "simple": {
+            "name": "Простые брусья",
+            "brushes": {
+                "circle": {
+                    "name": "Круг"
+                }
+            }
+        },
+        "shapes": {
+            "name": "Формы"
+        }
+    },
+    "button": {
+        "apply": "Применять",
+        "cancel": "Отменить",
+        "clear": "Чисто",
+        "convert": "Преобразовывать",
+        "create": "Создавать",
+        "createNewImage": "Создайте новый образ",
+        "done": "Сделано",
+        "export": "Экспорт",
+        "no": "Нет",
+        "ok": "ХОРОШО",
+        "openImage": "Открытое изображение",
+        "save": "Спасти",
+        "settings": "Настройки",
+        "take": "Взять",
+        "takePhoto": "Сделай фото",
+        "yes": "Да"
+    },
+    "canvas": {
+        "toolbar": {
+            "cropResize": {
+                "waitLabel": "Посадка и размер"
+            }
+        }
+    },
+    "dock": {
+        "colorPicker": {
+            "title": "Цветной Пикер",
+            "pickColorFromImage": "Выберите цвет из изображения",
+            "hexCode": "Кодекс Хекса"
+        },
+        "layers": {
+            "title": "Слои",
+            "add": "Добавить",
+            "layer": "Слой",
+            "group": "Группа",
+            "background": "Предыстория",
+            "toggleBackgroundVisibility": "Скачать Background видимость",
+            "noLayers": "Никаких слоев."
+        },
+        "settings": {
+            "title": "Меры",
+            "file": {
+                "tabTitle": "Файл",
+                "menu": {
+                    "new": "Новый",
+                    "open": "Открыть",
+                    "export": "Экспорт",
+                    "save": "Спасти",
+                    "saveAs": "Сохранить как",
+                    "insertPhoto": "Вставить фотографию",
+                    "takePhoto": "Сделать фото"
+                }
+            },
+            "image": {
+                "tabTitle": "Изображение",
+                "menu": {
+                    "cropResize": "Посадка и размер",
+                    "convertLayers": {
+                        "groupTitle": "Преобразование слоев...",
+                        "toImageSequence": "Изображение последовательности",
+                        "flatten": "Плоский к новому слою"
+                    },
+                    "cut": "Сокращение",
+                    "copy": "Копия",
+                    "copyAllLayers": "Копировать все слои",
+                    "paste": "Паста"
+                }
+            },
+            "view": {
+                "tabTitle": "Посмотреть",
+                "zoom": "Зум",
+                "zoomOut": "Издательство: Zoom Out",
+                "zoomIn": "Зум в игре",
+                "rotate": "Вращаться",
+                "rotateCounterClockwise": "Повернуть против часовой стрелки",
+                "rotateClockwise": "Поворот по часовой стрелке",
+                "reset": "Сброс",
+                "fit": "Готово",
+                "touchRotate": {
+                    "label": "Touch Rotate",
+                    "on": "На",
+                    "snap": "Щелчок",
+                    "off": "Оставить"
+                },
+                "window": "Окно",
+                "enterFullscreen": "Введите Fullscreen",
+                "exitFullscreen": "Выход Fullscreen"
+            },
+            "history": {
+                "tabTitle": "История",
+                "undo": "Снять",
+                "redo": "Реда",
+                "noHistory": "Пока нет истории.",
+                "baseImage": "Изображение Base"
+            },
+            "prefs": {
+                "tabTitle": "Префс",
+                "theme": "Тема",
+                "language": "Язык языка",
+                "default": "По умолчанию",
+                "performance": {
+                    "groupTitle": "Выступление",
+                    "renderer": {
+                        "label": "Рендер",
+                        "2d": "Canvas 2D",
+                        "webgl": "WebGL"
+                    },
+                    "optimizeLargeImage": "Оптимизация для большого изображения",
+                    "highQualityScaling": "Высокое качество масштабирования",
+                    "fixAdjacentLayerSeams": "Исправьте смежные слои"
+                },
+                "editor": {
+                    "groupTitle": "Редактор",
+                    "menuBarPosition": "Меню Бар Позиция",
+                    "showWelcomeScreen": "Приветственный экран",
+                    "showTips": "Показать советы",
+                    "resetSettings": "Сброс настроек"
+                },
+                "debugging": {
+                    "groupTitle": "Отладка",
+                    "useMobileDebugger": "Загрузить мобильный отладчик"
+                },
+                "help": {
+                    "groupTitle": "Помощь",
+                    "reportIssue": "Сообщить о проблеме"
+                }
+            }
+        }
+    },
+    "el": {
+        "horizontalScrollbarArrows": {
+            "scrollLeft": "Свиток слева",
+            "scrollRight": "Прокрутить правильно"
+        }
+    },
+    "keyboardMap": {
+        "file": {
+            "name": "Файл",
+            "actions": {
+                "open": "Открытый файл",
+                "export": "Экспортный файл",
+                "quickLoad": "Быстрая загрузка",
+                "quickSave": "Быстрая экономия"
+            }
+        },
+        "image": {
+            "name": "Изображение",
+            "actions": {
+                "cut": "Сокращение",
+                "copy": "Копия",
+                "paste": "Паста",
+                "delete": "Исключить"
+            }
+        },
+        "history": {
+            "name": "Редактирование истории",
+            "actions": {
+                "undo": "Снять",
+                "redo": "Реда"
+            }
+        },
+        "selection": {
+            "name": "Выбор",
+            "actions": {
+                "selectAll": "Выберите все",
+                "deleteSelection": "Удалить выбор"
+            }
+        }
+    },
+    "layerFilter": {
+        "brightness": {
+            "name": "Яркость",
+            "param": {
+                "mode": "Режим",
+                "modeOption": {
+                    "gamma": "Скорректировать гамма",
+                    "shift": "Черно-белая смена",
+                    "luminance": "Скорректировать яркость"
+                },
+                "brightness": "Яркость",
+                "effectiveRange": "Диапазон",
+                "effectiveRangeFeather": "Перо"
+            }
+        },
+        "chroma": {
+            "name": "Хрома",
+            "param": {
+                "chroma": "Хрома",
+                "mode": "Режим",
+                "modeOption": {
+                    "multiply": "Скорректировать контраст хрома",
+                    "shift": "Адаптация хрома"
+                }
+            }
+        },
+        "colorBlindness": {
+            "name": "Цветовая слепота",
+            "param": {
+                "method": "Метод моделирования",
+                "methodOption": {
+                    "brettel": "Бреттель 1997"
+                },
+                "type": "Тип слепоты",
+                "typeOption": {
+                    "protan": "Протанопия / Протаномалия (красно-слепая)",
+                    "deuteran": "Deuteranopia / Deuteranomaly (зелено-слепой)",
+                    "tritan": "Тританопия / Тританомалия (сине-слепая)",
+                    "achroma": "Ахроматомалия / Ахроматопсия (красный / зеленый / синий-слепой)"
+                },
+                "severity": "Серьезность"
+            }
+        },
+        "colorCorrection": {
+            "name": "Коррекция цвета"
+        },
+        "contrast": {
+            "name": "Контраст",
+            "param": {
+                "contrast": "Контраст",
+                "middleGray": "Средний серый"
+            }
+        },
+        "decreaseColorDepth": {
+            "name": "Уменьшить глубину цвета"
+        },
+        "gaussianBlur": {
+            "name": "Гауссиан Блур",
+            "param": {
+                "size": "Размер",
+                "xIntensity": "Интенсивность X",
+                "yIntensity": "Интенсивность Y"
+            }
+        },
+        "grayscale": {
+            "name": "Серая шкала",
+            "param": {
+                "mode": "Режим",
+                "modeOption": {
+                    "luminance": "Яркость",
+                    "luma": "Лума",
+                    "lightness": "Легкость (HSL)",
+                    "average": "Средняя (интенсивность HSI)",
+                    "value": "Значение (HSV)"
+                },
+                "modeOptionDescription": {
+                    "value": "= max (R,G,B)"
+                },
+                "mix": "Смешивать"
+            }
+        },
+        "hue": {
+            "name": "Хуэй",
+            "param": {
+                "colorSpace": "Цветное пространство",
+                "colorSpaceOption": {
+                    "oklab": "Оклаб",
+                    "perceptualRgb": "Восприятие RGB",
+                    "linearRgb": "Линейный RGB"
+                },
+                "rotate": "Вращаться"
+            }
+        },
+        "negative": {
+            "name": "Отрицательный",
+            "param": {
+                "colorSpace": "Цветное пространство",
+                "colorSpaceOption": {
+                    "perceptualRgb": "Восприятие RGB",
+                    "linearRgb": "Линейный RGB"
+                },
+                "invertRed": "Перевернутый красный канал",
+                "invertGreen": "Перевернутый зеленый канал",
+                "invertBlue": "Обратный синий канал",
+                "invertValue": "Инвертированная стоимость"
+            }
+        },
+        "saturation": {
+            "name": "Насыщение",
+            "param": {
+                "saturation": "Насыщение"
+            }
+        },
+        "sepia": {
+            "name": "Сепия"
+        }
+    },
+    "layerFilterGroup": {
+        "blur": {
+            "name": "Пятно"
+        },
+        "color": {
+            "name": "Цвет"
+        },
+        "distort": {
+            "name": "Искаженный"
+        },
+        "instagramFilter": {
+            "name": "Фильтр Instagram"
+        },
+        "photography": {
+            "name": "Фотография"
+        },
+        "sharpen": {
+            "name": "Шарпен"
+        }
+    },
+    "layoutShortcutGroup": {
+        "color": {
+            "name": "Выберите цвет",
+            "controls": {
+                "default": {
+                    "label": "Выберите цвет"
+                }
+            }
+        },
+        "deform": {
+            "name": "Деформация",
+            "controls": {
+                "default": {
+                    "label": "Деформация"
+                }
+            }
+        },
+        "draw": {
+            "name": "Рисовать",
+            "controls": {
+                "default": {
+                    "label": "Рисовать"
+                }
+            }
+        },
+        "effects": {
+            "name": "Последствия",
+            "controls": {
+                "default": {
+                    "label": "Последствия"
+                }
+            }
+        },
+        "erase": {
+            "name": "Стирать",
+            "controls": {
+                "default": {
+                    "label": "Стирать"
+                }
+            }
+        },
+        "history": {
+            "name": "История",
+            "controls": {
+                "undo": {
+                    "label": "Снять"
+                },
+                "redo": {
+                    "label": "Реда"
+                }
+            }
+        },
+        "layers": {
+            "name": "Слои",
+            "controls": {
+                "default": {
+                    "label": "Слои"
+                }
+            }
+        },
+        "search": {
+            "name": "Поиск",
+            "controls": {
+                "default": {
+                    "label": "Поиск"
+                }
+            }
+        },
+        "selection": {
+            "name": "Выбор",
+            "controls": {
+                "default": {
+                    "label": "Выбор"
+                }
+            }
+        },
+        "settings": {
+            "name": "Меры",
+            "controls": {
+                "default": {
+                    "label": "Меры"
+                }
+            }
+        },
+        "text": {
+            "name": "Текст",
+            "controls": {
+                "default": {
+                    "label": "Включить/редактировать текст"
+                }
+            }
+        },
+        "transform": {
+            "name": "Трансформация / Transform",
+            "controls": {
+                "default": {
+                    "label": "Трансформация / Transform"
+                }
+            }
+        },
+        "view": {
+            "name": "Canvas Viewport",
+            "controls": {
+                "default": {
+                    "label": "Zoom / Pan View"
+                }
+            }
+        }
+    },
+    "lib": {
+        "tutorial": {
+            "notification": {
+                "gotIt": "Понял",
+                "dontShowTips": "Не показывайте советы"
+            }
+        }
+    },
+    "measurement": {
+        "pixels": "Пиксели",
+        "millimeters": "Миллиметры",
+        "centimeters": "Сентиметры",
+        "inches": "Дюймы",
+        "pixelsPerInch": "Pixels/Inch",
+        "pixelsPerMillimeter": "Пиксели / Миллиметр",
+        "pixelsPerCentimeter": "Пиксели / Сентиметр"
+    },
+    "menuBar": {
+        "toolsHeading": "Инструменты"
+    },
+    "module": {
+        "fileExport": {
+            "title": "Экспортное изображение",
+            "saveBackIntroduction": "Вы открыли файл под названием {fileName}.",
+            "saveBackQuestion": "Сохранить в исходном файле?",
+            "fileName": "Имя файла",
+            "fileType": "Тип файла",
+            "layers": "Слои",
+            "quality": "Качество",
+            "dithering": "Колебание",
+            "ditheringOption": {
+                "none": "Никто",
+                "atkinson": "Аткинсон",
+                "atkinsonSerpentine": "Аткинсон (серпентин)",
+                "floydSteinberg": "Флойд Стейнберг",
+                "floydSteinbergSerpentine": "Флойд Стейнберг (серпентин)",
+                "falseFloydSteinberg": "Ложный Флойд Стейнберг",
+                "falseFloydSteinbergSerpentine": "Ложный Флойд Стейнберг (серпентин)",
+                "stucki": "Сукки",
+                "stuckiSerpentine": "Стуки (серпентин)"
+            }
+        },
+        "fileNew": {
+            "title": "Новый образ",
+            "preset": "Предустановленный",
+            "presetPlaceholder": "Выберите (опционально)",
+            "width": "Широта",
+            "height": "Высота",
+            "resolution": "Резолюция",
+            "colorProfile": "Цветной профиль",
+            "scaleFactor": "Масштабный фактор"
+        },
+        "fileSaveAs": {
+            "title": "Сохранить изображение как",
+            "saveBackIntroduction": "Вы открыли файл под названием {fileName}.",
+            "saveBackQuestion": "Сохранить в исходном файле?",
+            "exportDisclaimer": "Если вы хотите поделиться или просмотреть изображение в других программах, используйте «Экспорт».",
+            "fileName": "Имя файла"
+        },
+        "fileTakePhoto": {
+            "title": "Сделай фото",
+            "noCameraError": {
+                "title": "Камера недоступна",
+                "message": "Либо устройство не имеет камер, либо доступ к камере был отклонен."
+            },
+            "selectCamera": {
+                "placeholder": "Выберите камеру",
+                "user": "Фронт (пользователь)",
+                "environment": "Задняя часть (окружающая среда)"
+            }
+        },
+        "imageConvertLayersToImageSequence": {
+            "title": "Преобразование слоев в последовательность изображений",
+            "frameDelay": "Frame задержка"
+        },
+        "layerEffectBrowser": {
+            "title": "Эффект Браузера",
+            "description": "Выберите эффект для добавления в слой. Эффекты обычно манипулируют цветами слоя или добавляют специальные узоры, такие как размытые эффекты.",
+            "loading": "Создание предварительных просмотров...",
+            "generationErrorGeneral": "Ошибка произошла при генерации эффектов предварительного просмотра для выбранного слоя.",
+            "generationErrorUnsupportedType": "Выбранный вами слой не может иметь приложенных к нему фильтров.",
+            "generationErrorNoLayer": "Пожалуйста, выберите один или несколько слоев в доке слоев, чтобы добавить к ним эффекты."
+        },
+        "layerEffectEdit": {
+            "title": "Эффект редактирования",
+            "description": "Редактировать эффект для конкретного слоя.",
+            "loading": "Создание предварительных просмотров...",
+            "generalError": "Что-то пошло не так. Если вы продолжаете видеть это сообщение, пожалуйста, сообщите об этом как об ошибке.",
+            "deleteEffect": "Удалить эффект",
+            "enableToggle": "Допускать",
+            "resetField": "Перезагрузить поле",
+            "deleting": "Удаление эффекта...",
+            "deleteFilterError": "Во время попытки удалить фильтр произошла ошибка. Если вы продолжаете видеть это сообщение, пожалуйста, сообщите об этом как об ошибке.",
+            "applyFilterError": "При попытке применить изменения фильтра произошла ошибка. Если вы продолжаете видеть это сообщение, пожалуйста, сообщите об этом как об ошибке."
+        },
+        "renameLayer": {
+            "title": "Название Layer",
+            "layerName": "Новое имя"
+        }
+    },
+    "moduleGroup": {
+        "file": {
+            "name": "Управление файлами",
+            "description": "Загрузите и сохраните изображения на ваше устройство.",
+            "modules": {
+                "export": {
+                    "name": "Экспортное изображение",
+                    "description": "Сохраните изображение в универсальном формате, который может быть открыт другими редакторами."
+                },
+                "insertPhoto": {
+                    "name": "Вставить фотографию",
+                    "description": "Добавьте фотографию в качестве нового слоя в открывшееся изображение."
+                },
+                "new": {
+                    "name": "Новый образ",
+                    "description": "Создайте новое изображение с заданными размерами."
+                },
+                "open": {
+                    "name": "Открытое изображение",
+                    "description": "Откройте файл изображения или проекта в новом рабочем пространстве."
+                },
+                "quickLoad": {
+                    "name": "Быстрая загрузка",
+                    "description": "Загрузите файл, сохраненный быстрым сохранением."
+                },
+                "quickSave": {
+                    "name": "Быстрая экономия",
+                    "description": "Сохраняет текущий файл на временное хранение."
+                },
+                "saveAs": {
+                    "name": "Сохранить изображение как",
+                    "description": "Сохраняет изображение в формате проекта, который может быть вновь открыт OpenGraphica без потери какой-либо информации."
+                },
+                "takePhoto": {
+                    "name": "Сделать фото",
+                    "description": "Сделайте фотографию с камеры и веб-камеры и вставьте ее в изображение."
+                }
+            }
+        },
+        "history": {
+            "name": "Редактирование истории",
+            "description": "Операции, которые контролируют перемещение по истории редактирования изображений.",
+            "modules": {
+                "redo": {
+                    "name": "История Redo",
+                    "description": "Редо - последнее незавершенное действие."
+                },
+                "undo": {
+                    "name": "История Undo",
+                    "description": "Отмените последнее действие."
+                }
+            }
+        },
+        "image": {
+            "name": "Изображение Canvas",
+            "description": "Операции, которые влияют на изображение холста.",
+            "modules": {
+                "convertLayersToImageSequence": {
+                    "name": "Преобразование слоев в последовательность изображений",
+                    "description": "Преобразует выбранные слои в слой последовательности изображения (анимация)."
+                },
+                "convertLayersFlatten": {
+                    "name": "Преобразование слоев в плоское изображение",
+                    "description": "Сливает все слои в один слой изображения и добавляет его в верхнюю часть стека слоев."
+                },
+                "copy": {
+                    "name": "Копия выбранных слоев",
+                    "description": "Копируйте выбранные в настоящее время слои в буфер обмена."
+                },
+                "copyAll": {
+                    "name": "Копировать все слои",
+                    "description": "Скопируйте все слои на холсте в виде изображения PNG в буфер обмена."
+                },
+                "cut": {
+                    "name": "Сокращение",
+                    "description": "Удалите выбранные в настоящее время слои и скопируйте их в буфер обмена."
+                },
+                "paste": {
+                    "name": "Паста",
+                    "description": "Вставьте изображения на холст из буфера обмена."
+                }
+            }
+        },
+        "layer": {
+            "name": "Слои",
+            "description": "Операции, которые влияют на слои.",
+            "modules": {
+                "rename": {
+                    "name": "Название Layer",
+                    "description": "Изменить название слоя"
+                },
+                "layerEffectBrowser": {
+                    "name": "Эффект Браузера",
+                    "description": "Добавляет эффекты изображения в выбранный в настоящее время слой(ы) или группу(ы) слоев."
+                }
+            }
+        },
+        "tmp": {
+            "name": "Временные модули",
+            "description": "Модули, которые будут работать только во время начальной разработки.",
+            "modules": {
+                "notYetImplemented": {
+                    "name": "Пока не выполнено",
+                    "description": "Покажи предупреждение."
+                }
+            }
+        },
+        "tutorial": {
+            "name": "Учебники",
+            "description": "Узнайте, как использовать OpenGraphica.",
+            "modules": {
+                "welcome": {
+                    "name": "Добро пожаловать",
+                    "description": "Начните работать над изображением."
+                }
+            }
+        }
+    },
+    "option": {
+        "bottom": "Нижняя часть",
+        "left": "Левый",
+        "right": "Правильно",
+        "top": "Топ"
+    },
+    "theme": {
+        "light": "Свет",
+        "dark": "Темный"
+    },
+    "toolbar": {
+        "cropResize": {
+            "title": "Посадка и размер",
+            "linkWidthHeight": "Ссылка Width/Height",
+            "size": "Размер",
+            "width": "Широта",
+            "height": "Высота",
+            "dimensionUnits": "Единицы измерения",
+            "resolution": "Резолюция",
+            "resolutionUnits": "Единицы решения",
+            "snapping": {
+                "title": "Похищение",
+                "enable": "Включить Snapping"
+            }
+        },
+        "draw": {
+            "brushColor": "Цвет кисти",
+            "brushSize": "Размер"
+        },
+        "freeTransform": {
+            "clearSelection": "Четкий выбор",
+            "pickLayer": {
+                "label": "Выберите слой",
+                "auto": "Автомат",
+                "current": "Текущий"
+            },
+            "snapping": {
+                "title": "Похищение",
+                "rotationSnap": "Ротационный снэп"
+            },
+            "metrics": {
+                "title": "Метрики",
+                "position": "Позиция",
+                "width": "Широта",
+                "height": "Высота",
+                "rotation": "Вращение",
+                "resetRotation": "Вращение сброса",
+                "noLayers": "Выбранный(ые) слой(ы)."
+            },
+            "actions": {
+                "title": "Меры",
+                "applyTransform": "Apply Трансформация",
+                "expandToImageSize": "Лайерные границы для размера изображения",
+                "trimEmptySpace": "Пустое пустое пространство"
+            }
+        },
+        "general": {
+            "settings": "Настройки"
+        },
+        "selection": {
+            "selectionShape": {
+                "label": "Форма выбора",
+                "rectangle": "Прямоугольник",
+                "ellipse": "Эллипс",
+                "freePolygon": "Бесплатный полигон",
+                "freePolygonShort": "Свободный поли",
+                "tonalArea": "Тональная область"
+            },
+            "selectionCombineMode": {
+                "label": "Выбор комбинированного режима",
+                "add": "Добавить",
+                "subtract": "Вычитать",
+                "intersect": "Пересекаться"
+            }
+        },
+        "text": {
+            "font": "Шрифт",
+            "size": "Размер",
+            "bold": "Смелый",
+            "italic": "Итальянский",
+            "strikethrough": "Прорыв",
+            "underline": "Подчеркнуть",
+            "fill": "Заполнять",
+            "fillTooltip": "Цвет, который отображается внутри краев буквы ( букв)"
+        },
+        "zoom": {
+            "zoomOut": "Издательство: Zoom Out",
+            "zoomIn": "Зум в игре",
+            "rotateCounterClockwise": "Повернуть против часовой стрелки",
+            "rotateClockwise": "Поворот по часовой стрелке",
+            "fit": "Готово",
+            "flip": "Флип"
+        }
+    },
+    "toolGroup": {
+        "draw": {
+            "name": "Рисовать",
+            "description": "Ручки, карандаши, ручки и инструменты векторного рисования.",
+            "tools": {
+                "brush": {
+                    "name": "Кисть",
+                    "description": "Брусья, которые рисуют на растровых слоях."
+                }
+            }
+        },
+        "image": {
+            "name": "Изображение",
+            "description": "Общая манипуляция разрешением изображения.",
+            "tools": {
+                "cropResize": {
+                    "name": "Посадка и размер",
+                    "description": "Вырезать, изменить размер, изменить соотношение сторон или повторить изображение."
+                }
+            }
+        },
+        "selection": {
+            "name": "Выбор",
+            "description": "Выберите области активного слоя(ов), любые манипуляции с слоем(ами) происходят только внутри выбора.",
+            "tools": {
+                "selection": {
+                    "name": "Выбор",
+                    "description": "Выберите область изображения для целевого редактирования."
+                }
+            }
+        },
+        "text": {
+            "name": "Текст",
+            "description": "Инструменты для манипулирования текстовыми слоями.",
+            "tools": {
+                "text": {
+                    "name": "Текст",
+                    "description": "Создание и редактирование текстовых слоев."
+                }
+            }
+        },
+        "transform": {
+            "name": "Трансформация",
+            "description": "Инструменты для перемещения, вращения, масштабирования слоя.",
+            "tools": {
+                "freeTransform": {
+                    "name": "Свободная трансформация",
+                    "description": "Перемещайте, вращайте или масштабируйте выбранные слои."
+                }
+            }
+        },
+        "view": {
+            "name": "Дисплей Viewport",
+            "description": "Инструменты для управления дисплеем Viewport холста.",
+            "tools": {
+                "name": "Зум",
+                "description": "Введите и выведите холст, чтобы контролировать, сколько изображения вы можете видеть."
+            }
+        }
+    },
+    "tutorialTip": {
+        "drawToolIntroduction": {
+            "title": "Инструмент рисования",
+            "introduction": [
+                "Инструмент рисования позволяет создавать линии и формы."
+            ]
+        },
+        "explainCanvasViewportControls": {
+            "title": "Перемещение холста",
+            "introduction": [
+                "Независимо от того, какой инструмент выбран, вы можете контролировать просмотр холста.",
+                "При выборе {anyTool}:"
+            ],
+            "anyTool": "любой инструмент",
+            "body": {
+                "mouse": [
+                    "{zooming} - Используйте {mouseWheel} для увеличения и увеличения.",
+                    "{panning} - Нажмите и перетащите с помощью {rightMouseButton} для перемещения холста."
+                ],
+                "touch": [
+                    "{zooming} - Используйте два пальца и щипцы, чтобы увеличить и увеличить.",
+                    "{panning} - Используйте два пальца и сдвиньте их вместе, чтобы переместить полотно."
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "Зуминг",
+                "panning": "Пэннинг",
+                "mouseWheel": "Мышиное колесо",
+                "rightMouseButton": "Правая мышиная кнопка"
+            }
+        },
+        "freeTransformToolIntroduction": {
+            "title": "Бесплатный инструмент трансформации",
+            "introduction": [
+                "Этот инструмент перемещает, изменяет размеры и вращает слои. Граничная коробка показывает вокруг выбранного слоя(ов).",
+                "В {autoMode}:"
+            ],
+            "autoMode": "режим авто",
+            "body": {
+                "mouse": [
+                    "{selection} - {leftClick} на слое для его выбора.",
+                    "{moving} - {leftClick} на слое и перетаскивать его.",
+                    "{resizing} - {leftClick} и ручки перетаскивания."
+                ],
+                "touch": [
+                    "{selection} - Нажмите на слой, чтобы выбрать его.",
+                    "{moving} - Нажмите на слой и перетащите его.",
+                    "{resizing} - Используйте один палец для перетаскивания ручек."
+                ]
+            },
+            "bodyTitle": {
+                "selection": "Выбор",
+                "moving": "Двигаться",
+                "resizing": "Изменение размера",
+                "leftClick": "Левый клик"
+            }
+        },
+        "selectionToolIntroduction": {
+            "title": "Инструмент выбора",
+            "introduction": [
+                "Инструмент выбора позволяет выбрать определенные части изображения, чтобы ограничить влияние редактирования."
+            ],
+            "body": {
+                "mouse": [
+                    "{createSelection} - Нажмите и перетащите с помощью {leftClick} для создания выбора."
+                ],
+                "touch": [
+                    "{createSelection} - Нарисуйте одним пальцем, чтобы создать выбор."
+                ],
+                "end": [
+                    "{selectionShape} - Какая форма используется для выбора.",
+                    "{selectionCombineMode} - Как текущий отбор сочетается с существующим отбором."
+                ]
+            },
+            "bodyTitle": {
+                "createSelection": "Создать выбор",
+                "leftClick": "Левый клик",
+                "selectionShape": "Форма выбора",
+                "selectionCombineMode": "Выбор комбинированного режима"
+            }
+        },
+        "zoomToolIntroduction": {
+            "title": "Инструмент Zoom/Pan",
+            "introduction": [
+                "Этот инструмент позволяет увеличить изображение и перемещать вид вокруг."
+            ],
+            "body": {
+                "mouse": [
+                    "{zooming} - {leftClick} увеличить; {ctrlLeftClick} увеличить.",
+                    "{panning} - Нажмите и перетащите с помощью {leftMouseButton} для перемещения холста."
+                ],
+                "touch": [
+                    "{zooming} - Нажмите одним пальцем, чтобы увеличить. Нажмите двумя пальцами, чтобы увеличить.",
+                    "{panning} - Нажмите и перетащите одним пальцем, чтобы переместить полотно."
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "Зуминг",
+                "panning": "Пэннинг",
+                "leftClick": "Левый клик",
+                "ctrlLeftClick": "Ctrl + Левый клик",
+                "leftMouseButton": "Левая мышиная кнопка"
+            }
+        }
+    }
+}
