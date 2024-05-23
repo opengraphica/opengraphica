@@ -1,0 +1,996 @@
+{
+    "empty": "",
+    "action": {
+        "addLayerFilter": "レイヤーにエフェクトを追加する",
+        "addLayerFilterMultiple": "レイヤーにエフェクトを追加する",
+        "applyActiveSelection": "活動的な選択を適用して下さい",
+        "applyLayerTransform": "レイヤー変換を適用",
+        "clearSelection": "明確な選択",
+        "convertLayersToImageSequence": "レイヤーをイメージシーケンスに変換する",
+        "createDrawLayer": "レイヤーを作成する",
+        "createNewFile": "新しいファイル",
+        "createNewLayersFromSelection": "選択からレイヤーを作成する",
+        "cutLayers": "切断層(s)",
+        "deleteLayers": "レイヤーを削除します",
+        "deleteLayerFilter": "エフェクトの削除",
+        "deleteLayerSelectionArea": "選択を削除",
+        "disableLayerFilter": "無効な層効果",
+        "enableLayerFilter": "レイヤー効果を有効にする",
+        "fileTakePhoto": "写真を撮る",
+        "freeTransformRotate": "無料トランスフォーム(ルート)",
+        "freeTransformScale": "フリートランスフォーム(リサイズ)",
+        "freeTransformTranslate": "無料トランスフォーム(移動)",
+        "insertLayer": "インサート層",
+        "moduleCropResize": "クロップとリサイズ",
+        "openFile": "ファイルを開く",
+        "pasteLayers": "ペーストレイヤー(s)",
+        "placeholder": "プレースホルダー",
+        "pleaseWait": "お問い合わせ.",
+        "renameLayer": "レイヤーの名前を変更",
+        "reorderLayers": "注文層(s)",
+        "reorderLayerFilters": "注文効果(s)",
+        "selectLayers": "レイヤーを選択します",
+        "setLayerBoundsToWorkingFileBounds": "イメージのサイズへの層の傷",
+        "toggleLayerVisibilityOn": "レイヤーの可視性を切り替える お問い合わせ",
+        "toggleLayerVisibilityOff": "層の可視性を離れてトグルして下さい",
+        "trimLayerEmptySpace": "トリムレイヤー空のスペース",
+        "updateActiveSelection": "アクティブな選択を更新する",
+        "updateFile": "ファイル更新",
+        "updateLayer": "更新層",
+        "updateDrawLayer": "レイヤーを描画する",
+        "updateLayerFilterParams": "レイヤー効果の更新",
+        "updateSelectionCombineMode": "選択のコンバインのモードを更新して下さい"
+    },
+    "app": {
+        "colorPickerGradient": {
+            "hueSlider": "Hue スライダー",
+            "opacitySlider": "オパシティスライダー"
+        },
+        "dndDropOverlay": {
+            "addImage": "イメージを追加"
+        },
+        "historyNotification": {
+            "title": {
+                "do": {
+                    "inProgress": "ランニングアクション...",
+                    "complete": "エントリー"
+                },
+                "undo": {
+                    "inProgress": "ウンド...",
+                    "complete": "Undo 完了"
+                },
+                "redo": {
+                    "inProgress": "レッド...",
+                    "complete": "Redoコンプリート"
+                }
+            }
+        },
+        "layerList": {
+            "toggleLayerVisibility": "レイヤーの可視性を切り替える",
+            "layerSettings": "レイヤー設定",
+            "rename": "リネーム",
+            "addEffect": "エフェクトの追加",
+            "delete": "削除",
+            "frames": "フレーム",
+            "playAnimation": "アニメーションを再生",
+            "stopAnimation": "アニメーションを停止する",
+            "editFrames": "フレームの編集",
+            "emptyGroup": "グループは空です.",
+            "effects": "効果",
+            "recalculatingEffect": "加工...",
+            "moveEffectUp": "効果を上げる",
+            "moveEffectDown": "効果を下に移動する"
+        },
+        "wait": {
+            "applyLayerTransform": "レイヤー変換を適用",
+            "loadingImage": "ローディングのイメージ",
+            "pleaseWait": "お問い合わせ",
+            "trimLayerEmptySpace": "空の空間をトリムする",
+            "cancel": "キャンセル"
+        }
+    },
+    "brushCategory": {
+        "simple": {
+            "name": "シンプルなブラシ",
+            "brushes": {
+                "circle": {
+                    "name": "サークル"
+                }
+            }
+        },
+        "shapes": {
+            "name": "形状"
+        }
+    },
+    "button": {
+        "apply": "お問い合わせ",
+        "cancel": "キャンセル",
+        "clear": "クリア",
+        "convert": "コンバーター",
+        "create": "作成する",
+        "createNewImage": "新しいイメージを作成する",
+        "done": "ログイン",
+        "export": "エクスポート",
+        "no": "なし",
+        "ok": "お問い合わせ",
+        "openImage": "開いたイメージ",
+        "save": "保存する",
+        "settings": "コンテンツ",
+        "take": "お問い合わせ",
+        "takePhoto": "写真を撮る",
+        "yes": "お問い合わせ"
+    },
+    "canvas": {
+        "toolbar": {
+            "cropResize": {
+                "waitLabel": "クロップとリサイズ"
+            }
+        }
+    },
+    "dock": {
+        "colorPicker": {
+            "title": "カラーピッカー",
+            "pickColorFromImage": "画像から色を選ぶ",
+            "hexCode": "六角コード"
+        },
+        "layers": {
+            "title": "レイヤー",
+            "add": "追加する",
+            "layer": "レイヤー",
+            "group": "グループ",
+            "background": "プロフィール",
+            "toggleBackgroundVisibility": "背景を切り替える 可視性",
+            "noLayers": "レイヤーなし."
+        },
+        "settings": {
+            "title": "アクション",
+            "file": {
+                "tabTitle": "ファイル",
+                "menu": {
+                    "new": "ニュース",
+                    "open": "オープン",
+                    "export": "エクスポート",
+                    "save": "保存する",
+                    "saveAs": "保存 として",
+                    "insertPhoto": "写真をインサートする",
+                    "takePhoto": "写真を撮る"
+                }
+            },
+            "image": {
+                "tabTitle": "サイトマップ",
+                "menu": {
+                    "cropResize": "クロップとリサイズ",
+                    "convertLayers": {
+                        "groupTitle": "レイヤーを変換...",
+                        "toImageSequence": "画像シーケンスへ",
+                        "flatten": "新しい層に平らに"
+                    },
+                    "cut": "カット",
+                    "copy": "コピー",
+                    "copyAllLayers": "すべてのレイヤーをコピーする",
+                    "paste": "ペースト"
+                }
+            },
+            "view": {
+                "tabTitle": "ニュース",
+                "zoom": "ズーム",
+                "zoomOut": "ズームアウト",
+                "zoomIn": "ズームイン",
+                "rotate": "回転率",
+                "rotateCounterClockwise": "反時計回りを回して下さい",
+                "rotateClockwise": "時計回りの回転",
+                "reset": "リセット",
+                "fit": "フィット",
+                "touchRotate": {
+                    "label": "接触回転",
+                    "on": "お問い合わせ",
+                    "snap": "スナップ",
+                    "off": "オフ"
+                },
+                "window": "ウィンドウ",
+                "enterFullscreen": "フルスクリーンを入力してください",
+                "exitFullscreen": "出口のフルスクリーン"
+            },
+            "history": {
+                "tabTitle": "プロフィール",
+                "undo": "ログイン",
+                "redo": "ログイン",
+                "noHistory": "歴史はありません.",
+                "baseImage": "ベースイメージ"
+            },
+            "prefs": {
+                "tabTitle": "採用情報",
+                "theme": "テーマ:",
+                "performance": {
+                    "groupTitle": "パフォーマンス",
+                    "renderer": {
+                        "label": "レンダー",
+                        "2d": "キャンバス2D",
+                        "webgl": "サイトマップ"
+                    },
+                    "optimizeLargeImage": "大きいイメージのための最大限活用",
+                    "highQualityScaling": "高品質のスケーリング",
+                    "fixAdjacentLayerSeams": "Fix 隣接レイヤーシーム"
+                },
+                "editor": {
+                    "groupTitle": "ダウンロード",
+                    "menuBarPosition": "メニューバーの位置",
+                    "showWelcomeScreen": "歓迎画面を表示する",
+                    "showTips": "ヒントを表示する",
+                    "resetSettings": "リセット設定"
+                },
+                "debugging": {
+                    "groupTitle": "デバッギング",
+                    "useMobileDebugger": "モバイルデバッガーをロード"
+                },
+                "help": {
+                    "groupTitle": "お問い合わせ",
+                    "reportIssue": "課題報告"
+                }
+            }
+        }
+    },
+    "el": {
+        "horizontalScrollbarArrows": {
+            "scrollLeft": "左スクロール",
+            "scrollRight": "スクロール 右"
+        }
+    },
+    "keyboardMap": {
+        "file": {
+            "name": "ファイル",
+            "actions": {
+                "open": "ファイルを開く",
+                "export": "エクスポートファイル",
+                "quickLoad": "速い負荷",
+                "quickSave": "クイック保存"
+            }
+        },
+        "image": {
+            "name": "サイトマップ",
+            "actions": {
+                "cut": "カット",
+                "copy": "コピー",
+                "paste": "ペースト",
+                "delete": "削除"
+            }
+        },
+        "history": {
+            "name": "編集履歴",
+            "actions": {
+                "undo": "ログイン",
+                "redo": "ログイン"
+            }
+        },
+        "selection": {
+            "name": "セレクション",
+            "actions": {
+                "selectAll": "すべてを選択",
+                "deleteSelection": "選択を削除"
+            }
+        }
+    },
+    "layerFilter": {
+        "brightness": {
+            "name": "明るさ",
+            "param": {
+                "mode": "モード",
+                "modeOption": {
+                    "gamma": "Gammaを調節して下さい",
+                    "shift": "ブラック/ホワイトシフト",
+                    "luminance": "ルミナンスを調整する"
+                },
+                "brightness": "明るさ",
+                "effectiveRange": "レンジ",
+                "effectiveRangeFeather": "フェザー"
+            }
+        },
+        "chroma": {
+            "name": "クロマ",
+            "param": {
+                "chroma": "クロマ",
+                "mode": "モード",
+                "modeOption": {
+                    "multiply": "Chromaのコントラストを調節して下さい",
+                    "shift": "クロマを均等に調節して下さい"
+                }
+            }
+        },
+        "colorBlindness": {
+            "name": "色目隠し",
+            "param": {
+                "method": "シミュレーション方法",
+                "methodOption": {
+                    "brettel": "ブレットテル 1997"
+                },
+                "type": "盲目のタイプ",
+                "typeOption": {
+                    "protan": "Protanopia/Protanomaly (赤ブリン)",
+                    "deuteran": "Deuteranopia/Deuteranomaly (緑盲目)",
+                    "tritan": "トリタノピア/トリタノマリー(ブルー・ブリンド)",
+                    "achroma": "Achromatomaly/Achromatopsia (赤/緑/青-Blind)"
+                },
+                "severity": "重症度"
+            }
+        },
+        "colorCorrection": {
+            "name": "色の訂正"
+        },
+        "contrast": {
+            "name": "コントラスト",
+            "param": {
+                "contrast": "コントラスト",
+                "middleGray": "ミドルグレー"
+            }
+        },
+        "decreaseColorDepth": {
+            "name": "色の深さを減らして下さい"
+        },
+        "gaussianBlur": {
+            "name": "ガウス・ブルー",
+            "param": {
+                "size": "サイズ:",
+                "xIntensity": "X 強度",
+                "yIntensity": "Y 強度"
+            }
+        },
+        "grayscale": {
+            "name": "グレースケール",
+            "param": {
+                "mode": "モード",
+                "modeOption": {
+                    "luminance": "ルミナンス",
+                    "luma": "ログイン",
+                    "lightness": "明るさ(HSL)",
+                    "average": "平均(HSI強度)",
+                    "value": "値(HSV)"
+                },
+                "modeOptionDescription": {
+                    "value": "= 最高(R、G、B)"
+                },
+                "mix": "ミックス"
+            }
+        },
+        "hue": {
+            "name": "ログイン",
+            "param": {
+                "colorSpace": "色空間",
+                "colorSpaceOption": {
+                    "oklab": "オクララ",
+                    "perceptualRgb": "許容RGB",
+                    "linearRgb": "リニアRGB"
+                },
+                "rotate": "回転率"
+            }
+        },
+        "negative": {
+            "name": "ログイン",
+            "param": {
+                "colorSpace": "色空間",
+                "colorSpaceOption": {
+                    "perceptualRgb": "許容RGB",
+                    "linearRgb": "リニアRGB"
+                },
+                "invertRed": "逆に赤いチャネル",
+                "invertGreen": "インバーター緑のチャネル",
+                "invertBlue": "青いチャネルを転換して下さい",
+                "invertValue": "価値を転換して下さい"
+            }
+        },
+        "saturation": {
+            "name": "飽和",
+            "param": {
+                "saturation": "飽和"
+            }
+        },
+        "sepia": {
+            "name": "セピア"
+        }
+    },
+    "layerFilterGroup": {
+        "blur": {
+            "name": "ログイン"
+        },
+        "color": {
+            "name": "カラー"
+        },
+        "distort": {
+            "name": "ツイート"
+        },
+        "instagramFilter": {
+            "name": "インスタグラムフィルタ"
+        },
+        "photography": {
+            "name": "プロフィール"
+        },
+        "sharpen": {
+            "name": "シャープン"
+        }
+    },
+    "layoutShortcutGroup": {
+        "color": {
+            "name": "ピックカラー",
+            "controls": {
+                "default": {
+                    "label": "ピックカラー"
+                }
+            }
+        },
+        "deform": {
+            "name": "デフォーム",
+            "controls": {
+                "default": {
+                    "label": "デフォーム"
+                }
+            }
+        },
+        "draw": {
+            "name": "ドロー",
+            "controls": {
+                "default": {
+                    "label": "ドロー"
+                }
+            }
+        },
+        "effects": {
+            "name": "効果",
+            "controls": {
+                "default": {
+                    "label": "効果"
+                }
+            }
+        },
+        "erase": {
+            "name": "リリース",
+            "controls": {
+                "default": {
+                    "label": "リリース"
+                }
+            }
+        },
+        "history": {
+            "name": "プロフィール",
+            "controls": {
+                "undo": {
+                    "label": "ログイン"
+                },
+                "redo": {
+                    "label": "ログイン"
+                }
+            }
+        },
+        "layers": {
+            "name": "レイヤー",
+            "controls": {
+                "default": {
+                    "label": "レイヤー"
+                }
+            }
+        },
+        "search": {
+            "name": "インフォメーション",
+            "controls": {
+                "default": {
+                    "label": "インフォメーション"
+                }
+            }
+        },
+        "selection": {
+            "name": "セレクション",
+            "controls": {
+                "default": {
+                    "label": "セレクション"
+                }
+            }
+        },
+        "settings": {
+            "name": "アクション",
+            "controls": {
+                "default": {
+                    "label": "アクション"
+                }
+            }
+        },
+        "text": {
+            "name": "テキスト",
+            "controls": {
+                "default": {
+                    "label": "テキストの入力/編集"
+                }
+            }
+        },
+        "transform": {
+            "name": "移動/変換",
+            "controls": {
+                "default": {
+                    "label": "移動/変換"
+                }
+            }
+        },
+        "view": {
+            "name": "キャンバスビューポート",
+            "controls": {
+                "default": {
+                    "label": "ズーム/パンの眺め"
+                }
+            }
+        }
+    },
+    "lib": {
+        "tutorial": {
+            "notification": {
+                "gotIt": "お問い合わせ",
+                "dontShowTips": "ヒントを表示しないでください"
+            }
+        }
+    },
+    "measurement": {
+        "pixels": "ピクセル",
+        "millimeters": "ミリメートル",
+        "centimeters": "センチメートル",
+        "inches": "インチ",
+        "pixelsPerInch": "ピクセル/インチ",
+        "pixelsPerMillimeter": "ピクセル/ミリメートル",
+        "pixelsPerCentimeter": "ピクセル/周囲"
+    },
+    "menuBar": {
+        "toolsHeading": "ツール"
+    },
+    "module": {
+        "fileExport": {
+            "title": "輸出イメージ",
+            "saveBackIntroduction": "{fileName} という名前のファイルを開きます.",
+            "saveBackQuestion": "元のファイルに保存しますか?",
+            "fileName": "ファイル名",
+            "fileType": "ファイルの種類",
+            "layers": "レイヤー",
+            "quality": "品質保証",
+            "dithering": "ダイザーリング",
+            "ditheringOption": {
+                "none": "なし",
+                "atkinson": "アキンソン",
+                "atkinsonSerpentine": "アキンソン(蛇口)",
+                "floydSteinberg": "フロイド・ステインバーグ",
+                "floydSteinbergSerpentine": "フロイド・ステインバーグ(蛇口)",
+                "falseFloydSteinberg": "ファルス・フロイド・ステインバーグ",
+                "falseFloydSteinbergSerpentine": "False Floyd Steinberg(蛇口)",
+                "stucki": "スキャッキ",
+                "stuckiSerpentine": "スタッキー(蛇口)"
+            }
+        },
+        "fileNew": {
+            "title": "新しい画像",
+            "preset": "プリセット",
+            "presetPlaceholder": "選択して下さい(任意)",
+            "width": "アクセス",
+            "height": "高さ",
+            "resolution": "ソリューション",
+            "colorProfile": "色のプロフィール",
+            "scaleFactor": "スケール要因"
+        },
+        "fileSaveAs": {
+            "title": "保存イメージとして",
+            "saveBackIntroduction": "{fileName} という名前のファイルを開きます.",
+            "saveBackQuestion": "元のファイルに保存しますか?",
+            "exportDisclaimer": "他のプログラムで画像を共有したり表示したりしたい場合、代わりに「エクスポート」を使用してください.",
+            "fileName": "ファイル名"
+        },
+        "fileTakePhoto": {
+            "title": "写真を撮る",
+            "noCameraError": {
+                "title": "カメラ 利用不可",
+                "message": "デバイスにカメラがないか、カメラへのアクセスが拒否されました."
+            },
+            "selectCamera": {
+                "placeholder": "カメラを選択",
+                "user": "フロント(ユーザー)",
+                "environment": "リア(環境)"
+            }
+        },
+        "imageConvertLayersToImageSequence": {
+            "title": "レイヤーをイメージシーケンスに変換する",
+            "frameDelay": "フレームの遅れ"
+        },
+        "layerEffectBrowser": {
+            "title": "効果ブラウザ",
+            "description": "レイヤーに追加するエフェクトを選択します。 効果は一般に層の色を操作するか、または効果を膨らませるような特別なパターンを加えます.",
+            "loading": "プレビューを生成する...",
+            "generationErrorGeneral": "選択したレイヤーのエフェクトプレビューを生成するときにエラーが発生しました.",
+            "generationErrorUnsupportedType": "選択したレイヤーは、フィルタが適用されていない.",
+            "generationErrorNoLayer": "エフェクトを追加するには、レイヤードックのレイヤーを1つ以上選択してください."
+        },
+        "layerEffectEdit": {
+            "title": "エフェクトの編集",
+            "description": "特定のレイヤーのエフェクトを編集します.",
+            "loading": "プレビューを生成する...",
+            "generalError": "何かが間違っていた。 こちらのメッセージをご覧になる際は、バグを報告してください.",
+            "deleteEffect": "エフェクトの削除",
+            "enableToggle": "アクセス",
+            "resetField": "リセットフィールド",
+            "deleting": "削除効果...",
+            "deleteFilterError": "フィルターを削除しようとするとエラーが発生しました。 こちらのメッセージをご覧になる際は、バグを報告してください.",
+            "applyFilterError": "フィルターの変更を適用する試みの間にエラーが発生しました。 こちらのメッセージをご覧になる際は、バグを報告してください."
+        },
+        "renameLayer": {
+            "title": "レイヤーの名前を変更",
+            "layerName": "新しい名前"
+        }
+    },
+    "moduleGroup": {
+        "file": {
+            "name": "ファイル管理",
+            "description": "デバイスに画像をロードして保存します.",
+            "modules": {
+                "export": {
+                    "name": "輸出イメージ",
+                    "description": "他のエディタで開くことができる普遍的な形式で画像を保存します."
+                },
+                "insertPhoto": {
+                    "name": "写真をインサートする",
+                    "description": "現在開いている画像に新しいレイヤーとして写真を追加します."
+                },
+                "new": {
+                    "name": "新しい画像",
+                    "description": "指定された寸法で新しいイメージを作成します."
+                },
+                "open": {
+                    "name": "開いたイメージ",
+                    "description": "新規ワークスペースで画像やプロジェクトファイルを開きます."
+                },
+                "quickLoad": {
+                    "name": "速い負荷",
+                    "description": "保存したファイルを素早く保存します."
+                },
+                "quickSave": {
+                    "name": "クイック保存",
+                    "description": "現在のファイルを一時保存に保存します."
+                },
+                "saveAs": {
+                    "name": "保存イメージとして",
+                    "description": "情報を失うことなく、OpenGraphicaで再オープンできるプロジェクト形式で画像を保存します."
+                },
+                "takePhoto": {
+                    "name": "写真を撮る",
+                    "description": "カメラとウェブカムから写真を撮ってイメージに挿します."
+                }
+            }
+        },
+        "history": {
+            "name": "編集履歴",
+            "description": "画像編集履歴を移動させる操作.",
+            "modules": {
+                "redo": {
+                    "name": "歴史 レオ",
+                    "description": "最後の元に戻ったアクション."
+                },
+                "undo": {
+                    "name": "ユニドの歴史",
+                    "description": "最後のアクションを解除します."
+                }
+            }
+        },
+        "image": {
+            "name": "イメージのキャンバス",
+            "description": "画像キャンバスに影響を与える操作.",
+            "modules": {
+                "convertLayersToImageSequence": {
+                    "name": "レイヤーをイメージシーケンスに変換する",
+                    "description": "選択したレイヤーをイメージシーケンスレイヤー(アニメーション)に変換します."
+                },
+                "convertLayersFlatten": {
+                    "name": "レイヤーをフラットにイメージに変換する",
+                    "description": "すべてのレイヤーを単一のイメージレイヤーにマージし、レイヤースタックの一番上にレイヤーを追加します."
+                },
+                "copy": {
+                    "name": "選択したレイヤーのコピー",
+                    "description": "選択したレイヤーをクリップボードにコピーします."
+                },
+                "copyAll": {
+                    "name": "すべてのレイヤーをコピーする",
+                    "description": "キャンバス上のすべてのレイヤーをクリップボードにPNGイメージとしてコピーします."
+                },
+                "cut": {
+                    "name": "カット",
+                    "description": "選択したレイヤーを削除し、クリップボードにコピーします."
+                },
+                "paste": {
+                    "name": "ペースト",
+                    "description": "クリップボードからキャンバスに画像をインサートします."
+                }
+            }
+        },
+        "layer": {
+            "name": "レイヤー",
+            "description": "レイヤーに影響を与える操作.",
+            "modules": {
+                "rename": {
+                    "name": "レイヤーの名前を変更",
+                    "description": "レイヤーの名前を変更する"
+                },
+                "layerEffectBrowser": {
+                    "name": "効果ブラウザ",
+                    "description": "現在選択したレイヤー(s)またはレイヤーグループ(s)に画像効果を追加します."
+                }
+            }
+        },
+        "tmp": {
+            "name": "一時的なモジュール",
+            "description": "初期開発中にのみ固執するモジュール.",
+            "modules": {
+                "notYetImplemented": {
+                    "name": "まだ実装されていない",
+                    "description": "警告を表示します."
+                }
+            }
+        },
+        "tutorial": {
+            "name": "チュートリアル",
+            "description": "OpenGraphicaの使い方を学ぶ.",
+            "modules": {
+                "welcome": {
+                    "name": "お問い合わせ",
+                    "description": "画像処理を開始."
+                }
+            }
+        }
+    },
+    "option": {
+        "bottom": "ボトム",
+        "left": "ふりがな",
+        "right": "アクセス",
+        "top": "トップページ"
+    },
+    "theme": {
+        "light": "ライトライト",
+        "dark": "ダーク"
+    },
+    "toolbar": {
+        "cropResize": {
+            "title": "クロップとリサイズ",
+            "linkWidthHeight": "リンク幅/高さ",
+            "size": "サイズ:",
+            "width": "アクセス",
+            "height": "高さ",
+            "dimensionUnits": "次元の単位",
+            "resolution": "ソリューション",
+            "resolutionUnits": "決断の単位",
+            "snapping": {
+                "title": "スナップ",
+                "enable": "スナップを有効にする"
+            }
+        },
+        "draw": {
+            "brushColor": "ブラシ色",
+            "brushSize": "サイズ:"
+        },
+        "freeTransform": {
+            "clearSelection": "明確な選択",
+            "pickLayer": {
+                "label": "ピックアップ層",
+                "auto": "オートマチック",
+                "current": "現在の位置:"
+            },
+            "snapping": {
+                "title": "スナップ",
+                "rotationSnap": "回転スナップ"
+            },
+            "metrics": {
+                "title": "メトリック",
+                "position": "ポジション",
+                "width": "アクセス",
+                "height": "高さ",
+                "rotation": "ローテーション",
+                "resetRotation": "リセット回転",
+                "noLayers": "レイヤーなし."
+            },
+            "actions": {
+                "title": "アクション",
+                "applyTransform": "変換を適用",
+                "expandToImageSize": "イメージのサイズへの層の傷",
+                "trimEmptySpace": "トリム空のスペース"
+            }
+        },
+        "general": {
+            "settings": "コンテンツ"
+        },
+        "selection": {
+            "selectionShape": {
+                "label": "選択の形",
+                "rectangle": "長方形",
+                "ellipse": "エリス",
+                "freePolygon": "自由なポリゴン",
+                "freePolygonShort": "自由な多",
+                "tonalArea": "トーナルエリア"
+            },
+            "selectionCombineMode": {
+                "label": "選択 結合モード",
+                "add": "追加する",
+                "subtract": "サブトラクト",
+                "intersect": "インターセクト"
+            }
+        },
+        "text": {
+            "font": "トピックス",
+            "size": "サイズ:",
+            "bold": "ボールド",
+            "italic": "イタリック",
+            "strikethrough": "ストライクルー",
+            "underline": "サイトマップ",
+            "fill": "お問い合わせ",
+            "fillTooltip": "手紙の端に表示する色"
+        },
+        "zoom": {
+            "zoomOut": "ズームアウト",
+            "zoomIn": "ズームイン",
+            "rotateCounterClockwise": "反時計回りを回して下さい",
+            "rotateClockwise": "時計回りの回転",
+            "fit": "フィット",
+            "flip": "フリップ"
+        }
+    },
+    "toolGroup": {
+        "draw": {
+            "name": "ドロー",
+            "description": "ブラシ、鉛筆、ペン、ベクターアートの描画ツール.",
+            "tools": {
+                "brush": {
+                    "name": "ブラシ",
+                    "description": "ラスター層に描画するブラシ."
+                }
+            }
+        },
+        "image": {
+            "name": "サイトマップ",
+            "description": "一般的な画像の解像度操作.",
+            "tools": {
+                "cropResize": {
+                    "name": "クロップとリサイズ",
+                    "description": "トリミング、サイズ変更、アスペクト比変更、画像再サンプル."
+                }
+            }
+        },
+        "selection": {
+            "name": "セレクション",
+            "description": "アクティブなレイヤーの領域を選択し、レイヤーへの操作は選択中にのみ行われます.",
+            "tools": {
+                "selection": {
+                    "name": "セレクション",
+                    "description": "対象となる編集のための画像の領域を選択します."
+                }
+            }
+        },
+        "text": {
+            "name": "テキスト",
+            "description": "テキストレイヤーを操作するためのツール.",
+            "tools": {
+                "text": {
+                    "name": "テキスト",
+                    "description": "テキストレイヤーの作成と編集."
+                }
+            }
+        },
+        "transform": {
+            "name": "トランスフォーム",
+            "description": "レイヤーを移動、回転、スケーリングするためのツール.",
+            "tools": {
+                "freeTransform": {
+                    "name": "フリートランスフォーム",
+                    "description": "選択したレイヤーを移動、回転、またはスケールします."
+                }
+            }
+        },
+        "view": {
+            "name": "Viewportの表示",
+            "description": "キャンバスのビューポート表示を制御するためのツール.",
+            "tools": {
+                "name": "ズーム",
+                "description": "あなたが見ることができるイメージの量を制御するためにキャンバスをズームアウトします."
+            }
+        }
+    },
+    "tutorialTip": {
+        "drawToolIntroduction": {
+            "title": "ドローツール",
+            "introduction": [
+                "描画ツールを使用すると、ラインと形状を作成できます."
+            ]
+        },
+        "explainCanvasViewportControls": {
+            "title": "キャンバスの移動",
+            "introduction": [
+                "どのツールを選択しても、キャンバスビューをコントロールできます.",
+                "{anyTool} が選択されている場合:"
+            ],
+            "anyTool": "任意のツール",
+            "body": {
+                "mouse": [
+                    "{zooming} - {mouseWheel}を使用してズームインおよびアウトします.",
+                    "{panning} - {rightMouseButton}をクリックしてキャンバスを移動する."
+                ],
+                "touch": [
+                    "{zooming} - 2本の指とピンチを使用してズームインとアウトします.",
+                    "{panning} - 2本の指を使ってキャンバスを動かすためにそれらを一緒に滑らせて下さい."
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "動物園",
+                "panning": "パンニング",
+                "mouseWheel": "マウスの車輪",
+                "rightMouseButton": "右マウスボタン"
+            }
+        },
+        "freeTransformToolIntroduction": {
+            "title": "無料変換ツール",
+            "introduction": [
+                "このツールは、レイヤーを移動、サイズ変更、回転させます。 選択したレイヤーの周りの境界ボックスが表示されます.",
+                "で {autoMode}:"
+            ],
+            "autoMode": "自動モード",
+            "body": {
+                "mouse": [
+                    "{selection} - レイヤーの{leftClick} を選択して選択します.",
+                    "{moving} - レイヤーの{左クリック}とドラッグして移動します.",
+                    "{resizing} - {leftClick} とリサイズハンドルをドラッグします."
+                ],
+                "touch": [
+                    "{selection} - レイヤーをタップして選択します.",
+                    "{moving} - レイヤーをタップしてドラッグして移動します.",
+                    "{resizing} - 1つの指を使用して、リサイズハンドルをドラッグします."
+                ]
+            },
+            "bodyTitle": {
+                "selection": "セレクション",
+                "moving": "アクセス",
+                "resizing": "リサイジング",
+                "leftClick": "左クリック"
+            }
+        },
+        "selectionToolIntroduction": {
+            "title": "選択ツール",
+            "introduction": [
+                "選択ツールを使用すると、画像の特定の部分を選択して、編集の影響を制限することができます."
+            ],
+            "body": {
+                "mouse": [
+                    "{createSelection} - クリックして {左にドラッグ Click} をクリックして選択を作成します."
+                ],
+                "touch": [
+                    "{createSelection} - 1本の指で描画して選択を作成します."
+                ],
+                "end": [
+                    "お問い合わせ 形状} - 選択を引くためにどのような形状が使用されます.",
+                    "{selectionCombineMode} - 現在の選択は、既存の選択と組み合わせる方法."
+                ]
+            },
+            "bodyTitle": {
+                "createSelection": "選択の作成",
+                "leftClick": "左クリック",
+                "selectionShape": "選択の形",
+                "selectionCombineMode": "選択 結合モード"
+            }
+        },
+        "zoomToolIntroduction": {
+            "title": "ズーム/パンツール",
+            "introduction": [
+                "このツールは、画像にズームインし、周りのビューを移動することを可能にします."
+            ],
+            "body": {
+                "mouse": [
+                    "{zooming} - {leftClick} をズームイン、 {ctrlLeftClick} をズームアウトします.",
+                    "{panning} - キャンバスを移動する {leftMouseButton} をクリックしてドラッグします."
+                ],
+                "touch": [
+                    "{zooming} - 1つの指でタップしてズームインします。 2本の指でタップしてズームアウトします.",
+                    "{panning} - 1本の指でタップしてドラッグしてキャンバスを動かす."
+                ]
+            },
+            "bodyTitle": {
+                "zooming": "動物園",
+                "panning": "パンニング",
+                "leftClick": "左クリック",
+                "ctrlLeftClick": "Ctrl + 左クリック",
+                "leftMouseButton": "左マウスボタン"
+            }
+        }
+    }
+}

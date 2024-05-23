@@ -9,7 +9,8 @@
         "build:library": "webpack --mode=production --config ./webpack.config.library.js",
         "build:website": "webpack --mode=production --config ./webpack.config.website.js",
         "build:website:inspect": "node --inspect webpack --config ./webpack.config.website.js --stats verbose",
-        "serve": "npm run dev"
+        "serve": "npm run dev",
+        "translate": "node ./scripts/translate.js"
     },
     "dependencies": {
         "axios": "0.21.1",
