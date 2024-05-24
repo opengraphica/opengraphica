@@ -4,7 +4,7 @@ import { Bezier } from 'bezier-js';
 
 import { PointerTracker } from './base';
 import BaseCanvasMovementController from './base-movement';
-import { cursorHoverPosition, brushShape, brushColor, brushSize } from '../store/draw-state';
+import { cursorHoverPosition, brushShape, brushColor, brushSize } from '../store/draw-brush-state';
 import { blitActiveSelectionMask, activeSelectionMask, appliedSelectionMask } from '../store/selection-state';
 
 import { decomposeMatrix } from '@/lib/dom-matrix';
@@ -38,7 +38,6 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
 
     private brushShapeUnwatch: WatchStopHandle | null = null;
     private brushSizeUnwatch: WatchStopHandle | null = null;
-    private ctrlKeyUnwatch: WatchStopHandle | null = null;
     private selectedLayerIdsUnwatch: WatchStopHandle | null = null;
 
     private drawingPointerId: number | null = null;
@@ -91,10 +90,6 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
             }
         }, { immediate: true });
 
-        this.ctrlKeyUnwatch = watch([isCtrlOrMetaKeyPressed], ([isCtrlOrMetaKeyPressed]) => {
-            this.handleCursorIcon();
-        });
-
         this.brushShapeUnwatch = watch([brushShape, brushColor], async ([brushShape, brushColor]) => {
             if (this.brushShapeImage) {
                 URL.revokeObjectURL(this.brushShapeImage.src);
@@ -143,8 +138,6 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         this.brushShapeUnwatch = null;
         this.brushSizeUnwatch?.();
         this.brushSizeUnwatch = null;
-        this.ctrlKeyUnwatch?.();
-        this.ctrlKeyUnwatch = null;
         this.selectedLayerIdsUnwatch?.();
         this.selectedLayerIdsUnwatch = null;
 
@@ -194,18 +187,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                     layer.drafts = null;
                 }
             })();
-            // this.drawingPointerId = this.touches[0].id;
-            // this.drawStart();
         }
-    }
-
-    onMultiTouchTap(touches: PointerTracker[]) {
-        super.onMultiTouchTap(touches);
-        // if (touches.length === 1) {
-        //     this.onZoomIn();
-        // } else if (touches.length === 2) {
-        //     this.onZoomOut();
-        // }
     }
 
     onPointerMove(e: PointerEvent): void {

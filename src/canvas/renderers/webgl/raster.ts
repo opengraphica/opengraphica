@@ -21,6 +21,7 @@ import type { DrawWorkingFileLayerOptions } from '@/types';
 import { createEmptyCanvasWith2dContext } from '@/lib/image';
 
 export default class RasterLayerRenderer extends BaseLayerRenderer {
+    private stopWatchDrafts: WatchStopHandle | undefined;
     private stopWatchVisible: WatchStopHandle | undefined;
     private stopWatchSize: WatchStopHandle | undefined;
     private stopWatchTransform: WatchStopHandle | undefined;
@@ -33,6 +34,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
     private bakedTexture: InstanceType<typeof Texture> | undefined;
     private sourceTexture: InstanceType<typeof Texture> | undefined;
     private lastChunkUpdateId: string | undefined = undefined;
+    private isVisible: boolean = true;
 
     async onAttach(layer: WorkingFileRasterLayer<ColorModel>) {
 
@@ -49,8 +51,12 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
             this.draftTexture && (this.draftTexture.needsUpdate = true);
         };
         (this.threejsScene ?? canvasStore.get('threejsScene'))?.add(this.plane);
+        this.isVisible = layer.visible;
 
-        const { visible, width, height, transform, filters, data } = toRefs(layer);
+        const { drafts, visible, width, height, transform, filters, data } = toRefs(layer);
+        this.stopWatchDrafts = watch([drafts], ([drafts]) => {
+            this.update({ drafts });
+        }, { immediate: true });
         this.stopWatchVisible = watch([visible], ([visible]) => {
             this.update({ visible });
         }, { immediate: true });
@@ -81,7 +87,18 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
 
     async onUpdate(updates: Partial<WorkingFileRasterLayer<ColorModel>>) {
         if (updates.visible != null) {
-            this.plane && (this.plane.visible = updates.visible);
+            this.isVisible = updates.visible;
+        }
+        if (updates.visible != null || updates.drafts != null) {
+            let oldVisibility = this.plane?.visible;
+            let shouldBeVisible = this.isVisible;
+            if (updates.drafts?.[0]?.mode === 'replace') {
+                shouldBeVisible = false;
+            }
+            this.plane && (this.plane.visible = shouldBeVisible);
+            if (this.plane?.visible !== oldVisibility) {
+                canvasStore.set('dirty', true);
+            }
         }
         if (updates.width || updates.height) {
             const width = updates.width || this.planeGeometry?.parameters.width;
@@ -193,6 +210,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
         this.draftTexture?.dispose();
         this.draftTexture = undefined;
         this.disposeSourceTexture();
+        this.stopWatchDrafts?.();
         this.stopWatchVisible?.();
         this.stopWatchSize?.();
         this.stopWatchTransform?.();

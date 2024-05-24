@@ -10,7 +10,8 @@
                     "view",
                     "transform",
                     "selection",
-                    "draw"
+                    "draw",
+                    "erase"
                 ]
             }
         },

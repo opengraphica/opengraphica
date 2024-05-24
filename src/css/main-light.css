@@ -9590,6 +9590,20 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-layout-menu-bar.is-vertical > .is-flex .ogr-menu-section .el-button-group:last-child, .opengraphica .ogr-layout-menu-bar.is-vertical > .is-flex .ogr-menu-section .ogr-single-button-group:last-child {
   margin-bottom: 0.375rem;
 }
+.opengraphica .ogr-list--dashed {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+.opengraphica .ogr-list--dashed > li {
+  margin: 0;
+  padding: 0 0 0 0.5em;
+}
+.opengraphica .ogr-list--dashed > li:before {
+  content: "-";
+  position: relative;
+  left: -0.5em;
+}
 .opengraphica .ogr-logo h1 {
   font-size: 3.5rem;
   font-weight: 100;

@@ -111,6 +111,7 @@ export interface WorkingFileLayerDraft {
     height: number; // The actual height drawn across on the canvas
     logicalHeight: number; // The pixel height of the preview data, stretched to `height`
     logicalWidth: number; // The pixel width of the preview data, stretched to `width`
+    mode?: 'replace' | 'source-over'; // If 'replace', the original layer contents will not be drawn while the draft is in place.
     transform: DOMMatrix; // Should be an inverse transform to undo the global transform
     updateChunks: WorkingFileLayerDraftChunk[]; // List of canvas chunks to update a raster image preview
     width: number; // The actual width drawn across the canvas

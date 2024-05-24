@@ -74,8 +74,16 @@
                                         />
                                     </template>
                                     <template v-else>
-                                        <div class="px-3 py-2">
-                                            {{ $t(control.label) }}
+                                        <div class="px-4 py-3">
+                                            <strong class="has-text-weight-bold">{{ $t(control.label) }}</strong>
+                                            <ol v-if="$tm(control.description)?.length > 0" class="ogr-list--dashed">
+                                                <li
+                                                    v-for="descriptionLine of $tm(control.description)"
+                                                    :key="descriptionLine"
+                                                >
+                                                    {{ descriptionLine }}
+                                                </li>
+                                            </ol>
                                         </div>
                                     </template>
                                 </el-popover>
@@ -169,6 +177,7 @@ export default defineComponent({
         let pointerDownButton: number;
         let pointerDownShowDock: boolean = false;
         let pointerPressHoldTimeoutHandle: number | undefined;
+        let lastPointerTap: number = 0;
         const { viewWidth: viewportWidth, viewHeight: viewportHeight } = toRefs(canvasStore.state);
         const { activeToolGroup, activeTool } = toRefs(editorStore.state);
 
@@ -291,18 +300,20 @@ export default defineComponent({
             onPointerUpControlButton(event, control);
         }
         function onMouseEnterControlButton(event: MouseEvent, control: LayoutShortcutGroupDefinitionControlButton) {
-            // if (!(control.showDock || control.expanded)) {
-            //     if (!control.popoverVisible) {
-            //         control.popoverVisible = true;
-            //     }
-            // }
+            if (control.action?.type === 'dock') return;
+            if (window.performance.now() - lastPointerTap > 350 && !(control.showDock || control.expanded)) {
+                if (!control.popoverVisible) {
+                    control.popoverVisible = true;
+                }
+            }
         }
         function onMouseLeaveControlButton(event: MouseEvent, control: LayoutShortcutGroupDefinitionControlButton) {
-            // if (!(control.showDock || control.expanded)) {
-            //     if (control.popoverVisible) {
-            //         control.popoverVisible = false;
-            //     }
-            // }
+            if (control.action?.type === 'dock') return;
+            if (!(control.showDock || control.expanded)) {
+                if (control.popoverVisible) {
+                    control.popoverVisible = false;
+                }
+            }
             clearTimeout(pointerPressHoldTimeoutHandle);
         }
         function onMouseDownWindow(event: MouseEvent) {
@@ -319,6 +330,9 @@ export default defineComponent({
             if (event.target && activeControlDock) {
                 const target = event.target as Element;
                 activeControlDock.popoverVisible = false;
+            }
+            if (control.action?.type !== 'dock') {
+                control.popoverVisible = false;
             }
             pointerDownElement = event.target;
             pointerDownId = (event as TouchEvent).touches ? (event as TouchEvent).touches[0].identifier : 0;
@@ -350,6 +364,7 @@ export default defineComponent({
                 pointerDownButton = -1;
                 pointerDownId = -1;
                 ((event.target as HTMLButtonElement).closest('button') as any).focus();
+                lastPointerTap = window.performance.now();
             }
         }
         function onPointerDownWindow(event: TouchEvent | MouseEvent) {

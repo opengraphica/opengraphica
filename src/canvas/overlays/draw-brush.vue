@@ -21,11 +21,11 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, watch, onMounted, onUnmounted, toRefs } from 'vue';
-import { brushShape, brushSize, cursorHoverPosition } from '../store/draw-state';
+import { brushShape, brushSize, cursorHoverPosition } from '../store/draw-brush-state';
 import canvasStore from '@/store/canvas';
 
 export default defineComponent({
-    name: 'CanvasOverlaySelection',
+    name: 'CanvasOverlayDrawBrush',
     setup(props, { emit }) {
         const devicePixelRatio = window.devicePixelRatio || 1;
 

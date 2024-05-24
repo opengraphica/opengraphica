@@ -15,11 +15,13 @@ interface EditorDeferredTask {
 }
 
 interface TutorialFlags {
+    drawToolIntroduction?: boolean;
+    eraseToolIntroduction?: boolean;
     explainCanvasViewportControls?: boolean;
-    zoomToolIntroduction?: boolean;
     freeTransformToolIntroduction?: boolean;
     selectionToolIntroduction?: boolean;
-    drawToolIntroduction?: boolean;
+    zoomToolIntroduction?: boolean;
+
 }
 
 const toolGroups: { [key: string]: ToolGroupDefinition } = toolGroupsConfig as any;

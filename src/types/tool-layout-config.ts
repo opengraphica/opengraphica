@@ -29,6 +29,7 @@ export interface LayoutShortcutGroupDefinitionControlButton {
     type: 'button';
     icon: string;
     label: string;
+    description: string;
     displayTitle?: string;
     expanded?: boolean;
     showDock?: boolean;

@@ -38,6 +38,7 @@
         "updateFile": "Update File",
         "updateLayer": "Update Layer",
         "updateDrawLayer": "Draw on Layer",
+        "updateEraseLayer": "Erase from Layer",
         "updateLayerFilterParams": "Update Layer Effect",
         "updateSelectionCombineMode": "Update Selection Combine Mode"
     },
@@ -415,19 +416,16 @@
         }
     },
     "layoutShortcutGroup": {
-        "color": {
-            "name": "Pick Color",
-            "controls": {
-                "default": {
-                    "label": "Pick Color"
-                }
-            }
-        },
         "deform": {
             "name": "Deform",
             "controls": {
                 "default": {
-                    "label": "Deform"
+                    "label": "Deform",
+                    "description": [
+                        "Sharpen or blur the image",
+                        "Bulge, pinch areas of the image",
+                        "Clone areas of the image"
+                    ]
                 }
             }
         },
@@ -435,7 +433,11 @@
             "name": "Draw",
             "controls": {
                 "default": {
-                    "label": "Draw"
+                    "label": "Draw",
+                    "description": [
+                        "Use art brushes",
+                        "Create shapes or gradients"
+                    ]
                 }
             }
         },
@@ -443,7 +445,11 @@
             "name": "Effects",
             "controls": {
                 "default": {
-                    "label": "Effects"
+                    "label": "Effects",
+                    "description": [
+                        "Manipulate layer colors",
+                        "Add layer filters, such as blurring effects"
+                    ]
                 }
             }
         },
@@ -451,7 +457,10 @@
             "name": "Erase",
             "controls": {
                 "default": {
-                    "label": "Erase"
+                    "label": "Erase",
+                    "description": [
+                        "Erase the effects of the draw tool"
+                    ]
                 }
             }
         },
@@ -470,7 +479,8 @@
             "name": "Layers",
             "controls": {
                 "default": {
-                    "label": "Layers"
+                    "label": "Layers",
+                    "description": []
                 }
             }
         },
@@ -478,7 +488,8 @@
             "name": "Search",
             "controls": {
                 "default": {
-                    "label": "Search"
+                    "label": "Search",
+                    "description": []
                 }
             }
         },
@@ -486,7 +497,11 @@
             "name": "Selection",
             "controls": {
                 "default": {
-                    "label": "Selection"
+                    "label": "Selection",
+                    "description": [
+                        "Restrict the editing area",
+                        "Cut, copy, delete specific areas"
+                    ]
                 }
             }
         },
@@ -494,7 +509,8 @@
             "name": "Actions",
             "controls": {
                 "default": {
-                    "label": "Actions"
+                    "label": "Actions",
+                    "description": []
                 }
             }
         },
@@ -502,7 +518,11 @@
             "name": "Text",
             "controls": {
                 "default": {
-                    "label": "Insert / Edit Text"
+                    "label": "Text",
+                    "description": [
+                        "Insert text layers",
+                        "Edit existing text layers"
+                    ]
                 }
             }
         },
@@ -510,7 +530,11 @@
             "name": "Move / Transform",
             "controls": {
                 "default": {
-                    "label": "Move / Transform"
+                    "label": "Move / Transform",
+                    "description": [
+                        "Move, scale, rotate layers",
+                        "Manage layer boundaries"
+                    ]
                 }
             }
         },
@@ -518,7 +542,11 @@
             "name": "Canvas Viewport",
             "controls": {
                 "default": {
-                    "label": "Zoom / Pan View"
+                    "label": "Viewport",
+                    "description": [
+                        "Zoom in and out",
+                        "Pan or rotate the view"
+                    ]
                 }
             }
         }
@@ -766,8 +794,11 @@
                 "enable": "Enable Snapping"
             }
         },
-        "draw": {
+        "drawBrush": {
             "brushColor": "Brush Color",
+            "brushSize": "Size"
+        },
+        "eraseBrush": {
             "brushSize": "Size"
         },
         "freeTransform": {
@@ -841,8 +872,18 @@
             "description": "Brushes, pencils, pens, and vector art drawing tools.",
             "tools": {
                 "brush": {
-                    "name": "Brush",
+                    "name": "Draw Brush",
                     "description": "Brushes that draw on raster layers."
+                }
+            }
+        },
+        "erase": {
+            "name": "Erase",
+            "description": "Brushes, pencils, pens, that erase.",
+            "tools": {
+                "brush": {
+                    "name": "Erase Brush",
+                    "description": "Erases data from raster layers."
                 }
             }
         },
@@ -900,6 +941,12 @@
             "title": "Draw Tool",
             "introduction": [
                 "The draw tool lets you create lines and shapes."
+            ]
+        },
+        "eraseToolIntroduction": {
+            "title": "Erase Tool",
+            "introduction": [
+                "The erase tool allows you to remove parts of the layer, making them transparent."
             ]
         },
         "explainCanvasViewportControls": {

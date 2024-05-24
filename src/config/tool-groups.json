@@ -6,13 +6,31 @@
             "brush": {
                 "name": "toolGroup.draw.tools.brush.name",
                 "description": "toolGroup.draw.tools.brush.description",
-                "controller": "draw",
+                "controller": "draw-brush",
                 "toolbar": {
                     "position": "auto",
-                    "target": "draw"
+                    "target": "draw-brush"
                 },
                 "overlays": [
-                    "draw"
+                    "draw-brush"
+                ]
+            }
+        }
+    },
+    "erase": {
+        "name": "toolGroup.erase.name",
+        "description": "toolGroup.erase.description",
+        "tools": {
+            "brush": {
+                "name": "toolGroup.erase.tools.brush.name",
+                "description": "toolGroup.erase.tools.brush.description",
+                "controller": "erase-brush",
+                "toolbar": {
+                    "position": "auto",
+                    "target": "erase-brush"
+                },
+                "overlays": [
+                    "erase-brush"
                 ]
             }
         }

@@ -23,7 +23,8 @@ export default defineComponent({
     },
     components: {
         'toolbar-crop-resize': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-crop-resize' */ `./toolbar-crop-resize.vue`)),
-        'toolbar-draw': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-draw' */ `./toolbar-draw.vue`)),
+        'toolbar-draw-brush': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-draw-brush' */ `./toolbar-draw-brush.vue`)),
+        'toolbar-erase-brush': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-erase-brush' */ `./toolbar-erase-brush.vue`)),
         'toolbar-free-transform': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-free-transform' */ `./toolbar-free-transform.vue`)),
         'toolbar-selection': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-selection' */ `./toolbar-selection.vue`)),
         'toolbar-text': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-text' */ `./toolbar-text.vue`)),
