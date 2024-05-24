@@ -26,6 +26,10 @@ export interface CreateImageFromOptions {
  * @param imageData ImageData object that holds the image to check.
  * @param options Additional options.
  * @returns Object that contains information about the trimming bounds.
+ *          Top - the index of the last transparent row from the top, before opaque image data
+ *          Bottom - the index of the first transparent row after opaque image data from the top
+ *          Left - the index of the last transparent column from the left, before opaque image data
+ *          Right - the index of the first transparent row after opaque image data from the left
  */
 export function getImageDataEmptyBounds(imageData: ImageData, options: GetImageDataEmptyBoundsOptions = {}): ImageDataEmptyBounds {
     const emptyColor: number[] | null = options.emptyColor || null;
@@ -46,11 +50,12 @@ export function getImageDataEmptyBounds(imageData: ImageData, options: GetImageD
     };
 
     const { data, width, height } = imageData;
+    const widthX4 = width * 4;
 
     trimTop:
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
-            const k = ((y * (width * 4)) + (x * 4));
+            const k = ((y * widthX4) + (x * 4));
             if (data[k + 3] <= alphaTolerance) {
                 continue;
             }
@@ -70,7 +75,7 @@ export function getImageDataEmptyBounds(imageData: ImageData, options: GetImageD
     trimBottom:
     for (let y = height - 1; y >= 0; y--) {
         for (let x = width - 1; x >= 0; x--) {
-            const k = ((y * (width * 4)) + (x * 4));
+            const k = ((y * widthX4) + (x * 4));
             if (data[k + 3] <= alphaTolerance) {
                 continue;
             }
@@ -89,8 +94,8 @@ export function getImageDataEmptyBounds(imageData: ImageData, options: GetImageD
 
     trimLeft:
     for (let x = 0; x < width; x++) {
-        for (let y = 0; y < height; y++) {
-            const k = ((y * (width * 4)) + (x * 4));
+        for (let y = bounds.top; y < bounds.bottom; y++) {
+            const k = ((y * widthX4) + (x * 4));
             if (data[k + 3] <= alphaTolerance) {
                 continue;
             }
@@ -109,8 +114,8 @@ export function getImageDataEmptyBounds(imageData: ImageData, options: GetImageD
 
     trimRight:
     for (let x = width - 1; x >= 0; x--) {
-        for (let y = height - 1; y >= 0; y--) {
-            const k = ((y * (width * 4)) + (x * 4));
+        for (let y = bounds.top; y < bounds.bottom; y++) {
+            const k = ((y * widthX4) + (x * 4));
             if (data[k + 3] <= alphaTolerance) {
                 continue;
             }

@@ -20,7 +20,7 @@
             />
         </header>
         <div class="ogr-layout-dnd-center" :aria-busy="isShowHistoryNotification && !isHistoryNotificationCompleted">
-            <aside aria-label="Left Sidebar" class="sidebar-left" ref="sidebarLeft">
+            <aside aria-label="Left Sidebar" class="ogr-sidebar-left" ref="sidebarLeft">
                 <template v-if="!isActiveToolbarExclusive && config.menuBar && menuBarPosition === 'left'">
                     <app-layout-menu-bar :config="config.menuBar" layout-placement="left" @resize="onResizeLayout" />
                 </template>
@@ -36,7 +36,7 @@
                 @pointerdown="onPointerDownMain"
                 @wheel="onWheelMain"
             />
-            <aside aria-label="Right Sidebar" class="sidebar-right" ref="sidebarRight">
+            <aside aria-label="Right Sidebar" class="ogr-sidebar-right" ref="sidebarRight">
                 <template v-if="showDock && !isActiveToolbarExclusive && config.dock && dockPosition === 'right'">
                     <app-layout-dock :config="config.dock" layout-placement="right" @resize="onResizeLayout" />
                 </template>
@@ -166,7 +166,7 @@ export default defineComponent({
 
         watch(() => [footerToolbarComponent.value, footerElement.value], () => {
             calculateFooterHeight();
-        })
+        }, { immediate: true })
 
         onMounted(async () => {
             if (editorStore.state.activeToolGroupRestore) {
@@ -183,6 +183,11 @@ export default defineComponent({
             window.addEventListener('touchend', onTouchEndWindow);
             window.addEventListener('pointerup', onPointerUpWindow);
             window.addEventListener('pointermove', onPointerMoveWindow);
+
+            nextTick(() => {
+                calculateDndArea();
+                onResizeLayout();
+            });
 
             emit('dnd-ready', { mainElement: mainElement.value });
             appEmitter.emit('app.canvas.resetTransform');

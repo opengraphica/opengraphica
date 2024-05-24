@@ -4,6 +4,7 @@
             <template #default>
                 <component
                     :is="name"
+                    :key="name + '_' + languageOverride"
                     :is-dialog="isDialog"
                     :dialog-opened="dialogOpened"
                     v-bind:="props"
@@ -20,7 +21,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, defineAsyncComponent } from 'vue';
+import { computed, defineComponent, defineAsyncComponent } from 'vue';
+import preferencesStore from '@/store/preferences'
 import ElLoading from 'element-plus/lib/components/loading/index';
 
 export default defineComponent({
@@ -57,6 +59,8 @@ export default defineComponent({
     },
     setup(props, { emit }) {
 
+        const languageOverride = computed(() => preferencesStore.state.languageOverride);
+
         function onCloseDock() {
             emit('close', ...arguments);
         }
@@ -70,6 +74,7 @@ export default defineComponent({
         }
         
         return {
+            languageOverride,
             onCloseDock,
             onUpdateDialogSize,
             onUpdateTitle

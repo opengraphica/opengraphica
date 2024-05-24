@@ -13,9 +13,7 @@
                     @dnd-ready="onDndLayoutReady($event)"
                     @resize="onResizeLayoutContainer($event)"
                 />
-                <app-menu-drawers
-                    :key="'app-menu-drawers-' + languageOverride"
-                />
+                <app-menu-drawers />
                 <app-dialogs
                     :key="'app-dialogs-' + languageOverride"
                 />

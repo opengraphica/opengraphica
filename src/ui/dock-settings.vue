@@ -222,7 +222,7 @@
                 <el-scrollbar>
                     <el-form novalidate="novalidate" action="javascript:void(0)">
                         <!-- Prefs: Theme -->
-                        <el-form-item class="el-form-item--menu-item mb-1" :label="$t('dock.settings.prefs.theme')">
+                        <el-form-item class="el-form-item--menu-item" :label="$t('dock.settings.prefs.theme')">
                             <el-radio-group
                                 v-model="activeTheme"
                                 :disabled="!!loadingThemeName"
@@ -237,7 +237,7 @@
                             </el-radio-group>
                         </el-form-item>
                         <!-- Prefs: Language -->
-                        <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.language')">
+                        <el-form-item class="el-form-item--menu-item mb-1 el-form-item--has-content-right" :label="$t('dock.settings.prefs.language')">
                             <el-select v-model="languageOverride" size="small" style="width: 6rem;">
                                 <el-option-group>
                                     <el-option value="" :label="'[' + $t('dock.settings.prefs.default') + ']'" />

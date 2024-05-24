@@ -25,13 +25,16 @@ const i18n = createI18n({
 });
 
 export async function initializeI18n() {
-    const userLanguage = preferencesStore.state.languageOverride ?? (window.navigator?.language ?? 'en').split('-')[0].toLowerCase() ?? 'en';
+    const userLanguage = preferencesStore.state.languageOverride || (window.navigator?.language ?? 'en').split('-')[0].toLowerCase() || 'en';
     if (userLanguage != '') {
         await setEditorLanguage(userLanguage);
     }
 }
 
 export async function setEditorLanguage(language: string) {
+    if (language == '') {
+        language = preferencesStore.state.languageOverride || (window.navigator?.language ?? 'en').split('-')[0].toLowerCase() || 'en';
+    }
     if (language !== 'en') {
         i18n.global.setLocaleMessage(language, await loadLanguage(language));
     }

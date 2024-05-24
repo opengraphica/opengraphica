@@ -9329,13 +9329,13 @@ body.ogr-full-page .opengraphica {
   flex-grow: 1;
   max-height: 100%;
 }
-.opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > .sidebar-left {
+.opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > .ogr-sidebar-left {
   display: flex;
   flex-grow: 0;
   touch-action: pan-y;
   max-height: 100%;
 }
-.opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > .sidebar-right {
+.opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > .ogr-sidebar-right {
   display: flex;
   flex-grow: 0;
   touch-action: pan-y;

@@ -1258,13 +1258,13 @@ body.ogr-full-page {
             flex-grow: 1;
             max-height: 100%;
     
-            > .sidebar-left {
+            > .ogr-sidebar-left {
                 display: flex;
                 flex-grow: 0;
                 touch-action: pan-y;
                 max-height: 100%;
             }
-            > .sidebar-right {
+            > .ogr-sidebar-right {
                 display: flex;
                 flex-grow: 0;
                 touch-action: pan-y;
