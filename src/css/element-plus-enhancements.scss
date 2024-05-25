@@ -559,6 +559,12 @@
                 border-bottom-left-radius: 0;
             }
         }
+        > .el-input {
+            > .el-input__wrapper {
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+            }
+        }
     }
     .el-input-group--plain {
         .el-input-group__prepend, .el-input-group__append {

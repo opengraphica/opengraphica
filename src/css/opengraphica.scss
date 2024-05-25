@@ -267,9 +267,16 @@ body.ogr-full-page {
         .ogr-color-picker-gradient__hue {
             background: rgb(255, 0, 0);
             padding: 0 var(--el-slider-button-half-size);
+            position: relative;
 
             .el-slider__runway {
                 background: rgba(0, 0, 0, 0) linear-gradient(to right, rgb(255, 0, 0) 0%, rgb(255, 255, 0) 17%, rgb(0, 255, 0) 33%, rgb(0, 255, 255) 50%, rgb(0, 0, 255) 67%, rgb(255, 0, 255) 83%, rgb(255, 0, 0) 100%) repeat scroll 0% 0%;
+            }
+
+            &.ogr-color-picker-gradient__hue--okhsv { 
+                .el-slider__runway {
+                    background: transparent;
+                }
             }
         }
 
@@ -310,6 +317,16 @@ body.ogr-full-page {
             top: 0;
             bottom: 0;
             background: linear-gradient(to left, var(--ogr-color-pick-hue) .625rem, rgba(204, 154, 129, 0) calc(100% - .625rem));
+        }
+
+        .ogr-color-picker-gradient__canvas-gradient {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
         }
 
         .ogr-color-picker-gradient__value-gradient {

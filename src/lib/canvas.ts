@@ -261,7 +261,7 @@ async function setupThreejsRenderer(width: number, height: number) {
     }
     threejsRenderer.setSize(width, height, false);
 
-    if(!threejsRenderTarget) {
+    if (!threejsRenderTarget) {
         threejsRenderTarget = new WebGLRenderTarget(width, height, {
             format: RGBAFormat,
             type: UnsignedByteType,

@@ -1,6 +1,7 @@
 <template>
     <div class="ogr-color-picker-gradient">
         <div
+            ref="saturationValueContainer"
             class="ogr-color-picker-gradient__saturation-value"
             v-pointer.down="onPointerDownSaturationValueGradient"
             v-pointer.move.window="onPointerMoveSaturationValueGradient"
@@ -8,6 +9,7 @@
         >
             <div class="ogr-color-picker-gradient__saturation-gradient" :style="{ '--ogr-color-pick-hue': saturationValueGradientColorStyle }"></div>
             <div class="ogr-color-picker-gradient__value-gradient"></div>
+            <canvas v-show="useOkhsv" ref="okhsvGradientCanvas" class="ogr-color-picker-gradient__canvas-gradient" />
             <div ref="saturationValueHandleContainer" class="ogr-color-picker-gradient__saturation-value-handle-container">
                 <div
                     class="ogr-color-picker-gradient__saturation-value-handle"
@@ -18,8 +20,10 @@
                 />
             </div>
         </div>
-        <div ref="hueSliderContainer" class="ogr-color-picker-gradient__hue" v-pointer.tap="onPointerDownHueSliderContainer">
+        <div ref="hueSliderContainer" class="ogr-color-picker-gradient__hue" :class="{ 'ogr-color-picker-gradient__hue--okhsv': useOkhsv }" v-pointer.tap="onPointerDownHueSliderContainer">
+            <canvas v-show="useOkhsv" ref="okhsvHueSliderCanvas" class="ogr-color-picker-gradient__canvas-gradient" />
             <el-slider
+                ref="hueSlider"
                 v-model="hue"
                 :aria-label="$t('app.colorPickerGradient.hueSlider')"
                 :min="0" :max="0.999" :step="0.001" :show-tooltip="false"
@@ -38,9 +42,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, PropType, watch, toRef, nextTick } from 'vue';
+import { defineComponent, onMounted, onUnmounted, ref, type PropType, watch, toRef, nextTick } from 'vue';
 import ElSlider from 'element-plus/lib/components/slider/index';
-import { colorToHsva, getColorModelName, convertColorModel, generateColorStyle, createColor } from '@/lib/color';
+import { colorToRgba, colorToHsva, getColorModelName, convertColorModel, generateColorStyle, hexToColor, createColor } from '@/lib/color';
 import { ColorModel, ColorModelName, HSVAColor } from '@/types';
 import pointerDirective from '@/directives/pointer';
 import workingFileStore from '@/store/working-file';
@@ -67,24 +71,32 @@ export default defineComponent({
     setup(props, { emit }) {
         const hue = ref<number>(0);
         const opacity = ref<number>(1);
+        const useOkhsv = ref<boolean>(false);
 
+        const okhsvGradientCanvas = ref<HTMLCanvasElement>();
+        const okhsvHueSliderCanvas = ref<HTMLCanvasElement>();
+        const hueSlider = ref<InstanceType<typeof ElSlider>>();
         const hueSliderContainer = ref<HTMLDivElement>();
         const opacitySliderContainer = ref<HTMLDivElement>();
 
-        const pickedColor = ref<HSVAColor>({ is: 'color', h: 0, s: 0, v: 0, alpha: 1, style: '#000000' });
+        const pickedColor = ref<HSVAColor>({ is: 'color', h: 0, s: 0, v: 0, alpha: 1, style: '#000000', conversionSpace: 'srgb' });
         const pickedColorOpaqueStyle = ref<string>('rgb(0, 0, 0)');
         let outputColorModelName: ColorModelName = 'rgba';
 
+        const saturationValueContainer = ref<HTMLDivElement>();
         const saturationValueHandleContainer = ref<HTMLDivElement>();
         let saturationValueHandleContainerClientRect: DOMRect = new DOMRect();
         const saturationValueGradientColorStyle = ref<string>('rgb(255, 0, 0)');
         let isPointerDownSaturationValueGradient: boolean = false;
 
+        let disposeThreejsAssets: () => void = () => {};
+        let setThreejsHsvGradientHue: (hue: number) => void = () => {};
+
         watch([toRef(props, 'modelValue')], ([inputColor]) => {
             if (!isPointerDownSaturationValueGradient) {
                 outputColorModelName = getColorModelName(inputColor);
                 let oldPickedColor = JSON.parse(JSON.stringify(pickedColor.value));
-                let newPickedColor = colorToHsva(inputColor, outputColorModelName);
+                let newPickedColor = colorToHsva(inputColor, outputColorModelName, useOkhsv.value ? 'oklab' : 'srgb');
                 if (
                     (newPickedColor.h !== oldPickedColor.h && newPickedColor.v !== 0) ||
                     (newPickedColor.s !== oldPickedColor.s && newPickedColor.v !== 0) ||
@@ -92,15 +104,160 @@ export default defineComponent({
                     newPickedColor.alpha !== oldPickedColor.alpha
                 ) {
                     pickedColor.value = newPickedColor;
-                    if (newPickedColor.s > 0) {
+                    if (hexToColor(newPickedColor.style, 'hsva').s > 0) {
                         hue.value = pickedColor.value.h;
-                        saturationValueGradientColorStyle.value = createColor('hsva', { h: hue.value, s: 1, v: 1, alpha: 1 }, workingFileStore.state.colorSpace).style;
+                        setThreejsHsvGradientHue(hue.value);
+                        saturationValueGradientColorStyle.value = createColor(
+                            'hsva', { h: hue.value, s: 1, v: 1, alpha: 1 },
+                            workingFileStore.state.colorSpace,
+                            useOkhsv.value ? 'oklab' : 'srgb'
+                        ).style;
                     }
                     opacity.value = pickedColor.value.alpha;
                     pickedColorOpaqueStyle.value = generateColorStyle({ ...pickedColor.value, alpha: 1 }, 'hsva', workingFileStore.state.colorSpace);
                 }
             }
         }, { immediate: true });
+
+        onMounted(async () => {
+            try {
+                setupOkhsv();
+                useOkhsv.value = true;
+            } catch (error) {}
+        });
+
+        onUnmounted(() => {
+            disposeThreejsAssets();
+        });
+
+        async function setupOkhsv() {
+            const { DoubleSide, sRGBEncoding } = await import('three/src/constants');
+            const { Mesh } = await import('three/src/objects/Mesh');
+            const { ImagePlaneGeometry } = await import('@/canvas/renderers/webgl/geometries/image-plane-geometry');
+            const { WebGLRenderer } = await import('three/src/renderers/WebGLRenderer');
+            const { Scene } = await import('three/src/scenes/Scene');
+            const { OrthographicCamera } = await import('three/src/cameras/OrthographicCamera');
+            const { ShaderMaterial } = await import('three/src/materials/ShaderMaterial');
+            const okhsvGradientMaterialVertexShader = (await import('@/canvas/renderers/webgl/shaders/okhsv-gradient-material.vert')).default;
+            const okhsvGradientMaterialFragmentShader = (await import('@/canvas/renderers/webgl/shaders/okhsv-gradient-material.frag')).default;
+
+            // Create assets for saturation/value gradient
+
+            const valueGradientCanvas = okhsvGradientCanvas.value!;
+            const valueGradientCanvasClientRect = valueGradientCanvas.getBoundingClientRect();
+            valueGradientCanvas.width = valueGradientCanvasClientRect.width;
+            valueGradientCanvas.height = valueGradientCanvasClientRect.height;
+
+            const valueGradientRenderer = new WebGLRenderer({
+                alpha: true,
+                canvas: valueGradientCanvas,
+                premultipliedAlpha: false,
+                preserveDrawingBuffer: true,
+                powerPreference: 'high-performance',
+            });
+            valueGradientRenderer.setClearColor(0x000000, 0);
+            valueGradientRenderer.outputEncoding = sRGBEncoding;
+            valueGradientRenderer.setSize(valueGradientCanvas.width, valueGradientCanvas.height, false);
+
+            const valueGradientScene = new Scene();
+
+            const valueGradientCamera = new OrthographicCamera(0, valueGradientCanvas.width, 0, valueGradientCanvas.height, 0.1, 10000);
+            valueGradientCamera.position.z = 1;
+            valueGradientCamera.updateProjectionMatrix();
+
+            const saturationValueContainerClientRect = saturationValueContainer.value!.getBoundingClientRect();
+            saturationValueHandleContainerClientRect = saturationValueHandleContainer.value!.getBoundingClientRect();
+
+            pickedColor.value = colorToHsva(colorToRgba(pickedColor.value, 'hsva', 'srgb'), 'rgba', 'oklab');
+            hue.value = hexToColor(pickedColor.value.style, 'hsva').s > 0 ? pickedColor.value.h : 0;
+
+            let valueGradientShaderMaterial = new ShaderMaterial({
+                transparent: true,
+                vertexShader: okhsvGradientMaterialVertexShader,
+                fragmentShader: okhsvGradientMaterialFragmentShader,
+                side: DoubleSide,
+                defines: {
+                    cGradientType: 0,
+                },
+                uniforms: {
+                    hue: { value: hue.value },
+                    verticalBorderPercentage: { value: Math.abs(saturationValueHandleContainerClientRect.left - saturationValueContainerClientRect.left) / saturationValueContainerClientRect.width },
+                    horizontalBorderPercentage: { value: Math.abs(saturationValueHandleContainerClientRect.top - saturationValueContainerClientRect.top) / saturationValueContainerClientRect.height },
+                },
+            });
+
+            const valueGradientImageGeometry = new ImagePlaneGeometry(valueGradientCanvas.width, valueGradientCanvas.height);
+
+            const valueGradientImagePlane = new Mesh(valueGradientImageGeometry, valueGradientShaderMaterial);
+            valueGradientScene.add(valueGradientImagePlane);
+
+            valueGradientRenderer.render(valueGradientScene, valueGradientCamera);
+
+            setThreejsHsvGradientHue = (hue: number) => {
+                if (valueGradientShaderMaterial.uniforms.hue.value != hue) {
+                    valueGradientShaderMaterial.uniforms.hue.value = hue;
+                    valueGradientRenderer.render(valueGradientScene, valueGradientCamera);
+                }
+            };
+
+            // Create assets for hue
+
+            const hueGradientCanvas = okhsvHueSliderCanvas.value!;
+            const hueGradientCanvasClientRect = hueGradientCanvas.getBoundingClientRect();
+            hueGradientCanvas.width = hueGradientCanvasClientRect.width;
+            hueGradientCanvas.height = hueGradientCanvasClientRect.height;
+
+            const hueGradientRenderer = new WebGLRenderer({
+                alpha: true,
+                canvas: hueGradientCanvas,
+                premultipliedAlpha: false,
+                preserveDrawingBuffer: true,
+                powerPreference: 'high-performance',
+            });
+            hueGradientRenderer.setClearColor(0x000000, 0);
+            hueGradientRenderer.outputEncoding = sRGBEncoding;
+            hueGradientRenderer.setSize(hueGradientCanvas.width, hueGradientCanvas.height, false);
+
+            const hueGradientScene = new Scene();
+
+            const hueGradientCamera = new OrthographicCamera(0, hueGradientCanvas.width, 0, hueGradientCanvas.height, 0.1, 10000);
+            hueGradientCamera.position.z = 1;
+            hueGradientCamera.updateProjectionMatrix();
+
+            const hueSliderContainerClientRect = hueSliderContainer.value!.getBoundingClientRect();
+            const hueSliderClientRect = hueSlider.value!.$el.getBoundingClientRect();
+
+            let hueGradientShaderMaterial = new ShaderMaterial({
+                transparent: true,
+                vertexShader: okhsvGradientMaterialVertexShader,
+                fragmentShader: okhsvGradientMaterialFragmentShader,
+                side: DoubleSide,
+                defines: {
+                    cGradientType: 1,
+                },
+                uniforms: {
+                    horizontalBorderPercentage: { value: Math.abs(hueSliderContainerClientRect.left - hueSliderClientRect.left) / hueSliderContainerClientRect.width },
+                },
+            });
+
+            const hueGradientImageGeometry = new ImagePlaneGeometry(hueGradientCanvas.width, hueGradientCanvas.height);
+
+            const hueGradientImagePlane = new Mesh(hueGradientImageGeometry, hueGradientShaderMaterial);
+            hueGradientScene.add(hueGradientImagePlane);
+
+            hueGradientRenderer.render(hueGradientScene, hueGradientCamera);
+
+            hueGradientRenderer.dispose();
+            hueGradientShaderMaterial.dispose();
+            hueGradientImageGeometry.dispose();
+
+            disposeThreejsAssets = () => {
+                valueGradientRenderer.dispose();
+                valueGradientShaderMaterial.dispose();
+                (valueGradientShaderMaterial as unknown) = undefined;
+                valueGradientImageGeometry.dispose();
+            };
+        }
 
         function generateOutputColor(): ColorModel {
             const outputColor = convertColorModel(pickedColor.value, outputColorModelName);
@@ -111,9 +268,11 @@ export default defineComponent({
         }
 
         function handleSaturationValueGradientChange(event: PointerEvent) {
+            pickedColor.value.h = hue.value;
             pickedColor.value.s = Math.min(1, Math.max(0, (event.clientX - saturationValueHandleContainerClientRect.left) / saturationValueHandleContainerClientRect.width));
             pickedColor.value.v = 1 - Math.min(1, Math.max(0, (event.clientY - saturationValueHandleContainerClientRect.top) / saturationValueHandleContainerClientRect.height));
             const outputColor = generateOutputColor();
+            setThreejsHsvGradientHue(hue.value);
             emit('update:modelValue', outputColor);
             emit('input', outputColor);
         }
@@ -142,6 +301,7 @@ export default defineComponent({
 
         function onInputHueSlider(value: number) {
             pickedColor.value.h = value;
+            setThreejsHsvGradientHue(value);
 
             saturationValueGradientColorStyle.value = createColor('hsva', { h: hue.value, s: 1, v: 1, alpha: 1 }, workingFileStore.state.colorSpace).style;
 
@@ -152,6 +312,7 @@ export default defineComponent({
 
         function onChangeHueSlider(value: number) {
             pickedColor.value.h = value;
+            setThreejsHsvGradientHue(value);
             const outputColor = generateOutputColor();
             emit('update:modelValue', outputColor);
             emit('change', outputColor);
@@ -202,19 +363,30 @@ export default defineComponent({
         return {
             hue,
             opacity,
+            useOkhsv,
+
+            okhsvGradientCanvas,
+            okhsvHueSliderCanvas,
+            hueSlider,
             hueSliderContainer,
             opacitySliderContainer,
+            saturationValueContainer,
             saturationValueHandleContainer,
+
             saturationValueGradientColorStyle,
             pickedColorOpaqueStyle,
             pickedColor,
+
             onPointerDownSaturationValueGradient,
             onPointerMoveSaturationValueGradient,
             onPointerUpSaturationValueGradient,
+
             onInputHueSlider,
             onChangeHueSlider,
+
             onInputOpacitySlider,
             onChangeOpacitySlider,
+
             onPointerDownHueSliderContainer,
             onPointerDownOpacitySliderContainer
         };

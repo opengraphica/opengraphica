@@ -1,4 +1,4 @@
-import CanvasFreeTransformController from './free-transform';
+import BaseCanvasMovementController from './base-movement';
 import canvasStore from '@/store/canvas';
 
 const DRAG_TYPE_ALL = 0;
@@ -7,7 +7,7 @@ const DRAG_TYPE_BOTTOM = 2;
 const DRAG_TYPE_LEFT = 4;
 const DRAG_TYPE_RIGHT = 8;
 
-export default class CanvasTextController extends CanvasFreeTransformController {
+export default class CanvasTextController extends BaseCanvasMovementController {
     onEnter(): void {
         super.onEnter();
         

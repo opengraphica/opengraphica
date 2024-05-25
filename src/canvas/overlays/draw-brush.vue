@@ -12,7 +12,7 @@
                 :style="{ transform: `translate(${selectedLayerBounds.left}px, ${selectedLayerBounds.top}px)` }"
                 xmlns="http://www.w3.org/2000/svg">
                 <template v-for="svgPath of boundaryPointsSvgPaths" :key="svgPath">
-                    <path :d="svgPath" stroke="#333333" :stroke-width="boundaryPointsSvgPathStrokeWidth" fill="transparent"/>
+                    <path :d="svgPath" stroke="#777" :stroke-width="boundaryPointsSvgPathStrokeWidth" fill="transparent"/>
                     <path :d="svgPath" stroke="white" :stroke-width="boundaryPointsSvgPathStrokeWidth" :stroke-dasharray="boundaryPointsSvgPathStrokeWidth * 4" fill="transparent"/>
                 </template>
             </svg>

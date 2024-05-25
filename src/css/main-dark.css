@@ -8461,9 +8461,13 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__hue {
   background: red;
   padding: 0 var(--el-slider-button-half-size);
+  position: relative;
 }
 .opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__hue .el-slider__runway {
   background: rgba(0, 0, 0, 0) linear-gradient(to right, red 0%, yellow 17%, lime 33%, aqua 50%, blue 67%, fuchsia 83%, red 100%) repeat scroll 0% 0%;
+}
+.opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__hue.ogr-color-picker-gradient__hue--okhsv .el-slider__runway {
+  background: transparent;
 }
 .opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__opacity {
   background-image: url("../images/transparency-bg.png");
@@ -8498,6 +8502,15 @@ body.ogr-full-page .opengraphica {
   top: 0;
   bottom: 0;
   background: linear-gradient(to left, var(--ogr-color-pick-hue) 0.625rem, rgba(204, 154, 129, 0) calc(100% - .625rem));
+}
+.opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__canvas-gradient {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
 }
 .opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__value-gradient {
   position: absolute;
@@ -26758,6 +26771,7 @@ body.ogr-full-page .opengraphica {
   --el-color-info-lighter: mix(--el-color-white, --el-color-info, 90%);
   --el-fill-color-blank: #272c37;
   --el-fill-color-light: #343a46;
+  --el-mask-color: rgba(0, 0, 0, .6);
   --el-menu-hover-bg-color: rgba(64, 158, 255, 0.1);
   --el-switch-button-size: 1rem;
   --el-text-color-primary: #ffffff;
@@ -28569,6 +28583,10 @@ body.ogr-full-page .opengraphica {
   border-bottom-right-radius: var(--el-input-border-radius, var(--el-border-radius-base));
 }
 .opengraphica .el-input-group--prepend > .el-select .el-input__wrapper {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.opengraphica .el-input-group--prepend > .el-input > .el-input__wrapper {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }

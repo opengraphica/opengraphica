@@ -3,12 +3,12 @@
         <div class="ogr-toolbar-overlay">
             <div class="ogr-toolbar-tool-selector">
                 <span class="bi bi-type my-1" aria-hidden="true"></span>
-                <span class="ogr-toolbar-tool-selector__description" v-t="toolbar.general.settings" />
+                <span class="ogr-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
             </div>
             <el-horizontal-scrollbar-arrows>
                 <el-input-group>
                     <template #prepend>
-                        <span v-t="'toolbar.text.font'" />
+                        <span class="is-size-7" v-t="'toolbar.text.font'" />
                     </template>
                     <el-select :aria-label="$t('toolbar-text-font')" v-model="family" size="small" style="width: 6rem">
                         <el-option v-for="family of familyList" :key="family" :label="family" :value="family"></el-option>
@@ -16,27 +16,27 @@
                 </el-input-group>
                 <el-input-group class="ml-3">
                     <template #prepend>
-                        <span v-t="'toolbar.text.size'" />
+                        <span class="is-size-7" v-t="'toolbar.text.size'" />
                     </template>
-                    <el-input-number :aria-label="$t('toolbar-text-size')" v-model="size" size="small" style="width: 3rem"></el-input-number>
+                    <el-input-number :aria-label="$t('toolbar.text.size')" v-model="size" size="small" style="width: 3rem"></el-input-number>
                 </el-input-group>
                 <el-button-group class="el-button-group--flex ml-3">
-                    <el-button :aria-label="$t('toolbar.text.bold')" size="small" plain>
+                    <el-button :aria-label="$t('toolbar.text.bold')" size="small" plain class="px-3">
                         <span class="bi bi-type-bold" aria-hidden="true"></span>
                     </el-button>
-                    <el-button :aria-label="$t('toolbar.text.italic')" size="small" plain>
+                    <el-button :aria-label="$t('toolbar.text.italic')" size="small" plain class="px-3">
                         <span class="bi bi-type-italic" aria-hidden="true"></span>
                     </el-button>
-                    <el-button :aria-label="$t('toolbar.text.strikethrough')" size="small" plain>
+                    <el-button :aria-label="$t('toolbar.text.strikethrough')" size="small" plain class="px-3">
                         <span class="bi bi-type-strikethrough" aria-hidden="true"></span>
                     </el-button>
-                    <el-button :aria-label="$t('toolbar.text.underline')" size="small" plain>
+                    <el-button :aria-label="$t('toolbar.text.underline')" size="small" plain class="px-3">
                         <span class="bi bi-type-underline" aria-hidden="true"></span>
                     </el-button>
                 </el-button-group>
                 <el-input-group class="ml-3" :prepend-tooltip="$t('toolbar.text.fillTooltip')">
                     <template #prepend>
-                        <span v-t="'toolbar.text.fill'">Fill</span>
+                        <span class="is-size-7" v-t="'toolbar.text.fill'">Fill</span>
                     </template>
                     <el-input-color :aria-label="$t('toolbar.text.fill')"></el-input-color>
                 </el-input-group>

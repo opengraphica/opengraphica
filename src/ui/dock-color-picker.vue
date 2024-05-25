@@ -39,10 +39,12 @@ import ElTooltip from 'element-plus/lib/components/tooltip/index';
 import AppColorPickerGradient from '@/ui/app-color-picker-gradient.vue';
 import { isWorkerSupported } from '@/lib/feature-detection/worker';
 import { colorToRgba, colorToHex, hexToColor, getColorModelName } from '@/lib/color';
-import { ColorModel, ColorModelName, RGBAColor } from '@/types';
+import { throttle } from '@/lib/timing';
 import { createColorNamer, getColorName, destroyColorNamer } from '@/workers/color-namer.interface';
 import { runModule } from '@/modules';
 import colorNamer from 'color-namer';
+
+import type { ColorModel, ColorModelName, RGBAColor } from '@/types';
 
 export default defineComponent({
     name: 'DockColorPicker',
@@ -85,8 +87,16 @@ export default defineComponent({
 
         watch([toRef(props, 'color')], ([inputColor]) => {
             outputColorModelName = getColorModelName(inputColor);
-            workingColor.value = colorToRgba(inputColor, outputColorModelName);
+            workingColor.value = colorToRgba(inputColor, outputColorModelName, inputColor.conversionSpace);
         }, { immediate: true });
+
+        const nameColor = throttle(async function (hexColor: string) {
+            if (colorNamerWorkerUuid) {
+                colorName.value = await getColorName(colorNamerWorkerUuid, hexColor);
+            } else if (colorNamer) {
+                colorName.value = colorNamer(hexColor, { pick: ['ntc'] }).ntc[0]?.name;
+            }
+        }, 50);
 
         watch([workingColor], () => {
             hexCode.value = colorToHex(workingColor.value, 'rgba');
@@ -104,14 +114,6 @@ export default defineComponent({
                 destroyColorNamer(colorNamerWorkerUuid);
             }
         });
-
-        async function nameColor(hexColor: string) {
-            if (colorNamerWorkerUuid) {
-                colorName.value = await getColorName(colorNamerWorkerUuid, hexColor);
-            } else if (colorNamer) {
-                colorName.value = colorNamer(hexColor, { pick: ['ntc'] }).ntc[0]?.name;
-            }
-        }
 
         function onChangeHexCode(newHexCode: string) {
             workingColor.value = hexToColor(newHexCode, 'rgba');
