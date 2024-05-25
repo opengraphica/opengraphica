@@ -416,6 +416,12 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                     drawableCanvas.dispose();
                     
                     if (layerUpdateCanvas) {
+                        if (activeSelectionMask.value || appliedSelectionMask.value) {
+                            const layerGlobalTransform = getLayerGlobalTransform(layer.id);
+                            const layerTransform = new DOMMatrix().multiplySelf(layerGlobalTransform).translateSelf(sourceX, sourceY);
+                            layerUpdateCanvas = await blitActiveSelectionMask(layerUpdateCanvas, layerTransform);
+                        }
+
                         const { canvas: eraseCanvas, ctx: eraseCtx } = createEmptyCanvasWith2dContext(layerUpdateCanvas.width, layerUpdateCanvas.height);
                         if (!eraseCtx) continue;
                         eraseCtx.globalCompositeOperation = 'copy';
@@ -424,12 +430,6 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                         eraseCtx.drawImage(layerUpdateCanvas, 0, 0);
                         eraseCtx.globalCompositeOperation = 'source-over';
                         layerUpdateCanvas = eraseCanvas;
-
-                        if (activeSelectionMask.value || appliedSelectionMask.value) {
-                            const layerGlobalTransform = getLayerGlobalTransform(layer.id);
-                            const layerTransform = new DOMMatrix().multiplySelf(layerGlobalTransform).translateSelf(sourceX, sourceY);
-                            layerUpdateCanvas = await blitActiveSelectionMask(layerUpdateCanvas, layerTransform);
-                        }
 
                         layerActions.push(
                             new UpdateLayerAction<UpdateRasterLayerOptions>({
