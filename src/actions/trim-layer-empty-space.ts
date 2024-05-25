@@ -33,18 +33,6 @@ export class TrimLayerEmptySpaceAction extends BaseAction {
             new DOMPoint(emptyBounds.left, emptyBounds.bottom),
             new DOMPoint(emptyBounds.right, emptyBounds.bottom),
         ]);
-        const previousTransformedBounds = findPointListBounds([
-            new DOMPoint(0, 0).matrixTransform(layer.transform),
-            new DOMPoint(layer.width, 0).matrixTransform(layer.transform),
-            new DOMPoint(0, layer.height).matrixTransform(layer.transform),
-            new DOMPoint(layer.width, layer.height).matrixTransform(layer.transform),
-        ]);
-        const transformedEmptyCropBounds = findPointListBounds([
-            new DOMPoint(emptyBounds.left, emptyBounds.top).matrixTransform(layer.transform),
-            new DOMPoint(emptyBounds.right, emptyBounds.top).matrixTransform(layer.transform),
-            new DOMPoint(emptyBounds.left, emptyBounds.bottom).matrixTransform(layer.transform),
-            new DOMPoint(emptyBounds.right, emptyBounds.bottom).matrixTransform(layer.transform),
-        ]);
         const newWidth = Math.ceil(emptyCropBounds.right - emptyCropBounds.left);
         const newHeight = Math.ceil(emptyCropBounds.bottom - emptyCropBounds.top);
 
@@ -60,10 +48,10 @@ export class TrimLayerEmptySpaceAction extends BaseAction {
         workingCanvasCtx.translate(-emptyCropBounds.left, -emptyCropBounds.top);
         workingCanvasCtx.drawImage(layerCanvas, 0, 0);
         workingCanvasCtx.restore();
-        const newLayerTransform = new DOMMatrix().translateSelf(
-            transformedEmptyCropBounds.left - previousTransformedBounds.left,
-            transformedEmptyCropBounds.top - previousTransformedBounds.top
-        ).multiplySelf(layer.transform);
+        const newLayerTransform = new DOMMatrix().multiplySelf(layer.transform).translateSelf(
+            emptyBounds.left,
+            emptyBounds.top
+        );
 
         prepareStoredImageForArchival(layer.data.sourceUuid);
 
