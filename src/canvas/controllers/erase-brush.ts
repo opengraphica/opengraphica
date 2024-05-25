@@ -5,6 +5,7 @@ import BaseCanvasMovementController from './base-movement';
 import { cursorHoverPosition, brushShape, brushSize } from '../store/erase-brush-state';
 import { blitActiveSelectionMask, activeSelectionMask, appliedSelectionMask } from '../store/selection-state';
 
+import { decomposeMatrix } from '@/lib/dom-matrix';
 import { isOffscreenCanvasSupported } from '@/lib/feature-detection';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import { createImageFromBlob, createEmptyCanvasWith2dContext } from '@/lib/image';
@@ -205,7 +206,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
             (async () => {
                 await historyReserveQueueFree();
                 for (const layer of getSelectedLayers()) {
-                    layer.drafts = null;
+                    layer.drafts = [];
                 }
             })();
         }
@@ -286,7 +287,9 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                 if (!draftCtx) continue;
                 draftCtx.translate(-leftBound, -topBound);
                 draftCtx.transform(draftTransform.a, draftTransform.b, draftTransform.c, draftTransform.d, draftTransform.e, draftTransform.f);
-                draftCtx.drawImage(getStoredImageOrCanvas(layer.data.sourceUuid)!, 0, 0);
+                const sourceImage = getStoredImageOrCanvas(layer.data.sourceUuid)!;
+                draftCtx.imageSmoothingEnabled = true;
+                draftCtx.drawImage(sourceImage, 0, 0);
 
                 layer.drafts.push({
                     uuid: this.activeDraftUuid,
@@ -469,4 +472,5 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
         canvasStore.set('cursor', newIcon);
         return newIcon;
     }
+
 }

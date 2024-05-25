@@ -179,12 +179,21 @@ const drawImageWebglCache = {
     CanvasTexture: undefined as ClassType<CanvasTexture> | undefined,
 };
 
+let threejsRenderStack: Promise<void>[] = [];
+
 /**
  * Sets up the webgl renderer to work at the specified resolution.
  * @param width 
  * @param height 
  */
 async function setupThreejsRenderer(width: number, height: number) {
+    const currentRenderStack = [...threejsRenderStack];
+    let done = () => {};
+    const renderStackPromise = new Promise<void>((resolve) => done = resolve);
+    threejsRenderStack.push(renderStackPromise);
+
+    await Promise.allSettled(currentRenderStack);
+
     let {
         threejsCanvas, threejsRenderer, threejsScene, NearestFilter, sRGBEncoding, RGBAFormat, UnsignedByteType,
         threejsCamera, Mesh, ImagePlaneGeometry, MeshBasicMaterial, CanvasTexture, threejsRenderTarget,
@@ -281,6 +290,7 @@ async function setupThreejsRenderer(width: number, height: number) {
     threejsCamera.updateProjectionMatrix();
 
     return {
+        done,
         threejsCanvas, threejsRenderer, threejsScene, NearestFilter, sRGBEncoding, threejsCamera,
         Mesh, ImagePlaneGeometry, MeshBasicMaterial, CanvasTexture, threejsRenderTarget,
         threejsRasterTextureCompositorShaderMaterial, threejsPrepareGpuTextureShaderMaterial,
@@ -347,43 +357,49 @@ export async function drawImageToCanvas2d(targetCanvas: HTMLCanvasElement, sourc
     sourceCroppedTargetCtx.drawImage(targetCanvas, -x, -y);
 
     let {
-        threejsCanvas, threejsRenderer, threejsScene, NearestFilter, sRGBEncoding, threejsCamera,
+        done, threejsCanvas, threejsRenderer, threejsScene, NearestFilter, sRGBEncoding, threejsCamera,
         Mesh, ImagePlaneGeometry, CanvasTexture, threejsRasterTextureCompositorShaderMaterial,
     } = await setupThreejsRenderer(sourceImage.width, sourceImage.height);
 
-    const targetImageTexture = new CanvasTexture(sourceCroppedTargetCanvas);
-    targetImageTexture.generateMipmaps = false;
-    targetImageTexture.encoding = sRGBEncoding;
-    targetImageTexture.minFilter = NearestFilter;
-    targetImageTexture.magFilter = NearestFilter;
+    try {
+        const targetImageTexture = new CanvasTexture(sourceCroppedTargetCanvas);
+        targetImageTexture.generateMipmaps = false;
+        targetImageTexture.encoding = sRGBEncoding;
+        targetImageTexture.minFilter = NearestFilter;
+        targetImageTexture.magFilter = NearestFilter;
 
-    const sourceImageTexture = new CanvasTexture(sourceImage);
-    sourceImageTexture.generateMipmaps = false;
-    sourceImageTexture.encoding = sRGBEncoding;
-    sourceImageTexture.minFilter = NearestFilter;
-    sourceImageTexture.magFilter = NearestFilter;
+        const sourceImageTexture = new CanvasTexture(sourceImage);
+        sourceImageTexture.generateMipmaps = false;
+        sourceImageTexture.encoding = sRGBEncoding;
+        sourceImageTexture.minFilter = NearestFilter;
+        sourceImageTexture.magFilter = NearestFilter;
 
-    if (!threejsRasterTextureCompositorShaderMaterial) {
-        const { createRasterTextureCompositorShaderMaterial } = await import('@/canvas/renderers/webgl/shaders');
-        threejsRasterTextureCompositorShaderMaterial = createRasterTextureCompositorShaderMaterial(targetImageTexture, sourceImageTexture, 0, 0, blendMode);
-        threejsRasterTextureCompositorShaderMaterial.needsUpdate = true;
-        drawImageWebglCache.threejsRasterTextureCompositorShaderMaterial = threejsRasterTextureCompositorShaderMaterial;
-    } else {
-        const { updateRasterTextureCompositorShaderMaterial } = await import('@/canvas/renderers/webgl/shaders');
-        updateRasterTextureCompositorShaderMaterial(threejsRasterTextureCompositorShaderMaterial, targetImageTexture, sourceImageTexture, 0, 0, blendMode);
+        if (!threejsRasterTextureCompositorShaderMaterial) {
+            const { createRasterTextureCompositorShaderMaterial } = await import('@/canvas/renderers/webgl/shaders');
+            threejsRasterTextureCompositorShaderMaterial = createRasterTextureCompositorShaderMaterial(targetImageTexture, sourceImageTexture, 0, 0, blendMode);
+            threejsRasterTextureCompositorShaderMaterial.needsUpdate = true;
+            drawImageWebglCache.threejsRasterTextureCompositorShaderMaterial = threejsRasterTextureCompositorShaderMaterial;
+        } else {
+            const { updateRasterTextureCompositorShaderMaterial } = await import('@/canvas/renderers/webgl/shaders');
+            updateRasterTextureCompositorShaderMaterial(threejsRasterTextureCompositorShaderMaterial, targetImageTexture, sourceImageTexture, 0, 0, blendMode);
+        }
+
+        const imageGeometry = new ImagePlaneGeometry(sourceImage.width, sourceImage.height);
+
+        const imagePlane = new Mesh(imageGeometry, threejsRasterTextureCompositorShaderMaterial);
+
+        threejsScene.add(imagePlane);
+        threejsRenderer.render(threejsScene, threejsCamera);
+        threejsScene.clear();
+
+        targetImageTexture.dispose();
+        sourceImageTexture.dispose();
+        imageGeometry.dispose();
+    } catch (error) {
+        // Ignore
+    } finally {
+        done();
     }
-
-    const imageGeometry = new ImagePlaneGeometry(sourceImage.width, sourceImage.height);
-
-    const imagePlane = new Mesh(imageGeometry, threejsRasterTextureCompositorShaderMaterial);
-
-    threejsScene.add(imagePlane);
-    threejsRenderer.render(threejsScene, threejsCamera);
-    threejsScene.clear();
-
-    targetImageTexture.dispose();
-    sourceImageTexture.dispose();
-    imageGeometry.dispose();
 
     targetImageCtx.imageSmoothingEnabled = false;
     targetImageCtx.clearRect(x, y, sourceImage.width, sourceImage.height);
@@ -429,9 +445,10 @@ export async function createThreejsTextureFromImage(image: HTMLCanvasElement | I
 
     if (image.width < 2048 && image.height <= 2048) {
         let {
-            NearestFilter, sRGBEncoding, Mesh, ImagePlaneGeometry, CanvasTexture, threejsPrepareGpuTextureShaderMaterial,
+            done, NearestFilter, sRGBEncoding, Mesh, ImagePlaneGeometry, CanvasTexture, threejsPrepareGpuTextureShaderMaterial,
             MeshBasicMaterial, threejsScene, threejsRenderer, threejsCamera,
         } = await setupThreejsRenderer(1, 1);
+        done();
 
         const { LinearMipMapLinearFilter } = await import('three/src/constants');
         const { WebGLRenderTarget } = await import('three/src/renderers/WebGLRenderTarget');
@@ -470,9 +487,7 @@ export async function createThreejsTextureFromImage(image: HTMLCanvasElement | I
                 let fittedChunkWidth = Math.min(image.width - x, chunkWidth);
                 let fittedChunkHeight = Math.min(image.height - y, chunkHeight);
 
-                let {
-                    threejsScene, threejsRenderer, threejsRenderTarget, threejsCamera
-                } = await setupThreejsRenderer(fittedChunkWidth, fittedChunkHeight);
+                const { createPrepareGpuTextureShaderMaterial, updatePrepareGpuTextureShaderMaterial } = await import('@/canvas/renderers/webgl/shaders');
 
                 let chunkImage = isUseOriginalImage ? image : await createImageBitmap(
                     image, x, y, fittedChunkWidth, fittedChunkHeight, {
@@ -480,60 +495,69 @@ export async function createThreejsTextureFromImage(image: HTMLCanvasElement | I
                         premultiplyAlpha: 'none',
                     }
                 );
-                let imageTexture = new CanvasTexture(chunkImage);
-                imageTexture.generateMipmaps = false;
-                imageTexture.encoding = sRGBEncoding;
-                imageTexture.minFilter = NearestFilter;
-                imageTexture.magFilter = NearestFilter;
 
-                if (!threejsPrepareGpuTextureShaderMaterial) {
-                    const { createPrepareGpuTextureShaderMaterial } = await import('@/canvas/renderers/webgl/shaders');
-                    threejsPrepareGpuTextureShaderMaterial = createPrepareGpuTextureShaderMaterial(imageTexture);
-                    threejsPrepareGpuTextureShaderMaterial.needsUpdate = true;
-                    drawImageWebglCache.threejsPrepareGpuTextureShaderMaterial = threejsPrepareGpuTextureShaderMaterial;
-                } else {
-                    const { updatePrepareGpuTextureShaderMaterial } = await import('@/canvas/renderers/webgl/shaders');
-                    updatePrepareGpuTextureShaderMaterial(threejsPrepareGpuTextureShaderMaterial, imageTexture);
-                }
+                let {
+                    done, threejsScene, threejsRenderer, threejsRenderTarget, threejsCamera
+                } = await setupThreejsRenderer(fittedChunkWidth, fittedChunkHeight);
 
-                const imagePlane = new Mesh(imageGeometry, threejsPrepareGpuTextureShaderMaterial);
+                try {
+                    let imageTexture = new CanvasTexture(chunkImage);
+                    imageTexture.generateMipmaps = false;
+                    imageTexture.encoding = sRGBEncoding;
+                    imageTexture.minFilter = NearestFilter;
+                    imageTexture.magFilter = NearestFilter;
 
-                threejsScene.add(imagePlane);
-                threejsRenderer.setRenderTarget(threejsRenderTarget);
-                threejsRenderer.render(threejsScene, threejsCamera);
-                threejsRenderer.setRenderTarget(null);
-                threejsScene.clear();
-
-                if (!isUseOriginalImage) {
-                    (chunkImage as ImageBitmap).close();
-                }
-                imageTexture.dispose();
-
-                const pixelBuffer = new Uint8Array(fittedChunkWidth * fittedChunkHeight * 4);
-                threejsRenderer.readRenderTargetPixels(threejsRenderTarget, 0, 0, fittedChunkWidth, fittedChunkHeight, pixelBuffer);
-                const chunkBitmap = await createImageBitmap(
-                    new ImageData(new Uint8ClampedArray(pixelBuffer), fittedChunkWidth, fittedChunkHeight),
-                    0, 0, fittedChunkWidth, fittedChunkHeight, {
-                        imageOrientation: 'none',
-                        premultiplyAlpha: 'none',
+                    if (!threejsPrepareGpuTextureShaderMaterial) {
+                        threejsPrepareGpuTextureShaderMaterial = createPrepareGpuTextureShaderMaterial(imageTexture);
+                        threejsPrepareGpuTextureShaderMaterial.needsUpdate = true;
+                        drawImageWebglCache.threejsPrepareGpuTextureShaderMaterial = threejsPrepareGpuTextureShaderMaterial;
+                    } else {
+                        updatePrepareGpuTextureShaderMaterial(threejsPrepareGpuTextureShaderMaterial, imageTexture);
                     }
-                );
-                const chunkTexture = new CanvasTexture(chunkBitmap);
-                chunkTexture.premultiplyAlpha = false;
-                chunkTexture.generateMipmaps = true;
-                chunkTexture.encoding = sRGBEncoding;
-                chunkTexture.minFilter = LinearMipMapLinearFilter;
-                chunkTexture.magFilter = NearestFilter;
-                chunkTexture.needsUpdate = true;
 
-                if (isUseOriginalImage) {
-                    texture = chunkTexture;
-                    texture.userData.shouldDisposeBitmap = true;
-                } else {
-                    // TODO - this copy just isn't working...
-                    threejsRenderer.copyTextureToTexture(new Vector2(x, y), chunkTexture, texture);
-                    chunkBitmap.close();
-                    chunkTexture.dispose();
+                    const imagePlane = new Mesh(imageGeometry, threejsPrepareGpuTextureShaderMaterial);
+
+                    threejsScene.add(imagePlane);
+                    threejsRenderer.setRenderTarget(threejsRenderTarget);
+                    threejsRenderer.render(threejsScene, threejsCamera);
+                    threejsRenderer.setRenderTarget(null);
+                    threejsScene.clear();
+
+                    if (!isUseOriginalImage) {
+                        (chunkImage as ImageBitmap).close();
+                    }
+                    imageTexture.dispose();
+
+                    const pixelBuffer = new Uint8Array(fittedChunkWidth * fittedChunkHeight * 4);
+                    threejsRenderer.readRenderTargetPixels(threejsRenderTarget, 0, 0, fittedChunkWidth, fittedChunkHeight, pixelBuffer);
+                    const chunkBitmap = await createImageBitmap(
+                        new ImageData(new Uint8ClampedArray(pixelBuffer), fittedChunkWidth, fittedChunkHeight),
+                        0, 0, fittedChunkWidth, fittedChunkHeight, {
+                            imageOrientation: 'none',
+                            premultiplyAlpha: 'none',
+                        }
+                    );
+                    const chunkTexture = new CanvasTexture(chunkBitmap);
+                    chunkTexture.premultiplyAlpha = false;
+                    chunkTexture.generateMipmaps = true;
+                    chunkTexture.encoding = sRGBEncoding;
+                    chunkTexture.minFilter = LinearMipMapLinearFilter;
+                    chunkTexture.magFilter = NearestFilter;
+                    chunkTexture.needsUpdate = true;
+
+                    if (isUseOriginalImage) {
+                        texture = chunkTexture;
+                        texture.userData.shouldDisposeBitmap = true;
+                    } else {
+                        // TODO - this copy just isn't working...
+                        threejsRenderer.copyTextureToTexture(new Vector2(x, y), chunkTexture, texture);
+                        chunkBitmap.close();
+                        chunkTexture.dispose();
+                    }
+                } catch (error) {
+                    // Ignore
+                } finally {
+                    done();
                 }
             }
         }

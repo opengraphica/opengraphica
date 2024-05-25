@@ -184,7 +184,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
             (async () => {
                 await historyReserveQueueFree();
                 for (const layer of getSelectedLayers()) {
-                    layer.drafts = null;
+                    layer.drafts = [];
                 }
             })();
         }

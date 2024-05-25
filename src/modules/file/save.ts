@@ -7,6 +7,7 @@ import {
     SerializedFileGroupLayer, SerializedFileTextLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileVectorLayer,
     WorkingFileGroupLayer, WorkingFileTextLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer
 } from '@/types';
+import canvasStore from '@/store/canvas';
 import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { saveAs } from 'file-saver';
 import { getStoredImageOrCanvas } from '@/store/image';
@@ -95,7 +96,14 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
                     throw new Error('Missing canvas context');
                 }
                 ctx.imageSmoothingEnabled = false;
-                ctx.drawImage(getStoredImageOrCanvas((layer as WorkingFileRasterLayer<ColorModel>).data.sourceUuid) as ImageBitmap, 0, 0);
+                const sourceImage = getStoredImageOrCanvas((layer as WorkingFileRasterLayer<ColorModel>).data.sourceUuid);
+                if (canvasStore.state.renderer === 'webgl' && sourceImage instanceof ImageBitmap) {
+                    ctx.scale(1, -1);
+                    ctx.translate(0, -layer.height);
+                }
+                if (sourceImage) {
+                    ctx.drawImage(sourceImage, 0, 0);
+                }
                 serializedLayer = {
                     ...serializedLayer,
                     type: 'raster',

@@ -8793,6 +8793,17 @@ body.ogr-full-page .opengraphica {
   max-height: calc(100vh - 13rem) !important;
   overflow: auto !important;
 }
+.opengraphica .ogr-draw-bounds {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+}
+.opengraphica .ogr-draw-bounds svg {
+  position: absolute;
+  transform-origin: top left;
+}
 .opengraphica .ogr-free-transform {
   position: relative;
 }

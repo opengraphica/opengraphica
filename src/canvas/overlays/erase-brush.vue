@@ -1,6 +1,6 @@
 <template>
     <div ref="overlay" class="ogr-canvas-overlay is-full-canvas-area">
-        <div ref="drawContainer" class="ogr-draw">
+        <div ref="eraseBrushContainer" class="ogr-erase">
             <svg
                 width="2"
                 height="2"
@@ -30,7 +30,7 @@ export default defineComponent({
         const devicePixelRatio = window.devicePixelRatio || 1;
 
         const { transform, viewWidth, viewHeight, viewDirty } = toRefs(canvasStore.state);
-        const drawContainer = ref<HTMLDivElement>(null as any);
+        const eraseBrushContainer = ref<HTMLDivElement>(null as any);
 
         const zoom = computed<number>(() => {
             const decomposedTransform = canvasStore.state.decomposedTransform;
@@ -51,7 +51,7 @@ export default defineComponent({
         return {
             brushShape,
             brushSize,
-            drawContainer,
+            eraseBrushContainer,
             cursorHoverPosition,
             drawPreviewStrokeWidth,
             zoom,

@@ -11,21 +11,25 @@ import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import preferencesStore from '@/store/preferences';
 import workingFileStore, { getCanvasRenderingContext2DSettings, getLayerById } from '@/store/working-file';
-import { ColorModel, DrawWorkingFileOptions, UpdateAnyLayerOptions, WorkingFileLayer } from '@/types';
+
 import { DecomposedMatrix, decomposeMatrix } from '@/lib/dom-matrix';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
-import { CreateNewLayersFromSelectionAction } from '@/actions/create-new-layers-from-selection';
-import { ClearSelectionAction } from '@/actions/clear-selection';
-import { SelectLayersAction } from '@/actions/select-layers';
-import { UpdateLayerAction } from '@/actions/update-layer';
-import { BundleAction } from '@/actions/bundle';
 import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
 import { getImageDataFromImage, getImageDataEmptyBounds } from '@/lib/image';
 import { isInput } from '@/lib/events';
 import appEmitter, { AppEmitterEvents } from '@/lib/emitter';
 import { AsyncCallbackQueue } from '@/lib/timing';
-import { isShiftKeyPressed } from '@/lib/keyboard';
+import { isCtrlOrMetaKeyPressed, isShiftKeyPressed } from '@/lib/keyboard';
+
+import { CreateNewLayersFromSelectionAction } from '@/actions/create-new-layers-from-selection';
+import { ClearSelectionAction } from '@/actions/clear-selection';
+import { SelectLayersAction } from '@/actions/select-layers';
+import { UpdateLayerAction } from '@/actions/update-layer';
+import { BundleAction } from '@/actions/bundle';
+
 import { t, tm, rt } from '@/i18n';
+
+import type { ColorModel, DrawWorkingFileOptions, UpdateAnyLayerOptions, WorkingFileLayer } from '@/types';
 
 const DRAG_TYPE_ALL = 0;
 const DRAG_TYPE_TOP = 1;
@@ -340,8 +344,18 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 const layerId = this.transformStartPickLayer;
                 this.transformStartPickLayer = null;
                 if (layerId != null && layerId != workingFileStore.get('selectedLayerIds')[0]) {
+                    let selectedLayerIds = new Set<number>();
+
+                    // Multiple selection
+                    // if (isCtrlOrMetaKeyPressed.value) {
+                    //     for (const existingLayerId of workingFileStore.state.selectedLayerIds) {
+                    //         selectedLayerIds.add(existingLayerId);
+                    //     }
+                    // }
+
+                    selectedLayerIds.add(layerId);
                     await historyStore.dispatch('runAction', {
-                        action: new SelectLayersAction([layerId])
+                        action: new SelectLayersAction(Array.from(selectedLayerIds))
                     });
                     await nextTick();
                     this.setBoundsFromSelectedLayersImmediate();
