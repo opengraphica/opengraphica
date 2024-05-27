@@ -55,7 +55,11 @@ import ElInputGroup from '@/ui/el-input-group.vue';
 import ElInputNumber from '@/ui/el-input-number.vue';
 import ElPopover from '@/ui/el-popover.vue';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
+
+import defaultFontFamilies from '@/config/default-font-families.json';
+
 import { textMetaDefaults } from '@/canvas/store/text-state';
+
 import appEmitter from '@/lib/emitter';
 import canvasStore from '@/store/canvas';
 
@@ -83,7 +87,7 @@ export default defineComponent({
     setup(props, { emit }) {
 
         const family = ref<string>(textMetaDefaults.family);
-        const familyList = ref<string[]>([textMetaDefaults.family]);
+        const familyList = ref<string[]>(defaultFontFamilies.map((family) => family.family));
         const size = ref<number>(textMetaDefaults.size);
 
         return {

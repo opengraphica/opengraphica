@@ -110,7 +110,8 @@ module.exports = function setupConfig(config) {
                 patterns: [
                     { from: path.resolve(__dirname, 'src/assets/favicon'), to: '[name][ext]' },
                     { from: path.resolve(__dirname, 'src/css/main-*.css'), to: 'css/[name][ext]' },
-                    { from: path.resolve(__dirname, 'src/assets/fonts'), to: 'css/fonts' },
+                    { from: path.resolve(__dirname, 'src/css/fonts'), to: 'css/fonts' },
+                    { from: path.resolve(__dirname, 'src/assets/fonts'), to: 'fonts' },
                     { from: path.resolve(__dirname, 'src/assets/icons'), to: 'icons' },
                     { from: path.resolve(__dirname, 'src/assets/images'), to: 'images' },
                     { from: path.resolve(__dirname, 'src/workers'), to: 'js/workers' },

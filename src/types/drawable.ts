@@ -8,6 +8,8 @@ export interface DefaultDrawableData {
 
 export interface DrawableOptionsGeneral<T = DefaultDrawableData> {
     renderMode: DrawableRenderMode;
+    isInWorker: boolean;
+    needsUpdateCallback: (data: any) => void;
     data?: T;
 }
 

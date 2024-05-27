@@ -40,7 +40,7 @@ export default class DrawableCanvas {
     private forceDrawOnMainThread: boolean;
 
     private drawables = new Map<string, DrawableInfo>();
-    private drawableClassMap: Record<string, DrawableConstructor> = {};
+    private drawableClassMap: Record<string, () => Promise<DrawableConstructor>> = {};
 
     private mainThreadCanvas: HTMLCanvasElement | undefined = undefined;
     private mainThreadCanvasCtx2d: CanvasRenderingContext2D | undefined = undefined;
@@ -100,7 +100,7 @@ export default class DrawableCanvas {
             }
         } else {
             for (const uuid of this.drawables.keys()) {
-                this.initializeDrawable(uuid);
+                await this.initializeDrawable(uuid);
             }
         }
 
@@ -121,13 +121,22 @@ export default class DrawableCanvas {
         }
     }
 
-    private initializeDrawable(uuid: string) {
+    private async initializeDrawable(uuid: string) {
         if (!this.offscreenCanvasUuid) {
             const drawableInfo = this.drawables.get(uuid);
             if (!drawableInfo) return;
             const { name } = drawableInfo;
-            drawableInfo.drawable = new this.drawableClassMap[name]({
+            const DrawableClass = await this.drawableClassMap[name]();
+            drawableInfo.drawable = new DrawableClass({
                 renderMode: this.renderMode,
+                isInWorker: false,
+                needsUpdateCallback: (data: any) => {
+                    this.draw({
+                        updates: [
+                            { uuid, data },
+                        ],
+                    });
+                },
                 scene: undefined as never,
             });
         }
@@ -161,7 +170,7 @@ export default class DrawableCanvas {
         }
     }
 
-    add<T = DefaultDrawableData>(name: string, data: T = {} as never): string {
+    async add<T = DefaultDrawableData>(name: string, data: T = {} as never): Promise<string> {
         const uuid = uuidv4();
         this.drawables.set(uuid, {
             name,
@@ -171,7 +180,7 @@ export default class DrawableCanvas {
             if (this.offscreenCanvasUuid) {
                 addDrawable(this.offscreenCanvasUuid, uuid, name, data);
             }
-            this.initializeDrawable(uuid);
+            await this.initializeDrawable(uuid);
         }
         return uuid;
     }

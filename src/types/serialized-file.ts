@@ -1,4 +1,5 @@
 import { ColorModel, ColorModelName } from './color';
+import { TextDocument } from './text';
 import { VectorShape } from './vector';
 import { MeasuringUnits, ResolutionUnits } from './metrics';
 import { WorkingFileLayerBlendingMode, WorkingFileLayerFilter, WorkingFileLayerType } from './working-file';
@@ -78,48 +79,9 @@ export interface SerializedFileVectorLayer<T extends ColorModel> extends Seriali
     data: VectorShape<T>[];
 }
 
-export interface SerializedFileTextLayerSpanMeta<T extends ColorModel> {
-    family?: string;
-    size?: number;
-    weight?: number;
-    style?: 'normal' | 'italic' | 'oblique';
-    obliqueAngle?: number;
-    underline?: null | 'solid' | 'wavy' | 'dashed';
-    underlineColor?: null | T;
-    underlineThickness?: number;
-    overline?: null | 'solid' | 'wavy' | 'dashed';
-    overlineColor?: null | T;
-    overlineThickness?: number;
-    strikethrough?: null | 'solid' | 'wavy' | 'dashed';
-    strikethroughColor?: null | T;
-    strikethroughThickness?: number;
-    fillColor?: T;
-    strokeColor?: T;
-    strokeSize?: number;
-    tracking?: number;
-    leading?: number;
-}
-
-export interface SerializedFileTextLayerSpan<T extends ColorModel> {
-    text: string;
-    meta: SerializedFileTextLayerSpanMeta<T>;
-}
-
-export interface SerializedFileTextLayerLine<T extends ColorModel> {
-    align: 'start' | 'center' | 'end';
-    spans: SerializedFileTextLayerSpan<T>[];
-}
-
 export interface SerializedFileTextLayer<T extends ColorModel> extends SerializedFileLayer<T> {
     type: 'text';
-    data: {
-        boundary: 'dynamic' | 'box';
-        kerning: 'metrics' | 'none';
-        baseDirection: 'ltr' | 'rtl' | 'ttb' | 'btt';
-        wrapDirection: 'ltr' | 'rtl' | 'ttb' | 'btt';
-        wrapAt: 'word' | 'wordThenLetter';
-        lines: SerializedFileTextLayerLine<T>[];
-    }
+    data: TextDocument;
 }
 
 export interface SerializedFile<T extends ColorModel> {

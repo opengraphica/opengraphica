@@ -1,8 +1,8 @@
-import { ColorModel, WorkingFileTextLayerSpan, WorkingFileTextLayerSpanMeta } from '@/types';
+import { ColorModel, TextDocumentSpan } from '@/types';
 
 export interface TextLayerRenderInfoWrap<T extends ColorModel> {
     characterOffsets: number[];
-    spans: WorkingFileTextLayerSpan<T>[];
+    spans: TextDocumentSpan<T>[];
 }
 
 export interface TextLayerCacheItem<T extends ColorModel> {
@@ -27,10 +27,9 @@ export interface TextLayerCacheItem<T extends ColorModel> {
 export const textLayerCache = new WeakMap<object, TextLayerCacheItem<ColorModel>>();
 
 export const textMetaDefaults = Object.freeze({
-    family: 'Arial',
+    family: 'Roboto',
     size: 16,
-    weight: 400,
-    style: 'normal',
+    variant: 'regular',
     obliqueAngle: 0,
     underline: null,
     underlineColor: null,

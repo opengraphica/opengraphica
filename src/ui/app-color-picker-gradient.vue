@@ -143,12 +143,12 @@ export default defineComponent({
 
             // Create assets for saturation/value gradient
 
-            const valueGradientCanvas = okhsvGradientCanvas.value!;
-            const valueGradientCanvasClientRect = valueGradientCanvas.getBoundingClientRect();
+            let valueGradientCanvas = okhsvGradientCanvas.value!;
+            let valueGradientCanvasClientRect = valueGradientCanvas.getBoundingClientRect();
             valueGradientCanvas.width = valueGradientCanvasClientRect.width;
             valueGradientCanvas.height = valueGradientCanvasClientRect.height;
 
-            const valueGradientRenderer = new WebGLRenderer({
+            let valueGradientRenderer = new WebGLRenderer({
                 alpha: true,
                 canvas: valueGradientCanvas,
                 premultipliedAlpha: false,
@@ -159,13 +159,13 @@ export default defineComponent({
             valueGradientRenderer.outputEncoding = sRGBEncoding;
             valueGradientRenderer.setSize(valueGradientCanvas.width, valueGradientCanvas.height, false);
 
-            const valueGradientScene = new Scene();
+            let valueGradientScene = new Scene();
 
-            const valueGradientCamera = new OrthographicCamera(0, valueGradientCanvas.width, 0, valueGradientCanvas.height, 0.1, 10000);
+            let valueGradientCamera = new OrthographicCamera(0, valueGradientCanvas.width, 0, valueGradientCanvas.height, 0.1, 10000);
             valueGradientCamera.position.z = 1;
             valueGradientCamera.updateProjectionMatrix();
 
-            const saturationValueContainerClientRect = saturationValueContainer.value!.getBoundingClientRect();
+            let saturationValueContainerClientRect = saturationValueContainer.value!.getBoundingClientRect();
             saturationValueHandleContainerClientRect = saturationValueHandleContainer.value!.getBoundingClientRect();
 
             pickedColor.value = colorToHsva(colorToRgba(pickedColor.value, 'hsva', 'srgb'), 'rgba', 'oklab');
@@ -186,12 +186,16 @@ export default defineComponent({
                 },
             });
 
-            const valueGradientImageGeometry = new ImagePlaneGeometry(valueGradientCanvas.width, valueGradientCanvas.height);
+            let valueGradientImageGeometry = new ImagePlaneGeometry(valueGradientCanvas.width, valueGradientCanvas.height);
 
-            const valueGradientImagePlane = new Mesh(valueGradientImageGeometry, valueGradientShaderMaterial);
+            let valueGradientImagePlane = new Mesh(valueGradientImageGeometry, valueGradientShaderMaterial);
             valueGradientScene.add(valueGradientImagePlane);
 
             valueGradientRenderer.render(valueGradientScene, valueGradientCamera);
+
+            (valueGradientCanvas as unknown) = undefined;
+            (valueGradientCanvasClientRect as unknown) = undefined;
+            (saturationValueContainerClientRect as unknown) = undefined;
 
             setThreejsHsvGradientHue = (hue: number) => {
                 if (valueGradientShaderMaterial.uniforms.hue.value != hue) {
@@ -202,12 +206,12 @@ export default defineComponent({
 
             // Create assets for hue
 
-            const hueGradientCanvas = okhsvHueSliderCanvas.value!;
-            const hueGradientCanvasClientRect = hueGradientCanvas.getBoundingClientRect();
+            let hueGradientCanvas = okhsvHueSliderCanvas.value!;
+            let hueGradientCanvasClientRect = hueGradientCanvas.getBoundingClientRect();
             hueGradientCanvas.width = hueGradientCanvasClientRect.width;
             hueGradientCanvas.height = hueGradientCanvasClientRect.height;
 
-            const hueGradientRenderer = new WebGLRenderer({
+            let hueGradientRenderer = new WebGLRenderer({
                 alpha: true,
                 canvas: hueGradientCanvas,
                 premultipliedAlpha: false,
@@ -218,14 +222,14 @@ export default defineComponent({
             hueGradientRenderer.outputEncoding = sRGBEncoding;
             hueGradientRenderer.setSize(hueGradientCanvas.width, hueGradientCanvas.height, false);
 
-            const hueGradientScene = new Scene();
+            let hueGradientScene = new Scene();
 
-            const hueGradientCamera = new OrthographicCamera(0, hueGradientCanvas.width, 0, hueGradientCanvas.height, 0.1, 10000);
+            let hueGradientCamera = new OrthographicCamera(0, hueGradientCanvas.width, 0, hueGradientCanvas.height, 0.1, 10000);
             hueGradientCamera.position.z = 1;
             hueGradientCamera.updateProjectionMatrix();
 
-            const hueSliderContainerClientRect = hueSliderContainer.value!.getBoundingClientRect();
-            const hueSliderClientRect = hueSlider.value!.$el.getBoundingClientRect();
+            let hueSliderContainerClientRect = hueSliderContainer.value!.getBoundingClientRect();
+            let hueSliderClientRect = hueSlider.value!.$el.getBoundingClientRect();
 
             let hueGradientShaderMaterial = new ShaderMaterial({
                 transparent: true,
@@ -240,22 +244,39 @@ export default defineComponent({
                 },
             });
 
-            const hueGradientImageGeometry = new ImagePlaneGeometry(hueGradientCanvas.width, hueGradientCanvas.height);
+            let hueGradientImageGeometry = new ImagePlaneGeometry(hueGradientCanvas.width, hueGradientCanvas.height);
 
-            const hueGradientImagePlane = new Mesh(hueGradientImageGeometry, hueGradientShaderMaterial);
+            let hueGradientImagePlane = new Mesh(hueGradientImageGeometry, hueGradientShaderMaterial);
             hueGradientScene.add(hueGradientImagePlane);
 
             hueGradientRenderer.render(hueGradientScene, hueGradientCamera);
 
+            hueGradientScene.clear();
             hueGradientRenderer.dispose();
             hueGradientShaderMaterial.dispose();
             hueGradientImageGeometry.dispose();
 
+            (hueGradientCanvasClientRect as unknown) = undefined;
+            (hueGradientCanvas as unknown) = undefined;
+            (hueGradientRenderer as unknown) = undefined;
+            (hueGradientImageGeometry as unknown) = undefined;
+            (hueGradientImagePlane as unknown) = undefined;
+            (hueGradientScene as unknown) = undefined;
+            (hueGradientCamera as unknown) = undefined;
+            (hueSliderContainerClientRect as unknown) = undefined;
+            (hueSliderClientRect as unknown) = undefined;
+
             disposeThreejsAssets = () => {
+                valueGradientScene.clear();
                 valueGradientRenderer.dispose();
+                (valueGradientRenderer as unknown) = undefined;
                 valueGradientShaderMaterial.dispose();
                 (valueGradientShaderMaterial as unknown) = undefined;
                 valueGradientImageGeometry.dispose();
+                (valueGradientImageGeometry as unknown) = undefined;
+                (valueGradientCamera as unknown) = undefined;
+                (valueGradientScene as unknown) = undefined;
+                (valueGradientImagePlane as unknown) = undefined;
             };
         }
 

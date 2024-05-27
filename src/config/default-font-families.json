@@ -1,0 +1,55 @@
+[
+    {
+        "family": "Roboto",
+        "variants": {
+            "100": {
+                "name": "Thin",
+                "file": "fonts/Roboto-Thin.ttf"
+            },
+            "100italic": {
+                "name": "Thin Italic",
+                "file": "fonts/Roboto-ThinItalic.ttf"
+            },
+            "300": {
+                "name": "Light",
+                "file": "fonts/Roboto-Light.ttf"
+            },
+            "300italic": {
+                "name": "Light Italic", 
+                "file": "fonts/Roboto-LightItalic.ttf"
+            },
+            "regular": {
+                "name": "Regular",
+                "file": "fonts/Roboto-Regular.ttf"
+            },
+            "italic": {
+                "name": "Regular Italic",
+                "file": "fonts/Roboto-Italic.ttf"
+            },
+            "500": {
+                "name": "Medium",
+                "file": "fonts/Roboto-Medium.ttf"
+            },
+            "500italic": {
+                "name": "Medium Italic",
+                "file": "fonts/Roboto-MediumItalic.ttf"
+            },
+            "700": {
+                "name": "Bold",
+                "file": "fonts/Roboto-Bold.ttf"
+            },
+            "700italic": {
+                "name": "Bold Italic",
+                "file": "fonts/Roboto-BoldItalic.ttf"
+            },
+            "900": {
+                "name": "Black",
+                "file": "fonts/Roboto-Black.ttf"
+            },
+            "900italic": {
+                "name": "Black Italic",
+                "file": "fonts/Roboto-BlackItalic.ttf"
+            }
+        }
+    }
+]

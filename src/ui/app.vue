@@ -25,6 +25,7 @@
                     ref="dndDropOverlay"
                     @click="showDndDropOverlay = false"
                 />
+                <app-docks />
             </template>
         </template>
     </div>
@@ -35,6 +36,7 @@ import { computed, defineComponent, ref, provide, onMounted, onUnmounted, watch 
 import AppCanvas from '@/ui/app-canvas.vue';
 import AppDialogs from '@/ui/app-dialogs.vue';
 import AppDndDropOverlay from '@/ui/app-dnd-drop-overlay.vue';
+import AppDocks from '@/ui/app-docks.vue';
 import AppLayoutDndContainer from '@/ui/app-layout-dnd-container.vue';
 import AppMenuDrawers from '@/ui/app-menu-drawers.vue';
 import AppWait from '@/ui/app-wait.vue';
@@ -54,6 +56,7 @@ export default defineComponent({
         AppCanvas,
         AppDialogs,
         AppDndDropOverlay,
+        AppDocks,
         AppLayoutDndContainer,
         AppMenuDrawers,
         AppWait

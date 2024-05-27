@@ -93,7 +93,9 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
             }
             canvasStore.set('dirty', true);
         });
-        this.brushStrokeDrawableUuid = this.drawablePreviewCanvas.add<BrushStrokeData>('brushStroke', { smoothing: 1 });
+        this.drawablePreviewCanvas.add<BrushStrokeData>('brushStroke', { smoothing: 1 }).then((uuid) => {
+            this.brushStrokeDrawableUuid = uuid;
+        });
 
         this.selectedLayerIdsUnwatch = watch(() => workingFileStore.state.selectedLayerIds, (newIds, oldIds) => {
             const unusedOldIds = oldIds?.filter(id => newIds.indexOf(id) === -1) ?? [];
@@ -388,7 +390,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                     let sourceY = 0;
                     try {
                         await drawableCanvas.initialized();
-                        const brushStrokeUuid = drawableCanvas.add('brushStroke');
+                        const brushStrokeUuid = await drawableCanvas.add('brushStroke');
                         await drawableCanvas.draw({
                             refresh: true,
                             transform: layerTransform,

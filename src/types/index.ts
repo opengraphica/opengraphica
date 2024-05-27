@@ -6,6 +6,7 @@ export * from './filter';
 export * from './keyboard-map';
 export * from './metrics';
 export * from './serialized-file';
+export * from './text';
 export * from './tool-layout-config';
 export * from './typescript-language';
 export * from './vector';

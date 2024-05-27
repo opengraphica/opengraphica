@@ -1,5 +1,4 @@
 import drawableClassMap from '@/canvas/drawables';
-import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 
 import type { Drawable, DrawableRenderMode, DrawableDrawOptions } from '@/types';
 import type {
@@ -69,12 +68,21 @@ function setCanvasRenderScale(request: SetCanvasRenderScaleRequest) {
     renderScale = request.renderScale;
 }
 
-function addDrawable(request: AddDrawableRequest) {
+async function addDrawable(request: AddDrawableRequest) {
     const { uuid, name, data } = request;
-    const DrawableClass = drawableClassMap[name];
+    const DrawableClass = await drawableClassMap[name]();
     drawableMap.set(uuid, {
         drawable: new DrawableClass({
             renderMode,
+            isInWorker: true,
+            needsUpdateCallback: (data: any) => {
+                drawCanvas({
+                    type: 'DRAW_CANVAS',
+                    options: {
+                        updates: [{ uuid, data }],
+                    },
+                })
+            },
             scene: {} as any,
             data,
         }),

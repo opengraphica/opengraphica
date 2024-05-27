@@ -1,6 +1,6 @@
 import { ColorModel } from './color';
+import { TextDocument } from './text';
 import { VectorShape } from './vector';
-import { DecomposedMatrix } from '@/lib/dom-matrix';
 import type { Camera, Scene, WebGLRenderer } from 'three';
 
 export interface DrawWorkingFileLayerOptions {
@@ -175,48 +175,9 @@ export interface WorkingFileVectorLayer<T extends ColorModel = ColorModel> exten
     data: VectorShape<T>[];
 }
 
-export interface WorkingFileTextLayerSpanMeta<T extends ColorModel = ColorModel> {
-    family?: string;
-    size?: number;
-    weight?: number;
-    style?: 'normal' | 'italic' | 'oblique';
-    obliqueAngle?: number;
-    underline?: null | 'solid' | 'wavy' | 'dashed';
-    underlineColor?: null | T;
-    underlineThickness?: number;
-    overline?: null | 'solid' | 'wavy' | 'dashed';
-    overlineColor?: null | T;
-    overlineThickness?: number;
-    strikethrough?: null | 'solid' | 'wavy' | 'dashed';
-    strikethroughColor?: null | T;
-    strikethroughThickness?: number;
-    fillColor?: T;
-    strokeColor?: T;
-    strokeSize?: number;
-    tracking?: number;
-    leading?: number;
-}
-
-export interface WorkingFileTextLayerSpan<T extends ColorModel = ColorModel> {
-    text: string;
-    meta: WorkingFileTextLayerSpanMeta<T>;
-}
-
-export interface WorkingFileTextLayerLine<T extends ColorModel = ColorModel> {
-    align: 'start' | 'center' | 'end';
-    spans: WorkingFileTextLayerSpan<T>[];
-}
-
 export interface WorkingFileTextLayer<T extends ColorModel = ColorModel> extends WorkingFileLayer<T> {
     type: 'text';
-    data: {
-        boundary: 'dynamic' | 'box';
-        kerning: 'metrics' | 'none';
-        baseDirection: 'ltr' | 'rtl' | 'ttb' | 'btt';
-        wrapDirection: 'ltr' | 'rtl' | 'ttb' | 'btt';
-        wrapAt: 'word' | 'wordThenLetter';
-        lines: WorkingFileTextLayerLine<T>[];
-    }
+    data: TextDocument;
 }
 
 export type WorkingFileAnyLayer<T extends ColorModel = ColorModel> = WorkingFileEmptyLayer<T> | WorkingFileGroupLayer<T> | WorkingFileRasterLayer<T> | WorkingFileRasterSequenceLayer<T> | WorkingFileVectorLayer<T> | WorkingFileTextLayer<T>;
