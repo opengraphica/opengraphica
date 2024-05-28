@@ -61,7 +61,6 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
             });
         });
         this.drawableCanvas.onDrawn(async ({ canvas }) => {
-            console.log(canvas);
             this.isDrawnAfterAttach = true;
             let newTexture: Texture = await createThreejsTextureFromImage(canvas);
 

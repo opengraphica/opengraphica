@@ -43,7 +43,8 @@ export class FontCache {
             const fontFamilyDefinition = await this.getFontFamilyDefinition(family);
             const fontFetchPromises: Promise<{ variant: string; font: Font }>[] = [];
             for (const variantName in fontFamilyDefinition.variants) {
-                const fontUrl = this.fetchBaseUrl + fontFamilyDefinition.variants[variantName].file;
+                const fileUrl = fontFamilyDefinition.variants[variantName].file;
+                const fontUrl = (fileUrl.startsWith('http') ? '' : this.fetchBaseUrl) + fileUrl;
                 fontFetchPromises.push(new Promise((resolve, reject) => {
                     fetch(fontUrl).then((result) => {
                         result.arrayBuffer().then((fontArrayBuffer) => {
@@ -82,7 +83,7 @@ export class FontCache {
     private async getFontFamilyDefinition(family: string): Promise<FontFamilyFetchDefinition> {
         const definition = defaultFontFamilies.find((familyDef) => familyDef.family === family);
         if (definition) {
-            return definition;
+            return definition as unknown as FontFamilyFetchDefinition;
         }
         throw new Error('Definition not found.');
     }

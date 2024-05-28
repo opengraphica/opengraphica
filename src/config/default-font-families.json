@@ -1,54 +1,158 @@
 [
     {
-        "family": "Roboto",
+        "family": "Noto Sans",
+        "subsets": [
+            "cyrillic",
+            "cyrillic-ext",
+            "devanagari",
+            "greek",
+            "greek-ext",
+            "latin",
+            "latin-ext",
+            "vietnamese"
+        ],
         "variants": {
             "100": {
                 "name": "Thin",
-                "file": "fonts/Roboto-Thin.ttf"
-            },
-            "100italic": {
-                "name": "Thin Italic",
-                "file": "fonts/Roboto-ThinItalic.ttf"
+                "file": "fonts/NotoSans/NotoSans-Thin.ttf"
             },
             "300": {
                 "name": "Light",
-                "file": "fonts/Roboto-Light.ttf"
-            },
-            "300italic": {
-                "name": "Light Italic", 
-                "file": "fonts/Roboto-LightItalic.ttf"
+                "file": "fonts/NotoSans/NotoSans-Light.ttf"
             },
             "regular": {
                 "name": "Regular",
-                "file": "fonts/Roboto-Regular.ttf"
-            },
-            "italic": {
-                "name": "Regular Italic",
-                "file": "fonts/Roboto-Italic.ttf"
+                "file": "fonts/NotoSans/NotoSans-Regular.ttf"
             },
             "500": {
                 "name": "Medium",
-                "file": "fonts/Roboto-Medium.ttf"
-            },
-            "500italic": {
-                "name": "Medium Italic",
-                "file": "fonts/Roboto-MediumItalic.ttf"
+                "file": "fonts/NotoSans/NotoSans-Medium.ttf"
             },
             "700": {
                 "name": "Bold",
-                "file": "fonts/Roboto-Bold.ttf"
-            },
-            "700italic": {
-                "name": "Bold Italic",
-                "file": "fonts/Roboto-BoldItalic.ttf"
+                "file": "fonts/NotoSans/NotoSans-Bold.ttf"
             },
             "900": {
                 "name": "Black",
-                "file": "fonts/Roboto-Black.ttf"
+                "file": "fonts/NotoSans/NotoSans-Black.ttf"
+            },
+            "100italic": {
+                "name": "Thin Italic",
+                "file": "fonts/NotoSans/NotoSans-ThinItalic.ttf"
+            },
+            "300italic": {
+                "name": "Light Italic",
+                "file": "fonts/NotoSans/NotoSans-LightItalic.ttf"
+            },
+            "italic": {
+                "name": "Regular Italic",
+                "file": "fonts/NotoSans/NotoSans-Italic.ttf"
+            },
+            "500italic": {
+                "name": "Medium Italic",
+                "file": "fonts/NotoSans/NotoSans-MediumItalic.ttf"
+            },
+            "700italic": {
+                "name": "Bold Italic",
+                "file": "fonts/NotoSans/NotoSans-BoldItalic.ttf"
             },
             "900italic": {
                 "name": "Black Italic",
-                "file": "fonts/Roboto-BlackItalic.ttf"
+                "file": "fonts/NotoSans/NotoSans-BlackItalic.ttf"
+            }
+        }
+    },
+    {
+        "family": "Noto Sans Arabic",
+        "subsets": [
+            "arabic"
+        ],
+        "variants": {
+            "100": {
+                "name": "Thin",
+                "file": "fonts/NotoSansArabic/NotoSansArabic-Thin.ttf"
+            },
+            "300": {
+                "name": "Light",
+                "file": "fonts/NotoSansArabic/NotoSansArabic-Light.ttf"
+            },
+            "regular": {
+                "name": "Regular",
+                "file": "fonts/NotoSansArabic/NotoSansArabic-Regular.ttf"
+            },
+            "500": {
+                "name": "Medium",
+                "file": "fonts/NotoSansArabic/NotoSansArabic-Medium.ttf"
+            },
+            "700": {
+                "name": "Bold",
+                "file": "fonts/NotoSansArabic/NotoSansArabic-Bold.ttf"
+            },
+            "900": {
+                "name": "Black",
+                "file": "fonts/NotoSansArabic/NotoSansArabic-Black.ttf"
+            }
+        }
+    },
+    {
+        "family": "Roboto",
+        "subsets": [
+            "cyrillic",
+            "cyrillic-ext",
+            "greek",
+            "greek-ext",
+            "latin",
+            "latin-ext",
+            "vietnamese"
+        ],
+        "variants": {
+            "100": {
+                "name": "Thin",
+                "file": "fonts/Roboto/Roboto-Thin.ttf"
+            },
+            "100italic": {
+                "name": "Thin Italic",
+                "file": "fonts/Roboto/Roboto-ThinItalic.ttf"
+            },
+            "300": {
+                "name": "Light",
+                "file": "fonts/Roboto/Roboto-Light.ttf"
+            },
+            "300italic": {
+                "name": "Light Italic", 
+                "file": "fonts/Roboto/Roboto-LightItalic.ttf"
+            },
+            "regular": {
+                "name": "Regular",
+                "file": "fonts/Roboto/Roboto-Regular.ttf"
+            },
+            "italic": {
+                "name": "Regular Italic",
+                "file": "fonts/Roboto/Roboto-Italic.ttf"
+            },
+            "500": {
+                "name": "Medium",
+                "file": "fonts/Roboto/Roboto-Medium.ttf"
+            },
+            "500italic": {
+                "name": "Medium Italic",
+                "file": "fonts/Roboto/Roboto-MediumItalic.ttf"
+            },
+            "700": {
+                "name": "Bold",
+                "file": "fonts/Roboto/Roboto-Bold.ttf"
+            },
+            "700italic": {
+                "name": "Bold Italic",
+                "file": "fonts/Roboto/Roboto-BoldItalic.ttf"
+            },
+            "900": {
+                "name": "Black",
+                "file": "fonts/Roboto/Roboto-Black.ttf"
+            },
+            "900italic": {
+                "name": "Black Italic",
+                "file": "fonts/Roboto/Roboto-BlackItalic.ttf"
             }
         }
     }
