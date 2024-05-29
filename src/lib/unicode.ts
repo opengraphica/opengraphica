@@ -5,6 +5,8 @@
 
 import scriptRanges from './unicode/script-ranges';
 
+const subsetLookupCache = new Map<number, string[]>();
+
 const lettersPattern = /\p{Alphabetic}+/ug;
 
 export function getScripts(text: string): string[] {
@@ -29,12 +31,17 @@ export function getSubsets(text: string): string[] {
     const foundSubsets = new Set<string>();
     for (let i = 0; i < textLetters.length; i++) {
         const charCode = textLetters.charCodeAt(i);
-        const block = findBlock(charCode);
-        if (block) {
-            const { subsets } = block;
-            for (const subset of subsets ?? []) {
-                foundSubsets.add(subset);
+        let lookupSubsets = subsetLookupCache.get(charCode);
+        if (!lookupSubsets) {
+            const block = findBlock(charCode);
+            if (block) {
+                const { subsets } = block;
+                lookupSubsets = subsets;
+                subsetLookupCache.set(charCode, subsets ?? []);
             }
+        }
+        for (const subset of lookupSubsets ?? []) {
+            foundSubsets.add(subset);
         }
     }
 

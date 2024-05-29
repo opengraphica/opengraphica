@@ -19,6 +19,7 @@ export interface RenderGlyphInfo {
 
 export interface FontFamilyFetchDefinition  {
     family: string;
+    subsets: string[];
     variants: {
         [key: string]: {
             name: string;

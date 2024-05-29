@@ -8,6 +8,7 @@ export interface CreateFontCacheOptions {
 }
 
 export interface FontFamilyFontCache {
+    subsets: string[];
     variants: {
         [key: string]: Font;
     };
@@ -30,6 +31,15 @@ export class FontCache {
 
     public getFontFamily(family: string): FontFamilyFontCache | null {
         return this.fontFamilyMap.get(family) ?? null;
+    }
+
+    public getFallbackFontFamilyThatSatisfiesSubset(subset: string): FontFamilyFontCache | null {
+        for (const [family, fontFamilyCache] of this.fontFamilyMap.entries()) {
+            if (fontFamilyCache.subsets.includes(subset)) {
+                return fontFamilyCache;
+            }
+        }
+        return null;
     }
 
     public async loadFontFamily(family: string): Promise<FontFamilyFontCache> {
@@ -62,6 +72,7 @@ export class FontCache {
             }
             const fontFetchResult = await Promise.allSettled(fontFetchPromises);
             const cache: FontFamilyFontCache = {
+                subsets: fontFamilyDefinition.subsets,
                 variants: {},
             };
             for (const fetchResult of fontFetchResult) {
