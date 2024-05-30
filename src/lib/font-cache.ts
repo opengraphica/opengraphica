@@ -99,3 +99,10 @@ export class FontCache {
         throw new Error('Definition not found.');
     }
 }
+
+const isInWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+const fontCache = new FontCache({
+    fetchBaseUrl: isInWorker ? '../../' : ''
+});
+
+export default fontCache;

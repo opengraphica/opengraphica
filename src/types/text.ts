@@ -3,17 +3,19 @@ import { ColorModel } from './color';
 import type { Glyph } from 'opentype.js';
 
 export interface RenderTextLineInfo {
-    glyphs: RenderGlyphInfo[];
+    glyphs: RenderTextGlyphInfo[];
     heightAboveBaseline: number;
     heightBelowBaseline: number;
     largestCharacterWidth: number;
     lineSize: number;
 }
 
-export interface RenderGlyphInfo {
+export interface RenderTextGlyphInfo {
     glyph: Glyph;
     advance: number;
     fontSize: number;
+    fontAscender: number;
+    fontDescender: number;
     characterIndex: number;
 }
 

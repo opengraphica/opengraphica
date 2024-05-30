@@ -31,6 +31,7 @@ export interface DrawnCallbackEvent {
     canvas: HTMLCanvasElement;
     sourceX: number;
     sourceY: number;
+    updateInfo: Record<string, any>;
 }
 
 export default class DrawableCanvas {
@@ -46,6 +47,7 @@ export default class DrawableCanvas {
     private mainThreadCanvasCtx2d: CanvasRenderingContext2D | undefined = undefined;
     private lastDrawX: number = 0;
     private lastDrawY: number = 0;
+    private lastDrawUpdateInfo: Record<string, any> = {};
 
     private offscreenCanvasUuid: string | undefined = undefined;
     private offscreenCanvasLastCallbackData: DrawnCallbackEvent | undefined = undefined;
@@ -148,6 +150,7 @@ export default class DrawableCanvas {
             canvas: event.canvas,
             sourceX: event.sourceX,
             sourceY: event.sourceY,
+            updateInfo: event.updateInfo,
         };
         this.onDrawnCallback?.(callbackData);
         for (const callbackHandler of this.onDrawCompleteCallbacks) {
@@ -222,6 +225,7 @@ export default class DrawableCanvas {
                 canvas: this.mainThreadCanvas!,
                 sourceX: this.lastDrawX,
                 sourceY: this.lastDrawY,
+                updateInfo: this.lastDrawUpdateInfo,
             };
         }
     }
@@ -238,6 +242,7 @@ export default class DrawableCanvas {
         let right = -Infinity;
         let bottom = -Infinity;
 
+        let updateInfo: Record<string, any> = {};
         for (const drawableUpdate of drawableUpdates) {
             const drawableInfo = this.drawables.get(drawableUpdate.uuid);
             if (!drawableInfo?.drawable) continue;
@@ -261,6 +266,9 @@ export default class DrawableCanvas {
                 if (drawingBounds.right > right) right = drawingBounds.right;
                 if (drawingBounds.top < top) top = drawingBounds.top;
                 if (drawingBounds.bottom > bottom) bottom = drawingBounds.bottom;
+            }
+            if (drawingBounds.updateInfo) {
+                updateInfo[drawableUpdate.uuid] = drawingBounds.updateInfo;
             }
         }
 
@@ -290,10 +298,12 @@ export default class DrawableCanvas {
 
         this.lastDrawX = drawX;
         this.lastDrawY = drawY;
+        this.lastDrawUpdateInfo = updateInfo;
         this.onDrawnCallback?.({
             canvas,
             sourceX: drawX,
             sourceY: drawY,
+            updateInfo,
         });
     }
 

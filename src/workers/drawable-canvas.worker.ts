@@ -115,6 +115,7 @@ function drawCanvas(request: DrawCanvasRequest) {
     let right = -Infinity;
     let bottom = -Infinity;
 
+    let updateInfo: Record<string, any> = {};
     for (const drawableUpdate of drawableUpdates) {
         const drawableInfo = drawableMap.get(drawableUpdate.uuid);
         if (!drawableInfo) continue;
@@ -138,6 +139,9 @@ function drawCanvas(request: DrawCanvasRequest) {
             if (drawingBounds.right > right) right = drawingBounds.right;
             if (drawingBounds.top < top) top = drawingBounds.top;
             if (drawingBounds.bottom > bottom) bottom = drawingBounds.bottom;
+        }
+        if (drawingBounds.updateInfo) {
+            updateInfo[drawableUpdate.uuid] = updateInfo;
         }
     }
 
@@ -163,6 +167,7 @@ function drawCanvas(request: DrawCanvasRequest) {
             bitmap: canvas.transferToImageBitmap(),
             sourceX: drawX,
             sourceY: drawY,
+            updateInfo,
         } as DrawCompleteResult);
 
         if (pendingDrawRequest) {

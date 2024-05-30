@@ -3,37 +3,9 @@
  * still applicable for general text editing, with modifications to support more advanced features.
  */
 
-import type { RGBAColor, TextDocument, TextDocumentLine, TextDocumentSpan, TextDocumentSpanMeta } from '@/types';
+import { textMetaDefaults } from './text-common';
 
-// Default settings for styling text.
-// WARNING: changing these values can lead to issues with backwards compatibility.
-export const textMetaDefaults: TextDocumentSpanMeta<RGBAColor> = Object.freeze({
-    direction: 'ltr',
-    family: 'Roboto',
-    size: 16,
-    variant: 'regular',
-    bold: false,
-    oblique: false,
-    obliqueAngle: 0,
-    underline: null,
-    underlineColor: null,
-    underlineThickness: 1,
-    overline: null,
-    overlineColor: null,
-    overlineThickness: 1,
-    strikethrough: null,
-    strikethroughColor: null,
-    strikethroughThickness: 1,
-    fillColor: { is: 'color', r: 0, g: 0, b: 0, alpha: 1, style: '#000000' } as RGBAColor,
-    stroke1Color: { is: 'color', r: 0, g: 0, b: 0, alpha: 1, style: '#000000' } as RGBAColor,
-    stroke1Size: 0,
-    stroke1IsBehind: true,
-    stroke2Color: { is: 'color', r: 0, g: 0, b: 0, alpha: 1, style: '#000000' } as RGBAColor,
-    stroke2Size: 0,
-    stroke2IsBehind: true,
-    tracking: 0,
-    leading: 0,
-});
+import type { TextDocument, TextDocumentLine, TextDocumentSpan, TextDocumentSpanMeta } from '@/types';
 
 /**
  * This class's job is to modify the internal JSON format of a text layer.
@@ -661,6 +633,14 @@ export class TextDocumentEditor {
 		}
 	}
 
+	/**
+	 * Calling this may help the browser with memory clean up.
+	 */
+	public dispose() {
+		(this.document as unknown) = undefined;
+		(this.queuedMetaChanges as unknown) = undefined;
+	}
+
 }
 
 
@@ -670,7 +650,7 @@ export class TextDocumentEditor {
 export class TextDocumentSelection {
     private documentEditor: TextDocumentEditor;
 
-    private isActiveSideEnd: boolean = true;
+    public isActiveSideEnd: boolean = true;
 
     public start: { line: number, character: number };
     public end: { line: number, character: number };
@@ -926,4 +906,56 @@ export class TextDocumentSelection {
 		this.setPosition(newPosition.line, newPosition.character, keepSelection);
 	}
 
+	/**
+	 * Calling this may help the browser with memory clean up.
+	 */
+	 public dispose() {
+		(this.documentEditor as unknown) = undefined;
+	}
+
+}
+
+/**
+ * This class represents static utility functions that operate on an editor + selection.
+ */
+
+export class TextDocumentEditorWithSelection {
+
+	/** Inserts text at the specified selection position in the document. */
+	static insertTextAtCurrentPosition(documentEditor: TextDocumentEditor, documentSelection: TextDocumentSelection, text: string) {
+		if (!documentSelection.isEmpty()) {
+			TextDocumentEditorWithSelection.deleteCharacterAtCurrentPosition(documentEditor, documentSelection);
+		}
+		const position = documentSelection.getPosition();
+		const newPosition = documentEditor.insertText(text, position.line, position.character);
+		documentSelection.setPosition(newPosition.line, newPosition.character);
+	}
+
+	/** Deletes the character at the cursor specified by the selection. */
+	static deleteCharacterAtCurrentPosition(documentEditor: TextDocumentEditor, documentSelection: TextDocumentSelection, forward: boolean = false) {
+		let newPosition;
+		if (documentSelection.isEmpty()) {
+			const position = documentSelection.getPosition();
+			newPosition = documentEditor.deleteCharacter(forward, position.line, position.character);
+		} else {
+			newPosition = documentEditor.deleteRange(
+				documentSelection.start.line,
+				documentSelection.start.character,
+				documentSelection.end.line,
+				documentSelection.end.character
+			);
+		}
+		documentSelection.setPosition(newPosition.line, newPosition.character);
+	}
+
+	/** Deletes the range from the document specified by the selection. */
+	static deleteSelection(documentEditor: TextDocumentEditor, documentSelection: TextDocumentSelection) {
+		let newPosition = documentEditor.deleteRange(
+			documentSelection.start.line,
+			documentSelection.start.character,
+			documentSelection.end.line,
+			documentSelection.end.character
+		);
+		documentSelection.setPosition(newPosition.line, newPosition.character);
+	}
 }

@@ -151,7 +151,10 @@ function getLayersByType<T extends WorkingFileLayer<ColorModel>>(type: string, p
             layers.push(layer);
         }
         if (layer.type === 'group') {
-            layers = layers.concat(getLayersByType(type, (layer as WorkingFileGroupLayer<ColorModel>).layers));
+            const groupChildLayers = getLayersByType(type, (layer as WorkingFileGroupLayer<ColorModel>).layers);
+            for (const childLayer of groupChildLayers) {
+                layers.push(childLayer);
+            }
         }
     }
     return layers as T[];

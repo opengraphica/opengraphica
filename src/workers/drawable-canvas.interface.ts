@@ -18,6 +18,7 @@ interface DrawnCallbackEvent {
     canvas: HTMLCanvasElement;
     sourceX: number;
     sourceY: number;
+    updateInfo: Record<string, any>;
 }
 
 interface CreateDrawableCanvasOptions {
@@ -54,7 +55,7 @@ export async function createDrawableCanvas(options: CreateDrawableCanvasOptions)
         const workerInfo = canvasWorkerMap.get(uuid);
         if (!workerInfo) return;
         if (data.type === 'DRAW_COMPLETE_RESULT') {
-            const { bitmap, sourceX, sourceY } = data;
+            const { bitmap, sourceX, sourceY, updateInfo } = data;
             const canvas = document.createElement('canvas');
             canvas.width = bitmap.width;
             canvas.height = bitmap.height;
@@ -66,6 +67,7 @@ export async function createDrawableCanvas(options: CreateDrawableCanvasOptions)
                 canvas,
                 sourceX,
                 sourceY,
+                updateInfo,
             });
         } else if (data.type === 'INITIALIZED') {
             initializeResolve(uuid);

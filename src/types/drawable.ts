@@ -44,6 +44,7 @@ export interface DrawableUpdateBounds {
     right: number;
     top: number;
     bottom: number;
+    updateInfo?: any; // Drawable can set anything here that may be useful to know after it is drawn
 }
 
 export interface Drawable<T = DefaultDrawableData> {

@@ -49,6 +49,7 @@ export interface DrawCompleteResult {
     bitmap: ImageBitmap;
     sourceX: number;
     sourceY: number;
+    updateInfo: Record<string, any>;
 }
 
 export type DrawQueueResult = InitializedResult | DrawCompleteResult;

@@ -60,7 +60,22 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
                 }
             });
         });
-        this.drawableCanvas.onDrawn(async ({ canvas }) => {
+        this.drawableCanvas.onDrawn(async ({ canvas, updateInfo }) => {
+
+            if (canvas.width <= 1 || canvas.height <= 1) return;
+
+            const { lineDirectionSize, wrapDirectionSize } = updateInfo?.[this.textDrawableUuid ?? ''] ?? {};
+            const isHorizontal = ['ltr', 'rtl'].includes(layer.data.lineDirection);
+
+            // TODO - add history event & merge with text update history? The renderer seems like a weird place to be updating history.
+            if (isHorizontal) {
+                layer.width = lineDirectionSize;
+                layer.height = wrapDirectionSize;
+            } else {
+                layer.width = wrapDirectionSize;
+                layer.height = lineDirectionSize;
+            }
+
             this.isDrawnAfterAttach = true;
             let newTexture: Texture = await createThreejsTextureFromImage(canvas);
 
