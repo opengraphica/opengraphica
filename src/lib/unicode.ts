@@ -26,11 +26,9 @@ export function getScripts(text: string): string[] {
 }
 
 export function getSubsets(text: string): string[] {
-    const textLetters = (text.match(lettersPattern) ?? []).join('');
-
     const foundSubsets = new Set<string>();
-    for (let i = 0; i < textLetters.length; i++) {
-        const charCode = textLetters.charCodeAt(i);
+    for (let i = 0; i < text.length; i++) {
+        const charCode = text.charCodeAt(i);
         let lookupSubsets = subsetLookupCache.get(charCode);
         if (!lookupSubsets) {
             const block = findBlock(charCode);

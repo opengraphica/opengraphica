@@ -1,6 +1,7 @@
 [
     {
         "family": "Noto Sans",
+        "isFallback": false,
         "subsets": [
             "cyrillic",
             "cyrillic-ext",
@@ -64,6 +65,7 @@
     },
     {
         "family": "Noto Sans Arabic",
+        "isFallback": true,
         "subsets": [
             "arabic"
         ],
@@ -95,7 +97,465 @@
         }
     },
     {
+        "family": "Noto Sans Armenian",
+        "isFallback": true,
+        "subsets": [
+            "armenian"
+        ],
+        "variants": {
+            "100": {
+                "name": "Thin",
+                "file": "fonts/NotoSansArmenian/NotoSansArmenian-Thin.ttf"
+            },
+            "300": {
+                "name": "Light",
+                "file": "fonts/NotoSansArmenian/NotoSansArmenian-Light.ttf"
+            },
+            "regular": {
+                "name": "Regular",
+                "file": "fonts/NotoSansArmenian/NotoSansArmenian-Regular.ttf"
+            },
+            "500": {
+                "name": "Medium",
+                "file": "fonts/NotoSansArmenian/NotoSansArmenian-Medium.ttf"
+            },
+            "700": {
+                "name": "Bold",
+                "file": "fonts/NotoSansArmenian/NotoSansArmenian-Bold.ttf"
+            },
+            "900": {
+                "name": "Black",
+                "file": "fonts/NotoSansArmenian/NotoSansArmenian-Black.ttf"
+            }
+        }
+    },
+    {
+        "family": "Noto Sans Bengali",
+        "isFallback": true,
+        "subsets": [
+            "bengali"
+        ],
+        "variants": {
+            "100": {
+                "name": "Thin",
+                "file": "fonts/NotoSansBengali/NotoSansBengali-Thin.ttf"
+            },
+            "300": {
+                "name": "Light",
+                "file": "fonts/NotoSansBengali/NotoSansBengali-Light.ttf"
+            },
+            "regular": {
+                "name": "Regular",
+                "file": "fonts/NotoSansBengali/NotoSansBengali-Regular.ttf"
+            },
+            "500": {
+                "name": "Medium",
+                "file": "fonts/NotoSansBengali/NotoSansBengali-Medium.ttf"
+            },
+            "700": {
+                "name": "Bold",
+                "file": "fonts/NotoSansBengali/NotoSansBengali-Bold.ttf"
+            },
+            "900": {
+                "name": "Black",
+                "file": "fonts/NotoSansBengali/NotoSansBengali-Black.ttf"
+            }
+        }
+    },
+    {
+        "family": "Noto Sans Devanagari",
+        "isFallback": true,
+        "subsets": [
+            "devanagari"
+        ],
+        "variants": {
+            "100": {
+                "name": "Thin",
+                "file": "fonts/NotoSansDevanagari/NotoSansDevanagari-Thin.ttf"
+            },
+            "300": {
+                "name": "Light",
+                "file": "fonts/NotoSansDevanagari/NotoSansDevanagari-Light.ttf"
+            },
+            "regular": {
+                "name": "Regular",
+                "file": "fonts/NotoSansDevanagari/NotoSansDevanagari-Regular.ttf"
+            },
+            "500": {
+                "name": "Medium",
+                "file": "fonts/NotoSansDevanagari/NotoSansDevanagari-Medium.ttf"
+            },
+            "700": {
+                "name": "Bold",
+                "file": "fonts/NotoSansDevanagari/NotoSansDevanagari-Bold.ttf"
+            },
+            "900": {
+                "name": "Black",
+                "file": "fonts/NotoSansDevanagari/NotoSansDevanagari-Black.ttf"
+            }
+        }
+    },
+    {
+        "family": "Noto Sans Georgian",
+        "isFallback": true,
+        "subsets": [
+            "georgian"
+        ],
+        "variants": {
+            "100": {
+                "name": "Thin",
+                "file": "fonts/NotoSansGeorgian/NotoSansGeorgian-Thin.ttf"
+            },
+            "300": {
+                "name": "Light",
+                "file": "fonts/NotoSansGeorgian/NotoSansGeorgian-Light.ttf"
+            },
+            "regular": {
+                "name": "Regular",
+                "file": "fonts/NotoSansGeorgian/NotoSansGeorgian-Regular.ttf"
+            },
+            "500": {
+                "name": "Medium",
+                "file": "fonts/NotoSansGeorgian/NotoSansGeorgian-Medium.ttf"
+            },
+            "700": {
+                "name": "Bold",
+                "file": "fonts/NotoSansGeorgian/NotoSansGeorgian-Bold.ttf"
+            },
+            "900": {
+                "name": "Black",
+                "file": "fonts/NotoSansGeorgian/NotoSansGeorgian-Black.ttf"
+            }
+        }
+    },
+    {
+        "family": "Noto Sans Hebrew",
+        "isFallback": true,
+        "subsets": [
+            "hebrew"
+        ],
+        "variants": {
+            "100": {
+                "name": "Thin",
+                "file": "fonts/NotoSansHebrew/NotoSansHebrew-Thin.ttf"
+            },
+            "300": {
+                "name": "Light",
+                "file": "fonts/NotoSansHebrew/NotoSansHebrew-Light.ttf"
+            },
+            "regular": {
+                "name": "Regular",
+                "file": "fonts/NotoSansHebrew/NotoSansHebrew-Regular.ttf"
+            },
+            "500": {
+                "name": "Medium",
+                "file": "fonts/NotoSansHebrew/NotoSansHebrew-Medium.ttf"
+            },
+            "700": {
+                "name": "Bold",
+                "file": "fonts/NotoSansHebrew/NotoSansHebrew-Bold.ttf"
+            },
+            "900": {
+                "name": "Black",
+                "file": "fonts/NotoSansHebrew/NotoSansHebrew-Black.ttf"
+            }
+        }
+    },
+    {
+        "family": "Noto Sans CJK Japanese",
+        "isFallback": true,
+        "subsets": [
+            "japanese"
+        ],
+        "variants": {
+            "100": {
+                "name": "Thin",
+                "file": "fonts/NotoSansJP/NotoSansJP-Thin.ttf"
+            },
+            "300": {
+                "name": "Light",
+                "file": "fonts/NotoSansJP/NotoSansJP-Light.ttf"
+            },
+            "regular": {
+                "name": "Regular",
+                "file": "fonts/NotoSansJP/NotoSansJP-Regular.ttf"
+            },
+            "500": {
+                "name": "Medium",
+                "file": "fonts/NotoSansJP/NotoSansJP-Medium.ttf"
+            },
+            "700": {
+                "name": "Bold",
+                "file": "fonts/NotoSansJP/NotoSansJP-Bold.ttf"
+            },
+            "900": {
+                "name": "Black",
+                "file": "fonts/NotoSansJP/NotoSansJP-Black.ttf"
+            }
+        }
+    },
+    {
+        "family": "Noto Sans CJK Korean",
+        "isFallback": true,
+        "subsets": [
+            "korean"
+        ],
+        "variants": {
+            "100": {
+                "name": "Thin",
+                "file": "fonts/NotoSansKR/NotoSansKR-Thin.ttf"
+            },
+            "300": {
+                "name": "Light",
+                "file": "fonts/NotoSansKR/NotoSansKR-Light.ttf"
+            },
+            "regular": {
+                "name": "Regular",
+                "file": "fonts/NotoSansKR/NotoSansKR-Regular.ttf"
+            },
+            "500": {
+                "name": "Medium",
+                "file": "fonts/NotoSansKR/NotoSansKR-Medium.ttf"
+            },
+            "700": {
+                "name": "Bold",
+                "file": "fonts/NotoSansKR/NotoSansKR-Bold.ttf"
+            },
+            "900": {
+                "name": "Black",
+                "file": "fonts/NotoSansKR/NotoSansKR-Black.ttf"
+            }
+        }
+    },
+    {
+        "family": "Noto Sans Malayalam",
+        "isFallback": true,
+        "subsets": [
+            "malayalam"
+        ],
+        "variants": {
+            "100": {
+                "name": "Thin",
+                "file": "fonts/NotoSansMalayalam/NotoSansMalayalam-Thin.ttf"
+            },
+            "300": {
+                "name": "Light",
+                "file": "fonts/NotoSansMalayalam/NotoSansMalayalam-Light.ttf"
+            },
+            "regular": {
+                "name": "Regular",
+                "file": "fonts/NotoSansMalayalam/NotoSansMalayalam-Regular.ttf"
+            },
+            "500": {
+                "name": "Medium",
+                "file": "fonts/NotoSansMalayalam/NotoSansMalayalam-Medium.ttf"
+            },
+            "700": {
+                "name": "Bold",
+                "file": "fonts/NotoSansMalayalam/NotoSansMalayalam-Bold.ttf"
+            },
+            "900": {
+                "name": "Black",
+                "file": "fonts/NotoSansMalayalam/NotoSansMalayalam-Black.ttf"
+            }
+        }
+    },
+    {
+        "family": "Noto Sans Mongolian",
+        "isFallback": true,
+        "subsets": [
+            "mongolian"
+        ],
+        "variants": {
+            "regular": {
+                "name": "Regular",
+                "file": "fonts/NotoSansMongolian/NotoSansMongolian-Regular.ttf"
+            }
+        }
+    },
+    {
+        "family": "Noto Sans CJK Simplified Chinese",
+        "isFallback": true,
+        "subsets": [
+            "chinese-simplified"
+        ],
+        "variants": {
+            "100": {
+                "name": "Thin",
+                "file": "fonts/NotoSansSC/NotoSansSC-Thin.ttf"
+            },
+            "300": {
+                "name": "Light",
+                "file": "fonts/NotoSansSC/NotoSansSC-Light.ttf"
+            },
+            "regular": {
+                "name": "Regular",
+                "file": "fonts/NotoSansSC/NotoSansSC-Regular.ttf"
+            },
+            "500": {
+                "name": "Medium",
+                "file": "fonts/NotoSansSC/NotoSansSC-Medium.ttf"
+            },
+            "700": {
+                "name": "Bold",
+                "file": "fonts/NotoSansSC/NotoSansSC-Bold.ttf"
+            },
+            "900": {
+                "name": "Black",
+                "file": "fonts/NotoSansSC/NotoSansSC-Black.ttf"
+            }
+        }
+    },
+    {
+        "family": "Noto Sans Symbols",
+        "isFallback": true,
+        "subsets": [
+            "latin",
+            "latin-ext",
+            "symbols"
+        ],
+        "variants": {
+            "100": {
+                "name": "Thin",
+                "file": "fonts/NotoSansSymbols/NotoSansSymbols-Thin.ttf"
+            },
+            "300": {
+                "name": "Light",
+                "file": "fonts/NotoSansSymbols/NotoSansSymbols-Light.ttf"
+            },
+            "regular": {
+                "name": "Regular",
+                "file": "fonts/NotoSansSymbols/NotoSansSymbols-Regular.ttf"
+            },
+            "500": {
+                "name": "Medium",
+                "file": "fonts/NotoSansSymbols/NotoSansSymbols-Medium.ttf"
+            },
+            "700": {
+                "name": "Bold",
+                "file": "fonts/NotoSansSymbols/NotoSansSymbols-Bold.ttf"
+            },
+            "900": {
+                "name": "Black",
+                "file": "fonts/NotoSansSymbols/NotoSansSymbols-Black.ttf"
+            }
+        }
+    },
+    {
+        "family": "Noto Sans Tai Viet",
+        "isFallback": true,
+        "subsets": [
+            "tai-viet"
+        ],
+        "variants": {
+            "regular": {
+                "name": "Regular",
+                "file": "fonts/NotoSansTaiViet/NotoSansTaiViet-Regular.ttf"
+            }
+        }
+    },
+    {
+        "family": "Noto Sans Tamil",
+        "isFallback": true,
+        "subsets": [
+            "tamil"
+        ],
+        "variants": {
+            "100": {
+                "name": "Thin",
+                "file": "fonts/NotoSansTamil/NotoSansTamil-Thin.ttf"
+            },
+            "300": {
+                "name": "Light",
+                "file": "fonts/NotoSansTamil/NotoSansTamil-Light.ttf"
+            },
+            "regular": {
+                "name": "Regular",
+                "file": "fonts/NotoSansTamil/NotoSansTamil-Regular.ttf"
+            },
+            "500": {
+                "name": "Medium",
+                "file": "fonts/NotoSansTamil/NotoSansTamil-Medium.ttf"
+            },
+            "700": {
+                "name": "Bold",
+                "file": "fonts/NotoSansTamil/NotoSansTamil-Bold.ttf"
+            },
+            "900": {
+                "name": "Black",
+                "file": "fonts/NotoSansTamil/NotoSansTamil-Black.ttf"
+            }
+        }
+    },
+    {
+        "family": "Noto Sans CJK Traditional Chinese",
+        "isFallback": true,
+        "subsets": [
+            "chinese-traditional"
+        ],
+        "variants": {
+            "100": {
+                "name": "Thin",
+                "file": "fonts/NotoSansTC/NotoSansTC-Thin.ttf"
+            },
+            "300": {
+                "name": "Light",
+                "file": "fonts/NotoSansTC/NotoSansTC-Light.ttf"
+            },
+            "regular": {
+                "name": "Regular",
+                "file": "fonts/NotoSansTC/NotoSansTC-Regular.ttf"
+            },
+            "500": {
+                "name": "Medium",
+                "file": "fonts/NotoSansTC/NotoSansTC-Medium.ttf"
+            },
+            "700": {
+                "name": "Bold",
+                "file": "fonts/NotoSansTC/NotoSansTC-Bold.ttf"
+            },
+            "900": {
+                "name": "Black",
+                "file": "fonts/NotoSansTC/NotoSansTC-Black.ttf"
+            }
+        }
+    },
+    {
+        "family": "Noto Sans Thai",
+        "isFallback": true,
+        "subsets": [
+            "thai"
+        ],
+        "variants": {
+            "100": {
+                "name": "Thin",
+                "file": "fonts/NotoSansThai/NotoSansThai-Thin.ttf"
+            },
+            "300": {
+                "name": "Light",
+                "file": "fonts/NotoSansThai/NotoSansThai-Light.ttf"
+            },
+            "regular": {
+                "name": "Regular",
+                "file": "fonts/NotoSansThai/NotoSansThai-Regular.ttf"
+            },
+            "500": {
+                "name": "Medium",
+                "file": "fonts/NotoSansThai/NotoSansThai-Medium.ttf"
+            },
+            "700": {
+                "name": "Bold",
+                "file": "fonts/NotoSansThai/NotoSansThai-Bold.ttf"
+            },
+            "900": {
+                "name": "Black",
+                "file": "fonts/NotoSansThai/NotoSansThai-Black.ttf"
+            }
+        }
+    },
+    {
         "family": "Roboto",
+        "isFallback": false,
         "subsets": [
             "cyrillic",
             "cyrillic-ext",

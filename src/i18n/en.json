@@ -552,6 +552,10 @@
         }
     },
     "lib": {
+        "fontNotify": {
+            "title": "Loading Fonts",
+            "pleaseWait": "Please wait, these fonts are being loaded:"
+        },
         "tutorial": {
             "notification": {
                 "gotIt": "Got It",

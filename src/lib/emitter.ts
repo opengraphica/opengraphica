@@ -69,6 +69,7 @@ interface AppEmitterEvents {
     'editor.tool.cancelCurrentAction': undefined;
     'editor.tool.commitCurrentAction': undefined;
     'editor.tool.delete': undefined;
+    'editor.tool.fontsLoaded': undefined;
     'editor.tool.selectAll': undefined;
     'store.setPreference': {
         key: string;

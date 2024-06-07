@@ -12,7 +12,7 @@ import type { Font, Glyph } from 'opentype.js';
 
 const bidi = bidiFactory();
 
-export async function loadFonts(document: TextDocument): Promise<boolean> {
+export function getUnloadedFontFamilies(document: TextDocument): string[] {
     const fontFamilies = new Set<string>();
     fontFamilies.add(textMetaDefaults.family);
     const subsets = new Set<string>();
@@ -34,18 +34,27 @@ export async function loadFonts(document: TextDocument): Promise<boolean> {
             }
         }
     }
-    let hasUnloadedFont = false;
+    for (const fontFamily of Array.from(fontFamilies)) {
+        if (fontCache.isFontFamilyLoaded(fontFamily)) {
+            fontFamilies.delete(fontFamily);
+        }
+    }
+    return Array.from(fontFamilies);
+}
+
+export async function loadFontFamilies(unloadedFontFamilies: string[]): Promise<boolean> {
+    let hadUnloadedFont = false;
     let loadFontPromises: Promise<unknown>[] = [];
-    for (const family of Array.from(fontFamilies)) {
-        if (!(await fontCache.isFontFamilyLoaded(family))) {
-            hasUnloadedFont = true;
+    for (const family of unloadedFontFamilies) {
+        if (!(await fontCache.waitForFontFamilyLoaded(family))) {
+            hadUnloadedFont = true;
             loadFontPromises.push(
                 fontCache.loadFontFamily(family)
             );
         }
     }
     await Promise.allSettled(loadFontPromises);
-    return hasUnloadedFont;
+    return hadUnloadedFont;
 }
 
 export function splitSpanByAvailableFonts(span: TextDocumentSpan): Array<[Font | null, TextDocumentSpan]> {

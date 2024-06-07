@@ -5,6 +5,7 @@ import BaseLayerRenderer from './base';
 import canvasStore from '@/store/canvas';
 import DrawableCanvas from '@/canvas/renderers/drawable/canvas';
 import { createThreejsTextureFromImage } from '@/lib/canvas';
+import { notifyLoadingFontFamilies, notifyFontFamiliesLoaded } from '@/lib/font-notify';
 
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
@@ -31,6 +32,7 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
     private drawableCanvas: DrawableCanvas | undefined;
     private textDrawableUuid: string | undefined;
     private isDrawnAfterAttach: boolean = false;
+    private waitingToLoadFontFamilies: string[] = [];
 
     async onAttach(layer: WorkingFileTextLayer<ColorModel>) {
 
@@ -60,6 +62,15 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
             });
         });
         this.drawableCanvas.onDrawn(async ({ canvas, updateInfo }) => {
+
+            if (this.waitingToLoadFontFamilies.length > 0) {
+                notifyFontFamiliesLoaded(this.waitingToLoadFontFamilies);
+            }
+            const waitingToLoadFontFamilies = updateInfo?.[this.textDrawableUuid ?? '']?.waitingToLoadFontFamilies ?? [];
+            if (waitingToLoadFontFamilies.length > 0) {
+                this.waitingToLoadFontFamilies = waitingToLoadFontFamilies;
+                notifyLoadingFontFamilies(waitingToLoadFontFamilies);
+            }
 
             if (canvas.width <= 1 || canvas.height <= 1) return;
 

@@ -16,8 +16,30 @@ export default [
             [0x0100, 0x017f],
             // Latin Extended-B
             [0x0180, 0x024f],
+        ],
+    },
+    {
+        label: 'Symbols',
+        subsets: ['symbols'],
+        ranges: [
             // Enclosed Alphanumeric Supplement
             [0x1f100, 0x1f1ff],
+            // Miscellaneous Symbols
+            [0x2600, 0x26FF],
+            // Alchemical Symbols
+            [0x1F700, 0x1F70F],
+            // Miscellaneous Technical
+            [0x2300, 0x23FF],
+            // Enclosed Alphanumerics
+            [0x2460, 0x24FF],
+            // Arrows
+            [0x2190, 0x21FF],
+            // Combining Diacritical Marks
+            [0x0300, 0x036F],
+            // Dingbats
+            [0x2700, 0x27BF],
+            // Miscellaneous Symbols and Pictographs
+            [0x1F300, 0x1F5FF],
         ],
     },
     {

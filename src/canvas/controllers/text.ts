@@ -11,6 +11,7 @@ import { isEditorTextareaFocused, editingTextLayerId, editingRenderTextPlacement
 
 import type { WorkingFileTextLayer } from '@/types';
 import type { DecomposedMatrix } from '@/lib/dom-matrix';
+import appEmitter from '@/lib/emitter';
 
 const DRAG_TYPE_ALL = 0;
 const DRAG_TYPE_TOP = 1;
@@ -76,13 +77,29 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             }
         }, { immediate: true });
         
+        this.onFontsLoaded = this.onFontsLoaded.bind(this);
+        appEmitter.on('editor.tool.fontsLoaded', this.onFontsLoaded);
+        
     }
 
     onLeave(): void {
         this.destroyEditorTextarea();
         editingTextLayerId.value = null;
 
+        appEmitter.off('editor.tool.fontsLoaded', this.onFontsLoaded);
+
         this.selectedLayerIdsUnwatch?.();
+    }
+
+    private onFontsLoaded() {
+        if (editingTextLayerId.value != null) {
+            const layer = getLayerById(editingTextLayerId.value) as WorkingFileTextLayer;
+            if (!layer) return;
+            let isHorizontal = ['ltr', 'rtl'].includes(layer.data.lineDirection);
+            editingRenderTextPlacement.value = calculateTextPlacement(layer.data, {
+                wrapSize: isHorizontal ? layer.width : layer.height,
+            });
+        }
     }
 
     private createEditorTextarea() {

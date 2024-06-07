@@ -14,7 +14,7 @@ const bidi = bidiFactory()
 import defaultFontFamilies from '@/config/default-font-families.json';
 import { FontCache } from '@/lib/font-cache';
 import { textMetaDefaults } from '@/lib/text-common';
-import { loadFonts, calculateTextPlacement } from '@/lib/text-render';
+import { getUnloadedFontFamilies, loadFontFamilies, calculateTextPlacement } from '@/lib/text-render';
 import { getSubsets as getUnicodeSubsets } from '@/lib/unicode';
 
 import type {
@@ -53,12 +53,14 @@ export default class Text implements Drawable<TextData> {
         let bottom = 16;
         let lineDirectionSize = 0;
         let wrapDirectionSize = 0;
+        let waitingToLoadFontFamilies: string[] = [];
 
         if (lines) {
             this.linesToDraw = lines;
             this.longestLineSize = longestLineSize ?? 0;
         } else if (document) {
-            loadFonts(document).then((hadUnloadedFont) => {
+            waitingToLoadFontFamilies = getUnloadedFontFamilies(document);
+            loadFontFamilies(waitingToLoadFontFamilies).then((hadUnloadedFont) => {
                 if (hadUnloadedFont) {
                     this.needsUpdateCallback(data);
                 }
@@ -79,7 +81,8 @@ export default class Text implements Drawable<TextData> {
             bottom,
             updateInfo: {
                 lineDirectionSize,
-                wrapDirectionSize, 
+                wrapDirectionSize,
+                waitingToLoadFontFamilies,
             },
         };
     }

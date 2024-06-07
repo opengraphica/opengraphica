@@ -23,7 +23,11 @@ export class FontCache {
         this.fetchBaseUrl = options?.fetchBaseUrl ?? '';
     }
 
-    public async isFontFamilyLoaded(family: string): Promise<boolean> {
+    public isFontFamilyLoaded(family: string): boolean {
+        return this.fontFamilyMap.has(family);
+    }
+
+    public async waitForFontFamilyLoaded(family: string): Promise<boolean> {
         const fontLoadingPromise = this.fontFamilyLoadingPromiseMap.get(family);
         await fontLoadingPromise;
         return this.fontFamilyMap.has(family);
