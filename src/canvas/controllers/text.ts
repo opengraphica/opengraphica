@@ -4,8 +4,12 @@ import BaseCanvasMovementController from './base-movement';
 import canvasStore from '@/store/canvas';
 import { isInput } from '@/lib/events';
 import { TextDocumentEditor, TextDocumentSelection, TextDocumentEditorWithSelection } from '@/lib/text-editor';
+import { calculateTextPlacement } from '@/lib/text-render';
 import workingFileStore, { getLayerById, getLayerGlobalTransform, getLayersByType } from '@/store/working-file';
 
+import { isEditorTextareaFocused, editingTextLayerId, editingRenderTextPlacement, editingTextDocumentSelection } from '../store/text-state';
+
+import type { WorkingFileTextLayer } from '@/types';
 import type { DecomposedMatrix } from '@/lib/dom-matrix';
 
 const DRAG_TYPE_ALL = 0;
@@ -33,6 +37,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
 
         this.createEditorTextarea();
 
+        // Create text editor instances for currently selected layers.
         this.selectedLayerIdsUnwatch = watch(() => workingFileStore.state.selectedLayerIds, (newIds, oldIds) => {
             for (const oldId of oldIds ?? []) {
                 try {
@@ -49,7 +54,20 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 const layer = getLayerById(newId);
                 if (layer?.type === 'text') {
                     const documentEditor = new TextDocumentEditor(layer.data);
+                    documentEditor.onNotifyChange(() => {
+                        if (editingTextLayerId.value === newId) {
+                            let isHorizontal = ['ltr', 'rtl'].includes(layer.data.lineDirection);
+                            editingRenderTextPlacement.value = calculateTextPlacement(layer.data, {
+                                wrapSize: isHorizontal ? layer.width : layer.height,
+                            });
+                        }
+                    });
                     const documentSelection = new TextDocumentSelection(documentEditor);
+                    documentSelection.onNotifyChange(() => {
+                        if (editingTextLayerId.value === newId) {
+                            editingTextDocumentSelection.value = documentSelection.getSelectionState();
+                        }
+                    });
                     this.layerEditors.set(newId, {
                         documentEditor,
                         documentSelection,
@@ -62,6 +80,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
 
     onLeave(): void {
         this.destroyEditorTextarea();
+        editingTextLayerId.value = null;
 
         this.selectedLayerIdsUnwatch?.();
     }
@@ -95,17 +114,36 @@ export default class CanvasTextController extends BaseCanvasMovementController {
 
     private destroyEditorTextarea() {
         this.editorTextarea?.removeEventListener('focus', this.onFocusEditorTextarea, true);
+        this.editorTextarea?.removeEventListener('blur', this.onBlurEditorTextarea, true);
+        this.editorTextarea?.removeEventListener('compositionstart', this.onCompositionStartEditorTextarea, true);
+        this.editorTextarea?.removeEventListener('compositionupdate', this.onCompositionUpdateEditorTextarea, true);
+        this.editorTextarea?.removeEventListener('compositionend', this.onCompositionEndEditorTextarea, true);
+        this.editorTextarea?.removeEventListener('input', this.onInputEditorTextarea, true);
+        this.editorTextarea?.removeEventListener('keydown', this.onKeydownEditorTextarea, true);
         this.editorTextarea?.parentNode?.removeChild(this.editorTextarea);
         this.editorTextarea = null;
     }
 
     private onFocusEditorTextarea() {
-        this.isEditorTextareaFocused = true;
-        // TODO - setup editor?
+        isEditorTextareaFocused.value = true;
+        if (editingTextLayerId.value != null) {
+            const editors = this.layerEditors.get(editingTextLayerId.value);
+            if (editors) {
+            const { documentSelection } = editors;
+                const layer = getLayerById(editingTextLayerId.value) as WorkingFileTextLayer;
+                if (layer) {
+                    let isHorizontal = ['ltr', 'rtl'].includes(layer.data.lineDirection);
+                    editingRenderTextPlacement.value = calculateTextPlacement(layer.data, {
+                        wrapSize: isHorizontal ? layer.width : layer.height,
+                    });
+                }
+                editingTextDocumentSelection.value = documentSelection.getSelectionState();
+            }
+        }
     }
 
     private onBlurEditorTextarea() {
-        this.isEditorTextareaFocused = false;
+        isEditorTextareaFocused.value = false;
         // TODO - update layer in history
     }
 
@@ -124,19 +162,20 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     }
 
     private onInputEditorTextarea(event: Event) {
-        if (this.editingLayerId == null) return;
+        if (editingTextLayerId.value == null) return;
         if (!this.isEditorTextareaComposing) {
-            const editors = this.layerEditors.get(this.editingLayerId);
-            if (!editors) return;
+            const editors = this.layerEditors.get(editingTextLayerId.value);
+            if (!editors || !this.editorTextarea) return;
             const { documentEditor, documentSelection } = editors;
-            TextDocumentEditorWithSelection.insertTextAtCurrentPosition(documentEditor, documentSelection, (event.target as HTMLTextAreaElement)?.value);
-            // this.extendFixedBounds(this.editingLayerId);
+            TextDocumentEditorWithSelection.insertTextAtCurrentPosition(documentEditor, documentSelection, this.editorTextarea.value);
+            this.editorTextarea.value = '';
+            // this.extendFixedBounds(editingTextLayerId.value);
         }
     };
 
     private onKeydownEditorTextarea(event: KeyboardEvent) {
-        if (this.editingLayerId == null) return;
-        const editors = this.layerEditors.get(this.editingLayerId);
+        if (editingTextLayerId.value == null) return;
+        const editors = this.layerEditors.get(editingTextLayerId.value);
         if (!editors) return;
         let handled = true;
         const { documentEditor, documentSelection } = editors;
@@ -182,7 +221,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             case 'a':
                 if (event.ctrlKey) {
                     documentSelection.setPosition(0, 0);
-                    const lastLine = documentEditor.getLineCount();
+                    const lastLine = documentEditor.getLineCount() - 1;
                     documentSelection.setPosition(lastLine, documentEditor.getLineCharacterCount(lastLine), true);
                     break;
                 }
@@ -238,7 +277,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             canvasStore.set('dirty', true);
             // TODO - update tool selection GUI?
         }
-        // this.extendFixedBounds(this.editingLayerId);
+        // this.extendFixedBounds(editingTextLayerId.value);
         return !handled;
     }
 
@@ -269,9 +308,12 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         this.dragStartPickLayer = this.pickLayer(viewTransformPoint);
 
         // TODO - check for drag handle click before doing this.
-        if (this.dragStartPickLayer != null) {
-            this.editingLayerId = this.dragStartPickLayer;
-        }
+        setTimeout(() => {
+            if (this.dragStartPickLayer != null) {
+                editingTextLayerId.value = this.dragStartPickLayer;
+                this.editorTextarea?.focus();
+            }
+        }, 0);
     }
 
     private onDragEnd() {

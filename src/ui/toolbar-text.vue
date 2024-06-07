@@ -57,8 +57,9 @@ import ElPopover from '@/ui/el-popover.vue';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 
 import defaultFontFamilies from '@/config/default-font-families.json';
+import { textMetaDefaults } from '@/lib/text-common';
 
-import { textMetaDefaults } from '@/canvas/store/text-state';
+// import { textMetaDefaults } from '@/canvas/store/text-state';
 
 import appEmitter from '@/lib/emitter';
 import canvasStore from '@/store/canvas';

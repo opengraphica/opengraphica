@@ -21,7 +21,6 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
 
     private stopWatchData: WatchStopHandle | undefined;
     private stopWatchFilters: WatchStopHandle | undefined;
-    private stopWatchSize: WatchStopHandle | undefined;
     private stopWatchTransform: WatchStopHandle | undefined;
 
     private planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
@@ -67,6 +66,9 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
             const { lineDirectionSize, wrapDirectionSize } = updateInfo?.[this.textDrawableUuid ?? ''] ?? {};
             const isHorizontal = ['ltr', 'rtl'].includes(layer.data.lineDirection);
 
+            this.isDrawnAfterAttach = true;
+            let newTexture: Texture = await createThreejsTextureFromImage(canvas);
+
             // TODO - add history event & merge with text update history? The renderer seems like a weird place to be updating history.
             if (isHorizontal) {
                 layer.width = lineDirectionSize;
@@ -76,10 +78,7 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
                 layer.height = lineDirectionSize;
             }
 
-            this.isDrawnAfterAttach = true;
-            let newTexture: Texture = await createThreejsTextureFromImage(canvas);
-
-            if (this.planeGeometry?.parameters.width !== canvas.width || this.planeGeometry.parameters.height !== canvas.height) {
+            if (this.planeGeometry?.parameters.width !== canvas.width || this.planeGeometry?.parameters.height !== canvas.height) {
                 this.planeGeometry?.dispose();
                 this.planeGeometry = new ImagePlaneGeometry(canvas.width, canvas.height);
                 if (this.plane) {
@@ -103,9 +102,6 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
             await createFiltersFromLayerConfig(filters);
             this.update({ filters });
         }, { deep: true, immediate: false });
-        this.stopWatchSize = watch([width, height], ([width, height]) => {
-            this.update({ width, height });
-        }, { immediate: true });
         this.stopWatchTransform = watch([transform], ([transform]) => {
             this.update({ transform });
         }, { immediate: true });
@@ -122,15 +118,6 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
     }
 
     async onUpdate(updates: Partial<WorkingFileTextLayer<ColorModel>>) {
-        if (updates.width || updates.height) {
-            const width = updates.width || this.planeGeometry?.parameters.width;
-            const height = updates.height || this.planeGeometry?.parameters.height;
-            this.planeGeometry?.dispose();
-            this.planeGeometry = new ImagePlaneGeometry(width, height);
-            if (this.plane) {
-                this.plane.geometry = this.planeGeometry;
-            }
-        }
         if (updates.transform) {
             this.plane?.matrix.set(
                 updates.transform.m11, updates.transform.m21, updates.transform.m31, updates.transform.m41,
@@ -175,6 +162,8 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
         this.material?.dispose();
         this.material = undefined;
         this.stopWatchData?.();
+        this.stopWatchFilters?.();
+        this.stopWatchTransform?.();
         this.isDrawnAfterAttach = false;
     }
 

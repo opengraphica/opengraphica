@@ -2,17 +2,38 @@ import { ColorModel } from './color';
 
 import type { Glyph } from 'opentype.js';
 
+export type TextDirection = 'ltr' | 'rtl' | 'ttb' | 'btt';
+export type TextLineAlignment = 'start' | 'center' | 'end';
+
+export interface CalculatedTextPlacement {
+    lines: RenderTextLineInfo[];
+    longestLineSize: number;
+    lineDirection: TextDirection;
+    lineDirectionSize: number;
+    wrapDirectionSize: number;
+    isHorizontal: boolean;
+    left: number;
+    right: number;
+    top: number;
+    bottom: number;
+}
+
 export interface RenderTextLineInfo {
     glyphs: RenderTextGlyphInfo[];
     heightAboveBaseline: number;
     heightBelowBaseline: number;
     largestCharacterWidth: number;
-    lineSize: number;
+    lineAlignment: TextLineAlignment;
+    lineSize: number; // If horizontal, this is the width of the light. If vertical, the height.
+    lineStartOffset: number; // If horizontal, the number of pixels to offset the x starting position of the line based on text alignment.
+    wrapOffset: number; // If horizontal, this is basically the y-position of the line. Vertical, x position.
+    documentLineIndex: number;
 }
 
 export interface RenderTextGlyphInfo {
-    glyph: Glyph;
+    glyph: InstanceType<typeof Glyph>;
     advance: number;
+    advanceOffset: number;
     fontSize: number;
     fontAscender: number;
     fontDescender: number;
@@ -30,8 +51,11 @@ export interface FontFamilyFetchDefinition  {
     };
 }
 
-export type TextDirection = 'ltr' | 'rtl' | 'ttb' | 'btt';
-export type TextLineAlignment = 'start' | 'center' | 'end';
+export interface TextDocumentSelectionState {
+    isActiveSideEnd: boolean;
+    start: { line: number, character: number };
+    end: { line: number, character: number };
+}
 
 export interface TextDocument<T extends ColorModel = ColorModel> {
     boundary: 'dynamic' | 'box';

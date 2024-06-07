@@ -1,5 +1,5 @@
 import { DrawWorkingFileLayerOptions, WorkingFileTextLayer, WorkingFileLayerRenderer, ColorModel } from '@/types';
-import { fontLoadedStatusMap, textLayerCache, textMetaDefaults, TextLayerCacheItem, TextLayerRenderInfoWrap } from '@/canvas/store/text-state';
+// import { fontLoadedStatusMap, textLayerCache, textMetaDefaults, TextLayerCacheItem, TextLayerRenderInfoWrap } from '@/canvas/store/text-state';
 import { getFontMetrics, FontMetrics } from '@/lib/metrics';
 import { generateColorStyle } from '@/lib/color';
 import { DecomposedMatrix } from '@/lib/dom-matrix';
@@ -12,13 +12,13 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
      * Returns the text string at a given line wrap (ignores formatting).
      * @param {object} wrap - The wrap definition 
      */
-    getWrapText(wrap: TextLayerRenderInfoWrap<ColorModel>) {
-        let wrapText = '';
-        for (let i = 0; i < wrap.spans.length; i++) {
-            wrapText += wrap.spans[i].text;
-        }
-        return wrapText;
-    }
+    // getWrapText(wrap: TextLayerRenderInfoWrap<ColorModel>) {
+    //     let wrapText = '';
+    //     for (let i = 0; i < wrap.spans.length; i++) {
+    //         wrapText += wrap.spans[i].text;
+    //     }
+    //     return wrapText;
+    // }
 
     /**
      * Calculates and caches the position of all the letters in the text layer so subsequent rendering is faster.

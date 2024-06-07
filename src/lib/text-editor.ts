@@ -5,7 +5,7 @@
 
 import { textMetaDefaults } from './text-common';
 
-import type { TextDocument, TextDocumentLine, TextDocumentSpan, TextDocumentSpanMeta } from '@/types';
+import type { TextDocument, TextDocumentLine, TextDocumentSpan, TextDocumentSpanMeta, TextDocumentSelectionState } from '@/types';
 
 /**
  * This class's job is to modify the internal JSON format of a text layer.
@@ -13,13 +13,22 @@ import type { TextDocument, TextDocumentLine, TextDocumentSpan, TextDocumentSpan
 export class TextDocumentEditor {
     private document: TextDocument;
     private queuedMetaChanges: Partial<TextDocumentSpanMeta> | null = null;
+	private notifyChangeHandlers: Array<() => void> = [];
 
     constructor(document: TextDocument) {
         this.document = document;
     }
 
+	public onNotifyChange(handler: () => void) {
+		this.notifyChangeHandlers.push(handler);
+	}
+
     public notifyChange() {
-        // TODO - queue history save?
+        for (const handler of this.notifyChangeHandlers) {
+			try {
+				handler();
+			} catch (error) { /* Ignore */ }
+		}
     }
 
     /**
@@ -639,6 +648,7 @@ export class TextDocumentEditor {
 	public dispose() {
 		(this.document as unknown) = undefined;
 		(this.queuedMetaChanges as unknown) = undefined;
+		(this.notifyChangeHandlers as unknown) = undefined;
 	}
 
 }
@@ -655,6 +665,8 @@ export class TextDocumentSelection {
     public start: { line: number, character: number };
     public end: { line: number, character: number };
 
+	private notifyChangeHandlers: Array<() => void> = [];
+
     constructor(documentEditor: TextDocumentEditor) {
 		this.documentEditor = documentEditor;
 
@@ -669,6 +681,26 @@ export class TextDocumentSelection {
 		};
 
 		this.setPosition(0, 0);
+	}
+
+	public onNotifyChange(handler: () => void) {
+		this.notifyChangeHandlers.push(handler);
+	}
+
+    public notifyChange() {
+        for (const handler of this.notifyChangeHandlers) {
+			try {
+				handler();
+			} catch (error) { /* Ignore */ }
+		}
+    }
+
+	public getSelectionState(): TextDocumentSelectionState {
+		return {
+			isActiveSideEnd: this.isActiveSideEnd,
+    		start: this.start,
+    		end: this.end,
+		}
 	}
 
     /**
@@ -768,6 +800,8 @@ export class TextDocumentSelection {
 			this.start.line = this.end.line = line;
 			this.start.character = this.end.character = character;
 		}
+
+		this.notifyChange();
 	}
 
     /**
@@ -911,6 +945,7 @@ export class TextDocumentSelection {
 	 */
 	 public dispose() {
 		(this.documentEditor as unknown) = undefined;
+		(this.notifyChangeHandlers as unknown) = undefined;
 	}
 
 }

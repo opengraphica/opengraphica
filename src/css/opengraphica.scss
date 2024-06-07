@@ -2152,6 +2152,43 @@ body.ogr-full-page {
         }
     }
 
+    .ogr-text-editor {
+        display: block;
+        position: absolute;
+
+        .ogr-text-editor__selection {
+            display: block;
+            position: absolute;
+            transform-origin: 0 0 0;
+        }
+        .ogr-text-editor__selection__cursor {
+            display: block;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            animation: ogr-text-editor-selection-cursor-blink 1.5s linear infinite;
+    
+            @keyframes ogr-text-editor-selection-cursor-blink {
+                0% {
+                    opacity: 1;
+                }
+                59% {
+                    opacity: 1;
+                }
+                60% {
+                    opacity: 0;
+                }
+                100% {
+                    opacity: 0;
+                }
+            }
+    
+            &.ogr-text-editor__selection__cursor--no-blink {
+                animation: none;
+                opacity: 1;
+            }
+        }
+    }
+
     .ogr-wait {
         display: none;
 
