@@ -38,6 +38,7 @@ export interface RenderTextGlyphInfo {
     fontAscender: number;
     fontDescender: number;
     characterIndex: number;
+    documentCharacterIndex: number;
 }
 
 export interface FontFamilyFetchDefinition  {

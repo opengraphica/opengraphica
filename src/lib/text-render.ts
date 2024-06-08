@@ -335,6 +335,8 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
     let runningWrapOffset = 0;
     let lastHeightAboveBaseline = 0;
     let lastHeightBelowBaseline = 0;
+    let runningWrapCharacterIndex = 0;
+    let previousDocumentLineIndex = -1;
     for (const [lineIndex, line] of wrappedLines.entries()) {
         const lineInfo: RenderTextLineInfo = {
             glyphs: [],
@@ -422,12 +424,13 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                         const glyphMetrics = glyph.getMetrics();
                         const glyphInfo: RenderTextGlyphInfo = {
                             glyph: glyph,
-                            advance: (glyph.advanceWidth ?? 0) * glyphScale,
+                            advance: isHorizontal ? (glyph.advanceWidth ?? 0) * glyphScale : (font.ascender - font.descender) * glyphScale,
                             advanceOffset: runningAdvanceOffset,
                             fontSize: size,
                             fontAscender: font.ascender * glyphScale,
                             fontDescender: font.descender * glyphScale,
                             characterIndex: bidiRunCharacterIndex + originalTextCharacterIndex,
+                            documentCharacterIndex: runningWrapCharacterIndex + bidiRunCharacterIndex + originalTextCharacterIndex,
                         };
                         runningAdvanceOffset += glyphInfo.advance;
                         if (isHorizontal) {
@@ -477,6 +480,13 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
             lineInfo.heightAboveBaseline = lastHeightAboveBaseline;
             lineInfo.heightBelowBaseline = lastHeightBelowBaseline;
         }
+        if (lineInfo.documentLineIndex !== previousDocumentLineIndex) {
+            runningWrapCharacterIndex = 0;
+        } else {
+            runningWrapCharacterIndex += lineCharacterIndex;
+        }
+        previousDocumentLineIndex = lineInfo.documentLineIndex;
+
         linesToDraw.push(lineInfo);
     }
     

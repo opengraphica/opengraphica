@@ -10,6 +10,7 @@ import workingFileStore, { getLayerById, getLayerGlobalTransform, getLayersByTyp
 import { isEditorTextareaFocused, editingTextLayerId, editingRenderTextPlacement, editingTextDocumentSelection } from '../store/text-state';
 
 import type { WorkingFileTextLayer } from '@/types';
+import type { PointerTracker } from './base';
 import type { DecomposedMatrix } from '@/lib/dom-matrix';
 import appEmitter from '@/lib/emitter';
 
@@ -22,14 +23,13 @@ const DRAG_TYPE_RIGHT = 8;
 export default class CanvasTextController extends BaseCanvasMovementController {
 
     private dragStartPickLayer: number | null = null;
+    private dragStartPosition: DOMPoint | null = null;
 
     private editorTextarea: HTMLTextAreaElement | null = null;
     private editorTextareaId: string = 'textControllerKeyboardInput' + uuidv4();
-    private isEditorTextareaFocused: boolean = false;
     private isEditorTextareaComposing: boolean = false;
 
     private layerEditors: Map<number, { documentEditor: TextDocumentEditor, documentSelection: TextDocumentSelection }> = new Map();
-    private editingLayerId: number | null = null;
 
     private selectedLayerIdsUnwatch: WatchStopHandle | null = null;
 
@@ -146,7 +146,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         if (editingTextLayerId.value != null) {
             const editors = this.layerEditors.get(editingTextLayerId.value);
             if (editors) {
-            const { documentSelection } = editors;
+                const { documentSelection } = editors;
                 const layer = getLayerById(editingTextLayerId.value) as WorkingFileTextLayer;
                 if (layer) {
                     let isHorizontal = ['ltr', 'rtl'].includes(layer.data.lineDirection);
@@ -301,7 +301,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     onMultiTouchDown() {
         super.onMultiTouchDown();
         if (this.touches.length === 1) {
-            this.onDragStart();
+            this.onDragStart(this.touches[0]);
         }
     }
 
@@ -309,32 +309,70 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         super.onPointerDown(e);
         if (isInput(e.target)) return;
         if (e.isPrimary && ['mouse', 'pen'].includes(e.pointerType) && e.button === 0) {
-            this.onDragStart();
+            const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
+            this.onDragStart(pointer);
         }
     }
 
-    async onPointerUp(e: PointerEvent): Promise<void> {
+    onPointerMove(e: PointerEvent): void {
+        super.onPointerMove(e);
+        const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
+        if (pointer && pointer.down.button === 0) {
+            if (pointer.isDragging) {
+                this.onDragMove(pointer);
+            }
+        }
+    }
+
+    onPointerUp(e: PointerEvent): void {
         super.onPointerUp(e);
         if (e.isPrimary) {
             this.onDragEnd();    
         }
     }
 
-    private onDragStart() {
-        let { viewTransformPoint } = this.getTransformedCursorInfo();
-        this.dragStartPickLayer = this.pickLayer(viewTransformPoint);
+    private onDragStart(pointer: PointerTracker) {
+        let { viewTransformPoint } = this.getTransformedCursorInfo(pointer.down.pageX, pointer.down.pageY);
+        const dragStartPickLayer = this.pickLayer(viewTransformPoint);
+        this.dragStartPickLayer = dragStartPickLayer;
+        this.dragStartPosition = viewTransformPoint;
 
-        // TODO - check for drag handle click before doing this.
+        // TODO - check for resize handle click before doing this.
+        // Wait and then assign focus, because the browser immediately focuses on clicked element.
         setTimeout(() => {
-            if (this.dragStartPickLayer != null) {
-                editingTextLayerId.value = this.dragStartPickLayer;
+            // Focus active editor
+            if (dragStartPickLayer != null) {
+                editingTextLayerId.value = dragStartPickLayer;
                 this.editorTextarea?.focus();
             }
+
+            // Set cursor position based on pointer position
+            if (editingTextLayerId.value == null) return;
+            const editors = this.layerEditors.get(editingTextLayerId.value);
+            if (!editors || !this.editorTextarea) return;
+            const { documentSelection } = editors;
+            const cursorPosition = this.getEditorCursorAtPoint(viewTransformPoint);
+            documentSelection.setPosition(cursorPosition.line, cursorPosition.character);
         }, 0);
     }
 
+    private onDragMove(pointer: PointerTracker) {
+        const pageX = pointer.move?.pageX ?? 0;
+        const pageY = pointer.move?.pageY ?? 0;
+        const { viewTransformPoint } = this.getTransformedCursorInfo(pageX, pageY);
+        if (editingTextLayerId.value == null) return;
+        const editors = this.layerEditors.get(editingTextLayerId.value);
+        if (!editors || !this.editorTextarea) return;
+        const { documentSelection } = editors;
+        const pointerMoveCursor = this.getEditorCursorAtPoint(viewTransformPoint);
+        const pointerDownCursor = documentSelection.isActiveSideEnd ? documentSelection.start : documentSelection.end;
+        documentSelection.setPosition(pointerDownCursor.line, pointerDownCursor.character, false);
+        documentSelection.setPosition(pointerMoveCursor.line, pointerMoveCursor.character, true);
+    }
+
     private onDragEnd() {
-        
+        this.dragStartPickLayer = null;
+        this.dragStartPosition = null;
     }
 
     private pickLayer(viewTransformPoint: DOMPoint): number | null {
@@ -351,27 +389,78 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         return selectedLayer;
     }
 
-    private getTransformedCursorInfo(): { viewTransformPoint: DOMPoint, /* transformBoundsPoint: DOMPoint, */ viewDecomposedTransform: DecomposedMatrix } {
+    private getEditorCursorAtPoint(viewTransformPoint: DOMPoint): { line: number, character: number } {
+        let cursor = { line: 0, character: 0 };
+        if (editingRenderTextPlacement.value && editingTextLayerId.value != null) {
+            const layerTransform = getLayerGlobalTransform(editingTextLayerId.value).inverse();
+            const layerTransformPoint = viewTransformPoint.matrixTransform(layerTransform);
+            const lineRenderInfo = editingRenderTextPlacement.value;
+            if (lineRenderInfo.isHorizontal) {
+                findHorizontalCursor:
+                for (const line of lineRenderInfo.lines) {
+                    if (layerTransformPoint.y >= line.wrapOffset && layerTransformPoint.y <= line.wrapOffset + line.heightAboveBaseline + line.heightBelowBaseline) {
+                        cursor.line = line.documentLineIndex;
+                        if (layerTransformPoint.x < line.lineStartOffset) {
+                            cursor.character = line.glyphs[0]?.documentCharacterIndex ?? 0;
+                            break findHorizontalCursor;
+                        }
+                        for (const glyph of line.glyphs) {
+                            const left = glyph.advanceOffset;
+                            const right = glyph.advanceOffset + glyph.advance;
+                            if (layerTransformPoint.x >= left && layerTransformPoint.x <= right) {
+                                if (layerTransformPoint.x - left < right - layerTransformPoint.x) {
+                                    cursor.character = glyph.documentCharacterIndex;
+                                } else {
+                                    cursor.character = glyph.documentCharacterIndex + 1;
+                                }
+                                break findHorizontalCursor;
+                            }
+                        }
+                        cursor.character = line.glyphs[line.glyphs.length - 1].documentCharacterIndex + 1;
+                        break findHorizontalCursor;
+                    }
+                }
+            } else { // Vertical
+                findVerticalCursor:
+                for (const line of lineRenderInfo.lines) {
+                    const left = Math.min(line.wrapOffset, line.wrapOffset + line.largestCharacterWidth);
+                    const right = Math.max(line.wrapOffset, line.wrapOffset + line.largestCharacterWidth);
+                    if (layerTransformPoint.x >= left && layerTransformPoint.x <= right) {
+                        cursor.line = line.documentLineIndex;
+                        if (layerTransformPoint.y < line.lineStartOffset) {
+                            cursor.character = line.glyphs[0]?.documentCharacterIndex ?? 0;
+                            break findVerticalCursor;
+                        }
+                        for (const glyph of line.glyphs) {
+                            const top = Math.min(glyph.advanceOffset, glyph.advanceOffset + glyph.advance);
+                            const bottom = Math.max(glyph.advanceOffset, glyph.advanceOffset + glyph.advance);
+                            if (layerTransformPoint.y >= top && layerTransformPoint.y <= bottom) {
+                                if (layerTransformPoint.y - top < bottom - layerTransformPoint.y) {
+                                    cursor.character = glyph.documentCharacterIndex;
+                                } else {
+                                    cursor.character = glyph.documentCharacterIndex + 1;
+                                }
+                                break findVerticalCursor;
+                            }
+                        }
+                        cursor.character = line.glyphs[line.glyphs.length - 1].documentCharacterIndex + 1;
+                        break findVerticalCursor;
+                    }
+                }
+            }
+        }
+        return cursor;
+    }
+
+    private getTransformedCursorInfo(pageX: number, pageY: number): { viewTransformPoint: DOMPoint, /* transformBoundsPoint: DOMPoint, */ viewDecomposedTransform: DecomposedMatrix } {
         const devicePixelRatio = window.devicePixelRatio || 1;
         const viewTransform = canvasStore.get('transform');
         const viewDecomposedTransform = canvasStore.get('decomposedTransform');
-        const viewTransformPoint = new DOMPoint(this.lastCursorX * devicePixelRatio, this.lastCursorY * devicePixelRatio)
+        const viewTransformPoint = new DOMPoint(pageX * devicePixelRatio, pageY * devicePixelRatio)
             .matrixTransform(viewTransform.inverse());
         
-        // const originTranslateX = left.value + (transformOriginX.value * width.value);
-        // const originTranslateY = top.value + (transformOriginY.value * height.value);
-        // const boundsTransform =
-        //     new DOMMatrix()
-        //     .translateSelf(originTranslateX, originTranslateY)
-        //     .rotateSelf(rotation.value * Math.RADIANS_TO_DEGREES)
-        //     .translateSelf(-originTranslateX, -originTranslateY);
-        // const transformBoundsPoint =
-        //     new DOMPoint(this.lastCursorX * devicePixelRatio, this.lastCursorY * devicePixelRatio)
-        //     .matrixTransform(viewTransform.inverse())
-        //     .matrixTransform(boundsTransform.inverse());
         return {
             viewTransformPoint,
-            // transformBoundsPoint,
             viewDecomposedTransform
         };
     }

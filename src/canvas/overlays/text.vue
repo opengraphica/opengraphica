@@ -135,7 +135,7 @@ export default defineComponent({
             window.clearTimeout(disableBlinkingTimeoutHandle);
             disableBlinkingTimeoutHandle = window.setTimeout(() => {
                 disableBlinking.value = false;
-            }, 1000);
+            }, 200);
         }
 
         return {
