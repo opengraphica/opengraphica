@@ -2189,6 +2189,17 @@ body.ogr-full-page {
         }
     }
 
+    .ogr-text-selection {
+        display: block;
+        position: absolute;
+
+        .ogr-text-selection__box {
+            display: block;
+            position: absolute;
+            background: white;
+        }
+    }
+
     .ogr-wait {
         display: none;
 

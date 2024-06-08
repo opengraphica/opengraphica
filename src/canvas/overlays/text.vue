@@ -121,6 +121,7 @@ export default defineComponent({
                 }
             }
 
+            // TODO - fix. This shouldn't be here, no side effects in computed.
             makeCursorVisiblyActive();
 
             return {

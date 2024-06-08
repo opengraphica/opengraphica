@@ -85,6 +85,7 @@
                     "target": "text"
                 },
                 "overlays": [
+                    "text-selection",
                     "text"
                 ]
             }

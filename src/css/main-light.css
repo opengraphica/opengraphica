@@ -10113,6 +10113,15 @@ body.ogr-full-page .opengraphica {
   animation: none;
   opacity: 1;
 }
+.opengraphica .ogr-text-selection {
+  display: block;
+  position: absolute;
+}
+.opengraphica .ogr-text-selection .ogr-text-selection__box {
+  display: block;
+  position: absolute;
+  background: white;
+}
 .opengraphica .ogr-wait {
   display: none;
 }

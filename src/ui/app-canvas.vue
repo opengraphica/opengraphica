@@ -6,8 +6,7 @@
             <canvas v-if="usePostProcess" ref="postProcessCanvas" class="ogr-post-process-canvas" />
         </div>
         <canvas ref="selectionMaskCanvas" class="ogr-canvas-selection-mask" />
-        <app-canvas-overlays ref="canvasOverlays" />
-        <app-canvas-overlays :ignore-transform="true" />
+        <app-canvas-overlays ref="canvasOverlays" :css-view-transform="cssViewTransform" />
         <div v-if="loading" v-loading="true" class="ogr-canvas-area__loading-animation"></div>
     </div>
 </template>
@@ -59,6 +58,7 @@ export default defineComponent({
         const { viewWidth: viewportWidth, viewHeight: viewportHeight } = toRefs(canvasStore.state);
         const { width: imageWidth, height: imageHeight } = toRefs(workingFileStore.state);
         const isPixelatedZoomLevel = ref<boolean>(false);
+        const cssViewTransform = ref<string>('');
         let ctx: CanvasRenderingContext2D | WebGLRenderingContext | WebGL2RenderingContext | null = null;
 
         let postProcessCancel: ((reason?: any) => void) | null = null;
@@ -642,7 +642,6 @@ export default defineComponent({
                 const isViewDirty = canvasStore.get('viewDirty');
                 const isPlayingAnimation = canvasStore.get('playingAnimation');
 
-                let cssViewTransform: string = '';
                 let decomposedTransform: DecomposedMatrix = null as any;
                 if (isViewDirty && (useCssViewport.value === true || hasCanvasOverlays)) {
                     const devicePixelRatio = window.devicePixelRatio || 1;
@@ -657,7 +656,7 @@ export default defineComponent({
                         .scale(1 / devicePixelRatio, 1 / devicePixelRatio)
                         .translate(offsetX, offsetY)
                         .rotate(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES);
-                    cssViewTransform = `matrix(${pixelRatioTransform.a},${pixelRatioTransform.b},${pixelRatioTransform.c},${pixelRatioTransform.d},${pixelRatioTransform.e},${pixelRatioTransform.f})`;
+                    cssViewTransform.value = `matrix(${pixelRatioTransform.a},${pixelRatioTransform.b},${pixelRatioTransform.c},${pixelRatioTransform.d},${pixelRatioTransform.e},${pixelRatioTransform.f})`;
                 }
 
                 if (isViewDirty) {
@@ -665,7 +664,7 @@ export default defineComponent({
                     if (useCssViewport.value === true) {
                         clearTimeout(drawPostProcessTimeoutHandle);
 
-                        (canvasContainer.value as HTMLDivElement).style.transform = cssViewTransform;
+                        (canvasContainer.value as HTMLDivElement).style.transform = cssViewTransform.value;
 
                         // Post process for better pixel interpolation
                         if (postProcessCanvas.value) {
@@ -694,13 +693,8 @@ export default defineComponent({
                     if (canvasBackground.value) {
                         canvasBackground.value.style.width = imageWidth.value + 'px';
                         canvasBackground.value.style.height = imageHeight.value + 'px';
-                        canvasBackground.value.style.transform = cssViewTransform;
+                        canvasBackground.value.style.transform = cssViewTransform.value;
                         canvasBackground.value.style.backgroundSize = (16 * 1 / decomposedTransform.scaleX) + 'px';
-                    }
-
-                    // Update overlay transform
-                    if (hasCanvasOverlays && canvasOverlays.value) {
-                        (canvasOverlays.value as any).$el.style.transform = cssViewTransform;
                     }
 
                     // Draw selection mask
@@ -861,6 +855,7 @@ export default defineComponent({
             canvasBackground,
             canvasContainer,
             canvasOverlays,
+            cssViewTransform,
             selectionMaskCanvas,
             postProcessCanvas,
             isPixelatedZoomLevel,
