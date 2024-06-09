@@ -17,17 +17,23 @@
                     }"
                 >
                     <svg
-                        width="3"
-                        :height="selectionCursor.size"
-                        :viewBox="'0 0 3 ' + (selectionCursor.size + 2)"
+                        :width="selectionCursor.isHorizontal ? 3 : selectionCursor.size"
+                        :height="selectionCursor.isHorizontal ? selectionCursor.size : 3"
+                        :viewBox="'0 0 ' + (selectionCursor.isHorizontal ? ('3 ' + (selectionCursor.size + 2).toFixed(0)) : ((selectionCursor.size + 2).toFixed(0) + ' 3'))"
                         :style="{
-                            transform: 'scaleX(' + (1.0 / zoom) + ') translate(-50%, -50%)',
+                            transform: 'translate(-50%, -50%)',
                             position: 'absolute',
                         }"
                         xmlns="http://www.w3.org/2000/svg"
                     >
-                        <rect x="0" y="0" width="3" :height="selectionCursor.size + 2" fill="white" />
-                        <rect x="1" y="1" width="1" :height="selectionCursor.size" fill="black" />
+                        <template v-if="selectionCursor.isHorizontal">
+                            <rect x="0" y="0" width="3" :height="selectionCursor.size + 2" fill="white" />
+                            <rect x="1" y="1" width="1" :height="selectionCursor.size" fill="black" />
+                        </template>
+                        <template v-else>
+                            <rect x="0" y="0" height="3" :width="selectionCursor.size + 2" fill="white" />
+                            <rect x="1" y="1" height="1" :width="selectionCursor.size" fill="black" />
+                        </template>
                     </svg>
                 </div>
             </div>
@@ -54,6 +60,7 @@ export default defineComponent({
         interface SelectionCursor {
             position: DOMPoint;
             size: number;
+            isHorizontal: boolean;
         }
 
         const disableBlinking = ref(false);
@@ -79,6 +86,8 @@ export default defineComponent({
             const cursor = isActiveSideEnd.value ? end.value : start.value;
             let lineWrapCharacterIndexIterator = 0;
             const textPlacement: CalculatedTextPlacement = editingRenderTextPlacement.value as CalculatedTextPlacement;
+            const isHorizontal = ['ltr', 'rtl'].includes(textPlacement.lineDirection);
+
             let foundCursorLine: RenderTextLineInfo | null = null;
             let foundCursorGlyph: RenderTextGlyphInfo | null = null;
             findCursorGlyph:
@@ -105,19 +114,19 @@ export default defineComponent({
                 if (foundCursorGlyph) {
                     advanceOffset = foundCursorGlyph.advanceOffset;
                 } else {
-                    const lastGlyph = foundCursorLine.glyphs[foundCursorLine.glyphs.length - 1];
-                    if (lastGlyph) {
-                        advanceOffset = lastGlyph.advanceOffset + lastGlyph.advance;
+                    foundCursorGlyph = foundCursorLine.glyphs[foundCursorLine.glyphs.length - 1];
+                    if (foundCursorGlyph) {
+                        advanceOffset = foundCursorGlyph.advanceOffset + foundCursorGlyph.advance;
                     }
                 }
                 if (textPlacement.isHorizontal) {
-                    position.x = foundCursorLine.lineStartOffset + advanceOffset;
+                    position.x = foundCursorLine.lineStartOffset + advanceOffset + (foundCursorGlyph.bidiDirection === 'rtl' ? foundCursorGlyph.advance : 0);
                     position.y = foundCursorLine.wrapOffset + (foundCursorLine.heightAboveBaseline + foundCursorLine.heightBelowBaseline) / 2.0;
                     size = foundCursorLine.heightAboveBaseline + foundCursorLine.heightBelowBaseline;
                 } else {
                     position.x = foundCursorLine.wrapOffset + (foundCursorLine.largestCharacterWidth / 2.0);
                     position.y = foundCursorLine.lineStartOffset + advanceOffset;
-                    size = foundCursorLine.heightAboveBaseline + foundCursorLine.largestCharacterWidth;
+                    size = foundCursorLine.largestCharacterWidth;
                 }
             }
 
@@ -127,6 +136,7 @@ export default defineComponent({
             return {
                 position,
                 size,
+                isHorizontal,
             };
         });
 

@@ -25,8 +25,9 @@ export function getScripts(text: string): string[] {
     return Array.from(foundScripts);
 }
 
-export function getSubsets(text: string): string[] {
+export function getSubsets(text: string, mergeWhenMultipleOptions: boolean = false): string[] {
     const foundSubsets = new Set<string>();
+    let lookupsWithMultipleSubsets: Array<string[]> = [];
     for (let i = 0; i < text.length; i++) {
         const charCode = text.charCodeAt(i);
         let lookupSubsets = subsetLookupCache.get(charCode);
@@ -38,11 +39,31 @@ export function getSubsets(text: string): string[] {
                 subsetLookupCache.set(charCode, subsets ?? []);
             }
         }
-        for (const subset of lookupSubsets ?? []) {
-            foundSubsets.add(subset);
+        if (!lookupSubsets || lookupSubsets.length === 0) continue;
+        if (mergeWhenMultipleOptions) {
+            if (lookupSubsets.length === 1) {
+                foundSubsets.add(lookupSubsets[0]);
+            } else if (!lookupsWithMultipleSubsets.includes(lookupSubsets)) {
+                lookupsWithMultipleSubsets.push(lookupSubsets);
+            }
+        } else {
+            for (const subset of lookupSubsets) {
+                foundSubsets.add(subset);
+            }
         }
     }
-
+    for (const multipleSubset of lookupsWithMultipleSubsets) {
+        let isAnySubsetExisting = false;
+        for (const subset of multipleSubset) {
+            if (foundSubsets.has(subset)) {
+                isAnySubsetExisting = true;
+                break;
+            }
+        }
+        if (!isAnySubsetExisting) {
+            foundSubsets.add(multipleSubset[0]);
+        }
+    }
     return Array.from(foundSubsets);
 }
 

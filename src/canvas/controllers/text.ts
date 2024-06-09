@@ -30,6 +30,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     private isEditorTextareaComposing: boolean = false;
 
     private layerEditors: Map<number, { documentEditor: TextDocumentEditor, documentSelection: TextDocumentSelection }> = new Map();
+    private isEditingHorizontal: boolean = true;
 
     private selectedLayerIdsUnwatch: WatchStopHandle | null = null;
 
@@ -150,6 +151,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 const layer = getLayerById(editingTextLayerId.value) as WorkingFileTextLayer;
                 if (layer) {
                     let isHorizontal = ['ltr', 'rtl'].includes(layer.data.lineDirection);
+                    this.isEditingHorizontal = isHorizontal;
                     editingRenderTextPlacement.value = calculateTextPlacement(layer.data, {
                         wrapSize: isHorizontal ? layer.width : layer.height,
                     });
@@ -161,6 +163,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
 
     private onBlurEditorTextarea() {
         isEditorTextareaFocused.value = false;
+        this.isEditingHorizontal = true;
         // TODO - update layer in history
     }
 
@@ -312,6 +315,9 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
             this.onDragStart(pointer);
         }
+        setTimeout(() => {
+            this.handleCursorIcon();
+        }, 0);
     }
 
     onPointerMove(e: PointerEvent): void {
@@ -322,6 +328,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 this.onDragMove(pointer);
             }
         }
+        this.handleCursorIcon();
     }
 
     onPointerUp(e: PointerEvent): void {
@@ -329,6 +336,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         if (e.isPrimary) {
             this.onDragEnd();    
         }
+        this.handleCursorIcon();
     }
 
     private onDragStart(pointer: PointerTracker) {
@@ -409,9 +417,9 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                             const right = glyph.advanceOffset + glyph.advance;
                             if (layerTransformPoint.x >= left && layerTransformPoint.x <= right) {
                                 if (layerTransformPoint.x - left < right - layerTransformPoint.x) {
-                                    cursor.character = glyph.documentCharacterIndex;
+                                    cursor.character = glyph.documentCharacterIndex + (glyph.bidiDirection === 'rtl' ? 1 : 0);
                                 } else {
-                                    cursor.character = glyph.documentCharacterIndex + 1;
+                                    cursor.character = glyph.documentCharacterIndex + (glyph.bidiDirection === 'rtl' ? 0 : 1);
                                 }
                                 break findHorizontalCursor;
                             }
@@ -468,7 +476,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     protected handleCursorIcon() {
         let newIcon = super.handleCursorIcon();
         if (!newIcon) {
-            newIcon = 'text';
+            newIcon = (this.isEditingHorizontal) ? 'text' : 'vertical-text';
         }
         canvasStore.set('cursor', newIcon);
         return newIcon;

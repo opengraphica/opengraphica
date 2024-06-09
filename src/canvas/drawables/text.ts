@@ -20,8 +20,8 @@ import { getSubsets as getUnicodeSubsets } from '@/lib/unicode';
 import type {
     Drawable, DrawableOptions, DrawableUpdateOptions, RenderTextLineInfo, RenderTextGlyphInfo,
     TextDocument, TextDocumentLine, TextDocumentSpan, TextDocumentSpanMeta, TextDocumentSpanBidiRun,
+    CalculatedTextPlacement,
 } from '@/types';
-import type { Glyph, Font } from 'opentype.js';
 
 let fontCache!: FontCache;
 
@@ -35,8 +35,7 @@ export interface TextData {
 export default class Text implements Drawable<TextData> {
     private needsUpdateCallback: (data: TextData) => void;
 
-    private linesToDraw: RenderTextLineInfo[] = [];
-    private longestLineSize: number = 0;
+    private calculatedTextPlacement: CalculatedTextPlacement | null = null;
 
     constructor(options: DrawableOptions<TextData>) {
         this.needsUpdateCallback = options.needsUpdateCallback;
@@ -45,7 +44,7 @@ export default class Text implements Drawable<TextData> {
     }
 
     update(data: TextData, { refresh }: DrawableUpdateOptions = {}) {
-        let { wrapSize, document, lines, longestLineSize } = data;
+        let { wrapSize, document } = data;
 
         let left = 0;
         let top = 0;
@@ -55,10 +54,7 @@ export default class Text implements Drawable<TextData> {
         let wrapDirectionSize = 0;
         let waitingToLoadFontFamilies: string[] = [];
 
-        if (lines) {
-            this.linesToDraw = lines;
-            this.longestLineSize = longestLineSize ?? 0;
-        } else if (document) {
+        if (document) {
             waitingToLoadFontFamilies = getUnloadedFontFamilies(document);
             loadFontFamilies(waitingToLoadFontFamilies).then((hadUnloadedFont) => {
                 if (hadUnloadedFont) {
@@ -68,10 +64,8 @@ export default class Text implements Drawable<TextData> {
 
             wrapSize = wrapSize ?? 100;
 
-            const textPlacementResult = calculateTextPlacement(document, { wrapSize });
-            ({ left, right, top, bottom, lineDirectionSize, wrapDirectionSize } = textPlacementResult);
-            this.linesToDraw = textPlacementResult.lines;
-            this.longestLineSize = textPlacementResult.longestLineSize;
+            this.calculatedTextPlacement = calculateTextPlacement(document, { wrapSize });
+            ({ left, right, top, bottom, lineDirectionSize, wrapDirectionSize } = this.calculatedTextPlacement);
         }
 
         return {
@@ -88,14 +82,32 @@ export default class Text implements Drawable<TextData> {
     }
 
     draw2d(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) {
-        let currentLineTop = 0;
-        for (const line of this.linesToDraw) {
-            let currentAdvance = 0;
-            for (const { glyph, advance, fontSize, characterIndex } of line.glyphs) {
-                glyph.draw(ctx, currentAdvance, currentLineTop + line.heightAboveBaseline, fontSize);
-                currentAdvance += advance;
+        if (!this.calculatedTextPlacement) return;
+        const { lines, lineDirection } = this.calculatedTextPlacement;
+        const isHorizontal = ['ltr', 'rtl'].includes(lineDirection);
+
+        if (isHorizontal) {
+            for (const line of lines) {
+                for (const { glyph, advanceOffset, drawOffset, fontSize } of line.glyphs) {
+                    glyph.draw(
+                        ctx,
+                        line.lineStartOffset + drawOffset.x + advanceOffset,
+                        line.wrapOffset + drawOffset.y + line.heightAboveBaseline,
+                        fontSize,
+                    );
+                }
             }
-            currentLineTop += line.heightAboveBaseline + line.heightBelowBaseline;
+        } else {
+            for (const line of lines) {
+                for (const { glyph, advanceOffset, drawOffset, characterWidth, fontSize } of line.glyphs) {
+                    glyph.draw(
+                        ctx,
+                        line.wrapOffset + drawOffset.x + (line.largestCharacterWidth / 2.0) - (characterWidth / 2.0),
+                        line.lineStartOffset + drawOffset.y + advanceOffset,
+                        fontSize,
+                    );
+                }
+            }
         }
     }
 

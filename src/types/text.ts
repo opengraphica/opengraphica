@@ -1,6 +1,6 @@
 import { ColorModel } from './color';
 
-import type { Glyph } from 'opentype.js';
+import type { Glyph } from '@/lib/opentype.js';
 
 export type TextDirection = 'ltr' | 'rtl' | 'ttb' | 'btt';
 export type TextLineAlignment = 'start' | 'center' | 'end';
@@ -27,6 +27,7 @@ export interface RenderTextLineInfo {
     lineSize: number; // If horizontal, this is the width of the light. If vertical, the height.
     lineStartOffset: number; // If horizontal, the number of pixels to offset the x starting position of the line based on text alignment.
     wrapOffset: number; // If horizontal, this is basically the y-position of the line. Vertical, x position.
+    bearingOffset: DOMPoint; // Global x/y draw offset for the entire line.
     documentLineIndex: number;
 }
 
@@ -34,11 +35,14 @@ export interface RenderTextGlyphInfo {
     glyph: InstanceType<typeof Glyph>;
     advance: number;
     advanceOffset: number;
+    drawOffset: DOMPoint;
+    bidiDirection: TextDirection;
+    characterIndex: number;
+    characterWidth: number;
+    documentCharacterIndex: number;
     fontSize: number;
     fontAscender: number;
     fontDescender: number;
-    characterIndex: number;
-    documentCharacterIndex: number;
 }
 
 export interface FontFamilyFetchDefinition  {

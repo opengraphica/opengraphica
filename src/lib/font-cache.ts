@@ -1,4 +1,4 @@
-import { parse, type Font } from 'opentype.js';
+import { parse, type Font } from './opentype';
 import defaultFontFamilies from '@/config/default-font-families.json';
 
 import type { FontFamilyFetchDefinition } from '@/types';

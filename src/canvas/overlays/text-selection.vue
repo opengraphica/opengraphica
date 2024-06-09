@@ -1,6 +1,9 @@
 <template>
     <div class="ogr-canvas-overlay">
-        <div class="ogr-text-selection">
+        <div
+            class="ogr-text-selection"
+            :style="{ transform: editingLayerCssTransform }"
+        >
             <div
                 v-for="(selectionBox, index) of selectionBoxes"
                 :key="index"

@@ -8,7 +8,7 @@ import type {
     TextDocument, TextDocumentLine, TextDocumentSpan, TextDocumentSpanBidiRun, TextDocumentSpanMeta,
     RenderTextLineInfo, RenderTextGlyphInfo, CalculatedTextPlacement,
 } from '@/types';
-import type { Font, Glyph } from 'opentype.js';
+import type { Font, Glyph } from '@/lib/opentype.js';
 
 const bidi = bidiFactory();
 
@@ -18,7 +18,7 @@ export function getUnloadedFontFamilies(document: TextDocument): string[] {
     const subsets = new Set<string>();
     for (const line of document.lines) {
         for (const span of line.spans) {
-            for (const subset of getUnicodeSubsets(span.text)) {
+            for (const subset of getUnicodeSubsets(span.text, true)) {
                 subsets.add(subset);
             }
             if (span.meta.family) {
@@ -66,9 +66,16 @@ export function splitSpanByAvailableFonts(span: TextDocumentSpan): Array<[Font |
     let previousSelectedFont: Font | null = userSelectedFont;
     let currentFontSplitText = '';
     for (const character of span.text) {
-        const characterSubsets = getUnicodeSubsets(character);
+        const characterSubsets = getUnicodeSubsets(character, false);
         let selectedFont = userSelectedFont;
-        if (characterSubsets.length > 0 && !userSelectedFontSubsets.includes(characterSubsets[0])) {
+        let subsetExistsInUserSelectedFontSubsets = false;
+        for (const checkSubset of characterSubsets) {
+            if (userSelectedFontSubsets.includes(checkSubset)) {
+                subsetExistsInUserSelectedFontSubsets = true;
+                break;
+            }
+        }
+        if (characterSubsets.length > 0 && !subsetExistsInUserSelectedFontSubsets) {
             for (const characterSubset of characterSubsets) {
                 const fallbackFontFamily = fontCache.getFallbackFontFamilyThatSatisfiesSubset(characterSubset);
                 if (fallbackFontFamily) {
@@ -268,13 +275,11 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                                     let characters = words[0].split('');
                                     while (characters.length > 0) {
                                         let fittedCharacters: string = '';
-                                        let fittedCharacterAdvanceWidth = 0;
                                         let checkCharacterAdvanceWidth = 0;
                                         for (const character of characters) {
                                             checkCharacterAdvanceWidth = getAdvanceWidth(fittedCharacters + character, font, size, glyphScale, isHorizontal);
                                             if (currentLineSize + checkCharacterAdvanceWidth < wrapSize) {
                                                 fittedCharacters += character;
-                                                fittedCharacterAdvanceWidth = checkCharacterAdvanceWidth;
                                             } else {
                                                 break;
                                             }
@@ -347,6 +352,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
             lineSize: 0,
             lineStartOffset: 0,
             wrapOffset: runningWrapOffset,
+            bearingOffset: new DOMPoint(),
             documentLineIndex: originalLineIndices[lineIndex] ?? lineIndex,
         };
 
@@ -357,6 +363,10 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
 
         let lineCharacterIndex = 0;
         let runningAdvanceOffset = 0;
+        let isDrawCompensatingForAdvanceHeight = false;
+        let wasDrawCompensatingForAdvanceHeight = false;
+        let lineDrawXOffset = 0;
+        let lineDrawYOffset = 0;
         
         // let workingFlippedRun: RenderTextGlyphInfo[] = [];
         for (const fullSpan of line.spans) {
@@ -371,6 +381,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                 const unitsPerEm = font.unitsPerEm;
                 const size = span.meta.size ?? textMetaDefaults.size;
                 const glyphScale = size / unitsPerEm;
+                const goldenRatioMargin = size * 0.147058824;
 
                 const fontYMax = font.ascender * glyphScale;
                 const fontYMin = font.descender * glyphScale;
@@ -387,6 +398,8 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                 const bidiRuns = getSpanBidiRuns(lineCharacterIndex, span, flips);
                 let bidiRunCharacterIndex = lineCharacterIndex;
                 for (const bidiRun of bidiRuns) {
+                    const bidiDirection = bidiRun.isFlipped ? (lineDirection === 'ltr' ? 'rtl' : 'ltr') : lineDirection;
+
                     // // If switching from flipped to non-flipped run, add the glyphs from the previous flipped run to the line.
                     // if (!bidiRun.isFlipped && workingFlippedRun.length > 0) {
                     //     for (let glyphInfo of workingFlippedRun) {
@@ -422,26 +435,86 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                         if (originalTextCharacterIndex < 0 || originalTextCharacterIndex > bidiRunText.length - 1) originalTextCharacterIndex = startOriginalTextCharacterIndex;
 
                         const glyphMetrics = glyph.getMetrics();
+
+                        // if (lineInfo.glyphs.length === 0) {
+                        //     if (isHorizontal) {
+                        //         lineInfo.bearingOffset.x = 0.0;
+                        //         lineInfo.bearingOffset.y = 0.0;
+                        //         isLineBearingApplied = true;
+                        //     } else {
+                        //         lineInfo.bearingOffset.x = 0.0;
+                        //         if (glyph.topSideBearing != null) {
+                        //             lineInfo.bearingOffset.y = (glyphMetrics.xMax - (glyph.topSideBearing ?? 0)) * glyphScale;
+                        //             isLineBearingApplied = true;
+                        //         } else {
+                        //             lineInfo.bearingOffset.y = (font.ascender) * glyphScale;
+                        //         }
+                        //     }
+                        // }
+                        // else {
+                        //     if (!isLineBearingApplied && glyph.topSideBearing != null) {
+                        //         const bearingOffsetY = 100; // (glyphMetrics.xMax - (glyph.topSideBearing ?? 0)) * glyphScale;
+                        //         runningAdvanceOffset += bearingOffsetY;
+                        //         isLineBearingApplied = true;
+                        //     }
+                        // }
+
+                        if (lineInfo.glyphs.length === 0) {
+                            if (!isHorizontal) {
+                                if (glyph.advanceHeight) {
+                                    lineDrawYOffset += (glyphMetrics.yMax + (glyphMetrics.topSideBearing ?? 0)) * glyphScale;
+                                    isDrawCompensatingForAdvanceHeight = true;
+                                } else {
+                                    lineDrawYOffset = (glyphMetrics.yMax * glyphScale) + (goldenRatioMargin / 2);
+                                    isDrawCompensatingForAdvanceHeight = false;
+                                }
+                            }
+                        } else {
+                            isDrawCompensatingForAdvanceHeight = glyph.advanceHeight != null;
+                            if (!isDrawCompensatingForAdvanceHeight) {
+                                lineDrawYOffset = (glyphMetrics.yMax * glyphScale) + (goldenRatioMargin / 2);
+                            } else if (isDrawCompensatingForAdvanceHeight && !wasDrawCompensatingForAdvanceHeight) {
+                                lineDrawYOffset = (glyphMetrics.yMax + (glyphMetrics.topSideBearing ?? 0)) * glyphScale;
+                            }
+                        }
+
                         const glyphInfo: RenderTextGlyphInfo = {
                             glyph: glyph,
-                            advance: isHorizontal ? (glyph.advanceWidth ?? 0) * glyphScale : (font.ascender - font.descender) * glyphScale,
+                            advance: isHorizontal
+                                ? (glyph.advanceWidth ?? 0) * glyphScale
+                                : (
+                                    glyph.advanceHeight != null
+                                        ? glyph.advanceHeight * glyphScale
+                                        : (glyphMetrics.yMax - glyphMetrics.yMin) * glyphScale + goldenRatioMargin
+                                ),
                             advanceOffset: runningAdvanceOffset,
+                            drawOffset: new DOMPoint(lineDrawXOffset, lineDrawYOffset),
+                            characterWidth: (glyph.advanceWidth ?? 0) * glyphScale, // Math.abs(glyphMetrics.xMax * glyphScale - glyphMetrics.xMin * glyphScale),
                             fontSize: size,
                             fontAscender: font.ascender * glyphScale,
                             fontDescender: font.descender * glyphScale,
                             characterIndex: bidiRunCharacterIndex + originalTextCharacterIndex,
                             documentCharacterIndex: runningWrapCharacterIndex + bidiRunCharacterIndex + originalTextCharacterIndex,
+                            bidiDirection,
                         };
+                        wasDrawCompensatingForAdvanceHeight = isDrawCompensatingForAdvanceHeight;
                         runningAdvanceOffset += glyphInfo.advance;
-                        if (isHorizontal) {
-                            lineInfo.lineSize += glyphInfo.advance;
-                        } else {
-                            const characterWidth = Math.abs(glyphMetrics.xMax - glyphMetrics.xMin);
-                            if (characterWidth > lineInfo.largestCharacterWidth) {
-                                lineInfo.largestCharacterWidth = characterWidth;
+                        lineInfo.lineSize += glyphInfo.advance;
+
+                        if (!isHorizontal) {
+                            if (glyphInfo.characterWidth > lineInfo.largestCharacterWidth) {
+                                lineInfo.largestCharacterWidth = glyphInfo.characterWidth;
                             }
-                            lineInfo.lineSize += Math.abs(glyphMetrics.yMax - glyphMetrics.yMin);
                         }
+
+                        // if (isHorizontal) {
+                        //     lineInfo.lineSize += glyphInfo.advance;
+                        // } else {
+                            // if (glyphInfo.characterWidth > lineInfo.largestCharacterWidth) {
+                            //     lineInfo.largestCharacterWidth = glyphInfo.characterWidth;
+                            // }
+                        //     lineInfo.lineSize += Math.abs(glyphMetrics.yMax - glyphMetrics.yMin);
+                        // }
                         // if (bidiRun.isFlipped) {
                         //     workingFlippedRun.push(glyphInfo);
                         // } else {

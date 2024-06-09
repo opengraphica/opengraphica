@@ -9392,6 +9392,9 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor.ogr-custom-cursor--text {
   cursor: text;
 }
+.opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor.ogr-custom-cursor--vertical-text {
+  cursor: vertical-text;
+}
 .opengraphica .ogr-layout-dnd-container > .ogr-layout-dnd-center > main.ogr-custom-cursor.ogr-custom-cursor--zoom-in {
   cursor: zoom-in;
 }

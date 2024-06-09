@@ -1333,6 +1333,10 @@ body.ogr-full-page {
                         cursor: text;
                     }
 
+                    &.ogr-custom-cursor--vertical-text {
+                        cursor: vertical-text;
+                    }
+
                     &.ogr-custom-cursor--zoom-in {
                         cursor: zoom-in;
                     }
