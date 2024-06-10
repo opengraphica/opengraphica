@@ -1,5 +1,47 @@
 <template>
     <div class="ogr-canvas-overlay">
+        <div ref="editinglayerBounds"
+            class="ogr-free-transform"
+            v-show="editingTextLayerId != null"
+            :style="{
+                width: (editingLayerDimensions?.width ?? 0) + 'px',
+                height: (editingLayerDimensions?.height ?? 0) + 'px',
+                transform: editingLayerCssTransform,
+                transformOrigin: '0% 0%',
+            }"
+        >
+            <div class="ogr-free-transform-bounds" :style="{
+                outlineWidth: (0.35/zoom) + 'rem'
+            }"></div>
+            <div v-show="!editingLayerIsHorizontal" class="ogr-free-transform-handle-top" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+                <svg viewBox="0 0 100 100">
+                    <path d="M10 10 L90 10 L90 90 L10 90 Z"
+                        :fill="dragHandleHighlight === DRAG_TYPE_TOP ? dragHandleHighlightColor : 'white'"
+                        :stroke="dragHandleHighlight === DRAG_TYPE_TOP ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
+                </svg>
+            </div>
+            <div v-show="editingLayerIsHorizontal" class="ogr-free-transform-handle-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+                <svg viewBox="0 0 100 100">
+                    <path d="M10 10 L90 10 L90 90 L10 90 Z"
+                        :fill="dragHandleHighlight === DRAG_TYPE_LEFT ? dragHandleHighlightColor : 'white'"
+                        :stroke="dragHandleHighlight === DRAG_TYPE_LEFT ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
+                </svg>
+            </div>
+            <div v-show="!editingLayerIsHorizontal" class="ogr-free-transform-handle-bottom" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+                <svg viewBox="0 0 100 100">
+                    <path d="M10 10 L90 10 L90 90 L10 90 Z"
+                        :fill="dragHandleHighlight === DRAG_TYPE_BOTTOM ? dragHandleHighlightColor : 'white'"
+                        :stroke="dragHandleHighlight === DRAG_TYPE_BOTTOM ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
+                </svg>
+            </div>
+            <div v-show="editingLayerIsHorizontal" class="ogr-free-transform-handle-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+                <svg viewBox="0 0 100 100">
+                    <path d="M10 10 L90 10 L90 90 L10 90 Z"
+                        :fill="dragHandleHighlight === DRAG_TYPE_RIGHT ? dragHandleHighlightColor : 'white'"
+                        :stroke="dragHandleHighlight === DRAG_TYPE_RIGHT ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
+                </svg>
+            </div>
+        </div>
         <div class="ogr-text-editor">
             <div
                 v-if="selectionCursor && isEditorTextareaFocused"
@@ -45,9 +87,12 @@
 import { defineComponent, ref, computed, watch, onMounted, onUnmounted, toRefs } from 'vue';
 import canvasStore from '@/store/canvas';
 import workingFileStore, { getLayerById, getLayerGlobalTransform } from '@/store/working-file';
-import { isEditorTextareaFocused, editingTextLayerId, editingRenderTextPlacement, editingTextDocumentSelection } from '../store/text-state';
+import {
+    isEditorTextareaFocused, editingTextLayerId, editingRenderTextPlacement, editingTextDocumentSelection,
+    dragHandleHighlight,
+} from '../store/text-state';
 
-import type { CalculatedTextPlacement, RenderTextLineInfo, RenderTextGlyphInfo } from '@/types';
+import type { CalculatedTextPlacement, RenderTextLineInfo, RenderTextGlyphInfo, WorkingFileTextLayer } from '@/types';
 
 export default defineComponent({
     name: 'CanvasOverlayText',
@@ -56,7 +101,11 @@ export default defineComponent({
     props: {
     },
     setup(props, { emit }) {
-        
+        const editinglayerBounds = ref<HTMLDivElement>(null as any);
+
+        const dragHandleHighlightColor: string = '#ecf5ff';
+        const dragHandleHighlightBorderColor: string= '#b3d8ff';
+
         interface SelectionCursor {
             position: DOMPoint;
             size: number;
@@ -78,6 +127,20 @@ export default defineComponent({
             if (layer == null) return '';
             const transform = getLayerGlobalTransform(layer);
             return `matrix(${transform.a},${transform.b},${transform.c},${transform.d},${transform.e},${transform.f})`;
+        });
+
+        const editingLayerDimensions = computed(() => {
+            if (editingTextLayerId.value == null) return '';
+            const layer = getLayerById(editingTextLayerId.value);
+            if (layer == null) return '';
+            return { width: layer.width, height: layer.height };
+        });
+
+        const editingLayerIsHorizontal = computed<boolean>(() => {
+            if (editingTextLayerId.value == null) return true;
+            const layer = getLayerById(editingTextLayerId.value);
+            if (layer == null) return true;
+            return ['ltr', 'rtl'].includes((layer as WorkingFileTextLayer).data.lineDirection);
         });
 
         const selectionCursor = computed<SelectionCursor | undefined>(() => {
@@ -149,7 +212,19 @@ export default defineComponent({
         }
 
         return {
+            DRAG_TYPE_ALL: 0,
+            DRAG_TYPE_TOP: 1,
+            DRAG_TYPE_BOTTOM: 2,
+            DRAG_TYPE_LEFT: 4,
+            DRAG_TYPE_RIGHT: 8,
             zoom,
+            editingLayerIsHorizontal,
+            editingTextLayerId,
+            editinglayerBounds,
+            editingLayerDimensions,
+            dragHandleHighlight,
+            dragHandleHighlightColor,
+            dragHandleHighlightBorderColor,
             isEditorTextareaFocused,
             disableBlinking,
             editingLayerCssTransform,

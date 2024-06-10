@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref, provide, onMounted, onUnmounted, watch } from 'vue';
+import { computed, defineComponent, nextTick, ref, provide, onMounted, onUnmounted, watch } from 'vue';
 import AppCanvas from '@/ui/app-canvas.vue';
 import AppDialogs from '@/ui/app-dialogs.vue';
 import AppDndDropOverlay from '@/ui/app-dnd-drop-overlay.vue';
@@ -167,6 +167,8 @@ export default defineComponent({
             await initializeI18n();
 
             isLoaded.value = true;
+
+            await nextTick();
 
             if (preferencesStore.get('showWelcomeScreenAtStart')) {
                 const welcomeModule = getModuleDefinition('tutorial', 'welcome');

@@ -82,7 +82,10 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, watch, onMounted, onUnmounted, toRefs } from 'vue';
-import { isBoundsIndeterminate, freeTransformEmitter, left, top, width, height, rotation, transformOriginX, transformOriginY, dragHandleHighlight, rotateHandleHighlight, selectedLayers } from '../store/free-transform-state';
+import {
+    isBoundsIndeterminate, freeTransformEmitter, left, top, width, height, rotation,
+    transformOriginX, transformOriginY, dragHandleHighlight, rotateHandleHighlight, selectedLayers,
+} from '../store/free-transform-state';
 import canvasStore from '@/store/canvas';
 import workingFileStore from '@/store/working-file';
 import { decomposeMatrix } from '@/lib/dom-matrix';

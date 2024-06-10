@@ -662,7 +662,7 @@ body.ogr-full-page {
     }
 
     .ogr-free-transform {
-        position: relative;
+        position: absolute;
 
         @keyframes ogr-free-transform-bounds {
             0% {

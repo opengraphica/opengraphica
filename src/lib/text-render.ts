@@ -436,47 +436,12 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
 
                         const glyphMetrics = glyph.getMetrics();
 
-                        // if (lineInfo.glyphs.length === 0) {
-                        //     if (isHorizontal) {
-                        //         lineInfo.bearingOffset.x = 0.0;
-                        //         lineInfo.bearingOffset.y = 0.0;
-                        //         isLineBearingApplied = true;
-                        //     } else {
-                        //         lineInfo.bearingOffset.x = 0.0;
-                        //         if (glyph.topSideBearing != null) {
-                        //             lineInfo.bearingOffset.y = (glyphMetrics.xMax - (glyph.topSideBearing ?? 0)) * glyphScale;
-                        //             isLineBearingApplied = true;
-                        //         } else {
-                        //             lineInfo.bearingOffset.y = (font.ascender) * glyphScale;
-                        //         }
-                        //     }
-                        // }
-                        // else {
-                        //     if (!isLineBearingApplied && glyph.topSideBearing != null) {
-                        //         const bearingOffsetY = 100; // (glyphMetrics.xMax - (glyph.topSideBearing ?? 0)) * glyphScale;
-                        //         runningAdvanceOffset += bearingOffsetY;
-                        //         isLineBearingApplied = true;
-                        //     }
-                        // }
-
-                        if (lineInfo.glyphs.length === 0) {
-                            if (!isHorizontal) {
-                                if (glyph.advanceHeight) {
-                                    lineDrawYOffset += (glyphMetrics.yMax + (glyphMetrics.topSideBearing ?? 0)) * glyphScale;
-                                    isDrawCompensatingForAdvanceHeight = true;
-                                } else {
-                                    lineDrawYOffset = (glyphMetrics.yMax * glyphScale) + (goldenRatioMargin / 2);
-                                    isDrawCompensatingForAdvanceHeight = false;
-                                }
-                            }
-                        } else {
-                            if (!isHorizontal) {
-                                isDrawCompensatingForAdvanceHeight = glyph.advanceHeight != null;
-                                if (!isDrawCompensatingForAdvanceHeight) {
-                                    lineDrawYOffset = (glyphMetrics.yMax * glyphScale) + (goldenRatioMargin / 2);
-                                } else if (isDrawCompensatingForAdvanceHeight && !wasDrawCompensatingForAdvanceHeight) {
-                                    lineDrawYOffset = (glyphMetrics.yMax + (glyphMetrics.topSideBearing ?? 0)) * glyphScale;
-                                }
+                        if (!isHorizontal) {
+                            isDrawCompensatingForAdvanceHeight = glyph.advanceHeight != null;
+                            if (!isDrawCompensatingForAdvanceHeight) {
+                                lineDrawYOffset = (glyphMetrics.yMax * glyphScale) + (goldenRatioMargin / 2);
+                            } else if (isDrawCompensatingForAdvanceHeight && !wasDrawCompensatingForAdvanceHeight) {
+                                lineDrawYOffset = (glyphMetrics.yMax + (glyphMetrics.topSideBearing ?? 0)) * glyphScale;
                             }
                         }
 

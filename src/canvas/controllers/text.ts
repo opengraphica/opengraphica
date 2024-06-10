@@ -1,4 +1,4 @@
-import { watch, type WatchStopHandle } from 'vue';
+import { watch, type WatchStopHandle, watchEffect } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 
 import { SelectLayersAction } from '@/actions/select-layers';
@@ -10,9 +10,11 @@ import { TextDocumentEditor, TextDocumentSelection, TextDocumentEditorWithSelect
 import { calculateTextPlacement } from '@/lib/text-render';
 
 import historyStore from '@/store/history';
-import workingFileStore, { getLayerById, getLayerGlobalTransform, getLayersByType } from '@/store/working-file';
+import workingFileStore, { getLayerById, getLayerGlobalTransform, getLayersByType, getSelectedLayers } from '@/store/working-file';
 
-import { isEditorTextareaFocused, editingTextLayerId, editingRenderTextPlacement, editingTextDocumentSelection } from '../store/text-state';
+import {
+    isEditorTextareaFocused, editingTextLayerId, editingRenderTextPlacement, editingTextDocumentSelection,
+} from '../store/text-state';
 
 import type { WorkingFileTextLayer } from '@/types';
 import type { PointerTracker } from './base';
@@ -38,6 +40,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     private isEditingHorizontal: boolean = true;
 
     private selectedLayerIdsUnwatch: WatchStopHandle | null = null;
+    private editingLayerUnwatch: WatchStopHandle | null = null;
 
     onEnter(): void {
         super.onEnter();
@@ -57,7 +60,8 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                     }
                 } catch (error) { /* Ignore */ }
             }
-            for (const newId of newIds ?? []) {
+            newIds = newIds ?? [];
+            for (const newId of newIds) {
                 const layer = getLayerById(newId);
                 if (layer?.type === 'text') {
                     const documentEditor = new TextDocumentEditor(layer.data);
@@ -81,6 +85,9 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                     });
                 }
             }
+            if (!newIds.includes(editingTextLayerId.value as number)) {
+                editingTextLayerId.value = newIds[0] ?? null;
+            }
         }, { immediate: true });
         
         this.onFontsLoaded = this.onFontsLoaded.bind(this);
@@ -95,6 +102,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         appEmitter.off('editor.tool.fontsLoaded', this.onFontsLoaded);
 
         this.selectedLayerIdsUnwatch?.();
+        this.editingLayerUnwatch?.();
     }
 
     private onFontsLoaded() {
@@ -435,16 +443,21 @@ export default class CanvasTextController extends BaseCanvasMovementController {
 
     private pickLayer(viewTransformPoint: DOMPoint): number | null {
         const textLayers = getLayersByType('text').reverse();
-        let selectedLayer: number | null = null;
+        for (const alreadySelectedLayer of getSelectedLayers().filter(layer => layer.type === 'text')) {
+            const layerTransform = getLayerGlobalTransform(alreadySelectedLayer.id).inverse();
+            const layerTransformPoint = viewTransformPoint.matrixTransform(layerTransform);
+            if (layerTransformPoint.x > 0 && layerTransformPoint.y > 0 && layerTransformPoint.x < alreadySelectedLayer.width && layerTransformPoint.y < alreadySelectedLayer.height) {
+                return alreadySelectedLayer.id;
+            }
+        }
         for (const layer of textLayers) {
             const layerTransform = getLayerGlobalTransform(layer.id).inverse();
             const layerTransformPoint = viewTransformPoint.matrixTransform(layerTransform);
             if (layerTransformPoint.x > 0 && layerTransformPoint.y > 0 && layerTransformPoint.x < layer.width && layerTransformPoint.y < layer.height) {
-                selectedLayer = layer.id;
-                break;
+                return layer.id;
             }
         }
-        return selectedLayer;
+        return null;
     }
 
     private getEditorCursorAtPoint(viewTransformPoint: DOMPoint): { line: number, character: number } {

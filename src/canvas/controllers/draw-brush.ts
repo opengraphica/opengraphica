@@ -229,7 +229,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         await historyStore.dispatch('reserve', { token: startDrawReserveToken });
 
         const { width, height } = workingFileStore.state;
-        let selectedLayers = getSelectedLayers();
+        let selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster');
         let layerActions = [];
         if (selectedLayers.length === 0) {
             layerActions.push(new InsertLayerAction<InsertRasterLayerOptions>({
@@ -272,7 +272,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         await nextTick();
 
         // Create a draft image for each of the selected layers
-        selectedLayers = getSelectedLayers();
+        selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster');
         this.drawingOnLayers = selectedLayers as WorkingFileAnyLayer[];
         for (const layer of this.drawingOnLayers) {
             const layerGlobalTransformSelfExcluded = getLayerGlobalTransform(layer, { excludeSelf: true });

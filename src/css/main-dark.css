@@ -8818,7 +8818,7 @@ body.ogr-full-page .opengraphica {
   transform-origin: top left;
 }
 .opengraphica .ogr-free-transform {
-  position: relative;
+  position: absolute;
 }
 @keyframes ogr-free-transform-bounds {
   0% {
