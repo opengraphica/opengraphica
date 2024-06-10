@@ -1,10 +1,15 @@
 import { watch, type WatchStopHandle } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
+
+import { SelectLayersAction } from '@/actions/select-layers';
+
 import BaseCanvasMovementController from './base-movement';
 import canvasStore from '@/store/canvas';
 import { isInput } from '@/lib/events';
 import { TextDocumentEditor, TextDocumentSelection, TextDocumentEditorWithSelection } from '@/lib/text-editor';
 import { calculateTextPlacement } from '@/lib/text-render';
+
+import historyStore from '@/store/history';
 import workingFileStore, { getLayerById, getLayerGlobalTransform, getLayersByType } from '@/store/working-file';
 
 import { isEditorTextareaFocused, editingTextLayerId, editingRenderTextPlacement, editingTextDocumentSelection } from '../store/text-state';
@@ -213,30 +218,69 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 documentSelection.moveLineEnd(event.shiftKey);
                 break;
             case 'Left': case 'ArrowLeft':
-                if (!event.shiftKey && !documentSelection.isEmpty()) {
-                    documentSelection.isActiveSideEnd = false;
-                    documentSelection.moveCharacterPrevious(0, false);
-                } else if (event.ctrlKey) {
-                    documentSelection.moveWordPrevious(event.shiftKey);
-                } else {
-                    documentSelection.moveCharacterPrevious(1, event.shiftKey);
-                }
-                break;
             case 'Right': case 'ArrowRight':
-                if (!event.shiftKey && !documentSelection.isEmpty()) {
-                    documentSelection.isActiveSideEnd = true;
-                    documentSelection.moveCharacterNext(0, false);
-                } else if (event.ctrlKey) {
-                    documentSelection.moveWordNext(event.shiftKey);
-                } else {
-                    documentSelection.moveCharacterNext(1, event.shiftKey);
-                }
-                break;
             case 'Up': case 'ArrowUp':
-                documentSelection.moveLinePrevious(1, event.shiftKey);
-                break;
             case 'Down': case 'ArrowDown':
-                documentSelection.moveLineNext(1, event.shiftKey);
+                let mappedKey = {
+                    'Left': 'ArrowLeft',
+                    'Right': 'ArrowRight',
+                    'Up': 'ArrowUp',
+                    'Down': 'ArrowDown',
+                }[event.key as string] ?? event.key;
+                let finalKey = mappedKey;
+                const lineDirection = documentEditor.document.lineDirection;
+                const wrapDirection = documentEditor.document.wrapDirection;
+                if (lineDirection === 'rtl') {
+                    if (mappedKey === 'ArrowLeft') finalKey = 'ArrowRight';
+                    else if (mappedKey === 'ArrowRight') finalKey = 'ArrowLeft';
+                } else if (lineDirection === 'ttb') {
+                    if (mappedKey === 'ArrowUp') finalKey = 'ArrowLeft';
+                    else if (mappedKey === 'ArrowDown') finalKey = 'ArrowRight';
+                } else if (lineDirection === 'btt') {
+                    if (mappedKey === 'ArrowUp') finalKey = 'ArrowRight';
+                    else if (mappedKey === 'ArrowDown') finalKey = 'ArrowLeft';
+                }
+                if (['ltr', 'rtl'].includes(lineDirection)) {
+                    if (wrapDirection === 'btt') {
+                        if (mappedKey === 'ArrowUp') finalKey = 'ArrowDown';
+                        else if (mappedKey === 'ArrowDown') finalKey = 'ArrowUp';
+                    }
+                } else { // ttb / btt
+                    if (wrapDirection === 'ltr') {
+                        if (mappedKey === 'ArrowLeft') finalKey = 'ArrowUp';
+                        else if (mappedKey === 'ArrowRight') finalKey = 'ArrowDown';
+                    } else { // rtl
+                        if (mappedKey === 'ArrowLeft') finalKey = 'ArrowDown';
+                        else if (mappedKey === 'ArrowRight') finalKey = 'ArrowUp';
+                    }
+                }
+
+                if (finalKey === 'ArrowLeft') {
+                    if (!event.shiftKey && !documentSelection.isEmpty()) {
+                        documentSelection.isActiveSideEnd = false;
+                        documentSelection.moveCharacterPrevious(0, false);
+                    } else if (event.ctrlKey) {
+                        documentSelection.moveWordPrevious(event.shiftKey);
+                    } else {
+                        documentSelection.moveCharacterPrevious(1, event.shiftKey);
+                    }
+                }
+                else if (finalKey === 'ArrowRight') {
+                    if (!event.shiftKey && !documentSelection.isEmpty()) {
+                        documentSelection.isActiveSideEnd = true;
+                        documentSelection.moveCharacterNext(0, false);
+                    } else if (event.ctrlKey) {
+                        documentSelection.moveWordNext(event.shiftKey);
+                    } else {
+                        documentSelection.moveCharacterNext(1, event.shiftKey);
+                    }
+                }
+                else if (finalKey === 'ArrowUp') {
+                    documentSelection.moveLinePrevious(1, event.shiftKey);
+                }
+                else if (finalKey === 'ArrowDown') {
+                    documentSelection.moveLineNext(1, event.shiftKey);
+                }
                 break;
             case 'a':
                 if (event.ctrlKey) {
@@ -344,6 +388,12 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         const dragStartPickLayer = this.pickLayer(viewTransformPoint);
         this.dragStartPickLayer = dragStartPickLayer;
         this.dragStartPosition = viewTransformPoint;
+
+        if (dragStartPickLayer != null && !workingFileStore.state.selectedLayerIds.includes(dragStartPickLayer)) {
+            historyStore.dispatch('runAction', {
+                action: new SelectLayersAction([dragStartPickLayer])
+            });
+        }
 
         // TODO - check for resize handle click before doing this.
         // Wait and then assign focus, because the browser immediately focuses on clicked element.

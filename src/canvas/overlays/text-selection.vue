@@ -1,6 +1,7 @@
 <template>
     <div class="ogr-canvas-overlay">
         <div
+            v-if="isEditorTextareaFocused"
             class="ogr-text-selection"
             :style="{ transform: editingLayerCssTransform }"
         >

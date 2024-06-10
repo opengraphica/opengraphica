@@ -470,11 +470,13 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                                 }
                             }
                         } else {
-                            isDrawCompensatingForAdvanceHeight = glyph.advanceHeight != null;
-                            if (!isDrawCompensatingForAdvanceHeight) {
-                                lineDrawYOffset = (glyphMetrics.yMax * glyphScale) + (goldenRatioMargin / 2);
-                            } else if (isDrawCompensatingForAdvanceHeight && !wasDrawCompensatingForAdvanceHeight) {
-                                lineDrawYOffset = (glyphMetrics.yMax + (glyphMetrics.topSideBearing ?? 0)) * glyphScale;
+                            if (!isHorizontal) {
+                                isDrawCompensatingForAdvanceHeight = glyph.advanceHeight != null;
+                                if (!isDrawCompensatingForAdvanceHeight) {
+                                    lineDrawYOffset = (glyphMetrics.yMax * glyphScale) + (goldenRatioMargin / 2);
+                                } else if (isDrawCompensatingForAdvanceHeight && !wasDrawCompensatingForAdvanceHeight) {
+                                    lineDrawYOffset = (glyphMetrics.yMax + (glyphMetrics.topSideBearing ?? 0)) * glyphScale;
+                                }
                             }
                         }
 

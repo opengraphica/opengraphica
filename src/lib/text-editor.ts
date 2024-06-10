@@ -11,7 +11,7 @@ import type { TextDocument, TextDocumentLine, TextDocumentSpan, TextDocumentSpan
  * This class's job is to modify the internal JSON format of a text layer.
  */
 export class TextDocumentEditor {
-    private document: TextDocument;
+    public document: TextDocument;
     private queuedMetaChanges: Partial<TextDocumentSpanMeta> | null = null;
 	private notifyChangeHandlers: Array<() => void> = [];
 
