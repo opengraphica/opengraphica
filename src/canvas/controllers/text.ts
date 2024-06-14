@@ -5,6 +5,7 @@ import { SelectLayersAction } from '@/actions/select-layers';
 
 import BaseCanvasMovementController from './base-movement';
 import canvasStore from '@/store/canvas';
+import { decomposeMatrix } from '@/lib/dom-matrix';
 import { isInput } from '@/lib/events';
 import { TextDocumentEditor, TextDocumentSelection, TextDocumentEditorWithSelection } from '@/lib/text-editor';
 import { calculateTextPlacement } from '@/lib/text-render';
@@ -13,7 +14,7 @@ import historyStore from '@/store/history';
 import workingFileStore, { getLayerById, getLayerGlobalTransform, getLayersByType, getSelectedLayers } from '@/store/working-file';
 
 import {
-    isEditorTextareaFocused, editingTextLayerId, editingRenderTextPlacement, editingTextDocumentSelection,
+    isEditorTextareaFocused, editingTextLayerId, editingRenderTextPlacement, editingTextDocumentSelection, dragHandleHighlight,
 } from '../store/text-state';
 
 import type { WorkingFileTextLayer } from '@/types';
@@ -31,6 +32,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
 
     private dragStartPickLayer: number | null = null;
     private dragStartPosition: DOMPoint | null = null;
+    private transformIsDragging: boolean = false;
 
     private editorTextarea: HTMLTextAreaElement | null = null;
     private editorTextareaId: string = 'textControllerKeyboardInput' + uuidv4();
@@ -375,10 +377,11 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     onPointerMove(e: PointerEvent): void {
         super.onPointerMove(e);
         const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
-        if (pointer && pointer.down.button === 0) {
-            if (pointer.isDragging) {
-                this.onDragMove(pointer);
-            }
+        const isDragging = pointer && pointer.down.button === 0 && pointer.isDragging;
+        if (isDragging) {
+            this.onDragMove(pointer);
+        } else {
+            this.onCursorHover(e);
         }
         this.handleCursorIcon();
     }
@@ -392,7 +395,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     }
 
     private onDragStart(pointer: PointerTracker) {
-        let { viewTransformPoint } = this.getTransformedCursorInfo(pointer.down.pageX, pointer.down.pageY);
+        let { viewTransformPoint, transformBoundsPoint } = this.getTransformedCursorInfo(pointer.down.pageX, pointer.down.pageY);
         const dragStartPickLayer = this.pickLayer(viewTransformPoint);
         this.dragStartPickLayer = dragStartPickLayer;
         this.dragStartPosition = viewTransformPoint;
@@ -402,6 +405,9 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 action: new SelectLayersAction([dragStartPickLayer])
             });
         }
+
+        // Figure out which resize/rotate handles were clicked on, or if clicked in empty space just to drag
+        this.determineDragType(transformBoundsPoint);
 
         // TODO - check for resize handle click before doing this.
         // Wait and then assign focus, because the browser immediately focuses on clicked element.
@@ -439,6 +445,20 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     private onDragEnd() {
         this.dragStartPickLayer = null;
         this.dragStartPosition = null;
+        this.transformIsDragging = false;
+    }
+
+    private onCursorHover(pointer: PointerEvent) {
+        // Set handle highlights based on mouse hover
+        const pageX = pointer.pageX ?? 0;
+        const pageY = pointer.pageY ?? 0;
+        const { transformBoundsPoint } = this.getTransformedCursorInfo(pageX, pageY);
+        let transformDragType = this.getTransformDragType(transformBoundsPoint);
+        if (transformDragType != null) {
+            dragHandleHighlight.value = transformDragType;
+        } else {
+            dragHandleHighlight.value = null;
+        }
     }
 
     private pickLayer(viewTransformPoint: DOMPoint): number | null {
@@ -458,6 +478,46 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             }
         }
         return null;
+    }
+
+    private determineDragType(transformBoundsPoint: DOMPoint) {
+        this.transformIsDragging = false;
+        // Determine which dimensions to drag on
+        let transformDragType = this.getTransformDragType(transformBoundsPoint);
+        if (transformDragType != null) {
+            this.transformIsDragging = true;
+        }
+        dragHandleHighlight.value = transformDragType;
+    }
+
+    private getTransformDragType(transformBoundsPoint: DOMPoint): number | null {
+        const viewDecomposedTransform = canvasStore.get('decomposedTransform');
+        const devicePixelRatio = window.devicePixelRatio || 1;
+        let transformDragType: number | null = null;
+        const remToPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
+        const handleSize = (0.75 * remToPx / viewDecomposedTransform.scaleX * devicePixelRatio) + 2;
+        const touchForgivenessMargin = this.touches.length > 0 ? handleSize / 2 : 0;
+        const innerHandleSizeVertical = touchForgivenessMargin;
+        const innerHandleSizeHorizontal = touchForgivenessMargin;
+
+        if (editingTextLayerId.value == null) return null;
+        const textLayer = getLayerById(editingTextLayerId.value) as WorkingFileTextLayer;
+        if (textLayer == null) return null;
+        const isHorizontal = ['ltr', 'rtl'].includes(textLayer.data.lineDirection);
+
+        if (transformBoundsPoint.y >= 0 - handleSize - touchForgivenessMargin && transformBoundsPoint.y <= 0 + innerHandleSizeVertical) {
+            transformDragType = isHorizontal ? DRAG_TYPE_ALL : DRAG_TYPE_TOP;
+        }
+        if (transformBoundsPoint.y >= textLayer.height - innerHandleSizeVertical && transformBoundsPoint.y <= textLayer.height + handleSize + touchForgivenessMargin) {
+            transformDragType = isHorizontal ? DRAG_TYPE_ALL : DRAG_TYPE_BOTTOM;
+        }
+        if (transformBoundsPoint.x >= 0 - handleSize - touchForgivenessMargin && transformBoundsPoint.x <= 0 + innerHandleSizeHorizontal) {
+            transformDragType = isHorizontal ? DRAG_TYPE_LEFT : DRAG_TYPE_ALL;
+        }
+        if (transformBoundsPoint.x >= textLayer.width - innerHandleSizeHorizontal && transformBoundsPoint.x <= textLayer.width + handleSize + touchForgivenessMargin) {
+            transformDragType = isHorizontal ? DRAG_TYPE_RIGHT : DRAG_TYPE_ALL;
+        }
+        return transformDragType;
     }
 
     private getEditorCursorAtPoint(viewTransformPoint: DOMPoint): { line: number, character: number } {
@@ -523,15 +583,34 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         return cursor;
     }
 
-    private getTransformedCursorInfo(pageX: number, pageY: number): { viewTransformPoint: DOMPoint, /* transformBoundsPoint: DOMPoint, */ viewDecomposedTransform: DecomposedMatrix } {
+    private getTransformedCursorInfo(pageX: number, pageY: number): { viewTransformPoint: DOMPoint, transformBoundsPoint: DOMPoint, viewDecomposedTransform: DecomposedMatrix } {
         const devicePixelRatio = window.devicePixelRatio || 1;
         const viewTransform = canvasStore.get('transform');
         const viewDecomposedTransform = canvasStore.get('decomposedTransform');
         const viewTransformPoint = new DOMPoint(pageX * devicePixelRatio, pageY * devicePixelRatio)
             .matrixTransform(viewTransform.inverse());
-        
+
+        let transformBoundsPoint: DOMPoint | null = null;
+        if (editingTextLayerId.value != null) {
+            const textLayer = getLayerById(editingTextLayerId.value);
+            // const originTranslateX = left.value + (transformOriginX.value * width.value);
+            // const originTranslateY = top.value + (transformOriginY.value * height.value);
+            // const boundsTransform =
+            //     new DOMMatrix()
+            //     .translateSelf(originTranslateX, originTranslateY)
+            //     .rotateSelf(rotation.value * Math.RADIANS_TO_DEGREES)
+            //     .translateSelf(-originTranslateX, -originTranslateY);
+            if (textLayer) {
+                transformBoundsPoint =
+                    new DOMPoint(this.lastCursorX * devicePixelRatio, this.lastCursorY * devicePixelRatio)
+                    .matrixTransform(viewTransform.inverse())
+                    .matrixTransform(textLayer.transform.inverse());
+            }
+        }
+    
         return {
             viewTransformPoint,
+            transformBoundsPoint: transformBoundsPoint ?? new DOMPoint(),
             viewDecomposedTransform
         };
     }
@@ -540,6 +619,40 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         let newIcon = super.handleCursorIcon();
         if (!newIcon) {
             newIcon = (this.isEditingHorizontal) ? 'text' : 'vertical-text';
+            const decomposedViewTransform = canvasStore.get('decomposedTransform');
+            const dragHandle = dragHandleHighlight.value;
+            determineResizeHandleIcon:
+            if (dragHandle != null && editingTextLayerId.value != null) {
+                const textLayer = getLayerById(editingTextLayerId.value);
+                if (textLayer == null) break determineResizeHandleIcon;
+                const textLayerTransform = getLayerGlobalTransform(textLayer);
+                const textLayerDecomposedTransform = decomposeMatrix(textLayerTransform);
+                let handleRotation = 0;
+                if (dragHandle === DRAG_TYPE_RIGHT) handleRotation = 0;
+                else if (dragHandle === (DRAG_TYPE_BOTTOM | DRAG_TYPE_RIGHT)) handleRotation = Math.PI / 4;
+                else if (dragHandle === DRAG_TYPE_BOTTOM) handleRotation = Math.PI / 2;
+                else if (dragHandle === (DRAG_TYPE_BOTTOM | DRAG_TYPE_LEFT)) handleRotation = 3 * Math.PI / 4;
+                else if (dragHandle === DRAG_TYPE_LEFT) handleRotation = Math.PI;
+                else if (dragHandle === (DRAG_TYPE_TOP | DRAG_TYPE_LEFT)) handleRotation = 5 * Math.PI / 4;
+                else if (dragHandle === DRAG_TYPE_TOP) handleRotation = 3 * Math.PI / 2;
+                else if (dragHandle === (DRAG_TYPE_TOP | DRAG_TYPE_RIGHT)) handleRotation = 7 * Math.PI / 4;
+                else {
+                    newIcon = 'move';
+                    break determineResizeHandleIcon;
+                }
+                handleRotation += textLayerDecomposedTransform.rotation;
+                handleRotation += decomposedViewTransform.rotation;
+                if (handleRotation > 0) handleRotation = (2 * Math.PI) - (handleRotation % (2 * Math.PI));
+                else handleRotation = Math.abs(handleRotation % (2 * Math.PI));
+                if (handleRotation < Math.PI / 6 || handleRotation > 11 * Math.PI / 6) newIcon = 'ew-resize';
+                else if (handleRotation < Math.PI / 3) newIcon = 'nesw-resize';
+                else if (handleRotation < 2 * Math.PI / 3) newIcon = 'ns-resize';
+                else if (handleRotation < 5 * Math.PI / 6) newIcon = 'nwse-resize';
+                else if (handleRotation < 7 * Math.PI / 6) newIcon = 'ew-resize';
+                else if (handleRotation < 4 * Math.PI / 3) newIcon = 'nesw-resize';
+                else if (handleRotation < 5 * Math.PI / 3) newIcon = 'ns-resize';
+                else newIcon = 'nwse-resize';
+            }
         }
         canvasStore.set('cursor', newIcon);
         return newIcon;
