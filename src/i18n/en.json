@@ -31,6 +31,8 @@
         "reorderLayerFilters": "Reorder Effect(s)",
         "selectLayers": "Select Layer(s)",
         "setLayerBoundsToWorkingFileBounds": "Layer Bounds to Image Size",
+        "textTransformResize": "Resize Text Layer",
+        "textTransformTranslate": "Move Text Layer",
         "toggleLayerVisibilityOn": "Toggle Layer Visibility On",
         "toggleLayerVisibilityOff": "Toggle Layer Visibility Off",
         "trimLayerEmptySpace": "Trim Layer Empty Space",

@@ -136,6 +136,7 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
                 updates.transform.m13, updates.transform.m23, updates.transform.m33, updates.transform.m43, 
                 updates.transform.m14, updates.transform.m24, updates.transform.m34, updates.transform.m44
             );
+            canvasStore.set('dirty', true);
         }
         if (updates.filters) {
             const combinedShaderResult = combineShaders(
