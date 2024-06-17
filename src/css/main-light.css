@@ -8874,6 +8874,14 @@ body.ogr-full-page .opengraphica {
   height: 2.25rem;
   transform: translateX(-50%);
 }
+.opengraphica .ogr-free-transform .ogr-free-transform-icon-button {
+  outline: 0.35rem solid white;
+  border-radius: 1000%;
+  box-sizing: border-box;
+  position: absolute;
+  animation: ogr-free-transform-bounds 2s linear infinite;
+  transform: translate(-50%, -50%);
+}
 .opengraphica .ogr-free-transform .ogr-free-transform-handle-top-left,
 .opengraphica .ogr-free-transform .ogr-free-transform-handle-top-right,
 .opengraphica .ogr-free-transform .ogr-free-transform-handle-bottom-left,

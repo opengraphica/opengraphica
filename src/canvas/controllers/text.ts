@@ -21,7 +21,7 @@ import {
     isEditorTextareaFocused, editingTextLayerId, editingRenderTextPlacement, editingTextDocumentSelection, dragHandleHighlight,
 } from '../store/text-state';
 
-import type { WorkingFileTextLayer } from '@/types';
+import type { UpdateTextLayerOptions, WorkingFileTextLayer, TextDocument } from '@/types';
 import type { PointerTracker } from './base';
 import type { DecomposedMatrix } from '@/lib/dom-matrix';
 import appEmitter from '@/lib/emitter';
@@ -38,6 +38,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     private dragStartPosition: DOMPoint | null = null;
     private transformIsDragging: boolean = false;
     private editingLayerTransformStart: DOMMatrix | null = null;
+    private editingLayerDocumentStart: TextDocument | null = null;
     private editingLayerWidthStart: number | null = null;
     private editingLayerHeightStart: number | null = null;
 
@@ -419,6 +420,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         // Figure out which resize/rotate handles were clicked on, or if clicked in empty space just to drag
         this.determineDragType(transformBoundsPoint);
         this.editingLayerTransformStart = null;
+        this.editingLayerDocumentStart = null;
         this.editingLayerWidthStart = null;
         this.editingLayerHeightStart = null;
 
@@ -426,6 +428,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             // Pointer resizes / moves text layer.
             if (editingTextLayerId.value == null || this.editingLayer == null) return;
             this.editingLayerTransformStart = new DOMMatrix().multiply(this.editingLayer.transform);
+            this.editingLayerDocumentStart = JSON.parse(JSON.stringify(this.editingLayer.data)) as TextDocument;
             this.editingLayerWidthStart = this.editingLayer.width;
             this.editingLayerHeightStart = this.editingLayer.height;
         } else {
@@ -487,6 +490,9 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 this.editingLayer.transform = new DOMMatrix().translateSelf(translationVector.x, translationVector.y).multiplySelf(this.editingLayerTransformStart);
                 this.editingLayer.height = Math.max(1, this.editingLayerHeightStart - rotatedDragVector.x);
             }
+            if (dragHandle != null && dragHandle !== DRAG_TYPE_ALL && this.editingLayer.data.boundary !== 'box') {
+                this.editingLayer.data.boundary = 'box';
+            }
         } else {
             const editors = this.layerEditors.get(editingTextLayerId.value);
             if (!editors || !this.editorTextarea) return;
@@ -506,7 +512,8 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             (this.editingLayer.transform !== this.editingLayerTransformStart || this.editingLayer.width !== this.editingLayerWidthStart || this.editingLayer.height !== this.editingLayerHeightStart)
         ) {
             const isResize = this.editingLayer.width !== this.editingLayerWidthStart || this.editingLayer.height !== this.editingLayerHeightStart;
-            const updateLayerAction = new UpdateLayerAction({
+            const updateLayerActions: UpdateLayerAction<any>[] = [];
+            updateLayerActions.push(new UpdateLayerAction({
                 id: editingTextLayerId.value,
                 transform: this.editingLayer.transform,
                 width: this.editingLayer.width,
@@ -515,11 +522,19 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 transform: this.editingLayerTransformStart,
                 width: this.editingLayerWidthStart,
                 height: this.editingLayerHeightStart,
-            });
+            }));
+            if (isResize && this.editingLayerDocumentStart && this.editingLayerDocumentStart.boundary !== 'box') {
+                updateLayerActions.push(new UpdateLayerAction<UpdateTextLayerOptions>({
+                    id: editingTextLayerId.value,
+                    data: this.editingLayer.data,
+                }, {
+                    data: this.editingLayerDocumentStart,
+                }));
+            }
             historyStore.dispatch('runAction', {
                 action: new BundleAction(
                     'textTransform', isResize ? 'action.textTransformResize' : 'action.textTransformTranslate',
-                    [updateLayerAction]
+                    updateLayerActions
                 )
             });
         }
@@ -644,7 +659,9 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                                 break findHorizontalCursor;
                             }
                         }
-                        cursor.character = line.glyphs[line.glyphs.length - 1].documentCharacterIndex + 1;
+                        if (line.glyphs.length > 0) {
+                            cursor.character = line.glyphs[line.glyphs.length - 1].documentCharacterIndex + 1;
+                        }
                         break findHorizontalCursor;
                     }
                 }
@@ -671,7 +688,9 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                                 break findVerticalCursor;
                             }
                         }
-                        cursor.character = line.glyphs[line.glyphs.length - 1].documentCharacterIndex + 1;
+                        if (line.glyphs.length > 0) {
+                            cursor.character = line.glyphs[line.glyphs.length - 1].documentCharacterIndex + 1;
+                        }
                         break findVerticalCursor;
                     }
                 }

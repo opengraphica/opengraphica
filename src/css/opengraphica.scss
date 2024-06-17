@@ -735,6 +735,15 @@ body.ogr-full-page {
             }
         }
 
+        .ogr-free-transform-icon-button {
+            outline: 0.35rem solid white;
+            border-radius: 1000%;
+            box-sizing: border-box;
+            position: absolute;
+            animation: ogr-free-transform-bounds 2s linear infinite;
+            transform: translate(-50%, -50%);
+        }
+
         .ogr-free-transform-handle-top-left,
         .ogr-free-transform-handle-top-right,
         .ogr-free-transform-handle-bottom-left,

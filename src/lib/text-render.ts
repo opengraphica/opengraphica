@@ -171,8 +171,13 @@ export function getAdvanceWidth(text: string, font: Font, size: number, scale: n
         for (const character of text) {
             const glyph: Glyph = font.charToGlyph(character);
             if (glyph) {
-                const bbox = glyph.getBoundingBox();
-                advanceWidth += (bbox.y2 - bbox.y1) * scale;
+                if (glyph.advanceHeight != null) {
+                    advanceWidth += glyph.advanceHeight;
+                } else {
+                    // TODO - this isn't accurate
+                    const bbox = glyph.getBoundingBox();
+                    advanceWidth += (bbox.y2 - bbox.y1) * scale;
+                }
             }
         }
     }
@@ -203,12 +208,22 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
         wrappedLines = [];
         let currentLineSpans: TextDocumentSpan[] = [];
         let currentLineSize = 0;
+        let lastUsedFont: Font | null = null;
         for (const [lineIndex, line] of document.lines.entries()) {
+            currentLineSpans = [];
+            currentLineSize = 0;
             for (const fullSpan of line.spans) {
-                const spanFontSplits = splitSpanByAvailableFonts(fullSpan);
+                let spanFontSplits = splitSpanByAvailableFonts(fullSpan);
+                if (spanFontSplits.length === 0) {
+                    spanFontSplits = [[lastUsedFont, {
+                        text: ' ',
+                        meta: fullSpan.meta,
+                    }]];
+                }
                 for (const [font, span] of spanFontSplits) {
 
                     if (!font) continue;
+                    lastUsedFont = font;
                     const unitsPerEm = font.unitsPerEm;
                     const size = span.meta.size ?? textMetaDefaults.size;
                     const glyphScale = size / unitsPerEm;
@@ -222,7 +237,9 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                     } else {
                         // Need to determine which words in the span will fit in the line.
                         let words = span.text.split(' ');
-                        while (words.length > 0) {
+                        let maxWordIterations = 0;
+                        while (words.length > 0 && maxWordIterations < 100) {
+                            maxWordIterations++;
                             let fittedWords: string[] = [];
                             let fittedWordAdvanceWidth = 0;
                             let currentWordAdvanceWidth = 0;
@@ -240,7 +257,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                             // Not all words fit in the line.
                             if (currentLineSize + fittedWordAdvanceWidth + currentWordAdvanceWidth > wrapSize) {
                                 // If wrapping only per-word, make a new line.
-                                if (document.wrapAt === 'word') {
+                                if (document.wrapAt === 'word' || fittedWords.length > 0) {
                                     if (currentLineSize === 0 && fittedWords.length === 0) {
                                         fittedWords.push(words[0]);
                                     }
@@ -260,20 +277,14 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                                     currentLineSize = 0;
                                     words = words.slice(fittedWords.length);
                                 } else if (document.wrapAt === 'wordThenLetter') {
-                                    // Add words that fit to the line.
-                                    if (fittedWords.length > 0) {
-                                        currentLineSpans.push({
-                                            text: fittedWords.join(' '),
-                                            meta: span.meta,
-                                        });
-                                        currentLineSize += fittedWordAdvanceWidth;
-                                    }
-                                    words = words.slice(fittedWords.length);
                                     if (words.length === 0) break;
 
                                     // Need to determine which characters will fit in the line.
                                     let characters = words[0].split('');
-                                    while (characters.length > 0) {
+                                    words.shift();
+                                    let maxCharacterIterations = 0;
+                                    while (characters.length > 0 && maxCharacterIterations < 100) {
+                                        maxCharacterIterations++;
                                         let fittedCharacters: string = '';
                                         let checkCharacterAdvanceWidth = 0;
                                         for (const character of characters) {
@@ -329,6 +340,16 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                         }
                     }
                 }
+            }
+            if (currentLineSpans.length > 0) {
+                originalLineIndices.push(lineIndex);
+                wrappedLines.push({
+                    alignment: line.alignment,
+                    direction: line.direction,
+                    spans: currentLineSpans,
+                });
+                currentLineSpans = [];
+                currentLineSize = 0;
             }
         }
     }
@@ -520,16 +541,19 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
             lineInfo.heightAboveBaseline = lastHeightAboveBaseline;
             lineInfo.heightBelowBaseline = lastHeightBelowBaseline;
         }
-        if (lineInfo.documentLineIndex !== previousDocumentLineIndex) {
+        if (lineInfo.documentLineIndex !== originalLineIndices[lineIndex + 1]) {
             runningWrapCharacterIndex = 0;
         } else {
             runningWrapCharacterIndex += lineCharacterIndex;
         }
+
         previousDocumentLineIndex = lineInfo.documentLineIndex;
 
         linesToDraw.push(lineInfo);
     }
-    
+
+    console.log(linesToDraw);
+
     // Now that the longest line length is known, figure out text alignment offsets.
     for (const lineInfo of linesToDraw) {
         if (lineInfo.lineAlignment === 'end') {

@@ -147,7 +147,6 @@ export default defineComponent({
             if (!editingRenderTextPlacement.value || !editingTextDocumentSelection.value) return;
             const { isActiveSideEnd, start, end } = toRefs(editingTextDocumentSelection.value);
             const cursor = isActiveSideEnd.value ? end.value : start.value;
-            let lineWrapCharacterIndexIterator = 0;
             const textPlacement: CalculatedTextPlacement = editingRenderTextPlacement.value as CalculatedTextPlacement;
             const isHorizontal = ['ltr', 'rtl'].includes(textPlacement.lineDirection);
 
@@ -159,15 +158,14 @@ export default defineComponent({
                     foundCursorLine = line;
                     let lineMaxCharacterIndex = 0;
                     for (const glyph of line.glyphs) {
-                        if (cursor.character === glyph.characterIndex + lineWrapCharacterIndexIterator) {
+                        if (cursor.character === glyph.documentCharacterIndex) {
                             foundCursorGlyph = glyph;
                             break findCursorGlyph;
                         }
-                        if (glyph.characterIndex > lineMaxCharacterIndex) {
-                            lineMaxCharacterIndex = glyph.characterIndex;
+                        if (glyph.documentCharacterIndex > lineMaxCharacterIndex) {
+                            lineMaxCharacterIndex = glyph.documentCharacterIndex;
                         }
                     }
-                    lineWrapCharacterIndexIterator += lineMaxCharacterIndex;
                 }
             }
             let position = new DOMPoint();

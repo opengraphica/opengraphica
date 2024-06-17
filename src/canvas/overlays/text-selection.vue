@@ -63,7 +63,6 @@ export default defineComponent({
 
             const boxes: SelectionBox[] = [];
             let currentBox: SelectionBox | null = null;
-            let lineWrapCharacterIndexIterator = 0;
             let previousDocumentLineIndex = -1;
             const textPlacement: CalculatedTextPlacement = editingRenderTextPlacement.value as CalculatedTextPlacement;
 
@@ -72,7 +71,7 @@ export default defineComponent({
                     let lineMaxCharacterIndex = 0;
                     let previousGlyphCharacterIndex = -1;
                     for (const glyph of line.glyphs) {
-                        const glyphCharacterIndex = glyph.characterIndex + lineWrapCharacterIndexIterator;
+                        const glyphCharacterIndex = glyph.documentCharacterIndex; // + lineWrapCharacterIndexIterator;
                         if (
                             (glyphCharacterIndex >= startCharacter || line.documentLineIndex > startLine) &&
                             (glyphCharacterIndex < endCharacter || line.documentLineIndex < endLine)
@@ -89,7 +88,7 @@ export default defineComponent({
                             } else {
                                 if (textPlacement.isHorizontal) {
                                     if (
-                                        Math.abs(glyph.characterIndex -previousGlyphCharacterIndex) <= 1 &&
+                                        Math.abs(glyph.documentCharacterIndex -previousGlyphCharacterIndex) <= 1 &&
                                         currentBox.rect.y === y && currentBox.rect.height === height
                                     ) {
                                         currentBox.rect.x = Math.min(currentBox.rect.x, x);
@@ -100,7 +99,7 @@ export default defineComponent({
                                     }
                                 } else {
                                     if (
-                                        Math.abs(glyph.characterIndex -previousGlyphCharacterIndex) <= 1 &&
+                                        Math.abs(glyph.documentCharacterIndex -previousGlyphCharacterIndex) <= 1 &&
                                         currentBox.rect.x === x && currentBox.rect.width === width
                                     ) {
                                         currentBox.rect.y = Math.min(currentBox.rect.y, y);
@@ -121,12 +120,11 @@ export default defineComponent({
                             }
                         }
 
-                        if (glyph.characterIndex > lineMaxCharacterIndex) {
-                            lineMaxCharacterIndex = glyph.characterIndex;
+                        if (glyph.documentCharacterIndex > lineMaxCharacterIndex) {
+                            lineMaxCharacterIndex = glyph.documentCharacterIndex;
                         }
-                        previousGlyphCharacterIndex = glyph.characterIndex;
+                        previousGlyphCharacterIndex = glyph.documentCharacterIndex;
                     }
-                    lineWrapCharacterIndexIterator += lineMaxCharacterIndex;
                 }
 
                 if (currentBox) {
@@ -134,9 +132,6 @@ export default defineComponent({
                     currentBox = null;
                 }
 
-                if (line.documentLineIndex !== previousDocumentLineIndex) {
-                    lineWrapCharacterIndexIterator = 0;
-                }
                 previousDocumentLineIndex = line.documentLineIndex;
             }
 

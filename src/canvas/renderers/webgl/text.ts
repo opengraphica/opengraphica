@@ -21,8 +21,11 @@ import type { DrawWorkingFileLayerOptions, WorkingFileTextLayer, ColorModel } fr
 export default class TextLayerRenderer extends BaseLayerRenderer {
 
     private stopWatchData: WatchStopHandle | undefined;
+    private stopWatchDimensions: WatchStopHandle | undefined;
     private stopWatchFilters: WatchStopHandle | undefined;
     private stopWatchTransform: WatchStopHandle | undefined;
+
+    private layer!: WorkingFileTextLayer<ColorModel>;
 
     private planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
     private material: InstanceType<typeof ShaderMaterial> | undefined;
@@ -35,6 +38,7 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
     private waitingToLoadFontFamilies: string[] = [];
 
     async onAttach(layer: WorkingFileTextLayer<ColorModel>) {
+        this.layer = layer;
 
         const combinedShaderResult = combineShaders(
             await createFiltersFromLayerConfig(layer.filters),
@@ -77,17 +81,21 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
             const { lineDirectionSize, wrapDirectionSize } = updateInfo?.[this.textDrawableUuid ?? ''] ?? {};
             const isHorizontal = ['ltr', 'rtl'].includes(layer.data.lineDirection);
 
-            this.isDrawnAfterAttach = true;
-            let newTexture: Texture = await createThreejsTextureFromImage(canvas);
-
             // TODO - add history event & merge with text update history? The renderer seems like a weird place to be updating history.
             if (isHorizontal) {
-                layer.width = lineDirectionSize;
+                if (layer.data.boundary === 'dynamic') {
+                    layer.width = lineDirectionSize;
+                }
                 layer.height = wrapDirectionSize;
             } else {
                 layer.width = wrapDirectionSize;
-                layer.height = lineDirectionSize;
+                if (layer.data.boundary === 'dynamic') {
+                    layer.height = lineDirectionSize;
+                }
             }
+
+            this.isDrawnAfterAttach = true;
+            let newTexture: Texture = await createThreejsTextureFromImage(canvas);
 
             if (this.planeGeometry?.parameters.width !== canvas.width || this.planeGeometry?.parameters.height !== canvas.height) {
                 this.planeGeometry?.dispose();
@@ -108,6 +116,16 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
         const { width, height, filters, transform, data } = toRefs(layer);
         this.stopWatchData = watch([data], () => {
             this.update({ data: layer.data });
+        }, { deep: true, immediate: true });
+        this.stopWatchDimensions = watch([width, height], ([newWidth, newHeight], [oldWidth, oldHeight]) => {
+            const isHorizontal = ['ltr', 'rtl'].includes(layer.data.lineDirection);
+            if (layer.data.boundary === 'box') {
+                if (newWidth !== oldWidth && isHorizontal) {
+                    this.update({ width: newWidth });
+                } else if (newHeight !== oldHeight && !isHorizontal) {
+                    this.update({ height: newHeight });
+                }
+            }
         }, { deep: true, immediate: true });
         this.stopWatchFilters = watch([filters], async ([filters]) => {
             await createFiltersFromLayerConfig(filters);
@@ -149,14 +167,18 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
             this.material = createRasterShaderMaterial(map?.value, combinedShaderResult);
             this.plane && (this.plane.material = this.material);
         }
-        if (updates.data) {
+        if (updates.data || updates.width != null || updates.height != null) {
+            const isHorizontal = ['ltr', 'rtl'].includes(this.layer.data.lineDirection);
             if (this.drawableCanvas && this.textDrawableUuid) {
                 this.drawableCanvas.draw({
                     updates: [
                         {
                             uuid: this.textDrawableUuid,
                             data: {
-                                document: updates.data
+                                document: updates.data ?? this.layer.data,
+                                wrapSize: this.layer.data.boundary === 'box'
+                                    ? (isHorizontal ? (updates.width ?? this.layer.width) : (updates.height ?? this.layer.height))
+                                    : undefined,
                             }
                         }
                     ]
@@ -166,6 +188,7 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
     }
 
     onDetach(): void {
+        (this.layer as unknown) = undefined;
         this.drawableCanvas?.dispose();
         this.planeGeometry?.dispose();
         this.planeGeometry = undefined;
@@ -174,6 +197,7 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
         this.material?.dispose();
         this.material = undefined;
         this.stopWatchData?.();
+        this.stopWatchDimensions?.();
         this.stopWatchFilters?.();
         this.stopWatchTransform?.();
         this.isDrawnAfterAttach = false;
