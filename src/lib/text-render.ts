@@ -172,7 +172,7 @@ export function getAdvanceWidth(text: string, font: Font, size: number, scale: n
             const glyph: Glyph = font.charToGlyph(character);
             if (glyph) {
                 if (glyph.advanceHeight != null) {
-                    advanceWidth += glyph.advanceHeight;
+                    advanceWidth += glyph.advanceHeight * scale;
                 } else {
                     // TODO - this isn't accurate
                     const bbox = glyph.getBoundingBox();
@@ -222,7 +222,9 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                 }
                 for (const [font, span] of spanFontSplits) {
 
-                    if (!font) continue;
+                    if (!font) {
+                        continue;
+                    }
                     lastUsedFont = font;
                     const unitsPerEm = font.unitsPerEm;
                     const size = span.meta.size ?? textMetaDefaults.size;
@@ -238,7 +240,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                         // Need to determine which words in the span will fit in the line.
                         let words = span.text.split(' ');
                         let maxWordIterations = 0;
-                        while (words.length > 0 && maxWordIterations < 100) {
+                        while (words.length > 0 && maxWordIterations < 1000) {
                             maxWordIterations++;
                             let fittedWords: string[] = [];
                             let fittedWordAdvanceWidth = 0;
@@ -257,22 +259,24 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                             // Not all words fit in the line.
                             if (currentLineSize + fittedWordAdvanceWidth + currentWordAdvanceWidth > wrapSize) {
                                 // If wrapping only per-word, make a new line.
-                                if (document.wrapAt === 'word' || fittedWords.length > 0) {
-                                    if (currentLineSize === 0 && fittedWords.length === 0) {
+                                if (document.wrapAt === 'word' || fittedWords.length > 0 || currentLineSize > 0) {
+                                    if (currentLineSize === 0 && fittedWords.length === 0 && words[0].length > 0) {
                                         fittedWords.push(words[0]);
                                     }
                                     if (fittedWords.length > 0) {
                                         currentLineSpans.push({
-                                            text: fittedWords.join(' '),
+                                            text: fittedWords.join(' ') + (fittedWords.length !== words.length ? ' ' : ''),
                                             meta: span.meta,
                                         });
                                     }
                                     originalLineIndices.push(lineIndex);
-                                    wrappedLines.push({
-                                        alignment: line.alignment,
-                                        direction: line.direction,
-                                        spans: currentLineSpans,
-                                    });
+                                    if (currentLineSpans.length > 0) {
+                                        wrappedLines.push({
+                                            alignment: line.alignment,
+                                            direction: line.direction,
+                                            spans: currentLineSpans,
+                                        });
+                                    }
                                     currentLineSpans = [];
                                     currentLineSize = 0;
                                     words = words.slice(fittedWords.length);
@@ -283,7 +287,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                                     let characters = words[0].split('');
                                     words.shift();
                                     let maxCharacterIterations = 0;
-                                    while (characters.length > 0 && maxCharacterIterations < 100) {
+                                    while (characters.length > 0 && maxCharacterIterations < 1000) {
                                         maxCharacterIterations++;
                                         let fittedCharacters: string = '';
                                         let checkCharacterAdvanceWidth = 0;
@@ -307,22 +311,28 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                                                 });
                                             }
                                             originalLineIndices.push(lineIndex);
-                                            wrappedLines.push({
-                                                alignment: line.alignment,
-                                                direction: line.direction,
-                                                spans: currentLineSpans,
-                                            });
+                                            if (currentLineSpans.length > 0) {
+                                                wrappedLines.push({
+                                                    alignment: line.alignment,
+                                                    direction: line.direction,
+                                                    spans: currentLineSpans,
+                                                });
+                                            }
                                             currentLineSpans = [];
                                             currentLineSize = 0;
                                             characters = characters.slice(fittedCharacters.length);
                                         } else {
                                             // All characters fit in the current line. Add them.
-                                            currentLineSpans.push({
-                                                text: fittedCharacters,
-                                                meta: span.meta,
-                                            });
+                                            let endingSpace = (fittedWords.length !== words.length ? ' ' : '');
+                                            let endingSpaceAdvanceWidth = getAdvanceWidth(endingSpace, font, size, glyphScale, isHorizontal);
+                                            if (fittedCharacters.length > 0) {
+                                                currentLineSpans.push({
+                                                    text: fittedCharacters + endingSpace,
+                                                    meta: span.meta,
+                                                });
+                                            }
                                             characters = [];
-                                            currentLineSize += checkCharacterAdvanceWidth;
+                                            currentLineSize += checkCharacterAdvanceWidth + endingSpaceAdvanceWidth;
                                         }
                                     }
                                 } else {
@@ -330,10 +340,12 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                                 }
                             } else {
                                 // All words fit in the current line. Add them.
-                                currentLineSpans.push({
-                                    text: fittedWords.join(' '),
-                                    meta: span.meta,
-                                });
+                                if (fittedWords.length > 0) {
+                                    currentLineSpans.push({
+                                        text: fittedWords.join(' '),
+                                        meta: span.meta,
+                                    });
+                                }
                                 words = [];
                                 currentLineSize += fittedWordAdvanceWidth + currentWordAdvanceWidth;
                             }
@@ -549,10 +561,10 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
 
         previousDocumentLineIndex = lineInfo.documentLineIndex;
 
-        linesToDraw.push(lineInfo);
+        if (lineInfo.glyphs.length > 0) {
+            linesToDraw.push(lineInfo);
+        }
     }
-
-    console.log(linesToDraw);
 
     // Now that the longest line length is known, figure out text alignment offsets.
     for (const lineInfo of linesToDraw) {
