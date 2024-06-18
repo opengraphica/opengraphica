@@ -554,7 +554,11 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         const hoveringPickLayer = this.pickLayer(viewTransformPoint);
         if (hoveringPickLayer != null) {
             const hoveringLayer = getLayerById(hoveringPickLayer) as WorkingFileTextLayer;
-            this.isHoveringLayerHorizontal = !['ttb', 'btt'].includes(hoveringLayer?.data.lineDirection);
+            const hoveringLayerGlobalTransform = getLayerGlobalTransform(hoveringLayer);
+            const decomposedHoveringLayerGlobalTransform = decomposeMatrix(hoveringLayerGlobalTransform);
+            let layerDirection = (['ttb', 'btt'].includes(hoveringLayer?.data.lineDirection) ? 0 : Math.PI / 2.0) + decomposedHoveringLayerGlobalTransform.rotation;
+            const layerDirectionBearing = rotateDirectionVector2d(1.0, 0.0, layerDirection);
+            this.isHoveringLayerHorizontal = Math.abs(layerDirectionBearing.x) < Math.abs(layerDirectionBearing.y);
         } else {
             this.isHoveringLayerHorizontal = true;
         }

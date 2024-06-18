@@ -82,15 +82,17 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
             const isHorizontal = ['ltr', 'rtl'].includes(layer.data.lineDirection);
 
             // TODO - add history event & merge with text update history? The renderer seems like a weird place to be updating history.
-            if (isHorizontal) {
-                if (layer.data.boundary === 'dynamic') {
-                    layer.width = lineDirectionSize;
-                }
-                layer.height = wrapDirectionSize;
-            } else {
-                layer.width = wrapDirectionSize;
-                if (layer.data.boundary === 'dynamic') {
-                    layer.height = lineDirectionSize;
+            if (waitingToLoadFontFamilies.length === 0) {
+                if (isHorizontal) {
+                    if (layer.data.boundary === 'dynamic') {
+                        layer.width = lineDirectionSize;
+                    }
+                    layer.height = wrapDirectionSize;
+                } else {
+                    layer.width = wrapDirectionSize;
+                    if (layer.data.boundary === 'dynamic') {
+                        layer.height = lineDirectionSize;
+                    }
                 }
             }
 

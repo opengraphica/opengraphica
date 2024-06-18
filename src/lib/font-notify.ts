@@ -28,27 +28,31 @@ export async function notifyLoadingFontFamilies(fontFamilies: string[]) {
         loadingFontFamilies.add(fontFamily);
     }
 
-    if (loadingFontFamilies.size > 0 && !currentlyShowingNotification) {
-        const { t } = i18n.global;
-        currentlyShowingNotification = true;
-        appEmitter.emit('app.notify', {
-            type: 'info',
-            title: t('lib.fontNotify.title'),
-            message: `
-                ${t('lib.fontNotify.pleaseWait')}
-                <div id="${notifyContentId}"></div>
-            `,
-            dangerouslyUseHTMLString: true,
-            duration: 0,
-            onCreated(handle) {
-                currentlyShowingNotificationHandle = handle;
-                updateLoadingFontFamilyList();
-            },
-            onClose() {
-                currentlyShowingNotificationHandle = null;
-                currentlyShowingNotification = false;
-            }
-        });
+    if (loadingFontFamilies.size > 0) {
+        if (!currentlyShowingNotification) {
+            const { t } = i18n.global;
+            currentlyShowingNotification = true;
+            appEmitter.emit('app.notify', {
+                type: 'info',
+                title: t('lib.fontNotify.title'),
+                message: `
+                    ${t('lib.fontNotify.pleaseWait')}
+                    <div id="${notifyContentId}"></div>
+                `,
+                dangerouslyUseHTMLString: true,
+                duration: 0,
+                onCreated(handle) {
+                    currentlyShowingNotificationHandle = handle;
+                    updateLoadingFontFamilyList();
+                },
+                onClose() {
+                    currentlyShowingNotificationHandle = null;
+                    currentlyShowingNotification = false;
+                }
+            });
+        } else {
+            updateLoadingFontFamilyList();
+        }
     }
 }
 
