@@ -1,0 +1,14 @@
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+ <g>
+  <title>Layer 1</title>
+  <rect fill="#fff" stroke="#686868" x="276.5" y="17.50002" width="207.00001" height="200.99998" id="svg_9" stroke-width="6"/>
+  <rect fill="#fff" stroke="#686868" x="28.5" y="17.50002" width="207.00001" height="200.99998" id="svg_8" stroke-width="6"/>
+  <rect fill="#fff" stroke="#686868" x="276.5" y="281.50002" width="207.00001" height="200.99998" id="svg_1" stroke-width="6"/>
+  <rect fill="#fff" stroke="#686868" x="29.5" y="280.50002" width="207.00001" height="200.99998" id="svg_2" stroke-width="6"/>
+  <text fill="#5b5b5b" stroke="#686868" stroke-width="0" x="358.64167" y="412" id="svg_5" font-size="64" font-family="Noto Sans JP" text-anchor="start" xml:space="preserve">4</text>
+  <text fill="#5b5b5b" stroke="#686868" stroke-width="0" x="113.64167" y="142" id="svg_6" font-size="64" font-family="Noto Sans JP" text-anchor="start" xml:space="preserve">1</text>
+  <text fill="#5b5b5b" stroke="#686868" stroke-width="0" x="361.64167" y="145" id="svg_7" font-size="64" font-family="Noto Sans JP" text-anchor="start" xml:space="preserve">2</text>
+  <text fill="#5b5b5b" stroke="#686868" stroke-width="0" x="111.64167" y="411" id="svg_10" font-size="64" font-family="Noto Sans JP" text-anchor="start" xml:space="preserve">3</text>
+ </g>
+
+</svg>

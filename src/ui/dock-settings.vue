@@ -83,6 +83,10 @@
                                 <template v-slot:title>
                                     {{ $t('dock.settings.image.menu.convertLayers.groupTitle') }}
                                 </template>
+                                <el-menu-item index="convertLayersToCollage">
+                                    <i class="bi bi-arrow-return-right"></i>
+                                    <span v-t="'dock.settings.image.menu.convertLayers.toCollage'"></span>
+                                </el-menu-item>
                                 <el-menu-item index="convertLayersToImageSequence">
                                     <i class="bi bi-arrow-return-right"></i>
                                     <span v-t="'dock.settings.image.menu.convertLayers.toImageSequence'"></span>
@@ -692,6 +696,9 @@ export default defineComponent({
                                 break;
                             case 'paste':
                                 await runModule('image', 'paste');
+                                break;
+                            case 'convertLayersToCollage':
+                                await runModule('image', 'convertLayersToCollage');
                                 break;
                             case 'convertLayersToImageSequence':
                                 await runModule('image', 'convertLayersToImageSequence');

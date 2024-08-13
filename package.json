@@ -1,7 +1,11 @@
 {
     "name": "opengraphica",
-    "version": "0.0.1-alpha.1",
+    "version": "0.0.1-alpha.2",
     "private": false,
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/opengraphica/opengraphica/"
+    },
     "scripts": {
         "dev": "webpack serve --config ./webpack.config.dev.js",
         "build": "npm run build:website",

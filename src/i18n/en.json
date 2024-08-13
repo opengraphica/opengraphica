@@ -6,6 +6,7 @@
         "applyActiveSelection": "Apply Active Selection",
         "applyLayerTransform": "Apply Layer Transform",
         "clearSelection": "Clear Selection",
+        "convertLayersToCollage": "Convert Layers to Collage",
         "convertLayersToImageSequence": "Convert Layers to Image Sequence",
         "createDrawLayer": "Create Draw Layer",
         "createNewFile": "New File",
@@ -165,6 +166,7 @@
                     "cropResize": "Crop and Resize",
                     "convertLayers": {
                         "groupTitle": "Convert Layers...",
+                        "toCollage": "To Collage",
                         "toImageSequence": "To Image Sequence",
                         "flatten": "Flatten To New Layer"
                     },
@@ -628,6 +630,37 @@
                 "environment": "Rear (Environment)"
             }
         },
+        "imageConvertLayersToCollage": {
+            "title": "Convert Layers to Collage",
+            "collageType": {
+                "verticalStack": "Vertical Stack",
+                "horizontalStack": "Horizontal Stack",
+                "grid": "Grid"
+            },
+            "params": {
+                "shared": {
+                    "reverseLayerOrder": "Reverse Layer Order"
+                },
+                "verticalStack": {
+                    "horizontalAlignment": "Horizontal Alignment",
+                    "horizontalAlignmentOption": {
+                        "left": "Left",
+                        "center": "Center",
+                        "right": "Right"
+                    },
+                    "verticalMargin": "Vertical Margin"
+                },
+                "horizontalStack": {
+                    "verticalAlignment": "Vertical Alignment",
+                    "verticalAlignmentOption": {
+                        "top": "Top",
+                        "middle": "Middle",
+                        "bottom": "Bottom"
+                    },
+                    "horizontalMargin": "Horizontal Margin"
+                }
+            }
+        },
         "imageConvertLayersToImageSequence": {
             "title": "Convert Layers to Image Sequence",
             "frameDelay": "Frame Delay"
@@ -714,6 +747,10 @@
             "name": "Image Canvas",
             "description": "Operations that affect the image canvas.",
             "modules": {
+                "convertLayersToCollage": {
+                    "name": "Convert Layers to Collage",
+                    "description": "Converts the selected layers to an image collage. There are many different collage layouts available."
+                },
                 "convertLayersToImageSequence": {
                     "name": "Convert Layers to Image Sequence",
                     "description": "Converts the selected layers to an image sequence layer (animation)."

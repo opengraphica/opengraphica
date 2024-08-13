@@ -8286,6 +8286,29 @@ body.ogr-full-page .opengraphica {
   height: 1px;
   overflow: hidden;
 }
+.opengraphica .ogr-mode-select-button.el-button {
+  display: block;
+  padding: 1rem 0.5rem;
+  width: 100%;
+  height: 100%;
+  white-space: initial;
+}
+.opengraphica .ogr-mode-select-button.el-button > span {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.opengraphica .ogr-mode-select-button.el-button img {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+.opengraphica .ogr-mode-select-button.el-button .ogr-mode_select-button__title {
+  border-top: 1px solid var(--el-button-border-color);
+  display: block;
+  padding-top: 0.5rem;
+  width: 100%;
+}
 .opengraphica .ogr-canvas, .opengraphica .ogr-post-process-canvas {
   display: block;
   position: absolute;

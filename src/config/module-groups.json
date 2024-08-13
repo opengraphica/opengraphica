@@ -98,6 +98,14 @@
         "name": "moduleGroup.image.name",
         "description": "moduleGroup.image.description",
         "modules": {
+            "convertLayersToCollage": {
+                "name": "moduleGroup.image.modules.convertLayersToCollage.name",
+                "description": "moduleGroup.image.modules.convertLayersToCollage.description",
+                "action": {
+                    "type": "ui",
+                    "target": "image-convert-layers-to-collage"
+                }
+            },
             "convertLayersToImageSequence": {
                 "name": "moduleGroup.image.modules.convertLayersToImageSequence.name",
                 "description": "moduleGroup.image.modules.convertLayersToImageSequence.description",

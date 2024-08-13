@@ -59,4 +59,26 @@ export class BundleAction extends BaseAction {
 			(this.actions as BaseAction[] | null) = null;
 		}
 	}
+
+	hasActionId(id: string) {
+		for (const action of this.actions) {
+			if (action.id === id) {
+				return true;
+			} else if (action instanceof BundleAction) {
+				if (action.hasActionId(id)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	hasAnyActionId(ids: string[]) {
+		for (const id of ids) {
+			if (this.hasActionId(id)) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

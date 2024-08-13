@@ -422,7 +422,12 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     }
 
     private onHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
-        if (event?.trigger != 'do' || ['applyLayerTransform', 'trimLayerEmptySpace', 'setLayerBoundsToWorkingFileBounds'].includes(event?.action.id)) {
+        if (
+            event?.trigger != 'do' ||
+            [
+                'applyLayerTransform', 'trimLayerEmptySpace', 'setLayerBoundsToWorkingFileBounds', 'convertLayersToCollage'
+            ].includes(event?.action.id)
+        ) {
             isBoundsIndeterminate.value = true;
             this.setBoundsFromSelectedLayers();
         }

@@ -68,6 +68,33 @@ body.ogr-full-page {
         overflow: hidden;
     }
 
+    .ogr-mode-select-button.el-button {
+        display: block;
+        padding: 1rem 0.5rem;
+        width: 100%;
+        height: 100%;
+        white-space: initial;
+
+        > span {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        img {
+            display: block;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+
+        .ogr-mode_select-button__title {
+            border-top: 1px solid var(--el-button-border-color);
+            display: block;
+            padding-top: 0.5rem;
+            width: 100%;
+        }
+    }
+
     .ogr-canvas, .ogr-post-process-canvas {
         display: block;
         position: absolute;

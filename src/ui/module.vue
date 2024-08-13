@@ -33,6 +33,7 @@ export default defineComponent({
         'file-new': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-new' */ `./module-file-new.vue`)),
         'file-save-as': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-save-as' */ `./module-file-save-as.vue`)),
         'file-take-photo': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-take-photo' */ `./module-file-take-photo.vue`)),
+        'image-convert-layers-to-collage': defineAsyncComponent(() => import(/* webpackChunkName: 'module-image-convert-layers-to-collage' */ `./module-image-convert-layers-to-collage.vue`)),
         'image-convert-layers-to-image-sequence': defineAsyncComponent(() => import(/* webpackChunkName: 'module-image-convert-layers-to-image-sequence' */ `./module-image-convert-layers-to-image-sequence.vue`)),
         'layer-effect-browser': defineAsyncComponent(() => import(/* webpackChunkName: 'module-layer-effect-browser' */ `./module-layer-effect-browser.vue`)),
         'layer-effect-edit': defineAsyncComponent(() => import(/* webpackChunkName: 'module-layer-effect-edit' */ `./module-layer-effect-edit.vue`)),
