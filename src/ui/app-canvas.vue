@@ -286,7 +286,7 @@ export default defineComponent({
             loading.value = true;
             appEmitter.on('app.canvas.resetTransform', resetTransform);
 
-            if (canvas.value) {                
+            if (canvas.value) {
 
                 // Set up canvas width/height based on view
                 if (rootElement?.value) {

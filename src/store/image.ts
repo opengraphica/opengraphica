@@ -41,10 +41,16 @@ export async function createStoredImage(imageOrCanvas: HTMLCanvasElement | HTMLI
     if (imageOrCanvas instanceof HTMLCanvasElement) {
         sourceCanvas = imageOrCanvas;
     } else {
-        sourceBitmap = await createImageBitmap(imageOrCanvas, 0, 0, imageOrCanvas.width, imageOrCanvas.height, {
-            imageOrientation: canvasStore.get('renderer') === '2d' ? 'none' : 'flipY',
-            premultiplyAlpha: 'none',
-        });
+        const rendererType = canvasStore.get('renderer');
+        const maxTextureSize = rendererType === 'webgl' ? canvasStore.get('threejsRenderer')?.capabilities?.maxTextureSize ?? 2048 : Infinity;
+        if (imageOrCanvas.width > maxTextureSize || imageOrCanvas.height > maxTextureSize) {
+            sourceCanvas = createCanvasFromImage(imageOrCanvas);
+        } else {
+            sourceBitmap = await createImageBitmap(imageOrCanvas, 0, 0, imageOrCanvas.width, imageOrCanvas.height, {
+                imageOrientation: rendererType === '2d' ? 'none' : 'flipY',
+                premultiplyAlpha: 'none',
+            });
+        }
         if (imageOrCanvas instanceof HTMLImageElement) {
             URL.revokeObjectURL(imageOrCanvas.src);
         }
