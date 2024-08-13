@@ -125,7 +125,7 @@ export default defineComponent({
             return collageTypeCallbacks.map((definition) => ({
                 type: definition.type,
                 title: 'module.imageConvertLayersToCollage.collageType.' + definition.type,
-                icon: `icons/module/image/convert-layers-to-collage/${camelCaseToKebabCase(definition.type)}.svg`
+                icon: `images/module/image/convert-layers-to-collage/${camelCaseToKebabCase(definition.type)}.svg`
             }));
         });
 
