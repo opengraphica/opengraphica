@@ -1,6 +1,7 @@
-import { ColorModel } from './color';
-import { TextDocument } from './text';
-import { VectorShape } from './vector';
+import type { ColorModel, ColorModelName } from './color';
+import type { TextDocument } from './text';
+import type { VectorShape } from './vector';
+import type { MeasuringUnits, ResolutionUnits } from './metrics';
 import type { Camera, Scene, WebGLRenderer } from 'three';
 
 export interface DrawWorkingFileLayerOptions {
@@ -232,4 +233,27 @@ export interface NewFilePreset {
     resolutionUnits: 'px/in' | 'px/mm' | 'px/cm',
     colorProfile: string,
     scaleFactor: 1
+}
+
+export interface WorkingFile<T extends ColorModel = ColorModel> {
+    version: string;
+    date: string;
+    background: {
+        visible: boolean;
+        color: T;
+    };
+    colorModel: ColorModelName;
+    colorSpace: string;
+    drawOriginX: number;
+    drawOriginY: number;
+    height: number; // Always pixels
+    layerIdCounter: number;
+    measuringUnits: MeasuringUnits;
+    resolutionUnits: ResolutionUnits;
+    resolutionX: number;
+    resolutionY: number;
+    scaleFactor: number;
+    selectedLayerIds: number[];
+    width: number; // Always pixels
+    layers: WorkingFileLayer<T>[];
 }

@@ -5,10 +5,11 @@
 import {
     FileSystemFileHandle, SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel,
     SerializedFileGroupLayer, SerializedFileTextLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileVectorLayer,
-    WorkingFileGroupLayer, WorkingFileTextLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer
+    WorkingFile, WorkingFileGroupLayer, WorkingFileTextLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer
 } from '@/types';
 import canvasStore from '@/store/canvas';
 import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
+import { writeWorkingFile } from '@/store/data/working-file-database';
 import { saveAs } from 'file-saver';
 import { getStoredImageOrCanvas } from '@/store/image';
 
@@ -29,11 +30,28 @@ export async function saveImageAs(options: SaveImageAsOptions = {}) {
     saveAs(new Blob([JSON.stringify(serializedFile, null, "\t")], { type: 'text/plain' }), fileName);
 }
 
-export async function saveImageToTemporaryStorage() {
-    const serializedFile = serializeWorkingFile();
+export async function saveWorkingFileToTemporaryStorage() {
+    const workingFile: WorkingFile<ColorModel> = {
+        version: '0.0.1-ALPHA.1',
+        date: new Date().toISOString(),
+        background: workingFileStore.get('background'),
+        colorModel: workingFileStore.get('colorModel'),
+        colorSpace: workingFileStore.get('colorSpace'),
+        drawOriginX: workingFileStore.get('drawOriginX'),
+        drawOriginY: workingFileStore.get('drawOriginY'),
+        height: workingFileStore.get('height'),
+        layerIdCounter: workingFileStore.get('layerIdCounter'),
+        measuringUnits: workingFileStore.get('measuringUnits'),
+        resolutionUnits: workingFileStore.get('resolutionUnits'),
+        resolutionX: workingFileStore.get('resolutionX'),
+        resolutionY: workingFileStore.get('resolutionY'),
+        scaleFactor: workingFileStore.get('scaleFactor'),
+        selectedLayerIds: workingFileStore.get('selectedLayerIds'),
+        width: workingFileStore.get('width'),
+        layers: workingFileStore.get('layers'),
+    }
     try {
-        localStorage.removeItem('openGraphicaSave_0');
-        localStorage.setItem('openGraphicaSave_0', JSON.stringify(serializedFile));
+        await writeWorkingFile(workingFile);
     } catch (error) {
         console.warn(error);
         throw new Error('Could not save file. It may be too large.');

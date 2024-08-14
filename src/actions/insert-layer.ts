@@ -10,7 +10,7 @@ import { SelectLayersAction } from './select-layers';
 import canvasStore from '@/store/canvas';
 import { reserveStoredImage, unreserveStoredImage } from '@/store/image';
 import workingFileStore, { calculateLayerOrder, getGroupLayerById } from '@/store/working-file';
-import layerRenderers from '@/canvas/renderers';
+import layerRenderers, { assignLayerRenderer } from '@/canvas/renderers';
 import { updateBakedImageForLayer } from './baking';
 
 let layerInsertCounter: number = 1;
@@ -77,7 +77,6 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                 case 'empty':
                     newLayer = {
                         ...sharedOptions,
-                        renderer: markRaw(new layerRenderers[renderer].empty()),
                         ...this.insertLayerOptions
                     } as WorkingFileEmptyLayer<ColorModel>;
                     break;
@@ -86,14 +85,12 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                         ...sharedOptions,
                         layers: [],
                         expanded: false,
-                        renderer: markRaw(new layerRenderers[renderer].group()),
                         ...this.insertLayerOptions
                     } as WorkingFileGroupLayer<ColorModel>;
                     break;
                 case 'raster':
                     newLayer = {
                         ...sharedOptions,
-                        renderer: markRaw(new layerRenderers[renderer].raster()),
                         data: {},
                         ...this.insertLayerOptions,
                     } as WorkingFileRasterLayer<ColorModel>;
@@ -105,7 +102,6 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                     newLayer = {
                         ...sharedOptions,
                         data: {},
-                        renderer: markRaw(new layerRenderers[renderer].rasterSequence()),
                         ...this.insertLayerOptions
                     } as WorkingFileRasterSequenceLayer<ColorModel>;
                     for (let frame of newLayer.data.sequence) {
@@ -118,7 +114,6 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                     newLayer = {
                         ...sharedOptions,
                         data: [],
-                        renderer: markRaw(new layerRenderers[renderer].vector()),
                         ...this.insertLayerOptions
                     } as WorkingFileVectorLayer<ColorModel>;
                     break;
@@ -126,11 +121,11 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                     newLayer = {
                         ...sharedOptions,
                         data: {},
-                        renderer: markRaw(new layerRenderers[renderer].text()),
                         ...this.insertLayerOptions
                     } as WorkingFileTextLayer<ColorModel>;
                     break;
             }
+            assignLayerRenderer(newLayer);
 
             newLayer = reactive(newLayer);
 

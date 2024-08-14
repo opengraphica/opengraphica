@@ -1,4 +1,6 @@
-import type { WorkingFileLayerRenderer, ColorModel } from '@/types';
+import type { WorkingFileLayer, WorkingFileAnyLayer, WorkingFileLayerRenderer, ColorModel } from '@/types';
+import { markRaw } from 'vue';
+import canvasStore from '@/store/canvas';
 
 import BaseLayerRenderer2d from './2d/base';
 import GroupLayerRenderer2d from './2d/group';
@@ -42,3 +44,29 @@ const renderers: Renderers = {
 };
 
 export default renderers;
+
+export function assignLayerRenderer(layer: WorkingFileAnyLayer<ColorModel>) {
+    const renderer = canvasStore.get('renderer');
+    switch (layer.type) {
+        case 'empty':
+            layer.renderer = markRaw(new renderers[renderer].empty());
+            break;
+        case 'group':
+            layer.renderer = markRaw(new renderers[renderer].group());
+            break;
+        case 'raster':
+            layer.renderer = markRaw(new renderers[renderer].raster());
+            break;
+        case 'rasterSequence':
+            layer.renderer = markRaw(new renderers[renderer].rasterSequence());
+            break;
+        case 'vector':
+            layer.renderer = markRaw(new renderers[renderer].vector());
+            break;
+        case 'text':
+            layer.renderer = markRaw(new renderers[renderer].text());
+            break;
+        default:
+            (layer as WorkingFileLayer).renderer = markRaw(new renderers[renderer].base());
+    }
+}

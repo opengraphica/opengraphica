@@ -1,8 +1,8 @@
-import { ColorModel, ColorModelName } from './color';
-import { TextDocument } from './text';
-import { VectorShape } from './vector';
-import { MeasuringUnits, ResolutionUnits } from './metrics';
-import { WorkingFileLayerBlendingMode, WorkingFileLayerFilter, WorkingFileLayerType } from './working-file';
+import type { ColorModel, ColorModelName } from './color';
+import type { TextDocument } from './text';
+import type { VectorShape } from './vector';
+import type { MeasuringUnits, ResolutionUnits } from './metrics';
+import type { WorkingFileLayerBlendingMode, WorkingFileLayerFilter, WorkingFileLayerType } from './working-file';
 
 export interface SerializedFileTimelineKey {
     timing: number[]; // Cubic beizer, array of 4

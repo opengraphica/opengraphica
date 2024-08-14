@@ -59,7 +59,7 @@
                 "description": "moduleGroup.file.modules.quickSave.description",
                 "action": {
                     "type": "function",
-                    "target": "file/save.saveImageToTemporaryStorage"
+                    "target": "file/save.saveWorkingFileToTemporaryStorage"
                 }
             },
             "quickLoad": {

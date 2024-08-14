@@ -1,6 +1,6 @@
 
 import { BaseAction } from './base';
-import imageDatabase from '@/store/data/image-database';
+import imageDatabase from '@/store/data/image-history-database';
 import {
     activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset,
     selectionMaskDrawMargin, activeSelectionPath, createActiveSelectionMask, getActiveSelectionBounds,

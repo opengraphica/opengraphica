@@ -3,7 +3,7 @@
  * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
 
-import { Ref } from 'vue';
+import { nextTick, type Ref } from 'vue';
 import {
     ShowOpenFilePicker, FileSystemFileHandle,
     SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel, InsertAnyLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions,
@@ -14,12 +14,17 @@ import historyStore from '@/store/history';
 import { createStoredImage } from '@/store/image';
 import preferencesStore from '@/store/preferences';
 import workingFileStore, { getCanvasRenderingContext2DSettings, WorkingFileState, getTimelineById } from '@/store/working-file';
+import { readWorkingFile } from '@/store/data/working-file-database';
+import { discardActiveSelectionMask, discardAppliedSelectionMask, activeSelectionPath } from '@/canvas/store/selection-state';
+
 import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { UpdateFileAction } from '@/actions/update-file';
 import { CreateFileAction } from '@/actions/create-file';
 import { InsertLayerAction } from '@/actions/insert-layer';
+
 import { knownFileExtensions } from '@/lib/regex';
+import appEmitter from '@/lib/emitter';
 
 declare global {
     var showOpenFilePicker: ShowOpenFilePicker;
@@ -135,17 +140,31 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
 };
 
 export async function openFromTemporaryStorage() {
-    let savedJson: string | null = null;
-    try {
-        savedJson = localStorage.getItem('openGraphicaSave_0');
-        if (!savedJson) {
-            throw new Error('File does not exist.');
-        }
-    } catch (error) {
-        console.warn(error);
-        throw new Error('Could load file. It may not exist.');
-    }
-    await openFromFileList({ files: [new File([savedJson], "quicksave.json", { type: "text/plain" })] });
+    const workingFile = await readWorkingFile();
+    workingFileStore.set('background', workingFile.background);
+    workingFileStore.set('colorModel', workingFile.colorModel);
+    workingFileStore.set('colorSpace', workingFile.colorSpace);
+    workingFileStore.set('drawOriginX', workingFile.drawOriginX);
+    workingFileStore.set('drawOriginY', workingFile.drawOriginY);
+    workingFileStore.set('height', workingFile.height);
+    workingFileStore.set('layerIdCounter', workingFile.layerIdCounter);
+    workingFileStore.set('measuringUnits', workingFile.measuringUnits);
+    workingFileStore.set('resolutionUnits', workingFile.resolutionUnits);
+    workingFileStore.set('resolutionX', workingFile.resolutionX);
+    workingFileStore.set('resolutionY', workingFile.resolutionY);
+    workingFileStore.set('scaleFactor', workingFile.scaleFactor);
+    workingFileStore.set('selectedLayerIds', workingFile.selectedLayerIds);
+    workingFileStore.set('width', workingFile.width);
+    workingFileStore.set('layers', workingFile.layers);
+    discardActiveSelectionMask();
+    discardAppliedSelectionMask();
+    activeSelectionPath.value = [];
+    await historyStore.dispatch('free', {
+        memorySize: Infinity,
+        databaseSize: Infinity
+    });
+    await nextTick();
+    appEmitter.emit('app.canvas.resetTransform');
 }
 
 export async function insertFromFileDialog(options: FileDialogOpenOptions = {}) {
