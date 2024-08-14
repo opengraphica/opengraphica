@@ -1,4 +1,4 @@
-import type { WorkingFileLayer, WorkingFileAnyLayer, WorkingFileLayerRenderer, ColorModel } from '@/types';
+import type { WorkingFileLayer, WorkingFileAnyLayer, WorkingFileGroupLayer, WorkingFileLayerRenderer, ColorModel } from '@/types';
 import { markRaw } from 'vue';
 import canvasStore from '@/store/canvas';
 
@@ -68,5 +68,17 @@ export function assignLayerRenderer(layer: WorkingFileAnyLayer<ColorModel>) {
             break;
         default:
             (layer as WorkingFileLayer).renderer = markRaw(new renderers[renderer].base());
+    }
+}
+
+export function discardAllLayerRenderers(layers: Array<WorkingFileLayer<ColorModel>>) {
+    for (const layer of layers) {
+        if (layer.renderer) {
+            layer.renderer.detach();
+        }
+        delete (layer as unknown as { renderer: undefined }).renderer;
+        if (layer.type === 'group') {
+            discardAllLayerRenderers((layer as WorkingFileGroupLayer<ColorModel>).layers);
+        }
     }
 }

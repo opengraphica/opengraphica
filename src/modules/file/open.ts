@@ -16,6 +16,7 @@ import preferencesStore from '@/store/preferences';
 import workingFileStore, { getCanvasRenderingContext2DSettings, WorkingFileState, getTimelineById } from '@/store/working-file';
 import { readWorkingFile } from '@/store/data/working-file-database';
 import { discardActiveSelectionMask, discardAppliedSelectionMask, activeSelectionPath } from '@/canvas/store/selection-state';
+import { discardAllLayerRenderers } from '@/canvas/renderers';
 
 import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
@@ -141,6 +142,7 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
 
 export async function openFromTemporaryStorage() {
     const workingFile = await readWorkingFile();
+    discardAllLayerRenderers(workingFileStore.get('layers'));
     workingFileStore.set('background', workingFile.background);
     workingFileStore.set('colorModel', workingFile.colorModel);
     workingFileStore.set('colorSpace', workingFile.colorSpace);
