@@ -6,6 +6,7 @@ import { SelectLayersAction } from './select-layers';
 import canvasStore from '@/store/canvas';
 import { unreserveStoredImage } from '@/store/image';
 import workingFileStore, { calculateLayerOrder, getLayerById, getGroupLayerById } from '@/store/working-file';
+import { updateWorkingFile, updateWorkingFileLayer, deleteWorkingFileLayer } from '@/store/data/working-file-database';
 import { updateBakedImageForLayer } from './baking';
 
 export class DeleteLayersAction extends BaseAction {
@@ -55,6 +56,12 @@ export class DeleteLayersAction extends BaseAction {
 
         calculateLayerOrder();
         canvasStore.set('dirty', true);
+
+        // Update the working file backup
+        updateWorkingFile({ layers: workingFileStore.get('layers') });
+        for (const layerId of this.deleteLayerIds) {
+            deleteWorkingFileLayer(layerId);
+        }
 	}
 
 	public async undo() {
@@ -85,6 +92,13 @@ export class DeleteLayersAction extends BaseAction {
 
         calculateLayerOrder();
         canvasStore.set('dirty', true);
+
+        // Update the working file backup
+        updateWorkingFile({ layers: workingFileStore.get('layers') });
+        for (const layerId of this.deleteLayerIds) {
+            const layer = getLayerById(layerId);
+            if (layer) updateWorkingFileLayer(layer);
+        }
 	}
 
     public free() {

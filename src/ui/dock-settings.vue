@@ -10,6 +10,10 @@
             <template v-if="visitedTabs['file'] === true">
                 <el-scrollbar>
                     <el-menu class="el-menu--medium el-menu--borderless el-menu--inactivated mb-1" @select="onMenuSelect('file', $event)">
+                        <el-menu-item v-if="showRestoreImage" index="restore">
+                            <i class="bi bi-recycle"></i>
+                            <span v-t="'dock.settings.file.menu.restore'"></span>
+                        </el-menu-item>
                         <el-menu-item index="new">
                             <i class="bi bi-file-earmark-plus"></i>
                             <span v-t="'dock.settings.file.menu.new'"></span>
@@ -317,7 +321,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch, toRefs, nextTick, onMounted, onUnmounted } from 'vue';
+import { defineComponent, ref, computed, toRefs, nextTick, onMounted, onUnmounted, watch } from 'vue';
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
 import ElCollapse, { ElCollapseItem } from 'element-plus/lib/components/collapse/index';
@@ -342,6 +346,7 @@ import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore, { HistoryState } from '@/store/history';
 import preferencesStore, { PreferencesState } from '@/store/preferences';
+import { hasWorkingFile } from '@/store/data/working-file-database';
 import { notifyInjector, unexpectedErrorMessage } from '@/lib/notify';
 import appEmitter from '@/lib/emitter';
 import { runModule } from '@/modules';
@@ -407,6 +412,12 @@ export default defineComponent({
         // File operations
 
         const { vendorCustomSaveCallback } = toRefs(preferencesStore.state);
+        const showRestoreImage = ref(false);
+        watch(() => editorStore.state.showBackupRestore, (showBackupRestore) => {
+            if (!showBackupRestore) {
+                showRestoreImage.value = false;
+            }
+        });
 
         // View zoom/pan/rotate
         const zoomLevel = computed<number>({
@@ -461,6 +472,14 @@ export default defineComponent({
         }
         onMounted(() => {
             document.addEventListener('fullscreenchange', onFullscreenChange, false);
+
+            (async () => {
+                if (editorStore.get('showBackupRestore')) {
+                    try {
+                        showRestoreImage.value = await hasWorkingFile();
+                    } catch (error) { /* Ignore */ }
+                }
+            })();
         });
         onUnmounted(() => {
             document.removeEventListener('fullscreenchange', onFullscreenChange, false);
@@ -652,11 +671,17 @@ export default defineComponent({
                 switch (group) {
                     case 'file':
                         switch (index) {
+                            case 'restore':
+                                await runModule('file', 'restoreBackup');
+                                editorStore.set('showBackupRestore', false);
+                                break;
                             case 'new':
                                 await runModule('file', 'new');
+                                editorStore.set('showBackupRestore', false);
                                 break;
                             case 'open':
                                 await runModule('file', 'open');
+                                editorStore.set('showBackupRestore', false);
                                 break;
                             case 'export':
                                 await runModule('file', 'export');
@@ -671,9 +696,11 @@ export default defineComponent({
                                 break;
                             case 'insertPhoto':
                                 await runModule('file', 'insertPhoto');
+                                editorStore.set('showBackupRestore', false);
                                 break;
                             case 'takePhoto':
                                 await runModule('file', 'takePhoto');
+                                editorStore.set('showBackupRestore', false);
                                 break;
                         }
                         break;
@@ -728,6 +755,7 @@ export default defineComponent({
             loading,
 
             vendorCustomSaveCallback,
+            showRestoreImage,
 
             rotationAngle,
             zoomLevel,

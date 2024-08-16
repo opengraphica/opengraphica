@@ -10,6 +10,7 @@ import { SelectLayersAction } from './select-layers';
 import canvasStore from '@/store/canvas';
 import { reserveStoredImage, unreserveStoredImage } from '@/store/image';
 import workingFileStore, { calculateLayerOrder, getGroupLayerById } from '@/store/working-file';
+import { updateWorkingFile, updateWorkingFileLayer, deleteWorkingFileLayer } from '@/store/data/working-file-database';
 import layerRenderers, { assignLayerRenderer } from '@/canvas/renderers';
 import { updateBakedImageForLayer } from './baking';
 
@@ -181,6 +182,10 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
         updateBakedImageForLayer(newLayer);
 
         canvasStore.set('dirty', true);
+
+        // Update the working file backup
+        updateWorkingFile({ layers: workingFileStore.get('layers') });
+        updateWorkingFileLayer(this.insertedLayer);
 	}
 
 	public async undo() {
@@ -214,10 +219,15 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
         workingFileStore.set('layers', layers);
         workingFileStore.set('layerIdCounter', workingFileStore.get('layerIdCounter') - 1);
 
+        let oldInsertedLayerId = this.insertedLayerId;
         this.insertedLayerId = -1;
 
         calculateLayerOrder();
         canvasStore.set('dirty', true);
+
+        // Update the working file backup
+        updateWorkingFile({ layers: workingFileStore.get('layers') });
+        deleteWorkingFileLayer(oldInsertedLayerId);
 	}
 
     public free() {

@@ -1,6 +1,7 @@
 import { BaseAction } from './base';
 import canvasStore from '@/store/canvas';
 import workingFileStore, { WorkingFileState } from '@/store/working-file';
+import { updateWorkingFile } from '@/store/data/working-file-database';
 import appEmitter from '@/lib/emitter';
 
 export class UpdateFileAction extends BaseAction {
@@ -24,6 +25,9 @@ export class UpdateFileAction extends BaseAction {
         if (this.updateFileOptions.width || this.updateFileOptions.height) {
             appEmitter.emit('app.canvas.resetTransform');
         }
+
+        // Update the working file backup
+        updateWorkingFile(this.updateFileOptions);
 	}
 
 	public async undo() {
@@ -37,6 +41,9 @@ export class UpdateFileAction extends BaseAction {
         if (this.previousState.width || this.previousState.height) {
             appEmitter.emit('app.canvas.resetTransform');
         }
+
+        // Update the working file backup
+        updateWorkingFile(this.previousState);
 	}
 
     public free() {

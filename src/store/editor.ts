@@ -50,6 +50,7 @@ interface EditorState {
     isTouchUser: boolean;
     lastActiveThemeName: string | null;
     loadingThemeName: string | null;
+    showBackupRestore: boolean;
     tasks: EditorDeferredTask[];
     themes: {
         [themeName: string]: string;
@@ -110,6 +111,7 @@ const store = new PerformantStore<EditorStore>({
         isTouchUser: true,
         lastActiveThemeName: null,
         loadingThemeName: null,
+        showBackupRestore: true,
         tasks: [],
         themes: {},
         timelineCursor: 0,

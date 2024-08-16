@@ -83,70 +83,7 @@ function convertWorkingFileLayersToMeta(layers: WorkingFileLayer[]): DatabaseMet
 async function storeLayersRecursive(layers: WorkingFileLayer[]) {
     const putRequests: Promise<Event | void>[] = [];
     for (const layer of layers) {
-        const storedLayer: Record<string, any> = { ...layer };
-        storedLayer.thumbnailImageSrc = null;
-        storedLayer.drafts = null;
-        storedLayer.bakedImage = null;
-        storedLayer.isBaking = false;
-        storedLayer.transform = [layer.transform.a, layer.transform.b, layer.transform.c, layer.transform.d, layer.transform.e, layer.transform.f];
-        delete storedLayer.renderer;
-        delete storedLayer.layers;
-        if (storedLayer.type === 'raster') {
-            const storedRasterLayer = storedLayer as WorkingFileRasterLayer;
-            storedRasterLayer.data.updateChunks = undefined;
-            if (storedRasterLayer.data.sourceUuid) {
-                const imageCanvas = await prepareStoredImageForEditing(storedRasterLayer.data.sourceUuid);
-                if (imageCanvas) {
-                    const imageBlob = await createImageBlobFromCanvas(imageCanvas);
-                    const transaction = (database as IDBDatabase).transaction('images', 'readwrite');
-                    const imagesStore = transaction.objectStore('images');
-                    const imageStoreRequest = imagesStore.put({
-                        id: storedRasterLayer.data.sourceUuid,
-                        data: imageBlob,
-                    });
-                    putRequests.push(
-                        new Promise<Event>((resolve, reject) => {
-                            imageStoreRequest.onsuccess = resolve;
-                            imageStoreRequest.onerror = reject;
-                        })
-                    );
-                }
-            }
-        } else if (storedLayer.type === 'rasterSequence') {
-            const storedRasterSequenceLayer = storedLayer as WorkingFileRasterSequenceLayer;
-            for (const frame of storedRasterSequenceLayer.data.sequence) {
-                frame.thumbnailImageSrc = null;
-                frame.image.updateChunks = undefined;
-                if (frame.image.sourceUuid) {
-                    const imageCanvas = await prepareStoredImageForEditing(frame.image.sourceUuid);
-                    if (imageCanvas) {
-                        const imageBlob = await createImageBlobFromCanvas(imageCanvas);
-                        const transaction = (database as IDBDatabase).transaction('images', 'readwrite');
-                        const imagesStore = transaction.objectStore('images');
-                        const imageStoreRequest = imagesStore.put({
-                            id: frame.image.sourceUuid,
-                            data: imageBlob,
-                        });
-                        putRequests.push(
-                            new Promise<Event>((resolve, reject) => {
-                                imageStoreRequest.onsuccess = resolve;
-                                imageStoreRequest.onerror = reject;
-                            })
-                        );
-                        }
-                }
-            }
-        }
-
-        const transaction = (database as IDBDatabase).transaction('layers', 'readwrite');
-        const layersStore = transaction.objectStore('layers');
-        const request = layersStore.put(deepToRaw(storedLayer));
-        putRequests.push(
-            new Promise<Event>((resolve, reject) => {
-                request.onsuccess = resolve;
-                request.onerror = reject;
-            })
-        );
+        putRequests.push(updateWorkingFileLayer(layer, true));
 
         if (layer.type === 'group') {
             putRequests.push(
@@ -221,7 +158,7 @@ async function readStoredLayersRecursive(metaLayers: DatabaseMetaLayer[]): Promi
 }
 
 /** Clears all database tables */
-export async function clear() {
+export async function deleteWorkingFile() {
     await init();
     if (!database) return;
 
@@ -247,13 +184,27 @@ export async function clear() {
     });
 }
 
+/** Delete layer from database by id */
+export async function deleteWorkingFileLayer(id: number) {
+    await init();
+    if (!database) return;
+
+    const transaction = database.transaction('layers', 'readwrite');
+    const layersStore = transaction.objectStore('layers');
+    const request = layersStore.delete(id);
+    await new Promise((resolve) => {
+        request.onsuccess = resolve;
+        request.onerror = resolve;
+    });
+}
+
 /** Writes the working file to the database */
 export async function writeWorkingFile(workingFile: WorkingFile<ColorModel>) {
     await init();
     if (!database) return;
 
     // Clear all the existing object stores
-    await clear();
+    await deleteWorkingFile();
 
     try {
         // Store the meta data (root object properties) of the file
@@ -279,10 +230,143 @@ export async function writeWorkingFile(workingFile: WorkingFile<ColorModel>) {
         // Store each layer as a flat object in the layers store
         await storeLayersRecursive(workingFile.layers);
     } catch (error) {
-        await clear();
+        await deleteWorkingFile();
         throw error;
     }
 };
+
+/* Updates the meta data of the working file in the database */
+export async function updateWorkingFile(workingFile: Partial<WorkingFile<ColorModel>>) {
+    await init();
+    if (!database) return;
+
+    try {
+        const updatePromises: Promise<unknown>[] = [];
+
+        // Store the meta data (root object properties) of the file
+        const transaction = (database as IDBDatabase).transaction('meta', 'readwrite');
+        const metaStore = transaction.objectStore('meta');
+        for (const key in workingFile) {
+            const value = toRaw(workingFile[key as keyof WorkingFile<ColorModel>]);
+            let request: IDBRequest<IDBValidKey>;
+            if (key === 'layers') {
+                request = metaStore.put({
+                    id: 'layers',
+                    data: convertWorkingFileLayersToMeta(value as WorkingFileLayer[])
+                });
+            } else {
+                request = metaStore.put({ id: key, data: value });
+            }
+            updatePromises.push(new Promise((resolve, reject) => {
+                request.onsuccess = resolve;
+                request.onerror = reject;
+            }));
+        }
+
+        await Promise.all(updatePromises);
+    } catch (error) {
+        throw error;
+    }
+}
+
+export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNew: boolean = false): Promise<void> {
+    await init();
+    if (!database) throw new Error('Database not created.');
+
+    const putRequests: Promise<Event | void>[] = [];
+
+    let existingLayer: WorkingFileLayer | null = null;
+    if (!assumeIsNew) {
+        const transaction = (database as IDBDatabase).transaction('layers', 'readonly');
+        const layersStore = transaction.objectStore('layers');
+        const request = layersStore.get(layer.id);
+        await new Promise<Event | void>((resolve) => {
+            request.onsuccess = () => {
+                existingLayer = request.result;
+                resolve();
+            }
+            request.onerror = resolve;
+        });
+    }
+
+    const storedLayer: Record<string, any> = { ...layer };
+    storedLayer.thumbnailImageSrc = null;
+    storedLayer.drafts = null;
+    storedLayer.bakedImage = null;
+    storedLayer.isBaking = false;
+    storedLayer.transform = [layer.transform.a, layer.transform.b, layer.transform.c, layer.transform.d, layer.transform.e, layer.transform.f];
+    delete storedLayer.renderer;
+    delete storedLayer.layers;
+    if (storedLayer.type === 'raster') {
+        const storedRasterLayer = storedLayer as WorkingFileRasterLayer;
+        storedRasterLayer.data.updateChunks = undefined;
+        const originalSourceUuid = (existingLayer as any)?.data?.originalSourceUuid ?? null;
+        if (storedRasterLayer.data.sourceUuid && storedRasterLayer.data.sourceUuid != originalSourceUuid) {
+            (storedRasterLayer.data as any).originalSourceUuid = originalSourceUuid;
+            const imageCanvas = await prepareStoredImageForEditing(storedRasterLayer.data.sourceUuid);
+            if (imageCanvas) {
+                const imageBlob = await createImageBlobFromCanvas(imageCanvas);
+                const transaction = (database as IDBDatabase).transaction('images', 'readwrite');
+                const imagesStore = transaction.objectStore('images');
+                const imageStoreRequest = imagesStore.put({
+                    id: storedRasterLayer.data.sourceUuid,
+                    data: imageBlob,
+                });
+                putRequests.push(
+                    new Promise<Event>((resolve, reject) => {
+                        imageStoreRequest.onsuccess = resolve;
+                        imageStoreRequest.onerror = reject;
+                    })
+                );
+            }
+        } else {
+            storedRasterLayer.data.sourceUuid = originalSourceUuid;
+        }
+    } else if (storedLayer.type === 'rasterSequence') {
+        const storedRasterSequenceLayer = storedLayer as WorkingFileRasterSequenceLayer;
+        for (const [frameIndex, frame] of storedRasterSequenceLayer.data.sequence.entries()) {
+            frame.thumbnailImageSrc = null;
+            frame.image.updateChunks = undefined;
+            let originalSourceUuid = null;
+            const existingFrame = (existingLayer as unknown as WorkingFileRasterSequenceLayer)?.data?.sequence?.[frameIndex] ?? null;
+            if (existingFrame) {
+                originalSourceUuid = (existingFrame?.image as any)?.originalSourceUuid ?? null;
+            }
+            if (frame.image.sourceUuid && frame.image.sourceUuid != originalSourceUuid) {
+                const imageCanvas = await prepareStoredImageForEditing(frame.image.sourceUuid);
+                if (imageCanvas) {
+                    const imageBlob = await createImageBlobFromCanvas(imageCanvas);
+                    const transaction = (database as IDBDatabase).transaction('images', 'readwrite');
+                    const imagesStore = transaction.objectStore('images');
+                    const imageStoreRequest = imagesStore.put({
+                        id: frame.image.sourceUuid,
+                        data: imageBlob,
+                    });
+                    putRequests.push(
+                        new Promise<Event>((resolve, reject) => {
+                            imageStoreRequest.onsuccess = resolve;
+                            imageStoreRequest.onerror = reject;
+                        })
+                    );
+                }
+            } else {
+                frame.image.sourceUuid = originalSourceUuid;
+            }
+        }
+    }
+
+    const transaction = (database as IDBDatabase).transaction('layers', 'readwrite');
+    const layersStore = transaction.objectStore('layers');
+    const request = layersStore.put(deepToRaw(storedLayer));
+    putRequests.push(
+        new Promise<Event>((resolve, reject) => {
+            request.onsuccess = resolve;
+            request.onerror = reject;
+        })
+    );
+
+    return Promise.all(putRequests) as unknown as Promise<void>;
+}
 
 /** Reads the working file from the database */
 export async function readWorkingFile(): Promise<WorkingFile<ColorModel>> {
@@ -309,4 +393,20 @@ export async function readWorkingFile(): Promise<WorkingFile<ColorModel>> {
     }
 
     return workingFile as WorkingFile<ColorModel>;
+}
+
+export async function hasWorkingFile(): Promise<boolean> {
+    await init();
+    if (!database) throw new Error('Database not created.');
+
+    const transaction = database.transaction('layers', 'readonly');
+    const layersStore = transaction.objectStore('layers');
+    const layersRequest = layersStore.getAll();
+
+    return new Promise<boolean>((resolve, reject) => {
+        layersRequest.onsuccess = () => {
+            resolve(layersRequest.result?.length > 0);
+        }
+        layersRequest.onerror = reject;
+    });
 }

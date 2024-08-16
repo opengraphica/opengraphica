@@ -1,6 +1,7 @@
 import { BaseAction } from './base';
 import canvasStore from '@/store/canvas';
 import { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
+import { updateWorkingFileLayer } from '@/store/data/working-file-database';
 import { updateBakedImageForLayer } from './baking';
 
 import type { WorkingFileLayerFilter } from '@/types';
@@ -50,6 +51,7 @@ export class ReorderLayerFiltersAction extends BaseAction {
 
         regenerateLayerThumbnail(layer);
         updateBakedImageForLayer(layer);
+        updateWorkingFileLayer(layer);
 
         canvasStore.set('dirty', true);
 	}
@@ -92,6 +94,7 @@ export class ReorderLayerFiltersAction extends BaseAction {
 
         regenerateLayerThumbnail(layer);
         updateBakedImageForLayer(layer);
+        updateWorkingFileLayer(layer);
 
         canvasStore.set('dirty', true);
 	}

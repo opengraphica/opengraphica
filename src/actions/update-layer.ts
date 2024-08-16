@@ -10,6 +10,7 @@ import { drawImageToCanvas2d } from '@/lib/canvas';
 import canvasStore from '@/store/canvas';
 import { prepareStoredImageForEditing, prepareStoredImageForArchival, reserveStoredImage, unreserveStoredImage } from '@/store/image';
 import workingFileStore, { getLayerById, regenerateLayerThumbnail, getCanvasRenderingContext2DSettings } from '@/store/working-file';
+import { updateWorkingFileLayer } from '@/store/data/working-file-database';
 import { updateBakedImageForLayer } from './baking';
 import layerRenderers from '@/canvas/renderers';
 
@@ -158,6 +159,9 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
         }
 
         canvasStore.set('dirty', true);
+
+        // Update the working file backup
+        updateWorkingFileLayer(layer);
 	}
 
 	public async undo() {
@@ -209,6 +213,9 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
         }
 
         canvasStore.set('dirty', true);
+
+        // Update the working file backup
+        if (layer) updateWorkingFileLayer(layer);
 	}
 
     public free() {

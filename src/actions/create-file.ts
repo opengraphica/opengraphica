@@ -1,6 +1,7 @@
 import { nextTick } from 'vue';
 import { BaseAction } from './base';
 import workingFileStore, { calculateLayerOrder, WorkingFileState } from '@/store/working-file';
+import { writeWorkingFile, deleteWorkingFile } from '@/store/data/working-file-database';
 import appEmitter from '@/lib/emitter';
 import { discardActiveSelectionMask, discardAppliedSelectionMask, activeSelectionPath } from '@/canvas/store/selection-state';
 import { WorkingFileLayer, ColorModel, WorkingFileGroupLayer } from '@/types';
@@ -67,6 +68,12 @@ export class CreateFileAction extends BaseAction {
 
         await nextTick();
         appEmitter.emit('app.canvas.resetTransform');
+
+        try {
+            await writeWorkingFile(changes);
+        } catch (error) {
+            console.error('[src/actions/create-file.ts] failed to create database backup', error);
+        }
 	}
 
 	public async undo() {
@@ -88,6 +95,12 @@ export class CreateFileAction extends BaseAction {
 
         await nextTick();
         appEmitter.emit('app.canvas.resetTransform');
+
+        try {
+            await deleteWorkingFile();
+        } catch (error) {
+            console.error('[src/actions/create-file.ts] failed to delete database backup', error);
+        }
 	}
 
     private async assignLayerRenderers(layers: WorkingFileLayer<ColorModel>[]) {

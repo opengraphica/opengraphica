@@ -1,6 +1,7 @@
 import { BaseAction } from './base';
 import canvasStore from '@/store/canvas';
 import workingFileStore from '@/store/working-file';
+import { updateWorkingFile } from '@/store/data/working-file-database';
 
 export class SelectLayersAction extends BaseAction {
 
@@ -26,6 +27,9 @@ export class SelectLayersAction extends BaseAction {
         workingFileStore.set('selectedLayerIds', [...this.newSelectedLayerIds]);
 
         canvasStore.set('dirty', true);
+
+        // Update the working file backup
+        updateWorkingFile({ selectedLayerIds: workingFileStore.get('selectedLayerIds') });
 	}
 
 	public async undo() {
@@ -34,6 +38,9 @@ export class SelectLayersAction extends BaseAction {
         workingFileStore.set('selectedLayerIds', [...this.previousSelectedLayerIds]);
 
         canvasStore.set('dirty', true);
+
+        // Update the working file backup
+        updateWorkingFile({ selectedLayerIds: workingFileStore.get('selectedLayerIds') });
 	}
 
     public free() {

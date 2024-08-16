@@ -3,6 +3,7 @@ import { BaseAction } from './base';
 import canvasStore from '@/store/canvas';
 import { createStoredImage, prepareStoredImageForEditing, prepareStoredImageForArchival } from '@/store/image';
 import { getLayerById, getCanvasRenderingContext2DSettings } from '@/store/working-file';
+import { updateWorkingFileLayer } from '@/store/data/working-file-database';
 import { getImageDataEmptyBounds, getImageDataFromCanvas } from '@/lib/image';
 import { decomposeMatrix } from '@/lib/dom-matrix';
 import { findPointListBounds } from '@/lib/math';
@@ -92,6 +93,8 @@ export class ApplyLayerTransformAction extends BaseAction {
         await this.trimEmptySpaceAction.do();
 
         canvasStore.set('dirty', true);
+
+        updateWorkingFileLayer(layer);
 	}
 
 	public async undo() {
@@ -107,6 +110,11 @@ export class ApplyLayerTransformAction extends BaseAction {
         }
 
         canvasStore.set('dirty', true);
+
+        const layer = getLayerById(this.layerId);
+        if (layer) {
+            updateWorkingFileLayer(layer);
+        }
 	}
 
     public free() {

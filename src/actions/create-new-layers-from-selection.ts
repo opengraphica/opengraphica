@@ -2,7 +2,8 @@ import { BaseAction } from './base';
 import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset, selectionMaskDrawMargin } from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
 import { createStoredImage } from '@/store/image';
-import workingFileStore, { getCanvasRenderingContext2DSettings, getSelectedLayers, ensureUniqueLayerSiblingName } from '@/store/working-file';
+import workingFileStore, { getCanvasRenderingContext2DSettings, getSelectedLayers, ensureUniqueLayerSiblingName, getLayerById } from '@/store/working-file';
+import { updateWorkingFile, updateWorkingFileLayer, deleteWorkingFileLayer } from '@/store/data/working-file-database';
 import { createImageFromCanvas, getImageDataFromImage, getImageDataEmptyBounds } from '@/lib/image';
 import { ClearSelectionAction } from './clear-selection';
 import { InsertLayerAction } from './insert-layer';
@@ -23,6 +24,7 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
     private clearSelectionAction: ClearSelectionAction | null = null;
     private insertLayerActions: InsertLayerAction<any>[] = [];
     private selectLayersAction: SelectLayersAction | null = null;
+    private insertedLayerIds: number[] = [];
 
     constructor(options: CreateNewLayersFromSelectionOptions = {}) {
         super('createNewLayersFromSelection', 'action.createNewLayersFromSelection');
@@ -60,8 +62,6 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
                 throw new Error('Aborted - Couldn\'t create canvas context.');
             }
             ctx.imageSmoothingEnabled = false;
-
-            const decomposedTransform = canvasStore.get('decomposedTransform');
 
             // Create new layer for each of the selected layers.
             for (let layer of selectedLayers) {
@@ -115,10 +115,10 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
             this.freeEstimates.database += this.clearSelectionAction.freeEstimates.database;
         }
 
-        let insertedLayerIds = [];
+        this.insertedLayerIds = [];
         for (const insertLayerAction of this.insertLayerActions) {
             await insertLayerAction.do();
-            insertedLayerIds.push(insertLayerAction.insertedLayerId);
+            this.insertedLayerIds.push(insertLayerAction.insertedLayerId);
             this.freeEstimates.memory += insertLayerAction.freeEstimates.memory;
             this.freeEstimates.database += insertLayerAction.freeEstimates.database;
         }
@@ -129,9 +129,9 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
                 this.selectLayersAction = null;
             }
             if (this.selectNewLayers === 'replace') {
-                this.selectLayersAction = new SelectLayersAction(insertedLayerIds, previousSelectedLayerIds);
+                this.selectLayersAction = new SelectLayersAction(this.insertedLayerIds, previousSelectedLayerIds);
             } else {
-                this.selectLayersAction = new SelectLayersAction([ ...workingFileStore.get('selectedLayerIds'), ...insertedLayerIds ], previousSelectedLayerIds);
+                this.selectLayersAction = new SelectLayersAction([ ...workingFileStore.get('selectedLayerIds'), ...this.insertedLayerIds ], previousSelectedLayerIds);
             }
         }
 
@@ -143,6 +143,13 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
 
         canvasStore.set('dirty', true);
         canvasStore.set('viewDirty', true);
+
+        // Update the working file backup
+        updateWorkingFile({ layers: workingFileStore.get('layers') });
+        for (const layerId of this.insertedLayerIds) {
+            const layer = getLayerById(layerId);
+            if (layer) updateWorkingFileLayer(layer);
+        }
     }
 
     public async undo() {
@@ -171,6 +178,13 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
 
         canvasStore.set('dirty', true);
         canvasStore.set('viewDirty', true);
+
+        // Update the working file backup
+        updateWorkingFile({ layers: workingFileStore.get('layers') });
+        for (const layerId of this.insertedLayerIds) {
+            deleteWorkingFileLayer(layerId);
+        }
+        this.insertedLayerIds = [];
     }
 
     public async free() {

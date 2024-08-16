@@ -69,6 +69,14 @@
                     "type": "function",
                     "target": "file/open.openFromTemporaryStorage"
                 }
+            },
+            "restoreBackup": {
+                "name": "moduleGroup.file.modules.restoreBackup.name",
+                "description": "moduleGroup.file.modules.restoreBackup.description",
+                "action": {
+                    "type": "function",
+                    "target": "file/open.openFromTemporaryStorage"
+                }
             }
         }
     },

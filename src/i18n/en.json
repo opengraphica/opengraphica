@@ -118,6 +118,7 @@
         "no": "No",
         "ok": "OK",
         "openImage": "Open Image",
+        "restoreLastImage": "Restore Last Image",
         "save": "Save",
         "settings": "Settings",
         "take": "Take",
@@ -151,6 +152,7 @@
             "file": {
                 "tabTitle": "File",
                 "menu": {
+                    "restore": "Restore Last Image",
                     "new": "New",
                     "open": "Open",
                     "export": "Export",
@@ -718,6 +720,10 @@
                 "quickSave": {
                     "name": "Quick Save",
                     "description": "Saves the current file to temporary storage."
+                },
+                "restoreBackup": {
+                    "name": "Restore Backup Image",
+                    "description": "Load the backup file saved automatically during editing."
                 },
                 "saveAs": {
                     "name": "Save Image As",

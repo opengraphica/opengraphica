@@ -5,6 +5,7 @@ import {
 import { BaseAction } from './base';
 import canvasStore from '@/store/canvas';
 import workingFileStore, { calculateLayerOrder, getLayerById, getGroupLayerById } from '@/store/working-file';
+import { updateWorkingFile, updateWorkingFileLayer } from '@/store/data/working-file-database';
 
 export class ReorderLayersAction extends BaseAction {
 
@@ -72,6 +73,20 @@ export class ReorderLayersAction extends BaseAction {
         workingFileStore.set('layers', [...workingFileStore.get('layers')]);
         calculateLayerOrder();
         canvasStore.set('dirty', true);
+
+        // Update the working file backup
+        updateWorkingFile({ layers: workingFileStore.get('layers') });
+        for (const layerId of this.insertLayerIds) {
+            const layer = getLayerById(layerId);
+            if (layer) {
+                updateWorkingFileLayer(layer);
+                if (layer.groupId) {
+                    const groupLayer = getLayerById(layer.groupId);
+                    if (groupLayer) updateWorkingFileLayer(groupLayer);
+                }
+            }
+        }
+        updateWorkingFileLayer(referenceLayer);
 	}
 
 	public async undo() {
@@ -122,6 +137,20 @@ export class ReorderLayersAction extends BaseAction {
         workingFileStore.set('layers', [...workingFileStore.get('layers')]);
         calculateLayerOrder();
         canvasStore.set('dirty', true);
+
+        // Update the working file backup
+        updateWorkingFile({ layers: workingFileStore.get('layers') });
+        for (const layerId of this.insertLayerIds) {
+            const layer = getLayerById(layerId);
+            if (layer) {
+                updateWorkingFileLayer(layer);
+                if (layer.groupId) {
+                    const groupLayer = getLayerById(layer.groupId);
+                    if (groupLayer) updateWorkingFileLayer(groupLayer);
+                }
+            }
+        }
+        updateWorkingFileLayer(referenceLayer);
 	}
 
     public free() {

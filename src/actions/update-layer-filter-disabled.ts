@@ -1,6 +1,7 @@
 import { BaseAction } from './base';
 import canvasStore from '@/store/canvas';
 import workingFileStore, { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
+import { updateWorkingFileLayer } from '@/store/data/working-file-database';
 import { updateBakedImageForLayer } from './baking';
 
 export class UpdateLayerFilterDisabledAction extends BaseAction {
@@ -39,6 +40,7 @@ export class UpdateLayerFilterDisabledAction extends BaseAction {
 
         regenerateLayerThumbnail(layer);
         updateBakedImageForLayer(layer);
+        updateWorkingFileLayer(layer);
 
         canvasStore.set('dirty', true);
 	}
@@ -64,6 +66,7 @@ export class UpdateLayerFilterDisabledAction extends BaseAction {
 
         regenerateLayerThumbnail(layer);
         updateBakedImageForLayer(layer);
+        updateWorkingFileLayer(layer);
 
         canvasStore.set('dirty', true);
 	}

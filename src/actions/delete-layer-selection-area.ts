@@ -2,11 +2,9 @@ import { BaseAction } from './base';
 import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset, blitActiveSelectionMask } from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
 import workingFileStore, { getLayerById, getLayerGlobalTransform } from '@/store/working-file';
-import { createImageFromCanvas, getImageDataFromImage, getImageDataEmptyBounds, createEmptyCanvasWith2dContext } from '@/lib/image';
+import { updateWorkingFileLayer } from '@/store/data/working-file-database';
 import { ClearSelectionAction } from './clear-selection';
 import { UpdateLayerAction } from './update-layer';
-import { SelectLayersAction } from './select-layers';
-import renderers from '@/canvas/renderers';
 import { getStoredImageOrCanvas, createStoredImage } from '@/store/image';
 
 import type {
@@ -102,9 +100,13 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
             this.freeEstimates.database += this.clearSelectionAction.freeEstimates.database;
         }
 
-
         canvasStore.set('dirty', true);
         canvasStore.set('viewDirty', true);
+
+        for (const layerId of this.layerIds) {
+            const layer = getLayerById(layerId);
+            if (layer) updateWorkingFileLayer(layer);
+        }
     }
 
     public async undo() {
@@ -127,6 +129,11 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
 
         canvasStore.set('dirty', true);
         canvasStore.set('viewDirty', true);
+
+        for (const layerId of this.layerIds) {
+            const layer = getLayerById(layerId);
+            if (layer) updateWorkingFileLayer(layer);
+        }
     }
 
     public async free() {

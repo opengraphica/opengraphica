@@ -8,6 +8,10 @@
             </div>
             <div class="is-flex is-justify-content-center mt-4">
                 <div class="is-inline-block">
+                    <el-button v-if="showRestoreImage" link type="primary" class="m-0 is-block" @click="onRestoreImage()">
+                        <span class="bi bi-recycle mr-2" style="font-size: 1.2rem" aria-hidden="true" />
+                        {{ $t('button.restoreLastImage') }}
+                    </el-button>
                     <el-button link type="primary" class="m-0 is-block" @click="onNewImage()">
                         <span class="bi bi-file-earmark-plus mr-2" style="font-size: 1.2rem" aria-hidden="true" />
                         {{ $t('button.createNewImage') }}
@@ -29,6 +33,7 @@
 <script lang="ts">
 
 import { defineComponent, computed, ref, onMounted, onUnmounted } from 'vue';
+import { hasWorkingFile } from '@/store/data/working-file-database';
 import ElButton from 'element-plus/lib/components/button/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import appEmitter from '@/lib/emitter';
@@ -54,6 +59,7 @@ export default defineComponent({
         emit('update:title', 'empty');
 
         const loading = ref<boolean>(false);
+        const showRestoreImage = ref<boolean>(false);
 
         const logoThemeColor = computed<string>(() => {
             return (editorStore.state.activeTheme?.name === 'dark') ? 'light' : 'dark';
@@ -62,6 +68,12 @@ export default defineComponent({
         onMounted(async () => {
             appEmitter.on('app.workingFile.notifyImageLoadedFromClipboard', onCancel);
             appEmitter.on('app.workingFile.notifyImageLoadedFromDragAndDrop', onCancel);
+
+            if (editorStore.get('showBackupRestore')) {
+                try {
+                    showRestoreImage.value = await hasWorkingFile();
+                } catch (error) { /* Ignore */ }
+            }
         });
 
         onUnmounted(() => {
@@ -97,9 +109,18 @@ export default defineComponent({
             }
         });
 
+        async function onRestoreImage() {
+            loading.value = true;
+            await runModule('file', 'restoreBackup');
+            editorStore.set('showBackupRestore', false);
+            loading.value = false;
+            onCancel();
+        }
+
         async function onNewImage() {
             loading.value = true;
             await runModule('file', 'new');
+            editorStore.set('showBackupRestore', false);
             loading.value = false;
             onCancel();
         }
@@ -107,6 +128,7 @@ export default defineComponent({
         async function onOpenImage() {
             loading.value = true;
             await runModule('file', 'open');
+            editorStore.set('showBackupRestore', false);
             loading.value = false;
             onCancel();
         }
@@ -114,6 +136,7 @@ export default defineComponent({
         async function onTakePhoto() {
             loading.value = true;
             await runModule('file', 'takePhoto');
+            editorStore.set('showBackupRestore', false);
             loading.value = false;
             onCancel();
         }
@@ -124,7 +147,9 @@ export default defineComponent({
         
         return {
             loading,
+            showRestoreImage,
             logoThemeColor,
+            onRestoreImage,
             onNewImage,
             onOpenImage,
             onTakePhoto,
