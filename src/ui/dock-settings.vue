@@ -310,7 +310,7 @@
                             </el-collapse-item>
                         </el-collapse>
                         <!-- Prefs: Reset -->
-                        <div class="px-4.5 pt-4">
+                        <div class="px-4.5 pt-4 pb-4">
                             <el-button size="small" class="is-fullwidth" @click="onClickResetSettings" v-t="'dock.settings.prefs.editor.resetSettings'" />
                         </div>
                     </el-form>

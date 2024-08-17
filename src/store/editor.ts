@@ -16,6 +16,7 @@ interface EditorDeferredTask {
 
 interface TutorialFlags {
     drawToolIntroduction?: boolean;
+    effectToolIntroduction?: boolean;
     eraseToolIntroduction?: boolean;
     explainCanvasViewportControls?: boolean;
     freeTransformToolIntroduction?: boolean;

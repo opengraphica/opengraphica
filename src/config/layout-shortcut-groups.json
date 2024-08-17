@@ -31,17 +31,17 @@
         ],
         "draggable": true
     },
-    "effects": {
-        "name": "layoutShortcutGroup.effects.name",
+    "effect": {
+        "name": "layoutShortcutGroup.effect.name",
         "controls": [
             {
                 "type": "button",
                 "icon": "bi bi-stars",
-                "label": "layoutShortcutGroup.effects.controls.default.label",
-                "description": "layoutShortcutGroup.effects.controls.default.description",
+                "label": "layoutShortcutGroup.effect.controls.default.label",
+                "description": "layoutShortcutGroup.effect.controls.default.description",
                 "action": {
-                    "type": "runModule",
-                    "target": "tmp/notYetImplemented"
+                    "type": "toolGroup",
+                    "target": "effect"
                 }
             }
         ],

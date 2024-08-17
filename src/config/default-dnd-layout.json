@@ -12,7 +12,8 @@
                     "selection",
                     
                     "draw",
-                    "erase"
+                    "erase",
+                    "effect"
                 ]
             }
         },

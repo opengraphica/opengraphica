@@ -54,7 +54,7 @@
                                 <span v-t="'app.layerList.rename'"></span>
                             </el-menu-item>
                             <el-menu-item index="effect">
-                                <i class="bi bi-magic"></i>
+                                <i class="bi bi-stars"></i>
                                 <span v-t="'app.layerList.addEffect'"></span>
                             </el-menu-item>
                             <el-menu-item index="delete">

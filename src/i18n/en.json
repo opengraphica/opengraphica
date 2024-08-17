@@ -107,6 +107,7 @@
         }
     },
     "button": {
+        "addEffect": "Add Effect",
         "apply": "Apply",
         "cancel": "Cancel",
         "clear": "Clear",
@@ -114,6 +115,7 @@
         "create": "Create",
         "createNewImage": "Create New Image",
         "done": "Done",
+        "editEffects": "Edit Effects",
         "export": "Export",
         "no": "No",
         "ok": "OK",
@@ -447,11 +449,11 @@
                 }
             }
         },
-        "effects": {
-            "name": "Effects",
+        "effect": {
+            "name": "Effect",
             "controls": {
                 "default": {
-                    "label": "Effects",
+                    "label": "Effect",
                     "description": [
                         "Manipulate layer colors",
                         "Add layer filters, such as blurring effects"
@@ -847,6 +849,13 @@
             "brushColor": "Brush Color",
             "brushSize": "Size"
         },
+        "effect": {
+            "edit": {
+                "noLayersSelected": "Please select one or more layers in the layers dock in order to edit their effects.",
+                "layerHasNoEffects": "This layer has no effects.",
+                "deleteEffect": "Delete effect"
+            }
+        },
         "eraseBrush": {
             "brushSize": "Size"
         },
@@ -926,6 +935,16 @@
                 }
             }
         },
+        "effect": {
+            "name": "Effect",
+            "description": "Adjust layer colors, add blurring and other effects.",
+            "tools": {
+                "brush": {
+                    "name": "Effect",
+                    "description": "Manage the effects on layers."
+                }
+            }
+        },
         "erase": {
             "name": "Erase",
             "description": "Brushes, pencils, pens, that erase.",
@@ -990,6 +1009,12 @@
             "title": "Draw Tool",
             "introduction": [
                 "The draw tool lets you create lines and shapes."
+            ]
+        },
+        "effectToolIntroduction": {
+            "title": "Effect Tool",
+            "introduction": [
+                "The effect tool allows to add layer effects that can adjust colors and do all sorts of other useful operations to the entire layer. Effects can be stacked and removed at any time."
             ]
         },
         "eraseToolIntroduction": {

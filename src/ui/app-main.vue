@@ -45,7 +45,7 @@ import editorStore from '@/store/editor';
 import preferencesStore from '@/store/preferences';
 import ResizeObserver from 'resize-observer-polyfill';
 import appEmitter from '@/lib/emitter';
-import { initializeI18n } from '@/i18n';
+import { initializeI18n, t, tm, rt } from '@/i18n';
 import { getModuleDefinition, preloadModules } from '@/modules';
 import { useAppPreloadBlocker } from '@/composables/app-preload-blocker';
 
@@ -172,7 +172,13 @@ export default defineComponent({
 
             await nextTick();
 
-            if (preferencesStore.get('showWelcomeScreenAtStart') && window.innerWidth <= 1000) {
+            showWelcomeScreen();
+
+            appEmitter.emit('app.wait.stopBlocking', { id: 'appInitialLoad' });
+        }
+
+        function showWelcomeScreen() {
+            if (preferencesStore.get('showWelcomeScreenAtStart') && window.innerWidth <= preferencesStore.state.dockHideBreakpoint) {
                 const welcomeModule = getModuleDefinition('tutorial', 'welcome');
                 if (welcomeModule) {
                     appEmitter.emit('app.menuDrawer.openFromModule', {
@@ -186,9 +192,35 @@ export default defineComponent({
                         immediate: true
                     });
                 }
+            } else if (!editorStore.state.tutorialFlags.explainCanvasViewportControls) {
+                import('@/lib/tutorial').then(({ scheduleTutorialNotification }) => {
+                    let message = (tm('tutorialTip.explainCanvasViewportControls.introduction') as string[]).map((message) => {
+                        return `<p class="mb-3">${rt(message, {
+                            anyTool: `<strong class="has-text-weight-bold">${t('tutorialTip.explainCanvasViewportControls.anyTool')}</strong>`
+                        })}</p>`;
+                    }).join('');
+                    scheduleTutorialNotification({
+                        flag: 'explainCanvasViewportControls',
+                        title: t('tutorialTip.explainCanvasViewportControls.title'),
+                        message: {
+                            touch: message + (tm('tutorialTip.explainCanvasViewportControls.body.touch') as string[]).map((message) => {
+                                return `<p class="mb-3">${rt(message, {
+                                    zooming: `<strong class="has-text-weight-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.zooming')}</strong>`,
+                                    panning: `<strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.panning')}</strong>`,
+                                })}</p>`
+                            }).join(''),
+                            mouse: message + (tm('tutorialTip.explainCanvasViewportControls.body.mouse') as string[]).map((message) => {
+                                return `<p class="mb-3">${rt(message, {
+                                    zooming: `<strong class="has-text-weight-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.zooming')}</strong>`,
+                                    panning: `<strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.panning')}</strong>`,
+                                    mouseWheel: `<em>${t('tutorialTip.explainCanvasViewportControls.bodyTitle.mouseWheel')}</em>`,
+                                    rightMouseButton: `<em>${t('tutorialTip.explainCanvasViewportControls.bodyTitle.rightMouseButton')}</em>`,
+                                })}</p>`
+                            }).join(''),
+                        }
+                    });
+                });
             }
-
-            appEmitter.emit('app.wait.stopBlocking', { id: 'appInitialLoad' });
         }
 
         function onContextMenu(e: Event) {

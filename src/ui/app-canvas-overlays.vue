@@ -28,6 +28,7 @@ export default defineComponent({
         'overlay-canvas-border': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-canvas-border' */ `../canvas/overlays/canvas-border.vue`)),
         'overlay-crop-resize': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-crop-resize' */ `../canvas/overlays/crop-resize.vue`)),
         'overlay-draw-brush': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-draw-brush' */ `../canvas/overlays/draw-brush.vue`)),
+        'overlay-effect': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-effect' */ `../canvas/overlays/effect.vue`)),
         'overlay-erase-brush': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-erase-brush' */ `../canvas/overlays/erase-brush.vue`)),
         'overlay-free-transform': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-free-transform' */ `../canvas/overlays/free-transform.vue`)),
         'overlay-selection': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-selection' */ `../canvas/overlays/selection.vue`)),

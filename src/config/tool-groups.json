@@ -17,6 +17,24 @@
             }
         }
     },
+    "effect": {
+        "name": "toolGroup.effect.name",
+        "description": "toolGroup.effect.description",
+        "tools": {
+            "effect": {
+                "name": "toolGroup.effect.tools.effect.name",
+                "description": "toolGroup.effect.tools.effect.description",
+                "controller": "effect",
+                "toolbar": {
+                    "position": "auto",
+                    "target": "effect"
+                },
+                "overlays": [
+                    "effect"
+                ]
+            }
+        }
+    },
     "erase": {
         "name": "toolGroup.erase.name",
         "description": "toolGroup.erase.description",

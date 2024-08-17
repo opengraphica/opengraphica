@@ -160,9 +160,9 @@ function getLayersByType<T extends WorkingFileLayer<ColorModel>>(type: string, p
     return layers as T[];
 }
 
-function getSelectedLayers(): WorkingFileAnyLayer<ColorModel>[] {
+function getSelectedLayers(providedSelectedLayerIds?: number[]): WorkingFileAnyLayer<ColorModel>[] {
     const selectedLayers: WorkingFileAnyLayer<ColorModel>[] = [];
-    const selectedLayerIds = store.get('selectedLayerIds');
+    const selectedLayerIds = providedSelectedLayerIds ?? store.get('selectedLayerIds');
     if (selectedLayerIds.length > 0) {
         for (let id of selectedLayerIds) {
             const layer = getLayerById(id);

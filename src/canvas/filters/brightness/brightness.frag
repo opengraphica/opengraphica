@@ -42,7 +42,7 @@ vec4 processBrightness(vec4 color) {
     } else if (cMode == BrightnessModeLuminance) {
         vec3 lch = labToLch(rgbToOklab(color.rgb));
         lch.x = max(0.0, lch.x + pBrightness);
-        newRgb = oklabToRgb(lchToLab(lch));
+        newRgb = linearSrgbToSrgb(oklabToRgb(lchToLab(lch)));
     }
 
     // Apply effective range
