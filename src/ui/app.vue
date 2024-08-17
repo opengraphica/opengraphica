@@ -60,6 +60,8 @@
                     </g>
                 </g>
             </svg>
+            <img class="ogr-preload__hidden-image" src="images/logo-full-dark.svg" aria-hidden="true" >
+            <img class="ogr-preload__hidden-image" src="images/logo-full-light.svg" aria-hidden="true" >
         </div>
     </div>
 </template>
@@ -200,6 +202,12 @@ export default defineComponent({
                 left: 0;
                 right: 0;
                 bottom: 0;
+            }
+            .ogr-preload__hidden-image {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                opacity: 0.01;
             }
             .ogr-preload__logo {
                 display: block;
