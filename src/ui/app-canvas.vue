@@ -855,6 +855,7 @@ export default defineComponent({
         }
 
         function onDocumentVisibilityChange() {
+            console.log('visibility change', document.visibilityState);
             if (document.visibilityState === 'visible' && loading.value === false) {
                 const threejsRenderer = canvasStore.get('threejsRenderer');
                 if (threejsRenderer) {
