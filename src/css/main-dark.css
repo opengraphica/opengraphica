@@ -10032,6 +10032,14 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-toolbar.is-overlay.is-menu-bar-top {
   bottom: 0.5rem;
 }
+.opengraphica .ogr-toolbar--effect__edit-layer-name {
+  display: inline-block;
+  max-width: 20rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+  white-space: nowrap;
+}
 .opengraphica .ogr-selection {
   position: absolute;
   top: 0;

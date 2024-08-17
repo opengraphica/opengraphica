@@ -39,7 +39,11 @@
         "updateLayer": "Camada de atualização",
         "updateDrawLayer": "Desenhar na camada",
         "updateLayerFilterParams": "Efeito de camada de atualização",
-        "updateSelectionCombineMode": "Modo de seleção de atualização"
+        "updateSelectionCombineMode": "Modo de seleção de atualização",
+        "convertLayersToCollage": "Converter Camadas para Colagem",
+        "textTransformResize": "Redimensionar camada de texto",
+        "textTransformTranslate": "Mover camada de texto",
+        "updateEraseLayer": "Apagar da camada"
     },
     "app": {
         "colorPickerGradient": {
@@ -118,7 +122,10 @@
         "settings": "Configurações",
         "take": "Toma",
         "takePhoto": "Tomar foto",
-        "yes": "Sim"
+        "yes": "Sim",
+        "addEffect": "Adicionar efeito",
+        "editEffects": "Editar efeitos",
+        "restoreLastImage": "Restaurar última imagem"
     },
     "canvas": {
         "toolbar": {
@@ -153,7 +160,8 @@
                     "save": "Salvar",
                     "saveAs": "Salvar como",
                     "insertPhoto": "Insira uma foto",
-                    "takePhoto": "Tomar uma foto"
+                    "takePhoto": "Tomar uma foto",
+                    "restore": "Restaurar última imagem"
                 }
             },
             "image": {
@@ -163,7 +171,8 @@
                     "convertLayers": {
                         "groupTitle": "Converter Camadas...",
                         "toImageSequence": "Para seqüência de imagem",
-                        "flatten": "Flatten to New Layer"
+                        "flatten": "Flatten to New Layer",
+                        "toCollage": "Para colar"
                     },
                     "cut": "Corta",
                     "copy": "Entendido",
@@ -422,7 +431,12 @@
             "name": "Deformação",
             "controls": {
                 "default": {
-                    "label": "Deformação"
+                    "label": "Deformação",
+                    "description": [
+                        null,
+                        "Bulge, pinch áreas da imagem",
+                        "Clone áreas da imagem"
+                    ]
                 }
             }
         },
@@ -430,7 +444,11 @@
             "name": "Desenho",
             "controls": {
                 "default": {
-                    "label": "Desenho"
+                    "label": "Desenho",
+                    "description": [
+                        "Use pincéis de arte",
+                        "Criar formas ou gradientes"
+                    ]
                 }
             }
         },
@@ -446,7 +464,10 @@
             "name": "Apagar",
             "controls": {
                 "default": {
-                    "label": "Apagar"
+                    "label": "Apagar",
+                    "description": [
+                        "Apagar os efeitos da ferramenta de desenho"
+                    ]
                 }
             }
         },
@@ -465,7 +486,8 @@
             "name": "Camadas",
             "controls": {
                 "default": {
-                    "label": "Camadas"
+                    "label": "Camadas",
+                    "description": []
                 }
             }
         },
@@ -473,7 +495,8 @@
             "name": "Pesquisar",
             "controls": {
                 "default": {
-                    "label": "Pesquisar"
+                    "label": "Pesquisar",
+                    "description": []
                 }
             }
         },
@@ -481,7 +504,11 @@
             "name": "Seleção",
             "controls": {
                 "default": {
-                    "label": "Seleção"
+                    "label": "Seleção",
+                    "description": [
+                        "Restringir a área de edição",
+                        "Cortar, copiar, excluir áreas específicas"
+                    ]
                 }
             }
         },
@@ -489,7 +516,8 @@
             "name": "Acções",
             "controls": {
                 "default": {
-                    "label": "Acções"
+                    "label": "Acções",
+                    "description": []
                 }
             }
         },
@@ -497,7 +525,11 @@
             "name": "Texto",
             "controls": {
                 "default": {
-                    "label": "Inserir / Editar texto"
+                    "label": "Inserir / Editar texto",
+                    "description": [
+                        "Inserir camadas de texto",
+                        "Editar camadas de texto existentes"
+                    ]
                 }
             }
         },
@@ -505,7 +537,11 @@
             "name": "Mover / Transformar",
             "controls": {
                 "default": {
-                    "label": "Mover / Transformar"
+                    "label": "Mover / Transformar",
+                    "description": [
+                        "Mover, escalar, girar camadas",
+                        "Gerir limites de camada"
+                    ]
                 }
             }
         },
@@ -513,7 +549,23 @@
             "name": "Vista de lona",
             "controls": {
                 "default": {
-                    "label": "Zoom / Vista Pan"
+                    "label": "Zoom / Vista Pan",
+                    "description": [
+                        "Zoom dentro e fora",
+                        "Panar ou girar a vista"
+                    ]
+                }
+            }
+        },
+        "effect": {
+            "name": "Efeito",
+            "controls": {
+                "default": {
+                    "label": "Efeito",
+                    "description": [
+                        "Manipular cores de camada",
+                        "Adicionar filtros de camada, como efeitos de borragem"
+                    ]
                 }
             }
         }
@@ -524,6 +576,10 @@
                 "gotIt": "Consegui",
                 "dontShowTips": "Não mostrar dicas"
             }
+        },
+        "fontNotify": {
+            "title": "Carregando fontes",
+            "pleaseWait": "Por favor, espere, essas fontes estão sendo carregadas:"
         }
     },
     "measurement": {
@@ -616,6 +672,37 @@
         "renameLayer": {
             "title": "Renomear camada",
             "layerName": "Nome novo"
+        },
+        "imageConvertLayersToCollage": {
+            "title": "Converter Camadas para Colagem",
+            "collageType": {
+                "verticalStack": "Pilha vertical",
+                "horizontalStack": "Pilha horizontal",
+                "grid": "Moagem"
+            },
+            "params": {
+                "shared": {
+                    "reverseLayerOrder": "Ordem de camada reversa"
+                },
+                "verticalStack": {
+                    "horizontalAlignment": "Alinhamento horizontal",
+                    "horizontalAlignmentOption": {
+                        "left": "Esquerda",
+                        "center": "Centro",
+                        "right": "Certo"
+                    },
+                    "verticalMargin": "Margem vertical"
+                },
+                "horizontalStack": {
+                    "verticalAlignment": "Alinhamento vertical",
+                    "verticalAlignmentOption": {
+                        "top": "Topo",
+                        "middle": "Meio ambiente",
+                        "bottom": "Fundo"
+                    },
+                    "horizontalMargin": "Margem horizontal"
+                }
+            }
         }
     },
     "moduleGroup": {
@@ -654,6 +741,10 @@
                 "takePhoto": {
                     "name": "Tomar uma foto",
                     "description": "Tire uma foto de sua câmera e webcam e insira-a na imagem."
+                },
+                "restoreBackup": {
+                    "name": "Restaurar backup Imagem",
+                    "description": "Carregar o arquivo de backup salvo automaticamente durante a edição."
                 }
             }
         },
@@ -698,6 +789,10 @@
                 "paste": {
                     "name": "Pasta",
                     "description": "Insira imagens na tela da área de transferência."
+                },
+                "convertLayersToCollage": {
+                    "name": "Converter Camadas para Colagem",
+                    "description": "Converte as camadas selecionadas em uma colagem de imagem. Existem muitos layouts de colagem diferentes disponíveis."
                 }
             }
         },
@@ -828,6 +923,20 @@
             "rotateClockwise": "Rotar no sentido horário",
             "fit": "Fit",
             "flip": "Flip"
+        },
+        "drawBrush": {
+            "brushColor": "Cor da escova",
+            "brushSize": "Tamanho"
+        },
+        "effect": {
+            "edit": {
+                "noLayersSelected": "Selecione uma ou mais camadas na doca de camadas para editar seus efeitos.",
+                "layerHasNoEffects": "Esta camada não tem efeitos.",
+                "deleteEffect": "Excluir efeito"
+            }
+        },
+        "eraseBrush": {
+            "brushSize": "Tamanho"
         }
     },
     "toolGroup": {
@@ -887,6 +996,26 @@
             "tools": {
                 "name": "Zoom",
                 "description": "Zoom dentro e fora da tela para controlar o quanto da imagem que você pode ver."
+            }
+        },
+        "effect": {
+            "name": "Efeito",
+            "description": "Ajustar as cores da camada, adicionar borrada e outros efeitos.",
+            "tools": {
+                "brush": {
+                    "name": "Efeito",
+                    "description": "Gerenciar os efeitos em camadas."
+                }
+            }
+        },
+        "erase": {
+            "name": "Apagar",
+            "description": "Escovas, lápis, canetas, que apagam.",
+            "tools": {
+                "brush": {
+                    "name": "Pincel de borracha",
+                    "description": "Apague dados de camadas raster."
+                }
             }
         }
     },
@@ -993,6 +1122,18 @@
                 "ctrlLeftClick": "Ctrl + clique esquerdo",
                 "leftMouseButton": "Botão esquerdo do mouse"
             }
+        },
+        "effectToolIntroduction": {
+            "title": "Ferramenta de efeito",
+            "introduction": [
+                "A ferramenta de efeito permite adicionar efeitos de camada que podem ajustar as cores e fazer todos os tipos de outras operações úteis para toda a camada. Os efeitos podem ser empilhados e removidos a qualquer momento."
+            ]
+        },
+        "eraseToolIntroduction": {
+            "title": "Ferramenta de eliminação",
+            "introduction": [
+                "A ferramenta de apagamento permite remover partes da camada, tornando-os transparentes."
+            ]
         }
     }
 }

@@ -39,7 +39,11 @@
         "updateLayer": "Update Layer",
         "updateDrawLayer": "سحب على لاير",
         "updateLayerFilterParams": "Update Layer Effect",
-        "updateSelectionCombineMode": "Update Selection Combine Mode"
+        "updateSelectionCombineMode": "Update Selection Combine Mode",
+        "convertLayersToCollage": "Convert Layers to Collage",
+        "textTransformResize": "Resize Text Layer",
+        "textTransformTranslate": "نقل الرسائل",
+        "updateEraseLayer": "Erase from Layer"
     },
     "app": {
         "colorPickerGradient": {
@@ -118,7 +122,10 @@
         "settings": "الترتيبات",
         "take": "خذ",
         "takePhoto": "خذ الصورة",
-        "yes": "نعم"
+        "yes": "نعم",
+        "addEffect": "مضافا إليه:",
+        "editEffects": "Edit Effects",
+        "restoreLastImage": "استعادة آخر صورة"
     },
     "canvas": {
         "toolbar": {
@@ -153,7 +160,8 @@
                     "save": "أنقذ",
                     "saveAs": "أنقذني",
                     "insertPhoto": "Insert a Photo",
-                    "takePhoto": "خذ الصورة"
+                    "takePhoto": "خذ الصورة",
+                    "restore": "استعادة آخر صورة"
                 }
             },
             "image": {
@@ -163,7 +171,8 @@
                     "convertLayers": {
                         "groupTitle": "(المخادعون).",
                         "toImageSequence": "إلى معادلة الصور",
-                        "flatten": "(فلاطين) إلى (نيو لاير)"
+                        "flatten": "(فلاطين) إلى (نيو لاير)",
+                        "toCollage": "To Collage"
                     },
                     "cut": "قطع",
                     "copy": "نسخ",
@@ -422,7 +431,12 @@
             "name": "الشكل",
             "controls": {
                 "default": {
-                    "label": "الشكل"
+                    "label": "الشكل",
+                    "description": [
+                        null,
+                        "Bulge, fatch areas of the image",
+                        "مناطق كلون من الصورة"
+                    ]
                 }
             }
         },
@@ -430,7 +444,11 @@
             "name": "Draw",
             "controls": {
                 "default": {
-                    "label": "Draw"
+                    "label": "Draw",
+                    "description": [
+                        "استخدام فرشاة الفن",
+                        "إيجاد أشكال أو درجات"
+                    ]
                 }
             }
         },
@@ -446,7 +464,10 @@
             "name": "Erase",
             "controls": {
                 "default": {
-                    "label": "Erase"
+                    "label": "Erase",
+                    "description": [
+                        "Erase the effects of the draw tool"
+                    ]
                 }
             }
         },
@@ -465,7 +486,8 @@
             "name": "Layers",
             "controls": {
                 "default": {
-                    "label": "Layers"
+                    "label": "Layers",
+                    "description": []
                 }
             }
         },
@@ -473,7 +495,8 @@
             "name": "البحث",
             "controls": {
                 "default": {
-                    "label": "البحث"
+                    "label": "البحث",
+                    "description": []
                 }
             }
         },
@@ -481,7 +504,11 @@
             "name": "الاختيار",
             "controls": {
                 "default": {
-                    "label": "الاختيار"
+                    "label": "الاختيار",
+                    "description": [
+                        "تقييد منطقة التحرير",
+                        "قطع، نسخ، حذف مجالات محددة"
+                    ]
                 }
             }
         },
@@ -489,7 +516,8 @@
             "name": "الإجراءات",
             "controls": {
                 "default": {
-                    "label": "الإجراءات"
+                    "label": "الإجراءات",
+                    "description": []
                 }
             }
         },
@@ -497,7 +525,11 @@
             "name": "النص",
             "controls": {
                 "default": {
-                    "label": "Insert/ Edit Text"
+                    "label": "Insert/ Edit Text",
+                    "description": [
+                        "الطبقة النصية",
+                        "تصميم طبقات النصوص القائمة"
+                    ]
                 }
             }
         },
@@ -505,7 +537,11 @@
             "name": "النقل/التحول",
             "controls": {
                 "default": {
-                    "label": "النقل/التحول"
+                    "label": "النقل/التحول",
+                    "description": [
+                        "التحرك، المقياس، الطبقات الدوارة",
+                        "حدود الطبقة العاملة"
+                    ]
                 }
             }
         },
@@ -513,7 +549,23 @@
             "name": "Canvas Viewport",
             "controls": {
                 "default": {
-                    "label": "زوم/بان فيو"
+                    "label": "زوم/بان فيو",
+                    "description": [
+                        "تكبير في",
+                        "(بان) أو تناوب وجهة النظر"
+                    ]
+                }
+            }
+        },
+        "effect": {
+            "name": "الأثر",
+            "controls": {
+                "default": {
+                    "label": "الأثر",
+                    "description": [
+                        "التلاعب بألوان الطبقات",
+                        "إضافة مرشحات طبقات، مثل الآثار غير الواضحة"
+                    ]
                 }
             }
         }
@@ -524,6 +576,10 @@
                 "gotIt": "حصلت عليه",
                 "dontShowTips": "لا تظهر تيبس"
             }
+        },
+        "fontNotify": {
+            "title": "Loading Fonts",
+            "pleaseWait": "من فضلك انتظر، هذه العواطف يتم تحميلها:"
         }
     },
     "measurement": {
@@ -616,6 +672,37 @@
         "renameLayer": {
             "title": "Rename Layer",
             "layerName": "الاسم الجديد"
+        },
+        "imageConvertLayersToCollage": {
+            "title": "Convert Layers to Collage",
+            "collageType": {
+                "verticalStack": "الشكل الحرفي",
+                "horizontalStack": "Horizontal Stack",
+                "grid": "Grid"
+            },
+            "params": {
+                "shared": {
+                    "reverseLayerOrder": "الأمر العكسي"
+                },
+                "verticalStack": {
+                    "horizontalAlignment": "التسليح الأفقي",
+                    "horizontalAlignmentOption": {
+                        "left": "يسار",
+                        "center": "المركز",
+                        "right": "الحق"
+                    },
+                    "verticalMargin": "المريخ الحرفي"
+                },
+                "horizontalStack": {
+                    "verticalAlignment": "التألق الحرفي",
+                    "verticalAlignmentOption": {
+                        "top": "القمة",
+                        "middle": "الشرق الأوسط",
+                        "bottom": "الجزء السفلي"
+                    },
+                    "horizontalMargin": "Horizontal Margin"
+                }
+            }
         }
     },
     "moduleGroup": {
@@ -654,6 +741,10 @@
                 "takePhoto": {
                     "name": "خذ الصورة",
                     "description": "خذ صورة من الكاميرا وكاميرا الإنترنت وأدخلها في الصورة."
+                },
+                "restoreBackup": {
+                    "name": "إعادة الدعم الصورة",
+                    "description": "ضعي الملف الإحتياطي انقذ تلقائياً أثناء التحرير."
                 }
             }
         },
@@ -698,6 +789,10 @@
                 "paste": {
                     "name": "Paste",
                     "description": "ضع صوراً على اللوحة من على اللوح."
+                },
+                "convertLayersToCollage": {
+                    "name": "Convert Layers to Collage",
+                    "description": "يُحوّلُ الطبقاتَ المُختارةَ إلى a تصادم صورِ. وهناك العديد من مخططات تجميع مختلفة متاحة."
                 }
             }
         },
@@ -828,6 +923,20 @@
             "rotateClockwise": "Rotate Clockwise",
             "fit": "Fit",
             "flip": "Flip"
+        },
+        "drawBrush": {
+            "brushColor": "Brush Color",
+            "brushSize": "الحجم"
+        },
+        "effect": {
+            "edit": {
+                "noLayersSelected": "يرجى اختيار طبقة أو أكثر في رصيف الطبقات من أجل تحرير آثارها.",
+                "layerHasNoEffects": "هذه الطبقة ليس لها تأثيرات.",
+                "deleteEffect": "يحذف الأثر"
+            }
+        },
+        "eraseBrush": {
+            "brushSize": "الحجم"
         }
     },
     "toolGroup": {
@@ -887,6 +996,26 @@
             "tools": {
                 "name": "زوم",
                 "description": "تكبير داخل وخارج الكنفاس للسيطرة على كم الصورة التي يمكنك رؤيتها."
+            }
+        },
+        "effect": {
+            "name": "الأثر",
+            "description": "عدّل ألوان الطبقات، أضف الضبابية وغيرها من الآثار.",
+            "tools": {
+                "brush": {
+                    "name": "الأثر",
+                    "description": "إدارة الآثار على الطبقات."
+                }
+            }
+        },
+        "erase": {
+            "name": "Erase",
+            "description": "برش، قلم رصاص، أقلام، ممسحة.",
+            "tools": {
+                "brush": {
+                    "name": "Erase Brush",
+                    "description": "جمع البيانات من طبقات القاذورات."
+                }
             }
         }
     },
@@ -993,6 +1122,18 @@
                 "ctrlLeftClick": "Ctrl + left Click",
                 "leftMouseButton": "موسى بوتون"
             }
+        },
+        "effectToolIntroduction": {
+            "title": "Effect Tool",
+            "introduction": [
+                "وتسمح أداة التأثير بإضافة آثار طبقات يمكن أن تعدل الألوان وتقوم بجميع أنواع العمليات المفيدة الأخرى إلى كامل الطبقات. ويمكن تكديس الآثار وإزالتها في أي وقت."
+            ]
+        },
+        "eraseToolIntroduction": {
+            "title": "Erase Tool",
+            "introduction": [
+                "أداة الممسحة تسمح لك بإزالة أجزاء من الطبقة مما يجعلها شفافة."
+            ]
         }
     }
 }

@@ -39,7 +39,11 @@
         "updateLayer": "अद्यतन परत",
         "updateDrawLayer": "परत पर खींचो",
         "updateLayerFilterParams": "अद्यतन परत प्रभाव",
-        "updateSelectionCombineMode": "अद्यतन चयन संयोजन मोड"
+        "updateSelectionCombineMode": "अद्यतन चयन संयोजन मोड",
+        "convertLayersToCollage": "परतों को कोलाज में कनवर्ट करें",
+        "textTransformResize": "पाठ परत का आकार बदलें",
+        "textTransformTranslate": "पाठ परत",
+        "updateEraseLayer": "परत से मिटा"
     },
     "app": {
         "colorPickerGradient": {
@@ -118,7 +122,10 @@
         "settings": "सेटिंग्स",
         "take": "लेना",
         "takePhoto": "फोटो",
-        "yes": "हाँ"
+        "yes": "हाँ",
+        "addEffect": "प्रभाव जोड़ें",
+        "editEffects": "प्रभाव",
+        "restoreLastImage": "पिछली छवि को पुनर्स्थापित करें"
     },
     "canvas": {
         "toolbar": {
@@ -153,7 +160,8 @@
                     "save": "सहेजें",
                     "saveAs": "सहेजें",
                     "insertPhoto": "फोटो डालें",
-                    "takePhoto": "फोटो"
+                    "takePhoto": "फोटो",
+                    "restore": "पिछली छवि को पुनर्स्थापित करें"
                 }
             },
             "image": {
@@ -163,7 +171,8 @@
                     "convertLayers": {
                         "groupTitle": "कन्वर्ट परतें...",
                         "toImageSequence": "छवि अनुक्रम",
-                        "flatten": "Flatten to New Layer"
+                        "flatten": "Flatten to New Layer",
+                        "toCollage": "कोलाज"
                     },
                     "cut": "कट",
                     "copy": "कॉपी",
@@ -422,7 +431,12 @@
             "name": "विकृत",
             "controls": {
                 "default": {
-                    "label": "विकृत"
+                    "label": "विकृत",
+                    "description": [
+                        null,
+                        "Bulge, छवि के चुटकी क्षेत्र",
+                        "छवि के क्लोन क्षेत्र"
+                    ]
                 }
             }
         },
@@ -430,7 +444,11 @@
             "name": "ड्रा",
             "controls": {
                 "default": {
-                    "label": "ड्रा"
+                    "label": "ड्रा",
+                    "description": [
+                        "कला ब्रश का प्रयोग करें",
+                        "आकार या ढाल बनाएँ"
+                    ]
                 }
             }
         },
@@ -446,7 +464,10 @@
             "name": "एरेस",
             "controls": {
                 "default": {
-                    "label": "एरेस"
+                    "label": "एरेस",
+                    "description": [
+                        "ड्रॉ टूल के प्रभावों को मिटा दें"
+                    ]
                 }
             }
         },
@@ -465,7 +486,8 @@
             "name": "परत",
             "controls": {
                 "default": {
-                    "label": "परत"
+                    "label": "परत",
+                    "description": []
                 }
             }
         },
@@ -473,7 +495,8 @@
             "name": "खोज",
             "controls": {
                 "default": {
-                    "label": "खोज"
+                    "label": "खोज",
+                    "description": []
                 }
             }
         },
@@ -481,7 +504,11 @@
             "name": "चयन",
             "controls": {
                 "default": {
-                    "label": "चयन"
+                    "label": "चयन",
+                    "description": [
+                        "संपादन क्षेत्र को प्रतिबंधित करें",
+                        "कट, प्रतिलिपि, विशिष्ट क्षेत्रों को हटा दें"
+                    ]
                 }
             }
         },
@@ -489,7 +516,8 @@
             "name": "कार्य",
             "controls": {
                 "default": {
-                    "label": "कार्य"
+                    "label": "कार्य",
+                    "description": []
                 }
             }
         },
@@ -497,7 +525,11 @@
             "name": "पाठ",
             "controls": {
                 "default": {
-                    "label": "पाठ डालें / संपादित करें"
+                    "label": "पाठ डालें / संपादित करें",
+                    "description": [
+                        "टेक्स्ट लेयर्स डालें",
+                        "मौजूदा पाठ परतों को संपादित करें"
+                    ]
                 }
             }
         },
@@ -505,7 +537,11 @@
             "name": "मूव / ट्रांसफॉर्म",
             "controls": {
                 "default": {
-                    "label": "मूव / ट्रांसफॉर्म"
+                    "label": "मूव / ट्रांसफॉर्म",
+                    "description": [
+                        "चालना, पैमाने, बारी बारी परतें",
+                        "परत सीमाओं का प्रबंधन"
+                    ]
                 }
             }
         },
@@ -513,7 +549,23 @@
             "name": "कैनवास Viewport",
             "controls": {
                 "default": {
-                    "label": "ज़ूम / पैन व्यू"
+                    "label": "ज़ूम / पैन व्यू",
+                    "description": [
+                        "ज़ूम इन और आउट",
+                        "पैन या दृश्य बारी बारी से"
+                    ]
+                }
+            }
+        },
+        "effect": {
+            "name": "प्रभाव",
+            "controls": {
+                "default": {
+                    "label": "प्रभाव",
+                    "description": [
+                        "हेरफेर परत रंग",
+                        "ऐसे धुंधला प्रभाव के रूप में परत फिल्टर जोड़ें"
+                    ]
                 }
             }
         }
@@ -524,6 +576,10 @@
                 "gotIt": "यह",
                 "dontShowTips": "नहीं दिखाएँ युक्तियाँ"
             }
+        },
+        "fontNotify": {
+            "title": "लोड हो रहा है फ़ॉन्ट्स",
+            "pleaseWait": "कृपया प्रतीक्षा करें, इन फोंटों को लोड किया जा रहा है:"
         }
     },
     "measurement": {
@@ -616,6 +672,37 @@
         "renameLayer": {
             "title": "परत का नाम बदलें",
             "layerName": "नया नाम"
+        },
+        "imageConvertLayersToCollage": {
+            "title": "परतों को कोलाज में कनवर्ट करें",
+            "collageType": {
+                "verticalStack": "वर्टिकल स्टैक",
+                "horizontalStack": "क्षैतिज स्टैक",
+                "grid": "ग्रिड"
+            },
+            "params": {
+                "shared": {
+                    "reverseLayerOrder": "रिवर्स लेयर ऑर्डर"
+                },
+                "verticalStack": {
+                    "horizontalAlignment": "क्षैतिज संरेखण",
+                    "horizontalAlignmentOption": {
+                        "left": "बाएं",
+                        "center": "केंद्र",
+                        "right": "अधिकार"
+                    },
+                    "verticalMargin": "वर्टिकल मार्जिन"
+                },
+                "horizontalStack": {
+                    "verticalAlignment": "कार्यक्षेत्र संरेखण",
+                    "verticalAlignmentOption": {
+                        "top": "शीर्ष",
+                        "middle": "मध्य",
+                        "bottom": "नीचे"
+                    },
+                    "horizontalMargin": "क्षैतिज मार्जिन"
+                }
+            }
         }
     },
     "moduleGroup": {
@@ -654,6 +741,10 @@
                 "takePhoto": {
                     "name": "फोटो",
                     "description": "अपने कैमरे और कैमरे से एक तस्वीर लें और इसे छवि में डालें।."
+                },
+                "restoreBackup": {
+                    "name": "बैकअप पुनर्स्थापित करें छवि",
+                    "description": "संपादन के दौरान स्वचालित रूप से सहेजी गई बैकअप फ़ाइल को लोड करें।."
                 }
             }
         },
@@ -698,6 +789,10 @@
                 "paste": {
                     "name": "पेस्ट",
                     "description": "क्लिपबोर्ड से कैनवास पर चित्र डालें।."
+                },
+                "convertLayersToCollage": {
+                    "name": "परतों को कोलाज में कनवर्ट करें",
+                    "description": "चयनित परतों को एक छवि कोलाज में कनवर्ट करता है। कई अलग-अलग महाविद्यालय लेआउट उपलब्ध हैं।."
                 }
             }
         },
@@ -828,6 +923,20 @@
             "rotateClockwise": "रोटेट क्लॉकवे",
             "fit": "फिट",
             "flip": "फ्लिप"
+        },
+        "drawBrush": {
+            "brushColor": "ब्रश रंग",
+            "brushSize": "आकार"
+        },
+        "effect": {
+            "edit": {
+                "noLayersSelected": "अपने प्रभावों को संपादित करने के लिए कृपया परतों डॉक में एक या अधिक परतों का चयन करें।.",
+                "layerHasNoEffects": "इस परत का कोई प्रभाव नहीं है।.",
+                "deleteEffect": "निष्क्रिय प्रभाव"
+            }
+        },
+        "eraseBrush": {
+            "brushSize": "आकार"
         }
     },
     "toolGroup": {
@@ -887,6 +996,26 @@
             "tools": {
                 "name": "ज़ूम",
                 "description": "में ज़ूम और बाहर कैनवास को नियंत्रित करने के लिए कितनी छवि आप देख सकते हैं।."
+            }
+        },
+        "effect": {
+            "name": "प्रभाव",
+            "description": "परत रंग समायोजित करें, धुंधला और अन्य प्रभाव जोड़ें।.",
+            "tools": {
+                "brush": {
+                    "name": "प्रभाव",
+                    "description": "परतों पर प्रभाव का प्रबंधन करें।."
+                }
+            }
+        },
+        "erase": {
+            "name": "एरेस",
+            "description": "ब्रश, पेंसिल, पेन, जो मिटा देते हैं।.",
+            "tools": {
+                "brush": {
+                    "name": "एरेस ब्रश",
+                    "description": "रास्टर परतों से डेटा मिटाएं।."
+                }
             }
         }
     },
@@ -993,6 +1122,18 @@
                 "ctrlLeftClick": "Ctrl + लेफ्ट क्लिक",
                 "leftMouseButton": "बाएं माउस बटन"
             }
+        },
+        "effectToolIntroduction": {
+            "title": "प्रभाव उपकरण",
+            "introduction": [
+                "प्रभाव उपकरण उन परत प्रभावों को जोड़ने की अनुमति देता है जो रंगों को समायोजित कर सकते हैं और पूरी परत में अन्य उपयोगी कार्यों के सभी प्रकार कर सकते हैं। किसी भी समय प्रभाव को स्टैक किया जा सकता है और हटाया जा सकता है।."
+            ]
+        },
+        "eraseToolIntroduction": {
+            "title": "उपकरण",
+            "introduction": [
+                "मिटा उपकरण आपको परत के कुछ हिस्सों को हटाने की अनुमति देता है, जिससे उन्हें पारदर्शी बना दिया जाता है।."
+            ]
         }
     }
 }

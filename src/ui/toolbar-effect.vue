@@ -44,7 +44,10 @@
                                 v-for="layer of selectedLayers"
                                 :key="layer.id"
                             >
-                                <h3 v-t="layer.name" class="m-0" />
+                                <h3 class="m-0">
+                                    <i class="bi bi-layers mr-1" aria-hidden="true"></i>
+                                    <span class="ogr-toolbar--effect__edit-layer-name" v-t="layer.name" />
+                                </h3>
                                 <el-alert v-if="layer.filters.length == 0" type="warning" class="my-2" show-icon :closable="false">
                                     {{ $t('toolbar.effect.edit.layerHasNoEffects') }}
                                 </el-alert>

@@ -2099,6 +2099,15 @@ body.ogr-full-page {
             }
         }
     }
+    .ogr-toolbar--effect__edit-layer-name {
+        display: inline-block;
+        max-width: 20rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: top;
+        white-space: nowrap;
+    }
+
 
     .ogr-selection {
         position: absolute;

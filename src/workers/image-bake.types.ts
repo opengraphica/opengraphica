@@ -27,3 +27,15 @@ export interface FilterBakeResult {
     layerId: number;
     imageData: ImageData;
 }
+
+export interface FilterBakeError {
+    type: 'FILTER_BAKE_ERROR';
+    queueId: number;
+    layerId: number;
+    message: string;
+}
+
+export interface LogResponse {
+    type: 'LOG';
+    message: string;
+}

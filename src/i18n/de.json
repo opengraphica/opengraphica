@@ -39,7 +39,11 @@
         "updateLayer": "Update Layer",
         "updateDrawLayer": "Zeichnung auf Ebene",
         "updateLayerFilterParams": "Aktualisieren von Schichteffekten",
-        "updateSelectionCombineMode": "Auswahl aktualisieren Kombinieren Modus"
+        "updateSelectionCombineMode": "Auswahl aktualisieren Kombinieren Modus",
+        "convertLayersToCollage": "Ebenen nach Collage umrechnen",
+        "textTransformResize": "Textebene ändern",
+        "textTransformTranslate": "Textebene verschieben",
+        "updateEraseLayer": "Löschen von Layer"
     },
     "app": {
         "colorPickerGradient": {
@@ -118,7 +122,10 @@
         "settings": "Einstellungen",
         "take": "Nehmen",
         "takePhoto": "Foto machen",
-        "yes": "Ja"
+        "yes": "Ja",
+        "addEffect": "Effekt hinzufügen",
+        "editEffects": "Effekte bearbeiten",
+        "restoreLastImage": "Letztes Bild wiederherstellen"
     },
     "canvas": {
         "toolbar": {
@@ -153,7 +160,8 @@
                     "save": "Speichern",
                     "saveAs": "Speichern als",
                     "insertPhoto": "Ein Foto einfügen",
-                    "takePhoto": "Ein Foto machen"
+                    "takePhoto": "Ein Foto machen",
+                    "restore": "Letztes Bild wiederherstellen"
                 }
             },
             "image": {
@@ -163,7 +171,8 @@
                     "convertLayers": {
                         "groupTitle": "Ebenen umrechnen...",
                         "toImageSequence": "Zur Bildfolge",
-                        "flatten": "Flache bis neue Ebene"
+                        "flatten": "Flache bis neue Ebene",
+                        "toCollage": "Zu Collage"
                     },
                     "cut": "Schneiden",
                     "copy": "Kopie",
@@ -422,7 +431,12 @@
             "name": "Formblatt",
             "controls": {
                 "default": {
-                    "label": "Formblatt"
+                    "label": "Formblatt",
+                    "description": [
+                        null,
+                        "Bulge, Quetschbereiche des Bildes",
+                        "Einzelne Bereiche des Bildes"
+                    ]
                 }
             }
         },
@@ -430,7 +444,11 @@
             "name": "Zeichnung",
             "controls": {
                 "default": {
-                    "label": "Zeichnung"
+                    "label": "Zeichnung",
+                    "description": [
+                        "Kunstpinsel verwenden",
+                        "Formen oder Gradienten erstellen"
+                    ]
                 }
             }
         },
@@ -446,7 +464,10 @@
             "name": "Erase",
             "controls": {
                 "default": {
-                    "label": "Erase"
+                    "label": "Erase",
+                    "description": [
+                        "Löschen der Auswirkungen des Ziehwerkzeugs"
+                    ]
                 }
             }
         },
@@ -465,7 +486,8 @@
             "name": "Ebenen",
             "controls": {
                 "default": {
-                    "label": "Ebenen"
+                    "label": "Ebenen",
+                    "description": []
                 }
             }
         },
@@ -473,7 +495,8 @@
             "name": "Suche",
             "controls": {
                 "default": {
-                    "label": "Suche"
+                    "label": "Suche",
+                    "description": []
                 }
             }
         },
@@ -481,7 +504,11 @@
             "name": "Auswahl",
             "controls": {
                 "default": {
-                    "label": "Auswahl"
+                    "label": "Auswahl",
+                    "description": [
+                        "Einschränkung des Bearbeitungsbereichs",
+                        "Schnitt, Kopieren, bestimmte Bereiche löschen"
+                    ]
                 }
             }
         },
@@ -489,7 +516,8 @@
             "name": "Maßnahmen",
             "controls": {
                 "default": {
-                    "label": "Maßnahmen"
+                    "label": "Maßnahmen",
+                    "description": []
                 }
             }
         },
@@ -497,7 +525,11 @@
             "name": "Text",
             "controls": {
                 "default": {
-                    "label": "Text einfügen / bearbeiten"
+                    "label": "Text einfügen / bearbeiten",
+                    "description": [
+                        "Textschichten einfügen",
+                        "Bearbeiten von vorhandenen Textschichten"
+                    ]
                 }
             }
         },
@@ -505,7 +537,11 @@
             "name": "Bewegung / Transform",
             "controls": {
                 "default": {
-                    "label": "Bewegung / Transform"
+                    "label": "Bewegung / Transform",
+                    "description": [
+                        "Bewegung, Skala, rotieren Schichten",
+                        "Schichtgrenzen verwalten"
+                    ]
                 }
             }
         },
@@ -513,7 +549,23 @@
             "name": "Leinwand und wand",
             "controls": {
                 "default": {
-                    "label": "Zoom / Pan View"
+                    "label": "Zoom / Pan View",
+                    "description": [
+                        "Ein- und Aus Zoomen",
+                        "Pan oder drehen Sie die Ansicht"
+                    ]
+                }
+            }
+        },
+        "effect": {
+            "name": "Wirkung",
+            "controls": {
+                "default": {
+                    "label": "Wirkung",
+                    "description": [
+                        "Manipulierschichtfarben",
+                        "Fügen Sie Schichtfilter wie Bläheffekte hinzu"
+                    ]
                 }
             }
         }
@@ -524,6 +576,10 @@
                 "gotIt": "Verstanden",
                 "dontShowTips": "Keine Tipps anzeigen"
             }
+        },
+        "fontNotify": {
+            "title": "Schriftarten laden",
+            "pleaseWait": "Bitte warten Sie, diese Schriftarten werden geladen:"
         }
     },
     "measurement": {
@@ -616,6 +672,37 @@
         "renameLayer": {
             "title": "Rename Layer",
             "layerName": "Neuer Name"
+        },
+        "imageConvertLayersToCollage": {
+            "title": "Ebenen nach Collage umrechnen",
+            "collageType": {
+                "verticalStack": "Vertikaler Stapel",
+                "horizontalStack": "Horizontaler Stapel",
+                "grid": "Grid"
+            },
+            "params": {
+                "shared": {
+                    "reverseLayerOrder": "Reverse Layer Order"
+                },
+                "verticalStack": {
+                    "horizontalAlignment": "Horizontale Ausrichtung",
+                    "horizontalAlignmentOption": {
+                        "left": "Links",
+                        "center": "Zentrum",
+                        "right": "Richtig"
+                    },
+                    "verticalMargin": "Vertikaler Spielraum"
+                },
+                "horizontalStack": {
+                    "verticalAlignment": "Vertikale Ausrichtung",
+                    "verticalAlignmentOption": {
+                        "top": "Top",
+                        "middle": "Mittel",
+                        "bottom": "Boden"
+                    },
+                    "horizontalMargin": "Horizontale Marge"
+                }
+            }
         }
     },
     "moduleGroup": {
@@ -654,6 +741,10 @@
                 "takePhoto": {
                     "name": "Ein Foto machen",
                     "description": "Nehmen Sie ein Foto von Ihrer Kamera und Webcam und setzen Sie es in das Bild."
+                },
+                "restoreBackup": {
+                    "name": "Restore Backup Bild",
+                    "description": "Laden Sie die bei der Bearbeitung automatisch gespeicherte Sicherungsdatei."
                 }
             }
         },
@@ -698,6 +789,10 @@
                 "paste": {
                     "name": "Paste",
                     "description": "Bilder auf die Leinwand von der Zwischenablage einfügen."
+                },
+                "convertLayersToCollage": {
+                    "name": "Ebenen nach Collage umrechnen",
+                    "description": "Konvertiert die ausgewählten Schichten in eine Bildcollage. Es gibt viele verschiedene Collage-Layouts."
                 }
             }
         },
@@ -828,6 +923,20 @@
             "rotateClockwise": "Im Uhrzeigersinn drehen",
             "fit": "Passend für",
             "flip": "~"
+        },
+        "drawBrush": {
+            "brushColor": "Bürste Farbe",
+            "brushSize": "Größe"
+        },
+        "effect": {
+            "edit": {
+                "noLayersSelected": "Bitte wählen Sie eine oder mehrere Schichten im Layer-Dock, um ihre Effekte zu bearbeiten.",
+                "layerHasNoEffects": "Diese Schicht hat keine Auswirkungen.",
+                "deleteEffect": "Löscheffekt"
+            }
+        },
+        "eraseBrush": {
+            "brushSize": "Größe"
         }
     },
     "toolGroup": {
@@ -887,6 +996,26 @@
             "tools": {
                 "name": "Zoom",
                 "description": "Zoomen Sie ein und aus der Leinwand, um zu kontrollieren, wie viel des Bildes Sie sehen können."
+            }
+        },
+        "effect": {
+            "name": "Wirkung",
+            "description": "Passen Sie Schichtfarben, fügen Sie Blähungen und andere Effekte.",
+            "tools": {
+                "brush": {
+                    "name": "Wirkung",
+                    "description": "Verwalten Sie die Effekte auf Schichten."
+                }
+            }
+        },
+        "erase": {
+            "name": "Erase",
+            "description": "Bürste, Bleistifte, Stifte, die löschen.",
+            "tools": {
+                "brush": {
+                    "name": "Erase Brush",
+                    "description": "Löscht Daten aus Rasterschichten."
+                }
             }
         }
     },
@@ -993,6 +1122,18 @@
                 "ctrlLeftClick": "Ctrl + Linksklick",
                 "leftMouseButton": "Linke Maus"
             }
+        },
+        "effectToolIntroduction": {
+            "title": "Das Werkzeug",
+            "introduction": [
+                "Das Effekt-Tool ermöglicht es, Schichteffekte hinzuzufügen, die Farben einstellen und alle Arten von anderen nützlichen Operationen auf die gesamte Schicht tun können. Effekte können jederzeit gestapelt und entfernt werden."
+            ]
+        },
+        "eraseToolIntroduction": {
+            "title": "Erase Tool",
+            "introduction": [
+                "Das Löschwerkzeug ermöglicht es Ihnen, Teile der Schicht zu entfernen, so dass sie transparent."
+            ]
         }
     }
 }

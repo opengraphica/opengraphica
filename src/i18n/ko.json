@@ -39,7 +39,11 @@
         "updateLayer": "업데이트 층",
         "updateDrawLayer": "층에 끌기",
         "updateLayerFilterParams": "레이어 효과 업데이트",
-        "updateSelectionCombineMode": "업데이트 선택 Combine 모드"
+        "updateSelectionCombineMode": "업데이트 선택 Combine 모드",
+        "convertLayersToCollage": "레이어를 콜리지로 변환",
+        "textTransformResize": "Resize 텍스트 레이어",
+        "textTransformTranslate": "이동 텍스트 층",
+        "updateEraseLayer": "층의 Erase"
     },
     "app": {
         "colorPickerGradient": {
@@ -118,7 +122,10 @@
         "settings": "계정 설정",
         "take": "기타",
         "takePhoto": "본문 바로가기",
-        "yes": "이름 *"
+        "yes": "이름 *",
+        "addEffect": "추가 효과",
+        "editEffects": "편집 효과",
+        "restoreLastImage": "최근 이미지"
     },
     "canvas": {
         "toolbar": {
@@ -153,7 +160,8 @@
                     "save": "제품 정보",
                     "saveAs": "구매하기",
                     "insertPhoto": "사진 삽입",
-                    "takePhoto": "사진 찍기"
+                    "takePhoto": "사진 찍기",
+                    "restore": "최근 이미지"
                 }
             },
             "image": {
@@ -163,7 +171,8 @@
                     "convertLayers": {
                         "groupTitle": "층 변환 ...",
                         "toImageSequence": "본문 바로가기",
-                        "flatten": "평평한 에 새로운 층"
+                        "flatten": "평평한 에 새로운 층",
+                        "toCollage": "콜라겐"
                     },
                     "cut": "사이트맵",
                     "copy": "관련 기사",
@@ -422,7 +431,12 @@
             "name": "제품정보",
             "controls": {
                 "default": {
-                    "label": "제품정보"
+                    "label": "제품정보",
+                    "description": [
+                        null,
+                        "Bulge, 이미지의 pinch 지역",
+                        "이미지의 복제 영역"
+                    ]
                 }
             }
         },
@@ -430,7 +444,11 @@
             "name": "드로잉",
             "controls": {
                 "default": {
-                    "label": "드로잉"
+                    "label": "드로잉",
+                    "description": [
+                        "사용 예술 brushes",
+                        "모양 또는 gradients 만들기"
+                    ]
                 }
             }
         },
@@ -446,7 +464,10 @@
             "name": "언어 선택",
             "controls": {
                 "default": {
-                    "label": "언어 선택"
+                    "label": "언어 선택",
+                    "description": [
+                        "Draw tool의 효과를 제거"
+                    ]
                 }
             }
         },
@@ -465,7 +486,8 @@
             "name": "사이트맵",
             "controls": {
                 "default": {
-                    "label": "사이트맵"
+                    "label": "사이트맵",
+                    "description": []
                 }
             }
         },
@@ -473,7 +495,8 @@
             "name": "제품정보",
             "controls": {
                 "default": {
-                    "label": "제품정보"
+                    "label": "제품정보",
+                    "description": []
                 }
             }
         },
@@ -481,7 +504,11 @@
             "name": "제품정보",
             "controls": {
                 "default": {
-                    "label": "제품정보"
+                    "label": "제품정보",
+                    "description": [
+                        "편집 영역 제한",
+                        "잘라, 복사, 특정 영역을 삭제"
+                    ]
                 }
             }
         },
@@ -489,7 +516,8 @@
             "name": "팟캐스트",
             "controls": {
                 "default": {
-                    "label": "팟캐스트"
+                    "label": "팟캐스트",
+                    "description": []
                 }
             }
         },
@@ -497,7 +525,11 @@
             "name": "이름 *",
             "controls": {
                 "default": {
-                    "label": "삽입 / 편집 텍스트"
+                    "label": "삽입 / 편집 텍스트",
+                    "description": [
+                        "삽입 텍스트 층",
+                        "기존 텍스트 레이어를 편집"
+                    ]
                 }
             }
         },
@@ -505,7 +537,11 @@
             "name": "이동/변환",
             "controls": {
                 "default": {
-                    "label": "이동/변환"
+                    "label": "이동/변환",
+                    "description": [
+                        "이동, 가늠자, 자전 층",
+                        "층 경계 관리"
+                    ]
                 }
             }
         },
@@ -513,7 +549,23 @@
             "name": "캔버스 Viewport",
             "controls": {
                 "default": {
-                    "label": "줌 / 팬 뷰"
+                    "label": "줌 / 팬 뷰",
+                    "description": [
+                        "줌 및 밖으로",
+                        "팬 또는 시계"
+                    ]
+                }
+            }
+        },
+        "effect": {
+            "name": "제품 정보",
+            "controls": {
+                "default": {
+                    "label": "제품 정보",
+                    "description": [
+                        "층 색깔을 격리하십시오",
+                        "Blurring 효력과 같은 층 필터를 추가하십시오"
+                    ]
                 }
             }
         }
@@ -524,6 +576,10 @@
                 "gotIt": "뚱 베어",
                 "dontShowTips": "팁을 표시하지 마십시오"
             }
+        },
+        "fontNotify": {
+            "title": "관련 상품",
+            "pleaseWait": "이 폰트는 다음과 같이로드됩니다"
         }
     },
     "measurement": {
@@ -616,6 +672,37 @@
         "renameLayer": {
             "title": "이름 층",
             "layerName": "새로운 이름"
+        },
+        "imageConvertLayersToCollage": {
+            "title": "레이어를 콜리지로 변환",
+            "collageType": {
+                "verticalStack": "수직 더미",
+                "horizontalStack": "수평 스택",
+                "grid": "제품정보"
+            },
+            "params": {
+                "shared": {
+                    "reverseLayerOrder": "반전 층 순서"
+                },
+                "verticalStack": {
+                    "horizontalAlignment": "수평 정렬",
+                    "horizontalAlignmentOption": {
+                        "left": "왼쪽",
+                        "center": "- 연혁",
+                        "right": "지원하다"
+                    },
+                    "verticalMargin": "수직 마진"
+                },
+                "horizontalStack": {
+                    "verticalAlignment": "수직 정렬",
+                    "verticalAlignmentOption": {
+                        "top": "이름 *",
+                        "middle": "주요 특징",
+                        "bottom": "제품정보"
+                    },
+                    "horizontalMargin": "수평 마진"
+                }
+            }
         }
     },
     "moduleGroup": {
@@ -654,6 +741,10 @@
                 "takePhoto": {
                     "name": "사진 찍기",
                     "description": "카메라와 웹캠에서 사진을 찍고 이미지를 삽입합니다."
+                },
+                "restoreBackup": {
+                    "name": "백업 복구 (주)",
+                    "description": "백업 파일을 편집 중 자동으로 저장합니다."
                 }
             }
         },
@@ -698,6 +789,10 @@
                 "paste": {
                     "name": "이름 *",
                     "description": "클립보드에서 캔버스에 이미지를 삽입합니다."
+                },
+                "convertLayersToCollage": {
+                    "name": "레이어를 콜리지로 변환",
+                    "description": "선택한 레이어를 이미지 콜리지로 변환합니다. 많은 다른 collage 레이아웃이 있습니다."
                 }
             }
         },
@@ -828,6 +923,20 @@
             "rotateClockwise": "연락처",
             "fit": "제품 정보",
             "flip": "팟캐스트"
+        },
+        "drawBrush": {
+            "brushColor": "솔 색깔",
+            "brushSize": "크기 (mm)"
+        },
+        "effect": {
+            "edit": {
+                "noLayersSelected": "층 도크에 1 개 이상의 레이어를 선택하여 효과를 편집하십시오.",
+                "layerHasNoEffects": "이 층은 아무 효력도 없습니다.",
+                "deleteEffect": "삭제 효과"
+            }
+        },
+        "eraseBrush": {
+            "brushSize": "크기 (mm)"
         }
     },
     "toolGroup": {
@@ -887,6 +996,26 @@
             "tools": {
                 "name": "주 메뉴",
                 "description": "줌에서 캔버스를 제어하는 방법의 이미지를 볼 수 있습니다."
+            }
+        },
+        "effect": {
+            "name": "제품 정보",
+            "description": "층 색깔을 조정하고, blurring 및 다른 효력을 추가하십시오.",
+            "tools": {
+                "brush": {
+                    "name": "제품 정보",
+                    "description": "층의 효과 관리."
+                }
+            }
+        },
+        "erase": {
+            "name": "언어 선택",
+            "description": "솔, 연필, 펜, 그 지우기.",
+            "tools": {
+                "brush": {
+                    "name": "Erase 브러쉬",
+                    "description": "Raster 층의 데이터 삭제."
+                }
             }
         }
     },
@@ -993,6 +1122,18 @@
                 "ctrlLeftClick": "Ctrl + 왼쪽 클릭",
                 "leftMouseButton": "왼쪽 마우스 버튼"
             }
+        },
+        "effectToolIntroduction": {
+            "title": "효력 공구",
+            "introduction": [
+                "효과 도구는 색상을 조정할 수있는 층 효과를 추가하고 다른 유용한 작업의 모든 종류를 전체 레이어로 할 수 있습니다. 효력은 어떤 시간에 겹쳐 쌓이고 제거될 수 있습니다."
+            ]
+        },
+        "eraseToolIntroduction": {
+            "title": "Erase 도구",
+            "introduction": [
+                "지우개 도구는 층의 부품을 제거 할 수 있으므로 투명하게 만듭니다."
+            ]
         }
     }
 }

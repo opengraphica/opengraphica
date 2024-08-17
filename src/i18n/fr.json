@@ -39,7 +39,11 @@
         "updateLayer": "Mettre à jour le calque",
         "updateDrawLayer": "Dessiner sur le calque",
         "updateLayerFilterParams": "Mettre à jour l'effet calque",
-        "updateSelectionCombineMode": "Mettre à jour la sélection Combiner le mode"
+        "updateSelectionCombineMode": "Mettre à jour la sélection Combiner le mode",
+        "convertLayersToCollage": "Convertir les calques en collage",
+        "textTransformResize": "Redimensionner le calque texte",
+        "textTransformTranslate": "Déplacer le calque texte",
+        "updateEraseLayer": "Effacer du calque"
     },
     "app": {
         "colorPickerGradient": {
@@ -118,7 +122,10 @@
         "settings": "Paramètres",
         "take": "Prenez",
         "takePhoto": "Prendre une photo",
-        "yes": "Oui"
+        "yes": "Oui",
+        "addEffect": "Ajouter un effet",
+        "editEffects": "Modifier les effets",
+        "restoreLastImage": "Restauration de la dernière image"
     },
     "canvas": {
         "toolbar": {
@@ -153,7 +160,8 @@
                     "save": "Enregistrer",
                     "saveAs": "Enregistrer sous",
                     "insertPhoto": "Insérer une photo",
-                    "takePhoto": "Prenez une photo"
+                    "takePhoto": "Prenez une photo",
+                    "restore": "Restauration de la dernière image"
                 }
             },
             "image": {
@@ -163,7 +171,8 @@
                     "convertLayers": {
                         "groupTitle": "Convertir les calques...",
                         "toImageSequence": "Séquence d'image",
-                        "flatten": "Aplatir vers un nouveau calque"
+                        "flatten": "Aplatir vers un nouveau calque",
+                        "toCollage": "Vers le collage"
                     },
                     "cut": "Couper",
                     "copy": "Copier",
@@ -422,7 +431,12 @@
             "name": "Déformation",
             "controls": {
                 "default": {
-                    "label": "Déformation"
+                    "label": "Déformation",
+                    "description": [
+                        "Aiguiser ou brouiller l'image",
+                        "Ampoule, pincer les zones de l'image",
+                        "Zones clonées de l'image"
+                    ]
                 }
             }
         },
@@ -430,7 +444,11 @@
             "name": "Dessiner",
             "controls": {
                 "default": {
-                    "label": "Dessiner"
+                    "label": "Dessiner",
+                    "description": [
+                        "Utiliser des pinceaux d'art",
+                        "Créer des formes ou des gradients"
+                    ]
                 }
             }
         },
@@ -446,7 +464,10 @@
             "name": "Effacer",
             "controls": {
                 "default": {
-                    "label": "Effacer"
+                    "label": "Effacer",
+                    "description": [
+                        "Effacer les effets de l'outil de tirage"
+                    ]
                 }
             }
         },
@@ -465,7 +486,8 @@
             "name": "Calque",
             "controls": {
                 "default": {
-                    "label": "Calque"
+                    "label": "Calque",
+                    "description": []
                 }
             }
         },
@@ -473,7 +495,8 @@
             "name": "Rechercher",
             "controls": {
                 "default": {
-                    "label": "Rechercher"
+                    "label": "Rechercher",
+                    "description": []
                 }
             }
         },
@@ -481,7 +504,11 @@
             "name": "Sélection",
             "controls": {
                 "default": {
-                    "label": "Sélection"
+                    "label": "Sélection",
+                    "description": [
+                        "Limiter la zone de montage",
+                        "Couper, copier, supprimer des zones spécifiques"
+                    ]
                 }
             }
         },
@@ -489,7 +516,8 @@
             "name": "Actions",
             "controls": {
                 "default": {
-                    "label": "Actions"
+                    "label": "Actions",
+                    "description": []
                 }
             }
         },
@@ -497,7 +525,11 @@
             "name": "Texte",
             "controls": {
                 "default": {
-                    "label": "Insérer / Modifier le texte"
+                    "label": "Insérer / Modifier le texte",
+                    "description": [
+                        "Insérer des calques de texte",
+                        "Modifier les calques de texte existants"
+                    ]
                 }
             }
         },
@@ -505,7 +537,11 @@
             "name": "Déplacer / Transformer",
             "controls": {
                 "default": {
-                    "label": "Déplacer / Transformer"
+                    "label": "Déplacer / Transformer",
+                    "description": [
+                        "Déplacement, échelle, rotation des couches",
+                        "Gérer les limites des couches"
+                    ]
                 }
             }
         },
@@ -513,7 +549,23 @@
             "name": "Vue sur toile",
             "controls": {
                 "default": {
-                    "label": "Zoom / Vue panoramique"
+                    "label": "Zoom / Vue panoramique",
+                    "description": [
+                        "Zoom avant et arrière",
+                        "Pan ou tourner la vue"
+                    ]
+                }
+            }
+        },
+        "effect": {
+            "name": "Effet",
+            "controls": {
+                "default": {
+                    "label": "Effet",
+                    "description": [
+                        "Manipuler les couleurs des couches",
+                        "Ajouter des filtres de calques, tels que les effets de flou"
+                    ]
                 }
             }
         }
@@ -524,6 +576,10 @@
                 "gotIt": "Compris",
                 "dontShowTips": "Ne pas montrer des conseils"
             }
+        },
+        "fontNotify": {
+            "title": "Chargement des polices",
+            "pleaseWait": "Veuillez patienter, ces polices sont chargées :"
         }
     },
     "measurement": {
@@ -616,6 +672,37 @@
         "renameLayer": {
             "title": "Renommer le calque",
             "layerName": "Nouveau nom"
+        },
+        "imageConvertLayersToCollage": {
+            "title": "Convertir les calques en collage",
+            "collageType": {
+                "verticalStack": "Empil vertical",
+                "horizontalStack": "Empil horizontal",
+                "grid": "Grille"
+            },
+            "params": {
+                "shared": {
+                    "reverseLayerOrder": "Ordre inverse des calques"
+                },
+                "verticalStack": {
+                    "horizontalAlignment": "Alignement horizontal",
+                    "horizontalAlignmentOption": {
+                        "left": "Gauche",
+                        "center": "Centre",
+                        "right": "Droite"
+                    },
+                    "verticalMargin": "Marge verticale"
+                },
+                "horizontalStack": {
+                    "verticalAlignment": "Alignement vertical",
+                    "verticalAlignmentOption": {
+                        "top": "Haut",
+                        "middle": "Moyenne",
+                        "bottom": "Bas"
+                    },
+                    "horizontalMargin": "Marge horizontale"
+                }
+            }
         }
     },
     "moduleGroup": {
@@ -654,6 +741,10 @@
                 "takePhoto": {
                     "name": "Prenez une photo",
                     "description": "Prenez une photo de votre appareil photo et de votre webcam et insérez-la dans l'image."
+                },
+                "restoreBackup": {
+                    "name": "Restaurer la sauvegarde Image",
+                    "description": "Chargez le fichier de sauvegarde enregistré automatiquement lors de l'édition."
                 }
             }
         },
@@ -698,6 +789,10 @@
                 "paste": {
                     "name": "Pâte",
                     "description": "Insérez des images sur la toile depuis le presse-papiers."
+                },
+                "convertLayersToCollage": {
+                    "name": "Convertir les calques en collage",
+                    "description": "Convertit les couches sélectionnées en collage d'image. Il existe de nombreux aménagements de collage différents."
                 }
             }
         },
@@ -828,6 +923,20 @@
             "rotateClockwise": "Rotation dans le sens horaire",
             "fit": "Convient",
             "flip": "Flip"
+        },
+        "drawBrush": {
+            "brushColor": "Couleur de la brosse",
+            "brushSize": "Taille"
+        },
+        "effect": {
+            "edit": {
+                "noLayersSelected": "Veuillez sélectionner un ou plusieurs calques dans le dock des calques afin de modifier leurs effets.",
+                "layerHasNoEffects": "Cette couche n'a aucun effet.",
+                "deleteEffect": "Supprimer l'effet"
+            }
+        },
+        "eraseBrush": {
+            "brushSize": "Taille"
         }
     },
     "toolGroup": {
@@ -887,6 +996,26 @@
             "tools": {
                 "name": "Zoom",
                 "description": "Zoomez sur la toile pour contrôler la quantité d'image que vous pouvez voir."
+            }
+        },
+        "effect": {
+            "name": "Effet",
+            "description": "Ajuster les couleurs des couches, ajouter le flou et d'autres effets.",
+            "tools": {
+                "brush": {
+                    "name": "Effet",
+                    "description": "Gérer les effets sur les couches."
+                }
+            }
+        },
+        "erase": {
+            "name": "Effacer",
+            "description": "Brosses, crayons, stylos, qui effacent.",
+            "tools": {
+                "brush": {
+                    "name": "Effacer le pinceau",
+                    "description": "Efface les données des couches raster."
+                }
             }
         }
     },
@@ -993,6 +1122,18 @@
                 "ctrlLeftClick": "Ctrl + clic gauche",
                 "leftMouseButton": "Bouton gauche de la souris"
             }
+        },
+        "effectToolIntroduction": {
+            "title": "Outil d'effet",
+            "introduction": [
+                "L'outil d'effet permet d'ajouter des effets de couche qui peuvent ajuster les couleurs et faire toutes sortes d'autres opérations utiles à la couche entière. Les effets peuvent être empilés et enlevés à tout moment."
+            ]
+        },
+        "eraseToolIntroduction": {
+            "title": "Effacer l'outil",
+            "introduction": [
+                "L'outil d'effacement vous permet de supprimer des parties du calque, les rendant transparents."
+            ]
         }
     }
 }

@@ -39,7 +39,11 @@
         "updateLayer": "更新層",
         "updateDrawLayer": "レイヤーを描画する",
         "updateLayerFilterParams": "レイヤー効果の更新",
-        "updateSelectionCombineMode": "選択のコンバインのモードを更新して下さい"
+        "updateSelectionCombineMode": "選択のコンバインのモードを更新して下さい",
+        "convertLayersToCollage": "レイヤーをコラージュに変換する",
+        "textTransformResize": "テキストレイヤーのサイズ変更",
+        "textTransformTranslate": "テキストレイヤーの移動",
+        "updateEraseLayer": "層からの消去"
     },
     "app": {
         "colorPickerGradient": {
@@ -118,7 +122,10 @@
         "settings": "コンテンツ",
         "take": "お問い合わせ",
         "takePhoto": "写真を撮る",
-        "yes": "お問い合わせ"
+        "yes": "お問い合わせ",
+        "addEffect": "エフェクトの追加",
+        "editEffects": "エフェクトの編集",
+        "restoreLastImage": "最後の画像を復元する"
     },
     "canvas": {
         "toolbar": {
@@ -153,7 +160,8 @@
                     "save": "保存する",
                     "saveAs": "保存 として",
                     "insertPhoto": "写真をインサートする",
-                    "takePhoto": "写真を撮る"
+                    "takePhoto": "写真を撮る",
+                    "restore": "最後の画像を復元する"
                 }
             },
             "image": {
@@ -163,7 +171,8 @@
                     "convertLayers": {
                         "groupTitle": "レイヤーを変換...",
                         "toImageSequence": "画像シーケンスへ",
-                        "flatten": "新しい層に平らに"
+                        "flatten": "新しい層に平らに",
+                        "toCollage": "コラージュへ"
                     },
                     "cut": "カット",
                     "copy": "コピー",
@@ -422,7 +431,12 @@
             "name": "デフォーム",
             "controls": {
                 "default": {
-                    "label": "デフォーム"
+                    "label": "デフォーム",
+                    "description": [
+                        null,
+                        "膨らみ、イメージのピンチ領域",
+                        "画像の領域をクローンする"
+                    ]
                 }
             }
         },
@@ -430,7 +444,11 @@
             "name": "ドロー",
             "controls": {
                 "default": {
-                    "label": "ドロー"
+                    "label": "ドロー",
+                    "description": [
+                        "アートブラシの使用",
+                        "形状やグラデーションを作成する"
+                    ]
                 }
             }
         },
@@ -446,7 +464,10 @@
             "name": "リリース",
             "controls": {
                 "default": {
-                    "label": "リリース"
+                    "label": "リリース",
+                    "description": [
+                        "描画ツールの効果を消去する"
+                    ]
                 }
             }
         },
@@ -465,7 +486,8 @@
             "name": "レイヤー",
             "controls": {
                 "default": {
-                    "label": "レイヤー"
+                    "label": "レイヤー",
+                    "description": []
                 }
             }
         },
@@ -473,7 +495,8 @@
             "name": "インフォメーション",
             "controls": {
                 "default": {
-                    "label": "インフォメーション"
+                    "label": "インフォメーション",
+                    "description": []
                 }
             }
         },
@@ -481,7 +504,11 @@
             "name": "セレクション",
             "controls": {
                 "default": {
-                    "label": "セレクション"
+                    "label": "セレクション",
+                    "description": [
+                        "編集エリアの制限",
+                        "特定の領域をカット、コピー、削除"
+                    ]
                 }
             }
         },
@@ -489,7 +516,8 @@
             "name": "アクション",
             "controls": {
                 "default": {
-                    "label": "アクション"
+                    "label": "アクション",
+                    "description": []
                 }
             }
         },
@@ -497,7 +525,11 @@
             "name": "テキスト",
             "controls": {
                 "default": {
-                    "label": "テキストの入力/編集"
+                    "label": "テキストの入力/編集",
+                    "description": [
+                        "テキストレイヤーのインサート",
+                        "既存のテキストレイヤーの編集"
+                    ]
                 }
             }
         },
@@ -505,7 +537,11 @@
             "name": "移動/変換",
             "controls": {
                 "default": {
-                    "label": "移動/変換"
+                    "label": "移動/変換",
+                    "description": [
+                        "移動、スケール、回転層",
+                        "レイヤー境界を管理する"
+                    ]
                 }
             }
         },
@@ -513,7 +549,23 @@
             "name": "キャンバスビューポート",
             "controls": {
                 "default": {
-                    "label": "ズーム/パンの眺め"
+                    "label": "ズーム/パンの眺め",
+                    "description": [
+                        "ズームインとアウト",
+                        "パンまたはビューを回転させる"
+                    ]
+                }
+            }
+        },
+        "effect": {
+            "name": "エフェクト",
+            "controls": {
+                "default": {
+                    "label": "エフェクト",
+                    "description": [
+                        "層色を操作する",
+                        "鈍化効果のような層フィルターを加えて下さい、"
+                    ]
                 }
             }
         }
@@ -524,6 +576,10 @@
                 "gotIt": "お問い合わせ",
                 "dontShowTips": "ヒントを表示しないでください"
             }
+        },
+        "fontNotify": {
+            "title": "フォントの読み込み",
+            "pleaseWait": "お待ちください。これらのフォントは読み込まれています"
         }
     },
     "measurement": {
@@ -616,6 +672,37 @@
         "renameLayer": {
             "title": "レイヤーの名前を変更",
             "layerName": "新しい名前"
+        },
+        "imageConvertLayersToCollage": {
+            "title": "レイヤーをコラージュに変換する",
+            "collageType": {
+                "verticalStack": "縦の積み重ね",
+                "horizontalStack": "水平スタック",
+                "grid": "グリッド"
+            },
+            "params": {
+                "shared": {
+                    "reverseLayerOrder": "逆の層の発注"
+                },
+                "verticalStack": {
+                    "horizontalAlignment": "横の直線",
+                    "horizontalAlignmentOption": {
+                        "left": "ふりがな",
+                        "center": "センター",
+                        "right": "アクセス"
+                    },
+                    "verticalMargin": "垂直マージン"
+                },
+                "horizontalStack": {
+                    "verticalAlignment": "縦の直線",
+                    "verticalAlignmentOption": {
+                        "top": "トップページ",
+                        "middle": "ミドル",
+                        "bottom": "ボトム"
+                    },
+                    "horizontalMargin": "水平マージン"
+                }
+            }
         }
     },
     "moduleGroup": {
@@ -654,6 +741,10 @@
                 "takePhoto": {
                     "name": "写真を撮る",
                     "description": "カメラとウェブカムから写真を撮ってイメージに挿します."
+                },
+                "restoreBackup": {
+                    "name": "バックアップを復元する サイトマップ",
+                    "description": "編集時に自動的に保存されたバックアップファイルを読み込みます."
                 }
             }
         },
@@ -698,6 +789,10 @@
                 "paste": {
                     "name": "ペースト",
                     "description": "クリップボードからキャンバスに画像をインサートします."
+                },
+                "convertLayersToCollage": {
+                    "name": "レイヤーをコラージュに変換する",
+                    "description": "選択したレイヤーをイメージコラージュに変換します。 さまざまなコラージュのレイアウトがあります."
                 }
             }
         },
@@ -828,6 +923,20 @@
             "rotateClockwise": "時計回りの回転",
             "fit": "フィット",
             "flip": "フリップ"
+        },
+        "drawBrush": {
+            "brushColor": "ブラシ色",
+            "brushSize": "サイズ:"
+        },
+        "effect": {
+            "edit": {
+                "noLayersSelected": "エフェクトを編集するために、レイヤードック内のレイヤーを1つ以上選択してください.",
+                "layerHasNoEffects": "このレイヤーは効果がありません.",
+                "deleteEffect": "効果の削除"
+            }
+        },
+        "eraseBrush": {
+            "brushSize": "サイズ:"
         }
     },
     "toolGroup": {
@@ -887,6 +996,26 @@
             "tools": {
                 "name": "ズーム",
                 "description": "あなたが見ることができるイメージの量を制御するためにキャンバスをズームアウトします."
+            }
+        },
+        "effect": {
+            "name": "エフェクト",
+            "description": "レイヤーの色を調整し、ブルーリングやその他の効果を追加します.",
+            "tools": {
+                "brush": {
+                    "name": "エフェクト",
+                    "description": "レイヤーのエフェクトを管理します."
+                }
+            }
+        },
+        "erase": {
+            "name": "リリース",
+            "description": "ブラシ、鉛筆、ペン、消去.",
+            "tools": {
+                "brush": {
+                    "name": "消去ブラシ",
+                    "description": "ラスター層からデータを消去します."
+                }
             }
         }
     },
@@ -993,6 +1122,18 @@
                 "selectionCombineMode": "選択 結合モード"
             },
             "title": "選択ツール"
+        },
+        "effectToolIntroduction": {
+            "title": "エフェクトツール",
+            "introduction": [
+                "効果ツールは、色を調整し、レイヤー全体に他の有用な操作のすべての種類を行うことができるレイヤー効果を追加することができます。 効果はいつでも積み重ねられ、取除くことができます."
+            ]
+        },
+        "eraseToolIntroduction": {
+            "title": "消去ツール",
+            "introduction": [
+                "消去ツールを使用すると、レイヤーの部分を削除し、透明にすることができます."
+            ]
         }
     }
 }

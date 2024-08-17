@@ -39,7 +39,11 @@
         "updateLayer": "به روز رسانی Layer",
         "updateDrawLayer": "روی Layer",
         "updateLayerFilterParams": "به روز رسانی Layer Effect",
-        "updateSelectionCombineMode": "گزینه Update Selection Mode"
+        "updateSelectionCombineMode": "گزینه Update Selection Mode",
+        "convertLayersToCollage": "تبدیل لایه ها به Collage",
+        "textTransformResize": "Resize Text Layer",
+        "textTransformTranslate": "Move Text Layer",
+        "updateEraseLayer": "Erase از Layer"
     },
     "app": {
         "colorPickerGradient": {
@@ -118,7 +122,10 @@
         "settings": "تنظیمات",
         "take": "Take",
         "takePhoto": "عکس بگیرید",
-        "yes": "بله"
+        "yes": "بله",
+        "addEffect": "اضافه کردن اثر",
+        "editEffects": "ویژگی های Edit Effects",
+        "restoreLastImage": "آخرین تصویر"
     },
     "canvas": {
         "toolbar": {
@@ -153,7 +160,8 @@
                     "save": "Save",
                     "saveAs": "صرفه جویی در",
                     "insertPhoto": "وارد کردن یک عکس",
-                    "takePhoto": "یک عکس بگیرید"
+                    "takePhoto": "یک عکس بگیرید",
+                    "restore": "آخرین تصویر"
                 }
             },
             "image": {
@@ -163,7 +171,8 @@
                     "convertLayers": {
                         "groupTitle": "لایه های تبدیل ...",
                         "toImageSequence": "تصویر Sequence",
-                        "flatten": "تخت تا لایه جدید"
+                        "flatten": "تخت تا لایه جدید",
+                        "toCollage": "برای Collage"
                     },
                     "cut": "Cut",
                     "copy": "کپی رایت",
@@ -422,7 +431,12 @@
             "name": "Deform",
             "controls": {
                 "default": {
-                    "label": "Deform"
+                    "label": "Deform",
+                    "description": [
+                        null,
+                        "بالژ، مناطق ظریف تصویر",
+                        "مناطق Clone از تصویر"
+                    ]
                 }
             }
         },
@@ -430,7 +444,11 @@
             "name": "Draw",
             "controls": {
                 "default": {
-                    "label": "Draw"
+                    "label": "Draw",
+                    "description": [
+                        "استفاده از برس های هنری",
+                        "ایجاد اشکال یا گرادیان"
+                    ]
                 }
             }
         },
@@ -446,7 +464,10 @@
             "name": "Erase",
             "controls": {
                 "default": {
-                    "label": "Erase"
+                    "label": "Erase",
+                    "description": [
+                        "حذف اثرات ابزار قرعه کشی"
+                    ]
                 }
             }
         },
@@ -465,7 +486,8 @@
             "name": "لایه ها",
             "controls": {
                 "default": {
-                    "label": "لایه ها"
+                    "label": "لایه ها",
+                    "description": []
                 }
             }
         },
@@ -473,7 +495,8 @@
             "name": "جستجو",
             "controls": {
                 "default": {
-                    "label": "جستجو"
+                    "label": "جستجو",
+                    "description": []
                 }
             }
         },
@@ -481,7 +504,11 @@
             "name": "انتخاب",
             "controls": {
                 "default": {
-                    "label": "انتخاب"
+                    "label": "انتخاب",
+                    "description": [
+                        "محدود کردن منطقه ویرایش",
+                        "برش، کپی، حذف مناطق خاص"
+                    ]
                 }
             }
         },
@@ -489,7 +516,8 @@
             "name": "اقدامات",
             "controls": {
                 "default": {
-                    "label": "اقدامات"
+                    "label": "اقدامات",
+                    "description": []
                 }
             }
         },
@@ -497,7 +525,11 @@
             "name": "متن",
             "controls": {
                 "default": {
-                    "label": "Insert / Edit Text"
+                    "label": "Insert / Edit Text",
+                    "description": [
+                        "لایه های متن Insert text Layer",
+                        "لایه های متن موجود"
+                    ]
                 }
             }
         },
@@ -505,7 +537,11 @@
             "name": "حرکت / Transform",
             "controls": {
                 "default": {
-                    "label": "حرکت / Transform"
+                    "label": "حرکت / Transform",
+                    "description": [
+                        "حرکت، مقیاس، لایه های چرخش",
+                        "مدیریت مرزهای لایه"
+                    ]
                 }
             }
         },
@@ -513,7 +549,23 @@
             "name": "معرفی بازی Canvas Viewport",
             "controls": {
                 "default": {
-                    "label": "زوم / Pan View"
+                    "label": "زوم / Pan View",
+                    "description": [
+                        "Zoom در داخل و خارج",
+                        "پان یا چرخش دیدگاه"
+                    ]
+                }
+            }
+        },
+        "effect": {
+            "name": "اثر",
+            "controls": {
+                "default": {
+                    "label": "اثر",
+                    "description": [
+                        "رنگ های لایه Manipulate",
+                        "اضافه کردن فیلترهای لایه، مانند اثرات مبهم"
+                    ]
                 }
             }
         }
@@ -524,6 +576,10 @@
                 "gotIt": "It Got It",
                 "dontShowTips": "نکات را نشان ندهید"
             }
+        },
+        "fontNotify": {
+            "title": "دانلود آهنگ Britney Fonts",
+            "pleaseWait": "لطفا صبر کنید، این فونت ها بارگذاری می شوند:"
         }
     },
     "measurement": {
@@ -614,6 +670,37 @@
         "renameLayer": {
             "title": "لایه Rename Layer",
             "layerName": "نام جدید"
+        },
+        "imageConvertLayersToCollage": {
+            "title": "تبدیل لایه ها به Collage",
+            "collageType": {
+                "verticalStack": "عمودی",
+                "horizontalStack": "افقی Stack",
+                "grid": "Grid"
+            },
+            "params": {
+                "shared": {
+                    "reverseLayerOrder": "دستور Layer Order"
+                },
+                "verticalStack": {
+                    "horizontalAlignment": "افقی Alignment",
+                    "horizontalAlignmentOption": {
+                        "left": "چپ",
+                        "center": "مرکز مرکزی",
+                        "right": "حق راست"
+                    },
+                    "verticalMargin": "حاشیه عمودی"
+                },
+                "horizontalStack": {
+                    "verticalAlignment": "اعتبار عمودی",
+                    "verticalAlignmentOption": {
+                        "top": "Top",
+                        "middle": "خاورمیانه",
+                        "bottom": "پایین"
+                    },
+                    "horizontalMargin": "حاشیه افقی"
+                }
+            }
         }
     },
     "moduleGroup": {
@@ -652,6 +739,10 @@
                 "takePhoto": {
                     "name": "یک عکس بگیرید",
                     "description": "یک عکس از دوربین و وب سایت خود بگیرید و آن را در تصویر قرار دهید."
+                },
+                "restoreBackup": {
+                    "name": "بازیابی پشتیبان تصویر تصویر",
+                    "description": "فایل پشتیبان را به طور خودکار در طول ویرایش ذخیره کنید."
                 }
             }
         },
@@ -696,6 +787,10 @@
                 "paste": {
                     "name": "پاستور",
                     "description": "تصاویر را روی بوم از کلیپبورد قرار دهید."
+                },
+                "convertLayersToCollage": {
+                    "name": "تبدیل لایه ها به Collage",
+                    "description": "تبدیل لایه های انتخاب شده به یک کلاژ تصویر. طرح های کلی مختلفی در دسترس هستند."
                 }
             }
         },
@@ -826,6 +921,20 @@
             "rotateClockwise": "چرخش ساعت",
             "fit": "Fit",
             "flip": "Flip"
+        },
+        "drawBrush": {
+            "brushColor": "Brush Color",
+            "brushSize": "اندازه"
+        },
+        "effect": {
+            "edit": {
+                "noLayersSelected": "لطفا یک یا چند لایه را در لوله انتخاب کنید تا اثرات آن را ویرایش کنید.",
+                "layerHasNoEffects": "این لایه هیچ اثری ندارد.",
+                "deleteEffect": "حذف اثر"
+            }
+        },
+        "eraseBrush": {
+            "brushSize": "اندازه"
         }
     },
     "toolGroup": {
@@ -885,6 +994,26 @@
             "tools": {
                 "name": "Zoom",
                 "description": "زوم در داخل و خارج از بوم برای کنترل میزان تصویر که می توانید ببینید."
+            }
+        },
+        "effect": {
+            "name": "اثر",
+            "description": "رنگ های لایه تنظیم شده، اضافه کردن تار و سایر اثرات.",
+            "tools": {
+                "brush": {
+                    "name": "اثر",
+                    "description": "اثرات بر لایه ها را مدیریت کنید."
+                }
+            }
+        },
+        "erase": {
+            "name": "Erase",
+            "description": "قلم، مداد، قلم، که پاک می شود.",
+            "tools": {
+                "brush": {
+                    "name": "Erase Brush",
+                    "description": "داده ها را از لایه های raster دور می کند."
+                }
             }
         }
     },
@@ -991,6 +1120,18 @@
                 "ctrlLeftClick": "Ctrl + Left Click",
                 "leftMouseButton": "دکمه چپ"
             }
+        },
+        "effectToolIntroduction": {
+            "title": "ابزار اثر",
+            "introduction": [
+                "ابزار اثر اجازه می دهد تا اثرات لایه را اضافه کند که می تواند رنگ ها را تنظیم کند و انواع دیگر عملیات مفید را به کل لایه انجام دهد. اثرات را می توان در هر زمان جمع آوری و حذف کرد."
+            ]
+        },
+        "eraseToolIntroduction": {
+            "title": "ابزار Erase Tool",
+            "introduction": [
+                "ابزار پاک به شما اجازه می دهد تا بخش هایی از لایه را حذف کنید و آنها را شفاف کنید."
+            ]
         }
     }
 }

@@ -12,7 +12,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, Ref, computed, watch, watchEffect, inject, toRefs, onMounted, onUnmounted, markRaw } from 'vue';
+import {
+    computed, defineComponent, inject, markRaw, nextTick, onMounted,
+    onUnmounted, ref, toRefs, watch, watchEffect, type Ref
+} from 'vue';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
@@ -336,6 +339,8 @@ export default defineComponent({
                 // Set up pica image rescaler
                 await initializePica();
             }
+
+            document.addEventListener('visibilitychange', onDocumentVisibilityChange);
             
             loading.value = false;
             appEmitter.emit('app.canvas.ready');
@@ -343,6 +348,7 @@ export default defineComponent({
 
         onUnmounted(() => {
             appEmitter.off('app.canvas.resetTransform', resetTransform);
+            document.removeEventListener('visibilitychange', onDocumentVisibilityChange);
         });
 
         // Set up canvas for webgl rendering
@@ -848,6 +854,22 @@ export default defineComponent({
             }
         }
 
+        function onDocumentVisibilityChange() {
+            if (document.visibilityState === 'visible' && loading.value === false) {
+                const threejsRenderer = canvasStore.get('threejsRenderer');
+                if (threejsRenderer) {
+                    threejsRenderer.forceContextLoss();
+                    requestAnimationFrame(() => {
+                        threejsRenderer.forceContextRestore();
+                        requestAnimationFrame(() => {
+                            canvasStore.set('dirty', true);
+                            renderMainCanvas();
+                        });
+                    });
+                }
+            }
+        }
+
         return {
             loading,
             canvas,
@@ -861,7 +883,7 @@ export default defineComponent({
             isPixelatedZoomLevel,
             useCanvasBackground,
             usePostProcess,
-            useCssViewport
+            useCssViewport,
         };
     }
 });

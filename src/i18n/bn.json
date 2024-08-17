@@ -39,7 +39,11 @@
         "updateLayer": "আপডেট",
         "updateDrawLayer": "স্তর সহ আঁকো",
         "updateLayerFilterParams": "ইফেক্ট আপডেট করা হবে",
-        "updateSelectionCombineMode": "আপডেট করার মোড"
+        "updateSelectionCombineMode": "আপডেট করার মোড",
+        "convertLayersToCollage": "স্তর রূপান্তর করো",
+        "textTransformResize": "হরফের ছাঁদ পরিবর্তন করুন",
+        "textTransformTranslate": "টেক্সট স্তর",
+        "updateEraseLayer": "স্তর থেকে মুছে ফেলুন"
     },
     "app": {
         "colorPickerGradient": {
@@ -118,7 +122,10 @@
         "settings": "বৈশিষ্ট্য",
         "take": "নিয়ে যাও",
         "takePhoto": "ফটো নিন",
-        "yes": "হ্যাঁ"
+        "yes": "হ্যাঁ",
+        "addEffect": "ইফেক্ট যোগ করুন",
+        "editEffects": "আবহ (_E)",
+        "restoreLastImage": "সর্বশেষ ছবি পুনরায় লোড করুন"
     },
     "canvas": {
         "toolbar": {
@@ -153,7 +160,8 @@
                     "save": "সংরক্ষণ",
                     "saveAs": "নতুন নামে সংরক্ষণ",
                     "insertPhoto": "একটি ছবি সন্নিবেশ করুন",
-                    "takePhoto": "একটি ফটো নিন"
+                    "takePhoto": "একটি ফটো নিন",
+                    "restore": "সর্বশেষ ছবি পুনরায় লোড করুন"
                 }
             },
             "image": {
@@ -163,7 +171,8 @@
                     "convertLayers": {
                         "groupTitle": "স্তর রূপান্তর করো...",
                         "toImageSequence": "ক্রমপর্যায়ের",
-                        "flatten": "সমতল"
+                        "flatten": "সমতল",
+                        "toCollage": "কোজ"
                     },
                     "cut": "কাট করুন",
                     "copy": "কপি করুন",
@@ -422,7 +431,12 @@
             "name": "ডিফর্ম",
             "controls": {
                 "default": {
-                    "label": "ডিফর্ম"
+                    "label": "ডিফর্ম",
+                    "description": [
+                        null,
+                        "পুল, ছবিটির চিমভাগ",
+                        "ছবির ক্লোনড স্থান"
+                    ]
                 }
             }
         },
@@ -430,7 +444,11 @@
             "name": "অঙ্কন",
             "controls": {
                 "default": {
-                    "label": "অঙ্কন"
+                    "label": "অঙ্কন",
+                    "description": [
+                        "আর্ট স্কোয়ার ব্যবহার করুন",
+                        "গঠন করুন"
+                    ]
                 }
             }
         },
@@ -446,7 +464,10 @@
             "name": "মুছে ফেলুন",
             "controls": {
                 "default": {
-                    "label": "মুছে ফেলুন"
+                    "label": "মুছে ফেলুন",
+                    "description": [
+                        "অঙ্কন টুলের প্রভাব মুছে ফেলুন"
+                    ]
                 }
             }
         },
@@ -465,7 +486,8 @@
             "name": "স্তর",
             "controls": {
                 "default": {
-                    "label": "স্তর"
+                    "label": "স্তর",
+                    "description": []
                 }
             }
         },
@@ -473,7 +495,8 @@
             "name": "অনুসন্ধান",
             "controls": {
                 "default": {
-                    "label": "অনুসন্ধান"
+                    "label": "অনুসন্ধান",
+                    "description": []
                 }
             }
         },
@@ -481,7 +504,11 @@
             "name": "নির্বাচন",
             "controls": {
                 "default": {
-                    "label": "নির্বাচন"
+                    "label": "নির্বাচন",
+                    "description": [
+                        "সম্পাদন ক্ষেত্র",
+                        "কাট, কপি, নির্দিষ্ট এলাকা মুছে ফেলুন"
+                    ]
                 }
             }
         },
@@ -489,7 +516,8 @@
             "name": "কাজ",
             "controls": {
                 "default": {
-                    "label": "কাজ"
+                    "label": "কাজ",
+                    "description": []
                 }
             }
         },
@@ -497,7 +525,11 @@
             "name": "টেক্সট",
             "controls": {
                 "default": {
-                    "label": "টেক্সট সম্পাদনা"
+                    "label": "টেক্সট সম্পাদনা",
+                    "description": [
+                        "টেক্সটের স্তর সন্নিবেশ করুন",
+                        "উপস্থিত টেক্সট স্তর সম্পাদন করুন"
+                    ]
                 }
             }
         },
@@ -505,7 +537,11 @@
             "name": "/ করছিলাম",
             "controls": {
                 "default": {
-                    "label": "/ করছিলাম"
+                    "label": "/ করছিলাম",
+                    "description": [
+                        "চাল, মাত্রা, আবর্তিত",
+                        "স্তর সম্পাদনা করো"
+                    ]
                 }
             }
         },
@@ -513,7 +549,23 @@
             "name": "ক্যানভাস সংরক্ষণ করো",
             "controls": {
                 "default": {
-                    "label": "ক্ষুদ্র প্রদর্শন"
+                    "label": "ক্ষুদ্র প্রদর্শন",
+                    "description": [
+                        "ছোট করে প্রদর্শন",
+                        "প্যান প্রদর্শন বা আবর্তন"
+                    ]
+                }
+            }
+        },
+        "effect": {
+            "name": "ইফেক্ট",
+            "controls": {
+                "default": {
+                    "label": "ইফেক্ট",
+                    "description": [
+                        "মোট রং",
+                        "স্তরের ফিল্টার যোগ করুন, যেমন বাজপাখির গতি যোগ করুন"
+                    ]
                 }
             }
         }
@@ -524,6 +576,10 @@
                 "gotIt": "পেয়েছি",
                 "dontShowTips": "টিপ প্রদর্শন করা হবে না"
             }
+        },
+        "fontNotify": {
+            "title": "ফন্ট লোড করা হচ্ছে",
+            "pleaseWait": "অনুগ্রহ করে অপেক্ষা করুন, এই ফন্টটি লোড করা হচ্ছে:"
         }
     },
     "measurement": {
@@ -614,6 +670,37 @@
         "renameLayer": {
             "title": "স্তরের নাম পরিবর্তন করুন",
             "layerName": "নতুন নাম"
+        },
+        "imageConvertLayersToCollage": {
+            "title": "স্তর রূপান্তর করো",
+            "collageType": {
+                "verticalStack": "উলম্ব স্ট্যাক-ওভারফ্লো",
+                "horizontalStack": "অনুভূমিক স্ট্যাক-ওভারফ্লো",
+                "grid": "গ্রিড"
+            },
+            "params": {
+                "shared": {
+                    "reverseLayerOrder": "বিপরীত স্তর"
+                },
+                "verticalStack": {
+                    "horizontalAlignment": "অনুভূমিক অ্যালাইনমেন্ট",
+                    "horizontalAlignmentOption": {
+                        "left": "বাঁদিকে",
+                        "center": "কেন্দ্র",
+                        "right": "ডানদিকে"
+                    },
+                    "verticalMargin": "উলম্ব মার্জিন"
+                },
+                "horizontalStack": {
+                    "verticalAlignment": "উলম্ব অ্যালাইনমেন্ট",
+                    "verticalAlignmentOption": {
+                        "top": "উপরে",
+                        "middle": "মধ্যম",
+                        "bottom": "নীচে"
+                    },
+                    "horizontalMargin": "অনুভূমিক মার্জিন"
+                }
+            }
         }
     },
     "moduleGroup": {
@@ -652,6 +739,10 @@
                 "takePhoto": {
                     "name": "একটি ফটো নিন",
                     "description": "ক্যামেরা থেকে একটি ছবি নিন এবং একটি ফটো তুলুন ও সেটিকে ছবিতে প্রবেশ করান।."
+                },
+                "restoreBackup": {
+                    "name": "ব্যাক-আপ পুনরুদ্ধার করুন ছবি",
+                    "description": "সম্পাদন করার সময় ব্যাক-আপ ফাইল লোড করা হবে ।."
                 }
             }
         },
@@ -696,6 +787,10 @@
                 "paste": {
                     "name": "পেস্ট করুন",
                     "description": "ক্লিপ-বোর্ডে ছবি সন্নিবেশ করুন।."
+                },
+                "convertLayersToCollage": {
+                    "name": "স্তর রূপান্তর করো",
+                    "description": "নির্বাচিত স্তরকে একটি ছবিতে রূপান্তর করুন। এখানে অনেক ধরনের কোলাজ বিন্যাস পাওয়া যাচ্ছে।."
                 }
             }
         },
@@ -826,6 +921,20 @@
             "rotateClockwise": "আবর্তন",
             "fit": "মানানসই",
             "flip": "উল্টানো"
+        },
+        "drawBrush": {
+            "brushColor": "ইস্পাতের রং",
+            "brushSize": "মাপ"
+        },
+        "effect": {
+            "edit": {
+                "noLayersSelected": "অনুগ্রহ করে তাদের প্রভাব সম্পাদনা করার জন্য এক অথবা একাধিক স্তর বেছে নিন।.",
+                "layerHasNoEffects": "এই স্তরটির কোন প্রভাব নেই।.",
+                "deleteEffect": "মুছে ফেলুন"
+            }
+        },
+        "eraseBrush": {
+            "brushSize": "মাপ"
         }
     },
     "toolGroup": {
@@ -885,6 +994,26 @@
             "tools": {
                 "name": "প্রদর্শনের মাপ",
                 "description": "ক্যানভাসের ভেতরে এবং বাইরে কিভাবে আপনি ছবি দেখতে পারেন, তা নিয়ন্ত্রণ করতে পারেন।."
+            }
+        },
+        "effect": {
+            "name": "ইফেক্ট",
+            "description": "স্তর পরিবর্তন করো.",
+            "tools": {
+                "brush": {
+                    "name": "ইফেক্ট",
+                    "description": "স্তর সংক্রান্ত প্রভাব পরিচালনা করুন।."
+                }
+            }
+        },
+        "erase": {
+            "name": "মুছে ফেলুন",
+            "description": "পেন্সিল, পেন্সিল, কলম, মুছে দাও।.",
+            "tools": {
+                "brush": {
+                    "name": "মুছে ফেলুন",
+                    "description": "রেস্টার স্তর থেকে ডাটা মুছে ফেলে।."
+                }
             }
         }
     },
@@ -991,6 +1120,18 @@
                 "ctrlLeftClick": "Ctrl+ বাঁদিকের ক্লিক",
                 "leftMouseButton": "বাম মাউস বোতাম"
             }
+        },
+        "effectToolIntroduction": {
+            "title": "ইফেক্ট সংক্রান্ত সরঞ্জাম",
+            "introduction": [
+                "প্রভাবের সাহায্যে স্তর পরিবর্তনের জন্য বিভিন্ন স্তর যোগ করা যাবে যা বিভিন্ন ধরনের অন্যান্য কাজে ব্যবহার করতে পারে । এর ফলে যে কোন সময়ে প্রভাব বের হতে এবং সরিয়ে ফেলা যায়।."
+            ]
+        },
+        "eraseToolIntroduction": {
+            "title": "মুছে ফেলুন (_D)",
+            "introduction": [
+                "মুছে ফেলা টুলটি আপনাকে স্তর থেকে কিছু অংশ অপসারণ করতে দেয়, তাদেরকে স্বচ্ছ করা হবে ।."
+            ]
         }
     }
 }

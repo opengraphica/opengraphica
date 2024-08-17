@@ -7,6 +7,7 @@
             'ogr-preload--fade-out': isHidingPreloadAnimation,    
         }"
         @transitionend="onPreloadTransitionEnd()"
+        @click="onClickPreload"
     >
         <div class="ogr-preload__logo">
             <svg
@@ -171,6 +172,10 @@ export default defineComponent({
                 isShowingPreloadAnimation.value = false;
                 isHidingPreloadAnimation.value = false;
             }
+        }
+
+        function onClickPreload() {
+            document?.body?.focus();
         }
 
         /*-----------------------------------*\
@@ -345,6 +350,7 @@ export default defineComponent({
             isHidingPreloadAnimation,
             isPreloading,
             onPreloadTransitionEnd,
+            onClickPreload,
             isThemeLoaded,
             isAllPluginsLoaded,
             AppMainComponent,

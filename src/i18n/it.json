@@ -39,7 +39,11 @@
         "updateLayer": "Aggiornamento del livello",
         "updateDrawLayer": "Disegnare su Layer",
         "updateLayerFilterParams": "Effetto del livello di aggiornamento",
-        "updateSelectionCombineMode": "Aggiornamento Selezione Modalità Combinazione"
+        "updateSelectionCombineMode": "Aggiornamento Selezione Modalità Combinazione",
+        "convertLayersToCollage": "Convertire Layers in Collage",
+        "textTransformResize": "Ridimensionare il livello di testo",
+        "textTransformTranslate": "Spostare il livello di testo",
+        "updateEraseLayer": "Cancellazione da Layer"
     },
     "app": {
         "colorPickerGradient": {
@@ -118,7 +122,10 @@
         "settings": "Impostazioni impostazioni",
         "take": "Prendi",
         "takePhoto": "Prendere la foto",
-        "yes": "Sì"
+        "yes": "Sì",
+        "addEffect": "Aggiungere l'effetto",
+        "editEffects": "Modifica degli effetti",
+        "restoreLastImage": "Ripristina ultima immagine"
     },
     "canvas": {
         "toolbar": {
@@ -153,7 +160,8 @@
                     "save": "Salva",
                     "saveAs": "Salvare come",
                     "insertPhoto": "Inserisci una foto",
-                    "takePhoto": "Prendere una foto"
+                    "takePhoto": "Prendere una foto",
+                    "restore": "Ripristina ultima immagine"
                 }
             },
             "image": {
@@ -163,7 +171,8 @@
                     "convertLayers": {
                         "groupTitle": "Convertire Livelli...",
                         "toImageSequence": "Sequenza di immagine",
-                        "flatten": "Piatto a nuovo strato"
+                        "flatten": "Piatto a nuovo strato",
+                        "toCollage": "A Collage"
                     },
                     "cut": "Taglio",
                     "copy": "Copia",
@@ -422,7 +431,12 @@
             "name": "Deformità",
             "controls": {
                 "default": {
-                    "label": "Deformità"
+                    "label": "Deformità",
+                    "description": [
+                        null,
+                        "Bulge, zone pizzicate dell'immagine",
+                        "Zone clone dell'immagine"
+                    ]
                 }
             }
         },
@@ -430,7 +444,11 @@
             "name": "Disegno",
             "controls": {
                 "default": {
-                    "label": "Disegno"
+                    "label": "Disegno",
+                    "description": [
+                        "Utilizzare pennelli d'arte",
+                        "Crea forme o gradienti"
+                    ]
                 }
             }
         },
@@ -446,7 +464,10 @@
             "name": "Cancellazione",
             "controls": {
                 "default": {
-                    "label": "Cancellazione"
+                    "label": "Cancellazione",
+                    "description": [
+                        "Cancellare gli effetti dello strumento di estrazione"
+                    ]
                 }
             }
         },
@@ -465,7 +486,8 @@
             "name": "Livelli",
             "controls": {
                 "default": {
-                    "label": "Livelli"
+                    "label": "Livelli",
+                    "description": []
                 }
             }
         },
@@ -473,7 +495,8 @@
             "name": "Ricerca",
             "controls": {
                 "default": {
-                    "label": "Ricerca"
+                    "label": "Ricerca",
+                    "description": []
                 }
             }
         },
@@ -481,7 +504,11 @@
             "name": "Selezione",
             "controls": {
                 "default": {
-                    "label": "Selezione"
+                    "label": "Selezione",
+                    "description": [
+                        "Limitare l'area di editing",
+                        "Tagliare, copiare, eliminare aree specifiche"
+                    ]
                 }
             }
         },
@@ -489,7 +516,8 @@
             "name": "Azioni",
             "controls": {
                 "default": {
-                    "label": "Azioni"
+                    "label": "Azioni",
+                    "description": []
                 }
             }
         },
@@ -497,7 +525,11 @@
             "name": "Testo",
             "controls": {
                 "default": {
-                    "label": "Inserisci / Modifica testo"
+                    "label": "Inserisci / Modifica testo",
+                    "description": [
+                        "Inserisci strati di testo",
+                        "Modificare gli strati di testo esistenti"
+                    ]
                 }
             }
         },
@@ -505,7 +537,11 @@
             "name": "Spostare / trasformare",
             "controls": {
                 "default": {
-                    "label": "Spostare / trasformare"
+                    "label": "Spostare / trasformare",
+                    "description": [
+                        "Sposta, scala, ruota strati",
+                        "Gestione dei confini dei livelli"
+                    ]
                 }
             }
         },
@@ -513,7 +549,23 @@
             "name": "Vista su tela",
             "controls": {
                 "default": {
-                    "label": "Zoom / Vista panoramica"
+                    "label": "Zoom / Vista panoramica",
+                    "description": [
+                        "Zoom dentro e fuori",
+                        "Pan o ruotare la vista"
+                    ]
+                }
+            }
+        },
+        "effect": {
+            "name": "Effetto",
+            "controls": {
+                "default": {
+                    "label": "Effetto",
+                    "description": [
+                        "Manipolare i colori dello strato",
+                        "Aggiungere filtri a strati, come gli effetti sfocatura"
+                    ]
                 }
             }
         }
@@ -524,6 +576,10 @@
                 "gotIt": "Preso",
                 "dontShowTips": "Non mostrare consigli"
             }
+        },
+        "fontNotify": {
+            "title": "Caricamento di caratteri",
+            "pleaseWait": "Si prega di attendere, questi font sono caricati:"
         }
     },
     "measurement": {
@@ -616,6 +672,37 @@
         "renameLayer": {
             "title": "Rinomina Layer",
             "layerName": "Nuovo nome"
+        },
+        "imageConvertLayersToCollage": {
+            "title": "Convertire Layers in Collage",
+            "collageType": {
+                "verticalStack": "Stack verticale",
+                "horizontalStack": "Stack orizzontale",
+                "grid": "Griglia"
+            },
+            "params": {
+                "shared": {
+                    "reverseLayerOrder": "Ordine del livello inverso"
+                },
+                "verticalStack": {
+                    "horizontalAlignment": "Allineamento orizzontale",
+                    "horizontalAlignmentOption": {
+                        "left": "Sinistra",
+                        "center": "Centro",
+                        "right": "Giusto"
+                    },
+                    "verticalMargin": "Margine verticale"
+                },
+                "horizontalStack": {
+                    "verticalAlignment": "Allineamento verticale",
+                    "verticalAlignmentOption": {
+                        "top": "Top",
+                        "middle": "Medio",
+                        "bottom": "Fondo"
+                    },
+                    "horizontalMargin": "Margine orizzontale"
+                }
+            }
         }
     },
     "moduleGroup": {
@@ -654,6 +741,10 @@
                 "takePhoto": {
                     "name": "Prendere una foto",
                     "description": "Fai una foto dalla fotocamera e dalla webcam e inseriscila nell'immagine."
+                },
+                "restoreBackup": {
+                    "name": "Ripristinare il backup Immagine",
+                    "description": "Caricare il file di backup salvato automaticamente durante la modifica."
                 }
             }
         },
@@ -698,6 +789,10 @@
                 "paste": {
                     "name": "Paste",
                     "description": "Inserire le immagini sulla tela dalla clipboard."
+                },
+                "convertLayersToCollage": {
+                    "name": "Convertire Layers in Collage",
+                    "description": "Converte gli strati selezionati in un collage di immagine. Ci sono molti diversi layout di collage disponibili."
                 }
             }
         },
@@ -828,6 +923,20 @@
             "rotateClockwise": "Ruotare in senso orario",
             "fit": "Adattamento",
             "flip": "Flip"
+        },
+        "drawBrush": {
+            "brushColor": "Colore della spazzola",
+            "brushSize": "Dimensione"
+        },
+        "effect": {
+            "edit": {
+                "noLayersSelected": "Si prega di selezionare uno o più strati nel bacino strati per modificare i loro effetti.",
+                "layerHasNoEffects": "Questo strato non ha effetti.",
+                "deleteEffect": "Elimina l'effetto"
+            }
+        },
+        "eraseBrush": {
+            "brushSize": "Dimensione"
         }
     },
     "toolGroup": {
@@ -887,6 +996,26 @@
             "tools": {
                 "name": "Zoom",
                 "description": "Zoom dentro e fuori la tela per controllare quanto dell'immagine si può vedere."
+            }
+        },
+        "effect": {
+            "name": "Effetto",
+            "description": "Regolare i colori dello strato, aggiungere sfocatura e altri effetti.",
+            "tools": {
+                "brush": {
+                    "name": "Effetto",
+                    "description": "Gestire gli effetti sugli strati."
+                }
+            }
+        },
+        "erase": {
+            "name": "Cancellazione",
+            "description": "Spazzole, matite, penne, che cancellano.",
+            "tools": {
+                "brush": {
+                    "name": "Pennello di cancellazione",
+                    "description": "Cancella i dati da strati raster."
+                }
             }
         }
     },
@@ -993,6 +1122,18 @@
                 "ctrlLeftClick": "Ctrl + Clic sinistro",
                 "leftMouseButton": "Pulsante sinistro del mouse"
             }
+        },
+        "effectToolIntroduction": {
+            "title": "Strumento di effetto",
+            "introduction": [
+                "Lo strumento di effetto consente di aggiungere effetti a livello che possono regolare i colori e fare tutti i tipi di altre operazioni utili all'intero strato. Gli effetti possono essere impilati e rimossi in qualsiasi momento."
+            ]
+        },
+        "eraseToolIntroduction": {
+            "title": "Strumento di cancellazione",
+            "introduction": [
+                "Lo strumento di cancellazione consente di rimuovere parti dello strato, rendendoli trasparenti."
+            ]
         }
     }
 }

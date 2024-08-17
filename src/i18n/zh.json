@@ -39,7 +39,11 @@
         "updateLayer": "更新图层",
         "updateDrawLayer": "绘制图层",
         "updateLayerFilterParams": "更新图层效果",
-        "updateSelectionCombineMode": "更新选择组合模式"
+        "updateSelectionCombineMode": "更新选择组合模式",
+        "convertLayersToCollage": "将图层转换为拼接",
+        "textTransformResize": "修改文本图层大小",
+        "textTransformTranslate": "移动文本图层",
+        "updateEraseLayer": "从图层擦除"
     },
     "app": {
         "colorPickerGradient": {
@@ -118,7 +122,10 @@
         "settings": "设置",
         "take": "拿着",
         "takePhoto": "拍摄照片",
-        "yes": "对"
+        "yes": "对",
+        "addEffect": "添加效果",
+        "editEffects": "编辑效果",
+        "restoreLastImage": "恢复上一个图像"
     },
     "canvas": {
         "toolbar": {
@@ -153,7 +160,8 @@
                     "save": "保存",
                     "saveAs": "另存为",
                     "insertPhoto": "插入相片",
-                    "takePhoto": "照张相"
+                    "takePhoto": "照张相",
+                    "restore": "恢复上一个图像"
                 }
             },
             "image": {
@@ -163,7 +171,8 @@
                     "convertLayers": {
                         "groupTitle": "转换图层...",
                         "toImageSequence": "到图像序列",
-                        "flatten": "平移到新层"
+                        "flatten": "平移到新层",
+                        "toCollage": "到拼贴"
                     },
                     "cut": "剪切",
                     "copy": "复制",
@@ -422,7 +431,12 @@
             "name": "变形",
             "controls": {
                 "default": {
-                    "label": "变形"
+                    "label": "变形",
+                    "description": [
+                        "缩小图像或模糊图像",
+                        "组合, 抓取图像区域",
+                        "图像的克隆区域"
+                    ]
                 }
             }
         },
@@ -430,7 +444,11 @@
             "name": "绘制",
             "controls": {
                 "default": {
-                    "label": "绘制"
+                    "label": "绘制",
+                    "description": [
+                        "使用艺术刷子",
+                        "创建形状或梯度"
+                    ]
                 }
             }
         },
@@ -446,7 +464,10 @@
             "name": "擦除",
             "controls": {
                 "default": {
-                    "label": "擦除"
+                    "label": "擦除",
+                    "description": [
+                        "擦除绘图工具的效果"
+                    ]
                 }
             }
         },
@@ -465,7 +486,8 @@
             "name": "层",
             "controls": {
                 "default": {
-                    "label": "层"
+                    "label": "层",
+                    "description": []
                 }
             }
         },
@@ -473,7 +495,8 @@
             "name": "搜索",
             "controls": {
                 "default": {
-                    "label": "搜索"
+                    "label": "搜索",
+                    "description": []
                 }
             }
         },
@@ -481,7 +504,11 @@
             "name": "选择",
             "controls": {
                 "default": {
-                    "label": "选择"
+                    "label": "选择",
+                    "description": [
+                        "限制编辑区域",
+                        "剪切、复制、删除特定区域"
+                    ]
                 }
             }
         },
@@ -489,7 +516,8 @@
             "name": "行动",
             "controls": {
                 "default": {
-                    "label": "行动"
+                    "label": "行动",
+                    "description": []
                 }
             }
         },
@@ -497,7 +525,11 @@
             "name": "文本",
             "controls": {
                 "default": {
-                    "label": "插入/ 编辑文本"
+                    "label": "插入/ 编辑文本",
+                    "description": [
+                        "插入文本层",
+                        "编辑已存在的文本层"
+                    ]
                 }
             }
         },
@@ -505,7 +537,11 @@
             "name": "移动/ 转换",
             "controls": {
                 "default": {
-                    "label": "移动/ 转换"
+                    "label": "移动/ 转换",
+                    "description": [
+                        "移动、缩放、旋转层",
+                        "管理层边界"
+                    ]
                 }
             }
         },
@@ -513,7 +549,23 @@
             "name": "扫描屏视图端口",
             "controls": {
                 "default": {
-                    "label": "缩放/ 泛视图"
+                    "label": "缩放/ 泛视图",
+                    "description": [
+                        "缩小和缩小",
+                        "关闭或旋转视图"
+                    ]
+                }
+            }
+        },
+        "effect": {
+            "name": "效果",
+            "controls": {
+                "default": {
+                    "label": "效果",
+                    "description": [
+                        "操纵图层颜色",
+                        "添加图层过滤器, 如模糊效果"
+                    ]
                 }
             }
         }
@@ -524,6 +576,10 @@
                 "gotIt": "笵",
                 "dontShowTips": "不要显示提示"
             }
+        },
+        "fontNotify": {
+            "title": "正在装入字体",
+            "pleaseWait": "请等待, 这些字体正在被装入 :"
         }
     },
     "measurement": {
@@ -614,6 +670,37 @@
         "renameLayer": {
             "title": "重命名图层",
             "layerName": "新名称"
+        },
+        "imageConvertLayersToCollage": {
+            "title": "将图层转换为拼接",
+            "collageType": {
+                "verticalStack": "垂直堆栈",
+                "horizontalStack": "水平堆栈",
+                "grid": "网格"
+            },
+            "params": {
+                "shared": {
+                    "reverseLayerOrder": "反向图层顺序"
+                },
+                "verticalStack": {
+                    "horizontalAlignment": "水平对齐",
+                    "horizontalAlignmentOption": {
+                        "left": "左边",
+                        "center": "中间",
+                        "right": "对"
+                    },
+                    "verticalMargin": "垂直边距"
+                },
+                "horizontalStack": {
+                    "verticalAlignment": "垂直对齐",
+                    "verticalAlignmentOption": {
+                        "top": "顶",
+                        "middle": "中间",
+                        "bottom": "底层"
+                    },
+                    "horizontalMargin": "水平边距"
+                }
+            }
         }
     },
     "moduleGroup": {
@@ -652,6 +739,10 @@
                 "takePhoto": {
                     "name": "照张相",
                     "description": "从相机和网络相机中取出相机并插入到图像中."
+                },
+                "restoreBackup": {
+                    "name": "恢复备份 图像",
+                    "description": "装入编辑时自动保存的备份文件 ."
                 }
             }
         },
@@ -696,6 +787,10 @@
                 "paste": {
                     "name": "粘贴",
                     "description": "从剪贴板上将图像插入画布 ."
+                },
+                "convertLayersToCollage": {
+                    "name": "将图层转换为拼接",
+                    "description": "将所选图层转换为图像拼接。 现有许多不同的拼接布局."
                 }
             }
         },
@@ -826,6 +921,20 @@
             "rotateClockwise": "顺时针旋转",
             "fit": "适应",
             "flip": "翻转"
+        },
+        "drawBrush": {
+            "brushColor": "笔刷颜色",
+            "brushSize": "大小"
+        },
+        "effect": {
+            "edit": {
+                "noLayersSelected": "请在地层对接处选择一个或多个地层以编辑其效果 .",
+                "layerHasNoEffects": "这层没有影响.",
+                "deleteEffect": "删除效果"
+            }
+        },
+        "eraseBrush": {
+            "brushSize": "大小"
         }
     },
     "toolGroup": {
@@ -885,6 +994,26 @@
             "tools": {
                 "name": "缩放",
                 "description": "缩放出画布来控制你能看到多少图像."
+            }
+        },
+        "effect": {
+            "name": "效果",
+            "description": "调整层色,增加模糊等效果.",
+            "tools": {
+                "brush": {
+                    "name": "效果",
+                    "description": "管理层上的效果 ."
+                }
+            }
+        },
+        "erase": {
+            "name": "擦除",
+            "description": "布鲁什,铅笔,笔,那抹去.",
+            "tools": {
+                "brush": {
+                    "name": "擦除笔刷",
+                    "description": "从光栅层擦去数据."
+                }
             }
         }
     },
@@ -991,6 +1120,18 @@
                 "ctrlLeftClick": "Ctrl + 左键点击",
                 "leftMouseButton": "鼠标左键"
             }
+        },
+        "effectToolIntroduction": {
+            "title": "效果工具",
+            "introduction": [
+                "效果工具允许添加可以调整颜色的地层效果,并对整个地层进行各种其他有用的操作. 效果可以随时被堆放和去除."
+            ]
+        },
+        "eraseToolIntroduction": {
+            "title": "擦除工具",
+            "introduction": [
+                "擦除工具允许您去除部分地层,使其透明."
+            ]
         }
     }
 }

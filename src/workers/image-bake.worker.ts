@@ -1,6 +1,6 @@
 import filterClassesByName from '@/canvas/filters/filter-classes-by-name';
 
-import type { FilterBakeResult, FilterNewBakeRequest, FilterCancelBakeRequest } from './image-bake.types';
+import type { FilterBakeResult, FilterBakeError, FilterNewBakeRequest, FilterCancelBakeRequest } from './image-bake.types';
 
 const instructionQueue: Array<FilterNewBakeRequest | FilterCancelBakeRequest> = [];
 let isWorkingQueue: boolean = false;
@@ -14,7 +14,6 @@ self.onmessage = ({ data }: { data: FilterNewBakeRequest | FilterCancelBakeReque
             )
         });
         if (queueIndex > -1) {
-            // TODO - is this causing the queue to get hung up? Need to send a message back to main thread?
             instructionQueue.splice(queueIndex, 1);
         }
         instructionQueue.push(data);
@@ -29,6 +28,13 @@ self.onmessage = ({ data }: { data: FilterNewBakeRequest | FilterCancelBakeReque
     }
     workQueue();
 };
+
+function log(message: any) {
+    self.postMessage({
+        type: 'LOG',
+        message: `${message}`,
+    });
+}
 
 async function workQueue() {
     if (!isWorkingQueue) {
@@ -47,55 +53,65 @@ async function workQueue() {
 }
 
 async function workNewFilterBake(queueItem: FilterNewBakeRequest) {
-    // Manipulate the imageData.
-    const appliedImageData = queueItem.imageData;
-    const imageDataSize = appliedImageData.width * appliedImageData.height * 4;
+    try {
+        // Manipulate the imageData.
+        const appliedImageData = queueItem.imageData;
+        const imageDataSize = appliedImageData.width * appliedImageData.height * 4;
 
-    for (const filterConfiguration of queueItem.filterConfigurations) {
-        const filterName = filterConfiguration.name;
-        if (filterName in filterClassesByName && !filterConfiguration.disabled) {
-            const filter = new filterClassesByName[filterName as keyof typeof filterClassesByName]();
-            filter.params = filterConfiguration.params;
+        for (const filterConfiguration of queueItem.filterConfigurations) {
+            const filterName = filterConfiguration.name;
+            if (filterName in filterClassesByName && !filterConfiguration.disabled) {
+                const filter = new filterClassesByName[filterName as keyof typeof filterClassesByName]();
+                filter.params = filterConfiguration.params;
 
-            const appliedData = appliedImageData.data;
-            for (let i = 0; i < imageDataSize; i += 4) {
-                filter.fragment(appliedData, appliedData, i);
-            }
+                const appliedData = appliedImageData.data;
+                for (let i = 0; i < imageDataSize; i += 4) {
+                    filter.fragment(appliedData, appliedData, i);
+                }
 
-            // Wait for new messages to come in.
-            await new Promise((resolve) => {
-                setTimeout(resolve, 0);
-            });
+                // Wait for new messages to come in.
+                await new Promise((resolve) => {
+                    setTimeout(resolve, 0);
+                });
 
-            // Check if this was canceled already, don't send it back if so.
-            const cancelRequestIndex = instructionQueue.findIndex((queueItem) => 
-                (queueItem.type === 'CANCEL_FILTER_BAKE' && queueItem.queueId === queueItem.queueId)
-            );
-            if (cancelRequestIndex > -1) {
-                instructionQueue.splice(cancelRequestIndex, 1);
-                return;
+                // Check if this was canceled already, don't send it back if so.
+                const cancelRequestIndex = instructionQueue.findIndex((queueItem) => 
+                    (queueItem.type === 'CANCEL_FILTER_BAKE' && queueItem.queueId === queueItem.queueId)
+                );
+                if (cancelRequestIndex > -1) {
+                    instructionQueue.splice(cancelRequestIndex, 1);
+                    return;
+                }
             }
         }
-    }
 
-    // Wait for new messages to come in.
-    await new Promise((resolve) => {
-        setTimeout(resolve, 0);
-    });
-    
-    // Check if this was canceled already, don't send it back if so.
-    const cancelRequestIndex = instructionQueue.findIndex((queueItem) => 
-        (queueItem.type === 'CANCEL_FILTER_BAKE' && queueItem.queueId === queueItem.queueId)
-    );
-    if (cancelRequestIndex > -1) {
-        instructionQueue.splice(cancelRequestIndex, 1);
-    } else {
+        // Wait for new messages to come in.
+        await new Promise((resolve) => {
+            setTimeout(resolve, 0);
+        });
+        
+        // Check if this was canceled already, don't send it back if so.
+        const cancelRequestIndex = instructionQueue.findIndex((queueItem) => 
+            (queueItem.type === 'CANCEL_FILTER_BAKE' && queueItem.queueId === queueItem.queueId)
+        );
+        if (cancelRequestIndex > -1) {
+            instructionQueue.splice(cancelRequestIndex, 1);
+        } else {
+            // Send response.
+            self.postMessage({
+                type: 'FILTER_BAKE_RESULT',
+                queueId: queueItem.queueId,
+                layerId: queueItem.layerId,
+                imageData: appliedImageData
+            } as FilterBakeResult);
+        }
+    } catch (error) {
         // Send response.
         self.postMessage({
-            type: 'FILTER_BAKE_RESULT',
+            type: 'FILTER_BAKE_ERROR',
             queueId: queueItem.queueId,
             layerId: queueItem.layerId,
-            imageData: appliedImageData
-        } as FilterBakeResult);
+            message: `${error}`
+        } as FilterBakeError);
     }
 }

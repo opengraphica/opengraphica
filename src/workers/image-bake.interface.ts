@@ -1,8 +1,10 @@
 import { toRaw } from 'vue';
+import { deepToRaw } from '@/lib/vue';
 
 import type { WorkingFileLayerFilter } from '@/types';
 import type {
-    FilterBakeQueueItem, FilterNewBakeRequest, FilterCancelBakeRequest, FilterBakeResult
+    FilterBakeQueueItem, FilterNewBakeRequest, FilterCancelBakeRequest,
+    FilterBakeResult, FilterBakeError, LogResponse
 } from './image-bake.types';
 
 export const imageBakeWorker = new Worker(
@@ -12,7 +14,7 @@ export const imageBakeWorker = new Worker(
 let queueIdCounter = 0;
 const instructionQueue: FilterBakeQueueItem[] = [];
 
-imageBakeWorker.onmessage = ({ data }: { data: FilterBakeResult }) => {
+imageBakeWorker.onmessage = ({ data }: { data: FilterBakeResult | FilterBakeError | LogResponse }) => {
     if (data.type === 'FILTER_BAKE_RESULT') {
         const queueIndex = instructionQueue.findIndex((queueItem) => queueItem.queueId === data.queueId);
         if (queueIndex > -1) {
@@ -22,6 +24,16 @@ imageBakeWorker.onmessage = ({ data }: { data: FilterBakeResult }) => {
         } else {
             // If not found in the queue, the request was canceled. So ignore.
         }
+    } else if (data.type === 'FILTER_BAKE_ERROR') {
+        const queueIndex = instructionQueue.findIndex((queueItem) => queueItem.queueId === data.queueId);
+        if (queueIndex > -1) {
+            instructionQueue[queueIndex].rejectPromise(new Error(data.message));
+            instructionQueue.splice(queueIndex, 1);
+        } else {
+            // If not found in the queue, the request was canceled. So ignore.
+        }
+    } else if (data.type === 'LOG') {
+        console.info(data.message);
     }
 };
 imageBakeWorker.onmessageerror = (error) => {
@@ -40,27 +52,26 @@ export function bakeCanvasFilters(imageData: ImageData, layerId: number, filterC
         instructionQueue.splice(existingQueueIndex, 1);
     }
 
-    // Remove proxies from Vue config
-    for (let i = 0; i < filterConfigurations.length; i++) {
-        filterConfigurations[i] = toRaw(filterConfigurations[i]);
-    }
-
     return new Promise<ImageData>((resolve, reject) => {
-        // Create new request for this layer.
-        const queueId = queueIdCounter++;
-        instructionQueue.push({
-            type: 'FILTER_BAKE',
-            queueId,
-            layerId,
-            resolvePromise: resolve,
-            rejectPromise: reject
-        });
-        imageBakeWorker.postMessage({
-            type: 'NEW_FILTER_BAKE',
-            queueId,
-            layerId,
-            imageData: toRaw(imageData),
-            filterConfigurations: toRaw(filterConfigurations)
-        } as FilterNewBakeRequest);
+        try {
+            // Create new request for this layer.
+            const queueId = queueIdCounter++;
+            instructionQueue.push({
+                type: 'FILTER_BAKE',
+                queueId,
+                layerId,
+                resolvePromise: resolve,
+                rejectPromise: reject
+            });
+            imageBakeWorker.postMessage({
+                type: 'NEW_FILTER_BAKE',
+                queueId,
+                layerId,
+                imageData: toRaw(imageData),
+                filterConfigurations: deepToRaw(filterConfigurations)
+            } as FilterNewBakeRequest);
+        } catch (error) {
+            console.error('[src/workers/image-bake.interface.ts] Error sending message. ', error);
+        }
     });
 }

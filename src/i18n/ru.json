@@ -39,7 +39,11 @@
         "updateLayer": "Обновление уровня",
         "updateDrawLayer": "Рисуем на слое",
         "updateLayerFilterParams": "Обновление Layer Effect",
-        "updateSelectionCombineMode": "Обновление Selection Combine Mode"
+        "updateSelectionCombineMode": "Обновление Selection Combine Mode",
+        "convertLayersToCollage": "Преобразовать слои в коллаж",
+        "textTransformResize": "Размер текстового слоя",
+        "textTransformTranslate": "Переместить текстовый слой",
+        "updateEraseLayer": "Стирка с уровня"
     },
     "app": {
         "colorPickerGradient": {
@@ -118,7 +122,10 @@
         "settings": "Настройки",
         "take": "Взять",
         "takePhoto": "Сделай фото",
-        "yes": "Да"
+        "yes": "Да",
+        "addEffect": "Добавить эффект",
+        "editEffects": "Редактировать эффекты",
+        "restoreLastImage": "Восстановление последнего изображения"
     },
     "canvas": {
         "toolbar": {
@@ -153,7 +160,8 @@
                     "save": "Спасти",
                     "saveAs": "Сохранить как",
                     "insertPhoto": "Вставить фотографию",
-                    "takePhoto": "Сделать фото"
+                    "takePhoto": "Сделать фото",
+                    "restore": "Восстановление последнего изображения"
                 }
             },
             "image": {
@@ -163,7 +171,8 @@
                     "convertLayers": {
                         "groupTitle": "Преобразование слоев...",
                         "toImageSequence": "Изображение последовательности",
-                        "flatten": "Плоский к новому слою"
+                        "flatten": "Плоский к новому слою",
+                        "toCollage": "В коллаж"
                     },
                     "cut": "Сокращение",
                     "copy": "Копия",
@@ -422,7 +431,12 @@
             "name": "Деформация",
             "controls": {
                 "default": {
-                    "label": "Деформация"
+                    "label": "Деформация",
+                    "description": [
+                        null,
+                        "Bulge, pinch области изображения",
+                        "Области клонирования изображения"
+                    ]
                 }
             }
         },
@@ -430,7 +444,11 @@
             "name": "Рисовать",
             "controls": {
                 "default": {
-                    "label": "Рисовать"
+                    "label": "Рисовать",
+                    "description": [
+                        "Используйте художественные кисти",
+                        "Создание форм или градиентов"
+                    ]
                 }
             }
         },
@@ -446,7 +464,10 @@
             "name": "Стирать",
             "controls": {
                 "default": {
-                    "label": "Стирать"
+                    "label": "Стирать",
+                    "description": [
+                        "Уничтожьте эффекты инструмента для рисования"
+                    ]
                 }
             }
         },
@@ -465,7 +486,8 @@
             "name": "Слои",
             "controls": {
                 "default": {
-                    "label": "Слои"
+                    "label": "Слои",
+                    "description": []
                 }
             }
         },
@@ -473,7 +495,8 @@
             "name": "Поиск",
             "controls": {
                 "default": {
-                    "label": "Поиск"
+                    "label": "Поиск",
+                    "description": []
                 }
             }
         },
@@ -481,7 +504,11 @@
             "name": "Выбор",
             "controls": {
                 "default": {
-                    "label": "Выбор"
+                    "label": "Выбор",
+                    "description": [
+                        "Ограничить область редактирования",
+                        "Вырезать, скопировать, удалить определенные области"
+                    ]
                 }
             }
         },
@@ -489,7 +516,8 @@
             "name": "Меры",
             "controls": {
                 "default": {
-                    "label": "Меры"
+                    "label": "Меры",
+                    "description": []
                 }
             }
         },
@@ -497,7 +525,11 @@
             "name": "Текст",
             "controls": {
                 "default": {
-                    "label": "Включить/редактировать текст"
+                    "label": "Включить/редактировать текст",
+                    "description": [
+                        "Включить текстовые слои",
+                        "Редактировать существующие текстовые слои"
+                    ]
                 }
             }
         },
@@ -505,7 +537,11 @@
             "name": "Трансформация / Transform",
             "controls": {
                 "default": {
-                    "label": "Трансформация / Transform"
+                    "label": "Трансформация / Transform",
+                    "description": [
+                        "Двигайтесь, масштабируйте, вращайте слои",
+                        "Управление границами слоев"
+                    ]
                 }
             }
         },
@@ -513,7 +549,23 @@
             "name": "Canvas Viewport",
             "controls": {
                 "default": {
-                    "label": "Zoom / Pan View"
+                    "label": "Zoom / Pan View",
+                    "description": [
+                        "Входить и выходить",
+                        "Пан или повернуть вид"
+                    ]
+                }
+            }
+        },
+        "effect": {
+            "name": "Эффект",
+            "controls": {
+                "default": {
+                    "label": "Эффект",
+                    "description": [
+                        "Манипулирование цветами слоев",
+                        "Добавьте фильтры слоев, такие как эффекты размытия"
+                    ]
                 }
             }
         }
@@ -524,6 +576,10 @@
                 "gotIt": "Понял",
                 "dontShowTips": "Не показывайте советы"
             }
+        },
+        "fontNotify": {
+            "title": "Погрузочные шрифты",
+            "pleaseWait": "Пожалуйста, подождите, эти шрифты загружаются:"
         }
     },
     "measurement": {
@@ -616,6 +672,37 @@
         "renameLayer": {
             "title": "Название Layer",
             "layerName": "Новое имя"
+        },
+        "imageConvertLayersToCollage": {
+            "title": "Преобразовать слои в коллаж",
+            "collageType": {
+                "verticalStack": "Вертикальный стек",
+                "horizontalStack": "Горизонтальный стек",
+                "grid": "Сетка"
+            },
+            "params": {
+                "shared": {
+                    "reverseLayerOrder": "Обратный порядок слоев"
+                },
+                "verticalStack": {
+                    "horizontalAlignment": "Горизонтальное выравнивание",
+                    "horizontalAlignmentOption": {
+                        "left": "Левый",
+                        "center": "Центр",
+                        "right": "Правильно"
+                    },
+                    "verticalMargin": "Вертикальная маржа"
+                },
+                "horizontalStack": {
+                    "verticalAlignment": "Вертикальное выравнивание",
+                    "verticalAlignmentOption": {
+                        "top": "Топ",
+                        "middle": "Средний",
+                        "bottom": "Нижняя часть"
+                    },
+                    "horizontalMargin": "Горизонтальная маржа"
+                }
+            }
         }
     },
     "moduleGroup": {
@@ -654,6 +741,10 @@
                 "takePhoto": {
                     "name": "Сделать фото",
                     "description": "Сделайте фотографию с камеры и веб-камеры и вставьте ее в изображение."
+                },
+                "restoreBackup": {
+                    "name": "Восстановить резервное копирование Изображение",
+                    "description": "Загрузите резервный файл, сохраненный автоматически во время редактирования."
                 }
             }
         },
@@ -698,6 +789,10 @@
                 "paste": {
                     "name": "Паста",
                     "description": "Вставьте изображения на холст из буфера обмена."
+                },
+                "convertLayersToCollage": {
+                    "name": "Преобразовать слои в коллаж",
+                    "description": "Преобразует выбранные слои в коллаж изображения. Доступно множество различных компоновок коллажа."
                 }
             }
         },
@@ -828,6 +923,20 @@
             "rotateClockwise": "Поворот по часовой стрелке",
             "fit": "Готово",
             "flip": "Флип"
+        },
+        "drawBrush": {
+            "brushColor": "Цвет кисти",
+            "brushSize": "Размер"
+        },
+        "effect": {
+            "edit": {
+                "noLayersSelected": "Пожалуйста, выберите один или несколько слоев в доке слоев, чтобы отредактировать их эффекты.",
+                "layerHasNoEffects": "Этот слой не имеет эффектов.",
+                "deleteEffect": "Удалить эффект"
+            }
+        },
+        "eraseBrush": {
+            "brushSize": "Размер"
         }
     },
     "toolGroup": {
@@ -887,6 +996,26 @@
             "tools": {
                 "name": "Зум",
                 "description": "Введите и выведите холст, чтобы контролировать, сколько изображения вы можете видеть."
+            }
+        },
+        "effect": {
+            "name": "Эффект",
+            "description": "Настройте цвета слоя, добавьте размытие и другие эффекты.",
+            "tools": {
+                "brush": {
+                    "name": "Эффект",
+                    "description": "Управляйте воздействием на слои."
+                }
+            }
+        },
+        "erase": {
+            "name": "Стирать",
+            "description": "Ручки, карандаши, ручки, это стирание.",
+            "tools": {
+                "brush": {
+                    "name": "Стирать щетку",
+                    "description": "Стирает данные из растровых слоев."
+                }
             }
         }
     },
@@ -993,6 +1122,18 @@
                 "ctrlLeftClick": "Ctrl + Левый клик",
                 "leftMouseButton": "Левая мышиная кнопка"
             }
+        },
+        "effectToolIntroduction": {
+            "title": "Инструмент эффект",
+            "introduction": [
+                "Инструмент эффекта позволяет добавлять эффекты слоя, которые могут регулировать цвета и выполнять всевозможные другие полезные операции для всего слоя. Эффекты могут быть сложены и удалены в любое время."
+            ]
+        },
+        "eraseToolIntroduction": {
+            "title": "Стирать инструмент",
+            "introduction": [
+                "Стиральный инструмент позволяет удалять части слоя, делая их прозрачными."
+            ]
         }
     }
 }

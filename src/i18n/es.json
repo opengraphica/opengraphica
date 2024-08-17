@@ -39,7 +39,11 @@
         "updateLayer": "Actualización de capas",
         "updateDrawLayer": "Dibuja sobre Layer",
         "updateLayerFilterParams": "Efecto de capa de actualización",
-        "updateSelectionCombineMode": "Modo combinado de selección de actualización"
+        "updateSelectionCombineMode": "Modo combinado de selección de actualización",
+        "convertLayersToCollage": "Convertir Capas en Collage",
+        "textTransformResize": "Redimensionar la capa de texto",
+        "textTransformTranslate": "Mover capa de texto",
+        "updateEraseLayer": "Borrar de Layer"
     },
     "app": {
         "colorPickerGradient": {
@@ -118,7 +122,10 @@
         "settings": "Ajustes",
         "take": "Toma",
         "takePhoto": "Tomar foto",
-        "yes": "Sí"
+        "yes": "Sí",
+        "addEffect": "Add Effect",
+        "editEffects": "Editar efectos",
+        "restoreLastImage": "Restaurar última imagen"
     },
     "canvas": {
         "toolbar": {
@@ -153,7 +160,8 @@
                     "save": "Guardar",
                     "saveAs": "Guardar como",
                     "insertPhoto": "Insertar una foto",
-                    "takePhoto": "Tomar una foto"
+                    "takePhoto": "Tomar una foto",
+                    "restore": "Restaurar última imagen"
                 }
             },
             "image": {
@@ -163,7 +171,8 @@
                     "convertLayers": {
                         "groupTitle": "Convertir Capas...",
                         "toImageSequence": "A la secuencia de imágenes",
-                        "flatten": "Aplanado a nueva capa"
+                        "flatten": "Aplanado a nueva capa",
+                        "toCollage": "A Collage"
                     },
                     "cut": "Corte",
                     "copy": "Copiado",
@@ -422,7 +431,12 @@
             "name": "Deforme",
             "controls": {
                 "default": {
-                    "label": "Deforme"
+                    "label": "Deforme",
+                    "description": [
+                        null,
+                        "Bulge, áreas de pellizco de la imagen",
+                        "Áreas de cierre de la imagen"
+                    ]
                 }
             }
         },
@@ -430,7 +444,11 @@
             "name": "Dibujo",
             "controls": {
                 "default": {
-                    "label": "Dibujo"
+                    "label": "Dibujo",
+                    "description": [
+                        "Use pinceles de arte",
+                        "Crear formas o gradientes"
+                    ]
                 }
             }
         },
@@ -446,7 +464,10 @@
             "name": "Borrar",
             "controls": {
                 "default": {
-                    "label": "Borrar"
+                    "label": "Borrar",
+                    "description": [
+                        "Borrar los efectos de la herramienta de dibujo"
+                    ]
                 }
             }
         },
@@ -465,7 +486,8 @@
             "name": "Capas",
             "controls": {
                 "default": {
-                    "label": "Capas"
+                    "label": "Capas",
+                    "description": []
                 }
             }
         },
@@ -473,7 +495,8 @@
             "name": "Búsqueda",
             "controls": {
                 "default": {
-                    "label": "Búsqueda"
+                    "label": "Búsqueda",
+                    "description": []
                 }
             }
         },
@@ -481,7 +504,11 @@
             "name": "Selección",
             "controls": {
                 "default": {
-                    "label": "Selección"
+                    "label": "Selección",
+                    "description": [
+                        "Restringir el área de edición",
+                        "Cortar, copiar, eliminar áreas específicas"
+                    ]
                 }
             }
         },
@@ -489,7 +516,8 @@
             "name": "Acciones",
             "controls": {
                 "default": {
-                    "label": "Acciones"
+                    "label": "Acciones",
+                    "description": []
                 }
             }
         },
@@ -497,7 +525,11 @@
             "name": "Texto",
             "controls": {
                 "default": {
-                    "label": "Insertar / Editar texto"
+                    "label": "Insertar / Editar texto",
+                    "description": [
+                        "Insertar capas de texto",
+                        "Editar las capas de texto existentes"
+                    ]
                 }
             }
         },
@@ -505,7 +537,11 @@
             "name": "Mover / Transformar",
             "controls": {
                 "default": {
-                    "label": "Mover / Transformar"
+                    "label": "Mover / Transformar",
+                    "description": [
+                        "Mover, escalar, rotar capas",
+                        "Manage layer boundaries"
+                    ]
                 }
             }
         },
@@ -513,7 +549,23 @@
             "name": "Canvas Viewport",
             "controls": {
                 "default": {
-                    "label": "Zoom / Vista Pan"
+                    "label": "Zoom / Vista Pan",
+                    "description": [
+                        "Entrar y salir",
+                        "Pan o girar la vista"
+                    ]
+                }
+            }
+        },
+        "effect": {
+            "name": "Efecto",
+            "controls": {
+                "default": {
+                    "label": "Efecto",
+                    "description": [
+                        "Colores de capa manipular",
+                        "Añadir filtros de capa, como efectos borrosos"
+                    ]
                 }
             }
         }
@@ -524,6 +576,10 @@
                 "gotIt": "Lo tengo",
                 "dontShowTips": "No mostrar consejos"
             }
+        },
+        "fontNotify": {
+            "title": "Cargando fuentes",
+            "pleaseWait": "Por favor, esperen, estas fuentes están siendo cargadas:"
         }
     },
     "measurement": {
@@ -616,6 +672,37 @@
         "renameLayer": {
             "title": "Rename Layer",
             "layerName": "Nombre nuevo"
+        },
+        "imageConvertLayersToCollage": {
+            "title": "Convertir Capas en Collage",
+            "collageType": {
+                "verticalStack": "Vertical Stack",
+                "horizontalStack": "Horizontal Stack",
+                "grid": "Grid"
+            },
+            "params": {
+                "shared": {
+                    "reverseLayerOrder": "Orden de capas inversas"
+                },
+                "verticalStack": {
+                    "horizontalAlignment": "Alineación horizontal",
+                    "horizontalAlignmentOption": {
+                        "left": "Izquierda",
+                        "center": "Center",
+                        "right": "Bien"
+                    },
+                    "verticalMargin": "Margen vertical"
+                },
+                "horizontalStack": {
+                    "verticalAlignment": "Alineación vertical",
+                    "verticalAlignmentOption": {
+                        "top": "Top",
+                        "middle": "Medio ambiente",
+                        "bottom": "Bottom"
+                    },
+                    "horizontalMargin": "Margen horizontal"
+                }
+            }
         }
     },
     "moduleGroup": {
@@ -654,6 +741,10 @@
                 "takePhoto": {
                     "name": "Tomar una foto",
                     "description": "Tome una foto de su cámara web y webcam e inserte en la imagen."
+                },
+                "restoreBackup": {
+                    "name": "Restore Backup Imagen",
+                    "description": "Cargue el archivo de copia de seguridad guardado automáticamente durante la edición."
                 }
             }
         },
@@ -698,6 +789,10 @@
                 "paste": {
                     "name": "Pegado",
                     "description": "Inserte imágenes en el lienzo desde el portapapeles."
+                },
+                "convertLayersToCollage": {
+                    "name": "Convertir Capas en Collage",
+                    "description": "Convierte las capas seleccionadas en un collage de imagen. Hay muchos diseños de collage diferentes disponibles."
                 }
             }
         },
@@ -828,6 +923,20 @@
             "rotateClockwise": "Rotate Clockwise",
             "fit": "Fit",
             "flip": "Flip"
+        },
+        "drawBrush": {
+            "brushColor": "Brush Color",
+            "brushSize": "Tamaño"
+        },
+        "effect": {
+            "edit": {
+                "noLayersSelected": "Por favor seleccione una o más capas en el muelle de capas para editar sus efectos.",
+                "layerHasNoEffects": "Esta capa no tiene efectos.",
+                "deleteEffect": "Eliminar el efecto"
+            }
+        },
+        "eraseBrush": {
+            "brushSize": "Tamaño"
         }
     },
     "toolGroup": {
@@ -887,6 +996,26 @@
             "tools": {
                 "name": "Zoom",
                 "description": "Ampliar dentro y fuera del lienzo para controlar cuánto de la imagen se puede ver."
+            }
+        },
+        "effect": {
+            "name": "Efecto",
+            "description": "Ajuste los colores de la capa, agregue el borroso y otros efectos.",
+            "tools": {
+                "brush": {
+                    "name": "Efecto",
+                    "description": "Gestionar los efectos sobre las capas."
+                }
+            }
+        },
+        "erase": {
+            "name": "Borrar",
+            "description": "Brujas, lápices, bolígrafos, esa borrada.",
+            "tools": {
+                "brush": {
+                    "name": "Borrar el cepillo",
+                    "description": "Borra datos de capas de raster."
+                }
             }
         }
     },
@@ -993,6 +1122,18 @@
                 "ctrlLeftClick": "Ctrl + izquierda",
                 "leftMouseButton": "Botón izquierdo del ratón"
             }
+        },
+        "effectToolIntroduction": {
+            "title": "Herramienta de efecto",
+            "introduction": [
+                "La herramienta de efecto permite añadir efectos de capa que pueden ajustar los colores y hacer todo tipo de otras operaciones útiles a toda la capa. Los efectos se pueden apilar y eliminar en cualquier momento."
+            ]
+        },
+        "eraseToolIntroduction": {
+            "title": "Borrar la herramienta",
+            "introduction": [
+                "La herramienta borrada le permite eliminar partes de la capa, haciéndolos transparentes."
+            ]
         }
     }
 }

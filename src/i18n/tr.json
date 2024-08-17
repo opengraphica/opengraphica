@@ -39,7 +39,11 @@
         "updateLayer": "Güncelleme Katmanı",
         "updateDrawLayer": "Katman üzerinde çizin",
         "updateLayerFilterParams": "Update Katman Etkisi",
-        "updateSelectionCombineMode": "Update Selection Mode"
+        "updateSelectionCombineMode": "Update Selection Mode",
+        "convertLayersToCollage": "Kompaj Katmanları Collage",
+        "textTransformResize": "Resize Text Katman",
+        "textTransformTranslate": "Text Katman",
+        "updateEraseLayer": "Katmandan"
     },
     "app": {
         "colorPickerGradient": {
@@ -118,7 +122,10 @@
         "settings": "Ayarlar",
         "take": "Take",
         "takePhoto": "Fotoğraflar alın",
-        "yes": "Evet"
+        "yes": "Evet",
+        "addEffect": "Add Etkisi Ekle",
+        "editEffects": "Edit Effects",
+        "restoreLastImage": "Restore Last Image"
     },
     "canvas": {
         "toolbar": {
@@ -153,7 +160,8 @@
                     "save": "Kaydet",
                     "saveAs": "Kaydet As Save As Kaydet",
                     "insertPhoto": "Bir Fotoğraf Ekle",
-                    "takePhoto": "Bir Fotoğraflar Alın"
+                    "takePhoto": "Bir Fotoğraflar Alın",
+                    "restore": "Restore Last Image"
                 }
             },
             "image": {
@@ -163,7 +171,8 @@
                     "convertLayers": {
                         "groupTitle": "Convert Katmanlar...",
                         "toImageSequence": "Image Sequence",
-                        "flatten": "Flatten To New Katman"
+                        "flatten": "Flatten To New Katman",
+                        "toCollage": "Collage"
                     },
                     "cut": "Cut",
                     "copy": "Kopya kopya",
@@ -422,7 +431,12 @@
             "name": "Deform",
             "controls": {
                 "default": {
-                    "label": "Deform"
+                    "label": "Deform",
+                    "description": [
+                        "Sharpen veya görüntüyü bulanıklaştırıyor",
+                        "Bulge, görüntü alanları",
+                        "Görüntünün görüntü alanları"
+                    ]
                 }
             }
         },
@@ -430,7 +444,11 @@
             "name": "Çizim",
             "controls": {
                 "default": {
-                    "label": "Çizim"
+                    "label": "Çizim",
+                    "description": [
+                        "Sanat fırçaları kullanın",
+                        "Şekiller veya yüksek lisanslar oluşturun"
+                    ]
                 }
             }
         },
@@ -446,7 +464,10 @@
             "name": "Erase",
             "controls": {
                 "default": {
-                    "label": "Erase"
+                    "label": "Erase",
+                    "description": [
+                        "Çizim aracının etkilerini gözden geçirin"
+                    ]
                 }
             }
         },
@@ -465,7 +486,8 @@
             "name": "Katmanlar",
             "controls": {
                 "default": {
-                    "label": "Katmanlar"
+                    "label": "Katmanlar",
+                    "description": []
                 }
             }
         },
@@ -473,7 +495,8 @@
             "name": "Arama",
             "controls": {
                 "default": {
-                    "label": "Arama"
+                    "label": "Arama",
+                    "description": []
                 }
             }
         },
@@ -481,7 +504,11 @@
             "name": "Seçme",
             "controls": {
                 "default": {
-                    "label": "Seçme"
+                    "label": "Seçme",
+                    "description": [
+                        "Düzenleme alanı",
+                        "Cut, kopya, belirli alanları sil"
+                    ]
                 }
             }
         },
@@ -489,7 +516,8 @@
             "name": "Eylemler",
             "controls": {
                 "default": {
-                    "label": "Eylemler"
+                    "label": "Eylemler",
+                    "description": []
                 }
             }
         },
@@ -497,7 +525,11 @@
             "name": "Text",
             "controls": {
                 "default": {
-                    "label": "Ekle / Edit Text"
+                    "label": "Ekle / Edit Text",
+                    "description": [
+                        "Metin katmanları",
+                        "Mevcut metin katmanları"
+                    ]
                 }
             }
         },
@@ -505,7 +537,11 @@
             "name": "Move / Dönüşüm",
             "controls": {
                 "default": {
-                    "label": "Move / Dönüşüm"
+                    "label": "Move / Dönüşüm",
+                    "description": [
+                        "Move, ölçek, döndürme tabakaları",
+                        "Katman sınırlarını yönetin"
+                    ]
                 }
             }
         },
@@ -513,7 +549,23 @@
             "name": "Blood Viewport",
             "controls": {
                 "default": {
-                    "label": "Zoom / Pan View"
+                    "label": "Zoom / Pan View",
+                    "description": [
+                        "Zoom in and out",
+                        "Pan veya görünümü döndürür"
+                    ]
+                }
+            }
+        },
+        "effect": {
+            "name": "Etkisi",
+            "controls": {
+                "default": {
+                    "label": "Etkisi",
+                    "description": [
+                        "Manipulate tabakası renkleri",
+                        "Katman filtreleri ekleyin, bulanık etkiler gibi"
+                    ]
                 }
             }
         }
@@ -524,6 +576,10 @@
                 "gotIt": "Got It Got It",
                 "dontShowTips": "İpuçları göster"
             }
+        },
+        "fontNotify": {
+            "title": "Yüklemek Fonts",
+            "pleaseWait": "Lütfen bekleyin, bu fontlar yüklenir:"
         }
     },
     "measurement": {
@@ -616,6 +672,37 @@
         "renameLayer": {
             "title": "Rename Katmanı",
             "layerName": "Yeni İsim"
+        },
+        "imageConvertLayersToCollage": {
+            "title": "Kompaj Katmanları Collage",
+            "collageType": {
+                "verticalStack": "Dikey Stack",
+                "horizontalStack": "Yatay Stack",
+                "grid": "Grid"
+            },
+            "params": {
+                "shared": {
+                    "reverseLayerOrder": "Ters Katman Siparişi"
+                },
+                "verticalStack": {
+                    "horizontalAlignment": "Yatay Uyum",
+                    "horizontalAlignmentOption": {
+                        "left": "Sol sol sol",
+                        "center": "Merkez Merkezi",
+                        "right": "Doğru"
+                    },
+                    "verticalMargin": "Dikey Margin"
+                },
+                "horizontalStack": {
+                    "verticalAlignment": "Dikeyleştirme",
+                    "verticalAlignmentOption": {
+                        "top": "Top",
+                        "middle": "Orta",
+                        "bottom": "Alt"
+                    },
+                    "horizontalMargin": "Yatay Margin"
+                }
+            }
         }
     },
     "moduleGroup": {
@@ -654,6 +741,10 @@
                 "takePhoto": {
                     "name": "Bir Fotoğraflar Alın",
                     "description": "Kameranız ve web kameranızdan bir fotoğraf alın ve onu görüntüye ekleyin."
+                },
+                "restoreBackup": {
+                    "name": "Geri yükleme Backup Backup Image Image Image",
+                    "description": "Kira dosyasını düzenleme sırasında otomatik olarak kurtarın."
                 }
             }
         },
@@ -698,6 +789,10 @@
                 "paste": {
                     "name": "Paste",
                     "description": "Kutudan tuvale resim çizin."
+                },
+                "convertLayersToCollage": {
+                    "name": "Kompaj Katmanları Collage",
+                    "description": "Seçilen tabakaları bir görüntü kolajına dönüştürür. Mevcut birçok farklı kollage düzeni vardır."
                 }
             }
         },
@@ -828,6 +923,20 @@
             "rotateClockwise": "Rotate Clockwise",
             "fit": "Fit",
             "flip": "Flip"
+        },
+        "drawBrush": {
+            "brushColor": "Fırça Renkleri",
+            "brushSize": "Boyut Boyutu"
+        },
+        "effect": {
+            "edit": {
+                "noLayersSelected": "Lütfen etkilerini düzenlemek için tabakalarda bir veya daha fazla tabaka seçin.",
+                "layerHasNoEffects": "Bu tabakanın hiçbir etkisi yoktur.",
+                "deleteEffect": "Delete etkisi"
+            }
+        },
+        "eraseBrush": {
+            "brushSize": "Boyut Boyutu"
         }
     },
     "toolGroup": {
@@ -887,6 +996,26 @@
             "tools": {
                 "name": "Zoom",
                 "description": "Görebileceğiniz görüntünün ne kadarını kontrol etmek ve tuvali dışarı çıkarın."
+            }
+        },
+        "effect": {
+            "name": "Etkisi",
+            "description": "Katman renkleri, bulanık ve diğer etkiler ekleyin.",
+            "tools": {
+                "brush": {
+                    "name": "Etkisi",
+                    "description": "Katmanlar üzerindeki etkilerini yönetin."
+                }
+            }
+        },
+        "erase": {
+            "name": "Erase",
+            "description": "Fırçalar, kalemler, kalemler, bu silin.",
+            "tools": {
+                "brush": {
+                    "name": "Erase",
+                    "description": "Ayılar verileri raster katmanlarından."
+                }
             }
         }
     },
@@ -993,6 +1122,18 @@
                 "ctrlLeftClick": "Ctrl + Left Click",
                 "leftMouseButton": "Sol Mouse"
             }
+        },
+        "effectToolIntroduction": {
+            "title": "Etkisi",
+            "introduction": [
+                "Etkisi aracı, renkleri ayarlayabilen ve tüm katmana diğer yararlı operasyonları yapabilen katman etkilerini eklemeye olanak tanır. Etkiler herhangi bir zamanda yığılabilir ve kaldırılabilir."
+            ]
+        },
+        "eraseToolIntroduction": {
+            "title": "Erase Tool",
+            "introduction": [
+                "Kayıp araç, tabakanın parçalarını kaldırmanıza izin verir, onları şeffaf hale getirir."
+            ]
         }
     }
 }
