@@ -172,7 +172,7 @@ export default defineComponent({
 
             await nextTick();
 
-            if (preferencesStore.get('showWelcomeScreenAtStart')) {
+            if (preferencesStore.get('showWelcomeScreenAtStart') && window.innerWidth <= 1000) {
                 const welcomeModule = getModuleDefinition('tutorial', 'welcome');
                 if (welcomeModule) {
                     appEmitter.emit('app.menuDrawer.openFromModule', {
