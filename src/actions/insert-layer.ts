@@ -184,7 +184,10 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
         canvasStore.set('dirty', true);
 
         // Update the working file backup
-        updateWorkingFile({ layers: workingFileStore.get('layers') });
+        updateWorkingFile({
+            layerIdCounter: workingFileStore.get('layerIdCounter'),
+            layers: workingFileStore.get('layers')
+        });
         updateWorkingFileLayer(this.insertedLayer);
 	}
 
@@ -226,7 +229,10 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
         canvasStore.set('dirty', true);
 
         // Update the working file backup
-        updateWorkingFile({ layers: workingFileStore.get('layers') });
+        updateWorkingFile({
+            layerIdCounter: workingFileStore.get('layerIdCounter'),
+            layers: workingFileStore.get('layers')
+        });
         deleteWorkingFileLayer(oldInsertedLayerId);
 	}
 
