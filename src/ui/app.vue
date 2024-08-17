@@ -1,5 +1,5 @@
 <template>
-    <component v-if="AppMainComponent" :is="AppMainComponent" />
+    <component v-if="isAllPluginsLoaded && isThemeLoaded && AppMainComponent" :is="AppMainComponent" />
     <div
         v-if="isShowingPreloadAnimation"
         class="ogr-preload"
@@ -65,13 +65,54 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, markRaw, nextTick, ref, watch, type Component } from 'vue';
+import { computed, defineComponent, markRaw, nextTick, provide, ref, watch, type Component } from 'vue';
 import { useAppPreloadBlocker, isAppPreloading } from '@/composables/app-preload-blocker';
+import { usePlugin, getAppConfig } from '@/composables/app-plugin';
+import appEmitter from '@/lib/emitter';
+
+import type { Notify } from 'element-plus/lib/components/notification/src/notification.d';
 
 export default defineComponent({
     name: 'App',
     setup() {
         const { loading: isPreloadBlocked } = useAppPreloadBlocker(); 
+
+        /*------------------*\
+        | Import Vue Plugins |
+        \*------------------*/
+
+        const isI18nPluginLoaded = ref(false);
+        import('@/i18n').then(({ default: i18n }) => {
+            usePlugin(i18n);
+            isI18nPluginLoaded.value = true;
+        });
+
+        const isNotificationPluginLoaded = ref(false);
+        const $notify = ref<Notify>();
+        provide('$notify', $notify);
+        Promise.all([
+            import('element-plus/lib/components/notification/index'),
+            import('@/lib/notify'),
+        ]).then((results) => {
+            const [{ default: ElNotification }, { notifyPolyfill }] = results;
+            // Notification toasts
+            usePlugin(ElNotification);
+            $notify.value = markRaw(notifyPolyfill(getAppConfig().globalProperties.$notify));
+            appEmitter.on('app.notify', (options) => {
+                const instance = notifyPolyfill(getAppConfig().globalProperties.$notify)(options);
+                if (options?.onCreated) {
+                    options.onCreated(instance);
+                }
+            });
+            isNotificationPluginLoaded.value = true;
+        });
+
+        const isAllPluginsLoaded = computed(() => {
+            return (
+                isI18nPluginLoaded.value &&
+                isNotificationPluginLoaded.value
+            );
+        });
 
         /*-----------------------------*\
         | Asynchronously Import Main UI |
@@ -86,6 +127,21 @@ export default defineComponent({
             });
         });
 
+        /*-------------------*\
+        | Check Themes Loaded |
+        \*-------------------*/
+
+        const isThemeLoaded = ref(false);
+
+        import('@/store/editor').then(({ default: editorStore }) => {
+            const themeLoadUnwatch = watch(() => editorStore.state.activeTheme, (activeTheme) => {
+                if (activeTheme != null) {
+                    isThemeLoaded.value = true;
+                    themeLoadUnwatch();
+                }
+            }, { immediate: true });
+        });
+
         /*----------------------*\
         | Show Preload Animation |
         \*----------------------*/
@@ -96,6 +152,8 @@ export default defineComponent({
         const isPreloading = computed(() => {
             return (
                 !AppMainComponent.value ||
+                !isThemeLoaded.value ||
+                !isAllPluginsLoaded.value ||
                 isAppPreloading.value
             );
         });
@@ -127,6 +185,8 @@ export default defineComponent({
                 justify-content: center;
                 box-shadow: 0 0 5rem rgba(0,0,0,0.05) inset, 0 0 2rem rgba(0,0,0,0.05) inset;
                 opacity: 1;
+                max-width: 200vw;
+                max-height: 200vh;
                 z-index: 9999999;
             }
             .ogr-preload--fade-out {
@@ -277,6 +337,8 @@ export default defineComponent({
             isHidingPreloadAnimation,
             isPreloading,
             onPreloadTransitionEnd,
+            isThemeLoaded,
+            isAllPluginsLoaded,
             AppMainComponent,
         };
     }

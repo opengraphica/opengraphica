@@ -1,6 +1,6 @@
-import mitt, { Handler } from 'mitt';
-import { NotificationProps, NotificationHandle } from 'element-plus/lib/components/notification/src/notification.d';
-import { CanvasViewResetOptions, ModuleDefinition } from '@/types';
+import mitt, { type Handler } from 'mitt';
+import type { NotificationProps, NotificationHandle } from 'element-plus/lib/components/notification/src/notification.d';
+import type { CanvasViewResetOptions, ModuleDefinition } from '@/types';
 
 interface AppEmitterEvents {
     'app.canvas.calculateDndArea': undefined;

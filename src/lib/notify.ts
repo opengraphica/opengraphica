@@ -1,9 +1,10 @@
-import { inject } from 'vue';
-import { Notify, NotificationParams, NotificationHandle } from 'element-plus/lib/components/notification/src/notification.d';
+import { inject, type Ref } from 'vue';
+import type { Notify, NotificationParams, NotificationHandle } from 'element-plus/lib/components/notification/src/notification.d';
 
 export function notifyInjector(injectName: string): any {
-    const $notify = inject<Notify>(injectName) as Notify;
-    return notifyPolyfill($notify);
+    const $notify = inject<Ref<Notify>>(injectName) as Ref<Notify>;
+    if (!$notify.value) return () => {};
+    return notifyPolyfill($notify.value);
 }
 
 export function notifyPolyfill($notify: Notify): Notify {

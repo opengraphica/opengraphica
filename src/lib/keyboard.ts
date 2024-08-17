@@ -4,18 +4,13 @@
  */
 
 import defaultKeyboardMapConfig from '@/config/default-keyboard-map.json';
-import cloneDeep from 'lodash/cloneDeep';
 import { ref } from 'vue';
 import editorStore from '@/store/editor';
-import historyStore from '@/store/history';
-import workingFileStore, { ensureUniqueLayerSiblingName } from '@/store/working-file';
 import appEmitter from '@/lib/emitter';
 import { isInput } from '@/lib/events';
 import { generateImageBlobHash } from '@/lib/hash';
 import { runModule } from '@/modules';
 import { KeyboardMapConfigCategory } from '@/types';
-import { BundleAction } from '@/actions/bundle';
-import { InsertLayerAction } from '@/actions/insert-layer';
 import { t } from '@/i18n';
 
 export const isCtrlKeyPressed = ref<boolean>(false);
