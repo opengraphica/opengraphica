@@ -8,10 +8,6 @@
             </div>
             <div class="is-flex is-justify-content-center mt-4">
                 <div class="is-inline-block">
-                    <el-button v-if="showRestoreImage" link type="primary" class="m-0 is-block" @click="onRestoreImage()">
-                        <span class="bi bi-recycle mr-2" style="font-size: 1.2rem" aria-hidden="true" />
-                        {{ $t('button.restoreLastImage') }}
-                    </el-button>
                     <el-button link type="primary" class="m-0 is-block" @click="onNewImage()">
                         <span class="bi bi-file-earmark-plus mr-2" style="font-size: 1.2rem" aria-hidden="true" />
                         {{ $t('button.createNewImage') }}
@@ -23,6 +19,10 @@
                     <el-button link type="primary" class="m-0 is-block" @click="onTakePhoto()">
                         <span class="bi bi-camera mr-2" style="font-size: 1.2rem" aria-hidden="true" />
                         {{ $t('button.takePhoto') }}
+                    </el-button>
+                    <el-button v-if="showRestoreImage" link type="primary" class="m-0 is-block mt-3" @click="onRestoreImage()">
+                        <span class="bi bi-recycle mr-2" style="font-size: 1.2rem" aria-hidden="true" />
+                        {{ $t('button.restoreLastImage') }}
                     </el-button>
                 </div>
             </div>

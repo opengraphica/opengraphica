@@ -26,6 +26,7 @@ import appEmitter, { AppEmitterEvents } from '@/lib/emitter';
 import { DecomposedMatrix } from '@/lib/dom-matrix';
 import { isWebGLAvailable, isWebGL2Available } from '@/lib/webgl';
 import { colorToRgba, getColorModelName } from '@/lib/color';
+import { useAppPreloadBlocker } from '@/composables/app-preload-blocker';
 
 export default defineComponent({
     name: 'AppCanvas',
@@ -41,7 +42,7 @@ export default defineComponent({
         let isPicaSingleThreaded: boolean = false;
         const $notify = notifyInjector('$notify');
 
-        const loading = ref(false);
+        const { loading } = useAppPreloadBlocker();
 
         const rootElement = inject<Ref<Element>>('rootElement');
         const mainElement = inject<Ref<Element>>('mainElement');
@@ -283,7 +284,6 @@ export default defineComponent({
         });
 
         onMounted(async () => {
-            loading.value = true;
             appEmitter.on('app.canvas.resetTransform', resetTransform);
 
             if (canvas.value) {

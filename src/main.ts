@@ -1,5 +1,5 @@
 
-import { createApp, App } from 'vue';
+import { createApp, type App } from 'vue';
 import i18n from '@/i18n';
 import '@/polyfill';
 import OpenGraphicaApp from '@/ui/app.vue';
