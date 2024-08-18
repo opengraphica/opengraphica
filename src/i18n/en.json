@@ -38,6 +38,7 @@
         "toggleLayerVisibilityOn": "Toggle Layer Visibility On",
         "toggleLayerVisibilityOff": "Toggle Layer Visibility Off",
         "trimLayerEmptySpace": "Trim Layer Empty Space",
+        "typeInTextLayer": "Type in Text Layer",
         "updateActiveSelection": "Update Active Selection",
         "updateFile": "Update File",
         "updateLayer": "Update Layer",

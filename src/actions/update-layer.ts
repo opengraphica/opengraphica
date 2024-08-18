@@ -132,6 +132,14 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                 //         }
                 //     }
                 // }
+                else {
+                    if ((this.explicitPreviousProps as any)[prop] !== undefined) {
+                        (this.previousProps as any)[prop] = (this.explicitPreviousProps as any)[prop];
+                    } else {
+                        (this.previousProps as any)[prop] = (layer as any)[prop];
+                    }
+                    (layer as any).data = this.updateLayerOptions[prop];
+                }
             } else if (prop !== 'id') {
                 if (prop === 'type') {
                     if (layer.renderer) {

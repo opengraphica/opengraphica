@@ -7,7 +7,6 @@ import { SelectLayersAction } from '@/actions/select-layers';
 import { UpdateLayerAction } from '@/actions/update-layer';
 
 import BaseCanvasMovementController from './base-movement';
-import canvasStore from '@/store/canvas';
 
 import { decomposeMatrix } from '@/lib/dom-matrix';
 import { isInput } from '@/lib/events';
@@ -16,7 +15,9 @@ import { TextDocumentEditor, TextDocumentSelection, TextDocumentEditorWithSelect
 import { textMetaDefaults } from '@/lib/text-common';
 import { calculateTextPlacement } from '@/lib/text-render';
 
+import canvasStore from '@/store/canvas';
 import historyStore from '@/store/history';
+import preferencesStore from '@/store/preferences';
 import workingFileStore, { getLayerById, getLayerGlobalTransform, getLayersByType, getSelectedLayers } from '@/store/working-file';
 
 import {
@@ -44,6 +45,8 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     private editingLayerDocumentStart: TextDocument | null = null;
     private editingLayerWidthStart: number | null = null;
     private editingLayerHeightStart: number | null = null;
+    private editingLayerDocumentOnFocus: TextDocument | null = null;
+    private editingLayerDocumentOnFocusId: number | null = null;
 
     private isCreatingLayer: boolean = false;
     private createdLayerId: number | null = null;
@@ -51,6 +54,8 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     private editorTextarea: HTMLTextAreaElement | null = null;
     private editorTextareaId: string = 'textControllerKeyboardInput' + uuidv4();
     private isEditorTextareaComposing: boolean = false;
+    private isEditorTextareaDirty: boolean = false; // Unsaved changes have been made
+    private editorTextareaQueueSaveTimeoutHandle: number | undefined = undefined;
 
     private layerEditors: Map<number, { documentEditor: TextDocumentEditor, documentSelection: TextDocumentSelection }> = new Map();
     private editingLayer: WorkingFileTextLayer | null = null;
@@ -108,8 +113,16 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         }, { immediate: true });
 
         this.editingLayerIdUnwatch = watch(() => editingTextLayerId.value, (id) => {
-            if (id == null) return;
-            this.editingLayer = getLayerById(id) as WorkingFileTextLayer;
+            if (id == null) {
+                this.editingLayer = null;
+                return;
+            }
+            const layer = getLayerById(id) as WorkingFileTextLayer;
+            if (layer.type !== 'text') {
+                this.editingLayer = null;
+                return;
+            }
+            this.editingLayer = layer;
         }, { immediate: true });
         
         this.onFontsLoaded = this.onFontsLoaded.bind(this);
@@ -183,7 +196,9 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             if (editors) {
                 const { documentSelection } = editors;
                 const layer = getLayerById(editingTextLayerId.value) as WorkingFileTextLayer;
-                if (layer) {
+                if (layer && layer.type === 'text') {
+                    this.editingLayerDocumentOnFocusId = layer.id;
+                    this.editingLayerDocumentOnFocus = JSON.parse(JSON.stringify(layer.data));
                     let isHorizontal = ['ltr', 'rtl'].includes(layer.data.lineDirection);
                     editingRenderTextPlacement.value = calculateTextPlacement(layer.data, {
                         wrapSize: isHorizontal ? layer.width : layer.height,
@@ -195,8 +210,10 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     }
 
     private onBlurEditorTextarea() {
+        if (this.isEditorTextareaDirty) {
+            this.saveEditorTextarea();
+        }
         isEditorTextareaFocused.value = false;
-        // TODO - update layer in history
     }
 
     private onCompositionStartEditorTextarea(event: CompositionEvent) {
@@ -218,9 +235,13 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         if (!this.isEditorTextareaComposing) {
             const editors = this.layerEditors.get(editingTextLayerId.value);
             if (!editors || !this.editorTextarea) return;
-            const { documentEditor, documentSelection } = editors;
-            TextDocumentEditorWithSelection.insertTextAtCurrentPosition(documentEditor, documentSelection, this.editorTextarea.value);
-            this.editorTextarea.value = '';
+            if (this.editorTextarea.value.length > 0) {
+                const { documentEditor, documentSelection } = editors;
+                TextDocumentEditorWithSelection.insertTextAtCurrentPosition(documentEditor, documentSelection, this.editorTextarea.value);
+                this.editorTextarea.value = '';
+                this.isEditorTextareaDirty = true;
+                this.queueSaveEditorTextarea();
+            }
             // this.extendFixedBounds(editingTextLayerId.value);
         }
     };
@@ -234,9 +255,13 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         switch (event.key) {
             case 'Backspace':
                 TextDocumentEditorWithSelection.deleteCharacterAtCurrentPosition(documentEditor, documentSelection, false);
+                this.isEditorTextareaDirty = true;
+                this.queueSaveEditorTextarea();
                 break;
             case 'Delete':
                 TextDocumentEditorWithSelection.deleteCharacterAtCurrentPosition(documentEditor, documentSelection, true);
+                this.isEditorTextareaDirty = true;
+                this.queueSaveEditorTextarea();
                 break;
             case 'Home':
                 documentSelection.moveLineStart(event.shiftKey);
@@ -358,6 +383,9 @@ export default class CanvasTextController extends BaseCanvasMovementController {
 
                         // Delete selection
                         TextDocumentEditorWithSelection.deleteSelection(documentEditor, documentSelection);
+
+                        this.isEditorTextareaDirty = true;
+                        this.queueSaveEditorTextarea();
                     }
                     break;
                 }
@@ -707,6 +735,42 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             editingTextLayerId.value = createdLayerId;
             this.editorTextarea?.focus();
         }, 1);
+    }
+
+    private queueSaveEditorTextarea() {
+        this.editorTextareaQueueSaveTimeoutHandle = window.setTimeout(
+            this.saveEditorTextarea.bind(this),
+            preferencesStore.get('textLayerSaveDelay')
+        );
+    }
+
+    private async saveEditorTextarea() {
+        window.clearTimeout(this.editorTextareaQueueSaveTimeoutHandle);
+        this.editorTextareaQueueSaveTimeoutHandle = undefined;
+        if (this.isEditorTextareaDirty) {
+            if (
+                editingTextLayerId.value != null &&
+                this.editingLayerDocumentOnFocusId === editingTextLayerId.value &&
+                this.editingLayerDocumentOnFocus &&
+                this.editingLayer?.data
+            ) {
+                const oldTextDocument = this.editingLayerDocumentOnFocus;
+                this.editingLayerDocumentOnFocus = JSON.parse(JSON.stringify(this.editingLayer.data));
+                this.isEditorTextareaDirty = false;
+                await historyStore.dispatch('runAction', {
+                    action: new BundleAction('typeInTextLayer', 'action.typeInTextLayer', [
+                        new UpdateLayerAction<UpdateTextLayerOptions>({
+                            id: editingTextLayerId.value,
+                            data: this.editingLayer.data
+                        }, {
+                            data: oldTextDocument
+                        })
+                    ])
+                });
+            } else {
+                console.error('[src/canvas/controllers/text.ts] Attempted to save text layer changes, but some data was out of sync.');
+            }
+        }
     }
 
     private pickLayer(viewTransformPoint: DOMPoint): number | null {

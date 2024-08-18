@@ -1,7 +1,7 @@
 <template>
     <div class="ogr-canvas-overlay">
         <div
-            v-if="isEditorTextareaFocused"
+            v-if="selectionBoxes.length > 0"
             class="ogr-text-selection"
             :style="{ transform: editingLayerCssTransform }"
         >

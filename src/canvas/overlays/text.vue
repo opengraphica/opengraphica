@@ -1,5 +1,6 @@
 <template>
     <div class="ogr-canvas-overlay">
+        <!-- Display a resizable boundary box -->
         <div ref="editinglayerBounds"
             class="ogr-free-transform"
             v-show="editingTextLayerId != null"
@@ -42,6 +43,7 @@
                 </svg>
             </div>
         </div>
+        <!-- Editing cursor (selection highlight is in text-selection.vue) -->
         <div class="ogr-text-editor">
             <div
                 v-if="selectionCursor && isEditorTextareaFocused"
@@ -140,6 +142,7 @@ export default defineComponent({
             if (editingTextLayerId.value == null) return true;
             const layer = getLayerById(editingTextLayerId.value);
             if (layer == null) return true;
+            if (layer.type !== 'text') return true;
             return ['ltr', 'rtl'].includes((layer as WorkingFileTextLayer).data.lineDirection);
         });
 

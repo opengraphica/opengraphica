@@ -22,6 +22,7 @@ interface PreferencesState {
     showTutorialNotifications: boolean;
     showWelcomeScreenAtStart: boolean;
     snapSensitivity: number;
+    textLayerSaveDelay: number;
     tooltipShowDelay: number;
     touchRotation: 'on' | 'snap' | 'off';
     useCanvasViewport: boolean;
@@ -56,6 +57,7 @@ const store = new PerformantStore<PreferencesStore>({
         showTutorialNotifications: true,
         showWelcomeScreenAtStart: true,
         snapSensitivity: 5,
+        textLayerSaveDelay: 5000,
         tooltipShowDelay: 300,
         touchRotation: 'off',
         useCanvasViewport: true,
