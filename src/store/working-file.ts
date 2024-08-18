@@ -94,17 +94,17 @@ function getWebGLContextAttributes(): WebGLContextAttributes {
     return {};
 }
 
-function getLayerById(id: number, parent?: WorkingFileLayer<ColorModel>[]): WorkingFileAnyLayer<ColorModel> | null {
+function getLayerById<T extends WorkingFileAnyLayer<ColorModel>>(id: number, parent?: WorkingFileLayer<ColorModel>[]): T | null {
     if (parent == null) {
         parent = store.get('layers');
     }
     for (let layer of parent) {
         if (layer.id === id) {
-            return layer as WorkingFileAnyLayer<ColorModel>;
+            return layer as never;
         } else if (layer.type === 'group') {
             let foundLayer = getLayerById(id, (layer as WorkingFileGroupLayer<ColorModel>).layers);
             if (foundLayer) {
-                return foundLayer;
+                return foundLayer as never;
             }
         }
     }

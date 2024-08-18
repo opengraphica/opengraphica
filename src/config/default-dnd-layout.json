@@ -10,7 +10,7 @@
                     "view",
                     "transform",
                     "selection",
-                    
+                    "text",
                     "draw",
                     "erase",
                     "effect"

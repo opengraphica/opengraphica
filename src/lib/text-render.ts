@@ -202,14 +202,20 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
     let isHorizontal = ['ltr', 'rtl'].includes(document.lineDirection);
 
     // Determine line wrapping based on boundary box.
-    let wrappedLines = document.lines;
+    let documentLines = document.lines;
+    const isEmptyDocument = documentLines.length === 1 && documentLines[0].spans.length === 1 && documentLines[0].spans[0].text.trim() === '';
+    if (isEmptyDocument) {
+        documentLines = JSON.parse(JSON.stringify(documentLines));
+        documentLines[0].spans[0].text = ' ';
+    }
+    let wrappedLines = documentLines;
     let originalLineIndices = [];
     if (document.boundary === 'box') {
         wrappedLines = [];
         let currentLineSpans: TextDocumentSpan[] = [];
         let currentLineSize = 0;
         let lastUsedFont: Font | null = null;
-        for (const [lineIndex, line] of document.lines.entries()) {
+        for (const [lineIndex, line] of documentLines.entries()) {
             currentLineSpans = [];
             currentLineSize = 0;
             for (const fullSpan of line.spans) {

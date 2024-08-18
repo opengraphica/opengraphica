@@ -1,9 +1,10 @@
 import { watch, type WatchStopHandle, watchEffect } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 
+import { BundleAction } from '@/actions/bundle';
+import { InsertLayerAction } from '@/actions/insert-layer';
 import { SelectLayersAction } from '@/actions/select-layers';
 import { UpdateLayerAction } from '@/actions/update-layer';
-import { BundleAction } from '@/actions/bundle';
 
 import BaseCanvasMovementController from './base-movement';
 import canvasStore from '@/store/canvas';
@@ -12,16 +13,18 @@ import { decomposeMatrix } from '@/lib/dom-matrix';
 import { isInput } from '@/lib/events';
 import { rotateDirectionVector2d } from '@/lib/math';
 import { TextDocumentEditor, TextDocumentSelection, TextDocumentEditorWithSelection } from '@/lib/text-editor';
+import { textMetaDefaults } from '@/lib/text-common';
 import { calculateTextPlacement } from '@/lib/text-render';
 
 import historyStore from '@/store/history';
 import workingFileStore, { getLayerById, getLayerGlobalTransform, getLayersByType, getSelectedLayers } from '@/store/working-file';
 
 import {
-    isEditorTextareaFocused, editingTextLayerId, editingRenderTextPlacement, editingTextDocumentSelection, dragHandleHighlight,
+    isEditorTextareaFocused, editingTextLayerId, editingRenderTextPlacement, editingTextDocumentSelection,
+    dragHandleHighlight, createNewTextLayerSize,
 } from '../store/text-state';
 
-import type { UpdateTextLayerOptions, WorkingFileTextLayer, TextDocument } from '@/types';
+import type { UpdateTextLayerOptions, WorkingFileTextLayer, TextDocument, InsertTextLayerOptions } from '@/types';
 import type { PointerTracker } from './base';
 import type { DecomposedMatrix } from '@/lib/dom-matrix';
 import appEmitter from '@/lib/emitter';
@@ -41,6 +44,9 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     private editingLayerDocumentStart: TextDocument | null = null;
     private editingLayerWidthStart: number | null = null;
     private editingLayerHeightStart: number | null = null;
+
+    private isCreatingLayer: boolean = false;
+    private createdLayerId: number | null = null;
 
     private editorTextarea: HTMLTextAreaElement | null = null;
     private editorTextareaId: string = 'textControllerKeyboardInput' + uuidv4();
@@ -423,32 +429,39 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         this.editingLayerDocumentStart = null;
         this.editingLayerWidthStart = null;
         this.editingLayerHeightStart = null;
+        this.isCreatingLayer = false;
+        this.createdLayerId = null;
 
-        if (this.transformIsDragging) {
-            // Pointer resizes / moves text layer.
-            if (editingTextLayerId.value == null || this.editingLayer == null) return;
-            this.editingLayerTransformStart = new DOMMatrix().multiply(this.editingLayer.transform);
-            this.editingLayerDocumentStart = JSON.parse(JSON.stringify(this.editingLayer.data)) as TextDocument;
-            this.editingLayerWidthStart = this.editingLayer.width;
-            this.editingLayerHeightStart = this.editingLayer.height;
+        if (this.dragStartPickLayer != null || dragHandleHighlight.value != null) {
+
+            if (this.transformIsDragging) {
+                // Pointer resizes / moves text layer.
+                if (editingTextLayerId.value == null || this.editingLayer == null) return;
+                this.editingLayerTransformStart = new DOMMatrix().multiply(this.editingLayer.transform);
+                this.editingLayerDocumentStart = JSON.parse(JSON.stringify(this.editingLayer.data)) as TextDocument;
+                this.editingLayerWidthStart = this.editingLayer.width;
+                this.editingLayerHeightStart = this.editingLayer.height;
+            } else {
+                // Pointer manipulates text selection.
+                // Wait and then assign focus, because the browser immediately focuses on clicked element.
+                setTimeout(() => {
+                    // Focus active editor
+                    if (dragStartPickLayer != null) {
+                        editingTextLayerId.value = dragStartPickLayer;
+                        this.editorTextarea?.focus();
+                    }
+
+                    // Set cursor position based on pointer position
+                    if (editingTextLayerId.value == null) return;
+                    const editors = this.layerEditors.get(editingTextLayerId.value);
+                    if (!editors || !this.editorTextarea) return;
+                    const { documentSelection } = editors;
+                    const cursorPosition = this.getEditorCursorAtPoint(viewTransformPoint);
+                    documentSelection.setPosition(cursorPosition.line, cursorPosition.character);
+                }, 0);
+            }
         } else {
-            // Pointer manipulates text selection.
-            // Wait and then assign focus, because the browser immediately focuses on clicked element.
-            setTimeout(() => {
-                // Focus active editor
-                if (dragStartPickLayer != null) {
-                    editingTextLayerId.value = dragStartPickLayer;
-                    this.editorTextarea?.focus();
-                }
-
-                // Set cursor position based on pointer position
-                if (editingTextLayerId.value == null) return;
-                const editors = this.layerEditors.get(editingTextLayerId.value);
-                if (!editors || !this.editorTextarea) return;
-                const { documentSelection } = editors;
-                const cursorPosition = this.getEditorCursorAtPoint(viewTransformPoint);
-                documentSelection.setPosition(cursorPosition.line, cursorPosition.character);
-            }, 0);
+            this.isCreatingLayer = true;
         }
     }
 
@@ -456,89 +469,161 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         const pageX = pointer.move?.pageX ?? 0;
         const pageY = pointer.move?.pageY ?? 0;
         const { viewTransformPoint } = this.getTransformedCursorInfo(pageX, pageY);
-        if (editingTextLayerId.value == null) return;
-        if (this.transformIsDragging) {
-            if (!this.editingLayerTransformStart || this.editingLayerWidthStart == null || this.editingLayerHeightStart == null || this.editingLayer == null || this.dragStartPosition == null) return;
-            const dragHandle = dragHandleHighlight.value;
-            const decomposedViewTransform = canvasStore.get('decomposedTransform');
-            const textLayerTransform = getLayerGlobalTransform(this.editingLayer);
-            const textLayerDecomposedTransform = decomposeMatrix(textLayerTransform);
-            const rotationDirection = decomposedViewTransform.rotation + textLayerDecomposedTransform.rotation + ([DRAG_TYPE_TOP, DRAG_TYPE_BOTTOM].includes(dragHandle!) ? Math.PI / 2 : 0);
-            const rotatedDragVector = rotateDirectionVector2d(
-                viewTransformPoint.x - this.dragStartPosition.x,
-                viewTransformPoint.y - this.dragStartPosition.y,
-                -rotationDirection,
+
+        // Creating new text layer
+        if (this.isCreatingLayer) {
+            const { viewTransformPoint: pointerDownPoint } = this.getTransformedCursorInfo(
+                pointer.down.pageX, pointer.down.pageY
             );
-            if (dragHandle === DRAG_TYPE_ALL) {
-                const deltaX = viewTransformPoint.x - this.dragStartPosition.x;
-                const deltaY = viewTransformPoint.y - this.dragStartPosition.y;
-                this.editingLayer.transform = new DOMMatrix().translateSelf(deltaX, deltaY).multiplySelf(this.editingLayerTransformStart);
-            } else if (dragHandle === DRAG_TYPE_RIGHT) {
-                this.editingLayer.width = Math.max(1, this.editingLayerWidthStart + rotatedDragVector.x);
-            } else if (dragHandle === DRAG_TYPE_LEFT) {
-                const translationVector = rotateDirectionVector2d(
-                    rotatedDragVector.x, 0.0, rotationDirection
-                )
-                this.editingLayer.transform = new DOMMatrix().translateSelf(translationVector.x, translationVector.y).multiplySelf(this.editingLayerTransformStart);
-                this.editingLayer.width = Math.max(1, this.editingLayerWidthStart - rotatedDragVector.x);
-            } else if (dragHandle === DRAG_TYPE_BOTTOM) {
-                this.editingLayer.height = Math.max(1, this.editingLayerHeightStart + rotatedDragVector.x);
-            } else if (dragHandle === DRAG_TYPE_TOP) {
-                const translationVector = rotateDirectionVector2d(
-                    rotatedDragVector.x, 0.0, rotationDirection
-                )
-                this.editingLayer.transform = new DOMMatrix().translateSelf(translationVector.x, translationVector.y).multiplySelf(this.editingLayerTransformStart);
-                this.editingLayer.height = Math.max(1, this.editingLayerHeightStart - rotatedDragVector.x);
+            if (this.createdLayerId == null) {
+                // User just started dragging mouse; create a new text layer
+                this.createNewTextLayerAtPosition(pointerDownPoint, false);
+            } else if (this.createdLayerId > -1) {
+                const createdLayer = getLayerById<WorkingFileTextLayer>(this.createdLayerId);
+                // Resize width or height of layer when user drags mouse during text layer creation
+                if (createdLayer) {
+                    const topLeft = new DOMPoint(
+                        Math.min(pointerDownPoint.x, viewTransformPoint.x),
+                        Math.min(pointerDownPoint.y, viewTransformPoint.y),
+                    );
+                    const bottomRight = new DOMPoint(
+                        Math.max(pointerDownPoint.x, viewTransformPoint.x),
+                        Math.max(pointerDownPoint.y, viewTransformPoint.y),
+                    );
+                    const isHorizontal = ['ltr', 'rtl'].includes(createdLayer.data.lineDirection);
+                    const decomposedTransform = decomposeMatrix(createdLayer.transform);
+                    if (isHorizontal) {
+                        createdLayer.transform = new DOMMatrix().translate(
+                            topLeft.x,
+                            decomposedTransform.translateY,
+                        );
+                        createdLayer.width = bottomRight.x - topLeft.x;
+                    } else {
+                        createdLayer.transform = new DOMMatrix().translate(
+                            decomposedTransform.translateX,
+                            topLeft.y,
+                        );
+                        createdLayer.height = bottomRight.y - topLeft.y;
+                    }
+                }
             }
-            if (dragHandle != null && dragHandle !== DRAG_TYPE_ALL && this.editingLayer.data.boundary !== 'box') {
-                this.editingLayer.data.boundary = 'box';
+        }
+        else {
+            if (editingTextLayerId.value == null) return;
+
+            // Resizing text boundaries
+            if (this.transformIsDragging) {
+                if (!this.editingLayerTransformStart || this.editingLayerWidthStart == null || this.editingLayerHeightStart == null || this.editingLayer == null || this.dragStartPosition == null) return;
+                const dragHandle = dragHandleHighlight.value;
+                const decomposedViewTransform = canvasStore.get('decomposedTransform');
+                const textLayerTransform = getLayerGlobalTransform(this.editingLayer);
+                const textLayerDecomposedTransform = decomposeMatrix(textLayerTransform);
+                const rotationDirection = decomposedViewTransform.rotation + textLayerDecomposedTransform.rotation + ([DRAG_TYPE_TOP, DRAG_TYPE_BOTTOM].includes(dragHandle!) ? Math.PI / 2 : 0);
+                const rotatedDragVector = rotateDirectionVector2d(
+                    viewTransformPoint.x - this.dragStartPosition.x,
+                    viewTransformPoint.y - this.dragStartPosition.y,
+                    -rotationDirection,
+                );
+                if (dragHandle === DRAG_TYPE_ALL) {
+                    const deltaX = viewTransformPoint.x - this.dragStartPosition.x;
+                    const deltaY = viewTransformPoint.y - this.dragStartPosition.y;
+                    this.editingLayer.transform = new DOMMatrix().translateSelf(deltaX, deltaY).multiplySelf(this.editingLayerTransformStart);
+                } else if (dragHandle === DRAG_TYPE_RIGHT) {
+                    this.editingLayer.width = Math.max(1, this.editingLayerWidthStart + rotatedDragVector.x);
+                } else if (dragHandle === DRAG_TYPE_LEFT) {
+                    const translationVector = rotateDirectionVector2d(
+                        rotatedDragVector.x, 0.0, rotationDirection
+                    )
+                    this.editingLayer.transform = new DOMMatrix().translateSelf(translationVector.x, translationVector.y).multiplySelf(this.editingLayerTransformStart);
+                    this.editingLayer.width = Math.max(1, this.editingLayerWidthStart - rotatedDragVector.x);
+                } else if (dragHandle === DRAG_TYPE_BOTTOM) {
+                    this.editingLayer.height = Math.max(1, this.editingLayerHeightStart + rotatedDragVector.x);
+                } else if (dragHandle === DRAG_TYPE_TOP) {
+                    const translationVector = rotateDirectionVector2d(
+                        rotatedDragVector.x, 0.0, rotationDirection
+                    )
+                    this.editingLayer.transform = new DOMMatrix().translateSelf(translationVector.x, translationVector.y).multiplySelf(this.editingLayerTransformStart);
+                    this.editingLayer.height = Math.max(1, this.editingLayerHeightStart - rotatedDragVector.x);
+                }
+                if (dragHandle != null && dragHandle !== DRAG_TYPE_ALL && this.editingLayer.data.boundary !== 'box') {
+                    this.editingLayer.data.boundary = 'box';
+                }
+            } else { // Selecting text
+                const editors = this.layerEditors.get(editingTextLayerId.value);
+                if (!editors || !this.editorTextarea) return;
+                const { documentSelection } = editors;
+                const pointerMoveCursor = this.getEditorCursorAtPoint(viewTransformPoint);
+                const pointerDownCursor = documentSelection.isActiveSideEnd ? documentSelection.start : documentSelection.end;
+                documentSelection.setPosition(pointerDownCursor.line, pointerDownCursor.character, false);
+                documentSelection.setPosition(pointerMoveCursor.line, pointerMoveCursor.character, true);
             }
-        } else {
-            const editors = this.layerEditors.get(editingTextLayerId.value);
-            if (!editors || !this.editorTextarea) return;
-            const { documentSelection } = editors;
-            const pointerMoveCursor = this.getEditorCursorAtPoint(viewTransformPoint);
-            const pointerDownCursor = documentSelection.isActiveSideEnd ? documentSelection.start : documentSelection.end;
-            documentSelection.setPosition(pointerDownCursor.line, pointerDownCursor.character, false);
-            documentSelection.setPosition(pointerMoveCursor.line, pointerMoveCursor.character, true);
         }
     }
 
     private onDragEnd() {
 
-        // Commit transforms to history.
-        if (
-            this.transformIsDragging && editingTextLayerId.value != null && this.editingLayer && this.editingLayerTransformStart && this.editingLayerWidthStart != null && this.editingLayerHeightStart != null &&
-            (this.editingLayer.transform !== this.editingLayerTransformStart || this.editingLayer.width !== this.editingLayerWidthStart || this.editingLayer.height !== this.editingLayerHeightStart)
-        ) {
-            const isResize = this.editingLayer.width !== this.editingLayerWidthStart || this.editingLayer.height !== this.editingLayerHeightStart;
-            const updateLayerActions: UpdateLayerAction<any>[] = [];
-            updateLayerActions.push(new UpdateLayerAction({
-                id: editingTextLayerId.value,
-                transform: this.editingLayer.transform,
-                width: this.editingLayer.width,
-                height: this.editingLayer.height,
-            }, {
-                transform: this.editingLayerTransformStart,
-                width: this.editingLayerWidthStart,
-                height: this.editingLayerHeightStart,
-            }));
-            if (isResize && this.editingLayerDocumentStart && this.editingLayerDocumentStart.boundary !== 'box') {
-                updateLayerActions.push(new UpdateLayerAction<UpdateTextLayerOptions>({
-                    id: editingTextLayerId.value,
-                    data: this.editingLayer.data,
-                }, {
-                    data: this.editingLayerDocumentStart,
-                }));
+        if (this.isCreatingLayer) {
+            const createdLayerId = this.createdLayerId;
+            // User never dragged their mouse and just clicked; create new text layer
+            if (createdLayerId == null && this.dragStartPosition) {
+                this.createNewTextLayerAtPosition(this.dragStartPosition, true);
             }
-            historyStore.dispatch('runAction', {
-                action: new BundleAction(
-                    'textTransform', isResize ? 'action.textTransformResize' : 'action.textTransformTranslate',
-                    updateLayerActions
-                )
-            });
+            // User previously dragged their mouse during text layer creation, and those position changes should be saved to history
+            if (createdLayerId != null && createdLayerId > -1) {
+                const createdLayer = getLayerById(createdLayerId);
+                if (createdLayer) {
+                    historyStore.dispatch('runAction', {
+                        action: new UpdateLayerAction({
+                            id: createdLayerId,
+                            transform: createdLayer.transform,
+                            width: createdLayer.width,
+                            height: createdLayer.height
+                        }),
+                        mergeWithHistory: 'createTextLayer'
+                    });
+                }
+                setTimeout(() => {
+                    editingTextLayerId.value = createdLayerId;
+                    this.editorTextarea?.focus();
+                }, 1);
+            }
+        } else {
+            // Commit drag handle resize transforms to history.
+            if (
+                this.transformIsDragging && editingTextLayerId.value != null && this.editingLayer && this.editingLayerTransformStart && this.editingLayerWidthStart != null && this.editingLayerHeightStart != null &&
+                (this.editingLayer.transform !== this.editingLayerTransformStart || this.editingLayer.width !== this.editingLayerWidthStart || this.editingLayer.height !== this.editingLayerHeightStart)
+            ) {
+                const isResize = this.editingLayer.width !== this.editingLayerWidthStart || this.editingLayer.height !== this.editingLayerHeightStart;
+                const updateLayerActions: UpdateLayerAction<any>[] = [];
+                updateLayerActions.push(new UpdateLayerAction({
+                    id: editingTextLayerId.value,
+                    transform: this.editingLayer.transform,
+                    width: this.editingLayer.width,
+                    height: this.editingLayer.height,
+                }, {
+                    transform: this.editingLayerTransformStart,
+                    width: this.editingLayerWidthStart,
+                    height: this.editingLayerHeightStart,
+                }));
+                if (isResize && this.editingLayerDocumentStart && this.editingLayerDocumentStart.boundary !== 'box') {
+                    updateLayerActions.push(new UpdateLayerAction<UpdateTextLayerOptions>({
+                        id: editingTextLayerId.value,
+                        data: this.editingLayer.data,
+                    }, {
+                        data: this.editingLayerDocumentStart,
+                    }));
+                }
+                historyStore.dispatch('runAction', {
+                    action: new BundleAction(
+                        'textTransform', isResize ? 'action.textTransformResize' : 'action.textTransformTranslate',
+                        updateLayerActions
+                    )
+                });
+            }
         }
 
+        this.isCreatingLayer = false;
+        this.createdLayerId = null;
         this.dragStartPickLayer = null;
         this.dragStartPosition = null;
         this.transformIsDragging = false;
@@ -569,6 +654,59 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         } else {
             dragHandleHighlight.value = null;
         }
+    }
+
+    private async createNewTextLayerAtPosition(position: DOMPoint, isDynamic = false) {
+        this.createdLayerId = -1;
+        const lineDirection = 'ltr'; // TODO - base on toolbar setting
+        const isHorizontal = ['ltr', 'rtl'].includes(lineDirection);
+
+        const newTextDocument: TextDocument = {
+            boundary: isDynamic ? 'dynamic' : 'box',
+            lineAlignment: 'start', // TODO - base on toolbar setting
+            lineDirection, 
+            wrapDirection: 'ttb', // TODO - base on toolbar setting
+            wrapAt: 'wordThenLetter', // TODO - base on toolbar setting
+            lines: [
+                {
+                    spans: [
+                        {
+                            text: '',
+                            meta: { ...textMetaDefaults } // TODO - base on toolbar setting
+                        },
+                    ],
+                },
+            ],
+        };
+
+        const textPlacement = calculateTextPlacement(newTextDocument);
+        const textPlacementWidth = isHorizontal ? textPlacement.lineDirectionSize : textPlacement.wrapDirectionSize;
+        const textPlacementHeight = isHorizontal ? textPlacement.wrapDirectionSize : textPlacement.lineDirectionSize;
+        if (textPlacementWidth > 1 && textPlacementHeight > 1) {
+            createNewTextLayerSize.value.x = textPlacementWidth;
+            createNewTextLayerSize.value.y = textPlacementHeight;
+        }
+
+        const insertLayerAction = new InsertLayerAction<InsertTextLayerOptions>({
+            type: 'text',
+            transform: new DOMMatrix().translate(
+                isDynamic || !isHorizontal ? position.x - (createNewTextLayerSize.value.x / 2) : position.x,
+                isDynamic || isHorizontal ? position.y - (createNewTextLayerSize.value.y / 2) : position.y,
+            ),
+            width: isDynamic || !isHorizontal ? createNewTextLayerSize.value.x : 1,
+            height: isDynamic || isHorizontal ? createNewTextLayerSize.value.y : 1,
+            data: newTextDocument,
+        });
+        const createTextLayerAction = new BundleAction('createTextLayer', 'action.createTextLayer', [insertLayerAction]);
+        await historyStore.dispatch('runAction', {
+            action: createTextLayerAction,
+        });
+        this.createdLayerId = insertLayerAction.insertedLayerId;
+        const createdLayerId = this.createdLayerId;
+        setTimeout(() => {
+            editingTextLayerId.value = createdLayerId;
+            this.editorTextarea?.focus();
+        }, 1);
     }
 
     private pickLayer(viewTransformPoint: DOMPoint): number | null {

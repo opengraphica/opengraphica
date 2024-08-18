@@ -11,6 +11,7 @@
         "createDrawLayer": "Create Draw Layer",
         "createNewFile": "New File",
         "createNewLayersFromSelection": "Create Layers From Selection",
+        "createTextLayer": "Create Text Layer",
         "cutLayers": "Cut Layer(s)",
         "deleteLayers": "Delete Layer(s)",
         "deleteLayerFilter": "Delete Effect",
