@@ -22,7 +22,7 @@
                     </template>
                     <el-input-number :aria-label="$t('toolbar.text.size')" v-model="size" size="small" style="width: 3rem"></el-input-number>
                 </el-input-group>
-                <el-button-group class="el-button-group--flex ml-3">
+                <el-button-group v-if="false" class="el-button-group--flex ml-3">
                     <!-- Bold -->
                     <el-button :aria-label="$t('toolbar.text.bold')" size="small" :aria-pressed="bold"
                         :plain="!bold" :type="bold ? 'primary' : undefined" class="px-3" @click="bold = !bold">

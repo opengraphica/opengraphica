@@ -85,10 +85,18 @@
                                 </el-input-number>
                             </div>
                             <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.freeTransform.metrics.width')">
-                                <el-input-number v-model="inputWidth" style="width: 6rem" size="small" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputWidth($event)" @blur="onChangeDragResizeInput()" />
+                                <el-input-number
+                                    v-model="inputWidth" style="width: 6rem" size="small"
+                                    :suffix-text="measuringUnits" :blur-on-enter="true" :disabled="!isResizeEnabled"
+                                    @focus="onFocusAnyMetricInput()" @input="onInputWidth($event)" @blur="onChangeDragResizeInput()"
+                                />
                             </el-form-item>
                             <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.freeTransform.metrics.height')">
-                                <el-input-number v-model="inputHeight" style="width: 6rem" size="small" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputHeight($event)" @blur="onChangeDragResizeInput()" />
+                                <el-input-number
+                                    v-model="inputHeight" style="width: 6rem" size="small"
+                                    :suffix-text="measuringUnits" :blur-on-enter="true" :disabled="!isResizeEnabled"
+                                    @focus="onFocusAnyMetricInput()" @input="onInputHeight($event)" @blur="onChangeDragResizeInput()"
+                                />
                             </el-form-item>
                             <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.freeTransform.metrics.rotation')">
                                 <el-input-number v-model="inputRotation" style="width: 6rem" size="small" suffix-text="°" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputRotation($event)" @blur="onChangeRotationInput($event)">
@@ -159,7 +167,7 @@
 import { defineComponent, defineAsyncComponent, ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
 import {
     freeTransformEmitter, layerPickMode, useRotationSnapping, top, left, width, height, rotation,
-    applyTransform, trimEmptySpace, layerToImageBounds,
+    applyTransform, trimEmptySpace, layerToImageBounds, isResizeEnabled,
 } from '@/canvas/store/free-transform-state';
 import { appliedSelectionMask, activeSelectionMask } from '@/canvas/store/selection-state';
 import ElAlert from 'element-plus/lib/components/alert/index';
@@ -174,7 +182,7 @@ import ElPopover from '@/ui/el-popover.vue';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSwitch from 'element-plus/lib/components/switch/index';
 import historyStore from '@/store/history';
-import workingFileStore, { WorkingFileState } from '@/store/working-file';
+import workingFileStore, { getSelectedLayers, WorkingFileState } from '@/store/working-file';
 import { convertUnits } from '@/lib/metrics';
 import { ClearSelectionAction } from '@/actions/clear-selection';
 
@@ -351,6 +359,7 @@ export default defineComponent({
 
         return {
             hasSelection,
+            isResizeEnabled,
             inputLeft,
             inputTop,
             inputWidth,

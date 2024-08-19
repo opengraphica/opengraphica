@@ -29,7 +29,7 @@
                 </template>
             </aside>
             <main ref="main"
-                tabindex="-1"
+                tabindex="0"
                 :class="[{ 'ogr-custom-cursor': !!canvasState.cursor }, canvasState.cursor ? 'ogr-custom-cursor--' + canvasState.cursor : null]"
                 :style="{ 'pointer-events': isCanvasInteractable ? null : 'none' }"
                 @touchstart="onTouchStartMain"

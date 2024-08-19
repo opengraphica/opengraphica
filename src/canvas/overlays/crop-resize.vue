@@ -80,7 +80,9 @@
 import { defineComponent, ref, computed, watch, onMounted, onUnmounted, toRefs } from 'vue';
 import canvasStore from '@/store/canvas';
 import workingFileStore from '@/store/working-file';
-import { top, left, width, height, cropResizeEmitter, dragHandleHighlight, previewXSnap, previewYSnap } from '../store/crop-resize-state';
+import {
+    top, left, width, height, cropResizeEmitter, dragHandleHighlight, previewXSnap, previewYSnap
+} from '../store/crop-resize-state';
 
 export default defineComponent({
     name: 'CanvasOverlayCropResize',

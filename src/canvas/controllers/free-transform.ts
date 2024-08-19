@@ -3,9 +3,11 @@ import BaseCanvasMovementController from './base-movement';
 import {
     isBoundsIndeterminate, layerPickMode, useRotationSnapping, freeTransformEmitter, top, left, width, height, rotation,
     transformOriginX, transformOriginY, dimensionLockRatio, previewXSnap, previewYSnap, dragHandleHighlight, rotateHandleHighlight, selectedLayers,
-    applyTransform,
+    applyTransform, isResizeEnabled,
 } from '../store/free-transform-state';
-import { appliedSelectionMask, appliedSelectionMaskCanvasOffset, activeSelectionMask, activeSelectionMaskCanvasOffset } from '../store/selection-state';
+import {
+    appliedSelectionMask, appliedSelectionMaskCanvasOffset, activeSelectionMask, activeSelectionMaskCanvasOffset
+} from '../store/selection-state';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
@@ -694,17 +696,19 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         const touchForgivenessMargin = this.touches.length > 0 ? handleSize / 2 : 0;
         const innerHandleSizeVertical = touchForgivenessMargin;
         const innerHandleSizeHorizontal = touchForgivenessMargin;
-        if (point.y >= top.value - handleSize - touchForgivenessMargin && point.y <= top.value + innerHandleSizeVertical) {
-            transformDragType |= DRAG_TYPE_TOP;
-        }
-        if (point.y >= top.value + height.value - innerHandleSizeVertical && point.y <= top.value + height.value + handleSize + touchForgivenessMargin) {
-            transformDragType |= DRAG_TYPE_BOTTOM;
-        }
-        if (point.x >= left.value - handleSize - touchForgivenessMargin && point.x <= left.value + innerHandleSizeHorizontal) {
-            transformDragType |= DRAG_TYPE_LEFT;
-        }
-        if (point.x >= left.value + width.value - innerHandleSizeHorizontal && point.x <= left.value + width.value + handleSize + touchForgivenessMargin) {
-            transformDragType |= DRAG_TYPE_RIGHT;
+        if (isResizeEnabled.value) {
+            if (point.y >= top.value - handleSize - touchForgivenessMargin && point.y <= top.value + innerHandleSizeVertical) {
+                transformDragType |= DRAG_TYPE_TOP;
+            }
+            if (point.y >= top.value + height.value - innerHandleSizeVertical && point.y <= top.value + height.value + handleSize + touchForgivenessMargin) {
+                transformDragType |= DRAG_TYPE_BOTTOM;
+            }
+            if (point.x >= left.value - handleSize - touchForgivenessMargin && point.x <= left.value + innerHandleSizeHorizontal) {
+                transformDragType |= DRAG_TYPE_LEFT;
+            }
+            if (point.x >= left.value + width.value - innerHandleSizeHorizontal && point.x <= left.value + width.value + handleSize + touchForgivenessMargin) {
+                transformDragType |= DRAG_TYPE_RIGHT;
+            }
         }
         if (
             point.x < left.value - handleSize - touchForgivenessMargin ||

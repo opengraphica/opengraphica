@@ -1,8 +1,7 @@
 import mitt from 'mitt';
-import { ref } from 'vue';
-import appEmitter from '@/lib/emitter';
+import { computed, ref } from 'vue';
 import historyStore from '@/store/history';
-import workingFileStore from '@/store/working-file';
+import workingFileStore, { getSelectedLayers } from '@/store/working-file';
 import { ApplyLayerTransformAction } from '@/actions/apply-layer-transform';
 import { BundleAction } from '@/actions/bundle';
 import { SetLayerBoundsToWorkingFileBoundsAction } from '@/actions/set-layer-bounds-to-working-file-bounds';
@@ -28,6 +27,18 @@ export const dimensionLockRatio = ref<number | null>(null);
 export const selectedLayers = ref<WorkingFileLayer<ColorModel>[]>([]);
 
 export const freeTransformEmitter = mitt();
+
+export const isResizeEnabled = computed<boolean>(() => {
+    const selectedLayers = getSelectedLayers(workingFileStore.state.selectedLayerIds);
+    let isEnabled = true;
+    for (const layer of selectedLayers) {
+        if (layer.type === 'text') {
+            isEnabled = false;
+            break;
+        }
+    }
+    return isEnabled;
+});
 
 freeTransformEmitter.on('setDimensions', (event?: { top?: number, left?: number, width?: number, height?: number, rotation?: number, transformOriginX?: number, transformOriginY?: number }) => {
     if (event) {
