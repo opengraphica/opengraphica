@@ -46,8 +46,10 @@ export async function loadFontFamilies(unloadedFontFamilies: string[]): Promise<
     let hadUnloadedFont = false;
     let loadFontPromises: Promise<unknown>[] = [];
     for (const family of unloadedFontFamilies) {
-        if (!(await fontCache.waitForFontFamilyLoaded(family))) {
+        if (!fontCache.isFontFamilyLoaded(family)) {
             hadUnloadedFont = true;
+        }
+        if (!(await fontCache.waitForFontFamilyLoaded(family))) {
             loadFontPromises.push(
                 fontCache.loadFontFamily(family)
             );

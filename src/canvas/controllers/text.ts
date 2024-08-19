@@ -543,7 +543,6 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                     // Focus active editor
                     if (dragStartPickLayer != null && !isEditorTextareaFocused.value) {
                         editingTextLayerId.value = dragStartPickLayer;
-                        console.log('focus');
                         this.editorTextarea?.focus();
                     }
 

@@ -3,6 +3,8 @@ import { toRefs, watch, type WatchStopHandle } from 'vue';
 import BaseLayerRenderer from './base';
 
 import canvasStore from '@/store/canvas';
+import { regenerateLayerThumbnail } from '@/store/working-file';
+
 import DrawableCanvas from '@/canvas/renderers/drawable/canvas';
 import { createThreejsTextureFromImage } from '@/lib/canvas';
 import { notifyLoadingFontFamilies, notifyFontFamiliesLoaded } from '@/lib/font-notify';
@@ -111,6 +113,8 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
             this.texture = newTexture;
             this.texture.needsUpdate = true;
             this.material && (this.material.uniforms.map.value = this.texture);
+
+            regenerateLayerThumbnail(layer);
 
             canvasStore.set('dirty', true);
         });

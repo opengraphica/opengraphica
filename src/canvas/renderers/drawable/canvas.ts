@@ -19,6 +19,7 @@ export interface DrawableCanvasOptions {
     height?: number;
     scale?: number;
     forceDrawOnMainThread?: boolean;
+    sync?: boolean;
 }
 
 interface DrawableInfo {
@@ -39,9 +40,11 @@ export default class DrawableCanvas {
     private renderMode: DrawableRenderMode;
     private scale: number;
     private forceDrawOnMainThread: boolean;
+    private sync: boolean;
 
     private drawables = new Map<string, DrawableInfo>();
     private drawableClassMap: Record<string, () => Promise<DrawableConstructor>> = {};
+    private registeredDrawableClassMap: Record<string, DrawableConstructor> = {};
 
     private mainThreadCanvas: HTMLCanvasElement | undefined = undefined;
     private mainThreadCanvasCtx2d: CanvasRenderingContext2D | undefined = undefined;
@@ -63,6 +66,7 @@ export default class DrawableCanvas {
         this.renderMode = '2d';
         this.scale = options.scale ?? 1;
         this.forceDrawOnMainThread = options.forceDrawOnMainThread ?? false;
+        this.sync = options.sync ?? false;
         this.init();
     }
 
@@ -88,7 +92,7 @@ export default class DrawableCanvas {
             }
         }
 
-        if (!this.offscreenCanvasUuid) {
+        if (!this.sync && !this.offscreenCanvasUuid) {
             this.drawableClassMap = (await import('@/canvas/drawables')).default;
         }
 
@@ -128,7 +132,10 @@ export default class DrawableCanvas {
             const drawableInfo = this.drawables.get(uuid);
             if (!drawableInfo) return;
             const { name } = drawableInfo;
-            const DrawableClass = await this.drawableClassMap[name]();
+            let DrawableClass = this.registeredDrawableClassMap[name];
+            if (!DrawableClass) {
+                DrawableClass = await this.drawableClassMap[name]();
+            }
             drawableInfo.drawable = new DrawableClass({
                 renderMode: this.renderMode,
                 isInWorker: false,
@@ -142,6 +149,10 @@ export default class DrawableCanvas {
                 scene: undefined as never,
             });
         }
+    }
+
+    public registerDrawableClass(name: string, drawableClass: DrawableConstructor) {
+        this.registeredDrawableClassMap[name] = drawableClass;
     }
 
     private onOffscreenCanvasDrawn(event: DrawnCallbackEvent) {
@@ -188,6 +199,18 @@ export default class DrawableCanvas {
         return uuid;
     }
 
+    addSync<T = DefaultDrawableData>(name: string, data: T = {} as never): string {
+        const uuid = uuidv4();
+        this.drawables.set(uuid, {
+            name,
+            data,
+        });
+        if (this.isInitialized) {
+            this.initializeDrawable(uuid);
+        }
+        return uuid;
+    }
+
     remove(uuid: string) {
         const drawableInfo = this.drawables.get(uuid);
         if (!drawableInfo) return;
@@ -228,6 +251,15 @@ export default class DrawableCanvas {
                 updateInfo: this.lastDrawUpdateInfo,
             };
         }
+    }
+
+    drawCompleteSync(): DrawnCallbackEvent {
+        return {
+            canvas: this.mainThreadCanvas!,
+            sourceX: this.lastDrawX,
+            sourceY: this.lastDrawY,
+            updateInfo: this.lastDrawUpdateInfo,
+        };
     }
 
     draw2d(options: DrawableDrawOptions) {
