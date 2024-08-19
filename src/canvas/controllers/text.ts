@@ -29,7 +29,7 @@ import {
 import type { UpdateTextLayerOptions, WorkingFileTextLayer, TextDocument, InsertTextLayerOptions, TextDocumentSpanMeta } from '@/types';
 import type { PointerTracker } from './base';
 import type { DecomposedMatrix } from '@/lib/dom-matrix';
-import appEmitter from '@/lib/emitter';
+import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
 
 const DRAG_TYPE_ALL = 0;
 const DRAG_TYPE_TOP = 1;
@@ -132,26 +132,17 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 startLine: editingTextDocumentSelection.value?.start?.line as number,
                 startCharacter: editingTextDocumentSelection.value?.start?.character as number,
                 endLine: editingTextDocumentSelection.value?.end?.line as number,
-                endCharacter: editingTextDocumentSelection.value?.end?.character as number,
+                endCharacter: editingTextDocumentSelection.value?.end?.character as number
             }),
             (selection, oldSelection) => {
-                if (!selection || editingTextLayerId.value == null) return;
+                if (!selection) return;
                 if (
                     selection.startLine === oldSelection?.startLine &&
                     selection.startCharacter === oldSelection?.startCharacter &&
                     selection.endLine === oldSelection?.endLine &&
                     selection.endCharacter === oldSelection?.endCharacter
                 ) return;
-                const editors = this.layerEditors.get(editingTextLayerId.value);
-                if (editors == null) return;
-                const { documentEditor } = editors;
-                const selectionMeta = documentEditor.getMetaRange(
-                    selection.startLine,
-                    selection.startCharacter,
-                    selection.endLine,
-                    selection.endCharacter,
-                );
-                this.updateToolbarMetaFromSelection(selectionMeta);
+                this.updateToolbarMetaFromActiveSelection();
             }
         );
         
@@ -159,7 +150,9 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         textToolbarEmitter.on('toolbarMetaChanged', this.onToolbarMetaChanged);
 
         this.onFontsLoaded = this.onFontsLoaded.bind(this);
+        this.onHistoryStep = this.onHistoryStep.bind(this);
         appEmitter.on('editor.tool.fontsLoaded', this.onFontsLoaded);
+        appEmitter.on('editor.history.step', this.onHistoryStep);
         
     }
 
@@ -173,6 +166,22 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         this.selectedLayerIdsUnwatch?.();
         this.editingLayerIdUnwatch?.();
         this.editingTextDocumentSelectionUnwatch?.();
+    }
+
+    private onHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
+        if (event?.action.id === 'moduleCropResize') {
+
+            // Update document editor with new document.
+            if (editingTextLayerId.value != null) {
+                const editors = this.layerEditors.get(editingTextLayerId.value);
+                const layer = getLayerById<WorkingFileTextLayer>(editingTextLayerId.value);
+                if (layer?.type === 'text' && editors) {
+                    editors.documentEditor = new TextDocumentEditor(layer.data);
+                }
+            }
+
+            this.updateToolbarMetaFromActiveSelection();
+        }
     }
 
     private onFontsLoaded() {
@@ -814,7 +823,17 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         return newMeta as Partial<typeof textMetaDefaults>;
     }
 
-    private updateToolbarMetaFromSelection(selectionMeta: { [key: string]: any[] }) {
+    private updateToolbarMetaFromActiveSelection() {
+        if (editingTextLayerId.value == null) return;
+        const editors = this.layerEditors.get(editingTextLayerId.value);
+        if (editors == null) return;
+        const { documentEditor, documentSelection } = editors;
+        const selectionMeta = documentEditor.getMetaRange(
+            documentSelection.start.line,
+            documentSelection.start.character,
+            documentSelection.end.line,
+            documentSelection.end.character,
+        );
         for (const key in selectionMeta) {
             const values = selectionMeta[key];
             if (values.length > 1) {

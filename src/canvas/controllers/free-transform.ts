@@ -603,7 +603,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                         new UpdateLayerAction({
                             id: layer.id,
                             transform: layer.transform,
-                            ...(shouldScaleDuringResize ? {} : {
+                            ...(shouldScaleDuringResize || !isResizeEnabled.value ? {} : {
                                 width: width.value,
                                 height: height.value
                             })

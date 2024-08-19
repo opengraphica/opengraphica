@@ -103,6 +103,7 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent, ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
+
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
 import ElDivider from 'element-plus/lib/components/divider/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
@@ -113,17 +114,25 @@ import ElPopover from 'element-plus/lib/components/popover/index';
 import { ElRadioButton, ElRadioGroup } from 'element-plus/lib/components/radio/index';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSwitch from 'element-plus/lib/components/switch/index';
+
 import appEmitter from '@/lib/emitter';
 import canvasStore from '@/store/canvas';
 import historyStore from '@/store/history';
 import workingFileStore, { WorkingFileState } from '@/store/working-file';
 import { top as cropTop, left as cropLeft, width as cropWidth, height as cropHeight, enableSnapping, dimensionLockRatio } from '@/canvas/store/crop-resize-state';
-import { WorkingFileLayer, WorkingFileGroupLayer, ColorModel, UpdateAnyLayerOptions } from '@/types';
+
 import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { UpdateFileAction } from '@/actions/update-file';
 import { UpdateLayerAction } from '@/actions/update-layer';
+
 import { convertUnits } from '@/lib/metrics';
+import { textMetaDefaults } from '@/lib/text-common';
+
+import type {
+    WorkingFileLayer, WorkingFileGroupLayer, ColorModel, UpdateAnyLayerOptions, UpdateTextLayerOptions,
+    WorkingFileTextLayer, TextDocument,
+} from '@/types';
 import { decomposeMatrix } from '@/lib/dom-matrix';
 
 export default defineComponent({
@@ -227,6 +236,8 @@ export default defineComponent({
                 await onInputResizeHeight(resizeInputHeight.value);
                 cropTop.value = 0;
                 cropLeft.value = 0;
+                cropWidth.value = resizeInputWidth.value;
+                cropHeight.value = resizeInputHeight.value;
                 isDimensionRatioLock.value = true;
             } else {
                 resizeInputWidth.value = parseFloat(convertUnits(workingFileStore.get('width'), 'px', measuringUnits.value, resolutionX.value, resolutionUnits.value).toFixed(measuringUnits.value === 'px' ? 0 : 2));
@@ -348,6 +359,47 @@ export default defineComponent({
                             transform
                         })
                     );
+                } else if (layer.type === 'text') {
+                    let transform = layer.transform;
+                    if (mode.value === 'crop') {
+                        transform = new DOMMatrix().translateSelf(-cropLeft.value, -cropTop.value).multiplySelf(layer.transform);
+                        actions.push(
+                            new UpdateLayerAction<UpdateTextLayerOptions<ColorModel>>({
+                                id: layer.id,
+                                transform,
+                            })
+                        );
+                    } else {
+                        const decomposedTransform = decomposeMatrix(transform);
+                        transform = new DOMMatrix()
+                            .translateSelf(-cropLeft.value * widthRatio, -cropTop.value * heightRatio)
+                            .translateSelf(
+                                -decomposedTransform.translateX + (decomposedTransform.translateX * widthRatio),
+                                -decomposedTransform.translateY + (decomposedTransform.translateY * heightRatio)
+                            )
+                            .multiplySelf(layer.transform)
+                        const oldData = JSON.parse(JSON.stringify((layer as WorkingFileTextLayer).data)) as TextDocument;
+                        const newData = JSON.parse(JSON.stringify((layer as WorkingFileTextLayer).data)) as TextDocument;
+                        for (const line of newData.lines) {
+                            for (const span of line.spans) {
+                                span.meta.size = (span.meta.size ?? textMetaDefaults.size) * widthRatio;
+                            }
+                        }
+                        actions.push(
+                            new UpdateLayerAction<UpdateTextLayerOptions<ColorModel>>({
+                                id: layer.id,
+                                transform,
+                                width: layer.width * widthRatio,
+                                height: layer.height * heightRatio,
+                                data: newData,
+                            }, {
+                                transform: layer.transform,
+                                width: layer.width,
+                                height: layer.height,
+                                data: oldData,
+                            })
+                        );
+                    }
                 }
             }
             return actions;
