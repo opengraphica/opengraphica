@@ -519,7 +519,16 @@ export class TextDocumentEditor {
 						if (metaValue == null) {
 							metaValue = textMetaDefaults[metaKey as keyof TextDocumentSpanMeta];
 						}
-						if (!metaCollection[metaKey].includes(metaValue)) {
+						let isInCollection = false;
+						for (const existingValue of metaCollection[metaKey]) {
+							if (existingValue?.is === 'color' && (metaValue as any)?.is == 'color') {
+								isInCollection = existingValue?.style === (metaValue as any)?.style;
+							} else {
+								isInCollection = existingValue === metaValue;
+							}
+							if (isInCollection) break;
+						}
+						if (!isInCollection) {
 							metaCollection[metaKey].push(metaValue);
 						}
 					}

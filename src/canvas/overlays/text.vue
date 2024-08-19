@@ -185,8 +185,8 @@ export default defineComponent({
                 }
                 if (textPlacement.isHorizontal) {
                     position.x = foundCursorLine.lineStartOffset + advanceOffset + (foundCursorGlyph.bidiDirection === 'rtl' ? foundCursorGlyph.advance : 0);
-                    position.y = foundCursorLine.wrapOffset + (foundCursorLine.heightAboveBaseline + foundCursorLine.heightBelowBaseline) / 2.0;
-                    size = foundCursorLine.heightAboveBaseline + foundCursorLine.heightBelowBaseline;
+                    position.y = foundCursorLine.wrapOffset + foundCursorLine.heightAboveBaseline - (foundCursorGlyph.fontAscender + foundCursorGlyph.fontDescender) / 2.0;
+                    size = foundCursorGlyph.fontAscender - foundCursorGlyph.fontDescender;
                 } else {
                     position.x = foundCursorLine.wrapOffset + (foundCursorLine.largestCharacterWidth / 2.0);
                     position.y = foundCursorLine.lineStartOffset + advanceOffset;
