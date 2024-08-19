@@ -1,7 +1,7 @@
 <template>
     <div class="ogr-canvas-overlay">
         <div
-            v-if="selectionBoxes.length > 0"
+            v-if="editingLayerCssTransform && selectionBoxes.length > 0"
             class="ogr-text-selection"
             :style="{ transform: editingLayerCssTransform }"
         >
@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch, onMounted, onUnmounted, toRefs } from 'vue';
+import { computed, defineComponent, nextTick, ref, toRefs, watch } from 'vue';
 import canvasStore from '@/store/canvas';
 import workingFileStore, { getLayerById, getLayerGlobalTransform } from '@/store/working-file';
 import { isEditorTextareaFocused, editingTextLayerId, editingRenderTextPlacement, editingTextDocumentSelection } from '../store/text-state';
@@ -36,6 +36,11 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         
+        interface SelectionBoxPlacement {
+            layerId: number | null;
+            selectionBoxes: SelectionBox[];
+        }
+
         interface SelectionBox {
             rect: DOMRect;
             // TODO - support text transforms in the future.
@@ -47,12 +52,27 @@ export default defineComponent({
             return appliedZoom;
         });
 
+        const editingLayer = computed(() => {
+            if (editingTextLayerId.value == null) return null;
+            return getLayerById(editingTextLayerId.value);
+        });
+
         const editingLayerCssTransform = computed<string>(() => {
-            if (editingTextLayerId.value == null) return '';
-            const layer = getLayerById(editingTextLayerId.value);
-            if (layer == null) return '';
-            const transform = getLayerGlobalTransform(layer);
+            if (editingLayer.value == null) return '';
+            const transform = getLayerGlobalTransform(editingLayer.value);
             return `matrix(${transform.a},${transform.b},${transform.c},${transform.d},${transform.e},${transform.f})`;
+        });
+
+        const isSwitchingLayers = ref(false);
+        watch(() => editingTextLayerId.value, () => {
+            isSwitchingLayers.value = true;
+            nextTick(() => {
+                requestAnimationFrame(() => {
+                    setTimeout(() => {
+                        isSwitchingLayers.value = false;
+                    }, 1);
+                });
+            });
         });
 
         const selectionBoxes = computed<SelectionBox[]>(() => {
@@ -64,7 +84,8 @@ export default defineComponent({
             const boxes: SelectionBox[] = [];
             let currentBox: SelectionBox | null = null;
             let previousDocumentLineIndex = -1;
-            const textPlacement: CalculatedTextPlacement = editingRenderTextPlacement.value as CalculatedTextPlacement;
+            const textPlacement = isSwitchingLayers.value ? null : editingRenderTextPlacement.value;
+            if (!textPlacement) return [];
 
             for (const line of textPlacement.lines) {
                 if (line.documentLineIndex >= startLine && line.documentLineIndex <= endLine) {

@@ -459,7 +459,9 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     onMultiTouchDown() {
         super.onMultiTouchDown();
         if (this.touches.length === 1) {
-            this.onDragStart(this.touches[0]);
+            if (this.dragStartPickLayer == null) {
+                this.onDragStart(this.touches[0]);
+            }
         }
     }
 
@@ -469,6 +471,14 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         if (e.isPrimary && ['mouse', 'pen'].includes(e.pointerType) && e.button === 0) {
             const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
             this.onDragStart(pointer);
+        }
+        if (e.pointerType === 'touch') {
+            let { viewTransformPoint } = this.getTransformedCursorInfo(e.pageX, e.pageY);
+            const dragStartPickLayer = this.pickLayer(viewTransformPoint);
+            if (dragStartPickLayer != null && dragStartPickLayer === editingTextLayerId.value) {
+                const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
+                this.onDragStart(pointer);
+            }
         }
         setTimeout(() => {
             this.handleCursorIcon();
@@ -496,6 +506,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     }
 
     private onDragStart(pointer: PointerTracker) {
+
         let { viewTransformPoint, transformBoundsPoint } = this.getTransformedCursorInfo(pointer.down.pageX, pointer.down.pageY);
         const dragStartPickLayer = this.pickLayer(viewTransformPoint);
         this.dragStartPickLayer = dragStartPickLayer;
@@ -530,8 +541,9 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 // Wait and then assign focus, because the browser immediately focuses on clicked element.
                 setTimeout(() => {
                     // Focus active editor
-                    if (dragStartPickLayer != null) {
+                    if (dragStartPickLayer != null && !isEditorTextareaFocused.value) {
                         editingTextLayerId.value = dragStartPickLayer;
+                        console.log('focus');
                         this.editorTextarea?.focus();
                     }
 
@@ -632,7 +644,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 if (dragHandle != null && dragHandle !== DRAG_TYPE_ALL && this.editingLayer.data.boundary !== 'box') {
                     this.editingLayer.data.boundary = 'box';
                 }
-            } else { // Selecting text
+            } else if (this.dragStartPickLayer != null) { // Selecting text
                 const editors = this.layerEditors.get(editingTextLayerId.value);
                 if (!editors || !this.editorTextarea) return;
                 const { documentSelection } = editors;
