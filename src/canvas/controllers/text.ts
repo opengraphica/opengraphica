@@ -21,11 +21,12 @@ import preferencesStore from '@/store/preferences';
 import workingFileStore, { getLayerById, getLayerGlobalTransform, getLayersByType, getSelectedLayers } from '@/store/working-file';
 
 import {
-    isEditorTextareaFocused, editingTextLayerId, editingRenderTextPlacement, editingTextDocumentSelection,
-    dragHandleHighlight, createNewTextLayerSize,
+    textToolbarEmitter, isEditorTextareaFocused, editingTextLayerId,
+    editingRenderTextPlacement, editingTextDocumentSelection,
+    dragHandleHighlight, createNewTextLayerSize, toolbarTextMeta,
 } from '../store/text-state';
 
-import type { UpdateTextLayerOptions, WorkingFileTextLayer, TextDocument, InsertTextLayerOptions } from '@/types';
+import type { UpdateTextLayerOptions, WorkingFileTextLayer, TextDocument, InsertTextLayerOptions, TextDocumentSpanMeta } from '@/types';
 import type { PointerTracker } from './base';
 import type { DecomposedMatrix } from '@/lib/dom-matrix';
 import appEmitter from '@/lib/emitter';
@@ -63,6 +64,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
 
     private selectedLayerIdsUnwatch: WatchStopHandle | null = null;
     private editingLayerIdUnwatch: WatchStopHandle | null = null;
+    private editingTextDocumentSelectionUnwatch: WatchStopHandle | null = null;
 
     onEnter(): void {
         super.onEnter();
@@ -124,7 +126,38 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             }
             this.editingLayer = layer;
         }, { immediate: true });
+
+        this.editingTextDocumentSelectionUnwatch = watch(
+            () => ({
+                startLine: editingTextDocumentSelection.value?.start?.line as number,
+                startCharacter: editingTextDocumentSelection.value?.start?.character as number,
+                endLine: editingTextDocumentSelection.value?.end?.line as number,
+                endCharacter: editingTextDocumentSelection.value?.end?.character as number,
+            }),
+            (selection, oldSelection) => {
+                if (!selection || editingTextLayerId.value == null) return;
+                if (
+                    selection.startLine === oldSelection?.startLine &&
+                    selection.startCharacter === oldSelection?.startCharacter &&
+                    selection.endLine === oldSelection?.endLine &&
+                    selection.endCharacter === oldSelection?.endCharacter
+                ) return;
+                const editors = this.layerEditors.get(editingTextLayerId.value);
+                if (editors == null) return;
+                const { documentEditor } = editors;
+                const selectionMeta = documentEditor.getMetaRange(
+                    selection.startLine,
+                    selection.startCharacter,
+                    selection.endLine,
+                    selection.endCharacter,
+                );
+                this.updateToolbarMetaFromSelection(selectionMeta);
+            }
+        );
         
+        this.onToolbarMetaChanged = this.onToolbarMetaChanged.bind(this);
+        textToolbarEmitter.on('toolbarMetaChanged', this.onToolbarMetaChanged);
+
         this.onFontsLoaded = this.onFontsLoaded.bind(this);
         appEmitter.on('editor.tool.fontsLoaded', this.onFontsLoaded);
         
@@ -134,10 +167,12 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         this.destroyEditorTextarea();
         editingTextLayerId.value = null;
 
+        textToolbarEmitter.off('toolbarMetaChanged', this.onToolbarMetaChanged);
         appEmitter.off('editor.tool.fontsLoaded', this.onFontsLoaded);
 
         this.selectedLayerIdsUnwatch?.();
         this.editingLayerIdUnwatch?.();
+        this.editingTextDocumentSelectionUnwatch?.();
     }
 
     private onFontsLoaded() {
@@ -147,6 +182,27 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             editingRenderTextPlacement.value = calculateTextPlacement(this.editingLayer.data, {
                 wrapSize: isHorizontal ? this.editingLayer.width : this.editingLayer.height,
             });
+        }
+    }
+
+    private onToolbarMetaChanged(event: any) {
+        if (!event || editingTextLayerId.value == null) return;
+        const editors = this.layerEditors.get(editingTextLayerId.value);
+        if (!editors) return;
+        const { documentEditor, documentSelection } = editors;
+        const { name, value } = event as { name: string, value: any };
+        if (!documentSelection.isEmpty()) {
+            documentEditor.setMetaRange(
+                documentSelection.start.line,
+                documentSelection.start.character,
+                documentSelection.end.line,
+                documentSelection.end.character,
+                { [name]: value },
+            );
+            this.isEditorTextareaDirty = true;
+            this.saveEditorTextarea();
+        } else {
+            documentEditor.queueMetaChange(name as keyof TextDocumentSpanMeta, value);
         }
     }
 
@@ -700,7 +756,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                     spans: [
                         {
                             text: '',
-                            meta: { ...textMetaDefaults } // TODO - base on toolbar setting
+                            meta: this.generateTextMeta(toolbarTextMeta),
                         },
                     ],
                 },
@@ -735,6 +791,27 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             editingTextLayerId.value = createdLayerId;
             this.editorTextarea?.focus();
         }, 1);
+    }
+
+    private generateTextMeta(meta: Record<string, any>) {
+        const newMeta: Record<string, any> = {};
+        for (const prop in meta) {
+            if (textMetaDefaults[prop as keyof typeof textMetaDefaults] !== meta[prop]) {
+                newMeta[prop] = meta[prop];
+            }
+        }
+        return newMeta as Partial<typeof textMetaDefaults>;
+    }
+
+    private updateToolbarMetaFromSelection(selectionMeta: { [key: string]: any[] }) {
+        for (const key in selectionMeta) {
+            const values = selectionMeta[key];
+            if (values.length > 1) {
+                toolbarTextMeta[key as keyof TextDocumentSpanMeta] = null;
+            } else {
+                toolbarTextMeta[key as keyof TextDocumentSpanMeta] = values[0];
+            }
+        }
     }
 
     private queueSaveEditorTextarea() {

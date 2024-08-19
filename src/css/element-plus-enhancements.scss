@@ -184,6 +184,10 @@
         .el-dialog__header + .el-dialog__body {
             padding-top: 0.75rem;
         }
+
+        &.el-dialog--loading {
+            opacity: 0 !important;
+        }
     }
 
     .el-drawer {

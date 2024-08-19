@@ -33,6 +33,7 @@ export interface RenderTextLineInfo {
 
 export interface RenderTextGlyphInfo {
     glyph: InstanceType<typeof Glyph>;
+    meta: Partial<TextDocumentSpanMeta>;
     advance: number;
     advanceOffset: number;
     drawOffset: DOMPoint;

@@ -530,6 +530,26 @@ body.ogr-full-page {
             max-width: 90%;
         }
 
+        .el-dialog {
+            opacity: 1;
+            transition: opacity 0.3s;
+
+            .ogr-dock.ogr-dock--loading {
+                > :not(.ogr-dock__spinner) {
+                    position: absolute !important;
+                    visibility: hidden !important;
+                    pointer-events: none !important;
+                }
+            }
+        }
+
+        &.ogr-dialogs--loading {
+            .el-dialog {
+                transition: none !important;
+                opacity: 0 !important;
+            }
+        }
+
         @media screen and (max-width: 600px) {
             .el-dialog,
             .el-dialog.el-dialog--medium,

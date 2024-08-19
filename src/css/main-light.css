@@ -8704,6 +8704,19 @@ body.ogr-full-page .opengraphica {
   width: 100rem !important;
   max-width: 90%;
 }
+.opengraphica .ogr-dialogs .el-dialog {
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+.opengraphica .ogr-dialogs .el-dialog .ogr-dock.ogr-dock--loading > :not(.ogr-dock__spinner) {
+  position: absolute !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+.opengraphica .ogr-dialogs.ogr-dialogs--loading .el-dialog {
+  transition: none !important;
+  opacity: 0 !important;
+}
 @media screen and (max-width: 600px) {
   .opengraphica .ogr-dialogs .el-dialog,
 .opengraphica .ogr-dialogs .el-dialog.el-dialog--medium,
@@ -28322,6 +28335,9 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .el-dialog .el-dialog__header + .el-dialog__body {
   padding-top: 0.75rem;
+}
+.opengraphica .el-dialog.el-dialog--loading {
+  opacity: 0 !important;
 }
 .opengraphica .el-drawer .el-drawer__body {
   position: relative;

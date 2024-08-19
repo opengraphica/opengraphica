@@ -1,11 +1,14 @@
 <template>
-    <div class="ogr-dialogs">
+    <div class="ogr-dialogs" :class="{ 'ogr-dialogs--loading': loading }">
         <template v-for="dialog of dialogs" :key="dialog.id">
             <suspense>
                 <template #default>
                     <el-dialog
                         :title="$t(dialog.title || 'empty')"
-                        :class="'el-dialog--' + dialog.size + ' el-dialog--ogr-' + dialog.type"
+                        :class="[
+                            'el-dialog--' + dialog.size,
+                            'el-dialog--ogr-' + dialog.type,
+                        ]"
                         v-model="dialog.visible"
                         destroy-on-close
                         @closed="onDialogClosed(dialog)"
@@ -19,6 +22,7 @@
                                 :props="dialog.props"
                                 @update:title="dialog.title = $event"
                                 @update:dialogSize="dialog.size = $event"
+                                @update:loading="loading = $event"
                                 @close="onCloseDialog(dialog, $event)"
                             />
                         </template>
@@ -86,6 +90,7 @@ export default defineComponent({
     setup() {
         let dialogIdCounter: number = 0;
         const dialogs = ref<DialogDefinition[]>([]);
+        const loading = ref(false);
 
         onMounted(() => {
             appEmitter.on('app.dialogs.openFromDock', handleDockOpen);
@@ -98,6 +103,7 @@ export default defineComponent({
         });
 
         function handleDockOpen(event?: AppEmitterEvents['app.dialogs.openFromDock']) {
+            loading.value = true;
             if (event) {
                 dialogs.value.push({
                     type: 'dock',
@@ -130,6 +136,7 @@ export default defineComponent({
         }
 
         function onCloseDialog(dialog: DialogDefinition, event?: any) {
+            loading.value = false;
             dialog.visible = false;
             dialog.closeEventData = event;
             if (dialog.closeEventData && dialog.onClose) {
@@ -145,6 +152,7 @@ export default defineComponent({
         }
 
         return {
+            loading,
             dialogs,
             onCloseDialog,
             onDialogClosed

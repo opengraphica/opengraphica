@@ -61,14 +61,21 @@ export default defineComponent({
         modelValue: {
             type: Object as PropType<ColorModel>,
             default: { is: 'color', r: 0, g: 0, b: 0, alpha: 1, style: '#000000' }
+        },
+        preload: {
+            type: Boolean,
+            default: true,
         }
     },
     emits: [
         'input',
         'change',
-        'update:modelValue'
+        'update:modelValue',
+        'update:preload',
     ],
     setup(props, { emit }) {
+        const preloading = ref(true);
+
         const hue = ref<number>(0);
         const opacity = ref<number>(1);
         const useOkhsv = ref<boolean>(false);
@@ -124,6 +131,11 @@ export default defineComponent({
                 setupOkhsv();
                 useOkhsv.value = true;
             } catch (error) {}
+            await nextTick();
+            if (!useOkhsv.value) {
+                preloading.value = false;
+                emit('update:preload', false);
+            }
         });
 
         onUnmounted(() => {
@@ -192,6 +204,11 @@ export default defineComponent({
             valueGradientScene.add(valueGradientImagePlane);
 
             valueGradientRenderer.render(valueGradientScene, valueGradientCamera);
+
+            if (preloading.value === true) {
+                preloading.value = false;
+                emit('update:preload', false);
+            }
 
             (valueGradientCanvas as unknown) = undefined;
             (valueGradientCanvasClientRect as unknown) = undefined;

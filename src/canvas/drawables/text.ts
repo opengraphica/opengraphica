@@ -88,24 +88,29 @@ export default class Text implements Drawable<TextData> {
 
         if (isHorizontal) {
             for (const line of lines) {
-                for (const { glyph, advanceOffset, drawOffset, fontSize } of line.glyphs) {
-                    glyph.draw(
-                        ctx,
+                for (const { glyph, meta, advanceOffset, drawOffset, fontSize } of line.glyphs) {
+                    const path = glyph.getPath(
                         line.lineStartOffset + drawOffset.x + advanceOffset,
                         line.wrapOffset + drawOffset.y + line.heightAboveBaseline,
                         fontSize,
+                        {},
                     );
+                    path.fill = meta.fillColor?.style ?? textMetaDefaults.fillColor.style;
+                    path.draw(ctx);
                 }
             }
         } else {
             for (const line of lines) {
-                for (const { glyph, advanceOffset, drawOffset, characterWidth, fontSize } of line.glyphs) {
-                    glyph.draw(
-                        ctx,
+                for (const { glyph, meta, advanceOffset, drawOffset, characterWidth, fontSize } of line.glyphs) {
+                    ctx.fillStyle = meta.fillColor?.style ?? textMetaDefaults.fillColor.style;
+                    const path = glyph.getPath(
                         line.wrapOffset + drawOffset.x + (line.largestCharacterWidth / 2.0) - (characterWidth / 2.0),
                         line.lineStartOffset + drawOffset.y + advanceOffset,
                         fontSize,
+                        {},
                     );
+                    path.fill = meta.fillColor?.style ?? textMetaDefaults.fillColor.style;
+                    path.draw(ctx);
                 }
             }
         }

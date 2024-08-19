@@ -4,8 +4,8 @@ import type { RGBAColor, TextDocumentSpanMeta } from '@/types';
 // WARNING: changing these values can lead to issues with backwards compatibility.
 export const textMetaDefaults: TextDocumentSpanMeta<RGBAColor> = Object.freeze({
      direction: 'ltr',
-     family: 'Roboto',
-     size: 16,
+     family: 'Noto Sans',
+     size: 32,
      variant: 'regular',
      bold: false,
      oblique: false,

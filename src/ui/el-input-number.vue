@@ -190,7 +190,7 @@ export default defineComponent({
         let isFocused: boolean = false;
 
         watch(() => props.modelValue, (modelValue) => {
-            if (modelValue != null && modelValue !== lastEvaluatedValue) {
+            if (modelValue !== lastEvaluatedValue) {
                 updateModelValue(modelValue);
             }
         });
@@ -210,13 +210,13 @@ export default defineComponent({
         });
 
         onMounted(() => {
-            updateModelValue(props.modelValue || 0);
+            updateModelValue(props.modelValue);
         });
 
-        function updateModelValue(modelValue: number) {
-            lastEvaluatedValue = modelValue;
+        function updateModelValue(modelValue: number | null) {
+            lastEvaluatedValue = modelValue ?? 0;
             lastEvaluatedValue = Math.max(props.min, Math.min(props.max, lastEvaluatedValue));
-            displayValue.value = '' + modelValue;
+            displayValue.value = '' + (modelValue ?? '');
             if (!isFocused) {
                 addTextPrefixSuffix();
             }

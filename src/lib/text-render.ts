@@ -203,7 +203,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
 
     // Determine line wrapping based on boundary box.
     let documentLines = document.lines;
-    const isEmptyDocument = documentLines.length === 1 && documentLines[0].spans.length === 1 && documentLines[0].spans[0].text.trim() === '';
+    const isEmptyDocument = documentLines.length === 1 && documentLines[0].spans.length === 1 && documentLines[0].spans[0].text === '';
     if (isEmptyDocument) {
         documentLines = JSON.parse(JSON.stringify(documentLines));
         documentLines[0].spans[0].text = ' ';
@@ -486,6 +486,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
 
                         const glyphInfo: RenderTextGlyphInfo = {
                             glyph: glyph,
+                            meta: span.meta,
                             advance: isHorizontal
                                 ? (glyph.advanceWidth ?? 0) * glyphScale
                                 : (

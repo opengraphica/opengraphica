@@ -612,6 +612,16 @@ export class TextDocumentEditor {
         this.notifyChange();
 	}
 
+	/**
+	 * Queues a change to the meta for the next text edit
+	 */
+	public queueMetaChange(name: keyof TextDocumentSpanMeta, value: any) {
+		if (this.queuedMetaChanges == null) {
+			this.queuedMetaChanges = {};
+		}
+		this.queuedMetaChanges[name] = value;
+	}
+
     /**
 	 * Merges sibling spans that have the same metadata, and removes empty spans. 
 	 * @param startLine - The starting line of the text range

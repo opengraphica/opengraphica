@@ -116,7 +116,7 @@ export default defineComponent({
                         brushColor.value = event.color;
                     }
                 }
-            })
+            });
         }
 
         /*----------*\

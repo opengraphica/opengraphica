@@ -1,7 +1,7 @@
 <template>
     <div class="ogr-dock-content">
         <div class="ogr-dock-mobile-edge-padding">
-            <app-color-picker-gradient :modelValue="workingColor" @input="workingColor = $event" />
+            <app-color-picker-gradient :modelValue="workingColor" @input="workingColor = $event" v-model:preload="pickerGradientLoading" />
         </div>
         <h2 class="px-4.5 my-4 has-text-centered">{{ colorName }}</h2>
         <div class="px-4.5 my-4 is-flex is-justify-content-center">
@@ -71,19 +71,29 @@ export default defineComponent({
     },
     emits: [
         'close',
-        'update:title'
+        'update:title',
+        'update:loading',
     ],
     setup(props, { emit }) {
         emit('update:title', 'dock.colorPicker.title');
+        emit('update:loading', true);
 
         const workingColor = ref<RGBAColor>({ is: 'color', r: 0, g: 0, b: 0, alpha: 1, style: '#000000' });
         let outputColorModelName: ColorModelName = 'rgba';
+
+        const pickerGradientLoading = ref<boolean>(true);
 
         const hexCode = ref<string>();
         const colorName = ref<string>('\u00A0');
         const isFadeInColorName = ref<boolean>(false);
 
         let colorNamerWorkerUuid: string | null = null;
+
+        watch(() => pickerGradientLoading.value, (pickerGradientLoading, wasPickerGradientLoading) => {
+            if (wasPickerGradientLoading && !pickerGradientLoading) {
+                emit('update:loading', false);
+            }
+        }, { immediate: true });
 
         watch([toRef(props, 'color')], ([inputColor]) => {
             outputColorModelName = getColorModelName(inputColor);
@@ -132,10 +142,14 @@ export default defineComponent({
         }
 
         return {
+            pickerGradientLoading,
+
             workingColor,
             hexCode,
             colorName,
+
             isFadeInColorName,
+
             onChangeHexCode,
             onPickColorFromImage,
             onCancel,

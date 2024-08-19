@@ -1,6 +1,13 @@
 <template>
-    <div class="ogr-dock">
-        <suspense>
+    <div class="ogr-dock" :class="{ 'ogr-dock--loading': loading }">
+        <div v-if="loading" class="ogr-dock__spinner">
+            <div style="width: 5rem; height: 5rem; margin: auto;" v-loading="true" element-loading-background="transparent"></div>
+        </div>
+        <suspense
+            @pending="componentSuspsenseUpdate('pending')"
+            @resolve="componentSuspsenseUpdate('resolve')"
+            @fallback="componentSuspsenseUpdate('fallback')"
+        >
             <template #default>
                 <component
                     :is="name"
@@ -11,17 +18,15 @@
                     @close="onCloseDock"
                     @update:dialogSize="onUpdateDialogSize"
                     @update:title="onUpdateTitle"
+                    @update:loading="onUpdateLoading"
                 />
-            </template>
-            <template #fallback>
-                <div style="width: 5rem; height: 5rem; margin: auto;" v-loading="true" element-loading-background="transparent"></div>
             </template>
         </suspense>
     </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, defineAsyncComponent } from 'vue';
+import { computed, defineComponent, defineAsyncComponent, ref, watch } from 'vue';
 import preferencesStore from '@/store/preferences'
 import ElLoading from 'element-plus/lib/components/loading/index';
 
@@ -38,7 +43,8 @@ export default defineComponent({
     emits: [
         'close',
         'update:dialogSize',
-        'update:title'
+        'update:title',
+        'update:loading',
     ],
     props: {
         isDialog: {
@@ -58,6 +64,21 @@ export default defineComponent({
         }
     },
     setup(props, { emit }) {
+        emit('update:loading', true);
+
+        const loading = computed(() => {
+            return (
+                componentLoadingState.value === 'pending' ||
+                componentLoadingState.value === 'fallback' ||
+                componentContentLoading.value
+            );
+        });
+        const componentContentLoading = ref(false);
+        const componentLoadingState = ref('pending');
+
+        watch(() => loading.value, (loading) => {
+            emit('update:loading', loading);
+        }, { immediate: true });
 
         const languageOverride = computed(() => preferencesStore.state.languageOverride);
 
@@ -72,12 +93,26 @@ export default defineComponent({
         function onUpdateTitle() {
             emit('update:title', ...arguments);
         }
+
+        function onUpdateLoading(value: boolean) {
+            componentContentLoading.value = value;
+        }
+
+        function componentSuspsenseUpdate(loadingState: string) {
+            componentLoadingState.value = loadingState;
+        }
         
         return {
+            loading,
             languageOverride,
+
+            componentLoadingState,
+            componentSuspsenseUpdate,
+
             onCloseDock,
             onUpdateDialogSize,
-            onUpdateTitle
+            onUpdateTitle,
+            onUpdateLoading
         };
     }
 });
