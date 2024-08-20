@@ -43,7 +43,10 @@
         "convertLayersToCollage": "Преобразовать слои в коллаж",
         "textTransformResize": "Размер текстового слоя",
         "textTransformTranslate": "Переместить текстовый слой",
-        "updateEraseLayer": "Стирка с уровня"
+        "updateEraseLayer": "Стирка с уровня",
+        "createTextLayer": "Создание текстового слоя",
+        "typeInTextLayer": "Тип в текстовом слое",
+        "waitingOnQueueFree": "В ожидании завершения работы"
     },
     "app": {
         "colorPickerGradient": {
@@ -125,7 +128,8 @@
         "yes": "Да",
         "addEffect": "Добавить эффект",
         "editEffects": "Редактировать эффекты",
-        "restoreLastImage": "Восстановление последнего изображения"
+        "restoreLastImage": "Восстановление последнего изображения",
+        "pickColor": "Выберите цвет"
     },
     "canvas": {
         "toolbar": {
@@ -914,7 +918,8 @@
             "strikethrough": "Прорыв",
             "underline": "Подчеркнуть",
             "fill": "Заполнять",
-            "fillTooltip": "Цвет, который отображается внутри краев буквы ( букв)"
+            "fillTooltip": "Цвет, который отображается внутри краев буквы ( букв)",
+            "newTextLayerName": "Новый текст"
         },
         "zoom": {
             "zoomOut": "Издательство: Zoom Out",
@@ -926,7 +931,8 @@
         },
         "drawBrush": {
             "brushColor": "Цвет кисти",
-            "brushSize": "Размер"
+            "brushSize": "Размер",
+            "newBrushLayerName": "Новая краска"
         },
         "effect": {
             "edit": {

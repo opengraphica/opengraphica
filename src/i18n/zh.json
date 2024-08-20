@@ -43,7 +43,10 @@
         "convertLayersToCollage": "将图层转换为拼接",
         "textTransformResize": "修改文本图层大小",
         "textTransformTranslate": "移动文本图层",
-        "updateEraseLayer": "从图层擦除"
+        "updateEraseLayer": "从图层擦除",
+        "createTextLayer": "创建文本图层",
+        "typeInTextLayer": "在文本层中键入",
+        "waitingOnQueueFree": "等待工作完成"
     },
     "app": {
         "colorPickerGradient": {
@@ -125,7 +128,8 @@
         "yes": "对",
         "addEffect": "添加效果",
         "editEffects": "编辑效果",
-        "restoreLastImage": "恢复上一个图像"
+        "restoreLastImage": "恢复上一个图像",
+        "pickColor": "选择颜色"
     },
     "canvas": {
         "toolbar": {
@@ -912,7 +916,8 @@
             "strikethrough": "切换",
             "underline": "下划线",
             "fill": "填充",
-            "fillTooltip": "显示字母边缘内的颜色"
+            "fillTooltip": "显示字母边缘内的颜色",
+            "newTextLayerName": "新建文本"
         },
         "zoom": {
             "zoomOut": "缩小",
@@ -924,7 +929,8 @@
         },
         "drawBrush": {
             "brushColor": "笔刷颜色",
-            "brushSize": "大小"
+            "brushSize": "大小",
+            "newBrushLayerName": "新画"
         },
         "effect": {
             "edit": {

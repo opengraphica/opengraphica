@@ -43,7 +43,10 @@
         "convertLayersToCollage": "Convertir les calques en collage",
         "textTransformResize": "Redimensionner le calque texte",
         "textTransformTranslate": "Déplacer le calque texte",
-        "updateEraseLayer": "Effacer du calque"
+        "updateEraseLayer": "Effacer du calque",
+        "createTextLayer": "Créer un calque de texte",
+        "typeInTextLayer": "Saisissez le calque texte",
+        "waitingOnQueueFree": "Attendre que le travail soit terminé"
     },
     "app": {
         "colorPickerGradient": {
@@ -125,7 +128,8 @@
         "yes": "Oui",
         "addEffect": "Ajouter un effet",
         "editEffects": "Modifier les effets",
-        "restoreLastImage": "Restauration de la dernière image"
+        "restoreLastImage": "Restauration de la dernière image",
+        "pickColor": "Choisir la couleur"
     },
     "canvas": {
         "toolbar": {
@@ -914,7 +918,8 @@
             "strikethrough": "Grève",
             "underline": "Sous-titre",
             "fill": "Remplir",
-            "fillTooltip": "Couleur qui montre à l'intérieur des bords de la ou des lettre(s)"
+            "fillTooltip": "Couleur qui montre à l'intérieur des bords de la ou des lettre(s)",
+            "newTextLayerName": "Nouveau texte"
         },
         "zoom": {
             "zoomOut": "Zoom arrière",

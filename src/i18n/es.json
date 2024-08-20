@@ -43,7 +43,10 @@
         "convertLayersToCollage": "Convertir Capas en Collage",
         "textTransformResize": "Redimensionar la capa de texto",
         "textTransformTranslate": "Mover capa de texto",
-        "updateEraseLayer": "Borrar de Layer"
+        "updateEraseLayer": "Borrar de Layer",
+        "createTextLayer": "Crear capa de texto",
+        "typeInTextLayer": "Tipo de capa de texto",
+        "waitingOnQueueFree": "Esperando a trabajar para completar"
     },
     "app": {
         "colorPickerGradient": {
@@ -125,7 +128,8 @@
         "yes": "Sí",
         "addEffect": "Add Effect",
         "editEffects": "Editar efectos",
-        "restoreLastImage": "Restaurar última imagen"
+        "restoreLastImage": "Restaurar última imagen",
+        "pickColor": "Elija color"
     },
     "canvas": {
         "toolbar": {
@@ -914,7 +918,8 @@
             "strikethrough": "Strikethrough",
             "underline": "Subsidio",
             "fill": "Relleno",
-            "fillTooltip": "Color que muestra dentro de los bordes de las letras"
+            "fillTooltip": "Color que muestra dentro de los bordes de las letras",
+            "newTextLayerName": "Nuevo texto"
         },
         "zoom": {
             "zoomOut": "Zoom Out",
@@ -926,7 +931,8 @@
         },
         "drawBrush": {
             "brushColor": "Brush Color",
-            "brushSize": "Tamaño"
+            "brushSize": "Tamaño",
+            "newBrushLayerName": "Pintura nueva"
         },
         "effect": {
             "edit": {

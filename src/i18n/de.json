@@ -43,7 +43,10 @@
         "convertLayersToCollage": "Ebenen nach Collage umrechnen",
         "textTransformResize": "Textebene ändern",
         "textTransformTranslate": "Textebene verschieben",
-        "updateEraseLayer": "Löschen von Layer"
+        "updateEraseLayer": "Löschen von Layer",
+        "createTextLayer": "Textebene erstellen",
+        "typeInTextLayer": "Eingeben in Textebene",
+        "waitingOnQueueFree": "Warten auf Arbeiten zum Abschluss"
     },
     "app": {
         "colorPickerGradient": {
@@ -125,7 +128,8 @@
         "yes": "Ja",
         "addEffect": "Effekt hinzufügen",
         "editEffects": "Effekte bearbeiten",
-        "restoreLastImage": "Letztes Bild wiederherstellen"
+        "restoreLastImage": "Letztes Bild wiederherstellen",
+        "pickColor": "Farbe wählen"
     },
     "canvas": {
         "toolbar": {
@@ -914,7 +918,8 @@
             "strikethrough": "Striche",
             "underline": "Untergliederung",
             "fill": "Füllung",
-            "fillTooltip": "Farbe, die innerhalb der Kanten des Buchstabens zeigt"
+            "fillTooltip": "Farbe, die innerhalb der Kanten des Buchstabens zeigt",
+            "newTextLayerName": "Neuer Text"
         },
         "zoom": {
             "zoomOut": "In den Warenkorb",
@@ -926,7 +931,8 @@
         },
         "drawBrush": {
             "brushColor": "Bürste Farbe",
-            "brushSize": "Größe"
+            "brushSize": "Größe",
+            "newBrushLayerName": "Neue Farbe"
         },
         "effect": {
             "edit": {

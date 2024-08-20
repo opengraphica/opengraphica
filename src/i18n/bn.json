@@ -43,7 +43,10 @@
         "convertLayersToCollage": "স্তর রূপান্তর করো",
         "textTransformResize": "হরফের ছাঁদ পরিবর্তন করুন",
         "textTransformTranslate": "টেক্সট স্তর",
-        "updateEraseLayer": "স্তর থেকে মুছে ফেলুন"
+        "updateEraseLayer": "স্তর থেকে মুছে ফেলুন",
+        "createTextLayer": "টেক্সট স্তর তৈরি করুন",
+        "typeInTextLayer": "টেক্সট স্তর",
+        "waitingOnQueueFree": "কর্ম সম্পূর্ণ করার জন্য অপেক্ষারত"
     },
     "app": {
         "colorPickerGradient": {
@@ -125,7 +128,8 @@
         "yes": "হ্যাঁ",
         "addEffect": "ইফেক্ট যোগ করুন",
         "editEffects": "আবহ (_E)",
-        "restoreLastImage": "সর্বশেষ ছবি পুনরায় লোড করুন"
+        "restoreLastImage": "সর্বশেষ ছবি পুনরায় লোড করুন",
+        "pickColor": "লিংকের রং"
     },
     "canvas": {
         "toolbar": {
@@ -433,7 +437,7 @@
                 "default": {
                     "label": "ডিফর্ম",
                     "description": [
-                        null,
+                        "ছবিটির তীক্ষ্ণতা অথবা অস্পষ্টতা",
                         "পুল, ছবিটির চিমভাগ",
                         "ছবির ক্লোনড স্থান"
                     ]
@@ -912,7 +916,8 @@
             "strikethrough": "মধ্যে রেখাঙ্কিত",
             "underline": "নিম্নরেখাঙ্কিত",
             "fill": "ভরাটকরণ",
-            "fillTooltip": "অক্ষরের প্রান্তে প্রদর্শিত রং"
+            "fillTooltip": "অক্ষরের প্রান্তে প্রদর্শিত রং",
+            "newTextLayerName": "নতুন টেক্সট"
         },
         "zoom": {
             "zoomOut": "ছোট করে প্রদর্শন",
@@ -924,7 +929,8 @@
         },
         "drawBrush": {
             "brushColor": "ইস্পাতের রং",
-            "brushSize": "মাপ"
+            "brushSize": "মাপ",
+            "newBrushLayerName": "নতুন রং"
         },
         "effect": {
             "edit": {

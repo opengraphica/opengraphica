@@ -43,7 +43,10 @@
         "convertLayersToCollage": "Convertire Layers in Collage",
         "textTransformResize": "Ridimensionare il livello di testo",
         "textTransformTranslate": "Spostare il livello di testo",
-        "updateEraseLayer": "Cancellazione da Layer"
+        "updateEraseLayer": "Cancellazione da Layer",
+        "createTextLayer": "Crea un livello di testo",
+        "typeInTextLayer": "Tipo in strato di testo",
+        "waitingOnQueueFree": "In attesa di lavoro per completare"
     },
     "app": {
         "colorPickerGradient": {
@@ -125,7 +128,8 @@
         "yes": "Sì",
         "addEffect": "Aggiungere l'effetto",
         "editEffects": "Modifica degli effetti",
-        "restoreLastImage": "Ripristina ultima immagine"
+        "restoreLastImage": "Ripristina ultima immagine",
+        "pickColor": "Colore della scelta"
     },
     "canvas": {
         "toolbar": {
@@ -914,7 +918,8 @@
             "strikethrough": "Attaccamento",
             "underline": "Sottolineo",
             "fill": "Riempi",
-            "fillTooltip": "Colore che mostra all'interno dei bordi della lettera"
+            "fillTooltip": "Colore che mostra all'interno dei bordi della lettera",
+            "newTextLayerName": "Nuovo testo"
         },
         "zoom": {
             "zoomOut": "Zoom fuori",
@@ -926,7 +931,8 @@
         },
         "drawBrush": {
             "brushColor": "Colore della spazzola",
-            "brushSize": "Dimensione"
+            "brushSize": "Dimensione",
+            "newBrushLayerName": "Nuovo dipinto"
         },
         "effect": {
             "edit": {

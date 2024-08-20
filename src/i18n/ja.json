@@ -43,7 +43,10 @@
         "convertLayersToCollage": "レイヤーをコラージュに変換する",
         "textTransformResize": "テキストレイヤーのサイズ変更",
         "textTransformTranslate": "テキストレイヤーの移動",
-        "updateEraseLayer": "層からの消去"
+        "updateEraseLayer": "層からの消去",
+        "createTextLayer": "テキストレイヤーを作成する",
+        "typeInTextLayer": "テキストレイヤーの種類",
+        "waitingOnQueueFree": "作業の完了を待ちます"
     },
     "app": {
         "colorPickerGradient": {
@@ -125,7 +128,8 @@
         "yes": "お問い合わせ",
         "addEffect": "エフェクトの追加",
         "editEffects": "エフェクトの編集",
-        "restoreLastImage": "最後の画像を復元する"
+        "restoreLastImage": "最後の画像を復元する",
+        "pickColor": "ピックカラー"
     },
     "canvas": {
         "toolbar": {
@@ -914,7 +918,8 @@
             "strikethrough": "ストライクルー",
             "underline": "サイトマップ",
             "fill": "お問い合わせ",
-            "fillTooltip": "手紙の端に表示する色"
+            "fillTooltip": "手紙の端に表示する色",
+            "newTextLayerName": "新しいテキスト"
         },
         "zoom": {
             "zoomOut": "ズームアウト",
@@ -926,7 +931,8 @@
         },
         "drawBrush": {
             "brushColor": "ブラシ色",
-            "brushSize": "サイズ:"
+            "brushSize": "サイズ:",
+            "newBrushLayerName": "新しいペンキ"
         },
         "effect": {
             "edit": {

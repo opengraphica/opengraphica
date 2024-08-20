@@ -43,7 +43,10 @@
         "convertLayersToCollage": "परतों को कोलाज में कनवर्ट करें",
         "textTransformResize": "पाठ परत का आकार बदलें",
         "textTransformTranslate": "पाठ परत",
-        "updateEraseLayer": "परत से मिटा"
+        "updateEraseLayer": "परत से मिटा",
+        "createTextLayer": "टेक्स्ट लेयर बनाएं",
+        "typeInTextLayer": "टेक्स्ट लेयर में टाइप करें",
+        "waitingOnQueueFree": "काम पूरा करने के लिए प्रतीक्षा"
     },
     "app": {
         "colorPickerGradient": {
@@ -125,7 +128,8 @@
         "yes": "हाँ",
         "addEffect": "प्रभाव जोड़ें",
         "editEffects": "प्रभाव",
-        "restoreLastImage": "पिछली छवि को पुनर्स्थापित करें"
+        "restoreLastImage": "पिछली छवि को पुनर्स्थापित करें",
+        "pickColor": "रंग चुनें"
     },
     "canvas": {
         "toolbar": {
@@ -914,7 +918,8 @@
             "strikethrough": "स्ट्राइकथ्रू",
             "underline": "अंडरलाइन",
             "fill": "भरना",
-            "fillTooltip": "रंग जो अक्षरों के किनारों के अंदर दिखाता है"
+            "fillTooltip": "रंग जो अक्षरों के किनारों के अंदर दिखाता है",
+            "newTextLayerName": "नया पाठ"
         },
         "zoom": {
             "zoomOut": "ज़ूम आउट",
@@ -926,7 +931,8 @@
         },
         "drawBrush": {
             "brushColor": "ब्रश रंग",
-            "brushSize": "आकार"
+            "brushSize": "आकार",
+            "newBrushLayerName": "नई पेंट"
         },
         "effect": {
             "edit": {

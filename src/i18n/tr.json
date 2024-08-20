@@ -43,7 +43,10 @@
         "convertLayersToCollage": "Kompaj Katmanları Collage",
         "textTransformResize": "Resize Text Katman",
         "textTransformTranslate": "Text Katman",
-        "updateEraseLayer": "Katmandan"
+        "updateEraseLayer": "Katmandan",
+        "createTextLayer": "Create Text Katman",
+        "typeInTextLayer": "Text Katman",
+        "waitingOnQueueFree": "Tamamlamak için çalışmak için"
     },
     "app": {
         "colorPickerGradient": {
@@ -125,7 +128,8 @@
         "yes": "Evet",
         "addEffect": "Add Etkisi Ekle",
         "editEffects": "Edit Effects",
-        "restoreLastImage": "Restore Last Image"
+        "restoreLastImage": "Restore Last Image",
+        "pickColor": "Renk seçin"
     },
     "canvas": {
         "toolbar": {
@@ -914,7 +918,8 @@
             "strikethrough": "Grev",
             "underline": "Underline",
             "fill": "Doldurun",
-            "fillTooltip": "Mektupların kenarlarında gösteren renkler (s)"
+            "fillTooltip": "Mektupların kenarlarında gösteren renkler (s)",
+            "newTextLayerName": "Yeni Text"
         },
         "zoom": {
             "zoomOut": "Zoom Out Off",
@@ -926,7 +931,8 @@
         },
         "drawBrush": {
             "brushColor": "Fırça Renkleri",
-            "brushSize": "Boyut Boyutu"
+            "brushSize": "Boyut Boyutu",
+            "newBrushLayerName": "Yeni Paint"
         },
         "effect": {
             "edit": {

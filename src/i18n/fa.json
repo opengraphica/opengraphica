@@ -43,7 +43,10 @@
         "convertLayersToCollage": "تبدیل لایه ها به Collage",
         "textTransformResize": "Resize Text Layer",
         "textTransformTranslate": "Move Text Layer",
-        "updateEraseLayer": "Erase از Layer"
+        "updateEraseLayer": "Erase از Layer",
+        "createTextLayer": "Create Text Layer",
+        "typeInTextLayer": "نوع در Text Layer",
+        "waitingOnQueueFree": "انتظار برای کار برای تکمیل"
     },
     "app": {
         "colorPickerGradient": {
@@ -125,7 +128,8 @@
         "yes": "بله",
         "addEffect": "اضافه کردن اثر",
         "editEffects": "ویژگی های Edit Effects",
-        "restoreLastImage": "آخرین تصویر"
+        "restoreLastImage": "آخرین تصویر",
+        "pickColor": "انتخاب رنگ"
     },
     "canvas": {
         "toolbar": {
@@ -912,7 +916,8 @@
             "strikethrough": "اعتصاب از طریق اعتصاب",
             "underline": "زیر خط",
             "fill": "پر کردن",
-            "fillTooltip": "رنگی که در لبه های نامه (ها) نشان می دهد"
+            "fillTooltip": "رنگی که در لبه های نامه (ها) نشان می دهد",
+            "newTextLayerName": "متن جدید"
         },
         "zoom": {
             "zoomOut": "برگرفته از:",
@@ -924,7 +929,8 @@
         },
         "drawBrush": {
             "brushColor": "Brush Color",
-            "brushSize": "اندازه"
+            "brushSize": "اندازه",
+            "newBrushLayerName": "رنگ جدید"
         },
         "effect": {
             "edit": {

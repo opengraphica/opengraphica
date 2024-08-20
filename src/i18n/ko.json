@@ -43,7 +43,10 @@
         "convertLayersToCollage": "레이어를 콜리지로 변환",
         "textTransformResize": "Resize 텍스트 레이어",
         "textTransformTranslate": "이동 텍스트 층",
-        "updateEraseLayer": "층의 Erase"
+        "updateEraseLayer": "층의 Erase",
+        "createTextLayer": "텍스트 레이어 만들기",
+        "typeInTextLayer": "텍스트 레이어의 유형",
+        "waitingOnQueueFree": "업무 수행"
     },
     "app": {
         "colorPickerGradient": {
@@ -125,7 +128,8 @@
         "yes": "이름 *",
         "addEffect": "추가 효과",
         "editEffects": "편집 효과",
-        "restoreLastImage": "최근 이미지"
+        "restoreLastImage": "최근 이미지",
+        "pickColor": "색깔 선택"
     },
     "canvas": {
         "toolbar": {
@@ -914,7 +918,8 @@
             "strikethrough": "스트라이크",
             "underline": "이름 *",
             "fill": "제품정보",
-            "fillTooltip": "편지의 가장자리 안쪽에 보여주는 색깔 (s)"
+            "fillTooltip": "편지의 가장자리 안쪽에 보여주는 색깔 (s)",
+            "newTextLayerName": "새로운 텍스트"
         },
         "zoom": {
             "zoomOut": "줌 아웃",
@@ -926,7 +931,8 @@
         },
         "drawBrush": {
             "brushColor": "솔 색깔",
-            "brushSize": "크기 (mm)"
+            "brushSize": "크기 (mm)",
+            "newBrushLayerName": "새로운 페인트"
         },
         "effect": {
             "edit": {

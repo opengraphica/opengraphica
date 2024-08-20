@@ -43,7 +43,10 @@
         "convertLayersToCollage": "Convert Layers to Collage",
         "textTransformResize": "Resize Text Layer",
         "textTransformTranslate": "نقل الرسائل",
-        "updateEraseLayer": "Erase from Layer"
+        "updateEraseLayer": "Erase from Layer",
+        "createTextLayer": "Create Text Layer",
+        "typeInTextLayer": "Type in Text Layer",
+        "waitingOnQueueFree": "انتظار العمل"
     },
     "app": {
         "colorPickerGradient": {
@@ -125,7 +128,8 @@
         "yes": "نعم",
         "addEffect": "مضافا إليه:",
         "editEffects": "Edit Effects",
-        "restoreLastImage": "استعادة آخر صورة"
+        "restoreLastImage": "استعادة آخر صورة",
+        "pickColor": "المخلول"
     },
     "canvas": {
         "toolbar": {
@@ -914,7 +918,8 @@
             "strikethrough": "Strikethrough",
             "underline": "العنوان",
             "fill": "Fill",
-            "fillTooltip": "Color that shows inside the edges of the letter(s)"
+            "fillTooltip": "Color that shows inside the edges of the letter(s)",
+            "newTextLayerName": "النص الجديد"
         },
         "zoom": {
             "zoomOut": "زوم",
@@ -926,7 +931,8 @@
         },
         "drawBrush": {
             "brushColor": "Brush Color",
-            "brushSize": "الحجم"
+            "brushSize": "الحجم",
+            "newBrushLayerName": "الطلاء الجديد"
         },
         "effect": {
             "edit": {
