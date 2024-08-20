@@ -1,25 +1,20 @@
 import { v4 as uuidv4 } from 'uuid';
 import { nextTick, watch, WatchStopHandle } from 'vue';
-import { Bezier } from 'bezier-js';
 
-import { PointerTracker } from './base';
 import BaseCanvasMovementController from './base-movement';
 import { cursorHoverPosition, brushShape, brushColor, brushSize } from '../store/draw-brush-state';
 import { blitActiveSelectionMask, activeSelectionMask, appliedSelectionMask } from '../store/selection-state';
 
-import { decomposeMatrix } from '@/lib/dom-matrix';
 import { isOffscreenCanvasSupported } from '@/lib/feature-detection';
-import { isCtrlOrMetaKeyPressed } from '@/lib/keyboard';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
-import { createEmptyImage, createImageFromBlob, createEmptyCanvas, createEmptyCanvasWith2dContext } from '@/lib/image';
-import { pointDistance2d, nearestPowerOf2 } from '@/lib/math';
+import { createImageFromBlob, createEmptyCanvas } from '@/lib/image';
 import { t, tm, rt } from '@/i18n';
 
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
-import { getStoredImageOrCanvas, createStoredImage, prepareStoredImageForArchival, prepareStoredImageForEditing } from '@/store/image';
-import historyStore, { createHistoryReserveToken, historyReserveQueueFree } from '@/store/history';
-import workingFileStore, { getSelectedLayers, getLayerById, getLayerGlobalTransform } from '@/store/working-file';
+import { createStoredImage, prepareStoredImageForArchival, prepareStoredImageForEditing } from '@/store/image';
+import historyStore, { createHistoryReserveToken, historyReserveQueueFree, historyBlockInteractionUntilComplete } from '@/store/history';
+import workingFileStore, { getSelectedLayers, getLayerById, getLayerGlobalTransform, ensureUniqueLayerSiblingName } from '@/store/working-file';
 
 import DrawableCanvas from '@/canvas/renderers/drawable/canvas';
 import { prepareTextureCompositor } from '@/workers/texture-compositor.interface';
@@ -153,6 +148,9 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         if (!editorStore.state.tutorialFlags.drawToolIntroduction) {
             dismissTutorialNotification('drawToolIntroduction');
         }
+
+        // Block UI changes until history actions have completed
+        historyBlockInteractionUntilComplete();
     }
 
     onPointerDown(e: PointerEvent) {
@@ -234,7 +232,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         if (selectedLayers.length === 0) {
             layerActions.push(new InsertLayerAction<InsertRasterLayerOptions>({
                 type: 'raster',
-                name: 'New Paint',
+                name: ensureUniqueLayerSiblingName(workingFileStore.state.layers[0]?.id, t('toolbar.drawBrush.newBrushLayerName')),
                 width,
                 height,
                 data: {

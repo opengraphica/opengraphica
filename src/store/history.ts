@@ -381,6 +381,7 @@ function createHistoryReserveToken() {
     return uuidv4();
 }
 
+/** Returns a promise that resolves when all of the actions in the history queue have run. */
 async function historyReserveQueueFree() {
     let actionReserveQueue = store.get('actionReserveQueue');
     while (actionReserveQueue.length > 0) {
@@ -388,6 +389,28 @@ async function historyReserveQueueFree() {
         await reserveQueueItem.promise;
         actionReserveQueue = store.get('actionReserveQueue');
     }
+}
+
+/** If there are currently running actions, shows an overlay that disappears when all actions are complete. */
+export async function historyBlockInteractionUntilComplete() {
+    let actionReserveQueue = store.get('actionReserveQueue');
+    if (actionReserveQueue.length === 0) return;
+
+    appEmitter.emit('editor.history.startBlocking', {
+        trigger: 'do',
+        actions: [{
+            id: 'waitingOnQueueFree',
+            description: 'action.waitingOnQueueFree',
+        }],
+    });
+
+    while (actionReserveQueue.length > 0) {
+        await historyReserveQueueFree();
+        await nextTick();
+        actionReserveQueue = store.get('actionReserveQueue');
+    }
+    
+    appEmitter.emit('editor.history.stopBlocking');
 }
 
 export default store;

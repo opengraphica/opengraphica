@@ -8,6 +8,7 @@ import { UpdateLayerAction } from '@/actions/update-layer';
 
 import BaseCanvasMovementController from './base-movement';
 
+import { t } from '@/i18n';
 import { decomposeMatrix } from '@/lib/dom-matrix';
 import { isInput } from '@/lib/events';
 import { rotateDirectionVector2d } from '@/lib/math';
@@ -18,7 +19,7 @@ import { calculateTextPlacement } from '@/lib/text-render';
 import canvasStore from '@/store/canvas';
 import historyStore from '@/store/history';
 import preferencesStore from '@/store/preferences';
-import workingFileStore, { getLayerById, getLayerGlobalTransform, getLayersByType, getSelectedLayers } from '@/store/working-file';
+import workingFileStore, { getLayerById, getLayerGlobalTransform, getLayersByType, getSelectedLayers, ensureUniqueLayerSiblingName } from '@/store/working-file';
 
 import {
     textToolbarEmitter, isEditorTextareaFocused, editingTextLayerId,
@@ -793,6 +794,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
 
         const insertLayerAction = new InsertLayerAction<InsertTextLayerOptions>({
             type: 'text',
+            name: ensureUniqueLayerSiblingName(workingFileStore.state.layers[0]?.id, t('toolbar.text.newTextLayerName')),
             transform: new DOMMatrix().translate(
                 isDynamic || !isHorizontal ? position.x - (createNewTextLayerSize.value.x / 2) : position.x,
                 isDynamic || isHorizontal ? position.y - (createNewTextLayerSize.value.y / 2) : position.y,

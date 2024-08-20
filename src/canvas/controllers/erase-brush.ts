@@ -15,7 +15,7 @@ import { t, tm, rt } from '@/i18n';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import { getStoredImageOrCanvas, createStoredImage, prepareStoredImageForArchival, prepareStoredImageForEditing, getStoredImageCanvas } from '@/store/image';
-import historyStore, { createHistoryReserveToken, historyReserveQueueFree } from '@/store/history';
+import historyStore, { createHistoryReserveToken, historyReserveQueueFree, historyBlockInteractionUntilComplete } from '@/store/history';
 import workingFileStore, { getSelectedLayers, getLayerById, getLayerGlobalTransform } from '@/store/working-file';
 
 import DrawableCanvas from '@/canvas/renderers/drawable/canvas';
@@ -175,6 +175,9 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
         if (!editorStore.state.tutorialFlags.eraseToolIntroduction) {
             dismissTutorialNotification('eraseToolIntroduction');
         }
+
+        // Block UI changes until history actions have completed
+        historyBlockInteractionUntilComplete();
     }
 
     onPointerDown(e: PointerEvent) {
