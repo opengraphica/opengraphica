@@ -30,7 +30,7 @@
                         class="ogr-layer-dnd-handle"
                         v-pointer.tap="onPointerTapDndHandle"
                         @mouseenter="onMouseEnterDndHandle(layer)"
-                        @mouselealayerSettingsVisibilityve="onMouseLeaveDndHandle(layer)">
+                        @mouseleave="onMouseLeaveDndHandle(layer)">
                         <app-layer-list-thumbnail :layer="layer" />
                         <span class="ogr-layer-name">{{ layer.name }}</span>
                         <span v-if="layer.type === 'group'" class="ogr-layer-group-arrow bi" :class="{ 'bi-chevron-right': !layer.expanded, 'bi-chevron-down': layer.expanded }" aria-hidden="true"></span>

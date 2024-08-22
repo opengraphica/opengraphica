@@ -997,7 +997,7 @@ body.ogr-full-page {
             }
 
             &.is-dnd-hover {
-                background: var(--ogr-layer-list-background-color-hover);
+                box-shadow: 0 0 0 4px inset var(--ogr-layer-list-background-color-hover);
             }
 
             &.is-dnd-placeholder {
