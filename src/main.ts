@@ -1,7 +1,7 @@
 
 import { createApp, type App } from 'vue';
 import '@/polyfill';
-import OpenGraphicaApp from '@/ui/app.vue';
+import OpenGraphicaApp from '@/ui/app/app.vue';
 import appEmitter from '@/lib/emitter';
 import { registerApp } from '@/composables/app-plugin';
 
