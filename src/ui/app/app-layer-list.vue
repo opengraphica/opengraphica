@@ -300,7 +300,8 @@ export default defineComponent({
                 }
                 if (!workingFileStore.get('selectedLayerIds').includes(layerId)) {
                     historyStore.dispatch('runAction', {
-                        action: new SelectLayersAction([layerId])
+                        action: new SelectLayersAction([layerId]),
+                        mergeWithHistory: 'selectLayers',
                     });
                 }
             }

@@ -524,7 +524,8 @@ export default class CanvasTextController extends BaseCanvasMovementController {
 
         if (dragStartPickLayer != null && !workingFileStore.state.selectedLayerIds.includes(dragStartPickLayer)) {
             historyStore.dispatch('runAction', {
-                action: new SelectLayersAction([dragStartPickLayer])
+                action: new SelectLayersAction([dragStartPickLayer]),
+                mergeWithHistory: 'selectLayers',
             });
         }
 

@@ -77,7 +77,8 @@ export default class EffectController extends BaseCanvasMovementController {
         const pickLayerId = this.pickLayer(viewTransformPoint);
         if (pickLayerId != null) {
             await historyStore.dispatch('runAction', {
-                action: new SelectLayersAction([pickLayerId])
+                action: new SelectLayersAction([pickLayerId]),
+                mergeWithHistory: 'selectLayers',
             });
         }
     }

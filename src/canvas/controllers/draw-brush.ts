@@ -227,7 +227,7 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         await historyStore.dispatch('reserve', { token: startDrawReserveToken });
 
         const { width, height } = workingFileStore.state;
-        let selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster');
+        let selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster' || layer.type === 'empty');
         let layerActions = [];
         if (selectedLayers.length === 0) {
             layerActions.push(new InsertLayerAction<InsertRasterLayerOptions>({

@@ -26,6 +26,7 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
     private stopWatchDimensions: WatchStopHandle | undefined;
     private stopWatchFilters: WatchStopHandle | undefined;
     private stopWatchTransform: WatchStopHandle | undefined;
+    private stopWatchVisible: WatchStopHandle | undefined;
 
     private layer!: WorkingFileTextLayer<ColorModel>;
 
@@ -119,7 +120,7 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
             canvasStore.set('dirty', true);
         });
 
-        const { width, height, filters, transform, data } = toRefs(layer);
+        const { width, height, filters, transform, data, visible } = toRefs(layer);
         this.stopWatchData = watch([data], () => {
             this.update({ data: layer.data });
         }, { deep: true, immediate: true });
@@ -140,6 +141,9 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
         this.stopWatchTransform = watch([transform], ([transform]) => {
             this.update({ transform });
         }, { immediate: true });
+        this.stopWatchVisible = watch([visible], ([visible]) => {
+            this.update({ visible });
+        }, { immediate: true });
     }
 
     onReorder(order: number) {
@@ -153,6 +157,9 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
     }
 
     async onUpdate(updates: Partial<WorkingFileTextLayer<ColorModel>>) {
+        if (updates.visible != null) {
+            this.plane && (this.plane.visible = updates.visible);
+        }
         if (updates.transform) {
             this.plane?.matrix.set(
                 updates.transform.m11, updates.transform.m21, updates.transform.m31, updates.transform.m41,
@@ -206,6 +213,7 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
         this.stopWatchDimensions?.();
         this.stopWatchFilters?.();
         this.stopWatchTransform?.();
+        this.stopWatchVisible?.();
         this.isDrawnAfterAttach = false;
     }
 

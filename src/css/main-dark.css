@@ -9111,24 +9111,32 @@ body.ogr-full-page .opengraphica {
   padding: 0;
   display: block;
 }
-.opengraphica .ogr-layer-list .ogr-layer.is-active {
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer {
+  background: none;
+}
+.opengraphica .ogr-layer-list .ogr-layer.is-active,
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer.is-active {
   position: relative;
   background-color: var(--ogr-layout-menu-bar-background-color);
   background-image: linear-gradient(var(--ogr-layer-list-background-color-active), var(--ogr-layer-list-background-color-active));
   box-shadow: 0.1875rem 0 0 var(--ogr-layer-list-thumbnail-border-color-active) inset;
 }
-.opengraphica .ogr-layer-list .ogr-layer.is-dnd-hover {
+.opengraphica .ogr-layer-list .ogr-layer.is-dnd-hover,
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer.is-dnd-hover {
   box-shadow: 0 0 0 4px inset var(--ogr-layer-list-background-color-hover);
 }
-.opengraphica .ogr-layer-list .ogr-layer.is-dnd-placeholder {
+.opengraphica .ogr-layer-list .ogr-layer.is-dnd-placeholder,
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer.is-dnd-placeholder {
   background: var(--ogr-layout-menu-bar-background-color);
   position: relative;
   box-shadow: none;
 }
-.opengraphica .ogr-layer-list .ogr-layer.is-dnd-placeholder > * {
+.opengraphica .ogr-layer-list .ogr-layer.is-dnd-placeholder > *,
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer.is-dnd-placeholder > * {
   visibility: hidden;
 }
-.opengraphica .ogr-layer-list .ogr-layer.is-dnd-placeholder:before {
+.opengraphica .ogr-layer-list .ogr-layer.is-dnd-placeholder:before,
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer.is-dnd-placeholder:before {
   content: "";
   position: absolute;
   display: block;
@@ -9140,7 +9148,8 @@ body.ogr-full-page .opengraphica {
   bottom: 0;
   border: 0.25rem dashed rgba(127, 127, 127, 0.2);
 }
-.opengraphica .ogr-layer-list .ogr-layer.is-dragging {
+.opengraphica .ogr-layer-list .ogr-layer.is-dragging,
+.opengraphica .ogr-layer-list .ogr-layer .ogr-layer.is-dragging {
   pointer-events: none;
   position: absolute;
   background: var(--ogr-layer-list-background-color-drag);

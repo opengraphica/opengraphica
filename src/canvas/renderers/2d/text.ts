@@ -27,13 +27,14 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
         if (this.textDrawableUuid && this.drawableCanvas) {
             const isHorizontal = layer.data.lineDirection === 'ltr' || layer.data.lineDirection === 'rtl';
             this.drawableCanvas.draw({
+                refresh: true,
                 updates: [{
                     uuid: this.textDrawableUuid,
                     data: {
                         wrapSize: isHorizontal ? layer.width : layer.height,
-                        document: layer.data
-                    }
-                }]
+                        document: layer.data,
+                    },
+                }],
             });
             const { canvas } = this.drawableCanvas.drawCompleteSync();
             ctx.drawImage(canvas, 0, 0);
@@ -54,7 +55,7 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
         this.drawableCanvas.registerDrawableClass('text', TextDrawable);
         this.textDrawableUuid = this.drawableCanvas.addSync<TextData>('text', {
             wrapSize: layer.width,
-            document: layer.data
+            document: layer.data,
         });
     }
 

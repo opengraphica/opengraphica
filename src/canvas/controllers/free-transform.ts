@@ -357,7 +357,8 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
                     selectedLayerIds.add(layerId);
                     await historyStore.dispatch('runAction', {
-                        action: new SelectLayersAction(Array.from(selectedLayerIds))
+                        action: new SelectLayersAction(Array.from(selectedLayerIds)),
+                        mergeWithHistory: 'selectLayers',
                     });
                     await nextTick();
                     this.setBoundsFromSelectedLayersImmediate();
@@ -389,7 +390,8 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                         const layerId = this.transformStartPickLayer;
                         if (layerId != workingFileStore.get('selectedLayerIds')[0]) {
                             await historyStore.dispatch('runAction', {
-                                action: new SelectLayersAction([layerId])
+                                action: new SelectLayersAction([layerId]),
+                                mergeWithHistory: 'selectLayers',
                             });
                         }
                     }
