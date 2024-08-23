@@ -453,7 +453,6 @@ export default defineComponent({
                 if (canvasStore.get('useCssViewport')) {
                     cameraTransform = new DOMMatrix().inverse().translate(0, 0, 1);
                 } else {
-                    const devicePixelRatio = window.devicePixelRatio || 1;
                     cameraTransform = canvasStore.get('transform').inverse().translate(0, 0, 1);
                 }
                 const matrix = new Matrix4();
