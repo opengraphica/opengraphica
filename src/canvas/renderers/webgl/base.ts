@@ -278,6 +278,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
 
             if (chunk.x > draftWidth || chunk.y > draftHeight) continue;
 
+            // Crop the chunk if it is outside the bounds of the draft texture
             let shouldCloseChunkImage = false;
             let chunkWidth = chunk.data.width;
             let chunkHeight = chunk.data.height;
@@ -300,6 +301,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
                 }
             }
 
+            // Create a texture from the chunk
             const chunkTexture = new CanvasTexture(chunkImage);
             chunkTexture.premultiplyAlpha = true;
             chunkTexture.generateMipmaps = false;

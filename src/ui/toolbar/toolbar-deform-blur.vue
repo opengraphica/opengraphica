@@ -2,14 +2,14 @@
     <div class="is-flex container is-align-items-center is-justify-content-center mx-auto">
         <div class="ogr-toolbar-overlay">
             <div class="ogr-toolbar-tool-selector">
-                <span class="bi bi-eraser my-1" aria-hidden="true"></span>
+                <span class="bi bi-droplet my-1" aria-hidden="true"></span>
                 <span class="ogr-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
             </div>
             <el-horizontal-scrollbar-arrows>
                 <div class="is-flex is-align-items-center px-3">
-                    <label for="toolbar-erase-brush-size-slider" v-t="'toolbar.eraseBrush.brushSize'" class="mr-3" />
+                    <label for="toolbar-deform-blur-size-slider" v-t="'toolbar.deformBlur.brushSize'" class="mr-3" />
                     <el-slider
-                        id="toolbar-erase-brush-size-slider"
+                        id="toolbar-deform-blur-size-slider"
                         v-model="selectionBrushSize"
                         :min="0"
                         :max="1"
@@ -24,8 +24,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, toRefs, watch } from 'vue';
-import { brushSize } from '@/canvas/store/erase-brush-state';
+import { computed, defineComponent, ref } from 'vue';
+import { brushSize } from '@/canvas/store/deform-blur-state';
 
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
@@ -39,9 +39,8 @@ import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSlider from 'element-plus/lib/components/slider/index';
 import ElTooltip from 'element-plus/lib/components/tooltip/index';
 
-
 export default defineComponent({
-    name: 'ToolbarErase',
+    name: 'ToolbarDeformBlur',
     components: {
         ElAlert,
         ElButton,

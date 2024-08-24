@@ -15,6 +15,7 @@ interface EditorDeferredTask {
 }
 
 interface TutorialFlags {
+    deformBlurToolIntroduction?: boolean;
     drawToolIntroduction?: boolean;
     effectToolIntroduction?: boolean;
     eraseToolIntroduction?: boolean;

@@ -1,7 +1,6 @@
 import BaseCanvasController, { PointerTracker } from './base';
 import canvasStore from '@/store/canvas';
 import preferencesStore from '@/store/preferences';
-import { throttle } from '@/lib/timing';
 import { pointDistance2d } from '@/lib/math';
 
 export default class BaseCanvasMovementController extends BaseCanvasController {
@@ -20,7 +19,6 @@ export default class BaseCanvasMovementController extends BaseCanvasController {
 
     constructor() {
         super();
-        // this.zoomCanvas = throttle(this.zoomCanvas, 40);
     }
 
     onPointerDown(e: PointerEvent): void {

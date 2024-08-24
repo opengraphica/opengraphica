@@ -1,4 +1,22 @@
 {
+    "deform": {
+        "name": "toolGroup.deform.name",
+        "description": "toolGroup.deform.description",
+        "tools": {
+            "blur": {
+                "name": "toolGroup.draw.tools.blur.name",
+                "description": "toolGroup.draw.tools.blur.description",
+                "controller": "deform-blur",
+                "toolbar": {
+                    "position": "auto",
+                    "target": "deform-blur"
+                },
+                "overlays": [
+                    "deform-blur"
+                ]
+            }
+        }
+    },
     "draw": {
         "name": "toolGroup.draw.name",
         "description": "toolGroup.draw.description",

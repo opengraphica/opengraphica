@@ -9,6 +9,7 @@ import { BaseAction } from './base';
 import { SelectLayersAction } from './select-layers';
 import canvasStore from '@/store/canvas';
 import { reserveStoredImage, unreserveStoredImage } from '@/store/image';
+import { reserveStoredSvg, unreserveStoredSvg } from '@/store/svg';
 import workingFileStore, { calculateLayerOrder, getGroupLayerById } from '@/store/working-file';
 import { updateWorkingFile, updateWorkingFileLayer, deleteWorkingFileLayer } from '@/store/data/working-file-database';
 import layerRenderers, { assignLayerRenderer } from '@/canvas/renderers';
@@ -117,6 +118,9 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                         data: [],
                         ...this.insertLayerOptions
                     } as WorkingFileVectorLayer<ColorModel>;
+                    if (newLayer.data.sourceUuid) {
+                        reserveStoredSvg(newLayer.data.sourceUuid, `${layerId}`);
+                    }
                     break;
                 case 'text':
                     newLayer = {
@@ -253,6 +257,11 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                     if (frame.image.sourceUuid) {
                         unreserveStoredImage(frame.image.sourceUuid, `${this.insertedLayer.id}`);
                     }
+                }
+            }
+            else if (this.insertedLayer.type === 'vector') {
+                if (this.insertedLayer.data.sourceUuid) {
+                    unreserveStoredSvg(this.insertedLayer.data.sourceUuid, `${this.insertedLayer.id}`);
                 }
             }
         }

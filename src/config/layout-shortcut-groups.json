@@ -4,12 +4,12 @@
         "controls": [
             {
                 "type": "button",
-                "icon": "bi bi-droplet",
+                "icon": "bi bi-droplet-half",
                 "label": "layoutShortcutGroup.deform.controls.default.label",
                 "description": "layoutShortcutGroup.deform.controls.default.description",
                 "action": {
-                    "type": "runModule",
-                    "target": "tmp/notYetImplemented"
+                    "type": "toolGroup",
+                    "target": "deform"
                 }
             }
         ],
@@ -20,7 +20,7 @@
         "controls": [
             {
                 "type": "button",
-                "icon": "bi bi-pencil",
+                "icon": "bi bi-pencil-fill",
                 "label": "layoutShortcutGroup.draw.controls.default.label",
                 "description": "layoutShortcutGroup.draw.controls.default.description",
                 "action": {
@@ -52,7 +52,7 @@
         "controls": [
             {
                 "type": "button",
-                "icon": "bi bi-eraser",
+                "icon": "bi bi-eraser-fill",
                 "label": "layoutShortcutGroup.erase.controls.default.label",
                 "description": "layoutShortcutGroup.erase.controls.default.description",
                 "action": {

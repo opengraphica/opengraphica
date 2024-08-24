@@ -1,10 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import imageDatabase from './data/image-history-database';
 import canvasStore from './canvas';
-import { createImageBlobFromCanvas, createImageBlobFromImageBitmap, createImageFromBlob, createCanvasFromImage } from '@/lib/image';
-
-import type { Texture } from 'three/src/textures/Texture';
-import { saveAs } from 'file-saver';
+import { createImageBlobFromCanvas, createImageBlobFromImageBitmap, createCanvasFromImage } from '@/lib/image';
 
 // Map of uuid to image store data
 

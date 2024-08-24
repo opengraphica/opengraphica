@@ -2,10 +2,12 @@ import { reactive, toRaw } from 'vue';
 import { deepToRaw } from '@/lib/vue';
 import { assignLayerRenderer } from '@/canvas/renderers';
 import { prepareStoredImageForEditing, reserveStoredImage, createStoredImage } from '@/store/image';
+import { getStoredSvgDataUrl, createStoredSvg } from '@/store/svg';
 import { createImageBlobFromCanvas, createImageFromBlob } from '@/lib/image';
 import type {
     ColorModel, WorkingFile, WorkingFileGroupLayer, WorkingFileLayer, WorkingFileAnyLayer,
-    WorkingFileRasterLayer, WorkingFileRasterSequenceLayer
+    WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer,
+    SerializedFileVectorLayer,
 } from '@/types';
 
 interface DatabaseMetaLayer {
@@ -146,6 +148,14 @@ async function readStoredLayersRecursive(metaLayers: DatabaseMetaLayer[]): Promi
                     reserveStoredImage(imageUuid, `${layerResult.id}`);
                     frame.image.sourceUuid = imageUuid;
                 }
+            }
+        } else if (layerResult.type === 'vector') {
+            const vectorLayer = layerResult as WorkingFileVectorLayer;
+            const serializedVectorLayer = layerResult as unknown as SerializedFileVectorLayer;
+            if (serializedVectorLayer?.data?.sourceSvgSerialized) {
+                const image = new Image();
+                image.src = serializedVectorLayer.data.sourceSvgSerialized;
+                vectorLayer.data.sourceUuid = await createStoredSvg(image);
             }
         }
         assignLayerRenderer(layerResult);
@@ -352,6 +362,13 @@ export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNe
             } else {
                 frame.image.sourceUuid = originalSourceUuid;
             }
+        }
+    } else if (storedLayer.type === 'vector') {
+        const storedVectorLayer = storedLayer as SerializedFileVectorLayer;
+        const workingVectorLayer = layer as WorkingFileVectorLayer;
+        const originalSourceUuid = (existingLayer as any)?.data?.originalSourceUuid ?? null;
+        if (workingVectorLayer.data.sourceUuid && workingVectorLayer.data.sourceUuid != originalSourceUuid) {
+            storedVectorLayer.data.sourceSvgSerialized = getStoredSvgDataUrl(workingVectorLayer.data.sourceUuid) ?? undefined;
         }
     }
 

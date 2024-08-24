@@ -1,7 +1,3 @@
-import {
-    ColorModel, WorkingFileAnyLayer,
-    UpdateAnyLayerOptions, UpdateRasterLayerOptions, WorkingFileRasterLayer, WorkingFileLayerDraftChunk
-} from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 import { markRaw } from 'vue';
 import { BaseAction } from './base';
@@ -9,20 +5,30 @@ import { createEmptyCanvasWith2dContext, createImageFromCanvas } from '@/lib/ima
 import { drawImageToCanvas2d } from '@/lib/canvas';
 import canvasStore from '@/store/canvas';
 import { prepareStoredImageForEditing, prepareStoredImageForArchival, reserveStoredImage, unreserveStoredImage } from '@/store/image';
+import { reserveStoredSvg, unreserveStoredSvg } from '@/store/svg';
 import workingFileStore, { getLayerById, regenerateLayerThumbnail, getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { updateWorkingFileLayer } from '@/store/data/working-file-database';
 import { updateBakedImageForLayer } from './baking';
 import layerRenderers from '@/canvas/renderers';
 
+import type {
+    ColorModel, WorkingFileAnyLayer,
+    UpdateAnyLayerOptions, UpdateRasterLayerOptions, UpdateVectorLayerOptions,
+    WorkingFileRasterLayer, WorkingFileLayerDraftChunk, WorkingFileVectorLayer
+} from '@/types';
+
 export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorModel>> extends BaseAction {
 
     private updateLayerOptions!: LayerOptions;
+    private updateLayerType!: string;
     private previousProps: Partial<WorkingFileAnyLayer<ColorModel>> = {};
     private explicitPreviousProps: Partial<WorkingFileAnyLayer<ColorModel>> = {};
 
     private oldRasterSourceImageId: string | null = null;
     private oldRasterUpdateChunks: WorkingFileLayerDraftChunk[] = [];
     private newRasterUpdateChunks: WorkingFileLayerDraftChunk[] = [];
+
+    private oldVectorSourceSvgId: string | null = null;
 
     constructor(updateLayerOptions: LayerOptions, explicitPreviousProps: Partial<WorkingFileAnyLayer<ColorModel>> = {}) {
         super('updateLayer', 'action.updateLayer');
@@ -40,6 +46,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
         if (!layer) {
             throw new Error('Aborted - Layer with specified id not found.');
         }
+        this.updateLayerType = layer.type;
 
         const renderer = canvasStore.get('renderer');
 
@@ -132,6 +139,20 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                 //         }
                 //     }
                 // }
+                else if (layer.type === 'vector') {
+                    if (!layer.data) {
+                        layer.data = { sourceUuid: '' };
+                    }
+                    const newData = this.updateLayerOptions[prop] as UpdateVectorLayerOptions<ColorModel>['data'];
+                    const newSourceUuid = newData?.sourceUuid ?? '';
+                    const oldSourceUuid = layer.data.sourceUuid ?? '';
+                    if (newSourceUuid && newSourceUuid !== oldSourceUuid) {
+                        layer.data.sourceUuid = newSourceUuid;
+                        this.oldVectorSourceSvgId = oldSourceUuid;
+                        reserveStoredSvg(newSourceUuid, `${layer.id}`);
+                        requiresBaking = true;
+                    }
+                }
                 else {
                     if ((this.explicitPreviousProps as any)[prop] !== undefined) {
                         (this.previousProps as any)[prop] = (this.explicitPreviousProps as any)[prop];
@@ -235,14 +256,36 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
             if (this.oldRasterSourceImageId != null && this.oldRasterSourceImageId !== (this.updateLayerOptions as UpdateRasterLayerOptions<ColorModel>)?.data?.sourceUuid) {
                 unreserveStoredImage(this.oldRasterSourceImageId, `${this.previousProps.id}`);
             }
+
+            // For vector layer, if the svg source id was changed, free the old one.
+            if (this.oldVectorSourceSvgId != null && this.oldVectorSourceSvgId !== (this.updateLayerOptions as UpdateVectorLayerOptions<ColorModel>)?.data?.sourceUuid) {
+                unreserveStoredSvg(this.oldVectorSourceSvgId, `${this.previousProps.id}`);
+            }
         }
         // This is in the redo history
         if (!this.isDone) {
-            // For raster layer, if the image source id was changed, free the new one.
-            const rasterUpdateLayerOptions = (this.updateLayerOptions as UpdateRasterLayerOptions<ColorModel>);
-            const layer = getLayerById(this.updateLayerOptions.id) as WorkingFileRasterLayer<ColorModel>;
-            if (rasterUpdateLayerOptions.data?.sourceUuid && rasterUpdateLayerOptions.data?.sourceUuid !== layer?.data?.sourceUuid) {
-                unreserveStoredImage(rasterUpdateLayerOptions.data.sourceUuid, `${layer.id}`);
+            const layer = getLayerById(this.updateLayerOptions.id);
+            if (layer) {
+                // For raster layer, if the image source id was changed, free the new one.
+                if (this.updateLayerType === 'raster') {
+                    const rasterUpdateLayerOptions = (this.updateLayerOptions as UpdateRasterLayerOptions<ColorModel>);
+                    if (
+                        rasterUpdateLayerOptions?.data?.sourceUuid &&
+                        rasterUpdateLayerOptions?.data?.sourceUuid !== (layer as WorkingFileRasterLayer<ColorModel>)?.data?.sourceUuid
+                    ) {
+                        unreserveStoredImage(rasterUpdateLayerOptions.data.sourceUuid, `${layer.id}`);
+                    }
+                }
+                // For vector layer, if the svg source id was changed, free the new one.
+                if (this.updateLayerType === 'vector') {
+                    const vectorUpdateLayerOptions = (this.updateLayerOptions as UpdateVectorLayerOptions<ColorModel>);
+                    if (
+                        vectorUpdateLayerOptions?.data?.sourceUuid &&
+                        vectorUpdateLayerOptions?.data?.sourceUuid !== (layer as WorkingFileVectorLayer<ColorModel>)?.data?.sourceUuid
+                    ) {
+                        unreserveStoredImage(vectorUpdateLayerOptions.data.sourceUuid, `${layer.id}`);
+                    }
+                }
             }
         }
 

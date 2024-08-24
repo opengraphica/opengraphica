@@ -376,14 +376,16 @@ export function createEmptyCanvasWith2dContext(width: number, height: number): {
  * @param image 
  */
 interface CreateCanvasFromImageOptions {
-    imageOrientation: 'none' | 'flipY';
+    imageOrientation?: 'none' | 'flipY';
+    width?: number;
+    height?: number;
 }
 export function createCanvasFromImage(image: HTMLImageElement | ImageBitmap, options?: CreateCanvasFromImageOptions): HTMLCanvasElement {
     let canvas = document.createElement('canvas');
-    canvas.width = image.width;
-    canvas.height = image.height;
+    canvas.width = options?.width ?? image.width;
+    canvas.height = options?.height ?? image.height;
     const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
-    if (!ctx) throw new Error('Could not create canvas context');
+    if (!ctx) throw new Error('[src/lib/image.ts] Could not create canvas context.');
     ctx.imageSmoothingEnabled = false;
     ctx.save();
     if (options?.imageOrientation === 'flipY') {
@@ -391,7 +393,18 @@ export function createCanvasFromImage(image: HTMLImageElement | ImageBitmap, opt
         ctx.scale(1, -1);
         ctx.translate(0, -image.height / 2);
     }
-    ctx.drawImage(image, 0, 0);
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
     ctx.restore();
     return canvas;
+}
+
+export function cloneCanvas(canvas: HTMLCanvasElement): HTMLCanvasElement {
+    let newCanvas = document.createElement('canvas');
+    newCanvas.width = canvas.width;
+    newCanvas.height = canvas.height;
+    const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
+    if (!ctx) throw new Error('[src/lib/image.ts] Could not clone canvas.');
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(canvas, 0, 0);
+    return newCanvas;
 }

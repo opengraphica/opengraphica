@@ -4,14 +4,9 @@
  */
 
 import { nextTick, type Ref } from 'vue';
-import {
-    ShowOpenFilePicker, FileSystemFileHandle,
-    SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel, InsertAnyLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions,
-    WorkingFileEmptyLayer, WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer,
-    SerializedFileGroupLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileVectorLayer, SerializedFileTextLayer
-} from '@/types';
 import historyStore from '@/store/history';
 import { createStoredImage } from '@/store/image';
+import { createStoredSvg } from '@/store/svg';
 import preferencesStore from '@/store/preferences';
 import workingFileStore, { getCanvasRenderingContext2DSettings, WorkingFileState, getTimelineById } from '@/store/working-file';
 import { readWorkingFile } from '@/store/data/working-file-database';
@@ -26,6 +21,15 @@ import { InsertLayerAction } from '@/actions/insert-layer';
 
 import { knownFileExtensions } from '@/lib/regex';
 import appEmitter from '@/lib/emitter';
+
+import type {
+    ShowOpenFilePicker, FileSystemFileHandle,
+    SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel,
+    InsertAnyLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions, InsertVectorLayerOptions,
+    WorkingFileEmptyLayer, WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer,
+    WorkingFileVectorLayer, WorkingFileTextLayer, SerializedFileGroupLayer, SerializedFileRasterLayer,
+    SerializedFileRasterSequenceLayer, SerializedFileVectorLayer, SerializedFileTextLayer,
+} from '@/types';
 
 declare global {
     var showOpenFilePicker: ShowOpenFilePicker;
@@ -185,7 +189,8 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
     type FileReadResolve =
         { type: 'image', result: HTMLImageElement, file: File } |
         { type: 'imageSequence', result: { image: HTMLImageElement, duration: number }[], file: File } |
-        { type: 'json', result: string, file: File };
+        { type: 'json', result: string, file: File } |
+        { type: 'svg', result: HTMLImageElement, file: File };
 
     const readerPromises: Promise<FileReadResolve>[] = [];
 
@@ -378,6 +383,35 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                             } else {
                                 rejectReader('No frames found in video file "' + file.name + '".');
                             }
+                        } else if (file.type === 'image/svg+xml') {
+                            const fileContents = await new Promise<string>((resolveFileContents, rejectFileContents) => {
+                                fileReader.onload = async () => {
+                                    resolveFileContents(fileReader.result as string);
+                                };
+                                fileReader.onerror = () => {
+                                    rejectReader('An error occurred while reading the file "' + file.name + '".');
+                                };
+                                fileReader.readAsText(file);
+                            });
+                            const xmlParser = new DOMParser();
+                            const svgDocument = xmlParser.parseFromString(fileContents, 'text/xml');
+                            const svgElement = svgDocument.querySelector('svg');
+                            svgElement?.setAttribute('preserveAspectRatio', 'none');
+                            const xmlSerializer = new XMLSerializer();
+                            const modifiedSvgString = xmlSerializer.serializeToString(svgDocument);
+                            const blob = new Blob([modifiedSvgString], { type: 'image/svg+xml' });
+                            const modifiedFile = new File([blob], file.name, { type: 'image/svg+xml' });
+                            const image = await new Promise<HTMLImageElement>((resolveImage, rejectImage) => {
+                                const image = new Image();
+                                image.onload = () => {
+                                    resolveImage(image);
+                                };
+                                image.onerror = (error) => {
+                                    rejectImage(error);
+                                };
+                                image.src = URL.createObjectURL(modifiedFile) as string;
+                            });
+                            resolveReader({ type: 'svg', result: image, file: file });
                         } else {
                             const image = await new Promise<HTMLImageElement>((resolveImage, rejectImage) => {
                                 const image = new Image();
@@ -443,6 +477,26 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                         height: image.height,
                         data: {
                             sourceUuid: await createStoredImage(image),
+                        }
+                    })
+                );
+            }
+            else if(readerSettle.value.type === 'svg') {
+                const image = readerSettle.value.result;
+                if (image.width > largestWidth) {
+                    largestWidth = image.width;
+                }
+                if (image.height > largestHeight) {
+                    largestHeight = image.height;
+                }
+                insertLayerActions.push(
+                    new InsertLayerAction<InsertVectorLayerOptions<ColorModel>>({
+                        type: 'vector',
+                        name: readerSettle.value.file.name,
+                        width: image.width,
+                        height: image.height,
+                        data: {
+                            sourceUuid: await createStoredSvg(image),
                         }
                     })
                 );
@@ -658,10 +712,26 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
             } as WorkingFileRasterSequenceLayer<ColorModel>;
             (window as any).parsedLayer = parsedLayer;
         } else if (layer.type === 'vector') {
+            const serializedLayer = layer as SerializedFileVectorLayer<ColorModel>;
+            let image: HTMLImageElement | undefined;
+            if (serializedLayer?.data?.sourceSvgSerialized) {
+                image = new Image();
+                await new Promise<void>((resolve) => {
+                    image!.onload = () => {
+                        resolve();
+                    };
+                    image!.onerror = () => {
+                        resolve();
+                    };
+                    image!.src = serializedLayer.data.sourceSvgSerialized!;
+                });
+            }
             parsedLayer = {
                 ...parsedLayer,
                 type: 'vector',
-                data: (layer as SerializedFileVectorLayer<ColorModel>).data,
+                data: {
+                    sourceUuid: image ? await createStoredSvg(image) : undefined,
+                },
             } as WorkingFileVectorLayer<ColorModel>;
         } else if (layer.type === 'text') {
             parsedLayer = {

@@ -5,6 +5,7 @@ import { BaseAction } from './base';
 import { SelectLayersAction } from './select-layers';
 import canvasStore from '@/store/canvas';
 import { unreserveStoredImage } from '@/store/image';
+import { unreserveStoredSvg } from '@/store/svg';
 import workingFileStore, { calculateLayerOrder, getLayerById, getGroupLayerById } from '@/store/working-file';
 import { updateWorkingFile, updateWorkingFileLayer, deleteWorkingFileLayer } from '@/store/data/working-file-database';
 import { updateBakedImageForLayer } from './baking';
@@ -111,11 +112,16 @@ export class DeleteLayersAction extends BaseAction {
                     unreserveStoredImage(layer.data.sourceUuid, `${layer.id}`);
                 }
             }
-            if (layer.type === 'rasterSequence') {
+            else if (layer.type === 'rasterSequence') {
                 for (let frame of layer.data.sequence) {
                     if (frame.image.sourceUuid) {
                         unreserveStoredImage(frame.image.sourceUuid, `${layer.id}`);
                     }
+                }
+            }
+            else if (layer.type === 'vector') {
+                if (layer.data.sourceUuid) {
+                    unreserveStoredSvg(layer.data.sourceUuid, `${layer.id}`);
                 }
             }
         }

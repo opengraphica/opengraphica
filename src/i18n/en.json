@@ -43,6 +43,7 @@
         "updateFile": "Update File",
         "updateLayer": "Update Layer",
         "updateDrawLayer": "Draw on Layer",
+        "updateDeformBlurLayer": "Blur Layer",
         "updateEraseLayer": "Erase from Layer",
         "updateLayerFilterParams": "Update Layer Effect",
         "updateSelectionCombineMode": "Update Selection Combine Mode",
@@ -849,6 +850,9 @@
                 "enable": "Enable Snapping"
             }
         },
+        "deformBlur": {
+            "brushSize": "Size"
+        },
         "drawBrush": {
             "brushColor": "Brush Color",
             "brushSize": "Size",
@@ -931,6 +935,16 @@
         }
     },
     "toolGroup": {
+        "deform": {
+            "name": "Deform",
+            "description": "Tools that manipulate the existing image data, such as cloning, bulging, blurring.",
+            "tools": {
+                "blur": {
+                    "name": "Blur",
+                    "description": "Brush that blurs the area drawn."
+                }
+            }
+        },
         "draw": {
             "name": "Draw",
             "description": "Brushes, pencils, pens, and vector art drawing tools.",
@@ -1011,6 +1025,12 @@
         }
     },
     "tutorialTip": {
+        "deformBlurToolIntroduction": {
+            "title": "Blur Tool",
+            "introduction": [
+                "The blur tool will blur the portion of current layer you draw on."
+            ]
+        },
         "drawToolIntroduction": {
             "title": "Draw Tool",
             "introduction": [

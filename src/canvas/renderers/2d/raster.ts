@@ -1,6 +1,7 @@
-import { DrawWorkingFileLayerOptions, WorkingFileRasterLayer, WorkingFileLayerRenderer, ColorModel } from '@/types';
 import { getStoredImageOrCanvas } from '@/store/image';
 import BaseLayerRenderer from './base';
+
+import type { DrawWorkingFileLayerOptions, WorkingFileRasterLayer, ColorModel } from '@/types';
 
 export default class RasterLayerRenderer extends BaseLayerRenderer {
     onDraw(ctx: CanvasRenderingContext2D, layer: WorkingFileRasterLayer<ColorModel>, options: DrawWorkingFileLayerOptions = {}) {

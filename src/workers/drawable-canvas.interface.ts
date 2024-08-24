@@ -127,10 +127,15 @@ export function removeDrawable(workerUuid: string, drawableUuid: string) {
     } as RemoveDrawableRequest);
 }
 
-export function renderDrawableCanvas(uuid: string, options: DrawableDrawOptions) {
+export async function renderDrawableCanvas(uuid: string, options: DrawableDrawOptions) {
     const workerInfo = canvasWorkerMap.get(uuid);
     if (!workerInfo) return;
     const { worker } = workerInfo;
+    if (options.destinationCanvas) {
+        options.destinationCanvas = await createImageBitmap(
+            options.destinationCanvas
+        );
+    };
     worker.postMessage({
         type: 'DRAW_CANVAS',
         options,

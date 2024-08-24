@@ -188,7 +188,12 @@ function draw2d(canvas: OffscreenCanvas, ctx: OffscreenCanvasRenderingContext2D,
         ctx.transform(transform.a, transform.b, transform.c, transform.d, transform.e, transform.f);
     }
     for (const value of drawableMap.values()) {
-        value.drawable.draw2d(ctx);
+        value.drawable.draw2d(ctx, {
+            left: drawX,
+            top: drawY,
+            right: drawX + canvas.width,
+            bottom: drawY + canvas.height,
+        });
     }
     ctx.restore();
 }

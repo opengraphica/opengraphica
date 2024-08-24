@@ -2,16 +2,19 @@
  * Parts of this file were adapted from miniPaint
  * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
-import {
-    FileSystemFileHandle, SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel,
-    SerializedFileGroupLayer, SerializedFileTextLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileVectorLayer,
-    WorkingFile, WorkingFileGroupLayer, WorkingFileTextLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer
-} from '@/types';
 import canvasStore from '@/store/canvas';
 import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { writeWorkingFile } from '@/store/data/working-file-database';
 import { saveAs } from 'file-saver';
 import { getStoredImageOrCanvas } from '@/store/image';
+import { getStoredSvgDataUrl } from '@/store/svg';
+
+import type {
+    FileSystemFileHandle, SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel,
+    SerializedFileGroupLayer, SerializedFileTextLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer,
+    SerializedFileVectorLayer, WorkingFile, WorkingFileGroupLayer, WorkingFileTextLayer, WorkingFileRasterLayer,
+    WorkingFileRasterSequenceLayer, WorkingFileVectorLayer,
+} from '@/types';
 
 interface SaveImageAsOptions {
     fileName?: string;
@@ -176,7 +179,11 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
             serializedLayer = {
                 ...serializedLayer,
                 type: 'vector',
-                data: (layer as WorkingFileVectorLayer<ColorModel>).data
+                data: {
+                    sourceSvgSerialized: getStoredSvgDataUrl(
+                        (layer as WorkingFileVectorLayer<ColorModel>).data.sourceUuid
+                    )
+                }
             } as SerializedFileVectorLayer<ColorModel>;
         } else if (layer.type === 'text') {
             serializedLayer = {

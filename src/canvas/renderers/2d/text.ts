@@ -1,9 +1,5 @@
 import { DrawWorkingFileLayerOptions, WorkingFileTextLayer, WorkingFileLayerRenderer, ColorModel } from '@/types';
-// import { fontLoadedStatusMap, textLayerCache, textMetaDefaults, TextLayerCacheItem, TextLayerRenderInfoWrap } from '@/canvas/store/text-state';
-import { getFontMetrics, FontMetrics } from '@/lib/metrics';
-import { generateColorStyle } from '@/lib/color';
-import { DecomposedMatrix } from '@/lib/dom-matrix';
-import workingFileStore from '@/store/working-file';
+
 import BaseLayerRenderer from './base';
 
 import DrawableCanvas from '@/canvas/renderers/drawable/canvas';
@@ -45,6 +41,10 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
         this.createDrawableCanvas(layer);
     }
 
+    onDetach() {
+        this.destroyDrawableCanvas();
+    }
+
     createDrawableCanvas(layer: WorkingFileTextLayer<ColorModel>) {
         if (this.drawableCanvas || !TextDrawable) return;
         this.drawableCanvas = new DrawableCanvas({
@@ -57,6 +57,13 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
             wrapSize: layer.width,
             document: layer.data,
         });
+    }
+
+    destroyDrawableCanvas() {
+        if (this.drawableCanvas) {
+            this.drawableCanvas.dispose();
+            this.drawableCanvas = undefined;
+        }
     }
 
 }

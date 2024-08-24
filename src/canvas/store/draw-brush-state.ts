@@ -41,7 +41,7 @@ interface PermanentStorageState {
 }
 
 const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentStorageState }>({
-    name: 'drawStateStore',
+    name: 'drawBrushStateStore',
     state: {
         brushSize: 100,
         brushColor: {

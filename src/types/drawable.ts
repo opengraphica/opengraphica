@@ -23,14 +23,19 @@ export interface DrawableOptionsWebgl<T = DefaultDrawableData> extends DrawableO
 }
 
 export interface DrawableDrawOptions {
+    // The entire drawable should be drawn from scratch, rather than updating piecemeal
     refresh?: boolean;
+    // The transformation matrix that should be applied to the drawable
     transform?: DOMMatrix;
+    // The canvas data that the drawable is drawn on top of, in case it affects it
+    destinationCanvas?: HTMLCanvasElement | ImageBitmap;
+    // The transformation matrix that should be applied to that canvas
+    destinationCanvasTransform?: DOMMatrix;
+    // Updates for each drawable instance
     updates: DrawableUpdate[];
 }
 
-export interface DrawableUpdateOptions {
-    refresh?: boolean;
-}
+export type DrawableUpdateOptions = Omit<DrawableDrawOptions, 'transform' | 'updates'>;
 
 export interface DrawableUpdate<T = DefaultDrawableData> {
     uuid: string;
@@ -47,9 +52,16 @@ export interface DrawableUpdateBounds {
     updateInfo?: any; // Drawable can set anything here that may be useful to know after it is drawn
 }
 
+export interface DrawableDrawInfo {
+    left: number;
+    right: number;
+    top: number;
+    bottom: number;
+}
+
 export interface Drawable<T = DefaultDrawableData> {
     update: (data: T, options: DrawableUpdateOptions) => DrawableUpdateBounds;
-    draw2d: (context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) => void;
+    draw2d: (context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, info: DrawableDrawInfo) => void;
     drawWebgl: () => void;
     dispose: () => void;
 }

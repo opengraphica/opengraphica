@@ -30,7 +30,7 @@ export interface SerializedFileTimeline {
     }
 }
 
-export interface SerializedFileLayer<T extends ColorModel> {
+export interface SerializedFileLayer<T extends ColorModel = ColorModel> {
     blendingMode: WorkingFileLayerBlendingMode;
     filters: WorkingFileLayerFilter<T>[];
     groupId: number | null;
@@ -44,47 +44,49 @@ export interface SerializedFileLayer<T extends ColorModel> {
     width: number;
 }
 
-export interface SerializedFileEmptyLayer<T extends ColorModel> extends SerializedFileLayer<T> {
+export interface SerializedFileEmptyLayer<T extends ColorModel = ColorModel> extends SerializedFileLayer<T> {
     type: 'empty';
 }
 
-export interface SerializedFileGroupLayer<T extends ColorModel> extends SerializedFileLayer<T> {
+export interface SerializedFileGroupLayer<T extends ColorModel = ColorModel> extends SerializedFileLayer<T> {
     type: 'group';
     expanded: boolean;
     layers: SerializedFileLayer<T>[];
 }
 
-export interface SerializedFileRasterLayer<T extends ColorModel> extends SerializedFileLayer<T> {
+export interface SerializedFileRasterLayer<T extends ColorModel = ColorModel> extends SerializedFileLayer<T> {
     type: 'raster';
     data: {
         sourceImageSerialized?: string;
     }
 }
 
-export interface SerializedFileRasterSequenceLayerFrame<T extends ColorModel> {
+export interface SerializedFileRasterSequenceLayerFrame<T extends ColorModel = ColorModel> {
     start: number; // Milliseconds
     end: number; // Milliseconds
     image: SerializedFileRasterLayer<T>['data'];
 }
 
-export interface SerializedFileRasterSequenceLayer<T extends ColorModel> extends SerializedFileLayer<T> {
+export interface SerializedFileRasterSequenceLayer<T extends ColorModel = ColorModel> extends SerializedFileLayer<T> {
     type: 'rasterSequence';
     data: {
         sequence: SerializedFileRasterSequenceLayerFrame<T>[];
     };
 }
 
-export interface SerializedFileVectorLayer<T extends ColorModel> extends SerializedFileLayer<T> {
+export interface SerializedFileVectorLayer<T extends ColorModel = ColorModel> extends SerializedFileLayer<T> {
     type: 'vector';
-    data: VectorShape<T>[];
+    data: {
+        sourceSvgSerialized?: string;
+    }
 }
 
-export interface SerializedFileTextLayer<T extends ColorModel> extends SerializedFileLayer<T> {
+export interface SerializedFileTextLayer<T extends ColorModel = ColorModel> extends SerializedFileLayer<T> {
     type: 'text';
     data: TextDocument;
 }
 
-export interface SerializedFile<T extends ColorModel> {
+export interface SerializedFile<T extends ColorModel = ColorModel> {
     version: string;
     date: string;
     background: {

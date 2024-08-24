@@ -264,7 +264,12 @@ export default class DrawableCanvas {
 
     draw2d(options: DrawableDrawOptions) {
         if (!this.mainThreadCanvasCtx2d) return;
-        const { refresh, updates: drawableUpdates } = options;
+        const {
+            refresh,
+            updates: drawableUpdates,
+            destinationCanvas,
+            destinationCanvasTransform,
+        } = options;
         const ctx = this.mainThreadCanvasCtx2d;
         const canvas = ctx.canvas;
         const renderScale = this.scale;
@@ -278,7 +283,11 @@ export default class DrawableCanvas {
         for (const drawableUpdate of drawableUpdates) {
             const drawableInfo = this.drawables.get(drawableUpdate.uuid);
             if (!drawableInfo?.drawable) continue;
-            const drawingBounds = drawableInfo.drawable.update(drawableUpdate.data, { refresh });
+            const drawingBounds = drawableInfo.drawable.update(drawableUpdate.data, {
+                refresh,
+                destinationCanvas,
+                destinationCanvasTransform,
+            });
             const { transform } = options;
             if (transform) {
                 const transformedPoints = [
@@ -324,7 +333,12 @@ export default class DrawableCanvas {
         }
         for (const { drawable } of this.drawables.values()) {
             if (!drawable) continue;
-            drawable.draw2d(ctx);
+            drawable.draw2d(ctx, {
+                left: drawX,
+                top: drawY,
+                right: drawX + newCanvasWidth,
+                bottom: drawY + newCanvasHeight,
+            });
         }
         ctx.restore();
 

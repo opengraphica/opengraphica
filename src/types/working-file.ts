@@ -173,7 +173,9 @@ export interface WorkingFileRasterSequenceLayer<T extends ColorModel = ColorMode
 
 export interface WorkingFileVectorLayer<T extends ColorModel = ColorModel> extends WorkingFileLayer<T> {
     type: 'vector';
-    data: VectorShape<T>[];
+    data: {
+        sourceUuid?: string;
+    }
 }
 
 export interface WorkingFileTextLayer<T extends ColorModel = ColorModel> extends WorkingFileLayer<T> {

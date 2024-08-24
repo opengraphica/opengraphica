@@ -7,12 +7,14 @@ import GroupLayerRenderer2d from './2d/group';
 import RasterLayerRenderer2d from './2d/raster';
 import RasterSequenceLayerRenderer2d from './2d/raster-sequence';
 import TextLayerRenderer2d from './2d/text';
+import VectorLayerRenderer2d from './2d/vector';
 
 import BaseLayerRendererWebgl from './webgl/base';
 import GroupLayerRendererWebgl from './webgl/group';
 import RasterLayerRendererWebgl from './webgl/raster';
 import RasterSequenceLayerRendererWebgl from './webgl/raster-sequence';
 import TextLayerRendererWebgl from './webgl/text';
+import VectorLayerRendererWebgl from './webgl/vector';
 
 type ClassOfInterface<I, Args extends any[] = any[]> = new(...args: Args) => I;
 
@@ -30,7 +32,7 @@ const renderers: Renderers = {
         raster: RasterLayerRenderer2d,
         rasterSequence: RasterSequenceLayerRenderer2d,
         text: TextLayerRenderer2d,
-        vector: BaseLayerRenderer2d
+        vector: VectorLayerRenderer2d,
     },
     webgl: {
         base: BaseLayerRendererWebgl,
@@ -39,7 +41,7 @@ const renderers: Renderers = {
         raster: RasterLayerRendererWebgl,
         rasterSequence: RasterSequenceLayerRendererWebgl,
         text: TextLayerRendererWebgl,
-        vector: BaseLayerRendererWebgl
+        vector: VectorLayerRendererWebgl,
     }
 };
 
