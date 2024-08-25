@@ -209,6 +209,11 @@ export default class BlurStroke implements Drawable<BlurStrokeData> {
         ctx.drawImage(canvas, x, y);
     }
 
+    /**
+     * Stack Blur Algorithm by Mario Klingemann <mario@quasimondo.com>
+     * Copyright (c) 2010 Mario Klingemann
+     * @license MIT https://github.com/Quasimondo/QuasimondoJS/blob/master/blur/StackBlur.js
+     */
     private stackBlur(srcImageData: ImageData, radius: number) {
 		const srcPixels = srcImageData.data,
 			srcWidth = srcImageData.width,

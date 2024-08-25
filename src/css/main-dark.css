@@ -9478,6 +9478,12 @@ body.ogr-full-page .opengraphica {
   height: calc(100% - 1rem);
   z-index: 4;
 }
+.opengraphica .ogr-layout-dock.ogr-layout-dock--resizing {
+  cursor: ns-resize !important;
+}
+.opengraphica .ogr-layout-dock.ogr-layout-dock--resizing button, .opengraphica .ogr-layout-dock.ogr-layout-dock--resizing a, .opengraphica .ogr-layout-dock.ogr-layout-dock--resizing * {
+  cursor: ns-resize !important;
+}
 .opengraphica .ogr-layout-dock .ogr-layout-dock__container {
   background: var(--ogr-layout-menu-bar-background-color);
   box-shadow: 0 0 0px 1px var(--ogr-layout-menu-bar-border-color), 0 0.3rem 1.5rem var(--ogr-layout-menu-bar-border-color);
@@ -9524,8 +9530,9 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-layout-dock .ogr-layout-dock__container > .ogr-dock > .el-tabs > .el-tabs__content > .el-tab-pane {
   height: 100%;
 }
-.opengraphica .ogr-layout-dock .ogr-layout-dock__container + .ogr-layout-dock__container {
-  margin-top: 0.5rem;
+.opengraphica .ogr-layout-dock .ogr-layout-dock__divider {
+  cursor: ns-resize;
+  height: 0.5rem;
 }
 .opengraphica .ogr-layout-menu-bar {
   display: block;

@@ -167,7 +167,7 @@ export default class VectorLayerRenderer extends BaseLayerRenderer {
 
     private async updateSourceTexture() {
         const sourceImage = getStoredSvgImage(this.lastSvgSourceUuid ?? '');
-        if (sourceImage) {
+        if (sourceImage && this.plane) {
             let newSourceTexture: Texture = await createThreejsTextureFromImage(
                 createCanvasFromImage(sourceImage, {
                     width: this.lastCalculatedWidth,
@@ -175,11 +175,15 @@ export default class VectorLayerRenderer extends BaseLayerRenderer {
                 })
             );
             this.disposeSourceTexture();
-            this.sourceTexture = newSourceTexture;
+            if (this.plane) {
+                this.sourceTexture = newSourceTexture;
 
-            this.sourceTexture.needsUpdate = true;
-            this.material && (this.material.uniforms.map.value = this.sourceTexture);
-            canvasStore.set('dirty', true);
+                this.sourceTexture.needsUpdate = true;
+                this.material && (this.material.uniforms.map.value = this.sourceTexture);
+                canvasStore.set('dirty', true);
+            } else {
+                newSourceTexture.dispose();
+            }
         } else {
             this.disposeSourceTexture();
             this.material && (this.material.uniforms.map.value = null);

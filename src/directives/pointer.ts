@@ -482,42 +482,62 @@ function handleUpEvent(el: any, binding: DirectiveBinding<any>) {
     eventHandlerMap.set(el, callbackHandles);
 }
 
+function removeCallbacks(el: any, binding: DirectiveBinding<any>) {
+    const eventName = getEventName(binding);
+    const callbackHandles = eventHandlerMap.get(el) || {};
+    for (let realEventName in callbackHandles[eventName]) {
+        const eventDef = callbackHandles[eventName][realEventName];
+        eventDef[0].removeEventListener(realEventName, eventDef[1] as any, true);
+    }
+    delete callbackHandles[eventName];
+    if (Object.keys(callbackHandles).length === 0) {
+        eventHandlerMap.delete(el);
+    } else {
+        eventHandlerMap.set(el, callbackHandles);
+    }
+}
+
+function addCallbacks(el: any, binding: DirectiveBinding<any>) {
+    const eventName = getEventName(binding);
+    storeBinding(el, eventName, binding);
+
+    if (eventName === 'tap') {
+        handleTapEvent(el, binding);
+    } else if (eventName === 'press') {
+        handlePressEvent(el, binding);
+    } else if (['dragstart', 'dragend'].includes(eventName)) {
+        handleDragEvents(el, eventName, binding);
+    } else if (eventName === 'down') {
+        handleDownEvent(el, binding);
+    } else if (eventName === 'move') {
+        handleMoveEvent(el, binding);
+    } else if (eventName === 'up') {
+        handleUpEvent(el, binding);
+    }
+}
+
+
+
+function updateBinding(el: any, binding: DirectiveBinding<any>) {
+    const eventName = getEventName(binding);
+    storeBinding(el, eventName, binding);
+}
+
 const PointerDirective: ObjectDirective = {
     async mounted(el, binding) {
-        const eventName = getEventName(binding);
-        storeBinding(el, eventName, binding);
-
-        if (eventName === 'tap') {
-            handleTapEvent(el, binding);
-        } else if (eventName === 'press') {
-            handlePressEvent(el, binding);
-        } else if (['dragstart', 'dragend'].includes(eventName)) {
-            handleDragEvents(el, eventName, binding);
-        } else if (eventName === 'down') {
-            handleDownEvent(el, binding);
-        } else if (eventName === 'move') {
-            handleMoveEvent(el, binding);
-        } else if (eventName === 'up') {
-            handleUpEvent(el, binding);
-        }
+        addCallbacks(el, binding);
     },
     async updated(el, binding) {
-        const eventName = getEventName(binding);
-        storeBinding(el, eventName, binding);
+        if (binding.value == null) {
+            removeCallbacks(el, binding);
+        } else if (binding.value != null && binding.oldValue == null) {
+            addCallbacks(el, binding);
+        } else {
+            updateBinding(el, binding);
+        }
     },
     async unmounted(el, binding) {
-        const eventName = getEventName(binding);
-        const callbackHandles = eventHandlerMap.get(el) || {};
-        for (let realEventName in callbackHandles[eventName]) {
-            const eventDef = callbackHandles[eventName][realEventName];
-            eventDef[0].removeEventListener(realEventName, eventDef[1] as any);
-        }
-        delete callbackHandles[eventName];
-        if (Object.keys(callbackHandles).length === 0) {
-            eventHandlerMap.delete(el);
-        } else {
-            eventHandlerMap.set(el, callbackHandles);
-        }
+        removeCallbacks(el, binding);
     }
 };
 

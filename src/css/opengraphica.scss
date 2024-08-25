@@ -1440,6 +1440,14 @@ body.ogr-full-page {
         height: calc(100% - 1rem);
         z-index: 4;
 
+        &.ogr-layout-dock--resizing {
+            cursor: ns-resize !important;
+
+            button, a, * {
+                cursor: ns-resize !important;
+            }
+        }
+
         .ogr-layout-dock__container {
             background: var(--ogr-layout-menu-bar-background-color);
             box-shadow: 0 0 0px 1px var(--ogr-layout-menu-bar-border-color), 0 0.3rem 1.5rem var(--ogr-layout-menu-bar-border-color);
@@ -1500,10 +1508,11 @@ body.ogr-full-page {
                     }
                 }
             }
+        }
 
-            + .ogr-layout-dock__container {
-                margin-top: .5rem;
-            }
+        .ogr-layout-dock__divider {
+            cursor: ns-resize;
+            height: .5rem;
         }
 
     }
