@@ -1,7 +1,6 @@
 <template>
     <div class="ogr-layer-thumbnail">
-        <span v-if="layer.expanded" class="bi bi-folder2-open has-text-color-secondary" aria-hidden="true"></span>
-        <img v-else :src="thumbnailImageSrc" alt="thumbnail" :class="{ 'is-larger-width': isLargerWidth }" @touchstart="$event.preventDefault()" />
+        <img v-if="!layer.expanded" :src="thumbnailImageSrc" alt="thumbnail" :class="{ 'is-larger-width': isLargerWidth }" @touchstart="$event.preventDefault()" />
     </div>
 </template>
 

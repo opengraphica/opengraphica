@@ -9263,6 +9263,9 @@ body.ogr-full-page .opengraphica {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.opengraphica .ogr-layer-list .ogr-layer > .ogr-layer-main .ogr-layer-name .bi {
+  color: var(--el-text-color-secondary);
+}
 .opengraphica .ogr-layer-list .ogr-layer > .ogr-layer-main .ogr-layer-group-arrow {
   color: var(--el-text-color-secondary);
   align-self: center;
@@ -9636,6 +9639,14 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-layout-menu-bar .el-button--expanded-popover {
   box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.3) inset;
 }
+@keyframes ogr-menu-bar-tool-group-expand-fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
 .opengraphica .ogr-layout-menu-bar .ogr-menu-bar__tool-group-expand {
   position: absolute;
   display: flex;
@@ -9651,6 +9662,7 @@ body.ogr-full-page .opengraphica {
   top: 0;
   z-index: 4;
   transition: top 0.2s, left 0.2s, padding 0.2s;
+  animation: ogr-menu-bar-tool-group-expand-fade-in 0.2s forwards;
 }
 .opengraphica .ogr-layout-menu-bar .ogr-menu-bar__tool-group-expand .ogr-menu-bar__tool-group-expand__controls {
   display: flex;

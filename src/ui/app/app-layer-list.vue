@@ -32,7 +32,10 @@
                         @mouseenter="onMouseEnterDndHandle(layer)"
                         @mouseleave="onMouseLeaveDndHandle(layer)">
                         <app-layer-list-thumbnail :layer="layer" />
-                        <span class="ogr-layer-name">{{ layer.name }}</span>
+                        <span class="ogr-layer-name">
+                            <span class="bi mr-1" :class="getIconClass(layer)" aria-hidden="true" />
+                            {{ layer.name }}
+                        </span>
                         <span v-if="layer.type === 'group'" class="ogr-layer-group-arrow bi" :class="{ 'bi-chevron-right': !layer.expanded, 'bi-chevron-down': layer.expanded }" aria-hidden="true"></span>
                     </span>
                     <el-button link type="primary" class="px-2 my-1" :aria-label="$t('app.layerList.toggleLayerVisibility')" @click="onToggleLayerVisibility(layer)">
@@ -255,6 +258,17 @@ export default defineComponent({
 
         onUnmounted(() => {
         });
+
+        function getIconClass(layer: WorkingFileAnyLayer) {
+            switch (layer.type) {
+                case 'text': return 'bi-textarea-t';
+                case 'raster': return 'bi-image';
+                case 'rasterSequence': return 'bi-images';
+                case 'vector': return 'bi-bezier2';
+                case 'group': return (layer as WorkingFileGroupLayer).expanded ? 'bi-folder2-open' : 'bi-folder';
+            }
+            return 'bi-question';
+        }
 
         function reverseLayerList(layerList: WorkingFileAnyLayer<ColorModel>[]): WorkingFileAnyLayer<ColorModel>[] {
             const newLayersList = [];
@@ -527,6 +541,8 @@ export default defineComponent({
             layerSettingsVisibility,
             showLayerSettingsMenuFor,
             layerSettingsActiveIndex,
+
+            getIconClass,
             onLayerSettingsSelect,
             onMouseEnterDndHandle,
             onMouseLeaveDndHandle,

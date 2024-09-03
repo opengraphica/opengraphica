@@ -85,10 +85,12 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                     }
                 } catch (error) { /* Ignore */ }
             }
-            newIds = newIds ?? [];
-            for (const newId of newIds) {
+            const checkNewIds = newIds ?? [];
+            let newTextLayerIds: number[] = [];
+            for (const newId of checkNewIds) {
                 const layer = getLayerById(newId);
                 if (layer?.type === 'text') {
+                    newTextLayerIds.push(newId);
                     const documentEditor = new TextDocumentEditor(layer.data);
                     documentEditor.onNotifyChange(() => {
                         if (editingTextLayerId.value === newId) {
@@ -110,8 +112,8 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                     });
                 }
             }
-            if (!newIds.includes(editingTextLayerId.value as number)) {
-                editingTextLayerId.value = newIds[0] ?? null;
+            if (!newTextLayerIds.includes(editingTextLayerId.value as number)) {
+                editingTextLayerId.value = newTextLayerIds[0] ?? null;
             }
         }, { immediate: true });
 

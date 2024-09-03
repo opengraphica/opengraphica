@@ -1157,6 +1157,10 @@ body.ogr-full-page {
                     overflow: hidden;
                     text-overflow: ellipsis;
                     white-space: nowrap;
+
+                    .bi {
+                        color: var(--el-text-color-secondary);
+                    }
                 }
 
                 .ogr-layer-group-arrow {
@@ -1639,6 +1643,11 @@ body.ogr-full-page {
             box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.3) inset;
         }
 
+        @keyframes ogr-menu-bar-tool-group-expand-fade-in {
+            0% { opacity: 0 }
+            100% { opacity: 1 }
+        }
+
         .ogr-menu-bar__tool-group-expand {
             position: absolute;
             display: flex;
@@ -1654,6 +1663,7 @@ body.ogr-full-page {
             top: 0;
             z-index: 4;
             transition: top 0.2s, left 0.2s, padding 0.2s;
+            animation: ogr-menu-bar-tool-group-expand-fade-in 0.2s forwards;
 
             .ogr-menu-bar__tool-group-expand__controls {
                 display: flex;

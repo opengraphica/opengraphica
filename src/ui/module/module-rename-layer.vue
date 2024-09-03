@@ -15,6 +15,7 @@
                 <el-form-item-group>
                     <el-form-item :label="$t('module.renameLayer.layerName')">
                         <el-input
+                            ref="layerNameInput"
                             v-model="formData.layerName"
                             clearable
                         />
@@ -95,6 +96,8 @@ export default defineComponent({
         const hasError = ref(false);
         const loading = ref(false);
 
+        const layerNameInput = ref<typeof ElInput>();
+
         const formData = reactive<{ layerName: string }>({
             layerName: '',
         });
@@ -122,6 +125,15 @@ export default defineComponent({
                 if (layer) {
                     formData.layerName = layer.name;
                 }
+                try {
+                    if (layerNameInput.value) {
+                        const input = layerNameInput.value.ref as unknown as HTMLInputElement;
+                        input?.focus();
+                        setTimeout(() => {
+                            input?.select();
+                        }, 0);
+                    }
+                } catch (error) { /* Ignore */ }
             } catch (error) {
                 console.error('[src/ui/module-rename-layer.vue] Error during initial setup. ', error);
             }
@@ -146,8 +158,12 @@ export default defineComponent({
         return {
             hasError,
             loading,
+
+            layerNameInput,
+
             formData,
             formValidationRules,
+
             onCancel,
             onConfirm
         };
