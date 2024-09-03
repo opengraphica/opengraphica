@@ -1,5 +1,6 @@
 <template>
     <div
+        ref="menuBarElement"
         class="ogr-layout-menu-bar theme-dark"
         :class="[
             'is-positioned-' + layoutPlacement,
@@ -42,9 +43,10 @@
                                     @after-leave="onAfterLeavePopover(control)">
                                     <template #reference>
                                         <el-button
+                                            ref="toolGroupButtons"
                                             :aria-label="$t(control.label)"
-                                            :type="[activeToolGroup, activeMenuDrawerComponentName].includes(control.action && control.action.target) ? 'primary' : undefined"
-                                            :plain="![activeToolGroup, activeMenuDrawerComponentName].includes(control.action && control.action.target)"
+                                            :type="[activeToolGroup, activeMenuDrawerComponentName].includes(control.action?.target) ? 'primary' : undefined"
+                                            :plain="![activeToolGroup, activeMenuDrawerComponentName].includes(control.action?.target)"
                                             :circle="!control.expanded"
                                             :round="control.expanded"
                                             :class="{
@@ -52,6 +54,7 @@
                                                 'el-button--expanded-group': control.expanded,
                                                 'el-button--expanded-popover': control.showDock
                                             }"
+                                            :data-group-target="control.action?.target"
                                             @touchstart="onTouchStartControlButton($event, control)"
                                             @touchend="onTouchEndControlButton($event, control)"
                                             @mousedown="onMouseDownControlButton($event, control)"
@@ -60,7 +63,7 @@
                                             @mouseleave="onMouseLeaveControlButton($event, control)"
                                             @keydown="onKeyDownControlButton($event, control)"
                                         >
-                                            <span class="el-icon" :class="control.icon" aria-hidden="true" />
+                                            <span class="el-icon" :class="getControlIcon(control)" aria-hidden="true" />
                                             <span v-if="control.expanded" class="ml-2">{{ $t(control.label) }}</span>
                                             <el-tag v-if="control.expanded" type="info" class="ml-2 el-tag--mini">Ctrl + K</el-tag>
                                         </el-button>
@@ -110,11 +113,53 @@
                 </el-button>
             </div>
         </div>
+        <div
+            v-if="showToolGroupExpandButton && (toolGroupExpandOffsetTop || toolGroupExpandOffsetLeft)"
+            class="ogr-menu-bar__tool-group-expand"
+            :class="{
+                'ogr-menu-bar__tool-group-expand--expanded': isActiveToolGroupExpanded
+            }"
+            :style="{
+                top: toolGroupExpandOffsetTop,
+                left: toolGroupExpandOffsetLeft,
+            }"
+        >
+            <div v-if="isActiveToolGroupExpanded" class="ogr-menu-bar__tool-group-expand__controls">
+                <button
+                    v-for="control in activeToolGroupControls"
+                    :key="control.label"
+                    :aria-label="$t(control.label)"
+                    :class="{
+                        'ogr-menu-bar__tool-group-expand__control--active': control.action?.target == activeTool
+                    }"
+                    @touchstart="onTouchStartControlButton($event, control)"
+                    @touchend="onTouchEndControlButton($event, control)"
+                    @mousedown="onMouseDownControlButton($event, control)"
+                    @mouseup="onMouseUpControlButton($event, control)"
+                    @mouseenter="onMouseEnterControlButton($event, control)"
+                    @mouseleave="onMouseLeaveControlButton($event, control)"
+                    @keydown="onKeyDownControlButton($event, control)"
+                >
+                    <span :class="control.icon" aria-hidden="true" />
+                </button>
+            </div>
+            <button
+                class="ogr-menu-bar__tool-group-expand__toggle-button"
+                :aria-label="isActiveToolGroupExpanded ? $t('menuBar.collapseToolGroup') : $t('menuBar.expandToolGroup')"
+                @click="isActiveToolGroupExpanded = !isActiveToolGroupExpanded"
+            >
+                <span
+                    class="bi"
+                    :class="activeToolGroupExpandToggleIcon"
+                    aria-hidden="true"
+                />
+            </button>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, nextTick, watch, PropType, ref, onMounted, onUnmounted, toRefs, defineAsyncComponent } from 'vue';
+import { defineComponent, computed, watch, ref, unref, onMounted, onUnmounted, toRefs, defineAsyncComponent, type PropType } from 'vue';
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
 import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.vue';
 import ElLoading from 'element-plus/lib/components/loading/index';
@@ -162,6 +207,14 @@ export default defineComponent({
     setup(props, { emit }) {
         const mobileWidth: number = 550;
 
+        const menuBarElement = ref<HTMLDivElement>();
+        const toolGroupButtons = ref<typeof ElButton[]>([]);
+        const activeToolGroupButton = ref<HTMLButtonElement>();
+        const showToolGroupExpandButton = ref(false);
+        const isActiveToolGroupExpanded = ref(false);
+        const toolGroupExpandOffsetTop = ref<string | undefined>(undefined);
+        const toolGroupExpandOffsetLeft = ref<string | undefined>(undefined);
+
         let activeControlDock: LayoutShortcutGroupDefinitionControlButton | null = null;
         let pendingActiveControlCall: IArguments | null = null;
         let flexContainer = ref<HTMLDivElement>();
@@ -171,6 +224,7 @@ export default defineComponent({
         let showMoreActionsTooltip = ref<boolean>(false);
         let popoverPlacement = ref<'top' | 'bottom' | 'left' | 'right'>('top');
 
+        let repositionToolGroupExpandDebounceHandle: number | undefined = undefined;
         let resizeDebounceHandle: number | undefined = undefined;
         let pointerDownElement: EventTarget | null = null;
         let pointerDownId: number;
@@ -178,6 +232,7 @@ export default defineComponent({
         let pointerDownShowDock: boolean = false;
         let pointerPressHoldTimeoutHandle: number | undefined;
         let lastPointerTap: number = 0;
+
         const { viewWidth: viewportWidth, viewHeight: viewportHeight } = toRefs(canvasStore.state);
         const { activeToolGroup, activeTool } = toRefs(editorStore.state);
 
@@ -192,9 +247,44 @@ export default defineComponent({
             // return editorStore.state.isTouchUser;
         });
 
+        const activeToolGroupControls = computed(() => {
+            const activeActionToolGroupIndex = actionGroups.value.tools.findIndex(tool => tool.id === activeToolGroup.value);
+            const activeActionToolGroup = actionGroups.value.tools[activeActionToolGroupIndex];
+            return activeActionToolGroup?.controls[0]?.controls ?? [];
+        });
+
+        const activeToolGroupExpandToggleIcon = computed(() => {
+            if (direction.value === 'vertical') {
+                return props.layoutPlacement === 'left'
+                    ? (isActiveToolGroupExpanded.value ? 'bi-chevron-left' : 'bi-chevron-right' )
+                    : (isActiveToolGroupExpanded.value ? 'bi-chevron-right' : 'bi-chevron-left' );
+            } else {
+                return props.layoutPlacement === 'top'
+                    ? (isActiveToolGroupExpanded.value ? 'bi-chevron-up' : 'bi-chevron-down' )
+                    : (isActiveToolGroupExpanded.value ? 'bi-chevron-down' : 'bi-chevron-up' );
+            }
+        });
+
+        watch(() => activeToolGroup.value, () => {
+            if (!actionGroups.value) return;
+            activeToolGroupButton.value = (toolGroupButtons.value.find((button) => {
+                const buttonElement = button.ref as unknown as HTMLButtonElement;
+                return buttonElement?.getAttribute('data-group-target') === activeToolGroup.value;
+            })?.ref) as never;
+            showToolGroupExpandButton.value = activeToolGroupControls.value.length > 0;
+            toolGroupExpandOffsetTop.value = undefined;
+            toolGroupExpandOffsetLeft.value = undefined;
+            isActiveToolGroupExpanded.value = false;
+            repositionToolGroupExpand();
+        }, { immediate: true });
+
         watch([viewportWidth], () => {
             toggleMobileView();
+            repositionToolGroupExpand();
         });
+        watch([viewportHeight], () => {
+            repositionToolGroupExpand();
+        })
         watch([displayMode], () => {
             showMoreActionsMenu.value = false;
         });
@@ -224,13 +314,34 @@ export default defineComponent({
             window.removeEventListener('mouseup', onMouseUpWindow);
             window.removeEventListener('touchstart', onTouchStartWindow);
             window.removeEventListener('touchend', onTouchEndWindow);
+            repositionToolGroupExpand();
         });
+
+        function repositionToolGroupExpand() {
+            window.clearTimeout(repositionToolGroupExpandDebounceHandle);
+            repositionToolGroupExpandDebounceHandle = window.setTimeout(repositionToolGroupExpandImmediate, 200);
+        }
+
+        function repositionToolGroupExpandImmediate() {
+            const menuBarClientRect = menuBarElement.value?.getBoundingClientRect();
+            const buttonClientRect = activeToolGroupButton.value?.getBoundingClientRect();
+            if (!menuBarClientRect || !buttonClientRect) return;
+            if (direction.value === 'vertical') {
+                toolGroupExpandOffsetTop.value = Math.round(-menuBarClientRect.top + buttonClientRect.top + (buttonClientRect.height / 2)) + 'px';
+                toolGroupExpandOffsetLeft.value = undefined;
+            } else {
+                toolGroupExpandOffsetTop.value = undefined;
+                toolGroupExpandOffsetLeft.value = Math.round(-menuBarClientRect.left + buttonClientRect.left + (buttonClientRect.width / 2)) + 'px';
+            }
+        }
 
         function toggleMobileView() {
             window.clearTimeout(resizeDebounceHandle);
-            resizeDebounceHandle = window.setTimeout(async () => {
-                displayMode.value = viewportWidth.value / (window.devicePixelRatio || 1) > preferencesStore.state.dockHideBreakpoint ? 'tools' : 'all';
-            }, 400);
+            resizeDebounceHandle = window.setTimeout(toggleMobileViewImmediate, 400);
+        }
+
+        function toggleMobileViewImmediate() {
+            displayMode.value = viewportWidth.value / (window.devicePixelRatio || 1) > preferencesStore.state.dockHideBreakpoint ? 'tools' : 'all';
         }
 
         function createActionGroups(forceDisplayMode?: string): { [key: string]: LayoutShortcutGroupDefinition[] } {
@@ -261,6 +372,20 @@ export default defineComponent({
             }
             return actionGroups;
         };
+
+        function getControlIcon(control: LayoutShortcutGroupDefinitionControlButton) {
+            let icon = control.icon;
+            if (control.action?.type === 'toolGroup') {
+                const lastActiveTool = editorStore.state.toolGroupLastActivatedTool[control.action?.target];
+                const childControl = (control.controls ?? []).find(
+                    (control) => control.action?.type === 'tool' && control.action?.target === lastActiveTool
+                );
+                if (childControl?.icon) {
+                    icon = childControl.icon;
+                }
+            }
+            return icon;
+        }
 
         function onKeyDownControlButton(event: KeyboardEvent, control: LayoutShortcutGroupDefinitionControlButton) {
             if (event.key === 'Enter') {
@@ -404,8 +529,14 @@ export default defineComponent({
                             if (openTarget === 'modal') {
                                 showMoreActionsMenu.value = false;
                             }
-                        } else {
-                            
+                        }
+                    } else if (control.action.type === 'tool') {
+                        if (button === 0 && activeToolGroup.value && activeTool.value !== control.action.target) {
+                            editorStore.dispatch('setActiveTool', { group: activeToolGroup.value, tool: control.action.target });
+                            isActiveToolGroupExpanded.value = false;
+                            if (openTarget === 'modal') {
+                                showMoreActionsMenu.value = false;
+                            }
                         }
                     } else if (control.action.type === 'dock') {
                         if (openTarget === 'popover') {
@@ -459,8 +590,18 @@ export default defineComponent({
 
         return {
             activeMenuDrawerComponentName,
+
+            menuBarElement,
+            toolGroupButtons,
+            toolGroupExpandOffsetTop,
+            toolGroupExpandOffsetLeft,
+
+            showToolGroupExpandButton,
+            isActiveToolGroupExpanded,
             showMoreActionsMenu,
             showMoreActionsTooltip,
+            activeToolGroupExpandToggleIcon,
+
             popoverPlacement,
             displayMode,
             direction,
@@ -468,7 +609,11 @@ export default defineComponent({
             actionGroups,
             activeToolGroup,
             activeTool,
+            activeToolGroupControls,
+
             isTouchUser,
+
+            getControlIcon,
             onAfterLeavePopover,
             onKeyDownControlButton,
             onTouchStartControlButton,

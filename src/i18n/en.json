@@ -586,7 +586,9 @@
         "pixelsPerCentimeter": "Pixels/Centimeter"
     },
     "menuBar": {
-        "toolsHeading": "Tools"
+        "toolsHeading": "Tools",
+        "expandToolGroup": "Expand",
+        "collapseToolGroup": "Collapse"
     },
     "module": {
         "fileExport": {
@@ -950,8 +952,12 @@
             "description": "Brushes, pencils, pens, and vector art drawing tools.",
             "tools": {
                 "brush": {
-                    "name": "Draw Brush",
-                    "description": "Brushes that draw on raster layers."
+                    "name": "Brush",
+                    "description": "Draw on layers as if you are using a paint brush."
+                },
+                "gradient": {
+                    "name": "Gradient",
+                    "description": "Create smooth transitions between colors."
                 }
             }
         },

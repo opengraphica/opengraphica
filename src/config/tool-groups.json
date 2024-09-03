@@ -32,6 +32,18 @@
                 "overlays": [
                     "draw-brush"
                 ]
+            },
+            "gradient": {
+                "name": "toolGroup.draw.tools.gradient.name",
+                "description": "toolGroup.draw.tools.gradient.description",
+                "controller": "draw-brush",
+                "toolbar": {
+                    "position": "auto",
+                    "target": "draw-gradient"
+                },
+                "overlays": [
+                    "draw-brush"
+                ]
             }
         }
     },

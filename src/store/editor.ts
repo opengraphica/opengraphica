@@ -62,6 +62,9 @@ interface EditorState {
     timelinePlayStartTime: number; // Milliseconds
     timelineStart: number; // Milliseconds
     toolCanvasController: BaseCanvasController;
+    toolGroupLastActivatedTool: {
+        [toolGroup: string]: string;
+    }
     tutorialFlags: TutorialFlags;
     waiting: boolean;
 }
@@ -121,6 +124,7 @@ const store = new PerformantStore<EditorStore>({
         timelinePlayStartTime: 0,
         timelineStart: 0,
         toolCanvasController: new BaseCanvasMovementController(),
+        toolGroupLastActivatedTool: {},
         tutorialFlags: {},
         waiting: false,
     },
@@ -176,11 +180,12 @@ const store = new PerformantStore<EditorStore>({
                 let { tool, group } = value as EditorDispatch['setActiveTool'];
                 let activeTool = tool || null;
                 const activeGroup = store.get('activeToolGroup');
+                const toolGroupLastActivatedTool = store.get('toolGroupLastActivatedTool');
                 if (!tool) {
-                    activeTool = Object.keys(toolGroups[group]?.tools || [])[0];
+                    activeTool = toolGroupLastActivatedTool[group] ?? Object.keys(toolGroups[group]?.tools || [])[0];
                 }
                 if (group !== activeGroup || activeTool !== store.get('activeTool')) {
-                    const toolDefinition = toolGroups[group]?.tools[activeTool || ''];
+                    const toolDefinition = toolGroups[group]?.tools[activeTool ?? ''];
                     let isActiveToolbarExclusive = false;
                     let activeToolbar: string | null = null;
                     let activeToolbarPosition = 'top';
@@ -219,6 +224,10 @@ const store = new PerformantStore<EditorStore>({
                     set('activeToolPrevious', store.get('activeTool'));
                     set('activeToolOverlays', activeToolOverlays);
                     set('activeTool', activeTool);
+                    if (activeTool) {
+                        toolGroupLastActivatedTool[group] = activeTool;
+                        store.set('toolGroupLastActivatedTool', toolGroupLastActivatedTool);
+                    }
                     try {
                         store.get('toolCanvasController').onEnter();
                     } catch (error: any) {}

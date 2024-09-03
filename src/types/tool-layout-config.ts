@@ -35,11 +35,12 @@ export interface LayoutShortcutGroupDefinitionControlButton {
     showDock?: boolean;
     popoverVisible?: boolean;
     action?: {
-        type: 'dock' | 'toolGroup' | 'runModule';
+        type: 'dock' | 'toolGroup' | 'tool' | 'runModule';
         target: string;
     };
     onPrimaryClick?: ActionGroupControlEventHandler;
     onSecondaryClick?: ActionGroupControlEventHandler;
+    controls?: LayoutShortcutGroupDefinitionControlButton[];
 }
 
 export type LayoutShortcutGroupDefinitionControl = LayoutShortcutGroupDefinitionControlButton;

@@ -1342,6 +1342,7 @@ body.ogr-full-page {
     
         > header {
             flex-grow: 0;
+            flex-shrink: 0;
             // background: linear-gradient(to bottom, var(--ogr-background-color) 50%, rgba(255, 255, 255, 0.0) 100%);
             touch-action: none;
         }
@@ -1349,6 +1350,8 @@ body.ogr-full-page {
             display: flex;
             flex-direction: row;
             flex-grow: 1;
+            flex-shrink: 1;
+            height: 0;
             max-height: 100%;
     
             > .ogr-sidebar-left {
@@ -1427,7 +1430,8 @@ body.ogr-full-page {
             }
         }
         > footer {
-            flex-grow: 0;     
+            flex-grow: 0;   
+            flex-shrink: 0;  
             touch-action: none;   
         }
     }
@@ -1610,6 +1614,8 @@ body.ogr-full-page {
             .el-button-group, .ogr-single-button-group {
                 margin: 0 0 0 0.375rem;
                 width: max-content;
+                position: relative;
+                z-index: 5;
 
                 &:last-child {
                     margin-right: 0.375rem;
@@ -1631,6 +1637,188 @@ body.ogr-full-page {
 
         .el-button--expanded-popover {
             box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.3) inset;
+        }
+
+        .ogr-menu-bar__tool-group-expand {
+            position: absolute;
+            display: flex;
+            flex-direction: row;
+            transform: translateY(-50%);
+            background-color: var(--ogr-layout-menu-bar-background-color);
+            color: var(--el-text-color-primary);
+            border: none;
+            padding: 0;
+            position: absolute;
+            left: 2.15rem;
+            border-radius: 0 2rem 2rem 0;
+            top: 0;
+            z-index: 4;
+            transition: top 0.2s, left 0.2s, padding 0.2s;
+
+            .ogr-menu-bar__tool-group-expand__controls {
+                display: flex;
+                flex-direction: row;
+                margin-left: 1.35rem;
+                overflow: hidden;
+                width: 0;
+                transition: width 0.2s, margin 0.2s;
+
+                button {
+                    background-color: var(--ogr-layout-menu-bar-background-color);
+                    color: var(--el-text-color-primary);
+                    padding: 0.75rem;
+                    border: none;
+                    border-radius: 2rem;
+                    margin: 0 0 0 0.35rem;
+
+                    &.ogr-menu-bar__tool-group-expand__control--active {
+                        box-shadow: 0 0 0 0.15rem var(--el-color-primary) inset;
+                    }
+
+                    &:hover {
+                        background-color: var(--el-color-primary);
+                        color: var(--el-color-white);
+                        cursor: pointer;
+                    }
+                }
+            }
+
+            .ogr-menu-bar__tool-group-expand__toggle-button {
+                background-color: var(--ogr-layout-menu-bar-background-color);
+                color: var(--el-text-color-primary);
+                padding: 0.75rem 0.35rem 0.75rem 1.5rem;
+                border: none;
+                border-radius: 0 2rem 2rem 0;
+                margin: 0;
+
+                &:hover {
+                    background-color: var(--el-color-primary);
+                    color: var(--el-color-white);
+                    cursor: pointer;
+                }
+            }
+
+            &.ogr-menu-bar__tool-group-expand--expanded {
+                padding: 0.5rem;
+
+                .ogr-menu-bar__tool-group-expand__controls {
+                    width: auto;
+                }
+
+                .ogr-menu-bar__tool-group-expand__toggle-button {
+                    border-radius: 2rem;
+                    padding: 0.35rem 0.35rem 0.35rem 0.35rem;
+                    margin: 0.4rem 0 0.4rem 0.75rem;
+                }
+            }
+        }
+        &.is-positioned-right .ogr-menu-bar__tool-group-expand {
+            left: auto;
+            right: 2.15rem;
+            border-radius: 2rem 0 0 2rem;
+            flex-direction: row-reverse;
+
+            .ogr-menu-bar__tool-group-expand__controls {
+                margin-left: 0;
+                margin-right: 1.35rem;
+
+                button {
+                    margin: 0 0.35rem 0 0;
+                }
+            }
+
+            .ogr-menu-bar__tool-group-expand__toggle-button {
+                padding: 0.75rem 1.5rem 0.75rem 0.35rem;
+                border-radius: 2rem 0 0 2rem;
+            }
+
+            &.ogr-menu-bar__tool-group-expand--expanded {
+                .ogr-menu-bar__tool-group-expand__toggle-button {
+                    border-radius: 2rem;
+                    padding: 0.35rem 0.35rem 0.35rem 0.35rem;
+                    margin: 0.4rem 0.75rem 0.4rem 0;
+                }
+            }
+        }
+        &.is-positioned-bottom .ogr-menu-bar__tool-group-expand {
+            top: auto;
+            left: auto;
+            right: auto;
+            bottom: 1.75rem;
+            border-radius: 2rem 2rem 0 0;
+            flex-direction: column-reverse;
+            transform: translateX(-50%);
+
+            .ogr-menu-bar__tool-group-expand__controls {
+                flex-direction: column;
+                margin-top: 0;
+                margin-left: 0;
+                margin-right: 0;
+                margin-bottom: 1.35rem;
+                height: 0;
+                width: auto;
+                transition: height 0.2s, margin 0.2s;
+
+                button {
+                    margin: 0 0 0.35rem 0;
+                }
+            }
+
+            .ogr-menu-bar__tool-group-expand__toggle-button {
+                padding: 0.35rem 0.75rem 1.5rem 0.75rem;
+                border-radius: 2rem 2rem 0 0;
+            }
+
+            &.ogr-menu-bar__tool-group-expand--expanded {
+                .ogr-menu-bar__tool-group-expand__controls {
+                    height: auto;
+                }
+                .ogr-menu-bar__tool-group-expand__toggle-button {
+                    border-radius: 2rem;
+                    padding: 0.35rem 0.35rem 0.35rem 0.35rem;
+                    margin: 0 0.4rem 0.75rem 0.4rem;
+                }
+            }
+        }
+        &.is-positioned-top .ogr-menu-bar__tool-group-expand {
+            top: 1.75rem;
+            left: auto;
+            right: auto;
+            bottom: auto;
+            border-radius: 0 0 2rem 2rem;
+            flex-direction: column;
+            transform: translateX(-50%);
+
+            .ogr-menu-bar__tool-group-expand__controls {
+                flex-direction: column;
+                margin-top: 1.35rem;
+                margin-left: 0;
+                margin-right: 0;
+                margin-bottom: 0;
+                height: 0;
+                width: auto;
+                transition: height 0.2s, margin 0.2s;
+
+                button {
+                    margin: 0.35rem 0 0 0;
+                }
+            }
+
+            .ogr-menu-bar__tool-group-expand__toggle-button {
+                padding: 1.5rem 0.75rem 0.35rem 0.75rem;
+                border-radius: 0 0 2rem 2rem;
+            }
+
+            &.ogr-menu-bar__tool-group-expand--expanded {
+                .ogr-menu-bar__tool-group-expand__controls {
+                    height: auto;
+                }
+                .ogr-menu-bar__tool-group-expand__toggle-button {
+                    border-radius: 2rem;
+                    padding: 0.35rem 0.35rem 0.35rem 0.35rem;
+                    margin: 0.75rem 0.4rem 0 0.4rem;
+                }
+            }
         }
 
         &.is-vertical {

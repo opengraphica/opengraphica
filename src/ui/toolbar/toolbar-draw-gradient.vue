@@ -2,7 +2,7 @@
     <div class="is-flex container is-align-items-center is-justify-content-center mx-auto">
         <div class="ogr-toolbar-overlay">
             <div class="ogr-toolbar-tool-selector">
-                <span class="bi bi-pencil my-1" aria-hidden="true"></span>
+                <span class="bi bi-shadows my-1" aria-hidden="true"></span>
                 <span class="ogr-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
             </div>
             <el-horizontal-scrollbar-arrows>
@@ -24,18 +24,6 @@
                         <i class="bi bi-palette-fill" aria-hidden="true" />
                     </el-button>
                 </el-tooltip>
-                <div class="is-flex is-align-items-center px-3">
-                    <label for="toolbar-draw-brush-size-slider" v-t="'toolbar.drawBrush.brushSize'" class="mr-3" />
-                    <el-slider
-                        id="toolbar-draw-brush-size-slider"
-                        v-model="selectionBrushSize"
-                        :min="0"
-                        :max="1"
-                        :step="0.01"
-                        :format-tooltip="formatBrushSizeTooltip"
-                        style="width: 10rem"
-                    />
-                </div>
             </el-horizontal-scrollbar-arrows>
         </div>
     </div>
@@ -65,7 +53,7 @@ import appEmitter from '@/lib/emitter';
 import { colorToHsla } from '@/lib/color';
 
 export default defineComponent({
-    name: 'ToolbarDrawBrush',
+    name: 'ToolbarDrawGradient',
     components: {
         ElAlert,
         ElButton,

@@ -26,7 +26,29 @@
                 "action": {
                     "type": "toolGroup",
                     "target": "draw"
-                }
+                },
+                "controls": [
+                    {
+                        "type": "button",
+                        "icon": "bi bi-pencil-fill",
+                        "label": "toolgroup.draw.tools.brush.name",
+                        "description": "toolgroup.draw.tools.brush.description",
+                        "action": {
+                            "type": "tool",
+                            "target": "brush"
+                        }
+                    },
+                    {
+                        "type": "button",
+                        "icon": "bi bi-shadows",
+                        "label": "toolgroup.draw.tools.gradient.name",
+                        "description": "toolgroup.draw.tools.gradient.description",
+                        "action": {
+                            "type": "tool",
+                            "target": "gradient"
+                        }
+                    }
+                ]
             }
         ],
         "draggable": true
