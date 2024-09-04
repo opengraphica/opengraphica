@@ -55,18 +55,31 @@
     }
 
     .el-button {
+        --el-border-radius-base: 0.75rem;
+
         height: auto;
         min-height: 2.5rem;
         padding: 0.75rem 1.25rem;
+        transition: transform 0.25s;
 
         &.is-circle {
             padding: 0.75rem;
         }
+
+        &:active {
+            transform: scale(0.97);
+        }
     }
     .el-button--small {
+        --el-border-radius-base: 0.5rem;
+
         min-height: 2rem;
         padding: 0.5625rem 0.9375rem;
         font-size: 0.75rem;
+
+        &:active {
+            transform: scale(0.94);
+        }
     }
     .el-button--no-hover {
         &:hover, &:focus {
@@ -176,6 +189,8 @@
     }
 
     .el-dialog {
+        --el-dialog-border-radius: 0.875rem;
+
         &.el-dialog--ogr-dock {
             .el-dialog__body {
                 padding: 0 !important;
@@ -495,6 +510,9 @@
         padding-right: 2rem !important;
     }
 
+    .el-input {
+        --el-input-border-radius: 0.5rem;
+    }
     .el-input__wrapper {
         height: 2.5rem;
         line-height: 2.5rem;
@@ -653,7 +671,13 @@
         }
     }
 
+    .el-popover {
+        --el-popover-border-radius: 0.875rem;
+    }
+
     .el-radio-button { 
+        --el-border-radius-base: 0.75rem;
+
         &.is-active {
             cursor: default !important;
             .el-radio-button__inner {
@@ -665,6 +689,8 @@
         }
     }
     .el-radio-button--small {
+        --el-border-radius-base: 0.5rem;
+
         .el-radio-button__inner {
             padding: 0.5625rem 0.9375rem;
             font-size: 0.75rem;

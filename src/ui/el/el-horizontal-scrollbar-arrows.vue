@@ -38,6 +38,8 @@ export default defineComponent({
 
     },
     setup(props, { emit }) {
+        const scrollOffsetPadding = 4;
+
         const rootEl = ref<HTMLDivElement>();
         const scrollContentEl = ref<HTMLDivElement>();
         const scrollbar = ref<InstanceType<typeof ElScrollbar>>();
@@ -88,20 +90,72 @@ export default defineComponent({
             return scrollContentEl.value!.clientWidth - (scrollbar.value?.wrapRef?.clientWidth ?? 0);
         }
 
+        function getScrollViewWidth() {
+            return scrollbar.value!.$el.clientWidth;
+        }
+
         function handleScrollChange() {
             canScrollLeft.value = scrollLeft.value > getScrollLeftMin();
             canScrollRight.value = scrollLeft.value < getScrollLeftMax();
         }
 
         function onClickScrollLeft() {
-            scrollLeftTarget = scrollLeft.value - (scrollbar.value!.$el.clientWidth * .6);
+            if (!scrollbar.value || !scrollContentEl.value) return;
+            
+            const scrollViewWidth = getScrollViewWidth();
+            const scrollChildren = Array.from(scrollContentEl.value.childNodes);
+
+            // Find the first element that is right of the left side of the scroll view
+            let leftChildIndex = -1;
+            for (const [childIndex, child] of scrollChildren.entries()) {
+                if (child instanceof HTMLElement) {
+                    if (child.offsetLeft >= scrollLeft.value) {
+                        leftChildIndex = childIndex;
+                        break;
+                    }
+                }
+            }
+            if (leftChildIndex == -1) {
+                leftChildIndex = scrollChildren.length - 1;
+            }
+
+            // Scroll to the beginning of the previous element that is cut off by the scroll view
+            let traversedWidth = 0;
+            for (let i = leftChildIndex - 1; i >= 0; i--) {
+                const child = scrollChildren[i];
+                if (child instanceof HTMLElement) {
+                    const clientRect = child.getBoundingClientRect();
+                    traversedWidth += clientRect.width;
+                    if (traversedWidth <= scrollViewWidth || Math.abs(i - leftChildIndex) <= 1) {
+                        scrollLeftTarget = child.offsetLeft - scrollOffsetPadding;
+                    }
+                    if (traversedWidth > scrollViewWidth) {
+                        break;
+                    }
+                }
+            }
+
             if (!isScrollAnimating) {
                 scrollAnimate();
             }
         }
 
         function onClickScrollRight() {
-            scrollLeftTarget = scrollLeft.value + (scrollbar.value!.$el.clientWidth * .6);
+            if (!scrollbar.value || !scrollContentEl.value) return;
+
+            // Scroll to the beginning of the next element that is cut off by the scroll view
+            const scrollViewWidth = getScrollViewWidth();
+            const scrollChildren = scrollContentEl.value.childNodes;
+            for (const child of Array.from(scrollChildren)) {
+                if (child instanceof HTMLElement) {
+                    const clientRect = child.getBoundingClientRect();
+                    if (child.offsetLeft - scrollOffsetPadding > scrollLeft.value && child.offsetLeft + clientRect.width > scrollLeft.value + scrollViewWidth) {
+                        scrollLeftTarget = child.offsetLeft - scrollOffsetPadding;
+                        break;
+                    }
+                }
+            }
+
             if (!isScrollAnimating) {
                 scrollAnimate();
             }

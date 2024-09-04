@@ -8229,7 +8229,7 @@
   src: url("fonts/Roboto-Light.ttf");
 }
 :root {
-  --ogr-border-radius: 0.25rem;
+  --ogr-border-radius: 0.5rem;
   --ogr-modal-collapse-mobile: 600px;
   --ogr-dnd-drop-overlay-z-index: 800000;
   --ogr-history-notification-overlay-z-index: 850000;
@@ -8723,9 +8723,8 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-dialogs .el-dialog.el-dialog--large,
 .opengraphica .ogr-dialogs .el-dialog.el-dialog--big,
 .opengraphica .ogr-dialogs .el-dialog.el-dialog--huge {
-    margin: 0 !important;
-    height: 100% !important;
-    width: 100% !important;
+    margin: 0.25rem !important;
+    width: calc(100% - 0.5rem) !important;
     max-width: 100% !important;
     overflow: hidden !important;
     display: flex !important;
@@ -9494,7 +9493,7 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-layout-dock .ogr-layout-dock__container {
   background: var(--ogr-layout-menu-bar-background-color);
   box-shadow: 0 0 0px 1px var(--ogr-layout-menu-bar-border-color), 0 0.3rem 1.5rem var(--ogr-layout-menu-bar-border-color);
-  border-radius: 1rem;
+  border-radius: 0.875rem;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -9549,22 +9548,22 @@ body.ogr-full-page .opengraphica {
   max-width: calc(100% - 1rem);
   background: var(--ogr-layout-menu-bar-background-color);
   box-shadow: 0 0 0 0.063rem var(--ogr-layout-menu-bar-border-color);
-  border-radius: 1rem;
+  border-radius: 0.875rem;
   margin: 0.5rem;
   z-index: 10;
   transition: border-radius 0.2s;
 }
 .opengraphica .ogr-layout-menu-bar.is-positioned-top.is-menu-drawer-open {
-  border-radius: 1rem 1rem 0 0;
+  border-radius: 0.875rem 0.875rem 0 0;
 }
 .opengraphica .ogr-layout-menu-bar.is-positioned-bottom.is-menu-drawer-open {
-  border-radius: 0 0 1rem 1rem;
+  border-radius: 0 0 0.875rem 0.875rem;
 }
 .opengraphica .ogr-layout-menu-bar.is-positioned-left.is-menu-drawer-open {
-  border-radius: 1rem 0 0 1rem;
+  border-radius: 0.875rem 0 0 0.875rem;
 }
 .opengraphica .ogr-layout-menu-bar.is-positioned-right.is-menu-drawer-open {
-  border-radius: 0 1rem 1rem 0;
+  border-radius: 0 0.875rem 0.875rem 0;
 }
 .opengraphica .ogr-layout-menu-bar > .is-flex .ogr-menu-section__title {
   display: flex;
@@ -10007,7 +10006,7 @@ body.ogr-full-page .opengraphica {
   display: flex;
   flex-direction: column;
   background: var(--ogr-menu-drawer-background-color);
-  border-radius: 1rem;
+  border-radius: 0.875rem;
   position: absolute;
   top: 0.5rem;
   bottom: 0.5rem;
@@ -10209,13 +10208,13 @@ body.ogr-full-page .opengraphica {
   bottom: 0.5rem;
 }
 .opengraphica .ogr-toolbar.is-overlay.is-bottom .ogr-toolbar-overlay {
-  border-radius: 1rem;
+  border-radius: 0.875rem;
 }
 .opengraphica .ogr-toolbar.is-overlay.is-top {
   top: 0.5rem;
 }
 .opengraphica .ogr-toolbar.is-overlay.is-top .ogr-toolbar-overlay {
-  border-radius: 1rem;
+  border-radius: 0.875rem;
 }
 .opengraphica .ogr-toolbar.is-overlay.is-top .ogr-toolbar-overlay > .el-scrollbar > * > .el-scrollbar__view {
   padding: 0.5rem 0 0.75rem 0;
@@ -28426,17 +28425,26 @@ body.ogr-full-page .opengraphica {
   row-gap: var(--row-gap, 0px);
 }
 .opengraphica .el-button {
+  --el-border-radius-base: 0.75rem;
   height: auto;
   min-height: 2.5rem;
   padding: 0.75rem 1.25rem;
+  transition: transform 0.25s;
 }
 .opengraphica .el-button.is-circle {
   padding: 0.75rem;
 }
+.opengraphica .el-button:active {
+  transform: scale(0.97);
+}
 .opengraphica .el-button--small {
+  --el-border-radius-base: 0.5rem;
   min-height: 2rem;
   padding: 0.5625rem 0.9375rem;
   font-size: 0.75rem;
+}
+.opengraphica .el-button--small:active {
+  transform: scale(0.94);
 }
 .opengraphica .el-button--no-hover:hover, .opengraphica .el-button--no-hover:focus {
   --el-button-hover-text-color: var(--el-button-text-color);
@@ -28517,6 +28525,9 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .el-collapse--menu-item .el-collapse-item__content {
   padding-bottom: 0.5rem;
+}
+.opengraphica .el-dialog {
+  --el-dialog-border-radius: 0.875rem;
 }
 .opengraphica .el-dialog.el-dialog--ogr-dock .el-dialog__body {
   padding: 0 !important;
@@ -28772,6 +28783,9 @@ body.ogr-full-page .opengraphica {
 .opengraphica .pr-el-scrollbar-arrow-size {
   padding-right: 2rem !important;
 }
+.opengraphica .el-input {
+  --el-input-border-radius: 0.5rem;
+}
 .opengraphica .el-input__wrapper {
   height: 2.5rem;
   line-height: 2.5rem;
@@ -28893,6 +28907,12 @@ body.ogr-full-page .opengraphica {
 .opengraphica .el-notification.left {
   left: calc(var(--ogr-sidebar-left-width, .5rem) + .5rem);
 }
+.opengraphica .el-popover {
+  --el-popover-border-radius: 0.875rem;
+}
+.opengraphica .el-radio-button {
+  --el-border-radius-base: 0.75rem;
+}
 .opengraphica .el-radio-button.is-active {
   cursor: default !important;
 }
@@ -28901,6 +28921,9 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .el-radio-button .el-radio-button__orig-radio:disabled + .el-radio-button__inner {
   cursor: default !important;
+}
+.opengraphica .el-radio-button--small {
+  --el-border-radius-base: 0.5rem;
 }
 .opengraphica .el-radio-button--small .el-radio-button__inner {
   padding: 0.5625rem 0.9375rem;
