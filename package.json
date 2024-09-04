@@ -22,7 +22,7 @@
         "bidi-js": "^1.0.3",
         "bootstrap-icons": "1.11.3",
         "color-namer": "1.4.0",
-        "element-plus": "2.2.28",
+        "element-plus": "^2.2.28",
         "eruda": "3.0.1",
         "expr-eval": "2.0.2",
         "file-saver": "2.0.5",
@@ -36,7 +36,7 @@
         "unplugin-element-plus": "0.2.0",
         "uuid": "8.3.2",
         "vue": "3.2.45",
-        "vue-i18n": "^9.1.9",
+        "vue-i18n": "9.1.9",
         "vuex": "4.0.0"
     },
     "devDependencies": {

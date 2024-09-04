@@ -81,6 +81,7 @@ module.exports = function setupConfig(config) {
             ]
         },
         resolve: {
+            exportsFields: [],
             roots: [
                 path.resolve(__dirname, './')
             ],

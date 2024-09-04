@@ -17,6 +17,7 @@ interface EditorDeferredTask {
 interface TutorialFlags {
     deformBlurToolIntroduction?: boolean;
     drawToolIntroduction?: boolean;
+    drawGradientToolIntroduction?: boolean;
     effectToolIntroduction?: boolean;
     eraseToolIntroduction?: boolean;
     explainCanvasViewportControls?: boolean;
@@ -26,7 +27,7 @@ interface TutorialFlags {
 
 }
 
-const toolGroups: { [key: string]: ToolGroupDefinition } = toolGroupsConfig as any;
+const toolGroups: { [key: string]: ToolGroupDefinition } = toolGroupsConfig as never;
 
 interface EditorState {
     activeMenuDrawerComponentName: string | null;
@@ -40,6 +41,7 @@ interface EditorState {
     activeToolbar: string | null;
     activeToolbarPosition: 'top' | 'bottom';
     activeToolOverlays: string[];
+    activeToolRestore: string | null;
     clipboardBufferImageHash: string | null;
     clipboardBufferLayers: WorkingFileLayer<ColorModel>[];
     clipboardBufferSelectionMask: HTMLImageElement | null;
@@ -104,6 +106,7 @@ const store = new PerformantStore<EditorStore>({
         activeToolbar: null,
         activeToolbarPosition: 'top',
         activeToolOverlays: [],
+        activeToolRestore: null,
         clipboardBufferImageHash: null,
         clipboardBufferLayers: [],
         clipboardBufferSelectionMask: null,
@@ -129,7 +132,7 @@ const store = new PerformantStore<EditorStore>({
         waiting: false,
     },
     readOnly: ['activeTheme', 'activeTool', 'activeToolGroup', 'themes', 'timelineCursor'],
-    restore: ['activeToolGroupRestore', 'isTouchUser', 'lastActiveThemeName', 'tutorialFlags'],
+    restore: ['activeToolGroupRestore', 'activeToolRestore', 'isTouchUser', 'lastActiveThemeName', 'tutorialFlags'],
     async onDispatch(actionName: string, value: any, set) {
         switch (actionName) {
             case 'addTutorialFlag':
@@ -224,13 +227,14 @@ const store = new PerformantStore<EditorStore>({
                     set('activeToolPrevious', store.get('activeTool'));
                     set('activeToolOverlays', activeToolOverlays);
                     set('activeTool', activeTool);
+                    set('activeToolRestore', activeTool);
                     if (activeTool) {
                         toolGroupLastActivatedTool[group] = activeTool;
-                        store.set('toolGroupLastActivatedTool', toolGroupLastActivatedTool);
+                        set('toolGroupLastActivatedTool', toolGroupLastActivatedTool);
                     }
                     try {
                         store.get('toolCanvasController').onEnter();
-                    } catch (error: any) {}
+                    } catch (error: unknown) {}
                 }
                 break;
 

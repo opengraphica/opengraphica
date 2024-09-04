@@ -860,6 +860,25 @@
             "brushSize": "Size",
             "newBrushLayerName": "New Paint"
         },
+        "drawGradient": {
+            "colorSpace": {
+                "label": "Color Space",
+                "oklab": "Oklab",
+                "perceptualRgb": "Perceptual RGB",
+                "linearRgb": "Linear RGB"
+            },
+            "fillType": {
+                "label": "Fill Type",
+                "linear": "Linear",
+                "radial": "Radial"
+            },
+            "spreadMethod": {
+                "label": "Spread Method",
+                "pad": "Pad",
+                "repeat": "Repeat",
+                "reflect": "Reflect"
+            }
+        },
         "effect": {
             "edit": {
                 "noLayersSelected": "Please select one or more layers in the layers dock in order to edit their effects.",
@@ -1042,6 +1061,20 @@
             "introduction": [
                 "The draw tool lets you create lines and shapes."
             ]
+        },
+        "drawGradientToolIntroduction": {
+            "title": "Gradient Tool",
+            "introduction": [
+                "The gradient tool lets you add gradient layers. You can control the visible bounds of this tool by combining it with the selection tool or the erase tool."
+            ],
+            "body": {
+                "mouse": [
+                    "Click and drag to place a gradient on the canvas."
+                ],
+                "touch": [
+                    "Use one finger to touch and drag to place a gradient on the canvas."
+                ]
+            }
         },
         "effectToolIntroduction": {
             "title": "Effect Tool",

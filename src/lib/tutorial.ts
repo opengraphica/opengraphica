@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import i18n from '@/i18n';
+import i18n, { rt, t, tm } from '@/i18n';
 import appEmitter from '@/lib/emitter';
 import { NotificationHandle } from 'element-plus/lib/components/notification/src/notification.d';
 import editorStore, { TutorialFlags } from '@/store/editor';

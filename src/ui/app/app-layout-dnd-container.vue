@@ -170,7 +170,10 @@ export default defineComponent({
 
         onMounted(async () => {
             if (editorStore.state.activeToolGroupRestore) {
-                editorStore.dispatch('setActiveTool', { group: editorStore.state.activeToolGroupRestore });
+                editorStore.dispatch('setActiveTool', {
+                    group: editorStore.state.activeToolGroupRestore,
+                    tool: editorStore.state.activeToolRestore,
+                });
             }
 
             showDock.value = viewWidth.value / (window.devicePixelRatio || 1) > preferencesStore.state.dockHideBreakpoint;

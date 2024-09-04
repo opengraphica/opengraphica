@@ -1,6 +1,6 @@
 <template>
     <div class="ogr-layer-thumbnail">
-        <img v-if="!layer.expanded" :src="thumbnailImageSrc" alt="thumbnail" :class="{ 'is-larger-width': isLargerWidth }" @touchstart="$event.preventDefault()" />
+        <img :src="thumbnailImageSrc" alt="thumbnail" :class="{ 'is-larger-width': isLargerWidth }" @touchstart="$event.preventDefault()" />
     </div>
 </template>
 

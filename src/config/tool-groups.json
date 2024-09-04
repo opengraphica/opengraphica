@@ -1,11 +1,7 @@
 {
     "deform": {
-        "name": "toolGroup.deform.name",
-        "description": "toolGroup.deform.description",
         "tools": {
             "blur": {
-                "name": "toolGroup.draw.tools.blur.name",
-                "description": "toolGroup.draw.tools.blur.description",
                 "controller": "deform-blur",
                 "toolbar": {
                     "position": "auto",
@@ -18,12 +14,8 @@
         }
     },
     "draw": {
-        "name": "toolGroup.draw.name",
-        "description": "toolGroup.draw.description",
         "tools": {
             "brush": {
-                "name": "toolGroup.draw.tools.brush.name",
-                "description": "toolGroup.draw.tools.brush.description",
                 "controller": "draw-brush",
                 "toolbar": {
                     "position": "auto",
@@ -34,26 +26,20 @@
                 ]
             },
             "gradient": {
-                "name": "toolGroup.draw.tools.gradient.name",
-                "description": "toolGroup.draw.tools.gradient.description",
-                "controller": "draw-brush",
+                "controller": "draw-gradient",
                 "toolbar": {
                     "position": "auto",
                     "target": "draw-gradient"
                 },
                 "overlays": [
-                    "draw-brush"
+                    "draw-gradient"
                 ]
             }
         }
     },
     "effect": {
-        "name": "toolGroup.effect.name",
-        "description": "toolGroup.effect.description",
         "tools": {
             "effect": {
-                "name": "toolGroup.effect.tools.effect.name",
-                "description": "toolGroup.effect.tools.effect.description",
                 "controller": "effect",
                 "toolbar": {
                     "position": "auto",
@@ -66,12 +52,8 @@
         }
     },
     "erase": {
-        "name": "toolGroup.erase.name",
-        "description": "toolGroup.erase.description",
         "tools": {
             "brush": {
-                "name": "toolGroup.erase.tools.brush.name",
-                "description": "toolGroup.erase.tools.brush.description",
                 "controller": "erase-brush",
                 "toolbar": {
                     "position": "auto",
@@ -84,12 +66,8 @@
         }
     },
     "image": {
-        "name": "toolGroup.image.name",
-        "description": "toolGroup.image.description",
         "tools": {
             "cropResize": {
-                "name": "toolGroup.image.tools.cropResize.name",
-                "description": "toolGroup.image.tools.cropResize.description",
                 "controller": "crop-resize",
                 "toolbar": {
                     "exclusive": true,
@@ -103,12 +81,8 @@
         }
     },
     "selection": {
-        "name": "toolGroup.selection.name",
-        "description": "toolGroup.selection.description",
         "tools": {
             "selection": {
-                "name": "toolGroup.selection.tools.selection.name",
-                "description": "toolGroup.selection.tools.selection.description",
                 "controller": "selection",
                 "toolbar": {
                     "position": "auto",
@@ -121,12 +95,8 @@
         }
     },
     "text": {
-        "name": "toolGroup.text.name",
-        "description": "toolGroup.text.description",
         "tools": {
             "text": {
-                "name": "toolGroup.text.tools.text.name",
-                "description": "toolGroup.text.tools.text.description",
                 "controller": "text",
                 "toolbar": {
                     "position": "auto",
@@ -140,12 +110,8 @@
         }
     },
     "transform": {
-        "name": "toolGroup.transform.name",
-        "description": "toolGroup.transform.description",
         "tools": {
             "freeTransform": {
-                "name": "toolGroup.transform.tools.freeTransform.name",
-                "description": "toolGroup.transform.tools.freeTransform.description",
                 "controller": "free-transform",
                 "toolbar": {
                     "position": "auto",
@@ -158,12 +124,8 @@
         }
     },
     "view": {
-        "name": "toolGroup.view.name",
-        "description": "toolGroup.view.description",
         "tools": {
             "zoom": {
-                "name": "toolGroup.view.tools.zoom.name",
-                "description": "toolGroup.view.tools.zoom.description",
                 "controller": "zoom",
                 "toolbar": {
                     "position": "auto",

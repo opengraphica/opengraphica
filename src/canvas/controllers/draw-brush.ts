@@ -29,7 +29,7 @@ import type { BrushStrokeData } from '@/canvas/drawables/brush-stroke';
 
 const devicePixelRatio = window.devicePixelRatio || 1;
 
-export default class CanvasZoomController extends BaseCanvasMovementController {
+export default class CanvasDrawBrushController extends BaseCanvasMovementController {
 
     private brushShapeUnwatch: WatchStopHandle | null = null;
     private brushSizeUnwatch: WatchStopHandle | null = null;

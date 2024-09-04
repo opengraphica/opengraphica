@@ -53,8 +53,6 @@ export interface LayoutShortcutGroupDefinition {
 }
 
 export interface ToolDefinition {
-    name: string;
-    description: string;
     controller: string;
     toolbar?: {
         exclusive: boolean;
@@ -65,8 +63,6 @@ export interface ToolDefinition {
 }
 
 export interface ToolGroupDefinition {
-    name: string;
-    description: string;
     tools: {
         [key: string]: ToolDefinition;
     }
