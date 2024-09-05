@@ -9,6 +9,7 @@
         "convertLayersToCollage": "Convert Layers to Collage",
         "convertLayersToImageSequence": "Convert Layers to Image Sequence",
         "createDrawLayer": "Create Draw Layer",
+        "createDrawGradientLayer": "Create Gradient Layer",
         "createNewFile": "New File",
         "createNewLayersFromSelection": "Create Layers From Selection",
         "createTextLayer": "Create Text Layer",
@@ -43,6 +44,7 @@
         "updateFile": "Update File",
         "updateLayer": "Update Layer",
         "updateDrawLayer": "Draw on Layer",
+        "updateDrawGradientLayerPosition": "Update Gradient Position",
         "updateDeformBlurLayer": "Blur Layer",
         "updateEraseLayer": "Erase from Layer",
         "updateLayerFilterParams": "Update Layer Effect",
@@ -861,6 +863,7 @@
             "newBrushLayerName": "New Paint"
         },
         "drawGradient": {
+            "newGradientLayerName": "New Gradient",
             "colorSpace": {
                 "label": "Color Space",
                 "oklab": "Oklab",

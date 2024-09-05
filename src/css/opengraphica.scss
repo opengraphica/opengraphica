@@ -202,6 +202,29 @@ body.ogr-full-page {
         }
     }
 
+    .ogr-canvas-overlay-draw-bounds {
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        bottom: 0;
+
+        svg {
+            position: absolute;
+            transform-origin: top left;
+        }
+    }
+
+    .ogr-canvas-overlay__gradient-position-handle {
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        border: 2px solid #333333;
+        outline: 1px solid white;
+        border-radius: 100%;
+        transform: translate(-50%, -50%);
+    }
+
     .ogr-canvas-selection-mask {
         display: block;
         position: absolute;
@@ -694,19 +717,6 @@ body.ogr-full-page {
         }
     }
 
-    .ogr-draw-bounds {
-        position: absolute;
-        top: 0;
-        right: 0;
-        left: 0;
-        bottom: 0;
-
-        svg {
-            position: absolute;
-            transform-origin: top left;
-        }
-    }
-
     .ogr-free-transform {
         position: absolute;
 
@@ -1041,6 +1051,7 @@ body.ogr-full-page {
 
             &.is-background {
                 border-top: 1px solid var(--el-border-color);
+                border-radius: 0 0 0.875rem 0.875rem;
 
                 > .ogr-layer-main {
                     height: 3.5rem;

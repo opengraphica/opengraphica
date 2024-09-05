@@ -34,7 +34,7 @@ export type WorkingFileLayerBlendingMode = 'color' | 'color-burn' | 'color-dodge
     'difference' | 'exclusion' | 'hard-light' | 'hue' | 'lighten' | 'lighter' | 'luminosity' | 
     'multiply' | 'overlay' | 'saturation' | 'screen' | 'soft-light' | 'source-atop' | 'source-in' | 
     'source-out' | 'source-over' | 'xor';
-export type WorkingFileLayerType = 'empty' | 'group' | 'raster' | 'rasterSequence' | 'vector' | 'text';
+export type WorkingFileLayerType = 'empty' | 'gradient' | 'group' | 'raster' | 'rasterSequence' | 'vector' | 'text';
 
 export interface WorkingFileLayerFilter<T extends ColorModel = ColorModel> {
     name: string;
@@ -141,6 +141,28 @@ export interface WorkingFileEmptyLayer<T extends ColorModel = ColorModel> extend
     type: 'empty';
 }
 
+export interface WorkingFileGradientLayer<T extends ColorModel = ColorModel> extends WorkingFileLayer<T> {
+    type: 'gradient';
+    data: {
+        start: {
+            x: number;
+            y: number;
+        };
+        end: {
+            x: number;
+            y: number;
+        };
+        focus: {
+            x: number;
+            y: number;
+        };
+        stops: Array<{
+            offset: number;
+            color: ColorModel;
+        }>;
+    }
+}
+
 export interface WorkingFileGroupLayer<T extends ColorModel = ColorModel> extends WorkingFileLayer<T> {
     type: 'group';
     expanded: boolean;
@@ -183,10 +205,15 @@ export interface WorkingFileTextLayer<T extends ColorModel = ColorModel> extends
     data: TextDocument;
 }
 
-export type WorkingFileAnyLayer<T extends ColorModel = ColorModel> = WorkingFileEmptyLayer<T> | WorkingFileGroupLayer<T> | WorkingFileRasterLayer<T> | WorkingFileRasterSequenceLayer<T> | WorkingFileVectorLayer<T> | WorkingFileTextLayer<T>;
+export type WorkingFileAnyLayer<T extends ColorModel = ColorModel>
+    = WorkingFileEmptyLayer<T> | WorkingFileGradientLayer<T> | WorkingFileGroupLayer<T> | WorkingFileRasterLayer<T>
+    | WorkingFileRasterSequenceLayer<T> | WorkingFileVectorLayer<T> | WorkingFileTextLayer<T>;
 
 export interface InsertEmptyLayerOptions<T extends ColorModel = ColorModel> extends Partial<WorkingFileEmptyLayer<T>> {
     type: 'empty';
+}
+export interface InsertGradientLayerOptions<T extends ColorModel = ColorModel> extends Partial<WorkingFileGradientLayer<T>> {
+    type: 'gradient';
 }
 export interface InsertGroupLayerOptions<T extends ColorModel = ColorModel> extends Partial<WorkingFileGroupLayer<T>> {
     type: 'group';
@@ -203,9 +230,14 @@ export interface InsertVectorLayerOptions<T extends ColorModel = ColorModel> ext
 export interface InsertTextLayerOptions<T extends ColorModel = ColorModel> extends Partial<WorkingFileTextLayer<T>> {
     type: 'text';
 }
-export type InsertAnyLayerOptions<T extends ColorModel = ColorModel> = InsertEmptyLayerOptions<T> | InsertGroupLayerOptions<T> | InsertRasterLayerOptions<T> | InsertRasterSequenceLayerOptions<T> | InsertVectorLayerOptions<T> | InsertTextLayerOptions<T>;
+export type InsertAnyLayerOptions<T extends ColorModel = ColorModel>
+    = InsertEmptyLayerOptions<T> | InsertGradientLayerOptions<T> | InsertGroupLayerOptions<T> | InsertRasterLayerOptions<T>
+    | InsertRasterSequenceLayerOptions<T> | InsertVectorLayerOptions<T> | InsertTextLayerOptions<T>;
 
 export interface UpdateEmptyLayerOptions<T extends ColorModel = ColorModel> extends Partial<WorkingFileEmptyLayer<T>> {
+    id: number;
+}
+export interface UpdateGradientLayerOptions<T extends ColorModel = ColorModel> extends Partial<WorkingFileGradientLayer<T>> {
     id: number;
 }
 export interface UpdateGroupLayerOptions<T extends ColorModel = ColorModel> extends Partial<WorkingFileGroupLayer<T>> {
@@ -223,7 +255,9 @@ export interface UpdateVectorLayerOptions<T extends ColorModel = ColorModel> ext
 export interface UpdateTextLayerOptions<T extends ColorModel = ColorModel> extends Partial<WorkingFileTextLayer<T>> {
     id: number;
 }
-export type UpdateAnyLayerOptions<T extends ColorModel = ColorModel> = UpdateEmptyLayerOptions<T> | UpdateGroupLayerOptions<T> | UpdateRasterLayerOptions<T> | UpdateRasterSequenceLayerOptions<T> | UpdateVectorLayerOptions<T> | UpdateTextLayerOptions<T>;
+export type UpdateAnyLayerOptions<T extends ColorModel = ColorModel>
+    = UpdateEmptyLayerOptions<T> | UpdateGradientLayerOptions<T> | UpdateGroupLayerOptions<T> | UpdateRasterLayerOptions<T>
+    | UpdateRasterSequenceLayerOptions<T> | UpdateVectorLayerOptions<T> | UpdateTextLayerOptions<T>;
 
 export interface NewFilePreset {
     name: string,

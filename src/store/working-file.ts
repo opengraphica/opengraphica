@@ -160,7 +160,7 @@ function getLayersByType<T extends WorkingFileLayer<ColorModel>>(type: string, p
     return layers as T[];
 }
 
-function getSelectedLayers(providedSelectedLayerIds?: number[]): WorkingFileAnyLayer<ColorModel>[] {
+function getSelectedLayers<T = WorkingFileAnyLayer<ColorModel>>(providedSelectedLayerIds?: number[]): T[] {
     const selectedLayers: WorkingFileAnyLayer<ColorModel>[] = [];
     const selectedLayerIds = providedSelectedLayerIds ?? store.get('selectedLayerIds');
     if (selectedLayerIds.length > 0) {
@@ -171,7 +171,7 @@ function getSelectedLayers(providedSelectedLayerIds?: number[]): WorkingFileAnyL
             }
         }
     }
-    return selectedLayers;
+    return selectedLayers as never;
 }
 
 function getTimelineById(id: number): WorkingFileTimeline | null {

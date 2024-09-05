@@ -1,6 +1,9 @@
 import { ref } from 'vue';
 import { PerformantStore } from '@/store/performant-store';
 
+export const positionHandleRadius = 5;
+export const colorStopHandleRadius = 3;
+
 export const cursorHoverPosition = ref<DOMPoint>(new DOMPoint());
 
 type GradientColorSpace = 'oklab' | 'perceptualRgb' | 'linearRgb';

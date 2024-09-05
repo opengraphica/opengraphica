@@ -8402,6 +8402,26 @@ body.ogr-full-page .opengraphica {
   bottom: 0;
   right: 0;
 }
+.opengraphica .ogr-canvas-overlay-draw-bounds {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+}
+.opengraphica .ogr-canvas-overlay-draw-bounds svg {
+  position: absolute;
+  transform-origin: top left;
+}
+.opengraphica .ogr-canvas-overlay__gradient-position-handle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border: 2px solid #333333;
+  outline: 1px solid white;
+  border-radius: 100%;
+  transform: translate(-50%, -50%);
+}
 .opengraphica .ogr-canvas-selection-mask {
   display: block;
   position: absolute;
@@ -8841,17 +8861,6 @@ body.ogr-full-page .opengraphica {
   max-height: calc(100vh - 13rem) !important;
   overflow: auto !important;
 }
-.opengraphica .ogr-draw-bounds {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  bottom: 0;
-}
-.opengraphica .ogr-draw-bounds svg {
-  position: absolute;
-  transform-origin: top left;
-}
 .opengraphica .ogr-free-transform {
   position: absolute;
 }
@@ -9160,6 +9169,7 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .ogr-layer-list .ogr-layer.is-background {
   border-top: 1px solid var(--el-border-color);
+  border-radius: 0 0 0.875rem 0.875rem;
 }
 .opengraphica .ogr-layer-list .ogr-layer.is-background > .ogr-layer-main {
   height: 3.5rem;
@@ -28909,6 +28919,18 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .el-popover {
   --el-popover-border-radius: 0.875rem;
+}
+.opengraphica .el-popover > .el-menu {
+  border-radius: 0.875rem;
+}
+.opengraphica .el-popover > .el-menu > .el-menu-item:first-child {
+  border-radius: 0.875rem 0.875rem 0 0;
+}
+.opengraphica .el-popover > .el-menu > .el-menu-item:last-child {
+  border-radius: 0 0 0.875rem 0.875rem;
+}
+.opengraphica .el-popover > .el-menu > .el-menu-item:only-child {
+  border-radius: 0.875rem;
 }
 .opengraphica .el-radio-button {
   --el-border-radius-base: 0.75rem;

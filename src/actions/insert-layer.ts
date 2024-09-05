@@ -1,8 +1,8 @@
 import { reactive, markRaw } from 'vue';
 import {
     ColorModel, WorkingFileLayer,
-    WorkingFileEmptyLayer, WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer,
-    WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer,
+    WorkingFileEmptyLayer, WorkingFileGradientLayer, WorkingFileGroupLayer, WorkingFileRasterLayer,
+    WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer,
     InsertAnyLayerOptions
 } from '@/types';
 import { BaseAction } from './base';
@@ -81,6 +81,18 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                         ...sharedOptions,
                         ...this.insertLayerOptions
                     } as WorkingFileEmptyLayer<ColorModel>;
+                    break;
+                case 'gradient':
+                    newLayer = {
+                        ...sharedOptions,
+                        data: {
+                            start: { x: 0, y: 0 },
+                            end: { x: 0, y: 0 },
+                            focus: { x: 0, y: 0 },
+                            stops: [],
+                        },
+                        ...this.insertLayerOptions,
+                    } as WorkingFileGradientLayer<ColorModel>;
                     break;
                 case 'group':
                     newLayer = {

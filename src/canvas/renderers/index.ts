@@ -28,6 +28,7 @@ const renderers: Renderers = {
     '2d': {
         base: BaseLayerRenderer2d,
         empty: BaseLayerRenderer2d,
+        gradient: BaseLayerRenderer2d,
         group: GroupLayerRenderer2d,
         raster: RasterLayerRenderer2d,
         rasterSequence: RasterSequenceLayerRenderer2d,
@@ -37,6 +38,7 @@ const renderers: Renderers = {
     webgl: {
         base: BaseLayerRendererWebgl,
         empty: BaseLayerRendererWebgl,
+        gradient: BaseLayerRendererWebgl,
         group: GroupLayerRendererWebgl,
         raster: RasterLayerRendererWebgl,
         rasterSequence: RasterSequenceLayerRendererWebgl,

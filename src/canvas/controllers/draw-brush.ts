@@ -229,6 +229,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         const { width, height } = workingFileStore.state;
         let selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster' || layer.type === 'empty');
         let layerActions = [];
+        // Insert gradient layer if none selected
         if (selectedLayers.length === 0) {
             layerActions.push(new InsertLayerAction<InsertRasterLayerOptions>({
                 type: 'raster',
@@ -240,6 +241,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 },
             }));
         }
+        // Convert any empty layers to raster layers
         for (let i = selectedLayers.length - 1; i >= 0; i--) {
             const selectedLayer = selectedLayers[i];
             if (selectedLayer.type === 'empty') {
@@ -258,6 +260,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 selectedLayers.splice(i, 1);
             }
         }
+        // Finalize layer creation / conversion actions.
         if (layerActions.length > 0) {
             await historyStore.dispatch('runAction', {
                 action: new BundleAction('createDrawLayer', 'action.createDrawLayer', layerActions),

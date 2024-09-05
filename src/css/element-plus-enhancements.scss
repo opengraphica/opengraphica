@@ -673,6 +673,20 @@
 
     .el-popover {
         --el-popover-border-radius: 0.875rem;
+
+        > .el-menu {
+            border-radius: 0.875rem;
+
+            > .el-menu-item:first-child {
+                border-radius: 0.875rem 0.875rem 0 0;
+            }
+            > .el-menu-item:last-child {
+                border-radius: 0 0 0.875rem 0.875rem;
+            }
+            > .el-menu-item:only-child {
+                border-radius: 0.875rem;
+            }
+        }
     }
 
     .el-radio-button { 

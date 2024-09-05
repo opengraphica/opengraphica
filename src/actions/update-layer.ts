@@ -13,7 +13,7 @@ import layerRenderers from '@/canvas/renderers';
 
 import type {
     ColorModel, WorkingFileAnyLayer,
-    UpdateAnyLayerOptions, UpdateRasterLayerOptions, UpdateVectorLayerOptions,
+    UpdateAnyLayerOptions, UpdateGradientLayerOptions, UpdateRasterLayerOptions, UpdateVectorLayerOptions,
     WorkingFileRasterLayer, WorkingFileLayerDraftChunk, WorkingFileVectorLayer
 } from '@/types';
 
@@ -30,10 +30,10 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
 
     private oldVectorSourceSvgId: string | null = null;
 
-    constructor(updateLayerOptions: LayerOptions, explicitPreviousProps: Partial<WorkingFileAnyLayer<ColorModel>> = {}) {
+    constructor(updateLayerOptions: LayerOptions, explicitPreviousProps: Partial<LayerOptions> = {}) {
         super('updateLayer', 'action.updateLayer');
         this.updateLayerOptions = updateLayerOptions;
-        this.explicitPreviousProps = explicitPreviousProps;
+        this.explicitPreviousProps = explicitPreviousProps as never;
 	}
 
 	public async do() {

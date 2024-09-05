@@ -29,6 +29,7 @@ export default defineComponent({
         'overlay-crop-resize': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-crop-resize' */ `@/ui/overlay/overlay-crop-resize.vue`)),
         'overlay-deform-blur': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-deform-blur' */ `@/ui/overlay/overlay-deform-blur.vue`)),
         'overlay-draw-brush': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-draw-brush' */ `@/ui/overlay/overlay-draw-brush.vue`)),
+        'overlay-draw-gradient': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-draw-gradient' */ `@/ui/overlay/overlay-draw-gradient.vue`)),
         'overlay-effect': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-effect' */ `@/ui/overlay/overlay-effect.vue`)),
         'overlay-erase-brush': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-erase-brush' */ `@/ui/overlay/overlay-erase-brush.vue`)),
         'overlay-free-transform': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-free-transform' */ `@/ui/overlay/overlay-free-transform.vue`)),

@@ -2,7 +2,9 @@ import type { ColorModel, ColorModelName } from './color';
 import type { TextDocument } from './text';
 import type { VectorShape } from './vector';
 import type { MeasuringUnits, ResolutionUnits } from './metrics';
-import type { WorkingFileLayerBlendingMode, WorkingFileLayerFilter, WorkingFileLayerType } from './working-file';
+import type {
+    WorkingFileGradientLayer, WorkingFileLayerBlendingMode, WorkingFileLayerFilter, WorkingFileLayerType
+} from './working-file';
 
 export interface SerializedFileTimelineKey {
     timing: number[]; // Cubic beizer, array of 4
@@ -46,6 +48,11 @@ export interface SerializedFileLayer<T extends ColorModel = ColorModel> {
 
 export interface SerializedFileEmptyLayer<T extends ColorModel = ColorModel> extends SerializedFileLayer<T> {
     type: 'empty';
+}
+
+export interface SerializedFileGradientLayer<T extends ColorModel = ColorModel> extends SerializedFileLayer<T> {
+    type: 'gradient';
+    data: WorkingFileGradientLayer<T>['data'];
 }
 
 export interface SerializedFileGroupLayer<T extends ColorModel = ColorModel> extends SerializedFileLayer<T> {

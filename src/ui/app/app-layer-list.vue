@@ -261,11 +261,12 @@ export default defineComponent({
 
         function getIconClass(layer: WorkingFileAnyLayer) {
             switch (layer.type) {
-                case 'text': return 'bi-textarea-t';
+                case 'gradient': return 'bi-shadows';
+                case 'group': return (layer as WorkingFileGroupLayer).expanded ? 'bi-folder2-open' : 'bi-folder';
                 case 'raster': return 'bi-image';
                 case 'rasterSequence': return 'bi-images';
                 case 'vector': return 'bi-bezier2';
-                case 'group': return (layer as WorkingFileGroupLayer).expanded ? 'bi-folder2-open' : 'bi-folder';
+                case 'text': return 'bi-textarea-t';
             }
             return 'bi-question';
         }
