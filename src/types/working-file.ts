@@ -141,6 +141,14 @@ export interface WorkingFileEmptyLayer<T extends ColorModel = ColorModel> extend
     type: 'empty';
 }
 
+export interface WorkingFileGradientColorStop<T extends ColorModel = ColorModel> {
+    offset: number;
+    color: T;
+}
+export type WorkingFileGradientColorSpace = 'oklab' | 'srgb' | 'linearSrgb';
+export type WorkingFileGradientFillType = 'linear' | 'radial';
+export type WorkingFileGradientSpreadMethod = 'pad' | 'repeat' | 'reflect';
+
 export interface WorkingFileGradientLayer<T extends ColorModel = ColorModel> extends WorkingFileLayer<T> {
     type: 'gradient';
     data: {
@@ -156,10 +164,10 @@ export interface WorkingFileGradientLayer<T extends ColorModel = ColorModel> ext
             x: number;
             y: number;
         };
-        stops: Array<{
-            offset: number;
-            color: ColorModel;
-        }>;
+        stops: Array<WorkingFileGradientColorStop<T>>;
+        blendColorSpace: WorkingFileGradientColorSpace;
+        fillType: WorkingFileGradientFillType;
+        spreadMethod: WorkingFileGradientSpreadMethod;
     }
 }
 

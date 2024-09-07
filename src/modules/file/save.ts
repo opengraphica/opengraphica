@@ -11,9 +11,9 @@ import { getStoredSvgDataUrl } from '@/store/svg';
 
 import type {
     FileSystemFileHandle, SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel,
-    SerializedFileGroupLayer, SerializedFileTextLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer,
-    SerializedFileVectorLayer, WorkingFile, WorkingFileGroupLayer, WorkingFileTextLayer, WorkingFileRasterLayer,
-    WorkingFileRasterSequenceLayer, WorkingFileVectorLayer,
+    SerializedFileGradientLayer, SerializedFileGroupLayer, SerializedFileTextLayer, SerializedFileRasterLayer,
+    SerializedFileRasterSequenceLayer, SerializedFileVectorLayer, WorkingFile, WorkingFileGradientLayer,
+    WorkingFileGroupLayer, WorkingFileTextLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer,
 } from '@/types';
 
 interface SaveImageAsOptions {
@@ -100,7 +100,13 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
             visible: layer.visible,
             width: layer.width,
         };
-        if (layer.type === 'group') {
+        if (layer.type === 'gradient') {
+            serializedLayer = {
+                ...serializedLayer,
+                type: 'gradient',
+                data: (layer as WorkingFileGradientLayer<ColorModel>).data
+            } as SerializedFileGradientLayer<ColorModel>;
+        } else if (layer.type === 'group') {
             serializedLayer = {
                 ...serializedLayer,
                 type: 'group',

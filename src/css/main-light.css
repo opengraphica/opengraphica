@@ -10250,6 +10250,39 @@ body.ogr-full-page .opengraphica {
   vertical-align: top;
   white-space: nowrap;
 }
+.opengraphica .ogr-toolbar-draw-gradient__step-selection {
+  box-sizing: border-box;
+  height: 2rem;
+  border: var(--el-border);
+  border-radius: 0.5rem;
+  box-shadow: 0 0 0 0.125rem var(--el-input-bg-color, var(--el-fill-color-blank)) inset;
+  position: relative;
+  cursor: pointer;
+}
+.opengraphica .ogr-toolbar-draw-gradient__step-selection:before, .opengraphica .ogr-toolbar-draw-gradient__step-selection:after {
+  content: "";
+  display: block;
+  box-sizing: border-box;
+  background: url("../images/transparency-bg.png");
+  border: 0.125rem solid var(--el-input-bg-color, var(--el-fill-color-blank));
+  border-radius: 0.5rem;
+  width: 6rem;
+  height: 100%;
+  max-width: 50vw;
+}
+.opengraphica .ogr-toolbar-draw-gradient__step-selection:after {
+  background: var(--gradient);
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.opengraphica .ogr-toolbar-draw-gradient__step-selection:hover {
+  border-color: var(--el-border-color-hover);
+}
+.opengraphica .ogr-toolbar-draw-gradient__step-selection:focus {
+  border-color: var(--el-color-primary);
+  outline: none;
+}
 .opengraphica .ogr-selection {
   position: absolute;
   top: 0;
@@ -28785,7 +28818,7 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .el-horizontal-scrollbar-arrows > .el-button {
   box-shadow: 0 0 59px #dfdfdf;
-  z-index: 1;
+  z-index: 10;
 }
 .opengraphica .pl-el-scrollbar-arrow-size {
   padding-left: 2rem !important;

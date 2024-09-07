@@ -1,10 +1,10 @@
 import { camelCaseToKebabCase } from "@/lib/string";
 import { Vector2 } from 'three/src/math/Vector2';
 
-import basicMaterialVertexShaderSetup from '../renderers/webgl/shaders/basic-material.setup.vert';
-import basicMaterialVertexShaderMain from '../renderers/webgl/shaders/basic-material.main.vert';
-import basicMaterialFragmentShaderSetup from '../renderers/webgl/shaders/basic-material.setup.frag';
-import basicMaterialFragmentShaderMain from '../renderers/webgl/shaders/basic-material.main.frag';
+import basicMaterialVertexShaderSetup from '@/canvas/renderers/webgl/shaders/basic-material.setup.vert';
+import basicMaterialVertexShaderMain from '@/canvas/renderers/webgl/shaders/basic-material.main.vert';
+import basicMaterialFragmentShaderSetup from '@/canvas/renderers/webgl/shaders/basic-material.setup.frag';
+import basicMaterialFragmentShaderMain from '@/canvas/renderers/webgl/shaders/basic-material.main.frag';
 
 import type { IUniform } from 'three/src/renderers/shaders/UniformsLib';
 import type { CanvasFilter, CanvasFilterEditConfig, WorkingFileAnyLayer, WorkingFileLayerFilter } from '@/types';
@@ -130,7 +130,14 @@ export function generateShaderUniformsAndDefines(canvasFilters: CanvasFilter[], 
     return { defines, uniforms };
 }
 
-export function combineShaders(canvasFilters: CanvasFilter[], layer: Partial<WorkingFileAnyLayer>): CombinedShaderResult {
+interface CombineShadersOptions {
+    fragmentShaderMain?: string;
+    fragmentShaderSetup?: string;
+    vertexShaderMain?: string;
+    vertexShaderSetup?: string;
+}
+
+export function combineShaders(canvasFilters: CanvasFilter[], layer: Partial<WorkingFileAnyLayer>, options?: CombineShadersOptions): CombinedShaderResult {
     let vertexShader = '';
     let fragmentShader = '';
 
@@ -188,8 +195,10 @@ export function combineShaders(canvasFilters: CanvasFilter[], layer: Partial<Wor
         fragmentFilterCode += 'vec4 filterColorResult = gl_FragColor;\n' + fragmentShaderMainCalls.join('\n') + '\n    gl_FragColor = filterColorResult;';
     }
 
-    vertexShader = basicMaterialVertexShaderSetup + '\n' + vertexShader + '\n' + basicMaterialVertexShaderMain.replace('//[INJECT_FILTERS_HERE]', vertexFilterCode);
-    fragmentShader = basicMaterialFragmentShaderSetup + '\n' + fragmentShader + '\n' + basicMaterialFragmentShaderMain.replace('//[INJECT_FILTERS_HERE]', fragmentFilterCode);
+    vertexShader = (options?.vertexShaderSetup ?? basicMaterialVertexShaderSetup) + '\n' + vertexShader
+        + '\n' + (options?.vertexShaderMain ?? basicMaterialVertexShaderMain).replace('//[INJECT_FILTERS_HERE]', vertexFilterCode);
+    fragmentShader = (options?.fragmentShaderSetup ?? basicMaterialFragmentShaderSetup) + '\n' + fragmentShader
+        + '\n' + (options?.fragmentShaderMain ?? basicMaterialFragmentShaderMain).replace('//[INJECT_FILTERS_HERE]', fragmentFilterCode);
 
     return {
         vertexShader,

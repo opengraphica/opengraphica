@@ -1,6 +1,6 @@
 import fragmentShader from './brightness.frag';
 import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData, transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData } from '../color-space';
-import { colorToRgba, colorToHsla, linearRgbaToOklab, oklabToLinearRgba, lchaToLaba, labaToLcha } from '@/lib/color';
+import { colorToRgba, colorToHsla, linearSrgbaToOklab, oklabToLinearSrgba, lchaToLaba, labaToLcha } from '@/lib/color';
 
 import type { CanvasFilter, CanvasFilterEditConfig } from '@/types';
 
@@ -94,9 +94,9 @@ export default class BrightnessCanvasFilter implements CanvasFilter<BrightnessCa
                 newRgba.b += ((1.0 - newRgba.b) * brightness);
             }
         } else if (mode === BrightnessMode.LUMINANCE) {
-            const lcha = labaToLcha(linearRgbaToOklab(rgba));
+            const lcha = labaToLcha(linearSrgbaToOklab(rgba));
             lcha.l = Math.max(0.0, lcha.l + brightness);
-            newRgba = oklabToLinearRgba(lchaToLaba(lcha));
+            newRgba = oklabToLinearSrgba(lchaToLaba(lcha));
         }
 
         const intensity = rgba.r * 0.22 + rgba.g * 0.72 + rgba.b * 0.06;

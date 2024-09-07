@@ -25,6 +25,7 @@
                     v-if="displayMode === 'all' || actionGroupSectionName === 'tools'"
                     :is="actionGroupSectionName === 'tools' ? (direction === 'vertical' ? 'el-scrollbar' : 'el-horizontal-scrollbar-arrows') : 'v-fragment'"
                     style="height: auto"
+                    @scroll="onScrollTools"
                 >
                     <template v-for="actionGroup of actionGroupSection" :key="actionGroup.id">
                         <component :is="actionGroup.controls.length === 1 ? 'div' : 'el-button-group'" :class="{ 'ogr-single-button-group': actionGroup.controls.length === 1 }">
@@ -387,6 +388,10 @@ export default defineComponent({
             return icon;
         }
 
+        function onScrollTools() {
+            repositionToolGroupExpand();
+        }
+
         function onKeyDownControlButton(event: KeyboardEvent, control: LayoutShortcutGroupDefinitionControlButton) {
             if (event.key === 'Enter') {
                 onPressControlButton('popover', 0, control);
@@ -614,6 +619,7 @@ export default defineComponent({
             isTouchUser,
 
             getControlIcon,
+            onScrollTools,
             onAfterLeavePopover,
             onKeyDownControlButton,
             onTouchStartControlButton,

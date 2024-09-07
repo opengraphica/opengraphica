@@ -26,8 +26,8 @@ import type {
     ShowOpenFilePicker, FileSystemFileHandle,
     SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel,
     InsertAnyLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions, InsertVectorLayerOptions,
-    WorkingFileEmptyLayer, WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer,
-    WorkingFileVectorLayer, WorkingFileTextLayer, SerializedFileGroupLayer, SerializedFileRasterLayer,
+    WorkingFileEmptyLayer, WorkingFileGradientLayer, WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer,
+    WorkingFileVectorLayer, WorkingFileTextLayer, SerializedFileGradientLayer, SerializedFileGroupLayer, SerializedFileRasterLayer,
     SerializedFileRasterSequenceLayer, SerializedFileVectorLayer, SerializedFileTextLayer,
 } from '@/types';
 
@@ -481,7 +481,7 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                     })
                 );
             }
-            else if(readerSettle.value.type === 'svg') {
+            else if (readerSettle.value.type === 'svg') {
                 const image = readerSettle.value.result;
                 if (image.width > largestWidth) {
                     largestWidth = image.width;
@@ -648,6 +648,12 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
                 ...parsedLayer,
                 type: 'empty',
             } as WorkingFileEmptyLayer<ColorModel>;
+        } else if (layer.type === 'gradient') {
+            parsedLayer = {
+                ...parsedLayer,
+                type: 'gradient',
+                data: (layer as SerializedFileGradientLayer<ColorModel>).data,
+            } as WorkingFileGradientLayer<ColorModel>;
         } else if (layer.type === 'group') {
             parsedLayer = {
                 ...parsedLayer,

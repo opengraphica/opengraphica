@@ -1,6 +1,6 @@
 import fragmentShader from './saturation.frag';
 import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData } from '../color-space';
-import { linearRgbaToOklab, oklabToLinearRgba, lchaToLaba, labaToLcha } from '@/lib/color';
+import { linearSrgbaToOklab, oklabToLinearSrgba, lchaToLaba, labaToLcha } from '@/lib/color';
 
 import type { CanvasFilter, CanvasFilterEditConfig } from '@/types';
 
@@ -36,7 +36,7 @@ export default class SaturationCanvasFilter implements CanvasFilter<SaturationCa
         const saturation = (this.params.saturation ?? 0.0);
 
         let rgba = transfer8BitImageDataToLinearSrgb(sourceImageData, dataPosition);
-        const laba = linearRgbaToOklab(rgba);
+        const laba = linearSrgbaToOklab(rgba);
         const lcha = labaToLcha(laba);
         // let s = Math.sqrt(laba.a * laba.a + laba.b * laba.b) / laba.l;
         // const { l, c } = lcha;
@@ -53,7 +53,7 @@ export default class SaturationCanvasFilter implements CanvasFilter<SaturationCa
             lcha.c = lcha.c * (1.0 - Math.abs(saturation));
         }
         lcha.c = Math.min(1.0, Math.max(0.0, lcha.c));
-        rgba = oklabToLinearRgba(lchaToLaba(lcha));
+        rgba = oklabToLinearSrgba(lchaToLaba(lcha));
 
         transferLinearSrgbTo8BitImageData(rgba, targetImageData, dataPosition);
     }

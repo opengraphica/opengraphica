@@ -1,12 +1,25 @@
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
-import { DoubleSide, CustomBlending, ZeroFactor, OneFactor } from 'three/src/constants';
+import { Texture } from 'three/src/textures/Texture';
+import { Vector2 } from 'three/src/math/Vector2';
+import { DoubleSide, CustomBlending, ZeroFactor, OneFactor, sRGBEncoding, LinearFilter } from 'three/src/constants';
+
 import prepareGpuTextureMaterialFragmentShader from './prepare-gpu-texture-material.frag';
 import prepareGpuTextureMaterialVertexShader from './prepare-gpu-texture-material.vert';
 import textureCompositorMaterialFragmentShader from './texture-compositor-material.frag';
 import textureCompositorMaterialVertexShader from './texture-compositor-material.vert';
 
+import { srgbaToLinearSrgba, linearSrgbaToSrgba, linearSrgbaToOklab, oklabToLinearSrgba } from '@/lib/color';
+import { lerp } from '@/lib/math';
+
 import type { CombinedShaderResult } from '@/canvas/filters';
-import type { Texture } from 'three';
+import type {
+    WorkingFileGradientLayer,
+    WorkingFileGradientColorStop, WorkingFileGradientColorSpace, RGBAColor,
+} from '@/types';
+
+/*---------------------*\
+| Raster Layer Material |
+\*---------------------*/
 
 export function createRasterShaderMaterial(texture: Texture | null, combinedShaderResult: CombinedShaderResult): ShaderMaterial {
     return new ShaderMaterial({
@@ -26,6 +39,177 @@ export function createRasterShaderMaterial(texture: Texture | null, combinedShad
         },
     });
 }
+
+/*-----------------------*\
+| Gradient Layer Material |
+\*-----------------------*/
+
+enum GradientColorSpace {
+    'oklab' = 0,
+    'srgb' = 1,
+    'linearSrgb' = 2,
+}
+enum GradientFillType {
+    'linear' = 0,
+    'radial' = 1,
+}
+enum GradientSpreadMethod {
+    'pad' = 0,
+    'repeat' = 1,
+    'reflect' = 2,
+}
+function createGradientStopTexture(stops: WorkingFileGradientColorStop<RGBAColor>[], colorSpace: WorkingFileGradientColorSpace, textureSize: number = 64): Texture {
+    const gradientImageData = new ImageData(textureSize, 1);
+    stops.sort((a, b) => a.offset < b.offset ? -1 : 1);
+    let leftStopIndex = stops[0].offset > 0 ? -1 : 0;
+    let leftOffset = 0;
+    let leftColor = stops[0].color as RGBAColor;
+    let rightOffset = stops[leftStopIndex + 1]?.offset ?? 0 > 0 ? stops[1].offset : stops[0].offset;
+    let rightColor = (stops[leftStopIndex + 1]?.offset ?? 0 > 0 ? stops[1].color : stops[0].color) as RGBAColor;
+    for (let i = 0; i < textureSize; i++) {
+        const currentStopOffset = i / textureSize;
+        if (currentStopOffset > rightOffset) {
+            leftStopIndex += 1;
+            const leftStop = stops[Math.max(leftStopIndex, stops.length - 1)];
+            const rightStop = stops[Math.max(leftStopIndex + 1, stops.length - 1)];
+            leftOffset = leftStop.offset;
+            leftColor = leftStop.color as RGBAColor;
+            rightOffset = leftStopIndex + 1 > stops.length - 1 ? 1 : rightStop.offset;
+            rightColor = rightStop.color as RGBAColor;
+        }
+        const interpolateOffset = (rightOffset - leftOffset > 0) ? currentStopOffset - leftOffset / rightOffset - leftOffset : 0;
+        let interpolatedColor = leftColor;
+        if (colorSpace === 'oklab') {
+            const leftColorTransfer = linearSrgbaToOklab(srgbaToLinearSrgba(leftColor));
+            const rightColorTransfer = linearSrgbaToOklab(srgbaToLinearSrgba(rightColor));
+            interpolatedColor = linearSrgbaToSrgba(oklabToLinearSrgba({
+                l: lerp(leftColorTransfer.l, rightColorTransfer.l, interpolateOffset),
+                a: lerp(leftColorTransfer.a, rightColorTransfer.a, interpolateOffset),
+                b: lerp(leftColorTransfer.b, rightColorTransfer.b, interpolateOffset),
+                alpha: lerp(leftColorTransfer.alpha, rightColorTransfer.alpha, interpolateOffset),
+            }));
+        } else if (colorSpace === 'linearSrgb') {
+            const leftColorTransfer = srgbaToLinearSrgba(leftColor);
+            const rightColorTransfer = srgbaToLinearSrgba(rightColor);
+            interpolatedColor = linearSrgbaToSrgba({
+                r: lerp(leftColorTransfer.r, rightColorTransfer.r, interpolateOffset),
+                g: lerp(leftColorTransfer.g, rightColorTransfer.g, interpolateOffset),
+                b: lerp(leftColorTransfer.b, rightColorTransfer.b, interpolateOffset),
+                alpha: lerp(leftColorTransfer.alpha, rightColorTransfer.alpha, interpolateOffset),
+            });
+        } else {
+            interpolatedColor = {
+                is: 'color',
+                r: lerp(leftColor.r, rightColor.r, interpolateOffset),
+                g: lerp(leftColor.g, rightColor.g, interpolateOffset),
+                b: lerp(leftColor.b, rightColor.b, interpolateOffset),
+                alpha: lerp(leftColor.alpha, rightColor.alpha, interpolateOffset),
+                style: leftColor.style,
+            }
+        }
+        gradientImageData.data[(i * 4)] = Math.round(255 * interpolatedColor.r);
+        gradientImageData.data[(i * 4) + 1] = Math.round(255 * interpolatedColor.g);
+        gradientImageData.data[(i * 4) + 2] = Math.round(255 * interpolatedColor.b);
+        gradientImageData.data[(i * 4) + 3] = Math.round(255 * interpolatedColor.alpha);
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = gradientImageData.width;
+    canvas.height = gradientImageData.height;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+        ctx.putImageData(gradientImageData, 0, 0);
+    }
+    const texture = new Texture(canvas);
+    texture.encoding = sRGBEncoding;
+    texture.generateMipmaps = true;
+    texture.magFilter = LinearFilter;
+    texture.minFilter = LinearFilter;
+    texture.needsUpdate = true;
+    return texture;
+}
+export function createGradientShaderMaterial(params: WorkingFileGradientLayer<RGBAColor>['data'], canvasWidth: number, canvasHeight: number, combinedShaderResult: CombinedShaderResult): ShaderMaterial {
+    return new ShaderMaterial({
+        transparent: true,
+        depthTest: false,
+        vertexShader: combinedShaderResult.vertexShader,
+        fragmentShader: combinedShaderResult.fragmentShader,
+        side: DoubleSide,
+        defines: {
+            cCanvasWidth: canvasWidth,
+            cCanvasHeight: canvasHeight,
+            cBlendColorSpace: GradientColorSpace[params.blendColorSpace],
+            cFillType: GradientFillType[params.fillType],
+            cSpreadMethod: GradientSpreadMethod[params.spreadMethod],
+            ...combinedShaderResult.defines,
+        },
+        uniforms: {
+            gradientMap: { value: createGradientStopTexture(params.stops, params.blendColorSpace) },
+            start: { value: new Vector2(params.start.x, params.start.y) },
+            end: { value: new Vector2(params.end.x, params.end.y) },
+            focus: { value: new Vector2(params.focus.x, params.focus.y) },
+            ...combinedShaderResult.uniforms
+        },
+        userData: {
+            blendColorSpace: params.blendColorSpace,
+            stops: params.stops,
+        },
+    });
+}
+export function updateGradientShaderMaterial(material: ShaderMaterial, params: WorkingFileGradientLayer<RGBAColor>['data'], canvasWidth: number, canvasHeight: number) {
+    material.defines.cCanvasWidth = canvasWidth;
+    material.defines.cCanvasHeight = canvasHeight;
+    material.defines.cBlendColorSpace = GradientColorSpace[params.blendColorSpace];
+    material.defines.cFillType = GradientFillType[params.fillType];
+    material.defines.spreadMethod = GradientSpreadMethod[params.spreadMethod];
+    let hasStopsChanged = params.stops.length !== material.userData.stops?.length;
+    if (!hasStopsChanged) {
+        for (const [stopIndex, stop] of params.stops.entries()) {
+            if (
+                material.userData.stops?.[stopIndex].offset !== stop.offset ||
+                material.userData.stops?.[stopIndex]?.color?.r !== stop.color.r ||
+                material.userData.stops?.[stopIndex]?.color?.g !== stop.color.g ||
+                material.userData.stops?.[stopIndex]?.color?.b !== stop.color.b ||
+                material.userData.stops?.[stopIndex]?.color?.alpha !== stop.color.alpha
+            ) {
+                hasStopsChanged = true;
+                break;
+            }
+        }
+    }
+    if (hasStopsChanged || params.blendColorSpace !== material.userData.blendColorSpace) {
+        material.uniforms.gradientMap.value?.dispose();
+        material.uniforms.gradientMap.value = createGradientStopTexture(params.stops, params.blendColorSpace);
+    }
+    if (params.start.x !== material.uniforms.start.value.x || params.start.y !== material.uniforms.start.value.y) {
+        material.uniforms.start.value = new Vector2(params.start.x, params.start.y);
+    }
+    if (params.end.x !== material.uniforms.end.value.x || params.end.y !== material.uniforms.end.value.y) {
+        material.uniforms.end.value = new Vector2(params.end.x, params.end.y);
+    }
+    if (params.focus.x !== material.uniforms.focus.value.x || params.focus.y !== material.uniforms.focus.value.y) {
+        material.uniforms.focus.value = new Vector2(params.focus.x, params.focus.y);
+    }
+    material.userData.blendColorSpace = params.blendColorSpace;
+    material.userData.stops = params.stops;
+    material.needsUpdate = true;
+}
+export function cleanGradientShaderMaterial(material: ShaderMaterial) {
+    material.uniforms.gradientMap.value?.dispose();
+    material.uniforms.gradientMap.value = null;
+    delete material.uniforms.gradientMap;
+    material.uniforms.start.value = null;
+    delete material.uniforms.start;
+    material.uniforms.end.value = null;
+    delete material.uniforms.end;
+    material.uniforms.focus.value = null;
+    delete material.uniforms.focus;
+    material.userData = {};
+    material.needsUpdate = true;
+}
+
+/*----------------------*\
+| Composite Two Textures |
+\*----------------------*/
 
 export function createRasterTextureCompositorShaderMaterial(
     baseTexture: Texture,
@@ -88,6 +272,10 @@ export function cleanRasterTextureCompositorShaderMaterial(material: ShaderMater
     delete material.uniforms.overlayMap;
     material.needsUpdate = true;
 }
+
+/*---------------------------------*\
+| Prepare GPU Texture Alpha Channel |
+\*---------------------------------*/
 
 export function createPrepareGpuTextureShaderMaterial(texture: Texture): ShaderMaterial {
     return new ShaderMaterial({

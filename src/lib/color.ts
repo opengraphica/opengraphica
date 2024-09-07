@@ -227,10 +227,50 @@ export function colorToHsva(color: Partial<ColorModel>, colorModelName: ColorMod
 }
 
 /**
+ * Converts a color defined in linear standard RGB color space to perceptual space.
+ */
+export function linearSrgbaToSrgba(color: Partial<RGBAColor>): RGBAColor {
+    let { r, g, b, alpha, style } = color as RGBAColor;
+    r = linearSrgbChannelToSrgbChannel(r);
+    g = linearSrgbChannelToSrgbChannel(g);
+    b = linearSrgbChannelToSrgbChannel(b);
+    const newColor: RGBAColor = {
+        is: 'color',
+        r,
+        g,
+        b,
+        alpha,
+        style,
+    };
+    newColor.style = colorToHex(newColor, 'rgba');
+    return newColor;
+}
+
+/**
+ * Converts a color defined in standard RGB (perceptual) color space to linear space.
+ */
+export function srgbaToLinearSrgba(color: Partial<RGBAColor>): RGBAColor {
+    let { r, g, b, alpha, style } = color as RGBAColor;
+    r = srgbChannelToLinearSrgbChannel(r);
+    g = srgbChannelToLinearSrgbChannel(g);
+    b = srgbChannelToLinearSrgbChannel(b);
+    const newColor: RGBAColor = {
+        is: 'color',
+        r,
+        g,
+        b,
+        alpha,
+        style,
+    };
+    newColor.style = colorToHex(newColor, 'rgba');
+    return newColor;
+}
+
+/**
  * Adapted from https://github.com/Evercoder/culori/blob/main/src/oklab/convertLrgbToOklab.js
  * @license MIT https://github.com/Evercoder/culori/blob/main/LICENSE
  */
-export function linearRgbaToOklab(color: Partial<RGBAColor>): LABAColor {
+export function linearSrgbaToOklab(color: Partial<RGBAColor>): LABAColor {
     const { r, g, b, alpha, style } = color as RGBAColor;
     const L = Math.cbrt(
         0.41222147079999993 * r + 0.5363325363 * g + 0.0514459929 * b
@@ -255,7 +295,7 @@ export function linearRgbaToOklab(color: Partial<RGBAColor>): LABAColor {
  * Adapted from https://github.com/Evercoder/culori/blob/main/src/oklab/convertOklabToLrgb.js
  * @license MIT https://github.com/Evercoder/culori/blob/main/LICENSE
  */
-export function oklabToLinearRgba(color: Partial<LABAColor>): RGBAColor {
+export function oklabToLinearSrgba(color: Partial<LABAColor>): RGBAColor {
     const { l, a, b, alpha, style } = color as LABAColor;
     let L = Math.pow(
         l * 0.99999999845051981432 +
@@ -394,7 +434,7 @@ function findCusp(a: number, b: number): LC {
 	const sCusp = computeMaxSaturation(a, b);
 
 	// Convert to linear sRGB to find the first point where at least one of r,g or b >= 1:
-	const rgbAtMmax = oklabToLinearRgba({ l: 1, a: sCusp * a, b: sCusp * b });
+	const rgbAtMmax = oklabToLinearSrgba({ l: 1, a: sCusp * a, b: sCusp * b });
 	const lCusp = Math.cbrt(1 / Math.max(Math.max(rgbAtMmax.r, rgbAtMmax.g), rgbAtMmax.b));
 	const cCusp = lCusp * sCusp;
 
@@ -447,13 +487,13 @@ export function okhsvToRgba(hsva: HSVAColor): RGBAColor {
 	C = C * L_new / L;
 	L = L_new;
 
-	const rgbScale = oklabToLinearRgba({ l: lVt, a: a_ * cVt, b: b_ * cVt });
+	const rgbScale = oklabToLinearSrgba({ l: lVt, a: a_ * cVt, b: b_ * cVt });
 	const scale_L = Math.cbrt(1 / Math.max(Math.max(rgbScale.r, rgbScale.g), Math.max(rgbScale.b, 0)));
 
 	L = L * scale_L;
 	C = C * scale_L;
 
-	const rgb = oklabToLinearRgba({ l: L, a: C * a_, b: C * b_ });
+	const rgb = oklabToLinearSrgba({ l: L, a: C * a_, b: C * b_ });
 	return {
         is: 'color',
 		r: linearSrgbChannelToSrgbChannel(rgb.r) || 0,
@@ -467,7 +507,7 @@ export function okhsvToRgba(hsva: HSVAColor): RGBAColor {
 export function rgbaToOkhsv(rgba: RGBAColor): HSVAColor {
     const { r, g, b, alpha, style } = rgba;
 
-	const lab = linearRgbaToOklab({
+	const lab = linearSrgbaToOklab({
 		r: srgbChannelToLinearSrgbChannel(r),
 		g: srgbChannelToLinearSrgbChannel(g),
 		b: srgbChannelToLinearSrgbChannel(b),
@@ -498,7 +538,7 @@ export function rgbaToOkhsv(rgba: RGBAColor): HSVAColor {
 	const cVt = cV * lVt / lV;
 
 	// we can then use these to invert the step that compensates for the toe and the curved top part of the triangle:
-	const rgbScale = oklabToLinearRgba({ l: lVt, a: a_ * cVt, b: b_ * cVt });
+	const rgbScale = oklabToLinearSrgba({ l: lVt, a: a_ * cVt, b: b_ * cVt });
 	const scaleL = Math.cbrt(1 / Math.max(Math.max(rgbScale.r, rgbScale.g), Math.max(rgbScale.b, 0)));
 
 	L = L / scaleL;

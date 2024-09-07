@@ -6,7 +6,14 @@
                 <span class="ogr-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
             </div>
             <el-horizontal-scrollbar-arrows>
-                <el-radio-group v-model="fillType">
+                <div
+                    role="button"
+                    tabindex="0"
+                    class="ogr-toolbar-draw-gradient__step-selection"
+                    :style="{ '--gradient': selectedGradientBackground }"
+                >
+                </div>
+                <el-radio-group v-model="fillType" size="small" class="ml-3">
                     <el-radio-button label="linear">
                         {{ $t('toolbar.drawGradient.fillType.linear') }}
                     </el-radio-button>
@@ -14,14 +21,14 @@
                         {{ $t('toolbar.drawGradient.fillType.radial') }}
                     </el-radio-button>
                 </el-radio-group>
-                <el-input-group :prepend-tooltip="$t('toolbar.drawGradient.colorSpace.label')" class="ml-3">
+                <el-input-group :prepend-tooltip="$t('toolbar.drawGradient.blendColorSpace.label')" class="ml-3">
                     <template #prepend>
                         <span class="bi bi-rainbow" aria-hidden="true" />
                     </template>
-                    <el-select :aria-label="$t('toolbar.drawGradient.colorSpace.label')" v-model="colorSpace" size="small" style="width: 6.25rem">
-                        <el-option :label="$t('toolbar.drawGradient.colorSpace.oklab')" value="oklab" />
-                        <el-option :label="$t('toolbar.drawGradient.colorSpace.perceptualRgb')" value="perceptualRgb" />
-                        <el-option :label="$t('toolbar.drawGradient.colorSpace.linearRgb')" value="linearRgb" />
+                    <el-select :aria-label="$t('toolbar.drawGradient.blendColorSpace.label')" v-model="blendColorSpace" size="small" style="width: 6.25rem">
+                        <el-option :label="$t('toolbar.drawGradient.blendColorSpace.oklab')" value="oklab" />
+                        <el-option :label="$t('toolbar.drawGradient.blendColorSpace.srgb')" value="srgb" />
+                        <el-option :label="$t('toolbar.drawGradient.blendColorSpace.linearSrgb')" value="linearSrgb" />
                     </el-select>
                 </el-input-group>
                 <el-input-group :prepend-tooltip="$t('toolbar.drawGradient.spreadMethod.label')" class="ml-3">
@@ -42,7 +49,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed, toRefs, watch } from 'vue';
 
-import { colorSpace, fillType, spreadMethod } from '@/canvas/store/draw-gradient-state';
+import { activeColorStops, blendColorSpace, fillType, spreadMethod } from '@/canvas/store/draw-gradient-state';
 import { appliedSelectionMask, activeSelectionMask } from '@/canvas/store/selection-state';
 import historyStore from '@/store/history';
 import workingFileStore, { WorkingFileState } from '@/store/working-file';
@@ -60,6 +67,7 @@ import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSlider from 'element-plus/lib/components/slider/index';
 import ElTooltip from 'element-plus/lib/components/tooltip/index';
 
+import { srgbaToLinearSrgba, linearSrgbaToOklab } from '@/lib/color';
 import appEmitter from '@/lib/emitter';
 
 export default defineComponent({
@@ -91,15 +99,36 @@ export default defineComponent({
     setup(props, { emit }) {
         const { selectedLayerIds } = toRefs(workingFileStore.state);
 
+        const selectedGradientBackground = computed<string>(() => {
+            let previewGradient = '';
+            if (blendColorSpace.value === 'oklab') {
+                previewGradient = 'linear-gradient(in oklab 90deg, ' + activeColorStops.value.map((colorStop) => {
+                    const { l, a, b, alpha } = linearSrgbaToOklab(srgbaToLinearSrgba(colorStop.color));
+                    return `oklab(${l * 100}% ${a} ${b} / ${alpha}) ${colorStop.offset * 100}%`
+                }).join(', ') + ')';
+            } else if (blendColorSpace.value === 'linearSrgb') { 
+                previewGradient = 'linear-gradient(in srgb-linear 90deg, ' + activeColorStops.value.map((colorStop) => {
+                    return `${colorStop.color.style} ${colorStop.offset * 100}%`
+                }).join(', ') + ')';
+            }
+            if (!window?.CSS?.supports || !window.CSS.supports('background-image', previewGradient)) {
+                previewGradient = 'linear-gradient(90deg, ' + activeColorStops.value.map((colorStop) => {
+                    return `${colorStop.color.style} ${colorStop.offset * 100}%`
+                }).join(', ') + ')';
+            }
+            return previewGradient;
+        });
+
         const hasSelection = computed<boolean>(() => {
             return !(appliedSelectionMask.value == null && activeSelectionMask.value == null);
         });
 
         return {
+            selectedGradientBackground,
             selectedLayerIds,
             hasSelection,
 
-            colorSpace,
+            blendColorSpace,
             fillType,
             spreadMethod,
         };

@@ -5,6 +5,7 @@ import { CopyShader } from '../shaders/CopyShader';
 import { ShaderPass } from './ShaderPass';
 import { MaskPass } from './MaskPass';
 import { ClearMaskPass } from './MaskPass';
+import { FloatType, RGBAFormat, UnsignedByteType } from 'three/src/constants';
 
 import type { Pass } from './Pass';
 import type { WebGLRenderer } from 'three';
@@ -35,7 +36,15 @@ class EffectComposer {
             this._width = size.width;
             this._height = size.height;
 
-            renderTarget = new WebGLRenderTarget(this._width * this._pixelRatio, this._height * this._pixelRatio);
+            const gl = renderer.getContext();
+            const extFloatBlend = gl.getExtension('EXT_float_blend');
+
+            renderTarget = new WebGLRenderTarget(this._width * this._pixelRatio, this._height * this._pixelRatio, {
+                format: RGBAFormat,
+                type: extFloatBlend ? FloatType : UnsignedByteType,
+                depthBuffer: false,
+                stencilBuffer: false,
+            });
             renderTarget.texture.name = 'EffectComposer.rt1';
 
         } else {

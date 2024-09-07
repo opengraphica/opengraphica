@@ -2351,7 +2351,41 @@ body.ogr-full-page {
         vertical-align: top;
         white-space: nowrap;
     }
+    .ogr-toolbar-draw-gradient__step-selection {
+        box-sizing: border-box;
+        height: 2rem;
+        border: var(--el-border);
+        border-radius: 0.5rem;
+        box-shadow: 0 0 0 0.125rem var(--el-input-bg-color, var(--el-fill-color-blank)) inset;
+        position: relative;
+        cursor: pointer;
 
+        &:before, &:after {
+            content: '';
+            display: block;
+            box-sizing: border-box;
+            background: url("../images/transparency-bg.png");
+            border: 0.125rem solid var(--el-input-bg-color, var(--el-fill-color-blank));
+            border-radius: 0.5rem;
+            width: 6rem;
+            height: 100%;
+            max-width: 50vw;
+        }
+        &:after {
+            background: var(--gradient);
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        &:hover {
+            border-color: var(--el-border-color-hover);
+        }
+        &:focus {
+            border-color: var(--el-color-primary);
+            outline: none;
+        }
+    }
 
     .ogr-selection {
         position: absolute;

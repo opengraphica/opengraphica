@@ -10,6 +10,7 @@ import TextLayerRenderer2d from './2d/text';
 import VectorLayerRenderer2d from './2d/vector';
 
 import BaseLayerRendererWebgl from './webgl/base';
+import GradientLayerRendererWebgl from './webgl/gradient';
 import GroupLayerRendererWebgl from './webgl/group';
 import RasterLayerRendererWebgl from './webgl/raster';
 import RasterSequenceLayerRendererWebgl from './webgl/raster-sequence';
@@ -38,7 +39,7 @@ const renderers: Renderers = {
     webgl: {
         base: BaseLayerRendererWebgl,
         empty: BaseLayerRendererWebgl,
-        gradient: BaseLayerRendererWebgl,
+        gradient: GradientLayerRendererWebgl,
         group: GroupLayerRendererWebgl,
         raster: RasterLayerRendererWebgl,
         rasterSequence: RasterSequenceLayerRendererWebgl,
@@ -54,6 +55,9 @@ export function assignLayerRenderer(layer: WorkingFileAnyLayer<ColorModel>) {
     switch (layer.type) {
         case 'empty':
             layer.renderer = markRaw(new renderers[renderer].empty());
+            break;
+        case 'gradient':
+            layer.renderer = markRaw(new renderers[renderer].gradient());
             break;
         case 'group':
             layer.renderer = markRaw(new renderers[renderer].group());

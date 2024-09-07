@@ -864,11 +864,11 @@
         },
         "drawGradient": {
             "newGradientLayerName": "New Gradient",
-            "colorSpace": {
+            "blendColorSpace": {
                 "label": "Color Space",
                 "oklab": "Oklab",
-                "perceptualRgb": "Perceptual RGB",
-                "linearRgb": "Linear RGB"
+                "srgb": "sRGB",
+                "linearSrgb": "Linear sRGB"
             },
             "fillType": {
                 "label": "Fill Type",

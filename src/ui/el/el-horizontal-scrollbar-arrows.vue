@@ -32,11 +32,11 @@ export default defineComponent({
     name: 'ElHorizontalScrollbarArrows',
     components: {
         ElButton,
-        ElScrollbar
+        ElScrollbar,
     },
-    props: {
-
-    },
+    emits: [
+        'scroll',
+    ],
     setup(props, { emit }) {
         const scrollOffsetPadding = 4;
 
@@ -80,6 +80,7 @@ export default defineComponent({
         function onScroll(scrollInfo: any) {
             scrollLeft.value = scrollInfo.scrollLeft;
             handleScrollChange();
+            emit('scroll', scrollInfo);
         }
 
         function getScrollLeftMin() {
@@ -103,16 +104,14 @@ export default defineComponent({
             if (!scrollbar.value || !scrollContentEl.value) return;
             
             const scrollViewWidth = getScrollViewWidth();
-            const scrollChildren = Array.from(scrollContentEl.value.childNodes);
+            const scrollChildren = Array.from(scrollContentEl.value.childNodes).filter(child => child instanceof HTMLElement) as HTMLElement[];
 
             // Find the first element that is right of the left side of the scroll view
             let leftChildIndex = -1;
             for (const [childIndex, child] of scrollChildren.entries()) {
-                if (child instanceof HTMLElement) {
-                    if (child.offsetLeft >= scrollLeft.value) {
-                        leftChildIndex = childIndex;
-                        break;
-                    }
+                if (child.offsetLeft >= scrollLeft.value) {
+                    leftChildIndex = childIndex;
+                    break;
                 }
             }
             if (leftChildIndex == -1) {
@@ -123,15 +122,17 @@ export default defineComponent({
             let traversedWidth = 0;
             for (let i = leftChildIndex - 1; i >= 0; i--) {
                 const child = scrollChildren[i];
-                if (child instanceof HTMLElement) {
-                    const clientRect = child.getBoundingClientRect();
-                    traversedWidth += clientRect.width;
-                    if (traversedWidth <= scrollViewWidth || Math.abs(i - leftChildIndex) <= 1) {
+                const clientRect = child.getBoundingClientRect();
+                traversedWidth += clientRect.width;
+                if (traversedWidth <= scrollViewWidth || Math.abs(i - leftChildIndex) <= 1) {
+                    if (i === 0) {
+                        scrollLeftTarget = 0;    
+                    } else {
                         scrollLeftTarget = child.offsetLeft - scrollOffsetPadding;
                     }
-                    if (traversedWidth > scrollViewWidth) {
-                        break;
-                    }
+                }
+                if (traversedWidth > scrollViewWidth) {
+                    break;
                 }
             }
 
@@ -155,6 +156,8 @@ export default defineComponent({
                     }
                 }
             }
+
+            scrollLeftTarget = Math.min(scrollLeftTarget ?? 0, getScrollLeftMax());
 
             if (!isScrollAnimating) {
                 scrollAnimate();

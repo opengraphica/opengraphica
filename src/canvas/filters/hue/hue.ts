@@ -1,6 +1,6 @@
 import fragmentShader from './hue.frag';
 import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData, transfer8BitImageDataToSrgb, transferSrgbTo8BitImageData } from '../color-space';
-import { colorToRgba, colorToHsla, linearRgbaToOklab, oklabToLinearRgba, lchaToLaba, labaToLcha } from '@/lib/color';
+import { colorToRgba, colorToHsla, linearSrgbaToOklab, oklabToLinearSrgba, lchaToLaba, labaToLcha } from '@/lib/color';
 
 import type { CanvasFilter, CanvasFilterEditConfig } from '@/types';
 
@@ -57,9 +57,9 @@ export default class HueCanvasFilter implements CanvasFilter<HueCanvasFilterPara
             : transfer8BitImageDataToLinearSrgb(sourceImageData, dataPosition);
 
         if (this.params.colorSpace === HueColorSpace.OKLAB) {
-            const lcha = labaToLcha(linearRgbaToOklab(rgba));
+            const lcha = labaToLcha(linearSrgbaToOklab(rgba));
             lcha.h += rotate * 360;
-            rgba = oklabToLinearRgba(lchaToLaba(lcha));
+            rgba = oklabToLinearSrgba(lchaToLaba(lcha));
         } else {
             const hsla = colorToHsla(rgba, 'rgba');
             hsla.h += rotate;

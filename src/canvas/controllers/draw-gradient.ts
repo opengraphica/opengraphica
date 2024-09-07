@@ -2,7 +2,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { nextTick, watch, WatchStopHandle } from 'vue';
 
 import BaseCanvasMovementController from './base-movement';
-import { cursorHoverPosition, colorStopHandleRadius, positionHandleRadius } from '@/canvas/store/draw-gradient-state';
+import {
+    cursorHoverPosition, colorStopHandleRadius, positionHandleRadius,
+    activeColorStops, blendColorSpace, fillType, spreadMethod,
+} from '@/canvas/store/draw-gradient-state';
 import { blitActiveSelectionMask, activeSelectionMask, appliedSelectionMask } from '@/canvas/store/selection-state';
 
 import { isOffscreenCanvasSupported } from '@/lib/feature-detection';
@@ -22,7 +25,7 @@ import { UpdateLayerAction } from '@/actions/update-layer';
 import type { InsertGradientLayerOptions, UpdateGradientLayerOptions, WorkingFileAnyLayer, WorkingFileGradientLayer } from '@/types';
 
 const devicePixelRatio = window.devicePixelRatio || 1;
-const controlPointNames: Array<keyof Omit<WorkingFileGradientLayer['data'], 'stops'>> = ['end', 'start', 'focus'];
+const controlPointNames: Array<keyof Pick<WorkingFileGradientLayer['data'], 'start' | 'end' | 'focus'>> = ['end', 'start', 'focus'];
 
 export default class CanvasDrawGradientController extends BaseCanvasMovementController {
 
@@ -34,8 +37,8 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
     private selectedLayers: WorkingFileGradientLayer[] = [];
     private editingLayers: WorkingFileGradientLayer[] = [];
     private editingLayersStartData: Array<WorkingFileGradientLayer['data']> | null = null;
-    private editingControlPoint: keyof Omit<WorkingFileGradientLayer['data'], 'stops'> | null = null;
-    private hoveringControlPoint: keyof Omit<WorkingFileGradientLayer['data'], 'stops'> | null = null;
+    private editingControlPoint: keyof Pick<WorkingFileGradientLayer['data'], 'start' | 'end' | 'focus'> | null = null;
+    private hoveringControlPoint: keyof Pick<WorkingFileGradientLayer['data'], 'start' | 'end' | 'focus'> | null = null;
 
     onEnter(): void {
         super.onEnter();
@@ -168,6 +171,17 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
             const { width, height } = workingFileStore.state;
             let layerActions = [];
             selectedLayers = selectedLayers.filter(layer => layer.type === 'empty');
+
+            const newGradientData: InsertGradientLayerOptions['data'] = {
+                start: { x: start.x, y: start.y },
+                end: { x: start.x, y: start.y },
+                focus: { x: start.x, y: start.y },
+                stops: JSON.parse(JSON.stringify(activeColorStops.value)),
+                blendColorSpace: blendColorSpace.value,
+                fillType: fillType.value,
+                spreadMethod: spreadMethod.value,
+            }
+
             // Insert gradient layer if none selected
             if (selectedLayers.length === 0) {
                 layerActions.push(new InsertLayerAction<InsertGradientLayerOptions>({
@@ -175,12 +189,7 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
                     name: ensureUniqueLayerSiblingName(workingFileStore.state.layers[0]?.id, t('toolbar.drawGradient.newGradientLayerName')),
                     width,
                     height,
-                    data: {
-                        start: { x: start.x, y: start.y },
-                        end: { x: start.x, y: start.y },
-                        focus: { x: start.x, y: start.y },
-                        stops: [],
-                    },
+                    data: newGradientData,
                 }));
             }
             // Convert any empty layers to raster layers
@@ -193,12 +202,7 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
                             type: 'gradient',
                             width,
                             height,
-                            data: {
-                                start,
-                                end: { x: start.x, y: start.y },
-                                focus: { x: start.x, y: start.y },
-                                stops: [],
-                            },
+                            data: JSON.parse(JSON.stringify(newGradientData)),
                         })
                     );
                 } else if (selectedLayer.type !== 'gradient') {
@@ -253,6 +257,8 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
                 y: layerTransformPoint.y,
             };
         }
+
+        canvasStore.set('dirty', true);
     }
 
     private async drawEnd(e: PointerEvent) {
