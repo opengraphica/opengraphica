@@ -43,7 +43,7 @@ export default defineComponent({
 
         const selectedGradientLayerPositions = computed<SelectedGradientLayerPositions[]>(() => {
             const selectedLayers = getSelectedLayers<WorkingFileGradientLayer>(workingFileStore.state.selectedLayerIds).filter(
-                layer => layer.type === 'gradient'
+                layer => layer.type === 'gradient' && layer.visible
             );
             const positions: SelectedGradientLayerPositions[] = [];
             for (const layer of selectedLayers) {

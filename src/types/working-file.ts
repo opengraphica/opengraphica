@@ -147,7 +147,7 @@ export interface WorkingFileGradientColorStop<T extends ColorModel = ColorModel>
 }
 export type WorkingFileGradientColorSpace = 'oklab' | 'srgb' | 'linearSrgb';
 export type WorkingFileGradientFillType = 'linear' | 'radial';
-export type WorkingFileGradientSpreadMethod = 'pad' | 'repeat' | 'reflect';
+export type WorkingFileGradientSpreadMethod = 'pad' | 'repeat' | 'reflect' | 'truncate';
 
 export interface WorkingFileGradientLayer<T extends ColorModel = ColorModel> extends WorkingFileLayer<T> {
     type: 'gradient';

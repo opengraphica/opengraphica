@@ -3,12 +3,12 @@ import { nextTick, watch, WatchStopHandle } from 'vue';
 
 import BaseCanvasMovementController from './base-movement';
 import {
-    cursorHoverPosition, colorStopHandleRadius, positionHandleRadius,
+    cursorHoverPosition, positionHandleRadius, editingLayers,
     activeColorStops, blendColorSpace, fillType, spreadMethod,
 } from '@/canvas/store/draw-gradient-state';
 import { blitActiveSelectionMask, activeSelectionMask, appliedSelectionMask } from '@/canvas/store/selection-state';
 
-import { isOffscreenCanvasSupported } from '@/lib/feature-detection';
+import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import { t, tm, rt } from '@/i18n';
 
@@ -17,12 +17,14 @@ import editorStore from '@/store/editor';
 import historyStore, { createHistoryReserveToken, historyReserveQueueFree, historyBlockInteractionUntilComplete } from '@/store/history';
 import workingFileStore, { getSelectedLayers, getLayerById, getLayerGlobalTransform, ensureUniqueLayerSiblingName } from '@/store/working-file';
 
-import type { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { InsertLayerAction } from '@/actions/insert-layer';
 import { UpdateLayerAction } from '@/actions/update-layer';
 
-import type { InsertGradientLayerOptions, UpdateGradientLayerOptions, WorkingFileAnyLayer, WorkingFileGradientLayer } from '@/types';
+import type {
+    InsertGradientLayerOptions, UpdateGradientLayerOptions, WorkingFileAnyLayer, WorkingFileGradientFillType, WorkingFileGradientLayer, 
+    WorkingFileGradientColorSpace, WorkingFileGradientSpreadMethod,
+} from '@/types';
 
 const devicePixelRatio = window.devicePixelRatio || 1;
 const controlPointNames: Array<keyof Pick<WorkingFileGradientLayer['data'], 'start' | 'end' | 'focus'>> = ['end', 'start', 'focus'];
@@ -35,7 +37,6 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
 
     private hasCreatedLayer: boolean = false;
     private selectedLayers: WorkingFileGradientLayer[] = [];
-    private editingLayers: WorkingFileGradientLayer[] = [];
     private editingLayersStartData: Array<WorkingFileGradientLayer['data']> | null = null;
     private editingControlPoint: keyof Pick<WorkingFileGradientLayer['data'], 'start' | 'end' | 'focus'> | null = null;
     private hoveringControlPoint: keyof Pick<WorkingFileGradientLayer['data'], 'start' | 'end' | 'focus'> | null = null;
@@ -52,10 +53,13 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
             this.selectedLayers = getSelectedLayers<WorkingFileGradientLayer>(newIds).filter(
                 layer => layer.type === 'gradient'
             );
-            this.editingLayers = getSelectedLayers<WorkingFileGradientLayer>(newIds).filter(
+            editingLayers.value = getSelectedLayers<WorkingFileGradientLayer>(newIds).filter(
                 layer => layer.type === 'gradient'
             );
         }, { immediate: true });
+
+        this.onHistoryStep = this.onHistoryStep.bind(this);
+        appEmitter.on('editor.history.step', this.onHistoryStep);
 
         // Tutorial message
         if (!editorStore.state.tutorialFlags.drawGradientToolIntroduction) {
@@ -164,10 +168,10 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
         let selectedLayers = getSelectedLayers().filter(layer => layer.type === 'gradient' || layer.type === 'empty');
 
         // See if the user clicked on any points in a selected layer.
-        this.editingControlPoint = this.getControlPointAtPosition(start, selectedLayers);
+        this.editingControlPoint = this.getControlPointAtPosition(start, selectedLayers, true);
         
         if (this.editingControlPoint == null) {
-            this.editingLayers = [];
+            editingLayers.value = [];
             const { width, height } = workingFileStore.state;
             let layerActions = [];
             selectedLayers = selectedLayers.filter(layer => layer.type === 'empty');
@@ -223,19 +227,19 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
 
         selectedLayers = getSelectedLayers().filter(layer => layer.type === 'gradient');
         if (selectedLayers.length > 0) {
-            this.editingLayers = [selectedLayers[0] as WorkingFileGradientLayer];
+            editingLayers.value = [selectedLayers[0] as WorkingFileGradientLayer];
         } else {
-            this.editingLayers = [];
+            editingLayers.value = [];
         }
     }
 
     private drawPreview() {
-        if (this.editingControlPoint == null || this.editingLayers.length == 0) return;
+        if (this.editingControlPoint == null || editingLayers.value.length == 0) return;
         const { viewTransformPoint } = this.getTransformedCursorInfo();
 
         if (this.editingLayersStartData == null) {
             this.editingLayersStartData = [];
-            for (const layer of this.editingLayers) {
+            for (const layer of editingLayers.value) {
                 this.editingLayersStartData.push(
                     JSON.parse(JSON.stringify(layer.data))
                 );
@@ -243,7 +247,7 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
             }
         }
 
-        for (const layer of this.editingLayers) {
+        for (const layer of editingLayers.value) {
             const layerGlobalTransformInverse = getLayerGlobalTransform(layer).inverse();
             const layerTransformPoint = viewTransformPoint.matrixTransform(layerGlobalTransformInverse);
             if (this.editingControlPoint === 'start' && layer.data.start.x === layer.data.focus.x && layer.data.start.y === layer.data.focus.y) {
@@ -264,9 +268,9 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
     private async drawEnd(e: PointerEvent) {
         const pointer = this.pointers.filter((pointer) => pointer.id === this.drawingPointerId)[0];
 
-        if (pointer?.isDragging && this.editingControlPoint != null && this.editingLayers.length >= 0) {
+        if (pointer?.isDragging && this.editingControlPoint != null && editingLayers.value.length >= 0) {
             let layerActions = [];
-            for (const [layerIndex, layer] of this.editingLayers.entries()) {
+            for (const [layerIndex, layer] of editingLayers.value.entries()) {
                 layerActions.push(
                     new UpdateLayerAction<UpdateGradientLayerOptions>({
                         id: layer.id,
@@ -288,7 +292,7 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
         this.hasCreatedLayer = false;
     }
 
-    private getControlPointAtPosition(cursor: { x: number, y: number }, selectedLayers: WorkingFileAnyLayer[]) {
+    private getControlPointAtPosition(cursor: { x: number, y: number }, selectedLayers: WorkingFileAnyLayer[], editLayer = false) {
         const decomposedTransform = canvasStore.state.decomposedTransform;
         let appliedZoom: number = decomposedTransform.scaleX / devicePixelRatio;
         
@@ -304,12 +308,38 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
                     Math.abs(transformedPoint.y - cursor.y) <= positionHandleRadius / appliedZoom
                 ) {
                     controlPoint = controlPointName;
-                    this.editingLayers = [layer];
+                    if (editLayer) {
+                        editingLayers.value = [layer];
+                    }
                     break;
                 }
             }
         }
         return controlPoint;
+    }
+
+    private onHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
+        if (['updateDrawGradientLayerFillType', 'updateDrawGradientLayerBlendColorSpace', 'updateDrawGradientLayerSpreadMethod'].includes(event?.action.id as string)) {
+            if (editingLayers.value.length > 0) {
+                let editingFillTypes = new Set<WorkingFileGradientFillType>();
+                let editingBlendColorSpace = new Set<WorkingFileGradientColorSpace>();
+                let editingSpreadMethod = new Set<WorkingFileGradientSpreadMethod>();
+                for (const layer of editingLayers.value) {
+                    editingFillTypes.add(layer.data.fillType);
+                    editingBlendColorSpace.add(layer.data.blendColorSpace);
+                    editingSpreadMethod.add(layer.data.spreadMethod);
+                }
+                if (editingFillTypes.size === 1) {
+                    fillType.value = Array.from(editingFillTypes)[0];
+                }
+                if (editingBlendColorSpace.size === 1) {
+                    blendColorSpace.value = Array.from(editingBlendColorSpace)[0];
+                }
+                if (editingSpreadMethod.size === 1) {
+                    spreadMethod.value = Array.from(editingSpreadMethod)[0];
+                }
+            }
+        }
     }
 
     private getTransformedCursorInfo(): { viewTransformPoint: DOMPoint } {

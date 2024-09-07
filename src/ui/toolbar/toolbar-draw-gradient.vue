@@ -1,6 +1,12 @@
 <template>
     <div class="is-flex container is-align-items-center is-justify-content-center mx-auto">
-        <div class="ogr-toolbar-overlay">
+        <div v-if="editingLayers.length > 0" class="ogr-toolbar-edit-confirm">
+            {{ $t('toolbar.drawGradient.editingGradient') }}
+            <el-button plain size="small" class="ml-3" @click="onDoneEditing()">
+                <span class="bi bi-check-circle-fill mr-2" aria-hidden="true" /> {{ $t('button.done') }}
+            </el-button>
+        </div>
+        <div class="ogr-toolbar-overlay" :class="{ 'is-active': editingLayers.length > 0 }">
             <div class="ogr-toolbar-tool-selector">
                 <span class="bi bi-shadows my-1" aria-hidden="true"></span>
                 <span class="ogr-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
@@ -13,7 +19,7 @@
                     :style="{ '--gradient': selectedGradientBackground }"
                 >
                 </div>
-                <el-radio-group v-model="fillType" size="small" class="ml-3">
+                <el-radio-group v-model="fillType" size="small" class="ml-3" @change="onChangeFillType()">
                     <el-radio-button label="linear">
                         {{ $t('toolbar.drawGradient.fillType.linear') }}
                     </el-radio-button>
@@ -25,7 +31,7 @@
                     <template #prepend>
                         <span class="bi bi-rainbow" aria-hidden="true" />
                     </template>
-                    <el-select :aria-label="$t('toolbar.drawGradient.blendColorSpace.label')" v-model="blendColorSpace" size="small" style="width: 6.25rem">
+                    <el-select :aria-label="$t('toolbar.drawGradient.blendColorSpace.label')" v-model="blendColorSpace" size="small" style="width: 6.25rem" @change="onChangeBlendColorSpace()">
                         <el-option :label="$t('toolbar.drawGradient.blendColorSpace.oklab')" value="oklab" />
                         <el-option :label="$t('toolbar.drawGradient.blendColorSpace.srgb')" value="srgb" />
                         <el-option :label="$t('toolbar.drawGradient.blendColorSpace.linearSrgb')" value="linearSrgb" />
@@ -35,10 +41,11 @@
                     <template #prepend>
                         <span class="bi bi-bullseye" aria-hidden="true" />
                     </template>
-                    <el-select :aria-label="$t('toolbar.drawGradient.spreadMethod.label')" v-model="spreadMethod" size="small" style="width: 5rem">
+                    <el-select :aria-label="$t('toolbar.drawGradient.spreadMethod.label')" v-model="spreadMethod" size="small" style="width: 5.5rem" @change="onChangeSpreadMethod()">
                         <el-option :label="$t('toolbar.drawGradient.spreadMethod.pad')" value="pad" />
                         <el-option :label="$t('toolbar.drawGradient.spreadMethod.repeat')" value="repeat" />
                         <el-option :label="$t('toolbar.drawGradient.spreadMethod.reflect')" value="reflect" />
+                        <el-option :label="$t('toolbar.drawGradient.spreadMethod.truncate')" value="truncate" />
                     </el-select>
                 </el-input-group>
             </el-horizontal-scrollbar-arrows>
@@ -49,7 +56,10 @@
 <script lang="ts">
 import { defineComponent, ref, computed, toRefs, watch } from 'vue';
 
-import { activeColorStops, blendColorSpace, fillType, spreadMethod } from '@/canvas/store/draw-gradient-state';
+import { BundleAction } from '@/actions/bundle';
+import { UpdateLayerAction } from '@/actions/update-layer';
+
+import { activeColorStops, blendColorSpace, editingLayers, fillType, spreadMethod } from '@/canvas/store/draw-gradient-state';
 import { appliedSelectionMask, activeSelectionMask } from '@/canvas/store/selection-state';
 import historyStore from '@/store/history';
 import workingFileStore, { WorkingFileState } from '@/store/working-file';
@@ -69,6 +79,7 @@ import ElTooltip from 'element-plus/lib/components/tooltip/index';
 
 import { srgbaToLinearSrgba, linearSrgbaToOklab } from '@/lib/color';
 import appEmitter from '@/lib/emitter';
+import { UpdateGradientLayerOptions } from '@/types';
 
 export default defineComponent({
     name: 'ToolbarDrawGradient',
@@ -123,14 +134,75 @@ export default defineComponent({
             return !(appliedSelectionMask.value == null && activeSelectionMask.value == null);
         });
 
+        function onChangeFillType() {
+            if (editingLayers.value.length === 0) return;
+            const updateLayerActions: UpdateLayerAction<UpdateGradientLayerOptions>[] = [];
+            for (const layer of editingLayers.value) {
+                updateLayerActions.push(new UpdateLayerAction({
+                    id: layer.id,
+                    data: {
+                        ...JSON.parse(JSON.stringify(layer.data)),
+                        fillType: fillType.value,
+                    }
+                }));
+            }
+            historyStore.dispatch('runAction', {
+                action: new BundleAction('updateDrawGradientLayerFillType', 'action.updateDrawGradientLayerFillType', updateLayerActions),
+            });
+        }
+
+        function onChangeBlendColorSpace() {
+            if (editingLayers.value.length === 0) return;
+            const updateLayerActions: UpdateLayerAction<UpdateGradientLayerOptions>[] = [];
+            for (const layer of editingLayers.value) {
+                updateLayerActions.push(new UpdateLayerAction({
+                    id: layer.id,
+                    data: {
+                        ...JSON.parse(JSON.stringify(layer.data)),
+                        blendColorSpace: blendColorSpace.value,
+                    }
+                }));
+            }
+            historyStore.dispatch('runAction', {
+                action: new BundleAction('updateDrawGradientLayerBlendColorSpace', 'action.updateDrawGradientLayerBlendColorSpace', updateLayerActions),
+            });
+        }
+
+        function onChangeSpreadMethod() {
+            if (editingLayers.value.length === 0) return;
+            const updateLayerActions: UpdateLayerAction<UpdateGradientLayerOptions>[] = [];
+            for (const layer of editingLayers.value) {
+                updateLayerActions.push(new UpdateLayerAction({
+                    id: layer.id,
+                    data: {
+                        ...JSON.parse(JSON.stringify(layer.data)),
+                        spreadMethod: spreadMethod.value,
+                    }
+                }));
+            }
+            historyStore.dispatch('runAction', {
+                action: new BundleAction('updateDrawGradientLayerSpreadMethod', 'action.updateDrawGradientLayerSpreadMethod', updateLayerActions),
+            });
+        }
+
+        function onDoneEditing() {
+            editingLayers.value = [];
+        }
+
         return {
             selectedGradientBackground,
             selectedLayerIds,
             hasSelection,
 
             blendColorSpace,
+            editingLayers,
             fillType,
             spreadMethod,
+
+            onChangeFillType,
+            onChangeBlendColorSpace,
+            onChangeSpreadMethod,
+            onDoneEditing,
         };
     }
 });

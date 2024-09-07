@@ -57,6 +57,7 @@ enum GradientSpreadMethod {
     'pad' = 0,
     'repeat' = 1,
     'reflect' = 2,
+    'truncate' = 3,
 }
 function createGradientStopTexture(stops: WorkingFileGradientColorStop<RGBAColor>[], colorSpace: WorkingFileGradientColorSpace, textureSize: number = 64): Texture {
     const gradientImageData = new ImageData(textureSize, 1);
@@ -160,7 +161,7 @@ export function updateGradientShaderMaterial(material: ShaderMaterial, params: W
     material.defines.cCanvasHeight = canvasHeight;
     material.defines.cBlendColorSpace = GradientColorSpace[params.blendColorSpace];
     material.defines.cFillType = GradientFillType[params.fillType];
-    material.defines.spreadMethod = GradientSpreadMethod[params.spreadMethod];
+    material.defines.cSpreadMethod = GradientSpreadMethod[params.spreadMethod];
     let hasStopsChanged = params.stops.length !== material.userData.stops?.length;
     if (!hasStopsChanged) {
         for (const [stopIndex, stop] of params.stops.entries()) {

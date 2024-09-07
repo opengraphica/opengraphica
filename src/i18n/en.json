@@ -41,12 +41,15 @@
         "trimLayerEmptySpace": "Trim Layer Empty Space",
         "typeInTextLayer": "Type in Text Layer",
         "updateActiveSelection": "Update Active Selection",
-        "updateFile": "Update File",
-        "updateLayer": "Update Layer",
         "updateDrawLayer": "Draw on Layer",
-        "updateDrawGradientLayerPosition": "Update Gradient Position",
+        "updateDrawGradientLayerBlendColorSpace": "Update Gradient (Color Space)",
+        "updateDrawGradientLayerFillType": "Update Gradient (Fill Type)",
+        "updateDrawGradientLayerPosition": "Update Gradient (Position)",
+        "updateDrawGradientLayerSpreadMethod": "Update Gradient (Spread Method)",
         "updateDeformBlurLayer": "Blur Layer",
         "updateEraseLayer": "Erase from Layer",
+        "updateFile": "Update File",
+        "updateLayer": "Update Layer",
         "updateLayerFilterParams": "Update Layer Effect",
         "updateSelectionCombineMode": "Update Selection Combine Mode",
         "waitingOnQueueFree": "Waiting for Work to Complete"
@@ -863,6 +866,7 @@
             "newBrushLayerName": "New Paint"
         },
         "drawGradient": {
+            "editingGradient": "Editing Gradient",
             "newGradientLayerName": "New Gradient",
             "blendColorSpace": {
                 "label": "Color Space",
@@ -879,7 +883,8 @@
                 "label": "Spread Method",
                 "pad": "Pad",
                 "repeat": "Repeat",
-                "reflect": "Reflect"
+                "reflect": "Reflect",
+                "truncate": "Truncate"
             }
         },
         "effect": {

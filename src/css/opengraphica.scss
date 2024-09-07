@@ -2277,6 +2277,10 @@ body.ogr-full-page {
                 display: flex;
                 flex-direction: row;
 
+                &.is-active {
+                    box-shadow: 0 0 0 0.25rem var(--el-color-primary);
+                }
+
                 .ogr-toolbar-tool-selector {
                     background: var(--el-bg-color-page);
                     color: var(--el-text-color-primary);
@@ -2341,6 +2345,24 @@ body.ogr-full-page {
             &.is-menu-bar-top {
                 bottom: .5rem;
             }
+        }
+
+        .ogr-toolbar-edit-confirm {
+            display: flex;
+            align-items: center;
+            background: var(--el-color-primary);
+            color: white;
+            border-radius: 0.875rem;
+            padding: 0.5rem 0.5rem 0.5rem 1rem;
+            position: absolute;
+            font-size: 0.8125rem;
+            font-weight: bold;
+            top: -100%;
+            pointer-events: all;
+        }
+        &.is-top .ogr-toolbar-edit-confirm {
+            top: auto;
+            bottom: -100%;
         }
     }
     .ogr-toolbar--effect__edit-layer-name {

@@ -48,6 +48,10 @@ void main() {
     } else {
         t = (1.0 - fract(t));
     }
+#elif cSpreadMethod == GRADIENT_SPREAD_METHOD_TRUNCATE
+    if (t > 1.0 || t < 0.0) {
+        discard;
+    }
 #endif // cSpreadMethod
 
     gl_FragColor = texture2D(gradientMap, vec2(t, 0.0));

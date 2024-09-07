@@ -12,6 +12,7 @@
 #define GRADIENT_SPREAD_METHOD_PAD 0
 #define GRADIENT_SPREAD_METHOD_REPEAT 1
 #define GRADIENT_SPREAD_METHOD_REFLECT 2
+#define GRADIENT_SPREAD_METHOD_TRUNCATE 3
 
 uniform sampler2D gradientMap;
 uniform vec2 start;

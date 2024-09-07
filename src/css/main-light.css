@@ -10194,6 +10194,9 @@ body.ogr-full-page .opengraphica {
   display: flex;
   flex-direction: row;
 }
+.opengraphica .ogr-toolbar.is-overlay .ogr-toolbar-overlay.is-active {
+  box-shadow: 0 0 0 0.25rem var(--el-color-primary);
+}
 .opengraphica .ogr-toolbar.is-overlay .ogr-toolbar-overlay .ogr-toolbar-tool-selector {
   background: var(--el-bg-color-page);
   color: var(--el-text-color-primary);
@@ -10241,6 +10244,23 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .ogr-toolbar.is-overlay.is-menu-bar-top {
   bottom: 0.5rem;
+}
+.opengraphica .ogr-toolbar .ogr-toolbar-edit-confirm {
+  display: flex;
+  align-items: center;
+  background: var(--el-color-primary);
+  color: white;
+  border-radius: 0.875rem;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+  position: absolute;
+  font-size: 0.8125rem;
+  font-weight: bold;
+  top: -100%;
+  pointer-events: all;
+}
+.opengraphica .ogr-toolbar.is-top .ogr-toolbar-edit-confirm {
+  top: auto;
+  bottom: -100%;
 }
 .opengraphica .ogr-toolbar--effect__edit-layer-name {
   display: inline-block;

@@ -14,6 +14,7 @@ class EffectComposer {
     private _pixelRatio: number;
     private _width: number;
     private _height: number;
+    private _contextRestoredCallback: (() => void) | undefined;
 
     public renderer: WebGLRenderer;
     public renderTarget1: WebGLRenderTarget;
@@ -38,6 +39,11 @@ class EffectComposer {
 
             const gl = renderer.getContext();
             const extFloatBlend = gl.getExtension('EXT_float_blend');
+
+            this._contextRestoredCallback = () => {
+                gl.getExtension('EXT_float_blend');
+            };
+            gl.canvas.addEventListener("webglcontextrestored", this._contextRestoredCallback, false);
 
             renderTarget = new WebGLRenderTarget(this._width * this._pixelRatio, this._height * this._pixelRatio, {
                 format: RGBAFormat,
@@ -193,6 +199,11 @@ class EffectComposer {
     }
 
     dispose() {
+        if (this._contextRestoredCallback) {
+            const gl = this.renderer.getContext();
+            gl.canvas.removeEventListener("webglcontextrestored", this._contextRestoredCallback, false);
+            this._contextRestoredCallback = undefined;
+        }
         this.renderTarget1.dispose();
         this.renderTarget2.dispose();
         this.copyPass.dispose();
