@@ -28,7 +28,7 @@ export default defineComponent({
             type: Object
         }
     },
-    emits: ['update:modelValue'],
+    emits: ['update:modelValue', 'input', 'change'],
     setup(props, { emit }) {
 
         function onPickColor() {
@@ -40,6 +40,8 @@ export default defineComponent({
                 onClose: (event?: any) => {
                     if (event?.color) {
                         emit('update:modelValue', event.color);
+                        emit('input', event.color);
+                        emit('change', event.color);
                     }
                 }
             });

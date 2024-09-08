@@ -65,20 +65,21 @@ function createGradientStopTexture(stops: WorkingFileGradientColorStop<RGBAColor
     let leftStopIndex = stops[0].offset > 0 ? -1 : 0;
     let leftOffset = 0;
     let leftColor = stops[0].color as RGBAColor;
-    let rightOffset = stops[leftStopIndex + 1]?.offset ?? 0 > 0 ? stops[1].offset : stops[0].offset;
-    let rightColor = (stops[leftStopIndex + 1]?.offset ?? 0 > 0 ? stops[1].color : stops[0].color) as RGBAColor;
+    const rightStopIndex = Math.min(leftStopIndex + 1, stops.length - 1);
+    let rightOffset = stops[rightStopIndex].offset;
+    let rightColor = (stops[rightStopIndex].color) as RGBAColor;
     for (let i = 0; i < textureSize; i++) {
         const currentStopOffset = i / textureSize;
         if (currentStopOffset > rightOffset) {
             leftStopIndex += 1;
-            const leftStop = stops[Math.max(leftStopIndex, stops.length - 1)];
-            const rightStop = stops[Math.max(leftStopIndex + 1, stops.length - 1)];
+            const leftStop = stops[Math.min(leftStopIndex, stops.length - 1)];
+            const rightStop = stops[Math.min(leftStopIndex + 1, stops.length - 1)];
             leftOffset = leftStop.offset;
             leftColor = leftStop.color as RGBAColor;
             rightOffset = leftStopIndex + 1 > stops.length - 1 ? 1 : rightStop.offset;
             rightColor = rightStop.color as RGBAColor;
         }
-        const interpolateOffset = (rightOffset - leftOffset > 0) ? currentStopOffset - leftOffset / rightOffset - leftOffset : 0;
+        const interpolateOffset = (rightOffset - leftOffset > 0) ? (currentStopOffset - leftOffset) / (rightOffset - leftOffset) : 0;
         let interpolatedColor = leftColor;
         if (colorSpace === 'oklab') {
             const leftColorTransfer = linearSrgbaToOklab(srgbaToLinearSrgba(leftColor));

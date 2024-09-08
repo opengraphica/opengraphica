@@ -46,6 +46,7 @@
         "updateDrawGradientLayerFillType": "Update Gradient (Fill Type)",
         "updateDrawGradientLayerPosition": "Update Gradient (Position)",
         "updateDrawGradientLayerSpreadMethod": "Update Gradient (Spread Method)",
+        "updateDrawGradientLayerStops": "Update Gradient (Color Stops)",
         "updateDeformBlurLayer": "Blur Layer",
         "updateEraseLayer": "Erase from Layer",
         "updateFile": "Update File",
@@ -123,6 +124,7 @@
         "convert": "Convert",
         "create": "Create",
         "createNewImage": "Create New Image",
+        "delete": "Delete",
         "done": "Done",
         "editEffects": "Edit Effects",
         "export": "Export",
@@ -131,6 +133,7 @@
         "openImage": "Open Image",
         "pickColor": "Pick Color",
         "restoreLastImage": "Restore Last Image",
+        "reverse": "Reverse",
         "save": "Save",
         "settings": "Settings",
         "take": "Take",
@@ -256,6 +259,11 @@
             "scrollLeft": "Scroll Left",
             "scrollRight": "Scroll Right"
         }
+    },
+    "gradientPreset": {
+        "blackToTransparent": "Black to Transparent",
+        "whiteToTransparent": "White to Transparent",
+        "blackToWhite": "Black, White"
     },
     "keyboardMap": {
         "file": {
@@ -885,6 +893,12 @@
                 "repeat": "Repeat",
                 "reflect": "Reflect",
                 "truncate": "Truncate"
+            },
+            "stopDialog": {
+                "title": "Edit Gradient",
+                "close": "Close Dialog",
+                "stopColor": "Color",
+                "stopOffset": "Offset"
             }
         },
         "effect": {

@@ -5,6 +5,7 @@ import BaseCanvasMovementController from './base-movement';
 import {
     cursorHoverPosition, positionHandleRadius, editingLayers,
     activeColorStops, blendColorSpace, fillType, spreadMethod,
+    hasVisibleToolbarOverlay, showStopDrawer,
 } from '@/canvas/store/draw-gradient-state';
 import { blitActiveSelectionMask, activeSelectionMask, appliedSelectionMask } from '@/canvas/store/selection-state';
 
@@ -56,6 +57,7 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
             editingLayers.value = getSelectedLayers<WorkingFileGradientLayer>(newIds).filter(
                 layer => layer.type === 'gradient'
             );
+            this.updateToolbarFromEditingLayers();
         }, { immediate: true });
 
         this.onHistoryStep = this.onHistoryStep.bind(this);
@@ -86,6 +88,7 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
     onLeave(): void {
         super.onLeave();
 
+        showStopDrawer.value = false;
         this.selectedLayerIdsUnwatch?.();
 
         // Tutorial Message
@@ -99,6 +102,11 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
 
     onPointerDown(e: PointerEvent) {
         super.onPointerDown(e);
+
+        if (hasVisibleToolbarOverlay.value) {
+            showStopDrawer.value = false;
+            return;
+        }
 
         if (e.pointerType === 'pen' || !editorStore.state.isPenUser) {
             cursorHoverPosition.value = new DOMPoint(
@@ -231,6 +239,8 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
         } else {
             editingLayers.value = [];
         }
+
+        this.updateToolbarFromEditingLayers();
     }
 
     private drawPreview() {
@@ -319,25 +329,35 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
     }
 
     private onHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
-        if (['updateDrawGradientLayerFillType', 'updateDrawGradientLayerBlendColorSpace', 'updateDrawGradientLayerSpreadMethod'].includes(event?.action.id as string)) {
-            if (editingLayers.value.length > 0) {
-                let editingFillTypes = new Set<WorkingFileGradientFillType>();
-                let editingBlendColorSpace = new Set<WorkingFileGradientColorSpace>();
-                let editingSpreadMethod = new Set<WorkingFileGradientSpreadMethod>();
-                for (const layer of editingLayers.value) {
-                    editingFillTypes.add(layer.data.fillType);
-                    editingBlendColorSpace.add(layer.data.blendColorSpace);
-                    editingSpreadMethod.add(layer.data.spreadMethod);
-                }
-                if (editingFillTypes.size === 1) {
-                    fillType.value = Array.from(editingFillTypes)[0];
-                }
-                if (editingBlendColorSpace.size === 1) {
-                    blendColorSpace.value = Array.from(editingBlendColorSpace)[0];
-                }
-                if (editingSpreadMethod.size === 1) {
-                    spreadMethod.value = Array.from(editingSpreadMethod)[0];
-                }
+        if ([
+            'updateDrawGradientLayerFillType', 'updateDrawGradientLayerBlendColorSpace', 'updateDrawGradientLayerSpreadMethod',
+            'updateDrawGradientLayerStops',
+        ].includes(event?.action.id as string)) {
+            this.updateToolbarFromEditingLayers();
+        }
+    }
+
+    private updateToolbarFromEditingLayers() {
+        if (editingLayers.value.length > 0) {
+            let editingFillTypes = new Set<WorkingFileGradientFillType>();
+            let editingBlendColorSpace = new Set<WorkingFileGradientColorSpace>();
+            let editingSpreadMethod = new Set<WorkingFileGradientSpreadMethod>();
+            for (const layer of editingLayers.value) {
+                editingFillTypes.add(layer.data.fillType);
+                editingBlendColorSpace.add(layer.data.blendColorSpace);
+                editingSpreadMethod.add(layer.data.spreadMethod);
+            }
+            if (editingFillTypes.size === 1) {
+                fillType.value = Array.from(editingFillTypes)[0];
+            }
+            if (editingBlendColorSpace.size === 1) {
+                blendColorSpace.value = Array.from(editingBlendColorSpace)[0];
+            }
+            if (editingSpreadMethod.size === 1) {
+                spreadMethod.value = Array.from(editingSpreadMethod)[0];
+            }
+            if (editingLayers.value.length === 1) {
+                activeColorStops.value = JSON.parse(JSON.stringify(editingLayers.value[0].data.stops));
             }
         }
     }
@@ -354,7 +374,7 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
 
     protected handleCursorIcon() {
         let newIcon = super.handleCursorIcon();
-        if (!newIcon) {
+        if (!newIcon && !hasVisibleToolbarOverlay.value) {
             if (this.hoveringControlPoint == null) {
                 newIcon = 'crosshair';
             } else {

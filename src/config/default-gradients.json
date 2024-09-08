@@ -1,0 +1,65 @@
+[
+    {
+        "name": "gradientPreset.blackToTransparent",
+        "stops": [
+            {
+                "offset": 0,
+                "color": {
+                    "is": "color",
+                    "r": 0, "g": 0, "b": 0, "alpha": 1,
+                    "style": "#000000"
+                }
+            },
+            {
+                "offset": 1,
+                "color": {
+                    "is": "color",
+                    "r": 0, "g": 0, "b": 0, "alpha": 0,
+                    "style": "#00000000"
+                }
+            }
+        ]
+    },
+    {
+        "name": "gradientPreset.whiteToTransparent",
+        "stops": [
+            {
+                "offset": 0,
+                "color": {
+                    "is": "color",
+                    "r": 1, "g": 1, "b": 1, "alpha": 1,
+                    "style": "#ffffff"
+                }
+            },
+            {
+                "offset": 1,
+                "color": {
+                    "is": "color",
+                    "r": 1, "g": 1, "b": 1, "alpha": 0,
+                    "style": "#ffffff00"
+                }
+            }
+        ]
+    },
+    {
+        "name": "gradientPreset.blackToWhite",
+        "stops": [
+            {
+                "offset": 0,
+                "color": {
+                    "is": "color",
+                    "r": 0, "g": 0, "b": 0, "alpha": 1,
+                    "style": "#000000"
+                }
+            },
+            {
+                "offset": 1,
+                "color": {
+                    "is": "color",
+                    "r": 1, "g": 1, "b": 1, "alpha": 1,
+                    "style": "#ffffff"
+                }
+            }
+        ]
+    }
+]

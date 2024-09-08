@@ -188,6 +188,10 @@
         }
     }
 
+    .el-color-picker__color {
+        background-image: url("../images/transparency-bg.png");
+    }
+
     .el-dialog {
         --el-dialog-border-radius: 0.875rem;
 
