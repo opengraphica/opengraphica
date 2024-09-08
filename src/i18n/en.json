@@ -895,10 +895,12 @@
                 "truncate": "Truncate"
             },
             "stopDialog": {
-                "title": "Edit Gradient",
+                "title": "Edit Color Stops",
                 "close": "Close Dialog",
                 "stopColor": "Color",
-                "stopOffset": "Offset"
+                "stopOffset": "Offset",
+                "presets": "Presets",
+                "presetSettings": "Preset Settings"
             }
         },
         "effect": {

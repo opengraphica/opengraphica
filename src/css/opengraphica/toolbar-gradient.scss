@@ -1,0 +1,290 @@
+.ogr-gradient-editor {
+    display: block;
+    position: relative;
+    padding-bottom: 2rem;
+    width: 100%;
+
+    .ogr-gradient-editor__preview {
+        display: block;
+        position: relative;
+        width: 100%;
+        height: 2.5rem;
+        overflow: hidden;
+        box-shadow: 0 0 0 1px var(--el-border-color);
+        border-radius: 0.5rem;
+
+        &:before, &:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 0.5rem;
+            z-index: 0;
+        }
+        &:before {
+            background-image: url("../images/transparency-bg.png");
+        }
+        &:after {
+            background-image: var(--gradient);
+        }
+
+        .ogr-gradient-editor__add-position {
+            display: block;
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: black;
+            width: 1px;
+            border: 1px solid white;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+    }
+
+    .ogr-gradient-editor__stop-marker {
+        --stop-marker-border-color: var(--ogr-border-color-high-contrast);
+        --stop-marker-background-color: var(--ogr-background-color);
+
+        position: absolute;
+        border-radius: 0 0 0.25rem 0.25rem;
+        background: var(--stop-marker-background-color);
+        box-shadow: 0 1px 0 1px var(--stop-marker-border-color);
+        width: 0.85rem;
+        height: 0.85rem;
+        transform: translate(-50%, 0.75rem);
+        cursor: pointer;
+
+        &:before {
+            content: '';
+            position: absolute;
+            background: var(--stop-marker-background-color);
+            box-shadow: 0px 0px 0 1px var(--stop-marker-border-color);
+            width: 0.55rem;
+            height: 0.55rem;
+            transform: translate(0.425rem, -0.4rem) rotate(45deg);
+            transform-origin: top left;
+            z-index: 0;
+        }
+
+        &:after {
+            content: '';
+            box-sizing: border-box;
+            border: 0.125rem solid var(--stop-marker-background-color);
+            border-radius: 0 0 0.25rem 0.25rem;
+            background-image: url("../images/transparency-bg.png");
+            background-size: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 0;
+        }
+
+        .ogr-gradient-editor__stop-marker__color {
+            content: '';
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            border: 0.125rem solid var(--stop-marker-background-color);
+            border-radius: 0 0 0.25rem 0.25rem;
+            background: var(--stop-color, '#000000');
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+
+            .bi {
+                color: white;
+                font-size: 0.75rem;
+            }
+        }
+
+        &:hover {
+            --stop-marker-border-color: var(--el-color-primary);
+        }
+        &:focus {
+            --stop-marker-border-color: var(--el-color-primary);
+            outline: none;
+        }
+
+        &.is-active {
+            --stop-marker-background-color: var(--el-color-primary);
+            --stop-marker-border-color: var(--el-color-white);
+        }
+    }
+}
+
+.ogr-toolbar-draw-gradient__stop-selection {
+    box-sizing: border-box;
+    height: 2rem;
+    border: var(--el-border);
+    border-radius: 0.5rem;
+    box-shadow: 0 0 0 0.125rem var(--el-input-bg-color, var(--el-fill-color-blank)) inset;
+    position: relative;
+    cursor: pointer;
+
+    &:before, &:after {
+        content: '';
+        display: block;
+        box-sizing: border-box;
+        background: url("../images/transparency-bg.png");
+        border: 0.125rem solid var(--el-input-bg-color, var(--el-fill-color-blank));
+        border-radius: 0.5rem;
+        width: 6rem;
+        height: 100%;
+        max-width: 50vw;
+    }
+    &:after {
+        background: var(--gradient);
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    &:hover {
+        border-color: var(--el-border-color-hover);
+    }
+    &:focus {
+        border-color: var(--el-color-primary);
+        outline: none;
+    }
+}
+.ogr-toolbar-draw-gradient-stop-drawer__editor-preview-section {
+    padding: 1.5rem 1.25rem 0.875rem 1.25rem;
+    margin: 0 -1.25rem;
+    background: var(--ogr-background-color-secondary);
+    border-top: 1px solid var(--el-border-color);
+}
+.ogr-toolbar-draw-gradient-stop-drawer__editor-stop-form {
+    position: relative;
+    padding: 0 1.25rem 0 1.25rem;
+    margin: 0 -1.25rem;
+    border-bottom: 1px solid var(--el-border-color);
+    box-shadow: 0 -0.125rem 0.625rem rgba(0,0,0,0.05);
+
+    .ogr-toolbar-draw-gradient-stop-drawer__editor-stop-form__selection-indicator-container {
+        display: block;
+        position: relative;
+        padding: 0;
+    }
+    .ogr-toolbar-draw-gradient-stop-drawer__editor-stop-form__selection-indicator {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0; 
+        height: 0; 
+        border-left: 0.5rem solid transparent;
+        border-right: 0.5rem solid transparent;
+        border-bottom: 0.5rem solid var(--ogr-layout-menu-bar-background-color);
+        transform: translate(-50%, -100%);
+        transition: left 0.1s;
+    }
+
+    .el-horizontal-scrollbar-arrows {
+        margin: 0 -1.25rem;
+        .el-scrollbar {
+            flex-grow: 1;
+            .el-scrollbar__view > .is-flex {
+                margin: 0 auto;
+                justify-content: center;
+                .el-input-group {
+                    width: auto;
+                }
+            }
+        }
+    }
+}
+.ogr-toolbar-draw-gradient-stop-drawer__presets {
+    display: flex;
+    flex-direction: column;
+    height: 0;
+    flex-grow: 1;
+
+    > h3 {
+        margin: 1rem 0 0.5rem 0;
+    }
+
+    > .el-scrollbar {
+        margin: 0 -1.25rem;
+        flex-grow: 1;
+
+        .el-scrollbar__view {
+            padding: 0.25rem 1.25rem;
+        }
+    }
+}
+
+.ogr-gradient-preset {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    border-radius: 0.25rem;
+    
+    .ogr-gradient-preset__activate {
+        display: flex;
+        background: none;
+        padding: 0;
+        margin: 0;
+        border: none;
+        outline: none;
+        flex-grow: 1;
+        flex-shrink: 1;
+        cursor: pointer;
+
+        &:focus-visible {
+            outline: 0.125rem solid var(--el-color-primary);
+        }
+
+        .ogr-gradient-preset__name {
+            display: block;
+            width: 40%;
+            padding: 0.5rem 0.5rem 0.5rem 0;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            text-align: left;
+        }
+        .ogr-gradient_preset__color-stops {
+            display: block;
+            width: 60%;
+            height: 2rem;
+            position: relative;
+            border-radius: 0.25rem;
+
+            &:before, &:after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                border-radius: 0.25rem;
+            }
+            &:before {
+                background: url("../images/transparency-bg.png");
+            }
+            &:after {
+                background: var(--gradient);
+            }
+        }
+    }
+
+    &:hover {
+        background: var(--ogr-layer-list-background-color-active);
+        box-shadow: 0 0 0 0.25rem var(--ogr-layer-list-background-color-active);
+    }
+
+    > .el-button {
+        margin-left: 1rem;
+        flex-grow: 0;
+        flex-shrink: 0;
+    }
+}

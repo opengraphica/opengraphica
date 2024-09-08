@@ -1,4 +1,4 @@
-import { linearSrgbaToOklab, srgbaToLinearSrgba, linearSrgbaToSrgba, oklabToLinearSrgba } from './color';
+import { colorToHex, linearSrgbaToOklab, srgbaToLinearSrgba, linearSrgbaToSrgba, oklabToLinearSrgba } from './color';
 import { lerp } from './math';
 
 import type { RGBAColor, WorkingFileGradientColorStop, WorkingFileGradientColorSpace } from "@/types";
@@ -17,15 +17,20 @@ export function sampleGradient(stops: WorkingFileGradientColorStop<RGBAColor>[],
     let rightOffset = 1;
     let rightColor = sortedStops[0].color;
 
-    for (const [stopIndex, stop] of sortedStops.entries()) {
-        const nextStopIndex = Math.min(stopIndex + 1, sortedStops.length - 1);
-        const nextStop = sortedStops[nextStopIndex];
-        if ((sampleOffset >= stop.offset && sampleOffset < nextStop.offset) || stopIndex === sortedStops.length - 1) {
-            leftOffset = stop.offset;
-            leftColor = stop.color;
-            rightOffset = sortedStops[nextStopIndex].offset;
-            rightColor = sortedStops[nextStopIndex].color;
-            break;
+    if (sampleOffset >= sortedStops[0].offset) {
+        for (const [stopIndex, stop] of sortedStops.entries()) {
+            const nextStopIndex = Math.min(stopIndex + 1, sortedStops.length - 1);
+            const nextStop = sortedStops[nextStopIndex];
+            if (
+                (sampleOffset >= stop.offset && sampleOffset < nextStop.offset) ||
+                stopIndex === sortedStops.length - 1
+            ) {
+                leftOffset = stop.offset;
+                leftColor = stop.color;
+                rightOffset = sortedStops[nextStopIndex].offset;
+                rightColor = sortedStops[nextStopIndex].color;
+                break;
+            }
         }
     }
 
@@ -58,6 +63,7 @@ export function sampleGradient(stops: WorkingFileGradientColorStop<RGBAColor>[],
             alpha: lerp(leftColor.alpha, rightColor.alpha, interpolateOffset),
             style: leftColor.style,
         }
+        interpolatedColor.style = colorToHex(interpolatedColor, 'rgba');
     }
     return interpolatedColor;
 }

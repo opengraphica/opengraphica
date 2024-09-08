@@ -1,0 +1,42 @@
+.ogr-selection {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+
+    @keyframes ogr-selection-path {
+        0% {
+            stroke-dashoffset: 0;
+        }
+        100% {
+            stroke-dashoffset: 16;
+        }
+    }
+
+    @keyframes ogr-selection-handle {
+        0% {
+            stroke: rgba(200, 200, 200, 0.9);
+        }
+        50% {
+            stroke: rgba(130, 130, 130, 0.5);
+        }
+        100% {
+            stroke: rgba(200, 200, 235, 0.9);
+        }
+    }
+
+    svg {
+        position: absolute;
+        transform-origin: top left;
+
+        path {
+            animation: ogr-selection-path 1s linear infinite;
+        }
+
+        rect, ellipse {
+            fill: white;
+            animation: ogr-selection-handle 2s linear infinite;
+        }
+    }
+}

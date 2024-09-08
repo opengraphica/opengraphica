@@ -1,0 +1,56 @@
+.ogr-dock-popover {
+    min-width: 0 !important;
+    max-width: 90vw;
+    max-height: calc(100vh - 5rem) !important;
+    padding: 0 !important;
+    width: auto !important;
+
+    &.ogr-dock-popper--singleton {
+        transition: transform 0.15s var(--el-transition-function-fast-bezier), opacity 0.15s var(--el-transition-function-fast-bezier);
+    }
+
+    > .ogr-dock-title {
+        text-align: center;
+        font-size: 1rem;
+        font-weight: bold;
+        padding: 0.5rem 1rem 0.35rem 1rem;
+        margin: .25rem 0 0 0;
+    }
+
+    > .ogr-dock {
+        max-height: calc(100vh - 5rem) !important;
+        overflow: hidden !important;
+
+        > .ogr-dock-header {
+            border-bottom: 2px solid var(--el-border-color-light);
+        }
+
+        > .ogr-dock-content {
+            width: 350px;
+            max-width: 100%;
+
+            > .el-scrollbar, > .el-scrollbar  {
+                max-height: calc(100vh - 13rem) !important;
+                overflow: hidden !important;
+
+                > .el-scrollbar__wrap {
+                    max-height: calc(100vh - 13rem) !important;
+                }
+            }
+        }
+
+        > .el-tabs {
+            max-height: calc(100vh - 5rem) !important;
+            overflow: hidden !important;
+
+            > .el-tabs__content, > .el-tabs__content > .el-tab-pane, > .el-tabs__content > .el-tab-pane > .el-scrollbar {
+                max-height: calc(100vh - 13rem) !important;
+                overflow: hidden !important;
+            }
+            > .el-tabs__content > .el-tab-pane > .el-scrollbar > .el-scrollbar__wrap {
+                max-height: calc(100vh - 13rem) !important;
+                overflow: auto !important;
+            }
+        }
+    }
+}

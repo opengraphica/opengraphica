@@ -1,0 +1,148 @@
+.ogr-canvas, .ogr-post-process-canvas {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 0;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crisp-edges;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.ogr-canvas-border {
+    border-width: var(--ogr-canvas-border-width, 1px);
+    border-style: solid;
+    border-color: var(--ogr-working-image-border-color, #cccccc);
+    box-shadow: white 0px 0px 0px 2px #ffffff88;
+}
+
+.ogr-canvas-area {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+}
+.ogr-canvas-area--loading > * {
+    visibility: hidden;
+}
+
+.ogr-canvas-background {
+    transform-origin: 0 0;
+    background-image: url('../images/transparency-bg.png');
+    background-repeat: repeat;
+}
+
+.ogr-canvas-container {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+
+    &.ogr-canvas-viewport-css {
+        transform-origin: 0 0;
+
+        .ogr-canvas, .ogr-post-process-canvas {
+            width: auto;
+            height: auto;
+            right: auto;
+            bottom: auto;
+            width: initial !important;
+            height: initial !important;
+            image-rendering: auto;
+            image-rendering: smooth;
+            image-rendering: optimizequality;
+            image-rendering: high-quality;
+        }
+
+        .ogr-post-process-canvas {
+            transform-origin: top left;
+        }
+
+        &.ogr-canvas-viewport-css--pixelated {
+            .ogr-canvas {
+                image-rendering: optimizespeed;
+                image-rendering: crisp-edges;
+                image-rendering: pixelated;
+            }
+        }
+    }
+}
+
+.ogr-canvas-overlays {
+    display: block;
+    position: absolute;
+    transform-origin: 0 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+
+    .ogr-canvas-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        &.is-full-canvas-area {
+            bottom: 0;
+            right: 0;
+        }
+    }
+}
+
+.ogr-canvas-overlay-draw-bounds {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+
+    svg {
+        position: absolute;
+        transform-origin: top left;
+    }
+}
+
+.ogr-canvas-overlay__gradient-range-line {
+    position: absolute;
+}
+
+.ogr-canvas-overlay__gradient-position-handle {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border: 2px solid #333333;
+    outline: 1px solid white;
+    border-radius: 100%;
+    transform: translate(-50%, -50%);
+}
+
+.ogr-canvas-selection-mask {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    image-rendering: optimizespeed;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+}

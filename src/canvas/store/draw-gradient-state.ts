@@ -5,7 +5,7 @@ import { t } from '@/i18n';
 
 import type {
     WorkingFileGradientLayer, WorkingFileGradientColorStop, WorkingFileGradientColorSpace,
-    WorkingFileGradientFillType, WorkingFileGradientSpreadMethod,
+    WorkingFileGradientFillType, WorkingFileGradientSpreadMethod, RGBAColor,
 } from '@/types';
 
 export const positionHandleRadius = 5;
@@ -21,7 +21,7 @@ export const editingLayers = ref<WorkingFileGradientLayer[]>([]);
 
 export interface GradientPreset {
     name: string;
-    stops: WorkingFileGradientColorStop[];
+    stops: WorkingFileGradientColorStop<RGBAColor>[];
 }
 
 interface PermanentStorageState {

@@ -1,0 +1,208 @@
+.ogr-toolbar {
+    display: block;
+    position: relative;
+    transition: all 0.6s;
+    width: 100%;
+    max-width: 100%;
+    background: var(--ogr-layout-menu-bar-background-color);
+    box-shadow: 0 0 0 0.063rem var(--ogr-layout-menu-bar-border-color);
+    z-index: 4;
+
+    @keyframes ogr-toolbar-overlay-fade-in {
+        0% {
+            opacity: 0;
+            transform: translateY(50%);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes ogr-toolbar-overlay-fade-out {
+        0% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(50%);
+        }
+    }
+
+    &.is-overlay {
+        background: transparent;
+        box-shadow: none;
+        position: absolute;
+        pointer-events: none;
+        width: auto;
+        left: #{"max(.5rem, var(--ogr-sidebar-left-width, .5rem))"};
+        right: #{"max(.5rem, var(--ogr-sidebar-right-width, .5rem))"};
+        transition: none;
+        animation: ogr-toolbar-overlay-fade-in 0.2s ease-in forwards;
+
+        &.is-swap-out {
+            animation: ogr-toolbar-overlay-fade-out 0.2s ease-in forwards;
+        }
+
+        &.is-swap-in {
+            animation: ogr-toolbar-overlay-fade-in 0.2s ease-in forwards;
+        }
+
+        > .container {
+            pointer-events: none;
+        }
+
+        .ogr-toolbar-overlay {
+            background: var(--ogr-layout-menu-bar-background-color);
+            box-shadow: 0 0 0px 1px var(--ogr-layout-menu-bar-border-color), 0 .3rem 2rem var(--ogr-layout-menu-bar-border-color);
+            padding: 0;
+            pointer-events: all;
+            overflow: hidden;
+            padding: 0;
+            display: flex;
+            flex-direction: row;
+
+            &.is-active {
+                box-shadow: 0 0 0 0.25rem var(--el-color-primary);
+            }
+
+            .ogr-toolbar-tool-selector {
+                background: var(--el-bg-color-page);
+                color: var(--el-text-color-primary);
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                min-width: 3.5rem;
+                padding: 0 0.5rem;
+
+                .ogr-toolbar-tool-selector__description {
+                    display: block;
+                    font-size: .55rem;
+                    white-space: nowrap;
+                    text-transform: uppercase;
+                }
+            }
+
+            > .el-scrollbar {
+                > * > .el-scrollbar__view {
+                    padding: 0.75rem 0 0.5rem 0;
+                }
+            }
+        }
+
+        &.is-bottom {
+            bottom: .5rem;
+            .ogr-toolbar-overlay {
+                border-radius: 0.875rem;
+            }
+        }
+        &.is-top {
+            top: .5rem;
+            .ogr-toolbar-overlay {
+                border-radius: 0.875rem;
+
+                > .el-scrollbar {
+                    > * > .el-scrollbar__view {
+                        padding: 0.5rem 0 0.75rem 0;
+                    }
+                }
+            }
+        }
+
+        // &.is-menu-bar-left {
+        //     left: 5rem;
+        // }
+        // &.is-menu-bar-right {
+        //     right: 5rem;
+        // }
+        &.is-menu-bar-bottom {
+            bottom: 3rem;
+            .ogr-toolbar-overlay {
+                border-radius: 1rem 1rem 0 0;
+                padding-bottom: 1.25rem;
+            }
+            .ogr-toolbar-tool-selector {
+                border-radius: 0 0 1rem 0;
+            }
+        }
+        &.is-menu-bar-top {
+            bottom: .5rem;
+        }
+    }
+
+    .ogr-toolbar-edit-confirm {
+        display: flex;
+        align-items: center;
+        background: var(--el-color-primary);
+        color: white;
+        border-radius: 0.875rem;
+        padding: 0.5rem 0.5rem 0.5rem 1rem;
+        position: absolute;
+        font-size: 0.8125rem;
+        font-weight: bold;
+        top: -100%;
+        pointer-events: all;
+        animation: ogr-toolbar-edit-confirm-show 0.2s forwards;
+    }
+    &.is-top .ogr-toolbar-edit-confirm {
+        top: auto;
+        bottom: -100%;
+    }
+
+    @keyframes ogr-toolbar-edit-confirm-show {
+        0% { opacity: 0; transform: translateY(20%) }
+        100% { opacity: 1; transform: translateY(0%) }
+    }
+
+    .ogr-toolbar-drawer {
+        display: flex;
+        flex-direction: column;
+        background: var(--ogr-layout-menu-bar-background-color);
+        box-shadow: 0 0 0px 1px var(--ogr-layout-menu-bar-border-color), 0 0.3rem 2rem var(--ogr-layout-menu-bar-border-color);
+        color: var(--el-text-color-regular);
+        border-radius: 0.875rem;
+        box-sizing: border-box;
+        padding: 0.875rem 1.25rem;
+        position: absolute;
+        height: 60vh;
+        width: 100%;
+        bottom: calc(100% + 1rem);
+        pointer-events: all;
+        animation: ogr-toolbar-drawer-show 0.2s forwards;
+        z-index: 1001;
+
+        .ogr-toolbar-drawer__title {
+            font-size: 1rem;
+            padding: 0.5rem 1rem 0.35rem 0;
+            margin: 0 0 1rem 0;
+        }
+
+        .ogr-toolbar-drawer__close {
+            color: var(--el-text-color-secondary);
+            position: absolute;
+            top: 0.7rem;
+            right: 0.7rem;
+            cursor: pointer;
+
+            &:hover {
+                color: var(--el-color-primary);
+            }
+        }
+    }
+
+    @keyframes ogr-toolbar-drawer-show {
+        0% { opacity: 0; transform: translateY(2rem) }
+        100% { opacity: 1; transform: translateY(0%) }
+    }
+}
+.ogr-toolbar--effect__edit-layer-name {
+    display: inline-block;
+    max-width: 20rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
+    white-space: nowrap;
+}

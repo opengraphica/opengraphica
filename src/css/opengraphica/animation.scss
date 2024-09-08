@@ -1,0 +1,66 @@
+
+/***************************\
+| Vue Transition Animations |
+\***************************/
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.scale-down-enter-active,
+.scale-down-leave-active {
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    transform-origin: top left;
+}
+
+.scale-down-enter-from,
+.scale-down-leave-to {
+    transform: scale(1, 0);
+    transform-origin: top left;
+    opacity: 0;
+}
+
+.scale-up-enter-active,
+.scale-up-leave-active {
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    transform-origin: top left;
+}
+
+.scale-up-enter-from,
+.scale-up-leave-to {
+    transform: scale(1, 0);
+    transform-origin: top left;
+    opacity: 0;
+}
+
+/********************\
+| General Animations |
+\********************/
+
+@keyframes ogr-animate-fade-in {
+    from { opacity: 0% }
+    to { opacity: 100% }
+}
+
+.ogr-animate-fast {
+    animation-duration: 0.2s !important;
+}
+.ogr-animate-moderate {
+    animation-duration: 0.5s !important;
+}
+.ogr-animate-slow {
+    animation-duration: 1s !important;
+}
+.ogr-animate-very-slow {
+    animation-duration: 2s !important;
+}
+
+.ogr-animate-fade-in {
+    animation: ogr-animate-fade-in 0.2s ease-in forwards;
+}

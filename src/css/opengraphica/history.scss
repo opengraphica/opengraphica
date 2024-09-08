@@ -1,0 +1,85 @@
+@keyframes ogr-history-notification-highlight {
+    0% {
+        outline: 0.25rem solid var(--el-color-warning);
+        background: var(--ogr-history-notification-background-color-highlight);
+    }
+    100% {
+        outline: 0.25rem solid transparent;
+        background: var(--ogr-history-notification-background-color);
+    }
+}
+@keyframes ogr-history-notification-fade-out {
+    0% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+        transform: translate(0, 0);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(0, 1rem);
+    }
+}
+.ogr-history-notification-overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: var(--ogr-history-notification-overlay-z-index);
+
+    &.ogr-history-notification-overlay--completed {
+        pointer-events: none;
+
+        .ogr-history-notification {
+            animation: ogr-history-notification-fade-out 1.5s forwards !important;
+        }
+    }
+}
+.ogr-history-notification-container {
+    position: absolute;
+    left: #{"max(1rem, var(--ogr-sidebar-left-width, 1rem))"};
+    right: #{"max(1rem, var(--ogr-sidebar-right-width, 1rem))"};
+    bottom: var(--ogr-footer-height);
+    padding: 0 0 1rem 0;
+}
+.ogr-history-notification {
+    border-radius: 1rem;
+    background: var(--ogr-history-notification-background-color);
+    box-shadow: 0 0 0px 1px var(--ogr-history-notification-border-color), 0 0.3rem 2rem var(--ogr-history-notification-border-color);
+    overflow: hidden;
+    padding: 1rem 1.25rem;
+    display: flex;
+    max-width: 25rem;
+    margin: 0 auto;
+    animation: none;
+
+    .bi {
+        font-size: 2rem;
+        align-self: center;
+        margin-right: 1rem;
+
+        &.bi-clock-history {
+            color: var(--el-color-warning);
+        }
+        &.bi-check-circle {
+            color: var(--el-color-success);
+        }
+    }
+    h2 {
+        margin: 0 0 .1rem 0;
+        font-size: 1rem;
+        font-weight: bold;
+    }
+    p {
+        margin: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    &.ogr-history-notification--highlight {
+        animation: ogr-history-notification-highlight 1s forwards;
+    }
+}

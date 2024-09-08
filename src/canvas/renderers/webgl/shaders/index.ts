@@ -69,7 +69,7 @@ function createGradientStopTexture(stops: WorkingFileGradientColorStop<RGBAColor
     let rightOffset = stops[rightStopIndex].offset;
     let rightColor = (stops[rightStopIndex].color) as RGBAColor;
     for (let i = 0; i < textureSize; i++) {
-        const currentStopOffset = i / textureSize;
+        const currentStopOffset = i / (textureSize - 1);
         if (currentStopOffset > rightOffset) {
             leftStopIndex += 1;
             const leftStop = stops[Math.min(leftStopIndex, stops.length - 1)];
@@ -123,7 +123,7 @@ function createGradientStopTexture(stops: WorkingFileGradientColorStop<RGBAColor
     }
     const texture = new Texture(canvas);
     texture.encoding = sRGBEncoding;
-    texture.generateMipmaps = true;
+    texture.generateMipmaps = false;
     texture.magFilter = LinearFilter;
     texture.minFilter = LinearFilter;
     texture.needsUpdate = true;

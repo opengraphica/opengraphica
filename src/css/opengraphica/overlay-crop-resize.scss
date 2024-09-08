@@ -1,0 +1,153 @@
+
+.ogr-crop {
+    position: relative;
+    outline: 999999px solid var(--ogr-overlay-background-color);
+
+    .ogr-crop-bounds {
+        outline: 0.35rem solid rgba(235, 235, 235, 0.7);
+        box-sizing: border-box;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+    .ogr-crop-handle-top-left,
+    .ogr-crop-handle-top-right,
+    .ogr-crop-handle-bottom-left,
+    .ogr-crop-handle-bottom-right,
+    .ogr-crop-handle-top,
+    .ogr-crop-handle-left,
+    .ogr-crop-handle-bottom,
+    .ogr-crop-handle-right {
+        position: absolute;
+        svg {
+            display: block;
+            position: absolute;
+            height: 2rem;
+            width: 2rem;
+        }
+    }
+
+    .ogr-crop-handle-top-left {
+        top: 0;
+        left: 0;
+        transform-origin: top left;
+        svg {
+            transform: translate(-25%, -25%);
+            transform-origin: top left;
+        }
+    }
+    .ogr-crop-handle-top-right {
+        top: 0;
+        right: 0;
+        transform-origin: top right;
+        svg {
+            transform: rotate(90deg) translate(-25%, -25%);
+            transform-origin: top left;
+        }
+    }
+    .ogr-crop-handle-bottom-right {
+        bottom: 0;
+        right: 0;
+        transform-origin: bottom right;
+        svg {
+            transform: rotate(180deg) translate(-25%, -25%);
+            transform-origin: top left;
+        }
+    }
+    .ogr-crop-handle-bottom-left {
+        bottom: 0;
+        left: 0;
+        transform-origin: bottom left;
+        svg {
+            transform: rotate(270deg) translate(-25%, -25%);
+            transform-origin: top left;
+        }
+    }
+    .ogr-crop-handle-top {
+        top: 0;
+        left: 50%;
+        transform-origin: top center;
+        svg {
+            transform: translate(-50%, -100%);
+        }
+    }
+    .ogr-crop-handle-right {
+        top: 50%;
+        right: 0;
+        transform-origin: right center;
+        svg {
+            transform: rotate(90deg) translate(-50%, 0);
+            transform-origin: center;
+        }
+    }
+    .ogr-crop-handle-bottom {
+        bottom: 0;
+        right: 50%;
+        transform-origin: bottom center;
+        svg {
+            transform: rotate(180deg) translate(50%, 0);
+            transform-origin: center;
+        }
+    }
+    .ogr-crop-handle-left {
+        top: 50%;
+        left: 0;
+        transform-origin: left center;
+        svg {
+            transform: rotate(270deg) translate(0, -150%);
+            transform-origin: top center;
+        }
+    }
+}
+
+.ogr-snap-preview {
+    position: absolute;
+    background: var(--ogr-snap-line-color);
+    box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.5);
+
+    &.ogr-snap-preview-vertical {
+        width: 0.0625rem;
+        top: 0;
+
+        &:before, &:after {
+            content: '';
+            display: block;
+            height: 4rem;
+            position: absolute;
+            left: 0;
+            right: 0;
+        }
+        &:before {
+            background: linear-gradient(to bottom, transparent 0%, var(--ogr-snap-line-color) 100%); 
+            top: -4rem;
+        }
+        &:after {
+            background: linear-gradient(to bottom, var(--ogr-snap-line-color) 0%, transparent 100%); 
+            bottom: -4rem;
+        }
+    }
+    &.ogr-snap-preview-horizontal {
+        height: 0.0625rem;
+        left: 0;
+
+        &:before, &:after {
+            content: '';
+            display: block;
+            width: 4rem;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+        }
+        &:before {
+            background: linear-gradient(to right, transparent 0%, var(--ogr-snap-line-color) 100%); 
+            left: -4rem;
+        }
+        &:after {
+            background: linear-gradient(to right, var(--ogr-snap-line-color) 0%, transparent 100%); 
+            right: -4rem;
+        }
+    }
+}

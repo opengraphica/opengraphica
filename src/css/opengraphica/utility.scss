@@ -1,0 +1,16 @@
+.ogr-list--dashed {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+
+    > li {
+        margin: 0;
+        padding: 0 0 0 0.5em;
+
+        &:before {
+            content: '-';
+            position: relative;
+            left: -0.5em;
+        }
+    }
+}

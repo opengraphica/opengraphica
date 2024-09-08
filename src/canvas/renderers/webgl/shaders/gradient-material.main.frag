@@ -56,5 +56,13 @@ void main() {
 
     gl_FragColor = texture2D(gradientMap, vec2(t, 0.0));
 
+#if cBlendColorSpace == GRADIENT_COLOR_SPACE_SRGB
+    gl_FragColor.a = 1.0 - srgbChannelToLinearSrgbChannel(1.0 - gl_FragColor.a);
+#elif cBlendColorSpace == GRADIENT_COLOR_SPACE_OKLAB
+    float alphaTransfer = 1.0 - gl_FragColor.a;
+    alphaTransfer = oklabToRgb(vec3(alphaTransfer, 0.0, 0.0)).r;
+    gl_FragColor.a = 1.0 - alphaTransfer;
+#endif // cBlendColorSpace
+
     //[INJECT_FILTERS_HERE]
 }

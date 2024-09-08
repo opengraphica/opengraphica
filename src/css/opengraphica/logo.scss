@@ -1,0 +1,22 @@
+.ogr-logo {
+    h1 {
+        font-size: 3.5rem;
+        font-weight: 100;
+        margin: 0;
+
+        img {
+            width: 100%;
+            max-width: 25rem;
+        }
+
+        @media screen and (max-width: 550px) {
+            font-size: 2.5rem;
+        }
+        @media screen and (max-width: 450px) {
+            font-size: 1.75rem;
+        }
+    }
+    p {
+        margin: 0 0 1rem 0;
+    }
+}

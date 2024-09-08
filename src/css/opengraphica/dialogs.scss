@@ -1,0 +1,72 @@
+.ogr-dialogs {
+    .el-dialog.el-dialog--medium {
+        width: 25rem !important;
+        max-width: 90%;
+    }
+    .el-dialog.el-dialog--medium-large {
+        width: 35rem !important;
+        max-width: 90%;
+    }
+    .el-dialog.el-dialog--large {
+        width: 50rem !important;
+        max-width: 90%;
+    }
+    .el-dialog.el-dialog--big {
+        width: 75rem !important;
+        max-width: 90%;
+    }
+    .el-dialog.el-dialog--huge {
+        width: 100rem !important;
+        max-width: 90%;
+    }
+
+    .el-dialog {
+        opacity: 1;
+        transition: opacity 0.3s;
+
+        .ogr-dock.ogr-dock--loading {
+            > :not(.ogr-dock__spinner) {
+                position: absolute !important;
+                visibility: hidden !important;
+                pointer-events: none !important;
+            }
+        }
+    }
+
+    &.ogr-dialogs--loading {
+        .el-dialog {
+            transition: none !important;
+            opacity: 0 !important;
+        }
+    }
+
+    @media screen and (max-width: 600px) {
+        .el-dialog,
+        .el-dialog.el-dialog--medium,
+        .el-dialog.el-dialog--large,
+        .el-dialog.el-dialog--big,
+        .el-dialog.el-dialog--huge {
+            margin: 0.25rem !important;
+            width: calc(100% - 0.5rem) !important;
+            max-width: 100% !important;
+            overflow: hidden !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+        }
+        .el-dialog__header {
+            position: relative !important;
+            margin-right: 0 !important;
+        }
+        .el-dialog__body {
+            overflow: auto !important;
+        }
+    }
+
+    @media screen and (max-width: 600px) {
+        .ogr-dock-mobile-edge-padding {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+    }
+}

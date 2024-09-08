@@ -349,7 +349,7 @@ export default defineComponent({
             for (let layer of layers) {
                 if (layer.type === 'group') {
                     await generateResizeLayerActions((layer as WorkingFileGroupLayer<ColorModel>).layers, widthRatio, heightRatio);
-                } else if (layer.type === 'raster' || layer.type === 'rasterSequence' || layer.type === 'vector') {
+                } else if (layer.type === 'raster' || layer.type === 'rasterSequence' || layer.type === 'vector' || layer.type === 'gradient') {
                     let transform = layer.transform;
                     if (mode.value === 'crop') {
                         transform = new DOMMatrix().translateSelf(-cropLeft.value, -cropTop.value).multiplySelf(layer.transform);
