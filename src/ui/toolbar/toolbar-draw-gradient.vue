@@ -170,6 +170,9 @@
                         <el-button plain size="small" @click="onReverseStops()">
                             <span class="bi bi-shuffle mr-2" aria-hidden="true" /> {{ $t('button.reverse') }}
                         </el-button>
+                        <el-button plain size="small" @click="onSaveActivePreset()">
+                            <span class="bi bi-plus-circle-fill mr-2" aria-hidden="true" /> {{ $t('button.save') }}
+                        </el-button>
                     </el-button-group>
                 </el-horizontal-scrollbar-arrows>
             </div>
@@ -520,6 +523,22 @@ export default defineComponent({
             hasEditedActiveColorStops.value = true;
         }
 
+        async function onSaveActivePreset() {
+            const colorNamer = (await import('color-namer')).default;
+            const colorNames = new Set<string>();
+            for (const stop of editingColorStops.value) {
+                const colorName = (colorNamer(stop.color.style, { pick: ['ntc'] }).ntc[0]?.name ?? '');
+                colorNames.add(
+                    colorName.slice(0, 1).toUpperCase() + colorName.slice(1)
+                );
+                if (stop.color.alpha < 0.1) colorNames.add('Transparent');
+            }
+            presets.value.unshift({
+                name: Array.from(colorNames).join(', '),
+                stops: JSON.parse(JSON.stringify(editingColorStops.value)),
+            })
+        }
+
         /*-----------------------------------*\
         | Editing Dropdowns / History Updates |
         \*-----------------------------------*/
@@ -637,6 +656,7 @@ export default defineComponent({
             presetSettingsActiveIndex,
             onPresetSettingsSelect,
             onSelectPreset,
+            onSaveActivePreset,
 
             blendColorSpace,
             editingLayers,

@@ -4,6 +4,8 @@
  */
 
 import { nextTick, type Ref } from 'vue';
+
+import canvasStore from '@/store/canvas';
 import historyStore from '@/store/history';
 import { createStoredImage } from '@/store/image';
 import { createStoredSvg } from '@/store/svg';

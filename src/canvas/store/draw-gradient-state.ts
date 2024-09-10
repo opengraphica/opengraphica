@@ -61,11 +61,11 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
         }),
         spreadMethod: 'pad',
     },
-    restore: ['blendColorSpace', 'fillType', 'spreadMethod'],
+    restore: ['activeColorStops', 'blendColorSpace', 'fillType', 'presets', 'spreadMethod'],
 });
 
 export const activeColorStops = permanentStorage.getWritableRef('activeColorStops');
 export const blendColorSpace = permanentStorage.getWritableRef('blendColorSpace');
 export const fillType = permanentStorage.getWritableRef('fillType');
-export const presets = permanentStorage.getWritableRef('presets');
+export const presets = permanentStorage.getDeepWritableRef('presets');
 export const spreadMethod = permanentStorage.getWritableRef('spreadMethod');

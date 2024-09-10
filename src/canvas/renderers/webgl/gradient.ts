@@ -125,6 +125,10 @@ export default class GradientLayerRenderer extends BaseLayerRenderer {
             }
             this.lastWidth = width;
             this.lastHeight = height;
+            if (this.material && this.lastLayerData) {
+                updateGradientShaderMaterial(this.material, this.lastLayerData, this.lastWidth, this.lastHeight);
+                canvasStore.set('dirty', true);
+            }
         }
         if (updates.transform) {
             this.lastTransform = updates.transform;

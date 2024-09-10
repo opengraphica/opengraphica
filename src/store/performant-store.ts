@@ -1,4 +1,4 @@
-import { computed, reactive, shallowReadonly, Ref, UnwrapRef, WritableComputedRef } from 'vue';
+import { computed, reactive, shallowReadonly, watch, type Ref, type UnwrapRef, type WritableComputedRef } from 'vue';
 
 const localStoragePrefix = 'openGraphicaStore_';
 
@@ -81,6 +81,22 @@ export class PerformantStore<T extends StoreTypeMap> {
     }
 
     /**
+     * @private
+     */
+    storeRestoreProp<K extends keyof T['state']>(key: K, value: T['state'][K]) {
+        try {
+            const valueType = typeof value;
+            let serializedValue: string = value + '';
+            if (['object', 'array'].includes(valueType)) {
+                serializedValue = JSON.stringify(value);
+            }
+            localStorage.setItem(localStoragePrefix + this.name + '_' + (key as string), valueType + ';' + serializedValue);
+        } catch (error) {
+            // Does this matter?
+        }
+    }
+
+    /**
      * use "set" instead if you don't know what you're doing.
      * @private
      */
@@ -90,16 +106,7 @@ export class PerformantStore<T extends StoreTypeMap> {
             this.reactiveState[key] = value;
         }
         if (this.restoreProps.includes(key as string)) {
-            try {
-                const valueType = typeof value;
-                let serializedValue: string = value + '';
-                if (['object', 'array'].includes(valueType)) {
-                    serializedValue = JSON.stringify(value);
-                }
-                localStorage.setItem(localStoragePrefix + this.name + '_' + (key as string), valueType + ';' + serializedValue);
-            } catch (error) {
-                // Does this matter?
-            }
+            this.storeRestoreProp(key, value);
         }
     }
 
@@ -140,7 +147,30 @@ export class PerformantStore<T extends StoreTypeMap> {
         }
     }
 
+    /**
+     * Retrieves a ref that can be used to write to a specific field in the store.
+     */
     getWritableRef<K extends keyof T['state']>(key: K): WritableComputedRef<T['state'][K]> {
+        return computed({
+            set: (value) => {
+                this.set(key, value);
+            },
+            get: () => {
+                return this.get(key);
+            }
+        });
+    }
+
+    /**
+     * Retrieves a ref that can be used to write to a specific field in the store.
+     * Use for deep nested objects that you want to be watched for changes.
+     */
+    getDeepWritableRef<K extends keyof T['state']>(key: K): WritableComputedRef<T['state'][K]> {
+        if (this.restoreProps.includes(key as string)) {
+            watch(() => this.state[key], () => {
+                this.storeRestoreProp(key, this.state[key] as never);
+            }, { deep: true });
+        }
         return computed({
             set: (value) => {
                 this.set(key, value);

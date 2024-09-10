@@ -129,6 +129,13 @@ function createGradientStopTexture(stops: WorkingFileGradientColorStop<RGBAColor
     texture.needsUpdate = true;
     return texture;
 }
+export function calculateGradientAverageBrightness(stops: WorkingFileGradientColorStop<RGBAColor>[]) {
+    let brightnessAccumulator = 0;
+    for (const stop of stops) {
+        brightnessAccumulator += linearSrgbaToOklab(srgbaToLinearSrgba(stop.color)).l;
+    }
+    return brightnessAccumulator / stops.length;
+}
 export function createGradientShaderMaterial(params: WorkingFileGradientLayer<RGBAColor>['data'], canvasWidth: number, canvasHeight: number, combinedShaderResult: CombinedShaderResult): ShaderMaterial {
     return new ShaderMaterial({
         transparent: true,
@@ -142,6 +149,7 @@ export function createGradientShaderMaterial(params: WorkingFileGradientLayer<RG
             cBlendColorSpace: GradientColorSpace[params.blendColorSpace],
             cFillType: GradientFillType[params.fillType],
             cSpreadMethod: GradientSpreadMethod[params.spreadMethod],
+            cAverageBrightness: calculateGradientAverageBrightness(params.stops),
             ...combinedShaderResult.defines,
         },
         uniforms: {
@@ -163,6 +171,7 @@ export function updateGradientShaderMaterial(material: ShaderMaterial, params: W
     material.defines.cBlendColorSpace = GradientColorSpace[params.blendColorSpace];
     material.defines.cFillType = GradientFillType[params.fillType];
     material.defines.cSpreadMethod = GradientSpreadMethod[params.spreadMethod];
+    material.defines.cAverageBrightness = calculateGradientAverageBrightness(params.stops);
     let hasStopsChanged = params.stops.length !== material.userData.stops?.length;
     if (!hasStopsChanged) {
         for (const [stopIndex, stop] of params.stops.entries()) {

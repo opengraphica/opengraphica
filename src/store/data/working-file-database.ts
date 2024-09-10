@@ -6,8 +6,8 @@ import { getStoredSvgDataUrl, createStoredSvg } from '@/store/svg';
 import { createImageBlobFromCanvas, createImageFromBlob } from '@/lib/image';
 import type {
     ColorModel, WorkingFile, WorkingFileGroupLayer, WorkingFileLayer, WorkingFileAnyLayer,
-    WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer,
-    SerializedFileVectorLayer,
+    WorkingFileGradientLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer,
+    WorkingFileVectorLayer, SerializedFileVectorLayer,
 } from '@/types';
 
 interface DatabaseMetaLayer {

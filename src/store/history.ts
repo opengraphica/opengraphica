@@ -1,5 +1,6 @@
 import { nextTick } from 'vue';
 import { PerformantStore } from './performant-store';
+import { updateWorkingFile } from './data/working-file-database';
 import preferencesStore from './preferences';
 import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
@@ -280,6 +281,11 @@ async function dispatchRunAction({ action, mergeWithHistory, replaceHistory, res
             }
         }
 
+        // Update size of working file (creating new document doesn't update).
+        if (actionStack.length === 1) {
+            updateStoredWorkingFile();
+        }
+
     } catch (error) {
         actionRunStatus = { status: 'aborted', reason: error };
     }
@@ -411,6 +417,29 @@ export async function historyBlockInteractionUntilComplete() {
     }
     
     appEmitter.emit('editor.history.stopBlocking');
+}
+
+/**
+ * When any action runs for the first time, update the state of the working file in the database.
+ * This is done here, because we don't want to overwrite the saved file until actual edits are made.
+ */
+async function updateStoredWorkingFile() {
+    const workingFileStore = (await import('@/store/working-file')).default;
+    updateWorkingFile({
+        background: workingFileStore.get('background'),
+        colorModel: workingFileStore.get('colorModel'),
+        colorSpace: workingFileStore.get('colorSpace'),
+        drawOriginX: workingFileStore.get('drawOriginX'),
+        drawOriginY: workingFileStore.get('drawOriginY'),
+        height: workingFileStore.get('height'),
+        layerIdCounter: workingFileStore.get('layerIdCounter'),
+        measuringUnits: workingFileStore.get('measuringUnits'),
+        resolutionUnits: workingFileStore.get('resolutionUnits'),
+        resolutionX: workingFileStore.get('resolutionX'),
+        resolutionY: workingFileStore.get('resolutionY'),
+        scaleFactor: workingFileStore.get('scaleFactor'),
+        width: workingFileStore.get('width'),
+    });
 }
 
 export default store;

@@ -31,7 +31,8 @@ import { BundleAction } from '@/actions/bundle';
 
 import { t, tm, rt } from '@/i18n';
 
-import type { ColorModel, DrawWorkingFileOptions, UpdateAnyLayerOptions, WorkingFileLayer } from '@/types';
+import type { PointerTracker } from './base';
+import type { ColorModel, DrawWorkingFileOptions, UpdateAnyLayerOptions, WorkingFileLayer, WorkingFileGradientLayer } from '@/types';
 
 const DRAG_TYPE_ALL = 0;
 const DRAG_TYPE_TOP = 1;
@@ -179,116 +180,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         super.onPointerMove(e);
         const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
         if (pointer && e.isPrimary && this.transformTranslateStart) {
-            const { viewTransformPoint } = this.getTransformedCursorInfo();
-            const { shouldMaintainAspectRatio, shouldScaleDuringResize, shouldSnapRotationDegrees } = this.getTransformOptions();
-
-            if (pointer.isDragging) {
-                this.isPointerDragging = true;
-            }
-
-            // Rotation
-            if (this.transformIsRotating) {
-                const handleRotation = Math.atan2(
-                    viewTransformPoint.y - (top.value + (height.value * transformOriginY.value)),
-                    viewTransformPoint.x - (left.value + (width.value * transformOriginX.value))
-                );
-                let rotationDelta = handleRotation - this.transformStartDimensions.handleToRotationOrigin;
-
-                if (shouldSnapRotationDegrees) {
-                    const targetRotation = this.transformStartDimensions.rotation + rotationDelta;
-                    const roundedTargetRotation = Math.round(targetRotation / (Math.PI / 18)) * (Math.PI / 18);
-                    rotationDelta -= targetRotation - roundedTargetRotation;
-                }
-
-                this.previewRotationChange(this.transformStartDimensions.rotation + rotationDelta);
-            }
-            // Drag/Resize
-            else if (this.transformIsDragging) {
-
-                const isDragAll = this.transformDragType === DRAG_TYPE_ALL;
-                let isDragLeft = Math.floor(this.transformDragType / DRAG_TYPE_LEFT) % 2 === 1;
-                let isDragRight = Math.floor(this.transformDragType / DRAG_TYPE_RIGHT) % 2 === 1;
-                let isDragTop = Math.floor(this.transformDragType / DRAG_TYPE_TOP) % 2 === 1;
-                let isDragBottom = Math.floor(this.transformDragType / DRAG_TYPE_BOTTOM) % 2 === 1;
-    
-                const dx = Math.round(viewTransformPoint.x - this.transformTranslateStart.x);
-                const dy = Math.round(viewTransformPoint.y - this.transformTranslateStart.y);
-                const xFactor = Math.cos(rotation.value);
-                const yFactor = Math.sin(rotation.value);
-
-                const transformStartAppliedWidth = this.transformStartDimensions.width + (xFactor * dx) + (yFactor * dy);
-                const transformStartAppliedHeight = this.transformStartDimensions.height + (xFactor * dy) - (yFactor * dx);
-                let offsetWidth = transformStartAppliedWidth;
-                let offsetHeight = transformStartAppliedHeight;
-                if (isDragLeft) {
-                    offsetWidth = this.transformStartDimensions.width - ((xFactor * dx) + (yFactor * dy));
-                }
-                if (isDragTop) {
-                    offsetHeight = this.transformStartDimensions.height - ((xFactor * dy) - (yFactor * dx));
-                }
-                // @ts-ignore 2365
-                if (shouldMaintainAspectRatio && (isDragLeft + isDragRight + isDragTop + isDragBottom > 1)) {
-                    const ratioOffsetWidth = offsetHeight * (this.transformStartDimensions.width / this.transformStartDimensions.height);
-                    const ratioOffsetHeight = offsetWidth * (this.transformStartDimensions.height / this.transformStartDimensions.width);
-                    if (offsetHeight > ratioOffsetHeight) {
-                        offsetWidth = ratioOffsetWidth;
-                    } else {
-                        offsetHeight = ratioOffsetHeight;
-                    }
-                }
-    
-                // Determine dimensions
-                let left = this.transformStartDimensions.left;
-                let top = this.transformStartDimensions.top;
-                let width = this.transformStartDimensions.width;
-                let height = this.transformStartDimensions.height;
-                if (isDragAll) {
-                    top = this.transformStartDimensions.top + dy;
-                    left = this.transformStartDimensions.left + dx;
-                }
-                if (isDragTop || isDragLeft) {
-                    left = this.transformStartDimensions.left;
-                    top = this.transformStartDimensions.top;
-                }
-                if (isDragTop) {
-                    const heightDifference = Math.max(-this.transformStartDimensions.height + 1, (offsetHeight - this.transformStartDimensions.height));
-                    const offsetX = -yFactor * heightDifference;
-                    const offsetY = xFactor * heightDifference;
-                    left -= offsetX;
-                    top -= offsetY;
-                }
-                if (isDragLeft) {
-                    const widthDifference = Math.max(-this.transformStartDimensions.width + 1, (offsetWidth - this.transformStartDimensions.width));
-                    const offsetX = xFactor * widthDifference;
-                    const offsetY = yFactor * widthDifference;
-                    left -= offsetX;
-                    top -= offsetY;
-                }
-                if (isDragLeft || isDragRight) {
-                    width = offsetWidth;
-                }
-                if (isDragTop || isDragBottom) {
-                    height = offsetHeight;
-                }
-    
-                // Don't allow negative width/height
-                if (width <= 1) {
-                    width = 1;
-                }
-                if (height <= 1) {
-                    height = 1;
-                }
-
-                this.previewDragResizeChange({
-                    top,
-                    left,
-                    width,
-                    height,
-                }, shouldScaleDuringResize);
-                
-            }
-
-            canvasStore.set('dirty', true);
+            this.onTransformMove(pointer);
         }
         // Set handle highlights based on mouse hover
         if (!this.transformTranslateStart && e.isPrimary && ['mouse', 'pen'].includes(e.pointerType)) {
@@ -373,6 +265,121 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 canvasStore.set('viewDirty', true);
             }
         });
+    }
+
+    onTransformMove(pointer: PointerTracker) {
+        if (!this.transformTranslateStart) return;
+
+        const { viewTransformPoint } = this.getTransformedCursorInfo();
+        const { shouldMaintainAspectRatio, shouldScaleDuringResize, shouldSnapRotationDegrees } = this.getTransformOptions();
+
+        if (pointer.isDragging) {
+            this.isPointerDragging = true;
+        }
+
+        // Rotation
+        if (this.transformIsRotating) {
+            const handleRotation = Math.atan2(
+                viewTransformPoint.y - (top.value + (height.value * transformOriginY.value)),
+                viewTransformPoint.x - (left.value + (width.value * transformOriginX.value))
+            );
+            let rotationDelta = handleRotation - this.transformStartDimensions.handleToRotationOrigin;
+
+            if (shouldSnapRotationDegrees) {
+                const targetRotation = this.transformStartDimensions.rotation + rotationDelta;
+                const roundedTargetRotation = Math.round(targetRotation / (Math.PI / 18)) * (Math.PI / 18);
+                rotationDelta -= targetRotation - roundedTargetRotation;
+            }
+
+            this.previewRotationChange(this.transformStartDimensions.rotation + rotationDelta);
+        }
+        // Drag/Resize
+        else if (this.transformIsDragging) {
+
+            const isDragAll = this.transformDragType === DRAG_TYPE_ALL;
+            let isDragLeft = Math.floor(this.transformDragType / DRAG_TYPE_LEFT) % 2 === 1;
+            let isDragRight = Math.floor(this.transformDragType / DRAG_TYPE_RIGHT) % 2 === 1;
+            let isDragTop = Math.floor(this.transformDragType / DRAG_TYPE_TOP) % 2 === 1;
+            let isDragBottom = Math.floor(this.transformDragType / DRAG_TYPE_BOTTOM) % 2 === 1;
+
+            const dx = Math.round(viewTransformPoint.x - this.transformTranslateStart.x);
+            const dy = Math.round(viewTransformPoint.y - this.transformTranslateStart.y);
+            const xFactor = Math.cos(rotation.value);
+            const yFactor = Math.sin(rotation.value);
+
+            const transformStartAppliedWidth = this.transformStartDimensions.width + (xFactor * dx) + (yFactor * dy);
+            const transformStartAppliedHeight = this.transformStartDimensions.height + (xFactor * dy) - (yFactor * dx);
+            let offsetWidth = transformStartAppliedWidth;
+            let offsetHeight = transformStartAppliedHeight;
+            if (isDragLeft) {
+                offsetWidth = this.transformStartDimensions.width - ((xFactor * dx) + (yFactor * dy));
+            }
+            if (isDragTop) {
+                offsetHeight = this.transformStartDimensions.height - ((xFactor * dy) - (yFactor * dx));
+            }
+            // @ts-ignore 2365
+            if (shouldMaintainAspectRatio && (isDragLeft + isDragRight + isDragTop + isDragBottom > 1)) {
+                const ratioOffsetWidth = offsetHeight * (this.transformStartDimensions.width / this.transformStartDimensions.height);
+                const ratioOffsetHeight = offsetWidth * (this.transformStartDimensions.height / this.transformStartDimensions.width);
+                if (offsetHeight > ratioOffsetHeight) {
+                    offsetWidth = ratioOffsetWidth;
+                } else {
+                    offsetHeight = ratioOffsetHeight;
+                }
+            }
+
+            // Determine dimensions
+            let left = this.transformStartDimensions.left;
+            let top = this.transformStartDimensions.top;
+            let width = this.transformStartDimensions.width;
+            let height = this.transformStartDimensions.height;
+            if (isDragAll) {
+                top = this.transformStartDimensions.top + dy;
+                left = this.transformStartDimensions.left + dx;
+            }
+            if (isDragTop || isDragLeft) {
+                left = this.transformStartDimensions.left;
+                top = this.transformStartDimensions.top;
+            }
+            if (isDragTop) {
+                const heightDifference = Math.max(-this.transformStartDimensions.height + 1, (offsetHeight - this.transformStartDimensions.height));
+                const offsetX = -yFactor * heightDifference;
+                const offsetY = xFactor * heightDifference;
+                left -= offsetX;
+                top -= offsetY;
+            }
+            if (isDragLeft) {
+                const widthDifference = Math.max(-this.transformStartDimensions.width + 1, (offsetWidth - this.transformStartDimensions.width));
+                const offsetX = xFactor * widthDifference;
+                const offsetY = yFactor * widthDifference;
+                left -= offsetX;
+                top -= offsetY;
+            }
+            if (isDragLeft || isDragRight) {
+                width = offsetWidth;
+            }
+            if (isDragTop || isDragBottom) {
+                height = offsetHeight;
+            }
+
+            // Don't allow negative width/height
+            if (width <= 1) {
+                width = 1;
+            }
+            if (height <= 1) {
+                height = 1;
+            }
+
+            this.previewDragResizeChange({
+                top,
+                left,
+                width,
+                height,
+            }, shouldScaleDuringResize);
+            
+        }
+
+        canvasStore.set('dirty', true);
     }
 
     async onTransformEnd() {
@@ -753,24 +760,51 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         // For single layer selection, read transform data from that layer.
         else if (selectedLayers.value.length === 1) {
             const activeLayer = selectedLayers.value[0];
-            const originPosX = activeLayer.width * transformOriginX.value;
-            const originPosY = activeLayer.height * transformOriginY.value;
-            const decomposedTransform = decomposeMatrix(activeLayer.transform);
-            const decomposedPositionTransform = decomposeMatrix(
-                DOMMatrix.fromMatrix(activeLayer.transform)
-                .translateSelf(originPosX, originPosY)
-                .scaleSelf(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY)
-                .rotateSelf(-decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
-                .scaleSelf(decomposedTransform.scaleX, decomposedTransform.scaleY)
-                .translateSelf(-originPosX, -originPosY)
-            );
-            freeTransformEmitter.emit('setDimensions', {
-                left: decomposedPositionTransform.translateX,
-                top: decomposedPositionTransform.translateY,
-                width: activeLayer.width * decomposedTransform.scaleX,
-                height: activeLayer.height * decomposedTransform.scaleY,
-                rotation: decomposedTransform.rotation
-            });
+            if (activeLayer.type === 'gradient') {
+                const startHandle = (activeLayer as WorkingFileGradientLayer).data.start;
+                const endHandle = (activeLayer as WorkingFileGradientLayer).data.end;
+
+                const transformedStartHandle = new DOMPoint(startHandle.x, startHandle.y).matrixTransform(activeLayer.transform);
+                const transformedEndHandle = new DOMPoint(endHandle.x, endHandle.y).matrixTransform(activeLayer.transform);
+
+                // const originPosX = activeLayer.width * transformOriginX.value;
+                // const originPosY = activeLayer.height * transformOriginY.value;
+                const decomposedTransform = decomposeMatrix(activeLayer.transform);
+                // const decomposedPositionTransform = decomposeMatrix(
+                //     DOMMatrix.fromMatrix(activeLayer.transform)
+                //     .translateSelf(originPosX, originPosY)
+                //     .scaleSelf(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY)
+                //     .rotateSelf(-decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
+                //     .scaleSelf(decomposedTransform.scaleX, decomposedTransform.scaleY)
+                //     .translateSelf(-originPosX, -originPosY)
+                // );
+                freeTransformEmitter.emit('setDimensions', {
+                    left: Math.min(transformedStartHandle.x, transformedEndHandle.x),
+                    top: Math.min(transformedStartHandle.y, transformedEndHandle.y),
+                    width: Math.abs(transformedStartHandle.x - transformedEndHandle.x),
+                    height: Math.abs(transformedStartHandle.y - transformedEndHandle.y),
+                    rotation: decomposedTransform.rotation
+                });
+            } else {
+                const originPosX = activeLayer.width * transformOriginX.value;
+                const originPosY = activeLayer.height * transformOriginY.value;
+                const decomposedTransform = decomposeMatrix(activeLayer.transform);
+                const decomposedPositionTransform = decomposeMatrix(
+                    DOMMatrix.fromMatrix(activeLayer.transform)
+                    .translateSelf(originPosX, originPosY)
+                    .scaleSelf(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY)
+                    .rotateSelf(-decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
+                    .scaleSelf(decomposedTransform.scaleX, decomposedTransform.scaleY)
+                    .translateSelf(-originPosX, -originPosY)
+                );
+                freeTransformEmitter.emit('setDimensions', {
+                    left: decomposedPositionTransform.translateX,
+                    top: decomposedPositionTransform.translateY,
+                    width: activeLayer.width * decomposedTransform.scaleX,
+                    height: activeLayer.height * decomposedTransform.scaleY,
+                    rotation: decomposedTransform.rotation
+                });
+            }
         }
     }
 
