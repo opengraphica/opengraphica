@@ -309,10 +309,10 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
         let controlPoint = null;
         for (const layer of selectedLayers as WorkingFileGradientLayer[]) {
             if (layer.type !== 'gradient') continue;
-            const layerGlobalTransformInverse = getLayerGlobalTransform(layer).inverse();
+            const layerGlobalTransform = getLayerGlobalTransform(layer);
             for (const controlPointName of controlPointNames) {
                 const { x, y } = layer.data[controlPointName];
-                const transformedPoint = new DOMPoint(x, y).matrixTransform(layerGlobalTransformInverse);
+                const transformedPoint = new DOMPoint(x, y).matrixTransform(layerGlobalTransform);
                 if (
                     Math.abs(transformedPoint.x - cursor.x) <= positionHandleRadius / appliedZoom &&
                     Math.abs(transformedPoint.y - cursor.y) <= positionHandleRadius / appliedZoom

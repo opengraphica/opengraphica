@@ -85,16 +85,16 @@ export default defineComponent({
             );
             const positions: SelectedGradientLayerPositions[] = [];
             for (const layer of selectedLayers) {
-                const globalTransformInverse = getLayerGlobalTransform(layer).inverse();
-                const start = new DOMPoint(layer.data.start.x, layer.data.start.y).matrixTransform(globalTransformInverse);
-                const end = new DOMPoint(layer.data.end.x, layer.data.end.y).matrixTransform(globalTransformInverse);
+                const globalTransform = getLayerGlobalTransform(layer);
+                const start = new DOMPoint(layer.data.start.x, layer.data.start.y).matrixTransform(globalTransform);
+                const end = new DOMPoint(layer.data.end.x, layer.data.end.y).matrixTransform(globalTransform);
                 const left = Math.min(start.x, end.x);
                 const top = Math.min(start.y, end.y);
                 const rangeLineDirection = normalizedDirectionVector2d(start.x, start.y, end.x, end.y);
                 positions.push({
                     start,
                     end,
-                    focus: new DOMPoint(layer.data.focus.x, layer.data.focus.y).matrixTransform(globalTransformInverse),
+                    focus: new DOMPoint(layer.data.focus.x, layer.data.focus.y).matrixTransform(globalTransform),
                     bounds: new DOMRect(left, top, Math.abs(start.x - end.x), Math.abs(start.y - end.y)),
                     rangeBearing: new DOMPoint(rangeLineDirection.x, rangeLineDirection.y),
                 });

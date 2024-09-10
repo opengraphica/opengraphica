@@ -27,7 +27,7 @@ import { Clipper, PolyType, ClipType, Paths, PolyFillType } from '@/lib/clipper'
 import { findPointListBounds } from '@/lib/math';
 
 import canvasStore from '@/store/canvas';
-import workingFileStore, { getSelectedLayers } from '@/store/working-file';
+import workingFileStore, { getSelectedLayers, getLayerBoundingPoints } from '@/store/working-file';
 
 export default defineComponent({
     name: 'CanvasOverlayEffect',
@@ -81,12 +81,7 @@ export default defineComponent({
             if (layers.length > 0) {
                 const clipper = new Clipper();
                 for (const [layerIndex, layer] of layers.entries()) {
-                    const path = [
-                        new DOMPoint(0, 0).matrixTransform(layer.transform),
-                        new DOMPoint(layer.width, 0).matrixTransform(layer.transform),
-                        new DOMPoint(layer.width, layer.height).matrixTransform(layer.transform),
-                        new DOMPoint(0, layer.height).matrixTransform(layer.transform),
-                    ].map((point) => ({ X: point.x, Y: point.y }));
+                    const path = getLayerBoundingPoints(layer).map((point) => ({ X: point.x, Y: point.y }));
                     clipper.AddPath(path, layerIndex === 0 ? PolyType.ptSubject : PolyType.ptClip, true);
                 }
                 const solution: Paths = [];

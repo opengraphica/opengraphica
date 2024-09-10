@@ -21,17 +21,8 @@ import { createGradientShaderMaterial, updateGradientShaderMaterial } from './sh
 import type { WorkingFileGradientLayer, ColorModel, RGBAColor } from '@/types';
 
 // TODO - implement color model conversions
-function convertGradientLayerToRgba(data: WorkingFileGradientLayer['data'], transform: DOMMatrix): WorkingFileGradientLayer<RGBAColor>['data'] {
+function convertGradientLayerToRgba(data: WorkingFileGradientLayer['data']): WorkingFileGradientLayer<RGBAColor>['data'] {
     const dataCopy = JSON.parse(JSON.stringify(data)) as WorkingFileGradientLayer<RGBAColor>['data'];
-    // TODO - this may need to do a parent transform lookup if group layers have have non-identity transforms.
-    if (!transform.isIdentity) {
-        const start = new DOMPoint(dataCopy.start.x, dataCopy.start.y).matrixTransform(transform);
-        const end = new DOMPoint(dataCopy.end.x, dataCopy.end.y).matrixTransform(transform);
-        const focus = new DOMPoint(dataCopy.focus.x, dataCopy.focus.y).matrixTransform(transform);
-        dataCopy.start = { x: start.x, y: start.y };
-        dataCopy.end = { x: end.x, y: end.y };
-        dataCopy.focus = { x: focus.x, y: focus.y };
-    }
     return dataCopy;
 }
 
@@ -67,8 +58,8 @@ export default class GradientLayerRenderer extends BaseLayerRenderer {
                 fragmentShaderMain: gradientMaterialFragmentShaderMain,
             }
         );
-        this.lastLayerData = convertGradientLayerToRgba(layer.data, layer.transform);
-        this.material = createGradientShaderMaterial(this.lastLayerData, width.value, height.value, combinedShaderResult);
+        this.lastLayerData = convertGradientLayerToRgba(layer.data);
+        this.material = createGradientShaderMaterial(this.lastLayerData, width.value, height.value, transform.value, combinedShaderResult);
         this.plane = new Mesh(this.planeGeometry, this.material);
         this.plane.renderOrder = this.order + 0.1;
         this.plane.matrixAutoUpdate = false;
@@ -104,6 +95,7 @@ export default class GradientLayerRenderer extends BaseLayerRenderer {
     }
 
     async onUpdate(updates: Partial<WorkingFileGradientLayer<ColorModel>>) {
+        let needsMaterialUpdate = false;
         if (updates.visible != null) {
             this.isVisible = updates.visible;
         }
@@ -125,19 +117,15 @@ export default class GradientLayerRenderer extends BaseLayerRenderer {
             }
             this.lastWidth = width;
             this.lastHeight = height;
-            if (this.material && this.lastLayerData) {
-                updateGradientShaderMaterial(this.material, this.lastLayerData, this.lastWidth, this.lastHeight);
-                canvasStore.set('dirty', true);
-            }
+            needsMaterialUpdate = true;
         }
         if (updates.transform) {
             this.lastTransform = updates.transform;
+            needsMaterialUpdate = true;
         }
         if (updates.data) {
-            this.lastLayerData = convertGradientLayerToRgba(updates.data, this.lastTransform);
-            if (this.material) {
-                updateGradientShaderMaterial(this.material, this.lastLayerData, this.lastWidth, this.lastHeight);
-            }
+            this.lastLayerData = convertGradientLayerToRgba(updates.data);
+            needsMaterialUpdate = true;
         }
         if (updates.filters && this.lastLayerData) {
             const combinedShaderResult = combineShaders(
@@ -145,8 +133,13 @@ export default class GradientLayerRenderer extends BaseLayerRenderer {
                 { width: this.sourceTexture?.image.width, height: this.sourceTexture?.image.height }
             );
             this.material?.dispose();
-            this.material = createGradientShaderMaterial(this.lastLayerData, this.lastWidth, this.lastHeight, combinedShaderResult);
+            this.material = createGradientShaderMaterial(this.lastLayerData, this.lastWidth, this.lastHeight, this.lastTransform, combinedShaderResult);
             this.plane && (this.plane.material = this.material);
+        }
+
+        if (needsMaterialUpdate && this.material && this.lastLayerData) {
+            updateGradientShaderMaterial(this.material, this.lastLayerData, this.lastWidth, this.lastHeight, this.lastTransform);
+            canvasStore.set('dirty', true);
         }
     }
     

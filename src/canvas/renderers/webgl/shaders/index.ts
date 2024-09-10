@@ -136,7 +136,16 @@ export function calculateGradientAverageBrightness(stops: WorkingFileGradientCol
     }
     return brightnessAccumulator / stops.length;
 }
-export function createGradientShaderMaterial(params: WorkingFileGradientLayer<RGBAColor>['data'], canvasWidth: number, canvasHeight: number, combinedShaderResult: CombinedShaderResult): ShaderMaterial {
+export function createGradientShaderMaterial(
+    params: WorkingFileGradientLayer<RGBAColor>['data'],
+    canvasWidth: number,
+    canvasHeight: number,
+    transform: DOMMatrix,
+    combinedShaderResult: CombinedShaderResult
+): ShaderMaterial {
+    const startTransformed = new DOMPoint(params.start.x, params.start.y).matrixTransform(transform);
+    const endTransformed = new DOMPoint(params.end.x, params.end.y).matrixTransform(transform);
+    const focusTransformed = new DOMPoint(params.focus.x, params.focus.y).matrixTransform(transform);
     return new ShaderMaterial({
         transparent: true,
         depthTest: false,
@@ -154,18 +163,25 @@ export function createGradientShaderMaterial(params: WorkingFileGradientLayer<RG
         },
         uniforms: {
             gradientMap: { value: createGradientStopTexture(params.stops, params.blendColorSpace) },
-            start: { value: new Vector2(params.start.x, params.start.y) },
-            end: { value: new Vector2(params.end.x, params.end.y) },
-            focus: { value: new Vector2(params.focus.x, params.focus.y) },
+            start: { value: new Vector2(startTransformed.x, startTransformed.y) },
+            end: { value: new Vector2(endTransformed.x, endTransformed.y) },
+            focus: { value: new Vector2(focusTransformed.x, focusTransformed.y) },
             ...combinedShaderResult.uniforms
         },
         userData: {
             blendColorSpace: params.blendColorSpace,
             stops: params.stops,
+            transform: transform,
         },
     });
 }
-export function updateGradientShaderMaterial(material: ShaderMaterial, params: WorkingFileGradientLayer<RGBAColor>['data'], canvasWidth: number, canvasHeight: number) {
+export function updateGradientShaderMaterial(
+    material: ShaderMaterial,
+    params: WorkingFileGradientLayer<RGBAColor>['data'],
+    canvasWidth: number,
+    canvasHeight: number,
+    transform: DOMMatrix
+) {
     material.defines.cCanvasWidth = canvasWidth;
     material.defines.cCanvasHeight = canvasHeight;
     material.defines.cBlendColorSpace = GradientColorSpace[params.blendColorSpace];
@@ -191,17 +207,22 @@ export function updateGradientShaderMaterial(material: ShaderMaterial, params: W
         material.uniforms.gradientMap.value?.dispose();
         material.uniforms.gradientMap.value = createGradientStopTexture(params.stops, params.blendColorSpace);
     }
-    if (params.start.x !== material.uniforms.start.value.x || params.start.y !== material.uniforms.start.value.y) {
-        material.uniforms.start.value = new Vector2(params.start.x, params.start.y);
+    const hasTransformChanged = transform != material.userData.transform;
+    const startTransformed = new DOMPoint(params.start.x, params.start.y).matrixTransform(transform);
+    const endTransformed = new DOMPoint(params.end.x, params.end.y).matrixTransform(transform);
+    const focusTransformed = new DOMPoint(params.focus.x, params.focus.y).matrixTransform(transform);
+    if (hasTransformChanged || startTransformed.x !== material.uniforms.start.value.x || startTransformed.y !== material.uniforms.start.value.y) {
+        material.uniforms.start.value = new Vector2(startTransformed.x, startTransformed.y);
     }
-    if (params.end.x !== material.uniforms.end.value.x || params.end.y !== material.uniforms.end.value.y) {
-        material.uniforms.end.value = new Vector2(params.end.x, params.end.y);
+    if (hasTransformChanged || endTransformed.x !== material.uniforms.end.value.x || endTransformed.y !== material.uniforms.end.value.y) {
+        material.uniforms.end.value = new Vector2(endTransformed.x, endTransformed.y);
     }
-    if (params.focus.x !== material.uniforms.focus.value.x || params.focus.y !== material.uniforms.focus.value.y) {
-        material.uniforms.focus.value = new Vector2(params.focus.x, params.focus.y);
+    if (hasTransformChanged || focusTransformed.x !== material.uniforms.focus.value.x || focusTransformed.y !== material.uniforms.focus.value.y) {
+        material.uniforms.focus.value = new Vector2(focusTransformed.x, focusTransformed.y);
     }
     material.userData.blendColorSpace = params.blendColorSpace;
     material.userData.stops = params.stops;
+    material.userData.transform = transform;
     material.needsUpdate = true;
 }
 export function cleanGradientShaderMaterial(material: ShaderMaterial) {

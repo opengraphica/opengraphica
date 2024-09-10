@@ -130,6 +130,34 @@ function getLayerGlobalTransform(layerOrId: WorkingFileLayer<ColorModel> | numbe
     return transform;
 }
 
+/** Returns 4 points for each corner of the layer bounding box, transformed so they are relative to the document */
+function getLayerBoundingPoints(layerOrId: WorkingFileLayer<ColorModel> | number): DOMPoint[] {
+    let layer: WorkingFileLayer<ColorModel> | null = null;
+    if (typeof layerOrId === 'number') {
+        layer = getLayerById(layerOrId);
+    } else {
+        layer = layerOrId;
+    }
+    if (!layer) return [];
+    if (layer.type === 'gradient') {
+        const canvasWidth = store.get('width');
+        const canvasHeight = store.get('height');
+        return [
+            new DOMPoint(0, 0),
+            new DOMPoint(canvasWidth, 0),
+            new DOMPoint(canvasWidth, canvasHeight),
+            new DOMPoint(0, canvasHeight),
+        ];
+    }
+    const globalTransform = getLayerGlobalTransform(layer);
+    return [
+        new DOMPoint(0, 0).matrixTransform(globalTransform),
+        new DOMPoint(layer.width, 0).matrixTransform(globalTransform),
+        new DOMPoint(layer.width, layer.height).matrixTransform(globalTransform),
+        new DOMPoint(0, layer.height).matrixTransform(globalTransform),
+    ];
+}
+
 function getGroupLayerById(id: number, parent?: WorkingFileLayer<ColorModel>[]): WorkingFileGroupLayer<ColorModel> | null {
     if (parent == null) {
         parent = store.get('layers');
@@ -238,6 +266,7 @@ export {
     getWebGLContextAttributes,
     getLayerById,
     getLayerGlobalTransform,
+    getLayerBoundingPoints,
     getLayersByType,
     getGroupLayerById,
     getSelectedLayers,

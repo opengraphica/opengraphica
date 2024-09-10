@@ -20,6 +20,7 @@ import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
 import { getImageDataFromImage, getImageDataEmptyBounds } from '@/lib/image';
 import { isInput } from '@/lib/events';
 import appEmitter, { AppEmitterEvents } from '@/lib/emitter';
+import { clockwiseAngle2d, pointDistance2d } from '@/lib/math';
 import { AsyncCallbackQueue } from '@/lib/timing';
 import { isCtrlOrMetaKeyPressed, isShiftKeyPressed } from '@/lib/keyboard';
 
@@ -550,6 +551,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             shouldScaleDuringResize = this.getTransformOptions().shouldScaleDuringResize;
         }
         // Determine top/left offset based on width/height change
+        console.log(transformOriginX.value);
         let transformOriginXPoint = (this.transformStartDimensions.width * transformOriginX.value);
         let transformOriginYPoint = (this.transformStartDimensions.height * transformOriginY.value);
         const decomposedStartDimensions = decomposeMatrix(
@@ -763,27 +765,37 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             if (activeLayer.type === 'gradient') {
                 const startHandle = (activeLayer as WorkingFileGradientLayer).data.start;
                 const endHandle = (activeLayer as WorkingFileGradientLayer).data.end;
-
-                const transformedStartHandle = new DOMPoint(startHandle.x, startHandle.y).matrixTransform(activeLayer.transform);
-                const transformedEndHandle = new DOMPoint(endHandle.x, endHandle.y).matrixTransform(activeLayer.transform);
-
-                // const originPosX = activeLayer.width * transformOriginX.value;
-                // const originPosY = activeLayer.height * transformOriginY.value;
+                const handleSize = pointDistance2d(startHandle.x, startHandle.y, endHandle.x, endHandle.y);
+                const handleAngle = clockwiseAngle2d(startHandle.x, startHandle.y, endHandle.x, endHandle.y);
+                let boxSize = handleSize;
+                let boxCenter!: DOMPoint;
+                let topLeftOffset = 0;
+                switch ((activeLayer as WorkingFileGradientLayer).data.fillType) {
+                    case 'linear':
+                        boxCenter = new DOMPoint(
+                            (startHandle.x + endHandle.x) / 2,
+                            (startHandle.y + endHandle.y) / 2
+                        )
+                        topLeftOffset = -handleSize / 2;
+                        break;
+                    case 'radial':
+                        boxCenter = new DOMPoint(startHandle.x, startHandle.y);
+                        boxSize = handleSize * 2;
+                        topLeftOffset = -handleSize;
+                        break;
+                }
                 const decomposedTransform = decomposeMatrix(activeLayer.transform);
-                // const decomposedPositionTransform = decomposeMatrix(
-                //     DOMMatrix.fromMatrix(activeLayer.transform)
-                //     .translateSelf(originPosX, originPosY)
-                //     .scaleSelf(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY)
-                //     .rotateSelf(-decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
-                //     .scaleSelf(decomposedTransform.scaleX, decomposedTransform.scaleY)
-                //     .translateSelf(-originPosX, -originPosY)
-                // );
+                const topLeft = boxCenter.matrixTransform(
+                    activeLayer.transform
+                ).matrixTransform(
+                    new DOMMatrix().translate(topLeftOffset * decomposedTransform.scaleX, topLeftOffset * decomposedTransform.scaleX)
+                )
                 freeTransformEmitter.emit('setDimensions', {
-                    left: Math.min(transformedStartHandle.x, transformedEndHandle.x),
-                    top: Math.min(transformedStartHandle.y, transformedEndHandle.y),
-                    width: Math.abs(transformedStartHandle.x - transformedEndHandle.x),
-                    height: Math.abs(transformedStartHandle.y - transformedEndHandle.y),
-                    rotation: decomposedTransform.rotation
+                    left: topLeft.x,
+                    top: topLeft.y,
+                    width: boxSize * decomposedTransform.scaleX,
+                    height: boxSize * decomposedTransform.scaleX,
+                    rotation: decomposedTransform.rotation + handleAngle,
                 });
             } else {
                 const originPosX = activeLayer.width * transformOriginX.value;
