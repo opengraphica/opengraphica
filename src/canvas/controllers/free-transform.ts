@@ -551,7 +551,6 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             shouldScaleDuringResize = this.getTransformOptions().shouldScaleDuringResize;
         }
         // Determine top/left offset based on width/height change
-        console.log(transformOriginX.value);
         let transformOriginXPoint = (this.transformStartDimensions.width * transformOriginX.value);
         let transformOriginYPoint = (this.transformStartDimensions.height * transformOriginY.value);
         const decomposedStartDimensions = decomposeMatrix(

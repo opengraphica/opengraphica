@@ -3,6 +3,7 @@ import { markRaw } from 'vue';
 import canvasStore from '@/store/canvas';
 
 import BaseLayerRenderer2d from './2d/base';
+import GradientLayerRenderer2d from './2d/gradient';
 import GroupLayerRenderer2d from './2d/group';
 import RasterLayerRenderer2d from './2d/raster';
 import RasterSequenceLayerRenderer2d from './2d/raster-sequence';
@@ -29,7 +30,7 @@ const renderers: Renderers = {
     '2d': {
         base: BaseLayerRenderer2d,
         empty: BaseLayerRenderer2d,
-        gradient: BaseLayerRenderer2d,
+        gradient: GradientLayerRenderer2d,
         group: GroupLayerRenderer2d,
         raster: RasterLayerRenderer2d,
         rasterSequence: RasterSequenceLayerRenderer2d,
