@@ -87,14 +87,14 @@
                             <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.freeTransform.metrics.width')">
                                 <el-input-number
                                     v-model="inputWidth" style="width: 6rem" size="small"
-                                    :suffix-text="measuringUnits" :blur-on-enter="true" :disabled="!isResizeEnabled"
+                                    :suffix-text="measuringUnits" :blur-on-enter="true" :disabled="!isResizeEnabled && !isUnevenScalingEnabled"
                                     @focus="onFocusAnyMetricInput()" @input="onInputWidth($event)" @blur="onChangeDragResizeInput()"
                                 />
                             </el-form-item>
                             <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.freeTransform.metrics.height')">
                                 <el-input-number
                                     v-model="inputHeight" style="width: 6rem" size="small"
-                                    :suffix-text="measuringUnits" :blur-on-enter="true" :disabled="!isResizeEnabled"
+                                    :suffix-text="measuringUnits" :blur-on-enter="true" :disabled="!isResizeEnabled && !isUnevenScalingEnabled"
                                     @focus="onFocusAnyMetricInput()" @input="onInputHeight($event)" @blur="onChangeDragResizeInput()"
                                 />
                             </el-form-item>
@@ -167,7 +167,7 @@
 import { defineComponent, defineAsyncComponent, ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
 import {
     freeTransformEmitter, layerPickMode, useRotationSnapping, top, left, width, height, rotation,
-    applyTransform, trimEmptySpace, layerToImageBounds, isResizeEnabled,
+    applyTransform, trimEmptySpace, layerToImageBounds, isResizeEnabled, isUnevenScalingEnabled,
 } from '@/canvas/store/free-transform-state';
 import { appliedSelectionMask, activeSelectionMask } from '@/canvas/store/selection-state';
 import ElAlert from 'element-plus/lib/components/alert/index';
@@ -360,6 +360,7 @@ export default defineComponent({
         return {
             hasSelection,
             isResizeEnabled,
+            isUnevenScalingEnabled,
             inputLeft,
             inputTop,
             inputWidth,

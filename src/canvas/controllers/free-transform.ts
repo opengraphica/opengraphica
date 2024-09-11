@@ -3,7 +3,7 @@ import BaseCanvasMovementController from './base-movement';
 import {
     isBoundsIndeterminate, layerPickMode, useRotationSnapping, freeTransformEmitter, top, left, width, height, rotation,
     transformOriginX, transformOriginY, dimensionLockRatio, previewXSnap, previewYSnap, dragHandleHighlight, rotateHandleHighlight, selectedLayers,
-    applyTransform, isResizeEnabled,
+    applyTransform, isResizeEnabled, isUnevenScalingEnabled,
 } from '../store/free-transform-state';
 import {
     appliedSelectionMask, appliedSelectionMaskCanvasOffset, activeSelectionMask, activeSelectionMaskCanvasOffset
@@ -546,28 +546,6 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         }
     }
 
-    private getResizeOffset(newTransform: DragResizeTransformInfo, width: number, height: number): DOMPoint {
-        if (selectedLayers.value.length === 1) {
-            const activeLayer = selectedLayers.value[0];
-            if (activeLayer.type === 'gradient') {
-                return new DOMPoint(
-                    newTransform.left + (width / 2),
-                    newTransform.top + (height / 2),
-                );
-            } else {
-                return new DOMPoint(
-                    newTransform.left,
-                    newTransform.top,
-                );
-            }
-        } else {
-            return new DOMPoint(
-                newTransform.left,
-                newTransform.top,
-            );
-        }
-    }
-
     private previewDragResizeChange(newTransform: DragResizeTransformInfo, shouldScaleDuringResize?: boolean) {
         if (shouldScaleDuringResize == null) {
             shouldScaleDuringResize = this.getTransformOptions().shouldScaleDuringResize;
@@ -615,19 +593,26 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 rotationOffset = clockwiseAngle2d(startHandle.x, startHandle.y, endHandle.x, endHandle.y);
                 let startOrigin: DOMPoint;
                 let endOrigin: DOMPoint;
+                const startScale = decomposedTransform.scaleX;
+                const endScaleX = (decomposedTransform.scaleX * newTransform.width / this.transformStartDimensions.width);
+                const endScaleY = (decomposedTransform.scaleY * newTransform.height / this.transformStartDimensions.height);
                 switch ((layer as WorkingFileGradientLayer).data.fillType) {
                     case 'radial':
-                        startOrigin = new DOMPoint(
-                            handleSize * decomposedTransform.scaleX,
-                            handleSize * decomposedTransform.scaleX
-                        ).matrixTransform(
-                            new DOMMatrix().rotate((decomposedTransform.rotation + rotationOffset) * Math.RADIANS_TO_DEGREES)
+                        startOrigin = new DOMPoint().matrixTransform(
+                            new DOMMatrix()
+                                .rotate((decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES)
+                                .translate(-startHandle.x * startScale, -startHandle.y * startScale)
+                                .rotate((rotationOffset) * Math.RADIANS_TO_DEGREES)
+                                .translate(handleSize * startScale, handleSize * startScale)
+                                .rotate((decomposedTransform.rotation + rotationOffset) * Math.RADIANS_TO_DEGREES)
                         );
-                        endOrigin = new DOMPoint(
-                            handleSize * (decomposedTransform.scaleX * newTransform.width / this.transformStartDimensions.width),
-                            handleSize * (decomposedTransform.scaleY * newTransform.height / this.transformStartDimensions.height)
-                        ).matrixTransform(
-                            new DOMMatrix().rotate((decomposedTransform.rotation + rotationOffset) * Math.RADIANS_TO_DEGREES)
+                        endOrigin = new DOMPoint().matrixTransform(
+                            new DOMMatrix()
+                                .rotate((decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES)
+                                .translate(-startHandle.x * endScaleX, -startHandle.y * endScaleY)
+                                .rotate((rotationOffset) * Math.RADIANS_TO_DEGREES)
+                                .translate(handleSize * endScaleX, handleSize * endScaleY)
+                                .rotate((decomposedTransform.rotation + rotationOffset) * Math.RADIANS_TO_DEGREES)
                         );
                         transformStartOriginX = startOrigin.x;
                         transformStartOriginY = startOrigin.y;
@@ -635,17 +620,21 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                         transformEndOriginY = endOrigin.y;
                         break;
                     case 'linear':
-                        startOrigin = new DOMPoint(
-                            (0) * decomposedTransform.scaleX,
-                            (handleSize) * decomposedTransform.scaleX
-                        ).matrixTransform(
-                            new DOMMatrix().rotate((decomposedTransform.rotation + rotationOffset) * Math.RADIANS_TO_DEGREES)
+                        startOrigin = new DOMPoint().matrixTransform(
+                            new DOMMatrix()
+                                .rotate((decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES)
+                                .translate(-startHandle.x * startScale, -startHandle.y * startScale)
+                                .rotate((rotationOffset) * Math.RADIANS_TO_DEGREES)
+                                .translate(0 * startScale, handleSize * startScale)
+                                .rotate((decomposedTransform.rotation + rotationOffset) * Math.RADIANS_TO_DEGREES)
                         );
-                        endOrigin = new DOMPoint(
-                            (0) * (decomposedTransform.scaleX * newTransform.width / this.transformStartDimensions.width),
-                            (handleSize) * (decomposedTransform.scaleY * newTransform.height / this.transformStartDimensions.height)
-                        ).matrixTransform(
-                            new DOMMatrix().rotate((decomposedTransform.rotation + rotationOffset) * Math.RADIANS_TO_DEGREES)
+                        endOrigin = new DOMPoint().matrixTransform(
+                            new DOMMatrix()
+                                .rotate((decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES)
+                                .translate(-startHandle.x * endScaleX, -startHandle.y * endScaleY)
+                                .rotate((rotationOffset) * Math.RADIANS_TO_DEGREES)
+                                .translate(0 * endScaleX, handleSize * endScaleY)
+                                .rotate((decomposedTransform.rotation + rotationOffset) * Math.RADIANS_TO_DEGREES)
                         );
                         transformStartOriginX = startOrigin.x;
                         transformStartOriginY = startOrigin.y;
@@ -799,6 +788,17 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             if (point.x >= left.value + width.value - innerHandleSizeHorizontal && point.x <= left.value + width.value + handleSize + touchForgivenessMargin) {
                 transformDragType |= DRAG_TYPE_RIGHT;
             }
+            if (
+                !isUnevenScalingEnabled.value && 
+                (
+                    transformDragType == DRAG_TYPE_TOP ||
+                    transformDragType == DRAG_TYPE_BOTTOM ||
+                    transformDragType == DRAG_TYPE_LEFT ||
+                    transformDragType == DRAG_TYPE_RIGHT
+                )
+            ) {
+                transformDragType = 0;
+            }
         }
         if (
             point.x < left.value - handleSize - touchForgivenessMargin ||
@@ -912,6 +912,9 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             if (firstLayer.type === 'text') {
                 shouldMaintainAspectRatio = false;
                 shouldScaleDuringResize = false;
+            }
+            if (firstLayer.type === 'gradient') {
+                shouldMaintainAspectRatio = true;
             }
         }
         return { shouldMaintainAspectRatio, shouldScaleDuringResize, shouldSnapRotationDegrees };

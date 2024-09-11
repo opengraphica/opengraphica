@@ -40,6 +40,18 @@ export const isResizeEnabled = computed<boolean>(() => {
     return isEnabled;
 });
 
+export const isUnevenScalingEnabled = computed<boolean>(() => {
+    const selectedLayers = getSelectedLayers(workingFileStore.state.selectedLayerIds);
+    let isEnabled = true;
+    for (const layer of selectedLayers) {
+        if (layer.type === 'gradient') {
+            isEnabled = false;
+            break;
+        }
+    }
+    return isEnabled;
+});
+
 freeTransformEmitter.on('setDimensions', (event?: { top?: number, left?: number, width?: number, height?: number, rotation?: number, transformOriginX?: number, transformOriginY?: number }) => {
     if (event) {
         if (event.transformOriginX != null) {
