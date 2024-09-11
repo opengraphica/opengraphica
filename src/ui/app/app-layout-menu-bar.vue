@@ -229,10 +229,12 @@ export default defineComponent({
         let resizeDebounceHandle: number | undefined = undefined;
         let pointerDownElement: EventTarget | null = null;
         let pointerDownId: number;
+        let pointerDownType: string;
         let pointerDownButton: number;
         let pointerDownShowDock: boolean = false;
         let pointerPressHoldTimeoutHandle: number | undefined;
         let lastPointerTap: number = 0;
+        let lastPointerTapType: string = '';
 
         const { viewWidth: viewportWidth, viewHeight: viewportHeight } = toRefs(canvasStore.state);
         const { activeToolGroup, activeTool } = toRefs(editorStore.state);
@@ -466,6 +468,7 @@ export default defineComponent({
             }
             pointerDownElement = event.target;
             pointerDownId = (event as TouchEvent).touches ? (event as TouchEvent).touches[0].identifier : 0;
+            pointerDownType = event.type === 'mousedown' ? 'mouse' : 'touch';
             pointerDownButton = (event as MouseEvent).button || 0;
             pointerDownShowDock = control.showDock || false;
             clearTimeout(pointerPressHoldTimeoutHandle);
@@ -478,7 +481,8 @@ export default defineComponent({
         }
         function onPointerUpControlButton(event: TouchEvent | MouseEvent, control: LayoutShortcutGroupDefinitionControlButton) {
             clearTimeout(pointerPressHoldTimeoutHandle);
-            let id = pointerDownId;
+            const id = pointerDownId;
+            const type = event.type === 'mouseup' ? 'mouse' : 'touch';
             if ((event as TouchEvent).touches) {
                 for (let i = 0; i < (event as TouchEvent).touches.length; i++) {
                     if ((event as TouchEvent).touches[i].identifier === pointerDownId) {
@@ -488,13 +492,25 @@ export default defineComponent({
                 }
             }
             const button = (event as MouseEvent).button || 0;
-            if (pointerDownElement === event.target && pointerDownButton === button && pointerDownId === id) {
+            if (
+                pointerDownElement === event.target &&
+                pointerDownButton === button &&
+                pointerDownId === id &&
+                (
+                    pointerDownType === 'touch' ||
+                    (pointerDownType === 'mouse' && (
+                        lastPointerTapType !== 'touch' ||
+                        window.performance.now() - lastPointerTap > 350
+                    ))
+                )
+            ) {
                 onPressControlButton('popover', button, control);
                 pointerDownElement = null;
                 pointerDownButton = -1;
                 pointerDownId = -1;
                 ((event.target as HTMLButtonElement).closest('button') as any).focus();
                 lastPointerTap = window.performance.now();
+                lastPointerTapType = type;
             }
         }
         function onPointerDownWindow(event: TouchEvent | MouseEvent) {
