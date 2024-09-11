@@ -529,10 +529,14 @@ export default defineComponent({
             } else {
                 if (control.action) {
                     if (control.action.type === 'toolGroup') {
-                        if (button === 0 && activeToolGroup.value !== control.action.target) {
-                            editorStore.dispatch('setActiveTool', { group: control.action.target });
-                            if (openTarget === 'modal') {
-                                showMoreActionsMenu.value = false;
+                        if (button === 0) {
+                            if (activeToolGroup.value !== control.action.target) {
+                                editorStore.dispatch('setActiveTool', { group: control.action.target });
+                                if (openTarget === 'modal') {
+                                    showMoreActionsMenu.value = false;
+                                }
+                            } else if (control.controls?.length ?? 0 > 0) {
+                                isActiveToolGroupExpanded.value = !isActiveToolGroupExpanded.value;
                             }
                         }
                     } else if (control.action.type === 'tool') {
