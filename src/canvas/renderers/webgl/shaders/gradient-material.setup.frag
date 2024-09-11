@@ -21,6 +21,7 @@ uniform vec2 focus;
 
 varying vec2 vUv;
 
+#ifdef IS_WEBGL2
 float cbrt(float x) {
     float y = sign(x) * uintBitsToFloat(floatBitsToUint(abs(x)) / 3u + 0x2a514067u);
     for(int i = 0; i < CBRT_NEWTON_ITER; ++i) {
@@ -32,6 +33,11 @@ float cbrt(float x) {
     }
     return y;
 }
+#else
+float cbrt(float x) {
+    return x < 0.0 ? -pow(-x, 1.0 / 3.0) : pow(x, 1.0 / 3.0);
+}
+#endif
 
 float srgbChannelToLinearSrgbChannel(float value) {
     float calculatedValue = 0.0;

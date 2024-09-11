@@ -103,7 +103,7 @@ export default defineComponent({
         });
 
         const positionHandleDiameter = computed<number>(() => {
-            return positionHandleRadius * 2 * devicePixelRatio;
+            return positionHandleRadius * 2;
         });
 
         const rangeLineOffset = computed<number>(() => {
@@ -116,8 +116,8 @@ export default defineComponent({
 
         const zoom = computed<number>(() => {
             const decomposedTransform = canvasStore.state.decomposedTransform;
-            let appliedZoom: number = decomposedTransform.scaleX / devicePixelRatio;
-            return appliedZoom;
+            let appliedZoom: number = decomposedTransform.scaleX;
+            return appliedZoom / devicePixelRatio;
         });
 
         onMounted(() => {

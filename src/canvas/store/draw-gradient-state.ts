@@ -10,6 +10,7 @@ import type {
 
 export const positionHandleRadius = 5;
 export const colorStopHandleRadius = 3;
+export const radiusMultiplierTouch = 2.5;
 
 export const cursorHoverPosition = ref<DOMPoint>(new DOMPoint());
 export const showStopDrawer = ref(false);

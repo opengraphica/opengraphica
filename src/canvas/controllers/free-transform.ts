@@ -546,6 +546,28 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         }
     }
 
+    private getResizeOffset(newTransform: DragResizeTransformInfo, width: number, height: number): DOMPoint {
+        if (selectedLayers.value.length === 1) {
+            const activeLayer = selectedLayers.value[0];
+            if (activeLayer.type === 'gradient') {
+                return new DOMPoint(
+                    newTransform.left + (width / 2),
+                    newTransform.top + (height / 2),
+                );
+            } else {
+                return new DOMPoint(
+                    newTransform.left,
+                    newTransform.top,
+                );
+            }
+        } else {
+            return new DOMPoint(
+                newTransform.left,
+                newTransform.top,
+            );
+        }
+    }
+
     private previewDragResizeChange(newTransform: DragResizeTransformInfo, shouldScaleDuringResize?: boolean) {
         if (shouldScaleDuringResize == null) {
             shouldScaleDuringResize = this.getTransformOptions().shouldScaleDuringResize;
@@ -570,25 +592,83 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             .translateSelf(transformOriginXPoint, transformOriginYPoint)
         );
 
-        // Apply new dimensions
+        // Apply the transform offset to the layer dragging bounds overlay
         freeTransformEmitter.emit('setDimensions', {
             left: newTransform.left + decomposedEndDimensions.translateX - decomposedStartDimensions.translateX,
             top: newTransform.top + decomposedEndDimensions.translateY - decomposedStartDimensions.translateY,
             width: newTransform.width,
             height: newTransform.height
         });
+        // Apply the transform offset to each layer
         for (const [i, layer] of selectedLayers.value.entries()) {
             const decomposedTransform = decomposeMatrix(this.transformStartLayerData[i].transform);
             let transform = DOMMatrix.fromMatrix(this.transformStartLayerData[i].transform)
+            let rotationOffset = 0;
+            let transformStartOriginX = 0;
+            let transformStartOriginY = 0;
+            let transformEndOriginX = 0;
+            let transformEndOriginY = 0;
+            if (layer.type === 'gradient') {
+                const startHandle = (layer as WorkingFileGradientLayer).data.start;
+                const endHandle = (layer as WorkingFileGradientLayer).data.end;
+                const handleSize = pointDistance2d(startHandle.x, startHandle.y, endHandle.x, endHandle.y);
+                rotationOffset = clockwiseAngle2d(startHandle.x, startHandle.y, endHandle.x, endHandle.y);
+                let startOrigin: DOMPoint;
+                let endOrigin: DOMPoint;
+                switch ((layer as WorkingFileGradientLayer).data.fillType) {
+                    case 'radial':
+                        startOrigin = new DOMPoint(
+                            handleSize * decomposedTransform.scaleX,
+                            handleSize * decomposedTransform.scaleX
+                        ).matrixTransform(
+                            new DOMMatrix().rotate((decomposedTransform.rotation + rotationOffset) * Math.RADIANS_TO_DEGREES)
+                        );
+                        endOrigin = new DOMPoint(
+                            handleSize * (decomposedTransform.scaleX * newTransform.width / this.transformStartDimensions.width),
+                            handleSize * (decomposedTransform.scaleY * newTransform.height / this.transformStartDimensions.height)
+                        ).matrixTransform(
+                            new DOMMatrix().rotate((decomposedTransform.rotation + rotationOffset) * Math.RADIANS_TO_DEGREES)
+                        );
+                        transformStartOriginX = startOrigin.x;
+                        transformStartOriginY = startOrigin.y;
+                        transformEndOriginX = endOrigin.x;
+                        transformEndOriginY = endOrigin.y;
+                        break;
+                    case 'linear':
+                        startOrigin = new DOMPoint(
+                            (0) * decomposedTransform.scaleX,
+                            (handleSize) * decomposedTransform.scaleX
+                        ).matrixTransform(
+                            new DOMMatrix().rotate((decomposedTransform.rotation + rotationOffset) * Math.RADIANS_TO_DEGREES)
+                        );
+                        endOrigin = new DOMPoint(
+                            (0) * (decomposedTransform.scaleX * newTransform.width / this.transformStartDimensions.width),
+                            (handleSize) * (decomposedTransform.scaleY * newTransform.height / this.transformStartDimensions.height)
+                        ).matrixTransform(
+                            new DOMMatrix().rotate((decomposedTransform.rotation + rotationOffset) * Math.RADIANS_TO_DEGREES)
+                        );
+                        transformStartOriginX = startOrigin.x;
+                        transformStartOriginY = startOrigin.y;
+                        transformEndOriginX = endOrigin.x;
+                        transformEndOriginY = endOrigin.y;
+                        break;
+                }
+            }
             if (shouldScaleDuringResize) {
                 transform.scaleSelf(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY);
             }
             transform
-                .rotateSelf(-decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
-                .translateSelf(newTransform.left - this.transformStartDimensions.left, newTransform.top - this.transformStartDimensions.top)
-                .rotateSelf(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
+                .rotateSelf(-(decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES)
+                .translateSelf(
+                    (newTransform.left + transformEndOriginX) - (this.transformStartDimensions.left + transformStartOriginX),
+                    (newTransform.top + transformEndOriginY) - (this.transformStartDimensions.top + transformStartOriginY)
+                )
+                .rotateSelf((decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES)
             if (shouldScaleDuringResize) {
-                transform.scaleSelf(decomposedTransform.scaleX * newTransform.width / this.transformStartDimensions.width, decomposedTransform.scaleY * newTransform.height / this.transformStartDimensions.height)
+                transform.scaleSelf(
+                    decomposedTransform.scaleX * newTransform.width / this.transformStartDimensions.width,
+                    decomposedTransform.scaleY * newTransform.height / this.transformStartDimensions.height
+                )
             }
             layer.transform = transform;
         }

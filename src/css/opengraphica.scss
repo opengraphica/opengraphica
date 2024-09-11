@@ -68,6 +68,7 @@ body.ogr-full-page {
         overflow: hidden;
     }
 
+    @import './opengraphica/reset.scss';
     @import './opengraphica/animation.scss';
     @import './opengraphica/canvas.scss';
     @import './opengraphica/color-picker.scss';

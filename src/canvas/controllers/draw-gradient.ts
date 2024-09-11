@@ -5,7 +5,7 @@ import BaseCanvasMovementController from './base-movement';
 import {
     cursorHoverPosition, positionHandleRadius, editingLayers,
     activeColorStops, blendColorSpace, fillType, spreadMethod,
-    hasVisibleToolbarOverlay, showStopDrawer,
+    hasVisibleToolbarOverlay, showStopDrawer, radiusMultiplierTouch,
 } from '@/canvas/store/draw-gradient-state';
 import { blitActiveSelectionMask, activeSelectionMask, appliedSelectionMask } from '@/canvas/store/selection-state';
 
@@ -119,7 +119,6 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
             this.drawingPointerId == null && e.isPrimary && e.button === 0 &&
             (
                 e.pointerType === 'pen' ||
-                e.pointerType === 'touch' ||
                 (!editorStore.state.isPenUser && e.pointerType === 'mouse')
             )
         ) {
@@ -130,8 +129,9 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
 
     onMultiTouchDown() {
         super.onMultiTouchDown();
-        if (this.touches.length > 1) {
-            this.drawingPointerId = null;
+        if (this.touches.length === 1) {
+            this.drawingPointerId = this.touches[0].id;
+            this.drawStart();
         }
     }
 
@@ -305,17 +305,17 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
     private getControlPointAtPosition(cursor: { x: number, y: number }, selectedLayers: WorkingFileAnyLayer[], editLayer = false) {
         const decomposedTransform = canvasStore.state.decomposedTransform;
         let appliedZoom: number = decomposedTransform.scaleX / devicePixelRatio;
-        
         let controlPoint = null;
         for (const layer of selectedLayers as WorkingFileGradientLayer[]) {
             if (layer.type !== 'gradient') continue;
             const layerGlobalTransform = getLayerGlobalTransform(layer);
             for (const controlPointName of controlPointNames) {
+                const handleRadius = (positionHandleRadius * (editorStore.get('isTouchUser') ? radiusMultiplierTouch : 1)) / appliedZoom;
                 const { x, y } = layer.data[controlPointName];
                 const transformedPoint = new DOMPoint(x, y).matrixTransform(layerGlobalTransform);
                 if (
-                    Math.abs(transformedPoint.x - cursor.x) <= positionHandleRadius / appliedZoom &&
-                    Math.abs(transformedPoint.y - cursor.y) <= positionHandleRadius / appliedZoom
+                    Math.abs(transformedPoint.x - cursor.x) <= handleRadius &&
+                    Math.abs(transformedPoint.y - cursor.y) <= handleRadius
                 ) {
                     controlPoint = controlPointName;
                     if (editLayer) {
