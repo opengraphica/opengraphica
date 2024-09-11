@@ -130,7 +130,13 @@ export default class GradientLayerRenderer extends BaseLayerRenderer {
         if (updates.filters && this.lastLayerData) {
             const combinedShaderResult = combineShaders(
                 await createFiltersFromLayerConfig(updates.filters),
-                { width: this.sourceTexture?.image.width, height: this.sourceTexture?.image.height }
+                { width: this.sourceTexture?.image.width, height: this.sourceTexture?.image.height },
+                {
+                    vertexShaderSetup: gradientMaterialVertexShaderSetup,
+                    vertexShaderMain: gradientMaterialVertexShaderMain,
+                    fragmentShaderSetup: gradientMaterialFragmentShaderSetup,
+                    fragmentShaderMain: gradientMaterialFragmentShaderMain,
+                }
             );
             this.material?.dispose();
             this.material = createGradientShaderMaterial(this.lastLayerData, this.lastWidth, this.lastHeight, this.lastTransform, combinedShaderResult);
