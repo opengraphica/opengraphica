@@ -3,6 +3,7 @@ import { markRaw, nextTick, toRefs, watch, type WatchStopHandle } from 'vue';
 import canvasStore from '@/store/canvas';
 
 import { createRasterShaderMaterial } from './shaders';
+import { assignMaterialBlendModes } from './blending';
 import { createFiltersFromLayerConfig, combineShaders } from '../../filters';
 import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 
@@ -16,7 +17,7 @@ import { Vector2 } from 'three/src/math/Vector2';
 import { Camera, Scene, WebGLRenderer } from 'three';
 import type {
     DrawWorkingFileLayerOptions, WorkingFileLayer, WorkingFileLayerRenderer, WorkingFileGroupLayer, ColorModel,
-    WorkingFileLayerFilter, WorkingFileLayerDraft
+    WorkingFileLayerFilter, WorkingFileLayerDraft, WorkingFileLayerBlendingMode
 } from '@/types';
 
 interface DraftAssets {
@@ -41,6 +42,8 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
     private recycledDraftAssets: DraftAssets | null = null;
 
     private nextUpdatePromises: Array<Promise<void>> = [];
+
+    private lastBaseBlendingMode: WorkingFileLayerBlendingMode = 'normal';
 
     reorder(order: number) {
         this.order = order;
@@ -109,6 +112,16 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
             this.onUpdate(updates)
         );
 
+        if (updates.blendingMode) {
+            this.lastBaseBlendingMode = updates.blendingMode;
+            for (const draftUuid of this.draftAssetMap.keys()) {
+                const draftAssets = this.draftAssetMap.get(draftUuid);
+                if (draftAssets?.planeMaterial) {
+                    assignMaterialBlendModes(draftAssets.planeMaterial, updates.blendingMode);
+                }
+            }
+        }
+
         // Store filters definition in case it is needed later - assumed that inherited class calls update for this
         if (updates.filters) {
             this.draftPlaneUseFilters = updates.filters;
@@ -149,6 +162,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
                             { width: draftUpdate.logicalWidth, height: draftUpdate.logicalHeight }
                         );
                         draftAssets.planeMaterial = createRasterShaderMaterial(null, combinedShaderResult);
+                        assignMaterialBlendModes(draftAssets.planeMaterial, this.lastBaseBlendingMode);
                         if (draftAssets.planeTexture) {
                             draftAssets.planeMaterial.uniforms.map.value = draftAssets.planeTexture
                         }

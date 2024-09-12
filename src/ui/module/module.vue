@@ -35,6 +35,7 @@ export default defineComponent({
         'file-take-photo': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-take-photo' */ `@/ui/module/module-file-take-photo.vue`)),
         'image-convert-layers-to-collage': defineAsyncComponent(() => import(/* webpackChunkName: 'module-image-convert-layers-to-collage' */ `@/ui/module/module-image-convert-layers-to-collage.vue`)),
         'image-convert-layers-to-image-sequence': defineAsyncComponent(() => import(/* webpackChunkName: 'module-image-convert-layers-to-image-sequence' */ `@/ui/module/module-image-convert-layers-to-image-sequence.vue`)),
+        'layer-blending-mode': defineAsyncComponent(() => import(/* webpackChunkName: 'module-layer-blending-mode' */ `@/ui/module/module-layer-blending-mode.vue`)),
         'layer-effect-browser': defineAsyncComponent(() => import(/* webpackChunkName: 'module-layer-effect-browser' */ `@/ui/module/module-layer-effect-browser.vue`)),
         'layer-effect-edit': defineAsyncComponent(() => import(/* webpackChunkName: 'module-layer-effect-edit' */ `@/ui/module/module-layer-effect-edit.vue`)),
         'rename-layer': defineAsyncComponent(() => import(/* webpackChunkName: 'module-rename-layer' */ `@/ui/module/module-rename-layer.vue`)),

@@ -51,6 +51,7 @@
         "updateEraseLayer": "Erase from Layer",
         "updateFile": "Update File",
         "updateLayer": "Update Layer",
+        "updateLayerBlendingMode": "Change Blending Mode",
         "updateLayerFilterParams": "Update Layer Effect",
         "updateSelectionCombineMode": "Update Selection Combine Mode",
         "waitingOnQueueFree": "Waiting for Work to Complete"
@@ -83,6 +84,7 @@
             "toggleLayerVisibility": "Toggle Layer Visibility",
             "layerSettings": "Layer Settings",
             "rename": "Rename",
+            "blendingMode": "Blending",
             "addEffect": "Add Effect",
             "delete": "Delete",
             "frames": "Frames",
@@ -298,6 +300,10 @@
                 "deleteSelection": "Delete Selection"
             }
         }
+    },
+    "layerBlendingMode": {
+        "normal": "Normal",
+        "erase": "Erase"
     },
     "layerFilter": {
         "brightness": {
@@ -689,6 +695,10 @@
             "title": "Convert Layers to Image Sequence",
             "frameDelay": "Frame Delay"
         },
+        "layerBlendingMode": {
+            "title": "Change Blending Mode",
+            "blendingMode": "Blending Mode"
+        },
         "layerEffectBrowser": {
             "title": "Effect Browser",
             "description": "Choose an effect to add to the layer. Effects generally manipulate the colors of a layer or add special patterns like blurring effects.",
@@ -811,7 +821,11 @@
             "modules": {
                 "rename": {
                     "name": "Rename Layer",
-                    "description": "Change the name of a layer"
+                    "description": "Change the name of a layer."
+                },
+                "blendingMode": {
+                    "name": "Change Layer Blending Mode",
+                    "description": "Change the blending mode of the active layer."
                 },
                 "layerEffectBrowser": {
                     "name": "Effect Browser",

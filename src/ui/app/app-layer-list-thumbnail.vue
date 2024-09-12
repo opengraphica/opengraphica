@@ -54,7 +54,10 @@ export default defineComponent({
                 canvas.height = thumbnailHeight;
                 let ctx: CanvasRenderingContext2D = canvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
                 ctx.scale(thumbnailScale, thumbnailScale);
-                new renderers['2d'][props.layer.type]().draw(ctx, props.layer, { visible: true });
+                new renderers['2d'][props.layer.type]().draw(ctx, props.layer, {
+                    visible: true,
+                    globalCompositeOperation: 'source-over',
+                });
                 props.layer.thumbnailImageSrc = canvas.toDataURL();
             }
             return props.layer.thumbnailImageSrc;

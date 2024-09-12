@@ -56,6 +56,10 @@
                                 <i class="bi bi-alphabet"></i>
                                 <span v-t="'app.layerList.rename'"></span>
                             </el-menu-item>
+                            <el-menu-item index="blendingMode">
+                                <i class="bi bi-images"></i>
+                                <span v-t="'app.layerList.blendingMode'"></span>
+                            </el-menu-item>
                             <el-menu-item index="effect">
                                 <i class="bi bi-stars"></i>
                                 <span v-t="'app.layerList.addEffect'"></span>
@@ -145,12 +149,14 @@
 
 <script lang="ts">
 import { defineComponent, ref, watch, reactive, computed, onMounted, onUnmounted, toRefs, nextTick, PropType } from 'vue';
+
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton from 'element-plus/lib/components/button/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
-import ElMenu, { ElMenuItem } from 'element-plus/lib/components/menu/index';
+import ElMenu, { ElSubMenu, ElMenuItem } from 'element-plus/lib/components/menu/index';
 import ElPopover from 'element-plus/lib/components/popover/index';
 import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
+
 import pointerDirective from '@/directives/pointer';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
@@ -183,7 +189,8 @@ export default defineComponent({
         ElMenu,
         ElMenuItem,
         ElPopover,
-        ElScrollbar
+        ElScrollbar,
+        ElSubMenu,
     },
     props: {
         depth: {
@@ -281,11 +288,11 @@ export default defineComponent({
 
         async function onLayerSettingsSelect(layer: WorkingFileAnyLayer<ColorModel>, layerIndex: number, action: string) {
             if (action === 'rename') {
-                runModule('layer', 'rename', {
-                    layerId: layer.id,
-                })
+                runModule('layer', 'rename', { layerId: layer.id, });
+            } else if (action === 'blendingMode') {
+                runModule('layer', 'blendingMode', { layerId: layer.id });
             } else if (action === 'effect') {
-                await runModule('layer', 'layerEffectBrowser', { layerId: layer.id });
+                runModule('layer', 'layerEffectBrowser', { layerId: layer.id });
             } else if (action === 'delete') {
                 historyStore.dispatch('runAction', {
                     action: new DeleteLayersAction([layer.id])

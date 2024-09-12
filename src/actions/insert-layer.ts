@@ -60,7 +60,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
             const sharedOptions: WorkingFileLayer<ColorModel> = {
                 type: 'raster',
                 bakedImage: null,
-                blendingMode: 'source-over',
+                blendingMode: 'normal',
                 drafts: null,
                 filters: [],
                 id: layerId,

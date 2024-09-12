@@ -70,9 +70,12 @@ async function runModuleByDefinition(module: ModuleDefinition, moduleProperties?
                 moduleRunArgs.cancelRef = cancelRef;
             }
             if (!options.hideWaitAnimation) {
+                const moduleIdentifiers = findModuleIdentifiers(module);
                 appEmitter.emit('app.wait.startBlocking', {
                     id: moduleRunId,
-                    label: module.name,
+                    label: moduleIdentifiers
+                        ? `moduleGroup.${ moduleIdentifiers.group }.modules.${ moduleIdentifiers.module }.name`
+                        : 'app.wait.pleaseWait',
                     cancelable: module.cancelable || false
                 });
             }
@@ -115,13 +118,26 @@ export async function runModule(moduleGroupName: string, moduleName: string, mod
     }
 }
 
+function findModuleIdentifiers(module: ModuleDefinition): { group: string, module: string } | null {
+    for (const moduleGroupName in moduleGroups) {
+        const moduleGroup = moduleGroups[moduleGroupName];
+        for (const moduleName in moduleGroup.modules) {
+            if (moduleGroup.modules[moduleName] === module) {
+                return {
+                    group: moduleGroupName,
+                    module: moduleName,
+                }
+            }
+        }
+    }
+    return null;
+}
+
 appEmitter.on('app.runModule', (event) => {
     if (!event) return;
     const { action, groupName, moduleName, props, onSuccess, onError } = event;
     if (action) {
         runModuleByDefinition({
-            name: 'app.wait.pleaseWait',
-            description: '',
             action,
         }, props).then((result) => {
             onSuccess?.(result);

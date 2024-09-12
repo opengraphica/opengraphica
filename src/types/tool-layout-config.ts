@@ -69,8 +69,6 @@ export interface ToolGroupDefinition {
 }
 
 export interface ModuleDefinition {
-    name: string;
-    description: string;
     action: {
         type: 'ui' | 'function';
         target: string;
@@ -80,8 +78,6 @@ export interface ModuleDefinition {
 }
 
 export interface ModuleGroupDefinition {
-    name: string;
-    description: string;
     modules: {
         [key: string]: ModuleDefinition;
     }

@@ -289,7 +289,7 @@ interface SourceImageCropOptions {
 export async function blitActiveSelectionMask(
     sourceImage: HTMLImageElement | HTMLCanvasElement | ImageBitmap,
     layerTransform: DOMMatrix,
-    compositeOperation: WorkingFileLayerBlendingMode = 'source-in',
+    compositeOperation: CanvasRenderingContext2D['globalCompositeOperation'] = 'source-in',
     sourceCropOptions?: SourceImageCropOptions
 ): Promise<HTMLCanvasElement> {
     return blitSpecifiedSelectionMask(
@@ -307,7 +307,7 @@ export async function blitSpecifiedSelectionMask(
     selectionMaskCanvasOffset: DOMPoint,
     sourceImage: HTMLImageElement | HTMLCanvasElement | ImageBitmap,
     layerTransform: DOMMatrix,
-    compositeOperation: WorkingFileLayerBlendingMode = 'source-in',
+    compositeOperation: CanvasRenderingContext2D['globalCompositeOperation'] = 'source-in',
     sourceCropOptions?: SourceImageCropOptions
 ): Promise<HTMLCanvasElement> {
     if (selectionMask == null) throw new Error('Active selection mask does not exist.');

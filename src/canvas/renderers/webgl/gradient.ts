@@ -17,8 +17,9 @@ import { Texture } from 'three/src/textures/Texture';
 
 import { createFiltersFromLayerConfig, combineShaders } from '@/canvas/filters';
 import { createGradientShaderMaterial, updateGradientShaderMaterial } from './shaders';
+import { assignMaterialBlendModes } from './blending';
 
-import type { WorkingFileGradientLayer, ColorModel, RGBAColor } from '@/types';
+import type { WorkingFileGradientLayer, WorkingFileLayerBlendingMode, ColorModel, RGBAColor } from '@/types';
 
 // TODO - implement color model conversions
 function convertGradientLayerToRgba(data: WorkingFileGradientLayer['data']): WorkingFileGradientLayer<RGBAColor>['data'] {
@@ -27,11 +28,14 @@ function convertGradientLayerToRgba(data: WorkingFileGradientLayer['data']): Wor
 }
 
 export default class GradientLayerRenderer extends BaseLayerRenderer {
+
+    private stopWatchBlendingMode: WatchStopHandle | undefined;
     private stopWatchVisible: WatchStopHandle | undefined;
     private stopWatchSize: WatchStopHandle | undefined;
     private stopWatchTransform: WatchStopHandle | undefined;
     private stopWatchFilters: WatchStopHandle | undefined;
     private stopWatchData: WatchStopHandle | undefined;
+
     private planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
     private material: InstanceType<typeof ShaderMaterial> | undefined;
     private plane: InstanceType<typeof Mesh> | undefined;
@@ -42,10 +46,11 @@ export default class GradientLayerRenderer extends BaseLayerRenderer {
     private lastWidth: number = 0;
     private lastHeight: number = 0;
     private lastLayerData: WorkingFileGradientLayer<RGBAColor>['data'] | undefined;
+    private lastBlendingMode: WorkingFileLayerBlendingMode = 'normal';
 
     async onAttach(layer: WorkingFileGradientLayer<ColorModel>) {
 
-        const { visible, transform, filters, data } = toRefs(layer);
+        const { blendingMode, visible, transform, filters, data } = toRefs(layer);
         const { width, height } = toRefs(workingFileStore.state);
 
         const combinedShaderResult = combineShaders(
@@ -66,6 +71,9 @@ export default class GradientLayerRenderer extends BaseLayerRenderer {
         (this.threejsScene ?? canvasStore.get('threejsScene'))?.add(this.plane);
         this.isVisible = layer.visible;
 
+        this.stopWatchBlendingMode = watch([blendingMode], ([blendingMode]) => {
+            this.update({ blendingMode });
+        }, { immediate: true });
         this.stopWatchVisible = watch([visible], ([visible]) => {
             this.update({ visible });
         }, { immediate: true });
@@ -107,6 +115,12 @@ export default class GradientLayerRenderer extends BaseLayerRenderer {
                 canvasStore.set('dirty', true);
             }
         }
+        if (updates.blendingMode) {
+            this.lastBlendingMode = updates.blendingMode;
+            if (this.material) {
+                assignMaterialBlendModes(this.material, updates.blendingMode);
+            }
+        }
         if (updates.width || updates.height) {
             const width = (updates.width || this.planeGeometry?.parameters.width) ?? 1;
             const height = (updates.height || this.planeGeometry?.parameters.height) ?? 1;
@@ -140,6 +154,7 @@ export default class GradientLayerRenderer extends BaseLayerRenderer {
             );
             this.material?.dispose();
             this.material = createGradientShaderMaterial(this.lastLayerData, this.lastWidth, this.lastHeight, this.lastTransform, combinedShaderResult);
+            assignMaterialBlendModes(this.material, this.lastBlendingMode);
             this.plane && (this.plane.material = this.material);
         }
 
@@ -157,6 +172,7 @@ export default class GradientLayerRenderer extends BaseLayerRenderer {
         this.material?.dispose();
         this.material = undefined;
         this.lastLayerData = undefined;
+        this.stopWatchBlendingMode?.();
         this.stopWatchVisible?.();
         this.stopWatchSize?.();
         this.stopWatchTransform?.();

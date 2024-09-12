@@ -1,11 +1,6 @@
 import { toRefs, watch, type WatchStopHandle } from 'vue';
-import { WorkingFileRasterLayer, ColorModel } from '@/types';
 import canvasStore from '@/store/canvas';
 import { getStoredSvgImage } from '@/store/svg';
-
-import { createThreejsTextureFromImage } from '@/lib/canvas';
-import { decomposeMatrix } from '@/lib/dom-matrix';
-import { throttle } from '@/lib/timing';
 
 import BaseLayerRenderer from './base';
 
@@ -13,21 +8,29 @@ import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { Mesh } from 'three/src/objects/Mesh';
 import { Texture } from 'three/src/textures/Texture';
-import { Vector2 } from 'three/src/math/Vector2';
 
 import { createFiltersFromLayerConfig, combineShaders } from '@/canvas/filters';
 import { createRasterShaderMaterial } from './shaders';
+import { assignMaterialBlendModes } from './blending';
 
+import { createThreejsTextureFromImage } from '@/lib/canvas';
+import { decomposeMatrix } from '@/lib/dom-matrix';
+import { throttle } from '@/lib/timing';
 import { createCanvasFromImage } from '@/lib/image';
+
+import type { WorkingFileVectorLayer, WorkingFileLayerBlendingMode, ColorModel } from '@/types';
 
 const epsilon = 0.000001;
 
 export default class VectorLayerRenderer extends BaseLayerRenderer {
+
+    private stopWatchBlendingMode: WatchStopHandle | undefined;
     private stopWatchVisible: WatchStopHandle | undefined;
     private stopWatchSize: WatchStopHandle | undefined;
     private stopWatchTransform: WatchStopHandle | undefined;
     private stopWatchFilters: WatchStopHandle | undefined;
     private stopWatchData: WatchStopHandle | undefined;
+
     private planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
     private material: InstanceType<typeof ShaderMaterial> | undefined;
     private plane: InstanceType<typeof Mesh> | undefined;
@@ -40,10 +43,11 @@ export default class VectorLayerRenderer extends BaseLayerRenderer {
     private lastCalculatedWidth: number = 0;
     private lastCalculatedHeight: number = 0;
     private lastSvgSourceUuid: string | undefined;
+    private lastBlendingMode: WorkingFileLayerBlendingMode = 'normal';
 
     private handleResize: (() => void) | undefined;
 
-    async onAttach(layer: WorkingFileRasterLayer<ColorModel>) {
+    async onAttach(layer: WorkingFileVectorLayer<ColorModel>) {
 
         const combinedShaderResult = combineShaders(
             await createFiltersFromLayerConfig(layer.filters),
@@ -56,7 +60,11 @@ export default class VectorLayerRenderer extends BaseLayerRenderer {
         (this.threejsScene ?? canvasStore.get('threejsScene'))?.add(this.plane);
         this.isVisible = layer.visible;
 
-        const { visible, width, height, transform, filters, data } = toRefs(layer);
+        const { blendingMode, visible, width, height, transform, filters, data } = toRefs(layer);
+
+        this.stopWatchBlendingMode = watch([blendingMode], ([blendingMode]) => {
+            this.update({ blendingMode });
+        }, { immediate: true });
         this.stopWatchVisible = watch([visible], ([visible]) => {
             this.update({ visible });
         }, { immediate: true });
@@ -85,13 +93,19 @@ export default class VectorLayerRenderer extends BaseLayerRenderer {
         }
     }
 
-    update(updates: Partial<WorkingFileRasterLayer<ColorModel>>) {
+    update(updates: Partial<WorkingFileVectorLayer<ColorModel>>) {
         super.update(updates);
     }
 
-    async onUpdate(updates: Partial<WorkingFileRasterLayer<ColorModel>>) {
+    async onUpdate(updates: Partial<WorkingFileVectorLayer<ColorModel>>) {
         if (updates.visible != null) {
             this.isVisible = updates.visible;
+        }
+        if (updates.blendingMode != null) {
+            this.lastBlendingMode = updates.blendingMode;
+            if (this.material) {
+                assignMaterialBlendModes(this.material, updates.blendingMode);
+            }
         }
         if (updates.visible != null) {
             let oldVisibility = this.plane?.visible;
@@ -158,6 +172,7 @@ export default class VectorLayerRenderer extends BaseLayerRenderer {
         this.material?.dispose();
         this.material = undefined;
         this.disposeSourceTexture();
+        this.stopWatchBlendingMode?.();
         this.stopWatchVisible?.();
         this.stopWatchSize?.();
         this.stopWatchTransform?.();

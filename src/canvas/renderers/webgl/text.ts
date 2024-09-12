@@ -16,12 +16,14 @@ import { Texture } from 'three/src/textures/Texture';
 
 import { createFiltersFromLayerConfig, combineShaders } from '@/canvas/filters';
 import { createRasterShaderMaterial } from './shaders';
+import { assignMaterialBlendModes } from './blending';
 
 import type { TextData } from '@/canvas/drawables/text';
-import type { DrawWorkingFileLayerOptions, WorkingFileTextLayer, ColorModel } from '@/types';
+import type { WorkingFileLayerBlendingMode, WorkingFileTextLayer, ColorModel } from '@/types';
 
 export default class TextLayerRenderer extends BaseLayerRenderer {
 
+    private stopWatchBlendingMode: WatchStopHandle | undefined;
     private stopWatchData: WatchStopHandle | undefined;
     private stopWatchDimensions: WatchStopHandle | undefined;
     private stopWatchFilters: WatchStopHandle | undefined;
@@ -39,6 +41,7 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
     private textDrawableUuid: string | undefined;
     private isDrawnAfterAttach: boolean = false;
     private waitingToLoadFontFamilies: string[] = [];
+    private lastBlendingMode: WorkingFileLayerBlendingMode = 'normal';
 
     async onAttach(layer: WorkingFileTextLayer<ColorModel>) {
         this.layer = layer;
@@ -120,7 +123,11 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
             canvasStore.set('dirty', true);
         });
 
-        const { width, height, filters, transform, data, visible } = toRefs(layer);
+        const { blendingMode, width, height, filters, transform, data, visible } = toRefs(layer);
+
+        this.stopWatchBlendingMode = watch([blendingMode], ([blendingMode]) => {
+            this.update({ blendingMode });
+        }, { immediate: true });
         this.stopWatchData = watch([data], () => {
             this.update({ data: layer.data });
         }, { deep: true, immediate: true });
@@ -160,6 +167,12 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
         if (updates.visible != null) {
             this.plane && (this.plane.visible = updates.visible);
         }
+        if (updates.blendingMode) {
+            this.lastBlendingMode = updates.blendingMode;
+            if (this.material) {
+                assignMaterialBlendModes(this.material, updates.blendingMode);
+            }
+        }
         if (updates.transform) {
             this.plane?.matrix.set(
                 updates.transform.m11, updates.transform.m21, updates.transform.m31, updates.transform.m41,
@@ -178,6 +191,7 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
             delete this.material?.uniforms.map;
             this.material?.dispose();
             this.material = createRasterShaderMaterial(map?.value, combinedShaderResult);
+            assignMaterialBlendModes(this.material, this.lastBlendingMode);
             this.plane && (this.plane.material = this.material);
         }
         if (updates.data || updates.width != null || updates.height != null) {
@@ -209,6 +223,7 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
         this.plane = undefined;
         this.material?.dispose();
         this.material = undefined;
+        this.stopWatchBlendingMode?.();
         this.stopWatchData?.();
         this.stopWatchDimensions?.();
         this.stopWatchFilters?.();

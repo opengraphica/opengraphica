@@ -9,6 +9,7 @@ export interface DrawWorkingFileLayerOptions {
     selectedLayersOnly?: boolean;
     visible?: boolean;
     force2dRenderer?: boolean;
+    globalCompositeOperation?: CanvasRenderingContext2D['globalCompositeOperation'];
     selectionTest?: {
         point: DOMPoint;
         resultId?: number;
@@ -29,11 +30,7 @@ export interface DrawWorkingFileOptions {
     };
 }
 
-export type WorkingFileLayerBlendingMode = 'color' | 'color-burn' | 'color-dodge' | 'copy' | 
-    'darken' | 'destination-atop' | 'destination-in' | 'destination-out' | 'destination-over' | 
-    'difference' | 'exclusion' | 'hard-light' | 'hue' | 'lighten' | 'lighter' | 'luminosity' | 
-    'multiply' | 'overlay' | 'saturation' | 'screen' | 'soft-light' | 'source-atop' | 'source-in' | 
-    'source-out' | 'source-over' | 'xor';
+export type WorkingFileLayerBlendingMode = 'normal' | 'erase';
 export type WorkingFileLayerType = 'empty' | 'gradient' | 'group' | 'raster' | 'rasterSequence' | 'vector' | 'text';
 
 export interface WorkingFileLayerFilter<T extends ColorModel = ColorModel> {

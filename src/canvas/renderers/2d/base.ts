@@ -1,7 +1,7 @@
 import { DrawWorkingFileLayerOptions, WorkingFileLayer, WorkingFileLayerRenderer, ColorModel, WorkingFileGroupLayer } from '@/types';
 import canvasStore from '@/store/canvas';
 import preferencesStore from '@/store/preferences';
-import workingFileStore from '@/store/working-file';
+import workingFileStore, { getLayer2dCompositeOperation } from '@/store/working-file';
 
 import type { Camera, WebGLRenderer } from 'three';
 
@@ -97,7 +97,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
             
             ctx.save();
             ctx.globalAlpha = layer.opacity;
-            ctx.globalCompositeOperation = layer.blendingMode;
+            ctx.globalCompositeOperation = options?.globalCompositeOperation ?? getLayer2dCompositeOperation(layer);
             const wasImageSmoothingEnabled = ctx.imageSmoothingEnabled;
             if (wasImageSmoothingEnabled) {
                 ctx.imageSmoothingEnabled = false;

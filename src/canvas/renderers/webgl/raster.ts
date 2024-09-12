@@ -1,27 +1,28 @@
 import { toRefs, watch, type WatchStopHandle } from 'vue';
-import { WorkingFileRasterLayer, ColorModel } from '@/types';
+
 import canvasStore from '@/store/canvas';
 import { getStoredImageCanvas, getStoredImageOrCanvas } from '@/store/image';
-import { createThreejsTextureFromImage } from '@/lib/canvas';
+
 import BaseLayerRenderer from './base';
 
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
-import { DoubleSide, NearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, sRGBEncoding } from 'three/src/constants';
 import { Mesh } from 'three/src/objects/Mesh';
-import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { Texture } from 'three/src/textures/Texture';
-import { CanvasTexture } from 'three/src/textures/CanvasTexture';
 import { Vector2 } from 'three/src/math/Vector2';
 
 import { createFiltersFromLayerConfig, combineShaders } from '@/canvas/filters';
 import { createRasterShaderMaterial } from './shaders';
+import { assignMaterialBlendModes } from './blending';
 
-import type { DrawWorkingFileLayerOptions } from '@/types';
+import { createThreejsTextureFromImage } from '@/lib/canvas';
 import { createEmptyCanvasWith2dContext } from '@/lib/image';
+
+import type { WorkingFileRasterLayer, WorkingFileLayerBlendingMode, ColorModel } from '@/types';
 
 export default class RasterLayerRenderer extends BaseLayerRenderer {
     private stopWatchDrafts: WatchStopHandle | undefined;
+    private stopWatchBlendingMode: WatchStopHandle | undefined;
     private stopWatchVisible: WatchStopHandle | undefined;
     private stopWatchSize: WatchStopHandle | undefined;
     private stopWatchTransform: WatchStopHandle | undefined;
@@ -34,7 +35,9 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
     private bakedTexture: InstanceType<typeof Texture> | undefined;
     private sourceTexture: InstanceType<typeof Texture> | undefined;
     private lastChunkUpdateId: string | undefined = undefined;
+
     private isVisible: boolean = true;
+    private lastBlendingMode: WorkingFileLayerBlendingMode = 'normal';
 
     async onAttach(layer: WorkingFileRasterLayer<ColorModel>) {
 
@@ -53,9 +56,12 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
         (this.threejsScene ?? canvasStore.get('threejsScene'))?.add(this.plane);
         this.isVisible = layer.visible;
 
-        const { drafts, visible, width, height, transform, filters, data } = toRefs(layer);
+        const { drafts, blendingMode, visible, width, height, transform, filters, data } = toRefs(layer);
         this.stopWatchDrafts = watch([drafts], ([drafts]) => {
             this.update({ drafts });
+        }, { immediate: true });
+        this.stopWatchBlendingMode = watch([blendingMode], ([blendingMode]) => {
+            this.update({ blendingMode });
         }, { immediate: true });
         this.stopWatchVisible = watch([visible], ([visible]) => {
             this.update({ visible });
@@ -100,6 +106,12 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                 canvasStore.set('dirty', true);
             }
         }
+        if (updates.blendingMode) {
+            this.lastBlendingMode = updates.blendingMode;
+            if (this.material) {
+                assignMaterialBlendModes(this.material, updates.blendingMode);
+            }
+        }
         if (updates.width || updates.height) {
             const width = updates.width || this.planeGeometry?.parameters.width;
             const height = updates.height || this.planeGeometry?.parameters.height;
@@ -126,6 +138,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
             delete this.material?.uniforms.map;
             this.material?.dispose();
             this.material = createRasterShaderMaterial(map?.value, combinedShaderResult);
+            assignMaterialBlendModes(this.material, this.lastBlendingMode);
             this.plane && (this.plane.material = this.material);
         }
         if (updates.data) {
@@ -211,6 +224,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
         this.draftTexture = undefined;
         this.disposeSourceTexture();
         this.stopWatchDrafts?.();
+        this.stopWatchBlendingMode?.();
         this.stopWatchVisible?.();
         this.stopWatchSize?.();
         this.stopWatchTransform?.();

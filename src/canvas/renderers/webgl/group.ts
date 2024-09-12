@@ -1,7 +1,9 @@
 import { toRefs, watch, type WatchStopHandle, toRaw } from 'vue';
 import canvasStore from '@/store/canvas';
 import workingFileStore from '@/store/working-file';
+
 import BaseLayerRenderer from './base';
+
 import { OrthographicCamera } from 'three/src/cameras/OrthographicCamera';
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
@@ -10,23 +12,30 @@ import { WebGLRenderTarget } from 'three/src/renderers/WebGLRenderTarget';
 import { LinearFilter, NearestFilter, LinearEncoding } from 'three/src/constants';
 import { Matrix4 } from 'three/src/math/Matrix4';
 import { Scene } from 'three/src/scenes/Scene';
+
 import { createFiltersFromLayerConfig, combineShaders } from '../../filters';
 import { createRasterShaderMaterial } from './shaders';
+import { assignMaterialBlendModes } from './blending';
 
-import type { WorkingFileLayer, WorkingFileGroupLayer, WorkingFileLayerFilter, ColorModel } from '@/types';
+import type { WorkingFileLayer, WorkingFileGroupLayer, WorkingFileLayerBlendingMode, WorkingFileLayerFilter, ColorModel } from '@/types';
 import type { Camera, Texture, WebGLRenderer } from 'three';
 
 export default class GroupLayerRenderer extends BaseLayerRenderer {
+
+    private stopWatchBlendingMode: WatchStopHandle | undefined;
     private stopWatchVisible: WatchStopHandle | undefined;
     private stopWatchLayers: WatchStopHandle | undefined;
     private stopWatchFilters: WatchStopHandle | undefined;
     private stopWatchWorkingCanvasSize: WatchStopHandle | undefined;
+
     private groupRenderTarget: InstanceType<typeof WebGLRenderTarget> | undefined;
     private camera: InstanceType<typeof OrthographicCamera> | undefined;
     private material: InstanceType<typeof ShaderMaterial> | undefined;
     private planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
     private plane: InstanceType<typeof Mesh> | undefined;
     private childrenScene: Scene | undefined;
+
+    private lastBlendingMode: WorkingFileLayerBlendingMode = 'normal';
 
     async onAttach(layer: WorkingFileGroupLayer<ColorModel>) {
         
@@ -49,7 +58,11 @@ export default class GroupLayerRenderer extends BaseLayerRenderer {
         await this.updateChildrenLayerScene(layer.layers, []);
 
         const { width, height } = toRefs(workingFileStore.state);
-        const { visible, filters } = toRefs(layer);
+        const { blendingMode, visible, filters } = toRefs(layer);
+
+        this.stopWatchBlendingMode = watch([blendingMode], ([blendingMode]) => {
+            this.update({ blendingMode });
+        }, { immediate: true });
         this.stopWatchVisible = watch([visible], ([visible]) => {
             this.update({ visible });
         }, { immediate: true });
@@ -74,6 +87,12 @@ export default class GroupLayerRenderer extends BaseLayerRenderer {
     async onUpdate(updates: Partial<WorkingFileLayer<ColorModel>>) {
         if (updates.visible != null) {
             this.plane && (this.plane.visible = updates.visible);
+        }
+        if (updates.blendingMode) {
+            this.lastBlendingMode = updates.blendingMode;
+            if (this.material) {
+                assignMaterialBlendModes(this.material, updates.blendingMode);
+            }
         }
         if (updates.width || updates.height) {
             const width = (updates.width || this.planeGeometry?.parameters.width) ?? 1;
@@ -118,6 +137,7 @@ export default class GroupLayerRenderer extends BaseLayerRenderer {
         this.material?.dispose();
         this.material = undefined;
         this.childrenScene = undefined;
+        this.stopWatchBlendingMode?.();
         this.stopWatchVisible?.();
         this.stopWatchLayers?.();
         this.stopWatchFilters?.();
@@ -151,6 +171,7 @@ export default class GroupLayerRenderer extends BaseLayerRenderer {
         );
         this.material?.dispose();
         this.material = createRasterShaderMaterial(texture, combinedShaderResult);
+        assignMaterialBlendModes(this.material, this.lastBlendingMode);
     }
 
     private updateCameraDimensions(width: number, height: number) {
