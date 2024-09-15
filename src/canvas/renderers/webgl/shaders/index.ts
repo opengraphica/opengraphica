@@ -1,7 +1,7 @@
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { Texture } from 'three/src/textures/Texture';
 import { Vector2 } from 'three/src/math/Vector2';
-import { DoubleSide, CustomBlending, ZeroFactor, OneFactor, sRGBEncoding, LinearFilter } from 'three/src/constants';
+import { FrontSide, DoubleSide, CustomBlending, ZeroFactor, OneFactor, sRGBEncoding, LinearFilter } from 'three/src/constants';
 
 import prepareGpuTextureMaterialFragmentShader from './prepare-gpu-texture-material.frag';
 import prepareGpuTextureMaterialVertexShader from './prepare-gpu-texture-material.vert';
@@ -11,7 +11,7 @@ import textureCompositorMaterialVertexShader from './texture-compositor-material
 import { srgbaToLinearSrgba, linearSrgbaToSrgba, linearSrgbaToOklab, oklabToLinearSrgba } from '@/lib/color';
 import { lerp } from '@/lib/math';
 
-import type { CombinedShaderResult } from '@/canvas/filters';
+import type { CombinedFilterShaderResult } from '@/canvas/filters';
 import type {
     WorkingFileGradientLayer,
     WorkingFileGradientColorStop, WorkingFileGradientColorSpace, RGBAColor,
@@ -21,13 +21,13 @@ import type {
 | Raster Layer Material |
 \*---------------------*/
 
-export function createRasterShaderMaterial(texture: Texture | null, combinedShaderResult: CombinedShaderResult): ShaderMaterial {
+export function createRasterShaderMaterial(texture: Texture | null, combinedShaderResult: CombinedFilterShaderResult): ShaderMaterial {
     return new ShaderMaterial({
         transparent: true,
         depthTest: false,
         vertexShader: combinedShaderResult.vertexShader,
         fragmentShader: combinedShaderResult.fragmentShader,
-        side: DoubleSide,
+        side: FrontSide,
         defines: {
             cMapWidth: texture?.image.width ?? 1,
             cMapHeight: texture?.image.height ?? 1,
@@ -141,7 +141,7 @@ export function createGradientShaderMaterial(
     canvasWidth: number,
     canvasHeight: number,
     transform: DOMMatrix,
-    combinedShaderResult: CombinedShaderResult
+    combinedShaderResult: CombinedFilterShaderResult
 ): ShaderMaterial {
     const startTransformed = new DOMPoint(params.start.x, params.start.y).matrixTransform(transform);
     const endTransformed = new DOMPoint(params.end.x, params.end.y).matrixTransform(transform);

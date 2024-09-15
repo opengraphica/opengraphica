@@ -89,10 +89,10 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                     const { WebGLRenderer } = await import('three/src/renderers/WebGLRenderer');
                     const { sRGBEncoding } = await import('three/src/constants');
                     const { OrthographicCamera } = await import('three/src/cameras/OrthographicCamera');
-                    const { EffectComposer } = await import('@/canvas/renderers/webgl/three/postprocessing/EffectComposer');
-                    const { RenderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/RenderPass');
-                    const { ShaderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/ShaderPass');
-                    const { GammaCorrectionShader } = await import('@/canvas/renderers/webgl/three/shaders/GammaCorrectionShader');
+                    const { EffectComposer } = await import('@/canvas/renderers/webgl/postprocessing/effect-composer');
+                    const { RenderPass } = await import('@/canvas/renderers/webgl/postprocessing/render-pass');
+                    const { ShaderPass } = await import('@/canvas/renderers/webgl/postprocessing/shader-pass');
+                    const { GammaCorrectionShader } = await import('@/canvas/renderers/webgl/shaders/gamma-correction-shader');
                     // const { WebGLRenderTarget } = await import('three/src/renderers/WebGLRenderTarget');
 
                     const threejsScene = canvasStore.get('threejsScene')!;

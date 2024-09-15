@@ -3,7 +3,7 @@
  * http://en.wikipedia.org/wiki/gamma_correction
  */
 
-const GammaCorrectionShader = {
+ const GammaCorrectionShader = {
 
 	uniforms: {
 		'tDiffuse': { value: null }

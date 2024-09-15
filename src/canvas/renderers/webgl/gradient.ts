@@ -15,7 +15,7 @@ import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { Mesh } from 'three/src/objects/Mesh';
 import { Texture } from 'three/src/textures/Texture';
 
-import { createFiltersFromLayerConfig, combineShaders } from '@/canvas/filters';
+import { createFiltersFromLayerConfig, combineFiltersToShader } from '@/canvas/filters';
 import { createGradientShaderMaterial, updateGradientShaderMaterial } from './shaders';
 import { assignMaterialBlendModes } from './blending';
 
@@ -53,7 +53,7 @@ export default class GradientLayerRenderer extends BaseLayerRenderer {
         const { blendingMode, visible, transform, filters, data } = toRefs(layer);
         const { width, height } = toRefs(workingFileStore.state);
 
-        const combinedShaderResult = combineShaders(
+        const combinedShaderResult = combineFiltersToShader(
             await createFiltersFromLayerConfig(layer.filters),
             layer,
             {
@@ -142,7 +142,7 @@ export default class GradientLayerRenderer extends BaseLayerRenderer {
             needsMaterialUpdate = true;
         }
         if (updates.filters && this.lastLayerData) {
-            const combinedShaderResult = combineShaders(
+            const combinedShaderResult = combineFiltersToShader(
                 await createFiltersFromLayerConfig(updates.filters),
                 { width: this.sourceTexture?.image.width, height: this.sourceTexture?.image.height },
                 {

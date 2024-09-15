@@ -4,7 +4,7 @@ import canvasStore from '@/store/canvas';
 
 import { createRasterShaderMaterial } from './shaders';
 import { assignMaterialBlendModes } from './blending';
-import { createFiltersFromLayerConfig, combineShaders } from '../../filters';
+import { createFiltersFromLayerConfig, combineFiltersToShader } from '../../filters';
 import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 
 import { NearestFilter, LinearEncoding, LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, sRGBEncoding, RGBAFormat, UnsignedByteType } from 'three/src/constants';
@@ -66,6 +66,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
         if (!this.isAttached) {
             try {
                 this.onAttach(layer);
+                this.order = layer.renderer?.order ?? 0;
             } catch (error) {
                 console.error('[src/canvas/renderers/webgl/base.ts] Error during layer attach. ', error);
             }
@@ -157,7 +158,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
 
                 if (!draftAssets.planeMaterial) {
                     createFiltersFromLayerConfig(this.draftPlaneUseFilters ?? []).then((filterClasses) => {
-                        const combinedShaderResult = combineShaders(
+                        const combinedShaderResult = combineFiltersToShader(
                             filterClasses,
                             { width: draftUpdate.logicalWidth, height: draftUpdate.logicalHeight }
                         );

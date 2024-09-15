@@ -11,9 +11,10 @@ import { Mesh } from 'three/src/objects/Mesh';
 import { Texture } from 'three/src/textures/Texture';
 import { Vector2 } from 'three/src/math/Vector2';
 
-import { createFiltersFromLayerConfig, combineShaders } from '@/canvas/filters';
-import { createRasterShaderMaterial } from './shaders';
-import { assignMaterialBlendModes } from './blending';
+import { createFiltersFromLayerConfig, combineFiltersToShader } from '@/canvas/filters';
+import { createMaterial, disposeMaterial, type MaterialWrapper } from './materials';
+// import { createRasterShaderMaterial } from './shaders';
+// import { assignMaterialBlendModes } from './blending';
 
 import { createThreejsTextureFromImage } from '@/lib/canvas';
 import { createEmptyCanvasWith2dContext } from '@/lib/image';
@@ -29,7 +30,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
     private stopWatchFilters: WatchStopHandle | undefined;
     private stopWatchData: WatchStopHandle | undefined;
     private planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
-    private material: InstanceType<typeof ShaderMaterial> | undefined;
+    private materialWrapper: MaterialWrapper | undefined;
     private plane: InstanceType<typeof Mesh> | undefined;
     private draftTexture: InstanceType<typeof Texture> | undefined;
     private bakedTexture: InstanceType<typeof Texture> | undefined;
@@ -42,12 +43,8 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
     async onAttach(layer: WorkingFileRasterLayer<ColorModel>) {
 
         this.lastChunkUpdateId = layer.data?.chunkUpdateId;
-        const combinedShaderResult = combineShaders(
-            await createFiltersFromLayerConfig(layer.filters),
-            layer
-        );
-        this.material = createRasterShaderMaterial(null, combinedShaderResult);
-        this.plane = new Mesh(this.planeGeometry, this.material);
+        this.materialWrapper = await createMaterial('raster', { texture: undefined }, layer.filters, layer, layer.blendingMode);
+        this.plane = new Mesh(this.planeGeometry, this.materialWrapper.material);
         this.plane.renderOrder = this.order + 0.1;
         this.plane.matrixAutoUpdate = false;
         this.plane.onBeforeRender = () => {
@@ -108,8 +105,9 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
         }
         if (updates.blendingMode) {
             this.lastBlendingMode = updates.blendingMode;
-            if (this.material) {
-                assignMaterialBlendModes(this.material, updates.blendingMode);
+            if (this.materialWrapper) {
+                this.materialWrapper = this.materialWrapper.changeBlendingMode(updates.blendingMode);
+                this.plane && (this.plane.material = this.materialWrapper.material);
             }
         }
         if (updates.width || updates.height) {
@@ -130,16 +128,15 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
             );
         }
         if (updates.filters) {
-            const combinedShaderResult = combineShaders(
-                await createFiltersFromLayerConfig(updates.filters),
-                { width: this.sourceTexture?.image.width, height: this.sourceTexture?.image.height }
+            const map = this.materialWrapper?.material.uniforms.map.value;
+            if (this.materialWrapper) {
+                disposeMaterial(this.materialWrapper);
+            }
+            this.materialWrapper = await createMaterial('raster', { texture: map }, updates.filters, 
+                { width: this.sourceTexture?.image.width, height: this.sourceTexture?.image.height },
+                this.lastBlendingMode
             );
-            const map = this.material?.uniforms.map;
-            delete this.material?.uniforms.map;
-            this.material?.dispose();
-            this.material = createRasterShaderMaterial(map?.value, combinedShaderResult);
-            assignMaterialBlendModes(this.material, this.lastBlendingMode);
-            this.plane && (this.plane.material = this.material);
+            this.plane && (this.plane.material = this.materialWrapper.material);
         }
         if (updates.data) {
             if (this.draftTexture) {
@@ -203,11 +200,13 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                     this.sourceTexture = newSourceTexture;
 
                     this.sourceTexture.needsUpdate = true;
-                    this.material && (this.material.uniforms.map.value = this.sourceTexture);
+                    this.materialWrapper = this.materialWrapper!.update({ texture: this.sourceTexture });
+                    this.plane && (this.plane.material = this.materialWrapper.material);
                     canvasStore.set('dirty', true);
                 } else {
                     this.disposeSourceTexture();
-                    this.material && (this.material.uniforms.map.value = null);
+                    this.materialWrapper = this.materialWrapper!.update({ texture: undefined });
+                    this.plane && (this.plane.material = this.materialWrapper.material);
                 }
             }
         }
@@ -218,8 +217,10 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
         this.planeGeometry = undefined;
         this.plane && (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(this.plane);
         this.plane = undefined;
-        this.material?.dispose();
-        this.material = undefined;
+        if (this.materialWrapper) {
+            disposeMaterial(this.materialWrapper);
+        }
+        this.materialWrapper = undefined;
         this.draftTexture?.dispose();
         this.draftTexture = undefined;
         this.disposeSourceTexture();

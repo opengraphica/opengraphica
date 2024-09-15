@@ -14,7 +14,7 @@ import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { Mesh } from 'three/src/objects/Mesh';
 import { Texture } from 'three/src/textures/Texture';
 
-import { createFiltersFromLayerConfig, combineShaders } from '@/canvas/filters';
+import { createFiltersFromLayerConfig, combineFiltersToShader } from '@/canvas/filters';
 import { createRasterShaderMaterial } from './shaders';
 import { assignMaterialBlendModes } from './blending';
 
@@ -46,7 +46,7 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
     async onAttach(layer: WorkingFileTextLayer<ColorModel>) {
         this.layer = layer;
 
-        const combinedShaderResult = combineShaders(
+        const combinedShaderResult = combineFiltersToShader(
             await createFiltersFromLayerConfig(layer.filters),
             layer
         );
@@ -183,9 +183,9 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
             canvasStore.set('dirty', true);
         }
         if (updates.filters) {
-            const combinedShaderResult = combineShaders(
+            const combinedShaderResult = combineFiltersToShader(
                 await createFiltersFromLayerConfig(updates.filters),
-                { width: this.planeGeometry?.parameters.width, height: this.planeGeometry?.parameters.height }
+                { width: this.planeGeometry?.parameters.width ?? 1, height: this.planeGeometry?.parameters.height ?? 1 }
             );
             const map = this.material?.uniforms.map;
             delete this.material?.uniforms.map;

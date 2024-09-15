@@ -14,7 +14,7 @@ import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { Texture } from 'three/src/textures/Texture';
 import { CanvasTexture } from 'three/src/textures/CanvasTexture';
 
-import { createFiltersFromLayerConfig, combineShaders } from '../../filters';
+import { createFiltersFromLayerConfig, combineFiltersToShader } from '../../filters';
 import { createRasterShaderMaterial } from './shaders';
 import { assignMaterialBlendModes } from './blending';
 
@@ -40,7 +40,7 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
     private lastBlendingMode: WorkingFileLayerBlendingMode = 'normal';
 
     async onAttach(layer: WorkingFileRasterSequenceLayer<ColorModel>) {
-        const combinedShaderResult = combineShaders(
+        const combinedShaderResult = combineFiltersToShader(
             await createFiltersFromLayerConfig(layer.filters),
             layer
         );
@@ -126,7 +126,7 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
             );
         }
         if (updates.filters) {
-            const combinedShaderResult = combineShaders(
+            const combinedShaderResult = combineFiltersToShader(
                 await createFiltersFromLayerConfig(updates.filters),
                 { width: this.texture?.image.width, height: this.texture?.image.height }
             );

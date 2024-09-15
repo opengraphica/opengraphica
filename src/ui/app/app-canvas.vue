@@ -364,10 +364,10 @@ export default defineComponent({
             const { Mesh } = await import('three/src/objects/Mesh');
             const { Matrix4 } = await import('three/src/math/Matrix4');
             const { DoubleSide, sRGBEncoding, RepeatWrapping } = await import('three/src/constants');
-            const { EffectComposer } = await import('@/canvas/renderers/webgl/three/postprocessing/EffectComposer');
-            const { RenderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/RenderPass');
-            const { ShaderPass } = await import('@/canvas/renderers/webgl/three/postprocessing/ShaderPass');
-            const { GammaCorrectionShader } = await import('@/canvas/renderers/webgl/three/shaders/GammaCorrectionShader');
+            const { EffectComposer } = await import('@/canvas/renderers/webgl/postprocessing/effect-composer');
+            const { RenderPass } = await import('@/canvas/renderers/webgl/postprocessing/render-pass');
+            const { ShaderPass } = await import('@/canvas/renderers/webgl/postprocessing/shader-pass');
+            const { GammaCorrectionShader } = await import('@/canvas/renderers/webgl/shaders/gamma-correction-shader');
             const { default: selectionMaskMaterialFragmentShader } = await import('@/canvas/renderers/webgl/shaders/selection-mask-material.frag');
             const { default: selectionMaskMaterialVertexShader } = await import('@/canvas/renderers/webgl/shaders/selection-mask-material.vert');
             const workingFileWidth = workingFileStore.state.width;
@@ -376,7 +376,7 @@ export default defineComponent({
             const threejsRenderer = new WebGLRenderer({
                 alpha: true,
                 canvas: canvas.value,
-                premultipliedAlpha: true,
+                premultipliedAlpha: false,
                 powerPreference: 'high-performance'
             });
             threejsRenderer.outputEncoding = sRGBEncoding;

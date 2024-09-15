@@ -1,4 +1,4 @@
-import { Pass } from './Pass';
+import { Pass } from './pass';
 
 import type { Camera, Scene, WebGLRenderer, WebGLRenderTarget } from 'three';
 

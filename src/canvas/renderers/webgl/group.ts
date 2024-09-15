@@ -13,7 +13,7 @@ import { LinearFilter, NearestFilter, LinearEncoding } from 'three/src/constants
 import { Matrix4 } from 'three/src/math/Matrix4';
 import { Scene } from 'three/src/scenes/Scene';
 
-import { createFiltersFromLayerConfig, combineShaders } from '../../filters';
+import { createFiltersFromLayerConfig, combineFiltersToShader } from '../../filters';
 import { createRasterShaderMaterial } from './shaders';
 import { assignMaterialBlendModes } from './blending';
 
@@ -165,7 +165,7 @@ export default class GroupLayerRenderer extends BaseLayerRenderer {
         if (texture) {
             texture.encoding = LinearEncoding;
         }
-        const combinedShaderResult = combineShaders(
+        const combinedShaderResult = combineFiltersToShader(
             await createFiltersFromLayerConfig(filters),
             { width: workingFileStore.state.width, height: workingFileStore.state.height }
         );

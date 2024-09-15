@@ -3,12 +3,12 @@ import { Vector2 } from 'three/src/math/Vector2';
 
 import basicMaterialVertexShaderSetup from '@/canvas/renderers/webgl/shaders/basic-material.setup.vert';
 import basicMaterialVertexShaderMain from '@/canvas/renderers/webgl/shaders/basic-material.main.vert';
-import basicMaterialFragmentShaderUtility from '@/canvas/renderers/webgl/shaders/basic-material.utility.frag';
 import basicMaterialFragmentShaderSetup from '@/canvas/renderers/webgl/shaders/basic-material.setup.frag';
 import basicMaterialFragmentShaderMain from '@/canvas/renderers/webgl/shaders/basic-material.main.frag';
+import commonUtilityFragmentShader from '@/canvas/renderers/webgl/shaders/common-utility.frag';
 
 import type { IUniform } from 'three/src/renderers/shaders/UniformsLib';
-import type { CanvasFilter, CanvasFilterEditConfig, WorkingFileAnyLayer, WorkingFileLayerFilter } from '@/types';
+import type { CanvasFilter, CanvasFilterLayerInfo, CanvasFilterEditConfig, WorkingFileAnyLayer, WorkingFileLayerFilter } from '@/types';
 
 export async function getCanvasFilterClass(name: string): Promise<new (...args: any) => CanvasFilter> {
     const kebabCaseName = camelCaseToKebabCase(name);
@@ -73,7 +73,7 @@ export function buildCanvasFilterPreviewParams(canvasFilter: CanvasFilter): Reco
     return previewParams;
 }
 
-export interface CombinedShaderResult {
+export interface CombinedFilterShaderResult {
     fragmentShader: string,
     vertexShader: string,
     uniforms: Record<string, IUniform>,
@@ -90,7 +90,7 @@ function translateParamToUniformValue(paramValue: any, editConfig: CanvasFilterE
     return paramValue;
 }
 
-export function generateShaderUniformsAndDefines(canvasFilters: CanvasFilter[], layer: Partial<WorkingFileAnyLayer>): { uniforms: Record<string, IUniform>, defines: Record<string, unknown> } {
+export function generateShaderUniformsAndDefines(canvasFilters: CanvasFilter[], layer: CanvasFilterLayerInfo): { uniforms: Record<string, IUniform>, defines: Record<string, unknown> } {
     const defines: Record<string, unknown> = {};
     const uniforms: Record<string, IUniform> = {};
     for (const [index, canvasFilter] of canvasFilters.entries()) {
@@ -131,18 +131,18 @@ export function generateShaderUniformsAndDefines(canvasFilters: CanvasFilter[], 
     return { defines, uniforms };
 }
 
-interface CombineShadersOptions {
+interface CombineFilterShadersOptions {
     fragmentShaderMain?: string;
     fragmentShaderSetup?: string;
     vertexShaderMain?: string;
     vertexShaderSetup?: string;
 }
 
-export function combineShaders(canvasFilters: CanvasFilter[], layer: Partial<WorkingFileAnyLayer>, options?: CombineShadersOptions): CombinedShaderResult {
+export function combineFiltersToShader(canvasFilters: CanvasFilter[], layerInfo: CanvasFilterLayerInfo, options?: CombineFilterShadersOptions): CombinedFilterShaderResult {
     let vertexShader = '';
     let fragmentShader = '';
 
-    const { uniforms, defines } = generateShaderUniformsAndDefines(canvasFilters, layer);
+    const { uniforms, defines } = generateShaderUniformsAndDefines(canvasFilters, layerInfo);
 
     let vertexShaderMainCalls: string[] = [];
     let fragmentShaderMainCalls: string[] = [];
@@ -198,7 +198,7 @@ export function combineShaders(canvasFilters: CanvasFilter[], layer: Partial<Wor
 
     vertexShader = (options?.vertexShaderSetup ?? basicMaterialVertexShaderSetup) + '\n' + vertexShader
         + '\n' + (options?.vertexShaderMain ?? basicMaterialVertexShaderMain).replace('//[INJECT_FILTERS_HERE]', vertexFilterCode);
-    fragmentShader = basicMaterialFragmentShaderUtility + '\n' + (options?.fragmentShaderSetup ?? basicMaterialFragmentShaderSetup) + '\n' + fragmentShader
+    fragmentShader = commonUtilityFragmentShader + '\n' + (options?.fragmentShaderSetup ?? basicMaterialFragmentShaderSetup) + '\n' + fragmentShader
         + '\n' + (options?.fragmentShaderMain ?? basicMaterialFragmentShaderMain).replace('//[INJECT_FILTERS_HERE]', fragmentFilterCode);
 
     return {

@@ -1,13 +1,13 @@
 import { Clock } from 'three/src/core/Clock';
 import { Vector2 } from 'three/src/math/Vector2';
 import { WebGLRenderTarget } from 'three/src/renderers/WebGLRenderTarget';
-import { CopyShader } from '../shaders/CopyShader';
-import { ShaderPass } from './ShaderPass';
-import { MaskPass } from './MaskPass';
-import { ClearMaskPass } from './MaskPass';
-import { FloatType, RGBAFormat, UnsignedByteType } from 'three/src/constants';
+import { CopyShader } from '../shaders/copy-shader';
+import { ShaderPass } from './shader-pass';
+import { MaskPass } from './mask-pass';
+import { ClearMaskPass } from './mask-pass';
+import { HalfFloatType, RGBAFormat } from 'three/src/constants';
 
-import type { Pass } from './Pass';
+import type { Pass } from './pass';
 import type { WebGLRenderer } from 'three';
 
 class EffectComposer {
@@ -38,7 +38,6 @@ class EffectComposer {
             this._height = size.height;
 
             const gl = renderer.getContext();
-            const extFloatBlend = gl.getExtension('EXT_float_blend');
 
             this._contextRestoredCallback = () => {
                 gl.getExtension('EXT_float_blend');
@@ -47,7 +46,7 @@ class EffectComposer {
 
             renderTarget = new WebGLRenderTarget(this._width * this._pixelRatio, this._height * this._pixelRatio, {
                 format: RGBAFormat,
-                type: extFloatBlend ? FloatType : UnsignedByteType,
+                type: HalfFloatType,
                 depthBuffer: false,
                 stencilBuffer: false,
             });

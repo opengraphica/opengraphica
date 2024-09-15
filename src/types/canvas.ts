@@ -7,6 +7,11 @@ export interface CanvasViewResetOptions {
     margin?: number;
 };
 
+export interface CanvasFilterLayerInfo {
+    width: number;
+    height: number;
+}
+
 export interface CanvasFilterEditConfigFieldCommon {
     constant?: boolean;
     hidden?: boolean;

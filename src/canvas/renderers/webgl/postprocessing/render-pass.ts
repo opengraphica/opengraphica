@@ -1,5 +1,5 @@
 import { Color } from 'three/src/math/Color';
-import { Pass } from './Pass';
+import { Pass } from './pass';
 
 import type { Camera, Material, Scene, WebGLRenderer, WebGLRenderTarget } from 'three';
 

@@ -5,7 +5,7 @@ import {
     SubtractEquation,
     SrcAlphaFactor,
     OneMinusSrcAlphaFactor,
-    DstColorFactor,
+    SrcColorFactor,
     OneFactor,
     ZeroFactor,
 } from 'three/src/constants';
@@ -37,7 +37,7 @@ export function getBlendModes(layerBlendingMode: WorkingFileLayerBlendingMode): 
             blending = CustomBlending;
             blendEquation = AddEquation;
             blendSrc = ZeroFactor;
-            blendDst = DstColorFactor;
+            blendDst = OneFactor;
             blendDstAlpha = OneMinusSrcAlphaFactor;
             break;
     }

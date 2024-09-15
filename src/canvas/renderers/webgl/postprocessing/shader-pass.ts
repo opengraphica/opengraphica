@@ -1,6 +1,6 @@
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { UniformsUtils } from 'three/src/renderers/shaders/UniformsUtils';
-import { Pass, FullScreenQuad } from './Pass';
+import { Pass, FullScreenQuad } from './pass';
 
 import type { WebGLRenderer, Shader, WebGLRenderTarget } from 'three';
 

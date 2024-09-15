@@ -188,7 +188,7 @@ import layerRenderers from '@/canvas/renderers';
 import { createImageBlobFromCanvas } from '@/lib/image';
 import { isWebGLAvailable } from '@/lib/webgl';
 import { createRasterShaderMaterial } from '@/canvas/renderers/webgl/shaders';
-import { buildCanvasFilterParamsFromFormData, createFiltersFromLayerConfig, applyCanvasFilter, generateShaderUniformsAndDefines, combineShaders } from '@/canvas/filters';
+import { buildCanvasFilterParamsFromFormData, createFiltersFromLayerConfig, applyCanvasFilter, generateShaderUniformsAndDefines, combineFiltersToShader } from '@/canvas/filters';
 import { UpdateLayerFilterDisabledAction } from '@/actions/update-layer-filter-disabled';
 import { UpdateLayerFilterParamsAction } from '@/actions/update-layer-filter-params';
 import { DeleteLayerFilterAction } from '@/actions/delete-layer-filter';
@@ -204,10 +204,10 @@ import { Mesh } from 'three/src/objects/Mesh';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { Texture } from 'three/src/textures/Texture';
 import { OrthographicCamera } from 'three/src/cameras/OrthographicCamera';
-import { EffectComposer } from '@/canvas/renderers/webgl/three/postprocessing/EffectComposer';
-import { RenderPass } from '@/canvas/renderers/webgl/three/postprocessing/RenderPass';
-import { ShaderPass } from '@/canvas/renderers/webgl/three/postprocessing/ShaderPass';
-import { GammaCorrectionShader } from '@/canvas/renderers/webgl/three/shaders/GammaCorrectionShader';
+import { EffectComposer } from '@/canvas/renderers/webgl/postprocessing/effect-composer';
+import { RenderPass } from '@/canvas/renderers/webgl/postprocessing/render-pass';
+import { ShaderPass } from '@/canvas/renderers/webgl/postprocessing/shader-pass';
+import { GammaCorrectionShader } from '@/canvas/renderers/webgl/shaders/gamma-correction-shader';
 
 import type { WorkingFileLayerFilter, CanvasFilter, CanvasFilterEditConfig, CanvasFilterEditConfigField } from '@/types';
 
@@ -502,7 +502,7 @@ export default defineComponent({
                     beforeTexture.encoding = sRGBEncoding;
                 });
 
-                const combinedShaderResult = combineShaders(await createFiltersFromLayerConfig(beforeFilterConfigs), layer.value!);
+                const combinedShaderResult = combineFiltersToShader(await createFiltersFromLayerConfig(beforeFilterConfigs), layer.value!);
                 material = createRasterShaderMaterial(beforeTexture, combinedShaderResult);
 
                 mesh = new Mesh(imagePlaneGeometry, material);
@@ -572,7 +572,7 @@ export default defineComponent({
                 previewTexture.encoding = sRGBEncoding;
             });
 
-            const combinedShaderResult = combineShaders([currentFilter.value], layer.value!);
+            const combinedShaderResult = combineFiltersToShader([currentFilter.value], layer.value!);
             previewMaterial = createRasterShaderMaterial(previewTexture, combinedShaderResult);
 
             previewMesh = new Mesh(previewPlaneGeometry, previewMaterial);

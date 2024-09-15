@@ -4,7 +4,7 @@ import { DecomposedMatrix, decomposeMatrix } from '@/lib/dom-matrix';
 import preferencesStore from './preferences';
 
 import type { Mesh, PlaneGeometry, ShaderMaterial, OrthographicCamera, Scene, WebGLRenderer } from 'three';
-import type { EffectComposer } from '@/canvas/renderers/webgl/three/postprocessing/EffectComposer';
+import type { EffectComposer } from '@/canvas/renderers/webgl/postprocessing/effect-composer';
 
 const imageSmoothingZoomRatio = preferencesStore.get('imageSmoothingZoomRatio');
 let nextRenderFrameCallbacks: Array<() => void> = [];

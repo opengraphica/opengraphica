@@ -12,7 +12,7 @@ import type {
     PixelFormat, TextureDataType,
 } from 'three';
 import type { ImagePlaneGeometry } from '@/canvas/renderers/webgl/geometries/image-plane-geometry';
-import type { EffectComposer } from '@/canvas/renderers/webgl/three/postprocessing/EffectComposer';
+import type { EffectComposer } from '@/canvas/renderers/webgl/postprocessing/effect-composer';
 import type { ClassType } from '@/types';
 
 const imageSmoothingZoomRatio = preferencesStore.get('imageSmoothingZoomRatio');
