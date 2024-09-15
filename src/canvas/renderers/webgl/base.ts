@@ -57,7 +57,6 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
             }
             orderIterator += 0.01;
         }
-        console.log(this.order);
     }
     onReorder(order: number) {
         // Override

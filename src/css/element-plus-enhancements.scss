@@ -716,6 +716,44 @@
         }
     }
 
+    .el-radio-group {
+        &.el-radio-group--vertical {
+            flex-direction: column;
+            align-items: stretch;
+
+            .el-radio-button {
+                display: flex;
+                flex-direction: row;
+
+                .el-radio-button__inner {
+                    width: 100%;
+                    border-radius: 0;
+                    border: 1px solid var(--el-border-color);
+                    border-top: none;
+                }
+
+                &:first-child {
+                    .el-radio-button__inner {
+                        border-radius: var(--el-border-radius-base) var(--el-border-radius-base) 0 0;
+                        border-top: 1px solid var(--el-border-color);
+                    }
+                }
+                &:last-child {
+                    .el-radio-button__inner {
+                        border-radius: 0 0 var(--el-border-radius-base) var(--el-border-radius-base);
+                    }
+                }
+
+                &.is-active {
+                    .el-radio-button__inner {
+                        box-shadow: none;
+                        border-color: var(--el-color-primary);
+                    }
+                }
+            }
+        }
+    }
+
     .el-select-dropdown--unlocked-option-height {
         .el-select-dropdown__item {
             height: auto !important;

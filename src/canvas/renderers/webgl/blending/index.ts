@@ -1,11 +1,17 @@
 import {
     NormalBlending,
     CustomBlending,
+    MultiplyBlending,
     AddEquation,
+    MaxEquation,
+    MinEquation,
     SubtractEquation,
     SrcAlphaFactor,
+    OneMinusSrcColorFactor,
     OneMinusSrcAlphaFactor,
     SrcColorFactor,
+    DstColorFactor,
+    OneMinusDstColorFactor,
     OneFactor,
     ZeroFactor,
 } from 'three/src/constants';
@@ -30,14 +36,16 @@ export function getBlendModes(layerBlendingMode: WorkingFileLayerBlendingMode): 
     let blendSrc = SrcAlphaFactor;
     let blendDst = OneMinusSrcAlphaFactor;
     let blendEquationAlpha: BlendingEquation | null = null;
-    let blendSrcAlpha: BlendingDstFactor | null = null;
-    let blendDstAlpha: BlendingDstFactor | null = null;
+    let blendSrcAlpha: BlendingDstFactor | null = ZeroFactor;
+    let blendDstAlpha: BlendingDstFactor | null = OneMinusSrcAlphaFactor;
     switch (layerBlendingMode) {
         case 'erase':
             blending = CustomBlending;
             blendEquation = AddEquation;
             blendSrc = ZeroFactor;
             blendDst = OneFactor;
+            blendEquationAlpha = AddEquation;
+            blendSrcAlpha = null;
             blendDstAlpha = OneMinusSrcAlphaFactor;
             break;
     }

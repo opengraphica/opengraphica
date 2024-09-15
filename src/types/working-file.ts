@@ -30,7 +30,7 @@ export interface DrawWorkingFileOptions {
     };
 }
 
-export type WorkingFileLayerBlendingMode = 'normal' | 'erase';
+export type WorkingFileLayerBlendingMode = 'normal' | 'erase' | 'multiply';
 export type WorkingFileLayerType = 'empty' | 'gradient' | 'group' | 'raster' | 'rasterSequence' | 'vector' | 'text';
 
 export interface WorkingFileLayerFilter<T extends ColorModel = ColorModel> {

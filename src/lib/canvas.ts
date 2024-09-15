@@ -440,134 +440,134 @@ export async function createThreejsTextureFromImage(image: HTMLCanvasElement | I
     // TODO - maybe make these size limitations configurable. This pixel read can make the browser crash
     // with a big enough image that would load fine otherwise.
 
-    const chunkWidth = image.width; // Math.min(1024, image.width);
-    const chunkHeight = image.height; // Math.min(1024, image.height);
+    // const chunkWidth = image.width; // Math.min(1024, image.width);
+    // const chunkHeight = image.height; // Math.min(1024, image.height);
 
-    if (image.width < 2048 && image.height <= 2048) {
-        let {
-            done, NearestFilter, sRGBEncoding, Mesh, ImagePlaneGeometry, CanvasTexture, threejsPrepareGpuTextureShaderMaterial,
-            MeshBasicMaterial, threejsScene, threejsRenderer, threejsCamera,
-        } = await setupThreejsRenderer(1, 1);
-        done();
+    // if (image.width < 2048 && image.height <= 2048) {
+    //     let {
+    //         done, NearestFilter, sRGBEncoding, Mesh, ImagePlaneGeometry, CanvasTexture, threejsPrepareGpuTextureShaderMaterial,
+    //         MeshBasicMaterial, threejsScene, threejsRenderer, threejsCamera,
+    //     } = await setupThreejsRenderer(1, 1);
+    //     done();
 
-        const { LinearMipMapLinearFilter } = await import('three/src/constants');
-        const { WebGLRenderTarget } = await import('three/src/renderers/WebGLRenderTarget');
-        const { Vector2 } = await import('three/src/math/Vector2');
+    //     const { LinearMipMapLinearFilter } = await import('three/src/constants');
+    //     const { WebGLRenderTarget } = await import('three/src/renderers/WebGLRenderTarget');
+    //     const { Vector2 } = await import('three/src/math/Vector2');
 
-        const isUseOriginalImage = true; // (image.width === chunkWidth && image.height === chunkHeight);
+    //     const isUseOriginalImage = true; // (image.width === chunkWidth && image.height === chunkHeight);
 
-        let texture!: Texture;
-        if (!isUseOriginalImage) {
-            const canvas = document.createElement('canvas');
-            canvas.width = image.width;
-            canvas.height = image.height;
-            texture = new CanvasTexture(canvas);
-            texture.premultiplyAlpha = false;
-            texture.generateMipmaps = true;
-            texture.encoding = sRGBEncoding;
-            texture.minFilter = LinearMipMapLinearFilter;
-            texture.magFilter = NearestFilter;
-            texture.needsUpdate = true;
+    //     let texture!: Texture;
+    //     if (!isUseOriginalImage) {
+    //         const canvas = document.createElement('canvas');
+    //         canvas.width = image.width;
+    //         canvas.height = image.height;
+    //         texture = new CanvasTexture(canvas);
+    //         texture.premultiplyAlpha = false;
+    //         texture.generateMipmaps = true;
+    //         texture.encoding = sRGBEncoding;
+    //         texture.minFilter = LinearMipMapLinearFilter;
+    //         texture.magFilter = NearestFilter;
+    //         texture.needsUpdate = true;
 
-            // Upload the canvas texture to the GPU so it can be modified.
-            const dummyMaterial = new MeshBasicMaterial({ map: texture });
-            const dummyGeometry = new ImagePlaneGeometry(1, 1);
-            const dummyMesh = new Mesh(dummyGeometry, dummyMaterial);
-            threejsScene.add(dummyMesh);
-            threejsRenderer.render(threejsScene, threejsCamera);
-            threejsScene.clear();
-            dummyMaterial.dispose();
-            dummyGeometry.dispose();
-        }
+    //         // Upload the canvas texture to the GPU so it can be modified.
+    //         const dummyMaterial = new MeshBasicMaterial({ map: texture });
+    //         const dummyGeometry = new ImagePlaneGeometry(1, 1);
+    //         const dummyMesh = new Mesh(dummyGeometry, dummyMaterial);
+    //         threejsScene.add(dummyMesh);
+    //         threejsRenderer.render(threejsScene, threejsCamera);
+    //         threejsScene.clear();
+    //         dummyMaterial.dispose();
+    //         dummyGeometry.dispose();
+    //     }
 
-        const imageGeometry = new ImagePlaneGeometry(chunkWidth, chunkHeight);
+    //     const imageGeometry = new ImagePlaneGeometry(chunkWidth, chunkHeight);
 
-        for (let x = 0; x < image.width; x += chunkWidth) {
-            for (let y = 0; y < image.height; y += chunkHeight) {
-                let fittedChunkWidth = Math.min(image.width - x, chunkWidth);
-                let fittedChunkHeight = Math.min(image.height - y, chunkHeight);
+    //     for (let x = 0; x < image.width; x += chunkWidth) {
+    //         for (let y = 0; y < image.height; y += chunkHeight) {
+    //             let fittedChunkWidth = Math.min(image.width - x, chunkWidth);
+    //             let fittedChunkHeight = Math.min(image.height - y, chunkHeight);
 
-                const { createPrepareGpuTextureShaderMaterial, updatePrepareGpuTextureShaderMaterial } = await import('@/canvas/renderers/webgl/shaders');
+    //             const { createPrepareGpuTextureShaderMaterial, updatePrepareGpuTextureShaderMaterial } = await import('@/canvas/renderers/webgl/shaders');
 
-                let chunkImage = isUseOriginalImage ? image : await createImageBitmap(
-                    image, x, y, fittedChunkWidth, fittedChunkHeight, {
-                        imageOrientation: 'none',
-                        premultiplyAlpha: 'none',
-                    }
-                );
+    //             let chunkImage = isUseOriginalImage ? image : await createImageBitmap(
+    //                 image, x, y, fittedChunkWidth, fittedChunkHeight, {
+    //                     imageOrientation: 'none',
+    //                     premultiplyAlpha: 'none',
+    //                 }
+    //             );
 
-                let {
-                    done, threejsScene, threejsRenderer, threejsRenderTarget, threejsCamera
-                } = await setupThreejsRenderer(fittedChunkWidth, fittedChunkHeight);
+    //             let {
+    //                 done, threejsScene, threejsRenderer, threejsRenderTarget, threejsCamera
+    //             } = await setupThreejsRenderer(fittedChunkWidth, fittedChunkHeight);
 
-                try {
-                    let imageTexture = new CanvasTexture(chunkImage);
-                    imageTexture.generateMipmaps = false;
-                    imageTexture.encoding = sRGBEncoding;
-                    imageTexture.minFilter = NearestFilter;
-                    imageTexture.magFilter = NearestFilter;
+    //             try {
+    //                 let imageTexture = new CanvasTexture(chunkImage);
+    //                 imageTexture.generateMipmaps = false;
+    //                 imageTexture.encoding = sRGBEncoding;
+    //                 imageTexture.minFilter = NearestFilter;
+    //                 imageTexture.magFilter = NearestFilter;
 
-                    if (!threejsPrepareGpuTextureShaderMaterial) {
-                        threejsPrepareGpuTextureShaderMaterial = createPrepareGpuTextureShaderMaterial(imageTexture);
-                        threejsPrepareGpuTextureShaderMaterial.needsUpdate = true;
-                        drawImageWebglCache.threejsPrepareGpuTextureShaderMaterial = threejsPrepareGpuTextureShaderMaterial;
-                    } else {
-                        updatePrepareGpuTextureShaderMaterial(threejsPrepareGpuTextureShaderMaterial, imageTexture);
-                    }
+    //                 if (!threejsPrepareGpuTextureShaderMaterial) {
+    //                     threejsPrepareGpuTextureShaderMaterial = createPrepareGpuTextureShaderMaterial(imageTexture);
+    //                     threejsPrepareGpuTextureShaderMaterial.needsUpdate = true;
+    //                     drawImageWebglCache.threejsPrepareGpuTextureShaderMaterial = threejsPrepareGpuTextureShaderMaterial;
+    //                 } else {
+    //                     updatePrepareGpuTextureShaderMaterial(threejsPrepareGpuTextureShaderMaterial, imageTexture);
+    //                 }
 
-                    const imagePlane = new Mesh(imageGeometry, threejsPrepareGpuTextureShaderMaterial);
+    //                 const imagePlane = new Mesh(imageGeometry, threejsPrepareGpuTextureShaderMaterial);
 
-                    threejsScene.add(imagePlane);
-                    threejsRenderer.setRenderTarget(threejsRenderTarget);
-                    threejsRenderer.render(threejsScene, threejsCamera);
-                    threejsRenderer.setRenderTarget(null);
-                    threejsScene.clear();
+    //                 threejsScene.add(imagePlane);
+    //                 threejsRenderer.setRenderTarget(threejsRenderTarget);
+    //                 threejsRenderer.render(threejsScene, threejsCamera);
+    //                 threejsRenderer.setRenderTarget(null);
+    //                 threejsScene.clear();
 
-                    if (!isUseOriginalImage) {
-                        (chunkImage as ImageBitmap).close();
-                    }
-                    imageTexture.dispose();
+    //                 if (!isUseOriginalImage) {
+    //                     (chunkImage as ImageBitmap).close();
+    //                 }
+    //                 imageTexture.dispose();
 
-                    const pixelBuffer = new Uint8Array(fittedChunkWidth * fittedChunkHeight * 4);
-                    threejsRenderer.readRenderTargetPixels(threejsRenderTarget, 0, 0, fittedChunkWidth, fittedChunkHeight, pixelBuffer);
-                    const chunkBitmap = await createImageBitmap(
-                        new ImageData(new Uint8ClampedArray(pixelBuffer), fittedChunkWidth, fittedChunkHeight),
-                        0, 0, fittedChunkWidth, fittedChunkHeight, {
-                            imageOrientation: 'none',
-                            premultiplyAlpha: 'none',
-                        }
-                    );
-                    const chunkTexture = new CanvasTexture(chunkBitmap);
-                    chunkTexture.premultiplyAlpha = false;
-                    chunkTexture.generateMipmaps = true;
-                    chunkTexture.encoding = sRGBEncoding;
-                    chunkTexture.minFilter = LinearMipMapLinearFilter;
-                    chunkTexture.magFilter = NearestFilter;
-                    chunkTexture.needsUpdate = true;
+    //                 const pixelBuffer = new Uint8Array(fittedChunkWidth * fittedChunkHeight * 4);
+    //                 threejsRenderer.readRenderTargetPixels(threejsRenderTarget, 0, 0, fittedChunkWidth, fittedChunkHeight, pixelBuffer);
+    //                 const chunkBitmap = await createImageBitmap(
+    //                     new ImageData(new Uint8ClampedArray(pixelBuffer), fittedChunkWidth, fittedChunkHeight),
+    //                     0, 0, fittedChunkWidth, fittedChunkHeight, {
+    //                         imageOrientation: 'none',
+    //                         premultiplyAlpha: 'none',
+    //                     }
+    //                 );
+    //                 const chunkTexture = new CanvasTexture(chunkBitmap);
+    //                 chunkTexture.premultiplyAlpha = false;
+    //                 chunkTexture.generateMipmaps = true;
+    //                 chunkTexture.encoding = sRGBEncoding;
+    //                 chunkTexture.minFilter = LinearMipMapLinearFilter;
+    //                 chunkTexture.magFilter = NearestFilter;
+    //                 chunkTexture.needsUpdate = true;
 
-                    if (isUseOriginalImage) {
-                        texture = chunkTexture;
-                        texture.userData.shouldDisposeBitmap = true;
-                    } else {
-                        // TODO - this copy just isn't working...
-                        threejsRenderer.copyTextureToTexture(new Vector2(x, y), chunkTexture, texture);
-                        chunkBitmap.close();
-                        chunkTexture.dispose();
-                    }
-                } catch (error) {
-                    // Ignore
-                } finally {
-                    done();
-                }
-            }
-        }
+    //                 if (isUseOriginalImage) {
+    //                     texture = chunkTexture;
+    //                     texture.userData.shouldDisposeBitmap = true;
+    //                 } else {
+    //                     // TODO - this copy just isn't working...
+    //                     threejsRenderer.copyTextureToTexture(new Vector2(x, y), chunkTexture, texture);
+    //                     chunkBitmap.close();
+    //                     chunkTexture.dispose();
+    //                 }
+    //             } catch (error) {
+    //                 // Ignore
+    //             } finally {
+    //                 done();
+    //             }
+    //         }
+    //     }
 
-        imageGeometry.dispose();
+    //     imageGeometry.dispose();
 
-        return texture;        
-    }
+    //     return texture;        
+    // }
 
-    const { LinearMipMapLinearFilter, sRGBEncoding, NearestFilter } = await import('three/src/constants');
+    const { LinearMipMapLinearFilter, LinearEncoding, sRGBEncoding, NearestFilter } = await import('three/src/constants');
     const { CanvasTexture } = await import('three/src/textures/CanvasTexture');
 
     const texture = new CanvasTexture(preparedImage ?? image);

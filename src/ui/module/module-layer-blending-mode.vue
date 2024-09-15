@@ -11,16 +11,36 @@
             class="mt-3"
             @submit="onConfirm"
         >
-            <el-form-item-aligned-groups>
-                <el-form-item-group>
-                    <el-form-item :label="$t('module.layerBlendingMode.blendingMode')">
-                        <el-select v-model="formData.blendingMode">
-                            <el-option value="normal" :label="$t('layerBlendingMode.normal')" />
-                            <el-option value="erase" :label="$t('layerBlendingMode.erase')" />
-                        </el-select>
-                    </el-form-item>
-                </el-form-item-group>
-            </el-form-item-aligned-groups>
+            <div class="is-flex">
+                <el-radio-group v-model="formData.blendingMode" class="el-radio-group--vertical">
+                    <el-radio-button label="normal">
+                        {{ $t('layerBlendingMode.normal') }}
+                    </el-radio-button>
+                    <el-radio-button label="erase">
+                        {{ $t('layerBlendingMode.erase') }}
+                    </el-radio-button>
+                    <!-- <el-radio-button label="multiply">
+                        {{ $t('layerBlendingMode.multiply') }}
+                    </el-radio-button> -->
+                </el-radio-group>
+                <div class="is-flex-grow-1 pl-4">
+                    <div class="is-flex is-flex-direction-row is-align-items-center is-justify-content-center">
+                        <div class="is-flex is-flex-shrink-1 is-flex-direction-column is-align-items-center">
+                            <img :src="previewImages.top" class="ogr-module-layer-blending-mode__image-preview" :alt="$t('module.layerBlendingMode.layerTop')" width="256" height="256">
+                            <div>
+                                <span class="bi bi-plus is-size-3" />
+                            </div>
+                            <img :src="previewImages.bottom" class="ogr-module-layer-blending-mode__image-preview" :alt="$t('module.layerBlendingMode.layerBottom')" width="256" height="256">
+                        </div>
+                        <div class="is-flex-shrink-0 px-2">
+                            <span class="bi bi-arrow-right-short is-size-3" />
+                        </div>
+                        <div class="is-flex is-flex-shrink-1 is-flex-direction-column">
+                            <img :src="previewImages.result" class="ogr-module-layer-blending-mode__image-preview" :alt="$t('module.layerBlendingMode.result')" width="256" height="256">
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="has-text-right">
                 <el-divider />
                 <div class="has-text-right">
@@ -43,6 +63,7 @@ import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElFormItemGroup from '@/ui/el/el-form-item-group.vue';
 import ElFormItemAlignedGroups from '@/ui/el/el-form-item-aligned-groups.vue';
 import ElLoading from 'element-plus/lib/components/loading/index';
+import { ElRadioGroup, ElRadioButton } from 'element-plus/lib/components/radio/index';
 import ElRow from 'element-plus/lib/components/row/index';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 
@@ -69,6 +90,8 @@ export default defineComponent({
         ElFormItemGroup,
         ElFormItemAlignedGroups,
         ElOption,
+        ElRadioButton,
+        ElRadioGroup,
         ElRow,
         ElSelect,
     },
@@ -93,15 +116,43 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         emit('update:title', 'module.layerBlendingMode.title');
-        emit('update:dialogSize', 'medium');
+        emit('update:dialogSize', 'medium-large');
 
         const hasError = ref(false);
         const loading = ref(false);
 
         const formData = reactive<{ blendingMode: WorkingFileLayerBlendingMode }>({
-            blendingMode: 'normal',
+            blendingMode: getLayerById(props.layerId)?.blendingMode ?? 'normal',
         });
         const formValidationRules = ref<Rules>({});
+
+        const previewImages = computed(() => {
+            switch (formData.blendingMode) {
+                case 'normal':
+                    return {
+                        top: '../images/module/layer/blending-mode/blend-demo-foreground-flower.png',
+                        bottom: '../images/module/layer/blending-mode/blend-demo-apple.png',
+                        result: '../images/module/layer/blending-mode/blend-demo-result-normal.png',
+                    }
+                case 'erase':
+                    return {
+                        top: '../images/module/layer/blending-mode/blend-demo-foreground-flower.png',
+                        bottom: '../images/module/layer/blending-mode/blend-demo-apple.png',
+                        result: '../images/module/layer/blending-mode/blend-demo-result-erase.png',
+                    }
+                case 'multiply':
+                    return {
+                        top: '../images/module/layer/blending-mode/blend-demo-foreground-flower.png',
+                        bottom: '../images/module/layer/blending-mode/blend-demo-apple.png',
+                        result: '../images/module/layer/blending-mode/blend-demo-result-multiply.png',
+                    }
+            }
+            return {
+                top: '',
+                bottom: '',
+                result: '',
+            };
+        });
 
         onMounted(async () => {
             nextTick(async () => {
@@ -151,6 +202,7 @@ export default defineComponent({
         return {
             hasError,
             loading,
+            previewImages,
 
             formData,
             formValidationRules,

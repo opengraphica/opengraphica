@@ -303,7 +303,8 @@
     },
     "layerBlendingMode": {
         "normal": "Normal",
-        "erase": "Erase"
+        "erase": "Erase",
+        "multiply": "Multiply"
     },
     "layerFilter": {
         "brightness": {
@@ -697,7 +698,10 @@
         },
         "layerBlendingMode": {
             "title": "Change Blending Mode",
-            "blendingMode": "Blending Mode"
+            "blendingMode": "Blending Mode",
+            "layerTop": "Top Layer",
+            "layerBottom": "Bottom Layer",
+            "imageResult": "Result"
         },
         "layerEffectBrowser": {
             "title": "Effect Browser",

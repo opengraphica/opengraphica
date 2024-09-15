@@ -160,16 +160,18 @@ function createMaterialWrapper<T extends MaterialType>(
     });
     assignMaterialBlendModes(material, blendingMode);
     init(material, initParams);
+    let lastUpdate: MaterialWapperUpdates[T] | undefined;
     const materialWrapper: MaterialWrapper<MaterialWapperUpdates[T]> = {
         uuid,
         type,
         material,
         blendingMode,
         update(updateParams) {
+            lastUpdate = updateParams;
             const needsNewMaterial = update(this.material, updateParams);
             if (needsNewMaterial) {
                 disposeMaterial(materialWrapper);
-                return createMaterialWrapper(type, initParams, combinedShaderResult, blendingMode, init, update);
+                return createMaterialWrapper(type, lastUpdate, combinedShaderResult, blendingMode, init, update);
             }
             return materialWrapper;
         },
@@ -192,7 +194,7 @@ function createMaterialWrapper<T extends MaterialType>(
                     break;
                 }
             }
-            return createMaterialWrapper(type, initParams, combinedShaderResult, newBlendingMode, init, update, existingMaterial);
+            return createMaterialWrapper(type, lastUpdate ?? initParams, combinedShaderResult, newBlendingMode, init, update, existingMaterial);
         },
     }
     materialWrappersById.set(uuid, materialWrapper);
