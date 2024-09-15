@@ -57,6 +57,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
             }
             orderIterator += 0.01;
         }
+        console.log(this.order);
     }
     onReorder(order: number) {
         // Override
@@ -65,8 +66,10 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
     attach(layer: WorkingFileLayer<ColorModel>) {
         if (!this.isAttached) {
             try {
+                if (layer.renderer) {
+                    this.order = layer.renderer.order ?? 0;
+                }
                 this.onAttach(layer);
-                this.order = layer.renderer?.order ?? 0;
             } catch (error) {
                 console.error('[src/canvas/renderers/webgl/base.ts] Error during layer attach. ', error);
             }

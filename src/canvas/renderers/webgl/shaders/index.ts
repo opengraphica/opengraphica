@@ -151,7 +151,7 @@ export function createGradientShaderMaterial(
         depthTest: false,
         vertexShader: combinedShaderResult.vertexShader,
         fragmentShader: combinedShaderResult.fragmentShader,
-        side: DoubleSide,
+        side: FrontSide,
         defines: {
             cCanvasWidth: canvasWidth,
             cCanvasHeight: canvasHeight,
@@ -261,7 +261,7 @@ export function createRasterTextureCompositorShaderMaterial(
         blendDst: ZeroFactor,
         vertexShader: textureCompositorMaterialVertexShader,
         fragmentShader: textureCompositorMaterialFragmentShader,
-        side: DoubleSide,
+        side: FrontSide,
         defines: {},
         uniforms: {
             baseTextureScaleX: { value: overlayWidth / destinationWidth },
@@ -317,7 +317,7 @@ export function createPrepareGpuTextureShaderMaterial(texture: Texture): ShaderM
         blendDst: ZeroFactor,
         vertexShader: prepareGpuTextureMaterialVertexShader,
         fragmentShader: prepareGpuTextureMaterialFragmentShader,
-        side: DoubleSide,
+        side: FrontSide,
         defines: {
             cMapWidth: texture?.image.width ?? 1,
             cMapHeight: texture?.image.height ?? 1,

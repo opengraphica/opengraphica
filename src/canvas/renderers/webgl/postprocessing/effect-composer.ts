@@ -5,7 +5,7 @@ import { CopyShader } from '../shaders/copy-shader';
 import { ShaderPass } from './shader-pass';
 import { MaskPass } from './mask-pass';
 import { ClearMaskPass } from './mask-pass';
-import { HalfFloatType, RGBAFormat } from 'three/src/constants';
+import { UnsignedByteType, HalfFloatType, RGBAFormat } from 'three/src/constants';
 
 import type { Pass } from './pass';
 import type { WebGLRenderer } from 'three';
@@ -39,14 +39,16 @@ class EffectComposer {
 
             const gl = renderer.getContext();
 
+            const isHalfFloat = renderer.capabilities.isWebGL2 || gl.getExtension('OES_texture_half_float');
+
             this._contextRestoredCallback = () => {
-                gl.getExtension('EXT_float_blend');
+                renderer.capabilities.isWebGL2 || gl.getExtension('OES_texture_half_float');
             };
             gl.canvas.addEventListener("webglcontextrestored", this._contextRestoredCallback, false);
 
             renderTarget = new WebGLRenderTarget(this._width * this._pixelRatio, this._height * this._pixelRatio, {
                 format: RGBAFormat,
-                type: HalfFloatType,
+                type: isHalfFloat ? HalfFloatType : UnsignedByteType,
                 depthBuffer: false,
                 stencilBuffer: false,
             });
