@@ -145,6 +145,7 @@ export function combineFiltersToShader(canvasFilters: CanvasFilter[], layerInfo:
     let fragmentShader = '';
 
     const { uniforms, defines } = generateShaderUniformsAndDefines(canvasFilters, layerInfo);
+    defines.cLayerBlendingMode = 0;
 
     let vertexShaderMainCalls: string[] = [];
     let fragmentShaderMainCalls: string[] = [];

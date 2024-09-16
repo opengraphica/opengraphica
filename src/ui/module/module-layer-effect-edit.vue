@@ -656,6 +656,7 @@ export default defineComponent({
                     for (const uniformName in newUniforms) {
                         previewMaterial.uniforms[uniformName] = newUniforms[uniformName];
                     }
+                    previewMaterial.needsUpdate = true;
                     threejsComposer.render();
                 }
             } else {
