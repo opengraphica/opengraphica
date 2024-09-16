@@ -5,6 +5,8 @@ import basicMaterialVertexShaderSetup from '@/canvas/renderers/webgl/shaders/bas
 import basicMaterialVertexShaderMain from '@/canvas/renderers/webgl/shaders/basic-material.main.vert';
 import basicMaterialFragmentShaderSetup from '@/canvas/renderers/webgl/shaders/basic-material.setup.frag';
 import basicMaterialFragmentShaderMain from '@/canvas/renderers/webgl/shaders/basic-material.main.frag';
+import blendingModesFragmentShaderSetup from '@/canvas/renderers/webgl/shaders/blending-modes.setup.frag';
+import blendingModesFragmentShaderMain from '@/canvas/renderers/webgl/shaders/blending-modes.main.frag';
 import commonUtilityFragmentShader from '@/canvas/renderers/webgl/shaders/common-utility.frag';
 
 import type { IUniform } from 'three/src/renderers/shaders/UniformsLib';
@@ -195,10 +197,12 @@ export function combineFiltersToShader(canvasFilters: CanvasFilter[], layerInfo:
     if (fragmentShaderMainCalls.length > 0) {
         fragmentFilterCode += 'vec4 filterColorResult = gl_FragColor;\n' + fragmentShaderMainCalls.join('\n') + '\n    gl_FragColor = filterColorResult;';
     }
+    fragmentFilterCode += '\n' + blendingModesFragmentShaderMain + '\n';
 
     vertexShader = (options?.vertexShaderSetup ?? basicMaterialVertexShaderSetup) + '\n' + vertexShader
         + '\n' + (options?.vertexShaderMain ?? basicMaterialVertexShaderMain).replace('//[INJECT_FILTERS_HERE]', vertexFilterCode);
-    fragmentShader = commonUtilityFragmentShader + '\n' + (options?.fragmentShaderSetup ?? basicMaterialFragmentShaderSetup) + '\n' + fragmentShader
+    fragmentShader = commonUtilityFragmentShader + '\n' + blendingModesFragmentShaderSetup + '\n'
+        + (options?.fragmentShaderSetup ?? basicMaterialFragmentShaderSetup) + '\n' + fragmentShader
         + '\n' + (options?.fragmentShaderMain ?? basicMaterialFragmentShaderMain).replace('//[INJECT_FILTERS_HERE]', fragmentFilterCode);
 
     return {

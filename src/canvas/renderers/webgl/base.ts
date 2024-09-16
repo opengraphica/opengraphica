@@ -110,6 +110,20 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
         // Override
     }
 
+    swapScene(scene: Scene) {
+        if (this.isAttached) {
+            try {
+                this.onSwapScene(scene);
+            } catch (error) {
+                console.error('[src/canvas/renderers/webgl/base.ts] Error during layer swap scene. ', error);
+            }
+        }
+        this.threejsScene = scene;
+    }
+    onSwapScene(scene: Scene) {
+        // Override
+    }
+
     update(updates: Partial<WorkingFileLayer<ColorModel>>) {
         this.nextUpdatePromises.push(
             this.onUpdate(updates)
@@ -382,7 +396,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
                 recycledAssets.planeTextureRenderingContext?.clearRect(0, 0, recycledAssets.planeTexture?.image?.width ?? 1, recycledAssets.planeTexture?.image?.height ?? 1);
                 if (recycledAssets.planeTexture) recycledAssets.planeTexture.needsUpdate = true;
                 recycledAssets.latestDraftUpdate = null;
-                recycledAssets.plane && (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(recycledAssets.plane)
+                recycledAssets.plane && (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(recycledAssets.plane);
                 recycledAssets.plane = undefined;
                 recycledAssets.draftDestroyTimeoutHandle = window.setTimeout(() => {
                     this.disposeDraft(recycledAssets);
@@ -417,7 +431,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
         draftAssets.planeMaterial = undefined;
         draftAssets.planeTexture?.dispose();
         (draftAssets.planeTexture as unknown) = undefined;
-        draftAssets.plane && (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(draftAssets.plane)
+        draftAssets.plane && (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(draftAssets.plane);
     }
 
 }

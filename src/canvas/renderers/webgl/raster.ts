@@ -18,7 +18,9 @@ import { createMaterial, disposeMaterial, type MaterialWrapper } from './materia
 
 import { createThreejsTextureFromImage } from '@/lib/canvas';
 import { createEmptyCanvasWith2dContext } from '@/lib/image';
+import appEmitter from '@/lib/emitter';
 
+import type { Scene } from 'three';
 import type { WorkingFileRasterLayer, WorkingFileLayerBlendingMode, ColorModel } from '@/types';
 
 export default class RasterLayerRenderer extends BaseLayerRenderer {
@@ -45,6 +47,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
         this.lastChunkUpdateId = layer.data?.chunkUpdateId;
         this.materialWrapper = await createMaterial('raster', { texture: undefined }, layer.filters, layer, layer.blendingMode);
         this.plane = new Mesh(this.planeGeometry, this.materialWrapper.material);
+        this.plane.name = layer.name;
         this.plane.renderOrder = this.order + 0.1;
         this.plane.matrixAutoUpdate = false;
         this.plane.onBeforeRender = () => {
@@ -52,6 +55,9 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
         };
         (this.threejsScene ?? canvasStore.get('threejsScene'))?.add(this.plane);
         this.isVisible = layer.visible;
+
+        this.readBufferTextureUpdate = this.readBufferTextureUpdate.bind(this);
+        appEmitter.on('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
 
         const { drafts, blendingMode, visible, width, height, transform, filters, data } = toRefs(layer);
         this.stopWatchDrafts = watch([drafts], ([drafts]) => {
@@ -81,6 +87,13 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
     onReorder(order: number) {
         if (this.plane) {
             this.plane.renderOrder = order + 0.1;
+        }
+    }
+
+    onSwapScene(scene: Scene) {
+        if (this.plane) {
+            (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(this.plane);
+            scene.add(this.plane);
         }
     }
 
@@ -217,6 +230,9 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
         this.planeGeometry = undefined;
         this.plane && (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(this.plane);
         this.plane = undefined;
+
+        appEmitter.off('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
+
         if (this.materialWrapper) {
             disposeMaterial(this.materialWrapper);
         }
@@ -231,6 +247,12 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
         this.stopWatchTransform?.();
         this.stopWatchFilters?.();
         this.stopWatchData?.();
+    }
+
+    private readBufferTextureUpdate(texture?: Texture) {
+        if (!this.materialWrapper) return;
+        this.materialWrapper.material.uniforms.destinationMap.value = texture;
+        this.materialWrapper.material.uniformsNeedUpdate = true;
     }
 
     private disposeSourceTexture() {

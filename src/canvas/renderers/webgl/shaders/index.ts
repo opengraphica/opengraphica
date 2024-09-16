@@ -153,6 +153,7 @@ export function createGradientShaderMaterial(
         fragmentShader: combinedShaderResult.fragmentShader,
         side: FrontSide,
         defines: {
+            cLayerBlendingMode: 0,
             cCanvasWidth: canvasWidth,
             cCanvasHeight: canvasHeight,
             cBlendColorSpace: GradientColorSpace[params.blendColorSpace],
@@ -166,6 +167,7 @@ export function createGradientShaderMaterial(
             start: { value: new Vector2(startTransformed.x, startTransformed.y) },
             end: { value: new Vector2(endTransformed.x, endTransformed.y) },
             focus: { value: new Vector2(focusTransformed.x, focusTransformed.y) },
+            destinationMap: { value: undefined },
             ...combinedShaderResult.uniforms
         },
         userData: {

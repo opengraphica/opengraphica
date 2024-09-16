@@ -102,6 +102,13 @@ class EffectComposer {
         }
     }
 
+    disposeAllPasses() {
+        for (const pass of this.passes) {
+            pass.dispose();
+        }
+        this.passes = [];
+    }
+
     isLastEnabledPass(passIndex: number) {
         for (let i = passIndex + 1; i < this.passes.length; i ++) {
             if (this.passes[i].enabled) {

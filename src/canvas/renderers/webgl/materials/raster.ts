@@ -21,6 +21,9 @@ export const rasterMaterialSetup: MaterialWrapperSetup = {
         material.uniforms.map = {
             value: params.texture,
         };
+        material.uniforms.destinationMap = {
+            value: undefined,
+        };
     },
 
     update(material, params: RasterMaterialUpdateParams) {

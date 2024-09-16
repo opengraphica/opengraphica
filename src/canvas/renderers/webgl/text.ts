@@ -18,6 +18,7 @@ import { createFiltersFromLayerConfig, combineFiltersToShader } from '@/canvas/f
 import { createRasterShaderMaterial } from './shaders';
 import { assignMaterialBlendModes } from './blending';
 
+import type { Scene } from 'three';
 import type { TextData } from '@/canvas/drawables/text';
 import type { WorkingFileLayerBlendingMode, WorkingFileTextLayer, ColorModel } from '@/types';
 
@@ -156,6 +157,13 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
     onReorder(order: number) {
         if (this.plane) {
             this.plane.renderOrder = order + 0.1;
+        }
+    }
+
+    onSwapScene(scene: Scene) {
+        if (this.plane) {
+            (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(this.plane);
+            scene.add(this.plane);
         }
     }
 

@@ -47,6 +47,13 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
         // Override
     }
 
+    swapScene(scene: never) {
+        // Pass
+    }
+    onSwapScene(scene: never) {
+        // Pass
+    }
+
     update(updates: Partial<WorkingFileLayer<ColorModel>>) {
         this.onUpdate(updates);
         canvasStore.set('dirty', true);

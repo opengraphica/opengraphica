@@ -19,6 +19,7 @@ import { createFiltersFromLayerConfig, combineFiltersToShader } from '@/canvas/f
 import { createGradientShaderMaterial, updateGradientShaderMaterial } from './shaders';
 import { assignMaterialBlendModes } from './blending';
 
+import type { Scene } from 'three';
 import type { WorkingFileGradientLayer, WorkingFileLayerBlendingMode, ColorModel, RGBAColor } from '@/types';
 
 // TODO - implement color model conversions
@@ -95,6 +96,13 @@ export default class GradientLayerRenderer extends BaseLayerRenderer {
     onReorder(order: number) {
         if (this.plane) {
             this.plane.renderOrder = order + 0.1;
+        }
+    }
+
+    onSwapScene(scene: Scene) {
+        if (this.plane) {
+            (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(this.plane);
+            scene.add(this.plane);
         }
     }
 

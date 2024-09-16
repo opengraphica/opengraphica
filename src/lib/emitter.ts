@@ -1,5 +1,6 @@
 import mitt, { type Handler } from 'mitt';
 import type { NotificationProps, NotificationHandle } from 'element-plus/lib/components/notification/src/notification.d';
+import type { Texture } from 'three';
 import type { CanvasViewResetOptions, ModuleDefinition } from '@/types';
 
 interface AppEmitterEvents {
@@ -49,6 +50,7 @@ interface AppEmitterEvents {
     'app.wait.stopBlocking': {
         id: string;
     };
+    'app.workingFile.layerOrderCalculated': undefined;
     'app.workingFile.notifyImageLoadedFromClipboard': undefined;
     'app.workingFile.notifyImageLoadedFromDragAndDrop': undefined;
     'editor.history.startBlocking': {
@@ -71,6 +73,7 @@ interface AppEmitterEvents {
     'editor.tool.delete': undefined;
     'editor.tool.fontsLoaded': undefined;
     'editor.tool.selectAll': undefined;
+    'renderer.pass.readBufferTextureUpdate': Texture;
     'store.setPreference': {
         key: string;
         value: any;

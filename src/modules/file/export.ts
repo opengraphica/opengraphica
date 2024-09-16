@@ -3,6 +3,8 @@
  * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
 
+ import { saveAs } from 'file-saver';
+
 import workingFileStore, {
     getCanvasRenderingContext2DSettings,
     getLayersByType,
@@ -16,15 +18,17 @@ import historyStore from '@/store/history';
 import { drawWorkingFileToCanvas2d, drawWorkingFileToCanvasWebgl } from '@/lib/canvas';
 import { generateImageBlobHash } from '@/lib/hash';
 import { createImageFromCanvas } from '@/lib/image';
+import { knownFileExtensions } from '@/lib/regex';
 
 import { InsertLayerAction } from '@/actions/insert-layer';
 
-import { saveAs } from 'file-saver';
-import { knownFileExtensions } from '@/lib/regex';
-import { WorkingFileRasterSequenceLayer, FileSystemFileHandle, ColorModel } from '@/types';
 import { activeSelectionMask, appliedSelectionMask, blitActiveSelectionMask } from '@/canvas/store/selection-state';
+import { createLayerPasses, refreshLayerPasses } from '@/canvas/renderers/webgl/postprocessing/create-layer-passes';
+
 // @ts-ignore
 import GIF from '@/lib/gif.js';
+
+import type { WorkingFileRasterSequenceLayer, FileSystemFileHandle, ColorModel } from '@/types';
 
 declare class ClipboardItem {
     constructor(data: { [mimeType: string]: Blob });
@@ -119,11 +123,8 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                     // threejsRenderer.setRenderTarget(renderTarget);
 
                     const threejsComposer = new EffectComposer(threejsRenderer);
-                    const renderPass = new RenderPass(threejsScene, threejsCamera, undefined, undefined, 1);
-                    const gammaCorrectionPass = new ShaderPass(GammaCorrectionShader);
-                    threejsComposer.addPass(renderPass);
-                    threejsComposer.addPass(gammaCorrectionPass);
-
+                    createLayerPasses(threejsComposer, threejsCamera);
+                    
                     const threejsSelectionMask = canvasStore.get('threejsSelectionMask');
                     const selectionMaskWasVisible = !!(threejsSelectionMask?.visible);
                     if (threejsSelectionMask) {
@@ -146,9 +147,9 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
 
                     threejsRenderer.dispose();
                     threejsComposer.dispose();
-                    renderPass.dispose();
-                    gammaCorrectionPass.dispose();
 
+                    refreshLayerPasses();
+                    
                     // canvas = document.createElement('canvas');
                     // canvas.width = width;
                     // canvas.height = height;

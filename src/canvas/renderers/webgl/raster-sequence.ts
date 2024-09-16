@@ -18,6 +18,7 @@ import { createFiltersFromLayerConfig, combineFiltersToShader } from '../../filt
 import { createRasterShaderMaterial } from './shaders';
 import { assignMaterialBlendModes } from './blending';
 
+import type { Scene } from 'three';
 import type { DrawWorkingFileLayerOptions, WorkingFileLayerBlendingMode, WorkingFileRasterSequenceLayer, ColorModel } from '@/types';
 
 export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
@@ -91,6 +92,13 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
     onReorder(order: number) {
         if (this.plane) {
             this.plane.renderOrder = order;
+        }
+    }
+
+    onSwapScene(scene: Scene) {
+        if (this.plane) {
+            (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(this.plane);
+            scene.add(this.plane);
         }
     }
 

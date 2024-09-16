@@ -16,11 +16,51 @@ import {
     ZeroFactor,
 } from 'three/src/constants';
 
-import type { Material } from 'three/src/materials/Material';
+import type { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import type { Blending, BlendingEquation, BlendingDstFactor } from 'three/src/constants';
 import type { WorkingFileLayerBlendingMode } from "@/types";
 
-interface BlendModes {
+enum LayerBlendingMode {
+    normal = 0,
+    dissolve = 1,
+    colorErase = 2,
+    erase = 3,
+    merge = 4,
+    split = 5,
+
+    lightenOnly = 6,
+    lumaLightenOnly = 7,
+    screen = 8,
+    dodge = 9,
+
+    addition = 10,
+    darkenOnly = 11,
+    lumaDarkenOnly = 12,
+    multiply = 13,
+    burn = 14,
+    linearBurn = 15,
+
+    overlay = 16,
+    softLight = 17,
+    hardLight = 18,
+    vividLight = 19,
+    pinLight = 20,
+    linearLight = 21,
+    hardMix = 22,
+
+    difference = 23,
+    exclusion = 24,
+    subtract = 25,
+    grainExtract = 26,
+    grainMerge = 27,
+    divide = 28,
+
+    hue = 29,
+    color = 30,
+    value = 31,
+}
+
+interface MaterialBlendModes {
     blending: Blending;
     blendEquation: BlendingEquation;
     blendSrc: BlendingDstFactor;
@@ -30,7 +70,7 @@ interface BlendModes {
     blendDstAlpha: BlendingDstFactor | null;
 }
 
-export function getBlendModes(layerBlendingMode: WorkingFileLayerBlendingMode): BlendModes {
+export function getBlendModes(layerBlendingMode: WorkingFileLayerBlendingMode): MaterialBlendModes {
     let blending = NormalBlending;
     let blendEquation = AddEquation;
     let blendSrc = SrcAlphaFactor;
@@ -60,7 +100,7 @@ export function getBlendModes(layerBlendingMode: WorkingFileLayerBlendingMode): 
     };
 }
 
-export function assignMaterialBlendModes(material: Material, layerBlendingMode: WorkingFileLayerBlendingMode) {
+export function assignMaterialBlendModes(material: ShaderMaterial, layerBlendingMode: WorkingFileLayerBlendingMode) {
     const {
         blending,
         blendEquation,
@@ -77,4 +117,6 @@ export function assignMaterialBlendModes(material: Material, layerBlendingMode: 
     material.blendEquationAlpha = blendEquationAlpha;
     material.blendSrcAlpha = blendSrcAlpha;
     material.blendDstAlpha = blendDstAlpha;
+    material.defines.cLayerBlendingMode = LayerBlendingMode[layerBlendingMode as never];
+    material.needsUpdate = true;
 }

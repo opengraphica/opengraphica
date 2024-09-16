@@ -34,7 +34,7 @@
         }
 
         void main() {
-            gl_FragColor = texture2D( tDiffuse, vUv );
+            gl_FragColor = texture2D(tDiffuse, vUv);
             gl_FragColor = vec4(gl_FragColor.r / gl_FragColor.a, gl_FragColor.g / gl_FragColor.a, gl_FragColor.b / gl_FragColor.a, gl_FragColor.a);
             #include <encodings_fragment>
 

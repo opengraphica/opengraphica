@@ -31,6 +31,16 @@ import { isWebGLAvailable, isWebGL2Available } from '@/lib/webgl';
 import { colorToRgba, getColorModelName } from '@/lib/color';
 import { useAppPreloadBlocker } from '@/composables/app-preload-blocker';
 
+import type {
+    Matrix4, Mesh, MeshBasicMaterial, OrthographicCamera, PlaneGeometry, Scene, ShaderMaterial, Side, Texture, TextureEncoding, TextureLoader, WebGLRenderer, Wrapping,
+} from 'three';
+import type { EffectComposer } from '@/canvas/renderers/webgl/postprocessing/effect-composer';
+import type { createLayerPasses as CreateLayerPasses } from '@/canvas/renderers/webgl/postprocessing/create-layer-passes';
+import type { RenderPass } from '@/canvas/renderers/webgl/postprocessing/render-pass';
+import type { ShaderPass } from '@/canvas/renderers/webgl/postprocessing/shader-pass';
+import type { GammaCorrectionShader as GammaCorrectionShaderType } from '@/canvas/renderers/webgl/shaders/gamma-correction-shader';
+import type { ClassType } from '@/types';
+
 export default defineComponent({
     name: 'AppCanvas',
     directives: {
@@ -243,7 +253,7 @@ export default defineComponent({
         ) => {
             const { TextureLoader } = await import('three/src/loaders/TextureLoader');
             const { Texture } = await import('three/src/textures/Texture');
-            const { ClampToEdgeWrapping, NearestFilter, LinearFilter } = await import('three/src/constants');
+            const { sRGBEncoding, ClampToEdgeWrapping, NearestFilter, LinearFilter } = await import('three/src/constants');
 
             const newSelectionMask = newActiveSelectionMask ?? newAppliedSelectionMask ?? newSelectedLayersSelectionMaskPreview;
             const oldSelectionMask = oldActiveSelectionMask ?? oldAppliedSelectionMask ?? oldSelectedLayersSelectionMaskPreview;
@@ -271,6 +281,7 @@ export default defineComponent({
                     selectionMaskTexture.minFilter = LinearFilter;
                     selectionMaskTexture.wrapS = ClampToEdgeWrapping;
                     selectionMaskTexture.wrapT = ClampToEdgeWrapping;
+                    selectionMaskTexture.encoding = sRGBEncoding;
                     threejsSelectionMask.material.uniforms.selectedMaskMap.value = selectionMaskTexture;
                     threejsSelectionMask.material.uniforms.selectedMaskSize.value = [selectionMaskTexture.image.width, selectionMaskTexture.image.height];
                     threejsSelectionMask.material.uniforms.selectedMaskOffset.value = [newCanvasOffset.x, newCanvasOffset.y];
@@ -353,21 +364,61 @@ export default defineComponent({
 
         // Set up canvas for webgl rendering
         async function initializeThreejsRenderer() {
-            const { WebGLRenderer } = await import('three/src/renderers/WebGLRenderer');
-            const { Scene } = await import('three/src/scenes/Scene');
-            const { OrthographicCamera } = await import('three/src/cameras/OrthographicCamera');
-            const { PlaneGeometry } = await import('three/src/geometries/PlaneGeometry');
-            const { MeshBasicMaterial } = await import('three/src/materials/MeshBasicMaterial');
-            const { ShaderMaterial } = await import('three/src/materials/ShaderMaterial');
-            const { TextureLoader } = await import('three/src/loaders/TextureLoader');
-            const { Texture } = await import('three/src/textures/Texture');
-            const { Mesh } = await import('three/src/objects/Mesh');
-            const { Matrix4 } = await import('three/src/math/Matrix4');
-            const { DoubleSide, sRGBEncoding, RepeatWrapping } = await import('three/src/constants');
-            const { EffectComposer } = await import('@/canvas/renderers/webgl/postprocessing/effect-composer');
-            const { RenderPass } = await import('@/canvas/renderers/webgl/postprocessing/render-pass');
-            const { ShaderPass } = await import('@/canvas/renderers/webgl/postprocessing/shader-pass');
-            const { GammaCorrectionShader } = await import('@/canvas/renderers/webgl/shaders/gamma-correction-shader');
+            let WebGLRenderer: ClassType<WebGLRenderer>;
+            let Scene: ClassType<Scene>;
+            let OrthographicCamera: ClassType<OrthographicCamera>;
+            let PlaneGeometry: ClassType<PlaneGeometry>;
+            let MeshBasicMaterial: ClassType<MeshBasicMaterial>;
+            let ShaderMaterial: ClassType<ShaderMaterial>;
+            let TextureLoader: ClassType<TextureLoader>;
+            let Texture: ClassType<Texture>;
+            let Mesh: ClassType<Mesh>;
+            let Matrix4: ClassType<Matrix4>;
+            let DoubleSide: Side;
+            let sRGBEncoding: TextureEncoding;
+            let RepeatWrapping: Wrapping;
+            let EffectComposer: ClassType<EffectComposer>;
+            let createLayerPasses: typeof CreateLayerPasses;
+            let RenderPass: ClassType<RenderPass>;
+            let ShaderPass: ClassType<ShaderPass>;
+            let GammaCorrectionShader: typeof GammaCorrectionShaderType;
+
+            [
+                { DoubleSide, sRGBEncoding, RepeatWrapping },
+                { WebGLRenderer },
+                { Scene },
+                { OrthographicCamera },
+                { PlaneGeometry },
+                { MeshBasicMaterial },
+                { ShaderMaterial },
+                { TextureLoader },
+                { Texture },
+                { Mesh },
+                { Matrix4 },
+                { EffectComposer },
+                { createLayerPasses },
+                { RenderPass },
+                { ShaderPass },
+                { GammaCorrectionShader },
+            ] = await Promise.all([
+                import('three/src/constants'),
+                import('three/src/renderers/WebGLRenderer'),
+                import('three/src/scenes/Scene'),
+                import('three/src/cameras/OrthographicCamera'),
+                import('three/src/geometries/PlaneGeometry'),
+                import('three/src/materials/MeshBasicMaterial'),
+                import('three/src/materials/ShaderMaterial'),
+                import('three/src/loaders/TextureLoader'),
+                import('three/src/textures/Texture'),
+                import('three/src/objects/Mesh'),
+                import('three/src/math/Matrix4'),
+                import('@/canvas/renderers/webgl/postprocessing/effect-composer'),
+                import('@/canvas/renderers/webgl/postprocessing/create-layer-passes'),
+                import('@/canvas/renderers/webgl/postprocessing/render-pass'),
+                import('@/canvas/renderers/webgl/postprocessing/shader-pass'),
+                import('@/canvas/renderers/webgl/shaders/gamma-correction-shader'),
+            ]);
+
             const { default: selectionMaskMaterialFragmentShader } = await import('@/canvas/renderers/webgl/shaders/selection-mask-material.frag');
             const { default: selectionMaskMaterialVertexShader } = await import('@/canvas/renderers/webgl/shaders/selection-mask-material.vert');
             const workingFileWidth = workingFileStore.state.width;
@@ -410,6 +461,7 @@ export default defineComponent({
             if (selectionMaskUnselectedPatternTexture) {
                 selectionMaskUnselectedPatternTexture.wrapS = RepeatWrapping;
                 selectionMaskUnselectedPatternTexture.wrapT = RepeatWrapping;
+                selectionMaskUnselectedPatternTexture.encoding = sRGBEncoding;
             }
             const selectionMaskGeometry = new PlaneGeometry(2, 2); //viewportWidth.value, viewportHeight.value);
             const selectionMaskMaterial = new ShaderMaterial({
@@ -434,14 +486,12 @@ export default defineComponent({
             threejsSelectionMask.frustumCulled = false;
             threejsSelectionMask.visible = false;
             threejsScene.add(threejsSelectionMask);
-            canvasStore.set('threejsSelectionMask', markRaw(threejsSelectionMask));
+            canvasStore.set('threejsSelectionMask', markRaw(threejsSelectionMask) as never);
 
             await updateThreejsCanvasMargin(workingFileWidth, workingFileHeight);
 
             const threejsComposer = new EffectComposer(threejsRenderer);
-            const renderPass = new RenderPass(threejsScene, threejsCamera);
-            threejsComposer.addPass(renderPass);
-            threejsComposer.addPass(new ShaderPass(GammaCorrectionShader));
+            createLayerPasses(threejsComposer, threejsCamera);
             canvasStore.set('threejsComposer', markRaw(threejsComposer));
 
             canvasStore.set('renderer', 'webgl');

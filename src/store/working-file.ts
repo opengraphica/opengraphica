@@ -1,5 +1,6 @@
 import { PerformantStore } from './performant-store';
 import { ColorModel, FileSystemFileHandle, MeasuringUnits, ResolutionUnits, ColorModelName, WorkingFileLayer, WorkingFileAnyLayer, WorkingFileGroupLayer, WorkingFileTimeline } from '@/types';
+import appEmitter from '@/lib/emitter';
 
 interface WorkingFileState {
     activeTimelineId: number | null;
@@ -63,8 +64,10 @@ const store = new PerformantStore<WorkingFileStore>({
 });
 
 function calculateLayerOrder(parent?: WorkingFileLayer<ColorModel>[], order: number = 0): number {
+    let isStart = false;
     if (!parent) {
         parent = store.get('layers');
+        isStart = true;
     }
     for (const layer of parent) {
         layer.renderer.reorder(order);
@@ -72,6 +75,9 @@ function calculateLayerOrder(parent?: WorkingFileLayer<ColorModel>[], order: num
         if (layer.type === 'group') {
             order = calculateLayerOrder((layer as WorkingFileGroupLayer<ColorModel>).layers, order);
         }
+    }
+    if (isStart) {
+        appEmitter.emit('app.workingFile.layerOrderCalculated');
     }
     return order;
 }

@@ -303,8 +303,14 @@
     },
     "layerBlendingMode": {
         "normal": "Normal",
+        "dissolve": "Dissolve",
+        "colorErase": "Color Erase",
         "erase": "Erase",
-        "multiply": "Multiply"
+        "merge": "Merge",
+        "split": "Split",
+        "multiply": "Multiply",
+        "difference": "Difference",
+        "subtract": "Subtract"
     },
     "layerFilter": {
         "brightness": {

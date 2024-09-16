@@ -30,7 +30,14 @@ export interface DrawWorkingFileOptions {
     };
 }
 
-export type WorkingFileLayerBlendingMode = 'normal' | 'erase' | 'multiply';
+export type WorkingFileLayerBlendingMode
+    = 'normal' | 'dissolve' | 'colorErase' | 'erase' | 'merge' | 'split'
+    | 'lightenOnly' | 'lumaLightenOnly' | 'screen' | 'dodge' | 'addition'
+    | 'darkenOnly' | 'lumaDarkenOnly' | 'multiply' | 'burn' | 'linearBurn'
+    | 'overlay' | 'softLight' | 'hardLight' | 'vividLight' | 'pinLight' | 'linearLight' | 'hardMix'
+    | 'difference' | 'exclusion' | 'subtract' | 'grainExtract' | 'grainMerge' | 'divide'
+    | 'hue' | 'color' | 'texture';
+
 export type WorkingFileLayerType = 'empty' | 'gradient' | 'group' | 'raster' | 'rasterSequence' | 'vector' | 'text';
 
 export interface WorkingFileLayerFilter<T extends ColorModel = ColorModel> {
@@ -48,6 +55,8 @@ export interface WorkingFileLayerRenderer<T extends ColorModel = ColorModel> {
     onAttach(layer: WorkingFileLayer<ColorModel>): void;
     detach(): void;
     onDetach(): void;
+    swapScene(scene: Scene): void;
+    onSwapScene(scene: Scene): void;
     reorder(order: number): void;
     onReorder(order: number): void;
     update(updates: Partial<WorkingFileLayer<ColorModel>>): void;

@@ -19,9 +19,15 @@
                     <el-radio-button label="erase">
                         {{ $t('layerBlendingMode.erase') }}
                     </el-radio-button>
-                    <!-- <el-radio-button label="multiply">
+                    <el-radio-button label="multiply">
                         {{ $t('layerBlendingMode.multiply') }}
-                    </el-radio-button> -->
+                    </el-radio-button>
+                    <el-radio-button label="difference">
+                        {{ $t('layerBlendingMode.difference') }}
+                    </el-radio-button>
+                    <el-radio-button label="subtract">
+                        {{ $t('layerBlendingMode.subtract') }}
+                    </el-radio-button>
                 </el-radio-group>
                 <div class="is-flex-grow-1 pl-4">
                     <div class="is-flex is-flex-direction-row is-align-items-center is-justify-content-center">
@@ -145,6 +151,18 @@ export default defineComponent({
                         top: '../images/module/layer/blending-mode/blend-demo-foreground-flower.png',
                         bottom: '../images/module/layer/blending-mode/blend-demo-apple.png',
                         result: '../images/module/layer/blending-mode/blend-demo-result-multiply.png',
+                    }
+                case 'difference':
+                    return {
+                        top: '../images/module/layer/blending-mode/blend-demo-foreground-flower.png',
+                        bottom: '../images/module/layer/blending-mode/blend-demo-apple.png',
+                        result: '../images/module/layer/blending-mode/blend-demo-result-difference.png',
+                    }
+                case 'subtract':
+                    return {
+                        top: '../images/module/layer/blending-mode/blend-demo-foreground-flower.png',
+                        bottom: '../images/module/layer/blending-mode/blend-demo-apple.png',
+                        result: '../images/module/layer/blending-mode/blend-demo-result-subtract.png',
                     }
             }
             return {

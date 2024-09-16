@@ -16,3 +16,4 @@ uniform vec2 end;
 uniform vec2 focus;
 
 varying vec2 vUv;
+varying vec2 vScreenUv;

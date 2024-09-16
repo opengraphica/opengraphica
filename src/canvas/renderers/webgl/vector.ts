@@ -18,6 +18,7 @@ import { decomposeMatrix } from '@/lib/dom-matrix';
 import { throttle } from '@/lib/timing';
 import { createCanvasFromImage } from '@/lib/image';
 
+import type { Scene } from 'three';
 import type { WorkingFileVectorLayer, WorkingFileLayerBlendingMode, ColorModel } from '@/types';
 
 const epsilon = 0.000001;
@@ -90,6 +91,13 @@ export default class VectorLayerRenderer extends BaseLayerRenderer {
     onReorder(order: number) {
         if (this.plane) {
             this.plane.renderOrder = order + 0.1;
+        }
+    }
+
+    onSwapScene(scene: Scene) {
+        if (this.plane) {
+            (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(this.plane);
+            scene.add(this.plane);
         }
     }
 
