@@ -32,10 +32,12 @@ import { colorToRgba, getColorModelName } from '@/lib/color';
 import { useAppPreloadBlocker } from '@/composables/app-preload-blocker';
 
 import type {
-    Matrix4, Mesh, MeshBasicMaterial, OrthographicCamera, PlaneGeometry, Scene, ShaderMaterial, Side, Texture, TextureEncoding, TextureLoader, WebGLRenderer, Wrapping,
+    Blending, BlendingDstFactor, BufferAttribute, BufferGeometry, Matrix4, Mesh, MeshBasicMaterial,
+    OrthographicCamera, PlaneGeometry, Scene, ShaderMaterial, Side, Texture, TextureEncoding,
+    TextureLoader, WebGLRenderer, Wrapping,
 } from 'three';
 import type { EffectComposer } from '@/canvas/renderers/webgl/postprocessing/effect-composer';
-import type { createLayerPasses as CreateLayerPasses } from '@/canvas/renderers/webgl/postprocessing/create-layer-passes';
+import type { createLayerPasses as CreateLayerPasses, refreshLayerPasses as RefreshLayerPasses } from '@/canvas/renderers/webgl/postprocessing/create-layer-passes';
 import type { RenderPass } from '@/canvas/renderers/webgl/postprocessing/render-pass';
 import type { ShaderPass } from '@/canvas/renderers/webgl/postprocessing/shader-pass';
 import type { GammaCorrectionShader as GammaCorrectionShaderType } from '@/canvas/renderers/webgl/shaders/gamma-correction-shader';
@@ -590,11 +592,30 @@ export default defineComponent({
 
         // Updates the canvas empty space geometry size (it hides objects outside canvas bounds)
         async function updateThreejsCanvasMargin(imageWidth: number, imageHeight: number) {
-            const { BufferGeometry } = await import('three/src/core/BufferGeometry');
-            const { BufferAttribute } = await import('three/src/core/BufferAttribute');
-            const { MeshBasicMaterial } = await import('three/src/materials/MeshBasicMaterial');
-            const { Mesh } = await import('three/src/objects/Mesh');
-            const { CustomBlending, ZeroFactor, OneFactor, DstColorFactor } = await import('three/src/constants');
+            let refreshLayerPasses: typeof RefreshLayerPasses;
+            let BufferGeometry: ClassType<BufferGeometry>;
+            let BufferAttribute: ClassType<BufferAttribute>;
+            let MeshBasicMaterial: ClassType<MeshBasicMaterial>;
+            let Mesh: ClassType<Mesh>;
+            let CustomBlending: Blending;
+            let ZeroFactor: BlendingDstFactor;
+            let OneFactor: BlendingDstFactor;
+
+            [
+                { refreshLayerPasses },
+                { BufferGeometry },
+                { BufferAttribute },
+                { MeshBasicMaterial },
+                { Mesh },
+                { CustomBlending, ZeroFactor, OneFactor },
+            ] = await Promise.all([
+                import('@/canvas/renderers/webgl/postprocessing/create-layer-passes'),
+                import('three/src/core/BufferGeometry'),
+                import('three/src/core/BufferAttribute'),
+                import('three/src/materials/MeshBasicMaterial'),
+                import('three/src/objects/Mesh'),
+                import('three/src/constants'),
+            ]);
 
             const threejsScene = canvasStore.get('threejsScene');
             if (!threejsScene) return;
@@ -654,6 +675,8 @@ export default defineComponent({
             threejsScene.add(threejsCanvasMargin);
             threejsCanvasMargin.renderOrder = 9999;
             canvasStore.set('threejsCanvasMargin', markRaw(threejsCanvasMargin));
+
+            refreshLayerPasses();
         }
 
         // Centers the canvas and displays at 1x zoom or the maximum width/height of the window, whichever is smaller. 

@@ -36,7 +36,7 @@ export type WorkingFileLayerBlendingMode
     | 'darkenOnly' | 'lumaDarkenOnly' | 'multiply' | 'burn' | 'linearBurn'
     | 'overlay' | 'softLight' | 'hardLight' | 'vividLight' | 'pinLight' | 'linearLight' | 'hardMix'
     | 'difference' | 'exclusion' | 'subtract' | 'grainExtract' | 'grainMerge' | 'divide'
-    | 'hue' | 'color' | 'texture';
+    | 'hue' | 'chroma' | 'color' | 'lightness' | 'luminance';
 
 export type WorkingFileLayerType = 'empty' | 'gradient' | 'group' | 'raster' | 'rasterSequence' | 'vector' | 'text';
 

@@ -16,8 +16,26 @@
                     <el-radio-button label="normal">
                         {{ $t('layerBlendingMode.normal') }}
                     </el-radio-button>
+                    <!-- <el-radio-button label="colorErase">
+                        {{ $t('layerBlendingMode.colorErase') }}
+                    </el-radio-button> -->
                     <el-radio-button label="erase">
                         {{ $t('layerBlendingMode.erase') }}
+                    </el-radio-button>
+                    <el-radio-button label="lightenOnly">
+                        {{ $t('layerBlendingMode.lightenOnly') }}
+                    </el-radio-button>
+                    <el-radio-button label="lumaLightenOnly">
+                        {{ $t('layerBlendingMode.lumaLightenOnly') }}
+                    </el-radio-button>
+                    <el-radio-button label="screen">
+                        {{ $t('layerBlendingMode.screen') }}
+                    </el-radio-button>
+                    <el-radio-button label="dodge">
+                        {{ $t('layerBlendingMode.dodge') }}
+                    </el-radio-button>
+                    <el-radio-button label="addition">
+                        {{ $t('layerBlendingMode.addition') }}
                     </el-radio-button>
                     <el-radio-button label="multiply">
                         {{ $t('layerBlendingMode.multiply') }}
@@ -140,11 +158,47 @@ export default defineComponent({
                         bottom: '../images/module/layer/blending-mode/blend-demo-apple.png',
                         result: '../images/module/layer/blending-mode/blend-demo-result-normal.png',
                     }
+                case 'colorErase':
+                    return {
+                        top: '../images/module/layer/blending-mode/blend-demo-foreground-flower.png',
+                        bottom: '../images/module/layer/blending-mode/blend-demo-apple.png',
+                        result: '../images/module/layer/blending-mode/blend-demo-result-color-erase.png',
+                    }
                 case 'erase':
                     return {
                         top: '../images/module/layer/blending-mode/blend-demo-foreground-flower.png',
                         bottom: '../images/module/layer/blending-mode/blend-demo-apple.png',
                         result: '../images/module/layer/blending-mode/blend-demo-result-erase.png',
+                    }
+                case 'lightenOnly':
+                    return {
+                        top: '../images/module/layer/blending-mode/blend-demo-foreground-flower.png',
+                        bottom: '../images/module/layer/blending-mode/blend-demo-apple.png',
+                        result: '../images/module/layer/blending-mode/blend-demo-result-lighten-only.png',
+                    }
+                case 'lumaLightenOnly':
+                    return {
+                        top: '../images/module/layer/blending-mode/blend-demo-foreground-flower.png',
+                        bottom: '../images/module/layer/blending-mode/blend-demo-apple.png',
+                        result: '../images/module/layer/blending-mode/blend-demo-result-luma-lighten-only.png',
+                    }
+                case 'screen':
+                    return {
+                        top: '../images/module/layer/blending-mode/blend-demo-foreground-flower.png',
+                        bottom: '../images/module/layer/blending-mode/blend-demo-apple.png',
+                        result: '../images/module/layer/blending-mode/blend-demo-result-screen.png',
+                    }
+                case 'dodge':
+                    return {
+                        top: '../images/module/layer/blending-mode/blend-demo-foreground-flower.png',
+                        bottom: '../images/module/layer/blending-mode/blend-demo-apple.png',
+                        result: '../images/module/layer/blending-mode/blend-demo-result-dodge.png',
+                    }
+                case 'addition':
+                    return {
+                        top: '../images/module/layer/blending-mode/blend-demo-foreground-flower.png',
+                        bottom: '../images/module/layer/blending-mode/blend-demo-apple.png',
+                        result: '../images/module/layer/blending-mode/blend-demo-result-addition.png',
                     }
                 case 'multiply':
                     return {

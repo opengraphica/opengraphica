@@ -59,6 +59,10 @@ export function createLayerPasses(composer: EffectComposer, camera: Camera) {
     if (selectionMask) {
         passScenes[passScenes.length - 1].add(selectionMask);
     }
+    const canvasMargin = canvasStore.get('threejsCanvasMargin');
+    if (canvasMargin) {
+        passScenes[passScenes.length - 1].add(canvasMargin);
+    }
 
     let isFirstPass = true;
     for (const scene of passScenes) {

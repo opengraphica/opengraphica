@@ -306,11 +306,34 @@
         "dissolve": "Dissolve",
         "colorErase": "Color Erase",
         "erase": "Erase",
-        "merge": "Merge",
-        "split": "Split",
+        "lightenOnly": "Lighten Only",
+        "lumaLightenOnly": "Luma Lighten Only",
+        "screen": "Screen",
+        "dodge": "Dodge",
+        "addition": "Addition",
+        "darkenOnly": "Darken Only",
+        "lumaDarkenOnly": "Luma Darken Only",
         "multiply": "Multiply",
+        "burn": "Burn",
+        "linearBurn": "Linear Burn",
+        "overlay": "Overlay",
+        "softLight": "Soft Light",
+        "hardLight": "Hard Light",
+        "vividLight": "Vivid Light",
+        "pinLight": "Pin Light",
+        "linearLight": "Linear Light",
+        "hardMix": "Hard Mix",
         "difference": "Difference",
-        "subtract": "Subtract"
+        "exclusion": "Exclusion",
+        "subtract": "Subtract",
+        "grainExtract": "Grain Extract",
+        "grainMerge": "Grain Merge",
+        "divide": "Divide",
+        "hue": "Hue",
+        "chroma": "Chroma",
+        "color": "Color",
+        "lightness": "Lightness",
+        "luminance": "Luminance"
     },
     "layerFilter": {
         "brightness": {
@@ -707,7 +730,137 @@
             "blendingMode": "Blending Mode",
             "layerTop": "Top Layer",
             "layerBottom": "Bottom Layer",
-            "imageResult": "Result"
+            "imageResult": "Result",
+            "blendingModeSummary": {
+                "normal": {
+                    "description": "The top layer covers the bottom based on its opacity.",
+                    "example": "Cutting out a person from one photo and adding them to another photo."
+                },
+                "dissolve": {
+                    "description": "Randomly replaces pixels from the top layer with transparent pixels based on opacity.",
+                    "example": "Creating a grainy texture."
+                },
+                "colorErase": {
+                    "description": "Removes the color from the top layer that matches the color of the lower layer.",
+                    "example": "Removing a green screen background from an image."
+                },
+                "erase": {
+                    "description": "Erases the bottom layer where the top layer is opaque.",
+                    "example": "Removing unwanted objects in a photo by erasing those areas."
+                },
+                "lightenOnly": {
+                    "description": "Keeps the lighter color in each R,G,B channel of the top and bottom layers.",
+                    "example": "Adding a glow effect to an object without darkening the surrounding areas."
+                },
+                "lumaLightenOnly": {
+                    "description": "Compares the perceptual brightness between the top and bottom layers and keeps the brighter pixels.",
+                    "example": "Enhancing the brightness of a specific area in a black and white photo."
+                },
+                "screen": {
+                    "description": "Lightens the bottom layer based on the brightness of the top layer.",
+                    "example": "Making a night scene appear brighter."
+                },
+                "dodge": {
+                    "description": "Significantly brightens highlights and brings out details in the shadows.",
+                    "example": "Adding a sun flare."
+                },
+                "addition": {
+                    "description": "Adds the brightness of the top and bottom layers.",
+                    "example": "Creating vibrant, intense lighting effects."
+                },
+                "darkenOnly": {
+                    "description": "Keeps the darker color in each R,G,B channel of the top and bottom layers.",
+                    "example": "Darkening the shadows in a photo."
+                },
+                "lumaDarkenOnly": {
+                    "description": "Compares the perceptual darkness between the top and bottom layers and keeps the darker pixels.",
+                    "example": "Selectively underexposing bright areas."
+                },
+                "multiply": {
+                    "description": "Darkens the bottom layer based on the darkness of the top layer.",
+                    "example": "Making an image look darker, like simulating shadows or night scenes."
+                },
+                "burn": {
+                    "description": "Darkens the bottom layer proportional to the darkness of the top layer",
+                    "example": "Adding depth to shadows."
+                },
+                "linearBurn": {
+                    "description": "Adds the pixels of the upper and lower layers, then subtracts the brightest possible value.",
+                    "example": "Adding a dramatic shadowy look to the image."
+                },
+                "overlay": {
+                    "description": "A combination of multiply and screen, where light areas become lighter and dark areas become darker.",
+                    "example": "Adding contrast to photos without losing detail."
+                },
+                "softLight": {
+                    "description": "Brightens the image similar to overlay but with more gradual transitions.",
+                    "example": "Adding a soft glow to portraits."
+                },
+                "hardLight": {
+                    "description": "A harsher version of overlay, where bright areas become much brighter and dark areas much darker.",
+                    "example": "Dramatically increasing the contrast in action scenes."
+                },
+                "vividLight": {
+                    "description": "Increases the contrast very strongly, even more compared to hard light.",
+                    "example": "Stylizing photos with bold, punchy colors and contrast."
+                },
+                "pinLight": {
+                    "description": "Replaces pixels based on brightness, keeping the brightes and darkest pixels (midtones are unaffected).",
+                    "example": "Creating a posterized effect with sharp contrast between light and dark."
+                },
+                "linearLight": {
+                    "description": "Increases contrast linearly, brightening or darkening based on the top layer.",
+                    "example": "Simulating artificial lighting or enhancing metallic surfaces."
+                },
+                "hardMix": {
+                    "description": "Reduces the image to primary colors, creating a highly stylized look.",
+                    "example": "Creating a comic book or screen-printed effect."
+                },
+                "difference": {
+                    "description": "Finds the difference between layers, where black is no difference increasing color brightness is more different.",
+                    "example": "Aligning layers with similar content. When two pixels are the same, they turn black."
+                },
+                "exclusion": {
+                    "description": "Blending with white inverts color values, while blending with black produces no change.",
+                    "example": "Selectively invert colors."
+                },
+                "subtract": {
+                    "description": "Subtracts the brightness in the top layer from the bottom. The result is a lot of black or near-black areas.",
+                    "example": "Creating high contrast dark areas."
+                },
+                "grainExtract": {
+                    "description": "Extracts the film grain from a layer, also gives an embossed appearance.",
+                    "example": "Extracting grain from a film texture to apply to another texture."
+                },
+                "grainMerge": {
+                    "description": "Adds grain from the top layer to the bottom, leaving a grainy version of the original layer.",
+                    "example": "Adding film grain to a digital image for a vintage look."
+                },
+                "divide": {
+                    "description": "Divides the brightness of the top layer by the bottom.",
+                    "example": "Lightening an image dramatically, creating a glowing or ethereal effect."
+                },
+                "hue": {
+                    "description": "Uses the hue of the top layer while preserving the chroma and lightness of the bottom layer.",
+                    "example": "Changing a blue sky to purple while retaining its brightness."
+                },
+                "chroma": {
+                    "description": "Uses the chroma (intensity of color) of the top layer while preserving the hue and lightness of the bottom layer.",
+                    "example": "Boosting or reducing the intensity of colors in a photo."
+                },
+                "color": {
+                    "description": "Combines the hue and chroma of the top layer with the lightness of the bottom layer.",
+                    "example": "Recoloring an object while keeping the shading and lighting intact."
+                },
+                "lightness": {
+                    "description": "Uses the lightness of the top layer while preserving the hue and chroma of the bottom layer.",
+                    "example": "Lightening or darkening an image while keeping the colors true."
+                },
+                "luminance": {
+                    "description": "Divides upper layer luminance by lower layer, then multiplies the result to the lower layer.",
+                    "example": "Lightening or darkening an image while keeping the colors true."
+                }
+            }
         },
         "layerEffectBrowser": {
             "title": "Effect Browser",

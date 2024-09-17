@@ -56,8 +56,10 @@ enum LayerBlendingMode {
     divide = 28,
 
     hue = 29,
-    color = 30,
-    value = 31,
+    chroma = 30,
+    color = 31,
+    lightness = 32,
+    luminance = 33,
 }
 
 interface MaterialBlendModes {
@@ -88,6 +90,14 @@ export function getBlendModes(layerBlendingMode: WorkingFileLayerBlendingMode): 
             blendSrcAlpha = null;
             blendDstAlpha = OneMinusSrcAlphaFactor;
             break;
+        case 'colorErase':
+            blending = CustomBlending;
+            blendEquation = AddEquation;
+            blendSrc = OneFactor;
+            blendDst = ZeroFactor;
+            blendEquationAlpha = null;
+            blendSrcAlpha = null;
+            blendDstAlpha = null;
     }
     return {
         blending,
