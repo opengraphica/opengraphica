@@ -747,7 +747,16 @@
                 &.is-active {
                     .el-radio-button__inner {
                         box-shadow: none;
+                        --el-border-color: var(--el-color-primary);
                         border-color: var(--el-color-primary);
+                    }
+                }
+
+                &.el-radio-button--section-break {
+                    background-color: var(--el-border-color);
+                    .el-radio-button__inner {
+                        margin-top: 0.125rem;
+                        border-top: 1px solid var(--el-border-color);
                     }
                 }
             }

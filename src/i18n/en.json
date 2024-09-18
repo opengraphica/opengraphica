@@ -310,6 +310,7 @@
         "lumaLightenOnly": "Luma Lighten Only",
         "screen": "Screen",
         "dodge": "Dodge",
+        "linearDodge": "Linear Dodge",
         "addition": "Addition",
         "darkenOnly": "Darken Only",
         "lumaDarkenOnly": "Luma Darken Only",
@@ -762,6 +763,10 @@
                 },
                 "dodge": {
                     "description": "Significantly brightens highlights and brings out details in the shadows.",
+                    "example": "Adding a sun flare."
+                },
+                "linearDodge": {
+                    "description": "Adds the brightness of the top and bottom layers in perceptual space.",
                     "example": "Adding a sun flare."
                 },
                 "addition": {

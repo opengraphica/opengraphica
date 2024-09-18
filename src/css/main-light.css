@@ -29330,7 +29330,15 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .el-radio-group.el-radio-group--vertical .el-radio-button.is-active .el-radio-button__inner {
   box-shadow: none;
+  --el-border-color: var(--el-color-primary);
   border-color: var(--el-color-primary);
+}
+.opengraphica .el-radio-group.el-radio-group--vertical .el-radio-button.el-radio-button--section-break {
+  background-color: var(--el-border-color);
+}
+.opengraphica .el-radio-group.el-radio-group--vertical .el-radio-button.el-radio-button--section-break .el-radio-button__inner {
+  margin-top: 0.125rem;
+  border-top: 1px solid var(--el-border-color);
 }
 .opengraphica .el-select-dropdown--unlocked-option-height .el-select-dropdown__item {
   height: auto !important;

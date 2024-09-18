@@ -32,7 +32,7 @@ export interface DrawWorkingFileOptions {
 
 export type WorkingFileLayerBlendingMode
     = 'normal' | 'dissolve' | 'colorErase' | 'erase' | 'merge' | 'split'
-    | 'lightenOnly' | 'lumaLightenOnly' | 'screen' | 'dodge' | 'addition'
+    | 'lightenOnly' | 'lumaLightenOnly' | 'screen' | 'dodge' | 'linearDodge' | 'addition'
     | 'darkenOnly' | 'lumaDarkenOnly' | 'multiply' | 'burn' | 'linearBurn'
     | 'overlay' | 'softLight' | 'hardLight' | 'vividLight' | 'pinLight' | 'linearLight' | 'hardMix'
     | 'difference' | 'exclusion' | 'subtract' | 'grainExtract' | 'grainMerge' | 'divide'

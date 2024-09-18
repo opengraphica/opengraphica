@@ -1,0 +1,162 @@
+{
+    "normal": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-normal.png"
+    },
+    "colorErase": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-color-erase.png"
+    },
+    "erase": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-erase.png"
+    },
+    "lightenOnly": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-lighten-only.png"
+    },
+    "lumaLightenOnly": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-luma-lighten-only.png"
+    },
+    "screen": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-screen.png"
+    },
+    "dodge": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-dodge.png"
+    },
+    "linearDodge": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-linear-dodge.png"
+    },
+    "addition": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-addition.png"
+    },
+    "darkenOnly": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-darken-only.png"
+    },
+    "lumaDarkenOnly": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-luma-darken-only.png"
+    },
+    "multiply": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-multiply.png"
+    },
+    "burn": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-burn.png"
+    },
+    "linearBurn": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-linear-burn.png"
+    },
+    "overlay": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-overlay.png"
+    },
+    "softLight": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-soft-light.png"
+    },
+    "hardLight": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-hard-light.png"
+    },
+    "vividLight": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-vivid-light.png"
+    },
+    "pinLight": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-pin-light.png"
+    },
+    "linearLight": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-linear-light.png"
+    },
+    "hardMix": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-hard-mix.png"
+    },
+    "difference": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-difference.png"
+    },
+    "exclusion": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-exclusion.png"
+    },
+    "subtract": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-subtract.png"
+    },
+    "grainExtract": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-grain-extract.png"
+    },
+    "grainMerge": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-grain-merge.png"
+    },
+    "divide": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-divide.png"
+    },
+    "hue": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-hue.png"
+    },
+    "chroma": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-chroma.png"
+    },
+    "color": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-color.png"
+    },
+    "lightness": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-lightness.png"
+    },
+    "luminance": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-luminance.png"
+    }
+}
