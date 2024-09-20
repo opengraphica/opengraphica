@@ -17,7 +17,7 @@ import type { CanvasFilterLayerInfo, WorkingFileLayerBlendingMode, WorkingFileLa
 
 export type MaterialType = 'raster' | 'gradient';
 
-interface MaterialWapperUpdates {
+export interface MaterialWapperUpdates {
     raster: RasterMaterialUpdateParams;
     gradient: RasterMaterialUpdateParams;
 }

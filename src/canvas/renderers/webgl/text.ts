@@ -8,6 +8,7 @@ import { regenerateLayerThumbnail } from '@/store/working-file';
 import DrawableCanvas from '@/canvas/renderers/drawable/canvas';
 import { createThreejsTextureFromImage } from '@/lib/canvas';
 import { notifyLoadingFontFamilies, notifyFontFamiliesLoaded } from '@/lib/font-notify';
+import appEmitter from '@/lib/emitter';
 
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
@@ -15,8 +16,7 @@ import { Mesh } from 'three/src/objects/Mesh';
 import { Texture } from 'three/src/textures/Texture';
 
 import { createFiltersFromLayerConfig, combineFiltersToShader } from '@/canvas/filters';
-import { createRasterShaderMaterial } from './shaders';
-import { assignMaterialBlendModes } from './blending';
+import { createMaterial, disposeMaterial, type MaterialWrapper } from './materials';
 
 import type { Scene } from 'three';
 import type { TextData } from '@/canvas/drawables/text';
@@ -34,7 +34,7 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
     private layer!: WorkingFileTextLayer<ColorModel>;
 
     private planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
-    private material: InstanceType<typeof ShaderMaterial> | undefined;
+    private materialWrapper: MaterialWrapper | undefined;
     private plane: InstanceType<typeof Mesh> | undefined;
     private texture: InstanceType<typeof Texture> | undefined;
 
@@ -47,12 +47,8 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
     async onAttach(layer: WorkingFileTextLayer<ColorModel>) {
         this.layer = layer;
 
-        const combinedShaderResult = combineFiltersToShader(
-            await createFiltersFromLayerConfig(layer.filters),
-            layer
-        );
-        this.material = createRasterShaderMaterial(null, combinedShaderResult);
-        this.plane = new Mesh(this.planeGeometry, this.material);
+        this.materialWrapper = await createMaterial('raster', { srcTexture: undefined }, layer.filters, layer, layer.blendingMode);
+        this.plane = new Mesh(this.planeGeometry, this.materialWrapper.material);
         this.plane.renderOrder = this.order + 0.1;
         this.plane.matrixAutoUpdate = false;
         (this.threejsScene ?? canvasStore.get('threejsScene'))?.add(this.plane);
@@ -117,12 +113,15 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
             this.texture?.dispose();
             this.texture = newTexture;
             this.texture.needsUpdate = true;
-            this.material && (this.material.uniforms.map.value = this.texture);
+            this.materialWrapper && (this.materialWrapper.material.uniforms.srcTexture.value = this.texture);
 
             regenerateLayerThumbnail(layer);
 
             canvasStore.set('dirty', true);
         });
+
+        this.readBufferTextureUpdate = this.readBufferTextureUpdate.bind(this);
+        appEmitter.on('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
 
         const { blendingMode, width, height, filters, transform, data, visible } = toRefs(layer);
 
@@ -177,8 +176,10 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
         }
         if (updates.blendingMode) {
             this.lastBlendingMode = updates.blendingMode;
-            if (this.material) {
-                assignMaterialBlendModes(this.material, updates.blendingMode);
+            if (this.materialWrapper) {
+                this.materialWrapper = this.materialWrapper.changeBlendingMode(updates.blendingMode);
+                this.plane && (this.plane.material = this.materialWrapper.material);
+                this.materialWrapper && (this.materialWrapper.material.uniforms.srcTexture.value = this.texture);
             }
         }
         if (updates.transform) {
@@ -191,16 +192,15 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
             canvasStore.set('dirty', true);
         }
         if (updates.filters) {
-            const combinedShaderResult = combineFiltersToShader(
-                await createFiltersFromLayerConfig(updates.filters),
-                { width: this.planeGeometry?.parameters.width ?? 1, height: this.planeGeometry?.parameters.height ?? 1 }
+            const srcTexture = this.materialWrapper?.material.uniforms.srcTexture.value;
+            if (this.materialWrapper) {
+                disposeMaterial(this.materialWrapper);
+            }
+            this.materialWrapper = await createMaterial('raster', { srcTexture }, updates.filters, 
+            { width: this.planeGeometry?.parameters.width ?? 1, height: this.planeGeometry?.parameters.height ?? 1 },
+                this.lastBlendingMode
             );
-            const map = this.material?.uniforms.map;
-            delete this.material?.uniforms.map;
-            this.material?.dispose();
-            this.material = createRasterShaderMaterial(map?.value, combinedShaderResult);
-            assignMaterialBlendModes(this.material, this.lastBlendingMode);
-            this.plane && (this.plane.material = this.material);
+            this.plane && (this.plane.material = this.materialWrapper.material);
         }
         if (updates.data || updates.width != null || updates.height != null) {
             const isHorizontal = ['ltr', 'rtl'].includes(this.layer.data.lineDirection);
@@ -229,8 +229,13 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
         this.planeGeometry = undefined;
         this.plane && (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(this.plane);
         this.plane = undefined;
-        this.material?.dispose();
-        this.material = undefined;
+
+        appEmitter.off('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
+
+        if (this.materialWrapper) {
+            disposeMaterial(this.materialWrapper);
+        }
+        this.materialWrapper = undefined;
         this.stopWatchBlendingMode?.();
         this.stopWatchData?.();
         this.stopWatchDimensions?.();
@@ -238,6 +243,12 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
         this.stopWatchTransform?.();
         this.stopWatchVisible?.();
         this.isDrawnAfterAttach = false;
+    }
+
+    private readBufferTextureUpdate(texture?: Texture) {
+        if (!this.materialWrapper) return;
+        this.materialWrapper.material.uniforms.dstTexture.value = texture;
+        this.materialWrapper.material.uniformsNeedUpdate = true;
     }
 
 }

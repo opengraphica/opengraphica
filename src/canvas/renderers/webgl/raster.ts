@@ -12,9 +12,7 @@ import { Texture } from 'three/src/textures/Texture';
 import { Vector2 } from 'three/src/math/Vector2';
 
 import { createFiltersFromLayerConfig, combineFiltersToShader } from '@/canvas/filters';
-import { createMaterial, disposeMaterial, type MaterialWrapper } from './materials';
-// import { createRasterShaderMaterial } from './shaders';
-// import { assignMaterialBlendModes } from './blending';
+import { createMaterial, disposeMaterial, type MaterialWrapper, type MaterialWapperUpdates } from './materials';
 
 import { createThreejsTextureFromImage } from '@/lib/canvas';
 import { createEmptyCanvasWith2dContext } from '@/lib/image';
@@ -31,8 +29,9 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
     private stopWatchTransform: WatchStopHandle | undefined;
     private stopWatchFilters: WatchStopHandle | undefined;
     private stopWatchData: WatchStopHandle | undefined;
+
     private planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
-    private materialWrapper: MaterialWrapper | undefined;
+    private materialWrapper: MaterialWrapper<MaterialWapperUpdates['raster']> | undefined;
     private plane: InstanceType<typeof Mesh> | undefined;
     private draftTexture: InstanceType<typeof Texture> | undefined;
     private bakedTexture: InstanceType<typeof Texture> | undefined;
@@ -45,7 +44,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
     async onAttach(layer: WorkingFileRasterLayer<ColorModel>) {
 
         this.lastChunkUpdateId = layer.data?.chunkUpdateId;
-        this.materialWrapper = await createMaterial('raster', { texture: undefined }, layer.filters, layer, layer.blendingMode);
+        this.materialWrapper = await createMaterial('raster', { srcTexture: undefined }, layer.filters, layer, layer.blendingMode);
         this.plane = new Mesh(this.planeGeometry, this.materialWrapper.material);
         this.plane.name = layer.name;
         this.plane.renderOrder = this.order + 0.1;
@@ -141,11 +140,11 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
             );
         }
         if (updates.filters) {
-            const map = this.materialWrapper?.material.uniforms.map.value;
+            const srcTexture = this.materialWrapper?.material.uniforms.srcTexture.value;
             if (this.materialWrapper) {
                 disposeMaterial(this.materialWrapper);
             }
-            this.materialWrapper = await createMaterial('raster', { texture: map }, updates.filters, 
+            this.materialWrapper = await createMaterial('raster', { srcTexture }, updates.filters, 
                 { width: this.sourceTexture?.image.width, height: this.sourceTexture?.image.height },
                 this.lastBlendingMode
             );
@@ -213,12 +212,12 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                     this.sourceTexture = newSourceTexture;
 
                     this.sourceTexture.needsUpdate = true;
-                    this.materialWrapper = this.materialWrapper!.update({ texture: this.sourceTexture });
+                    this.materialWrapper = this.materialWrapper!.update({ srcTexture: this.sourceTexture });
                     this.plane && (this.plane.material = this.materialWrapper.material);
                     canvasStore.set('dirty', true);
                 } else {
                     this.disposeSourceTexture();
-                    this.materialWrapper = this.materialWrapper!.update({ texture: undefined });
+                    this.materialWrapper = this.materialWrapper!.update({ srcTexture: undefined });
                     this.plane && (this.plane.material = this.materialWrapper.material);
                 }
             }
@@ -251,7 +250,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
 
     private readBufferTextureUpdate(texture?: Texture) {
         if (!this.materialWrapper) return;
-        this.materialWrapper.material.uniforms.destinationMap.value = texture;
+        this.materialWrapper.material.uniforms.dstTexture.value = texture;
         this.materialWrapper.material.uniformsNeedUpdate = true;
     }
 

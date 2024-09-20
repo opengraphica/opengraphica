@@ -738,7 +738,7 @@
                     "example": "Cutting out a person from one photo and adding them to another photo."
                 },
                 "dissolve": {
-                    "description": "Randomly replaces pixels from the top layer with transparent pixels based on opacity.",
+                    "description": "Randomly replaces pixels from the top layer with transparent pixels based on opacity, creating a digital noise effect.",
                     "example": "Creating a grainy texture."
                 },
                 "colorErase": {
@@ -758,19 +758,19 @@
                     "example": "Enhancing the brightness of a specific area in a black and white photo."
                 },
                 "screen": {
-                    "description": "Lightens the bottom layer based on the brightness of the top layer.",
+                    "description": "Lightens the bottom layer based on the brightness of the top layer. Screen mimics the way light interacts when projected or layered.",
                     "example": "Making a night scene appear brighter."
                 },
                 "dodge": {
-                    "description": "Significantly brightens highlights and brings out details in the shadows.",
+                    "description": "Significantly brightens highlights and brings out details in the shadows. This mimics the effect of \"dodging\" in darkroom photography.",
                     "example": "Adding a sun flare."
                 },
                 "linearDodge": {
-                    "description": "Adds the brightness of the top and bottom layers in perceptual space.",
-                    "example": "Adding a sun flare."
+                    "description": "Adds the brightness of the top and bottom layers in perceptual SRGB space.",
+                    "example": "Creating vibrant, intense lighting effects."
                 },
                 "addition": {
-                    "description": "Adds the brightness of the top and bottom layers.",
+                    "description": "Adds the brightness of the top and bottom layers in linear SRGB space.",
                     "example": "Creating vibrant, intense lighting effects."
                 },
                 "darkenOnly": {
@@ -782,11 +782,11 @@
                     "example": "Selectively underexposing bright areas."
                 },
                 "multiply": {
-                    "description": "Darkens the bottom layer based on the darkness of the top layer.",
+                    "description": "Darkens the bottom layer based on the darkness of the top layer. Multiply mimics how multiple photographic negatives look when layered together.",
                     "example": "Making an image look darker, like simulating shadows or night scenes."
                 },
                 "burn": {
-                    "description": "Darkens the bottom layer proportional to the darkness of the top layer",
+                    "description": "Darkens the bottom layer proportional to the darkness of the top layer.",
                     "example": "Adding depth to shadows."
                 },
                 "linearBurn": {
@@ -798,7 +798,7 @@
                     "example": "Adding contrast to photos without losing detail."
                 },
                 "softLight": {
-                    "description": "Brightens the image similar to overlay but with more gradual transitions.",
+                    "description": "Brightens the image similar to overlay but with more gradual transitions. Soft light simulates diffused lighting.",
                     "example": "Adding a soft glow to portraits."
                 },
                 "hardLight": {
@@ -810,7 +810,7 @@
                     "example": "Stylizing photos with bold, punchy colors and contrast."
                 },
                 "pinLight": {
-                    "description": "Replaces pixels based on brightness, keeping the brightes and darkest pixels (midtones are unaffected).",
+                    "description": "Replaces pixels based on brightness, keeping the brightest and darkest pixels, based on their distance from midtones.",
                     "example": "Creating a posterized effect with sharp contrast between light and dark."
                 },
                 "linearLight": {
@@ -826,7 +826,7 @@
                     "example": "Aligning layers with similar content. When two pixels are the same, they turn black."
                 },
                 "exclusion": {
-                    "description": "Blending with white inverts color values, while blending with black produces no change.",
+                    "description": "A variation of difference with less contrast, for where subtle differences need to be highlighted without overwhelming the image.",
                     "example": "Selectively invert colors."
                 },
                 "subtract": {
@@ -843,7 +843,7 @@
                 },
                 "divide": {
                     "description": "Divides the brightness of the top layer by the bottom.",
-                    "example": "Lightening an image dramatically, creating a glowing or ethereal effect."
+                    "example": "Lightening an image dramatically, creating a glowing or ethereal effect. Can be used for exposure correction."
                 },
                 "hue": {
                     "description": "Uses the hue of the top layer while preserving the chroma and lightness of the bottom layer.",

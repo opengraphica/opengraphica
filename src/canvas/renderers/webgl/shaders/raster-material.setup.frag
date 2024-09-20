@@ -1,4 +1,4 @@
-uniform sampler2D map;
+uniform sampler2D srcTexture;
 uniform sampler2D dstTexture;
 
 varying vec2 vUv;

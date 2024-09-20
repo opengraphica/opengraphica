@@ -1,6 +1,6 @@
 
 #ifdef cLayerBlendingMode
-    vec4 blendTexture = texture2D(destinationMap, vScreenUv);
+    vec4 blendTexture = texture2D(dstTexture, vScreenUv);
 #endif
 #if cLayerBlendingMode == BLENDING_MODE_COLOR_ERASE
     // TODO - not sure about this implementation.
@@ -171,8 +171,76 @@
     gl_FragColor.r = srgbChannelToLinearSrgbChannel(abs(linearSrgbChannelToSrgbChannel(blendTexture.r) - linearSrgbChannelToSrgbChannel(gl_FragColor.r)));
     gl_FragColor.g = srgbChannelToLinearSrgbChannel(abs(linearSrgbChannelToSrgbChannel(blendTexture.g) - linearSrgbChannelToSrgbChannel(gl_FragColor.g)));
     gl_FragColor.b = srgbChannelToLinearSrgbChannel(abs(linearSrgbChannelToSrgbChannel(blendTexture.b) - linearSrgbChannelToSrgbChannel(gl_FragColor.b)));
+#elif cLayerBlendingMode == BLENDING_MODE_EXCLUSION
+    float topR = linearSrgbChannelToSrgbChannel(gl_FragColor.r);
+    float bottomR = linearSrgbChannelToSrgbChannel(blendTexture.r);
+    float topG = linearSrgbChannelToSrgbChannel(gl_FragColor.g);
+    float bottomG = linearSrgbChannelToSrgbChannel(blendTexture.g);
+    float topB = linearSrgbChannelToSrgbChannel(gl_FragColor.b);
+    float bottomB = linearSrgbChannelToSrgbChannel(blendTexture.b);
+    gl_FragColor.r = srgbChannelToLinearSrgbChannel(
+        bottomR + topR - 2.0 * bottomR * topR
+    );
+    gl_FragColor.g = srgbChannelToLinearSrgbChannel(
+        bottomG + topG - 2.0 * bottomG * topG
+    );
+    gl_FragColor.b = srgbChannelToLinearSrgbChannel(
+        bottomB + topB - 2.0 * bottomB * topB
+    );
 #elif cLayerBlendingMode == BLENDING_MODE_SUBTRACT
     gl_FragColor.r = clamp(blendTexture.r - gl_FragColor.r, 0.0, 1.0);
     gl_FragColor.g = clamp(blendTexture.g - gl_FragColor.g, 0.0, 1.0);
     gl_FragColor.b = clamp(blendTexture.b - gl_FragColor.b, 0.0, 1.0);
+#elif cLayerBlendingMode == BLENDING_MODE_GRAIN_EXTRACT
+    gl_FragColor.r = clamp(
+        srgbChannelToLinearSrgbChannel(
+            linearSrgbChannelToSrgbChannel(blendTexture.r) - linearSrgbChannelToSrgbChannel(gl_FragColor.r) + 0.5
+        ), 0.0, 1.0
+    );
+    gl_FragColor.g = clamp(
+        srgbChannelToLinearSrgbChannel(
+            linearSrgbChannelToSrgbChannel(blendTexture.g) - linearSrgbChannelToSrgbChannel(gl_FragColor.g) + 0.5
+        ), 0.0, 1.0
+    );
+    gl_FragColor.b = clamp(
+        srgbChannelToLinearSrgbChannel(
+            linearSrgbChannelToSrgbChannel(blendTexture.b) - linearSrgbChannelToSrgbChannel(gl_FragColor.b) + 0.5
+        ), 0.0, 1.0
+    );
+#elif cLayerBlendingMode == BLENDING_MODE_GRAIN_MERGE
+    gl_FragColor.r = clamp(
+        srgbChannelToLinearSrgbChannel(
+            linearSrgbChannelToSrgbChannel(blendTexture.r) + linearSrgbChannelToSrgbChannel(gl_FragColor.r) - 0.5
+        ), 0.0, 1.0
+    );
+    gl_FragColor.g = clamp(
+        srgbChannelToLinearSrgbChannel(
+            linearSrgbChannelToSrgbChannel(blendTexture.g) + linearSrgbChannelToSrgbChannel(gl_FragColor.g) - 0.5
+        ), 0.0, 1.0
+    );
+    gl_FragColor.b = clamp(
+        srgbChannelToLinearSrgbChannel(
+            linearSrgbChannelToSrgbChannel(blendTexture.b) + linearSrgbChannelToSrgbChannel(gl_FragColor.b) - 0.5
+        ), 0.0, 1.0
+    );
+#elif cLayerBlendingMode == BLENDING_MODE_DIVIDE
+    gl_FragColor.r = clamp(blendTexture.r / max(0.00001, gl_FragColor.r), 0.0, 1.0);
+    gl_FragColor.g = clamp(blendTexture.g / max(0.00001, gl_FragColor.g), 0.0, 1.0);
+    gl_FragColor.b = clamp(blendTexture.b / max(0.00001, gl_FragColor.b), 0.0, 1.0);
+#elif cLayerBlendingMode == BLENDING_MODE_HUE
+    vec3 topLch = labToLch(rgbToOklab(gl_FragColor.rgb));
+    vec3 bottomLch = labToLch(rgbToOklab(blendTexture.rgb));
+    gl_FragColor.rgb = oklabToRgb(lchToLab(vec3(bottomLch.x, bottomLch.y, topLch.z)));
+#elif cLayerBlendingMode == BLENDING_MODE_CHROMA
+    vec3 topLch = labToLch(rgbToOklab(gl_FragColor.rgb));
+    vec3 bottomLch = labToLch(rgbToOklab(blendTexture.rgb));
+    gl_FragColor.rgb = oklabToRgb(lchToLab(vec3(bottomLch.x, topLch.y, bottomLch.z)));
+#elif cLayerBlendingMode == BLENDING_MODE_COLOR
+    vec3 topLch = labToLch(rgbToOklab(gl_FragColor.rgb));
+    vec3 bottomLch = labToLch(rgbToOklab(blendTexture.rgb));
+    gl_FragColor.rgb = oklabToRgb(lchToLab(vec3(bottomLch.x, topLch.y, topLch.z)));
+#elif cLayerBlendingMode == BLENDING_MODE_LIGHTNESS
+    vec3 topLch = labToLch(rgbToOklab(gl_FragColor.rgb));
+    vec3 bottomLch = labToLch(rgbToOklab(blendTexture.rgb));
+    gl_FragColor.rgb = oklabToRgb(lchToLab(vec3(topLch.x, bottomLch.y, bottomLch.z)));
 #endif

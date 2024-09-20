@@ -10,13 +10,13 @@ import { Mesh } from 'three/src/objects/Mesh';
 import { Texture } from 'three/src/textures/Texture';
 
 import { createFiltersFromLayerConfig, combineFiltersToShader } from '@/canvas/filters';
-import { createRasterShaderMaterial } from './shaders';
-import { assignMaterialBlendModes } from './blending';
+import { createMaterial, disposeMaterial, type MaterialWrapper, type MaterialWapperUpdates } from './materials';
 
 import { createThreejsTextureFromImage } from '@/lib/canvas';
 import { decomposeMatrix } from '@/lib/dom-matrix';
 import { throttle } from '@/lib/timing';
 import { createCanvasFromImage } from '@/lib/image';
+import appEmitter from '@/lib/emitter';
 
 import type { Scene } from 'three';
 import type { WorkingFileVectorLayer, WorkingFileLayerBlendingMode, ColorModel } from '@/types';
@@ -33,7 +33,7 @@ export default class VectorLayerRenderer extends BaseLayerRenderer {
     private stopWatchData: WatchStopHandle | undefined;
 
     private planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
-    private material: InstanceType<typeof ShaderMaterial> | undefined;
+    private materialWrapper: MaterialWrapper<MaterialWapperUpdates['raster']> | undefined;
     private plane: InstanceType<typeof Mesh> | undefined;
     private sourceTexture: InstanceType<typeof Texture> | undefined;
     private isVisible: boolean = true;
@@ -50,19 +50,17 @@ export default class VectorLayerRenderer extends BaseLayerRenderer {
 
     async onAttach(layer: WorkingFileVectorLayer<ColorModel>) {
 
-        const combinedShaderResult = combineFiltersToShader(
-            await createFiltersFromLayerConfig(layer.filters),
-            layer
-        );
-        this.material = createRasterShaderMaterial(null, combinedShaderResult);
-        this.plane = new Mesh(this.planeGeometry, this.material);
+        this.materialWrapper = await createMaterial('raster', { srcTexture: undefined }, layer.filters, layer, layer.blendingMode);
+        this.plane = new Mesh(this.planeGeometry, this.materialWrapper.material);
         this.plane.renderOrder = this.order + 0.1;
         this.plane.matrixAutoUpdate = false;
         (this.threejsScene ?? canvasStore.get('threejsScene'))?.add(this.plane);
         this.isVisible = layer.visible;
 
-        const { blendingMode, visible, width, height, transform, filters, data } = toRefs(layer);
+        this.readBufferTextureUpdate = this.readBufferTextureUpdate.bind(this);
+        appEmitter.on('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
 
+        const { blendingMode, visible, width, height, transform, filters, data } = toRefs(layer);
         this.stopWatchBlendingMode = watch([blendingMode], ([blendingMode]) => {
             this.update({ blendingMode });
         }, { immediate: true });
@@ -111,8 +109,9 @@ export default class VectorLayerRenderer extends BaseLayerRenderer {
         }
         if (updates.blendingMode != null) {
             this.lastBlendingMode = updates.blendingMode;
-            if (this.material) {
-                assignMaterialBlendModes(this.material, updates.blendingMode);
+            if (this.materialWrapper) {
+                this.materialWrapper = this.materialWrapper.changeBlendingMode(updates.blendingMode);
+                this.plane && (this.plane.material = this.materialWrapper.material);
             }
         }
         if (updates.visible != null) {
@@ -144,15 +143,15 @@ export default class VectorLayerRenderer extends BaseLayerRenderer {
             this.lastTransform = updates.transform;
         }
         if (updates.filters) {
-            const combinedShaderResult = combineFiltersToShader(
-                await createFiltersFromLayerConfig(updates.filters),
-                { width: this.sourceTexture?.image.width, height: this.sourceTexture?.image.height }
+            const srcTexture = this.materialWrapper?.material.uniforms.srcTexture.value;
+            if (this.materialWrapper) {
+                disposeMaterial(this.materialWrapper);
+            }
+            this.materialWrapper = await createMaterial('raster', { srcTexture }, updates.filters, 
+                { width: this.sourceTexture?.image.width, height: this.sourceTexture?.image.height },
+                this.lastBlendingMode
             );
-            const map = this.material?.uniforms.map;
-            delete this.material?.uniforms.map;
-            this.material?.dispose();
-            this.material = createRasterShaderMaterial(map?.value, combinedShaderResult);
-            this.plane && (this.plane.material = this.material);
+            this.plane && (this.plane.material = this.materialWrapper.material);
         }
         if (updates.data) {
             this.lastSvgSourceUuid = updates.data.sourceUuid;
@@ -177,8 +176,13 @@ export default class VectorLayerRenderer extends BaseLayerRenderer {
         this.planeGeometry = undefined;
         this.plane && (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(this.plane);
         this.plane = undefined;
-        this.material?.dispose();
-        this.material = undefined;
+
+        appEmitter.off('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
+
+        if (this.materialWrapper) {
+            disposeMaterial(this.materialWrapper);
+        }
+        this.materialWrapper = undefined;
         this.disposeSourceTexture();
         this.stopWatchBlendingMode?.();
         this.stopWatchVisible?.();
@@ -186,6 +190,12 @@ export default class VectorLayerRenderer extends BaseLayerRenderer {
         this.stopWatchTransform?.();
         this.stopWatchFilters?.();
         this.stopWatchData?.();
+    }
+
+    private readBufferTextureUpdate(texture?: Texture) {
+        if (!this.materialWrapper) return;
+        this.materialWrapper.material.uniforms.dstTexture.value = texture;
+        this.materialWrapper.material.uniformsNeedUpdate = true;
     }
 
     private async updateSourceTexture() {
@@ -202,14 +212,22 @@ export default class VectorLayerRenderer extends BaseLayerRenderer {
                 this.sourceTexture = newSourceTexture;
 
                 this.sourceTexture.needsUpdate = true;
-                this.material && (this.material.uniforms.map.value = this.sourceTexture);
+                if (this.materialWrapper) {
+                    this.materialWrapper = this.materialWrapper.update({ srcTexture: this.sourceTexture });
+                    this.plane.material = this.materialWrapper.material;
+                }
                 canvasStore.set('dirty', true);
             } else {
                 newSourceTexture.dispose();
             }
         } else {
             this.disposeSourceTexture();
-            this.material && (this.material.uniforms.map.value = null);
+            if (this.materialWrapper) {
+                this.materialWrapper = this.materialWrapper.update({ srcTexture: undefined });
+                if (this.plane) {
+                    this.plane.material = this.materialWrapper!.material;
+                }
+            }
         }
     }
 

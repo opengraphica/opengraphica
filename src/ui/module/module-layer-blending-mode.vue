@@ -81,8 +81,32 @@
                             <el-radio-button label="difference" class="el-radio-button--section-break">
                                 {{ $t('layerBlendingMode.difference') }}
                             </el-radio-button>
+                            <el-radio-button label="exclusion">
+                                {{ $t('layerBlendingMode.exclusion') }}
+                            </el-radio-button>
                             <el-radio-button label="subtract">
                                 {{ $t('layerBlendingMode.subtract') }}
+                            </el-radio-button>
+                            <el-radio-button label="grainExtract">
+                                {{ $t('layerBlendingMode.grainExtract') }}
+                            </el-radio-button>
+                            <el-radio-button label="grainMerge">
+                                {{ $t('layerBlendingMode.grainMerge') }}
+                            </el-radio-button>
+                            <el-radio-button label="divide">
+                                {{ $t('layerBlendingMode.divide') }}
+                            </el-radio-button>
+                            <el-radio-button label="hue" class="el-radio-button--section-break">
+                                {{ $t('layerBlendingMode.hue') }}
+                            </el-radio-button>
+                            <el-radio-button label="chroma">
+                                {{ $t('layerBlendingMode.chroma') }}
+                            </el-radio-button>
+                            <el-radio-button label="color">
+                                {{ $t('layerBlendingMode.color') }}
+                            </el-radio-button>
+                            <el-radio-button label="lightness">
+                                {{ $t('layerBlendingMode.lightness') }}
                             </el-radio-button>
                         </el-radio-group>
                     </el-scrollbar>

@@ -14,7 +14,7 @@ uniform sampler2D gradientMap;
 uniform vec2 start;
 uniform vec2 end;
 uniform vec2 focus;
-uniform sampler2D destinationMap;
+uniform sampler2D dstTexture;
 
 varying vec2 vUv;
 varying vec2 vScreenUv;

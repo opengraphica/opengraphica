@@ -13,10 +13,10 @@ import { Mesh } from 'three/src/objects/Mesh';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { Texture } from 'three/src/textures/Texture';
 import { CanvasTexture } from 'three/src/textures/CanvasTexture';
+import appEmitter from '@/lib/emitter';
 
 import { createFiltersFromLayerConfig, combineFiltersToShader } from '../../filters';
-import { createRasterShaderMaterial } from './shaders';
-import { assignMaterialBlendModes } from './blending';
+import { createMaterial, disposeMaterial, type MaterialWrapper, type MaterialWapperUpdates } from './materials';
 
 import type { Scene } from 'three';
 import type { DrawWorkingFileLayerOptions, WorkingFileLayerBlendingMode, WorkingFileRasterSequenceLayer, ColorModel } from '@/types';
@@ -31,7 +31,7 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
     private stopWatchData: WatchStopHandle | undefined;
 
     private planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
-    private material: InstanceType<typeof ShaderMaterial> | undefined;
+    private materialWrapper: MaterialWrapper<MaterialWapperUpdates['raster']> | undefined;
     private plane: InstanceType<typeof Mesh> | undefined;
     private lastUpdatedFrame: WorkingFileRasterSequenceLayer<ColorModel>['data']['currentFrame'] | undefined;
     private textureCanvas: InstanceType<typeof HTMLCanvasElement> | undefined;
@@ -41,12 +41,8 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
     private lastBlendingMode: WorkingFileLayerBlendingMode = 'normal';
 
     async onAttach(layer: WorkingFileRasterSequenceLayer<ColorModel>) {
-        const combinedShaderResult = combineFiltersToShader(
-            await createFiltersFromLayerConfig(layer.filters),
-            layer
-        );
-        this.material = createRasterShaderMaterial(null, combinedShaderResult);
-        this.plane = new Mesh(this.planeGeometry, this.material);
+        this.materialWrapper = await createMaterial('raster', { srcTexture: undefined }, layer.filters, layer, layer.blendingMode);
+        this.plane = new Mesh(this.planeGeometry, this.materialWrapper.material);
         this.plane.renderOrder = this.order;
         this.plane.matrixAutoUpdate = false;
         (this.threejsScene ?? canvasStore.get('threejsScene'))?.add(this.plane);
@@ -64,10 +60,12 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
         this.texture = new CanvasTexture(this.textureCanvas);
         this.texture.magFilter = NearestFilter;
         this.texture.encoding = sRGBEncoding;
-        this.material && (this.material.uniforms.map.value = this.texture);
+        this.materialWrapper && (this.materialWrapper.material.uniforms.srcTexture.value = this.texture);
+
+        this.readBufferTextureUpdate = this.readBufferTextureUpdate.bind(this);
+        appEmitter.on('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
 
         const { blendingMode, visible, width, height, transform, filters, data } = toRefs(layer);
-
         this.stopWatchBlendingMode = watch([blendingMode], ([blendingMode]) => {
             this.update({ blendingMode });
         }, { immediate: true });
@@ -112,8 +110,9 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
         }
         if (updates.blendingMode) {
             this.lastBlendingMode = updates.blendingMode;
-            if (this.material) {
-                assignMaterialBlendModes(this.material, updates.blendingMode);
+            if (this.materialWrapper) {
+                this.materialWrapper = this.materialWrapper.changeBlendingMode(updates.blendingMode);
+                this.plane && (this.plane.material = this.materialWrapper.material);
             }
         }
         if (updates.width || updates.height) {
@@ -134,16 +133,15 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
             );
         }
         if (updates.filters) {
-            const combinedShaderResult = combineFiltersToShader(
-                await createFiltersFromLayerConfig(updates.filters),
-                { width: this.texture?.image.width, height: this.texture?.image.height }
+            const srcTexture = this.materialWrapper?.material.uniforms.srcTexture.value;
+            if (this.materialWrapper) {
+                disposeMaterial(this.materialWrapper);
+            }
+            this.materialWrapper = await createMaterial('raster', { srcTexture }, updates.filters, 
+                { width: this.texture?.image.width, height: this.texture?.image.height },
+                this.lastBlendingMode
             );
-            const map = this.material?.uniforms.map;
-            delete this.material?.uniforms.map;
-            this.material?.dispose();
-            this.material = createRasterShaderMaterial(map?.value, combinedShaderResult);
-            assignMaterialBlendModes(this.material, this.lastBlendingMode);
-            this.plane && (this.plane.material = this.material);
+            this.plane && (this.plane.material = this.materialWrapper.material);
         }
         if (updates.data) {
             if (!this.textureCtx) return;
@@ -153,8 +151,8 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
                 if (sourceImage) {
                     this.textureCtx.drawImage(sourceImage, 0, 0);
                 }
-                if (this.material?.uniforms.map.value) {
-                    this.material.uniforms.map.value.needsUpdate = true;
+                if (this.materialWrapper?.material.uniforms.srcTexture.value) {
+                    this.materialWrapper.material.uniforms.srcTexture.value.needsUpdate = true;
                 }
             }
             this.lastUpdatedFrame = updates.data.currentFrame;
@@ -174,8 +172,13 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
         this.planeGeometry = undefined;
         this.plane && (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(this.plane);
         this.plane = undefined;
-        this.material?.dispose();
-        this.material = undefined;
+
+        appEmitter.off('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
+
+        if (this.materialWrapper) {
+            disposeMaterial(this.materialWrapper);
+        }
+        this.materialWrapper = undefined;
         this.textureCanvas = undefined;
         this.textureCtx = undefined;
         this.texture?.dispose();
@@ -187,5 +190,11 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
         this.stopWatchTransform?.();
         this.stopWatchFilters?.();
         this.stopWatchData?.();
+    }
+
+    private readBufferTextureUpdate(texture?: Texture) {
+        if (!this.materialWrapper) return;
+        this.materialWrapper.material.uniforms.dstTexture.value = texture;
+        this.materialWrapper.material.uniformsNeedUpdate = true;
     }
 }
