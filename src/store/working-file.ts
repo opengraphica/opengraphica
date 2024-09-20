@@ -136,24 +136,6 @@ function getLayerGlobalTransform(layerOrId: WorkingFileLayer<ColorModel> | numbe
     return transform;
 }
 
-function getLayer2dCompositeOperation(layerOrId: WorkingFileLayer<ColorModel> | number): CanvasRenderingContext2D['globalCompositeOperation'] {
-    let layer: WorkingFileLayer<ColorModel> | null = null;
-    if (typeof layerOrId === 'number') {
-        layer = getLayerById(layerOrId);
-    } else {
-        layer = layerOrId;
-    }
-    if (!layer) return 'source-over';
-    switch (layer.blendingMode) {
-        case 'normal':
-            return 'source-over';
-        case 'erase':
-            return 'destination-out';
-        default:
-            return 'source-over';
-    }
-}
-
 /** Returns 4 points for each corner of the layer bounding box, transformed so they are relative to the document */
 function getLayerBoundingPoints(layerOrId: WorkingFileLayer<ColorModel> | number): DOMPoint[] {
     let layer: WorkingFileLayer<ColorModel> | null = null;
@@ -290,7 +272,6 @@ export {
     getWebGLContextAttributes,
     getLayerById,
     getLayerGlobalTransform,
-    getLayer2dCompositeOperation,
     getLayerBoundingPoints,
     getLayersByType,
     getGroupLayerById,

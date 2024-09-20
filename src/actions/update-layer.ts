@@ -10,6 +10,7 @@ import workingFileStore, { getLayerById, regenerateLayerThumbnail, getCanvasRend
 import { updateWorkingFileLayer } from '@/store/data/working-file-database';
 import { updateBakedImageForLayer } from './baking';
 import layerRenderers from '@/canvas/renderers';
+import { queueRefreshLayerPasses } from '@/canvas/renderers/webgl/postprocessing/create-layer-passes';
 
 import type {
     ColorModel, WorkingFileAnyLayer,
@@ -167,6 +168,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                         layer.renderer.detach();
                     }
                     layer.renderer = markRaw(new layerRenderers[renderer][this.updateLayerOptions['type'] as string]());
+                    queueRefreshLayerPasses();
                     if (layer.renderer) {
                         layer.renderer.attach(layer);
                     }

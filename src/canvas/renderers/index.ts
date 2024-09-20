@@ -17,6 +17,7 @@ import RasterLayerRendererWebgl from './webgl/raster';
 import RasterSequenceLayerRendererWebgl from './webgl/raster-sequence';
 import TextLayerRendererWebgl from './webgl/text';
 import VectorLayerRendererWebgl from './webgl/vector';
+import { queueRefreshLayerPasses } from './webgl/postprocessing/create-layer-passes';
 
 type ClassOfInterface<I, Args extends any[] = any[]> = new(...args: Args) => I;
 
@@ -78,6 +79,7 @@ export function assignLayerRenderer(layer: WorkingFileAnyLayer<ColorModel>) {
         default:
             (layer as WorkingFileLayer).renderer = markRaw(new renderers[renderer].base());
     }
+    queueRefreshLayerPasses();
 }
 
 export function discardAllLayerRenderers(layers: Array<WorkingFileLayer<ColorModel>>) {

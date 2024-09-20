@@ -1,7 +1,8 @@
 import { DrawWorkingFileLayerOptions, WorkingFileLayer, WorkingFileLayerRenderer, ColorModel, WorkingFileGroupLayer } from '@/types';
 import canvasStore from '@/store/canvas';
 import preferencesStore from '@/store/preferences';
-import workingFileStore, { getLayer2dCompositeOperation } from '@/store/working-file';
+import workingFileStore from '@/store/working-file';
+import { getLayer2dCompositeOperation } from './blending';
 
 import type { Camera, WebGLRenderer } from 'three';
 

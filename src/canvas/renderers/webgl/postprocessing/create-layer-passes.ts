@@ -76,6 +76,13 @@ export function createLayerPasses(composer: EffectComposer, camera: Camera) {
     canvasStore.set('dirty', true);
 }
 
+let queueRefreshLayerPassesTimeoutHandle: number | undefined;
+
+export function queueRefreshLayerPasses() {
+    window.clearTimeout(queueRefreshLayerPassesTimeoutHandle);
+    queueRefreshLayerPassesTimeoutHandle = window.setTimeout(refreshLayerPasses, 0);
+}
+
 export function refreshLayerPasses() {
     const composer = canvasStore.get('threejsComposer');
     const camera = canvasStore.get('threejsCamera');

@@ -117,6 +117,20 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
             } catch (error) {
                 console.error('[src/canvas/renderers/webgl/base.ts] Error during layer swap scene. ', error);
             }
+            for (const draftAssets of this.draftAssetMap.values()) {
+                if (draftAssets.plane) {
+                    try {
+                        (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(draftAssets.plane);
+                    } catch (error) {
+                        console.error('[src/canvas/renderers/webgl/base.ts] Error during layer swap scene. ', error);
+                    }
+                    try {
+                        scene.add(draftAssets.plane);
+                    } catch (error) {
+                        console.error('[src/canvas/renderers/webgl/base.ts] Error during layer swap scene. ', error);
+                    }
+                }
+            }
         }
         this.threejsScene = scene;
     }
