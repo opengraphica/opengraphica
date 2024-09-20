@@ -51,7 +51,7 @@ interface FileListOpenOptions {
 
 export async function openFromFileDialog(options: FileDialogOpenOptions = {}): Promise<void> {
 
-    if (!options?.fileDiscardConfirmed && historyStore.get('hasUnsavedChanges')) {
+    if (!options.insert && !options?.fileDiscardConfirmed && historyStore.get('hasUnsavedChanges')) {
         const { runModule } = await import('@/modules');
         runModule('file', 'openConfirm');
         return;
