@@ -31,6 +31,7 @@ export default defineComponent({
     components: {
         'file-export': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-export' */ `@/ui/module/module-file-export.vue`)),
         'file-new': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-new' */ `@/ui/module/module-file-new.vue`)),
+        'file-open-confirm': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-open-confirm' */ `@/ui/module/module-file-open-confirm.vue`)),
         'file-save-as': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-save-as' */ `@/ui/module/module-file-save-as.vue`)),
         'file-take-photo': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-take-photo' */ `@/ui/module/module-file-take-photo.vue`)),
         'image-convert-layers-to-collage': defineAsyncComponent(() => import(/* webpackChunkName: 'module-image-convert-layers-to-collage' */ `@/ui/module/module-image-convert-layers-to-collage.vue`)),

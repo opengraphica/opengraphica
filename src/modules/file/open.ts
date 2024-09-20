@@ -41,6 +41,7 @@ interface FileDialogOpenOptions {
     insert?: boolean; // False will create a new document, true inserts into current document.
     accept?: string; // Mime type of files to accept, same as input "accept" attribute.
     cancelRef?: Ref<boolean>;
+    fileDiscardConfirmed?: boolean;
 }
 
 interface FileListOpenOptions {
@@ -49,6 +50,12 @@ interface FileListOpenOptions {
 }
 
 export async function openFromFileDialog(options: FileDialogOpenOptions = {}): Promise<void> {
+
+    if (!options?.fileDiscardConfirmed && historyStore.get('hasUnsavedChanges')) {
+        const { runModule } = await import('@/modules');
+        runModule('file', 'openConfirm');
+        return;
+    }
 
     // We're working with new APIs
     if (window.isSecureContext && window.showOpenFilePicker) {

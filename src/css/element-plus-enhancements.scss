@@ -204,6 +204,12 @@
             padding-top: 0.75rem;
         }
 
+        .el-dialog__body {
+            p {
+                line-height: 1.4;
+            }
+        }
+
         &.el-dialog--loading {
             opacity: 0 !important;
         }

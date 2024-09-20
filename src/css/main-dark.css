@@ -28950,6 +28950,9 @@ body.ogr-full-page .opengraphica {
 .opengraphica .el-dialog .el-dialog__header + .el-dialog__body {
   padding-top: 0.75rem;
 }
+.opengraphica .el-dialog .el-dialog__body p {
+  line-height: 1.4;
+}
 .opengraphica .el-dialog.el-dialog--loading {
   opacity: 0 !important;
 }

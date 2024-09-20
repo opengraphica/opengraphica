@@ -127,6 +127,7 @@
         "create": "Create",
         "createNewImage": "Create New Image",
         "delete": "Delete",
+        "discardChanges": "Discard Changes",
         "done": "Done",
         "editEffects": "Edit Effects",
         "export": "Export",
@@ -671,6 +672,13 @@
             "resolution": "Resolution",
             "colorProfile": "Color Profile",
             "scaleFactor": "Scale Factor"
+        },
+        "fileOpenConfirm": {
+            "title": "Are you sure?",
+            "warning": [
+                "You have made edits to your current file. If you open a new file now, these edits will be discarded. If you only wish to add new layers to this file, use the {insertPhoto} option.",
+                "Do you wish to continue to open a new file and discard all of your changes?"
+            ]
         },
         "fileSaveAs": {
             "title": "Save Image As",

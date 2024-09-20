@@ -15,6 +15,12 @@
                 "preload": true,
                 "cancelable": true
             },
+            "openConfirm": {
+                "action": {
+                    "type": "ui",
+                    "target": "file-open-confirm"
+                }
+            },
             "export": {
                 "action": {
                     "type": "ui",

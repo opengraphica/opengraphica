@@ -20,6 +20,7 @@ interface HistoryState {
     actionStackUpdateToggle: boolean;
     canRedo: boolean;
     canUndo: boolean;
+    hasUnsavedChanges: boolean;
 }
 
 interface HistoryDispatch {
@@ -57,7 +58,8 @@ const store = new PerformantStore<HistoryStore>({
         actionStackIndex: 0,
         actionStackUpdateToggle: false, // Toggles between true/false every history update for watchers
         canUndo: false,
-        canRedo: false
+        canRedo: false,
+        hasUnsavedChanges: false,
     },
     readOnly: ['actionReserveQueue', 'actionStack', 'actionStackIndex', 'canUndo', 'canRedo'],
     async onDispatch(actionName: keyof HistoryDispatch, value: any, set) {
@@ -125,6 +127,9 @@ async function dispatchFree({ databaseSize, memorySize }: HistoryDispatch['free'
     set('actionStackUpdateToggle', !store.state.actionStackUpdateToggle);
     set('canUndo', actionStackIndex > 0);
     set('canRedo', actionStackIndex < actionStack.length);
+    if (actionStack.length === 0) {
+        set('hasUnsavedChanges', false);
+    }
 
     return {
         totalMemoryFreed,
@@ -205,6 +210,7 @@ async function dispatchRunAction({ action, mergeWithHistory, replaceHistory, res
         let actionStackIndex = store.get('actionStackIndex');
         let errorDuringFree: boolean = false;
         await action.do();
+        set('hasUnsavedChanges', true);
 
         // Remove all redo actions from history
         if (actionStackIndex < actionStack.length) {

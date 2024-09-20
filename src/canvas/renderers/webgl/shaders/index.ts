@@ -184,6 +184,7 @@ export function updateGradientShaderMaterial(
     canvasHeight: number,
     transform: DOMMatrix
 ) {
+    material.defines.cLayerBlendingMode = 0;
     material.defines.cCanvasWidth = canvasWidth;
     material.defines.cCanvasHeight = canvasHeight;
     material.defines.cBlendColorSpace = GradientColorSpace[params.blendColorSpace];
