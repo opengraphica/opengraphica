@@ -138,9 +138,17 @@ export default defineComponent({
         function onCloseDialog(dialog: DialogDefinition, event?: any) {
             loading.value = false;
             dialog.visible = false;
+            let disableCloseTransition = false;
+            if (event?.disableCloseTransition) {
+                disableCloseTransition = event.disableCloseTransition;
+                delete event.disableCloseTransition;
+            }
             dialog.closeEventData = event;
-            if (dialog.closeEventData && dialog.onClose) {
+            if ((disableCloseTransition || dialog.closeEventData) && dialog.onClose) {
                 dialog.onClose(dialog.closeEventData);
+            }
+            if (disableCloseTransition) {
+                dialogs.value.splice(dialogs.value.indexOf(dialog), 1);
             }
         }
 

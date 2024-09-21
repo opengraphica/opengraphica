@@ -54,7 +54,7 @@ void main() {
     }
 #endif // cSpreadMethod
 
-    gl_FragColor = texture2D(gradientMap, vec2(t, 0.0));
+    gl_FragColor = texture2D(stops, vec2(t, 0.0));
 
 #if cBlendColorSpace == GRADIENT_COLOR_SPACE_SRGB
     gl_FragColor.a = (

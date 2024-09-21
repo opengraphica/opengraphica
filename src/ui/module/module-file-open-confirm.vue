@@ -49,7 +49,7 @@ export default defineComponent({
 
         async function onDiscard() {
             await runModule('file', 'open', { fileDiscardConfirmed: true });
-            emit('close');
+            emit('close', { disableCloseTransition: true });
         }
 
         return {

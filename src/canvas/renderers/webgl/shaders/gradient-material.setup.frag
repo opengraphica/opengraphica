@@ -10,7 +10,7 @@
 #define GRADIENT_SPREAD_METHOD_REFLECT 2
 #define GRADIENT_SPREAD_METHOD_TRUNCATE 3
 
-uniform sampler2D gradientMap;
+uniform sampler2D stops;
 uniform vec2 start;
 uniform vec2 end;
 uniform vec2 focus;

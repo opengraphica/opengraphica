@@ -3,21 +3,17 @@ import { toRefs, watch, type WatchStopHandle } from 'vue';
 import canvasStore from '@/store/canvas';
 import workingFileStore from '@/store/working-file';
 
+import appEmitter from '@/lib/emitter';
+
 import BaseLayerRenderer from './base';
 
-import gradientMaterialVertexShaderSetup from '@/canvas/renderers/webgl/shaders/gradient-material.setup.vert';
-import gradientMaterialVertexShaderMain from '@/canvas/renderers/webgl/shaders/gradient-material.main.vert';
-import gradientMaterialFragmentShaderSetup from '@/canvas/renderers/webgl/shaders/gradient-material.setup.frag';
-import gradientMaterialFragmentShaderMain from '@/canvas/renderers/webgl/shaders/gradient-material.main.frag';
-
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
-import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { Mesh } from 'three/src/objects/Mesh';
 import { Texture } from 'three/src/textures/Texture';
 
 import { createFiltersFromLayerConfig, combineFiltersToShader } from '@/canvas/filters';
-import { createGradientShaderMaterial, updateGradientShaderMaterial } from './shaders';
-import { assignMaterialBlendModes } from './blending';
+import { needsBufferTextureUpdate } from './postprocessing/create-layer-passes';
+import { createMaterial, disposeMaterial, type MaterialWrapper, type MaterialWapperUpdates } from './materials';
 
 import type { Scene } from 'three';
 import type { WorkingFileGradientLayer, WorkingFileLayerBlendingMode, ColorModel, RGBAColor } from '@/types';
@@ -38,7 +34,7 @@ export default class GradientLayerRenderer extends BaseLayerRenderer {
     private stopWatchData: WatchStopHandle | undefined;
 
     private planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
-    private material: InstanceType<typeof ShaderMaterial> | undefined;
+    private materialWrapper: MaterialWrapper<MaterialWapperUpdates['gradient']> | undefined;
     private plane: InstanceType<typeof Mesh> | undefined;
     private sourceTexture: InstanceType<typeof Texture> | undefined;
     private isVisible: boolean = true;
@@ -54,23 +50,23 @@ export default class GradientLayerRenderer extends BaseLayerRenderer {
         const { blendingMode, visible, transform, filters, data } = toRefs(layer);
         const { width, height } = toRefs(workingFileStore.state);
 
-        const combinedShaderResult = combineFiltersToShader(
-            await createFiltersFromLayerConfig(layer.filters),
-            layer,
-            {
-                vertexShaderSetup: gradientMaterialVertexShaderSetup,
-                vertexShaderMain: gradientMaterialVertexShaderMain,
-                fragmentShaderSetup: gradientMaterialFragmentShaderSetup,
-                fragmentShaderMain: gradientMaterialFragmentShaderMain,
-            }
-        );
         this.lastLayerData = convertGradientLayerToRgba(layer.data);
-        this.material = createGradientShaderMaterial(this.lastLayerData, width.value, height.value, transform.value, combinedShaderResult);
-        this.plane = new Mesh(this.planeGeometry, this.material);
+        this.materialWrapper = await createMaterial('gradient', {
+            gradientData: this.lastLayerData,
+            canvasWidth: width.value,
+            canvasHeight: height.value,
+            transform: transform.value,
+        }, layer.filters, layer, layer.blendingMode);
+        this.plane = new Mesh(this.planeGeometry, this.materialWrapper.material);
         this.plane.renderOrder = this.order + 0.1;
         this.plane.matrixAutoUpdate = false;
         (this.threejsScene ?? canvasStore.get('threejsScene'))?.add(this.plane);
         this.isVisible = layer.visible;
+
+        this.readBufferTextureUpdate = this.readBufferTextureUpdate.bind(this);
+        if (needsBufferTextureUpdate(layer.blendingMode)) {
+            appEmitter.on('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
+        }
 
         this.stopWatchBlendingMode = watch([blendingMode], ([blendingMode]) => {
             this.update({ blendingMode });
@@ -124,9 +120,16 @@ export default class GradientLayerRenderer extends BaseLayerRenderer {
             }
         }
         if (updates.blendingMode) {
-            this.lastBlendingMode = updates.blendingMode;
-            if (this.material) {
-                assignMaterialBlendModes(this.material, updates.blendingMode);
+            if (updates.blendingMode !== this.lastBlendingMode) {
+                this.lastBlendingMode = updates.blendingMode;
+                if (this.materialWrapper) {
+                    this.materialWrapper = this.materialWrapper.changeBlendingMode(updates.blendingMode);
+                    this.plane && (this.plane.material = this.materialWrapper.material);
+                }
+                appEmitter.off('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
+                if (needsBufferTextureUpdate(updates.blendingMode)) {
+                    appEmitter.on('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
+                }
             }
         }
         if (updates.width || updates.height) {
@@ -150,24 +153,31 @@ export default class GradientLayerRenderer extends BaseLayerRenderer {
             needsMaterialUpdate = true;
         }
         if (updates.filters && this.lastLayerData) {
-            const combinedShaderResult = combineFiltersToShader(
-                await createFiltersFromLayerConfig(updates.filters),
-                { width: this.sourceTexture?.image.width, height: this.sourceTexture?.image.height },
+            if (this.materialWrapper) {
+                disposeMaterial(this.materialWrapper);
+            }
+            this.materialWrapper = await createMaterial('gradient',
                 {
-                    vertexShaderSetup: gradientMaterialVertexShaderSetup,
-                    vertexShaderMain: gradientMaterialVertexShaderMain,
-                    fragmentShaderSetup: gradientMaterialFragmentShaderSetup,
-                    fragmentShaderMain: gradientMaterialFragmentShaderMain,
-                }
+                    gradientData: this.lastLayerData,
+                    canvasWidth: this.lastWidth,
+                    canvasHeight: this.lastHeight,
+                    transform: this.lastTransform,
+                },
+                updates.filters, 
+                { width: this.sourceTexture?.image.width, height: this.sourceTexture?.image.height },
+                this.lastBlendingMode
             );
-            this.material?.dispose();
-            this.material = createGradientShaderMaterial(this.lastLayerData, this.lastWidth, this.lastHeight, this.lastTransform, combinedShaderResult);
-            assignMaterialBlendModes(this.material, this.lastBlendingMode);
-            this.plane && (this.plane.material = this.material);
+            this.plane && (this.plane.material = this.materialWrapper.material);
         }
 
-        if (needsMaterialUpdate && this.material && this.lastLayerData) {
-            updateGradientShaderMaterial(this.material, this.lastLayerData, this.lastWidth, this.lastHeight, this.lastTransform);
+        if (needsMaterialUpdate && this.materialWrapper && this.lastLayerData) {
+            this.materialWrapper = this.materialWrapper.update({
+                gradientData: this.lastLayerData,
+                canvasWidth: this.lastWidth,
+                canvasHeight: this.lastHeight,
+                transform: this.lastTransform,
+            });
+            this.plane && (this.plane.material = this.materialWrapper.material);
             canvasStore.set('dirty', true);
         }
     }
@@ -177,8 +187,13 @@ export default class GradientLayerRenderer extends BaseLayerRenderer {
         this.planeGeometry = undefined;
         this.plane && (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(this.plane);
         this.plane = undefined;
-        this.material?.dispose();
-        this.material = undefined;
+
+        appEmitter.off('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
+
+        if (this.materialWrapper) {
+            disposeMaterial(this.materialWrapper);
+        }
+        this.materialWrapper = undefined;
         this.lastLayerData = undefined;
         this.stopWatchBlendingMode?.();
         this.stopWatchVisible?.();
@@ -186,6 +201,12 @@ export default class GradientLayerRenderer extends BaseLayerRenderer {
         this.stopWatchTransform?.();
         this.stopWatchFilters?.();
         this.stopWatchData?.();
+    }
+
+    private readBufferTextureUpdate(texture?: Texture) {
+        if (!this.materialWrapper) return;
+        this.materialWrapper.material.uniforms.dstTexture.value = texture;
+        this.materialWrapper.material.uniformsNeedUpdate = true;
     }
 
 }

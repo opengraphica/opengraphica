@@ -6,20 +6,21 @@
 import { v4 as uuidv4 } from 'uuid';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { FrontSide } from 'three/src/constants';
-import { combineFiltersToShader, createFiltersFromLayerConfig, type CombinedFilterShaderResult } from '@/canvas/filters';
+import { combineFiltersToShader, createFiltersFromLayerConfig, generateShaderUniformsAndDefines, type CombinedFilterShaderResult } from '@/canvas/filters';
 
 import { assignMaterialBlendModes } from './../blending';
 import { rasterMaterialSetup } from './raster';
 import { gradientMaterialSetup } from './gradient';
 
 import type { RasterMaterialUpdateParams } from './raster';
-import type { CanvasFilterLayerInfo, WorkingFileLayerBlendingMode, WorkingFileLayerFilter } from '@/types';
+import type { GradientMaterialUpdateParams } from './gradient';
+import type { CanvasFilter, CanvasFilterLayerInfo, WorkingFileLayerBlendingMode, WorkingFileLayerFilter } from '@/types';
 
 export type MaterialType = 'raster' | 'gradient';
 
 export interface MaterialWapperUpdates {
     raster: RasterMaterialUpdateParams;
-    gradient: RasterMaterialUpdateParams;
+    gradient: GradientMaterialUpdateParams;
 }
 
 export interface MaterialWrapperSetup {
@@ -65,7 +66,7 @@ function shaderDefinesMatch(defines1: Record<string, any>, defines2: Record<stri
 export async function createMaterial<T extends MaterialType>(
     type: T,
     initParams: MaterialWapperUpdates[T],
-    canvasFilters: WorkingFileLayerFilter[],
+    layerFilters: WorkingFileLayerFilter[],
     canvasFilterLayerInfo: CanvasFilterLayerInfo,
     blendingMode: WorkingFileLayerBlendingMode = 'normal',
 ): Promise<MaterialWrapper<MaterialWapperUpdates[T]>> {
@@ -99,8 +100,9 @@ export async function createMaterial<T extends MaterialType>(
             break;
     }
 
+    const canvasFilters = await createFiltersFromLayerConfig(layerFilters);
     const combinedShaderResult = combineFiltersToShader(
-        await createFiltersFromLayerConfig(canvasFilters),
+        canvasFilters,
         canvasFilterLayerInfo,
         {
             vertexShaderSetup,
@@ -125,11 +127,18 @@ export async function createMaterial<T extends MaterialType>(
             // queuedDisposalMaterials.delete(existingUuid);
             // return existingMaterialWrapper;
             existingMaterial = existingMaterialWrapper.material.clone();
+            const { uniforms } = generateShaderUniformsAndDefines(canvasFilters, canvasFilterLayerInfo);
+            for (const uniformName in uniforms) {
+                existingMaterial.uniforms[uniformName] = uniforms[uniformName];
+            }
+            existingMaterial.uniformsNeedUpdate = true;
             break;
         }
     }
 
-    return createMaterialWrapper(type, initParams, combinedShaderResult, blendingMode, init, update, existingMaterial);
+    return createMaterialWrapper(
+        type, initParams, combinedShaderResult, blendingMode, canvasFilters, canvasFilterLayerInfo, init, update, existingMaterial
+    );
 }
 
 function createMaterialWrapper<T extends MaterialType>(
@@ -137,6 +146,8 @@ function createMaterialWrapper<T extends MaterialType>(
     initParams: Record<string, any>,
     combinedShaderResult: CombinedFilterShaderResult,
     blendingMode: WorkingFileLayerBlendingMode,
+    canvasFilters: CanvasFilter[],
+    layerInfo: CanvasFilterLayerInfo,
     init: MaterialWrapperSetup['init'],
     update: MaterialWrapperSetup['update'],
     materialOverride?: ShaderMaterial,
@@ -171,7 +182,9 @@ function createMaterialWrapper<T extends MaterialType>(
             const needsNewMaterial = update(this.material, updateParams);
             if (needsNewMaterial) {
                 disposeMaterial(materialWrapper);
-                return createMaterialWrapper(type, lastUpdate, combinedShaderResult, blendingMode, init, update);
+                return createMaterialWrapper(
+                    type, lastUpdate, combinedShaderResult, blendingMode, canvasFilters, layerInfo, init, update
+                );
             }
             return materialWrapper;
         },
@@ -191,10 +204,18 @@ function createMaterialWrapper<T extends MaterialType>(
                     // queuedDisposalMaterials.delete(existingUuid);
                     // return existingMaterialWrapper;
                     existingMaterial = existingMaterialWrapper.material.clone();
+                    const { uniforms } = generateShaderUniformsAndDefines(canvasFilters, layerInfo);
+                    for (const uniformName in uniforms) {
+                        existingMaterial.uniforms[uniformName] = uniforms[uniformName];
+                    }
+                    existingMaterial.uniformsNeedUpdate = true;
                     break;
                 }
             }
-            return createMaterialWrapper(type, lastUpdate ?? initParams, combinedShaderResult, newBlendingMode, init, update, existingMaterial);
+            return createMaterialWrapper(
+                type, lastUpdate ?? initParams, combinedShaderResult, newBlendingMode,
+                canvasFilters, layerInfo, init, update, existingMaterial
+            );
         },
     }
     materialWrappersById.set(uuid, materialWrapper);

@@ -116,10 +116,12 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
             }
         }
         if (updates.blendingMode) {
-            this.lastBlendingMode = updates.blendingMode;
-            if (this.materialWrapper) {
-                this.materialWrapper = this.materialWrapper.changeBlendingMode(updates.blendingMode);
-                this.plane && (this.plane.material = this.materialWrapper.material);
+            if (updates.blendingMode !== this.lastBlendingMode) {
+                this.lastBlendingMode = updates.blendingMode;
+                if (this.materialWrapper) {
+                    this.materialWrapper = this.materialWrapper.changeBlendingMode(updates.blendingMode);
+                    this.plane && (this.plane.material = this.materialWrapper.material);
+                }
             }
         }
         if (updates.width || updates.height) {

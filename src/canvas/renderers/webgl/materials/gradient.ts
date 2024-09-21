@@ -157,6 +157,7 @@ export const gradientMaterialSetup: MaterialWrapperSetup = {
         material.uniforms.start = { value: new Vector2(startTransformed.x, startTransformed.y) };
         material.uniforms.end = { value: new Vector2(endTransformed.x, endTransformed.y) };
         material.uniforms.focus = { value: new Vector2(focusTransformed.x, focusTransformed.y) };
+        material.uniforms.dstTexture = { value: undefined };
 
         material.userData.blendColorSpace = gradientData.blendColorSpace;
         material.userData.stopsHash = newStopsHash;
@@ -228,8 +229,8 @@ export const gradientMaterialSetup: MaterialWrapperSetup = {
     dispose(material) {
         generatedGradientStopTextures.get(material.userData.stopsHash)?.dispose();
         generatedGradientStopTextures.delete(material.userData.stopsHash);
-        material.uniforms.gradientMap.value = null;
-        delete material.uniforms.gradientMap;
+        material.uniforms.stops.value = null;
+        delete material.uniforms.stops;
         material.uniforms.start.value = null;
         delete material.uniforms.start;
         material.uniforms.end.value = null;

@@ -8,7 +8,7 @@ import { GammaCorrectionShader } from '@/canvas/renderers/webgl/shaders/gamma-co
 
 import type { Camera } from 'three';
 import type { EffectComposer } from './effect-composer';
-import type { WorkingFileGroupLayer, WorkingFileLayer } from '@/types';
+import type { WorkingFileGroupLayer, WorkingFileLayer, WorkingFileLayerBlendingMode } from '@/types';
 
 const noRenderPassModes = new Set(['normal', 'erase']);
 
@@ -88,6 +88,10 @@ export function refreshLayerPasses() {
     const camera = canvasStore.get('threejsCamera');
     if (!composer || !camera) return;
     createLayerPasses(composer, camera);
+}
+
+export function needsBufferTextureUpdate(blendingMode: WorkingFileLayerBlendingMode) {
+    return !noRenderPassModes.has(blendingMode);
 }
 
 appEmitter.on('app.workingFile.layerOrderCalculated', () => {
