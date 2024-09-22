@@ -14,8 +14,8 @@ import { Matrix4 } from 'three/src/math/Matrix4';
 import { Scene } from 'three/src/scenes/Scene';
 
 import { createFiltersFromLayerConfig, combineFiltersToShader } from '../../filters';
-import { createRasterShaderMaterial } from './shaders';
-import { assignMaterialBlendModes } from './blending';
+import { createMaterial, disposeMaterial, type MaterialWrapper, type MaterialWapperUpdates } from './materials';
+import appEmitter from '@/lib/emitter';
 
 import type { WorkingFileLayer, WorkingFileGroupLayer, WorkingFileLayerBlendingMode, WorkingFileLayerFilter, ColorModel } from '@/types';
 import type { Camera, Texture, WebGLRenderer } from 'three';
@@ -30,7 +30,7 @@ export default class GroupLayerRenderer extends BaseLayerRenderer {
 
     private groupRenderTarget: InstanceType<typeof WebGLRenderTarget> | undefined;
     private camera: InstanceType<typeof OrthographicCamera> | undefined;
-    private material: InstanceType<typeof ShaderMaterial> | undefined;
+    private materialWrapper: MaterialWrapper<MaterialWapperUpdates['raster']> | undefined;
     private planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
     private plane: InstanceType<typeof Mesh> | undefined;
     private childrenScene: Scene | undefined;
@@ -48,14 +48,17 @@ export default class GroupLayerRenderer extends BaseLayerRenderer {
             { minFilter: LinearFilter, magFilter: NearestFilter }
         );
         this.planeGeometry = new ImagePlaneGeometry(workingFileStore.state.width, workingFileStore.state.height);
-        await this.recreateMaterial(null, layer.filters);
-        this.plane = new Mesh(this.planeGeometry, this.material);
+        await this.recreateMaterial(undefined, layer.filters);
+        this.plane = new Mesh(this.planeGeometry, this.materialWrapper!.material);
         this.plane.renderOrder = this.order;
         this.plane.matrixAutoUpdate = false;
         (this.threejsScene ?? canvasStore.get('threejsScene'))?.add(this.plane);
         this.childrenScene = new Scene();
 
         await this.updateChildrenLayerScene(layer.layers, []);
+
+        this.readBufferTextureUpdate = this.readBufferTextureUpdate.bind(this);
+        appEmitter.on('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
 
         const { width, height } = toRefs(workingFileStore.state);
         const { blendingMode, visible, filters } = toRefs(layer);
@@ -89,9 +92,12 @@ export default class GroupLayerRenderer extends BaseLayerRenderer {
             this.plane && (this.plane.visible = updates.visible);
         }
         if (updates.blendingMode) {
-            this.lastBlendingMode = updates.blendingMode;
-            if (this.material) {
-                assignMaterialBlendModes(this.material, updates.blendingMode);
+            if (updates.blendingMode !== this.lastBlendingMode) {
+                this.lastBlendingMode = updates.blendingMode;
+                if (this.materialWrapper) {
+                    this.materialWrapper = this.materialWrapper.changeBlendingMode(updates.blendingMode);
+                    this.plane && (this.plane.material = this.materialWrapper.material);
+                }
             }
         }
         if (updates.width || updates.height) {
@@ -105,27 +111,27 @@ export default class GroupLayerRenderer extends BaseLayerRenderer {
             }
         }
         if (updates.filters) {
-            await this.recreateMaterial(this.groupRenderTarget?.texture ?? null, updates.filters);
-            this.plane && this.material && (this.plane.material = this.material);
+            await this.recreateMaterial(this.groupRenderTarget?.texture, updates.filters);
         }
     }
 
     onRenderGroup(renderer: WebGLRenderer, camera: Camera, layer: WorkingFileGroupLayer<ColorModel>): void {
-        for (const childLayer of layer.layers) {
-            if (childLayer.type === 'group') {
-                childLayer.renderer.renderGroup(renderer, camera, childLayer);
-            }
-        }
-        if (this.groupRenderTarget && this.childrenScene && this.camera) {
-            renderer.setRenderTarget(this.groupRenderTarget);
-            renderer.render(this.childrenScene, this.camera);
-            this.recreateMaterial(this.groupRenderTarget.texture, layer.filters);
-            this.plane && this.material && (this.plane.material = this.material);
-            renderer.setRenderTarget(null);
-        }
+        // for (const childLayer of layer.layers) {
+        //     if (childLayer.type === 'group') {
+        //         childLayer.renderer.renderGroup(renderer, camera, childLayer);
+        //     }
+        // }
+        // if (this.groupRenderTarget && this.childrenScene && this.camera) {
+        //     renderer.setRenderTarget(this.groupRenderTarget);
+        //     renderer.render(this.childrenScene, this.camera);
+        //     this.recreateMaterial(this.groupRenderTarget.texture, layer.filters);
+        //     renderer.setRenderTarget(null);
+        // }
     }
 
     onDetach(): void {
+        appEmitter.off('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
+
         // Clean up old stuff
         this.camera = undefined;
         this.groupRenderTarget?.dispose();
@@ -134,8 +140,9 @@ export default class GroupLayerRenderer extends BaseLayerRenderer {
         this.plane = undefined;
         this.planeGeometry?.dispose();
         this.planeGeometry = undefined;
-        this.material?.dispose();
-        this.material = undefined;
+        if (this.materialWrapper) {
+            disposeMaterial(this.materialWrapper);
+        }
         this.childrenScene = undefined;
         this.stopWatchBlendingMode?.();
         this.stopWatchVisible?.();
@@ -161,17 +168,20 @@ export default class GroupLayerRenderer extends BaseLayerRenderer {
         }
     }
 
-    private async recreateMaterial(texture: Texture | null, filters: WorkingFileLayerFilter[]) {
+    private async recreateMaterial(texture: Texture | undefined, filters: WorkingFileLayerFilter[]) {
         if (texture) {
             texture.encoding = LinearEncoding;
         }
-        const combinedShaderResult = combineFiltersToShader(
-            await createFiltersFromLayerConfig(filters),
-            { width: workingFileStore.state.width, height: workingFileStore.state.height }
+        if (this.materialWrapper) {
+            disposeMaterial(this.materialWrapper);
+        }
+        this.materialWrapper = await createMaterial('raster', { srcTexture: texture }, filters, 
+            { width: workingFileStore.state.width, height: workingFileStore.state.height },
+            this.lastBlendingMode
         );
-        this.material?.dispose();
-        this.material = createRasterShaderMaterial(texture, combinedShaderResult);
-        assignMaterialBlendModes(this.material, this.lastBlendingMode);
+        if (texture) {
+            this.plane && this.materialWrapper && (this.plane.material = this.materialWrapper.material);
+        }
     }
 
     private updateCameraDimensions(width: number, height: number) {
@@ -192,5 +202,11 @@ export default class GroupLayerRenderer extends BaseLayerRenderer {
         this.camera.matrix = matrix;
         this.camera.updateMatrixWorld(true);
         this.camera.updateProjectionMatrix();
+    }
+
+    private readBufferTextureUpdate(texture?: Texture) {
+        if (!this.materialWrapper) return;
+        this.materialWrapper.material.uniforms.dstTexture.value = texture;
+        this.materialWrapper.material.uniformsNeedUpdate = true;
     }
 }

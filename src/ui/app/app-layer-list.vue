@@ -64,6 +64,10 @@
                                 <i class="bi bi-stars"></i>
                                 <span v-t="'app.layerList.addEffect'"></span>
                             </el-menu-item>
+                            <el-menu-item index="duplicate">
+                                <i class="bi bi-copy"></i>
+                                <span v-t="'app.layerList.duplicate'"></span>
+                            </el-menu-item>
                             <el-menu-item index="delete">
                                 <i class="bi bi-trash"></i>
                                 <span v-t="'app.layerList.delete'"></span>
@@ -156,22 +160,25 @@ import ElLoading from 'element-plus/lib/components/loading/index';
 import ElMenu, { ElSubMenu, ElMenuItem } from 'element-plus/lib/components/menu/index';
 import ElPopover from 'element-plus/lib/components/popover/index';
 import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
+import AppLayerListThumbnail from '@/ui/app/app-layer-list-thumbnail.vue';
+import AppLayerFrameThumbnail from '@/ui/app/app-layer-frame-thumbnail.vue';
 
 import pointerDirective from '@/directives/pointer';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import workingFileStore, { getLayerById } from '@/store/working-file';
+
 import appEmitter from '@/lib/emitter';
-import AppLayerListThumbnail from '@/ui/app/app-layer-list-thumbnail.vue';
-import AppLayerFrameThumbnail from '@/ui/app/app-layer-frame-thumbnail.vue';
+import { runModule } from '@/modules';
+
 import { BundleAction } from '@/actions/bundle';
 import { DeleteLayersAction } from '@/actions/delete-layers';
+import { DuplicateLayerAction } from '@/actions/duplicate-layer';
 import { SelectLayersAction } from '@/actions/select-layers';
 import { UpdateLayerAction } from '@/actions/update-layer';
 import { ReorderLayersAction } from '@/actions/reorder-layers';
 import { ReorderLayerFiltersAction } from '@/actions/reorder-layer-filters';
-import { runModule } from '@/modules';
 
 import type { WorkingFileAnyLayer, WorkingFileGroupLayer, ColorModel, WorkingFileRasterSequenceLayer } from '@/types';
 
@@ -293,6 +300,10 @@ export default defineComponent({
                 runModule('layer', 'blendingMode', { layerId: layer.id });
             } else if (action === 'effect') {
                 runModule('layer', 'layerEffectBrowser', { layerId: layer.id });
+            } else if (action === 'duplicate') {
+                historyStore.dispatch('runAction', {
+                    action: new DuplicateLayerAction(layer.id)
+                });
             } else if (action === 'delete') {
                 historyStore.dispatch('runAction', {
                     action: new DeleteLayersAction([layer.id])
