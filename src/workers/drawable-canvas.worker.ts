@@ -1,9 +1,10 @@
 import drawableClassMap from '@/canvas/drawables';
+import InfiniteBackbuffer from '@/canvas/renderers/drawable/infinite-backbuffer';
 
 import type { Drawable, DrawableRenderMode, DrawableDrawOptions } from '@/types';
 import type {
     CreateCanvasRequest, AddDrawableRequest, RemoveDrawableRequest, DrawCanvasRequest,
-    DrawQueueRequest, DrawCompleteResult, SetCanvasRenderScaleRequest, InitializedResult,
+    DrawQueueRequest, DrawCompleteResult, SetCanvasRenderScaleRequest, SetCanvasGlobalAlphaRequest, InitializedResult,
 } from './drawable-canvas.types';
 
 self.postMessage({ type: 'INITIALIZED' } as InitializedResult);
@@ -14,6 +15,7 @@ interface DrawableInfo {
 
 let renderMode: DrawableRenderMode = '2d'; // TODO - webgl
 let renderScale = 1;
+let globalAlpha = 1;
 let drawX = 0;
 let drawY = 0;
 let currentBuffer = 1;
@@ -25,6 +27,8 @@ let isDrawingBuffer: { [key: number]: boolean } = {
 }
 let canvas1Ctx2d: OffscreenCanvasRenderingContext2D;
 let canvas2Ctx2d: OffscreenCanvasRenderingContext2D;
+let backbuffer = new InfiniteBackbuffer(256);
+
 const drawableMap = new Map<string, DrawableInfo>();
 let pendingDrawRequest: DrawCanvasRequest | null = null;
 
@@ -33,6 +37,8 @@ self.onmessage = ({ data }: { data: DrawQueueRequest }) => {
         createCanvas(data);
     } else if (data.type === 'SET_CANVAS_RENDER_SCALE') {
         setCanvasRenderScale(data);
+    } else if (data.type === 'SET_CANVAS_GLOBAL_ALPHA') {
+        setCanvasGlobalAlpha(data);
     } else if (data.type === 'ADD_DRAWABLE') {
         addDrawable(data);
     } else if (data.type === 'REMOVE_DRAWABLE') {
@@ -66,6 +72,10 @@ function createCanvas(request: CreateCanvasRequest) {
 
 function setCanvasRenderScale(request: SetCanvasRenderScaleRequest) {
     renderScale = request.renderScale;
+}
+
+function setCanvasGlobalAlpha(request: SetCanvasGlobalAlphaRequest) {
+    globalAlpha = request.globalAlpha;
 }
 
 async function addDrawable(request: AddDrawableRequest) {
@@ -110,6 +120,10 @@ function drawCanvas(request: DrawCanvasRequest) {
 
     const { updates: drawableUpdates, refresh } = request.options;
 
+    if (refresh) {
+        backbuffer.clear();
+    }
+
     let left = Infinity;
     let top = Infinity;
     let right = -Infinity;
@@ -150,13 +164,23 @@ function drawCanvas(request: DrawCanvasRequest) {
 
     const newCanvasWidth = Math.pow(2, nearestPowerOf2((right - left) * renderScale));
     const newCanvasHeight = Math.pow(2, nearestPowerOf2((bottom - top) * renderScale));
-    if (newCanvasWidth && newCanvasHeight && (newCanvasWidth != canvas.width || newCanvasHeight != canvas.height)) {
-        canvas.width = newCanvasWidth;
-        canvas.height = newCanvasHeight;
+    if (newCanvasWidth && newCanvasHeight) {
+        if (newCanvasWidth != canvas.width || newCanvasHeight != canvas.height) {
+            canvas.width = newCanvasWidth;
+            canvas.height = newCanvasHeight;
+        }
     }
 
     if (renderMode === '2d') {
+        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
         draw2d(canvas, canvasCtx, request.options);
+        if (!refresh || globalAlpha < 1) {
+            backbuffer.drawCanvas(canvas, drawX, drawY);
+            canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+            backbuffer.setGlobalAlpha(globalAlpha);
+            backbuffer.drawToCtx(drawX, drawY, canvas.width, canvas.height, canvasCtx, 0, 0);
+            backbuffer.setGlobalAlpha(1);
+        }
     }
 
     requestAnimationFrame(() => {
@@ -179,7 +203,6 @@ function drawCanvas(request: DrawCanvasRequest) {
 }
 
 function draw2d(canvas: OffscreenCanvas, ctx: OffscreenCanvasRenderingContext2D, options: DrawableDrawOptions) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
     ctx.translate(-drawX, -drawY);
     ctx.scale(renderScale, renderScale);

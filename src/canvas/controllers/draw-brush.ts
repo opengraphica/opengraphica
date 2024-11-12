@@ -1,8 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
-import { nextTick, watch, WatchStopHandle } from 'vue';
+import { markRaw, nextTick, watch, WatchStopHandle } from 'vue';
 
 import BaseCanvasMovementController from './base-movement';
-import { cursorHoverPosition, brushShape, brushColor, brushSize } from '../store/draw-brush-state';
+import {
+    cursorHoverPosition, brushShape, brushColor, brushSize, brushMinDensity, brushMaxDensity,
+} from '../store/draw-brush-state';
 import { blitActiveSelectionMask, activeSelectionMask, appliedSelectionMask } from '../store/selection-state';
 
 import { isOffscreenCanvasSupported } from '@/lib/feature-detection';
@@ -25,7 +27,7 @@ import { InsertLayerAction } from '@/actions/insert-layer';
 import { UpdateLayerAction } from '@/actions/update-layer';
 
 import type { InsertRasterLayerOptions, UpdateRasterLayerOptions, WorkingFileAnyLayer } from '@/types';
-import type { BrushStrokeData } from '@/canvas/drawables/brush-stroke';
+import type { BrushStrokeData, BrushStrokePoint } from '@/canvas/drawables/brush-stroke';
 
 const devicePixelRatio = window.devicePixelRatio || 1;
 
@@ -37,13 +39,16 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
 
     private drawingPointerId: number | null = null;
     private drawingOnLayers: WorkingFileAnyLayer[] = [];
-    private drawingPoints: DOMPoint[] = [];
+    private drawingPoints: BrushStrokePoint[] = [];
 
     private activeDraftUuid: string | null = null;
     private drawablePreviewCanvas: DrawableCanvas | null = null;
     private brushStrokeDrawableUuid: string | null = null;
 
     private brushShapeImage: HTMLImageElement | null = null;
+    private brushPreviewUpdate: BrushStrokeData | null = null;
+    private brushColorStyle: string = '#000000';
+    private brushColorAlpha: number = 1;
 
     onEnter(): void {
         super.onEnter();
@@ -53,6 +58,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         });
 
         this.drawablePreviewCanvas = new DrawableCanvas({ scale: 1 });
+        this.drawablePreviewCanvas.initialized().then(() => console.log('Drawable preview initialized.'));
         this.drawablePreviewCanvas.onDrawn((event) => {
             if (this.activeDraftUuid == null) return;
             for (const layer of this.drawingOnLayers) {
@@ -100,6 +106,14 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                     <path d="${brushShape}" fill="${brushColor.style}" />
                 </svg>`;
             this.brushShapeImage = await createImageFromBlob(new Blob([svg], { type: 'image/svg+xml' }));
+
+            if (brushColor.style.length === 9) {
+                this.brushColorAlpha = parseInt(brushColor.style.substring(7, 9), 16) / 255;
+                this.brushColorStyle = brushColor.style.substring(0, 7);
+            } else {
+                this.brushColorAlpha = 1;
+                this.brushColorStyle = brushColor.style;
+            }
         }, { immediate: true });
 
         cursorHoverPosition.value = new DOMPoint(
@@ -204,12 +218,18 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         if (
             this.drawingPointerId === e.pointerId
         ) {
-            this.drawingPoints.push(
-                new DOMPoint(
-                    this.lastCursorX * devicePixelRatio,
-                    this.lastCursorY * devicePixelRatio
-                ).matrixTransform(canvasStore.state.transform.inverse())
-            );
+            const transformedPoint = new DOMPoint(
+                this.lastCursorX * devicePixelRatio,
+                this.lastCursorY * devicePixelRatio
+            ).matrixTransform(canvasStore.state.transform.inverse());
+            this.drawingPoints.push({
+                x: transformedPoint.x,
+                y: transformedPoint.y,
+                size: brushSize.value,
+                tiltX: e.tiltX,
+                tiltY: e.tiltY,
+                twist: e.twist,
+            });
 
             this.drawPreview();
         }
@@ -288,6 +308,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 layer.drafts.push({
                     uuid: this.activeDraftUuid,
                     lastUpdateTimestamp: window.performance.now(),
+                    mode: 'source-over',
                     width,
                     height,
                     logicalWidth,
@@ -299,19 +320,34 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         }
 
         // Populate first drawing point
-        this.drawingPoints = [
-            new DOMPoint(
-                this.lastCursorX * devicePixelRatio,
-                this.lastCursorY * devicePixelRatio
-            ).matrixTransform(canvasStore.state.transform.inverse())
-        ];
+        const transformedPoint = new DOMPoint(
+            this.lastCursorX * devicePixelRatio,
+            this.lastCursorY * devicePixelRatio
+        ).matrixTransform(canvasStore.state.transform.inverse())
+        this.drawingPoints = markRaw([
+            {
+                x: transformedPoint.x,
+                y: transformedPoint.y,
+                size: brushSize.value,
+                tiltX: 0,
+                tiltY: 0,
+                twist: 0,
+            }
+        ]);
+
+        this.brushPreviewUpdate = markRaw({
+            color: this.brushColorStyle,
+            points: this.drawingPoints,
+            isPointsFinalized: false,
+        });
+        this.drawablePreviewCanvas?.setGlobalAlpha(this.brushColorAlpha);
 
         // Generate draw preview
         this.drawPreview(true);
     }
 
     private drawPreview(refresh = false) {
-        if (this.drawingOnLayers.length > 0 && this.brushShapeImage) {
+        if (this.drawingOnLayers.length > 0 && this.brushShapeImage && this.brushPreviewUpdate) {
 
             const points = this.drawingPoints;
 
@@ -325,17 +361,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 updates: [
                     {
                         uuid: this.brushStrokeDrawableUuid!,
-                        data: {
-                            color: brushColor.value.style,
-                            points: points.map(point => ({
-                                x: point.x,
-                                y: point.y,
-                                size: brushSize.value,
-                                tiltX: 0,
-                                tiltY: 0,
-                                twist: 0,
-                            }))
-                        } as BrushStrokeData,
+                        data: this.brushPreviewUpdate,
                     }
                 ],
             });
@@ -344,6 +370,11 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
 
     private async drawEnd(e: PointerEvent) {
         if (this.drawingPointerId === e.pointerId) {
+            if (this.brushPreviewUpdate) {
+                this.brushPreviewUpdate.isPointsFinalized = true;
+            }
+            this.drawPreview(false);
+
             const points = this.drawingPoints.slice();
             const drawingOnLayers = this.drawingOnLayers.slice();
             const updateHistoryStartTimestamp = window.performance.now();
@@ -377,6 +408,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                     try {
                         await drawableCanvas.initialized();
                         const brushStrokeUuid = await drawableCanvas.add('brushStroke');
+                        drawableCanvas.setGlobalAlpha(this.brushColorAlpha);
                         await drawableCanvas.draw({
                             refresh: true,
                             transform: layerTransform,
@@ -385,14 +417,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                                     uuid: brushStrokeUuid,
                                     data: {
                                         color: brushColor.value.style,
-                                        points: points.map(point => ({
-                                            x: point.x,
-                                            y: point.y,
-                                            size: brushSize.value,
-                                            tiltX: 0,
-                                            tiltY: 0,
-                                            twist: 0,
-                                        }))
+                                        points,
+                                        isPointsFinalized: true,
                                     } as BrushStrokeData,
                                 }
                             ],

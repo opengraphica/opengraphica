@@ -17,10 +17,10 @@ void main() {
     vec3 ac = (step(a.a, 0.00001) * b.rgb) + step(0.00001, a.a) * a.rgb;
     vec3 bc = (step(b.a, 0.00001) * a.rgb) + step(0.00001, b.a) * b.rgb;
     gl_FragColor = vec4(
-        ac.r * (1.0 - b.a) + bc.r * b.a,
-        ac.g * (1.0 - b.a) + bc.g * b.a,
-        ac.b * (1.0 - b.a) + bc.b * b.a,
-        a.a + b.a
+        clamp(ac.r * (1.0 - b.a) + bc.r * b.a, 0.0, 1.0),
+        clamp(ac.g * (1.0 - b.a) + bc.g * b.a, 0.0, 1.0),
+        clamp(ac.b * (1.0 - b.a) + bc.b * b.a, 0.0, 1.0),
+        a.a + b.a * (1.0 - a.a)
     );
 
     #include <encodings_fragment>

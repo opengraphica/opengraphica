@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import type {
     CreateCanvasRequest, AddDrawableRequest, RemoveDrawableRequest, DrawCanvasRequest,
-    TerminateRequest, DrawQueueResult, SetCanvasRenderScaleRequest, DrawCompleteAcknowledgedRequest
+    TerminateRequest, DrawQueueResult, SetCanvasRenderScaleRequest, SetCanvasGlobalAlphaRequest, DrawCompleteAcknowledgedRequest
 } from './drawable-canvas.types';
 import type { DrawableDrawOptions } from '@/types';
 import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
@@ -51,17 +51,35 @@ export async function createDrawableCanvas(options: CreateDrawableCanvasOptions)
         initializeReject = reject;
     });
 
+    // Cache canvas callback instances to avoid garbage collection jank.
+    const drawCompleteCanvases: HTMLCanvasElement[] = [
+        document.createElement('canvas'),
+        document.createElement('canvas'),
+        document.createElement('canvas'),
+        document.createElement('canvas'),
+        document.createElement('canvas'),
+        document.createElement('canvas'),
+    ];
+    let drawCompleteCanvasIndex = 0;
+
     worker.onmessage = ({ data }: { data: DrawQueueResult }) => {
         const workerInfo = canvasWorkerMap.get(uuid);
         if (!workerInfo) return;
         if (data.type === 'DRAW_COMPLETE_RESULT') {
             const { bitmap, sourceX, sourceY, updateInfo } = data;
-            const canvas = document.createElement('canvas');
-            canvas.width = bitmap.width;
-            canvas.height = bitmap.height;
+            const canvas = drawCompleteCanvases[drawCompleteCanvasIndex++];
+            if (drawCompleteCanvasIndex >= drawCompleteCanvases.length) {
+                drawCompleteCanvasIndex = 0;
+            }
+            if (canvas.width !== bitmap.width || canvas.height !== bitmap.height) {
+                canvas.width = bitmap.width;
+                canvas.height = bitmap.height;
+            }
             const ctx = canvas.getContext('bitmaprenderer');
             if (!ctx) return;
             ctx.transferFromImageBitmap(bitmap);
+            // TODO - maybe keep bitmap references and delay closing until there's a pause
+            // in draw calls, in order to avoid garbage collection jank.
             bitmap.close();
             onDrawn({
                 canvas,
@@ -71,6 +89,8 @@ export async function createDrawableCanvas(options: CreateDrawableCanvasOptions)
             });
         } else if (data.type === 'INITIALIZED') {
             initializeResolve(uuid);
+        } else if (data.type === 'LOG') {
+            console.log(data.value);
         }
     };
     worker.onmessageerror = (error) => {
@@ -103,6 +123,16 @@ export function setDrawableCanvasScale(workerUuid: string, newScale: number) {
         type: 'SET_CANVAS_RENDER_SCALE',
         renderScale: newScale,
     } as SetCanvasRenderScaleRequest);
+}
+
+export function setDrawableCanvasGlobalAlpha(workerUuid: string, newGlobalAlpha: number) {
+    const workerInfo = canvasWorkerMap.get(workerUuid);
+    if (!workerInfo) return;
+    const { worker } = workerInfo;
+    worker.postMessage({
+        type: 'SET_CANVAS_GLOBAL_ALPHA',
+        globalAlpha: newGlobalAlpha,
+    } as SetCanvasGlobalAlphaRequest);
 }
 
 export function addDrawable(workerUuid: string, drawableUuid: string, name: string, data: any) {

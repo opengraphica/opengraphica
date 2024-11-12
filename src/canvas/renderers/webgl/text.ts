@@ -206,6 +206,7 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
             const isHorizontal = ['ltr', 'rtl'].includes(this.layer.data.lineDirection);
             if (this.drawableCanvas && this.textDrawableUuid) {
                 this.drawableCanvas.draw({
+                    refresh: true,
                     updates: [
                         {
                             uuid: this.textDrawableUuid,

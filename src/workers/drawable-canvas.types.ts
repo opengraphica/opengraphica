@@ -12,6 +12,11 @@ export interface SetCanvasRenderScaleRequest {
     renderScale: number;
 }
 
+export interface SetCanvasGlobalAlphaRequest {
+    type: 'SET_CANVAS_GLOBAL_ALPHA',
+    globalAlpha: number;
+}
+
 export interface AddDrawableRequest {
     type: 'ADD_DRAWABLE';
     uuid: string;
@@ -37,7 +42,8 @@ export interface TerminateRequest {
     type: 'TERMINATE';
 }
 
-export type DrawQueueRequest = CreateCanvasRequest | SetCanvasRenderScaleRequest | AddDrawableRequest | RemoveDrawableRequest | DrawCanvasRequest | TerminateRequest | DrawCompleteAcknowledgedRequest;
+export type DrawQueueRequest = CreateCanvasRequest | SetCanvasRenderScaleRequest | SetCanvasGlobalAlphaRequest
+    | AddDrawableRequest | RemoveDrawableRequest | DrawCanvasRequest | TerminateRequest | DrawCompleteAcknowledgedRequest;
 
 export interface InitializedResult {
     type: 'INITIALIZED'
@@ -52,5 +58,10 @@ export interface DrawCompleteResult {
     updateInfo: Record<string, any>;
 }
 
-export type DrawQueueResult = InitializedResult | DrawCompleteResult;
+export interface LogResult {
+    type: 'LOG';
+    value: any;
+}
+
+export type DrawQueueResult = InitializedResult | DrawCompleteResult | LogResult;
 

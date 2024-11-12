@@ -7,17 +7,22 @@
 import { v4 as uuidv4 } from 'uuid';
 import canvasStore from '@/store/canvas';
 import {
-    createDrawableCanvas, setDrawableCanvasScale, addDrawable, removeDrawable, renderDrawableCanvas, destroyDrawableCanvas,
+    createDrawableCanvas, setDrawableCanvasScale, setDrawableCanvasGlobalAlpha, addDrawable,
+    removeDrawable, renderDrawableCanvas, destroyDrawableCanvas,
 } from '@/workers/drawable-canvas.interface';
+import InfiniteBackbuffer from './infinite-backbuffer';
+
 import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { isOffscreenCanvasSupported } from '@/lib/feature-detection/offscreen-canvas';
 import { nearestPowerOf2 } from '@/lib/math';
+
 import type { DefaultDrawableData, Drawable, DrawableDrawOptions, DrawableConstructor, DrawableRenderMode, DrawableUpdate } from '@/types';
 
 export interface DrawableCanvasOptions {
     width?: number;
     height?: number;
     scale?: number;
+    globalAlpha?: number;
     forceDrawOnMainThread?: boolean;
     sync?: boolean;
 }
@@ -39,6 +44,7 @@ export default class DrawableCanvas {
     private isInitialized: boolean = false;
     private renderMode: DrawableRenderMode;
     private scale: number;
+    private globalAlpha: number;
     private forceDrawOnMainThread: boolean;
     private sync: boolean;
 
@@ -48,6 +54,7 @@ export default class DrawableCanvas {
 
     private mainThreadCanvas: HTMLCanvasElement | undefined = undefined;
     private mainThreadCanvasCtx2d: CanvasRenderingContext2D | undefined = undefined;
+    private mainThreadBackbuffer: InfiniteBackbuffer | undefined = undefined;
     private lastDrawX: number = 0;
     private lastDrawY: number = 0;
     private lastDrawUpdateInfo: Record<string, any> = {};
@@ -67,6 +74,7 @@ export default class DrawableCanvas {
         this.scale = options.scale ?? 1;
         this.forceDrawOnMainThread = options.forceDrawOnMainThread ?? false;
         this.sync = options.sync ?? false;
+        this.globalAlpha = options.globalAlpha ?? 1;
         this.init();
     }
 
@@ -90,6 +98,7 @@ export default class DrawableCanvas {
             if (this.renderMode === '2d') {
                 this.mainThreadCanvasCtx2d = this.mainThreadCanvas.getContext('2d', getCanvasRenderingContext2DSettings()) ?? undefined;
             }
+            this.mainThreadBackbuffer = new InfiniteBackbuffer(256);
         }
 
         if (!this.sync && !this.offscreenCanvasUuid) {
@@ -184,6 +193,14 @@ export default class DrawableCanvas {
         }
     }
 
+    setGlobalAlpha(newGlobalAlpha: number) {
+        this.globalAlpha = newGlobalAlpha;
+        if (!this.isInitialized) return;
+        if (this.offscreenCanvasUuid) {
+            setDrawableCanvasGlobalAlpha(this.offscreenCanvasUuid, newGlobalAlpha);
+        }
+    }
+
     async add<T = DefaultDrawableData>(name: string, data: T = {} as never): Promise<string> {
         const uuid = uuidv4();
         this.drawables.set(uuid, {
@@ -263,7 +280,7 @@ export default class DrawableCanvas {
     }
 
     draw2d(options: DrawableDrawOptions) {
-        if (!this.mainThreadCanvasCtx2d) return;
+        if (!this.mainThreadCanvasCtx2d || !this.mainThreadBackbuffer) return;
         const {
             refresh,
             updates: drawableUpdates,
@@ -273,6 +290,10 @@ export default class DrawableCanvas {
         const ctx = this.mainThreadCanvasCtx2d;
         const canvas = ctx.canvas;
         const renderScale = this.scale;
+
+        if (refresh) {
+            this.mainThreadBackbuffer.clear();
+        }
 
         let left = Infinity;
         let top = Infinity;
@@ -341,6 +362,14 @@ export default class DrawableCanvas {
             });
         }
         ctx.restore();
+
+        if (!refresh || this.globalAlpha < 1) {
+            this.mainThreadBackbuffer.drawCanvas(canvas, drawX, drawY);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            this.mainThreadBackbuffer.setGlobalAlpha(this.globalAlpha);
+            this.mainThreadBackbuffer.drawToCtx(drawX, drawY, canvas.width, canvas.height, ctx, 0, 0);
+            this.mainThreadBackbuffer.setGlobalAlpha(1);
+        }
 
         this.lastDrawX = drawX;
         this.lastDrawY = drawY;
