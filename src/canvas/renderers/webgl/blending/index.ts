@@ -74,10 +74,10 @@ interface MaterialBlendModes {
 }
 
 export function getBlendModes(layerBlendingMode: WorkingFileLayerBlendingMode): MaterialBlendModes {
-    let blending = NormalBlending;
+    let blending: Blending = NormalBlending;
     let blendEquation = AddEquation;
-    let blendSrc = SrcAlphaFactor;
-    let blendDst = OneMinusSrcAlphaFactor;
+    let blendSrc: BlendingDstFactor = SrcAlphaFactor;
+    let blendDst: BlendingDstFactor = OneMinusSrcAlphaFactor;
     let blendEquationAlpha: BlendingEquation | null = null;
     let blendSrcAlpha: BlendingDstFactor | null = ZeroFactor;
     let blendDstAlpha: BlendingDstFactor | null = OneMinusSrcAlphaFactor;

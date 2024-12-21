@@ -2,7 +2,13 @@ import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { UniformsUtils } from 'three/src/renderers/shaders/UniformsUtils';
 import { Pass, FullScreenQuad } from './pass';
 
-import type { WebGLRenderer, Shader, WebGLRenderTarget } from 'three';
+import type { WebGLRenderer, WebGLRenderTarget } from 'three';
+
+type Shader = {
+    uniforms?: ShaderMaterial['uniforms'];
+    vertexShader?: string;
+    fragmentShader?: string;
+}
 
 class ShaderPass extends Pass {
 
@@ -20,7 +26,7 @@ class ShaderPass extends Pass {
             this.uniforms = shader.uniforms;
             this.material = shader;
         } else if (shader) {
-            this.uniforms = UniformsUtils.clone(shader.uniforms);
+            this.uniforms = shader.uniforms ? UniformsUtils.clone(shader.uniforms!) : {};
 
             this.material = new ShaderMaterial({
                 defines: Object.assign({}, (shader as ShaderMaterial).defines),

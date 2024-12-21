@@ -1,7 +1,7 @@
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { Texture } from 'three/src/textures/Texture';
 import { Vector2 } from 'three/src/math/Vector2';
-import { FrontSide, DoubleSide, CustomBlending, ZeroFactor, OneFactor, sRGBEncoding, LinearFilter } from 'three/src/constants';
+import { FrontSide, DoubleSide, CustomBlending, ZeroFactor, OneFactor, LinearFilter } from 'three/src/constants';
 
 import prepareGpuTextureMaterialFragmentShader from './prepare-gpu-texture-material.frag';
 import prepareGpuTextureMaterialVertexShader from './prepare-gpu-texture-material.vert';

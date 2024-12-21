@@ -5,7 +5,7 @@ import { generateObjectHash, generateStringHash } from '@/lib/hash';
 import { lerp } from '@/lib/math';
 
 import { Vector2 } from 'three/src/math/Vector2';
-import { sRGBEncoding, LinearFilter } from 'three/src/constants';
+import { SRGBColorSpace, LinearFilter } from 'three/src/constants';
 
 import gradientMaterialVertexShaderSetup from '@/canvas/renderers/webgl/shaders/gradient-material.setup.vert';
 import gradientMaterialVertexShaderMain from '@/canvas/renderers/webgl/shaders/gradient-material.main.vert';
@@ -109,7 +109,7 @@ function createGradientStopTexture(
         ctx.putImageData(gradientImageData, 0, 0);
     }
     const texture = new Texture(canvas);
-    texture.encoding = sRGBEncoding;
+    texture.colorSpace = SRGBColorSpace;
     texture.generateMipmaps = false;
     texture.magFilter = LinearFilter;
     texture.minFilter = LinearFilter;

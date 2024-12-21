@@ -4,10 +4,11 @@ import { assignLayerRenderer } from '@/canvas/renderers';
 import { prepareStoredImageForEditing, reserveStoredImage, createStoredImage } from '@/store/image';
 import { getStoredSvgDataUrl, createStoredSvg } from '@/store/svg';
 import { createImageBlobFromCanvas, createImageFromBlob } from '@/lib/image';
+import { getStoredVideoDataUrl, createStoredVideo } from '@/store/video';
 import type {
     ColorModel, WorkingFile, WorkingFileGroupLayer, WorkingFileLayer, WorkingFileAnyLayer,
     WorkingFileGradientLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer,
-    WorkingFileVectorLayer, SerializedFileVectorLayer,
+    WorkingFileVectorLayer, SerializedFileVectorLayer, WorkingFileVideoLayer, SerializedFileVideoLayer,
 } from '@/types';
 
 interface DatabaseMetaLayer {
@@ -156,6 +157,14 @@ async function readStoredLayersRecursive(metaLayers: DatabaseMetaLayer[]): Promi
                 const image = new Image();
                 image.src = serializedVectorLayer.data.sourceSvgSerialized;
                 vectorLayer.data.sourceUuid = await createStoredSvg(image);
+            }
+        } else if (layerResult.type === 'video') {
+            const videoLayer = layerResult as WorkingFileVideoLayer;
+            const serializedVideoLayer = layerResult as unknown as SerializedFileVideoLayer;
+            if (serializedVideoLayer?.data?.sourceVideoSerialized) {
+                const video = document.createElement('video');
+                video.src = serializedVideoLayer.data.sourceVideoSerialized;
+                videoLayer.data.sourceUuid = await createStoredVideo(video);
             }
         }
         assignLayerRenderer(layerResult);
@@ -369,6 +378,13 @@ export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNe
         const originalSourceUuid = (existingLayer as any)?.data?.originalSourceUuid ?? null;
         if (workingVectorLayer.data.sourceUuid && workingVectorLayer.data.sourceUuid != originalSourceUuid) {
             storedVectorLayer.data.sourceSvgSerialized = getStoredSvgDataUrl(workingVectorLayer.data.sourceUuid) ?? undefined;
+        }
+    } else if (storedLayer.type === 'video') {
+        const storedVideoLayer = storedLayer as SerializedFileVideoLayer;
+        const workingVideoLayer = layer as WorkingFileVideoLayer;
+        const originalSourceUuid = (existingLayer as any)?.data?.originalSourceUuid ?? null;
+        if (workingVideoLayer.data.sourceUuid && workingVideoLayer.data.sourceUuid != originalSourceUuid) {
+            storedVideoLayer.data.sourceVideoSerialized = getStoredVideoDataUrl(workingVideoLayer.data.sourceUuid) ?? undefined;
         }
     }
 

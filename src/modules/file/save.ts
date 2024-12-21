@@ -8,12 +8,14 @@ import { writeWorkingFile } from '@/store/data/working-file-database';
 import { saveAs } from 'file-saver';
 import { getStoredImageOrCanvas } from '@/store/image';
 import { getStoredSvgDataUrl } from '@/store/svg';
+import { getStoredVideoDataUrl } from '@/store/video';
 
 import type {
     FileSystemFileHandle, SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel,
     SerializedFileGradientLayer, SerializedFileGroupLayer, SerializedFileTextLayer, SerializedFileRasterLayer,
-    SerializedFileRasterSequenceLayer, SerializedFileVectorLayer, WorkingFile, WorkingFileGradientLayer,
-    WorkingFileGroupLayer, WorkingFileTextLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer,
+    SerializedFileRasterSequenceLayer, SerializedFileVectorLayer, SerializedFileVideoLayer, WorkingFile, WorkingFileGradientLayer,
+    WorkingFileGroupLayer, WorkingFileTextLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer,
+    WorkingFileVectorLayer, WorkingFileVideoLayer,
 } from '@/types';
 
 interface SaveImageAsOptions {
@@ -106,14 +108,16 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
                 type: 'gradient',
                 data: (layer as WorkingFileGradientLayer<ColorModel>).data
             } as SerializedFileGradientLayer<ColorModel>;
-        } else if (layer.type === 'group') {
+        }
+        else if (layer.type === 'group') {
             serializedLayer = {
                 ...serializedLayer,
                 type: 'group',
                 expanded: (layer as WorkingFileGroupLayer<ColorModel>).expanded,
                 layers: serializeWorkingFileLayers((layer as WorkingFileGroupLayer<ColorModel>).layers)
             } as SerializedFileGroupLayer<ColorModel>;
-        } else if (layer.type === 'raster') {
+        }
+        else if (layer.type === 'raster') {
             const canvas = document.createElement('canvas');
             canvas.width = layer.width;
             canvas.height = layer.height;
@@ -145,7 +149,8 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
                 canvas.height = 1;
                 throw error;
             }
-        } else if (layer.type === 'rasterSequence') {
+        }
+        else if (layer.type === 'rasterSequence') {
             const memoryLayer = (layer as WorkingFileRasterSequenceLayer<ColorModel>);
             const serializedSequence: SerializedFileRasterSequenceLayer<ColorModel>['data']['sequence'] = [];
             for (let frame of memoryLayer.data.sequence) {
@@ -181,7 +186,15 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
                     sequence: serializedSequence
                 }
             } as SerializedFileRasterSequenceLayer<ColorModel>;
-        } else if (layer.type === 'vector') {
+        }
+        else if (layer.type === 'text') {
+            serializedLayer = {
+                ...serializedLayer,
+                type: 'text',
+                data: (layer as WorkingFileTextLayer<ColorModel>).data
+            } as SerializedFileTextLayer<ColorModel>;
+        }
+        else if (layer.type === 'vector') {
             serializedLayer = {
                 ...serializedLayer,
                 type: 'vector',
@@ -191,12 +204,17 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
                     )
                 }
             } as SerializedFileVectorLayer<ColorModel>;
-        } else if (layer.type === 'text') {
+        }
+        else if (layer.type === 'video') {
             serializedLayer = {
                 ...serializedLayer,
-                type: 'text',
-                data: (layer as WorkingFileTextLayer<ColorModel>).data
-            } as SerializedFileTextLayer<ColorModel>;
+                type: 'video',
+                data: {
+                    sourceVideoSerialized: getStoredVideoDataUrl(
+                        (layer as WorkingFileVideoLayer<ColorModel>).data.sourceUuid
+                    )
+                }
+            } as SerializedFileVideoLayer<ColorModel>;
         }
         serializedLayers.push(serializedLayer);
     }

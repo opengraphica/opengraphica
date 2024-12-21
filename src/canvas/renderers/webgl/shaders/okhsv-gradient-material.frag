@@ -225,5 +225,5 @@ void main() {
     }
 
     gl_FragColor = vec4(rgb.r, rgb.g, rgb.b, 1.0);
-    #include <encodings_fragment>
+    #include <colorspace_fragment>
 }

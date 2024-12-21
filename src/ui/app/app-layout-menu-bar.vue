@@ -330,11 +330,11 @@ export default defineComponent({
             const buttonClientRect = activeToolGroupButton.value?.getBoundingClientRect();
             if (!menuBarClientRect || !buttonClientRect) return;
             if (direction.value === 'vertical') {
-                toolGroupExpandOffsetTop.value = Math.round(-menuBarClientRect.top + buttonClientRect.top + (buttonClientRect.height / 2)) + 'px';
+                toolGroupExpandOffsetTop.value = (-menuBarClientRect.top + buttonClientRect.top + (buttonClientRect.height / 2)).toFixed(1) + 'px';
                 toolGroupExpandOffsetLeft.value = undefined;
             } else {
                 toolGroupExpandOffsetTop.value = undefined;
-                toolGroupExpandOffsetLeft.value = Math.round(-menuBarClientRect.left + buttonClientRect.left + (buttonClientRect.width / 2)) + 'px';
+                toolGroupExpandOffsetLeft.value = (-menuBarClientRect.left + buttonClientRect.left + (buttonClientRect.width / 2)).toFixed(1) + 'px';
             }
         }
 

@@ -2,14 +2,15 @@ import { reactive, markRaw } from 'vue';
 import {
     ColorModel, WorkingFileLayer,
     WorkingFileEmptyLayer, WorkingFileGradientLayer, WorkingFileGroupLayer, WorkingFileRasterLayer,
-    WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileTextLayer, WorkingFileAnyLayer,
-    InsertAnyLayerOptions
+    WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileVideoLayer, WorkingFileTextLayer,
+    WorkingFileAnyLayer, InsertAnyLayerOptions
 } from '@/types';
 import { BaseAction } from './base';
 import { SelectLayersAction } from './select-layers';
 import canvasStore from '@/store/canvas';
 import { reserveStoredImage, unreserveStoredImage } from '@/store/image';
 import { reserveStoredSvg, unreserveStoredSvg } from '@/store/svg';
+import { reserveStoredVideo, unreserveStoredVideo } from '@/store/video';
 import workingFileStore, { calculateLayerOrder, getGroupLayerById } from '@/store/working-file';
 import { updateWorkingFile, updateWorkingFileLayer, deleteWorkingFileLayer } from '@/store/data/working-file-database';
 import layerRenderers, { assignLayerRenderer } from '@/canvas/renderers';
@@ -124,6 +125,13 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                         }
                     }
                     break;
+                case 'text':
+                    newLayer = {
+                        ...sharedOptions,
+                        data: {},
+                        ...this.insertLayerOptions
+                    } as WorkingFileTextLayer<ColorModel>;
+                    break;
                 case 'vector':
                     newLayer = {
                         ...sharedOptions,
@@ -134,12 +142,15 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                         reserveStoredSvg(newLayer.data.sourceUuid, `${layerId}`);
                     }
                     break;
-                case 'text':
+                case 'video':
                     newLayer = {
                         ...sharedOptions,
-                        data: {},
+                        data: [],
                         ...this.insertLayerOptions
-                    } as WorkingFileTextLayer<ColorModel>;
+                    } as WorkingFileVideoLayer<ColorModel>;
+                    if (newLayer.data.sourceUuid) {
+                        reserveStoredVideo(newLayer.data.sourceUuid, `${layerId}`);
+                    }
                     break;
             }
             assignLayerRenderer(newLayer);
@@ -274,6 +285,11 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
             else if (this.insertedLayer.type === 'vector') {
                 if (this.insertedLayer.data.sourceUuid) {
                     unreserveStoredSvg(this.insertedLayer.data.sourceUuid, `${this.insertedLayer.id}`);
+                }
+            }
+            else if (this.insertedLayer.type === 'video') {
+                if (this.insertedLayer.data.sourceUuid) {
+                    unreserveStoredVideo(this.insertedLayer.data.sourceUuid, `${this.insertedLayer.id}`);
                 }
             }
         }

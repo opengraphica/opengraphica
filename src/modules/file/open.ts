@@ -9,6 +9,7 @@ import canvasStore from '@/store/canvas';
 import historyStore from '@/store/history';
 import { createStoredImage } from '@/store/image';
 import { createStoredSvg } from '@/store/svg';
+import { createStoredVideo } from '@/store/video';
 import preferencesStore from '@/store/preferences';
 import workingFileStore, { getCanvasRenderingContext2DSettings, WorkingFileState, getTimelineById, calculateLayerOrder } from '@/store/working-file';
 import { readWorkingFile } from '@/store/data/working-file-database';
@@ -27,10 +28,10 @@ import appEmitter from '@/lib/emitter';
 import type {
     ShowOpenFilePicker, FileSystemFileHandle,
     SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel,
-    InsertAnyLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions, InsertVectorLayerOptions,
+    InsertAnyLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions, InsertVectorLayerOptions, InsertVideoLayerOptions,
     WorkingFileEmptyLayer, WorkingFileGradientLayer, WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer,
-    WorkingFileVectorLayer, WorkingFileTextLayer, SerializedFileGradientLayer, SerializedFileGroupLayer, SerializedFileRasterLayer,
-    SerializedFileRasterSequenceLayer, SerializedFileVectorLayer, SerializedFileTextLayer,
+    WorkingFileTextLayer, WorkingFileVectorLayer, WorkingFileVideoLayer, SerializedFileGradientLayer, SerializedFileGroupLayer,
+    SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileTextLayer, SerializedFileVectorLayer, SerializedFileVideoLayer
 } from '@/types';
 
 declare global {
@@ -195,12 +196,13 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
     if (!files) return;
     if (!dialogOptions) dialogOptions = {};
 
-    type FileReadType = 'json' | 'image';
+    type FileReadType = 'json' | 'media';
     type FileReadResolve =
         { type: 'image', result: HTMLImageElement, file: File } |
         { type: 'imageSequence', result: { image: HTMLImageElement, duration: number }[], file: File } |
         { type: 'json', result: string, file: File } |
-        { type: 'svg', result: HTMLImageElement, file: File };
+        { type: 'svg', result: HTMLImageElement, file: File } |
+        { type: 'video', result: HTMLVideoElement, file: File};
 
     const readerPromises: Promise<FileReadResolve>[] = [];
 
@@ -213,7 +215,7 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
             new Promise(async (resolveReader, rejectReader) => {
                 try {
                     // Some images don't have the correct extension, which causes the browser to not recognize the type. Default to read as 'image';
-                    const fileReadType: FileReadType = (file.type === 'text/plain' || file.name.match(/\.json$/)) ? 'json' : 'image';
+                    const fileReadType: FileReadType = (file.type === 'text/plain' || file.name.match(/\.json$/)) ? 'json' : 'media';
 
                     if (!fileName) {
                         fileName = file.name.replace(knownFileExtensions, '');
@@ -221,7 +223,7 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
 
                     const fileReader = new FileReader();
 
-                    if (fileReadType === 'image') {
+                    if (fileReadType === 'media') {
                         if (file.type === 'image/gif') {
                             const result: { image: HTMLImageElement, duration: number }[] = [];
                             const gifArrayBuffer = await new Promise<ArrayBuffer | null>((resolveArrayBuffer) => {
@@ -319,80 +321,20 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                             } else {
                                 rejectReader('No frames found in gif file "' + file.name + '".');
                             }
-                        } else if (['video/mp4', 'video/webp'].includes(file.type)) {
-                            const result: { image: HTMLImageElement, duration: number }[] = [];
-                            let fps: number = 25;
+                        } else if (file.type.startsWith('video/')) {
                             let videoObjectUrl = URL.createObjectURL(file);
                             let video = document.createElement('video');
-                            let seekResolve: (value?: any) => void;
-                            video.addEventListener('seeked', async function() {
-                                if (seekResolve) {
-                                    seekResolve();
-                                }
+                            await new Promise<void>((resolve, reject) => {
+                                video.addEventListener('loadedmetadata', function() {
+                                    resolve();
+                                    video.currentTime = 0;
+                                });
+                                video.addEventListener('error', function(error) {
+                                    reject(error.toString());
+                                });
+                                video.src = videoObjectUrl;
                             });
-                            video.src = videoObjectUrl;
-                            while ((video.duration === Infinity || isNaN(video.duration)) && video.readyState < 2) {
-                                await new Promise(r => setTimeout(r, 1000));
-                                video.currentTime = 10000000 * Math.random();
-                                if (dialogOptions?.cancelRef?.value === true) {
-                                    rejectReader('File open canceled.');
-                                    return;
-                                }
-                            }
-                            let duration = Math.min(5, video.duration);
-                            let canvas = document.createElement('canvas');
-                            let ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
-                            if (!ctx) {
-                                rejectReader('Not enough memory to parse the video file "' + file.name + '".');
-                                return;
-                            }
-                            let [w, h] = [video.videoWidth, video.videoHeight];
-                            canvas.width =  w;
-                            canvas.height = h;
-                            let frames = [];
-                            let interval = 1 / fps;
-                            let currentTime = 0;
-                            while (currentTime < duration) {
-                                video.currentTime = currentTime;
-                                await new Promise(resolveSeek => {
-                                    seekResolve = resolveSeek;
-                                });
-                                ctx.drawImage(video, 0, 0, w, h);
-                                let base64ImageData = canvas.toDataURL();
-                                frames.push(base64ImageData);
-                                currentTime += interval;
-                                if (dialogOptions?.cancelRef?.value === true) {
-                                    rejectReader('File open canceled.');
-                                    return;
-                                }
-                            }
-                            for (let frame of frames) {
-                                const image = await new Promise<HTMLImageElement>((resolveImage, rejectImage) => {
-                                    const image = new Image();
-                                    image.onload = () => {
-                                        resolveImage(image);
-                                    };
-                                    image.onerror = (error: any) => {
-                                        rejectImage();
-                                    };
-                                    image.src = frame;
-                                });
-                                if (dialogOptions?.cancelRef?.value === true) {
-                                    rejectReader('File open canceled.');
-                                    return;
-                                }
-                                result.push({
-                                    image,
-                                    duration: 1000 / fps
-                                });
-                            }
-                            if (result.length === 1) {
-                                resolveReader({ type: 'image', result: result[0].image, file: file });
-                            } else if (result.length > 0) {
-                                resolveReader({ type: 'imageSequence', result, file: file });
-                            } else {
-                                rejectReader('No frames found in video file "' + file.name + '".');
-                            }
+                            resolveReader({ type: 'video', result: video, file: file });
                         } else if (file.type === 'image/svg+xml') {
                             const fileContents = await new Promise<string>((resolveFileContents, rejectFileContents) => {
                                 fileReader.onload = async () => {
@@ -450,7 +392,7 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                         fileReader.readAsText(file);
                     }
                 } catch (error: any) {
-                    rejectReader('An error occurred while parsing the file. ' + error);
+                    rejectReader('An error occurred while parsing the file. ' + error?.toString());
                 }
             })
         );
@@ -487,26 +429,6 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                         height: image.height,
                         data: {
                             sourceUuid: await createStoredImage(image),
-                        }
-                    })
-                );
-            }
-            else if (readerSettle.value.type === 'svg') {
-                const image = readerSettle.value.result;
-                if (image.width > largestWidth) {
-                    largestWidth = image.width;
-                }
-                if (image.height > largestHeight) {
-                    largestHeight = image.height;
-                }
-                insertLayerActions.push(
-                    new InsertLayerAction<InsertVectorLayerOptions<ColorModel>>({
-                        type: 'vector',
-                        name: readerSettle.value.file.name,
-                        width: image.width,
-                        height: image.height,
-                        data: {
-                            sourceUuid: await createStoredSvg(image),
                         }
                     })
                 );
@@ -558,6 +480,46 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                     }
                 }
                 insertLayerActions = insertLayerActions.concat(workingFileInsertLayerActions);
+            }
+            else if (readerSettle.value.type === 'svg') {
+                const image = readerSettle.value.result;
+                if (image.width > largestWidth) {
+                    largestWidth = image.width;
+                }
+                if (image.height > largestHeight) {
+                    largestHeight = image.height;
+                }
+                insertLayerActions.push(
+                    new InsertLayerAction<InsertVectorLayerOptions<ColorModel>>({
+                        type: 'vector',
+                        name: readerSettle.value.file.name,
+                        width: image.width,
+                        height: image.height,
+                        data: {
+                            sourceUuid: await createStoredSvg(image),
+                        }
+                    })
+                );
+            }
+            else if (readerSettle.value.type === 'video') {
+                const video = readerSettle.value.result;
+                if (video.videoWidth > largestWidth) {
+                    largestWidth = video.videoWidth;
+                }
+                if (video.videoHeight > largestHeight) {
+                    largestHeight = video.videoHeight;
+                }
+                insertLayerActions.push(
+                    new InsertLayerAction<InsertVideoLayerOptions<ColorModel>>({
+                        type: 'video',
+                        name: readerSettle.value.file.name,
+                        width: video.videoWidth,
+                        height: video.videoHeight,
+                        data: {
+                            sourceUuid: await createStoredVideo(video),
+                        }
+                    })
+                );
             }
         } else if (readerSettle.status === 'rejected') {
             loadErrorMessages.push(readerSettle.reason);
@@ -658,13 +620,15 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
                 ...parsedLayer,
                 type: 'empty',
             } as WorkingFileEmptyLayer<ColorModel>;
-        } else if (layer.type === 'gradient') {
+        }
+        else if (layer.type === 'gradient') {
             parsedLayer = {
                 ...parsedLayer,
                 type: 'gradient',
                 data: (layer as SerializedFileGradientLayer<ColorModel>).data,
             } as WorkingFileGradientLayer<ColorModel>;
-        } else if (layer.type === 'group') {
+        }
+        else if (layer.type === 'group') {
             parsedLayer = {
                 ...parsedLayer,
                 type: 'group',
@@ -672,7 +636,8 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
                 layers: []
             } as WorkingFileGroupLayer<ColorModel>;
             groupInsertLayerActions = groupInsertLayerActions.concat(await parseLayersToActions((layer as SerializedFileGroupLayer<ColorModel>).layers));
-        } else if (layer.type === 'raster') {
+        }
+        else if (layer.type === 'raster') {
             const serializedLayer = layer as SerializedFileRasterLayer<ColorModel>;
             const image = new Image();
             const base64Fetch = await fetch(serializedLayer.data.sourceImageSerialized || '');
@@ -693,7 +658,8 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
                     sourceUuid: await createStoredImage(image),
                 }
             } as WorkingFileRasterLayer<ColorModel>;
-        } else if (layer.type === 'rasterSequence') {
+        }
+        else if (layer.type === 'rasterSequence') {
             const serializedLayer = layer as SerializedFileRasterSequenceLayer<ColorModel>;
             const parsedSequence: WorkingFileRasterSequenceLayer<ColorModel>['data']['sequence'] = [];
             for (let frame of serializedLayer.data.sequence) {
@@ -727,7 +693,8 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
                 }
             } as WorkingFileRasterSequenceLayer<ColorModel>;
             (window as any).parsedLayer = parsedLayer;
-        } else if (layer.type === 'vector') {
+        }
+        else if (layer.type === 'vector') {
             const serializedLayer = layer as SerializedFileVectorLayer<ColorModel>;
             let image: HTMLImageElement | undefined;
             if (serializedLayer?.data?.sourceSvgSerialized) {
@@ -749,13 +716,38 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
                     sourceUuid: image ? await createStoredSvg(image) : undefined,
                 },
             } as WorkingFileVectorLayer<ColorModel>;
-        } else if (layer.type === 'text') {
+        }
+        else if (layer.type === 'video') {
+            const serializedLayer = layer as SerializedFileVideoLayer<ColorModel>;
+            let video: HTMLVideoElement | undefined;
+            if (serializedLayer?.data?.sourceVideoSerialized) {
+                video = document.createElement('video');
+                await new Promise<void>((resolve) => {
+                    video!.addEventListener('loadeddata', () => {
+                        resolve();
+                    });
+                    video!.addEventListener('error', (error) => {
+                        console.log(error);
+                        resolve();
+                    });
+                    video!.src = serializedLayer.data.sourceVideoSerialized!;
+                });
+            }
+            parsedLayer = {
+                ...parsedLayer,
+                type: 'video',
+                data: {
+                    sourceUuid: video ? await createStoredVideo(video) : undefined,
+                },
+            } as WorkingFileVideoLayer<ColorModel>;
+        }
+        else if (layer.type === 'text') {
             parsedLayer = {
                 ...parsedLayer,
                 type: 'text',
                 data: (layer as SerializedFileTextLayer<ColorModel>).data,
             } as WorkingFileTextLayer<ColorModel>;
-        }
+        } 
         insertLayerActions.push(
             new InsertLayerAction<InsertAnyLayerOptions<ColorModel>>(parsedLayer as InsertAnyLayerOptions<ColorModel>)
         );

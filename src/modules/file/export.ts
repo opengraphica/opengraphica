@@ -91,7 +91,7 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                     });
                 } else {
                     const { WebGLRenderer } = await import('three/src/renderers/WebGLRenderer');
-                    const { sRGBEncoding } = await import('three/src/constants');
+                    const { SRGBColorSpace } = await import('three/src/constants');
                     const { OrthographicCamera } = await import('three/src/cameras/OrthographicCamera');
                     const { EffectComposer } = await import('@/canvas/renderers/webgl/postprocessing/effect-composer');
                     const { RenderPass } = await import('@/canvas/renderers/webgl/postprocessing/render-pass');
@@ -116,7 +116,7 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                         powerPreference: 'high-performance'
                     });
                     threejsRenderer.setClearColor(0x000000, 0);
-                    threejsRenderer.outputEncoding = sRGBEncoding;
+                    threejsRenderer.outputColorSpace = SRGBColorSpace;
                     threejsRenderer.setSize(width, height);
 
                     // const renderTarget = new WebGLRenderTarget(width, height);

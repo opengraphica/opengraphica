@@ -7,7 +7,7 @@ import { assignMaterialBlendModes } from './blending';
 import { createFiltersFromLayerConfig, combineFiltersToShader } from '../../filters';
 import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 
-import { NearestFilter, LinearEncoding, LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, sRGBEncoding, RGBAFormat, UnsignedByteType } from 'three/src/constants';
+import { NearestFilter, RGBAFormat, SRGBColorSpace } from 'three/src/constants';
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { Mesh } from 'three/src/objects/Mesh';
@@ -247,7 +247,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
                     draftAssets.planeTexture.premultiplyAlpha = false;
                     draftAssets.planeTexture.generateMipmaps = false;
                     draftAssets.planeTexture.format = RGBAFormat;
-                    draftAssets.planeTexture.encoding = sRGBEncoding;
+                    draftAssets.planeTexture.colorSpace = SRGBColorSpace;
                     draftAssets.planeTexture.magFilter = NearestFilter;
                     draftAssets.planeTexture.minFilter = NearestFilter;
                     draftAssets.planeMaterial && (draftAssets.planeMaterial.uniforms.map.value = draftAssets.planeTexture);
@@ -351,7 +351,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
             chunkTexture.premultiplyAlpha = true;
             chunkTexture.generateMipmaps = false;
             chunkTexture.format = RGBAFormat;
-            chunkTexture.encoding = sRGBEncoding;
+            chunkTexture.colorSpace = SRGBColorSpace;
             chunkTexture.minFilter = NearestFilter;
             chunkTexture.magFilter = NearestFilter;
 
@@ -361,9 +361,10 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
             // draftAssets.planeTexture.needsUpdate = true;
             
             renderer.copyTextureToTexture(
-                new Vector2(chunk.x, draftAssets.planeTexture.image.height - chunk.y - chunkHeight),
                 chunkTexture,
-                draftAssets.planeTexture
+                draftAssets.planeTexture,
+                null,
+                new Vector2(chunk.x, draftAssets.planeTexture.image.height - chunk.y - chunkHeight)
             );
             if (shouldCloseChunkImage) {
                 (chunkImage as ImageBitmap).close();

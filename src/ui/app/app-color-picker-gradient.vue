@@ -143,7 +143,7 @@ export default defineComponent({
         });
 
         async function setupOkhsv() {
-            const { DoubleSide, sRGBEncoding } = await import('three/src/constants');
+            const { DoubleSide, SRGBColorSpace } = await import('three/src/constants');
             const { Mesh } = await import('three/src/objects/Mesh');
             const { ImagePlaneGeometry } = await import('@/canvas/renderers/webgl/geometries/image-plane-geometry');
             const { WebGLRenderer } = await import('three/src/renderers/WebGLRenderer');
@@ -168,7 +168,7 @@ export default defineComponent({
                 powerPreference: 'high-performance',
             });
             valueGradientRenderer.setClearColor(0x000000, 0);
-            valueGradientRenderer.outputEncoding = sRGBEncoding;
+            valueGradientRenderer.outputColorSpace = SRGBColorSpace;
             valueGradientRenderer.setSize(valueGradientCanvas.width, valueGradientCanvas.height, false);
 
             let valueGradientScene = new Scene();
@@ -236,7 +236,7 @@ export default defineComponent({
                 powerPreference: 'high-performance',
             });
             hueGradientRenderer.setClearColor(0x000000, 0);
-            hueGradientRenderer.outputEncoding = sRGBEncoding;
+            hueGradientRenderer.outputColorSpace = SRGBColorSpace;
             hueGradientRenderer.setSize(hueGradientCanvas.width, hueGradientCanvas.height, false);
 
             let hueGradientScene = new Scene();

@@ -9,7 +9,7 @@ import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { Mesh } from 'three/src/objects/Mesh';
 import { WebGLRenderTarget } from 'three/src/renderers/WebGLRenderTarget';
-import { LinearFilter, NearestFilter, LinearEncoding } from 'three/src/constants';
+import { LinearFilter, NearestFilter, LinearSRGBColorSpace } from 'three/src/constants';
 import { Matrix4 } from 'three/src/math/Matrix4';
 import { Scene } from 'three/src/scenes/Scene';
 
@@ -111,7 +111,9 @@ export default class GroupLayerRenderer extends BaseLayerRenderer {
             }
         }
         if (updates.filters) {
-            await this.recreateMaterial(this.groupRenderTarget?.texture, updates.filters);
+            let texture = this.groupRenderTarget?.texture;
+            if ((texture as Texture[])?.length > 1) texture = (texture as Texture[])?.[0];
+            await this.recreateMaterial(texture as Texture, updates.filters);
         }
     }
 
@@ -170,7 +172,7 @@ export default class GroupLayerRenderer extends BaseLayerRenderer {
 
     private async recreateMaterial(texture: Texture | undefined, filters: WorkingFileLayerFilter[]) {
         if (texture) {
-            texture.encoding = LinearEncoding;
+            texture.colorSpace = LinearSRGBColorSpace;
         }
         if (this.materialWrapper) {
             disposeMaterial(this.materialWrapper);

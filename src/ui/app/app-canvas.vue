@@ -33,7 +33,7 @@ import { useAppPreloadBlocker } from '@/composables/app-preload-blocker';
 
 import type {
     Blending, BlendingDstFactor, BufferAttribute, BufferGeometry, Matrix4, Mesh, MeshBasicMaterial,
-    OrthographicCamera, PlaneGeometry, Scene, ShaderMaterial, Side, Texture, TextureEncoding,
+    OrthographicCamera, PlaneGeometry, Scene, ShaderMaterial, Side, Texture, ColorSpace,
     TextureLoader, WebGLRenderer, Wrapping,
 } from 'three';
 import type { EffectComposer } from '@/canvas/renderers/webgl/postprocessing/effect-composer';
@@ -255,7 +255,7 @@ export default defineComponent({
         ) => {
             const { TextureLoader } = await import('three/src/loaders/TextureLoader');
             const { Texture } = await import('three/src/textures/Texture');
-            const { sRGBEncoding, ClampToEdgeWrapping, NearestFilter, LinearFilter } = await import('three/src/constants');
+            const { SRGBColorSpace, ClampToEdgeWrapping, NearestFilter, LinearFilter } = await import('three/src/constants');
 
             const newSelectionMask = newActiveSelectionMask ?? newAppliedSelectionMask ?? newSelectedLayersSelectionMaskPreview;
             const oldSelectionMask = oldActiveSelectionMask ?? oldAppliedSelectionMask ?? oldSelectedLayersSelectionMaskPreview;
@@ -283,7 +283,7 @@ export default defineComponent({
                     selectionMaskTexture.minFilter = LinearFilter;
                     selectionMaskTexture.wrapS = ClampToEdgeWrapping;
                     selectionMaskTexture.wrapT = ClampToEdgeWrapping;
-                    selectionMaskTexture.encoding = sRGBEncoding;
+                    selectionMaskTexture.colorSpace = SRGBColorSpace;
                     threejsSelectionMask.material.uniforms.selectedMaskMap.value = selectionMaskTexture;
                     threejsSelectionMask.material.uniforms.selectedMaskSize.value = [selectionMaskTexture.image.width, selectionMaskTexture.image.height];
                     threejsSelectionMask.material.uniforms.selectedMaskOffset.value = [newCanvasOffset.x, newCanvasOffset.y];
@@ -377,7 +377,7 @@ export default defineComponent({
             let Mesh: ClassType<Mesh>;
             let Matrix4: ClassType<Matrix4>;
             let DoubleSide: Side;
-            let sRGBEncoding: TextureEncoding;
+            let SRGBColorSpace: ColorSpace;
             let RepeatWrapping: Wrapping;
             let EffectComposer: ClassType<EffectComposer>;
             let createLayerPasses: typeof CreateLayerPasses;
@@ -386,7 +386,7 @@ export default defineComponent({
             let GammaCorrectionShader: typeof GammaCorrectionShaderType;
 
             [
-                { DoubleSide, sRGBEncoding, RepeatWrapping },
+                { DoubleSide, SRGBColorSpace, RepeatWrapping },
                 { WebGLRenderer },
                 { Scene },
                 { OrthographicCamera },
@@ -432,7 +432,7 @@ export default defineComponent({
                 premultipliedAlpha: false,
                 powerPreference: 'high-performance'
             });
-            threejsRenderer.outputEncoding = sRGBEncoding;
+            threejsRenderer.outputColorSpace = SRGBColorSpace;
             threejsRenderer.setSize(1, 1);
             canvasStore.set('threejsRenderer', threejsRenderer);
 
@@ -463,7 +463,7 @@ export default defineComponent({
             if (selectionMaskUnselectedPatternTexture) {
                 selectionMaskUnselectedPatternTexture.wrapS = RepeatWrapping;
                 selectionMaskUnselectedPatternTexture.wrapT = RepeatWrapping;
-                selectionMaskUnselectedPatternTexture.encoding = sRGBEncoding;
+                selectionMaskUnselectedPatternTexture.colorSpace = SRGBColorSpace;
             }
             const selectionMaskGeometry = new PlaneGeometry(2, 2); //viewportWidth.value, viewportHeight.value);
             const selectionMaskMaterial = new ShaderMaterial({

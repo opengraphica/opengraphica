@@ -9033,6 +9033,7 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .ogr-layout-menu-bar .ogr-menu-section .el-button-group > .el-button, .opengraphica .ogr-layout-menu-bar .ogr-menu-section .ogr-single-button-group > .el-button {
   border-width: 0 !important;
+  width: 2.5rem;
 }
 .opengraphica .ogr-layout-menu-bar .el-button {
   height: fit-content;
@@ -9083,6 +9084,7 @@ body.ogr-full-page .opengraphica {
   border: none;
   border-radius: 2rem;
   margin: 0 0 0 0.35rem;
+  height: 2.5rem;
 }
 .opengraphica .ogr-layout-menu-bar .ogr-menu-bar__tool-group-expand .ogr-menu-bar__tool-group-expand__controls button.ogr-menu-bar__tool-group-expand__control--active {
   box-shadow: 0 0 0 0.15rem var(--el-color-primary) inset;
@@ -9099,6 +9101,8 @@ body.ogr-full-page .opengraphica {
   border: none;
   border-radius: 0 2rem 2rem 0;
   margin: 0;
+  height: 2.5rem;
+  width: 2.5rem;
 }
 .opengraphica .ogr-layout-menu-bar .ogr-menu-bar__tool-group-expand .ogr-menu-bar__tool-group-expand__toggle-button:hover {
   background-color: var(--el-color-primary);
@@ -9115,6 +9119,8 @@ body.ogr-full-page .opengraphica {
   border-radius: 2rem;
   padding: 0.35rem 0.35rem 0.35rem 0.35rem;
   margin: 0.4rem 0 0.4rem 0.75rem;
+  height: auto;
+  width: auto;
 }
 .opengraphica .ogr-layout-menu-bar.is-positioned-right .ogr-menu-bar__tool-group-expand {
   left: auto;
@@ -9249,6 +9255,10 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-layout-menu-bar.is-vertical > .is-flex .ogr-menu-section .el-button-group, .opengraphica .ogr-layout-menu-bar.is-vertical > .is-flex .ogr-menu-section .ogr-single-button-group {
   margin: 0.375rem 0 0 0;
   height: max-content;
+}
+.opengraphica .ogr-layout-menu-bar.is-vertical > .is-flex .ogr-menu-section .el-button-group .el-button, .opengraphica .ogr-layout-menu-bar.is-vertical > .is-flex .ogr-menu-section .ogr-single-button-group .el-button {
+  height: 2.5rem;
+  width: auto;
 }
 .opengraphica .ogr-layout-menu-bar.is-vertical > .is-flex .ogr-menu-section .el-button-group:last-child, .opengraphica .ogr-layout-menu-bar.is-vertical > .is-flex .ogr-menu-section .ogr-single-button-group:last-child {
   margin-bottom: 0.375rem;

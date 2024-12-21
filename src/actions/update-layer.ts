@@ -6,6 +6,7 @@ import { drawImageToCanvas2d } from '@/lib/canvas';
 import canvasStore from '@/store/canvas';
 import { prepareStoredImageForEditing, prepareStoredImageForArchival, reserveStoredImage, unreserveStoredImage } from '@/store/image';
 import { reserveStoredSvg, unreserveStoredSvg } from '@/store/svg';
+import { reserveStoredVideo, unreserveStoredVideo } from '@/store/video';
 import workingFileStore, { getLayerById, regenerateLayerThumbnail, getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { updateWorkingFileLayer } from '@/store/data/working-file-database';
 import { updateBakedImageForLayer } from './baking';
@@ -15,7 +16,7 @@ import { queueRefreshLayerPasses } from '@/canvas/renderers/webgl/postprocessing
 import type {
     ColorModel, WorkingFileAnyLayer,
     UpdateAnyLayerOptions, UpdateGradientLayerOptions, UpdateRasterLayerOptions, UpdateVectorLayerOptions,
-    WorkingFileRasterLayer, WorkingFileLayerDraftChunk, WorkingFileVectorLayer
+    UpdateVideoLayerOptions, WorkingFileRasterLayer, WorkingFileLayerDraftChunk, WorkingFileVectorLayer
 } from '@/types';
 
 export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorModel>> extends BaseAction {
@@ -30,6 +31,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
     private newRasterUpdateChunks: WorkingFileLayerDraftChunk[] = [];
 
     private oldVectorSourceSvgId: string | null = null;
+    private oldVideoSourceUuid: string | null = null;
 
     constructor(updateLayerOptions: LayerOptions, explicitPreviousProps: Partial<LayerOptions> = {}) {
         super('updateLayer', 'action.updateLayer');
@@ -154,6 +156,20 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                         requiresBaking = true;
                     }
                 }
+                else if (layer.type === 'video') {
+                    if (!layer.data) {
+                        layer.data = { sourceUuid: '' };
+                    }
+                    const newData = this.updateLayerOptions[prop] as UpdateVideoLayerOptions<ColorModel>['data'];
+                    const newSourceUuid = newData?.sourceUuid ?? '';
+                    const oldSourceUuid = layer.data.sourceUuid ?? '';
+                    if (newSourceUuid && newSourceUuid !== oldSourceUuid) {
+                        layer.data.sourceUuid = newSourceUuid;
+                        this.oldVideoSourceUuid = oldSourceUuid;
+                        reserveStoredVideo(newSourceUuid, `${layer.id}`);
+                        requiresBaking = true;
+                    }
+                }
                 else {
                     if ((this.explicitPreviousProps as any)[prop] !== undefined) {
                         (this.previousProps as any)[prop] = (this.explicitPreviousProps as any)[prop];
@@ -262,6 +278,11 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
             // For vector layer, if the svg source id was changed, free the old one.
             if (this.oldVectorSourceSvgId != null && this.oldVectorSourceSvgId !== (this.updateLayerOptions as UpdateVectorLayerOptions<ColorModel>)?.data?.sourceUuid) {
                 unreserveStoredSvg(this.oldVectorSourceSvgId, `${this.previousProps.id}`);
+            }
+
+            // For video layer, if the video source id was changed, free the old one.
+            if (this.oldVideoSourceUuid != null && this.oldVideoSourceUuid !== (this.updateLayerOptions as UpdateVideoLayerOptions<ColorModel>)?.data?.sourceUuid) {
+                unreserveStoredVideo(this.oldVideoSourceUuid, `${this.previousProps.id}`);
             }
         }
         // This is in the redo history

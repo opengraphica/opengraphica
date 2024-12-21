@@ -279,8 +279,9 @@ export default defineComponent({
                 case 'group': return (layer as WorkingFileGroupLayer).expanded ? 'bi-folder2-open' : 'bi-folder';
                 case 'raster': return 'bi-image';
                 case 'rasterSequence': return 'bi-images';
-                case 'vector': return 'bi-bezier2';
                 case 'text': return 'bi-textarea-t';
+                case 'vector': return 'bi-bezier2';
+                case 'video': return 'bi-film';
             }
             return 'bi-question';
         }

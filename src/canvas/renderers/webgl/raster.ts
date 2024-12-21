@@ -193,7 +193,12 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
                         }
                         // Copy update data to existing texture.
                         const updateChunkTexture = await createThreejsTextureFromImage(updateCanvas, { preferWorkerThread: true });
-                        renderer.copyTextureToTexture(new Vector2(updateX, sourceHeight - updateY - updateHeight), updateChunkTexture, this.sourceTexture);
+                        renderer.copyTextureToTexture(
+                            updateChunkTexture,
+                            this.sourceTexture,
+                            null,
+                            new Vector2(updateX, sourceHeight - updateY - updateHeight)
+                        );
                         updateChunkTexture.dispose();
                     }
                     // Update the image source of the texture, needed for exporting. Don't mark as needsUpdate so not to trigger a re-upload.

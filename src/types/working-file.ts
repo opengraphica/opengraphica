@@ -38,7 +38,7 @@ export type WorkingFileLayerBlendingMode
     | 'difference' | 'exclusion' | 'subtract' | 'grainExtract' | 'grainMerge' | 'divide'
     | 'hue' | 'chroma' | 'color' | 'lightness' | 'luminance';
 
-export type WorkingFileLayerType = 'empty' | 'gradient' | 'group' | 'raster' | 'rasterSequence' | 'vector' | 'text';
+export type WorkingFileLayerType = 'empty' | 'gradient' | 'group' | 'raster' | 'rasterSequence' | 'vector' | 'video' | 'text';
 
 export interface WorkingFileLayerFilter<T extends ColorModel = ColorModel> {
     name: string;
@@ -214,6 +214,13 @@ export interface WorkingFileVectorLayer<T extends ColorModel = ColorModel> exten
     }
 }
 
+export interface WorkingFileVideoLayer<T extends ColorModel = ColorModel> extends WorkingFileLayer<T> {
+    type: 'video';
+    data: {
+        sourceUuid?: string;
+    }
+}
+
 export interface WorkingFileTextLayer<T extends ColorModel = ColorModel> extends WorkingFileLayer<T> {
     type: 'text';
     data: TextDocument;
@@ -221,7 +228,7 @@ export interface WorkingFileTextLayer<T extends ColorModel = ColorModel> extends
 
 export type WorkingFileAnyLayer<T extends ColorModel = ColorModel>
     = WorkingFileEmptyLayer<T> | WorkingFileGradientLayer<T> | WorkingFileGroupLayer<T> | WorkingFileRasterLayer<T>
-    | WorkingFileRasterSequenceLayer<T> | WorkingFileVectorLayer<T> | WorkingFileTextLayer<T>;
+    | WorkingFileRasterSequenceLayer<T> | WorkingFileVectorLayer<T> | WorkingFileVideoLayer<T> | WorkingFileTextLayer<T>;
 
 export interface InsertEmptyLayerOptions<T extends ColorModel = ColorModel> extends Partial<WorkingFileEmptyLayer<T>> {
     type: 'empty';
@@ -241,12 +248,15 @@ export interface InsertRasterSequenceLayerOptions<T extends ColorModel = ColorMo
 export interface InsertVectorLayerOptions<T extends ColorModel = ColorModel> extends Partial<WorkingFileVectorLayer<T>> {
     type: 'vector';
 }
+export interface InsertVideoLayerOptions<T extends ColorModel = ColorModel> extends Partial<WorkingFileVideoLayer<T>> {
+    type: 'video';
+}
 export interface InsertTextLayerOptions<T extends ColorModel = ColorModel> extends Partial<WorkingFileTextLayer<T>> {
     type: 'text';
 }
 export type InsertAnyLayerOptions<T extends ColorModel = ColorModel>
     = InsertEmptyLayerOptions<T> | InsertGradientLayerOptions<T> | InsertGroupLayerOptions<T> | InsertRasterLayerOptions<T>
-    | InsertRasterSequenceLayerOptions<T> | InsertVectorLayerOptions<T> | InsertTextLayerOptions<T>;
+    | InsertRasterSequenceLayerOptions<T> | InsertVectorLayerOptions<T> | InsertVideoLayerOptions<T> | InsertTextLayerOptions<T>;
 
 export interface UpdateEmptyLayerOptions<T extends ColorModel = ColorModel> extends Partial<WorkingFileEmptyLayer<T>> {
     id: number;
@@ -266,12 +276,15 @@ export interface UpdateRasterSequenceLayerOptions<T extends ColorModel = ColorMo
 export interface UpdateVectorLayerOptions<T extends ColorModel = ColorModel> extends Partial<WorkingFileVectorLayer<T>> {
     id: number;
 }
+export interface UpdateVideoLayerOptions<T extends ColorModel = ColorModel> extends Partial<WorkingFileVideoLayer<T>> {
+    id: number;
+}
 export interface UpdateTextLayerOptions<T extends ColorModel = ColorModel> extends Partial<WorkingFileTextLayer<T>> {
     id: number;
 }
 export type UpdateAnyLayerOptions<T extends ColorModel = ColorModel>
     = UpdateEmptyLayerOptions<T> | UpdateGradientLayerOptions<T> | UpdateGroupLayerOptions<T> | UpdateRasterLayerOptions<T>
-    | UpdateRasterSequenceLayerOptions<T> | UpdateVectorLayerOptions<T> | UpdateTextLayerOptions<T>;
+    | UpdateRasterSequenceLayerOptions<T> | UpdateVectorLayerOptions<T> | UpdateVideoLayerOptions<T> | UpdateTextLayerOptions<T>;
 
 export interface NewFilePreset {
     name: string,

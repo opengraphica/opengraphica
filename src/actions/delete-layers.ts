@@ -6,6 +6,7 @@ import { SelectLayersAction } from './select-layers';
 import canvasStore from '@/store/canvas';
 import { unreserveStoredImage } from '@/store/image';
 import { unreserveStoredSvg } from '@/store/svg';
+import { unreserveStoredVideo } from '@/store/video';
 import workingFileStore, { calculateLayerOrder, getLayerById, getGroupLayerById } from '@/store/working-file';
 import { updateWorkingFile, updateWorkingFileLayer, deleteWorkingFileLayer } from '@/store/data/working-file-database';
 import { updateBakedImageForLayer } from './baking';
@@ -122,6 +123,11 @@ export class DeleteLayersAction extends BaseAction {
             else if (layer.type === 'vector') {
                 if (layer.data.sourceUuid) {
                     unreserveStoredSvg(layer.data.sourceUuid, `${layer.id}`);
+                }
+            }
+            else if (layer.type === 'video') {
+                if (layer.data.sourceUuid) {
+                    unreserveStoredVideo(layer.data.sourceUuid, `${layer.id}`);
                 }
             }
         }

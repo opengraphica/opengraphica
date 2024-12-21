@@ -1,4 +1,4 @@
-import { NearestFilter, sRGBEncoding } from 'three/src/constants';
+import { NearestFilter, SRGBColorSpace } from 'three/src/constants';
 import { Mesh } from 'three/src/objects/Mesh';
 import { ImagePlaneGeometry } from '@/canvas/renderers/webgl/geometries/image-plane-geometry';
 import { CanvasTexture } from 'three/src/textures/CanvasTexture';
@@ -74,7 +74,7 @@ async function workNewTextureComposite(queueItem: TextureCompositeRequest) {
                 powerPreference: 'high-performance',
             });
             threejsRenderer.setClearColor(0x000000, 0);
-            threejsRenderer.outputEncoding = sRGBEncoding;
+            threejsRenderer.outputColorSpace = SRGBColorSpace;
         }
         threejsRenderer.setSize(overlayBitmap.width, overlayBitmap.height, false);
 
@@ -105,13 +105,13 @@ async function workNewTextureComposite(queueItem: TextureCompositeRequest) {
 
         const baseImageTexture = new CanvasTexture(overlayCroppedBaseCanvas);
         baseImageTexture.generateMipmaps = false;
-        baseImageTexture.encoding = sRGBEncoding;
+        baseImageTexture.colorSpace = SRGBColorSpace;
         baseImageTexture.minFilter = NearestFilter;
         baseImageTexture.magFilter = NearestFilter;
 
         const overlayImageTexture = new CanvasTexture(overlayBitmap);
         overlayImageTexture.generateMipmaps = false;
-        overlayImageTexture.encoding = sRGBEncoding;
+        overlayImageTexture.colorSpace = SRGBColorSpace;
         overlayImageTexture.minFilter = NearestFilter;
         overlayImageTexture.magFilter = NearestFilter;
 
@@ -172,7 +172,7 @@ async function workNewPrepareThreejsTexture(queueItem: PrepareThreejsTextureRequ
                 powerPreference: 'high-performance',
             });
             threejsRenderer.setClearColor(0x000000, 0);
-            threejsRenderer.outputEncoding = sRGBEncoding;
+            threejsRenderer.outputColorSpace = SRGBColorSpace;
         }
         threejsRenderer.setSize(bitmap.width, bitmap.height, false);
 
@@ -191,7 +191,7 @@ async function workNewPrepareThreejsTexture(queueItem: PrepareThreejsTextureRequ
 
         let imageTexture = new CanvasTexture(bitmap);
         imageTexture.generateMipmaps = false;
-        imageTexture.encoding = sRGBEncoding;
+        imageTexture.colorSpace = SRGBColorSpace;
         imageTexture.minFilter = NearestFilter;
         imageTexture.magFilter = NearestFilter;
 

@@ -37,5 +37,5 @@ void main() {
         }
     }
 
-    gl_FragColor = LinearTosRGB(gl_FragColor);
+    #include <colorspace_fragment>
 }

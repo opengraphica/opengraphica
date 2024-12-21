@@ -7,9 +7,9 @@ import { isOffscreenCanvasSupported } from '@/lib/feature-detection/offscreen-ca
 import { createCompositeTexture2d, prepareThreejsTexture } from '@/workers/texture-compositor.interface';
 
 import type {
-    Camera, Scene, WebGLRenderer, TextureEncoding, OrthographicCamera, Mesh, Texture,
+    Camera, Scene, WebGLRenderer, ColorSpace, OrthographicCamera, Mesh, Texture,
     MeshBasicMaterial, CanvasTexture, TextureFilter, WebGLRenderTarget, ShaderMaterial,
-    PixelFormat, TextureDataType,
+    PixelFormat, TextureDataType, MagnificationTextureFilter
 } from 'three';
 import type { ImagePlaneGeometry } from '@/canvas/renderers/webgl/geometries/image-plane-geometry';
 import type { EffectComposer } from '@/canvas/renderers/webgl/postprocessing/effect-composer';
@@ -169,8 +169,8 @@ const drawImageWebglCache = {
     threejsCamera: undefined as OrthographicCamera | undefined,
     threejsRasterTextureCompositorShaderMaterial: undefined as ShaderMaterial | undefined,
     threejsPrepareGpuTextureShaderMaterial: undefined as ShaderMaterial | undefined,
-    NearestFilter: undefined as TextureFilter | undefined,
-    sRGBEncoding: undefined as TextureEncoding | undefined,
+    NearestFilter: undefined as MagnificationTextureFilter | undefined,
+    SRGBColorSpace: undefined as ColorSpace | undefined,
     RGBAFormat: undefined as PixelFormat | undefined,
     UnsignedByteType: undefined as TextureDataType | undefined,
     Mesh: undefined as ClassType<Mesh> | undefined,
@@ -195,15 +195,15 @@ async function setupThreejsRenderer(width: number, height: number) {
     await Promise.allSettled(currentRenderStack);
 
     let {
-        threejsCanvas, threejsRenderer, threejsScene, NearestFilter, sRGBEncoding, RGBAFormat, UnsignedByteType,
+        threejsCanvas, threejsRenderer, threejsScene, NearestFilter, SRGBColorSpace, RGBAFormat, UnsignedByteType,
         threejsCamera, Mesh, ImagePlaneGeometry, MeshBasicMaterial, CanvasTexture, threejsRenderTarget,
         threejsRasterTextureCompositorShaderMaterial, threejsPrepareGpuTextureShaderMaterial,
     } = drawImageWebglCache;
 
-    if (!NearestFilter || !sRGBEncoding || !RGBAFormat || !UnsignedByteType) {
-        ({ NearestFilter, sRGBEncoding, RGBAFormat, UnsignedByteType } = await import('three/src/constants'));
+    if (!NearestFilter || !SRGBColorSpace || !RGBAFormat || !UnsignedByteType) {
+        ({ NearestFilter, SRGBColorSpace, RGBAFormat, UnsignedByteType } = await import('three/src/constants'));
         drawImageWebglCache.NearestFilter = NearestFilter;
-        drawImageWebglCache.sRGBEncoding = sRGBEncoding;
+        drawImageWebglCache.SRGBColorSpace = SRGBColorSpace;
         drawImageWebglCache.RGBAFormat = RGBAFormat;
         drawImageWebglCache.UnsignedByteType = UnsignedByteType;
     }
@@ -256,7 +256,7 @@ async function setupThreejsRenderer(width: number, height: number) {
             powerPreference: 'high-performance',
         });
         threejsRenderer.setClearColor(0x000000, 0);
-        threejsRenderer.outputEncoding = sRGBEncoding;
+        threejsRenderer.outputColorSpace = SRGBColorSpace;
         drawImageWebglCache.threejsRenderer = threejsRenderer;
     }
     threejsRenderer.setSize(width, height, false);
@@ -291,7 +291,7 @@ async function setupThreejsRenderer(width: number, height: number) {
 
     return {
         done,
-        threejsCanvas, threejsRenderer, threejsScene, NearestFilter, sRGBEncoding, threejsCamera,
+        threejsCanvas, threejsRenderer, threejsScene, NearestFilter, SRGBColorSpace, threejsCamera,
         Mesh, ImagePlaneGeometry, MeshBasicMaterial, CanvasTexture, threejsRenderTarget,
         threejsRasterTextureCompositorShaderMaterial, threejsPrepareGpuTextureShaderMaterial,
     };
@@ -315,7 +315,7 @@ export function cleanDrawImageWebglCache() {
     drawImageWebglCache.threejsScene = undefined;
     drawImageWebglCache.threejsRasterTextureCompositorShaderMaterial = undefined;
     drawImageWebglCache.threejsPrepareGpuTextureShaderMaterial = undefined;
-    drawImageWebglCache.sRGBEncoding = undefined;
+    drawImageWebglCache.SRGBColorSpace = undefined;
     drawImageWebglCache.threejsCamera = undefined;
     drawImageWebglCache.Mesh = undefined;
     drawImageWebglCache.ImagePlaneGeometry = undefined;
@@ -357,20 +357,20 @@ export async function drawImageToCanvas2d(targetCanvas: HTMLCanvasElement, sourc
     sourceCroppedTargetCtx.drawImage(targetCanvas, -x, -y);
 
     let {
-        done, threejsCanvas, threejsRenderer, threejsScene, NearestFilter, sRGBEncoding, threejsCamera,
+        done, threejsCanvas, threejsRenderer, threejsScene, NearestFilter, SRGBColorSpace, threejsCamera,
         Mesh, ImagePlaneGeometry, CanvasTexture, threejsRasterTextureCompositorShaderMaterial,
     } = await setupThreejsRenderer(sourceImage.width, sourceImage.height);
 
     try {
         const targetImageTexture = new CanvasTexture(sourceCroppedTargetCanvas);
         targetImageTexture.generateMipmaps = false;
-        targetImageTexture.encoding = sRGBEncoding;
+        targetImageTexture.colorSpace = SRGBColorSpace;
         targetImageTexture.minFilter = NearestFilter;
         targetImageTexture.magFilter = NearestFilter;
 
         const sourceImageTexture = new CanvasTexture(sourceImage);
         sourceImageTexture.generateMipmaps = false;
-        sourceImageTexture.encoding = sRGBEncoding;
+        sourceImageTexture.colorSpace = SRGBColorSpace;
         sourceImageTexture.minFilter = NearestFilter;
         sourceImageTexture.magFilter = NearestFilter;
 
@@ -464,7 +464,7 @@ export async function createThreejsTextureFromImage(image: HTMLCanvasElement | I
     //         texture = new CanvasTexture(canvas);
     //         texture.premultiplyAlpha = false;
     //         texture.generateMipmaps = true;
-    //         texture.encoding = sRGBEncoding;
+    //         texture.colorSpace = SRGBColorSpace;
     //         texture.minFilter = LinearMipMapLinearFilter;
     //         texture.magFilter = NearestFilter;
     //         texture.needsUpdate = true;
@@ -503,7 +503,7 @@ export async function createThreejsTextureFromImage(image: HTMLCanvasElement | I
     //             try {
     //                 let imageTexture = new CanvasTexture(chunkImage);
     //                 imageTexture.generateMipmaps = false;
-    //                 imageTexture.encoding = sRGBEncoding;
+    //                 imageTexture.colorSpace = SRGBColorSpace;
     //                 imageTexture.minFilter = NearestFilter;
     //                 imageTexture.magFilter = NearestFilter;
 
@@ -540,7 +540,7 @@ export async function createThreejsTextureFromImage(image: HTMLCanvasElement | I
     //                 const chunkTexture = new CanvasTexture(chunkBitmap);
     //                 chunkTexture.premultiplyAlpha = false;
     //                 chunkTexture.generateMipmaps = true;
-    //                 chunkTexture.encoding = sRGBEncoding;
+    //                 chunkTexture.colorSpace = SRGBColorSpace;
     //                 chunkTexture.minFilter = LinearMipMapLinearFilter;
     //                 chunkTexture.magFilter = NearestFilter;
     //                 chunkTexture.needsUpdate = true;
@@ -550,7 +550,7 @@ export async function createThreejsTextureFromImage(image: HTMLCanvasElement | I
     //                     texture.userData.shouldDisposeBitmap = true;
     //                 } else {
     //                     // TODO - this copy just isn't working...
-    //                     threejsRenderer.copyTextureToTexture(new Vector2(x, y), chunkTexture, texture);
+    //                     threejsRenderer.copyTextureToTexture(chunkTexture, texture, null, new Vector2(x, y));
     //                     chunkBitmap.close();
     //                     chunkTexture.dispose();
     //                 }
@@ -567,13 +567,13 @@ export async function createThreejsTextureFromImage(image: HTMLCanvasElement | I
     //     return texture;        
     // }
 
-    const { LinearMipMapLinearFilter, LinearEncoding, sRGBEncoding, NearestFilter } = await import('three/src/constants');
+    const { LinearMipMapLinearFilter, SRGBColorSpace, NearestFilter } = await import('three/src/constants');
     const { CanvasTexture } = await import('three/src/textures/CanvasTexture');
 
     const texture = new CanvasTexture(preparedImage ?? image);
     texture.premultiplyAlpha = false;
     texture.generateMipmaps = true;
-    texture.encoding = sRGBEncoding;
+    texture.colorSpace = SRGBColorSpace;
     texture.minFilter = LinearMipMapLinearFilter;
     texture.magFilter = NearestFilter;
 

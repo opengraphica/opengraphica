@@ -199,7 +199,7 @@ import { Scene } from 'three/src/scenes/Scene';
 import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer';
 import { ImagePlaneGeometry } from '@/canvas/renderers/webgl/geometries/image-plane-geometry';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
-import { DoubleSide, NearestFilter, sRGBEncoding } from 'three/src/constants';
+import { DoubleSide, NearestFilter, SRGBColorSpace } from 'three/src/constants';
 import { Mesh } from 'three/src/objects/Mesh';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { Texture } from 'three/src/textures/Texture';
@@ -499,7 +499,7 @@ export default defineComponent({
                         () => reject()
                     );
                     beforeTexture.magFilter = NearestFilter;
-                    beforeTexture.encoding = sRGBEncoding;
+                    beforeTexture.colorSpace = SRGBColorSpace;
                 });
 
                 const combinedShaderResult = combineFiltersToShader(await createFiltersFromLayerConfig(beforeFilterConfigs), layer.value!);
@@ -509,7 +509,7 @@ export default defineComponent({
                 scene.add(mesh);
 
                 renderer.setSize(width, height, false);
-                renderer.outputEncoding = sRGBEncoding;
+                renderer.outputColorSpace = SRGBColorSpace;
 
                 camera = new OrthographicCamera(-1, 1, 1, -1, 1, 10000);
                 camera.position.z = 1;
@@ -569,7 +569,7 @@ export default defineComponent({
                     () => reject()
                 );
                 previewTexture.magFilter = NearestFilter;
-                previewTexture.encoding = sRGBEncoding;
+                previewTexture.colorSpace = SRGBColorSpace;
             });
 
             const combinedShaderResult = combineFiltersToShader([currentFilter.value], layer.value!);
@@ -579,7 +579,7 @@ export default defineComponent({
             threejsScene.add(previewMesh);
 
             threejsRenderer.setSize(width, height, false);
-            threejsRenderer.outputEncoding = sRGBEncoding;
+            threejsRenderer.outputColorSpace = SRGBColorSpace;
 
             threejsCamera = new OrthographicCamera(-1, 1, 1, -1, 1, 10000);
             threejsCamera.position.z = 1;

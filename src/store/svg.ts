@@ -46,7 +46,7 @@ export function getStoredSvgImage(uuid?: string): HTMLImageElement | null {
 /**
  * Synchronously retrieves the data URL representation of the SVG, for exporting.
  */
- export function getStoredSvgDataUrl(uuid?: string): string | null {
+export function getStoredSvgDataUrl(uuid?: string): string | null {
     const storedSvg = svgUuidMap.get(uuid);
     return storedSvg?.sourceDataUrl ?? null;
 }
@@ -56,7 +56,7 @@ export function getStoredSvgImage(uuid?: string): HTMLImageElement | null {
  * Releases the stored svg from memory, and from the database.
  * @param uuid - ID of the database entry for the svg
  */
- export async function deleteStoredSvg(uuid: string) {
+export async function deleteStoredSvg(uuid: string) {
     const storedSvg = svgUuidMap.get(uuid);
     if (!storedSvg) return;
     svgUuidMap.delete(uuid);
@@ -73,7 +73,7 @@ export function getStoredSvgImage(uuid?: string): HTMLImageElement | null {
  * Adds to the user count of the stored svg, preventing its deletion.
  * @param uuid - ID of the database entry for the svg
  */
- export function reserveStoredSvg(uuid: string, userId: string) {
+export function reserveStoredSvg(uuid: string, userId: string) {
     let users = svgUserUuidMap.get(uuid) ?? new Set<string>();
     users.add(userId);
     svgUserUuidMap.set(uuid, users);

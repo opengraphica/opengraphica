@@ -23,5 +23,5 @@ void main() {
         a.a + b.a * (1.0 - a.a)
     );
 
-    #include <encodings_fragment>
+    #include <colorspace_fragment>
 }

@@ -9,6 +9,7 @@ import RasterLayerRenderer2d from './2d/raster';
 import RasterSequenceLayerRenderer2d from './2d/raster-sequence';
 import TextLayerRenderer2d from './2d/text';
 import VectorLayerRenderer2d from './2d/vector';
+import VideoLayerRenderer2d from './2d/video';
 
 import BaseLayerRendererWebgl from './webgl/base';
 import GradientLayerRendererWebgl from './webgl/gradient';
@@ -17,6 +18,7 @@ import RasterLayerRendererWebgl from './webgl/raster';
 import RasterSequenceLayerRendererWebgl from './webgl/raster-sequence';
 import TextLayerRendererWebgl from './webgl/text';
 import VectorLayerRendererWebgl from './webgl/vector';
+import VideoLayerRendererWebgl from './webgl/video';
 import { queueRefreshLayerPasses } from './webgl/postprocessing/create-layer-passes';
 
 type ClassOfInterface<I, Args extends any[] = any[]> = new(...args: Args) => I;
@@ -36,6 +38,7 @@ const renderers: Renderers = {
         raster: RasterLayerRenderer2d,
         rasterSequence: RasterSequenceLayerRenderer2d,
         text: TextLayerRenderer2d,
+        video: VideoLayerRenderer2d,
         vector: VectorLayerRenderer2d,
     },
     webgl: {
@@ -47,6 +50,7 @@ const renderers: Renderers = {
         rasterSequence: RasterSequenceLayerRendererWebgl,
         text: TextLayerRendererWebgl,
         vector: VectorLayerRendererWebgl,
+        video: VideoLayerRendererWebgl,
     }
 };
 
@@ -70,11 +74,14 @@ export function assignLayerRenderer(layer: WorkingFileAnyLayer<ColorModel>) {
         case 'rasterSequence':
             layer.renderer = markRaw(new renderers[renderer].rasterSequence());
             break;
+        case 'text':
+            layer.renderer = markRaw(new renderers[renderer].text());
+            break;
         case 'vector':
             layer.renderer = markRaw(new renderers[renderer].vector());
             break;
-        case 'text':
-            layer.renderer = markRaw(new renderers[renderer].text());
+        case 'video':
+            layer.renderer = markRaw(new renderers[renderer].video());
             break;
         default:
             (layer as WorkingFileLayer).renderer = markRaw(new renderers[renderer].base());

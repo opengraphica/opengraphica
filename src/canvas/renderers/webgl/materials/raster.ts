@@ -7,8 +7,14 @@ import rasterMaterialFragmentShaderMain from '@/canvas/renderers/webgl/shaders/r
 import type { Texture } from 'three/src/textures/Texture';
 import type { MaterialWrapperSetup } from './material-factory';
 
+export enum ColorSpaceConversion {
+    'none' = 0,
+    'srgbToLinearSrgb' = 1,
+}
+
 export interface RasterMaterialUpdateParams {
     srcTexture?: Texture;
+    colorSpaceConversion?: ColorSpaceConversion;
 }
 
 export const rasterMaterialSetup: MaterialWrapperSetup = {
@@ -18,6 +24,7 @@ export const rasterMaterialSetup: MaterialWrapperSetup = {
     fragmentShaderMain: rasterMaterialFragmentShaderMain,
 
     init(material, params: RasterMaterialUpdateParams) {
+        material.defines.cColorSpaceConversion = params.colorSpaceConversion ?? 0;
         material.uniforms.srcTexture = {
             value: params.srcTexture,
         };

@@ -88,6 +88,13 @@ export interface SerializedFileVectorLayer<T extends ColorModel = ColorModel> ex
     }
 }
 
+export interface SerializedFileVideoLayer<T extends ColorModel = ColorModel> extends SerializedFileLayer<T> {
+    type: 'video';
+    data: {
+        sourceVideoSerialized?: string;
+    }
+}
+
 export interface SerializedFileTextLayer<T extends ColorModel = ColorModel> extends SerializedFileLayer<T> {
     type: 'text';
     data: TextDocument;
