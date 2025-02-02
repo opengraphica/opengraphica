@@ -8,6 +8,25 @@
                 xmlns="http://www.w3.org/2000/svg">
                 <path :d="svgPathDraw" stroke="#333333" :stroke-width="svgPathStrokeWidth" fill="transparent"/>
                 <path :d="svgPathDraw" stroke="white" :stroke-width="svgPathStrokeWidth * .8" :stroke-dasharray="svgPathStrokeWidth * 2" fill="transparent"/>
+                <template v-if="isDrawingSelection">
+                    <text
+                        text-anchor="middle"
+                        dominant-baseline="hanging"
+                        font-size="14"
+                        stroke="white"
+                        stroke-width="3"
+                        :x="transformedActiveSelectionPathDimensionsPosition.x"
+                        :y="transformedActiveSelectionPathDimensionsPosition.y"
+                    >{{ activeSelectionPathDimensionsText }}</text>
+                    <text
+                        text-anchor="middle"
+                        dominant-baseline="hanging"
+                        font-size="14"
+                        fill="black"
+                        :x="transformedActiveSelectionPathDimensionsPosition.x"
+                        :y="transformedActiveSelectionPathDimensionsPosition.y"
+                    >{{ activeSelectionPathDimensionsText }}</text>
+                </template>
                 <template v-if="!isDrawingSelection">
                     <template v-for="(point, i) in transformedactiveSelectionPath" :key="i + '_' + point.x + '_' + point.y">
                         <template v-if="point.type === 'line'">
@@ -35,18 +54,21 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, watch, onMounted, onUnmounted, toRefs } from 'vue';
+
+import { convertUnits } from '@/lib/metrics';
+
 import { isDrawingSelection, activeSelectionPath, SelectionPathPoint } from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
-import workingFileStore from '@/store/working-file';
-import { decomposeMatrix } from '@/lib/dom-matrix';
+import workingFileStore, { type WorkingFileState } from '@/store/working-file';
 
 export default defineComponent({
     name: 'CanvasOverlaySelection',
-    setup(props, { emit }) {
+    setup() {
         const devicePixelRatio = window.devicePixelRatio || 1;
 
         const { transform, viewWidth, viewHeight, viewDirty } = toRefs(canvasStore.state);
-        const { selectedLayerIds } = toRefs(workingFileStore.state);
+        const { measuringUnits, resolutionX, resolutionY, resolutionUnits, selectedLayerIds } = toRefs(workingFileStore.state);
+
         const selectionContainer = ref<HTMLDivElement>(null as any);
         const dragHandleHighlightColor: string = '#ecf5ff';
         const dragHandleHighlightBorderColor: string= '#b3d8ff';
@@ -71,10 +93,29 @@ export default defineComponent({
         });
         
         let transformedactiveSelectionPath = ref<SelectionPathPoint[]>([]);
+        let activeSelectionPathPixelWidth = ref(0);
+        let activeSelectionPathPixelHeight = ref(0);
+        let transformedActiveSelectionPathDimensionsPosition = ref({ x: 0, y: 0 });
         watch([activeSelectionPath, viewDirty], () => {
             transformedactiveSelectionPath.value = [];
+            let left = Infinity;
+            let right = -Infinity;
+            let top = Infinity;
+            let bottom = -Infinity;
+            let xfLeft = Infinity;
+            let xfRight = -Infinity;
+            let xfTop = Infinity;
+            let xfBottom = -Infinity;
             for (const pathPoint of activeSelectionPath.value) {
+                if (pathPoint.x < left) left = pathPoint.x;
+                if (pathPoint.x > right) right = pathPoint.x;
+                if (pathPoint.y < top) top = pathPoint.y;
+                if (pathPoint.y > bottom) bottom = pathPoint.y;
                 const position = new DOMPoint(pathPoint.x, pathPoint.y).matrixTransform(transform.value);
+                if (position.x < xfLeft) xfLeft = position.x;
+                if (position.x > xfRight) xfRight = position.x;
+                if (position.y < xfTop) xfTop = position.y;
+                if (position.y > xfBottom) xfBottom = position.y;
                 let startHandle = position;
                 let endHandle = position;
                 if (pathPoint.type === 'bezierCurve') {
@@ -91,6 +132,12 @@ export default defineComponent({
                     ehy: endHandle.y / devicePixelRatio
                 });
             }
+            transformedActiveSelectionPathDimensionsPosition.value = new DOMPoint(
+                (xfLeft + (xfRight - xfLeft) / 2) / devicePixelRatio,
+                ((xfBottom) / devicePixelRatio) + 10,
+            );
+            activeSelectionPathPixelWidth.value = right - left;
+            activeSelectionPathPixelHeight.value = bottom - top;
         });
 
         const activeSelectionPathEditorShape = computed<string>(() => {
@@ -116,6 +163,14 @@ export default defineComponent({
             return draw;
         });
 
+        const activeSelectionPathDimensionsText = computed<string | undefined>(() => {
+            if (activeSelectionPathEditorShape.value === 'rectangle') {
+                const width = parseFloat(convertUnits(activeSelectionPathPixelWidth.value, 'px', measuringUnits.value, resolutionX.value, resolutionUnits.value).toFixed(2));
+                const height = parseFloat(convertUnits(activeSelectionPathPixelHeight.value, 'px', measuringUnits.value, resolutionY.value, resolutionUnits.value).toFixed(2));
+                return `${width}×${height}${measuringUnits.value}`;
+            }
+        });
+
         onMounted(() => {
         });
 
@@ -125,14 +180,20 @@ export default defineComponent({
         return {
             isDrawingSelection,
             activeSelectionPathEditorShape,
+
+            activeSelectionPathDimensionsText,
+            transformedActiveSelectionPathDimensionsPosition,
             transformedactiveSelectionPath,
+
             selectedLayerIds,
             selectionContainer,
+
             svgPathDraw,
             svgPathStrokeWidth,
             svgHandleWidth,
             svgBoundsWidth,
             svgBoundsHeight,
+
             zoom,
             dragHandleHighlightColor,
             dragHandleHighlightBorderColor
