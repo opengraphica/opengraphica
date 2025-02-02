@@ -13,16 +13,17 @@
                         text-anchor="middle"
                         dominant-baseline="hanging"
                         font-size="14"
-                        stroke="white"
-                        stroke-width="3"
-                        :x="transformedActiveSelectionPathDimensionsPosition.x"
-                        :y="transformedActiveSelectionPathDimensionsPosition.y"
+                        font-weight="bold"
+                        fill="black"
+                        :x="transformedActiveSelectionPathDimensionsPosition.x + 1"
+                        :y="transformedActiveSelectionPathDimensionsPosition.y + 1"
                     >{{ activeSelectionPathDimensionsText }}</text>
                     <text
                         text-anchor="middle"
                         dominant-baseline="hanging"
                         font-size="14"
-                        fill="black"
+                        font-weight="bold"
+                        fill="white"
                         :x="transformedActiveSelectionPathDimensionsPosition.x"
                         :y="transformedActiveSelectionPathDimensionsPosition.y"
                     >{{ activeSelectionPathDimensionsText }}</text>
@@ -167,7 +168,7 @@ export default defineComponent({
             if (activeSelectionPathEditorShape.value === 'rectangle') {
                 const width = parseFloat(convertUnits(activeSelectionPathPixelWidth.value, 'px', measuringUnits.value, resolutionX.value, resolutionUnits.value).toFixed(2));
                 const height = parseFloat(convertUnits(activeSelectionPathPixelHeight.value, 'px', measuringUnits.value, resolutionY.value, resolutionUnits.value).toFixed(2));
-                return `${width}×${height}${measuringUnits.value}`;
+                return `${width}×${height} ${measuringUnits.value}`;
             }
         });
 
