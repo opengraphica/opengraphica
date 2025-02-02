@@ -99,6 +99,12 @@
             "moveEffectUp": "Move Effect Up",
             "moveEffectDown": "Move Effect Down"
         },
+        "renderer": {
+            "initializeFailed": {
+                "title": "Setup Failed",
+                "message": "OpenGraphica relies on some basic web functionality that does not exist in your browser. Please update your web browser, or switch to a modern one like Chrome, Firefox, Safari, or Edge."
+            }
+        },
         "wait": {
             "applyLayerTransform": "Applying Layer Transform",
             "loadingImage": "Loading Image",

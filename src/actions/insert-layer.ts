@@ -63,6 +63,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                 bakedImage: null,
                 blendingMode: 'normal',
                 drafts: null,
+                draftDrawables: null,
                 filters: [],
                 id: layerId,
                 groupId: null,

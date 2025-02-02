@@ -249,7 +249,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         const { width, height } = workingFileStore.state;
         let selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster' || layer.type === 'empty');
         let layerActions = [];
-        // Insert gradient layer if none selected
+        // Insert raster layer if none selected
         if (selectedLayers.length === 0) {
             layerActions.push(new InsertLayerAction<InsertRasterLayerOptions>({
                 type: 'raster',

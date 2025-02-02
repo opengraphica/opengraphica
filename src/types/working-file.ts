@@ -125,10 +125,20 @@ export interface WorkingFileLayerDraft {
     width: number; // The actual width drawn across the canvas
 }
 
+export interface WorkingFileLayerDraftDrawable {
+    type: string,
+    left: number;
+    right: number;
+    top: number;
+    bottom: number;
+    data: Record<string, any>;
+}
+
 export interface WorkingFileLayer<T extends ColorModel = ColorModel> {
     bakedImage: HTMLImageElement | null;
     blendingMode: WorkingFileLayerBlendingMode;
     drafts: WorkingFileLayerDraft[] | null;
+    draftDrawables: WorkingFileLayerDraftDrawable[] | null;
     filters: WorkingFileLayerFilter<T>[];
     groupId: number | null;
     height: number;
