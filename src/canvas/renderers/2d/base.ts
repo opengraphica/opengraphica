@@ -142,4 +142,8 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
     onRenderGroup(renderer: WebGLRenderer, camera: Camera, layer: WorkingFileGroupLayer<ColorModel>) {
         // Override
     }
+
+    onContextRestored(renderer: WebGLRenderer) {
+        // Override
+    }
 }

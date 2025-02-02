@@ -7,9 +7,11 @@
                     :is-dialog="isDialog"
                     :dialog-opened="dialogOpened"
                     v-bind:="props"
-                    @update:dialogSize="onSetDialogSize($event)"
-                    @update:title="onSetTitle($event)"
-                    @close="onCloseModule($event)"
+                    @update:dialogSize="onSetDialogSize"
+                    @update:title="onSetTitle"
+                    @hide="onHideModule"
+                    @show="onShowModule"
+                    @close="onCloseModule"
                 />
             </template>
             <template #fallback>
@@ -62,9 +64,19 @@ export default defineComponent({
     emits: [
         'update:title',
         'update:dialogSize',
+        'hide',
+        'show',
         'close'
     ],
     setup(props, { emit }) {
+
+        function onHideModule() {
+            emit('hide');
+        }
+
+        function onShowModule() {
+            emit('show');
+        }
 
         function onCloseModule() {
             emit('close', ...arguments);
@@ -79,6 +91,8 @@ export default defineComponent({
         }
 
         return {
+            onHideModule,
+            onShowModule,
             onCloseModule,
             onSetDialogSize,
             onSetTitle

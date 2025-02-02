@@ -23,6 +23,7 @@ import appEmitter from '@/lib/emitter';
 
 import type { Scene } from 'three';
 import type { WorkingFileVideoLayer, WorkingFileLayerBlendingMode, ColorModel } from '@/types';
+import { WebGLRenderer } from 'three/src/Three';
 
 const epsilon = 0.000001;
 
@@ -176,6 +177,9 @@ export default class VideoLayerRenderer extends BaseLayerRenderer {
         this.stopWatchData?.();
     }
 
+    onContextRestored(renderer: WebGLRenderer): void {
+    }
+
     private readBufferTextureUpdate(texture?: Texture) {
         if (!this.materialWrapper) return;
         this.materialWrapper.material.uniforms.dstTexture.value = texture;
@@ -188,22 +192,24 @@ export default class VideoLayerRenderer extends BaseLayerRenderer {
             let newSourceTexture = new VideoTexture(sourceVideo);
             newSourceTexture.colorSpace = SRGBColorSpace;
             this.disposeSourceTexture();
-            if (this.plane) {
-                this.sourceTexture = newSourceTexture;
+            this.sourceTexture = newSourceTexture;
 
-                this.sourceTexture.needsUpdate = true;
-                if (this.materialWrapper) {
-                    this.materialWrapper = this.materialWrapper.update({ srcTexture: this.sourceTexture });
-                    this.plane.material = this.materialWrapper.material;
-                }
-                canvasStore.set('dirty', true);
-            } else {
-                newSourceTexture.dispose();
+            this.sourceTexture.needsUpdate = true;
+            if (this.materialWrapper) {
+                this.materialWrapper = this.materialWrapper.update({
+                    srcTexture: this.sourceTexture,
+                    colorSpaceConversion: ColorSpaceConversion.srgbToLinearSrgb,
+                });
+                this.plane.material = this.materialWrapper.material;
             }
+            canvasStore.set('dirty', true);
         } else {
             this.disposeSourceTexture();
             if (this.materialWrapper) {
-                this.materialWrapper = this.materialWrapper.update({ srcTexture: undefined });
+                this.materialWrapper = this.materialWrapper.update({
+                    srcTexture: undefined,
+                    colorSpaceConversion: ColorSpaceConversion.srgbToLinearSrgb,
+                });
                 if (this.plane) {
                     this.plane.material = this.materialWrapper!.material;
                 }

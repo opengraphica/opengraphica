@@ -1065,6 +1065,9 @@
             "brushSize": "Size",
             "newBrushLayerName": "New Paint"
         },
+        "drawColorPicker": {
+            "title": "Color Picker"
+        },
         "drawGradient": {
             "editingGradient": "Editing Gradient",
             "newGradientLayerName": "New Gradient",

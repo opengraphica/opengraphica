@@ -74,6 +74,7 @@ export interface WorkingFileLayerRenderer<T extends ColorModel = ColorModel> {
     ): void;
     renderGroup(renderer: WebGLRenderer, camera: Camera, layer: WorkingFileGroupLayer<ColorModel>): void;
     onRenderGroup(renderer: WebGLRenderer, camera: Camera, layer: WorkingFileGroupLayer<ColorModel>): void;
+    onContextRestored(renderer: WebGLRenderer): void;
 }
 export declare var WorkingFileLayerRenderer: {
     new (layer: WorkingFileLayer<ColorModel>): void;

@@ -23,6 +23,7 @@ import { CreateFileAction } from '@/actions/create-file';
 import { InsertLayerAction } from '@/actions/insert-layer';
 
 import { knownFileExtensions } from '@/lib/regex';
+import { createBlobFromDataUri } from '@/lib/binary';
 import appEmitter from '@/lib/emitter';
 
 import type {
@@ -706,7 +707,9 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
                     image!.onerror = () => {
                         resolve();
                     };
-                    image!.src = serializedLayer.data.sourceSvgSerialized!;
+                    image!.src = URL.createObjectURL(
+                        createBlobFromDataUri(serializedLayer.data.sourceSvgSerialized!)
+                    );
                 });
             }
             parsedLayer = {
@@ -724,13 +727,28 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
                 video = document.createElement('video');
                 await new Promise<void>((resolve) => {
                     video!.addEventListener('loadeddata', () => {
-                        resolve();
-                    });
+                        let hasResolved = false;
+                        video!.addEventListener('playing', () => {
+                            video!.pause();
+                            video!.currentTime = 0;
+                            if (!hasResolved) {
+                                clearTimeout(playStartTimeout);
+                                resolve();
+                            }
+                        }, { once: true });
+                        video!.play();
+                        let playStartTimeout = setTimeout(() => {
+                            hasResolved = true;
+                            resolve();
+                        }, 1000);
+                    }, { once: true });
                     video!.addEventListener('error', (error) => {
                         console.log(error);
                         resolve();
-                    });
-                    video!.src = serializedLayer.data.sourceVideoSerialized!;
+                    }, { once: true });
+                    video!.src = URL.createObjectURL(
+                        createBlobFromDataUri(serializedLayer.data.sourceVideoSerialized!)
+                    );
                 });
             }
             parsedLayer = {

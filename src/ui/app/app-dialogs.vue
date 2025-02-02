@@ -10,7 +10,7 @@
                             'el-dialog--ogr-' + dialog.type,
                         ]"
                         v-model="dialog.visible"
-                        destroy-on-close
+                        :destroy-on-close="!dialog.temporarilyHidden"
                         @closed="onDialogClosed(dialog)"
                         @opened="dialog.opened = true"
                     >
@@ -23,6 +23,8 @@
                                 @update:title="dialog.title = $event"
                                 @update:dialogSize="dialog.size = $event"
                                 @update:loading="loading = $event"
+                                @hide="onHideDialog(dialog, $event)"
+                                @show="onShowDialog(dialog, $event)"
                                 @close="onCloseDialog(dialog, $event)"
                             />
                         </template>
@@ -34,6 +36,8 @@
                                 :props="dialog.props"
                                 @update:title="dialog.title = $event"
                                 @update:dialogSize="dialog.size = $event"
+                                @hide="onHideDialog(dialog, $event)"
+                                @show="onShowDialog(dialog, $event)"
                                 @close="onCloseDialog(dialog, $event)"
                             />
                         </template>
@@ -59,6 +63,7 @@ interface DialogCommonDefinition {
     title: string;
     visible: boolean;
     opened: boolean;
+    temporarilyHidden: boolean;
     size: 'small' | 'medium' | 'large' | 'big';
     props?: any;
     onClose?: (event: any) => void;
@@ -111,6 +116,7 @@ export default defineComponent({
                     title: '',
                     visible: true,
                     opened: false,
+                    temporarilyHidden: false,
                     dock: event,
                     size: 'medium',
                     props: event.props,
@@ -127,12 +133,23 @@ export default defineComponent({
                     title: '',
                     visible: true,
                     opened: false,
+                    temporarilyHidden: false,
                     module: event,
                     size: 'medium',
                     props: event.props,
                     onClose: event.onClose
                 });
             }
+        }
+
+        function onHideDialog(dialog: DialogDefinition, event?: any) {
+            dialog.temporarilyHidden = true;
+            dialog.visible = false;
+        }
+
+        function onShowDialog(dialog: DialogDefinition, event?: any) {
+            dialog.temporarilyHidden = false;
+            dialog.visible = true;
         }
 
         function onCloseDialog(dialog: DialogDefinition, event?: any) {
@@ -153,6 +170,7 @@ export default defineComponent({
         }
 
         function onDialogClosed(dialog: DialogDefinition) {
+            if (dialog.temporarilyHidden) return;
             if (!dialog.closeEventData && dialog.onClose) {
                 dialog.onClose(dialog.closeEventData);
             }
@@ -162,6 +180,8 @@ export default defineComponent({
         return {
             loading,
             dialogs,
+            onHideDialog,
+            onShowDialog,
             onCloseDialog,
             onDialogClosed
         };

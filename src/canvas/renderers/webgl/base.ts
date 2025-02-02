@@ -310,6 +310,10 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
         // Override
     }
 
+    onContextRestored(renderer: WebGLRenderer) {
+        // Override
+    }
+
     private async applyDraftUpdateChunks(renderer: WebGLRenderer, draftUuid: string) {
         const draftAssets = this.draftAssetMap.get(draftUuid);
         if (!draftAssets) return;

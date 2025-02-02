@@ -185,7 +185,11 @@ const store = new PerformantStore<EditorStore>({
                 const activeGroup = store.get('activeToolGroup');
                 const toolGroupLastActivatedTool = store.get('toolGroupLastActivatedTool');
                 if (!tool) {
-                    activeTool = toolGroupLastActivatedTool[group] ?? Object.keys(toolGroups[group]?.tools || [])[0];
+                    const firstToolInGroup = Object.keys(toolGroups[group]?.tools || [])[0];
+                    activeTool = toolGroupLastActivatedTool[group] ?? firstToolInGroup;
+                    if (activeTool && toolGroups[`${group}`]?.tools[activeTool]?.toolbar?.exclusive) {
+                        activeTool = firstToolInGroup;
+                    }
                 }
                 if (group !== activeGroup || activeTool !== store.get('activeTool')) {
                     const toolDefinition = toolGroups[group]?.tools[activeTool ?? ''];

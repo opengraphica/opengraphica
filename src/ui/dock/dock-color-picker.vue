@@ -29,20 +29,27 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUnmounted, ref, toRef, watch, PropType } from 'vue';
+import { defineComponent, nextTick, onMounted, onUnmounted, ref, toRef, watch, PropType } from 'vue';
+
 import ElButton from 'element-plus/lib/components/button/index';
 import ElDivider from 'element-plus/lib/components/divider/index';
 import ElInput from 'element-plus/lib/components/input/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
 import ElTooltip from 'element-plus/lib/components/tooltip/index';
+
 import AppColorPickerGradient from '@/ui/app/app-color-picker-gradient.vue';
+
 import { isWorkerSupported } from '@/lib/feature-detection/worker';
 import { colorToRgba, colorToHex, hexToColor, getColorModelName } from '@/lib/color';
 import { throttle } from '@/lib/timing';
+
 import { createColorNamer, getColorName, destroyColorNamer } from '@/workers/color-namer.interface';
-import { runModule } from '@/modules';
+
 import colorNamer from 'color-namer';
+
+import editorStore from '@/store/editor';
+import { pickedColor, drawColorPickerEmitter } from '@/canvas/store/draw-color-picker-state';
 
 import type { ColorModel, ColorModelName, RGBAColor } from '@/types';
 
@@ -70,6 +77,8 @@ export default defineComponent({
         }
     },
     emits: [
+        'hide',
+        'show',
         'close',
         'update:title',
         'update:loading',
@@ -130,7 +139,27 @@ export default defineComponent({
         }
 
         function onPickColorFromImage() {
-            runModule('tmp', 'notYetImplemented');
+            emit('hide');
+            editorStore.dispatch('setActiveTool', { group: 'draw', tool: 'colorPicker' });
+
+            function onColorPickerClose() {
+                pickedColorUnwatch();
+                drawColorPickerEmitter.off('close', onColorPickerClose);
+                emit('show');
+            }
+
+            const pickedColorUnwatch = watch(() => pickedColor.value, (pickedColor) => {
+                pickedColorUnwatch();
+                drawColorPickerEmitter.off('close', onColorPickerClose);
+                if (pickedColor) {
+                    workingColor.value = { ...pickedColor };
+                }
+                nextTick(() => {
+                    emit('show');
+                });
+            });
+
+            drawColorPickerEmitter.on('close', onColorPickerClose);
         }
 
         function onCancel() {

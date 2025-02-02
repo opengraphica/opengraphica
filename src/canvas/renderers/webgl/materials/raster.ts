@@ -34,9 +34,15 @@ export const rasterMaterialSetup: MaterialWrapperSetup = {
     },
 
     update(material, params: RasterMaterialUpdateParams) {
+        let needsNewMaterial = false;
+        const colorSpaceConversion = params.colorSpaceConversion ?? 0;
+        if (colorSpaceConversion !== material.defines.cColorSpaceConversion) {
+            material.defines.cColorSpaceConversion = colorSpaceConversion;
+            needsNewMaterial = true;
+        }
         material.uniforms.srcTexture.value = params.srcTexture;
         material.needsUpdate = true;
-        return false;
+        return needsNewMaterial;
     },
 
     dispose() {

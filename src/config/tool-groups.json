@@ -34,6 +34,14 @@
                 "overlays": [
                     "draw-gradient"
                 ]
+            },
+            "colorPicker": {
+                "controller": "draw-color-picker",
+                "toolbar": {
+                    "exclusive": true,
+                    "position": "top",
+                    "target": "draw-color-picker"
+                }
             }
         }
     },

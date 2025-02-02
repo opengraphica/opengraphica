@@ -15,6 +15,8 @@
                     :is-dialog="isDialog"
                     :dialog-opened="dialogOpened"
                     v-bind:="props"
+                    @hide="onHideDock"
+                    @show="onShowDock"
                     @close="onCloseDock"
                     @update:dialogSize="onUpdateDialogSize"
                     @update:title="onUpdateTitle"
@@ -41,6 +43,8 @@ export default defineComponent({
         'settings': defineAsyncComponent(() => import(/* webpackChunkName: 'dock-settings' */ `./dock-settings.vue`))
     },
     emits: [
+        'hide',
+        'show',
         'close',
         'update:dialogSize',
         'update:title',
@@ -82,6 +86,14 @@ export default defineComponent({
 
         const languageOverride = computed(() => preferencesStore.state.languageOverride);
 
+        function onHideDock() {
+            emit('hide');
+        }
+
+        function onShowDock() {
+            emit('show');
+        }
+
         function onCloseDock() {
             emit('close', ...arguments);
         }
@@ -109,6 +121,8 @@ export default defineComponent({
             componentLoadingState,
             componentSuspsenseUpdate,
 
+            onHideDock,
+            onShowDock,
             onCloseDock,
             onUpdateDialogSize,
             onUpdateTitle,

@@ -499,6 +499,12 @@ export default defineComponent({
             canvasStore.set('renderer', 'webgl');
             updateThreejsImageSize(imageWidth.value, imageHeight.value, viewportWidth.value, viewportHeight.value);
 
+            canvas.value?.addEventListener('webglcontextrestored', () => {
+                for (const layer of workingFileStore.state.layers) {
+                    layer.renderer.onContextRestored(threejsRenderer);
+                }
+            });
+
             // Assign new render function
             renderMainCanvas = () => {
                 let cameraTransform: DOMMatrix;
