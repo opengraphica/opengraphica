@@ -176,7 +176,7 @@ export function useThreejsViewport(options: ThreejsViewportOptions) {
         workingFileStore.state.height,
         canvasStore.state.viewWidth,
         canvasStore.state.viewHeight
-    ], async ([imageWidth, imageHeight, viewWidth, viewHeight]) => {
+    ], async ([imageWidth, imageHeight, viewWidth, viewHeight], [oldImageWidth, oldImageHeight]) => {
         updateThreejsImageSize(
             imageWidth,
             imageHeight,
@@ -192,6 +192,10 @@ export function useThreejsViewport(options: ThreejsViewportOptions) {
             threejsBackground.geometry = new PlaneGeometry(imageWidth, imageHeight);
             threejsBackground.position.x = imageWidth / 2;
             threejsBackground.position.y = imageHeight / 2;
+        }
+
+        if (imageWidth != oldImageWidth || imageHeight != oldImageHeight) {
+            updateThreejsCanvasMargin(imageWidth, imageHeight);
         }
     });
 

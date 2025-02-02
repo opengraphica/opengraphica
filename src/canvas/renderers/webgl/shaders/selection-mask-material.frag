@@ -29,7 +29,7 @@ void main() {
     selectedColor.a *= step(localUV.y, 1.0);
     selectedColor.a *= step(0.0, localUV.y);
 
-    unselectedColor.a -= selectedColor.a;
+    unselectedColor.a = max(unselectedColor.a - selectedColor.a, 0.0);
 
     gl_FragColor = unselectedColor;
 
