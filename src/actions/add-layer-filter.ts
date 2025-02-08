@@ -45,11 +45,8 @@ export class AddLayerFilterAction extends BaseAction {
         let layerFilter = { ...this.layerFilter };
 
         if (this.createdMaskImageUuid || (this.selectionMask && this.selectionMaskCanvasOffset)) {
-            let maskImageUuid;
-            if (this.createdMaskImageUuid) {
-                maskImageUuid = this.createdMaskImageUuid;
-            } else {
-                maskImageUuid = await createStoredImage(
+            if (!this.createdMaskImageUuid) {
+                this.createdMaskImageUuid = await createStoredImage(
                     await resampleSelectionMaskInLayerBounds(
                         this.selectionMask!,
                         this.selectionMaskCanvasOffset,
@@ -58,12 +55,12 @@ export class AddLayerFilterAction extends BaseAction {
                     )
                 );
                 this.selectionMask = null;
-                reserveStoredImage(maskImageUuid, `${this.layerId}`);
+                reserveStoredImage(this.createdMaskImageUuid, `${this.layerId}`);
             }
-            const storedMaskImage = getStoredImageOrCanvas(maskImageUuid);
+            const storedMaskImage = getStoredImageOrCanvas(this.createdMaskImageUuid);
             if (storedMaskImage) {
                 const mask: WorkingFileLayerMask = {
-                    sourceUuid: maskImageUuid,
+                    sourceUuid: this.createdMaskImageUuid,
                     offset: new DOMPoint(0, 0),
                     hash: await generateImageHash(storedMaskImage),
                 };
