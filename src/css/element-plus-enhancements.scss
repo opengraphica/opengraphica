@@ -192,7 +192,17 @@
         background-image: url("../images/transparency-bg.png");
     }
 
+    .el-overlay-dialog {
+        display: flex;
+        align-items: center;
+
+        @media screen and (max-width: 600px) {
+            align-items: flex-start;
+        }
+    }
+
     .el-dialog {
+        --el-dialog-margin-top: 2.5rem;
         --el-dialog-border-radius: 0.875rem;
 
         &.el-dialog--ogr-dock {

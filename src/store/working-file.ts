@@ -1,5 +1,6 @@
 import { PerformantStore } from './performant-store';
 import appEmitter from '@/lib/emitter';
+import { deleteStoredImage } from '@/store/image';
 
 import type {
     ColorModel, FileSystemFileHandle, MeasuringUnits, ResolutionUnits, ColorModelName,
@@ -269,6 +270,50 @@ function regenerateLayerThumbnail(layer: WorkingFileAnyLayer<ColorModel>) {
     }
 }
 
+function isMaskIdUsed(maskId: number, parentLayers?: WorkingFileLayer<ColorModel>[]) {
+    let layers: WorkingFileLayer<ColorModel>[] | undefined = parentLayers ?? store.get('layers');
+    if (layers != null) {
+        for (const layer of layers) {
+            if (layer.type === 'group') {
+                if (isMaskIdUsed(maskId, (layer as WorkingFileGroupLayer).layers)) {
+                    return true;
+                }
+            }
+            for (const filter of layer.filters) {
+                if (filter.maskId === maskId) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+function discardMaskIfUnused(maskId?: number) {
+    if (maskId == null) return;
+    if (!isMaskIdUsed(maskId)) {
+        const masks = store.get('masks');
+        const mask = masks[maskId];
+        delete masks[maskId];
+        if (
+            Object.keys(masks).findIndex((value) => {
+                const checkMaskId = parseInt(value);
+                return masks[checkMaskId].sourceUuid === mask.sourceUuid;
+            }) == -1
+        ) {
+            deleteStoredImage(mask.sourceUuid);
+        }
+        store.set('masks', masks);
+    }
+}
+
+function discardAllUnusedMasks() {
+    const maskIds = Object.keys(store.get('masks')).map(key => parseInt(key));
+    for (const maskId of maskIds) {
+        discardMaskIfUnused(maskId);
+    }
+}
+
 export default store;
 
 export {
@@ -286,5 +331,7 @@ export {
     getSelectedLayers,
     getTimelineById,
     ensureUniqueLayerSiblingName,
-    regenerateLayerThumbnail
+    regenerateLayerThumbnail,
+    discardMaskIfUnused,
+    discardAllUnusedMasks,
 };

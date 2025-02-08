@@ -54,6 +54,7 @@
         "updateLayer": "Update Layer",
         "updateLayerBlendingMode": "Change Blending Mode",
         "updateLayerFilterParams": "Update Layer Effect",
+        "updateLayerFilterMask": "Update Layer Effect Mask",
         "updateSelectionCombineMode": "Update Selection Combine Mode",
         "waitingOnQueueFree": "Waiting for Work to Complete"
     },
@@ -900,6 +901,8 @@
             "enableToggle": "Enable",
             "resetField": "Reset Field",
             "deleting": "Deleting effect...",
+            "useActiveSelectionMask": "Apply Selection as Mask",
+            "clearSelectionMask": "Remove Mask",
             "deleteFilterError": "An error occurred while attempting to delete the filter. If you keep seeing this message, please report this as a bug.",
             "applyFilterError": "An error occurred while attempting to apply the filter changes. If you keep seeing this message, please report this as a bug."
         },

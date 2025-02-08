@@ -8557,7 +8557,7 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-color-picker-gradient .ogr-color-picker-gradient__opacity:before {
   content: "";
   position: absolute;
-  background: linear-gradient(to right, white 50%, var(--ogr-color-pick-opaque) 51%);
+  background: var(--ogr-color-pick-opaque);
   top: 0;
   left: auto;
   right: 0;
@@ -28955,7 +28955,17 @@ body.ogr-full-page .opengraphica {
 .opengraphica .el-color-picker__color {
   background-image: url("../images/transparency-bg.png");
 }
+.opengraphica .el-overlay-dialog {
+  display: flex;
+  align-items: center;
+}
+@media screen and (max-width: 600px) {
+  .opengraphica .el-overlay-dialog {
+    align-items: flex-start;
+  }
+}
 .opengraphica .el-dialog {
+  --el-dialog-margin-top: 2.5rem;
   --el-dialog-border-radius: 0.875rem;
 }
 .opengraphica .el-dialog.el-dialog--ogr-dock .el-dialog__body {

@@ -5,13 +5,14 @@
 
 import { nextTick, type Ref } from 'vue';
 
-import canvasStore from '@/store/canvas';
 import historyStore from '@/store/history';
 import { createStoredImage } from '@/store/image';
 import { createStoredSvg } from '@/store/svg';
 import { createStoredVideo } from '@/store/video';
 import preferencesStore from '@/store/preferences';
-import workingFileStore, { getCanvasRenderingContext2DSettings, WorkingFileState, getTimelineById, calculateLayerOrder } from '@/store/working-file';
+import workingFileStore, {
+    getCanvasRenderingContext2DSettings, calculateLayerOrder, discardAllUnusedMasks, type WorkingFileState
+} from '@/store/working-file';
 import { readWorkingFile } from '@/store/data/working-file-database';
 import { discardActiveSelectionMask, discardAppliedSelectionMask, activeSelectionPath } from '@/canvas/store/selection-state';
 import { discardAllLayerRenderers } from '@/canvas/renderers';
@@ -176,6 +177,7 @@ export async function openFromTemporaryStorage() {
     workingFileStore.set('layers', workingFile.layers);
     discardActiveSelectionMask();
     discardAppliedSelectionMask();
+    discardAllUnusedMasks();
     calculateLayerOrder();
     activeSelectionPath.value = [];
     await historyStore.dispatch('free', {

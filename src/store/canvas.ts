@@ -147,12 +147,10 @@ const store = new PerformantStore<CanvasStore>({
 
                 let handleX = store.get('dndAreaLeft') + (store.get('dndAreaWidth') / 2);
                 let handleY = store.get('dndAreaTop') + (store.get('dndAreaHeight') / 2);
-                let point = new DOMPoint(handleX, handleY).matrixTransform(inverseTransform);
-                const centerPoint = new DOMPoint(viewCanvas.width / 2, viewCanvas.height / 2);
+                let centerPoint = new DOMPoint(handleX, handleY).matrixTransform(inverseTransform);
 
                 if (actionName === 'setTransformRotation') {
                     rotationDelta = (value - decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES;
-                    point = centerPoint;
                 } else if (actionName === 'setTransformScale') {
                     scaleDeltaX = value / decomposedTransform.scaleX;
                     scaleDeltaY = scaleDeltaX;
@@ -162,21 +160,19 @@ const store = new PerformantStore<CanvasStore>({
                 } else if (actionName === 'setTransformFlipX') {
                     scaleDeltaX = -1;
                     scaleDeltaY = 1;
-                    point = centerPoint;
                 } else if (actionName === 'setTransformFlipY') {
                     scaleDeltaX = 1;
                     scaleDeltaY = -1;
-                    point = centerPoint;
                 }
 
-                transform.translateSelf(point.x, point.y);
+                transform.translateSelf(centerPoint.x, centerPoint.y);
                 if (scaleDeltaX || scaleDeltaY) {
                     transform.scaleSelf(scaleDeltaX, scaleDeltaY);
                 }
                 if (rotationDelta) {
                     transform.rotateSelf(rotationDelta);
                 }
-                transform.translateSelf(-point.x, -point.y);
+                transform.translateSelf(-centerPoint.x, -centerPoint.y);
 
                 store.set('transform', transform);
                 store.set('viewDirty', true);

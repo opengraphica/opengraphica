@@ -4,21 +4,23 @@
     <template v-else>
         <template v-for="category of categorizedFilters" :key="category.name">
             <h3 v-t="category.name" />
-            <el-auto-grid :breakpoints="[{ maxWidth: 525, itemWidth: '6rem' }]">
+            <el-auto-grid item-width="8rem" :breakpoints="[{ maxWidth: 525, itemWidth: '6rem' }]">
                 <template
                     v-for="filter of category.filters"
                     :key="filter.name"
                 >
                     <el-card :body-style="{ padding: '0px' }" class="el-card--link" role="button" tabindex="0" style="max-width: 15rem" @click="onSelectFilter(filter.id)">
-                        <img
-                            :src="filterPreviewThumbnails[filter.id]"
-                            :style="{
-                                'width': '100%',
-                                'height': previewImageHeight,
-                                'background-image': 'url(\'../images/transparency-bg.png\')',
-                                'background-repeat': 'repeat'
-                            }"
-                        />
+                        <div style="max-height: 10rem; overflow: hidden;">
+                            <img
+                                :src="filterPreviewThumbnails[filter.id]"
+                                :style="{
+                                    'width': '100%',
+                                    'height': previewImageHeight,
+                                    'background-image': 'url(\'../images/transparency-bg.png\')',
+                                    'background-repeat': 'repeat'
+                                }"
+                            />
+                        </div>
                         <div class="p-2 has-text-centered" v-t="filter.name"></div>
                     </el-card>
                 </template>

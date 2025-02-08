@@ -1,11 +1,21 @@
 <template>
-    <el-alert v-if="hasError" type="error" show-icon :closable="false" :title="$t('module.layerEffectEdit.generalError')" />
-    <div v-else-if="isDeleting" v-loading="true" :element-loading-text="$t('module.layerEffectEdit.deleting')" style="height: 15rem" />
-    <div v-else v-loading="loading" :element-loading-text="$t('module.layerEffectEdit.loading')">
+    <el-alert v-if="hasError" type="error" show-icon :closable="false" :title="t('module.layerEffectEdit.generalError')" />
+    <div v-else-if="isDeleting" v-loading="true" :element-loading-text="t('module.layerEffectEdit.deleting')" style="height: 15rem" />
+    <div v-else v-loading="loading" :element-loading-text="t('module.layerEffectEdit.loading')">
         <div class="is-flex is-flex-row is-align-items-center">
             <canvas ref="beforeEffectCanvas" style="width: 100%; min-width: 0; height: auto; max-height: 40vh; background-image: url('../images/transparency-bg.png')" />
             <span class="bi bi-arrow-right-short is-flex-shrink-1 is-size-1 has-text-color-fill-darker" :style="{ visibility: currentFilterEnabled ? undefined : 'hidden' }" aria-hidden="true" />
             <canvas ref="afterEffectCanvas" style="width: 100%; min-width: 0; height: auto; max-height: 40vh; background-image: url('../images/transparency-bg.png')" :style="{ visibility: currentFilterEnabled ? undefined : 'hidden' }" />
+        </div>
+        <div class="is-flex is-flex-row is-align-items-center is-justify-content-center my-3">
+            <el-button v-if="isSelectionMaskAvailable" @click="onCreateSelectionMask">
+                <span class="bi bi-mask mr-1" aria-hidden="true" />
+                {{ t('module.layerEffectEdit.useActiveSelectionMask') }}
+            </el-button>
+            <el-button v-if="isMaskApplied" @click="onClearMask">
+                <span class="bi bi-x-circle mr-1" aria-hidden="true" />
+                {{ t('module.layerEffectEdit.clearSelectionMask') }}
+            </el-button>
         </div>
         <el-divider />
         <div class="is-flex is-flex-row is-align-items-center is-justify-content-space-between">
@@ -13,7 +23,7 @@
             <div class="is-flex is-flex-row is-align-items-center is-flex-shrink-1">
                 <el-switch
                     v-model="currentFilterEnabled"
-                    :active-text="$t('module.layerEffectEdit.enableToggle')"
+                    :active-text="t('module.layerEffectEdit.enableToggle')"
                     class="mr-4 el-switch--label-align-fix-sm-above"
                 />
                 <el-button link type="danger" class="el-text-alignment-fix--below" @click="onDelete">
@@ -35,7 +45,7 @@
         >
             <el-form-item-group class="el-form-item-group--resetable">
                 <template v-for="(editConfigField, paramName) in currentFilterEditConfig" :key="paramName">
-                    <el-form-item v-if="!editConfigField.hidden" :label="$t(`layerFilter.${currentFilterName}.param.${paramName}`)">
+                    <el-form-item v-if="!editConfigField.hidden" :label="t(`layerFilter.${currentFilterName}.param.${paramName}`)">
                         <template v-if="editConfigField.type === 'percentage'">
                             <el-row>
                                 <el-col :span="20" :xs="18">
@@ -63,7 +73,7 @@
                             <el-button
                                 link type="primary" class="el-button--form-item-reset"
                                 :disabled="isFilterParamDefault(paramName, editConfigField)"
-                                :aria-label="$t('module.layerEffectEdit.resetField')"
+                                :aria-label="t('module.layerEffectEdit.resetField')"
                                 @click="resetFilterParam(paramName, editConfigField)">
                                 <span class="bi bi-arrow-repeat" aria-hidden="true" />
                             </el-button>
@@ -108,7 +118,7 @@
                             <el-button
                                 link type="primary" class="el-button--form-item-reset"
                                 :disabled="isFilterParamDefault(paramName, editConfigField)"
-                                :aria-label="$t('module.layerEffectEdit.resetField')"
+                                :aria-label="t('module.layerEffectEdit.resetField')"
                                 @click="resetFilterParam(paramName, editConfigField)">
                                 <span class="bi bi-arrow-repeat" aria-hidden="true" />
                             </el-button>
@@ -118,13 +128,13 @@
                                 <el-option
                                     v-for="option of editConfigField.options"
                                     :key="option.key"
-                                    :label="$t(`layerFilter.${currentFilterName}.param.${paramName}Option.${option.key}`)"
+                                    :label="t(`layerFilter.${currentFilterName}.param.${paramName}Option.${option.key}`)"
                                     :value="option.value"
                                 >
                                     <div style="line-height: 1.4em" class="py-2">
-                                        <div>{{ $t(`layerFilter.${currentFilterName}.param.${paramName}Option.${option.key}`) }}</div>
+                                        <div>{{ t(`layerFilter.${currentFilterName}.param.${paramName}Option.${option.key}`) }}</div>
                                         <div v-if="editConfigField.optionsHaveDescriptions" class="has-text-color-placeholder">
-                                            {{ $t(`layerFilter.${currentFilterName}.param.${paramName}OptionDescription.${option.key}`) }}
+                                            {{ t(`layerFilter.${currentFilterName}.param.${paramName}OptionDescription.${option.key}`) }}
                                         </div>
                                     </div>
                                 </el-option>
@@ -132,7 +142,7 @@
                             <el-button
                                 link type="primary" class="el-button--form-item-reset"
                                 :disabled="isFilterParamDefault(paramName, editConfigField)"
-                                :aria-label="$t('module.layerEffectEdit.resetField')"
+                                :aria-label="t('module.layerEffectEdit.resetField')"
                                 @click="resetFilterParam(paramName, editConfigField)">
                                 <span class="bi bi-arrow-repeat" aria-hidden="true" />
                             </el-button>
@@ -142,7 +152,7 @@
                             <el-button
                                 link type="primary" class="el-button--form-item-reset"
                                 :disabled="isFilterParamDefault(paramName, editConfigField)"
-                                :aria-label="$t('module.layerEffectEdit.resetField')"
+                                :aria-label="t('module.layerEffectEdit.resetField')"
                                 @click="resetFilterParam(paramName, editConfigField)">
                                 <span class="bi bi-arrow-repeat" aria-hidden="true" />
                             </el-button>
@@ -154,8 +164,8 @@
         <div class="has-text-right">
             <el-divider />
             <div class="has-text-right">
-                <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
-                <el-button type="primary" @click="onConfirm">{{ $t('button.apply') }}</el-button>
+                <el-button @click="onCancel">{{ t('button.cancel') }}</el-button>
+                <el-button type="primary" @click="onConfirm">{{ t('button.apply') }}</el-button>
             </div>
         </div>
     </div>
@@ -164,6 +174,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted, onUnmounted, nextTick, reactive, watch, WatchStopHandle } from 'vue';
 import { Rules } from 'async-validator';
+
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElAutoGrid from '@/ui/el/el-auto-grid.vue';
 import ElButton from 'element-plus/lib/components/button/index';
@@ -180,36 +191,45 @@ import ElSwitch from 'element-plus/lib/components/switch/index';
 import ElRow from 'element-plus/lib/components/row/index';
 
 import { useI18n } from '@/i18n';
-import historyStore from '@/store/history';
-import workingFileStore, { getCanvasRenderingContext2DSettings, getLayerById } from '@/store/working-file';
+
 import { notifyInjector } from '@/lib/notify';
 import { throttle } from '@/lib/timing';
-import layerRenderers from '@/canvas/renderers';
+import { generateImageHash } from '@/lib/hash';
 import { createImageBlobFromCanvas } from '@/lib/image';
 import { isWebGLAvailable } from '@/lib/webgl';
-import { createRasterShaderMaterial } from '@/canvas/renderers/webgl/shaders';
-import { buildCanvasFilterParamsFromFormData, createFiltersFromLayerConfig, applyCanvasFilter, generateShaderUniformsAndDefines, combineFiltersToShader } from '@/canvas/filters';
+
 import { UpdateLayerFilterDisabledAction } from '@/actions/update-layer-filter-disabled';
+import { UpdateLayerFilterMaskAction } from '@/actions/update-layer-filter-mask';
 import { UpdateLayerFilterParamsAction } from '@/actions/update-layer-filter-params';
 import { DeleteLayerFilterAction } from '@/actions/delete-layer-filter';
 import { BundleAction } from '@/actions/bundle';
+
+import historyStore from '@/store/history';
+import { createStoredImage, deleteStoredImage, getStoredImageOrCanvas } from '@/store/image';
+import workingFileStore, { getCanvasRenderingContext2DSettings, getLayerById, getLayerGlobalTransform, discardMaskIfUnused } from '@/store/working-file';
+import { activeSelectionMask, appliedSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMaskCanvasOffset, resampleSelectionMaskInLayerBounds } from '@/canvas/store/selection-state';
+
+import layerRenderers from '@/canvas/renderers';
+import { createRasterShaderMaterial } from '@/canvas/renderers/webgl/shaders';
+import { buildCanvasFilterParamsFromFormData, createFiltersFromLayerConfig, applyCanvasFilter, generateShaderUniformsAndDefines, combineFiltersToShader } from '@/canvas/filters';
+import { EffectComposer } from '@/canvas/renderers/webgl/postprocessing/effect-composer';
+import { RenderPass } from '@/canvas/renderers/webgl/postprocessing/render-pass';
+import { ShaderPass } from '@/canvas/renderers/webgl/postprocessing/shader-pass';
+import { GammaCorrectionShader } from '@/canvas/renderers/webgl/shaders/gamma-correction-shader';
+
 import { bakeCanvasFilters } from '@/workers';
 
 import { Scene } from 'three/src/scenes/Scene';
 import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer';
 import { ImagePlaneGeometry } from '@/canvas/renderers/webgl/geometries/image-plane-geometry';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
-import { DoubleSide, NearestFilter, SRGBColorSpace } from 'three/src/constants';
+import { NearestFilter, SRGBColorSpace } from 'three/src/constants';
 import { Mesh } from 'three/src/objects/Mesh';
 import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { Texture } from 'three/src/textures/Texture';
 import { OrthographicCamera } from 'three/src/cameras/OrthographicCamera';
-import { EffectComposer } from '@/canvas/renderers/webgl/postprocessing/effect-composer';
-import { RenderPass } from '@/canvas/renderers/webgl/postprocessing/render-pass';
-import { ShaderPass } from '@/canvas/renderers/webgl/postprocessing/shader-pass';
-import { GammaCorrectionShader } from '@/canvas/renderers/webgl/shaders/gamma-correction-shader';
 
-import type { WorkingFileLayerFilter, CanvasFilter, CanvasFilterEditConfig, CanvasFilterEditConfigField } from '@/types';
+import type { WorkingFileLayerFilter, WorkingFileLayerMask, CanvasFilter, CanvasFilterEditConfig, CanvasFilterEditConfigField } from '@/types';
 
 export default defineComponent({
     name: 'ModuleLayerEffectEdit',
@@ -297,6 +317,10 @@ export default defineComponent({
         });
         const formValidationRules = ref<Rules>({});
 
+        const generatedSelectionMaskUuid = ref<string>();
+        const generatedMaskId = ref<number>();
+        const removedMaskId = ref<number>();
+
         const layer = computed(() => {
             return getLayerById(props.layerId);
         });
@@ -321,6 +345,14 @@ export default defineComponent({
 
         const currentFilterTitle = computed<string>(() => {
             return `layerFilter.${currentFilterConfig.value?.name}.name`;
+        });
+
+        const isMaskApplied = computed<boolean>(() => {
+            return currentFilter.value?.maskId != null;
+        });
+
+        const isSelectionMaskAvailable = computed<boolean>(() => {
+            return !!(activeSelectionMask.value || appliedSelectionMask.value);
         });
 
         watch([layer], async ([layer]) => {
@@ -396,6 +428,11 @@ export default defineComponent({
 
         onUnmounted(() => {
             cleanupThreejs();
+
+            if (generatedMaskId.value != null) {
+                discardMaskIfUnused(generatedMaskId.value);
+            }
+
             if (isCanceling.value && props.isFilterJustAdded) {
                 historyStore.dispatch('undo');
             }
@@ -682,6 +719,63 @@ export default defineComponent({
             }
         }, 20);
 
+        async function onCreateSelectionMask() {
+            const selectionMask = activeSelectionMask.value || appliedSelectionMask.value;
+            const selectionMaskCanvasOffset = activeSelectionMaskCanvasOffset.value || appliedSelectionMaskCanvasOffset.value;
+            const activeLayer = layer.value;
+            if (afterEffectCanvas.value && selectionMask && activeLayer) {
+                cleanupThreejs();
+
+                const masks = workingFileStore.get('masks');
+                let maskIdCounter = workingFileStore.get('maskIdCounter');
+                if (generatedSelectionMaskUuid.value) {
+                    deleteStoredImage(generatedSelectionMaskUuid.value);
+                }
+                generatedSelectionMaskUuid.value = await createStoredImage(
+                    await resampleSelectionMaskInLayerBounds(
+                        selectionMask,
+                        selectionMaskCanvasOffset,
+                        new DOMPoint(activeLayer.width ?? 1, activeLayer.height ?? 1),
+                        getLayerGlobalTransform(activeLayer.id),
+                    )
+                );
+                const storedMaskImage = getStoredImageOrCanvas(generatedSelectionMaskUuid.value);
+                if (storedMaskImage) {
+                    if (generatedMaskId.value != null && masks[generatedMaskId.value]) {
+                        delete masks[generatedMaskId.value];
+                    } else {
+                        generatedMaskId.value = maskIdCounter++;
+                        workingFileStore.set('maskIdCounter', maskIdCounter);
+                    }
+                    const mask = {
+                        sourceUuid: generatedSelectionMaskUuid.value,
+                        offset: new DOMPoint(0, 0),
+                        hash: await generateImageHash(storedMaskImage),
+                    };
+                    masks[generatedMaskId.value] = mask;
+                    workingFileStore.set('masks', masks);
+                    if (canvasFilters.value[props.filterIndex]) {
+                        canvasFilters.value[props.filterIndex].maskId = generatedMaskId.value;
+                    }
+                } else {
+                    deleteStoredImage(generatedSelectionMaskUuid.value);
+                }
+
+                initializeThreejs(afterEffectCanvas.value);
+            }
+        }
+
+        function onClearMask() {
+            if (afterEffectCanvas.value && canvasFilters.value[props.filterIndex].maskId != null) {
+                cleanupThreejs();
+                if (canvasFilters.value[props.filterIndex].maskId !== generatedMaskId.value) {
+                    removedMaskId.value = canvasFilters.value[props.filterIndex].maskId;
+                }
+                canvasFilters.value[props.filterIndex].maskId = undefined;
+                initializeThreejs(afterEffectCanvas.value);
+            }
+        }
+
         function onDelete() {
             if (layer.value) {
                 isDeleting.value = true;
@@ -717,6 +811,18 @@ export default defineComponent({
                         new UpdateLayerFilterParamsAction(layerId, props.filterIndex, newParams)
                     );
                 }
+
+                if (generatedMaskId.value != null && canvasFilters.value[props.filterIndex].maskId === generatedMaskId.value) {
+                    actions.push(
+                        new UpdateLayerFilterMaskAction(layerId, props.filterIndex, generatedMaskId.value)
+                    );
+                    generatedMaskId.value = undefined;
+                } else if (removedMaskId.value != null && canvasFilters.value[props.filterIndex].maskId == null) {
+                    actions.push(
+                        new UpdateLayerFilterMaskAction(layerId, props.filterIndex, undefined)
+                    );
+                }
+
                 if (actions.length > 0) {
                     await historyStore.dispatch('runAction', {
                         action: new BundleAction('applyLayerFilterChanges', 'action.updateLayerFilterParams', actions)
@@ -732,22 +838,31 @@ export default defineComponent({
         }
         
         return {
+            t,
             hasError,
             isDeleting,
             loading,
+            isMaskApplied,
+            isSelectionMaskAvailable,
+
             beforeEffectCanvas,
             afterEffectCanvas,
+
             currentFilterConfig,
             currentFilterName,
             currentFilterTitle,
             currentFilterEnabled,
             currentFilterEditConfig,
+
             formData,
             formValidationRules,
+
             getEditConfigMin,
             getEditConfigMax,
             isFilterParamDefault,
             resetFilterParam,
+            onCreateSelectionMask,
+            onClearMask,
             onDelete,
             onCancel,
             onConfirm

@@ -14,7 +14,7 @@
                     @change="onChangeHexCode"
                 />
             </div>
-            <el-button :aria-label="$t('dock.colorPicker.pickColorFromImage')" class="ml-3" @click="onPickColorFromImage">
+            <el-button :title="$t('dock.colorPicker.pickColorFromImage')" class="ml-3" @click="onPickColorFromImage">
                 <span class="bi bi-eyedropper" aria-hidden="true" />
             </el-button>
         </div>

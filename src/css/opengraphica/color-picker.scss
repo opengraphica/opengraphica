@@ -97,7 +97,7 @@
         &:before {
             content: '';
             position: absolute;
-            background: linear-gradient(to right, white 50%, var(--ogr-color-pick-opaque) 51%);
+            background: var(--ogr-color-pick-opaque);
             top: 0;
             left: auto;
             right: 0;
