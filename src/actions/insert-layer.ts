@@ -154,6 +154,17 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                     }
                     break;
             }
+
+            for (const filter of newLayer.filters) {
+                if (filter.maskId != null) {
+                    const masks = workingFileStore.get('masks');
+                    const mask = masks[filter.maskId];
+                    if (mask) {
+                        reserveStoredImage(mask.sourceUuid, `${layerId}`);
+                    }
+                }
+            }
+
             assignLayerRenderer(newLayer);
 
             newLayer = reactive(newLayer);
@@ -291,6 +302,15 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
             else if (this.insertedLayer.type === 'video') {
                 if (this.insertedLayer.data.sourceUuid) {
                     unreserveStoredVideo(this.insertedLayer.data.sourceUuid, `${this.insertedLayer.id}`);
+                }
+            }
+            for (const filter of this.insertedLayer.filters) {
+                if (filter.maskId != null) {
+                    const masks = workingFileStore.get('masks');
+                    const mask = masks[filter.maskId];
+                    if (mask) {
+                        unreserveStoredImage(mask.sourceUuid, `${this.insertedLayer.id}`);
+                    }
                 }
             }
         }

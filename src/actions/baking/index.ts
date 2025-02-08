@@ -3,7 +3,7 @@ import canvasStore from '@/store/canvas';
 import { getStoredImageOrCanvas } from '@/store/image';
 import { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
 import { getImageDataFromImage, getImageDataFromCanvas, getImageDataFromImageBitmap, createImageFromImageData } from '@/lib/image';
-import { bakeCanvasFilters } from '@/workers';
+import { bakeCanvasFilters, cancelBakeCanvasFilters } from '@/workers';
 
 import type { WorkingFileAnyLayer, ColorModel } from '@/types';
 
@@ -12,6 +12,7 @@ export async function updateBakedImageForLayer(layerOrLayerId: WorkingFileAnyLay
     if (!layer) return;
     if (!layer.filters || layer.filters.length === 0) {
         layer.bakedImage = null;
+        cancelBakeCanvasFilters(layer.id);
         return;
     }
     if (layer.type === 'raster') {
@@ -19,7 +20,9 @@ export async function updateBakedImageForLayer(layerOrLayerId: WorkingFileAnyLay
         if (!sourceImage) return;
         const sourceImageData = (sourceImage instanceof HTMLImageElement)
             ? getImageDataFromImage(sourceImage)
-            : (sourceImage instanceof ImageBitmap) ? getImageDataFromImageBitmap(sourceImage) : getImageDataFromCanvas(sourceImage);
+            : (sourceImage instanceof ImageBitmap)
+                ? getImageDataFromImageBitmap(sourceImage, { imageOrientation: layer.renderer.renderMode === 'webgl' ? 'flipY' : 'none' })
+                : getImageDataFromCanvas(sourceImage);
         try {
             setTimeout(() => {
                 layer.isBaking = true;

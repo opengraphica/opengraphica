@@ -44,6 +44,7 @@ export interface WorkingFileLayerFilter<T extends ColorModel = ColorModel> {
     name: string;
     disabled?: boolean;
     params: Record<string, unknown>;
+    maskId?: number;
 }
 
 export interface WorkingFileLayerRenderer<T extends ColorModel = ColorModel> {
@@ -135,7 +136,7 @@ export interface WorkingFileLayerDraftDrawable {
 }
 
 export interface WorkingFileLayer<T extends ColorModel = ColorModel> {
-    bakedImage: HTMLImageElement | null;
+    bakedImage: ImageBitmap | HTMLImageElement | null;
     blendingMode: WorkingFileLayerBlendingMode;
     drafts: WorkingFileLayerDraft[] | null;
     draftDrawables: WorkingFileLayerDraftDrawable[] | null;
@@ -309,6 +310,12 @@ export interface NewFilePreset {
     scaleFactor: 1
 }
 
+export interface WorkingFileLayerMask {
+    sourceUuid: string;
+    offset: DOMPoint;
+    hash: string;
+}
+
 export interface WorkingFile<T extends ColorModel = ColorModel> {
     version: string;
     date: string;
@@ -322,6 +329,8 @@ export interface WorkingFile<T extends ColorModel = ColorModel> {
     drawOriginY: number;
     height: number; // Always pixels
     layerIdCounter: number;
+    maskIdCounter: number;
+    masks: Record<number, WorkingFileLayerMask>;
     measuringUnits: MeasuringUnits;
     resolutionUnits: ResolutionUnits;
     resolutionX: number;

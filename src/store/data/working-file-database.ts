@@ -1,12 +1,14 @@
 import { reactive, toRaw } from 'vue';
 import { deepToRaw } from '@/lib/vue';
 import { assignLayerRenderer } from '@/canvas/renderers';
+
 import { prepareStoredImageForEditing, reserveStoredImage, createStoredImage } from '@/store/image';
 import { getStoredSvgDataUrl, createStoredSvg } from '@/store/svg';
 import { createImageBlobFromCanvas, createImageFromBlob } from '@/lib/image';
 import { getStoredVideoDataUrl, createStoredVideo } from '@/store/video';
+
 import type {
-    ColorModel, WorkingFile, WorkingFileGroupLayer, WorkingFileLayer, WorkingFileAnyLayer,
+    ColorModel, WorkingFile, WorkingFileLayerMask, WorkingFileGroupLayer, WorkingFileLayer, WorkingFileAnyLayer,
     WorkingFileGradientLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer,
     WorkingFileVectorLayer, SerializedFileVectorLayer, WorkingFileVideoLayer, SerializedFileVideoLayer,
 } from '@/types';
@@ -98,7 +100,22 @@ async function storeLayersRecursive(layers: WorkingFileLayer[]) {
     await Promise.all(putRequests);
 }
 
-async function readStoredLayersRecursive(metaLayers: DatabaseMetaLayer[]): Promise<WorkingFileAnyLayer[]> {
+async function readStoredImage(sourceUuid: string) {
+    const transaction = (database as IDBDatabase).transaction('images', 'readonly');
+    const imagesStore = transaction.objectStore('images');
+    const getImageRequest = imagesStore.get(sourceUuid);
+    const imageBlob = await new Promise<DatabaseImage>((resolve, reject) => {
+        getImageRequest.onsuccess = () => {
+            resolve(getImageRequest.result);
+        };
+        getImageRequest.onerror = reject;
+    });
+    const image = await createImageFromBlob(imageBlob.data);
+    const imageUuid = await createStoredImage(image);
+    return imageUuid;
+}
+
+async function readStoredLayersRecursive(metaLayers: DatabaseMetaLayer[], workingFile: Partial<WorkingFile>): Promise<WorkingFileAnyLayer[]> {
     const layers: WorkingFileAnyLayer[] = reactive([]);
     for (const metaLayer of metaLayers) {
         const transaction = (database as IDBDatabase).transaction('layers', 'readonly');
@@ -113,21 +130,11 @@ async function readStoredLayersRecursive(metaLayers: DatabaseMetaLayer[]): Promi
         const transformArray: number[] = layerResult.transform as never;
         layerResult.transform = new DOMMatrix(transformArray);
         if (layerResult.type === 'group') {
-            (layerResult as WorkingFileGroupLayer).layers = await readStoredLayersRecursive(metaLayer.layers);
+            (layerResult as WorkingFileGroupLayer).layers = await readStoredLayersRecursive(metaLayer.layers, workingFile);
         } else if (layerResult.type === 'raster') {
             const rasterLayer = layerResult as WorkingFileRasterLayer;
             if (rasterLayer.data.sourceUuid) {
-                const transaction = (database as IDBDatabase).transaction('images', 'readonly');
-                const imagesStore = transaction.objectStore('images');
-                const getImageRequest = imagesStore.get(rasterLayer.data.sourceUuid);
-                const imageBlob = await new Promise<DatabaseImage>((resolve, reject) => {
-                    getImageRequest.onsuccess = () => {
-                        resolve(getImageRequest.result);
-                    };
-                    getImageRequest.onerror = reject;
-                });
-                const image = await createImageFromBlob(imageBlob.data);
-                const imageUuid = await createStoredImage(image);
+                const imageUuid = await readStoredImage(rasterLayer.data.sourceUuid);
                 reserveStoredImage(imageUuid, `${layerResult.id}`);
                 rasterLayer.data.sourceUuid = imageUuid;
             }
@@ -135,17 +142,7 @@ async function readStoredLayersRecursive(metaLayers: DatabaseMetaLayer[]): Promi
             const rasterSequenceLayer = layerResult as WorkingFileRasterSequenceLayer;
             for (const frame of rasterSequenceLayer.data.sequence) {
                 if (frame.image.sourceUuid) {
-                    const transaction = (database as IDBDatabase).transaction('images', 'readonly');
-                    const imagesStore = transaction.objectStore('images');
-                    const getImageRequest = imagesStore.get(frame.image.sourceUuid);
-                    const imageBlob = await new Promise<DatabaseImage>((resolve, reject) => {
-                        getImageRequest.onsuccess = () => {
-                            resolve(getImageRequest.result);
-                        };
-                        getImageRequest.onerror = reject;
-                    });
-                    const image = await createImageFromBlob(imageBlob.data);
-                    const imageUuid = await createStoredImage(image);
+                    const imageUuid = await readStoredImage(frame.image.sourceUuid);
                     reserveStoredImage(imageUuid, `${layerResult.id}`);
                     frame.image.sourceUuid = imageUuid;
                 }
@@ -167,6 +164,18 @@ async function readStoredLayersRecursive(metaLayers: DatabaseMetaLayer[]): Promi
                 videoLayer.data.sourceUuid = await createStoredVideo(video);
             }
         }
+
+        if (workingFile.masks) {
+            for (const filter of layerResult.filters) {
+                if (filter.maskId != null) {
+                    const mask = workingFile.masks[filter.maskId];
+                    if (mask) {
+                        reserveStoredImage(mask.sourceUuid, `${layerResult.id}`);
+                    }
+                }
+            }
+        }
+
         assignLayerRenderer(layerResult);
         layers.push(layerResult);
     }
@@ -254,6 +263,22 @@ export async function writeWorkingFile(workingFile: WorkingFile<ColorModel>) {
     }
 };
 
+export async function updateWorkingFileMasks(masks: Record<number, WorkingFileLayerMask>) {
+    await init();
+    if (!database) return;
+    try {
+        const transaction = (database as IDBDatabase).transaction('meta', 'readwrite');
+        const metaStore = transaction.objectStore('meta');
+        let request = metaStore.put({ id: 'masks', data: toRaw(masks) });
+        await new Promise((resolve, reject) => {
+            request.onsuccess = resolve;
+            request.onerror = reject;
+        });
+    } catch (error) {
+        throw error;
+    }
+}
+
 /* Updates the meta data of the working file in the database */
 export async function updateWorkingFile(workingFile: Partial<WorkingFile<ColorModel>>) {
     await init();
@@ -288,7 +313,7 @@ export async function updateWorkingFile(workingFile: Partial<WorkingFile<ColorMo
     }
 }
 
-export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNew: boolean = false): Promise<void> {
+export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNew: boolean = false, workingFile?: Partial<WorkingFile>): Promise<void> {
     await init();
     if (!database) throw new Error('Database not created.');
 
@@ -388,6 +413,37 @@ export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNe
         }
     }
 
+    if (workingFile?.masks) {
+        let hasMasks = false;
+        for (const filter of layer.filters) {
+            if (filter.maskId != null) {
+                const mask = workingFile.masks[filter.maskId];
+                if (mask) {
+                    hasMasks = true;
+                    const imageCanvas = await prepareStoredImageForEditing(mask.sourceUuid);
+                    if (imageCanvas) {
+                        const imageBlob = await createImageBlobFromCanvas(imageCanvas);
+                        const transaction = (database as IDBDatabase).transaction('images', 'readwrite');
+                        const imagesStore = transaction.objectStore('images');
+                        const imageStoreRequest = imagesStore.put({
+                            id: mask.sourceUuid,
+                            data: imageBlob,
+                        });
+                        putRequests.push(
+                            new Promise<Event>((resolve, reject) => {
+                                imageStoreRequest.onsuccess = resolve;
+                                imageStoreRequest.onerror = reject;
+                            })
+                        );
+                    }
+                }
+            }
+        }
+        if (hasMasks) {
+            updateWorkingFileMasks(workingFile.masks);
+        }
+    }
+
     const transaction = (database as IDBDatabase).transaction('layers', 'readwrite');
     const layersStore = transaction.objectStore('layers');
     const request = layersStore.put(deepToRaw(storedLayer));
@@ -417,13 +473,27 @@ export async function readWorkingFile(): Promise<WorkingFile<ColorModel>> {
         };
         metaRequest.onerror = reject;
     });
+    let layers: DatabaseMetaLayer[] = [];
     for (const meta of metaResults) {
         if (meta.id === 'layers') {
-            workingFile.layers = await readStoredLayersRecursive(meta.data);
+            layers = meta.data;
+        } else if (meta.id === 'masks') {
+            let databaseMasks = meta.data;
+            let masks: Record<number, WorkingFileLayerMask> = {};
+            for (const maskId of Object.keys(meta.data).map(key => parseInt(key))) {
+                const mask = databaseMasks[maskId];
+                masks[maskId] = {
+                    sourceUuid: await readStoredImage(mask.sourceUuid),
+                    hash: mask.hash,
+                    offset: mask.offset,
+                };
+            }
+            workingFile.masks = masks;
         } else {
             workingFile[meta.id as keyof WorkingFile<ColorModel>] = meta.data;
         }
     }
+    workingFile.layers = await readStoredLayersRecursive(layers, workingFile);
 
     return workingFile as WorkingFile<ColorModel>;
 }

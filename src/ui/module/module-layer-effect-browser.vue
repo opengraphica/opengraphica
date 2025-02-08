@@ -183,7 +183,7 @@ export default defineComponent({
                 };
                 addFilterActions.push(new AddLayerFilterAction(id, filter));
             }
-            historyStore.dispatch('runAction', {
+            await historyStore.dispatch('runAction', {
                 action: new BundleAction('addLayerFilterMultiple', 'action.addLayerFilterMultiple', addFilterActions)
             });
             setTimeout(() => {

@@ -25,8 +25,12 @@ export async function generateArrayBufferHash(
 }
 
 export async function generateImageBlobHash(blob: Blob): Promise<string> {
-    let hash = '';
     const image = await createImageFromBlob(blob);
+    return generateImageHash(image);
+}
+
+export async function generateImageHash(image: HTMLCanvasElement | HTMLImageElement | ImageBitmap): Promise<string> {
+    let hash = '';
     if (!temporaryCanvas) {
         temporaryCanvas = document.createElement('canvas');
     }

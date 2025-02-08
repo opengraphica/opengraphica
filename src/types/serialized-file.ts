@@ -100,6 +100,12 @@ export interface SerializedFileTextLayer<T extends ColorModel = ColorModel> exte
     data: TextDocument;
 }
 
+export interface SerializedFileLayerMask {
+    sourceImageSerialized: string;
+    offset: DOMPoint;
+    hash: string;
+}
+
 export interface SerializedFile<T extends ColorModel = ColorModel> {
     version: string;
     date: string;
@@ -113,6 +119,7 @@ export interface SerializedFile<T extends ColorModel = ColorModel> {
     drawOriginY: number;
     height: number; // Always pixels
     layerIdCounter: number;
+    masks: Record<number, SerializedFileLayerMask>;
     measuringUnits: MeasuringUnits;
     resolutionUnits: ResolutionUnits;
     resolutionX: number;

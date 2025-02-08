@@ -40,6 +40,7 @@ export class CreateFileAction extends BaseAction {
             height: this.createFileOptions.height,
             layerIdCounter: this.createFileOptions.layerIdCounter || 0,
             layers: [],
+            masks: this.createFileOptions.masks || {},
             measuringUnits: this.createFileOptions.measuringUnits || 'px',
             resolutionUnits: this.createFileOptions.resolutionUnits || 'px/in',
             resolutionX: this.createFileOptions.resolutionX || 300,

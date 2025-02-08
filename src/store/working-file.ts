@@ -1,6 +1,10 @@
 import { PerformantStore } from './performant-store';
-import { ColorModel, FileSystemFileHandle, MeasuringUnits, ResolutionUnits, ColorModelName, WorkingFileLayer, WorkingFileAnyLayer, WorkingFileGroupLayer, WorkingFileTimeline } from '@/types';
 import appEmitter from '@/lib/emitter';
+
+import type {
+    ColorModel, FileSystemFileHandle, MeasuringUnits, ResolutionUnits, ColorModelName,
+    WorkingFileLayer, WorkingFileAnyLayer, WorkingFileGroupLayer, WorkingFileTimeline, WorkingFileLayerMask
+} from '@/types';
 
 interface WorkingFileState {
     activeTimelineId: number | null;
@@ -17,6 +21,8 @@ interface WorkingFileState {
     height: number; // Always pixels
     layerIdCounter: number;
     layers: WorkingFileLayer<ColorModel>[];
+    maskIdCounter: number;
+    masks: Record<number, WorkingFileLayerMask>,
     measuringUnits: MeasuringUnits;
     resolutionUnits: ResolutionUnits;
     resolutionX: number;
@@ -50,6 +56,8 @@ const store = new PerformantStore<WorkingFileStore>({
         height: 892, // Always pixels
         layerIdCounter: 0,
         layers: [],
+        maskIdCounter: 0,
+        masks: {},
         measuringUnits: 'px',
         resolutionUnits: 'px/in',
         resolutionX: 300,

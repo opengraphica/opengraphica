@@ -289,6 +289,7 @@ export default defineComponent({
         let previewTexture: Texture;
         let previewPlaneGeometry: ImagePlaneGeometry;
         let previewMaterial: ShaderMaterial;
+        let previewFilterTextures: Texture[] = [];
         let previewMesh: Mesh;
 
         const formData = reactive<{ filterParams: Record<string, unknown> }>({
@@ -331,6 +332,8 @@ export default defineComponent({
         watch([currentFilterConfig], async ([currentFilterConfig]) => {
             if (currentFilterConfig) {
                 currentFilterEnabled.value = !currentFilterConfig.disabled;
+            } else {
+                onCancel();
             }
         }, { immediate: true });
 
@@ -473,6 +476,7 @@ export default defineComponent({
             let camera!: OrthographicCamera;
             let composer!: EffectComposer;
             let encounteredError: unknown;
+            let filterTextures: Texture[] = [];
 
             try {
                 const bakingCanvas = document.createElement('canvas');
@@ -504,6 +508,7 @@ export default defineComponent({
 
                 const combinedShaderResult = combineFiltersToShader(await createFiltersFromLayerConfig(beforeFilterConfigs), layer.value!);
                 material = createRasterShaderMaterial(beforeTexture, combinedShaderResult);
+                filterTextures = combinedShaderResult.textures;
 
                 mesh = new Mesh(imagePlaneGeometry, material);
                 scene.add(mesh);
@@ -540,6 +545,9 @@ export default defineComponent({
             beforeTexture?.dispose();
             imagePlaneGeometry?.dispose();
             material?.dispose();
+            for (const texture of filterTextures) {
+                texture.dispose();
+            }
             
             if (encounteredError) {
                 throw encounteredError;
@@ -574,6 +582,7 @@ export default defineComponent({
 
             const combinedShaderResult = combineFiltersToShader([currentFilter.value], layer.value!);
             previewMaterial = createRasterShaderMaterial(previewTexture, combinedShaderResult);
+            previewFilterTextures = combinedShaderResult.textures;
 
             previewMesh = new Mesh(previewPlaneGeometry, previewMaterial);
             threejsScene.add(previewMesh);
@@ -615,6 +624,10 @@ export default defineComponent({
             (previewMesh as any) = undefined;
             threejsComposer?.dispose();
             (threejsComposer as any) = undefined;
+            for (const texture of previewFilterTextures) {
+                texture.dispose();
+            }
+            previewFilterTextures = [];
         }
 
         function isParamsChanged(oldParams: Record<string, unknown>, newParams: Record<string, unknown>) {

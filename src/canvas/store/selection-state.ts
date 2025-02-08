@@ -1,12 +1,15 @@
 import mitt from 'mitt';
 import { ref, reactive } from 'vue';
-import canvasStore from '@/store/canvas';
-import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
-import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
-import { createCanvasFromImage, createImageFromCanvas, getImageDataEmptyBounds } from '@/lib/image';
-import { PerformantStore } from '@/store/performant-store';
 
-import type { WorkingFileLayerBlendingMode } from '@/types';
+import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
+import { createImageFromCanvas, createEmptyCanvasWith2dContext } from '@/lib/image';
+
+import canvasStore from '@/store/canvas';
+import { getStoredImageOrCanvas } from '@/store/image';
+import { PerformantStore } from '@/store/performant-store';
+import workingFileStore, { getCanvasRenderingContext2DSettings, getLayerGlobalTransform } from '@/store/working-file';
+
+import type { WorkingFileLayerBlendingMode, WorkingFileRasterLayer } from '@/types';
 
 export type SelectionAddShape = 'rectangle' | 'ellipse' | 'freePolygon' | 'tonalArea';
 export type SelectionCombineMode = 'add' | 'subtract' | 'intersect' | 'replace';
@@ -302,6 +305,9 @@ export async function blitActiveSelectionMask(
     );
 }
 
+/**
+ * This modifies the alpha channel of the given sourceImage according to the contents of the selection mask.
+ */
 export async function blitSpecifiedSelectionMask(
     selectionMask: HTMLImageElement | null,
     selectionMaskCanvasOffset: DOMPoint,
@@ -355,4 +361,58 @@ export async function blitSpecifiedSelectionMask(
     }
     ctx.globalCompositeOperation = 'source-over';
     return workingCanvas;
+}
+
+
+
+/**
+ * The selection mask image and offset is defined from the point of view of the canvas itself.
+ * Layers can be transformed in many ways. This generates a new selection mask image that
+ * can be drawn in the context of the layer's transform.
+ * 
+ * Example:
+ * ```
+ * resampleSelectionMaskInLayerBounds(
+ *     activeSelectionMask.value ?? appliedSelectionMask.value,
+ *     activeSelectionMask.value ? activeSelectionMaskCanvasOffset.value : appliedSelectionMaskCanvasOffset.value,
+ *     new DOMPoint(layer.width, layer.height),
+ *     getLayerGlobalTransform(layer.id)
+ * )
+ * ```
+ */
+export async function resampleSelectionMaskInLayerBounds(
+    selectionMask: HTMLImageElement,
+    selectionMaskCanvasOffset: DOMPoint,
+    layerDimensions: DOMPoint,
+    layerTransform: DOMMatrix,
+): Promise<HTMLCanvasElement> {
+    const p0 = selectionMaskCanvasOffset.matrixTransform(layerTransform.inverse());
+    const p1 = new DOMPoint(selectionMaskCanvasOffset.x + selectionMask.width, selectionMaskCanvasOffset.y).matrixTransform(layerTransform.inverse());
+    const p2 = new DOMPoint(selectionMaskCanvasOffset.x, selectionMaskCanvasOffset.y + selectionMask.height).matrixTransform(layerTransform.inverse());
+    const p3 = new DOMPoint(selectionMaskCanvasOffset.x + selectionMask.width, selectionMaskCanvasOffset.y + selectionMask.height).matrixTransform(layerTransform.inverse());
+    const topLeft = new DOMPoint(Math.min(p0.x, p1.x, p2.x, p3.x), Math.min(p0.y, p1.y, p2.y, p3.y));
+    topLeft.x = Math.max(0, Math.floor(topLeft.x - 1));
+    topLeft.y = Math.max(0, Math.floor(topLeft.y - 1));
+    const bottomRight = new DOMPoint(Math.max(p0.x, p1.x, p2.x, p3.x), Math.max(p0.y, p1.y, p2.y, p3.y));
+    bottomRight.x = Math.min(layerDimensions.x, Math.ceil(bottomRight.x + 1));
+    bottomRight.y = Math.min(layerDimensions.y, Math.ceil(bottomRight.y + 1));
+    const { canvas: blackCanvas, ctx: blackCtx } = createEmptyCanvasWith2dContext(layerDimensions.x, layerDimensions.y);
+    if (blackCtx) {
+        blackCtx.fillStyle = '#000000';
+        blackCtx.fillRect(0, 0, layerDimensions.x, layerDimensions.y);
+    }
+    const updateChunkImage = await blitSpecifiedSelectionMask(
+        selectionMask,
+        selectionMaskCanvasOffset,
+        blackCanvas,
+        layerTransform,
+        'source-in',
+        // {
+        //     sx: topLeft.x,
+        //     sy: topLeft.y,
+        //     sWidth: bottomRight.x - topLeft.x,
+        //     sHeight: bottomRight.y - topLeft.y,
+        // }
+    );
+    return updateChunkImage;
 }

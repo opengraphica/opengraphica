@@ -1,7 +1,10 @@
 import { BaseAction } from './base';
+
 import canvasStore from '@/store/canvas';
+import { unreserveStoredImage } from '@/store/image';
 import workingFileStore, { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
-import { updateWorkingFileLayer } from '@/store/data/working-file-database';
+import { updateWorkingFileMasks, updateWorkingFileLayer } from '@/store/data/working-file-database';
+
 import { updateBakedImageForLayer } from './baking';
 
 import type { WorkingFileLayerFilter } from '@/types';
@@ -59,6 +62,18 @@ export class DeleteLayerFilterAction extends BaseAction {
 
     public free() {
         super.free();
+
+        if (this.isDone && this.deletedFilter?.maskId != null) {
+            const masks = workingFileStore.get('masks');
+            const mask = masks[this.deletedFilter.maskId];
+            if (mask) {
+                unreserveStoredImage(mask.sourceUuid, `${this.layerId}`);
+                delete masks[this.deletedFilter.maskId];
+            }
+            workingFileStore.set('masks', masks);
+        }
+        updateWorkingFileMasks(workingFileStore.get('masks'));
+
         (this.layerId as any) = null;
         (this.filterIndex as any) = null;
         (this.deletedFilter as any) = null;

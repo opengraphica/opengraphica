@@ -176,8 +176,11 @@ export function getImageDataFromCanvas(canvas: HTMLCanvasElement): ImageData {
  * @param bitmap The bitmap to convert.
  * @returns The resulting ImageData.
  */
-export function getImageDataFromImageBitmap(bitmap: ImageBitmap): ImageData {
-    return getImageDataFromCanvas(createCanvasFromImage(bitmap));
+interface GetImageDataFromImageBitmapOptions {
+    imageOrientation?: 'none' | 'flipY';
+}
+export function getImageDataFromImageBitmap(bitmap: ImageBitmap, options?: GetImageDataFromImageBitmapOptions): ImageData {
+    return getImageDataFromCanvas(createCanvasFromImage(bitmap, options));
 }
 
 /**

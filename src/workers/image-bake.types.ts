@@ -14,6 +14,7 @@ export interface FilterNewBakeRequest {
     layerId: number;
     imageData: ImageData;
     filterConfigurations: WorkingFileLayerFilter[];
+    masks: Record<number, ImageData>;
 }
 
 export interface FilterCancelBakeRequest {

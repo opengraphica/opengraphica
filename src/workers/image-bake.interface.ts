@@ -1,5 +1,11 @@
 import { toRaw } from 'vue';
+
+import { getImageDataFromImage, getImageDataFromImageBitmap, getImageDataFromCanvas } from '@/lib/image';
 import { deepToRaw } from '@/lib/vue';
+
+import workingFileStore from '@/store/working-file';
+import canvasStore from '@/store/canvas';
+import { getStoredImageOrCanvas } from '@/store/image';
 
 import type { WorkingFileLayerFilter } from '@/types';
 import type {
@@ -40,8 +46,7 @@ imageBakeWorker.onmessageerror = (error) => {
     console.error('[src/workers/image-bake.interface.ts] Error received from imageBakeWorker', error);
 };
 
-export function bakeCanvasFilters(imageData: ImageData, layerId: number, filterConfigurations: WorkingFileLayerFilter[]): Promise<ImageData> {
-    // Remove existing request for this layer.
+export function cancelBakeCanvasFilters(layerId: number) {
     const existingQueueIndex = instructionQueue.findIndex((queueItem) => queueItem.type === 'FILTER_BAKE' && queueItem.layerId === layerId);
     if (existingQueueIndex > -1) {
         imageBakeWorker.postMessage({
@@ -51,6 +56,11 @@ export function bakeCanvasFilters(imageData: ImageData, layerId: number, filterC
         instructionQueue[existingQueueIndex].rejectPromise();
         instructionQueue.splice(existingQueueIndex, 1);
     }
+}
+
+export function bakeCanvasFilters(imageData: ImageData, layerId: number, filterConfigurations: WorkingFileLayerFilter[]): Promise<ImageData> {
+    // Remove existing request for this layer.
+    cancelBakeCanvasFilters(layerId);
 
     return new Promise<ImageData>((resolve, reject) => {
         try {
@@ -63,12 +73,28 @@ export function bakeCanvasFilters(imageData: ImageData, layerId: number, filterC
                 resolvePromise: resolve,
                 rejectPromise: reject
             });
+            const masks: Record<number, ImageData> = {};
+            for (const filter of filterConfigurations) {
+                if (filter.maskId != null) {
+                    const mask = workingFileStore.get('masks')[filter.maskId];
+                    const sourceImage = getStoredImageOrCanvas(mask.sourceUuid ?? '');
+                    if (!sourceImage) continue;
+                    const sourceImageData = (sourceImage instanceof HTMLImageElement)
+                        ? getImageDataFromImage(sourceImage)
+                        : (sourceImage instanceof ImageBitmap)
+                            ? getImageDataFromImageBitmap(sourceImage, { imageOrientation: canvasStore.state.renderer === 'webgl' ? 'flipY' : 'none' })
+                            : getImageDataFromCanvas(sourceImage);
+                    masks[filter.maskId] = sourceImageData;
+                }
+            }
+
             imageBakeWorker.postMessage({
                 type: 'NEW_FILTER_BAKE',
                 queueId,
                 layerId,
                 imageData: toRaw(imageData),
-                filterConfigurations: deepToRaw(filterConfigurations)
+                filterConfigurations: deepToRaw(filterConfigurations),
+                masks,
             } as FilterNewBakeRequest);
         } catch (error) {
             console.error('[src/workers/image-bake.interface.ts] Error sending message. ', error);

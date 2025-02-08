@@ -11,7 +11,7 @@ import { getStoredSvgDataUrl } from '@/store/svg';
 import { getStoredVideoDataUrl } from '@/store/video';
 
 import type {
-    FileSystemFileHandle, SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel,
+    FileSystemFileHandle, SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel, SerializedFileLayerMask,
     SerializedFileGradientLayer, SerializedFileGroupLayer, SerializedFileTextLayer, SerializedFileRasterLayer,
     SerializedFileRasterSequenceLayer, SerializedFileVectorLayer, SerializedFileVideoLayer, WorkingFile, WorkingFileGradientLayer,
     WorkingFileGroupLayer, WorkingFileTextLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer,
@@ -46,6 +46,8 @@ export async function saveWorkingFileToTemporaryStorage() {
         drawOriginY: workingFileStore.get('drawOriginY'),
         height: workingFileStore.get('height'),
         layerIdCounter: workingFileStore.get('layerIdCounter'),
+        maskIdCounter: workingFileStore.get('maskIdCounter'),
+        masks: workingFileStore.get('masks'),
         measuringUnits: workingFileStore.get('measuringUnits'),
         resolutionUnits: workingFileStore.get('resolutionUnits'),
         resolutionX: workingFileStore.get('resolutionX'),
@@ -64,6 +66,17 @@ export async function saveWorkingFileToTemporaryStorage() {
 }
 
 function serializeWorkingFile(): SerializedFile<ColorModel> {
+    const masks = workingFileStore.get('masks');
+    const serializedMasks: Record<number, SerializedFileLayerMask> = {};
+    for (const maskId of Object.keys(masks).map(key => parseInt(key))) {
+        const mask = masks[maskId];
+        serializedMasks[maskId] = {
+            sourceImageSerialized: serializeStoredImage(mask.sourceUuid),
+            hash: mask.hash,
+            offset: mask.offset,
+        }
+    }
+
     const serializedFile: SerializedFile<ColorModel> = {
         version: '0.0.1-ALPHA.1',
         date: new Date().toISOString(),
@@ -74,6 +87,7 @@ function serializeWorkingFile(): SerializedFile<ColorModel> {
         drawOriginY: workingFileStore.get('drawOriginY'),
         height: workingFileStore.get('height'),
         layerIdCounter: workingFileStore.get('layerIdCounter'),
+        masks: serializedMasks,
         measuringUnits: workingFileStore.get('measuringUnits'),
         resolutionUnits: workingFileStore.get('resolutionUnits'),
         resolutionX: workingFileStore.get('resolutionX'),
@@ -84,6 +98,35 @@ function serializeWorkingFile(): SerializedFile<ColorModel> {
         layers: serializeWorkingFileLayers(workingFileStore.get('layers'))
     };
     return serializedFile;
+}
+
+function serializeStoredImage(imageUuid?: string): string {
+    const canvas = document.createElement('canvas');
+    try {
+        const sourceImage = getStoredImageOrCanvas(imageUuid);
+        if (!sourceImage) return '';
+
+        canvas.width = sourceImage.width;
+        canvas.height = sourceImage.height;
+        const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
+        if (!ctx) {
+            return '';
+        }
+        ctx.imageSmoothingEnabled = false;
+        
+        if (canvasStore.state.renderer === 'webgl' && sourceImage instanceof ImageBitmap) {
+            ctx.scale(1, -1);
+            ctx.translate(0, -sourceImage.height);
+        }
+        if (sourceImage) {
+            ctx.drawImage(sourceImage, 0, 0);
+        }
+        return canvas.toDataURL('image/png');
+    } catch (error: any) {
+        canvas.width = 1;
+        canvas.height = 1;
+    }
+    return '';
 }
 
 function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): SerializedFileLayer<ColorModel>[] {
@@ -118,66 +161,25 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
             } as SerializedFileGroupLayer<ColorModel>;
         }
         else if (layer.type === 'raster') {
-            const canvas = document.createElement('canvas');
-            canvas.width = layer.width;
-            canvas.height = layer.height;
-            const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
-            try {
-                if (!ctx) {
-                    throw new Error('Missing canvas context');
+            serializedLayer = {
+                ...serializedLayer,
+                type: 'raster',
+                data: {
+                    sourceImageSerialized: serializeStoredImage((layer as WorkingFileRasterLayer<ColorModel>).data.sourceUuid)
                 }
-                ctx.imageSmoothingEnabled = false;
-                const sourceImage = getStoredImageOrCanvas((layer as WorkingFileRasterLayer<ColorModel>).data.sourceUuid);
-                if (canvasStore.state.renderer === 'webgl' && sourceImage instanceof ImageBitmap) {
-                    ctx.scale(1, -1);
-                    ctx.translate(0, -layer.height);
-                }
-                if (sourceImage) {
-                    ctx.drawImage(sourceImage, 0, 0);
-                }
-                serializedLayer = {
-                    ...serializedLayer,
-                    type: 'raster',
-                    data: {
-                        sourceImageSerialized: canvas.toDataURL('image/png')
-                    }
-                } as SerializedFileRasterLayer<ColorModel>;
-                canvas.width = 1;
-                canvas.height = 1;
-            } catch (error: any) {
-                canvas.width = 1;
-                canvas.height = 1;
-                throw error;
-            }
+            } as SerializedFileRasterLayer<ColorModel>;
         }
         else if (layer.type === 'rasterSequence') {
             const memoryLayer = (layer as WorkingFileRasterSequenceLayer<ColorModel>);
             const serializedSequence: SerializedFileRasterSequenceLayer<ColorModel>['data']['sequence'] = [];
             for (let frame of memoryLayer.data.sequence) {
-                const canvas = document.createElement('canvas');
-                canvas.width = layer.width;
-                canvas.height = layer.height;
-                const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
-                try {
-                    if (!ctx) {
-                        throw new Error('Missing canvas context');
+                serializedSequence.push({
+                    start: frame.start,
+                    end: frame.end,
+                    image: {
+                        sourceImageSerialized: serializeStoredImage(frame.image.sourceUuid)
                     }
-                    ctx.imageSmoothingEnabled = false;
-                    ctx.drawImage(getStoredImageOrCanvas(frame.image.sourceUuid) as ImageBitmap, 0, 0);
-                    serializedSequence.push({
-                        start: frame.start,
-                        end: frame.end,
-                        image: {
-                            sourceImageSerialized: canvas.toDataURL('image/png')
-                        }
-                    });
-                    canvas.width = 1;
-                    canvas.height = 1;
-                } catch (error: any) {
-                    canvas.width = 1;
-                    canvas.height = 1;
-                    throw error;
-                }
+                });
             }
             serializedLayer = {
                 ...serializedLayer,

@@ -11,11 +11,10 @@ import { notifyLoadingFontFamilies, notifyFontFamiliesLoaded } from '@/lib/font-
 import appEmitter from '@/lib/emitter';
 
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
-import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { Mesh } from 'three/src/objects/Mesh';
 import { Texture } from 'three/src/textures/Texture';
 
-import { createFiltersFromLayerConfig, combineFiltersToShader } from '@/canvas/filters';
+import { createFiltersFromLayerConfig } from '@/canvas/filters';
 import { createMaterial, disposeMaterial, type MaterialWrapper } from './materials';
 
 import type { Scene } from 'three';

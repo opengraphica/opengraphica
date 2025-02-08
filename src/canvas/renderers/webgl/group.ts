@@ -6,14 +6,13 @@ import BaseLayerRenderer from './base';
 
 import { OrthographicCamera } from 'three/src/cameras/OrthographicCamera';
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
-import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { Mesh } from 'three/src/objects/Mesh';
 import { WebGLRenderTarget } from 'three/src/renderers/WebGLRenderTarget';
 import { LinearFilter, NearestFilter, LinearSRGBColorSpace } from 'three/src/constants';
 import { Matrix4 } from 'three/src/math/Matrix4';
 import { Scene } from 'three/src/scenes/Scene';
 
-import { createFiltersFromLayerConfig, combineFiltersToShader } from '../../filters';
+import { createFiltersFromLayerConfig } from '../../filters';
 import { createMaterial, disposeMaterial, type MaterialWrapper, type MaterialWapperUpdates } from './materials';
 import appEmitter from '@/lib/emitter';
 

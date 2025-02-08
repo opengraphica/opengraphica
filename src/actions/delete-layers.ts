@@ -8,7 +8,7 @@ import { unreserveStoredImage } from '@/store/image';
 import { unreserveStoredSvg } from '@/store/svg';
 import { unreserveStoredVideo } from '@/store/video';
 import workingFileStore, { calculateLayerOrder, getLayerById, getGroupLayerById } from '@/store/working-file';
-import { updateWorkingFile, updateWorkingFileLayer, deleteWorkingFileLayer } from '@/store/data/working-file-database';
+import { updateWorkingFileMasks, updateWorkingFile, updateWorkingFileLayer, deleteWorkingFileLayer } from '@/store/data/working-file-database';
 import { updateBakedImageForLayer } from './baking';
 
 export class DeleteLayersAction extends BaseAction {
@@ -106,31 +106,45 @@ export class DeleteLayersAction extends BaseAction {
     public free() {
         super.free();
 
-        for (let deletedLayerInfo of this.deletedLayers) {
-            const layer = deletedLayerInfo.layer;
-            if (layer.type === 'raster') {
-                if (layer.data.sourceUuid) {
-                    unreserveStoredImage(layer.data.sourceUuid, `${layer.id}`);
+        if (this.isDone) {
+            for (let deletedLayerInfo of this.deletedLayers) {
+                const layer = deletedLayerInfo.layer;
+                if (layer.type === 'raster') {
+                    if (layer.data.sourceUuid) {
+                        unreserveStoredImage(layer.data.sourceUuid, `${layer.id}`);
+                    }
                 }
-            }
-            else if (layer.type === 'rasterSequence') {
-                for (let frame of layer.data.sequence) {
-                    if (frame.image.sourceUuid) {
-                        unreserveStoredImage(frame.image.sourceUuid, `${layer.id}`);
+                else if (layer.type === 'rasterSequence') {
+                    for (let frame of layer.data.sequence) {
+                        if (frame.image.sourceUuid) {
+                            unreserveStoredImage(frame.image.sourceUuid, `${layer.id}`);
+                        }
+                    }
+                }
+                else if (layer.type === 'vector') {
+                    if (layer.data.sourceUuid) {
+                        unreserveStoredSvg(layer.data.sourceUuid, `${layer.id}`);
+                    }
+                }
+                else if (layer.type === 'video') {
+                    if (layer.data.sourceUuid) {
+                        unreserveStoredVideo(layer.data.sourceUuid, `${layer.id}`);
+                    }
+                }
+                for (const filter of layer.filters) {
+                    if (filter.maskId != null) {
+                        const masks = workingFileStore.get('masks');
+                        const mask = masks[filter.maskId];
+                        if (mask) {
+                            unreserveStoredImage(mask.sourceUuid, `${layer.id}`);
+                            delete masks[filter.maskId];
+                        }
+                        workingFileStore.set('masks', masks);
                     }
                 }
             }
-            else if (layer.type === 'vector') {
-                if (layer.data.sourceUuid) {
-                    unreserveStoredSvg(layer.data.sourceUuid, `${layer.id}`);
-                }
-            }
-            else if (layer.type === 'video') {
-                if (layer.data.sourceUuid) {
-                    unreserveStoredVideo(layer.data.sourceUuid, `${layer.id}`);
-                }
-            }
         }
+        updateWorkingFileMasks(workingFileStore.get('masks'));
 
         (this.deleteLayerIds as any) = null;
         (this.deletedLayers as any) = null;

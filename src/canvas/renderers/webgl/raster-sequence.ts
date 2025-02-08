@@ -7,15 +7,13 @@ import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import BaseLayerRenderer from './base';
 
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
-import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
-import { DoubleSide, NearestFilter, SRGBColorSpace } from 'three/src/constants';
+import { NearestFilter, SRGBColorSpace } from 'three/src/constants';
 import { Mesh } from 'three/src/objects/Mesh';
-import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { Texture } from 'three/src/textures/Texture';
 import { CanvasTexture } from 'three/src/textures/CanvasTexture';
 import appEmitter from '@/lib/emitter';
 
-import { createFiltersFromLayerConfig, combineFiltersToShader } from '../../filters';
+import { createFiltersFromLayerConfig } from '../../filters';
 import { createMaterial, disposeMaterial, type MaterialWrapper, type MaterialWapperUpdates } from './materials';
 
 import type { Scene } from 'three';

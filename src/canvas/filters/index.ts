@@ -1,5 +1,7 @@
 import { camelCaseToKebabCase } from "@/lib/string";
 import { Vector2 } from 'three/src/math/Vector2';
+import { CanvasTexture } from 'three/src/textures/CanvasTexture';
+import { Texture } from 'three/src/textures/Texture';
 
 import basicMaterialVertexShaderSetup from '@/canvas/renderers/webgl/shaders/basic-material.setup.vert';
 import basicMaterialVertexShaderMain from '@/canvas/renderers/webgl/shaders/basic-material.main.vert';
@@ -8,6 +10,9 @@ import basicMaterialFragmentShaderMain from '@/canvas/renderers/webgl/shaders/ba
 import blendingModesFragmentShaderSetup from '@/canvas/renderers/webgl/shaders/blending-modes.setup.frag';
 import blendingModesFragmentShaderMain from '@/canvas/renderers/webgl/shaders/blending-modes.main.frag';
 import commonUtilityFragmentShader from '@/canvas/renderers/webgl/shaders/common-utility.frag';
+
+import workingFileStore from '@/store/working-file';
+import { getStoredImageOrCanvas } from "@/store/image";
 
 import type { IUniform } from 'three/src/renderers/shaders/UniformsLib';
 import type { CanvasFilter, CanvasFilterLayerInfo, CanvasFilterEditConfig, WorkingFileAnyLayer, WorkingFileLayerFilter } from '@/types';
@@ -26,6 +31,7 @@ export async function createFiltersFromLayerConfig(filterConfigs: WorkingFileLay
     for (const filterConfig of filterConfigs) {
         if (!filterConfig.disabled || options.createDisabled) {
             const canvasFilter = new (await getCanvasFilterClass(filterConfig.name))();
+            canvasFilter.maskId = filterConfig.maskId;
             canvasFilter.params = filterConfig.params ?? {};
             canvasFilters.push(canvasFilter);
         }
@@ -79,7 +85,8 @@ export interface CombinedFilterShaderResult {
     fragmentShader: string,
     vertexShader: string,
     uniforms: Record<string, IUniform>,
-    defines: Record<string, unknown>
+    defines: Record<string, unknown>,
+    textures: Texture[],
 }
 
 function translateParamToUniformValue(paramValue: any, editConfig: CanvasFilterEditConfig, editParamName: string) {
@@ -147,22 +154,48 @@ export function combineFiltersToShader(canvasFilters: CanvasFilter[], layerInfo:
     const { uniforms, defines } = generateShaderUniformsAndDefines(canvasFilters, layerInfo);
     defines.cLayerBlendingMode = 0;
 
+    const masks = workingFileStore.get('masks');
+
     let vertexShaderMainCalls: string[] = [];
     let fragmentShaderMainCalls: string[] = [];
+    let textures: Texture[] = [];
 
     for (const [index, canvasFilter] of canvasFilters.entries()) {
         const editConfig = canvasFilter.getEditConfig();
         let filterVertexShader = canvasFilter.getVertexShader();
         let filterFragmentShader = canvasFilter.getFragmentShader();
-        const searchFunctionName = 'process' + canvasFilter.name[0].toUpperCase() + canvasFilter.name.slice(1);
-        if (filterVertexShader) {
-            if (filterVertexShader.includes(searchFunctionName)) {
-                vertexShaderMainCalls.push('    filterPositionResult = ' + searchFunctionName + '(filterPositionResult);');
+
+        const mask = masks[canvasFilter.maskId ?? -1];
+        let maskTexture: Texture | undefined;
+        if (mask) {
+            const maskImage = getStoredImageOrCanvas(mask.sourceUuid);
+            if (maskImage) {
+                maskTexture = new CanvasTexture(maskImage);
+                textures.push(maskTexture);
+                uniforms[`filterMask${index}Map`] = {
+                    value: maskTexture,
+                };
             }
         }
-        if (filterFragmentShader) {
-            if (filterFragmentShader.includes(searchFunctionName)) {
-                fragmentShaderMainCalls.push('    filterColorResult = ' + searchFunctionName + '(filterColorResult);');
+
+        const searchFunctionName = 'process' + canvasFilter.name[0].toUpperCase() + canvasFilter.name.slice(1);
+        if (filterVertexShader?.includes(searchFunctionName)) {
+            vertexShaderMainCalls.push('    filterPositionResult = ' + searchFunctionName + '(filterPositionResult);');
+        }
+        if (filterFragmentShader?.includes(searchFunctionName)) {
+            if (maskTexture) {
+                fragmentShaderMainCalls.push(`    filterColorBuffer = filterColorResult;\n    filterMaskAlpha = texture2D(filterMask${index}Map, vUv).a;`);
+            }
+            fragmentShaderMainCalls.push('    filterColorResult = ' + searchFunctionName + '(filterColorResult);');
+            if (maskTexture) {
+                fragmentShaderMainCalls.push(
+                    '    filterColorResult = vec4('
+                    +       'filterColorResult.r * filterMaskAlpha + filterColorBuffer.r * (1.0 - filterMaskAlpha),'
+                    +       'filterColorResult.g * filterMaskAlpha + filterColorBuffer.g * (1.0 - filterMaskAlpha),'
+                    +       'filterColorResult.b * filterMaskAlpha + filterColorBuffer.b * (1.0 - filterMaskAlpha),'
+                    +       'filterColorResult.a + filterColorBuffer.a * (1.0 - filterColorResult.a)'
+                    +   ');'
+                );
             }
         }
         
@@ -188,15 +221,21 @@ export function combineFiltersToShader(canvasFilters: CanvasFilter[], layerInfo:
         if (filterFragmentShader) {
             fragmentShader += filterFragmentShader + '\n';
         }
+        if (maskTexture) {
+            fragmentShader += `uniform sampler2D filterMask${index}Map;\n`;
+        }
     }
 
     let vertexFilterCode = '';
     if (vertexShaderMainCalls.length > 0) {
-        vertexFilterCode += 'vec4 filterPositionResult = gl_Position;\n' + vertexShaderMainCalls.join('\n') + '\n    gl_Position = filterPositionResult;';
+        vertexFilterCode += '    vec4 filterPositionResult = gl_Position;\n' + vertexShaderMainCalls.join('\n') + '\n    gl_Position = filterPositionResult;';
     }
     let fragmentFilterCode = '';
     if (fragmentShaderMainCalls.length > 0) {
-        fragmentFilterCode += 'vec4 filterColorResult = gl_FragColor;\n' + fragmentShaderMainCalls.join('\n') + '\n    gl_FragColor = filterColorResult;';
+        if (textures.length > 0) {
+            fragmentFilterCode += 'float filterMaskAlpha = 1.0;\n    vec4 filterColorBuffer = vec4(0.0, 0.0, 0.0, 0.0);\n';
+        }
+        fragmentFilterCode += '    vec4 filterColorResult = gl_FragColor;\n' + fragmentShaderMainCalls.join('\n') + '\n    gl_FragColor = filterColorResult;';
     }
     fragmentFilterCode += '\n' + blendingModesFragmentShaderMain + '\n';
 
@@ -210,6 +249,7 @@ export function combineFiltersToShader(canvasFilters: CanvasFilter[], layerInfo:
         vertexShader,
         fragmentShader,
         uniforms,
-        defines
+        defines,
+        textures,
     };
 }

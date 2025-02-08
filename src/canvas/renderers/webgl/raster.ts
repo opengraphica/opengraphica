@@ -6,12 +6,11 @@ import { getStoredImageCanvas, getStoredImageOrCanvas } from '@/store/image';
 import BaseLayerRenderer from './base';
 
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
-import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { Mesh } from 'three/src/objects/Mesh';
 import { Texture } from 'three/src/textures/Texture';
 import { Vector2 } from 'three/src/math/Vector2';
 
-import { createFiltersFromLayerConfig, combineFiltersToShader } from '@/canvas/filters';
+import { createFiltersFromLayerConfig } from '@/canvas/filters';
 import { createMaterial, disposeMaterial, type MaterialWrapper, type MaterialWapperUpdates } from './materials';
 
 import { createThreejsTextureFromImage } from '@/lib/canvas';

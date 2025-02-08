@@ -14,7 +14,7 @@ import { Mesh } from 'three/src/objects/Mesh';
 import { CanvasTexture } from 'three/src/textures/CanvasTexture';
 import { Vector2 } from 'three/src/math/Vector2';
 
-import { Camera, Scene, WebGLRenderer } from 'three';
+import type { Camera, Scene, Texture, WebGLRenderer } from 'three';
 import type {
     DrawWorkingFileLayerOptions, WorkingFileLayer, WorkingFileLayerRenderer, WorkingFileGroupLayer, ColorModel,
     WorkingFileLayerFilter, WorkingFileLayerDraft, WorkingFileLayerBlendingMode
@@ -28,6 +28,7 @@ interface DraftAssets {
     plane: InstanceType<typeof Mesh> | undefined;
     draftDestroyTimeoutHandle: number | undefined;
     latestDraftUpdate: WorkingFileLayerDraft | null | undefined;
+    filterTextures: Texture[];
 }
 
 export default class BaseLayerRenderer implements WorkingFileLayerRenderer<ColorModel> {
@@ -192,6 +193,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
                             filterClasses,
                             { width: draftUpdate.logicalWidth, height: draftUpdate.logicalHeight }
                         );
+                        draftAssets.filterTextures = combinedShaderResult.textures;
                         draftAssets.planeMaterial = createRasterShaderMaterial(null, combinedShaderResult);
                         assignMaterialBlendModes(draftAssets.planeMaterial, this.lastBaseBlendingMode);
                         if (draftAssets.planeTexture) {
@@ -394,6 +396,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
             plane: undefined,
             draftDestroyTimeoutHandle: undefined,
             latestDraftUpdate: undefined,
+            filterTextures: [],
         };
     }
 
@@ -451,6 +454,10 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
         draftAssets.planeTexture?.dispose();
         (draftAssets.planeTexture as unknown) = undefined;
         draftAssets.plane && (this.threejsScene ?? canvasStore.get('threejsScene'))?.remove(draftAssets.plane);
+        for (const texture of draftAssets.filterTextures) {
+            texture.dispose();
+        }
+        draftAssets.filterTextures = [];
     }
 
 }

@@ -30,7 +30,7 @@ import type {
     ShowOpenFilePicker, FileSystemFileHandle,
     SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel,
     InsertAnyLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions, InsertVectorLayerOptions, InsertVideoLayerOptions,
-    WorkingFileEmptyLayer, WorkingFileGradientLayer, WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer,
+    WorkingFileLayerMask, WorkingFileEmptyLayer, WorkingFileGradientLayer, WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer,
     WorkingFileTextLayer, WorkingFileVectorLayer, WorkingFileVideoLayer, SerializedFileGradientLayer, SerializedFileGroupLayer,
     SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileTextLayer, SerializedFileVectorLayer, SerializedFileVideoLayer
 } from '@/types';
@@ -165,6 +165,7 @@ export async function openFromTemporaryStorage() {
     workingFileStore.set('drawOriginY', workingFile.drawOriginY);
     workingFileStore.set('height', workingFile.height);
     workingFileStore.set('layerIdCounter', workingFile.layerIdCounter);
+    workingFileStore.set('masks', workingFile.masks);
     workingFileStore.set('measuringUnits', workingFile.measuringUnits);
     workingFileStore.set('resolutionUnits', workingFile.resolutionUnits);
     workingFileStore.set('resolutionX', workingFile.resolutionX);
@@ -576,6 +577,16 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
 }
 
 async function parseSerializedFileToActions(serializedFile: SerializedFile<ColorModel>): Promise<{ workingFileDefinition: Partial<WorkingFileState>, insertLayerActions: InsertLayerAction<any>[] }> {
+    const serializedMasks = serializedFile.masks;
+    const masks: Record<number, WorkingFileLayerMask> = {};
+    for (const maskId of Object.keys(serializedFile.masks ?? {}).map(key => parseInt(key))) {
+        masks[maskId] = {
+            sourceUuid: await parseDataUrlToStoredImage(serializedMasks[maskId].sourceImageSerialized),
+            hash: serializedMasks[maskId].hash,
+            offset: new DOMPoint(serializedMasks[maskId].offset.x, serializedMasks[maskId].offset.y),
+        };
+    }
+
     const workingFileDefinition: Partial<WorkingFileState> = {
         background: serializedFile.background,
         colorModel: serializedFile.colorModel,
@@ -584,6 +595,7 @@ async function parseSerializedFileToActions(serializedFile: SerializedFile<Color
         drawOriginY: serializedFile.drawOriginY,
         height: serializedFile.height,
         layerIdCounter: serializedFile.layerIdCounter,
+        masks,
         measuringUnits: serializedFile.measuringUnits,
         resolutionUnits: serializedFile.resolutionUnits,
         resolutionX: serializedFile.resolutionX,
@@ -597,6 +609,22 @@ async function parseSerializedFileToActions(serializedFile: SerializedFile<Color
         workingFileDefinition,
         insertLayerActions
     };
+}
+
+async function parseDataUrlToStoredImage(dataUrl: string): Promise<string> {
+    const image = new Image();
+    const base64Fetch = await fetch(dataUrl);
+    const imageBlob = await base64Fetch.blob();
+    await new Promise<void>((resolve) => {
+        image.onload = () => {
+            resolve();
+        };
+        image.onerror = () => {
+            resolve();
+        };
+        image.src = URL.createObjectURL(imageBlob);
+    });
+    return await createStoredImage(image);
 }
 
 async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): Promise<InsertLayerAction<any>[]> {
@@ -640,23 +668,11 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
         }
         else if (layer.type === 'raster') {
             const serializedLayer = layer as SerializedFileRasterLayer<ColorModel>;
-            const image = new Image();
-            const base64Fetch = await fetch(serializedLayer.data.sourceImageSerialized || '');
-            const imageBlob = await base64Fetch.blob();
-            await new Promise<void>((resolve) => {
-                image.onload = () => {
-                    resolve();
-                };
-                image.onerror = () => {
-                    resolve();
-                };
-                image.src = URL.createObjectURL(imageBlob);
-            });
             parsedLayer = {
                 ...parsedLayer,
                 type: 'raster',
                 data: {
-                    sourceUuid: await createStoredImage(image),
+                    sourceUuid: await parseDataUrlToStoredImage(serializedLayer.data.sourceImageSerialized || ''),
                 }
             } as WorkingFileRasterLayer<ColorModel>;
         }
@@ -664,23 +680,11 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
             const serializedLayer = layer as SerializedFileRasterSequenceLayer<ColorModel>;
             const parsedSequence: WorkingFileRasterSequenceLayer<ColorModel>['data']['sequence'] = [];
             for (let frame of serializedLayer.data.sequence) {
-                const image = new Image();
-                const base64Fetch = await fetch(frame.image.sourceImageSerialized || '');
-                const imageBlob = await base64Fetch.blob();
-                await new Promise<void>((resolve) => {
-                    image.onload = () => {
-                        resolve();
-                    };
-                    image.onerror = () => {
-                        resolve();
-                    };
-                    image.src = URL.createObjectURL(imageBlob);
-                });
                 parsedSequence.push({
                     start: frame.start,
                     end: frame.end,
                     image: {
-                        sourceUuid: await createStoredImage(image),
+                        sourceUuid: await parseDataUrlToStoredImage(frame.image.sourceImageSerialized || ''),
                     },
                     thumbnailImageSrc: null
                 });

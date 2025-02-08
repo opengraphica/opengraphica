@@ -76,6 +76,7 @@ export interface CanvasFilterEditConfig {
 export interface CanvasFilter<T extends Object = Record<string, unknown>> {
     name: string;
     params: T;
+    maskId?: number;
     getEditConfig(): CanvasFilterEditConfig;
     getFragmentShader(): string | undefined;
     getVertexShader(): string | undefined;

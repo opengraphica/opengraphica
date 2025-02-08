@@ -58,15 +58,33 @@ async function workNewFilterBake(queueItem: FilterNewBakeRequest) {
         const appliedImageData = queueItem.imageData;
         const imageDataSize = appliedImageData.width * appliedImageData.height * 4;
 
+        let maskImageDataBuffer!: ImageData;
+        if (Object.keys(queueItem.masks).length > 0) {
+            maskImageDataBuffer = new ImageData(appliedImageData.width, appliedImageData.height);
+        }
+
         for (const filterConfiguration of queueItem.filterConfigurations) {
             const filterName = filterConfiguration.name;
             if (filterName in filterClassesByName && !filterConfiguration.disabled) {
                 const filter = new filterClassesByName[filterName as keyof typeof filterClassesByName]();
                 filter.params = filterConfiguration.params;
+                const mask = queueItem.masks[filterConfiguration.maskId ?? -1];
 
-                const appliedData = appliedImageData.data;
-                for (let i = 0; i < imageDataSize; i += 4) {
-                    filter.fragment(appliedData, appliedData, i);
+                if (mask) {
+                    const appliedData = appliedImageData.data;
+                    for (let i = 0; i < imageDataSize; i += 4) {
+                        const maskAlpha = 1.0 - (mask.data[i + 3] / 255);
+                        filter.fragment(appliedData, maskImageDataBuffer.data, i);
+                        appliedData[i] = appliedData[i] * maskAlpha + maskImageDataBuffer.data[i] * (1.0 - maskAlpha);
+                        appliedData[i + 1] = appliedData[i + 1] * maskAlpha + maskImageDataBuffer.data[i + 1] * (1.0 - maskAlpha);
+                        appliedData[i + 2] = appliedData[i + 2] * maskAlpha + maskImageDataBuffer.data[i + 2] * (1.0 - maskAlpha);
+                        appliedData[i + 3] = Math.max(appliedData[i + 3], maskImageDataBuffer.data[i + 3]);
+                    }
+                } else {
+                    const appliedData = appliedImageData.data;
+                    for (let i = 0; i < imageDataSize; i += 4) {
+                        filter.fragment(appliedData, appliedData, i);
+                    }
                 }
 
                 // Wait for new messages to come in.

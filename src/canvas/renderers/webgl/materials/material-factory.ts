@@ -167,6 +167,7 @@ function createMaterialWrapper<T extends MaterialType>(
         },
         userData: {
             uuid,
+            disposableTextures: combinedShaderResult.textures,
         },
     });
     assignMaterialBlendModes(material, blendingMode);
@@ -247,6 +248,12 @@ function disposeMaterialDeferred(materialWrapper: MaterialWrapper) {
         case 'gradient':
             gradientMaterialSetup.dispose(material);
             break;
+    }
+    if (material.userData.disposableTextures) {
+        for (const texture of material.userData.disposableTextures) {
+            texture.dispose();
+        }
+        material.userData.disposableTextures = null;
     }
     material.dispose();
     materialWrappersById.delete(uuid);

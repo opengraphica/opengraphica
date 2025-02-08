@@ -27428,6 +27428,7 @@ body.ogr-full-page .opengraphica {
   --el-color-warning-lighter: mix(--el-color-white, --el-color-warning, 90%);
   --el-color-danger-lighter: mix(--el-color-white, --el-color-danger, 90%);
   --el-color-info-lighter: mix(--el-color-white, --el-color-info, 90%);
+  --el-disabled-text-color: #828e93;
   --el-fill-color-blank: #272c37;
   --el-fill-color-light: #343a46;
   --el-mask-color: rgba(0, 0, 0, .6);

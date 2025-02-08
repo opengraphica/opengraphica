@@ -5,13 +5,12 @@ import { getStoredVideo } from '@/store/video';
 import BaseLayerRenderer from './base';
 
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
-import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { Mesh } from 'three/src/objects/Mesh';
 import { Texture } from 'three/src/textures/Texture';
 import { VideoTexture } from 'three/src/textures/VideoTexture';
 import { SRGBColorSpace, LinearSRGBColorSpace } from 'three/src/constants';
 
-import { createFiltersFromLayerConfig, combineFiltersToShader } from '@/canvas/filters';
+import { createFiltersFromLayerConfig } from '@/canvas/filters';
 import { createMaterial, disposeMaterial, type MaterialWrapper, type MaterialWapperUpdates } from './materials';
 import { ColorSpaceConversion } from './materials/raster';
 
