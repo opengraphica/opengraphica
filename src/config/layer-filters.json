@@ -34,5 +34,17 @@
     "instagramAden": {
         "name": "layerFilter.instagramAden.name",
         "group": "instagramFilter"
+    },
+    "instagramClarendon": {
+        "name": "layerFilter.instagramClarendon.name",
+        "group": "instagramFilter"
+    },
+    "instagramGingham": {
+        "name": "layerFilter.instagramGingham.name",
+        "group": "instagramFilter"
+    },
+    "instagramInkwell": {
+        "name": "layerFilter.instagramInkwell.name",
+        "group": "instagramFilter"
     }
 }

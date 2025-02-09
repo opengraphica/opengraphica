@@ -16,6 +16,10 @@ import { default as saturation } from './saturation/saturation';
 import { default as sepia } from './sepia/sepia';
 
 import { default as instagram1997 } from './instagram1997/instagram1997';
+import { default as instagramAden } from './instagram-aden/instagram-aden';
+import { default as instagramClarendon } from './instagram-clarendon/instagram-clarendon';
+import { default as instagramGingham } from './instagram-gingham/instagram-gingham';
+import { default as instagramInkwell } from './instagram-inkwell/instagram-inkwell';
 
 export default {
     brightness,
@@ -31,4 +35,8 @@ export default {
     sepia,
 
     instagram1997,
+    instagramAden,
+    instagramClarendon,
+    instagramGingham,
+    instagramInkwell,
 };
