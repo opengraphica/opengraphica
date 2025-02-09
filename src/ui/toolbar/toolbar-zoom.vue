@@ -7,20 +7,20 @@
             </div>
             <el-horizontal-scrollbar-arrows>
                 <el-button-group class="el-button-group--flex">
-                    <el-button size="small" plain :aria-label="$t('toolbar.zoom.zoomOut')" :title="$t('toolbar.zoom.zoomOut')" @click="zoomLevel *= 1/1.25">
+                    <el-button size="small" plain :aria-label="$t('toolbar.zoom.zoomOut')" :title="$t('toolbar.zoom.zoomOut')" @click="isZoomLevelTouched = true; zoomLevel *= 1/1.25">
                         <i class="bi bi-zoom-out" aria-hidden="true" />
                     </el-button>
-                    <el-input-number v-model.lazy="zoomLevel" :blur-on-enter="true" suffix-text="%" size="small" class="el-input--text-center" style="width: 4rem" />
-                    <el-button size="small" plain :aria-label="$t('toolbar.zoom.zoomIn')" :title="$t('toolbar.zoom.zoomIn')" @click="zoomLevel *= 1.25">
+                    <el-input-number v-model.lazy="zoomLevel" :blur-on-enter="true" suffix-text="%" size="small" class="el-input--text-center" style="width: 4rem" @input="isZoomLevelTouched = true"/>
+                    <el-button size="small" plain :aria-label="$t('toolbar.zoom.zoomIn')" :title="$t('toolbar.zoom.zoomIn')" @click="isZoomLevelTouched = true; zoomLevel *= 1.25">
                         <i class="bi bi-zoom-in" aria-hidden="true" />
                     </el-button>
                 </el-button-group>
                 <el-button-group class="el-button-group--flex ml-3">
-                    <el-button size="small" plain :aria-label="$t('toolbar.zoom.rotateCounterClockwise')" :title="$t('toolbar.zoom.rotateCounterClockwise')" @click="rotationAngle -= 15">
+                    <el-button size="small" plain :aria-label="$t('toolbar.zoom.rotateCounterClockwise')" :title="$t('toolbar.zoom.rotateCounterClockwise')" @click="isRotationAngleTouched = true; rotationAngle -= 15">
                         <i class="bi bi-arrow-counterclockwise" aria-hidden="true" />
                     </el-button>
-                    <el-input-number v-model.lazy="rotationAngle" :blur-on-enter="true" suffix-text="°" size="small" class="el-input--text-center" style="width: 4rem" />
-                    <el-button size="small" plain :aria-label="$t('toolbar.zoom.rotateClockwise')" :title="$t('toolbar.zoom.rotateClockwise')" @click="rotationAngle += 15">
+                    <el-input-number v-model.lazy="rotationAngle" :blur-on-enter="true" suffix-text="°" size="small" class="el-input--text-center" style="width: 4rem" @input="isRotationAngleTouched = true" />
+                    <el-button size="small" plain :aria-label="$t('toolbar.zoom.rotateClockwise')" :title="$t('toolbar.zoom.rotateClockwise')" @click="isRotationAngleTouched = true; rotationAngle += 15">
                         <i class="bi bi-arrow-clockwise" aria-hidden="true" />
                     </el-button>
                 </el-button-group>
@@ -80,32 +80,29 @@ export default defineComponent({
         'close'
     ],
     setup(props, { emit }) {
-        const { decomposedTransform } = toRefs(canvasStore.state);
+        const zoomLevel = ref<number>(100);
+        const isZoomLevelTouched = ref<boolean>(false);
+        const rotationAngle = ref<number>(0);
+        const isRotationAngleTouched = ref<boolean>(false);
 
-        const decomposedScaleX = ref(decomposedTransform.value.scaleX);
-        const decomposedRotation = ref(decomposedTransform.value.rotation);
-
-        watch([decomposedTransform], throttle(([decomposedTransform]) => {
-            decomposedScaleX.value = decomposedTransform.scaleX;
-            decomposedRotation.value = decomposedTransform.rotation;
+        watch(() => canvasStore.state.decomposedTransform, throttle((decomposedTransform) => {
+            zoomLevel.value = Math.round(decomposedTransform.scaleX * 100);
+            rotationAngle.value = Math.round(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES);
         }, 100), { immediate: true });
 
-        const zoomLevel = computed<number>({
-            get() {
-                return Math.round(decomposedScaleX.value * 100);
-            },
-            set(value) {
-                canvasStore.dispatch('setTransformScale', value / 100);
+        watch([zoomLevel], ([zoomLevel]) => {
+            if (isZoomLevelTouched.value) {
+                canvasStore.dispatch('setTransformScale', zoomLevel / 100);
+                isZoomLevelTouched.value = false;
             }
         });
-        const rotationAngle = computed<number>({
-            get() {
-                return Math.round(decomposedRotation.value * Math.RADIANS_TO_DEGREES);
-            },
-            set(value) {
-                canvasStore.dispatch('setTransformRotation', value * Math.DEGREES_TO_RADIANS);
+        watch([rotationAngle], ([rotationAngle]) => {
+            if (isRotationAngleTouched.value) {
+                canvasStore.dispatch('setTransformRotation', rotationAngle * Math.DEGREES_TO_RADIANS);
+                isRotationAngleTouched.value = false;
             }
         });
+
         function onResetViewFit() {
             appEmitter.emit('app.canvas.resetTransform');
         }
@@ -124,7 +121,9 @@ export default defineComponent({
 
         return {
             zoomLevel,
+            isZoomLevelTouched,
             rotationAngle,
+            isRotationAngleTouched,
             onResetViewFit,
             onResetViewRotation,
             onResetViewZoom,

@@ -2,7 +2,7 @@
     <div ref="overlay" class="ogr-canvas-overlay is-full-canvas-area">
         <div ref="selectionContainer" class="ogr-selection">
             <svg
-                v-if="transformedactiveSelectionPath.length > 0"
+                v-if="transformedActiveSelectionPath.length > 0"
                 :width="svgBoundsWidth"
                 :height="svgBoundsHeight"
                 xmlns="http://www.w3.org/2000/svg">
@@ -29,7 +29,7 @@
                     >{{ activeSelectionPathDimensionsText }}</text>
                 </template>
                 <template v-if="!isDrawingSelection">
-                    <template v-for="(point, i) in transformedactiveSelectionPath" :key="i + '_' + point.x + '_' + point.y">
+                    <template v-for="(point, i) in transformedActiveSelectionPath" :key="i + '_' + point.x + '_' + point.y">
                         <template v-if="point.type === 'line'">
                             <rect :x="point.x - (svgHandleWidth * 1.4)" :y="point.y - (svgHandleWidth * 1.4)" :width="svgHandleWidth * 2.8" :height="svgHandleWidth * 2.8" :stroke-width="0" />
                             <rect :x="point.x - (svgHandleWidth)" :y="point.y - (svgHandleWidth)" :width="svgHandleWidth * 2" :height="svgHandleWidth * 2" :stroke-width="svgHandleWidth * .3" />
@@ -93,12 +93,12 @@ export default defineComponent({
             return viewHeight.value / devicePixelRatio;
         });
         
-        let transformedactiveSelectionPath = ref<SelectionPathPoint[]>([]);
+        let transformedActiveSelectionPath = ref<SelectionPathPoint[]>([]);
         let activeSelectionPathPixelWidth = ref(0);
         let activeSelectionPathPixelHeight = ref(0);
         let transformedActiveSelectionPathDimensionsPosition = ref({ x: 0, y: 0 });
         watch([activeSelectionPath, viewDirty], () => {
-            transformedactiveSelectionPath.value = [];
+            transformedActiveSelectionPath.value = [];
             let left = Infinity;
             let right = -Infinity;
             let top = Infinity;
@@ -123,7 +123,7 @@ export default defineComponent({
                     startHandle = new DOMPoint(pathPoint.shx, pathPoint.shy).matrixTransform(transform.value);
                     endHandle = new DOMPoint(pathPoint.ehx, pathPoint.ehy).matrixTransform(transform.value);
                 }
-                transformedactiveSelectionPath.value.push({
+                transformedActiveSelectionPath.value.push({
                     type: pathPoint.type,
                     x: position.x / devicePixelRatio,
                     y: position.y / devicePixelRatio,
@@ -146,7 +146,7 @@ export default defineComponent({
         });
 
         const svgPathDraw = computed<string>(() => {
-            const path = transformedactiveSelectionPath.value;
+            const path = transformedActiveSelectionPath.value;
             let draw = 'M' + path[0].x + ' ' + path[0].y;
             for (let i = 1; i < path.length; i++) {
                 const point = path[i];
@@ -184,7 +184,7 @@ export default defineComponent({
 
             activeSelectionPathDimensionsText,
             transformedActiveSelectionPathDimensionsPosition,
-            transformedactiveSelectionPath,
+            transformedActiveSelectionPath,
 
             selectedLayerIds,
             selectionContainer,

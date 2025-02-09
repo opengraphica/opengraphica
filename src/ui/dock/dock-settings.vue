@@ -117,22 +117,22 @@
                     <el-form novalidate="novalidate" action="javascript:void(0)" class="mb-1 mt-1">
                         <el-form-item class="el-form-item--menu-item" :label="$t('dock.settings.view.zoom')">
                             <el-button-group class="el-button-group--flex">
-                                <el-button size="small" plain :aria-label="$t('dock.settings.view.zoomOut')" :title="$t('dock.settings.view.zoomOut')" @click="zoomLevel *= 1/1.1">
+                                <el-button size="small" plain :aria-label="$t('dock.settings.view.zoomOut')" :title="$t('dock.settings.view.zoomOut')" @click="isZoomLevelTouched = true; zoomLevel *= 1/1.25">
                                     <i class="bi bi-zoom-out" aria-hidden="true" />
                                 </el-button>
-                                <el-input-number v-model.lazy="zoomLevel" suffix-text="%" size="small" class="el-input--text-center" style="width: 5rem" />
-                                <el-button size="small" plain :aria-label="$t('dock.settings.view.zoomIn')" :title="$t('dock.settings.view.zoomIn')" @click="zoomLevel *= 1.1">
+                                <el-input-number v-model.lazy="zoomLevel" suffix-text="%" size="small" class="el-input--text-center" style="width: 5rem" @input="isZoomLevelTouched = true" />
+                                <el-button size="small" plain :aria-label="$t('dock.settings.view.zoomIn')" :title="$t('dock.settings.view.zoomIn')" @click="isZoomLevelTouched = true; zoomLevel *= 1.25;">
                                     <i class="bi bi-zoom-in" aria-hidden="true" />
                                 </el-button>
                             </el-button-group>
                         </el-form-item>
                         <el-form-item class="el-form-item--menu-item" :label="$t('dock.settings.view.rotate')">
                             <el-button-group class="el-button-group--flex">
-                                <el-button size="small" plain :aria-label="$t('dock.settings.view.rotateCounterClockwise')" :title="$t('dock.settings.view.rotateCounterClockwise')" @click="rotationAngle -= 15">
+                                <el-button size="small" plain :aria-label="$t('dock.settings.view.rotateCounterClockwise')" :title="$t('dock.settings.view.rotateCounterClockwise')" @click="isRotationAngleTouched = true; rotationAngle -= 15">
                                     <i class="bi bi-arrow-counterclockwise" aria-hidden="true" />
                                 </el-button>
-                                <el-input-number v-model.lazy="rotationAngle" suffix-text="°" size="small" class="el-input--text-center" style="width: 5rem" />
-                                <el-button size="small" plain :aria-label="$t('dock.settings.view.rotateClockwise')" :title="$t('dock.settings.view.rotateClockwise')" @click="rotationAngle += 15">
+                                <el-input-number v-model.lazy="rotationAngle" suffix-text="°" size="small" class="el-input--text-center" style="width: 5rem" @input="isRotationAngleTouched = true" />
+                                <el-button size="small" plain :aria-label="$t('dock.settings.view.rotateClockwise')" :title="$t('dock.settings.view.rotateClockwise')" @click="isRotationAngleTouched = true; rotationAngle += 15">
                                     <i class="bi bi-arrow-clockwise" aria-hidden="true" />
                                 </el-button>
                             </el-button-group>
@@ -211,7 +211,7 @@
                         <el-timeline-item
                             v-for="(action, index) of historyActionStack"
                             :key="action.id + '_' + index"
-                            :type="historyActionStackIndex > index ? 'primary' : null"
+                            :type="historyActionStackIndex > index ? 'primary' : undefined"
                             class="pb-1">
                             <el-link type="primary" href="javascript:void(0)" @click="onGoHistory(index + 1)" v-t="action.description" />
                         </el-timeline-item>
@@ -253,8 +253,8 @@
                                 <el-option-group>
                                     <el-option
                                         v-for="option in languageOptions"
-                                        :key="option.value"
-                                        :value="option.value"
+                                        :key="option.value ?? undefined"
+                                        :value="option.value ?? ''"
                                         :label="option.label"
                                     />
                                 </el-option-group>
@@ -349,6 +349,7 @@ import preferencesStore, { PreferencesState } from '@/store/preferences';
 import { hasWorkingFile } from '@/store/data/working-file-database';
 import { notifyInjector, unexpectedErrorMessage } from '@/lib/notify';
 import appEmitter from '@/lib/emitter';
+import { throttle } from '@/lib/timing';
 import { runModule } from '@/modules';
 import { format } from '@/format';
 import '@/format/title-case';
@@ -420,24 +421,29 @@ export default defineComponent({
         });
 
         // View zoom/pan/rotate
-        const zoomLevel = computed<number>({
-            get() {
-                const decomposedTransform = canvasStore.state.decomposedTransform;
-                return Math.round(decomposedTransform.scaleX * 100);
-            },
-            set(value) {
-                canvasStore.dispatch('setTransformScale', value / 100);
+        const zoomLevel = ref<number>(100);
+        const isZoomLevelTouched = ref<boolean>(false);
+        const rotationAngle = ref<number>(0);
+        const isRotationAngleTouched = ref<boolean>(false);
+
+        watch(() => canvasStore.state.decomposedTransform, throttle((decomposedTransform) => {
+            zoomLevel.value = Math.round(decomposedTransform.scaleX * 100);
+            rotationAngle.value = Math.round(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES);
+        }, 100), { immediate: true });
+
+        watch([zoomLevel], ([zoomLevel]) => {
+            if (isZoomLevelTouched.value) {
+                canvasStore.dispatch('setTransformScale', zoomLevel / 100);
+                isZoomLevelTouched.value = false;
             }
         });
-        const rotationAngle = computed<number>({
-            get() {
-                const decomposedTransform = canvasStore.state.decomposedTransform;
-                return Math.round(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES);
-            },
-            set(value) {
-                canvasStore.dispatch('setTransformRotation', value * Math.DEGREES_TO_RADIANS);
+        watch([rotationAngle], ([rotationAngle]) => {
+            if (isRotationAngleTouched.value) {
+                canvasStore.dispatch('setTransformRotation', rotationAngle * Math.DEGREES_TO_RADIANS);
+                isRotationAngleTouched.value = false;
             }
         });
+
         const touchRotationPreference = computed<'on' | 'off' | 'snap'>({
             get() {
                 return preferencesStore.state.touchRotation;
@@ -758,7 +764,9 @@ export default defineComponent({
             showRestoreImage,
 
             rotationAngle,
+            isRotationAngleTouched,
             zoomLevel,
+            isZoomLevelTouched,
             touchRotationPreference,
             touchRotationOptions,
             onResetViewFit,
