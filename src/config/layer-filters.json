@@ -26,5 +26,13 @@
     "negative": {
         "name": "layerFilter.negative.name",
         "group": "color"
+    },
+    "instagram1997": {
+        "name": "layerFilter.instagram1997.name",
+        "group": "instagramFilter"
+    },
+    "instagramAden": {
+        "name": "layerFilter.instagramAden.name",
+        "group": "instagramFilter"
     }
 }

@@ -2,14 +2,14 @@
     <el-alert v-if="filterGenerationErrorMessage" type="error" show-icon :closable="false" :title="$t(filterGenerationErrorMessage)" />
     <div v-else-if="!hasFilterPreviewThumbnails" v-loading="true" :element-loading-text="$t('module.layerEffectBrowser.loading')" style="height: 15rem" />
     <template v-else>
-        <template v-for="category of categorizedFilters" :key="category.name">
-            <h3 v-t="category.name" />
-            <el-auto-grid item-width="8rem" :breakpoints="[{ maxWidth: 525, itemWidth: '6rem' }]">
+        <el-auto-grid item-width="8rem" :breakpoints="[{ maxWidth: 525, itemWidth: '6rem' }]">
+            <template v-for="category of categorizedFilters" :key="category.name">
+                <h3 class="mb-0 mt-2" style="grid-column: 1 / -1;">{{ t(category.name) }}</h3>
                 <template
                     v-for="filter of category.filters"
                     :key="filter.name"
                 >
-                    <el-card :body-style="{ padding: '0px' }" class="el-card--link" role="button" tabindex="0" style="max-width: 15rem" @click="onSelectFilter(filter.id)">
+                    <el-card :body-style="{ padding: '0px' }" class="el-card--link" role="button" tabindex="0" style="border-radius: 0.875rem; max-width: 15rem" @click="onSelectFilter(filter.id)">
                         <div style="max-height: 10rem; overflow: hidden;">
                             <img
                                 :src="filterPreviewThumbnails[filter.id]"
@@ -21,16 +21,17 @@
                                 }"
                             />
                         </div>
-                        <div class="p-2 has-text-centered" v-t="filter.name"></div>
+                        <div class="p-2 has-text-centered">{{ t(filter.name) }}</div>
                     </el-card>
                 </template>
-            </el-auto-grid>
-        </template>
+            </template>
+        </el-auto-grid>
     </template>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted, onUnmounted, nextTick, type PropType } from 'vue';
+import { useI18n } from '@/i18n';
 import layerFilterList from '@/config/layer-filters.json';
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElAutoGrid from '@/ui/el/el-auto-grid.vue';
@@ -84,6 +85,7 @@ export default defineComponent({
         emit('update:title', 'module.layerEffectBrowser.title');
         emit('update:dialogSize', 'big');
 
+        const { t } = useI18n();
         const $notify = notifyInjector('$notify');
 
         const filterGenerationErrorMessage = ref();
@@ -153,6 +155,7 @@ export default defineComponent({
                     previewImageHeight.value = ((targetHeight / targetWidth) * 100) + '%';
                     filterPreviewThumbnails.value = newPreviewThumbnails;
                 } catch (error) {
+                    console.error(error);
                     emit('update:dialogSize', 'medium');
                     if ((error as Error)?.message?.startsWith('module.')) {
                         filterGenerationErrorMessage.value = (error as Error).message;
@@ -203,6 +206,7 @@ export default defineComponent({
         }
         
         return {
+            t,
             hasFilterPreviewThumbnails,
             filterPreviewThumbnails,
             filterGenerationErrorMessage,

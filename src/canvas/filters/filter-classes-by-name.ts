@@ -15,6 +15,8 @@ import { default as negative } from './negative/negative';
 import { default as saturation } from './saturation/saturation';
 import { default as sepia } from './sepia/sepia';
 
+import { default as instagram1997 } from './instagram1997/instagram1997';
+
 export default {
     brightness,
     chroma,
@@ -26,5 +28,7 @@ export default {
     hue,
     negative,
     saturation,
-    sepia
+    sepia,
+
+    instagram1997,
 };
