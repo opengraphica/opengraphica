@@ -67,3 +67,39 @@ export function sampleGradient(stops: WorkingFileGradientColorStop<RGBAColor>[],
     }
     return interpolatedColor;
 }
+
+export function generateCssGradient(colorStops: WorkingFileGradientColorStop<RGBAColor>[], blendColorSpace: WorkingFileGradientColorSpace): string {
+    let previewGradient = '';
+    let handledOffsets = new Set<number>();
+    let sampledColorStops: WorkingFileGradientColorStop<RGBAColor>[] = [];
+    for (const stop of colorStops) {
+        sampledColorStops.push(stop);
+        handledOffsets.add(stop.offset);
+    }
+    for (let i = 0; i <= 100; i += 10) {
+        const sampleOffset = i / 100;
+        if (handledOffsets.has(sampleOffset)) continue;
+        sampledColorStops.push({
+            offset: sampleOffset,
+            color: sampleGradient(colorStops, blendColorSpace, sampleOffset),
+        });
+    }
+    sampledColorStops.sort((a, b) => a.offset < b.offset ? -1 : 1);
+
+    if (blendColorSpace === 'oklab') {
+        previewGradient = 'linear-gradient(in oklab 90deg, ' + sampledColorStops.map((colorStop) => {
+            const { l, a, b, alpha } = linearSrgbaToOklab(srgbaToLinearSrgba(colorStop.color));
+            return `oklab(${l * 100}% ${a} ${b} / ${alpha}) ${colorStop.offset * 100}%`
+        }).join(', ') + ')';
+    } else if (blendColorSpace === 'linearSrgb') { 
+        previewGradient = 'linear-gradient(in srgb-linear 90deg, ' + sampledColorStops.map((colorStop) => {
+            return `${colorStop.color.style} ${colorStop.offset * 100}%`
+        }).join(', ') + ')';
+    }
+    if (!window?.CSS?.supports || !window.CSS.supports('background-image', previewGradient)) {
+        previewGradient = 'linear-gradient(90deg, ' + sampledColorStops.map((colorStop) => {
+            return `${colorStop.color.style} ${colorStop.offset * 100}%`
+        }).join(', ') + ')';
+    }
+    return previewGradient;
+}

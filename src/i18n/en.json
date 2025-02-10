@@ -411,6 +411,19 @@
                 "yIntensity": "Y Intensity"
             }
         },
+        "gradientMap": {
+            "name": "Gradient Map",
+            "param": {
+                "gradient": "Gradient",
+                "colorSpace": "Color Space",
+                "colorSpaceOption": {
+                    "oklab": "Oklab",
+                    "perceptualRgb": "Perceptual RGB",
+                    "linearRgb": "Linear RGB"
+                },
+                "mix": "Mix"
+            }
+        },
         "grayscale": {
             "name": "Grayscale",
             "param": {

@@ -67,9 +67,9 @@ export default class HueCanvasFilter implements CanvasFilter<HueCanvasFilterPara
         }
 
         if (this.params.colorSpace === HueColorSpace.PERCEPTUAL_RGB) {
-            transferSrgbTo8BitImageData(rgba, targetImageData, dataPosition);
+            return transferSrgbTo8BitImageData(rgba, targetImageData, dataPosition);
         } else {
-            transferLinearSrgbTo8BitImageData(rgba, targetImageData, dataPosition);
+            return transferLinearSrgbTo8BitImageData(rgba, targetImageData, dataPosition);
         }
     }
 }

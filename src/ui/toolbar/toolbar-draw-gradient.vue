@@ -71,143 +71,7 @@
             >
                 <span class="bi bi-check-circle-fill mr-2" aria-hidden="true" /> <span>{{ $t('button.done') }}</span>
             </el-button>
-            <div class="ogr-toolbar-draw-gradient-stop-drawer__editor-preview-section">
-                <div ref="gradientEditorElement" class="ogr-gradient-editor">
-                    <div
-                        class="ogr-gradient-editor__preview"
-                        :style="{ '--gradient': editingGradientBackground }"
-                        @mouseenter="onMouseEnterGradientEditorPreview"
-                        @mouseleave="onMouseLeaveGradientEditorPreview"
-                        v-pointer.move="onPointerMoveGradientEditorPreview"
-                        v-pointer.down="onPointerDownGradientEditorPreview"
-                    >
-                        <div
-                            v-if="showStopAddCursor"
-                            class="ogr-gradient-editor__add-position"
-                            :style="{
-                                left: (addCursorOffset * 100) + '%',
-                            }"
-                        />
-                    </div>
-                    <div
-                        v-for="(colorStop, colorStopIndex) in editingColorStops"
-                        :key="colorStopIndex"
-                        role="button"
-                        tabindex="0"
-                        class="ogr-gradient-editor__stop-marker"
-                        :class="{
-                            'is-active': activeColorStopIndex === colorStopIndex,
-                        }"
-                        :style="{
-                            'left': (colorStop.offset * 100) + '%',
-                            '--stop-color': colorStop.color.style,
-                        }"
-                        :aria-label="colorStop.offset + ' ' + colorStop.color.style"
-                        :data-color-stop-index="colorStopIndex"
-                        @keydown="onKeydownStopMarker($event, colorStopIndex)"
-                        v-pointer.down="onPointerDownStopMarker"
-                        v-pointer.move.window="draggingColorStopIndex > -1 ? onPointerMoveStopMarker : undefined"
-                        v-pointer.up.window="draggingColorStopIndex > -1 ? onPointerUpStopMarker : undefined"
-                    >
-                        <div class="ogr-gradient-editor__stop-marker__color" :data-color-stop-index="colorStopIndex" />
-                    </div>
-                    <div
-                        v-if="showStopAddCursor"
-                        class="ogr-gradient-editor__stop-marker"
-                        :style="{
-                            'left': (addCursorOffset * 100) + '%',
-                            '--stop-color': addCursorColor.style,
-                        }"
-                        aria-hidden="true"
-                    >
-                        <div class="ogr-gradient-editor__stop-marker__color">
-                            <span class="bi bi-plus" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div
-                v-if="activeColorStopIndex > -1 && activeColorStopIndex < editingColorStops.length"
-                class="ogr-toolbar-draw-gradient-stop-drawer__editor-stop-form"
-            >
-                <div class="ogr-toolbar-draw-gradient-stop-drawer__editor-stop-form__selection-indicator-container">
-                    <div
-                        class="ogr-toolbar-draw-gradient-stop-drawer__editor-stop-form__selection-indicator"
-                        :style="{ left: (editingColorStops[activeColorStopIndex].offset * 100) + '%' }"
-                    />
-                </div>
-                <el-horizontal-scrollbar-arrows>
-                    <el-input-group>
-                        <template #prepend>
-                            <span class="is-size-7">{{ $t('toolbar.drawGradient.stopDialog.stopColor') }}</span>
-                        </template>
-                        <el-input-color
-                            v-model="editingColorStops[activeColorStopIndex].color"
-                            :aria-label="$t('toolbar.drawGradient.stopDialog.stopColor')"
-                            @change="onChangeEditingStopColor()"
-                        ></el-input-color>
-                    </el-input-group>
-                    <el-input-group  class="ml-3">
-                        <template #prepend>
-                            <span class="is-size-7">{{ $t('toolbar.drawGradient.stopDialog.stopOffset') }}</span>
-                        </template>
-                        <el-input-number
-                            :model-value="parseInt(editingColorStops[activeColorStopIndex].offset * 100)"
-                            size="small"
-                            :min="0"
-                            :max="100"
-                            suffix-text="%"
-                            style="width: 3.5rem"
-                            :aria-label="$t('toolbar.drawGradient.stopDialog.stopOffset')"
-                            @update:model-value="editingColorStops[activeColorStopIndex].offset = $event / 100"
-                            @change="onChangeEditingStopOffset()"
-                        ></el-input-number>
-                    </el-input-group>
-                    <el-button-group class="is-flex ml-3">
-                        <el-button plain size="small" @click="onDeleteEditingStop()">
-                            <span class="bi bi-trash mr-2" aria-hidden="true" /> {{ $t('button.delete') }}
-                        </el-button>
-                        <el-button plain size="small" @click="onReverseStops()">
-                            <span class="bi bi-shuffle mr-2" aria-hidden="true" /> {{ $t('button.reverse') }}
-                        </el-button>
-                        <el-button plain size="small" @click="onSaveActivePreset()">
-                            <span class="bi bi-plus-circle-fill mr-2" aria-hidden="true" /> {{ $t('button.save') }}
-                        </el-button>
-                    </el-button-group>
-                </el-horizontal-scrollbar-arrows>
-            </div>
-            <div class="ogr-toolbar-draw-gradient-stop-drawer__presets">
-                <h3 v-t="'toolbar.drawGradient.stopDialog.presets'" class="is-size-6" />
-                <el-scrollbar>
-                    <div v-for="(preset, presetIndex) of gradientPresets" :key="presetIndex" class="ogr-gradient-preset">
-                        <button class="ogr-gradient-preset__activate" @click="onSelectPreset(presetIndex)">
-                            <div class="ogr-gradient-preset__name">{{ preset.name }}</div>
-                            <div class="ogr-gradient_preset__color-stops" :style="{ '--gradient': preset.gradientBackground }" />
-                        </button>
-                        <el-popover
-                            v-model:visible="presetSettingsVisibility[presetIndex]"
-                            trigger="click"
-                            popper-class="p-0"
-                        >
-                            <template #reference>
-                                <el-button type="primary" link :aria-label="$t('toolbar.drawGradient.stopDialog.presetSettings')">
-                                    <span class="bi bi-three-dots-vertical" aria-hidden="true" />
-                                </el-button>
-                            </template>
-                            <el-menu
-                                class="el-menu--medium el-menu--borderless my-1"
-                                :default-active="presetSettingsActiveIndex"
-                                @select="onPresetSettingsSelect(preset, presetIndex, $event)"
-                            >
-                                <el-menu-item index="delete">
-                                    <i class="bi bi-trash"></i>
-                                    <span v-t="'app.layerList.delete'"></span>
-                                </el-menu-item>
-                            </el-menu>
-                        </el-popover>
-                    </div>
-                </el-scrollbar>
-            </div>
+            <dock-gradient-editor v-model="editingColorStops" :blend-color-space="blendColorSpace" @stops-edited="hasEditedColorStops = true" />
         </div>
     </div>
 </template>
@@ -220,12 +84,11 @@ import { BundleAction } from '@/actions/bundle';
 import { UpdateLayerAction } from '@/actions/update-layer';
 
 import {
-    activeColorStops, blendColorSpace, editingLayers, fillType, presets, showStopDrawer, spreadMethod,
-    type GradientPreset,
+    activeColorStops, blendColorSpace, editingLayers, fillType, showStopDrawer, spreadMethod,
 } from '@/canvas/store/draw-gradient-state';
 import { appliedSelectionMask, activeSelectionMask } from '@/canvas/store/selection-state';
 import historyStore from '@/store/history';
-import workingFileStore, { WorkingFileState } from '@/store/working-file';
+import workingFileStore from '@/store/working-file';
 
 import pointerDirective from '@/directives/pointer';
 
@@ -245,9 +108,10 @@ import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSlider from 'element-plus/lib/components/slider/index';
 import ElTooltip from 'element-plus/lib/components/tooltip/index';
 
-import { srgbaToLinearSrgba, linearSrgbaToOklab } from '@/lib/color';
-import { sampleGradient } from '@/lib/gradient';
-import { UpdateGradientLayerOptions, WorkingFileGradientColorStop, WorkingFileGradientColorSpace, RGBAColor } from '@/types';
+import DockGradientEditor from '@/ui/dock/dock-gradient-editor.vue';
+
+import { generateCssGradient } from '@/lib/gradient';
+import { UpdateGradientLayerOptions, WorkingFileGradientColorStop, RGBAColor } from '@/types';
 
 export default defineComponent({
     name: 'ToolbarDrawGradient',
@@ -275,6 +139,7 @@ export default defineComponent({
         ElSelect,
         ElSlider,
         ElTooltip,
+        DockGradientEditor,
     },
     props: {
         
@@ -296,7 +161,7 @@ export default defineComponent({
         \*----------------------*/
 
         const selectedGradientBackground = computed<string>(() => {
-            return generatePreviewCssGradient(activeColorStops.value as WorkingFileGradientColorStop<RGBAColor>[], blendColorSpace.value);
+            return generateCssGradient(activeColorStops.value as WorkingFileGradientColorStop<RGBAColor>[], blendColorSpace.value);
         });
 
         function onClickStopGradientSelect() {
@@ -309,235 +174,21 @@ export default defineComponent({
             }
         }
 
+        const editingColorStops = ref<Array<WorkingFileGradientColorStop<RGBAColor>>>([]);
+        const hasEditedColorStops = ref<boolean>(false);
+
         watch([showStopDrawer], ([show]) => {
             if (show) {
                 editingColorStops.value = JSON.parse(JSON.stringify(activeColorStops.value));
-                activeColorStopIndex.value = Math.min(editingColorStops.value.length - 1, Math.max(0, activeColorStopIndex.value));
+                hasEditedColorStops.value = false;
             } else {
-                if (hasEditedActiveColorStops.value) {
+                if (hasEditedColorStops.value) {
                     activeColorStops.value = JSON.parse(JSON.stringify(editingColorStops.value));
-                    hasEditedActiveColorStops.value = false;
+                    hasEditedColorStops.value = false;
                     onChangeActiveColorStops();
                 }
             }
-        })
-
-        /*------------------*\
-        | Gradient Stop Edit |
-        \*------------------*/
-
-        const hasEditedActiveColorStops = ref(false);
-        const gradientEditorElement = ref<HTMLDivElement>();
-        const editingColorStops = ref<WorkingFileGradientColorStop<RGBAColor>[]>([]);
-        const activeColorStopIndex = ref(-1);
-
-        const showStopAddCursor = ref(false);
-        const addCursorOffset = ref(0);
-        const addCursorColor = ref<RGBAColor>({
-            is: 'color',
-            r: 0, g: 0, b: 0, alpha: 1,
-            style: '#000000',
         });
-        const justAddedCursor = ref(false);
-
-        const draggingColorStopIndex = ref(-1);
-        const draggingColorStopStartOffset = ref(0);
-        const draggingColorStopStartX = ref(0);
-        const draggingColorStopMaxWidth = ref(1);
-
-        const editingGradientBackground = computed<string>(() => {
-            return generatePreviewCssGradient(editingColorStops.value, blendColorSpace.value);
-        });
-
-        function generatePreviewCssGradient(colorStops: WorkingFileGradientColorStop<RGBAColor>[], blendColorSpace: WorkingFileGradientColorSpace): string {
-            let previewGradient = '';
-            let handledOffsets = new Set<number>();
-            let sampledColorStops: WorkingFileGradientColorStop<RGBAColor>[] = [];
-            for (const stop of colorStops) {
-                sampledColorStops.push(stop);
-                handledOffsets.add(stop.offset);
-            }
-            for (let i = 0; i <= 100; i += 10) {
-                const sampleOffset = i / 100;
-                if (handledOffsets.has(sampleOffset)) continue;
-                sampledColorStops.push({
-                    offset: sampleOffset,
-                    color: sampleGradient(colorStops, blendColorSpace, sampleOffset),
-                });
-            }
-            sampledColorStops.sort((a, b) => a.offset < b.offset ? -1 : 1);
-
-            if (blendColorSpace === 'oklab') {
-                previewGradient = 'linear-gradient(in oklab 90deg, ' + sampledColorStops.map((colorStop) => {
-                    const { l, a, b, alpha } = linearSrgbaToOklab(srgbaToLinearSrgba(colorStop.color));
-                    return `oklab(${l * 100}% ${a} ${b} / ${alpha}) ${colorStop.offset * 100}%`
-                }).join(', ') + ')';
-            } else if (blendColorSpace === 'linearSrgb') { 
-                previewGradient = 'linear-gradient(in srgb-linear 90deg, ' + sampledColorStops.map((colorStop) => {
-                    return `${colorStop.color.style} ${colorStop.offset * 100}%`
-                }).join(', ') + ')';
-            }
-            if (!window?.CSS?.supports || !window.CSS.supports('background-image', previewGradient)) {
-                previewGradient = 'linear-gradient(90deg, ' + sampledColorStops.map((colorStop) => {
-                    return `${colorStop.color.style} ${colorStop.offset * 100}%`
-                }).join(', ') + ')';
-            }
-            return previewGradient;
-        }
-
-        function onKeydownStopMarker(event: KeyboardEvent, colorMarkerIndex: number) {
-            switch (event.key) {
-                case 'Enter': case ' ':
-                    activeColorStopIndex.value = colorMarkerIndex;
-                    break;
-                case 'ArrowLeft': case 'ArrowRight': case 'ArrowUp': case 'ArrowDown': case 'PageUp': case 'PageDown':
-                    const stopIndex = parseInt((event?.target as HTMLElement)?.getAttribute('data-color-stop-index') ?? '-1');
-                    if (stopIndex < 0) return;
-                    const slideSpeed = event.key === 'PageUp' || event.key === 'PageDown' ? 0.05 : 0.01;
-                    if (event.key === 'ArrowLeft' || event.key === 'ArrowDown' || event.key === 'PageDown') {
-                        editingColorStops.value[stopIndex].offset = Math.max(0, editingColorStops.value[stopIndex].offset - slideSpeed);
-                    } else {
-                        editingColorStops.value[stopIndex].offset = Math.min(1, editingColorStops.value[stopIndex].offset + slideSpeed);
-                    }
-                    hasEditedActiveColorStops.value = true;
-                    break;
-            }
-        }
-
-        function onPointerDownStopMarker(event: PointerEvent) {
-            if (!event.target || !gradientEditorElement.value) return;
-            const colorStopIndex = (event.target as Element).getAttribute('data-color-stop-index');
-            if (colorStopIndex == null) return;
-
-            draggingColorStopIndex.value = parseInt(colorStopIndex);
-            activeColorStopIndex.value = draggingColorStopIndex.value;
-            draggingColorStopStartOffset.value = editingColorStops.value[draggingColorStopIndex.value].offset;
-            draggingColorStopStartX.value = event.pageX;
-            const gradientEditorClientRect = gradientEditorElement.value?.getBoundingClientRect();
-            draggingColorStopMaxWidth.value = gradientEditorClientRect?.width ?? 1;
-        }
-        function onPointerMoveStopMarker(event: PointerEvent) {
-            if (draggingColorStopIndex.value < 0) return;
-
-            editingColorStops.value[draggingColorStopIndex.value].offset = Math.max(0, Math.min(1,
-                draggingColorStopStartOffset.value +
-                (event.pageX - draggingColorStopStartX.value) / draggingColorStopMaxWidth.value
-            ));
-            hasEditedActiveColorStops.value = true;
-        }
-        function onPointerUpStopMarker() {
-            draggingColorStopIndex.value = -1;
-        }
-
-        function onChangeEditingStopColor() {
-            hasEditedActiveColorStops.value = true;
-        }
-
-        function onChangeEditingStopOffset() {
-            hasEditedActiveColorStops.value = true;
-        }
-
-        function onDeleteEditingStop() {
-            if (activeColorStopIndex.value < 0) return;
-            editingColorStops.value.splice(activeColorStopIndex.value, 1);
-            activeColorStopIndex.value = editingColorStops.value.length - 1;
-            hasEditedActiveColorStops.value = true;
-        }
-
-        function onReverseStops() {
-            for (const stop of editingColorStops.value) {
-                stop.offset = 1.0 - stop.offset;
-            }
-            hasEditedActiveColorStops.value = true;
-        }
-
-        function onMouseEnterGradientEditorPreview() {
-            if (!justAddedCursor.value) {
-                showStopAddCursor.value = true;
-            }
-        }
-
-        function onMouseLeaveGradientEditorPreview() {
-            justAddedCursor.value = false;
-            showStopAddCursor.value = false;
-        }
-
-        function onPointerMoveGradientEditorPreview(event: PointerEvent) {
-            const gradientEditorClientRect = gradientEditorElement.value?.getBoundingClientRect();
-            if (!gradientEditorClientRect) return;
-            addCursorOffset.value = (event.clientX - gradientEditorClientRect.x) / gradientEditorClientRect.width;
-            addCursorColor.value = sampleGradient(editingColorStops.value, blendColorSpace.value, addCursorOffset.value);
-        }
-
-        function onPointerDownGradientEditorPreview(event: PointerEvent) {
-            if (justAddedCursor.value) return;
-
-            const gradientEditorClientRect = gradientEditorElement.value?.getBoundingClientRect();
-            if (!gradientEditorClientRect) return;
-            editingColorStops.value.push({
-                offset: Math.min(1, Math.max(0, (event.clientX - gradientEditorClientRect.x) / gradientEditorClientRect.width)),
-                color: sampleGradient(editingColorStops.value, blendColorSpace.value, addCursorOffset.value),
-            });
-            hasEditedActiveColorStops.value = true;
-            justAddedCursor.value = true;
-            showStopAddCursor.value = false;
-            nextTick(() => {
-                activeColorStopIndex.value = editingColorStops.value.length - 1;
-            });
-        }
-
-        /*----------------*\
-        | Gradient Presets |
-        \*----------------*/
-
-        interface GradientPresetDisplay extends GradientPreset {
-            gradientBackground: string;
-        }
-
-        const gradientPresets = ref<GradientPresetDisplay[]>([]);
-
-        const presetSettingsVisibility = ref<boolean[]>([]);
-        const presetSettingsActiveIndex = ref('');
-        
-        watch([presets, blendColorSpace], () => {
-            gradientPresets.value = presets.value.map((preset) => ({
-                name: preset.name,
-                stops: preset.stops,
-                gradientBackground: generatePreviewCssGradient(preset.stops, blendColorSpace.value),
-            }));
-        }, { immediate: true, deep: true });
-
-        async function onPresetSettingsSelect(preset: GradientPreset, presetIndex: number, action: string) {
-            if (action === 'delete') {
-                presets.value.splice(presetIndex, 1);
-            }
-            presetSettingsActiveIndex.value = ' ';
-            await nextTick();
-            presetSettingsActiveIndex.value = '';
-            presetSettingsVisibility.value[presetIndex] = false;
-        }
-
-        function onSelectPreset(presetIndex: number) {
-            editingColorStops.value = JSON.parse(JSON.stringify(gradientPresets.value[presetIndex].stops));
-            activeColorStopIndex.value = 0;
-            hasEditedActiveColorStops.value = true;
-        }
-
-        async function onSaveActivePreset() {
-            const colorNamer = (await import('color-namer')).default;
-            const colorNames = new Set<string>();
-            for (const stop of editingColorStops.value) {
-                const colorName = (colorNamer(stop.color.style, { pick: ['ntc'] }).ntc[0]?.name ?? '');
-                colorNames.add(
-                    colorName.slice(0, 1).toUpperCase() + colorName.slice(1)
-                );
-                if (stop.color.alpha < 0.1) colorNames.add('Transparent');
-            }
-            presets.value.unshift({
-                name: Array.from(colorNames).join(', '),
-                stops: JSON.parse(JSON.stringify(editingColorStops.value)),
-            })
-        }
 
         /*-----------------------------------*\
         | Editing Dropdowns / History Updates |
@@ -630,38 +281,13 @@ export default defineComponent({
             selectedLayerIds,
             hasSelection,
 
-            gradientEditorElement,
-            activeColorStopIndex,
-            showStopAddCursor,
-            addCursorOffset,
-            addCursorColor,
-            draggingColorStopIndex,
-            editingColorStops,
-            editingGradientBackground,
-            onKeydownStopMarker,
-            onPointerDownStopMarker,
-            onPointerMoveStopMarker,
-            onPointerUpStopMarker,
-            onChangeEditingStopColor,
-            onChangeEditingStopOffset,
-            onDeleteEditingStop,
-            onReverseStops,
-            onMouseEnterGradientEditorPreview,
-            onMouseLeaveGradientEditorPreview,
-            onPointerMoveGradientEditorPreview,
-            onPointerDownGradientEditorPreview,
-
-            gradientPresets,
-            presetSettingsVisibility,
-            presetSettingsActiveIndex,
-            onPresetSettingsSelect,
-            onSelectPreset,
-            onSaveActivePreset,
-
             blendColorSpace,
             editingLayers,
             fillType,
             spreadMethod,
+
+            editingColorStops,
+            hasEditedColorStops,
 
             onChangeFillType,
             onChangeBlendColorSpace,

@@ -8288,6 +8288,7 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica button {
   margin: 0;
+  color: var(--el-text-color-regular);
 }
 .opengraphica .fade-enter-active,
 .opengraphica .fade-leave-active {
@@ -10493,6 +10494,11 @@ body.ogr-full-page .opengraphica {
 }
 .opengraphica .ogr-toolbar .ogr-toolbar-drawer .ogr-toolbar-drawer__close:hover {
   color: var(--el-color-primary);
+}
+.opengraphica .ogr-toolbar .ogr-toolbar-drawer > .ogr-dock-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 @keyframes ogr-toolbar-drawer-show {
   0% {
@@ -28907,6 +28913,8 @@ body.ogr-full-page .opengraphica {
 .opengraphica .el-overlay-dialog {
   display: flex;
   align-items: center;
+  position: relative;
+  min-height: 100%;
 }
 @media screen and (max-width: 600px) {
   .opengraphica .el-overlay-dialog {
@@ -29012,6 +29020,7 @@ body.ogr-full-page .opengraphica {
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-input > .el-input__wrapper,
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-input-group > *:last-child,
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-row > .el-col:last-child > .el-input-group > *:last-child,
+.opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-row > .el-col:last-child > .el-input:last-child > .el-input__wrapper,
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__wrapper,
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper,
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-switch {

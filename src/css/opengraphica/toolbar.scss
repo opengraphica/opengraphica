@@ -191,6 +191,12 @@
                 color: var(--el-color-primary);
             }
         }
+
+        > .ogr-dock-content {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
     }
 
     @keyframes ogr-toolbar-drawer-show {

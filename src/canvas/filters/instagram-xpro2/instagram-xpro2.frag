@@ -14,9 +14,9 @@ vec4 processInstagramXpro2(vec4 color) {
     newRgb.rgb = (gradientColor.rgb * gradientColor.a) + (rgb.rgb * (1.0 - gradientColor.a));
 
     // Burn blending mode
-    newRgb.r = (1.0 - ((1.0 - (rgb.r)) / max(0.00001, (gradientColor.r))));
-    newRgb.g = (1.0 - ((1.0 - (rgb.g)) / max(0.00001, (gradientColor.g))));
-    newRgb.b = (1.0 - ((1.0 - (rgb.b)) / max(0.00001, (gradientColor.b))));
+    newRgb.r = (1.0 - ((1.0 - (newRgb.r)) / max(0.00001, (gradientColor.r))));
+    newRgb.g = (1.0 - ((1.0 - (newRgb.g)) / max(0.00001, (gradientColor.g))));
+    newRgb.b = (1.0 - ((1.0 - (newRgb.b)) / max(0.00001, (gradientColor.b))));
 
     // Sepia(0.3)
     newRgb.r = rgb.r * 0.7 + (0.393 * rgb.r + 0.769 * rgb.g + 0.189 * rgb.b) * 0.3;

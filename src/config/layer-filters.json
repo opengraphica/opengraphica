@@ -15,6 +15,10 @@
         "name": "layerFilter.contrast.name",
         "group": "color"
     },
+    "gradientMap": {
+        "name": "layerFilter.gradientMap.name",
+        "group": "color"
+    },
     "grayscale": {
         "name": "layerFilter.grayscale.name",
         "group": "color"

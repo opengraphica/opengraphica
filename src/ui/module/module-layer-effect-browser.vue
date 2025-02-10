@@ -147,7 +147,6 @@ export default defineComponent({
                     const newPreviewThumbnails: Record<string, string> = {};
                     for (const layerFilterName in layerFilterList) {
                         const canvasFilter = new (await getCanvasFilterClass(layerFilterName))();
-                        console.log(layerFilterName, canvasFilter);
                         const appliedImageData = applyCanvasFilter(originalImageData, canvasFilter, buildCanvasFilterPreviewParams(canvasFilter));
                         previewCtx.putImageData(appliedImageData, 0, 0);
                         const imageBlob = await createImageBlobFromCanvas(previewCanvas);

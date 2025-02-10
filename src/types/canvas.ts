@@ -1,3 +1,6 @@
+import type { RGBAColor } from './color';
+import type { WorkingFileGradientColorStop } from './working-file';
+
 export interface CanvasRenderingContext2DEnhanced extends CanvasRenderingContext2D {
     get2dTransformArray(): [number, number, number, number, number, number];
     transformedPoint(x: number, y: number): DOMPoint;
@@ -67,7 +70,13 @@ export interface CanvasFilterEditConfigPercentageRange extends CanvasFilterEditC
     preview?: number[];
 }
 
-export type CanvasFilterEditConfigField = CanvasFilterEditConfigBoolean | CanvasFilterEditConfigInteger | CanvasFilterEditConfigFloat | CanvasFilterEditConfigPercentage | CanvasFilterEditConfigPercentageRange | CanvasFilterEditConfigComputedFloat;
+export interface CanvasFilterEditConfigGradient extends CanvasFilterEditConfigFieldCommon {
+    type: 'gradient';
+    default: WorkingFileGradientColorStop<RGBAColor>[];
+    preview?: WorkingFileGradientColorStop<RGBAColor>[];
+}
+
+export type CanvasFilterEditConfigField = CanvasFilterEditConfigBoolean | CanvasFilterEditConfigInteger | CanvasFilterEditConfigFloat | CanvasFilterEditConfigPercentage | CanvasFilterEditConfigPercentageRange | CanvasFilterEditConfigComputedFloat | CanvasFilterEditConfigGradient;
 
 export interface CanvasFilterEditConfig {
     [key: string]: CanvasFilterEditConfigField;

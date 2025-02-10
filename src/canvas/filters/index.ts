@@ -163,6 +163,8 @@ export function combineFiltersToShader(canvasFilters: CanvasFilter[], layerInfo:
     let fragmentShaderMainCalls: string[] = [];
     let textures: Texture[] = [];
 
+    const alreadyIncludedFilters = new Set<string>();
+
     for (const [index, canvasFilter] of canvasFilters.entries()) {
         const editConfig = canvasFilter.getEditConfig();
         let filterVertexShader = canvasFilter.getVertexShader();
@@ -182,14 +184,23 @@ export function combineFiltersToShader(canvasFilters: CanvasFilter[], layerInfo:
         }
 
         const searchFunctionName = 'process' + canvasFilter.name[0].toUpperCase() + canvasFilter.name.slice(1);
+        const useFunctionName = searchFunctionName + index;
         if (filterVertexShader?.includes(searchFunctionName)) {
-            vertexShaderMainCalls.push('    filterPositionResult = ' + searchFunctionName + '(filterPositionResult);');
+            if (alreadyIncludedFilters.has(canvasFilter.name)) {
+                filterVertexShader = filterVertexShader.replace(/const int.*?;/g, '');
+            }
+            filterVertexShader = filterVertexShader.replace(searchFunctionName + '(', useFunctionName + '(');
+            vertexShaderMainCalls.push('    filterPositionResult = ' + useFunctionName + '(filterPositionResult);');
         }
         if (filterFragmentShader?.includes(searchFunctionName)) {
+            if (alreadyIncludedFilters.has(canvasFilter.name)) {
+                filterFragmentShader = filterFragmentShader.replace(/const int.*?;/g, '');
+            }
+            filterFragmentShader = filterFragmentShader.replace(searchFunctionName + '(', useFunctionName + '(');
             if (maskTexture) {
                 fragmentShaderMainCalls.push(`    filterColorBuffer = filterColorResult;\n    filterMaskAlpha = texture2D(filterMask${index}Map, vUv).a;`);
             }
-            fragmentShaderMainCalls.push('    filterColorResult = ' + searchFunctionName + '(filterColorResult);');
+            fragmentShaderMainCalls.push('    filterColorResult = ' + useFunctionName + '(filterColorResult);');
             if (maskTexture) {
                 fragmentShaderMainCalls.push(
                     '    filterColorResult = vec4('
@@ -227,6 +238,7 @@ export function combineFiltersToShader(canvasFilters: CanvasFilter[], layerInfo:
         if (maskTexture) {
             fragmentShader += `uniform sampler2D filterMask${index}Map;\n`;
         }
+        alreadyIncludedFilters.add(canvasFilter.name);
     }
 
     let vertexFilterCode = '';

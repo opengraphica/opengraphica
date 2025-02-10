@@ -39,6 +39,7 @@ export default defineComponent({
     },
     components: {
         'color-picker': defineAsyncComponent(() => import(/* webpackChunkName: 'dock-color-picker' */ `./dock-color-picker.vue`)),
+        'gradient-editor': defineAsyncComponent(() => import(/* webpackChunkName: 'dock-gradient-editor' */ `./dock-gradient-editor.vue`)),
         'layers': defineAsyncComponent(() => import(/* webpackChunkName: 'dock-layers' */ `./dock-layers.vue`)),
         'settings': defineAsyncComponent(() => import(/* webpackChunkName: 'dock-settings' */ `./dock-settings.vue`))
     },

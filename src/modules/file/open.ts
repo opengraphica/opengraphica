@@ -749,7 +749,7 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
                         }, 1000);
                     }, { once: true });
                     video!.addEventListener('error', (error) => {
-                        console.log(error);
+                        console.error(error);
                         resolve();
                     }, { once: true });
                     video!.src = URL.createObjectURL(
