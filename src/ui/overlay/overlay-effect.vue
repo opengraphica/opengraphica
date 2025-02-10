@@ -13,7 +13,7 @@
             >
                 <template v-for="svgPath of selectedLayerSvgPaths" :key="svgPath">
                     <path :d="svgPath" stroke="#777" :stroke-width="svgPathStrokeWidth" fill="transparent"/>
-                    <path :d="svgPath" stroke="white" :stroke-width="svgPathStrokeWidth" :stroke-dasharray="svgPathStrokeWidth * 4" fill="transparent"/>
+                    <path :d="svgPath" stroke="white" :stroke-width="svgPathStrokeWidth" :stroke-dasharray="svgPathStrokeDashArray" fill="transparent"/>
                 </template>
             </svg>
         </div>
@@ -49,6 +49,12 @@ export default defineComponent({
         const svgPathStrokeWidth = computed<number>(() => {
             return 1;
         });
+        const svgPathStrokeDashArray = computed<number>(() => {
+            // Don't allow this number to get too small at high zoom levels because it tanks performance.
+            const decomposedTransform = canvasStore.state.decomposedTransform;
+            let appliedZoom: number = decomposedTransform.scaleX / devicePixelRatio;
+            return Math.max(svgPathStrokeWidth.value * 4, Math.round(appliedZoom));
+        })
 
         watch(() => workingFileStore.state.selectedLayerIds, () => {
             const layers = getSelectedLayers();
@@ -105,6 +111,7 @@ export default defineComponent({
             svgBoundsWidth,
             svgBoundsHeight,
             svgPathStrokeWidth,
+            svgPathStrokeDashArray,
             selectedLayerSvgPaths,
         };
     }

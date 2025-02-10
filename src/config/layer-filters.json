@@ -27,6 +27,7 @@
         "name": "layerFilter.negative.name",
         "group": "color"
     },
+
     "instagram1997": {
         "name": "layerFilter.instagram1997.name",
         "group": "instagramFilter"
@@ -45,6 +46,18 @@
     },
     "instagramInkwell": {
         "name": "layerFilter.instagramInkwell.name",
+        "group": "instagramFilter"
+    },
+    "instagramLofi": {
+        "name": "layerFilter.instagramLofi.name",
+        "group": "instagramFilter"
+    },
+    "instagramToaster": {
+        "name": "layerFilter.instagramToaster.name",
+        "group": "instagramFilter"
+    },
+    "instagramXpro2": {
+        "name": "layerFilter.instagramXpro2.name",
         "group": "instagramFilter"
     }
 }

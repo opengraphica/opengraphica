@@ -22,18 +22,18 @@ void main() {
         vec2 proj2 = start + d2 * axis;
         focusProjected = proj2 - (proj2 - focus) * ellipseRatio;
     }
-	float gradientLength = 1.0;
-	vec2 diff = focusProjected - start;
-	vec2 rayDirection = normalize(fragCoord - focusProjected);
-	float a = dot(rayDirection, rayDirection);
-	float b = 2.0 * dot(rayDirection, diff);
-	float c = dot(diff, diff) - radius * radius;
-	float disc = b * b - 4.0 * a * c;
-	if (disc >= 0.0) {
-		float projectT = (-b + sqrt(abs(disc))) / (2.0 * a);
-		vec2 projection = focusProjected + rayDirection * projectT;
-		gradientLength = distance(projection, focusProjected);
-	}
+    float gradientLength = 1.0;
+    vec2 diff = focusProjected - start;
+    vec2 rayDirection = normalize(fragCoord - focusProjected);
+    float a = dot(rayDirection, rayDirection);
+    float b = 2.0 * dot(rayDirection, diff);
+    float c = dot(diff, diff) - radius * radius;
+    float disc = b * b - 4.0 * a * c;
+    if (disc >= 0.0) {
+        float projectT = (-b + sqrt(abs(disc))) / (2.0 * a);
+        vec2 projection = focusProjected + rayDirection * projectT;
+        gradientLength = distance(projection, focusProjected);
+    }
     float t = (distance(fragCoord, focusProjected) - startRadius) / gradientLength;
 #endif // cFillType
 

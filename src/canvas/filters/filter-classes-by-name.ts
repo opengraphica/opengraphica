@@ -20,6 +20,10 @@ import { default as instagramAden } from './instagram-aden/instagram-aden';
 import { default as instagramClarendon } from './instagram-clarendon/instagram-clarendon';
 import { default as instagramGingham } from './instagram-gingham/instagram-gingham';
 import { default as instagramInkwell } from './instagram-inkwell/instagram-inkwell';
+import { default as instagramLofi } from './instagram-lofi/instagram-lofi';
+import { default as instagramToaster } from './instagram-toaster/instagram-toaster';
+import { default as instagramValencia } from './instagram-valencia/instagram-valencia';
+import { default as instagramXpro2 } from './instagram-xpro2/instagram-xpro2';
 
 export default {
     brightness,
@@ -39,4 +43,8 @@ export default {
     instagramClarendon,
     instagramGingham,
     instagramInkwell,
+    instagramLofi,
+    instagramToaster,
+    instagramValencia,
+    instagramXpro2,
 };

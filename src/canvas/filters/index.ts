@@ -15,7 +15,7 @@ import workingFileStore from '@/store/working-file';
 import { getStoredImageOrCanvas } from "@/store/image";
 
 import type { IUniform } from 'three/src/renderers/shaders/UniformsLib';
-import type { CanvasFilter, CanvasFilterLayerInfo, CanvasFilterEditConfig, WorkingFileAnyLayer, WorkingFileLayerFilter } from '@/types';
+import type { CanvasFilter, CanvasFilterLayerInfo, CanvasFilterEditConfig, WorkingFileLayerFilter } from '@/types';
 
 export async function getCanvasFilterClass(name: string): Promise<new (...args: any) => CanvasFilter> {
     const kebabCaseName = camelCaseToKebabCase(name);
@@ -49,7 +49,7 @@ export function applyCanvasFilter(imageData: ImageData, canvasFilter: CanvasFilt
     const data = imageData.data;
     const appliedData = appliedImageData.data;
     for (let i = 0; i < imageDataSize; i += 4) {
-        canvasFilter.fragment(data, appliedData, i);
+        canvasFilter.fragment(data, appliedData, i, imageData.width, imageData.height);
     }
     if (paramData) {
         canvasFilter.params = originalParams;
@@ -100,7 +100,10 @@ function translateParamToUniformValue(paramValue: any, editConfig: CanvasFilterE
 }
 
 export function generateShaderUniformsAndDefines(canvasFilters: CanvasFilter[], layer: CanvasFilterLayerInfo): { uniforms: Record<string, IUniform>, defines: Record<string, unknown> } {
-    const defines: Record<string, unknown> = {};
+    const defines: Record<string, unknown> = {
+        cLayerWidth: layer.width,
+        cLayerHeight: layer.height,
+    };
     const uniforms: Record<string, IUniform> = {};
     for (const [index, canvasFilter] of canvasFilters.entries()) {
         const editConfig = canvasFilter.getEditConfig();

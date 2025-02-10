@@ -1,6 +1,7 @@
 import filterClassesByName from '@/canvas/filters/filter-classes-by-name';
 
 import type { FilterBakeResult, FilterBakeError, FilterNewBakeRequest, FilterCancelBakeRequest } from './image-bake.types';
+import type { CanvasFilter } from '@/types';
 
 const instructionQueue: Array<FilterNewBakeRequest | FilterCancelBakeRequest> = [];
 let isWorkingQueue: boolean = false;
@@ -66,7 +67,7 @@ async function workNewFilterBake(queueItem: FilterNewBakeRequest) {
         for (const filterConfiguration of queueItem.filterConfigurations) {
             const filterName = filterConfiguration.name;
             if (filterName in filterClassesByName && !filterConfiguration.disabled) {
-                const filter = new filterClassesByName[filterName as keyof typeof filterClassesByName]();
+                const filter: CanvasFilter = new filterClassesByName[filterName as keyof typeof filterClassesByName]() as never;
                 filter.params = filterConfiguration.params;
                 const mask = queueItem.masks[filterConfiguration.maskId ?? -1];
 
@@ -74,7 +75,7 @@ async function workNewFilterBake(queueItem: FilterNewBakeRequest) {
                     const appliedData = appliedImageData.data;
                     for (let i = 0; i < imageDataSize; i += 4) {
                         const maskAlpha = 1.0 - (mask.data[i + 3] / 255);
-                        filter.fragment(appliedData, maskImageDataBuffer.data, i);
+                        filter.fragment(appliedData, maskImageDataBuffer.data, i, appliedImageData.width, appliedImageData.height);
                         appliedData[i] = appliedData[i] * maskAlpha + maskImageDataBuffer.data[i] * (1.0 - maskAlpha);
                         appliedData[i + 1] = appliedData[i + 1] * maskAlpha + maskImageDataBuffer.data[i + 1] * (1.0 - maskAlpha);
                         appliedData[i + 2] = appliedData[i + 2] * maskAlpha + maskImageDataBuffer.data[i + 2] * (1.0 - maskAlpha);
@@ -83,7 +84,7 @@ async function workNewFilterBake(queueItem: FilterNewBakeRequest) {
                 } else {
                     const appliedData = appliedImageData.data;
                     for (let i = 0; i < imageDataSize; i += 4) {
-                        filter.fragment(appliedData, appliedData, i);
+                        filter.fragment(appliedData, appliedData, i, appliedImageData.width, appliedImageData.height);
                     }
                 }
 

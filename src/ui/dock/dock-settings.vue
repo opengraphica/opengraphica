@@ -411,7 +411,6 @@ export default defineComponent({
         }, { immediate: true });
 
         // File operations
-
         const { vendorCustomSaveCallback } = toRefs(preferencesStore.state);
         const showRestoreImage = ref(false);
         watch(() => editorStore.state.showBackupRestore, (showBackupRestore) => {

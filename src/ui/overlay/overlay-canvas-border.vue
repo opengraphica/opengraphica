@@ -5,7 +5,7 @@
             class="ogr-canvas-border"
             :style="{
                 position: 'absolute',
-                top: '-1px', left: '-1px', width: width + 'px', height: height + 'px',
+                top: '-0.5px', left: '-0.5px', width: width + 'px', height: height + 'px',
                 '--ogr-canvas-border-width': 1 / zoom * 0.0625 + 'rem'
             }"
         >

@@ -1,21 +1,13 @@
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { Texture } from 'three/src/textures/Texture';
-import { Vector2 } from 'three/src/math/Vector2';
-import { FrontSide, DoubleSide, CustomBlending, ZeroFactor, OneFactor, LinearFilter } from 'three/src/constants';
+import { FrontSide, CustomBlending, ZeroFactor, OneFactor } from 'three/src/constants';
 
 import prepareGpuTextureMaterialFragmentShader from './prepare-gpu-texture-material.frag';
 import prepareGpuTextureMaterialVertexShader from './prepare-gpu-texture-material.vert';
 import textureCompositorMaterialFragmentShader from './texture-compositor-material.frag';
 import textureCompositorMaterialVertexShader from './texture-compositor-material.vert';
 
-import { srgbaToLinearSrgba, linearSrgbaToSrgba, linearSrgbaToOklab, oklabToLinearSrgba } from '@/lib/color';
-import { lerp } from '@/lib/math';
-
 import type { CombinedFilterShaderResult } from '@/canvas/filters';
-import type {
-    WorkingFileGradientLayer,
-    WorkingFileGradientColorStop, WorkingFileGradientColorSpace, RGBAColor,
-} from '@/types';
 
 /*---------------------*\
 | Raster Layer Material |

@@ -80,5 +80,5 @@ export interface CanvasFilter<T extends Object = Record<string, unknown>> {
     getEditConfig(): CanvasFilterEditConfig;
     getFragmentShader(): string | undefined;
     getVertexShader(): string | undefined;
-    fragment(sourceImageData: Uint8ClampedArray, targetImageData: Uint8ClampedArray, dataPosition: number): void;
+    fragment(sourceImageData: Uint8ClampedArray, targetImageData: Uint8ClampedArray, dataPosition: number, width: number, height: number): void;
 }
