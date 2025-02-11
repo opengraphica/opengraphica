@@ -38,6 +38,7 @@ export interface ExportAsImageOptions {
     fileName?: string,
     fileType: 'png' | 'jpg' | 'webp' | 'gif' | 'bmp' | 'tiff',
     layerSelection?: 'all' | 'selected',
+    cameraTransform?: DOMMatrix,
     blitActiveSelectionMask?: boolean,
     quality?: number,
     toClipboard?: boolean,
@@ -86,7 +87,7 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                     drawWorkingFileToCanvas2d(canvas, ctx, {
                         force2dRenderer: true,
                         selectedLayersOnly: options.layerSelection === 'selected',
-                        initialTransform: new DOMMatrix(),
+                        initialTransform: options.cameraTransform ?? new DOMMatrix(),
                         disableViewportTransform: true,
                     });
                 } else {
@@ -94,10 +95,7 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                     const { SRGBColorSpace } = await import('three/src/constants');
                     const { OrthographicCamera } = await import('three/src/cameras/OrthographicCamera');
                     const { EffectComposer } = await import('@/canvas/renderers/webgl/postprocessing/effect-composer');
-                    const { RenderPass } = await import('@/canvas/renderers/webgl/postprocessing/render-pass');
-                    const { ShaderPass } = await import('@/canvas/renderers/webgl/postprocessing/shader-pass');
-                    const { GammaCorrectionShader } = await import('@/canvas/renderers/webgl/shaders/gamma-correction-shader');
-                    // const { WebGLRenderTarget } = await import('three/src/renderers/WebGLRenderTarget');
+                    const { Matrix4 } = await import('three/src/math/Matrix4');
 
                     const threejsScene = canvasStore.get('threejsScene')!;
 
@@ -107,6 +105,17 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                     const threejsCamera = new OrthographicCamera(0, width, 0, height, 0.1, 10000);
                     threejsCamera.position.z = 1;
                     threejsCamera.updateProjectionMatrix();
+                    if (options.cameraTransform) {
+                        const t = options.cameraTransform;
+                        threejsCamera.projectionMatrix.multiply(
+                            new Matrix4(
+                                t.m11, t.m12, t.m13, t.m14,
+                                t.m21, t.m22, t.m23, t.m24,
+                                t.m31, t.m32, t.m33, t.m34,
+                                t.m41, t.m42, t.m43, t.m44,
+                            )
+                        )
+                    }
 
                     const threejsRenderer = new WebGLRenderer({
                         alpha: true,

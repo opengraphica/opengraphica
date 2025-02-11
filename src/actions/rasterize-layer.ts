@@ -7,7 +7,7 @@ import { UpdateLayerAction } from './update-layer';
 import { createImageFromBlob } from '@/lib/image';
 
 import { createStoredImage } from '@/store/image';
-import { getLayerById } from '@/store/working-file';
+import workingFileStore, { getLayerById } from '@/store/working-file';
 
 import { exportAsImage } from '@/modules/file/export';
 
@@ -40,6 +40,10 @@ export class RasterizeLayerAction extends BaseAction {
             fileType: 'png',
             toBlob: true,
             layerSelection: 'selected',
+            cameraTransform: new DOMMatrix().scale(
+                workingFileStore.get('width') / layer.width,
+                workingFileStore.get('height') / layer.height,
+            ).multiply(layer.transform.inverse()),
         });
 
         if (!blob) {
