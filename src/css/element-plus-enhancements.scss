@@ -302,7 +302,8 @@
             .el-form-item__content > .el-row > .el-col > .el-input-group > *:last-child,
             .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__wrapper,
             .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper,
-            .el-form-item__content > .el-switch {
+            .el-form-item__content > .el-switch,
+            .el-form-item__content > .ogr-gradient-input {
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
             }
@@ -316,7 +317,8 @@
                 .el-form-item__content > .el-row > .el-col:last-child > .el-input-group > *:last-child,
                 .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__wrapper,
                 .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper,
-                .el-form-item__content > .el-switch {
+                .el-form-item__content > .el-switch,
+                .el-form-item__content > .ogr-gradient-input {
                     border-top-right-radius: var(--ogr-border-radius);
                 }
             }
@@ -330,7 +332,8 @@
                 .el-form-item__content > .el-row > .el-col:last-child > .el-input:last-child > .el-input__wrapper,
                 .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__wrapper,
                 .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper,
-                .el-form-item__content > .el-switch {
+                .el-form-item__content > .el-switch,
+                .el-form-item__content > .ogr-gradient-input {
                     border-bottom-right-radius: var(--ogr-border-radius);
                 }
             }
@@ -369,7 +372,6 @@
                 }
 
                 > .el-select,  > .el-input {
-                    width: 100%;
                     .el-input__wrapper {
                         background-color: var(--ogr-form-connected-label-input-focus-color);
                     }
@@ -418,6 +420,12 @@
                     height: 100%;
                     padding: 0 0.5rem;
                     width: 100%;
+                }
+
+                > .ogr-gradient-input {
+                    width: 100%;
+                    border-top-left-radius: 0;
+                    border-bottom-left-radius: 0;
                 }
 
                 > .el-select, .el-input:not(.el-input-group) {
@@ -482,7 +490,8 @@
                     > .el-row,
                     > .el-input,
                     > .el-select,
-                    > .el-switch {
+                    > .el-switch,
+                    > .ogr-gradient-input {
                         width: calc(100% - 2rem);
                     }
 

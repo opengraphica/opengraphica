@@ -157,6 +157,25 @@
                                 <span class="bi bi-arrow-repeat" aria-hidden="true" />
                             </el-button>
                         </template>
+                        <template v-else-if="editConfigField.type === 'gradient'">
+                            <div
+                                role="button"
+                                tabindex="0"
+                                class="ogr-gradient-input"
+                                :style="{ '--gradient': gradientBackgrounds[paramName] }"
+                                aria-haspopup="dialog"
+                                @click="onClickStopGradientSelect(paramName)"
+                                @keydown="onKeydownStopGradientSelect($event, paramName)"
+                            >
+                            </div>
+                            <el-button
+                                link type="primary" class="el-button--form-item-reset"
+                                :disabled="isFilterParamDefault(paramName, editConfigField)"
+                                :aria-label="t('module.layerEffectEdit.resetField')"
+                                @click="resetFilterParam(paramName, editConfigField)">
+                                <span class="bi bi-arrow-repeat" aria-hidden="true" />
+                            </el-button>
+                        </template>
                     </el-form-item>
                 </template>
             </el-form-item-group>
@@ -192,6 +211,8 @@ import ElRow from 'element-plus/lib/components/row/index';
 
 import { useI18n } from '@/i18n';
 
+import appEmitter from '@/lib/emitter';
+import { generateCssGradient } from '@/lib/gradient';
 import { notifyInjector } from '@/lib/notify';
 import { throttle } from '@/lib/timing';
 import { generateImageHash } from '@/lib/hash';
@@ -229,7 +250,7 @@ import { TextureLoader } from 'three/src/loaders/TextureLoader';
 import { Texture } from 'three/src/textures/Texture';
 import { OrthographicCamera } from 'three/src/cameras/OrthographicCamera';
 
-import type { WorkingFileLayerFilter, WorkingFileLayerMask, CanvasFilter, CanvasFilterEditConfig, CanvasFilterEditConfigField } from '@/types';
+import type { WorkingFileLayerFilter, WorkingFileLayerMask, CanvasFilter, CanvasFilterEditConfig, CanvasFilterEditConfigField, CanvasFilterEditConfigGradient, WorkingFileGradientColorSpace } from '@/types';
 
 export default defineComponent({
     name: 'ModuleLayerEffectEdit',
@@ -346,6 +367,21 @@ export default defineComponent({
         const currentFilterTitle = computed<string>(() => {
             return `layerFilter.${currentFilterConfig.value?.name}.name`;
         });
+
+        const gradientBackgrounds = computed<Record<string, string>>(() => {
+            const backgrounds: Record<string, string> = {};
+            if (!currentFilterEditConfig.value) return backgrounds;
+            for (const paramKey of Object.keys(currentFilterEditConfig.value)) {
+                if (currentFilterEditConfig.value?.[paramKey]?.type === 'gradient') {
+                    const colorSpaceFieldName = currentFilterEditConfig.value?.[paramKey].colorSpaceFieldName;
+                    backgrounds[paramKey] = generateCssGradient(
+                        currentFilter.value?.params[paramKey] as never,
+                        currentFilter.value?.params[colorSpaceFieldName] as WorkingFileGradientColorSpace,
+                    );
+                }
+            }
+            return backgrounds;
+        })
 
         const isMaskApplied = computed<boolean>(() => {
             return currentFilter.value?.maskId != null;
@@ -765,6 +801,34 @@ export default defineComponent({
             }
         }
 
+        async function onClickStopGradientSelect(fieldName: string) {
+            const colorSpaceFieldName = (currentFilterEditConfig.value?.[fieldName] as CanvasFilterEditConfigGradient).colorSpaceFieldName;
+            const blendColorSpace = formData.filterParams[colorSpaceFieldName];
+            appEmitter.emit('app.dialogs.openFromDock', {
+                name: 'gradient-editor',
+                props: {
+                    isDialog: true,
+                    gradient: JSON.parse(JSON.stringify(formData.filterParams[fieldName])),
+                    blendColorSpace: {
+                        0: 'oklab',
+                        1: 'srgb',
+                        2: 'linearSrgb',
+                    }[blendColorSpace as number] ?? blendColorSpace,
+                },
+                onClose: (event?: any) => {
+                    if (event?.gradient) {
+                        formData.filterParams[fieldName] = event.gradient;
+                    }
+                }
+            });
+        }
+        
+        function onKeydownStopGradientSelect(event: KeyboardEvent, fieldName: string) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                onClickStopGradientSelect(fieldName);
+            }
+        }
+
         function onClearMask() {
             if (afterEffectCanvas.value && canvasFilters.value[props.filterIndex].maskId != null) {
                 cleanupThreejs();
@@ -847,6 +911,10 @@ export default defineComponent({
 
             beforeEffectCanvas,
             afterEffectCanvas,
+
+            gradientBackgrounds,
+            onClickStopGradientSelect,
+            onKeydownStopGradientSelect,
 
             currentFilterConfig,
             currentFilterName,

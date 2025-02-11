@@ -20,7 +20,7 @@
         </div>
         <template v-if="isDialog">
             <el-divider />
-            <div class="px-4.5 mt-4 pb-4 has-text-right">
+            <div class="px-4.5 mt-4 pb-5 has-text-right">
                 <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
                 <el-button @click="onConfirmSelection">{{ $t('button.ok') }}</el-button>
             </div>

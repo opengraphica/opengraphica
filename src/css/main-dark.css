@@ -9267,6 +9267,106 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-layout-menu-bar.is-vertical > .is-flex .ogr-menu-section .el-button-group:last-child, .opengraphica .ogr-layout-menu-bar.is-vertical > .is-flex .ogr-menu-section .ogr-single-button-group:last-child {
   margin-bottom: 0.375rem;
 }
+.opengraphica .ogr-gradient-input {
+  display: inline-flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  height: 2.5rem;
+  border: var(--el-border);
+  border-radius: 0.5rem;
+  box-shadow: 0 0 0 0.125rem var(--el-input-bg-color, var(--el-fill-color-blank)) inset;
+  position: relative;
+  cursor: pointer;
+  width: 6rem;
+  max-width: 50vw;
+}
+.opengraphica .ogr-gradient-input:before, .opengraphica .ogr-gradient-input:after {
+  content: "";
+  display: block !important;
+  box-sizing: border-box;
+  background: url("../images/transparency-bg.png");
+  border: 0.125rem solid var(--el-input-bg-color, var(--el-fill-color-blank));
+  border-radius: 0.5rem;
+  width: 100%;
+  height: 100%;
+}
+.opengraphica .ogr-gradient-input:after {
+  background: var(--gradient);
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.opengraphica .ogr-gradient-input:hover {
+  border-color: var(--el-border-color-hover);
+}
+.opengraphica .ogr-gradient-input:focus {
+  border-color: var(--el-color-primary);
+  outline: none;
+}
+.opengraphica .ogr-gradient-input--small {
+  height: 2rem;
+}
+.opengraphica .ogr-gradient-preset {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: nowrap;
+  border-radius: 0.25rem;
+}
+.opengraphica .ogr-gradient-preset .ogr-gradient-preset__activate {
+  display: flex;
+  background: none;
+  padding: 0;
+  margin: 0;
+  border: none;
+  outline: none;
+  flex-grow: 1;
+  flex-shrink: 1;
+  cursor: pointer;
+}
+.opengraphica .ogr-gradient-preset .ogr-gradient-preset__activate:focus-visible {
+  outline: 0.125rem solid var(--el-color-primary);
+}
+.opengraphica .ogr-gradient-preset .ogr-gradient-preset__activate .ogr-gradient-preset__name {
+  display: block;
+  width: 40%;
+  padding: 0.5rem 0.5rem 0.5rem 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  text-align: left;
+}
+.opengraphica .ogr-gradient-preset .ogr-gradient-preset__activate .ogr-gradient_preset__color-stops {
+  display: block;
+  width: 60%;
+  height: 2rem;
+  position: relative;
+  border-radius: 0.25rem;
+}
+.opengraphica .ogr-gradient-preset .ogr-gradient-preset__activate .ogr-gradient_preset__color-stops:before, .opengraphica .ogr-gradient-preset .ogr-gradient-preset__activate .ogr-gradient_preset__color-stops:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 0.25rem;
+}
+.opengraphica .ogr-gradient-preset .ogr-gradient-preset__activate .ogr-gradient_preset__color-stops:before {
+  background: url("../images/transparency-bg.png");
+}
+.opengraphica .ogr-gradient-preset .ogr-gradient-preset__activate .ogr-gradient_preset__color-stops:after {
+  background: var(--gradient);
+}
+.opengraphica .ogr-gradient-preset:hover {
+  background: var(--ogr-layer-list-background-color-active);
+  box-shadow: 0 0 0 0.25rem var(--ogr-layer-list-background-color-active);
+}
+.opengraphica .ogr-gradient-preset > .el-button {
+  margin-left: 1rem;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
 @keyframes ogr-history-notification-highlight {
   0% {
     outline: 0.25rem solid var(--el-color-warning);
@@ -10629,39 +10729,6 @@ body.ogr-full-page .opengraphica {
   --stop-marker-background-color: var(--el-color-primary);
   --stop-marker-border-color: var(--el-color-white);
 }
-.opengraphica .ogr-toolbar-draw-gradient__stop-selection {
-  box-sizing: border-box;
-  height: 2rem;
-  border: var(--el-border);
-  border-radius: 0.5rem;
-  box-shadow: 0 0 0 0.125rem var(--el-input-bg-color, var(--el-fill-color-blank)) inset;
-  position: relative;
-  cursor: pointer;
-}
-.opengraphica .ogr-toolbar-draw-gradient__stop-selection:before, .opengraphica .ogr-toolbar-draw-gradient__stop-selection:after {
-  content: "";
-  display: block;
-  box-sizing: border-box;
-  background: url("../images/transparency-bg.png");
-  border: 0.125rem solid var(--el-input-bg-color, var(--el-fill-color-blank));
-  border-radius: 0.5rem;
-  width: 6rem;
-  height: 100%;
-  max-width: 50vw;
-}
-.opengraphica .ogr-toolbar-draw-gradient__stop-selection:after {
-  background: var(--gradient);
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-.opengraphica .ogr-toolbar-draw-gradient__stop-selection:hover {
-  border-color: var(--el-border-color-hover);
-}
-.opengraphica .ogr-toolbar-draw-gradient__stop-selection:focus {
-  border-color: var(--el-color-primary);
-  outline: none;
-}
 .opengraphica .ogr-toolbar-draw-gradient-stop-drawer__editor-preview-section {
   padding: 1.5rem 1.25rem 0.875rem 1.25rem;
   margin: 0 -1.25rem;
@@ -10722,65 +10789,11 @@ body.ogr-full-page .opengraphica {
 .opengraphica .ogr-toolbar-draw-gradient-stop-drawer__presets > .el-scrollbar .el-scrollbar__view {
   padding: 0.25rem 1.25rem;
 }
-.opengraphica .ogr-gradient-preset {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  flex-wrap: nowrap;
-  border-radius: 0.25rem;
+.opengraphica .el-dialog .ogr-dock > .ogr-toolbar-draw-gradient-stop-drawer.ogr-dock-content {
+  padding: 0 1.25rem;
 }
-.opengraphica .ogr-gradient-preset .ogr-gradient-preset__activate {
-  display: flex;
-  background: none;
-  padding: 0;
-  margin: 0;
-  border: none;
-  outline: none;
-  flex-grow: 1;
-  flex-shrink: 1;
-  cursor: pointer;
-}
-.opengraphica .ogr-gradient-preset .ogr-gradient-preset__activate:focus-visible {
-  outline: 0.125rem solid var(--el-color-primary);
-}
-.opengraphica .ogr-gradient-preset .ogr-gradient-preset__activate .ogr-gradient-preset__name {
-  display: block;
-  width: 40%;
-  padding: 0.5rem 0.5rem 0.5rem 0;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  text-align: left;
-}
-.opengraphica .ogr-gradient-preset .ogr-gradient-preset__activate .ogr-gradient_preset__color-stops {
-  display: block;
-  width: 60%;
-  height: 2rem;
-  position: relative;
-  border-radius: 0.25rem;
-}
-.opengraphica .ogr-gradient-preset .ogr-gradient-preset__activate .ogr-gradient_preset__color-stops:before, .opengraphica .ogr-gradient-preset .ogr-gradient-preset__activate .ogr-gradient_preset__color-stops:after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border-radius: 0.25rem;
-}
-.opengraphica .ogr-gradient-preset .ogr-gradient-preset__activate .ogr-gradient_preset__color-stops:before {
-  background: url("../images/transparency-bg.png");
-}
-.opengraphica .ogr-gradient-preset .ogr-gradient-preset__activate .ogr-gradient_preset__color-stops:after {
-  background: var(--gradient);
-}
-.opengraphica .ogr-gradient-preset:hover {
-  background: var(--ogr-layer-list-background-color-active);
-  box-shadow: 0 0 0 0.25rem var(--ogr-layer-list-background-color-active);
-}
-.opengraphica .ogr-gradient-preset > .el-button {
-  margin-left: 1rem;
-  flex-grow: 0;
-  flex-shrink: 0;
+.opengraphica .el-dialog .ogr-dock > .ogr-toolbar-draw-gradient-stop-drawer.ogr-dock-content .ogr-toolbar-draw-gradient-stop-drawer__presets {
+  min-height: 13rem;
 }
 .opengraphica .ogr-list--dashed {
   margin: 0;
@@ -29050,7 +29063,8 @@ body.ogr-full-page .opengraphica {
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-row > .el-col > .el-input-group > *:last-child,
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__wrapper,
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper,
-.opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-switch {
+.opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-switch,
+.opengraphica .el-form-item-group .el-form-item .el-form-item__content > .ogr-gradient-input {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
@@ -29062,7 +29076,8 @@ body.ogr-full-page .opengraphica {
 .opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-row > .el-col:last-child > .el-input-group > *:last-child,
 .opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__wrapper,
 .opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper,
-.opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-switch {
+.opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-switch,
+.opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .ogr-gradient-input {
   border-top-right-radius: var(--ogr-border-radius);
 }
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__label {
@@ -29074,7 +29089,8 @@ body.ogr-full-page .opengraphica {
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-row > .el-col:last-child > .el-input:last-child > .el-input__wrapper,
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__wrapper,
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper,
-.opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-switch {
+.opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-switch,
+.opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .ogr-gradient-input {
   border-bottom-right-radius: var(--ogr-border-radius);
 }
 .opengraphica .el-form-item-group .el-form-item + .el-form-item {
@@ -29104,9 +29120,6 @@ body.ogr-full-page .opengraphica {
   z-index: 2;
 }
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content .el-row {
-  width: 100%;
-}
-.opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-select, .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-input {
   width: 100%;
 }
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-select .el-input__wrapper, .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-input .el-input__wrapper {
@@ -29146,6 +29159,11 @@ body.ogr-full-page .opengraphica {
   height: 100%;
   padding: 0 0.5rem;
   width: 100%;
+}
+.opengraphica .el-form-item-group .el-form-item .el-form-item__content > .ogr-gradient-input {
+  width: 100%;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-select, .opengraphica .el-form-item-group .el-form-item .el-form-item__content .el-input:not(.el-input-group) {
   display: block;
@@ -29194,7 +29212,8 @@ body.ogr-full-page .opengraphica {
 .opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content > .el-row,
 .opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content > .el-input,
 .opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content > .el-select,
-.opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content > .el-switch {
+.opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content > .el-switch,
+.opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content > .ogr-gradient-input {
   width: calc(100% - 2rem);
 }
 .opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content .el-button.el-button--form-item-reset {

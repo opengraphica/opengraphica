@@ -168,7 +168,7 @@ export default defineComponent({
                         canvasStore.set('dirty', true);
                     }
                 }
-            })
+            });
         }
 
         function onScrollLayerList() {

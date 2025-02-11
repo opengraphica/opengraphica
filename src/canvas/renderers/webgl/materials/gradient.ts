@@ -1,6 +1,7 @@
 import { Texture } from 'three/src/textures/Texture';
 
 import { srgbaToLinearSrgba, linearSrgbaToSrgba, linearSrgbaToOklab, oklabToLinearSrgba } from '@/lib/color';
+import { generateGradientImage } from '@/lib/gradient';
 import { generateObjectHash, generateStringHash } from '@/lib/hash';
 import { lerp } from '@/lib/math';
 
@@ -47,68 +48,7 @@ function createGradientStopTexture(
     colorSpace: WorkingFileGradientColorSpace,
     textureSize: number = 64
 ): Texture {
-    const gradientImageData = new ImageData(textureSize, 1);
-    stops.sort((a, b) => a.offset < b.offset ? -1 : 1);
-    let leftStopIndex = stops[0].offset > 0 ? -1 : 0;
-    let leftOffset = 0;
-    let leftColor = stops[0].color as RGBAColor;
-    const rightStopIndex = Math.min(leftStopIndex + 1, stops.length - 1);
-    let rightOffset = stops[rightStopIndex].offset;
-    let rightColor = (stops[rightStopIndex].color) as RGBAColor;
-    for (let i = 0; i < textureSize; i++) {
-        const currentStopOffset = i / (textureSize - 1);
-        if (currentStopOffset > rightOffset) {
-            leftStopIndex += 1;
-            const leftStop = stops[Math.min(leftStopIndex, stops.length - 1)];
-            const rightStop = stops[Math.min(leftStopIndex + 1, stops.length - 1)];
-            leftOffset = leftStop.offset;
-            leftColor = leftStop.color as RGBAColor;
-            rightOffset = leftStopIndex + 1 > stops.length - 1 ? 1 : rightStop.offset;
-            rightColor = rightStop.color as RGBAColor;
-        }
-        const interpolateOffset = (rightOffset - leftOffset > 0) ? (currentStopOffset - leftOffset) / (rightOffset - leftOffset) : 0;
-        let interpolatedColor = leftColor;
-        if (colorSpace === 'oklab') {
-            const leftColorTransfer = linearSrgbaToOklab(srgbaToLinearSrgba(leftColor));
-            const rightColorTransfer = linearSrgbaToOklab(srgbaToLinearSrgba(rightColor));
-            interpolatedColor = linearSrgbaToSrgba(oklabToLinearSrgba({
-                l: lerp(leftColorTransfer.l, rightColorTransfer.l, interpolateOffset),
-                a: lerp(leftColorTransfer.a, rightColorTransfer.a, interpolateOffset),
-                b: lerp(leftColorTransfer.b, rightColorTransfer.b, interpolateOffset),
-                alpha: lerp(leftColorTransfer.alpha, rightColorTransfer.alpha, interpolateOffset),
-            }));
-        } else if (colorSpace === 'linearSrgb') {
-            const leftColorTransfer = srgbaToLinearSrgba(leftColor);
-            const rightColorTransfer = srgbaToLinearSrgba(rightColor);
-            interpolatedColor = linearSrgbaToSrgba({
-                r: lerp(leftColorTransfer.r, rightColorTransfer.r, interpolateOffset),
-                g: lerp(leftColorTransfer.g, rightColorTransfer.g, interpolateOffset),
-                b: lerp(leftColorTransfer.b, rightColorTransfer.b, interpolateOffset),
-                alpha: lerp(leftColorTransfer.alpha, rightColorTransfer.alpha, interpolateOffset),
-            });
-        } else {
-            interpolatedColor = {
-                is: 'color',
-                r: lerp(leftColor.r, rightColor.r, interpolateOffset),
-                g: lerp(leftColor.g, rightColor.g, interpolateOffset),
-                b: lerp(leftColor.b, rightColor.b, interpolateOffset),
-                alpha: lerp(leftColor.alpha, rightColor.alpha, interpolateOffset),
-                style: leftColor.style,
-            }
-        }
-        gradientImageData.data[(i * 4)] = Math.round(255 * interpolatedColor.r);
-        gradientImageData.data[(i * 4) + 1] = Math.round(255 * interpolatedColor.g);
-        gradientImageData.data[(i * 4) + 2] = Math.round(255 * interpolatedColor.b);
-        gradientImageData.data[(i * 4) + 3] = Math.round(255 * interpolatedColor.alpha);
-    }
-    const canvas = document.createElement('canvas');
-    canvas.width = gradientImageData.width;
-    canvas.height = gradientImageData.height;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-        ctx.putImageData(gradientImageData, 0, 0);
-    }
-    const texture = new Texture(canvas);
+    const texture = new Texture(generateGradientImage(stops, colorSpace, textureSize));
     texture.colorSpace = SRGBColorSpace;
     texture.generateMipmaps = false;
     texture.magFilter = LinearFilter;

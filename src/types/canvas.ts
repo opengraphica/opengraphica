@@ -73,6 +73,7 @@ export interface CanvasFilterEditConfigPercentageRange extends CanvasFilterEditC
 export interface CanvasFilterEditConfigGradient extends CanvasFilterEditConfigFieldCommon {
     type: 'gradient';
     default: WorkingFileGradientColorStop<RGBAColor>[];
+    colorSpaceFieldName: string;
     preview?: WorkingFileGradientColorStop<RGBAColor>[];
 }
 

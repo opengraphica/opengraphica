@@ -1,5 +1,5 @@
 <template>
-    <div class="ogr-dock-content">
+    <div class="ogr-dock-content ogr-toolbar-draw-gradient-stop-drawer">
         <div class="ogr-toolbar-draw-gradient-stop-drawer__editor-preview-section">
             <div ref="gradientEditorElement" class="ogr-gradient-editor">
                 <div
@@ -139,6 +139,13 @@
                 </div>
             </el-scrollbar>
         </div>
+        <template v-if="isDialog">
+            <el-divider class="mt-0" />
+            <div class="mt-4 pb-5 has-text-right">
+                <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
+                <el-button @click="onConfirmSelection">{{ $t('button.ok') }}</el-button>
+            </div>
+        </template>
     </div>
 </template>
 
@@ -155,6 +162,7 @@ import {
 } from '@/canvas/store/draw-gradient-state';
 
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
+import ElDivider from 'element-plus/lib/components/divider/index';
 import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.vue';
 import ElInputColor from '@/ui/el/el-input-color.vue';
 import ElInputGroup from '@/ui/el/el-input-group.vue';
@@ -166,24 +174,29 @@ import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
 import type { RGBAColor, WorkingFileGradientColorSpace, WorkingFileGradientColorStop } from '@/types';
 
 const props = defineProps({
-    modelValue: {
+    gradient: {
         type: Array as PropType<Array<WorkingFileGradientColorStop<RGBAColor>>>,
         required: true,
     },
     blendColorSpace: {
         type: String as PropType<WorkingFileGradientColorSpace>,
         required: true,
-    }
+    },
+    isDialog: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const emit = defineEmits([
+    'close',
     'stops-edited',
     'update:title',
     'update:dialogSize',
-    'update:modelValue',
+    'update:gradient',
 ]);
 emit('update:title', 'toolbar.drawGradient.stopDialog.title');
-emit('update:dialogSize', 'medium');
+emit('update:dialogSize', 'medium-large');
 
 const { t } = useI18n();
 
@@ -198,8 +211,8 @@ const editingColorStops = ref<Array<WorkingFileGradientColorStop<RGBAColor>>>([]
 const hasEditedActiveColorStops = ref(false);
 const activeColorStopIndex = ref(-1);
 
-watch(() => props.modelValue, (modelValue) => {
-    editingColorStops.value = modelValue;
+watch(() => props.gradient, (gradient) => {
+    editingColorStops.value = gradient;
 
     activeColorStopIndex.value = Math.min(editingColorStops.value.length - 1, Math.max(0, activeColorStopIndex.value));
 }, { immediate: true });
@@ -263,7 +276,7 @@ function onPointerDownGradientEditorPreview(event: PointerEvent) {
     showStopAddCursor.value = false;
     nextTick(() => {
         activeColorStopIndex.value = editingColorStops.value.length - 1;
-        emit('update:modelValue', editingColorStops.value);
+        emit('update:gradient', editingColorStops.value);
     });
 }
 
@@ -291,7 +304,7 @@ function onKeydownStopMarker(event: KeyboardEvent, colorMarkerIndex: number) {
                 editingColorStops.value[stopIndex].offset = Math.min(1, editingColorStops.value[stopIndex].offset + slideSpeed);
             }
             hasEditedActiveColorStops.value = true;
-            emit('update:modelValue', editingColorStops.value);
+            emit('update:gradient', editingColorStops.value);
             break;
     }
 }
@@ -321,7 +334,7 @@ function onPointerMoveStopMarker(event: PointerEvent) {
         (event.pageX - draggingColorStopStartX.value) / draggingColorStopMaxWidth.value
     ));
     hasEditedActiveColorStops.value = true;
-    emit('update:modelValue', editingColorStops.value);
+    emit('update:gradient', editingColorStops.value);
 }
 function onPointerUpStopMarker() {
     draggingColorStopIndex.value = -1;
@@ -333,12 +346,12 @@ function onPointerUpStopMarker() {
 
 function onChangeEditingStopColor() {
     hasEditedActiveColorStops.value = true;
-    emit('update:modelValue', editingColorStops.value);
+    emit('update:gradient', editingColorStops.value);
 }
 
 function onChangeEditingStopOffset() {
     hasEditedActiveColorStops.value = true;
-    emit('update:modelValue', editingColorStops.value);
+    emit('update:gradient', editingColorStops.value);
 }
 
 function onDeleteEditingStop() {
@@ -346,7 +359,7 @@ function onDeleteEditingStop() {
     editingColorStops.value.splice(activeColorStopIndex.value, 1);
     activeColorStopIndex.value = editingColorStops.value.length - 1;
     hasEditedActiveColorStops.value = true;
-    emit('update:modelValue', editingColorStops.value);
+    emit('update:gradient', editingColorStops.value);
 }
 
 function onReverseStops() {
@@ -354,7 +367,7 @@ function onReverseStops() {
         stop.offset = 1.0 - stop.offset;
     }
     hasEditedActiveColorStops.value = true;
-    emit('update:modelValue', editingColorStops.value);
+    emit('update:gradient', editingColorStops.value);
 }
 
 /*----------------*\
@@ -392,7 +405,7 @@ function onSelectPreset(presetIndex: number) {
     editingColorStops.value = JSON.parse(JSON.stringify(gradientPresets.value[presetIndex].stops));
     activeColorStopIndex.value = 0;
     hasEditedActiveColorStops.value = true;
-    emit('update:modelValue', editingColorStops.value);
+    emit('update:gradient', editingColorStops.value);
 }
 
 async function onSaveActivePreset() {
@@ -409,6 +422,18 @@ async function onSaveActivePreset() {
         name: Array.from(colorNames).join(', '),
         stops: JSON.parse(JSON.stringify(editingColorStops.value)),
     })
+}
+
+/*---------------*\
+| Dialog Controls |
+\*---------------*/
+
+function onCancel() {
+    emit('close');
+}
+
+function onConfirmSelection() {
+    emit('close', { gradient: JSON.parse(JSON.stringify(editingColorStops.value)) });
 }
 
 </script>

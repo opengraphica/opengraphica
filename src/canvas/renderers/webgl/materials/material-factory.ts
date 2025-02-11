@@ -260,4 +260,3 @@ function disposeMaterialDeferred(materialWrapper: MaterialWrapper) {
     materialWrapperUserCount.delete(uuid);
     queuedDisposalMaterials.delete(uuid);
 }
-

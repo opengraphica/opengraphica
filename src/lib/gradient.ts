@@ -68,7 +68,18 @@ export function sampleGradient(stops: WorkingFileGradientColorStop<RGBAColor>[],
     return interpolatedColor;
 }
 
-export function generateCssGradient(colorStops: WorkingFileGradientColorStop<RGBAColor>[], blendColorSpace: WorkingFileGradientColorSpace): string {
+export function generateCssGradient(
+    colorStops: WorkingFileGradientColorStop<RGBAColor>[],
+    blendColorSpace: WorkingFileGradientColorSpace | number
+): string {
+    if (blendColorSpace === 0) {
+        blendColorSpace = 'oklab';
+    } else if (blendColorSpace === 1) {
+        blendColorSpace = 'srgb';
+    } else if (blendColorSpace === 2) {
+        blendColorSpace = 'linearSrgb';
+    }
+
     let previewGradient = '';
     let handledOffsets = new Set<number>();
     let sampledColorStops: WorkingFileGradientColorStop<RGBAColor>[] = [];
@@ -81,7 +92,7 @@ export function generateCssGradient(colorStops: WorkingFileGradientColorStop<RGB
         if (handledOffsets.has(sampleOffset)) continue;
         sampledColorStops.push({
             offset: sampleOffset,
-            color: sampleGradient(colorStops, blendColorSpace, sampleOffset),
+            color: sampleGradient(colorStops, blendColorSpace as WorkingFileGradientColorSpace, sampleOffset),
         });
     }
     sampledColorStops.sort((a, b) => a.offset < b.offset ? -1 : 1);
@@ -102,4 +113,73 @@ export function generateCssGradient(colorStops: WorkingFileGradientColorStop<RGB
         }).join(', ') + ')';
     }
     return previewGradient;
+}
+
+export function generateGradientImage(
+    stops: WorkingFileGradientColorStop<RGBAColor>[],
+    colorSpace: WorkingFileGradientColorSpace,
+    textureSize: number = 64
+): HTMLCanvasElement {
+    const gradientImageData = new ImageData(textureSize, 1);
+    stops.sort((a, b) => a.offset < b.offset ? -1 : 1);
+    let leftStopIndex = stops[0].offset > 0 ? -1 : 0;
+    let leftOffset = 0;
+    let leftColor = stops[0].color as RGBAColor;
+    const rightStopIndex = Math.min(leftStopIndex + 1, stops.length - 1);
+    let rightOffset = stops[rightStopIndex].offset;
+    let rightColor = (stops[rightStopIndex].color) as RGBAColor;
+    for (let i = 0; i < textureSize; i++) {
+        const currentStopOffset = i / (textureSize - 1);
+        if (currentStopOffset > rightOffset) {
+            leftStopIndex += 1;
+            const leftStop = stops[Math.min(leftStopIndex, stops.length - 1)];
+            const rightStop = stops[Math.min(leftStopIndex + 1, stops.length - 1)];
+            leftOffset = leftStop.offset;
+            leftColor = leftStop.color as RGBAColor;
+            rightOffset = leftStopIndex + 1 > stops.length - 1 ? 1 : rightStop.offset;
+            rightColor = rightStop.color as RGBAColor;
+        }
+        const interpolateOffset = (rightOffset - leftOffset > 0) ? (currentStopOffset - leftOffset) / (rightOffset - leftOffset) : 0;
+        let interpolatedColor = leftColor;
+        if (colorSpace === 'oklab') {
+            const leftColorTransfer = linearSrgbaToOklab(srgbaToLinearSrgba(leftColor));
+            const rightColorTransfer = linearSrgbaToOklab(srgbaToLinearSrgba(rightColor));
+            interpolatedColor = linearSrgbaToSrgba(oklabToLinearSrgba({
+                l: lerp(leftColorTransfer.l, rightColorTransfer.l, interpolateOffset),
+                a: lerp(leftColorTransfer.a, rightColorTransfer.a, interpolateOffset),
+                b: lerp(leftColorTransfer.b, rightColorTransfer.b, interpolateOffset),
+                alpha: lerp(leftColorTransfer.alpha, rightColorTransfer.alpha, interpolateOffset),
+            }));
+        } else if (colorSpace === 'linearSrgb') {
+            const leftColorTransfer = srgbaToLinearSrgba(leftColor);
+            const rightColorTransfer = srgbaToLinearSrgba(rightColor);
+            interpolatedColor = linearSrgbaToSrgba({
+                r: lerp(leftColorTransfer.r, rightColorTransfer.r, interpolateOffset),
+                g: lerp(leftColorTransfer.g, rightColorTransfer.g, interpolateOffset),
+                b: lerp(leftColorTransfer.b, rightColorTransfer.b, interpolateOffset),
+                alpha: lerp(leftColorTransfer.alpha, rightColorTransfer.alpha, interpolateOffset),
+            });
+        } else {
+            interpolatedColor = {
+                is: 'color',
+                r: lerp(leftColor.r, rightColor.r, interpolateOffset),
+                g: lerp(leftColor.g, rightColor.g, interpolateOffset),
+                b: lerp(leftColor.b, rightColor.b, interpolateOffset),
+                alpha: lerp(leftColor.alpha, rightColor.alpha, interpolateOffset),
+                style: leftColor.style,
+            }
+        }
+        gradientImageData.data[(i * 4)] = Math.round(255 * interpolatedColor.r);
+        gradientImageData.data[(i * 4) + 1] = Math.round(255 * interpolatedColor.g);
+        gradientImageData.data[(i * 4) + 2] = Math.round(255 * interpolatedColor.b);
+        gradientImageData.data[(i * 4) + 3] = Math.round(255 * interpolatedColor.alpha);
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = gradientImageData.width;
+    canvas.height = gradientImageData.height;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+        ctx.putImageData(gradientImageData, 0, 0);
+    }
+    return canvas;
 }

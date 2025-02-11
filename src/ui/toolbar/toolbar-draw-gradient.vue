@@ -15,7 +15,7 @@
                 <div
                     role="button"
                     tabindex="0"
-                    class="ogr-toolbar-draw-gradient__stop-selection"
+                    class="ogr-gradient-input ogr-gradient-input--small"
                     :style="{ '--gradient': selectedGradientBackground }"
                     aria-haspopup="dialog"
                     :aria-expanded="showStopDrawer"
@@ -71,7 +71,7 @@
             >
                 <span class="bi bi-check-circle-fill mr-2" aria-hidden="true" /> <span>{{ $t('button.done') }}</span>
             </el-button>
-            <dock-gradient-editor v-model="editingColorStops" :blend-color-space="blendColorSpace" @stops-edited="hasEditedColorStops = true" />
+            <dock-gradient-editor v-model:gradient="editingColorStops" :blend-color-space="blendColorSpace" @stops-edited="hasEditedColorStops = true" />
         </div>
     </div>
 </template>

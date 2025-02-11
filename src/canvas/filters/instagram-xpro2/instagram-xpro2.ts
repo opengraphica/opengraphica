@@ -47,7 +47,7 @@ export default class InstagramXpro2CanvasFilter implements CanvasFilter<Instagra
         const sourceG = rgba.g;
         const sourceB = rgba.b;
 
-        const radius = 1.0;
+        const radius = 0.85;
         
         const interpolation = Math.min(Math.max(pointDistance2d(0.0, 0.0, -0.5 + uvX, -0.5 + uvY) - (1.0 - radius), 0.0), 1.0);
         const gradientColor = {

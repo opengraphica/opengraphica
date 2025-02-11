@@ -90,7 +90,7 @@ export async function createDrawableCanvas(options: CreateDrawableCanvasOptions)
         } else if (data.type === 'INITIALIZED') {
             initializeResolve(uuid);
         } else if (data.type === 'LOG') {
-            console.log(data.value);
+            console['log'](data.value);
         }
     };
     worker.onmessageerror = (error) => {

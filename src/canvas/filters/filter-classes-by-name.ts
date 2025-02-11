@@ -9,6 +9,7 @@ import { default as colorBlindness } from './color-blindness/color-blindness';
 import { default as colorCorrection } from './color-correction/color-correction';
 import { default as contrast } from './contrast/contrast';
 import { default as gaussianBlur } from './gaussian-blur/gaussian-blur';
+import { default as gradientMap } from './gradient-map/gradient-map';
 import { default as grayscale } from './grayscale/grayscale';
 import { default as hue } from './hue/hue';
 import { default as negative } from './negative/negative';
@@ -32,6 +33,7 @@ export default {
     colorCorrection,
     contrast,
     gaussianBlur,
+    gradientMap,
     grayscale,
     hue,
     negative,

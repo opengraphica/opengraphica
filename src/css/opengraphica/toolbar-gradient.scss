@@ -121,41 +121,6 @@
     }
 }
 
-.ogr-toolbar-draw-gradient__stop-selection {
-    box-sizing: border-box;
-    height: 2rem;
-    border: var(--el-border);
-    border-radius: 0.5rem;
-    box-shadow: 0 0 0 0.125rem var(--el-input-bg-color, var(--el-fill-color-blank)) inset;
-    position: relative;
-    cursor: pointer;
-
-    &:before, &:after {
-        content: '';
-        display: block;
-        box-sizing: border-box;
-        background: url("../images/transparency-bg.png");
-        border: 0.125rem solid var(--el-input-bg-color, var(--el-fill-color-blank));
-        border-radius: 0.5rem;
-        width: 6rem;
-        height: 100%;
-        max-width: 50vw;
-    }
-    &:after {
-        background: var(--gradient);
-        position: absolute;
-        top: 0;
-        left: 0;
-    }
-
-    &:hover {
-        border-color: var(--el-border-color-hover);
-    }
-    &:focus {
-        border-color: var(--el-color-primary);
-        outline: none;
-    }
-}
 .ogr-toolbar-draw-gradient-stop-drawer__editor-preview-section {
     padding: 1.5rem 1.25rem 0.875rem 1.25rem;
     margin: 0 -1.25rem;
@@ -222,69 +187,9 @@
     }
 }
 
-.ogr-gradient-preset {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: nowrap;
-    border-radius: 0.25rem;
-    
-    .ogr-gradient-preset__activate {
-        display: flex;
-        background: none;
-        padding: 0;
-        margin: 0;
-        border: none;
-        outline: none;
-        flex-grow: 1;
-        flex-shrink: 1;
-        cursor: pointer;
-
-        &:focus-visible {
-            outline: 0.125rem solid var(--el-color-primary);
-        }
-
-        .ogr-gradient-preset__name {
-            display: block;
-            width: 40%;
-            padding: 0.5rem 0.5rem 0.5rem 0;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            text-align: left;
-        }
-        .ogr-gradient_preset__color-stops {
-            display: block;
-            width: 60%;
-            height: 2rem;
-            position: relative;
-            border-radius: 0.25rem;
-
-            &:before, &:after {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                border-radius: 0.25rem;
-            }
-            &:before {
-                background: url("../images/transparency-bg.png");
-            }
-            &:after {
-                background: var(--gradient);
-            }
-        }
-    }
-
-    &:hover {
-        background: var(--ogr-layer-list-background-color-active);
-        box-shadow: 0 0 0 0.25rem var(--ogr-layer-list-background-color-active);
-    }
-
-    > .el-button {
-        margin-left: 1rem;
-        flex-grow: 0;
-        flex-shrink: 0;
+.el-dialog .ogr-dock > .ogr-toolbar-draw-gradient-stop-drawer.ogr-dock-content {
+    padding: 0 1.25rem;
+    .ogr-toolbar-draw-gradient-stop-drawer__presets {
+        min-height: 13rem;
     }
 }

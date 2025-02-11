@@ -11,11 +11,15 @@ import blendingModesFragmentShaderSetup from '@/canvas/renderers/webgl/shaders/b
 import blendingModesFragmentShaderMain from '@/canvas/renderers/webgl/shaders/blending-modes.main.frag';
 import commonUtilityFragmentShader from '@/canvas/renderers/webgl/shaders/common-utility.frag';
 
+import { generateGradientImage } from '@/lib/gradient';
+
 import workingFileStore from '@/store/working-file';
 import { getStoredImageOrCanvas } from "@/store/image";
 
+import { SRGBColorSpace, LinearFilter } from 'three/src/constants';
+
 import type { IUniform } from 'three/src/renderers/shaders/UniformsLib';
-import type { CanvasFilter, CanvasFilterLayerInfo, CanvasFilterEditConfig, WorkingFileLayerFilter } from '@/types';
+import type { CanvasFilter, CanvasFilterLayerInfo, CanvasFilterEditConfig, WorkingFileLayerFilter, CanvasFilterEditConfigGradient } from '@/types';
 
 export async function getCanvasFilterClass(name: string): Promise<new (...args: any) => CanvasFilter> {
     const kebabCaseName = camelCaseToKebabCase(name);
@@ -89,29 +93,48 @@ export interface CombinedFilterShaderResult {
     textures: Texture[],
 }
 
-function translateParamToUniformValue(paramValue: any, editConfig: CanvasFilterEditConfig, editParamName: string) {
+function translateParamToUniformValue(paramValue: any, editConfig: CanvasFilterEditConfig, editParamName: string, params: Record<string, unknown>) {
     const type = editConfig[editParamName].type;
     if (type === 'boolean') {
         paramValue = paramValue === true ? 1 : 0;
     } else if (type === 'percentageRange') {
         paramValue = new Vector2(paramValue[0], paramValue[1]);
+    } else if (type === 'gradient') {
+        const colorSpaceFieldName = (editConfig[editParamName] as CanvasFilterEditConfigGradient).colorSpaceFieldName;
+        const blendColorSpace = ({
+            0: 'oklab',
+            1: 'srgb',
+            2: 'linearSrgb',
+        }[params[colorSpaceFieldName] as number] ?? 'oklab') as never;
+        const texture = new Texture(generateGradientImage(paramValue, blendColorSpace, 64));
+        texture.colorSpace = SRGBColorSpace;
+        texture.generateMipmaps = false;
+        texture.magFilter = LinearFilter;
+        texture.minFilter = LinearFilter;
+        texture.needsUpdate = true;
+        paramValue = texture;
     }
     return paramValue;
 }
 
-export function generateShaderUniformsAndDefines(canvasFilters: CanvasFilter[], layer: CanvasFilterLayerInfo): { uniforms: Record<string, IUniform>, defines: Record<string, unknown> } {
+export function generateShaderUniformsAndDefines(
+    canvasFilters: CanvasFilter[],
+    layer: CanvasFilterLayerInfo
+): { uniforms: Record<string, IUniform>, defines: Record<string, unknown>, textures: Texture[] } {
     const defines: Record<string, unknown> = {
         cLayerWidth: layer.width,
         cLayerHeight: layer.height,
     };
     const uniforms: Record<string, IUniform> = {};
+    let textures: Texture[] = [];
     for (const [index, canvasFilter] of canvasFilters.entries()) {
         const editConfig = canvasFilter.getEditConfig();
         const computedParamNames: string[] = [];
         const paramValues: Record<string, unknown> = {};
         for (const editParamName in editConfig) {
             let paramValue = canvasFilter.params[editParamName] ?? editConfig[editParamName].default;
-            paramValues[editParamName] = translateParamToUniformValue(paramValue, editConfig, editParamName);
+            paramValue = translateParamToUniformValue(paramValue, editConfig, editParamName, canvasFilter.params);
+            paramValues[editParamName] = paramValue;
             if (editConfig[editParamName].computedValue) {
                 computedParamNames.push(editParamName);
             } else {
@@ -125,10 +148,13 @@ export function generateShaderUniformsAndDefines(canvasFilters: CanvasFilter[], 
                     };
                 }
             }
+            if ((paramValue as Texture).isTexture) {
+                textures.push(paramValue as Texture);
+            }
         }
         for (const editParamName of computedParamNames) {
             let paramValue = editConfig[editParamName].computedValue?.(paramValues, { layerWidth: layer.width ?? 0, layerHeight: layer.height ?? 0 });
-            paramValue = translateParamToUniformValue(paramValue, editConfig, editParamName);
+            paramValue = translateParamToUniformValue(paramValue, editConfig, editParamName, canvasFilter.params);
             if (editConfig[editParamName].constant) {
                 const replaceDefineName = 'constant' + index + '_' + editParamName;
                 defines[replaceDefineName] = paramValue;
@@ -138,9 +164,12 @@ export function generateShaderUniformsAndDefines(canvasFilters: CanvasFilter[], 
                     value: paramValue
                 };
             }
+            if ((paramValue as Texture).isTexture) {
+                textures.push(paramValue as Texture);
+            }
         }
     }
-    return { defines, uniforms };
+    return { defines, uniforms, textures };
 }
 
 interface CombineFilterShadersOptions {
@@ -154,14 +183,13 @@ export function combineFiltersToShader(canvasFilters: CanvasFilter[], layerInfo:
     let vertexShader = '';
     let fragmentShader = '';
 
-    const { uniforms, defines } = generateShaderUniformsAndDefines(canvasFilters, layerInfo);
+    const { uniforms, defines, textures } = generateShaderUniformsAndDefines(canvasFilters, layerInfo);
     defines.cLayerBlendingMode = 0;
 
     const masks = workingFileStore.get('masks');
 
     let vertexShaderMainCalls: string[] = [];
     let fragmentShaderMainCalls: string[] = [];
-    let textures: Texture[] = [];
 
     const alreadyIncludedFilters = new Set<string>();
 

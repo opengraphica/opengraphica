@@ -6,22 +6,22 @@ vec4 processInstagramXpro2(vec4 color) {
 
     // Vignette
     vec2 position = vec2(-0.5, -0.5);
-    float radius = 1.0;
+    float radius = 0.85;
     vec4 stop1 = vec4(0.90196, 0.90588, 0.87843, 1.0);
     vec4 stop2 = vec4(0.16862, 0.16470, 0.63137, 0.6);
     float interpolation = clamp(length(position + vUv) - (1.0 - radius), 0.0, 1.0);
     vec4 gradientColor = (interpolation * stop2) + (1.0 - interpolation) * stop1;
-    newRgb.rgb = (gradientColor.rgb * gradientColor.a) + (rgb.rgb * (1.0 - gradientColor.a));
+    // newRgb.rgb = (gradientColor.rgb * gradientColor.a) + (rgb.rgb * (1.0 - gradientColor.a));
 
     // Burn blending mode
-    newRgb.r = (1.0 - ((1.0 - (newRgb.r)) / max(0.00001, (gradientColor.r))));
-    newRgb.g = (1.0 - ((1.0 - (newRgb.g)) / max(0.00001, (gradientColor.g))));
-    newRgb.b = (1.0 - ((1.0 - (newRgb.b)) / max(0.00001, (gradientColor.b))));
+    newRgb.r = (1.0 - ((1.0 - (rgb.r)) / max(0.00001, (gradientColor.r))));
+    newRgb.g = (1.0 - ((1.0 - (rgb.g)) / max(0.00001, (gradientColor.g))));
+    newRgb.b = (1.0 - ((1.0 - (rgb.b)) / max(0.00001, (gradientColor.b))));
 
     // Sepia(0.3)
-    newRgb.r = rgb.r * 0.7 + (0.393 * rgb.r + 0.769 * rgb.g + 0.189 * rgb.b) * 0.3;
-    newRgb.g = rgb.g * 0.7 + (0.349 * rgb.r + 0.686 * rgb.g + 0.168 * rgb.b) * 0.3;
-    newRgb.b = rgb.b * 0.7 + (0.272 * rgb.r + 0.534 * rgb.g + 0.131 * rgb.b) * 0.3;
+    newRgb.r = newRgb.r * 0.7 + (0.393 * newRgb.r + 0.769 * newRgb.g + 0.189 * newRgb.b) * 0.3;
+    newRgb.g = newRgb.g * 0.7 + (0.349 * newRgb.r + 0.686 * newRgb.g + 0.168 * newRgb.b) * 0.3;
+    newRgb.b = newRgb.b * 0.7 + (0.272 * newRgb.r + 0.534 * newRgb.g + 0.131 * newRgb.b) * 0.3;
 
     return vec4(srgbToLinearSrgb(rgb.rgb * (1.0 - pMix) + newRgb * pMix), color.a);
 }
