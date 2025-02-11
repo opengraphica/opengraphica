@@ -30,6 +30,7 @@
         "pasteLayers": "Paste Layer(s)",
         "placeholder": "Placeholder",
         "pleaseWait": "Please Wait...",
+        "rasterizeLayer": "Rasterize Layer",
         "renameLayer": "Rename Layer",
         "reorderLayers": "Reorder Layer(s)",
         "reorderLayerFilters": "Reorder Effect(s)",
@@ -96,6 +97,7 @@
             "editFrames": "Edit Frames",
             "emptyGroup": "Group is Empty.",
             "effects": "Effects",
+            "rasterizeEffects": "Merge All",
             "recalculatingEffect": "Processing...",
             "moveEffectUp": "Move Effect Up",
             "moveEffectDown": "Move Effect Down"

@@ -372,6 +372,8 @@
                 }
 
                 > .el-select,  > .el-input {
+                    width: 100%;
+
                     .el-input__wrapper {
                         background-color: var(--ogr-form-connected-label-input-focus-color);
                     }

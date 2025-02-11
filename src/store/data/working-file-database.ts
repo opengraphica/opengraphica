@@ -313,7 +313,12 @@ export async function updateWorkingFile(workingFile: Partial<WorkingFile<ColorMo
     }
 }
 
+let updateWorkingFileLayerRequestIds = new Map<number, number>();
+
 export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNew: boolean = false, workingFile?: Partial<WorkingFile>): Promise<void> {
+    const requestId = Math.random();
+    updateWorkingFileLayerRequestIds.set(layer.id, requestId);
+
     await init();
     if (!database) throw new Error('Database not created.');
 
@@ -332,6 +337,7 @@ export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNe
             request.onerror = resolve;
         });
     }
+    if (updateWorkingFileLayerRequestIds.get(layer.id) !== requestId) return;
 
     const storedLayer: Record<string, any> = { ...layer };
     storedLayer.thumbnailImageSrc = null;
@@ -352,6 +358,7 @@ export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNe
                 const imageBlob = await createImageBlobFromCanvas(imageCanvas);
                 const transaction = (database as IDBDatabase).transaction('images', 'readwrite');
                 const imagesStore = transaction.objectStore('images');
+                if (updateWorkingFileLayerRequestIds.get(layer.id) !== requestId) return;
                 const imageStoreRequest = imagesStore.put({
                     id: storedRasterLayer.data.sourceUuid,
                     data: imageBlob,
@@ -382,6 +389,7 @@ export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNe
                     const imageBlob = await createImageBlobFromCanvas(imageCanvas);
                     const transaction = (database as IDBDatabase).transaction('images', 'readwrite');
                     const imagesStore = transaction.objectStore('images');
+                    if (updateWorkingFileLayerRequestIds.get(layer.id) !== requestId) return;
                     const imageStoreRequest = imagesStore.put({
                         id: frame.image.sourceUuid,
                         data: imageBlob,
@@ -425,6 +433,7 @@ export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNe
                         const imageBlob = await createImageBlobFromCanvas(imageCanvas);
                         const transaction = (database as IDBDatabase).transaction('images', 'readwrite');
                         const imagesStore = transaction.objectStore('images');
+                        if (updateWorkingFileLayerRequestIds.get(layer.id) !== requestId) return;
                         const imageStoreRequest = imagesStore.put({
                             id: mask.sourceUuid,
                             data: imageBlob,
@@ -444,6 +453,7 @@ export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNe
         }
     }
 
+    if (updateWorkingFileLayerRequestIds.get(layer.id) !== requestId) return;
     const transaction = (database as IDBDatabase).transaction('layers', 'readwrite');
     const layersStore = transaction.objectStore('layers');
     const request = layersStore.put(deepToRaw(storedLayer));

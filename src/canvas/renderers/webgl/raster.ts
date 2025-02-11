@@ -17,8 +17,10 @@ import { createThreejsTextureFromImage } from '@/lib/canvas';
 import { createEmptyCanvasWith2dContext } from '@/lib/image';
 import appEmitter from '@/lib/emitter';
 
+import { queueRefreshLayerPasses } from '@/canvas/renderers/webgl/postprocessing/create-layer-passes';
+
 import type { Scene } from 'three';
-import type { WorkingFileRasterLayer, WorkingFileLayerBlendingMode, ColorModel } from '@/types';
+import type { WorkingFileRasterLayer, WorkingFileLayerBlendingMode, ColorModel, CanvasFilter } from '@/types';
 
 export default class RasterLayerRenderer extends BaseLayerRenderer {
     private stopWatchDrafts: WatchStopHandle | undefined;
@@ -39,12 +41,34 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
 
     private isVisible: boolean = true;
     private lastBlendingMode: WorkingFileLayerBlendingMode = 'normal';
+    private lastFilters: CanvasFilter[] = [];
+
+    private materialWrapperUpdates: Array<() => Promise<MaterialWrapper | undefined>> = [];
+    async scheduleMaterialWrapperUpdate(callback: () => Promise<MaterialWrapper | undefined>) {
+        this.materialWrapperUpdates.unshift(callback);
+        if (this.materialWrapperUpdates.length === 1) {
+            while (this.materialWrapperUpdates.length > 0) {
+                const updateCallback = this.materialWrapperUpdates[this.materialWrapperUpdates.length - 1];
+                if (!updateCallback) break;
+                const materialWrapper = await updateCallback();
+                if (materialWrapper) {
+                    this.materialWrapper = materialWrapper;
+                    this.plane && (this.plane.material = this.materialWrapper.material);
+                }
+                this.materialWrapperUpdates.pop();
+                // queueRefreshLayerPasses();
+                canvasStore.set('dirty', true);
+            }
+        }
+    }
 
     async onAttach(layer: WorkingFileRasterLayer<ColorModel>) {
 
         this.lastChunkUpdateId = layer.data?.chunkUpdateId;
-        this.materialWrapper = await createMaterial('raster', { srcTexture: undefined }, layer.filters, layer, layer.blendingMode);
-        this.plane = new Mesh(this.planeGeometry, this.materialWrapper.material);
+        this.scheduleMaterialWrapperUpdate(async () => {
+            return await createMaterial('raster', { srcTexture: undefined }, layer.filters, layer, layer.blendingMode);
+        })
+        this.plane = new Mesh(this.planeGeometry, undefined);
         this.plane.name = layer.name;
         this.plane.renderOrder = this.order + 0.1;
         this.plane.matrixAutoUpdate = false;
@@ -117,10 +141,11 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
         if (updates.blendingMode) {
             if (updates.blendingMode !== this.lastBlendingMode) {
                 this.lastBlendingMode = updates.blendingMode;
-                if (this.materialWrapper) {
-                    this.materialWrapper = this.materialWrapper.changeBlendingMode(updates.blendingMode);
-                    this.plane && (this.plane.material = this.materialWrapper.material);
-                }
+                this.scheduleMaterialWrapperUpdate(async () => {
+                    if (this.materialWrapper) {
+                        return this.materialWrapper.changeBlendingMode(this.lastBlendingMode);
+                    }
+                });
             }
         }
         if (updates.width || updates.height) {
@@ -141,15 +166,18 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
             );
         }
         if (updates.filters) {
-            const srcTexture = this.materialWrapper?.material.uniforms.srcTexture.value;
-            if (this.materialWrapper) {
-                disposeMaterial(this.materialWrapper);
-            }
-            this.materialWrapper = await createMaterial('raster', { srcTexture }, updates.filters, 
-                { width: this.sourceTexture?.image.width, height: this.sourceTexture?.image.height },
-                this.lastBlendingMode
-            );
-            this.plane && (this.plane.material = this.materialWrapper.material);
+            this.lastFilters = updates.filters as CanvasFilter[];
+            // const srcTexture = this.materialWrapper?.material.uniforms.srcTexture.value;
+            this.scheduleMaterialWrapperUpdate(async () => {
+                if (this.materialWrapper) {
+                    delete this.materialWrapper.material.uniforms.srcTexture;
+                    disposeMaterial(this.materialWrapper);
+                }
+                return await createMaterial('raster', { srcTexture: this.sourceTexture }, this.lastFilters, 
+                    { width: this.sourceTexture?.image.width, height: this.sourceTexture?.image.height },
+                    this.lastBlendingMode
+                );
+            });
         }
         if (updates.data) {
             if (this.draftTexture) {
@@ -211,20 +239,25 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
             }
             // Re-upload the full image texture to the GPU, discard the old texture.
             else {
-                const sourceImage = await getStoredImageOrCanvas(updates.data.sourceUuid ?? '');
+                const sourceImage = getStoredImageOrCanvas(updates.data.sourceUuid ?? '');
                 if (sourceImage) {
                     let newSourceTexture: Texture = await createThreejsTextureFromImage(sourceImage);
                     this.disposeSourceTexture();
                     this.sourceTexture = newSourceTexture;
-
                     this.sourceTexture.needsUpdate = true;
-                    this.materialWrapper = this.materialWrapper!.update({ srcTexture: this.sourceTexture });
-                    this.plane && (this.plane.material = this.materialWrapper.material);
-                    canvasStore.set('dirty', true);
+                    this.scheduleMaterialWrapperUpdate(async () => {
+                        if (this.materialWrapper) {
+                            return this.materialWrapper.update({ srcTexture: this.sourceTexture });
+                        }
+                    });
                 } else {
                     this.disposeSourceTexture();
-                    this.materialWrapper = this.materialWrapper!.update({ srcTexture: undefined });
-                    this.plane && (this.plane.material = this.materialWrapper.material);
+
+                    this.scheduleMaterialWrapperUpdate(async () => {
+                        if (this.materialWrapper) {
+                            return this.materialWrapper.update({ srcTexture: this.sourceTexture });
+                        }
+                    });
                 }
             }
         }

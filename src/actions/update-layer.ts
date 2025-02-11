@@ -1,14 +1,17 @@
 import { v4 as uuidv4 } from 'uuid';
 import { markRaw } from 'vue';
 import { BaseAction } from './base';
-import { createEmptyCanvasWith2dContext, createImageFromCanvas } from '@/lib/image';
+
+import { createEmptyCanvasWith2dContext } from '@/lib/image';
 import { drawImageToCanvas2d } from '@/lib/canvas';
+
 import canvasStore from '@/store/canvas';
 import { prepareStoredImageForEditing, prepareStoredImageForArchival, reserveStoredImage, unreserveStoredImage } from '@/store/image';
 import { reserveStoredSvg, unreserveStoredSvg } from '@/store/svg';
 import { reserveStoredVideo, unreserveStoredVideo } from '@/store/video';
 import workingFileStore, { getLayerById, regenerateLayerThumbnail, getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { updateWorkingFileLayer } from '@/store/data/working-file-database';
+
 import { updateBakedImageForLayer } from './baking';
 import layerRenderers from '@/canvas/renderers';
 import { queueRefreshLayerPasses } from '@/canvas/renderers/webgl/postprocessing/create-layer-passes';
@@ -227,6 +230,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                             layer.renderer.detach();
                         }
                         layer.renderer = markRaw(new layerRenderers[renderer][(layer as any)[prop] as string]());
+                        queueRefreshLayerPasses();
                         if (layer.renderer) {
                             layer.renderer.attach(layer);
                         }

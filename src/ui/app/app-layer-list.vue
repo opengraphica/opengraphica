@@ -104,9 +104,13 @@
                             <transition name="fade">
                                 <img v-if="layer.isBaking" src="../../assets/images/loading-spinner.svg" class="is-align-self-center ml-3 mr-1" style="width: 1rem" />
                             </transition>
-                            <transition name="fade">
+                            <!-- <transition name="fade">
                                 <span v-if="layer.isBaking" v-t="'app.layerList.recalculatingEffect'" class="has-color-primary" />
-                            </transition>
+                            </transition> -->
+                            <el-button link type="primary" class="ml-auto mr-1" style="min-height: 0" @click="rasterizeLayer(layer)">
+                                <span class="bi bi-sign-merge-left mr-1" aria-hidden="true" />
+                                {{ t('app.layerList.rasterizeEffects') }}
+                            </el-button>
                         </span>
                     </span>
                     <ul class="ogr-layer-effect-stack">
@@ -153,6 +157,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, watch, reactive, computed, onMounted, onUnmounted, toRefs, nextTick, PropType } from 'vue';
+import { useI18n } from '@/i18n';
 
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton from 'element-plus/lib/components/button/index';
@@ -177,6 +182,7 @@ import { DeleteLayersAction } from '@/actions/delete-layers';
 import { DuplicateLayerAction } from '@/actions/duplicate-layer';
 import { SelectLayersAction } from '@/actions/select-layers';
 import { UpdateLayerAction } from '@/actions/update-layer';
+import { RasterizeLayerAction } from '@/actions/rasterize-layer';
 import { ReorderLayersAction } from '@/actions/reorder-layers';
 import { ReorderLayerFiltersAction } from '@/actions/reorder-layer-filters';
 
@@ -225,6 +231,8 @@ export default defineComponent({
         'scroll-by'
     ],
     setup(props, { emit }) {
+        const { t } = useI18n();
+
         const layerList = ref<HTMLUListElement>(null as unknown as HTMLUListElement);
         const draggingLayer = ref<HTMLLIElement | null>(null);
         const dropTargetLayerId = ref<number | null>(null);
@@ -547,7 +555,15 @@ export default defineComponent({
             });
         }
 
+        function rasterizeLayer(layer: WorkingFileAnyLayer<ColorModel>) {
+            historyStore.dispatch('runAction', {
+                action: new RasterizeLayerAction(layer.id)
+            })
+        }
+
         return {
+            t,
+
             layerList,
             draggingLayer,
             conditionalDragStartEventModifier,
@@ -580,6 +596,8 @@ export default defineComponent({
             onEditLayerFilter,
             onMoveLayerFilterUp,
             onMoveLayerFilterDown,
+            rasterizeLayer,
+
             reversedLayers
         };
     },
