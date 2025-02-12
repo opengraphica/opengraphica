@@ -46,7 +46,18 @@
         "updateEraseLayer": "从图层擦除",
         "createTextLayer": "创建文本图层",
         "typeInTextLayer": "在文本层中键入",
-        "waitingOnQueueFree": "等待工作完成"
+        "waitingOnQueueFree": "等待工作完成",
+        "createDrawGradientLayer": "创建渐变图层",
+        "duplicateLayer": "复制层",
+        "rasterizeLayer": "淡化层",
+        "updateDrawGradientLayerBlendColorSpace": "更新渐变( 颜色空间)",
+        "updateDrawGradientLayerFillType": "更新渐变( 覆盖类型)",
+        "updateDrawGradientLayerPosition": "更新渐变( 位置)",
+        "updateDrawGradientLayerSpreadMethod": "更新渐变( 速率法)",
+        "updateDrawGradientLayerStops": "更新渐变( 颜色停止)",
+        "updateDeformBlurLayer": "模糊层",
+        "updateLayerBlendingMode": "更改混合模式",
+        "updateLayerFilterMask": "更新图层效果遮盖"
     },
     "app": {
         "colorPickerGradient": {
@@ -86,7 +97,10 @@
             "effects": "效果",
             "recalculatingEffect": "正在处理...",
             "moveEffectUp": "向上移动效果",
-            "moveEffectDown": "向下移动效果"
+            "moveEffectDown": "向下移动效果",
+            "blendingMode": "组合",
+            "duplicate": "复制",
+            "rasterizeEffects": "全部合并"
         },
         "wait": {
             "applyLayerTransform": "应用图层变换",
@@ -94,6 +108,12 @@
             "pleaseWait": "请等一下",
             "trimLayerEmptySpace": "缩放空格",
             "cancel": "取消"
+        },
+        "renderer": {
+            "initializeFailed": {
+                "title": "设置失败",
+                "message": "OpenGraphica依赖于一些在浏览器中不存在的基本网页功能. 请更新您的网页浏览器, 或切换到像 Chrome, Firefox, Safari, 或 Edge 这样的现代浏览器 ."
+            }
         }
     },
     "brushCategory": {
@@ -129,7 +149,10 @@
         "addEffect": "添加效果",
         "editEffects": "编辑效果",
         "restoreLastImage": "恢复上一个图像",
-        "pickColor": "选择颜色"
+        "pickColor": "选择颜色",
+        "delete": "删除",
+        "discardChanges": "丢弃更改",
+        "reverse": "反转"
     },
     "canvas": {
         "toolbar": {
@@ -400,6 +423,71 @@
         },
         "sepia": {
             "name": "塞皮亚"
+        },
+        "gradientMap": {
+            "param": {
+                "gradient": "渐变",
+                "colorSpace": "颜色空间",
+                "colorSpaceOption": {
+                    "oklab": "奥克拉布",
+                    "perceptualRgb": "概念 RGB",
+                    "linearRgb": "线性 RGB"
+                },
+                "mix": "混合"
+            }
+        },
+        "instagram1997": {
+            "param": {
+                "mix": "混合"
+            }
+        },
+        "instagramAden": {
+            "name": "亚丁",
+            "param": {
+                "mix": "混合"
+            }
+        },
+        "instagramClarendon": {
+            "name": "克莱伦顿",
+            "param": {
+                "mix": "混合"
+            }
+        },
+        "instagramGingham": {
+            "name": "银汉",
+            "param": {
+                "mix": "混合"
+            }
+        },
+        "instagramInkwell": {
+            "name": "墨威尔",
+            "param": {
+                "mix": "混合"
+            }
+        },
+        "instagramLofi": {
+            "name": "罗菲",
+            "param": {
+                "mix": "混合"
+            }
+        },
+        "instagramToaster": {
+            "name": "烤面包机",
+            "param": {
+                "mix": "混合"
+            }
+        },
+        "instagramValencia": {
+            "name": "巴伦西亚",
+            "param": {
+                "mix": "混合"
+            }
+        },
+        "instagramXpro2": {
+            "name": "Xpro2 数据",
+            "param": {
+                "mix": "混合"
+            }
         }
     },
     "layerFilterGroup": {
@@ -596,7 +684,9 @@
         "pixelsPerCentimeter": "像素/计时器"
     },
     "menuBar": {
-        "toolsHeading": "工具"
+        "toolsHeading": "工具",
+        "expandToolGroup": "扩展",
+        "collapseToolGroup": "折叠"
     },
     "module": {
         "fileExport": {
@@ -669,7 +759,9 @@
             "resetField": "重设字段",
             "deleting": "删除效果...",
             "deleteFilterError": "试图删除过滤器时出错 。 如果您继续看到此消息, 请将此报告为错误 .",
-            "applyFilterError": "尝试应用过滤器更改时发生错误 。 如果您继续看到此消息, 请将此报告为错误 ."
+            "applyFilterError": "尝试应用过滤器更改时发生错误 。 如果您继续看到此消息, 请将此报告为错误 .",
+            "useActiveSelectionMask": "将选中区域应用为遮罩",
+            "clearSelectionMask": "删除遮罩"
         },
         "renameLayer": {
             "title": "重命名图层",
@@ -703,6 +795,154 @@
                         "bottom": "底层"
                     },
                     "horizontalMargin": "水平边距"
+                }
+            }
+        },
+        "fileOpenConfirm": {
+            "title": "你确定吗?",
+            "warning": [
+                null,
+                "您是否希望继续打开新文件并丢弃您的全部更改 ?"
+            ]
+        },
+        "layerBlendingMode": {
+            "title": "更改混合模式",
+            "blendingMode": "混合模式",
+            "layerTop": "顶层",
+            "layerBottom": "底层",
+            "imageResult": "结果",
+            "blendingModeSummary": {
+                "normal": {
+                    "description": "顶层基于其不透明性覆盖底部.",
+                    "example": "从一张照片中剪掉一个人,然后添加到另一张照片中."
+                },
+                "dissolve": {
+                    "description": "随机取代顶层的像素,以透明不透明为基础的透明像素,形成数字噪声效应.",
+                    "example": "创造谷粒质地."
+                },
+                "colorErase": {
+                    "description": "从顶层中删除符合下层颜色的颜色.",
+                    "example": "从图像中删除绿色屏幕背景 ."
+                },
+                "erase": {
+                    "description": "擦除顶层不透明的底层.",
+                    "example": "通过去除那些区域去除照片中不想要的物品."
+                },
+                "lightenOnly": {
+                    "description": "保持顶层和底层每个R,G,B通道的较轻颜色.",
+                    "example": "在不暗化周边地区的前提下,给物体添加发光效应."
+                },
+                "lumaLightenOnly": {
+                    "description": "比较上层和下层之间的感光度,并保持亮度像素.",
+                    "example": "增强黑白照片中特定区域的亮度."
+                },
+                "screen": {
+                    "description": "根据顶层的亮度来照亮底层. 屏幕模仿光线在投射或分层时的相互作用方式.",
+                    "example": "让夜幕看起来更明亮."
+                },
+                "dodge": {
+                    "description": "显著亮度突出 并展现出细节 在阴影。 这模仿了暗室摄影中\"躲\"的效果.",
+                    "example": "添加太阳耀斑."
+                },
+                "linearDodge": {
+                    "description": "在感知的SRGB空间中添加上层和下层的亮度.",
+                    "example": "创造生机勃勃,密集的照明效果."
+                },
+                "addition": {
+                    "description": "在线性SRGB空间中添加上层和下层的亮度.",
+                    "example": "创造生机勃勃,密集的照明效果."
+                },
+                "darkenOnly": {
+                    "description": "保持顶层和底层每个R,G,B通道中较暗的颜色.",
+                    "example": "在照片中暗化阴影."
+                },
+                "lumaDarkenOnly": {
+                    "description": "比较上层和下层之间的感知黑暗,并保持较暗的像素.",
+                    "example": "选择性地暴露出亮度区."
+                },
+                "multiply": {
+                    "description": "基于顶层的黑暗使底层变暗. 乘以模仿多幅摄影底片在分层时的外观.",
+                    "example": "让图像看起来更暗,比如模拟阴影或夜幕."
+                },
+                "burn": {
+                    "description": "使底层与顶层的黑暗成正比地变暗.",
+                    "example": "增深为阴."
+                },
+                "linearBurn": {
+                    "description": "添加上下层的像素,然后减去最亮的值.",
+                    "example": "在画面上加上戏剧性的影子外观."
+                },
+                "overlay": {
+                    "description": "复数和屏幕相结合,其中光区变轻,暗区变暗.",
+                    "example": "在照片上添加对比,而不失去细节."
+                },
+                "softLight": {
+                    "description": "使图像亮度与覆叠类似,但具有更渐进的过渡. 软光模拟扩散照明.",
+                    "example": "在肖像画中加入柔软的光芒."
+                },
+                "hardLight": {
+                    "description": "更严酷的叠加版,其中明亮的区域变得更加明亮,暗黑的区域更加黑暗.",
+                    "example": "戏剧性地增加了动作场景中的对比度."
+                },
+                "vividLight": {
+                    "description": "与硬光相比,提高对比度更强.",
+                    "example": "以粗壮,鲜明的颜色和对比度来拼凑照片."
+                },
+                "pinLight": {
+                    "description": "取代基于亮度的像素,保留最亮和最暗的像素,基于它们与中位点的距离.",
+                    "example": "以光线和暗线的尖锐对比来创造一种后天效应."
+                },
+                "linearLight": {
+                    "description": "根据顶层增加线性、亮度或暗度.",
+                    "example": "模拟人工照明或增强金属表面."
+                },
+                "hardMix": {
+                    "description": "将图像降为主色调,形成高度结构化的外观.",
+                    "example": "创建漫画或屏幕打印效果."
+                },
+                "difference": {
+                    "description": "查找各层的区别,其中黑色是无差别的,增加颜色亮度更不同.",
+                    "example": "与类似内容对齐层 。 当两个像素相同时,就会变成黑色."
+                },
+                "exclusion": {
+                    "description": "差异的变异与反差较小,因为在这种差异中,需要突出微妙的差异,而不压倒形象.",
+                    "example": "选择性反向颜色."
+                },
+                "subtract": {
+                    "description": "从底部切减上层的亮度。 结果是大量黑或近黑地区.",
+                    "example": "创造出高对比度的黑暗区域."
+                },
+                "grainExtract": {
+                    "description": "从一层取出胶片粒,也呈现出浮雕的外观.",
+                    "example": "从胶片纹理中提取粒以应用到另一个纹理."
+                },
+                "grainMerge": {
+                    "description": "从上层添加到下层的谷物,留下原始层的谷物版本.",
+                    "example": "将胶片颗粒添加到数字图像中,用于古装外观."
+                },
+                "divide": {
+                    "description": "将顶层的亮度除以底.",
+                    "example": "大幅点亮一个图像,产生发光或电光效应. 可用于曝光矫正."
+                },
+                "hue": {
+                    "description": "在保留下层染色体和光度的同时使用顶层的色调.",
+                    "example": "在保留其亮度的同时,将蓝天改为紫色."
+                },
+                "chroma": {
+                    "description": "使用顶层的染色体(颜色强度),同时保留底层的色调和光度.",
+                    "example": "推动或降低照片中的颜色强度."
+                },
+                "color": {
+                    "description": "将顶层的hue和铬与底层的光度结合.",
+                    "example": "重新显示物体的颜色,同时保持阴影和照明完好无损."
+                },
+                "lightness": {
+                    "description": "使用顶层的光度,同时保留底层的hue和铬.",
+                    "example": "点亮或暗化图像同时保持颜色真实性."
+                },
+                "luminance": {
+                    "description": "将上层光度除以下层,然后将结果乘以下层.",
+                    "example": "点亮或暗化图像同时保持颜色真实性."
                 }
             }
         }
@@ -804,11 +1044,15 @@
             "modules": {
                 "rename": {
                     "name": "重命名图层",
-                    "description": "更改层名"
+                    "description": "更改一层的名称 ."
                 },
                 "layerEffectBrowser": {
                     "name": "效果浏览器",
                     "description": "将图像效果添加到当前选定的层或层组中."
+                },
+                "blendingMode": {
+                    "name": "更改层混合模式",
+                    "description": "改变活动层的混合模式."
                 }
             }
         },
@@ -941,6 +1185,42 @@
         },
         "eraseBrush": {
             "brushSize": "大小"
+        },
+        "deformBlur": {
+            "brushSize": "大小"
+        },
+        "drawColorPicker": {
+            "title": "颜色拾取器"
+        },
+        "drawGradient": {
+            "editingGradient": "编辑渐变",
+            "newGradientLayerName": "新建渐变",
+            "blendColorSpace": {
+                "label": "颜色空间",
+                "oklab": "奥克拉布",
+                "srgb": "sRGB 软件",
+                "linearSrgb": "线性 sRGB"
+            },
+            "fillType": {
+                "label": "填充类型",
+                "linear": "线性",
+                "radial": "辐射"
+            },
+            "spreadMethod": {
+                "label": "扩散方法",
+                "pad": "纸",
+                "repeat": "重复",
+                "reflect": "反映",
+                "truncate": "截断"
+            },
+            "stopDialog": {
+                "title": "编辑颜色停止",
+                "close": "关闭对话框",
+                "stopColor": "颜色",
+                "stopOffset": "折换",
+                "presets": "预设",
+                "presetSettings": "预设设置"
+            }
         }
     },
     "toolGroup": {
@@ -950,7 +1230,11 @@
             "tools": {
                 "brush": {
                     "name": "笔刷",
-                    "description": "Brushes 画出光栅层."
+                    "description": "画在图层上 就像你用油漆刷子一样."
+                },
+                "gradient": {
+                    "name": "渐变",
+                    "description": "创建颜色之间的平滑转换 ."
                 }
             }
         },
@@ -1019,6 +1303,16 @@
                 "brush": {
                     "name": "擦除笔刷",
                     "description": "从光栅层擦去数据."
+                }
+            }
+        },
+        "deform": {
+            "name": "变形",
+            "description": "操纵现有图像数据的工具,如克隆,膨胀,模糊.",
+            "tools": {
+                "blur": {
+                    "name": "模糊",
+                    "description": "刷子模糊了画的区域."
                 }
             }
         }
@@ -1138,6 +1432,66 @@
             "introduction": [
                 "擦除工具允许您去除部分地层,使其透明."
             ]
+        },
+        "deformBlurToolIntroduction": {
+            "title": "模糊工具",
+            "introduction": [
+                "模糊的工具会模糊您所绘制的当前图层的部分 ."
+            ]
+        },
+        "drawGradientToolIntroduction": {
+            "title": "渐变工具",
+            "introduction": [
+                "梯度工具允许您添加梯度层。 您可以通过结合选择工具或擦除工具来控制此工具的可见界限."
+            ],
+            "body": {
+                "mouse": [
+                    "单击并拖曳将梯度放置在画布上 ."
+                ],
+                "touch": [
+                    "用一根手指来触摸和拖动,在画布上放置一个梯度."
+                ]
+            }
         }
+    },
+    "gradientPreset": {
+        "blackToTransparent": "黑色到透明",
+        "whiteToTransparent": "白色到透明",
+        "blackToWhite": "黑色、白色"
+    },
+    "layerBlendingMode": {
+        "normal": "常规",
+        "dissolve": "溶解",
+        "colorErase": "颜色擦除",
+        "erase": "擦除",
+        "lightenOnly": "仅点亮",
+        "lumaLightenOnly": "露马灯 仅",
+        "screen": "屏幕",
+        "dodge": "隐藏",
+        "linearDodge": "线性道奇",
+        "addition": "加号",
+        "darkenOnly": "仅变暗",
+        "lumaDarkenOnly": "露玛·暗黑 仅",
+        "multiply": "乘数",
+        "burn": "燃烧",
+        "linearBurn": "线性燃烧",
+        "overlay": "重叠",
+        "softLight": "软光",
+        "hardLight": "硬灯",
+        "vividLight": "生动光",
+        "pinLight": "平灯",
+        "linearLight": "线性光线",
+        "hardMix": "硬混合",
+        "difference": "差额",
+        "exclusion": "不适用情况",
+        "subtract": "减法",
+        "grainExtract": "谷物提取",
+        "grainMerge": "谷物合并",
+        "divide": "除号",
+        "hue": "色调",
+        "chroma": "颜色",
+        "color": "颜色",
+        "lightness": "光度",
+        "luminance": "光辉"
     }
 }

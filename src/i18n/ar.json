@@ -46,7 +46,18 @@
         "updateEraseLayer": "Erase from Layer",
         "createTextLayer": "Create Text Layer",
         "typeInTextLayer": "Type in Text Layer",
-        "waitingOnQueueFree": "انتظار العمل"
+        "waitingOnQueueFree": "انتظار العمل",
+        "createDrawGradientLayer": "Create Gradient Layer",
+        "duplicateLayer": "Duplicate Layer",
+        "rasterizeLayer": "Rasterize Layer",
+        "updateDrawGradientLayerBlendColorSpace": "Update Gradient (Color Space)",
+        "updateDrawGradientLayerFillType": "Update Gradient (Fill Type)",
+        "updateDrawGradientLayerPosition": "آخر المستجدات (الطلب)",
+        "updateDrawGradientLayerSpreadMethod": "Update Gradient (Spread Method)",
+        "updateDrawGradientLayerStops": "Update Gradient (Color stops)",
+        "updateDeformBlurLayer": "Blur Layer",
+        "updateLayerBlendingMode": "تغيير أسلوب البيع",
+        "updateLayerFilterMask": "Update Layer Effect Mask"
     },
     "app": {
         "colorPickerGradient": {
@@ -86,7 +97,10 @@
             "effects": "الآثار",
             "recalculatingEffect": "تجهيز...",
             "moveEffectUp": "تحرك",
-            "moveEffectDown": "تحرك"
+            "moveEffectDown": "تحرك",
+            "blendingMode": "Blending",
+            "duplicate": "ازدواج",
+            "rasterizeEffects": "Merge All"
         },
         "wait": {
             "applyLayerTransform": "Applying Layer Transform",
@@ -94,6 +108,12 @@
             "pleaseWait": "من فضلك",
             "trimLayerEmptySpace": "الفضاء الخارجي",
             "cancel": "إلغاء"
+        },
+        "renderer": {
+            "initializeFailed": {
+                "title": "الإنشاءات",
+                "message": "(افتح (غرافيكا يعتمد على بعض الوظائف الأساسية على الإنترنت التي لا وجود لها في جهازك من فضلك قم بتحديث موقعك أو التحول إلى شخص عصري مثل (كروم) أو (فايرفوكس) أو (سافاري) أو (إدج)."
+            }
         }
     },
     "brushCategory": {
@@ -129,7 +149,10 @@
         "addEffect": "مضافا إليه:",
         "editEffects": "Edit Effects",
         "restoreLastImage": "استعادة آخر صورة",
-        "pickColor": "المخلول"
+        "pickColor": "المخلول",
+        "delete": "تحذف",
+        "discardChanges": "التغييرات في النفايات",
+        "reverse": "العكس"
     },
     "canvas": {
         "toolbar": {
@@ -400,6 +423,71 @@
         },
         "sepia": {
             "name": "سيبيا"
+        },
+        "gradientMap": {
+            "param": {
+                "gradient": "العيادة",
+                "colorSpace": "Color Space",
+                "colorSpaceOption": {
+                    "oklab": "Oklab",
+                    "perceptualRgb": "المنظور الجنساني",
+                    "linearRgb": "Linear RGB"
+                },
+                "mix": "Mix"
+            }
+        },
+        "instagram1997": {
+            "param": {
+                "mix": "Mix"
+            }
+        },
+        "instagramAden": {
+            "name": "عدن",
+            "param": {
+                "mix": "Mix"
+            }
+        },
+        "instagramClarendon": {
+            "name": "Clarendon",
+            "param": {
+                "mix": "Mix"
+            }
+        },
+        "instagramGingham": {
+            "name": "Gingham",
+            "param": {
+                "mix": "Mix"
+            }
+        },
+        "instagramInkwell": {
+            "name": "Inkwell",
+            "param": {
+                "mix": "Mix"
+            }
+        },
+        "instagramLofi": {
+            "name": "لوفي",
+            "param": {
+                "mix": "Mix"
+            }
+        },
+        "instagramToaster": {
+            "name": "Toaster",
+            "param": {
+                "mix": "Mix"
+            }
+        },
+        "instagramValencia": {
+            "name": "Valencia",
+            "param": {
+                "mix": "Mix"
+            }
+        },
+        "instagramXpro2": {
+            "name": "Xpro2",
+            "param": {
+                "mix": "Mix"
+            }
         }
     },
     "layerFilterGroup": {
@@ -437,7 +525,7 @@
                 "default": {
                     "label": "الشكل",
                     "description": [
-                        null,
+                        "(شاربن) أو ضباب الصورة",
                         "Bulge, fatch areas of the image",
                         "مناطق كلون من الصورة"
                     ]
@@ -596,7 +684,9 @@
         "pixelsPerCentimeter": "Pixels/Centimeter"
     },
     "menuBar": {
-        "toolsHeading": "الأدوات"
+        "toolsHeading": "الأدوات",
+        "expandToolGroup": "التوسع",
+        "collapseToolGroup": "التصفيق"
     },
     "module": {
         "fileExport": {
@@ -671,7 +761,9 @@
             "resetField": "ميدان إعادة التوطين",
             "deleting": "إزالة التأثير...",
             "deleteFilterError": "حدث خطأ في محاولة حذف التصفية إذا استمريت في رؤية هذه الرسالة، يرجى الإبلاغ عن هذا كحشرة.",
-            "applyFilterError": "وحدث خطأ أثناء محاولة تطبيق تغييرات التصفية. إذا استمريت في رؤية هذه الرسالة، يرجى الإبلاغ عن هذا كحشرة."
+            "applyFilterError": "وحدث خطأ أثناء محاولة تطبيق تغييرات التصفية. إذا استمريت في رؤية هذه الرسالة، يرجى الإبلاغ عن هذا كحشرة.",
+            "useActiveSelectionMask": "Apply Selection as Mask",
+            "clearSelectionMask": "Remove Mask"
         },
         "renameLayer": {
             "title": "Rename Layer",
@@ -705,6 +797,154 @@
                         "bottom": "الجزء السفلي"
                     },
                     "horizontalMargin": "Horizontal Margin"
+                }
+            }
+        },
+        "fileOpenConfirm": {
+            "title": "هل أنت متأكد؟?",
+            "warning": [
+                "لقد أعددت ملفك الحالي إذا فتحت ملفاً جديداً الآن، سيتم التخلص من هذه الملفات. إذا كنت ترغب فقط في إضافة طبقات جديدة إلى هذا الملف، استخدام خيار {insertPhoto}.",
+                "هل ترغب في الاستمرار في فتح ملف جديد و التخلص من جميع التغييرات الخاصة بك؟?"
+            ]
+        },
+        "layerBlendingMode": {
+            "title": "تغيير أسلوب البيع",
+            "blendingMode": "Blending Mode",
+            "layerTop": "أكبر",
+            "layerBottom": "Bottom Layer",
+            "imageResult": "النتيجة",
+            "blendingModeSummary": {
+                "normal": {
+                    "description": "الطبقة العلوية تغطي القاع على أساس عدمه.",
+                    "example": "قطع شخص من صورة واحدة وإضافتها إلى صورة أخرى."
+                },
+                "dissolve": {
+                    "description": "نادراً ما يحل محل البكسلات من الطبقات العلوية مع بؤر شفافة تقوم على الظلم، مما يخلق تأثير ضوضاء رقمية.",
+                    "example": "خلق نسيج الحبوب."
+                },
+                "colorErase": {
+                    "description": "يزيل اللون من الطبقة العلوية الذي يطابق لون الطبقة السفلى.",
+                    "example": "إزالة خلفية الشاشة الخضراء من صورة."
+                },
+                "erase": {
+                    "description": "يمسح الطبقة السفلية حيث الطبقة العليا غامضة.",
+                    "example": "إزالة الأجسام غير المرغوبة في صورة عن طريق محو تلك المناطق."
+                },
+                "lightenOnly": {
+                    "description": "يحافظ على اللون الخفيف في كل قناة R,G,B من الطبقات العليا والقاعية.",
+                    "example": "أضف أثراً متوهجاً إلى جسم ما دون ظلم المناطق المحيطة."
+                },
+                "lumaLightenOnly": {
+                    "description": "يقارن اللمعان الظاهري بين الطبقات العلوية والقاعية ويحافظ على الأذكى.",
+                    "example": "Enhancing the brightness of a specific area in a black and white photo."
+                },
+                "screen": {
+                    "description": "يشعل الطبقة السفلية على ضوء الطبقة العليا (سكرين) يُميّز الطريقة التي يتفاعل بها الضوء عندما يُتوقع أو يُطبق.",
+                    "example": "جعل مشهد ليلي يبدو أكثر إشراقاً."
+                },
+                "dodge": {
+                    "description": "تُلقي الأضواء بشكل ملحوظ وتُظهر التفاصيل في الظلال هذا يذكّر تأثير \"التذمر\" في التصوير المظلم.",
+                    "example": "أضف شعلة الشمس."
+                },
+                "linearDodge": {
+                    "description": "يُضاف إشراق الطبقات العلوية والقاعية في الفضاء الافتراضي لـ (جي جي بي).",
+                    "example": "خلق التأثيرات النابضة المكثفة."
+                },
+                "addition": {
+                    "description": "يُضفي الضوء على الطبقات العلوية والقاعية في الفضاء المتسلسل.",
+                    "example": "خلق التأثيرات النابضة المكثفة."
+                },
+                "darkenOnly": {
+                    "description": "يحافظ على اللون الاسود في كل قناة من الطبقة العليا والقاعية.",
+                    "example": "تظلم الظلال في صورة."
+                },
+                "lumaDarkenOnly": {
+                    "description": "يقارن الظلام الظاهري بين الطبقات العلوية والقاعية ويحافظ على الأزرق المظلمة.",
+                    "example": "تقلل من المخاطرة بالمناطق المشرقة."
+                },
+                "multiply": {
+                    "description": "يظلم الطبقة السفلية على ظلام الطبقة العليا ميكروفونات متعددة كم تبدو صور سلبية متعددة عندما تكون مطبقة معاً.",
+                    "example": "جعل الصورة تبدو أظلم مثل محاكاة الظلال أو المشاهد الليلية."
+                },
+                "burn": {
+                    "description": "الظلام يتناسب مع ظلمة الطبقة العليا.",
+                    "example": "أضف العمق إلى الظلال."
+                },
+                "linearBurn": {
+                    "description": "يضيف أكياس الطبقات العلوية والأدنى ثم يخفض القيمة الأذكى.",
+                    "example": "أضف نظرة غامضة على الصورة."
+                },
+                "overlay": {
+                    "description": "A combination of multiply and screen, where light areas become lighter and dark areas become darker.",
+                    "example": "إضافة تناقض للصور دون فقدان التفاصيل."
+                },
+                "softLight": {
+                    "description": "يطبع الصورة المشابهة للتفوق ولكن مع الانتقال التدريجي. الضوء الخفيف يحفز الإضاءة.",
+                    "example": "أضف توهجاً ناعماً للصور."
+                },
+                "hardLight": {
+                    "description": "نسخة أكثر قسوة من الإفراط، حيث تصبح المناطق المشرقة أكثر إشراقاً وأظلم بكثير.",
+                    "example": ":: زيادة تناقض مسارات العمل بشكل جذري."
+                },
+                "vividLight": {
+                    "description": "ويزيد من التناقض بشدة، بل ويزيد من ذلك مقارنة بالضوء الصلب.",
+                    "example": "تذوّق الصور بألوان جريئة وكمية وتناقض."
+                },
+                "pinLight": {
+                    "description": "يُستبدلُ البكسلاتَ القائمةِ على اللامعِ، يَبْقى الأذكى والأغمقَ، على بُعدِهم مِنْ وسطِ.",
+                    "example": "خلق تأثير ملصق مع تناقض حاد بين الضوء والظلام."
+                },
+                "linearLight": {
+                    "description": "يزيد من التواؤم أو الإغماء على الطبقة العليا.",
+                    "example": "- محاكاة الإضاءة الصناعية أو تعزيز الأسطح المعدنية."
+                },
+                "hardMix": {
+                    "description": "يخفض الصورة إلى الألوان الرئيسية، ويخلق مظهراً عالياً.",
+                    "example": "إنشاء كتاب كوميدي أو أثر مطبعي."
+                },
+                "difference": {
+                    "description": "يجد الفرق بين الطبقات، حيث لا يوجد فارق بين اللون الازدهار هو أكثر اختلافا.",
+                    "example": "اربط الطبقة بمحتوى مماثل عندما يكون اثنان من الفطائر متشابهان يصبحان اسود."
+                },
+                "exclusion": {
+                    "description": "A variation of difference with less contrast, for where subtle differences need to be highlighted without overwhelming the image.",
+                    "example": "ألوان منحرفة."
+                },
+                "subtract": {
+                    "description": "يُستحوذ على اللامع في الطبقة العلوية من الأسفل والنتيجة هي وجود الكثير من المناطق السوداء أو شبه السوداء.",
+                    "example": "إيجاد مناطق مظلمة شديدة التناقض."
+                },
+                "grainExtract": {
+                    "description": "يستخرج الحبوب من طبقة، ويعطي أيضاً مظهراً مجسداً.",
+                    "example": "استخراج الحبوب من نسيج سينمائي لتطبيقها على نسيج آخر."
+                },
+                "grainMerge": {
+                    "description": "يضيف الحبوب من الطبقة العلوية إلى القاع، يترك نسخة حبوب من الطبقة الأصلية.",
+                    "example": "أضف الحبوب إلى صورة رقمية من أجل نظرة خبيثة."
+                },
+                "divide": {
+                    "description": "يقسم إشراق الطبقة العلوية إلى الأسفل.",
+                    "example": "تضيء صورة بشكل مُثير، تُحدث أثراً متوهجاً أو هُناك. يمكن استخدامه لتصويب التعرض."
+                },
+                "hue": {
+                    "description": "يستعمل كوخ الطبقة العليا بينما يحافظ على الكروما و خفة الطبقة السفلية.",
+                    "example": "تغيير السماء الزرقاء إلى الأرجوانية مع الحفاظ على مشرقتها."
+                },
+                "chroma": {
+                    "description": "يستعمل الكروما (عدوى اللون) من الطبقة العلوية مع الحفاظ على كوخ وضوء طبقة القاع.",
+                    "example": "ازدهار أو تقليل كثافة الألوان في صورة."
+                },
+                "color": {
+                    "description": "يجمع بين كوخ وكروما من الطبقة العليا مع ضوء الطبقة السفلية.",
+                    "example": "إعادة إستعمار الجسم مع إبقاء الظل والإضاءة سليمة."
+                },
+                "lightness": {
+                    "description": "يستخدم ضوء الطبقة العليا بينما يحافظ على كوخ وكروما الطبقة السفلية.",
+                    "example": "تضيء أو تظلم صورة بينما تحافظ على الألوان."
+                },
+                "luminance": {
+                    "description": "يقسم الطبقة العلوية على الطبقة السفلى ثم يضاعف النتيجة الى الطبقة السفلى.",
+                    "example": "تضيء أو تظلم صورة بينما تحافظ على الألوان."
                 }
             }
         }
@@ -806,11 +1046,15 @@
             "modules": {
                 "rename": {
                     "name": "Rename Layer",
-                    "description": "تغيير اسم طبقة"
+                    "description": "غير اسم طبقة."
                 },
                 "layerEffectBrowser": {
                     "name": "Effect Browser",
                     "description": "يضيف آثار الصور إلى طبقة (طبقات) مختارة حالياً أو مجموعة (مجموعات)."
+                },
+                "blendingMode": {
+                    "name": "غيّر ليير بليند مودي",
+                    "description": "غيّر أسلوب الدمج في الطبقات النشطة."
                 }
             }
         },
@@ -943,6 +1187,42 @@
         },
         "eraseBrush": {
             "brushSize": "الحجم"
+        },
+        "deformBlur": {
+            "brushSize": "الحجم"
+        },
+        "drawColorPicker": {
+            "title": "Color Becker"
+        },
+        "drawGradient": {
+            "editingGradient": "التعليم العالي",
+            "newGradientLayerName": "New Gradient",
+            "blendColorSpace": {
+                "label": "Color Space",
+                "oklab": "Oklab",
+                "srgb": "sRGB",
+                "linearSrgb": "Linear sRGB"
+            },
+            "fillType": {
+                "label": "الشكل",
+                "linear": "Linear",
+                "radial": "Radial"
+            },
+            "spreadMethod": {
+                "label": "طريقة الانتشار",
+                "pad": "Pad",
+                "repeat": "متكررة",
+                "reflect": "التضخم",
+                "truncate": "الفئة الحقيقية"
+            },
+            "stopDialog": {
+                "title": "اديت كولور توقف",
+                "close": "اغلق الديولوجيا",
+                "stopColor": "Color",
+                "stopOffset": "Offset",
+                "presets": "Presets",
+                "presetSettings": "Preset Settings"
+            }
         }
     },
     "toolGroup": {
@@ -952,7 +1232,11 @@
             "tools": {
                 "brush": {
                     "name": "Brush",
-                    "description": "(بروس) التي ترسم على طبقات (راسستر)."
+                    "description": "ارسم على طبقات كما لو كنت تستخدم فرشاة طلاء."
+                },
+                "gradient": {
+                    "name": "العيادة",
+                    "description": "خلق تحولات سلسة بين الألوان."
                 }
             }
         },
@@ -1023,6 +1307,16 @@
                     "description": "جمع البيانات من طبقات القاذورات."
                 }
             }
+        },
+        "deform": {
+            "name": "الشكل",
+            "description": "الأدوات التي تتلاعب ببيانات الصور الموجودة، مثل الاستنساخ، التنظيف، الضباب.",
+            "tools": {
+                "blur": {
+                    "name": "Blur",
+                    "description": "حطموا تلك المنطقة."
+                }
+            }
         }
     },
     "tutorialTip": {
@@ -1036,12 +1330,12 @@
             "title": "ننتقل إلى كانفاس",
             "introduction": [
                 "لا يهم أيّ أداة يتم اختيارها، يمكنك التحكم في مشهد التفاح.",
-                null
+                "When {anyTool} is selected:"
             ],
             "anyTool": "أي أداة",
             "body": {
                 "mouse": [
-                    null,
+                    "{zooming} - Use the {mouseWheel} to zoom in and out.",
                     "{panning} - Click and drag with the {rightMouseButton} to move the canvas."
                 ],
                 "touch": [
@@ -1066,8 +1360,8 @@
             "body": {
                 "mouse": [
                     null,
-                    null,
-                    null
+                    "{moving} - {leftClick} on a layer and drag to move it.",
+                    "{resizing} - {leftClick} and drag resize handles."
                 ],
                 "touch": [
                     "{selection} - Tap on a layer to select it.",
@@ -1140,6 +1434,66 @@
             "introduction": [
                 "أداة الممسحة تسمح لك بإزالة أجزاء من الطبقة مما يجعلها شفافة."
             ]
+        },
+        "deformBlurToolIntroduction": {
+            "title": "بلور",
+            "introduction": [
+                "الأداة الضبابية ستطمس الجزء من الطبقة الحالية التي تعتمد عليها."
+            ]
+        },
+        "drawGradientToolIntroduction": {
+            "title": "الخادمة",
+            "introduction": [
+                "أداة التدرج تجعلك تضيف طبقات التدرج يمكنك التحكم في الحدود المرئية لهذه الأداة من خلال الجمع بينها مع أداة الاختيار أو أداة محو."
+            ],
+            "body": {
+                "mouse": [
+                    "إضغطي و جرّي إلى وضع خريج على الشموع."
+                ],
+                "touch": [
+                    "إستخدم إصبع واحد ليلمس و يسحب ليضع خريجاً على الكتف."
+                ]
+            }
         }
+    },
+    "gradientPreset": {
+        "blackToTransparent": "من السود إلى الشفافية",
+        "whiteToTransparent": "بيضاء إلى شفافة",
+        "blackToWhite": "أسود، أبيض"
+    },
+    "layerBlendingMode": {
+        "normal": "المعيار",
+        "dissolve": "حل",
+        "colorErase": "Color Erase",
+        "erase": "Erase",
+        "lightenOnly": "النور فقط",
+        "lumaLightenOnly": "Luma Lighten فقط",
+        "screen": "Screen",
+        "dodge": "دودج",
+        "linearDodge": "Linear Dodge",
+        "addition": "الإضافة",
+        "darkenOnly": "داركن فقط",
+        "lumaDarkenOnly": "لوما داركن فقط",
+        "multiply": "متعددة",
+        "burn": "حرق",
+        "linearBurn": "Linear Burn",
+        "overlay": "النفقات",
+        "softLight": "خفيفة",
+        "hardLight": "الضوء الصلب",
+        "vividLight": "Vivid Light",
+        "pinLight": "الضوء",
+        "linearLight": "لايت",
+        "hardMix": "صلب",
+        "difference": "الفرق",
+        "exclusion": "الاستبعاد",
+        "subtract": "العقود من الباطن",
+        "grainExtract": "Extract",
+        "grainMerge": "Grain Merge",
+        "divide": "Divide",
+        "hue": "Hue",
+        "chroma": "Chroma",
+        "color": "Color",
+        "lightness": "النور",
+        "luminance": "اللوم"
     }
 }

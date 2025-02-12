@@ -46,7 +46,18 @@
         "updateEraseLayer": "Katmandan",
         "createTextLayer": "Create Text Katman",
         "typeInTextLayer": "Text Katman",
-        "waitingOnQueueFree": "Tamamlamak için çalışmak için"
+        "waitingOnQueueFree": "Tamamlamak için çalışmak için",
+        "createDrawGradientLayer": "Build Gradient Katman",
+        "duplicateLayer": "Karmaşık Katman",
+        "rasterizeLayer": "Rasterize Katman",
+        "updateDrawGradientLayerBlendColorSpace": "Update Gradient (Renk Uzayı)",
+        "updateDrawGradientLayerFillType": "Update Gradient (Fill Type)",
+        "updateDrawGradientLayerPosition": "Update Gradient (Position)",
+        "updateDrawGradientLayerSpreadMethod": "Update Gradient (Spread Method)",
+        "updateDrawGradientLayerStops": "Update Gradient (Renk Durları)",
+        "updateDeformBlurLayer": "Blur Katmanı",
+        "updateLayerBlendingMode": "Moding Mode",
+        "updateLayerFilterMask": "Update Katman Etkisi Maske"
     },
     "app": {
         "colorPickerGradient": {
@@ -86,7 +97,10 @@
             "effects": "Etkileri",
             "recalculatingEffect": "İşleme...",
             "moveEffectUp": "Move Etkisi Up",
-            "moveEffectDown": "Move Etkisi Down"
+            "moveEffectDown": "Move Etkisi Down",
+            "blendingMode": "Ölmek",
+            "duplicate": "Duplicate",
+            "rasterizeEffects": "Merge All"
         },
         "wait": {
             "applyLayerTransform": "Katmanı Uygulayın",
@@ -94,6 +108,12 @@
             "pleaseWait": "Lütfen bekleyin",
             "trimLayerEmptySpace": "Boş Uzay",
             "cancel": "Cancel"
+        },
+        "renderer": {
+            "initializeFailed": {
+                "title": "Kurulum Başarısız",
+                "message": "OpenGraphica, tarayıcınızda bulunmayan bazı temel web işlevlerine dayanmaktadır. Please update your web browser, or switch to a modern one like Chrome, Firefox, Safari, or Edge."
+            }
         }
     },
     "brushCategory": {
@@ -129,7 +149,10 @@
         "addEffect": "Add Etkisi Ekle",
         "editEffects": "Edit Effects",
         "restoreLastImage": "Restore Last Image",
-        "pickColor": "Renk seçin"
+        "pickColor": "Renk seçin",
+        "delete": "Delete",
+        "discardChanges": "Discard Changes",
+        "reverse": "Ters"
     },
     "canvas": {
         "toolbar": {
@@ -400,6 +423,71 @@
         },
         "sepia": {
             "name": "Sepia"
+        },
+        "gradientMap": {
+            "param": {
+                "gradient": "Gradient",
+                "colorSpace": "Renkli Uzay",
+                "colorSpaceOption": {
+                    "oklab": "Oklab",
+                    "perceptualRgb": "Perceptual RGB",
+                    "linearRgb": "Linear RGB"
+                },
+                "mix": "Mix"
+            }
+        },
+        "instagram1997": {
+            "param": {
+                "mix": "Mix"
+            }
+        },
+        "instagramAden": {
+            "name": "Aden",
+            "param": {
+                "mix": "Mix"
+            }
+        },
+        "instagramClarendon": {
+            "name": "Clarendon",
+            "param": {
+                "mix": "Mix"
+            }
+        },
+        "instagramGingham": {
+            "name": "Gingham",
+            "param": {
+                "mix": "Mix"
+            }
+        },
+        "instagramInkwell": {
+            "name": "Inkwell",
+            "param": {
+                "mix": "Mix"
+            }
+        },
+        "instagramLofi": {
+            "name": "Lofi",
+            "param": {
+                "mix": "Mix"
+            }
+        },
+        "instagramToaster": {
+            "name": "Toaster",
+            "param": {
+                "mix": "Mix"
+            }
+        },
+        "instagramValencia": {
+            "name": "Valencia",
+            "param": {
+                "mix": "Mix"
+            }
+        },
+        "instagramXpro2": {
+            "name": "Xpro2",
+            "param": {
+                "mix": "Mix"
+            }
         }
     },
     "layerFilterGroup": {
@@ -596,7 +684,9 @@
         "pixelsPerCentimeter": "Pixels/Centimeter"
     },
     "menuBar": {
-        "toolsHeading": "Araçlar"
+        "toolsHeading": "Araçlar",
+        "expandToolGroup": "Genişletilmiş Genişleme",
+        "collapseToolGroup": "Collap"
     },
     "module": {
         "fileExport": {
@@ -671,7 +761,9 @@
             "resetField": "Tamam Field",
             "deleting": "Deleting effect...",
             "deleteFilterError": "Bir hata, filtreyi silmeye çalışırken gerçekleşti. Bu mesajı görmeye devam ederseniz, lütfen bunu bir boğa olarak rapor edin.",
-            "applyFilterError": "Filtre değişikliklerini uygulamaya çalışırken bir hata meydana geldi. Bu mesajı görmeye devam ederseniz, lütfen bunu bir boğa olarak rapor edin."
+            "applyFilterError": "Filtre değişikliklerini uygulamaya çalışırken bir hata meydana geldi. Bu mesajı görmeye devam ederseniz, lütfen bunu bir boğa olarak rapor edin.",
+            "useActiveSelectionMask": "Maske Olarak Seçme",
+            "clearSelectionMask": "Maskeyi Kaldır"
         },
         "renameLayer": {
             "title": "Rename Katmanı",
@@ -705,6 +797,154 @@
                         "bottom": "Alt"
                     },
                     "horizontalMargin": "Yatay Margin"
+                }
+            }
+        },
+        "fileOpenConfirm": {
+            "title": "Emin misiniz?",
+            "warning": [
+                "Mevcut dosyanıza değişiklikler yaptınız. Şimdi yeni bir dosyayı açıyorsanız, bu düzenlemeler iptal edilecektir. Bu dosyaya yeni katmanları eklemek istiyorsanız, {insertPhoto} seçeneğini kullanın.",
+                "Yeni bir dosyayı açmaya ve tüm değişikliklerinizi atlatmak ister misiniz?"
+            ]
+        },
+        "layerBlendingMode": {
+            "title": "Moding Mode",
+            "blendingMode": "Moding Mode",
+            "layerTop": "Top Katman",
+            "layerBottom": "Alt Katman",
+            "imageResult": "Sonuç",
+            "blendingModeSummary": {
+                "normal": {
+                    "description": "Üst tabaka, opaklıkına dayanan altı kapsar.",
+                    "example": "Bir fotoğraftan bir kişiyi kesmek ve başka bir fotoğrafa eklemek."
+                },
+                "dissolve": {
+                    "description": "Randomly, opaklık temelinde şeffaf pikselli üst katmandan gelen pikselleri değiştirir, bir dijital gürültü etkisi yaratır.",
+                    "example": "Bir tahıl doku oluşturmak."
+                },
+                "colorErase": {
+                    "description": "Daha düşük tabakanın rengini oynayan üst katmanından rengini çıkarın.",
+                    "example": "Bir görüntüden yeşil ekran arka planını geri yükleyin."
+                },
+                "erase": {
+                    "description": "Üst tabakanın opak olduğu alt tabakalar.",
+                    "example": "Bu alanları ortadan kaldırarak bir fotoğraftaki istenmeyen nesneleri geri yükleyin."
+                },
+                "lightenOnly": {
+                    "description": "Her R,G,B üst ve alt tabakaların hafif rengini tut.",
+                    "example": "Çevre alanlarını karanlıklaştırmadan bir nesneye bir ışık etkisi ekleyin."
+                },
+                "lumaLightenOnly": {
+                    "description": "Üst ve alt tabakalar arasındaki algısal parlaklıkla karşılaştırın ve daha parlak piksel tutar.",
+                    "example": "Siyah ve beyaz bir fotoğrafta belirli bir alanın parlaklığını teşvik edin."
+                },
+                "screen": {
+                    "description": "Üst tabakanın parlaklığına dayanan alt tabakayı aydınlatın. Ekran mimiks ışık, proje veya tabakalandığında etkileşime girer.",
+                    "example": "Bir gece sahne yapmak daha parlak görünüyor."
+                },
+                "dodge": {
+                    "description": "Önemli derecede parlak işaretler ve gölgelerde ayrıntıları ortaya koyar. Bu mimiks karanlık oda fotoğrafçılığında \"dodging\" etkisi.",
+                    "example": "Bir güneş ışığı ekleyin."
+                },
+                "linearDodge": {
+                    "description": "En üst ve alt tabakaların perceptual SRGB uzayını ekleyin.",
+                    "example": "Canlı, yoğun aydınlatma etkileri yaratmak."
+                },
+                "addition": {
+                    "description": "Lineer SRGB uzayında üst ve alt tabakaların parlaklığını ekleyin.",
+                    "example": "Canlı, yoğun aydınlatma etkileri yaratmak."
+                },
+                "darkenOnly": {
+                    "description": "Her R,G,B üst ve alt tabakaların karanlık rengini tut.",
+                    "example": "Bir fotoğraftaki gölgeleri karanlıklayın."
+                },
+                "lumaDarkenOnly": {
+                    "description": "Üst ve alt katmanlar arasındaki algısal karanlığınla karşılaştırın ve koyu piksel tutar.",
+                    "example": "Temel olarak altexposing parlak alanları seçin."
+                },
+                "multiply": {
+                    "description": "Üst tabakanın karanlığına dayanan alt tabaka. Multiply, birden fazla fotoğraf negatifinin birlikte tabakalandığında nasıl göründüğünü taklit eder.",
+                    "example": "Bir görüntü koyu görünmek, gölgeleri veya gece sahnelerini basitleştirmek gibi."
+                },
+                "burn": {
+                    "description": "Darkens the alt tabaka, üst tabakanın karanlığına orantılıdır.",
+                    "example": "Gölgelere derinlik eklemek."
+                },
+                "linearBurn": {
+                    "description": "Üst ve alt tabakaların piksellerini ekleyin, sonra mümkün olan en parlak değeri çıkarın.",
+                    "example": "Dramatik bir gölgeli görüntüye bakmak."
+                },
+                "overlay": {
+                    "description": "Prodüksiyon ve ekran kombinasyonu, ışık alanlarının daha hafif ve karanlık alanları karanlık hale geldiği.",
+                    "example": "Detay kaybetmeden fotoğraflara kontrast ekleyin."
+                },
+                "softLight": {
+                    "description": "Parlakens the image similar to overlay ama daha kademeli geçişlerle. Yumuşak ışık dağınık aydınlatmayı taklit eder.",
+                    "example": "Portrelere yumuşak bir ışık ekleyin."
+                },
+                "hardLight": {
+                    "description": "Overlay'ın sert bir versiyonu, parlak alanların çok daha parlak ve karanlık alanları çok daha karanlık hale geldiği.",
+                    "example": "Dramatically eylem sahnelerindeki kontrastı artırır."
+                },
+                "vividLight": {
+                    "description": "Karşılaştırmayı zor ışığa kıyasla daha da güçlü bir şekilde artırın.",
+                    "example": "Cesur, yumruklı renkler ve kontrast ile fotolar."
+                },
+                "pinLight": {
+                    "description": "Işıklara dayanan pikselleri değiştirir, en parlak ve en karanlık pikselleri tutar, orta tonlardan uzaklarına göre.",
+                    "example": "Işık ve karanlık arasında keskin bir kontrast ile posterli bir etki yaratmak."
+                },
+                "linearLight": {
+                    "description": "Üst tabakaya dayanan lineer olarak, parlaklama veya karanlıklaştırma.",
+                    "example": "Yapay aydınlatma veya metalik yüzeyleri artırmak."
+                },
+                "hardMix": {
+                    "description": "Görüntüyü birincil renklere azaltır, son derece stilize bir görünüm yaratır.",
+                    "example": "Bir komik kitap veya ekran baskılı etki yaratmak."
+                },
+                "difference": {
+                    "description": "Katmanlar arasındaki farkı öğrenin, siyahın artan renk parlaklıkunun daha farklı olduğu fark yoktur.",
+                    "example": "Aligning katmanları benzer içerikle. İki piksel aynı olduğunda, siyah dönüyorlar."
+                },
+                "exclusion": {
+                    "description": "Daha az kontrastla bir fark, çünkü ince farklılıkların görüntüyü bozmadan vurgulanması gerekir.",
+                    "example": "Esasen invert renkler seçin."
+                },
+                "subtract": {
+                    "description": "Alttan üst tabakadaki parlaklığı alttan çıkarır. Sonuç birçok siyah veya yakın kara alandır.",
+                    "example": "Yüksek kontrast karanlık alanları yaratmak."
+                },
+                "grainExtract": {
+                    "description": "Film tahılı bir katmandan alıntılar, aynı zamanda bir embosssed görünüm verir.",
+                    "example": "Başka bir dokuya başvurmak için bir film dokusundan tahıl alıntı yapmak."
+                },
+                "grainMerge": {
+                    "description": "Üst tabakadan alta tahıl ekleyin, orijinal tabakanın bir tahıl versiyonunu bırakın.",
+                    "example": "Film tahılı bir klasik görünüm için dijital bir görüntü ekleyin."
+                },
+                "divide": {
+                    "description": "Üst kattaki üst tabakanın parlaklığını bölün.",
+                    "example": "Bir görüntüyü dramatik bir şekilde aydınlatın, bir ışıklandırma veya einal etki yaratmak. maruz kalma düzeltmesi için kullanılabilir."
+                },
+                "hue": {
+                    "description": "Alt tabakanın krom ve ışıklığını korurken üst tabakanın hue'sini kullanın.",
+                    "example": "Parlaklığını korurken mavi bir gökyüzü değiştirmek."
+                },
+                "chroma": {
+                    "description": "Alt tabakanın hue ve ışıklığını korurken üst tabakanın chroma'sını kullanın.",
+                    "example": "Bir fotoğrafta renklerin yoğunluğunu artırmak veya azaltmak."
+                },
+                "color": {
+                    "description": "Alt tabakanın ışıklığı ile üst tabakanın hue ve chroma'sını birleştirir.",
+                    "example": "Şaşırmayı ve aydınlatmayı sağlam tutarken bir nesneyi boyamak."
+                },
+                "lightness": {
+                    "description": "Alt tabakanın hue ve chroma'sını korurken üst tabakanın ışığı kullanın.",
+                    "example": "Renkleri doğru tutarken bir görüntüyü aydınlatın veya karanlıklayın."
+                },
+                "luminance": {
+                    "description": "Üst tabakayı alt tabaka tarafından aydınlatır, sonra daha düşük tabakaya sonucu çok temizler.",
+                    "example": "Renkleri doğru tutarken bir görüntüyü aydınlatın veya karanlıklayın."
                 }
             }
         }
@@ -806,11 +1046,15 @@
             "modules": {
                 "rename": {
                     "name": "Rename Katmanı",
-                    "description": "Bir tabakanın adını değiştirin"
+                    "description": "Bir tabakanın adını değiştirin."
                 },
                 "layerEffectBrowser": {
                     "name": "Etkisi",
                     "description": "Şu anda seçilmiş tabakaya (s) veya tabaka grubuna görüntü etkilerini ekleyin (s)."
+                },
+                "blendingMode": {
+                    "name": "Değişim Katmanı Moding Mode",
+                    "description": "Aktif tabakanın karışımını değiştirin."
                 }
             }
         },
@@ -943,6 +1187,42 @@
         },
         "eraseBrush": {
             "brushSize": "Boyut Boyutu"
+        },
+        "deformBlur": {
+            "brushSize": "Boyut Boyutu"
+        },
+        "drawColorPicker": {
+            "title": "Renk Picker"
+        },
+        "drawGradient": {
+            "editingGradient": "Tartışma",
+            "newGradientLayerName": "Yeni Gradient",
+            "blendColorSpace": {
+                "label": "Renkli Uzay",
+                "oklab": "Oklab",
+                "srgb": "sRGB",
+                "linearSrgb": "Linear sRGB"
+            },
+            "fillType": {
+                "label": "Tür",
+                "linear": "Linear",
+                "radial": "Radial"
+            },
+            "spreadMethod": {
+                "label": "Genişleme Yöntemi",
+                "pad": "Pad",
+                "repeat": "Tekrar",
+                "reflect": "Yan yana",
+                "truncate": "Truncate"
+            },
+            "stopDialog": {
+                "title": "Edit Color Stops",
+                "close": "Close Dialog",
+                "stopColor": "Renkli Renk",
+                "stopOffset": "Offset",
+                "presets": "Presets",
+                "presetSettings": "Preset Ayarlar"
+            }
         }
     },
     "toolGroup": {
@@ -952,7 +1232,11 @@
             "tools": {
                 "brush": {
                     "name": "Fırça",
-                    "description": "Bulucu tabakalarda çizen fırçalar."
+                    "description": "Bir boya fırça kullanıyorsanız katmanları çizin."
+                },
+                "gradient": {
+                    "name": "Gradient",
+                    "description": "Renkler arasında düzgün geçişler oluşturun."
                 }
             }
         },
@@ -1021,6 +1305,16 @@
                 "brush": {
                     "name": "Erase",
                     "description": "Ayılar verileri raster katmanlarından."
+                }
+            }
+        },
+        "deform": {
+            "name": "Deform",
+            "description": "Mevcut görüntü verilerini manipüle eden araçlar, klonlama, bulanıklaşma gibi.",
+            "tools": {
+                "blur": {
+                    "name": "Blur",
+                    "description": "Tamamlanan alanı bulanıklaştıran fırça."
                 }
             }
         }
@@ -1140,6 +1434,66 @@
             "introduction": [
                 "Kayıp araç, tabakanın parçalarını kaldırmanıza izin verir, onları şeffaf hale getirir."
             ]
+        },
+        "deformBlurToolIntroduction": {
+            "title": "Blur Tool",
+            "introduction": [
+                "Bulanık araç, çizdiğiniz mevcut katmanın bölümünü bulanıklaştıracaktır."
+            ]
+        },
+        "drawGradientToolIntroduction": {
+            "title": "Gradient Tool",
+            "introduction": [
+                "Gradient aracı, gradient katmanları eklemenizi sağlar. Bu aracın görünür sınırlarını seçim aracı veya silinmiş araçla birleştirerek kontrol edebilirsiniz."
+            ],
+            "body": {
+                "mouse": [
+                    "Tuval üzerinde bir gradient yerleştirmek için tıklayın ve sürükleyin."
+                ],
+                "touch": [
+                    "Tuval üzerinde bir gradient yerleştirmek için bir parmağı kullanın."
+                ]
+            }
         }
+    },
+    "gradientPreset": {
+        "blackToTransparent": "Siyah",
+        "whiteToTransparent": "Beyazı Saymak",
+        "blackToWhite": "Siyah, Beyaz"
+    },
+    "layerBlendingMode": {
+        "normal": "Normal",
+        "dissolve": "Dissolve",
+        "colorErase": "Renk Erase",
+        "erase": "Erase",
+        "lightenOnly": "Lighten Only",
+        "lumaLightenOnly": "Luma Lighten Sadece Sadece Sadece Sadece Sadece Sadece Sadece",
+        "screen": "Ekran",
+        "dodge": "Dodge",
+        "linearDodge": "Linear Dodge",
+        "addition": "Addition",
+        "darkenOnly": "Darken Only",
+        "lumaDarkenOnly": "Luma Darken Sadece Sadece Sadece Sadece Sadece Sadece Sadece",
+        "multiply": "Multiply",
+        "burn": "Burn",
+        "linearBurn": "Linear Burn",
+        "overlay": "Overlay",
+        "softLight": "Yumuşak Işık Işığı",
+        "hardLight": "Sert Işık",
+        "vividLight": "Vivid Light",
+        "pinLight": "Pin Light",
+        "linearLight": "Linear Işık",
+        "hardMix": "Hard Mix",
+        "difference": "Farklılık farklılıkları",
+        "exclusion": "Exclusion",
+        "subtract": "Subtract",
+        "grainExtract": "Örnek",
+        "grainMerge": "Merge",
+        "divide": "Bölün",
+        "hue": "Hue",
+        "chroma": "Chroma",
+        "color": "Renkli Renk",
+        "lightness": "Işık",
+        "luminance": "Luminance"
     }
 }

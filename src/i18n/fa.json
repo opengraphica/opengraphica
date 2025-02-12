@@ -46,7 +46,18 @@
         "updateEraseLayer": "Erase از Layer",
         "createTextLayer": "Create Text Layer",
         "typeInTextLayer": "نوع در Text Layer",
-        "waitingOnQueueFree": "انتظار برای کار برای تکمیل"
+        "waitingOnQueueFree": "انتظار برای کار برای تکمیل",
+        "createDrawGradientLayer": "ایجاد لایه Gradient Layer",
+        "duplicateLayer": "لایه تکراری",
+        "rasterizeLayer": "Rasterize Layer",
+        "updateDrawGradientLayerBlendColorSpace": "به روز رسانی Gradient (Color Space)",
+        "updateDrawGradientLayerFillType": "Update Gradient (Fill Type)",
+        "updateDrawGradientLayerPosition": "Update Gradient (Position)",
+        "updateDrawGradientLayerSpreadMethod": "Update Gradient (Spread Method)",
+        "updateDrawGradientLayerStops": "Update Gradient (Color Stops)",
+        "updateDeformBlurLayer": "لایه Blur Layer",
+        "updateLayerBlendingMode": "تغییر حالت Blending Mode",
+        "updateLayerFilterMask": "دانلود بازی Layer Effect Mask"
     },
     "app": {
         "colorPickerGradient": {
@@ -86,7 +97,10 @@
             "effects": "اثرات",
             "recalculatingEffect": "پردازش ...",
             "moveEffectUp": "حرکت اثر بالا",
-            "moveEffectDown": "حرکت اثر Down"
+            "moveEffectDown": "حرکت اثر Down",
+            "blendingMode": "Blending",
+            "duplicate": "تکراری",
+            "rasterizeEffects": "دانلود آهنگ Merge All"
         },
         "wait": {
             "applyLayerTransform": "استفاده از Layer Transform",
@@ -94,6 +108,12 @@
             "pleaseWait": "لطفا صبر کنید",
             "trimLayerEmptySpace": "فضایی خالی",
             "cancel": "لغو"
+        },
+        "renderer": {
+            "initializeFailed": {
+                "title": "راه اندازی شکست خورده",
+                "message": "OpenGraphica متکی بر برخی از قابلیت های وب پایه است که در مرورگر شما وجود ندارد. لطفا مرورگر وب خود را به روز کنید یا به یک مدرن مانند Chrome، فایرفاکس، Safari یا Edge تبدیل کنید."
+            }
         }
     },
     "brushCategory": {
@@ -129,7 +149,10 @@
         "addEffect": "اضافه کردن اثر",
         "editEffects": "ویژگی های Edit Effects",
         "restoreLastImage": "آخرین تصویر",
-        "pickColor": "انتخاب رنگ"
+        "pickColor": "انتخاب رنگ",
+        "delete": "حذف",
+        "discardChanges": "تغییرات کارت",
+        "reverse": "معکوس"
     },
     "canvas": {
         "toolbar": {
@@ -400,6 +423,71 @@
         },
         "sepia": {
             "name": "سپتامبرia"
+        },
+        "gradientMap": {
+            "param": {
+                "gradient": "Gradient",
+                "colorSpace": "فضای رنگی",
+                "colorSpaceOption": {
+                    "oklab": "Oklab",
+                    "perceptualRgb": "Perceptual RGB",
+                    "linearRgb": "خطی RGB"
+                },
+                "mix": "مخلوط"
+            }
+        },
+        "instagram1997": {
+            "param": {
+                "mix": "مخلوط"
+            }
+        },
+        "instagramAden": {
+            "name": "Aden",
+            "param": {
+                "mix": "مخلوط"
+            }
+        },
+        "instagramClarendon": {
+            "name": "Clarendon",
+            "param": {
+                "mix": "مخلوط"
+            }
+        },
+        "instagramGingham": {
+            "name": "Gingham",
+            "param": {
+                "mix": "مخلوط"
+            }
+        },
+        "instagramInkwell": {
+            "name": "Inkwell",
+            "param": {
+                "mix": "مخلوط"
+            }
+        },
+        "instagramLofi": {
+            "name": "Lofi",
+            "param": {
+                "mix": "مخلوط"
+            }
+        },
+        "instagramToaster": {
+            "name": "Toaster",
+            "param": {
+                "mix": "مخلوط"
+            }
+        },
+        "instagramValencia": {
+            "name": "والنسیا",
+            "param": {
+                "mix": "مخلوط"
+            }
+        },
+        "instagramXpro2": {
+            "name": "Xpro2",
+            "param": {
+                "mix": "مخلوط"
+            }
         }
     },
     "layerFilterGroup": {
@@ -437,7 +525,7 @@
                 "default": {
                     "label": "Deform",
                     "description": [
-                        null,
+                        "شارپ یا تار کردن تصویر",
                         "بالژ، مناطق ظریف تصویر",
                         "مناطق Clone از تصویر"
                     ]
@@ -596,7 +684,9 @@
         "pixelsPerCentimeter": "Pixels / Centimeter"
     },
     "menuBar": {
-        "toolsHeading": "ابزار"
+        "toolsHeading": "ابزار",
+        "expandToolGroup": "گسترش",
+        "collapseToolGroup": "سقوط"
     },
     "module": {
         "fileExport": {
@@ -669,7 +759,9 @@
             "resetField": "Reset Field",
             "deleting": "کاهش تاثیر ...",
             "deleteFilterError": "یک خطا در هنگام تلاش برای حذف فیلتر رخ داد. اگر این پیام را می بینید، لطفا این را به عنوان یک مشکل گزارش کنید.",
-            "applyFilterError": "یک خطا در هنگام تلاش برای اعمال تغییرات فیلتر رخ داد. اگر این پیام را می بینید، لطفا این را به عنوان یک مشکل گزارش کنید."
+            "applyFilterError": "یک خطا در هنگام تلاش برای اعمال تغییرات فیلتر رخ داد. اگر این پیام را می بینید، لطفا این را به عنوان یک مشکل گزارش کنید.",
+            "useActiveSelectionMask": "انتخاب به عنوان ماسک",
+            "clearSelectionMask": "ماسک را حذف کنید"
         },
         "renameLayer": {
             "title": "لایه Rename Layer",
@@ -703,6 +795,154 @@
                         "bottom": "پایین"
                     },
                     "horizontalMargin": "حاشیه افقی"
+                }
+            }
+        },
+        "fileOpenConfirm": {
+            "title": "مطمئن هستید؟?",
+            "warning": [
+                null,
+                "آیا می خواهید یک فایل جدید را باز کنید و تمام تغییرات خود را کنار بگذارید؟?"
+            ]
+        },
+        "layerBlendingMode": {
+            "title": "تغییر حالت Blending Mode",
+            "blendingMode": "Blending Mode",
+            "layerTop": "لایه بالا",
+            "layerBottom": "لایه پایین",
+            "imageResult": "نتیجه",
+            "blendingModeSummary": {
+                "normal": {
+                    "description": "لایه بالا پایین را بر اساس opacity آن پوشش می دهد.",
+                    "example": "برش یک فرد از یک عکس و اضافه کردن آنها به یک عکس دیگر."
+                },
+                "dissolve": {
+                    "description": "به طور تصادفی جایگزین پیکسل از لایه بالا با پیکسل های شفاف بر اساس opacity، ایجاد یک اثر نویز دیجیتال.",
+                    "example": "ایجاد یک بافت دانه ای."
+                },
+                "colorErase": {
+                    "description": "رنگ را از لایه بالا که با رنگ لایه پایین مطابقت دارد حذف کنید.",
+                    "example": "حذف یک صفحه نمایش سبز از یک تصویر."
+                },
+                "erase": {
+                    "description": "لایه پایین را که در آن لایه بالا مبهم است، تنظیم می کند.",
+                    "example": "حذف اشیاء ناخواسته در یک عکس با دور زدن آن مناطق."
+                },
+                "lightenOnly": {
+                    "description": "رنگ سبک تر را در هر R،G، کانال B لایه های بالا و پایین نگه دارید.",
+                    "example": "اضافه کردن یک اثر درخشان به یک شی بدون تاریک کردن مناطق اطراف."
+                },
+                "lumaLightenOnly": {
+                    "description": "مقایسه روشنایی ادراکی بین لایه های بالا و پایین و نگه داشتن پیکسل های روشن تر.",
+                    "example": "افزایش روشنایی یک منطقه خاص در یک عکس سیاه و سفید."
+                },
+                "screen": {
+                    "description": "لایه پایین را بر اساس روشنایی لایه بالا روشن می کند. صفحه نمایش تقلید می کند که چگونه نور هنگام پیش بینی یا لایه برداری ارتباط برقرار می کند.",
+                    "example": "یک صحنه شبانه روشن تر به نظر می رسد."
+                },
+                "dodge": {
+                    "description": "روشن کننده های برجسته و جزئیات را در سایه ها به ارمغان می آورد. این تقلید اثر \"انجام\" در عکاسی تاریک اتاق.",
+                    "example": "اضافه کردن یک شعله آفتاب."
+                },
+                "linearDodge": {
+                    "description": "روشنایی لایه های بالا و پایین را در فضای SRGB ادراکی اضافه کنید.",
+                    "example": "ایجاد اثرات نورپردازی پر جنب و جوش و شدید."
+                },
+                "addition": {
+                    "description": "روشنایی لایه های بالا و پایین را در فضای خطی SRGB اضافه می کند.",
+                    "example": "ایجاد اثرات نورپردازی پر جنب و جوش و شدید."
+                },
+                "darkenOnly": {
+                    "description": "رنگ تیره تر را در هر R،G، کانال B لایه های بالا و پایین نگه دارید.",
+                    "example": "تاریکی سایه ها در یک عکس."
+                },
+                "lumaDarkenOnly": {
+                    "description": "تاریکی ادراکی بین لایه های بالا و پایین را مقایسه می کند و پیکسل های تیره تر را نگه می دارد.",
+                    "example": "مناطق روشن را انتخاب کنید."
+                },
+                "multiply": {
+                    "description": "لایه پایین را بر اساس تاریکی لایه بالا تیره می کند. چند برابر تقلید می کند که چند منفی عکاسی وقتی با هم لایه می شوند، چگونه به نظر می رسند.",
+                    "example": "یک تصویر تاریک تر به نظر می رسد، مانند سایه های شبیه سازی یا صحنه های شب."
+                },
+                "burn": {
+                    "description": "لایه پایین را متناسب با تاریکی لایه بالا قرار دهید.",
+                    "example": "اضافه کردن عمق به سایه ها."
+                },
+                "linearBurn": {
+                    "description": "پیکسل های لایه های بالا و پایین را اضافه می کند، سپس درخشان ترین ارزش ممکن را کاهش می دهد.",
+                    "example": "اضافه کردن یک نگاه سایه ای دراماتیک به تصویر."
+                },
+                "overlay": {
+                    "description": "ترکیبی از ضرب و شتم، جایی که مناطق نور روشن تر و تاریک تر می شوند.",
+                    "example": "اضافه کردن عکس بدون از دست دادن جزئیات."
+                },
+                "softLight": {
+                    "description": "تصویر را شبیه به Overlay اما با انتقال تدریجی بیشتر روشن می کند. نور نرم شبیه سازی نور پراکنده است.",
+                    "example": "اضافه کردن یک درخشش نرم به پرتره."
+                },
+                "hardLight": {
+                    "description": "یک نسخه خشن از Overlay که در آن مناطق روشن بسیار روشن تر و تاریک تر می شوند.",
+                    "example": "افزایش چشمگیر کنتراست در صحنه های اکشن."
+                },
+                "vividLight": {
+                    "description": "کنتراست را به شدت افزایش می دهد، حتی بیشتر در مقایسه با نور سخت.",
+                    "example": "عکاسی عکس ها با رنگ های جسورانه، مشتی و کنتراست."
+                },
+                "pinLight": {
+                    "description": "پیکسل ها را بر اساس روشنایی جایگزین می کند، درخشان ترین و تاریک ترین پیکسل ها را بر اساس فاصله آنها از میان سنگ ها نگه می دارد.",
+                    "example": "ایجاد یک اثر پوستر با کنتراست تیز بین نور و تاریکی."
+                },
+                "linearLight": {
+                    "description": "کنتراست را به صورت خطی، روشن کردن یا تیره شدن بر اساس لایه بالا افزایش می دهد.",
+                    "example": "ساده سازی روشنایی مصنوعی یا افزایش سطوح فلزی."
+                },
+                "hardMix": {
+                    "description": "تصویر را به رنگ های اولیه کاهش می دهد و یک نگاه بسیار روشن ایجاد می کند.",
+                    "example": "ایجاد یک کتاب کمیک یا اثر چاپ صفحه نمایش."
+                },
+                "difference": {
+                    "description": "تفاوت بین لایه ها را پیدا کنید، جایی که سیاه هیچ تفاوتی در افزایش روشنایی رنگ ندارد.",
+                    "example": "تقویت لایه ها با محتوای مشابه وقتی دو پیکسل یکسان هستند، سیاه می شوند."
+                },
+                "exclusion": {
+                    "description": "تنوع تفاوت با کنتراست کمتر، برای جایی که تفاوت های ظریف باید بدون غلبه بر تصویر برجسته شوند.",
+                    "example": "انتخاب رنگ های بی طرف."
+                },
+                "subtract": {
+                    "description": "روشنایی را در لایه بالا از پایین ردیابی کنید. نتیجه بسیاری از مناطق سیاه یا نزدیک به سیاه است.",
+                    "example": "ایجاد مناطق تاریک کنتراست بالا."
+                },
+                "grainExtract": {
+                    "description": "دانه فیلم را از یک لایه استخراج می کند، همچنین یک ظاهر برجسته را ارائه می دهد.",
+                    "example": "استخراج دانه از یک بافت فیلم برای اعمال به بافت دیگر."
+                },
+                "grainMerge": {
+                    "description": "دانه را از لایه بالا به پایین اضافه می کند و یک نسخه غله از لایه اصلی را ترک می کند.",
+                    "example": "اضافه کردن دانه فیلم به یک تصویر دیجیتال برای یک نگاه قدیمی."
+                },
+                "divide": {
+                    "description": "روشنایی لایه بالا را به پایین تقسیم می کند.",
+                    "example": "روشن کردن یک تصویر به طور چشمگیری، ایجاد یک اثر درخشان یا اتر. می تواند برای اصلاح نوردهی استفاده شود."
+                },
+                "hue": {
+                    "description": "استفاده از رنگ لایه بالا در حالی که حفظ رنگ و نور لایه پایین.",
+                    "example": "تغییر یک آسمان آبی به بنفش در هنگام حفظ روشنایی آن."
+                },
+                "chroma": {
+                    "description": "از chroma ( شدت رنگ) لایه بالا در حالی که حفظ رنگ و نور لایه پایین استفاده می کند.",
+                    "example": "افزایش یا کاهش شدت رنگ ها در یک عکس."
+                },
+                "color": {
+                    "description": "رنگ و رنگ لایه بالا را با نور لایه پایین ترکیب می کند.",
+                    "example": "تغییر رنگ یک شی در حالی که نگه داشتن سایه و نور دست نخورده است."
+                },
+                "lightness": {
+                    "description": "استفاده از نور لایه بالا در حالی که حفظ رنگ و رنگ لایه پایین.",
+                    "example": "روشن کردن یا تاریک کردن یک تصویر در حالی که نگه داشتن رنگ ها درست است."
+                },
+                "luminance": {
+                    "description": "لایه بالا را با لایه پایین تقسیم می کند، سپس نتیجه را به لایه پایین تر تقسیم می کند.",
+                    "example": "روشن کردن یا تاریک کردن یک تصویر در حالی که نگه داشتن رنگ ها درست است."
                 }
             }
         }
@@ -804,11 +1044,15 @@
             "modules": {
                 "rename": {
                     "name": "لایه Rename Layer",
-                    "description": "تغییر نام یک لایه"
+                    "description": "نام یک لایه را تغییر دهید."
                 },
                 "layerEffectBrowser": {
                     "name": "تأثیر Browser",
                     "description": "اضافه کردن اثرات تصویر به لایه انتخاب شده در حال حاضر (بازدید کنندگان) یا گروه لایه (ها)."
+                },
+                "blendingMode": {
+                    "name": "تغییر لایه Blending Mode",
+                    "description": "تغییر حالت ترکیب لایه فعال."
                 }
             }
         },
@@ -941,6 +1185,42 @@
         },
         "eraseBrush": {
             "brushSize": "اندازه"
+        },
+        "deformBlur": {
+            "brushSize": "اندازه"
+        },
+        "drawColorPicker": {
+            "title": "Color Picker"
+        },
+        "drawGradient": {
+            "editingGradient": "ویرایش Gradient",
+            "newGradientLayerName": "New Gradient",
+            "blendColorSpace": {
+                "label": "فضای رنگی",
+                "oklab": "Oklab",
+                "srgb": "sRGB",
+                "linearSrgb": "خطی sRGB"
+            },
+            "fillType": {
+                "label": "نوع Fill Type",
+                "linear": "خطی",
+                "radial": "شعاعی"
+            },
+            "spreadMethod": {
+                "label": "روش گسترش",
+                "pad": "Pad",
+                "repeat": "تکرار تکراری",
+                "reflect": "انعکاس",
+                "truncate": "Trunc"
+            },
+            "stopDialog": {
+                "title": "بازی Edit Color Stops",
+                "close": "نزدیک Dialog",
+                "stopColor": "رنگ رنگی",
+                "stopOffset": "جبران خسارت",
+                "presets": "Presets",
+                "presetSettings": "تنظیمات مقدماتی"
+            }
         }
     },
     "toolGroup": {
@@ -950,7 +1230,11 @@
             "tools": {
                 "brush": {
                     "name": "مسواک",
-                    "description": "قلم هایی که روی لایه های raster کشیده می شوند."
+                    "description": "لایه ها را طوری بکشید که انگار از یک برس رنگی استفاده می کنید."
+                },
+                "gradient": {
+                    "name": "Gradient",
+                    "description": "ایجاد انتقال صاف بین رنگ ها."
                 }
             }
         },
@@ -1019,6 +1303,16 @@
                 "brush": {
                     "name": "Erase Brush",
                     "description": "داده ها را از لایه های raster دور می کند."
+                }
+            }
+        },
+        "deform": {
+            "name": "Deform",
+            "description": "ابزارهایی که داده های تصویر موجود را دستکاری می کنند، مانند cloning، bulging، blurring.",
+            "tools": {
+                "blur": {
+                    "name": "Blur",
+                    "description": "قلم که منطقه را کشیده است."
                 }
             }
         }
@@ -1138,6 +1432,66 @@
             "introduction": [
                 "ابزار پاک به شما اجازه می دهد تا بخش هایی از لایه را حذف کنید و آنها را شفاف کنید."
             ]
+        },
+        "deformBlurToolIntroduction": {
+            "title": "ابزار Blur Tool",
+            "introduction": [
+                "ابزار تار بخشی از لایه فعلی را که شما بر روی آن قرار می دهید، تار می کند."
+            ]
+        },
+        "drawGradientToolIntroduction": {
+            "title": "ابزار Gradient Tool",
+            "introduction": [
+                "ابزار گرادیان به شما اجازه می دهد لایه های گرادیان را اضافه کنید. شما می توانید مرزهای قابل مشاهده این ابزار را با ترکیب آن با ابزار انتخاب یا ابزار پاک کنترل کنید."
+            ],
+            "body": {
+                "mouse": [
+                    "کلیک کنید و بکشید تا یک گرادی روی بوم قرار دهید."
+                ],
+                "touch": [
+                    "از یک انگشت برای لمس و کشیدن برای قرار دادن شیب بر روی بوم استفاده کنید."
+                ]
+            }
         }
+    },
+    "gradientPreset": {
+        "blackToTransparent": "سیاه شفاف",
+        "whiteToTransparent": "سفید شفاف",
+        "blackToWhite": "سیاه، سفید"
+    },
+    "layerBlendingMode": {
+        "normal": "عادی",
+        "dissolve": "Dissolve",
+        "colorErase": "رنگ Erase",
+        "erase": "Erase",
+        "lightenOnly": "نور فقط",
+        "lumaLightenOnly": "Luma Light فقط",
+        "screen": "صفحه نمایش Screen",
+        "dodge": "دج",
+        "linearDodge": "خطی خطیج",
+        "addition": "Addition",
+        "darkenOnly": "تاریکی فقط",
+        "lumaDarkenOnly": "Luma Darken فقط",
+        "multiply": "Multiply",
+        "burn": "برنز",
+        "linearBurn": "خطی سوخته",
+        "overlay": "Overlay",
+        "softLight": "نور نرم",
+        "hardLight": "نور سخت",
+        "vividLight": "نور",
+        "pinLight": "Pinlight",
+        "linearLight": "نور خطی",
+        "hardMix": "دانلود بازی Hard Mix",
+        "difference": "تفاوت",
+        "exclusion": "انحصاری",
+        "subtract": "Subtract",
+        "grainExtract": "عصاره دانه",
+        "grainMerge": "دانه Merge",
+        "divide": "تقسیم بندی",
+        "hue": "Hue",
+        "chroma": "کروموزوم",
+        "color": "رنگ رنگی",
+        "lightness": "نور",
+        "luminance": "Luminance"
     }
 }

@@ -46,7 +46,18 @@
         "updateEraseLayer": "層からの消去",
         "createTextLayer": "テキストレイヤーを作成する",
         "typeInTextLayer": "テキストレイヤーの種類",
-        "waitingOnQueueFree": "作業の完了を待ちます"
+        "waitingOnQueueFree": "作業の完了を待ちます",
+        "createDrawGradientLayer": "Gradientレイヤーを作成する",
+        "duplicateLayer": "重複レイヤー",
+        "rasterizeLayer": "レイヤーをラスタライズ",
+        "updateDrawGradientLayerBlendColorSpace": "アップデート グラデーション(カラースペース)",
+        "updateDrawGradientLayerFillType": "Gradientの更新(図タイプ)",
+        "updateDrawGradientLayerPosition": "アップデート グラデーション(ポジション)",
+        "updateDrawGradientLayerSpreadMethod": "Gradientの更新(スプレッドメソッド)",
+        "updateDrawGradientLayerStops": "Gradient(カラーストップ)を更新",
+        "updateDeformBlurLayer": "Blurの層",
+        "updateLayerBlendingMode": "混合モードの変更",
+        "updateLayerFilterMask": "層効果マスクの更新"
     },
     "app": {
         "colorPickerGradient": {
@@ -86,7 +97,10 @@
             "effects": "効果",
             "recalculatingEffect": "加工...",
             "moveEffectUp": "効果を上げる",
-            "moveEffectDown": "効果を下に移動する"
+            "moveEffectDown": "効果を下に移動する",
+            "blendingMode": "ブレンド",
+            "duplicate": "重複する",
+            "rasterizeEffects": "マージ すべて"
         },
         "wait": {
             "applyLayerTransform": "レイヤー変換を適用",
@@ -94,6 +108,12 @@
             "pleaseWait": "お問い合わせ",
             "trimLayerEmptySpace": "空の空間をトリムする",
             "cancel": "キャンセル"
+        },
+        "renderer": {
+            "initializeFailed": {
+                "title": "セットアップ失敗",
+                "message": "OpenGraphicaは、ブラウザに存在しない基本的なWeb機能に依存しています。 お使いのブラウザを更新するか、Chrome、Firefox、Safari、Edgeなどのモダンなブラウザに切り替えてください."
+            }
         }
     },
     "brushCategory": {
@@ -129,7 +149,10 @@
         "addEffect": "エフェクトの追加",
         "editEffects": "エフェクトの編集",
         "restoreLastImage": "最後の画像を復元する",
-        "pickColor": "ピックカラー"
+        "pickColor": "ピックカラー",
+        "delete": "削除",
+        "discardChanges": "破棄変更",
+        "reverse": "バックアップ"
     },
     "canvas": {
         "toolbar": {
@@ -400,6 +423,71 @@
         },
         "sepia": {
             "name": "セピア"
+        },
+        "gradientMap": {
+            "param": {
+                "gradient": "グラデーション",
+                "colorSpace": "色空間",
+                "colorSpaceOption": {
+                    "oklab": "バックナンバー",
+                    "perceptualRgb": "許容RGB",
+                    "linearRgb": "リニアRGB"
+                },
+                "mix": "ミックス"
+            }
+        },
+        "instagram1997": {
+            "param": {
+                "mix": "ミックス"
+            }
+        },
+        "instagramAden": {
+            "name": "アデン",
+            "param": {
+                "mix": "ミックス"
+            }
+        },
+        "instagramClarendon": {
+            "name": "クラレンドン",
+            "param": {
+                "mix": "ミックス"
+            }
+        },
+        "instagramGingham": {
+            "name": "ジンガム",
+            "param": {
+                "mix": "ミックス"
+            }
+        },
+        "instagramInkwell": {
+            "name": "インクウェル",
+            "param": {
+                "mix": "ミックス"
+            }
+        },
+        "instagramLofi": {
+            "name": "ログイン",
+            "param": {
+                "mix": "ミックス"
+            }
+        },
+        "instagramToaster": {
+            "name": "トピックス",
+            "param": {
+                "mix": "ミックス"
+            }
+        },
+        "instagramValencia": {
+            "name": "バレンシア",
+            "param": {
+                "mix": "ミックス"
+            }
+        },
+        "instagramXpro2": {
+            "name": "Xpro2の特長",
+            "param": {
+                "mix": "ミックス"
+            }
         }
     },
     "layerFilterGroup": {
@@ -437,7 +525,7 @@
                 "default": {
                     "label": "デフォーム",
                     "description": [
-                        null,
+                        "画像をシャープまたはブール",
                         "膨らみ、イメージのピンチ領域",
                         "画像の領域をクローンする"
                     ]
@@ -596,7 +684,9 @@
         "pixelsPerCentimeter": "ピクセル/周囲"
     },
     "menuBar": {
-        "toolsHeading": "ツール"
+        "toolsHeading": "ツール",
+        "expandToolGroup": "プロモーション",
+        "collapseToolGroup": "ログイン"
     },
     "module": {
         "fileExport": {
@@ -671,7 +761,9 @@
             "resetField": "リセットフィールド",
             "deleting": "削除効果...",
             "deleteFilterError": "フィルターを削除しようとするとエラーが発生しました。 こちらのメッセージをご覧になる際は、バグを報告してください.",
-            "applyFilterError": "フィルターの変更を適用する試みの間にエラーが発生しました。 こちらのメッセージをご覧になる際は、バグを報告してください."
+            "applyFilterError": "フィルターの変更を適用する試みの間にエラーが発生しました。 こちらのメッセージをご覧になる際は、バグを報告してください.",
+            "useActiveSelectionMask": "マスクとして選択を適用する",
+            "clearSelectionMask": "マスクの削除"
         },
         "renameLayer": {
             "title": "レイヤーの名前を変更",
@@ -705,6 +797,154 @@
                         "bottom": "ボトム"
                     },
                     "horizontalMargin": "水平マージン"
+                }
+            }
+        },
+        "fileOpenConfirm": {
+            "title": "お問い合わせ?",
+            "warning": [
+                "現在のファイルを編集しました。 新しいファイルを開いたら、これらの編集は破棄されます。 このファイルに新しいレイヤーを追加する場合は、{insertPhoto}オプションを使用します.",
+                "新しいファイルを開き、すべての変更を破棄したいですか?"
+            ]
+        },
+        "layerBlendingMode": {
+            "title": "混合モードの変更",
+            "blendingMode": "混合モード",
+            "layerTop": "トップレイヤー",
+            "layerBottom": "最下の層",
+            "imageResult": "結果発表",
+            "blendingModeSummary": {
+                "normal": {
+                    "description": "上層は、その不透明度に基づいて底をカバーしています.",
+                    "example": "1枚の写真から人を切り、別の写真に追加します."
+                },
+                "dissolve": {
+                    "description": "ランダムに、ピクセルをトップレイヤーから、透明ピクセルをオパシティに基づいて置き換え、デジタルノイズ効果を作成します.",
+                    "example": "粒状のテクスチャーを作る."
+                },
+                "colorErase": {
+                    "description": "下層の色にマッチする上層から色を取り除きます.",
+                    "example": "画像から緑色の画面の背景を削除します."
+                },
+                "erase": {
+                    "description": "上層が不透明である下層を消去します.",
+                    "example": "これらの領域を消去することにより、写真内の不要なオブジェクトを除去します."
+                },
+                "lightenOnly": {
+                    "description": "上部および底層の各R、G、Bチャネルのより軽い色を保ちます.",
+                    "example": "周囲の領域を暗くせずにオブジェクトに白熱効果を追加します."
+                },
+                "lumaLightenOnly": {
+                    "description": "上層と下層の間の周囲の明るさを比較し、より明るいピクセルを維持します.",
+                    "example": "黒と白写真の特定の領域の明るさを高めます."
+                },
+                "screen": {
+                    "description": "上層の明るさに基づいて下層を明るくします。 画面は、プロジェクトやレイヤーされたときに光が相互作用する方法を模倣します.",
+                    "example": "夜のシーンを明るく見せる."
+                },
+                "dodge": {
+                    "description": "ハイライトを明るくし、影の細部を引き出す。 暗室撮影で「ドッジ」の効果を模倣します.",
+                    "example": "太陽のフレアを追加します."
+                },
+                "linearDodge": {
+                    "description": "パーセプチュアルSRGBスペースのトップとボトムレイヤーの明るさを追加します.",
+                    "example": "活気に満ちた、激しい照明効果を作成します."
+                },
+                "addition": {
+                    "description": "線形SRGBスペースの上部および最下の層の明るさを加えて下さい.",
+                    "example": "活気に満ちた、激しい照明効果を作成します."
+                },
+                "darkenOnly": {
+                    "description": "R、G、B の各チャネルの濃い色を上層および底層に保ちます.",
+                    "example": "写真の影を暗くする."
+                },
+                "lumaDarkenOnly": {
+                    "description": "上層と下層の間の周囲の暗闇を比較し、より暗いピクセルを維持します.",
+                    "example": "明るいエリアを厳選して展開."
+                },
+                "multiply": {
+                    "description": "上層の暗闇に基づいて下層を暗くします。 複数の写真のネガが一緒にレイヤーしたときにどのように見えるかをマルチプライ模倣します.",
+                    "example": "影や夜のシーンをシミュレートするようなイメージを暗く見せる."
+                },
+                "burn": {
+                    "description": "上層の闇に比例した下層を暗くします.",
+                    "example": "影に深さを加える."
+                },
+                "linearBurn": {
+                    "description": "上層と下層のピクセルを追加し、最も明るい値を指定します.",
+                    "example": "ドラマティックな影をイメージに追加."
+                },
+                "overlay": {
+                    "description": "光領域がより明るく、暗い領域がより濃くなるマルチプライとスクリーンの組み合わせ.",
+                    "example": "細部を失うことなく写真にコントラストを追加します."
+                },
+                "softLight": {
+                    "description": "オーバーレイと同様のイメージを明るくしますが、より段階的な移行で。 柔らかいライトは拡散させた照明を模倣します.",
+                    "example": "ソフトな輝きをポートレートに追加."
+                },
+                "hardLight": {
+                    "description": "明るい領域がはるかに明るく、暗い領域がはるかに濃くなるオーバーレイの厳しいバージョン.",
+                    "example": "アクションシーンのコントラストを劇的に高めます."
+                },
+                "vividLight": {
+                    "description": "コントラストを非常に強く、さらに硬い光と比較して増加します.",
+                    "example": "太字、パンチングカラー、コントラストで写真をスタイリング."
+                },
+                "pinLight": {
+                    "description": "明るさに基づいてピクセルを置換し、中音からの距離に基づいて、最も明るく暗いピクセルを維持します.",
+                    "example": "光と暗い間のシャープなコントラストでポスター効果を作成します."
+                },
+                "linearLight": {
+                    "description": "上層に基づいて、線形、明るく、または暗くなるコントラストを増加させます.",
+                    "example": "人工的な照明を模倣するか、または金属表面を高めること."
+                },
+                "hardMix": {
+                    "description": "主色にイメージを縮小し、高精細な表情を演出します.",
+                    "example": "コミックブックやスクリーンプリント効果を制作."
+                },
+                "difference": {
+                    "description": "レイヤーの違いを見つけ、黒が違いないと色の明るさが異なる.",
+                    "example": "同様のコンテンツでレイヤーをアライメントします。 2つのピクセルが同じ場合、黒色になります."
+                },
+                "exclusion": {
+                    "description": "微妙な違いがイメージを圧倒することなく強調する必要があるため、より少ないコントラストの違いのバリエーション.",
+                    "example": "選択的に色を反転させます."
+                },
+                "subtract": {
+                    "description": "底から上の層の明るさを割込みます。 結果は、黒や黒の部分が多いです.",
+                    "example": "高コントラストの暗い領域を作成する."
+                },
+                "grainExtract": {
+                    "description": "層からのフィルムの穀物を、また浮彫りにされた出現を与えます抽出して下さい.",
+                    "example": "フィルムのテクスチャから穀物を抽出して、別のテクスチャに適用する."
+                },
+                "grainMerge": {
+                    "description": "上層から下層に穀物を追加し、元の層の粒状バージョンを残します.",
+                    "example": "ヴィンテージルック用のデジタルイメージにフィルムグラインドを追加します."
+                },
+                "divide": {
+                    "description": "最下層の明るさを分割します.",
+                    "example": "画像を劇的に明るくし、輝きやエーテル効果を生み出します。 露出補正に使用できます."
+                },
+                "hue": {
+                    "description": "最下の層のクロムそして明るさを維持している間上の層のhueを使用して下さい.",
+                    "example": "明るさを保ちながら青空を紫に変える."
+                },
+                "chroma": {
+                    "description": "底層の色合いと明るさを維持しながら、トップ層のクロム(色の強度)を使用します.",
+                    "example": "写真の色の強度をブーストまたは減らすこと."
+                },
+                "color": {
+                    "description": "底層の明るさでトップ層の色合いとクロムを組み合わせます.",
+                    "example": "陰影や照明をそのまま保ちながら、オブジェクトを再配置します."
+                },
+                "lightness": {
+                    "description": "最下層の色合いと色彩を維持しながらトップ層の明るさを使用します.",
+                    "example": "色を真に保ちながらイメージを明るくしたり暗くしたりします."
+                },
+                "luminance": {
+                    "description": "層の低い層によって上部の層の輝度を分け、それからより低い層に結果をmultiplies.",
+                    "example": "色を真に保ちながらイメージを明るくしたり暗くしたりします."
                 }
             }
         }
@@ -806,11 +1046,15 @@
             "modules": {
                 "rename": {
                     "name": "レイヤーの名前を変更",
-                    "description": "レイヤーの名前を変更する"
+                    "description": "レイヤーの名前を変更します."
                 },
                 "layerEffectBrowser": {
                     "name": "効果ブラウザ",
                     "description": "現在選択したレイヤー(s)またはレイヤーグループ(s)に画像効果を追加します."
+                },
+                "blendingMode": {
+                    "name": "レイヤーブレンドモードの変更",
+                    "description": "アクティブレイヤーの混合モードを変更します."
                 }
             }
         },
@@ -943,6 +1187,42 @@
         },
         "eraseBrush": {
             "brushSize": "サイズ:"
+        },
+        "deformBlur": {
+            "brushSize": "サイズ:"
+        },
+        "drawColorPicker": {
+            "title": "カラーピッカー"
+        },
+        "drawGradient": {
+            "editingGradient": "Gradientの編集",
+            "newGradientLayerName": "新卒採用",
+            "blendColorSpace": {
+                "label": "色空間",
+                "oklab": "バックナンバー",
+                "srgb": "ログイン",
+                "linearSrgb": "線形sRGB"
+            },
+            "fillType": {
+                "label": "充填タイプ",
+                "linear": "リニア",
+                "radial": "ラジアル"
+            },
+            "spreadMethod": {
+                "label": "スプレッド方法",
+                "pad": "パッド",
+                "repeat": "リピート",
+                "reflect": "リフレクション",
+                "truncate": "トレーニング"
+            },
+            "stopDialog": {
+                "title": "カラーストップの編集",
+                "close": "Dialogを閉じる",
+                "stopColor": "カラー",
+                "stopOffset": "オフセット",
+                "presets": "プリセット",
+                "presetSettings": "プリセット設定"
+            }
         }
     },
     "toolGroup": {
@@ -952,7 +1232,11 @@
             "tools": {
                 "brush": {
                     "name": "ブラシ",
-                    "description": "ラスター層に描画するブラシ."
+                    "description": "塗料ブラシを使用している場合はレイヤーを描画します."
+                },
+                "gradient": {
+                    "name": "グラデーション",
+                    "description": "色間のスムーズな移行を作成します."
                 }
             }
         },
@@ -1021,6 +1305,16 @@
                 "brush": {
                     "name": "消去ブラシ",
                     "description": "ラスター層からデータを消去します."
+                }
+            }
+        },
+        "deform": {
+            "name": "デフォーム",
+            "description": "クローニング、膨満、ブルーリングなどの既存の画像データを操作するツール.",
+            "tools": {
+                "blur": {
+                    "name": "ログイン",
+                    "description": "区域を引くブラシ."
                 }
             }
         }
@@ -1140,6 +1434,66 @@
             "introduction": [
                 "消去ツールを使用すると、レイヤーの部分を削除し、透明にすることができます."
             ]
+        },
+        "deformBlurToolIntroduction": {
+            "title": "Blurツール",
+            "introduction": [
+                "ブローツールは、描画する現在のレイヤーの部分をぼかします."
+            ]
+        },
+        "drawGradientToolIntroduction": {
+            "title": "グラデーションツール",
+            "introduction": [
+                "グラデーションツールを使用すると、グラデーションレイヤーを追加できます。 選択ツールまたは消去ツールと組み合わせることで、このツールの可視境界を制御することができます."
+            ],
+            "body": {
+                "mouse": [
+                    "クリックしてドラッグしてキャンバスにグラデーションを配置します."
+                ],
+                "touch": [
+                    "1本の指を使ってキャンバスにグラデーションを配置します."
+                ]
+            }
         }
+    },
+    "gradientPreset": {
+        "blackToTransparent": "黒から透明",
+        "whiteToTransparent": "透明への白",
+        "blackToWhite": "黒、白"
+    },
+    "layerBlendingMode": {
+        "normal": "ノーマル",
+        "dissolve": "ソリューション",
+        "colorErase": "色 消去",
+        "erase": "リリース",
+        "lightenOnly": "ライトンのみ",
+        "lumaLightenOnly": "Luma ライトン 詳しくはこちら",
+        "screen": "スクリーン",
+        "dodge": "ドッジ",
+        "linearDodge": "リニアドッジ",
+        "addition": "追加条件",
+        "darkenOnly": "ダークンのみ",
+        "lumaDarkenOnly": "Luma ダークン 詳しくはこちら",
+        "multiply": "マルチプライ",
+        "burn": "ログイン",
+        "linearBurn": "リニアバーン",
+        "overlay": "オーバーレイ",
+        "softLight": "ソフトライト",
+        "hardLight": "堅いライト",
+        "vividLight": "鮮やかなライト",
+        "pinLight": "ピン ライト",
+        "linearLight": "リニアライト",
+        "hardMix": "ハード ミックス",
+        "difference": "よくある質問",
+        "exclusion": "免責事項",
+        "subtract": "サブトラクト",
+        "grainExtract": "穀物のエキス",
+        "grainMerge": "穀物マージ",
+        "divide": "ダイバーシティ",
+        "hue": "ログイン",
+        "chroma": "クロマ",
+        "color": "カラー",
+        "lightness": "ライトネス",
+        "luminance": "ルミナンス"
     }
 }

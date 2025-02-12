@@ -46,7 +46,18 @@
         "updateEraseLayer": "Borrar de Layer",
         "createTextLayer": "Crear capa de texto",
         "typeInTextLayer": "Tipo de capa de texto",
-        "waitingOnQueueFree": "Esperando a trabajar para completar"
+        "waitingOnQueueFree": "Esperando a trabajar para completar",
+        "createDrawGradientLayer": "Crear capa de ingredientes",
+        "duplicateLayer": "Duplicate Layer",
+        "rasterizeLayer": "Rasterize Layer",
+        "updateDrawGradientLayerBlendColorSpace": "Gradiente de actualización (Espacio de color)",
+        "updateDrawGradientLayerFillType": "Gradiente de actualización (Tipo de archivo)",
+        "updateDrawGradientLayerPosition": "Actualizar el nivel (Posición)",
+        "updateDrawGradientLayerSpreadMethod": "Actualizar el gradiente (Método de pan)",
+        "updateDrawGradientLayerStops": "Actualizar Gradient (Color Stops)",
+        "updateDeformBlurLayer": "Blur Layer",
+        "updateLayerBlendingMode": "Cambio Modo de amortiguación",
+        "updateLayerFilterMask": "Máscara de efecto de capa de actualización"
     },
     "app": {
         "colorPickerGradient": {
@@ -86,7 +97,10 @@
             "effects": "Efectos",
             "recalculatingEffect": "Procesando...",
             "moveEffectUp": "Efecto de movimiento",
-            "moveEffectDown": "Efecto de movimiento hacia abajo"
+            "moveEffectDown": "Efecto de movimiento hacia abajo",
+            "blendingMode": "Blending",
+            "duplicate": "Duplicar",
+            "rasterizeEffects": "Merge All"
         },
         "wait": {
             "applyLayerTransform": "Transformación de capas",
@@ -94,6 +108,12 @@
             "pleaseWait": "Espera",
             "trimLayerEmptySpace": "Trimming Empty Space",
             "cancel": "Cancelar"
+        },
+        "renderer": {
+            "initializeFailed": {
+                "title": "Setup Failed",
+                "message": "OpenGraphica confía en alguna funcionalidad web básica que no existe en su navegador. Por favor, actualice su navegador web, o cambie a uno moderno como Chrome, Firefox, Safari, o Edge."
+            }
         }
     },
     "brushCategory": {
@@ -129,7 +149,10 @@
         "addEffect": "Add Effect",
         "editEffects": "Editar efectos",
         "restoreLastImage": "Restaurar última imagen",
-        "pickColor": "Elija color"
+        "pickColor": "Elija color",
+        "delete": "Suprimir",
+        "discardChanges": "Cambios de disco",
+        "reverse": "Inversión"
     },
     "canvas": {
         "toolbar": {
@@ -400,6 +423,71 @@
         },
         "sepia": {
             "name": "Sepia"
+        },
+        "gradientMap": {
+            "param": {
+                "gradient": "Gradiente",
+                "colorSpace": "Espacio de color",
+                "colorSpaceOption": {
+                    "oklab": "Oklab",
+                    "perceptualRgb": "RGB perceptual",
+                    "linearRgb": "Linear RGB"
+                },
+                "mix": "Mezcla"
+            }
+        },
+        "instagram1997": {
+            "param": {
+                "mix": "Mezcla"
+            }
+        },
+        "instagramAden": {
+            "name": "Aden",
+            "param": {
+                "mix": "Mezcla"
+            }
+        },
+        "instagramClarendon": {
+            "name": "Clarendon",
+            "param": {
+                "mix": "Mezcla"
+            }
+        },
+        "instagramGingham": {
+            "name": "Gingham",
+            "param": {
+                "mix": "Mezcla"
+            }
+        },
+        "instagramInkwell": {
+            "name": "Inkwell",
+            "param": {
+                "mix": "Mezcla"
+            }
+        },
+        "instagramLofi": {
+            "name": "Lofi",
+            "param": {
+                "mix": "Mezcla"
+            }
+        },
+        "instagramToaster": {
+            "name": "Toaster",
+            "param": {
+                "mix": "Mezcla"
+            }
+        },
+        "instagramValencia": {
+            "name": "Valencia",
+            "param": {
+                "mix": "Mezcla"
+            }
+        },
+        "instagramXpro2": {
+            "name": "Xpro2",
+            "param": {
+                "mix": "Mezcla"
+            }
         }
     },
     "layerFilterGroup": {
@@ -437,7 +525,7 @@
                 "default": {
                     "label": "Deforme",
                     "description": [
-                        null,
+                        "Abra o borre la imagen",
                         "Bulge, áreas de pellizco de la imagen",
                         "Áreas de cierre de la imagen"
                     ]
@@ -596,7 +684,9 @@
         "pixelsPerCentimeter": "Pixels/Centimeter"
     },
     "menuBar": {
-        "toolsHeading": "Herramientas"
+        "toolsHeading": "Herramientas",
+        "expandToolGroup": "Ampliación",
+        "collapseToolGroup": "Collapse"
     },
     "module": {
         "fileExport": {
@@ -671,7 +761,9 @@
             "resetField": "Reset Field",
             "deleting": "Efecto de eliminación...",
             "deleteFilterError": "Se produjo un error al intentar eliminar el filtro. Si sigues viendo este mensaje, por favor reporta esto como un bicho.",
-            "applyFilterError": "Se produjo un error al intentar aplicar los cambios de filtro. Si sigues viendo este mensaje, por favor reporta esto como un bicho."
+            "applyFilterError": "Se produjo un error al intentar aplicar los cambios de filtro. Si sigues viendo este mensaje, por favor reporta esto como un bicho.",
+            "useActiveSelectionMask": "Aplicar la selección como máscara",
+            "clearSelectionMask": "Quitar Mascara"
         },
         "renameLayer": {
             "title": "Rename Layer",
@@ -705,6 +797,154 @@
                         "bottom": "Bottom"
                     },
                     "horizontalMargin": "Margen horizontal"
+                }
+            }
+        },
+        "fileOpenConfirm": {
+            "title": "¿Estás seguro?",
+            "warning": [
+                "Usted ha hecho ediciones a su archivo actual. Si abre un nuevo archivo ahora, estas ediciones serán descartadas. Si sólo desea añadir nuevas capas a este archivo, utilice la opción {insertPhoto}.",
+                "¿Desea continuar abriendo un nuevo archivo y descartando todos sus cambios?"
+            ]
+        },
+        "layerBlendingMode": {
+            "title": "Cambio Modo de amortiguación",
+            "blendingMode": "Modo de fusión",
+            "layerTop": "Top Layer",
+            "layerBottom": "Bottom Layer",
+            "imageResult": "Resultado",
+            "blendingModeSummary": {
+                "normal": {
+                    "description": "La capa superior cubre el fondo basado en su opacidad.",
+                    "example": "Cortar a una persona de una foto y añadirlas a otra foto."
+                },
+                "dissolve": {
+                    "description": "Aleatoriamente reemplaza los píxeles de la capa superior con píxeles transparentes basados en la opacidad, creando un efecto de ruido digital.",
+                    "example": "Creando una textura granulada."
+                },
+                "colorErase": {
+                    "description": "Elimina el color de la capa superior que coincide con el color de la capa inferior.",
+                    "example": "Eliminación de un fondo de pantalla verde de una imagen."
+                },
+                "erase": {
+                    "description": "Borra la capa inferior donde la capa superior es opaca.",
+                    "example": "Eliminación de objetos no deseados en una foto borrando esas áreas."
+                },
+                "lightenOnly": {
+                    "description": "Mantiene el color más ligero en cada canal R,G,B de las capas superior e inferior.",
+                    "example": "Agregar un efecto de brillo a un objeto sin oscurecer las áreas circundantes."
+                },
+                "lumaLightenOnly": {
+                    "description": "Compara el brillo perceptual entre las capas superior e inferior y mantiene los píxeles más brillantes.",
+                    "example": "Mejorar el brillo de una zona específica en una foto blanca y negra."
+                },
+                "screen": {
+                    "description": "Enciende la capa inferior basada en el brillo de la capa superior. La pantalla imita la forma en que la luz interactúa cuando se proyecta o se capa.",
+                    "example": "Hacer que una escena nocturna parezca más brillante."
+                },
+                "dodge": {
+                    "description": "Significativamente ilumina los aspectos más destacados y da detalles en las sombras. Esto imita el efecto de \"hacer\" en la fotografía de cuarto oscuro.",
+                    "example": "Añadiendo una luz solar."
+                },
+                "linearDodge": {
+                    "description": "Añade el brillo de las capas superior e inferior en el espacio perceptual SRGB.",
+                    "example": "Creando efectos de iluminación vibrantes e intensos."
+                },
+                "addition": {
+                    "description": "Añade el brillo de las capas superior e inferior en espacio lineal SRGB.",
+                    "example": "Creando efectos de iluminación vibrantes e intensos."
+                },
+                "darkenOnly": {
+                    "description": "Mantiene el color más oscuro en cada canal R,G,B de las capas superior e inferior.",
+                    "example": "Oscurecendo las sombras en una foto."
+                },
+                "lumaDarkenOnly": {
+                    "description": "Compara la oscuridad perceptual entre las capas superior e inferior y mantiene los píxeles más oscuros.",
+                    "example": "Exponiendo áreas brillantes de forma selectiva."
+                },
+                "multiply": {
+                    "description": "Oscurece la capa inferior basada en la oscuridad de la capa superior. Multiply mimics how multiple photographic negatives look when layered together.",
+                    "example": "Hacer que una imagen parezca más oscura, como simular sombras o escenas nocturnas."
+                },
+                "burn": {
+                    "description": "Oscurece la capa inferior proporcional a la oscuridad de la capa superior.",
+                    "example": "Añadiendo profundidad a las sombras."
+                },
+                "linearBurn": {
+                    "description": "Añade los píxeles de las capas superior e inferior, luego resta el valor más brillante posible.",
+                    "example": "Añadiendo un dramático look sombrío a la imagen."
+                },
+                "overlay": {
+                    "description": "Una combinación de multiplicación y pantalla, donde las áreas de luz se vuelven más ligeras y oscuras se vuelven más oscuras.",
+                    "example": "Agregar contraste a las fotos sin perder detalle."
+                },
+                "softLight": {
+                    "description": "Ilumina la imagen similar a la superposición pero con transiciones más graduales. La luz suave simula la iluminación difundida.",
+                    "example": "Añadiendo un brillo suave a los retratos."
+                },
+                "hardLight": {
+                    "description": "Una versión más dura de superposición, donde áreas brillantes se vuelven mucho más brillantes y zonas oscuras mucho más oscuras.",
+                    "example": "Aumentar dramáticamente el contraste en escenas de acción."
+                },
+                "vividLight": {
+                    "description": "Aumenta el contraste muy fuerte, incluso más comparado con la luz dura.",
+                    "example": "Fotos estilizantes con colores audaces, puntiagudos y contraste."
+                },
+                "pinLight": {
+                    "description": "Reemplaza píxeles basados en el brillo, manteniendo los píxeles más brillantes y oscuros, basados en su distancia de las tonalidades medias.",
+                    "example": "Crear un efecto posterizado con contraste agudo entre luz y oscuridad."
+                },
+                "linearLight": {
+                    "description": "Aumenta el contraste linealmente, el brillo o el oscurecimiento basado en la capa superior.",
+                    "example": "Simulación de iluminación artificial o mejora de superficies metálicas."
+                },
+                "hardMix": {
+                    "description": "Reduce la imagen a los colores primarios, creando un aspecto altamente estilizado.",
+                    "example": "Crear un libro cómico o efecto impreso en pantalla."
+                },
+                "difference": {
+                    "description": "Encuentra la diferencia entre capas, donde el negro no es diferencia aumentar el brillo del color es más diferente.",
+                    "example": "Alineando capas con contenido similar. Cuando dos píxeles son iguales, se vuelven negros."
+                },
+                "exclusion": {
+                    "description": "Una variación de la diferencia con menos contraste, para donde las diferencias sutiles deben ser resaltadas sin abrumar la imagen.",
+                    "example": "Invertir los colores selectivamente."
+                },
+                "subtract": {
+                    "description": "Sube el brillo en la capa superior de la parte inferior. El resultado es una gran cantidad de áreas negras o casi negras.",
+                    "example": "Creación de zonas oscuras de alto contraste."
+                },
+                "grainExtract": {
+                    "description": "Extrae el grano de película de una capa, también da una apariencia encarnada.",
+                    "example": "Extracción de grano de una textura de película para aplicar a otra textura."
+                },
+                "grainMerge": {
+                    "description": "Añade grano de la capa superior a la parte inferior, dejando una versión granulada de la capa original.",
+                    "example": "Agregar grano de película a una imagen digital para un aspecto vintage."
+                },
+                "divide": {
+                    "description": "Divide el brillo de la capa superior por la parte inferior.",
+                    "example": "Iluminar una imagen dramáticamente, creando un efecto brillante o etéreo. Se puede utilizar para la corrección de exposición."
+                },
+                "hue": {
+                    "description": "Utiliza el tono de la capa superior preservando el croma y la ligereza de la capa inferior.",
+                    "example": "Cambiar un cielo azul a púrpura mientras conserva su brillo."
+                },
+                "chroma": {
+                    "description": "Utiliza el croma (intensidad de color) de la capa superior preservando el casco y la ligereza de la capa inferior.",
+                    "example": "Boosting o reducción de la intensidad de los colores en una foto."
+                },
+                "color": {
+                    "description": "Combina el tono y el croma de la capa superior con la ligereza de la capa inferior.",
+                    "example": "Recolorar un objeto manteniendo intacta la sombra e iluminación."
+                },
+                "lightness": {
+                    "description": "Utiliza la ligereza de la capa superior preservando el tono y el croma de la capa inferior.",
+                    "example": "Iluminar o o oscurecer una imagen manteniendo los colores verdaderos."
+                },
+                "luminance": {
+                    "description": "Divide la luminancia de capa superior por capa inferior, luego multiplica el resultado a la capa inferior.",
+                    "example": "Iluminar o o oscurecer una imagen manteniendo los colores verdaderos."
                 }
             }
         }
@@ -806,11 +1046,15 @@
             "modules": {
                 "rename": {
                     "name": "Rename Layer",
-                    "description": "Cambiar el nombre de una capa"
+                    "description": "Cambiar el nombre de una capa."
                 },
                 "layerEffectBrowser": {
                     "name": "Navegador de efecto",
                     "description": "Añade efectos de imagen a las capas o grupos de capas seleccionados actualmente."
+                },
+                "blendingMode": {
+                    "name": "Modo de fusión de capa de cambio",
+                    "description": "Cambiar el modo de mezcla de la capa activa."
                 }
             }
         },
@@ -943,6 +1187,42 @@
         },
         "eraseBrush": {
             "brushSize": "Tamaño"
+        },
+        "deformBlur": {
+            "brushSize": "Tamaño"
+        },
+        "drawColorPicker": {
+            "title": "Color Picker"
+        },
+        "drawGradient": {
+            "editingGradient": "Edición de gradiente",
+            "newGradientLayerName": "Nuevo coeficiente",
+            "blendColorSpace": {
+                "label": "Espacio de color",
+                "oklab": "Oklab",
+                "srgb": "sRGB",
+                "linearSrgb": "SRGB linear"
+            },
+            "fillType": {
+                "label": "Tipo de relleno",
+                "linear": "Linear",
+                "radial": "Radial"
+            },
+            "spreadMethod": {
+                "label": "Método de propagación",
+                "pad": "Pad",
+                "repeat": "Repito",
+                "reflect": "Reflejo",
+                "truncate": "Truncate"
+            },
+            "stopDialog": {
+                "title": "Editar paradas de color",
+                "close": "Diálogo cercano",
+                "stopColor": "Color",
+                "stopOffset": "Offset",
+                "presets": "Presets",
+                "presetSettings": "Ajustes de posición"
+            }
         }
     },
     "toolGroup": {
@@ -952,7 +1232,11 @@
             "tools": {
                 "brush": {
                     "name": "Cepillo",
-                    "description": "Brujas que dibujan sobre capas de raster."
+                    "description": "Dibuja sobre capas como si estuviera usando un pincel de pintura."
+                },
+                "gradient": {
+                    "name": "Gradiente",
+                    "description": "Cree transiciones suaves entre colores."
                 }
             }
         },
@@ -1021,6 +1305,16 @@
                 "brush": {
                     "name": "Borrar el cepillo",
                     "description": "Borra datos de capas de raster."
+                }
+            }
+        },
+        "deform": {
+            "name": "Deforme",
+            "description": "Herramientas que manipulan los datos de imagen existentes, como clonar, abultar, desenfocar.",
+            "tools": {
+                "blur": {
+                    "name": "Blur",
+                    "description": "Cepillo que borre el área dibujada."
                 }
             }
         }
@@ -1140,6 +1434,66 @@
             "introduction": [
                 "La herramienta borrada le permite eliminar partes de la capa, haciéndolos transparentes."
             ]
+        },
+        "deformBlurToolIntroduction": {
+            "title": "Blur Tool",
+            "introduction": [
+                "La herramienta borrosa difuminará la porción de la capa actual que dibuja."
+            ]
+        },
+        "drawGradientToolIntroduction": {
+            "title": "Herramienta de ingredientes",
+            "introduction": [
+                "La herramienta gradiente le permite añadir capas gradientes. Usted puede controlar los límites visibles de esta herramienta combinando con la herramienta de selección o la herramienta borrada."
+            ],
+            "body": {
+                "mouse": [
+                    "Haga clic y arrastre para colocar un gradiente en el lienzo."
+                ],
+                "touch": [
+                    "Use un dedo para tocar y arrastrar para colocar un gradiente en el lienzo."
+                ]
+            }
         }
+    },
+    "gradientPreset": {
+        "blackToTransparent": "Negro a transparente",
+        "whiteToTransparent": "Blanco a transparente",
+        "blackToWhite": "Negro, Blanco"
+    },
+    "layerBlendingMode": {
+        "normal": "Normal",
+        "dissolve": "Dissolve",
+        "colorErase": "Color Erase",
+        "erase": "Borrar",
+        "lightenOnly": "Lighten Only",
+        "lumaLightenOnly": "Luma Lighten Sólo",
+        "screen": "Pantalla",
+        "dodge": "Dodge",
+        "linearDodge": "Dodge lineal",
+        "addition": "Adición",
+        "darkenOnly": "Darken Only",
+        "lumaDarkenOnly": "Luma Darken Sólo",
+        "multiply": "Multiply",
+        "burn": "Quema",
+        "linearBurn": "Quema lineal",
+        "overlay": "Superposición",
+        "softLight": "Luz suave",
+        "hardLight": "Luz dura",
+        "vividLight": "Vivid Light",
+        "pinLight": "Pin Light",
+        "linearLight": "Luz lineal",
+        "hardMix": "Mezcla dura",
+        "difference": "Diferencia",
+        "exclusion": "Exclusión",
+        "subtract": "Subtract",
+        "grainExtract": "Extracto de grano",
+        "grainMerge": "Grain Merge",
+        "divide": "Divide",
+        "hue": "Hue",
+        "chroma": "Chroma",
+        "color": "Color",
+        "lightness": "Luz",
+        "luminance": "Luminance"
     }
 }

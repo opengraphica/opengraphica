@@ -46,7 +46,18 @@
         "updateEraseLayer": "층의 Erase",
         "createTextLayer": "텍스트 레이어 만들기",
         "typeInTextLayer": "텍스트 레이어의 유형",
-        "waitingOnQueueFree": "업무 수행"
+        "waitingOnQueueFree": "업무 수행",
+        "createDrawGradientLayer": "Gradient 층 만들기",
+        "duplicateLayer": "중복 층",
+        "rasterizeLayer": "연락처",
+        "updateDrawGradientLayerBlendColorSpace": "Gradient 업데이트 (색상 공간)",
+        "updateDrawGradientLayerFillType": "Gradient 업데이트 (Fill Type)",
+        "updateDrawGradientLayerPosition": "Gradient 업데이트",
+        "updateDrawGradientLayerSpreadMethod": "Gradient 업데이트 (Spread 메서드)",
+        "updateDrawGradientLayerStops": "Gradient 업데이트 (컬러 스톱)",
+        "updateDeformBlurLayer": "Blur 층",
+        "updateLayerBlendingMode": "혼합 모드 변경",
+        "updateLayerFilterMask": "업데이트 레이어 효과 마스크"
     },
     "app": {
         "colorPickerGradient": {
@@ -86,7 +97,10 @@
             "effects": "제품정보",
             "recalculatingEffect": "기타...",
             "moveEffectUp": "이동 효과",
-            "moveEffectDown": "아래로 이동 효력"
+            "moveEffectDown": "아래로 이동 효력",
+            "blendingMode": "회사 소개",
+            "duplicate": "기타 제품",
+            "rasterizeEffects": "모든 것"
         },
         "wait": {
             "applyLayerTransform": "층 Transform 적용",
@@ -94,6 +108,12 @@
             "pleaseWait": "오시는 길",
             "trimLayerEmptySpace": "트리밍 빈 공간",
             "cancel": "이름 *"
+        },
+        "renderer": {
+            "initializeFailed": {
+                "title": "설정 실패",
+                "message": "OpenGraphica는 브라우저에 존재하지 않는 몇 가지 기본 웹 기능에 의존합니다. 웹 브라우저를 업데이트하거나 Chrome, Firefox, Safari 또는 Edge와 같은 현대 버전으로 전환하십시오."
+            }
         }
     },
     "brushCategory": {
@@ -129,7 +149,10 @@
         "addEffect": "추가 효과",
         "editEffects": "편집 효과",
         "restoreLastImage": "최근 이미지",
-        "pickColor": "색깔 선택"
+        "pickColor": "색깔 선택",
+        "delete": "이름 *",
+        "discardChanges": "Discard 변경",
+        "reverse": "이름 *"
     },
     "canvas": {
         "toolbar": {
@@ -400,6 +423,71 @@
         },
         "sepia": {
             "name": "인기 카테고리"
+        },
+        "gradientMap": {
+            "param": {
+                "gradient": "사이트맵",
+                "colorSpace": "색깔 공간",
+                "colorSpaceOption": {
+                    "oklab": "오크랩",
+                    "perceptualRgb": "영원한 RGB",
+                    "linearRgb": "선형 RGB"
+                },
+                "mix": "·"
+            }
+        },
+        "instagram1997": {
+            "param": {
+                "mix": "·"
+            }
+        },
+        "instagramAden": {
+            "name": "아이든",
+            "param": {
+                "mix": "·"
+            }
+        },
+        "instagramClarendon": {
+            "name": "콜롬비아",
+            "param": {
+                "mix": "·"
+            }
+        },
+        "instagramGingham": {
+            "name": "스낵 바",
+            "param": {
+                "mix": "·"
+            }
+        },
+        "instagramInkwell": {
+            "name": "잉크웰",
+            "param": {
+                "mix": "·"
+            }
+        },
+        "instagramLofi": {
+            "name": "로그아웃",
+            "param": {
+                "mix": "·"
+            }
+        },
+        "instagramToaster": {
+            "name": "토스터",
+            "param": {
+                "mix": "·"
+            }
+        },
+        "instagramValencia": {
+            "name": "운영 정보",
+            "param": {
+                "mix": "·"
+            }
+        },
+        "instagramXpro2": {
+            "name": "사이트맵",
+            "param": {
+                "mix": "·"
+            }
         }
     },
     "layerFilterGroup": {
@@ -437,7 +525,7 @@
                 "default": {
                     "label": "제품정보",
                     "description": [
-                        null,
+                        "Sharpen 또는 blur 이미지",
                         "Bulge, 이미지의 pinch 지역",
                         "이미지의 복제 영역"
                     ]
@@ -596,7 +684,9 @@
         "pixelsPerCentimeter": "화소/미터"
     },
     "menuBar": {
-        "toolsHeading": "제품정보"
+        "toolsHeading": "제품정보",
+        "expandToolGroup": "지원하다",
+        "collapseToolGroup": "뚱 베어"
     },
     "module": {
         "fileExport": {
@@ -671,7 +761,9 @@
             "resetField": "재설정 필드",
             "deleting": "공급 업체.",
             "deleteFilterError": "필터를 삭제하려고 하는 동안 오류가 발생했습니다. 이 메시지를 보시려면이 버그로보고하십시오.",
-            "applyFilterError": "오류는 필터 변경을 적용하려고하는 동안 발생했습니다. 이 메시지를 보시려면이 버그로보고하십시오."
+            "applyFilterError": "오류는 필터 변경을 적용하려고하는 동안 발생했습니다. 이 메시지를 보시려면이 버그로보고하십시오.",
+            "useActiveSelectionMask": "선택 적용",
+            "clearSelectionMask": "마스크 제거"
         },
         "renameLayer": {
             "title": "이름 층",
@@ -705,6 +797,154 @@
                         "bottom": "제품정보"
                     },
                     "horizontalMargin": "수평 마진"
+                }
+            }
+        },
+        "fileOpenConfirm": {
+            "title": "견적 요청?",
+            "warning": [
+                "현재 파일로 편집했습니다. 이제 새 파일을 열면, 이 편집은 삭제됩니다. 이 파일에 새 레이어를 추가하려면 {insertPhoto} 옵션을 사용하십시오.",
+                "새 파일을 열려면 계속 하시겠습니까?"
+            ]
+        },
+        "layerBlendingMode": {
+            "title": "혼합 모드 변경",
+            "blendingMode": "혼합 형태",
+            "layerTop": "상단 층",
+            "layerBottom": "밑바닥 층",
+            "imageResult": "제품정보",
+            "blendingModeSummary": {
+                "normal": {
+                    "description": "상단 층은 그것의 불투명에 근거를 둔 바닥을 포함합니다.",
+                    "example": "한 사진에서 사람을 잘라 다른 사진에 추가."
+                },
+                "dissolve": {
+                    "description": "임의의의는 디지털 잡음 효과를 창출하는 opacity를 기반으로 투명한 픽셀과 상단층의 픽셀을 대체합니다.",
+                    "example": "곡물 질감 만들기."
+                },
+                "colorErase": {
+                    "description": "더 낮은 층의 색상을 일치 상단 층에서 색상을 제거합니다.",
+                    "example": "이미지에서 녹색 화면 배경을 제거."
+                },
+                "erase": {
+                    "description": "상단 층이 불투명한 바닥 층을 제거한다.",
+                    "example": "사진의 원치 않는 개체를 제거하여 그 영역을 지우십시오."
+                },
+                "lightenOnly": {
+                    "description": "각 R, G의 B 수로 및 밑바닥 층에 있는 점화기 색깔을 지키십시오.",
+                    "example": "주변 지역을 어둡게하지 않고 객체에 글로우 효과를 추가합니다."
+                },
+                "lumaLightenOnly": {
+                    "description": "상단과 하단 레이어 사이의 영구 밝기를 비교하고 더 밝은 픽셀을 유지합니다.",
+                    "example": "검은 색과 흰색 사진의 특정 영역의 밝기를 향상시킵니다."
+                },
+                "screen": {
+                    "description": "상단 층의 밝기를 기반으로 바닥 층을 가집니다. 스크린 mimics는 계획되거나 층을 깔 때 빛 상호 작용합니다.",
+                    "example": "밤 장면이 더 밝게 나타납니다."
+                },
+                "dodge": {
+                    "description": "Significantly brightens 하이라이트와 그림자에 대한 세부 정보를 제공합니다. 어둠 속에서 \"도징\"의 영향을 미칩니다.",
+                    "example": "태양 flare 추가."
+                },
+                "linearDodge": {
+                    "description": "수직 SRGB 공간에 있는 정상과 바닥 층의 광도를 추가하십시오.",
+                    "example": "활기찬, 강렬한 조명 효과 만들기."
+                },
+                "addition": {
+                    "description": "선형 SRGB 공간의 상단과 하단 레이어의 밝기를 추가합니다.",
+                    "example": "활기찬, 강렬한 조명 효과 만들기."
+                },
+                "darkenOnly": {
+                    "description": "각 R, G의 B 수로 및 밑바닥 층에 있는 더 어두운 색깔을 지키십시오.",
+                    "example": "사진에 그림자를 희게합니다."
+                },
+                "lumaDarkenOnly": {
+                    "description": "상단과 하단 레이어 사이의 영구 어둠을 비교하고 더 어두운 픽셀을 유지합니다.",
+                    "example": "선택적으로 밝은 영역을 뚫는."
+                },
+                "multiply": {
+                    "description": "상단 층의 어둠을 기반으로 바닥 층을 어둠. 여러 사진 음이 어떻게 함께 층으로 나타낸다.",
+                    "example": "그림자 또는 밤 장면을 시뮬레이션처럼 더 어두운 이미지를 만듭니다."
+                },
+                "burn": {
+                    "description": "상단 층의 어둠에 대한 바닥 층 비례.",
+                    "example": "그림자에 깊이를 추가합니다."
+                },
+                "linearBurn": {
+                    "description": "위와 더 낮은 층의 화소를 추가하고, 가장 밝은 가능한 가치를 빼십시오.",
+                    "example": "극적인 그림자를 이미지로 추가합니다."
+                },
+                "overlay": {
+                    "description": "가닥과 스크린의 조합은, 빛 지역이 점화되고 어두운 지역은 더 어둡게 됩니다.",
+                    "example": "세부 사항을 잃지 않고 사진에 대비합니다."
+                },
+                "softLight": {
+                    "description": "Overlay와 유사한 이미지를 Brightens하지만 더 많은 gradual 전환. 연약한 빛은 확산된 점화를 가장합니다.",
+                    "example": "초상화에 부드러운 빛을 추가합니다."
+                },
+                "hardLight": {
+                    "description": "오버레이의 가혹한 버전, 밝은 지역은 훨씬 더 밝고 어두운 지역이 훨씬 더 어둡게됩니다.",
+                    "example": "극적으로 행동 장면에서 대비 증가."
+                },
+                "vividLight": {
+                    "description": "매우 강하게 대조를 증가시키고, 더 단단한 빛과 비교해.",
+                    "example": "대담한, 펀치 색상 및 대비를 가진 스타일링 사진."
+                },
+                "pinLight": {
+                    "description": "밝기를 기반으로 픽셀을 교체하고, 가장 밝고 어두운 픽셀을 유지하고, 중간에서 거리를 기반으로합니다.",
+                    "example": "빛과 어두운 사이 날카로운 대조를 가진 posterized 효력을 창조하십시오."
+                },
+                "linearLight": {
+                    "description": "밝고 밝고 짙은 밝고, 밝고, 밝고, 밝고, 짙은 밝고, 밝고, 밝고, 짙은 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 짙은 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고.",
+                    "example": "인공 조명 또는 금속 표면을 강화."
+                },
+                "hardMix": {
+                    "description": "이미지가 1차 색상으로 줄어들고, 매우 안정된 모습을 만들어냅니다.",
+                    "example": "만화책 또는 스크린 인쇄 효과 만들기."
+                },
+                "difference": {
+                    "description": "레이어의 차이를 찾아, 검은 색이 차이 증가하는 색상 밝기는 더 다르다.",
+                    "example": "비슷한 콘텐츠를 가진 층 정렬. 두 개의 픽셀이 동일 할 때, 그들은 검은 색을 켭니다."
+                },
+                "exclusion": {
+                    "description": "더 적은 대조를 가진 다름의 변이, 어떤 미묘한 다름은 이미지를 압도 없이 강조될 필요가 있습니다.",
+                    "example": "선택할 수 있는 색상."
+                },
+                "subtract": {
+                    "description": "하단의 상단층의 밝기를 뺍니다. 결과는 검은 색 또는 검은 색 영역의 많은 것입니다.",
+                    "example": "높은 대조 어두운 지역을 창조하십시오."
+                },
+                "grainExtract": {
+                    "description": "층에서 영화 곡물을 추출, 또한 엠보싱 외관을 제공합니다.",
+                    "example": "필름 질감에서 곡물을 추출하여 다른 질감에 적용합니다."
+                },
+                "grainMerge": {
+                    "description": "상단 층에서 바닥에 곡물을 추가, 원래 층의 곡물 버전을 떠나.",
+                    "example": "영화 곡물을 빈티지 보기에 대한 디지털 이미지에 추가."
+                },
+                "divide": {
+                    "description": "상단층의 밝기를 바닥으로 나눕니다.",
+                    "example": "이미지를 극적으로 점화하고, 빛나는 또는 ethereal 효력을 창조하십시오. 노출 개정을 위해 사용될 수 있습니다."
+                },
+                "hue": {
+                    "description": "아래 층의 크롬과 가벼움을 보존하면서 상단 층의 턱을 사용합니다.",
+                    "example": "푸른 하늘을 보라색으로 바꾸고 밝기를 유지하면서."
+                },
+                "chroma": {
+                    "description": "상단층의 크롬(intensity of color)를 사용하여 바닥층의 턱과 가벼움을 보존합니다.",
+                    "example": "사진의 색상의 강도를 높일 수 있습니다."
+                },
+                "color": {
+                    "description": "밑바닥 층의 가벼움을 가진 최고 층의 hue와 크롬을 결합하십시오.",
+                    "example": "셰이딩 및 조명 intact를 유지하면서 객체를 재coloring."
+                },
+                "lightness": {
+                    "description": "아래 층의 hue와 크롬을 보존하면서 상단 층의 가벼움을 사용합니다.",
+                    "example": "색상을 true 유지하면서 이미지를 밝히거나 어둡게합니다."
+                },
+                "luminance": {
+                    "description": "더 낮은 층에 의해 위 층 발광성, 그 후에 더 낮은 층에 결과를 다룹니다.",
+                    "example": "색상을 true 유지하면서 이미지를 밝히거나 어둡게합니다."
                 }
             }
         }
@@ -806,11 +1046,15 @@
             "modules": {
                 "rename": {
                     "name": "이름 층",
-                    "description": "층의 이름을 변경"
+                    "description": "층의 이름을 변경합니다."
                 },
                 "layerEffectBrowser": {
                     "name": "비밀번호",
                     "description": "현재 선택된 층(s) 또는 층 그룹(s)에 이미지 효과를 추가합니다."
+                },
+                "blendingMode": {
+                    "name": "변화 층 혼합 형태",
+                    "description": "활성 층의 혼합 모드를 변경합니다."
                 }
             }
         },
@@ -943,6 +1187,42 @@
         },
         "eraseBrush": {
             "brushSize": "크기 (mm)"
+        },
+        "deformBlur": {
+            "brushSize": "크기 (mm)"
+        },
+        "drawColorPicker": {
+            "title": "색깔 피커"
+        },
+        "drawGradient": {
+            "editingGradient": "Gradient 편집",
+            "newGradientLayerName": "새로운 기온",
+            "blendColorSpace": {
+                "label": "색깔 공간",
+                "oklab": "오크랩",
+                "srgb": "사이트맵",
+                "linearSrgb": "선형 sRGB"
+            },
+            "fillType": {
+                "label": "충전 유형",
+                "linear": "제품정보",
+                "radial": "관련 기사"
+            },
+            "spreadMethod": {
+                "label": "스프레드 방법",
+                "pad": "기타",
+                "repeat": "기타 제품",
+                "reflect": "제품정보",
+                "truncate": "관련 기사"
+            },
+            "stopDialog": {
+                "title": "편집 색상 정지",
+                "close": "닫기 Dialog",
+                "stopColor": "색깔: 백색",
+                "stopOffset": "제품정보",
+                "presets": "기타 제품",
+                "presetSettings": "Preset 설정"
+            }
         }
     },
     "toolGroup": {
@@ -952,7 +1232,11 @@
             "tools": {
                 "brush": {
                     "name": "제품정보",
-                    "description": "래스터 레이어에 그리는 브러쉬."
+                    "description": "페인트 브러시를 사용하는 경우 레이어에 그리기."
+                },
+                "gradient": {
+                    "name": "사이트맵",
+                    "description": "색상 사이의 부드러운 전환을 만듭니다."
                 }
             }
         },
@@ -1021,6 +1305,16 @@
                 "brush": {
                     "name": "Erase 브러쉬",
                     "description": "Raster 층의 데이터 삭제."
+                }
+            }
+        },
+        "deform": {
+            "name": "제품정보",
+            "description": "복제, bulging, blurring과 같은 기존 이미지 데이터를 조작하는 도구.",
+            "tools": {
+                "blur": {
+                    "name": "뚱 베어",
+                    "description": "Blurs 지역 그려지는 솔."
                 }
             }
         }
@@ -1140,6 +1434,66 @@
             "introduction": [
                 "지우개 도구는 층의 부품을 제거 할 수 있으므로 투명하게 만듭니다."
             ]
+        },
+        "deformBlurToolIntroduction": {
+            "title": "Blur 공구",
+            "introduction": [
+                "Blur 도구는 현재 레이어의 일부를 blur합니다."
+            ]
+        },
+        "drawGradientToolIntroduction": {
+            "title": "Gradient 공구",
+            "introduction": [
+                "Gradient 도구는 gradient 레이어를 추가 할 수 있습니다. 선택 도구 또는 지우기 도구와 결합하여이 도구의 눈에 보이는 경계를 제어 할 수 있습니다."
+            ],
+            "body": {
+                "mouse": [
+                    "캔버스에 gradient를 배치하고 드래그하십시오."
+                ],
+                "touch": [
+                    "한 손가락을 터치하고 캔버스에 그라디언트를 배치합니다."
+                ]
+            }
         }
+    },
+    "gradientPreset": {
+        "blackToTransparent": "투명한 검정",
+        "whiteToTransparent": "투명한에 백색",
+        "blackToWhite": "검정, 백색"
+    },
+    "layerBlendingMode": {
+        "normal": "·",
+        "dissolve": "기타 제품",
+        "colorErase": "색깔 Erase",
+        "erase": "언어 선택",
+        "lightenOnly": "빛 만",
+        "lumaLightenOnly": "Luma 라이센 지원하다",
+        "screen": "제품정보",
+        "dodge": "닷지",
+        "linearDodge": "선형 Dodge",
+        "addition": "더 보기",
+        "darkenOnly": "어둠 만",
+        "lumaDarkenOnly": "루마 Darken 지원하다",
+        "multiply": "기타 제품",
+        "burn": "뚱 베어",
+        "linearBurn": "선형 화상",
+        "overlay": "오버레이",
+        "softLight": "연한 빛",
+        "hardLight": "단단한 빛",
+        "vividLight": "생생한 빛",
+        "pinLight": "핀 빛",
+        "linearLight": "선형 빛",
+        "hardMix": "하드 믹스",
+        "difference": "주요 특징",
+        "exclusion": "이름 *",
+        "subtract": "기타 제품",
+        "grainExtract": "곡물 추출물",
+        "grainMerge": "곡물 Merge",
+        "divide": "한국어",
+        "hue": "Hue 조명",
+        "chroma": "크롬",
+        "color": "색깔: 백색",
+        "lightness": "밝기",
+        "luminance": "운영 정보"
     }
 }
