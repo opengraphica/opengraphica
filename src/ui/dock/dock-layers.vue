@@ -6,10 +6,10 @@
                 <span class="bi bi-file-earmark-plus mr-1" aria-hidden="true"></span>
                 {{ $t('dock.layers.layer') }}
             </el-button>
-            <el-button link type="primary" class="px-0" @click="onAddGroup">
+            <!-- <el-button link type="primary" class="px-0" @click="onAddGroup">
                 <span class="bi bi-folder-plus el-text-alignment-fix--above mr-1" aria-hidden="true"></span>
                 {{ $t('dock.layers.group') }}
-            </el-button>
+            </el-button> -->
         </div>
     </div>
     <div class="ogr-dock-content is-spaced-between">
