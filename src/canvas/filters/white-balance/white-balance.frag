@@ -1,13 +1,13 @@
 uniform vec4 pWhite;
 
 vec4 processWhiteBalance(vec4 color) {
-    vec4 white = pWhite;
-    vec3 whiteLab = rgbToOklab(srgbToLinearSrgb(white.rgb));
-    float neutral = whiteLab.x;
+    vec3 white = srgbToLinearSrgb(pWhite.rgb);
 
-    color.r = clamp(color.r * neutral / white.r, 0.0, 1.0);
-    color.g = clamp(color.g * neutral / white.g, 0.0, 1.0);
-    color.b = clamp(color.b * neutral / white.b, 0.0, 1.0);
+    float neutral = (0.22 * white.r) + (0.72 * white.g) + (0.06 * white.b);
+
+    vec3 scale = vec3(neutral) / white;
+
+    color.rgb = clamp(color.rgb * scale, 0.0, 1.0);
 
     return color;
 }
