@@ -1,5 +1,5 @@
 <template>
-    <div class="ogr-dialogs" :class="{ 'ogr-dialogs--loading': loading }">
+    <div class="ogr-dialogs" :hidden="isAllDialogsHidden" :class="{ 'ogr-dialogs--loading': loading }">
         <template v-for="dialog of dialogs" :key="dialog.id">
             <suspense>
                 <template #default>
@@ -52,9 +52,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, defineAsyncComponent, ref, onMounted, onUnmounted } from 'vue';
+import { computed, defineComponent, defineAsyncComponent, ref, onMounted, onUnmounted } from 'vue';
 import Dock from '@/ui/dock/dock.vue';
 import Module from '@/ui/module/module.vue';
+import editorStore from '@/store/editor';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import appEmitter, { AppEmitterEvents } from '@/lib/emitter';
 
@@ -96,6 +97,10 @@ export default defineComponent({
         let dialogIdCounter: number = 0;
         const dialogs = ref<DialogDefinition[]>([]);
         const loading = ref(false);
+
+        const isAllDialogsHidden = computed(() => {
+            return editorStore.state.isToolHidingDialogs;
+        });
 
         onMounted(() => {
             appEmitter.on('app.dialogs.openFromDock', handleDockOpen);
@@ -179,6 +184,7 @@ export default defineComponent({
 
         return {
             loading,
+            isAllDialogsHidden,
             dialogs,
             onHideDialog,
             onShowDialog,

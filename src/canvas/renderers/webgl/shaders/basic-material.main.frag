@@ -1,5 +1,4 @@
-
-void main() {
+vec4 materialMain(vec2 uv) {
     // Calculate the mip level based on the texture coordinates
     // vec2 textureSize = vec2(float(cMapWidth), float(cMapHeight));
     // float lod = log2(max(textureSize.x, textureSize.y)); // Max dimension of the texture
@@ -43,6 +42,10 @@ void main() {
     //     discard;
     // }
 
-    gl_FragColor = texture2D(map, vUv);
+    return texture2D(map, vUv);
+}
+
+void main() {
+    gl_FragColor = materialMain(vUv);
     //[INJECT_FILTERS_HERE]
 }

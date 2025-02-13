@@ -6,16 +6,6 @@ uniform float pBrightness;
 uniform vec2 pEffectiveRange;
 uniform vec2 pEffectiveRangeFeather;
 
-// vec4 processBrightness(vec4 color) {
-//     vec3 lab = rgbToOklab(color.rgb);
-//     lab.x += pBrightness;
-//     // float darknessMultiplier = abs(pBrightness);
-//     // lab.x -= step(pBrightness, 0.0) * lab.x * darknessMultiplier;
-//     // lab.x += step(0.0, pBrightness) * ((1.0 - lab.x) * pBrightness);
-//     color.rgb = oklabToRgb(lab);
-//     return color;
-// }
-
 vec4 processBrightness(vec4 color) {
     vec3 rgb = linearSrgbToSrgb(color.rgb);
     vec3 newRgb = vec3(rgb.rgb);

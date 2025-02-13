@@ -41,7 +41,8 @@
                     "exclusive": true,
                     "position": "top",
                     "target": "draw-color-picker"
-                }
+                },
+                "hideDialogs": true
             }
         }
     },

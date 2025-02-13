@@ -51,6 +51,7 @@ interface EditorState {
     isActiveToolbarExclusive: boolean;
     isPenUser: boolean;
     isTaskRunning: boolean;
+    isToolHidingDialogs: boolean;
     isTouchUser: boolean;
     lastActiveThemeName: string | null;
     loadingThemeName: string | null;
@@ -116,6 +117,7 @@ const store = new PerformantStore<EditorStore>({
         isActiveToolbarExclusive: false,
         isPenUser: false,
         isTaskRunning: false,
+        isToolHidingDialogs: false,
         isTouchUser: true,
         lastActiveThemeName: null,
         loadingThemeName: null,
@@ -222,6 +224,7 @@ const store = new PerformantStore<EditorStore>({
                     if (toolDefinition?.overlays) {
                         activeToolOverlays = toolDefinition.overlays;
                     }
+                    set('isToolHidingDialogs', !!toolDefinition?.hideDialogs);
                     set('activeToolGroupPrevious', store.get('activeToolGroup'));
                     set('activeToolGroup', group);
                     set('activeToolGroupRestore', group);

@@ -374,6 +374,18 @@
                 }
             }
         },
+        "chromaKey": {
+            "name": "Chroma Key",
+            "param": {
+                "eraseColor": "Erase Color",
+                "threshold": "Erase Threshold",
+                "softness": "Softness",
+                "spillSuppression": "Spill Suppression",
+                "hueWeight": "Hue Weight",
+                "chromaWeight": "Chroma Weight",
+                "lightnessWeight": "Lightness Weight"
+            }
+        },
         "colorBlindness": {
             "name": "Color Blindness",
             "param": {
@@ -535,6 +547,12 @@
         },
         "sepia": {
             "name": "Sepia"
+        },
+        "whiteBalance": {
+            "name": "White Balance",
+            "param": {
+                "white": "White Color"
+            }
         }
     },
     "layerFilterGroup": {

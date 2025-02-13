@@ -1,6 +1,6 @@
 
-void main() {
-    vec2 fragCoord = vec2(vUv.x * float(cCanvasWidth), (1.0 - vUv.y) * float(cCanvasHeight));
+vec4 materialMain(vec2 uv) {
+    vec2 fragCoord = vec2(uv.x * float(cCanvasWidth), (1.0 - uv.y) * float(cCanvasHeight));
 
 #if cFillType == GRADIENT_FILL_TYPE_LINEAR
     vec2 dt = end - start;
@@ -54,19 +54,25 @@ void main() {
     }
 #endif // cSpreadMethod
 
-    gl_FragColor = texture2D(stops, vec2(t, 0.0));
+    vec4 color = texture2D(stops, vec2(t, 0.0));
 
 #if cBlendColorSpace == GRADIENT_COLOR_SPACE_SRGB
-    gl_FragColor.a = (
-        (1.0 - srgbChannelToLinearSrgbChannel(1.0 - gl_FragColor.a)) * mix(1.0, 0.0, float(cAverageBrightness)) +
-        (srgbChannelToLinearSrgbChannel(gl_FragColor.a)) * mix(0.0, 1.0, float(cAverageBrightness))
+    color.a = (
+        (1.0 - srgbChannelToLinearSrgbChannel(1.0 - color.a)) * mix(1.0, 0.0, float(cAverageBrightness)) +
+        (srgbChannelToLinearSrgbChannel(color.a)) * mix(0.0, 1.0, float(cAverageBrightness))
     );
 #elif cBlendColorSpace == GRADIENT_COLOR_SPACE_OKLAB
-    gl_FragColor.a = (
-        (1.0 - (oklabToRgb(vec3(1.0 - gl_FragColor.a, 0.0, 0.0)).r)) * mix(1.0, 0.0, float(cAverageBrightness)) +
-        (oklabToRgb(vec3(gl_FragColor.a, 0.0, 0.0)).r) * mix(0.0, 1.0, float(cAverageBrightness))
+    color.a = (
+        (1.0 - (oklabToRgb(vec3(1.0 - color.a, 0.0, 0.0)).r)) * mix(1.0, 0.0, float(cAverageBrightness)) +
+        (oklabToRgb(vec3(color.a, 0.0, 0.0)).r) * mix(0.0, 1.0, float(cAverageBrightness))
     );
 #endif // cBlendColorSpace
 
+    return color;
+}
+
+void main() {
+    gl_FragColor = materialMain(vUv);
+    
     //[INJECT_FILTERS_HERE]
 }

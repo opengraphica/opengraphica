@@ -70,6 +70,12 @@ export interface CanvasFilterEditConfigPercentageRange extends CanvasFilterEditC
     preview?: number[];
 }
 
+export interface CanvasFilterEditConfigColor extends CanvasFilterEditConfigFieldCommon {
+    type: 'color';
+    default: RGBAColor;
+    preview?: RGBAColor;
+}
+
 export interface CanvasFilterEditConfigGradient extends CanvasFilterEditConfigFieldCommon {
     type: 'gradient';
     default: WorkingFileGradientColorStop<RGBAColor>[];
@@ -77,7 +83,7 @@ export interface CanvasFilterEditConfigGradient extends CanvasFilterEditConfigFi
     preview?: WorkingFileGradientColorStop<RGBAColor>[];
 }
 
-export type CanvasFilterEditConfigField = CanvasFilterEditConfigBoolean | CanvasFilterEditConfigInteger | CanvasFilterEditConfigFloat | CanvasFilterEditConfigPercentage | CanvasFilterEditConfigPercentageRange | CanvasFilterEditConfigComputedFloat | CanvasFilterEditConfigGradient;
+export type CanvasFilterEditConfigField = CanvasFilterEditConfigBoolean | CanvasFilterEditConfigInteger | CanvasFilterEditConfigFloat | CanvasFilterEditConfigPercentage | CanvasFilterEditConfigPercentageRange | CanvasFilterEditConfigComputedFloat | CanvasFilterEditConfigColor | CanvasFilterEditConfigGradient;
 
 export interface CanvasFilterEditConfig {
     [key: string]: CanvasFilterEditConfigField;

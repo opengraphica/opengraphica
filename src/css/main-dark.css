@@ -29058,6 +29058,7 @@ body.ogr-full-page .opengraphica {
   border-bottom-left-radius: 0;
 }
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-input > .el-input__wrapper,
+.opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-color-picker > .el-color-picker__trigger,
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-input-group > *:last-child,
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-row > .el-col > .el-input > .el-input__wrapper,
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-row > .el-col > .el-input-group > *:last-child,
@@ -29072,6 +29073,7 @@ body.ogr-full-page .opengraphica {
   border-top-left-radius: var(--ogr-border-radius);
 }
 .opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-input > .el-input__wrapper,
+.opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-color-picker > .el-color-picker__trigger,
 .opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-input-group > *:last-child,
 .opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-row > .el-col:last-child > .el-input-group > *:last-child,
 .opengraphica .el-form-item-group .el-form-item:first-child .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__wrapper,
@@ -29084,6 +29086,7 @@ body.ogr-full-page .opengraphica {
   border-bottom-left-radius: var(--ogr-border-radius);
 }
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-input > .el-input__wrapper,
+.opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-color-picker > .el-color-picker__trigger,
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-input-group > *:last-child,
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-row > .el-col:last-child > .el-input-group > *:last-child,
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-row > .el-col:last-child > .el-input:last-child > .el-input__wrapper,
@@ -29120,6 +29123,15 @@ body.ogr-full-page .opengraphica {
   z-index: 2;
 }
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content .el-row {
+  width: 100%;
+}
+.opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-color-picker {
+  width: 100%;
+}
+.opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-color-picker > .el-color-picker__trigger {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  height: 2.5rem;
   width: 100%;
 }
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-select, .opengraphica .el-form-item-group .el-form-item .el-form-item__content > .el-input {
@@ -29213,6 +29225,7 @@ body.ogr-full-page .opengraphica {
   position: relative;
 }
 .opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content > .el-row,
+.opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content > .el-color-picker,
 .opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content > .el-input,
 .opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content > .el-select,
 .opengraphica .el-form-item-group.el-form-item-group--resetable .el-form-item > .el-form-item__content > .el-switch,

@@ -70,13 +70,6 @@
                                     </el-input-number>
                                 </el-col>
                             </el-row>
-                            <el-button
-                                link type="primary" class="el-button--form-item-reset"
-                                :disabled="isFilterParamDefault(paramName, editConfigField)"
-                                :aria-label="t('module.layerEffectEdit.resetField')"
-                                @click="resetFilterParam(paramName, editConfigField)">
-                                <span class="bi bi-arrow-repeat" aria-hidden="true" />
-                            </el-button>
                         </template>
                         <template v-if="editConfigField.type === 'percentageRange'">
                             <el-row>
@@ -115,13 +108,6 @@
                                     </el-input-number>
                                 </el-col>
                             </el-row>
-                            <el-button
-                                link type="primary" class="el-button--form-item-reset"
-                                :disabled="isFilterParamDefault(paramName, editConfigField)"
-                                :aria-label="t('module.layerEffectEdit.resetField')"
-                                @click="resetFilterParam(paramName, editConfigField)">
-                                <span class="bi bi-arrow-repeat" aria-hidden="true" />
-                            </el-button>
                         </template>
                         <template v-else-if="editConfigField.type === 'integer' && editConfigField.options">
                             <el-select v-model="formData.filterParams[paramName]" popper-class="el-select-dropdown--unlocked-option-height">
@@ -139,23 +125,12 @@
                                     </div>
                                 </el-option>
                             </el-select>
-                            <el-button
-                                link type="primary" class="el-button--form-item-reset"
-                                :disabled="isFilterParamDefault(paramName, editConfigField)"
-                                :aria-label="t('module.layerEffectEdit.resetField')"
-                                @click="resetFilterParam(paramName, editConfigField)">
-                                <span class="bi bi-arrow-repeat" aria-hidden="true" />
-                            </el-button>
                         </template>
                         <template v-else-if="editConfigField.type === 'boolean'">
                             <el-switch v-model="formData.filterParams[paramName]" />
-                            <el-button
-                                link type="primary" class="el-button--form-item-reset"
-                                :disabled="isFilterParamDefault(paramName, editConfigField)"
-                                :aria-label="t('module.layerEffectEdit.resetField')"
-                                @click="resetFilterParam(paramName, editConfigField)">
-                                <span class="bi bi-arrow-repeat" aria-hidden="true" />
-                            </el-button>
+                        </template>
+                        <template v-else-if="editConfigField.type === 'color'">
+                            <el-input-color v-model="formData.filterParams[paramName]" />
                         </template>
                         <template v-else-if="editConfigField.type === 'gradient'">
                             <div
@@ -168,14 +143,14 @@
                                 @keydown="onKeydownStopGradientSelect($event, paramName)"
                             >
                             </div>
-                            <el-button
-                                link type="primary" class="el-button--form-item-reset"
-                                :disabled="isFilterParamDefault(paramName, editConfigField)"
-                                :aria-label="t('module.layerEffectEdit.resetField')"
-                                @click="resetFilterParam(paramName, editConfigField)">
-                                <span class="bi bi-arrow-repeat" aria-hidden="true" />
-                            </el-button>
                         </template>
+                        <el-button
+                            link type="primary" class="el-button--form-item-reset"
+                            :disabled="isFilterParamDefault(paramName, editConfigField)"
+                            :aria-label="t('module.layerEffectEdit.resetField')"
+                            @click="resetFilterParam(paramName, editConfigField)">
+                            <span class="bi bi-arrow-repeat" aria-hidden="true" />
+                        </el-button>
                     </el-form-item>
                 </template>
             </el-form-item-group>
@@ -202,6 +177,7 @@ import ElCol from 'element-plus/lib/components/col/index';
 import ElDivider from 'element-plus/lib/components/divider/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElFormItemGroup from '@/ui/el/el-form-item-group.vue';
+import ElInputColor from '@/ui/el/el-input-color.vue';
 import ElInputNumber from '@/ui/el/el-input-number.vue';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import ElSlider from 'element-plus/lib/components/slider/index';
@@ -268,6 +244,7 @@ export default defineComponent({
         ElForm,
         ElFormItem,
         ElFormItemGroup,
+        ElInputColor,
         ElInputNumber,
         ElOption,
         ElRow,
@@ -841,6 +818,10 @@ export default defineComponent({
         }
 
         function onDelete() {
+            if (props.isFilterJustAdded) {
+                onCancel();
+                return;
+            }
             if (layer.value) {
                 isDeleting.value = true;
                 historyStore.dispatch('runAction', {

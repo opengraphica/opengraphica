@@ -1,5 +1,6 @@
 import { camelCaseToKebabCase } from "@/lib/string";
 import { Vector2 } from 'three/src/math/Vector2';
+import { Vector4 } from 'three/src/math/Vector4';
 import { CanvasTexture } from 'three/src/textures/CanvasTexture';
 import { Texture } from 'three/src/textures/Texture';
 
@@ -99,6 +100,8 @@ function translateParamToUniformValue(paramValue: any, editConfig: CanvasFilterE
         paramValue = paramValue === true ? 1 : 0;
     } else if (type === 'percentageRange') {
         paramValue = new Vector2(paramValue[0], paramValue[1]);
+    } else if (type === 'color') {
+        paramValue = new Vector4(paramValue.r, paramValue.g, paramValue.b, paramValue.a);
     } else if (type === 'gradient') {
         const colorSpaceFieldName = (editConfig[editParamName] as CanvasFilterEditConfigGradient).colorSpaceFieldName;
         const blendColorSpace = ({
@@ -192,6 +195,9 @@ export function combineFiltersToShader(canvasFilters: CanvasFilter[], layerInfo:
     let fragmentShaderMainCalls: string[] = [];
 
     const alreadyIncludedFilters = new Set<string>();
+    const useFunctionNameStack: string[] = [];
+
+    fragmentShader = 'vec4 materialMain(vec2 uv);\n' + fragmentShader;
 
     for (const [index, canvasFilter] of canvasFilters.entries()) {
         const editConfig = canvasFilter.getEditConfig();
@@ -223,6 +229,14 @@ export function combineFiltersToShader(canvasFilters: CanvasFilter[], layerInfo:
         if (filterFragmentShader?.includes(searchFunctionName)) {
             if (alreadyIncludedFilters.has(canvasFilter.name)) {
                 filterFragmentShader = filterFragmentShader.replace(/const int.*?;/g, '');
+            }
+            if (filterFragmentShader.includes('sampleBackbuffer(')) {
+                filterFragmentShader = filterFragmentShader.replace(/sampleBackbuffer\(/g, `sampleBackbuffer${index}(`);
+                fragmentShader += `vec4 sampleBackbuffer${index}(vec2 uv) { return ${
+                    useFunctionNameStack.map(name => name + '(').join('')
+                }materialMain(uv)${
+                    useFunctionNameStack.map(_ => ')').join('')
+                }; }\n`;
             }
             filterFragmentShader = filterFragmentShader.replace(searchFunctionName + '(', useFunctionName + '(');
             if (maskTexture) {
@@ -267,6 +281,7 @@ export function combineFiltersToShader(canvasFilters: CanvasFilter[], layerInfo:
             fragmentShader += `uniform sampler2D filterMask${index}Map;\n`;
         }
         alreadyIncludedFilters.add(canvasFilter.name);
+        useFunctionNameStack.push(useFunctionName);
     }
 
     let vertexFilterCode = '';

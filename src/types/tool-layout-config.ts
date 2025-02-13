@@ -60,6 +60,7 @@ export interface ToolDefinition {
         target: string;
     };
     overlays: string[];
+    hideDialogs?: boolean;
 }
 
 export interface ToolGroupDefinition {
