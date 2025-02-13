@@ -551,7 +551,7 @@
         "whiteBalance": {
             "name": "White Balance",
             "param": {
-                "white": "White Color"
+                "white": "Neutral Color"
             }
         }
     },

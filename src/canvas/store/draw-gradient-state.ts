@@ -49,7 +49,7 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
                 offset: 1,
                 color: {
                     is: 'color',
-                    r: 1, g: 1, b: 1, alpha: 1,
+                    r: 0, g: 0, b: 0, alpha: 0,
                     style: '#ffffff'
                 }
             },

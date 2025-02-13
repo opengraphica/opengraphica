@@ -31,6 +31,10 @@
         "name": "layerFilter.negative.name",
         "group": "color"
     },
+    "whiteBalance": {
+        "name": "layerFilter.whiteBalance.name",
+        "group": "color"
+    },
 
     "instagram1997": {
         "name": "layerFilter.instagram1997.name",

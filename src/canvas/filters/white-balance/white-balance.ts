@@ -1,6 +1,6 @@
 import fragmentShader from './white-balance.frag';
 import { transfer8BitImageDataToLinearSrgb, transferLinearSrgbTo8BitImageData } from '../color-space';
-import { linearSrgbaToOklab, oklabToLinearSrgba, lchaToLaba, labaToLcha } from '@/lib/color';
+import { linearSrgbaToOklab, srgbaToLinearSrgba, oklabToLinearSrgba, lchaToLaba, labaToLcha } from '@/lib/color';
 
 import type { CanvasFilter, CanvasFilterEditConfig, RGBAColor } from '@/types';
 
@@ -31,19 +31,13 @@ export default class WhiteBalanceCanvasFilter implements CanvasFilter<WhiteBalan
 
     public fragment(sourceImageData: Uint8ClampedArray, targetImageData: Uint8ClampedArray, dataPosition: number) {
         let rgba = transfer8BitImageDataToLinearSrgb(sourceImageData, dataPosition);
-        // const laba = linearSrgbaToOklab(rgba);
-        // const lcha = labaToLcha(laba);
-        // if (mode === ChromaModifyMode.MULTIPLY) {
-        //     lcha.c *= chroma;
-        // } else {
-        //     if (chroma > 0) {
-        //         lcha.c = lcha.c + (1.0 - lcha.c) * chroma / 4.0;
-        //     } else {
-        //         lcha.c = lcha.c * (1.0 - Math.abs(chroma));
-        //     }
-        // }
-        // lcha.c = Math.min(1.0, Math.max(0.0, lcha.c));
-        // rgba = oklabToLinearSrgba(lchaToLaba(lcha));
+
+        let white = this.params.white!;
+        let whiteLab = linearSrgbaToOklab(srgbaToLinearSrgba(white));
+        
+        rgba.r *= whiteLab.l / white.r;
+        rgba.g *= whiteLab.l / white.g;
+        rgba.b *= whiteLab.l / white.b;
 
         transferLinearSrgbTo8BitImageData(rgba, targetImageData, dataPosition);
     }
