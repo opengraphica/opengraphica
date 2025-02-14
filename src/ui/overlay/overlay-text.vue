@@ -91,7 +91,7 @@ import canvasStore from '@/store/canvas';
 import workingFileStore, { getLayerById, getLayerGlobalTransform } from '@/store/working-file';
 import {
     isEditorTextareaFocused, editingTextLayerId, editingRenderTextPlacement, editingTextDocumentSelection,
-    dragHandleHighlight,
+    dragHandleHighlight, overlaySelectionCursorPosition, overlaySelectionCursorSize, editingLayerCssTransform,
 } from '@/canvas/store/text-state';
 
 import type { CalculatedTextPlacement, RenderTextLineInfo, RenderTextGlyphInfo, WorkingFileTextLayer } from '@/types';
@@ -123,18 +123,10 @@ export default defineComponent({
             return appliedZoom;
         });
 
-        const editingLayerCssTransform = computed<string>(() => {
-            if (editingTextLayerId.value == null) return '';
-            const layer = getLayerById(editingTextLayerId.value);
-            if (layer == null) return '';
-            const transform = getLayerGlobalTransform(layer);
-            return `matrix(${transform.a},${transform.b},${transform.c},${transform.d},${transform.e},${transform.f})`;
-        });
-
         const editingLayerDimensions = computed(() => {
-            if (editingTextLayerId.value == null) return '';
+            if (editingTextLayerId.value == null) return null;
             const layer = getLayerById(editingTextLayerId.value);
-            if (layer == null) return '';
+            if (layer == null) return null;
             return { width: layer.width, height: layer.height };
         });
 
@@ -203,6 +195,11 @@ export default defineComponent({
                 isHorizontal,
             };
         });
+
+        watch(() => [selectionCursor.value?.position, selectionCursor.value?.size] as const, ([position, size]) => {
+            overlaySelectionCursorPosition.value = (position as DOMPoint);
+            overlaySelectionCursorSize.value = size ?? 10;
+        })
 
         function makeCursorVisiblyActive() {
             disableBlinking.value = true;

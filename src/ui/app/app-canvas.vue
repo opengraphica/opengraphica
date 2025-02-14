@@ -19,7 +19,7 @@ import {
 import { t } from '@/i18n';
 
 import canvasStore from '@/store/canvas';
-import editorStore from '@/store/editor';
+import editorStore, { cssViewTransform } from '@/store/editor';
 import workingFileStore from '@/store/working-file';
 import preferencesStore from '@/store/preferences';
 
@@ -59,7 +59,6 @@ export default defineComponent({
         const { viewWidth: viewportWidth, viewHeight: viewportHeight } = toRefs(canvasStore.state);
         const { width: imageWidth, height: imageHeight } = toRefs(workingFileStore.state);
         const isPixelatedZoomLevel = ref<boolean>(false);
-        const cssViewTransform = ref<string>('');
 
         let renderer: typeof canvasStore.state.renderer = '2d';
         const preferredRenderer = preferencesStore.get('renderer');

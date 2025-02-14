@@ -17,6 +17,7 @@ import { textMetaDefaults } from '@/lib/text-common';
 import { calculateTextPlacement } from '@/lib/text-render';
 
 import canvasStore from '@/store/canvas';
+import { cssViewTransform } from '@/store/editor';
 import historyStore from '@/store/history';
 import preferencesStore from '@/store/preferences';
 import workingFileStore, { getLayerById, getLayerGlobalTransform, getLayersByType, getSelectedLayers, ensureUniqueLayerSiblingName } from '@/store/working-file';
@@ -25,6 +26,7 @@ import {
     textToolbarEmitter, isEditorTextareaFocused, editingTextLayerId,
     editingRenderTextPlacement, editingTextDocumentSelection,
     dragHandleHighlight, createNewTextLayerSize, toolbarTextMeta,
+    overlaySelectionCursorPosition, overlaySelectionCursorSize, editingLayerCssTransform,
 } from '../store/text-state';
 
 import type { UpdateTextLayerOptions, WorkingFileTextLayer, TextDocument, InsertTextLayerOptions, TextDocumentSpanMeta } from '@/types';
@@ -42,6 +44,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
 
     private dragStartPickLayer: number | null = null;
     private dragStartPosition: DOMPoint | null = null;
+    private dragStartDragType: number | null = null;
     private transformIsDragging: boolean = false;
     private editingLayerTransformStart: DOMMatrix | null = null;
     private editingLayerDocumentStart: TextDocument | null = null;
@@ -53,6 +56,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     private isCreatingLayer: boolean = false;
     private createdLayerId: number | null = null;
 
+    private editorTextareaContainer: HTMLDivElement | null = null;
     private editorTextarea: HTMLTextAreaElement | null = null;
     private editorTextareaId: string = 'textControllerKeyboardInput' + uuidv4();
     private isEditorTextareaComposing: boolean = false;
@@ -227,7 +231,11 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         this.editorTextarea.setAttribute('autocomplete', 'off');
         this.editorTextarea.setAttribute('spellcheck', 'false');
         this.editorTextarea.setAttribute('style', `position: absolute; top: 0; left: 0; padding: 0; width: 1px; height: 1px; background: transparent; border: none; outline: none; color: transparent; opacity: 0.01; pointer-events: none;`);
-        document.body.appendChild(this.editorTextarea);
+
+        this.editorTextareaContainer = document.createElement('div');
+        this.editorTextareaContainer.setAttribute('style', `position: absolute; top: 0; left: 0; padding: 0; width: 1px; height: 1px; background: transparent; border: none; outline: none; color: transparent; opacity: 0.01; pointer-events: none;`);
+        this.editorTextareaContainer.appendChild(this.editorTextarea);
+        document.body.appendChild(this.editorTextareaContainer);
 
         this.onFocusEditorTextarea = this.onFocusEditorTextarea.bind(this);
         this.editorTextarea.addEventListener('focus', this.onFocusEditorTextarea, true);
@@ -245,6 +253,17 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         this.editorTextarea.addEventListener('keydown', this.onKeydownEditorTextarea, true);
     }
 
+    private updateEditorTextareaPosition() {
+        if (!this.editorTextarea) return;
+        this.editorTextarea.style.transformOrigin = '0% 0%';
+        this.editorTextarea.style.transform = editingLayerCssTransform.value;
+        this.editorTextarea.style.left = `${overlaySelectionCursorPosition.value.x}px`;
+        this.editorTextarea.style.top = `${overlaySelectionCursorPosition.value.y + overlaySelectionCursorSize.value}px`;
+        if (!this.editorTextareaContainer) return;
+        this.editorTextareaContainer.style.transformOrigin = '0% 0%';
+        this.editorTextareaContainer.style.transform = cssViewTransform.value;
+    }
+
     private destroyEditorTextarea() {
         this.editorTextarea?.removeEventListener('focus', this.onFocusEditorTextarea, true);
         this.editorTextarea?.removeEventListener('blur', this.onBlurEditorTextarea, true);
@@ -255,6 +274,8 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         this.editorTextarea?.removeEventListener('keydown', this.onKeydownEditorTextarea, true);
         this.editorTextarea?.parentNode?.removeChild(this.editorTextarea);
         this.editorTextarea = null;
+        this.editorTextareaContainer?.parentNode?.removeChild(this.editorTextareaContainer);
+        this.editorTextareaContainer = null;
     }
 
     private onFocusEditorTextarea() {
@@ -286,16 +307,34 @@ export default class CanvasTextController extends BaseCanvasMovementController {
 
     private onCompositionStartEditorTextarea(event: CompositionEvent) {
         this.isEditorTextareaComposing = true;
-        // TODO
+        this.replaceCompositionText(event);
+        this.updateEditorTextareaPosition();
     }
 
     private onCompositionUpdateEditorTextarea(event: CompositionEvent) {
-        // TODO
+        this.replaceCompositionText(event);
     }
 
     private onCompositionEndEditorTextarea(event: CompositionEvent) {
         this.isEditorTextareaComposing = false;
-        // TODO
+        this.replaceCompositionText(event, true);
+        this.isEditorTextareaDirty = true;
+        this.queueSaveEditorTextarea();
+    }
+
+    private replaceCompositionText(event: CompositionEvent, isEnd: boolean = false) {
+        if (editingTextLayerId.value == null) return;
+        const editors = this.layerEditors.get(editingTextLayerId.value);
+        if (!editors || !this.editorTextarea) return;
+        if (event.data.length > 0) {
+            const { documentEditor, documentSelection } = editors;
+            TextDocumentEditorWithSelection.insertTextAtCurrentPosition(documentEditor, documentSelection, event.data, true);
+            if (isEnd) {
+                this.editorTextarea.value = '';
+                const { line, character } = documentSelection.getPosition();
+                documentSelection.setPosition(line, character);
+            }
+        }
     }
 
     private onInputEditorTextarea(event: Event) {
@@ -533,6 +572,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
 
         // Figure out which resize/rotate handles were clicked on, or if clicked in empty space just to drag
         this.determineDragType(transformBoundsPoint);
+        this.dragStartDragType = dragHandleHighlight.value;
         this.editingLayerTransformStart = null;
         this.editingLayerDocumentStart = null;
         this.editingLayerWidthStart = null;
@@ -576,7 +616,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     private onDragMove(pointer: PointerTracker) {
         const pageX = pointer.move?.pageX ?? 0;
         const pageY = pointer.move?.pageY ?? 0;
-        const { viewTransformPoint } = this.getTransformedCursorInfo(pageX, pageY);
+        const { viewTransformPoint, transformBoundsPoint } = this.getTransformedCursorInfo(pageX, pageY);
 
         // Creating new text layer
         if (this.isCreatingLayer) {
@@ -622,7 +662,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             // Resizing text boundaries
             if (this.transformIsDragging) {
                 if (!this.editingLayerTransformStart || this.editingLayerWidthStart == null || this.editingLayerHeightStart == null || this.editingLayer == null || this.dragStartPosition == null) return;
-                const dragHandle = dragHandleHighlight.value;
+                let dragHandle = this.dragStartDragType;
                 const decomposedViewTransform = canvasStore.get('decomposedTransform');
                 const textLayerTransform = getLayerGlobalTransform(this.editingLayer);
                 const textLayerDecomposedTransform = decomposeMatrix(textLayerTransform);
@@ -734,6 +774,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         this.createdLayerId = null;
         this.dragStartPickLayer = null;
         this.dragStartPosition = null;
+        this.dragStartDragType = null;
         this.transformIsDragging = false;
     }
 
@@ -1053,7 +1094,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         if (!newIcon) {
             newIcon = (this.isHoveringLayerHorizontal) ? 'text' : 'vertical-text';
             const decomposedViewTransform = canvasStore.get('decomposedTransform');
-            const dragHandle = dragHandleHighlight.value;
+            const dragHandle = this.dragStartDragType ?? dragHandleHighlight.value;
             determineResizeHandleIcon:
             if (dragHandle != null && editingTextLayerId.value != null) {
                 if (this.editingLayer == null) break determineResizeHandleIcon;

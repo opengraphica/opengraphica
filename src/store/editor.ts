@@ -1,3 +1,4 @@
+import { ref } from 'vue';
 import { PerformantStore } from './performant-store';
 import BaseCanvasController from '@/canvas/controllers/base';
 import BaseCanvasMovementController from '@/canvas/controllers/base-movement';
@@ -266,6 +267,8 @@ const store = new PerformantStore<EditorStore>({
         }
     },
 });
+
+export const cssViewTransform = ref<string>('');
 
 async function runTasks(runId: number, set: PerformantStore<EditorStore>['directSet']) {
     if (!store.get('isTaskRunning')) {

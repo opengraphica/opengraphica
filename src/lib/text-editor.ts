@@ -976,13 +976,18 @@ export class TextDocumentSelection {
 export class TextDocumentEditorWithSelection {
 
 	/** Inserts text at the specified selection position in the document. */
-	static insertTextAtCurrentPosition(documentEditor: TextDocumentEditor, documentSelection: TextDocumentSelection, text: string) {
+	static insertTextAtCurrentPosition(documentEditor: TextDocumentEditor, documentSelection: TextDocumentSelection, text: string, selectText: boolean = false) {
 		if (!documentSelection.isEmpty()) {
 			TextDocumentEditorWithSelection.deleteCharacterAtCurrentPosition(documentEditor, documentSelection);
 		}
 		const position = documentSelection.getPosition();
 		const newPosition = documentEditor.insertText(text, position.line, position.character);
-		documentSelection.setPosition(newPosition.line, newPosition.character);
+		if (selectText) {
+			documentSelection.setPosition(position.line, position.character);
+			documentSelection.setPosition(newPosition.line, newPosition.character, true);
+		} else {
+			documentSelection.setPosition(newPosition.line, newPosition.character);
+		}
 	}
 
 	/** Deletes the character at the cursor specified by the selection. */
