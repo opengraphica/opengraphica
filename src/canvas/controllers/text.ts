@@ -25,7 +25,7 @@ import workingFileStore, { getLayerById, getLayerGlobalTransform, getLayersByTyp
 import {
     textToolbarEmitter, isEditorTextareaFocused, editingTextLayerId,
     editingRenderTextPlacement, editingTextDocumentSelection,
-    dragHandleHighlight, createNewTextLayerSize, toolbarTextMeta,
+    dragHandleHighlight, createNewTextLayerSize, toolbarTextMeta, toolbarTextDefaults,
     overlaySelectionCursorPosition, overlaySelectionCursorSize, editingLayerCssTransform,
 } from '../store/text-state';
 
@@ -62,6 +62,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     private isEditorTextareaComposing: boolean = false;
     private isEditorTextareaDirty: boolean = false; // Unsaved changes have been made
     private editorTextareaQueueSaveTimeoutHandle: number | undefined = undefined;
+    private editorTextareaSelectWordTimestamp: number = 0;
 
     private layerEditors: Map<number, { documentEditor: TextDocumentEditor, documentSelection: TextDocumentSelection }> = new Map();
     private editingLayer: WorkingFileTextLayer | null = null;
@@ -155,6 +156,8 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         
         this.onToolbarMetaChanged = this.onToolbarMetaChanged.bind(this);
         textToolbarEmitter.on('toolbarMetaChanged', this.onToolbarMetaChanged);
+        this.onToolbarDocumentChanged = this.onToolbarDocumentChanged.bind(this);
+        textToolbarEmitter.on('toolbarDocumentChanged', this.onToolbarDocumentChanged);
 
         this.onFontsLoaded = this.onFontsLoaded.bind(this);
         this.onHistoryStep = this.onHistoryStep.bind(this);
@@ -168,6 +171,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         editingTextLayerId.value = null;
 
         textToolbarEmitter.off('toolbarMetaChanged', this.onToolbarMetaChanged);
+        textToolbarEmitter.off('toolbarDocumentChanged', this.onToolbarDocumentChanged);
         appEmitter.off('editor.tool.fontsLoaded', this.onFontsLoaded);
 
         this.selectedLayerIdsUnwatch?.();
@@ -201,6 +205,16 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         }
     }
 
+    private onToolbarDocumentChanged(event: any) {        
+        if (!this.editingLayer) return;
+        const { name, value } = event as { name: keyof TextDocument, value: any };
+        this.editingLayer.data[name] = value as never;
+        this.editingLayerDocumentOnFocusId = editingTextLayerId.value;
+        this.editingLayerDocumentOnFocus = this.editingLayer.data;
+        this.isEditorTextareaDirty = true;
+        this.saveEditorTextarea('updateTextLayerProperties');
+    }
+
     private onToolbarMetaChanged(event: any) {
         if (!event || editingTextLayerId.value == null) return;
         const editors = this.layerEditors.get(editingTextLayerId.value);
@@ -216,7 +230,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 { [name]: value },
             );
             this.isEditorTextareaDirty = true;
-            this.saveEditorTextarea();
+            this.saveEditorTextarea('updateTextLayerProperties');
         } else {
             documentEditor.queueMetaChange(name as keyof TextDocumentSpanMeta, value);
         }
@@ -536,6 +550,23 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         }, 0);
     }
 
+    onPointerDoubleTap(e: PointerEvent): void {
+        super.onPointerDoubleTap(e);
+
+        // Double click selects the word that the user clicked on.
+        if (editingTextLayerId.value == null) return;
+        const editors = this.layerEditors.get(editingTextLayerId.value);
+        if (!editors || !this.editorTextarea) return;
+        let { viewTransformPoint } = this.getTransformedCursorInfo(e.pageX, e.pageY);
+        const { documentEditor, documentSelection } = editors;
+        const cursorPosition = this.getEditorCursorAtPoint(viewTransformPoint);
+        const wordStart = documentEditor.getWordStartPosition(cursorPosition.line, cursorPosition.character);
+        const wordEnd = documentEditor.getWordEndPosition(cursorPosition.line, cursorPosition.character);
+        documentSelection.setPosition(wordStart.line, wordStart.character);
+        documentSelection.setPosition(wordEnd.line, wordEnd.character, true);
+        this.editorTextareaSelectWordTimestamp = window.performance.now();
+    }
+
     onPointerMove(e: PointerEvent): void {
         super.onPointerMove(e);
         const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
@@ -598,6 +629,9 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                         editingTextLayerId.value = dragStartPickLayer;
                         this.editorTextarea?.focus();
                     }
+
+                    // Don't continue if double click already executed.
+                    if (window.performance.now() < this.editorTextareaSelectWordTimestamp + 250) return;
 
                     // Set cursor position based on pointer position
                     if (editingTextLayerId.value == null) return;
@@ -807,15 +841,15 @@ export default class CanvasTextController extends BaseCanvasMovementController {
 
     private async createNewTextLayerAtPosition(position: DOMPoint, isDynamic = false) {
         this.createdLayerId = -1;
-        const lineDirection = 'ltr'; // TODO - base on toolbar setting
+        const lineDirection = toolbarTextDefaults.lineDirection;
         const isHorizontal = ['ltr', 'rtl'].includes(lineDirection);
 
         const newTextDocument: TextDocument = {
             boundary: isDynamic ? 'dynamic' : 'box',
-            lineAlignment: 'start', // TODO - base on toolbar setting
+            lineAlignment: toolbarTextDefaults.lineAlignment,
             lineDirection, 
-            wrapDirection: 'ttb', // TODO - base on toolbar setting
-            wrapAt: 'wordThenLetter', // TODO - base on toolbar setting
+            wrapDirection: toolbarTextDefaults.wrapDirection,
+            wrapAt: toolbarTextDefaults.wrapAt,
             lines: [
                 {
                     spans: [
@@ -880,7 +914,11 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             documentSelection.end.line,
             documentSelection.end.character,
         );
+        if (!documentSelection.isEmpty()) {
+            documentEditor.queuedMetaChanges = null;
+        }
         for (const key in selectionMeta) {
+            if (documentEditor.queuedMetaChanges?.[key as keyof TextDocumentSpanMeta] != null) continue;
             const values = selectionMeta[key];
             if (values.length > 1) {
                 toolbarTextMeta[key as keyof TextDocumentSpanMeta] = null;
@@ -897,7 +935,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         );
     }
 
-    private async saveEditorTextarea() {
+    private async saveEditorTextarea(actionId: string = 'typeInTextLayer') {
         window.clearTimeout(this.editorTextareaQueueSaveTimeoutHandle);
         this.editorTextareaQueueSaveTimeoutHandle = undefined;
         if (this.isEditorTextareaDirty) {
@@ -911,7 +949,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 this.editingLayerDocumentOnFocus = JSON.parse(JSON.stringify(this.editingLayer.data));
                 this.isEditorTextareaDirty = false;
                 await historyStore.dispatch('runAction', {
-                    action: new BundleAction('typeInTextLayer', 'action.typeInTextLayer', [
+                    action: new BundleAction(actionId, `action.${actionId}`, [
                         new UpdateLayerAction<UpdateTextLayerOptions>({
                             id: editingTextLayerId.value,
                             data: this.editingLayer.data
@@ -931,7 +969,13 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         for (const alreadySelectedLayer of getSelectedLayers().filter(layer => layer.type === 'text')) {
             const layerTransform = getLayerGlobalTransform(alreadySelectedLayer.id).inverse();
             const layerTransformPoint = viewTransformPoint.matrixTransform(layerTransform);
-            if (layerTransformPoint.x > 0 && layerTransformPoint.y > 0 && layerTransformPoint.x < alreadySelectedLayer.width && layerTransformPoint.y < alreadySelectedLayer.height) {
+            if (
+                dragHandleHighlight.value != null
+                || (
+                    layerTransformPoint.x > 0 && layerTransformPoint.y > 0
+                    && layerTransformPoint.x < alreadySelectedLayer.width && layerTransformPoint.y < alreadySelectedLayer.height
+                )
+            ) {
                 return alreadySelectedLayer.id;
             }
         }

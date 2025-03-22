@@ -505,6 +505,8 @@ export async function readWorkingFile(): Promise<WorkingFile<ColorModel>> {
     }
     workingFile.layers = await readStoredLayersRecursive(layers, workingFile);
 
+    workingFile.masks = workingFile.masks ?? {};
+
     return workingFile as WorkingFile<ColorModel>;
 }
 

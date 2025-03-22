@@ -12,7 +12,7 @@ import type { TextDocument, TextDocumentLine, TextDocumentSpan, TextDocumentSpan
  */
 export class TextDocumentEditor {
     public document: TextDocument;
-    private queuedMetaChanges: Partial<TextDocumentSpanMeta> | null = null;
+    public queuedMetaChanges: Partial<TextDocumentSpanMeta> | null = null;
 	private notifyChangeHandlers: Array<() => void> = [];
 
     constructor(document: TextDocument) {

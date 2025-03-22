@@ -351,7 +351,6 @@ import { notifyInjector, unexpectedErrorMessage } from '@/lib/notify';
 import appEmitter from '@/lib/emitter';
 import { throttle } from '@/lib/timing';
 import { runModule } from '@/modules';
-import { format } from '@/format';
 import '@/format/title-case';
 
 const activeTab = ref<string>('file');
@@ -742,6 +741,7 @@ export default defineComponent({
                         break;
                 }
             } catch (error: any) {
+                console.error(error);
                 $notify({
                     type: 'error',
                     title: 'An Error Occurred',

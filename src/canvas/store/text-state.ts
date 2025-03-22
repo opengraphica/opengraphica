@@ -2,8 +2,11 @@ import mitt from 'mitt';
 import { computed, reactive, ref } from 'vue';
 import { textMetaDefaults } from '@/lib/text-common';
 import { getLayerById, getLayerGlobalTransform } from '@/store/working-file';
+import { PerformantStore } from '@/store/performant-store';
 
-import type { CalculatedTextPlacement, TextDocumentSelectionState, TextDocumentSpanMeta } from '@/types';
+import type {
+    CalculatedTextPlacement, TextDocumentSelectionState, TextDocument, TextDocumentSpanMeta
+} from '@/types';
 
 type RecordWithNull<T> = {
     [P in keyof T]: T[P] | null;
@@ -31,4 +34,29 @@ export const editingLayerCssTransform = computed<string>(() => {
     if (layer == null) return '';
     const transform = getLayerGlobalTransform(layer);
     return `matrix(${transform.a},${transform.b},${transform.c},${transform.d},${transform.e},${transform.f})`;
+});
+
+interface PermanentStorageState {
+    lineAlignment: TextDocument['lineAlignment'],
+    lineDirection: TextDocument['lineDirection'],
+    wrapDirection: TextDocument['wrapDirection'],
+    wrapAt: TextDocument['wrapAt'],
+}
+
+const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentStorageState }>({
+    name: 'textStateStore',
+    state: {
+        lineAlignment: 'start',
+        lineDirection: 'ltr',
+        wrapDirection: 'ttb',
+        wrapAt: 'wordThenLetter',
+    },
+    restore: ['lineAlignment', 'lineDirection', 'wrapDirection', 'wrapAt'],
+});
+
+export const toolbarTextDefaults = reactive({
+    lineAlignment: permanentStorage.getWritableRef('lineAlignment'),
+    lineDirection: permanentStorage.getWritableRef('lineDirection'),
+    wrapDirection: permanentStorage.getWritableRef('wrapDirection'),
+    wrapAt: permanentStorage.getWritableRef('wrapAt'),
 });

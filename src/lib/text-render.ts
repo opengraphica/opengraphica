@@ -241,7 +241,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                     const spanAdvanceWidth = getAdvanceWidth(span.text, font, size, glyphScale, isHorizontal);
 
                     // The whole span fits in the line. Easy path.
-                    if (currentLineSize + spanAdvanceWidth < wrapSize) {
+                    if (currentLineSize + spanAdvanceWidth <= wrapSize) {
                         currentLineSpans.push(span);
                         currentLineSize += spanAdvanceWidth;
                     } else {
@@ -255,7 +255,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                             let currentWordAdvanceWidth = 0;
                             for (const [wordIndex, word] of words.entries()) {
                                 currentWordAdvanceWidth = getAdvanceWidth((wordIndex > 0 ? ' ': '') + word, font, size, glyphScale, isHorizontal);
-                                if (currentLineSize + fittedWordAdvanceWidth + currentWordAdvanceWidth < wrapSize) {
+                                if (currentLineSize + fittedWordAdvanceWidth + currentWordAdvanceWidth <= wrapSize) {
                                     fittedWords.push(word);
                                     fittedWordAdvanceWidth += currentWordAdvanceWidth;
                                     currentWordAdvanceWidth = 0;
@@ -301,7 +301,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                                         let checkCharacterAdvanceWidth = 0;
                                         for (const character of characters) {
                                             checkCharacterAdvanceWidth = getAdvanceWidth(fittedCharacters + character, font, size, glyphScale, isHorizontal);
-                                            if (currentLineSize + checkCharacterAdvanceWidth < wrapSize) {
+                                            if (currentLineSize + checkCharacterAdvanceWidth <= wrapSize) {
                                                 fittedCharacters += character;
                                             } else {
                                                 break;

@@ -3,6 +3,9 @@ import canvasStore from '@/store/canvas';
 import preferencesStore from '@/store/preferences';
 import appEmitter from '@/lib/emitter';
 import { isInput } from '@/lib/events';
+import { pointDistance2d } from '@/lib/math';
+
+const devicePixelRatio = window.devicePixelRatio || 1;
 
 export interface PointerTracker {
     id: number,
@@ -35,6 +38,7 @@ export default class BaseCanvasController {
 
     protected canvas!: HTMLCanvasElement; 
     protected ctx!: CanvasRenderingContext2D;
+    protected previousPointerDown: PointerTracker | null = null;
     protected pointers: PointerTracker[] = [];
     protected touches: PointerTracker[] = []; // Populated at onMultiTouchDown(), once the multi-touch tap timeout extinquishes.
     protected multiTouchDownCount: number = 0;
@@ -101,13 +105,14 @@ export default class BaseCanvasController {
     onPointerDown(e: PointerEvent): void {
         if (isInput(e.target)) return;
 
+        const now = window.performance.now();
         const pointer: PointerTracker = {
             id: e.pointerId,
             type: e.pointerType as any,
             primary: e.isPrimary,
             isDragging: false,
             down: e,
-            downTimestamp: window.performance.now()
+            downTimestamp: now,
         };
 
         const isRecentPenDown = !!this.pointers.find((existingPointer) => {
@@ -130,6 +135,20 @@ export default class BaseCanvasController {
             }
         }
         canvasStore.set('preventPostProcess', true);
+
+        if (
+            pointer.type === this.previousPointerDown?.type
+            && now - this.previousPointerDown.downTimestamp < preferencesStore.get('pointerDoubleTapTimeout')
+            && pointDistance2d(
+                pointer.down.pageX, pointer.down.pageY,
+                this.previousPointerDown.down.pageX, this.previousPointerDown.down.pageY
+            ) <= this.dragStartRadius * devicePixelRatio
+        ) {
+            this.previousPointerDown = null;
+            requestAnimationFrame(() => this.onPointerDoubleTap(e));
+        } else {
+            this.previousPointerDown = pointer;
+        }
     }
 
     /**
@@ -139,15 +158,22 @@ export default class BaseCanvasController {
         // Override
     }
 
+    /**
+     * Fires when a pointer pressed down twice in the same spot in quick succession.
+     */
+    onPointerDoubleTap(e: PointerEvent): void {
+        // Override
+    }
+
     onPointerMove(e: PointerEvent): void {
-        const devicePixelRatio = window.devicePixelRatio || 1;
         const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
         if (pointer) {
             pointer.movePrev = pointer.move;
             pointer.move = e;
             if (
-                Math.abs(pointer.down.pageX - pointer.move.pageX) >= this.dragStartRadius * devicePixelRatio ||
-                Math.abs(pointer.down.pageY - pointer.move.pageY) >= this.dragStartRadius * devicePixelRatio
+                pointDistance2d(
+                    pointer.down.pageX, pointer.down.pageY, pointer.move.pageX, pointer.move.pageY
+                ) > this.dragStartRadius * devicePixelRatio
             ) {
                 if (!pointer.isDragging) {
                     pointer.isDragging = true;

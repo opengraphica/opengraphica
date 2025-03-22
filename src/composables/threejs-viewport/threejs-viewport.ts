@@ -347,7 +347,7 @@ export function useThreejsViewport(options: ThreejsViewportOptions) {
     }
 
     function renderCanvas() {
-        if (!Matrix4) return;
+        if (!Matrix4 || !threejsCamera) return;
         let cameraTransform: DOMMatrix;
         if (canvasStore.get('useCssViewport')) {
             cameraTransform = new DOMMatrix().inverse().translate(0, 0, 1);

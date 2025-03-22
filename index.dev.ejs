@@ -7,21 +7,21 @@
         <title><%= htmlWebpackPlugin.options.title %></title>
         <script>
             (() => {
-                const warn = console.warn;
-                console.warn = function(message) {
-                    if (message?.includes) {
-                        if (
-                            message.includes('You are running the esm-bundler build of vue-i18n') ||
-                            message.includes('__VUE_OPTIONS_API__') ||
-                            message.startsWith('[HMR]') ||
-                            message.startsWith('[intlify] ')
-                        ) {
-                            return;
-                        }
-                    }
-                    console.trace();
-                    return warn.call(console, ...arguments);
-                };
+                // const warn = console.warn;
+                // console.warn = function(message) {
+                //     if (message?.includes) {
+                //         if (
+                //             message.includes('You are running the esm-bundler build of vue-i18n') ||
+                //             message.includes('__VUE_OPTIONS_API__') ||
+                //             message.startsWith('[HMR]') ||
+                //             message.startsWith('[intlify] ')
+                //         ) {
+                //             return;
+                //         }
+                //     }
+                //     console.trace();
+                //     return warn.call(console, ...arguments);
+                // };
             })();
         </script>
     </head>

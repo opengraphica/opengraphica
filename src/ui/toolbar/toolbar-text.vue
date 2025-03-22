@@ -51,6 +51,73 @@
                     </template>
                     <el-input-color v-model="fillColor" :aria-label="$t('toolbar.text.fill')"></el-input-color>
                 </el-input-group>
+                <!-- Alignment -->
+                <el-popover
+                    placement="bottom"
+                    popper-class="ogr-dock-popover"
+                    trigger="click"
+                    :width="250"
+                    :popper-options="{
+                        modifiers: [
+                            {
+                                name: 'computeStyles',
+                                options: {
+                                    adaptive: false,
+                                    enabled: false
+                                }
+                            }
+                        ]
+                    }">
+                    <template #reference>
+                        <el-button size="small" class="ml-3">
+                            <span class="bi bi-aspect-ratio mr-2" aria-hidden="true" /> {{ $t('toolbar.text.alignment.title') }}
+                        </el-button>
+                    </template>
+                    <h2 class="ogr-dock-title" v-t="'toolbar.text.alignment.title'" />
+                    <el-form novalidate="novalidate" action="javascript:void(0)">
+                        <!-- Boundary Type -->
+                        <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.text.alignment.boundary')">
+                            <el-select v-model="boundary" size="small" style="width: 6rem">
+                                <el-option :label="$t('toolbar.text.alignment.boundaryOption.dynamic')" value="dynamic" />
+                                <el-option :label="$t('toolbar.text.alignment.boundaryOption.box')" value="box" />
+                            </el-select>
+                        </el-form-item>
+                        <!-- Line Direction -->
+                        <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.text.alignment.lineDirection')">
+                            <el-radio-group
+                                v-model="lineDirection"
+                                size="small">
+                                <el-radio-button label="ltr">
+                                    <i class="bi bi-arrow-right" aria-hidden="true" />
+                                    <span class="is-sr-only">{{ $t('toolbar.text.alignment.lineDirectionOption.ltr') }}</span>
+                                </el-radio-button>
+                                <el-radio-button label="rtl">
+                                    <i class="bi bi-arrow-left" aria-hidden="true" />
+                                    <span class="is-sr-only">{{ $t('toolbar.text.alignment.lineDirectionOption.rtl') }}</span>
+                                </el-radio-button>
+                                <el-radio-button label="ttb">
+                                    <i class="bi bi-arrow-down" aria-hidden="true" />
+                                    <span class="is-sr-only">{{ $t('toolbar.text.alignment.lineDirectionOption.ttb') }}</span>
+                                </el-radio-button>
+                            </el-radio-group>
+                        </el-form-item>
+                        <!-- Wrap Direction -->
+                        <el-form-item v-if="lineDirection === 'ttb' || lineDirection === 'btt'" class="el-form-item--menu-item mb-1" :label="$t('toolbar.text.alignment.wrapDirection')">
+                            <el-radio-group
+                                v-model="wrapDirection"
+                                size="small">
+                                <el-radio-button label="ltr">
+                                    <i class="bi bi-arrow-right" aria-hidden="true" />
+                                    <span class="is-sr-only">{{ $t('toolbar.text.alignment.wrapDirectionOption.ltr') }}</span>
+                                </el-radio-button>
+                                <el-radio-button label="rtl">
+                                    <i class="bi bi-arrow-left" aria-hidden="true" />
+                                    <span class="is-sr-only">{{ $t('toolbar.text.alignment.wrapDirectionOption.rtl') }}</span>
+                                </el-radio-button>
+                            </el-radio-group>
+                        </el-form-item>
+                    </el-form>
+                </el-popover>
             </el-horizontal-scrollbar-arrows>
         </div>
     </div>
@@ -58,6 +125,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
+
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.vue';
@@ -65,13 +133,17 @@ import ElInputColor from '@/ui/el/el-input-color.vue';
 import ElInputGroup from '@/ui/el/el-input-group.vue';
 import ElInputNumber from '@/ui/el/el-input-number.vue';
 import ElPopover from '@/ui/el/el-popover.vue';
+import { ElRadioButton, ElRadioGroup } from 'element-plus/lib/components/radio/index';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 
 import defaultFontFamilies from '@/config/default-font-families.json';
 
-import { textToolbarEmitter, toolbarTextMeta } from '@/canvas/store/text-state';
+import { textMetaDefaults } from '@/lib/text-common';
 
-import type { RGBAColor } from '@/types';
+import { getLayerById } from '@/store/working-file';
+import { editingTextLayerId, textToolbarEmitter, toolbarTextMeta, toolbarTextDefaults } from '@/canvas/store/text-state';
+
+import type { RGBAColor, TextDocument, WorkingFileTextLayer } from '@/types';
 
 export default defineComponent({
     name: 'ToolbarText',
@@ -86,6 +158,8 @@ export default defineComponent({
         ElInputNumber,
         ElOption,
         ElPopover,
+        ElRadioButton,
+        ElRadioGroup,
         ElSelect
     },
     props: {
@@ -95,8 +169,19 @@ export default defineComponent({
         'close'
     ],
     setup() {
+        const editingTextLayer = computed(() => {
+            const id = editingTextLayerId.value;
+            if (id == null) {
+                return null;
+            }
+            const layer = getLayerById(id) as WorkingFileTextLayer;
+            if (layer?.type !== 'text') {
+                return null;
+            }
+            return layer;
+        });
 
-        const family = computed<string | null>({
+        const family = computed<string>({
             set(value) {
                 toolbarTextMeta.family = value;
                 textToolbarEmitter.emit('toolbarMetaChanged', {
@@ -105,14 +190,14 @@ export default defineComponent({
                 });
             },
             get() {
-                return toolbarTextMeta.family;
+                return toolbarTextMeta.family ?? textMetaDefaults.family;
             }
         });
         const familyList = ref<string[]>(
             defaultFontFamilies.filter((family) => !family.isFallback).map((family) => family.family)
         );
 
-        const size = computed<number | null>({
+        const size = computed<number>({
             set(value) {
                 toolbarTextMeta.size = value;
                 textToolbarEmitter.emit('toolbarMetaChanged', {
@@ -121,7 +206,7 @@ export default defineComponent({
                 });
             },
             get() {
-                return toolbarTextMeta.size;
+                return toolbarTextMeta.size ?? textMetaDefaults.size;
             }
         });
 
@@ -134,7 +219,7 @@ export default defineComponent({
                 });
             },
             get() {
-                return toolbarTextMeta.bold ?? false;
+                return toolbarTextMeta.bold ?? textMetaDefaults.bold;
             }
         });
 
@@ -147,7 +232,7 @@ export default defineComponent({
                 });
             },
             get() {
-                return toolbarTextMeta.oblique ?? false;
+                return toolbarTextMeta.oblique ?? textMetaDefaults.oblique;
             }
         });
 
@@ -160,7 +245,7 @@ export default defineComponent({
                 });
             },
             get() {
-                return toolbarTextMeta.strikethrough;
+                return toolbarTextMeta.strikethrough ?? textMetaDefaults.strikethrough;
             }
         });
 
@@ -173,7 +258,7 @@ export default defineComponent({
                 });
             },
             get() {
-                return toolbarTextMeta.underline;
+                return toolbarTextMeta.underline ?? textMetaDefaults.underline;
             }
         });
 
@@ -194,6 +279,57 @@ export default defineComponent({
             }
         });
 
+        const boundary = computed<TextDocument['boundary']>({
+            set(value) {
+                textToolbarEmitter.emit('toolbarDocumentChanged', {
+                    name: 'boundary',
+                    value,
+                });
+            },
+            get() {
+                return editingTextLayer.value?.data.boundary ?? 'dynamic';
+            }
+        });
+
+        const lineDirection = computed<TextDocument['lineDirection']>({
+            set(value) {
+                textToolbarEmitter.emit('toolbarDocumentChanged', {
+                    name: 'lineDirection',
+                    value,
+                });
+                toolbarTextDefaults.lineDirection = value;
+                if (['ltr', 'rtl'].includes(value) && !['ttb', 'btt'].includes(wrapDirection.value)) {
+                    textToolbarEmitter.emit('toolbarDocumentChanged', {
+                        name: 'wrapDirection',
+                        value: 'ttb',
+                    });
+                    toolbarTextDefaults.wrapDirection = 'ttb';
+                } else if (['ttb', 'btt'].includes(value) && !['ltr', 'rtl'].includes(wrapDirection.value)) {
+                    textToolbarEmitter.emit('toolbarDocumentChanged', {
+                        name: 'wrapDirection',
+                        value: 'rtl',
+                    });
+                    toolbarTextDefaults.wrapDirection = 'rtl';
+                }
+            },
+            get() {
+                return editingTextLayer.value?.data?.lineDirection ?? 'ltr';
+            }
+        });
+
+        const wrapDirection = computed<TextDocument['wrapDirection']>({
+            set(value) {
+                textToolbarEmitter.emit('toolbarDocumentChanged', {
+                    name: 'wrapDirection',
+                    value,
+                });
+                toolbarTextDefaults.wrapDirection = value;
+            },
+            get() {
+                return editingTextLayer.value?.data.wrapDirection ?? 'ltr';
+            }
+        });
+
         return {
             family,
             familyList,
@@ -203,6 +339,9 @@ export default defineComponent({
             strikethrough,
             underline,
             fillColor,
+            boundary,
+            lineDirection,
+            wrapDirection,
         };
     }
 });
