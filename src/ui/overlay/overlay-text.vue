@@ -143,7 +143,10 @@ export default defineComponent({
             const { isActiveSideEnd, start, end } = toRefs(editingTextDocumentSelection.value);
             const cursor = isActiveSideEnd.value ? end.value : start.value;
             const textPlacement: CalculatedTextPlacement = editingRenderTextPlacement.value as CalculatedTextPlacement;
-            const isHorizontal = ['ltr', 'rtl'].includes(textPlacement.lineDirection);
+            const isHorizontal = textPlacement.isHorizontal;
+
+            const wrapSign = ['ltr', 'ttb'].includes(textPlacement.wrapDirection) ? 1 : -1;
+            let wrapOffsetStart = wrapSign > 0 ? 0 : textPlacement.wrapDirectionSize;
 
             let foundCursorLine: RenderTextLineInfo | null = null;
             let foundCursorGlyph: RenderTextGlyphInfo | null = null;
@@ -166,6 +169,8 @@ export default defineComponent({
             let position = new DOMPoint();
             let size = 10;
             if (foundCursorLine) {
+                const wrapOffsetLine = wrapSign > 0 ? 0 : -(textPlacement.isHorizontal ? (foundCursorLine.heightAboveBaseline + foundCursorLine.heightBelowBaseline) : foundCursorLine.largestCharacterWidth);
+
                 let advanceOffset = 0;
                 if (foundCursorGlyph) {
                     advanceOffset = foundCursorGlyph.advanceOffset;
@@ -177,10 +182,10 @@ export default defineComponent({
                 }
                 if (textPlacement.isHorizontal) {
                     position.x = foundCursorLine.lineStartOffset + advanceOffset + (foundCursorGlyph.bidiDirection === 'rtl' ? foundCursorGlyph.advance : 0);
-                    position.y = foundCursorLine.wrapOffset + foundCursorLine.heightAboveBaseline - (foundCursorGlyph.fontAscender + foundCursorGlyph.fontDescender) / 2.0;
+                    position.y = wrapOffsetStart + wrapOffsetLine + (foundCursorLine.wrapOffset * wrapSign) + foundCursorLine.heightAboveBaseline - (foundCursorGlyph.fontAscender + foundCursorGlyph.fontDescender) / 2.0;
                     size = foundCursorGlyph.fontAscender - foundCursorGlyph.fontDescender;
                 } else {
-                    position.x = foundCursorLine.wrapOffset + (foundCursorLine.largestCharacterWidth / 2.0);
+                    position.x = wrapOffsetStart + wrapOffsetLine + (foundCursorLine.wrapOffset * wrapSign) + (foundCursorLine.largestCharacterWidth / 2.0);
                     position.y = foundCursorLine.lineStartOffset + advanceOffset;
                     size = foundCursorLine.largestCharacterWidth;
                 }

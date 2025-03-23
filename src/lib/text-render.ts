@@ -59,7 +59,7 @@ export async function loadFontFamilies(unloadedFontFamilies: string[]): Promise<
     return hadUnloadedFont;
 }
 
-export function splitSpanByAvailableFonts(span: TextDocumentSpan): Array<[Font | null, TextDocumentSpan]> {
+export function splitSpanByAvailableFonts(span: TextDocumentSpan, emptyCharacter: string | null = null): Array<[Font | null, TextDocumentSpan]> {
     const userSelectedFontFamily = fontCache.getFontFamily(span.meta.family ?? textMetaDefaults.family);
     const preferredVariant = span.meta.variant ?? textMetaDefaults.variant;
     const userSelectedFont = userSelectedFontFamily?.variants[preferredVariant] ?? null;
@@ -96,9 +96,9 @@ export function splitSpanByAvailableFonts(span: TextDocumentSpan): Array<[Font |
         currentFontSplitText += character;
         previousSelectedFont = selectedFont;
     }
-    if (currentFontSplitText.length > 0) {
+    if (currentFontSplitText.length > 0 || emptyCharacter != null) {
         fontSplits.push([previousSelectedFont, {
-            text: currentFontSplitText,
+            text: currentFontSplitText.length > 0 ? currentFontSplitText : emptyCharacter as string,
             meta: span.meta,
         }]);
     }
@@ -220,6 +220,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
         for (const [lineIndex, line] of documentLines.entries()) {
             currentLineSpans = [];
             currentLineSize = 0;
+
             for (const fullSpan of line.spans) {
                 let spanFontSplits = splitSpanByAvailableFonts(fullSpan);
                 if (spanFontSplits.length === 0) {
@@ -398,6 +399,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
         };
 
         const lineText = getLineText(line);
+        const isEmptyLine = lineText === '';
         const lineDirection = (line.direction ?? document.lineDirection === 'rtl') ? 'rtl' : 'ltr';
         const embeddingLevels = bidi.getEmbeddingLevels(lineText, lineDirection);
         const flips = bidi.getReorderSegments(lineText, embeddingLevels);
@@ -411,7 +413,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
         
         // let workingFlippedRun: RenderTextGlyphInfo[] = [];
         for (const fullSpan of line.spans) {
-            const spanFontSplits = splitSpanByAvailableFonts(fullSpan);
+            const spanFontSplits = splitSpanByAvailableFonts(fullSpan, isEmptyLine ? (isHorizontal ? '​' : ' ') : null);
             for (const [font, span] of spanFontSplits) {
 
                 // Abort if no font.
@@ -610,6 +612,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
         longestLineSize,
         lineDirection: document.lineDirection,
         lineDirectionSize,
+        wrapDirection: document.wrapDirection,
         wrapDirectionSize,
         isHorizontal,
         left,

@@ -102,18 +102,30 @@
                             </el-radio-group>
                         </el-form-item>
                         <!-- Wrap Direction -->
-                        <el-form-item v-if="lineDirection === 'ttb' || lineDirection === 'btt'" class="el-form-item--menu-item mb-1" :label="$t('toolbar.text.alignment.wrapDirection')">
+                        <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.text.alignment.wrapDirection')">
                             <el-radio-group
                                 v-model="wrapDirection"
                                 size="small">
-                                <el-radio-button label="ltr">
-                                    <i class="bi bi-arrow-right" aria-hidden="true" />
-                                    <span class="is-sr-only">{{ $t('toolbar.text.alignment.wrapDirectionOption.ltr') }}</span>
-                                </el-radio-button>
-                                <el-radio-button label="rtl">
-                                    <i class="bi bi-arrow-left" aria-hidden="true" />
-                                    <span class="is-sr-only">{{ $t('toolbar.text.alignment.wrapDirectionOption.rtl') }}</span>
-                                </el-radio-button>
+                                <template v-if="lineDirection === 'ttb' || lineDirection === 'btt'">
+                                    <el-radio-button label="ltr">
+                                        <i class="bi bi-arrow-right" aria-hidden="true" />
+                                        <span class="is-sr-only">{{ $t('toolbar.text.alignment.wrapDirectionOption.ltr') }}</span>
+                                    </el-radio-button>
+                                    <el-radio-button label="rtl">
+                                        <i class="bi bi-arrow-left" aria-hidden="true" />
+                                        <span class="is-sr-only">{{ $t('toolbar.text.alignment.wrapDirectionOption.rtl') }}</span>
+                                    </el-radio-button>
+                                </template>
+                                <template v-else>
+                                    <el-radio-button label="ttb">
+                                        <i class="bi bi-arrow-down" aria-hidden="true" />
+                                        <span class="is-sr-only">{{ $t('toolbar.text.alignment.wrapDirectionOption.ttb') }}</span>
+                                    </el-radio-button>
+                                    <el-radio-button label="btt">
+                                        <i class="bi bi-arrow-up" aria-hidden="true" />
+                                        <span class="is-sr-only">{{ $t('toolbar.text.alignment.wrapDirectionOption.btt') }}</span>
+                                    </el-radio-button>
+                                </template>
                             </el-radio-group>
                         </el-form-item>
                     </el-form>

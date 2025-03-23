@@ -10,6 +10,7 @@ export interface CalculatedTextPlacement {
     longestLineSize: number;
     lineDirection: TextDirection;
     lineDirectionSize: number;
+    wrapDirection: TextDirection;
     wrapDirectionSize: number;
     isHorizontal: boolean;
     left: number;

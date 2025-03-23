@@ -1040,11 +1040,20 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         if (editingRenderTextPlacement.value && editingTextLayerId.value != null) {
             const layerTransform = getLayerGlobalTransform(editingTextLayerId.value).inverse();
             const layerTransformPoint = viewTransformPoint.matrixTransform(layerTransform);
-            const lineRenderInfo = editingRenderTextPlacement.value;
-            if (lineRenderInfo.isHorizontal) {
+            const textPlacement = editingRenderTextPlacement.value;
+
+            if (textPlacement.isHorizontal) {
+                if (textPlacement.wrapDirection === 'btt') {
+                    layerTransformPoint.y = textPlacement.wrapDirectionSize - layerTransformPoint.y;
+                }
+
                 findHorizontalCursor:
-                for (const line of lineRenderInfo.lines) {
-                    if (layerTransformPoint.y >= line.wrapOffset && layerTransformPoint.y <= line.wrapOffset + line.heightAboveBaseline + line.heightBelowBaseline) {
+                for (const line of textPlacement.lines) {
+                    const wrapBegin = line.wrapOffset;
+                    const wrapEnd = wrapBegin + line.heightAboveBaseline + line.heightBelowBaseline;
+                    const wrapMin = Math.min(wrapBegin, wrapEnd);
+                    const wrapMax = Math.max(wrapBegin, wrapEnd);
+                    if (layerTransformPoint.y >= wrapMin && layerTransformPoint.y <= wrapMax) {
                         cursor.line = line.documentLineIndex;
                         if (layerTransformPoint.x < line.lineStartOffset) {
                             cursor.character = line.glyphs[0]?.documentCharacterIndex ?? 0;
@@ -1069,8 +1078,13 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                     }
                 }
             } else { // Vertical
+                if (textPlacement.wrapDirection === 'rtl') {
+                    layerTransformPoint.x = textPlacement.wrapDirectionSize - layerTransformPoint.x;
+                }
+
                 findVerticalCursor:
-                for (const line of lineRenderInfo.lines) {
+                for (const line of textPlacement.lines) {
+                    
                     const left = Math.min(line.wrapOffset, line.wrapOffset + line.largestCharacterWidth);
                     const right = Math.max(line.wrapOffset, line.wrapOffset + line.largestCharacterWidth);
                     if (layerTransformPoint.x >= left && layerTransformPoint.x <= right) {

@@ -11,19 +11,14 @@
 import bidiFactory from 'bidi-js';
 const bidi = bidiFactory()
 
-import defaultFontFamilies from '@/config/default-font-families.json';
 import { FontCache } from '@/lib/font-cache';
 import { textMetaDefaults } from '@/lib/text-common';
 import { getUnloadedFontFamilies, loadFontFamilies, calculateTextPlacement } from '@/lib/text-render';
-import { getSubsets as getUnicodeSubsets } from '@/lib/unicode';
 
 import type {
-    Drawable, DrawableOptions, DrawableUpdateOptions, RenderTextLineInfo, RenderTextGlyphInfo,
-    TextDocument, TextDocumentLine, TextDocumentSpan, TextDocumentSpanMeta, TextDocumentSpanBidiRun,
-    CalculatedTextPlacement,
+    CalculatedTextPlacement, Drawable, DrawableOptions, DrawableUpdateOptions,
+    RenderTextLineInfo, TextDocument, 
 } from '@/types';
-
-let fontCache!: FontCache;
 
 export interface TextData {
     wrapSize?: number;
@@ -83,15 +78,17 @@ export default class Text implements Drawable<TextData> {
 
     draw2d(ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) {
         if (!this.calculatedTextPlacement) return;
-        const { lines, lineDirection } = this.calculatedTextPlacement;
-        const isHorizontal = ['ltr', 'rtl'].includes(lineDirection);
+        const { isHorizontal, lines, wrapDirection, wrapDirectionSize } = this.calculatedTextPlacement;
+        const wrapSign = ['ltr', 'ttb'].includes(wrapDirection) ? 1 : -1;
+        let wrapOffsetStart = wrapSign > 0 ? 0 : wrapDirectionSize;
 
         if (isHorizontal) {
             for (const line of lines) {
+                const wrapOffsetLine = wrapSign > 0 ? 0 : -(line.heightAboveBaseline + line.heightBelowBaseline);
                 for (const { glyph, meta, advanceOffset, drawOffset, fontSize } of line.glyphs) {
                     const path = glyph.getPath(
                         line.lineStartOffset + drawOffset.x + advanceOffset,
-                        line.wrapOffset + drawOffset.y + line.heightAboveBaseline,
+                        wrapOffsetStart + wrapOffsetLine + (line.wrapOffset * wrapSign) + drawOffset.y + line.heightAboveBaseline,
                         fontSize,
                         {},
                     );
@@ -101,10 +98,11 @@ export default class Text implements Drawable<TextData> {
             }
         } else {
             for (const line of lines) {
+                const wrapOffsetLine = wrapSign > 0 ? 0 : -line.largestCharacterWidth;
                 for (const { glyph, meta, advanceOffset, drawOffset, characterWidth, fontSize } of line.glyphs) {
                     ctx.fillStyle = meta.fillColor?.style ?? textMetaDefaults.fillColor.style;
                     const path = glyph.getPath(
-                        line.wrapOffset + drawOffset.x + (line.largestCharacterWidth / 2.0) - (characterWidth / 2.0),
+                        wrapOffsetStart + wrapOffsetLine + (line.wrapOffset * wrapSign) + drawOffset.x + (line.largestCharacterWidth / 2.0) - (characterWidth / 2.0),
                         line.lineStartOffset + drawOffset.y + advanceOffset,
                         fontSize,
                         {},

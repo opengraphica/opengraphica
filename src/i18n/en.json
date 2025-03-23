@@ -1267,7 +1267,7 @@
                     "dynamic": "Dynamic",
                     "box": "Box"
                 },
-                "lineDirection": "Direction",
+                "lineDirection": "Text Direction",
                 "lineDirectionOption": {
                     "ltr": "Left-to-right",
                     "rtl": "Right-to-left",

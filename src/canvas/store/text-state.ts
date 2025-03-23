@@ -60,3 +60,10 @@ export const toolbarTextDefaults = reactive({
     wrapDirection: permanentStorage.getWritableRef('wrapDirection'),
     wrapAt: permanentStorage.getWritableRef('wrapAt'),
 });
+
+if (['ltr', 'rtl'].includes(toolbarTextDefaults.lineDirection) && !['ttb', 'btt'].includes(toolbarTextDefaults.wrapDirection)) {
+    toolbarTextDefaults.wrapDirection = 'ltr';
+}
+if (['ttb', 'btt'].includes(toolbarTextDefaults.lineDirection) && !['ltr', 'rtl'].includes(toolbarTextDefaults.wrapDirection)) {
+    toolbarTextDefaults.wrapDirection = 'ttb';
+}

@@ -87,7 +87,12 @@ export default defineComponent({
             const textPlacement = isSwitchingLayers.value ? null : editingRenderTextPlacement.value;
             if (!textPlacement) return [];
 
+            const wrapSign = ['ltr', 'ttb'].includes(textPlacement.wrapDirection) ? 1 : -1;
+            let wrapOffsetStart = wrapSign > 0 ? 0 : textPlacement.wrapDirectionSize;
+
             for (const line of textPlacement.lines) {
+                const wrapOffsetLine = wrapSign > 0 ? 0 : -(textPlacement.isHorizontal ? (line.heightAboveBaseline + line.heightBelowBaseline) : line.largestCharacterWidth);
+
                 if (line.documentLineIndex >= startLine && line.documentLineIndex <= endLine) {
                     let lineMaxCharacterIndex = 0;
                     let previousGlyphCharacterIndex = -1;
@@ -97,9 +102,9 @@ export default defineComponent({
                             (glyphCharacterIndex >= startCharacter || line.documentLineIndex > startLine) &&
                             (glyphCharacterIndex < endCharacter || line.documentLineIndex < endLine)
                         ) {
-                            let x = textPlacement.isHorizontal ? glyph.advanceOffset : line.wrapOffset;
-                            let y = textPlacement.isHorizontal ? line.wrapOffset + line.heightAboveBaseline - glyph.fontAscender : glyph.advanceOffset;
-                            let width = textPlacement.isHorizontal ? glyph.advance : line.wrapOffset + line.largestCharacterWidth;
+                            let x = textPlacement.isHorizontal ? glyph.advanceOffset : wrapOffsetStart + wrapOffsetLine + (line.wrapOffset * wrapSign);
+                            let y = textPlacement.isHorizontal ? wrapOffsetStart + wrapOffsetLine + (line.wrapOffset * wrapSign) + line.heightAboveBaseline - glyph.fontAscender : glyph.advanceOffset;
+                            let width = textPlacement.isHorizontal ? glyph.advance : line.largestCharacterWidth;
                             let height = textPlacement.isHorizontal ? glyph.fontAscender + -glyph.fontDescender : glyph.advance;
                             
                             let isCreateNewBox = false;
