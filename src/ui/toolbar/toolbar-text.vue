@@ -20,7 +20,7 @@
                     <template #prepend>
                         <span class="is-size-7" v-t="'toolbar.text.size'" />
                     </template>
-                    <el-input-number :aria-label="$t('toolbar.text.size')" v-model="size" size="small" style="width: 3rem"></el-input-number>
+                    <el-input-number :aria-label="$t('toolbar.text.size')" v-model="size" :precision="2" :step="0.01" size="small" style="width: 3rem"></el-input-number>
                 </el-input-group>
                 <el-button-group v-if="false" class="el-button-group--flex ml-3">
                     <!-- Bold -->
@@ -206,7 +206,7 @@ export default defineComponent({
                 });
             },
             get() {
-                return toolbarTextMeta.size ?? textMetaDefaults.size;
+                return parseFloat((toolbarTextMeta.size ?? textMetaDefaults.size).toFixed(2));
             }
         });
 

@@ -6,6 +6,7 @@ import { ApplyLayerTransformAction } from '@/actions/apply-layer-transform';
 import { BundleAction } from '@/actions/bundle';
 import { SetLayerBoundsToWorkingFileBoundsAction } from '@/actions/set-layer-bounds-to-working-file-bounds';
 import { TrimLayerEmptySpaceAction } from '@/actions/trim-layer-empty-space';
+import { isShiftKeyPressed } from '@/lib/keyboard';
 
 import type { WorkingFileLayer, ColorModel } from '@/types';
 
@@ -28,28 +29,63 @@ export const selectedLayers = ref<WorkingFileLayer<ColorModel>[]>([]);
 
 export const freeTransformEmitter = mitt();
 
-export const isResizeEnabled = computed<boolean>(() => {
-    const selectedLayers = getSelectedLayers(workingFileStore.state.selectedLayerIds);
-    let isEnabled = true;
-    for (const layer of selectedLayers) {
-        if (layer.type === 'text') {
-            isEnabled = false;
-            break;
+export const transformOptions = computed(() => {
+    let canTranslate: boolean = true;
+    let canScale: boolean = true;
+    let canRotate: boolean = true;
+    let shouldShowUnevenScalingHandles = new Set<boolean>(); // Enables the edge handles with apply uneven scaling
+    let shouldMaintainAspectRatio = new Set<boolean>(); // The scale must be applied evenly to layer's width/height
+    let shouldScaleDuringResize = new Set<boolean>(); // The scale will be applied to the layer's DOMMatrix
+    let shouldSnapRotationDegrees: boolean = useRotationSnapping.value;
+    if (isShiftKeyPressed.value === true) {
+        shouldMaintainAspectRatio.add(false);
+        shouldSnapRotationDegrees = !useRotationSnapping.value;
+    }
+    if (selectedLayers.value.length === 1) {
+        if (selectedLayers.value.find(layer => layer.type === 'text')) {
+            shouldShowUnevenScalingHandles.add(false); // Can enable if coded to reuse these handles while maintaining aspect ratio
+            shouldMaintainAspectRatio.add(true);
+            shouldScaleDuringResize.add(false);
+        }
+        if (selectedLayers.value.find(layer => layer.type === 'gradient')) {
+            shouldShowUnevenScalingHandles.add(false);
+            shouldMaintainAspectRatio.add(true);
         }
     }
-    return isEnabled;
+    if (shouldShowUnevenScalingHandles.size === 0) {
+        shouldShowUnevenScalingHandles.add(true);
+    }
+    if (shouldMaintainAspectRatio.size === 0) {
+        shouldMaintainAspectRatio.add(true);
+    }
+    if (shouldScaleDuringResize.size === 0) {
+        shouldScaleDuringResize.add(true);
+    }
+
+    if (shouldShowUnevenScalingHandles.size > 1) {
+        canScale = false;
+    }
+    if (shouldMaintainAspectRatio.size > 1) {
+        canScale = false;
+    }
+    if (shouldScaleDuringResize.size > 1) {
+        canScale = false;
+    }
+    return {
+        canTranslate, canScale, canRotate,
+        shouldShowUnevenScalingHandles: shouldShowUnevenScalingHandles.values().next().value ?? false,
+        shouldMaintainAspectRatio: shouldMaintainAspectRatio.values().next().value ?? false,
+        shouldScaleDuringResize: shouldScaleDuringResize.values().next().value ?? false,
+        shouldSnapRotationDegrees,
+    };
+});
+
+export const isResizeEnabled = computed<boolean>(() => {
+    return transformOptions.value.canScale;
 });
 
 export const isUnevenScalingEnabled = computed<boolean>(() => {
-    const selectedLayers = getSelectedLayers(workingFileStore.state.selectedLayerIds);
-    let isEnabled = true;
-    for (const layer of selectedLayers) {
-        if (layer.type === 'gradient') {
-            isEnabled = false;
-            break;
-        }
-    }
-    return isEnabled;
+    return transformOptions.value.shouldShowUnevenScalingHandles;
 });
 
 freeTransformEmitter.on('setDimensions', (event?: { top?: number, left?: number, width?: number, height?: number, rotation?: number, transformOriginX?: number, transformOriginY?: number }) => {

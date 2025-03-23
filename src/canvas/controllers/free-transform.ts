@@ -3,7 +3,7 @@ import BaseCanvasMovementController from './base-movement';
 import {
     isBoundsIndeterminate, layerPickMode, useRotationSnapping, freeTransformEmitter, top, left, width, height, rotation,
     transformOriginX, transformOriginY, dimensionLockRatio, previewXSnap, previewYSnap, dragHandleHighlight, rotateHandleHighlight, selectedLayers,
-    applyTransform, isResizeEnabled, isUnevenScalingEnabled,
+    applyTransform, isResizeEnabled, isUnevenScalingEnabled, transformOptions,
 } from '../store/free-transform-state';
 import {
     appliedSelectionMask, appliedSelectionMaskCanvasOffset, activeSelectionMask, activeSelectionMaskCanvasOffset
@@ -22,7 +22,7 @@ import { isInput } from '@/lib/events';
 import appEmitter, { AppEmitterEvents } from '@/lib/emitter';
 import { clockwiseAngle2d, pointDistance2d } from '@/lib/math';
 import { AsyncCallbackQueue } from '@/lib/timing';
-import { isCtrlOrMetaKeyPressed, isShiftKeyPressed } from '@/lib/keyboard';
+import { textMetaDefaults } from '@/lib/text-common';
 
 import { CreateNewLayersFromSelectionAction } from '@/actions/create-new-layers-from-selection';
 import { ClearSelectionAction } from '@/actions/clear-selection';
@@ -33,7 +33,11 @@ import { BundleAction } from '@/actions/bundle';
 import { t, tm, rt } from '@/i18n';
 
 import type { PointerTracker } from './base';
-import type { ColorModel, DrawWorkingFileOptions, UpdateAnyLayerOptions, WorkingFileLayer, WorkingFileGradientLayer } from '@/types';
+import type {
+    ColorModel, DrawWorkingFileOptions, UpdateAnyLayerOptions,
+    WorkingFileLayer, WorkingFileGradientLayer, WorkingFileTextLayer,
+    UpdateTextLayerOptions,
+} from '@/types';
 
 const DRAG_TYPE_ALL = 0;
 const DRAG_TYPE_TOP = 1;
@@ -53,6 +57,12 @@ interface TransformInfo extends DragResizeTransformInfo {
     handleToRotationOrigin: number;
 }
 
+interface TransformStartLayerData {
+    transform: DOMMatrix;
+    baseFontSize: number;
+    textDocument?: WorkingFileTextLayer['data'];
+}
+
 type PointerProcessStep = 'start' | 'move' | 'end' | null;
 
 export default class CanvasFreeTransformController extends BaseCanvasMovementController {
@@ -60,7 +70,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     private remToPx: number = 16;
     private transformTranslateStart: DOMPoint | null = null;
     private transformStartDimensions: TransformInfo = { top: 0, left: 0, width: 0, height: 0, rotation: 0, handleToRotationOrigin: 0 };
-    private transformStartLayerData: { transform: DOMMatrix }[] = [];
+    private transformStartLayerData: TransformStartLayerData[] = [];
     private transformStartPickLayer: number | null = null;
     private transformDragType: number = 0;
     private transformIsDragging: boolean = false;
@@ -272,7 +282,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         if (!this.transformTranslateStart) return;
 
         const { viewTransformPoint } = this.getTransformedCursorInfo();
-        const { shouldMaintainAspectRatio, shouldScaleDuringResize, shouldSnapRotationDegrees } = this.getTransformOptions();
+        const { shouldMaintainAspectRatio, shouldScaleDuringResize, shouldSnapRotationDegrees } = transformOptions.value;
 
         if (pointer.isDragging) {
             this.isPointerDragging = true;
@@ -483,8 +493,19 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         this.transformStartLayerData = [];
 
         for (let layer of selectedLayers.value) {
+            let baseFontSize = 0;
+            let textDocument: WorkingFileTextLayer['data'] | undefined;
+            if (layer.type === 'text') {
+                baseFontSize = (layer as WorkingFileTextLayer).data.lines?.[0].spans?.[0].meta.size ?? textMetaDefaults.size;
+                textDocument = (layer as WorkingFileTextLayer).data;
+                // TODO - maybe can detect if the user is attempting to scale the layer and not create a clone
+                // here because it is not necessary. But that doesn't seem simple to detect right here.
+                (layer as WorkingFileTextLayer).data = JSON.parse(JSON.stringify((layer as WorkingFileTextLayer).data));
+            }
             this.transformStartLayerData.push({
-                transform: layer.transform
+                transform: layer.transform,
+                baseFontSize,
+                textDocument,
             });
         }
     }
@@ -493,6 +514,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         this.storeTransformStart(viewTransformPoint);
         this.transformIsRotating = false;
         this.transformIsDragging = false;
+
         // Determine which dimensions to drag on
         if (this.isPointOnRotateHandle(transformBoundsPoint, viewDecomposedTransform)) {
             this.transformIsRotating = true;
@@ -548,7 +570,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
     private previewDragResizeChange(newTransform: DragResizeTransformInfo, shouldScaleDuringResize?: boolean) {
         if (shouldScaleDuringResize == null) {
-            shouldScaleDuringResize = this.getTransformOptions().shouldScaleDuringResize;
+            shouldScaleDuringResize = transformOptions.value.shouldScaleDuringResize;
         }
         // Determine top/left offset based on width/height change
         let transformOriginXPoint = (this.transformStartDimensions.width * transformOriginX.value);
@@ -642,6 +664,19 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                         transformEndOriginY = endOrigin.y;
                         break;
                 }
+            } else if (layer.type === 'text') {
+                const textDocument = (layer as WorkingFileTextLayer).data;
+                const currentScaleRatio = (
+                    (textDocument.lines?.[0].spans?.[0].meta.size ?? textMetaDefaults.size) /
+                    this.transformStartLayerData[i].baseFontSize
+                );
+                const newScaleRatio = decomposedTransform.scaleX * newTransform.width / this.transformStartDimensions.width;
+                for (const line of textDocument.lines) {
+                    for (const span of line.spans) {
+                        const newFontSize = ((span.meta.size ?? textMetaDefaults.size) / currentScaleRatio) * newScaleRatio;
+                        span.meta.size = newFontSize;
+                    }
+                }
             }
             if (shouldScaleDuringResize) {
                 transform.scaleSelf(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY);
@@ -665,7 +700,6 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
     private async commitTransforms() {
         try {
-            let { shouldScaleDuringResize } = this.getTransformOptions();
             width.value = Math.max(1, width.value);
             height.value = Math.max(1, height.value);
             previewXSnap.value = [];
@@ -678,17 +712,23 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             if (isTranslate || isScale || isRotate) {
                 const updateLayerActions: UpdateLayerAction<UpdateAnyLayerOptions<ColorModel>>[] = [];
                 for (const [i, layer] of selectedLayers.value.entries()) {
+                    const updateLayerOptions: UpdateAnyLayerOptions = {
+                        id: layer.id,
+                        transform: layer.transform,
+                    };
+                    const revertLayerOptions: Partial<UpdateAnyLayerOptions> = {
+                        transform: this.transformStartLayerData[i].transform,
+                    };
+                    if (isResizeEnabled.value) {
+                        updateLayerOptions.width = width.value;
+                        updateLayerOptions.height = height.value;
+                    }
+                    if (this.transformStartLayerData[i].textDocument) {
+                        (updateLayerOptions as UpdateTextLayerOptions).data = (layer as WorkingFileTextLayer).data;
+                        (revertLayerOptions as Partial<UpdateTextLayerOptions>).data = this.transformStartLayerData[i].textDocument;
+                    }
                     updateLayerActions.push(
-                        new UpdateLayerAction({
-                            id: layer.id,
-                            transform: layer.transform,
-                            ...(shouldScaleDuringResize || !isResizeEnabled.value ? {} : {
-                                width: width.value,
-                                height: height.value
-                            })
-                        }, {
-                            transform: this.transformStartLayerData[i].transform
-                        })
+                        new UpdateLayerAction(updateLayerOptions, revertLayerOptions)
                     );
                 }
                 await historyStore.dispatch('runAction', {
@@ -897,27 +937,6 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 });
             }
         }
-    }
-
-    protected getTransformOptions() {
-        let shouldMaintainAspectRatio: boolean = true;
-        let shouldScaleDuringResize: boolean = true;
-        let shouldSnapRotationDegrees: boolean = useRotationSnapping.value;
-        if (isShiftKeyPressed.value === true) {
-            shouldMaintainAspectRatio = false;
-            shouldSnapRotationDegrees = !useRotationSnapping.value;
-        }
-        if (selectedLayers.value.length === 1) {
-            const firstLayer = selectedLayers.value[0];
-            if (firstLayer.type === 'text') {
-                shouldMaintainAspectRatio = false;
-                shouldScaleDuringResize = false;
-            }
-            if (firstLayer.type === 'gradient') {
-                shouldMaintainAspectRatio = true;
-            }
-        }
-        return { shouldMaintainAspectRatio, shouldScaleDuringResize, shouldSnapRotationDegrees };
     }
 
     protected handleCursorIcon() {

@@ -99,7 +99,7 @@
                                 />
                             </el-form-item>
                             <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.freeTransform.metrics.rotation')">
-                                <el-input-number v-model="inputRotation" style="width: 6rem" size="small" suffix-text="°" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputRotation($event)" @blur="onChangeRotationInput($event)">
+                                <el-input-number v-model="inputRotation" style="width: 6rem" size="small" suffix-text="°" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputRotation($event)" @blur="onChangeRotationInput()">
                                     <template #append>
                                         <el-button size="small" :aria-label="$t('toolbar.freeTransform.metrics.resetRotation')" @click="onResetRotation()">
                                             <span class="bi bi-arrow-repeat" aria-hidden="true"></span>
