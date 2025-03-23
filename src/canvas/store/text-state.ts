@@ -5,7 +5,7 @@ import { getLayerById, getLayerGlobalTransform } from '@/store/working-file';
 import { PerformantStore } from '@/store/performant-store';
 
 import type {
-    CalculatedTextPlacement, TextDocumentSelectionState, TextDocument, TextDocumentSpanMeta
+    CalculatedTextPlacement, TextDocumentSelectionState, TextDocument, TextDocumentSpanMeta, WorkingFileTextLayer
 } from '@/types';
 
 type RecordWithNull<T> = {
@@ -36,6 +36,8 @@ export const editingLayerCssTransform = computed<string>(() => {
     return `matrix(${transform.a},${transform.b},${transform.c},${transform.d},${transform.e},${transform.f})`;
 });
 
+export const editingTextLayer = ref<WorkingFileTextLayer | null>(null);
+
 interface PermanentStorageState {
     lineAlignment: TextDocument['lineAlignment'],
     lineDirection: TextDocument['lineDirection'],
@@ -62,8 +64,8 @@ export const toolbarTextDefaults = reactive({
 });
 
 if (['ltr', 'rtl'].includes(toolbarTextDefaults.lineDirection) && !['ttb', 'btt'].includes(toolbarTextDefaults.wrapDirection)) {
-    toolbarTextDefaults.wrapDirection = 'ltr';
+    toolbarTextDefaults.wrapDirection = 'ttb';
 }
 if (['ttb', 'btt'].includes(toolbarTextDefaults.lineDirection) && !['ltr', 'rtl'].includes(toolbarTextDefaults.wrapDirection)) {
-    toolbarTextDefaults.wrapDirection = 'ttb';
+    toolbarTextDefaults.wrapDirection = 'rtl';
 }

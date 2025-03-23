@@ -19,6 +19,10 @@ export class TextDocumentEditor {
         this.document = document;
     }
 
+	public setDocument(document: TextDocument) {
+		this.document = document;
+	}
+
 	public onNotifyChange(handler: () => void) {
 		this.notifyChangeHandlers.push(handler);
 	}

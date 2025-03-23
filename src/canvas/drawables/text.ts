@@ -11,7 +11,6 @@
 import bidiFactory from 'bidi-js';
 const bidi = bidiFactory()
 
-import { FontCache } from '@/lib/font-cache';
 import { textMetaDefaults } from '@/lib/text-common';
 import { getUnloadedFontFamilies, loadFontFamilies, calculateTextPlacement } from '@/lib/text-render';
 

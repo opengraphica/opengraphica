@@ -152,10 +152,9 @@ import defaultFontFamilies from '@/config/default-font-families.json';
 
 import { textMetaDefaults } from '@/lib/text-common';
 
-import { getLayerById } from '@/store/working-file';
-import { editingTextLayerId, textToolbarEmitter, toolbarTextMeta, toolbarTextDefaults } from '@/canvas/store/text-state';
+import { editingTextLayer, textToolbarEmitter, toolbarTextMeta, toolbarTextDefaults } from '@/canvas/store/text-state';
 
-import type { RGBAColor, TextDocument, WorkingFileTextLayer } from '@/types';
+import type { RGBAColor, TextDocument } from '@/types';
 
 export default defineComponent({
     name: 'ToolbarText',
@@ -181,17 +180,6 @@ export default defineComponent({
         'close'
     ],
     setup() {
-        const editingTextLayer = computed(() => {
-            const id = editingTextLayerId.value;
-            if (id == null) {
-                return null;
-            }
-            const layer = getLayerById(id) as WorkingFileTextLayer;
-            if (layer?.type !== 'text') {
-                return null;
-            }
-            return layer;
-        });
 
         const family = computed<string>({
             set(value) {

@@ -156,7 +156,7 @@ export default defineComponent({
                     foundCursorLine = line;
                     let lineMaxCharacterIndex = 0;
                     for (const glyph of line.glyphs) {
-                        if (cursor.character === glyph.documentCharacterIndex) {
+                        if (cursor.character >= glyph.documentCharacterIndex && cursor.character < glyph.documentCharacterIndex + glyph.documentCharacterCount) {
                             foundCursorGlyph = glyph;
                             break findCursorGlyph;
                         }
@@ -174,6 +174,11 @@ export default defineComponent({
                 let advanceOffset = 0;
                 if (foundCursorGlyph) {
                     advanceOffset = foundCursorGlyph.advanceOffset;
+                    if (cursor.character > foundCursorGlyph.documentCharacterIndex) {
+                        advanceOffset += (
+                            (cursor.character - foundCursorGlyph.documentCharacterIndex) / foundCursorGlyph.documentCharacterCount
+                        ) * foundCursorGlyph.advance;
+                    }
                 } else {
                     foundCursorGlyph = foundCursorLine.glyphs[foundCursorLine.glyphs.length - 1];
                     if (foundCursorGlyph) {

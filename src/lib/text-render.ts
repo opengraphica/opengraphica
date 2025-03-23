@@ -410,6 +410,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
         let wasDrawCompensatingForAdvanceHeight = false;
         let lineDrawXOffset = 0;
         let lineDrawYOffset = 0;
+        let previousGlyphInfo: RenderTextGlyphInfo | null = null;
         
         // let workingFlippedRun: RenderTextGlyphInfo[] = [];
         for (const fullSpan of line.spans) {
@@ -465,6 +466,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                     let originalTextCharacterIndex = bidiRun.isFlipped ? bidiRunText.length - 1 : 0;
                     for (const glyph of glyphs) {
                         const unicodes = glyph.unicodes;
+                        const documentCharacterCount = glyph.components?.length ?? 1;
                         let startOriginalTextCharacterIndex = originalTextCharacterIndex;
                         if (bidiRun.isFlipped) {
                             for (; originalTextCharacterIndex >= -1; originalTextCharacterIndex--) {
@@ -504,8 +506,8 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                             fontSize: size,
                             fontAscender: font.ascender * glyphScale,
                             fontDescender: font.descender * glyphScale,
-                            characterIndex: bidiRunCharacterIndex + originalTextCharacterIndex,
                             documentCharacterIndex: runningWrapCharacterIndex + bidiRunCharacterIndex + originalTextCharacterIndex,
+                            documentCharacterCount,
                             bidiDirection,
                         };
                         wasDrawCompensatingForAdvanceHeight = isDrawCompensatingForAdvanceHeight;
@@ -532,8 +534,8 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                         lineInfo.glyphs.push(glyphInfo);
                         // }
 
-                        if (unicodes.length > 0) {
-                            originalTextCharacterIndex += bidiRun.isFlipped ? -1 : 1;
+                        if (glyph.unicodes.length > 0) {
+                            originalTextCharacterIndex += bidiRun.isFlipped ? -documentCharacterCount : documentCharacterCount;
                         }
                     }
 

@@ -68,7 +68,6 @@ export default class TextLayerRenderer extends BaseLayerRenderer {
             });
         });
         this.drawableCanvas.onDrawn(async ({ canvas, updateInfo }) => {
-
             if (this.waitingToLoadFontFamilies.length > 0) {
                 notifyFontFamiliesLoaded(this.waitingToLoadFontFamilies);
             }

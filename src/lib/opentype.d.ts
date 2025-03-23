@@ -162,6 +162,16 @@ export interface Field {
  * GLYPH
  ******************************************/
 
+export interface GlyphComponent {
+    dx: number;
+    dy: number;
+    glyphIndex: number;
+    scale01: number;
+    scale10: number;
+    xScale: number;
+    yScale: number;
+}
+
 export class Glyph {
     index: number;
     name: string | null;
@@ -176,6 +186,9 @@ export class Glyph {
     advanceHeight?: number;
     topSideBearing?: number;
     path: Path;
+
+    isComposite?: boolean;
+    components?: GlyphComponent[];
 
     private bindConstructorValues(options: GlyphOptions): void;
     constructor(options: GlyphOptions);

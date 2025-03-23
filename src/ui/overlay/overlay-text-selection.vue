@@ -97,15 +97,34 @@ export default defineComponent({
                     let lineMaxCharacterIndex = 0;
                     let previousGlyphCharacterIndex = -1;
                     for (const glyph of line.glyphs) {
-                        const glyphCharacterIndex = glyph.documentCharacterIndex; // + lineWrapCharacterIndexIterator;
+                        const glyphCharacterIndex = glyph.documentCharacterIndex;
+                        const glyphCharacterCount = glyph.documentCharacterCount;
                         if (
-                            (glyphCharacterIndex >= startCharacter || line.documentLineIndex > startLine) &&
+                            (glyphCharacterIndex + (glyphCharacterCount - 1) >= startCharacter || line.documentLineIndex > startLine) &&
                             (glyphCharacterIndex < endCharacter || line.documentLineIndex < endLine)
                         ) {
-                            let x = textPlacement.isHorizontal ? glyph.advanceOffset : wrapOffsetStart + wrapOffsetLine + (line.wrapOffset * wrapSign);
-                            let y = textPlacement.isHorizontal ? wrapOffsetStart + wrapOffsetLine + (line.wrapOffset * wrapSign) + line.heightAboveBaseline - glyph.fontAscender : glyph.advanceOffset;
-                            let width = textPlacement.isHorizontal ? glyph.advance : line.largestCharacterWidth;
-                            let height = textPlacement.isHorizontal ? glyph.fontAscender + -glyph.fontDescender : glyph.advance;
+                            const glyphSelectionStartCharacter = Math.max(
+                                glyphCharacterIndex,
+                                startLine === line.documentLineIndex ? startCharacter : -Infinity,
+                            );
+                            const glyphSelectionEndCharacter = Math.min(
+                                glyphCharacterIndex + glyphCharacterCount,
+                                endLine === line.documentLineIndex ? endCharacter : Infinity,
+                            );
+                            const advanceStartRatio = (glyphSelectionStartCharacter - glyphCharacterIndex) / glyphCharacterCount;
+                            const advance = glyph.advance * ((glyphSelectionEndCharacter - glyphSelectionStartCharacter) / glyphCharacterCount);
+                            let x = textPlacement.isHorizontal
+                                ? glyph.advanceOffset + (glyph.advance * advanceStartRatio)
+                                : wrapOffsetStart + wrapOffsetLine + (line.wrapOffset * wrapSign);
+                            let y = textPlacement.isHorizontal
+                                ? wrapOffsetStart + wrapOffsetLine + (line.wrapOffset * wrapSign) + line.heightAboveBaseline - glyph.fontAscender
+                                : glyph.advanceOffset + (glyph.advance * advanceStartRatio);
+                            let width = textPlacement.isHorizontal
+                                ? advance
+                                : line.largestCharacterWidth;
+                            let height = textPlacement.isHorizontal
+                                ? glyph.fontAscender + -glyph.fontDescender
+                                : advance;
                             
                             let isCreateNewBox = false;
 
@@ -114,7 +133,7 @@ export default defineComponent({
                             } else {
                                 if (textPlacement.isHorizontal) {
                                     if (
-                                        Math.abs(glyph.documentCharacterIndex -previousGlyphCharacterIndex) <= 1 &&
+                                        Math.abs(glyph.documentCharacterIndex - previousGlyphCharacterIndex) <= 1 &&
                                         currentBox.rect.y === y && currentBox.rect.height === height
                                     ) {
                                         currentBox.rect.x = Math.min(currentBox.rect.x, x);
@@ -125,7 +144,7 @@ export default defineComponent({
                                     }
                                 } else {
                                     if (
-                                        Math.abs(glyph.documentCharacterIndex -previousGlyphCharacterIndex) <= 1 &&
+                                        Math.abs(glyph.documentCharacterIndex - previousGlyphCharacterIndex) <= 1 &&
                                         currentBox.rect.x === x && currentBox.rect.width === width
                                     ) {
                                         currentBox.rect.y = Math.min(currentBox.rect.y, y);
