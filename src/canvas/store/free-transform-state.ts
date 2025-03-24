@@ -35,7 +35,7 @@ export const transformOptions = computed(() => {
     let canRotate: boolean = true;
     let shouldShowUnevenScalingHandles = new Set<boolean>(); // Enables the edge handles with apply uneven scaling
     let shouldMaintainAspectRatio = new Set<boolean>(); // The scale must be applied evenly to layer's width/height
-    let shouldScaleDuringResize = new Set<boolean>(); // The scale will be applied to the layer's DOMMatrix
+    let shouldScaleDuringResize = new Set<boolean>(); // The scale will be applied to the layer's DOMMatrix, otherwise width/height are changed
     let shouldSnapRotationDegrees: boolean = useRotationSnapping.value;
     if (isShiftKeyPressed.value === true) {
         shouldMaintainAspectRatio.add(false);

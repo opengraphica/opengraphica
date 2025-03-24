@@ -700,6 +700,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
     private async commitTransforms() {
         try {
+            let { shouldScaleDuringResize } = transformOptions.value;
             width.value = Math.max(1, width.value);
             height.value = Math.max(1, height.value);
             previewXSnap.value = [];
@@ -719,7 +720,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                     const revertLayerOptions: Partial<UpdateAnyLayerOptions> = {
                         transform: this.transformStartLayerData[i].transform,
                     };
-                    if (isResizeEnabled.value) {
+                    if (!shouldScaleDuringResize && !isResizeEnabled.value) {
                         updateLayerOptions.width = width.value;
                         updateLayerOptions.height = height.value;
                     }
