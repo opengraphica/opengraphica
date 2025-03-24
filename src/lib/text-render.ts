@@ -417,15 +417,22 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
             const spanFontSplits = splitSpanByAvailableFonts(fullSpan, isEmptyLine ? (isHorizontal ? '​' : ' ') : null);
             for (const [font, span] of spanFontSplits) {
 
+
                 // Abort if no font.
                 if (!font) {
                     lineCharacterIndex += span.text.length;
                     continue;
                 }
+
                 const unitsPerEm = font.unitsPerEm;
                 const size = span.meta.size ?? textMetaDefaults.size;
                 const glyphScale = size / unitsPerEm;
-                const goldenRatioMargin = size * 0.147058824;
+                const hGlyph = font.charToGlyph('H');
+                const capHeight = font.tables?.os2?.sCapHeight 
+                    ? font.tables.os2.sCapHeight + (unitsPerEm / size) * 2
+                    : hGlyph.yMax
+                        ? hGlyph.yMax + (unitsPerEm / size) * 2
+                        : font.ascender;
 
                 const fontYMax = font.ascender * glyphScale;
                 const fontYMin = font.descender * glyphScale;
@@ -444,14 +451,6 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                 for (const bidiRun of bidiRuns) {
                     const bidiDirection = bidiRun.isFlipped ? (lineDirection === 'ltr' ? 'rtl' : 'ltr') : lineDirection;
 
-                    // // If switching from flipped to non-flipped run, add the glyphs from the previous flipped run to the line.
-                    // if (!bidiRun.isFlipped && workingFlippedRun.length > 0) {
-                    //     for (let glyphInfo of workingFlippedRun) {
-                    //         lineInfo.glyphs.push(glyphInfo);
-                    //     }
-                    //     workingFlippedRun = [];
-                    // }
-
                     // Replace mirrored charactrs
                     let bidiRunText = bidiRun.text;
                     if (bidiRun.isFlipped) {
@@ -462,29 +461,24 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                     }
 
                     // Convert characters to glyphs
-                    const glyphs = font.stringToGlyphs(bidiRunText);
+                    const glyphs = isHorizontal
+                        ? font.stringToGlyphMapping(bidiRunText)
+                        : bidiRunText.split('').map((char, index) => {
+                            return {
+                                glyph: font.charToGlyph(char),
+                                replaced: [index]
+                            };
+                        });
                     let originalTextCharacterIndex = bidiRun.isFlipped ? bidiRunText.length - 1 : 0;
-                    for (const glyph of glyphs) {
-                        const unicodes = glyph.unicodes;
-                        const documentCharacterCount = glyph.components?.length ?? 1;
-                        let startOriginalTextCharacterIndex = originalTextCharacterIndex;
-                        if (bidiRun.isFlipped) {
-                            for (; originalTextCharacterIndex >= -1; originalTextCharacterIndex--) {
-                                if (unicodes.includes(bidiRunText.charCodeAt(originalTextCharacterIndex))) break;
-                            }
-                        } else {
-                            for (; originalTextCharacterIndex <= bidiRunText.length; originalTextCharacterIndex++) {
-                                if (unicodes.includes(bidiRunText.charCodeAt(originalTextCharacterIndex))) break;
-                            }
-                        }
-                        if (originalTextCharacterIndex < 0 || originalTextCharacterIndex > bidiRunText.length - 1) originalTextCharacterIndex = startOriginalTextCharacterIndex;
-
+                    for (const { glyph, replaced } of glyphs) {
+                        const documentCharacterCount = replaced.length;
+                        
                         const glyphMetrics = glyph.getMetrics();
 
                         if (!isHorizontal) {
                             isDrawCompensatingForAdvanceHeight = glyph.advanceHeight != null;
                             if (!isDrawCompensatingForAdvanceHeight) {
-                                lineDrawYOffset = (glyphMetrics.yMax * glyphScale) + (goldenRatioMargin / 2);
+                                lineDrawYOffset = capHeight * glyphScale;
                             } else if (isDrawCompensatingForAdvanceHeight && !wasDrawCompensatingForAdvanceHeight) {
                                 lineDrawYOffset = (glyphMetrics.yMax + (glyphMetrics.topSideBearing ?? 0)) * glyphScale;
                             }
@@ -498,11 +492,11 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                                 : (
                                     glyph.advanceHeight != null
                                         ? glyph.advanceHeight * glyphScale
-                                        : (glyphMetrics.yMax - glyphMetrics.yMin) * glyphScale + goldenRatioMargin
+                                        : (font.ascender - font.descender) * glyphScale
                                 ),
                             advanceOffset: runningAdvanceOffset,
                             drawOffset: new DOMPoint(lineDrawXOffset, lineDrawYOffset),
-                            characterWidth: (glyph.advanceWidth ?? 0) * glyphScale, // Math.abs(glyphMetrics.xMax * glyphScale - glyphMetrics.xMin * glyphScale),
+                            characterWidth: (glyph.advanceWidth ?? 0) * glyphScale,
                             fontSize: size,
                             fontAscender: font.ascender * glyphScale,
                             fontDescender: font.descender * glyphScale,
@@ -515,24 +509,13 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                         lineInfo.lineSize += glyphInfo.advance;
 
                         if (!isHorizontal) {
-                            if (glyphInfo.characterWidth > lineInfo.largestCharacterWidth) {
-                                lineInfo.largestCharacterWidth = glyphInfo.characterWidth;
+                            const characterLineWidth = Math.max(glyphInfo.characterWidth, glyphInfo.fontSize);
+                            if (characterLineWidth > lineInfo.largestCharacterWidth) {
+                                lineInfo.largestCharacterWidth = characterLineWidth;
                             }
                         }
 
-                        // if (isHorizontal) {
-                        //     lineInfo.lineSize += glyphInfo.advance;
-                        // } else {
-                            // if (glyphInfo.characterWidth > lineInfo.largestCharacterWidth) {
-                            //     lineInfo.largestCharacterWidth = glyphInfo.characterWidth;
-                            // }
-                        //     lineInfo.lineSize += Math.abs(glyphMetrics.yMax - glyphMetrics.yMin);
-                        // }
-                        // if (bidiRun.isFlipped) {
-                        //     workingFlippedRun.push(glyphInfo);
-                        // } else {
                         lineInfo.glyphs.push(glyphInfo);
-                        // }
 
                         if (glyph.unicodes.length > 0) {
                             originalTextCharacterIndex += bidiRun.isFlipped ? -documentCharacterCount : documentCharacterCount;
@@ -544,14 +527,6 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                 lineCharacterIndex += span.text.length;
             }
         }
-
-        // // Add final flipped run to line.
-        // if (workingFlippedRun.length > 0) {
-        //     for (let glyphInfo of workingFlippedRun) {
-        //         lineInfo.glyphs.push(glyphInfo);
-        //     }
-        //     workingFlippedRun = [];
-        // }
 
         // Add line to list of lines.
         if (lineInfo.lineSize > longestLineSize) {

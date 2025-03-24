@@ -71,6 +71,8 @@ export class Font {
     numberOfHMetrics: number;
     numGlyphs: number;
     outlinesFormat: string;
+    stringToGlyphIndexes(s: string): number[];
+    stringToGlyphMapping(s: string): Array<{ glyph: Glyph, replaced: number[] }>;
     stringToGlyphs(s: string): Glyph[];
     toArrayBuffer(): ArrayBuffer;
     toBuffer(): ArrayBuffer;

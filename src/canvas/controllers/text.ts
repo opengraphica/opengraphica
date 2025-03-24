@@ -1,4 +1,4 @@
-import { watch, type WatchStopHandle, watchEffect } from 'vue';
+import { nextTick, watch, type WatchStopHandle } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 
 import { BundleAction } from '@/actions/bundle';
@@ -10,7 +10,9 @@ import BaseCanvasMovementController from './base-movement';
 
 import { t } from '@/i18n';
 import { decomposeMatrix } from '@/lib/dom-matrix';
+import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
 import { isInput } from '@/lib/events';
+import { getKeyboardAction } from '@/lib/keyboard';
 import { rotateDirectionVector2d } from '@/lib/math';
 import { TextDocumentEditor, TextDocumentSelection, TextDocumentEditorWithSelection } from '@/lib/text-editor';
 import { textMetaDefaults } from '@/lib/text-common';
@@ -29,10 +31,11 @@ import {
     overlaySelectionCursorPosition, overlaySelectionCursorSize, editingLayerCssTransform,
 } from '../store/text-state';
 
+import { runModule } from '@/modules';
+
 import type { UpdateTextLayerOptions, WorkingFileTextLayer, TextDocument, InsertTextLayerOptions, TextDocumentSpanMeta } from '@/types';
 import type { PointerTracker } from './base';
 import type { DecomposedMatrix } from '@/lib/dom-matrix';
-import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
 
 const DRAG_TYPE_ALL = 0;
 const DRAG_TYPE_TOP = 1;
@@ -81,6 +84,9 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         this.selectedLayerIdsUnwatch = watch(() => workingFileStore.state.selectedLayerIds, (newIds, oldIds) => {
             for (const oldId of oldIds ?? []) {
                 try {
+                    if (editingTextLayerId.value === oldId) {
+                        editingTextDocumentSelection.value = null;
+                    }
                     const editors = this.layerEditors.get(oldId);
                     if (editors) {
                         const { documentEditor, documentSelection } = editors;
@@ -203,14 +209,16 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         this.editingTextLayerDimensionsUnwatch?.();
     }
 
-    private onHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
+    private async onHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
         if (['moduleCropResize', 'typeInTextLayer', 'updateTextLayerProperties'].includes(event?.action.id as string)) {
 
             // Update document editor with new document.
             if (editingTextLayerId.value != null) {
+                await nextTick();
                 const editors = this.layerEditors.get(editingTextLayerId.value);
                 const layer = getLayerById<WorkingFileTextLayer>(editingTextLayerId.value);
                 if (layer?.type === 'text' && editors) {
+                    layer.data = JSON.parse(JSON.stringify(layer.data));
                     editors.documentEditor.setDocument(layer.data);
                 }
             }
@@ -236,7 +244,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         const { name, value } = event as { name: keyof TextDocument, value: any };
         editingTextLayer.value.data[name] = value as never;
         this.editingLayerDocumentOnFocusId = editingTextLayerId.value;
-        this.editingLayerDocumentOnFocus = editingTextLayer.value.data;
+        this.editingLayerDocumentOnFocus = JSON.parse(JSON.stringify(editingTextLayer.value.data));
         this.isEditorTextareaDirty = true;
         this.saveEditorTextarea('updateTextLayerProperties');
     }
@@ -537,7 +545,24 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                     break;
                 }
             default:
-                handled = false;
+                const shortcutAction = getKeyboardAction(event.key, event.ctrlKey, event.shiftKey, event.altKey);
+                if (shortcutAction?.target == 'history/undo') {
+                    const actionSplit = shortcutAction.target.split('/');
+                    if (this.isEditorTextareaDirty) {
+                        this.saveEditorTextarea().then(() => {
+                            runModule(actionSplit[0], actionSplit[1]);
+                        });
+                    } else {
+                        runModule(actionSplit[0], actionSplit[1]);
+                    }
+                } else if (shortcutAction?.target == 'history/redo') {
+                    this.isEditorTextareaDirty = false;
+                    clearTimeout(this.editorTextareaQueueSaveTimeoutHandle);
+                    const actionSplit = shortcutAction.target.split('/');
+                    runModule(actionSplit[0], actionSplit[1]);
+                } else {
+                    handled = false;
+                }
         }
         if (handled) {
             canvasStore.set('dirty', true);
@@ -814,11 +839,13 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                     height: this.editingLayerHeightStart,
                 }));
                 if (isResize && this.editingLayerDocumentStart && this.editingLayerDocumentStart.boundary !== 'box') {
+                    const oldData = this.editingLayerDocumentStart;
+                    this.editingLayerDocumentStart = JSON.parse(JSON.stringify(oldData));
                     updateLayerActions.push(new UpdateLayerAction<UpdateTextLayerOptions>({
                         id: editingTextLayerId.value,
                         data: editingTextLayer.value.data,
                     }, {
-                        data: this.editingLayerDocumentStart,
+                        data: oldData,
                     }));
                 }
                 historyStore.dispatch('runAction', {
@@ -978,10 +1005,10 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                     action: new BundleAction(actionId, `action.${actionId}`, [
                         new UpdateLayerAction<UpdateTextLayerOptions>({
                             id: editingTextLayerId.value,
-                            data: JSON.parse(JSON.stringify(editingTextLayer.value.data))
+                            data: editingTextLayer.value.data,
                         }, {
                             data: oldTextDocument
-                        })
+                        }),
                     ])
                 });
             } else {

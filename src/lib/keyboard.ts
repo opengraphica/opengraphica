@@ -30,6 +30,7 @@ interface ShortcutDefinition {
     };
 }
 
+// Mapping of primary key (such as 'a') to one or more shortcut definitions.
 const shortcutKeyMap = new Map<string, ShortcutDefinition[]>();
 
 export function buildShortcutKeyMap(keyboardMapConfig: KeyboardMapConfigCategory[]) {
@@ -125,6 +126,14 @@ async function onDocumentKeyDown(e: KeyboardEvent) {
                     break;
                 }
             }
+        }
+    }
+}
+
+export function getKeyboardAction(primaryKey: string, isCtrl: boolean = false, isShift: boolean = false, isAlt: boolean = false) {
+    for (const shortcut of shortcutKeyMap.get(primaryKey) ?? []) {
+        if (shortcut.ctrl === isCtrl && shortcut.shift === isShift && shortcut.alt === isAlt) {
+            return shortcut.action;
         }
     }
 }

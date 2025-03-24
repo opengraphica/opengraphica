@@ -3608,7 +3608,7 @@ var opentype = (() => {
     for (i = glyphs.length - 1; i > 0; i -= 1) {
       const g = glyphs.get(i);
       if (g.unicode > 65535) {
-        console.info("Adding CMAP format 12 (needed!)");
+        console.log("Adding CMAP format 12 (needed!)");
         isPlan0Only = false;
         break;
       }
@@ -6006,7 +6006,7 @@ var opentype = (() => {
       metrics.yMax = 0;
     }
     metrics.rightSideBearing = this.advanceWidth - metrics.leftSideBearing - (metrics.xMax - metrics.xMin);
-    metrics.bottomSideBearing = this.advanceHeight - metrics.topSideBearing - (metrics.yMax - metrics.yMin);
+    metrics.bottomSideBearing = metrics.topSideBearing != null ? this.advanceHeight - metrics.topSideBearing - (metrics.yMax - metrics.yMin) : void 0;
     return metrics;
   };
   Glyph.prototype.draw = function(ctx, x, y, fontSize, options, font) {
@@ -6154,7 +6154,7 @@ var opentype = (() => {
     };
   }
   GlyphSet.prototype.get = function(index) {
-    if (this.glyphs[index] === void 0) {
+    if (this.font._push && this.glyphs[index] === void 0) {
       this.font._push(index);
       if (typeof this.glyphs[index] === "function") {
         this.glyphs[index] = this.glyphs[index]();
@@ -6910,7 +6910,7 @@ var opentype = (() => {
                 p.curveTo(c3x, c3y, c4x, c4y, x, y);
                 break;
               default:
-                console.info("Glyph " + glyph.index + ": unknown operator 1200" + v);
+                console.log("Glyph " + glyph.index + ": unknown operator 1200" + v);
                 stack.length = 0;
             }
             break;
@@ -7005,6 +7005,7 @@ var opentype = (() => {
             parseStems();
             break;
           case 19:
+          // hintmask
           case 20:
             parseStems();
             i += nStems + 7 >> 3;
@@ -7142,7 +7143,7 @@ var opentype = (() => {
             break;
           default:
             if (v < 32) {
-              console.info("Glyph " + glyph.index + ": unknown operator " + v);
+              console.log("Glyph " + glyph.index + ": unknown operator " + v);
             } else if (v < 247) {
               stack.push(v - 139);
             } else if (v < 251) {
@@ -9122,9 +9123,9 @@ var opentype = (() => {
       { name: "version", type: "USHORT", value: 1 },
       { name: "numRanges", type: "USHORT", value: gasp.numRanges }
     ]);
-    for (let i in gasp.numRanges) {
-      result.fields.push({ name: "rangeMaxPPEM", type: "USHORT", value: gasp.numRanges[i].rangeMaxPPEM });
-      result.fields.push({ name: "rangeGaspBehavior", type: "USHORT", value: gasp.numRanges[i].rangeGaspBehavior });
+    for (let i in gasp.gaspRanges) {
+      result.fields.push({ name: "rangeMaxPPEM", type: "USHORT", value: gasp.gaspRanges[i].rangeMaxPPEM });
+      result.fields.push({ name: "rangeGaspBehavior", type: "USHORT", value: gasp.gaspRanges[i].rangeGaspBehavior });
     }
     return result;
   }
@@ -9436,13 +9437,14 @@ var opentype = (() => {
     const fontNamesUnicode = font.names.unicode || {};
     const fontNamesMacintosh = font.names.macintosh || {};
     const fontNamesWindows = font.names.windows || {};
-    for (const platform in ["unicode", "macintosh", "windows"]) {
+    for (const platform in names) {
       names[platform] = names[platform] || {};
       if (!names[platform].uniqueID) {
-        names.unicode.uniqueID = { en: font.getEnglishName("manufacturer") + ":" + englishFullName };
+        const manufacturer = font.getEnglishName("manufacturer") || "";
+        names[platform].uniqueID = { en: `${manufacturer}: ${englishFullName}` };
       }
       if (!names[platform].postScriptName) {
-        names.unicode.postScriptName = { en: postScriptName };
+        names[platform].postScriptName = { en: postScriptName };
       }
     }
     if (!names.unicode.preferredFamily) {
@@ -12021,6 +12023,7 @@ var opentype = (() => {
       case "glyf":
         this.zp0 = this.zp1 = this.zp2 = 1;
         this.rp0 = this.rp1 = this.rp2 = 0;
+      /* fall through */
       case "prep":
         this.fv = this.pv = this.dpv = xUnitVector;
         this.round = roundToGrid;
@@ -12041,13 +12044,13 @@ var opentype = (() => {
         fpgmState.funcs = [];
         fpgmState.font = font;
         if (false) {
-          console.info("---EXEC FPGM---");
+          console.log("---EXEC FPGM---");
           fpgmState.step = -1;
         }
         try {
           exec(fpgmState);
         } catch (e) {
-          console.info("Hinting error in FPGM:" + e);
+          console.log("Hinting error in FPGM:" + e);
           this._errorState = 3;
           return;
         }
@@ -12066,14 +12069,14 @@ var opentype = (() => {
         prepState.cvt = [];
       }
       if (false) {
-        console.info("---EXEC PREP---");
+        console.log("---EXEC PREP---");
         prepState.step = -1;
       }
       try {
         exec(prepState);
       } catch (e) {
         if (this._errorState < 2) {
-          console.info("Hinting error in PREP:" + e);
+          console.log("Hinting error in PREP:" + e);
         }
         this._errorState = 2;
       }
@@ -12083,8 +12086,8 @@ var opentype = (() => {
       return execGlyph(glyph, prepState);
     } catch (e) {
       if (this._errorState < 1) {
-        console.info("Hinting error:" + e);
-        console.info("Note: further hinting errors are silenced");
+        console.log("Hinting error:" + e);
+        console.log("Note: further hinting errors are silenced");
       }
       this._errorState = 1;
       return void 0;
@@ -12101,7 +12104,7 @@ var opentype = (() => {
     if (!components) {
       state = new State("glyf", glyph.instructions);
       if (false) {
-        console.info("---EXEC GLYPH---");
+        console.log("---EXEC GLYPH---");
         state.step = -1;
       }
       execComponent(glyph, state, xScale, yScale);
@@ -12115,7 +12118,7 @@ var opentype = (() => {
         const cg = font.glyphs.get(c.glyphIndex);
         state = new State("glyf", cg.instructions);
         if (false) {
-          console.info("---EXEC COMP " + i + "---");
+          console.log("---EXEC COMP " + i + "---");
           state.step = -1;
         }
         execComponent(cg, state, xScale, yScale);
@@ -12144,7 +12147,7 @@ var opentype = (() => {
           new HPoint(Math.round(glyph.advanceWidth * xScale), 0)
         );
         if (false) {
-          console.info("---EXEC COMPOSITE---");
+          console.log("---EXEC COMPOSITE---");
           state.step = -1;
         }
         exec(state);
@@ -12188,9 +12191,9 @@ var opentype = (() => {
     }
     if (state.inhibitGridFit) return;
     if (false) {
-      console.info("PROCESSING GLYPH", state.stack);
+      console.log("PROCESSING GLYPH", state.stack);
       for (let i = 0; i < pLen; i++) {
-        console.info(i, gZone[i].x, gZone[i].y);
+        console.log(i, gZone[i].x, gZone[i].y);
       }
     }
     gZone.push(
@@ -12200,9 +12203,9 @@ var opentype = (() => {
     exec(state);
     gZone.length -= 2;
     if (false) {
-      console.info("FINISHED GLYPH", state.stack);
+      console.log("FINISHED GLYPH", state.stack);
       for (let i = 0; i < pLen; i++) {
-        console.info(i, gZone[i].x, gZone[i].y);
+        console.log(i, gZone[i].x, gZone[i].y);
       }
     }
   };
@@ -12253,15 +12256,15 @@ var opentype = (() => {
     state.ip = ip;
   }
   function SVTCA(v, state) {
-    if (false) console.info(state.step, "SVTCA[" + v.axis + "]");
+    if (false) console.log(state.step, "SVTCA[" + v.axis + "]");
     state.fv = state.pv = state.dpv = v;
   }
   function SPVTCA(v, state) {
-    if (false) console.info(state.step, "SPVTCA[" + v.axis + "]");
+    if (false) console.log(state.step, "SPVTCA[" + v.axis + "]");
     state.pv = state.dpv = v;
   }
   function SFVTCA(v, state) {
-    if (false) console.info(state.step, "SFVTCA[" + v.axis + "]");
+    if (false) console.log(state.step, "SFVTCA[" + v.axis + "]");
     state.fv = v;
   }
   function SPVTL(a, state) {
@@ -12270,7 +12273,7 @@ var opentype = (() => {
     const p1i = stack.pop();
     const p2 = state.z2[p2i];
     const p1 = state.z1[p1i];
-    if (false) console.info("SPVTL[" + a + "]", p2i, p1i);
+    if (false) console.log("SPVTL[" + a + "]", p2i, p1i);
     let dx;
     let dy;
     if (!a) {
@@ -12288,7 +12291,7 @@ var opentype = (() => {
     const p1i = stack.pop();
     const p2 = state.z2[p2i];
     const p1 = state.z1[p1i];
-    if (false) console.info("SFVTL[" + a + "]", p2i, p1i);
+    if (false) console.log("SFVTL[" + a + "]", p2i, p1i);
     let dx;
     let dy;
     if (!a) {
@@ -12304,33 +12307,33 @@ var opentype = (() => {
     const stack = state.stack;
     const y = stack.pop();
     const x = stack.pop();
-    if (false) console.info(state.step, "SPVFS[]", y, x);
+    if (false) console.log(state.step, "SPVFS[]", y, x);
     state.pv = state.dpv = getUnitVector(x, y);
   }
   function SFVFS(state) {
     const stack = state.stack;
     const y = stack.pop();
     const x = stack.pop();
-    if (false) console.info(state.step, "SPVFS[]", y, x);
+    if (false) console.log(state.step, "SPVFS[]", y, x);
     state.fv = getUnitVector(x, y);
   }
   function GPV(state) {
     const stack = state.stack;
     const pv = state.pv;
-    if (false) console.info(state.step, "GPV[]");
+    if (false) console.log(state.step, "GPV[]");
     stack.push(pv.x * 16384);
     stack.push(pv.y * 16384);
   }
   function GFV(state) {
     const stack = state.stack;
     const fv = state.fv;
-    if (false) console.info(state.step, "GFV[]");
+    if (false) console.log(state.step, "GFV[]");
     stack.push(fv.x * 16384);
     stack.push(fv.y * 16384);
   }
   function SFVTPV(state) {
     state.fv = state.pv;
-    if (false) console.info(state.step, "SFVTPV[]");
+    if (false) console.log(state.step, "SFVTPV[]");
   }
   function ISECT(state) {
     const stack = state.stack;
@@ -12346,7 +12349,7 @@ var opentype = (() => {
     const pb0 = z1[pb0i];
     const pb1 = z1[pb1i];
     const p = state.z2[pi];
-    if (false) console.info("ISECT[], ", pa0i, pa1i, pb0i, pb1i, pi);
+    if (false) console.log("ISECT[], ", pa0i, pa1i, pb0i, pb1i, pi);
     const x1 = pa0.x;
     const y1 = pa0.y;
     const x2 = pa1.x;
@@ -12363,19 +12366,19 @@ var opentype = (() => {
   }
   function SRP0(state) {
     state.rp0 = state.stack.pop();
-    if (false) console.info(state.step, "SRP0[]", state.rp0);
+    if (false) console.log(state.step, "SRP0[]", state.rp0);
   }
   function SRP1(state) {
     state.rp1 = state.stack.pop();
-    if (false) console.info(state.step, "SRP1[]", state.rp1);
+    if (false) console.log(state.step, "SRP1[]", state.rp1);
   }
   function SRP2(state) {
     state.rp2 = state.stack.pop();
-    if (false) console.info(state.step, "SRP2[]", state.rp2);
+    if (false) console.log(state.step, "SRP2[]", state.rp2);
   }
   function SZP0(state) {
     const n = state.stack.pop();
-    if (false) console.info(state.step, "SZP0[]", n);
+    if (false) console.log(state.step, "SZP0[]", n);
     state.zp0 = n;
     switch (n) {
       case 0:
@@ -12391,7 +12394,7 @@ var opentype = (() => {
   }
   function SZP1(state) {
     const n = state.stack.pop();
-    if (false) console.info(state.step, "SZP1[]", n);
+    if (false) console.log(state.step, "SZP1[]", n);
     state.zp1 = n;
     switch (n) {
       case 0:
@@ -12407,7 +12410,7 @@ var opentype = (() => {
   }
   function SZP2(state) {
     const n = state.stack.pop();
-    if (false) console.info(state.step, "SZP2[]", n);
+    if (false) console.log(state.step, "SZP2[]", n);
     state.zp2 = n;
     switch (n) {
       case 0:
@@ -12423,7 +12426,7 @@ var opentype = (() => {
   }
   function SZPS(state) {
     const n = state.stack.pop();
-    if (false) console.info(state.step, "SZPS[]", n);
+    if (false) console.log(state.step, "SZPS[]", n);
     state.zp0 = state.zp1 = state.zp2 = n;
     switch (n) {
       case 0:
@@ -12439,72 +12442,72 @@ var opentype = (() => {
   }
   function SLOOP(state) {
     state.loop = state.stack.pop();
-    if (false) console.info(state.step, "SLOOP[]", state.loop);
+    if (false) console.log(state.step, "SLOOP[]", state.loop);
   }
   function RTG(state) {
-    if (false) console.info(state.step, "RTG[]");
+    if (false) console.log(state.step, "RTG[]");
     state.round = roundToGrid;
   }
   function RTHG(state) {
-    if (false) console.info(state.step, "RTHG[]");
+    if (false) console.log(state.step, "RTHG[]");
     state.round = roundToHalfGrid;
   }
   function SMD(state) {
     const d = state.stack.pop();
-    if (false) console.info(state.step, "SMD[]", d);
+    if (false) console.log(state.step, "SMD[]", d);
     state.minDis = d / 64;
   }
   function ELSE(state) {
-    if (false) console.info(state.step, "ELSE[]");
+    if (false) console.log(state.step, "ELSE[]");
     skip(state, false);
   }
   function JMPR(state) {
     const o = state.stack.pop();
-    if (false) console.info(state.step, "JMPR[]", o);
+    if (false) console.log(state.step, "JMPR[]", o);
     state.ip += o - 1;
   }
   function SCVTCI(state) {
     const n = state.stack.pop();
-    if (false) console.info(state.step, "SCVTCI[]", n);
+    if (false) console.log(state.step, "SCVTCI[]", n);
     state.cvCutIn = n / 64;
   }
   function DUP(state) {
     const stack = state.stack;
-    if (false) console.info(state.step, "DUP[]");
+    if (false) console.log(state.step, "DUP[]");
     stack.push(stack[stack.length - 1]);
   }
   function POP(state) {
-    if (false) console.info(state.step, "POP[]");
+    if (false) console.log(state.step, "POP[]");
     state.stack.pop();
   }
   function CLEAR(state) {
-    if (false) console.info(state.step, "CLEAR[]");
+    if (false) console.log(state.step, "CLEAR[]");
     state.stack.length = 0;
   }
   function SWAP(state) {
     const stack = state.stack;
     const a = stack.pop();
     const b = stack.pop();
-    if (false) console.info(state.step, "SWAP[]");
+    if (false) console.log(state.step, "SWAP[]");
     stack.push(a);
     stack.push(b);
   }
   function DEPTH(state) {
     const stack = state.stack;
-    if (false) console.info(state.step, "DEPTH[]");
+    if (false) console.log(state.step, "DEPTH[]");
     stack.push(stack.length);
   }
   function LOOPCALL(state) {
     const stack = state.stack;
     const fn = stack.pop();
     const c = stack.pop();
-    if (false) console.info(state.step, "LOOPCALL[]", fn, c);
+    if (false) console.log(state.step, "LOOPCALL[]", fn, c);
     const cip = state.ip;
     const cprog = state.prog;
     state.prog = state.funcs[fn];
     for (let i = 0; i < c; i++) {
       exec(state);
-      if (false) console.info(
+      if (false) console.log(
         ++state.step,
         i + 1 < c ? "next loopcall" : "done loopcall",
         i
@@ -12515,25 +12518,25 @@ var opentype = (() => {
   }
   function CALL(state) {
     const fn = state.stack.pop();
-    if (false) console.info(state.step, "CALL[]", fn);
+    if (false) console.log(state.step, "CALL[]", fn);
     const cip = state.ip;
     const cprog = state.prog;
     state.prog = state.funcs[fn];
     exec(state);
     state.ip = cip;
     state.prog = cprog;
-    if (false) console.info(++state.step, "returning from", fn);
+    if (false) console.log(++state.step, "returning from", fn);
   }
   function CINDEX(state) {
     const stack = state.stack;
     const k = stack.pop();
-    if (false) console.info(state.step, "CINDEX[]", k);
+    if (false) console.log(state.step, "CINDEX[]", k);
     stack.push(stack[stack.length - k]);
   }
   function MINDEX(state) {
     const stack = state.stack;
     const k = stack.pop();
-    if (false) console.info(state.step, "MINDEX[]", k);
+    if (false) console.log(state.step, "MINDEX[]", k);
     stack.push(stack.splice(stack.length - k, 1)[0]);
   }
   function FDEF(state) {
@@ -12543,7 +12546,7 @@ var opentype = (() => {
     let ip = state.ip;
     const fn = stack.pop();
     const ipBegin = ip;
-    if (false) console.info(state.step, "FDEF[]", fn);
+    if (false) console.log(state.step, "FDEF[]", fn);
     while (prog[++ip] !== 45) ;
     state.ip = ip;
     state.funcs[fn] = prog.slice(ipBegin + 1, ip);
@@ -12553,7 +12556,7 @@ var opentype = (() => {
     const p = state.z0[pi];
     const fv = state.fv;
     const pv = state.pv;
-    if (false) console.info(state.step, "MDAP[" + round + "]", pi);
+    if (false) console.log(state.step, "MDAP[" + round + "]", pi);
     let d = pv.distance(p, HPZero);
     if (round) d = state.round(d);
     fv.setRelative(p, HPZero, d, pv);
@@ -12566,7 +12569,7 @@ var opentype = (() => {
     let cp;
     let pp;
     let np;
-    if (false) console.info(state.step, "IUP[" + v.axis + "]");
+    if (false) console.log(state.step, "IUP[" + v.axis + "]");
     for (let i = 0; i < pLen; i++) {
       cp = z2[i];
       if (v.touched(cp)) continue;
@@ -12594,7 +12597,7 @@ var opentype = (() => {
       fv.setRelative(p, p, d, pv);
       fv.touch(p);
       if (false) {
-        console.info(
+        console.log(
           state.step,
           (state.loop > 1 ? "loop " + (state.loop - loop) + ": " : "") + "SHP[" + (a ? "rp1" : "rp2") + "]",
           pi
@@ -12612,7 +12615,7 @@ var opentype = (() => {
     const ci = stack.pop();
     const sp = state.z2[state.contours[ci]];
     let p = sp;
-    if (false) console.info(state.step, "SHC[" + a + "]", ci);
+    if (false) console.log(state.step, "SHC[" + a + "]", ci);
     const d = pv.distance(rp, rp, false, true);
     do {
       if (p !== rp) fv.setRelative(p, p, d, pv);
@@ -12626,7 +12629,7 @@ var opentype = (() => {
     const fv = state.fv;
     const pv = state.pv;
     const e = stack.pop();
-    if (false) console.info(state.step, "SHZ[" + a + "]", e);
+    if (false) console.log(state.step, "SHZ[" + a + "]", e);
     let z;
     switch (e) {
       case 0:
@@ -12656,7 +12659,7 @@ var opentype = (() => {
       const pi = stack.pop();
       const p = z2[pi];
       if (false) {
-        console.info(
+        console.log(
           state.step,
           (state.loop > 1 ? "loop " + (state.loop - loop) + ": " : "") + "SHPIX[]",
           pi,
@@ -12682,7 +12685,7 @@ var opentype = (() => {
       const pi = stack.pop();
       const p = z2[pi];
       if (false) {
-        console.info(
+        console.log(
           state.step,
           (state.loop > 1 ? "loop " + (state.loop - loop) + ": " : "") + "IP[]",
           pi,
@@ -12706,7 +12709,7 @@ var opentype = (() => {
     const pv = state.pv;
     fv.setRelative(p, rp0, d, pv);
     fv.touch(p);
-    if (false) console.info(state.step, "MSIRP[" + a + "]", d, pi);
+    if (false) console.log(state.step, "MSIRP[" + a + "]", d, pi);
     state.rp1 = state.rp0;
     state.rp2 = pi;
     if (a) state.rp0 = pi;
@@ -12723,7 +12726,7 @@ var opentype = (() => {
       const pi = stack.pop();
       const p = z1[pi];
       if (false) {
-        console.info(
+        console.log(
           state.step,
           (state.loop > 1 ? "loop " + (state.loop - loop) + ": " : "") + "ALIGNRP[]",
           pi
@@ -12735,7 +12738,7 @@ var opentype = (() => {
     state.loop = 1;
   }
   function RTDG(state) {
-    if (false) console.info(state.step, "RTDG[]");
+    if (false) console.log(state.step, "RTDG[]");
     state.round = roundToDoubleGrid;
   }
   function MIAP(round, state) {
@@ -12747,7 +12750,7 @@ var opentype = (() => {
     const pv = state.pv;
     let cv = state.cvt[n];
     if (false) {
-      console.info(
+      console.log(
         state.step,
         "MIAP[" + round + "]",
         n,
@@ -12775,7 +12778,7 @@ var opentype = (() => {
     let ip = state.ip;
     const stack = state.stack;
     const n = prog[++ip];
-    if (false) console.info(state.step, "NPUSHB[]", n);
+    if (false) console.log(state.step, "NPUSHB[]", n);
     for (let i = 0; i < n; i++) stack.push(prog[++ip]);
     state.ip = ip;
   }
@@ -12784,7 +12787,7 @@ var opentype = (() => {
     const prog = state.prog;
     const stack = state.stack;
     const n = prog[++ip];
-    if (false) console.info(state.step, "NPUSHW[]", n);
+    if (false) console.log(state.step, "NPUSHW[]", n);
     for (let i = 0; i < n; i++) {
       let w = prog[++ip] << 8 | prog[++ip];
       if (w & 32768) w = -((w ^ 65535) + 1);
@@ -12798,14 +12801,14 @@ var opentype = (() => {
     if (!store) store = state.store = [];
     const v = stack.pop();
     const l = stack.pop();
-    if (false) console.info(state.step, "WS", v, l);
+    if (false) console.log(state.step, "WS", v, l);
     store[l] = v;
   }
   function RS(state) {
     const stack = state.stack;
     const store = state.store;
     const l = stack.pop();
-    if (false) console.info(state.step, "RS", l);
+    if (false) console.log(state.step, "RS", l);
     const v = store && store[l] || 0;
     stack.push(v);
   }
@@ -12813,20 +12816,20 @@ var opentype = (() => {
     const stack = state.stack;
     const v = stack.pop();
     const l = stack.pop();
-    if (false) console.info(state.step, "WCVTP", v, l);
+    if (false) console.log(state.step, "WCVTP", v, l);
     state.cvt[l] = v / 64;
   }
   function RCVT(state) {
     const stack = state.stack;
     const cvte = stack.pop();
-    if (false) console.info(state.step, "RCVT", cvte);
+    if (false) console.log(state.step, "RCVT", cvte);
     stack.push(state.cvt[cvte] * 64);
   }
   function GC(a, state) {
     const stack = state.stack;
     const pi = stack.pop();
     const p = state.z2[pi];
-    if (false) console.info(state.step, "GC[" + a + "]", pi);
+    if (false) console.log(state.step, "GC[" + a + "]", pi);
     stack.push(state.dpv.distance(p, HPZero, a, false) * 64);
   }
   function MD(a, state) {
@@ -12836,101 +12839,101 @@ var opentype = (() => {
     const p2 = state.z1[pi2];
     const p1 = state.z0[pi1];
     const d = state.dpv.distance(p1, p2, a, a);
-    if (false) console.info(state.step, "MD[" + a + "]", pi2, pi1, "->", d);
+    if (false) console.log(state.step, "MD[" + a + "]", pi2, pi1, "->", d);
     state.stack.push(Math.round(d * 64));
   }
   function MPPEM(state) {
-    if (false) console.info(state.step, "MPPEM[]");
+    if (false) console.log(state.step, "MPPEM[]");
     state.stack.push(state.ppem);
   }
   function FLIPON(state) {
-    if (false) console.info(state.step, "FLIPON[]");
+    if (false) console.log(state.step, "FLIPON[]");
     state.autoFlip = true;
   }
   function LT(state) {
     const stack = state.stack;
     const e2 = stack.pop();
     const e1 = stack.pop();
-    if (false) console.info(state.step, "LT[]", e2, e1);
+    if (false) console.log(state.step, "LT[]", e2, e1);
     stack.push(e1 < e2 ? 1 : 0);
   }
   function LTEQ(state) {
     const stack = state.stack;
     const e2 = stack.pop();
     const e1 = stack.pop();
-    if (false) console.info(state.step, "LTEQ[]", e2, e1);
+    if (false) console.log(state.step, "LTEQ[]", e2, e1);
     stack.push(e1 <= e2 ? 1 : 0);
   }
   function GT(state) {
     const stack = state.stack;
     const e2 = stack.pop();
     const e1 = stack.pop();
-    if (false) console.info(state.step, "GT[]", e2, e1);
+    if (false) console.log(state.step, "GT[]", e2, e1);
     stack.push(e1 > e2 ? 1 : 0);
   }
   function GTEQ(state) {
     const stack = state.stack;
     const e2 = stack.pop();
     const e1 = stack.pop();
-    if (false) console.info(state.step, "GTEQ[]", e2, e1);
+    if (false) console.log(state.step, "GTEQ[]", e2, e1);
     stack.push(e1 >= e2 ? 1 : 0);
   }
   function EQ(state) {
     const stack = state.stack;
     const e2 = stack.pop();
     const e1 = stack.pop();
-    if (false) console.info(state.step, "EQ[]", e2, e1);
+    if (false) console.log(state.step, "EQ[]", e2, e1);
     stack.push(e2 === e1 ? 1 : 0);
   }
   function NEQ(state) {
     const stack = state.stack;
     const e2 = stack.pop();
     const e1 = stack.pop();
-    if (false) console.info(state.step, "NEQ[]", e2, e1);
+    if (false) console.log(state.step, "NEQ[]", e2, e1);
     stack.push(e2 !== e1 ? 1 : 0);
   }
   function ODD(state) {
     const stack = state.stack;
     const n = stack.pop();
-    if (false) console.info(state.step, "ODD[]", n);
+    if (false) console.log(state.step, "ODD[]", n);
     stack.push(Math.trunc(n) & 1 ? 1 : 0);
   }
   function EVEN(state) {
     const stack = state.stack;
     const n = stack.pop();
-    if (false) console.info(state.step, "EVEN[]", n);
+    if (false) console.log(state.step, "EVEN[]", n);
     stack.push(Math.trunc(n) & 1 ? 0 : 1);
   }
   function IF(state) {
     let test = state.stack.pop();
     let ins;
-    if (false) console.info(state.step, "IF[]", test);
+    if (false) console.log(state.step, "IF[]", test);
     if (!test) {
       skip(state, true);
-      if (false) console.info(state.step, ins === 27 ? "ELSE[]" : "EIF[]");
+      if (false) console.log(state.step, ins === 27 ? "ELSE[]" : "EIF[]");
     }
   }
   function EIF(state) {
-    if (false) console.info(state.step, "EIF[]");
+    if (false) console.log(state.step, "EIF[]");
   }
   function AND(state) {
     const stack = state.stack;
     const e2 = stack.pop();
     const e1 = stack.pop();
-    if (false) console.info(state.step, "AND[]", e2, e1);
+    if (false) console.log(state.step, "AND[]", e2, e1);
     stack.push(e2 && e1 ? 1 : 0);
   }
   function OR(state) {
     const stack = state.stack;
     const e2 = stack.pop();
     const e1 = stack.pop();
-    if (false) console.info(state.step, "OR[]", e2, e1);
+    if (false) console.log(state.step, "OR[]", e2, e1);
     stack.push(e2 || e1 ? 1 : 0);
   }
   function NOT(state) {
     const stack = state.stack;
     const e = stack.pop();
-    if (false) console.info(state.step, "NOT[]", e);
+    if (false) console.log(state.step, "NOT[]", e);
     stack.push(e ? 0 : 1);
   }
   function DELTAP123(b, state) {
@@ -12942,7 +12945,7 @@ var opentype = (() => {
     const base = state.deltaBase + (b - 1) * 16;
     const ds = state.deltaShift;
     const z0 = state.z0;
-    if (false) console.info(state.step, "DELTAP[" + b + "]", n, stack);
+    if (false) console.log(state.step, "DELTAP[" + b + "]", n, stack);
     for (let i = 0; i < n; i++) {
       const pi = stack.pop();
       const arg = stack.pop();
@@ -12950,7 +12953,7 @@ var opentype = (() => {
       if (appem !== ppem) continue;
       let mag = (arg & 15) - 8;
       if (mag >= 0) mag++;
-      if (false) console.info(state.step, "DELTAPFIX", pi, "by", mag * ds);
+      if (false) console.log(state.step, "DELTAPFIX", pi, "by", mag * ds);
       const p = z0[pi];
       fv.setRelative(p, p, mag * ds, pv);
     }
@@ -12958,78 +12961,78 @@ var opentype = (() => {
   function SDB(state) {
     const stack = state.stack;
     const n = stack.pop();
-    if (false) console.info(state.step, "SDB[]", n);
+    if (false) console.log(state.step, "SDB[]", n);
     state.deltaBase = n;
   }
   function SDS(state) {
     const stack = state.stack;
     const n = stack.pop();
-    if (false) console.info(state.step, "SDS[]", n);
+    if (false) console.log(state.step, "SDS[]", n);
     state.deltaShift = Math.pow(0.5, n);
   }
   function ADD(state) {
     const stack = state.stack;
     const n2 = stack.pop();
     const n1 = stack.pop();
-    if (false) console.info(state.step, "ADD[]", n2, n1);
+    if (false) console.log(state.step, "ADD[]", n2, n1);
     stack.push(n1 + n2);
   }
   function SUB(state) {
     const stack = state.stack;
     const n2 = stack.pop();
     const n1 = stack.pop();
-    if (false) console.info(state.step, "SUB[]", n2, n1);
+    if (false) console.log(state.step, "SUB[]", n2, n1);
     stack.push(n1 - n2);
   }
   function DIV(state) {
     const stack = state.stack;
     const n2 = stack.pop();
     const n1 = stack.pop();
-    if (false) console.info(state.step, "DIV[]", n2, n1);
+    if (false) console.log(state.step, "DIV[]", n2, n1);
     stack.push(n1 * 64 / n2);
   }
   function MUL(state) {
     const stack = state.stack;
     const n2 = stack.pop();
     const n1 = stack.pop();
-    if (false) console.info(state.step, "MUL[]", n2, n1);
+    if (false) console.log(state.step, "MUL[]", n2, n1);
     stack.push(n1 * n2 / 64);
   }
   function ABS(state) {
     const stack = state.stack;
     const n = stack.pop();
-    if (false) console.info(state.step, "ABS[]", n);
+    if (false) console.log(state.step, "ABS[]", n);
     stack.push(Math.abs(n));
   }
   function NEG(state) {
     const stack = state.stack;
     let n = stack.pop();
-    if (false) console.info(state.step, "NEG[]", n);
+    if (false) console.log(state.step, "NEG[]", n);
     stack.push(-n);
   }
   function FLOOR(state) {
     const stack = state.stack;
     const n = stack.pop();
-    if (false) console.info(state.step, "FLOOR[]", n);
+    if (false) console.log(state.step, "FLOOR[]", n);
     stack.push(Math.floor(n / 64) * 64);
   }
   function CEILING(state) {
     const stack = state.stack;
     const n = stack.pop();
-    if (false) console.info(state.step, "CEILING[]", n);
+    if (false) console.log(state.step, "CEILING[]", n);
     stack.push(Math.ceil(n / 64) * 64);
   }
   function ROUND(dt, state) {
     const stack = state.stack;
     const n = stack.pop();
-    if (false) console.info(state.step, "ROUND[]");
+    if (false) console.log(state.step, "ROUND[]");
     stack.push(state.round(n / 64) * 64);
   }
   function WCVTF(state) {
     const stack = state.stack;
     const v = stack.pop();
     const l = stack.pop();
-    if (false) console.info(state.step, "WCVTF[]", v, l);
+    if (false) console.log(state.step, "WCVTF[]", v, l);
     state.cvt[l] = v * state.ppem / state.font.unitsPerEm;
   }
   function DELTAC123(b, state) {
@@ -13038,7 +13041,7 @@ var opentype = (() => {
     const ppem = state.ppem;
     const base = state.deltaBase + (b - 1) * 16;
     const ds = state.deltaShift;
-    if (false) console.info(state.step, "DELTAC[" + b + "]", n, stack);
+    if (false) console.log(state.step, "DELTAC[" + b + "]", n, stack);
     for (let i = 0; i < n; i++) {
       const c = stack.pop();
       const arg = stack.pop();
@@ -13047,13 +13050,13 @@ var opentype = (() => {
       let mag = (arg & 15) - 8;
       if (mag >= 0) mag++;
       const delta = mag * ds;
-      if (false) console.info(state.step, "DELTACFIX", c, "by", delta);
+      if (false) console.log(state.step, "DELTACFIX", c, "by", delta);
       state.cvt[c] += delta;
     }
   }
   function SROUND(state) {
     let n = state.stack.pop();
-    if (false) console.info(state.step, "SROUND[]", n);
+    if (false) console.log(state.step, "SROUND[]", n);
     state.round = roundSuper;
     let period;
     switch (n & 192) {
@@ -13092,7 +13095,7 @@ var opentype = (() => {
   }
   function S45ROUND(state) {
     let n = state.stack.pop();
-    if (false) console.info(state.step, "S45ROUND[]", n);
+    if (false) console.log(state.step, "S45ROUND[]", n);
     state.round = roundSuper;
     let period;
     switch (n & 192) {
@@ -13130,20 +13133,20 @@ var opentype = (() => {
     else state.srThreshold = (n / 8 - 0.5) * period;
   }
   function ROFF(state) {
-    if (false) console.info(state.step, "ROFF[]");
+    if (false) console.log(state.step, "ROFF[]");
     state.round = roundOff;
   }
   function RUTG(state) {
-    if (false) console.info(state.step, "RUTG[]");
+    if (false) console.log(state.step, "RUTG[]");
     state.round = roundUpToGrid;
   }
   function RDTG(state) {
-    if (false) console.info(state.step, "RDTG[]");
+    if (false) console.log(state.step, "RDTG[]");
     state.round = roundDownToGrid;
   }
   function SCANCTRL(state) {
     const n = state.stack.pop();
-    if (false) console.info(state.step, "SCANCTRL[]", n);
+    if (false) console.log(state.step, "SCANCTRL[]", n);
   }
   function SDPVTL(a, state) {
     const stack = state.stack;
@@ -13151,7 +13154,7 @@ var opentype = (() => {
     const p1i = stack.pop();
     const p2 = state.z2[p2i];
     const p1 = state.z1[p1i];
-    if (false) console.info(state.step, "SDPVTL[" + a + "]", p2i, p1i);
+    if (false) console.log(state.step, "SDPVTL[" + a + "]", p2i, p1i);
     let dx;
     let dy;
     if (!a) {
@@ -13167,7 +13170,7 @@ var opentype = (() => {
     const stack = state.stack;
     const sel = stack.pop();
     let r = 0;
-    if (false) console.info(state.step, "GETINFO[]", sel);
+    if (false) console.log(state.step, "GETINFO[]", sel);
     if (sel & 1) r = 35;
     if (sel & 32) r |= 4096;
     stack.push(r);
@@ -13177,7 +13180,7 @@ var opentype = (() => {
     const a = stack.pop();
     const b = stack.pop();
     const c = stack.pop();
-    if (false) console.info(state.step, "ROLL[]");
+    if (false) console.log(state.step, "ROLL[]");
     stack.push(b);
     stack.push(a);
     stack.push(c);
@@ -13186,24 +13189,24 @@ var opentype = (() => {
     const stack = state.stack;
     const e2 = stack.pop();
     const e1 = stack.pop();
-    if (false) console.info(state.step, "MAX[]", e2, e1);
+    if (false) console.log(state.step, "MAX[]", e2, e1);
     stack.push(Math.max(e1, e2));
   }
   function MIN(state) {
     const stack = state.stack;
     const e2 = stack.pop();
     const e1 = stack.pop();
-    if (false) console.info(state.step, "MIN[]", e2, e1);
+    if (false) console.log(state.step, "MIN[]", e2, e1);
     stack.push(Math.min(e1, e2));
   }
   function SCANTYPE(state) {
     const n = state.stack.pop();
-    if (false) console.info(state.step, "SCANTYPE[]", n);
+    if (false) console.log(state.step, "SCANTYPE[]", n);
   }
   function INSTCTRL(state) {
     const s = state.stack.pop();
     let v = state.stack.pop();
-    if (false) console.info(state.step, "INSTCTRL[]", s, v);
+    if (false) console.log(state.step, "INSTCTRL[]", s, v);
     switch (s) {
       case 1:
         state.inhibitGridFit = !!v;
@@ -13219,7 +13222,7 @@ var opentype = (() => {
     const stack = state.stack;
     const prog = state.prog;
     let ip = state.ip;
-    if (false) console.info(state.step, "PUSHB[" + n + "]");
+    if (false) console.log(state.step, "PUSHB[" + n + "]");
     for (let i = 0; i < n; i++) stack.push(prog[++ip]);
     state.ip = ip;
   }
@@ -13227,7 +13230,7 @@ var opentype = (() => {
     let ip = state.ip;
     const prog = state.prog;
     const stack = state.stack;
-    if (false) console.info(state.ip, "PUSHW[" + n + "]");
+    if (false) console.log(state.ip, "PUSHW[" + n + "]");
     for (let i = 0; i < n; i++) {
       let w = prog[++ip] << 8 | prog[++ip];
       if (w & 32768) w = -((w ^ 65535) + 1);
@@ -13261,7 +13264,7 @@ var opentype = (() => {
     fv.setRelative(p, rp, sign * d, pv);
     fv.touch(p);
     if (false) {
-      console.info(
+      console.log(
         state.step,
         (indirect ? "MIRP[" : "MDRP[") + (setRp0 ? "M" : "m") + (keepD ? ">" : "_") + (ro ? "R" : "_") + (dt === 0 ? "Gr" : dt === 1 ? "Bl" : dt === 2 ? "Wh" : "") + "]",
         indirect ? cvte + "(" + state.cvt[cvte] + "," + cv + ")" : "",
@@ -15236,6 +15239,39 @@ var opentype = (() => {
     }
     return indexes;
   };
+  Bidi.prototype.getTextGlyphMapping = function(text) {
+    this.processText(text);
+    let mapping = [];
+    let lastIndex = null;
+    let replaced = [];
+    for (let i = 0; i < this.tokenizer.tokens.length; i++) {
+      const token = this.tokenizer.tokens[i];
+      if (token.state.deleted) {
+        replaced.push(i);
+        continue;
+      }
+      if (lastIndex != null) {
+        mapping.push({
+          index: lastIndex,
+          replaced
+        });
+        lastIndex = null;
+        replaced = [];
+      }
+      const index = token.activeState.value;
+      lastIndex = Array.isArray(index) ? index[0] : index;
+      replaced.push(i);
+    }
+    if (lastIndex != null) {
+      mapping.push({
+        index: lastIndex,
+        replaced
+      });
+      lastIndex = null;
+      replaced = [];
+    }
+    return mapping;
+  };
   var bidi_default = Bidi;
 
   // src/font.mjs
@@ -15377,6 +15413,24 @@ var opentype = (() => {
     let features = options ? this.updateFeatures(options.features) : this.defaultRenderOptions.features;
     bidi.applyFeatures(this, features);
     return bidi.getTextGlyphs(s);
+  };
+  Font.prototype.stringToGlyphMapping = function(s, options) {
+    const bidi = new bidi_default();
+    const charToGlyphIndexMod = (token) => this.charToGlyphIndex(token.char);
+    bidi.registerModifier("glyphIndex", null, charToGlyphIndexMod);
+    let features = options ? this.updateFeatures(options.features) : this.defaultRenderOptions.features;
+    bidi.applyFeatures(this, features);
+    const indexMapping = bidi.getTextGlyphMapping(s);
+    let length = indexMapping.length;
+    const glyphMapping = new Array(length);
+    const notdef = this.glyphs.get(0);
+    for (let i = 0; i < length; i += 1) {
+      glyphMapping[i] = {
+        glyph: this.glyphs.get(indexMapping[i].index) || notdef,
+        replaced: indexMapping[i].replaced
+      };
+    }
+    return glyphMapping;
   };
   Font.prototype.stringToGlyphs = function(s, options) {
     const indexes = this.stringToGlyphIndexes(s, options);
@@ -15676,47 +15730,6 @@ var opentype = (() => {
   }
   var hvar_default = { make: makeHvarTable, parse: parseHvarTable };
 
-  // src/tables/vvar.mjs
-  function parseVvarTable(data, start) {
-    const p = new parse_default.Parser(data, start);
-    const tableVersionMajor = p.parseUShort();
-    const tableVersionMinor = p.parseUShort();
-    if (tableVersionMajor !== 1) {
-      console.warn(`Unsupported vvar table version ${tableVersionMajor}.${tableVersionMinor}`);
-    }
-    const version = [
-      tableVersionMajor,
-      tableVersionMinor
-    ];
-    const itemVariationStore = p.parsePointer32(function() {
-      return this.parseItemVariationStore();
-    });
-    const advanceHeight = p.parsePointer32(function() {
-      return this.parseDeltaSetIndexMap();
-    });
-    const tsb = p.parsePointer32(function() {
-      return this.parseDeltaSetIndexMap();
-    });
-    const bsb = p.parsePointer32(function() {
-      return this.parseDeltaSetIndexMap();
-    });
-    const vOrg = p.parsePointer32(function() {
-      return this.parseDeltaSetIndexMap();
-    });
-    return {
-      version,
-      itemVariationStore,
-      advanceHeight,
-      tsb,
-      bsb,
-      vOrg
-    };
-  }
-  function makeVvarTable() {
-    console.warn("Writing of vvar tables is not yet supported.");
-  }
-  var vvar_default = { make: makeVvarTable, parse: parseVvarTable };
-
   // src/tables/gdef.mjs
   var attachList = function() {
     return {
@@ -15917,7 +15930,7 @@ var opentype = (() => {
     return vhea;
   }
   function makeVheaTable(options) {
-    return new table_default.Table("hhea", [
+    return new table_default.Table("vhea", [
       { name: "version", type: "FIXED", value: 65536 },
       { name: "ascent", type: "FWORD", value: 0 },
       { name: "descent", type: "FWORD", value: 0 },
@@ -16161,7 +16174,6 @@ var opentype = (() => {
     let hmtxTableEntry;
     let hvarTableEntry;
     let vmtxTableEntry;
-    let vvarTableEntry;
     let kernTableEntry;
     let locaTableEntry;
     let nameTableEntry;
@@ -16220,15 +16232,13 @@ var opentype = (() => {
         case "hmtx":
           hmtxTableEntry = tableEntry;
           break;
-        case "VVAR":
-          vvarTableEntry = tableEntry;
-          break;
         case "vhea":
           table = uncompressTable(data, tableEntry);
           font.tables.vhea = vhea_default.parse(table.data, table.offset);
           font.vertTypoAscender = font.tables.vhea.vertTypoAscender;
           font.vertTypoDescender = font.tables.vhea.vertTypoDescender;
           font.numOfLongVerMetrics = font.tables.vhea.numOfLongVerMetrics;
+          break;
         case "vmtx":
           vmtxTableEntry = tableEntry;
           break;
@@ -16294,8 +16304,13 @@ var opentype = (() => {
           metaTableEntry = tableEntry;
           break;
         case "gasp":
-          table = uncompressTable(data, tableEntry);
-          font.tables.gasp = gasp_default.parse(table.data, table.offset);
+          try {
+            table = uncompressTable(data, tableEntry);
+            font.tables.gasp = gasp_default.parse(table.data, table.offset);
+          } catch (e) {
+            console.warn("Failed to parse gasp table, skipping.");
+            console.warn(e);
+          }
           break;
         case "SVG ":
           table = uncompressTable(data, tableEntry);
@@ -16398,16 +16413,6 @@ var opentype = (() => {
       }
       const hvarTable = uncompressTable(data, hvarTableEntry);
       font.tables.hvar = hvar_default.parse(hvarTable.data, hvarTable.offset, font.tables.fvar);
-    }
-    if (vvarTableEntry) {
-      if (!fvarTableEntry) {
-        console.warn("This font provides an VVAR table, but no fvar table, which is required for variable fonts.");
-      }
-      if (!vmtxTableEntry) {
-        console.warn("This font provides an VVAR table, but no vmtx table to vary.");
-      }
-      const vvarTable = uncompressTable(data, vvarTableEntry);
-      font.tables.vvar = vvar_default.parse(vvarTable.data, vvarTable.offset, font.tables.fvar);
     }
     if (metaTableEntry) {
       const metaTable = uncompressTable(data, metaTableEntry);
