@@ -198,6 +198,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     onLeave(): void {
         this.destroyEditorTextarea();
         editingTextLayerId.value = null;
+        editingTextDocumentSelection.value = null;
 
         textToolbarEmitter.off('toolbarMetaChanged', this.onToolbarMetaChanged);
         textToolbarEmitter.off('toolbarDocumentChanged', this.onToolbarDocumentChanged);

@@ -53,6 +53,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
             throw new Error('Aborted - Layer with specified id not found.');
         }
         this.updateLayerType = layer.type;
+        let hasChangedLayerType = false;
 
         const renderer = canvasStore.get('renderer');
 
@@ -186,11 +187,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                     if (layer.renderer) {
                         layer.renderer.detach();
                     }
-                    layer.renderer = markRaw(new layerRenderers[renderer][this.updateLayerOptions['type'] as string]());
-                    queueRefreshLayerPasses();
-                    if (layer.renderer) {
-                        layer.renderer.attach(layer);
-                    }
+                    hasChangedLayerType = true;
                 }
 
                 // Store old values and assign new values
@@ -202,6 +199,15 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                 (layer as any)[prop] = this.updateLayerOptions[prop];
             }
         }
+
+        if (hasChangedLayerType) {
+            layer.renderer = markRaw(new layerRenderers[renderer][this.updateLayerOptions['type'] as string]());
+            queueRefreshLayerPasses();
+            if (layer.renderer) {
+                layer.renderer.attach(layer);
+            }
+        }
+
         await layer.renderer.nextUpdate();
         regenerateLayerThumbnail(layer);
         if (requiresBaking) {

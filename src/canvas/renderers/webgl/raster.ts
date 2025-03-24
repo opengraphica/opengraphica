@@ -63,7 +63,6 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
     }
 
     async onAttach(layer: WorkingFileRasterLayer<ColorModel>) {
-
         this.lastChunkUpdateId = layer.data?.chunkUpdateId;
         this.scheduleMaterialWrapperUpdate(async () => {
             return await createMaterial('raster', { srcTexture: undefined }, layer.filters, layer, layer.blendingMode);
