@@ -9465,6 +9465,9 @@ body.ogr-full-page .opengraphica {
   padding: 0;
   display: block;
 }
+.opengraphica .ogr-layer-list .ogr-layer[hidden] {
+  display: none !important;
+}
 .opengraphica .ogr-layer-list .ogr-layer .ogr-layer {
   background: none;
 }

@@ -314,6 +314,10 @@ function discardAllUnusedMasks() {
     }
 }
 
+function isGroupLayer(layer: WorkingFileAnyLayer): layer is WorkingFileGroupLayer {
+    return layer.type === 'group' && !!layer.layers;
+}
+
 export default store;
 
 export {
@@ -334,4 +338,5 @@ export {
     regenerateLayerThumbnail,
     discardMaskIfUnused,
     discardAllUnusedMasks,
+    isGroupLayer,
 };

@@ -9,12 +9,16 @@
         :class="{ 'is-dnd-dragging': draggingLayerId != null }"
     >
         <template v-for="(layer, layerIndex) of reversedLayers" :key="layer.id">
+            <li
+                v-if="dropTargetLayerId === layer.id && dropTargetPosition === 'above'"
+                class="ogr-layer is-dnd-placeholder"
+                :style="{ height: draggingLayerHeight + 'px' }"
+            />
             <li class="ogr-layer"
                 :class="{
                     'is-dnd-hover': layer.id === hoveringLayerId,
-                    'is-dnd-placeholder': layer.id === draggingLayerId,
                     'is-active': selectedLayerIds.includes(layer.id),
-                    'is-expanded': layer.expanded,
+                    'is-expanded': isGroupLayer(layer) && layer.expanded,
                     'is-drag-insert-above': dropTargetLayerId === layer.id && dropTargetPosition === 'above',
                     'is-drag-insert-below': dropTargetLayerId === layer.id && dropTargetPosition === 'below',
                     'is-drag-insert-inside': dropTargetLayerId === layer.id && dropTargetPosition === 'inside'
@@ -22,6 +26,7 @@
                 :style="{
                     '--layer-group-indent': depth + 'rem'
                 }"
+                :hidden="layer.id === draggingLayerId && draggingLayerHeight > 0"
                 :data-layer-id="layer.id"
             >
                 <!-- Name, View, Options -->
@@ -80,7 +85,7 @@
                     <span class="ogr-layer-attributes__title">
                         <i class="bi bi-arrow-return-right" aria-hidden="true"></i> {{ $t('app.layerList.frames') }}
                         <el-button v-if="!playingAnimation" link type="primary" class="p-0 ml-1" style="min-height: 0" :aria-label="$t('app.layerList.playAnimation')" @click="onPlayRasterSequence(layer)"><i class="bi bi-play" aria-hidden="true"></i></el-button>
-                        <el-button v-else link type="primary" class="p-0 ml-1" style="min-height: 0" :aria-label="$t('app.layerList.stopAnimation')" @click="onStopRasterSequence(layer)"><i class="bi bi-stop" aria-hidden="true"></i></el-button>
+                        <el-button v-else link type="primary" class="p-0 ml-1" style="min-height: 0" :aria-label="$t('app.layerList.stopAnimation')" @click="onStopRasterSequence()"><i class="bi bi-stop" aria-hidden="true"></i></el-button>
                     </span>
                     <div class="is-flex">
                         <el-scrollbar>
@@ -137,42 +142,55 @@
                     </ul>
                 </span>
                 <!-- No Layers Alert -->
-                <el-alert
-                    v-if="layer.layers && layer.expanded && layer.layers.length === 0"
-                    type="info"
-                    :title="$t('app.layerList.emptyGroup')"
-                    show-icon
-                    :closable="false"
-                    class="is-justify-content-center">
-                </el-alert>
-                <app-layer-list
-                    v-if="layer.layers && layer.expanded && layer.layers.length > 0"
-                    :layers="layer.layers" :depth="depth + 1"
-                />
+                <template v-if="isGroupLayer(layer)">
+                    <el-alert
+                        v-if="layer.layers && layer.expanded && layer.layers.length === 0"
+                        type="info"
+                        :title="$t('app.layerList.emptyGroup')"
+                        show-icon
+                        :closable="false"
+                        class="is-justify-content-center">
+                    </el-alert>
+                    <app-layer-list
+                        v-if="layer.layers && layer.expanded && layer.layers.length > 0"
+                        :layers="layer.layers" :depth="depth + 1"
+                        @dragging-layer="onChildDraggingLayer"
+                    />
+                </template>
             </li>
+            <li
+                v-if="dropTargetLayerId === layer.id && dropTargetPosition === 'below'"
+                class="ogr-layer is-dnd-placeholder"
+                :style="{ height: draggingLayerHeight + 'px' }"
+            />
         </template>
-        <li ref="draggingLayer" v-if="draggingLayerId != null" class="ogr-layer is-dragging" aria-hidden="true" v-html="draggingItemHtml"></li>
+        <li
+            ref="draggingLayer"
+            v-if="draggingLayerId != null"
+            class="ogr-layer is-dragging"
+            aria-hidden="true"
+            v-html="draggingItemHtml"
+        />
     </ul>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, watch, reactive, computed, onMounted, onUnmounted, toRefs, nextTick, PropType } from 'vue';
+<script setup lang="ts">
+import { ref, watch, reactive, computed, onMounted, onUnmounted, toRefs, nextTick, PropType } from 'vue';
 import { useI18n } from '@/i18n';
 
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton from 'element-plus/lib/components/button/index';
-import ElLoading from 'element-plus/lib/components/loading/index';
-import ElMenu, { ElSubMenu, ElMenuItem } from 'element-plus/lib/components/menu/index';
+import ElMenu, { ElMenuItem } from 'element-plus/lib/components/menu/index';
 import ElPopover from 'element-plus/lib/components/popover/index';
 import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
 import AppLayerListThumbnail from '@/ui/app/app-layer-list-thumbnail.vue';
 import AppLayerFrameThumbnail from '@/ui/app/app-layer-frame-thumbnail.vue';
 
-import pointerDirective from '@/directives/pointer';
+import vPointer from '@/directives/pointer';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
-import workingFileStore, { getLayerById } from '@/store/working-file';
+import workingFileStore, { getLayerById, isGroupLayer } from '@/store/working-file';
 
 import appEmitter from '@/lib/emitter';
 import { runModule } from '@/modules';
@@ -188,424 +206,434 @@ import { ReorderLayerFiltersAction } from '@/actions/reorder-layer-filters';
 
 import type { WorkingFileAnyLayer, WorkingFileGroupLayer, ColorModel, WorkingFileRasterSequenceLayer } from '@/types';
 
-export default defineComponent({
-    name: 'AppLayerList',
-    directives: {
-        loading: ElLoading.directive,
-        pointer: pointerDirective
+const props = defineProps({
+    depth: {
+        type: Number,
+        default: 0,
     },
-    components: {
-        AppLayerListThumbnail,
-        AppLayerFrameThumbnail,
-        ElAlert,
-        ElButton,
-        ElMenu,
-        ElMenuItem,
-        ElPopover,
-        ElScrollbar,
-        ElSubMenu,
+    isRoot: {
+        type: Boolean,
+        default: false
     },
-    props: {
-        depth: {
-            type: Number,
-            default: 0,
-        },
-        isRoot: {
-            type: Boolean,
-            default: false
-        },
-        layers: {
-            type: Array as PropType<WorkingFileAnyLayer<ColorModel>[]>,
-            required: true
-        },
-        scrollContainerHeight: {
-            type: Number,
-            default: 0
-        },
-        scrollTop: {
-            type: Number,
-            default: 0
-        }
+    layers: {
+        type: Array as PropType<WorkingFileAnyLayer<ColorModel>[]>,
+        required: true
     },
-    emits: [
-        'scroll-by'
-    ],
-    setup(props, { emit }) {
-        const { t } = useI18n();
-
-        const layerList = ref<HTMLUListElement>(null as unknown as HTMLUListElement);
-        const draggingLayer = ref<HTMLLIElement | null>(null);
-        const dropTargetLayerId = ref<number | null>(null);
-        const dropTargetPosition = ref<'above' | 'inside' | 'below'>('above');
-        const hoveringLayerId = ref<number | null>(null);
-        let draggingLayerPointerOffset: number = 0;
-        let draggingLayerHeight: number = 0;
-        let dragItemOffsets: { isExpanded: boolean; top: number; height: number; id: number; }[] = [];
-        let dragItemOffsetCalculatedScrollTop: number = 0;
-        let lastDragPageY: number = 0;
-        let isDragMoveUp: boolean = false;
-        let dragScrollMargin: number = 20;
-        let draggingLayerStartPointerId: number | null = null;
-        const draggingLayerId = ref<number | null>(null);
-        const draggingItemHtml = ref<string>('');
-
-        const layerSettingsVisibility = ref<boolean[]>([]);
-        const showLayerSettingsMenuFor = ref<number | null>(null);
-        const layerSettingsActiveIndex = ref('');
-
-        const conditionalDragStartEventModifier: string = props.isRoot ? 'dragstart' : '';
-        const { playingAnimation } = toRefs(canvasStore.state);
-        const { selectedLayerIds } = toRefs(workingFileStore.state);
-
-        const reversedLayers = computed<WorkingFileAnyLayer<ColorModel>[]>(() => {
-            return reverseLayerList(props.layers);
-        });
-
-        watch(() => props.layers.length, async (newLength, oldLength) => {
-            if (newLength != oldLength) {
-                layerSettingsVisibility.value = new Array(newLength).fill(false);
-            }
-        }, { immediate: true });
-
-        watch(() => props.scrollTop, () => {
-            if (draggingLayerId.value != null) {
-                requestAnimationFrame(() => {
-                    calculateDropPosition(lastDragPageY);
-                });
-            }
-        });
-
-        onMounted(() => {
-        });
-
-        onUnmounted(() => {
-        });
-
-        function getIconClass(layer: WorkingFileAnyLayer) {
-            switch (layer.type) {
-                case 'gradient': return 'bi-shadows';
-                case 'group': return (layer as WorkingFileGroupLayer).expanded ? 'bi-folder2-open' : 'bi-folder';
-                case 'raster': return 'bi-image';
-                case 'rasterSequence': return 'bi-images';
-                case 'text': return 'bi-textarea-t';
-                case 'vector': return 'bi-bezier2';
-                case 'video': return 'bi-film';
-            }
-            return 'bi-question';
-        }
-
-        function reverseLayerList(layerList: WorkingFileAnyLayer<ColorModel>[]): WorkingFileAnyLayer<ColorModel>[] {
-            const newLayersList = [];
-            for (let i = layerList.length - 1; i >= 0; i--) {
-                newLayersList.push(reactive(layerList[i]));
-            }
-            return newLayersList;
-        }
-
-        async function onLayerSettingsSelect(layer: WorkingFileAnyLayer<ColorModel>, layerIndex: number, action: string) {
-            if (action === 'rename') {
-                runModule('layer', 'rename', { layerId: layer.id, });
-            } else if (action === 'blendingMode') {
-                runModule('layer', 'blendingMode', { layerId: layer.id });
-            } else if (action === 'effect') {
-                runModule('layer', 'layerEffectBrowser', { layerId: layer.id });
-            } else if (action === 'duplicate') {
-                historyStore.dispatch('runAction', {
-                    action: new DuplicateLayerAction(layer.id)
-                });
-            } else if (action === 'delete') {
-                historyStore.dispatch('runAction', {
-                    action: new DeleteLayersAction([layer.id])
-                });
-            }
-            showLayerSettingsMenuFor.value = null;
-            layerSettingsActiveIndex.value = ' ';
-            await nextTick();
-            layerSettingsActiveIndex.value = '';
-            layerSettingsVisibility.value[layerIndex] = false;
-        }
-
-        function onMouseEnterDndHandle(layer: WorkingFileAnyLayer<ColorModel>) {
-            hoveringLayerId.value = layer.id;
-        }
-
-        function onMouseLeaveDndHandle(layer: WorkingFileAnyLayer<ColorModel>) {
-            hoveringLayerId.value = null;
-        }
-
-        function onPointerTapDndHandle(e: PointerEvent) {
-            const layerId: number = parseInt((e.target as Element)?.closest('.ogr-layer')?.getAttribute('data-layer-id') || '-1', 10);
-            const layer = getLayerById(layerId);
-            if (layer) {
-                if (layer.type === 'group') {
-                    layer.expanded = !layer.expanded;
-                }
-                if (!workingFileStore.get('selectedLayerIds').includes(layerId)) {
-                    historyStore.dispatch('runAction', {
-                        action: new SelectLayersAction([layerId]),
-                        mergeWithHistory: 'selectLayers',
-                    });
-                }
-            }
-        }
-        async function onPointerDragStartList(e: PointerEvent) {
-            if (e.pointerType != 'touch') {
-                handleDragStartList(e);
-            }
-        }
-        function onPointerPressList(e: PointerEvent) {
-            if (e.pointerType === 'touch') {
-                handleDragStartList(e);
-            }
-        }
-        async function handleDragStartList(e: PointerEvent) {
-            draggingLayerStartPointerId = e.pointerId;
-            const target = e.target;
-            const pageY = e.pageY;
-            lastDragPageY = pageY;
-            const layerElement: Element | null | undefined = (target as Element)?.closest('.ogr-layer-dnd-handle')?.closest('.ogr-layer');
-
-            if (layerElement?.parentNode !== layerList.value) {
-                return;
-            }
-
-            const layerId: number = parseInt(layerElement?.getAttribute('data-layer-id') || '-1', 10);
-            if (layerId > -1 && layerElement) {
-                calculateDragOffsets();
-
-                draggingLayerId.value = layerId;
-                draggingItemHtml.value = layerElement.innerHTML;
-                await nextTick();
-                if (draggingLayer.value) {
-                    const layerElementClientRect = layerElement.getBoundingClientRect();
-                    const layerListTop = layerList.value.getBoundingClientRect().top + window.scrollY;
-                    const layerElementTop = layerElementClientRect.top + window.scrollY;
-                    draggingLayerPointerOffset = pageY - layerElementTop;
-                    draggingLayerHeight = layerElementClientRect.height;
-                    draggingLayer.value.style.top = (pageY - layerListTop - draggingLayerPointerOffset) + 'px';
-                }
-            }
-        }
-        function onPointerMoveList(e: PointerEvent) {
-            if (draggingLayerId.value != null) {
-                const pageY = (e as any).pageY;
-                calculateDropPosition(pageY);
-                lastDragPageY = pageY;
-            }
-        }
-        function onPointerUpList(e: PointerEvent) {
-            if (e.pointerId === draggingLayerStartPointerId) {
-                onPointerDragEndList(e);
-            }
-        }
-        function calculateDropPosition(pageY: number) {
-            if (draggingLayer.value) {
-                dropTargetLayerId.value = null;
-                const layerListTop = layerList.value.getBoundingClientRect().top + window.scrollY;
-                draggingLayer.value.style.top = pageY - layerListTop - draggingLayerPointerOffset + 'px';
-                const dragItemHandleHeight = 64;
-                const dragItemTop = pageY - draggingLayerPointerOffset;
-                const dragItemBottom = dragItemTop + draggingLayerHeight;
-                const dragItemTopOffset = dragItemTop + (props.scrollTop - dragItemOffsetCalculatedScrollTop);
-                const dragItemBottomOffset = dragItemBottom + (props.scrollTop - dragItemOffsetCalculatedScrollTop);
-                const dragItemHandleBottomOffset = dragItemTopOffset + dragItemHandleHeight;
-                if (pageY < lastDragPageY) {
-                    isDragMoveUp = true;
-                } else if (pageY > lastDragPageY) {
-                    isDragMoveUp = false;
-                }
-                let previousItemHalfHeight: number = 0;
-                let previousItemId: number = -1;
-                for (let i = 0; i < dragItemOffsets.length; i++) {
-                    let nextItemHalfHeight: number = 0;
-                    let nextItemId: number = -1;
-                    if (dragItemOffsets[i + 1]) {
-                        nextItemHalfHeight = dragItemOffsets[i + 1].height / 2;
-                        nextItemId = dragItemOffsets[i + 1].id;
-                    }
-                    const offsetInfo = dragItemOffsets[i];
-                    const offsetCenter = offsetInfo.top + (offsetInfo.height / 2);
-                    if (offsetInfo.isExpanded &&
-                        (isDragMoveUp && dragItemTopOffset > offsetInfo.top + (dragItemHandleHeight / 4) && dragItemTopOffset < offsetInfo.top + offsetInfo.height - (dragItemHandleHeight / 4)) ||
-                        (!isDragMoveUp && dragItemBottomOffset > offsetInfo.top + (dragItemHandleHeight / 4) && dragItemBottomOffset < offsetInfo.top + offsetInfo.height - (dragItemHandleHeight / 4))
-                    ) {
-                        dropTargetLayerId.value = offsetInfo.id;
-                        dropTargetPosition.value = 'inside';
-                    } else if (isDragMoveUp &&
-                        (
-                            (dragItemTopOffset < offsetCenter && dragItemTopOffset > offsetInfo.top - previousItemHalfHeight) ||
-                            (i === 0 && dragItemTopOffset < offsetCenter)
-                        )
-                    ) {
-                        if (offsetInfo.id !== draggingLayerId.value && previousItemId !== draggingLayerId.value) {
-                            dropTargetLayerId.value = offsetInfo.id;
-                            dropTargetPosition.value = 'above';
-                        }
-                    } else if (
-                        !isDragMoveUp &&
-                        (
-                            (dragItemBottomOffset < offsetInfo.top + offsetInfo.height + nextItemHalfHeight && dragItemBottomOffset > offsetCenter) ||
-                            (i === dragItemOffsets.length - 1 && dragItemBottomOffset > offsetCenter)
-                        )
-                    ) {
-                        if (offsetInfo.id !== draggingLayerId.value  && nextItemId !== draggingLayerId.value) {
-                            dropTargetLayerId.value = offsetInfo.id;
-                            dropTargetPosition.value = 'below';
-                        }
-                    }
-                    previousItemHalfHeight = offsetInfo.height / 2;
-                    previousItemId = offsetInfo.id;
-                }
-                if (dragItemTop - layerListTop - props.scrollTop < dragScrollMargin) {
-                    emit('scroll-by', -5);
-                }
-                if (dragItemBottom - layerListTop - props.scrollTop > props.scrollContainerHeight - dragScrollMargin) {
-                    emit('scroll-by', 5);
-                }
-            }
-        }
-        async function onPointerDragEndList(e: PointerEvent | MouseEvent | TouchEvent) {
-            if (draggingLayerId.value != null && dropTargetLayerId.value != null && draggingLayerId.value !== dropTargetLayerId.value) {
-                await historyStore.dispatch('runAction', {
-                    action: new ReorderLayersAction(
-                        [draggingLayerId.value],
-                        dropTargetLayerId.value,
-                        (dropTargetPosition.value === 'above'
-                            ? 'above'
-                            : (dropTargetPosition.value === 'inside' ? 'topChild' : 'below')
-                        )
-                    )
-                });
-            }
-            draggingLayerId.value = null;
-            draggingItemHtml.value = '';
-            dropTargetLayerId.value = null;
-        }
-
-        function onToggleLayerSettings(layer: WorkingFileAnyLayer<ColorModel>) {
-            if (showLayerSettingsMenuFor.value === layer.id) {
-                showLayerSettingsMenuFor.value = null;
-            } else {
-                showLayerSettingsMenuFor.value = layer.id;
-            }
-        }
-
-        function onToggleLayerVisibility(layer: WorkingFileAnyLayer<ColorModel>) {
-            let visibility = layer.visible;
-            historyStore.dispatch('runAction', {
-                action: new BundleAction('toggleLayerVisibility', 'action.toggleLayerVisibility' + (visibility ? 'Off' : 'On'), [
-                    new UpdateLayerAction({
-                        id: layer.id,
-                        visible: !visibility
-                    })
-                ])
-            });
-        }
-
-        function onSelectLayerFrame(layer: WorkingFileRasterSequenceLayer<ColorModel>, index: number) {
-            editorStore.dispatch('setTimelineCursor', layer.data.sequence[index].start);
-        }
-
-        function onPlayRasterSequence(layer: WorkingFileRasterSequenceLayer<ColorModel>) {
-            editorStore.set({
-                timelineEnd: layer.data.sequence[layer.data.sequence.length - 1].end,
-                timelinePlayStartTime: performance.now(),
-                timelineStart: layer.data.sequence[0].start
-            });
-            editorStore.dispatch('setTimelineCursor', layer.data.sequence[0].start);
-            canvasStore.set('playingAnimation', true);
-        }
-
-        function onStopRasterSequence() {
-            editorStore.dispatch('setTimelineCursor', 0);
-            canvasStore.set('playingAnimation', false);
-        }
-
-        function onEditLayerFilter(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
-            runModule('layer', 'layerEffectEdit', {
-                layerId: layer.id,
-                filterIndex
-            });
-        }
-
-        function onMoveLayerFilterUp(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
-            historyStore.dispatch('runAction', {
-                action: new ReorderLayerFiltersAction(layer.id, [filterIndex], filterIndex - 1, 'before')
-            });
-        }
-
-        function onMoveLayerFilterDown(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
-            historyStore.dispatch('runAction', {
-                action: new ReorderLayerFiltersAction(layer.id, [filterIndex], filterIndex + 1, 'after')
-            });
-        }
-
-        function calculateDragOffsets() {
-            dragItemOffsetCalculatedScrollTop = props.scrollTop;
-            dragItemOffsets = [];
-            const layers = layerList.value.querySelectorAll(':scope > .ogr-layer:not(.is-dragging)');
-            layers.forEach((layerEl) => {
-                const clientRect = layerEl.getBoundingClientRect();
-                dragItemOffsets.push({
-                    isExpanded: layerEl.classList.contains('is-expanded'),
-                    top: clientRect.top + window.scrollY,
-                    height: clientRect.height,
-                    id: parseInt(layerEl.getAttribute('data-layer-id') + '', 10)
-                });
-            });
-        }
-
-        function rasterizeLayer(layer: WorkingFileAnyLayer<ColorModel>) {
-            historyStore.dispatch('runAction', {
-                action: new RasterizeLayerAction(layer.id)
-            })
-        }
-
-        return {
-            t,
-
-            layerList,
-            draggingLayer,
-            conditionalDragStartEventModifier,
-            draggingLayerId,
-            dropTargetLayerId,
-            dropTargetPosition,
-            draggingItemHtml,
-            selectedLayerIds,
-            playingAnimation,
-            hoveringLayerId,
-            layerSettingsVisibility,
-            showLayerSettingsMenuFor,
-            layerSettingsActiveIndex,
-
-            getIconClass,
-            onLayerSettingsSelect,
-            onMouseEnterDndHandle,
-            onMouseLeaveDndHandle,
-            onPointerTapDndHandle,
-            onPointerDragStartList,
-            onPointerDragEndList,
-            onPointerMoveList,
-            onPointerUpList,
-            onPointerPressList,
-            onToggleLayerSettings,
-            onToggleLayerVisibility,
-            onSelectLayerFrame,
-            onPlayRasterSequence,
-            onStopRasterSequence,
-            onEditLayerFilter,
-            onMoveLayerFilterUp,
-            onMoveLayerFilterDown,
-            rasterizeLayer,
-
-            reversedLayers
-        };
+    scrollContainerHeight: {
+        type: Number,
+        default: 0
     },
-    // Remove force update, not sure why it was added, but it breaks the reactivity of layer updates when using webgl renderer
-    // mounted() {
-    //     this.$watch(() => historyStore.state.actionStackUpdateToggle, () => {
-    //         this.$forceUpdate();
-    //     });
-    // }
+    scrollTop: {
+        type: Number,
+        default: 0
+    }
 });
+
+const emit = defineEmits([
+    'scroll-by',
+    'dragging-layer'
+]);
+
+const { t } = useI18n();
+
+const layerList = ref<HTMLUListElement>(null as unknown as HTMLUListElement);
+
+const draggingLayer = ref<HTMLLIElement | null>(null);
+const dropTargetLayerId = ref<number | null>(null);
+const dropTargetPosition = ref<'above' | 'inside' | 'below'>('above');
+const hoveringLayerId = ref<number | null>(null);
+const draggingLayerHeight = ref<number>(0);
+let draggingLayerPointerOffset: number = 0;
+let dragItemOffsets: { isExpanded: boolean; top: number; height: number; id: number; }[] = [];
+let dragItemOffsetCalculatedScrollTop: number = 0;
+let lastDragPageY: number = 0;
+let isDragMoveUp: boolean = false;
+let dragScrollMargin: number = 20;
+let draggingLayerStartPointerId: number | null = null;
+const draggingLayerId = ref<number | null>(null);
+const draggingItemHtml = ref<string>('');
+
+const layerSettingsVisibility = ref<boolean[]>([]);
+const showLayerSettingsMenuFor = ref<number | null>(null);
+const layerSettingsActiveIndex = ref('');
+
+const conditionalDragStartEventModifier: string = props.isRoot ? 'dragstart' : '';
+const { playingAnimation } = toRefs(canvasStore.state);
+const { selectedLayerIds } = toRefs(workingFileStore.state);
+
+const reversedLayers = computed<WorkingFileAnyLayer<ColorModel>[]>(() => {
+    return reverseLayerList(props.layers);
+});
+
+watch(() => props.layers.length, async (newLength, oldLength) => {
+    if (newLength != oldLength) {
+        layerSettingsVisibility.value = new Array(newLength).fill(false);
+    }
+}, { immediate: true });
+
+watch(() => props.scrollTop, () => {
+    if (draggingLayerId.value != null) {
+        requestAnimationFrame(() => {
+            calculateDropPosition(lastDragPageY);
+        });
+    }
+});
+
+if (!props.isRoot) {
+    watch(() => ({
+        id: draggingLayerId.value,
+        html: draggingItemHtml.value,
+    }), (draggingProps) => {
+        emit('dragging-layer', draggingProps);
+    });
+}
+
+onMounted(() => {
+});
+
+onUnmounted(() => {
+});
+
+function getIconClass(layer: WorkingFileAnyLayer) {
+    switch (layer.type) {
+        case 'gradient': return 'bi-shadows';
+        case 'group': return (layer as WorkingFileGroupLayer).expanded ? 'bi-folder2-open' : 'bi-folder';
+        case 'raster': return 'bi-image';
+        case 'rasterSequence': return 'bi-images';
+        case 'text': return 'bi-textarea-t';
+        case 'vector': return 'bi-bezier2';
+        case 'video': return 'bi-film';
+    }
+    return 'bi-question';
+}
+
+function reverseLayerList(layerList: WorkingFileAnyLayer<ColorModel>[]): WorkingFileAnyLayer<ColorModel>[] {
+    const newLayersList = [];
+    for (let i = layerList.length - 1; i >= 0; i--) {
+        newLayersList.push(reactive(layerList[i]));
+    }
+    return newLayersList;
+}
+
+async function onLayerSettingsSelect(layer: WorkingFileAnyLayer<ColorModel>, layerIndex: number, action: string) {
+    if (action === 'rename') {
+        runModule('layer', 'rename', { layerId: layer.id, });
+    } else if (action === 'blendingMode') {
+        runModule('layer', 'blendingMode', { layerId: layer.id });
+    } else if (action === 'effect') {
+        runModule('layer', 'layerEffectBrowser', { layerId: layer.id });
+    } else if (action === 'duplicate') {
+        historyStore.dispatch('runAction', {
+            action: new DuplicateLayerAction(layer.id)
+        });
+    } else if (action === 'delete') {
+        historyStore.dispatch('runAction', {
+            action: new DeleteLayersAction([layer.id])
+        });
+    }
+    showLayerSettingsMenuFor.value = null;
+    layerSettingsActiveIndex.value = ' ';
+    await nextTick();
+    layerSettingsActiveIndex.value = '';
+    layerSettingsVisibility.value[layerIndex] = false;
+}
+
+function onMouseEnterDndHandle(layer: WorkingFileAnyLayer<ColorModel>) {
+    hoveringLayerId.value = layer.id;
+}
+
+function onMouseLeaveDndHandle(layer: WorkingFileAnyLayer<ColorModel>) {
+    hoveringLayerId.value = null;
+}
+
+function onPointerTapDndHandle(e: PointerEvent) {
+    const layerId: number = parseInt((e.target as Element)?.closest('.ogr-layer')?.getAttribute('data-layer-id') || '-1', 10);
+    const layer = getLayerById(layerId);
+    if (layer) {
+        if (layer.type === 'group') {
+            layer.expanded = !layer.expanded;
+        }
+        if (!workingFileStore.get('selectedLayerIds').includes(layerId)) {
+            historyStore.dispatch('runAction', {
+                action: new SelectLayersAction([layerId]),
+                mergeWithHistory: 'selectLayers',
+            });
+        }
+    }
+}
+async function onPointerDragStartList(e: PointerEvent) {
+    if (e.pointerType != 'touch') {
+        handleDragStartList(e);
+    }
+}
+function onPointerPressList(e: PointerEvent) {
+    if (e.pointerType === 'touch') {
+        handleDragStartList(e);
+    }
+}
+async function handleDragStartList(e: PointerEvent) {
+    draggingLayerStartPointerId = e.pointerId;
+    const target = e.target;
+    const pageY = e.pageY;
+    lastDragPageY = pageY;
+    const layerElement: Element | null | undefined = (target as Element)?.closest('.ogr-layer-dnd-handle')?.closest('.ogr-layer');
+
+    if (layerElement?.parentNode !== layerList.value) {
+        return;
+    }
+
+    const layerId: number = parseInt(layerElement?.getAttribute('data-layer-id') || '-1', 10);
+    if (layerId > -1 && layerElement) {
+        draggingLayerId.value = layerId;
+        draggingItemHtml.value = layerElement.innerHTML;
+        draggingLayerHeight.value = 0;
+        await nextTick();
+        if (draggingLayer.value) {
+            const layerElementClientRect = layerElement.getBoundingClientRect();
+            const layerListTop = layerList.value.getBoundingClientRect().top + window.scrollY;
+            const layerElementTop = layerElementClientRect.top + window.scrollY;
+            draggingLayerPointerOffset = pageY - layerElementTop;
+            draggingLayerHeight.value = layerElementClientRect.height;
+            draggingLayer.value.style.top = (pageY - layerListTop - draggingLayerPointerOffset) + 'px';
+            calculateDragOffsets();
+        }
+    }
+}
+function onPointerMoveList(e: PointerEvent) {
+    if (draggingLayerId.value != null) {
+        const pageY = (e as any).pageY;
+        calculateDropPosition(pageY);
+        lastDragPageY = pageY;
+    }
+}
+function onPointerUpList(e: PointerEvent) {
+    if (e.pointerId === draggingLayerStartPointerId) {
+        onPointerDragEndList(e);
+    }
+}
+function calculateDropPosition(pageY: number) {
+    if (draggingLayer.value) {
+        let newDropTargetLayerId: number | null = null;
+        let newDropTargetPosition: 'above' | 'inside' | 'below' = 'above';
+
+        const previousDropTargetLayerId = dropTargetLayerId.value ?? draggingLayerId.value;
+        const layerListTop = layerList.value.getBoundingClientRect().top + window.scrollY;
+        draggingLayer.value.style.top = pageY - layerListTop - draggingLayerPointerOffset + 'px';
+        const dragItemHandleHeight = 64;
+        const dragItemTop = pageY - draggingLayerPointerOffset;
+        const dragItemBottom = dragItemTop + draggingLayerHeight.value;
+        const dragItemTopOffset = dragItemTop + (props.scrollTop - dragItemOffsetCalculatedScrollTop);
+        const dragItemBottomOffset = dragItemBottom + (props.scrollTop - dragItemOffsetCalculatedScrollTop);
+
+        const dragItemRelativeCenter = dragItemTopOffset - layerListTop + draggingLayerHeight.value / 2;
+        if (pageY < lastDragPageY) {
+            isDragMoveUp = true;
+        } else if (pageY > lastDragPageY) {
+            isDragMoveUp = false;
+        }
+
+        findDropTarget:
+        {
+            let runningOffset = 0;
+            let id: number, height: number, previousHeight: number = 0, nextId: number = -1, nextHeight: number = 0;
+            for (let i = 0; i < dragItemOffsets.length; i++) {
+                ({ id, height } = dragItemOffsets[i]);
+                if (dragItemOffsets[i + 1]) {
+                    ({ id: nextId } = dragItemOffsets[i + 1]);
+                }
+                if (id === previousDropTargetLayerId) {
+                    runningOffset += draggingLayerHeight.value;
+                    previousHeight = draggingLayerHeight.value;
+                }
+                if (i === 0 && nextId === previousDropTargetLayerId) {
+                    nextHeight = draggingLayerHeight.value;
+                } else {
+                    nextHeight = 0;
+                }
+                if (dragItemRelativeCenter < runningOffset - previousHeight + (previousHeight + height + nextHeight) / 2) {
+                    newDropTargetLayerId = id;
+                    newDropTargetPosition = 'above';
+                    break findDropTarget;
+                }
+                runningOffset += height;
+                previousHeight = height;
+            }
+            newDropTargetLayerId = dragItemOffsets[dragItemOffsets.length - 1].id;
+            newDropTargetPosition = 'below';
+        }
+        // let previousItemHalfHeight: number = 0;
+        // let previousItemId: number = -1;
+        // for (let i = 0; i < dragItemOffsets.length; i++) {
+        //     let nextItemHalfHeight: number = 0;
+        //     let nextItemId: number = -1;
+        //     if (dragItemOffsets[i + 1]) {
+        //         nextItemHalfHeight = dragItemOffsets[i + 1].height / 2;
+        //         nextItemId = dragItemOffsets[i + 1].id;
+        //     }
+        //     const offsetInfo = dragItemOffsets[i];
+        //     const offsetCenter = offsetInfo.top + (offsetInfo.height / 2);
+        //     if (offsetInfo.isExpanded &&
+        //         (isDragMoveUp && dragItemTopOffset > offsetInfo.top + (dragItemHandleHeight / 4) && dragItemTopOffset < offsetInfo.top + offsetInfo.height - (dragItemHandleHeight / 4)) ||
+        //         (!isDragMoveUp && dragItemBottomOffset > offsetInfo.top + (dragItemHandleHeight / 4) && dragItemBottomOffset < offsetInfo.top + offsetInfo.height - (dragItemHandleHeight / 4))
+        //     ) {
+        //         dropTargetLayerId.value = offsetInfo.id;
+        //         dropTargetPosition.value = 'inside';
+        //     } else if (isDragMoveUp &&
+        //         (
+        //             (dragItemTopOffset < offsetCenter && dragItemTopOffset > offsetInfo.top - previousItemHalfHeight) ||
+        //             (i === 0 && dragItemTopOffset < offsetCenter)
+        //         )
+        //     ) {
+        //         if (offsetInfo.id !== draggingLayerId.value && previousItemId !== draggingLayerId.value) {
+        //             dropTargetLayerId.value = offsetInfo.id;
+        //             dropTargetPosition.value = 'above';
+        //         }
+        //     } else if (
+        //         !isDragMoveUp &&
+        //         (
+        //             (dragItemBottomOffset < offsetInfo.top + offsetInfo.height + nextItemHalfHeight && dragItemBottomOffset > offsetCenter) ||
+        //             (i === dragItemOffsets.length - 1 && dragItemBottomOffset > offsetCenter)
+        //         )
+        //     ) {
+        //         if (offsetInfo.id !== draggingLayerId.value  && nextItemId !== draggingLayerId.value) {
+        //             dropTargetLayerId.value = offsetInfo.id;
+        //             dropTargetPosition.value = 'below';
+        //         }
+        //     }
+        //     previousItemHalfHeight = offsetInfo.height / 2;
+        //     previousItemId = offsetInfo.id;
+        // }
+        if (dragItemTop - layerListTop - props.scrollTop < dragScrollMargin) {
+            emit('scroll-by', -5);
+        }
+        if (dragItemBottom - layerListTop - props.scrollTop > props.scrollContainerHeight - dragScrollMargin) {
+            emit('scroll-by', 5);
+        }
+
+        if (dropTargetLayerId.value !== newDropTargetLayerId || dropTargetPosition.value !== newDropTargetPosition) {
+            dropTargetLayerId.value = newDropTargetLayerId;
+            dropTargetPosition.value = newDropTargetPosition;
+        }
+    }
+}
+async function onPointerDragEndList(e: PointerEvent | MouseEvent | TouchEvent) {
+    if (draggingLayerId.value != null && dropTargetLayerId.value != null && draggingLayerId.value !== dropTargetLayerId.value) {
+        await historyStore.dispatch('runAction', {
+            action: new ReorderLayersAction(
+                [draggingLayerId.value],
+                dropTargetLayerId.value,
+                (dropTargetPosition.value === 'above'
+                    ? 'above'
+                    : (dropTargetPosition.value === 'inside' ? 'topChild' : 'below')
+                )
+            )
+        });
+    }
+    draggingLayerId.value = null;
+    draggingItemHtml.value = '';
+    dropTargetLayerId.value = null;
+}
+
+function onToggleLayerSettings(layer: WorkingFileAnyLayer<ColorModel>) {
+    if (showLayerSettingsMenuFor.value === layer.id) {
+        showLayerSettingsMenuFor.value = null;
+    } else {
+        showLayerSettingsMenuFor.value = layer.id;
+    }
+}
+
+function onToggleLayerVisibility(layer: WorkingFileAnyLayer<ColorModel>) {
+    let visibility = layer.visible;
+    historyStore.dispatch('runAction', {
+        action: new BundleAction('toggleLayerVisibility', 'action.toggleLayerVisibility' + (visibility ? 'Off' : 'On'), [
+            new UpdateLayerAction({
+                id: layer.id,
+                visible: !visibility
+            })
+        ])
+    });
+}
+
+function onSelectLayerFrame(layer: WorkingFileRasterSequenceLayer<ColorModel>, index: number) {
+    editorStore.dispatch('setTimelineCursor', layer.data.sequence[index].start);
+}
+
+function onPlayRasterSequence(layer: WorkingFileRasterSequenceLayer<ColorModel>) {
+    editorStore.set({
+        timelineEnd: layer.data.sequence[layer.data.sequence.length - 1].end,
+        timelinePlayStartTime: performance.now(),
+        timelineStart: layer.data.sequence[0].start
+    });
+    editorStore.dispatch('setTimelineCursor', layer.data.sequence[0].start);
+    canvasStore.set('playingAnimation', true);
+}
+
+function onStopRasterSequence() {
+    editorStore.dispatch('setTimelineCursor', 0);
+    canvasStore.set('playingAnimation', false);
+}
+
+function onEditLayerFilter(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
+    runModule('layer', 'layerEffectEdit', {
+        layerId: layer.id,
+        filterIndex
+    });
+}
+
+function onMoveLayerFilterUp(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
+    historyStore.dispatch('runAction', {
+        action: new ReorderLayerFiltersAction(layer.id, [filterIndex], filterIndex - 1, 'before')
+    });
+}
+
+function onMoveLayerFilterDown(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
+    historyStore.dispatch('runAction', {
+        action: new ReorderLayerFiltersAction(layer.id, [filterIndex], filterIndex + 1, 'after')
+    });
+}
+
+function onChildDraggingLayer(draggingProps: { id: number, html: string }) {
+    if (props.isRoot) {
+        draggingLayerId.value = draggingProps.id;
+        draggingItemHtml.value = draggingProps.html;
+    } else {
+        emit('dragging-layer', draggingProps);
+    }
+}
+
+function calculateDragOffsets() {
+    dragItemOffsetCalculatedScrollTop = props.scrollTop;
+    dragItemOffsets = [];
+    let hasEncounteredCurrentLayer = false;
+    const layers = layerList.value.querySelectorAll(':scope > .ogr-layer:not(.is-dragging)');
+    layers.forEach((layerEl) => {
+        const clientRect = layerEl.getBoundingClientRect();
+        const id = parseInt(layerEl.getAttribute('data-layer-id') + '', 10);
+        if (id != draggingLayerId.value) {
+            if (hasEncounteredCurrentLayer) {
+                hasEncounteredCurrentLayer = false;
+                dropTargetLayerId.value = id;
+                dropTargetPosition.value = 'above';
+            }
+            dragItemOffsets.push({
+                isExpanded: layerEl.classList.contains('is-expanded'),
+                top: clientRect.top + window.scrollY,
+                height: clientRect.height,
+                id,
+            });
+        } else {
+            hasEncounteredCurrentLayer = true;
+        }
+    });
+    if (hasEncounteredCurrentLayer) {
+        dropTargetLayerId.value = dragItemOffsets[dragItemOffsets.length - 1].id;
+        dropTargetPosition.value = 'below';
+    }
+}
+
+function rasterizeLayer(layer: WorkingFileAnyLayer<ColorModel>) {
+    historyStore.dispatch('runAction', {
+        action: new RasterizeLayerAction(layer.id)
+    })
+}
 </script>
