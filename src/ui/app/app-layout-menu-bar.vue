@@ -23,7 +23,7 @@
                 <span v-if="actionGroupSectionName === 'tools'" class="og-menu-section__title">{{ $t('menuBar.toolsHeading') }}</span>
                 <component
                     v-if="displayMode === 'all' || actionGroupSectionName === 'tools'"
-                    :is="actionGroupSectionName === 'tools' ? (direction === 'vertical' ? 'el-scrollbar' : 'el-horizontal-scrollbar-arrows') : 'v-fragment'"
+                    :is="actionGroupSectionName === 'tools' ? (direction === 'vertical' ? ElScrollbar : ElHorizontalScrollbarArrows) : 'v-fragment'"
                     style="height: auto"
                     @scroll="onScrollTools"
                 >
@@ -143,7 +143,7 @@
         </div>
     </div>
     <transition
-        name="og-transition-fade-left"
+        :name="`og-transition-fade-${reversePopoverPlacement}`"
     >
         <div
             v-if="toolPreviewPopoverVisible"
@@ -176,11 +176,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, ref, toRefs, watch, type PropType } from 'vue';
+import { computed, defineAsyncComponent, nextTick, onMounted, onUnmounted, ref, toRefs, watch, type PropType } from 'vue';
 import { flip, offset, useFloating } from '@floating-ui/vue';
 
 import ElButton from 'element-plus/lib/components/button/index';
+const ElHorizontalScrollbarArrows = defineAsyncComponent(() => import('@/ui/el/el-horizontal-scrollbar-arrows.vue'));
 import ElPopover from '@/ui/el/el-popover.vue';
+const ElScrollbar = defineAsyncComponent(() => import('element-plus/lib/components/scrollbar/index'));
 import ElTag from 'element-plus/lib/components/tag/index';
 import DynamicallyLoadedDock from '@/ui/dock/dock.vue';
 
@@ -289,6 +291,14 @@ const activeToolGroupExpandToggleIcon = computed(() => {
             ? (isActiveToolGroupExpanded.value ? 'bi-chevron-up' : 'bi-chevron-down' )
             : (isActiveToolGroupExpanded.value ? 'bi-chevron-down' : 'bi-chevron-up' );
     }
+});
+
+const reversePopoverPlacement = computed(() => {
+    if (popoverPlacement.value === 'right') return 'left';
+    if (popoverPlacement.value === 'left') return 'right';
+    if (popoverPlacement.value === 'top') return 'bottom';
+    if (popoverPlacement.value === 'bottom') return 'top';
+    return '';
 });
 
 const toolPreviewPopoverReference = computed<HTMLButtonElement | undefined>(() => {

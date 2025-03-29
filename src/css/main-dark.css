@@ -8346,6 +8346,33 @@ body.og-full-page .opengraphica {
   margin-left: 2rem !important;
   opacity: 0 !important;
 }
+.opengraphica .og-transition-fade-right-enter-active,
+.opengraphica .og-transition-fade-right-leave-active {
+  transition: margin var(--og-transition-duration, 0.5s) ease, opacity var(--og-transition-duration, 0.5s) ease !important;
+}
+.opengraphica .og-transition-fade-right-enter-from,
+.opengraphica .og-transition-fade-right-leave-to {
+  margin-left: -2rem !important;
+  opacity: 0 !important;
+}
+.opengraphica .og-transition-fade-top-enter-active,
+.opengraphica .og-transition-fade-top-leave-active {
+  transition: margin var(--og-transition-duration, 0.5s) ease, opacity var(--og-transition-duration, 0.5s) ease !important;
+}
+.opengraphica .og-transition-fade-top-enter-from,
+.opengraphica .og-transition-fade-top-leave-to {
+  margin-top: 2rem !important;
+  opacity: 0 !important;
+}
+.opengraphica .og-transition-fade-bottom-enter-active,
+.opengraphica .og-transition-fade-bottom-leave-active {
+  transition: margin var(--og-transition-duration, 0.5s) ease, opacity var(--og-transition-duration, 0.5s) ease !important;
+}
+.opengraphica .og-transition-fade-bottom-enter-from,
+.opengraphica .og-transition-fade-bottom-leave-to {
+  margin-top: -2rem !important;
+  opacity: 0 !important;
+}
 .opengraphica .og-transition-scale-down-enter-active,
 .opengraphica .og-transition-scale-down-leave-active {
   transition: transform var(--og-transition-duration, 0.5s) ease, opacity var(--og-transition-duration, 0.5s) ease !important;

@@ -199,10 +199,10 @@
                             :closable="false">
                         </el-alert>
                     </div>
-                    <el-timeline v-else class="px-5 pt-4">
+                    <el-timeline v-else class="!px-5 !pt-4">
                         <el-timeline-item
                             v-if="historyActionStack.length > 0"
-                            class="pb-1"
+                            class="!pb-1"
                             type="primary">
                             <el-link type="primary" href="javascript:void(0)" @click="onGoHistory(0)">
                                 [{{ $t('dock.settings.history.baseImage') }}]
@@ -212,7 +212,7 @@
                             v-for="(action, index) of historyActionStack"
                             :key="action.id + '_' + index"
                             :type="historyActionStackIndex > index ? 'primary' : undefined"
-                            class="pb-1">
+                            class="!pb-1">
                             <el-link type="primary" href="javascript:void(0)" @click="onGoHistory(index + 1)" v-t="action.description" />
                         </el-timeline-item>
                     </el-timeline>
