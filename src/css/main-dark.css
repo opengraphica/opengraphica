@@ -8331,33 +8331,42 @@ body.og-full-page .opengraphica {
 }
 .opengraphica .og-transition-fade-enter-active,
 .opengraphica .og-transition-fade-leave-active {
-  transition: opacity var(--og-transition-duration, 0.5s) ease;
+  transition: opacity var(--og-transition-duration, 0.5s) ease !important;
 }
 .opengraphica .og-transition-fade-enter-from,
 .opengraphica .og-transition-fade-leave-to {
-  opacity: 0;
+  opacity: 0 !important;
+}
+.opengraphica .og-transition-fade-left-enter-active,
+.opengraphica .og-transition-fade-left-leave-active {
+  transition: margin var(--og-transition-duration, 0.5s) ease, opacity var(--og-transition-duration, 0.5s) ease !important;
+}
+.opengraphica .og-transition-fade-left-enter-from,
+.opengraphica .og-transition-fade-left-leave-to {
+  margin-left: 2rem !important;
+  opacity: 0 !important;
 }
 .opengraphica .og-transition-scale-down-enter-active,
 .opengraphica .og-transition-scale-down-leave-active {
-  transition: transform var(--og-transition-duration, 0.5s) ease, opacity var(--og-transition-duration, 0.5s) ease;
-  transform-origin: top left;
+  transition: transform var(--og-transition-duration, 0.5s) ease, opacity var(--og-transition-duration, 0.5s) ease !important;
+  transform-origin: top left !important;
 }
 .opengraphica .og-transition-scale-down-enter-from,
 .opengraphica .og-transition-scale-down-leave-to {
-  transform: scale(1, 0);
-  transform-origin: top left;
-  opacity: 0;
+  transform: scale(1, 0) !important;
+  transform-origin: top left !important;
+  opacity: 0 !important;
 }
 .opengraphica .og-transition-scale-up-enter-active,
 .opengraphica .og-transition-scale-up-leave-active {
-  transition: transform var(--og-transition-duration, 0.5s) ease, opacity var(--og-transition-duration, 0.5s) ease;
-  transform-origin: top left;
+  transition: transform var(--og-transition-duration, 0.5s) ease, opacity var(--og-transition-duration, 0.5s) ease !important;
+  transform-origin: top left !important;
 }
 .opengraphica .og-transition-scale-up-enter-from,
 .opengraphica .og-transition-scale-up-leave-to {
-  transform: scale(1, 0);
-  transform-origin: top left;
-  opacity: 0;
+  transform: scale(1, 0) !important;
+  transform-origin: top left !important;
+  opacity: 0 !important;
 }
 @keyframes og-animate-fade-in {
   from {
@@ -10518,6 +10527,9 @@ body.og-full-page .opengraphica {
   box-shadow: var(--og-popover-shadow);
   z-index: 2061;
   --el-menu-bg-color: transparent;
+}
+.opengraphica .og-popover--animated-placement {
+  transition: transform 0.2s;
 }
 .opengraphica .og-popover__arrow {
   background: var(--og-popover-background-color);

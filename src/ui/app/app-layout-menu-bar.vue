@@ -76,27 +76,6 @@
                                         @close="control.popoverVisible = false"
                                     />
                                 </template>
-                                <template v-else>
-                                    <div class="px-4 py-3 max-w-72 text-left break-normal">
-                                        <strong class="block font-bold mb-1">{{ $t(`menuBarToolGroup.${control.id}.name`) }}</strong>
-                                        <ol v-if="control.controls" class="og-list--unstyled">
-                                            <li
-                                                v-for="subControl of control.controls"
-                                                class="flex my-1"
-                                                :key="subControl.icon"
-                                            >
-                                                <span class="shrink-0 grow-0 w-4 mr-1" :class="subControl.icon" aria-hidden="true" />
-                                                {{ $t(`menuBarToolGroup.${control.id}.tools.${subControl.action.target}`) }}
-                                            </li>
-                                        </ol>
-                                        <ol v-else class="og-list--unstyled">
-                                            <li class="flex">
-                                                <span class="shrink-0 grow-0 w-4 mr-1" :class="control.icon" aria-hidden="true" />
-                                                {{ $t(`menuBarToolGroup.${control.id}.tools.${control.id}`) }}
-                                            </li>
-                                        </ol>
-                                    </div>
-                                </template>
                             </el-popover>
                         </div>
                     </template>
@@ -163,501 +142,548 @@
             </button>
         </div>
     </div>
+    <transition
+        name="og-transition-fade-left"
+    >
+        <div
+            v-if="toolPreviewPopoverVisible"
+            ref="toolPreviewPopover"
+            class="og-popover og-transition-fast !max-w-72 pointer-events-none"
+            :class="['og-popover--' + popoverPlacement, isToolPreviewPopoverReused ? 'og-popover--animated-placement' : undefined]"
+            :style="toolPreviewPopoverStyles"
+        >
+            <div class="og-popover__content">
+                <strong class="block font-bold mb-1">{{ $t(`menuBarToolGroup.${toolPreviewPopoverGroupDefinition.id}.name`) }}</strong>
+                <ol v-if="toolPreviewPopoverGroupDefinition.controls" class="og-list--unstyled">
+                    <li
+                        v-for="subControl of toolPreviewPopoverGroupDefinition.controls"
+                        class="flex my-1"
+                        :key="subControl.icon"
+                    >
+                        <span class="shrink-0 grow-0 w-4 mr-2" :class="subControl.icon" aria-hidden="true" />
+                        {{ $t(`menuBarToolGroup.${toolPreviewPopoverGroupDefinition.id}.tools.${subControl.action.target}`) }}
+                    </li>
+                </ol>
+                <ol v-else class="og-list--unstyled">
+                    <li class="flex">
+                        <span class="shrink-0 grow-0 w-4 mr-2" :class="toolPreviewPopoverGroupDefinition.icon" aria-hidden="true" />
+                        {{ $t(`menuBarToolGroup.${toolPreviewPopoverGroupDefinition.id}.tools.${toolPreviewPopoverGroupDefinition.id}`) }}
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </transition>
 </template>
 
-<script lang="ts">
-import { defineComponent, computed, watch, ref, unref, onMounted, onUnmounted, toRefs, defineAsyncComponent, type PropType } from 'vue';
-import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
-import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.vue';
-import ElLoading from 'element-plus/lib/components/loading/index';
+<script setup lang="ts">
+import { computed, nextTick, onMounted, onUnmounted, ref, toRefs, watch, type PropType } from 'vue';
+import { flip, offset, useFloating } from '@floating-ui/vue';
+
+import ElButton from 'element-plus/lib/components/button/index';
 import ElPopover from '@/ui/el/el-popover.vue';
 import ElTag from 'element-plus/lib/components/tag/index';
-import { MenuBarToolGroupButton, DndLayoutMenuBar } from '@/types';
+import DynamicallyLoadedDock from '@/ui/dock/dock.vue';
+
 import toolGroupsDefinition from '@/config/menu-bar-tool-groups.json';
+import appEmitter from '@/lib/emitter';
+import { runModule } from '@/modules';
+
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import preferencesStore from '@/store/preferences';
-import appEmitter from '@/lib/emitter';
-import { runModule } from '@/modules';
-import Dock from '@/ui/dock/dock.vue';
-import VFragment from '@/ui/el/v-fragment.vue';
 
-export default defineComponent({
-    name: 'AppLayoutMenuBar',
-    directives: {
-        loading: ElLoading.directive
+import type { MenuBarToolGroupButton, DndLayoutMenuBar } from '@/types';
+
+/*-----*\
+| Props |
+\*-----*/
+
+const props = defineProps({
+    config: {
+        type: Object as PropType<DndLayoutMenuBar>,
+        required: true
     },
-    components: {
-        DynamicallyLoadedDock: Dock,
-        ElButton,
-        ElButtonGroup,
-        ElDrawer: defineAsyncComponent(() => import(`element-plus/lib/components/drawer/index`)),
-        ElHorizontalScrollbarArrows,
-        ElMenu: defineAsyncComponent(() => import(`element-plus/lib/components/menu/index`)),
-        ElMenuItem: defineAsyncComponent(async () => (await import(`element-plus/lib/components/menu/index`)).ElMenuItem),
-        ElPopover,
-        ElScrollbar: defineAsyncComponent(() => import(`element-plus/lib/components/scrollbar/index`)),
-        ElTag,
-        VFragment
+    layoutPlacement: {
+        type: String as PropType<'top' | 'bottom' | 'left' | 'right'>,
+        default: 'top'
     },
-    props: {
-        config: {
-            type: Object as PropType<DndLayoutMenuBar>,
-            required: true
-        },
-        layoutPlacement: {
-            type: String as PropType<'top' | 'bottom' | 'left' | 'right'>,
-            default: 'top'
-        },
-    },
-    emit: ['resize'],
-    setup(props, { emit }) {
-        const mobileWidth: number = 550;
+});
 
-        const menuBarElement = ref<HTMLDivElement>();
-        const toolGroupButtons = ref<typeof ElButton[]>([]);
-        const activeToolGroupButton = ref<HTMLButtonElement>();
-        const showToolGroupExpandButton = ref(false);
-        const isActiveToolGroupExpanded = ref(false);
-        const toolGroupExpandOffsetTop = ref<string | undefined>(undefined);
-        const toolGroupExpandOffsetLeft = ref<string | undefined>(undefined);
+/*-----*\
+| Emits |
+\*-----*/
 
-        let activeControlDock: MenuBarToolGroupButton | null = null;
-        let pendingActiveControlCall: IArguments | null = null;
-        let flexContainer = ref<HTMLDivElement>();
-        let displayMode = ref<'all' | 'tools'>('all');
-        let direction = ref<'horizontal' | 'vertical'>('horizontal');
-        let showMoreActionsMenu = ref<boolean>(false);
-        let showMoreActionsTooltip = ref<boolean>(false);
-        let popoverPlacement = ref<'top' | 'bottom' | 'left' | 'right'>('top');
+const emit = defineEmits<{
+    (e: 'resize'): void;
+}>();
 
-        let repositionToolGroupExpandDebounceHandle: number | undefined = undefined;
-        let resizeDebounceHandle: number | undefined = undefined;
-        let pointerDownElement: EventTarget | null = null;
-        let pointerDownId: number;
-        let pointerDownType: string;
-        let pointerDownButton: number;
-        let pointerDownShowDock: boolean = false;
-        let pointerPressHoldTimeoutHandle: number | undefined;
-        let lastPointerTap: number = 0;
-        let lastPointerTapType: string = '';
+/*----*\
+| Data |
+\*----*/
 
-        const { viewWidth: viewportWidth, viewHeight: viewportHeight } = toRefs(canvasStore.state);
-        const { activeToolGroup, activeTool } = toRefs(editorStore.state);
+const mobileWidth: number = 550;
 
-        const actionGroups = ref<{ [key: string]: MenuBarToolGroupButton[] }>(createActionGroups());
+const menuBarElement = ref<HTMLDivElement>();
+const toolGroupButtons = ref<typeof ElButton[]>([]);
+const activeToolGroupButton = ref<HTMLButtonElement>();
+const showToolGroupExpandButton = ref(false);
+const isActiveToolGroupExpanded = ref(false);
+const toolGroupExpandOffsetTop = ref<string | undefined>(undefined);
+const toolGroupExpandOffsetLeft = ref<string | undefined>(undefined);
 
-        const activeMenuDrawerComponentName = computed<string | null>(() => {
-            return editorStore.state.activeMenuDrawerComponentName;
-        });
+let activeControlDock: MenuBarToolGroupButton | null = null;
+let pendingActiveControlCall: IArguments | null = null;
+const flexContainer = ref<HTMLDivElement>();
+const displayMode = ref<'all' | 'tools'>('all');
+const direction = ref<'horizontal' | 'vertical'>('horizontal');
 
-        const isTouchUser = computed<boolean>(() => {
-            return true;
-            // return editorStore.state.isTouchUser;
-        });
+const toolPreviewPopoverVisible = ref(false);
+let hideToolPreviewPopoverTimeout: number | undefined = undefined;
+const toolPreviewPopover = ref<HTMLDivElement>();
+const toolPreviewPopoverGroupDefinition = ref<MenuBarToolGroupButton | null>(null);
+const isToolPreviewPopoverReused = ref(false);
+const popoverPlacement = ref<'top' | 'bottom' | 'left' | 'right'>('top');
 
-        const activeToolGroupControls = computed(() => {
-            const activeActionToolGroupIndex = actionGroups.value.tools.findIndex(tool => tool.id === activeToolGroup.value);
-            const activeActionToolGroup = actionGroups.value.tools[activeActionToolGroupIndex];
-            return activeActionToolGroup?.controls ?? [];
-        });
+let repositionToolGroupExpandDebounceHandle: number | undefined = undefined;
+let resizeDebounceHandle: number | undefined = undefined;
+let pointerDownElement: EventTarget | null = null;
+let pointerDownId: number;
+let pointerDownType: string;
+let pointerDownButton: number;
+let pointerDownShowDock: boolean = false;
+let pointerPressHoldTimeoutHandle: number | undefined;
+let lastPointerTap: number = 0;
+let lastPointerTapType: string = '';
 
-        const activeToolGroupExpandToggleIcon = computed(() => {
-            if (direction.value === 'vertical') {
-                return props.layoutPlacement === 'left'
-                    ? (isActiveToolGroupExpanded.value ? 'bi-chevron-left' : 'bi-chevron-right' )
-                    : (isActiveToolGroupExpanded.value ? 'bi-chevron-right' : 'bi-chevron-left' );
-            } else {
-                return props.layoutPlacement === 'top'
-                    ? (isActiveToolGroupExpanded.value ? 'bi-chevron-up' : 'bi-chevron-down' )
-                    : (isActiveToolGroupExpanded.value ? 'bi-chevron-down' : 'bi-chevron-up' );
-            }
-        });
+const { viewWidth: viewportWidth, viewHeight: viewportHeight } = toRefs(canvasStore.state);
+const { activeToolGroup, activeTool } = toRefs(editorStore.state);
 
-        watch(() => activeToolGroup.value, () => {
-            if (!actionGroups.value) return;
-            activeToolGroupButton.value = (toolGroupButtons.value.find((button) => {
-                const buttonElement = button.ref as unknown as HTMLButtonElement;
-                return buttonElement?.getAttribute('data-group-target') === activeToolGroup.value;
-            })?.ref) as never;
-            showToolGroupExpandButton.value = activeToolGroupControls.value.length > 1;
-            toolGroupExpandOffsetTop.value = undefined;
-            toolGroupExpandOffsetLeft.value = undefined;
-            isActiveToolGroupExpanded.value = false;
-            repositionToolGroupExpand();
-        }, { immediate: true });
+const actionGroups = ref<{ [key: string]: MenuBarToolGroupButton[] }>(createActionGroups());
 
-        watch([viewportWidth], () => {
-            toggleMobileView();
-            repositionToolGroupExpand();
-        });
-        watch([viewportHeight], () => {
-            repositionToolGroupExpand();
-        })
-        watch([displayMode], () => {
-            showMoreActionsMenu.value = false;
-        });
-        watch(() => props.layoutPlacement, (layoutPlacement) => {
-            direction.value = ['left', 'right'].includes(layoutPlacement) ? 'vertical' : 'horizontal';
-            popoverPlacement.value = {
-                bottom: 'top',
-                top: 'bottom',
-                left: 'right',
-                right: 'left'
-            }[layoutPlacement] as any;
-        }, { immediate: true });
+/*--------*\
+| Computed |
+\*--------*/
 
-        onMounted(() => {
-            window.addEventListener('mousedown', onMouseDownWindow);
-            window.addEventListener('mouseup', onMouseUpWindow);
-            window.addEventListener('touchstart', onTouchStartWindow);
-            window.addEventListener('touchend', onTouchEndWindow);
-            
-            displayMode.value = viewportWidth.value / (window.devicePixelRatio || 1) > preferencesStore.state.dockHideBreakpoint ? 'tools' : 'all';
+const activeMenuDrawerComponentName = computed<string | null>(() => {
+    return editorStore.state.activeMenuDrawerComponentName;
+});
 
-            emit('resize');
-        });
+const isTouchUser = computed<boolean>(() => {
+    return true;
+    // return editorStore.state.isTouchUser;
+});
 
-        onUnmounted(() => {
-            window.removeEventListener('mousedown', onMouseDownWindow);
-            window.removeEventListener('mouseup', onMouseUpWindow);
-            window.removeEventListener('touchstart', onTouchStartWindow);
-            window.removeEventListener('touchend', onTouchEndWindow);
-            repositionToolGroupExpand();
-        });
+const activeToolGroupControls = computed(() => {
+    const activeActionToolGroupIndex = actionGroups.value.tools.findIndex(tool => tool.id === activeToolGroup.value);
+    const activeActionToolGroup = actionGroups.value.tools[activeActionToolGroupIndex];
+    return activeActionToolGroup?.controls ?? [];
+});
 
-        function repositionToolGroupExpand() {
-            window.clearTimeout(repositionToolGroupExpandDebounceHandle);
-            repositionToolGroupExpandDebounceHandle = window.setTimeout(repositionToolGroupExpandImmediate, 200);
-        }
-
-        function repositionToolGroupExpandImmediate() {
-            const menuBarClientRect = menuBarElement.value?.getBoundingClientRect();
-            const buttonClientRect = activeToolGroupButton.value?.getBoundingClientRect();
-            if (!menuBarClientRect || !buttonClientRect) return;
-            if (direction.value === 'vertical') {
-                toolGroupExpandOffsetTop.value = (-menuBarClientRect.top + buttonClientRect.top + (buttonClientRect.height / 2)).toFixed(1) + 'px';
-                toolGroupExpandOffsetLeft.value = undefined;
-            } else {
-                toolGroupExpandOffsetTop.value = undefined;
-                toolGroupExpandOffsetLeft.value = (-menuBarClientRect.left + buttonClientRect.left + (buttonClientRect.width / 2)).toFixed(1) + 'px';
-            }
-        }
-
-        function toggleMobileView() {
-            window.clearTimeout(resizeDebounceHandle);
-            resizeDebounceHandle = window.setTimeout(toggleMobileViewImmediate, 400);
-        }
-
-        function toggleMobileViewImmediate() {
-            displayMode.value = viewportWidth.value / (window.devicePixelRatio || 1) > preferencesStore.state.dockHideBreakpoint ? 'tools' : 'all';
-        }
-
-        function createActionGroups(forceDisplayMode?: string): { [key: string]: MenuBarToolGroupButton[] } {
-            activeControlDock = null;
-            pendingActiveControlCall = null;
-            forceDisplayMode = forceDisplayMode || displayMode.value;
-            let actionGroups: { [key: string]: MenuBarToolGroupButton[] } = {};
-            const sectionNames = ['docks', 'tools'] as ('docks' | 'tools')[];
-            for (let section of sectionNames) {
-                if (props.config.layout[section]) {
-                    const sectionActionGroups: MenuBarToolGroupButton[] = [];
-                    for (let tool of props.config.layout[section] || []) {
-                        const actionGroup = {
-                            id: tool,
-                            ...(toolGroupsDefinition)[tool]
-                        }
-                        if (actionGroup.controls) {
-                            for (let control of actionGroup.controls) {
-                                control.displayTitle = '';
-                                control.popoverVisible = false;
-                                control.showDock = false;
-                            }
-                        }
-                        sectionActionGroups.push(actionGroup);
-                    }
-                    actionGroups[section] = sectionActionGroups;
-                }
-            }
-            return actionGroups;
-        };
-
-        function getControlIcon(control: MenuBarToolGroupButton) {
-            let icon = control.icon;
-            if (control.action?.type === 'toolGroup') {
-                const lastActiveTool = editorStore.state.toolGroupLastActivatedTool[control.action?.target];
-                const childControl = (control.controls ?? []).find(
-                    (control) => control.action?.type === 'tool' && control.action?.target === lastActiveTool
-                );
-                if (childControl?.icon) {
-                    icon = childControl.icon;
-                }
-            }
-            return icon;
-        }
-
-        function onScrollTools() {
-            repositionToolGroupExpand();
-        }
-
-        function onKeyDownControlButton(event: KeyboardEvent, control: MenuBarToolGroupButton) {
-            if (event.key === 'Enter') {
-                onPressControlButton('popover', 0, control);
-            }
-        }
-
-        function onTouchStartControlButton(event: TouchEvent, control: MenuBarToolGroupButton) {
-            onPointerDownControlButton(event, control);
-        }
-        function onTouchEndControlButton(event: TouchEvent, control: MenuBarToolGroupButton) {
-            onPointerUpControlButton(event, control);
-        }
-        function onTouchMoveMenuBar(event: TouchEvent) {
-            if (pointerDownElement) {
-                for (let i = 0; i < event.touches.length; i++) {
-                    if (event.touches[i].identifier === pointerDownId) {
-                        if (pointerDownElement !== event.touches[i].target) {
-                            clearTimeout(pointerPressHoldTimeoutHandle);
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-        function onTouchStartWindow(event: TouchEvent) {
-            onPointerDownWindow(event);
-        }
-        function onTouchEndWindow(event: TouchEvent) {
-            onPointerUpWindow(event);
-        }
-
-        function onMouseDownControlButton(event: MouseEvent, control: MenuBarToolGroupButton) {
-            onPointerDownControlButton(event, control);
-        }
-        function onMouseUpControlButton(event: MouseEvent, control: MenuBarToolGroupButton) {
-            onPointerUpControlButton(event, control);
-        }
-        function onMouseEnterControlButton(event: MouseEvent, control: MenuBarToolGroupButton) {
-            if (control.action?.type === 'dock') return;
-            if (window.performance.now() - lastPointerTap > 350 && !(control.showDock || control.expanded)) {
-                if (!control.popoverVisible) {
-                    control.popoverVisible = true;
-                }
-            }
-        }
-        function onMouseLeaveControlButton(event: MouseEvent, control: MenuBarToolGroupButton) {
-            if (control.action?.type === 'dock') return;
-            if (!(control.showDock || control.expanded)) {
-                if (control.popoverVisible) {
-                    control.popoverVisible = false;
-                }
-            }
-            clearTimeout(pointerPressHoldTimeoutHandle);
-        }
-        function onMouseDownWindow(event: MouseEvent) {
-            onPointerDownWindow(event);
-        }
-        function onMouseUpWindow(event: MouseEvent) {
-            onPointerUpWindow(event);
-        }
-
-        function onPointerDownControlButton(event: TouchEvent | MouseEvent, control: MenuBarToolGroupButton) {
-            if (control.action?.type !== 'toolGroup') {
-                event.preventDefault();
-            }
-            if (event.target && activeControlDock) {
-                const target = event.target as Element;
-                activeControlDock.popoverVisible = false;
-            }
-            if (control.action?.type !== 'dock') {
-                control.popoverVisible = false;
-            }
-            pointerDownElement = event.target;
-            pointerDownId = (event as TouchEvent).touches ? (event as TouchEvent).touches[0].identifier : 0;
-            pointerDownType = event.type === 'mousedown' ? 'mouse' : 'touch';
-            pointerDownButton = (event as MouseEvent).button || 0;
-            pointerDownShowDock = control.showDock || false;
-            clearTimeout(pointerPressHoldTimeoutHandle);
-            pointerPressHoldTimeoutHandle = window.setTimeout(() => {
-                pointerDownElement = null;
-                pointerDownButton = -1;
-                pointerDownId = -1;
-                onPressHoldControlButton(event, control);
-            }, preferencesStore.get('pointerPressHoldTimeout'));
-        }
-        function onPointerUpControlButton(event: TouchEvent | MouseEvent, control: MenuBarToolGroupButton) {
-            clearTimeout(pointerPressHoldTimeoutHandle);
-            const id = pointerDownId;
-            const type = event.type === 'mouseup' ? 'mouse' : 'touch';
-            if ((event as TouchEvent).touches) {
-                for (let i = 0; i < (event as TouchEvent).touches.length; i++) {
-                    if ((event as TouchEvent).touches[i].identifier === pointerDownId) {
-                        pointerDownId = -1;
-                        break;
-                    }
-                }
-            }
-            const button = (event as MouseEvent).button || 0;
-            if (
-                pointerDownElement === event.target &&
-                pointerDownButton === button &&
-                pointerDownId === id &&
-                (
-                    pointerDownType === 'touch' ||
-                    (pointerDownType === 'mouse' && (
-                        lastPointerTapType !== 'touch' ||
-                        window.performance.now() - lastPointerTap > 350
-                    ))
-                )
-            ) {
-                onPressControlButton('popover', button, control);
-                pointerDownElement = null;
-                pointerDownButton = -1;
-                pointerDownId = -1;
-                ((event.target as HTMLButtonElement).closest('button') as any).focus();
-                lastPointerTap = window.performance.now();
-                lastPointerTapType = type;
-            }
-        }
-        function onPointerDownWindow(event: TouchEvent | MouseEvent) {
-            if (event.target && activeControlDock) {
-                const target = event.target as Element;
-                if (!target.closest || !target.closest('.el-popover')) {
-                    activeControlDock.popoverVisible = false;
-                }
-            }
-        }
-        function onPointerUpWindow(event: TouchEvent | MouseEvent) {
-            clearTimeout(pointerPressHoldTimeoutHandle);
-            let id = pointerDownId;
-            if ((event as TouchEvent).touches) {
-                for (let i = 0; i < (event as TouchEvent).touches.length; i++) {
-                    if ((event as TouchEvent).touches[i].identifier === pointerDownId) {
-                        pointerDownId = -1;
-                        break;
-                    }
-                }
-            }
-            const button = (event as MouseEvent).button || 0;
-            if (pointerDownButton === button && pointerDownId === id) {
-                pointerDownElement = null;
-                pointerDownButton = -1;
-                pointerDownId = -1;
-            }
-        }
-        async function onPressControlButton(openTarget: 'popover' | 'modal', button: number, control: MenuBarToolGroupButton) {
-            if (activeControlDock) {
-                pendingActiveControlCall = arguments;
-            } else {
-                if (control.action) {
-                    if (control.action.type === 'toolGroup') {
-                        if (button === 0) {
-                            if (activeToolGroup.value !== control.action.target) {
-                                editorStore.dispatch('setActiveTool', { group: control.action.target });
-                                if (openTarget === 'modal') {
-                                    showMoreActionsMenu.value = false;
-                                }
-                            } else if (control.controls?.length ?? 0 > 0) {
-                                isActiveToolGroupExpanded.value = !isActiveToolGroupExpanded.value;
-                            }
-                        }
-                    } else if (control.action.type === 'tool') {
-                        if (button === 0 && activeToolGroup.value && activeTool.value !== control.action.target) {
-                            editorStore.dispatch('setActiveTool', { group: activeToolGroup.value, tool: control.action.target });
-                            isActiveToolGroupExpanded.value = false;
-                            if (openTarget === 'modal') {
-                                showMoreActionsMenu.value = false;
-                            }
-                        }
-                    } else if (control.action.type === 'dock') {
-                        if (openTarget === 'popover') {
-                            if (!pointerDownShowDock) {
-                                if (window.innerWidth < mobileWidth) {
-                                    control.popoverVisible = false;
-                                    appEmitter.emit('app.menuDrawer.openFromDock', {
-                                        name: control.action.target,
-                                        placement: popoverPlacement.value
-                                    });
-                                } else {
-                                    activeControlDock = control;
-                                    control.showDock = true;
-                                    if (!control.popoverVisible) {
-                                        control.popoverVisible = true;
-                                    }
-                                    appEmitter.emit('app.menuDrawer.closeAll');
-                                }
-                            } else {
-                                control.popoverVisible = false;
-                            }
-                        } else if (openTarget === 'modal') {
-                            appEmitter.emit('app.dialogs.openFromDock', { name: control.action.target });
-                            showMoreActionsMenu.value = false;
-                        }
-                    } else if (control.action.type === 'runModule') {
-                        const actionSplit = control.action.target.split('/');
-                        await runModule(actionSplit[0], actionSplit[1]);
-                    }
-                }
-            }
-        }
-        function onPressHoldControlButton(event: TouchEvent | MouseEvent, control: MenuBarToolGroupButton) {
-            // TODO - drag & drop
-        }
-
-        function onAfterLeavePopover(control: MenuBarToolGroupButton) {
-            if (control === activeControlDock) {
-                activeControlDock = null;
-                control.showDock = false;
-                if (pendingActiveControlCall) {
-                    onPressControlButton.apply(window, pendingActiveControlCall as any);
-                    pendingActiveControlCall = null;
-                }
-            }
-        }
-
-        function onClickUndo() {
-            runModule('history', 'undo');
-        }
-
-        return {
-            activeMenuDrawerComponentName,
-
-            menuBarElement,
-            toolGroupButtons,
-            toolGroupExpandOffsetTop,
-            toolGroupExpandOffsetLeft,
-
-            showToolGroupExpandButton,
-            isActiveToolGroupExpanded,
-            showMoreActionsMenu,
-            showMoreActionsTooltip,
-            activeToolGroupExpandToggleIcon,
-
-            popoverPlacement,
-            displayMode,
-            direction,
-            flexContainer,
-            actionGroups,
-            activeToolGroup,
-            activeTool,
-            activeToolGroupControls,
-
-            isTouchUser,
-
-            getControlIcon,
-            onScrollTools,
-            onAfterLeavePopover,
-            onKeyDownControlButton,
-            onTouchStartControlButton,
-            onTouchEndControlButton,
-            onTouchMoveMenuBar,
-            onMouseDownControlButton,
-            onMouseUpControlButton,
-            onMouseEnterControlButton,
-            onMouseLeaveControlButton,
-            onPressControlButton,
-            onClickUndo
-        };
+const activeToolGroupExpandToggleIcon = computed(() => {
+    if (direction.value === 'vertical') {
+        return props.layoutPlacement === 'left'
+            ? (isActiveToolGroupExpanded.value ? 'bi-chevron-left' : 'bi-chevron-right' )
+            : (isActiveToolGroupExpanded.value ? 'bi-chevron-right' : 'bi-chevron-left' );
+    } else {
+        return props.layoutPlacement === 'top'
+            ? (isActiveToolGroupExpanded.value ? 'bi-chevron-up' : 'bi-chevron-down' )
+            : (isActiveToolGroupExpanded.value ? 'bi-chevron-down' : 'bi-chevron-up' );
     }
 });
+
+const toolPreviewPopoverReference = computed<HTMLButtonElement | undefined>(() => {
+    return (toolGroupButtons.value.find((button) => {
+        const buttonElement = button.ref as unknown as HTMLButtonElement;
+        return buttonElement?.getAttribute('data-group-target') === toolPreviewPopoverGroupDefinition.value?.id;
+    })?.ref) as never;
+});
+
+/*--------*\
+| Watchers |
+\*--------*/
+
+watch(() => activeToolGroup.value, () => {
+    if (!actionGroups.value) return;
+    activeToolGroupButton.value = (toolGroupButtons.value.find((button) => {
+        const buttonElement = button.ref as unknown as HTMLButtonElement;
+        return buttonElement?.getAttribute('data-group-target') === activeToolGroup.value;
+    })?.ref) as never;
+    showToolGroupExpandButton.value = activeToolGroupControls.value.length > 1;
+    toolGroupExpandOffsetTop.value = undefined;
+    toolGroupExpandOffsetLeft.value = undefined;
+    isActiveToolGroupExpanded.value = false;
+    repositionToolGroupExpand();
+}, { immediate: true });
+
+watch([viewportWidth], () => {
+    toggleMobileView();
+    repositionToolGroupExpand();
+});
+watch([viewportHeight], () => {
+    repositionToolGroupExpand();
+})
+
+watch(() => props.layoutPlacement, (layoutPlacement) => {
+    direction.value = ['left', 'right'].includes(layoutPlacement) ? 'vertical' : 'horizontal';
+    popoverPlacement.value = {
+        bottom: 'top',
+        top: 'bottom',
+        left: 'right',
+        right: 'left'
+    }[layoutPlacement] as any;
+}, { immediate: true });
+
+/*-----------*\
+| Composition |
+\*-----------*/
+
+const { floatingStyles: toolPreviewPopoverStyles, update: updateToolPreviewPopover } = useFloating(
+    computed(() => toolPreviewPopoverReference.value),
+    toolPreviewPopover,
+    {
+        placement: computed(() => popoverPlacement.value),
+        middleware: [
+            flip({
+                fallbackAxisSideDirection: 'end',
+            }),
+            offset(16),
+        ],
+    },
+);
+
+/*---------*\
+| Lifecycle |
+\*---------*/
+
+onMounted(() => {
+    window.addEventListener('mousedown', onMouseDownWindow);
+    window.addEventListener('mouseup', onMouseUpWindow);
+    window.addEventListener('touchstart', onTouchStartWindow);
+    window.addEventListener('touchend', onTouchEndWindow);
+    
+    displayMode.value = viewportWidth.value / (window.devicePixelRatio || 1) > preferencesStore.state.dockHideBreakpoint ? 'tools' : 'all';
+
+    emit('resize');
+});
+
+onUnmounted(() => {
+    window.removeEventListener('mousedown', onMouseDownWindow);
+    window.removeEventListener('mouseup', onMouseUpWindow);
+    window.removeEventListener('touchstart', onTouchStartWindow);
+    window.removeEventListener('touchend', onTouchEndWindow);
+    repositionToolGroupExpand();
+});
+
+/*-------*\
+| Methods |
+\*-------*/
+
+function repositionToolGroupExpand() {
+    window.clearTimeout(repositionToolGroupExpandDebounceHandle);
+    repositionToolGroupExpandDebounceHandle = window.setTimeout(repositionToolGroupExpandImmediate, 200);
+}
+
+function repositionToolGroupExpandImmediate() {
+    const menuBarClientRect = menuBarElement.value?.getBoundingClientRect();
+    const buttonClientRect = activeToolGroupButton.value?.getBoundingClientRect();
+    if (!menuBarClientRect || !buttonClientRect) return;
+    if (direction.value === 'vertical') {
+        toolGroupExpandOffsetTop.value = (-menuBarClientRect.top + buttonClientRect.top + (buttonClientRect.height / 2)).toFixed(1) + 'px';
+        toolGroupExpandOffsetLeft.value = undefined;
+    } else {
+        toolGroupExpandOffsetTop.value = undefined;
+        toolGroupExpandOffsetLeft.value = (-menuBarClientRect.left + buttonClientRect.left + (buttonClientRect.width / 2)).toFixed(1) + 'px';
+    }
+}
+
+function toggleMobileView() {
+    window.clearTimeout(resizeDebounceHandle);
+    resizeDebounceHandle = window.setTimeout(toggleMobileViewImmediate, 400);
+}
+
+function toggleMobileViewImmediate() {
+    displayMode.value = viewportWidth.value / (window.devicePixelRatio || 1) > preferencesStore.state.dockHideBreakpoint ? 'tools' : 'all';
+}
+
+function createActionGroups(forceDisplayMode?: string): { [key: string]: MenuBarToolGroupButton[] } {
+    activeControlDock = null;
+    pendingActiveControlCall = null;
+    forceDisplayMode = forceDisplayMode || displayMode.value;
+    let actionGroups: { [key: string]: MenuBarToolGroupButton[] } = {};
+    const sectionNames = ['docks', 'tools'] as ('docks' | 'tools')[];
+    for (let section of sectionNames) {
+        if (props.config.layout[section]) {
+            const sectionActionGroups: MenuBarToolGroupButton[] = [];
+            for (let tool of props.config.layout[section] || []) {
+                const actionGroup = {
+                    id: tool,
+                    ...(toolGroupsDefinition)[tool]
+                }
+                if (actionGroup.controls) {
+                    for (let control of actionGroup.controls) {
+                        control.displayTitle = '';
+                        control.popoverVisible = false;
+                        control.showDock = false;
+                    }
+                }
+                sectionActionGroups.push(actionGroup);
+            }
+            actionGroups[section] = sectionActionGroups;
+        }
+    }
+    return actionGroups;
+};
+
+function getControlIcon(control: MenuBarToolGroupButton) {
+    let icon = control.icon;
+    if (control.action?.type === 'toolGroup') {
+        const lastActiveTool = editorStore.state.toolGroupLastActivatedTool[control.action?.target];
+        const childControl = (control.controls ?? []).find(
+            (control) => control.action?.type === 'tool' && control.action?.target === lastActiveTool
+        );
+        if (childControl?.icon) {
+            icon = childControl.icon;
+        }
+    }
+    return icon;
+}
+
+function onScrollTools() {
+    repositionToolGroupExpand();
+}
+
+function onKeyDownControlButton(event: KeyboardEvent, control: MenuBarToolGroupButton) {
+    if (event.key === 'Enter') {
+        onPressControlButton('popover', 0, control);
+    }
+}
+
+function onTouchStartControlButton(event: TouchEvent, control: MenuBarToolGroupButton) {
+    onPointerDownControlButton(event, control);
+}
+function onTouchEndControlButton(event: TouchEvent, control: MenuBarToolGroupButton) {
+    onPointerUpControlButton(event, control);
+}
+function onTouchMoveMenuBar(event: TouchEvent) {
+    if (pointerDownElement) {
+        for (let i = 0; i < event.touches.length; i++) {
+            if (event.touches[i].identifier === pointerDownId) {
+                if (pointerDownElement !== event.touches[i].target) {
+                    clearTimeout(pointerPressHoldTimeoutHandle);
+                }
+                break;
+            }
+        }
+    }
+}
+function onTouchStartWindow(event: TouchEvent) {
+    onPointerDownWindow(event);
+}
+function onTouchEndWindow(event: TouchEvent) {
+    onPointerUpWindow(event);
+}
+
+function onMouseDownControlButton(event: MouseEvent, control: MenuBarToolGroupButton) {
+    onPointerDownControlButton(event, control);
+}
+function onMouseUpControlButton(event: MouseEvent, control: MenuBarToolGroupButton) {
+    onPointerUpControlButton(event, control);
+}
+async function onMouseEnterControlButton(event: MouseEvent, control: MenuBarToolGroupButton) {
+    if (control.action?.type === 'dock') return;
+    if (
+        window.performance.now() - lastPointerTap > 350
+        && !(control.showDock || control.expanded)
+        && control.action?.type === 'toolGroup'
+        && !(control.action.target === activeToolGroup.value && isActiveToolGroupExpanded.value)
+        
+    ) {
+        toolPreviewPopoverGroupDefinition.value = control;
+        nextTick(showToolPreviewPopover);
+    }
+}
+function onMouseLeaveControlButton(event: MouseEvent, control: MenuBarToolGroupButton) {
+    if (control.action?.type === 'dock') return;
+    if (!(control.showDock || control.expanded)) {
+        if (toolPreviewPopoverVisible.value) {
+            window.clearTimeout(hideToolPreviewPopoverTimeout);
+            hideToolPreviewPopoverTimeout = window.setTimeout(hideToolPreviewPopover, 150);
+        }
+    }
+    clearTimeout(pointerPressHoldTimeoutHandle);
+}
+function onMouseDownWindow(event: MouseEvent) {
+    onPointerDownWindow(event);
+}
+function onMouseUpWindow(event: MouseEvent) {
+    onPointerUpWindow(event);
+}
+
+function showToolPreviewPopover() {
+    window.clearTimeout(hideToolPreviewPopoverTimeout);
+    if (!toolPreviewPopoverVisible.value) {
+        isToolPreviewPopoverReused.value = false;
+        toolPreviewPopoverVisible.value = true;
+    } else {
+        isToolPreviewPopoverReused.value = true;
+    }
+    updateToolPreviewPopover();
+}
+function hideToolPreviewPopover() {
+    toolPreviewPopoverVisible.value = false;
+    isToolPreviewPopoverReused.value = false;
+}
+
+function onPointerDownControlButton(event: TouchEvent | MouseEvent, control: MenuBarToolGroupButton) {
+    if (control.action?.type !== 'toolGroup') {
+        event.preventDefault();
+    }
+    if (event.target && activeControlDock) {
+        const target = event.target as Element;
+        activeControlDock.popoverVisible = false;
+    }
+    if (control.action?.type !== 'dock') {
+        window.clearTimeout(hideToolPreviewPopoverTimeout);
+        toolPreviewPopoverVisible.value = false;
+    }
+    pointerDownElement = event.target;
+    pointerDownId = (event as TouchEvent).touches ? (event as TouchEvent).touches[0].identifier : 0;
+    pointerDownType = event.type === 'mousedown' ? 'mouse' : 'touch';
+    pointerDownButton = (event as MouseEvent).button || 0;
+    pointerDownShowDock = control.showDock || false;
+    clearTimeout(pointerPressHoldTimeoutHandle);
+    pointerPressHoldTimeoutHandle = window.setTimeout(() => {
+        pointerDownElement = null;
+        pointerDownButton = -1;
+        pointerDownId = -1;
+        onPressHoldControlButton(event, control);
+    }, preferencesStore.get('pointerPressHoldTimeout'));
+}
+function onPointerUpControlButton(event: TouchEvent | MouseEvent, control: MenuBarToolGroupButton) {
+    clearTimeout(pointerPressHoldTimeoutHandle);
+    const id = pointerDownId;
+    const type = event.type === 'mouseup' ? 'mouse' : 'touch';
+    if ((event as TouchEvent).touches) {
+        for (let i = 0; i < (event as TouchEvent).touches.length; i++) {
+            if ((event as TouchEvent).touches[i].identifier === pointerDownId) {
+                pointerDownId = -1;
+                break;
+            }
+        }
+    }
+    const button = (event as MouseEvent).button || 0;
+    if (
+        pointerDownElement === event.target &&
+        pointerDownButton === button &&
+        pointerDownId === id &&
+        (
+            pointerDownType === 'touch' ||
+            (pointerDownType === 'mouse' && (
+                lastPointerTapType !== 'touch' ||
+                window.performance.now() - lastPointerTap > 350
+            ))
+        )
+    ) {
+        onPressControlButton('popover', button, control);
+        pointerDownElement = null;
+        pointerDownButton = -1;
+        pointerDownId = -1;
+        ((event.target as HTMLButtonElement).closest('button') as any).focus();
+        lastPointerTap = window.performance.now();
+        lastPointerTapType = type;
+    }
+}
+function onPointerDownWindow(event: TouchEvent | MouseEvent) {
+    if (event.target && activeControlDock) {
+        const target = event.target as Element;
+        if (!target.closest || !target.closest('.el-popover')) {
+            activeControlDock.popoverVisible = false;
+        }
+    }
+}
+function onPointerUpWindow(event: TouchEvent | MouseEvent) {
+    clearTimeout(pointerPressHoldTimeoutHandle);
+    let id = pointerDownId;
+    if ((event as TouchEvent).touches) {
+        for (let i = 0; i < (event as TouchEvent).touches.length; i++) {
+            if ((event as TouchEvent).touches[i].identifier === pointerDownId) {
+                pointerDownId = -1;
+                break;
+            }
+        }
+    }
+    const button = (event as MouseEvent).button || 0;
+    if (pointerDownButton === button && pointerDownId === id) {
+        pointerDownElement = null;
+        pointerDownButton = -1;
+        pointerDownId = -1;
+    }
+}
+async function onPressControlButton(openTarget: 'popover' | 'modal', button: number, control: MenuBarToolGroupButton) {
+    if (activeControlDock) {
+        pendingActiveControlCall = arguments;
+    } else {
+        if (control.action) {
+            if (control.action.type === 'toolGroup') {
+                if (button === 0) {
+                    if (activeToolGroup.value !== control.action.target) {
+                        editorStore.dispatch('setActiveTool', { group: control.action.target });
+                    } else if (control.controls?.length ?? 0 > 0) {
+                        isActiveToolGroupExpanded.value = !isActiveToolGroupExpanded.value;
+                    }
+                }
+            } else if (control.action.type === 'tool') {
+                if (button === 0 && activeToolGroup.value && activeTool.value !== control.action.target) {
+                    editorStore.dispatch('setActiveTool', { group: activeToolGroup.value, tool: control.action.target });
+                    isActiveToolGroupExpanded.value = false;
+                }
+            } else if (control.action.type === 'dock') {
+                if (openTarget === 'popover') {
+                    if (!pointerDownShowDock) {
+                        if (window.innerWidth < mobileWidth) {
+                            control.popoverVisible = false;
+                            appEmitter.emit('app.menuDrawer.openFromDock', {
+                                name: control.action.target,
+                                placement: popoverPlacement.value
+                            });
+                        } else {
+                            activeControlDock = control;
+                            control.showDock = true;
+                            if (!control.popoverVisible) {
+                                control.popoverVisible = true;
+                            }
+                            appEmitter.emit('app.menuDrawer.closeAll');
+                        }
+                    } else {
+                        control.popoverVisible = false;
+                    }
+                } else if (openTarget === 'modal') {
+                    appEmitter.emit('app.dialogs.openFromDock', { name: control.action.target });
+                }
+            } else if (control.action.type === 'runModule') {
+                const actionSplit = control.action.target.split('/');
+                await runModule(actionSplit[0], actionSplit[1]);
+            }
+        }
+    }
+}
+function onPressHoldControlButton(event: TouchEvent | MouseEvent, control: MenuBarToolGroupButton) {
+    // TODO - drag & drop
+}
+
+function onAfterLeavePopover(control: MenuBarToolGroupButton) {
+    if (control === activeControlDock) {
+        activeControlDock = null;
+        control.showDock = false;
+        if (pendingActiveControlCall) {
+            onPressControlButton.apply(window, pendingActiveControlCall as any);
+            pendingActiveControlCall = null;
+        }
+    }
+}
+
+function onClickUndo() {
+    runModule('history', 'undo');
+}
+
 </script>

@@ -21,6 +21,9 @@
 
         --el-menu-bg-color: transparent;
     }
+    .og-popover--animated-placement {
+        transition: transform 0.2s;
+    }
 
     .og-popover__arrow {
         background: var(--og-popover-background-color);        
