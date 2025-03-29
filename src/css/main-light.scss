@@ -2,7 +2,6 @@
 @use './opengraphica/popover.scss';
 
 @use './vendor/element-plus-theme-chalk.css';
-@use './vendor/bulma.scss' as *;
 @use './element-plus-enhancements.scss' as *;
 
 :root {
@@ -49,7 +48,6 @@
 }
 
 .opengraphica {
-    @include bulma;
     @include element-plus-enhancements;
 
     --el-switch-button-size: 1rem;

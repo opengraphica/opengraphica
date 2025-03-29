@@ -1,12 +1,12 @@
 <template>
-    <div class="is-flex container is-align-items-center is-justify-content-center mx-auto">
+    <div class="flex container items-center justify-center mx-auto">
         <div class="og-toolbar-overlay">
             <div class="og-toolbar-tool-selector">
                 <span class="bi bi-eraser my-1" aria-hidden="true"></span>
                 <span class="og-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
             </div>
             <el-horizontal-scrollbar-arrows>
-                <div class="is-flex is-align-items-center px-3">
+                <div class="flex items-center px-3">
                     <label for="toolbar-erase-brush-size-slider" v-t="'toolbar.eraseBrush.brushSize'" class="mr-3" />
                     <el-slider
                         id="toolbar-erase-brush-size-slider"

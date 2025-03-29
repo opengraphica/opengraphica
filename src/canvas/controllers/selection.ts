@@ -89,8 +89,8 @@ export default class SelectionController extends BaseMovementController {
                 }).join('');
                 let messageEnd = (tm('tutorialTip.selectionToolIntroduction.body.end') as string[]).map((message) => {
                     return `<p class="mb-3">${rt(message, {
-                        selectionShape: `<strong class="has-text-weight-bold"><span class="bi bi-square"></span> ${t('tutorialTip.selectionToolIntroduction.bodyTitle.selectionShape')}</strong>`,
-                        selectionCombineMode: `<strong class="has-text-weight-bold"><span class="bi bi-plus-circle-dotted"></span> ${t('tutorialTip.selectionToolIntroduction.bodyTitle.selectionCombineMode')}</strong>`
+                        selectionShape: `<strong class="font-bold"><span class="bi bi-square"></span> ${t('tutorialTip.selectionToolIntroduction.bodyTitle.selectionShape')}</strong>`,
+                        selectionCombineMode: `<strong class="font-bold"><span class="bi bi-plus-circle-dotted"></span> ${t('tutorialTip.selectionToolIntroduction.bodyTitle.selectionCombineMode')}</strong>`
                     })}</p>`;
                 }).join('');
                 scheduleTutorialNotification({
@@ -99,12 +99,12 @@ export default class SelectionController extends BaseMovementController {
                     message: {
                         touch: messageStart + (tm('tutorialTip.selectionToolIntroduction.body.touch') as string[]).map((message) => {
                             return `<p class="mb-3">${rt(message, {
-                                createSelection: `<strong class="has-text-weight-bold"><span class="bi bi-bounding-box"></span> ${t('tutorialTip.selectionToolIntroduction.bodyTitle.createSelection')}</strong>`,
+                                createSelection: `<strong class="font-bold"><span class="bi bi-bounding-box"></span> ${t('tutorialTip.selectionToolIntroduction.bodyTitle.createSelection')}</strong>`,
                             })}</p>`
                         }).join('') + messageEnd,
                         mouse: messageStart + (tm('tutorialTip.selectionToolIntroduction.body.mouse') as string[]).map((message) => {
                             return `<p class="mb-3">${rt(message, {
-                                createSelection: `<strong class="has-text-weight-bold"><span class="bi bi-bounding-box"></span> ${t('tutorialTip.selectionToolIntroduction.bodyTitle.createSelection')}</strong>`,
+                                createSelection: `<strong class="font-bold"><span class="bi bi-bounding-box"></span> ${t('tutorialTip.selectionToolIntroduction.bodyTitle.createSelection')}</strong>`,
                                 leftClick: `<em>${t('tutorialTip.selectionToolIntroduction.bodyTitle.leftClick')}</em>`,
                             })}</p>`
                         }).join('') + messageEnd,

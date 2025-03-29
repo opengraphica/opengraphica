@@ -2,14 +2,14 @@
     <el-tabs class="el-tabs--icon-tabs" v-model="activeTab" v-loading="loading">
         <el-tab-pane name="file">
             <template #label>
-                <div class="leading-tight">
-                    <i class="bi bi-archive leading-snug is-block has-text-centered is-size-5 mt-1"></i>
-                    <div class="mb-3" v-t="'dock.settings.file.tabTitle'"></div>
+                <div class="leading-5">
+                    <i class="bi bi-archive leading-[1.375] block text-center text-lg !mt-1"></i>
+                    <div class="!mb-3" v-t="'dock.settings.file.tabTitle'"></div>
                 </div>
             </template>
             <template v-if="visitedTabs['file'] === true">
                 <el-scrollbar>
-                    <el-menu class="el-menu--medium el-menu--borderless el-menu--inactivated mb-1" @select="onMenuSelect('file', $event)">
+                    <el-menu class="el-menu--medium el-menu--borderless el-menu--inactivated !mb-1" @select="onMenuSelect('file', $event)">
                         <el-menu-item v-if="showRestoreImage" index="restore">
                             <i class="bi bi-recycle"></i>
                             <span v-t="'dock.settings.file.menu.restore'"></span>
@@ -53,14 +53,14 @@
         </el-tab-pane>
         <el-tab-pane name="image">
             <template #label>
-                <div class="leading-tight">
-                    <i class="bi bi-image leading-snug is-block has-text-centered is-size-5 mt-1"></i>
-                    <div class="mb-3" v-t="'dock.settings.image.tabTitle'"></div>
+                <div class="leading-5">
+                    <i class="bi bi-image leading-[1.375] block text-center text-lg !mt-1"></i>
+                    <div class="!mb-3" v-t="'dock.settings.image.tabTitle'"></div>
                 </div>
             </template>
             <template v-if="visitedTabs['image'] === true">
                 <el-scrollbar>
-                    <el-menu class="el-menu--medium el-menu--borderless el-menu--inactivated mb-1" @select="onMenuSelect('image', $event)">
+                    <el-menu class="el-menu--medium el-menu--borderless el-menu--inactivated !mb-1" @select="onMenuSelect('image', $event)">
                         <el-menu-item index="cropResize">
                             <i class="bi bi-crop"></i>
                             <span v-t="'dock.settings.image.menu.cropResize'"></span>
@@ -107,14 +107,14 @@
         </el-tab-pane>
         <el-tab-pane name="view">
             <template #label>
-                <div class="leading-tight">
-                    <i class="bi bi-display leading-snug is-block has-text-centered is-size-5 mt-1"></i>
-                    <div class="mb-3" v-t="'dock.settings.view.tabTitle'"></div>
+                <div class="leading-5">
+                    <i class="bi bi-display leading-[1.375] block text-center text-lg !mt-1"></i>
+                    <div class="!mb-3" v-t="'dock.settings.view.tabTitle'"></div>
                 </div>
             </template>
             <template v-if="visitedTabs['view'] === true">
                 <el-scrollbar>
-                    <el-form novalidate="novalidate" action="javascript:void(0)" class="mb-1 mt-1">
+                    <el-form novalidate="novalidate" action="javascript:void(0)" class="!mb-1 !mt-1">
                         <el-form-item class="el-form-item--menu-item" :label="$t('dock.settings.view.zoom')">
                             <el-button-group class="el-button-group--flex">
                                 <el-button size="small" plain :aria-label="$t('dock.settings.view.zoomOut')" :title="$t('dock.settings.view.zoomOut')" @click="isZoomLevelTouched = true; zoomLevel *= 1/1.25">
@@ -144,7 +144,7 @@
                                 <el-button size="small" plain @click="onResetViewRotation">0°</el-button>
                             </el-button-group>
                         </el-form-item>
-                        <el-divider class="my-2" />
+                        <el-divider class="!my-2" />
                         <el-form-item class="el-form-item--menu-item" :label="$t('dock.settings.view.touchRotate.label')">
                             <el-radio-group
                                 v-model="touchRotationPreference"
@@ -157,7 +157,7 @@
                                 </el-radio-button>
                             </el-radio-group>
                         </el-form-item>
-                        <el-divider class="my-2" />
+                        <el-divider class="!my-2" />
                         <el-form-item class="el-form-item--menu-item" :label="$t('dock.settings.view.window')">
                             <el-button v-if="isFullscreen" size="small" plain @click="onExitFullscreen()">
                                 <i class="bi bi-fullscreen-exit mr-2" aria-hidden="true" />
@@ -174,14 +174,14 @@
         </el-tab-pane>
         <el-tab-pane name="history">
             <template #label>
-                <div class="leading-tight">
-                    <i class="bi bi-clock-history leading-snug is-block has-text-centered is-size-5 mt-1"></i>
-                    <div class="mb-3" v-t="'dock.settings.history.tabTitle'"></div>
+                <div class="leading-5">
+                    <i class="bi bi-clock-history leading-[1.375] block text-center text-lg !mt-1"></i>
+                    <div class="!mb-3" v-t="'dock.settings.history.tabTitle'"></div>
                 </div>
             </template>
             <template v-if="visitedTabs['history'] === true">
                 <el-scrollbar>
-                    <div class="is-flex is-justify-content-center px-4 pt-2">
+                    <div class="flex justify-center px-4 pt-2">
                         <el-button-group>
                             <el-button size="small" :disabled="!canUndo" round plain aria-label="Undo" @click="onHistoryUndo()">
                                 <i class="bi bi-arrow-90deg-left mr-1" aria-hidden="true" /> {{ $t('dock.settings.history.undo') }}
@@ -221,9 +221,9 @@
         </el-tab-pane>
         <el-tab-pane name="prefs">
             <template #label>
-                <div class="leading-tight">
-                    <i class="bi bi-toggle-on leading-snug is-block has-text-centered is-size-5 mt-1"></i>
-                    <div class="mb-3" v-t="'dock.settings.prefs.tabTitle'"></div>
+                <div class="leading-5">
+                    <i class="bi bi-toggle-on leading-[1.375] block text-center text-lg !mt-1"></i>
+                    <div class="!mb-3" v-t="'dock.settings.prefs.tabTitle'"></div>
                 </div>
             </template>
             <template v-if="visitedTabs['prefs'] === true">
@@ -245,7 +245,7 @@
                             </el-radio-group>
                         </el-form-item>
                         <!-- Prefs: Language -->
-                        <el-form-item class="el-form-item--menu-item mb-1 el-form-item--has-content-right" :label="$t('dock.settings.prefs.language')">
+                        <el-form-item class="el-form-item--menu-item !mb-1 el-form-item--has-content-right" :label="$t('dock.settings.prefs.language')">
                             <el-select v-model="languageOverride" size="small" style="width: 6rem;">
                                 <el-option-group>
                                     <el-option value="" :label="'[' + $t('dock.settings.prefs.default') + ']'" />
@@ -310,8 +310,8 @@
                             </el-collapse-item>
                         </el-collapse>
                         <!-- Prefs: Reset -->
-                        <div class="px-4.5 pt-4 pb-4">
-                            <el-button size="small" class="is-fullwidth" @click="onClickResetSettings" v-t="'dock.settings.prefs.editor.resetSettings'" />
+                        <div class="px-5 pt-4 pb-4">
+                            <el-button size="small" class="w-full" @click="onClickResetSettings" v-t="'dock.settings.prefs.editor.resetSettings'" />
                         </div>
                     </el-form>
                 </el-scrollbar>

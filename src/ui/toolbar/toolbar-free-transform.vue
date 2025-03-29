@@ -1,5 +1,5 @@
 <template>
-    <div class="is-flex container is-align-items-center is-justify-content-center mx-auto">
+    <div class="flex container items-center justify-center mx-auto">
         <div class="og-toolbar-overlay">
             <div class="og-toolbar-tool-selector">
                 <span class="bi bi-cursor my-1" aria-hidden="true"></span>
@@ -36,7 +36,7 @@
                     }"
                 >
                     <template #reference>
-                        <el-button size="small" class="ml-3">
+                        <el-button size="small" class="!ml-3">
                             <span class="bi bi-magnet-fill mr-2" aria-hidden="true" /> {{ $t('toolbar.freeTransform.snapping.title') }}
                         </el-button>
                     </template>
@@ -65,22 +65,22 @@
                     }"
                 >
                     <template #reference>
-                        <el-button size="small" class="ml-3">
+                        <el-button size="small" class="!ml-3">
                             <span class="bi bi-clipboard-data-fill mr-2" aria-hidden="true" /> {{ $t('toolbar.freeTransform.metrics.title') }}
                         </el-button>
                     </template>
                     <h2 class="og-dock-title" v-t="'toolbar.freeTransform.metrics.title'" />
                     <template v-if="selectedLayerIds.length > 0">
                         <el-form novalidate="novalidate" action="javascript:void(0)" style="max-width: 15rem;">
-                            <div class="px-4.5 my-3 is-flex">
+                            <div class="px-5 my-3 flex">
                                 <el-input-number
                                     v-model="inputLeft" :aria-label="'X ' + $t('toolbar.freeTransform.metrics.position')" size="small"
-                                    class="el-input-group--plain is-flex-grow-1" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputLeft($event)" @blur="onChangeDragResizeInput()">
+                                    class="el-input-group--plain grow-1" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputLeft($event)" @blur="onChangeDragResizeInput()">
                                     <template #prepend>X</template>
                                 </el-input-number>
                                 <el-input-number
                                     v-model="inputTop" :aria-label="'Y ' + $t('toolbar.freeTransform.metrics.position')" size="small"
-                                    class="el-input-group--plain is-flex-grow-1 ml-3" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputTop($event)" @blur="onChangeDragResizeInput()">
+                                    class="el-input-group--plain grow-1 ml-3" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputTop($event)" @blur="onChangeDragResizeInput()">
                                     <template #prepend>Y</template>
                                 </el-input-number>
                             </div>
@@ -110,7 +110,7 @@
                         </el-form>
                     </template>
                     <template v-else>
-                        <div class="px-4.5 my-3">
+                        <div class="px-5 my-3">
                             <el-alert
                                 type="info"
                                 :title="$t('toolbar.freeTransform.metrics.noLayers')"
@@ -139,7 +139,7 @@
                     }"
                 >
                     <template #reference>
-                        <el-button size="small" class="ml-3">
+                        <el-button size="small" class="!ml-3">
                             <span class="bi bi-gear-fill mr-2" aria-hidden="true" /> {{ $t('toolbar.freeTransform.actions.title') }}
                         </el-button>
                     </template>

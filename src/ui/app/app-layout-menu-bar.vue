@@ -10,7 +10,7 @@
             }
         ]"
         @touchmove="onTouchMoveMenuBar($event)">
-        <div ref="flexContainer" class="is-flex container mx-auto">
+        <div ref="flexContainer" class="flex container mx-auto">
             <div
                 v-for="(actionGroupSection, actionGroupSectionName) of actionGroups"
                 :key="actionGroupSectionName"
@@ -27,72 +27,78 @@
                     style="height: auto"
                     @scroll="onScrollTools"
                 >
-                    <template v-for="actionGroup of actionGroupSection" :key="actionGroup.id">
-                        <component :is="actionGroup.controls.length === 1 ? 'div' : 'el-button-group'" :class="{ 'og-single-button-group': actionGroup.controls.length === 1 }">
-                            <template v-for="control of actionGroup.controls" :key="control.label">
-                                <el-popover
-                                    v-model:visible="control.popoverVisible"
-                                    :trigger="[]"
-                                    effect="light"
-                                    :placement="popoverPlacement"
-                                    :popper-class="'og-dock-popover'"
-                                    :show-after="0"
-                                    :hide-after="0"
-                                    :transition="control.showDock ? 'el-fade-in-linear' : 'none'"
-                                    :popper-options="{ boundariesElement: 'body' }"
-                                    append-to=".opengraphica"
-                                    @after-leave="onAfterLeavePopover(control)">
-                                    <template #reference>
-                                        <el-button
-                                            ref="toolGroupButtons"
-                                            :aria-label="$t(control.label)"
-                                            :type="[activeToolGroup, activeMenuDrawerComponentName].includes(control.action?.target) ? 'primary' : undefined"
-                                            :plain="![activeToolGroup, activeMenuDrawerComponentName].includes(control.action?.target)"
-                                            :circle="!control.expanded"
-                                            :round="control.expanded"
-                                            :class="{
-                                                'og-menu-bar-button--hover-title': !control.expanded,
-                                                'el-button--expanded-group': control.expanded,
-                                                'el-button--expanded-popover': control.showDock
-                                            }"
-                                            :data-group-target="control.action?.target"
-                                            @touchstart="onTouchStartControlButton($event, control)"
-                                            @touchend="onTouchEndControlButton($event, control)"
-                                            @mousedown="onMouseDownControlButton($event, control)"
-                                            @mouseup="onMouseUpControlButton($event, control)"
-                                            @mouseenter="onMouseEnterControlButton($event, control)"
-                                            @mouseleave="onMouseLeaveControlButton($event, control)"
-                                            @keydown="onKeyDownControlButton($event, control)"
-                                        >
-                                            <span class="el-icon" :class="getControlIcon(control)" aria-hidden="true" />
-                                            <span v-if="control.expanded" class="ml-2">{{ $t(control.label) }}</span>
-                                            <el-tag v-if="control.expanded" type="info" class="ml-2 el-tag--mini">Ctrl + K</el-tag>
-                                        </el-button>
-                                    </template>
-                                    <template v-if="control.showDock">
-                                        <div v-if="control.displayTitle" class="og-dock-title" v-t="control.displayTitle" />
-                                        <dynamically-loaded-dock
-                                            :name="control.action.target" :key="'dock-' + control.action.target"
-                                            @update:title="control.displayTitle = $event"
-                                            @close="control.popoverVisible = false"
-                                        />
-                                    </template>
-                                    <template v-else>
-                                        <div class="px-4 py-3">
-                                            <strong class="has-text-weight-bold">{{ $t(control.label) }}</strong>
-                                            <ol v-if="$tm(control.description)?.length > 0" class="og-list--dashed">
-                                                <li
-                                                    v-for="descriptionLine of $tm(control.description)"
-                                                    :key="descriptionLine"
-                                                >
-                                                    {{ descriptionLine }}
-                                                </li>
-                                            </ol>
-                                        </div>
-                                    </template>
-                                </el-popover>
-                            </template>
-                        </component>
+                    <template v-for="control of actionGroupSection" :key="control.id">
+                        <div class="og-single-button-group ">
+                            <el-popover
+                                v-model:visible="control.popoverVisible"
+                                :trigger="[]"
+                                effect="light"
+                                :placement="popoverPlacement"
+                                :popper-class="'og-dock-popover'"
+                                :show-after="0"
+                                :hide-after="0"
+                                :transition="control.showDock ? 'el-fade-in-linear' : 'none'"
+                                :popper-options="{ boundariesElement: 'body' }"
+                                append-to=".opengraphica"
+                                @after-leave="onAfterLeavePopover(control)">
+                                <template #reference>
+                                    <el-button
+                                        ref="toolGroupButtons"
+                                        :aria-label="$t(`menuBarToolGroup.${control.id}.name`)"
+                                        :type="[activeToolGroup, activeMenuDrawerComponentName].includes(control.action?.target) ? 'primary' : undefined"
+                                        :plain="![activeToolGroup, activeMenuDrawerComponentName].includes(control.action?.target)"
+                                        :circle="!control.expanded"
+                                        :round="control.expanded"
+                                        :class="{
+                                            'og-menu-bar-button--hover-title': !control.expanded,
+                                            'el-button--expanded-group': control.expanded,
+                                            'el-button--expanded-popover': control.showDock
+                                        }"
+                                        :data-group-target="control.action?.target"
+                                        @touchstart="onTouchStartControlButton($event, control)"
+                                        @touchend="onTouchEndControlButton($event, control)"
+                                        @mousedown="onMouseDownControlButton($event, control)"
+                                        @mouseup="onMouseUpControlButton($event, control)"
+                                        @mouseenter="onMouseEnterControlButton($event, control)"
+                                        @mouseleave="onMouseLeaveControlButton($event, control)"
+                                        @keydown="onKeyDownControlButton($event, control)"
+                                    >
+                                        <span class="el-icon" :class="getControlIcon(control)" aria-hidden="true" />
+                                        <span v-if="control.expanded" class="ml-2">{{ $t(`menuBarToolGroup.${control.id}.name`) }}</span>
+                                        <el-tag v-if="control.expanded" type="info" class="ml-2 el-tag--mini">Ctrl + K</el-tag>
+                                    </el-button>
+                                </template>
+                                <template v-if="control.showDock">
+                                    <div v-if="control.displayTitle" class="og-dock-title" v-t="control.displayTitle" />
+                                    <dynamically-loaded-dock
+                                        :name="control.action.target" :key="'dock-' + control.action.target"
+                                        @update:title="control.displayTitle = $event"
+                                        @close="control.popoverVisible = false"
+                                    />
+                                </template>
+                                <template v-else>
+                                    <div class="px-4 py-3 max-w-72 text-left break-normal">
+                                        <strong class="block font-bold mb-1">{{ $t(`menuBarToolGroup.${control.id}.name`) }}</strong>
+                                        <ol v-if="control.controls" class="og-list--unstyled">
+                                            <li
+                                                v-for="subControl of control.controls"
+                                                class="flex my-1"
+                                                :key="subControl.icon"
+                                            >
+                                                <span class="shrink-0 grow-0 w-4 mr-1" :class="subControl.icon" aria-hidden="true" />
+                                                {{ $t(`menuBarToolGroup.${control.id}.tools.${subControl.action.target}`) }}
+                                            </li>
+                                        </ol>
+                                        <ol v-else class="og-list--unstyled">
+                                            <li class="flex">
+                                                <span class="shrink-0 grow-0 w-4 mr-1" :class="control.icon" aria-hidden="true" />
+                                                {{ $t(`menuBarToolGroup.${control.id}.tools.${control.id}`) }}
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </template>
+                            </el-popover>
+                        </div>
                     </template>
                 </component>
             </div>
@@ -128,8 +134,8 @@
             <div v-if="isActiveToolGroupExpanded" class="og-menu-bar__tool-group-expand__controls">
                 <button
                     v-for="control in activeToolGroupControls"
-                    :key="control.label"
-                    :aria-label="$t(control.label)"
+                    :key="control.icon"
+                    :aria-label="$t(`menuBarToolGroup.${activeToolGroup}.tools.${control.action.target}`)"
                     :class="{
                         'og-menu-bar__tool-group-expand__control--active': control.action?.target == activeTool
                     }"
@@ -166,8 +172,8 @@ import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.
 import ElLoading from 'element-plus/lib/components/loading/index';
 import ElPopover from '@/ui/el/el-popover.vue';
 import ElTag from 'element-plus/lib/components/tag/index';
-import { LayoutShortcutGroupDefinition, LayoutShortcutGroupDefinitionControlButton, DndLayoutMenuBar } from '@/types';
-import actionGroupsDefinition from '@/config/layout-shortcut-groups.json';
+import { MenuBarToolGroupButton, DndLayoutMenuBar } from '@/types';
+import toolGroupsDefinition from '@/config/menu-bar-tool-groups.json';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import preferencesStore from '@/store/preferences';
@@ -216,7 +222,7 @@ export default defineComponent({
         const toolGroupExpandOffsetTop = ref<string | undefined>(undefined);
         const toolGroupExpandOffsetLeft = ref<string | undefined>(undefined);
 
-        let activeControlDock: LayoutShortcutGroupDefinitionControlButton | null = null;
+        let activeControlDock: MenuBarToolGroupButton | null = null;
         let pendingActiveControlCall: IArguments | null = null;
         let flexContainer = ref<HTMLDivElement>();
         let displayMode = ref<'all' | 'tools'>('all');
@@ -239,7 +245,7 @@ export default defineComponent({
         const { viewWidth: viewportWidth, viewHeight: viewportHeight } = toRefs(canvasStore.state);
         const { activeToolGroup, activeTool } = toRefs(editorStore.state);
 
-        const actionGroups = ref<{ [key: string]: LayoutShortcutGroupDefinition[] }>(createActionGroups());
+        const actionGroups = ref<{ [key: string]: MenuBarToolGroupButton[] }>(createActionGroups());
 
         const activeMenuDrawerComponentName = computed<string | null>(() => {
             return editorStore.state.activeMenuDrawerComponentName;
@@ -253,7 +259,7 @@ export default defineComponent({
         const activeToolGroupControls = computed(() => {
             const activeActionToolGroupIndex = actionGroups.value.tools.findIndex(tool => tool.id === activeToolGroup.value);
             const activeActionToolGroup = actionGroups.value.tools[activeActionToolGroupIndex];
-            return activeActionToolGroup?.controls[0]?.controls ?? [];
+            return activeActionToolGroup?.controls ?? [];
         });
 
         const activeToolGroupExpandToggleIcon = computed(() => {
@@ -274,7 +280,7 @@ export default defineComponent({
                 const buttonElement = button.ref as unknown as HTMLButtonElement;
                 return buttonElement?.getAttribute('data-group-target') === activeToolGroup.value;
             })?.ref) as never;
-            showToolGroupExpandButton.value = activeToolGroupControls.value.length > 0;
+            showToolGroupExpandButton.value = activeToolGroupControls.value.length > 1;
             toolGroupExpandOffsetTop.value = undefined;
             toolGroupExpandOffsetLeft.value = undefined;
             isActiveToolGroupExpanded.value = false;
@@ -347,19 +353,19 @@ export default defineComponent({
             displayMode.value = viewportWidth.value / (window.devicePixelRatio || 1) > preferencesStore.state.dockHideBreakpoint ? 'tools' : 'all';
         }
 
-        function createActionGroups(forceDisplayMode?: string): { [key: string]: LayoutShortcutGroupDefinition[] } {
+        function createActionGroups(forceDisplayMode?: string): { [key: string]: MenuBarToolGroupButton[] } {
             activeControlDock = null;
             pendingActiveControlCall = null;
             forceDisplayMode = forceDisplayMode || displayMode.value;
-            let actionGroups: { [key: string]: LayoutShortcutGroupDefinition[] } = {};
+            let actionGroups: { [key: string]: MenuBarToolGroupButton[] } = {};
             const sectionNames = ['docks', 'tools'] as ('docks' | 'tools')[];
             for (let section of sectionNames) {
                 if (props.config.layout[section]) {
-                    const sectionActionGroups: LayoutShortcutGroupDefinition[] = [];
+                    const sectionActionGroups: MenuBarToolGroupButton[] = [];
                     for (let tool of props.config.layout[section] || []) {
                         const actionGroup = {
                             id: tool,
-                            ...(actionGroupsDefinition as { [key: string]: LayoutShortcutGroupDefinition })[tool]
+                            ...(toolGroupsDefinition)[tool]
                         }
                         if (actionGroup.controls) {
                             for (let control of actionGroup.controls) {
@@ -376,7 +382,7 @@ export default defineComponent({
             return actionGroups;
         };
 
-        function getControlIcon(control: LayoutShortcutGroupDefinitionControlButton) {
+        function getControlIcon(control: MenuBarToolGroupButton) {
             let icon = control.icon;
             if (control.action?.type === 'toolGroup') {
                 const lastActiveTool = editorStore.state.toolGroupLastActivatedTool[control.action?.target];
@@ -394,16 +400,16 @@ export default defineComponent({
             repositionToolGroupExpand();
         }
 
-        function onKeyDownControlButton(event: KeyboardEvent, control: LayoutShortcutGroupDefinitionControlButton) {
+        function onKeyDownControlButton(event: KeyboardEvent, control: MenuBarToolGroupButton) {
             if (event.key === 'Enter') {
                 onPressControlButton('popover', 0, control);
             }
         }
 
-        function onTouchStartControlButton(event: TouchEvent, control: LayoutShortcutGroupDefinitionControlButton) {
+        function onTouchStartControlButton(event: TouchEvent, control: MenuBarToolGroupButton) {
             onPointerDownControlButton(event, control);
         }
-        function onTouchEndControlButton(event: TouchEvent, control: LayoutShortcutGroupDefinitionControlButton) {
+        function onTouchEndControlButton(event: TouchEvent, control: MenuBarToolGroupButton) {
             onPointerUpControlButton(event, control);
         }
         function onTouchMoveMenuBar(event: TouchEvent) {
@@ -425,13 +431,13 @@ export default defineComponent({
             onPointerUpWindow(event);
         }
 
-        function onMouseDownControlButton(event: MouseEvent, control: LayoutShortcutGroupDefinitionControlButton) {
+        function onMouseDownControlButton(event: MouseEvent, control: MenuBarToolGroupButton) {
             onPointerDownControlButton(event, control);
         }
-        function onMouseUpControlButton(event: MouseEvent, control: LayoutShortcutGroupDefinitionControlButton) {
+        function onMouseUpControlButton(event: MouseEvent, control: MenuBarToolGroupButton) {
             onPointerUpControlButton(event, control);
         }
-        function onMouseEnterControlButton(event: MouseEvent, control: LayoutShortcutGroupDefinitionControlButton) {
+        function onMouseEnterControlButton(event: MouseEvent, control: MenuBarToolGroupButton) {
             if (control.action?.type === 'dock') return;
             if (window.performance.now() - lastPointerTap > 350 && !(control.showDock || control.expanded)) {
                 if (!control.popoverVisible) {
@@ -439,7 +445,7 @@ export default defineComponent({
                 }
             }
         }
-        function onMouseLeaveControlButton(event: MouseEvent, control: LayoutShortcutGroupDefinitionControlButton) {
+        function onMouseLeaveControlButton(event: MouseEvent, control: MenuBarToolGroupButton) {
             if (control.action?.type === 'dock') return;
             if (!(control.showDock || control.expanded)) {
                 if (control.popoverVisible) {
@@ -455,7 +461,7 @@ export default defineComponent({
             onPointerUpWindow(event);
         }
 
-        function onPointerDownControlButton(event: TouchEvent | MouseEvent, control: LayoutShortcutGroupDefinitionControlButton) {
+        function onPointerDownControlButton(event: TouchEvent | MouseEvent, control: MenuBarToolGroupButton) {
             if (control.action?.type !== 'toolGroup') {
                 event.preventDefault();
             }
@@ -479,7 +485,7 @@ export default defineComponent({
                 onPressHoldControlButton(event, control);
             }, preferencesStore.get('pointerPressHoldTimeout'));
         }
-        function onPointerUpControlButton(event: TouchEvent | MouseEvent, control: LayoutShortcutGroupDefinitionControlButton) {
+        function onPointerUpControlButton(event: TouchEvent | MouseEvent, control: MenuBarToolGroupButton) {
             clearTimeout(pointerPressHoldTimeoutHandle);
             const id = pointerDownId;
             const type = event.type === 'mouseup' ? 'mouse' : 'touch';
@@ -539,7 +545,7 @@ export default defineComponent({
                 pointerDownId = -1;
             }
         }
-        async function onPressControlButton(openTarget: 'popover' | 'modal', button: number, control: LayoutShortcutGroupDefinitionControlButton) {
+        async function onPressControlButton(openTarget: 'popover' | 'modal', button: number, control: MenuBarToolGroupButton) {
             if (activeControlDock) {
                 pendingActiveControlCall = arguments;
             } else {
@@ -594,11 +600,11 @@ export default defineComponent({
                 }
             }
         }
-        function onPressHoldControlButton(event: TouchEvent | MouseEvent, control: LayoutShortcutGroupDefinitionControlButton) {
+        function onPressHoldControlButton(event: TouchEvent | MouseEvent, control: MenuBarToolGroupButton) {
             // TODO - drag & drop
         }
 
-        function onAfterLeavePopover(control: LayoutShortcutGroupDefinitionControlButton) {
+        function onAfterLeavePopover(control: MenuBarToolGroupButton) {
             if (control === activeControlDock) {
                 activeControlDock = null;
                 control.showDock = false;

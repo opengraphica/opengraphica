@@ -37,7 +37,7 @@
                 </el-form-item>
             </el-form-item-group>
         </transition>
-        <div class="has-text-right">
+        <div class="text-right">
             <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
             <el-button type="primary" native-type="submit">{{ $t('button.save') }}</el-button>
         </div>

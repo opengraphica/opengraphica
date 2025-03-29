@@ -25,7 +25,8 @@ export interface ActionGroupControlEventHandler {
     arguments?: any[];
 }
 
-export interface LayoutShortcutGroupDefinitionControlButton {
+export interface MenuBarToolGroupButton {
+    id?: string;
     type: 'button';
     icon: string;
     label: string;
@@ -40,16 +41,7 @@ export interface LayoutShortcutGroupDefinitionControlButton {
     };
     onPrimaryClick?: ActionGroupControlEventHandler;
     onSecondaryClick?: ActionGroupControlEventHandler;
-    controls?: LayoutShortcutGroupDefinitionControlButton[];
-}
-
-export type LayoutShortcutGroupDefinitionControl = LayoutShortcutGroupDefinitionControlButton;
-
-export interface LayoutShortcutGroupDefinition {
-    id?: string;
-    name: string;
-    draggable: boolean;
-    controls: LayoutShortcutGroupDefinitionControl[];
+    controls?: MenuBarToolGroupButton[];
 }
 
 export interface ToolDefinition {

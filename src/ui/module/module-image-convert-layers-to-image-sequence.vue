@@ -14,7 +14,7 @@
                 <el-input-number v-model="formData.frameDelay" :min="0.001" suffix-text="ms"></el-input-number>
             </el-form-item>
         </el-form-item-group>
-        <div class="has-text-right">
+        <div class="text-right">
             <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
             <el-button type="primary" native-type="submit">{{ $t('button.convert') }}</el-button>
         </div>

@@ -5,7 +5,7 @@
         v-html="warningParagraph"
         :class="{ 'mt-0': paragraphIndex === 0 }"
     />
-    <div class="has-text-right">
+    <div class="text-right">
         <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
         <el-button type="danger" @click="onDiscard">{{ $t('button.discardChanges') }}</el-button>
     </div>
@@ -38,7 +38,7 @@ export default defineComponent({
         const warningParagraphs = computed(() => {
             return (tm('module.fileOpenConfirm.warning') as string[]).map((message) => {
                 return rt(message, {
-                    insertPhoto: '<strong class="has-text-weight-bold">' + t('moduleGroup.file.modules.insertPhoto.name') + '</strong>',
+                    insertPhoto: '<strong class="font-bold">' + t('moduleGroup.file.modules.insertPhoto.name') + '</strong>',
                 }); 
             });
         });

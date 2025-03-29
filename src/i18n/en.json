@@ -576,139 +576,60 @@
             "name": "Sharpen"
         }
     },
-    "layoutShortcutGroup": {
+    "menuBarToolGroup": {
         "deform": {
             "name": "Deform",
-            "controls": {
-                "default": {
-                    "label": "Deform",
-                    "description": [
-                        "Sharpen or blur the image",
-                        "Bulge, pinch areas of the image",
-                        "Clone areas of the image"
-                    ]
-                }
+            "tools": {
+                "blur": "Blur specific areas of the image"
             }
         },
         "draw": {
             "name": "Draw",
-            "controls": {
-                "default": {
-                    "label": "Draw",
-                    "description": [
-                        "Use art brushes",
-                        "Create shapes or gradients"
-                    ]
-                }
+            "tools": {
+                "brush": "Draw with art brushes",
+                "gradient": "Create gradients of color"
             }
         },
         "effect": {
             "name": "Effect",
-            "controls": {
-                "default": {
-                    "label": "Effect",
-                    "description": [
-                        "Manipulate layer colors",
-                        "Add layer filters, such as blurring effects"
-                    ]
-                }
+            "tools": {
+                "effect": "Manipulate layer colors and add filter effects"
             }
         },
         "erase": {
             "name": "Erase",
-            "controls": {
-                "default": {
-                    "label": "Erase",
-                    "description": [
-                        "Erase the effects of the draw tool"
-                    ]
-                }
-            }
-        },
-        "history": {
-            "name": "History",
-            "controls": {
-                "undo": {
-                    "label": "Undo"
-                },
-                "redo": {
-                    "label": "Redo"
-                }
+            "tools": {
+                "brush": "Erase areas of the image with brush strokes"
             }
         },
         "layers": {
-            "name": "Layers",
-            "controls": {
-                "default": {
-                    "label": "Layers",
-                    "description": []
-                }
-            }
-        },
-        "search": {
-            "name": "Search",
-            "controls": {
-                "default": {
-                    "label": "Search",
-                    "description": []
-                }
-            }
+            "name": "Layers"
         },
         "selection": {
             "name": "Selection",
-            "controls": {
-                "default": {
-                    "label": "Selection",
-                    "description": [
-                        "Restrict the editing area",
-                        "Cut, copy, delete specific areas"
-                    ]
-                }
+            "tools": {
+                "selection": "Select specifc areas of the image to edit, cut, copy, or delete"
             }
         },
         "settings": {
-            "name": "Actions",
-            "controls": {
-                "default": {
-                    "label": "Actions",
-                    "description": []
-                }
-            }
+            "name": "Actions"
         },
         "text": {
             "name": "Text",
-            "controls": {
-                "default": {
-                    "label": "Text",
-                    "description": [
-                        "Insert text layers",
-                        "Edit existing text layers"
-                    ]
-                }
+            "tools": {
+                "text": "Insert and edit text layers"
             }
         },
         "transform": {
             "name": "Move / Transform",
-            "controls": {
-                "default": {
-                    "label": "Move / Transform",
-                    "description": [
-                        "Move, scale, rotate layers",
-                        "Manage layer boundaries"
-                    ]
-                }
+            "tools": {
+                "freeTransform": "Move, scale, rotate layers, and manage layer boundaries"
             }
         },
         "view": {
             "name": "Canvas Viewport",
-            "controls": {
-                "default": {
-                    "label": "Viewport",
-                    "description": [
-                        "Zoom in and out",
-                        "Pan or rotate the view"
-                    ]
-                }
+            "tools": {
+                "zoom": "Zoom in and out, pan, or rotate your view of the image"
             }
         }
     },

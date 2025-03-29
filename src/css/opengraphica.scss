@@ -1,5 +1,7 @@
 @use '../../node_modules/bootstrap-icons/font/bootstrap-icons.css';
 @use './palette.scss';
+
+@use './opengraphica/container.scss';
 @use './opengraphica/popover.scss';
 
 @font-face {
@@ -74,6 +76,7 @@ body.og-full-page {
     @import './opengraphica/animation.scss';
     @import './opengraphica/canvas.scss';
     @import './opengraphica/color-picker.scss';
+    @include container.main;
     @import './opengraphica/dialogs.scss';
     @import './opengraphica/dock.scss';
     @import './opengraphica/dnd-layout.scss';

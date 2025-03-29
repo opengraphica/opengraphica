@@ -3,8 +3,8 @@
         <div class="og-dock-mobile-edge-padding">
             <app-color-picker-gradient :modelValue="workingColor" @input="workingColor = $event" v-model:preload="pickerGradientLoading" />
         </div>
-        <h2 class="px-4.5 my-4 has-text-centered">{{ colorName }}</h2>
-        <div class="px-4.5 my-4 is-flex is-justify-content-center">
+        <h2 class="px-5 my-4 text-center">{{ colorName }}</h2>
+        <div class="px-5 my-4 flex justify-center">
             <div class="og-color-picker-preview">
                 <div class="og-color-picker-preview__color" :style="{ '--preview-color': workingColor.style }" />
                 <el-input
@@ -14,13 +14,13 @@
                     @change="onChangeHexCode"
                 />
             </div>
-            <el-button :title="$t('dock.colorPicker.pickColorFromImage')" class="ml-3" @click="onPickColorFromImage">
+            <el-button :title="$t('dock.colorPicker.pickColorFromImage')" class="!ml-3" @click="onPickColorFromImage">
                 <span class="bi bi-eyedropper" aria-hidden="true" />
             </el-button>
         </div>
         <template v-if="isDialog">
             <el-divider />
-            <div class="px-4.5 mt-4 pb-5 has-text-right">
+            <div class="px-5 mt-4 pb-5 text-right">
                 <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
                 <el-button @click="onConfirmSelection">{{ $t('button.ok') }}</el-button>
             </div>

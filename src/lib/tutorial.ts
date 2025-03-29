@@ -70,7 +70,7 @@ function showNextTutorialNotification() {
                 message = editorStore.get('isTouchUser') ? notification.message.touch : notification.message.mouse;
             }
             const buttonUuid = uuidv4();
-            message += `<div class="is-flex is-justify-content-space-between is-flex-wrap-wrap mt-4">
+            message += `<div class="flex justify-between flex-wrap mt-4">
                 <a id="${buttonUuid + '-disable-tutorial'}" class="el-button el-button is-link px-0" style="--el-button-border-color: transparent; --el-button-hover-border-color: transparent; --el-button-text-color: var(--el-color-primary)">${i18n.global.t('lib.tutorial.notification.dontShowTips')}</a>
                 <a id="${buttonUuid + '-ok'}" class="el-button el-button el-button--primary ml-3">${i18n.global.t('lib.tutorial.notification.gotIt')}</a>
             </div>`;

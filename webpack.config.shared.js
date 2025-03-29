@@ -15,17 +15,14 @@ module.exports = function setupConfig(config) {
             rules: [
                 {
                     test: /\.(vert|frag)$/i,
-                    // include: path.resolve(__dirname, 'src'),
                     type: 'asset/source',
                 },
                 {
                     test: /\.vue$/,
-                    // include: path.resolve(__dirname, 'src'),
                     loader: 'vue-loader'
                 },
                 {
                     test: /\.ts$/,
-                    // include: path.resolve(__dirname, 'src'),
                     loader: 'ts-loader',
                     options: {
                         appendTsSuffixTo: [/\.vue$/],
@@ -42,12 +39,25 @@ module.exports = function setupConfig(config) {
                 },
                 {
                     test: /\.css$/i,
-                    // include: path.resolve(__dirname, 'src'),
-                    loader: 'css-loader'
+                    use: [
+                        'style-loader',
+                        'css-loader',
+                        {
+                            loader: "postcss-loader",
+                            options: {
+                                postcssOptions: {
+                                    plugins: [
+                                        [
+                                            "@tailwindcss/postcss", {},
+                                        ],
+                                    ],
+                                },
+                            },
+                        },
+                    ],
                 },
                 {
                     test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
-                    // include: path.resolve(__dirname, 'src'),
                     use: [
                         {
                             loader: 'file-loader',

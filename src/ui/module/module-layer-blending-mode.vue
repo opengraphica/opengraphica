@@ -11,7 +11,7 @@
             class="mt-3"
             @submit="onConfirm"
         >
-            <div class="is-flex">
+            <div class="flex">
                 <div style="max-height: 35vh">
                     <el-scrollbar>
                         <el-radio-group ref="blendingModeRadioGroup" v-model="formData.blendingMode" class="el-radio-group--vertical pr-3">
@@ -111,27 +111,27 @@
                         </el-radio-group>
                     </el-scrollbar>
                 </div>
-                <div class="is-flex-grow-1 pl-4">
-                    <div class="is-flex is-flex-direction-row is-align-items-center is-justify-content-center">
-                        <div class="is-flex is-flex-shrink-1 is-flex-direction-column is-align-items-center">
+                <div class="grow-1 pl-4">
+                    <div class="flex flex-row items-center justify-center">
+                        <div class="flex shrink-1 flex-col items-center">
                             <img :src="previewImages.top" class="og-module-layer-blending-mode__image-preview" :alt="$t('module.layerBlendingMode.layerTop')" width="256" height="256">
                             <div>
-                                <span class="bi bi-plus is-size-3" />
+                                <span class="bi bi-plus text-3xl" />
                             </div>
                             <img :src="previewImages.bottom" class="og-module-layer-blending-mode__image-preview" :alt="$t('module.layerBlendingMode.layerBottom')" width="256" height="256">
                         </div>
-                        <div class="is-flex-shrink-0 px-2">
-                            <span class="bi bi-arrow-right-short is-size-3" />
+                        <div class="shrink-0 px-2">
+                            <span class="bi bi-arrow-right-short text-3xl" />
                         </div>
-                        <div class="is-flex is-flex-shrink-1 is-flex-direction-column">
+                        <div class="flex shrink-1 flex-col">
                             <img :src="previewImages.result" class="og-module-layer-blending-mode__image-preview" :alt="$t('module.layerBlendingMode.result')" width="256" height="256">
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="has-text-right">
+            <div class="text-right">
                 <el-divider />
-                <div class="has-text-right">
+                <div class="text-right">
                     <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
                     <el-button type="primary" @click="onConfirm">{{ $t('button.apply') }}</el-button>
                 </div>

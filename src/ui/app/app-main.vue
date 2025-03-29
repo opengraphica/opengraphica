@@ -34,6 +34,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, nextTick, ref, provide, onMounted, onUnmounted, watch } from 'vue';
+
 import AppCanvas from '@/ui/app/app-canvas.vue';
 import AppDialogs from '@/ui/app/app-dialogs.vue';
 import AppDndDropOverlay from '@/ui/app/app-dnd-drop-overlay.vue';
@@ -41,14 +42,19 @@ import AppDocks from '@/ui/app/app-docks.vue';
 import AppLayoutDndContainer from '@/ui/app/app-layout-dnd-container.vue';
 import AppMenuDrawers from '@/ui/app/app-menu-drawers.vue';
 import AppWait from '@/ui/app/app-wait.vue';
+
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import preferencesStore from '@/store/preferences';
+
 import ResizeObserver from 'resize-observer-polyfill';
+
 import appEmitter from '@/lib/emitter';
 import { initializeI18n, t, tm, rt } from '@/i18n';
 import { getModuleDefinition, preloadModules } from '@/modules';
 import { useAppPreloadBlocker } from '@/composables/app-preload-blocker';
+
+import '@/css/tailwind.css';
 
 import type { Eruda } from 'eruda';
 
@@ -197,7 +203,7 @@ export default defineComponent({
                 import('@/lib/tutorial').then(({ scheduleTutorialNotification }) => {
                     let message = (tm('tutorialTip.explainCanvasViewportControls.introduction') as string[]).map((message) => {
                         return `<p class="mb-3">${rt(message, {
-                            anyTool: `<strong class="has-text-weight-bold">${t('tutorialTip.explainCanvasViewportControls.anyTool')}</strong>`
+                            anyTool: `<strong class="font-bold">${t('tutorialTip.explainCanvasViewportControls.anyTool')}</strong>`
                         })}</p>`;
                     }).join('');
                     scheduleTutorialNotification({
@@ -206,14 +212,14 @@ export default defineComponent({
                         message: {
                             touch: message + (tm('tutorialTip.explainCanvasViewportControls.body.touch') as string[]).map((message) => {
                                 return `<p class="mb-3">${rt(message, {
-                                    zooming: `<strong class="has-text-weight-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.zooming')}</strong>`,
-                                    panning: `<strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.panning')}</strong>`,
+                                    zooming: `<strong class="font-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.zooming')}</strong>`,
+                                    panning: `<strong class="font-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.panning')}</strong>`,
                                 })}</p>`
                             }).join(''),
                             mouse: message + (tm('tutorialTip.explainCanvasViewportControls.body.mouse') as string[]).map((message) => {
                                 return `<p class="mb-3">${rt(message, {
-                                    zooming: `<strong class="has-text-weight-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.zooming')}</strong>`,
-                                    panning: `<strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.panning')}</strong>`,
+                                    zooming: `<strong class="font-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.zooming')}</strong>`,
+                                    panning: `<strong class="font-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.panning')}</strong>`,
                                     mouseWheel: `<em>${t('tutorialTip.explainCanvasViewportControls.bodyTitle.mouseWheel')}</em>`,
                                     rightMouseButton: `<em>${t('tutorialTip.explainCanvasViewportControls.bodyTitle.rightMouseButton')}</em>`,
                                 })}</p>`

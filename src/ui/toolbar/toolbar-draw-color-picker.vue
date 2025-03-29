@@ -1,12 +1,12 @@
 <template>
-    <div class="is-flex container is-align-items-center is-justify-content-space-between mx-auto">
-        <div class="py-2 pl-el-scrollbar-arrow-size is-text-nowrap is-text-ellipsis">
-            <div class="is-block my-2 is-text-ellipsis">
+    <div class="flex container items-center justify-between mx-auto">
+        <div class="py-2 pl-el-scrollbar-arrow-size text-nowrap text-ellipsis">
+            <div class="block my-2 text-ellipsis">
                 <i class="bi bi-crop" aria-hidden="true" />
                 {{ $t('toolbar.drawColorPicker.title') }}
             </div>
         </div>
-        <div class="py-2 pl-3 pr-el-scrollbar-arrow-size is-text-nowrap">
+        <div class="py-2 pl-3 pr-el-scrollbar-arrow-size text-nowrap">
             <el-button plain link type="primary" class="px-4 mr-2" :aria-label="$t('button.cancel')" @click="onCancel">
                 <template v-if="isMobileView">
                     <i class="bi bi-x"></i>

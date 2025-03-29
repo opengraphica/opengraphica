@@ -1,26 +1,26 @@
 <template>
-    <div class="is-flex is-align-items-center is-justify-content-center" style="height:100%" v-loading="loading">
+    <div class="flex items-center justify-center" style="height:100%" v-loading="loading">
         <div>
             <div class="og-logo">
                 <h1 class="px-6">
                     <img :src="`images/logo-full-${logoThemeColor}.svg`" alt="OpenGraphica">
                 </h1>
             </div>
-            <div class="is-flex is-justify-content-center mt-4">
-                <div class="is-inline-block">
-                    <el-button link type="primary" class="m-0 is-block" @click="onNewImage()">
+            <div class="flex justify-center">
+                <div class="inline-flex flex-col items-start mt-8">
+                    <el-button link type="primary" class="!m-0" @click="onNewImage()">
                         <span class="bi bi-file-earmark-plus mr-2" style="font-size: 1.2rem" aria-hidden="true" />
                         {{ $t('button.createNewImage') }}
                     </el-button>
-                    <el-button link type="primary" class="m-0 is-block" @click="onOpenImage()">
+                    <el-button link type="primary" class="!m-0" @click="onOpenImage()">
                         <span class="bi bi-folder2-open mr-2" style="font-size: 1.2rem" aria-hidden="true" />
                         {{ $t('button.openImage') }}
                     </el-button>
-                    <el-button link type="primary" class="m-0 is-block" @click="onTakePhoto()">
+                    <el-button link type="primary" class="!m-0" @click="onTakePhoto()">
                         <span class="bi bi-camera mr-2" style="font-size: 1.2rem" aria-hidden="true" />
                         {{ $t('button.takePhoto') }}
                     </el-button>
-                    <el-button v-if="showRestoreImage" link type="primary" class="m-0 is-block mt-3" @click="onRestoreImage()">
+                    <el-button v-if="showRestoreImage" link type="primary" class="!mx-0 !mb-0 !mt-3" @click="onRestoreImage()">
                         <span class="bi bi-recycle mr-2" style="font-size: 1.2rem" aria-hidden="true" />
                         {{ $t('button.restoreLastImage') }}
                     </el-button>
@@ -83,7 +83,7 @@ export default defineComponent({
             if (!editorStore.state.tutorialFlags.explainCanvasViewportControls) {
                 let message = (tm('tutorialTip.explainCanvasViewportControls.introduction') as string[]).map((message) => {
                     return `<p class="mb-3">${rt(message, {
-                        anyTool: `<strong class="has-text-weight-bold">${t('tutorialTip.explainCanvasViewportControls.anyTool')}</strong>`
+                        anyTool: `<strong class="font-bold">${t('tutorialTip.explainCanvasViewportControls.anyTool')}</strong>`
                     })}</p>`;
                 }).join('');
                 scheduleTutorialNotification({
@@ -92,14 +92,14 @@ export default defineComponent({
                     message: {
                         touch: message + (tm('tutorialTip.explainCanvasViewportControls.body.touch') as string[]).map((message) => {
                             return `<p class="mb-3">${rt(message, {
-                                zooming: `<strong class="has-text-weight-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.zooming')}</strong>`,
-                                panning: `<strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.panning')}</strong>`,
+                                zooming: `<strong class="font-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.zooming')}</strong>`,
+                                panning: `<strong class="font-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.panning')}</strong>`,
                             })}</p>`
                         }).join(''),
                         mouse: message + (tm('tutorialTip.explainCanvasViewportControls.body.mouse') as string[]).map((message) => {
                             return `<p class="mb-3">${rt(message, {
-                                zooming: `<strong class="has-text-weight-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.zooming')}</strong>`,
-                                panning: `<strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.panning')}</strong>`,
+                                zooming: `<strong class="font-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.zooming')}</strong>`,
+                                panning: `<strong class="font-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.panning')}</strong>`,
                                 mouseWheel: `<em>${t('tutorialTip.explainCanvasViewportControls.bodyTitle.mouseWheel')}</em>`,
                                 rightMouseButton: `<em>${t('tutorialTip.explainCanvasViewportControls.bodyTitle.rightMouseButton')}</em>`,
                             })}</p>`

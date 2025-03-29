@@ -1,5 +1,5 @@
 <template>
-    <div class="is-flex container is-align-items-center is-justify-content-center mx-auto">
+    <div class="flex container items-center justify-center mx-auto">
         <div class="og-toolbar-overlay">
             <div class="og-toolbar-tool-selector">
                 <span class="bi bi-bounding-box my-1" aria-hidden="true"></span>
@@ -50,7 +50,7 @@
                         </el-option>
                     </el-select>
                 </el-input-group>
-                <el-button-group class="is-flex ml-3">
+                <el-button-group class="!flex !ml-3">
                     <el-button size="small" :disabled="!canClearSelection" @click="onClickClear">
                         <span class="bi bi-x-circle-fill mr-2" aria-hidden="true" /> {{ $t('button.clear') }}
                     </el-button>

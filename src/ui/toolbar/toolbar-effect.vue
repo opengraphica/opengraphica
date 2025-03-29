@@ -1,5 +1,5 @@
 <template>
-    <div class="is-flex container is-align-items-center is-justify-content-center mx-auto">
+    <div class="flex container items-center justify-center mx-auto">
         <div class="og-toolbar-overlay">
             <div class="og-toolbar-tool-selector">
                 <span class="bi bi-stars my-1" aria-hidden="true"></span>
@@ -48,17 +48,17 @@
                                     <i class="bi bi-layers mr-1" aria-hidden="true"></i>
                                     <span class="og-toolbar--effect__edit-layer-name" v-t="layer.name" />
                                 </h3>
-                                <el-alert v-if="layer.filters.length == 0" type="warning" class="my-2" show-icon :closable="false">
+                                <el-alert v-if="layer.filters.length == 0" type="warning" class="!my-2" show-icon :closable="false">
                                     {{ $t('toolbar.effect.edit.layerHasNoEffects') }}
                                 </el-alert>
                                 <div
                                     v-for="(filter, filterIndex) of layer.filters"
                                     :key="filterIndex + '_' + filter.name"
-                                    class="is-flex"
+                                    class="flex"
                                 >
                                     <el-button
                                         link
-                                        class="is-flex-grow-1 is-justify-content-flex-start"
+                                        class="grow-1 justify-start"
                                         :type="filter.disabled ? undefined : 'primary'"
                                         @click="onEditLayerFilter(layer, filterIndex)"
                                     >

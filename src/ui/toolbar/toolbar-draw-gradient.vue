@@ -1,5 +1,5 @@
 <template>
-    <div class="is-flex container is-align-items-center is-justify-content-center mx-auto">
+    <div class="flex container items-center justify-center mx-auto">
         <div v-if="editingLayers.length > 0 && !showStopDrawer" class="og-toolbar-edit-confirm">
             {{ $t('toolbar.drawGradient.editingGradient') }}
             <el-button plain size="small" class="ml-3" @click="onDoneEditing()">

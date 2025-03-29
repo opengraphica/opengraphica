@@ -278,7 +278,7 @@
         border-radius: 0 0.875rem 0.875rem 0;
     }
 
-    > .is-flex {
+    > .flex {
         .og-menu-section__title {
             display: flex;
             align-items: center;
@@ -404,10 +404,11 @@
             button {
                 background-color: var(--og-layout-menu-bar-background-color);
                 color: var(--el-text-color-primary);
-                padding: 0.75rem;
+                padding: 0.15rem;
                 border: none;
                 border-radius: 2rem;
                 margin: 0 0 0 0.35rem;
+                width: 2.5rem;
                 height: 2.5rem;
 
                 &.og-menu-bar__tool-group-expand__control--active {
@@ -423,6 +424,9 @@
         }
 
         .og-menu-bar__tool-group-expand__toggle-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background-color: var(--og-layout-menu-bar-background-color);
             color: var(--el-text-color-primary);
             padding: 0.75rem 0.35rem 0.75rem 1.5rem;
@@ -431,6 +435,10 @@
             margin: 0;
             height: 2.5rem;
             width: 2.5rem;
+
+            > .bi {
+                font-size: 0.75rem;
+            }
 
             &:hover {
                 background-color: var(--el-color-primary);
@@ -568,7 +576,7 @@
         height: calc(100% - 1rem);
         width: auto;
 
-        > .is-flex {
+        > .flex {
             flex-direction: column;
             height: calc(100% - 1rem);
 

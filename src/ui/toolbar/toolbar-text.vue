@@ -1,5 +1,5 @@
 <template>
-    <div class="is-flex container is-align-items-center is-justify-content-center mx-auto">
+    <div class="flex container items-center justify-center mx-auto">
         <div class="og-toolbar-overlay">
             <div class="og-toolbar-tool-selector">
                 <span class="bi bi-type my-1" aria-hidden="true"></span>
@@ -9,7 +9,7 @@
                 <!-- Font Family -->
                 <el-input-group>
                     <template #prepend>
-                        <span class="is-size-7" v-t="'toolbar.text.font'" />
+                        <span class="text-xs" v-t="'toolbar.text.font'" />
                     </template>
                     <el-select :aria-label="$t('toolbar.text.font')" v-model="family" size="small" style="width: 6rem">
                         <el-option v-for="family of familyList" :key="family" :label="family" :value="family"></el-option>
@@ -18,7 +18,7 @@
                 <!-- Text Size -->
                 <el-input-group class="ml-3">
                     <template #prepend>
-                        <span class="is-size-7" v-t="'toolbar.text.size'" />
+                        <span class="text-xs" v-t="'toolbar.text.size'" />
                     </template>
                     <el-input-number :aria-label="$t('toolbar.text.size')" v-model="size" :precision="2" :step="0.01" size="small" style="width: 3rem"></el-input-number>
                 </el-input-group>
@@ -47,7 +47,7 @@
                 <!-- Fill Color -->
                 <el-input-group class="ml-3" :prepend-tooltip="$t('toolbar.text.fillTooltip')">
                     <template #prepend>
-                        <span class="is-size-7" v-t="'toolbar.text.fill'">Fill</span>
+                        <span class="text-xs" v-t="'toolbar.text.fill'">Fill</span>
                     </template>
                     <el-input-color v-model="fillColor" :aria-label="$t('toolbar.text.fill')"></el-input-color>
                 </el-input-group>
@@ -69,7 +69,7 @@
                         ]
                     }">
                     <template #reference>
-                        <el-button size="small" class="ml-3">
+                        <el-button size="small" class="!ml-3">
                             <span class="bi bi-aspect-ratio mr-2" aria-hidden="true" /> {{ $t('toolbar.text.alignment.title') }}
                         </el-button>
                     </template>
@@ -89,15 +89,15 @@
                                 size="small">
                                 <el-radio-button label="ltr">
                                     <i class="bi bi-arrow-right" aria-hidden="true" />
-                                    <span class="is-sr-only">{{ $t('toolbar.text.alignment.lineDirectionOption.ltr') }}</span>
+                                    <span class="sr-only">{{ $t('toolbar.text.alignment.lineDirectionOption.ltr') }}</span>
                                 </el-radio-button>
                                 <el-radio-button label="rtl">
                                     <i class="bi bi-arrow-left" aria-hidden="true" />
-                                    <span class="is-sr-only">{{ $t('toolbar.text.alignment.lineDirectionOption.rtl') }}</span>
+                                    <span class="sr-only">{{ $t('toolbar.text.alignment.lineDirectionOption.rtl') }}</span>
                                 </el-radio-button>
                                 <el-radio-button label="ttb">
                                     <i class="bi bi-arrow-down" aria-hidden="true" />
-                                    <span class="is-sr-only">{{ $t('toolbar.text.alignment.lineDirectionOption.ttb') }}</span>
+                                    <span class="sr-only">{{ $t('toolbar.text.alignment.lineDirectionOption.ttb') }}</span>
                                 </el-radio-button>
                             </el-radio-group>
                         </el-form-item>
@@ -109,21 +109,21 @@
                                 <template v-if="lineDirection === 'ttb' || lineDirection === 'btt'">
                                     <el-radio-button label="ltr">
                                         <i class="bi bi-arrow-right" aria-hidden="true" />
-                                        <span class="is-sr-only">{{ $t('toolbar.text.alignment.wrapDirectionOption.ltr') }}</span>
+                                        <span class="sr-only">{{ $t('toolbar.text.alignment.wrapDirectionOption.ltr') }}</span>
                                     </el-radio-button>
                                     <el-radio-button label="rtl">
                                         <i class="bi bi-arrow-left" aria-hidden="true" />
-                                        <span class="is-sr-only">{{ $t('toolbar.text.alignment.wrapDirectionOption.rtl') }}</span>
+                                        <span class="sr-only">{{ $t('toolbar.text.alignment.wrapDirectionOption.rtl') }}</span>
                                     </el-radio-button>
                                 </template>
                                 <template v-else>
                                     <el-radio-button label="ttb">
                                         <i class="bi bi-arrow-down" aria-hidden="true" />
-                                        <span class="is-sr-only">{{ $t('toolbar.text.alignment.wrapDirectionOption.ttb') }}</span>
+                                        <span class="sr-only">{{ $t('toolbar.text.alignment.wrapDirectionOption.ttb') }}</span>
                                     </el-radio-button>
                                     <el-radio-button label="btt">
                                         <i class="bi bi-arrow-up" aria-hidden="true" />
-                                        <span class="is-sr-only">{{ $t('toolbar.text.alignment.wrapDirectionOption.btt') }}</span>
+                                        <span class="sr-only">{{ $t('toolbar.text.alignment.wrapDirectionOption.btt') }}</span>
                                     </el-radio-button>
                                 </template>
                             </el-radio-group>

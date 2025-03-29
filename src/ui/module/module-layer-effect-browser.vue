@@ -21,7 +21,7 @@
                                 }"
                             />
                         </div>
-                        <div class="p-2 has-text-centered">{{ t(filter.name) }}</div>
+                        <div class="p-2 text-center">{{ t(filter.name) }}</div>
                     </el-card>
                 </template>
             </template>

@@ -22,9 +22,9 @@
                     </el-form-item>
                 </el-form-item-group>
             </el-form-item-aligned-groups>
-            <div class="has-text-right">
+            <div class="text-right">
                 <el-divider />
-                <div class="has-text-right">
+                <div class="text-right">
                     <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
                     <el-button type="primary" @click="onConfirm">{{ $t('button.apply') }}</el-button>
                 </div>

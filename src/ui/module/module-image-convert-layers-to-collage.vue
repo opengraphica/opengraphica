@@ -55,7 +55,7 @@
                 </el-form-item>
             </el-form-item-group>
         </template>
-        <div class="has-text-right mt-4">
+        <div class="text-right mt-4">
             <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
             <el-button v-if="step === 'editParams'" type="primary" native-type="submit">{{ $t('button.apply') }}</el-button>
         </div>

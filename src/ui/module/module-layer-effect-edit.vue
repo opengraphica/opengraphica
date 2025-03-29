@@ -2,12 +2,12 @@
     <el-alert v-if="hasError" type="error" show-icon :closable="false" :title="t('module.layerEffectEdit.generalError')" />
     <div v-else-if="isDeleting" v-loading="true" :element-loading-text="t('module.layerEffectEdit.deleting')" style="height: 15rem" />
     <div v-else v-loading="loading" :element-loading-text="t('module.layerEffectEdit.loading')">
-        <div class="is-flex is-flex-row is-align-items-center">
+        <div class="flex flex-row items-center">
             <canvas ref="beforeEffectCanvas" style="width: 100%; min-width: 0; height: auto; max-height: 40vh; background-image: url('../images/transparency-bg.png')" />
-            <span class="bi bi-arrow-right-short is-flex-shrink-1 is-size-1 has-text-color-fill-darker" :style="{ visibility: currentFilterEnabled ? undefined : 'hidden' }" aria-hidden="true" />
+            <span class="bi bi-arrow-right-short shrink-1 text-5xl has-text-color-fill-darker" :style="{ visibility: currentFilterEnabled ? undefined : 'hidden' }" aria-hidden="true" />
             <canvas ref="afterEffectCanvas" style="width: 100%; min-width: 0; height: auto; max-height: 40vh; background-image: url('../images/transparency-bg.png')" :style="{ visibility: currentFilterEnabled ? undefined : 'hidden' }" />
         </div>
-        <div class="is-flex is-flex-row is-align-items-center is-justify-content-center my-3">
+        <div class="flex flex-row items-center justify-center my-3">
             <el-button v-if="isSelectionMaskAvailable" @click="onCreateSelectionMask">
                 <span class="bi bi-mask mr-1" aria-hidden="true" />
                 {{ t('module.layerEffectEdit.useActiveSelectionMask') }}
@@ -18,9 +18,9 @@
             </el-button>
         </div>
         <el-divider />
-        <div class="is-flex is-flex-row is-align-items-center is-justify-content-space-between">
+        <div class="flex flex-row items-center justify-between">
             <h2 v-t="currentFilterTitle" class="m-0" />
-            <div class="is-flex is-flex-row is-align-items-center is-flex-shrink-1">
+            <div class="flex flex-row items-center shrink-1">
                 <el-switch
                     v-model="currentFilterEnabled"
                     :active-text="t('module.layerEffectEdit.enableToggle')"
@@ -155,9 +155,9 @@
                 </template>
             </el-form-item-group>
         </el-form>
-        <div class="has-text-right">
+        <div class="text-right">
             <el-divider />
-            <div class="has-text-right">
+            <div class="text-right">
                 <el-button @click="onCancel">{{ t('button.cancel') }}</el-button>
                 <el-button type="primary" @click="onConfirm">{{ t('button.apply') }}</el-button>
             </div>

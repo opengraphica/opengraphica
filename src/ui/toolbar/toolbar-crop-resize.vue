@@ -1,13 +1,13 @@
 <template>
-    <div class="is-flex container is-align-items-center is-justify-content-space-between mx-auto">
-        <div class="py-2 pl-el-scrollbar-arrow-size is-text-nowrap is-text-ellipsis">
-            <div class="is-block my-2 is-text-ellipsis">
+    <div class="flex container items-center justify-between mx-auto">
+        <div class="py-2 pl-el-scrollbar-arrow-size text-nowrap text-ellipsis">
+            <div class="block my-2 text-ellipsis">
                 <i class="bi bi-crop" aria-hidden="true" />
                 {{ $t('toolbar.cropResize.title') }}
             </div>
         </div>
-        <div class="py-2 pl-3 pr-el-scrollbar-arrow-size is-text-nowrap">
-            <el-button plain link type="primary" class="px-4 mr-2" :aria-label="$t('button.cancel')" @click="onCancel">
+        <div class="py-2 pl-3 pr-el-scrollbar-arrow-size text-nowrap">
+            <el-button plain link type="primary" class="!px-4 !mr-2" :aria-label="$t('button.cancel')" @click="onCancel">
                 <template v-if="isMobileView">
                     <i class="bi bi-x"></i>
                 </template>
@@ -15,7 +15,7 @@
                     {{ $t('button.cancel') }}
                 </template>
             </el-button>
-            <el-button :aria-label="$t('button.done')" plain type="primary" class="ml-0" @click="onDone">
+            <el-button :aria-label="$t('button.done')" plain type="primary" class="!ml-0" @click="onDone">
                 <template v-if="isMobileView">
                     <i class="bi bi-check"></i>
                 </template>
@@ -36,13 +36,13 @@
                         <el-radio-button label="resample">Resample</el-radio-button>
                     </el-radio-group>
                 </el-form-item>
-                <el-form-item :label="$t('toolbar.cropResize.size')" class="ml-5 el-form-item--small-label">
+                <el-form-item :label="$t('toolbar.cropResize.size')" class="ml-6 el-form-item--small-label">
                     <el-button-group class="el-button-group--flex">
-                        <el-input-number v-model="resizeInputWidth" :aria-label="$t('toolbar.cropResize.width')" size="small" class="is-flex-grow-1" style="width: 5rem" @input="onInputResizeWidth" />
+                        <el-input-number v-model="resizeInputWidth" :aria-label="$t('toolbar.cropResize.width')" size="small" class="grow-1" style="width: 5rem" @input="onInputResizeWidth" />
                         <el-button size="small" :aria-label="$t('toolbar.cropResize.linkWidthHeight')" class="px-3" :disabled="mode === 'resample'" @click="isDimensionRatioLock = !isDimensionRatioLock">
                             <i :class="['bi', isDimensionRatioLock ? 'bi-lock-fill' : 'bi-unlock-fill']" aria-hidden="true" />
                         </el-button>
-                        <el-input-number v-model="resizeInputHeight" :aria-label="$t('toolbar.cropResize.height')" size="small" class="is-flex-grow-1" style="width: 5rem" @input="onInputResizeHeight" />
+                        <el-input-number v-model="resizeInputHeight" :aria-label="$t('toolbar.cropResize.height')" size="small" class="grow-1" style="width: 5rem" @input="onInputResizeHeight" />
                         <el-select v-model="measuringUnits" :aria-label="$t('toolbar.cropResize.dimensionUnits')" size="small" style="width: 3.75rem">
                             <el-option
                                 v-for="option in dimensionUnitOptions"
@@ -54,7 +54,7 @@
                         </el-select>
                     </el-button-group>
                 </el-form-item>
-                <el-form-item :label="$t('toolbar.cropResize.resolution')" class="ml-5 el-form-item--small-label">
+                <el-form-item :label="$t('toolbar.cropResize.resolution')" class="ml-6 el-form-item--small-label">
                     <el-button-group class="el-button-group--flex">
                         <el-input-number v-model="resolution" :aria-label="$t('toolbar.cropResize.resolution')" style="width: 4rem" size="small" @change="onChangeResolution()" />
                         <el-select v-model="resolutionUnits" :aria-label="$t('toolbar.cropResize.resolutionUnits')" style="width: 5rem" size="small" @change="onChangeResolutionUnits()">
@@ -85,7 +85,7 @@
                         ]
                     }">
                     <template #reference>
-                        <el-button size="small" class="ml-5">
+                        <el-button size="small" class="!ml-6">
                             <span class="bi bi-magnet-fill mr-2" aria-hidden="true" /> {{ $t('toolbar.freeTransform.snapping.title') }}
                         </el-button>
                     </template>

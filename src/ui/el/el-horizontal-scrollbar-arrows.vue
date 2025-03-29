@@ -1,18 +1,18 @@
 <template>
     <div ref="rootEl" class="el-horizontal-scrollbar-arrows">
         <el-button
-            link type="primary" class="is-flex-grow-0 is-border-radius-0 px-2 py-0"
+            link type="primary" class="grow-0 !rounded-none !px-2 !py-0"
             :aria-label="$t('el.horizontalScrollbarArrows.scrollLeft')" :style="{ visibility: canScrollLeft ? '' : 'hidden' }"
             @click="onClickScrollLeft()">
             <span class="bi bi-chevron-left" aria-hidden="true" />
         </el-button>
         <el-scrollbar ref="scrollbar" @scroll="onScroll">
-            <div ref="scrollContentEl" class="is-flex is-align-items-center">
+            <div ref="scrollContentEl" class="flex items-center">
                 <slot />
             </div>
         </el-scrollbar>
         <el-button
-            link type="primary" class="is-flex-grow-0 is-border-radius-0 px-2 py-0"
+            link type="primary" class="grow-0 !rounded-none !px-2 !py-0"
             :aria-label="$t('el.horizontalScrollbarArrows.scrollRight')" :style="{ visibility: canScrollRight ? '' : 'hidden' }"
             @click="onClickScrollRight()">
             <span class="bi bi-chevron-right" aria-hidden="true" />

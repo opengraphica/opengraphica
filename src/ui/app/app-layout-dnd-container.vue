@@ -8,7 +8,7 @@
         }"
     >
         <header ref="header" :aria-busy="isShowHistoryNotification && !isHistoryNotificationCompleted">
-            <h1 class="is-sr-only">OpenGraphica</h1>
+            <h1 class="sr-only">OpenGraphica</h1>
             <template v-if="!isActiveToolbarExclusive && config.menuBar && menuBarPosition === 'top'">
                 <app-layout-menu-bar :config="config.menuBar" layout-placement="top" @resize="onResizeLayout" />
             </template>

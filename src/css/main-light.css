@@ -8673,6 +8673,43 @@ body.og-full-page .opengraphica {
 .opengraphica .og-color-picker-gradient .og-color-picker-gradient__saturation-value-handle.is-grabbing {
   cursor: grabbing;
 }
+.opengraphica .container {
+  flex-grow: 1;
+  margin: 0 auto;
+  position: relative;
+  width: auto;
+}
+.opengraphica .container.w-full {
+  max-width: none !important;
+  padding-left: 32px;
+  padding-right: 32px;
+  width: 100%;
+}
+@media screen and (min-width: 1024px) {
+  .opengraphica .container {
+    max-width: 960px;
+  }
+}
+@media screen and (max-width: 1215px) {
+  .opengraphica .container.is-widescreen:not(.is-max-desktop) {
+    max-width: 1152px;
+  }
+}
+@media screen and (max-width: 1407px) {
+  .opengraphica .container.is-fullhd:not(.is-max-desktop):not(.is-max-widescreen) {
+    max-width: 1344px;
+  }
+}
+@media screen and (min-width: 1216px) {
+  .opengraphica .container:not(.is-max-desktop) {
+    max-width: 1152px;
+  }
+}
+@media screen and (min-width: 1408px) {
+  .opengraphica .container:not(.is-max-desktop):not(.is-max-widescreen) {
+    max-width: 1344px;
+  }
+}
 .opengraphica .og-dialogs .el-dialog.el-dialog--medium {
   width: 25rem !important;
   max-width: 90%;
@@ -9013,7 +9050,7 @@ body.og-full-page .opengraphica {
 .opengraphica .og-layout-menu-bar.is-positioned-right.is-menu-drawer-open {
   border-radius: 0 0.875rem 0.875rem 0;
 }
-.opengraphica .og-layout-menu-bar > .is-flex .og-menu-section__title {
+.opengraphica .og-layout-menu-bar > .flex .og-menu-section__title {
   display: flex;
   align-items: center;
   color: var(--el-text-color-regular);
@@ -9022,19 +9059,19 @@ body.og-full-page .opengraphica {
   text-transform: uppercase;
   white-space: pre-wrap;
 }
-.opengraphica .og-layout-menu-bar > .is-flex .og-menu-section__title img {
+.opengraphica .og-layout-menu-bar > .flex .og-menu-section__title img {
   width: 2.4rem;
 }
 @media screen and (max-width: 600px) {
-  .opengraphica .og-layout-menu-bar > .is-flex .og-menu-section__title {
+  .opengraphica .og-layout-menu-bar > .flex .og-menu-section__title {
     display: none !important;
   }
 }
-.opengraphica .og-layout-menu-bar > .is-flex > .og-menu-favorites {
+.opengraphica .og-layout-menu-bar > .flex > .og-menu-favorites {
   flex: 1;
   display: flex;
 }
-.opengraphica .og-layout-menu-bar > .is-flex > .og-menu-docks, .opengraphica .og-layout-menu-bar > .is-flex > .og-menu-end {
+.opengraphica .og-layout-menu-bar > .flex > .og-menu-docks, .opengraphica .og-layout-menu-bar > .flex > .og-menu-end {
   flex: 1;
   display: flex;
   justify-content: flex-start;
@@ -9042,27 +9079,27 @@ body.og-full-page .opengraphica {
   min-width: -webkit-min-content;
   /* Workaround to Chrome bug */
 }
-.opengraphica .og-layout-menu-bar > .is-flex > .og-menu-tools {
+.opengraphica .og-layout-menu-bar > .flex > .og-menu-tools {
   flex-shrink: 1;
   flex-grow: 0;
   display: flex;
   overflow: hidden;
 }
-.opengraphica .og-layout-menu-bar > .is-flex > .og-menu-tools > .el-scrollbar {
+.opengraphica .og-layout-menu-bar > .flex > .og-menu-tools > .el-scrollbar {
   width: 100%;
 }
-.opengraphica .og-layout-menu-bar > .is-flex > .og-menu-tools > .el-scrollbar .el-scrollbar__view {
+.opengraphica .og-layout-menu-bar > .flex > .og-menu-tools > .el-scrollbar .el-scrollbar__view {
   display: flex;
   flex-direction: row;
   align-items: center;
 }
-.opengraphica .og-layout-menu-bar > .is-flex > .og-menu-tools .el-button .el-icon {
+.opengraphica .og-layout-menu-bar > .flex > .og-menu-tools .el-button .el-icon {
   color: var(--el-button-font-color);
 }
-.opengraphica .og-layout-menu-bar > .is-flex > .og-menu-tools .el-button.el-button--primary.is-plain {
+.opengraphica .og-layout-menu-bar > .flex > .og-menu-tools .el-button.el-button--primary.is-plain {
   --el-button-font-color: var(--el-text-color-primary);
 }
-.opengraphica .og-layout-menu-bar > .is-flex > .og-menu-end {
+.opengraphica .og-layout-menu-bar > .flex > .og-menu-end {
   justify-content: flex-end;
 }
 .opengraphica .og-layout-menu-bar .og-menu-section .el-button-group, .opengraphica .og-layout-menu-bar .og-menu-section .og-single-button-group {
@@ -9123,10 +9160,11 @@ body.og-full-page .opengraphica {
 .opengraphica .og-layout-menu-bar .og-menu-bar__tool-group-expand .og-menu-bar__tool-group-expand__controls button {
   background-color: var(--og-layout-menu-bar-background-color);
   color: var(--el-text-color-primary);
-  padding: 0.75rem;
+  padding: 0.15rem;
   border: none;
   border-radius: 2rem;
   margin: 0 0 0 0.35rem;
+  width: 2.5rem;
   height: 2.5rem;
 }
 .opengraphica .og-layout-menu-bar .og-menu-bar__tool-group-expand .og-menu-bar__tool-group-expand__controls button.og-menu-bar__tool-group-expand__control--active {
@@ -9138,6 +9176,9 @@ body.og-full-page .opengraphica {
   cursor: pointer;
 }
 .opengraphica .og-layout-menu-bar .og-menu-bar__tool-group-expand .og-menu-bar__tool-group-expand__toggle-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: var(--og-layout-menu-bar-background-color);
   color: var(--el-text-color-primary);
   padding: 0.75rem 0.35rem 0.75rem 1.5rem;
@@ -9146,6 +9187,9 @@ body.og-full-page .opengraphica {
   margin: 0;
   height: 2.5rem;
   width: 2.5rem;
+}
+.opengraphica .og-layout-menu-bar .og-menu-bar__tool-group-expand .og-menu-bar__tool-group-expand__toggle-button > .bi {
+  font-size: 0.75rem;
 }
 .opengraphica .og-layout-menu-bar .og-menu-bar__tool-group-expand .og-menu-bar__tool-group-expand__toggle-button:hover {
   background-color: var(--el-color-primary);
@@ -9259,51 +9303,51 @@ body.og-full-page .opengraphica {
   height: calc(100% - 1rem);
   width: auto;
 }
-.opengraphica .og-layout-menu-bar.is-vertical > .is-flex {
+.opengraphica .og-layout-menu-bar.is-vertical > .flex {
   flex-direction: column;
   height: calc(100% - 1rem);
 }
-.opengraphica .og-layout-menu-bar.is-vertical > .is-flex > .og-menu-docks {
+.opengraphica .og-layout-menu-bar.is-vertical > .flex > .og-menu-docks {
   justify-content: flex-start;
 }
-.opengraphica .og-layout-menu-bar.is-vertical > .is-flex > .og-menu-end {
+.opengraphica .og-layout-menu-bar.is-vertical > .flex > .og-menu-end {
   justify-content: flex-end;
 }
-.opengraphica .og-layout-menu-bar.is-vertical > .is-flex > .og-menu-tools > .el-scrollbar {
+.opengraphica .og-layout-menu-bar.is-vertical > .flex > .og-menu-tools > .el-scrollbar {
   width: 100%;
 }
-.opengraphica .og-layout-menu-bar.is-vertical > .is-flex > .og-menu-tools > .el-scrollbar .el-scrollbar__view {
+.opengraphica .og-layout-menu-bar.is-vertical > .flex > .og-menu-tools > .el-scrollbar .el-scrollbar__view {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-.opengraphica .og-layout-menu-bar.is-vertical > .is-flex > .og-menu-docks, .opengraphica .og-layout-menu-bar.is-vertical > .is-flex > .og-menu-tools, .opengraphica .og-layout-menu-bar.is-vertical > .is-flex > .og-menu-end {
+.opengraphica .og-layout-menu-bar.is-vertical > .flex > .og-menu-docks, .opengraphica .og-layout-menu-bar.is-vertical > .flex > .og-menu-tools, .opengraphica .og-layout-menu-bar.is-vertical > .flex > .og-menu-end {
   align-items: center;
   flex-direction: column;
 }
-.opengraphica .og-layout-menu-bar.is-vertical > .is-flex .og-menu-section .og-menu-section__title {
+.opengraphica .og-layout-menu-bar.is-vertical > .flex .og-menu-section .og-menu-section__title {
   color: var(--el-text-color-regular);
   font-size: 0.675rem;
   margin: 0.75rem 0;
   text-transform: uppercase;
 }
-.opengraphica .og-layout-menu-bar.is-vertical > .is-flex .og-menu-section .og-menu-section__title img {
+.opengraphica .og-layout-menu-bar.is-vertical > .flex .og-menu-section .og-menu-section__title img {
   width: 2.4rem;
 }
 @media screen and (max-height: 600px) {
-  .opengraphica .og-layout-menu-bar.is-vertical > .is-flex .og-menu-section .og-menu-section__title {
+  .opengraphica .og-layout-menu-bar.is-vertical > .flex .og-menu-section .og-menu-section__title {
     display: none !important;
   }
 }
-.opengraphica .og-layout-menu-bar.is-vertical > .is-flex .og-menu-section .el-button-group, .opengraphica .og-layout-menu-bar.is-vertical > .is-flex .og-menu-section .og-single-button-group {
+.opengraphica .og-layout-menu-bar.is-vertical > .flex .og-menu-section .el-button-group, .opengraphica .og-layout-menu-bar.is-vertical > .flex .og-menu-section .og-single-button-group {
   margin: 0.375rem 0 0 0;
   height: max-content;
 }
-.opengraphica .og-layout-menu-bar.is-vertical > .is-flex .og-menu-section .el-button-group .el-button, .opengraphica .og-layout-menu-bar.is-vertical > .is-flex .og-menu-section .og-single-button-group .el-button {
+.opengraphica .og-layout-menu-bar.is-vertical > .flex .og-menu-section .el-button-group .el-button, .opengraphica .og-layout-menu-bar.is-vertical > .flex .og-menu-section .og-single-button-group .el-button {
   height: 2.5rem;
   width: auto;
 }
-.opengraphica .og-layout-menu-bar.is-vertical > .is-flex .og-menu-section .el-button-group:last-child, .opengraphica .og-layout-menu-bar.is-vertical > .is-flex .og-menu-section .og-single-button-group:last-child {
+.opengraphica .og-layout-menu-bar.is-vertical > .flex .og-menu-section .el-button-group:last-child, .opengraphica .og-layout-menu-bar.is-vertical > .flex .og-menu-section .og-single-button-group:last-child {
   margin-bottom: 0.375rem;
 }
 .opengraphica .og-gradient-input {
@@ -10856,11 +10900,11 @@ body.og-full-page .opengraphica {
 .opengraphica .og-toolbar-draw-gradient-stop-drawer__editor-stop-form .el-horizontal-scrollbar-arrows .el-scrollbar {
   flex-grow: 1;
 }
-.opengraphica .og-toolbar-draw-gradient-stop-drawer__editor-stop-form .el-horizontal-scrollbar-arrows .el-scrollbar .el-scrollbar__view > .is-flex {
+.opengraphica .og-toolbar-draw-gradient-stop-drawer__editor-stop-form .el-horizontal-scrollbar-arrows .el-scrollbar .el-scrollbar__view > .flex {
   margin: 0 auto;
   justify-content: center;
 }
-.opengraphica .og-toolbar-draw-gradient-stop-drawer__editor-stop-form .el-horizontal-scrollbar-arrows .el-scrollbar .el-scrollbar__view > .is-flex .el-input-group {
+.opengraphica .og-toolbar-draw-gradient-stop-drawer__editor-stop-form .el-horizontal-scrollbar-arrows .el-scrollbar .el-scrollbar__view > .flex .el-input-group {
   width: auto;
 }
 .opengraphica .og-toolbar-draw-gradient-stop-drawer__presets {
@@ -10884,6 +10928,15 @@ body.og-full-page .opengraphica {
 }
 .opengraphica .el-dialog .og-dock > .og-toolbar-draw-gradient-stop-drawer.og-dock-content .og-toolbar-draw-gradient-stop-drawer__presets {
   min-height: 13rem;
+}
+.opengraphica .og-list--unstyled {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+.opengraphica .og-list--unstyled > li {
+  margin: 0;
+  padding: 0;
 }
 .opengraphica .og-list--dashed {
   margin: 0;
@@ -27500,1368 +27553,6 @@ body.og-full-page .opengraphica {
 .opengraphica {
   --el-transition-duration-fast: 0.1s;
   --el-switch-button-size: 1rem;
-}
-.opengraphica .container {
-  flex-grow: 1;
-  margin: 0 auto;
-  position: relative;
-  width: auto;
-}
-.opengraphica .container.is-fluid {
-  max-width: none !important;
-  padding-left: 32px;
-  padding-right: 32px;
-  width: 100%;
-}
-@media screen and (min-width: 1024px) {
-  .opengraphica .container {
-    max-width: 960px;
-  }
-}
-@media screen and (max-width: 1215px) {
-  .opengraphica .container.is-widescreen:not(.is-max-desktop) {
-    max-width: 1152px;
-  }
-}
-@media screen and (max-width: 1407px) {
-  .opengraphica .container.is-fullhd:not(.is-max-desktop):not(.is-max-widescreen) {
-    max-width: 1344px;
-  }
-}
-@media screen and (min-width: 1216px) {
-  .opengraphica .container:not(.is-max-desktop) {
-    max-width: 1152px;
-  }
-}
-@media screen and (min-width: 1408px) {
-  .opengraphica .container:not(.is-max-desktop):not(.is-max-widescreen) {
-    max-width: 1344px;
-  }
-}
-.opengraphica .is-flex-direction-row {
-  flex-direction: row !important;
-}
-.opengraphica .is-flex-direction-row-reverse {
-  flex-direction: row-reverse !important;
-}
-.opengraphica .is-flex-direction-column {
-  flex-direction: column !important;
-}
-.opengraphica .is-flex-direction-column-reverse {
-  flex-direction: column-reverse !important;
-}
-.opengraphica .is-flex-wrap-nowrap {
-  flex-wrap: nowrap !important;
-}
-.opengraphica .is-flex-wrap-wrap {
-  flex-wrap: wrap !important;
-}
-.opengraphica .is-flex-wrap-wrap-reverse {
-  flex-wrap: wrap-reverse !important;
-}
-.opengraphica .is-justify-content-flex-start {
-  justify-content: flex-start !important;
-}
-.opengraphica .is-justify-content-flex-end {
-  justify-content: flex-end !important;
-}
-.opengraphica .is-justify-content-center {
-  justify-content: center !important;
-}
-.opengraphica .is-justify-content-space-between {
-  justify-content: space-between !important;
-}
-.opengraphica .is-justify-content-space-around {
-  justify-content: space-around !important;
-}
-.opengraphica .is-justify-content-space-evenly {
-  justify-content: space-evenly !important;
-}
-.opengraphica .is-justify-content-start {
-  justify-content: start !important;
-}
-.opengraphica .is-justify-content-end {
-  justify-content: end !important;
-}
-.opengraphica .is-justify-content-left {
-  justify-content: left !important;
-}
-.opengraphica .is-justify-content-right {
-  justify-content: right !important;
-}
-.opengraphica .is-align-content-flex-start {
-  align-content: flex-start !important;
-}
-.opengraphica .is-align-content-flex-end {
-  align-content: flex-end !important;
-}
-.opengraphica .is-align-content-center {
-  align-content: center !important;
-}
-.opengraphica .is-align-content-space-between {
-  align-content: space-between !important;
-}
-.opengraphica .is-align-content-space-around {
-  align-content: space-around !important;
-}
-.opengraphica .is-align-content-space-evenly {
-  align-content: space-evenly !important;
-}
-.opengraphica .is-align-content-stretch {
-  align-content: stretch !important;
-}
-.opengraphica .is-align-content-start {
-  align-content: start !important;
-}
-.opengraphica .is-align-content-end {
-  align-content: end !important;
-}
-.opengraphica .is-align-content-baseline {
-  align-content: baseline !important;
-}
-.opengraphica .is-align-items-stretch {
-  align-items: stretch !important;
-}
-.opengraphica .is-align-items-flex-start {
-  align-items: flex-start !important;
-}
-.opengraphica .is-align-items-flex-end {
-  align-items: flex-end !important;
-}
-.opengraphica .is-align-items-center {
-  align-items: center !important;
-}
-.opengraphica .is-align-items-baseline {
-  align-items: baseline !important;
-}
-.opengraphica .is-align-items-start {
-  align-items: start !important;
-}
-.opengraphica .is-align-items-end {
-  align-items: end !important;
-}
-.opengraphica .is-align-items-self-start {
-  align-items: self-start !important;
-}
-.opengraphica .is-align-items-self-end {
-  align-items: self-end !important;
-}
-.opengraphica .is-align-self-auto {
-  align-self: auto !important;
-}
-.opengraphica .is-align-self-flex-start {
-  align-self: flex-start !important;
-}
-.opengraphica .is-align-self-flex-end {
-  align-self: flex-end !important;
-}
-.opengraphica .is-align-self-center {
-  align-self: center !important;
-}
-.opengraphica .is-align-self-baseline {
-  align-self: baseline !important;
-}
-.opengraphica .is-align-self-stretch {
-  align-self: stretch !important;
-}
-.opengraphica .is-flex-grow-0 {
-  flex-grow: 0 !important;
-}
-.opengraphica .is-flex-grow-1 {
-  flex-grow: 1 !important;
-}
-.opengraphica .is-flex-grow-2 {
-  flex-grow: 2 !important;
-}
-.opengraphica .is-flex-grow-3 {
-  flex-grow: 3 !important;
-}
-.opengraphica .is-flex-grow-4 {
-  flex-grow: 4 !important;
-}
-.opengraphica .is-flex-grow-5 {
-  flex-grow: 5 !important;
-}
-.opengraphica .is-flex-shrink-0 {
-  flex-shrink: 0 !important;
-}
-.opengraphica .is-flex-shrink-1 {
-  flex-shrink: 1 !important;
-}
-.opengraphica .is-flex-shrink-2 {
-  flex-shrink: 2 !important;
-}
-.opengraphica .is-flex-shrink-3 {
-  flex-shrink: 3 !important;
-}
-.opengraphica .is-flex-shrink-4 {
-  flex-shrink: 4 !important;
-}
-.opengraphica .is-flex-shrink-5 {
-  flex-shrink: 5 !important;
-}
-.opengraphica .is-marginless {
-  margin: 0 !important;
-}
-.opengraphica .is-paddingless {
-  padding: 0 !important;
-}
-.opengraphica .m-0 {
-  margin: 0 !important;
-}
-.opengraphica .mt-0 {
-  margin-top: 0 !important;
-}
-.opengraphica .mr-0 {
-  margin-right: 0 !important;
-}
-.opengraphica .mb-0 {
-  margin-bottom: 0 !important;
-}
-.opengraphica .ml-0 {
-  margin-left: 0 !important;
-}
-.opengraphica .mx-0 {
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-}
-.opengraphica .my-0 {
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-}
-.opengraphica .m-1 {
-  margin: 0.25rem !important;
-}
-.opengraphica .mt-1 {
-  margin-top: 0.25rem !important;
-}
-.opengraphica .mr-1 {
-  margin-right: 0.25rem !important;
-}
-.opengraphica .mb-1 {
-  margin-bottom: 0.25rem !important;
-}
-.opengraphica .ml-1 {
-  margin-left: 0.25rem !important;
-}
-.opengraphica .mx-1 {
-  margin-left: 0.25rem !important;
-  margin-right: 0.25rem !important;
-}
-.opengraphica .my-1 {
-  margin-top: 0.25rem !important;
-  margin-bottom: 0.25rem !important;
-}
-.opengraphica .m-2 {
-  margin: 0.5rem !important;
-}
-.opengraphica .mt-2 {
-  margin-top: 0.5rem !important;
-}
-.opengraphica .mr-2 {
-  margin-right: 0.5rem !important;
-}
-.opengraphica .mb-2 {
-  margin-bottom: 0.5rem !important;
-}
-.opengraphica .ml-2 {
-  margin-left: 0.5rem !important;
-}
-.opengraphica .mx-2 {
-  margin-left: 0.5rem !important;
-  margin-right: 0.5rem !important;
-}
-.opengraphica .my-2 {
-  margin-top: 0.5rem !important;
-  margin-bottom: 0.5rem !important;
-}
-.opengraphica .m-3 {
-  margin: 0.75rem !important;
-}
-.opengraphica .mt-3 {
-  margin-top: 0.75rem !important;
-}
-.opengraphica .mr-3 {
-  margin-right: 0.75rem !important;
-}
-.opengraphica .mb-3 {
-  margin-bottom: 0.75rem !important;
-}
-.opengraphica .ml-3 {
-  margin-left: 0.75rem !important;
-}
-.opengraphica .mx-3 {
-  margin-left: 0.75rem !important;
-  margin-right: 0.75rem !important;
-}
-.opengraphica .my-3 {
-  margin-top: 0.75rem !important;
-  margin-bottom: 0.75rem !important;
-}
-.opengraphica .m-4 {
-  margin: 1rem !important;
-}
-.opengraphica .mt-4 {
-  margin-top: 1rem !important;
-}
-.opengraphica .mr-4 {
-  margin-right: 1rem !important;
-}
-.opengraphica .mb-4 {
-  margin-bottom: 1rem !important;
-}
-.opengraphica .ml-4 {
-  margin-left: 1rem !important;
-}
-.opengraphica .mx-4 {
-  margin-left: 1rem !important;
-  margin-right: 1rem !important;
-}
-.opengraphica .my-4 {
-  margin-top: 1rem !important;
-  margin-bottom: 1rem !important;
-}
-.opengraphica .m-5 {
-  margin: 1.5rem !important;
-}
-.opengraphica .mt-5 {
-  margin-top: 1.5rem !important;
-}
-.opengraphica .mr-5 {
-  margin-right: 1.5rem !important;
-}
-.opengraphica .mb-5 {
-  margin-bottom: 1.5rem !important;
-}
-.opengraphica .ml-5 {
-  margin-left: 1.5rem !important;
-}
-.opengraphica .mx-5 {
-  margin-left: 1.5rem !important;
-  margin-right: 1.5rem !important;
-}
-.opengraphica .my-5 {
-  margin-top: 1.5rem !important;
-  margin-bottom: 1.5rem !important;
-}
-.opengraphica .m-6 {
-  margin: 3rem !important;
-}
-.opengraphica .mt-6 {
-  margin-top: 3rem !important;
-}
-.opengraphica .mr-6 {
-  margin-right: 3rem !important;
-}
-.opengraphica .mb-6 {
-  margin-bottom: 3rem !important;
-}
-.opengraphica .ml-6 {
-  margin-left: 3rem !important;
-}
-.opengraphica .mx-6 {
-  margin-left: 3rem !important;
-  margin-right: 3rem !important;
-}
-.opengraphica .my-6 {
-  margin-top: 3rem !important;
-  margin-bottom: 3rem !important;
-}
-.opengraphica .p-0 {
-  padding: 0 !important;
-}
-.opengraphica .pt-0 {
-  padding-top: 0 !important;
-}
-.opengraphica .pr-0 {
-  padding-right: 0 !important;
-}
-.opengraphica .pb-0 {
-  padding-bottom: 0 !important;
-}
-.opengraphica .pl-0 {
-  padding-left: 0 !important;
-}
-.opengraphica .px-0 {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-}
-.opengraphica .py-0 {
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-}
-.opengraphica .p-1 {
-  padding: 0.25rem !important;
-}
-.opengraphica .pt-1 {
-  padding-top: 0.25rem !important;
-}
-.opengraphica .pr-1 {
-  padding-right: 0.25rem !important;
-}
-.opengraphica .pb-1 {
-  padding-bottom: 0.25rem !important;
-}
-.opengraphica .pl-1 {
-  padding-left: 0.25rem !important;
-}
-.opengraphica .px-1 {
-  padding-left: 0.25rem !important;
-  padding-right: 0.25rem !important;
-}
-.opengraphica .py-1 {
-  padding-top: 0.25rem !important;
-  padding-bottom: 0.25rem !important;
-}
-.opengraphica .p-2 {
-  padding: 0.5rem !important;
-}
-.opengraphica .pt-2 {
-  padding-top: 0.5rem !important;
-}
-.opengraphica .pr-2 {
-  padding-right: 0.5rem !important;
-}
-.opengraphica .pb-2 {
-  padding-bottom: 0.5rem !important;
-}
-.opengraphica .pl-2 {
-  padding-left: 0.5rem !important;
-}
-.opengraphica .px-2 {
-  padding-left: 0.5rem !important;
-  padding-right: 0.5rem !important;
-}
-.opengraphica .py-2 {
-  padding-top: 0.5rem !important;
-  padding-bottom: 0.5rem !important;
-}
-.opengraphica .p-3 {
-  padding: 0.75rem !important;
-}
-.opengraphica .pt-3 {
-  padding-top: 0.75rem !important;
-}
-.opengraphica .pr-3 {
-  padding-right: 0.75rem !important;
-}
-.opengraphica .pb-3 {
-  padding-bottom: 0.75rem !important;
-}
-.opengraphica .pl-3 {
-  padding-left: 0.75rem !important;
-}
-.opengraphica .px-3 {
-  padding-left: 0.75rem !important;
-  padding-right: 0.75rem !important;
-}
-.opengraphica .py-3 {
-  padding-top: 0.75rem !important;
-  padding-bottom: 0.75rem !important;
-}
-.opengraphica .p-4 {
-  padding: 1rem !important;
-}
-.opengraphica .pt-4 {
-  padding-top: 1rem !important;
-}
-.opengraphica .pr-4 {
-  padding-right: 1rem !important;
-}
-.opengraphica .pb-4 {
-  padding-bottom: 1rem !important;
-}
-.opengraphica .pl-4 {
-  padding-left: 1rem !important;
-}
-.opengraphica .px-4 {
-  padding-left: 1rem !important;
-  padding-right: 1rem !important;
-}
-.opengraphica .py-4 {
-  padding-top: 1rem !important;
-  padding-bottom: 1rem !important;
-}
-.opengraphica .p-5 {
-  padding: 1.5rem !important;
-}
-.opengraphica .pt-5 {
-  padding-top: 1.5rem !important;
-}
-.opengraphica .pr-5 {
-  padding-right: 1.5rem !important;
-}
-.opengraphica .pb-5 {
-  padding-bottom: 1.5rem !important;
-}
-.opengraphica .pl-5 {
-  padding-left: 1.5rem !important;
-}
-.opengraphica .px-5 {
-  padding-left: 1.5rem !important;
-  padding-right: 1.5rem !important;
-}
-.opengraphica .py-5 {
-  padding-top: 1.5rem !important;
-  padding-bottom: 1.5rem !important;
-}
-.opengraphica .p-6 {
-  padding: 3rem !important;
-}
-.opengraphica .pt-6 {
-  padding-top: 3rem !important;
-}
-.opengraphica .pr-6 {
-  padding-right: 3rem !important;
-}
-.opengraphica .pb-6 {
-  padding-bottom: 3rem !important;
-}
-.opengraphica .pl-6 {
-  padding-left: 3rem !important;
-}
-.opengraphica .px-6 {
-  padding-left: 3rem !important;
-  padding-right: 3rem !important;
-}
-.opengraphica .py-6 {
-  padding-top: 3rem !important;
-  padding-bottom: 3rem !important;
-}
-.opengraphica .is-size-1 {
-  font-size: 3rem !important;
-}
-.opengraphica .is-size-2 {
-  font-size: 2.5rem !important;
-}
-.opengraphica .is-size-3 {
-  font-size: 2rem !important;
-}
-.opengraphica .is-size-4 {
-  font-size: 1.5rem !important;
-}
-.opengraphica .is-size-5 {
-  font-size: 1.25rem !important;
-}
-.opengraphica .is-size-6 {
-  font-size: 1rem !important;
-}
-.opengraphica .is-size-7 {
-  font-size: 0.75rem !important;
-}
-@media screen and (max-width: 768px) {
-  .opengraphica .is-size-1-mobile {
-    font-size: 3rem !important;
-  }
-  .opengraphica .is-size-2-mobile {
-    font-size: 2.5rem !important;
-  }
-  .opengraphica .is-size-3-mobile {
-    font-size: 2rem !important;
-  }
-  .opengraphica .is-size-4-mobile {
-    font-size: 1.5rem !important;
-  }
-  .opengraphica .is-size-5-mobile {
-    font-size: 1.25rem !important;
-  }
-  .opengraphica .is-size-6-mobile {
-    font-size: 1rem !important;
-  }
-  .opengraphica .is-size-7-mobile {
-    font-size: 0.75rem !important;
-  }
-}
-@media screen and (min-width: 769px), print {
-  .opengraphica .is-size-1-tablet {
-    font-size: 3rem !important;
-  }
-  .opengraphica .is-size-2-tablet {
-    font-size: 2.5rem !important;
-  }
-  .opengraphica .is-size-3-tablet {
-    font-size: 2rem !important;
-  }
-  .opengraphica .is-size-4-tablet {
-    font-size: 1.5rem !important;
-  }
-  .opengraphica .is-size-5-tablet {
-    font-size: 1.25rem !important;
-  }
-  .opengraphica .is-size-6-tablet {
-    font-size: 1rem !important;
-  }
-  .opengraphica .is-size-7-tablet {
-    font-size: 0.75rem !important;
-  }
-}
-@media screen and (max-width: 1023px) {
-  .opengraphica .is-size-1-touch {
-    font-size: 3rem !important;
-  }
-  .opengraphica .is-size-2-touch {
-    font-size: 2.5rem !important;
-  }
-  .opengraphica .is-size-3-touch {
-    font-size: 2rem !important;
-  }
-  .opengraphica .is-size-4-touch {
-    font-size: 1.5rem !important;
-  }
-  .opengraphica .is-size-5-touch {
-    font-size: 1.25rem !important;
-  }
-  .opengraphica .is-size-6-touch {
-    font-size: 1rem !important;
-  }
-  .opengraphica .is-size-7-touch {
-    font-size: 0.75rem !important;
-  }
-}
-@media screen and (min-width: 1024px) {
-  .opengraphica .is-size-1-desktop {
-    font-size: 3rem !important;
-  }
-  .opengraphica .is-size-2-desktop {
-    font-size: 2.5rem !important;
-  }
-  .opengraphica .is-size-3-desktop {
-    font-size: 2rem !important;
-  }
-  .opengraphica .is-size-4-desktop {
-    font-size: 1.5rem !important;
-  }
-  .opengraphica .is-size-5-desktop {
-    font-size: 1.25rem !important;
-  }
-  .opengraphica .is-size-6-desktop {
-    font-size: 1rem !important;
-  }
-  .opengraphica .is-size-7-desktop {
-    font-size: 0.75rem !important;
-  }
-}
-@media screen and (min-width: 1216px) {
-  .opengraphica .is-size-1-widescreen {
-    font-size: 3rem !important;
-  }
-  .opengraphica .is-size-2-widescreen {
-    font-size: 2.5rem !important;
-  }
-  .opengraphica .is-size-3-widescreen {
-    font-size: 2rem !important;
-  }
-  .opengraphica .is-size-4-widescreen {
-    font-size: 1.5rem !important;
-  }
-  .opengraphica .is-size-5-widescreen {
-    font-size: 1.25rem !important;
-  }
-  .opengraphica .is-size-6-widescreen {
-    font-size: 1rem !important;
-  }
-  .opengraphica .is-size-7-widescreen {
-    font-size: 0.75rem !important;
-  }
-}
-@media screen and (min-width: 1408px) {
-  .opengraphica .is-size-1-fullhd {
-    font-size: 3rem !important;
-  }
-  .opengraphica .is-size-2-fullhd {
-    font-size: 2.5rem !important;
-  }
-  .opengraphica .is-size-3-fullhd {
-    font-size: 2rem !important;
-  }
-  .opengraphica .is-size-4-fullhd {
-    font-size: 1.5rem !important;
-  }
-  .opengraphica .is-size-5-fullhd {
-    font-size: 1.25rem !important;
-  }
-  .opengraphica .is-size-6-fullhd {
-    font-size: 1rem !important;
-  }
-  .opengraphica .is-size-7-fullhd {
-    font-size: 0.75rem !important;
-  }
-}
-.opengraphica .has-text-centered {
-  text-align: center !important;
-}
-.opengraphica .has-text-justified {
-  text-align: justify !important;
-}
-.opengraphica .has-text-left {
-  text-align: left !important;
-}
-.opengraphica .has-text-right {
-  text-align: right !important;
-}
-@media screen and (max-width: 768px) {
-  .opengraphica .has-text-centered-mobile {
-    text-align: center !important;
-  }
-}
-@media screen and (min-width: 769px), print {
-  .opengraphica .has-text-centered-tablet {
-    text-align: center !important;
-  }
-}
-@media screen and (min-width: 769px) and (max-width: 1023px) {
-  .opengraphica .has-text-centered-tablet-only {
-    text-align: center !important;
-  }
-}
-@media screen and (max-width: 1023px) {
-  .opengraphica .has-text-centered-touch {
-    text-align: center !important;
-  }
-}
-@media screen and (min-width: 1024px) {
-  .opengraphica .has-text-centered-desktop {
-    text-align: center !important;
-  }
-}
-@media screen and (min-width: 1024px) and (max-width: 1215px) {
-  .opengraphica .has-text-centered-desktop-only {
-    text-align: center !important;
-  }
-}
-@media screen and (min-width: 1216px) {
-  .opengraphica .has-text-centered-widescreen {
-    text-align: center !important;
-  }
-}
-@media screen and (min-width: 1216px) and (max-width: 1407px) {
-  .opengraphica .has-text-centered-widescreen-only {
-    text-align: center !important;
-  }
-}
-@media screen and (min-width: 1408px) {
-  .opengraphica .has-text-centered-fullhd {
-    text-align: center !important;
-  }
-}
-@media screen and (max-width: 768px) {
-  .opengraphica .has-text-justified-mobile {
-    text-align: justify !important;
-  }
-}
-@media screen and (min-width: 769px), print {
-  .opengraphica .has-text-justified-tablet {
-    text-align: justify !important;
-  }
-}
-@media screen and (min-width: 769px) and (max-width: 1023px) {
-  .opengraphica .has-text-justified-tablet-only {
-    text-align: justify !important;
-  }
-}
-@media screen and (max-width: 1023px) {
-  .opengraphica .has-text-justified-touch {
-    text-align: justify !important;
-  }
-}
-@media screen and (min-width: 1024px) {
-  .opengraphica .has-text-justified-desktop {
-    text-align: justify !important;
-  }
-}
-@media screen and (min-width: 1024px) and (max-width: 1215px) {
-  .opengraphica .has-text-justified-desktop-only {
-    text-align: justify !important;
-  }
-}
-@media screen and (min-width: 1216px) {
-  .opengraphica .has-text-justified-widescreen {
-    text-align: justify !important;
-  }
-}
-@media screen and (min-width: 1216px) and (max-width: 1407px) {
-  .opengraphica .has-text-justified-widescreen-only {
-    text-align: justify !important;
-  }
-}
-@media screen and (min-width: 1408px) {
-  .opengraphica .has-text-justified-fullhd {
-    text-align: justify !important;
-  }
-}
-@media screen and (max-width: 768px) {
-  .opengraphica .has-text-left-mobile {
-    text-align: left !important;
-  }
-}
-@media screen and (min-width: 769px), print {
-  .opengraphica .has-text-left-tablet {
-    text-align: left !important;
-  }
-}
-@media screen and (min-width: 769px) and (max-width: 1023px) {
-  .opengraphica .has-text-left-tablet-only {
-    text-align: left !important;
-  }
-}
-@media screen and (max-width: 1023px) {
-  .opengraphica .has-text-left-touch {
-    text-align: left !important;
-  }
-}
-@media screen and (min-width: 1024px) {
-  .opengraphica .has-text-left-desktop {
-    text-align: left !important;
-  }
-}
-@media screen and (min-width: 1024px) and (max-width: 1215px) {
-  .opengraphica .has-text-left-desktop-only {
-    text-align: left !important;
-  }
-}
-@media screen and (min-width: 1216px) {
-  .opengraphica .has-text-left-widescreen {
-    text-align: left !important;
-  }
-}
-@media screen and (min-width: 1216px) and (max-width: 1407px) {
-  .opengraphica .has-text-left-widescreen-only {
-    text-align: left !important;
-  }
-}
-@media screen and (min-width: 1408px) {
-  .opengraphica .has-text-left-fullhd {
-    text-align: left !important;
-  }
-}
-@media screen and (max-width: 768px) {
-  .opengraphica .has-text-right-mobile {
-    text-align: right !important;
-  }
-}
-@media screen and (min-width: 769px), print {
-  .opengraphica .has-text-right-tablet {
-    text-align: right !important;
-  }
-}
-@media screen and (min-width: 769px) and (max-width: 1023px) {
-  .opengraphica .has-text-right-tablet-only {
-    text-align: right !important;
-  }
-}
-@media screen and (max-width: 1023px) {
-  .opengraphica .has-text-right-touch {
-    text-align: right !important;
-  }
-}
-@media screen and (min-width: 1024px) {
-  .opengraphica .has-text-right-desktop {
-    text-align: right !important;
-  }
-}
-@media screen and (min-width: 1024px) and (max-width: 1215px) {
-  .opengraphica .has-text-right-desktop-only {
-    text-align: right !important;
-  }
-}
-@media screen and (min-width: 1216px) {
-  .opengraphica .has-text-right-widescreen {
-    text-align: right !important;
-  }
-}
-@media screen and (min-width: 1216px) and (max-width: 1407px) {
-  .opengraphica .has-text-right-widescreen-only {
-    text-align: right !important;
-  }
-}
-@media screen and (min-width: 1408px) {
-  .opengraphica .has-text-right-fullhd {
-    text-align: right !important;
-  }
-}
-.opengraphica .is-capitalized {
-  text-transform: capitalize !important;
-}
-.opengraphica .is-lowercase {
-  text-transform: lowercase !important;
-}
-.opengraphica .is-uppercase {
-  text-transform: uppercase !important;
-}
-.opengraphica .is-italic {
-  font-style: italic !important;
-}
-.opengraphica .has-text-weight-light {
-  font-weight: 300 !important;
-}
-.opengraphica .has-text-weight-normal {
-  font-weight: 400 !important;
-}
-.opengraphica .has-text-weight-medium {
-  font-weight: 500 !important;
-}
-.opengraphica .has-text-weight-semibold {
-  font-weight: 600 !important;
-}
-.opengraphica .has-text-weight-bold {
-  font-weight: 700 !important;
-}
-.opengraphica .is-family-primary {
-  font-family: BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif !important;
-}
-.opengraphica .is-family-secondary {
-  font-family: BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif !important;
-}
-.opengraphica .is-family-sans-serif {
-  font-family: BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif !important;
-}
-.opengraphica .is-family-monospace {
-  font-family: monospace !important;
-}
-.opengraphica .is-family-code {
-  font-family: monospace !important;
-}
-.opengraphica .is-block {
-  display: block !important;
-}
-@media screen and (max-width: 768px) {
-  .opengraphica .is-block-mobile {
-    display: block !important;
-  }
-}
-@media screen and (min-width: 769px), print {
-  .opengraphica .is-block-tablet {
-    display: block !important;
-  }
-}
-@media screen and (min-width: 769px) and (max-width: 1023px) {
-  .opengraphica .is-block-tablet-only {
-    display: block !important;
-  }
-}
-@media screen and (max-width: 1023px) {
-  .opengraphica .is-block-touch {
-    display: block !important;
-  }
-}
-@media screen and (min-width: 1024px) {
-  .opengraphica .is-block-desktop {
-    display: block !important;
-  }
-}
-@media screen and (min-width: 1024px) and (max-width: 1215px) {
-  .opengraphica .is-block-desktop-only {
-    display: block !important;
-  }
-}
-@media screen and (min-width: 1216px) {
-  .opengraphica .is-block-widescreen {
-    display: block !important;
-  }
-}
-@media screen and (min-width: 1216px) and (max-width: 1407px) {
-  .opengraphica .is-block-widescreen-only {
-    display: block !important;
-  }
-}
-@media screen and (min-width: 1408px) {
-  .opengraphica .is-block-fullhd {
-    display: block !important;
-  }
-}
-.opengraphica .is-flex {
-  display: flex !important;
-}
-@media screen and (max-width: 768px) {
-  .opengraphica .is-flex-mobile {
-    display: flex !important;
-  }
-}
-@media screen and (min-width: 769px), print {
-  .opengraphica .is-flex-tablet {
-    display: flex !important;
-  }
-}
-@media screen and (min-width: 769px) and (max-width: 1023px) {
-  .opengraphica .is-flex-tablet-only {
-    display: flex !important;
-  }
-}
-@media screen and (max-width: 1023px) {
-  .opengraphica .is-flex-touch {
-    display: flex !important;
-  }
-}
-@media screen and (min-width: 1024px) {
-  .opengraphica .is-flex-desktop {
-    display: flex !important;
-  }
-}
-@media screen and (min-width: 1024px) and (max-width: 1215px) {
-  .opengraphica .is-flex-desktop-only {
-    display: flex !important;
-  }
-}
-@media screen and (min-width: 1216px) {
-  .opengraphica .is-flex-widescreen {
-    display: flex !important;
-  }
-}
-@media screen and (min-width: 1216px) and (max-width: 1407px) {
-  .opengraphica .is-flex-widescreen-only {
-    display: flex !important;
-  }
-}
-@media screen and (min-width: 1408px) {
-  .opengraphica .is-flex-fullhd {
-    display: flex !important;
-  }
-}
-.opengraphica .is-inline {
-  display: inline !important;
-}
-@media screen and (max-width: 768px) {
-  .opengraphica .is-inline-mobile {
-    display: inline !important;
-  }
-}
-@media screen and (min-width: 769px), print {
-  .opengraphica .is-inline-tablet {
-    display: inline !important;
-  }
-}
-@media screen and (min-width: 769px) and (max-width: 1023px) {
-  .opengraphica .is-inline-tablet-only {
-    display: inline !important;
-  }
-}
-@media screen and (max-width: 1023px) {
-  .opengraphica .is-inline-touch {
-    display: inline !important;
-  }
-}
-@media screen and (min-width: 1024px) {
-  .opengraphica .is-inline-desktop {
-    display: inline !important;
-  }
-}
-@media screen and (min-width: 1024px) and (max-width: 1215px) {
-  .opengraphica .is-inline-desktop-only {
-    display: inline !important;
-  }
-}
-@media screen and (min-width: 1216px) {
-  .opengraphica .is-inline-widescreen {
-    display: inline !important;
-  }
-}
-@media screen and (min-width: 1216px) and (max-width: 1407px) {
-  .opengraphica .is-inline-widescreen-only {
-    display: inline !important;
-  }
-}
-@media screen and (min-width: 1408px) {
-  .opengraphica .is-inline-fullhd {
-    display: inline !important;
-  }
-}
-.opengraphica .is-inline-block {
-  display: inline-block !important;
-}
-@media screen and (max-width: 768px) {
-  .opengraphica .is-inline-block-mobile {
-    display: inline-block !important;
-  }
-}
-@media screen and (min-width: 769px), print {
-  .opengraphica .is-inline-block-tablet {
-    display: inline-block !important;
-  }
-}
-@media screen and (min-width: 769px) and (max-width: 1023px) {
-  .opengraphica .is-inline-block-tablet-only {
-    display: inline-block !important;
-  }
-}
-@media screen and (max-width: 1023px) {
-  .opengraphica .is-inline-block-touch {
-    display: inline-block !important;
-  }
-}
-@media screen and (min-width: 1024px) {
-  .opengraphica .is-inline-block-desktop {
-    display: inline-block !important;
-  }
-}
-@media screen and (min-width: 1024px) and (max-width: 1215px) {
-  .opengraphica .is-inline-block-desktop-only {
-    display: inline-block !important;
-  }
-}
-@media screen and (min-width: 1216px) {
-  .opengraphica .is-inline-block-widescreen {
-    display: inline-block !important;
-  }
-}
-@media screen and (min-width: 1216px) and (max-width: 1407px) {
-  .opengraphica .is-inline-block-widescreen-only {
-    display: inline-block !important;
-  }
-}
-@media screen and (min-width: 1408px) {
-  .opengraphica .is-inline-block-fullhd {
-    display: inline-block !important;
-  }
-}
-.opengraphica .is-inline-flex {
-  display: inline-flex !important;
-}
-@media screen and (max-width: 768px) {
-  .opengraphica .is-inline-flex-mobile {
-    display: inline-flex !important;
-  }
-}
-@media screen and (min-width: 769px), print {
-  .opengraphica .is-inline-flex-tablet {
-    display: inline-flex !important;
-  }
-}
-@media screen and (min-width: 769px) and (max-width: 1023px) {
-  .opengraphica .is-inline-flex-tablet-only {
-    display: inline-flex !important;
-  }
-}
-@media screen and (max-width: 1023px) {
-  .opengraphica .is-inline-flex-touch {
-    display: inline-flex !important;
-  }
-}
-@media screen and (min-width: 1024px) {
-  .opengraphica .is-inline-flex-desktop {
-    display: inline-flex !important;
-  }
-}
-@media screen and (min-width: 1024px) and (max-width: 1215px) {
-  .opengraphica .is-inline-flex-desktop-only {
-    display: inline-flex !important;
-  }
-}
-@media screen and (min-width: 1216px) {
-  .opengraphica .is-inline-flex-widescreen {
-    display: inline-flex !important;
-  }
-}
-@media screen and (min-width: 1216px) and (max-width: 1407px) {
-  .opengraphica .is-inline-flex-widescreen-only {
-    display: inline-flex !important;
-  }
-}
-@media screen and (min-width: 1408px) {
-  .opengraphica .is-inline-flex-fullhd {
-    display: inline-flex !important;
-  }
-}
-.opengraphica .is-hidden {
-  display: none !important;
-}
-.opengraphica .is-sr-only {
-  border: none !important;
-  clip: rect(0, 0, 0, 0) !important;
-  height: 0.01em !important;
-  overflow: hidden !important;
-  padding: 0 !important;
-  position: absolute !important;
-  white-space: nowrap !important;
-  width: 0.01em !important;
-}
-@media screen and (max-width: 768px) {
-  .opengraphica .is-hidden-mobile {
-    display: none !important;
-  }
-}
-@media screen and (min-width: 769px), print {
-  .opengraphica .is-hidden-tablet {
-    display: none !important;
-  }
-}
-@media screen and (min-width: 769px) and (max-width: 1023px) {
-  .opengraphica .is-hidden-tablet-only {
-    display: none !important;
-  }
-}
-@media screen and (max-width: 1023px) {
-  .opengraphica .is-hidden-touch {
-    display: none !important;
-  }
-}
-@media screen and (min-width: 1024px) {
-  .opengraphica .is-hidden-desktop {
-    display: none !important;
-  }
-}
-@media screen and (min-width: 1024px) and (max-width: 1215px) {
-  .opengraphica .is-hidden-desktop-only {
-    display: none !important;
-  }
-}
-@media screen and (min-width: 1216px) {
-  .opengraphica .is-hidden-widescreen {
-    display: none !important;
-  }
-}
-@media screen and (min-width: 1216px) and (max-width: 1407px) {
-  .opengraphica .is-hidden-widescreen-only {
-    display: none !important;
-  }
-}
-@media screen and (min-width: 1408px) {
-  .opengraphica .is-hidden-fullhd {
-    display: none !important;
-  }
-}
-.opengraphica .is-invisible {
-  visibility: hidden !important;
-}
-@media screen and (max-width: 768px) {
-  .opengraphica .is-invisible-mobile {
-    visibility: hidden !important;
-  }
-}
-@media screen and (min-width: 769px), print {
-  .opengraphica .is-invisible-tablet {
-    visibility: hidden !important;
-  }
-}
-@media screen and (min-width: 769px) and (max-width: 1023px) {
-  .opengraphica .is-invisible-tablet-only {
-    visibility: hidden !important;
-  }
-}
-@media screen and (max-width: 1023px) {
-  .opengraphica .is-invisible-touch {
-    visibility: hidden !important;
-  }
-}
-@media screen and (min-width: 1024px) {
-  .opengraphica .is-invisible-desktop {
-    visibility: hidden !important;
-  }
-}
-@media screen and (min-width: 1024px) and (max-width: 1215px) {
-  .opengraphica .is-invisible-desktop-only {
-    visibility: hidden !important;
-  }
-}
-@media screen and (min-width: 1216px) {
-  .opengraphica .is-invisible-widescreen {
-    visibility: hidden !important;
-  }
-}
-@media screen and (min-width: 1216px) and (max-width: 1407px) {
-  .opengraphica .is-invisible-widescreen-only {
-    visibility: hidden !important;
-  }
-}
-@media screen and (min-width: 1408px) {
-  .opengraphica .is-invisible-fullhd {
-    visibility: hidden !important;
-  }
-}
-.opengraphica .mt-auto, .opengraphica .my-auto, .opengraphica .m-auto {
-  margin-top: auto;
-}
-.opengraphica .mb-auto, .opengraphica .my-auto, .opengraphica .m-auto {
-  margin-bottom: auto;
-}
-.opengraphica .ml-auto, .opengraphica .mx-auto, .opengraphica .m-auto {
-  margin-left: auto;
-}
-.opengraphica .mr-auto, .opengraphica .mx-auto, .opengraphica .m-auto {
-  margin-right: auto;
-}
-.opengraphica .ml-4\.5, .opengraphica .mx-4\.5 {
-  margin-left: 1.25rem;
-}
-.opengraphica .mr-4\.5, .opengraphica .mx-4\.5 {
-  margin-right: 1.25rem;
-}
-.opengraphica .mt-4\.5, .opengraphica .my-4\.5 {
-  margin-top: 1.25rem;
-}
-.opengraphica .mb-4\.5, .opengraphica .my-4\.5 {
-  margin-bottom: 1.25rem;
-}
-.opengraphica .pl-4\.5, .opengraphica .px-4\.5 {
-  padding-left: 1.25rem;
-}
-.opengraphica .pr-4\.5, .opengraphica .px-4\.5 {
-  padding-right: 1.25rem;
-}
-.opengraphica .pt-4\.5, .opengraphica .py-4\.5 {
-  padding-top: 1.25rem;
-}
-.opengraphica .pb-4\.5, .opengraphica .py-4\.5 {
-  padding-bottom: 1.25rem;
-}
-.opengraphica .is-border-radius-0 {
-  border-radius: 0;
-}
-.opengraphica .is-border-radius-attach-left {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-}
-.opengraphica .is-border-radius-attach-right {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-.opengraphica .is-border-radius-attach-top {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
-.opengraphica .is-border-radius-attach-bottom {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-.opengraphica .leading-none {
-  line-height: 1;
-}
-.opengraphica .leading-tight {
-  line-height: 1.25;
-}
-.opengraphica .leading-snug {
-  line-height: 1.375;
-}
-.opengraphica .leading-normal {
-  line-height: 1.5;
-}
-.opengraphica .leading-relaxed {
-  line-height: 1.625;
-}
-.opengraphica .leading-loose {
-  line-height: 2;
-}
-.opengraphica .is-text-nowrap {
-  white-space: nowrap;
-}
-.opengraphica .is-text-ellipsis {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.opengraphica .is-strikethrough {
-  text-decoration: line-through;
-}
-.opengraphica .is-fullheight {
-  height: 100%;
-}
-.opengraphica .is-fullwidth {
-  width: 100%;
-}
-.opengraphica .is-position-absolute-full {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
 }
 .opengraphica .el-text-alignment-fix--sm--above {
   margin-top: 0.05em;

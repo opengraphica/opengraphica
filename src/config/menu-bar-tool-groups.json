@@ -1,0 +1,117 @@
+{
+    "deform": {
+        "icon": "bi bi-droplet-half",
+        "action": {
+            "type": "toolGroup",
+            "target": "deform"
+        }
+    },
+    "draw": {
+        "icon": "bi bi-pencil-fill",
+        "action": {
+            "type": "toolGroup",
+            "target": "draw"
+        },
+        "controls": [
+            {
+                "icon": "bi bi-pencil-fill",
+                "action": {
+                    "type": "tool",
+                    "target": "brush"
+                }
+            },
+            {
+                "icon": "bi bi-shadows",
+                "action": {
+                    "type": "tool",
+                    "target": "gradient"
+                }
+            }
+        ]
+    },
+    "effect": {
+        "icon": "bi bi-stars",
+        "action": {
+            "type": "toolGroup",
+            "target": "effect"
+        }
+    },
+    "erase": {
+        "icon": "bi bi-eraser-fill",
+        "action": {
+            "type": "toolGroup",
+            "target": "erase"
+        },
+        "controls": [
+            {
+                "icon": "bi bi-eraser-fill",
+                "action": {
+                    "type": "tool",
+                    "target": "brush"
+                }
+            }
+        ]
+    },
+    "layers": {
+        "icon": "bi bi-layers",
+        "action": {
+            "type": "dock",
+            "target": "layers"
+        }
+    },
+    "selection": {
+        "icon": "bi bi-bounding-box",
+        "action": {
+            "type": "toolGroup",
+            "target": "selection"
+        }
+    },
+    "settings": {
+        "icon": "bi bi-gear",
+        "action": {
+            "type": "dock",
+            "target": "settings"
+        }
+    },
+    "text": {
+        "icon": "bi bi-type",
+        "action": {
+            "type": "toolGroup",
+            "target": "text"
+        }
+    },
+    "transform": {
+        "type": "button",
+        "icon": "bi bi-cursor",
+        "action": {
+            "type": "toolGroup",
+            "target": "transform"
+        },
+        "controls": [
+            {
+                "icon": "bi bi-cursor",
+                "action": {
+                    "type": "tool",
+                    "target": "freeTransform"
+                }
+            }
+        ]
+    },
+    "view": {
+        "type": "button",
+        "icon": "bi bi-zoom-in",
+        "action": {
+            "type": "toolGroup",
+            "target": "view"
+        },
+        "controls": [
+            {
+                "icon": "bi bi-zoom-in",
+                "action": {
+                    "type": "tool",
+                    "target": "zoom"
+                }
+            }
+        ]
+    }
+}

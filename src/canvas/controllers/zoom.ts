@@ -32,14 +32,14 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
                     message: {
                         touch: message + (tm('tutorialTip.zoomToolIntroduction.body.touch') as string[]).map((message) => {
                             return `<p class="mb-3">${rt(message, {
-                                zooming: `<strong class="has-text-weight-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.zoomToolIntroduction.bodyTitle.zooming')}</strong>`,
-                                panning: `<strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.zoomToolIntroduction.bodyTitle.panning')}</strong>`,
+                                zooming: `<strong class="font-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.zoomToolIntroduction.bodyTitle.zooming')}</strong>`,
+                                panning: `<strong class="font-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.zoomToolIntroduction.bodyTitle.panning')}</strong>`,
                             })}</p>`
                         }).join(''),
                         mouse: message + (tm('tutorialTip.zoomToolIntroduction.body.mouse') as string[]).map((message) => {
                             return `<p class="mb-3">${rt(message, {
-                                zooming: `<strong class="has-text-weight-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.zoomToolIntroduction.bodyTitle.zooming')}</strong>`,
-                                panning: `<strong class="has-text-weight-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.zoomToolIntroduction.bodyTitle.panning')}</strong>`,
+                                zooming: `<strong class="font-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.zoomToolIntroduction.bodyTitle.zooming')}</strong>`,
+                                panning: `<strong class="font-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.zoomToolIntroduction.bodyTitle.panning')}</strong>`,
                                 leftClick: `<em>${t('tutorialTip.zoomToolIntroduction.bodyTitle.leftClick')}</em>`,
                                 ctrlLeftClick: `<em>${t('tutorialTip.zoomToolIntroduction.bodyTitle.ctrlLeftClick')}</em>`,
                                 leftMouseButton: `<em>${t('tutorialTip.zoomToolIntroduction.bodyTitle.leftMouseButton')}</em>`,

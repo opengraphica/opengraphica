@@ -9,12 +9,12 @@
             {{ $t('module.fileTakePhoto.noCameraError.message') }}
         </el-alert>
         <template v-else>
-            <el-select v-model="facingMode" class="mx-0 mt-0 mb-2 is-fullwidth" :placeholder="$t('module.fileTakePhoto.selectCamera.placeholder')">
+            <el-select v-model="facingMode" class="mx-0 mt-0 mb-2 w-full" :placeholder="$t('module.fileTakePhoto.selectCamera.placeholder')">
                 <el-option key="user" value="user" :label="$t('module.fileTakePhoto.selectCamera.user')" />
                 <el-option key="environment" value="environment" :label="$t('module.fileTakePhoto.selectCamera.environment')" />
             </el-select>
-            <video ref="video" autoplay="true" class="is-fullwidth"></video>
-            <div class="has-text-right mt-4">
+            <video ref="video" autoplay="true" class="w-full"></video>
+            <div class="text-right mt-4">
                 <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
                 <el-button type="primary" @click="onTake">{{ $t('button.take') }}</el-button>
             </div>

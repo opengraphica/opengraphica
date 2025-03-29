@@ -1,6 +1,6 @@
 <template>
     <div class="og-dock-header">
-        <div class="is-flex is-align-items-center is-justify-content-center">
+        <div class="flex items-center justify-center">
             <strong class="has-text-color-regular mr-3">{{ $t('dock.layers.add') }}:</strong>
             <el-button link type="primary" class="px-0" @click="onAddLayer">
                 <span class="bi bi-file-earmark-plus mr-1" aria-hidden="true"></span>
@@ -29,7 +29,7 @@
                     :title="$t('dock.layers.noLayers')"
                     show-icon
                     :closable="false"
-                    class="is-justify-content-center">
+                    class="justify-center">
                 </el-alert>
             </template>
             <ul class="og-layer-list">

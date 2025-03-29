@@ -69,7 +69,7 @@
             <el-horizontal-scrollbar-arrows>
                 <el-input-group>
                     <template #prepend>
-                        <span class="is-size-7">{{ t('toolbar.drawGradient.stopDialog.stopColor') }}</span>
+                        <span class="text-xs">{{ t('toolbar.drawGradient.stopDialog.stopColor') }}</span>
                     </template>
                     <el-input-color
                         ref="stopColorPicker"
@@ -80,7 +80,7 @@
                 </el-input-group>
                 <el-input-group  class="ml-3">
                     <template #prepend>
-                        <span class="is-size-7">{{ t('toolbar.drawGradient.stopDialog.stopOffset') }}</span>
+                        <span class="text-xs">{{ t('toolbar.drawGradient.stopDialog.stopOffset') }}</span>
                     </template>
                     <el-input-number
                         :model-value="Math.floor(editingColorStops[activeColorStopIndex].offset * 100)"
@@ -94,7 +94,7 @@
                         @change="onChangeEditingStopOffset()"
                     ></el-input-number>
                 </el-input-group>
-                <el-button-group class="is-flex ml-3">
+                <el-button-group class="flex ml-3">
                     <el-button plain size="small" @click="onDeleteEditingStop()">
                         <span class="bi bi-trash mr-2" aria-hidden="true" /> {{ t('button.delete') }}
                     </el-button>
@@ -108,7 +108,7 @@
             </el-horizontal-scrollbar-arrows>
         </div>
         <div class="og-toolbar-draw-gradient-stop-drawer__presets">
-            <h3 class="is-size-6">{{ t('toolbar.drawGradient.stopDialog.presets') }}</h3>
+            <h3 class="text-base">{{ t('toolbar.drawGradient.stopDialog.presets') }}</h3>
             <el-scrollbar>
                 <div v-for="(preset, presetIndex) of gradientPresets" :key="presetIndex" class="og-gradient-preset">
                     <button class="og-gradient-preset__activate" @click="onSelectPreset(presetIndex)">
@@ -141,7 +141,7 @@
         </div>
         <template v-if="isDialog">
             <el-divider class="mt-0" />
-            <div class="mt-4 pb-5 has-text-right">
+            <div class="mt-4 pb-5 text-right">
                 <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
                 <el-button @click="onConfirmSelection">{{ $t('button.ok') }}</el-button>
             </div>

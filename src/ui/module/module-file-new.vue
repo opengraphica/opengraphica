@@ -87,7 +87,7 @@
                 </el-form-item>
             </el-form-item-group>
         </el-form-item-aligned-groups>
-        <div class="has-text-right">
+        <div class="text-right">
             <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
             <el-button type="primary" native-type="submit">{{ $t('button.create') }}</el-button>
         </div>

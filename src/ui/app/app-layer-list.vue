@@ -8,7 +8,7 @@
         class="og-layer-list"
         :class="{
             'is-dnd-dragging': draggingLayerId != null,
-            'is-flex-grow-1': isRoot,
+            'grow-1': isRoot,
         }"
     >
         <template v-for="(layer, layerIndex) of reversedLayers" :key="layer.id">
@@ -44,10 +44,10 @@
                         </span>
                         <span v-if="layer.type === 'group'" class="og-layer-group-arrow bi" :class="{ 'bi-chevron-right': !layer.expanded, 'bi-chevron-down': layer.expanded }" aria-hidden="true"></span>
                     </span>
-                    <el-button link type="primary" class="px-2 my-1" :aria-label="$t('app.layerList.toggleLayerVisibility')" @click="onToggleLayerVisibility(layer)">
+                    <el-button link type="primary" class="!px-2 !my-1" :aria-label="$t('app.layerList.toggleLayerVisibility')" @click="onToggleLayerVisibility(layer)">
                         <i class="bi" :class="{ 'bi-eye-fill': layer.visible, 'bi-eye-slash': !layer.visible }" aria-hidden="true"></i>
                     </el-button>
-                    <el-button link type="primary" class="px-2 mr-2 my-1 ml-0" :aria-label="$t('app.layerList.layerSettings')" @click="onToggleLayerSettings($event, layer)">
+                    <el-button link type="primary" class="!px-2 !mr-2 !my-1 !ml-0" :aria-label="$t('app.layerList.layerSettings')" @click="onToggleLayerSettings($event, layer)">
                         <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
                     </el-button>
                 </span>
@@ -58,7 +58,7 @@
                         <el-button v-if="!playingAnimation" link type="primary" class="p-0 ml-1" style="min-height: 0" :aria-label="$t('app.layerList.playAnimation')" @click="onPlayRasterSequence(layer)"><i class="bi bi-play" aria-hidden="true"></i></el-button>
                         <el-button v-else link type="primary" class="p-0 ml-1" style="min-height: 0" :aria-label="$t('app.layerList.stopAnimation')" @click="onStopRasterSequence()"><i class="bi bi-stop" aria-hidden="true"></i></el-button>
                     </span>
-                    <div class="is-flex">
+                    <div class="flex">
                         <el-scrollbar>
                             <ul class="og-layer-frames-list">
                                 <li v-for="(frame, index) in layer.data.sequence" :key="index">
@@ -66,7 +66,7 @@
                                 </li>
                             </ul>
                         </el-scrollbar>
-                        <el-button :aria-label="$t('app.layerList.editFrames')" class="is-flex-grow-0 is-border-radius-attach-left px-2 py-0 mb-2">
+                        <el-button :aria-label="$t('app.layerList.editFrames')" class="grow-0 rounded-s-none px-2 py-0 mb-2">
                             <i class="bi bi-pencil-square" aria-hidden="true"></i>
                         </el-button>
                     </div>
@@ -74,11 +74,11 @@
                 <!-- Effects -->
                 <span v-if="layer.filters?.length > 0" role="group" class="og-layer-attributes">
                     <span class="og-layer-attributes__title">
-                        <span class="is-flex is-flex-direction-row">
+                        <span class="flex flex-row">
                             <i class="bi bi-arrow-return-right mr-1" aria-hidden="true"></i>
                             {{ $t('app.layerList.effects') }}
                             <transition name="og-transition-fade">
-                                <img v-if="layer.isBaking" src="../../assets/images/loading-spinner.svg" class="is-align-self-center ml-3 mr-1" style="width: 1rem" />
+                                <img v-if="layer.isBaking" src="../../assets/images/loading-spinner.svg" class="self-center ml-3 mr-1" style="width: 1rem" />
                             </transition>
                             <!-- <transition name="og-transition-fade">
                                 <span v-if="layer.isBaking" v-t="'app.layerList.recalculatingEffect'" class="has-color-primary" />
@@ -120,7 +120,7 @@
                         :title="$t('app.layerList.emptyGroup')"
                         show-icon
                         :closable="false"
-                        class="is-justify-content-center">
+                        class="justify-center">
                     </el-alert>
                     <app-layer-list
                         v-if="layer.layers && layer.expanded && layer.layers.length > 0"
@@ -325,7 +325,6 @@ function reverseLayerList(layerList: WorkingFileAnyLayer<ColorModel>[]): Working
 async function onLayerSettingsSelect(action: string) {
     const layer = getLayerById(showLayerSettingsMenuFor.value ?? -1);
     if (!layer) return;
-    console.log('asf', layer.id);
 
     if (action === 'rename') {
         runModule('layer', 'rename', { layerId: layer.id, });
