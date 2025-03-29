@@ -1,4 +1,4 @@
-.ogr-canvas, .ogr-post-process-canvas {
+.og-canvas, .og-post-process-canvas {
     display: block;
     position: absolute;
     top: 0;
@@ -14,14 +14,14 @@
     image-rendering: crisp-edges;
 }
 
-.ogr-canvas-border {
-    border-width: var(--ogr-canvas-border-width, 1px);
+.og-canvas-border {
+    border-width: var(--og-canvas-border-width, 1px);
     border-style: solid;
-    border-color: var(--ogr-working-image-border-color, #cccccc);
+    border-color: var(--og-working-image-border-color, #cccccc);
     box-shadow: white 0px 0px 0px 2px #ffffff88;
 }
 
-.ogr-canvas-area {
+.og-canvas-area {
     display: block;
     position: absolute;
     top: 0;
@@ -31,17 +31,17 @@
     width: 100%;
     height: 100%;
 }
-.ogr-canvas-area--loading > * {
+.og-canvas-area--loading > * {
     visibility: hidden;
 }
 
-.ogr-canvas-background {
+.og-canvas-background {
     transform-origin: 0 0;
     background-image: url('../images/transparency-bg.png');
     background-repeat: repeat;
 }
 
-.ogr-canvas-container {
+.og-canvas-container {
     display: block;
     position: absolute;
     top: 0;
@@ -51,10 +51,10 @@
     width: 100%;
     height: 100%;
 
-    &.ogr-canvas-viewport-css {
+    &.og-canvas-viewport-css {
         transform-origin: 0 0;
 
-        .ogr-canvas, .ogr-post-process-canvas {
+        .og-canvas, .og-post-process-canvas {
             width: auto;
             height: auto;
             right: auto;
@@ -67,12 +67,12 @@
             image-rendering: high-quality;
         }
 
-        .ogr-post-process-canvas {
+        .og-post-process-canvas {
             transform-origin: top left;
         }
 
-        &.ogr-canvas-viewport-css--pixelated {
-            .ogr-canvas {
+        &.og-canvas-viewport-css--pixelated {
+            .og-canvas {
                 image-rendering: optimizespeed;
                 image-rendering: crisp-edges;
                 image-rendering: pixelated;
@@ -81,7 +81,7 @@
     }
 }
 
-.ogr-canvas-overlays {
+.og-canvas-overlays {
     display: block;
     position: absolute;
     transform-origin: 0 0;
@@ -93,7 +93,7 @@
     height: 100%;
     z-index: 2;
 
-    .ogr-canvas-overlay {
+    .og-canvas-overlay {
         position: absolute;
         top: 0;
         left: 0;
@@ -105,7 +105,7 @@
     }
 }
 
-.ogr-canvas-overlay-draw-bounds {
+.og-canvas-overlay-draw-bounds {
     position: absolute;
     top: 0;
     right: 0;
@@ -118,11 +118,11 @@
     }
 }
 
-.ogr-canvas-overlay__gradient-range-line {
+.og-canvas-overlay__gradient-range-line {
     position: absolute;
 }
 
-.ogr-canvas-overlay__gradient-position-handle {
+.og-canvas-overlay__gradient-position-handle {
     position: absolute;
     width: 5px;
     height: 5px;
@@ -132,7 +132,7 @@
     transform: translate(-50%, -50%);
 }
 
-.ogr-canvas-selection-mask {
+.og-canvas-selection-mask {
     display: block;
     position: absolute;
     top: 0;

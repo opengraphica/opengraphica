@@ -1,8 +1,8 @@
 <template>
-    <div ref="overlay" class="ogr-canvas-overlay">
+    <div ref="overlay" class="og-canvas-overlay">
         <div ref="freeTransform"
             v-show="selectedLayerCount > 0 && !isBoundsIndeterminate"
-            class="ogr-free-transform"
+            class="og-free-transform"
             :style="{
                 width: width + 'px',
                 height: height + 'px',
@@ -10,66 +10,66 @@
                 transformOrigin: transformOrigin
             }"
         >
-            <div class="ogr-free-transform-bounds" :style="{
+            <div class="og-free-transform-bounds" :style="{
                 outlineWidth: (0.35/zoom) + 'rem'
             }"></div>
-            <div class="ogr-free-transform-handle-rotate" :style="{ transform: 'scale(' + (1/zoom) + ')', top: (-2 / zoom) + 'rem' }">
-                <div class="ogr-free-transform-handle-rotate-line"></div>
+            <div class="og-free-transform-handle-rotate" :style="{ transform: 'scale(' + (1/zoom) + ')', top: (-2 / zoom) + 'rem' }">
+                <div class="og-free-transform-handle-rotate-line"></div>
                 <svg viewBox="0 0 100 100">
                     <circle cx="50" cy="50" r="45" fill="white" :stroke="rotateHandleHighlight === true ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
                     <circle cx="50" cy="50" r="25" :fill="rotateHandleHighlight === true ? dragHandleHighlightBorderColor : '#ccc'" />
                 </svg>
             </div>
-            <div v-show="isResizeEnabled && isUnevenScalingEnabled && !hideVerticalSideHandles" class="ogr-free-transform-handle-top" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+            <div v-show="isResizeEnabled && isUnevenScalingEnabled && !hideVerticalSideHandles" class="og-free-transform-handle-top" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
                     <path d="M10 10 L90 10 L90 90 L10 90 Z"
                         :fill="dragHandleHighlight === DRAG_TYPE_TOP ? dragHandleHighlightColor : 'white'"
                         :stroke="dragHandleHighlight === DRAG_TYPE_TOP ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
                 </svg>
             </div>
-            <div v-show="isResizeEnabled && isUnevenScalingEnabled && !hideHorizontalSideHandles" class="ogr-free-transform-handle-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+            <div v-show="isResizeEnabled && isUnevenScalingEnabled && !hideHorizontalSideHandles" class="og-free-transform-handle-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
                     <path d="M10 10 L90 10 L90 90 L10 90 Z"
                         :fill="dragHandleHighlight === DRAG_TYPE_LEFT ? dragHandleHighlightColor : 'white'"
                         :stroke="dragHandleHighlight === DRAG_TYPE_LEFT ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
                 </svg>
             </div>
-            <div v-show="isResizeEnabled && isUnevenScalingEnabled && !hideVerticalSideHandles" class="ogr-free-transform-handle-bottom" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+            <div v-show="isResizeEnabled && isUnevenScalingEnabled && !hideVerticalSideHandles" class="og-free-transform-handle-bottom" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
                     <path d="M10 10 L90 10 L90 90 L10 90 Z"
                         :fill="dragHandleHighlight === DRAG_TYPE_BOTTOM ? dragHandleHighlightColor : 'white'"
                         :stroke="dragHandleHighlight === DRAG_TYPE_BOTTOM ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
                 </svg>
             </div>
-            <div v-show="isResizeEnabled && isUnevenScalingEnabled && !hideHorizontalSideHandles" class="ogr-free-transform-handle-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+            <div v-show="isResizeEnabled && isUnevenScalingEnabled && !hideHorizontalSideHandles" class="og-free-transform-handle-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
                     <path d="M10 10 L90 10 L90 90 L10 90 Z"
                         :fill="dragHandleHighlight === DRAG_TYPE_RIGHT ? dragHandleHighlightColor : 'white'"
                         :stroke="dragHandleHighlight === DRAG_TYPE_RIGHT ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
                 </svg>
             </div>
-            <div v-show="isResizeEnabled" class="ogr-free-transform-handle-top-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+            <div v-show="isResizeEnabled" class="og-free-transform-handle-top-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
                     <path d="M10 10 L90 10 L90 90 L10 90 Z"
                         :fill="dragHandleHighlight === (DRAG_TYPE_TOP | DRAG_TYPE_LEFT) ? dragHandleHighlightColor : 'white'"
                         :stroke="dragHandleHighlight === (DRAG_TYPE_TOP | DRAG_TYPE_LEFT) ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
                 </svg>
             </div>
-            <div v-show="isResizeEnabled" class="ogr-free-transform-handle-top-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+            <div v-show="isResizeEnabled" class="og-free-transform-handle-top-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
                     <path d="M10 10 L90 10 L90 90 L10 90 Z"
                         :fill="dragHandleHighlight === (DRAG_TYPE_TOP | DRAG_TYPE_RIGHT) ? dragHandleHighlightColor : 'white'"
                         :stroke="dragHandleHighlight === (DRAG_TYPE_TOP | DRAG_TYPE_RIGHT) ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
                 </svg>
             </div>
-            <div v-show="isResizeEnabled" class="ogr-free-transform-handle-bottom-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+            <div v-show="isResizeEnabled" class="og-free-transform-handle-bottom-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
                     <path d="M10 10 L90 10 L90 90 L10 90 Z"
                         :fill="dragHandleHighlight === (DRAG_TYPE_BOTTOM | DRAG_TYPE_LEFT) ? dragHandleHighlightColor : 'white'"
                         :stroke="dragHandleHighlight === (DRAG_TYPE_BOTTOM | DRAG_TYPE_LEFT) ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
                 </svg>
             </div>
-            <div v-show="isResizeEnabled" class="ogr-free-transform-handle-bottom-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+            <div v-show="isResizeEnabled" class="og-free-transform-handle-bottom-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
                     <path d="M10 10 L90 10 L90 90 L10 90 Z"
                         :fill="dragHandleHighlight === (DRAG_TYPE_BOTTOM | DRAG_TYPE_RIGHT) ? dragHandleHighlightColor : 'white'"

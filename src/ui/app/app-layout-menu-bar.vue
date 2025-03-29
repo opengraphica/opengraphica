@@ -1,7 +1,7 @@
 <template>
     <div
         ref="menuBarElement"
-        class="ogr-layout-menu-bar theme-dark"
+        class="og-layout-menu-bar theme-dark"
         :class="[
             'is-positioned-' + layoutPlacement,
             {
@@ -14,13 +14,13 @@
             <div
                 v-for="(actionGroupSection, actionGroupSectionName) of actionGroups"
                 :key="actionGroupSectionName"
-                class="ogr-menu-section my-2"
-                :class="['ogr-menu-' + actionGroupSectionName, {
+                class="og-menu-section my-2"
+                :class="['og-menu-' + actionGroupSectionName, {
                     'pl-3 pr-0': actionGroupSectionName === 'docks' && direction === 'horizontal',
                     'px-3': actionGroupSectionName !== 'tools' && direction === 'vertical',
                 }]"
             >
-                <span v-if="actionGroupSectionName === 'tools'" class="ogr-menu-section__title">{{ $t('menuBar.toolsHeading') }}</span>
+                <span v-if="actionGroupSectionName === 'tools'" class="og-menu-section__title">{{ $t('menuBar.toolsHeading') }}</span>
                 <component
                     v-if="displayMode === 'all' || actionGroupSectionName === 'tools'"
                     :is="actionGroupSectionName === 'tools' ? (direction === 'vertical' ? 'el-scrollbar' : 'el-horizontal-scrollbar-arrows') : 'v-fragment'"
@@ -28,14 +28,14 @@
                     @scroll="onScrollTools"
                 >
                     <template v-for="actionGroup of actionGroupSection" :key="actionGroup.id">
-                        <component :is="actionGroup.controls.length === 1 ? 'div' : 'el-button-group'" :class="{ 'ogr-single-button-group': actionGroup.controls.length === 1 }">
+                        <component :is="actionGroup.controls.length === 1 ? 'div' : 'el-button-group'" :class="{ 'og-single-button-group': actionGroup.controls.length === 1 }">
                             <template v-for="control of actionGroup.controls" :key="control.label">
                                 <el-popover
                                     v-model:visible="control.popoverVisible"
                                     :trigger="[]"
                                     effect="light"
                                     :placement="popoverPlacement"
-                                    :popper-class="'ogr-dock-popover'"
+                                    :popper-class="'og-dock-popover'"
                                     :show-after="0"
                                     :hide-after="0"
                                     :transition="control.showDock ? 'el-fade-in-linear' : 'none'"
@@ -51,7 +51,7 @@
                                             :circle="!control.expanded"
                                             :round="control.expanded"
                                             :class="{
-                                                'ogr-menu-bar-button--hover-title': !control.expanded,
+                                                'og-menu-bar-button--hover-title': !control.expanded,
                                                 'el-button--expanded-group': control.expanded,
                                                 'el-button--expanded-popover': control.showDock
                                             }"
@@ -70,7 +70,7 @@
                                         </el-button>
                                     </template>
                                     <template v-if="control.showDock">
-                                        <div v-if="control.displayTitle" class="ogr-dock-title" v-t="control.displayTitle" />
+                                        <div v-if="control.displayTitle" class="og-dock-title" v-t="control.displayTitle" />
                                         <dynamically-loaded-dock
                                             :name="control.action.target" :key="'dock-' + control.action.target"
                                             @update:title="control.displayTitle = $event"
@@ -80,7 +80,7 @@
                                     <template v-else>
                                         <div class="px-4 py-3">
                                             <strong class="has-text-weight-bold">{{ $t(control.label) }}</strong>
-                                            <ol v-if="$tm(control.description)?.length > 0" class="ogr-list--dashed">
+                                            <ol v-if="$tm(control.description)?.length > 0" class="og-list--dashed">
                                                 <li
                                                     v-for="descriptionLine of $tm(control.description)"
                                                     :key="descriptionLine"
@@ -98,7 +98,7 @@
             </div>
             <div
                 v-if="isTouchUser"
-                class="ogr-menu-end"
+                class="og-menu-end"
                 :class="{
                     'pr-3': direction === 'horizontal',
                     'px-3': direction === 'vertical',
@@ -108,7 +108,7 @@
                     <span class="el-icon bi bi-arrow-counterclockwise" aria-hidden="true" />
                 </el-button>
             </div>
-            <div v-else class="ogr-menu-end px-3" style="height: 0px; overflow: hidden; visibility: hidden;">
+            <div v-else class="og-menu-end px-3" style="height: 0px; overflow: hidden; visibility: hidden;">
                 <el-button aria-hidden="true" circle round>
                     <span class="el-icon" aria-hidden="true" />
                 </el-button>
@@ -116,22 +116,22 @@
         </div>
         <div
             v-if="showToolGroupExpandButton && (toolGroupExpandOffsetTop || toolGroupExpandOffsetLeft)"
-            class="ogr-menu-bar__tool-group-expand"
+            class="og-menu-bar__tool-group-expand"
             :class="{
-                'ogr-menu-bar__tool-group-expand--expanded': isActiveToolGroupExpanded
+                'og-menu-bar__tool-group-expand--expanded': isActiveToolGroupExpanded
             }"
             :style="{
                 top: toolGroupExpandOffsetTop,
                 left: toolGroupExpandOffsetLeft,
             }"
         >
-            <div v-if="isActiveToolGroupExpanded" class="ogr-menu-bar__tool-group-expand__controls">
+            <div v-if="isActiveToolGroupExpanded" class="og-menu-bar__tool-group-expand__controls">
                 <button
                     v-for="control in activeToolGroupControls"
                     :key="control.label"
                     :aria-label="$t(control.label)"
                     :class="{
-                        'ogr-menu-bar__tool-group-expand__control--active': control.action?.target == activeTool
+                        'og-menu-bar__tool-group-expand__control--active': control.action?.target == activeTool
                     }"
                     @touchstart="onTouchStartControlButton($event, control)"
                     @touchend="onTouchEndControlButton($event, control)"
@@ -145,7 +145,7 @@
                 </button>
             </div>
             <button
-                class="ogr-menu-bar__tool-group-expand__toggle-button"
+                class="og-menu-bar__tool-group-expand__toggle-button"
                 :aria-label="isActiveToolGroupExpanded ? $t('menuBar.collapseToolGroup') : $t('menuBar.expandToolGroup')"
                 @click="isActiveToolGroupExpanded = !isActiveToolGroupExpanded"
             >

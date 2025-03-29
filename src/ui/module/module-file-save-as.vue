@@ -30,7 +30,7 @@
                 class="mb-4">
             </el-alert>
         </template>
-        <transition name="scale-down">
+        <transition name="og-transition-scale-down">
             <el-form-item-group v-if="!formData.workingFile.saveBackDirectly">
                 <el-form-item :label="$t('module.fileSaveAs.fileName')" prop="fileName">
                     <el-input v-model="formData.workingFile.fileName" clearable></el-input>

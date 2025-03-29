@@ -1,5 +1,5 @@
 <template>
-    <div class="ogr-dialogs" :hidden="isAllDialogsHidden" :class="{ 'ogr-dialogs--loading': loading }">
+    <div class="og-dialogs" :hidden="isAllDialogsHidden" :class="{ 'og-dialogs--loading': loading }">
         <template v-for="dialog of dialogs" :key="dialog.id">
             <suspense>
                 <template #default>
@@ -7,7 +7,7 @@
                         :title="$t(dialog.title || 'empty')"
                         :class="[
                             'el-dialog--' + dialog.size,
-                            'el-dialog--ogr-' + dialog.type,
+                            'el-dialog--og-' + dialog.type,
                         ]"
                         v-model="dialog.visible"
                         :destroy-on-close="!dialog.temporarilyHidden"

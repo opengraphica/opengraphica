@@ -1,36 +1,36 @@
 <template>
-    <div class="ogr-canvas-overlay">
-        <div ref="crop" class="ogr-crop" :style="{ top: top + 'px', left: left + 'px', width: width + 'px', height: height + 'px' }">
-            <div class="ogr-crop-bounds" :style="{ outlineWidth: (0.35/zoom) + 'rem' }"></div>
-            <div class="ogr-crop-handle-top" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+    <div class="og-canvas-overlay">
+        <div ref="crop" class="og-crop" :style="{ top: top + 'px', left: left + 'px', width: width + 'px', height: height + 'px' }">
+            <div class="og-crop-bounds" :style="{ outlineWidth: (0.35/zoom) + 'rem' }"></div>
+            <div class="og-crop-handle-top" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
                     <path v-if="showHorizontalHandles" d="M1.5 98.5 L98.5 98.5 L98.5 75 L1.5 75 Z"
                         :fill="dragHandleHighlight === DRAG_TYPE_TOP ? dragHandleHighlightColor : 'white'"
                         :stroke="dragHandleHighlight === DRAG_TYPE_TOP ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
                 </svg>
             </div>
-            <div class="ogr-crop-handle-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+            <div class="og-crop-handle-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
                     <path v-if="showVerticalHandles" d="M1.5 98.5 L98.5 98.5 L98.5 75 L1.5 75 Z"
                         :fill="dragHandleHighlight === DRAG_TYPE_LEFT ? dragHandleHighlightColor : 'white'"
                         :stroke="dragHandleHighlight === DRAG_TYPE_LEFT ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
                 </svg>
             </div>
-            <div class="ogr-crop-handle-bottom" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+            <div class="og-crop-handle-bottom" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
                     <path v-if="showHorizontalHandles" d="M1.5 98.5 L98.5 98.5 L98.5 75 L1.5 75 Z"
                         :fill="dragHandleHighlight === DRAG_TYPE_BOTTOM ? dragHandleHighlightColor : 'white'" 
                         :stroke="dragHandleHighlight === DRAG_TYPE_BOTTOM ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
                 </svg>
             </div>
-            <div class="ogr-crop-handle-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+            <div class="og-crop-handle-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
                     <path v-if="showVerticalHandles" d="M1.5 98.5 L98.5 98.5 L98.5 75 L1.5 75 Z"
                         :fill="dragHandleHighlight === DRAG_TYPE_RIGHT ? dragHandleHighlightColor : 'white'"
                         :stroke="dragHandleHighlight === DRAG_TYPE_RIGHT ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
                 </svg>
             </div>
-            <div class="ogr-crop-handle-top-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+            <div class="og-crop-handle-top-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
                     <path v-if="isSmallHandles" d="M1.5 1.5 L25 1.5 L25 25 L1.5 25 Z"
                         :fill="dragHandleHighlight === (DRAG_TYPE_TOP | DRAG_TYPE_LEFT) ? dragHandleHighlightColor : 'white'"
@@ -40,7 +40,7 @@
                         :stroke="dragHandleHighlight === (DRAG_TYPE_TOP | DRAG_TYPE_LEFT) ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
                 </svg>
             </div>
-            <div class="ogr-crop-handle-top-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+            <div class="og-crop-handle-top-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
                     <path v-if="isSmallHandles" d="M1.5 1.5 L25 1.5 L25 25 L1.5 25 Z"
                         :fill="dragHandleHighlight === (DRAG_TYPE_TOP | DRAG_TYPE_RIGHT) ? dragHandleHighlightColor : 'white'"
@@ -50,7 +50,7 @@
                         :stroke="dragHandleHighlight === (DRAG_TYPE_TOP | DRAG_TYPE_RIGHT) ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
                 </svg>
             </div>
-            <div class="ogr-crop-handle-bottom-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+            <div class="og-crop-handle-bottom-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
                     <path v-if="isSmallHandles" d="M1.5 1.5 L25 1.5 L25 25 L1.5 25 Z"
                         :fill="dragHandleHighlight === (DRAG_TYPE_BOTTOM | DRAG_TYPE_LEFT) ? dragHandleHighlightColor : 'white'"
@@ -60,7 +60,7 @@
                         :stroke="dragHandleHighlight === (DRAG_TYPE_BOTTOM | DRAG_TYPE_LEFT) ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="3" />
                 </svg>
             </div>
-            <div class="ogr-crop-handle-bottom-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+            <div class="og-crop-handle-bottom-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
                     <path v-if="isSmallHandles" d="M1.5 1.5 L25 1.5 L25 25 L1.5 25 Z"
                         :fill="dragHandleHighlight === (DRAG_TYPE_BOTTOM | DRAG_TYPE_RIGHT) ? dragHandleHighlightColor : 'white'"
@@ -71,8 +71,8 @@
                 </svg>
             </div>
         </div>
-        <div v-show="previewXSnap != null" class="ogr-snap-preview ogr-snap-preview-vertical" :style="{ left: (previewXSnap - (1/zoom/2)) + 'px', width: (1/zoom) + 'px', height: fileHeight + 'px' }"></div>
-        <div v-show="previewYSnap != null" class="ogr-snap-preview ogr-snap-preview-horizontal" :style="{ top: (previewYSnap - (1/zoom/2)) + 'px', height: (1/zoom) + 'px', width: fileWidth + 'px' }"></div>
+        <div v-show="previewXSnap != null" class="og-snap-preview og-snap-preview-vertical" :style="{ left: (previewXSnap - (1/zoom/2)) + 'px', width: (1/zoom) + 'px', height: fileHeight + 'px' }"></div>
+        <div v-show="previewYSnap != null" class="og-snap-preview og-snap-preview-horizontal" :style="{ top: (previewYSnap - (1/zoom/2)) + 'px', height: (1/zoom) + 'px', width: fileWidth + 'px' }"></div>
     </div>
 </template>
 

@@ -1,4 +1,4 @@
-.ogr-layer-list {
+.og-layer-list {
     --layer-group-indent: 0px;
     list-style: none;
     margin: 0;
@@ -7,13 +7,13 @@
     overflow: hidden; // Prevent scroll during dragging from increasing container size
 
     &.is-dnd-dragging {
-        > .ogr-layer > * {
+        > .og-layer > * {
             pointer-events: none;
         }
     }
 
-    .ogr-layer {
-        background: var(--ogr-layout-menu-bar-background-color);
+    .og-layer {
+        background: var(--og-layout-menu-bar-background-color);
         list-style: none;
         margin: 0;
         padding: 0;
@@ -23,25 +23,25 @@
             display: none !important;
         }
 
-        .ogr-layer {
+        .og-layer {
             background: none;
         }
 
         &,
-        .ogr-layer {
+        .og-layer {
             &.is-active {
                 position: relative;
-                background-color: var(--ogr-layout-menu-bar-background-color);
-                background-image: linear-gradient(var(--ogr-layer-list-background-color-active), var(--ogr-layer-list-background-color-active));
-                box-shadow: 0.1875rem 0 0 var(--ogr-layer-list-thumbnail-border-color-active) inset;
+                background-color: var(--og-layout-menu-bar-background-color);
+                background-image: linear-gradient(var(--og-layer-list-background-color-active), var(--og-layer-list-background-color-active));
+                box-shadow: 0.1875rem 0 0 var(--og-layer-list-thumbnail-border-color-active) inset;
             }
 
             &.is-dnd-hover {
-                box-shadow: 0 0 0 4px inset var(--ogr-layer-list-background-color-hover);
+                box-shadow: 0 0 0 4px inset var(--og-layer-list-background-color-hover);
             }
 
             &.is-dnd-placeholder {
-                background: var(--ogr-layout-menu-bar-background-color);
+                background: var(--og-layout-menu-bar-background-color);
                 position: relative;
                 box-shadow: none;
 
@@ -65,7 +65,7 @@
             &.is-dragging {
                 pointer-events: none;
                 position: absolute;
-                background: var(--ogr-layer-list-background-color-drag);
+                background: var(--og-layer-list-background-color-drag);
                 box-shadow: 0 0 1rem rgba(0, 0, 0, 0.2);
                 left: 0;
                 right: 0;
@@ -78,10 +78,10 @@
             border-top: 1px solid var(--el-border-color);
             border-radius: 0 0 0.875rem 0.875rem;
 
-            > .ogr-layer-main {
+            > .og-layer-main {
                 height: 3.5rem;
 
-                .ogr-layer-thumbnail {
+                .og-layer-thumbnail {
                     cursor: pointer !important;
                 }
             }
@@ -93,7 +93,7 @@
                 content: '';
                 display: block;
                 position: absolute;
-                background: var(--ogr-snap-line-color);
+                background: var(--og-snap-line-color);
                 height: 0.25rem;
                 bottom: 0;
                 left: 0;
@@ -107,7 +107,7 @@
                 content: '';
                 display: block;
                 position: absolute;
-                background: var(--ogr-snap-line-color);
+                background: var(--og-snap-line-color);
                 height: 0.25rem;
                 top: 0;
                 left: 0;
@@ -116,14 +116,14 @@
         }
 
         &.is-drag-insert-inside {
-            > .ogr-layer-list, > .el-alert {
+            > .og-layer-list, > .el-alert {
                 position: relative;
                 &:after {
                     content: '';
                     display: block;
                     box-sizing: border-box;
                     position: absolute;
-                    border: 0.25rem solid var(--ogr-snap-line-color);
+                    border: 0.25rem solid var(--og-snap-line-color);
                     bottom: 0;
                     top: 0;
                     left: 0;
@@ -136,14 +136,14 @@
             background: transparent;
         }
 
-        > .ogr-layer-main {
+        > .og-layer-main {
             display: flex;
             flex-direction: row;
             height: 4rem;
             transition: height 0.3s;
             padding: 0 0 0 var(--layer-group-indent, 0);
 
-            .ogr-layer-dnd-handle {
+            .og-layer-dnd-handle {
                 cursor: pointer;
                 display: flex;
                 flex-direction: row;
@@ -151,7 +151,7 @@
                 overflow: hidden;
             }
 
-            .ogr-layer-thumbnail {
+            .og-layer-thumbnail {
                 cursor: move;
                 display: flex;
                 justify-content: center;
@@ -167,7 +167,7 @@
                     width: auto;
                     height: 100%;
                     box-sizing: border-box;
-                    border: .25rem solid var(--ogr-layer-list-thumbnail-border-color);
+                    border: .25rem solid var(--og-layer-list-thumbnail-border-color);
 
                     &.is-larger-width {
                         width: 100%;
@@ -175,16 +175,16 @@
                     }
                 }
 
-                .ogr-layer-thumbnail-custom-img {
+                .og-layer-thumbnail-custom-img {
                     background: white;
                     width: 4rem;
                     height: 100%;
                     box-sizing: border-box;
-                    border: .25rem solid var(--ogr-layer-list-thumbnail-border-color);
+                    border: .25rem solid var(--og-layer-list-thumbnail-border-color);
                 }
             }
 
-            .ogr-layer-name {
+            .og-layer-name {
                 display: block;
                 padding: 0 0.5rem 0 0;
                 align-self: center;
@@ -198,7 +198,7 @@
                 }
             }
 
-            .ogr-layer-group-arrow {
+            .og-layer-group-arrow {
                 color: var(--el-text-color-secondary);
                 align-self: center;
                 padding-right: .5rem;
@@ -208,16 +208,16 @@
                 min-height: 0;
 
                 &:hover {
-                    background: var(--ogr-layer-list-background-color-hover);
+                    background: var(--og-layer-list-background-color-hover);
                 }
             }
         }
 
         &.is-expanded {
-            > .ogr-layer-main {
+            > .og-layer-main {
                 height: 2.75rem;
 
-                .ogr-layer-thumbnail {
+                .og-layer-thumbnail {
                     img {
                         &.is-larger-width {
                             width: auto;
@@ -228,25 +228,25 @@
             }
         }
 
-        .ogr-layer-attributes {
+        .og-layer-attributes {
             display: block;
             margin: 0 0.5rem 0 calc(2rem + var(--layer-group-indent, 0rem));
-            // border-top: 0.0625rem solid var(--ogr-layer-list-border-color);
-            // border-bottom: 0.0625rem solid var(--ogr-layer-list-border-color);
+            // border-top: 0.0625rem solid var(--og-layer-list-border-color);
+            // border-bottom: 0.0625rem solid var(--og-layer-list-border-color);
 
             /*
-            + .ogr-layer-attributes {
+            + .og-layer-attributes {
                 margin-top: -0.0625rem;
             }
             */
 
-            .ogr-layer-attributes__title {
+            .og-layer-attributes__title {
                 display: block;
                 padding: 0 0 0.25rem 0;
             }
         }
 
-        .ogr-layer-effect-stack {
+        .og-layer-effect-stack {
             display: block;
             list-style: none;
             padding: 0 0 0.25rem 0;
@@ -280,19 +280,19 @@
                     }
 
                     &:not(.is-disabled):hover {
-                        background: var(--ogr-layer-list-background-color-hover);
+                        background: var(--og-layer-list-background-color-hover);
                     }
                 }
             }
         }
 
-        .ogr-layer-frames {
+        .og-layer-frames {
             .el-scrollbar__view {
                 display: inline-block;
             }
         }
 
-        .ogr-layer-frames-list {
+        .og-layer-frames-list {
             list-style: none;
             margin: 0;
             padding: 0 0 0.5rem 0;
@@ -305,7 +305,7 @@
                 margin: 0 0.5rem 0 0;
                 padding: 0;
 
-                .ogr-layer-thumbnail {
+                .og-layer-thumbnail {
                     cursor: pointer;
                     display: block;
                     width: auto;
@@ -320,10 +320,10 @@
                         margin: 0;
                         padding: 0;
                         box-sizing: border-box;
-                        border: .25rem solid var(--ogr-layer-list-thumbnail-border-color);
+                        border: .25rem solid var(--og-layer-list-thumbnail-border-color);
                     }
 
-                    .ogr-layer-thumbnail__label {
+                    .og-layer-thumbnail__label {
                         font-size: 0.85rem;
                         display: inline-block;
                         position: absolute;
@@ -337,7 +337,7 @@
 
                     &.is-active {
                         img {
-                            border-color: var(--ogr-layer-list-thumbnail-border-color-active);
+                            border-color: var(--og-layer-list-thumbnail-border-color-active);
                         }
                     }
                 }
@@ -349,11 +349,11 @@
         }
     }
 }
-.ogr-menu-drawer__content .ogr-layer-list:last-child {
+.og-menu-drawer__content .og-layer-list:last-child {
     border-bottom-right-radius: .8rem;
 }
 
-.ogr-menu-bar-button--hover-title {
+.og-menu-bar-button--hover-title {
     position: relative;
     // &:hover::before {
     //     content: attr(aria-label);

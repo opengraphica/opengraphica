@@ -1,8 +1,8 @@
-.ogr-color-picker-preview {
+.og-color-picker-preview {
     display: inline-flex;
     flex-direction: row;
 
-    .ogr-color-picker-preview__color {
+    .og-color-picker-preview__color {
         display: block;
         box-sizing: border-box;
         position: relative;
@@ -37,7 +37,7 @@
     }
 }
 
-.ogr-color-picker-gradient {
+.og-color-picker-gradient {
     // background: white;
     position: relative;
     width: 100%;
@@ -72,7 +72,7 @@
         }
     }
 
-    .ogr-color-picker-gradient__hue {
+    .og-color-picker-gradient__hue {
         background: rgb(255, 0, 0);
         padding: 0 var(--el-slider-button-half-size);
         position: relative;
@@ -81,14 +81,14 @@
             background: rgba(0, 0, 0, 0) linear-gradient(to right, rgb(255, 0, 0) 0%, rgb(255, 255, 0) 17%, rgb(0, 255, 0) 33%, rgb(0, 255, 255) 50%, rgb(0, 0, 255) 67%, rgb(255, 0, 255) 83%, rgb(255, 0, 0) 100%) repeat scroll 0% 0%;
         }
 
-        &.ogr-color-picker-gradient__hue--okhsv { 
+        &.og-color-picker-gradient__hue--okhsv { 
             .el-slider__runway {
                 background: transparent;
             }
         }
     }
 
-    .ogr-color-picker-gradient__opacity {
+    .og-color-picker-gradient__opacity {
         background-image: url('../images/transparency-bg.png');
         background-repeat: repeat;
         padding: 0 var(--el-slider-button-half-size);
@@ -97,7 +97,7 @@
         &:before {
             content: '';
             position: absolute;
-            background: var(--ogr-color-pick-opaque);
+            background: var(--og-color-pick-opaque);
             top: 0;
             left: auto;
             right: 0;
@@ -106,11 +106,11 @@
         }
 
         .el-slider__runway {
-            background: rgba(0, 0, 0, 0) linear-gradient(to right, rgba(0, 0, 0, 0) 0%, var(--ogr-color-pick-opaque) 100%) repeat scroll 0% 0%;
+            background: rgba(0, 0, 0, 0) linear-gradient(to right, rgba(0, 0, 0, 0) 0%, var(--og-color-pick-opaque) 100%) repeat scroll 0% 0%;
         }
     }
 
-    .ogr-color-picker-gradient__saturation-value {
+    .og-color-picker-gradient__saturation-value {
         background: white;
         position: relative;
         min-height: 14rem;
@@ -118,16 +118,16 @@
         touch-action: none;
     }
 
-    .ogr-color-picker-gradient__saturation-gradient {
+    .og-color-picker-gradient__saturation-gradient {
         position: absolute;
         left: 0;
         right: 0;
         top: 0;
         bottom: 0;
-        background: linear-gradient(to left, var(--ogr-color-pick-hue) .625rem, rgba(204, 154, 129, 0) calc(100% - .625rem));
+        background: linear-gradient(to left, var(--og-color-pick-hue) .625rem, rgba(204, 154, 129, 0) calc(100% - .625rem));
     }
 
-    .ogr-color-picker-gradient__canvas-gradient {
+    .og-color-picker-gradient__canvas-gradient {
         position: absolute;
         left: 0;
         right: 0;
@@ -137,7 +137,7 @@
         height: 100%;
     }
 
-    .ogr-color-picker-gradient__value-gradient {
+    .og-color-picker-gradient__value-gradient {
         position: absolute;
         left: 0;
         right: 0;
@@ -146,14 +146,14 @@
         background: linear-gradient(to top, #000 .925rem, rgba(204, 154, 129, 0) calc(100% - .925rem));
     }
 
-    .ogr-color-picker-gradient__saturation-value-handle-container {
+    .og-color-picker-gradient__saturation-value-handle-container {
         position: absolute;
         left: .925rem;
         right: .925rem;
         top: .925rem;
         bottom: .925rem;
     }
-    .ogr-color-picker-gradient__saturation-value-handle {
+    .og-color-picker-gradient__saturation-value-handle {
         position: absolute;
         left: 0;
         right: auto;

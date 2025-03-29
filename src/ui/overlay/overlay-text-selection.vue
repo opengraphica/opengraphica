@@ -1,14 +1,14 @@
 <template>
-    <div class="ogr-canvas-overlay">
+    <div class="og-canvas-overlay">
         <div
             v-if="editingLayerCssTransform && selectionBoxes.length > 0"
-            class="ogr-text-selection"
+            class="og-text-selection"
             :style="{ transform: editingLayerCssTransform }"
         >
             <div
                 v-for="(selectionBox, index) of selectionBoxes"
                 :key="index"
-                class="ogr-text-selection__box"
+                class="og-text-selection__box"
                 :style="{
                     transform: `translate(${selectionBox.rect.x}px, ${selectionBox.rect.y}px)`,
                     width: selectionBox.rect.width + 'px',

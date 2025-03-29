@@ -1,9 +1,9 @@
 <template>
     <div class="is-flex container is-align-items-center is-justify-content-center mx-auto">
-        <div class="ogr-toolbar-overlay">
-            <div class="ogr-toolbar-tool-selector">
+        <div class="og-toolbar-overlay">
+            <div class="og-toolbar-tool-selector">
                 <span class="bi bi-cursor my-1" aria-hidden="true"></span>
-                <span class="ogr-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
+                <span class="og-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
             </div>
             <el-horizontal-scrollbar-arrows>
                 <el-button v-if="hasSelection" size="small" @click="onClickClearSelection">
@@ -20,7 +20,7 @@
                 </el-input-group>
                 <el-popover
                     placement="top"
-                    popper-class="ogr-dock-popover"
+                    popper-class="og-dock-popover"
                     trigger="click"
                     :width="250"
                     :popper-options="{
@@ -40,7 +40,7 @@
                             <span class="bi bi-magnet-fill mr-2" aria-hidden="true" /> {{ $t('toolbar.freeTransform.snapping.title') }}
                         </el-button>
                     </template>
-                    <h2 class="ogr-dock-title" v-t="'toolbar.freeTransform.snapping.title'" />
+                    <h2 class="og-dock-title" v-t="'toolbar.freeTransform.snapping.title'" />
                     <el-form novalidate="novalidate" action="javascript:void(0)">
                         <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="$t('toolbar.freeTransform.snapping.rotationSnap')">
                             <el-switch v-model="useRotationSnapping" />
@@ -49,7 +49,7 @@
                 </el-popover>
                 <el-popover
                     placement="top"
-                    popper-class="ogr-dock-popover"
+                    popper-class="og-dock-popover"
                     trigger="click"
                     :width="250"
                     :popper-options="{
@@ -69,7 +69,7 @@
                             <span class="bi bi-clipboard-data-fill mr-2" aria-hidden="true" /> {{ $t('toolbar.freeTransform.metrics.title') }}
                         </el-button>
                     </template>
-                    <h2 class="ogr-dock-title" v-t="'toolbar.freeTransform.metrics.title'" />
+                    <h2 class="og-dock-title" v-t="'toolbar.freeTransform.metrics.title'" />
                     <template v-if="selectedLayerIds.length > 0">
                         <el-form novalidate="novalidate" action="javascript:void(0)" style="max-width: 15rem;">
                             <div class="px-4.5 my-3 is-flex">
@@ -123,7 +123,7 @@
                 <el-popover
                     v-model:visible="isActionPopoverVisible"
                     placement="top"
-                    popper-class="ogr-dock-popover"
+                    popper-class="og-dock-popover"
                     trigger="click"
                     :width="250"
                     :popper-options="{

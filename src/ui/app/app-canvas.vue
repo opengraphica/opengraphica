@@ -1,12 +1,12 @@
 <template>
-    <div ref="canvasArea" class="ogr-canvas-area" :class="{ 'ogr-canvas-area--loading': loading }">
-        <div v-if="useCanvasBackground" ref="canvasBackground" class="ogr-canvas-background"></div>
-        <div ref="canvasContainer" class="ogr-canvas-container" :class="{ 'ogr-canvas-viewport-css': useCssViewport, 'ogr-canvas-viewport-css--pixelated': isPixelatedZoomLevel }">
-            <canvas ref="canvas" class="ogr-canvas" />
+    <div ref="canvasArea" class="og-canvas-area" :class="{ 'og-canvas-area--loading': loading }">
+        <div v-if="useCanvasBackground" ref="canvasBackground" class="og-canvas-background"></div>
+        <div ref="canvasContainer" class="og-canvas-container" :class="{ 'og-canvas-viewport-css': useCssViewport, 'og-canvas-viewport-css--pixelated': isPixelatedZoomLevel }">
+            <canvas ref="canvas" class="og-canvas" />
         </div>
-        <canvas ref="selectionMaskCanvas" class="ogr-canvas-selection-mask" />
+        <canvas ref="selectionMaskCanvas" class="og-canvas-selection-mask" />
         <overlay ref="canvasOverlays" :css-view-transform="cssViewTransform" />
-        <div v-if="loading" v-loading="true" class="ogr-canvas-area__loading-animation"></div>
+        <div v-if="loading" v-loading="true" class="og-canvas-area__loading-animation"></div>
     </div>
 </template>
 
@@ -87,7 +87,7 @@ export default defineComponent({
             return editorStore.state.activeToolOverlays.length > 0;
         });
 
-        canvasStore.set('workingImageBorderColor', getComputedStyle(document.documentElement).getPropertyValue('--ogr-working-image-border-color'));
+        canvasStore.set('workingImageBorderColor', getComputedStyle(document.documentElement).getPropertyValue('--og-working-image-border-color'));
 
         // Toggle between CSS and 2D canvas-rendered viewport
         watch([useCssViewport], ([isUseCssViewport]) => {

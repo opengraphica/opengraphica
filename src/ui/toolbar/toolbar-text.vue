@@ -1,9 +1,9 @@
 <template>
     <div class="is-flex container is-align-items-center is-justify-content-center mx-auto">
-        <div class="ogr-toolbar-overlay">
-            <div class="ogr-toolbar-tool-selector">
+        <div class="og-toolbar-overlay">
+            <div class="og-toolbar-tool-selector">
                 <span class="bi bi-type my-1" aria-hidden="true"></span>
-                <span class="ogr-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
+                <span class="og-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
             </div>
             <el-horizontal-scrollbar-arrows>
                 <!-- Font Family -->
@@ -54,7 +54,7 @@
                 <!-- Alignment -->
                 <el-popover
                     placement="bottom"
-                    popper-class="ogr-dock-popover"
+                    popper-class="og-dock-popover"
                     trigger="click"
                     :width="250"
                     :popper-options="{
@@ -73,7 +73,7 @@
                             <span class="bi bi-aspect-ratio mr-2" aria-hidden="true" /> {{ $t('toolbar.text.alignment.title') }}
                         </el-button>
                     </template>
-                    <h2 class="ogr-dock-title" v-t="'toolbar.text.alignment.title'" />
+                    <h2 class="og-dock-title" v-t="'toolbar.text.alignment.title'" />
                     <el-form novalidate="novalidate" action="javascript:void(0)">
                         <!-- Boundary Type -->
                         <el-form-item class="el-form-item--menu-item mb-1" :label="$t('toolbar.text.alignment.boundary')">

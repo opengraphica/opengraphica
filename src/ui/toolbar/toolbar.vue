@@ -1,5 +1,5 @@
 <template>
-    <div class="ogr-toolbar" :class="{ 'is-swap-in': animationSwap === 'in', 'is-swap-out': animationSwap === 'out' }" @animationend="onToolbarAnimationEnd">
+    <div class="og-toolbar" :class="{ 'is-swap-in': animationSwap === 'in', 'is-swap-out': animationSwap === 'out' }" @animationend="onToolbarAnimationEnd">
         <suspense @resolve="onLoadToolbarResolve">
             <template #default>
                 <component :is="'toolbar-' + currentName" @close="onCloseToolbar" />

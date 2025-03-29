@@ -45,24 +45,6 @@ module.exports = function setupConfig(config) {
                     // include: path.resolve(__dirname, 'src'),
                     loader: 'css-loader'
                 },
-                /*{
-                    test: /\.s[ac]ss$/i,
-                    include: path.resolve(__dirname, 'src'),
-                    use: [
-                        'style-loader',
-                        'css-loader',
-                        {
-                            loader: 'sass-loader',
-                            options: {
-                                // Prefer `dart-sass`
-                                implementation: require('sass'),
-                                sassOptions: {
-                                    includePaths: [path.resolve(__dirname, './src')],
-                                },
-                            }
-                        }
-                    ]
-                },*/
                 {
                     test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
                     // include: path.resolve(__dirname, 'src'),
@@ -268,6 +250,10 @@ module.exports = function setupConfig(config) {
                         test: /[\\/]node_modules[\\/](expr-eval)[\\/]/,
                         name: 'expr-eval'
                     },
+                    floatingUi: {
+                        test: /[\\/]node_modules[\\/](@floating-ui)[\\/]/,
+                        name: 'floating-ui'
+                    },
                     gifken: {
                         test: /[\\/]node_modules[\\/]gifken[\\/]/,
                         name: 'gifken'
@@ -278,11 +264,11 @@ module.exports = function setupConfig(config) {
                     },
                     opengraphicaElementInput: {
                         test: /[\\/]src[\\/]ui[\\/](el-input-number|el-input-group)/,
-                        name: 'ogr-element-input'
+                        name: 'og-element-input'
                     },
                     opengraphicaElementForm: {
                         test: /[\\/]src[\\/]ui[\\/](el-form-item-group|el-form-item-aligned-groups)/,
-                        name: 'ogr-element-form'
+                        name: 'og-element-form'
                     },
                     opentype: {
                         test: /[\\/]node_modules[\\/](opentype)[\\/]/,

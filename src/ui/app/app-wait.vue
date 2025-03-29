@@ -1,6 +1,6 @@
 <template>
-    <div class="ogr-wait" :aria-hidden="!waiting" :class="{ 'is-immediate': isImmediate }">
-        <div class="ogr-wait__center">
+    <div class="og-wait" :aria-hidden="!waiting" :class="{ 'is-immediate': isImmediate }">
+        <div class="og-wait__center">
             <div style="width: 100%; height: 5rem;" v-loading="true" element-loading-background="transparent"></div>
             <strong v-t="'app.wait.pleaseWait'"></strong>
             <template v-for="(notification, notificationId) in notifications" :key="notification">

@@ -1,8 +1,8 @@
 <template>
-    <div ref="overlay" class="ogr-canvas-overlay is-full-canvas-area">
+    <div ref="overlay" class="og-canvas-overlay is-full-canvas-area">
         <template v-for="layer of selectedGradientLayerPositions" :key="layer.id">
             <svg
-                class="ogr-canvas-overlay__gradient-range-line"
+                class="og-canvas-overlay__gradient-range-line"
                 :viewBox="
                     -rangeLinePadding + ' ' + -rangeLinePadding + ' ' +
                     (layer.bounds.width + rangeLinePadding*2) + ' ' + (layer.bounds.height + rangeLinePadding*2)
@@ -37,7 +37,7 @@
             </svg>
             <template v-for="handleName of ['start', 'end', 'focus']" :key="handleName">
                 <div
-                    class="ogr-canvas-overlay__gradient-position-handle"
+                    class="og-canvas-overlay__gradient-position-handle"
                     :style="{
                         left: layer[handleName].x + 'px',
                         top: layer[handleName].y + 'px',

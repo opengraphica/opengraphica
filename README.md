@@ -29,7 +29,7 @@ Production-ready files will output in the `www` folder. You may view the index.h
         <script src="js/vendors.js">
         <script src="js/opengraphica.js">
     </head>
-    <body class="ogr-full-page">
+    <body class="og-full-page">
         <div id="opengraphica"></div>
         <script>
             OpenGraphica.theme({

@@ -25,7 +25,7 @@
             </el-button>
         </div>
     </div>
-    <div style="background: var(--ogr-background-color)">
+    <div style="background: var(--og-background-color)">
         <div class="container mx-auto">
             <el-horizontal-scrollbar-arrows>
                 <el-form-item class="el-form-item--small-label" label="Mode">
@@ -70,7 +70,7 @@
                 </el-form-item>
                 <el-popover
                     placement="bottom"
-                    popper-class="ogr-dock-popover"
+                    popper-class="og-dock-popover"
                     trigger="click"
                     :width="250"
                     :popper-options="{
@@ -89,7 +89,7 @@
                             <span class="bi bi-magnet-fill mr-2" aria-hidden="true" /> {{ $t('toolbar.freeTransform.snapping.title') }}
                         </el-button>
                     </template>
-                    <h2 class="ogr-dock-title" v-t="'toolbar.cropResize.snapping.title'" />
+                    <h2 class="og-dock-title" v-t="'toolbar.cropResize.snapping.title'" />
                     <el-form novalidate="novalidate" action="javascript:void(0)">
                         <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="$t('toolbar.cropResize.snapping.enable')">
                             <el-switch v-model="enableSnapping" />

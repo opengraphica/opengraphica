@@ -1,9 +1,9 @@
 <template>
     <div class="is-flex container is-align-items-center is-justify-content-center mx-auto">
-        <div class="ogr-toolbar-overlay">
-            <div class="ogr-toolbar-tool-selector">
+        <div class="og-toolbar-overlay">
+            <div class="og-toolbar-tool-selector">
                 <span class="bi bi-droplet my-1" aria-hidden="true"></span>
-                <span class="ogr-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
+                <span class="og-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
             </div>
             <el-horizontal-scrollbar-arrows>
                 <div class="is-flex is-align-items-center px-3">

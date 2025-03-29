@@ -1,21 +1,21 @@
 <template>
     <div
         ref="dockLayout"
-        class="ogr-layout-dock"
+        class="og-layout-dock"
         :class="{
-            'ogr-layout-dock--resizing': draggingDividerIndex > -1
+            'og-layout-dock--resizing': draggingDividerIndex > -1
         }"
         :style="{ width: '320px' }"
     >
         <template v-for="(dockDefinition, dockContainerIndex) of config.layout" :key="dockDefinition.name">
-            <div class="ogr-layout-dock__container" :style="{ 'height': (dockContainerRatios[dockContainerIndex] * 100) + '%' }">
-                <div v-if="dockDefinition.title" class="ogr-dock-title" v-t="dockDefinition.title"></div>
+            <div class="og-layout-dock__container" :style="{ 'height': (dockContainerRatios[dockContainerIndex] * 100) + '%' }">
+                <div v-if="dockDefinition.title" class="og-dock-title" v-t="dockDefinition.title"></div>
                 <dock :name="dockDefinition.name" @update:title="dockDefinition.title = $event" />
             </div>
             <div
                 v-if="dockContainerIndex < config.layout.length - 1"
                 ref="dockDivider"
-                class="ogr-layout-dock__divider"
+                class="og-layout-dock__divider"
                 tabindex="-1"
                 :data-divider-index="dockContainerIndex"
                 v-pointer.down="onPointerDownDivider"

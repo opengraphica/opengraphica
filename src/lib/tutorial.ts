@@ -19,7 +19,7 @@ let currentlyShowingTutorialNotificationHandle: NotificationHandle | null = null
 export function waitForNoOverlays(): Promise<void> {
     return new Promise<void>((resolve) => {
         const intervalHandle = window.setInterval(() => {
-            const preventableElement = document.querySelector('.ogr-menu-drawers > .ogr-menu-drawer, .ogr-dialogs > .el-overlay');
+            const preventableElement = document.querySelector('.og-menu-drawers > .og-menu-drawer, .og-dialogs > .el-overlay');
             if (preventableElement == null) {
                 resolve();
                 window.clearInterval(intervalHandle);
@@ -33,7 +33,7 @@ export function scheduleTutorialNotification(notification: TutorialNotification)
     tutorialNotificationStack.push(notification);
     if (notificationCanShowIntervalHandle == null && !currentlyShowingTutorialNotification) {
         notificationCanShowIntervalHandle = window.setInterval(() => {
-            const preventableElement = document.querySelector('.ogr-menu-drawers > .ogr-menu-drawer, .ogr-dialogs > .el-overlay');
+            const preventableElement = document.querySelector('.og-menu-drawers > .og-menu-drawer, .og-dialogs > .el-overlay');
             if (preventableElement == null) {
                 showNextTutorialNotification();
                 window.clearInterval(notificationCanShowIntervalHandle);

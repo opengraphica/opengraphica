@@ -9,6 +9,7 @@ import { getStoredImageOrCanvas, createStoredImage } from '@/store/image';
 
 import type {
     ColorModel, UpdateAnyLayerOptions, UpdateRasterLayerOptions,
+    WorkingFileAnyLayer,
 } from '@/types';
 
 interface DeleteLayerSelectionAreaOptions {
@@ -36,7 +37,7 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
         this.freeEstimates.memory = 0;
         this.freeEstimates.database = 0;
 
-        const layersToModify = [];
+        const layersToModify: WorkingFileAnyLayer[] = [];
         for (const layerId of this.layerIds) {
             const layer = getLayerById(layerId);
             if (layer) {

@@ -402,7 +402,7 @@ export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNe
                     );
                 }
             } else {
-                frame.image.sourceUuid = originalSourceUuid;
+                frame.image.sourceUuid = originalSourceUuid ?? undefined;
             }
         }
     } else if (storedLayer.type === 'vector') {

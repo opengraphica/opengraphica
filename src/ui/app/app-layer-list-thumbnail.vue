@@ -1,5 +1,5 @@
 <template>
-    <div class="ogr-layer-thumbnail">
+    <div class="og-layer-thumbnail">
         <img :src="thumbnailImageSrc" alt="thumbnail" :class="{ 'is-larger-width': isLargerWidth }" @touchstart="$event.preventDefault()" />
     </div>
 </template>

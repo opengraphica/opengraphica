@@ -1,15 +1,15 @@
-.ogr-menu-drawers {
+.og-menu-drawers {
     position: absolute;
-    background: var(--ogr-menu-drawers-background-color);
+    background: var(--og-menu-drawers-background-color);
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    animation: ogr-menu-drawers-fade-in 0.15s ease-in;
+    animation: og-menu-drawers-fade-in 0.15s ease-in;
     animation-fill-mode: forwards;
     z-index: 5;
 
-    @keyframes ogr-menu-drawers-fade-in {
+    @keyframes og-menu-drawers-fade-in {
         0% {
             display: none;
             opacity: 0;
@@ -22,7 +22,7 @@
         }
     }
 
-    @keyframes ogr-menu-drawers-fade-out {
+    @keyframes og-menu-drawers-fade-out {
         0% {
             opacity: 1;
         }
@@ -35,7 +35,7 @@
         }
     }
 
-    @keyframes ogr-menu-drawer-slide-right-open {
+    @keyframes og-menu-drawer-slide-right-open {
         0% {
             transform: translateX(-100%);
             opacity: 0.5;
@@ -45,7 +45,7 @@
             opacity: 1;
         }
     }
-    @keyframes ogr-menu-drawer-slide-right-close {
+    @keyframes og-menu-drawer-slide-right-close {
         0% {
             transform: translateX(0);
             opacity: 1;
@@ -56,7 +56,7 @@
         }
     }
 
-    @keyframes ogr-menu-drawer-slide-left-open {
+    @keyframes og-menu-drawer-slide-left-open {
         0% {
             transform: translateX(100%);
             opacity: 0.5;
@@ -66,7 +66,7 @@
             opacity: 1;
         }
     }
-    @keyframes ogr-menu-drawer-slide-left-close {
+    @keyframes og-menu-drawer-slide-left-close {
         0% {
             transform: translateX(0);
             opacity: 1;
@@ -77,7 +77,7 @@
         }
     }
 
-    @keyframes ogr-menu-drawer-slide-top-open {
+    @keyframes og-menu-drawer-slide-top-open {
         0% {
             transform: translateY(100%);
             opacity: 0.5;
@@ -87,7 +87,7 @@
             opacity: 1;
         }
     }
-    @keyframes ogr-menu-drawer-slide-top-close {
+    @keyframes og-menu-drawer-slide-top-close {
         0% {
             transform: translateY(0);
             opacity: 1;
@@ -98,7 +98,7 @@
         }
     }
 
-    @keyframes ogr-menu-drawer-slide-bottom-open {
+    @keyframes og-menu-drawer-slide-bottom-open {
         0% {
             transform: translateY(-100%);
             opacity: 0.5;
@@ -108,7 +108,7 @@
             opacity: 1;
         }
     }
-    @keyframes ogr-menu-drawer-slide-bottom-close {
+    @keyframes og-menu-drawer-slide-bottom-close {
         0% {
             transform: translateY(0);
             opacity: 1;
@@ -120,14 +120,14 @@
     }
 
     &.is-fade-out {
-        animation: ogr-menu-drawers-fade-out 0.15s ease-in;
+        animation: og-menu-drawers-fade-out 0.15s ease-in;
     }
 }
 
-.ogr-menu-drawer {
+.og-menu-drawer {
     display: flex;
     flex-direction: column;
-    background: var(--ogr-menu-drawer-background-color);
+    background: var(--og-menu-drawer-background-color);
     border-radius: 0.875rem;
     position: absolute;
     top: .5rem;
@@ -145,57 +145,57 @@
     &.is-open-right {
         padding-left: 4rem;
         right: 3.5rem;
-        animation-name: ogr-menu-drawer-slide-right-open;
+        animation-name: og-menu-drawer-slide-right-open;
 
-        .ogr-menu-drawer__close {
+        .og-menu-drawer__close {
             right: -2.5rem;
         }
 
         &.is-closing {
-            animation-name: ogr-menu-drawer-slide-right-close;
+            animation-name: og-menu-drawer-slide-right-close;
         }
     }
     &.is-open-left {
         padding-right: 4rem;
         left: 3.5rem;
-        animation-name: ogr-menu-drawer-slide-left-open;
+        animation-name: og-menu-drawer-slide-left-open;
 
-        .ogr-menu-drawer__close {
+        .og-menu-drawer__close {
             right: auto;
             left: -2.5rem;
         }
 
         &.is-closing {
-            animation-name: ogr-menu-drawer-slide-left-close;
+            animation-name: og-menu-drawer-slide-left-close;
         }
     }
     &.is-open-top {
         padding-bottom: 4rem;
         top: 3.5rem;
-        animation-name: ogr-menu-drawer-slide-top-open;
+        animation-name: og-menu-drawer-slide-top-open;
 
-        .ogr-menu-drawer__close {
+        .og-menu-drawer__close {
             top: -2.75rem;
             right: .25rem;
         }
 
         &.is-closing {
-            animation-name: ogr-menu-drawer-slide-top-close;
+            animation-name: og-menu-drawer-slide-top-close;
         }
     }
     &.is-open-bottom {
         padding-top: 4rem;
         bottom: 3.5rem;
-        animation-name: ogr-menu-drawer-slide-bottom-open;
+        animation-name: og-menu-drawer-slide-bottom-open;
 
-        .ogr-menu-drawer__close {
+        .og-menu-drawer__close {
             top: auto;
             bottom: -2.75rem;
             right: .25rem;
         }
 
         &.is-closing {
-            animation-name: ogr-menu-drawer-slide-bottom-close;
+            animation-name: og-menu-drawer-slide-bottom-close;
         }
     }
 
@@ -203,41 +203,41 @@
         flex-grow: 1;
     }
 }
-.ogr-menu-drawer__title {
+.og-menu-drawer__title {
     margin: 1.5rem 0 .5rem 0;
     padding: 0 1rem;
     flex-grow: 0;
     flex-shrink: 1;
 }
-.ogr-menu-drawer__close {
+.og-menu-drawer__close {
     position: absolute;
     top: 1.2rem;
     right: 1.2rem;
-    color: var(--ogr-menu-drawer-close-icon-color);
+    color: var(--og-menu-drawer-close-icon-color);
 
     &:hover {
-        color: var(--ogr-menu-drawer-close-icon-color-hover);
+        color: var(--og-menu-drawer-close-icon-color-hover);
     }
 
     .bi {
         font-size: 1.6rem;
     }
 }
-.ogr-menu-drawer__content {
+.og-menu-drawer__content {
     padding: .5rem 0;
     flex-grow: 1;
     overflow: hidden;
 
-    .ogr-dock {
+    .og-dock {
         display: flex;
         flex-direction: column;
         height: 100%;
 
-        > .ogr-dock-header {
+        > .og-dock-header {
             border-bottom: 2px solid var(--el-border-color-light);
         }
 
-        > .ogr-dock-content {
+        > .og-dock-content {
             flex-grow: 1;
 
             > .el-scrollbar > .el-scrollbar__wrap > .el-scrollbar__view {
@@ -261,11 +261,11 @@
         }
     }
 
-    .ogr-module {
+    .og-module {
         height: 100%;
     }
 }
 
-.ogr-module {
+.og-module {
     word-break: normal;
 }

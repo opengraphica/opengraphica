@@ -30,3 +30,26 @@ module.exports = setupConfig({
         })
     ]
 });
+
+module.exports.module.rules.push({
+    test: /\.(woff|woff2|eot|ttf|otf)$/i,
+    type: 'asset/resource',
+});
+module.exports.module.rules.push({
+    test: /\.s[ac]ss$/i,
+    include: path.resolve(__dirname, 'src'),
+    use: [
+        'style-loader',
+        'css-loader',
+        {
+            loader: 'sass-loader',
+            options: {
+                // Prefer `dart-sass`
+                implementation: require('sass'),
+                sassOptions: {
+                    includePaths: [path.resolve(__dirname, './src')],
+                },
+            }
+        }
+    ]
+});

@@ -1,8 +1,8 @@
 <template>
-    <div class="ogr-canvas-overlay">
+    <div class="og-canvas-overlay">
         <!-- Display a resizable boundary box -->
         <div ref="editinglayerBounds"
-            class="ogr-free-transform"
+            class="og-free-transform"
             v-show="editingTextLayerId != null"
             :style="{
                 width: (editingLayerDimensions?.width ?? 0) + 'px',
@@ -11,31 +11,31 @@
                 transformOrigin: '0% 0%',
             }"
         >
-            <div class="ogr-free-transform-bounds" :style="{
+            <div class="og-free-transform-bounds" :style="{
                 outlineWidth: (0.35/zoom) + 'rem'
             }"></div>
-            <div v-show="!editingLayerIsHorizontal" class="ogr-free-transform-handle-top" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+            <div v-show="!editingLayerIsHorizontal" class="og-free-transform-handle-top" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
                     <path d="M10 10 L90 10 L90 90 L10 90 Z"
                         :fill="dragHandleHighlight === DRAG_TYPE_TOP ? dragHandleHighlightColor : 'white'"
                         :stroke="dragHandleHighlight === DRAG_TYPE_TOP ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
                 </svg>
             </div>
-            <div v-show="editingLayerIsHorizontal" class="ogr-free-transform-handle-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+            <div v-show="editingLayerIsHorizontal" class="og-free-transform-handle-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
                     <path d="M10 10 L90 10 L90 90 L10 90 Z"
                         :fill="dragHandleHighlight === DRAG_TYPE_LEFT ? dragHandleHighlightColor : 'white'"
                         :stroke="dragHandleHighlight === DRAG_TYPE_LEFT ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
                 </svg>
             </div>
-            <div v-show="!editingLayerIsHorizontal" class="ogr-free-transform-handle-bottom" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+            <div v-show="!editingLayerIsHorizontal" class="og-free-transform-handle-bottom" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
                     <path d="M10 10 L90 10 L90 90 L10 90 Z"
                         :fill="dragHandleHighlight === DRAG_TYPE_BOTTOM ? dragHandleHighlightColor : 'white'"
                         :stroke="dragHandleHighlight === DRAG_TYPE_BOTTOM ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
                 </svg>
             </div>
-            <div v-show="editingLayerIsHorizontal" class="ogr-free-transform-handle-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+            <div v-show="editingLayerIsHorizontal" class="og-free-transform-handle-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
                 <svg viewBox="0 0 100 100">
                     <path d="M10 10 L90 10 L90 90 L10 90 Z"
                         :fill="dragHandleHighlight === DRAG_TYPE_RIGHT ? dragHandleHighlightColor : 'white'"
@@ -44,16 +44,16 @@
             </div>
         </div>
         <!-- Editing cursor (selection highlight is in text-selection.vue) -->
-        <div class="ogr-text-editor">
+        <div class="og-text-editor">
             <div
                 v-if="selectionCursor && isEditorTextareaFocused"
-                class="ogr-text-editor__selection"
+                class="og-text-editor__selection"
                 :style="{ transform: editingLayerCssTransform }"
             >
                 <div
-                    class="ogr-text-editor__selection__cursor"
+                    class="og-text-editor__selection__cursor"
                     :class="{
-                        'ogr-text-editor__selection__cursor--no-blink': disableBlinking,
+                        'og-text-editor__selection__cursor--no-blink': disableBlinking,
                     }"
                     :style="{
                         left: selectionCursor.position.x + 'px',

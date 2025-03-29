@@ -1,7 +1,7 @@
 <template>
     <div
         ref="root" class="opengraphica"
-        :style="{ '--ogr-sidebar-left-width': sidebarLeftWidth + 'px', '--ogr-sidebar-right-width': sidebarRightWidth + 'px' }"
+        :style="{ '--og-sidebar-left-width': sidebarLeftWidth + 'px', '--og-sidebar-right-width': sidebarRightWidth + 'px' }"
         @scroll="onScrollRoot($event)"
         @touchstart="onTouchStartRoot($event)"
     >
@@ -26,6 +26,7 @@
                     @click="showDndDropOverlay = false"
                 />
                 <app-docks />
+                <div id="og-popover-container" />
             </template>
         </template>
     </div>
@@ -93,7 +94,7 @@ export default defineComponent({
             appEmitter.emit('app.wait.startBlocking', { id: 'appInitialLoad', immediate: true });
 
             // Full page fixes for quirks in browsers (Chrome)
-            if (document.body.classList.contains('ogr-full-page')) {
+            if (document.body.classList.contains('og-full-page')) {
                 // Reset user zoom on some browsers
                 try {
                     (document as any).firstElementChild.style.zoom = 'reset';

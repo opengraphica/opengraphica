@@ -1,10 +1,10 @@
 <template>
     <div
-        ref="dndContainer" class="ogr-layout-dnd-container"
+        ref="dndContainer" class="og-layout-dnd-container"
         :style="{
-            '--ogr-sidebar-left-width': sidebarLeftWidth + 'px',
-            '--ogr-sidebar-right-width': sidebarRightWidth + 'px',
-            '--ogr-footer-height': footerHeight + 'px',
+            '--og-sidebar-left-width': sidebarLeftWidth + 'px',
+            '--og-sidebar-right-width': sidebarRightWidth + 'px',
+            '--og-footer-height': footerHeight + 'px',
         }"
     >
         <header ref="header" :aria-busy="isShowHistoryNotification && !isHistoryNotificationCompleted">
@@ -19,8 +19,8 @@
                 :class="['is-top', { 'is-overlay': !isActiveToolbarExclusive }]"
             />
         </header>
-        <div class="ogr-layout-dnd-center" :aria-busy="isShowHistoryNotification && !isHistoryNotificationCompleted">
-            <aside aria-label="Left Sidebar" class="ogr-sidebar-left" ref="sidebarLeft">
+        <div class="og-layout-dnd-center" :aria-busy="isShowHistoryNotification && !isHistoryNotificationCompleted">
+            <aside aria-label="Left Sidebar" class="og-sidebar-left" ref="sidebarLeft">
                 <template v-if="!isActiveToolbarExclusive && config.menuBar && menuBarPosition === 'left'">
                     <app-layout-menu-bar :config="config.menuBar" layout-placement="left" @resize="onResizeLayout" />
                 </template>
@@ -30,13 +30,13 @@
             </aside>
             <main ref="main"
                 tabindex="0"
-                :class="[{ 'ogr-custom-cursor': !!canvasState.cursor }, canvasState.cursor ? 'ogr-custom-cursor--' + canvasState.cursor : null]"
+                :class="[{ 'og-custom-cursor': !!canvasState.cursor }, canvasState.cursor ? 'og-custom-cursor--' + canvasState.cursor : null]"
                 :style="{ 'pointer-events': isCanvasInteractable ? null : 'none' }"
                 @touchstart="onTouchStartMain"
                 @pointerdown="onPointerDownMain"
                 @wheel="onWheelMain"
             />
-            <aside aria-label="Right Sidebar" class="ogr-sidebar-right" ref="sidebarRight">
+            <aside aria-label="Right Sidebar" class="og-sidebar-right" ref="sidebarRight">
                 <template v-if="showDock && !isActiveToolbarExclusive && config.dock && dockPosition === 'right'">
                     <app-layout-dock :config="config.dock" layout-placement="right" @resize="onResizeLayout" />
                 </template>
@@ -61,13 +61,13 @@
         </footer>
         <div
             v-if="isShowHistoryNotification"
-            class="ogr-history-notification-overlay theme-dark"
-            :class="{ 'ogr-history-notification-overlay--completed': isHistoryNotificationCompleted }"
+            class="og-history-notification-overlay theme-dark"
+            :class="{ 'og-history-notification-overlay--completed': isHistoryNotificationCompleted }"
             @animationend="onAnimationEndHistoryNotificationOverlay()"
             @click="onClickHistoryNotificationOverlay($event)"
         >
-            <div class="ogr-history-notification-container">
-                <div ref="historyNotification" role="alert" class="ogr-history-notification" :class="{ 'ogr-history-notification--highlight': isHighlightHistoryNotification }">
+            <div class="og-history-notification-container">
+                <div ref="historyNotification" role="alert" class="og-history-notification" :class="{ 'og-history-notification--highlight': isHighlightHistoryNotification }">
                     <i
                         class="bi"
                         :class="{

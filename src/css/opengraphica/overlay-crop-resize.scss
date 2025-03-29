@@ -1,9 +1,9 @@
 
-.ogr-crop {
+.og-crop {
     position: relative;
-    outline: 999999px solid var(--ogr-overlay-background-color);
+    outline: 999999px solid var(--og-overlay-background-color);
 
-    .ogr-crop-bounds {
+    .og-crop-bounds {
         outline: 0.35rem solid rgba(235, 235, 235, 0.7);
         box-sizing: border-box;
         position: absolute;
@@ -13,14 +13,14 @@
         bottom: 0;
     }
 
-    .ogr-crop-handle-top-left,
-    .ogr-crop-handle-top-right,
-    .ogr-crop-handle-bottom-left,
-    .ogr-crop-handle-bottom-right,
-    .ogr-crop-handle-top,
-    .ogr-crop-handle-left,
-    .ogr-crop-handle-bottom,
-    .ogr-crop-handle-right {
+    .og-crop-handle-top-left,
+    .og-crop-handle-top-right,
+    .og-crop-handle-bottom-left,
+    .og-crop-handle-bottom-right,
+    .og-crop-handle-top,
+    .og-crop-handle-left,
+    .og-crop-handle-bottom,
+    .og-crop-handle-right {
         position: absolute;
         svg {
             display: block;
@@ -30,7 +30,7 @@
         }
     }
 
-    .ogr-crop-handle-top-left {
+    .og-crop-handle-top-left {
         top: 0;
         left: 0;
         transform-origin: top left;
@@ -39,7 +39,7 @@
             transform-origin: top left;
         }
     }
-    .ogr-crop-handle-top-right {
+    .og-crop-handle-top-right {
         top: 0;
         right: 0;
         transform-origin: top right;
@@ -48,7 +48,7 @@
             transform-origin: top left;
         }
     }
-    .ogr-crop-handle-bottom-right {
+    .og-crop-handle-bottom-right {
         bottom: 0;
         right: 0;
         transform-origin: bottom right;
@@ -57,7 +57,7 @@
             transform-origin: top left;
         }
     }
-    .ogr-crop-handle-bottom-left {
+    .og-crop-handle-bottom-left {
         bottom: 0;
         left: 0;
         transform-origin: bottom left;
@@ -66,7 +66,7 @@
             transform-origin: top left;
         }
     }
-    .ogr-crop-handle-top {
+    .og-crop-handle-top {
         top: 0;
         left: 50%;
         transform-origin: top center;
@@ -74,7 +74,7 @@
             transform: translate(-50%, -100%);
         }
     }
-    .ogr-crop-handle-right {
+    .og-crop-handle-right {
         top: 50%;
         right: 0;
         transform-origin: right center;
@@ -83,7 +83,7 @@
             transform-origin: center;
         }
     }
-    .ogr-crop-handle-bottom {
+    .og-crop-handle-bottom {
         bottom: 0;
         right: 50%;
         transform-origin: bottom center;
@@ -92,7 +92,7 @@
             transform-origin: center;
         }
     }
-    .ogr-crop-handle-left {
+    .og-crop-handle-left {
         top: 50%;
         left: 0;
         transform-origin: left center;
@@ -103,12 +103,12 @@
     }
 }
 
-.ogr-snap-preview {
+.og-snap-preview {
     position: absolute;
-    background: var(--ogr-snap-line-color);
+    background: var(--og-snap-line-color);
     box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.5);
 
-    &.ogr-snap-preview-vertical {
+    &.og-snap-preview-vertical {
         width: 0.0625rem;
         top: 0;
 
@@ -121,15 +121,15 @@
             right: 0;
         }
         &:before {
-            background: linear-gradient(to bottom, transparent 0%, var(--ogr-snap-line-color) 100%); 
+            background: linear-gradient(to bottom, transparent 0%, var(--og-snap-line-color) 100%); 
             top: -4rem;
         }
         &:after {
-            background: linear-gradient(to bottom, var(--ogr-snap-line-color) 0%, transparent 100%); 
+            background: linear-gradient(to bottom, var(--og-snap-line-color) 0%, transparent 100%); 
             bottom: -4rem;
         }
     }
-    &.ogr-snap-preview-horizontal {
+    &.og-snap-preview-horizontal {
         height: 0.0625rem;
         left: 0;
 
@@ -142,11 +142,11 @@
             bottom: 0;
         }
         &:before {
-            background: linear-gradient(to right, transparent 0%, var(--ogr-snap-line-color) 100%); 
+            background: linear-gradient(to right, transparent 0%, var(--og-snap-line-color) 100%); 
             left: -4rem;
         }
         &:after {
-            background: linear-gradient(to right, var(--ogr-snap-line-color) 0%, transparent 100%); 
+            background: linear-gradient(to right, var(--og-snap-line-color) 0%, transparent 100%); 
             right: -4rem;
         }
     }

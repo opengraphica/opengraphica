@@ -114,17 +114,17 @@
                 <div class="is-flex-grow-1 pl-4">
                     <div class="is-flex is-flex-direction-row is-align-items-center is-justify-content-center">
                         <div class="is-flex is-flex-shrink-1 is-flex-direction-column is-align-items-center">
-                            <img :src="previewImages.top" class="ogr-module-layer-blending-mode__image-preview" :alt="$t('module.layerBlendingMode.layerTop')" width="256" height="256">
+                            <img :src="previewImages.top" class="og-module-layer-blending-mode__image-preview" :alt="$t('module.layerBlendingMode.layerTop')" width="256" height="256">
                             <div>
                                 <span class="bi bi-plus is-size-3" />
                             </div>
-                            <img :src="previewImages.bottom" class="ogr-module-layer-blending-mode__image-preview" :alt="$t('module.layerBlendingMode.layerBottom')" width="256" height="256">
+                            <img :src="previewImages.bottom" class="og-module-layer-blending-mode__image-preview" :alt="$t('module.layerBlendingMode.layerBottom')" width="256" height="256">
                         </div>
                         <div class="is-flex-shrink-0 px-2">
                             <span class="bi bi-arrow-right-short is-size-3" />
                         </div>
                         <div class="is-flex is-flex-shrink-1 is-flex-direction-column">
-                            <img :src="previewImages.result" class="ogr-module-layer-blending-mode__image-preview" :alt="$t('module.layerBlendingMode.result')" width="256" height="256">
+                            <img :src="previewImages.result" class="og-module-layer-blending-mode__image-preview" :alt="$t('module.layerBlendingMode.result')" width="256" height="256">
                         </div>
                     </div>
                 </div>

@@ -494,8 +494,8 @@ export class TextDocumentEditor {
 		for (let lineIndex = startLine; lineIndex <= endLine; lineIndex++) {
 			const line = this.document.lines[lineIndex];
 			let spanStartCharacter = 0;
-			let startSpan = null;
-			let endSpan = null;
+			let startSpan: TextDocumentSpan | null = null;
+			let endSpan: TextDocumentSpan | null = null;
 			for (let spanIndex = 0; spanIndex < line.spans.length; spanIndex++) {
 				const span = line.spans[spanIndex];
 				if (lineIndex === startLine) {
@@ -853,7 +853,7 @@ export class TextDocumentSelection {
 		const lastLine = positionCompare === 1 ? this.start.line : this.end.line;
 		const firstCharacter = positionCompare === 1 ? this.end.character : this.start.character;
 		const lastCharacter = positionCompare === 1 ? this.start.character : this.end.character;
-		let textLines = [];
+		let textLines: string[] = [];
 		for (let i = firstLine; i <= lastLine; i++) {
 			if (i === firstLine && i === lastLine) {
 				textLines.push(this.documentEditor.getLineText(i).slice(firstCharacter, lastCharacter));

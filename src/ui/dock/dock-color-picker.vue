@@ -1,12 +1,12 @@
 <template>
-    <div class="ogr-dock-content">
-        <div class="ogr-dock-mobile-edge-padding">
+    <div class="og-dock-content">
+        <div class="og-dock-mobile-edge-padding">
             <app-color-picker-gradient :modelValue="workingColor" @input="workingColor = $event" v-model:preload="pickerGradientLoading" />
         </div>
         <h2 class="px-4.5 my-4 has-text-centered">{{ colorName }}</h2>
         <div class="px-4.5 my-4 is-flex is-justify-content-center">
-            <div class="ogr-color-picker-preview">
-                <div class="ogr-color-picker-preview__color" :style="{ '--preview-color': workingColor.style }" />
+            <div class="og-color-picker-preview">
+                <div class="og-color-picker-preview__color" :style="{ '--preview-color': workingColor.style }" />
                 <el-input
                     v-model.lazy="hexCode" style="width: 7rem"
                     :aria-label="$t('dock.colorPicker.hexCode')"

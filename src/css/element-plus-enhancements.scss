@@ -40,7 +40,7 @@
     }
 
     .el-alert--info.is-light {
-        color: var(--ogr-alert-info-color);
+        color: var(--og-alert-info-color);
     }
 
     .el-auto-grid {
@@ -101,16 +101,16 @@
             }
             &:first-child {
                 > .el-input__wrapper {
-                    border-top-left-radius: var(--ogr-border-radius);
-                    border-bottom-left-radius: var(--ogr-border-radius);
+                    border-top-left-radius: var(--og-border-radius);
+                    border-bottom-left-radius: var(--og-border-radius);
                 }
             }
             &:last-child {
                 margin-right: 0;
 
                 > .el-input__wrapper {
-                    border-top-right-radius: var(--ogr-border-radius);
-                    border-bottom-right-radius: var(--ogr-border-radius);
+                    border-top-right-radius: var(--og-border-radius);
+                    border-bottom-right-radius: var(--og-border-radius);
                 }
             }
 
@@ -134,16 +134,16 @@
 
             &:first-child {
                 > .select-trigger > .el-input > .el-input__wrapper {
-                    border-top-left-radius: var(--ogr-border-radius);
-                    border-bottom-left-radius: var(--ogr-border-radius);
+                    border-top-left-radius: var(--og-border-radius);
+                    border-bottom-left-radius: var(--og-border-radius);
                 }
             }
             &:last-child {
                 margin-right: 0;
 
                 > .select-trigger > .el-input > .el-input__wrapper {
-                    border-top-right-radius: var(--ogr-border-radius);
-                    border-bottom-right-radius: var(--ogr-border-radius);
+                    border-top-right-radius: var(--og-border-radius);
+                    border-bottom-right-radius: var(--og-border-radius);
                 }
             }
 
@@ -207,7 +207,7 @@
         --el-dialog-margin-top: 2.5rem;
         --el-dialog-border-radius: 0.875rem;
 
-        &.el-dialog--ogr-dock {
+        &.el-dialog--og-dock {
             .el-dialog__body {
                 padding: 0 !important;
             }
@@ -304,14 +304,14 @@
             .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__wrapper,
             .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper,
             .el-form-item__content > .el-switch,
-            .el-form-item__content > .ogr-gradient-input {
+            .el-form-item__content > .og-gradient-input {
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
             }
 
             &:first-child {
                 .el-form-item__label {
-                    border-top-left-radius: var(--ogr-border-radius);
+                    border-top-left-radius: var(--og-border-radius);
                 }
                 .el-form-item__content > .el-input > .el-input__wrapper,
                 .el-form-item__content > .el-color-picker > .el-color-picker__trigger,
@@ -320,13 +320,13 @@
                 .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__wrapper,
                 .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper,
                 .el-form-item__content > .el-switch,
-                .el-form-item__content > .ogr-gradient-input {
-                    border-top-right-radius: var(--ogr-border-radius);
+                .el-form-item__content > .og-gradient-input {
+                    border-top-right-radius: var(--og-border-radius);
                 }
             }
             &:last-child {
                 .el-form-item__label {
-                    border-bottom-left-radius: var(--ogr-border-radius);
+                    border-bottom-left-radius: var(--og-border-radius);
                 }
                 .el-form-item__content > .el-input > .el-input__wrapper,
                 .el-form-item__content > .el-color-picker > .el-color-picker__trigger,
@@ -336,8 +336,8 @@
                 .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__wrapper,
                 .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper,
                 .el-form-item__content > .el-switch,
-                .el-form-item__content > .ogr-gradient-input {
-                    border-bottom-right-radius: var(--ogr-border-radius);
+                .el-form-item__content > .og-gradient-input {
+                    border-bottom-right-radius: var(--og-border-radius);
                 }
             }
 
@@ -346,8 +346,8 @@
             }
 
             .el-form-item__label {
-                background-color: var(--ogr-form-connected-label-background-color);
-                border: 0.0625rem solid var(--ogr-form-connected-label-border-color);
+                background-color: var(--og-form-connected-label-background-color);
+                border: 0.0625rem solid var(--og-form-connected-label-border-color);
                 border-right: none;
                 min-width: var(--label-min-width);
                 line-height: 1;
@@ -389,7 +389,7 @@
                     width: 100%;
 
                     .el-input__wrapper {
-                        background-color: var(--ogr-form-connected-label-input-focus-color);
+                        background-color: var(--og-form-connected-label-input-focus-color);
                     }
                 }
 
@@ -412,33 +412,33 @@
                     box-sizing: border-box;
                     padding-left: 0.9375rem;
                     padding-right: 0.9375rem;
-                    border-top: 0.0625rem solid var(--ogr-form-connected-label-border-color) !important;
-                    border-bottom: 0.0625rem solid var(--ogr-form-connected-label-border-color) !important;
+                    border-top: 0.0625rem solid var(--og-form-connected-label-border-color) !important;
+                    border-bottom: 0.0625rem solid var(--og-form-connected-label-border-color) !important;
                 }
                 > .el-slider {
                     &:last-child {
-                        border-right: 0.0625rem solid var(--ogr-form-connected-label-border-color) !important;
+                        border-right: 0.0625rem solid var(--og-form-connected-label-border-color) !important;
                     }
                 }
                 > .el-row > .el-col > .el-slider {
                     height: 100%;
                 }
                 > .el-row > .el-col:last-child > .el-slider {
-                    border-right: 0.0625rem solid var(--ogr-form-connected-label-border-color) !important;
+                    border-right: 0.0625rem solid var(--og-form-connected-label-border-color) !important;
                 }
                 > .el-row:first-child > .el-col:first-child > .el-slider {
-                    border-left: 0.0625rem solid var(--ogr-form-connected-label-border-color) !important;
+                    border-left: 0.0625rem solid var(--og-form-connected-label-border-color) !important;
                 }
 
                 > .el-switch {
                     box-sizing: border-box;
-                    border: 0.0625rem solid var(--ogr-form-connected-label-border-color);
+                    border: 0.0625rem solid var(--og-form-connected-label-border-color);
                     height: 100%;
                     padding: 0 0.5rem;
                     width: 100%;
                 }
 
-                > .ogr-gradient-input {
+                > .og-gradient-input {
                     width: 100%;
                     border-top-left-radius: 0;
                     border-bottom-left-radius: 0;
@@ -452,9 +452,9 @@
                         border-top-left-radius: 0;
                         border-bottom-left-radius: 0;
                         border-left-width: 0 !important;
-                        border-top-color: var(--ogr-form-connected-label-border-color) !important;
-                        border-bottom-color: var(--ogr-form-connected-label-border-color) !important;
-                        border-right-color: var(--ogr-form-connected-label-border-color) !important;
+                        border-top-color: var(--og-form-connected-label-border-color) !important;
+                        border-bottom-color: var(--og-form-connected-label-border-color) !important;
+                        border-right-color: var(--og-form-connected-label-border-color) !important;
                     }
                 }
 
@@ -464,14 +464,14 @@
                             border-radius: 0;
                             border-left-width: 0 !important;
                             border-right-width: 0 !important;
-                            border-top-color: var(--ogr-form-connected-label-border-color) !important;
-                            border-bottom-color: var(--ogr-form-connected-label-border-color) !important;
+                            border-top-color: var(--og-form-connected-label-border-color) !important;
+                            border-bottom-color: var(--og-form-connected-label-border-color) !important;
                         }
                     }
                 }
 
                 .el-input-group__append {
-                    background-color: var(--ogr-form-connected-label-background-color);
+                    background-color: var(--og-form-connected-label-background-color);
                     box-sizing: border-box;
                     padding-left: 0.9375rem;
                     padding-right: 0.9375rem;
@@ -508,7 +508,7 @@
                     > .el-input,
                     > .el-select,
                     > .el-switch,
-                    > .ogr-gradient-input {
+                    > .og-gradient-input {
                         width: calc(100% - 2rem);
                     }
 
@@ -713,10 +713,10 @@
       
     .el-notification {
         &.right {
-            right: calc(var(--ogr-sidebar-right-width, .5rem) + .5rem);
+            right: calc(var(--og-sidebar-right-width, .5rem) + .5rem);
         }
         &.left {
-            left: calc(var(--ogr-sidebar-left-width, .5rem) + .5rem);
+            left: calc(var(--og-sidebar-left-width, .5rem) + .5rem);
         }
     }
 

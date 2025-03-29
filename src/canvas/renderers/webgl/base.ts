@@ -174,7 +174,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
                 break updateDrafts;
             }
 
-            let usedDraftIds = [];
+            let usedDraftIds: string[] = [];
             let orderIterator = 0;
             for (const draftUpdate of updates.drafts) {
                 usedDraftIds.push(draftUpdate.uuid);

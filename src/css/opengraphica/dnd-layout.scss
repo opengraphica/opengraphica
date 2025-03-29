@@ -1,4 +1,4 @@
-.ogr-dnd-drop-overlay {
+.og-dnd-drop-overlay {
     background: white;
     display: flex;
     position: absolute;
@@ -6,16 +6,16 @@
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: var(--ogr-dnd-drop-overlay-z-index);
+    z-index: var(--og-dnd-drop-overlay-z-index);
     align-items: center;
     justify-content: center;
     
-    .ogr-dnd-drop-overlay__center {
+    .og-dnd-drop-overlay__center {
         display: block;
         pointer-events: none;
     }
 
-    .ogr-dnd-drop-corner-top-left, .ogr-dnd-drop-corner-top-right, .ogr-dnd-drop-corner-bottom-left, .ogr-dnd-drop-corner-bottom-right {
+    .og-dnd-drop-corner-top-left, .og-dnd-drop-corner-top-right, .og-dnd-drop-corner-bottom-left, .og-dnd-drop-corner-bottom-right {
         position: absolute;
         pointer-events: none;
 
@@ -24,11 +24,11 @@
             height: 3rem;
         }
     }
-    .ogr-dnd-drop-corner-top-left {
+    .og-dnd-drop-corner-top-left {
         top: 1rem;
         left: 1rem;
     }
-    .ogr-dnd-drop-corner-top-right {
+    .og-dnd-drop-corner-top-right {
         top: 1rem;
         right: 1rem;
 
@@ -36,7 +36,7 @@
             transform: rotate(90deg);
         }
     }
-    .ogr-dnd-drop-corner-bottom-left {
+    .og-dnd-drop-corner-bottom-left {
         bottom: 1rem;
         left: 1rem;
 
@@ -44,7 +44,7 @@
             transform: rotate(-90deg);
         }
     }
-    .ogr-dnd-drop-corner-bottom-right {
+    .og-dnd-drop-corner-bottom-right {
         bottom: 1rem;
         right: 1rem;
 
@@ -54,7 +54,7 @@
     }
 }
 
-.ogr-layout-dnd-container {
+.og-layout-dnd-container {
     display: flex;
     flex-direction: column;
     position: absolute;
@@ -70,10 +70,10 @@
     > header {
         flex-grow: 0;
         flex-shrink: 0;
-        // background: linear-gradient(to bottom, var(--ogr-background-color) 50%, rgba(255, 255, 255, 0.0) 100%);
+        // background: linear-gradient(to bottom, var(--og-background-color) 50%, rgba(255, 255, 255, 0.0) 100%);
         touch-action: none;
     }
-    > .ogr-layout-dnd-center {
+    > .og-layout-dnd-center {
         display: flex;
         flex-direction: row;
         flex-grow: 1;
@@ -81,13 +81,13 @@
         height: 0;
         max-height: 100%;
 
-        > .ogr-sidebar-left {
+        > .og-sidebar-left {
             display: flex;
             flex-grow: 0;
             touch-action: pan-y;
             max-height: 100%;
         }
-        > .ogr-sidebar-right {
+        > .og-sidebar-right {
             display: flex;
             flex-grow: 0;
             touch-action: pan-y;
@@ -103,58 +103,58 @@
                 outline: none;
             }
 
-            &.ogr-custom-cursor {
+            &.og-custom-cursor {
                 cursor: none;
 
-                &.ogr-custom-cursor--crosshair {
+                &.og-custom-cursor--crosshair {
                     cursor: crosshair;
                 }
 
-                &.ogr-custom-cursor--grabbing {
+                &.og-custom-cursor--grabbing {
                     cursor: grabbing;
                 }
 
-                &.ogr-custom-cursor--move {
+                &.og-custom-cursor--move {
                     cursor: move;
                 }
 
-                &.ogr-custom-cursor--pointer {
+                &.og-custom-cursor--pointer {
                     cursor: pointer;
                 }
 
-                &.ogr-custom-cursor--text {
+                &.og-custom-cursor--text {
                     cursor: text;
                 }
 
-                &.ogr-custom-cursor--vertical-text {
+                &.og-custom-cursor--vertical-text {
                     cursor: vertical-text;
                 }
 
-                &.ogr-custom-cursor--zoom-in {
+                &.og-custom-cursor--zoom-in {
                     cursor: zoom-in;
                 }
 
-                &.ogr-custom-cursor--zoom-out {
+                &.og-custom-cursor--zoom-out {
                     cursor: zoom-out;
                 }
 
-                &.ogr-custom-cursor--ns-resize {
+                &.og-custom-cursor--ns-resize {
                     cursor: ns-resize;
                 }
 
-                &.ogr-custom-cursor--ew-resize {
+                &.og-custom-cursor--ew-resize {
                     cursor: ew-resize;
                 }
 
-                &.ogr-custom-cursor--nesw-resize {
+                &.og-custom-cursor--nesw-resize {
                     cursor: nesw-resize;
                 }
 
-                &.ogr-custom-cursor--nwse-resize {
+                &.og-custom-cursor--nwse-resize {
                     cursor: nwse-resize;
                 }
 
-                &.ogr-custom-cursor--eyedropper {
+                &.og-custom-cursor--eyedropper {
                     cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-eyedropper' viewBox='0 0 16 16'%3E%3Cpath d='M13.354.646a1.207 1.207 0 0 0-1.708 0L8.5 3.793l-.646-.647a.5.5 0 1 0-.708.708L8.293 5l-7.147 7.146A.5.5 0 0 0 1 12.5v1.793l-.854.853a.5.5 0 1 0 .708.707L1.707 15H3.5a.5.5 0 0 0 .354-.146L11 7.707l1.146 1.147a.5.5 0 0 0 .708-.708l-.647-.646 3.147-3.146a1.207 1.207 0 0 0 0-1.708zM2 12.707l7-7L10.293 7l-7 7H2z'/%3E%3C/svg%3E"), auto;
                 }
             }
@@ -167,7 +167,7 @@
     }
 }
 
-.ogr-layout-dock {
+.og-layout-dock {
     position: relative;
     margin: 0.5rem;
     display: flex;
@@ -175,7 +175,7 @@
     height: calc(100% - 1rem);
     z-index: 4;
 
-    &.ogr-layout-dock--resizing {
+    &.og-layout-dock--resizing {
         cursor: ns-resize !important;
 
         button, a, * {
@@ -183,31 +183,31 @@
         }
     }
 
-    .ogr-layout-dock__container {
-        background: var(--ogr-layout-menu-bar-background-color);
-        box-shadow: 0 0 0px 1px var(--ogr-layout-menu-bar-border-color), 0 0.3rem 1.5rem var(--ogr-layout-menu-bar-border-color);
+    .og-layout-dock__container {
+        background: var(--og-layout-menu-bar-background-color);
+        box-shadow: 0 0 0px 1px var(--og-layout-menu-bar-border-color), 0 0.3rem 1.5rem var(--og-layout-menu-bar-border-color);
         border-radius: 0.875rem;
         overflow: hidden;
         display: flex;
         flex-direction: column;
 
-        > .ogr-dock-title {
+        > .og-dock-title {
             padding: 0.75rem 1rem 0.35rem 1rem;
             text-align: center;
             flex-shrink: 1;
         }
 
-        > .ogr-dock {
+        > .og-dock {
             display: flex;
             flex-direction: column;
             flex-grow: 1;
             overflow: hidden;
 
-            > .ogr-dock-header {
+            > .og-dock-header {
                 border-bottom: 2px solid var(--el-border-color-light);
             }
 
-            > .ogr-dock-content {
+            > .og-dock-content {
                 flex-grow: 1;
                 overflow: hidden;
 
@@ -245,21 +245,21 @@
         }
     }
 
-    .ogr-layout-dock__divider {
+    .og-layout-dock__divider {
         cursor: ns-resize;
         height: .5rem;
     }
 
 }
 
-.ogr-layout-menu-bar {
+.og-layout-menu-bar {
     display: block;
     position: relative; // Necessary for z-index
     transition: all 0.6s;
     width: calc(100% - 1rem);
     max-width: calc(100% - 1rem);
-    background: var(--ogr-layout-menu-bar-background-color);
-    box-shadow: 0 0 0 0.063rem var(--ogr-layout-menu-bar-border-color);
+    background: var(--og-layout-menu-bar-background-color);
+    box-shadow: 0 0 0 0.063rem var(--og-layout-menu-bar-border-color);
     border-radius: 0.875rem;
     margin: 0.5rem;
     z-index: 10;
@@ -279,7 +279,7 @@
     }
 
     > .is-flex {
-        .ogr-menu-section__title {
+        .og-menu-section__title {
             display: flex;
             align-items: center;
             color: var(--el-text-color-regular);
@@ -297,12 +297,12 @@
             }
         }
 
-        > .ogr-menu-favorites {
+        > .og-menu-favorites {
             flex: 1;
             display: flex;
         }
 
-        > .ogr-menu-docks, > .ogr-menu-end {
+        > .og-menu-docks, > .og-menu-end {
             flex: 1;
             display: flex;
             justify-content: flex-start;
@@ -310,7 +310,7 @@
             min-width: -webkit-min-content; /* Workaround to Chrome bug */
         }
 
-        > .ogr-menu-tools {
+        > .og-menu-tools {
             flex-shrink: 1;
             flex-grow: 0;
             display: flex;
@@ -336,13 +336,13 @@
             }
         }
 
-        > .ogr-menu-end {
+        > .og-menu-end {
             justify-content: flex-end;
         }
     }
 
-    .ogr-menu-section {
-        .el-button-group, .ogr-single-button-group {
+    .og-menu-section {
+        .el-button-group, .og-single-button-group {
             margin: 0 0 0 0.375rem;
             width: max-content;
             position: relative;
@@ -371,17 +371,17 @@
         box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.3) inset;
     }
 
-    @keyframes ogr-menu-bar-tool-group-expand-fade-in {
+    @keyframes og-menu-bar-tool-group-expand-fade-in {
         0% { opacity: 0 }
         100% { opacity: 1 }
     }
 
-    .ogr-menu-bar__tool-group-expand {
+    .og-menu-bar__tool-group-expand {
         position: absolute;
         display: flex;
         flex-direction: row;
         transform: translateY(-50%);
-        background-color: var(--ogr-layout-menu-bar-background-color);
+        background-color: var(--og-layout-menu-bar-background-color);
         color: var(--el-text-color-primary);
         border: none;
         padding: 0;
@@ -391,9 +391,9 @@
         top: 0;
         z-index: 4;
         transition: top 0.2s, left 0.2s, padding 0.2s;
-        animation: ogr-menu-bar-tool-group-expand-fade-in 0.2s forwards;
+        animation: og-menu-bar-tool-group-expand-fade-in 0.2s forwards;
 
-        .ogr-menu-bar__tool-group-expand__controls {
+        .og-menu-bar__tool-group-expand__controls {
             display: flex;
             flex-direction: row;
             margin-left: 1.35rem;
@@ -402,7 +402,7 @@
             transition: width 0.2s, margin 0.2s;
 
             button {
-                background-color: var(--ogr-layout-menu-bar-background-color);
+                background-color: var(--og-layout-menu-bar-background-color);
                 color: var(--el-text-color-primary);
                 padding: 0.75rem;
                 border: none;
@@ -410,7 +410,7 @@
                 margin: 0 0 0 0.35rem;
                 height: 2.5rem;
 
-                &.ogr-menu-bar__tool-group-expand__control--active {
+                &.og-menu-bar__tool-group-expand__control--active {
                     box-shadow: 0 0 0 0.15rem var(--el-color-primary) inset;
                 }
 
@@ -422,8 +422,8 @@
             }
         }
 
-        .ogr-menu-bar__tool-group-expand__toggle-button {
-            background-color: var(--ogr-layout-menu-bar-background-color);
+        .og-menu-bar__tool-group-expand__toggle-button {
+            background-color: var(--og-layout-menu-bar-background-color);
             color: var(--el-text-color-primary);
             padding: 0.75rem 0.35rem 0.75rem 1.5rem;
             border: none;
@@ -439,14 +439,14 @@
             }
         }
 
-        &.ogr-menu-bar__tool-group-expand--expanded {
+        &.og-menu-bar__tool-group-expand--expanded {
             padding: 0.5rem;
 
-            .ogr-menu-bar__tool-group-expand__controls {
+            .og-menu-bar__tool-group-expand__controls {
                 width: auto;
             }
 
-            .ogr-menu-bar__tool-group-expand__toggle-button {
+            .og-menu-bar__tool-group-expand__toggle-button {
                 border-radius: 2rem;
                 padding: 0.35rem 0.35rem 0.35rem 0.35rem;
                 margin: 0.4rem 0 0.4rem 0.75rem;
@@ -455,13 +455,13 @@
             }
         }
     }
-    &.is-positioned-right .ogr-menu-bar__tool-group-expand {
+    &.is-positioned-right .og-menu-bar__tool-group-expand {
         left: auto;
         right: 2.15rem;
         border-radius: 2rem 0 0 2rem;
         flex-direction: row-reverse;
 
-        .ogr-menu-bar__tool-group-expand__controls {
+        .og-menu-bar__tool-group-expand__controls {
             margin-left: 0;
             margin-right: 1.35rem;
 
@@ -470,20 +470,20 @@
             }
         }
 
-        .ogr-menu-bar__tool-group-expand__toggle-button {
+        .og-menu-bar__tool-group-expand__toggle-button {
             padding: 0.75rem 1.5rem 0.75rem 0.35rem;
             border-radius: 2rem 0 0 2rem;
         }
 
-        &.ogr-menu-bar__tool-group-expand--expanded {
-            .ogr-menu-bar__tool-group-expand__toggle-button {
+        &.og-menu-bar__tool-group-expand--expanded {
+            .og-menu-bar__tool-group-expand__toggle-button {
                 border-radius: 2rem;
                 padding: 0.35rem 0.35rem 0.35rem 0.35rem;
                 margin: 0.4rem 0.75rem 0.4rem 0;
             }
         }
     }
-    &.is-positioned-bottom .ogr-menu-bar__tool-group-expand {
+    &.is-positioned-bottom .og-menu-bar__tool-group-expand {
         top: auto;
         left: auto;
         right: auto;
@@ -492,7 +492,7 @@
         flex-direction: column-reverse;
         transform: translateX(-50%);
 
-        .ogr-menu-bar__tool-group-expand__controls {
+        .og-menu-bar__tool-group-expand__controls {
             flex-direction: column;
             margin-top: 0;
             margin-left: 0;
@@ -507,23 +507,23 @@
             }
         }
 
-        .ogr-menu-bar__tool-group-expand__toggle-button {
+        .og-menu-bar__tool-group-expand__toggle-button {
             padding: 0.35rem 0.75rem 1.5rem 0.75rem;
             border-radius: 2rem 2rem 0 0;
         }
 
-        &.ogr-menu-bar__tool-group-expand--expanded {
-            .ogr-menu-bar__tool-group-expand__controls {
+        &.og-menu-bar__tool-group-expand--expanded {
+            .og-menu-bar__tool-group-expand__controls {
                 height: auto;
             }
-            .ogr-menu-bar__tool-group-expand__toggle-button {
+            .og-menu-bar__tool-group-expand__toggle-button {
                 border-radius: 2rem;
                 padding: 0.35rem 0.35rem 0.35rem 0.35rem;
                 margin: 0 0.4rem 0.75rem 0.4rem;
             }
         }
     }
-    &.is-positioned-top .ogr-menu-bar__tool-group-expand {
+    &.is-positioned-top .og-menu-bar__tool-group-expand {
         top: 1.75rem;
         left: auto;
         right: auto;
@@ -532,7 +532,7 @@
         flex-direction: column;
         transform: translateX(-50%);
 
-        .ogr-menu-bar__tool-group-expand__controls {
+        .og-menu-bar__tool-group-expand__controls {
             flex-direction: column;
             margin-top: 1.35rem;
             margin-left: 0;
@@ -547,16 +547,16 @@
             }
         }
 
-        .ogr-menu-bar__tool-group-expand__toggle-button {
+        .og-menu-bar__tool-group-expand__toggle-button {
             padding: 1.5rem 0.75rem 0.35rem 0.75rem;
             border-radius: 0 0 2rem 2rem;
         }
 
-        &.ogr-menu-bar__tool-group-expand--expanded {
-            .ogr-menu-bar__tool-group-expand__controls {
+        &.og-menu-bar__tool-group-expand--expanded {
+            .og-menu-bar__tool-group-expand__controls {
                 height: auto;
             }
-            .ogr-menu-bar__tool-group-expand__toggle-button {
+            .og-menu-bar__tool-group-expand__toggle-button {
                 border-radius: 2rem;
                 padding: 0.35rem 0.35rem 0.35rem 0.35rem;
                 margin: 0.75rem 0.4rem 0 0.4rem;
@@ -572,13 +572,13 @@
             flex-direction: column;
             height: calc(100% - 1rem);
 
-            > .ogr-menu-docks {
+            > .og-menu-docks {
                 justify-content: flex-start;
             }
-            > .ogr-menu-end {
+            > .og-menu-end {
                 justify-content: flex-end;
             }
-            > .ogr-menu-tools {
+            > .og-menu-tools {
                 > .el-scrollbar {
                     width: 100%;
 
@@ -589,13 +589,13 @@
                     }
                 }
             }
-            > .ogr-menu-docks, > .ogr-menu-tools, > .ogr-menu-end {
+            > .og-menu-docks, > .og-menu-tools, > .og-menu-end {
                 align-items: center;
                 flex-direction: column;
             }
 
-            .ogr-menu-section {
-                .ogr-menu-section__title {
+            .og-menu-section {
+                .og-menu-section__title {
                     color: var(--el-text-color-regular);
                     font-size: .675rem;
                     margin: .75rem 0;
@@ -610,7 +610,7 @@
                     }
                 }
 
-                .el-button-group, .ogr-single-button-group {
+                .el-button-group, .og-single-button-group {
                     margin: 0.375rem 0 0 0;
                     height: max-content;
 

@@ -1,12 +1,12 @@
 <template>
-    <div class="ogr-canvas-overlay">
+    <div class="og-canvas-overlay">
         <div
             ref="canvasBorder"
-            class="ogr-canvas-border"
+            class="og-canvas-border"
             :style="{
                 position: 'absolute',
                 top: '-0.5px', left: '-0.5px', width: width + 'px', height: height + 'px',
-                '--ogr-canvas-border-width': 1 / zoom * 0.0625 + 'rem'
+                '--og-canvas-border-width': 1 / zoom * 0.0625 + 'rem'
             }"
         >
         </div>

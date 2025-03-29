@@ -1,0 +1,73 @@
+@mixin light() {
+    --og-popover-background-color: var(--og-surface-0);
+    --og-popover-color: var(--og-surface-800);
+    --og-popover-shadow: 0 0 0.9375rem 0 rgba(0, 0, 0, .03), 0 0.125rem 1.875rem 0 rgba(0, 0, 0, .08), 0 0 0.0625rem 0 rgba(0, 0, 0, .3);
+}
+
+@mixin dark() {
+    --og-popover-background-color: var(--og-surface-800);
+    --og-popover-color: var(--og-surface-0);
+    --og-popover-shadow: 0 0 0.9375rem 0 rgba(0, 0, 0, 0.08), 0 0.125rem 1.875rem 0 rgba(0, 0, 0, .18), 0 0 0.0625rem 0 rgba(0, 0, 0, .75);
+}
+
+@mixin main() {
+    .og-popover {
+        border-radius: 0.875rem;
+        background: var(--og-popover-background-color);
+        color: var(--og-popover-color);
+        max-width: 90vw;
+        box-shadow: var(--og-popover-shadow);
+        z-index: 2061;
+
+        --el-menu-bg-color: transparent;
+    }
+
+    .og-popover__arrow {
+        background: var(--og-popover-background-color);        
+        width: 0.55rem;
+        height: 0.55rem;
+        transform: rotate(45deg);
+        z-index: -1;
+    }
+    .og-popover--bottom-start,
+    .og-popover--bottom,
+    .og-popover--bottom-end {
+        .og-popover__arrow {
+            top: -0.375rem;
+        }
+    }
+    .og-popover--top-start,
+    .og-popover--top,
+    .og-popover--top-end {
+        .og-popover__arrow {
+            bottom: -0.375rem;
+        }
+    }
+
+    .og-popover__content {
+        display: block;
+        padding: 0.75rem 0.875rem;
+    }
+
+    .og-popover__arrow + .og-popover__content,
+    .og-popover__content:first-child {
+        border-start-start-radius: 0.875rem;
+        border-start-end-radius: 0.875rem;;
+    }
+
+    .og-popover__content:last-child {
+        border-end-start-radius: 0.875rem;
+        border-end-end-radius: 0.875rem;;
+    }
+
+    // TODO - replace
+    .og-popover > .og-popover__arrow + .el-menu > .el-menu-item:first-child,
+    .og-popover > .el-menu:first-child > .el-menu-item:first-child {
+        border-start-start-radius: 0.875rem;
+        border-start-end-radius: 0.875rem;
+    }
+    .og-popover > .el-menu:last-child > .el-menu-item:last-child {
+        border-end-start-radius: 0.875rem;
+        border-end-end-radius: 0.875rem;;
+    }
+}

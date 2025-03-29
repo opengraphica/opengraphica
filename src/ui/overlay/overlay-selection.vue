@@ -1,6 +1,6 @@
 <template>
-    <div ref="overlay" class="ogr-canvas-overlay is-full-canvas-area">
-        <div ref="selectionContainer" class="ogr-selection">
+    <div ref="overlay" class="og-canvas-overlay is-full-canvas-area">
+        <div ref="selectionContainer" class="og-selection">
             <svg
                 v-if="transformedActiveSelectionPath.length > 0"
                 :width="svgBoundsWidth"

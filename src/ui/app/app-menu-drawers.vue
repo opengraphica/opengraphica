@@ -1,12 +1,12 @@
 <template>
-    <div ref="drawerContainer" class="ogr-menu-drawers" :hidden="menuDrawers.length === 0" :class="{ 'is-fade-out': isAllDrawersClosing }" @animationend="onAnimationEndDrawers($event)" @click="onCloseAllDrawers($event)">
+    <div ref="drawerContainer" class="og-menu-drawers" :hidden="menuDrawers.length === 0" :class="{ 'is-fade-out': isAllDrawersClosing }" @animationend="onAnimationEndDrawers($event)" @click="onCloseAllDrawers($event)">
         <template v-for="menuDrawer of menuDrawers" :key="menuDrawer.id">
-            <section :ref="el => { drawers[menuDrawer.id] = el }" class="ogr-menu-drawer" :class="['is-open-' + menuDrawer.placement, { 'is-closing': !menuDrawer.visible, 'is-immediate': menuDrawer.immediate }]">
-                <h1 class="ogr-menu-drawer__title" v-t="menuDrawer.title || 'empty'" />
-                <a href="javascript:void(0)" class="ogr-menu-drawer__close" title="Close" @click="onMenuDrawerClosed(menuDrawer)">
+            <section :ref="el => { drawers[menuDrawer.id] = el }" class="og-menu-drawer" :class="['is-open-' + menuDrawer.placement, { 'is-closing': !menuDrawer.visible, 'is-immediate': menuDrawer.immediate }]">
+                <h1 class="og-menu-drawer__title" v-t="menuDrawer.title || 'empty'" />
+                <a href="javascript:void(0)" class="og-menu-drawer__close" title="Close" @click="onMenuDrawerClosed(menuDrawer)">
                     <span class="bi bi-x-circle-fill" aria-hidden="true" />
                 </a>
-                <div class="ogr-menu-drawer__content">
+                <div class="og-menu-drawer__content">
                     <template v-if="menuDrawer.type === 'dock'">
                         <dock :name="menuDrawer.dock.name" @update:title="menuDrawer.title = $event" @close="onMenuDrawerClosed(menuDrawer)" />
                     </template>

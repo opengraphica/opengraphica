@@ -1,6 +1,6 @@
 <template>
-    <div ref="overlay" class="ogr-canvas-overlay is-full-canvas-area">
-        <div ref="eraseBrushContainer" class="ogr-erase">
+    <div ref="overlay" class="og-canvas-overlay is-full-canvas-area">
+        <div ref="eraseBrushContainer" class="og-erase">
             <svg
                 width="2"
                 height="2"

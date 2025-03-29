@@ -15,7 +15,7 @@ export class BundleAction extends BaseAction {
 
 	async do() {
 		super.do();
-		let error = null;
+		let error: any = null;
 		let i = 0;
         this.freeEstimates.memory = 0;
         this.freeEstimates.database = 0;

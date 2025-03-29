@@ -14,10 +14,10 @@ class ImagePlaneGeometry extends BufferGeometry {
             height: height
         };
 
-        const indices = [];
-        const vertices = [];
-        const normals = [];
-        const uvs = [];
+        const indices: number[] = [];
+        const vertices: number[] = [];
+        const normals: number[] = [];
+        const uvs: number[] = [];
 
         for (let iy = 0; iy < 2; iy++) {
             const y = iy * height;

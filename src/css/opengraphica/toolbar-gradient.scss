@@ -1,10 +1,10 @@
-.ogr-gradient-editor {
+.og-gradient-editor {
     display: block;
     position: relative;
     padding-bottom: 2rem;
     width: 100%;
 
-    .ogr-gradient-editor__preview {
+    .og-gradient-editor__preview {
         display: block;
         position: relative;
         width: 100%;
@@ -30,7 +30,7 @@
             background-image: var(--gradient);
         }
 
-        .ogr-gradient-editor__add-position {
+        .og-gradient-editor__add-position {
             display: block;
             position: absolute;
             left: 0;
@@ -44,9 +44,9 @@
         }
     }
 
-    .ogr-gradient-editor__stop-marker {
-        --stop-marker-border-color: var(--ogr-border-color-high-contrast);
-        --stop-marker-background-color: var(--ogr-background-color);
+    .og-gradient-editor__stop-marker {
+        --stop-marker-border-color: var(--og-border-color-high-contrast);
+        --stop-marker-background-color: var(--og-background-color);
 
         position: absolute;
         border-radius: 0 0 0.25rem 0.25rem;
@@ -84,7 +84,7 @@
             z-index: 0;
         }
 
-        .ogr-gradient-editor__stop-marker__color {
+        .og-gradient-editor__stop-marker__color {
             content: '';
             display: flex;
             align-items: center;
@@ -121,25 +121,25 @@
     }
 }
 
-.ogr-toolbar-draw-gradient-stop-drawer__editor-preview-section {
+.og-toolbar-draw-gradient-stop-drawer__editor-preview-section {
     padding: 1.5rem 1.25rem 0.875rem 1.25rem;
     margin: 0 -1.25rem;
-    background: var(--ogr-background-color-secondary);
+    background: var(--og-background-color-secondary);
     border-top: 1px solid var(--el-border-color);
 }
-.ogr-toolbar-draw-gradient-stop-drawer__editor-stop-form {
+.og-toolbar-draw-gradient-stop-drawer__editor-stop-form {
     position: relative;
     padding: 0 1.25rem 0 1.25rem;
     margin: 0 -1.25rem;
     border-bottom: 1px solid var(--el-border-color);
     box-shadow: 0 -0.125rem 0.625rem rgba(0,0,0,0.05);
 
-    .ogr-toolbar-draw-gradient-stop-drawer__editor-stop-form__selection-indicator-container {
+    .og-toolbar-draw-gradient-stop-drawer__editor-stop-form__selection-indicator-container {
         display: block;
         position: relative;
         padding: 0;
     }
-    .ogr-toolbar-draw-gradient-stop-drawer__editor-stop-form__selection-indicator {
+    .og-toolbar-draw-gradient-stop-drawer__editor-stop-form__selection-indicator {
         display: block;
         position: absolute;
         top: 0;
@@ -148,7 +148,7 @@
         height: 0; 
         border-left: 0.5rem solid transparent;
         border-right: 0.5rem solid transparent;
-        border-bottom: 0.5rem solid var(--ogr-layout-menu-bar-background-color);
+        border-bottom: 0.5rem solid var(--og-layout-menu-bar-background-color);
         transform: translate(-50%, -100%);
         transition: left 0.1s;
     }
@@ -167,7 +167,7 @@
         }
     }
 }
-.ogr-toolbar-draw-gradient-stop-drawer__presets {
+.og-toolbar-draw-gradient-stop-drawer__presets {
     display: flex;
     flex-direction: column;
     height: 0;
@@ -187,9 +187,9 @@
     }
 }
 
-.el-dialog .ogr-dock > .ogr-toolbar-draw-gradient-stop-drawer.ogr-dock-content {
+.el-dialog .og-dock > .og-toolbar-draw-gradient-stop-drawer.og-dock-content {
     padding: 0 1.25rem;
-    .ogr-toolbar-draw-gradient-stop-drawer__presets {
+    .og-toolbar-draw-gradient-stop-drawer__presets {
         min-height: 13rem;
     }
 }

@@ -1,7 +1,7 @@
-.ogr-wait {
+.og-wait {
     display: none;
 
-    @keyframes ogr-wait-fade-in {
+    @keyframes og-wait-fade-in {
         0% {
             opacity: 0;
         }
@@ -13,8 +13,8 @@
         }
     }
 }
-.ogr-wait[aria-hidden="false"] {
-    background: var(--ogr-background-color);
+.og-wait[aria-hidden="false"] {
+    background: var(--og-background-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -23,8 +23,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: var(--ogr-wait-z-index);
-    animation: ogr-wait-fade-in 0.2s ease-in forwards;
+    z-index: var(--og-wait-z-index);
+    animation: og-wait-fade-in 0.2s ease-in forwards;
 
     &.is-immediate {
         animation: none !important;
@@ -34,7 +34,7 @@
         font-weight: bold;
     }
 
-    .ogr-wait__center {
+    .og-wait__center {
         display: flex;
         flex-direction: column;
         align-items: center;

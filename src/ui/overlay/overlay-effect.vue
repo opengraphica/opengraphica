@@ -1,8 +1,8 @@
 <template>
-    <div ref="overlay" class="ogr-canvas-overlay is-full-canvas-area">
+    <div ref="overlay" class="og-canvas-overlay is-full-canvas-area">
         <div
             ref="drawBoundsContainer"
-            class="ogr-canvas-overlay-draw-bounds"
+            class="og-canvas-overlay-draw-bounds"
         >
             <svg
                 v-if="selectedLayerSvgPaths.length > 0"

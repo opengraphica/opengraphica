@@ -1,7 +1,7 @@
 <template>
     <div class="is-flex is-align-items-center is-justify-content-center" style="height:100%" v-loading="loading">
         <div>
-            <div class="ogr-logo">
+            <div class="og-logo">
                 <h1 class="px-6">
                     <img :src="`images/logo-full-${logoThemeColor}.svg`" alt="OpenGraphica">
                 </h1>

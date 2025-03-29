@@ -74,7 +74,7 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
                 }
             ]
         });
-        const files = [];
+        const files: File[] = [];
         let firstFileHandle: FileSystemFileHandle | null = null;
         for (const fileHandle of fileHandles) {
             if (fileHandle.kind === 'file') {
@@ -96,10 +96,10 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
     else {
         // This container and the file input is purposely left in the dom after creation in order to avoid
         // several bugs revolving around the fact that browsers give you no information if file selection is canceled.
-        let temporaryFileInputContainer = document.getElementById('ogr-tmp-file-input-container') as HTMLDivElement;
+        let temporaryFileInputContainer = document.getElementById('og-tmp-file-input-container') as HTMLDivElement;
         if (!temporaryFileInputContainer) {
             temporaryFileInputContainer = document.createElement('div');
-            temporaryFileInputContainer.id = 'ogr-tmp-file-input-container';
+            temporaryFileInputContainer.id = 'og-tmp-file-input-container';
             temporaryFileInputContainer.style.position = 'absolute';
             temporaryFileInputContainer.style.opacity = '0.01';
             temporaryFileInputContainer.style.width = '1px';

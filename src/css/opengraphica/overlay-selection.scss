@@ -1,11 +1,11 @@
-.ogr-selection {
+.og-selection {
     position: absolute;
     top: 0;
     right: 0;
     left: 0;
     bottom: 0;
 
-    @keyframes ogr-selection-path {
+    @keyframes og-selection-path {
         0% {
             stroke-dashoffset: 0;
         }
@@ -14,7 +14,7 @@
         }
     }
 
-    @keyframes ogr-selection-handle {
+    @keyframes og-selection-handle {
         0% {
             stroke: rgba(200, 200, 200, 0.9);
         }
@@ -31,12 +31,12 @@
         transform-origin: top left;
 
         path {
-            animation: ogr-selection-path 1s linear infinite;
+            animation: og-selection-path 1s linear infinite;
         }
 
         rect, ellipse {
             fill: white;
-            animation: ogr-selection-handle 2s linear infinite;
+            animation: og-selection-handle 2s linear infinite;
         }
     }
 }

@@ -1,21 +1,21 @@
 <template>
     <div class="is-flex container is-align-items-center is-justify-content-center mx-auto">
-        <div v-if="editingLayers.length > 0 && !showStopDrawer" class="ogr-toolbar-edit-confirm">
+        <div v-if="editingLayers.length > 0 && !showStopDrawer" class="og-toolbar-edit-confirm">
             {{ $t('toolbar.drawGradient.editingGradient') }}
             <el-button plain size="small" class="ml-3" @click="onDoneEditing()">
                 <span class="bi bi-check-circle-fill mr-2" aria-hidden="true" /> {{ $t('button.done') }}
             </el-button>
         </div>
-        <div class="ogr-toolbar-overlay" :class="{ 'is-active': editingLayers.length > 0 }">
-            <div class="ogr-toolbar-tool-selector">
+        <div class="og-toolbar-overlay" :class="{ 'is-active': editingLayers.length > 0 }">
+            <div class="og-toolbar-tool-selector">
                 <span class="bi bi-shadows my-1" aria-hidden="true"></span>
-                <span class="ogr-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
+                <span class="og-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
             </div>
             <el-horizontal-scrollbar-arrows>
                 <div
                     role="button"
                     tabindex="0"
-                    class="ogr-gradient-input ogr-gradient-input--small"
+                    class="og-gradient-input og-gradient-input--small"
                     :style="{ '--gradient': selectedGradientBackground }"
                     aria-haspopup="dialog"
                     :aria-expanded="showStopDrawer"
@@ -59,13 +59,13 @@
             v-if="showStopDrawer"
             :id="'toolbar-draw-gradient-stop-drawer-' + uuid"
             role="dialog"
-            class="ogr-toolbar-drawer"
+            class="og-toolbar-drawer"
             style="max-width: 38rem"
         >
-            <h2 class="ogr-toolbar-drawer__title" v-t="'toolbar.drawGradient.stopDialog.title'" />
+            <h2 class="og-toolbar-drawer__title" v-t="'toolbar.drawGradient.stopDialog.title'" />
             <el-button
                 plain
-                class="ogr-toolbar-drawer__close"
+                class="og-toolbar-drawer__close"
                 :aria-label="$t('toolbar.drawGradient.stopDialog.close')"
                 @click="showStopDrawer = false"
             >

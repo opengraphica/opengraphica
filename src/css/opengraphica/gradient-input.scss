@@ -1,4 +1,4 @@
-.ogr-gradient-input {
+.og-gradient-input {
     display: inline-flex;
     flex-direction: row;
     flex-shrink: 0;
@@ -37,18 +37,18 @@
         outline: none;
     }
 }
-.ogr-gradient-input--small {
+.og-gradient-input--small {
     height: 2rem;
 }
 
-.ogr-gradient-preset {
+.og-gradient-preset {
     display: flex;
     flex-direction: row;
     align-items: center;
     flex-wrap: nowrap;
     border-radius: 0.25rem;
     
-    .ogr-gradient-preset__activate {
+    .og-gradient-preset__activate {
         display: flex;
         background: none;
         padding: 0;
@@ -63,7 +63,7 @@
             outline: 0.125rem solid var(--el-color-primary);
         }
 
-        .ogr-gradient-preset__name {
+        .og-gradient-preset__name {
             display: block;
             width: 40%;
             padding: 0.5rem 0.5rem 0.5rem 0;
@@ -71,7 +71,7 @@
             overflow: hidden;
             text-align: left;
         }
-        .ogr-gradient_preset__color-stops {
+        .og-gradient_preset__color-stops {
             display: block;
             width: 60%;
             height: 2rem;
@@ -97,8 +97,8 @@
     }
 
     &:hover {
-        background: var(--ogr-layer-list-background-color-active);
-        box-shadow: 0 0 0 0.25rem var(--ogr-layer-list-background-color-active);
+        background: var(--og-layer-list-background-color-active);
+        box-shadow: 0 0 0 0.25rem var(--og-layer-list-background-color-active);
     }
 
     > .el-button {

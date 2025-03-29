@@ -1,4 +1,4 @@
-.ogr-dialogs {
+.og-dialogs {
     .el-dialog.el-dialog--medium {
         width: 25rem !important;
         max-width: 90%;
@@ -24,8 +24,8 @@
         opacity: 1;
         transition: opacity 0.3s;
 
-        .ogr-dock.ogr-dock--loading {
-            > :not(.ogr-dock__spinner) {
+        .og-dock.og-dock--loading {
+            > :not(.og-dock__spinner) {
                 position: absolute !important;
                 visibility: hidden !important;
                 pointer-events: none !important;
@@ -33,7 +33,7 @@
         }
     }
 
-    &.ogr-dialogs--loading {
+    &.og-dialogs--loading {
         .el-dialog {
             transition: none !important;
             opacity: 0 !important;
@@ -64,7 +64,7 @@
     }
 
     @media screen and (max-width: 600px) {
-        .ogr-dock-mobile-edge-padding {
+        .og-dock-mobile-edge-padding {
             padding-left: 1.5rem;
             padding-right: 1.5rem;
         }

@@ -2,23 +2,23 @@
     <component v-if="isAllPluginsLoaded && isThemeLoaded && AppMainComponent" :is="AppMainComponent" />
     <div
         v-if="isShowingPreloadAnimation"
-        class="ogr-preload"
+        class="og-preload"
         :class="{
-            'ogr-preload--fade-out': isHidingPreloadAnimation,    
+            'og-preload--fade-out': isHidingPreloadAnimation,    
         }"
         @transitionend="onPreloadTransitionEnd()"
         @click="onClickPreload"
     >
-        <div class="ogr-preload__logo">
+        <div class="og-preload__logo">
             <svg
                 viewBox="-30 0 840 168.59"
                 width="791.31"
                 height="168.59"
             >
-                <g class="ogr-preload__logo__icon">
+                <g class="og-preload__logo__icon">
                     <g transform="translate(-559.34,-404.7)">
-                        <path class="ogr-preload__logo__icon-background" d="M 718.49,573.29 H 578.26 c -10.45,0 -18.92,-8.47 -18.92,-18.92 V 423.62 c 0,-10.45 8.47,-18.92 18.92,-18.92 h 140.23 c 10.45,0 18.92,8.47 18.92,18.92 v 130.75 c 0,10.45 -8.47,18.92 -18.92,18.92 z" />
-                        <g class="ogr-preload__logo__icon-fill" transform="matrix(1.2238877,0,0,1.2661526,-156.90615,-149.146)">
+                        <path class="og-preload__logo__icon-background" d="M 718.49,573.29 H 578.26 c -10.45,0 -18.92,-8.47 -18.92,-18.92 V 423.62 c 0,-10.45 8.47,-18.92 18.92,-18.92 h 140.23 c 10.45,0 18.92,8.47 18.92,18.92 v 130.75 c 0,10.45 -8.47,18.92 -18.92,18.92 z" />
+                        <g class="og-preload__logo__icon-fill" transform="matrix(1.2238877,0,0,1.2661526,-156.90615,-149.146)">
                             <path d="m 687.93,498.3 c -7,3.41 -13.48,7.74 -19.41,13.01 0.75,-1.66 1.44,-3.33 2.04,-5.04 2.52,-7.25 3.28,-15.11 4.9,-23.13 5.36,4.29 9.25,9.48 12.47,15.16 z" />
                             <path d="m 657.99,449.36 c -11.14,12.75 -14.21,27.85 -15.65,44.4 -8.57,-7.09 -13.44,-15.43 -17.32,-24.38 6.27,-11.97 19.89,-20.45 32.97,-20.02 z" />
                             <path d="m 697.61,494.31 c -2.77,0.95 -5.47,2.04 -8.09,3.25 -2.63,-4.03 -5.31,-8 -8.51,-11.48 -5.03,-5.48 -11.43,-9.71 -17.38,-14.61 9.62,-4.06 19.45,-3.87 29.79,-1.97 4.18,8.2 5.6,16.51 4.19,24.81 z" />
@@ -32,7 +32,7 @@
                     </g>
                 </g>
                 <g transform="translate(-559.34,-404.7)">
-                    <g class="ogr-preload__logo__sub-text">
+                    <g class="og-preload__logo__sub-text">
                         <path d="m 1169.83,558.32 h -2.88 v -21.86 h 2.88 z" />
                         <path d="m 1177.27,542.08 0.08,1.8 c 1.19,-1.4 2.8,-2.1 4.82,-2.1 2.27,0 3.82,0.87 4.64,2.61 0.54,-0.78 1.24,-1.41 2.11,-1.89 0.87,-0.48 1.89,-0.72 3.07,-0.72 3.56,0 5.37,1.89 5.43,5.66 v 10.88 h -2.78 V 547.6 c 0,-1.16 -0.27,-2.03 -0.8,-2.6 -0.53,-0.58 -1.42,-0.86 -2.67,-0.86 -1.03,0 -1.89,0.31 -2.57,0.92 -0.68,0.62 -1.08,1.44 -1.19,2.48 v 10.78 h -2.79 v -10.64 c 0,-2.36 -1.16,-3.54 -3.47,-3.54 -1.82,0 -3.07,0.78 -3.74,2.33 v 11.86 h -2.78 v -16.24 h 2.64 z" />
                         <path d="m 1211.63,558.32 c -0.16,-0.32 -0.29,-0.89 -0.39,-1.71 -1.29,1.34 -2.83,2.01 -4.62,2.01 -1.6,0 -2.92,-0.45 -3.94,-1.36 -1.03,-0.91 -1.54,-2.05 -1.54,-3.44 0,-1.69 0.64,-3 1.93,-3.94 1.29,-0.94 3.09,-1.4 5.43,-1.4 h 2.7 v -1.28 c 0,-0.97 -0.29,-1.74 -0.87,-2.32 -0.58,-0.58 -1.44,-0.86 -2.57,-0.86 -0.99,0 -1.82,0.25 -2.49,0.75 -0.67,0.5 -1.01,1.11 -1.01,1.82 h -2.79 c 0,-0.81 0.29,-1.59 0.86,-2.35 0.58,-0.76 1.36,-1.35 2.34,-1.79 0.99,-0.44 2.07,-0.66 3.25,-0.66 1.87,0 3.34,0.47 4.4,1.4 1.06,0.94 1.61,2.22 1.65,3.87 v 7.48 c 0,1.49 0.19,2.68 0.57,3.56 v 0.24 h -2.91 z m -4.6,-2.11 c 0.87,0 1.7,-0.23 2.48,-0.68 0.78,-0.45 1.35,-1.04 1.7,-1.76 v -3.33 h -2.18 c -3.4,0 -5.1,1 -5.1,2.99 0,0.87 0.29,1.55 0.87,2.04 0.57,0.49 1.31,0.74 2.23,0.74 z" />
@@ -45,7 +45,7 @@
                         <path d="m 1310.76,550.05 c 0,-1.59 0.31,-3.02 0.94,-4.29 0.62,-1.27 1.5,-2.25 2.61,-2.94 1.12,-0.69 2.39,-1.04 3.82,-1.04 2.21,0 4,0.77 5.37,2.3 1.37,1.53 2.05,3.57 2.05,6.11 v 0.2 c 0,1.58 -0.3,3 -0.91,4.26 -0.61,1.26 -1.47,2.23 -2.6,2.94 -1.13,0.71 -2.42,1.05 -3.88,1.05 -2.2,0 -3.99,-0.77 -5.35,-2.3 -1.36,-1.53 -2.05,-3.56 -2.05,-6.08 z m 2.79,0.33 c 0,1.8 0.42,3.25 1.25,4.34 0.83,1.09 1.95,1.64 3.35,1.64 1.41,0 2.53,-0.55 3.36,-1.66 0.83,-1.11 1.25,-2.65 1.25,-4.65 0,-1.78 -0.42,-3.23 -1.27,-4.33 -0.85,-1.1 -1.97,-1.66 -3.37,-1.66 -1.37,0 -2.48,0.55 -3.32,1.64 -0.83,1.09 -1.25,2.65 -1.25,4.68 z" />
                         <path d="m 1336.88,544.57 c -0.42,-0.07 -0.88,-0.1 -1.37,-0.1 -1.82,0 -3.06,0.78 -3.71,2.33 v 11.53 h -2.78 v -16.24 h 2.7 l 0.04,1.88 c 0.91,-1.45 2.2,-2.18 3.87,-2.18 0.54,0 0.95,0.07 1.23,0.21 v 2.57 z" />
                     </g>
-                    <g class="ogr-preload__logo__main-text">
+                    <g class="og-preload__logo__main-text">
                         <path d="m 823.18,492.52 c 0,6.55 -1.1,12.26 -3.3,17.14 -2.2,4.88 -5.32,8.61 -9.36,11.18 -4.04,2.57 -8.75,3.86 -14.14,3.86 -5.26,0 -9.93,-1.29 -14,-3.88 -4.07,-2.58 -7.23,-6.27 -9.48,-11.06 -2.25,-4.79 -3.4,-10.33 -3.46,-16.64 v -4.82 c 0,-6.43 1.12,-12.1 3.35,-17.03 2.23,-4.93 5.39,-8.7 9.48,-11.31 4.08,-2.62 8.76,-3.92 14.02,-3.92 5.35,0 10.07,1.29 14.16,3.88 4.08,2.59 7.23,6.33 9.43,11.24 2.2,4.91 3.3,10.62 3.3,17.14 z m -8.77,-4.31 c 0,-7.92 -1.59,-14.01 -4.77,-18.24 -3.18,-4.24 -7.63,-6.36 -13.36,-6.36 -5.57,0 -9.95,2.12 -13.15,6.36 -3.2,4.24 -4.84,10.12 -4.93,17.65 v 4.91 c 0,7.68 1.61,13.72 4.84,18.11 3.23,4.39 7.67,6.59 13.33,6.59 5.69,0 10.1,-2.07 13.22,-6.22 3.12,-4.15 4.73,-10.09 4.82,-17.83 z" />
                         <path d="m 877.01,499.5 c 0,7.56 -1.73,13.65 -5.19,18.27 -3.46,4.62 -8.14,6.93 -14.04,6.93 -6.03,0 -10.77,-1.91 -14.23,-5.74 v 23.91 h -8.49 v -68.75 h 7.76 l 0.41,5.51 c 3.46,-4.28 8.26,-6.43 14.41,-6.43 5.97,0 10.69,2.25 14.16,6.75 3.47,4.5 5.21,10.76 5.21,18.77 z m -8.49,-0.97 c 0,-5.6 -1.19,-10.02 -3.58,-13.26 -2.39,-3.24 -5.66,-4.86 -9.82,-4.86 -5.14,0 -9,2.28 -11.57,6.84 v 23.73 c 2.54,4.53 6.43,6.79 11.66,6.79 4.07,0 7.3,-1.61 9.71,-4.84 2.4,-3.23 3.6,-8.03 3.6,-14.4 z" />
                         <path d="m 908.41,524.7 c -6.73,0 -12.21,-2.21 -16.43,-6.63 -4.22,-4.42 -6.33,-10.33 -6.33,-17.74 v -1.56 c 0,-4.93 0.94,-9.32 2.82,-13.19 1.88,-3.87 4.51,-6.9 7.89,-9.09 3.38,-2.19 7.04,-3.28 10.99,-3.28 6.46,0 11.47,2.13 15.05,6.38 3.58,4.25 5.37,10.34 5.37,18.27 v 3.53 h -33.64 c 0.12,4.9 1.55,8.85 4.29,11.86 2.74,3.01 6.22,4.52 10.44,4.52 3,0 5.54,-0.61 7.62,-1.84 2.08,-1.22 3.9,-2.85 5.46,-4.86 l 5.19,4.04 c -4.16,6.39 -10.4,9.59 -18.72,9.59 z m -1.06,-44.52 c -3.43,0 -6.3,1.25 -8.63,3.74 -2.33,2.49 -3.76,5.99 -4.31,10.49 h 24.88 v -0.64 c -0.25,-4.31 -1.41,-7.66 -3.49,-10.03 -2.09,-2.38 -4.9,-3.56 -8.45,-3.56 z" />
@@ -61,8 +61,8 @@
                     </g>
                 </g>
             </svg>
-            <img class="ogr-preload__hidden-image" src="images/logo-full-dark.svg" aria-hidden="true" >
-            <img class="ogr-preload__hidden-image" src="images/logo-full-light.svg" aria-hidden="true" >
+            <img class="og-preload__hidden-image" src="images/logo-full-dark.svg" aria-hidden="true" >
+            <img class="og-preload__hidden-image" src="images/logo-full-light.svg" aria-hidden="true" >
         </div>
     </div>
 </template>
@@ -183,8 +183,8 @@ export default defineComponent({
         \*-----------------------------------*/
 
         const preloadStyle = `
-            .ogr-preload {
-                background: var(--ogr-preload-background, white);
+            .og-preload {
+                background: var(--og-preload-background, white);
                 color: #333;
                 display: flex;
                 flex-direction: column;
@@ -196,31 +196,31 @@ export default defineComponent({
                 max-height: 200vh;
                 z-index: 9999999;
             }
-            .ogr-preload--fade-out {
+            .og-preload--fade-out {
                 pointer-events: none;
                 opacity: 0;
                 transition: opacity 0.5s;
             }
-            body.ogr-full-page .ogr-preload {
+            body.og-full-page .og-preload {
                 position: absolute;
                 top: 0;
                 left: 0;
                 right: 0;
                 bottom: 0;
             }
-            .ogr-preload__hidden-image {
+            .og-preload__hidden-image {
                 position: absolute;
                 width: 1px;
                 height: 1px;
                 opacity: 0.01;
             }
-            .ogr-preload__logo {
+            .og-preload__logo {
                 display: block;
                 position: relative;
-                animation: ogr-preload-logo-fade-in 0.3s forwards;
+                animation: og-preload-logo-fade-in 0.3s forwards;
                 margin: 1rem 4rem;
             }
-            @keyframes ogr-preload-logo-fade-in {
+            @keyframes og-preload-logo-fade-in {
                 0% {
                     opacity: 0;
                 }
@@ -228,53 +228,53 @@ export default defineComponent({
                     opacity: 1;
                 }
             }
-            .ogr-preload__logo svg {
+            .og-preload__logo svg {
                 width: 25rem;
                 max-width: 100%;
             }
-            .ogr-preload__logo__main-text {
+            .og-preload__logo__main-text {
                 fill: black;
             }
-            .ogr-preload__logo__main-text path:nth-child(0) {
-                animation: ogr-preload-logo-text-jump 5s ease-in-out 0s infinite;
+            .og-preload__logo__main-text path:nth-child(0) {
+                animation: og-preload-logo-text-jump 5s ease-in-out 0s infinite;
             }
-            .ogr-preload__logo__main-text path:nth-child(1) {
-                animation: ogr-preload-logo-text-jump 5s ease-in-out 0.1s infinite;
+            .og-preload__logo__main-text path:nth-child(1) {
+                animation: og-preload-logo-text-jump 5s ease-in-out 0.1s infinite;
             }
-            .ogr-preload__logo__main-text path:nth-child(2) {
-                animation: ogr-preload-logo-text-jump 5s ease-in-out 0.2s infinite;
+            .og-preload__logo__main-text path:nth-child(2) {
+                animation: og-preload-logo-text-jump 5s ease-in-out 0.2s infinite;
             }
-            .ogr-preload__logo__main-text path:nth-child(3) {
-                animation: ogr-preload-logo-text-jump 5s ease-in-out 0.3s infinite;
+            .og-preload__logo__main-text path:nth-child(3) {
+                animation: og-preload-logo-text-jump 5s ease-in-out 0.3s infinite;
             }
-            .ogr-preload__logo__main-text path:nth-child(4) {
-                animation: ogr-preload-logo-text-jump 5s ease-in-out 0.4s infinite;
+            .og-preload__logo__main-text path:nth-child(4) {
+                animation: og-preload-logo-text-jump 5s ease-in-out 0.4s infinite;
             }
-            .ogr-preload__logo__main-text path:nth-child(5) {
-                animation: ogr-preload-logo-text-jump 5s ease-in-out 0.5s infinite;
+            .og-preload__logo__main-text path:nth-child(5) {
+                animation: og-preload-logo-text-jump 5s ease-in-out 0.5s infinite;
             }
-            .ogr-preload__logo__main-text path:nth-child(6) {
-                animation: ogr-preload-logo-text-jump 5s ease-in-out 0.6s infinite;
+            .og-preload__logo__main-text path:nth-child(6) {
+                animation: og-preload-logo-text-jump 5s ease-in-out 0.6s infinite;
             }
-            .ogr-preload__logo__main-text path:nth-child(7) {
-                animation: ogr-preload-logo-text-jump 5s ease-in-out 0.7s infinite;
+            .og-preload__logo__main-text path:nth-child(7) {
+                animation: og-preload-logo-text-jump 5s ease-in-out 0.7s infinite;
             }
-            .ogr-preload__logo__main-text path:nth-child(8) {
-                animation: ogr-preload-logo-text-jump 5s ease-in-out 0.8s infinite;
+            .og-preload__logo__main-text path:nth-child(8) {
+                animation: og-preload-logo-text-jump 5s ease-in-out 0.8s infinite;
             }
-            .ogr-preload__logo__main-text path:nth-child(9) {
-                animation: ogr-preload-logo-text-jump 5s ease-in-out 0.9s infinite;
+            .og-preload__logo__main-text path:nth-child(9) {
+                animation: og-preload-logo-text-jump 5s ease-in-out 0.9s infinite;
             }
-            .ogr-preload__logo__main-text path:nth-child(10) {
-                animation: ogr-preload-logo-text-jump 5s ease-in-out 1s infinite;
+            .og-preload__logo__main-text path:nth-child(10) {
+                animation: og-preload-logo-text-jump 5s ease-in-out 1s infinite;
             }
-            .ogr-preload__logo__main-text path:nth-child(11) {
-                animation: ogr-preload-logo-text-jump 5s ease-in-out 1.1s infinite;
+            .og-preload__logo__main-text path:nth-child(11) {
+                animation: og-preload-logo-text-jump 5s ease-in-out 1.1s infinite;
             }
-            .ogr-preload__logo__main-text path:nth-child(12) {
-                animation: ogr-preload-logo-text-jump 5s ease-in-out 1.2s infinite;
+            .og-preload__logo__main-text path:nth-child(12) {
+                animation: og-preload-logo-text-jump 5s ease-in-out 1.2s infinite;
             }
-            @keyframes ogr-preload-logo-text-jump {
+            @keyframes og-preload-logo-text-jump {
                 60% {
                     transform: translateY(0);
                 }
@@ -288,13 +288,13 @@ export default defineComponent({
                     transform: translateY(0);
                 }
             }
-            .ogr-preload__logo__sub-text {
+            .og-preload__logo__sub-text {
                 fill: #5EACF2;
             }
-            .ogr-preload__logo__icon {
-                animation: ogr-preload-logo-icon-spin 5s ease-in-out infinite;
+            .og-preload__logo__icon {
+                animation: og-preload-logo-icon-spin 5s ease-in-out infinite;
             }
-            @keyframes ogr-preload-logo-icon-spin {
+            @keyframes og-preload-logo-icon-spin {
                 0% {
                     transform: rotate(0deg);
                     transform-origin: 90px 85px;
@@ -320,23 +320,23 @@ export default defineComponent({
                     transform-origin: 90px 85px;
                 }
             }
-            .ogr-preload__logo__icon-background {
+            .og-preload__logo__icon-background {
                 fill-rule: evenodd;
                 clip-rule: evenodd;
                 fill: #5EACF2;
             }
-            .ogr-preload__logo__icon-fill {
+            .og-preload__logo__icon-fill {
                 fill-rule: evenodd;
                 clip-rule: evenodd;
                 fill: #FFFFFF;
             }
             @media (prefers-color-scheme: dark) {
-                .ogr-preload {
-                    background: var(--ogr-preload-background, #1f252d);
+                .og-preload {
+                    background: var(--og-preload-background, #1f252d);
                     color: white;
                     box-shadow: 0 0 5rem rgba(0,0,0,0.4) inset, 0 0 2rem rgba(0,0,0,0.05) inset;
                 }
-                .ogr-preload__logo__main-text {
+                .og-preload__logo__main-text {
                     fill: white;
                 }
             }

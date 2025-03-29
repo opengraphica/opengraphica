@@ -1,15 +1,15 @@
-.ogr-dock-popover {
+.og-dock-popover {
     min-width: 0 !important;
     max-width: 90vw;
     max-height: calc(100vh - 5rem) !important;
     padding: 0 !important;
     width: auto !important;
 
-    &.ogr-dock-popper--singleton {
+    &.og-dock-popper--singleton {
         transition: transform 0.15s var(--el-transition-function-fast-bezier), opacity 0.15s var(--el-transition-function-fast-bezier);
     }
 
-    > .ogr-dock-title {
+    > .og-dock-title {
         text-align: center;
         font-size: 1rem;
         font-weight: bold;
@@ -17,15 +17,15 @@
         margin: .25rem 0 0 0;
     }
 
-    > .ogr-dock {
+    > .og-dock {
         max-height: calc(100vh - 5rem) !important;
         overflow: hidden !important;
 
-        > .ogr-dock-header {
+        > .og-dock-header {
             border-bottom: 2px solid var(--el-border-color-light);
         }
 
-        > .ogr-dock-content {
+        > .og-dock-content {
             width: 350px;
             max-width: 100%;
 

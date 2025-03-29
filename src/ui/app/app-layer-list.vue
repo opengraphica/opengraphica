@@ -5,22 +5,23 @@
         v-pointer.press="onPointerPressList"
         v-pointer.move.window="onPointerMoveList"
         v-pointer.up.window="onPointerUpList"
-        class="ogr-layer-list"
-        :class="{ 'is-dnd-dragging': draggingLayerId != null }"
+        class="og-layer-list"
+        :class="{
+            'is-dnd-dragging': draggingLayerId != null,
+            'is-flex-grow-1': isRoot,
+        }"
     >
         <template v-for="(layer, layerIndex) of reversedLayers" :key="layer.id">
             <li
                 v-if="dropTargetLayerId === layer.id && dropTargetPosition === 'above'"
-                class="ogr-layer is-dnd-placeholder"
+                class="og-layer is-dnd-placeholder"
                 :style="{ height: draggingLayerHeight + 'px' }"
             />
-            <li class="ogr-layer"
+            <li class="og-layer"
                 :class="{
                     'is-dnd-hover': layer.id === hoveringLayerId,
                     'is-active': selectedLayerIds.includes(layer.id),
                     'is-expanded': isGroupLayer(layer) && layer.expanded,
-                    'is-drag-insert-above': dropTargetLayerId === layer.id && dropTargetPosition === 'above',
-                    'is-drag-insert-below': dropTargetLayerId === layer.id && dropTargetPosition === 'below',
                     'is-drag-insert-inside': dropTargetLayerId === layer.id && dropTargetPosition === 'inside'
                 }"
                 :style="{
@@ -30,66 +31,36 @@
                 :data-layer-id="layer.id"
             >
                 <!-- Name, View, Options -->
-                <span class="ogr-layer-main">
+                <span class="og-layer-main">
                     <span
-                        class="ogr-layer-dnd-handle"
+                        class="og-layer-dnd-handle"
                         v-pointer.tap="onPointerTapDndHandle"
                         @mouseenter="onMouseEnterDndHandle(layer)"
                         @mouseleave="onMouseLeaveDndHandle(layer)">
                         <app-layer-list-thumbnail :layer="layer" />
-                        <span class="ogr-layer-name">
+                        <span class="og-layer-name">
                             <span class="bi mr-1" :class="getIconClass(layer)" aria-hidden="true" />
                             {{ layer.name }}
                         </span>
-                        <span v-if="layer.type === 'group'" class="ogr-layer-group-arrow bi" :class="{ 'bi-chevron-right': !layer.expanded, 'bi-chevron-down': layer.expanded }" aria-hidden="true"></span>
+                        <span v-if="layer.type === 'group'" class="og-layer-group-arrow bi" :class="{ 'bi-chevron-right': !layer.expanded, 'bi-chevron-down': layer.expanded }" aria-hidden="true"></span>
                     </span>
                     <el-button link type="primary" class="px-2 my-1" :aria-label="$t('app.layerList.toggleLayerVisibility')" @click="onToggleLayerVisibility(layer)">
                         <i class="bi" :class="{ 'bi-eye-fill': layer.visible, 'bi-eye-slash': !layer.visible }" aria-hidden="true"></i>
                     </el-button>
-                    <el-popover
-                        v-model:visible="layerSettingsVisibility[layerIndex]"
-                        trigger="click"
-                        popper-class="p-0"
-                    >
-                        <template #reference>
-                            <el-button link type="primary" class="px-2 mr-2 my-1 ml-0" :aria-label="$t('app.layerList.layerSettings')">
-                                <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
-                            </el-button>
-                        </template>
-                        <el-menu class="el-menu--medium el-menu--borderless my-1" :default-active="layerSettingsActiveIndex" @select="onLayerSettingsSelect(layer, layerIndex, $event)">
-                            <el-menu-item index="rename">
-                                <i class="bi bi-alphabet"></i>
-                                <span v-t="'app.layerList.rename'"></span>
-                            </el-menu-item>
-                            <el-menu-item index="blendingMode">
-                                <i class="bi bi-images"></i>
-                                <span v-t="'app.layerList.blendingMode'"></span>
-                            </el-menu-item>
-                            <el-menu-item index="effect">
-                                <i class="bi bi-stars"></i>
-                                <span v-t="'app.layerList.addEffect'"></span>
-                            </el-menu-item>
-                            <el-menu-item index="duplicate">
-                                <i class="bi bi-copy"></i>
-                                <span v-t="'app.layerList.duplicate'"></span>
-                            </el-menu-item>
-                            <el-menu-item index="delete">
-                                <i class="bi bi-trash"></i>
-                                <span v-t="'app.layerList.delete'"></span>
-                            </el-menu-item>
-                        </el-menu>
-                    </el-popover>
+                    <el-button link type="primary" class="px-2 mr-2 my-1 ml-0" :aria-label="$t('app.layerList.layerSettings')" @click="onToggleLayerSettings($event, layer)">
+                        <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
+                    </el-button>
                 </span>
                 <!-- Raster Sequence Frames -->
-                <span v-if="layer.type === 'rasterSequence'" role="group" class="ogr-layer-attributes ogr-layer-frames">
-                    <span class="ogr-layer-attributes__title">
+                <span v-if="layer.type === 'rasterSequence'" role="group" class="og-layer-attributes og-layer-frames">
+                    <span class="og-layer-attributes__title">
                         <i class="bi bi-arrow-return-right" aria-hidden="true"></i> {{ $t('app.layerList.frames') }}
                         <el-button v-if="!playingAnimation" link type="primary" class="p-0 ml-1" style="min-height: 0" :aria-label="$t('app.layerList.playAnimation')" @click="onPlayRasterSequence(layer)"><i class="bi bi-play" aria-hidden="true"></i></el-button>
                         <el-button v-else link type="primary" class="p-0 ml-1" style="min-height: 0" :aria-label="$t('app.layerList.stopAnimation')" @click="onStopRasterSequence()"><i class="bi bi-stop" aria-hidden="true"></i></el-button>
                     </span>
                     <div class="is-flex">
                         <el-scrollbar>
-                            <ul class="ogr-layer-frames-list">
+                            <ul class="og-layer-frames-list">
                                 <li v-for="(frame, index) in layer.data.sequence" :key="index">
                                     <app-layer-frame-thumbnail :layer="layer" :sequence-index="index" role="button" :tabindex="0" @dragstart.prevent @click="onSelectLayerFrame(layer, index)" />
                                 </li>
@@ -101,15 +72,15 @@
                     </div>
                 </span>
                 <!-- Effects -->
-                <span v-if="layer.filters?.length > 0" role="group" class="ogr-layer-attributes">
-                    <span class="ogr-layer-attributes__title">
+                <span v-if="layer.filters?.length > 0" role="group" class="og-layer-attributes">
+                    <span class="og-layer-attributes__title">
                         <span class="is-flex is-flex-direction-row">
                             <i class="bi bi-arrow-return-right mr-1" aria-hidden="true"></i>
                             {{ $t('app.layerList.effects') }}
-                            <transition name="fade">
+                            <transition name="og-transition-fade">
                                 <img v-if="layer.isBaking" src="../../assets/images/loading-spinner.svg" class="is-align-self-center ml-3 mr-1" style="width: 1rem" />
                             </transition>
-                            <!-- <transition name="fade">
+                            <!-- <transition name="og-transition-fade">
                                 <span v-if="layer.isBaking" v-t="'app.layerList.recalculatingEffect'" class="has-color-primary" />
                             </transition> -->
                             <el-button link type="primary" class="ml-auto mr-1" style="min-height: 0" @click="rasterizeLayer(layer)">
@@ -118,7 +89,7 @@
                             </el-button>
                         </span>
                     </span>
-                    <ul class="ogr-layer-effect-stack">
+                    <ul class="og-layer-effect-stack">
                         <li v-for="(filter, filterIndex) of layer.filters" :key="filterIndex">
                             <el-button link :type="filter.disabled ? undefined : 'primary'" @click="onEditLayerFilter(layer, filterIndex)">
                                 <i class="bi bi-pencil-square mr-1" aria-hidden="true"></i>
@@ -160,24 +131,54 @@
             </li>
             <li
                 v-if="dropTargetLayerId === layer.id && dropTargetPosition === 'below'"
-                class="ogr-layer is-dnd-placeholder"
+                class="og-layer is-dnd-placeholder"
                 :style="{ height: draggingLayerHeight + 'px' }"
             />
         </template>
         <li
             ref="draggingLayer"
-            v-if="draggingLayerId != null"
-            class="ogr-layer is-dragging"
+            v-if="isRoot && draggingLayerId != null"
+            class="og-layer is-dragging"
             aria-hidden="true"
             v-html="draggingItemHtml"
         />
     </ul>
+    <og-popover
+        v-model:visible="showLayerSettingsMenu"
+        placement="bottom-end"
+        :reference="showLayerSettingsReference"
+        @hidden="showLayerSettingsMenuFor = null"
+    >
+        <el-menu class="el-menu--medium el-menu--borderless" :default-active="layerSettingsActiveIndex" @select="onLayerSettingsSelect($event)">
+            <el-menu-item index="rename">
+                <i class="bi bi-alphabet"></i>
+                <span v-t="'app.layerList.rename'"></span>
+            </el-menu-item>
+            <el-menu-item index="blendingMode">
+                <i class="bi bi-images"></i>
+                <span v-t="'app.layerList.blendingMode'"></span>
+            </el-menu-item>
+            <el-menu-item index="effect">
+                <i class="bi bi-stars"></i>
+                <span v-t="'app.layerList.addEffect'"></span>
+            </el-menu-item>
+            <el-menu-item index="duplicate">
+                <i class="bi bi-copy"></i>
+                <span v-t="'app.layerList.duplicate'"></span>
+            </el-menu-item>
+            <el-menu-item index="delete">
+                <i class="bi bi-trash"></i>
+                <span v-t="'app.layerList.delete'"></span>
+            </el-menu-item>
+        </el-menu>
+    </og-popover>
 </template>
 
 <script setup lang="ts">
 import { ref, watch, reactive, computed, onMounted, onUnmounted, toRefs, nextTick, PropType } from 'vue';
 import { useI18n } from '@/i18n';
 
+import OgPopover from '@/ui/element/popover.vue';
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton from 'element-plus/lib/components/button/index';
 import ElMenu, { ElMenuItem } from 'element-plus/lib/components/menu/index';
@@ -254,6 +255,8 @@ const draggingLayerId = ref<number | null>(null);
 const draggingItemHtml = ref<string>('');
 
 const layerSettingsVisibility = ref<boolean[]>([]);
+const showLayerSettingsReference = ref<HTMLButtonElement>();
+const showLayerSettingsMenu = ref(false);
 const showLayerSettingsMenuFor = ref<number | null>(null);
 const layerSettingsActiveIndex = ref('');
 
@@ -277,6 +280,10 @@ watch(() => props.scrollTop, () => {
             calculateDropPosition(lastDragPageY);
         });
     }
+});
+
+watch(() => showLayerSettingsMenuFor.value, (value) => {
+    showLayerSettingsMenu.value = value != null;
 });
 
 if (!props.isRoot) {
@@ -315,7 +322,11 @@ function reverseLayerList(layerList: WorkingFileAnyLayer<ColorModel>[]): Working
     return newLayersList;
 }
 
-async function onLayerSettingsSelect(layer: WorkingFileAnyLayer<ColorModel>, layerIndex: number, action: string) {
+async function onLayerSettingsSelect(action: string) {
+    const layer = getLayerById(showLayerSettingsMenuFor.value ?? -1);
+    if (!layer) return;
+    console.log('asf', layer.id);
+
     if (action === 'rename') {
         runModule('layer', 'rename', { layerId: layer.id, });
     } else if (action === 'blendingMode') {
@@ -335,7 +346,6 @@ async function onLayerSettingsSelect(layer: WorkingFileAnyLayer<ColorModel>, lay
     layerSettingsActiveIndex.value = ' ';
     await nextTick();
     layerSettingsActiveIndex.value = '';
-    layerSettingsVisibility.value[layerIndex] = false;
 }
 
 function onMouseEnterDndHandle(layer: WorkingFileAnyLayer<ColorModel>) {
@@ -347,7 +357,7 @@ function onMouseLeaveDndHandle(layer: WorkingFileAnyLayer<ColorModel>) {
 }
 
 function onPointerTapDndHandle(e: PointerEvent) {
-    const layerId: number = parseInt((e.target as Element)?.closest('.ogr-layer')?.getAttribute('data-layer-id') || '-1', 10);
+    const layerId: number = parseInt((e.target as Element)?.closest('.og-layer')?.getAttribute('data-layer-id') || '-1', 10);
     const layer = getLayerById(layerId);
     if (layer) {
         if (layer.type === 'group') {
@@ -376,7 +386,7 @@ async function handleDragStartList(e: PointerEvent) {
     const target = e.target;
     const pageY = e.pageY;
     lastDragPageY = pageY;
-    const layerElement: Element | null | undefined = (target as Element)?.closest('.ogr-layer-dnd-handle')?.closest('.ogr-layer');
+    const layerElement: Element | null | undefined = (target as Element)?.closest('.og-layer-dnd-handle')?.closest('.og-layer');
 
     if (layerElement?.parentNode !== layerList.value) {
         return;
@@ -417,6 +427,7 @@ function calculateDropPosition(pageY: number) {
         let newDropTargetPosition: 'above' | 'inside' | 'below' = 'above';
 
         const previousDropTargetLayerId = dropTargetLayerId.value ?? draggingLayerId.value;
+        const previousDropTargetPosition = dropTargetPosition.value ?? 'above';
         const layerListTop = layerList.value.getBoundingClientRect().top + window.scrollY;
         draggingLayer.value.style.top = pageY - layerListTop - draggingLayerPointerOffset + 'px';
         const dragItemHandleHeight = 64;
@@ -435,74 +446,50 @@ function calculateDropPosition(pageY: number) {
         findDropTarget:
         {
             let runningOffset = 0;
-            let id: number, height: number, previousHeight: number = 0, nextId: number = -1, nextHeight: number = 0;
+            let id: number, height: number, isPreviousTargetEncountered: boolean = false, nextId: number = -1, nextHeight: number = 0;
             for (let i = 0; i < dragItemOffsets.length; i++) {
                 ({ id, height } = dragItemOffsets[i]);
                 if (dragItemOffsets[i + 1]) {
-                    ({ id: nextId } = dragItemOffsets[i + 1]);
-                }
-                if (id === previousDropTargetLayerId) {
-                    runningOffset += draggingLayerHeight.value;
-                    previousHeight = draggingLayerHeight.value;
-                }
-                if (i === 0 && nextId === previousDropTargetLayerId) {
-                    nextHeight = draggingLayerHeight.value;
+                    ({ id: nextId, height: nextHeight } = dragItemOffsets[i + 1]);
                 } else {
-                    nextHeight = 0;
+                    nextId = -1;
+                    nextHeight = draggingLayerHeight.value;
                 }
-                if (dragItemRelativeCenter < runningOffset - previousHeight + (previousHeight + height + nextHeight) / 2) {
+
+                if (i === 0 && id === previousDropTargetLayerId && previousDropTargetPosition === 'above') {
+                    if (dragItemRelativeCenter < (draggingLayerHeight.value + height) / 2) {
+                        newDropTargetLayerId = id;
+                        newDropTargetPosition = 'above';
+                        break findDropTarget;
+                    }
+                }
+
+                if (isPreviousTargetEncountered) {
+                    isPreviousTargetEncountered = false;
+                    if (dragItemRelativeCenter < runningOffset + (draggingLayerHeight.value + height) / 2) {
+                        newDropTargetLayerId = id;
+                        newDropTargetPosition = 'above';
+                        break findDropTarget;
+                    }
+                }
+
+                if (nextId === previousDropTargetLayerId && previousDropTargetPosition === 'above') {
+                    nextId = previousDropTargetLayerId;
+                    nextHeight = draggingLayerHeight.value;
+                    isPreviousTargetEncountered = true;
+                }
+
+                if (dragItemRelativeCenter < runningOffset + (height + nextHeight) / 2) {
                     newDropTargetLayerId = id;
                     newDropTargetPosition = 'above';
                     break findDropTarget;
                 }
                 runningOffset += height;
-                previousHeight = height;
             }
             newDropTargetLayerId = dragItemOffsets[dragItemOffsets.length - 1].id;
             newDropTargetPosition = 'below';
         }
-        // let previousItemHalfHeight: number = 0;
-        // let previousItemId: number = -1;
-        // for (let i = 0; i < dragItemOffsets.length; i++) {
-        //     let nextItemHalfHeight: number = 0;
-        //     let nextItemId: number = -1;
-        //     if (dragItemOffsets[i + 1]) {
-        //         nextItemHalfHeight = dragItemOffsets[i + 1].height / 2;
-        //         nextItemId = dragItemOffsets[i + 1].id;
-        //     }
-        //     const offsetInfo = dragItemOffsets[i];
-        //     const offsetCenter = offsetInfo.top + (offsetInfo.height / 2);
-        //     if (offsetInfo.isExpanded &&
-        //         (isDragMoveUp && dragItemTopOffset > offsetInfo.top + (dragItemHandleHeight / 4) && dragItemTopOffset < offsetInfo.top + offsetInfo.height - (dragItemHandleHeight / 4)) ||
-        //         (!isDragMoveUp && dragItemBottomOffset > offsetInfo.top + (dragItemHandleHeight / 4) && dragItemBottomOffset < offsetInfo.top + offsetInfo.height - (dragItemHandleHeight / 4))
-        //     ) {
-        //         dropTargetLayerId.value = offsetInfo.id;
-        //         dropTargetPosition.value = 'inside';
-        //     } else if (isDragMoveUp &&
-        //         (
-        //             (dragItemTopOffset < offsetCenter && dragItemTopOffset > offsetInfo.top - previousItemHalfHeight) ||
-        //             (i === 0 && dragItemTopOffset < offsetCenter)
-        //         )
-        //     ) {
-        //         if (offsetInfo.id !== draggingLayerId.value && previousItemId !== draggingLayerId.value) {
-        //             dropTargetLayerId.value = offsetInfo.id;
-        //             dropTargetPosition.value = 'above';
-        //         }
-        //     } else if (
-        //         !isDragMoveUp &&
-        //         (
-        //             (dragItemBottomOffset < offsetInfo.top + offsetInfo.height + nextItemHalfHeight && dragItemBottomOffset > offsetCenter) ||
-        //             (i === dragItemOffsets.length - 1 && dragItemBottomOffset > offsetCenter)
-        //         )
-        //     ) {
-        //         if (offsetInfo.id !== draggingLayerId.value  && nextItemId !== draggingLayerId.value) {
-        //             dropTargetLayerId.value = offsetInfo.id;
-        //             dropTargetPosition.value = 'below';
-        //         }
-        //     }
-        //     previousItemHalfHeight = offsetInfo.height / 2;
-        //     previousItemId = offsetInfo.id;
-        // }
+
         if (dragItemTop - layerListTop - props.scrollTop < dragScrollMargin) {
             emit('scroll-by', -5);
         }
@@ -534,7 +521,10 @@ async function onPointerDragEndList(e: PointerEvent | MouseEvent | TouchEvent) {
     dropTargetLayerId.value = null;
 }
 
-function onToggleLayerSettings(layer: WorkingFileAnyLayer<ColorModel>) {
+function onToggleLayerSettings(event: MouseEvent, layer: WorkingFileAnyLayer<ColorModel>) {
+    const button = (event.target as HTMLElement)?.closest('button');
+    if (!button) return;
+    showLayerSettingsReference.value = button;
     if (showLayerSettingsMenuFor.value === layer.id) {
         showLayerSettingsMenuFor.value = null;
     } else {
@@ -605,7 +595,7 @@ function calculateDragOffsets() {
     dragItemOffsetCalculatedScrollTop = props.scrollTop;
     dragItemOffsets = [];
     let hasEncounteredCurrentLayer = false;
-    const layers = layerList.value.querySelectorAll(':scope > .ogr-layer:not(.is-dragging)');
+    const layers = layerList.value.querySelectorAll(':scope > .og-layer:not(.is-dragging)');
     layers.forEach((layerEl) => {
         const clientRect = layerEl.getBoundingClientRect();
         const id = parseInt(layerEl.getAttribute('data-layer-id') + '', 10);

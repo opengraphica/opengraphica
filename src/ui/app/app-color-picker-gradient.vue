@@ -1,18 +1,18 @@
 <template>
-    <div class="ogr-color-picker-gradient">
+    <div class="og-color-picker-gradient">
         <div
             ref="saturationValueContainer"
-            class="ogr-color-picker-gradient__saturation-value"
+            class="og-color-picker-gradient__saturation-value"
             v-pointer.down="onPointerDownSaturationValueGradient"
             v-pointer.move.window="onPointerMoveSaturationValueGradient"
             v-pointer.up.window="onPointerUpSaturationValueGradient"
         >
-            <div class="ogr-color-picker-gradient__saturation-gradient" :style="{ '--ogr-color-pick-hue': saturationValueGradientColorStyle }"></div>
-            <div class="ogr-color-picker-gradient__value-gradient"></div>
-            <canvas v-show="useOkhsv" ref="okhsvGradientCanvas" class="ogr-color-picker-gradient__canvas-gradient" />
-            <div ref="saturationValueHandleContainer" class="ogr-color-picker-gradient__saturation-value-handle-container">
+            <div class="og-color-picker-gradient__saturation-gradient" :style="{ '--og-color-pick-hue': saturationValueGradientColorStyle }"></div>
+            <div class="og-color-picker-gradient__value-gradient"></div>
+            <canvas v-show="useOkhsv" ref="okhsvGradientCanvas" class="og-color-picker-gradient__canvas-gradient" />
+            <div ref="saturationValueHandleContainer" class="og-color-picker-gradient__saturation-value-handle-container">
                 <div
-                    class="ogr-color-picker-gradient__saturation-value-handle"
+                    class="og-color-picker-gradient__saturation-value-handle"
                     :style="{
                         top: (1 - pickedColor.v) * 100 + '%',
                         left: pickedColor.s * 100 + '%'
@@ -20,8 +20,8 @@
                 />
             </div>
         </div>
-        <div ref="hueSliderContainer" class="ogr-color-picker-gradient__hue" :class="{ 'ogr-color-picker-gradient__hue--okhsv': useOkhsv }" v-pointer.tap="onPointerDownHueSliderContainer">
-            <canvas v-show="useOkhsv" ref="okhsvHueSliderCanvas" class="ogr-color-picker-gradient__canvas-gradient" />
+        <div ref="hueSliderContainer" class="og-color-picker-gradient__hue" :class="{ 'og-color-picker-gradient__hue--okhsv': useOkhsv }" v-pointer.tap="onPointerDownHueSliderContainer">
+            <canvas v-show="useOkhsv" ref="okhsvHueSliderCanvas" class="og-color-picker-gradient__canvas-gradient" />
             <el-slider
                 ref="hueSlider"
                 v-model="hue"
@@ -30,7 +30,7 @@
                 @input="onInputHueSlider" @change="onChangeHueSlider"
             />
         </div>
-        <div ref="opacitySliderContainer" class="ogr-color-picker-gradient__opacity" v-pointer.tap="onPointerDownOpacitySliderContainer" :style="{ '--ogr-color-pick-opaque': pickedColorOpaqueStyle }">
+        <div ref="opacitySliderContainer" class="og-color-picker-gradient__opacity" v-pointer.tap="onPointerDownOpacitySliderContainer" :style="{ '--og-color-pick-opaque': pickedColorOpaqueStyle }">
             <el-slider
                 v-model="opacity"
                 :aria-label="$t('app.colorPickerGradient.opacitySlider')"

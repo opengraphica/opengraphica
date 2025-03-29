@@ -16,9 +16,9 @@
                     :key="collageTypeOption.title"
                     :span="6"
                 >
-                    <el-button plain class="ogr-mode-select-button" @click="selectType(collageTypeOption.type)">
+                    <el-button plain class="og-mode-select-button" @click="selectType(collageTypeOption.type)">
                         <img :src="collageTypeOption.icon" aria-hidden="true" />
-                        <span class="ogr-mode_select-button__title">{{ $t(collageTypeOption.title) }}</span>
+                        <span class="og-mode_select-button__title">{{ $t(collageTypeOption.title) }}</span>
                     </el-button>
                 </el-col>
             </el-row>

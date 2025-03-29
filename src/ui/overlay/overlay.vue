@@ -2,7 +2,7 @@
     <div
         v-for="overlayGroup of overlayGroups"
         :key="overlayGroup.id"
-        class="ogr-canvas-overlays"
+        class="og-canvas-overlays"
         :class="{
             'is-ignore-transform': overlayGroup.isIgnoreTransform,
         }"

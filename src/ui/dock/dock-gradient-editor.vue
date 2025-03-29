@@ -1,9 +1,9 @@
 <template>
-    <div class="ogr-dock-content ogr-toolbar-draw-gradient-stop-drawer">
-        <div class="ogr-toolbar-draw-gradient-stop-drawer__editor-preview-section">
-            <div ref="gradientEditorElement" class="ogr-gradient-editor">
+    <div class="og-dock-content og-toolbar-draw-gradient-stop-drawer">
+        <div class="og-toolbar-draw-gradient-stop-drawer__editor-preview-section">
+            <div ref="gradientEditorElement" class="og-gradient-editor">
                 <div
-                    class="ogr-gradient-editor__preview"
+                    class="og-gradient-editor__preview"
                     :style="{ '--gradient': editingGradientBackground }"
                     @mouseenter="onMouseEnterGradientEditorPreview"
                     @mouseleave="onMouseLeaveGradientEditorPreview"
@@ -12,7 +12,7 @@
                 >
                     <div
                         v-if="showStopAddCursor"
-                        class="ogr-gradient-editor__add-position"
+                        class="og-gradient-editor__add-position"
                         :style="{
                             left: (addCursorOffset * 100) + '%',
                         }"
@@ -23,7 +23,7 @@
                     :key="colorStopIndex"
                     role="button"
                     tabindex="0"
-                    class="ogr-gradient-editor__stop-marker"
+                    class="og-gradient-editor__stop-marker"
                     :class="{
                         'is-active': activeColorStopIndex === colorStopIndex,
                     }"
@@ -39,18 +39,18 @@
                     v-pointer.move.window="draggingColorStopIndex > -1 ? onPointerMoveStopMarker : undefined"
                     v-pointer.up.window="draggingColorStopIndex > -1 ? onPointerUpStopMarker : undefined"
                 >
-                    <div class="ogr-gradient-editor__stop-marker__color" :data-color-stop-index="colorStopIndex" />
+                    <div class="og-gradient-editor__stop-marker__color" :data-color-stop-index="colorStopIndex" />
                 </div>
                 <div
                     v-if="showStopAddCursor"
-                    class="ogr-gradient-editor__stop-marker"
+                    class="og-gradient-editor__stop-marker"
                     :style="{
                         'left': (addCursorOffset * 100) + '%',
                         '--stop-color': addCursorColor.style,
                     }"
                     aria-hidden="true"
                 >
-                    <div class="ogr-gradient-editor__stop-marker__color">
+                    <div class="og-gradient-editor__stop-marker__color">
                         <span class="bi bi-plus" />
                     </div>
                 </div>
@@ -58,11 +58,11 @@
         </div>
         <div
             v-if="activeColorStopIndex > -1 && activeColorStopIndex < editingColorStops.length"
-            class="ogr-toolbar-draw-gradient-stop-drawer__editor-stop-form"
+            class="og-toolbar-draw-gradient-stop-drawer__editor-stop-form"
         >
-            <div class="ogr-toolbar-draw-gradient-stop-drawer__editor-stop-form__selection-indicator-container">
+            <div class="og-toolbar-draw-gradient-stop-drawer__editor-stop-form__selection-indicator-container">
                 <div
-                    class="ogr-toolbar-draw-gradient-stop-drawer__editor-stop-form__selection-indicator"
+                    class="og-toolbar-draw-gradient-stop-drawer__editor-stop-form__selection-indicator"
                     :style="{ left: (editingColorStops[activeColorStopIndex].offset * 100) + '%' }"
                 />
             </div>
@@ -107,13 +107,13 @@
                 </el-button-group>
             </el-horizontal-scrollbar-arrows>
         </div>
-        <div class="ogr-toolbar-draw-gradient-stop-drawer__presets">
+        <div class="og-toolbar-draw-gradient-stop-drawer__presets">
             <h3 class="is-size-6">{{ t('toolbar.drawGradient.stopDialog.presets') }}</h3>
             <el-scrollbar>
-                <div v-for="(preset, presetIndex) of gradientPresets" :key="presetIndex" class="ogr-gradient-preset">
-                    <button class="ogr-gradient-preset__activate" @click="onSelectPreset(presetIndex)">
-                        <div class="ogr-gradient-preset__name">{{ preset.name }}</div>
-                        <div class="ogr-gradient_preset__color-stops" :style="{ '--gradient': preset.gradientBackground }" />
+                <div v-for="(preset, presetIndex) of gradientPresets" :key="presetIndex" class="og-gradient-preset">
+                    <button class="og-gradient-preset__activate" @click="onSelectPreset(presetIndex)">
+                        <div class="og-gradient-preset__name">{{ preset.name }}</div>
+                        <div class="og-gradient_preset__color-stops" :style="{ '--gradient': preset.gradientBackground }" />
                     </button>
                     <el-popover
                         v-model:visible="presetSettingsVisibility[presetIndex]"

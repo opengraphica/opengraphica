@@ -1,7 +1,7 @@
-.ogr-free-transform {
+.og-free-transform {
     position: absolute;
 
-    @keyframes ogr-free-transform-bounds {
+    @keyframes og-free-transform-bounds {
         0% {
             outline-color: rgba(235, 235, 235, 1);
         }
@@ -13,7 +13,7 @@
         }
     }
 
-    @keyframes ogr-free-transform-rotate-line {
+    @keyframes og-free-transform-rotate-line {
         0% {
             background: rgba(235, 235, 235, 0.9);
         }
@@ -25,7 +25,7 @@
         }
     }
 
-    .ogr-free-transform-bounds {
+    .og-free-transform-bounds {
         outline: 0.35rem solid white;
         // border: 0.35rem solid white;
         box-sizing: border-box;
@@ -34,7 +34,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        animation: ogr-free-transform-bounds 2s linear infinite;
+        animation: og-free-transform-bounds 2s linear infinite;
 
         // &:after {
         //     content: '';
@@ -44,12 +44,12 @@
         //     left: 0;
         //     right: 0;
         //     bottom: 0;
-        //     outline: var(--ogr-free-transform-bound-inner-width) solid rgba(235, 235, 235, 0.7);
-        //     animation: ogr-free-transform-bounds 2s linear infinite;
+        //     outline: var(--og-free-transform-bound-inner-width) solid rgba(235, 235, 235, 0.7);
+        //     animation: og-free-transform-bounds 2s linear infinite;
         // }
     }
 
-    .ogr-free-transform-handle-rotate {
+    .og-free-transform-handle-rotate {
         position: absolute;
         top: 0;
         left: 50%;
@@ -61,7 +61,7 @@
             transform: translateX(-50%) rotate(180deg);
             transform-origin: top center;
         }
-        .ogr-free-transform-handle-rotate-line {
+        .og-free-transform-handle-rotate-line {
             background: rgba(235, 235, 235, 0.7);
             display: block;
             position: absolute;
@@ -72,23 +72,23 @@
         }
     }
 
-    .ogr-free-transform-icon-button {
+    .og-free-transform-icon-button {
         outline: 0.35rem solid white;
         border-radius: 1000%;
         box-sizing: border-box;
         position: absolute;
-        animation: ogr-free-transform-bounds 2s linear infinite;
+        animation: og-free-transform-bounds 2s linear infinite;
         transform: translate(-50%, -50%);
     }
 
-    .ogr-free-transform-handle-top-left,
-    .ogr-free-transform-handle-top-right,
-    .ogr-free-transform-handle-bottom-left,
-    .ogr-free-transform-handle-bottom-right,
-    .ogr-free-transform-handle-top,
-    .ogr-free-transform-handle-left,
-    .ogr-free-transform-handle-bottom,
-    .ogr-free-transform-handle-right {
+    .og-free-transform-handle-top-left,
+    .og-free-transform-handle-top-right,
+    .og-free-transform-handle-bottom-left,
+    .og-free-transform-handle-bottom-right,
+    .og-free-transform-handle-top,
+    .og-free-transform-handle-left,
+    .og-free-transform-handle-bottom,
+    .og-free-transform-handle-right {
         position: absolute;
         svg {
             display: block;
@@ -98,7 +98,7 @@
         }
     }
 
-    .ogr-free-transform-handle-top-left {
+    .og-free-transform-handle-top-left {
         top: 0;
         left: 0;
         transform-origin: top left;
@@ -107,7 +107,7 @@
             transform-origin: top left;
         }
     }
-    .ogr-free-transform-handle-top-right {
+    .og-free-transform-handle-top-right {
         top: 0;
         right: 0;
         transform-origin: top right;
@@ -116,7 +116,7 @@
             transform-origin: top right;
         }
     }
-    .ogr-free-transform-handle-bottom-right {
+    .og-free-transform-handle-bottom-right {
         bottom: 0;
         right: 0;
         transform-origin: bottom right;
@@ -125,7 +125,7 @@
             transform-origin: bottom right;
         }
     }
-    .ogr-free-transform-handle-bottom-left {
+    .og-free-transform-handle-bottom-left {
         bottom: 0;
         left: 0;
         transform-origin: bottom left;
@@ -134,7 +134,7 @@
             transform-origin: bottom left;
         }
     }
-    .ogr-free-transform-handle-top {
+    .og-free-transform-handle-top {
         top: 0;
         left: 50%;
         transform-origin: top center;
@@ -143,7 +143,7 @@
             transform-origin: top center;
         }
     }
-    .ogr-free-transform-handle-right {
+    .og-free-transform-handle-right {
         top: 50%;
         right: 0;
         transform-origin: right center;
@@ -152,7 +152,7 @@
             transform-origin: right center;
         }
     }
-    .ogr-free-transform-handle-bottom {
+    .og-free-transform-handle-bottom {
         bottom: 0;
         right: 50%;
         transform-origin: bottom center;
@@ -161,7 +161,7 @@
             transform-origin: bottom center;
         }
     }
-    .ogr-free-transform-handle-left {
+    .og-free-transform-handle-left {
         top: 50%;
         left: 0;
         transform-origin: left center;

@@ -1,9 +1,9 @@
 <template>
     <div class="is-flex container is-align-items-center is-justify-content-center mx-auto">
-        <div class="ogr-toolbar-overlay">
-            <div class="ogr-toolbar-tool-selector">
+        <div class="og-toolbar-overlay">
+            <div class="og-toolbar-tool-selector">
                 <span class="bi bi-stars my-1" aria-hidden="true"></span>
-                <span class="ogr-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
+                <span class="og-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
             </div>
             <el-horizontal-scrollbar-arrows>
                 <el-button size="small" @click="onClickAddEffect">
@@ -12,7 +12,7 @@
                 <el-popover
                     v-model:visible="isEditEffectPopoverVisible"
                     placement="top"
-                    popper-class="ogr-dock-popover"
+                    popper-class="og-dock-popover"
                     trigger="click"
                     :width="250"
                     :popper-options="{
@@ -38,7 +38,7 @@
                         </el-alert>
                     </div>
                     <template v-else>
-                        <h2 class="ogr-dock-title" v-t="'button.editEffects'"></h2>
+                        <h2 class="og-dock-title" v-t="'button.editEffects'"></h2>
                         <div class="p-4">
                             <template
                                 v-for="layer of selectedLayers"
@@ -46,7 +46,7 @@
                             >
                                 <h3 class="m-0">
                                     <i class="bi bi-layers mr-1" aria-hidden="true"></i>
-                                    <span class="ogr-toolbar--effect__edit-layer-name" v-t="layer.name" />
+                                    <span class="og-toolbar--effect__edit-layer-name" v-t="layer.name" />
                                 </h3>
                                 <el-alert v-if="layer.filters.length == 0" type="warning" class="my-2" show-icon :closable="false">
                                     {{ $t('toolbar.effect.edit.layerHasNoEffects') }}

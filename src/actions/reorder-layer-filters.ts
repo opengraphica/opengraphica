@@ -32,7 +32,7 @@ export class ReorderLayerFiltersAction extends BaseAction {
 
         // Remove insertFilterIndices from the list
         let referenceFilterIndex = this.referenceFilterIndex;
-        const insertFilters = [];
+        const insertFilters: WorkingFileLayerFilter[] = [];
         for (const index of this.insertFilterIndices.sort().reverse()) {
             if (index < this.referenceFilterIndex) {
                 referenceFilterIndex -= 1;

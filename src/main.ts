@@ -83,7 +83,7 @@ if ((window as any).webpackHotUpdateOpenGraphica) {
     const mount = document.createElement('div');
     mount.id = 'opengraphica';
     document.body.append(mount);
-    document.body.className = 'ogr-full-page';
+    document.body.className = 'og-full-page';
     app.mount('#opengraphica');
     app.theme({
         light: './css/main-light.css',

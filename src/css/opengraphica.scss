@@ -1,4 +1,6 @@
 @use '../../node_modules/bootstrap-icons/font/bootstrap-icons.css';
+@use './palette.scss';
+@use './opengraphica/popover.scss';
 
 @font-face {
     font-family: Roboto;
@@ -6,18 +8,18 @@
 }
 
 :root {
-    --ogr-border-radius: 0.5rem;
-    --ogr-dnd-drop-overlay-z-index: 800000;
-    --ogr-history-notification-overlay-z-index: 850000;
-    --ogr-modal-collapse-mobile: 600px;
-    --ogr-wait-z-index: 900000;
+    --og-border-radius: 0.5rem;
+    --og-dnd-drop-overlay-z-index: 800000;
+    --og-history-notification-overlay-z-index: 850000;
+    --og-modal-collapse-mobile: 600px;
+    --og-wait-z-index: 900000;
 }
 
 html {
     overscroll-behavior-y: contain;
 }
 
-body.ogr-full-page {
+body.og-full-page {
     display: block;
     position: fixed;
     width: 100%;
@@ -37,8 +39,8 @@ body.ogr-full-page {
 }
 
 .opengraphica {
-    background-color: var(--ogr-background-color);
-    background-image: var(--ogr-body-background-image);
+    background-color: var(--og-background-color);
+    background-image: var(--og-body-background-image);
     font-family: Roboto,
         system-ui,
         -apple-system, /* Firefox supports this but not yet `system-ui` */
@@ -60,7 +62,7 @@ body.ogr-full-page {
     -webkit-user-select: none;
     user-select: none;
 
-    #ogr-tmp-file-input-container {
+    #og-tmp-file-input-container {
         position: absolute;
         opacity: 0.01;
         width: 1px;
@@ -86,6 +88,7 @@ body.ogr-full-page {
     @import './opengraphica/overlay-free-transform.scss';
     @import './opengraphica/overlay-selection.scss';
     @import './opengraphica/overlay-text.scss';
+    @include popover.main;
     @import './opengraphica/toolbar.scss';
     @import './opengraphica/toolbar-gradient.scss';
     @import './opengraphica/utility.scss';

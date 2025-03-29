@@ -1,36 +1,51 @@
 @use './opengraphica.scss';
+@use './opengraphica/popover.scss';
+
 @use './vendor/element-plus-theme-chalk.css';
 @use './vendor/bulma.scss' as *;
 @use './element-plus-enhancements.scss' as *;
 
 :root {
-    --ogr-background-color: #fafafa;
-    --ogr-background-color-secondary: #f4f4f5;
-    --ogr-body-background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAMAAACeL25MAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRF////zsrFFOhhzwAAAA9JREFUeNpiYGTAAAABBgAAJwAC/BnsgQAAAABJRU5ErkJggg==');
-    --ogr-border-color-high-contrast: #8f949f;
-    --ogr-form-connected-label-background-color: #F8F9FB;
-    --ogr-form-connected-label-border-color: #DCDFE6;
-    --ogr-form-connected-label-input-hover-color: #f0f2f3;
-    --ogr-form-connected-label-input-focus-color: #ffffff;
-    --ogr-history-notification-border-color: #dadeeaee;
-    --ogr-history-notification-background-color: white;
-    --ogr-history-notification-background-color-highlight: #DCDFE6;
-    --ogr-layout-menu-bar-border-color: #dadeeaee;
-    --ogr-layout-menu-bar-background-color: white;
-    --ogr-menu-drawers-background-color: rgba(0, 0, 0, 0.1);
-    --ogr-menu-drawer-background-color: white;
-    --ogr-menu-drawer-close-icon-color: #a4a8b3c4;
-    --ogr-menu-drawer-close-icon-color-hover: #8f949f;
-    --ogr-working-image-border-color: #e4e7f2;
-    --ogr-alert-info-color: #515356;
-    --ogr-overlay-background-color: rgba(255, 255, 255, 0.8);
-    --ogr-snap-line-color: #66b1ff;
-    --ogr-layer-list-background-color-hover: rgba(64, 158, 255, 0.15);
-    --ogr-layer-list-background-color-active: rgba(64, 158, 255, 0.1);
-    --ogr-layer-list-background-color-drag: #f5faff;
-    --ogr-layer-list-border-color: #ebeef5;
-    --ogr-layer-list-thumbnail-border-color: #ebeef5;
-    --ogr-layer-list-thumbnail-border-color-active: rgba(64, 158, 255, 0.6);
+    --og-background-color: #fafafa;
+    --og-background-color-secondary: #f4f4f5;
+
+    --og-body-background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAMAAACeL25MAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRF////zsrFFOhhzwAAAA9JREFUeNpiYGTAAAABBgAAJwAC/BnsgQAAAABJRU5ErkJggg==');
+
+    --og-border-color-high-contrast: #8f949f;
+
+    --og-form-connected-label-background-color: #F8F9FB;
+    --og-form-connected-label-border-color: #DCDFE6;
+    --og-form-connected-label-input-hover-color: #f0f2f3;
+    --og-form-connected-label-input-focus-color: #ffffff;
+
+    --og-history-notification-border-color: #dadeeaee;
+    --og-history-notification-background-color: white;
+    --og-history-notification-background-color-highlight: #DCDFE6;
+
+    --og-layout-menu-bar-border-color: #dadeeaee;
+    --og-layout-menu-bar-background-color: white;
+
+    --og-menu-drawers-background-color: rgba(0, 0, 0, 0.1);
+    --og-menu-drawer-background-color: white;
+    --og-menu-drawer-close-icon-color: #a4a8b3c4;
+    --og-menu-drawer-close-icon-color-hover: #8f949f;
+
+    --og-working-image-border-color: #e4e7f2;
+
+    --og-alert-info-color: #515356;
+
+    --og-overlay-background-color: rgba(255, 255, 255, 0.8);
+
+    --og-snap-line-color: #66b1ff;
+
+    --og-layer-list-background-color-hover: rgba(64, 158, 255, 0.15);
+    --og-layer-list-background-color-active: rgba(64, 158, 255, 0.1);
+    --og-layer-list-background-color-drag: #f5faff;
+    --og-layer-list-border-color: #ebeef5;
+    --og-layer-list-thumbnail-border-color: #ebeef5;
+    --og-layer-list-thumbnail-border-color-active: rgba(64, 158, 255, 0.6);
+
+    @include popover.light;
 }
 
 .opengraphica {
@@ -64,26 +79,26 @@
             }
         }
 
-        --ogr-background-color: #1f252d;
-        --ogr-form-connected-label-background-color: #232831;
-        --ogr-form-connected-label-border-color: #191d25;
-        --ogr-form-connected-label-input-hover-color: #f0f2f3;
-        --ogr-form-connected-label-input-focus-color: #272c37;
-        --ogr-history-notification-border-color: #dadeeaee;
-        --ogr-history-notification-background-color: #222933;
-        --ogr-history-notification-background-color-highlight: #424c58;
-        --ogr-layout-menu-bar-border-color: transparent;
-        --ogr-layout-menu-bar-background-color: #222933;
-        --ogr-working-image-border-color: black;
-        --ogr-alert-info-color: #ffffff;
-        --ogr-overlay-background-color: rgba(31, 37, 45, 0.8);
-        --ogr-snap-line-color: #66b1ff;
-        --ogr-layer-list-background-color-hover: rgba(64, 158, 255, 0.1);
-        --ogr-layer-list-background-color-active: rgba(64, 158, 255, 0.05);
-        --ogr-layer-list-background-color-drag: #66b1ff;
-        --ogr-layer-list-border-color: #0e1014;
-        --ogr-layer-list-thumbnail-border-color: #0e1014;
-        --ogr-layer-list-thumbnail-border-color-active: #333;
+        --og-background-color: #1f252d;
+        --og-form-connected-label-background-color: #232831;
+        --og-form-connected-label-border-color: #191d25;
+        --og-form-connected-label-input-hover-color: #f0f2f3;
+        --og-form-connected-label-input-focus-color: #272c37;
+        --og-history-notification-border-color: #dadeeaee;
+        --og-history-notification-background-color: #222933;
+        --og-history-notification-background-color-highlight: #424c58;
+        --og-layout-menu-bar-border-color: transparent;
+        --og-layout-menu-bar-background-color: #222933;
+        --og-working-image-border-color: black;
+        --og-alert-info-color: #ffffff;
+        --og-overlay-background-color: rgba(31, 37, 45, 0.8);
+        --og-snap-line-color: #66b1ff;
+        --og-layer-list-background-color-hover: rgba(64, 158, 255, 0.1);
+        --og-layer-list-background-color-active: rgba(64, 158, 255, 0.05);
+        --og-layer-list-background-color-drag: #66b1ff;
+        --og-layer-list-border-color: #0e1014;
+        --og-layer-list-thumbnail-border-color: #0e1014;
+        --og-layer-list-thumbnail-border-color-active: #333;
         --el-color-white: #272c37;
         --el-color-black: #eeeeee;
         --el-color-primary: #009cff;
@@ -118,6 +133,8 @@
         --el-border-color-lighter: #1d232e;
         --el-border-color-extra-light: #F2F6FC;
         --el-bg-color: #272c37;
+
+        @include popover.dark;
 
         color: var(--el-color-black);
     }

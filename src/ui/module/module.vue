@@ -1,5 +1,5 @@
 <template>
-    <div class="ogr-module">
+    <div class="og-module">
         <suspense>
             <template #default>
                 <component

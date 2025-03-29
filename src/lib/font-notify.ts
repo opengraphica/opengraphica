@@ -4,7 +4,7 @@ import appEmitter from '@/lib/emitter';
 
 import { NotificationHandle } from 'element-plus/lib/components/notification/src/notification.d';
 
-const notifyContentId = 'ogr-font-notify-' + uuidv4();
+const notifyContentId = 'og-font-notify-' + uuidv4();
 const loadingFontFamilies = new Set<string>();
 
 let currentlyShowingNotification = false;

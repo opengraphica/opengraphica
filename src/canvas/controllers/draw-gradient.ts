@@ -18,6 +18,7 @@ import editorStore from '@/store/editor';
 import historyStore, { createHistoryReserveToken, historyReserveQueueFree, historyBlockInteractionUntilComplete } from '@/store/history';
 import workingFileStore, { getSelectedLayers, getLayerById, getLayerGlobalTransform, ensureUniqueLayerSiblingName } from '@/store/working-file';
 
+import { type BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { InsertLayerAction } from '@/actions/insert-layer';
 import { UpdateLayerAction } from '@/actions/update-layer';
@@ -181,7 +182,7 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
         if (this.editingControlPoint == null) {
             editingLayers.value = [];
             const { width, height } = workingFileStore.state;
-            let layerActions = [];
+            let layerActions: BaseAction[] = [];
             selectedLayers = selectedLayers.filter(layer => layer.type === 'empty');
 
             const newGradientData: InsertGradientLayerOptions['data'] = {
@@ -279,7 +280,7 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
         const pointer = this.pointers.filter((pointer) => pointer.id === this.drawingPointerId)[0];
 
         if (pointer?.isDragging && this.editingControlPoint != null && editingLayers.value.length >= 0) {
-            let layerActions = [];
+            let layerActions: BaseAction[] = [];
             for (const [layerIndex, layer] of editingLayers.value.entries()) {
                 layerActions.push(
                     new UpdateLayerAction<UpdateGradientLayerOptions>({
@@ -305,7 +306,7 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
     private getControlPointAtPosition(cursor: { x: number, y: number }, selectedLayers: WorkingFileAnyLayer[], editLayer = false) {
         const decomposedTransform = canvasStore.state.decomposedTransform;
         let appliedZoom: number = decomposedTransform.scaleX / devicePixelRatio;
-        let controlPoint = null;
+        let controlPoint: 'start' | 'end' | 'focus' | null = null;
         for (const layer of selectedLayers as WorkingFileGradientLayer[]) {
             if (layer.type !== 'gradient') continue;
             const layerGlobalTransform = getLayerGlobalTransform(layer);

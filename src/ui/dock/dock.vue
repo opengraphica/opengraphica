@@ -1,6 +1,6 @@
 <template>
-    <div class="ogr-dock" :class="{ 'ogr-dock--loading': loading }">
-        <div v-if="loading" class="ogr-dock__spinner">
+    <div class="og-dock" :class="{ 'og-dock--loading': loading }">
+        <div v-if="loading" class="og-dock__spinner">
             <div style="width: 5rem; height: 5rem; margin: auto;" v-loading="true" element-loading-background="transparent"></div>
         </div>
         <suspense

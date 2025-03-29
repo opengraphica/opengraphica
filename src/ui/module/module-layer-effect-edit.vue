@@ -136,7 +136,7 @@
                             <div
                                 role="button"
                                 tabindex="0"
-                                class="ogr-gradient-input"
+                                class="og-gradient-input"
                                 :style="{ '--gradient': gradientBackgrounds[paramName] }"
                                 aria-haspopup="dialog"
                                 @click="onClickStopGradientSelect(paramName)"

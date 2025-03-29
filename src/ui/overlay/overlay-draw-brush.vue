@@ -1,8 +1,8 @@
 <template>
-    <div ref="overlay" class="ogr-canvas-overlay is-full-canvas-area">
+    <div ref="overlay" class="og-canvas-overlay is-full-canvas-area">
         <div
             ref="drawBoundsContainer"
-            class="ogr-canvas-overlay-draw-bounds"
+            class="og-canvas-overlay-draw-bounds"
         >
             <svg
                 v-if="boundaryPointsSvgPaths.length > 0"
@@ -17,7 +17,7 @@
                 </template>
             </svg>
         </div>
-        <div ref="drawBrushContainer" class="ogr-canvas-overlay-draw-brush">
+        <div ref="drawBrushContainer" class="og-canvas-overlay-draw-brush">
             <svg
                 width="2"
                 height="2"

@@ -248,7 +248,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
 
         const { width, height } = workingFileStore.state;
         let selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster' || layer.type === 'empty');
-        let layerActions = [];
+        let layerActions: BaseAction[] = [];
         // Insert raster layer if none selected
         if (selectedLayers.length === 0) {
             layerActions.push(new InsertLayerAction<InsertRasterLayerOptions>({

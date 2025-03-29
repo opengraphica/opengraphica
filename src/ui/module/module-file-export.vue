@@ -22,12 +22,12 @@
             </el-form-item>
         </template>
         <el-form-item-group>
-            <transition name="scale-down">
+            <transition name="og-transition-scale-down">
                 <el-form-item v-if="!formData.workingFile.saveBackDirectly" :label="$t('module.fileExport.fileName')" prop="fileName">
                     <el-input v-model="formData.workingFile.fileName" clearable></el-input>
                 </el-form-item>
             </transition>
-            <transition name="scale-down">
+            <transition name="og-transition-scale-down">
                 <el-form-item v-if="!formData.workingFile.saveBackDirectly" :label="$t('module.fileExport.fileType')" prop="fileType" >
                     <el-select v-model="formData.workingFile.fileType">
                         <el-option
@@ -49,7 +49,7 @@
                     </el-option>
                 </el-select>
             </el-form-item>
-            <transition name="scale-down">
+            <transition name="og-transition-scale-down">
                 <el-form-item v-if="showQualitySetting" :label="$t('module.fileExport.quality')" prop="quality">
                     <el-row>
                         <el-col :span="14">
@@ -63,7 +63,7 @@
                     </el-row>
                 </el-form-item>
             </transition>
-            <transition name="scale-down">
+            <transition name="og-transition-scale-down">
                 <el-form-item v-if="showDitheringSetting" :label="$t('module.fileExport.dithering')" prop="dithering">
                     <el-select v-model="formData.workingFile.dithering">
                         <el-option

@@ -211,7 +211,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
         documentLines[0].spans[0].text = ' ';
     }
     let wrappedLines = documentLines;
-    let originalLineIndices = [];
+    let originalLineIndices: number[] = [];
     if (document.boundary === 'box') {
         wrappedLines = [];
         let currentLineSpans: TextDocumentSpan[] = [];
