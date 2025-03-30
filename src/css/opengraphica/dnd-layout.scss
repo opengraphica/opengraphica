@@ -185,7 +185,7 @@
 
     .og-layout-dock__container {
         background: var(--og-layout-menu-bar-background-color);
-        box-shadow: 0 0 0px 1px var(--og-layout-menu-bar-border-color), 0 0.3rem 1.5rem var(--og-layout-menu-bar-border-color);
+        box-shadow: 0 0 0px 1px var(--og-layout-menu-bar-border-color), 0 0.3rem 1.5rem var(--og-layout-menu-bar-shadow-color);
         border-radius: 0.875rem;
         overflow: hidden;
         display: flex;

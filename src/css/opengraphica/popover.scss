@@ -1,11 +1,13 @@
 @mixin light() {
     --og-popover-background-color: var(--og-surface-0);
+    --og-popover-border-color: var(--og-surface-0);
     --og-popover-color: var(--og-surface-800);
     --og-popover-shadow: 0 0 0.9375rem 0 rgba(0, 0, 0, .03), 0 0.125rem 1.875rem 0 rgba(0, 0, 0, .08), 0 0 0.0625rem 0 rgba(0, 0, 0, .3);
 }
 
 @mixin dark() {
     --og-popover-background-color: var(--og-surface-800);
+    --og-popover-border-color: var(--og-surface-500);
     --og-popover-color: var(--og-surface-0);
     --og-popover-shadow: 0 0 0.9375rem 0 rgba(0, 0, 0, 0.08), 0 0.125rem 1.875rem 0 rgba(0, 0, 0, .18), 0 0 0.0625rem 0 rgba(0, 0, 0, .75);
 }
@@ -14,6 +16,7 @@
     .og-popover {
         border-radius: 0.875rem;
         background: var(--og-popover-background-color);
+        border: 0.0625rem solid var(--og-popover-border-color);
         color: var(--og-popover-color);
         max-width: 90vw;
         box-shadow: var(--og-popover-shadow);

@@ -6,28 +6,36 @@
 @use './element-plus-enhancements.scss' as *;
 
 :root {
-    --og-background-color: #1f252d;
+    --og-background-color: #191e29;
     --og-background-color-secondary: #191f26;
     
+    --og-body-background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAdnJLH8AAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEADMAOABERAtIiAAAAAlwSFlzAAAuIwAALiMBeKU/dgAAAAd0SU1FB+kDHhQYHIfMdSwAAAAfSURBVAjXY3RyD/7/8eNHBhhgQuYwMDAwMDGgAQwBALNHB4nNtmXTAAAAAElFTkSuQmCC');
     --og-body-background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAMAAACeL25MAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRF////zsrFFOhhzwAAAA9JREFUeNpiYGTAAAABBgAAJwAC/BnsgQAAAABJRU5ErkJggg==');
+    
     --og-border-color-high-contrast: #8f949f;
     --og-form-connected-label-background-color: #232831;
     --og-form-connected-label-border-color: #191d25;
     --og-form-connected-label-input-hover-color: #f0f2f3;
     --og-form-connected-label-input-focus-color: #272c37;
+
     --og-history-notification-border-color: #dadeeaee;
-    --og-history-notification-background-color: var(--og-surface-600);
+    --og-history-notification-background-color: var(--og-surface-800);
     --og-history-notification-background-color-highlight: #424c58;
-    --og-layout-menu-bar-border-color: transparent;
-    --og-layout-menu-bar-background-color: var(--og-surface-600);
+
+    --og-layout-menu-bar-border-color: var(--og-surface-400);
+    --og-layout-menu-bar-background-color: var(--og-surface-800);
+    --og-layout-menu-bar-shadow-color: transparent;
+
     --og-menu-drawers-background-color: rgba(0, 0, 0, 0.4);
-    --og-menu-drawer-background-color: #1f252d;
+    --og-menu-drawer-background-color: #191e29;
     --og-menu-drawer-close-icon-color: #ffffffc4;
     --og-menu-drawer-close-icon-color-hover: #8f949f;
+
     --og-working-image-border-color: #e4e7f2;
     --og-alert-info-color: #ffffff;
     --og-overlay-background-color: rgba(31, 37, 45, 0.8);
     --og-snap-line-color: #66b1ff;
+
     --og-layer-list-background-color-hover: rgba(64, 158, 255, 0.1);
     --og-layer-list-background-color-active: rgba(64, 158, 255, 0.05);
     --og-layer-list-background-color-drag: #66b1ff;
@@ -43,8 +51,8 @@
     @include element-plus-enhancements;
 
     --el-bg-color: #272c37;
-    --el-bg-color-page: #1f252d;
-    --el-bg-color-overlay: #272c37;
+    --el-bg-color-page: #191e29;
+    --el-bg-color-overlay: var(--og-surface-800);
     --el-border-color: #3e4548;
     --el-border-color-base: #3e4548;
     --el-border-color-light: #3e4548;
@@ -84,8 +92,8 @@
     --el-color-danger-lighter: mix(--el-color-white, --el-color-danger, 90%);
     --el-color-info-lighter: mix(--el-color-white, --el-color-info, 90%);
     --el-disabled-text-color: #828e93;
-    --el-fill-color-blank: #272c37;
-    --el-fill-color-light: #343a46;
+    --el-fill-color-blank: var(--og-surface-800);
+    --el-fill-color-light: var(--og-surface-500);
     --el-mask-color: rgba(0, 0, 0, .6);
     --el-menu-hover-bg-color: rgba(64, 158, 255, 0.1);
     --el-switch-button-size: 1rem;

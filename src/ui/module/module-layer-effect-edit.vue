@@ -19,7 +19,7 @@
         </div>
         <el-divider />
         <div class="flex flex-row items-center justify-between">
-            <h2 v-t="currentFilterTitle" class="m-0" />
+            <h2 v-t="currentFilterTitle" class="text-lg m-0" />
             <div class="flex flex-row items-center shrink-1">
                 <el-switch
                     v-model="currentFilterEnabled"

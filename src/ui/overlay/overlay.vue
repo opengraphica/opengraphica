@@ -49,7 +49,7 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const ignoreTransformWith: string[] = [
-            'effect', 'selection',
+            'canvas-border', 'effect', 'selection',
         ];
         const blendModes: Record<string, string> = {
             'text-selection': 'difference',

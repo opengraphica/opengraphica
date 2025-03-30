@@ -8234,7 +8234,7 @@
   --og-surface-500: #343a46;
   --og-surface-600: #242934;
   --og-surface-700: #1f252d;
-  --og-surface-800: #191d25;
+  --og-surface-800: #1d222d;
   --og-surface-900: #0e1014;
   --og-primary-0: white;
   --og-primary-25: #d9ecff;
@@ -9013,7 +9013,7 @@ body.og-full-page .opengraphica {
 }
 .opengraphica .og-layout-dock .og-layout-dock__container {
   background: var(--og-layout-menu-bar-background-color);
-  box-shadow: 0 0 0px 1px var(--og-layout-menu-bar-border-color), 0 0.3rem 1.5rem var(--og-layout-menu-bar-border-color);
+  box-shadow: 0 0 0px 1px var(--og-layout-menu-bar-border-color), 0 0.3rem 1.5rem var(--og-layout-menu-bar-shadow-color);
   border-radius: 0.875rem;
   overflow: hidden;
   display: flex;
@@ -10549,6 +10549,7 @@ body.og-full-page .opengraphica {
 .opengraphica .og-popover {
   border-radius: 0.875rem;
   background: var(--og-popover-background-color);
+  border: 0.0625rem solid var(--og-popover-border-color);
   color: var(--og-popover-color);
   max-width: 90vw;
   box-shadow: var(--og-popover-shadow);
@@ -10679,7 +10680,7 @@ body.og-full-page .opengraphica {
 .opengraphica .og-select__dropdown[data-side=top] {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
-  margin-top: 0.0625rem;
+  margin-bottom: -0.0625rem;
 }
 .opengraphica .og-select__dropdown[data-side=top] .og-select__dropdown-option:first-child {
   border-top-left-radius: calc(var(--og-select-border-radius) - 0.0625rem);
@@ -10777,7 +10778,7 @@ body.og-full-page .opengraphica {
 }
 .opengraphica .og-toolbar.is-overlay .og-toolbar-overlay {
   background: var(--og-layout-menu-bar-background-color);
-  box-shadow: 0 0 0px 1px var(--og-layout-menu-bar-border-color), 0 0.3rem 2rem var(--og-layout-menu-bar-border-color);
+  box-shadow: 0 0 0px 1px var(--og-layout-menu-bar-border-color), 0 0.3rem 2rem var(--og-layout-menu-bar-shadow-color);
   padding: 0;
   pointer-events: all;
   overflow: hidden;
@@ -10868,7 +10869,7 @@ body.og-full-page .opengraphica {
   display: flex;
   flex-direction: column;
   background: var(--og-layout-menu-bar-background-color);
-  box-shadow: 0 0 0px 1px var(--og-layout-menu-bar-border-color), 0 0.3rem 2rem var(--og-layout-menu-bar-border-color);
+  box-shadow: 0 0 0px 1px var(--og-layout-menu-bar-border-color), 0 0.3rem 2rem var(--og-layout-menu-bar-shadow-color);
   color: var(--el-text-color-regular);
   border-radius: 0.875rem;
   box-sizing: border-box;
@@ -27697,6 +27698,7 @@ body.og-full-page .opengraphica {
   --og-history-notification-background-color: white;
   --og-history-notification-background-color-highlight: #DCDFE6;
   --og-layout-menu-bar-border-color: #dadeeaee;
+  --og-layout-menu-bar-shadow-color: #dadeeaee;
   --og-layout-menu-bar-background-color: white;
   --og-menu-drawers-background-color: rgba(0, 0, 0, 0.1);
   --og-menu-drawer-background-color: white;
@@ -27713,6 +27715,7 @@ body.og-full-page .opengraphica {
   --og-layer-list-thumbnail-border-color: #ebeef5;
   --og-layer-list-thumbnail-border-color-active: rgba(64, 158, 255, 0.6);
   --og-popover-background-color: var(--og-surface-0);
+  --og-popover-border-color: var(--og-surface-0);
   --og-popover-color: var(--og-surface-800);
   --og-popover-shadow: 0 0 0.9375rem 0 rgba(0, 0, 0, .03), 0 0.125rem 1.875rem 0 rgba(0, 0, 0, .08), 0 0 0.0625rem 0 rgba(0, 0, 0, .3);
   --og-select-background-color: var(--og-surface-0);
@@ -28472,6 +28475,7 @@ body.og-full-page .opengraphica {
   --el-border-color-extra-light: #F2F6FC;
   --el-bg-color: #272c37;
   --og-popover-background-color: var(--og-surface-800);
+  --og-popover-border-color: var(--og-surface-500);
   --og-popover-color: var(--og-surface-0);
   --og-popover-shadow: 0 0 0.9375rem 0 rgba(0, 0, 0, 0.08), 0 0.125rem 1.875rem 0 rgba(0, 0, 0, .18), 0 0 0.0625rem 0 rgba(0, 0, 0, .75);
   --og-select-background-color: var(--og-surface-600);
