@@ -43,6 +43,8 @@ const DRAG_TYPE_BOTTOM = 2;
 const DRAG_TYPE_LEFT = 4;
 const DRAG_TYPE_RIGHT = 8;
 
+const CLEARED_EDITOR_TEXTAREA_LENGTH = 2;
+
 export default class CanvasTextController extends BaseCanvasMovementController {
 
     private dragStartPickLayer: number | null = null;
@@ -66,6 +68,8 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     private isEditorTextareaDirty: boolean = false; // Unsaved changes have been made
     private editorTextareaQueueSaveTimeoutHandle: number | undefined = undefined;
     private editorTextareaSelectWordTimestamp: number = 0;
+
+    private isKeydownEventSupported: boolean = false;
 
     private layerEditors: Map<number, { documentEditor: TextDocumentEditor, documentSelection: TextDocumentSelection }> = new Map();
     private isHoveringLayerHorizontal: boolean = true;
@@ -345,6 +349,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 editingTextDocumentSelection.value = documentSelection.getSelectionState();
             }
         }
+        this.clearEditorTextarea();
     }
 
     private onBlurEditorTextarea() {
@@ -369,6 +374,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         this.replaceCompositionText(event, true);
         this.isEditorTextareaDirty = true;
         this.queueSaveEditorTextarea();
+        this.clearEditorTextarea();
     }
 
     private replaceCompositionText(event: CompositionEvent, isEnd: boolean = false) {
@@ -379,27 +385,55 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             const { documentEditor, documentSelection } = editors;
             TextDocumentEditorWithSelection.insertTextAtCurrentPosition(documentEditor, documentSelection, event.data, true);
             if (isEnd) {
-                this.editorTextarea.value = '';
                 const { line, character } = documentSelection.getPosition();
                 documentSelection.setPosition(line, character);
             }
         }
     }
 
-    private onInputEditorTextarea(event: Event) {
+    private async onInputEditorTextarea(event: Event) {
         if (editingTextLayerId.value == null) return;
-        if (!this.isEditorTextareaComposing) {
-            const editors = this.layerEditors.get(editingTextLayerId.value);
-            if (!editors || !this.editorTextarea) return;
-            if (this.editorTextarea.value.length > 0) {
+        const editors = this.layerEditors.get(editingTextLayerId.value);
+        if (!editors || !this.editorTextarea) return;
+
+        // Because mobile virtual keyboards absolutely suck, we must detect basic things like backspace
+        // by comparing the input's value to an expected result.
+        if (this.isEditorTextareaBackspace()) {
+            const { documentEditor, documentSelection } = editors;
+            TextDocumentEditorWithSelection.deleteCharacterAtCurrentPosition(documentEditor, documentSelection, false);
+            this.isEditorTextareaDirty = true;
+            this.clearEditorTextarea();
+            this.queueSaveEditorTextarea();
+        } else if (this.isEditorTextareaDelete()) {
+            const { documentEditor, documentSelection } = editors;
+            TextDocumentEditorWithSelection.deleteCharacterAtCurrentPosition(documentEditor, documentSelection, true);
+            this.isEditorTextareaDirty = true;
+            this.clearEditorTextarea();
+            this.queueSaveEditorTextarea();
+        } else if (this.editorTextarea.value.length < CLEARED_EDITOR_TEXTAREA_LENGTH) {
+            // We got in a bad state. This can happen when the user picks an auto-suggestion,
+            // and the browser's selection API stops working. Browser bug.
+            if (this.isEditorTextareaBrokenBackspace()) {
                 const { documentEditor, documentSelection } = editors;
-                TextDocumentEditorWithSelection.insertTextAtCurrentPosition(documentEditor, documentSelection, this.editorTextarea.value);
-                this.editorTextarea.value = '';
+                TextDocumentEditorWithSelection.deleteCharacterAtCurrentPosition(documentEditor, documentSelection, false);
                 this.isEditorTextareaDirty = true;
-                this.queueSaveEditorTextarea();
+                this.clearEditorTextarea();
             }
-            // this.extendFixedBounds(editingTextLayerId.value);
+            // Blur & refocus to fix selection API.
+            this.editorTextarea.blur();
+            setTimeout(() => {
+                this.editorTextarea?.focus();
+            }, 0);
         }
+
+        if (this.isEditorTextareaComposing) return;
+        if (this.editorTextarea.value.length > CLEARED_EDITOR_TEXTAREA_LENGTH) {
+            const { documentEditor, documentSelection } = editors;
+            TextDocumentEditorWithSelection.insertTextAtCurrentPosition(documentEditor, documentSelection, this.extractEditorTextareaInput());
+            this.isEditorTextareaDirty = true;
+            this.queueSaveEditorTextarea();
+        }
+        this.clearEditorTextarea();
     };
 
     private onKeydownEditorTextarea(event: KeyboardEvent) {
@@ -410,12 +444,24 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         const { documentEditor, documentSelection } = editors;
         switch (event.key) {
             case 'Backspace':
-                TextDocumentEditorWithSelection.deleteCharacterAtCurrentPosition(documentEditor, documentSelection, false);
+                event.preventDefault();
+                if (event.ctrlKey) {
+                    documentSelection.moveWordPrevious(true);
+                    TextDocumentEditorWithSelection.deleteSelection(documentEditor, documentSelection);
+                } else {
+                    TextDocumentEditorWithSelection.deleteCharacterAtCurrentPosition(documentEditor, documentSelection, false);
+                }
                 this.isEditorTextareaDirty = true;
                 this.queueSaveEditorTextarea();
                 break;
             case 'Delete':
-                TextDocumentEditorWithSelection.deleteCharacterAtCurrentPosition(documentEditor, documentSelection, true);
+                event.preventDefault();
+                if (event.ctrlKey) {
+                    documentSelection.moveWordNext(true);
+                    TextDocumentEditorWithSelection.deleteSelection(documentEditor, documentSelection);
+                } else {
+                    TextDocumentEditorWithSelection.deleteCharacterAtCurrentPosition(documentEditor, documentSelection, true);
+                }
                 this.isEditorTextareaDirty = true;
                 this.queueSaveEditorTextarea();
                 break;
@@ -429,6 +475,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             case 'Right': case 'ArrowRight':
             case 'Up': case 'ArrowUp':
             case 'Down': case 'ArrowDown':
+                event.preventDefault();
                 let mappedKey = {
                     'Left': 'ArrowLeft',
                     'Right': 'ArrowRight',
@@ -492,6 +539,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 break;
             case 'a':
                 if (event.ctrlKey) {
+                    event.preventDefault();
                     documentSelection.setPosition(0, 0);
                     const lastLine = documentEditor.getLineCount() - 1;
                     documentSelection.setPosition(lastLine, documentEditor.getLineCharacterCount(lastLine), true);
@@ -511,7 +559,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                         this.editorTextarea.select();
                         this.editorTextarea.setSelectionRange(0, 99999);
                         document.execCommand('copy'); // TODO - use new API
-                        this.editorTextarea.value = '';
+                        this.clearEditorTextarea();
                     }
                     break;
                 }
@@ -535,7 +583,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                         this.editorTextarea.select();
                         this.editorTextarea.setSelectionRange(0, 99999);
                         document.execCommand('copy'); // TODO - use new API
-                        this.editorTextarea.value = '';
+                        this.clearEditorTextarea();
 
                         // Delete selection
                         TextDocumentEditorWithSelection.deleteSelection(documentEditor, documentSelection);
@@ -548,6 +596,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             default:
                 const shortcutAction = getKeyboardAction(event.key, event.ctrlKey, event.shiftKey, event.altKey);
                 if (shortcutAction?.target == 'history/undo') {
+                    event.preventDefault();
                     const actionSplit = shortcutAction.target.split('/');
                     if (this.isEditorTextareaDirty) {
                         this.saveEditorTextarea().then(() => {
@@ -557,6 +606,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                         runModule(actionSplit[0], actionSplit[1]);
                     }
                 } else if (shortcutAction?.target == 'history/redo') {
+                    event.preventDefault();
                     this.isEditorTextareaDirty = false;
                     clearTimeout(this.editorTextareaQueueSaveTimeoutHandle);
                     const actionSplit = shortcutAction.target.split('/');
@@ -566,6 +616,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 }
         }
         if (handled) {
+            this.clearEditorTextarea();
             canvasStore.set('dirty', true);
             // TODO - update tool selection GUI?
         }
@@ -573,11 +624,11 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         return !handled;
     }
 
-    onMultiTouchDown() {
-        super.onMultiTouchDown();
-        if (this.touches.length === 1) {
+    onMultiTouchTap(touches) {
+        if (touches.length === 1) {
             if (this.dragStartPickLayer == null) {
-                this.onDragStart(this.touches[0]);
+                this.onDragStart(touches[0]);
+                this.onDragEnd();
             }
         }
     }
@@ -640,7 +691,6 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     }
 
     private onDragStart(pointer: PointerTracker) {
-
         let { viewTransformPoint, transformBoundsPoint } = this.getTransformedCursorInfo(pointer.down.pageX, pointer.down.pageY);
         const dragStartPickLayer = this.pickLayer(viewTransformPoint);
         this.dragStartPickLayer = dragStartPickLayer;
@@ -795,7 +845,6 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     }
 
     private onDragEnd() {
-
         if (this.isCreatingLayer) {
             const createdLayerId = this.createdLayerId;
             // User never dragged their mouse and just clicked; create new text layer
@@ -941,10 +990,11 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         });
         this.createdLayerId = insertLayerAction.insertedLayerId;
         const createdLayerId = this.createdLayerId;
+
         setTimeout(() => {
             editingTextLayerId.value = createdLayerId;
             this.editorTextarea?.focus();
-        }, 1);
+        }, 50);
     }
 
     private generateTextMeta(meta: Record<string, any>) {
@@ -980,6 +1030,45 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 toolbarTextMeta[key as keyof TextDocumentSpanMeta] = values[0];
             }
         }
+    }
+
+    private clearEditorTextarea() {
+        if (!this.editorTextarea) return;
+        this.editorTextarea.value = 'ab';
+        this.editorTextarea.select();
+        this.editorTextarea.setSelectionRange(1, 1);
+    }
+
+    private extractEditorTextareaInput() {
+        if (!this.editorTextarea) return '';
+        if (this.editorTextarea.value.length > CLEARED_EDITOR_TEXTAREA_LENGTH) {
+            return this.editorTextarea.value.slice(1, -1);
+        }
+        return '';
+    }
+
+    private isEditorTextareaBackspace() {
+        return (
+            this.editorTextarea?.value === 'b'
+            && this.editorTextarea?.selectionStart === 0
+            && this.editorTextarea?.selectionEnd === 0
+        );
+    }
+
+    private isEditorTextareaBrokenBackspace() {
+        return (
+            this.editorTextarea?.value === 'a'
+            && this.editorTextarea?.selectionStart === 1
+            && this.editorTextarea?.selectionEnd === 1
+        );
+    }
+
+    private isEditorTextareaDelete() {
+        return (
+            this.editorTextarea?.value === 'a'
+            && this.editorTextarea?.selectionStart === 1
+            && this.editorTextarea?.selectionEnd === 1
+        );
     }
 
     private queueSaveEditorTextarea() {

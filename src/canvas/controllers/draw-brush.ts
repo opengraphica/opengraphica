@@ -58,7 +58,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         });
 
         this.drawablePreviewCanvas = new DrawableCanvas({ scale: 1 });
-        this.drawablePreviewCanvas.initialized().then(() => console.log('Drawable preview initialized.'));
+        this.drawablePreviewCanvas.initialized();
         this.drawablePreviewCanvas.onDrawn((event) => {
             if (this.activeDraftUuid == null) return;
             for (const layer of this.drawingOnLayers) {

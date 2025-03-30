@@ -58,6 +58,7 @@ export default class BaseCanvasMovementController extends BaseCanvasController {
     }
 
     onMultiTouchUp() {
+        super.onMultiTouchUp();
         if (this.moveTranslateStart) {
             this.moveTranslateStart = null;
         }
