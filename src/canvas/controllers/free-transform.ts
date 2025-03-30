@@ -438,7 +438,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     }
 
     private onCommitCurrentAction() {
-        if (!this.transformIsRotating && !this.transformIsDragging) {
+        if (!this.transformIsRotating && !this.transformIsDragging && document.activeElement?.tagName == 'MAIN') {
             applyTransform();
         }
     }

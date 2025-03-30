@@ -1,5 +1,6 @@
 @use './opengraphica.scss';
 @use './opengraphica/popover.scss';
+@use './opengraphica/select.scss';
 
 @use './vendor/element-plus-theme-chalk.css';
 @use './element-plus-enhancements.scss' as *;
@@ -35,6 +36,7 @@
     --og-layer-list-thumbnail-border-color-active: var(--og-primary-600);
 
     @include popover.dark;
+    @include select.dark;
 }
 
 .opengraphica {

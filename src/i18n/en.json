@@ -35,7 +35,7 @@
         "reorderLayers": "Reorder Layer(s)",
         "reorderLayerFilters": "Reorder Effect(s)",
         "selectLayers": "Select Layer(s)",
-        "setLayerBoundsToWorkingFileBounds": "Layer Bounds to Image Size",
+        "setLayerBoundsToWorkingFileBounds": "Layer Bounds to Canvas Size",
         "textTransformResize": "Resize Text Layer",
         "textTransformTranslate": "Move Text Layer",
         "toggleLayerVisibilityOn": "Toggle Layer Visibility On",
@@ -1155,7 +1155,7 @@
             "actions": {
                 "title": "Actions",
                 "applyTransform": "Apply Transform",
-                "expandToImageSize": "Layer Bounds to Image Size",
+                "expandToImageSize": "Layer Bounds to Canvas Size",
                 "trimEmptySpace": "Trim Empty Space"
             }
         },

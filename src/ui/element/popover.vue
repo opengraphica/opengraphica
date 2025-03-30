@@ -7,6 +7,7 @@
             <div
                 v-if="visible"
                 v-pointer.down.window="onPointerDownWindow"
+                v-pointer.up.window="onPointerUpWindow"
                 ref="popover"
                 class="og-popover og-transition-fast"
                 :class="['og-popover--' + placement]"
@@ -85,10 +86,19 @@ const { floatingStyles, middlewareData, placement } = useFloating(
 );
 
 function onPointerDownWindow(event: PointerEvent) {
+    hideIfClickedOutsidePopover(event);
+}
+
+function onPointerUpWindow(event: PointerEvent) {
+    hideIfClickedOutsidePopover(event);
+}
+
+function hideIfClickedOutsidePopover(event: PointerEvent) {
     if (!popover.value || !event.target || !props.visible) return;
     if (
         !popover.value.contains(event.target as HTMLElement)
         && !props.reference?.contains(event.target as HTMLElement)
+        && props.visible
     ) {
         emit('update:visible', false);
     }

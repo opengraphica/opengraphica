@@ -3,7 +3,7 @@
         <div class="og-dock-mobile-edge-padding">
             <app-color-picker-gradient :modelValue="workingColor" @input="workingColor = $event" v-model:preload="pickerGradientLoading" />
         </div>
-        <h2 class="px-5 my-4 text-center">{{ colorName }}</h2>
+        <h2 class="px-5 my-4 text-lg text-center">{{ colorName }}</h2>
         <div class="px-5 my-4 flex justify-center">
             <div class="og-color-picker-preview">
                 <div class="og-color-picker-preview__color" :style="{ '--preview-color': workingColor.style }" />

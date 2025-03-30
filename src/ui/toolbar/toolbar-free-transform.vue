@@ -163,13 +163,17 @@
     </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, defineAsyncComponent, ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
+<script setup lang="ts">
+import { ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
+
 import {
     freeTransformEmitter, layerPickMode, useRotationSnapping, top, left, width, height, rotation,
     applyTransform, trimEmptySpace, layerToImageBounds, isResizeEnabled, isUnevenScalingEnabled,
 } from '@/canvas/store/free-transform-state';
 import { appliedSelectionMask, activeSelectionMask } from '@/canvas/store/selection-state';
+import historyStore from '@/store/history';
+import workingFileStore, { getSelectedLayers, WorkingFileState } from '@/store/working-file';
+
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
@@ -181,211 +185,157 @@ import ElMenu, { ElMenuItem } from 'element-plus/lib/components/menu/index';
 import ElPopover from '@/ui/el/el-popover.vue';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSwitch from 'element-plus/lib/components/switch/index';
-import historyStore from '@/store/history';
-import workingFileStore, { getSelectedLayers, WorkingFileState } from '@/store/working-file';
+
 import { convertUnits } from '@/lib/metrics';
 import { ClearSelectionAction } from '@/actions/clear-selection';
 
-export default defineComponent({
-    name: 'ToolbarFreeTransform',
-    components: {
-        ElAlert,
-        ElButton,
-        ElButtonGroup,
-        ElForm,
-        ElFormItem,
-        ElHorizontalScrollbarArrows,
-        ElInput,
-        ElInputGroup,
-        ElInputNumber,
-        ElMenu,
-        ElMenuItem,
-        ElOption,
-        ElPopover,
-        ElSelect,
-        ElSwitch
-    },
-    props: {
-        
-    },
-    emits: [
-        'close'
-    ],
-    setup(props, { emit }) {
-        const { selectedLayerIds } = toRefs(workingFileStore.state);
-        const measuringUnits = ref<WorkingFileState['measuringUnits']>(workingFileStore.get('measuringUnits'));
-        const resolutionX = ref<number>(workingFileStore.get('resolutionX'));
-        const resolutionY = ref<number>(workingFileStore.get('resolutionY'));
-        const resolutionUnits = ref<WorkingFileState['resolutionUnits']>(workingFileStore.get('resolutionUnits'));
-        const dimensionLockRatio = ref<number | null>(null);
+const emit = defineEmits<{
+    (e: 'close'): void;
+}>();
 
-        const actionActiveIndex = ref<string>('');
-        const isActionPopoverVisible = ref<boolean>(false);
+const { selectedLayerIds } = toRefs(workingFileStore.state);
+const measuringUnits = ref<WorkingFileState['measuringUnits']>(workingFileStore.get('measuringUnits'));
+const resolutionX = ref<number>(workingFileStore.get('resolutionX'));
+const resolutionY = ref<number>(workingFileStore.get('resolutionY'));
+const resolutionUnits = ref<WorkingFileState['resolutionUnits']>(workingFileStore.get('resolutionUnits'));
+const dimensionLockRatio = ref<number | null>(null);
 
-        let disableInputUpdate: boolean = false;
+const actionActiveIndex = ref<string>('');
+const isActionPopoverVisible = ref<boolean>(false);
 
-        const inputLeft = ref<number>(0);
-        const inputTop = ref<number>(0);
-        const inputWidth = ref<number>(1);
-        const inputHeight = ref<number>(1);
-        const inputRotation = ref<number>(0);
+let disableInputUpdate: boolean = false;
 
-        const hasSelection = computed<boolean>(() => {
-            return !(appliedSelectionMask.value == null && activeSelectionMask.value == null);
-        });
+const inputLeft = ref<number>(0);
+const inputTop = ref<number>(0);
+const inputWidth = ref<number>(1);
+const inputHeight = ref<number>(1);
+const inputRotation = ref<number>(0);
 
-        watch([left], ([left]) => {
-            if (!disableInputUpdate) {
-                inputLeft.value = parseFloat(convertUnits(left, 'px', measuringUnits.value, resolutionX.value, resolutionUnits.value).toFixed(2));
-            }
-        }, { immediate: true });
-        watch([top], ([top]) => {
-            if (!disableInputUpdate) {
-                inputTop.value = parseFloat(convertUnits(top, 'px', measuringUnits.value, resolutionX.value, resolutionUnits.value).toFixed(2));
-            }
-        }, { immediate: true });
-        watch([width, height], ([width, height]) => {
-            if (!disableInputUpdate) {
-                inputWidth.value = parseFloat(convertUnits(width, 'px', measuringUnits.value, resolutionX.value, resolutionUnits.value).toFixed(measuringUnits.value === 'px' ? 0 : 2));
-                inputHeight.value = parseFloat(convertUnits(height, 'px', measuringUnits.value, resolutionY.value, resolutionUnits.value).toFixed(measuringUnits.value === 'px' ? 0 : 2));
-            }
-        }, { immediate: true });
-        watch([rotation], ([rotation]) => {
-            if (!disableInputUpdate) {
-                inputRotation.value = parseFloat((rotation * Math.RADIANS_TO_DEGREES).toFixed(2));
-            }
-        }, { immediate: true });
-
-        function onToggleDimensionLockRatio() {
-            if (dimensionLockRatio.value == null) {
-                dimensionLockRatio.value = width.value / height.value;
-            } else {
-                dimensionLockRatio.value = null;
-            }
-        }
-
-        function onFocusAnyMetricInput() {
-            freeTransformEmitter.emit('storeTransformStart');
-            disableInputUpdate = true;
-        }
-
-        function onInputLeft(left: number) {
-            freeTransformEmitter.emit('previewDragResizeChange', {
-                transform: {
-                    left: convertUnits(left, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
-                    top: convertUnits(inputTop.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
-                    width: convertUnits(inputWidth.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
-                    height: convertUnits(inputHeight.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value)
-                }
-            });
-        }
-
-        function onInputTop(top: number) {
-            freeTransformEmitter.emit('previewDragResizeChange', {
-                transform: {
-                    left: convertUnits(inputLeft.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
-                    top: convertUnits(top, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
-                    width: convertUnits(inputWidth.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
-                    height: convertUnits(inputHeight.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value)
-                }
-            });
-        }
-
-        function onInputWidth(width: number) {
-            freeTransformEmitter.emit('previewDragResizeChange', {
-                transform: {
-                    left: convertUnits(inputLeft.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
-                    top: convertUnits(inputTop.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
-                    width: convertUnits(width, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
-                    height: convertUnits(inputHeight.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value)
-                }
-            });
-        }
-
-        function onInputHeight(height: number) {
-            freeTransformEmitter.emit('previewDragResizeChange', {
-                transform: {
-                    left: convertUnits(inputLeft.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
-                    top: convertUnits(inputTop.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
-                    width: convertUnits(inputWidth.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
-                    height: convertUnits(height, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value)
-                }
-            });
-        }
-
-        function onInputRotation(rotation: number) {
-            freeTransformEmitter.emit('previewRotationChange', {
-                rotation: rotation * Math.DEGREES_TO_RADIANS
-            });
-        }
-
-        function onChangeDragResizeInput() {
-            disableInputUpdate = false;
-            freeTransformEmitter.emit('commitTransforms');
-        }
-
-        function onChangeRotationInput() {
-            disableInputUpdate = false;
-            freeTransformEmitter.emit('commitTransforms');
-        }
-
-        function onResetRotation() {
-            freeTransformEmitter.emit('storeTransformStart');
-            freeTransformEmitter.emit('previewRotationChange', {
-                rotation: 0
-            });
-            freeTransformEmitter.emit('commitTransforms');
-        }
-
-        async function onClickClearSelection() {
-            await historyStore.dispatch('runAction', {
-                action: new ClearSelectionAction()
-            });
-        }
-
-        async function onActionSelect(action: string) {
-            if (action === 'applyTransform') {
-                await applyTransform();
-            } else if (action === 'expandToImageSize') {
-                await layerToImageBounds();
-            } else if (action === 'trimEmptySpace') {
-                await trimEmptySpace();
-            }
-            actionActiveIndex.value = ' ';
-            await nextTick();
-            actionActiveIndex.value = '';
-            isActionPopoverVisible.value = false;
-        }
-
-        return {
-            hasSelection,
-            isResizeEnabled,
-            isUnevenScalingEnabled,
-            inputLeft,
-            inputTop,
-            inputWidth,
-            inputHeight,
-            inputRotation,
-            measuringUnits,
-            layerPickMode,
-            useRotationSnapping,
-            dimensionLockRatio,
-            selectedLayerIds,
-            actionActiveIndex,
-            isActionPopoverVisible,
-            onToggleDimensionLockRatio,
-            onFocusAnyMetricInput,
-            onInputLeft,
-            onInputTop,
-            onInputWidth,
-            onInputHeight,
-            onInputRotation,
-            onChangeDragResizeInput,
-            onChangeRotationInput,
-            onResetRotation,
-            onClickClearSelection,
-            onActionSelect,
-        };
-    }
+const hasSelection = computed<boolean>(() => {
+    return !(appliedSelectionMask.value == null && activeSelectionMask.value == null);
 });
+
+watch([left], ([left]) => {
+    if (!disableInputUpdate) {
+        inputLeft.value = parseFloat(convertUnits(left, 'px', measuringUnits.value, resolutionX.value, resolutionUnits.value).toFixed(2));
+    }
+}, { immediate: true });
+watch([top], ([top]) => {
+    if (!disableInputUpdate) {
+        inputTop.value = parseFloat(convertUnits(top, 'px', measuringUnits.value, resolutionX.value, resolutionUnits.value).toFixed(2));
+    }
+}, { immediate: true });
+watch([width, height], ([width, height]) => {
+    if (!disableInputUpdate) {
+        inputWidth.value = parseFloat(convertUnits(width, 'px', measuringUnits.value, resolutionX.value, resolutionUnits.value).toFixed(measuringUnits.value === 'px' ? 0 : 2));
+        inputHeight.value = parseFloat(convertUnits(height, 'px', measuringUnits.value, resolutionY.value, resolutionUnits.value).toFixed(measuringUnits.value === 'px' ? 0 : 2));
+    }
+}, { immediate: true });
+watch([rotation], ([rotation]) => {
+    if (!disableInputUpdate) {
+        inputRotation.value = parseFloat((rotation * Math.RADIANS_TO_DEGREES).toFixed(2));
+    }
+}, { immediate: true });
+
+function onToggleDimensionLockRatio() {
+    if (dimensionLockRatio.value == null) {
+        dimensionLockRatio.value = width.value / height.value;
+    } else {
+        dimensionLockRatio.value = null;
+    }
+}
+
+function onFocusAnyMetricInput() {
+    freeTransformEmitter.emit('storeTransformStart');
+    disableInputUpdate = true;
+}
+
+function onInputLeft(left: number) {
+    freeTransformEmitter.emit('previewDragResizeChange', {
+        transform: {
+            left: convertUnits(left, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+            top: convertUnits(inputTop.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+            width: convertUnits(inputWidth.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+            height: convertUnits(inputHeight.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value)
+        }
+    });
+}
+
+function onInputTop(top: number) {
+    freeTransformEmitter.emit('previewDragResizeChange', {
+        transform: {
+            left: convertUnits(inputLeft.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+            top: convertUnits(top, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+            width: convertUnits(inputWidth.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+            height: convertUnits(inputHeight.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value)
+        }
+    });
+}
+
+function onInputWidth(width: number) {
+    freeTransformEmitter.emit('previewDragResizeChange', {
+        transform: {
+            left: convertUnits(inputLeft.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+            top: convertUnits(inputTop.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+            width: convertUnits(width, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+            height: convertUnits(inputHeight.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value)
+        }
+    });
+}
+
+function onInputHeight(height: number) {
+    freeTransformEmitter.emit('previewDragResizeChange', {
+        transform: {
+            left: convertUnits(inputLeft.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+            top: convertUnits(inputTop.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+            width: convertUnits(inputWidth.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value),
+            height: convertUnits(height, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value)
+        }
+    });
+}
+
+function onInputRotation(rotation: number) {
+    freeTransformEmitter.emit('previewRotationChange', {
+        rotation: rotation * Math.DEGREES_TO_RADIANS
+    });
+}
+
+function onChangeDragResizeInput() {
+    disableInputUpdate = false;
+    freeTransformEmitter.emit('commitTransforms');
+}
+
+function onChangeRotationInput() {
+    disableInputUpdate = false;
+    freeTransformEmitter.emit('commitTransforms');
+}
+
+function onResetRotation() {
+    freeTransformEmitter.emit('storeTransformStart');
+    freeTransformEmitter.emit('previewRotationChange', {
+        rotation: 0
+    });
+    freeTransformEmitter.emit('commitTransforms');
+}
+
+async function onClickClearSelection() {
+    await historyStore.dispatch('runAction', {
+        action: new ClearSelectionAction()
+    });
+}
+
+async function onActionSelect(action: string) {
+    if (action === 'applyTransform') {
+        await applyTransform();
+    } else if (action === 'expandToImageSize') {
+        await layerToImageBounds();
+    } else if (action === 'trimEmptySpace') {
+        await trimEmptySpace();
+    }
+    actionActiveIndex.value = ' ';
+    await nextTick();
+    actionActiveIndex.value = '';
+    isActionPopoverVisible.value = false;
+}
+
 </script>

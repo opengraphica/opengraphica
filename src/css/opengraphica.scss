@@ -2,6 +2,7 @@
 @use './palette.scss';
 
 @use './opengraphica/container.scss';
+@use './opengraphica/select.scss';
 @use './opengraphica/popover.scss';
 
 @font-face {
@@ -92,6 +93,7 @@ body.og-full-page {
     @import './opengraphica/overlay-selection.scss';
     @import './opengraphica/overlay-text.scss';
     @include popover.main;
+    @include select.main;
     @import './opengraphica/toolbar.scss';
     @import './opengraphica/toolbar-gradient.scss';
     @import './opengraphica/utility.scss';

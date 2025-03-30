@@ -83,7 +83,7 @@
                             <!-- <transition name="og-transition-fade">
                                 <span v-if="layer.isBaking" v-t="'app.layerList.recalculatingEffect'" class="has-color-primary" />
                             </transition> -->
-                            <el-button link type="primary" class="ml-auto mr-1" style="min-height: 0" @click="rasterizeLayer(layer)">
+                            <el-button link type="primary" class="!ml-auto !mr-1" style="min-height: 0" @click="rasterizeLayer(layer)">
                                 <span class="bi bi-sign-merge-left mr-1" aria-hidden="true" />
                                 {{ t('app.layerList.rasterizeEffects') }}
                             </el-button>
