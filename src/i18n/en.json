@@ -1124,7 +1124,13 @@
             }
         },
         "eraseBrush": {
-            "brushSize": "Size"
+            "brushSize": "Size",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "No Layers Selected",
+                    "message": "Please select at least one image layer in the layers dock. Certain layer types can't be erased."
+                }
+            }
         },
         "freeTransform": {
             "clearSelection": "Clear Selection",
@@ -1170,6 +1176,12 @@
                 "add": "Add",
                 "subtract": "Subtract",
                 "intersect": "Intersect"
+            },
+            "notification": {
+                "unproductiveSelection": {
+                    "title": "No Layers Selected",
+                    "message": "<p>You have created a selection mask on top of the image.</p><p>Please select at least one image layer in the layers dock.</p>"
+                }
             }
         },
         "text": {

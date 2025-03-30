@@ -8,7 +8,7 @@ import {
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
-import workingFileStore from '@/store/working-file';
+import workingFileStore, { getSelectedLayers } from '@/store/working-file';
 import appEmitter from '@/lib/emitter';
 import { normalizedDirectionVector2d, rotateDirectionVector2d, pointDistance2d, lineIntersectsLine2d } from '@/lib/math';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
@@ -474,6 +474,7 @@ export default class SelectionController extends BaseMovementController {
             if (pointer.isDragging) {
                 isDrawingSelection.value = false;
                 if (this.dragStartHandleIndex > -1 || this.dragStartActiveSelectionPath) {
+
                     // Update active selection path in history
                     if (activeSelectionPath.value[0]?.editorShapeIntent === 'freePolygon') {
                         let isFinished = false;
@@ -513,6 +514,7 @@ export default class SelectionController extends BaseMovementController {
                             }, [activeSelectionPath.value, this.freePathStartActiveSelectionPath ?? []]);
                         }
                     } else {
+                        this.warnIfUnproductiveSelection();
                         this.queueAsyncAction((newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) => {
                             return this.updateActiveSelection(newPath, oldPath);
                         }, [activeSelectionPath.value, this.dragStartActiveSelectionPath]);
@@ -524,9 +526,10 @@ export default class SelectionController extends BaseMovementController {
                 this.dragStartRectangleOriginToRightDirection = null;
                 this.dragStartEllipsePerpendicularRadius = null;
             } else {
-                // Close free select path 
+                // Close free select path
                 const dragHandleIndex = this.getDragHandleIndexAtPagePoint(pointer.down.pageX, pointer.down.pageY);
                 if (activeSelectionPath.value.length > 2 && activeSelectionPath.value[0]?.editorShapeIntent === 'freePolygon' && dragHandleIndex === 0) {
+                    this.warnIfUnproductiveSelection();
                     activeSelectionPath.value.push({
                         type: 'line',
                         x: activeSelectionPath.value[0].x,
@@ -701,6 +704,18 @@ export default class SelectionController extends BaseMovementController {
                 action: new UpdateSelectionCombineModeAction(event, selectionCombineMode.value),
                 mergeWithHistory: ['applyActiveSelection']
             });
+        });
+    }
+
+    warnIfUnproductiveSelection() {
+        if (appliedSelectionMask.value != null) return;
+        if (getSelectedLayers().length > 0) return;
+        appEmitter.emit('app.notify', {
+            type: 'info',
+            title: t('toolbar.selection.notification.unproductiveSelection.title'),
+            message: t('toolbar.selection.notification.unproductiveSelection.message'),
+            dangerouslyUseHTMLString: true,
+            duration: 10000,
         });
     }
 

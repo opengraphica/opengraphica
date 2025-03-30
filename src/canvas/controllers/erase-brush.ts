@@ -5,7 +5,7 @@ import BaseCanvasMovementController from './base-movement';
 import { cursorHoverPosition, brushShape, brushSize } from '../store/erase-brush-state';
 import { blitActiveSelectionMask, activeSelectionMask, appliedSelectionMask } from '../store/selection-state';
 
-import { decomposeMatrix } from '@/lib/dom-matrix';
+import appEmitter from '@/lib/emitter';
 import { isOffscreenCanvasSupported } from '@/lib/feature-detection';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import { createImageFromBlob, createEmptyCanvasWith2dContext } from '@/lib/image';
@@ -249,6 +249,12 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
     protected async eraseStart() {
         let selectedLayers = getSelectedLayers().filter((layer) => layer.type === 'raster');
         if (selectedLayers.length === 0) {
+            appEmitter.emit('app.notify', {
+                type: 'info',
+                title: t('toolbar.eraseBrush.notification.noSelectedLayers.title'),
+                message: t('toolbar.eraseBrush.notification.noSelectedLayers.message'),
+                duration: 5000,
+            });
             return;   
         }
 
