@@ -1072,7 +1072,13 @@
             "resolutionUnits": "Resolution Units",
             "snapping": {
                 "title": "Snapping",
-                "enable": "Enable Snapping"
+                "enable": "Enable Snapping",
+                "currentCanvas": "Current Canvas",
+                "cropArea": "Crop Area",
+                "snapToCenter": "Snap to Center",
+                "snapToEdges": "Snap to Edges",
+                "snapAtCenter": "Snap at Center",
+                "snapAtEdges": "Snap at Edges"
             }
         },
         "deformBlur": {

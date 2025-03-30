@@ -1,5 +1,10 @@
+import { watch, type WatchHandle } from 'vue';
 import BaseCanvasMovementController from './base-movement';
-import { top, left, width, height, cropResizeEmitter, enableSnapping, dragHandleHighlight, previewXSnap, previewYSnap, dimensionLockRatio } from '../store/crop-resize-state';
+import {
+    top, left, width, height, cropResizeEmitter,
+    enableSnapping, enableSnappingToCanvasCenter, enableSnappingToCanvasEdges, enableSnappingToSelectionCenter, enableSnappingToSelectionEdges,
+    dragHandleHighlight, previewXSnap, previewYSnap, dimensionLockRatio
+} from '../store/crop-resize-state';
 import { DecomposedMatrix } from '@/lib/dom-matrix';
 import canvasStore from '@/store/canvas';
 import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset } from '@/canvas/store/selection-state';
@@ -23,6 +28,10 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
     private yAxisSnap: number[] = [];
     private snapSensitivity = 0;
 
+    private currentCanvasWidth: number = 0;
+    private currentCanvasHeight: number = 0;
+    private unwatchEnableSnapping: WatchHandle | undefined = undefined;
+
     onEnter(): void {
         super.onEnter();
         this.remToPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
@@ -31,9 +40,9 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
         left.value = 0;
         width.value = workingFileStore.get('width');
         height.value = workingFileStore.get('height');
-        this.xAxisSnap = [0, Math.floor(width.value / 2), width.value];
-        this.yAxisSnap = [0, Math.floor(height.value / 2), height.value];
         canvasStore.set('showAreaOutsideWorkingFile', true);
+        this.currentCanvasWidth = width.value;
+        this.currentCanvasHeight = height.value;
 
         const selectionMask = activeSelectionMask.value ?? appliedSelectionMask.value;
         if (selectionMask) {
@@ -42,10 +51,30 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
             width.value = selectionMask.width;
             height.value = selectionMask.height;
         }
+
+        this.unwatchEnableSnapping = watch(() => [
+            enableSnappingToCanvasCenter.value, enableSnappingToCanvasEdges.value
+        ], ([enableSnappingToCanvasCenter, enableSnappingToCanvasEdges]) => {
+            this.xAxisSnap = [];
+            this.yAxisSnap = [];
+            if (enableSnappingToCanvasEdges) {
+                this.xAxisSnap.push(0);
+                this.yAxisSnap.push(0);
+            }
+            if (enableSnappingToCanvasCenter) {
+                this.xAxisSnap.push(Math.floor(this.currentCanvasWidth / 2));
+                this.yAxisSnap.push(Math.floor(this.currentCanvasHeight / 2));
+            }
+            if (enableSnappingToCanvasEdges) {
+                this.xAxisSnap.push(this.currentCanvasWidth);
+                this.yAxisSnap.push(this.currentCanvasHeight);
+            }
+        }, { immediate: true });
     }
 
     onLeave(): void {
         canvasStore.set('showAreaOutsideWorkingFile', false);
+        this.unwatchEnableSnapping?.();
     }
 
     onMultiTouchDown() {
@@ -160,50 +189,66 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
                 let ySnap: number | null = null;
                 if (!dimensionLockRatio.value || !(isDragTop || isDragBottom)) {
                     if (isDragLeft || isDragAll) {
-                        xSnap = this.snapPointX(left);
+                        if (enableSnappingToSelectionEdges.value) {
+                            xSnap = this.snapPointX(left);
+                        }
                         let difference = (xSnap != null ? xSnap : left) - left;
                         left += difference;
                         if (isDragAll) {
-                            const halfWidth = Math.floor(width / 2);
-                            let halfWidthXSnap = this.snapPointX(left + halfWidth);
-                            if (halfWidthXSnap != null) {
-                                xSnap = halfWidthXSnap;
-                                left = (xSnap != null ? xSnap : (left + halfWidth)) - halfWidth;
+                            if (enableSnappingToSelectionCenter.value) {
+                                const halfWidth = Math.floor(width / 2);
+                                let halfWidthXSnap = this.snapPointX(left + halfWidth);
+                                if (halfWidthXSnap != null) {
+                                    xSnap = halfWidthXSnap;
+                                    left = (xSnap != null ? xSnap : (left + halfWidth)) - halfWidth;
+                                }
                             }
-                            let widthXSnap = this.snapPointX(left + width);
-                            if (widthXSnap != null) {
-                                xSnap = widthXSnap;
-                                left = (xSnap != null ? xSnap : (left + width)) - width;
+                            if (enableSnappingToSelectionEdges.value) {
+                                let widthXSnap = this.snapPointX(left + width);
+                                if (widthXSnap != null) {
+                                    xSnap = widthXSnap;
+                                    left = (xSnap != null ? xSnap : (left + width)) - width;
+                                }
                             }
                         } else {
                             width -= difference;
                         }
                     } else if (isDragRight) {
-                        xSnap = this.snapPointX(left + width);
+                        if (enableSnappingToSelectionEdges.value) {
+                            xSnap = this.snapPointX(left + width);
+                        }
                         width = (xSnap != null ? xSnap : (left + width)) - left;
                     }
                 }
                 if (isDragTop || isDragAll) {
-                    ySnap = this.snapPointY(top);
+                    if (enableSnappingToSelectionEdges.value) {
+                        ySnap = this.snapPointY(top);
+                    }
                     let difference = (ySnap != null ? ySnap : top) - top;
                     top += difference;
                     if (isDragAll) {
-                        const halfHeight = Math.floor(height / 2);
-                        let halfHeightYSnap = this.snapPointY(top + halfHeight);
-                        if (halfHeightYSnap != null) {
-                            ySnap = halfHeightYSnap;
-                            top = (ySnap != null ? ySnap : (top + halfHeight)) - halfHeight;
+                        if (enableSnappingToSelectionCenter.value) {
+                            const halfHeight = Math.floor(height / 2);
+                            let halfHeightYSnap = this.snapPointY(top + halfHeight);
+                            if (halfHeightYSnap != null) {
+                                ySnap = halfHeightYSnap;
+                                top = (ySnap != null ? ySnap : (top + halfHeight)) - halfHeight;
+                            }
                         }
-                        let heightYSnap = this.snapPointY(top + height);
-                        if (heightYSnap != null) {
-                            ySnap = heightYSnap;
-                            top = (ySnap != null ? ySnap : (top + height)) - height;
+                        if (enableSnappingToSelectionEdges.value) {
+                            let heightYSnap = this.snapPointY(top + height);
+                            if (heightYSnap != null) {
+                                ySnap = heightYSnap;
+                                top = (ySnap != null ? ySnap : (top + height)) - height;
+                            }
                         }
                     } else {
                         height -= difference;                        
                     }
                 } else if (isDragBottom) {
-                    ySnap = this.snapPointY(top + height);
+                    if (enableSnappingToSelectionEdges.value) {
+                        ySnap = this.snapPointY(top + height);
+                    }
                     height = (ySnap != null ? ySnap : (top + height)) - top;
                 }
                 previewXSnap.value = xSnap;
