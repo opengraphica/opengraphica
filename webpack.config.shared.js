@@ -57,7 +57,7 @@ module.exports = function setupConfig(config) {
                     ],
                 },
                 {
-                    test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+                    test: /\.(cur|woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
                     use: [
                         {
                             loader: 'file-loader',
@@ -108,7 +108,6 @@ module.exports = function setupConfig(config) {
                     { from: path.resolve(__dirname, 'src/css'), to: 'css/[name][ext]' },
                     { from: path.resolve(__dirname, 'src/css/fonts'), to: 'css/fonts' },
                     { from: path.resolve(__dirname, 'src/assets/fonts'), to: 'fonts' },
-                    { from: path.resolve(__dirname, 'src/assets/icons'), to: 'icons' },
                     { from: path.resolve(__dirname, 'src/assets/images'), to: 'images' },
                     { from: path.resolve(__dirname, 'src/workers'), to: 'js/workers' },
                     { from: path.resolve(__dirname, 'src/lib/feature-detection/workers'), to: 'js/lib/feature-detection/workers' },
