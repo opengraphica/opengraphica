@@ -4,3 +4,4 @@ dist
 www
 dist-ssr
 *.local
+PRIORITY.txt
