@@ -3,13 +3,16 @@ import {
 } from '@/types';
 import { BaseAction } from './base';
 import { SelectLayersAction } from './select-layers';
+import { updateBakedImageForLayer } from './baking';
+
 import canvasStore from '@/store/canvas';
 import { unreserveStoredImage } from '@/store/image';
 import { unreserveStoredSvg } from '@/store/svg';
 import { unreserveStoredVideo } from '@/store/video';
 import workingFileStore, { calculateLayerOrder, getLayerById, getGroupLayerById } from '@/store/working-file';
 import { updateWorkingFileMasks, updateWorkingFile, updateWorkingFileLayer, deleteWorkingFileLayer } from '@/store/data/working-file-database';
-import { updateBakedImageForLayer } from './baking';
+
+import appEmitter from '@/lib/emitter';
 
 export class DeleteLayersAction extends BaseAction {
 
@@ -48,7 +51,7 @@ export class DeleteLayersAction extends BaseAction {
                         parentIndex: parentListIndex
                     });
                 }
-                layer.renderer.detach();
+                appEmitter.emit('app.workingFile.layerDetached', layer);
                 layer.bakedImage = null;
             }
         }
@@ -78,7 +81,7 @@ export class DeleteLayersAction extends BaseAction {
                 parentList = getGroupLayerById(layer.groupId)?.layers || layers;
             }
             parentList.splice(deletedLayerInfo.parentIndex, 0, layer);
-            await layer.renderer.attach(layer);
+            appEmitter.emit('app.workingFile.layerAttached', layer);
             updateBakedImageForLayer(layer);
         }
         this.deletedLayers = [];

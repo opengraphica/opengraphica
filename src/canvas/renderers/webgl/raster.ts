@@ -1,7 +1,7 @@
 import { toRefs, watch, type WatchStopHandle } from 'vue';
 
 import canvasStore from '@/store/canvas';
-import { getStoredImageCanvas, getStoredImageOrCanvas } from '@/store/image';
+import { getStoredImageOrCanvas } from '@/store/image';
 
 import BaseLayerRenderer from './base';
 

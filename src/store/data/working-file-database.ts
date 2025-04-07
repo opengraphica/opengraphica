@@ -1,6 +1,7 @@
 import { reactive, toRaw } from 'vue';
+
+import appEmitter from '@/lib/emitter';
 import { deepToRaw } from '@/lib/vue';
-import { assignLayerRenderer } from '@/canvas/renderers';
 
 import { prepareStoredImageForEditing, reserveStoredImage, createStoredImage } from '@/store/image';
 import { getStoredSvgDataUrl, createStoredSvg } from '@/store/svg';
@@ -176,11 +177,10 @@ async function readStoredLayersRecursive(metaLayers: DatabaseMetaLayer[], workin
             }
         }
 
-        assignLayerRenderer(layerResult);
         layers.push(layerResult);
     }
     for (const layer of layers) {
-        await layer.renderer.attach(layer);
+        appEmitter.emit('app.workingFile.layerAttached', layer);
     }
     return layers;
 }

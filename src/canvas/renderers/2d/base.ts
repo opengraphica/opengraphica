@@ -73,7 +73,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
             
             // In some browsers you can see visible seams between drawImage calls that are otherwise pixel perfect aligned in certain view transforms.
             // Optionally, drawing subsequent raster layers to a buffer canvas first then applying the transform eliminates this issue at a performance cost.
-            if (preferencesStore.get('enableMultiLayerBuffer') && !canvasStore.get('useCssViewport') && canvasStore.get('decomposedTransform').scaleX < 1) {
+            if (preferencesStore.get('enableMultiLayerBuffer') && canvasStore.get('decomposedTransform').scaleX < 1) {
                 const isBufferInUse = canvasStore.get('isBufferInUse');
                 if (layer.type === 'raster') {
                     ctx = canvasStore.get('bufferCtx');

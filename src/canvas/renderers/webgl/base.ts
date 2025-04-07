@@ -66,9 +66,9 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
     attach(layer: WorkingFileLayer<ColorModel>) {
         if (!this.isAttached) {
             try {
-                if (layer.renderer) {
-                    this.order = layer.renderer.order ?? 0;
-                }
+                // if (layer.renderer) {
+                //     this.order = layer.renderer.order ?? 0;
+                // }
                 this.onAttach(layer);
             } catch (error) {
                 console.error('[src/canvas/renderers/webgl/base.ts] Error during layer attach. ', error);

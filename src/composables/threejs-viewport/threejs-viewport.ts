@@ -160,16 +160,6 @@ export function useThreejsViewport(options: ThreejsViewportOptions) {
         canvasStore.set('dirty', true);
     });
 
-    // Update canvas size when viewport type changes to/from CSS
-    watch(() => canvasStore.state.useCssViewport, () => {
-        updateThreejsImageSize(
-            workingFileStore.state.width,
-            workingFileStore.state.height,
-            canvasStore.state.viewWidth,
-            canvasStore.state.viewHeight,
-        );
-    });
-
     // Update canvas on browser window or image resize
     watch(() => [
         workingFileStore.state.width,
@@ -338,7 +328,7 @@ export function useThreejsViewport(options: ThreejsViewportOptions) {
 
         options.canvas.value?.addEventListener('webglcontextrestored', () => {
             for (const layer of workingFileStore.state.layers) {
-                layer.renderer.onContextRestored(threejsRenderer);
+                // layer.renderer.onContextRestored(threejsRenderer);
             }
         });
 
@@ -349,11 +339,7 @@ export function useThreejsViewport(options: ThreejsViewportOptions) {
     function renderCanvas() {
         if (!Matrix4 || !threejsCamera) return;
         let cameraTransform: DOMMatrix;
-        if (canvasStore.get('useCssViewport')) {
-            cameraTransform = new DOMMatrix().inverse().translate(0, 0, 1);
-        } else {
-            cameraTransform = canvasStore.get('transform').inverse().translate(0, 0, 1);
-        }
+        cameraTransform = canvasStore.get('transform').inverse().translate(0, 0, 1);
         const matrix = new Matrix4();
         matrix.set(
             cameraTransform.m11, cameraTransform.m21, cameraTransform.m31, cameraTransform.m41,
@@ -463,10 +449,6 @@ export function useThreejsViewport(options: ThreejsViewportOptions) {
     async function updateThreejsImageSize(imageWidth: number, imageHeight: number, canvasWidth: number, canvasHeight: number) {
         let width = canvasWidth;
         let height = canvasHeight;
-        if (canvasStore.state.useCssViewport) {
-            width = imageWidth;
-            height = imageHeight;
-        }
         const threejsRenderer = canvasStore.get('threejsRenderer');
         const threejsComposer = canvasStore.get('threejsComposer');
         const threejsCamera = canvasStore.get('threejsCamera');

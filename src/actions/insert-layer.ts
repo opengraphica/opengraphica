@@ -1,20 +1,24 @@
 import { reactive, markRaw } from 'vue';
-import {
-    ColorModel, WorkingFileLayer,
-    WorkingFileEmptyLayer, WorkingFileGradientLayer, WorkingFileGroupLayer, WorkingFileRasterLayer,
-    WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileVideoLayer, WorkingFileTextLayer,
-    WorkingFileAnyLayer, InsertAnyLayerOptions
-} from '@/types';
+
 import { BaseAction } from './base';
+import { updateBakedImageForLayer } from './baking';
 import { SelectLayersAction } from './select-layers';
+
 import canvasStore from '@/store/canvas';
 import { reserveStoredImage, unreserveStoredImage } from '@/store/image';
 import { reserveStoredSvg, unreserveStoredSvg } from '@/store/svg';
 import { reserveStoredVideo, unreserveStoredVideo } from '@/store/video';
 import workingFileStore, { calculateLayerOrder, getGroupLayerById } from '@/store/working-file';
 import { updateWorkingFile, updateWorkingFileLayer, deleteWorkingFileLayer } from '@/store/data/working-file-database';
-import layerRenderers, { assignLayerRenderer } from '@/canvas/renderers';
-import { updateBakedImageForLayer } from './baking';
+
+import appEmitter from '@/lib/emitter';
+
+import type {
+    ColorModel, WorkingFileLayer,
+    WorkingFileEmptyLayer, WorkingFileGradientLayer, WorkingFileGroupLayer, WorkingFileRasterLayer,
+    WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileVideoLayer, WorkingFileTextLayer,
+    WorkingFileAnyLayer, InsertAnyLayerOptions
+} from '@/types';
 
 let layerInsertCounter: number = 1;
 
@@ -51,8 +55,6 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
 
         this.insertedLayerId = layerId;
 
-        const renderer = canvasStore.get('renderer');
-
         // Create new layer object if not already created (do vs redo)
         let newLayer: WorkingFileAnyLayer<ColorModel>;
         if (this.insertedLayer) {
@@ -74,7 +76,6 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                 thumbnailImageSrc: null,
                 transform: new DOMMatrix(),
                 visible: true,
-                renderer: markRaw(new layerRenderers[renderer].base())
             }
 
             switch (this.insertLayerOptions.type) {
@@ -165,8 +166,6 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                 }
             }
 
-            assignLayerRenderer(newLayer);
-
             newLayer = reactive(newLayer);
 
             this.insertedLayer = newLayer;
@@ -208,7 +207,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
         }
 
         // Attach the renderer (needed for webgl)
-        await newLayer.renderer.attach(newLayer);
+        appEmitter.emit('app.workingFile.layerAttached', newLayer);
 
         // Set the modified layer list
         workingFileStore.set('layers', layers);
@@ -253,7 +252,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
 
         // Detach the renderer (needed for webgl)
         if (this.insertedLayer) {
-            this.insertedLayer.renderer.detach()
+            appEmitter.emit('app.workingFile.layerDetached', this.insertedLayer);
             this.insertedLayer.bakedImage = null;
         }
 

@@ -34,8 +34,8 @@ export function useCanvas2dViewport(options: Canvas2dViewportOptions) {
         // Set up buffer canvas
         const originalCtx = canvas.value.getContext('2d', getCanvasRenderingContext2DSettings());
         const bufferCanvas = document.createElement('canvas');
-        bufferCanvas.width = canvasStore.state.useCssViewport === true ? 10 : workingFileStore.state.width;
-        bufferCanvas.height = canvasStore.state.useCssViewport === true ? 10 : workingFileStore.state.height;
+        bufferCanvas.width = workingFileStore.state.width;
+        bufferCanvas.height = workingFileStore.state.height;
         let bufferCtx: CanvasRenderingContext2D = bufferCanvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
         if (originalCtx && bufferCtx) {
             // Assign view canvas

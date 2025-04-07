@@ -18,6 +18,7 @@ interface HistoryState {
     actionStack: BaseAction[];
     actionStackIndex: number;
     actionStackUpdateToggle: boolean;
+    activeActionPromise: Promise<void> | null;
     canRedo: boolean;
     canUndo: boolean;
     hasUnsavedChanges: boolean;
@@ -57,6 +58,7 @@ const store = new PerformantStore<HistoryStore>({
         actionStack: [],
         actionStackIndex: 0,
         actionStackUpdateToggle: false, // Toggles between true/false every history update for watchers
+        activeActionPromise: null,
         canUndo: false,
         canRedo: false,
         hasUnsavedChanges: false,
@@ -161,6 +163,8 @@ async function dispatchUnreserve({ token }: HistoryDispatch['unreserve'], set: P
 async function dispatchRunAction({ action, mergeWithHistory, replaceHistory, reserveToken, blockInteraction }: HistoryDispatch['runAction'], set: PerformantStore<HistoryStore>['directSet']) {
 
     let actionRunStatus: { status: string, reason?: any } = { status: 'completed' };
+    let resolveActiveAction = (value: void) => {};
+    let rejectActiveAction = () => {};
 
     if (blockInteraction) {
         appEmitter.emit('editor.history.startBlocking', {
@@ -205,10 +209,21 @@ async function dispatchRunAction({ action, mergeWithHistory, replaceHistory, res
             actionReserveQueue = store.get('actionReserveQueue');
         }
 
+        // Wait for existing running actions to complete.
+        let activeActionPromise: Promise<void> | null;
+        while (activeActionPromise = store.get('activeActionPromise')) {
+            await activeActionPromise;
+        }
+
         // Run the action
         let actionStack = store.get('actionStack');
         let actionStackIndex = store.get('actionStackIndex');
         let errorDuringFree: boolean = false;
+        activeActionPromise = new Promise<void>((resolve, reject) => {
+            resolveActiveAction = resolve;
+            rejectActiveAction = reject;
+        });
+        set('activeActionPromise', activeActionPromise);
         await action.do();
         set('hasUnsavedChanges', true);
 
@@ -292,9 +307,13 @@ async function dispatchRunAction({ action, mergeWithHistory, replaceHistory, res
             updateStoredWorkingFile();
         }
 
+        resolveActiveAction();
     } catch (error) {
         actionRunStatus = { status: 'aborted', reason: error };
+        rejectActiveAction();
     }
+
+    set('activeActionPromise', null);
 
     if (blockInteraction) {
         appEmitter.emit('editor.history.stopBlocking');
@@ -403,6 +422,15 @@ async function historyReserveQueueFree() {
     }
 }
 
+async function historyActionQueueFree() {
+    await historyReserveQueueFree();
+    let activeActionPromise: Promise<void> | null;
+    while (activeActionPromise = store.get('activeActionPromise')) {
+        await activeActionPromise;
+        await nextTick();
+    }
+}
+
 /** If there are currently running actions, shows an overlay that disappears when all actions are complete. */
 export async function historyBlockInteractionUntilComplete() {
     let actionReserveQueue = store.get('actionReserveQueue');
@@ -421,6 +449,7 @@ export async function historyBlockInteractionUntilComplete() {
         await nextTick();
         actionReserveQueue = store.get('actionReserveQueue');
     }
+    await historyActionQueueFree();
     
     appEmitter.emit('editor.history.stopBlocking');
 }
@@ -450,4 +479,4 @@ async function updateStoredWorkingFile() {
 
 export default store;
 
-export { HistoryStore, HistoryState, createHistoryReserveToken, historyReserveQueueFree };
+export { HistoryStore, HistoryState, createHistoryReserveToken, historyReserveQueueFree, historyActionQueueFree };

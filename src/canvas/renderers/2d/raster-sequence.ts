@@ -7,7 +7,7 @@ export default class RasterSequenceLayerRenderer extends BaseLayerRenderer {
         const frame = layer.data.currentFrame;
         if (frame?.sourceUuid) {
             const frameImage = layer.bakedImage || getStoredImageOrCanvas(frame.sourceUuid) as ImageBitmap;
-            const isFlipY = layer.renderer.renderMode === 'webgl' && frameImage instanceof ImageBitmap;
+            const isFlipY = false; // layer.renderer.renderMode === 'webgl' && frameImage instanceof ImageBitmap;
             if (isFlipY) {
                 ctx.save();
                 ctx.translate(0, layer.width / 2);

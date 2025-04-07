@@ -58,10 +58,9 @@ export function drawWorkingFileToCanvas2d(canvas: HTMLCanvasElement, ctx: Canvas
     // Set canvas transform based on the current pan/zoom/rotation of the view
     const transform = canvasStore.get('transform');
     const decomposedTransform = canvasStore.get('decomposedTransform');
-    const useCssViewport: boolean = canvasStore.get('useCssViewport');
     // canvasStore.set('isDisplayingNonRasterLayer', false);
 
-    if (!useCssViewport && !options.selectionTest && !options.disableViewportTransform) {
+    if (!options.selectionTest && !options.disableViewportTransform) {
         ctx.transform(transform.a, transform.b, transform.c, transform.d, transform.e, transform.f);
     }
     
@@ -93,12 +92,10 @@ export function drawWorkingFileToCanvas2d(canvas: HTMLCanvasElement, ctx: Canvas
     now = performance.now();
 
     // Clip the canvas
-    if (!useCssViewport) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(0, 0, imageWidth, imageHeight);
-        ctx.clip();
-    }
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, imageWidth, imageHeight);
+    ctx.clip();
 
     (window as any).averageTimeClip = ((performance.now() - now) * 0.1) + (((window as any).averageTimeClip || 0) * 0.9);
     now = performance.now();
@@ -109,7 +106,7 @@ export function drawWorkingFileToCanvas2d(canvas: HTMLCanvasElement, ctx: Canvas
         if (options.force2dRenderer) {
             new layerRenderers['2d'][layer.type]().draw(ctx, layer, options);
         } else {
-            layer.renderer.draw(ctx, layer, options);
+            // layer.renderer.draw(ctx, layer, options);
         }
     }
 
@@ -125,9 +122,7 @@ export function drawWorkingFileToCanvas2d(canvas: HTMLCanvasElement, ctx: Canvas
     }
 
     // Unclip the canvas
-    if (!useCssViewport) {
-        ctx.restore();
-    }
+    ctx.restore();
 
     (window as any).averageTimeRestore = ((performance.now() - now) * 0.1) + (((window as any).averageTimeRestore || 0) * 0.9);
     now = performance.now();
@@ -144,7 +139,7 @@ export function drawWorkingFileToCanvasWebgl(composer: EffectComposer | undefine
         const layers = workingFileStore.get('layers');
         for (const layer of layers) {
             if (layer.type === 'group') {
-                layer.renderer.renderGroup(renderer, camera, layer as WorkingFileGroupLayer<ColorModel>);
+                // layer.renderer.renderGroup(renderer, camera, layer as WorkingFileGroupLayer<ColorModel>);
             }
         }
         if (composer) {

@@ -39,15 +39,7 @@ export async function createStoredImage(imageOrCanvas: HTMLCanvasElement | HTMLI
         sourceCanvas = imageOrCanvas;
     } else {
         const rendererType = canvasStore.get('renderer');
-        const maxTextureSize = rendererType === 'webgl' ? canvasStore.get('threejsRenderer')?.capabilities?.maxTextureSize ?? 2048 : Infinity;
-        if (imageOrCanvas.width > maxTextureSize || imageOrCanvas.height > maxTextureSize) {
-            sourceCanvas = createCanvasFromImage(imageOrCanvas);
-        } else {
-            sourceBitmap = await createImageBitmap(imageOrCanvas, 0, 0, imageOrCanvas.width, imageOrCanvas.height, {
-                imageOrientation: rendererType === '2d' ? 'none' : 'flipY',
-                premultiplyAlpha: 'none',
-            });
-        }
+        sourceCanvas = createCanvasFromImage(imageOrCanvas);
         if (imageOrCanvas instanceof HTMLImageElement) {
             URL.revokeObjectURL(imageOrCanvas.src);
         }
@@ -91,6 +83,28 @@ export async function getStoredImageCanvas(uuid?: string): Promise<HTMLCanvasEle
         return await createCanvasFromImage(image);
     }
     return image ?? null;
+}
+
+/**
+ * Returns the image as an ImageBitmap
+ * @param uuid - ID of the database entry for the image
+ * @returns The image, or null if somehow it doesn't exist
+ */
+export async function getStoredImageAsBitmap(
+    uuid?: string,
+    options?: { imageOrientation: 'flipY' | 'none' }
+): Promise<ImageBitmap | null> {
+    const storedImage = imageUuidMap.get(uuid);
+    if (storedImage?.sourceBitmap) {
+        return storedImage.sourceBitmap;
+    } else if (storedImage?.sourceCanvas) {
+        return await createImageBitmap(
+            storedImage.sourceCanvas, 0, 0,
+            storedImage.sourceCanvas.width, storedImage.sourceCanvas.height,
+            { imageOrientation: options?.imageOrientation ?? 'none', premultiplyAlpha: 'none' }
+        );
+    }
+    return null;
 }
 
 /**

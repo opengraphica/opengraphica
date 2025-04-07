@@ -79,7 +79,7 @@ function calculateLayerOrder(parent?: WorkingFileLayer<ColorModel>[], order: num
         isStart = true;
     }
     for (const layer of parent) {
-        layer.renderer.reorder(order);
+        appEmitter.emit('app.workingFile.layerReordered', { layer: layer as never, order });
         order++;
         if (layer.type === 'group') {
             order = calculateLayerOrder((layer as WorkingFileGroupLayer<ColorModel>).layers, order);

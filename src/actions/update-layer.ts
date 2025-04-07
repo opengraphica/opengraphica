@@ -1,9 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
 import { markRaw } from 'vue';
 import { BaseAction } from './base';
+import { updateBakedImageForLayer } from './baking';
 
 import { createEmptyCanvasWith2dContext } from '@/lib/image';
 import { drawImageToCanvas2d } from '@/lib/canvas';
+import appEmitter from '@/lib/emitter';
 
 import canvasStore from '@/store/canvas';
 import { prepareStoredImageForEditing, prepareStoredImageForArchival, reserveStoredImage, unreserveStoredImage } from '@/store/image';
@@ -12,7 +14,6 @@ import { reserveStoredVideo, unreserveStoredVideo } from '@/store/video';
 import workingFileStore, { getLayerById, regenerateLayerThumbnail, getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { updateWorkingFileLayer } from '@/store/data/working-file-database';
 
-import { updateBakedImageForLayer } from './baking';
 import layerRenderers from '@/canvas/renderers';
 import { queueRefreshLayerPasses } from '@/canvas/renderers/webgl/postprocessing/create-layer-passes';
 
@@ -184,9 +185,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                 }
             } else if (prop !== 'id') {
                 if (prop === 'type') {
-                    if (layer.renderer) {
-                        layer.renderer.detach();
-                    }
+                    appEmitter.emit('app.workingFile.layerDetached', layer);
                     hasChangedLayerType = true;
                 }
 
@@ -201,14 +200,10 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
         }
 
         if (hasChangedLayerType) {
-            layer.renderer = markRaw(new layerRenderers[renderer][this.updateLayerOptions['type'] as string]());
-            queueRefreshLayerPasses();
-            if (layer.renderer) {
-                layer.renderer.attach(layer);
-            }
+            appEmitter.emit('app.workingFile.layerAttached', layer);
         }
 
-        await layer.renderer.nextUpdate();
+        appEmitter.emit('app.workingFile.layerUpdated', layer);
         regenerateLayerThumbnail(layer);
         if (requiresBaking) {
             updateBakedImageForLayer(layer);
@@ -229,17 +224,12 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
         if (layer) {
             for (let prop in this.previousProps) {
                 if (prop !== 'id') {
-                    (layer as any)[prop] = (this.previousProps as any)[prop];
-
                     if (prop === 'type') {
-                        if (layer.renderer) {
-                            layer.renderer.detach();
-                        }
-                        layer.renderer = markRaw(new layerRenderers[renderer][(layer as any)[prop] as string]());
-                        queueRefreshLayerPasses();
-                        if (layer.renderer) {
-                            layer.renderer.attach(layer);
-                        }
+                        appEmitter.emit('app.workingFile.layerDetached', layer);
+                    }
+                    (layer as any)[prop] = (this.previousProps as any)[prop];
+                    if (prop === 'type') {
+                        appEmitter.emit('app.workingFile.layerAttached', layer);
                     }
                 }
             }

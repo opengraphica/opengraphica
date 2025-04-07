@@ -9,20 +9,19 @@ interface ViewportCommonOptions {
     canvasArea: Ref<HTMLDivElement | undefined>;
     loading: Ref<boolean>;
     mainElement: Ref<Element> | undefined;
-    renderCanvas: () => void;
 }
 
 export function useViewportCommon(options: ViewportCommonOptions) {
-    const { canvasArea, loading, mainElement, renderCanvas } = options;
+    const { canvasArea, loading, mainElement } = options;
 
     onMounted(() => {
         appEmitter.on('app.canvas.resetTransform', resetTransform);
-        document.addEventListener('visibilitychange', onDocumentVisibilityChange);
+        // document.addEventListener('visibilitychange', onDocumentVisibilityChange);
     });
 
     onUnmounted(() => {
         appEmitter.off('app.canvas.resetTransform', resetTransform);
-        document.removeEventListener('visibilitychange', onDocumentVisibilityChange);
+        // document.removeEventListener('visibilitychange', onDocumentVisibilityChange);
     });
 
     // Centers the canvas and displays at 1x zoom or the maximum width/height of the window, whichever is smaller. 
@@ -62,20 +61,20 @@ export function useViewportCommon(options: ViewportCommonOptions) {
     }
 
     // Workaround for Firefox for Android somehow no longer updating after switching away from the tab for a while.
-    function onDocumentVisibilityChange() {
-        if (document.visibilityState === 'visible' && loading.value === false) {
-            const threejsRenderer = canvasStore.get('threejsRenderer');
-            if (threejsRenderer) {
-                threejsRenderer.forceContextLoss();
-                requestAnimationFrame(() => {
-                    threejsRenderer.forceContextRestore();
-                    requestAnimationFrame(() => {
-                        canvasStore.set('dirty', true);
-                        renderCanvas();
-                    });
-                });
-            }
-        }
-    }
+    // function onDocumentVisibilityChange() {
+    //     if (document.visibilityState === 'visible' && loading.value === false) {
+    //         const threejsRenderer = canvasStore.get('threejsRenderer');
+    //         if (threejsRenderer) {
+    //             threejsRenderer.forceContextLoss();
+    //             requestAnimationFrame(() => {
+    //                 threejsRenderer.forceContextRestore();
+    //                 requestAnimationFrame(() => {
+    //                     canvasStore.set('dirty', true);
+    //                     renderCanvas();
+    //                 });
+    //             });
+    //         }
+    //     }
+    // }
 
 }

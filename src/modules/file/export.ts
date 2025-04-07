@@ -81,7 +81,7 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
             canvas.width = workingFileStore.get('width');
             canvas.height = workingFileStore.get('height');
             if (!['image/gif'].includes(mimeType)) {
-                if (canvasStore.state.renderer === '2d' || options.layerSelection === 'selected') {
+                if (/*canvasStore.state.renderer === '2d' ||*/ options.layerSelection === 'selected') {
                     const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
                     ctx.imageSmoothingEnabled = false;
                     drawWorkingFileToCanvas2d(canvas, ctx, {

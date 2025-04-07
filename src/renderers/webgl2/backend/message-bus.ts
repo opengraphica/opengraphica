@@ -1,0 +1,34 @@
+import mitt, { type Handler } from 'mitt';
+import type { Texture } from 'three';
+
+interface MessageBusEvents {
+    'backend.requestFrontendTexture': string;
+    'frontend.replyFrontendTexture': {
+        sourceUuid: string;
+        texture: ImageBitmap | undefined;
+    };
+    'renderer.pass.readBufferTextureUpdate': Texture;
+    'renderer.renderComplete': void;
+}
+
+const emitter = mitt();
+
+class ProtectedEmitter<T extends Object> {
+    on<K extends keyof T>(type: K, handler: Handler<T[K]>): void;
+    on(type: any, handler: any): void {
+        return emitter.on(type, handler);
+    }
+
+    off<K extends keyof T>(type: K, handler: Handler<T[K]>): void;
+    off(type: any, handler: any): void {
+        return emitter.off(type, handler);
+    }
+
+    emit<K extends keyof T>(type: K, event?: T[K]): void;
+    emit(type: any, event?: any) {
+        return emitter.emit(type, event);
+    }
+}
+
+export const messageBus = new ProtectedEmitter<MessageBusEvents>();
+export type { ProtectedEmitter };

@@ -21,7 +21,9 @@ export async function updateBakedImageForLayer(layerOrLayerId: WorkingFileAnyLay
         const sourceImageData = (sourceImage instanceof HTMLImageElement)
             ? getImageDataFromImage(sourceImage)
             : (sourceImage instanceof ImageBitmap)
-                ? getImageDataFromImageBitmap(sourceImage, { imageOrientation: layer.renderer.renderMode === 'webgl' ? 'flipY' : 'none' })
+                ? getImageDataFromImageBitmap(sourceImage, {
+                    imageOrientation: /*layer.renderer.renderMode === 'webgl' ?*/ 'flipY'/* : 'none'*/
+                })
                 : getImageDataFromCanvas(sourceImage);
         try {
             setTimeout(() => {
