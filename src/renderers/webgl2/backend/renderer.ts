@@ -87,7 +87,7 @@ export class Webgl2RendererBackend {
             this.imageBackground.resize(imageWidth, imageHeight);
         }
         if (this.imageBoundaryMask) {
-            await this.imageBoundaryMask.initialize(this.scene, imageWidth, imageHeight);
+            this.imageBoundaryMask.resize(imageWidth, imageHeight);
         }
         this.dirty = true;
     }
@@ -186,7 +186,7 @@ export class Webgl2RendererBackend {
             this.composer.addPass(renderPass);
         }
     
-        this.composer.addPass(new ShaderPass(GammaCorrectionShader));
+        // this.composer.addPass(new ShaderPass(GammaCorrectionShader));
         this.dirty = true;
     }
 

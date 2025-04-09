@@ -96,21 +96,7 @@ export default defineComponent({
 
         watch(() => canvasStore.state.viewDirty, (viewDirty) => {
             if (!viewDirty) return;
-            if (hasCanvasOverlays.value) {
-                let decomposedTransform: DecomposedMatrix = null as any;
-                const devicePixelRatio = window.devicePixelRatio || 1;
-                const transform = canvasStore.get('transform');
-                decomposedTransform = canvasStore.get('decomposedTransform');
-                const offsetX = transform.e / decomposedTransform.scaleX;
-                const offsetY = transform.f / decomposedTransform.scaleX;
-                const pixelRatioTransform = transform
-                    .rotate(-decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
-                    .translate(-offsetX, -offsetY)
-                    .scale(1 / devicePixelRatio, 1 / devicePixelRatio)
-                    .translate(offsetX, offsetY)
-                    .rotate(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES);
-                cssViewTransform.value = `matrix(${pixelRatioTransform.a},${pixelRatioTransform.b},${pixelRatioTransform.c},${pixelRatioTransform.d},${pixelRatioTransform.e},${pixelRatioTransform.f})`;
-            }
+            calculateCssViewTransform();
         });
 
         onMounted(async () => {
@@ -130,6 +116,7 @@ export default defineComponent({
                     frontend.initialize(canvas.value!).then(() => {
                         loading.value = false;
                         appEmitter.emit('app.canvas.ready');
+                        calculateCssViewTransform();
                     }).catch(() => {
                         loading.value = false;
                         appEmitter.emit('app.notify', {
@@ -141,6 +128,24 @@ export default defineComponent({
                 });
             }
         });
+
+        function calculateCssViewTransform() {
+            if (hasCanvasOverlays.value) {
+                let decomposedTransform: DecomposedMatrix = null as any;
+                const devicePixelRatio = window.devicePixelRatio || 1;
+                const transform = canvasStore.get('transform');
+                decomposedTransform = canvasStore.get('decomposedTransform');
+                const offsetX = transform.e / decomposedTransform.scaleX;
+                const offsetY = transform.f / decomposedTransform.scaleX;
+                const pixelRatioTransform = transform
+                    .rotate(-decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
+                    .translate(-offsetX, -offsetY)
+                    .scale(1 / devicePixelRatio, 1 / devicePixelRatio)
+                    .translate(offsetX, offsetY)
+                    .rotate(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES);
+                cssViewTransform.value = `matrix(${pixelRatioTransform.a},${pixelRatioTransform.b},${pixelRatioTransform.c},${pixelRatioTransform.d},${pixelRatioTransform.e},${pixelRatioTransform.f})`;
+            }
+        }
 
         return {
             loading,

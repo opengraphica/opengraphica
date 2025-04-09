@@ -14,12 +14,30 @@ export class ImageBoundaryMask {
 
     async initialize(scene: Scene, imageWidth: number, imageHeight: number) {
         if (this.imageBoundaryMesh) {
-            this.scene?.remove(this.imageBoundaryMesh);
-            this.imageBoundaryMaterial?.dispose();
-            this.imageBoundaryGeometry?.dispose();
+            return;
         }
         this.scene = scene;
 
+        this.resize(imageWidth, imageHeight);
+
+        this.imageBoundaryMaterial = new MeshBasicMaterial({
+            color: 0x000000,
+            alphaTest: -1,
+            opacity: 0,
+            transparent: true,
+            depthTest: false,
+            blending: CustomBlending,
+            blendDst: ZeroFactor,
+            blendSrc: OneFactor
+        });
+
+        this.imageBoundaryMesh = new Mesh(this.imageBoundaryGeometry, this.imageBoundaryMaterial);
+        this.scene.add(this.imageBoundaryMesh);
+        this.imageBoundaryMesh.renderOrder = 9999;
+    }
+
+    resize(imageWidth: number, imageHeight: number) {
+        this.imageBoundaryGeometry?.dispose();
         this.imageBoundaryGeometry = new BufferGeometry();
         const marginSize = Math.max(imageWidth, imageHeight) * 10;
         const z = 0.5;
@@ -57,24 +75,9 @@ export class ImageBoundaryMask {
             imageWidth + marginSize, imageHeight, z,
         ]);
         this.imageBoundaryGeometry.setAttribute('position', new BufferAttribute(vertices, 3));
-
-        this.imageBoundaryMaterial = new MeshBasicMaterial({
-            color: 0x000000,
-            alphaTest: -1,
-            opacity: 0,
-            transparent: true,
-            depthTest: false,
-            blending: CustomBlending,
-            blendDst: ZeroFactor,
-            blendSrc: OneFactor
-        });
-
-        this.imageBoundaryMesh = new Mesh(this.imageBoundaryGeometry, this.imageBoundaryMaterial);
-        this.scene.add(this.imageBoundaryMesh);
-        this.imageBoundaryMesh.renderOrder = 9999;
-
-        // TODO
-        // refreshLayerPasses();
+        if (this.imageBoundaryMesh) {
+            this.imageBoundaryMesh.geometry = this.imageBoundaryGeometry;
+        }
     }
 
     enable(enabled: boolean) {

@@ -119,6 +119,7 @@ export class RasterLayerMeshController implements RendererMeshController {
         if (this.plane) {
             this.plane.geometry = this.planeGeometry;
         }
+        markRenderDirty();
     }
 
     updateTransform(transform: Float64Array) {
@@ -128,6 +129,7 @@ export class RasterLayerMeshController implements RendererMeshController {
             transform[8], transform[9], transform[10], transform[11], 
             transform[12], transform[13], transform[14], transform[15],
         );
+        markRenderDirty();
     }
 
     updateVisible(visible: boolean) {

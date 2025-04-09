@@ -7,12 +7,12 @@ export async function requestFrontendTexture(requestSourceUuid?: string): Promis
     if (!requestSourceUuid) return;
     const promise = new Promise<Texture | undefined>((resolve) => {
         function handleResponse(options?: { sourceUuid: string, texture: ImageBitmap | undefined }) {
-            messageBus.off('frontend.replyFrontendTexture', handleResponse);
             if (!options) {
                 return;
             }
             const { sourceUuid, texture } = options;
             if (sourceUuid === requestSourceUuid) {
+                messageBus.off('frontend.replyFrontendTexture', handleResponse);
                 resolve(new Texture(texture));
             }
         }

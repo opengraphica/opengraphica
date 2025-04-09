@@ -31,6 +31,9 @@ const svgBoundsWidth = computed<number>(() => {
 const svgBoundsHeight = computed<number>(() => {
     return viewHeight.value / devicePixelRatio;
 });
+const svgPathStrokeWidth = computed<number>(() => {
+    return 1;
+});
 
 const imageBoundaryPoints = computed(() => {
     return [

@@ -157,8 +157,8 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
 };
 
 export async function openFromTemporaryStorage() {
-    const workingFile = await readWorkingFile();
     appEmitter.emit('app.workingFile.detachAllLayers');
+    const workingFile = await readWorkingFile();
     workingFileStore.set('background', workingFile.background);
     workingFileStore.set('colorModel', workingFile.colorModel);
     workingFileStore.set('colorSpace', workingFile.colorSpace);
