@@ -83,23 +83,13 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
             canvas.width = workingFileStore.get('width');
             canvas.height = workingFileStore.get('height');
             if (!['image/gif'].includes(mimeType)) {
-                if (/*canvasStore.state.renderer === '2d' ||*/ options.layerSelection === 'selected') {
-                    const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
-                    ctx.imageSmoothingEnabled = false;
-                    drawWorkingFileToCanvas2d(canvas, ctx, {
-                        force2dRenderer: true,
-                        selectedLayersOnly: options.layerSelection === 'selected',
-                        initialTransform: options.cameraTransform ?? new DOMMatrix(),
-                        disableViewportTransform: true,
-                    });
-                } else {
-                    const renderer = await useRenderer();
-                    const snapshotBitmap = await renderer.takeSnapshot(canvas.width, canvas.height, {
-                        cameraTransform: options.cameraTransform,
-                    });
-                    const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
-                    ctx.drawImage(snapshotBitmap, 0, 0);
-                }
+                const renderer = await useRenderer();
+                const snapshotBitmap = await renderer.takeSnapshot(canvas.width, canvas.height, {
+                    cameraTransform: options.cameraTransform,
+                    layerIds: options.layerSelection === 'selected' ? workingFileStore.state.selectedLayerIds : undefined,
+                });
+                const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
+                ctx.drawImage(snapshotBitmap, 0, 0);
             }
             if (options.blitActiveSelectionMask && (activeSelectionMask.value != null || appliedSelectionMask.value != null)) {
                 canvas = await blitActiveSelectionMask(canvas, new DOMMatrix(), 'source-in');

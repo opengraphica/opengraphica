@@ -32,7 +32,7 @@ function createCanvas(width: number, height: number): HTMLCanvasElement | Offscr
 
 export interface Webgl2RendererBackendTakeSnapshotOptions {
     cameraTransform?: Float64Array;
-    layerIds?: number[];
+    layerIds?: Uint32Array;
 }
 
 export class Webgl2RendererBackend {
@@ -148,7 +148,7 @@ export class Webgl2RendererBackend {
         this.createLayerPasses();
     }
 
-    createLayerPasses(composer?: EffectComposer, camera?: Camera) {
+    createLayerPasses(composer?: EffectComposer, camera?: Camera, includeLayerIds?: Uint32Array) {
         composer = composer ?? this.composer;
         camera = camera ?? this.camera;
 
@@ -177,7 +177,9 @@ export class Webgl2RendererBackend {
                     stack.unshift(childLayer);
                 }
             }
-            const meshController = this.meshControllersById.get(layer.id);
+            const meshController = includeLayerIds == null || includeLayerIds?.includes(layer.id)
+                ? this.meshControllersById.get(layer.id)
+                : undefined;
             if (meshController) {
                 if (!noRenderPassModes.has(layer.blendingMode)) {
                     if (currentSceneIsUsed) {
@@ -266,7 +268,7 @@ export class Webgl2RendererBackend {
         if (!this.snapshotComposer) {
             this.snapshotComposer = new EffectComposer(this.snapshotRenderer);
         }
-        this.createLayerPasses(this.snapshotComposer, snapshotCamera);
+        this.createLayerPasses(this.snapshotComposer, snapshotCamera, options?.layerIds);
 
         const selectionMaskWasVisible = !!(this.selectionMask?.visible);
         if (this.selectionMask) {

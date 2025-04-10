@@ -185,9 +185,12 @@ export class Webgl2RenderFrontend implements RendererFrontend {
                 options.cameraTransform.m41, options.cameraTransform.m42, options.cameraTransform.m43, options.cameraTransform.m44,
             ])
             : undefined;
+        const layerIds = options?.layerIds
+            ? new Uint32Array(options.layerIds)
+            : undefined;
         return this.rendererBackend.takeSnapshot(imageWidth, imageHeight, {
             cameraTransform,
-            layerIds: options?.layerIds,
+            layerIds,
         });
     }
 
