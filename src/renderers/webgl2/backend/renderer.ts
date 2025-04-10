@@ -14,9 +14,26 @@ import { ImageBoundaryMask } from './image-boundary-mask';
 import { SelectionMask } from './selection-mask';
 import { messageBus } from './message-bus';
 
+import type { Camera } from 'three';
 import type { RendererMeshController, WorkingFileLayer, WorkingFileGroupLayer } from '@/types';
 
 const noRenderPassModes = new Set(['normal', 'erase']);
+
+function createCanvas(width: number, height: number): HTMLCanvasElement | OffscreenCanvas {
+    if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
+        return new OffscreenCanvas(width, height);
+    } else {
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        return canvas;
+    }
+}
+
+export interface Webgl2RendererBackendTakeSnapshotOptions {
+    cameraTransform?: Float64Array;
+    layerIds?: number[];
+}
 
 export class Webgl2RendererBackend {
     dirty: boolean = false;
@@ -28,6 +45,10 @@ export class Webgl2RendererBackend {
     renderer!: WebGLRenderer;
     scene!: Scene;
     selectionMask!: SelectionMask;
+
+    snapshotCanvas?: HTMLCanvasElement | OffscreenCanvas;
+    snapshotComposer?: EffectComposer;
+    snapshotRenderer?: WebGLRenderer;
 
     maxTextureSize: number = 2048;
     viewTransform: Matrix4 = new Matrix4();
@@ -127,8 +148,11 @@ export class Webgl2RendererBackend {
         this.createLayerPasses();
     }
 
-    createLayerPasses() {
-        this.composer.disposeAllPasses();
+    createLayerPasses(composer?: EffectComposer, camera?: Camera) {
+        composer = composer ?? this.composer;
+        camera = camera ?? this.camera;
+
+        composer.disposeAllPasses();
     
         let passScenes: Array<Scene> = [];
     
@@ -180,13 +204,13 @@ export class Webgl2RendererBackend {
     
         let isFirstPass = true;
         for (const scene of passScenes) {
-            const renderPass = new RenderPass(scene, this.camera);
+            const renderPass = new RenderPass(scene, camera);
             renderPass.isFirstPass = isFirstPass;
             if (isFirstPass) isFirstPass = false;
-            this.composer.addPass(renderPass);
+            composer.addPass(renderPass);
         }
     
-        // this.composer.addPass(new ShaderPass(GammaCorrectionShader));
+        // composer.addPass(new ShaderPass(GammaCorrectionShader));
         this.dirty = true;
     }
 
@@ -201,6 +225,67 @@ export class Webgl2RendererBackend {
 
         this.dirty = false;
         messageBus.emit('renderer.renderComplete');
+    }
+
+    async takeSnapshot(
+        imageWidth: number, imageHeight: number, options?: Webgl2RendererBackendTakeSnapshotOptions
+    ): Promise<ImageBitmap> {
+
+        const snapshotCamera = new OrthographicCamera(0, imageWidth, 0, imageHeight, 0.1, 10000);
+        snapshotCamera.position.z = 1;
+        snapshotCamera.updateProjectionMatrix();
+        if (options?.cameraTransform) {
+            const t = options.cameraTransform;
+            snapshotCamera.projectionMatrix.multiply(
+                new Matrix4(
+                    t[0], t[1], t[2], t[3],
+                    t[4], t[5], t[6], t[7],
+                    t[8], t[9], t[10], t[11],
+                    t[12], t[13], t[14], t[15],
+                )
+            )
+        }
+
+        if (!this.snapshotCanvas) {
+            this.snapshotCanvas = createCanvas(imageWidth, imageHeight);
+        }
+
+        if (!this.snapshotRenderer) {
+            this.snapshotRenderer = new WebGLRenderer({
+                alpha: true,
+                canvas: this.snapshotCanvas,
+                premultipliedAlpha: false,
+                preserveDrawingBuffer: true,
+                powerPreference: 'high-performance'
+            });
+            this.snapshotRenderer.setClearColor(0x000000, 0);
+            this.snapshotRenderer.outputColorSpace = SRGBColorSpace;
+        }
+        this.snapshotRenderer.setSize(imageWidth, imageHeight);
+
+        if (!this.snapshotComposer) {
+            this.snapshotComposer = new EffectComposer(this.snapshotRenderer);
+        }
+        this.createLayerPasses(this.snapshotComposer, snapshotCamera);
+
+        const selectionMaskWasVisible = !!(this.selectionMask?.visible);
+        if (this.selectionMask) {
+            this.selectionMask.visible = false;
+        }
+
+        this.snapshotComposer.render();
+
+        if (selectionMaskWasVisible && this.selectionMask) {
+            this.selectionMask.visible = true;
+        }
+
+        this.createLayerPasses();
+
+        if (window.OffscreenCanvas && this.snapshotCanvas instanceof window.OffscreenCanvas) {
+            return this.snapshotCanvas.transferToImageBitmap();
+        } else {
+            return createImageBitmap(this.snapshotCanvas, 0, 0, imageWidth, imageHeight, { imageOrientation: 'none' });
+        }
     }
 
     dispose() {

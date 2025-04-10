@@ -1,9 +1,15 @@
 import type { Scene } from 'three';
 import type { WorkingFileLayer } from '@/types';
 
+export interface RendererFrontendTakeSnapshotOptions {
+    cameraTransform?: DOMMatrix;
+    layerIds?: number[];
+}
+
 export interface RendererFrontend {
     initialize(canvas: HTMLCanvasElement | OffscreenCanvas): Promise<void>;
     resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number): Promise<void>;
+    takeSnapshot(imageWidth: number, imageHeight: number, options?: RendererFrontendTakeSnapshotOptions): Promise<ImageBitmap>;
     dispose(): Promise<void>;
 }
 

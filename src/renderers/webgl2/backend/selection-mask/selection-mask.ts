@@ -17,6 +17,14 @@ export class SelectionMask {
     scene!: Scene;
     selectionMaskMesh!: Mesh;
 
+    get visible() {
+        return this.selectionMaskMesh.visible;
+    }
+
+    set visible(visible: boolean) {
+        this.selectionMaskMesh.visible = visible;
+    }
+
     async initialize(camera: Camera, scene: Scene, viewWidth: number, viewHeight: number) {
         this.scene = scene;
 

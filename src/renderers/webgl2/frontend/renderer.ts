@@ -11,7 +11,10 @@ import { colorToRgba, getColorModelName } from '@/lib/color';
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
 
 import type { Webgl2RendererBackend } from '@/renderers/webgl2/backend';
-import type { ClassType, RendererFrontend, RendererLayerWatcher, WorkingFileAnyLayer } from '@/types';
+import type {
+    ClassType, RendererFrontend, RendererFrontendTakeSnapshotOptions,
+    RendererLayerWatcher, WorkingFileAnyLayer
+} from '@/types';
 
 export class Webgl2RenderFrontend implements RendererFrontend {
     rendererBackend: Webgl2RendererBackend | undefined;
@@ -170,6 +173,22 @@ export class Webgl2RenderFrontend implements RendererFrontend {
 
     async resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number) {
         await this.rendererBackend?.resize(imageWidth, imageHeight, viewWidth, viewHeight);
+    }
+
+    async takeSnapshot(imageWidth: number, imageHeight: number, options?: RendererFrontendTakeSnapshotOptions): Promise<ImageBitmap> {
+        if (!this.rendererBackend) throw Error('Renderer backend not initialized.');
+        const cameraTransform = options?.cameraTransform
+            ? new Float64Array([
+                options.cameraTransform.m11, options.cameraTransform.m12, options.cameraTransform.m13, options.cameraTransform.m14,
+                options.cameraTransform.m21, options.cameraTransform.m22, options.cameraTransform.m23, options.cameraTransform.m24,
+                options.cameraTransform.m31, options.cameraTransform.m32, options.cameraTransform.m33, options.cameraTransform.m34,
+                options.cameraTransform.m41, options.cameraTransform.m42, options.cameraTransform.m43, options.cameraTransform.m44,
+            ])
+            : undefined;
+        return this.rendererBackend.takeSnapshot(imageWidth, imageHeight, {
+            cameraTransform,
+            layerIds: options?.layerIds,
+        });
     }
 
     async dispose() {
