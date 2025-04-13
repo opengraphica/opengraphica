@@ -213,6 +213,7 @@ export async function createLayerShader(
 
     fragmentShader = 'vec4 materialMain(vec2 uv);\n' + fragmentShader;
 
+    let hasMaskTextures = false;
     for (const [index, canvasFilter] of canvasFilters.entries()) {
         const editConfig = canvasFilter.getEditConfig();
         let filterVertexShader = '';
@@ -220,6 +221,8 @@ export async function createLayerShader(
 
         const maskTexture = await rendererBackend.getMaskTexture(canvasFilter.maskId ?? -1);
         if (maskTexture) {
+            maskTexture.needsUpdate = true;
+            hasMaskTextures = true;
             uniforms[`filterMask${index}Map`] = {
                 value: maskTexture,
             };
@@ -298,10 +301,10 @@ export async function createLayerShader(
     }
     let fragmentFilterCode = '';
     if (fragmentShaderMainCalls.length > 0) {
-        if (textures.length > 0) {
+        if (hasMaskTextures) {
             fragmentFilterCode += 'float filterMaskAlpha = 1.0;\n    vec4 filterColorBuffer = vec4(0.0, 0.0, 0.0, 0.0);\n';
         }
-        fragmentFilterCode += '    vec4 filterColorResult = gl_FragColor;\n' + fragmentShaderMainCalls.join('\n') + '\n    gl_FragColor = filterColorResult;';
+        fragmentFilterCode += 'vec4 filterColorResult = gl_FragColor;\n' + fragmentShaderMainCalls.join('\n') + '\n    gl_FragColor = filterColorResult;';
     }
     fragmentFilterCode += '\n' + blendingModesFragmentShaderMain + '\n';
 

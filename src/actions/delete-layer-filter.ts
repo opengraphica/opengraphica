@@ -72,7 +72,7 @@ export class DeleteLayerFilterAction extends BaseAction {
             }
             workingFileStore.set('masks', masks);
         }
-        updateWorkingFileMasks(workingFileStore.get('masks'));
+        updateWorkingFileMasks(workingFileStore.get('masks'), workingFileStore.get('maskIdCounter'));
 
         (this.layerId as any) = null;
         (this.filterIndex as any) = null;

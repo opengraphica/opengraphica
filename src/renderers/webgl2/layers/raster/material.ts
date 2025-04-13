@@ -56,6 +56,7 @@ export async function createRasterMaterial(params: RasterMaterialUpdateParams) {
     material.uniforms.dstTexture = {
         value: undefined,
     };
+    material.needsUpdate = true;
 
     return material;
 }
@@ -73,5 +74,6 @@ export async function disposeRasterMaterial(material: ShaderMaterial) {
     for (const texture of material.userData.disposableTextures ?? []) {
         texture.dispose();
     }
+    material.uniforms = {};
     material.dispose();
 }

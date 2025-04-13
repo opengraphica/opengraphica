@@ -195,6 +195,7 @@ import { generateImageHash } from '@/lib/hash';
 import { createImageBlobFromCanvas } from '@/lib/image';
 import { isWebGLAvailable } from '@/lib/webgl';
 
+import { BaseAction } from '@/actions/base';
 import { UpdateLayerFilterDisabledAction } from '@/actions/update-layer-filter-disabled';
 import { UpdateLayerFilterMaskAction } from '@/actions/update-layer-filter-mask';
 import { UpdateLayerFilterParamsAction } from '@/actions/update-layer-filter-params';
@@ -844,7 +845,7 @@ export default defineComponent({
         async function onConfirm() {
             if (layer.value && currentFilterConfig.value) {
                 const layerId = layer.value.id;
-                let actions = [];
+                let actions: BaseAction[] = [];
                 if ((currentFilterEnabled.value === true) !== ((!currentFilterConfig.value.disabled) === true)) {
                     actions.push(
                         new UpdateLayerFilterDisabledAction(layerId, props.filterIndex, !currentFilterEnabled.value)

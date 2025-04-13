@@ -167,6 +167,7 @@ export async function openFromTemporaryStorage() {
     workingFileStore.set('height', workingFile.height);
     workingFileStore.set('layerIdCounter', workingFile.layerIdCounter);
     workingFileStore.set('masks', workingFile.masks);
+    workingFileStore.set('maskIdCounter', workingFile.maskIdCounter);
     workingFileStore.set('measuringUnits', workingFile.measuringUnits);
     workingFileStore.set('resolutionUnits', workingFile.resolutionUnits);
     workingFileStore.set('resolutionX', workingFile.resolutionX);

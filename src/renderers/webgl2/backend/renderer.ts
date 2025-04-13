@@ -15,10 +15,12 @@ import { ImageBoundaryMask } from './image-boundary-mask';
 import { requestFrontendTexture } from './image-transfer';
 import { SelectionMask } from './selection-mask';
 import { messageBus } from './message-bus';
+import { createCanvasFiltersFromLayerConfig } from '@/renderers/webgl2/layers/base/material';
 
 import type { Camera, Texture } from 'three';
 import type {
-    RendererMeshController, WorkingFileLayer, WorkingFileGroupLayer, WorkingFileLayerMask,
+    RendererMeshController, Webgl2RendererCanvasFilter, WorkingFileLayer,
+    WorkingFileGroupLayer, WorkingFileLayerFilter, WorkingFileLayerMask,
 } from '@/types';
 
 const noRenderPassModes = new Set(['normal', 'erase']);
@@ -37,6 +39,7 @@ function createCanvas(width: number, height: number): HTMLCanvasElement | Offscr
 export interface Webgl2RendererBackendTakeSnapshotOptions {
     cameraTransform?: Float64Array;
     layerIds?: Uint32Array;
+    filters?: WorkingFileLayerFilter[];
 }
 
 export class Webgl2RendererBackend {
@@ -141,16 +144,19 @@ export class Webgl2RendererBackend {
     }
 
     setMasks(masks: Record<number, WorkingFileLayerMask>) {
-        this.masks = masks;
-        const maskIds = new Set(Object.keys(this.masks));
+        const maskIds = new Set(Object.keys(masks));
         const maskTextureIds = new Set(Object.keys(this.maskTextures));
 
-        const added = [...maskIds].filter((id) => !maskTextureIds.has(id));
+        const addedOrChanged = [...maskIds].filter((id) => {
+            const idNumber = parseInt(id);
+            return !maskTextureIds.has(id) || this.masks[idNumber].hash !== masks[idNumber].hash
+        });
         const removed = [...maskTextureIds].filter((id) => !maskIds.has(id));
 
-        for (const key of added) {
+        for (const key of addedOrChanged) {
             const id = parseInt(key);
-            this.maskTextureRequests[id] = requestFrontendTexture(this.masks[id].sourceUuid);
+            this.maskTextures[id]?.dispose();
+            this.maskTextureRequests[id] = requestFrontendTexture(masks[id].sourceUuid);
             this.maskTextureRequests[id]!.then((texture) => {
                 if (texture) {
                     this.maskTextures[id] = texture;
@@ -164,6 +170,7 @@ export class Webgl2RendererBackend {
             this.maskTextures[id]?.dispose();
             delete this.maskTextures[id];
         }
+        this.masks = JSON.parse(JSON.stringify(masks));
     }
 
     async getMaskTexture(maskId: number): Promise<Texture | undefined> {
@@ -291,6 +298,11 @@ export class Webgl2RendererBackend {
         options?: Webgl2RendererBackendTakeSnapshotOptions
     ): Promise<ImageBitmap> {
 
+        let filtersOverride: Webgl2RendererCanvasFilter[] | undefined;
+        if (options?.filters) {
+            filtersOverride = await createCanvasFiltersFromLayerConfig(options.filters);
+        }
+
         const snapshotCamera = new OrthographicCamera(0, imageWidth, 0, imageHeight, 0.1, 10000);
         snapshotCamera.position.z = 1;
         snapshotCamera.updateProjectionMatrix();
@@ -338,10 +350,30 @@ export class Webgl2RendererBackend {
             this.selectionMask.visible = false;
         }
 
+        if (options?.layerIds) {
+            for (const layerId of options.layerIds) {
+                const meshController = this.meshControllersById.get(layerId);
+                meshController?.overrideVisibility(true);
+                if (filtersOverride) {
+                    await meshController?.overrideFilters(filtersOverride);
+                }
+            }
+        }
+
         this.snapshotComposer.render();
 
         if (selectionMaskWasVisible && this.selectionMask) {
             this.selectionMask.visible = true;
+        }
+
+        if (options?.layerIds) {
+            for (const layerId of options.layerIds) {
+                const meshController = this.meshControllersById.get(layerId);
+                meshController?.overrideVisibility(undefined);
+                if (filtersOverride) {
+                    meshController?.overrideFilters(undefined);
+                }
+            }
         }
 
         this.createLayerPasses();

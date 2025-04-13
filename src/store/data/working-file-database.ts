@@ -135,17 +135,25 @@ async function readStoredLayersRecursive(metaLayers: DatabaseMetaLayer[], workin
         } else if (layerResult.type === 'raster') {
             const rasterLayer = layerResult as WorkingFileRasterLayer;
             if (rasterLayer.data.sourceUuid) {
-                const imageUuid = await readStoredImage(rasterLayer.data.sourceUuid);
-                reserveStoredImage(imageUuid, `${layerResult.id}`);
-                rasterLayer.data.sourceUuid = imageUuid;
+                try {
+                    const imageUuid = await readStoredImage(rasterLayer.data.sourceUuid);
+                    reserveStoredImage(imageUuid, `${layerResult.id}`);
+                    rasterLayer.data.sourceUuid = imageUuid;
+                } catch (error) {
+                    console.warn('[src/store/data/working-file-database.ts] Failed to read a layer\'s source image from the store.');
+                }
             }
         } else if (layerResult.type === 'rasterSequence') {
             const rasterSequenceLayer = layerResult as WorkingFileRasterSequenceLayer;
             for (const frame of rasterSequenceLayer.data.sequence) {
                 if (frame.image.sourceUuid) {
-                    const imageUuid = await readStoredImage(frame.image.sourceUuid);
-                    reserveStoredImage(imageUuid, `${layerResult.id}`);
-                    frame.image.sourceUuid = imageUuid;
+                    try {
+                        const imageUuid = await readStoredImage(frame.image.sourceUuid);
+                        reserveStoredImage(imageUuid, `${layerResult.id}`);
+                        frame.image.sourceUuid = imageUuid;
+                    } catch (error) {
+                        console.warn('[src/store/data/working-file-database.ts] Failed to read a layer\'s source image from the store.');
+                    }
                 }
             }
         } else if (layerResult.type === 'vector') {
@@ -263,13 +271,18 @@ export async function writeWorkingFile(workingFile: WorkingFile<ColorModel>) {
     }
 };
 
-export async function updateWorkingFileMasks(masks: Record<number, WorkingFileLayerMask>) {
+export async function updateWorkingFileMasks(masks: Record<number, WorkingFileLayerMask>, maskIdCounter: number) {
     await init();
     if (!database) return;
     try {
         const transaction = (database as IDBDatabase).transaction('meta', 'readwrite');
         const metaStore = transaction.objectStore('meta');
         let request = metaStore.put({ id: 'masks', data: toRaw(masks) });
+        await new Promise((resolve, reject) => {
+            request.onsuccess = resolve;
+            request.onerror = reject;
+        });
+        request = metaStore.put({ id: 'maskIdCounter', data: maskIdCounter });
         await new Promise((resolve, reject) => {
             request.onsuccess = resolve;
             request.onerror = reject;
@@ -449,7 +462,11 @@ export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNe
             }
         }
         if (hasMasks) {
-            updateWorkingFileMasks(workingFile.masks);
+            updateWorkingFileMasks(
+                workingFile.masks,
+                workingFile.maskIdCounter
+                    ?? (parseInt(Object.keys(workingFile.masks).sort((a, b) => (a < b ? 1 : -1))[0]) + 1)
+            );
         }
     }
 
@@ -492,11 +509,15 @@ export async function readWorkingFile(): Promise<WorkingFile<ColorModel>> {
             let masks: Record<number, WorkingFileLayerMask> = {};
             for (const maskId of Object.keys(meta.data).map(key => parseInt(key))) {
                 const mask = databaseMasks[maskId];
-                masks[maskId] = {
-                    sourceUuid: await readStoredImage(mask.sourceUuid),
-                    hash: mask.hash,
-                    offset: mask.offset,
-                };
+                try {
+                    masks[maskId] = {
+                        sourceUuid: await readStoredImage(mask.sourceUuid),
+                        hash: mask.hash,
+                        offset: mask.offset,
+                    };
+                } catch {
+                    console.warn('[src/store/data/working-file-database.ts] Failed to read a mask image from the store.');
+                }
             }
             workingFile.masks = masks;
         } else {

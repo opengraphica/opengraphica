@@ -33,6 +33,7 @@ export class UpdateLayerFilterMaskAction extends BaseAction {
 
         const filter = layer.filters[this.filterIndex];
         this.oldMaskId = filter.maskId;
+        filter.maskId = -1; // Trigger reactivity if new and old mask ids are the same.
         filter.maskId = this.newMaskId;
 
         regenerateLayerThumbnail(layer);
@@ -56,6 +57,7 @@ export class UpdateLayerFilterMaskAction extends BaseAction {
         }
 
         const filter = layer.filters[this.filterIndex];
+        filter.maskId = -1; // Trigger reactivity if new and old mask ids are the same.
         filter.maskId = this.oldMaskId;
 
         regenerateLayerThumbnail(layer);

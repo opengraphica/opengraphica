@@ -55,7 +55,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
 
         this.stopWatchMasks = watch(() => workingFileStore.state.masks, (masks) => {
             this.rendererBackend?.setMasks(masks);
-        });
+        }, { deep: true });
 
         this.stopWatchShowBoundary = watch(() => canvasStore.state.showAreaOutsideWorkingFile, (showAreaOutsideWorkingFile) => {
             this.rendererBackend?.enableImageBoundaryMask(!showAreaOutsideWorkingFile);
@@ -142,6 +142,13 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         });
     }
 
+    onRegenerateThumbnail(event?: number) {
+        if (event == null) return;
+        const layer = getLayerById(event);
+        if (!layer) return;
+        regenerateLayerThumbnail(layer);
+    }
+
     onLayerAttached(layer?: WorkingFileAnyLayer) {
         if (!layer) return;
         const LayerWatcher = this.layerWatchersByType[layer.type];
@@ -191,13 +198,6 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         }
     }
 
-    onRegenerateThumbnail(event?: number) {
-        if (event == null) return;
-        const layer = getLayerById(event);
-        if (!layer) return;
-        regenerateLayerThumbnail(layer);
-    }
-
     async resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number) {
         await this.rendererBackend?.resize(imageWidth, imageHeight, viewWidth, viewHeight);
     }
@@ -218,6 +218,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         return this.rendererBackend.takeSnapshot(imageWidth, imageHeight, {
             cameraTransform,
             layerIds,
+            filters: options?.filters,
         });
     }
 
@@ -233,6 +234,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         this.layerWatchersById.clear();
 
         messageBus.off('backend.requestFrontendTexture', this.onTextureRequest);
+        messageBus.off('layer.regenerateThumbnail', this.onRegenerateThumbnail);
         appEmitter.off('app.workingFile.layerAttached', this.onLayerAttached);
         appEmitter.off('app.workingFile.layerReordered', this.onLayerReordered);
         appEmitter.off('app.workingFile.layerDetached', this.onLayerDetached);

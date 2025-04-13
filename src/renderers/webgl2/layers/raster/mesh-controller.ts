@@ -29,8 +29,10 @@ export class RasterLayerMeshController implements RendererMeshController {
     id: number = -1;
     blendingMode: WorkingFileLayerBlendingMode = 'normal';
     filters: Webgl2RendererCanvasFilter[] = [];
+    filtersOverride: Webgl2RendererCanvasFilter[] | undefined = undefined;
     sourceUuid: string | undefined;
     visible: boolean = true;
+    visibleOverride: boolean | undefined = undefined;
 
     materialUpdates: Array<'destroyAndCreate' | 'update'> = [];
     regenerateThumbnailTimeoutHandle: number | undefined;
@@ -45,11 +47,11 @@ export class RasterLayerMeshController implements RendererMeshController {
         this.scene.add(this.plane);
     }
 
-    regenerateThumbnail() {
+    queueRegenerateThumbnail() {
         clearTimeout(this.regenerateThumbnailTimeoutHandle);
-        this.regenerateThumbnailTimeoutHandle = setTimeout(this.regenerateThumbnailDeferred.bind(this), 0);
+        this.regenerateThumbnailTimeoutHandle = setTimeout(this.regenerateThumbnail.bind(this), 25);
     }
-    regenerateThumbnailDeferred() {
+    regenerateThumbnail() {
         messageBus.emit('layer.regenerateThumbnail', this.id);
     }
 
@@ -72,7 +74,7 @@ export class RasterLayerMeshController implements RendererMeshController {
                 if (!this.material || updateType === 'destroyAndCreate') {
                     this.material = await createRasterMaterial({
                         srcTexture: this.sourceTexture,
-                        canvasFilters: this.filters,
+                        canvasFilters: this.filtersOverride ?? this.filters,
                     });
                 } else {
                     await updateRasterMaterial(this.material, {
@@ -82,8 +84,8 @@ export class RasterLayerMeshController implements RendererMeshController {
                 this.plane && (this.plane.material = this.material);
                 this.materialUpdates.pop();
                 if (this.materialUpdates.length < 1) {
-                    this.regenerateThumbnail();
                     markRenderDirty();
+                    this.queueRegenerateThumbnail();
                 }
             }
         }
@@ -148,7 +150,7 @@ export class RasterLayerMeshController implements RendererMeshController {
     updateVisible(visible: boolean) {
         this.visible = visible;
         let oldVisibility = this.plane?.visible;
-        this.plane && (this.plane.visible = this.visible);
+        this.plane && (this.plane.visible = this.visibleOverride ?? this.visible);
         if (this.plane?.visible !== oldVisibility) {
             markRenderDirty();
         }
@@ -167,36 +169,16 @@ export class RasterLayerMeshController implements RendererMeshController {
         this.scene = scene;
     }
 
-    clone() {
-        const clone = new RasterLayerMeshController();
-
-        clone.id = this.id;
-        clone.blendingMode = this.blendingMode;
-        clone.filters = this.filters;
-        clone.sourceUuid = this.sourceUuid;
-        clone.visible = this.visible;
-
-        clone.material = this.material?.clone();
-        clone.planeGeometry = this.planeGeometry?.clone();
-        clone.plane = this.plane?.clone();
-        clone.sourceTexture = this.sourceTexture?.clone();
-        clone.scene = this.scene;
-
-        if (clone.plane) {
-            if (clone.planeGeometry) {
-                clone.plane.geometry = clone.planeGeometry;
-            }
-            if (clone.material) {
-                clone.plane.material = clone.material;
-            }
-        }
-        if (clone.sourceTexture) {
-            clone.sourceTexture.userData.shouldDisposeBitmap = false;
-        }
-
-        return clone;
+    async overrideFilters(filters?: Webgl2RendererCanvasFilter[]) {
+        this.filtersOverride = filters;
+        await this.scheduleMaterialUpdate('destroyAndCreate');
     }
 
+    overrideVisibility(visible?: boolean) {
+        this.visibleOverride = visible;
+        this.updateVisible(this.visible);
+    }
+    
     detach() {
         const backend = getWebgl2RendererBackend();
         backend.removeMeshController(this.id);

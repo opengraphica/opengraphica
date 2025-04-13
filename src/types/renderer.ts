@@ -1,9 +1,10 @@
 import type { Scene } from 'three';
-import type { WorkingFileLayer } from '@/types';
+import type { WorkingFileLayer, WorkingFileLayerFilter, Webgl2RendererCanvasFilter } from '@/types';
 
 export interface RendererFrontendTakeSnapshotOptions {
     cameraTransform?: DOMMatrix;
     layerIds?: number[];
+    filters?: WorkingFileLayerFilter[];
 }
 
 export interface RendererFrontend {
@@ -21,5 +22,6 @@ export interface RendererLayerWatcher<T = WorkingFileLayer> {
 
 export interface RendererMeshController {
     swapScene(scene: Scene): void;
-    clone(): RendererMeshController;
+    overrideFilters(filters?: Webgl2RendererCanvasFilter[]): Promise<void>;
+    overrideVisibility(visible?: boolean): void;
 }

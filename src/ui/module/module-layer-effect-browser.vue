@@ -134,23 +134,28 @@ export default defineComponent({
                     const previewCanvas = document.createElement('canvas');
                     previewCanvas.width = targetWidth;
                     previewCanvas.height = targetHeight;
-                    const previewCtx = previewCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
+                    const previewCtx = previewCanvas.getContext('bitmaprenderer', getCanvasRenderingContext2DSettings());
                     if (!previewCtx) {
                         throw new Error('module.layerEffectBrowser.generationErrorGeneral');
                     }
 
                     const renderer = await useRenderer();
-                    const layerBitmap = await renderer.takeSnapshot(layerWidth, layerHeight, { layerIds: [selectedLayer.id] });
-                    previewCtx.drawImage(layerBitmap, 0, 0);
-
-                    const originalImageData = previewCtx.getImageData(0, 0, targetWidth, targetHeight);
                     const newPreviewThumbnails: Record<string, string> = {};
                     for (const layerFilterName in layerFilterList) {
                         const canvasFilter = new (await getCanvasFilterClass(layerFilterName))();
 
-                        // const appliedImageData = applyCanvasFilter(originalImageData, canvasFilter, buildCanvasFilterPreviewParams(canvasFilter));
-                        // previewCtx.putImageData(appliedImageData, 0, 0);
-                        previewCtx.putImageData(originalImageData, 0, 0);
+                        const filtersWithPreview: WorkingFileLayerFilter[] = [
+                            ...selectedLayer.filters,
+                            {
+                                name: layerFilterName,
+                                params: buildCanvasFilterPreviewParams(canvasFilter)
+                            }
+                        ]
+                        const layerPreviewBitmap = await renderer.takeSnapshot(layerWidth, layerHeight, {
+                            layerIds: [selectedLayer.id],
+                            filters: filtersWithPreview,
+                        });
+                        previewCtx.transferFromImageBitmap(layerPreviewBitmap);
 
                         const imageBlob = await createImageBlobFromCanvas(previewCanvas);
                         newPreviewThumbnails[layerFilterName] = URL.createObjectURL(imageBlob);

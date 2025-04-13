@@ -147,7 +147,7 @@ export class DeleteLayersAction extends BaseAction {
                 }
             }
         }
-        updateWorkingFileMasks(workingFileStore.get('masks'));
+        updateWorkingFileMasks(workingFileStore.get('masks'), workingFileStore.get('maskIdCounter'));
 
         (this.deleteLayerIds as any) = null;
         (this.deletedLayers as any) = null;
