@@ -21,4 +21,5 @@ export interface RendererLayerWatcher<T = WorkingFileLayer> {
 
 export interface RendererMeshController {
     swapScene(scene: Scene): void;
+    clone(): RendererMeshController;
 }

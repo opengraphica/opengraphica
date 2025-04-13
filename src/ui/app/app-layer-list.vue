@@ -96,14 +96,14 @@
                                 <span v-t="`layerFilter.${filter.name}.name`"></span>
                             </el-button>
                             <el-button
-                                link type="primary" class="px-2 my-0 ml-0"
+                                link type="primary" class="!px-2 !my-0 !ml-0"
                                 :disabled="filterIndex === 0" :aria-label="$t('app.layerList.moveEffectUp')"
                                 @click="onMoveLayerFilterUp(layer, filterIndex)"
                             >
                                 <i class="bi bi-chevron-up" aria-hidden="true"></i>
                             </el-button>
                             <el-button
-                                link type="primary" class="px-2 my-0 ml-0"
+                                link type="primary" class="!px-2 !my-0 !ml-0"
                                 :disabled="filterIndex === layer.filters.length - 1" :aria-label="$t('app.layerList.moveEffectDown')"
                                 @click="onMoveLayerFilterDown(layer, filterIndex)"
                             >
@@ -315,7 +315,7 @@ function getIconClass(layer: WorkingFileAnyLayer) {
 }
 
 function reverseLayerList(layerList: WorkingFileAnyLayer<ColorModel>[]): WorkingFileAnyLayer<ColorModel>[] {
-    const newLayersList = [];
+    const newLayersList: WorkingFileAnyLayer[] = [];
     for (let i = layerList.length - 1; i >= 0; i--) {
         newLayersList.push(reactive(layerList[i]));
     }

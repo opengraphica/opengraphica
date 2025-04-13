@@ -46,6 +46,7 @@ import { getCanvasFilterClass, applyCanvasFilter, buildCanvasFilterPreviewParams
 import { AddLayerFilterAction } from '@/actions/add-layer-filter';
 import { BundleAction } from '@/actions/bundle';
 import { runModule } from '@/modules';
+import { useRenderer } from '@/renderers';
 
 import type { WorkingFileLayerFilter } from '@/types';
 
@@ -124,31 +125,33 @@ export default defineComponent({
                     if (!selectedLayer) {
                         throw new Error('module.layerEffectBrowser.generationErrorNoLayer');
                     }
-                    const previewCanvas = document.createElement('canvas');
+
                     const layerWidth = selectedLayer.type === 'group' ? workingFileStore.state.width : selectedLayer.width;
                     const layerHeight = selectedLayer.type === 'group' ? workingFileStore.state.height : selectedLayer.height;
                     const targetWidth = 200;
                     const targetHeight = targetWidth * (layerHeight / layerWidth);
+
+                    const previewCanvas = document.createElement('canvas');
                     previewCanvas.width = targetWidth;
                     previewCanvas.height = targetHeight;
                     const previewCtx = previewCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
                     if (!previewCtx) {
                         throw new Error('module.layerEffectBrowser.generationErrorGeneral');
                     }
-                    previewCtx.setTransform(selectedLayer.transform.scale(layerWidth / targetWidth, layerHeight / targetHeight).invertSelf());
-                    if (layerRenderers['2d'][selectedLayer?.type]) {
-                        const layerRenderer = new layerRenderers['2d'][selectedLayer.type]();
-                        await layerRenderer.attach(selectedLayer);
-                        await layerRenderer.draw(previewCtx, selectedLayer, { visible: true, force2dRenderer: true });
-                    } else {
-                        throw new Error('module.layerEffectBrowser.generationErrorUnsupportedType');
-                    }
+
+                    const renderer = await useRenderer();
+                    const layerBitmap = await renderer.takeSnapshot(layerWidth, layerHeight, { layerIds: [selectedLayer.id] });
+                    previewCtx.drawImage(layerBitmap, 0, 0);
+
                     const originalImageData = previewCtx.getImageData(0, 0, targetWidth, targetHeight);
                     const newPreviewThumbnails: Record<string, string> = {};
                     for (const layerFilterName in layerFilterList) {
                         const canvasFilter = new (await getCanvasFilterClass(layerFilterName))();
-                        const appliedImageData = applyCanvasFilter(originalImageData, canvasFilter, buildCanvasFilterPreviewParams(canvasFilter));
-                        previewCtx.putImageData(appliedImageData, 0, 0);
+
+                        // const appliedImageData = applyCanvasFilter(originalImageData, canvasFilter, buildCanvasFilterPreviewParams(canvasFilter));
+                        // previewCtx.putImageData(appliedImageData, 0, 0);
+                        previewCtx.putImageData(originalImageData, 0, 0);
+
                         const imageBlob = await createImageBlobFromCanvas(previewCanvas);
                         newPreviewThumbnails[layerFilterName] = URL.createObjectURL(imageBlob);
                     }
@@ -175,7 +178,7 @@ export default defineComponent({
         async function onSelectFilter(filterName: string) {
             const selectedLayerIds = props.layerId != null ? [props.layerId] : workingFileStore.get('selectedLayerIds');
             const canvasFilter = new (await getCanvasFilterClass(filterName))();
-            const addFilterActions = [];
+            const addFilterActions: AddLayerFilterAction[] = [];
             for (const id of selectedLayerIds) {
                 const filterParams: Record<string, unknown> = {};
                 const editParamsConfig = canvasFilter.getEditConfig();

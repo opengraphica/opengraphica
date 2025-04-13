@@ -311,7 +311,10 @@ export interface NewFilePreset {
 
 export interface WorkingFileLayerMask {
     sourceUuid: string;
-    offset: DOMPoint;
+    offset: {
+        x: number;
+        y: number;
+    };
     hash: string;
 }
 

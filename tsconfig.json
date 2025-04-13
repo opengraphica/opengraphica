@@ -11,6 +11,7 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "lib": ["esnext", "dom", "webworker"],
+        "types": ["bezier-js", "color-namer", "file-saver", "lodash", "offscreencanvas", "pica", "three", "uuid"],
         "baseUrl": "./",
         "paths": {
             "@/*": ["src/*"]

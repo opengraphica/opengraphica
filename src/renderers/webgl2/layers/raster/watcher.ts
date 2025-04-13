@@ -35,7 +35,7 @@ export class RasterLayerWatcher implements RendererLayerWatcher<WorkingFileRaste
         // }, { immediate: true });
         this.stopWatchFilters = watch([filters], async ([filters]) => {
             this.meshController?.updateFilters(filters);
-        }, { deep: true, immediate: false });
+        }, { deep: true, immediate: true });
         this.stopWatchName = watch([name], ([name]) => {
             this.meshController?.updateName(name);
         }, { immediate: true });

@@ -5,12 +5,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, toRefs, nextTick, PropType } from 'vue';
+import { computed, defineComponent, ref, watch, PropType } from 'vue';
+
 import ElLoading from 'element-plus/lib/components/loading/index';
+
 import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import renderers from '@/canvas/renderers';
-import { DecomposedMatrix } from '@/lib/dom-matrix';
-import { WorkingFileAnyLayer, ColorModel } from '@/types';
+import { createCanvasFromImage } from '@/lib/image';
+
+import { useRenderer } from '@/renderers';
+
+import type { WorkingFileAnyLayer, ColorModel } from '@/types';
 
 export default defineComponent({
     name: 'AppLayerListThumbnail',
@@ -33,9 +38,12 @@ export default defineComponent({
             return workingFileStore.state.width > workingFileStore.state.height;
         });
 
-        const thumbnailImageSrc = computed<string>(() => {
-            if (!props.layer.thumbnailImageSrc) {
-                const canvas = document.createElement('canvas');
+        const thumbnailImageSrc = ref<string>('data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==');
+        let thumbnailCanvas = document.createElement('canvas');
+        let thumbnailCanvasCtx = thumbnailCanvas.getContext('bitmaprenderer', getCanvasRenderingContext2DSettings());
+
+        watch(() => props.layer.thumbnailImageSrc, async (layerThumbnailSrc) => {
+            if (!layerThumbnailSrc) {
                 const imageWidth = workingFileStore.state.width;
                 const imageHeight = workingFileStore.state.height;
                 let thumbnailWidth = 1;
@@ -50,18 +58,19 @@ export default defineComponent({
                     thumbnailScale = thumbnailSize / imageHeight;
                     thumbnailWidth = Math.floor(imageWidth / imageHeight * thumbnailSize);
                 }
-                canvas.width = thumbnailWidth;
-                canvas.height = thumbnailHeight;
-                let ctx: CanvasRenderingContext2D = canvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
-                ctx.scale(thumbnailScale, thumbnailScale);
-                new renderers['2d'][props.layer.type]().draw(ctx, props.layer, {
-                    visible: true,
-                    globalCompositeOperation: 'source-over',
-                });
-                props.layer.thumbnailImageSrc = canvas.toDataURL();
+
+                const renderer = await useRenderer();
+                const thumbnailBitmap = await renderer.takeSnapshot(thumbnailWidth, thumbnailHeight, { layerIds: [props.layer.id] });
+                if (thumbnailCanvas.width !== thumbnailBitmap.width || thumbnailCanvas.height !== thumbnailBitmap.height) {
+                    thumbnailCanvas.width = thumbnailBitmap.width;
+                    thumbnailCanvas.height = thumbnailBitmap.height;
+                }
+                thumbnailCanvasCtx?.transferFromImageBitmap(thumbnailBitmap);
+                const dataUrl = thumbnailCanvas.toDataURL();
+                props.layer.thumbnailImageSrc = dataUrl;
+                thumbnailImageSrc.value = dataUrl;
             }
-            return props.layer.thumbnailImageSrc;
-        });
+        }, { immediate: true });
 
         return {
             isLargerWidth,

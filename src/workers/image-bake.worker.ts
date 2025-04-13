@@ -75,7 +75,7 @@ async function workNewFilterBake(queueItem: FilterNewBakeRequest) {
                     const appliedData = appliedImageData.data;
                     for (let i = 0; i < imageDataSize; i += 4) {
                         const maskAlpha = 1.0 - (mask.data[i + 3] / 255);
-                        filter.fragment(appliedData, maskImageDataBuffer.data, i, appliedImageData.width, appliedImageData.height);
+                        // filter.fragment(appliedData, maskImageDataBuffer.data, i, appliedImageData.width, appliedImageData.height);
                         appliedData[i] = appliedData[i] * maskAlpha + maskImageDataBuffer.data[i] * (1.0 - maskAlpha);
                         appliedData[i + 1] = appliedData[i + 1] * maskAlpha + maskImageDataBuffer.data[i + 1] * (1.0 - maskAlpha);
                         appliedData[i + 2] = appliedData[i + 2] * maskAlpha + maskImageDataBuffer.data[i + 2] * (1.0 - maskAlpha);
@@ -84,7 +84,7 @@ async function workNewFilterBake(queueItem: FilterNewBakeRequest) {
                 } else {
                     const appliedData = appliedImageData.data;
                     for (let i = 0; i < imageDataSize; i += 4) {
-                        filter.fragment(appliedData, appliedData, i, appliedImageData.width, appliedImageData.height);
+                        // filter.fragment(appliedData, appliedData, i, appliedImageData.width, appliedImageData.height);
                     }
                 }
 

@@ -8,11 +8,13 @@ import { Mesh } from 'three/src/objects/Mesh';
 import { Texture } from 'three/src/textures/Texture';
 
 import { getWebgl2RendererBackend, markRenderDirty, requestFrontendTexture } from '@/renderers/webgl2/backend';
+import { messageBus } from '@/renderers/webgl2/backend/message-bus';
+import { createCanvasFiltersFromLayerConfig } from '../base/material';
 import { createRasterMaterial, disposeRasterMaterial, updateRasterMaterial } from './material';
 
 import type { Scene, ShaderMaterial } from 'three';
 import type {
-    RendererMeshController,
+    RendererMeshController, Webgl2RendererCanvasFilter,
     WorkingFileLayerBlendingMode, WorkingFileRasterLayer, WorkingFileLayerFilter
 } from '@/types';
 
@@ -26,11 +28,12 @@ export class RasterLayerMeshController implements RendererMeshController {
 
     id: number = -1;
     blendingMode: WorkingFileLayerBlendingMode = 'normal';
-    filters: WorkingFileLayerFilter[] = [];
+    filters: Webgl2RendererCanvasFilter[] = [];
     sourceUuid: string | undefined;
     visible: boolean = true;
 
     materialUpdates: Array<'destroyAndCreate' | 'update'> = [];
+    regenerateThumbnailTimeoutHandle: number | undefined;
 
     attach(id: number) {
         this.id = id;
@@ -40,6 +43,14 @@ export class RasterLayerMeshController implements RendererMeshController {
         this.plane = new Mesh(undefined, undefined);
         this.plane.matrixAutoUpdate = false;
         this.scene.add(this.plane);
+    }
+
+    regenerateThumbnail() {
+        clearTimeout(this.regenerateThumbnailTimeoutHandle);
+        this.regenerateThumbnailTimeoutHandle = setTimeout(this.regenerateThumbnailDeferred.bind(this), 0);
+    }
+    regenerateThumbnailDeferred() {
+        messageBus.emit('layer.regenerateThumbnail', this.id);
     }
 
     async scheduleMaterialUpdate(type: 'destroyAndCreate' | 'update') {
@@ -61,6 +72,7 @@ export class RasterLayerMeshController implements RendererMeshController {
                 if (!this.material || updateType === 'destroyAndCreate') {
                     this.material = await createRasterMaterial({
                         srcTexture: this.sourceTexture,
+                        canvasFilters: this.filters,
                     });
                 } else {
                     await updateRasterMaterial(this.material, {
@@ -69,7 +81,10 @@ export class RasterLayerMeshController implements RendererMeshController {
                 }
                 this.plane && (this.plane.material = this.material);
                 this.materialUpdates.pop();
-                markRenderDirty();
+                if (this.materialUpdates.length < 1) {
+                    this.regenerateThumbnail();
+                    markRenderDirty();
+                }
             }
         }
     }
@@ -93,18 +108,16 @@ export class RasterLayerMeshController implements RendererMeshController {
             this.disposeSourceTexture();
             this.sourceTexture = sourceTexture;
             this.sourceTexture.needsUpdate = true;
-            this.scheduleMaterialUpdate('update');
+            await this.scheduleMaterialUpdate('update');
         } else {
             this.disposeSourceTexture();
-            this.scheduleMaterialUpdate('update');
+            await this.scheduleMaterialUpdate('update');
         }
-        markRenderDirty();
     }
 
-    updateFilters(filters: WorkingFileLayerFilter[]) {
-        this.filters = filters;
-        // TODO - convert to filter classes?
-        this.scheduleMaterialUpdate('destroyAndCreate');
+    async updateFilters(filters: WorkingFileLayerFilter[]) {
+        this.filters = await createCanvasFiltersFromLayerConfig(filters);
+        await this.scheduleMaterialUpdate('destroyAndCreate');
     }
 
     updateName(name: string) {
@@ -141,16 +154,6 @@ export class RasterLayerMeshController implements RendererMeshController {
         }
     }
 
-    private disposeSourceTexture() {
-        if (this.sourceTexture) {
-            if (this.sourceTexture.userData.shouldDisposeBitmap) {
-                this.sourceTexture.image?.close();
-            }
-            this.sourceTexture.dispose();
-            this.sourceTexture = undefined;
-        }
-    }
-
     reorder(order: number) {
         if (this.plane) {
             this.plane.renderOrder = order + 0.1;
@@ -162,6 +165,36 @@ export class RasterLayerMeshController implements RendererMeshController {
         this.scene?.remove(this.plane);
         scene.add(this.plane);
         this.scene = scene;
+    }
+
+    clone() {
+        const clone = new RasterLayerMeshController();
+
+        clone.id = this.id;
+        clone.blendingMode = this.blendingMode;
+        clone.filters = this.filters;
+        clone.sourceUuid = this.sourceUuid;
+        clone.visible = this.visible;
+
+        clone.material = this.material?.clone();
+        clone.planeGeometry = this.planeGeometry?.clone();
+        clone.plane = this.plane?.clone();
+        clone.sourceTexture = this.sourceTexture?.clone();
+        clone.scene = this.scene;
+
+        if (clone.plane) {
+            if (clone.planeGeometry) {
+                clone.plane.geometry = clone.planeGeometry;
+            }
+            if (clone.material) {
+                clone.plane.material = clone.material;
+            }
+        }
+        if (clone.sourceTexture) {
+            clone.sourceTexture.userData.shouldDisposeBitmap = false;
+        }
+
+        return clone;
     }
 
     detach() {
@@ -182,6 +215,16 @@ export class RasterLayerMeshController implements RendererMeshController {
         this.disposeSourceTexture();
 
         this.scene = undefined;
+    }
+
+    disposeSourceTexture() {
+        if (this.sourceTexture) {
+            if (this.sourceTexture.userData.shouldDisposeBitmap) {
+                this.sourceTexture.image?.close();
+            }
+            this.sourceTexture.dispose();
+            this.sourceTexture = undefined;
+        }
     }
 
 }

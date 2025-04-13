@@ -3,6 +3,7 @@ import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer';
 import { Scene } from 'three/src/scenes/Scene';
 import { OrthographicCamera } from 'three/src/cameras/OrthographicCamera';
 import { Matrix4 } from 'three/src/math/Matrix4';
+import { Vector3 } from 'three/src/math/Vector3';
 
 import { EffectComposer } from './postprocessing/effect-composer';
 import { GammaCorrectionShader } from './postprocessing/gamma-correction-shader';
@@ -11,11 +12,14 @@ import { ShaderPass } from './postprocessing/shader-pass';
 
 import { ImageBackground } from './image-background';
 import { ImageBoundaryMask } from './image-boundary-mask';
+import { requestFrontendTexture } from './image-transfer';
 import { SelectionMask } from './selection-mask';
 import { messageBus } from './message-bus';
 
-import type { Camera } from 'three';
-import type { RendererMeshController, WorkingFileLayer, WorkingFileGroupLayer } from '@/types';
+import type { Camera, Texture } from 'three';
+import type {
+    RendererMeshController, WorkingFileLayer, WorkingFileGroupLayer, WorkingFileLayerMask,
+} from '@/types';
 
 const noRenderPassModes = new Set(['normal', 'erase']);
 
@@ -52,11 +56,20 @@ export class Webgl2RendererBackend {
 
     maxTextureSize: number = 2048;
     viewTransform: Matrix4 = new Matrix4();
+    imageWidth: number = 1;
+    imageHeight: number = 1;
 
     layerOrder: WorkingFileLayer[] = [];
+    masks: Record<number, WorkingFileLayerMask> = {};
+    maskTextures: Record<number, Texture> = {};
+    maskTextureRequests: Record<number, Promise<Texture | undefined> | undefined> = {};
     meshControllersById: Map<number, RendererMeshController> = new Map();
+    queueCreateLayerPassesTimeoutHandle: number | undefined;
 
     async initialize(canvas: HTMLCanvasElement | OffscreenCanvas, imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number) {
+        this.imageWidth = imageWidth;
+        this.imageHeight = imageHeight;
+
         this.renderer = new WebGLRenderer({
             alpha: true,
             canvas,
@@ -91,6 +104,8 @@ export class Webgl2RendererBackend {
     }
 
     async resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number) {
+        this.imageWidth = imageWidth;
+        this.imageHeight = imageHeight;
         if (this.renderer) {
             this.renderer.setSize(viewWidth, viewHeight, true);
         }
@@ -125,6 +140,39 @@ export class Webgl2RendererBackend {
         this.dirty = true;
     }
 
+    setMasks(masks: Record<number, WorkingFileLayerMask>) {
+        this.masks = masks;
+        const maskIds = new Set(Object.keys(this.masks));
+        const maskTextureIds = new Set(Object.keys(this.maskTextures));
+
+        const added = [...maskIds].filter((id) => !maskTextureIds.has(id));
+        const removed = [...maskTextureIds].filter((id) => !maskIds.has(id));
+
+        for (const key of added) {
+            const id = parseInt(key);
+            this.maskTextureRequests[id] = requestFrontendTexture(this.masks[id].sourceUuid);
+            this.maskTextureRequests[id]!.then((texture) => {
+                if (texture) {
+                    this.maskTextures[id] = texture;
+                }
+                delete this.maskTextureRequests[id];
+                return texture;
+            });
+        }
+        for (const key of removed) {
+            const id = parseInt(key);
+            this.maskTextures[id]?.dispose();
+            delete this.maskTextures[id];
+        }
+    }
+
+    async getMaskTexture(maskId: number): Promise<Texture | undefined> {
+        if (this.maskTextureRequests[maskId]) {
+            return await this.maskTextureRequests[maskId];
+        }
+        return this.maskTextures[maskId];
+    }
+
     setViewTransform(transform: Float64Array) {
         this.viewTransform.set(
             transform[0], transform[1], transform[2], transform[3],
@@ -137,6 +185,7 @@ export class Webgl2RendererBackend {
 
     addMeshController(id: number, controller: RendererMeshController) {
         this.meshControllersById.set(id, controller);
+        this.queueCreateLayerPasses();
     }
 
     removeMeshController(id: number) {
@@ -148,7 +197,14 @@ export class Webgl2RendererBackend {
         this.createLayerPasses();
     }
 
+    queueCreateLayerPasses() {
+        window.clearTimeout(this.queueCreateLayerPassesTimeoutHandle);
+        this.queueCreateLayerPassesTimeoutHandle = window.setTimeout(this.createLayerPasses.bind(this), 0);
+    }
+
     createLayerPasses(composer?: EffectComposer, camera?: Camera, includeLayerIds?: Uint32Array) {
+        window.clearTimeout(this.queueCreateLayerPassesTimeoutHandle);
+
         composer = composer ?? this.composer;
         camera = camera ?? this.camera;
 
@@ -212,7 +268,7 @@ export class Webgl2RendererBackend {
             composer.addPass(renderPass);
         }
     
-        // composer.addPass(new ShaderPass(GammaCorrectionShader));
+        composer.addPass(new ShaderPass(GammaCorrectionShader));
         this.dirty = true;
     }
 
@@ -230,7 +286,9 @@ export class Webgl2RendererBackend {
     }
 
     async takeSnapshot(
-        imageWidth: number, imageHeight: number, options?: Webgl2RendererBackendTakeSnapshotOptions
+        imageWidth: number,
+        imageHeight: number,
+        options?: Webgl2RendererBackendTakeSnapshotOptions
     ): Promise<ImageBitmap> {
 
         const snapshotCamera = new OrthographicCamera(0, imageWidth, 0, imageHeight, 0.1, 10000);
@@ -247,6 +305,9 @@ export class Webgl2RendererBackend {
                 )
             )
         }
+        snapshotCamera.projectionMatrix.scale(
+            new Vector3(imageWidth / this.imageWidth, imageHeight / this.imageHeight, 1)
+        )
 
         if (!this.snapshotCanvas) {
             this.snapshotCanvas = createCanvas(imageWidth, imageHeight);
@@ -267,6 +328,8 @@ export class Webgl2RendererBackend {
 
         if (!this.snapshotComposer) {
             this.snapshotComposer = new EffectComposer(this.snapshotRenderer);
+        } else {
+            this.snapshotComposer.setSize(imageWidth, imageHeight);
         }
         this.createLayerPasses(this.snapshotComposer, snapshotCamera, options?.layerIds);
 

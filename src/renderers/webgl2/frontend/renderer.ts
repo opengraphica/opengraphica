@@ -2,10 +2,10 @@ import { toRefs, watch, type WatchStopHandle } from 'vue';
 
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
-import workingFileStore from '@/store/working-file';
+import workingFileStore, { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
 import { getStoredImageAsBitmap } from '@/store/image';
 
-import appEmitter from '@/lib/emitter';
+import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
 import { colorToRgba, getColorModelName } from '@/lib/color';
 
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
@@ -20,6 +20,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
     rendererBackend: Webgl2RendererBackend | undefined;
 
     stopWatchBackgroundColor: WatchStopHandle | undefined;
+    stopWatchMasks: WatchStopHandle | undefined;
     stopWatchShowBoundary: WatchStopHandle | undefined;
     stopWatchSize: WatchStopHandle | undefined;
     stopWatchViewTransform: WatchStopHandle | undefined;
@@ -52,6 +53,10 @@ export class Webgl2RenderFrontend implements RendererFrontend {
             );
         });
 
+        this.stopWatchMasks = watch(() => workingFileStore.state.masks, (masks) => {
+            this.rendererBackend?.setMasks(masks);
+        });
+
         this.stopWatchShowBoundary = watch(() => canvasStore.state.showAreaOutsideWorkingFile, (showAreaOutsideWorkingFile) => {
             this.rendererBackend?.enableImageBoundaryMask(!showAreaOutsideWorkingFile);
         }, { immediate: true });
@@ -68,6 +73,9 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         this.onTextureRequest = this.onTextureRequest.bind(this);
         messageBus.on('backend.requestFrontendTexture', this.onTextureRequest);
 
+        this.onRegenerateThumbnail = this.onRegenerateThumbnail.bind(this);
+        messageBus.on('layer.regenerateThumbnail', this.onRegenerateThumbnail);
+
         this.onLayerAttached = this.onLayerAttached.bind(this);
         appEmitter.on('app.workingFile.layerAttached', this.onLayerAttached);
 
@@ -82,6 +90,9 @@ export class Webgl2RenderFrontend implements RendererFrontend {
 
         this.onLayerOrderCalculated = this.onLayerOrderCalculated.bind(this);
         appEmitter.on('app.workingFile.layerOrderCalculated', this.onLayerOrderCalculated);
+
+        this.onEditorHistoryStep = this.onEditorHistoryStep.bind(this);
+        appEmitter.on('editor.history.step', this.onEditorHistoryStep);
 
         const renderLoop = () => {
             if (!this.rendererBackend) return;
@@ -125,7 +136,9 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         }
         messageBus.emit('frontend.replyFrontendTexture', {
             sourceUuid,
-            texture: await getStoredImageAsBitmap(sourceUuid, { imageOrientation: 'flipY' }) ?? undefined,
+            bitmap: await getStoredImageAsBitmap(sourceUuid, {
+                imageOrientation: 'flipY',
+            }) ?? undefined,
         });
     }
 
@@ -171,6 +184,20 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         );
     }
 
+    onEditorHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
+        if (!event) return;
+        if (event.action.id === 'updateLayerBlendingMode') {
+            this.rendererBackend?.queueCreateLayerPasses();
+        }
+    }
+
+    onRegenerateThumbnail(event?: number) {
+        if (event == null) return;
+        const layer = getLayerById(event);
+        if (!layer) return;
+        regenerateLayerThumbnail(layer);
+    }
+
     async resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number) {
         await this.rendererBackend?.resize(imageWidth, imageHeight, viewWidth, viewHeight);
     }
@@ -205,13 +232,16 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         }
         this.layerWatchersById.clear();
 
+        messageBus.off('backend.requestFrontendTexture', this.onTextureRequest);
         appEmitter.off('app.workingFile.layerAttached', this.onLayerAttached);
         appEmitter.off('app.workingFile.layerReordered', this.onLayerReordered);
         appEmitter.off('app.workingFile.layerDetached', this.onLayerDetached);
         appEmitter.off('app.workingFile.detachAllLayers', this.onDetachAllLayers);
         appEmitter.off('app.workingFile.layerOrderCalculated', this.onLayerOrderCalculated);
+        appEmitter.off('editor.history.step', this.onEditorHistoryStep);
 
         this.stopWatchBackgroundColor?.();
+        this.stopWatchMasks?.();
         this.stopWatchShowBoundary?.();
         this.stopWatchSize?.();
         this.stopWatchViewTransform?.();

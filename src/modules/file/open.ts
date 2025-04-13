@@ -585,7 +585,7 @@ async function parseSerializedFileToActions(serializedFile: SerializedFile<Color
         masks[maskId] = {
             sourceUuid: await parseDataUrlToStoredImage(serializedMasks[maskId].sourceImageSerialized),
             hash: serializedMasks[maskId].hash,
-            offset: new DOMPoint(serializedMasks[maskId].offset.x, serializedMasks[maskId].offset.y),
+            offset: serializedMasks[maskId].offset,
         };
     }
 

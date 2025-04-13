@@ -92,7 +92,9 @@ export async function getStoredImageCanvas(uuid?: string): Promise<HTMLCanvasEle
  */
 export async function getStoredImageAsBitmap(
     uuid?: string,
-    options?: { imageOrientation: 'flipY' | 'none' }
+    options?: {
+        imageOrientation: 'flipY' | 'none',
+    }
 ): Promise<ImageBitmap | null> {
     const storedImage = imageUuidMap.get(uuid);
     if (storedImage?.sourceBitmap) {

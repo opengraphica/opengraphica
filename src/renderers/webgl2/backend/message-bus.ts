@@ -5,8 +5,9 @@ interface MessageBusEvents {
     'backend.requestFrontendTexture': string;
     'frontend.replyFrontendTexture': {
         sourceUuid: string;
-        texture: ImageBitmap | undefined;
+        bitmap: ImageBitmap | undefined;
     };
+    'layer.regenerateThumbnail': number;
     'renderer.pass.readBufferTextureUpdate': Texture;
     'renderer.renderComplete': void;
 }
