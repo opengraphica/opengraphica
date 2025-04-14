@@ -4,6 +4,11 @@ import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import workingFileStore, { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
 import { getStoredImageAsBitmap } from '@/store/image';
+import {
+    activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask,
+    appliedSelectionMaskCanvasOffset, selectedLayersSelectionMaskPreview,
+    selectedLayersSelectionMaskPreviewCanvasOffset,
+} from '@/canvas/store/selection-state';
 
 import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
 import { colorToRgba, getColorModelName } from '@/lib/color';
@@ -23,6 +28,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
     stopWatchMasks: WatchStopHandle | undefined;
     stopWatchShowBoundary: WatchStopHandle | undefined;
     stopWatchSize: WatchStopHandle | undefined;
+    stopWatchSelectionMask: WatchStopHandle | undefined;
     stopWatchViewTransform: WatchStopHandle | undefined;
 
     layerWatchersByType: Record<string, ClassType<RendererLayerWatcher>> = {};
@@ -60,6 +66,26 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         this.stopWatchShowBoundary = watch(() => canvasStore.state.showAreaOutsideWorkingFile, (showAreaOutsideWorkingFile) => {
             this.rendererBackend?.enableImageBoundaryMask(!showAreaOutsideWorkingFile);
         }, { immediate: true });
+
+        this.stopWatchSelectionMask = watch([
+            activeSelectionMask, activeSelectionMaskCanvasOffset,
+            appliedSelectionMask, appliedSelectionMaskCanvasOffset,
+            selectedLayersSelectionMaskPreview, selectedLayersSelectionMaskPreviewCanvasOffset,
+        ], async (
+            [newActiveSelectionMask, newActiveSelectionMaskCanvasOffset, newAppliedSelectionMask, newAppliedSelectionMaskCanvasOffset,
+            newSelectedLayersSelectionMaskPreview, newSelectedLayersSelectionMaskPreviewCanvasOffset],
+        ) => {
+            const newSelectionMask = newActiveSelectionMask ?? newAppliedSelectionMask ?? newSelectedLayersSelectionMaskPreview;
+            const newCanvasOffset = newActiveSelectionMask ? newActiveSelectionMaskCanvasOffset : (newAppliedSelectionMask ? newAppliedSelectionMaskCanvasOffset : newSelectedLayersSelectionMaskPreviewCanvasOffset);
+            if (newSelectionMask) {
+                this.rendererBackend?.setSelectionMask(
+                    await createImageBitmap(newSelectionMask, { imageOrientation: 'flipY' }),
+                    { x: newCanvasOffset.x, y: newCanvasOffset.y },
+                );
+            } else {
+                this.rendererBackend?.setSelectionMask(undefined);
+            }
+        });
 
         this.stopWatchBackgroundColor = watch(() => [
             workingFileStore.state.background.color,
@@ -245,6 +271,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         this.stopWatchBackgroundColor?.();
         this.stopWatchMasks?.();
         this.stopWatchShowBoundary?.();
+        this.stopWatchSelectionMask?.();
         this.stopWatchSize?.();
         this.stopWatchViewTransform?.();
     }

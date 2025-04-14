@@ -180,6 +180,11 @@ export class Webgl2RendererBackend {
         return this.maskTextures[maskId];
     }
 
+    setSelectionMask(image?: ImageBitmap, offset?: { x: number, y: number }) {
+        this.selectionMask.setImage(image, offset);
+        this.dirty = true;
+    }
+
     setViewTransform(transform: Float64Array) {
         this.viewTransform.set(
             transform[0], transform[1], transform[2], transform[3],

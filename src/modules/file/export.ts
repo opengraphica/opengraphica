@@ -90,6 +90,7 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                 });
                 const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
                 ctx.drawImage(snapshotBitmap, 0, 0);
+                snapshotBitmap.close();
             }
             if (options.blitActiveSelectionMask && (activeSelectionMask.value != null || appliedSelectionMask.value != null)) {
                 canvas = await blitActiveSelectionMask(canvas, new DOMMatrix(), 'source-in');

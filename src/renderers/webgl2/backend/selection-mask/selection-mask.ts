@@ -1,4 +1,7 @@
-import { DoubleSide, SRGBColorSpace, RepeatWrapping } from 'three/src/constants';
+import {
+    ClampToEdgeWrapping, DoubleSide, LinearFilter, NearestFilter,
+    SRGBColorSpace, RepeatWrapping,
+} from 'three/src/constants';
 import { Mesh } from 'three/src/objects/Mesh';
 import { PlaneGeometry } from 'three/src/geometries/PlaneGeometry';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
@@ -16,6 +19,7 @@ const selectionMaskPatternSrc = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA
 export class SelectionMask {
     scene!: Scene;
     selectionMaskMesh!: Mesh;
+    selectionMaskMaterial!: ShaderMaterial;
 
     get visible() {
         return this.selectionMaskMesh.visible;
@@ -42,7 +46,7 @@ export class SelectionMask {
             selectionMaskUnselectedPatternTexture.colorSpace = SRGBColorSpace;
         }
         const selectionMaskGeometry = new PlaneGeometry(2, 2); //viewportWidth.value, viewportHeight.value);
-        const selectionMaskMaterial = new ShaderMaterial({
+        this.selectionMaskMaterial = new ShaderMaterial({
             transparent: true,
             depthTest: false,
             vertexShader: selectionMaskVertexShader,
@@ -58,12 +62,36 @@ export class SelectionMask {
                 inverseProjectionMatrix: { value: camera.projectionMatrixInverse.elements },
             },
         });
-        this.selectionMaskMesh = new Mesh(selectionMaskGeometry, selectionMaskMaterial);
+        this.selectionMaskMesh = new Mesh(selectionMaskGeometry, this.selectionMaskMaterial);
         this.selectionMaskMesh.renderOrder = 9999999999999;
         this.selectionMaskMesh.position.z = 0.2;
         this.selectionMaskMesh.frustumCulled = false;
         this.selectionMaskMesh.visible = false;
         this.scene.add(this.selectionMaskMesh);
+    }
+
+    setImage(image?: ImageBitmap, offset?: { x: number, y: number }) {
+        this.selectionMaskMaterial.uniforms.selectedMaskMap.value?.dispose();
+        this.selectionMaskMaterial.uniforms.selectedMaskMap.value?.image?.close?.();
+        if (image) {
+            const selectionMaskTexture = new Texture(image);
+            selectionMaskTexture.magFilter = NearestFilter;
+            selectionMaskTexture.minFilter = LinearFilter;
+            selectionMaskTexture.wrapS = ClampToEdgeWrapping;
+            selectionMaskTexture.wrapT = ClampToEdgeWrapping;
+            selectionMaskTexture.colorSpace = SRGBColorSpace;
+            selectionMaskTexture.needsUpdate = true;
+            this.selectionMaskMaterial.uniforms.selectedMaskMap.value = selectionMaskTexture;
+            this.selectionMaskMaterial.uniforms.selectedMaskSize.value = [image.width, image.height];
+            this.selectionMaskMaterial.uniforms.selectedMaskOffset.value = [offset?.x ?? 0, offset?.y ?? 0];
+            this.selectionMaskMesh.visible = true;
+        } else {
+            this.selectionMaskMaterial.uniforms.selectedMaskMap.value = undefined;
+            this.selectionMaskMaterial.uniforms.selectedMaskSize.value = [1, 1];
+            this.selectionMaskMaterial.uniforms.selectedMaskOffset.value = [0, 0];
+            this.selectionMaskMesh.visible = false;
+        }
+        this.selectionMaskMaterial.needsUpdate = true;
     }
 
     swapScene(scene: Scene) {
