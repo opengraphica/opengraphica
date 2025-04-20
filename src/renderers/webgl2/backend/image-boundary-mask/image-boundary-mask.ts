@@ -12,6 +12,16 @@ export class ImageBoundaryMask {
     imageBoundaryGeometry: BufferGeometry | undefined;
     scene: Scene | undefined;
 
+    get visible() {
+        return this.imageBoundaryMesh?.visible ?? false;
+    }
+
+    set visible(visible: boolean) {
+        if (this.imageBoundaryMesh) {
+            this.imageBoundaryMesh.visible = visible;
+        }
+    }
+
     async initialize(scene: Scene, imageWidth: number, imageHeight: number) {
         if (this.imageBoundaryMesh) {
             return;
@@ -28,7 +38,7 @@ export class ImageBoundaryMask {
             depthTest: false,
             blending: CustomBlending,
             blendDst: ZeroFactor,
-            blendSrc: OneFactor
+            blendSrc: OneFactor,
         });
 
         this.imageBoundaryMesh = new Mesh(this.imageBoundaryGeometry, this.imageBoundaryMaterial);
@@ -78,11 +88,6 @@ export class ImageBoundaryMask {
         if (this.imageBoundaryMesh) {
             this.imageBoundaryMesh.geometry = this.imageBoundaryGeometry;
         }
-    }
-
-    enable(enabled: boolean) {
-        if (!this.imageBoundaryMesh) return;
-        this.imageBoundaryMesh.visible = enabled;
     }
 
     swapScene(scene: Scene) {

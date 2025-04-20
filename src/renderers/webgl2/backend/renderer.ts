@@ -1,9 +1,9 @@
 import { SRGBColorSpace } from 'three/src/constants';
-import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer';
-import { Scene } from 'three/src/scenes/Scene';
 import { OrthographicCamera } from 'three/src/cameras/OrthographicCamera';
 import { Matrix4 } from 'three/src/math/Matrix4';
+import { Scene } from 'three/src/scenes/Scene';
 import { Vector3 } from 'three/src/math/Vector3';
+import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer';
 
 import { EffectComposer } from './postprocessing/effect-composer';
 import { GammaCorrectionShader } from './postprocessing/gamma-correction-shader';
@@ -19,7 +19,7 @@ import { createCanvasFiltersFromLayerConfig } from '@/renderers/webgl2/layers/ba
 
 import type { Camera, Texture } from 'three';
 import type {
-    RendererMeshController, Webgl2RendererCanvasFilter, WorkingFileLayer,
+    RendererTextureTile, Webgl2RendererCanvasFilter, Webgl2RendererMeshController, WorkingFileLayer,
     WorkingFileGroupLayer, WorkingFileLayerFilter, WorkingFileLayerMask,
 } from '@/types';
 
@@ -42,6 +42,10 @@ export interface Webgl2RendererBackendTakeSnapshotOptions {
     filters?: WorkingFileLayerFilter[];
 }
 
+export interface Webgl2RendererApplySelectionMaskToAlphaChannelOptions {
+    invert?: boolean;
+}
+
 export class Webgl2RendererBackend {
     dirty: boolean = false;
 
@@ -57,6 +61,7 @@ export class Webgl2RendererBackend {
     snapshotComposer?: EffectComposer;
     snapshotRenderer?: WebGLRenderer;
 
+    textureTileSize: number = 512;
     maxTextureSize: number = 2048;
     viewTransform: Matrix4 = new Matrix4();
     imageWidth: number = 1;
@@ -66,7 +71,7 @@ export class Webgl2RendererBackend {
     masks: Record<number, WorkingFileLayerMask> = {};
     maskTextures: Record<number, Texture> = {};
     maskTextureRequests: Record<number, Promise<Texture | undefined> | undefined> = {};
-    meshControllersById: Map<number, RendererMeshController> = new Map();
+    meshControllersById: Map<number, Webgl2RendererMeshController> = new Map();
     queueCreateLayerPassesTimeoutHandle: number | undefined;
 
     async initialize(canvas: HTMLCanvasElement | OffscreenCanvas, imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number) {
@@ -133,7 +138,7 @@ export class Webgl2RendererBackend {
 
     enableImageBoundaryMask(enabled: boolean) {
         if (!this.imageBoundaryMask) return;
-        this.imageBoundaryMask.enable(enabled);
+        this.imageBoundaryMask.visible = enabled;
         this.dirty = true;
     }
 
@@ -195,7 +200,7 @@ export class Webgl2RendererBackend {
         this.dirty = true;
     }
 
-    addMeshController(id: number, controller: RendererMeshController) {
+    addMeshController(id: number, controller: Webgl2RendererMeshController) {
         this.meshControllersById.set(id, controller);
         this.queueCreateLayerPasses();
     }
@@ -297,6 +302,21 @@ export class Webgl2RendererBackend {
         messageBus.emit('renderer.renderComplete');
     }
 
+    async applySelectionMaskToAlphaChannel(layerId: number, options?: Webgl2RendererApplySelectionMaskToAlphaChannelOptions): Promise<RendererTextureTile[]> {
+        const meshController = this.meshControllersById.get(layerId);
+        if (!meshController) return [];
+        const texture = await meshController.getTexture();
+        if (!texture) return [];
+        const transform = meshController.getTransform();
+        return this.selectionMask.applyToTextureAlphaChannel(
+            texture,
+            new Matrix4().multiply(transform),
+            this.textureTileSize,
+            this.renderer,
+            options?.invert,
+        );
+    }
+
     async takeSnapshot(
         imageWidth: number,
         imageHeight: number,
@@ -348,11 +368,15 @@ export class Webgl2RendererBackend {
         } else {
             this.snapshotComposer.setSize(imageWidth, imageHeight);
         }
-        this.createLayerPasses(this.snapshotComposer, snapshotCamera, options?.layerIds);
 
         const selectionMaskWasVisible = !!(this.selectionMask?.visible);
         if (this.selectionMask) {
             this.selectionMask.visible = false;
+        }
+
+        const imageBoundaryMaskWasVisible = !!(this.imageBoundaryMask?.visible);
+        if (this.imageBoundaryMask) {
+            this.imageBoundaryMask.visible = false;
         }
 
         if (options?.layerIds) {
@@ -365,10 +389,15 @@ export class Webgl2RendererBackend {
             }
         }
 
+        this.createLayerPasses(this.snapshotComposer, snapshotCamera, options?.layerIds);
+
         this.snapshotComposer.render();
 
         if (selectionMaskWasVisible && this.selectionMask) {
             this.selectionMask.visible = true;
+        }
+        if (imageBoundaryMaskWasVisible && this.imageBoundaryMask) {
+            this.imageBoundaryMask.visible = true;
         }
 
         if (options?.layerIds) {

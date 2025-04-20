@@ -6,6 +6,7 @@ import { updateWorkingFileLayer } from '@/store/data/working-file-database';
 import { ClearSelectionAction } from './clear-selection';
 import { UpdateLayerAction } from './update-layer';
 import { getStoredImageOrCanvas, createStoredImage } from '@/store/image';
+import { useRenderer } from '@/renderers';
 
 import type {
     ColorModel, UpdateAnyLayerOptions, UpdateRasterLayerOptions,
@@ -65,28 +66,32 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
                     const bottomRight = new DOMPoint(Math.max(p0.x, p1.x, p2.x, p3.x), Math.max(p0.y, p1.y, p2.y, p3.y));
                     bottomRight.x = Math.min(sourceImage.width, Math.ceil(bottomRight.x + 1));
                     bottomRight.y = Math.min(sourceImage.height, Math.ceil(bottomRight.y + 1));
-                    const updateChunkImage = await blitActiveSelectionMask(sourceImage, layerTransform, 'source-out', {
-                        sx: topLeft.x,
-                        sy: topLeft.y,
-                        sWidth: bottomRight.x - topLeft.x,
-                        sHeight: bottomRight.y - topLeft.y,
-                    });
 
-                    const updateLayerAction = new UpdateLayerAction<UpdateRasterLayerOptions>({
-                        id: layer.id,
-                        data: {
-                            updateChunks: [{
-                                x: topLeft.x,
-                                y: topLeft.y,
-                                data: updateChunkImage,
-                                mode: 'replace',
-                            }],
-                        },
-                    });
-                    await updateLayerAction.do();
-                    this.freeEstimates.memory += updateLayerAction.freeEstimates.memory;
-                    this.freeEstimates.database += updateLayerAction.freeEstimates.database;
-                    this.updateLayerActions.push(updateLayerAction);
+                    const renderer = await useRenderer();
+                    await renderer.applySelectionMaskToAlphaChannel(layer.id, { invert: true });
+
+                    // const updateChunkImage = await blitActiveSelectionMask(sourceImage, layerTransform, 'source-out', {
+                    //     sx: topLeft.x,
+                    //     sy: topLeft.y,
+                    //     sWidth: bottomRight.x - topLeft.x,
+                    //     sHeight: bottomRight.y - topLeft.y,
+                    // });
+
+                    // const updateLayerAction = new UpdateLayerAction<UpdateRasterLayerOptions>({
+                    //     id: layer.id,
+                    //     data: {
+                    //         updateChunks: [{
+                    //             x: topLeft.x,
+                    //             y: topLeft.y,
+                    //             data: updateChunkImage,
+                    //             mode: 'replace',
+                    //         }],
+                    //     },
+                    // });
+                    // await updateLayerAction.do();
+                    // this.freeEstimates.memory += updateLayerAction.freeEstimates.memory;
+                    // this.freeEstimates.database += updateLayerAction.freeEstimates.database;
+                    // this.updateLayerActions.push(updateLayerAction);
                 }
             }
         }

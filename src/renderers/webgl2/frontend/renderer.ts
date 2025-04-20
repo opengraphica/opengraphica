@@ -18,7 +18,8 @@ import { messageBus } from '@/renderers/webgl2/backend/message-bus';
 import type { Webgl2RendererBackend } from '@/renderers/webgl2/backend';
 import type {
     ClassType, RendererFrontend, RendererFrontendTakeSnapshotOptions,
-    RendererLayerWatcher, WorkingFileAnyLayer
+    RendererFrontendApplySelectionMaskToAlphaChannelOptions,
+    RendererLayerWatcher, RendererTextureTile, WorkingFileAnyLayer
 } from '@/types';
 
 export class Webgl2RenderFrontend implements RendererFrontend {
@@ -222,6 +223,13 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         if (event.action.id === 'updateLayerBlendingMode') {
             this.rendererBackend?.queueCreateLayerPasses();
         }
+    }
+
+    async applySelectionMaskToAlphaChannel(layerId: number, options?: RendererFrontendApplySelectionMaskToAlphaChannelOptions): Promise<RendererTextureTile[]> {
+        if (this.rendererBackend) {
+            return this.rendererBackend.applySelectionMaskToAlphaChannel(layerId, options);
+        }
+        return [];
     }
 
     async resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number) {

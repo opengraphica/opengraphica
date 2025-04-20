@@ -4,6 +4,7 @@
  */
 
 import { ImagePlaneGeometry } from '@/renderers/webgl2/geometries/image-plane-geometry';
+import { Matrix4 } from 'three/src/math/Matrix4';
 import { Mesh } from 'three/src/objects/Mesh';
 import { Texture } from 'three/src/textures/Texture';
 
@@ -14,11 +15,11 @@ import { createRasterMaterial, disposeRasterMaterial, updateRasterMaterial } fro
 
 import type { Scene, ShaderMaterial } from 'three';
 import type {
-    RendererMeshController, Webgl2RendererCanvasFilter,
+    Webgl2RendererCanvasFilter, Webgl2RendererMeshController,
     WorkingFileLayerBlendingMode, WorkingFileRasterLayer, WorkingFileLayerFilter
 } from '@/types';
 
-export class RasterLayerMeshController implements RendererMeshController {
+export class RasterLayerMeshController implements Webgl2RendererMeshController {
     
     material: InstanceType<typeof ShaderMaterial> | undefined;
     plane: InstanceType<typeof Mesh> | undefined;
@@ -160,6 +161,14 @@ export class RasterLayerMeshController implements RendererMeshController {
         if (this.plane) {
             this.plane.renderOrder = order + 0.1;
         }
+    }
+
+    getTexture() {
+        return Promise.resolve(this.sourceTexture ?? null);
+    }
+
+    getTransform() {
+        return this.plane?.matrix ?? new Matrix4();
     }
     
     swapScene(scene: Scene) {
