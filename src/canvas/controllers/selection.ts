@@ -685,11 +685,14 @@ export default class SelectionController extends BaseMovementController {
     }
 
     async deleteSelection() {
+        const start = window.performance.now();
+        await new Promise(resolve => setTimeout(resolve, 0));
         if (activeSelectionMask.value || appliedSelectionMask.value) {
             await historyStore.dispatch('runAction', {
                 action: new DeleteLayerSelectionAreaAction(),
             });
         }
+        console.log('deleteLayerSelectionArea', window.performance.now() - start);
     }
 
     async queueDeleteSelection() {

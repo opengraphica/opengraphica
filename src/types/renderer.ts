@@ -33,6 +33,7 @@ export interface RendererTextureTile {
     y: number;
     width: number;
     height: number;
+    oldImage?: ImageBitmap;
     image: ImageBitmap;
 }
 

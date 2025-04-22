@@ -19,6 +19,9 @@ export async function requestFrontendTexture(requestSourceUuid?: string): Promis
                 texture.colorSpace = SRGBColorSpace;
                 texture.minFilter = LinearMipMapLinearFilter;
                 texture.magFilter = NearestFilter;
+                texture.userData = {
+                    shouldDisposeBitmap: true,
+                };
                 resolve(texture);
             }
         }

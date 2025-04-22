@@ -51,11 +51,6 @@ export async function createStoredImage(imageOrCanvas: HTMLCanvasElement | HTMLI
         lockedForEditing: false,
         databaseUuid: null,
     };
-    (sourceCanvas ? createImageBlobFromCanvas(sourceCanvas) : createImageBlobFromImageBitmap(sourceBitmap!)).then((imageBlob) => {
-        imageDatabase.add(imageBlob).then((databaseUuid) => {
-            storedImage.databaseUuid = databaseUuid;
-        });
-    });
     const uuid = uuidv4();
     imageUuidMap.set(uuid, storedImage);
     return uuid;

@@ -7,6 +7,7 @@ import { ImagePlaneGeometry } from '@/renderers/webgl2/geometries/image-plane-ge
 import { Matrix4 } from 'three/src/math/Matrix4';
 import { Mesh } from 'three/src/objects/Mesh';
 import { Texture } from 'three/src/textures/Texture';
+import { Vector2 } from 'three/src/math/Vector2';
 
 import { getWebgl2RendererBackend, markRenderDirty, requestFrontendTexture } from '@/renderers/webgl2/backend';
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
@@ -32,6 +33,7 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
     filters: Webgl2RendererCanvasFilter[] = [];
     filtersOverride: Webgl2RendererCanvasFilter[] | undefined = undefined;
     sourceUuid: string | undefined;
+    tileUpdateId: string | undefined;
     visible: boolean = true;
     visibleOverride: boolean | undefined = undefined;
 
@@ -100,22 +102,45 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
     }
 
     async updateData(data: WorkingFileRasterLayer['data']) {
-        // TODO - partial updates
-        this.sourceUuid = data.sourceUuid;
-        const sourceTexture = await requestFrontendTexture(data.sourceUuid)
-        if (data.sourceUuid !== this.sourceUuid) {
-            sourceTexture?.dispose();
-            return;
-        }
-        if (sourceTexture) {
-            this.disposeSourceTexture();
-            this.sourceTexture = sourceTexture;
-            this.sourceTexture.needsUpdate = true;
-            await this.scheduleMaterialUpdate('update');
+        if (this.sourceTexture && data.tileUpdates) {
+            if (data.tileUpdateId === this.tileUpdateId) return;
+            const backend = getWebgl2RendererBackend();
+            const tileTextures = await Promise.allSettled(
+                data.tileUpdates.map((tileUpdate) => requestFrontendTexture(tileUpdate.sourceUuid))
+            );
+            for (const [updateIndex, tileUpdate] of data.tileUpdates.entries()) {
+                const tileTexture = tileTextures[updateIndex].status === 'fulfilled' ? tileTextures[updateIndex].value : null;
+                if (!tileTexture) continue;
+                backend.renderer.copyTextureToTexture(
+                    tileTexture,
+                    this.sourceTexture,
+                    null,
+                    new Vector2(tileUpdate.x, this.sourceTexture.image.height - tileUpdate.y - tileTexture.image.height)
+                );
+                if (tileTexture.userData.shouldDisposeBitmap) {
+                    tileTexture.image?.close();
+                }
+                tileTexture.dispose();
+            }
+            markRenderDirty();
         } else {
-            this.disposeSourceTexture();
-            await this.scheduleMaterialUpdate('update');
+            this.sourceUuid = data.sourceUuid;
+            const sourceTexture = await requestFrontendTexture(data.sourceUuid)
+            if (data.sourceUuid !== this.sourceUuid) {
+                this.disposeSourceTexture();
+                return;
+            }
+            if (sourceTexture) {
+                this.disposeSourceTexture();
+                this.sourceTexture = sourceTexture;
+                this.sourceTexture.needsUpdate = true;
+                await this.scheduleMaterialUpdate('update');
+            } else {
+                this.disposeSourceTexture();
+                await this.scheduleMaterialUpdate('update');
+            }
         }
+        this.tileUpdateId = data.tileUpdateId;
     }
 
     async updateFilters(filters: WorkingFileLayerFilter[]) {

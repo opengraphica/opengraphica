@@ -1,5 +1,5 @@
 import {
-    ClampToEdgeWrapping, DoubleSide, HalfFloatType, LinearFilter, LinearSRGBColorSpace, NearestFilter,
+    ClampToEdgeWrapping, DoubleSide, LinearFilter, LinearSRGBColorSpace, NearestFilter,
     SRGBColorSpace, RepeatWrapping, RGBAFormat, UnsignedByteType,
 } from 'three/src/constants';
 import { Box2 } from 'three/src/math/Box2';
@@ -30,6 +30,9 @@ export class SelectionMask {
     scene!: Scene;
     selectionMaskMesh!: Mesh;
     selectionMaskMaterial!: ShaderMaterial;
+
+    renderTargetStack: Array<WebGLRenderTarget | undefined> = new Array(8);
+    renderTargetWaitQueue: Array<(target: WebGLRenderTarget) => void> = [];
 
     get visible() {
         return this.selectionMaskMesh.visible;
@@ -111,23 +114,12 @@ export class SelectionMask {
         renderer: WebGLRenderer,
         invert: boolean = false,
     ): Promise<RendererTextureTile[]> {
-        const originalRendererSize = new Vector2();
-        renderer.getSize(originalRendererSize);
         const originalRendererViewport = new Vector4();
         renderer.getViewport(originalRendererViewport);
-        
-        const gl = renderer.getContext();
-        const isHalfFloat = renderer.capabilities.isWebGL2 || gl.getExtension('OES_texture_half_float');
 
-        const tileRenderTarget = new WebGLRenderTarget(tileSize, tileSize, {
-            type: isHalfFloat ? HalfFloatType : UnsignedByteType,
-            minFilter: LinearFilter,
-            magFilter: LinearFilter,
-            format: RGBAFormat,
-            depthBuffer: false,
-            colorSpace: LinearSRGBColorSpace,
-            stencilBuffer: false,
-        });
+        console.time('mask');
+
+        const maskTransformInverse = maskTransform.clone().invert();
 
         const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
         const scene = new Scene();
@@ -135,6 +127,8 @@ export class SelectionMask {
 
         const selectionMaskMap = this.selectionMaskMaterial.uniforms.selectedMaskMap.value;
         const selectionMaskOffset = this.selectionMaskMaterial.uniforms.selectedMaskOffset.value;
+        const selectionMaskWidth = selectionMaskMap.image.width;
+        const selectionMaskHeight = selectionMaskMap.image.height;
 
         const material = new ShaderMaterial({
             defines: {
@@ -145,6 +139,7 @@ export class SelectionMask {
                 selectionMaskMap: { value: selectionMaskMap },
                 tileOffsetAndSize: { value: new Vector4() },
                 selectionMaskTransform: { value: new Matrix4() },
+                selectionMaskAlpha: { value: 1 },
             },
             vertexShader: applySelectionMaskToAlphaChannelVertexShader,
             fragmentShader: applySelectionMaskToAlphaChannelFragmentShader,
@@ -157,37 +152,53 @@ export class SelectionMask {
         const mesh = new Mesh(geometry, material);
         scene.add(mesh);
 
-        loop:
+        const p0 = new Vector3(selectionMaskOffset[0], selectionMaskOffset[1], 0.0).applyMatrix4(maskTransformInverse);
+        const p1 = new Vector3(selectionMaskOffset[0] + selectionMaskWidth, selectionMaskOffset[1], 0.0).applyMatrix4(maskTransformInverse);
+        const p2 = new Vector3(selectionMaskOffset[0], selectionMaskOffset[1] + selectionMaskHeight, 0.0).applyMatrix4(maskTransformInverse);
+        const p3 = new Vector3(selectionMaskOffset[0] + selectionMaskWidth, selectionMaskOffset[1] + selectionMaskHeight, 0.0).applyMatrix4(maskTransformInverse);
+        const aabb = new Box2(
+            new Vector2(Math.min(p0.x, p1.x, p2.x, p3.x), Math.min(p0.y, p1.y, p2.y, p3.y)),
+            new Vector2(Math.max(p0.x, p1.x, p2.x, p3.x), Math.max(p0.y, p1.y, p2.y, p3.y)),
+        );
+
+        const tileBitmaps: RendererTextureTile[] = [];
+        const tileReadPromises: Promise<void>[] = [];
+
         for (let tileX = 0; tileX < texture.image.width; tileX += tileSize) {
             const tileWidth = Math.min(tileSize, texture.image.width - tileX);
-            for (let tileY = 0; tileY < texture.image.height; tileY += tileSize) {
 
+            if (tileX + tileWidth < aabb.min.x || tileX > aabb.max.x) continue;
+
+            for (let tileY = 0; tileY < texture.image.height; tileY += tileSize) {
                 const tileHeight = Math.min(tileSize, texture.image.height - tileY);
+
+                if (tileY + tileHeight < aabb.min.y || tileY > aabb.max.y) continue;
+
                 material.uniforms.tileOffsetAndSize.value.x = tileX / texture.image.width;
                 material.uniforms.tileOffsetAndSize.value.y = tileY / texture.image.height;
                 material.uniforms.tileOffsetAndSize.value.z = tileWidth / texture.image.width;
                 material.uniforms.tileOffsetAndSize.value.w = tileHeight / texture.image.height;
 
-                const selectionMaskTileOffsetX = (tileX - selectionMaskOffset[0]) / selectionMaskMap.image.width;
-                const selectionMaskTileOffsetY = (tileY - selectionMaskOffset[1]) / selectionMaskMap.image.height;
-                const selectionMaskTileScaleX = (tileWidth / selectionMaskMap.image.width);
-                const selectionMaskTileScaleY = (tileHeight / selectionMaskMap.image.height);
+                const selectionMaskTileOffsetX = (tileX - selectionMaskOffset[0]) / selectionMaskWidth;
+                const selectionMaskTileOffsetY = (tileY - selectionMaskOffset[1]) / selectionMaskHeight;
+                const selectionMaskTileScaleX = (tileWidth / selectionMaskWidth);
+                const selectionMaskTileScaleY = (tileHeight / selectionMaskHeight);
 
                 const tileTransformReset = new Matrix4()
                     .multiply(
                         new Matrix4().makeTranslation(new Vector3(
-                            -selectionMaskOffset[0] / selectionMaskMap.image.width,
-                            1.0 + (selectionMaskOffset[1] / selectionMaskMap.image.height),
+                            -selectionMaskOffset[0] / selectionMaskWidth,
+                            1.0 + (selectionMaskOffset[1] / selectionMaskHeight),
                             0.0
                         ))
                     )
                     .multiply(
                         new Matrix4().makeScale(
-                            1.0 / selectionMaskMap.image.width,
-                            -1.0 / selectionMaskMap.image.height,
+                            1.0 / selectionMaskWidth,
+                            -1.0 / selectionMaskHeight,
                             1.0,
                         )
-                    )
+                    );
                 const tileTransformResetInverse = tileTransformReset.clone().invert();
 
                 material.uniforms.selectionMaskTransform.value = new Matrix4()
@@ -211,29 +222,135 @@ export class SelectionMask {
                         )
                     );
 
-                renderer.setRenderTarget(tileRenderTarget);
-                renderer.setSize(tileWidth, tileHeight);
+                await new Promise((resolve) => setTimeout(resolve, 0));
+
                 renderer.setViewport(0, 0, tileWidth, tileHeight);
+
+                // Render unmasked tile
+                const beforeTile = await this.createTileRenderTarget(tileWidth, tileHeight);
+                renderer.setRenderTarget(beforeTile);
+                material.uniforms.selectionMaskAlpha.value = 0;
                 renderer.render(scene, camera);
+
+                // Render masked tile
+                const afterTile = await this.createTileRenderTarget(tileWidth, tileHeight);
+                renderer.setRenderTarget(afterTile);
+                material.uniforms.selectionMaskAlpha.value = 1;
+                material.needsUpdate = true;
+                renderer.render(scene, camera);
+
                 renderer.setRenderTarget(null);
 
+                // Copy render result back to original texture in GPU
                 renderer.copyTextureToTexture(
-                    tileRenderTarget.texture,
+                    afterTile.texture,
                     texture,
                     new Box2(new Vector2(0, 0), new Vector2(tileWidth, tileHeight)),
                     new Vector2(tileX, texture.image.height - tileHeight - tileY),
                 );
 
+                // Read render result to CPU for permanent storage
+                tileReadPromises.push(
+                    this.readTile(
+                        tileX,
+                        tileY,
+                        tileWidth,
+                        tileHeight,
+                        renderer,
+                        beforeTile,
+                        afterTile,
+                        tileBitmaps,
+                    )
+                );
             }
         }
 
+        await Promise.allSettled(tileReadPromises);
+
+        for (const renderTarget of this.renderTargetStack) {
+            renderTarget?.dispose();
+        }
+        this.renderTargetStack = new Array(16);
+
         geometry.dispose();
         material.dispose();
-        tileRenderTarget.dispose();
-        renderer.setSize(originalRendererSize.x, originalRendererSize.y);
+        
+        renderer.setRenderTarget(null);
         renderer.setViewport(originalRendererViewport.x, originalRendererViewport.y, originalRendererViewport.z, originalRendererViewport.w);
 
-        return [];
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        console.timeEnd('mask');
+
+        return tileBitmaps;
+    }
+
+    async createTileRenderTarget(tileWidth: number, tileHeight: number): Promise<WebGLRenderTarget> {
+        let renderTarget: WebGLRenderTarget | undefined;
+        if (this.renderTargetStack.length === 0) {
+            renderTarget = await new Promise<WebGLRenderTarget>((resolve) => {
+                this.renderTargetWaitQueue.push(resolve);
+            });
+        }
+        if (!renderTarget) {
+            renderTarget = this.renderTargetStack.pop()
+            if (!renderTarget) {
+                renderTarget = new WebGLRenderTarget(tileWidth, tileHeight, {
+                    type: UnsignedByteType,
+                    minFilter: LinearFilter,
+                    magFilter: LinearFilter,
+                    wrapS: ClampToEdgeWrapping,
+                    wrapT: ClampToEdgeWrapping,
+                    format: RGBAFormat,
+                    depthBuffer: false,
+                    colorSpace: LinearSRGBColorSpace,
+                    stencilBuffer: false,
+                });
+            }
+        }
+        if (renderTarget.width !== tileWidth || renderTarget.height !== tileHeight) {
+            renderTarget.setSize(tileWidth, tileHeight);
+        }
+        return renderTarget;
+    }
+
+    reclaimRenderTarget(renderTarget: WebGLRenderTarget) {
+        if (this.renderTargetWaitQueue.length > 0) {
+            this.renderTargetWaitQueue.pop()!(renderTarget);
+        } else {
+            this.renderTargetStack.push(renderTarget);
+        }
+    }
+
+    async readTile(
+        tileX: number,
+        tileY: number,
+        tileWidth: number,
+        tileHeight: number,
+        renderer: WebGLRenderer,
+        beforeTile: WebGLRenderTarget,
+        afterTile: WebGLRenderTarget,
+        tileBitmaps: RendererTextureTile[]
+    ) {
+        const beforeBuffer = new Uint8Array(tileWidth * tileHeight * 4);
+        const afterBuffer = new Uint8Array(tileWidth * tileHeight * 4);
+        await renderer.readRenderTargetPixelsAsync(beforeTile, 0, 0, tileWidth, tileHeight, beforeBuffer);
+        await renderer.readRenderTargetPixelsAsync(afterTile, 0, 0, tileWidth, tileHeight, afterBuffer);
+        tileBitmaps.push({
+            x: tileX,
+            y: tileY,
+            width: tileWidth,
+            height: tileHeight,
+            oldImage: await createImageBitmap(
+                new ImageData(new Uint8ClampedArray(beforeBuffer), tileWidth, tileHeight),
+                { imageOrientation: 'flipY' }
+            ),
+            image: await createImageBitmap(
+                new ImageData(new Uint8ClampedArray(afterBuffer), tileWidth, tileHeight),
+                { imageOrientation: 'flipY' }
+            ),
+        });
+        this.reclaimRenderTarget(beforeTile);
+        this.reclaimRenderTarget(afterTile);
     }
 
     swapScene(scene: Scene) {

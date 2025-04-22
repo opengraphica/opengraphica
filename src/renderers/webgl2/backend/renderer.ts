@@ -1,9 +1,14 @@
-import { SRGBColorSpace } from 'three/src/constants';
+import {
+    ClampToEdgeWrapping, DoubleSide, LinearFilter, LinearSRGBColorSpace, NearestFilter,
+    SRGBColorSpace, RepeatWrapping, RGBAFormat, UnsignedByteType,
+} from 'three/src/constants';
 import { OrthographicCamera } from 'three/src/cameras/OrthographicCamera';
 import { Matrix4 } from 'three/src/math/Matrix4';
 import { Scene } from 'three/src/scenes/Scene';
 import { Vector3 } from 'three/src/math/Vector3';
+import { Vector4 } from 'three/src/math/Vector4';
 import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer';
+import { WebGLRenderTarget } from 'three/src/renderers/WebGLRenderTarget';
 
 import { EffectComposer } from './postprocessing/effect-composer';
 import { GammaCorrectionShader } from './postprocessing/gamma-correction-shader';
@@ -48,6 +53,7 @@ export interface Webgl2RendererApplySelectionMaskToAlphaChannelOptions {
 
 export class Webgl2RendererBackend {
     dirty: boolean = false;
+    rendererBusy: boolean = false; // Renderer is being used for other operations and shouldn't be used to draw right now
 
     camera!: OrthographicCamera;
     composer!: EffectComposer;
@@ -82,7 +88,8 @@ export class Webgl2RendererBackend {
             alpha: true,
             canvas,
             premultipliedAlpha: false,
-            powerPreference: 'high-performance'
+            preserveDrawingBuffer: false,
+            powerPreference: 'high-performance',
         });
         this.renderer.outputColorSpace = SRGBColorSpace;
         this.renderer.setSize(1, 1);
@@ -290,13 +297,15 @@ export class Webgl2RendererBackend {
     }
 
     render() {
-        if (!this.camera) return;
+        if (!this.camera || this.rendererBusy) return;
 
         this.camera.matrix = this.viewTransform.clone().invert().multiply(new Matrix4().makeTranslation(0, 0, 1));
         this.camera.updateMatrixWorld(true);
         this.camera.updateProjectionMatrix();
 
+        console.time('render');
         this.composer.render();
+        console.timeEnd('render');
 
         this.dirty = false;
         messageBus.emit('renderer.renderComplete');
@@ -308,13 +317,23 @@ export class Webgl2RendererBackend {
         const texture = await meshController.getTexture();
         if (!texture) return [];
         const transform = meshController.getTransform();
-        return this.selectionMask.applyToTextureAlphaChannel(
-            texture,
-            new Matrix4().multiply(transform),
-            this.textureTileSize,
-            this.renderer,
-            options?.invert,
-        );
+        try {
+            this.rendererBusy = true;
+            const tiles = await this.selectionMask.applyToTextureAlphaChannel(
+                texture,
+                new Matrix4().multiply(transform),
+                this.textureTileSize,
+                this.renderer,
+                options?.invert,
+            );
+            this.rendererBusy = false;
+            this.dirty = true;
+            return tiles;
+        } catch (error) {
+            this.rendererBusy = false;
+            console.error('[renderers/webgl2/backend/renderer.ts] Error when applying selection mask.', error);
+        }
+        return [];
     }
 
     async takeSnapshot(
@@ -322,6 +341,7 @@ export class Webgl2RendererBackend {
         imageHeight: number,
         options?: Webgl2RendererBackendTakeSnapshotOptions
     ): Promise<ImageBitmap> {
+        console.time('takeSnapshot');
 
         let filtersOverride: Webgl2RendererCanvasFilter[] | undefined;
         if (options?.filters) {
@@ -344,79 +364,97 @@ export class Webgl2RendererBackend {
         }
         snapshotCamera.projectionMatrix.scale(
             new Vector3(imageWidth / this.imageWidth, imageHeight / this.imageHeight, 1)
-        )
+        );
 
-        if (!this.snapshotCanvas) {
-            this.snapshotCanvas = createCanvas(imageWidth, imageHeight);
-        }
+        const snapshotRenderTarget = new WebGLRenderTarget(imageWidth, imageHeight, {
+            type: UnsignedByteType,
+            minFilter: LinearFilter,
+            magFilter: LinearFilter,
+            format: RGBAFormat,
+            depthBuffer: false,
+            colorSpace: SRGBColorSpace,
+            stencilBuffer: false,
+        });
 
-        if (!this.snapshotRenderer) {
-            this.snapshotRenderer = new WebGLRenderer({
-                alpha: true,
-                canvas: this.snapshotCanvas,
-                premultipliedAlpha: false,
-                preserveDrawingBuffer: true,
-                powerPreference: 'high-performance'
-            });
-            this.snapshotRenderer.setClearColor(0x000000, 0);
-            this.snapshotRenderer.outputColorSpace = SRGBColorSpace;
-        }
-        this.snapshotRenderer.setSize(imageWidth, imageHeight);
+        this.rendererBusy = true;
 
-        if (!this.snapshotComposer) {
-            this.snapshotComposer = new EffectComposer(this.snapshotRenderer);
-        } else {
-            this.snapshotComposer.setSize(imageWidth, imageHeight);
-        }
+        const originalRendererViewport = new Vector4();
+        this.renderer.getViewport(originalRendererViewport);
 
-        const selectionMaskWasVisible = !!(this.selectionMask?.visible);
-        if (this.selectionMask) {
-            this.selectionMask.visible = false;
-        }
+        try {
 
-        const imageBoundaryMaskWasVisible = !!(this.imageBoundaryMask?.visible);
-        if (this.imageBoundaryMask) {
-            this.imageBoundaryMask.visible = false;
-        }
+            this.renderer.setRenderTarget(snapshotRenderTarget);
+            this.renderer.setViewport(0, 0, imageWidth, imageHeight);
 
-        if (options?.layerIds) {
-            for (const layerId of options.layerIds) {
-                const meshController = this.meshControllersById.get(layerId);
-                meshController?.overrideVisibility(true);
-                if (filtersOverride) {
-                    await meshController?.overrideFilters(filtersOverride);
+            if (!this.snapshotComposer) {
+                this.snapshotComposer = new EffectComposer(this.renderer, snapshotRenderTarget);
+            } else {
+                this.snapshotComposer.reset(snapshotRenderTarget);
+                this.snapshotComposer.setSize(imageWidth, imageHeight);
+            }
+
+            const selectionMaskWasVisible = !!(this.selectionMask?.visible);
+            if (this.selectionMask) {
+                this.selectionMask.visible = false;
+            }
+
+            const imageBoundaryMaskWasVisible = !!(this.imageBoundaryMask?.visible);
+            if (this.imageBoundaryMask) {
+                this.imageBoundaryMask.visible = false;
+            }
+
+            if (options?.layerIds) {
+                for (const layerId of options.layerIds) {
+                    const meshController = this.meshControllersById.get(layerId);
+                    meshController?.overrideVisibility(true);
+                    if (filtersOverride) {
+                        await meshController?.overrideFilters(filtersOverride);
+                    }
                 }
             }
-        }
 
-        this.createLayerPasses(this.snapshotComposer, snapshotCamera, options?.layerIds);
+            this.createLayerPasses(this.snapshotComposer, snapshotCamera, options?.layerIds);
+            this.snapshotComposer.renderToScreen = false;
 
-        this.snapshotComposer.render();
+            this.snapshotComposer.render();
 
-        if (selectionMaskWasVisible && this.selectionMask) {
-            this.selectionMask.visible = true;
-        }
-        if (imageBoundaryMaskWasVisible && this.imageBoundaryMask) {
-            this.imageBoundaryMask.visible = true;
-        }
+            if (selectionMaskWasVisible && this.selectionMask) {
+                this.selectionMask.visible = true;
+            }
+            if (imageBoundaryMaskWasVisible && this.imageBoundaryMask) {
+                this.imageBoundaryMask.visible = true;
+            }
 
-        if (options?.layerIds) {
-            for (const layerId of options.layerIds) {
-                const meshController = this.meshControllersById.get(layerId);
-                meshController?.overrideVisibility(undefined);
-                if (filtersOverride) {
-                    meshController?.overrideFilters(undefined);
+            if (options?.layerIds) {
+                for (const layerId of options.layerIds) {
+                    const meshController = this.meshControllersById.get(layerId);
+                    meshController?.overrideVisibility(undefined);
+                    if (filtersOverride) {
+                        meshController?.overrideFilters(undefined);
+                    }
                 }
             }
+
+            this.createLayerPasses();
+        } catch (error) {
+            console.error('[renderers/webgl2/backend/renderer] Error taking snapshot. ', error);
         }
 
-        this.createLayerPasses();
+        this.renderer.setViewport(originalRendererViewport);
+        this.rendererBusy = false;
 
-        if (window.OffscreenCanvas && this.snapshotCanvas instanceof window.OffscreenCanvas) {
-            return this.snapshotCanvas.transferToImageBitmap();
-        } else {
-            return createImageBitmap(this.snapshotCanvas, 0, 0, imageWidth, imageHeight, { imageOrientation: 'none' });
-        }
+        const buffer = new Uint8Array(imageWidth * imageHeight * 4);
+        await this.renderer.readRenderTargetPixelsAsync(snapshotRenderTarget, 0, 0, imageWidth, imageHeight, buffer);
+
+        const bitmap = await createImageBitmap(
+            new ImageData(new Uint8ClampedArray(buffer), imageWidth, imageHeight),
+            { imageOrientation: 'flipY' }
+        );
+
+        snapshotRenderTarget.dispose();
+
+        console.timeEnd('takeSnapshot');
+        return bitmap;
     }
 
     dispose() {

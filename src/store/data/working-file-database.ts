@@ -352,7 +352,7 @@ export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNe
     }
     if (updateWorkingFileLayerRequestIds.get(layer.id) !== requestId) return;
 
-    const storedLayer: Record<string, any> = { ...layer };
+    const storedLayer: Record<string, any> = { ...layer, data: { ...(layer as any).data ?? {} } };
     storedLayer.thumbnailImageSrc = null;
     storedLayer.drafts = null;
     storedLayer.bakedImage = null;
@@ -362,7 +362,7 @@ export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNe
     delete storedLayer.layers;
     if (storedLayer.type === 'raster') {
         const storedRasterLayer = storedLayer as WorkingFileRasterLayer;
-        storedRasterLayer.data.updateChunks = undefined;
+        delete storedRasterLayer.data.tileUpdates;
         const originalSourceUuid = (existingLayer as any)?.data?.originalSourceUuid ?? null;
         if (storedRasterLayer.data.sourceUuid && storedRasterLayer.data.sourceUuid != originalSourceUuid) {
             (storedRasterLayer.data as any).originalSourceUuid = originalSourceUuid;
@@ -390,7 +390,7 @@ export async function updateWorkingFileLayer(layer: WorkingFileLayer, assumeIsNe
         const storedRasterSequenceLayer = storedLayer as WorkingFileRasterSequenceLayer;
         for (const [frameIndex, frame] of storedRasterSequenceLayer.data.sequence.entries()) {
             frame.thumbnailImageSrc = null;
-            frame.image.updateChunks = undefined;
+            frame.image.tileUpdates = undefined;
             let originalSourceUuid = null;
             const existingFrame = (existingLayer as unknown as WorkingFileRasterSequenceLayer)?.data?.sequence?.[frameIndex] ?? null;
             if (existingFrame) {

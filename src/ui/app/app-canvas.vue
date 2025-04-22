@@ -11,8 +11,8 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, inject, onMounted,
-    onUnmounted, ref, toRefs, watch, type Ref
+    computed, defineComponent, inject, nextTick, onMounted,
+    ref, toRefs, watch, type Ref
 } from 'vue';
 
 import { t } from '@/i18n';
@@ -94,8 +94,7 @@ export default defineComponent({
             canvasStore.set('dirty', true);
         });
 
-        watch(() => canvasStore.state.viewDirty, (viewDirty) => {
-            if (!viewDirty) return;
+        watch(() => canvasStore.state.viewDirty, () => {
             calculateCssViewTransform();
         });
 

@@ -4,6 +4,7 @@ uniform sampler2D baseMap;
 uniform sampler2D selectionMaskMap;
 uniform vec4 tileOffsetAndSize;
 uniform mat4 selectionMaskTransform;
+uniform float selectionMaskAlpha;
 
 float linearSrgbChannelToSrgbChannel(float value) {
     float calculatedValue = 0.0;
@@ -33,12 +34,12 @@ void main() {
 #if cInvert == 1
     gl_FragColor = vec4(
         baseColor.rgb,
-        baseColor.a * (1.0 - selectionMaskVisible * selectionMaskColor.a)
+        baseColor.a * (1.0 - selectionMaskVisible * selectionMaskAlpha * selectionMaskColor.a)
     );
 #else
     gl_FragColor = vec4(
         baseColor.rgb,
-        baseColor.a * (selectionMaskVisible * selectionMaskColor.a)
+        baseColor.a * (selectionMaskVisible * selectionMaskAlpha * selectionMaskColor.a)
     );
 #endif
 

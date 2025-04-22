@@ -59,15 +59,16 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
 
         this.drawablePreviewCanvas = new DrawableCanvas({ scale: 1 });
         this.drawablePreviewCanvas.initialized();
-        this.drawablePreviewCanvas.onDrawn((event) => {
+        this.drawablePreviewCanvas.onDrawn(async (event) => {
             if (this.activeDraftUuid == null) return;
             for (const layer of this.drawingOnLayers) {
                 const draftIndex = layer.drafts?.findIndex((draft) => draft.uuid === this.activeDraftUuid) ?? -1;
                 if (!layer.drafts?.[draftIndex]) continue;
-                layer.drafts[draftIndex].updateChunks.push({
+                const canvasUuid = await createStoredImage(event.canvas);
+                layer.drafts[draftIndex].tileUpdates.push({
                     x: event.sourceX,
                     y: event.sourceY,
-                    data: event.canvas,
+                    sourceUuid: canvasUuid,
                 });
                 layer.drafts[draftIndex].lastUpdateTimestamp = window.performance.now();
             }
@@ -314,7 +315,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                     logicalWidth,
                     logicalHeight,
                     transform: layerGlobalTransformSelfExcluded.inverse(),
-                    updateChunks: [],
+                    tileUpdates: [],
                 });
             }
         }
@@ -436,14 +437,16 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                             layerUpdateCanvas = await blitActiveSelectionMask(layerUpdateCanvas, layerTransform);
                         }
 
+                        const layerUpdateCanvasUuid = await createStoredImage(layerUpdateCanvas);
+
                         layerActions.push(
                             new UpdateLayerAction<UpdateRasterLayerOptions>({
                                 id: layer.id,
                                 data: {
-                                    updateChunks: [{
+                                    tileUpdates: [{
                                         x: sourceX,
                                         y: sourceY,
-                                        data: layerUpdateCanvas,
+                                        sourceUuid: layerUpdateCanvasUuid,
                                         mode: 'source-over',
                                     }],
                                 }

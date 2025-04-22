@@ -54,7 +54,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
         });
 
         this.drawablePreviewCanvas = new DrawableCanvas({ scale: 1 });
-        this.drawablePreviewCanvas.onDrawn((event) => {
+        this.drawablePreviewCanvas.onDrawn(async (event) => {
             if (this.activeDraftUuid == null) return;
             for (const layer of this.erasingOnLayers) {
                 const draftIndex = layer.drafts?.findIndex((draft) => draft.uuid === this.activeDraftUuid) ?? -1;
@@ -81,10 +81,12 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                 draftCtx.drawImage(event.canvas, 0, 0);
                 draftCtx.globalCompositeOperation = 'source-over';
 
-                layer.drafts[draftIndex].updateChunks.push({
+                const draftUuid = await createStoredImage(draftCanvas);
+
+                layer.drafts[draftIndex].tileUpdates.push({
                     x: event.sourceX,
                     y: event.sourceY,
-                    data: draftCanvas,
+                    sourceUuid: draftUuid,
                     mode: 'replace',
                 });
                 layer.drafts[draftIndex].lastUpdateTimestamp = window.performance.now();
@@ -300,6 +302,8 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                 draftCtx.imageSmoothingEnabled = true;
                 draftCtx.drawImage(sourceImage, 0, 0);
 
+                const draftCanvasUuid = await createStoredImage(draftCanvas);
+
                 layer.drafts.push({
                     uuid: this.activeDraftUuid,
                     lastUpdateTimestamp: window.performance.now(),
@@ -309,10 +313,10 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                     logicalHeight,
                     mode: 'replace',
                     transform: layerGlobalTransformSelfExcluded.inverse(),
-                    updateChunks: [{
+                    tileUpdates: [{
                         x: leftBound,
                         y: topBound,
-                        data: draftCanvas,
+                        sourceUuid: draftCanvasUuid,
                         mode: 'replace',
                     }],
                 });
@@ -440,14 +444,16 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                         eraseCtx.globalCompositeOperation = 'source-over';
                         layerUpdateCanvas = eraseCanvas;
 
+                        const layerUpdateCanvasUuid = await createStoredImage(layerUpdateCanvas);
+
                         layerActions.push(
                             new UpdateLayerAction<UpdateRasterLayerOptions>({
                                 id: layer.id,
                                 data: {
-                                    updateChunks: [{
+                                    tileUpdates: [{
                                         x: sourceX,
                                         y: sourceY,
-                                        data: layerUpdateCanvas,
+                                        sourceUuid: layerUpdateCanvasUuid,
                                         mode: 'replace',
                                     }],
                                 }

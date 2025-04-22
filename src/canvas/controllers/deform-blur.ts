@@ -58,7 +58,7 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
             scale: 1,
             forceDrawOnMainThread: true, // TODO - remove this!!!!
         });
-        this.drawablePreviewCanvas.onDrawn((event) => {
+        this.drawablePreviewCanvas.onDrawn(async (event) => {
             if (this.activeDraftUuid == null) return;
             for (const layer of this.blurringOnLayers) {
                 const draftIndex = layer.drafts?.findIndex((draft) => draft.uuid === this.activeDraftUuid) ?? -1;
@@ -85,10 +85,12 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
                 // draftCtx.drawImage(event.canvas, 0, 0);
                 // draftCtx.globalCompositeOperation = 'source-over';
 
-                layer.drafts[draftIndex].updateChunks.push({
+                const canvasUuid = await createStoredImage(event.canvas);
+
+                layer.drafts[draftIndex].tileUpdates.push({
                     x: event.sourceX,
                     y: event.sourceY,
-                    data: event.canvas,
+                    sourceUuid: canvasUuid,
                 });
                 layer.drafts[draftIndex].lastUpdateTimestamp = window.performance.now();
             }
@@ -306,6 +308,8 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
                     .scaleSelf(width / logicalWidth, height / logicalHeight)
                     .translateSelf(leftBound, topBound);
 
+                const draftCanvasUuid = await createStoredImage(draftCanvas);
+
                 layer.drafts.push({
                     uuid: this.activeDraftUuid,
                     lastUpdateTimestamp: window.performance.now(),
@@ -315,10 +319,10 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
                     logicalHeight,
                     mode: 'source-over',
                     transform: layerGlobalTransformSelfExcluded.inverse(),
-                    updateChunks: [{
+                    tileUpdates: [{
                         x: leftBound,
                         y: topBound,
-                        data: draftCanvas,
+                        sourceUuid: draftCanvasUuid,
                     }],
                 });
             }
@@ -450,14 +454,16 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
                         blurCtx.globalCompositeOperation = 'source-over';
                         layerUpdateCanvas = blurCanvas;
 
+                        const layerUpdateCanvasUuid = await createStoredImage(layerUpdateCanvas);
+
                         layerActions.push(
                             new UpdateLayerAction<UpdateRasterLayerOptions>({
                                 id: layer.id,
                                 data: {
-                                    updateChunks: [{
+                                    tileUpdates: [{
                                         x: sourceX,
                                         y: sourceY,
-                                        data: layerUpdateCanvas,
+                                        sourceUuid: layerUpdateCanvasUuid,
                                         mode: 'replace',
                                     }],
                                 }

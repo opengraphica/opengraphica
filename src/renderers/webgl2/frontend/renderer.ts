@@ -1,4 +1,4 @@
-import { toRefs, watch, type WatchStopHandle } from 'vue';
+import { nextTick, toRefs, watch, type WatchStopHandle } from 'vue';
 
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
@@ -121,12 +121,18 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         this.onEditorHistoryStep = this.onEditorHistoryStep.bind(this);
         appEmitter.on('editor.history.step', this.onEditorHistoryStep);
 
+        let viewDirtyTrail = false;
+        const setViewDirtyTrail = () => {
+            viewDirtyTrail = true;
+        };
+
         const renderLoop = () => {
             if (!this.rendererBackend) return;
             const isViewDirty = canvasStore.get('viewDirty');
             const isPlayingAnimation = canvasStore.get('playingAnimation');
 
-            if (isViewDirty) {
+            if (isViewDirty || viewDirtyTrail) {
+                viewDirtyTrail = false;
                 canvasStore.set('viewDirty', false);
                 const transform = canvasStore.get('transform');
                 this.rendererBackend?.setViewTransform(
@@ -137,6 +143,9 @@ export class Webgl2RenderFrontend implements RendererFrontend {
                         transform.m14, transform.m24, transform.m34, transform.m44,
                     ])
                 );
+                if (isViewDirty) {
+                    nextTick(setViewDirtyTrail);
+                }
             }
 
             if (isPlayingAnimation) {

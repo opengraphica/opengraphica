@@ -1,11 +1,12 @@
 import { markRaw, nextTick, toRefs, watch, type WatchStopHandle } from 'vue';
 
 import canvasStore from '@/store/canvas';
+import { getStoredImageOrCanvas } from '@/store/image';
+import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 
 import { createRasterShaderMaterial } from './shaders';
 import { assignMaterialBlendModes } from './blending';
 import { createFiltersFromLayerConfig, combineFiltersToShader } from '../../filters';
-import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 
 import { NearestFilter, RGBAFormat, SRGBColorSpace } from 'three/src/constants';
 import { ImagePlaneGeometry } from './geometries/image-plane-geometry';
@@ -225,7 +226,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
                     draftAssets.plane.renderOrder = this.order + 0.2;
                     draftAssets.plane.matrixAutoUpdate = false;
                     draftAssets.plane.onBeforeRender = (renderer) => {
-                        this.applyDraftUpdateChunks(renderer, draftUpdate.uuid);
+                        this.applyDraftTileUpdates(renderer, draftUpdate.uuid);
                     };
                     (this.threejsScene ?? canvasStore.get('threejsScene'))?.add(draftAssets.plane);
 
@@ -267,7 +268,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
                     );
                 }
 
-                if (draftUpdate.updateChunks.length > 0) {
+                if (draftUpdate.tileUpdates.length > 0) {
                     canvasStore.set('dirty', true);
                 }
 
@@ -316,7 +317,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
         // Override
     }
 
-    private async applyDraftUpdateChunks(renderer: WebGLRenderer, draftUuid: string) {
+    private async applyDraftTileUpdates(renderer: WebGLRenderer, draftUuid: string) {
         const draftAssets = this.draftAssetMap.get(draftUuid);
         if (!draftAssets) return;
         const draft = draftAssets.latestDraftUpdate;
@@ -324,18 +325,18 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
         renderer = renderer ?? canvasStore.get('threejsRenderer')!;
         const draftWidth = draftAssets.planeTexture.image.width;
         const draftHeight = draftAssets.planeTexture.image.height;
-        for (const chunk of draft.updateChunks) {
-            let chunkImage: HTMLCanvasElement | ImageBitmap = chunk.data;
+        for (const chunk of draft.tileUpdates) {
+            let chunkImage = getStoredImageOrCanvas(chunk.sourceUuid);
 
-            if (chunk.x > draftWidth || chunk.y > draftHeight) continue;
+            if (!chunkImage || chunk.x > draftWidth || chunk.y > draftHeight) continue;
 
             // Crop the chunk if it is outside the bounds of the draft texture
             let shouldCloseChunkImage = false;
-            let chunkWidth = chunk.data.width;
-            let chunkHeight = chunk.data.height;
-            if (chunk.x + chunk.data.width > draftWidth || chunk.y + chunk.data.height > draftHeight) {
-                chunkWidth = Math.min(chunk.data.width, draftWidth - chunk.x);
-                chunkHeight = Math.min(chunk.data.height, draftHeight - chunk.y);
+            let chunkWidth = chunkImage.width;
+            let chunkHeight = chunkImage.height;
+            if (chunk.x + chunkImage.width > draftWidth || chunk.y + chunkImage.height > draftHeight) {
+                chunkWidth = Math.min(chunkImage.width, draftWidth - chunk.x);
+                chunkHeight = Math.min(chunkImage.height, draftHeight - chunk.y);
                 const canvas = document.createElement('canvas');
                 canvas.width = chunkWidth;
                 canvas.height = chunkHeight;
@@ -377,7 +378,7 @@ export default class BaseLayerRenderer implements WorkingFileLayerRenderer<Color
             }
             chunkTexture.dispose();
         }
-        draft.updateChunks = [];
+        draft.tileUpdates = [];
     }
 
     private createDraftAssets(): DraftAssets {

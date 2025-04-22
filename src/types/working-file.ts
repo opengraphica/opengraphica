@@ -107,10 +107,11 @@ export interface WorkingFileTimeline {
     }
 }
 
-export interface WorkingFileLayerDraftChunk {
+export interface WorkingFileLayerRasterTileUpdate {
     x: number;
     y: number;
-    data: HTMLCanvasElement;
+    oldSourceUuid?: string;
+    sourceUuid: string;
     mode?: 'replace' | 'source-over';
 }
 
@@ -122,7 +123,7 @@ export interface WorkingFileLayerDraft {
     logicalWidth: number; // The pixel width of the preview data, stretched to `width`
     mode?: 'replace' | 'source-over'; // If 'replace', the original layer contents will not be drawn while the draft is in place.
     transform: DOMMatrix; // Should be an inverse transform to undo the global transform
-    updateChunks: WorkingFileLayerDraftChunk[]; // List of canvas chunks to update a raster image preview
+    tileUpdates: WorkingFileLayerRasterTileUpdate[]; // List of canvas chunks to update a raster image preview
     width: number; // The actual width drawn across the canvas
 }
 
@@ -198,8 +199,9 @@ export interface WorkingFileRasterLayer<T extends ColorModel = ColorModel> exten
     type: 'raster';
     data: {
         sourceUuid?: string;
-        updateChunks?: WorkingFileLayerDraftChunk[];
-        chunkUpdateId?: string; // This value changes every chunk update to trigger a re-render
+        tileUpdates?: WorkingFileLayerRasterTileUpdate[];
+        tileUpdateId?: string; // This value changes every chunk update to trigger a re-render
+        alreadyRendererd?: boolean; // Stalls tileUpdateId generation for one update
     }
 }
 

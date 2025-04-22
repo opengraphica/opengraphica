@@ -321,7 +321,7 @@ export function cleanDrawImageWebglCache() {
 /**
  * Draws an image to a canvas using WebGL, which allows for alpha blending in linear RGB color space.
  */
-export async function drawImageToCanvas2d(targetCanvas: HTMLCanvasElement, sourceImage: HTMLCanvasElement, x: number, y: number, blendMode: string = 'source-over') {
+export async function drawImageToCanvas2d(targetCanvas: HTMLCanvasElement, sourceImage: HTMLCanvasElement | ImageBitmap, x: number, y: number, blendMode: string = 'source-over') {
     const targetImageCtx = targetCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
     if (!targetImageCtx) return;
 
