@@ -24,12 +24,13 @@ void main() {
     localUV.y = 1.0 - localUV.y;
     
     vec4 selectedColor = texture2D(selectedMaskMap, localUV);
-    selectedColor.a *= step(localUV.x, 1.0);
-    selectedColor.a *= step(0.0, localUV.x);
-    selectedColor.a *= step(localUV.y, 1.0);
-    selectedColor.a *= step(0.0, localUV.y);
+    selectedColor.a *= step(localUV.x, 1.0) * step(0.0, localUV.x) * step(localUV.y, 1.0) * step(0.0, localUV.y);
 
+#if cUseClipping == 1
+    unselectedColor.a = selectedColor.a;
+#else
     unselectedColor.a = clamp(unselectedColor.a - selectedColor.a, 0.0, 1.0);
+#endif
 
     gl_FragColor = unselectedColor;
 

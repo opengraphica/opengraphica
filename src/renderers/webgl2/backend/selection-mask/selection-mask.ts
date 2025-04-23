@@ -1,6 +1,7 @@
 import {
-    ClampToEdgeWrapping, DoubleSide, LinearFilter, LinearSRGBColorSpace, NearestFilter,
-    SRGBColorSpace, RepeatWrapping, RGBAFormat, UnsignedByteType,
+    ClampToEdgeWrapping, CustomBlending, DoubleSide, LinearFilter, LinearSRGBColorSpace, NearestFilter,
+    NormalBlending, OneFactor, OneMinusSrcAlphaFactor, SrcAlphaFactor, SRGBColorSpace, RepeatWrapping,
+    RGBAFormat, UnsignedByteType, ZeroFactor,
 } from 'three/src/constants';
 import { Box2 } from 'three/src/math/Box2';
 import { Matrix4 } from 'three/src/math/Matrix4';
@@ -65,6 +66,9 @@ export class SelectionMask {
             vertexShader: selectionMaskVertexShader,
             fragmentShader: selectionMaskFragmentShader,
             side: DoubleSide,
+            defines: {
+                cUseClipping: 0,
+            },
             uniforms: {
                 unselectedMaskMap: { value: selectionMaskUnselectedPatternTexture },
                 selectedMaskMap: { value: undefined },
@@ -81,6 +85,24 @@ export class SelectionMask {
         this.selectionMaskMesh.frustumCulled = false;
         this.selectionMaskMesh.visible = false;
         this.scene.add(this.selectionMaskMesh);
+    }
+
+    useClipping(clip: boolean) {
+        if (clip) {
+            this.selectionMaskMaterial.defines.cUseClipping = 1;
+            this.selectionMaskMaterial.blending = CustomBlending;
+            this.selectionMaskMaterial.blendSrc = ZeroFactor;
+            this.selectionMaskMaterial.blendDst = OneFactor;
+            this.selectionMaskMaterial.blendSrcAlpha = OneFactor;
+            this.selectionMaskMaterial.blendDstAlpha = ZeroFactor;
+        } else {
+            this.selectionMaskMaterial.defines.cUseClipping = 0;
+            this.selectionMaskMaterial.blending = NormalBlending;
+            this.selectionMaskMaterial.blendSrc = SrcAlphaFactor;
+            this.selectionMaskMaterial.blendDst = OneMinusSrcAlphaFactor;
+            this.selectionMaskMaterial.blendSrcAlpha = null;
+            this.selectionMaskMaterial.blendDstAlpha = null;
+        }
     }
 
     setImage(image?: ImageBitmap, offset?: { x: number, y: number }) {
@@ -110,7 +132,6 @@ export class SelectionMask {
     async applyToTextureAlphaChannel(
         texture: Texture,
         maskTransform: Matrix4,
-        tileSize: number,
         renderer: WebGLRenderer,
         invert: boolean = false,
     ): Promise<RendererTextureTile[]> {
@@ -129,6 +150,12 @@ export class SelectionMask {
         const selectionMaskOffset = this.selectionMaskMaterial.uniforms.selectedMaskOffset.value;
         const selectionMaskWidth = selectionMaskMap.image.width;
         const selectionMaskHeight = selectionMaskMap.image.height;
+
+        const maxTileSize = 8192;
+        const minTileSize = 64;
+        const approxTileCount = Math.ceil(Math.sqrt(selectionMaskWidth * selectionMaskHeight) / 1024);
+        const estimatedTileSize = Math.max(minTileSize, Math.min(maxTileSize, Math.floor(Math.sqrt((selectionMaskWidth * selectionMaskHeight) / approxTileCount))));
+        const tileSize = Math.pow(2, Math.round(Math.log2(estimatedTileSize)));
 
         const material = new ShaderMaterial({
             defines: {

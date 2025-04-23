@@ -262,6 +262,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
             cameraTransform,
             layerIds,
             filters: options?.filters,
+            applySelectionMask: options?.applySelectionMask,
         });
     }
 

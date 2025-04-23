@@ -1,8 +1,7 @@
 import { BaseAction } from './base';
 
 import {
-    activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask,
-    appliedSelectionMaskCanvasOffset, blitActiveSelectionMask
+    activeSelectionMask, appliedSelectionMask,
 } from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
 import { getStoredImageOrCanvas, createStoredImage } from '@/store/image';

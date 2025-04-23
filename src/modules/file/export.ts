@@ -87,14 +87,15 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                 const snapshotBitmap = await renderer.takeSnapshot(canvas.width, canvas.height, {
                     cameraTransform: options.cameraTransform,
                     layerIds: options.layerSelection === 'selected' ? workingFileStore.state.selectedLayerIds : undefined,
+                    applySelectionMask: options.blitActiveSelectionMask && (activeSelectionMask.value != null || appliedSelectionMask.value != null),
                 });
                 const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
                 ctx.drawImage(snapshotBitmap, 0, 0);
                 snapshotBitmap.close();
             }
-            if (options.blitActiveSelectionMask && (activeSelectionMask.value != null || appliedSelectionMask.value != null)) {
-                canvas = await blitActiveSelectionMask(canvas, new DOMMatrix(), 'source-in');
-            }
+            // if (options.blitActiveSelectionMask && (activeSelectionMask.value != null || appliedSelectionMask.value != null)) {
+            //     canvas = await blitActiveSelectionMask(canvas, new DOMMatrix(), 'source-in');
+            // }
 
             if (options.toNewLayer) {
                 historyStore.dispatch('runAction', {

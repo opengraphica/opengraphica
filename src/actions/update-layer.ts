@@ -61,8 +61,6 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
         this.updateLayerType = layer.type;
         let hasChangedLayerType = false;
 
-        const renderer = canvasStore.get('renderer');
-
         const layerUpdateProps = Object.keys(this.updateLayerOptions).sort((aKey, bKey) => {
             if (aKey === 'type' && bKey !== 'type') return -1;
             if (aKey !== 'type' && bKey === 'type') return 1;

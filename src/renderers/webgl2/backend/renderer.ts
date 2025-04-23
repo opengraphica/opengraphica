@@ -45,6 +45,7 @@ export interface Webgl2RendererBackendTakeSnapshotOptions {
     cameraTransform?: Float64Array;
     layerIds?: Uint32Array;
     filters?: WorkingFileLayerFilter[];
+    applySelectionMask?: boolean;
 }
 
 export interface Webgl2RendererApplySelectionMaskToAlphaChannelOptions {
@@ -67,7 +68,6 @@ export class Webgl2RendererBackend {
     snapshotComposer?: EffectComposer;
     snapshotRenderer?: WebGLRenderer;
 
-    textureTileSize: number = 512;
     maxTextureSize: number = 2048;
     viewTransform: Matrix4 = new Matrix4();
     imageWidth: number = 1;
@@ -303,9 +303,7 @@ export class Webgl2RendererBackend {
         this.camera.updateMatrixWorld(true);
         this.camera.updateProjectionMatrix();
 
-        console.time('render');
         this.composer.render();
-        console.timeEnd('render');
 
         this.dirty = false;
         messageBus.emit('renderer.renderComplete');
@@ -322,7 +320,6 @@ export class Webgl2RendererBackend {
             const tiles = await this.selectionMask.applyToTextureAlphaChannel(
                 texture,
                 new Matrix4().multiply(transform),
-                this.textureTileSize,
                 this.renderer,
                 options?.invert,
             );
@@ -395,7 +392,12 @@ export class Webgl2RendererBackend {
 
             const selectionMaskWasVisible = !!(this.selectionMask?.visible);
             if (this.selectionMask) {
-                this.selectionMask.visible = false;
+                if (options?.applySelectionMask) {
+                    this.selectionMask.visible = false;    
+                    this.selectionMask.useClipping(true);
+                } else {
+                    this.selectionMask.visible = false;
+                }
             }
 
             const imageBoundaryMaskWasVisible = !!(this.imageBoundaryMask?.visible);
@@ -418,8 +420,9 @@ export class Webgl2RendererBackend {
 
             this.snapshotComposer.render();
 
-            if (selectionMaskWasVisible && this.selectionMask) {
-                this.selectionMask.visible = true;
+            if (this.selectionMask) {
+                this.selectionMask.visible = selectionMaskWasVisible;
+                this.selectionMask.useClipping(false);
             }
             if (imageBoundaryMaskWasVisible && this.imageBoundaryMask) {
                 this.imageBoundaryMask.visible = true;
