@@ -22,7 +22,7 @@ import selectionMaskFragmentShader from './shader/selection-mask.frag';
 import applySelectionMaskToAlphaChannelVertexShader from './shader/apply-selection-mask-to-alpha-channel.vert';
 import applySelectionMaskToAlphaChannelFragmentShader from './shader/apply-selection-mask-to-alpha-channel.frag';
 
-import type { Camera, WebGLRenderer } from 'three';
+import type { Camera, PixelFormatGPU, TextureDataType, WebGLRenderer } from 'three';
 import type { RendererTextureTile } from '@/types';
 
 const selectionMaskPatternSrc = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAABg2lDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV/TiiIVh3YQcchQnVoQFXHUKhShQqgVWnUwufQLmjQkKS6OgmvBwY/FqoOLs64OroIg+AHi6OSk6CIl/i8ptIjx4Lgf7+497t4BQrPKNCs0Dmi6bWZSSTGXXxV7XyEgghDiCMjMMuYkKQ3f8XWPAF/vEjzL/9yfY0AtWAwIiMSzzDBt4g3i6U3b4LxPHGVlWSU+J46bdEHiR64rHr9xLrks8Myomc3ME0eJxVIXK13MyqZGPEUcUzWd8oWcxyrnLc5atc7a9+QvDBf0lWWu0xxBCotYggQRCuqooAobCVp1UixkaD/p4x92/RK5FHJVwMixgBo0yK4f/A9+d2sVJye8pHAS6HlxnI9RoHcXaDUc5/vYcVonQPAZuNI7/loTmPkkvdHRYkfA4DZwcd3RlD3gcgcYejJkU3alIE2hWATez+ib8kDkFuhf83pr7+P0AchSV+kb4OAQGCtR9rrPu/u6e/v3TLu/Hx5FcoXj45C+AAAABmJLR0QATgBOAE714JEKAAAACXBIWXMAAC4jAAAuIwF4pT92AAAAB3RJTUUH5gITBDkEOkUYUQAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAAtSURBVAjXY/z//383AxT4+/szMCFzNm7cCBGAcRgYGBiYz58/7wbjMDAwMAAAGKUPRK2REh8AAAAASUVORK5CYII=';
@@ -95,6 +95,7 @@ export class SelectionMask {
             this.selectionMaskMaterial.blendDst = OneFactor;
             this.selectionMaskMaterial.blendSrcAlpha = OneFactor;
             this.selectionMaskMaterial.blendDstAlpha = ZeroFactor;
+            this.selectionMaskMaterial.needsUpdate = true;
         } else {
             this.selectionMaskMaterial.defines.cUseClipping = 0;
             this.selectionMaskMaterial.blending = NormalBlending;
@@ -102,6 +103,7 @@ export class SelectionMask {
             this.selectionMaskMaterial.blendDst = OneMinusSrcAlphaFactor;
             this.selectionMaskMaterial.blendSrcAlpha = null;
             this.selectionMaskMaterial.blendDstAlpha = null;
+            this.selectionMaskMaterial.needsUpdate = true;
         }
     }
 
@@ -110,11 +112,13 @@ export class SelectionMask {
         this.selectionMaskMaterial.uniforms.selectedMaskMap.value?.image?.close?.();
         if (image) {
             const selectionMaskTexture = new Texture(image);
+            selectionMaskTexture.type = UnsignedByteType;
             selectionMaskTexture.magFilter = NearestFilter;
             selectionMaskTexture.minFilter = LinearFilter;
             selectionMaskTexture.wrapS = ClampToEdgeWrapping;
             selectionMaskTexture.wrapT = ClampToEdgeWrapping;
             selectionMaskTexture.colorSpace = SRGBColorSpace;
+            selectionMaskTexture.format = RGBAFormat;
             selectionMaskTexture.needsUpdate = true;
             this.selectionMaskMaterial.uniforms.selectedMaskMap.value = selectionMaskTexture;
             this.selectionMaskMaterial.uniforms.selectedMaskSize.value = [image.width, image.height];
@@ -126,6 +130,11 @@ export class SelectionMask {
             this.selectionMaskMaterial.uniforms.selectedMaskOffset.value = [0, 0];
             this.selectionMaskMesh.visible = false;
         }
+        this.selectionMaskMaterial.needsUpdate = true;
+    }
+
+    setCamera(camera: Camera) {
+        this.selectionMaskMaterial.uniforms.inverseProjectionMatrix.value = camera.projectionMatrixInverse.elements;
         this.selectionMaskMaterial.needsUpdate = true;
     }
 
@@ -254,13 +263,13 @@ export class SelectionMask {
                 renderer.setViewport(0, 0, tileWidth, tileHeight);
 
                 // Render unmasked tile
-                const beforeTile = await this.createTileRenderTarget(tileWidth, tileHeight);
+                const beforeTile = await this.createTileRenderTarget(tileWidth, tileHeight, texture.type, texture.internalFormat, texture.colorSpace);
                 renderer.setRenderTarget(beforeTile);
                 material.uniforms.selectionMaskAlpha.value = 0;
                 renderer.render(scene, camera);
 
                 // Render masked tile
-                const afterTile = await this.createTileRenderTarget(tileWidth, tileHeight);
+                const afterTile = await this.createTileRenderTarget(tileWidth, tileHeight, texture.type, texture.internalFormat, texture.colorSpace);
                 renderer.setRenderTarget(afterTile);
                 material.uniforms.selectionMaskAlpha.value = 1;
                 material.needsUpdate = true;
@@ -311,7 +320,13 @@ export class SelectionMask {
         return tileBitmaps;
     }
 
-    async createTileRenderTarget(tileWidth: number, tileHeight: number): Promise<WebGLRenderTarget> {
+    async createTileRenderTarget(
+        tileWidth: number,
+        tileHeight: number,
+        type: TextureDataType,
+        internalFormat: PixelFormatGPU | null,
+        colorSpace: string | undefined,
+    ): Promise<WebGLRenderTarget> {
         let renderTarget: WebGLRenderTarget | undefined;
         if (this.renderTargetStack.length === 0) {
             renderTarget = await new Promise<WebGLRenderTarget>((resolve) => {
@@ -319,17 +334,18 @@ export class SelectionMask {
             });
         }
         if (!renderTarget) {
-            renderTarget = this.renderTargetStack.pop()
+            renderTarget = this.renderTargetStack.pop();
             if (!renderTarget) {
                 renderTarget = new WebGLRenderTarget(tileWidth, tileHeight, {
-                    type: UnsignedByteType,
+                    type,
                     minFilter: LinearFilter,
                     magFilter: LinearFilter,
                     wrapS: ClampToEdgeWrapping,
                     wrapT: ClampToEdgeWrapping,
                     format: RGBAFormat,
+                    internalFormat,
                     depthBuffer: false,
-                    colorSpace: LinearSRGBColorSpace,
+                    colorSpace,
                     stencilBuffer: false,
                 });
             }

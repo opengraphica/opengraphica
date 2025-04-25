@@ -13,7 +13,7 @@ import { UpdateLayerAction } from './update-layer';
 
 import { createCanvasFromImage } from '@/lib/image';
 
-import { useRenderer } from '@/renderers';
+import { transferRendererTilesToRasterLayerUpdates, useRenderer } from '@/renderers';
 
 import type {
     ColorModel, UpdateAnyLayerOptions, UpdateRasterLayerOptions,
@@ -65,36 +65,10 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
                     const renderer = await useRenderer();
                     const tiles = await renderer.applySelectionMaskToAlphaChannel(layer.id, { invert: true });
 
-                    const tileUpdates: WorkingFileLayerRasterTileUpdate[] = [];
-                    for (const tile of tiles) {
-                        let oldTileCanvasUuid: string | undefined;
-                        if (tile.oldImage) {
-                            const oldTileCanvas = createCanvasFromImage(tile.oldImage, {
-                                transfer: true,
-                                width: tile.width,
-                                height: tile.height,
-                            });
-                            oldTileCanvasUuid = await createStoredImage(oldTileCanvas);
-                        }
-                        const tileCanvas = createCanvasFromImage(tile.image, {
-                            transfer: true,
-                            width: tile.width,
-                            height: tile.height,
-                        });
-                        const tileCanvasUuid = await createStoredImage(tileCanvas);
-                        tileUpdates.push({
-                            x: tile.x,
-                            y: tile.y,
-                            oldSourceUuid: oldTileCanvasUuid,
-                            sourceUuid: tileCanvasUuid,
-                            mode: 'replace',
-                        });
-                    }
-
                     const updateLayerAction = new UpdateLayerAction<UpdateRasterLayerOptions>({
                         id: layer.id,
                         data: {
-                            tileUpdates,
+                            tileUpdates: await transferRendererTilesToRasterLayerUpdates(tiles),
                             alreadyRendererd: true,
                         },
                     });

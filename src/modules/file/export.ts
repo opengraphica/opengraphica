@@ -10,20 +10,17 @@ import workingFileStore, {
     getLayersByType,
     ensureUniqueLayerSiblingName
 } from '@/store/working-file';
-import canvasStore, { getCanvasRenderingContext } from '@/store/canvas';
 import editorStore from '@/store/editor';
 import { createStoredImage } from '@/store/image';
 import historyStore from '@/store/history';
 
-import { drawWorkingFileToCanvas2d, drawWorkingFileToCanvasWebgl } from '@/lib/canvas';
+import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
 import { generateImageBlobHash } from '@/lib/hash';
-import { createImageFromCanvas } from '@/lib/image';
 import { knownFileExtensions } from '@/lib/regex';
 
 import { InsertLayerAction } from '@/actions/insert-layer';
 
-import { activeSelectionMask, appliedSelectionMask, blitActiveSelectionMask } from '@/canvas/store/selection-state';
-import { createLayerPasses, refreshLayerPasses } from '@/canvas/renderers/webgl/postprocessing/create-layer-passes';
+import { activeSelectionMask, appliedSelectionMask } from '@/canvas/store/selection-state';
 
 import { useRenderer } from '@/renderers';
 
@@ -41,7 +38,7 @@ export interface ExportAsImageOptions {
     fileType: 'png' | 'jpg' | 'webp' | 'gif' | 'bmp' | 'tiff',
     layerSelection?: 'all' | 'selected',
     cameraTransform?: DOMMatrix,
-    blitActiveSelectionMask?: boolean,
+    applySelectionMask?: boolean,
     quality?: number,
     toClipboard?: boolean,
     toBlob?: boolean,
@@ -87,15 +84,12 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                 const snapshotBitmap = await renderer.takeSnapshot(canvas.width, canvas.height, {
                     cameraTransform: options.cameraTransform,
                     layerIds: options.layerSelection === 'selected' ? workingFileStore.state.selectedLayerIds : undefined,
-                    applySelectionMask: options.blitActiveSelectionMask && (activeSelectionMask.value != null || appliedSelectionMask.value != null),
+                    applySelectionMask: options.applySelectionMask && (activeSelectionMask.value != null || appliedSelectionMask.value != null),
                 });
                 const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
                 ctx.drawImage(snapshotBitmap, 0, 0);
                 snapshotBitmap.close();
             }
-            // if (options.blitActiveSelectionMask && (activeSelectionMask.value != null || appliedSelectionMask.value != null)) {
-            //     canvas = await blitActiveSelectionMask(canvas, new DOMMatrix(), 'source-in');
-            // }
 
             if (options.toNewLayer) {
                 historyStore.dispatch('runAction', {

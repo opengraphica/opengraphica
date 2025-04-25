@@ -166,7 +166,7 @@ export async function prepareStoredImageForArchival(uuid?: string) {
  * Releases the stored image from memory, and from the database.
  * @param uuid - ID of the database entry for the image
  */
- export async function deleteStoredImage(uuid: string) {
+ export async function deleteStoredImage(uuid?: string) {
     const storedImage = imageUuidMap.get(uuid);
     if (!storedImage) return;
     imageUuidMap.delete(uuid);

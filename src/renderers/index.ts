@@ -13,3 +13,5 @@ export async function useRenderer(engine?: RendererEngine): Promise<RendererFron
     }[engine ?? 'webgl2'];
     return rendererFrontend;
 }
+
+export * from './common/tiles';

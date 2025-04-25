@@ -995,7 +995,11 @@
                 },
                 "copy": {
                     "name": "Copy Selected Layers",
-                    "description": "Copy the currently selected layers to the clipboard."
+                    "description": "Copy the currently selected layers to the clipboard.",
+                    "noSelectedLayers": {
+                        "title": "No Layers Selected",
+                        "message": "Please select at least one layer to copy."
+                    }
                 },
                 "copyAll": {
                     "name": "Copy All Layers",

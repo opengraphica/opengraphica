@@ -3,7 +3,7 @@ import { PerformantStore } from './performant-store';
 import BaseCanvasController from '@/canvas/controllers/base';
 import BaseCanvasMovementController from '@/canvas/controllers/base-movement';
 import toolGroupsConfig from '@/config/tool-groups.json';
-import { ToolGroupDefinition, WorkingFileLayer, WorkingFileGroupLayer, WorkingFileRasterSequenceLayer, ColorModel } from '@/types';
+import { ToolGroupDefinition, WorkingFileLayer, WorkingFileAnyLayer, WorkingFileGroupLayer, WorkingFileRasterSequenceLayer, ColorModel } from '@/types';
 import { loadStylesheet } from '@/lib/stylesheet';
 import canvasStore from './canvas';
 import workingFileStore from './working-file';
@@ -44,7 +44,7 @@ interface EditorState {
     activeToolOverlays: string[];
     activeToolRestore: string | null;
     clipboardBufferImageHash: string | null;
-    clipboardBufferLayers: WorkingFileLayer<ColorModel>[];
+    clipboardBufferLayers: WorkingFileAnyLayer<ColorModel>[];
     clipboardBufferSelectionMask: HTMLImageElement | null;
     clipboardBufferSelectionMaskCanvasOffset: DOMPoint;
     clipboardBufferUpdateTimestamp: number;

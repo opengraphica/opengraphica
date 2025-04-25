@@ -43,5 +43,5 @@ void main() {
     );
 #endif
 
-    gl_FragColor = linearSrgbToSrgb(gl_FragColor);
+    gl_FragColor = gl_FragColor;
 }

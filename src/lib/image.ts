@@ -412,7 +412,7 @@ export function cloneCanvas(canvas: HTMLCanvasElement): HTMLCanvasElement {
     let newCanvas = document.createElement('canvas');
     newCanvas.width = canvas.width;
     newCanvas.height = canvas.height;
-    const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
+    const ctx = newCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
     if (!ctx) throw new Error('[src/lib/image.ts] Could not clone canvas.');
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(canvas, 0, 0);

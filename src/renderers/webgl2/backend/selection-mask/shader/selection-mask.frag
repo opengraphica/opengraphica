@@ -27,11 +27,10 @@ void main() {
     selectedColor.a *= step(localUV.x, 1.0) * step(0.0, localUV.x) * step(localUV.y, 1.0) * step(0.0, localUV.y);
 
 #if cUseClipping == 1
-    unselectedColor.a = selectedColor.a;
+    gl_FragColor = vec4(0.0, 0.0, 0.0, selectedColor.a);
 #else
     unselectedColor.a = clamp(unselectedColor.a - selectedColor.a, 0.0, 1.0);
-#endif
-
     gl_FragColor = unselectedColor;
+#endif
 
 }

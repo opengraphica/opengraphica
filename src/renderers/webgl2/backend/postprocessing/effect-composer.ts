@@ -185,6 +185,14 @@ class EffectComposer {
         this.readBuffer = this.renderTarget2;
     }
 
+    detach(renderTarget: WebGLRenderTarget) {
+        if (this.renderTarget1 === renderTarget) {
+            this.renderTarget1 = this.renderTarget2;
+        } else if (this.renderTarget2 === renderTarget) {
+            this.renderTarget2 = this.renderTarget1;
+        } 
+    }
+
     setSize(width: number, height: number) {
         this._width = width;
         this._height = height;

@@ -30,17 +30,6 @@ import type {
 
 const noRenderPassModes = new Set(['normal', 'erase']);
 
-function createCanvas(width: number, height: number): HTMLCanvasElement | OffscreenCanvas {
-    if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
-        return new OffscreenCanvas(width, height);
-    } else {
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        return canvas;
-    }
-}
-
 export interface Webgl2RendererBackendTakeSnapshotOptions {
     cameraTransform?: Float64Array;
     layerIds?: Uint32Array;
@@ -94,6 +83,34 @@ export class Webgl2RendererBackend {
         this.renderer.outputColorSpace = SRGBColorSpace;
         this.renderer.setSize(1, 1);
         this.maxTextureSize = this.renderer?.capabilities?.maxTextureSize ?? 2048;
+
+        const gl = this.renderer.getContext();
+        // const origTexImage2D = gl.texImage2D.bind(gl);
+        // gl.texImage2D = function (...args) {
+        //   console.log('[texImage2D]', ...args);
+        //   // @ts-expect-error
+        //   return origTexImage2D(...args);
+        // };
+
+        const enumMap = (glEnum) => {
+            for (const key in WebGL2RenderingContext) {
+                if (WebGL2RenderingContext[key] === glEnum) return key;
+            }
+            return glEnum;
+        };
+          
+        const originalTexImage2D = gl.texImage2D.bind(gl);
+          
+        gl.texImage2D = function (...args) {
+            const [target, level, internalFormat, width, height, border, format, type, data] = args;
+            console.log('[texImage2D]', 
+                enumMap(target), level,
+                enumMap(internalFormat), width, height, border,
+                enumMap(format), enumMap(type), data ? '[data]' : 'null'
+            );
+            // @ts-expect-error
+            return originalTexImage2D(...args);
+        };
 
         this.scene = new Scene();
         this.scene.background = null;
@@ -380,7 +397,6 @@ export class Webgl2RendererBackend {
 
         try {
 
-            this.renderer.setRenderTarget(snapshotRenderTarget);
             this.renderer.setViewport(0, 0, imageWidth, imageHeight);
 
             if (!this.snapshotComposer) {
@@ -393,7 +409,8 @@ export class Webgl2RendererBackend {
             const selectionMaskWasVisible = !!(this.selectionMask?.visible);
             if (this.selectionMask) {
                 if (options?.applySelectionMask) {
-                    this.selectionMask.visible = false;    
+                    this.selectionMask.visible = true;    
+                    this.selectionMask.setCamera(snapshotCamera);
                     this.selectionMask.useClipping(true);
                 } else {
                     this.selectionMask.visible = false;
@@ -422,7 +439,10 @@ export class Webgl2RendererBackend {
 
             if (this.selectionMask) {
                 this.selectionMask.visible = selectionMaskWasVisible;
-                this.selectionMask.useClipping(false);
+                if (options?.applySelectionMask) {
+                    this.selectionMask.setCamera(this.camera);
+                    this.selectionMask.useClipping(false);
+                }
             }
             if (imageBoundaryMaskWasVisible && this.imageBoundaryMask) {
                 this.imageBoundaryMask.visible = true;
@@ -444,6 +464,7 @@ export class Webgl2RendererBackend {
         }
 
         this.renderer.setViewport(originalRendererViewport);
+
         this.rendererBusy = false;
 
         const buffer = new Uint8Array(imageWidth * imageHeight * 4);
@@ -453,6 +474,7 @@ export class Webgl2RendererBackend {
             new ImageData(new Uint8ClampedArray(buffer), imageWidth, imageHeight),
             { imageOrientation: 'flipY' }
         );
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         snapshotRenderTarget.dispose();
 
