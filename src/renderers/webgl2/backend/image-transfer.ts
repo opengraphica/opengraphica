@@ -13,7 +13,6 @@ export async function requestFrontendTexture(requestSourceUuid?: string): Promis
             const { sourceUuid, bitmap } = options;
             if (sourceUuid === requestSourceUuid) {
                 messageBus.off('frontend.replyFrontendTexture', handleResponse);
-                console.log('create texture ', requestSourceUuid);
                 const texture = new Texture(bitmap);
                 texture.format = RGBAFormat;
                 texture.type = UnsignedByteType;

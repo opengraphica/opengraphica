@@ -39,6 +39,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         const { getWebgl2RendererBackend } = await import('@/renderers/webgl2/backend');
         this.rendererBackend = getWebgl2RendererBackend();
 
+        this.layerWatchersByType['gradient'] = (await import('@/renderers/webgl2/layers/gradient/watcher')).GradientLayerWatcher;
         this.layerWatchersByType['raster'] = (await import('@/renderers/webgl2/layers/raster/watcher')).RasterLayerWatcher;
 
         const { viewWidth, viewHeight } = toRefs(canvasStore.state);

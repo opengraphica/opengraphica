@@ -84,34 +84,6 @@ export class Webgl2RendererBackend {
         this.renderer.setSize(1, 1);
         this.maxTextureSize = this.renderer?.capabilities?.maxTextureSize ?? 2048;
 
-        const gl = this.renderer.getContext();
-        // const origTexImage2D = gl.texImage2D.bind(gl);
-        // gl.texImage2D = function (...args) {
-        //   console.log('[texImage2D]', ...args);
-        //   // @ts-expect-error
-        //   return origTexImage2D(...args);
-        // };
-
-        const enumMap = (glEnum) => {
-            for (const key in WebGL2RenderingContext) {
-                if (WebGL2RenderingContext[key] === glEnum) return key;
-            }
-            return glEnum;
-        };
-          
-        const originalTexImage2D = gl.texImage2D.bind(gl);
-          
-        gl.texImage2D = function (...args) {
-            const [target, level, internalFormat, width, height, border, format, type, data] = args;
-            console.log('[texImage2D]', 
-                enumMap(target), level,
-                enumMap(internalFormat), width, height, border,
-                enumMap(format), enumMap(type), data ? '[data]' : 'null'
-            );
-            // @ts-expect-error
-            return originalTexImage2D(...args);
-        };
-
         this.scene = new Scene();
         this.scene.background = null;
 

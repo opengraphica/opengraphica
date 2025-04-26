@@ -1,5 +1,5 @@
 /**
- * This file constructs the necessary assets to render a raster layer.
+ * This file constructs the necessary assets to render a Gradient layer.
  * It can run in the main thread or a worker.
  */
 
@@ -12,16 +12,21 @@ import { Vector2 } from 'three/src/math/Vector2';
 import { getWebgl2RendererBackend, markRenderDirty, requestFrontendTexture } from '@/renderers/webgl2/backend';
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
 import { createCanvasFiltersFromLayerConfig } from '../base/material';
-import { assignMaterialBlendingMode } from '../base/blending-mode';
-import { createRasterMaterial, disposeRasterMaterial, updateRasterMaterial } from './material';
+import { createGradientMaterial, disposeGradientMaterial, updateGradientMaterial } from './material';
 
 import type { Scene, ShaderMaterial } from 'three';
 import type {
-    Webgl2RendererCanvasFilter, Webgl2RendererMeshController,
-    WorkingFileLayerBlendingMode, WorkingFileRasterLayer, WorkingFileLayerFilter
+    RGBAColor, Webgl2RendererCanvasFilter, Webgl2RendererMeshController,
+    WorkingFileLayerBlendingMode, WorkingFileGradientLayer, WorkingFileLayerFilter
 } from '@/types';
 
-export class RasterLayerMeshController implements Webgl2RendererMeshController {
+// TODO - implement color model conversions
+function convertGradientLayerToRgba(data: WorkingFileGradientLayer['data']): WorkingFileGradientLayer<RGBAColor>['data'] {
+    const dataCopy = JSON.parse(JSON.stringify(data)) as WorkingFileGradientLayer<RGBAColor>['data'];
+    return dataCopy;
+}
+
+export class GradientLayerMeshController implements Webgl2RendererMeshController {
     
     material: InstanceType<typeof ShaderMaterial> | undefined;
     plane: InstanceType<typeof Mesh> | undefined;
@@ -31,10 +36,10 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
 
     id: number = -1;
     blendingMode: WorkingFileLayerBlendingMode = 'normal';
+    data: WorkingFileGradientLayer<RGBAColor>['data'] | undefined = undefined;
     filters: Webgl2RendererCanvasFilter[] = [];
     filtersOverride: Webgl2RendererCanvasFilter[] | undefined = undefined;
-    sourceUuid: string | undefined;
-    tileUpdateId: string | undefined;
+    transform: Matrix4 = new Matrix4();
     visible: boolean = true;
     visibleOverride: boolean | undefined = undefined;
 
@@ -70,23 +75,29 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
             this.materialUpdates.unshift(type);
         }
         if (this.materialUpdates.length === 1) {
+            const backend = getWebgl2RendererBackend();
             while (this.materialUpdates.length > 0) {
                 const updateType = this.materialUpdates[this.materialUpdates.length - 1];
                 if (!updateType) break;
                 if (updateType === 'destroyAndCreate') {
                     if (this.material) {
-                        await disposeRasterMaterial(this.material);
+                        await disposeGradientMaterial(this.material);
                     }
                 }
                 if (!this.material || updateType === 'destroyAndCreate') {
-                    this.material = await createRasterMaterial({
-                        srcTexture: this.sourceTexture,
+                    this.material = await createGradientMaterial({
+                        gradientData: this.data!,
+                        canvasWidth: backend.imageWidth,
+                        canvasHeight: backend.imageHeight,
+                        transform: this.transform,
                         canvasFilters: this.filtersOverride ?? this.filters,
                     });
-                    assignMaterialBlendingMode(this.material, this.blendingMode);
                 } else {
-                    await updateRasterMaterial(this.material, {
-                        srcTexture: this.sourceTexture,
+                    await updateGradientMaterial(this.material, {
+                        gradientData: this.data!,
+                        canvasWidth: backend.imageWidth,
+                        canvasHeight: backend.imageHeight,
+                        transform: this.transform,
                     })
                 }
                 this.plane && (this.plane.material = this.material);
@@ -106,46 +117,9 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
         }
     }
 
-    async updateData(data: WorkingFileRasterLayer['data']) {
-        if (this.sourceTexture && data.tileUpdates) {
-            if (data.tileUpdateId === this.tileUpdateId) return;
-            const backend = getWebgl2RendererBackend();
-            const tileTextures = await Promise.allSettled(
-                data.tileUpdates.map((tileUpdate) => requestFrontendTexture(tileUpdate.sourceUuid))
-            );
-            for (const [updateIndex, tileUpdate] of data.tileUpdates.entries()) {
-                const tileTexture = tileTextures[updateIndex].status === 'fulfilled' ? tileTextures[updateIndex].value : null;
-                if (!tileTexture) continue;
-                backend.renderer.copyTextureToTexture(
-                    tileTexture,
-                    this.sourceTexture,
-                    null,
-                    new Vector2(tileUpdate.x, this.sourceTexture.image.height - tileUpdate.y - tileTexture.image.height)
-                );
-                if (tileTexture.userData.shouldDisposeBitmap) {
-                    tileTexture.image?.close();
-                }
-                tileTexture.dispose();
-            }
-            markRenderDirty();
-        } else {
-            this.sourceUuid = data.sourceUuid;
-            const sourceTexture = await requestFrontendTexture(data.sourceUuid)
-            if (data.sourceUuid !== this.sourceUuid) {
-                this.disposeSourceTexture();
-                return;
-            }
-            if (sourceTexture) {
-                this.disposeSourceTexture();
-                this.sourceTexture = sourceTexture;
-                this.sourceTexture.needsUpdate = true;
-                await this.scheduleMaterialUpdate('update');
-            } else {
-                this.disposeSourceTexture();
-                await this.scheduleMaterialUpdate('update');
-            }
-        }
-        this.tileUpdateId = data.tileUpdateId;
+    async updateData(data: WorkingFileGradientLayer['data']) {
+        this.data = convertGradientLayerToRgba(data);
+        this.scheduleMaterialUpdate('update');
     }
 
     async updateFilters(filters: WorkingFileLayerFilter[]) {
@@ -169,13 +143,13 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
     }
 
     updateTransform(transform: Float64Array) {
-        this.plane?.matrix.set(
+        this.transform = new Matrix4(
             transform[0], transform[1], transform[2], transform[3],
             transform[4], transform[5], transform[6], transform[7],
             transform[8], transform[9], transform[10], transform[11], 
             transform[12], transform[13], transform[14], transform[15],
         );
-        markRenderDirty();
+        this.scheduleMaterialUpdate('update');
     }
 
     updateVisible(visible: boolean) {
@@ -217,12 +191,6 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
         this.visibleOverride = visible;
         this.updateVisible(this.visible);
     }
-
-    readBufferTextureUpdate(texture?: Texture) {
-        if (!this.material?.uniforms?.dstTexture) return;
-        this.material.uniforms.dstTexture.value = texture;
-        this.material.uniformsNeedUpdate = true;
-    }
     
     detach() {
         const backend = getWebgl2RendererBackend();
@@ -237,13 +205,19 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
         this.plane = undefined;
 
         if (this.material) {
-            disposeRasterMaterial(this.material);
+            disposeGradientMaterial(this.material);
             this.material = undefined;
         }
 
         this.disposeSourceTexture();
 
         this.scene = undefined;
+    }
+
+    readBufferTextureUpdate(texture?: Texture) {
+        if (!this.material?.uniforms?.dstTexture) return;
+        this.material.uniforms.dstTexture.value = texture;
+        this.material.uniformsNeedUpdate = true;
     }
 
     disposeSourceTexture() {
