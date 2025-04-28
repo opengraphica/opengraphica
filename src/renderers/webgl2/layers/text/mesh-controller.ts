@@ -1,52 +1,72 @@
 /**
- * This file constructs the necessary assets to render a raster layer.
+ * This file constructs the necessary assets to render a text layer.
  * It can run in the main thread or a worker.
  */
-
+import { mergeGeometries } from '@/renderers/webgl2/geometries/buffer-geometry-utils';
 import { ImagePlaneGeometry } from '@/renderers/webgl2/geometries/image-plane-geometry';
+
+import { BackSide } from 'three/src/constants';
 import { Matrix4 } from 'three/src/math/Matrix4';
+import { MeshBasicMaterial } from 'three/src/materials/MeshBasicMaterial';
 import { Mesh } from 'three/src/objects/Mesh';
+import { Object3D } from 'three/src/core/Object3D';
+import { Path } from 'three/src/extras/core/Path';
+import { Shape } from 'three/src/extras/core/Shape';
+import { ShapeGeometry } from 'three/src/geometries/ShapeGeometry';
 import { Texture } from 'three/src/textures/Texture';
 import { Vector2 } from 'three/src/math/Vector2';
+import { Vector3 } from 'three/src/math/Vector3';
+
+import { Clipper, PolyType, ClipType, Paths, PathPoint, PolyFillType, PolyTree } from '@/lib/clipper';
+import { textMetaDefaults } from '@/lib/text-common';
+import { getUnloadedFontFamilies, loadFontFamilies, calculateTextPlacement } from '@/lib/text-render';
 
 import { getWebgl2RendererBackend, markRenderDirty, requestFrontendTexture } from '@/renderers/webgl2/backend';
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
 import { createCanvasFiltersFromLayerConfig } from '../base/material';
 import { assignMaterialBlendingMode } from '../base/blending-mode';
-import { createRasterMaterial, disposeRasterMaterial, updateRasterMaterial } from './material';
+import { createTextMaterial, disposeTextMaterial, updateTextMaterial } from './material';
+import { LetterMeshCache } from './letter-mesh-cache';
 
 import type { Scene, ShaderMaterial } from 'three';
 import type {
     Webgl2RendererCanvasFilter, Webgl2RendererMeshController,
-    WorkingFileLayerBlendingMode, WorkingFileRasterLayer, WorkingFileLayerFilter
+    WorkingFileLayerBlendingMode, WorkingFileTextLayer, WorkingFileLayerFilter
 } from '@/types';
+import type { Glyph } from '@/lib/opentype';
 
 export class TextLayerMeshController implements Webgl2RendererMeshController {
     
+    letterMeshCache: LetterMeshCache | undefined;
     material: InstanceType<typeof ShaderMaterial> | undefined;
-    plane: InstanceType<typeof Mesh> | undefined;
-    planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
     scene: InstanceType<typeof Scene> | undefined;
     sourceTexture: InstanceType<typeof Texture> | undefined;
+    textGroup: InstanceType<typeof Object3D> | undefined;
 
     id: number = -1;
     blendingMode: WorkingFileLayerBlendingMode = 'normal';
+    data: WorkingFileTextLayer['data'] | undefined = undefined;
     filters: Webgl2RendererCanvasFilter[] = [];
     filtersOverride: Webgl2RendererCanvasFilter[] | undefined = undefined;
+    height: number = 0;
     visible: boolean = true;
     visibleOverride: boolean | undefined = undefined;
+    width: number = 0;
 
     materialUpdates: Array<'destroyAndCreate' | 'update'> = [];
     regenerateThumbnailTimeoutHandle: number | undefined;
+    waitingToLoadFontFamilies: string[] = [];
+    
+    letterMeshes: InstanceType<typeof Mesh>[] = [];
 
     attach(id: number) {
         this.id = id;
         const backend = getWebgl2RendererBackend();
         backend.addMeshController(id, this);
         this.scene = backend.scene;
-        this.plane = new Mesh(undefined, undefined);
-        this.plane.matrixAutoUpdate = false;
-        this.scene.add(this.plane);
+        this.textGroup = new Object3D();
+        this.textGroup.matrixAutoUpdate = false;
+        this.letterMeshCache = new LetterMeshCache(this.textGroup);
 
         this.readBufferTextureUpdate = this.readBufferTextureUpdate.bind(this);
         messageBus.on('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
@@ -73,21 +93,18 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
                 if (!updateType) break;
                 if (updateType === 'destroyAndCreate') {
                     if (this.material) {
-                        await disposeRasterMaterial(this.material);
+                        await disposeTextMaterial(this.material);
                     }
                 }
                 if (!this.material || updateType === 'destroyAndCreate') {
-                    this.material = await createRasterMaterial({
-                        srcTexture: this.sourceTexture,
+                    this.material = await createTextMaterial({
                         canvasFilters: this.filtersOverride ?? this.filters,
                     });
                     assignMaterialBlendingMode(this.material, this.blendingMode);
+                    this.letterMeshCache?.setMaterial(this.material);
                 } else {
-                    await updateRasterMaterial(this.material, {
-                        srcTexture: this.sourceTexture,
-                    })
+                    console.warn('[src/renderers/webgl2/layers/text/mesh-controller.ts] Currently no use case for material updates in controller.');
                 }
-                this.plane && (this.plane.material = this.material);
                 this.materialUpdates.pop();
                 if (this.materialUpdates.length < 1) {
                     markRenderDirty();
@@ -104,8 +121,75 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
         }
     }
 
-    async updateData(data: WorkingFileRasterLayer['data']) {
-        
+    async updateData(data: WorkingFileTextLayer['data']) {
+        this.data = data;
+        this.waitingToLoadFontFamilies = getUnloadedFontFamilies(data);
+        this.loadFontFamilies();
+        this.regenerateFromData();
+    }
+
+    regenerateFromData() {
+        const data = this.data;
+        if (!data) return;
+
+        const isHorizontal = ['ltr', 'rtl'].includes(data.lineDirection);
+        const wrapSize = isHorizontal ? this.width : this.height;
+        const { lines, lineDirectionSize, wrapDirection, wrapDirectionSize } = calculateTextPlacement(data, { wrapSize });
+        const wrapSign = ['ltr', 'ttb'].includes(wrapDirection) ? 1 : -1;
+        let wrapOffsetStart = wrapSign > 0 ? 0 : wrapDirectionSize;
+
+        const width = isHorizontal ? data.boundary === 'box' ? this.width : lineDirectionSize : wrapDirectionSize;
+        const height = isHorizontal ? wrapDirectionSize : data.boundary === 'box' ? this.height : lineDirectionSize;
+        if (this.width !== width || this.height !== height) {
+            this.width = width;
+            this.height = height;
+            messageBus.emit('layer.text.notifySizeUpdate', { id: this.id, width, height });
+        }
+
+        for (const mesh of this.letterMeshes) {
+            this.textGroup?.remove(mesh);
+            mesh.geometry?.dispose();
+            (mesh.material as ShaderMaterial)?.dispose();
+        }
+        this.letterMeshes = [];
+
+        if (isHorizontal) {
+            for (const line of lines) {
+                const wrapOffsetLine = wrapSign > 0 ? 0 : -(line.heightAboveBaseline + line.heightBelowBaseline);
+                for (const { glyph, meta, advanceOffset, documentCharacterIndex, drawOffset, fontName, fontSize } of line.glyphs) {
+                    this.letterMeshCache?.addLetter(
+                        glyph,
+                        fontName,
+                        line.documentLineIndex,
+                        documentCharacterIndex,
+                        line.lineStartOffset + drawOffset.x + advanceOffset,
+                        wrapOffsetStart + wrapOffsetLine + (line.wrapOffset * wrapSign) + drawOffset.y + line.heightAboveBaseline,
+                        fontSize,
+                        meta.fillColor?.style ?? textMetaDefaults.fillColor.style,
+                    );
+                }
+            }
+        } else {
+            for (const line of lines) {
+                const wrapOffsetLine = wrapSign > 0 ? 0 : -line.largestCharacterWidth;
+                for (const { glyph, meta, advanceOffset, documentCharacterIndex, drawOffset, fontName, characterWidth, fontSize } of line.glyphs) {
+                    this.letterMeshCache?.addLetter(
+                        glyph,
+                        fontName,
+                        line.documentLineIndex,
+                        documentCharacterIndex,
+                        wrapOffsetStart + wrapOffsetLine + (line.wrapOffset * wrapSign) + drawOffset.x + (line.largestCharacterWidth / 2.0) - (characterWidth / 2.0),
+                        line.lineStartOffset + drawOffset.y + advanceOffset,
+                        fontSize,
+                        meta.fillColor?.style ?? textMetaDefaults.fillColor.style,
+                    );
+                }
+            }
+        }
+
+        this.letterMeshCache?.finalize();
+
+        markRenderDirty();
     }
 
     async updateFilters(filters: WorkingFileLayerFilter[]) {
@@ -114,22 +198,19 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
     }
 
     updateName(name: string) {
-        if (this.plane) {
-            this.plane.name = name;
+        if (this.textGroup) {
+            this.textGroup.name = name;
         }
     }
 
     updateSize(width: number, height: number) {
-        this.planeGeometry?.dispose();
-        this.planeGeometry = new ImagePlaneGeometry(width, height);
-        if (this.plane) {
-            this.plane.geometry = this.planeGeometry;
-        }
-        markRenderDirty();
+        this.width = width;
+        this.height = height;
+        this.regenerateFromData();
     }
 
     updateTransform(transform: Float64Array) {
-        this.plane?.matrix.set(
+        this.textGroup?.matrix.set(
             transform[0], transform[1], transform[2], transform[3],
             transform[4], transform[5], transform[6], transform[7],
             transform[8], transform[9], transform[10], transform[11], 
@@ -140,16 +221,16 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
 
     updateVisible(visible: boolean) {
         this.visible = visible;
-        let oldVisibility = this.plane?.visible;
-        this.plane && (this.plane.visible = this.visibleOverride ?? this.visible);
-        if (this.plane?.visible !== oldVisibility) {
+        let oldVisibility = this.textGroup?.visible;
+        this.textGroup && (this.textGroup.visible = this.visibleOverride ?? this.visible);
+        if (this.textGroup?.visible !== oldVisibility) {
             markRenderDirty();
         }
     }
 
     reorder(order: number) {
-        if (this.plane) {
-            this.plane.renderOrder = order + 0.1;
+        if (this.textGroup) {
+            this.textGroup.renderOrder = order + 0.1;
         }
     }
 
@@ -158,13 +239,13 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
     }
 
     getTransform() {
-        return this.plane?.matrix ?? new Matrix4();
+        return this.textGroup?.matrix ?? new Matrix4();
     }
     
     swapScene(scene: Scene) {
-        if (!this.plane) return;
-        this.scene?.remove(this.plane);
-        scene.add(this.plane);
+        if (!this.textGroup) return;
+        this.scene?.remove(this.textGroup);
+        scene.add(this.textGroup);
         this.scene = scene;
     }
 
@@ -176,6 +257,13 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
     overrideVisibility(visible?: boolean) {
         this.visibleOverride = visible;
         this.updateVisible(this.visible);
+    }
+
+    async loadFontFamilies() {
+        const hadUnloadedFont = await loadFontFamilies(this.waitingToLoadFontFamilies);
+        if (hadUnloadedFont && this.data) {
+            this.updateData(this.data);
+        }
     }
 
     readBufferTextureUpdate(texture?: Texture) {
@@ -190,14 +278,19 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
 
         messageBus.off('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
 
-        this.planeGeometry?.dispose();
-        this.planeGeometry = undefined;
+        for (const mesh of this.letterMeshes) {
+            mesh.geometry?.dispose();
+            (mesh.material as ShaderMaterial)?.dispose();
+        }
 
-        this.plane && this.scene?.remove(this.plane);
-        this.plane = undefined;
+        this.letterMeshCache?.dispose();
+        this.letterMeshCache = undefined;
+
+        this.textGroup && this.scene?.remove(this.textGroup);
+        this.textGroup = undefined;
 
         if (this.material) {
-            disposeRasterMaterial(this.material);
+            disposeTextMaterial(this.material);
             this.material = undefined;
         }
 

@@ -4,8 +4,21 @@
  */
 
 import { toRefs, watch, type WatchStopHandle } from 'vue';
+
+import { getLayerById } from '@/store/working-file';
+
+import { messageBus } from '@/renderers/webgl2/backend/message-bus';
 import { TextLayerMeshController } from './mesh-controller';
+
 import type { RendererLayerWatcher, WorkingFileTextLayer } from '@/types';
+
+messageBus.on('layer.text.notifySizeUpdate', (update) => {
+    if (!update) return;
+    const layer = getLayerById(update.id);
+    if (!layer) return;
+    layer.width = update.width;
+    layer.height = update.height;
+});
 
 export class TextLayerWatcher implements RendererLayerWatcher<WorkingFileTextLayer> {
     meshController: TextLayerMeshController | undefined;

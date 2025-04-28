@@ -8,6 +8,11 @@ interface MessageBusEvents {
         bitmap: ImageBitmap | undefined;
     };
     'layer.regenerateThumbnail': number;
+    'layer.text.notifySizeUpdate': {
+        id: number;
+        width: number;
+        height: number;
+    };
     'renderer.pass.readBufferTextureUpdate': Texture;
     'renderer.renderComplete': void;
 }

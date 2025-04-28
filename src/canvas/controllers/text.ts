@@ -1042,7 +1042,11 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     private extractEditorTextareaInput() {
         if (!this.editorTextarea) return '';
         if (this.editorTextarea.value.length > CLEARED_EDITOR_TEXTAREA_LENGTH) {
-            return this.editorTextarea.value.slice(1, -1);
+            if (this.editorTextarea.value[0] === 'a' && this.editorTextarea.value[this.editorTextarea.value.length - 1] === 'b') {
+                return this.editorTextarea.value.slice(1, -1);
+            } else if (this.editorTextarea.value[1] === 'b') {
+                return this.editorTextarea.value.slice(2);
+            }
         }
         return '';
     }

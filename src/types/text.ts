@@ -42,6 +42,7 @@ export interface RenderTextGlyphInfo {
     characterWidth: number; // Width of the glyph in pixels.
     documentCharacterIndex: number; // Index of the character in the original document relative to the current line (line wrapping does not reset this index).
     documentCharacterCount: number; // How many characters in the original document this glyph represents.
+    fontName: string;
     fontSize: number;
     fontAscender: number;
     fontDescender: number;

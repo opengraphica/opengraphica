@@ -282,6 +282,8 @@ export class Webgl2RendererBackend {
         }
     
         composer.addPass(new ShaderPass(GammaCorrectionShader));
+        composer.renderTarget1.samples = 4;
+        composer.renderTarget2.samples = 4;
         this.dirty = true;
     }
 
