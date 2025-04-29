@@ -17,9 +17,6 @@ import { reserveStoredVideo, unreserveStoredVideo } from '@/store/video';
 import workingFileStore, { getLayerById, regenerateLayerThumbnail, getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { updateWorkingFileLayer } from '@/store/data/working-file-database';
 
-import layerRenderers from '@/canvas/renderers';
-import { queueRefreshLayerPasses } from '@/canvas/renderers/webgl/postprocessing/create-layer-passes';
-
 import type {
     ColorModel, WorkingFileAnyLayer,
     UpdateAnyLayerOptions, UpdateGradientLayerOptions, UpdateRasterLayerOptions, UpdateVectorLayerOptions,
@@ -225,7 +222,6 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
 
         const layers = workingFileStore.get('layers');
         const layer = getLayerById(this.updateLayerOptions.id, layers);
-        const renderer = canvasStore.get('renderer');
         if (layer) {
             for (let prop in this.previousProps) {
                 if (prop !== 'id') {

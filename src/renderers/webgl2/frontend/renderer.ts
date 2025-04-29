@@ -302,6 +302,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         this.layerWatchersById.clear();
 
         messageBus.off('backend.requestFrontendTexture', this.onTextureRequest);
+        messageBus.off('backend.requestFrontendSvg', this.onSvgRequest);
         messageBus.off('layer.regenerateThumbnail', this.onRegenerateThumbnail);
         appEmitter.off('app.workingFile.layerAttached', this.onLayerAttached);
         appEmitter.off('app.workingFile.layerReordered', this.onLayerReordered);
