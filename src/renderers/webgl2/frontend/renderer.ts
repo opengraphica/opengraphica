@@ -4,6 +4,7 @@ import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import workingFileStore, { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
 import { getStoredImageAsBitmap } from '@/store/image';
+import { getStoredSvgImage } from '@/store/svg';
 import {
     activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask,
     appliedSelectionMaskCanvasOffset, selectedLayersSelectionMaskPreview,
@@ -42,6 +43,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         this.layerWatchersByType['gradient'] = (await import('@/renderers/webgl2/layers/gradient/watcher')).GradientLayerWatcher;
         this.layerWatchersByType['raster'] = (await import('@/renderers/webgl2/layers/raster/watcher')).RasterLayerWatcher;
         this.layerWatchersByType['text'] = (await import('@/renderers/webgl2/layers/text/watcher')).TextLayerWatcher;
+        this.layerWatchersByType['vector'] = (await import('@/renderers/webgl2/layers/vector/watcher')).VectorLayerWatcher;
 
         const { viewWidth, viewHeight } = toRefs(canvasStore.state);
         const { width: imageWidth, height: imageHeight } = toRefs(workingFileStore.state);
@@ -98,6 +100,9 @@ export class Webgl2RenderFrontend implements RendererFrontend {
             if (!visible) alpha = 0;
             this.rendererBackend?.setBackgroundColor(r, g, b, alpha);
         }, { immediate: true });
+
+        this.onSvgRequest = this.onSvgRequest.bind(this);
+        messageBus.on('backend.requestFrontendSvg', this.onSvgRequest);
 
         this.onTextureRequest = this.onTextureRequest.bind(this);
         messageBus.on('backend.requestFrontendTexture', this.onTextureRequest);
@@ -168,10 +173,27 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         requestAnimationFrame(renderLoop);
     }
 
-    async onTextureRequest(sourceUuid?: string) {
-        if (!sourceUuid) {
-            return;
+    async onSvgRequest(request?: { sourceUuid: string, width: number, height: number }) {
+        if (!request) return;
+        const { sourceUuid, width, height } = request;
+        let bitmap: ImageBitmap | undefined;
+        const sourceImage = getStoredSvgImage(sourceUuid);
+        if (sourceImage) {
+            bitmap = await createImageBitmap(sourceImage, {
+                resizeWidth: width,
+                resizeHeight: height,
+                resizeQuality: 'high',
+                imageOrientation: 'flipY',
+            });
         }
+        messageBus.emit('frontend.replyFrontendSvg', {
+            sourceUuid,
+            bitmap,
+        });
+    }
+
+    async onTextureRequest(sourceUuid?: string) {
+        if (!sourceUuid) return;
         messageBus.emit('frontend.replyFrontendTexture', {
             sourceUuid,
             bitmap: await getStoredImageAsBitmap(sourceUuid, {

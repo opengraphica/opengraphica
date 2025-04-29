@@ -2,7 +2,16 @@ import mitt, { type Handler } from 'mitt';
 import type { Texture } from 'three';
 
 interface MessageBusEvents {
+    'backend.requestFrontendSvg': {
+        sourceUuid: string;
+        width: number;
+        height: number;
+    };
     'backend.requestFrontendTexture': string;
+    'frontend.replyFrontendSvg': {
+        sourceUuid: string;
+        bitmap: ImageBitmap | undefined;
+    };
     'frontend.replyFrontendTexture': {
         sourceUuid: string;
         bitmap: ImageBitmap | undefined;

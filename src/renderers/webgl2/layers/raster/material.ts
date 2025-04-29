@@ -66,7 +66,10 @@ export async function updateRasterMaterial(material: ShaderMaterial, params: Ras
     if (colorSpaceConversion !== material.defines.cColorSpaceConversion) {
         material.defines.cColorSpaceConversion = colorSpaceConversion;
     }
-    material.uniforms.srcTexture.value = params.srcTexture;
+    if (material.uniforms.srcTexture.value !== params.srcTexture) {
+        material.uniforms.srcTexture.value?.dispose(); // Prevent GPU memory leak. If it's still needed, THREE will re-upload.
+        material.uniforms.srcTexture.value = params.srcTexture;
+    }
     material.needsUpdate = true;
 }
 
