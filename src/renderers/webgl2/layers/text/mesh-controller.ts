@@ -49,6 +49,7 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
     filters: Webgl2RendererCanvasFilter[] = [];
     filtersOverride: Webgl2RendererCanvasFilter[] | undefined = undefined;
     height: number = 0;
+    order: number = 0;
     visible: boolean = true;
     visibleOverride: boolean | undefined = undefined;
     width: number = 0;
@@ -133,6 +134,9 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
         if (!data) return;
 
         const isHorizontal = ['ltr', 'rtl'].includes(data.lineDirection);
+
+        if (data.boundary !== 'dynamic' && ((isHorizontal && this.width === 0) || (!isHorizontal && this.height === 0))) return;
+
         const wrapSize = isHorizontal ? this.width : this.height;
         const { lines, lineDirectionSize, wrapDirection, wrapDirectionSize } = calculateTextPlacement(data, { wrapSize });
         const wrapSign = ['ltr', 'ttb'].includes(wrapDirection) ? 1 : -1;
@@ -229,9 +233,11 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
     }
 
     reorder(order: number) {
+        this.order = order;
         if (this.textGroup) {
             this.textGroup.renderOrder = order + 0.1;
         }
+        this.letterMeshCache?.reorder(order);
     }
 
     getTexture() {

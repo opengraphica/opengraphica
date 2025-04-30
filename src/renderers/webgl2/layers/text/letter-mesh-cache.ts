@@ -64,6 +64,7 @@ interface GeometryToMerge {
 
 export class LetterMeshCache {
 
+    order: number = 0;
     parent: Object3D;
 
     material: ShaderMaterial | undefined;
@@ -410,6 +411,7 @@ export class LetterMeshCache {
                             materialGroup.mergedMesh.geometry = materialGroup.mergedGeometry;
                         } else {
                             materialGroup.mergedMesh = new Mesh(materialGroup.mergedGeometry, materialGroup.material);
+                            materialGroup.mergedMesh.renderOrder = this.order + 0.1;
                         }
                         this.parent.add(materialGroup.mergedMesh);
                     }
@@ -443,6 +445,15 @@ export class LetterMeshCache {
         }
 
         this.stagedGlyphs.clear();
+    }
+
+    reorder(order: number) {
+        this.order = order;
+        for (const materialGroup of this.geometryMaterialGroups.values()) {
+            if (materialGroup.mergedMesh) {
+                materialGroup.mergedMesh.renderOrder = order + 0.1;
+            }
+        }
     }
 
     dispose() {
