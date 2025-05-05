@@ -57,3 +57,22 @@ export async function requestFrontendSvg(
     messageBus.emit('backend.requestFrontendSvg', { sourceUuid: requestSourceUuid, width, height });
     return promise;
 }
+
+export async function requestFrontendVideoFrame(
+    requestSourceUuid: string | undefined,
+): Promise<ImageBitmap | undefined> {
+    if (!requestSourceUuid) return;
+    const promise = new Promise<ImageBitmap | undefined>((resolve) => {
+        function handleResponse(options?: { sourceUuid: string, bitmap: ImageBitmap | undefined }) {
+            if (!options) return;
+            const { sourceUuid, bitmap } = options;
+            if (sourceUuid === requestSourceUuid) {
+                messageBus.off('frontend.replyFrontendVideoFrame', handleResponse);
+                resolve(bitmap);
+            }
+        }
+        messageBus.on('frontend.replyFrontendVideoFrame', handleResponse);
+    });
+    messageBus.emit('backend.requestFrontendVideoFrame', requestSourceUuid);
+    return promise;
+}

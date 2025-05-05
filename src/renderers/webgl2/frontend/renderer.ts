@@ -15,6 +15,7 @@ import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
 import { colorToRgba, getColorModelName } from '@/lib/color';
 
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
+import { VideoPlayer } from './video-player';
 
 import type { Webgl2RendererBackend } from '@/renderers/webgl2/backend';
 import type {
@@ -25,6 +26,7 @@ import type {
 
 export class Webgl2RenderFrontend implements RendererFrontend {
     rendererBackend: Webgl2RendererBackend | undefined;
+    videoPlayer: VideoPlayer | undefined;
 
     stopWatchBackgroundColor: WatchStopHandle | undefined;
     stopWatchMasks: WatchStopHandle | undefined;
@@ -39,11 +41,13 @@ export class Webgl2RenderFrontend implements RendererFrontend {
     async initialize(canvas: HTMLCanvasElement | OffscreenCanvas) {
         const { getWebgl2RendererBackend } = await import('@/renderers/webgl2/backend');
         this.rendererBackend = getWebgl2RendererBackend();
+        this.videoPlayer = new VideoPlayer();
 
         this.layerWatchersByType['gradient'] = (await import('@/renderers/webgl2/layers/gradient/watcher')).GradientLayerWatcher;
         this.layerWatchersByType['raster'] = (await import('@/renderers/webgl2/layers/raster/watcher')).RasterLayerWatcher;
         this.layerWatchersByType['text'] = (await import('@/renderers/webgl2/layers/text/watcher')).TextLayerWatcher;
         this.layerWatchersByType['vector'] = (await import('@/renderers/webgl2/layers/vector/watcher')).VectorLayerWatcher;
+        this.layerWatchersByType['video'] = (await import('@/renderers/webgl2/layers/video/watcher')).VideoLayerWatcher;
 
         const { viewWidth, viewHeight } = toRefs(canvasStore.state);
         const { width: imageWidth, height: imageHeight } = toRefs(workingFileStore.state);
@@ -293,6 +297,8 @@ export class Webgl2RenderFrontend implements RendererFrontend {
     async dispose() {
         this.rendererBackend?.dispose();
         this.rendererBackend = undefined;
+        this.videoPlayer?.dispose();
+        this.videoPlayer = undefined;
 
         for (const key of this.layerWatchersById.keys()) {
             const layerWatcher = this.layerWatchersById.get(key);
