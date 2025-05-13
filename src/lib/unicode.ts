@@ -1,5 +1,6 @@
 /**
  * Parts of this file are adapted from https://github.com/maxlath/unicode-scripts-finder
+ * @copyright (c) 2020 maxlath
  * @license MIT https://github.com/maxlath/unicode-scripts-finder/blob/main/package.json
  */
 

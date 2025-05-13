@@ -122,7 +122,7 @@ export class VideoLayerMeshController implements Webgl2RendererMeshController {
             this.sourceCanvas.width = this.width;
             this.sourceCanvas.height = this.height;
         }
-        this.sourceCanvasContext = this.sourceCanvas.getContext('bitmaprenderer') ?? undefined;
+        this.sourceCanvasContext = this.sourceCanvas.getContext('bitmaprenderer') as ImageBitmapRenderingContext ?? undefined;
         this.disposeSourceTexture();
         this.sourceTexture = new CanvasTexture(this.sourceCanvas);
         this.scheduleMaterialUpdate('update');

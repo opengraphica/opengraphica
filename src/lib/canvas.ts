@@ -130,29 +130,6 @@ export function drawWorkingFileToCanvas2d(canvas: HTMLCanvasElement, ctx: Canvas
     (window as any).averageTime = ((performance.now() - now) * 0.1) + (((window as any).averageTime || 0) * 0.9)
 }
 
-
-/**
- * Draws everything in the working document to the threejs renderer.
- */
-export function drawWorkingFileToCanvasWebgl(composer: EffectComposer | undefined, renderer: WebGLRenderer, scene: Scene, camera: Camera, options: DrawWorkingFileOptions = {}) {
-    try {
-        const layers = workingFileStore.get('layers');
-        for (const layer of layers) {
-            if (layer.type === 'group') {
-                // layer.renderer.renderGroup(renderer, camera, layer as WorkingFileGroupLayer<ColorModel>);
-            }
-        }
-        if (composer) {
-            composer.render();
-        } else {
-            renderer.render(scene, camera);
-        }
-    } catch (error) {
-        console.error('[src/lib/canvas.ts] Error drawing webgl canvas. ', error);
-        throw error;
-    }
-}
-
 /**
  * Shared threejs rendering objects used in the functions below.
  */

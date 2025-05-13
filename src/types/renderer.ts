@@ -42,6 +42,9 @@ export interface RendererFrontend {
     resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number): Promise<void>;
     applySelectionMaskToAlphaChannel(layerId: number, options?: RendererFrontendApplySelectionMaskToAlphaChannelOptions): Promise<RendererTextureTile[]>;
     takeSnapshot(imageWidth: number, imageHeight: number, options?: RendererFrontendTakeSnapshotOptions): Promise<ImageBitmap>;
+    startBrushStroke(layerId: number, brushSize: number): Promise<void>;
+    moveBrushStroke(layerId: number, x: number, y: number): Promise<void>;
+    stopBrushStroke(layerId: number): Promise<void>;
     dispose(): Promise<void>;
 }
 
@@ -52,7 +55,7 @@ export interface RendererLayerWatcher<T = WorkingFileLayer> {
 }
 
 export interface Webgl2RendererMeshController {
-    getTexture(): Promise<Texture | null>;
+    getTexture(wait?: boolean): Promise<Texture | null>;
     getTransform(): Matrix4;
     swapScene(scene: Scene): void;
     overrideFilters(filters?: Webgl2RendererCanvasFilter[]): Promise<void>;

@@ -32,7 +32,7 @@ export class SelectionMask {
     selectionMaskMesh!: Mesh;
     selectionMaskMaterial!: ShaderMaterial;
 
-    renderTargetStack: Array<WebGLRenderTarget | undefined> = new Array(8);
+    renderTargetStack: Array<WebGLRenderTarget | undefined> = new Array(8); // > 8 doesn't improve speed that much
     renderTargetWaitQueue: Array<(target: WebGLRenderTarget) => void> = [];
 
     get visible() {
@@ -142,11 +142,9 @@ export class SelectionMask {
         texture: Texture,
         maskTransform: Matrix4,
         renderer: WebGLRenderer,
+        originalViewport: Vector4,
         invert: boolean = false,
     ): Promise<RendererTextureTile[]> {
-        const originalRendererViewport = new Vector4();
-        renderer.getViewport(originalRendererViewport);
-
         console.time('mask');
 
         const maskTransformInverse = maskTransform.clone().invert();
@@ -258,7 +256,8 @@ export class SelectionMask {
                         )
                     );
 
-                await new Promise((resolve) => setTimeout(resolve, 0));
+                // Why was this here?
+                // await new Promise((resolve) => setTimeout(resolve, 0));
 
                 renderer.setViewport(0, 0, tileWidth, tileHeight);
 
@@ -306,13 +305,13 @@ export class SelectionMask {
         for (const renderTarget of this.renderTargetStack) {
             renderTarget?.dispose();
         }
-        this.renderTargetStack = new Array(16);
+        this.renderTargetStack = new Array(8);
 
         geometry.dispose();
         material.dispose();
         
         renderer.setRenderTarget(null);
-        renderer.setViewport(originalRendererViewport.x, originalRendererViewport.y, originalRendererViewport.z, originalRendererViewport.w);
+        renderer.setViewport(originalViewport);
 
         await new Promise((resolve) => setTimeout(resolve, 0));
         console.timeEnd('mask');

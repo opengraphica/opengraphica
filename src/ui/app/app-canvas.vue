@@ -31,9 +31,7 @@ import { DecomposedMatrix } from '@/lib/dom-matrix';
 import { isWebGLAvailable } from '@/lib/webgl';
 
 import { useAppPreloadBlocker } from '@/composables/app-preload-blocker';
-import { useCanvas2dViewport } from '@/composables/canvas2d-viewport';
 import { useViewportCommon } from '@/composables/viewport-common';
-import { useThreejsViewport } from '@/composables/threejs-viewport';
 import { useRenderer } from '@/renderers';
 
 import type { RendererFrontend } from '@/types';

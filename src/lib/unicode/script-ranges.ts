@@ -1,5 +1,6 @@
 /**
  * This file is adapted from https://github.com/maxlath/unicode-scripts-finder
+ * @copyright (c) 2020 maxlath
  * @license MIT https://github.com/maxlath/unicode-scripts-finder/blob/main/package.json
  */
 // Source: https://en.wikipedia.org/wiki/List_of_Unicode_characters

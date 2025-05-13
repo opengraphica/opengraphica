@@ -1,5 +1,6 @@
 /**
  * Parts of this file were adapted from miniPaint
+ * @copyright (c) ViliusL
  * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
 import { getCanvasRenderingContext2DSettings } from '@/store/working-file';

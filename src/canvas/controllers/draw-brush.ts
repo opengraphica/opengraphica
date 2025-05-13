@@ -1,13 +1,8 @@
-import { v4 as uuidv4 } from 'uuid';
-import { markRaw, nextTick, watch, WatchStopHandle } from 'vue';
+import { nextTick, watch, WatchStopHandle } from 'vue';
 
 import BaseCanvasMovementController from './base-movement';
-import {
-    cursorHoverPosition, brushShape, brushColor, brushSize, brushMinDensity, brushMaxDensity,
-} from '../store/draw-brush-state';
-import { blitActiveSelectionMask, activeSelectionMask, appliedSelectionMask } from '../store/selection-state';
 
-import { isOffscreenCanvasSupported } from '@/lib/feature-detection';
+import { BrushStroke, type BrushStrokePoint } from '@/lib/brush-stroke';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import { createImageFromBlob, createEmptyCanvas } from '@/lib/image';
 import { t, tm, rt } from '@/i18n';
@@ -17,17 +12,22 @@ import editorStore from '@/store/editor';
 import { createStoredImage, prepareStoredImageForArchival, prepareStoredImageForEditing } from '@/store/image';
 import historyStore, { createHistoryReserveToken, historyReserveQueueFree, historyBlockInteractionUntilComplete } from '@/store/history';
 import workingFileStore, { getSelectedLayers, getLayerById, getLayerGlobalTransform, ensureUniqueLayerSiblingName } from '@/store/working-file';
+import {
+    cursorHoverPosition, brushShape, brushSmoothing, brushSpacing, brushColor, brushSize, brushMinDensity, brushMaxDensity,
+} from '../store/draw-brush-state';
 
 import DrawableCanvas from '@/canvas/renderers/drawable/canvas';
-import { prepareTextureCompositor } from '@/workers/texture-compositor.interface';
 
 import type { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { InsertLayerAction } from '@/actions/insert-layer';
 import { UpdateLayerAction } from '@/actions/update-layer';
 
-import type { InsertRasterLayerOptions, UpdateRasterLayerOptions, WorkingFileAnyLayer } from '@/types';
-import type { BrushStrokeData, BrushStrokePoint } from '@/canvas/drawables/brush-stroke';
+import { useRenderer } from '@/renderers';
+
+import type { InsertRasterLayerOptions, RendererFrontend, UpdateRasterLayerOptions, WorkingFileAnyLayer } from '@/types';
+import type { BrushStrokeData } from '@/canvas/drawables/brush-stroke';
+
 
 const devicePixelRatio = window.devicePixelRatio || 1;
 
@@ -37,9 +37,14 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
     private brushSizeUnwatch: WatchStopHandle | null = null;
     private selectedLayerIdsUnwatch: WatchStopHandle | null = null;
 
+    private renderer: RendererFrontend | null = null;
+
     private drawingPointerId: number | null = null;
     private drawingOnLayers: WorkingFileAnyLayer[] = [];
-    private drawingPoints: BrushStrokePoint[] = [];
+    private drawingBrushStroke: BrushStroke | null = null;
+    private drawLoopDeltaAccumulator: number = 0;
+    private drawLoopLastRunTimestamp: number = 0;
+    private drawLoopLastPointerMoveTimestamp: number = 0;
 
     private activeDraftUuid: string | null = null;
     private drawablePreviewCanvas: DrawableCanvas | null = null;
@@ -53,29 +58,10 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
     onEnter(): void {
         super.onEnter();
 
-        isOffscreenCanvasSupported().then((isSupported) => {
-            isSupported && prepareTextureCompositor();
-        });
+        this.drawLoop = this.drawLoop.bind(this);
 
-        this.drawablePreviewCanvas = new DrawableCanvas({ scale: 1 });
-        this.drawablePreviewCanvas.initialized();
-        this.drawablePreviewCanvas.onDrawn(async (event) => {
-            if (this.activeDraftUuid == null) return;
-            for (const layer of this.drawingOnLayers) {
-                const draftIndex = layer.drafts?.findIndex((draft) => draft.uuid === this.activeDraftUuid) ?? -1;
-                if (!layer.drafts?.[draftIndex]) continue;
-                const canvasUuid = await createStoredImage(event.canvas);
-                layer.drafts[draftIndex].tileUpdates.push({
-                    x: event.sourceX,
-                    y: event.sourceY,
-                    sourceUuid: canvasUuid,
-                });
-                layer.drafts[draftIndex].lastUpdateTimestamp = window.performance.now();
-            }
-            canvasStore.set('dirty', true);
-        });
-        this.drawablePreviewCanvas.add<BrushStrokeData>('brushStroke', { smoothing: 1 }).then((uuid) => {
-            this.brushStrokeDrawableUuid = uuid;
+        useRenderer().then((renderer) => {
+            this.renderer = renderer;
         });
 
         this.selectedLayerIdsUnwatch = watch(() => workingFileStore.state.selectedLayerIds, (newIds, oldIds) => {
@@ -195,7 +181,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         super.onMultiTouchDown();
         if (this.touches.length > 1) {
             this.drawingPointerId = null;
-            this.drawingPoints = [];
+            this.drawingBrushStroke = null;
             (async () => {
                 await historyReserveQueueFree();
                 for (const layer of getSelectedLayers()) {
@@ -223,7 +209,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 this.lastCursorX * devicePixelRatio,
                 this.lastCursorY * devicePixelRatio
             ).matrixTransform(canvasStore.state.transform.inverse());
-            this.drawingPoints.push({
+            this.drawingBrushStroke?.addPoint({
                 x: transformedPoint.x,
                 y: transformedPoint.y,
                 size: brushSize.value,
@@ -231,8 +217,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 tiltY: e.tiltY,
                 twist: e.twist,
             });
-
-            this.drawPreview();
+            this.drawLoopLastPointerMoveTimestamp = performance.now();
         }
     }
 
@@ -250,6 +235,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         const { width, height } = workingFileStore.state;
         let selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster' || layer.type === 'empty');
         let layerActions: BaseAction[] = [];
+
         // Insert raster layer if none selected
         if (selectedLayers.length === 0) {
             layerActions.push(new InsertLayerAction<InsertRasterLayerOptions>({
@@ -262,6 +248,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 },
             }));
         }
+
         // Convert any empty layers to raster layers
         for (let i = selectedLayers.length - 1; i >= 0; i--) {
             const selectedLayer = selectedLayers[i];
@@ -281,6 +268,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 selectedLayers.splice(i, 1);
             }
         }
+
         // Finalize layer creation / conversion actions.
         if (layerActions.length > 0) {
             await historyStore.dispatch('runAction', {
@@ -296,28 +284,12 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         // Create a draft image for each of the selected layers
         selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster');
         this.drawingOnLayers = selectedLayers as WorkingFileAnyLayer[];
+
         for (const layer of this.drawingOnLayers) {
-            const layerGlobalTransformSelfExcluded = getLayerGlobalTransform(layer, { excludeSelf: true });
-            const viewTransform = canvasStore.get('decomposedTransform');
-            const width = workingFileStore.get('width');
-            const height = workingFileStore.get('height');
-            const logicalWidth = Math.min(width, workingFileStore.get('width') * viewTransform.scaleX);
-            const logicalHeight = Math.min(height, workingFileStore.get('height') * viewTransform.scaleY);
-            if (layer.type === 'raster') {
-                if (!layer.drafts) layer.drafts = [];
-                this.activeDraftUuid = uuidv4();
-                layer.drafts.push({
-                    uuid: this.activeDraftUuid,
-                    lastUpdateTimestamp: window.performance.now(),
-                    mode: 'source-over',
-                    width,
-                    height,
-                    logicalWidth,
-                    logicalHeight,
-                    transform: layerGlobalTransformSelfExcluded.inverse(),
-                    tileUpdates: [],
-                });
-            }
+            await this.renderer?.startBrushStroke(
+                layer.id,
+                brushSize.value,
+            );
         }
 
         // Populate first drawing point
@@ -325,7 +297,9 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             this.lastCursorX * devicePixelRatio,
             this.lastCursorY * devicePixelRatio
         ).matrixTransform(canvasStore.state.transform.inverse())
-        this.drawingPoints = markRaw([
+        this.drawingBrushStroke = new BrushStroke(
+            brushSmoothing.value,
+            brushSpacing.value,
             {
                 x: transformedPoint.x,
                 y: transformedPoint.y,
@@ -334,54 +308,69 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 tiltY: 0,
                 twist: 0,
             }
-        ]);
-
-        this.brushPreviewUpdate = markRaw({
-            color: this.brushColorStyle,
-            points: this.drawingPoints,
-            isPointsFinalized: false,
-        });
-        this.drawablePreviewCanvas?.setGlobalAlpha(this.brushColorAlpha);
+        );
 
         // Generate draw preview
-        this.drawPreview(true);
+        for (const layer of this.drawingOnLayers) {
+            this.renderer?.moveBrushStroke(
+                layer.id,
+                transformedPoint.x,
+                transformedPoint.y,
+            );
+        }
+
+        window.requestAnimationFrame(this.drawLoop);
     }
 
-    private drawPreview(refresh = false) {
-        if (this.drawingOnLayers.length > 0 && this.brushShapeImage && this.brushPreviewUpdate) {
+    private drawLoop() {
+        if (!this.drawingBrushStroke) return;
 
-            const points = this.drawingPoints;
+        const points = this.drawingBrushStroke.retrieveBezierSegmentPoints();
 
-            const previewRatioX = Math.min(1, canvasStore.get('decomposedTransform').scaleX);
-  
-            // Draw the line to each canvas chunk
+        const now = performance.now();
+        if (points.length > 0) {
+            this.drawLoopDeltaAccumulator = 0;
+            // let point: BrushStrokePoint | undefined;
+            for (const point of points) {
+                for (const layer of this.drawingOnLayers) {
+                    this.renderer?.moveBrushStroke(
+                        layer.id,
+                        point.x,
+                        point.y,
+                    );
+                }
+            }
+        } else if (now - this.drawLoopLastPointerMoveTimestamp > 25) {
+            this.drawLoopDeltaAccumulator += now - this.drawLoopLastRunTimestamp;
+            this.drawLoopLastRunTimestamp = now;
 
-            this.drawablePreviewCanvas?.setScale(previewRatioX);
-            this.drawablePreviewCanvas?.draw({
-                refresh,
-                updates: [
-                    {
-                        uuid: this.brushStrokeDrawableUuid!,
-                        data: this.brushPreviewUpdate,
-                    }
-                ],
-            });
+            if (this.drawLoopDeltaAccumulator > 16.66) {
+                this.drawLoopDeltaAccumulator -= 16.66;
+                this.drawingBrushStroke.advanceLine();
+
+                if (this.drawLoopDeltaAccumulator > 16.66 * 6) {
+                    this.drawLoopDeltaAccumulator = 0;
+                }
+            }
         }
+
+        window.requestAnimationFrame(this.drawLoop);
     }
 
     private async drawEnd(e: PointerEvent) {
         if (this.drawingPointerId === e.pointerId) {
-            if (this.brushPreviewUpdate) {
-                this.brushPreviewUpdate.isPointsFinalized = true;
-            }
-            this.drawPreview(false);
 
-            const points = this.drawingPoints.slice();
+            for (const layer of this.drawingOnLayers) {
+                this.renderer?.stopBrushStroke(
+                    layer.id,
+                );
+            }
+
             const drawingOnLayers = this.drawingOnLayers.slice();
             const updateHistoryStartTimestamp = window.performance.now();
             const draftId = this.activeDraftUuid;
 
-            this.drawingPoints = [];
+            this.drawingBrushStroke = null;
             this.drawingOnLayers = [];
             this.drawingPointerId = null;
             this.activeDraftUuid = null;
@@ -398,61 +387,61 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 if (layer.type === 'raster') {
                     // TODO - START - This is fairly slow, speed it up?
 
-                    const layerGlobalTransform = getLayerGlobalTransform(layer);
+                    // const layerGlobalTransform = getLayerGlobalTransform(layer);
 
-                    const layerTransform = new DOMMatrix().multiply(layerGlobalTransform.inverse());
+                    // const layerTransform = new DOMMatrix().multiply(layerGlobalTransform.inverse());
 
-                    let drawableCanvas = new DrawableCanvas({ forceDrawOnMainThread: true, scale: 1 });
+                    // let drawableCanvas = new DrawableCanvas({ forceDrawOnMainThread: true, scale: 1 });
                     let layerUpdateCanvas: HTMLCanvasElement | undefined = undefined;
-                    let sourceX = 0;
-                    let sourceY = 0;
-                    try {
-                        await drawableCanvas.initialized();
-                        const brushStrokeUuid = await drawableCanvas.add('brushStroke');
-                        drawableCanvas.setGlobalAlpha(this.brushColorAlpha);
-                        await drawableCanvas.draw({
-                            refresh: true,
-                            transform: layerTransform,
-                            updates: [
-                                {
-                                    uuid: brushStrokeUuid,
-                                    data: {
-                                        color: brushColor.value.style,
-                                        points,
-                                        isPointsFinalized: true,
-                                    } as BrushStrokeData,
-                                }
-                            ],
-                        });
-                        ({ canvas: layerUpdateCanvas, sourceX, sourceY } = await drawableCanvas.drawComplete());
-                    } catch (error) {
-                        console.error(error);
-                    }
-                    drawableCanvas.dispose();
+                    // let sourceX = 0;
+                    // let sourceY = 0;
+                    // try {
+                    //     await drawableCanvas.initialized();
+                    //     const brushStrokeUuid = await drawableCanvas.add('brushStroke');
+                    //     drawableCanvas.setGlobalAlpha(this.brushColorAlpha);
+                    //     await drawableCanvas.draw({
+                    //         refresh: true,
+                    //         transform: layerTransform,
+                    //         updates: [
+                    //             {
+                    //                 uuid: brushStrokeUuid,
+                    //                 data: {
+                    //                     color: brushColor.value.style,
+                    //                     points,
+                    //                     isPointsFinalized: true,
+                    //                 } as BrushStrokeData,
+                    //             }
+                    //         ],
+                    //     });
+                    //     ({ canvas: layerUpdateCanvas, sourceX, sourceY } = await drawableCanvas.drawComplete());
+                    // } catch (error) {
+                    //     console.error(error);
+                    // }
+                    // drawableCanvas.dispose();
                     
-                    if (layerUpdateCanvas) {
-                        if (activeSelectionMask.value || appliedSelectionMask.value) {
-                            const layerGlobalTransform = getLayerGlobalTransform(layer.id);
-                            const layerTransform = new DOMMatrix().multiplySelf(layerGlobalTransform).translateSelf(sourceX, sourceY);
-                            layerUpdateCanvas = await blitActiveSelectionMask(layerUpdateCanvas, layerTransform);
-                        }
+                    // if (layerUpdateCanvas) {
+                    //     if (activeSelectionMask.value || appliedSelectionMask.value) {
+                    //         const layerGlobalTransform = getLayerGlobalTransform(layer.id);
+                    //         const layerTransform = new DOMMatrix().multiplySelf(layerGlobalTransform).translateSelf(sourceX, sourceY);
+                    //         layerUpdateCanvas = await blitActiveSelectionMask(layerUpdateCanvas, layerTransform);
+                    //     }
 
-                        const layerUpdateCanvasUuid = await createStoredImage(layerUpdateCanvas);
+                    //     const layerUpdateCanvasUuid = await createStoredImage(layerUpdateCanvas);
 
-                        layerActions.push(
-                            new UpdateLayerAction<UpdateRasterLayerOptions>({
-                                id: layer.id,
-                                data: {
-                                    tileUpdates: [{
-                                        x: sourceX,
-                                        y: sourceY,
-                                        sourceUuid: layerUpdateCanvasUuid,
-                                        mode: 'source-over',
-                                    }],
-                                }
-                            })
-                        );
-                    }
+                    //     layerActions.push(
+                    //         new UpdateLayerAction<UpdateRasterLayerOptions>({
+                    //             id: layer.id,
+                    //             data: {
+                    //                 tileUpdates: [{
+                    //                     x: sourceX,
+                    //                     y: sourceY,
+                    //                     sourceUuid: layerUpdateCanvasUuid,
+                    //                     mode: 'source-over',
+                    //                 }],
+                    //             }
+                    //         })
+                    //     );
+                    // }
 
                     // TODO - END - This is fairly slow, speed it up?
                 }

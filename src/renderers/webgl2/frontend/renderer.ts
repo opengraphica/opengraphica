@@ -294,6 +294,36 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         });
     }
 
+    async startBrushStroke(
+        layerId: number,
+        brushSize: number,
+    ) {
+        await this.rendererBackend?.startBrushStroke(
+            layerId,
+            brushSize,
+        )
+    }
+
+    async moveBrushStroke(
+        layerId: number,
+        x: number,
+        y: number,
+    ) {
+        await this.rendererBackend?.moveBrushStroke(
+            layerId,
+            x,
+            y,
+        );
+    }
+
+    async stopBrushStroke(
+        layerId: number,
+    ) {
+        await this.rendererBackend?.stopBrushStroke(
+            layerId,
+        );
+    }
+
     async dispose() {
         this.rendererBackend?.dispose();
         this.rendererBackend = undefined;

@@ -1,3 +1,5 @@
+import { markRaw } from 'vue';
+
 import type { RendererFrontend } from '@/types';
 
 type RendererEngine = 'webgl2';
@@ -11,7 +13,7 @@ export async function useRenderer(engine?: RendererEngine): Promise<RendererFron
     rendererFrontend = {
         'webgl2': new (await import('@/renderers/webgl2/frontend')).Webgl2RenderFrontend(),
     }[engine ?? 'webgl2'];
-    return rendererFrontend;
+    return markRaw(rendererFrontend);
 }
 
 export * from './common/tiles';

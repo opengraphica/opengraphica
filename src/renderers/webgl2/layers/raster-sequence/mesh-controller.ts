@@ -13,15 +13,15 @@ import { getWebgl2RendererBackend, markRenderDirty, requestFrontendTexture } fro
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
 import { createCanvasFiltersFromLayerConfig } from '../base/material';
 import { assignMaterialBlendingMode } from '../base/blending-mode';
-import { createRasterMaterial, disposeRasterMaterial, updateRasterMaterial } from './material';
+import { createRasterMaterial, disposeRasterMaterial, updateRasterMaterial } from '../raster/material';
 
 import type { Scene, ShaderMaterial } from 'three';
 import type {
     Webgl2RendererCanvasFilter, Webgl2RendererMeshController,
-    WorkingFileLayerBlendingMode, WorkingFileRasterLayer, WorkingFileLayerFilter
+    WorkingFileLayerBlendingMode, WorkingFileRasterSequenceLayer, WorkingFileLayerFilter
 } from '@/types';
 
-export class RasterLayerMeshController implements Webgl2RendererMeshController {
+export class RasterSequenceLayerMeshController implements Webgl2RendererMeshController {
     
     material: InstanceType<typeof ShaderMaterial> | undefined;
     plane: InstanceType<typeof Mesh> | undefined;
@@ -40,8 +40,6 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
 
     materialUpdates: Array<'destroyAndCreate' | 'update'> = [];
     regenerateThumbnailTimeoutHandle: number | undefined;
-    isRequestingSourceTexture: boolean = false;
-    sourceTextureFetchCallbacks: Array<(texture: Texture | null) => void> = [];
 
     attach(id: number) {
         this.id = id;
@@ -108,55 +106,8 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
         }
     }
 
-    async updateData(data: WorkingFileRasterLayer['data']) {
-        if (this.sourceTexture && data.tileUpdates) {
-            if (data.tileUpdateId === this.tileUpdateId) return;
-            const backend = getWebgl2RendererBackend();
-            const tileTextures = await Promise.allSettled(
-                data.tileUpdates.map((tileUpdate) => requestFrontendTexture(tileUpdate.sourceUuid))
-            );
-            for (const [updateIndex, tileUpdate] of data.tileUpdates.entries()) {
-                const tileTexture = tileTextures[updateIndex].status === 'fulfilled' ? tileTextures[updateIndex].value : null;
-                if (!tileTexture) continue;
-                backend.renderer.copyTextureToTexture(
-                    tileTexture,
-                    this.sourceTexture,
-                    null,
-                    new Vector2(tileUpdate.x, this.sourceTexture.image.height - tileUpdate.y - tileTexture.image.height)
-                );
-                if (tileTexture.userData.shouldDisposeBitmap) {
-                    tileTexture.image?.close();
-                }
-                tileTexture.dispose();
-            }
-            markRenderDirty();
-        } else {
-            this.sourceUuid = data.sourceUuid;
-            this.isRequestingSourceTexture = true;
-            const sourceTexture = await requestFrontendTexture(data.sourceUuid)
-            if (data.sourceUuid !== this.sourceUuid) {
-                this.disposeSourceTexture();
-                return;
-            }
-            if (sourceTexture) {
-                this.disposeSourceTexture();
-                this.sourceTexture = sourceTexture;
-                this.sourceTexture.needsUpdate = true;
-                this.isRequestingSourceTexture = false;
-                for (const callback of this.sourceTextureFetchCallbacks) {
-                    callback(this.sourceTexture);
-                }
-                await this.scheduleMaterialUpdate('update');
-            } else {
-                this.disposeSourceTexture();
-                this.isRequestingSourceTexture = false;
-                for (const callback of this.sourceTextureFetchCallbacks) {
-                    callback(null);
-                }
-                await this.scheduleMaterialUpdate('update');
-            }
-        }
-        this.tileUpdateId = data.tileUpdateId;
+    async updateData(data: WorkingFileRasterSequenceLayer['data']) {
+        // TODO
     }
 
     async updateFilters(filters: WorkingFileLayerFilter[]) {
@@ -204,14 +155,8 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
         }
     }
 
-    getTexture(wait?: boolean) {
-        if (wait && this.isRequestingSourceTexture) {
-            return new Promise<Texture | null>((resolve) => {
-                this.sourceTextureFetchCallbacks.push(resolve)
-            });
-        } else {
-            return Promise.resolve(this.sourceTexture ?? null);
-        }
+    getTexture() {
+        return Promise.resolve(this.sourceTexture ?? null);
     }
 
     getTransform() {

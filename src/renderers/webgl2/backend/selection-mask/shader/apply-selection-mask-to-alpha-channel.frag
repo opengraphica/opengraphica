@@ -6,22 +6,6 @@ uniform vec4 tileOffsetAndSize;
 uniform mat4 selectionMaskTransform;
 uniform float selectionMaskAlpha;
 
-float linearSrgbChannelToSrgbChannel(float value) {
-    float calculatedValue = 0.0;
-    calculatedValue += step(value, 0.0031308) * value * 12.92;
-    calculatedValue += step(0.0031308, value) * (pow(value, 1.0 / 2.4) * 1.055 - 0.055);
-    return clamp(calculatedValue, 0.0, 1.0);
-}
-
-vec4 linearSrgbToSrgb(vec4 rgb) {
-    return vec4(
-        linearSrgbChannelToSrgbChannel(rgb.r),
-        linearSrgbChannelToSrgbChannel(rgb.g),
-        linearSrgbChannelToSrgbChannel(rgb.b),
-        rgb.a
-    );
-}
-
 void main() {
     vec2 baseUv = vec2(tileOffsetAndSize.x, 1.0 - tileOffsetAndSize.y - tileOffsetAndSize.w) + vUv * tileOffsetAndSize.zw;
     vec4 baseColor = texture2D(baseMap, baseUv);
@@ -43,5 +27,4 @@ void main() {
     );
 #endif
 
-    gl_FragColor = gl_FragColor;
 }

@@ -30,6 +30,7 @@ interface BrushDefinitionLibrary {
 
 const brushDefinitions: BrushDefinitionLibrary = { ...defaultBrushDefinitions } as unknown as BrushDefinitionLibrary;
 
+export const brushSmoothing = ref<number>(0);
 export const brushShape = ref<string>('');
 export const brushMinSize = ref<number>(1);
 export const brushSpacing = ref<number>(0.05);

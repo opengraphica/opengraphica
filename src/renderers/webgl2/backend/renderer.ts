@@ -15,6 +15,7 @@ import { GammaCorrectionShader } from './postprocessing/gamma-correction-shader'
 import { RenderPass } from './postprocessing/render-pass';
 import { ShaderPass } from './postprocessing/shader-pass';
 
+import { Compositor } from './compositor';
 import { ImageBackground } from './image-background';
 import { ImageBoundaryMask } from './image-boundary-mask';
 import { requestFrontendTexture } from './image-transfer';
@@ -47,11 +48,13 @@ export class Webgl2RendererBackend {
 
     camera!: OrthographicCamera;
     composer!: EffectComposer;
+    compositor!: Compositor;
     imageBackground!: ImageBackground;
     imageBoundaryMask!: ImageBoundaryMask;
     renderer!: WebGLRenderer;
     scene!: Scene;
     selectionMask!: SelectionMask;
+    viewport!: Vector4;
 
     snapshotCanvas?: HTMLCanvasElement | OffscreenCanvas;
     snapshotComposer?: EffectComposer;
@@ -69,6 +72,8 @@ export class Webgl2RendererBackend {
     meshControllersById: Map<number, Webgl2RendererMeshController> = new Map();
     queueCreateLayerPassesTimeoutHandle: number | undefined;
 
+    compositorBrushStrokes = new Map<number, number>();
+
     async initialize(canvas: HTMLCanvasElement | OffscreenCanvas, imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number) {
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
@@ -76,12 +81,13 @@ export class Webgl2RendererBackend {
         this.renderer = new WebGLRenderer({
             alpha: true,
             canvas,
-            premultipliedAlpha: false,
+            premultipliedAlpha: false, // KEEP THIS FALSE - It gives the most flexibility for renderer reuse.
             preserveDrawingBuffer: false,
             powerPreference: 'high-performance',
         });
         this.renderer.outputColorSpace = SRGBColorSpace;
         this.renderer.setSize(1, 1);
+        this.viewport = new Vector4();
         this.maxTextureSize = this.renderer?.capabilities?.maxTextureSize ?? 2048;
 
         this.scene = new Scene();
@@ -89,6 +95,9 @@ export class Webgl2RendererBackend {
 
         this.camera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 10000);
         this.camera.matrixAutoUpdate = false;
+
+        this.compositor = new Compositor(this.renderer);
+        this.compositor.setOriginalViewport(this.viewport);
 
         this.imageBackground = new ImageBackground();
         await this.imageBackground.initialize(this.scene, imageWidth, imageHeight);
@@ -112,6 +121,7 @@ export class Webgl2RendererBackend {
         this.imageHeight = imageHeight;
         if (this.renderer) {
             this.renderer.setSize(viewWidth, viewHeight, true);
+            this.renderer.getViewport(this.viewport);
         }
         if (this.composer) {
             this.composer.setSize(viewWidth, viewHeight);
@@ -122,6 +132,9 @@ export class Webgl2RendererBackend {
             this.camera.top = 0;
             this.camera.bottom = viewHeight;
             this.camera.updateProjectionMatrix();
+        }
+        if (this.compositor) {
+            this.compositor.setOriginalViewport(this.viewport);
         }
         if (this.imageBackground) {
             this.imageBackground.resize(imageWidth, imageHeight);
@@ -235,7 +248,7 @@ export class Webgl2RendererBackend {
         let currentScene = new Scene();
         currentScene.background = null;
         let currentSceneIsUsed = false;
-    
+
         const stack: Array<WorkingFileLayer> = [
             { type: 'group', layers: this.layerOrder } as WorkingFileGroupLayer,
         ];
@@ -312,6 +325,7 @@ export class Webgl2RendererBackend {
                 texture,
                 new Matrix4().multiply(transform),
                 this.renderer,
+                this.viewport,
                 options?.invert,
             );
             this.rendererBusy = false;
@@ -329,7 +343,6 @@ export class Webgl2RendererBackend {
         imageHeight: number,
         options?: Webgl2RendererBackendTakeSnapshotOptions
     ): Promise<ImageBitmap> {
-        console.time('takeSnapshot');
 
         let filtersOverride: Webgl2RendererCanvasFilter[] | undefined;
         if (options?.filters) {
@@ -365,9 +378,6 @@ export class Webgl2RendererBackend {
         });
 
         this.rendererBusy = true;
-
-        const originalRendererViewport = new Vector4();
-        this.renderer.getViewport(originalRendererViewport);
 
         try {
 
@@ -437,7 +447,7 @@ export class Webgl2RendererBackend {
             console.error('[renderers/webgl2/backend/renderer] Error taking snapshot. ', error);
         }
 
-        this.renderer.setViewport(originalRendererViewport);
+        this.renderer.setViewport(this.viewport);
 
         this.rendererBusy = false;
 
@@ -452,8 +462,46 @@ export class Webgl2RendererBackend {
 
         snapshotRenderTarget.dispose();
 
-        console.timeEnd('takeSnapshot');
         return bitmap;
+    }
+
+    async startBrushStroke(
+        layerId: number,
+        brushSize: number,
+    ) {
+        const meshController = this.meshControllersById.get(layerId);
+        if (!meshController) return;
+        const texture = await meshController.getTexture(true);
+        if (!texture) return;
+        const transform = meshController.getTransform();
+
+        this.compositorBrushStrokes.set(layerId,
+            this.compositor.startBrushStroke(
+                texture,
+                transform,
+                brushSize,
+            )
+        );
+    }
+
+    moveBrushStroke(
+        layerId: number,
+        x: number,
+        y: number,
+    ) {
+        const brushStrokeId = this.compositorBrushStrokes.get(layerId);
+        if (brushStrokeId == null) return;
+
+        this.compositor.moveBrushStroke(brushStrokeId, x, y);
+    }
+
+    stopBrushStroke(
+        layerId: number,
+    ) {
+        const brushStrokeId = this.compositorBrushStrokes.get(layerId);
+        if (brushStrokeId == null) return;
+
+        this.compositor.stopBrushStroke(brushStrokeId);
     }
 
     dispose() {

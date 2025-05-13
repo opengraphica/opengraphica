@@ -54,7 +54,7 @@ export default defineComponent({
             const decomposedTransform = canvasStore.state.decomposedTransform;
             let appliedZoom: number = decomposedTransform.scaleX / devicePixelRatio;
             return Math.max(svgPathStrokeWidth.value * 4, Math.round(appliedZoom));
-        })
+        });
 
         watch(() => workingFileStore.state.selectedLayerIds, () => {
             const layers = getSelectedLayers();
