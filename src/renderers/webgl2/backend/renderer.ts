@@ -70,7 +70,9 @@ export class Webgl2RendererBackend {
     maskTextures: Record<number, Texture> = {};
     maskTextureRequests: Record<number, Promise<Texture | undefined> | undefined> = {};
     meshControllersById: Map<number, Webgl2RendererMeshController> = new Map();
+
     queueCreateLayerPassesTimeoutHandle: number | undefined;
+    beforeRenderCallbacks: Array<() => void> = [];
 
     compositorBrushStrokes = new Map<number, number>();
 
@@ -300,8 +302,23 @@ export class Webgl2RendererBackend {
         this.dirty = true;
     }
 
+    registerBeforeRenderCallback(callback: () => void) {
+        this.beforeRenderCallbacks.push(callback);
+    }
+
+    unregisterBeforeRenderCallback(callback: () => void) {
+        let index = this.beforeRenderCallbacks.indexOf(callback);
+        if (index > -1) {
+            this.beforeRenderCallbacks.splice(index, 1);
+        }
+    }
+
     render() {
         if (!this.camera || this.rendererBusy) return;
+
+        for (const callback of this.beforeRenderCallbacks) {
+            callback();
+        }
 
         this.camera.matrix = this.viewTransform.clone().invert().multiply(new Matrix4().makeTranslation(0, 0, 1));
         this.camera.updateMatrixWorld(true);

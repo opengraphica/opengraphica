@@ -4,11 +4,11 @@
  */
 
 import { toRefs, watch, type WatchStopHandle } from 'vue';
-import { RasterLayerMeshController } from './mesh-controller';
+import { RasterSequenceLayerMeshController } from './mesh-controller';
 import type { RendererLayerWatcher, WorkingFileRasterSequenceLayer } from '@/types';
 
 export class RasterSequenceLayerWatcher implements RendererLayerWatcher<WorkingFileRasterSequenceLayer> {
-    meshController: RasterLayerMeshController | undefined;
+    meshController: RasterSequenceLayerMeshController | undefined;
     stopWatchName: WatchStopHandle | undefined;
     stopWatchDrafts: WatchStopHandle | undefined;
     stopWatchBlendingMode: WatchStopHandle | undefined;
@@ -21,7 +21,7 @@ export class RasterSequenceLayerWatcher implements RendererLayerWatcher<WorkingF
     async attach(layer: WorkingFileRasterSequenceLayer) {
         const { blendingMode, data, drafts, filters, height, name, transform, visible, width } = toRefs(layer);
 
-        this.meshController = new RasterLayerMeshController();
+        this.meshController = new RasterSequenceLayerMeshController();
         this.meshController.attach(layer.id);
 
         this.stopWatchBlendingMode = watch([blendingMode], ([blendingMode]) => {

@@ -325,24 +325,25 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
     private drawLoop() {
         if (!this.drawingBrushStroke) return;
 
-        const points = this.drawingBrushStroke.retrieveBezierSegmentPoints();
-
         const now = performance.now();
-        if (points.length > 0) {
+
+        let point: BrushStrokePoint | undefined;
+        let count = 0;
+        while (point = this.drawingBrushStroke.retrieveBezierSegmentPoint()) {
+            count++;
             this.drawLoopDeltaAccumulator = 0;
-            // let point: BrushStrokePoint | undefined;
-            for (const point of points) {
-                for (const layer of this.drawingOnLayers) {
-                    this.renderer?.moveBrushStroke(
-                        layer.id,
-                        point.x,
-                        point.y,
-                    );
-                }
+            for (const layer of this.drawingOnLayers) {
+                this.renderer?.moveBrushStroke(
+                    layer.id,
+                    point.x,
+                    point.y,
+                );
             }
-        } else if (now - this.drawLoopLastPointerMoveTimestamp > 25) {
+            if (count > 30) break;
+        }
+        
+        if (now - this.drawLoopLastPointerMoveTimestamp > 25) {
             this.drawLoopDeltaAccumulator += now - this.drawLoopLastRunTimestamp;
-            this.drawLoopLastRunTimestamp = now;
 
             if (this.drawLoopDeltaAccumulator > 16.66) {
                 this.drawLoopDeltaAccumulator -= 16.66;
@@ -353,12 +354,26 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 }
             }
         }
+        this.drawLoopLastRunTimestamp = now;
 
         window.requestAnimationFrame(this.drawLoop);
     }
 
     private async drawEnd(e: PointerEvent) {
         if (this.drawingPointerId === e.pointerId) {
+
+            if (this.drawingBrushStroke) {
+                let point: BrushStrokePoint | undefined;
+                while (point = this.drawingBrushStroke.retrieveBezierSegmentPoint()) {
+                    for (const layer of this.drawingOnLayers) {
+                        this.renderer?.moveBrushStroke(
+                            layer.id,
+                            point.x,
+                            point.y,
+                        );
+                    }
+                }
+            }
 
             for (const layer of this.drawingOnLayers) {
                 this.renderer?.stopBrushStroke(

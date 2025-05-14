@@ -77,7 +77,7 @@ class BrushStrokeBezierSegment {
         if (targetLength <= 0) return 0;
         if (targetLength >= this.length) return 1;
     
-        let low = 0, high = (this.lut.length / 2) - 1;
+        let low = 0, high = (this.lut.length / 2) - 2;
         while (low <= high) {
             const mid = Math.floor((low + high) / 2);
             const midLen = this.lut[mid * 2 + 1];
@@ -94,7 +94,8 @@ class BrushStrokeBezierSegment {
         const bT = this.lut[low * 2];
         const bLength = this.lut[low * 2 + 1];
         const ratio = (targetLength - aLength) / (bLength - aLength);
-        return aT + (bT - aT) * ratio;
+        const t = aT + (bT - aT) * ratio;
+        return t;
     }
 }
 
@@ -192,40 +193,67 @@ export class BrushStroke {
         return collectedPoint;
     }
 
-    retrieveBezierSegmentPoints(): BrushStrokePoint[] {
-        const points: BrushStrokePoint[] = [];
-        if (this.collectedPointsLength - this.collectedPointRetrieveIndex - 1 >= 2) {
-            const p0 = this.lastCollectedPoint;
-            const p1 = this.retrieveCollectedPoint()!;
-            const p2 = this.retrieveCollectedPoint()!;
-            let p01Length = this.bezierSegment.distance(p0.x, p0.y, p1.x, p1.y);
-            let p12Length = this.bezierSegment.distance(p1.x, p1.y, p2.x, p2.y);
+    retrieveBezierP0: BrushStrokePoint | undefined;
+    retrieveBezierP1: BrushStrokePoint | undefined;
+    retrieveBezierP2: BrushStrokePoint | undefined;
+    retrieveBezierP01Length: number = 0;
+    retrieveBezierP12Length: number = 0;
+    retrieveBezierTravel: number = 0;
 
-            if (p01Length < 2 && p12Length < 2) {
-                points.push(p1);
-                points.push(p2);
+    retrieveBezierSegmentPoint(): BrushStrokePoint | undefined {
+        let point: BrushStrokePoint | undefined;
+        let isRetrievingBezier = !!(this.retrieveBezierP0 && this.retrieveBezierP1 && this.retrieveBezierP2);
+        if (!isRetrievingBezier && this.retrieveBezierP2) {
+            point = this.retrieveBezierP2;
+            this.retrieveBezierP2 = undefined;
+            return point;
+        }
+        if (!isRetrievingBezier && this.collectedPointsLength - this.collectedPointRetrieveIndex - 1 >= 2) {
+            this.retrieveBezierP0 = this.lastCollectedPoint;
+            this.retrieveBezierP1 = this.retrieveCollectedPoint()!;
+            this.retrieveBezierP2 = this.retrieveCollectedPoint()!;
+            this.retrieveBezierP01Length = this.bezierSegment.distance(this.retrieveBezierP0.x, this.retrieveBezierP0.y, this.retrieveBezierP1.x, this.retrieveBezierP1.y);
+            this.retrieveBezierP12Length = this.bezierSegment.distance(this.retrieveBezierP1.x, this.retrieveBezierP1.y, this.retrieveBezierP2.x, this.retrieveBezierP2.y);
+
+            if (this.retrieveBezierP01Length < 2 && this.retrieveBezierP12Length < 2) {
+                point = this.retrieveBezierP1;
+                this.retrieveBezierP0 = undefined;
+                this.retrieveBezierP1 = undefined;
+                return point;
             } else {
-                this.bezierSegment.init(p0, p1, p2);
-                let travel = this.leftoverLineTravel;
-                
-                let stepDistance = 1;
-                for (; travel < this.bezierSegment.length; travel += stepDistance) {
-                    let travelRatio = travel / this.bezierSegment.length;
-                    let brushSize = this.getBrushSize(p0, p1, p2, p01Length, p12Length, travelRatio);
-                    stepDistance = Math.max(1, brushSize * this.spacing);
-                    let bezierT = this.bezierSegment.getTAtLength(travel);
-                    points.push({
-                        x: this.bezierSegment.bezierX(bezierT),
-                        y: this.bezierSegment.bezierY(bezierT),
-                        size: brushSize,
-                        tiltX: p1.tiltX, // TODO - interpolate
-                        tiltY: p1.tiltY, // TODO - interpolate
-                        twist: p1.twist, // TODO - interpolate
-                    });
-                }
+                isRetrievingBezier = true;
+                this.bezierSegment.init(this.retrieveBezierP0, this.retrieveBezierP1, this.retrieveBezierP2);
+                this.retrieveBezierTravel = this.leftoverLineTravel;
             }
         }
-        return points;
+        if (isRetrievingBezier) {
+            let travel = this.retrieveBezierTravel;
+            
+            let travelRatio = travel / this.bezierSegment.length;
+            let brushSize = this.getBrushSize(
+                this.retrieveBezierP0!, this.retrieveBezierP1!, this.retrieveBezierP2!,
+                this.retrieveBezierP01Length, this.retrieveBezierP12Length, travelRatio
+            );
+            let stepDistance = Math.max(1, brushSize * this.spacing);
+            let bezierT = this.bezierSegment.getTAtLength(travel);
+            point = {
+                x: this.bezierSegment.bezierX(bezierT),
+                y: this.bezierSegment.bezierY(bezierT),
+                size: brushSize,
+                tiltX: this.retrieveBezierP1!.tiltX, // TODO - interpolate
+                tiltY: this.retrieveBezierP1!.tiltY, // TODO - interpolate
+                twist: this.retrieveBezierP1!.twist, // TODO - interpolate
+            }
+
+            this.retrieveBezierTravel += stepDistance;
+            if (this.retrieveBezierTravel >= this.bezierSegment.length) {
+                this.retrieveBezierP0 = undefined;
+                this.retrieveBezierP1 = undefined;
+                this.retrieveBezierP2 = undefined;
+            }
+            return point;
+        }
+        return undefined;
     }
 
     getBrushSize(p0: BrushStrokePoint, p1: BrushStrokePoint, p2: BrushStrokePoint, p01length: number, p12Length: number, t: number) {

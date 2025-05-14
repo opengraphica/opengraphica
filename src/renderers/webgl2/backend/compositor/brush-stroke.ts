@@ -19,7 +19,7 @@ import compositorFragmentShader from './shader/compositor.frag';
 import copyTileVertexShader from './shader/copy-tile.vert';
 import copyTileFragmentShader from './shader/copy-tile.frag';
 
-import { markRenderDirty } from '..';
+import { markRenderDirty, getWebgl2RendererBackend } from '..';
 
 import type { Camera, WebGLRenderer } from 'three';
 
@@ -43,6 +43,8 @@ export class BrushStroke {
     xTileCount!: number;
     yTileCount!: number;
     brushSize!: number;
+
+    dirtyTiles!: Uint8Array;
 
     // TODO - share this across multiple brush strokes?
     destinationTextureRenderTargets: Array<WebGLRenderTarget | undefined> = [];
@@ -84,7 +86,7 @@ export class BrushStroke {
         this.geometry = new PlaneGeometry(2, 2);
 
         const maxTileSize = 8192;
-        const minTileSize = 64;
+        const minTileSize = Math.max(64, Math.max(this.texture.image.width, this.texture.image.height) / 8);
         const approxTileCount = Math.ceil(Math.sqrt(brushSize * brushSize) / 1024);
         const estimatedTileSize = Math.max(minTileSize, Math.min(maxTileSize, Math.floor(Math.sqrt((brushSize * brushSize) / approxTileCount))));
         this.tileSize = Math.pow(2, Math.round(Math.log2(estimatedTileSize)));
@@ -92,6 +94,7 @@ export class BrushStroke {
         this.xTileCount = Math.ceil(this.texture.image.width / this.tileSize);
         this.yTileCount = Math.ceil(this.texture.image.height / this.tileSize);
         const tileCount = this.xTileCount * this.yTileCount;
+        this.dirtyTiles = new Uint8Array(tileCount);
         this.destinationTextureRenderTargets = new Array(tileCount);
         this.brushStrokeRenderTargets = new Array(tileCount);
 
@@ -140,6 +143,9 @@ export class BrushStroke {
 
         this.mesh = new Mesh(this.geometry, this.brushMaterial);
         this.scene.add(this.mesh);
+
+        this.composite = this.composite.bind(this);
+        getWebgl2RendererBackend().registerBeforeRenderCallback(this.composite);
     }
 
     move(
@@ -166,8 +172,9 @@ export class BrushStroke {
         let tileY = 0;
         let tileWidth = 0;
         let tileHeight = 0;
-        let destinationRenderTarget: WebGLRenderTarget;
         let brushRenderTarget: WebGLRenderTarget;
+
+        let count = 0;
         for (xi = 0; xi < this.xTileCount; xi++) {
             tileX = xi * this.tileSize;
             tileWidth = Math.min(this.tileSize, this.texture.image.width - tileX);
@@ -180,12 +187,7 @@ export class BrushStroke {
 
                 if (tileY + tileHeight < aabb.min.y || tileY > aabb.max.y) continue;
 
-                destinationRenderTarget = this.createDestinationTextureRenderTarget(
-                    xi,
-                    yi,
-                    tileWidth,
-                    tileHeight,
-                );
+                count++;
 
                 brushRenderTarget = this.createBrushTextureRenderTarget(
                     xi,
@@ -264,42 +266,84 @@ export class BrushStroke {
                 this.renderer.setRenderTarget(brushRenderTarget);
                 this.renderer.render(this.scene, this.camera);
 
-                // Set up composite material
-                this.mesh.material = this.compositorMaterial;
-
-                this.compositorMaterial.uniforms.dstMap.value = destinationRenderTarget.texture;
-                this.compositorMaterial.uniforms.dstOffsetAndSize.value.x = 0;
-                this.compositorMaterial.uniforms.dstOffsetAndSize.value.y = 0;
-                this.compositorMaterial.uniforms.dstOffsetAndSize.value.z = 1;
-                this.compositorMaterial.uniforms.dstOffsetAndSize.value.w = 1;
-                this.compositorMaterial.uniforms.srcMap.value = brushRenderTarget.texture;
-                this.compositorMaterial.uniformsNeedUpdate = true;
-
-                // Render composite tile
-                const outputRenderTarget = this.createOutputTileRenderTarget(tileWidth, tileHeight);
-                this.renderer.setRenderTarget(outputRenderTarget);
-                this.renderer.render(this.scene, this.camera);
-                this.renderer.setRenderTarget(null);
-
-                // Copy render result back to original texture in GPU
-                this.copyTextureRegion.min.x = 0;
-                this.copyTextureRegion.min.y = 0;
-                this.copyTextureRegion.max.x = tileWidth;
-                this.copyTextureRegion.max.y = tileHeight;
-                this.copyTextureDestination.x = tileX;
-                this.copyTextureDestination.y = this.texture.image.height - tileHeight - tileY;
-                this.renderer.copyTextureToTexture(
-                    outputRenderTarget.texture, // TODO compositeTile.texture
-                    this.texture,
-                    this.copyTextureRegion,
-                    this.copyTextureDestination,
-                );
+                this.dirtyTiles[yi * this.xTileCount + xi] = 1;
             }
         }
 
         this.renderer.setRenderTarget(null);
         this.renderer.setViewport(this.originalViewport);
         markRenderDirty();
+    }
+
+    composite() {
+        let destinationRenderTarget: WebGLRenderTarget;
+        let brushRenderTarget: WebGLRenderTarget;
+
+        let xi: number;
+        let yi: number;
+        let tileX: number;
+        let tileY: number;
+        let tileWidth: number;
+        let tileHeight: number;
+        for (let i = 0; i < this.dirtyTiles.length; i++) {
+            if (this.dirtyTiles[i] === 0) continue;
+            this.dirtyTiles[i] = 0;
+
+            yi = Math.floor(i / this.xTileCount);
+            xi = i - yi * this.xTileCount;
+            tileX = xi * this.tileSize;
+            tileY = yi * this.tileSize;
+            tileWidth = Math.min(this.tileSize, this.texture.image.width - tileX);
+            tileHeight = Math.min(this.tileSize, this.texture.image.height - tileY);
+
+            destinationRenderTarget = this.createDestinationTextureRenderTarget(
+                xi,
+                yi,
+                tileWidth,
+                tileHeight,
+            );
+
+            brushRenderTarget = this.createBrushTextureRenderTarget(
+                xi,
+                yi,
+                tileWidth,
+                tileHeight,
+            );
+
+            // Set up composite material
+            this.mesh.material = this.compositorMaterial;
+
+            this.compositorMaterial.uniforms.dstMap.value = destinationRenderTarget.texture;
+            this.compositorMaterial.uniforms.dstOffsetAndSize.value.x = 0;
+            this.compositorMaterial.uniforms.dstOffsetAndSize.value.y = 0;
+            this.compositorMaterial.uniforms.dstOffsetAndSize.value.z = 1;
+            this.compositorMaterial.uniforms.dstOffsetAndSize.value.w = 1;
+            this.compositorMaterial.uniforms.srcMap.value = brushRenderTarget.texture;
+            this.compositorMaterial.uniformsNeedUpdate = true;
+
+            // Render composite tile
+            const outputRenderTarget = this.createOutputTileRenderTarget(tileWidth, tileHeight);
+            this.renderer.setViewport(0, 0, tileWidth, tileHeight);
+            this.renderer.setRenderTarget(outputRenderTarget);
+            this.renderer.render(this.scene, this.camera);
+            this.renderer.setRenderTarget(null);
+
+            // Copy render result back to original texture in GPU
+            this.copyTextureRegion.min.x = 0;
+            this.copyTextureRegion.min.y = 0;
+            this.copyTextureRegion.max.x = tileWidth;
+            this.copyTextureRegion.max.y = tileHeight;
+            this.copyTextureDestination.x = tileX;
+            this.copyTextureDestination.y = this.texture.image.height - tileHeight - tileY;
+            this.renderer.copyTextureToTexture(
+                outputRenderTarget.texture,
+                this.texture,
+                this.copyTextureRegion,
+                this.copyTextureDestination,
+            );
+        }
+        this.renderer.setRenderTarget(null);
+        this.renderer.setViewport(this.originalViewport);
     }
 
     createOutputTileRenderTarget(
@@ -417,6 +461,9 @@ export class BrushStroke {
     }
 
     dispose() {
+        this.composite();
+        getWebgl2RendererBackend().unregisterBeforeRenderCallback(this.composite);
+
         this.geometry?.dispose();
         this.brushMaterial?.dispose();
         this.copyTileMaterial?.dispose();
