@@ -1,4 +1,4 @@
-import { LinearFilter, ClampToEdgeWrapping, RGBAFormat, LinearSRGBColorSpace, SRGBColorSpace, HalfFloatType, UnsignedByteType } from 'three/src/constants';
+import { LinearFilter, ClampToEdgeWrapping, RGBAFormat, LinearSRGBColorSpace, SRGBColorSpace, HalfFloatType, UnsignedByteType, NearestFilter } from 'three/src/constants';
 import { Box2 } from 'three/src/math/Box2';
 import { Matrix4 } from 'three/src/math/Matrix4';
 import { Mesh } from 'three/src/objects/Mesh';
@@ -151,8 +151,9 @@ export class BrushStroke {
     move(
         x: number,
         y: number,
+        size: number,
     ) {
-        const brushSize = this.brushSize;
+        const brushSize = size;
         const brushLeft = x - brushSize / 2;
         const brushTop = y - brushSize / 2;
 
@@ -253,6 +254,7 @@ export class BrushStroke {
                 const brushBlendRenderTarget = this.createBrushBlendRenderTarget(tileWidth, tileHeight);
                 this.renderer.setViewport(0, 0, tileWidth, tileHeight);
                 this.renderer.setRenderTarget(brushBlendRenderTarget);
+                this.renderer.clearColor();
                 this.renderer.render(this.scene, this.camera);
                 
                 // Copy brush render result back to the brush render target
@@ -264,6 +266,7 @@ export class BrushStroke {
                 this.copyTileMaterial.uniforms.tileOffsetAndSize.value.w = 1;
                 this.copyTileMaterial.uniformsNeedUpdate = true;
                 this.renderer.setRenderTarget(brushRenderTarget);
+                this.renderer.clearColor();
                 this.renderer.render(this.scene, this.camera);
 
                 this.dirtyTiles[yi * this.xTileCount + xi] = 1;
@@ -325,6 +328,7 @@ export class BrushStroke {
             const outputRenderTarget = this.createOutputTileRenderTarget(tileWidth, tileHeight);
             this.renderer.setViewport(0, 0, tileWidth, tileHeight);
             this.renderer.setRenderTarget(outputRenderTarget);
+            this.renderer.clearColor();
             this.renderer.render(this.scene, this.camera);
             this.renderer.setRenderTarget(null);
 
@@ -357,8 +361,8 @@ export class BrushStroke {
         }
         const renderTarget = new WebGLRenderTarget(tileWidth, tileHeight, {
             type: this.texture.type,
-            minFilter: LinearFilter,
-            magFilter: LinearFilter,
+            minFilter: NearestFilter,
+            magFilter: NearestFilter,
             wrapS: ClampToEdgeWrapping,
             wrapT: ClampToEdgeWrapping,
             format: RGBAFormat,
@@ -382,8 +386,8 @@ export class BrushStroke {
         }
         const renderTarget = new WebGLRenderTarget(tileWidth, tileHeight, {
             type: this.isHalfFloat ? HalfFloatType : UnsignedByteType,
-            minFilter: LinearFilter,
-            magFilter: LinearFilter,
+            minFilter: NearestFilter,
+            magFilter: NearestFilter,
             wrapS: ClampToEdgeWrapping,
             wrapT: ClampToEdgeWrapping,
             format: RGBAFormat,
@@ -407,8 +411,8 @@ export class BrushStroke {
         if (!renderTarget) {
             renderTarget = new WebGLRenderTarget(tileWidth, tileHeight, {
                 type: this.isHalfFloat ? HalfFloatType : UnsignedByteType,
-                minFilter: LinearFilter,
-                magFilter: LinearFilter,
+                minFilter: NearestFilter,
+                magFilter: NearestFilter,
                 wrapS: ClampToEdgeWrapping,
                 wrapT: ClampToEdgeWrapping,
                 format: RGBAFormat,
@@ -445,8 +449,8 @@ export class BrushStroke {
         if (!renderTarget) {
             renderTarget = new WebGLRenderTarget(tileWidth, tileHeight, {
                 type: this.isHalfFloat ? HalfFloatType : UnsignedByteType,
-                minFilter: LinearFilter,
-                magFilter: LinearFilter,
+                minFilter: NearestFilter,
+                magFilter: NearestFilter,
                 wrapS: ClampToEdgeWrapping,
                 wrapT: ClampToEdgeWrapping,
                 format: RGBAFormat,

@@ -149,13 +149,12 @@ export class BrushStroke {
     retrieveCatmullRomP1: BrushStrokePoint | undefined;
     retrieveCatmullRomP2: BrushStrokePoint | undefined;
     retrieveCatmullRomP3: BrushStrokePoint | undefined;
-    retrieveCatmullRomP01Length: number = 0;
-    retrieveCatmullRomP12Length: number = 0;
     retrieveCatmullRomTravel: number = 0;
     retrieveLineLength: number = 0;
 
     constructor(smoothing: number, spacing: number, startingPoint: BrushStrokePoint) {
-        smoothing = 0.05;
+        smoothing = 1; // 0.05
+        smoothing = 0.2;
         this.spacing = spacing;
         this.smoothing = smoothing;
 

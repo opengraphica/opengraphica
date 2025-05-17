@@ -40,6 +40,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
     private renderer: RendererFrontend | null = null;
 
     private drawingPointerId: number | null = null;
+    private drawingUsePressure: boolean = false;
     private drawingOnLayers: WorkingFileAnyLayer[] = [];
     private drawingBrushStroke: BrushStroke | null = null;
     private drawLoopDeltaAccumulator: number = 0;
@@ -163,17 +164,16 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 this.lastCursorY * devicePixelRatio
             ).matrixTransform(canvasStore.state.transform.inverse());
         }
-
         if (
             this.drawingPointerId == null && e.isPrimary && e.button === 0 &&
             (
                 e.pointerType === 'pen' ||
-                e.pointerType === 'touch' ||
                 (!editorStore.state.isPenUser && e.pointerType === 'mouse')
             )
         ) {
             this.drawingPointerId = e.pointerId;
-            this.drawStart();
+            this.drawingUsePressure = e.pointerType === 'pen' && e.pressure !== 0.5 && e.pressure !== 1.0;
+            this.drawStart(e);
         }
     }
 
@@ -188,6 +188,10 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                     layer.drafts = [];
                 }
             })();
+        } else if (this.touches.length === 1) {
+            this.drawingPointerId = this.touches[0].id;
+            this.drawingUsePressure = this.touches[0].down.pressure !== 0.5 && this.touches[0].down.pressure !== 1.0;
+            this.drawStart(this.touches[0].down);
         }
     }
 
@@ -212,7 +216,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             this.drawingBrushStroke?.addPoint({
                 x: transformedPoint.x,
                 y: transformedPoint.y,
-                size: brushSize.value,
+                size: brushSize.value * (this.drawingUsePressure ? e.pressure : 1),
                 tiltX: e.tiltX,
                 tiltY: e.tiltY,
                 twist: e.twist,
@@ -227,7 +231,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         this.drawEnd(e);
     }
 
-    protected async drawStart() {
+    protected async drawStart(e: PointerEvent) {
         // Create layer if one does not exist
         const startDrawReserveToken = createHistoryReserveToken();
         await historyStore.dispatch('reserve', { token: startDrawReserveToken });
@@ -303,7 +307,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             {
                 x: transformedPoint.x,
                 y: transformedPoint.y,
-                size: brushSize.value,
+                size: brushSize.value * (this.drawingUsePressure ? e.pressure : 1),
                 tiltX: 0,
                 tiltY: 0,
                 twist: 0,
@@ -316,6 +320,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 layer.id,
                 transformedPoint.x,
                 transformedPoint.y,
+                brushSize.value * (this.drawingUsePressure ? e.pressure : 1),
             );
         }
 
@@ -329,7 +334,9 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
 
         let point: BrushStrokePoint | undefined;
         let count = 0;
-        while (point = this.drawingBrushStroke.retrieveCatmullRomSegmentPoint()) {
+        while (this.drawingBrushStroke.hasCollectedPoints()) {
+            point = this.drawingBrushStroke.retrieveCatmullRomSegmentPoint();
+            if (!point) continue;
             count++;
             this.drawLoopDeltaAccumulator = 0;
             for (const layer of this.drawingOnLayers) {
@@ -337,9 +344,10 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                     layer.id,
                     point.x,
                     point.y,
+                    point.size,
                 );
             }
-            if (count > 30) break;
+            if (count > 60) break;
         }
         
         if (now - this.drawLoopLastPointerMoveTimestamp > 25) {
@@ -373,6 +381,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                             layer.id,
                             point.x,
                             point.y,
+                            point.size,
                         );
                     }
                 }
@@ -383,6 +392,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                             layer.id,
                             point.x,
                             point.y,
+                            point.size,
                         );
                     }
                 }

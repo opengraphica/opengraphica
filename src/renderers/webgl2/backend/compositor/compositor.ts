@@ -41,10 +41,11 @@ export class Compositor {
         index: number,
         x: number,
         y: number,
+        size: number,
     ) {
         const brushStroke = this.brushStrokes.get(index);
         if (!brushStroke) return;
-        brushStroke.move(x, y);
+        brushStroke.move(x, y, size);
     }
 
     stopBrushStroke(

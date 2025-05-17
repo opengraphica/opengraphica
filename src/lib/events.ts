@@ -120,7 +120,7 @@ export function translateTouchEventToPointerEvents(type: string, e: TouchEvent):
                 pageY: touch.pageY,
                 pointerId: touch.identifier,
                 pointerType: 'touch',
-                pressure: 1,
+                pressure: touch.force,
                 relatedTarget: null,
                 returnValue: e.returnValue,
                 screenX: touch.screenX,
