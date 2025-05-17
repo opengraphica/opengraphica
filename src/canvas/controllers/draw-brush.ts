@@ -329,7 +329,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
 
         let point: BrushStrokePoint | undefined;
         let count = 0;
-        while (point = this.drawingBrushStroke.retrieveBezierSegmentPoint()) {
+        while (point = this.drawingBrushStroke.retrieveCatmullRomSegmentPoint()) {
             count++;
             this.drawLoopDeltaAccumulator = 0;
             for (const layer of this.drawingOnLayers) {
@@ -363,8 +363,21 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         if (this.drawingPointerId === e.pointerId) {
 
             if (this.drawingBrushStroke) {
+                this.drawingBrushStroke.finalizeLine();
                 let point: BrushStrokePoint | undefined;
-                while (point = this.drawingBrushStroke.retrieveBezierSegmentPoint()) {
+                while (this.drawingBrushStroke.hasCollectedPoints()) {
+                    point = this.drawingBrushStroke.retrieveCatmullRomSegmentPoint();
+                    if (!point) continue;
+                    for (const layer of this.drawingOnLayers) {
+                        this.renderer?.moveBrushStroke(
+                            layer.id,
+                            point.x,
+                            point.y,
+                        );
+                    }
+                }
+                point = this.drawingBrushStroke.retrieveFinalPoint();
+                if (point) {
                     for (const layer of this.drawingOnLayers) {
                         this.renderer?.moveBrushStroke(
                             layer.id,
