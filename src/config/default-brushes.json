@@ -1,11 +1,40 @@
 {
-    "simple": {
-        "name": "brushCategory.simple.name",
-        "brushes": {
-            "circle": {
-                "name": "brushCategory.simple.brushes.circle.name",
-                "shape": "M 1,0.5 A 0.5,0.5 0 0 1 0.5,1 0.5,0.5 0 0 1 0,0.5 0.5,0.5 0 0 1 0.5,0 0.5,0.5 0 0 1 1,0.5 Z"
-            }
+    "categories": [
+        { "id": "simple", "icon": "bi bi-diamond-fill" },
+        { "id": "custom", "icon": "bi bi-tools" }
+    ],
+    "brushes": [
+        {
+            "id": "simplePen",
+            "categories": ["simple"],
+            "shape": "M 1,0.5 A 0.5,0.5 0 0 1 0.5,1 0.5,0.5 0 0 1 0,0.5 0.5,0.5 0 0 1 0.5,0 0.5,0.5 0 0 1 1,0.5 Z",
+            "spacing": 0.05,
+            "jitter": 0,
+            "angle": 0,
+            "pressureTaperStart": 1,
+            "pressureTaperEnd": 1,
+            "pressureMinSize": 0,
+            "pressureMinDensity": 1,
+            "pressureMaxDensity": 1,
+            "colorBlendingFactor": 0,
+            "colorBlendingPersistence": 0,
+            "alphaBlendingFactor": 0
+        },
+        {
+            "id": "simplePaintBrush",
+            "categories": ["simple"],
+            "shape": "M 1,0.5 A 0.5,0.5 0 0 1 0.5,1 0.5,0.5 0 0 1 0,0.5 0.5,0.5 0 0 1 0.5,0 0.5,0.5 0 0 1 1,0.5 Z",
+            "spacing": 0.05,
+            "jitter": 0,
+            "angle": 0,
+            "pressureTaperStart": 1,
+            "pressureTaperEnd": 1,
+            "pressureMinSize": 0,
+            "pressureMinDensity": 0,
+            "pressureMaxDensity": 0.25,
+            "colorBlendingFactor": 0.5,
+            "colorBlendingPersistence": 0.5,
+            "alphaBlendingFactor": 0
         }
-    }
+    ]
 }

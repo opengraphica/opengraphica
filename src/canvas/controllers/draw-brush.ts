@@ -13,7 +13,8 @@ import { createStoredImage, prepareStoredImageForArchival, prepareStoredImageFor
 import historyStore, { createHistoryReserveToken, historyReserveQueueFree, historyBlockInteractionUntilComplete } from '@/store/history';
 import workingFileStore, { getSelectedLayers, getLayerById, getLayerGlobalTransform, ensureUniqueLayerSiblingName } from '@/store/working-file';
 import {
-    cursorHoverPosition, brushShape, brushSmoothing, brushSpacing, brushColor, brushSize, brushMinDensity, brushMaxDensity,
+    cursorHoverPosition, brushShape, brushSmoothing, brushSpacing, brushColor,
+    brushSize, brushPressureMinDensity, brushPressureMaxDensity, showBrushDrawer,
 } from '../store/draw-brush-state';
 
 import DrawableCanvas from '@/canvas/renderers/drawable/canvas';
@@ -26,7 +27,6 @@ import { UpdateLayerAction } from '@/actions/update-layer';
 import { useRenderer } from '@/renderers';
 
 import type { InsertRasterLayerOptions, RendererFrontend, UpdateRasterLayerOptions, WorkingFileAnyLayer } from '@/types';
-import type { BrushStrokeData } from '@/canvas/drawables/brush-stroke';
 
 
 const devicePixelRatio = window.devicePixelRatio || 1;
@@ -52,7 +52,6 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
     private brushStrokeDrawableUuid: string | null = null;
 
     private brushShapeImage: HTMLImageElement | null = null;
-    private brushPreviewUpdate: BrushStrokeData | null = null;
     private brushColorStyle: string = '#000000';
     private brushColorAlpha: number = 1;
 
@@ -130,6 +129,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
     onLeave(): void {
         super.onLeave();
 
+        showBrushDrawer.value = false;
+
         this.drawablePreviewCanvas?.dispose();
         this.drawablePreviewCanvas = null;
 
@@ -164,22 +165,36 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 this.lastCursorY * devicePixelRatio
             ).matrixTransform(canvasStore.state.transform.inverse());
         }
+
+        const hasPressure = (e.pointerType === 'pen' || e.pointerType === 'touch') && e.pressure !== 0.5 && e.pressure !== 1.0;
         if (
             this.drawingPointerId == null && e.isPrimary && e.button === 0 &&
             (
                 e.pointerType === 'pen' ||
+                (e.pointerType === 'touch' && hasPressure) ||
                 (!editorStore.state.isPenUser && e.pointerType === 'mouse')
             )
         ) {
+            if (showBrushDrawer.value) {
+                showBrushDrawer.value = false;
+                return;
+            }
+
             this.drawingPointerId = e.pointerId;
-            this.drawingUsePressure = e.pointerType === 'pen' && e.pressure !== 0.5 && e.pressure !== 1.0;
+            this.drawingUsePressure = hasPressure;
             this.drawStart(e);
         }
     }
 
     onMultiTouchDown() {
         super.onMultiTouchDown();
-        if (this.touches.length > 1) {
+        const hasPressure = this.touches[0].down.pressure !== 0.5 && this.touches[0].down.pressure !== 1.0;
+        if (this.drawingPointerId != null || hasPressure) return;
+        if (showBrushDrawer.value) {
+            showBrushDrawer.value = false;
+            return;
+        }
+        if (this.touches.length > 1 && !this.drawingUsePressure) {
             this.drawingPointerId = null;
             this.drawingBrushStroke = null;
             (async () => {
@@ -190,10 +205,12 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             })();
         } else if (this.touches.length === 1) {
             this.drawingPointerId = this.touches[0].id;
-            this.drawingUsePressure = this.touches[0].down.pressure !== 0.5 && this.touches[0].down.pressure !== 1.0;
+            this.drawingUsePressure = false;
             this.drawStart(this.touches[0].down);
         }
     }
+
+    lastPointerTimestamp = 0;
 
     onPointerMove(e: PointerEvent): void {
         super.onPointerMove(e);
@@ -206,9 +223,11 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             ).matrixTransform(canvasStore.state.transform.inverse());
         }
 
+        const now = performance.now();
         if (
             this.drawingPointerId === e.pointerId
         ) {
+            this.lastPointerTimestamp = now;
             const transformedPoint = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
                 this.lastCursorY * devicePixelRatio
@@ -369,6 +388,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
 
     private async drawEnd(e: PointerEvent) {
         if (this.drawingPointerId === e.pointerId) {
+            this.drawingPointerId = null;
 
             if (this.drawingBrushStroke) {
                 this.drawingBrushStroke.finalizeLine();
@@ -410,7 +430,6 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
 
             this.drawingBrushStroke = null;
             this.drawingOnLayers = [];
-            this.drawingPointerId = null;
             this.activeDraftUuid = null;
 
             const updateLayerReserveToken = createHistoryReserveToken();

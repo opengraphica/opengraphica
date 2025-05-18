@@ -307,6 +307,12 @@
                                         <i class="bi bi-box-arrow-up-right ml-2"></i>
                                     </el-link>
                                 </div>
+                                <div class="el-form-item el-form-item--menu-item">
+                                    <el-link href="javascript:void" type="primary" @click="onClickShowDesignSystem()">
+                                        <span v-t="'dock.settings.prefs.help.designSystem'"></span>
+                                        <i class="bi bi-box-arrow-up-right ml-2"></i>
+                                    </el-link>
+                                </div>
                             </el-collapse-item>
                         </el-collapse>
                         <!-- Prefs: Reset -->
@@ -647,6 +653,9 @@ export default defineComponent({
                 preferencesStore.set('showWelcomeScreenAtStart', value);
             }
         });
+        function onClickShowDesignSystem() {
+            runModule('developer', 'designSystem');
+        }
         function onClickResetSettings() {
             for (let key in localStorage) {
                 if (key.startsWith('openGraphica')) {
@@ -795,6 +804,7 @@ export default defineComponent({
             preferenceMenuBarPosition,
             showTutorialNotifications,
             showWelcomeScreenAtStart,
+            onClickShowDesignSystem,
             onClickResetSettings,
             useMobileDebugger,
 

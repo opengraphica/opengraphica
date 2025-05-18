@@ -117,22 +117,10 @@
             "cancel": "Cancel"
         }
     },
-    "brushCategory": {
-        "simple": {
-            "name": "Simple Brushes",
-            "brushes": {
-                "circle": {
-                    "name": "Circle"
-                }
-            }
-        },
-        "shapes": {
-            "name": "Shapes"
-        }
-    },
     "button": {
         "addEffect": "Add Effect",
         "apply": "Apply",
+        "back": "Back",
         "cancel": "Cancel",
         "clear": "Clear",
         "convert": "Convert",
@@ -141,6 +129,7 @@
         "delete": "Delete",
         "discardChanges": "Discard Changes",
         "done": "Done",
+        "editBrush": "Edit Brush",
         "editEffects": "Edit Effects",
         "export": "Export",
         "no": "No",
@@ -161,6 +150,15 @@
                 "waitLabel": "Crop and Resize"
             }
         }
+    },
+    "defaultBrush": {
+        "default": "Default",
+        "simplePaintBrush": "Simple Paint Brush",
+        "simplePen": "Simple Pen"
+    },
+    "defaultBrushCategory": {
+        "custom": "Custom",
+        "simple": "Simple"
     },
     "dock": {
         "colorPicker": {
@@ -264,7 +262,8 @@
                 },
                 "help": {
                     "groupTitle": "Help",
-                    "reportIssue": "Report an Issue"
+                    "reportIssue": "Report an Issue",
+                    "designSystem": "Design System"
                 }
             }
         }
@@ -646,6 +645,8 @@
         }
     },
     "measurement": {
+        "percent": "Percent",
+        "percentage": "Percentage",
         "pixels": "Pixels",
         "millimeters": "Millimeters",
         "centimeters": "Centimeters",
@@ -660,6 +661,9 @@
         "collapseToolGroup": "Collapse"
     },
     "module": {
+        "designSystem": {
+            "title": "Design System"
+        },
         "fileExport": {
             "title": "Export Image",
             "saveBackIntroduction": "You have opened a file named {fileName}.",
@@ -1089,9 +1093,49 @@
             "brushSize": "Size"
         },
         "drawBrush": {
-            "brushColor": "Brush Color",
+            "brushColor": "Color",
             "brushSize": "Size",
-            "newBrushLayerName": "New Paint"
+            "brushSmoothing": "Smoothing",
+            "newBrushLayerName": "New Paint",
+            "brushDialog": {
+                "title": "Select Brush",
+                "close": "Close Dialog",
+                "noBrushCategorySelected": {
+                    "title": "No Category Selected",
+                    "message": "Please select a brush category."
+                },
+                "noBrushesInCategory": {
+                    "title": "No Brushes",
+                    "message": "This category has no brushes. Create some!"
+                },
+                "editorTab": {
+                    "blending": {
+                        "title": "Blending",
+                        "density": "Density",
+                        "pressureMinDensity": "Min Density",
+                        "pressureMaxDensity": "Max Density",
+                        "colorBlendingFactor": "Color Blending Factor",
+                        "colorBlendingPersistence": "Color Blending Persistence",
+                        "alphaBlendingFactor": "Alpha Blending Factor"
+                    },
+                    "shape": {
+                        "title": "Shape",
+                        "angle": "Angle"
+                    },
+                    "strokePath": {
+                        "title": "Stroke Path",
+                        "spacing": "Spacing",
+                        "jitter": "Jitter"
+                    },
+                    "taper": {
+                        "title": "Taper",
+                        "pressureTaper": "Pressure Taper",
+                        "pressureTaperStart": "Pressure Taper Start",
+                        "pressureTaperEnd": "Pressure Taper End",
+                        "pressureMinSize": "Minimum Size"
+                    }
+                }
+            }
         },
         "drawColorPicker": {
             "title": "Color Picker"

@@ -1,3 +1,4 @@
+export * from './brush';
 export * from './canvas';
 export * from './color';
 export * from './drawable';

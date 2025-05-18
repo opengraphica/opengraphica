@@ -1,4 +1,14 @@
 {
+    "developer": {
+        "modules": {
+            "designSystem": {
+                "action": {
+                    "type": "ui",
+                    "target": "design-system"
+                }
+            }
+        }
+    },
     "file": {
         "modules": {
             "new": {

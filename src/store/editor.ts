@@ -49,6 +49,7 @@ interface EditorState {
     clipboardBufferSelectionMaskCanvasOffset: DOMPoint;
     clipboardBufferUpdateTimestamp: number;
     hasClipboardUpdateSupport: boolean;
+    floatingDocksContainer: HTMLElement | null;
     isActiveToolbarExclusive: boolean;
     isPenUser: boolean;
     isTaskRunning: boolean;
@@ -116,6 +117,7 @@ const store = new PerformantStore<EditorStore>({
         clipboardBufferSelectionMaskCanvasOffset: new DOMPoint,
         clipboardBufferUpdateTimestamp: 0,
         hasClipboardUpdateSupport: false,
+        floatingDocksContainer: null,
         isActiveToolbarExclusive: false,
         isPenUser: false,
         isTaskRunning: false,

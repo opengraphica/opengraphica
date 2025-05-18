@@ -1,6 +1,8 @@
 @use './opengraphica.scss';
+@use './opengraphica/button.scss';
 @use './opengraphica/popover.scss';
 @use './opengraphica/select.scss';
+@use './opengraphica/toolbar-brush.scss';
 
 @use './vendor/element-plus-theme-chalk.css';
 @use './element-plus-enhancements.scss' as *;
@@ -43,8 +45,10 @@
     --og-layer-list-thumbnail-border-color: #0e1014;
     --og-layer-list-thumbnail-border-color-active: var(--og-primary-600);
 
+    @include button.dark;
     @include popover.dark;
     @include select.dark;
+    @include toolbar-brush.dark;
 }
 
 .opengraphica {

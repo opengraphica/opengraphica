@@ -1,6 +1,8 @@
 @use './opengraphica.scss';
+@use './opengraphica/button.scss';
 @use './opengraphica/popover.scss';
 @use './opengraphica/select.scss';
+@use './opengraphica/toolbar-brush.scss';
 
 @use './vendor/element-plus-theme-chalk.css';
 @use './element-plus-enhancements.scss' as *;
@@ -46,8 +48,10 @@
     --og-layer-list-thumbnail-border-color: #ebeef5;
     --og-layer-list-thumbnail-border-color-active: rgba(64, 158, 255, 0.6);
 
+    @include button.light;
     @include popover.light;
     @include select.light;
+    @include toolbar-brush.light;
 }
 
 .opengraphica {
@@ -135,8 +139,10 @@
         --el-border-color-extra-light: #F2F6FC;
         --el-bg-color: #272c37;
 
+        @include button.dark;
         @include popover.dark;
         @include select.dark;
+        @include toolbar-brush.dark;
 
         color: var(--el-color-black);
     }
