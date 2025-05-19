@@ -33,8 +33,29 @@
                 </div>
                 <h2>Toggle</h2>
                 <div class="flex gap-2 items-center">
-                    <og-button outline solid toggle>Toggle</og-button>
-                    <og-button outline solid small toggle>Toggle</og-button>
+                    <og-button outline solid toggle>Pressed</og-button>
+                    <og-button outline solid small toggle>Pressed</og-button>
+                    <og-button outline solid toggle="active">Active</og-button>
+                    <og-button outline solid small toggle="active">Active</og-button>
+                </div>
+                <h2>Round</h2>
+                <div class="flex gap-2 items-center">
+                    <og-button outline solid round>Round</og-button>
+                    <og-button outline solid small round>Round</og-button>
+                </div>
+                <h2>Icon</h2>
+                <div class="flex gap-2 items-center">
+                    <og-button outline solid icon>
+                        <span class="bi bi-plus" aria-hidden="true" />
+                    </og-button>
+                    <og-button outline solid small icon>
+                        <span class="bi bi-plus" aria-hidden="true" />
+                    </og-button>
+                </div>
+                <h2>Slim</h2>
+                <div class="flex gap-2 items-center">
+                    <og-button outline solid slim>Slim</og-button>
+                    <og-button outline solid small slim>Slim</og-button>
                 </div>
             </el-scrollbar>
         </el-tab-pane>

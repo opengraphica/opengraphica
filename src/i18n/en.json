@@ -1094,6 +1094,7 @@
         },
         "drawBrush": {
             "brushColor": "Color",
+            "paletteCount": "Palette Count",
             "brushSize": "Size",
             "brushSmoothing": "Smoothing",
             "newBrushLayerName": "New Paint",

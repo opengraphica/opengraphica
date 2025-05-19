@@ -27,7 +27,8 @@ export const drawEmitter = mitt();
 
 interface PermanentStorageState {
     brushSize: number;
-    brushColor: RGBAColor;
+    colorPalette: RGBAColor[];
+    colorPaletteIndex: number;
     selectedBrush: string;
 }
 
@@ -35,22 +36,46 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
     name: 'drawBrushStateStore',
     state: {
         brushSize: 100,
-        brushColor: {
-            is: 'color',
-            r: 0,
-            g: 0,
-            b: 0,
-            alpha: 1,
-            style: '#000000'
-        },
+        colorPalette: [
+            {
+                is: 'color',
+                r: 0,
+                g: 0,
+                b: 0,
+                alpha: 1,
+                style: '#000000'
+            },
+            {
+                is: 'color',
+                r: 1,
+                g: 1,
+                b: 1,
+                alpha: 1,
+                style: '#ffffff'
+            },
+            {
+                is: 'color',
+                r: 1,
+                g: 0,
+                b: 0,
+                alpha: 1,
+                style: '#ff0000'
+            },
+        ],
+        colorPaletteIndex: 0,
         selectedBrush: 'simplePen'
     },
-    restore: ['brushSize', 'brushColor', 'selectedBrushCategory', 'selectedBrush'],
+    restore: ['brushSize', 'colorPalette', 'colorPaletteIndex', 'selectedBrushCategory', 'selectedBrush'],
 });
 
 export const brushSize = permanentStorage.getWritableRef('brushSize');
-export const brushColor = permanentStorage.getWritableRef('brushColor');
+export const colorPalette = permanentStorage.getDeepWritableRef('colorPalette');
+export const colorPaletteIndex = permanentStorage.getWritableRef('colorPaletteIndex');
 export const selectedBrush = permanentStorage.getWritableRef('selectedBrush');
+
+export const brushColor = computed(() => {
+    return colorPalette.value[colorPaletteIndex.value];
+});
 
 export const colorPaletteDockTop = ref(0);
 export const colorPaletteDockLeft = ref(0);

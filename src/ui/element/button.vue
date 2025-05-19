@@ -12,10 +12,14 @@
     </component>
 </template>
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch, type WatchStopHandle } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch, type PropType, type WatchStopHandle } from 'vue';
 
 const props = defineProps({
     danger: {
+        type: Boolean,
+        default: false,
+    },
+    icon: {
         type: Boolean,
         default: false,
     },
@@ -28,6 +32,14 @@ const props = defineProps({
         default: false,
     },
     primary: {
+        type: Boolean,
+        default: false,
+    },
+    round: {
+        type: Boolean,
+        default: false,
+    },
+    slim: {
         type: Boolean,
         default: false,
     },
@@ -44,7 +56,7 @@ const props = defineProps({
         default: 'button'
     },
     toggle: {
-        type: Boolean,
+        type: [Boolean, String] as PropType<boolean | 'pressed' | 'active'>,
         default: false,
     }
 });
@@ -57,11 +69,14 @@ const emit = defineEmits<{
 const classList = computed(() => {
     return [
         props.danger ? 'og-button--danger' : undefined,
+        props.icon ? 'og-button--icon' : undefined,
         props.outline ? 'og-button--outline' : undefined,
         props.primary ? 'og-button--primary' : undefined,
+        props.round ? 'og-button--round' : undefined,
+        props.slim ? 'og-button--slim' : undefined,
         props.small ? 'og-button--small' : undefined,
         props.solid ? 'og-button--solid' : undefined,
-        pressed.value ? 'og-button--pressed' : undefined,
+        pressed.value ? props.toggle === 'active' ? 'og-button--active' : 'og-button--pressed' : undefined,
     ];
 });
 
@@ -89,11 +104,11 @@ onUnmounted(() => {
 \*------*/
 
 function onClick(event: MouseEvent) {
-    if (props.toggle) {
+    emit('click', event);
+    if (props.toggle && !event.defaultPrevented) {
         pressed.value = !pressed.value;
         emit('update:pressed', pressed.value);
     }
-    emit('click', event);
 }
 
 </script>

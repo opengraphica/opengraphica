@@ -11,7 +11,9 @@
                 maxWidth: `${maxWidth}px`,
                 maxHeight: `${maxHeight}px`,
                 zIndex: floatingDockRect.order,
-            }">
+            }"
+            v-pointer.down="onPointerDownRoot"
+        >
             <div
                 class="og-floating-dock__grip"
                 v-pointer.dragstart="onDragStartGrip"
@@ -122,6 +124,10 @@ function placeAtBottomCenter() {
         top.value = dndTop + dndHeight - boundingBox.height;
     } else {
         let potentialPositions: Array<RectPosition> = [];
+        potentialPositions.push({
+            left: dndLeft + (dndWidth / 2) - (boundingBox.width / 2),
+            top: dndTop + dndHeight - boundingBox.height,
+        });
         for (const rect of rects) {
             if (rect.id === floatingDockRect.id) continue;
             const bottom = rect.top + rect.height;
@@ -133,7 +139,7 @@ function placeAtBottomCenter() {
                 left: rect.left + rect.width + placementMargin,
                 top: bottom - boundingBox.height,
             }
-            let top: RectPosition = {
+            let above: RectPosition = {
                 left: dndLeft + (dndWidth / 2) - (boundingBox.width / 2),
                 top: rect.top - boundingBox.height - placementMargin,
             };
@@ -143,7 +149,7 @@ function placeAtBottomCenter() {
             if (right.left + boundingBox.width < dndLeft + dndWidth) {
                 potentialPositions.push(right);
             }
-            potentialPositions.push(top);
+            potentialPositions.push(above);
         }
         potentialPositions.sort((a, b) => {
             if (a.top !== b.top) return a.top > b.top ? -1 : 1;
@@ -220,6 +226,17 @@ let dragStartTop = 0;
 let dragStartX = 0;
 let dragStartY = 0;
 
+function onPointerDownRoot() {
+    const rects = editorStore.get('floatingDockRects');
+    if (floatingDockRect.order !== rects.length) {
+        floatingDockRect.order = rects.length;
+        for (let rect of rects) {
+            if (rect.id === floatingDockRect.id) continue;
+            rect.order = Math.max(0, rect.order - 1);
+        }
+    }
+}
+
 function onDragStartGrip(e: PointerEvent) {
     if (!dockElement.value) return;
 
@@ -229,15 +246,6 @@ function onDragStartGrip(e: PointerEvent) {
     dragStartX = e.pageX;
     dragStartY = e.pageY;
     calculateBoundingBox();
-
-    const rects = editorStore.get('floatingDockRects');
-    if (floatingDockRect.order !== rects.length) {
-        floatingDockRect.order = rects.length;
-        for (let rect of rects) {
-            if (rect.id === floatingDockRect.id) continue;
-            rect.order = Math.max(0, rect.order - 1);
-        }
-    }
 }
 
 function onDragEndGrip() {

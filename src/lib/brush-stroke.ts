@@ -229,7 +229,9 @@ export class BrushStroke {
     }
 
     hasCollectedPoints() {
-        return this.collectedPointsLength > 0;
+        let isRetrievingCurve = !!(this.retrieveCatmullRomP0 && this.retrieveCatmullRomP1 && this.retrieveCatmullRomP2 && this.retrieveCatmullRomP3);
+        let isRetrievingLine = !isRetrievingCurve && !!(this.retrieveCatmullRomP1 && this.retrieveCatmullRomP2);
+        return this.collectedPointsLength > 0 || isRetrievingCurve || isRetrievingLine;
     }
 
     retrieveCollectedPoint(): BrushStrokePoint | undefined {
@@ -327,15 +329,63 @@ export class BrushStroke {
                 this.retrieveCatmullRomP1 = undefined;
                 this.retrieveCatmullRomP2 = undefined;
                 this.retrieveCatmullRomTravel -= this.retrieveLineLength;
+
             }
             return point;
         }
         return undefined;
     }
 
-    retrieveFinalPoint(): BrushStrokePoint | undefined {
-        if (this.retrieveCatmullRomTravel > 1) {
-            return {
+    retrieveFinalPoints(): BrushStrokePoint | undefined {
+        let point: BrushStrokePoint | undefined;
+        let isRetrievingLine = !!(this.retrieveCatmullRomP1 && this.retrieveCatmullRomP2);
+        let isRetrieveLastPoint = false;
+        if (!isRetrievingLine && this.lastCollectedPoint2 !== this.lastCollectedPoint1) {
+            let centerPointDistance = this.catmullRomSegment.distance(
+                this.lastCollectedPoint2.x, this.lastCollectedPoint2.y,
+                this.lastCollectedPoint1.x, this.lastCollectedPoint1.y,
+            );
+            if (centerPointDistance > 1) {
+                this.retrieveCatmullRomP0 = undefined;
+                this.retrieveCatmullRomP1 = this.lastCollectedPoint2;
+                this.retrieveCatmullRomP2 = this.lastCollectedPoint1;
+                this.retrieveCatmullRomP3 = undefined;
+                this.retrieveLineLength = centerPointDistance;
+            } else if (this.retrieveCatmullRomTravel > 1) {
+                this.retrieveCatmullRomTravel = 0;
+                isRetrieveLastPoint = true;
+            }
+        }
+        if (isRetrievingLine) {
+            const travel = this.retrieveCatmullRomTravel;
+            const travelRatio = travel / Math.max(this.retrieveLineLength, 0.00001);
+
+            const brushSize = this.retrieveCatmullRomP1!.size * (1 - travelRatio) + this.retrieveCatmullRomP2!.size * travelRatio;
+            const stepDistance = Math.max(1, brushSize * this.spacing);
+
+            if (travel <= this.retrieveLineLength) {
+                point = {
+                    x: this.retrieveCatmullRomP1!.x * (1 - travelRatio) + this.retrieveCatmullRomP2!.x * travelRatio,
+                    y: this.retrieveCatmullRomP1!.y * (1 - travelRatio) + this.retrieveCatmullRomP2!.y * travelRatio,
+                    size: brushSize,
+                    tiltX: this.retrieveCatmullRomP1!.tiltX, // TODO - interpolate
+                    tiltY: this.retrieveCatmullRomP1!.tiltY, // TODO - interpolate
+                    twist: this.retrieveCatmullRomP1!.twist, // TODO - interpolate
+                }
+                this.retrieveCatmullRomTravel += stepDistance;
+            } else {
+                this.retrieveCatmullRomP1 = undefined;
+                this.retrieveCatmullRomP2 = undefined;
+                this.lastCollectedPoint2 = this.lastCollectedPoint1;
+                this.retrieveCatmullRomTravel -= this.retrieveLineLength;
+                if (this.retrieveCatmullRomTravel > 1) {
+                    this.retrieveCatmullRomTravel = 0;
+                    isRetrieveLastPoint = true;
+                }
+            }
+        }
+        if (isRetrieveLastPoint) {
+            point = {
                 x: this.x,
                 y: this.y,
                 size: this.size,
@@ -344,6 +394,7 @@ export class BrushStroke {
                 twist: this.twist,
             }
         }
+        return point;
     }
 
 }

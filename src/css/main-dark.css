@@ -8515,11 +8515,45 @@ body.og-full-page .opengraphica {
   left: 0.25rem;
   right: 0.25rem;
 }
+.opengraphica .og-button--active {
+  outline: 0.25rem solid var(--og-button-primary-background);
+  outline-offset: 0;
+}
+.opengraphica .og-button--active:focus-visible {
+  outline: 0.25rem solid var(--og-button-primary-focus-outline-color);
+  outline-offset: 0;
+}
 .opengraphica .og-button--small {
   --og-button-border-radius: var(--og-border-radius-medium);
   font-size: 0.75rem;
   line-height: 0.875rem;
   padding: 0.5625rem 0.875rem;
+}
+.opengraphica .og-button--slim {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+.opengraphica .og-button--slim.og-button--small {
+  padding-left: 0.375rem;
+  padding-right: 0.375rem;
+}
+.opengraphica .og-button--icon {
+  --og-button-border-radius: 100%;
+  padding-left: 0;
+  padding-right: 0;
+  min-width: 2.5rem;
+}
+.opengraphica .og-button--icon.og-button--small {
+  --og-button-border-radius: 100%;
+  padding-left: 0;
+  padding-right: 0;
+  min-width: 2.125rem;
+}
+.opengraphica .og-button--round {
+  --og-button-border-radius: 2rem;
+}
+.opengraphica .og-button--round.og-button--small {
+  --og-button-border-radius: 2rem;
 }
 .opengraphica .og-button--primary {
   --og-button-background: var(--og-button-primary-background);
@@ -8929,7 +8963,13 @@ body.og-full-page .opengraphica {
 .opengraphica .og-dialogs .el-dialog--fullscreen .el-dialog__body .og-module {
   height: 100%;
 }
-.opengraphica .og-dialogs .el-dialog--fullscreen .el-dialog__body .og-module .el-tabs {
+.opengraphica .og-dialogs .el-dialog--fullscreen .el-dialog__body .og-module > .el-tabs {
+  height: 100%;
+}
+.opengraphica .og-dialogs .el-dialog--fullscreen .el-dialog__body .og-module > .el-tabs > .el-tabs__content {
+  height: 100%;
+}
+.opengraphica .og-dialogs .el-dialog--fullscreen .el-dialog__body .og-module > .el-tabs > .el-tabs__content > .el-tab-pane {
   height: 100%;
 }
 .opengraphica .og-dialogs .el-dialog {
@@ -28015,7 +28055,7 @@ body.og-full-page .opengraphica {
   --og-button-base-hover-background: var(--og-primary-900);
   --og-button-base-hover-border-color: var(--og-primary-700);
   --og-button-base-hover-color: var(--og-surface-0);
-  --og-button-base-focus-outline-color: var(--og-primary-500);
+  --og-button-base-focus-outline-color: var(--og-primary-600);
   --og-button-base-pressed-background: var(--og-primary-500);
   --og-button-base-pressed-color: var(--og-surface-900);
   --og-button-primary-background: var(--og-primary-500);
@@ -28024,14 +28064,14 @@ body.og-full-page .opengraphica {
   --og-button-primary-hover-background: var(--og-primary-400);
   --og-button-primary-hover-border-color: var(--og-primary-400);
   --og-button-primary-hover-color: var(--og-surface-900);
-  --og-button-primary-focus-outline-color: var(--og-primary-100);
+  --og-button-primary-focus-outline-color: var(--og-primary-600);
   --og-button-danger-background: var(--og-danger-500);
   --og-button-danger-border-color: var(--og-danger-500);
   --og-button-danger-color: var(--og-surface-900);
   --og-button-danger-hover-background: var(--og-danger-400);
   --og-button-danger-hover-border-color: var(--og-danger-400);
   --og-button-danger-hover-color: var(--og-surface-900);
-  --og-button-danger-focus-outline-color: var(--og-danger-100);
+  --og-button-danger-focus-outline-color: var(--og-danger-600);
   --og-popover-background-color: var(--og-surface-800);
   --og-popover-border-color: var(--og-surface-500);
   --og-popover-color: var(--og-surface-0);
@@ -28289,7 +28329,7 @@ body.og-full-page .opengraphica {
 .opengraphica .el-drawer .el-drawer__body {
   position: relative;
 }
-.opengraphica .el-form--default .el-form-item .el-form-item__label,
+.opengraphica .el-form--default:not(.el-form--label-top) .el-form-item .el-form-item__label,
 .opengraphica .el-form-item--default .el-form-item__label {
   line-height: 2.5rem;
   min-height: 2.5rem;

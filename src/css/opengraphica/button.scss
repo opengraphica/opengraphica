@@ -33,7 +33,7 @@
     --og-button-base-hover-background: var(--og-primary-900);
     --og-button-base-hover-border-color: var(--og-primary-700);
     --og-button-base-hover-color: var(--og-surface-0);
-    --og-button-base-focus-outline-color: var(--og-primary-500);
+    --og-button-base-focus-outline-color: var(--og-primary-600);
     --og-button-base-pressed-background: var(--og-primary-500);
     --og-button-base-pressed-color: var(--og-surface-900);
 
@@ -43,7 +43,7 @@
     --og-button-primary-hover-background: var(--og-primary-400);
     --og-button-primary-hover-border-color: var(--og-primary-400);
     --og-button-primary-hover-color: var(--og-surface-900);
-    --og-button-primary-focus-outline-color: var(--og-primary-100);
+    --og-button-primary-focus-outline-color: var(--og-primary-600);
 
     --og-button-danger-background: var(--og-danger-500);
     --og-button-danger-border-color: var(--og-danger-500);
@@ -51,7 +51,7 @@
     --og-button-danger-hover-background: var(--og-danger-400);
     --og-button-danger-hover-border-color: var(--og-danger-400);
     --og-button-danger-hover-color: var(--og-surface-900);
-    --og-button-danger-focus-outline-color: var(--og-danger-100);
+    --og-button-danger-focus-outline-color: var(--og-danger-600);
 }
 
 @mixin main() {
@@ -154,6 +154,16 @@
             right: 0.25rem;
         }
     }
+
+    .og-button--active {
+        outline: 0.25rem solid var(--og-button-primary-background);
+        outline-offset: 0;
+
+        &:focus-visible {
+            outline: 0.25rem solid var(--og-button-primary-focus-outline-color);
+            outline-offset: 0;
+        }
+    }
     
     .og-button--small {
         --og-button-border-radius: var(--og-border-radius-medium);
@@ -161,6 +171,38 @@
         font-size: 0.75rem;
         line-height: 0.875rem;
         padding: 0.5625rem 0.875rem;
+    }
+
+    .og-button--slim {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+
+        &.og-button--small {
+            padding-left: 0.375rem;
+            padding-right: 0.375rem;
+        }
+    }
+
+    .og-button--icon {
+        --og-button-border-radius: 100%;
+        padding-left: 0;
+        padding-right: 0;
+        min-width: 2.5rem;
+
+        &.og-button--small {
+            --og-button-border-radius: 100%;
+            padding-left: 0;
+            padding-right: 0;
+            min-width: 2.125rem;
+        }
+    }
+
+    .og-button--round {
+        --og-button-border-radius: 2rem;
+
+        &.og-button--small {
+            --og-button-border-radius: 2rem;
+        }
     }
 
     .og-button--primary {

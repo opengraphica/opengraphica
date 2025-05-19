@@ -405,8 +405,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                         );
                     }
                 }
-                point = this.drawingBrushStroke.retrieveFinalPoint();
-                if (point) {
+                while (point = this.drawingBrushStroke.retrieveFinalPoints()) {
                     for (const layer of this.drawingOnLayers) {
                         this.renderer?.moveBrushStroke(
                             layer.id,

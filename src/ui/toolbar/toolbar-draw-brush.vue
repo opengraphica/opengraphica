@@ -21,34 +21,59 @@
                 <og-button v-model:pressed="colorPaletteDockVisible" outline solid small toggle class="!ml-3"
                     @click="colorPaletteDockLeft = 0; colorPaletteDockTop = 0;">
                     <i class="bi bi-palette-fill mr-1" aria-hidden="true" />
-                    {{ $t('toolbar.drawBrush.brushColor') }}
+                    {{ t('toolbar.drawBrush.brushColor') }}
                 </og-button>
                 <og-button v-model:pressed="sizeDockVisible" outline solid small toggle class="!ml-3"
                     @click="sizeDockLeft = 0; sizeDockTop = 0;">
                     <i class="bi bi-plus-circle mr-1" aria-hidden="true" />
-                    {{ $t('toolbar.drawBrush.brushSize') }}
+                    {{ t('toolbar.drawBrush.brushSize') }}
                 </og-button>
                 <og-button v-model:pressed="smoothingDockVisible" outline solid small toggle class="!ml-3 !mr-3"
                     @click="smoothingDockLeft = 0; smoothingDockTop = 0;">
                     <i class="bi bi-disc mr-1" aria-hidden="true" />
-                    {{ $t('toolbar.drawBrush.brushSmoothing') }}
+                    {{ t('toolbar.drawBrush.brushSmoothing') }}
                 </og-button>
             </el-horizontal-scrollbar-arrows>
         </div>
         <floating-dock v-if="colorPaletteDockVisible" v-model:top="colorPaletteDockTop" v-model:left="colorPaletteDockLeft" :visible="floatingDocksVisible">
-            <el-button
-                round
-                size="small"
-                :aria-label="$t('toolbar.drawBrush.brushColor')"
-                :style="{
-                    backgroundColor: brushColor.style,
-                    color: isBrushColorLight ? '#000000' : '#ffffff',
-                    borderColor: isBrushColorLight ? undefined : 'transparent'
-                }"
-                @click="onPickColor()"
-            >
-                <i class="bi bi-palette-fill" aria-hidden="true" />
-            </el-button>
+            <div class="flex flex-wrap gap-2 max-w-105">
+                <og-button
+                    v-for="(palette, colorIndex) of colorPaletteItems"
+                    solid icon small toggle="active"
+                    :pressed="colorIndex === colorPaletteIndex"
+                    :aria-label="t('toolbar.drawBrush.brushColor')"
+                    :style="{
+                        '--og-button-background': palette.color.style,
+                        '--og-button-hover-background': palette.color.style,
+                        '--og-button-color': palette.isLight ? '#000000' : '#ffffff',
+                        '--og-button-hover-color': palette.isLight ? '#000000' : '#ffffff',
+                        '--og-button-pressed-color': palette.isLight ? '#000000' : '#ffffff',
+                    }"
+                    @click="onClickColorPalette($event, colorIndex)"
+                >
+                    <i class="bi bi-palette-fill" aria-hidden="true" />
+                </og-button>
+                <og-button ref="showColorPaletteSettingsButton" :aria-label="t('button.settings')" small slim @click="onEditPaletteSettings()">
+                    <span class="bi bi-gear-fill" aria-hidden="true" />
+                </og-button>
+                <og-popover
+                    v-model:visible="showColorPaletteSettings"
+                    placement="top" arrow :offset="16"
+                    :reference="showColorPaletteSettingsButton?.$el"
+                >
+                    <div class="og-popover__content">
+                        <el-form action="javascript:void" label-position="top">
+                            <el-form-item :label="$t('toolbar.drawBrush.paletteCount')" class="!m-0 !p-0 !max-w-30">
+                                <el-input-number
+                                    v-model.lazy="colorPaletteCount"
+                                    size="small"
+                                    :min="1" :max="19" :step="1"
+                                />
+                            </el-form-item>
+                        </el-form>
+                    </div>
+                </og-popover>
+            </div>
         </floating-dock>
         <floating-dock v-if="sizeDockVisible" v-model:top="sizeDockTop" v-model:left="sizeDockLeft" :visible="floatingDocksVisible">
             <label for="toolbar-draw-brush-size-slider" v-t="'toolbar.drawBrush.brushSize'" class="mr-4" />
@@ -92,15 +117,17 @@
 
 <script setup lang="ts">
 import { v4 as uuidv4 } from 'uuid';
-import { defineComponent, ref, computed, onMounted, onUnmounted, toRefs, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, toRefs, watch } from 'vue';
 
 import {
-    brushColor, brushSize, brushSmoothing, showBrushDrawer, selectedBrush,
+    brushSize, brushSmoothing, colorPalette, colorPaletteIndex, showBrushDrawer, selectedBrush,
     colorPaletteDockVisible, colorPaletteDockTop, colorPaletteDockLeft,
     sizeDockVisible, sizeDockTop, sizeDockLeft,
     smoothingDockVisible, smoothingDockTop, smoothingDockLeft,
 } from '@/canvas/store/draw-brush-state';
 import { appliedSelectionMask, activeSelectionMask } from '@/canvas/store/selection-state';
+
+import { t } from '@/i18n';
 
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
@@ -115,6 +142,7 @@ import ElSlider from 'element-plus/lib/components/slider/index';
 import ElTooltip from 'element-plus/lib/components/tooltip/index';
 
 import OgButton from '@/ui/element/button.vue';
+import OgPopover from '@/ui/element/popover.vue';
 import FloatingDock from '@/ui/dock/floating-dock.vue';
 import DockBrushEditor from '@/ui/dock/dock-brush-editor.vue';
 
@@ -125,6 +153,8 @@ import { ClearSelectionAction } from '@/actions/clear-selection';
 import { convertUnits } from '@/lib/metrics';
 import appEmitter from '@/lib/emitter';
 import { colorToHsla } from '@/lib/color';
+
+import type { RGBAColor } from '@/types';
 
 defineOptions({
     name: 'ToolbarDrawBrush',
@@ -178,34 +208,76 @@ function onKeydownBrushSelect(event: KeyboardEvent) {
     }
 }
 
-/*------------*\
-| Color Picker |
-\*------------*/
-
-const isBrushColorLight = ref<boolean>(true);
-
-watch(() => brushColor.value, (color) => {
-    isBrushColorLight.value = colorToHsla(color, 'rgba').l > 0.6;
-}, { immediate: true });
-
-function onPickColor() {
-    appEmitter.emit('app.dialogs.openFromDock', {
-        name: 'color-picker',
-        props: {
-            color: brushColor.value
-        },
-        onClose: (event?: any) => {
-            if (event?.color) {
-                brushColor.value = event.color;
-            }
-        }
-    });
-}
-
 /*-------------*\
 | Color Palette |
 \*-------------*/
 
+interface ColorPaletteItem {
+    isLight: boolean;
+    color: RGBAColor;
+}
+
+const showColorPaletteSettingsButton = ref<typeof OgButton>();
+const showColorPaletteSettings = ref<boolean>(false);
+
+const colorPaletteCount = computed<number>({
+    get() {
+        return colorPalette.value.length;
+    },
+    set(count) {
+        count = Math.round(count);
+        if (isNaN(count)) return;
+        if (colorPaletteIndex.value >= count) {
+            colorPaletteIndex.value = 0;
+        }
+        if (colorPalette.value.length > count) {
+            colorPalette.value = colorPalette.value.slice(0, count);
+        } else if (colorPalette.value.length < count) {
+            for (let i = colorPalette.value.length; i < count; i++) {
+                colorPalette.value.push({
+                    is: 'color',
+                    r: 0,
+                    g: 0,
+                    b: 0,
+                    alpha: 1,
+                    style: '#000000'
+                });
+            }
+        }
+    }
+});
+
+const colorPaletteItems = computed<ColorPaletteItem[]>(() => {
+    return colorPalette.value.map((color) => {
+        return {
+            isLight: colorToHsla(color, 'rgba').l > 0.6,
+            color,
+        }
+    });
+});
+
+function onClickColorPalette(e: MouseEvent, index: number) {
+    if (index === colorPaletteIndex.value) {
+        e.preventDefault();
+        appEmitter.emit('app.dialogs.openFromDock', {
+            name: 'color-picker',
+            props: {
+                color: colorPalette.value[index],
+            },
+            onClose: (event?: any) => {
+                if (event?.color) {
+                    colorPalette.value[index] = event.color;
+                }
+            }
+        });
+    } else {
+        colorPaletteIndex.value = index;
+    }
+}
+
+function onEditPaletteSettings() {
+    showColorPaletteSettings.value = !showColorPaletteSettings.value;
+}
 
 /*----------*\
 | Brush Size |

@@ -233,7 +233,7 @@
         }
     }
 
-    .el-form--default .el-form-item .el-form-item__label,
+    .el-form--default:not(.el-form--label-top) .el-form-item .el-form-item__label,
     .el-form-item--default .el-form-item__label {
         line-height: 2.5rem;
         min-height: 2.5rem;

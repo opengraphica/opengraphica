@@ -35,8 +35,16 @@
             .og-module {
                 height: 100%;
 
-                .el-tabs {
+                > .el-tabs {
                     height: 100%;
+
+                    > .el-tabs__content {
+                        height: 100%;
+
+                        > .el-tab-pane {
+                            height: 100%;
+                        }
+                    }
                 }
             }
         }
