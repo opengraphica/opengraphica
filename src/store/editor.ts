@@ -30,6 +30,15 @@ interface TutorialFlags {
 
 const toolGroups: { [key: string]: ToolGroupDefinition } = toolGroupsConfig as never;
 
+export interface FloatingDockRect {
+    id: string;
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+    order: number;
+}
+
 interface EditorState {
     activeMenuDrawerComponentName: string | null;
     activePopoverIds: number[],
@@ -50,6 +59,7 @@ interface EditorState {
     clipboardBufferUpdateTimestamp: number;
     hasClipboardUpdateSupport: boolean;
     floatingDocksContainer: HTMLElement | null;
+    floatingDockRects: FloatingDockRect[];
     isActiveToolbarExclusive: boolean;
     isPenUser: boolean;
     isTaskRunning: boolean;
@@ -118,6 +128,7 @@ const store = new PerformantStore<EditorStore>({
         clipboardBufferUpdateTimestamp: 0,
         hasClipboardUpdateSupport: false,
         floatingDocksContainer: null,
+        floatingDockRects: [],
         isActiveToolbarExclusive: false,
         isPenUser: false,
         isTaskRunning: false,

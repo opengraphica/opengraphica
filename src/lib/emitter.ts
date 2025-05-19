@@ -81,6 +81,7 @@ interface AppEmitterEvents {
     'editor.tool.commitCurrentAction': undefined;
     'editor.tool.delete': undefined;
     'editor.tool.fontsLoaded': undefined;
+    'editor.tool.toolbarSwapping': undefined;
     'editor.tool.selectAll': undefined;
     'renderer.pass.readBufferTextureUpdate': Texture;
     'store.setPreference': {

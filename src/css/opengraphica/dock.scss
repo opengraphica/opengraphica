@@ -61,7 +61,7 @@
     left: 0;
     width: 100vw;
     height: 0;
-    z-index: 9;
+    z-index: 5; // Must be greater than main
 
     .og-floating-dock {
         position: absolute;
@@ -72,6 +72,12 @@
         box-shadow: 0 0 0px 1px var(--og-layout-menu-bar-border-color), 0 0.3rem 2rem var(--og-layout-menu-bar-shadow-color);
         border-radius: var(--og-border-radius-big);
         padding: 0;
+        opacity: 0;
+        transition: opacity 0.2s;
+
+        &.og-floating-dock--visible {
+            opacity: 1;
+        }
     }
 
     .og-floating-dock__grip {

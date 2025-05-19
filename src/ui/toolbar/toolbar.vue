@@ -15,6 +15,7 @@
 import { defineComponent, defineAsyncComponent, ref, toRef, watch, onMounted, nextTick } from 'vue';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import editorStore from '@/store/editor';
+import appEmitter from '@/lib/emitter';
 
 export default defineComponent({
     name: 'Toolbar',
@@ -48,6 +49,7 @@ export default defineComponent({
 
         watch([toRef(props, 'name')], async () => {
             animationSwap.value = 'out';
+            appEmitter.emit('editor.tool.toolbarSwapping');
         });
 
         onMounted(() => {

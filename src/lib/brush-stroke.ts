@@ -153,8 +153,6 @@ export class BrushStroke {
     retrieveLineLength: number = 0;
 
     constructor(smoothing: number, spacing: number, startingPoint: BrushStrokePoint) {
-        smoothing = 1; // 0.05
-        smoothing = 0.2;
         this.spacing = spacing;
         this.smoothing = smoothing;
 

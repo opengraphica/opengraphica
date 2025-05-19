@@ -18,21 +18,24 @@
                     @keydown="onKeydownBrushSelect($event)"
                 >
                 </div>
-                <og-button v-model:pressed="colorPaletteDockVisible" outline solid small toggle class="!ml-3">
+                <og-button v-model:pressed="colorPaletteDockVisible" outline solid small toggle class="!ml-3"
+                    @click="colorPaletteDockLeft = 0; colorPaletteDockTop = 0;">
                     <i class="bi bi-palette-fill mr-1" aria-hidden="true" />
                     {{ $t('toolbar.drawBrush.brushColor') }}
                 </og-button>
-                <og-button v-model:pressed="sizeDockVisible" outline solid small toggle class="!ml-3">
+                <og-button v-model:pressed="sizeDockVisible" outline solid small toggle class="!ml-3"
+                    @click="sizeDockLeft = 0; sizeDockTop = 0;">
                     <i class="bi bi-plus-circle mr-1" aria-hidden="true" />
                     {{ $t('toolbar.drawBrush.brushSize') }}
                 </og-button>
-                <og-button v-model:pressed="smoothingDockVisible" outline solid small toggle class="!ml-3 !mr-3">
+                <og-button v-model:pressed="smoothingDockVisible" outline solid small toggle class="!ml-3 !mr-3"
+                    @click="smoothingDockLeft = 0; smoothingDockTop = 0;">
                     <i class="bi bi-disc mr-1" aria-hidden="true" />
                     {{ $t('toolbar.drawBrush.brushSmoothing') }}
                 </og-button>
             </el-horizontal-scrollbar-arrows>
         </div>
-        <floating-dock v-if="colorPaletteDockVisible" v-model:top="colorPaletteDockTop" v-model:left="colorPaletteDockLeft">
+        <floating-dock v-if="colorPaletteDockVisible" v-model:top="colorPaletteDockTop" v-model:left="colorPaletteDockLeft" :visible="floatingDocksVisible">
             <el-button
                 round
                 size="small"
@@ -47,16 +50,28 @@
                 <i class="bi bi-palette-fill" aria-hidden="true" />
             </el-button>
         </floating-dock>
-        <floating-dock v-if="sizeDockVisible" v-model:top="sizeDockTop" v-model:left="sizeDockLeft">
-            <label for="toolbar-draw-brush-size-slider" v-t="'toolbar.drawBrush.brushSize'" class="mr-3" />
+        <floating-dock v-if="sizeDockVisible" v-model:top="sizeDockTop" v-model:left="sizeDockLeft" :visible="floatingDocksVisible">
+            <label for="toolbar-draw-brush-size-slider" v-t="'toolbar.drawBrush.brushSize'" class="mr-4" />
             <el-slider
                 id="toolbar-draw-brush-size-slider"
-                v-model="selectionBrushSize"
+                v-model="scaledBrushSize"
                 :min="0"
                 :max="1"
                 :step="0.01"
                 :format-tooltip="formatBrushSizeTooltip"
-                style="width: 10rem"
+                class="!w-50 !max-w-full"
+            />
+        </floating-dock>
+        <floating-dock v-if="smoothingDockVisible" v-model:top="smoothingDockTop" v-model:left="smoothingDockLeft" :visible="floatingDocksVisible">
+            <label for="toolbar-draw-brush-smoothing-slider" v-t="'toolbar.drawBrush.brushSmoothing'" class="mr-4" />
+            <el-slider
+                id="toolbar-draw-brush-smoothing-slider"
+                v-model="scaledBrushSmoothing"
+                :min="0"
+                :max="1"
+                :step="0.01"
+                :format-tooltip="formatBrushSmoothingTooltip"
+                class="!w-30 !max-w-full"
             />
         </floating-dock>
         <div
@@ -77,10 +92,10 @@
 
 <script setup lang="ts">
 import { v4 as uuidv4 } from 'uuid';
-import { defineComponent, ref, computed, toRefs, watch } from 'vue';
+import { defineComponent, ref, computed, onMounted, onUnmounted, toRefs, watch } from 'vue';
 
 import {
-    brushColor, brushSize, showBrushDrawer, selectedBrush,
+    brushColor, brushSize, brushSmoothing, showBrushDrawer, selectedBrush,
     colorPaletteDockVisible, colorPaletteDockTop, colorPaletteDockLeft,
     sizeDockVisible, sizeDockTop, sizeDockLeft,
     smoothingDockVisible, smoothingDockTop, smoothingDockLeft,
@@ -118,6 +133,24 @@ defineOptions({
 const emit = defineEmits(['close']);
 
 const uuid = uuidv4();
+
+/*------------*\
+| Toolbar Swap |
+\*------------*/
+
+const floatingDocksVisible = ref<boolean>(true);
+
+onMounted(() => {
+    appEmitter.on('editor.tool.toolbarSwapping', onToolbarSwap);
+});
+
+onUnmounted(() => {
+    appEmitter.off('editor.tool.toolbarSwapping', onToolbarSwap);
+});
+
+function onToolbarSwap() {
+    floatingDocksVisible.value = false;
+}
 
 /*---------*\
 | Selection |
@@ -181,7 +214,7 @@ function onPickColor() {
 const minBrushSize = ref(1);
 const maxBrushSize = ref(1000);
 
-const selectionBrushSize = computed<number>({
+const scaledBrushSize = computed<number>({
     set(value) {
         const easingValue = value * value;
         brushSize.value = Math.round(minBrushSize.value + easingValue * (maxBrushSize.value - minBrushSize.value));
@@ -202,5 +235,24 @@ function formatBrushSizeTooltip() {
 | Brush Smoothing |
 \*---------------*/
 
+const minBrushSmoothing = ref(0.05);
+const maxBrushSmoothing = ref(1);
+
+const scaledBrushSmoothing = computed<number>({
+    set(value) {
+        const easingValue = ((1 - value) * (1 - value) * (1 - value));
+        brushSmoothing.value = minBrushSmoothing.value + easingValue * (maxBrushSmoothing.value - minBrushSmoothing.value);
+    },
+    get() {
+        const scaledBrushSmoothing = (brushSmoothing.value - minBrushSmoothing.value) / (maxBrushSmoothing.value - minBrushSmoothing.value);
+        return 1 - Math.cbrt(scaledBrushSmoothing);
+    }
+});
+
+function formatBrushSmoothingTooltip() {
+    const value = brushSmoothing.value;
+    const percentage = (value - minBrushSmoothing.value) / (maxBrushSmoothing.value - minBrushSmoothing.value);
+    return `${(100 * (1 - Math.cbrt(percentage))).toFixed(0)}%`;
+}
 
 </script>

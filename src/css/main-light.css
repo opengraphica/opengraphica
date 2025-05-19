@@ -9026,7 +9026,7 @@ body.og-full-page .opengraphica {
   left: 0;
   width: 100vw;
   height: 0;
-  z-index: 9;
+  z-index: 5;
 }
 .opengraphica .og-floating-docks .og-floating-dock {
   position: absolute;
@@ -9037,6 +9037,11 @@ body.og-full-page .opengraphica {
   box-shadow: 0 0 0px 1px var(--og-layout-menu-bar-border-color), 0 0.3rem 2rem var(--og-layout-menu-bar-shadow-color);
   border-radius: var(--og-border-radius-big);
   padding: 0;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.opengraphica .og-floating-docks .og-floating-dock.og-floating-dock--visible {
+  opacity: 1;
 }
 .opengraphica .og-floating-docks .og-floating-dock__grip {
   display: flex;
@@ -10941,7 +10946,7 @@ body.og-full-page .opengraphica {
   max-width: 100%;
   background: var(--og-layout-menu-bar-background-color);
   box-shadow: 0 0 0 0.063rem var(--og-layout-menu-bar-border-color);
-  z-index: 4;
+  z-index: 6;
 }
 @keyframes og-toolbar-overlay-fade-in {
   0% {

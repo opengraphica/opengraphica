@@ -3,10 +3,14 @@
         <div
             ref="dockElement"
             class="og-floating-dock"
+            :class="{
+                'og-floating-dock--visible': props.visible
+            }"
             :style="{
                 transform: `translate(${left}px, ${top}px)`,
                 maxWidth: `${maxWidth}px`,
                 maxHeight: `${maxHeight}px`,
+                zIndex: floatingDockRect.order,
             }">
             <div
                 class="og-floating-dock__grip"
@@ -23,12 +27,15 @@
     </teleport>
 </template>
 <script setup lang="ts">
-import { nextTick, onMounted, onUnmounted, ref, toRef, toRefs, watch } from 'vue';
+import { v4 as uuidv4 } from 'uuid';
+import { nextTick, onMounted, onUnmounted, reactive, ref, toRef, toRefs, watch } from 'vue';
 
 import vPointer from '@/directives/pointer';
 
 import canvasStore from '@/store/canvas';
-import editorStore from '@/store/editor';
+import editorStore, { type FloatingDockRect } from '@/store/editor';
+
+type RectPosition = Omit<FloatingDockRect, 'id' | 'width' | 'height' | 'order'>;
 
 const props = defineProps({
     top: {
@@ -38,6 +45,10 @@ const props = defineProps({
     left: {
         type: Number,
         default: 0,
+    },
+    visible: {
+        type: Boolean,
+        default: true,
     }
 });
 
@@ -52,11 +63,33 @@ const top = ref<number>(0);
 const left = ref<number>(0);
 const maxHeight = ref<number>(10000000);
 const maxWidth = ref<number>(10000000);
+
 let boundingBox: DOMRect;
+const placementMargin = 8;
+
+const floatingDockRect: FloatingDockRect = reactive({
+    id: uuidv4(),
+    left: 0,
+    top: 0,
+    width: 0,
+    height: 0,
+    order: 0,
+});
 
 onMounted(() => {
-    boundingBox = dockElement.value!.getBoundingClientRect();
+    calculateBoundingBox();
+    const rects = editorStore.get('floatingDockRects');
+    rects.push(floatingDockRect);
+    editorStore.set('floatingDockRects', rects);
+    nextTick(placeAtBottomCenter);
     nextTick(limitDragBounds);
+});
+
+onUnmounted(() => {
+    const rects = editorStore.get('floatingDockRects');
+    const index = rects.findIndex((rect) => rect.id === floatingDockRect.id);
+    rects.splice(index, 1);
+    editorStore.set('floatingDockRects', rects);
 });
 
 watch(() => [props.top, props.left], (newProps, oldProps) => {
@@ -64,16 +97,94 @@ watch(() => [props.top, props.left], (newProps, oldProps) => {
         top.value = props.top;
         left.value = props.left;
         if (!dockElement.value) return;
-        boundingBox = dockElement.value.getBoundingClientRect();
+        calculateBoundingBox();
         nextTick(limitDragBounds);
     }
 }, { immediate: true });
 
 watch([dndAreaLeft, dndAreaTop, dndAreaWidth, dndAreaHeight], () => {
-    if (!dockElement.value) return;
-    boundingBox = dockElement.value.getBoundingClientRect();
+    calculateBoundingBox();
     nextTick(limitDragBounds);
 }, { immediate: true });
+
+function placeAtBottomCenter() {
+    if (props.left !== 0 || props.top !== 0) return;
+
+    const rects = editorStore.get('floatingDockRects');
+    const dndTop = dndAreaTop.value / devicePixelRatio;
+    const dndLeft = dndAreaLeft.value / devicePixelRatio;
+    const dndWidth = dndAreaWidth.value / devicePixelRatio;
+    const dndHeight = dndAreaHeight.value / devicePixelRatio;
+    const dndCenter = dndLeft + (dndWidth / 2);
+    
+    if (rects.length === 1) {
+        left.value = dndLeft + (dndWidth / 2) - (boundingBox.width / 2);
+        top.value = dndTop + dndHeight - boundingBox.height;
+    } else {
+        let potentialPositions: Array<RectPosition> = [];
+        for (const rect of rects) {
+            if (rect.id === floatingDockRect.id) continue;
+            const bottom = rect.top + rect.height;
+            let left: RectPosition = {
+                left: rect.left - boundingBox.width - placementMargin,
+                top: bottom - boundingBox.height,
+            };
+            let right: RectPosition = {
+                left: rect.left + rect.width + placementMargin,
+                top: bottom - boundingBox.height,
+            }
+            let top: RectPosition = {
+                left: dndLeft + (dndWidth / 2) - (boundingBox.width / 2),
+                top: rect.top - boundingBox.height - placementMargin,
+            };
+            if (left.left >= dndLeft) {
+                potentialPositions.push(left);
+            }
+            if (right.left + boundingBox.width < dndLeft + dndWidth) {
+                potentialPositions.push(right);
+            }
+            potentialPositions.push(top);
+        }
+        potentialPositions.sort((a, b) => {
+            if (a.top !== b.top) return a.top > b.top ? -1 : 1;
+            return (
+                Math.abs((a.left + boundingBox.width / 2) - dndCenter) <
+                Math.abs((b.left + boundingBox.width / 2) - dndCenter)
+            ) ? -1 : 1;
+        });
+        let foundPosition: RectPosition | undefined;
+        for (const potentialPosition of potentialPositions) {
+            let hasConflicts = false;
+            for (const rect of rects) {
+                if (rect.id === floatingDockRect.id) continue;
+                if (
+                    rect.left < potentialPosition.left + boundingBox.width
+                    && rect.left + rect.width > potentialPosition.left
+                    && rect.top < potentialPosition.top + boundingBox.height
+                    && rect.top + rect.height > potentialPosition.top
+                ) {
+                    hasConflicts = true;
+                    break;
+                }
+            }
+            if (hasConflicts) continue;
+            foundPosition = potentialPosition;
+            break;
+        }
+        if (!foundPosition) foundPosition = potentialPositions[potentialPositions.length - 1];
+        left.value = foundPosition.left;
+        top.value = foundPosition.top;
+    }
+}
+
+function calculateBoundingBox() {
+    if (!dockElement.value) return;
+    boundingBox = dockElement.value.getBoundingClientRect();
+    floatingDockRect.left = left.value;
+    floatingDockRect.top = top.value;
+    floatingDockRect.width = boundingBox.width;
+    floatingDockRect.height = boundingBox.height;
+}
 
 function limitDragBounds() {
     const dndTop = dndAreaTop.value / devicePixelRatio;
@@ -95,6 +206,10 @@ function limitDragBounds() {
     if (left.value < dndLeft) {
         left.value = dndLeft;
     }
+
+    floatingDockRect.top = top.value;
+    floatingDockRect.left = left.value;
+
     emit('update:top', top.value);
     emit('update:left', left.value);
 }
@@ -113,11 +228,21 @@ function onDragStartGrip(e: PointerEvent) {
     dragStartTop = top.value;
     dragStartX = e.pageX;
     dragStartY = e.pageY;
-    boundingBox = dockElement.value.getBoundingClientRect();
+    calculateBoundingBox();
+
+    const rects = editorStore.get('floatingDockRects');
+    if (floatingDockRect.order !== rects.length) {
+        floatingDockRect.order = rects.length;
+        for (let rect of rects) {
+            if (rect.id === floatingDockRect.id) continue;
+            rect.order = Math.max(0, rect.order - 1);
+        }
+    }
 }
 
 function onDragEndGrip() {
     isDragging = false;
+    calculateBoundingBox();
 }
 
 function onPointerMoveGrip(e: PointerEvent) {
