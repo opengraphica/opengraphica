@@ -14,8 +14,8 @@ import { WebGLRenderTarget } from 'three/src/renderers/WebGLRenderTarget';
 
 import brushStrokeVertexShader from './shader/brush-stroke.vert';
 import brushStrokeFragmentShader from './shader/brush-stroke.frag';
-import compositorVertexShader from './shader/compositor.vert';
-import compositorFragmentShader from './shader/compositor.frag';
+import brushCompositorVertexShader from './shader/brush-compositor.vert';
+import brushCompositorFragmentShader from './shader/brush-compositor.frag';
 import copyTileVertexShader from './shader/copy-tile.vert';
 import copyTileFragmentShader from './shader/copy-tile.frag';
 
@@ -136,8 +136,8 @@ export class BrushStroke {
                 dstMap: { value: undefined },
                 dstOffsetAndSize: { value: new Vector4() },
             },
-            vertexShader: compositorVertexShader,
-            fragmentShader: compositorFragmentShader,
+            vertexShader: brushCompositorVertexShader,
+            fragmentShader: brushCompositorFragmentShader,
             depthTest: false,
             depthWrite: false,
             transparent: true,

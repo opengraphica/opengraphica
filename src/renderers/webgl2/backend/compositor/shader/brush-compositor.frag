@@ -49,6 +49,6 @@ void main() {
 
     float alpha = srcColor.a + dstColor.a * (1.0 - srcColor.a);
     gl_FragColor = vec4(
-        ((srcColor.rgb / alpha) * srcColor.a + dstColor.rgb * (1.0 - srcColor.a)), alpha
+        (srcColor.rgb * srcColor.a + (dstColor.rgb * dstColor.a) * (1.0 - srcColor.a)) / alpha, alpha
     );
 }
