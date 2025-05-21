@@ -5,6 +5,7 @@ import { Vector4 } from 'three/src/math/Vector4';
 import { BrushStroke } from './brush-stroke';
 
 import type { WebGLRenderer } from 'three';
+import type { RendererBrushStrokeSettings } from '@/types';
 
 export class Compositor {
     renderer!: WebGLRenderer;
@@ -24,7 +25,7 @@ export class Compositor {
     startBrushStroke(
         texture: Texture,
         layerTransform: Matrix4,
-        brushSize: number,
+        settings: RendererBrushStrokeSettings,
     ): number {
         const brushStrokeIndex = this.brushStrokeCounter++;
         this.brushStrokes.set(brushStrokeIndex, new BrushStroke(
@@ -32,7 +33,7 @@ export class Compositor {
             this.originalViewport,
             texture,
             layerTransform,
-            brushSize,
+            settings,
         ));
         return brushStrokeIndex;
     }

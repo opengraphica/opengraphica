@@ -170,7 +170,7 @@
 
         font-size: 0.75rem;
         line-height: 0.875rem;
-        padding: 0.5625rem 0.875rem;
+        padding: 0.5rem 0.875rem;
     }
 
     .og-button--slim {
@@ -256,6 +256,30 @@
                 --og-button-hover-background: var(--og-button-danger-hover-background);
                 --og-button-hover-color: var(--og-button-danger-hover-color);
             }
+        }
+    }
+
+    .og-button--color-swatch {
+        background-image: url("../images/transparency-bg.png");
+        position: relative;
+        border-color: var(--og-button-swatch-background);
+        color: var(--og-button-swatch-color);
+        overflow: hidden;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--og-button-swatch-background);
+        }
+
+        &:hover {
+            background-image: url("../images/transparency-bg.png");
+            border-color: var(--og-button-swatch-background);
+            color: var(--og-button-swatch-color);
         }
     }
 }

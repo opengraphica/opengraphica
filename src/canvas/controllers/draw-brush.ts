@@ -309,10 +309,11 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         this.drawingOnLayers = selectedLayers as WorkingFileAnyLayer[];
 
         for (const layer of this.drawingOnLayers) {
-            await this.renderer?.startBrushStroke(
-                layer.id,
-                brushSize.value,
-            );
+            await this.renderer?.startBrushStroke({
+                layerId: layer.id,
+                size: brushSize.value,
+                color: new Float16Array([brushColor.value.r, brushColor.value.g, brushColor.value.b, brushColor.value.alpha]),
+            });
         }
 
         // Populate first drawing point

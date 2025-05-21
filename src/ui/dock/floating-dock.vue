@@ -109,6 +109,16 @@ watch([dndAreaLeft, dndAreaTop, dndAreaWidth, dndAreaHeight], () => {
     nextTick(limitDragBounds);
 }, { immediate: true });
 
+watch(() => editorStore.state.floatingDockRects.length, (newLength, oldLength) => {
+    if (newLength != oldLength) {
+        const rects = editorStore.get('floatingDockRects');
+        rects.sort((a, b) => a.order < b.order ? -1 : 1);
+        for (let i = 0; i < rects.length; i++) {
+            rects[i].order = i + 1;
+        }
+    }
+});
+
 function placeAtBottomCenter() {
     if (props.left !== 0 || props.top !== 0) return;
 

@@ -37,12 +37,18 @@ export interface RendererTextureTile {
     image: ImageBitmap;
 }
 
+export interface RendererBrushStrokeSettings {
+    layerId: number;
+    size: number;
+    color: Float16Array;
+}
+
 export interface RendererFrontend {
     initialize(canvas: HTMLCanvasElement | OffscreenCanvas): Promise<void>;
     resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number): Promise<void>;
     applySelectionMaskToAlphaChannel(layerId: number, options?: RendererFrontendApplySelectionMaskToAlphaChannelOptions): Promise<RendererTextureTile[]>;
     takeSnapshot(imageWidth: number, imageHeight: number, options?: RendererFrontendTakeSnapshotOptions): Promise<ImageBitmap>;
-    startBrushStroke(layerId: number, brushSize: number): Promise<void>;
+    startBrushStroke(settings: RendererBrushStrokeSettings): Promise<void>;
     moveBrushStroke(layerId: number, x: number, y: number, size: number): Promise<void>;
     stopBrushStroke(layerId: number): Promise<void>;
     dispose(): Promise<void>;

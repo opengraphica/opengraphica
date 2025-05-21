@@ -42,12 +42,10 @@
                     solid icon small toggle="active"
                     :pressed="colorIndex === colorPaletteIndex"
                     :aria-label="t('toolbar.drawBrush.brushColor')"
+                    class="og-button--color-swatch"
                     :style="{
-                        '--og-button-background': palette.color.style,
-                        '--og-button-hover-background': palette.color.style,
-                        '--og-button-color': palette.isLight ? '#000000' : '#ffffff',
-                        '--og-button-hover-color': palette.isLight ? '#000000' : '#ffffff',
-                        '--og-button-pressed-color': palette.isLight ? '#000000' : '#ffffff',
+                        '--og-button-swatch-background': palette.color.style,
+                        '--og-button-swatch-color': palette.isLight ? '#000000' : '#ffffff',
                     }"
                     @click="onClickColorPalette($event, colorIndex)"
                 >
@@ -125,32 +123,19 @@ import {
     sizeDockVisible, sizeDockTop, sizeDockLeft,
     smoothingDockVisible, smoothingDockTop, smoothingDockLeft,
 } from '@/canvas/store/draw-brush-state';
-import { appliedSelectionMask, activeSelectionMask } from '@/canvas/store/selection-state';
 
 import { t } from '@/i18n';
 
-import ElAlert from 'element-plus/lib/components/alert/index';
-import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.vue';
-import ElInput from 'element-plus/lib/components/input/index';
-import ElInputGroup from '@/ui/el/el-input-group.vue';
 import ElInputNumber from '@/ui/el/el-input-number.vue';
-import ElPopover from '@/ui/el/el-popover.vue';
-import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSlider from 'element-plus/lib/components/slider/index';
-import ElTooltip from 'element-plus/lib/components/tooltip/index';
 
 import OgButton from '@/ui/element/button.vue';
 import OgPopover from '@/ui/element/popover.vue';
 import FloatingDock from '@/ui/dock/floating-dock.vue';
 import DockBrushEditor from '@/ui/dock/dock-brush-editor.vue';
 
-import historyStore from '@/store/history';
-import workingFileStore, { WorkingFileState } from '@/store/working-file';
-import { ClearSelectionAction } from '@/actions/clear-selection';
-
-import { convertUnits } from '@/lib/metrics';
 import appEmitter from '@/lib/emitter';
 import { colorToHsla } from '@/lib/color';
 
@@ -181,16 +166,6 @@ onUnmounted(() => {
 function onToolbarSwap() {
     floatingDocksVisible.value = false;
 }
-
-/*---------*\
-| Selection |
-\*---------*/
-
-const { selectedLayerIds } = toRefs(workingFileStore.state);
-
-const hasSelection = computed<boolean>(() => {
-    return !(appliedSelectionMask.value == null && activeSelectionMask.value == null);
-});
 
 /*---------*\
 | Selection |

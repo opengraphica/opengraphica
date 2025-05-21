@@ -22,6 +22,7 @@ import copyTileFragmentShader from './shader/copy-tile.frag';
 import { markRenderDirty, getWebgl2RendererBackend } from '..';
 
 import type { Camera, WebGLRenderer } from 'three';
+import type { RendererBrushStrokeSettings } from '@/types';
 
 export class BrushStroke {
     originalViewport!: Vector4;
@@ -42,7 +43,9 @@ export class BrushStroke {
     tileSize!: number;
     xTileCount!: number;
     yTileCount!: number;
+
     brushSize!: number;
+    brushColor!: Float16Array;
 
     dirtyTiles!: Uint8Array;
 
@@ -69,14 +72,15 @@ export class BrushStroke {
         originalViewport: Vector4,
         texture: Texture,
         layerTransform: Matrix4,
-        brushSize: number,
+        settings: RendererBrushStrokeSettings,
     ) {
         this.renderer = renderer;
         this.originalViewport = originalViewport;
         this.texture = texture;
         this.layerTransform = layerTransform;
         this.layerTransformInverse = layerTransform.clone().invert();
-        this.brushSize = brushSize;
+        this.brushSize = settings.size;
+        this.brushColor = settings.color;
 
         const gl = renderer.getContext();
         this.isHalfFloat = !!(renderer.capabilities.isWebGL2 || gl.getExtension('OES_texture_half_float'));
@@ -87,8 +91,8 @@ export class BrushStroke {
 
         const maxTileSize = 8192;
         const minTileSize = Math.max(64, Math.max(this.texture.image.width, this.texture.image.height) / 8);
-        const approxTileCount = Math.ceil(Math.sqrt(brushSize * brushSize) / 1024);
-        const estimatedTileSize = Math.max(minTileSize, Math.min(maxTileSize, Math.floor(Math.sqrt((brushSize * brushSize) / approxTileCount))));
+        const approxTileCount = Math.ceil(Math.sqrt(this.brushSize * this.brushSize) / 1024);
+        const estimatedTileSize = Math.max(minTileSize, Math.min(maxTileSize, Math.floor(Math.sqrt((this.brushSize * this.brushSize) / approxTileCount))));
         this.tileSize = Math.pow(2, Math.round(Math.log2(estimatedTileSize)));
 
         this.xTileCount = Math.ceil(this.texture.image.width / this.tileSize);
@@ -103,8 +107,7 @@ export class BrushStroke {
                 brushStrokeMap: { value: undefined },
                 tileOffsetAndSize: { value: new Vector4() },
                 brushTransform: { value: new Matrix4() },
-                brushColor: { value: new Vector4(0.34, 0.03, 0.02, 1.0) },
-                // brushColor: { value: new Vector4(1.0, 0.0, 0.0, 1.0) },
+                brushColor: { value: new Vector4(this.brushColor[0], this.brushColor[1], this.brushColor[2], 1.0) },
             },
             vertexShader: brushStrokeVertexShader,
             fragmentShader: brushStrokeFragmentShader,

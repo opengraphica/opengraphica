@@ -43,12 +43,12 @@ vec4 linearSrgbToSrgb(vec4 rgb) {
 }
 
 void main() {
-    vec4 srcColor = texture2D(srcMap, vUv);
+    vec4 srcColor = srgbToLinearSrgb(texture2D(srcMap, vUv));
     vec2 dstUv = vec2(dstOffsetAndSize.x, 1.0 - dstOffsetAndSize.y - dstOffsetAndSize.w) + vUv * dstOffsetAndSize.zw;
-    vec4 dstColor = linearSrgbToSrgb(texture2D(dstMap, dstUv));
+    vec4 dstColor = texture2D(dstMap, dstUv);
 
-    gl_FragColor = srgbToLinearSrgb(vec4(
-        srcColor.rgb * srcColor.a + dstColor.rgb * (1.0 - srcColor.a),
-        srcColor.a + dstColor.a * (1.0 - srcColor.a)
-    ));
+    float alpha = srcColor.a + dstColor.a * (1.0 - srcColor.a);
+    gl_FragColor = vec4(
+        ((srcColor.rgb / alpha) * srcColor.a + dstColor.rgb * (1.0 - srcColor.a)), alpha
+    );
 }
