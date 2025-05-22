@@ -308,7 +308,7 @@
                                     </el-link>
                                 </div>
                                 <div class="el-form-item el-form-item--menu-item">
-                                    <el-link href="javascript:void" type="primary" @click="onClickShowDesignSystem()">
+                                    <el-link href="javascript:void(0)" type="primary" @click="onClickShowDesignSystem()">
                                         <span v-t="'dock.settings.prefs.help.designSystem'"></span>
                                         <i class="bi bi-box-arrow-up-right ml-2"></i>
                                     </el-link>

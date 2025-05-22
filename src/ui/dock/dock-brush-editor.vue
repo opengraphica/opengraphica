@@ -76,8 +76,8 @@
             </div>
         </div>
         <div v-else-if="view === 'edit'" class="og-brush-editor">
-            <el-tabs tab-position="left">
-                <el-tab-pane :label="t('toolbar.drawBrush.brushDialog.editorTab.shape.title')">
+            <el-tabs v-model="brushEditorTab" tab-position="left">
+                <el-tab-pane name="shape" :label="t('toolbar.drawBrush.brushDialog.editorTab.shape.title')">
                     <el-scrollbar>
                         <h3>{{ t('toolbar.drawBrush.brushDialog.editorTab.shape.title') }}</h3>
                         <el-form novalidate="novalidate" action="javascript:void(0)" label-position="top">
@@ -103,7 +103,7 @@
                         </el-form>
                     </el-scrollbar>
                 </el-tab-pane>
-                <el-tab-pane :label="t('toolbar.drawBrush.brushDialog.editorTab.strokePath.title')">
+                <el-tab-pane name="strokePath" :label="t('toolbar.drawBrush.brushDialog.editorTab.strokePath.title')">
                     <el-scrollbar>
                         <h3>{{ t('toolbar.drawBrush.brushDialog.editorTab.strokePath.title') }}</h3>
                         <el-form novalidate="novalidate" action="javascript:void(0)" label-position="top">
@@ -148,37 +148,30 @@
                         </el-form>
                     </el-scrollbar>
                 </el-tab-pane>
-                <el-tab-pane :label="t('toolbar.drawBrush.brushDialog.editorTab.taper.title')">
+                <el-tab-pane name="pressure" :label="t('toolbar.drawBrush.brushDialog.editorTab.pressure.title')">
                     <el-scrollbar>
-                        <h3>{{ t('toolbar.drawBrush.brushDialog.editorTab.taper.title') }}</h3>
+                        <h3>{{ t('toolbar.drawBrush.brushDialog.editorTab.pressure.title') }}</h3>
                         <el-form novalidate="novalidate" action="javascript:void(0)" label-position="top">
-                            <el-form-item :label="$t('toolbar.drawBrush.brushDialog.editorTab.taper.pressureTaper')">
+                            <el-form-item :label="$t('toolbar.drawBrush.brushDialog.editorTab.pressure.pressureTaper')">
                                 <div class="flex gap-2 w-full items-center">
                                     <div class="px-3 grow-1">
                                         <el-slider
-                                            v-model="editingBrush.pressureTaperRange"
-                                            range
+                                            v-model="editingBrush.pressureTaper"
                                             :aria-label="t('measurement.percentage')"
-                                            :min="0" :max="1000" :step="1" :show-tooltip="false"
+                                            :min="0" :max="400" :step="1" :show-tooltip="false"
                                         />
                                     </div>
                                     <div class="flex grow-0 gap-2">
                                         <el-input-number
-                                            v-model="editingBrush.pressureTaperRange[0]"
-                                            :aria-label="t('toolbar.drawBrush.brushDialog.editorTab.taper.pressureTaperStart')"
+                                            v-model="editingBrush.pressureTaper"
+                                            :aria-label="t('measurement.percentage')"
                                             suffix-text="%"
-                                            style="width: 4rem"
-                                        />
-                                        <el-input-number
-                                            v-model="editingBrush.pressureTaperRange[1]"
-                                            :aria-label="t('toolbar.drawBrush.brushDialog.editorTab.taper.pressureTaperEnd')"
-                                            suffix-text="%"
-                                            style="width: 4rem"
+                                            style="width: 5rem"
                                         />
                                     </div>
                                 </div>
                             </el-form-item>
-                            <el-form-item :label="$t('toolbar.drawBrush.brushDialog.editorTab.taper.pressureMinSize')">
+                            <el-form-item :label="$t('toolbar.drawBrush.brushDialog.editorTab.pressure.pressureMinSize')">
                                 <div class="flex gap-2 w-full items-center">
                                     <div class="px-3 grow-1">
                                         <el-slider
@@ -200,7 +193,7 @@
                         </el-form>
                     </el-scrollbar>
                 </el-tab-pane>
-                <el-tab-pane :label="t('toolbar.drawBrush.brushDialog.editorTab.blending.title')">
+                <el-tab-pane name="blending" :label="t('toolbar.drawBrush.brushDialog.editorTab.blending.title')">
                     <el-scrollbar>
                         <h3>{{ t('toolbar.drawBrush.brushDialog.editorTab.blending.title') }}</h3>
                         <el-form novalidate="novalidate" action="javascript:void(0)" label-position="top">
@@ -311,7 +304,7 @@ import vPointer from '@/directives/pointer';
 import { generateCssGradient, sampleGradient } from '@/lib/gradient';
 
 import {
-    brushesByCategory, getBrushById, addCustomBrush
+    brushEditorTab, brushesByCategory, getBrushById, addCustomBrush
 } from '@/canvas/store/brush-library-state';
 
 import ElAlert from 'element-plus/lib/components/alert/index';
@@ -401,9 +394,7 @@ function onClickEditBrush(brushId: string) {
         spacing: Math.round(brush.spacing * 100),
         jitter: Math.round(brush.jitter * 100),
         angle: Math.round(brush.angle * Math.RADIANS_TO_DEGREES),
-        pressureTaperRange: [Math.round(brush.pressureTaperStart * 100), Math.round((10 - brush.pressureTaperEnd) * 100)],
-        pressureTaperStart: 0,
-        pressureTaperEnd: 0,
+        pressureTaper: Math.round((brush.pressureTaper - 1) * 100),
         pressureMinSize: Math.round(brush.pressureMinSize * 100),
         pressureDensityRange: [Math.round(brush.pressureMinDensity * 100), Math.round(brush.pressureMaxDensity * 100)],
         pressureMinDensity: 0,
@@ -424,8 +415,7 @@ function applyBrushEdits() {
         spacing: editingBrush.value.spacing / 100,
         jitter: editingBrush.value.jitter / 100,
         angle: editingBrush.value.angle * Math.DEGREES_TO_RADIANS,
-        pressureTaperStart: editingBrush.value.pressureTaperRange[0] / 100,
-        pressureTaperEnd: 10 - (editingBrush.value.pressureTaperRange[1] / 100),
+        pressureTaper: (editingBrush.value.pressureTaper / 100) + 1,
         pressureMinSize: editingBrush.value.pressureMinSize / 100,
         pressureMinDensity: editingBrush.value.pressureDensityRange[0] / 100,
         pressureMaxDensity: editingBrush.value.pressureDensityRange[1] / 100,
@@ -445,7 +435,6 @@ function applyBrushEdits() {
 \*----------*/
 
 const editingBrush = ref<BrushDefinition & {
-    pressureTaperRange: number[];
     pressureDensityRange: number[];
 }>({} as never);
 

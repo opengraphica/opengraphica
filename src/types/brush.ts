@@ -25,12 +25,9 @@ export interface BrushDefinition {
     // Rotation of the brush shape, in radians
     angle: number;
 
-    // Percentage of the brush size where the pressureMinDensity is linearly interpolated from the start of the stroke (1 = 100%)
-    pressureTaperStart: number;
+    // Larger values make the pressure more exponentially biased towards zero, making skinnier lines easier to draw. Default is 1.
+    pressureTaper: number;
 
-    // Percentage of the brush size where the pressureMinDensity is linearly interpolated from the end of the stroke (1 = 100%)
-    pressureTaperEnd: number;
-  
     // Percentage of the brush size (max size) that will be used as the size when the minimum amount of pen pressure is used
     pressureMinSize: number;
 

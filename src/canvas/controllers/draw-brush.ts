@@ -14,7 +14,8 @@ import historyStore, { createHistoryReserveToken, historyReserveQueueFree, histo
 import workingFileStore, { getSelectedLayers, getLayerById, getLayerGlobalTransform, ensureUniqueLayerSiblingName } from '@/store/working-file';
 import {
     cursorHoverPosition, brushShape, brushSmoothing, brushSpacing, brushColor,
-    brushSize, brushPressureMinDensity, brushPressureMaxDensity, showBrushDrawer,
+    brushSize, brushJitter, brushPressureMinDensity, brushPressureMaxDensity, showBrushDrawer,
+    brushPressureMinSize, brushPressureTaper,
 } from '../store/draw-brush-state';
 
 import DrawableCanvas from '@/canvas/renderers/drawable/canvas';
@@ -232,10 +233,17 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 this.lastCursorX * devicePixelRatio,
                 this.lastCursorY * devicePixelRatio
             ).matrixTransform(canvasStore.state.transform.inverse());
+
+            const pressure = this.drawingUsePressure ? e.pressure : 1;
+
             this.drawingBrushStroke?.addPoint({
                 x: transformedPoint.x,
                 y: transformedPoint.y,
-                size: brushSize.value * (this.drawingUsePressure ? e.pressure : 1),
+                density: brushPressureMinDensity.value + (brushPressureMaxDensity.value - brushPressureMinDensity.value) * pressure,
+                size: brushSize.value * Math.max(
+                    brushPressureMinSize.value,
+                    Math.pow(pressure, brushPressureTaper.value)
+                ),
                 tiltX: e.tiltX,
                 tiltY: e.tiltY,
                 twist: e.twist,
@@ -321,31 +329,42 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             this.lastCursorX * devicePixelRatio,
             this.lastCursorY * devicePixelRatio
         ).matrixTransform(canvasStore.state.transform.inverse())
+        const pressure = this.drawingUsePressure ? e.pressure : 1;
+        const size = brushSize.value * Math.max(
+            brushPressureMinSize.value,
+            Math.pow(pressure, brushPressureTaper.value)
+        );
+        const density = brushPressureMinDensity.value + (brushPressureMaxDensity.value - brushPressureMinDensity.value) * pressure;
         this.drawingBrushStroke = new BrushStroke(
             brushSmoothing.value,
             brushSpacing.value,
+            brushJitter.value,
             {
                 x: transformedPoint.x,
                 y: transformedPoint.y,
-                size: brushSize.value * (this.drawingUsePressure ? e.pressure : 1),
+                density,
+                size,
                 tiltX: 0,
                 tiltY: 0,
                 twist: 0,
             }
         );
 
-        // Generate draw preview
+        // Draw first point
         for (const layer of this.drawingOnLayers) {
             this.renderer?.moveBrushStroke(
                 layer.id,
                 transformedPoint.x,
                 transformedPoint.y,
-                brushSize.value * (this.drawingUsePressure ? e.pressure : 1),
+                size,
+                density,
             );
         }
 
         window.requestAnimationFrame(this.drawLoop);
     }
+
+    // lastPoint!: BrushStrokePoint;
 
     private drawLoop() {
         if (!this.drawingBrushStroke) return;
@@ -365,8 +384,10 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                     point.x,
                     point.y,
                     point.size,
+                    point.density,
                 );
             }
+
             if (count > 60) break;
         }
         
@@ -403,6 +424,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                             point.x,
                             point.y,
                             point.size,
+                            point.density,
                         );
                     }
                 }
@@ -413,6 +435,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                             point.x,
                             point.y,
                             point.size,
+                            point.density,
                         );
                     }
                 }

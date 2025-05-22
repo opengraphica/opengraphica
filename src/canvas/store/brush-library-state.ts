@@ -1,4 +1,4 @@
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 import defaultBrushDefinitions from '@/config/default-brushes.json';
 import { PerformantStore } from '@/store/performant-store';
@@ -19,13 +19,14 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
 
 const customBrushes = permanentStorage.getDeepWritableRef('customBrushes');
 
+export const brushEditorTab = ref<string>('shape');
+
 function createBrushDefaults(brushDefinition: Partial<BrushDefinition>) {
     brushDefinition.shape = brushDefinition.shape ?? 'M 1,0.5 A 0.5,0.5 0 0 1 0.5,1 0.5,0.5 0 0 1 0,0.5 0.5,0.5 0 0 1 0.5,0 0.5,0.5 0 0 1 1,0.5 Z';
     brushDefinition.spacing = brushDefinition.spacing ?? 0.05;
     brushDefinition.jitter = brushDefinition.jitter ?? 0;
     brushDefinition.angle = brushDefinition.angle ?? 0;
-    brushDefinition.pressureTaperStart = brushDefinition.pressureTaperStart ?? 0;
-    brushDefinition.pressureTaperEnd = brushDefinition.pressureTaperEnd ?? 0;
+    brushDefinition.pressureTaper = brushDefinition.pressureTaper ?? 1;
     brushDefinition.pressureMinSize = brushDefinition.pressureMinSize ?? 0;
     brushDefinition.pressureMinDensity = brushDefinition.pressureMinDensity ?? 1;
     brushDefinition.pressureMaxDensity = brushDefinition.pressureMaxDensity ?? 1;

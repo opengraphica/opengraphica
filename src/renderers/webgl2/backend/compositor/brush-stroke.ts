@@ -135,6 +135,7 @@ export class BrushStroke {
                 srcMap: { value: undefined },
                 dstMap: { value: undefined },
                 dstOffsetAndSize: { value: new Vector4() },
+                brushAlpha: { value: this.brushColor[3] },
             },
             vertexShader: brushCompositorVertexShader,
             fragmentShader: brushCompositorFragmentShader,
@@ -155,6 +156,7 @@ export class BrushStroke {
         x: number,
         y: number,
         size: number,
+        density: number,
     ) {
         const brushSize = size;
         const brushLeft = x - brushSize / 2;
@@ -213,6 +215,7 @@ export class BrushStroke {
                 this.brushMaterial.uniforms.tileOffsetAndSize.value.y = 0;
                 this.brushMaterial.uniforms.tileOffsetAndSize.value.z = 1;
                 this.brushMaterial.uniforms.tileOffsetAndSize.value.w = 1;
+                this.brushMaterial.uniforms.brushColor.value.setW(density);
 
                 this._v30.x = -brushLeft / brushSize;
                 this._v30.y = 1.0 + (brushTop / brushSize);

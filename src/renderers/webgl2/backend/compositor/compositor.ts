@@ -43,10 +43,11 @@ export class Compositor {
         x: number,
         y: number,
         size: number,
+        density: number,
     ) {
         const brushStroke = this.brushStrokes.get(index);
         if (!brushStroke) return;
-        brushStroke.move(x, y, size);
+        brushStroke.move(x, y, size, density);
     }
 
     stopBrushStroke(

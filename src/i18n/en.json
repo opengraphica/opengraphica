@@ -1128,11 +1128,9 @@
                         "spacing": "Spacing",
                         "jitter": "Jitter"
                     },
-                    "taper": {
-                        "title": "Taper",
-                        "pressureTaper": "Pressure Taper",
-                        "pressureTaperStart": "Pressure Taper Start",
-                        "pressureTaperEnd": "Pressure Taper End",
+                    "pressure": {
+                        "title": "Pressure",
+                        "pressureTaper": "Taper",
                         "pressureMinSize": "Minimum Size"
                     }
                 }

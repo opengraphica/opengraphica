@@ -49,7 +49,7 @@ export interface RendererFrontend {
     applySelectionMaskToAlphaChannel(layerId: number, options?: RendererFrontendApplySelectionMaskToAlphaChannelOptions): Promise<RendererTextureTile[]>;
     takeSnapshot(imageWidth: number, imageHeight: number, options?: RendererFrontendTakeSnapshotOptions): Promise<ImageBitmap>;
     startBrushStroke(settings: RendererBrushStrokeSettings): Promise<void>;
-    moveBrushStroke(layerId: number, x: number, y: number, size: number): Promise<void>;
+    moveBrushStroke(layerId: number, x: number, y: number, size: number, density: number): Promise<void>;
     stopBrushStroke(layerId: number): Promise<void>;
     dispose(): Promise<void>;
 }

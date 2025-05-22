@@ -306,12 +306,14 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         x: number,
         y: number,
         size: number,
+        density: number,
     ) {
         await this.rendererBackend?.moveBrushStroke(
             layerId,
             x,
             y,
             size,
+            density,
         );
     }
 

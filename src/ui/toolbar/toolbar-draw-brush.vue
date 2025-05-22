@@ -60,7 +60,7 @@
                     :reference="showColorPaletteSettingsButton?.$el"
                 >
                     <div class="og-popover__content">
-                        <el-form action="javascript:void" label-position="top">
+                        <el-form action="javascript:void(0)" label-position="top">
                             <el-form-item :label="$t('toolbar.drawBrush.paletteCount')" class="!m-0 !p-0 !max-w-30">
                                 <el-input-number
                                     v-model.lazy="colorPaletteCount"

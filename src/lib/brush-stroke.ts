@@ -5,6 +5,7 @@ export interface BrushStrokePoint {
     tiltX: number;
     tiltY: number;
     twist: number;
+    density: number;
     rendered?: boolean;
 }
 
@@ -121,6 +122,7 @@ class BrushStrokeCatmullRomSegment {
 export class BrushStroke {
     smoothing!: number;
     spacing!: number;
+    jitter!: number;
 
     collectedPoints: Array<BrushStrokePoint | undefined> = [];
     collectedPointRetrieveIndex: number = -1;
@@ -132,12 +134,14 @@ export class BrushStroke {
 
     x: number;
     y: number;
+    density: number;
     size: number;
     tiltX: number;
     tiltY: number;
     twist: number;
     sX: number;
     sY: number;
+    sDensity: number;
     sSize: number;
     sTiltX: number;
     sTiltY: number;
@@ -152,18 +156,23 @@ export class BrushStroke {
     retrieveCatmullRomTravel: number = 0;
     retrieveLineLength: number = 0;
 
-    constructor(smoothing: number, spacing: number, startingPoint: BrushStrokePoint) {
+    constructor(
+        smoothing: number, spacing: number, jitter: number, startingPoint: BrushStrokePoint
+    ) {
         this.spacing = spacing;
         this.smoothing = smoothing;
+        this.jitter = jitter;
 
         this.x = startingPoint.x;
         this.y = startingPoint.y;
+        this.density = startingPoint.density;
         this.size = startingPoint.size;
         this.tiltX = startingPoint.tiltX;
         this.tiltY = startingPoint.tiltY;
         this.twist = startingPoint.twist;
         this.sX = startingPoint.x;
         this.sY = startingPoint.y;
+        this.sDensity = startingPoint.density;
         this.sSize = startingPoint.size;
         this.sTiltX = startingPoint.tiltX;
         this.sTiltY = startingPoint.tiltY;
@@ -177,18 +186,21 @@ export class BrushStroke {
     addPoint(point: BrushStrokePoint) {
         this.x = point.x;
         this.y = point.y;
+        this.density = point.density;
         this.size = point.size;
         this.tiltX = point.tiltX;
         this.tiltY = point.tiltY;
         this.twist = point.twist;
         this.sX = (1 - this.smoothing) * this.sX + this.smoothing * point.x;
         this.sY = (1 - this.smoothing) * this.sY + this.smoothing * point.y;
+        this.sDensity = (1 - this.smoothing) * this.sDensity + this.smoothing * point.density;
         this.sSize = (1 - this.smoothing) * this.sSize + this.smoothing * point.size;
         this.sTiltX = (1 - this.smoothing) * this.sTiltX + this.smoothing * point.tiltX;
         this.sTiltY = (1 - this.smoothing) * this.sTiltY + this.smoothing * point.tiltY;
         this.sTwist = (1 - this.smoothing) * this.sTwist + this.smoothing * point.twist;
         point.x = this.sX;
         point.y = this.sY;
+        point.density = this.sDensity;
         point.size = this.sSize;
         point.tiltX = this.sTiltX;
         point.tiltY = this.sTiltY;
@@ -204,6 +216,7 @@ export class BrushStroke {
             this.addCollectedPoint({
                 x: this.sX,
                 y: this.sY,
+                density: this.sDensity,
                 size: this.sSize,
                 tiltX: this.sTiltX,
                 tiltY: this.sTiltY,
@@ -261,8 +274,16 @@ export class BrushStroke {
             this.retrieveCatmullRomP3 = this.retrieveCollectedPoint()!;
 
             if (this.retrieveCatmullRomP1.x == this.retrieveCatmullRomP2.x && this.retrieveCatmullRomP1.y == this.retrieveCatmullRomP2.y) {
+                this.retrieveCatmullRomP0 = undefined;
+                this.retrieveCatmullRomP1 = undefined;
+                this.retrieveCatmullRomP2 = undefined;
+                this.retrieveCatmullRomP3 = undefined;
+                return;
+            } else if (
+                this.retrieveCatmullRomP0.x == this.retrieveCatmullRomP1.x && this.retrieveCatmullRomP0.y == this.retrieveCatmullRomP1.y
+                || this.retrieveCatmullRomP2.x == this.retrieveCatmullRomP3.x && this.retrieveCatmullRomP2.y == this.retrieveCatmullRomP3.y
+            ) {
                 isRetrievingLine = true;
-                this.retrieveCatmullRomP2 = this.retrieveCatmullRomP3;
             }
             let centerPointDistance = this.catmullRomSegment.distance(
                 this.retrieveCatmullRomP1.x, this.retrieveCatmullRomP1.y,
@@ -283,6 +304,8 @@ export class BrushStroke {
             const travelRatio = travel / Math.max(this.catmullRomSegment.length, 0.00001);
 
             const brushSize = this.retrieveCatmullRomP1!.size * (1 - travelRatio) + this.retrieveCatmullRomP2!.size * travelRatio;
+            const brushDensity = this.retrieveCatmullRomP1!.density * (1 - travelRatio) + this.retrieveCatmullRomP2!.density * travelRatio;
+
             const stepDistance = Math.max(1, brushSize * this.spacing);
             const bezierT = this.catmullRomSegment.getTAtLength(travel);
 
@@ -292,11 +315,14 @@ export class BrushStroke {
                 point = {
                     x: this.catmullRomSegment.catmullRomX(tt),
                     y: this.catmullRomSegment.catmullRomY(tt),
+                    density: brushDensity,
                     size: brushSize,
                     tiltX: this.retrieveCatmullRomP1!.tiltX, // TODO - interpolate
                     tiltY: this.retrieveCatmullRomP1!.tiltY, // TODO - interpolate
                     twist: this.retrieveCatmullRomP1!.twist, // TODO - interpolate
                 }
+                point.x += ((Math.random() * 2) - 1) * this.jitter * brushSize;
+                point.y += ((Math.random() * 2) - 1) * this.jitter * brushSize;
                 this.retrieveCatmullRomTravel += stepDistance;
             } else {
                 this.retrieveCatmullRomP0 = undefined;
@@ -313,17 +339,21 @@ export class BrushStroke {
             const travelRatio = travel / Math.max(this.retrieveLineLength, 0.00001);
 
             const brushSize = this.retrieveCatmullRomP1!.size * (1 - travelRatio) + this.retrieveCatmullRomP2!.size * travelRatio;
+            const brushDensity = this.retrieveCatmullRomP1!.density * (1 - travelRatio) + this.retrieveCatmullRomP2!.density * travelRatio;
             const stepDistance = Math.max(1, brushSize * this.spacing);
 
             if (travel <= this.retrieveLineLength) {
                 point = {
                     x: this.retrieveCatmullRomP1!.x * (1 - travelRatio) + this.retrieveCatmullRomP2!.x * travelRatio,
                     y: this.retrieveCatmullRomP1!.y * (1 - travelRatio) + this.retrieveCatmullRomP2!.y * travelRatio,
+                    density: brushDensity,
                     size: brushSize,
                     tiltX: this.retrieveCatmullRomP1!.tiltX, // TODO - interpolate
                     tiltY: this.retrieveCatmullRomP1!.tiltY, // TODO - interpolate
                     twist: this.retrieveCatmullRomP1!.twist, // TODO - interpolate
                 }
+                point.x += ((Math.random() * 2) - 1) * this.jitter * brushSize;
+                point.y += ((Math.random() * 2) - 1) * this.jitter * brushSize;
                 this.retrieveCatmullRomTravel += stepDistance;
             } else {
                 this.retrieveCatmullRomP1 = undefined;
@@ -361,17 +391,21 @@ export class BrushStroke {
             const travelRatio = travel / Math.max(this.retrieveLineLength, 0.00001);
 
             const brushSize = this.retrieveCatmullRomP1!.size * (1 - travelRatio) + this.retrieveCatmullRomP2!.size * travelRatio;
+            const brushDensity = this.retrieveCatmullRomP1!.density * (1 - travelRatio) + this.retrieveCatmullRomP2!.density * travelRatio;
             const stepDistance = Math.max(1, brushSize * this.spacing);
 
             if (travel <= this.retrieveLineLength) {
                 point = {
                     x: this.retrieveCatmullRomP1!.x * (1 - travelRatio) + this.retrieveCatmullRomP2!.x * travelRatio,
                     y: this.retrieveCatmullRomP1!.y * (1 - travelRatio) + this.retrieveCatmullRomP2!.y * travelRatio,
+                    density: brushDensity,
                     size: brushSize,
                     tiltX: this.retrieveCatmullRomP1!.tiltX, // TODO - interpolate
                     tiltY: this.retrieveCatmullRomP1!.tiltY, // TODO - interpolate
                     twist: this.retrieveCatmullRomP1!.twist, // TODO - interpolate
                 }
+                point.x += ((Math.random() * 2) - 1) * this.jitter * brushSize;
+                point.y += ((Math.random() * 2) - 1) * this.jitter * brushSize;
                 this.retrieveCatmullRomTravel += stepDistance;
             } else {
                 this.retrieveCatmullRomP1 = undefined;
@@ -388,11 +422,14 @@ export class BrushStroke {
             point = {
                 x: this.x,
                 y: this.y,
+                density: this.density,
                 size: this.size,
                 tiltX: this.tiltX,
                 tiltY: this.tiltY,
                 twist: this.twist,
-            }
+            };
+            point.x += ((Math.random() * 2) - 1) * this.jitter * this.size;
+            point.y += ((Math.random() * 2) - 1) * this.jitter * this.size;
         }
         return point;
     }
