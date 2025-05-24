@@ -16,6 +16,7 @@ import brushStrokeVertexShader from './shader/brush-stroke.vert';
 import brushStrokeFragmentShader from './shader/brush-stroke.frag';
 import brushCompositorVertexShader from './shader/brush-compositor.vert';
 import brushCompositorFragmentShader from './shader/brush-compositor.frag';
+import spectralFragmentShader from './shader/spectral.frag';
 import copyTileVertexShader from './shader/copy-tile.vert';
 import copyTileFragmentShader from './shader/copy-tile.frag';
 
@@ -138,7 +139,7 @@ export class BrushStroke {
                 brushAlpha: { value: this.brushColor[3] },
             },
             vertexShader: brushCompositorVertexShader,
-            fragmentShader: brushCompositorFragmentShader,
+            fragmentShader: spectralFragmentShader + '\n' + brushCompositorFragmentShader,
             depthTest: false,
             depthWrite: false,
             transparent: true,

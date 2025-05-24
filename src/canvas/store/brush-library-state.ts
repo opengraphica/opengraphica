@@ -23,16 +23,19 @@ export const brushEditorTab = ref<string>('shape');
 
 function createBrushDefaults(brushDefinition: Partial<BrushDefinition>) {
     brushDefinition.shape = brushDefinition.shape ?? 'M 1,0.5 A 0.5,0.5 0 0 1 0.5,1 0.5,0.5 0 0 1 0,0.5 0.5,0.5 0 0 1 0.5,0 0.5,0.5 0 0 1 1,0.5 Z';
+    brushDefinition.hardness = brushDefinition.hardness ?? 1;
     brushDefinition.spacing = brushDefinition.spacing ?? 0.05;
     brushDefinition.jitter = brushDefinition.jitter ?? 0;
     brushDefinition.angle = brushDefinition.angle ?? 0;
     brushDefinition.pressureTaper = brushDefinition.pressureTaper ?? 1;
     brushDefinition.pressureMinSize = brushDefinition.pressureMinSize ?? 0;
     brushDefinition.pressureMinDensity = brushDefinition.pressureMinDensity ?? 1;
-    brushDefinition.pressureMaxDensity = brushDefinition.pressureMaxDensity ?? 1;
-    brushDefinition.colorBlendingFactor = brushDefinition.colorBlendingFactor ?? 0;
+    brushDefinition.density = brushDefinition.density ?? 1;
+    brushDefinition.colorBlendingStrength = brushDefinition.colorBlendingStrength ?? 0;
+    brushDefinition.pressureMinColorBlendingStrength = brushDefinition.pressureMinColorBlendingStrength ?? 0;
     brushDefinition.colorBlendingPersistence = brushDefinition.colorBlendingPersistence ?? 0;
-    brushDefinition.alphaBlendingFactor = brushDefinition.alphaBlendingFactor ?? 1;
+    brushDefinition.concentration = brushDefinition.concentration ?? 1;
+    brushDefinition.pressureMinConcentration = brushDefinition.pressureMinConcentration ?? 1;
 }
 
 export const brushesByCategory = computed(() => {

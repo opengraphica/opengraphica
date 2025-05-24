@@ -7,13 +7,13 @@
                 plain
                 @click="onBack()"
             >
-                <span class="bi bi-chevron-left mr-2" aria-hidden="true" /> <span>{{ $t('button.back') }}</span>
+                <span class="bi bi-chevron-left mr-2" aria-hidden="true" /> <span>{{ t('button.back') }}</span>
             </el-button>
             <el-button
                 plain
                 @click="onDone()"
             >
-                <span class="bi bi-check-circle-fill mr-2" aria-hidden="true" /> <span>{{ $t('button.done') }}</span>
+                <span class="bi bi-check-circle-fill mr-2" aria-hidden="true" /> <span>{{ t('button.done') }}</span>
             </el-button>
         </div>
     </template>
@@ -49,27 +49,27 @@
                                     {{ brush.name ?? t('defaultBrush.' + brush.id) }}
                                 </span>
                             </button>
-                            <el-button link type="primary" class="!px-2 !my-1" :aria-label="$t('button.editBrush')" @click="onClickEditBrush(brush.id)">
+                            <el-button link type="primary" class="!px-2 !my-1" :aria-label="t('button.editBrush')" @click="onClickEditBrush(brush.id)">
                                 <span class="bi bi-pencil-square" aria-hidden="true" />
                             </el-button>
                         </div>
                     </template>
                     <template v-else-if="selectedBrushCategory">
                         <el-alert
-                            :title="$t('toolbar.drawBrush.brushDialog.noBrushesInCategory.title')"
+                            :title="t('toolbar.drawBrush.brushDialog.noBrushesInCategory.title')"
                             type="warning"
                             show-icon
                             :closable="false">
-                            {{ $t('toolbar.drawBrush.brushDialog.noBrushesInCategory.message') }}
+                            {{ t('toolbar.drawBrush.brushDialog.noBrushesInCategory.message') }}
                         </el-alert>
                     </template>
                     <template v-else>
                         <el-alert
-                            :title="$t('toolbar.drawBrush.brushDialog.noBrushCategorySelected.title')"
+                            :title="t('toolbar.drawBrush.brushDialog.noBrushCategorySelected.title')"
                             type="warning"
                             show-icon
                             :closable="false">
-                            {{ $t('toolbar.drawBrush.brushDialog.noBrushCategorySelected.message') }}
+                            {{ t('toolbar.drawBrush.brushDialog.noBrushCategorySelected.message') }}
                         </el-alert>
                     </template>
                 </el-scrollbar>
@@ -81,7 +81,11 @@
                     <el-scrollbar>
                         <h3>{{ t('toolbar.drawBrush.brushDialog.editorTab.shape.title') }}</h3>
                         <el-form novalidate="novalidate" action="javascript:void(0)" label-position="top">
-                            <el-form-item :label="$t('toolbar.drawBrush.brushDialog.editorTab.shape.angle')">
+                            <el-form-item>
+                                <template #label>
+                                    {{ t('toolbar.drawBrush.brushDialog.editorTab.shape.angle') }}
+                                    <og-more-info-icon :message="t('toolbar.drawBrush.brushDialog.editorTab.shape.angleDescription')" />
+                                </template>
                                 <div class="flex gap-2 w-full items-center">
                                     <div class="px-3 grow-1">
                                         <el-slider
@@ -107,7 +111,11 @@
                     <el-scrollbar>
                         <h3>{{ t('toolbar.drawBrush.brushDialog.editorTab.strokePath.title') }}</h3>
                         <el-form novalidate="novalidate" action="javascript:void(0)" label-position="top">
-                            <el-form-item :label="$t('toolbar.drawBrush.brushDialog.editorTab.strokePath.spacing')">
+                            <el-form-item>
+                                <template #label>
+                                    {{ t('toolbar.drawBrush.brushDialog.editorTab.strokePath.spacing') }}
+                                    <og-more-info-icon :message="t('toolbar.drawBrush.brushDialog.editorTab.strokePath.spacingDescription')" />
+                                </template>
                                 <div class="flex gap-2 w-full items-center">
                                     <div class="px-3 grow-1">
                                         <el-slider
@@ -126,7 +134,11 @@
                                     </div>
                                 </div>
                             </el-form-item>
-                            <el-form-item :label="$t('toolbar.drawBrush.brushDialog.editorTab.strokePath.jitter')">
+                            <el-form-item>
+                                <template #label>
+                                    {{ t('toolbar.drawBrush.brushDialog.editorTab.strokePath.jitter') }}
+                                    <og-more-info-icon :message="t('toolbar.drawBrush.brushDialog.editorTab.strokePath.jitterDescription')" />
+                                </template>
                                 <div class="flex gap-2 w-full items-center">
                                     <div class="px-3 grow-1">
                                         <el-slider
@@ -152,7 +164,11 @@
                     <el-scrollbar>
                         <h3>{{ t('toolbar.drawBrush.brushDialog.editorTab.pressure.title') }}</h3>
                         <el-form novalidate="novalidate" action="javascript:void(0)" label-position="top">
-                            <el-form-item :label="$t('toolbar.drawBrush.brushDialog.editorTab.pressure.pressureTaper')">
+                            <el-form-item>
+                                <template #label>
+                                    {{ t('toolbar.drawBrush.brushDialog.editorTab.pressure.pressureTaper') }}
+                                    <og-more-info-icon :message="t('toolbar.drawBrush.brushDialog.editorTab.pressure.pressureTaperDescription')" />
+                                </template>
                                 <div class="flex gap-2 w-full items-center">
                                     <div class="px-3 grow-1">
                                         <el-slider
@@ -171,7 +187,11 @@
                                     </div>
                                 </div>
                             </el-form-item>
-                            <el-form-item :label="$t('toolbar.drawBrush.brushDialog.editorTab.pressure.pressureMinSize')">
+                            <el-form-item>
+                                <template #label>
+                                    {{ t('toolbar.drawBrush.brushDialog.editorTab.pressure.pressureMinSize') }}
+                                    <og-more-info-icon :message="t('toolbar.drawBrush.brushDialog.editorTab.pressure.pressureMinSizeDescription')" />
+                                </template>
                                 <div class="flex gap-2 w-full items-center">
                                     <div class="px-3 grow-1">
                                         <el-slider
@@ -197,7 +217,11 @@
                     <el-scrollbar>
                         <h3>{{ t('toolbar.drawBrush.brushDialog.editorTab.blending.title') }}</h3>
                         <el-form novalidate="novalidate" action="javascript:void(0)" label-position="top">
-                            <el-form-item :label="$t('toolbar.drawBrush.brushDialog.editorTab.blending.density')">
+                            <el-form-item>
+                                <template #label>
+                                    {{ t('toolbar.drawBrush.brushDialog.editorTab.blending.density') }}
+                                    <og-more-info-icon :message="t('toolbar.drawBrush.brushDialog.editorTab.blending.densityDescription')" />
+                                </template>
                                 <div class="flex gap-2 w-full items-center">
                                     <div class="px-3 grow-1">
                                         <el-slider
@@ -223,26 +247,41 @@
                                     </div>
                                 </div>
                             </el-form-item>
-                            <el-form-item :label="$t('toolbar.drawBrush.brushDialog.editorTab.blending.colorBlendingFactor')">
+                            <el-form-item>
+                                <template #label>
+                                    {{ t('toolbar.drawBrush.brushDialog.editorTab.blending.colorBlendingStrength') }}
+                                    <og-more-info-icon :message="t('toolbar.drawBrush.brushDialog.editorTab.blending.colorBlendingStrengthDescription')" />
+                                </template>
                                 <div class="flex gap-2 w-full items-center">
                                     <div class="px-3 grow-1">
                                         <el-slider
-                                            v-model="editingBrush.colorBlendingFactor"
+                                            v-model="editingBrush.colorBlendingStrengthRange"
+                                            range
                                             :aria-label="t('measurement.percentage')"
                                             :min="0" :max="100" :step="1" :show-tooltip="false"
                                         />
                                     </div>
-                                    <div class="grow-0">
+                                    <div class="flex grow-0 gap-2">
                                         <el-input-number
-                                            v-model="editingBrush.colorBlendingFactor"
-                                            :aria-label="t('measurement.percentage')"
+                                            v-model="editingBrush.colorBlendingStrengthRange[0]"
+                                            :aria-label="t('toolbar.drawBrush.brushDialog.editorTab.blending.pressureMinColorBlendingStrength')"
                                             suffix-text="%"
-                                            style="width: 5rem"
+                                            style="width: 4rem"
+                                        />
+                                        <el-input-number
+                                            v-model="editingBrush.colorBlendingStrengthRange[1]"
+                                            :aria-label="t('toolbar.drawBrush.brushDialog.editorTab.blending.pressureMaxColorBlendingStrength')"
+                                            suffix-text="%"
+                                            style="width: 4rem"
                                         />
                                     </div>
                                 </div>
                             </el-form-item>
-                            <el-form-item :label="$t('toolbar.drawBrush.brushDialog.editorTab.blending.colorBlendingPersistence')">
+                            <el-form-item>
+                                <template #label>
+                                    {{ t('toolbar.drawBrush.brushDialog.editorTab.blending.colorBlendingPersistence') }}
+                                    <og-more-info-icon :message="t('toolbar.drawBrush.brushDialog.editorTab.blending.colorBlendingPersistenceDescription')" />
+                                </template>
                                 <div class="flex gap-2 w-full items-center">
                                     <div class="px-3 grow-1">
                                         <el-slider
@@ -261,21 +300,32 @@
                                     </div>
                                 </div>
                             </el-form-item>
-                            <el-form-item :label="$t('toolbar.drawBrush.brushDialog.editorTab.blending.alphaBlendingFactor')">
+                            <el-form-item>
+                                <template #label>
+                                    {{ t('toolbar.drawBrush.brushDialog.editorTab.blending.concentration') }}
+                                    <og-more-info-icon :message="t('toolbar.drawBrush.brushDialog.editorTab.blending.concentrationDescription')" />
+                                </template>
                                 <div class="flex gap-2 w-full items-center">
                                     <div class="px-3 grow-1">
                                         <el-slider
-                                            v-model="editingBrush.alphaBlendingFactor"
+                                            v-model="editingBrush.concentrationRange"
+                                            range
                                             :aria-label="t('measurement.percentage')"
                                             :min="0" :max="100" :step="1" :show-tooltip="false"
                                         />
                                     </div>
-                                    <div class="grow-0">
+                                    <div class="flex grow-0 gap-2">
                                         <el-input-number
-                                            v-model="editingBrush.alphaBlendingFactor"
-                                            :aria-label="t('measurement.percentage')"
+                                            v-model="editingBrush.concentrationRange[0]"
+                                            :aria-label="t('toolbar.drawBrush.brushDialog.editorTab.blending.pressureMinConcentration')"
                                             suffix-text="%"
-                                            style="width: 5rem"
+                                            style="width: 4rem"
+                                        />
+                                        <el-input-number
+                                            v-model="editingBrush.concentrationRange[1]"
+                                            :aria-label="t('toolbar.drawBrush.brushDialog.editorTab.blending.pressureMaxConcentration')"
+                                            suffix-text="%"
+                                            style="width: 4rem"
                                         />
                                     </div>
                                 </div>
@@ -288,8 +338,8 @@
         <template v-if="isDialog">
             <el-divider class="mt-0" />
             <div class="mt-4 pb-5 text-right">
-                <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
-                <el-button @click="onConfirmSelection">{{ $t('button.ok') }}</el-button>
+                <el-button @click="onCancel">{{ t('button.cancel') }}</el-button>
+                <el-button @click="onConfirmSelection">{{ t('button.ok') }}</el-button>
             </div>
         </template>
     </div>
@@ -320,6 +370,8 @@ import ElPopover from '@/ui/el/el-popover.vue';
 import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
 import ElSlider from 'element-plus/lib/components/slider/index';
 import ElTabs, { ElTabPane } from 'element-plus/lib/components/tabs/index';
+
+import OgMoreInfoIcon from '@/ui/element/more-info-icon.vue';
 
 import type { BrushDefinition, RGBAColor, WorkingFileGradientColorSpace, WorkingFileGradientColorStop } from '@/types';
 
@@ -391,17 +443,22 @@ function onClickEditBrush(brushId: string) {
         id: brush.id,
         name: brush.name,
         shape: brush.shape,
+        hardness: brush.hardness * 100,
         spacing: Math.round(brush.spacing * 100),
         jitter: Math.round(brush.jitter * 100),
         angle: Math.round(brush.angle * Math.RADIANS_TO_DEGREES),
         pressureTaper: Math.round((brush.pressureTaper - 1) * 100),
         pressureMinSize: Math.round(brush.pressureMinSize * 100),
-        pressureDensityRange: [Math.round(brush.pressureMinDensity * 100), Math.round(brush.pressureMaxDensity * 100)],
+        pressureDensityRange: [Math.round(brush.pressureMinDensity * 100), Math.round(brush.density * 100)],
+        density: 0,
         pressureMinDensity: 0,
-        pressureMaxDensity: 0,
-        colorBlendingFactor: Math.round(brush.colorBlendingFactor * 100),
+        colorBlendingStrengthRange: [Math.round(brush.pressureMinColorBlendingStrength * 100), Math.round(brush.colorBlendingStrength * 100)],
+        colorBlendingStrength: 0,
+        pressureMinColorBlendingStrength: 0,
         colorBlendingPersistence: Math.round(brush.colorBlendingPersistence * 100),
-        alphaBlendingFactor: Math.round(brush.alphaBlendingFactor * 100),
+        concentrationRange: [Math.round(brush.pressureMinConcentration * 100), Math.round(brush.concentration * 100)],
+        concentration: 0,
+        pressureMinConcentration: 0,
     };
     view.value = 'edit';
 }
@@ -412,16 +469,19 @@ function applyBrushEdits() {
         id: editingBrush.value.id,
         name: editingBrush.value.name,
         shape: editingBrush.value.shape,
+        hardness: editingBrush.value.hardness / 100,
         spacing: editingBrush.value.spacing / 100,
         jitter: editingBrush.value.jitter / 100,
         angle: editingBrush.value.angle * Math.DEGREES_TO_RADIANS,
         pressureTaper: (editingBrush.value.pressureTaper / 100) + 1,
         pressureMinSize: editingBrush.value.pressureMinSize / 100,
+        density: editingBrush.value.pressureDensityRange[1] / 100,
         pressureMinDensity: editingBrush.value.pressureDensityRange[0] / 100,
-        pressureMaxDensity: editingBrush.value.pressureDensityRange[1] / 100,
-        colorBlendingFactor: editingBrush.value.colorBlendingFactor / 100,
+        colorBlendingStrength: editingBrush.value.colorBlendingStrengthRange[1] / 100,
+        pressureMinColorBlendingStrength: editingBrush.value.colorBlendingStrengthRange[0] / 100,
         colorBlendingPersistence: editingBrush.value.colorBlendingPersistence / 100,
-        alphaBlendingFactor: editingBrush.value.alphaBlendingFactor / 100,
+        concentration: editingBrush.value.concentrationRange[1] / 100,
+        pressureMinConcentration: editingBrush.value.concentrationRange[1] / 100,
     }
     addCustomBrush(brushDefinition);
     emit('update:selectedBrushId', 'default');
@@ -436,6 +496,8 @@ function applyBrushEdits() {
 
 const editingBrush = ref<BrushDefinition & {
     pressureDensityRange: number[];
+    colorBlendingStrengthRange: number[];
+    concentrationRange: number[];
 }>({} as never);
 
 /*---------------*\

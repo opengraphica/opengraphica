@@ -6,6 +6,8 @@ export interface BrushStrokePoint {
     tiltY: number;
     twist: number;
     density: number;
+    colorBlendingStrength: number;
+    concentration: number;
     rendered?: boolean;
 }
 
@@ -135,6 +137,8 @@ export class BrushStroke {
     x: number;
     y: number;
     density: number;
+    colorBlendingStrength: number;
+    concentration: number;
     size: number;
     tiltX: number;
     tiltY: number;
@@ -142,6 +146,8 @@ export class BrushStroke {
     sX: number;
     sY: number;
     sDensity: number;
+    sColorBlendingStrength: number;
+    sConcentration: number;
     sSize: number;
     sTiltX: number;
     sTiltY: number;
@@ -166,6 +172,8 @@ export class BrushStroke {
         this.x = startingPoint.x;
         this.y = startingPoint.y;
         this.density = startingPoint.density;
+        this.colorBlendingStrength = startingPoint.colorBlendingStrength;
+        this.concentration = startingPoint.concentration;
         this.size = startingPoint.size;
         this.tiltX = startingPoint.tiltX;
         this.tiltY = startingPoint.tiltY;
@@ -173,6 +181,8 @@ export class BrushStroke {
         this.sX = startingPoint.x;
         this.sY = startingPoint.y;
         this.sDensity = startingPoint.density;
+        this.sColorBlendingStrength = startingPoint.colorBlendingStrength;
+        this.sConcentration = startingPoint.concentration;
         this.sSize = startingPoint.size;
         this.sTiltX = startingPoint.tiltX;
         this.sTiltY = startingPoint.tiltY;
@@ -213,10 +223,15 @@ export class BrushStroke {
             this.sX += (this.x - this.sX) * 0.05;
             this.sY += (this.y - this.sY) * 0.05;
             this.sSize += (this.size - this.sSize) * 0.05;
+            this.sDensity += (this.density - this.sDensity) * 0.05;
+            this.sColorBlendingStrength += (this.colorBlendingStrength - this.sColorBlendingStrength) * 0.05;
+            this.sConcentration += (this.concentration - this.sConcentration) * 0.05;
             this.addCollectedPoint({
                 x: this.sX,
                 y: this.sY,
                 density: this.sDensity,
+                colorBlendingStrength: this.sColorBlendingStrength,
+                concentration: this.sConcentration,
                 size: this.sSize,
                 tiltX: this.sTiltX,
                 tiltY: this.sTiltY,
@@ -303,10 +318,12 @@ export class BrushStroke {
             const travel = this.retrieveCatmullRomTravel;
             const travelRatio = travel / Math.max(this.catmullRomSegment.length, 0.00001);
 
-            const brushSize = this.retrieveCatmullRomP1!.size * (1 - travelRatio) + this.retrieveCatmullRomP2!.size * travelRatio;
-            const brushDensity = this.retrieveCatmullRomP1!.density * (1 - travelRatio) + this.retrieveCatmullRomP2!.density * travelRatio;
+            const size = this.retrieveCatmullRomP1!.size * (1 - travelRatio) + this.retrieveCatmullRomP2!.size * travelRatio;
+            const density = this.retrieveCatmullRomP1!.density * (1 - travelRatio) + this.retrieveCatmullRomP2!.density * travelRatio;
+            const colorBlendingStrength = this.retrieveCatmullRomP1!.colorBlendingStrength * (1 - travelRatio) + this.retrieveCatmullRomP2!.colorBlendingStrength * travelRatio;
+            const concentration = this.retrieveCatmullRomP1!.concentration * (1 - travelRatio) + this.retrieveCatmullRomP2!.concentration * travelRatio;
 
-            const stepDistance = Math.max(1, brushSize * this.spacing);
+            const stepDistance = Math.max(1, size * this.spacing);
             const bezierT = this.catmullRomSegment.getTAtLength(travel);
 
             const tt = this.catmullRomSegment.t1 + (this.catmullRomSegment.t2 - this.catmullRomSegment.t1) * bezierT;
@@ -315,14 +332,16 @@ export class BrushStroke {
                 point = {
                     x: this.catmullRomSegment.catmullRomX(tt),
                     y: this.catmullRomSegment.catmullRomY(tt),
-                    density: brushDensity,
-                    size: brushSize,
+                    density,
+                    colorBlendingStrength,
+                    concentration,
+                    size,
                     tiltX: this.retrieveCatmullRomP1!.tiltX, // TODO - interpolate
                     tiltY: this.retrieveCatmullRomP1!.tiltY, // TODO - interpolate
                     twist: this.retrieveCatmullRomP1!.twist, // TODO - interpolate
                 }
-                point.x += ((Math.random() * 2) - 1) * this.jitter * brushSize;
-                point.y += ((Math.random() * 2) - 1) * this.jitter * brushSize;
+                point.x += ((Math.random() * 2) - 1) * this.jitter * size;
+                point.y += ((Math.random() * 2) - 1) * this.jitter * size;
                 this.retrieveCatmullRomTravel += stepDistance;
             } else {
                 this.retrieveCatmullRomP0 = undefined;
@@ -338,22 +357,26 @@ export class BrushStroke {
             const travel = this.retrieveCatmullRomTravel;
             const travelRatio = travel / Math.max(this.retrieveLineLength, 0.00001);
 
-            const brushSize = this.retrieveCatmullRomP1!.size * (1 - travelRatio) + this.retrieveCatmullRomP2!.size * travelRatio;
-            const brushDensity = this.retrieveCatmullRomP1!.density * (1 - travelRatio) + this.retrieveCatmullRomP2!.density * travelRatio;
-            const stepDistance = Math.max(1, brushSize * this.spacing);
+            const size = this.retrieveCatmullRomP1!.size * (1 - travelRatio) + this.retrieveCatmullRomP2!.size * travelRatio;
+            const density = this.retrieveCatmullRomP1!.density * (1 - travelRatio) + this.retrieveCatmullRomP2!.density * travelRatio;
+            const colorBlendingStrength = this.retrieveCatmullRomP1!.colorBlendingStrength * (1 - travelRatio) + this.retrieveCatmullRomP2!.colorBlendingStrength * travelRatio;
+            const concentration = this.retrieveCatmullRomP1!.concentration * (1 - travelRatio) + this.retrieveCatmullRomP2!.concentration * travelRatio;
+            const stepDistance = Math.max(1, size * this.spacing);
 
             if (travel <= this.retrieveLineLength) {
                 point = {
                     x: this.retrieveCatmullRomP1!.x * (1 - travelRatio) + this.retrieveCatmullRomP2!.x * travelRatio,
                     y: this.retrieveCatmullRomP1!.y * (1 - travelRatio) + this.retrieveCatmullRomP2!.y * travelRatio,
-                    density: brushDensity,
-                    size: brushSize,
+                    density,
+                    colorBlendingStrength,
+                    concentration,
+                    size,
                     tiltX: this.retrieveCatmullRomP1!.tiltX, // TODO - interpolate
                     tiltY: this.retrieveCatmullRomP1!.tiltY, // TODO - interpolate
                     twist: this.retrieveCatmullRomP1!.twist, // TODO - interpolate
                 }
-                point.x += ((Math.random() * 2) - 1) * this.jitter * brushSize;
-                point.y += ((Math.random() * 2) - 1) * this.jitter * brushSize;
+                point.x += ((Math.random() * 2) - 1) * this.jitter * size;
+                point.y += ((Math.random() * 2) - 1) * this.jitter * size;
                 this.retrieveCatmullRomTravel += stepDistance;
             } else {
                 this.retrieveCatmullRomP1 = undefined;
@@ -390,22 +413,26 @@ export class BrushStroke {
             const travel = this.retrieveCatmullRomTravel;
             const travelRatio = travel / Math.max(this.retrieveLineLength, 0.00001);
 
-            const brushSize = this.retrieveCatmullRomP1!.size * (1 - travelRatio) + this.retrieveCatmullRomP2!.size * travelRatio;
-            const brushDensity = this.retrieveCatmullRomP1!.density * (1 - travelRatio) + this.retrieveCatmullRomP2!.density * travelRatio;
-            const stepDistance = Math.max(1, brushSize * this.spacing);
+            const size = this.retrieveCatmullRomP1!.size * (1 - travelRatio) + this.retrieveCatmullRomP2!.size * travelRatio;
+            const density = this.retrieveCatmullRomP1!.density * (1 - travelRatio) + this.retrieveCatmullRomP2!.density * travelRatio;
+            const colorBlendingStrength = this.retrieveCatmullRomP1!.colorBlendingStrength * (1 - travelRatio) + this.retrieveCatmullRomP2!.colorBlendingStrength * travelRatio;
+            const concentration = this.retrieveCatmullRomP1!.concentration * (1 - travelRatio) + this.retrieveCatmullRomP2!.concentration * travelRatio;
+            const stepDistance = Math.max(1, size * this.spacing);
 
             if (travel <= this.retrieveLineLength) {
                 point = {
                     x: this.retrieveCatmullRomP1!.x * (1 - travelRatio) + this.retrieveCatmullRomP2!.x * travelRatio,
                     y: this.retrieveCatmullRomP1!.y * (1 - travelRatio) + this.retrieveCatmullRomP2!.y * travelRatio,
-                    density: brushDensity,
-                    size: brushSize,
+                    density,
+                    colorBlendingStrength,
+                    concentration,
+                    size: size,
                     tiltX: this.retrieveCatmullRomP1!.tiltX, // TODO - interpolate
                     tiltY: this.retrieveCatmullRomP1!.tiltY, // TODO - interpolate
                     twist: this.retrieveCatmullRomP1!.twist, // TODO - interpolate
                 }
-                point.x += ((Math.random() * 2) - 1) * this.jitter * brushSize;
-                point.y += ((Math.random() * 2) - 1) * this.jitter * brushSize;
+                point.x += ((Math.random() * 2) - 1) * this.jitter * size;
+                point.y += ((Math.random() * 2) - 1) * this.jitter * size;
                 this.retrieveCatmullRomTravel += stepDistance;
             } else {
                 this.retrieveCatmullRomP1 = undefined;
@@ -423,6 +450,8 @@ export class BrushStroke {
                 x: this.x,
                 y: this.y,
                 density: this.density,
+                colorBlendingStrength: this.colorBlendingStrength,
+                concentration: this.concentration,
                 size: this.size,
                 tiltX: this.tiltX,
                 tiltY: this.tiltY,

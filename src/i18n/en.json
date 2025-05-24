@@ -132,6 +132,7 @@
         "editBrush": "Edit Brush",
         "editEffects": "Edit Effects",
         "export": "Export",
+        "moreInfo": "More Info",
         "no": "No",
         "ok": "OK",
         "openImage": "Open Image",
@@ -153,8 +154,10 @@
     },
     "defaultBrush": {
         "default": "Default",
+        "simpleAirBrush": "Simple Air Brush",
         "simplePaintBrush": "Simple Paint Brush",
-        "simplePen": "Simple Pen"
+        "simplePen": "Simple Pen",
+        "simpleWaterColor": "Simple Water Color"
     },
     "defaultBrushCategory": {
         "custom": "Custom",
@@ -1113,25 +1116,38 @@
                     "blending": {
                         "title": "Blending",
                         "density": "Density",
+                        "densityDescription": "How transparent each stamp of the brush will be, based on pen pressure. The range is used when varying pen pressure.",
                         "pressureMinDensity": "Min Density",
                         "pressureMaxDensity": "Max Density",
-                        "colorBlendingFactor": "Color Blending Factor",
+                        "colorBlendingStrength": "Color Blending Strength",
+                        "pressureMinColorBlendingStrength": "Min Strength",
+                        "pressureMaxColorBlendingStrength": "Max Strength",
+                        "colorBlendingStrengthDescription": "How much of the color underneath the brush will be picked up while drawing. The range is used when varying pen pressure.",
                         "colorBlendingPersistence": "Color Blending Persistence",
-                        "alphaBlendingFactor": "Alpha Blending Factor"
+                        "colorBlendingPersistenceDescription": "How long the picked up color remains on the brush while dragging the stroke.",
+                        "concentration": "Concentration",
+                        "concentrationDescription": "Lower values simulate brush dilution with water, and high values full concentrated color. This setting has no effect when drawing on top of fully opaque colors. The range is used when varying pen pressure.",
+                        "pressureMinConcentration": "Min Concentration",
+                        "pressureMaxConcentration": "Max Concentration"
                     },
                     "shape": {
                         "title": "Shape",
-                        "angle": "Angle"
+                        "angle": "Angle",
+                        "angleDescription": "Rotates the brush shape."
                     },
                     "strokePath": {
                         "title": "Stroke Path",
                         "spacing": "Spacing",
-                        "jitter": "Jitter"
+                        "spacingDescription": "The distance between each stamp of the brush, relative to the brush size.",
+                        "jitter": "Jitter",
+                        "jitterDescription": "Randomly shifts the position of the brush shape."
                     },
                     "pressure": {
                         "title": "Pressure",
                         "pressureTaper": "Taper",
-                        "pressureMinSize": "Minimum Size"
+                        "pressureTaperDescription": "Higher values will draw skinnier lines at lower pen pressures. Makes it easier to control pens with unstable sensitivity at lower pressures.",
+                        "pressureMinSize": "Minimum Size",
+                        "pressureMinSizeDescription": "The size of the brush at 0% pen pressure, relative to the currently selected brush size."
                     }
                 }
             }

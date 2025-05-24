@@ -11,11 +11,13 @@ import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import { createStoredImage, prepareStoredImageForArchival, prepareStoredImageForEditing } from '@/store/image';
 import historyStore, { createHistoryReserveToken, historyReserveQueueFree, historyBlockInteractionUntilComplete } from '@/store/history';
+import preferencesStore from '@/store/preferences';
 import workingFileStore, { getSelectedLayers, getLayerById, getLayerGlobalTransform, ensureUniqueLayerSiblingName } from '@/store/working-file';
 import {
     cursorHoverPosition, brushShape, brushSmoothing, brushSpacing, brushColor,
-    brushSize, brushJitter, brushPressureMinDensity, brushPressureMaxDensity, showBrushDrawer,
-    brushPressureMinSize, brushPressureTaper,
+    brushSize, brushJitter, brushPressureMinDensity, brushDensity, showBrushDrawer,
+    brushPressureMinSize, brushPressureTaper, brushConcentration, brushPressureMinConcentration,
+    brushColorBlendingStrength, brushPressureMinColorBlendingStrength,
 } from '../store/draw-brush-state';
 
 import DrawableCanvas from '@/canvas/renderers/drawable/canvas';
@@ -37,6 +39,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
     private brushShapeUnwatch: WatchStopHandle | null = null;
     private brushSizeUnwatch: WatchStopHandle | null = null;
     private selectedLayerIdsUnwatch: WatchStopHandle | null = null;
+    private pointerPenMaxPressureMarginUnwatch: WatchStopHandle | null = null;
 
     private renderer: RendererFrontend | null = null;
 
@@ -55,6 +58,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
     private brushShapeImage: HTMLImageElement | null = null;
     private brushColorStyle: string = '#000000';
     private brushColorAlpha: number = 1;
+
+    private pointerPenMaxPressureMargin: number = 0;
 
     onEnter(): void {
         super.onEnter();
@@ -104,6 +109,10 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             }
         }, { immediate: true });
 
+        this.pointerPenMaxPressureMarginUnwatch = watch(() => preferencesStore.state.pointerPenMaxPressureMargin, (pointerPenMaxPressureMargin) => {
+            this.pointerPenMaxPressureMargin = pointerPenMaxPressureMargin;
+        }, { immediate: true });
+
         cursorHoverPosition.value = new DOMPoint(
             -100000000000,
             -100000000000
@@ -138,9 +147,11 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         this.brushShapeUnwatch?.();
         this.brushShapeUnwatch = null;
         this.brushSizeUnwatch?.();
+        this.pointerPenMaxPressureMarginUnwatch?.();
         this.brushSizeUnwatch = null;
         this.selectedLayerIdsUnwatch?.();
         this.selectedLayerIdsUnwatch = null;
+        this.pointerPenMaxPressureMarginUnwatch = null;
 
         for (const layer of getSelectedLayers()) {
             if (layer.type === 'raster') {
@@ -234,16 +245,20 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 this.lastCursorY * devicePixelRatio
             ).matrixTransform(canvasStore.state.transform.inverse());
 
-            const pressure = this.drawingUsePressure ? e.pressure : 1;
+            const pressure = this.drawingUsePressure ? Math.min(1, (e.pressure) / (1 - this.pointerPenMaxPressureMargin)) : 1;
+            const size = brushSize.value * Math.max(
+                brushPressureMinSize.value,
+                Math.pow(pressure, brushPressureTaper.value)
+            );
+            const density = this.calculateDensity(pressure, size);
 
             this.drawingBrushStroke?.addPoint({
                 x: transformedPoint.x,
                 y: transformedPoint.y,
-                density: brushPressureMinDensity.value + (brushPressureMaxDensity.value - brushPressureMinDensity.value) * pressure,
-                size: brushSize.value * Math.max(
-                    brushPressureMinSize.value,
-                    Math.pow(pressure, brushPressureTaper.value)
-                ),
+                density,
+                colorBlendingStrength: brushPressureMinColorBlendingStrength.value + (brushColorBlendingStrength.value - brushPressureMinColorBlendingStrength.value) * (1 - pressure),
+                concentration: brushPressureMinConcentration.value + (brushConcentration.value - brushPressureMinConcentration.value) * pressure,
+                size,
                 tiltX: e.tiltX,
                 tiltY: e.tiltY,
                 twist: e.twist,
@@ -329,12 +344,14 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             this.lastCursorX * devicePixelRatio,
             this.lastCursorY * devicePixelRatio
         ).matrixTransform(canvasStore.state.transform.inverse())
-        const pressure = this.drawingUsePressure ? e.pressure : 1;
+        const pressure = this.drawingUsePressure ? Math.min(1, (e.pressure) / (1 - this.pointerPenMaxPressureMargin)) : 1;
         const size = brushSize.value * Math.max(
             brushPressureMinSize.value,
             Math.pow(pressure, brushPressureTaper.value)
         );
-        const density = brushPressureMinDensity.value + (brushPressureMaxDensity.value - brushPressureMinDensity.value) * pressure;
+        const density = this.calculateDensity(pressure, size);
+        const colorBlendingStrength = brushPressureMinColorBlendingStrength.value + (brushColorBlendingStrength.value - brushPressureMinColorBlendingStrength.value) * (1 - pressure);
+        const concentration = brushPressureMinConcentration.value + (brushConcentration.value - brushPressureMinConcentration.value) * pressure;
         this.drawingBrushStroke = new BrushStroke(
             brushSmoothing.value,
             brushSpacing.value,
@@ -343,6 +360,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 x: transformedPoint.x,
                 y: transformedPoint.y,
                 density,
+                colorBlendingStrength,
+                concentration,
                 size,
                 tiltX: 0,
                 tiltY: 0,
@@ -542,6 +561,14 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 }
             }
         }
+    }
+
+    private calculateDensity(pressure: number, size: number): number {
+        const pressureSmoothStep = this.drawingUsePressure ? Math.min(1, 3 * Math.pow(pressure, 2) - 2 * Math.pow(pressure, 3)) : 0.8;
+        const linearPressure = (brushPressureMinDensity.value + (brushDensity.value - brushPressureMinDensity.value) * pressureSmoothStep);
+        const stampCount = Math.min(1 / (brushSpacing.value * 2), size);
+        const stampAlpha = Math.max(1 - Math.pow(1 - linearPressure, 1 / stampCount), 1 / 255);
+        return stampAlpha;
     }
 
     protected handleCursorIcon() {

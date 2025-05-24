@@ -35,6 +35,13 @@ void main() {
     float srcAlpha = srcColor.a * brushAlpha;
     float alpha = srcAlpha + dstColor.a * (1.0 - srcAlpha);
     gl_FragColor = vec4(
-        (srcColor.rgb * srcAlpha + (dstColor.rgb * dstColor.a) * (1.0 - srcAlpha)) / alpha, alpha
+        (srcColor.rgb * srcAlpha + (dstColor.rgb) * (1.0 - srcAlpha)) / alpha, alpha
     );
+
+
+    // float alpha = max(srcAlpha, srcAlpha / (srcAlpha + dstColor.a));
+    // gl_FragColor = vec4(
+    //     spectral_mix(srcColor.rgb, dstColor.rgb, (1.0 - alpha)),
+    //     srcColor.a + dstColor.a * (1.0 - srcColor.a)
+    // );
 }

@@ -10,18 +10,19 @@ import type { RGBAColor } from '@/types';
 
 export const showBrushDrawer = ref<boolean>(false);
 
-export const brushSmoothing = ref<number>(1);
 export const brushShape = ref<string>('');
 export const brushSpacing = ref<number>(0.05);
 export const brushJitter = ref<number>(0);
 export const brushPressureTaper = ref<number>(0);
 export const brushPressureMinSize = ref<number>(1);
+export const brushDensity = ref<number>(1);
 export const brushPressureMinDensity = ref<number>(1);
-export const brushPressureMaxDensity = ref<number>(1);
 export const brushAngle = ref<number>(0);
-export const brushColorBlendingFactor = ref<number>(0);
+export const brushColorBlendingStrength = ref<number>(0);
+export const brushPressureMinColorBlendingStrength = ref<number>(0);
 export const brushColorBlendingPersistence = ref<number>(0);
-export const brushAlphaBlendingFactor = ref<number>(0);
+export const brushConcentration = ref<number>(0);
+export const brushPressureMinConcentration = ref<number>(0);
 
 export const cursorHoverPosition = ref<DOMPoint>(new DOMPoint());
 
@@ -29,6 +30,7 @@ export const drawEmitter = mitt();
 
 interface PermanentStorageState {
     brushSize: number;
+    brushSmoothing: number;
     colorPalette: RGBAColor[];
     colorPaletteIndex: number;
     selectedBrush: string;
@@ -38,6 +40,7 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
     name: 'drawBrushStateStore',
     state: {
         brushSize: 100,
+        brushSmoothing: 0.45078125, // 25%,
         colorPalette: [
             {
                 is: 'color',
@@ -71,6 +74,7 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
 });
 
 export const brushSize = permanentStorage.getWritableRef('brushSize');
+export const brushSmoothing = permanentStorage.getWritableRef('brushSmoothing');
 export const colorPalette = permanentStorage.getDeepWritableRef('colorPalette');
 export const colorPaletteIndex = permanentStorage.getWritableRef('colorPaletteIndex');
 export const selectedBrush = permanentStorage.getWritableRef('selectedBrush');
@@ -103,9 +107,11 @@ watch(() => selectedBrush.value, (selectedBrush) => {
     brushSpacing.value = brushDefinition.spacing ?? 0.05;
     brushJitter.value = brushDefinition.jitter ?? 0;
     brushPressureMinDensity.value = brushDefinition.pressureMinDensity ?? 1;
-    brushPressureMaxDensity.value = brushDefinition.pressureMaxDensity ?? 1;
+    brushDensity.value = brushDefinition.density ?? 1;
     brushAngle.value = brushDefinition.angle ?? 0;
-    brushColorBlendingFactor.value = brushDefinition.colorBlendingFactor ?? 0;
+    brushColorBlendingStrength.value = brushDefinition.colorBlendingStrength ?? 0;
+    brushPressureMinColorBlendingStrength.value = brushDefinition.pressureMinColorBlendingStrength ?? 0;
     brushColorBlendingPersistence.value = brushDefinition.colorBlendingPersistence ?? 0;
-    brushAlphaBlendingFactor.value = brushDefinition.alphaBlendingFactor ?? 0;
+    brushConcentration.value = brushDefinition.concentration ?? 1;
+    brushPressureMinConcentration.value = brushDefinition.pressureMinConcentration ?? 1;
 }, { immediate: true });
