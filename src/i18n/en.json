@@ -1132,13 +1132,15 @@
                     },
                     "shape": {
                         "title": "Shape",
+                        "hardness": "Hardness",
+                        "hardnessDescription": "Lower values will have soft faded edges, and higher values sharp edges.",
                         "angle": "Angle",
                         "angleDescription": "Rotates the brush shape."
                     },
                     "strokePath": {
                         "title": "Stroke Path",
                         "spacing": "Spacing",
-                        "spacingDescription": "The distance between each stamp of the brush, relative to the brush size.",
+                        "spacingDescription": "The distance between each stamp of the brush, relative to the brush size. Be careful with extremely low values, as it can tank performance on larger brush sizes.",
                         "jitter": "Jitter",
                         "jitterDescription": "Randomly shifts the position of the brush shape."
                     },

@@ -307,6 +307,8 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         y: number,
         size: number,
         density: number,
+        colorBlendingStrength: number,
+        concentration: number,
     ) {
         await this.rendererBackend?.moveBrushStroke(
             layerId,
@@ -314,6 +316,8 @@ export class Webgl2RenderFrontend implements RendererFrontend {
             y,
             size,
             density,
+            colorBlendingStrength,
+            concentration,
         );
     }
 

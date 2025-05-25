@@ -41,6 +41,8 @@ export interface RendererBrushStrokeSettings {
     layerId: number;
     size: number;
     color: Float16Array;
+    hardness: number;
+    colorBlendingPersistence: number;
 }
 
 export interface RendererFrontend {
@@ -49,7 +51,7 @@ export interface RendererFrontend {
     applySelectionMaskToAlphaChannel(layerId: number, options?: RendererFrontendApplySelectionMaskToAlphaChannelOptions): Promise<RendererTextureTile[]>;
     takeSnapshot(imageWidth: number, imageHeight: number, options?: RendererFrontendTakeSnapshotOptions): Promise<ImageBitmap>;
     startBrushStroke(settings: RendererBrushStrokeSettings): Promise<void>;
-    moveBrushStroke(layerId: number, x: number, y: number, size: number, density: number): Promise<void>;
+    moveBrushStroke(layerId: number, x: number, y: number, size: number, density: number, colorBlendingStrength: number, concentration: number): Promise<void>;
     stopBrushStroke(layerId: number): Promise<void>;
     dispose(): Promise<void>;
 }

@@ -11,6 +11,7 @@ import type { RGBAColor } from '@/types';
 export const showBrushDrawer = ref<boolean>(false);
 
 export const brushShape = ref<string>('');
+export const brushHardness = ref<number>(1);
 export const brushSpacing = ref<number>(0.05);
 export const brushJitter = ref<number>(0);
 export const brushPressureTaper = ref<number>(0);
@@ -102,6 +103,7 @@ watch(() => selectedBrush.value, (selectedBrush) => {
     if (!brushDefinition) return;
     selectedBrushCategoryId.value = brushDefinition.categories[0];
     brushShape.value = brushDefinition.shape;
+    brushHardness.value = brushDefinition.hardness ?? 1;
     brushPressureMinSize.value = brushDefinition.pressureMinSize ?? 1;
     brushPressureTaper.value = brushDefinition.pressureTaper ?? 0;
     brushSpacing.value = brushDefinition.spacing ?? 0.05;

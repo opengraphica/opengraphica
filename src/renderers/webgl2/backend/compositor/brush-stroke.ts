@@ -1,4 +1,4 @@
-import { LinearFilter, ClampToEdgeWrapping, RGBAFormat, LinearSRGBColorSpace, SRGBColorSpace, HalfFloatType, UnsignedByteType, NearestFilter } from 'three/src/constants';
+import { LinearFilter, ClampToEdgeWrapping, RGBAFormat, LinearSRGBColorSpace, SRGBColorSpace, HalfFloatType, FloatType, UnsignedByteType, NearestFilter } from 'three/src/constants';
 import { Box2 } from 'three/src/math/Box2';
 import { Matrix4 } from 'three/src/math/Matrix4';
 import { Mesh } from 'three/src/objects/Mesh';
@@ -16,9 +16,11 @@ import brushStrokeVertexShader from './shader/brush-stroke.vert';
 import brushStrokeFragmentShader from './shader/brush-stroke.frag';
 import brushCompositorVertexShader from './shader/brush-compositor.vert';
 import brushCompositorFragmentShader from './shader/brush-compositor.frag';
-import spectralFragmentShader from './shader/spectral.frag';
 import copyTileVertexShader from './shader/copy-tile.vert';
 import copyTileFragmentShader from './shader/copy-tile.frag';
+import sampleBrushColorVertexShader from './shader/sample-brush-color.vert';
+import sampleBrushColorFragmentShader from './shader/sample-brush-color.frag';
+import spectralFragmentShader from './shader/spectral.frag';
 
 import { markRenderDirty, getWebgl2RendererBackend } from '..';
 
@@ -38,6 +40,7 @@ export class BrushStroke {
     copyTileMaterial!: ShaderMaterial;
     geometry!: PlaneGeometry;
     mesh!: Mesh;
+    sampleBrushColorMaterial!: ShaderMaterial;
     scene!: Scene;
 
     isHalfFloat!: boolean;
@@ -45,8 +48,14 @@ export class BrushStroke {
     xTileCount!: number;
     yTileCount!: number;
 
+    x: number = 0;
+    y: number = 0;
+
     brushSize!: number;
     brushColor!: Float16Array;
+    brushHardness!: number;
+    brushColorBlendingPersistence!: number;
+    brushMinConcentration: number = 1;
 
     dirtyTiles!: Uint8Array;
 
@@ -55,6 +64,9 @@ export class BrushStroke {
     brushStrokeRenderTargets: Array<WebGLRenderTarget | undefined> = [];
     brushBlendRenderTargetStack: Array<WebGLRenderTarget> = [];
     outputRenderTargetStack: Array<WebGLRenderTarget> = [];
+    brushColorRenderTarget1!: WebGLRenderTarget;
+    brushColorRenderTarget2!: WebGLRenderTarget;
+    inactiveBrushColorRenderTarget!: WebGLRenderTarget;
 
     // Reuse matrix and vector objects to prevent memory pressure while drawing.
     aabb = new Box2();
@@ -82,6 +94,8 @@ export class BrushStroke {
         this.layerTransformInverse = layerTransform.clone().invert();
         this.brushSize = settings.size;
         this.brushColor = settings.color;
+        this.brushHardness = settings.hardness;
+        this.brushColorBlendingPersistence = settings.colorBlendingPersistence;
 
         const gl = renderer.getContext();
         this.isHalfFloat = !!(renderer.capabilities.isWebGL2 || gl.getExtension('OES_texture_half_float'));
@@ -103,12 +117,15 @@ export class BrushStroke {
         this.destinationTextureRenderTargets = new Array(tileCount);
         this.brushStrokeRenderTargets = new Array(tileCount);
 
+        this.createBrushColorRenderTargets();
+
         this.brushMaterial = new ShaderMaterial({
             uniforms: {
                 brushStrokeMap: { value: undefined },
+                brushColorMap: { value: this.brushColorRenderTarget1.texture },
                 tileOffsetAndSize: { value: new Vector4() },
                 brushTransform: { value: new Matrix4() },
-                brushColor: { value: new Vector4(this.brushColor[0], this.brushColor[1], this.brushColor[2], 1.0) },
+                brushHardness: { value: this.brushHardness },
             },
             vertexShader: brushStrokeVertexShader,
             fragmentShader: brushStrokeFragmentShader,
@@ -131,12 +148,28 @@ export class BrushStroke {
             premultipliedAlpha: true,
         });
 
+        this.sampleBrushColorMaterial = new ShaderMaterial({
+            uniforms: {
+                sampleMap: { value: texture },
+                previousColorMap: { value: this.brushColorRenderTarget2.texture },
+                tileOffsetAndSize: { value: new Vector4() },
+                brushColor: { value: new Vector4(this.brushColor[0], this.brushColor[1], this.brushColor[2], 1.0) },
+                brushBlendingPersistenceBearingConcentration: { value: new Vector4(0, 0, 0, 1) },
+            },
+            vertexShader: sampleBrushColorVertexShader,
+            fragmentShader: sampleBrushColorFragmentShader,
+            depthTest: false,
+            depthWrite: false,
+            transparent: true,
+            premultipliedAlpha: true,
+        });
+
         this.compositorMaterial = new ShaderMaterial({
             uniforms: {
                 srcMap: { value: undefined },
                 dstMap: { value: undefined },
                 dstOffsetAndSize: { value: new Vector4() },
-                brushAlpha: { value: this.brushColor[3] },
+                brushAlphaConcentration: { value: new Vector2(this.brushColor[3], 0) },
             },
             vertexShader: brushCompositorVertexShader,
             fragmentShader: spectralFragmentShader + '\n' + brushCompositorFragmentShader,
@@ -149,8 +182,33 @@ export class BrushStroke {
         this.mesh = new Mesh(this.geometry, this.brushMaterial);
         this.scene.add(this.mesh);
 
+        this.populateColor();
+
         this.composite = this.composite.bind(this);
         getWebgl2RendererBackend().registerBeforeRenderCallback(this.composite);
+    }
+
+    populateColor() {
+        this.mesh.material = this.sampleBrushColorMaterial;
+        this.sampleBrushColorMaterial.uniforms.previousColorMap.value = this.brushColorRenderTarget1.texture;
+        this.sampleBrushColorMaterial.uniforms.tileOffsetAndSize.value.x = 0;
+        this.sampleBrushColorMaterial.uniforms.tileOffsetAndSize.value.y = 0;
+        this.sampleBrushColorMaterial.uniforms.tileOffsetAndSize.value.z = 1;
+        this.sampleBrushColorMaterial.uniforms.tileOffsetAndSize.value.w = 1;
+        this.sampleBrushColorMaterial.uniforms.brushColor.value.setW(1);
+        this.sampleBrushColorMaterial.uniforms.brushBlendingPersistenceBearingConcentration.value.x = 0;
+        this.sampleBrushColorMaterial.uniforms.brushBlendingPersistenceBearingConcentration.value.y = 1;
+        this.sampleBrushColorMaterial.uniforms.brushBlendingPersistenceBearingConcentration.value.z = 0;
+        this.sampleBrushColorMaterial.uniformsNeedUpdate = true;
+        this.renderer.setViewport(0, 0, 1, 1);
+        this.renderer.setRenderTarget(this.brushColorRenderTarget2);
+        this.renderer.clearColor();
+        // this.renderer.render(this.scene, this.camera);
+        this.renderer.setRenderTarget(null);
+        this.renderer.setViewport(this.originalViewport);
+
+        this.sampleBrushColorMaterial.uniforms.brushBlendingPersistenceBearingConcentration.value.y = Math.max(0.001, (1.0 - this.brushColorBlendingPersistence) * 0.01);
+        this.sampleBrushColorMaterial.uniformsNeedUpdate = true;
     }
 
     move(
@@ -158,7 +216,15 @@ export class BrushStroke {
         y: number,
         size: number,
         density: number,
+        colorBlendingStrength: number,
+        concentration: number,
     ) {
+        let bearing = Math.atan2(this.y - y, (x - this.x));
+        if (bearing < 0) bearing += 2 * Math.PI;
+        this.x = x;
+        this.y = y;
+        this.brushMinConcentration = Math.min(this.brushMinConcentration, concentration);
+
         const brushSize = size;
         const brushLeft = x - brushSize / 2;
         const brushTop = y - brushSize / 2;
@@ -181,6 +247,26 @@ export class BrushStroke {
         let tileHeight = 0;
         let brushRenderTarget: WebGLRenderTarget;
 
+        // Find the average color under the brush stamp
+        const activeBrushColorRenderTarget = this.inactiveBrushColorRenderTarget == this.brushColorRenderTarget1 ? this.brushColorRenderTarget2 : this.brushColorRenderTarget1;
+        this.mesh.material = this.sampleBrushColorMaterial;
+        this.sampleBrushColorMaterial.uniforms.previousColorMap.value = this.inactiveBrushColorRenderTarget.texture;
+        this.sampleBrushColorMaterial.uniforms.tileOffsetAndSize.value.x = aabb.min.x / this.texture.image.width;
+        this.sampleBrushColorMaterial.uniforms.tileOffsetAndSize.value.y = aabb.min.y / this.texture.image.height;
+        this.sampleBrushColorMaterial.uniforms.tileOffsetAndSize.value.z = (aabb.max.x - aabb.min.x) / this.texture.image.width;
+        this.sampleBrushColorMaterial.uniforms.tileOffsetAndSize.value.w = (aabb.max.y - aabb.min.y) / this.texture.image.height;
+        this.sampleBrushColorMaterial.uniforms.brushColor.value.setW(density);
+        this.sampleBrushColorMaterial.uniforms.brushBlendingPersistenceBearingConcentration.value.x = colorBlendingStrength;
+        this.sampleBrushColorMaterial.uniforms.brushBlendingPersistenceBearingConcentration.value.z = bearing;
+        this.sampleBrushColorMaterial.uniforms.brushBlendingPersistenceBearingConcentration.value.w = concentration;
+        this.sampleBrushColorMaterial.uniformsNeedUpdate = true;
+        this.renderer.setViewport(0, 0, this.brushSize, this.brushSize);
+        this.renderer.setRenderTarget(activeBrushColorRenderTarget);
+        this.renderer.clearColor();
+        this.renderer.render(this.scene, this.camera);
+        this.inactiveBrushColorRenderTarget = (this.inactiveBrushColorRenderTarget == this.brushColorRenderTarget1) ? this.brushColorRenderTarget2 : this.brushColorRenderTarget1;
+
+        // Loop through each tile and render tiles affected by the brush stamp
         let count = 0;
         for (xi = 0; xi < this.xTileCount; xi++) {
             tileX = xi * this.tileSize;
@@ -212,11 +298,11 @@ export class BrushStroke {
                 const brushTileScaleY = (tileHeight / brushSize);
 
                 this.brushMaterial.uniforms.brushStrokeMap.value = brushRenderTarget.texture;
+                this.brushMaterial.uniforms.brushColorMap.value = activeBrushColorRenderTarget.texture;
                 this.brushMaterial.uniforms.tileOffsetAndSize.value.x = 0;
                 this.brushMaterial.uniforms.tileOffsetAndSize.value.y = 0;
                 this.brushMaterial.uniforms.tileOffsetAndSize.value.z = 1;
                 this.brushMaterial.uniforms.tileOffsetAndSize.value.w = 1;
-                this.brushMaterial.uniforms.brushColor.value.setW(density);
 
                 this._v30.x = -brushLeft / brushSize;
                 this._v30.y = 1.0 + (brushTop / brushSize);
@@ -329,6 +415,7 @@ export class BrushStroke {
             this.compositorMaterial.uniforms.dstOffsetAndSize.value.z = 1;
             this.compositorMaterial.uniforms.dstOffsetAndSize.value.w = 1;
             this.compositorMaterial.uniforms.srcMap.value = brushRenderTarget.texture;
+            this.compositorMaterial.uniforms.brushAlphaConcentration.value.y = this.brushMinConcentration;
             this.compositorMaterial.uniformsNeedUpdate = true;
 
             // Render composite tile
@@ -382,6 +469,40 @@ export class BrushStroke {
         return renderTarget;
     }
 
+    createBrushColorRenderTargets() {
+        if (!this.brushColorRenderTarget1) {
+            this.brushColorRenderTarget1 = new WebGLRenderTarget(8, 8, {
+                type: FloatType,
+                minFilter: NearestFilter,
+                magFilter: NearestFilter,
+                wrapS: ClampToEdgeWrapping,
+                wrapT: ClampToEdgeWrapping,
+                format: RGBAFormat,
+                internalFormat: this.texture.internalFormat,
+                depthBuffer: false,
+                colorSpace: LinearSRGBColorSpace,
+                stencilBuffer: false,
+                generateMipmaps: false,
+            });
+        }
+        if (!this.brushColorRenderTarget2) {
+            this.brushColorRenderTarget2 = new WebGLRenderTarget(8, 8, {
+                type: FloatType,
+                minFilter: NearestFilter,
+                magFilter: NearestFilter,
+                wrapS: ClampToEdgeWrapping,
+                wrapT: ClampToEdgeWrapping,
+                format: RGBAFormat,
+                internalFormat: this.texture.internalFormat,
+                depthBuffer: false,
+                colorSpace: LinearSRGBColorSpace,
+                stencilBuffer: false,
+                generateMipmaps: false,
+            });
+            this.inactiveBrushColorRenderTarget = this.brushColorRenderTarget2;
+        }
+    }
+
     createBrushBlendRenderTarget(
         tileWidth: number,
         tileHeight: number,
@@ -402,6 +523,7 @@ export class BrushStroke {
             depthBuffer: false,
             colorSpace: LinearSRGBColorSpace,
             stencilBuffer: false,
+            generateMipmaps: false,
         });
         this.brushBlendRenderTargetStack.push(renderTarget);
         return renderTarget;
@@ -427,6 +549,7 @@ export class BrushStroke {
                 depthBuffer: false,
                 colorSpace: LinearSRGBColorSpace,
                 stencilBuffer: false,
+                generateMipmaps: false,
             });
             this.destinationTextureRenderTargets[tileIndex] = renderTarget;
 
@@ -465,6 +588,7 @@ export class BrushStroke {
                 depthBuffer: false,
                 colorSpace: LinearSRGBColorSpace,
                 stencilBuffer: false,
+                generateMipmaps: false,
             });
             this.brushStrokeRenderTargets[tileIndex] = renderTarget;
         }
@@ -494,5 +618,8 @@ export class BrushStroke {
         for (const renderTarget of this.outputRenderTargetStack) {
             renderTarget.dispose();
         }
+
+        this.brushColorRenderTarget1.dispose();
+        this.brushColorRenderTarget2.dispose();
     }
 }

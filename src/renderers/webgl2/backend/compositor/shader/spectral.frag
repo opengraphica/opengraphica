@@ -180,6 +180,8 @@ float KM(float KS) {
 vec3 spectral_mix(vec3 color1, float tintingStrength1, float factor1, vec3 color2, float tintingStrength2, float factor2) {
     vec3 lrgb1 = spectral_srgb_to_linear(color1);
     vec3 lrgb2 = spectral_srgb_to_linear(color2);
+    // vec3 lrgb1 = color1;
+    // vec3 lrgb2 = color2;
 
     float R1[SPECTRAL_SIZE];
     float R2[SPECTRAL_SIZE];
@@ -207,6 +209,7 @@ vec3 spectral_mix(vec3 color1, float tintingStrength1, float factor1, vec3 color
     }
 
     return spectral_xyz_to_srgb(spectral_reflectance_to_xyz(R));
+    // return spectral_xyz_to_linear(spectral_reflectance_to_xyz(R));
 }
 
 vec3 spectral_mix(vec3 color1, vec3 color2, float factor) {

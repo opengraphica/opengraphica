@@ -83,6 +83,29 @@
                         <el-form novalidate="novalidate" action="javascript:void(0)" label-position="top">
                             <el-form-item>
                                 <template #label>
+                                    {{ t('toolbar.drawBrush.brushDialog.editorTab.shape.hardness') }}
+                                    <og-more-info-icon :message="t('toolbar.drawBrush.brushDialog.editorTab.shape.hardnessDescription')" />
+                                </template>
+                                <div class="flex gap-2 w-full items-center">
+                                    <div class="px-3 grow-1">
+                                        <el-slider
+                                            v-model="editingBrush.hardness"
+                                            :aria-label="t('measurement.percentage')"
+                                            :min="0" :max="100" :step="1" :show-tooltip="false"
+                                        />
+                                    </div>
+                                    <div class="grow-0">
+                                        <el-input-number
+                                            v-model="editingBrush.hardness"
+                                            :aria-label="t('measurement.percentage')"
+                                            suffix-text="%"
+                                            style="width: 5rem"
+                                        />
+                                    </div>
+                                </div>
+                            </el-form-item>
+                            <el-form-item>
+                                <template #label>
                                     {{ t('toolbar.drawBrush.brushDialog.editorTab.shape.angle') }}
                                     <og-more-info-icon :message="t('toolbar.drawBrush.brushDialog.editorTab.shape.angleDescription')" />
                                 </template>

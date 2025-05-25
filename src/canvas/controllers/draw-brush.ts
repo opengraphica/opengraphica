@@ -18,6 +18,7 @@ import {
     brushSize, brushJitter, brushPressureMinDensity, brushDensity, showBrushDrawer,
     brushPressureMinSize, brushPressureTaper, brushConcentration, brushPressureMinConcentration,
     brushColorBlendingStrength, brushPressureMinColorBlendingStrength,
+    brushColorBlendingPersistence, brushHardness,
 } from '../store/draw-brush-state';
 
 import DrawableCanvas from '@/canvas/renderers/drawable/canvas';
@@ -336,6 +337,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 layerId: layer.id,
                 size: brushSize.value,
                 color: new Float16Array([brushColor.value.r, brushColor.value.g, brushColor.value.b, brushColor.value.alpha]),
+                hardness: brushHardness.value,
+                colorBlendingPersistence: brushColorBlendingPersistence.value,
             });
         }
 
@@ -377,6 +380,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 transformedPoint.y,
                 size,
                 density,
+                colorBlendingStrength,
+                concentration,
             );
         }
 
@@ -404,6 +409,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                     point.y,
                     point.size,
                     point.density,
+                    point.colorBlendingStrength,
+                    point.concentration,
                 );
             }
 
@@ -444,6 +451,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                             point.y,
                             point.size,
                             point.density,
+                            point.colorBlendingStrength,
+                            point.concentration,
                         );
                     }
                 }
@@ -455,6 +464,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                             point.y,
                             point.size,
                             point.density,
+                            point.colorBlendingStrength,
+                            point.concentration,
                         );
                     }
                 }

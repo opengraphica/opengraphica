@@ -507,11 +507,13 @@ export class Webgl2RendererBackend {
         y: number,
         size: number,
         density: number,
+        colorBlendingStrength: number,
+        concentration: number,
     ) {
         const brushStrokeId = this.compositorBrushStrokes.get(layerId);
         if (brushStrokeId == null) return;
 
-        this.compositor.moveBrushStroke(brushStrokeId, x, y, size, density);
+        this.compositor.moveBrushStroke(brushStrokeId, x, y, size, density, colorBlendingStrength, concentration);
     }
 
     stopBrushStroke(
