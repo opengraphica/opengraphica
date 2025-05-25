@@ -247,9 +247,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             ).matrixTransform(canvasStore.state.transform.inverse());
 
             const pressure = this.drawingUsePressure ? Math.min(1, (e.pressure) / (1 - this.pointerPenMaxPressureMargin)) : 1;
-            const size = brushSize.value * Math.max(
-                brushPressureMinSize.value,
-                Math.pow(pressure, brushPressureTaper.value)
+            const size = brushSize.value * (
+                brushPressureMinSize.value + (1 - brushPressureMinSize.value) * Math.pow(pressure, brushPressureTaper.value)
             );
             const density = this.calculateDensity(pressure, size);
 
@@ -348,9 +347,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             this.lastCursorY * devicePixelRatio
         ).matrixTransform(canvasStore.state.transform.inverse())
         const pressure = this.drawingUsePressure ? Math.min(1, (e.pressure) / (1 - this.pointerPenMaxPressureMargin)) : 1;
-        const size = brushSize.value * Math.max(
-            brushPressureMinSize.value,
-            Math.pow(pressure, brushPressureTaper.value)
+        const size = brushSize.value * (
+            brushPressureMinSize.value + (1 - brushPressureMinSize.value) * Math.pow(pressure, brushPressureTaper.value)
         );
         const density = this.calculateDensity(pressure, size);
         const colorBlendingStrength = brushPressureMinColorBlendingStrength.value + (brushColorBlendingStrength.value - brushPressureMinColorBlendingStrength.value) * (1 - pressure);

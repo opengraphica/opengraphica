@@ -2,6 +2,7 @@ export interface BrushCategoryWithBrushes {
     id: string;
     icon: string;
     brushes: BrushDefinition[];
+    brushPreviews: Array<HTMLCanvasElement | undefined>;
 }
 
 export interface BrushDefinition {
@@ -12,6 +13,9 @@ export interface BrushDefinition {
 
     // Custom name for this brush (if omitted, uses i18n with id)
     name?: string;
+
+    // Hides the brush from the UI
+    hidden?: boolean;
 
     // SVG Path command that defines the brush shape
     shape: string;

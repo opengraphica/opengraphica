@@ -1,4 +1,4 @@
-import { LinearMipMapLinearFilter, NearestFilter, RGBAFormat, SRGBColorSpace, UnsignedByteType } from 'three/src/constants';
+import { LinearMipMapLinearFilter, LinearFilter, RGBAFormat, SRGBColorSpace, UnsignedByteType } from 'three/src/constants';
 import { Texture } from 'three/src/textures/Texture';
 
 import { messageBus } from './message-bus';
@@ -12,7 +12,7 @@ export function createTexture(bitmap?: ImageBitmap) {
     texture.generateMipmaps = true;
     texture.colorSpace = SRGBColorSpace;
     texture.minFilter = LinearMipMapLinearFilter;
-    texture.magFilter = NearestFilter;
+    texture.magFilter = LinearFilter;
     texture.userData = {
         shouldDisposeBitmap: bitmap instanceof ImageBitmap,
     };

@@ -9696,6 +9696,17 @@ body.og-full-page .opengraphica {
   border-color: var(--el-color-primary);
   outline: none;
 }
+.opengraphica .og-gradient-input .og-gradient-input__image {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  border: 0.125rem solid var(--el-input-bg-color, var(--el-fill-color-blank));
+  border-radius: 0.5rem;
+  width: 100%;
+  height: 100%;
+}
 .opengraphica .og-gradient-input--small {
   height: 2rem;
 }
@@ -11243,6 +11254,7 @@ body.og-full-page .opengraphica {
   text-align: left;
   flex-grow: 1;
   border: 0.25rem solid transparent;
+  position: relative;
   cursor: pointer;
 }
 .opengraphica .og-brush-selector__brush-preview:focus-visible {
@@ -11256,6 +11268,15 @@ body.og-full-page .opengraphica {
   display: block;
   padding: 0 0.5rem;
   color: var(--og-toolbar-brush-preview-name-color);
+}
+.opengraphica .og-brush-selector__brush-preview-image {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
 }
 .opengraphica .og-brush-editor {
   display: flex;

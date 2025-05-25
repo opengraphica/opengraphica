@@ -145,7 +145,9 @@ void main() {
     blendedColor = previousColor.rgb + diff * persistence;
     blendedColor = snap * blendedColor + (vec3(1.0) - snap) * snapTargetColor;
 
-    float alpha = mix(min(brushColor.a, sampledColor.a), brushColor.a, concentration);
+    // float alphaDiff = sign(sampledColor.a - previousColor.a);
+    // float sampledAlpha = previousColor.a + alphaDiff * 0.01;
+    // float alpha = sampledAlpha * brushColor.a; // mix(min(brushColor.a, sampledAlpha), brushColor.a, concentration);
 
-    gl_FragColor = linearSrgbToSrgb(vec4(blendedColor, alpha));
+    gl_FragColor = linearSrgbToSrgb(vec4(blendedColor, brushColor.a));
 }

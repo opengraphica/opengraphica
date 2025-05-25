@@ -20,7 +20,7 @@ import { VideoPlayer } from './video-player';
 import type { Webgl2RendererBackend } from '@/renderers/webgl2/backend';
 import type {
     ClassType, RendererFrontend, RendererFrontendTakeSnapshotOptions,
-    RendererBrushStrokeSettings,
+    RendererBrushStrokeSettings, RendererBrushStrokePreviewsettings,
     RendererFrontendApplySelectionMaskToAlphaChannelOptions,
     RendererLayerWatcher, RendererTextureTile, WorkingFileAnyLayer
 } from '@/types';
@@ -327,6 +327,12 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         await this.rendererBackend?.stopBrushStroke(
             layerId,
         );
+    }
+
+    async createBrushPreview(
+        settings: RendererBrushStrokePreviewsettings,
+    ): Promise<ImageBitmap> {
+        return await this.rendererBackend!.createBrushPreview(settings);
     }
 
     async dispose() {

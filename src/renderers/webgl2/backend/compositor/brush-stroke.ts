@@ -440,6 +440,7 @@ export class BrushStroke {
                 this.copyTextureDestination,
             );
         }
+
         this.renderer.setRenderTarget(null);
         this.renderer.setViewport(this.originalViewport);
     }

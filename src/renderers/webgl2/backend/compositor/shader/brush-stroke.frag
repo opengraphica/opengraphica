@@ -30,20 +30,10 @@ void main() {
     vec4 brushColor = texture2D(brushColorMap, vec2(0.5, 0.5));
     vec4 brushStampColor = vec4(brushColor.rgb, brushColor.a * circle(brushUv, vec2(0.5, 0.5), 0.5));
 
-    // brushStrokeColor.rgb = (
-    //     (step(brushStampColor.a, 0.001) * brushStrokeColor.rgb)
-    //     + (step(0.001, brushStampColor.a) * brushStampColor.rgb)
-    // );
-
     brushStrokeColor.rgb = (
         (step(brushStrokeColor.a, 0.001) * brushStampColor.rgb)
         + (step(0.001, brushStrokeColor.a) * brushStrokeColor.rgb)
     );
-
-    // gl_FragColor = vec4(
-    //     brushStampColor.rgb * brushStampColor.a + brushStrokeColor.rgb * (1.0 - brushStampColor.a),
-    //     brushStampColor.a + brushStrokeColor.a * (1.0 - brushStampColor.a)
-    // );
 
     gl_FragColor = vec4(
         brushStampColor.rgb * brushStampColor.a + brushStrokeColor.rgb * (1.0 - brushStampColor.a),

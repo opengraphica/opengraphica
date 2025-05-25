@@ -1,7 +1,8 @@
-import { computed, ref } from 'vue';
+import { computed, markRaw, ref, reactive } from 'vue';
 
 import defaultBrushDefinitions from '@/config/default-brushes.json';
 import { PerformantStore } from '@/store/performant-store';
+import { useRenderer } from '@/renderers';
 
 import type { BrushCategoryWithBrushes, BrushDefinition, WithRequiredProperty } from '@/types';
 
@@ -18,6 +19,8 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
 });
 
 const customBrushes = permanentStorage.getDeepWritableRef('customBrushes');
+
+export const brushPreviews = reactive<{ [key: string]: HTMLCanvasElement }>({});
 
 export const brushEditorTab = ref<string>('shape');
 
@@ -52,6 +55,7 @@ export const brushesByCategory = computed(() => {
         }
     }
     for (brushDefinition of defaultBrushDefinitions.brushes) {
+        if (brushDefinition.hidden) continue;
         createBrushDefaults(brushDefinition);
         for (let categoryId of brushDefinition.categories) {
             if (!categories[categoryId]) categories[categoryId] = [];
@@ -63,10 +67,17 @@ export const brushesByCategory = computed(() => {
     }
     let sortedCategories: BrushCategoryWithBrushes[] = [];
     for (let category of defaultBrushDefinitions.categories) {
+        const brushes = categories[category.id] ?? [];
         sortedCategories.push({
             id: category.id,
             icon: category.icon,
-            brushes: categories[category.id] ?? [],
+            brushes,
+            brushPreviews: brushes.map((brush) => {
+                if (brushPreviews[brush.id]) {
+                    return markRaw(brushPreviews[brush.id]);
+                }
+                return undefined;
+            }),
         });
     }
     return sortedCategories;
@@ -103,4 +114,47 @@ export function getBrushById(id: string): BrushDefinition | undefined {
             return brushDefinition as BrushDefinition;
         }
     }
+}
+
+const brushPreviewsGenerating = new Map<string, boolean>();
+
+export async function generateBrushPreview(id: string) {
+    if (brushPreviewsGenerating.get(id)) return;
+
+    const renderer = await useRenderer();
+    const brush = getBrushById(id);
+    if (!brush) return;
+
+    brushPreviewsGenerating.set(id, true);
+    const bitmap = await renderer.createBrushPreview({
+        color: new Float16Array([0, 0, 0, 1]),
+        size: 16,
+        hardness: brush.hardness,
+        colorBlendingPersistence: brush.colorBlendingPersistence,
+        colorBlendingStrength: brush.colorBlendingStrength,
+        pressureMinColorBlendingStrength: brush.pressureMinColorBlendingStrength,
+        density: brush.density,
+        pressureMinDensity: brush.pressureMinDensity,
+        concentration: brush.concentration,
+        pressureMinConcentration: brush.pressureMinConcentration,
+        pressureMinSize: brush.pressureMinSize,
+        jitter: brush.jitter,
+        spacing: brush.spacing,
+        pressureTaper: brush.pressureTaper,
+    });
+    brushPreviewsGenerating.delete(id);
+
+    let canvas = brushPreviews[id];
+    if (!canvas) {
+        canvas = document.createElement('canvas');
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
+    }
+    const ctx = canvas.getContext('bitmaprenderer');
+    if (!ctx) {
+        bitmap.close();
+        return;
+    }
+    ctx.transferFromImageBitmap(bitmap);
+    brushPreviews[id] = canvas;
 }

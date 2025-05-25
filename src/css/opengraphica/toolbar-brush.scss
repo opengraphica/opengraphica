@@ -73,6 +73,7 @@
         text-align: left;
         flex-grow: 1;
         border: 0.25rem solid transparent;
+        position: relative;
         cursor: pointer;
 
         &:focus-visible {
@@ -89,6 +90,16 @@
         display: block;
         padding: 0 0.5rem;
         color: var(--og-toolbar-brush-preview-name-color);
+    }
+
+    .og-brush-selector__brush-preview-image {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
     }
 
     .og-brush-editor {

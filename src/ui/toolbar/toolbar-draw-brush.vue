@@ -10,13 +10,13 @@
                     role="button"
                     tabindex="0"
                     class="og-gradient-input og-gradient-input--small"
-                    :style="{ '--gradient': selectedBrushPreviewImage }"
                     aria-haspopup="dialog"
                     :aria-expanded="showBrushDrawer"
                     :aria-controls="showBrushDrawer ? ('toolbar-draw-brush-select-brush-drawer-' + uuid) : undefined"
                     @click="onClickBrushSelect()"
                     @keydown="onKeydownBrushSelect($event)"
                 >
+                    <img class="og-gradient-input__image" :src="selectedBrushPreviewImage" aria-hidden="true">
                 </div>
                 <og-button v-model:pressed="colorPaletteDockVisible" outline solid small toggle class="!ml-3"
                     @click="colorPaletteDockLeft = 0; colorPaletteDockTop = 0;">
@@ -118,7 +118,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { ref, computed, onMounted, onUnmounted, toRefs, watch } from 'vue';
 
 import {
-    brushSize, brushSmoothing, colorPalette, colorPaletteIndex, showBrushDrawer, selectedBrush,
+    brushSize, brushSmoothing, colorPalette, colorPaletteIndex, showBrushDrawer,
+    selectedBrush, selectedBrushPreview, generateSelectedBrushPreview,
     colorPaletteDockVisible, colorPaletteDockTop, colorPaletteDockLeft,
     sizeDockVisible, sizeDockTop, sizeDockLeft,
     smoothingDockVisible, smoothingDockTop, smoothingDockLeft,
@@ -138,6 +139,7 @@ import DockBrushEditor from '@/ui/dock/dock-brush-editor.vue';
 
 import appEmitter from '@/lib/emitter';
 import { colorToHsla } from '@/lib/color';
+import { createImageFromCanvas } from '@/lib/image';
 
 import type { RGBAColor } from '@/types';
 
@@ -167,11 +169,22 @@ function onToolbarSwap() {
     floatingDocksVisible.value = false;
 }
 
-/*---------*\
-| Selection |
-\*---------*/
+/*------------*\
+| Brush Select |
+\*------------*/
 
 const selectedBrushPreviewImage = ref<string>('');
+
+onMounted(() => {
+    generateSelectedBrushPreview();
+});
+
+watch(() => selectedBrushPreview.value, (selectedBrushPreview) => {
+    if (!selectedBrushPreview) return;
+    createImageFromCanvas(selectedBrushPreview, { srcType: 'objectUrl' }).then((image) => {
+        selectedBrushPreviewImage.value = image.src;
+    });
+}, { immediate: true });
 
 function onClickBrushSelect() {
     showBrushDrawer.value = !showBrushDrawer.value;

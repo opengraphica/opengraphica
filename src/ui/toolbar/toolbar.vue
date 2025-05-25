@@ -2,7 +2,7 @@
     <div class="og-toolbar" :class="{ 'is-swap-in': animationSwap === 'in', 'is-swap-out': animationSwap === 'out' }" @animationend="onToolbarAnimationEnd">
         <suspense @resolve="onLoadToolbarResolve">
             <template #default>
-                <component :is="'toolbar-' + currentName" @close="onCloseToolbar" />
+                <component v-if="!isAppPreloading" :is="'toolbar-' + currentName" @close="onCloseToolbar" />
             </template>
             <template #fallback>
                 <div></div>
@@ -13,6 +13,7 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent, ref, toRef, watch, onMounted, nextTick } from 'vue';
+import { isAppPreloading } from '@/composables/app-preload-blocker';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import editorStore from '@/store/editor';
 import appEmitter from '@/lib/emitter';
@@ -76,6 +77,7 @@ export default defineComponent({
         }
 
         return {
+            isAppPreloading,
             currentName,
             animationSwap,
             onLoadToolbarResolve,

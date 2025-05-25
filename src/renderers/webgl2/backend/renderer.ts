@@ -25,7 +25,7 @@ import { createCanvasFiltersFromLayerConfig } from '@/renderers/webgl2/layers/ba
 
 import type { Camera, Texture } from 'three';
 import type {
-    RendererBrushStrokeSettings,
+    RendererBrushStrokeSettings, RendererBrushStrokePreviewsettings,
     RendererTextureTile, Webgl2RendererCanvasFilter, Webgl2RendererMeshController, WorkingFileLayer,
     WorkingFileGroupLayer, WorkingFileLayerFilter, WorkingFileLayerMask,
 } from '@/types';
@@ -523,6 +523,12 @@ export class Webgl2RendererBackend {
         if (brushStrokeId == null) return;
 
         this.compositor.stopBrushStroke(brushStrokeId);
+    }
+
+    async createBrushPreview(
+        settings: RendererBrushStrokePreviewsettings,
+    ): Promise<ImageBitmap> {
+        return await this.compositor.createBrushPreview(settings);
     }
 
     dispose() {

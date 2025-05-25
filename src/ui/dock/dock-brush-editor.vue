@@ -37,7 +37,7 @@
             <div class="og-brush-selector__brushes">
                 <el-scrollbar>
                     <template v-if="selectedBrushCategory && selectedBrushCategory.brushes.length > 0">
-                        <div v-for="brush of selectedBrushCategory.brushes" class="og-brush-selector__brush">
+                        <div v-for="(brush, brushIndex) of selectedBrushCategory.brushes" class="og-brush-selector__brush">
                             <button
                                 class="og-brush-selector__brush-preview"
                                 :class="{
@@ -48,6 +48,11 @@
                                 <span class="og-brush-selector__brush-preview-name">
                                     {{ brush.name ?? t('defaultBrush.' + brush.id) }}
                                 </span>
+                                <og-canvas-container
+                                    v-if="selectedBrushCategory.brushPreviews[brushIndex]"
+                                    :canvas="selectedBrushCategory.brushPreviews[brushIndex]"
+                                    class="og-brush-selector__brush-preview-image"
+                                />
                             </button>
                             <el-button link type="primary" class="!px-2 !my-1" :aria-label="t('button.editBrush')" @click="onClickEditBrush(brush.id)">
                                 <span class="bi bi-pencil-square" aria-hidden="true" />
@@ -323,7 +328,7 @@
                                     </div>
                                 </div>
                             </el-form-item>
-                            <el-form-item>
+                            <!--el-form-item>
                                 <template #label>
                                     {{ t('toolbar.drawBrush.brushDialog.editorTab.blending.concentration') }}
                                     <og-more-info-icon :message="t('toolbar.drawBrush.brushDialog.editorTab.blending.concentrationDescription')" />
@@ -352,7 +357,7 @@
                                         />
                                     </div>
                                 </div>
-                            </el-form-item>
+                            </el-form-item-->
                         </el-form>
                     </el-scrollbar>
                 </el-tab-pane>
@@ -377,7 +382,7 @@ import vPointer from '@/directives/pointer';
 import { generateCssGradient, sampleGradient } from '@/lib/gradient';
 
 import {
-    brushEditorTab, brushesByCategory, getBrushById, addCustomBrush
+    brushEditorTab, brushesByCategory, getBrushById, addCustomBrush, generateBrushPreview
 } from '@/canvas/store/brush-library-state';
 
 import ElAlert from 'element-plus/lib/components/alert/index';
@@ -394,6 +399,7 @@ import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
 import ElSlider from 'element-plus/lib/components/slider/index';
 import ElTabs, { ElTabPane } from 'element-plus/lib/components/tabs/index';
 
+import OgCanvasContainer from '@/ui/element/canvas-container.vue';
 import OgMoreInfoIcon from '@/ui/element/more-info-icon.vue';
 
 import type { BrushDefinition, RGBAColor, WorkingFileGradientColorSpace, WorkingFileGradientColorStop } from '@/types';
@@ -453,6 +459,16 @@ watch(() => props.selectedBrushId, (selectedBrushId) => {
     selectedBrushCategoryId.value = selectedBrush.value?.categories[0];
 }, { immediate: true });
 
+watch(() => selectedBrushCategory.value, (selectedBrushCategory) => {
+    if (!selectedBrushCategory) return;
+
+    for (let i = 0; i < selectedBrushCategory.brushes.length; i++) {
+        if (!selectedBrushCategory.brushPreviews[i]) {
+            generateBrushPreview(selectedBrushCategory.brushes[i].id);
+        }
+    }
+}, { immediate: true });
+
 function onClickActivateBrush(brushId: string) {
     emit('update:selectedBrushId', brushId);
 }
@@ -507,6 +523,7 @@ function applyBrushEdits() {
         pressureMinConcentration: editingBrush.value.concentrationRange[1] / 100,
     }
     addCustomBrush(brushDefinition);
+    generateBrushPreview(brushDefinition.id);
     emit('update:selectedBrushId', 'default');
     nextTick(() => {
         emit('update:selectedBrushId', brushDefinition.id);

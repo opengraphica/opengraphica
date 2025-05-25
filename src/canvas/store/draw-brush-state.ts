@@ -1,9 +1,11 @@
 import mitt from 'mitt';
 import { computed, ref, watch } from 'vue';
-import { PerformantStore } from '@/store/performant-store';
 
+import { useRenderer } from '@/renderers';
+
+import { PerformantStore } from '@/store/performant-store';
 import {
-    getBrushById
+    getBrushById, brushPreviews, generateBrushPreview
 } from '../store/brush-library-state';
 
 import type { RGBAColor } from '@/types';
@@ -98,6 +100,10 @@ export const smoothingDockVisible = ref<boolean>(false);
 
 export const selectedBrushCategoryId = ref<string>();
 
+export const selectedBrushPreview = computed<HTMLCanvasElement | undefined>(() => {
+    return brushPreviews[selectedBrush.value];
+});
+
 watch(() => selectedBrush.value, (selectedBrush) => {
     const brushDefinition = getBrushById(selectedBrush);
     if (!brushDefinition) return;
@@ -117,3 +123,9 @@ watch(() => selectedBrush.value, (selectedBrush) => {
     brushConcentration.value = brushDefinition.concentration ?? 1;
     brushPressureMinConcentration.value = brushDefinition.pressureMinConcentration ?? 1;
 }, { immediate: true });
+
+export function generateSelectedBrushPreview() {
+    if (!brushPreviews[selectedBrush.value]) {
+        generateBrushPreview(selectedBrush.value);
+    }
+}

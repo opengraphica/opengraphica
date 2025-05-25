@@ -37,12 +37,28 @@ export interface RendererTextureTile {
     image: ImageBitmap;
 }
 
-export interface RendererBrushStrokeSettings {
-    layerId: number;
-    size: number;
+export interface RendererBrushStrokeSettingsCommon {
     color: Float16Array;
+    size: number;
     hardness: number;
     colorBlendingPersistence: number;
+}
+
+export interface RendererBrushStrokePreviewsettings extends RendererBrushStrokeSettingsCommon {
+    colorBlendingStrength: number;
+    pressureMinColorBlendingStrength: number;
+    density: number;
+    pressureMinDensity: number;
+    concentration: number;
+    pressureMinConcentration: number;
+    pressureMinSize: number;
+    jitter: number;
+    spacing: number;
+    pressureTaper: number;
+}
+
+export interface RendererBrushStrokeSettings extends RendererBrushStrokeSettingsCommon {
+    layerId: number;
 }
 
 export interface RendererFrontend {
@@ -53,6 +69,7 @@ export interface RendererFrontend {
     startBrushStroke(settings: RendererBrushStrokeSettings): Promise<void>;
     moveBrushStroke(layerId: number, x: number, y: number, size: number, density: number, colorBlendingStrength: number, concentration: number): Promise<void>;
     stopBrushStroke(layerId: number): Promise<void>;
+    createBrushPreview(settings: RendererBrushStrokePreviewsettings): Promise<ImageBitmap>;
     dispose(): Promise<void>;
 }
 
