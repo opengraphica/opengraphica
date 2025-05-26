@@ -25,7 +25,7 @@ import spectralFragmentShader from './shader/spectral.frag';
 import { markRenderDirty, getWebgl2RendererBackend } from '..';
 
 import type { Camera, WebGLRenderer } from 'three';
-import type { RendererBrushStrokeSettings } from '@/types';
+import type { RendererBrushStrokeSettings, RendererTextureTile } from '@/types';
 
 export class BrushStroke {
     originalViewport!: Vector4;
@@ -57,7 +57,8 @@ export class BrushStroke {
     brushColorBlendingPersistence!: number;
     brushMinConcentration: number = 1;
 
-    dirtyTiles!: Uint8Array;
+    allDirtyTiles!: Uint8Array;
+    compositeDirtyTiles!: Uint8Array;
 
     // TODO - share this across multiple brush strokes?
     destinationTextureRenderTargets: Array<WebGLRenderTarget | undefined> = [];
@@ -113,7 +114,8 @@ export class BrushStroke {
         this.xTileCount = Math.ceil(this.texture.image.width / this.tileSize);
         this.yTileCount = Math.ceil(this.texture.image.height / this.tileSize);
         const tileCount = this.xTileCount * this.yTileCount;
-        this.dirtyTiles = new Uint8Array(tileCount);
+        this.allDirtyTiles = new Uint8Array(tileCount);
+        this.compositeDirtyTiles = new Uint8Array(tileCount);
         this.destinationTextureRenderTargets = new Array(tileCount);
         this.brushStrokeRenderTargets = new Array(tileCount);
 
@@ -362,7 +364,8 @@ export class BrushStroke {
                 this.renderer.clearColor();
                 this.renderer.render(this.scene, this.camera);
 
-                this.dirtyTiles[yi * this.xTileCount + xi] = 1;
+                this.allDirtyTiles[yi * this.xTileCount + xi] = 1;
+                this.compositeDirtyTiles[yi * this.xTileCount + xi] = 1;
             }
         }
 
@@ -381,9 +384,9 @@ export class BrushStroke {
         let tileY: number;
         let tileWidth: number;
         let tileHeight: number;
-        for (let i = 0; i < this.dirtyTiles.length; i++) {
-            if (this.dirtyTiles[i] === 0) continue;
-            this.dirtyTiles[i] = 0;
+        for (let i = 0; i < this.compositeDirtyTiles.length; i++) {
+            if (this.compositeDirtyTiles[i] === 0) continue;
+            this.compositeDirtyTiles[i] = 0;
 
             yi = Math.floor(i / this.xTileCount);
             xi = i - yi * this.xTileCount;
@@ -443,6 +446,111 @@ export class BrushStroke {
 
         this.renderer.setRenderTarget(null);
         this.renderer.setViewport(this.originalViewport);
+    }
+
+    async collectTiles(): Promise<RendererTextureTile[]> {
+        this.composite();
+
+        const newImageBufferReads: Array<Promise<Uint8Array>> = [];
+        const oldImageBufferReads: Array<Promise<Uint8Array>> = [];
+        const tiles: Array<RendererTextureTile> = [];
+
+        let xi: number;
+        let yi: number;
+        let tileX: number;
+        let tileY: number;
+        let tileWidth: number;
+        let tileHeight: number;
+
+        for (let i = 0; i < this.allDirtyTiles.length; i++) {
+            if (this.allDirtyTiles[i] === 0) continue;
+            this.allDirtyTiles[i] = 0;
+
+            yi = Math.floor(i / this.xTileCount);
+            xi = i - yi * this.xTileCount;
+            tileX = xi * this.tileSize;
+            tileY = yi * this.tileSize;
+            tileWidth = Math.min(this.tileSize, this.texture.image.width - tileX);
+            tileHeight = Math.min(this.tileSize, this.texture.image.height - tileY);
+
+            this.mesh.material = this.copyTileMaterial;
+
+            // Read the pixels from this tile on the old texture, already stored during the brush stroke.
+            const oldTextureTile = this.createDestinationTextureRenderTarget(xi, yi, tileWidth, tileHeight);
+            const oldBuffer = new Uint8Array(tileWidth * tileHeight * 4);
+            oldImageBufferReads.push(
+                this.renderer.readRenderTargetPixelsAsync(oldTextureTile, 0, 0, tileWidth, tileHeight, oldBuffer) as Promise<Uint8Array>
+            );
+
+            // Render a crop of the current texture a tile render target & read its pixels.
+            this.copyTileMaterial.uniforms.map.value = this.texture;
+            this.copyTileMaterial.uniforms.tileOffsetAndSize.value.x = tileX / this.texture.image.width;
+            this.copyTileMaterial.uniforms.tileOffsetAndSize.value.y = tileY / this.texture.image.height;
+            this.copyTileMaterial.uniforms.tileOffsetAndSize.value.z = tileWidth / this.texture.image.width;
+            this.copyTileMaterial.uniforms.tileOffsetAndSize.value.w = tileHeight / this.texture.image.height;
+            this.copyTileMaterial.uniformsNeedUpdate = true;
+
+            const outputRenderTarget = this.createOutputTileRenderTarget(tileWidth, tileHeight);
+            this.renderer.setViewport(0, 0, tileWidth, tileHeight);
+            this.renderer.setRenderTarget(outputRenderTarget);
+            this.renderer.clearColor();
+            this.renderer.render(this.scene, this.camera);
+            
+            const newBuffer = new Uint8Array(tileWidth * tileHeight * 4);
+            newImageBufferReads.push(
+                this.renderer.readRenderTargetPixelsAsync(outputRenderTarget, 0, 0, tileWidth, tileHeight, newBuffer) as Promise<Uint8Array>
+            );
+            tiles.push({
+                x: tileX,
+                y: tileY,
+                width: tileWidth,
+                height: tileHeight,
+                oldImage: undefined,
+                image: undefined as never,
+            });
+        }
+        this.renderer.setRenderTarget(null);
+        this.renderer.setViewport(this.originalViewport);
+
+        const [settledNewBufferReads, settledOldBufferReads] = await Promise.all([
+            Promise.allSettled(newImageBufferReads),
+            Promise.allSettled(oldImageBufferReads),
+        ]);
+        const createdNewBitmaps: Array<Promise<ImageBitmap>> = [];
+        const createdOldBitmaps: Array<Promise<ImageBitmap>> = [];
+        for (let i = 0; i < settledNewBufferReads.length; i++) {
+            const newSettleResult = settledNewBufferReads[i];
+            const oldSettleResult = settledOldBufferReads[i];
+            if (newSettleResult.status === 'fulfilled' && oldSettleResult.status === 'fulfilled') {
+                createdNewBitmaps.push(
+                    createImageBitmap(
+                        new ImageData(new Uint8ClampedArray(newSettleResult.value), tiles[i].width, tiles[i].height),
+                        { imageOrientation: 'flipY' },
+                    )
+                );
+                createdOldBitmaps.push(
+                    createImageBitmap(
+                        new ImageData(new Uint8ClampedArray(oldSettleResult.value), tiles[i].width, tiles[i].height),
+                        { imageOrientation: 'flipY' },
+                    )
+                );
+            }
+        }
+
+        const [settledNewBitmaps, settledOldBitmaps] = await Promise.all([
+            Promise.allSettled(createdNewBitmaps),
+            Promise.allSettled(createdOldBitmaps),
+        ]);
+        for (let i = 0; i < settledNewBitmaps.length; i++) {
+            const newSettleResult = settledNewBitmaps[i];
+            const oldSettleResult = settledOldBitmaps[i];
+            if (newSettleResult.status === 'fulfilled' && oldSettleResult.status === 'fulfilled') {
+                tiles[i].image = newSettleResult.value;
+                tiles[i].oldImage = oldSettleResult.value;
+            }
+        }
+
+        return tiles.filter((tile) => tile.image) as RendererTextureTile[];
     }
 
     createOutputTileRenderTarget(
@@ -540,7 +648,7 @@ export class BrushStroke {
         let renderTarget = this.destinationTextureRenderTargets[tileIndex];
         if (!renderTarget) {
             renderTarget = new WebGLRenderTarget(tileWidth, tileHeight, {
-                type: this.isHalfFloat ? HalfFloatType : UnsignedByteType,
+                type: UnsignedByteType, // Required for readRenderTargetPixelsAsync read.
                 minFilter: NearestFilter,
                 magFilter: NearestFilter,
                 wrapS: ClampToEdgeWrapping,
@@ -548,7 +656,7 @@ export class BrushStroke {
                 format: RGBAFormat,
                 internalFormat: this.texture.internalFormat,
                 depthBuffer: false,
-                colorSpace: LinearSRGBColorSpace,
+                colorSpace: SRGBColorSpace,
                 stencilBuffer: false,
                 generateMipmaps: false,
             });
@@ -597,7 +705,6 @@ export class BrushStroke {
     }
 
     dispose() {
-        this.composite();
         getWebgl2RendererBackend().unregisterBeforeRenderCallback(this.composite);
 
         this.geometry?.dispose();

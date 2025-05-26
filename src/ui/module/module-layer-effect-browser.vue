@@ -141,25 +141,30 @@ export default defineComponent({
 
                     const renderer = await useRenderer();
                     const newPreviewThumbnails: Record<string, string> = {};
+
+                    const newPreviewThumbnailPromises: Promise<void>[] = [];
                     for (const layerFilterName in layerFilterList) {
-                        const canvasFilter = new (await getCanvasFilterClass(layerFilterName))();
+                        newPreviewThumbnailPromises.push((async (layerFilterName) => {
+                            const canvasFilter = new (await getCanvasFilterClass(layerFilterName))();
 
-                        const filtersWithPreview: WorkingFileLayerFilter[] = [
-                            ...selectedLayer.filters,
-                            {
-                                name: layerFilterName,
-                                params: buildCanvasFilterPreviewParams(canvasFilter)
-                            }
-                        ]
-                        const layerPreviewBitmap = await renderer.takeSnapshot(layerWidth, layerHeight, {
-                            layerIds: [selectedLayer.id],
-                            filters: filtersWithPreview,
-                        });
-                        previewCtx.transferFromImageBitmap(layerPreviewBitmap);
+                            const filtersWithPreview: WorkingFileLayerFilter[] = [
+                                ...selectedLayer.filters,
+                                {
+                                    name: layerFilterName,
+                                    params: buildCanvasFilterPreviewParams(canvasFilter)
+                                }
+                            ]
+                            const layerPreviewBitmap = await renderer.takeSnapshot(layerWidth, layerHeight, {
+                                layerIds: [selectedLayer.id],
+                                filters: filtersWithPreview,
+                            });
+                            previewCtx.transferFromImageBitmap(layerPreviewBitmap);
 
-                        const imageBlob = await createImageBlobFromCanvas(previewCanvas);
-                        newPreviewThumbnails[layerFilterName] = URL.createObjectURL(imageBlob);
+                            const imageBlob = await createImageBlobFromCanvas(previewCanvas);
+                            newPreviewThumbnails[layerFilterName] = URL.createObjectURL(imageBlob);
+                        })(layerFilterName));
                     }
+                    await Promise.allSettled(newPreviewThumbnailPromises);
                     previewImageHeight.value = ((targetHeight / targetWidth) * 100) + '%';
                     filterPreviewThumbnails.value = newPreviewThumbnails;
                 } catch (error) {

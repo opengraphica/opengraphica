@@ -25,8 +25,8 @@ import { createCanvasFiltersFromLayerConfig } from '@/renderers/webgl2/layers/ba
 
 import type { Camera, Texture } from 'three';
 import type {
-    RendererBrushStrokeSettings, RendererBrushStrokePreviewsettings,
-    RendererTextureTile, Webgl2RendererCanvasFilter, Webgl2RendererMeshController, WorkingFileLayer,
+    RendererBrushStrokeSettings, RendererBrushStrokePreviewsettings, RendererTextureTile,
+    Webgl2RendererCanvasFilter, Webgl2RendererMeshController, WorkingFileLayer,
     WorkingFileGroupLayer, WorkingFileLayerFilter, WorkingFileLayerMask,
 } from '@/types';
 
@@ -516,13 +516,13 @@ export class Webgl2RendererBackend {
         this.compositor.moveBrushStroke(brushStrokeId, x, y, size, density, colorBlendingStrength, concentration);
     }
 
-    stopBrushStroke(
+    async stopBrushStroke(
         layerId: number,
-    ) {
+    ): Promise<RendererTextureTile[]> {
         const brushStrokeId = this.compositorBrushStrokes.get(layerId);
-        if (brushStrokeId == null) return;
+        if (brushStrokeId == null) return [];
 
-        this.compositor.stopBrushStroke(brushStrokeId);
+        return this.compositor.stopBrushStroke(brushStrokeId);
     }
 
     async createBrushPreview(

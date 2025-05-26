@@ -323,10 +323,10 @@ export class Webgl2RenderFrontend implements RendererFrontend {
 
     async stopBrushStroke(
         layerId: number,
-    ) {
-        await this.rendererBackend?.stopBrushStroke(
+    ): Promise<RendererTextureTile[]> {
+        return this.rendererBackend?.stopBrushStroke(
             layerId,
-        );
+        ) ?? [];
     }
 
     async createBrushPreview(

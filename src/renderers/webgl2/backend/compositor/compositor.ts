@@ -6,7 +6,7 @@ import { BrushPreview } from './brush-preview';
 import { BrushStroke } from './brush-stroke';
 
 import type { WebGLRenderer } from 'three';
-import type { RendererBrushStrokeSettings, RendererBrushStrokePreviewsettings } from '@/types';
+import type { RendererBrushStrokeSettings, RendererBrushStrokePreviewsettings, RendererTextureTile } from '@/types';
 
 export class Compositor {
     renderer!: WebGLRenderer;
@@ -55,15 +55,17 @@ export class Compositor {
         brushStroke.move(x, y, size, density, colorBlendingStrength, concentration);
     }
 
-    stopBrushStroke(
+    async stopBrushStroke(
         index: number,
-    ) {
+    ): Promise<RendererTextureTile[]> {
         const brushStroke = this.brushStrokes.get(index);
-        if (!brushStroke) return;
+        if (!brushStroke) return[];
 
-        // Do stuff
+        const tiles = brushStroke.collectTiles();
         brushStroke.dispose();
         this.brushStrokes.delete(index);
+
+        return tiles;
     }
 
     async createBrushPreview(

@@ -1,4 +1,4 @@
-import { LinearMipMapLinearFilter, LinearFilter, RGBAFormat, SRGBColorSpace, UnsignedByteType } from 'three/src/constants';
+import { LinearMipMapLinearFilter, NearestFilter, RGBAFormat, SRGBColorSpace, UnsignedByteType } from 'three/src/constants';
 import { Texture } from 'three/src/textures/Texture';
 
 import { messageBus } from './message-bus';
@@ -12,7 +12,7 @@ export function createTexture(bitmap?: ImageBitmap) {
     texture.generateMipmaps = true;
     texture.colorSpace = SRGBColorSpace;
     texture.minFilter = LinearMipMapLinearFilter;
-    texture.magFilter = LinearFilter;
+    texture.magFilter = NearestFilter; // Alpha channel in texture copies are corrupted if this isn't nearest. Anti-aliasing should happen in the shader.
     texture.userData = {
         shouldDisposeBitmap: bitmap instanceof ImageBitmap,
     };

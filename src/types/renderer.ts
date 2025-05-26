@@ -68,7 +68,7 @@ export interface RendererFrontend {
     takeSnapshot(imageWidth: number, imageHeight: number, options?: RendererFrontendTakeSnapshotOptions): Promise<ImageBitmap>;
     startBrushStroke(settings: RendererBrushStrokeSettings): Promise<void>;
     moveBrushStroke(layerId: number, x: number, y: number, size: number, density: number, colorBlendingStrength: number, concentration: number): Promise<void>;
-    stopBrushStroke(layerId: number): Promise<void>;
+    stopBrushStroke(layerId: number): Promise<RendererTextureTile[]>;
     createBrushPreview(settings: RendererBrushStrokePreviewsettings): Promise<ImageBitmap>;
     dispose(): Promise<void>;
 }

@@ -179,7 +179,7 @@ export class BrushPreview {
         brushStroke.composite();
 
         const buffer = new Uint8Array(this.renderTarget.width * this.renderTarget.height * 4);
-        this.renderer.readRenderTargetPixels(this.renderTarget, 0, 0, this.renderTarget.width, this.renderTarget.height, buffer);
+        await this.renderer.readRenderTargetPixelsAsync(this.renderTarget, 0, 0, this.renderTarget.width, this.renderTarget.height, buffer);
 
         brushStroke.dispose();
 
