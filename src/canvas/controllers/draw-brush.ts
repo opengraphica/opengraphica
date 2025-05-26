@@ -21,8 +21,6 @@ import {
     brushColorBlendingPersistence, brushHardness,
 } from '../store/draw-brush-state';
 
-import DrawableCanvas from '@/canvas/renderers/drawable/canvas';
-
 import type { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { InsertLayerAction } from '@/actions/insert-layer';
@@ -37,7 +35,6 @@ const devicePixelRatio = window.devicePixelRatio || 1;
 
 export default class CanvasDrawBrushController extends BaseCanvasMovementController {
 
-    private brushShapeUnwatch: WatchStopHandle | null = null;
     private brushSizeUnwatch: WatchStopHandle | null = null;
     private selectedLayerIdsUnwatch: WatchStopHandle | null = null;
     private pointerPenMaxPressureMarginUnwatch: WatchStopHandle | null = null;
@@ -48,14 +45,12 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
     private drawingUsePressure: boolean = false;
     private drawingOnLayers: WorkingFileAnyLayer[] = [];
     private drawingBrushStroke: BrushStroke | null = null;
+    
     private drawLoopDeltaAccumulator: number = 0;
     private drawLoopLastRunTimestamp: number = 0;
     private drawLoopLastPointerMoveTimestamp: number = 0;
 
-    private drawablePreviewCanvas: DrawableCanvas | null = null;
-
     private pointerPenMaxPressureMargin: number = 0;
-    private lastPointerTimestamp = 0;
 
     onEnter(): void {
         super.onEnter();
@@ -114,11 +109,6 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
 
         showBrushDrawer.value = false;
 
-        this.drawablePreviewCanvas?.dispose();
-        this.drawablePreviewCanvas = null;
-
-        this.brushShapeUnwatch?.();
-        this.brushShapeUnwatch = null;
         this.brushSizeUnwatch?.();
         this.pointerPenMaxPressureMarginUnwatch?.();
         this.brushSizeUnwatch = null;
@@ -243,7 +233,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
 
         await nextTick();
 
-        // Create a draft image for each of the selected layers
+        // Start a brush stroke for each of the selected layers
         selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster');
         this.drawingOnLayers = selectedLayers as WorkingFileAnyLayer[];
 
@@ -317,7 +307,6 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         if (
             this.drawingPointerId === e.pointerId
         ) {
-            this.lastPointerTimestamp = now;
             const transformedPoint = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
                 this.lastCursorY * devicePixelRatio

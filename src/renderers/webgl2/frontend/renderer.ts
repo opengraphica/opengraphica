@@ -178,6 +178,17 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         requestAnimationFrame(renderLoop);
     }
 
+    waitForRendererInitialized() {
+        return new Promise<void>((resolve) => {
+            let intervalHandle = setInterval(() => {
+                if (this.rendererBackend) {
+                    clearInterval(intervalHandle);
+                    resolve();
+                }
+            }, 50);
+        });
+    }
+
     async onSvgRequest(request?: { sourceUuid: string, width: number, height: number }) {
         if (!request) return;
         const { sourceUuid, width, height } = request;
@@ -332,6 +343,9 @@ export class Webgl2RenderFrontend implements RendererFrontend {
     async createBrushPreview(
         settings: RendererBrushStrokePreviewsettings,
     ): Promise<ImageBitmap> {
+        if (!this.rendererBackend) {
+            await this.waitForRendererInitialized();
+        }
         return await this.rendererBackend!.createBrushPreview(settings);
     }
 

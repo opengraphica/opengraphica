@@ -1,7 +1,4 @@
-import mitt from 'mitt';
 import { computed, ref, watch } from 'vue';
-
-import { useRenderer } from '@/renderers';
 
 import { PerformantStore } from '@/store/performant-store';
 import {
@@ -28,8 +25,6 @@ export const brushConcentration = ref<number>(0);
 export const brushPressureMinConcentration = ref<number>(0);
 
 export const cursorHoverPosition = ref<DOMPoint>(new DOMPoint());
-
-export const drawEmitter = mitt();
 
 interface PermanentStorageState {
     brushSize: number;

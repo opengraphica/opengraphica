@@ -115,7 +115,9 @@
 
 <script setup lang="ts">
 import { v4 as uuidv4 } from 'uuid';
-import { ref, computed, onMounted, onUnmounted, toRefs, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+
+import { t } from '@/i18n';
 
 import {
     brushSize, brushSmoothing, colorPalette, colorPaletteIndex, showBrushDrawer,
@@ -124,8 +126,6 @@ import {
     sizeDockVisible, sizeDockTop, sizeDockLeft,
     smoothingDockVisible, smoothingDockTop, smoothingDockLeft,
 } from '@/canvas/store/draw-brush-state';
-
-import { t } from '@/i18n';
 
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.vue';

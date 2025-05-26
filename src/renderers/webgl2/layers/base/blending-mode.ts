@@ -12,7 +12,7 @@ import type { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import type { Blending, BlendingEquation, BlendingDstFactor } from 'three/src/constants';
 import type { WorkingFileLayerBlendingMode } from "@/types";
 
-enum LayerBlendingMode {
+export enum LayerBlendingMode {
     normal = 0,
     dissolve = 1,
     colorErase = 2,

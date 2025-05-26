@@ -1195,7 +1195,9 @@
             }
         },
         "eraseBrush": {
+            "brushOpacity": "Opacity",
             "brushSize": "Size",
+            "brushSmoothing": "Smoothing",
             "notification": {
                 "noSelectedLayers": {
                     "title": "No Layers Selected",

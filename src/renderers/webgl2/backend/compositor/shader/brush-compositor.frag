@@ -74,11 +74,18 @@ void main() {
     float srcAlpha = srcColor.a * brushAlphaConcentration.x;
     vec4 dstColor = texture2D(dstMap, dstUv);
 
-    float alpha = srcAlpha + dstColor.a * (1.0 - srcAlpha);
+#if cLayerBlendingMode == BLENDING_MODE_ERASE
+    float alpha = max(dstColor.a - srcAlpha, 0.0);
     gl_FragColor = vec4(
-        oklabToRgb((rgbToOklab(srcColor.rgb) * srcAlpha + (rgbToOklab(dstColor.rgb) * dstColor.a) * (1.0 - srcAlpha)) / alpha), alpha
+        (dstColor.rgb * dstColor.a) / alpha, alpha
     );
+#else
+    float alpha = srcAlpha + dstColor.a * (1.0 - srcAlpha);
+    // gl_FragColor = vec4(
+    //     oklabToRgb((rgbToOklab(srcColor.rgb) * srcAlpha + (rgbToOklab(dstColor.rgb) * dstColor.a) * (1.0 - srcAlpha)) / alpha), alpha
+    // );
     gl_FragColor = vec4(
         ((srcColor.rgb) * srcAlpha + ((dstColor.rgb) * dstColor.a) * (1.0 - srcAlpha)) / alpha, alpha
     );
+#endif
 }

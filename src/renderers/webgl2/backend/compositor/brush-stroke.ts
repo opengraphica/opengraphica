@@ -12,6 +12,9 @@ import { Vector3 } from 'three/src/math/Vector3';
 import { Vector4 } from 'three/src/math/Vector4';
 import { WebGLRenderTarget } from 'three/src/renderers/WebGLRenderTarget';
 
+import { LayerBlendingMode } from '@/renderers/webgl2/layers/base/blending-mode';
+
+import blendingModesSetupFragmentShader from '@/renderers/webgl2/layers/base/shader/blending-modes.setup.frag';
 import brushStrokeVertexShader from './shader/brush-stroke.vert';
 import brushStrokeFragmentShader from './shader/brush-stroke.frag';
 import brushCompositorVertexShader from './shader/brush-compositor.vert';
@@ -20,12 +23,12 @@ import copyTileVertexShader from './shader/copy-tile.vert';
 import copyTileFragmentShader from './shader/copy-tile.frag';
 import sampleBrushColorVertexShader from './shader/sample-brush-color.vert';
 import sampleBrushColorFragmentShader from './shader/sample-brush-color.frag';
-import spectralFragmentShader from './shader/spectral.frag';
+// import spectralFragmentShader from './shader/spectral.frag';
 
 import { markRenderDirty, getWebgl2RendererBackend } from '..';
 
 import type { Camera, WebGLRenderer } from 'three';
-import type { RendererBrushStrokeSettings, RendererTextureTile } from '@/types';
+import type { RendererBrushStrokeSettings, RendererTextureTile, WorkingFileLayerBlendingMode } from '@/types';
 
 export class BrushStroke {
     originalViewport!: Vector4;
@@ -51,6 +54,7 @@ export class BrushStroke {
     x: number = 0;
     y: number = 0;
 
+    blendingMode: WorkingFileLayerBlendingMode = 'normal';
     brushSize!: number;
     brushColor!: Float16Array;
     brushHardness!: number;
@@ -93,6 +97,7 @@ export class BrushStroke {
         this.texture = texture;
         this.layerTransform = layerTransform;
         this.layerTransformInverse = layerTransform.clone().invert();
+        this.blendingMode = settings.blendingMode ?? this.blendingMode;
         this.brushSize = settings.size;
         this.brushColor = settings.color;
         this.brushHardness = settings.hardness;
@@ -167,6 +172,9 @@ export class BrushStroke {
         });
 
         this.compositorMaterial = new ShaderMaterial({
+            defines: {
+                cLayerBlendingMode: LayerBlendingMode[this.blendingMode],
+            },
             uniforms: {
                 srcMap: { value: undefined },
                 dstMap: { value: undefined },
@@ -174,7 +182,7 @@ export class BrushStroke {
                 brushAlphaConcentration: { value: new Vector2(this.brushColor[3], 0) },
             },
             vertexShader: brushCompositorVertexShader,
-            fragmentShader: spectralFragmentShader + '\n' + brushCompositorFragmentShader,
+            fragmentShader: blendingModesSetupFragmentShader + '\n' + brushCompositorFragmentShader,
             depthTest: false,
             depthWrite: false,
             transparent: true,

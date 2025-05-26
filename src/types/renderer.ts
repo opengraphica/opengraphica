@@ -1,5 +1,5 @@
 import type { Matrix4, Scene, Texture } from 'three';
-import type { WorkingFileLayer, WorkingFileLayerFilter, Webgl2RendererCanvasFilter } from '@/types';
+import type { WorkingFileLayer, WorkingFileLayerBlendingMode, WorkingFileLayerFilter, Webgl2RendererCanvasFilter } from '@/types';
 
 export interface RendererFrontendTakeSnapshotCropOptions {
     x: number;
@@ -59,6 +59,7 @@ export interface RendererBrushStrokePreviewsettings extends RendererBrushStrokeS
 
 export interface RendererBrushStrokeSettings extends RendererBrushStrokeSettingsCommon {
     layerId: number;
+    blendingMode?: WorkingFileLayerBlendingMode;
 }
 
 export interface RendererFrontend {
