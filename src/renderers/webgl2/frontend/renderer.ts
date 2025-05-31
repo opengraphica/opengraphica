@@ -12,13 +12,14 @@ import {
 } from '@/canvas/store/selection-state';
 
 import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
-import { colorToRgba, getColorModelName } from '@/lib/color';
+import { colorToHex, colorToRgba, getColorModelName } from '@/lib/color';
 
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
 import { VideoPlayer } from './video-player';
 
 import type { Webgl2RendererBackend } from '@/renderers/webgl2/backend';
 import type {
+    RGBAColor,
     ClassType, RendererFrontend, RendererFrontendTakeSnapshotOptions,
     RendererBrushStrokeSettings, RendererBrushStrokePreviewsettings,
     RendererFrontendApplySelectionMaskToAlphaChannelOptions,
@@ -303,7 +304,37 @@ export class Webgl2RenderFrontend implements RendererFrontend {
             layerIds,
             filters: options?.filters,
             applySelectionMask: options?.applySelectionMask,
+            disableScaleToSize: options?.disableScaleToSize,
         });
+    }
+
+    async pickColor(canvasX: number, canvasY: number): Promise<RGBAColor> {
+        if (!this.rendererBackend) throw Error('Renderer backend not initialized.');
+        const imageWidth = workingFileStore.get('width');
+        const imageHeight = workingFileStore.get('height');
+        const cameraTransform = new DOMMatrix()
+            .scaleSelf(imageWidth, imageHeight)
+            .translateSelf(canvasX, canvasY)
+        const bitmap = await this.takeSnapshot(1, 1, {
+            cameraTransform,
+            disableScaleToSize: true,
+        });
+        const canvas = document.createElement('canvas');
+        canvas.width = 1;
+        canvas.height = 1;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(bitmap, 0, 0);
+        const imageData = ctx?.getImageData(0, 0, 1, 1);
+        const color: RGBAColor = {
+            is: 'color',
+            r: (imageData?.data[0] ?? 0) / 255,
+            g: (imageData?.data[1] ?? 0) / 255,
+            b: (imageData?.data[2] ?? 0) / 255,
+            alpha: (imageData?.data[3] ?? 0) / 255,
+            style: '',
+        };
+        color.style = colorToHex(color, 'rgba');
+        return color;
     }
 
     async startBrushStroke(

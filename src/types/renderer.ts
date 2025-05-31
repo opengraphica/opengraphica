@@ -1,5 +1,8 @@
 import type { Matrix4, Scene, Texture } from 'three';
-import type { WorkingFileLayer, WorkingFileLayerBlendingMode, WorkingFileLayerFilter, Webgl2RendererCanvasFilter } from '@/types';
+import type {
+    RGBAColor,
+    WorkingFileLayer, WorkingFileLayerBlendingMode, WorkingFileLayerFilter, Webgl2RendererCanvasFilter
+} from '@/types';
 
 export interface RendererFrontendTakeSnapshotCropOptions {
     x: number;
@@ -25,7 +28,7 @@ export interface RendererFrontendTakeSnapshotOptions {
     /** Inverts the selection mask during application. */
     invertSelectionMask?: boolean;
     /** Crops the final image, after all of the other transforms are applied. */
-    crop?: RendererFrontendTakeSnapshotCropOptions;
+    disableScaleToSize?: boolean;
 }
 
 export interface RendererTextureTile {
@@ -67,6 +70,7 @@ export interface RendererFrontend {
     resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number): Promise<void>;
     applySelectionMaskToAlphaChannel(layerId: number, options?: RendererFrontendApplySelectionMaskToAlphaChannelOptions): Promise<RendererTextureTile[]>;
     takeSnapshot(imageWidth: number, imageHeight: number, options?: RendererFrontendTakeSnapshotOptions): Promise<ImageBitmap>;
+    pickColor(canvasX: number, canvasY: number): Promise<RGBAColor>;
     startBrushStroke(settings: RendererBrushStrokeSettings): Promise<void>;
     moveBrushStroke(layerId: number, x: number, y: number, size: number, density: number, colorBlendingStrength: number, concentration: number): Promise<void>;
     stopBrushStroke(layerId: number): Promise<RendererTextureTile[]>;

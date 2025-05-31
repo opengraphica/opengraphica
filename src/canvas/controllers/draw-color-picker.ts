@@ -10,7 +10,9 @@ import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import workingFileStore from '@/store/working-file';
 import { drawColorPickerEmitter, pickedColor } from '@/canvas/store/draw-color-picker-state';
 
-import type { DrawWorkingFileOptions, RGBAColor } from '@/types';
+import { useRenderer } from '@/renderers';
+
+import type { DrawWorkingFileOptions, RGBAColor, RendererFrontend } from '@/types';
 
 const devicePixelRatio = window.devicePixelRatio || 1;
 
@@ -18,8 +20,14 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
 
     private isPickingColor = false;
 
+    private renderer: RendererFrontend | undefined;
+
     onEnter(): void {
         super.onEnter();
+
+        useRenderer().then((renderer) => {
+            this.renderer = renderer;
+        });
     }
 
     onLeave(): void {
@@ -71,35 +79,15 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         };
     }
 
-    private pickColor(viewTransformPoint: DOMPoint): number | null {
-        const workingCanvas = document.createElement('canvas');
-        workingCanvas.width = 1;
-        workingCanvas.height = 1;
-        const ctx = workingCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
-        if (!ctx) return null;
-        const initialTransform = new DOMMatrix().translateSelf(-viewTransformPoint.x, -viewTransformPoint.y);
-        const selectionTest: DrawWorkingFileOptions['selectionTest'] = {
-            point: new DOMPoint(),
-            resultId: undefined,
-            resultPixelTest: undefined
-        };
-        drawWorkingFileToCanvas2d(workingCanvas, ctx, { initialTransform, selectionTest });
-        if (selectionTest.resultPixelTest) {
-            const color: RGBAColor = {
-                is: 'color',
-                r: selectionTest.resultPixelTest[0] / 255,
-                g: selectionTest.resultPixelTest[1] / 255,
-                b: selectionTest.resultPixelTest[2] / 255,
-                alpha: 1,
-                style: ''
-            };
-            color.style = generateColorStyle(color, 'rgba', workingFileStore.state.colorSpace);
+    private pickColor(viewTransformPoint: DOMPoint) {
+        if (!this.renderer) return null;
+
+        this.renderer.pickColor(-viewTransformPoint.x, -viewTransformPoint.y).then((color) => {
             pickedColor.value = color;
             nextTick(() => {
                 drawColorPickerEmitter.emit('colorPicked');
             });
-        }
-        return selectionTest.resultId != null ? selectionTest.resultId : null;
+        });
     }
 
     protected handleCursorIcon() {

@@ -28,6 +28,7 @@ import type {
     RendererBrushStrokeSettings, RendererBrushStrokePreviewsettings, RendererTextureTile,
     Webgl2RendererCanvasFilter, Webgl2RendererMeshController, WorkingFileLayer,
     WorkingFileGroupLayer, WorkingFileLayerFilter, WorkingFileLayerMask,
+    RendererFrontendTakeSnapshotCropOptions,
 } from '@/types';
 
 const noRenderPassModes = new Set(['normal', 'erase']);
@@ -37,6 +38,7 @@ export interface Webgl2RendererBackendTakeSnapshotOptions {
     layerIds?: Uint32Array;
     filters?: WorkingFileLayerFilter[];
     applySelectionMask?: boolean;
+    disableScaleToSize?: boolean;
 }
 
 export interface Webgl2RendererApplySelectionMaskToAlphaChannelOptions {
@@ -374,16 +376,18 @@ export class Webgl2RendererBackend {
             const t = options.cameraTransform;
             snapshotCamera.projectionMatrix.multiply(
                 new Matrix4(
-                    t[0], t[1], t[2], t[3],
-                    t[4], t[5], t[6], t[7],
-                    t[8], t[9], t[10], t[11],
-                    t[12], t[13], t[14], t[15],
+                    t[0], t[4], t[8], t[12],
+                    t[1], t[5], t[9], t[13],
+                    t[2], t[6], t[10], t[14],
+                    t[3], t[7], t[11], t[15],
                 )
             )
         }
-        snapshotCamera.projectionMatrix.scale(
-            new Vector3(imageWidth / this.imageWidth, imageHeight / this.imageHeight, 1)
-        );
+        if (!options?.disableScaleToSize) {
+            snapshotCamera.projectionMatrix.scale(
+                new Vector3(imageWidth / this.imageWidth, imageHeight / this.imageHeight, 1)
+            );
+        }
 
         const snapshotRenderTarget = new WebGLRenderTarget(imageWidth, imageHeight, {
             type: UnsignedByteType,
@@ -476,7 +480,6 @@ export class Webgl2RendererBackend {
             new ImageData(new Uint8ClampedArray(buffer), imageWidth, imageHeight),
             { imageOrientation: 'flipY' }
         );
-        await new Promise((resolve) => setTimeout(resolve, 500));
 
         snapshotRenderTarget.dispose();
 
@@ -549,7 +552,7 @@ export class Webgl2RendererBackend {
 let rendererBackendInstance: Webgl2RendererBackend | undefined;
 
 export function getWebgl2RendererBackend(): Webgl2RendererBackend {
-    if (!rendererBackendInstance?.composer) {
+    if (!rendererBackendInstance) {
         rendererBackendInstance = new Webgl2RendererBackend();
     }
     return rendererBackendInstance;
