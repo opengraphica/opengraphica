@@ -1,4 +1,5 @@
 import { ref } from 'vue';
+import { checkUpdates } from '@/check-updates';
 import { PerformantStore } from './performant-store';
 import BaseCanvasController from '@/canvas/controllers/base';
 import BaseCanvasMovementController from '@/canvas/controllers/base-movement';
@@ -221,8 +222,13 @@ const store = new PerformantStore<EditorStore>({
                     if (toolDefinition?.controller) {
                         controllerName = toolDefinition.controller;
                     }
-                    const CanvasControllerGenericClass: typeof BaseCanvasController =
-                        (await import(/* webpackChunkName: 'canvas-controller-[request]' */ `../canvas/controllers/${controllerName}.ts`)).default;
+                    const CanvasControllerGenericClass: typeof BaseCanvasController = (
+                        await import(/* webpackChunkName: 'canvas-controller-[request]' */ `../canvas/controllers/${controllerName}.ts`)
+                            .catch((error) => {
+                                checkUpdates()
+                                console.error(error);
+                            })
+                    ).default;
                     controller = new CanvasControllerGenericClass();
                     if (this.state.toolCanvasController) {
                         try {

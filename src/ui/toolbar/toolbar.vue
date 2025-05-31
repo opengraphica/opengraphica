@@ -12,7 +12,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, defineAsyncComponent, ref, toRef, watch, onMounted, nextTick } from 'vue';
+import { defineComponent, defineAsyncComponent, onErrorCaptured, onMounted, ref, toRef, watch } from 'vue';
+import { checkUpdates } from '@/check-updates';
 import { isAppPreloading } from '@/composables/app-preload-blocker';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import editorStore from '@/store/editor';
@@ -55,6 +56,11 @@ export default defineComponent({
 
         onMounted(() => {
             currentName.value = props.name;
+        });
+
+        onErrorCaptured((error) => {
+            checkUpdates();
+            console.error(error);
         });
 
         function onToolbarAnimationEnd() {

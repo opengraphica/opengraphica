@@ -20,21 +20,26 @@ export function createTexture(bitmap?: ImageBitmap) {
     return texture;
 }
 
-export async function requestFrontendTexture(requestSourceUuid?: string): Promise<Texture | undefined> {
+export async function requestFrontendBitmap(requestSourceUuid?: string): Promise<ImageBitmap | undefined> {
     if (!requestSourceUuid) return;
-    const promise = new Promise<Texture | undefined>((resolve) => {
+    const promise = new Promise<ImageBitmap | undefined>((resolve) => {
         function handleResponse(options?: { sourceUuid: string, bitmap: ImageBitmap | undefined }) {
             if (!options) return;
             const { sourceUuid, bitmap } = options;
             if (sourceUuid === requestSourceUuid) {
                 messageBus.off('frontend.replyFrontendTexture', handleResponse);
-                resolve(createTexture(bitmap));
+                resolve(bitmap);
             }
         }
         messageBus.on('frontend.replyFrontendTexture', handleResponse);
     });
     messageBus.emit('backend.requestFrontendTexture', requestSourceUuid);
     return promise;
+}
+
+export async function requestFrontendTexture(requestSourceUuid?: string): Promise<Texture | undefined> {
+    const bitmap = await requestFrontendBitmap(requestSourceUuid);
+    return createTexture(bitmap);
 }
 
 export async function requestFrontendSvg(

@@ -19,7 +19,8 @@
 
 <script lang="ts">
 import { v4 as uuidv4 } from 'uuid';
-import { defineComponent, defineAsyncComponent, computed } from 'vue';
+import { checkUpdates } from '@/check-updates';
+import { defineComponent, defineAsyncComponent, computed, onErrorCaptured } from 'vue';
 import editorStore from '@/store/editor';
 
 export default defineComponent({
@@ -99,6 +100,11 @@ export default defineComponent({
             }
 
             return groups;
+        });
+
+        onErrorCaptured((error) => {
+            checkUpdates();
+            console.error(error);
         });
 
         return {

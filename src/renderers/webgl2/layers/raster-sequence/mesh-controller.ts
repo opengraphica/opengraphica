@@ -9,7 +9,7 @@ import { Mesh } from 'three/src/objects/Mesh';
 import { Texture } from 'three/src/textures/Texture';
 import { Vector2 } from 'three/src/math/Vector2';
 
-import { getWebgl2RendererBackend, markRenderDirty, requestFrontendTexture } from '@/renderers/webgl2/backend';
+import { getWebgl2RendererBackend, markRenderDirty, requestFrontendBitmap } from '@/renderers/webgl2/backend';
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
 import { createCanvasFiltersFromLayerConfig } from '../base/material';
 import { assignMaterialBlendingMode } from '../base/blending-mode';
@@ -28,6 +28,8 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
     planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
     scene: InstanceType<typeof Scene> | undefined;
     sourceTexture: InstanceType<typeof Texture> | undefined;
+    sourceTextureCanvas: InstanceType<typeof HTMLCanvasElement | typeof OffscreenCanvas> | undefined;
+    sourceTextureCtx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | undefined;
 
     id: number = -1;
     blendingMode: WorkingFileLayerBlendingMode = 'normal';
@@ -49,6 +51,16 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
         this.plane = new Mesh(undefined, undefined);
         this.plane.matrixAutoUpdate = false;
         this.scene.add(this.plane);
+
+        if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
+            this.sourceTextureCanvas = new OffscreenCanvas(10, 10);
+        } else {
+            this.sourceTextureCanvas = document.createElement('canvas');
+        }
+        this.sourceTextureCtx = this.sourceTextureCanvas.getContext('2d') || undefined;
+        if (this.sourceTextureCtx) {
+            this.sourceTextureCtx.imageSmoothingEnabled = false;
+        }
 
         this.readBufferTextureUpdate = this.readBufferTextureUpdate.bind(this);
         messageBus.on('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
@@ -107,7 +119,8 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
     }
 
     async updateData(data: WorkingFileRasterSequenceLayer['data']) {
-        // TODO
+        if (!this.sourceTextureCtx) return;
+        // data.sequence[0].image.
     }
 
     async updateFilters(filters: WorkingFileLayerFilter[]) {

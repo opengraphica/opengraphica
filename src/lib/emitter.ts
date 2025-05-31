@@ -39,6 +39,7 @@ interface AppEmitterEvents {
         onSuccess?: (event?: any) => void;
         onError?: (error?: any) => void;
     },
+    'app.updateRequired': void;
     'app.wait.startBlocking': {
         id: string;
         label?: string;

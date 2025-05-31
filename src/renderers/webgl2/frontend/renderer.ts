@@ -47,6 +47,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
 
         this.layerWatchersByType['gradient'] = (await import('@/renderers/webgl2/layers/gradient/watcher')).GradientLayerWatcher;
         this.layerWatchersByType['raster'] = (await import('@/renderers/webgl2/layers/raster/watcher')).RasterLayerWatcher;
+        this.layerWatchersByType['rasterSequence'] = (await import('@/renderers/webgl2/layers/raster-sequence/watcher')).RasterSequenceLayerWatcher;
         this.layerWatchersByType['text'] = (await import('@/renderers/webgl2/layers/text/watcher')).TextLayerWatcher;
         this.layerWatchersByType['vector'] = (await import('@/renderers/webgl2/layers/vector/watcher')).VectorLayerWatcher;
         this.layerWatchersByType['video'] = (await import('@/renderers/webgl2/layers/video/watcher')).VideoLayerWatcher;

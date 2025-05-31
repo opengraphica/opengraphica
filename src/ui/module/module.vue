@@ -22,7 +22,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, defineAsyncComponent } from 'vue';
+import { defineComponent, defineAsyncComponent, onErrorCaptured } from 'vue';
+import { checkUpdates } from '@/check-updates';
 import ElLoading from 'element-plus/lib/components/loading/index';
 
 export default defineComponent({
@@ -70,6 +71,11 @@ export default defineComponent({
         'close'
     ],
     setup(props, { emit }) {
+
+        onErrorCaptured((error) => {
+            checkUpdates();
+            console.error(error);
+        });
 
         function onHideModule() {
             emit('hide');

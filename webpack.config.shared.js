@@ -1,6 +1,7 @@
 const path = require('path');
+const { execSync } = require('child_process');
 const { DefinePlugin, ProgressPlugin } = require('webpack');
-const CopyWebpackPlugin = require("copy-webpack-plugin");
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
@@ -35,7 +36,7 @@ module.exports = function setupConfig(config) {
                         fullySpecified: false
                     },
                     include: /node_modules/,
-                    type: "javascript/auto"
+                    type: 'javascript/auto'
                 },
                 {
                     test: /\.css$/i,
@@ -43,12 +44,12 @@ module.exports = function setupConfig(config) {
                         'style-loader',
                         'css-loader',
                         {
-                            loader: "postcss-loader",
+                            loader: 'postcss-loader',
                             options: {
                                 postcssOptions: {
                                     plugins: [
                                         [
-                                            "@tailwindcss/postcss", {},
+                                            '@tailwindcss/postcss', {},
                                         ],
                                     ],
                                 },
@@ -97,6 +98,7 @@ module.exports = function setupConfig(config) {
                 __VUE_I18N_LEGACY_API__: true,
                 __INTLIFY_PROD_DEVTOOLS__: false,
                 __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
+                __BUILD_GIT_COMMIT_ID__: `'${execSync('git rev-parse HEAD').toString().trim()}'`,
             }),
             new ForkTsCheckerWebpackPlugin(),
             new ProgressPlugin({

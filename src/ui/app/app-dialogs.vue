@@ -52,7 +52,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, defineAsyncComponent, ref, onMounted, onUnmounted } from 'vue';
+import { computed, defineComponent, defineAsyncComponent, ref, onErrorCaptured, onMounted, onUnmounted } from 'vue';
+import { checkUpdates } from '@/check-updates';
 import Dock from '@/ui/dock/dock.vue';
 import Module from '@/ui/module/module.vue';
 import editorStore from '@/store/editor';
@@ -110,6 +111,11 @@ export default defineComponent({
         onUnmounted(() => {
             appEmitter.off('app.dialogs.openFromDock', handleDockOpen);
             appEmitter.off('app.dialogs.openFromModule', handleModuleOpen);
+        });
+
+        onErrorCaptured((error) => {
+            checkUpdates();
+            console.error(error);
         });
 
         function handleDockOpen(event?: AppEmitterEvents['app.dialogs.openFromDock']) {

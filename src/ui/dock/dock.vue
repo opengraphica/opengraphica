@@ -28,7 +28,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, defineAsyncComponent, ref, watch } from 'vue';
+import { computed, defineComponent, defineAsyncComponent, onErrorCaptured, ref, watch } from 'vue';
+import { checkUpdates } from '@/check-updates';
 import preferencesStore from '@/store/preferences'
 import ElLoading from 'element-plus/lib/components/loading/index';
 
@@ -80,6 +81,11 @@ export default defineComponent({
         });
         const componentContentLoading = ref(false);
         const componentLoadingState = ref('pending');
+
+        onErrorCaptured((error) => {
+            checkUpdates();
+            console.error(error);
+        });
 
         watch(() => loading.value, (loading) => {
             emit('update:loading', loading);
