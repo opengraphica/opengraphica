@@ -62,6 +62,7 @@ export default defineComponent({
                 currentName.value = props.name;
             } else if (animationSwap.value === 'in') {
                 animationSwap.value = '';
+                appEmitter.emit('app.canvas.calculateDndArea');
             }
         }
 

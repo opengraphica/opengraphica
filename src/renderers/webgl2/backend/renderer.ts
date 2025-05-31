@@ -101,17 +101,19 @@ export class Webgl2RendererBackend {
         this.camera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 10000);
         this.camera.matrixAutoUpdate = false;
 
-        this.compositor = new Compositor(this.renderer);
+        this.selectionMask = new SelectionMask();
+
+        this.compositor = new Compositor(this.renderer, this.selectionMask);
         this.compositor.setOriginalViewport(this.viewport);
 
         this.imageBackground = new ImageBackground();
-        await this.imageBackground.initialize(this.scene, imageWidth, imageHeight);
-
         this.imageBoundaryMask = new ImageBoundaryMask();
-        await this.imageBoundaryMask.initialize(this.scene, viewWidth, viewHeight);
 
-        this.selectionMask = new SelectionMask();
-        await this.selectionMask.initialize(this.camera, this.scene, viewWidth, viewHeight);
+        await Promise.all([
+            this.imageBackground.initialize(this.scene, imageWidth, imageHeight),
+            this.imageBoundaryMask.initialize(this.scene, viewWidth, viewHeight),
+            this.selectionMask.initialize(this.camera, this.scene, viewWidth, viewHeight),
+        ]);
 
         this.composer = new EffectComposer(this.renderer);
         this.createLayerPasses();

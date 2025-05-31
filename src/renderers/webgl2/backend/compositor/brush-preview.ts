@@ -122,6 +122,7 @@ export class BrushPreview {
 
         const brushStroke = new BrushStroke(
             this.renderer,
+            undefined,
             originalViewport,
             this.renderTarget.texture,
             new Matrix4(),

@@ -133,6 +133,17 @@ export class SelectionMask {
         this.selectionMaskMaterial.needsUpdate = true;
     }
 
+    getTexture(): Texture | undefined {
+        return this.selectionMaskMaterial.uniforms.selectedMaskMap.value;
+    }
+
+    getOffset(): number[] {
+        return [
+            this.selectionMaskMaterial.uniforms.selectedMaskOffset.value[0],
+            this.selectionMaskMaterial.uniforms.selectedMaskOffset.value[1]
+        ];
+    }
+
     setCamera(camera: Camera) {
         this.selectionMaskMaterial.uniforms.inverseProjectionMatrix.value = camera.projectionMatrixInverse.elements;
         this.selectionMaskMaterial.needsUpdate = true;

@@ -395,9 +395,9 @@ watch(
                 await calculateBeforeImageWithThreejs(beforeEffectCanvas, beforeEffectCanvasCtx, filterConfigurations);
                 await initializeThreejs(afterEffectCanvas);
             } else if (afterEffectCanvasCtx) {
-                beforeImageData = await bakeCanvasFilters(beforeImageData, 999999999 + Math.floor(Math.random() * 1000), filterConfigurations);
-                beforeEffectCanvasCtx.putImageData(beforeImageData, 0, 0);
-                afterEffectCanvasCtx.putImageData(beforeImageData, 0, 0);
+                // beforeImageData = await bakeCanvasFilters(beforeImageData, 999999999 + Math.floor(Math.random() * 1000), filterConfigurations);
+                // beforeEffectCanvasCtx.putImageData(beforeImageData, 0, 0);
+                // afterEffectCanvasCtx.putImageData(beforeImageData, 0, 0);
             }
             updatePreview();
             loading.value = false;

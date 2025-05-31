@@ -6,18 +6,21 @@ import { BrushPreview } from './brush-preview';
 import { BrushStroke } from './brush-stroke';
 
 import type { WebGLRenderer } from 'three';
+import type { SelectionMask } from '../selection-mask';
 import type { RendererBrushStrokeSettings, RendererBrushStrokePreviewsettings, RendererTextureTile } from '@/types';
 
 export class Compositor {
     renderer!: WebGLRenderer;
+    selectionMask!: SelectionMask;
     originalViewport!: Vector4;
 
     brushPreview!: BrushPreview;
     brushStrokes = new Map<number, BrushStroke>();
     brushStrokeCounter: number = 0;
 
-    constructor(renderer: WebGLRenderer) {
+    constructor(renderer: WebGLRenderer, selectionMask: SelectionMask) {
         this.renderer = renderer;
+        this.selectionMask = selectionMask;
         this.brushPreview = new BrushPreview(this.renderer);
     }
 
@@ -33,6 +36,7 @@ export class Compositor {
         const brushStrokeIndex = this.brushStrokeCounter++;
         this.brushStrokes.set(brushStrokeIndex, new BrushStroke(
             this.renderer,
+            this.selectionMask,
             this.originalViewport,
             texture,
             layerTransform,

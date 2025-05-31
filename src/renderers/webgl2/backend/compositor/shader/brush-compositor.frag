@@ -8,8 +8,10 @@ varying vec2 vUv;
 
 uniform sampler2D srcMap;
 uniform sampler2D dstMap;
+uniform sampler2D selectionMaskMap;
 uniform vec4 dstOffsetAndSize;
 uniform vec2 brushAlphaConcentration;
+uniform mat4 selectionMaskTransform;
 
 float srgbChannelToLinearSrgbChannel(float value) {
     float calculatedValue = 0.0;
@@ -70,8 +72,17 @@ vec3 oklabToRgb(in vec3 lab) {
 void main() {
     vec2 dstUv = vec2(dstOffsetAndSize.x, 1.0 - dstOffsetAndSize.y - dstOffsetAndSize.w) + vUv * dstOffsetAndSize.zw;
     
+#if cSelectionMaskEnabled == 1
+    vec2 selectionMaskUv = (selectionMaskTransform * vec4(vUv, 0.0, 1.0)).xy;
+    float selectionMaskVisible = step(0.0, selectionMaskUv.x) * step(0.0, selectionMaskUv.y) *
+        step(selectionMaskUv.x, 1.0) * step(selectionMaskUv.y, 1.0);
+    float selectionMaskMultiplier = texture2D(selectionMaskMap, selectionMaskUv).a * selectionMaskVisible;
+#else
+    float selectionMaskMultiplier = 1.0;
+#endif
+
     vec4 srcColor = srgbToLinearSrgb(texture2D(srcMap, vUv));
-    float srcAlpha = srcColor.a * brushAlphaConcentration.x;
+    float srcAlpha = srcColor.a * brushAlphaConcentration.x * selectionMaskMultiplier;
     vec4 dstColor = texture2D(dstMap, dstUv);
 
 #if cLayerBlendingMode == BLENDING_MODE_ERASE
@@ -81,9 +92,12 @@ void main() {
     );
 #else
     float alpha = srcAlpha + dstColor.a * (1.0 - srcAlpha);
+
+    // OKLab Variant
     // gl_FragColor = vec4(
     //     oklabToRgb((rgbToOklab(srcColor.rgb) * srcAlpha + (rgbToOklab(dstColor.rgb) * dstColor.a) * (1.0 - srcAlpha)) / alpha), alpha
     // );
+
     gl_FragColor = vec4(
         ((srcColor.rgb) * srcAlpha + ((dstColor.rgb) * dstColor.a) * (1.0 - srcAlpha)) / alpha, alpha
     );

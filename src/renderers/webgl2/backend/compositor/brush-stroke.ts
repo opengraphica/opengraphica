@@ -28,11 +28,13 @@ import sampleBrushColorFragmentShader from './shader/sample-brush-color.frag';
 import { markRenderDirty, getWebgl2RendererBackend } from '..';
 
 import type { Camera, WebGLRenderer } from 'three';
+import type { SelectionMask } from '../selection-mask';
 import type { RendererBrushStrokeSettings, RendererTextureTile, WorkingFileLayerBlendingMode } from '@/types';
 
 export class BrushStroke {
     originalViewport!: Vector4;
     renderer!: WebGLRenderer;
+    selectionMask: SelectionMask | undefined;
     texture!: Texture;
     layerTransform!: Matrix4;
     layerTransformInverse!: Matrix4;
@@ -87,12 +89,14 @@ export class BrushStroke {
 
     constructor(
         renderer: WebGLRenderer,
+        selectionMask: SelectionMask | undefined,
         originalViewport: Vector4,
         texture: Texture,
         layerTransform: Matrix4,
         settings: RendererBrushStrokeSettings,
     ) {
         this.renderer = renderer;
+        this.selectionMask = selectionMask;
         this.originalViewport = originalViewport;
         this.texture = texture;
         this.layerTransform = layerTransform;
@@ -171,15 +175,19 @@ export class BrushStroke {
             premultipliedAlpha: true,
         });
 
+        const selectionMaskTexture = this.selectionMask?.getTexture();
         this.compositorMaterial = new ShaderMaterial({
             defines: {
                 cLayerBlendingMode: LayerBlendingMode[this.blendingMode],
+                cSelectionMaskEnabled: selectionMaskTexture ? 1 : 0,
             },
             uniforms: {
                 srcMap: { value: undefined },
                 dstMap: { value: undefined },
+                selectionMaskMap: { value: selectionMaskTexture },
                 dstOffsetAndSize: { value: new Vector4() },
                 brushAlphaConcentration: { value: new Vector2(this.brushColor[3], 0) },
+                selectionMaskTransform: { value: new Matrix4() },
             },
             vertexShader: brushCompositorVertexShader,
             fragmentShader: blendingModesSetupFragmentShader + '\n' + brushCompositorFragmentShader,
@@ -196,6 +204,61 @@ export class BrushStroke {
 
         this.composite = this.composite.bind(this);
         getWebgl2RendererBackend().registerBeforeRenderCallback(this.composite);
+    }
+
+    createSelectionMaskTransform(tileX: number, tileY: number, tileWidth: number, tileHeight: number) {
+        if (!this.selectionMask) return;
+
+        const selectionMaskTexture = this.selectionMask.getTexture();
+        if (!selectionMaskTexture) return;
+
+        const selectionMaskWidth = selectionMaskTexture.image.width;
+        const selectionMaskHeight = selectionMaskTexture.image.height;
+        const selectionMaskOffset = this.selectionMask.getOffset();
+
+        const selectionMaskTileOffsetX = (tileX - selectionMaskOffset[0]) / selectionMaskWidth;
+        const selectionMaskTileOffsetY = (tileY - selectionMaskOffset[1]) / selectionMaskHeight;
+        const selectionMaskTileScaleX = (tileWidth / selectionMaskWidth);
+        const selectionMaskTileScaleY = (tileHeight / selectionMaskHeight);
+
+        const tileTransformReset = this._m0.identity()
+            .multiply(
+                this._m1.makeTranslation(
+                    -selectionMaskOffset[0] / selectionMaskWidth,
+                    1.0 + (selectionMaskOffset[1] / selectionMaskHeight),
+                    0.0
+                )
+            )
+            .multiply(
+                this._m1.makeScale(
+                    1.0 / selectionMaskWidth,
+                    -1.0 / selectionMaskHeight,
+                    1.0,
+                )
+            );
+        const tileTransformResetInverse = this._m1.copy(tileTransformReset).invert();
+
+        (this.compositorMaterial.uniforms.selectionMaskTransform.value as Matrix4)
+            .identity()
+            .multiply(tileTransformReset)
+            .multiply(
+                this.layerTransform
+            )
+            .multiply(tileTransformResetInverse)
+            .multiply(
+                this._m2.makeTranslation(
+                    selectionMaskTileOffsetX,
+                    1.0 - selectionMaskTileOffsetY - selectionMaskTileScaleY,
+                    1.0,
+                )
+            )
+            .multiply(
+                this._m2.makeScale(
+                    selectionMaskTileScaleX,
+                    selectionMaskTileScaleY,
+                    1.0,
+                )
+            );
     }
 
     populateColor() {
@@ -427,6 +490,7 @@ export class BrushStroke {
             this.compositorMaterial.uniforms.dstOffsetAndSize.value.w = 1;
             this.compositorMaterial.uniforms.srcMap.value = brushRenderTarget.texture;
             this.compositorMaterial.uniforms.brushAlphaConcentration.value.y = this.brushMinConcentration;
+            this.createSelectionMaskTransform(tileX, tileY, tileWidth, tileHeight);
             this.compositorMaterial.uniformsNeedUpdate = true;
 
             // Render composite tile
