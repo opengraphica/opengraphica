@@ -71,7 +71,7 @@ function calculateGradientAverageBrightness(stops: WorkingFileGradientColorStop<
 }
 
 export async function createGradientMaterial(
-    { canvasFilters, canvasWidth, canvasHeight, gradientData, transform }: Required<GradientMaterialUpdateParams>
+    { canvasFilters, canvasWidth, canvasHeight, gradientData, transform }: GradientMaterialUpdateParams
 ) {
     const uuid = uuidv4();
 
@@ -102,34 +102,45 @@ export async function createGradientMaterial(
         },
     });
 
-    const cBlendColorSpace = GradientColorSpace[gradientData.blendColorSpace];
-    const cFillType = GradientFillType[gradientData.fillType];
-    const cSpreadMethod = GradientSpreadMethod[gradientData.spreadMethod];
-    const cAverageBrightness = calculateGradientAverageBrightness(gradientData.stops);
+    if (gradientData) {
+        const cBlendColorSpace = GradientColorSpace[gradientData.blendColorSpace];
+        const cFillType = GradientFillType[gradientData.fillType];
+        const cSpreadMethod = GradientSpreadMethod[gradientData.spreadMethod];
+        const cAverageBrightness = calculateGradientAverageBrightness(gradientData.stops);
+        material.defines.cBlendColorSpace = cBlendColorSpace;
+        material.defines.cFillType = cFillType;
+        material.defines.cSpreadMethod = cSpreadMethod;
+        material.defines.cAverageBrightness = cAverageBrightness;
+    }
 
     material.defines.cCanvasWidth = canvasWidth ?? 1;
     material.defines.cCanvasHeight = canvasHeight ?? 1;
-    material.defines.cBlendColorSpace = cBlendColorSpace;
-    material.defines.cFillType = cFillType;
-    material.defines.cSpreadMethod = cSpreadMethod;
-    material.defines.cAverageBrightness = cAverageBrightness;
+    
+    if (gradientData) {
+        const newStopsHash = generateObjectHash(gradientData.stops) + generateStringHash(gradientData.blendColorSpace) + generateStringHash(uuid);
+        const newStopsTexture = createGradientStopTexture(gradientData.stops, gradientData.blendColorSpace);
+        generatedGradientStopTextures.set(newStopsHash, newStopsTexture);
+        material.uniforms.stops = { value: newStopsTexture };
 
-    const newStopsHash = generateObjectHash(gradientData.stops) + generateStringHash(gradientData.blendColorSpace) + generateStringHash(uuid);
-    const newStopsTexture = createGradientStopTexture(gradientData.stops, gradientData.blendColorSpace);
-    generatedGradientStopTextures.set(newStopsHash, newStopsTexture);
-    material.uniforms.stops = { value: newStopsTexture };
+        const startTransformed = new Vector3(gradientData.start.x, gradientData.start.y, 1).applyMatrix4(transform);
+        const endTransformed = new Vector3(gradientData.end.x, gradientData.end.y, 1).applyMatrix4(transform);
+        const focusTransformed = new Vector3(gradientData.focus.x, gradientData.focus.y, 1).applyMatrix4(transform);
+        material.uniforms.start = { value: new Vector2(startTransformed.x, startTransformed.y) };
+        material.uniforms.end = { value: new Vector2(endTransformed.x, endTransformed.y) };
+        material.uniforms.focus = { value: new Vector2(focusTransformed.x, focusTransformed.y) };
 
-    const startTransformed = new Vector3(gradientData.start.x, gradientData.start.y, 1).applyMatrix4(transform);
-    const endTransformed = new Vector3(gradientData.end.x, gradientData.end.y, 1).applyMatrix4(transform);
-    const focusTransformed = new Vector3(gradientData.focus.x, gradientData.focus.y, 1).applyMatrix4(transform);
-    material.uniforms.start = { value: new Vector2(startTransformed.x, startTransformed.y) };
-    material.uniforms.end = { value: new Vector2(endTransformed.x, endTransformed.y) };
-    material.uniforms.focus = { value: new Vector2(focusTransformed.x, focusTransformed.y) };
+        material.userData.stopsHash = newStopsHash;
+        material.userData.blendColorSpace = gradientData.blendColorSpace;
+    } else {
+        material.uniforms.stops = { value: undefined };
+        material.uniforms.start = { value: new Vector2() };
+        material.uniforms.end = { value: new Vector2() };
+        material.uniforms.focus = { value: new Vector2() };
+    }
+
     material.uniforms.dstTexture = { value: undefined };
 
     material.userData.uuid = uuid;
-    material.userData.blendColorSpace = gradientData.blendColorSpace;
-    material.userData.stopsHash = newStopsHash;
     material.userData.transform = transform;
     material.needsUpdate = true;
 

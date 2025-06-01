@@ -12,6 +12,7 @@ import { Vector2 } from 'three/src/math/Vector2';
 import { getWebgl2RendererBackend, markRenderDirty, requestFrontendTexture } from '@/renderers/webgl2/backend';
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
 import { createCanvasFiltersFromLayerConfig } from '../base/material';
+import { assignMaterialBlendingMode } from '../base/blending-mode';
 import { createGradientMaterial, disposeGradientMaterial, updateGradientMaterial } from './material';
 
 import type { Scene, ShaderMaterial } from 'three';
@@ -92,9 +93,10 @@ export class GradientLayerMeshController implements Webgl2RendererMeshController
                         transform: this.transform,
                         canvasFilters: this.filtersOverride ?? this.filters,
                     });
-                } else {
+                    assignMaterialBlendingMode(this.material, this.blendingMode);
+                } else if (this.data) {
                     await updateGradientMaterial(this.material, {
-                        gradientData: this.data!,
+                        gradientData: this.data,
                         canvasWidth: backend.imageWidth,
                         canvasHeight: backend.imageHeight,
                         transform: this.transform,

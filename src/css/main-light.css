@@ -28319,11 +28319,6 @@ body.og-full-page .opengraphica {
 .opengraphica .el-drawer .el-drawer__body {
   position: relative;
 }
-.opengraphica .el-form--default:not(.el-form--label-top) .el-form-item .el-form-item__label,
-.opengraphica .el-form-item--default .el-form-item__label {
-  line-height: 2.5rem;
-  min-height: 2.5rem;
-}
 .opengraphica .el-form-item.el-form-item--menu-item {
   display: flex;
   padding: 0 1.25rem;
@@ -28338,6 +28333,8 @@ body.og-full-page .opengraphica {
   flex-grow: 1;
   text-align: left;
   justify-content: flex-start;
+  line-height: 2.5rem;
+  min-height: 2.5rem;
 }
 .opengraphica .el-form-item.el-form-item--menu-item > .el-form-item__content {
   flex-basis: auto;
