@@ -1,4 +1,5 @@
 import { LinearMipMapLinearFilter, NearestFilter, RGBAFormat, SRGBColorSpace, UnsignedByteType } from 'three/src/constants';
+import { CanvasTexture } from 'three/src/textures/CanvasTexture';
 import { Texture } from 'three/src/textures/Texture';
 
 import { messageBus } from './message-bus';
@@ -15,6 +16,22 @@ export function createTexture(bitmap?: ImageBitmap) {
     texture.magFilter = NearestFilter; // Alpha channel in texture copies are corrupted if this isn't nearest. Anti-aliasing should happen in the shader.
     texture.userData = {
         shouldDisposeBitmap: bitmap instanceof ImageBitmap,
+    };
+    texture.needsUpdate = true;
+    return texture;
+}
+
+export function createCanvasTexture(canvas: HTMLCanvasElement | OffscreenCanvas) {
+    const texture = new CanvasTexture(canvas);
+    texture.format = RGBAFormat;
+    texture.type = UnsignedByteType;
+    texture.premultiplyAlpha = false;
+    texture.generateMipmaps = true;
+    texture.colorSpace = SRGBColorSpace;
+    texture.minFilter = LinearMipMapLinearFilter;
+    texture.magFilter = NearestFilter; // Alpha channel in texture copies are corrupted if this isn't nearest. Anti-aliasing should happen in the shader.
+    texture.userData = {
+        shouldDisposeBitmap: false,
     };
     texture.needsUpdate = true;
     return texture;

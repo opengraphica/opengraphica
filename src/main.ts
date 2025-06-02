@@ -4,6 +4,12 @@ import OpenGraphicaApp from '@/ui/app/app.vue';
 import appEmitter from '@/lib/emitter';
 import { registerApp } from '@/composables/app-plugin';
 
+declare global {
+    interface Window {
+        debugImage: (image: HTMLImageElement | HTMLCanvasElement | ImageBitmap | null) => void;
+    }
+}
+
 import('@/lib/keyboard');
 
 export interface OpenGraphica extends App<Element> {

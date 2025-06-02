@@ -140,6 +140,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
             viewDirtyTrail = true;
         };
 
+        let timelineCursor = 0;
         const renderLoop = () => {
             if (!this.rendererBackend) return;
             const isViewDirty = canvasStore.get('viewDirty');
@@ -162,18 +163,19 @@ export class Webgl2RenderFrontend implements RendererFrontend {
                 }
             }
 
+            
             if (isPlayingAnimation) {
                 this.rendererBackend.dirty = true;
                 const now = performance.now();
                 const { timelinePlayStartTime, timelineStart, timelineEnd } = editorStore.state;
                 const timelineRange = timelineEnd - timelineStart;
-                const cursor = ((now - timelinePlayStartTime) % timelineRange) + timelineStart;
-                editorStore.dispatch('setTimelineCursor', cursor);
+                timelineCursor = ((now - timelinePlayStartTime) % timelineRange) + timelineStart;
+                editorStore.dispatch('setTimelineCursor', timelineCursor);
             }
 
             if (this.rendererBackend.dirty) {
                 canvasStore.set('dirty', false);
-                this.rendererBackend.render();
+                this.rendererBackend.render(timelineCursor);
             }
             requestAnimationFrame(renderLoop);
         };

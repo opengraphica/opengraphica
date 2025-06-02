@@ -75,7 +75,7 @@ export class Webgl2RendererBackend {
     meshControllersById: Map<number, Webgl2RendererMeshController> = new Map();
 
     queueCreateLayerPassesTimeoutHandle: number | undefined;
-    beforeRenderCallbacks: Array<() => void> = [];
+    beforeRenderCallbacks: Array<(timelineCursor: number) => void> = [];
 
     compositorBrushStrokes = new Map<number, number>();
 
@@ -120,7 +120,7 @@ export class Webgl2RendererBackend {
 
         await this.resize(imageWidth, imageHeight, viewWidth, viewHeight);
 
-        this.render();
+        this.render(0);
     }
 
     async resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number) {
@@ -307,22 +307,22 @@ export class Webgl2RendererBackend {
         this.dirty = true;
     }
 
-    registerBeforeRenderCallback(callback: () => void) {
+    registerBeforeRenderCallback(callback: (timelineCursor: number) => void) {
         this.beforeRenderCallbacks.push(callback);
     }
 
-    unregisterBeforeRenderCallback(callback: () => void) {
+    unregisterBeforeRenderCallback(callback: (timelineCursor: number) => void) {
         let index = this.beforeRenderCallbacks.indexOf(callback);
         if (index > -1) {
             this.beforeRenderCallbacks.splice(index, 1);
         }
     }
 
-    render() {
+    render(timelineCursor: number) {
         if (!this.camera || this.rendererBusy) return;
 
         for (const callback of this.beforeRenderCallbacks) {
-            callback();
+            callback(timelineCursor);
         }
 
         this.camera.matrix = this.viewTransform.clone().invert().multiply(new Matrix4().makeTranslation(0, 0, 1));

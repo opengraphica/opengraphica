@@ -3,13 +3,14 @@
  * It can run in the main thread or a worker.
  */
 
+import { CanvasTexture } from 'three/src/textures/CanvasTexture';
 import { ImagePlaneGeometry } from '@/renderers/webgl2/geometries/image-plane-geometry';
 import { Matrix4 } from 'three/src/math/Matrix4';
 import { Mesh } from 'three/src/objects/Mesh';
 import { Texture } from 'three/src/textures/Texture';
 import { Vector2 } from 'three/src/math/Vector2';
 
-import { getWebgl2RendererBackend, markRenderDirty, requestFrontendBitmap } from '@/renderers/webgl2/backend';
+import { createCanvasTexture, getWebgl2RendererBackend, markRenderDirty, requestFrontendBitmap } from '@/renderers/webgl2/backend';
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
 import { createCanvasFiltersFromLayerConfig } from '../base/material';
 import { assignMaterialBlendingMode } from '../base/blending-mode';
@@ -18,7 +19,8 @@ import { createRasterMaterial, disposeRasterMaterial, updateRasterMaterial } fro
 import type { Scene, ShaderMaterial } from 'three';
 import type {
     Webgl2RendererCanvasFilter, Webgl2RendererMeshController,
-    WorkingFileLayerBlendingMode, WorkingFileRasterSequenceLayer, WorkingFileLayerFilter
+    WorkingFileLayerBlendingMode, WorkingFileRasterSequenceLayer, WorkingFileLayerFilter,
+    WorkingFileRasterSequenceLayerFrame
 } from '@/types';
 
 export class RasterSequenceLayerMeshController implements Webgl2RendererMeshController {
@@ -31,8 +33,13 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
     sourceTextureCanvas: InstanceType<typeof HTMLCanvasElement | typeof OffscreenCanvas> | undefined;
     sourceTextureCtx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | undefined;
 
+    requestedSourceUuids = new Set<string>();
+    sourceBitmaps = new Map<string, ImageBitmap>();
+    lastDrawnSourceUuid: string = '';
+
     id: number = -1;
     blendingMode: WorkingFileLayerBlendingMode = 'normal';
+    data: WorkingFileRasterSequenceLayer['data'] | undefined = undefined;
     filters: Webgl2RendererCanvasFilter[] = [];
     filtersOverride: Webgl2RendererCanvasFilter[] | undefined = undefined;
     sourceUuid: string | undefined;
@@ -56,11 +63,17 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
             this.sourceTextureCanvas = new OffscreenCanvas(10, 10);
         } else {
             this.sourceTextureCanvas = document.createElement('canvas');
+            this.sourceTextureCanvas.width = 256;
+            this.sourceTextureCanvas.height = 256;
         }
         this.sourceTextureCtx = this.sourceTextureCanvas.getContext('2d') || undefined;
         if (this.sourceTextureCtx) {
             this.sourceTextureCtx.imageSmoothingEnabled = false;
         }
+        this.sourceTexture = createCanvasTexture(this.sourceTextureCanvas);
+
+        this.beforeRender = this.beforeRender.bind(this);
+        backend.registerBeforeRenderCallback(this.beforeRender);
 
         this.readBufferTextureUpdate = this.readBufferTextureUpdate.bind(this);
         messageBus.on('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
@@ -99,7 +112,7 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
                 } else {
                     await updateRasterMaterial(this.material, {
                         srcTexture: this.sourceTexture,
-                    })
+                    });
                 }
                 this.plane && (this.plane.material = this.material);
                 this.materialUpdates.pop();
@@ -119,8 +132,8 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
     }
 
     async updateData(data: WorkingFileRasterSequenceLayer['data']) {
-        if (!this.sourceTextureCtx) return;
-        // data.sequence[0].image.
+        this.data = data;
+        await this.scheduleMaterialUpdate('update');
     }
 
     async updateFilters(filters: WorkingFileLayerFilter[]) {
@@ -159,6 +172,52 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
         this.plane && (this.plane.visible = this.visibleOverride ?? this.visible);
         if (this.plane?.visible !== oldVisibility) {
             markRenderDirty();
+        }
+    }
+
+    beforeRender(timelineCursor: number) {
+        if (!this.data || !this.sourceTextureCtx) return;
+
+        // TODO - find the current frame in a way that doesn't potentially loop through all frames.
+        let currentFrame: WorkingFileRasterSequenceLayerFrame | undefined;
+        for (let frame of this.data.sequence) {
+            if (timelineCursor >= frame.start && timelineCursor < frame.end) {
+                currentFrame = frame;
+                break;
+            }
+        }
+        if (!currentFrame?.image?.sourceUuid) return;
+
+        const sourceUuid = currentFrame.image.sourceUuid;
+        if (!this.sourceBitmaps.has(sourceUuid) && !this.requestedSourceUuids.has(sourceUuid)) {
+            this.requestedSourceUuids.add(sourceUuid);
+            requestFrontendBitmap(sourceUuid).then((bitmap) => {
+                this.requestedSourceUuids.delete(sourceUuid);
+                if (bitmap) {
+                    this.sourceBitmaps.set(sourceUuid, bitmap);
+                    if (this.sourceTextureCanvas && this.sourceTexture) {
+                        if (this.sourceTextureCanvas.width !== bitmap.width || this.sourceTextureCanvas.height !== bitmap.height) {
+                            this.sourceTextureCanvas.width = bitmap.width;
+                            this.sourceTextureCanvas.height = bitmap.height;
+                            this.sourceTexture?.dispose();
+                            this.sourceTexture = createCanvasTexture(this.sourceTextureCanvas);
+                        }
+                    }
+                }
+            });   
+        }
+        if (this.lastDrawnSourceUuid !== currentFrame.image.sourceUuid) {
+            const bitmap = this.sourceBitmaps.get(sourceUuid);
+            if (bitmap && this.sourceTexture) {
+                this.sourceTextureCtx.save();
+                this.sourceTextureCtx.translate(0, bitmap.height / 2);
+                this.sourceTextureCtx.scale(1, -1);
+                this.sourceTextureCtx.translate(0, -bitmap.height / 2);
+                this.sourceTextureCtx.drawImage(bitmap, 0, 0);
+                this.sourceTextureCtx.restore();
+                this.lastDrawnSourceUuid = currentFrame.image.sourceUuid;
+                this.sourceTexture.needsUpdate = true;
+            }
         }
     }
 
@@ -202,8 +261,16 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
     detach() {
         const backend = getWebgl2RendererBackend();
         backend.removeMeshController(this.id);
+        backend.unregisterBeforeRenderCallback(this.beforeRender);
 
         messageBus.off('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
+
+        this.requestedSourceUuids.clear();
+        for (const bitmap of this.sourceBitmaps.values()) {
+            bitmap.close();
+        }
+        this.sourceBitmaps.clear();
+        this.lastDrawnSourceUuid = '';
 
         this.planeGeometry?.dispose();
         this.planeGeometry = undefined;

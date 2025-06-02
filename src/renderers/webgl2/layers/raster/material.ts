@@ -5,7 +5,7 @@ import rasterMaterialVertexShaderSetup from './shader/setup.vert';
 import rasterMaterialVertexShaderMain from './shader/main.vert';
 import rasterMaterialFragmentShaderSetup from './shader/setup.frag';
 import rasterMaterialFragmentShaderMain from './shader/main.frag';
-import { createLayerShader, createLayerShaderUniformsAndDefines } from '../base/material';
+import { createLayerShader } from '../base/material';
 
 import type { Texture } from 'three/src/textures/Texture';
 import type { Webgl2RendererCanvasFilter } from '@/types';
