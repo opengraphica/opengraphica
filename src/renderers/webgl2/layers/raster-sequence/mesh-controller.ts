@@ -204,7 +204,7 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
                         }
                     }
                 }
-            });   
+            });
         }
         if (this.lastDrawnSourceUuid !== currentFrame.image.sourceUuid) {
             const bitmap = this.sourceBitmaps.get(sourceUuid);
