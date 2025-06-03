@@ -130,6 +130,7 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
                 tileTexture.dispose();
             }
             markRenderDirty();
+            this.queueRegenerateThumbnail();
         } else {
             this.sourceUuid = data.sourceUuid;
             this.isRequestingSourceTexture = true;
