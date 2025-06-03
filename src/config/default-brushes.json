@@ -1,11 +1,81 @@
 {
-    "simple": {
-        "name": "brushCategory.simple.name",
-        "brushes": {
-            "circle": {
-                "name": "brushCategory.simple.brushes.circle.name",
-                "shape": "M 1,0.5 A 0.5,0.5 0 0 1 0.5,1 0.5,0.5 0 0 1 0,0.5 0.5,0.5 0 0 1 0.5,0 0.5,0.5 0 0 1 1,0.5 Z"
-            }
+    "categories": [
+        { "id": "simple", "icon": "bi bi-diamond-fill" },
+        { "id": "custom", "icon": "bi bi-tools" }
+    ],
+    "brushes": [
+        {
+            "id": "simplePen",
+            "categories": ["simple"],
+            "shape": "M 1,0.5 A 0.5,0.5 0 0 1 0.5,1 0.5,0.5 0 0 1 0,0.5 0.5,0.5 0 0 1 0.5,0 0.5,0.5 0 0 1 1,0.5 Z",
+            "hardness": 1,
+            "spacing": 0.05,
+            "jitter": 0,
+            "angle": 0,
+            "pressureTaper": 1,
+            "pressureMinSize": 0,
+            "density": 1,
+            "pressureMinDensity": 1,
+            "colorBlendingStrength": 0,
+            "pressureMinColorBlendingStrength": 0,
+            "colorBlendingPersistence": 0,
+            "concentration": 1,
+            "pressureMinConcentration": 1
+        },
+        {
+            "id": "simplePaintBrush",
+            "categories": ["simple"],
+            "shape": "M 1,0.5 A 0.5,0.5 0 0 1 0.5,1 0.5,0.5 0 0 1 0,0.5 0.5,0.5 0 0 1 0.5,0 0.5,0.5 0 0 1 1,0.5 Z",
+            "hardness": 1,
+            "spacing": 0.05,
+            "jitter": 0,
+            "angle": 0,
+            "pressureTaper": 1,
+            "pressureMinSize": 0.5,
+            "density": 1,
+            "pressureMinDensity": 0,
+            "colorBlendingStrength": 0,
+            "pressureMinColorBlendingStrength": 0,
+            "colorBlendingPersistence": 0.5,
+            "concentration": 1,
+            "pressureMinConcentration": 1
+        },
+        {
+            "id": "simpleWaterColor",
+            "hidden": true,
+            "categories": ["simple"],
+            "shape": "M 1,0.5 A 0.5,0.5 0 0 1 0.5,1 0.5,0.5 0 0 1 0,0.5 0.5,0.5 0 0 1 0.5,0 0.5,0.5 0 0 1 1,0.5 Z",
+            "hardness": 1,
+            "spacing": 0.05,
+            "jitter": 0,
+            "angle": 0,
+            "pressureTaper": 1,
+            "pressureMinSize": 0.5,
+            "density": 1,
+            "pressureMinDensity": 0, 
+            "colorBlendingStrength": 1,
+            "pressureMinColorBlendingStrength": 0.3,
+            "colorBlendingPersistence": 0.5,
+            "concentration": 0.7,
+            "pressureMinConcentration": 0.7
+        },
+        {
+            "id": "simpleAirBrush",
+            "categories": ["simple"],
+            "shape": "M 1,0.5 A 0.5,0.5 0 0 1 0.5,1 0.5,0.5 0 0 1 0,0.5 0.5,0.5 0 0 1 0.5,0 0.5,0.5 0 0 1 1,0.5 Z",
+            "hardness": 0,
+            "spacing": 0.05,
+            "jitter": 0,
+            "angle": 0,
+            "pressureTaper": 1,
+            "pressureMinSize": 0.5,
+            "density": 1,
+            "pressureMinDensity": 0, 
+            "colorBlendingStrength": 0,
+            "pressureMinColorBlendingStrength": 0,
+            "colorBlendingPersistence": 0,
+            "concentration": 1,
+            "pressureMinConcentration": 1
         }
-    }
-}
+    ]
+}    

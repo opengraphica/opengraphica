@@ -1,3 +1,4 @@
+export * from './brush';
 export * from './canvas';
 export * from './color';
 export * from './drawable';
@@ -5,6 +6,7 @@ export * from './file-system-access';
 export * from './filter';
 export * from './keyboard-map';
 export * from './metrics';
+export * from './renderer';
 export * from './serialized-file';
 export * from './text';
 export * from './tool-layout-config';

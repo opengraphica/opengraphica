@@ -8237,7 +8237,7 @@
   --og-surface-800: #1d222d;
   --og-surface-900: #0e1014;
   --og-primary-0: white;
-  --og-primary-25: #d9ecff;
+  --og-primary-25: #e9f4ff;
   --og-primary-50: #c6e2ff;
   --og-primary-75: #b3d8ff;
   --og-primary-100: #a0cfff;
@@ -8249,6 +8249,21 @@
   --og-primary-700: #175987;
   --og-primary-800: #234362;
   --og-primary-900: #23374b;
+  --og-danger-0: white;
+  --og-danger-50: #ffd5d9;
+  --og-danger-100: #ffbfc5;
+  --og-danger-200: #ffa2a9;
+  --og-danger-300: #ff808a;
+  --og-danger-400: #fb6a76;
+  --og-danger-500: #ff5562;
+  --og-danger-600: #de3846;
+  --og-danger-700: #a61b26;
+  --og-danger-800: #721119;
+  --og-danger-900: #44070d;
+  --og-border-radius-small: 0.25rem;
+  --og-border-radius-medium: 0.5rem;
+  --og-border-radius-large: 0.75rem;
+  --og-border-radius-big: 0.875rem;
 }
 
 @font-face {
@@ -8417,6 +8432,193 @@ body.og-full-page .opengraphica {
 }
 .opengraphica .og-animate-fade-in {
   animation: og-animate-fade-in 0.2s ease-in forwards;
+}
+.opengraphica .og-button {
+  --og-button-border-radius: var(--og-border-radius-large);
+  --og-button-background: var(--og-button-base-background);
+  --og-button-border-color: var(--og-button-base-border-color);
+  --og-button-color: var(--og-button-base-color);
+  --og-button-hover-background: var(--og-button-base-hover-background);
+  --og-button-hover-border-color: var(--og-button-base-hover-border-color);
+  --og-button-hover-color: var(--og-button-base-hover-color);
+  --og-button-focus-outline-color: var(--og-button-base-focus-outline-color);
+  --og-button-pressed-background: var(--og-button-base-pressed-background);
+  --og-button-pressed-color: var(--og-button-base-pressed-color);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  box-sizing: border-box;
+  font-size: 0.875rem;
+  border: 0.0625rem solid transparent;
+  border-radius: var(--og-button-border-radius);
+  color: currentColor;
+  line-height: 1rem;
+  padding: 0.6875rem 1.25rem;
+  transition: transform 0.25s;
+  cursor: pointer;
+}
+.opengraphica .og-button:hover {
+  background-color: var(--og-button-hover-background);
+  color: var(--og-button-hover-color);
+  border-color: var(--og-button-hover-background);
+}
+.opengraphica .og-button:active {
+  transform: scale(0.97);
+}
+.opengraphica .og-button:focus-visible {
+  outline: 0.125rem solid var(--og-button-focus-outline-color);
+  outline-offset: 0.0625rem;
+}
+.opengraphica .og-button__label {
+  display: inline-flex;
+  position: relative;
+}
+.opengraphica .og-button--outline {
+  border-color: var(--og-button-border-color);
+}
+.opengraphica .og-button--outline:hover {
+  border-color: var(--og-button-hover-border-color);
+}
+.opengraphica .og-button--solid {
+  background-color: var(--og-button-background);
+  border-color: var(--og-button-background);
+  color: var(--og-button-color);
+}
+.opengraphica .og-button--solid:hover {
+  background-color: var(--og-button-hover-background);
+  border-color: var(--og-button-hover-background);
+  color: var(--og-button-hover-color);
+}
+.opengraphica .og-button--solid.og-button--outline {
+  border-color: var(--og-button-border-color);
+}
+.opengraphica .og-button--solid.og-button--outline:hover {
+  border-color: var(--og-button-hover-border-color);
+}
+.opengraphica .og-button--pressed {
+  position: relative;
+}
+.opengraphica .og-button--pressed, .opengraphica .og-button--pressed.og-button--solid, .opengraphica .og-button--pressed.og-button--outline {
+  color: var(--og-button-pressed-color);
+}
+.opengraphica .og-button--pressed:hover, .opengraphica .og-button--pressed.og-button--solid:hover, .opengraphica .og-button--pressed.og-button--outline:hover {
+  color: var(--og-button-pressed-color);
+}
+.opengraphica .og-button--pressed::before {
+  content: "";
+  background: var(--og-button-pressed-background);
+  position: absolute;
+  border-radius: calc(var(--og-button-border-radius) * 0.625);
+  top: 0.25rem;
+  bottom: 0.25rem;
+  left: 0.25rem;
+  right: 0.25rem;
+}
+.opengraphica .og-button--active {
+  outline: 0.25rem solid var(--og-button-primary-background);
+  outline-offset: 0;
+}
+.opengraphica .og-button--active:focus-visible {
+  outline: 0.25rem solid var(--og-button-primary-focus-outline-color);
+  outline-offset: 0;
+}
+.opengraphica .og-button--small {
+  --og-button-border-radius: var(--og-border-radius-medium);
+  font-size: 0.75rem;
+  line-height: 0.875rem;
+  padding: 0.5rem 0.875rem;
+}
+.opengraphica .og-button--slim {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+.opengraphica .og-button--slim.og-button--small {
+  padding-left: 0.375rem;
+  padding-right: 0.375rem;
+}
+.opengraphica .og-button--icon {
+  --og-button-border-radius: 100%;
+  padding-left: 0;
+  padding-right: 0;
+  min-width: 2.5rem;
+}
+.opengraphica .og-button--icon.og-button--small {
+  --og-button-border-radius: 100%;
+  padding-left: 0;
+  padding-right: 0;
+  min-width: 2.125rem;
+}
+.opengraphica .og-button--round {
+  --og-button-border-radius: 2rem;
+}
+.opengraphica .og-button--round.og-button--small {
+  --og-button-border-radius: 2rem;
+}
+.opengraphica .og-button--primary {
+  --og-button-background: var(--og-button-primary-background);
+  --og-button-color: var(--og-button-primary-color);
+  --og-button-hover-border-color: var(--og-button-primary-hover-border-color);
+  --og-button-hover-color: var(--og-button-primary-hover-color);
+  --og-button-focus-outline-color: var(--og-button-primary-focus-outline-color);
+}
+.opengraphica .og-button--primary.og-button--solid, .opengraphica .og-button--primary:not(.og-button--outline) {
+  --og-button-border-color: var(--og-button-primary-border-color);
+  --og-button-hover-background: var(--og-button-primary-hover-background);
+}
+.opengraphica .og-button--primary.og-button--outline {
+  --og-button-hover-background: var(--og-button-base-background);
+  --og-button-hover-color: var(--og-button-base-color);
+}
+.opengraphica .og-button--primary.og-button--outline.og-button--solid {
+  --og-button-background: var(--og-button-base-background);
+  --og-button-color: var(--og-button-base-color);
+  --og-button-border-color: var(--og-button-primary-border-color);
+  --og-button-hover-background: var(--og-button-primary-hover-background);
+  --og-button-hover-color: var(--og-button-primary-hover-color);
+}
+.opengraphica .og-button--danger {
+  --og-button-background: var(--og-button-danger-background);
+  --og-button-color: var(--og-button-danger-color);
+  --og-button-hover-border-color: var(--og-button-danger-hover-border-color);
+  --og-button-hover-color: var(--og-button-danger-hover-color);
+  --og-button-focus-outline-color: var(--og-button-danger-focus-outline-color);
+}
+.opengraphica .og-button--danger.og-button--solid, .opengraphica .og-button--danger:not(.og-button--outline) {
+  --og-button-border-color: var(--og-button-danger-border-color);
+  --og-button-hover-background: var(--og-button-danger-hover-background);
+}
+.opengraphica .og-button--danger.og-button--outline {
+  --og-button-hover-background: var(--og-button-base-background);
+  --og-button-hover-color: var(--og-button-base-color);
+}
+.opengraphica .og-button--danger.og-button--outline.og-button--solid {
+  --og-button-background: var(--og-button-base-background);
+  --og-button-color: var(--og-button-base-color);
+  --og-button-border-color: var(--og-button-danger-border-color);
+  --og-button-hover-background: var(--og-button-danger-hover-background);
+  --og-button-hover-color: var(--og-button-danger-hover-color);
+}
+.opengraphica .og-button--color-swatch {
+  background-image: url("../images/transparency-bg.png");
+  position: relative;
+  border-color: var(--og-button-swatch-background);
+  color: var(--og-button-swatch-color);
+  overflow: hidden;
+}
+.opengraphica .og-button--color-swatch::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--og-button-swatch-background);
+}
+.opengraphica .og-button--color-swatch:hover {
+  background-image: url("../images/transparency-bg.png");
+  border-color: var(--og-button-swatch-background);
+  color: var(--og-button-swatch-color);
 }
 .opengraphica .og-canvas, .opengraphica .og-post-process-canvas {
   display: block;
@@ -8766,6 +8968,31 @@ body.og-full-page .opengraphica {
   width: 100rem !important;
   max-width: 90%;
 }
+.opengraphica .og-dialogs .el-dialog--fullscreen {
+  display: flex;
+  flex-direction: column;
+  width: 100% !important;
+  max-width: 100%;
+  height: 100vh;
+  margin: 0;
+  border-radius: 0;
+}
+.opengraphica .og-dialogs .el-dialog--fullscreen .el-dialog__body {
+  flex-grow: 1;
+  overflow: hidden;
+}
+.opengraphica .og-dialogs .el-dialog--fullscreen .el-dialog__body .og-module {
+  height: 100%;
+}
+.opengraphica .og-dialogs .el-dialog--fullscreen .el-dialog__body .og-module > .el-tabs {
+  height: 100%;
+}
+.opengraphica .og-dialogs .el-dialog--fullscreen .el-dialog__body .og-module > .el-tabs > .el-tabs__content {
+  height: 100%;
+}
+.opengraphica .og-dialogs .el-dialog--fullscreen .el-dialog__body .og-module > .el-tabs > .el-tabs__content > .el-tab-pane {
+  height: 100%;
+}
 .opengraphica .og-dialogs .el-dialog {
   opacity: 1;
   transition: opacity 0.3s;
@@ -8853,6 +9080,45 @@ body.og-full-page .opengraphica {
 .opengraphica .og-dock-popover > .og-dock > .el-tabs > .el-tabs__content > .el-tab-pane > .el-scrollbar > .el-scrollbar__wrap {
   max-height: calc(100vh - 13rem) !important;
   overflow: auto !important;
+}
+.opengraphica .og-floating-docks {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 0;
+  z-index: 5;
+}
+.opengraphica .og-floating-docks .og-floating-dock {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  background: var(--og-layout-menu-bar-background-color);
+  box-shadow: 0 0 0px 1px var(--og-layout-menu-bar-border-color), 0 0.3rem 2rem var(--og-layout-menu-bar-shadow-color);
+  border-radius: var(--og-border-radius-big);
+  padding: 0;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.opengraphica .og-floating-docks .og-floating-dock.og-floating-dock--visible {
+  opacity: 1;
+}
+.opengraphica .og-floating-docks .og-floating-dock__grip {
+  display: flex;
+  align-items: center;
+  background: var(--el-bg-color-page);
+  border-radius: var(--og-border-radius-big) 0 0 var(--og-border-radius-big);
+  flex-grow: 0;
+  flex-shrink: 0;
+  padding: 0.5rem;
+  cursor: move;
+}
+.opengraphica .og-floating-docks .og-floating-dock__content {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 0.5rem 1rem 0.5rem 0.5rem;
 }
 .opengraphica .og-dnd-drop-overlay {
   background: white;
@@ -8997,7 +9263,7 @@ body.og-full-page .opengraphica {
   cursor: nwse-resize;
 }
 .opengraphica .og-layout-dnd-container > .og-layout-dnd-center > main.og-custom-cursor.og-custom-cursor--eyedropper {
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-eyedropper' viewBox='0 0 16 16'%3E%3Cpath d='M13.354.646a1.207 1.207 0 0 0-1.708 0L8.5 3.793l-.646-.647a.5.5 0 1 0-.708.708L8.293 5l-7.147 7.146A.5.5 0 0 0 1 12.5v1.793l-.854.853a.5.5 0 1 0 .708.707L1.707 15H3.5a.5.5 0 0 0 .354-.146L11 7.707l1.146 1.147a.5.5 0 0 0 .708-.708l-.647-.646 3.147-3.146a1.207 1.207 0 0 0 0-1.708zM2 12.707l7-7L10.293 7l-7 7H2z'/%3E%3C/svg%3E"), auto;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-eyedropper' viewBox='0 0 16 16'%3E%3Cpath d='M13.354.646a1.207 1.207 0 0 0-1.708 0L8.5 3.793l-.646-.647a.5.5 0 1 0-.708.708L8.293 5l-7.147 7.146A.5.5 0 0 0 1 12.5v1.793l-.854.853a.5.5 0 1 0 .708.707L1.707 15H3.5a.5.5 0 0 0 .354-.146L11 7.707l1.146 1.147a.5.5 0 0 0 .708-.708l-.647-.646 3.147-3.146a1.207 1.207 0 0 0 0-1.708zM2 12.707l7-7L10.293 7l-7 7H2z'/%3E%3C/svg%3E") 0 16, auto;
 }
 .opengraphica .og-layout-dnd-container > footer {
   flex-grow: 0;
@@ -9429,6 +9695,17 @@ body.og-full-page .opengraphica {
 .opengraphica .og-gradient-input:focus {
   border-color: var(--el-color-primary);
   outline: none;
+}
+.opengraphica .og-gradient-input .og-gradient-input__image {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  border: 0.125rem solid var(--el-input-bg-color, var(--el-fill-color-blank));
+  border-radius: 0.5rem;
+  width: 100%;
+  height: 100%;
 }
 .opengraphica .og-gradient-input--small {
   height: 2rem;
@@ -10741,7 +11018,7 @@ body.og-full-page .opengraphica {
   max-width: 100%;
   background: var(--og-layout-menu-bar-background-color);
   box-shadow: 0 0 0 0.063rem var(--og-layout-menu-bar-border-color);
-  z-index: 4;
+  z-index: 6;
 }
 @keyframes og-toolbar-overlay-fade-in {
   0% {
@@ -10926,6 +11203,98 @@ body.og-full-page .opengraphica {
   text-overflow: ellipsis;
   vertical-align: top;
   white-space: nowrap;
+}
+.opengraphica .og-brush-selector {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+}
+.opengraphica .og-brush-selector__categories {
+  display: flex;
+  flex-direction: column;
+  width: 30%;
+  max-width: 20rem;
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+.opengraphica .og-brush_selector__category-link {
+  display: block;
+  background: transparent;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 2.5rem;
+  text-align: left;
+  color: var(--og-toolbar-brush-category-link-color);
+  cursor: pointer;
+}
+.opengraphica .og-brush_selector__category-link .bi {
+  margin-right: 0.25rem;
+}
+.opengraphica .og-brush_selector__category-link:hover {
+  color: var(--og-toolbar-brush-category-link-active-color);
+}
+.opengraphica .og-brush_selector__category-link.og-brush_selector__category-link--active {
+  color: var(--og-toolbar-brush-category-link-active-color);
+}
+.opengraphica .og-brush-selector__brushes {
+  flex-grow: 1;
+}
+.opengraphica .og-brush-selector__brush {
+  display: flex;
+  padding: 0.25rem 0.25rem 0.25rem 0;
+}
+.opengraphica .og-brush-selector__brush-preview {
+  display: flex;
+  background-image: url("../images/transparency-bg.png");
+  height: 4rem;
+  border-radius: 0.25rem;
+  overflow: hidden;
+  text-align: left;
+  flex-grow: 1;
+  border: 0.25rem solid transparent;
+  position: relative;
+  cursor: pointer;
+}
+.opengraphica .og-brush-selector__brush-preview:focus-visible {
+  border-color: var(--og-toolbar-brush-preview-focus-outline-color);
+}
+.opengraphica .og-brush-selector__brush-preview.og-brush-selector__brush-preview--active {
+  border-color: var(--og-toolbar-brush-preview-focus-outline-color);
+  cursor: default;
+}
+.opengraphica .og-brush-selector__brush-preview-name {
+  display: block;
+  padding: 0 0.5rem;
+  color: var(--og-toolbar-brush-preview-name-color);
+}
+.opengraphica .og-brush-selector__brush-preview-image {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+}
+.opengraphica .og-brush-editor {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+}
+.opengraphica .og-brush-editor .el-tabs {
+  flex-grow: 1;
+}
+.opengraphica .og-brush-editor .el-tabs__content {
+  padding-left: 1rem;
+}
+.opengraphica .og-brush-editor .el-tabs__content h3 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+.opengraphica .og-brush-editor .el-form-item__label {
+  min-height: 0 !important;
 }
 .opengraphica .og-gradient-editor {
   display: block;
@@ -27721,6 +28090,29 @@ body.og-full-page .opengraphica {
   --og-layer-list-border-color: #ebeef5;
   --og-layer-list-thumbnail-border-color: #ebeef5;
   --og-layer-list-thumbnail-border-color-active: rgba(64, 158, 255, 0.6);
+  --og-button-base-background: var(--og-surface-0);
+  --og-button-base-border-color: var(--og-surface-200);
+  --og-button-base-color: var(--og-surface-400);
+  --og-button-base-hover-background: var(--og-primary-25);
+  --og-button-base-hover-border-color: var(--og-primary-50);
+  --og-button-base-hover-color: var(--og-primary-400);
+  --og-button-base-focus-outline-color: var(--og-primary-100);
+  --og-button-base-pressed-background: var(--og-primary-500);
+  --og-button-base-pressed-color: var(--og-surface-900);
+  --og-button-primary-background: var(--og-primary-500);
+  --og-button-primary-border-color: var(--og-primary-500);
+  --og-button-primary-color: var(--og-surface-0);
+  --og-button-primary-hover-background: var(--og-primary-400);
+  --og-button-primary-hover-border-color: var(--og-primary-400);
+  --og-button-primary-hover-color: var(--og-surface-0);
+  --og-button-primary-focus-outline-color: var(--og-primary-100);
+  --og-button-danger-background: var(--og-danger-500);
+  --og-button-danger-border-color: var(--og-danger-500);
+  --og-button-danger-color: var(--og-surface-0);
+  --og-button-danger-hover-background: var(--og-danger-400);
+  --og-button-danger-hover-border-color: var(--og-danger-400);
+  --og-button-danger-hover-color: var(--og-surface-0);
+  --og-button-danger-focus-outline-color: var(--og-danger-100);
   --og-popover-background-color: var(--og-surface-0);
   --og-popover-border-color: var(--og-surface-0);
   --og-popover-color: var(--og-surface-800);
@@ -27734,6 +28126,10 @@ body.og-full-page .opengraphica {
   --og-select-option-border-color: var(--og-surface-100);
   --og-select-option-hover-background-color: var(--og-surface-200);
   --og-select-option-active-color: var(--og-primary-500);
+  --og-toolbar-brush-category-link-color: var(--og-surface-800);
+  --og-toolbar-brush-category-link-active-color: var(--og-primary-500);
+  --og-toolbar-brush-preview-focus-outline-color: var(--og-primary-500);
+  --og-toolbar-brush-preview-name-color: var(--og-surface-800);
 }
 
 .opengraphica {
@@ -27923,11 +28319,6 @@ body.og-full-page .opengraphica {
 .opengraphica .el-drawer .el-drawer__body {
   position: relative;
 }
-.opengraphica .el-form--default .el-form-item .el-form-item__label,
-.opengraphica .el-form-item--default .el-form-item__label {
-  line-height: 2.5rem;
-  min-height: 2.5rem;
-}
 .opengraphica .el-form-item.el-form-item--menu-item {
   display: flex;
   padding: 0 1.25rem;
@@ -27942,6 +28333,8 @@ body.og-full-page .opengraphica {
   flex-grow: 1;
   text-align: left;
   justify-content: flex-start;
+  line-height: 2.5rem;
+  min-height: 2.5rem;
 }
 .opengraphica .el-form-item.el-form-item--menu-item > .el-form-item__content {
   flex-basis: auto;
@@ -28481,6 +28874,29 @@ body.og-full-page .opengraphica {
   --el-border-color-lighter: #1d232e;
   --el-border-color-extra-light: #F2F6FC;
   --el-bg-color: #272c37;
+  --og-button-base-background: var(--og-surface-600);
+  --og-button-base-border-color: var(--og-surface-500);
+  --og-button-base-color: var(--og-surface-0);
+  --og-button-base-hover-background: var(--og-primary-900);
+  --og-button-base-hover-border-color: var(--og-primary-700);
+  --og-button-base-hover-color: var(--og-surface-0);
+  --og-button-base-focus-outline-color: var(--og-primary-600);
+  --og-button-base-pressed-background: var(--og-primary-500);
+  --og-button-base-pressed-color: var(--og-surface-900);
+  --og-button-primary-background: var(--og-primary-500);
+  --og-button-primary-border-color: var(--og-primary-500);
+  --og-button-primary-color: var(--og-surface-900);
+  --og-button-primary-hover-background: var(--og-primary-400);
+  --og-button-primary-hover-border-color: var(--og-primary-400);
+  --og-button-primary-hover-color: var(--og-surface-900);
+  --og-button-primary-focus-outline-color: var(--og-primary-600);
+  --og-button-danger-background: var(--og-danger-500);
+  --og-button-danger-border-color: var(--og-danger-500);
+  --og-button-danger-color: var(--og-surface-900);
+  --og-button-danger-hover-background: var(--og-danger-400);
+  --og-button-danger-hover-border-color: var(--og-danger-400);
+  --og-button-danger-hover-color: var(--og-surface-900);
+  --og-button-danger-focus-outline-color: var(--og-danger-600);
   --og-popover-background-color: var(--og-surface-800);
   --og-popover-border-color: var(--og-surface-500);
   --og-popover-color: var(--og-surface-0);
@@ -28494,6 +28910,10 @@ body.og-full-page .opengraphica {
   --og-select-option-border-color: var(--og-surface-500);
   --og-select-option-hover-background-color: var(--og-surface-400);
   --og-select-option-active-color: var(--og-primary-500);
+  --og-toolbar-brush-category-link-color: var(--og-surface-0);
+  --og-toolbar-brush-category-link-active-color: var(--og-primary-500);
+  --og-toolbar-brush-preview-focus-outline-color: var(--og-primary-500);
+  --og-toolbar-brush-preview-name-color: var(--og-surface-800);
   color: var(--el-color-black);
 }
 .opengraphica .theme-dark .el-button--primary.is-plain {

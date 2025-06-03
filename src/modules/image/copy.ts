@@ -1,24 +1,63 @@
 import cloneDeep from 'lodash/cloneDeep';
+
+import { t } from '@/i18n';
+
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
-import { getStoredImageOrCanvas, createStoredImage } from '@/store/image';
+import { createStoredImage, getStoredImageCanvas, deleteStoredImage } from '@/store/image';
 import workingFileStore, { getSelectedLayers } from '@/store/working-file';
+import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset } from '@/canvas/store/selection-state';
+
 import appEmitter from '@/lib/emitter';
+import { cloneCanvas } from '@/lib/image';
 import { unexpectedErrorMessage } from '@/lib/notify';
-import { createImageFromCanvas } from '@/lib/image';
+
 import { BundleAction } from '@/actions/bundle';
 import { ClearSelectionAction } from '@/actions/clear-selection';
 import { DeleteLayersAction } from '@/actions/delete-layers';
 import { UpdateLayerAction } from '@/actions/update-layer';
-import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset, blitActiveSelectionMask } from '@/canvas/store/selection-state';
+
+import { transferRendererTilesToRasterLayerUpdates, useRenderer } from '@/renderers';
+
 import type {
-    ColorModel, UpdateAnyLayerOptions, WorkingFileRasterLayer
+    ColorModel, UpdateAnyLayerOptions,
+    WorkingFileAnyLayer,
 } from '@/types';
 
 export async function copySelectedLayers() {
-    editorStore.set('clipboardBufferLayers',
-        cloneDeep(getSelectedLayers())
-    );
+    let selectedLayers = getSelectedLayers();
+    if (selectedLayers.length === 0) {
+        appEmitter.emit('app.notify', {
+            type: 'info',
+            title: t('moduleGroup.image.modules.copy.noSelectedLayers.title'),
+            message: t('moduleGroup.image.modules.copy.noSelectedLayers.message'),
+            duration: 5000,
+        });
+        return;   
+    }
+
+    // Delete the cloned images from previous clipboard buffer layers.
+    for (const layer of editorStore.get('clipboardBufferLayers')) {
+        if (layer.type === 'raster') {
+            deleteStoredImage(layer.data.sourceUuid);
+        }
+    }
+
+    // Clone the images of clipboard buffer layers, don't want future edits to affect clipboard buffer.
+    const clipboardBufferLayers: WorkingFileAnyLayer[] = [];
+    for (const layer of getSelectedLayers()) {
+        const layerCopy = cloneDeep(layer);
+        if (layerCopy.type === 'raster') {
+            const storedImage = await getStoredImageCanvas(layerCopy.data.sourceUuid);
+            if (storedImage) {
+                const imageClone = cloneCanvas(storedImage);
+                layerCopy.data.sourceUuid = await createStoredImage(imageClone);
+            }
+        }
+        clipboardBufferLayers.push(layerCopy);
+    }
+
+    editorStore.set('clipboardBufferLayers', clipboardBufferLayers);
     const selectionMask = activeSelectionMask.value ?? appliedSelectionMask.value;
     const selectionMaskCanvasOffset = activeSelectionMask.value ? activeSelectionMaskCanvasOffset.value : appliedSelectionMaskCanvasOffset.value;
     editorStore.set('clipboardBufferSelectionMask', selectionMask);
@@ -28,7 +67,7 @@ export async function copySelectedLayers() {
         const exportResults = await exportAsImage({
             fileType: 'png',
             layerSelection: 'selected',
-            blitActiveSelectionMask: true,
+            applySelectionMask: true,
             toClipboard: true,
             generateImageHash: true
         });
@@ -48,19 +87,17 @@ export async function cutSelectedLayers() {
         const selectedLayers = getSelectedLayers();
         for (const layer of selectedLayers) {
             if (layer.type === 'raster') {
-                const rasterLayer = layer as WorkingFileRasterLayer<ColorModel>;
-                const sourceImage = getStoredImageOrCanvas(rasterLayer.data.sourceUuid);
-                if (sourceImage) {
-                    const newImage = await blitActiveSelectionMask(sourceImage, rasterLayer.transform, 'source-out');
-                    updateLayerActions.push(
-                        new UpdateLayerAction({
-                            id: rasterLayer.id,
-                            data: {
-                                sourceUuid: await createStoredImage(newImage),
-                            }
-                        })
-                    );
-                }
+                const renderer = await useRenderer();
+                const tiles = await renderer.applySelectionMaskToAlphaChannel(layer.id, { invert: true });
+                updateLayerActions.push(
+                    new UpdateLayerAction({
+                        id: layer.id,
+                        data: {
+                            tileUpdates: await transferRendererTilesToRasterLayerUpdates(tiles),
+                            alreadyRendererd: true,
+                        }
+                    })
+                );
             }
         }
         await historyStore.dispatch('runAction', {

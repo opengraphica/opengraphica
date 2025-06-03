@@ -2,11 +2,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { nextTick, watch, WatchStopHandle } from 'vue';
 
 import BaseCanvasMovementController from './base-movement';
-import { cursorHoverPosition, brushShape, brushSize } from '../store/erase-brush-state';
-import { blitActiveSelectionMask, activeSelectionMask, appliedSelectionMask } from '../store/selection-state';
 
+import { BrushStroke, type BrushStrokePoint } from '@/lib/brush-stroke';
 import appEmitter from '@/lib/emitter';
-import { isOffscreenCanvasSupported } from '@/lib/feature-detection';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import { createImageFromBlob, createEmptyCanvasWith2dContext } from '@/lib/image';
 import { findPointListBounds } from '@/lib/math';
@@ -14,85 +12,56 @@ import { t, tm, rt } from '@/i18n';
 
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
+import preferencesStore from '@/store/preferences';
 import { getStoredImageOrCanvas, createStoredImage, prepareStoredImageForArchival, prepareStoredImageForEditing, getStoredImageCanvas } from '@/store/image';
 import historyStore, { createHistoryReserveToken, historyReserveQueueFree, historyBlockInteractionUntilComplete } from '@/store/history';
 import workingFileStore, { getSelectedLayers, getLayerById, getLayerGlobalTransform } from '@/store/working-file';
+import {
+    showBrushDrawer,
+    cursorHoverPosition, brushShape, brushSpacing, brushSize, brushOpacity,
+    brushHardness, brushPressureMinSize, brushPressureTaper,
+    brushDensity, brushPressureMinDensity, brushSmoothing, brushJitter,
+} from '../store/erase-brush-state';
+import { blitActiveSelectionMask, activeSelectionMask, appliedSelectionMask } from '../store/selection-state';
 
 import DrawableCanvas from '@/canvas/renderers/drawable/canvas';
-import { prepareTextureCompositor } from '@/workers/texture-compositor.interface';
 
 import type { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { UpdateLayerAction } from '@/actions/update-layer';
 
-import type { UpdateRasterLayerOptions, WorkingFileAnyLayer } from '@/types';
-import type { BrushStrokeData } from '@/canvas/drawables/brush-stroke';
+import { useRenderer, transferRendererTilesToRasterLayerUpdates } from '@/renderers';
+
+import type { RendererFrontend, RendererTextureTile, UpdateRasterLayerOptions, WorkingFileAnyLayer } from '@/types';
 
 const devicePixelRatio = window.devicePixelRatio || 1;
 
 export default class CanvasEraseController extends BaseCanvasMovementController {
 
-    private brushShapeUnwatch: WatchStopHandle | null = null;
     private brushSizeUnwatch: WatchStopHandle | null = null;
     private selectedLayerIdsUnwatch: WatchStopHandle | null = null;
+    private pointerPenMaxPressureMarginUnwatch: WatchStopHandle | null = null;
+
+    private renderer: RendererFrontend | null = null;
 
     private erasingPointerId: number | null = null;
+    private erasingUsePressure: boolean = false;
     private erasingOnLayers: WorkingFileAnyLayer[] = [];
-    private erasingPoints: DOMPoint[] = [];
+    private erasingBrushStroke: BrushStroke | null = null;
 
-    private activeDraftUuid: string | null = null;
-    private drawablePreviewCanvas: DrawableCanvas | null = null;
-    private brushStrokeDrawableUuid: string | null = null;
+    private eraseLoopDeltaAccumulator: number = 0;
+    private eraseLoopLastRunTimestamp: number = 0;
+    private eraseLoopLastPointerMoveTimestamp: number = 0;
 
-    private brushShapeImage: HTMLImageElement | null = null;
+    private pointerPenMaxPressureMargin: number = 0;
 
     onEnter(): void {
         super.onEnter();
 
-        isOffscreenCanvasSupported().then((isSupported) => {
-            isSupported && prepareTextureCompositor();
-        });
-
-        this.drawablePreviewCanvas = new DrawableCanvas({ scale: 1 });
-        this.drawablePreviewCanvas.onDrawn((event) => {
-            if (this.activeDraftUuid == null) return;
-            for (const layer of this.erasingOnLayers) {
-                const draftIndex = layer.drafts?.findIndex((draft) => draft.uuid === this.activeDraftUuid) ?? -1;
-                if (!layer.drafts?.[draftIndex]) continue;
-                if (layer.type !== 'raster') continue;
-
-                const { logicalWidth, logicalHeight, width, height } = layer.drafts[draftIndex];
-
-                // Transform layer content to the view of the draft preview
-                const draftTransform = new DOMMatrix()
-                    .scaleSelf(logicalWidth / width, logicalHeight / height)
-                    .multiplySelf(layer.transform);
-
-                // Draw current layer on draft preview
-                const { canvas: draftCanvas, ctx: draftCtx } = createEmptyCanvasWith2dContext(event.canvas.width, event.canvas.height);
-                if (!draftCtx) continue;
-                draftCtx.globalCompositeOperation = 'copy';
-                draftCtx.save();
-                draftCtx.translate(-event.sourceX, -event.sourceY);
-                draftCtx.transform(draftTransform.a, draftTransform.b, draftTransform.c, draftTransform.d, draftTransform.e, draftTransform.f);
-                draftCtx.drawImage(getStoredImageOrCanvas(layer.data.sourceUuid)!, 0, 0);
-                draftCtx.restore();
-                draftCtx.globalCompositeOperation = 'destination-out';
-                draftCtx.drawImage(event.canvas, 0, 0);
-                draftCtx.globalCompositeOperation = 'source-over';
-
-                layer.drafts[draftIndex].updateChunks.push({
-                    x: event.sourceX,
-                    y: event.sourceY,
-                    data: draftCanvas,
-                    mode: 'replace',
-                });
-                layer.drafts[draftIndex].lastUpdateTimestamp = window.performance.now();
-            }
-            canvasStore.set('dirty', true);
-        });
-        this.drawablePreviewCanvas.add<BrushStrokeData>('brushStroke', { smoothing: 1 }).then((uuid) => {
-            this.brushStrokeDrawableUuid = uuid;
+        this.eraseLoop = this.eraseLoop.bind(this);
+        
+        useRenderer().then((renderer) => {
+            this.renderer = renderer;
         });
 
         this.selectedLayerIdsUnwatch = watch(() => workingFileStore.state.selectedLayerIds, (newIds, oldIds) => {
@@ -111,19 +80,8 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
             }
         }, { immediate: true });
 
-        this.brushShapeUnwatch = watch([brushShape], async ([brushShape]) => {
-            if (this.brushShapeImage) {
-                URL.revokeObjectURL(this.brushShapeImage.src);
-                this.brushShapeImage = null;
-            }
-            const svg = `
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    width="3"
-                    height="3"
-                    viewBox="-1 -1 3 3">
-                    <path d="${brushShape}" fill="#000000" />
-                </svg>`;
-            this.brushShapeImage = await createImageFromBlob(new Blob([svg], { type: 'image/svg+xml' }));
+        this.pointerPenMaxPressureMarginUnwatch = watch(() => preferencesStore.state.pointerPenMaxPressureMargin, (pointerPenMaxPressureMargin) => {
+            this.pointerPenMaxPressureMargin = pointerPenMaxPressureMargin;
         }, { immediate: true });
         
         cursorHoverPosition.value = new DOMPoint(
@@ -153,15 +111,14 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
     onLeave(): void {
         super.onLeave();
 
-        this.drawablePreviewCanvas?.dispose();
-        this.drawablePreviewCanvas = null;
+        showBrushDrawer.value = false;
 
-        this.brushShapeUnwatch?.();
-        this.brushShapeUnwatch = null;
         this.brushSizeUnwatch?.();
         this.brushSizeUnwatch = null;
         this.selectedLayerIdsUnwatch?.();
         this.selectedLayerIdsUnwatch = null;
+        this.pointerPenMaxPressureMarginUnwatch?.();
+        this.pointerPenMaxPressureMarginUnwatch = null;
 
         for (const layer of getSelectedLayers()) {
             if (layer.type === 'raster') {
@@ -188,65 +145,44 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
             ).matrixTransform(canvasStore.state.transform.inverse());
         }
 
+        const hasPressure = (e.pointerType === 'pen' || e.pointerType === 'touch') && e.pressure !== 0.5 && e.pressure !== 1.0;
         if (
             this.erasingPointerId == null && e.isPrimary && e.button === 0 &&
             (
                 e.pointerType === 'pen' ||
-                e.pointerType === 'touch' ||
+                (e.pointerType === 'touch' && hasPressure) ||
                 (!editorStore.state.isPenUser && e.pointerType === 'mouse')
             )
         ) {
+            if (showBrushDrawer.value) {
+                showBrushDrawer.value = false;
+                return;
+            }
+
             this.erasingPointerId = e.pointerId;
-            this.eraseStart();
+            this.eraseStart(e);
         }
     }
 
     onMultiTouchDown() {
         super.onMultiTouchDown();
-        if (this.touches.length > 1) {
+        const hasPressure = this.touches[0].down.pressure !== 0.5 && this.touches[0].down.pressure !== 1.0;
+        if (this.erasingPointerId != null || hasPressure) return;
+        if (showBrushDrawer.value) {
+            showBrushDrawer.value = false;
+            return;
+        }
+        if (this.touches.length > 1 && !this.erasingUsePressure) {
             this.erasingPointerId = null;
-            this.erasingPoints = [];
-            (async () => {
-                await historyReserveQueueFree();
-                for (const layer of getSelectedLayers()) {
-                    layer.drafts = [];
-                }
-            })();
+            this.erasingBrushStroke = null;
+        } else if (this.touches.length === 1) {
+            this.erasingPointerId = this.touches[0].id;
+            this.erasingUsePressure = false;
+            this.eraseStart(this.touches[0].down);
         }
     }
 
-    onPointerMove(e: PointerEvent): void {
-        super.onPointerMove(e);
-        const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
-
-        if (e.pointerType === 'pen' || !editorStore.state.isPenUser) {
-            cursorHoverPosition.value = new DOMPoint(
-                this.lastCursorX * devicePixelRatio,
-                this.lastCursorY * devicePixelRatio
-            ).matrixTransform(canvasStore.state.transform.inverse());
-        }
-
-        if (
-            this.erasingPointerId === e.pointerId
-        ) {
-            this.erasingPoints.push(
-                new DOMPoint(
-                    this.lastCursorX * devicePixelRatio,
-                    this.lastCursorY * devicePixelRatio
-                ).matrixTransform(canvasStore.state.transform.inverse())
-            );
-
-            this.erasePreview();
-        }
-    }
-
-    async onPointerUpBeforePurge(e: PointerEvent): Promise<void> {
-        super.onPointerUpBeforePurge(e);
-
-        this.eraseEnd(e);
-    }
-
-    protected async eraseStart() {
+    protected async eraseStart(e: PointerEvent) {
         let selectedLayers = getSelectedLayers().filter((layer) => layer.type === 'raster');
         if (selectedLayers.length === 0) {
             appEmitter.emit('app.notify', {
@@ -260,120 +196,204 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
 
         await nextTick();
 
-        // Create a draft image for each of the selected layers
-        selectedLayers = getSelectedLayers();
+        // Start a brush stroke for each of the selected layers
         this.erasingOnLayers = selectedLayers as WorkingFileAnyLayer[];
+
         for (const layer of this.erasingOnLayers) {
-            const layerGlobalTransformSelfExcluded = getLayerGlobalTransform(layer, { excludeSelf: true });
-            const viewTransform = canvasStore.get('decomposedTransform');
-            const width = workingFileStore.get('width');
-            const height = workingFileStore.get('height');
-            const logicalWidth = Math.min(width, workingFileStore.get('width') * viewTransform.scaleX);
-            const logicalHeight = Math.min(height, workingFileStore.get('height') * viewTransform.scaleY);
-            if (layer.type === 'raster') {
-                if (!layer.drafts) layer.drafts = [];
-                this.activeDraftUuid = uuidv4();
-
-                // Transform layer content to the view of the draft preview
-                const draftTransform = new DOMMatrix()
-                    .scaleSelf(logicalWidth / width, logicalHeight / height)
-                    .multiplySelf(layer.transform);
-                const transformedLayerBounds = findPointListBounds([
-                    new DOMPoint(0, 0).matrixTransform(draftTransform),
-                    new DOMPoint(layer.width, 0).matrixTransform(draftTransform),
-                    new DOMPoint(0, layer.height).matrixTransform(draftTransform),
-                    new DOMPoint(layer.width, layer.height).matrixTransform(draftTransform),
-                ]);
-                const leftBound = Math.max(0, transformedLayerBounds.left);
-                const topBound = Math.max(0, transformedLayerBounds.top);
-                const rightBound = Math.min(logicalWidth, transformedLayerBounds.right);
-                const bottomBound = Math.min(logicalHeight, transformedLayerBounds.bottom);
-
-                // Draw current layer on draft preview
-                const { canvas: draftCanvas, ctx: draftCtx } = createEmptyCanvasWith2dContext(
-                    rightBound - leftBound, bottomBound - topBound
-                );
-                if (!draftCtx) continue;
-                draftCtx.translate(-leftBound, -topBound);
-                draftCtx.transform(draftTransform.a, draftTransform.b, draftTransform.c, draftTransform.d, draftTransform.e, draftTransform.f);
-                const sourceImage = getStoredImageOrCanvas(layer.data.sourceUuid)!;
-                draftCtx.imageSmoothingEnabled = true;
-                draftCtx.drawImage(sourceImage, 0, 0);
-
-                layer.drafts.push({
-                    uuid: this.activeDraftUuid,
-                    lastUpdateTimestamp: window.performance.now(),
-                    width,
-                    height,
-                    logicalWidth,
-                    logicalHeight,
-                    mode: 'replace',
-                    transform: layerGlobalTransformSelfExcluded.inverse(),
-                    updateChunks: [{
-                        x: leftBound,
-                        y: topBound,
-                        data: draftCanvas,
-                        mode: 'replace',
-                    }],
-                });
-            }
-        }
-
-        // Populate first drawing point
-        this.erasingPoints = [
-            new DOMPoint(
-                this.lastCursorX * devicePixelRatio,
-                this.lastCursorY * devicePixelRatio
-            ).matrixTransform(canvasStore.state.transform.inverse())
-        ];
-
-        // Generate draw preview
-        this.erasePreview(true);
-    }
-
-    private erasePreview(refresh = false) {
-        if (this.erasingOnLayers.length > 0 && this.brushShapeImage) {
-
-            const points = this.erasingPoints;
-
-            const previewRatioX = Math.min(1, canvasStore.get('decomposedTransform').scaleX);
-  
-            // Draw the line to each canvas chunk
-
-            this.drawablePreviewCanvas?.setScale(previewRatioX);
-            this.drawablePreviewCanvas?.draw({
-                refresh,
-                updates: [
-                    {
-                        uuid: this.brushStrokeDrawableUuid!,
-                        data: {
-                            color: '#000000',
-                            points: points.map(point => ({
-                                x: point.x,
-                                y: point.y,
-                                size: brushSize.value,
-                                tiltX: 0,
-                                tiltY: 0,
-                                twist: 0,
-                            }))
-                        } as BrushStrokeData,
-                    }
-                ],
+            await this.renderer?.startBrushStroke({
+                layerId: layer.id,
+                blendingMode: 'erase',
+                size: brushSize.value,
+                color: new Float16Array([1, 1, 1, brushOpacity.value]),
+                hardness: brushHardness.value,
+                colorBlendingPersistence: 0,
             });
         }
+
+        // Populate first erasing point
+        const transformedPoint = new DOMPoint(
+            this.lastCursorX * devicePixelRatio,
+            this.lastCursorY * devicePixelRatio
+        ).matrixTransform(canvasStore.state.transform.inverse())
+        const pressure = this.erasingUsePressure ? Math.min(1, (e.pressure) / (1 - this.pointerPenMaxPressureMargin)) : 1;
+        const size = brushSize.value * (
+            brushPressureMinSize.value + (1 - brushPressureMinSize.value) * Math.pow(pressure, brushPressureTaper.value)
+        );
+        const density = this.calculateDensity(pressure, size);
+        this.erasingBrushStroke = new BrushStroke(
+            brushSmoothing.value,
+            brushSpacing.value,
+            brushJitter.value,
+            {
+                x: transformedPoint.x,
+                y: transformedPoint.y,
+                density,
+                colorBlendingStrength: 0,
+                concentration: 1,
+                size,
+                tiltX: 0,
+                tiltY: 0,
+                twist: 0,
+            }
+        );
+
+        // Draw first point
+        for (const layer of this.erasingOnLayers) {
+            this.renderer?.moveBrushStroke(
+                layer.id,
+                transformedPoint.x,
+                transformedPoint.y,
+                size,
+                density,
+                0,
+                1,
+            );
+        }
+
+        window.requestAnimationFrame(this.eraseLoop);
+    }
+
+    onPointerMove(e: PointerEvent): void {
+        super.onPointerMove(e);
+        const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
+
+        if (e.pointerType === 'pen' || !editorStore.state.isPenUser) {
+            cursorHoverPosition.value = new DOMPoint(
+                this.lastCursorX * devicePixelRatio,
+                this.lastCursorY * devicePixelRatio
+            ).matrixTransform(canvasStore.state.transform.inverse());
+        }
+
+        const now = performance.now();
+        if (
+            this.erasingPointerId === e.pointerId
+        ) {
+            const transformedPoint = new DOMPoint(
+                this.lastCursorX * devicePixelRatio,
+                this.lastCursorY * devicePixelRatio
+            ).matrixTransform(canvasStore.state.transform.inverse());
+
+            const pressure = this.erasingUsePressure ? Math.min(1, (e.pressure) / (1 - this.pointerPenMaxPressureMargin)) : 1;
+            const size = brushSize.value * (
+                brushPressureMinSize.value + (1 - brushPressureMinSize.value) * Math.pow(pressure, brushPressureTaper.value)
+            );
+            const density = this.calculateDensity(pressure, size);
+
+            this.erasingBrushStroke?.addPoint({
+                x: transformedPoint.x,
+                y: transformedPoint.y,
+                density,
+                colorBlendingStrength: 0,
+                concentration: 1,
+                size,
+                tiltX: e.tiltX,
+                tiltY: e.tiltY,
+                twist: e.twist,
+            });
+            this.eraseLoopLastPointerMoveTimestamp = performance.now();
+        }
+    }
+
+    private eraseLoop() {
+        if (!this.erasingBrushStroke) return;
+
+        const now = performance.now();
+
+        let point: BrushStrokePoint | undefined;
+        let count = 0;
+        while (this.erasingBrushStroke.hasCollectedPoints()) {
+            point = this.erasingBrushStroke.retrieveCatmullRomSegmentPoint();
+            if (!point) continue;
+            count++;
+            this.eraseLoopDeltaAccumulator = 0;
+            for (const layer of this.erasingOnLayers) {
+                this.renderer?.moveBrushStroke(
+                    layer.id,
+                    point.x,
+                    point.y,
+                    point.size,
+                    point.density,
+                    point.colorBlendingStrength,
+                    point.concentration,
+                );
+            }
+
+            if (count > 60) break;
+        }
+        
+        if (now - this.eraseLoopLastPointerMoveTimestamp > 25) {
+            this.eraseLoopDeltaAccumulator += now - this.eraseLoopLastRunTimestamp;
+
+            if (this.eraseLoopDeltaAccumulator > 16.66) {
+                this.eraseLoopDeltaAccumulator -= 16.66;
+                this.erasingBrushStroke.advanceLine();
+
+                if (this.eraseLoopDeltaAccumulator > 16.66 * 6) {
+                    this.eraseLoopDeltaAccumulator = 0;
+                }
+            }
+        }
+        this.eraseLoopLastRunTimestamp = now;
+
+        window.requestAnimationFrame(this.eraseLoop);
+    }
+
+    async onPointerUpBeforePurge(e: PointerEvent): Promise<void> {
+        super.onPointerUpBeforePurge(e);
+
+        this.eraseEnd(e);
     }
 
     private async eraseEnd(e: PointerEvent) {
         if (this.erasingPointerId === e.pointerId) {
-            const points = this.erasingPoints.slice();
-            const erasingOnLayers = this.erasingOnLayers.slice();
-            const updateHistoryStartTimestamp = window.performance.now();
-            const draftId = this.activeDraftUuid;
-
-            this.erasingPoints = [];
-            this.erasingOnLayers = [];
             this.erasingPointerId = null;
-            this.activeDraftUuid = null;
+
+            const collectedTiles: Array<Promise<Array<RendererTextureTile>>> = [];
+
+            if (this.erasingBrushStroke && this.renderer) {
+                this.erasingBrushStroke.finalizeLine();
+                let point: BrushStrokePoint | undefined;
+                while (this.erasingBrushStroke.hasCollectedPoints()) {
+                    point = this.erasingBrushStroke.retrieveCatmullRomSegmentPoint();
+                    if (!point) continue;
+                    for (const layer of this.erasingOnLayers) {
+                        this.renderer.moveBrushStroke(
+                            layer.id,
+                            point.x,
+                            point.y,
+                            point.size,
+                            point.density,
+                            point.colorBlendingStrength,
+                            point.concentration,
+                        );
+                    }
+                }
+                while (point = this.erasingBrushStroke.retrieveFinalPoints()) {
+                    for (const layer of this.erasingOnLayers) {
+                        this.renderer.moveBrushStroke(
+                            layer.id,
+                            point.x,
+                            point.y,
+                            point.size,
+                            point.density,
+                            point.colorBlendingStrength,
+                            point.concentration,
+                        );
+                    }
+                }
+
+                for (const layer of this.erasingOnLayers) {
+                    collectedTiles.push(
+                        this.renderer.stopBrushStroke(
+                            layer.id,
+                        )
+                    );
+                }
+            }
+
+            const erasingOnLayers = this.erasingOnLayers.slice();
+            this.erasingBrushStroke = null;
+            this.erasingOnLayers = [];
 
             const updateLayerReserveToken = createHistoryReserveToken();
 
@@ -383,79 +403,21 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
 
             const layerActions: BaseAction[] = [];
 
-            for (const layer of erasingOnLayers) {
+            for (const [layerIndex, layer] of erasingOnLayers.entries()) {
                 if (layer.type === 'raster') {
-                    // TODO - START - This is fairly slow, speed it up?
 
-                    const layerGlobalTransform = getLayerGlobalTransform(layer);
+                    layerActions.push(
+                        new UpdateLayerAction<UpdateRasterLayerOptions>({
+                            id: layer.id,
+                            data: {
+                                tileUpdates: await transferRendererTilesToRasterLayerUpdates(
+                                    await collectedTiles[layerIndex],
+                                ),
+                                alreadyRendererd: true,
+                            }
+                        })
+                    );
 
-                    const layerTransform = new DOMMatrix().multiply(layerGlobalTransform.inverse());
-
-                    let drawableCanvas = new DrawableCanvas({ forceDrawOnMainThread: true, scale: 1 });
-                    let layerUpdateCanvas: HTMLCanvasElement | undefined = undefined;
-                    let sourceX = 0;
-                    let sourceY = 0;
-                    try {
-                        await drawableCanvas.initialized();
-                        const brushStrokeUuid = await drawableCanvas.add('brushStroke');
-                        await drawableCanvas.draw({
-                            refresh: true,
-                            transform: layerTransform,
-                            updates: [
-                                {
-                                    uuid: brushStrokeUuid,
-                                    data: {
-                                        color: '#000000',
-                                        points: points.map(point => ({
-                                            x: point.x,
-                                            y: point.y,
-                                            size: brushSize.value,
-                                            tiltX: 0,
-                                            tiltY: 0,
-                                            twist: 0,
-                                        }))
-                                    } as BrushStrokeData,
-                                }
-                            ],
-                        });
-                        ({ canvas: layerUpdateCanvas, sourceX, sourceY } = await drawableCanvas.drawComplete());
-                    } catch (error) {
-                        console.error(error);
-                    }
-                    drawableCanvas.dispose();
-                    
-                    if (layerUpdateCanvas) {
-                        if (activeSelectionMask.value || appliedSelectionMask.value) {
-                            const layerGlobalTransform = getLayerGlobalTransform(layer.id);
-                            const layerTransform = new DOMMatrix().multiplySelf(layerGlobalTransform).translateSelf(sourceX, sourceY);
-                            layerUpdateCanvas = await blitActiveSelectionMask(layerUpdateCanvas, layerTransform);
-                        }
-
-                        const { canvas: eraseCanvas, ctx: eraseCtx } = createEmptyCanvasWith2dContext(layerUpdateCanvas.width, layerUpdateCanvas.height);
-                        if (!eraseCtx) continue;
-                        eraseCtx.globalCompositeOperation = 'copy';
-                        eraseCtx.drawImage(getStoredImageOrCanvas(layer.data.sourceUuid)!, -sourceX, -sourceY);
-                        eraseCtx.globalCompositeOperation = 'destination-out';
-                        eraseCtx.drawImage(layerUpdateCanvas, 0, 0);
-                        eraseCtx.globalCompositeOperation = 'source-over';
-                        layerUpdateCanvas = eraseCanvas;
-
-                        layerActions.push(
-                            new UpdateLayerAction<UpdateRasterLayerOptions>({
-                                id: layer.id,
-                                data: {
-                                    updateChunks: [{
-                                        x: sourceX,
-                                        y: sourceY,
-                                        data: layerUpdateCanvas,
-                                        mode: 'replace',
-                                    }],
-                                }
-                            })
-                        );
-                    }
-
-                    // TODO - END - This is fairly slow, speed it up?
                 }
             }
 
@@ -467,13 +429,16 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
             } else {
                 await historyStore.dispatch('unreserve', { token: updateLayerReserveToken });
             }
-            for (const layer of erasingOnLayers) {
-                const draftIndex = layer.drafts?.findIndex((draft) => draft.uuid === draftId) ?? -1;
-                if (draftIndex > -1) {
-                    layer?.drafts?.splice(draftIndex, 1);
-                }
-            }
+
         }
+    }
+
+    private calculateDensity(pressure: number, size: number): number {
+        const pressureSmoothStep = this.erasingUsePressure ? Math.min(1, 3 * Math.pow(pressure, 2) - 2 * Math.pow(pressure, 3)) : 0.8;
+        const linearPressure = (brushPressureMinDensity.value + (brushDensity.value - brushPressureMinDensity.value) * pressureSmoothStep);
+        const stampCount = Math.min(1 / (brushSpacing.value * 2), size);
+        const stampAlpha = Math.max(1 - Math.pow(1 - linearPressure, 1 / stampCount), 1 / 255);
+        return stampAlpha;
     }
 
     protected handleCursorIcon() {

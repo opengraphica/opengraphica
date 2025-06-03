@@ -156,15 +156,15 @@ export default class GroupLayerRenderer extends BaseLayerRenderer {
         const childrenScene = this.childrenScene; // this.threejsScene ?? canvasStore.get('threejsScene');
         if (childrenScene) {
             for (const childLayer of layers) {
-                if (childLayer.renderer.threejsScene != childrenScene) {
-                    if (childLayer.renderer.isAttached) {
-                        childLayer.renderer.detach();
-                        childLayer.renderer.threejsScene = childrenScene;
-                        await childLayer.renderer.attach(childLayer);
-                    } else {
-                        childLayer.renderer.threejsScene = childrenScene;
-                    }
-                }
+                // if (childLayer.renderer.threejsScene != childrenScene) {
+                //     if (childLayer.renderer.isAttached) {
+                //         childLayer.renderer.detach();
+                //         childLayer.renderer.threejsScene = childrenScene;
+                //         await childLayer.renderer.attach(childLayer);
+                //     } else {
+                //         childLayer.renderer.threejsScene = childrenScene;
+                //     }
+                // }
             }
         }
     }

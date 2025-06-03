@@ -65,7 +65,6 @@ export class DuplicateLayerAction extends BaseAction {
             childLayers = referenceLayer.layers;
         }
         delete (layerShallowCopy as any).id;
-        delete (layerShallowCopy as any).renderer;
         delete (layerShallowCopy as any).groupId;
         delete (layerShallowCopy as any).layers;
 

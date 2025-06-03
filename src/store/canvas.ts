@@ -7,7 +7,6 @@ import type { Mesh, PlaneGeometry, ShaderMaterial, OrthographicCamera, Scene, We
 import type { EffectComposer } from '@/canvas/renderers/webgl/postprocessing/effect-composer';
 
 const imageSmoothingZoomRatio = preferencesStore.get('imageSmoothingZoomRatio');
-let nextRenderFrameCallbacks: Array<() => void> = [];
 
 interface CanvasState {
     bufferCanvas: HTMLCanvasElement;
@@ -38,10 +37,6 @@ interface CanvasState {
     threejsSelectionMask: Mesh<PlaneGeometry, ShaderMaterial> | null;
     transform: DOMMatrix;
     transformResetOptions: undefined | true | CanvasViewResetOptions;
-    useCssCanvas: boolean;
-    useCssViewport: boolean;
-    viewCanvas: HTMLCanvasElement;
-    viewCtx: CanvasRenderingContext2D | WebGLRenderingContext | WebGL2RenderingContext;
     viewDirty: boolean;
     viewHeight: number; // Maps to screen height; devicePixelRatio IS applied.
     viewWidth: number; // Maps to screen width; devicePixelRatio IS applied.
@@ -97,10 +92,6 @@ const store = new PerformantStore<CanvasStore>({
         threejsSelectionMask: null,
         transform: new DOMMatrix(),
         transformResetOptions: undefined,
-        useCssCanvas: true,
-        useCssViewport: false,
-        viewCanvas: dummyCanvas,
-        viewCtx: dummyCanvas.getContext('2d') as CanvasRenderingContext2D | WebGLRenderingContext | WebGL2RenderingContext,
         viewDirty: true,
         viewHeight: 100, // Maps to screen height; devicePixelRatio IS applied.
         viewWidth: 100, // Maps to screen width; devicePixelRatio IS applied.
@@ -112,13 +103,6 @@ const store = new PerformantStore<CanvasStore>({
             const previousDecomposedTransform = store.state.decomposedTransform;
             const decomposedTransform = decomposeMatrix(value as DOMMatrix);
             set('decomposedTransform', decomposedTransform);
-            set('useCssViewport',
-                /* store.state.renderer !== '2d' || */
-                (
-                    !preferencesStore.get('useCanvasViewport') &&
-                    !(store.get('isDisplayingNonRasterLayer') && decomposedTransform.scaleX > 1)
-                )
-            );
             set('transformResetOptions', undefined);
             const imageSmoothingZoomRatioDevice = imageSmoothingZoomRatio * window.devicePixelRatio;
             if (
@@ -136,7 +120,6 @@ const store = new PerformantStore<CanvasStore>({
             case 'setTransformTranslate':
             case 'setTransformFlipX':
             case 'setTransformFlipY':
-                const viewCanvas = store.get('viewCanvas');
                 const decomposedTransform = store.get('decomposedTransform');
                 let rotationDelta = 0;
                 let scaleDeltaX = 0;
@@ -197,35 +180,10 @@ async function getCanvasRenderingContext(canvas: HTMLCanvasElement) {
     return null;
 }
 
-function nextRenderFrame(): Promise<void>;
-function nextRenderFrame(callback: () => void): void;
-function nextRenderFrame(callback?: () => void): Promise<void> | void {
-    if (callback) {
-        nextRenderFrameCallbacks.push(callback);
-    } else {
-        return new Promise((resolve) => {
-            nextRenderFrameCallbacks.push(resolve);
-        });
-    }
-}
-
-function notifyNextRenderFrame() {
-    for (const callback of nextRenderFrameCallbacks) {
-        try {
-            callback();
-        } catch (error) {
-            console.error('[src/store/canvas.ts] Error on render frame callback:', error);
-        }
-    }
-    nextRenderFrameCallbacks = [];
-}
-
 export default store;
 
 export {
     CanvasStore,
     CanvasState,
     getCanvasRenderingContext,
-    nextRenderFrame,
-    notifyNextRenderFrame,
 };

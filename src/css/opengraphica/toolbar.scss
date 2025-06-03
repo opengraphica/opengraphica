@@ -6,7 +6,7 @@
     max-width: 100%;
     background: var(--og-layout-menu-bar-background-color);
     box-shadow: 0 0 0 0.063rem var(--og-layout-menu-bar-border-color);
-    z-index: 4;
+    z-index: 6; // Must be greater than og-floating-docks
 
     @keyframes og-toolbar-overlay-fade-in {
         0% {

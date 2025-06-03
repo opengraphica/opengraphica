@@ -2,7 +2,7 @@
     <div class="og-toolbar" :class="{ 'is-swap-in': animationSwap === 'in', 'is-swap-out': animationSwap === 'out' }" @animationend="onToolbarAnimationEnd">
         <suspense @resolve="onLoadToolbarResolve">
             <template #default>
-                <component :is="'toolbar-' + currentName" @close="onCloseToolbar" />
+                <component v-if="!isAppPreloading" :is="'toolbar-' + currentName" @close="onCloseToolbar" />
             </template>
             <template #fallback>
                 <div></div>
@@ -12,9 +12,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, defineAsyncComponent, ref, toRef, watch, onMounted, nextTick } from 'vue';
+import { defineComponent, defineAsyncComponent, onErrorCaptured, onMounted, ref, toRef, watch } from 'vue';
+import { checkUpdates } from '@/check-updates';
+import { isAppPreloading } from '@/composables/app-preload-blocker';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import editorStore from '@/store/editor';
+import appEmitter from '@/lib/emitter';
 
 export default defineComponent({
     name: 'Toolbar',
@@ -48,10 +51,16 @@ export default defineComponent({
 
         watch([toRef(props, 'name')], async () => {
             animationSwap.value = 'out';
+            appEmitter.emit('editor.tool.toolbarSwapping');
         });
 
         onMounted(() => {
             currentName.value = props.name;
+        });
+
+        onErrorCaptured((error) => {
+            checkUpdates();
+            console.error(error);
         });
 
         function onToolbarAnimationEnd() {
@@ -59,6 +68,7 @@ export default defineComponent({
                 currentName.value = props.name;
             } else if (animationSwap.value === 'in') {
                 animationSwap.value = '';
+                appEmitter.emit('app.canvas.calculateDndArea');
             }
         }
 
@@ -74,6 +84,7 @@ export default defineComponent({
         }
 
         return {
+            isAppPreloading,
             currentName,
             animationSwap,
             onLoadToolbarResolve,

@@ -1,7 +1,8 @@
 import mitt, { type Handler } from 'mitt';
+
 import type { NotificationProps, NotificationHandle } from 'element-plus/lib/components/notification/src/notification.d';
 import type { Texture } from 'three';
-import type { CanvasViewResetOptions, ModuleDefinition } from '@/types';
+import type { CanvasViewResetOptions, ModuleDefinition, WorkingFileAnyLayer } from '@/types';
 
 interface AppEmitterEvents {
     'app.canvas.calculateDndArea': undefined;
@@ -38,6 +39,7 @@ interface AppEmitterEvents {
         onSuccess?: (event?: any) => void;
         onError?: (error?: any) => void;
     },
+    'app.updateRequired': void;
     'app.wait.startBlocking': {
         id: string;
         label?: string;
@@ -50,7 +52,15 @@ interface AppEmitterEvents {
     'app.wait.stopBlocking': {
         id: string;
     };
+    'app.workingFile.detachAllLayers': undefined;
+    'app.workingFile.layerAttached': WorkingFileAnyLayer;
+    'app.workingFile.layerUpdated': WorkingFileAnyLayer;
+    'app.workingFile.layerDetached': WorkingFileAnyLayer;
     'app.workingFile.layerOrderCalculated': undefined;
+    'app.workingFile.layerReordered': {
+        layer: WorkingFileAnyLayer;
+        order: number;
+    };
     'app.workingFile.notifyImageLoadedFromClipboard': undefined;
     'app.workingFile.notifyImageLoadedFromDragAndDrop': undefined;
     'editor.history.startBlocking': {
@@ -72,6 +82,7 @@ interface AppEmitterEvents {
     'editor.tool.commitCurrentAction': undefined;
     'editor.tool.delete': undefined;
     'editor.tool.fontsLoaded': undefined;
+    'editor.tool.toolbarSwapping': undefined;
     'editor.tool.selectAll': undefined;
     'renderer.pass.readBufferTextureUpdate': Texture;
     'store.setPreference': {

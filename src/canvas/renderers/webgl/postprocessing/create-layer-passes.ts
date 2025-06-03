@@ -37,17 +37,17 @@ export function createLayerPasses(composer: EffectComposer, camera: Camera) {
                 stack.unshift(childLayer);
             }    
         }
-        if (layer.renderer) {
-            if (!noRenderPassModes.has(layer.blendingMode)) {
-                if (currentSceneIsUsed) {
-                    passScenes.push(currentScene);
-                    currentScene = new Scene();
-                    currentSceneIsUsed = false;
-                }
-            }
-            layer.renderer.swapScene(currentScene);
-            currentSceneIsUsed = true;
-        }
+        // if (layer.renderer) {
+        //     if (!noRenderPassModes.has(layer.blendingMode)) {
+        //         if (currentSceneIsUsed) {
+        //             passScenes.push(currentScene);
+        //             currentScene = new Scene();
+        //             currentSceneIsUsed = false;
+        //         }
+        //     }
+        //     layer.renderer.swapScene(currentScene);
+        //     currentSceneIsUsed = true;
+        // }
     }
     if (currentSceneIsUsed) {
         passScenes.push(currentScene);

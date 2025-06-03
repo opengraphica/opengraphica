@@ -1,15 +1,24 @@
 import { BaseAction } from './base';
-import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset, blitActiveSelectionMask } from '@/canvas/store/selection-state';
+
+import {
+    activeSelectionMask, appliedSelectionMask,
+} from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
+import { getStoredImageOrCanvas, createStoredImage } from '@/store/image';
 import workingFileStore, { getLayerById, getLayerGlobalTransform } from '@/store/working-file';
 import { updateWorkingFileLayer } from '@/store/data/working-file-database';
+
 import { ClearSelectionAction } from './clear-selection';
 import { UpdateLayerAction } from './update-layer';
-import { getStoredImageOrCanvas, createStoredImage } from '@/store/image';
+
+import { createCanvasFromImage } from '@/lib/image';
+
+import { transferRendererTilesToRasterLayerUpdates, useRenderer } from '@/renderers';
 
 import type {
     ColorModel, UpdateAnyLayerOptions, UpdateRasterLayerOptions,
     WorkingFileAnyLayer,
+    WorkingFileLayerRasterTileUpdate,
 } from '@/types';
 
 interface DeleteLayerSelectionAreaOptions {
@@ -53,34 +62,14 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
                 if (sourceImage) {
                     const selectionMask = activeSelectionMask.value ?? appliedSelectionMask.value;
                     if (!selectionMask) continue;
-                    const selectionMaskOffset = activeSelectionMask.value ? activeSelectionMaskCanvasOffset.value : appliedSelectionMaskCanvasOffset.value;
-                    const layerTransform = getLayerGlobalTransform(layer.id);
-                    const p0 = selectionMaskOffset.matrixTransform(layerTransform.inverse());
-                    const p1 = new DOMPoint(selectionMaskOffset.x + selectionMask.width, selectionMaskOffset.y).matrixTransform(layerTransform.inverse());
-                    const p2 = new DOMPoint(selectionMaskOffset.x, selectionMaskOffset.y + selectionMask.height).matrixTransform(layerTransform.inverse());
-                    const p3 = new DOMPoint(selectionMaskOffset.x + selectionMask.width, selectionMaskOffset.y + selectionMask.height).matrixTransform(layerTransform.inverse());
-                    const topLeft = new DOMPoint(Math.min(p0.x, p1.x, p2.x, p3.x), Math.min(p0.y, p1.y, p2.y, p3.y));
-                    topLeft.x = Math.max(0, Math.floor(topLeft.x - 1));
-                    topLeft.y = Math.max(0, Math.floor(topLeft.y - 1));
-                    const bottomRight = new DOMPoint(Math.max(p0.x, p1.x, p2.x, p3.x), Math.max(p0.y, p1.y, p2.y, p3.y));
-                    bottomRight.x = Math.min(sourceImage.width, Math.ceil(bottomRight.x + 1));
-                    bottomRight.y = Math.min(sourceImage.height, Math.ceil(bottomRight.y + 1));
-                    const updateChunkImage = await blitActiveSelectionMask(sourceImage, layerTransform, 'source-out', {
-                        sx: topLeft.x,
-                        sy: topLeft.y,
-                        sWidth: bottomRight.x - topLeft.x,
-                        sHeight: bottomRight.y - topLeft.y,
-                    });
+                    const renderer = await useRenderer();
+                    const tiles = await renderer.applySelectionMaskToAlphaChannel(layer.id, { invert: true });
 
                     const updateLayerAction = new UpdateLayerAction<UpdateRasterLayerOptions>({
                         id: layer.id,
                         data: {
-                            updateChunks: [{
-                                x: topLeft.x,
-                                y: topLeft.y,
-                                data: updateChunkImage,
-                                mode: 'replace',
-                            }],
+                            tileUpdates: await transferRendererTilesToRasterLayerUpdates(tiles),
+                            alreadyRendererd: true,
                         },
                     });
                     await updateLayerAction.do();
@@ -108,6 +97,7 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
             const layer = getLayerById(layerId);
             if (layer) updateWorkingFileLayer(layer);
         }
+
     }
 
     public async undo() {

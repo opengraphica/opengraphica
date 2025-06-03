@@ -19,7 +19,7 @@ export default class GroupLayerRenderer extends BaseLayerRenderer {
             if (options.force2dRenderer) {
                 new layerRenderers['2d'][layer.type]().draw(ctx, layer, options);
             } else {
-                layer.renderer.draw(ctx, layer, options);
+                // layer.renderer.draw(ctx, layer, options);
             }
         }
     }

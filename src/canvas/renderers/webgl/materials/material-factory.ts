@@ -205,7 +205,7 @@ function createMaterialWrapper<T extends MaterialType>(
                     // queuedDisposalMaterials.delete(existingUuid);
                     // return existingMaterialWrapper;
                     existingMaterial = existingMaterialWrapper.material.clone();
-                    const { uniforms } = generateShaderUniformsAndDefines(canvasFilters, layerInfo);
+                    const { uniforms } = generateShaderUniformsAndDefines(canvasFilters as any, layerInfo);
                     for (const uniformName in uniforms) {
                         existingMaterial.uniforms[uniformName] = uniforms[uniformName];
                     }

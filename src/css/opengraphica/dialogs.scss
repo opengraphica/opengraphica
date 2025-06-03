@@ -19,6 +19,36 @@
         width: 100rem !important;
         max-width: 90%;
     }
+    .el-dialog--fullscreen {
+        display: flex;
+        flex-direction: column;
+        width: 100% !important;
+        max-width: 100%;
+        height: 100vh;
+        margin: 0;
+        border-radius: 0;
+
+        .el-dialog__body {
+            flex-grow: 1;
+            overflow: hidden;
+
+            .og-module {
+                height: 100%;
+
+                > .el-tabs {
+                    height: 100%;
+
+                    > .el-tabs__content {
+                        height: 100%;
+
+                        > .el-tab-pane {
+                            height: 100%;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     .el-dialog {
         opacity: 1;

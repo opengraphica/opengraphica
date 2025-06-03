@@ -1,9 +1,10 @@
 import { ref } from 'vue';
+import { checkUpdates } from '@/check-updates';
 import { PerformantStore } from './performant-store';
 import BaseCanvasController from '@/canvas/controllers/base';
 import BaseCanvasMovementController from '@/canvas/controllers/base-movement';
 import toolGroupsConfig from '@/config/tool-groups.json';
-import { ToolGroupDefinition, WorkingFileLayer, WorkingFileGroupLayer, WorkingFileRasterSequenceLayer, ColorModel } from '@/types';
+import { ToolGroupDefinition, WorkingFileLayer, WorkingFileAnyLayer, WorkingFileGroupLayer, WorkingFileRasterSequenceLayer, ColorModel } from '@/types';
 import { loadStylesheet } from '@/lib/stylesheet';
 import canvasStore from './canvas';
 import workingFileStore from './working-file';
@@ -30,6 +31,15 @@ interface TutorialFlags {
 
 const toolGroups: { [key: string]: ToolGroupDefinition } = toolGroupsConfig as never;
 
+export interface FloatingDockRect {
+    id: string;
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+    order: number;
+}
+
 interface EditorState {
     activeMenuDrawerComponentName: string | null;
     activePopoverIds: number[],
@@ -44,11 +54,13 @@ interface EditorState {
     activeToolOverlays: string[];
     activeToolRestore: string | null;
     clipboardBufferImageHash: string | null;
-    clipboardBufferLayers: WorkingFileLayer<ColorModel>[];
+    clipboardBufferLayers: WorkingFileAnyLayer<ColorModel>[];
     clipboardBufferSelectionMask: HTMLImageElement | null;
     clipboardBufferSelectionMaskCanvasOffset: DOMPoint;
     clipboardBufferUpdateTimestamp: number;
     hasClipboardUpdateSupport: boolean;
+    floatingDocksContainer: HTMLElement | null;
+    floatingDockRects: FloatingDockRect[];
     isActiveToolbarExclusive: boolean;
     isPenUser: boolean;
     isTaskRunning: boolean;
@@ -116,6 +128,8 @@ const store = new PerformantStore<EditorStore>({
         clipboardBufferSelectionMaskCanvasOffset: new DOMPoint,
         clipboardBufferUpdateTimestamp: 0,
         hasClipboardUpdateSupport: false,
+        floatingDocksContainer: null,
+        floatingDockRects: [],
         isActiveToolbarExclusive: false,
         isPenUser: false,
         isTaskRunning: false,
@@ -208,8 +222,13 @@ const store = new PerformantStore<EditorStore>({
                     if (toolDefinition?.controller) {
                         controllerName = toolDefinition.controller;
                     }
-                    const CanvasControllerGenericClass: typeof BaseCanvasController =
-                        (await import(/* webpackChunkName: 'canvas-controller-[request]' */ `../canvas/controllers/${controllerName}.ts`)).default;
+                    const CanvasControllerGenericClass: typeof BaseCanvasController = (
+                        await import(/* webpackChunkName: 'canvas-controller-[request]' */ `../canvas/controllers/${controllerName}.ts`)
+                            .catch((error) => {
+                                checkUpdates()
+                                console.error(error);
+                            })
+                    ).default;
                     controller = new CanvasControllerGenericClass();
                     if (this.state.toolCanvasController) {
                         try {

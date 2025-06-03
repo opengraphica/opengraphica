@@ -107,10 +107,11 @@ export interface WorkingFileTimeline {
     }
 }
 
-export interface WorkingFileLayerDraftChunk {
+export interface WorkingFileLayerRasterTileUpdate {
     x: number;
     y: number;
-    data: HTMLCanvasElement;
+    oldSourceUuid?: string;
+    sourceUuid: string;
     mode?: 'replace' | 'source-over';
 }
 
@@ -122,7 +123,7 @@ export interface WorkingFileLayerDraft {
     logicalWidth: number; // The pixel width of the preview data, stretched to `width`
     mode?: 'replace' | 'source-over'; // If 'replace', the original layer contents will not be drawn while the draft is in place.
     transform: DOMMatrix; // Should be an inverse transform to undo the global transform
-    updateChunks: WorkingFileLayerDraftChunk[]; // List of canvas chunks to update a raster image preview
+    tileUpdates: WorkingFileLayerRasterTileUpdate[]; // List of canvas chunks to update a raster image preview
     width: number; // The actual width drawn across the canvas
 }
 
@@ -147,7 +148,6 @@ export interface WorkingFileLayer<T extends ColorModel = ColorModel> {
     isBaking?: boolean;
     name: string;
     opacity: 1;
-    renderer: WorkingFileLayerRenderer<T>;
     thumbnailImageSrc: string | null;
     transform: DOMMatrix;
     type: WorkingFileLayerType;
@@ -199,8 +199,9 @@ export interface WorkingFileRasterLayer<T extends ColorModel = ColorModel> exten
     type: 'raster';
     data: {
         sourceUuid?: string;
-        updateChunks?: WorkingFileLayerDraftChunk[];
-        chunkUpdateId?: string; // This value changes every chunk update to trigger a re-render
+        tileUpdates?: WorkingFileLayerRasterTileUpdate[];
+        tileUpdateId?: string; // This value changes every chunk update to trigger a re-render
+        alreadyRendererd?: boolean; // Stalls tileUpdateId generation for one update
     }
 }
 
@@ -312,7 +313,10 @@ export interface NewFilePreset {
 
 export interface WorkingFileLayerMask {
     sourceUuid: string;
-    offset: DOMPoint;
+    offset: {
+        x: number;
+        y: number;
+    };
     hash: string;
 }
 

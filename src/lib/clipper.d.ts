@@ -159,7 +159,10 @@ export class ClipperBase {
     AddPaths(ppg: Paths, polyType: PolyType, closed: boolean): boolean;
 }
 export class Clipper extends ClipperBase {
-    Execute(clipType: ClipType, solution: Paths, subjFillType: PolyFillType, clipFillType: PolyFillType): boolean;
+    static GetBounds(paths: Paths): { top: number; bottom: number; left: number; right: number };
+    static Orientation(poly: Path): boolean;
+    static PointInPolygon(point: Point, path: Path): number;
+    Execute(clipType: ClipType, solution: Paths | PolyTree, subjFillType: PolyFillType, clipFillType: PolyFillType): boolean;
 }
 export class DoublePoint {
     X: number;
@@ -204,3 +207,13 @@ export function Lighten(
     polygon: ArrayLike<IntPoint> | ArrayLike<ArrayLike<IntPoint>>,
     tolerance: number,
 ): ArrayLike<IntPoint> | ArrayLike<ArrayLike<IntPoint>>;
+
+export class PolyNode {
+    ChildCount(): number;
+    Childs(): PolyNode[];
+    Contour(): Path;
+    IsHole(): boolean;
+}
+export class PolyTree extends PolyNode {
+    
+}

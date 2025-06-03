@@ -1,7 +1,7 @@
 import { toRefs, watch, type WatchStopHandle } from 'vue';
 
 import canvasStore from '@/store/canvas';
-import { getStoredImageCanvas, getStoredImageOrCanvas } from '@/store/image';
+import { getStoredImageOrCanvas } from '@/store/image';
 
 import BaseLayerRenderer from './base';
 
@@ -37,7 +37,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
     private draftTexture: InstanceType<typeof Texture> | undefined;
     private bakedTexture: InstanceType<typeof Texture> | undefined;
     private sourceTexture: InstanceType<typeof Texture> | undefined;
-    private lastChunkUpdateId: string | undefined = undefined;
+    private lastTileUpdateId: string | undefined = undefined;
 
     private isVisible: boolean = true;
     private lastBlendingMode: WorkingFileLayerBlendingMode = 'normal';
@@ -63,7 +63,7 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
     }
 
     async onAttach(layer: WorkingFileRasterLayer<ColorModel>) {
-        this.lastChunkUpdateId = layer.data?.chunkUpdateId;
+        this.lastTileUpdateId = layer.data?.tileUpdateId;
         this.scheduleMaterialWrapperUpdate(async () => {
             return await createMaterial('raster', { srcTexture: undefined }, layer.filters, layer, layer.blendingMode);
         })
@@ -185,14 +185,16 @@ export default class RasterLayerRenderer extends BaseLayerRenderer {
             }
 
             // Only pieces of the image have updated - shortcut.
-            if (this.sourceTexture && updates.data.chunkUpdateId !== this.lastChunkUpdateId && updates.data.updateChunks) {
-                this.lastChunkUpdateId = updates.data.chunkUpdateId;
+            if (this.sourceTexture && updates.data.tileUpdateId !== this.lastTileUpdateId && updates.data.tileUpdates) {
+                this.lastTileUpdateId = updates.data.tileUpdateId;
                 const renderer = canvasStore.get('threejsRenderer');
                 if (renderer) {
                     let sourceCanvas: HTMLCanvasElement | ImageBitmap | null = null;
                     const { width: sourceWidth, height: sourceHeight } = this.sourceTexture.image;
-                    for (const updateChunk of updates.data.updateChunks) {
-                        let { x: updateX, y: updateY, data: updateCanvas } = updateChunk;
+                    for (const updateChunk of updates.data.tileUpdates) {
+                        let { x: updateX, y: updateY, sourceUuid: updateSourceUuid } = updateChunk;
+                        let updateCanvas = getStoredImageOrCanvas(updateSourceUuid);
+                        if (!updateCanvas) continue;
                         let updateWidth = updateCanvas.width;
                         let updateHeight = updateCanvas.height;
                         // Clip update data to destination image bounds, or use original image if not replace mode.

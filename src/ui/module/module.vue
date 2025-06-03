@@ -22,7 +22,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, defineAsyncComponent } from 'vue';
+import { defineComponent, defineAsyncComponent, onErrorCaptured } from 'vue';
+import { checkUpdates } from '@/check-updates';
 import ElLoading from 'element-plus/lib/components/loading/index';
 
 export default defineComponent({
@@ -31,6 +32,7 @@ export default defineComponent({
         loading: ElLoading.directive
     },
     components: {
+        'design-system': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-design-system' */ `@/ui/module/module-design-system.vue`)),
         'file-export': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-export' */ `@/ui/module/module-file-export.vue`)),
         'file-new': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-new' */ `@/ui/module/module-file-new.vue`)),
         'file-open-confirm': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-open-confirm' */ `@/ui/module/module-file-open-confirm.vue`)),
@@ -69,6 +71,11 @@ export default defineComponent({
         'close'
     ],
     setup(props, { emit }) {
+
+        onErrorCaptured((error) => {
+            checkUpdates();
+            console.error(error);
+        });
 
         function onHideModule() {
             emit('hide');

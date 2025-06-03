@@ -5,7 +5,7 @@
             <strong v-t="'app.wait.pleaseWait'"></strong>
             <template v-for="(notification, notificationId) in notifications" :key="notification">
                 <p v-if="notification.label" v-t="notification.label"></p>
-                <button v-if="notification.cancelable" type="button" size="small" class="el-button" @click="onClickCancel(notificationId)" v-t="'app.wait.cancel'"></button>
+                <button v-if="notification.cancelable" type="button" size="small" class="el-button !mt-4" @click="onClickCancel(notificationId)" v-t="'app.wait.cancel'"></button>
             </template>
         </div>
     </div>

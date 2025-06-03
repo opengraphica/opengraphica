@@ -1,5 +1,6 @@
 /**
  * Parts of this file were adapted from miniPaint
+ * @copyright (c) ViliusL
  * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
 import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
@@ -379,6 +380,7 @@ export function createEmptyCanvasWith2dContext(width: number, height: number): {
  * @param image 
  */
 interface CreateCanvasFromImageOptions {
+    transfer?: boolean;
     imageOrientation?: 'none' | 'flipY';
     width?: number;
     height?: number;
@@ -387,17 +389,23 @@ export function createCanvasFromImage(image: HTMLImageElement | ImageBitmap, opt
     let canvas = document.createElement('canvas');
     canvas.width = options?.width ?? image.width;
     canvas.height = options?.height ?? image.height;
-    const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
-    if (!ctx) throw new Error('[src/lib/image.ts] Could not create canvas context.');
-    ctx.imageSmoothingEnabled = false;
-    ctx.save();
-    if (options?.imageOrientation === 'flipY') {
-        ctx.translate(0, image.height / 2);
-        ctx.scale(1, -1);
-        ctx.translate(0, -image.height / 2);
+    if (options?.transfer) {
+        const ctx = canvas.getContext('bitmaprenderer', getCanvasRenderingContext2DSettings());
+        if (!ctx) throw new Error('[src/lib/image.ts] Could not create canvas context.');
+        ctx.transferFromImageBitmap(image as ImageBitmap);
+    } else {
+        const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
+        if (!ctx) throw new Error('[src/lib/image.ts] Could not create canvas context.');
+        ctx.imageSmoothingEnabled = false;
+        ctx.save();
+        if (options?.imageOrientation === 'flipY') {
+            ctx.translate(0, image.height / 2);
+            ctx.scale(1, -1);
+            ctx.translate(0, -image.height / 2);
+        }
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        ctx.restore();
     }
-    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-    ctx.restore();
     return canvas;
 }
 
@@ -405,7 +413,7 @@ export function cloneCanvas(canvas: HTMLCanvasElement): HTMLCanvasElement {
     let newCanvas = document.createElement('canvas');
     newCanvas.width = canvas.width;
     newCanvas.height = canvas.height;
-    const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings());
+    const ctx = newCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
     if (!ctx) throw new Error('[src/lib/image.ts] Could not clone canvas.');
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(canvas, 0, 0);

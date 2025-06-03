@@ -1,5 +1,6 @@
 /**
  * Parts of this file were adapted from miniPaint
+ * @copyright (c) ViliusL
  * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
 
@@ -10,20 +11,19 @@ import workingFileStore, {
     getLayersByType,
     ensureUniqueLayerSiblingName
 } from '@/store/working-file';
-import canvasStore, { getCanvasRenderingContext } from '@/store/canvas';
 import editorStore from '@/store/editor';
 import { createStoredImage } from '@/store/image';
 import historyStore from '@/store/history';
 
-import { drawWorkingFileToCanvas2d, drawWorkingFileToCanvasWebgl } from '@/lib/canvas';
+import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
 import { generateImageBlobHash } from '@/lib/hash';
-import { createImageFromCanvas } from '@/lib/image';
 import { knownFileExtensions } from '@/lib/regex';
 
 import { InsertLayerAction } from '@/actions/insert-layer';
 
-import { activeSelectionMask, appliedSelectionMask, blitActiveSelectionMask } from '@/canvas/store/selection-state';
-import { createLayerPasses, refreshLayerPasses } from '@/canvas/renderers/webgl/postprocessing/create-layer-passes';
+import { activeSelectionMask, appliedSelectionMask } from '@/canvas/store/selection-state';
+
+import { useRenderer } from '@/renderers';
 
 // @ts-ignore
 import GIF from '@/lib/gif.js';
@@ -39,7 +39,7 @@ export interface ExportAsImageOptions {
     fileType: 'png' | 'jpg' | 'webp' | 'gif' | 'bmp' | 'tiff',
     layerSelection?: 'all' | 'selected',
     cameraTransform?: DOMMatrix,
-    blitActiveSelectionMask?: boolean,
+    applySelectionMask?: boolean,
     quality?: number,
     toClipboard?: boolean,
     toBlob?: boolean,
@@ -81,93 +81,15 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
             canvas.width = workingFileStore.get('width');
             canvas.height = workingFileStore.get('height');
             if (!['image/gif'].includes(mimeType)) {
-                if (canvasStore.state.renderer === '2d' || options.layerSelection === 'selected') {
-                    const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
-                    ctx.imageSmoothingEnabled = false;
-                    drawWorkingFileToCanvas2d(canvas, ctx, {
-                        force2dRenderer: true,
-                        selectedLayersOnly: options.layerSelection === 'selected',
-                        initialTransform: options.cameraTransform ?? new DOMMatrix(),
-                        disableViewportTransform: true,
-                    });
-                } else {
-                    const { WebGLRenderer } = await import('three/src/renderers/WebGLRenderer');
-                    const { SRGBColorSpace } = await import('three/src/constants');
-                    const { OrthographicCamera } = await import('three/src/cameras/OrthographicCamera');
-                    const { EffectComposer } = await import('@/canvas/renderers/webgl/postprocessing/effect-composer');
-                    const { Matrix4 } = await import('three/src/math/Matrix4');
-
-                    const threejsScene = canvasStore.get('threejsScene')!;
-
-                    const width = workingFileStore.get('width');
-                    const height = workingFileStore.get('height');
-
-                    const threejsCamera = new OrthographicCamera(0, width, 0, height, 0.1, 10000);
-                    threejsCamera.position.z = 1;
-                    threejsCamera.updateProjectionMatrix();
-                    if (options.cameraTransform) {
-                        const t = options.cameraTransform;
-                        threejsCamera.projectionMatrix.multiply(
-                            new Matrix4(
-                                t.m11, t.m12, t.m13, t.m14,
-                                t.m21, t.m22, t.m23, t.m24,
-                                t.m31, t.m32, t.m33, t.m34,
-                                t.m41, t.m42, t.m43, t.m44,
-                            )
-                        )
-                    }
-
-                    const threejsRenderer = new WebGLRenderer({
-                        alpha: true,
-                        canvas: canvas,
-                        premultipliedAlpha: false,
-                        preserveDrawingBuffer: true,
-                        powerPreference: 'high-performance'
-                    });
-                    threejsRenderer.setClearColor(0x000000, 0);
-                    threejsRenderer.outputColorSpace = SRGBColorSpace;
-                    threejsRenderer.setSize(width, height);
-
-                    // const renderTarget = new WebGLRenderTarget(width, height);
-                    // threejsRenderer.setRenderTarget(renderTarget);
-
-                    const threejsComposer = new EffectComposer(threejsRenderer);
-                    createLayerPasses(threejsComposer, threejsCamera);
-                    
-                    const threejsSelectionMask = canvasStore.get('threejsSelectionMask');
-                    const selectionMaskWasVisible = !!(threejsSelectionMask?.visible);
-                    if (threejsSelectionMask) {
-                        threejsSelectionMask.visible = false;
-                    }
-
-                    drawWorkingFileToCanvasWebgl(
-                        threejsComposer,
-                        threejsRenderer,
-                        threejsScene,
-                        threejsCamera
-                    );
-
-                    if (selectionMaskWasVisible && threejsSelectionMask) {
-                        threejsSelectionMask.visible = true;
-                    }
-
-                    // const pixels = new Uint8Array(width * height * 4);
-                    // threejsRenderer.readRenderTargetPixels(renderTarget, 0, 0, width, height, pixels);
-
-                    threejsRenderer.dispose();
-                    threejsComposer.dispose();
-
-                    refreshLayerPasses();
-                    
-                    // canvas = document.createElement('canvas');
-                    // canvas.width = width;
-                    // canvas.height = height;
-                    // const ctx = canvas.getContext('2d')!;
-                    // ctx.putImageData(new ImageData(Uint8ClampedArray.from(pixels), width, height), 0, 0);
-                }
-            }
-            if (options.blitActiveSelectionMask && (activeSelectionMask.value != null || appliedSelectionMask.value != null)) {
-                canvas = await blitActiveSelectionMask(canvas, new DOMMatrix(), 'source-in');
+                const renderer = await useRenderer();
+                const snapshotBitmap = await renderer.takeSnapshot(canvas.width, canvas.height, {
+                    cameraTransform: options.cameraTransform,
+                    layerIds: options.layerSelection === 'selected' ? workingFileStore.state.selectedLayerIds : undefined,
+                    applySelectionMask: options.applySelectionMask && (activeSelectionMask.value != null || appliedSelectionMask.value != null),
+                });
+                const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
+                ctx.drawImage(snapshotBitmap, 0, 0);
+                snapshotBitmap.close();
             }
 
             if (options.toNewLayer) {

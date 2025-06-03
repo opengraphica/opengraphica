@@ -1,9 +1,11 @@
 @use '../../node_modules/bootstrap-icons/font/bootstrap-icons.css';
-@use './palette.scss';
+@use './theme.scss';
 
+@use './opengraphica/button.scss';
 @use './opengraphica/container.scss';
 @use './opengraphica/select.scss';
 @use './opengraphica/popover.scss';
+@use './opengraphica/toolbar-brush.scss';
 
 @font-face {
     font-family: Roboto;
@@ -75,6 +77,7 @@ body.og-full-page {
 
     @import './opengraphica/reset.scss';
     @import './opengraphica/animation.scss';
+    @include button.main;
     @import './opengraphica/canvas.scss';
     @import './opengraphica/color-picker.scss';
     @include container.main;
@@ -95,6 +98,7 @@ body.og-full-page {
     @include popover.main;
     @include select.main;
     @import './opengraphica/toolbar.scss';
+    @include toolbar-brush.main;
     @import './opengraphica/toolbar-gradient.scss';
     @import './opengraphica/utility.scss';
     @import './opengraphica/wait.scss';

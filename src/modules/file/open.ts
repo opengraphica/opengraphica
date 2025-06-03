@@ -1,5 +1,6 @@
 /**
  * Parts of this file were adapted from miniPaint
+ * @copyright (c) ViliusL
  * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
 
@@ -16,7 +17,6 @@ import workingFileStore, {
 } from '@/store/working-file';
 import { readWorkingFile } from '@/store/data/working-file-database';
 import { discardActiveSelectionMask, discardAppliedSelectionMask, activeSelectionPath } from '@/canvas/store/selection-state';
-import { discardAllLayerRenderers } from '@/canvas/renderers';
 
 import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
@@ -158,8 +158,8 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
 };
 
 export async function openFromTemporaryStorage() {
+    appEmitter.emit('app.workingFile.detachAllLayers');
     const workingFile = await readWorkingFile();
-    discardAllLayerRenderers(workingFileStore.get('layers'));
     workingFileStore.set('background', workingFile.background);
     workingFileStore.set('colorModel', workingFile.colorModel);
     workingFileStore.set('colorSpace', workingFile.colorSpace);
@@ -168,6 +168,7 @@ export async function openFromTemporaryStorage() {
     workingFileStore.set('height', workingFile.height);
     workingFileStore.set('layerIdCounter', workingFile.layerIdCounter);
     workingFileStore.set('masks', workingFile.masks);
+    workingFileStore.set('maskIdCounter', workingFile.maskIdCounter);
     workingFileStore.set('measuringUnits', workingFile.measuringUnits);
     workingFileStore.set('resolutionUnits', workingFile.resolutionUnits);
     workingFileStore.set('resolutionX', workingFile.resolutionX);
@@ -586,7 +587,7 @@ async function parseSerializedFileToActions(serializedFile: SerializedFile<Color
         masks[maskId] = {
             sourceUuid: await parseDataUrlToStoredImage(serializedMasks[maskId].sourceImageSerialized),
             hash: serializedMasks[maskId].hash,
-            offset: new DOMPoint(serializedMasks[maskId].offset.x, serializedMasks[maskId].offset.y),
+            offset: serializedMasks[maskId].offset,
         };
     }
 

@@ -102,7 +102,10 @@ export interface SerializedFileTextLayer<T extends ColorModel = ColorModel> exte
 
 export interface SerializedFileLayerMask {
     sourceImageSerialized: string;
-    offset: DOMPoint;
+    offset: {
+        x: number;
+        y: number;
+    };
     hash: string;
 }
 

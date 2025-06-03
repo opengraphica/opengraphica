@@ -84,6 +84,18 @@ export default defineComponent({
 
         const languageOverride = computed(() => preferencesStore.state.languageOverride);
 
+        // Notify users who have old cached files to reload the page
+        let updateRequiredNotified: boolean = false;
+        appEmitter.on('app.updateRequired', () => {
+            if (updateRequiredNotified) return;
+            updateRequiredNotified = true;
+            appEmitter.emit('app.notify', {
+                title: t('app.updateRequired.title'),
+                message: t('app.updateRequired.message'),
+                duration: 0,
+            });
+        });
+
         watch(() => preferencesStore.state.useMobileDebugger, async (useMobileDebugger) => {
             if (useMobileDebugger) {
                 if (!erudaDebuggerInstance) {

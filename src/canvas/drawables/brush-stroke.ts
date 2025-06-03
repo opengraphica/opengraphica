@@ -34,6 +34,7 @@ export interface BrushStrokePoint {
     tiltX: number;
     tiltY: number;
     twist: number;
+    rendered?: boolean;
 }
 
 export interface BrushStrokeData {

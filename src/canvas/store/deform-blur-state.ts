@@ -1,10 +1,9 @@
 import { ref } from 'vue';
-import defaultBrushDefinitions from '@/config/default-brushes.json';
 import { PerformantStore } from '@/store/performant-store';
 
 export const cursorHoverPosition = ref<DOMPoint>(new DOMPoint());
 
-export const brushShape = ref(defaultBrushDefinitions.simple.brushes.circle.shape);
+export const brushShape = ref('M 1,0.5 A 0.5,0.5 0 0 1 0.5,1 0.5,0.5 0 0 1 0,0.5 0.5,0.5 0 0 1 0.5,0 0.5,0.5 0 0 1 1,0.5 Z');
 
 interface PermanentStorageState {
     brushSize: number;

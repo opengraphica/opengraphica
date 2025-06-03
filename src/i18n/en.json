@@ -109,6 +109,10 @@
                 "message": "OpenGraphica relies on some basic web functionality that does not exist in your browser. Please update your web browser, or switch to a modern one like Chrome, Firefox, Safari, or Edge."
             }
         },
+        "updateRequired": {
+            "title": "Update Required",
+            "message": "The editor tried to fetch a file that is no longer available. Please refresh the page to continue. Clear your browser's cache if you keep seeing this message. Use the \"Restore Last Image\" option in the menu to continue where you left off."
+        },
         "wait": {
             "applyLayerTransform": "Applying Layer Transform",
             "loadingImage": "Loading Image",
@@ -117,22 +121,10 @@
             "cancel": "Cancel"
         }
     },
-    "brushCategory": {
-        "simple": {
-            "name": "Simple Brushes",
-            "brushes": {
-                "circle": {
-                    "name": "Circle"
-                }
-            }
-        },
-        "shapes": {
-            "name": "Shapes"
-        }
-    },
     "button": {
         "addEffect": "Add Effect",
         "apply": "Apply",
+        "back": "Back",
         "cancel": "Cancel",
         "clear": "Clear",
         "convert": "Convert",
@@ -141,8 +133,10 @@
         "delete": "Delete",
         "discardChanges": "Discard Changes",
         "done": "Done",
+        "editBrush": "Edit Brush",
         "editEffects": "Edit Effects",
         "export": "Export",
+        "moreInfo": "More Info",
         "no": "No",
         "ok": "OK",
         "openImage": "Open Image",
@@ -161,6 +155,17 @@
                 "waitLabel": "Crop and Resize"
             }
         }
+    },
+    "defaultBrush": {
+        "default": "Default",
+        "simpleAirBrush": "Simple Air Brush",
+        "simplePaintBrush": "Simple Paint Brush",
+        "simplePen": "Simple Pen",
+        "simpleWaterColor": "Simple Water Color"
+    },
+    "defaultBrushCategory": {
+        "custom": "Custom",
+        "simple": "Simple"
     },
     "dock": {
         "colorPicker": {
@@ -264,7 +269,8 @@
                 },
                 "help": {
                     "groupTitle": "Help",
-                    "reportIssue": "Report an Issue"
+                    "reportIssue": "Report an Issue",
+                    "designSystem": "Design System"
                 }
             }
         }
@@ -646,6 +652,8 @@
         }
     },
     "measurement": {
+        "percent": "Percent",
+        "percentage": "Percentage",
         "pixels": "Pixels",
         "millimeters": "Millimeters",
         "centimeters": "Centimeters",
@@ -660,6 +668,9 @@
         "collapseToolGroup": "Collapse"
     },
     "module": {
+        "designSystem": {
+            "title": "Design System"
+        },
         "fileExport": {
             "title": "Export Image",
             "saveBackIntroduction": "You have opened a file named {fileName}.",
@@ -995,7 +1006,11 @@
                 },
                 "copy": {
                     "name": "Copy Selected Layers",
-                    "description": "Copy the currently selected layers to the clipboard."
+                    "description": "Copy the currently selected layers to the clipboard.",
+                    "noSelectedLayers": {
+                        "title": "No Layers Selected",
+                        "message": "Please select at least one layer to copy."
+                    }
                 },
                 "copyAll": {
                     "name": "Copy All Layers",
@@ -1085,9 +1100,63 @@
             "brushSize": "Size"
         },
         "drawBrush": {
-            "brushColor": "Brush Color",
+            "brushColor": "Color",
+            "paletteCount": "Palette Count",
             "brushSize": "Size",
-            "newBrushLayerName": "New Paint"
+            "brushSmoothing": "Smoothing",
+            "newBrushLayerName": "New Paint",
+            "brushDialog": {
+                "title": "Select Brush",
+                "close": "Close Dialog",
+                "noBrushCategorySelected": {
+                    "title": "No Category Selected",
+                    "message": "Please select a brush category."
+                },
+                "noBrushesInCategory": {
+                    "title": "No Brushes",
+                    "message": "This category has no brushes. Create some!"
+                },
+                "editorTab": {
+                    "blending": {
+                        "title": "Blending",
+                        "density": "Density",
+                        "densityDescription": "How transparent each stamp of the brush will be, based on pen pressure. The range is used when varying pen pressure.",
+                        "pressureMinDensity": "Min Density",
+                        "pressureMaxDensity": "Max Density",
+                        "colorBlendingStrength": "Color Blending Strength",
+                        "pressureMinColorBlendingStrength": "Min Strength",
+                        "pressureMaxColorBlendingStrength": "Max Strength",
+                        "colorBlendingStrengthDescription": "How much of the color underneath the brush will be picked up while drawing. The range is used when varying pen pressure.",
+                        "colorBlendingPersistence": "Color Blending Persistence",
+                        "colorBlendingPersistenceDescription": "How long the picked up color remains on the brush while dragging the stroke.",
+                        "concentration": "Concentration",
+                        "concentrationDescription": "Lower values simulate brush dilution with water, and high values full concentrated color. This setting has no effect when drawing on top of fully opaque colors. The range is used when varying pen pressure.",
+                        "pressureMinConcentration": "Min Concentration",
+                        "pressureMaxConcentration": "Max Concentration"
+                    },
+                    "shape": {
+                        "title": "Shape",
+                        "hardness": "Hardness",
+                        "hardnessDescription": "Lower values will have soft faded edges, and higher values sharp edges.",
+                        "angle": "Angle",
+                        "angleDescription": "Rotates the brush shape."
+                    },
+                    "strokePath": {
+                        "title": "Stroke Path",
+                        "spacing": "Spacing",
+                        "spacingDescription": "The distance between each stamp of the brush, relative to the brush size. Be careful with extremely low values, as it can tank performance on larger brush sizes.",
+                        "jitter": "Jitter",
+                        "jitterDescription": "Randomly shifts the position of the brush shape."
+                    },
+                    "pressure": {
+                        "title": "Pressure",
+                        "pressureTaper": "Taper",
+                        "pressureTaperDescription": "Higher values will draw skinnier lines at lower pen pressures. Makes it easier to control pens with unstable sensitivity at lower pressures.",
+                        "pressureMinSize": "Minimum Size",
+                        "pressureMinSizeDescription": "The size of the brush at 0% pen pressure, relative to the currently selected brush size."
+                    }
+                }
+            }
         },
         "drawColorPicker": {
             "title": "Color Picker"
@@ -1130,7 +1199,9 @@
             }
         },
         "eraseBrush": {
+            "brushOpacity": "Opacity",
             "brushSize": "Size",
+            "brushSmoothing": "Smoothing",
             "notification": {
                 "noSelectedLayers": {
                     "title": "No Layers Selected",

@@ -56,47 +56,47 @@ const renderers: Renderers = {
 
 export default renderers;
 
-export function assignLayerRenderer(layer: WorkingFileAnyLayer<ColorModel>) {
-    const renderer = canvasStore.get('renderer');
-    switch (layer.type) {
-        case 'empty':
-            layer.renderer = markRaw(new renderers[renderer].empty());
-            break;
-        case 'gradient':
-            layer.renderer = markRaw(new renderers[renderer].gradient());
-            break;
-        case 'group':
-            layer.renderer = markRaw(new renderers[renderer].group());
-            break;
-        case 'raster':
-            layer.renderer = markRaw(new renderers[renderer].raster());
-            break;
-        case 'rasterSequence':
-            layer.renderer = markRaw(new renderers[renderer].rasterSequence());
-            break;
-        case 'text':
-            layer.renderer = markRaw(new renderers[renderer].text());
-            break;
-        case 'vector':
-            layer.renderer = markRaw(new renderers[renderer].vector());
-            break;
-        case 'video':
-            layer.renderer = markRaw(new renderers[renderer].video());
-            break;
-        default:
-            (layer as WorkingFileLayer).renderer = markRaw(new renderers[renderer].base());
-    }
-    queueRefreshLayerPasses();
-}
+// export function assignLayerRenderer(layer: WorkingFileAnyLayer<ColorModel>) {
+//     const renderer = canvasStore.get('renderer');
+//     switch (layer.type) {
+//         case 'empty':
+//             layer.renderer = markRaw(new renderers[renderer].empty());
+//             break;
+//         case 'gradient':
+//             layer.renderer = markRaw(new renderers[renderer].gradient());
+//             break;
+//         case 'group':
+//             layer.renderer = markRaw(new renderers[renderer].group());
+//             break;
+//         case 'raster':
+//             layer.renderer = markRaw(new renderers[renderer].raster());
+//             break;
+//         case 'rasterSequence':
+//             layer.renderer = markRaw(new renderers[renderer].rasterSequence());
+//             break;
+//         case 'text':
+//             layer.renderer = markRaw(new renderers[renderer].text());
+//             break;
+//         case 'vector':
+//             layer.renderer = markRaw(new renderers[renderer].vector());
+//             break;
+//         case 'video':
+//             layer.renderer = markRaw(new renderers[renderer].video());
+//             break;
+//         default:
+//             (layer as WorkingFileLayer).renderer = markRaw(new renderers[renderer].base());
+//     }
+//     queueRefreshLayerPasses();
+// }
 
-export function discardAllLayerRenderers(layers: Array<WorkingFileLayer<ColorModel>>) {
-    for (const layer of layers) {
-        if (layer.renderer) {
-            layer.renderer.detach();
-        }
-        delete (layer as unknown as { renderer: undefined }).renderer;
-        if (layer.type === 'group') {
-            discardAllLayerRenderers((layer as WorkingFileGroupLayer<ColorModel>).layers);
-        }
-    }
-}
+// export function discardAllLayerRenderers(layers: Array<WorkingFileLayer<ColorModel>>) {
+//     for (const layer of layers) {
+//         if (layer.renderer) {
+//             layer.renderer.detach();
+//         }
+//         delete (layer as unknown as { renderer: undefined }).renderer;
+//         if (layer.type === 'group') {
+//             discardAllLayerRenderers((layer as WorkingFileGroupLayer<ColorModel>).layers);
+//         }
+//     }
+// }

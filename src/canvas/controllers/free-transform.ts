@@ -268,13 +268,6 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                     this.determineDragRotateType(viewTransformPoint, transformBoundsPoint, viewDecomposedTransform);
                 }
             }
-    
-            // If we're about to do some rotate/resize/drag, switch the viewport for better performance with large images.
-            if (this.transformTranslateStart) {
-                preferencesStore.set('useCanvasViewport', true);
-                canvasStore.set('useCssViewport', false);
-                canvasStore.set('viewDirty', true);
-            }
         });
     }
 
@@ -399,10 +392,6 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 try {
                     await this.commitTransforms();
                 } catch (error) { /* Ignore */ }
-                if (!preferencesStore.get('preferCanvasViewport')) {
-                    preferencesStore.set('useCanvasViewport', false);
-                    canvasStore.set('useCssViewport', true);
-                }
                 try {
                     if (this.transformStartPickLayer != null && !this.isPointerDragging) {
                         const layerId = this.transformStartPickLayer;

@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import { nextTick, watch, WatchStopHandle } from 'vue';
 
 import BaseCanvasMovementController from './base-movement';
@@ -7,7 +6,6 @@ import {
     activeColorStops, blendColorSpace, fillType, spreadMethod,
     hasVisibleToolbarOverlay, showStopDrawer, radiusMultiplierTouch,
 } from '@/canvas/store/draw-gradient-state';
-import { blitActiveSelectionMask, activeSelectionMask, appliedSelectionMask } from '@/canvas/store/selection-state';
 
 import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
@@ -15,8 +13,8 @@ import { t, tm, rt } from '@/i18n';
 
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
-import historyStore, { createHistoryReserveToken, historyReserveQueueFree, historyBlockInteractionUntilComplete } from '@/store/history';
-import workingFileStore, { getSelectedLayers, getLayerById, getLayerGlobalTransform, ensureUniqueLayerSiblingName } from '@/store/working-file';
+import historyStore, { historyBlockInteractionUntilComplete } from '@/store/history';
+import workingFileStore, { getSelectedLayers, getLayerGlobalTransform, ensureUniqueLayerSiblingName } from '@/store/working-file';
 
 import { type BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';

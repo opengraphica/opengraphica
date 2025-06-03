@@ -23,10 +23,10 @@
 <script lang="ts">
 import { computed, defineComponent, nextTick, ref, toRefs, watch } from 'vue';
 import canvasStore from '@/store/canvas';
-import workingFileStore, { getLayerById, getLayerGlobalTransform } from '@/store/working-file';
-import { isEditorTextareaFocused, editingTextLayerId, editingRenderTextPlacement, editingTextDocumentSelection } from '@/canvas/store/text-state';
-
-import type { CalculatedTextPlacement, RenderTextLineInfo, RenderTextGlyphInfo } from '@/types';
+import { getLayerById, getLayerGlobalTransform } from '@/store/working-file';
+import {
+    isEditorTextareaFocused, editingTextLayerId, editingRenderTextPlacement, editingTextDocumentSelection
+} from '@/canvas/store/text-state';
 
 export default defineComponent({
     name: 'CanvasOverlayTextSelection',

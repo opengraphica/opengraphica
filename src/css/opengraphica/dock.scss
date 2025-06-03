@@ -54,3 +54,47 @@
         }
     }
 }
+
+.og-floating-docks {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 0;
+    z-index: 5; // Must be greater than main
+
+    .og-floating-dock {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: flex;
+        background: var(--og-layout-menu-bar-background-color);
+        box-shadow: 0 0 0px 1px var(--og-layout-menu-bar-border-color), 0 0.3rem 2rem var(--og-layout-menu-bar-shadow-color);
+        border-radius: var(--og-border-radius-big);
+        padding: 0;
+        opacity: 0;
+        transition: opacity 0.2s;
+
+        &.og-floating-dock--visible {
+            opacity: 1;
+        }
+    }
+
+    .og-floating-dock__grip {
+        display: flex;
+        align-items: center;
+        background: var(--el-bg-color-page);
+        border-radius: var(--og-border-radius-big) 0 0 var(--og-border-radius-big);
+        flex-grow: 0;
+        flex-shrink: 0;
+        padding: 0.5rem;
+        cursor: move;
+    }
+
+    .og-floating-dock__content {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        padding: 0.5rem 1rem 0.5rem 0.5rem;
+    }
+}

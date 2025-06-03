@@ -685,9 +685,12 @@ export default class SelectionController extends BaseMovementController {
     }
 
     async deleteSelection() {
+        await new Promise(resolve => setTimeout(resolve, 0));
         if (activeSelectionMask.value || appliedSelectionMask.value) {
+            const size = (activeSelectionMask.value?.width ?? appliedSelectionMask.value?.width ?? 1) * (activeSelectionMask.value?.height ?? appliedSelectionMask.value?.height ?? 1);
             await historyStore.dispatch('runAction', {
                 action: new DeleteLayerSelectionAreaAction(),
+                blockInteraction: size > 2048 * 2048,
             });
         }
     }

@@ -78,6 +78,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     private editingTextDocumentSelectionUnwatch: WatchStopHandle | null = null;
     private editingTextLayerIdUnwatch: WatchStopHandle | null = null;
     private editingTextLayerDimensionsUnwatch: WatchStopHandle | null = null;
+    private editingTextLayerDirectionUnwatch: WatchStopHandle | null = null;
 
     onEnter(): void {
         super.onEnter();
@@ -187,6 +188,17 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             }
         });
 
+        this.editingTextLayerDirectionUnwatch = watch(() => ([
+            editingTextLayer.value?.data.lineDirection,
+            editingTextLayer.value?.data.wrapDirection,
+        ]), ([lineDirection]) => {
+            if (!editingTextLayer.value || !lineDirection) return;
+            let isHorizontal = ['ltr', 'rtl'].includes(lineDirection);
+            editingRenderTextPlacement.value = calculateTextPlacement(editingTextLayer.value.data, {
+                wrapSize: isHorizontal ? editingTextLayer.value.width : editingTextLayer.value.height,
+            });
+        });
+
         this.onToolbarMetaChanged = this.onToolbarMetaChanged.bind(this);
         textToolbarEmitter.on('toolbarMetaChanged', this.onToolbarMetaChanged);
         this.onToolbarDocumentChanged = this.onToolbarDocumentChanged.bind(this);
@@ -212,6 +224,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         this.editingTextDocumentSelectionUnwatch?.();
         this.editingTextLayerIdUnwatch?.();
         this.editingTextLayerDimensionsUnwatch?.();
+        this.editingTextLayerDirectionUnwatch?.();
     }
 
     private async onHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
@@ -1042,7 +1055,11 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     private extractEditorTextareaInput() {
         if (!this.editorTextarea) return '';
         if (this.editorTextarea.value.length > CLEARED_EDITOR_TEXTAREA_LENGTH) {
-            return this.editorTextarea.value.slice(1, -1);
+            if (this.editorTextarea.value[0] === 'a' && this.editorTextarea.value[this.editorTextarea.value.length - 1] === 'b') {
+                return this.editorTextarea.value.slice(1, -1);
+            } else if (this.editorTextarea.value[1] === 'b') {
+                return this.editorTextarea.value.slice(2);
+            }
         }
         return '';
     }

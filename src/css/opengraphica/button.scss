@@ -1,0 +1,285 @@
+@mixin light() {
+    --og-button-base-background: var(--og-surface-0);
+    --og-button-base-border-color: var(--og-surface-200);
+    --og-button-base-color: var(--og-surface-400);
+    --og-button-base-hover-background: var(--og-primary-25);
+    --og-button-base-hover-border-color: var(--og-primary-50);
+    --og-button-base-hover-color: var(--og-primary-400);
+    --og-button-base-focus-outline-color: var(--og-primary-100);
+    --og-button-base-pressed-background: var(--og-primary-500);
+    --og-button-base-pressed-color: var(--og-surface-900);
+
+    --og-button-primary-background: var(--og-primary-500);
+    --og-button-primary-border-color: var(--og-primary-500);
+    --og-button-primary-color: var(--og-surface-0);
+    --og-button-primary-hover-background: var(--og-primary-400);
+    --og-button-primary-hover-border-color: var(--og-primary-400);
+    --og-button-primary-hover-color: var(--og-surface-0);
+    --og-button-primary-focus-outline-color: var(--og-primary-100);
+
+    --og-button-danger-background: var(--og-danger-500);
+    --og-button-danger-border-color: var(--og-danger-500);
+    --og-button-danger-color: var(--og-surface-0);
+    --og-button-danger-hover-background: var(--og-danger-400);
+    --og-button-danger-hover-border-color: var(--og-danger-400);
+    --og-button-danger-hover-color: var(--og-surface-0);
+    --og-button-danger-focus-outline-color: var(--og-danger-100);
+}
+
+@mixin dark() {
+    --og-button-base-background: var(--og-surface-600);
+    --og-button-base-border-color: var(--og-surface-500);
+    --og-button-base-color: var(--og-surface-0);
+    --og-button-base-hover-background: var(--og-primary-900);
+    --og-button-base-hover-border-color: var(--og-primary-700);
+    --og-button-base-hover-color: var(--og-surface-0);
+    --og-button-base-focus-outline-color: var(--og-primary-600);
+    --og-button-base-pressed-background: var(--og-primary-500);
+    --og-button-base-pressed-color: var(--og-surface-900);
+
+    --og-button-primary-background: var(--og-primary-500);
+    --og-button-primary-border-color: var(--og-primary-500);
+    --og-button-primary-color: var(--og-surface-900);
+    --og-button-primary-hover-background: var(--og-primary-400);
+    --og-button-primary-hover-border-color: var(--og-primary-400);
+    --og-button-primary-hover-color: var(--og-surface-900);
+    --og-button-primary-focus-outline-color: var(--og-primary-600);
+
+    --og-button-danger-background: var(--og-danger-500);
+    --og-button-danger-border-color: var(--og-danger-500);
+    --og-button-danger-color: var(--og-surface-900);
+    --og-button-danger-hover-background: var(--og-danger-400);
+    --og-button-danger-hover-border-color: var(--og-danger-400);
+    --og-button-danger-hover-color: var(--og-surface-900);
+    --og-button-danger-focus-outline-color: var(--og-danger-600);
+}
+
+@mixin main() {
+    .og-button {
+        --og-button-border-radius: var(--og-border-radius-large);
+        --og-button-background: var(--og-button-base-background);
+        --og-button-border-color: var(--og-button-base-border-color);
+        --og-button-color: var(--og-button-base-color);
+        --og-button-hover-background: var(--og-button-base-hover-background);
+        --og-button-hover-border-color: var(--og-button-base-hover-border-color);
+        --og-button-hover-color: var(--og-button-base-hover-color);
+        --og-button-focus-outline-color: var(--og-button-base-focus-outline-color);
+        --og-button-pressed-background: var(--og-button-base-pressed-background);
+        --og-button-pressed-color: var(--og-button-base-pressed-color);
+
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        background-color: transparent;
+        box-sizing: border-box;
+        font-size: 0.875rem;
+        border: 0.0625rem solid transparent;
+        border-radius: var(--og-button-border-radius);
+        color: currentColor;
+        line-height: 1rem;
+        padding: 0.6875rem 1.25rem;
+        transition: transform 0.25s;
+        cursor: pointer;
+
+        &:hover {
+            background-color: var(--og-button-hover-background);
+            color: var(--og-button-hover-color);
+            border-color: var(--og-button-hover-background);
+        }
+
+        &:active {
+            transform: scale(0.97);
+        }
+
+        &:focus-visible {
+            outline: 0.125rem solid var(--og-button-focus-outline-color);
+            outline-offset: 0.0625rem;
+        }
+    }
+
+    .og-button__label {
+        display: inline-flex;
+        position: relative;
+    }
+
+    .og-button--outline {
+        border-color: var(--og-button-border-color);
+
+        &:hover {
+            border-color: var(--og-button-hover-border-color);
+        }
+    }
+
+    .og-button--solid {
+        background-color: var(--og-button-background);
+        border-color: var(--og-button-background);
+        color: var(--og-button-color);
+
+        &:hover {
+            background-color: var(--og-button-hover-background);
+            border-color: var(--og-button-hover-background);
+            color: var(--og-button-hover-color);
+        }
+
+        &.og-button--outline {
+            border-color: var(--og-button-border-color);
+
+            &:hover {
+                border-color: var(--og-button-hover-border-color);
+            }
+        }
+    }
+
+    .og-button--pressed {
+        position: relative;
+
+        &,
+        &.og-button--solid,
+        &.og-button--outline {
+            color: var(--og-button-pressed-color);
+
+            &:hover {
+                color: var(--og-button-pressed-color);
+            }
+        }
+
+        &::before {
+            content: '';
+            background: var(--og-button-pressed-background);
+            position: absolute;
+            border-radius: calc(var(--og-button-border-radius) * 0.625);
+            top: 0.25rem;
+            bottom: 0.25rem;
+            left: 0.25rem;
+            right: 0.25rem;
+        }
+    }
+
+    .og-button--active {
+        outline: 0.25rem solid var(--og-button-primary-background);
+        outline-offset: 0;
+
+        &:focus-visible {
+            outline: 0.25rem solid var(--og-button-primary-focus-outline-color);
+            outline-offset: 0;
+        }
+    }
+    
+    .og-button--small {
+        --og-button-border-radius: var(--og-border-radius-medium);
+
+        font-size: 0.75rem;
+        line-height: 0.875rem;
+        padding: 0.5rem 0.875rem;
+    }
+
+    .og-button--slim {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+
+        &.og-button--small {
+            padding-left: 0.375rem;
+            padding-right: 0.375rem;
+        }
+    }
+
+    .og-button--icon {
+        --og-button-border-radius: 100%;
+        padding-left: 0;
+        padding-right: 0;
+        min-width: 2.5rem;
+
+        &.og-button--small {
+            --og-button-border-radius: 100%;
+            padding-left: 0;
+            padding-right: 0;
+            min-width: 2.125rem;
+        }
+    }
+
+    .og-button--round {
+        --og-button-border-radius: 2rem;
+
+        &.og-button--small {
+            --og-button-border-radius: 2rem;
+        }
+    }
+
+    .og-button--primary {
+        --og-button-background: var(--og-button-primary-background);
+        --og-button-color: var(--og-button-primary-color);
+        --og-button-hover-border-color: var(--og-button-primary-hover-border-color);
+        --og-button-hover-color: var(--og-button-primary-hover-color);
+        --og-button-focus-outline-color: var(--og-button-primary-focus-outline-color);
+
+        &.og-button--solid,
+        &:not(.og-button--outline) {
+            --og-button-border-color: var(--og-button-primary-border-color);
+            --og-button-hover-background: var(--og-button-primary-hover-background);
+        }
+
+        &.og-button--outline {
+            --og-button-hover-background: var(--og-button-base-background);
+            --og-button-hover-color: var(--og-button-base-color);
+
+            &.og-button--solid {
+                --og-button-background: var(--og-button-base-background);
+                --og-button-color: var(--og-button-base-color);
+                --og-button-border-color: var(--og-button-primary-border-color);
+                --og-button-hover-background: var(--og-button-primary-hover-background);
+                --og-button-hover-color: var(--og-button-primary-hover-color);
+            }
+        }
+    }
+
+    .og-button--danger {
+        --og-button-background: var(--og-button-danger-background);
+        --og-button-color: var(--og-button-danger-color);
+        --og-button-hover-border-color: var(--og-button-danger-hover-border-color);
+        --og-button-hover-color: var(--og-button-danger-hover-color);
+        --og-button-focus-outline-color: var(--og-button-danger-focus-outline-color);
+
+        &.og-button--solid,
+        &:not(.og-button--outline) {
+            --og-button-border-color: var(--og-button-danger-border-color);
+            --og-button-hover-background: var(--og-button-danger-hover-background);
+        }
+
+        &.og-button--outline {
+            --og-button-hover-background: var(--og-button-base-background);
+            --og-button-hover-color: var(--og-button-base-color);
+
+            &.og-button--solid {
+                --og-button-background: var(--og-button-base-background);
+                --og-button-color: var(--og-button-base-color);
+                --og-button-border-color: var(--og-button-danger-border-color);
+                --og-button-hover-background: var(--og-button-danger-hover-background);
+                --og-button-hover-color: var(--og-button-danger-hover-color);
+            }
+        }
+    }
+
+    .og-button--color-swatch {
+        background-image: url("../images/transparency-bg.png");
+        position: relative;
+        border-color: var(--og-button-swatch-background);
+        color: var(--og-button-swatch-color);
+        overflow: hidden;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--og-button-swatch-background);
+        }
+
+        &:hover {
+            background-image: url("../images/transparency-bg.png");
+            border-color: var(--og-button-swatch-background);
+            color: var(--og-button-swatch-color);
+        }
+    }
+}

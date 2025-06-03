@@ -283,12 +283,12 @@
                                 <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.debugging.useMobileDebugger')">
                                     <el-switch v-model="useMobileDebugger" />
                                 </el-form-item>
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.performance.renderer.label')">
+                                <!--el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.performance.renderer.label')">
                                     <el-select v-model="preferenceRenderer" size="small" style="width: 6rem;">
                                         <el-option value="2d" :label="$t('dock.settings.prefs.performance.renderer.2d')" />
                                         <el-option value="webgl" :label="$t('dock.settings.prefs.performance.renderer.webgl')" />
                                     </el-select>
-                                </el-form-item>
+                                </el-form-item-->
                                 <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.performance.optimizeLargeImage')">
                                     <el-switch v-model="preferenceOptimizeLargeImages" />
                                 </el-form-item>
@@ -304,6 +304,12 @@
                                 <div class="el-form-item el-form-item--menu-item">
                                     <el-link href="https://github.com/opengraphica/opengraphica/issues/" type="primary" target="_blank">
                                         <span v-t="'dock.settings.prefs.help.reportIssue'"></span>
+                                        <i class="bi bi-box-arrow-up-right ml-2"></i>
+                                    </el-link>
+                                </div>
+                                <div class="el-form-item el-form-item--menu-item">
+                                    <el-link href="javascript:void(0)" type="primary" @click="onClickShowDesignSystem()">
+                                        <span v-t="'dock.settings.prefs.help.designSystem'"></span>
                                         <i class="bi bi-box-arrow-up-right ml-2"></i>
                                     </el-link>
                                 </div>
@@ -600,7 +606,6 @@ export default defineComponent({
             set(value) {
                 preferencesStore.set('preferCanvasViewport', value);
                 preferencesStore.set('useCanvasViewport', value);
-                canvasStore.set('useCssViewport', !value);
                 canvasStore.set('viewDirty', true);
             }
         });
@@ -648,6 +653,9 @@ export default defineComponent({
                 preferencesStore.set('showWelcomeScreenAtStart', value);
             }
         });
+        function onClickShowDesignSystem() {
+            runModule('developer', 'designSystem');
+        }
         function onClickResetSettings() {
             for (let key in localStorage) {
                 if (key.startsWith('openGraphica')) {
@@ -796,6 +804,7 @@ export default defineComponent({
             preferenceMenuBarPosition,
             showTutorialNotifications,
             showWelcomeScreenAtStart,
+            onClickShowDesignSystem,
             onClickResetSettings,
             useMobileDebugger,
 

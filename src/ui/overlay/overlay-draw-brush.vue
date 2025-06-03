@@ -5,15 +5,15 @@
             class="og-canvas-overlay-draw-bounds"
         >
             <svg
-                v-if="boundaryPointsSvgPaths.length > 0"
-                :width="boundarySvgWidth"
-                :height="boundarySvgHeight"
-                :viewBox="`0 0 ${boundarySvgWidth} ${boundarySvgHeight}`"
-                :style="{ transform: `translate(${selectedLayerBounds.left}px, ${selectedLayerBounds.top}px)` }"
-                xmlns="http://www.w3.org/2000/svg">
-                <template v-for="svgPath of boundaryPointsSvgPaths" :key="svgPath">
-                    <path :d="svgPath" stroke="#777" :stroke-width="boundaryPointsSvgPathStrokeWidth" fill="transparent"/>
-                    <path :d="svgPath" stroke="white" :stroke-width="boundaryPointsSvgPathStrokeWidth" :stroke-dasharray="boundaryPointsSvgPathStrokeWidth * 4" fill="transparent"/>
+                v-if="selectedLayerSvgPaths.length > 0"
+                :width="svgBoundsWidth"
+                :height="svgBoundsHeight"
+                :viewBox="`0 0 ${svgBoundsWidth} ${svgBoundsHeight}`"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <template v-for="svgPath of selectedLayerSvgPaths" :key="svgPath">
+                    <path :d="svgPath" stroke="#777" :stroke-width="svgPathStrokeWidth" fill="transparent"/>
+                    <path :d="svgPath" stroke="white" :stroke-width="svgPathStrokeWidth" :stroke-dasharray="svgPathStrokeDashArray" fill="transparent"/>
                 </template>
             </svg>
         </div>
@@ -23,10 +23,10 @@
                 height="2"
                 viewBox="-.5 -.5 2 2"
                 :style="{
-                    transform: 'scale(' + brushSize + ',' + brushSize + ')',
+                    transform: 'scale(' + brushSize * zoom + ',' + brushSize * zoom + ')',
                     position: 'absolute',
-                    left: cursorHoverPosition.x - 1 + 'px',
-                    top: cursorHoverPosition.y - 1 + 'px'
+                    left: transformedCursorHoverX - 1 + 'px',
+                    top: transformedCursorHoverY - 1 + 'px'
                 }"
                 xmlns="http://www.w3.org/2000/svg">
                 <path :d="brushShape" stroke="#333333" :stroke-width="drawPreviewStrokeWidth / brushSize" fill="transparent"/>
@@ -51,10 +51,15 @@ export default defineComponent({
     setup(props, { emit }) {
         const devicePixelRatio = window.devicePixelRatio || 1;
 
+        const { transform, viewWidth, viewHeight, viewDirty } = toRefs(canvasStore.state);
+
         const drawBrushContainer = ref<HTMLDivElement>(null as any);
+        const transformedCursorHoverX = ref(0);
+        const transformedCursorHoverY = ref(0);
 
         const selectedLayerBoundaryPoints = ref<DOMPoint[][]>([]);
         const selectedLayerBounds = ref<ReturnType<typeof findPointListBounds>>({ left: 0, right: 1, top: 0, bottom: 1 });
+        const selectedLayerSvgPaths = ref<string[]>([]);
 
         const zoom = computed<number>(() => {
             const decomposedTransform = canvasStore.state.decomposedTransform;
@@ -62,45 +67,29 @@ export default defineComponent({
             return appliedZoom;
         });
 
-        const boundarySvgWidth = computed<number>(() => {
-            return selectedLayerBounds.value.right - selectedLayerBounds.value.left;
+        const svgBoundsWidth = computed<number>(() => {
+            return viewWidth.value / devicePixelRatio;
         });
-        const boundarySvgHeight = computed<number>(() => {
-            return selectedLayerBounds.value.bottom - selectedLayerBounds.value.top;
+        const svgBoundsHeight = computed<number>(() => {
+            return viewHeight.value / devicePixelRatio;
+        });
+        const svgPathStrokeWidth = computed<number>(() => {
+            return 1;
+        });
+        const svgPathStrokeDashArray = computed<number>(() => {
+            // Don't allow this number to get too small at high zoom levels because it tanks performance.
+            const decomposedTransform = canvasStore.state.decomposedTransform;
+            let appliedZoom: number = decomposedTransform.scaleX / devicePixelRatio;
+            return Math.max(svgPathStrokeWidth.value * 4, Math.round(appliedZoom));
         });
 
         const drawPreviewStrokeWidth = computed<number>(() => {
             return 1.25 / zoom.value;
         });
 
-        const boundaryPointsSvgPaths = computed(() => {
-            const svgPaths: string[] = [];
-            for (const path of selectedLayerBoundaryPoints.value) {
-                const transformedPoints = path.map((point) => {
-                    return point.matrixTransform(new DOMMatrix().translateSelf(
-                        -selectedLayerBounds.value.left,
-                        -selectedLayerBounds.value.top
-                    ));
-                });
-                if (transformedPoints.length > 1) {
-                    let draw = 'M' + transformedPoints[0].x + ' ' + transformedPoints[0].y;
-                    for (let i = 1; i < transformedPoints.length; i++) {
-                        const point = transformedPoints[i];
-                        draw += ' L ' + point.x + ' ' + point.y;
-                    }
-                    draw += ' z';
-                    svgPaths.push(draw);
-                }
-            }
-            return svgPaths;
-        });
-
-        const boundaryPointsSvgPathStrokeWidth = computed<number>(() => {
-            return (1 / zoom.value);
-        });
-
         watch(() => workingFileStore.state.selectedLayerIds, () => {
             const layers = getSelectedLayers();
+            
             if (layers.length > 0) {
                 const clipper = new Clipper();
                 for (const [layerIndex, layer] of layers.entries()) {
@@ -124,6 +113,33 @@ export default defineComponent({
             selectedLayerBounds.value = bounds;
         }, { immediate: true });
 
+        watch([selectedLayerBounds, selectedLayerBoundaryPoints, viewDirty], () => {
+            const svgPaths: string[] = [];
+            for (const path of selectedLayerBoundaryPoints.value) {
+                const transformedPoints = path.map((point) => {
+                    return point.matrixTransform(new DOMMatrix().scale(1 / devicePixelRatio).multiply(transform.value));
+                });
+                if (transformedPoints.length > 1) {
+                    let draw = 'M' + transformedPoints[0].x + ' ' + transformedPoints[0].y;
+                    for (let i = 1; i < transformedPoints.length; i++) {
+                        const point = transformedPoints[i];
+                        draw += ' L ' + point.x + ' ' + point.y;
+                    }
+                    draw += ' z';
+                    svgPaths.push(draw);
+                }
+            }
+            selectedLayerSvgPaths.value = svgPaths;
+        });
+
+        watch([cursorHoverPosition], () => {
+            const point = cursorHoverPosition.value.matrixTransform(
+                new DOMMatrix().scale(1 / devicePixelRatio).multiply(transform.value)
+            );
+            transformedCursorHoverX.value = point.x;
+            transformedCursorHoverY.value = point.y;
+        });
+
         onMounted(() => {
         });
 
@@ -134,13 +150,15 @@ export default defineComponent({
             brushShape,
             brushSize,
             drawBrushContainer,
-            cursorHoverPosition,
+            transformedCursorHoverX,
+            transformedCursorHoverY,
             drawPreviewStrokeWidth,
 
-            boundarySvgWidth,
-            boundarySvgHeight,
-            boundaryPointsSvgPaths,
-            boundaryPointsSvgPathStrokeWidth,
+            svgBoundsWidth,
+            svgBoundsHeight,
+            svgPathStrokeDashArray,
+            svgPathStrokeWidth,
+            selectedLayerSvgPaths,
             selectedLayerBounds,
 
             zoom,

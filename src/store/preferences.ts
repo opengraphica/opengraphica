@@ -3,31 +3,86 @@ import { PerformantStore } from './performant-store';
 import appEmitter from '@/lib/emitter';
 
 interface PreferencesState {
+    // Viewport-applied screen width, where docks will be hidden if the window is smaller.
     dockHideBreakpoint: number;
+
+    // Position the UI docks display on the screen.
     dockPosition: 'left' | 'right';
-    dragStartRadius: number; // Pixels
+
+    // Pixel radius that is the distance a pointer needs to move to start a drag event.
+    dragStartRadius: number;
+
+    // Was used for canvas renderer to fix seams between images next to each other; currently unused.
     enableMultiLayerBuffer: boolean;
+
+    // Maximum number of history events before discarding.
     historyStatesMax: number;
+
+    // Keyboard bindings.
     keyboardMapConfig: KeyboardMapConfigCategory[];
+
+    // Zoom percentage at which to switch from smooth to per-pixel interpolation (deprecated).
     imageSmoothingZoomRatio: number;
+
+    // Language code used for i18n.
     languageOverride: string;
+
+    // Position of the tool selection menu on the screen.
     menuBarPosition: 'top' | 'bottom' | 'left' | 'right';
-    multiTouchDownTimeout: number; // Delay between multiple fingers touching down to determine if it counts as a single press.
-    multiTouchTapTimeout: number; // Delay between multiple fingers touching down to determine if it counts as a single tap.
-    pointerDoubleTapTimeout: number; // Delay between pointer down events that will count as a double tap/click.
-    pointerTapTimeout: number; // Delay between pointer down/up to determine if it counts as a tap.
-    pointerPressHoldTimeout: number; // Delay when pointer down and hold before the secondary action (such as a context menu) fires.
+
+    // Delay between multiple fingers touching down to determine if it counts as a single press.
+    multiTouchDownTimeout: number;
+
+    // Delay between multiple fingers touching down to determine if it counts as a single tap.
+    multiTouchTapTimeout: number;
+
+    // Delay between pointer down events that will count as a double tap/click.
+    pointerDoubleTapTimeout: number;
+
+    // Percentage of the max pressure margin to discard. Makes max pressure easier to reach.
+    // Some styluses break screens before reaching max pressure.
+    pointerPenMaxPressureMargin: number;
+
+    // Delay when pointer down and hold before the secondary action (such as a context menu) fires.
+    pointerPressHoldTimeout: number;
+
+    // Delay between pointer down/up to determine if it counts as a tap.
+    pointerTapTimeout: number;
+
+    // For canvas renderer, anti-aliases the viewport.
     postProcessInterpolateImage: boolean;
+
+    // Handle the viewport in the canvas renderer instead of using CSS to transform it.
     preferCanvasViewport: boolean;
-    renderer: '2d' | 'webgl'; // The preferred renderer. May not be the active renderer if unavailable.
+
+    // Unused at the moment.
+    renderer: '2d' | 'webgl';
+
+    // Shows tutorial notification popups.
     showTutorialNotifications: boolean;
+
+    // Shows the simplified welcome screen when loading the app in mobile view.
     showWelcomeScreenAtStart: boolean;
+
+    // Pixel radius used for snapping.
     snapSensitivity: number;
+
+    // How long after the user stops typing in a text layer to create a history event.
     textLayerSaveDelay: number;
+
+    // Millisecond delay for displaying tooltips.
     tooltipShowDelay: number;
+
+    // Whether to allow two-finger rotation of the view on a touch screen.
     touchRotation: 'on' | 'snap' | 'off';
+
+    // Handle the viewport in the canvas renderer instead of using CSS to transform it.
     useCanvasViewport: boolean;
+
+    // Enables eruda.
     useMobileDebugger: boolean;
+
+    // Used to implement a custom save button without modifying this codebase.
     vendorCustomSaveCallback: (() => void) | null;
 }
 
@@ -51,8 +106,9 @@ const store = new PerformantStore<PreferencesStore>({
         multiTouchDownTimeout: 75,
         multiTouchTapTimeout: 175,
         pointerDoubleTapTimeout: 300,
-        pointerTapTimeout: 150,
+        pointerPenMaxPressureMargin: 0.2,
         pointerPressHoldTimeout: 500,
+        pointerTapTimeout: 150,
         postProcessInterpolateImage: true,
         preferCanvasViewport: true,
         renderer: 'webgl',
@@ -74,8 +130,9 @@ const store = new PerformantStore<PreferencesStore>({
         'menuBarPosition',
         'multiTouchDownTimeout',
         'multiTouchTapTimeout',
-        'pointerTapTimeout',
+        'pointerPenMaxPressureMargin',
         'pointerPressHoldTimeout',
+        'pointerTapTimeout',
         'renderer',
         'showTutorialNotifications',
         'showWelcomeScreenAtStart',

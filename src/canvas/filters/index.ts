@@ -20,22 +20,24 @@ import { getStoredImageOrCanvas } from "@/store/image";
 import { SRGBColorSpace, LinearFilter } from 'three/src/constants';
 
 import type { IUniform } from 'three/src/renderers/shaders/UniformsLib';
-import type { CanvasFilter, CanvasFilterLayerInfo, CanvasFilterEditConfig, WorkingFileLayerFilter, CanvasFilterEditConfigGradient } from '@/types';
+import type { Webgl2RendererCanvasFilter, CanvasFilterLayerInfo, CanvasFilterEditConfig, WorkingFileLayerFilter, CanvasFilterEditConfigGradient } from '@/types';
 
-export async function getCanvasFilterClass(name: string): Promise<new (...args: any) => CanvasFilter> {
+export async function getCanvasFilterClass(name: string): Promise<new (...args: any) => Webgl2RendererCanvasFilter> {
     const kebabCaseName = camelCaseToKebabCase(name);
-    return (await import(/* webpackChunkName: 'layer-filter-[request]' */ `./${kebabCaseName}/${kebabCaseName}`)).default;
+    return (await import(/* webpackChunkName: 'layer-filter-[request]' */ `./${kebabCaseName}`)).default;
 }
 
 interface CreateFiltersOptions {
     createDisabled?: boolean;
 }
 
-export async function createFiltersFromLayerConfig(filterConfigs: WorkingFileLayerFilter[], options: CreateFiltersOptions = {}): Promise<CanvasFilter[]> {
-    const canvasFilters: CanvasFilter[] = [];
+export async function createFiltersFromLayerConfig(filterConfigs: WorkingFileLayerFilter[], options: CreateFiltersOptions = {}): Promise<Webgl2RendererCanvasFilter[]> {
+    const canvasFilters: Webgl2RendererCanvasFilter[] = [];
     for (const filterConfig of filterConfigs) {
         if (!filterConfig.disabled || options.createDisabled) {
             const canvasFilter = new (await getCanvasFilterClass(filterConfig.name))();
+            const kebabCaseName = camelCaseToKebabCase(filterConfig.name);
+            canvasFilter.fragmentShader = (await import(/* webpackChunkName: 'layer-filter-[request]' */ `@/renderers/webgl2/backend/filters/${kebabCaseName}.frag`)).default
             canvasFilter.maskId = filterConfig.maskId;
             canvasFilter.params = filterConfig.params ?? {};
             canvasFilters.push(canvasFilter);
@@ -44,7 +46,7 @@ export async function createFiltersFromLayerConfig(filterConfigs: WorkingFileLay
     return canvasFilters;
 }
 
-export function applyCanvasFilter(imageData: ImageData, canvasFilter: CanvasFilter, paramData?: Record<string, unknown>): ImageData {
+export function applyCanvasFilter(imageData: ImageData, canvasFilter: Webgl2RendererCanvasFilter, paramData?: Record<string, unknown>): ImageData {
     const originalParams = canvasFilter.params;
     if (paramData) {
         canvasFilter.params = paramData;
@@ -54,7 +56,7 @@ export function applyCanvasFilter(imageData: ImageData, canvasFilter: CanvasFilt
     const data = imageData.data;
     const appliedData = appliedImageData.data;
     for (let i = 0; i < imageDataSize; i += 4) {
-        canvasFilter.fragment(data, appliedData, i, imageData.width, imageData.height);
+        // canvasFilter.fragment(data, appliedData, i, imageData.width, imageData.height);
     }
     if (paramData) {
         canvasFilter.params = originalParams;
@@ -62,7 +64,7 @@ export function applyCanvasFilter(imageData: ImageData, canvasFilter: CanvasFilt
     return appliedImageData;
 }
 
-export function buildCanvasFilterParamsFromFormData(canvasFilter: CanvasFilter, formData: Record<string,unknown>): Record<string, unknown> {
+export function buildCanvasFilterParamsFromFormData(canvasFilter: Webgl2RendererCanvasFilter, formData: Record<string,unknown>): Record<string, unknown> {
     const params: Record<string, unknown> = {};
     const editConfig = canvasFilter.getEditConfig();
     for (const paramName in editConfig) {
@@ -77,7 +79,7 @@ export function buildCanvasFilterParamsFromFormData(canvasFilter: CanvasFilter, 
     return params;
 }
 
-export function buildCanvasFilterPreviewParams(canvasFilter: CanvasFilter): Record<string, unknown> {
+export function buildCanvasFilterPreviewParams(canvasFilter: Webgl2RendererCanvasFilter): Record<string, unknown> {
     const filterEditConfig = canvasFilter.getEditConfig();
     const previewParams: Record<string, unknown> = {};
     for (const paramName in filterEditConfig) {
@@ -121,7 +123,7 @@ function translateParamToUniformValue(paramValue: any, editConfig: CanvasFilterE
 }
 
 export function generateShaderUniformsAndDefines(
-    canvasFilters: CanvasFilter[],
+    canvasFilters: Webgl2RendererCanvasFilter[],
     layer: CanvasFilterLayerInfo
 ): { uniforms: Record<string, IUniform>, defines: Record<string, unknown>, textures: Texture[] } {
     const defines: Record<string, unknown> = {
@@ -182,7 +184,7 @@ interface CombineFilterShadersOptions {
     vertexShaderSetup?: string;
 }
 
-export function combineFiltersToShader(canvasFilters: CanvasFilter[], layerInfo: CanvasFilterLayerInfo, options?: CombineFilterShadersOptions): CombinedFilterShaderResult {
+export function combineFiltersToShader(canvasFilters: Webgl2RendererCanvasFilter[], layerInfo: CanvasFilterLayerInfo, options?: CombineFilterShadersOptions): CombinedFilterShaderResult {
     let vertexShader = '';
     let fragmentShader = '';
 
@@ -201,8 +203,8 @@ export function combineFiltersToShader(canvasFilters: CanvasFilter[], layerInfo:
 
     for (const [index, canvasFilter] of canvasFilters.entries()) {
         const editConfig = canvasFilter.getEditConfig();
-        let filterVertexShader = canvasFilter.getVertexShader();
-        let filterFragmentShader = canvasFilter.getFragmentShader();
+        let filterVertexShader = '';
+        let filterFragmentShader = canvasFilter.fragmentShader;
 
         const mask = masks[canvasFilter.maskId ?? -1];
         let maskTexture: Texture | undefined;

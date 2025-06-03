@@ -417,7 +417,6 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
             const spanFontSplits = splitSpanByAvailableFonts(fullSpan, isEmptyLine ? (isHorizontal ? '​' : ' ') : null);
             for (const [font, span] of spanFontSplits) {
 
-
                 // Abort if no font.
                 if (!font) {
                     lineCharacterIndex += span.text.length;
@@ -497,6 +496,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                             advanceOffset: runningAdvanceOffset,
                             drawOffset: new DOMPoint(lineDrawXOffset, lineDrawYOffset),
                             characterWidth: (glyph.advanceWidth ?? 0) * glyphScale,
+                            fontName: span.meta.family ?? textMetaDefaults.family,
                             fontSize: size,
                             fontAscender: font.ascender * glyphScale,
                             fontDescender: font.descender * glyphScale,

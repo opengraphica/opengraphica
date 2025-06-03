@@ -1,11 +1,14 @@
 import { nextTick } from 'vue';
 import { BaseAction } from './base';
+
 import editorStore from '@/store/editor';
 import workingFileStore, { calculateLayerOrder, discardAllUnusedMasks, type WorkingFileState } from '@/store/working-file';
 import { writeWorkingFile, deleteWorkingFile } from '@/store/data/working-file-database';
-import appEmitter from '@/lib/emitter';
 import { discardActiveSelectionMask, discardAppliedSelectionMask, activeSelectionPath } from '@/canvas/store/selection-state';
-import { WorkingFileLayer, ColorModel, WorkingFileGroupLayer } from '@/types';
+
+import appEmitter from '@/lib/emitter';
+
+import type { WorkingFileLayer, ColorModel, WorkingFileGroupLayer } from '@/types';
 
 export interface CreateFileOptions {
     fileName?: string;
@@ -112,7 +115,7 @@ export class CreateFileAction extends BaseAction {
             if (layer.type === 'group') {
                 this.assignLayerRenderers((layer as WorkingFileGroupLayer<ColorModel>).layers);
             }
-            await layer.renderer.attach(layer);
+            appEmitter.emit('app.workingFile.layerAttached', layer as never);
         }
     }
 
@@ -121,7 +124,7 @@ export class CreateFileAction extends BaseAction {
             if (layer.type === 'group') {
                 this.detachLayerRenderers((layer as WorkingFileGroupLayer<ColorModel>).layers);
             }
-            layer.renderer.detach();
+            appEmitter.emit('app.workingFile.layerDetached', layer as never);
         }
     }
 

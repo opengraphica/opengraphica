@@ -3,7 +3,20 @@ import { lerp } from './math';
 
 import type { RGBAColor, WorkingFileGradientColorStop, WorkingFileGradientColorSpace } from "@/types";
 
-export function sampleGradient(stops: WorkingFileGradientColorStop<RGBAColor>[], colorSpace: WorkingFileGradientColorSpace, sampleOffset: number): RGBAColor {
+/**
+ * Gives the color at the specified offset in a gradient.
+ * @function sampleGradient
+ * @param {WorkingFileGradientColorStop<RGBAColor>[]} stops - The list of gradient color stops
+ * @param {WorkingFileGradientColorSpace} colorSpace - The color space to use to interpolate between colors
+ * @param {number} sampleOffset - The offset to sample the gradient at
+ * @returns {RGBAColor} - The sampled color
+ */
+
+export function sampleGradient(
+    stops: WorkingFileGradientColorStop<RGBAColor>[],
+    colorSpace: WorkingFileGradientColorSpace,
+    sampleOffset: number,
+): RGBAColor {
     const sortedStops = [...stops].sort((a, b) => a.offset < b.offset ? -1 : 1);
 
     if (sortedStops.length === 0) return {
@@ -68,6 +81,14 @@ export function sampleGradient(stops: WorkingFileGradientColorStop<RGBAColor>[],
     return interpolatedColor;
 }
 
+/**
+ * Generates the styles for a CSS gradient with the given color stops.
+ * @function generateCssGradient
+ * @param {WorkingFileGradientColorStop<RGBAColor>[]} colorStops - The color stops that define the gradient
+ * @param {WorkingFileGradientColorSpace | number} blendColorSpace - The color space to use to interpolate between colors
+ * @returns {string} - The CSS string as a linear-gradient() command
+ */
+
 export function generateCssGradient(
     colorStops: WorkingFileGradientColorStop<RGBAColor>[],
     blendColorSpace: WorkingFileGradientColorSpace | number
@@ -115,11 +136,20 @@ export function generateCssGradient(
     return previewGradient;
 }
 
+/**
+ * Generates a canvas that contains a 1-dimensional sampling of a gradient. For use in shaders.
+ * @function generateGradientImage
+ * @param {WorkingFileGradientColorStop<RGBAColor>[]} stops - The list of gradient color stops
+ * @param {WorkingFileGradientColorSpace} colorSpace - The color space to use to interpolate between colors
+ * @param {number} textureSize - How wide the resulting texture will be
+ * @returns {HTMLCanvasElement | OffscreenCanvas} A canvas that contains the gradient texture
+ */
+
 export function generateGradientImage(
     stops: WorkingFileGradientColorStop<RGBAColor>[],
     colorSpace: WorkingFileGradientColorSpace,
     textureSize: number = 64
-): HTMLCanvasElement {
+): HTMLCanvasElement | OffscreenCanvas {
     const gradientImageData = new ImageData(textureSize, 1);
     stops.sort((a, b) => a.offset < b.offset ? -1 : 1);
     let leftStopIndex = stops[0].offset > 0 ? -1 : 0;
@@ -174,10 +204,15 @@ export function generateGradientImage(
         gradientImageData.data[(i * 4) + 2] = Math.round(255 * interpolatedColor.b);
         gradientImageData.data[(i * 4) + 3] = Math.round(255 * interpolatedColor.alpha);
     }
-    const canvas = document.createElement('canvas');
-    canvas.width = gradientImageData.width;
-    canvas.height = gradientImageData.height;
-    const ctx = canvas.getContext('2d');
+    let canvas: HTMLCanvasElement | OffscreenCanvas;
+    if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
+        canvas = new OffscreenCanvas(gradientImageData.width, gradientImageData.height);
+    } else {
+        canvas = document.createElement('canvas');
+        canvas.width = gradientImageData.width;
+        canvas.height = gradientImageData.height;
+    }
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | null;
     if (ctx) {
         ctx.putImageData(gradientImageData, 0, 0);
     }

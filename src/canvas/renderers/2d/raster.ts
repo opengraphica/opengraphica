@@ -6,7 +6,7 @@ import type { DrawWorkingFileLayerOptions, WorkingFileRasterLayer, ColorModel } 
 export default class RasterLayerRenderer extends BaseLayerRenderer {
     onDraw(ctx: CanvasRenderingContext2D, layer: WorkingFileRasterLayer<ColorModel>, options: DrawWorkingFileLayerOptions = {}) {
         const image = layer.bakedImage || getStoredImageOrCanvas(layer.data.sourceUuid ?? '') as ImageBitmap;
-        const isFlipY = layer.renderer.renderMode === 'webgl' && image instanceof ImageBitmap;
+        const isFlipY = false; // layer.renderer.renderMode === 'webgl' && image instanceof ImageBitmap;
         if (isFlipY) {
             ctx.save();
             ctx.translate(0, layer.height / 2);
