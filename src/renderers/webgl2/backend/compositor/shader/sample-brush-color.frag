@@ -38,6 +38,14 @@ vec4 srgbToLinearSrgb(vec4 srgb) {
     );
 }
 
+vec3 srgbToLinearSrgb(vec3 srgb) {
+    return vec3(
+        srgbChannelToLinearSrgbChannel(srgb.r),
+        srgbChannelToLinearSrgbChannel(srgb.g),
+        srgbChannelToLinearSrgbChannel(srgb.b)
+    );
+}
+
 vec3 rgbToOklab(in vec3 rgb) {
     float L = pow(
         0.41222147079999993 * rgb.r + 0.5363325363 * rgb.g + 0.0514459929 * rgb.b,
@@ -137,7 +145,7 @@ void main() {
     float persistence = min(1.0, step(previousColor.a, 0.001) + brushBlendingPersistenceBearingConcentration.y);
     float concentration = brushBlendingPersistenceBearingConcentration.a;
 
-    vec3 blendedColor = oklabToRgb(rgbToOklab(brushColor.rgb) * (1.0 - blending) + rgbToOklab(sampledColor.rgb) * blending);
+    vec3 blendedColor = oklabToRgb(rgbToOklab(srgbToLinearSrgb(brushColor.rgb)) * (1.0 - blending) + rgbToOklab(sampledColor.rgb) * blending);
     vec3 snapTargetColor = blendedColor;
 
     vec3 snap = step(vec3(persistence), abs(blendedColor - previousColor.rgb));

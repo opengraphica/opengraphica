@@ -45,6 +45,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
     private drawingUsePressure: boolean = false;
     private drawingOnLayers: WorkingFileAnyLayer[] = [];
     private drawingBrushStroke: BrushStroke | null = null;
+    private isQueueingInput: boolean = false;
+    private queuedBrushStrokePoints: Array<BrushStrokePoint> = []; 
     
     private drawLoopDeltaAccumulator: number = 0;
     private drawLoopLastRunTimestamp: number = 0;
@@ -141,30 +143,31 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             ).matrixTransform(canvasStore.state.transform.inverse());
         }
 
+        this.isQueueingInput = false;
         const hasPressure = (e.pointerType === 'pen' || e.pointerType === 'touch') && e.pressure !== 0.5 && e.pressure !== 1.0;
-        if (
-            this.drawingPointerId == null && e.isPrimary && e.button === 0 &&
-            (
-                e.pointerType === 'pen' ||
-                (e.pointerType === 'touch' && hasPressure) ||
-                (!editorStore.state.isPenUser && e.pointerType === 'mouse')
-            )
-        ) {
+        if (this.drawingPointerId == null && e.isPrimary && e.button === 0) {
             if (showBrushDrawer.value) {
                 showBrushDrawer.value = false;
                 return;
             }
 
-            this.drawingPointerId = e.pointerId;
-            this.drawingUsePressure = hasPressure;
-            this.drawStart(e);
+            if (
+                e.pointerType === 'pen' ||
+                (!editorStore.state.isPenUser && e.pointerType === 'mouse')
+            ) {
+                this.drawingPointerId = e.pointerId;
+                this.drawingUsePressure = hasPressure;
+                this.drawStart(e);
+            } else if (e.pointerType === 'touch') {
+                this.isQueueingInput = true;
+                this.queuedBrushStrokePoints = [];
+            }
         }
     }
 
     onMultiTouchDown() {
         super.onMultiTouchDown();
-        const hasPressure = this.touches[0].down.pressure !== 0.5 && this.touches[0].down.pressure !== 1.0;
-        if (this.drawingPointerId != null || hasPressure) return;
+        if (this.drawingPointerId != null) return;
         if (showBrushDrawer.value) {
             showBrushDrawer.value = false;
             return;
@@ -173,9 +176,18 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             this.drawingPointerId = null;
             this.drawingBrushStroke = null;
         } else if (this.touches.length === 1) {
+            const hasPressure = this.touches[0].down.pressure !== 0.5 && this.touches[0].down.pressure !== 1.0;
             this.drawingPointerId = this.touches[0].id;
-            this.drawingUsePressure = false;
+            this.drawingUsePressure = hasPressure;
             this.drawStart(this.touches[0].down);
+
+            for (const point of this.queuedBrushStrokePoints) {
+                this.drawingBrushStroke?.addPoint(point);
+            }
+        }
+        if (this.isQueueingInput) {
+            this.isQueueingInput = false;
+            this.queuedBrushStrokePoints = [];
         }
     }
 
@@ -303,9 +315,9 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             ).matrixTransform(canvasStore.state.transform.inverse());
         }
 
-        const now = performance.now();
         if (
             this.drawingPointerId === e.pointerId
+            || this.isQueueingInput
         ) {
             const transformedPoint = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
@@ -318,7 +330,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             );
             const density = this.calculateDensity(pressure, size);
 
-            this.drawingBrushStroke?.addPoint({
+            const point: BrushStrokePoint = {
                 x: transformedPoint.x,
                 y: transformedPoint.y,
                 density,
@@ -328,7 +340,13 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 tiltX: e.tiltX,
                 tiltY: e.tiltY,
                 twist: e.twist,
-            });
+            };
+
+            if (this.isQueueingInput) {
+                this.queuedBrushStrokePoints.push(point);
+            } else {
+                this.drawingBrushStroke?.addPoint(point);
+            }
             this.drawLoopLastPointerMoveTimestamp = performance.now();
         }
     }
