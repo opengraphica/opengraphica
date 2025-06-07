@@ -127,7 +127,7 @@ const svgBoundsHeight = computed<number>(() => {
 });
 
 const showEditHandles = computed<boolean>(() => {
-    return !isDrawingSelection.value && selectionAddShape.value !== 'lasso'
+    return !isDrawingSelection.value && activeSelectionPath.value[0].editorShapeIntent !== 'lasso'
 });
 
 let transformedActiveSelectionPath = ref<SelectionPathPoint[]>([]);
