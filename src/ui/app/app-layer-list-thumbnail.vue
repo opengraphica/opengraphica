@@ -10,8 +10,6 @@ import { computed, defineComponent, ref, watch, PropType } from 'vue';
 import ElLoading from 'element-plus/lib/components/loading/index';
 
 import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
-import renderers from '@/canvas/renderers';
-import { createCanvasFromImage } from '@/lib/image';
 
 import { useRenderer } from '@/renderers';
 

@@ -6,10 +6,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import canvasStore from '@/store/canvas';
-import {
-    createDrawableCanvas, setDrawableCanvasScale, setDrawableCanvasGlobalAlpha, addDrawable,
-    removeDrawable, renderDrawableCanvas, destroyDrawableCanvas,
-} from '@/workers/drawable-canvas.interface';
 import InfiniteBackbuffer from './infinite-backbuffer';
 
 import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
@@ -79,18 +75,6 @@ export default class DrawableCanvas {
     }
 
     private async init() {
-        const canUseOffscrenCanvas = this.forceDrawOnMainThread ? false : await isOffscreenCanvasSupported();
-        if (canUseOffscrenCanvas) {
-            try {
-                this.offscreenCanvasUuid = await createDrawableCanvas({
-                    onDrawn: (event) => {
-                        this.onOffscreenCanvasDrawn(event);
-                    }
-                });
-            } catch (error) {
-                console.error('[src/canvas/renderers/drawable/canvas.ts] Error setting up OffscreenCanvas. ', error);
-            }
-        }
         if (!this.offscreenCanvasUuid) {
             this.mainThreadCanvas = document.createElement('canvas');
             this.mainThreadCanvas.width = 64;
@@ -107,16 +91,8 @@ export default class DrawableCanvas {
 
         this.isInitialized = true;
 
-        // Setup offscreen canvas state if some properties were modified before initialization.
-        if (this.offscreenCanvasUuid) {
-            setDrawableCanvasScale(this.offscreenCanvasUuid, this.scale);
-            for (const [uuid, { name, data }] of this.drawables.entries()) {
-                addDrawable(this.offscreenCanvasUuid, uuid, name, data);
-            }
-        } else {
-            for (const uuid of this.drawables.keys()) {
-                await this.initializeDrawable(uuid);
-            }
+        for (const uuid of this.drawables.keys()) {
+            await this.initializeDrawable(uuid);
         }
 
         // Run callbacks
@@ -188,17 +164,11 @@ export default class DrawableCanvas {
         if (newScale == this.scale) return;
         this.scale = newScale;
         if (!this.isInitialized) return;
-        if (this.offscreenCanvasUuid) {
-            setDrawableCanvasScale(this.offscreenCanvasUuid, newScale);
-        }
     }
 
     setGlobalAlpha(newGlobalAlpha: number) {
         this.globalAlpha = newGlobalAlpha;
         if (!this.isInitialized) return;
-        if (this.offscreenCanvasUuid) {
-            setDrawableCanvasGlobalAlpha(this.offscreenCanvasUuid, newGlobalAlpha);
-        }
     }
 
     async add<T = DefaultDrawableData>(name: string, data: T = {} as never): Promise<string> {
@@ -208,9 +178,6 @@ export default class DrawableCanvas {
             data,
         });
         if (this.isInitialized) {
-            if (this.offscreenCanvasUuid) {
-                addDrawable(this.offscreenCanvasUuid, uuid, name, data);
-            }
             await this.initializeDrawable(uuid);
         }
         return uuid;
@@ -233,19 +200,11 @@ export default class DrawableCanvas {
         if (!drawableInfo) return;
         this.drawables.delete(uuid);
         if (!this.isInitialized) return;
-        if (this.offscreenCanvasUuid) {
-            removeDrawable(this.offscreenCanvasUuid, uuid);
-        }
     }
 
     draw(options: DrawableDrawOptions) {
         if (this.offscreenCanvasUuid) {
-            if (!this.isWaitingOnOffscreenCanvasResult) {
-                this.isWaitingOnOffscreenCanvasResult = true;
-                renderDrawableCanvas(this.offscreenCanvasUuid, options);
-            } else {
-                this.pendingDrawOptions = options;
-            }
+            this.pendingDrawOptions = options;
         } else if (this.renderMode === '2d') {
             this.draw2d(options);
         } else if (this.renderMode === 'webgl') {
@@ -393,8 +352,5 @@ export default class DrawableCanvas {
     dispose() {
         this.onDrawnCallback = undefined;
         this.drawables.clear();
-        if (this.offscreenCanvasUuid) {
-            destroyDrawableCanvas(this.offscreenCanvasUuid);
-        }
     }
 }

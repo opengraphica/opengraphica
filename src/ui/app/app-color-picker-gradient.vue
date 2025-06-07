@@ -145,13 +145,13 @@ export default defineComponent({
         async function setupOkhsv() {
             const { DoubleSide, SRGBColorSpace } = await import('three/src/constants');
             const { Mesh } = await import('three/src/objects/Mesh');
-            const { ImagePlaneGeometry } = await import('@/canvas/renderers/webgl/geometries/image-plane-geometry');
+            const { ImagePlaneGeometry } = await import('@/renderers/webgl2/geometries/image-plane-geometry');
             const { WebGLRenderer } = await import('three/src/renderers/WebGLRenderer');
             const { Scene } = await import('three/src/scenes/Scene');
             const { OrthographicCamera } = await import('three/src/cameras/OrthographicCamera');
             const { ShaderMaterial } = await import('three/src/materials/ShaderMaterial');
-            const okhsvGradientMaterialVertexShader = (await import('@/canvas/renderers/webgl/shaders/okhsv-gradient-material.vert')).default;
-            const okhsvGradientMaterialFragmentShader = (await import('@/canvas/renderers/webgl/shaders/okhsv-gradient-material.frag')).default;
+            const okhsvGradientMaterialVertexShader = (await import('@/renderers/webgl2/layers/base/shader/okhsv-gradient-material.vert')).default;
+            const okhsvGradientMaterialFragmentShader = (await import('@/renderers/webgl2/layers/base/shader/okhsv-gradient-material.frag')).default;
 
             // Create assets for saturation/value gradient
 

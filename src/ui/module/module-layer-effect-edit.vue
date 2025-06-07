@@ -180,7 +180,7 @@ import { Rules } from 'async-validator';
 
 import { Scene } from 'three/src/scenes/Scene';
 import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer';
-import { ImagePlaneGeometry } from '@/canvas/renderers/webgl/geometries/image-plane-geometry';
+import { ImagePlaneGeometry } from '@/renderers/webgl2/geometries/image-plane-geometry';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { NearestFilter, SRGBColorSpace } from 'three/src/constants';
 import { Mesh } from 'three/src/objects/Mesh';
@@ -224,12 +224,13 @@ import { createStoredImage, deleteStoredImage, getStoredImageOrCanvas } from '@/
 import workingFileStore, { getCanvasRenderingContext2DSettings, getLayerById, getLayerGlobalTransform, discardMaskIfUnused } from '@/store/working-file';
 import { activeSelectionMask, appliedSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMaskCanvasOffset, resampleSelectionMaskInLayerBounds } from '@/canvas/store/selection-state';
 
-import { createRasterShaderMaterial } from '@/canvas/renderers/webgl/shaders';
-import { buildCanvasFilterParamsFromFormData, createFiltersFromLayerConfig, applyCanvasFilter, generateShaderUniformsAndDefines, combineFiltersToShader } from '@/canvas/filters';
-import { EffectComposer } from '@/canvas/renderers/webgl/postprocessing/effect-composer';
-import { RenderPass } from '@/canvas/renderers/webgl/postprocessing/render-pass';
-import { ShaderPass } from '@/canvas/renderers/webgl/postprocessing/shader-pass';
-import { GammaCorrectionShader } from '@/canvas/renderers/webgl/shaders/gamma-correction-shader';
+import { createLayerShaderUniformsAndDefines } from '@/renderers/webgl2/layers/base/material';
+import { createRasterMaterial } from '@/renderers/webgl2/layers/raster/material';
+import { buildCanvasFilterParamsFromFormData, createFiltersFromLayerConfig, applyCanvasFilter } from '@/canvas/filters';
+import { EffectComposer } from '@/renderers/webgl2/backend/postprocessing/effect-composer';
+import { RenderPass } from '@/renderers/webgl2/backend/postprocessing/render-pass';
+import { ShaderPass } from '@/renderers/webgl2/backend/postprocessing/shader-pass';
+import { GammaCorrectionShader } from '@/renderers/webgl2/backend/postprocessing/gamma-correction-shader';
 
 import { useRenderer } from '@/renderers';
 
@@ -545,9 +546,11 @@ async function calculateBeforeImageWithThreejs(beforeCanvas: HTMLCanvasElement, 
             beforeTexture.colorSpace = SRGBColorSpace;
         });
 
-        const combinedShaderResult = combineFiltersToShader(await createFiltersFromLayerConfig(beforeFilterConfigs), layer.value!);
-        material = createRasterShaderMaterial(beforeTexture, combinedShaderResult);
-        filterTextures = combinedShaderResult.textures;
+        material = await createRasterMaterial({
+            srcTexture: beforeTexture,
+            canvasFilters: await createFiltersFromLayerConfig(beforeFilterConfigs)
+        });
+        filterTextures = material.userData.disposableTextures;
 
         mesh = new Mesh(imagePlaneGeometry, material);
         scene.add(mesh);
@@ -619,9 +622,11 @@ async function initializeThreejs(afterCanvas: HTMLCanvasElement) {
         previewTexture.colorSpace = SRGBColorSpace;
     });
 
-    const combinedShaderResult = combineFiltersToShader([currentFilter.value], layer.value!);
-    previewMaterial = createRasterShaderMaterial(previewTexture, combinedShaderResult);
-    previewFilterTextures = combinedShaderResult.textures;
+    previewMaterial = await createRasterMaterial({
+        srcTexture: previewTexture,
+        canvasFilters: await createFiltersFromLayerConfig([currentFilter.value])
+    });
+    previewFilterTextures = previewMaterial.userData.disposableTextures;
 
     previewMesh = new Mesh(previewPlaneGeometry, previewMaterial);
     threejsScene.add(previewMesh);
@@ -701,7 +706,7 @@ const updatePreview = throttle(function () {
     if (isUseWebGlPreview) {
         if (threejsComposer && previewMaterial) {
             currentFilter.value.params = buildEditParamsFromFromData();
-            const { uniforms: newUniforms, defines: newDefines } = generateShaderUniformsAndDefines([currentFilter.value], layer.value!);
+            const { uniforms: newUniforms, defines: newDefines, textures: newTextures } = createLayerShaderUniformsAndDefines(layer.value!.width, layer.value!.height, [currentFilter.value]);
             for (const defineName in newDefines) {
                 previewMaterial.defines[defineName] = newDefines[defineName];
             }
@@ -710,6 +715,10 @@ const updatePreview = throttle(function () {
             }
             previewMaterial.needsUpdate = true;
             threejsComposer.render();
+            for (const texture of previewFilterTextures) {
+                texture.dispose();
+            }
+            previewFilterTextures = newTextures;
         }
     } else {
         if (currentFilter.value && beforeCtx && afterCtx) {

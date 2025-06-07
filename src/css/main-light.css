@@ -8275,8 +8275,8 @@
   font-family: "OpenGraphicaIcons";
   font-style: normal;
   font-weight: 400;
-  src: url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.eot?1749252555645");
-  src: url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.eot?#iefix") format("embedded-opentype"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.woff2?1749252555645") format("woff2"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.woff?1749252555645") format("woff"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.ttf?1749252555645") format("truetype"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.svg?1749252555645#OpenGraphicaIcons") format("svg");
+  src: url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.eot?1749253147455");
+  src: url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.eot?#iefix") format("embedded-opentype"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.woff2?1749253147455") format("woff2"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.woff?1749253147455") format("woff"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.ttf?1749253147455") format("truetype"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.svg?1749253147455#OpenGraphicaIcons") format("svg");
 }
 .bi.bi-lasso::before {
   font-family: "OpenGraphicaIcons" !important;
@@ -28444,6 +28444,7 @@ body.og-full-page .opengraphica {
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content {
   flex-grow: 1;
   margin: 0;
+  min-height: 2.5rem;
 }
 .opengraphica .el-form-item-group .el-form-item .el-form-item__content:hover {
   z-index: 1;

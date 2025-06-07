@@ -4,7 +4,6 @@ import { BaseAction } from './base';
 import { updateBakedImageForLayer } from './baking';
 
 import { createEmptyCanvas } from '@/lib/image';
-import { drawImageToCanvas2d } from '@/lib/canvas';
 import appEmitter from '@/lib/emitter';
 
 import canvasStore from '@/store/canvas';
@@ -127,7 +126,9 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                                 sourceCtx.clearRect(updateChunk.x, updateChunk.y, updateCanvas.width, updateCanvas.height);
                                 sourceCtx.drawImage(updateCanvas, 0, 0, updateCanvas.width, updateCanvas.height, updateChunk.x, updateChunk.y, updateCanvas.width, updateCanvas.height);
                             } else {
-                                await drawImageToCanvas2d(sourceCanvas, updateCanvas, updateChunk.x, updateChunk.y);
+                                sourceCtx.globalCompositeOperation = 'source-over';
+                                sourceCtx.imageSmoothingEnabled = false;
+                                sourceCtx.drawImage(updateCanvas, 0, 0, updateCanvas.width, updateCanvas.height, updateChunk.x, updateChunk.y, updateCanvas.width, updateCanvas.height);
                             }
                         }
                         prepareStoredImageForArchival(layer.data.sourceUuid);

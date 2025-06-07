@@ -6,25 +6,20 @@ import BaseCanvasMovementController from './base-movement';
 import { BrushStroke, type BrushStrokePoint } from '@/lib/brush-stroke';
 import appEmitter from '@/lib/emitter';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
-import { createImageFromBlob, createEmptyCanvasWith2dContext } from '@/lib/image';
-import { findPointListBounds } from '@/lib/math';
 import { t, tm, rt } from '@/i18n';
 
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import preferencesStore from '@/store/preferences';
-import { getStoredImageOrCanvas, createStoredImage, prepareStoredImageForArchival, prepareStoredImageForEditing, getStoredImageCanvas } from '@/store/image';
+import { prepareStoredImageForArchival, prepareStoredImageForEditing } from '@/store/image';
 import historyStore, { createHistoryReserveToken, historyReserveQueueFree, historyBlockInteractionUntilComplete } from '@/store/history';
-import workingFileStore, { getSelectedLayers, getLayerById, getLayerGlobalTransform } from '@/store/working-file';
+import workingFileStore, { getSelectedLayers, getLayerById } from '@/store/working-file';
 import {
     showBrushDrawer,
     cursorHoverPosition, brushShape, brushSpacing, brushSize, brushOpacity,
     brushHardness, brushPressureMinSize, brushPressureTaper,
     brushDensity, brushPressureMinDensity, brushSmoothing, brushJitter,
 } from '../store/erase-brush-state';
-import { blitActiveSelectionMask, activeSelectionMask, appliedSelectionMask } from '../store/selection-state';
-
-import DrawableCanvas from '@/canvas/renderers/drawable/canvas';
 
 import type { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';

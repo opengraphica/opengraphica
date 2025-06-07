@@ -358,6 +358,7 @@
             .el-form-item__content {
                 flex-grow: 1;
                 margin: 0;
+                min-height: 2.5rem;
 
                 &:hover {
                     z-index: 1;

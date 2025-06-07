@@ -4,7 +4,6 @@ import { DecomposedMatrix, decomposeMatrix } from '@/lib/dom-matrix';
 import preferencesStore from './preferences';
 
 import type { Mesh, PlaneGeometry, ShaderMaterial, OrthographicCamera, Scene, WebGLRenderer } from 'three';
-import type { EffectComposer } from '@/canvas/renderers/webgl/postprocessing/effect-composer';
 
 const imageSmoothingZoomRatio = preferencesStore.get('imageSmoothingZoomRatio');
 
@@ -28,13 +27,6 @@ interface CanvasState {
     renderer: '2d' | 'webgl'; // The active renderer. See preferences store for preferred renderer.
     selectionMaskCanvas: HTMLCanvasElement;
     showAreaOutsideWorkingFile: boolean;
-    threejsBackground: Mesh | null;
-    threejsCamera: OrthographicCamera | null;
-    threejsCanvasMargin: Mesh | null;
-    threejsComposer: EffectComposer | null;
-    threejsRenderer: WebGLRenderer | null;
-    threejsScene: Scene | null;
-    threejsSelectionMask: Mesh<PlaneGeometry, ShaderMaterial> | null;
     transform: DOMMatrix;
     transformResetOptions: undefined | true | CanvasViewResetOptions;
     viewDirty: boolean;
@@ -83,13 +75,6 @@ const store = new PerformantStore<CanvasStore>({
         renderer: '2d',
         selectionMaskCanvas: dummyCanvas,
         showAreaOutsideWorkingFile: false,
-        threejsBackground: null,
-        threejsCamera: null,
-        threejsCanvasMargin: null,
-        threejsComposer: null,
-        threejsRenderer: null,
-        threejsScene: null,
-        threejsSelectionMask: null,
         transform: new DOMMatrix(),
         transformResetOptions: undefined,
         viewDirty: true,
@@ -97,7 +82,7 @@ const store = new PerformantStore<CanvasStore>({
         viewWidth: 100, // Maps to screen width; devicePixelRatio IS applied.
         workingImageBorderColor: '#cccccc'
     },
-    nonReactive: ['bufferCanvas', 'bufferCtx', 'isDisplayingNonRasterLayer', 'selectionMaskCanvas', 'threejsCamera', 'threejsComposer', 'threejsSelectionMask', 'viewCanvas', 'viewCtx'],
+    nonReactive: ['bufferCanvas', 'bufferCtx', 'isDisplayingNonRasterLayer', 'selectionMaskCanvas', 'viewCanvas', 'viewCtx'],
     onSet(key, value, set) {
         if (key === 'transform') {
             const previousDecomposedTransform = store.state.decomposedTransform;
@@ -171,11 +156,7 @@ async function getCanvasRenderingContext(canvas: HTMLCanvasElement) {
     if (store.state.renderer === '2d') {
         return canvas.getContext('2d', getCanvasRenderingContext2DSettings());
     } else if (store.state.renderer === 'webgl') {
-        if (store.state.threejsRenderer?.capabilities.isWebGL2) {
-            return canvas.getContext('webgl2', getWebGLContextAttributes());
-        } else {
-            return canvas.getContext('webgl', getWebGLContextAttributes());
-        }
+        
     }
     return null;
 }

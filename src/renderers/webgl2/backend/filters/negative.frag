@@ -7,16 +7,16 @@ vec4 processNegative(vec4 color) {
         rgb = linearSrgbToSrgb(rgb);
     }
 
-    #ifdef cInvertRed
+    #if cInvertRed == 1
         rgb.r = 1.0 - rgb.r;
     #endif
-    #ifdef cInvertGreen
+    #if cInvertGreen == 1
         rgb.g = 1.0 - rgb.g;
     #endif
-    #ifdef cInvertBlue
+    #if cInvertBlue == 1
         rgb.b = 1.0 - rgb.b;
     #endif
-    #ifdef cInvertValue
+    #if cInvertValue == 1
         vec3 hsv = rgbToHsv(rgb);
         hsv.z = 1.0 - hsv.z;
         rgb = hsvToRgb(hsv);
