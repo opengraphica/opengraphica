@@ -98,9 +98,6 @@ watch(() => [props.top, props.left], (newProps, oldProps) => {
     if (newProps[0] !== oldProps?.[0] || newProps[1] !== oldProps?.[1]) {
         top.value = props.top;
         left.value = props.left;
-        if (!dockElement.value) return;
-        calculateBoundingBox();
-        nextTick(limitDragBounds);
     }
 }, { immediate: true });
 

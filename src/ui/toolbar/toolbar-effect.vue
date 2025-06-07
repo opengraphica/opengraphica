@@ -98,7 +98,7 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { computed, defineComponent, nextTick, ref, toRefs } from 'vue';
 
 import ElAlert from 'element-plus/lib/components/alert/index';
@@ -125,87 +125,54 @@ import appEmitter from '@/lib/emitter';
 
 import type { WorkingFileAnyLayer, ColorModel } from '@/types';
 
-export default defineComponent({
-    name: 'ToolbarEffect',
-    components: {
-        ElAlert,
-        ElButton,
-        ElButtonGroup,
-        ElForm,
-        ElFormItem,
-        ElHorizontalScrollbarArrows,
-        ElInput,
-        ElInputGroup,
-        ElInputNumber,
-        ElOption,
-        ElPopover,
-        ElSelect,
-        ElSlider,
-        ElTooltip,
-    },
-    props: {
-        
-    },
-    emits: [
-        'close'
-    ],
-    setup(props, { emit }) {
-        const { selectedLayerIds } = toRefs(workingFileStore.state);
-
-        const selectedLayers = computed(() => {
-            return getSelectedLayers(workingFileStore.state.selectedLayerIds);
-        });
-
-        const isEditEffectPopoverVisible = ref(false);
-       
-        function onClickAddEffect() {
-            runModule('layer', 'layerEffectBrowser');
-        }
-
-        function onEditLayerFilter(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
-            isEditEffectPopoverVisible.value = false;
-            runModule('layer', 'layerEffectEdit', {
-                layerId: layer.id,
-                filterIndex
-            });
-        }
-
-        function onMoveLayerFilterUp(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
-            historyStore.dispatch('runAction', {
-                action: new ReorderLayerFiltersAction(layer.id, [filterIndex], filterIndex - 1, 'before')
-            });
-        }
-
-        function onMoveLayerFilterDown(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
-            historyStore.dispatch('runAction', {
-                action: new ReorderLayerFiltersAction(layer.id, [filterIndex], filterIndex + 1, 'after')
-            });
-        }
-
-        function onDeleteLayerFilter(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
-            historyStore.dispatch('runAction', {
-                action: new DeleteLayerFilterAction(layer.id, filterIndex)
-            });
-
-            // Resize popover
-            isEditEffectPopoverVisible.value = false;
-            nextTick(() => {
-                isEditEffectPopoverVisible.value = true;
-            });
-        }
-
-        return {
-            selectedLayerIds,
-            selectedLayers,
-
-            isEditEffectPopoverVisible,
-
-            onClickAddEffect,
-            onEditLayerFilter,
-            onMoveLayerFilterUp,
-            onMoveLayerFilterDown,
-            onDeleteLayerFilter,
-        };
-    }
+defineOptions({
+    name: 'ToolbarEffect',  
 });
+
+const emit = defineEmits(['close']);
+        
+const { selectedLayerIds } = toRefs(workingFileStore.state);
+
+const selectedLayers = computed(() => {
+    return getSelectedLayers(workingFileStore.state.selectedLayerIds);
+});
+
+const isEditEffectPopoverVisible = ref(false);
+
+function onClickAddEffect() {
+    runModule('layer', 'layerEffectBrowser');
+}
+
+function onEditLayerFilter(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
+    isEditEffectPopoverVisible.value = false;
+    runModule('layer', 'layerEffectEdit', {
+        layerId: layer.id,
+        filterIndex
+    });
+}
+
+function onMoveLayerFilterUp(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
+    historyStore.dispatch('runAction', {
+        action: new ReorderLayerFiltersAction(layer.id, [filterIndex], filterIndex - 1, 'before')
+    });
+}
+
+function onMoveLayerFilterDown(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
+    historyStore.dispatch('runAction', {
+        action: new ReorderLayerFiltersAction(layer.id, [filterIndex], filterIndex + 1, 'after')
+    });
+}
+
+function onDeleteLayerFilter(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
+    historyStore.dispatch('runAction', {
+        action: new DeleteLayerFilterAction(layer.id, filterIndex)
+    });
+
+    // Resize popover
+    isEditEffectPopoverVisible.value = false;
+    nextTick(() => {
+        isEditEffectPopoverVisible.value = true;
+    });
+}
+
 </script>

@@ -436,7 +436,8 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         if (
             event?.trigger != 'do' ||
             [
-                'applyLayerTransform', 'trimLayerEmptySpace', 'setLayerBoundsToWorkingFileBounds', 'convertLayersToCollage'
+                'applyLayerTransform', 'trimLayerEmptySpace', 'setLayerBoundsToWorkingFileBounds',
+                'convertLayersToCollage', 'resetLayerWidths', 'resetLayerHeights'
             ].includes(event?.action.id)
         ) {
             isBoundsIndeterminate.value = true;
@@ -702,6 +703,8 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             if (isTranslate || isScale || isRotate) {
                 const updateLayerActions: UpdateLayerAction<UpdateAnyLayerOptions<ColorModel>>[] = [];
                 for (const [i, layer] of selectedLayers.value.entries()) {
+                    if (!this.transformStartLayerData[i]) continue;
+
                     const updateLayerOptions: UpdateAnyLayerOptions = {
                         id: layer.id,
                         transform: layer.transform,

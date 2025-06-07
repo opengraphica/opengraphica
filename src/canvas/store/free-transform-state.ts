@@ -1,11 +1,16 @@
 import mitt from 'mitt';
 import { computed, ref } from 'vue';
+
 import historyStore from '@/store/history';
 import workingFileStore, { getSelectedLayers } from '@/store/working-file';
+
 import { ApplyLayerTransformAction } from '@/actions/apply-layer-transform';
 import { BundleAction } from '@/actions/bundle';
 import { SetLayerBoundsToWorkingFileBoundsAction } from '@/actions/set-layer-bounds-to-working-file-bounds';
 import { TrimLayerEmptySpaceAction } from '@/actions/trim-layer-empty-space';
+import { UpdateLayerAction } from '@/actions/update-layer';
+
+import { decomposeMatrix } from '@/lib/dom-matrix';
 import { isShiftKeyPressed } from '@/lib/keyboard';
 
 import type { WorkingFileLayer, ColorModel } from '@/types';
@@ -28,6 +33,14 @@ export const dimensionLockRatio = ref<number | null>(null);
 export const selectedLayers = ref<WorkingFileLayer<ColorModel>[]>([]);
 
 export const freeTransformEmitter = mitt();
+
+export const snappingDockTop = ref(0);
+export const snappingDockLeft = ref(0);
+export const snappingDockVisible = ref<boolean>(false);
+
+export const metricsDockTop = ref(0);
+export const metricsDockLeft = ref(0);
+export const metricsDockVisible = ref<boolean>(false);
 
 export const transformOptions = computed(() => {
     let canTranslate: boolean = true;
@@ -114,6 +127,60 @@ freeTransformEmitter.on('setDimensions', (event?: { top?: number, left?: number,
     }
 });
 
+export async function resetSelectedLayerWidths() {
+    if (!isResizeEnabled.value) return;
+
+    const actions: UpdateLayerAction<any>[] = [];
+    for (const layer of selectedLayers.value) {
+        const decomposedTransform = decomposeMatrix(layer.transform);
+        const scaleX = 1;
+        const scaleY = (isUnevenScalingEnabled.value) ? decomposedTransform.scaleY : 1;
+
+        if (decomposedTransform.scaleX !== scaleX) {
+            actions.push(new UpdateLayerAction({
+                id: layer.id,
+                transform: new DOMMatrix()
+                    .translateSelf(decomposedTransform.translateX, decomposedTransform.translateY)
+                    .rotateSelf(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
+                    .scaleSelf(scaleX, scaleY)
+            }));
+        }
+    }
+    if (actions.length > 0) {
+        await historyStore.dispatch('runAction', {
+            action: new BundleAction('resetLayerWidths', 'action.freeTransformScale', actions),
+            blockInteraction: true,
+        });
+    }
+}
+
+export async function resetSelectedLayerHeights() {
+    if (!isResizeEnabled.value) return;
+
+    const actions: UpdateLayerAction<any>[] = [];
+    for (const layer of selectedLayers.value) {
+        const decomposedTransform = decomposeMatrix(layer.transform);
+        const scaleX = (isUnevenScalingEnabled.value) ? decomposedTransform.scaleX : 1;
+        const scaleY = 1;
+
+        if (decomposedTransform.scaleY !== scaleY) {
+            actions.push(new UpdateLayerAction({
+                id: layer.id,
+                transform: new DOMMatrix()
+                    .translateSelf(decomposedTransform.translateX, decomposedTransform.translateY)
+                    .rotateSelf(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
+                    .scaleSelf(scaleX, scaleY)
+            }));
+        }
+    }
+    if (actions.length > 0) {
+        await historyStore.dispatch('runAction', {
+            action: new BundleAction('resetLayerHeights', 'action.freeTransformScale', actions),
+            blockInteraction: true,
+        });
+    }
+}
+
 export async function applyTransform() {
     try {
         const actions: ApplyLayerTransformAction[] = [];
@@ -158,3 +225,4 @@ export async function layerToImageBounds() {
         console.error('[src/canvas/store/free-transform-state.ts] Error occurred during trim empty space.', error);
     }
 }
+

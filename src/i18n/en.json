@@ -1223,8 +1223,11 @@
             "metrics": {
                 "title": "Metrics",
                 "position": "Position",
+                "resetPosition": "Reset {dimension} Position",
                 "width": "Width",
+                "resetWidth": "Reset Width",
                 "height": "Height",
+                "resetHeight": "Reset Height",
                 "rotation": "Rotation",
                 "resetRotation": "Reset Rotation",
                 "noLayers": "No layer(s) selected."

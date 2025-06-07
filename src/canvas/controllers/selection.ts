@@ -179,9 +179,13 @@ export default class SelectionController extends BaseMovementController {
             const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
             if (pointer && (pointer.type !== 'touch' || this.multiTouchDownCount === 1) && pointer.down.button === 0 && pointer.isDragging) {
 
+                const editorShapeIntent = activeSelectionPath.value[0]?.editorShapeIntent;
+
                 // Create selection path or find drag handle
                 if (!this.dragStartActiveSelectionPath && this.dragStartHandleIndex == -1) {
-                    this.dragStartHandleIndex = this.getDragHandleIndexAtPagePoint(pointer.down.pageX, pointer.down.pageY);
+                    if (editorShapeIntent !== 'lasso') {
+                        this.dragStartHandleIndex = this.getDragHandleIndexAtPagePoint(pointer.down.pageX, pointer.down.pageY);
+                    }
                     this.dragStartActiveSelectionPathIsClosed = this.isActiveSelectionPathClosed();
                     if (this.dragStartHandleIndex === -1) {
                         this.dragStartActiveSelectionPath = [];
@@ -203,8 +207,11 @@ export default class SelectionController extends BaseMovementController {
                 const cursorY = e.pageY;
 
                 // Drag handle of active path
-                if (this.dragStartHandleIndex > -1 && activeSelectionPath.value.length - 1 >= this.dragStartHandleIndex && this.dragStartActiveSelectionPath) {
-                    const editorShapeIntent = activeSelectionPath.value[0]?.editorShapeIntent;
+                if (
+                    this.dragStartHandleIndex > -1
+                    && activeSelectionPath.value.length - 1 >= this.dragStartHandleIndex
+                    && this.dragStartActiveSelectionPath
+                ) {
 
                     // Resize rectangle
                     if (editorShapeIntent === 'rectangle') {
@@ -307,7 +314,7 @@ export default class SelectionController extends BaseMovementController {
                     }
 
                     // Modify free select handle placement
-                    else {
+                    else if (editorShapeIntent === 'freePolygon') {
                         const newDragHandlePosition = new DOMPoint(cursorX * devicePixelRatio, cursorY * devicePixelRatio).matrixTransform(transformInverse);
                         const dragHandle = activeSelectionPath.value[this.dragStartHandleIndex];
                         dragHandle.x = newDragHandlePosition.x;
@@ -323,7 +330,6 @@ export default class SelectionController extends BaseMovementController {
                     }
                 }
                 else { // Create a shape
-                    
                     
                     const decomposedTransform = canvasStore.get('decomposedTransform');
 
@@ -794,11 +800,12 @@ export default class SelectionController extends BaseMovementController {
     protected handleCursorIcon() {
         let newIcon = super.handleCursorIcon();
         if (!newIcon) {
-            if (this.hoveringActiveSelectionPathIndex > -1) {
+            const editorShapeIntent = activeSelectionPath.value[0]?.editorShapeIntent;
+            if (this.hoveringActiveSelectionPathIndex > -1 && editorShapeIntent !== 'lasso') {
                 if (
                     this.hoveringActiveSelectionPathIndex === 0 &&
                     activeSelectionPath.value.length > 2 &&
-                    activeSelectionPath.value[0]?.editorShapeIntent === 'freePolygon' &&
+                    editorShapeIntent === 'freePolygon' &&
                     !this.isActiveSelectionPathClosed()
                 ) {
                     newIcon = 'pointer';
