@@ -1,6 +1,8 @@
 @use '../../node_modules/bootstrap-icons/font/bootstrap-icons.css';
 @use './theme.scss';
 
+@use './opengraphica/webfont.scss';
+
 @use './opengraphica/button.scss';
 @use './opengraphica/container.scss';
 @use './opengraphica/select.scss';
@@ -11,6 +13,7 @@
     font-family: Roboto;
     src: url('fonts/Roboto-Light.ttf');
 }
+
 
 :root {
     --og-border-radius: 0.5rem;
@@ -76,6 +79,7 @@ body.og-full-page {
     }
 
     @import './opengraphica/reset.scss';
+
     @import './opengraphica/animation.scss';
     @include button.main;
     @import './opengraphica/canvas.scss';

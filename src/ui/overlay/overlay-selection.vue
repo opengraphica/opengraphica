@@ -14,8 +14,39 @@
                         dominant-baseline="hanging"
                         font-size="14"
                         font-weight="bold"
+                        letter-spacing="2"
+                        fill="black"
+                        :x="transformedActiveSelectionPathDimensionsPosition.x - 1"
+                        :y="transformedActiveSelectionPathDimensionsPosition.y + 0"
+                    >{{ activeSelectionPathDimensionsText }}</text>
+                    <text
+                        text-anchor="middle"
+                        dominant-baseline="hanging"
+                        font-size="14"
+                        font-weight="bold"
+                        letter-spacing="2"
                         fill="black"
                         :x="transformedActiveSelectionPathDimensionsPosition.x + 1"
+                        :y="transformedActiveSelectionPathDimensionsPosition.y + 0"
+                    >{{ activeSelectionPathDimensionsText }}</text>
+                    <text
+                        text-anchor="middle"
+                        dominant-baseline="hanging"
+                        font-size="14"
+                        font-weight="bold"
+                        letter-spacing="2"
+                        fill="black"
+                        :x="transformedActiveSelectionPathDimensionsPosition.x + 0"
+                        :y="transformedActiveSelectionPathDimensionsPosition.y - 1"
+                    >{{ activeSelectionPathDimensionsText }}</text>
+                    <text
+                        text-anchor="middle"
+                        dominant-baseline="hanging"
+                        font-size="14"
+                        font-weight="bold"
+                        letter-spacing="2"
+                        fill="black"
+                        :x="transformedActiveSelectionPathDimensionsPosition.x + 0"
                         :y="transformedActiveSelectionPathDimensionsPosition.y + 1"
                     >{{ activeSelectionPathDimensionsText }}</text>
                     <text
@@ -23,12 +54,13 @@
                         dominant-baseline="hanging"
                         font-size="14"
                         font-weight="bold"
+                        letter-spacing="2"
                         fill="white"
                         :x="transformedActiveSelectionPathDimensionsPosition.x"
                         :y="transformedActiveSelectionPathDimensionsPosition.y"
                     >{{ activeSelectionPathDimensionsText }}</text>
                 </template>
-                <template v-if="!isDrawingSelection">
+                <template v-if="showEditHandles">
                     <template v-for="(point, i) in transformedActiveSelectionPath" :key="i + '_' + point.x + '_' + point.y">
                         <template v-if="point.type === 'line'">
                             <rect :x="point.x - (svgHandleWidth * 1.4)" :y="point.y - (svgHandleWidth * 1.4)" :width="svgHandleWidth * 2.8" :height="svgHandleWidth * 2.8" :stroke-width="0" />
@@ -53,152 +85,128 @@
     </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, computed, watch, onMounted, onUnmounted, toRefs } from 'vue';
+<script setup lang="ts">
+import { ref, computed, watch, toRefs } from 'vue';
 
 import { convertUnits } from '@/lib/metrics';
 
-import { isDrawingSelection, activeSelectionPath, SelectionPathPoint } from '@/canvas/store/selection-state';
+import { isDrawingSelection, activeSelectionPath, selectionAddShape, type SelectionPathPoint } from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
-import workingFileStore, { type WorkingFileState } from '@/store/working-file';
+import workingFileStore from '@/store/working-file';
 
-export default defineComponent({
-    name: 'CanvasOverlaySelection',
-    setup() {
-        const devicePixelRatio = window.devicePixelRatio || 1;
+defineOptions({
+    name: 'CanvasOverlaySelection'
+});
 
-        const { transform, viewWidth, viewHeight, viewDirty } = toRefs(canvasStore.state);
-        const { measuringUnits, resolutionX, resolutionY, resolutionUnits, selectedLayerIds } = toRefs(workingFileStore.state);
+const devicePixelRatio = window.devicePixelRatio || 1;
 
-        const selectionContainer = ref<HTMLDivElement>(null as any);
-        const dragHandleHighlightColor: string = '#ecf5ff';
-        const dragHandleHighlightBorderColor: string= '#b3d8ff';
+const { transform, viewWidth, viewHeight, viewDirty } = toRefs(canvasStore.state);
+const { measuringUnits, resolutionX, resolutionY, resolutionUnits, selectedLayerIds } = toRefs(workingFileStore.state);
 
-        const zoom = computed<number>(() => {
-            const decomposedTransform = canvasStore.state.decomposedTransform;
-            let appliedZoom: number = decomposedTransform.scaleX / devicePixelRatio;
-            return appliedZoom;
+const selectionContainer = ref<HTMLDivElement>(null as any);
+const dragHandleHighlightColor: string = '#ecf5ff';
+const dragHandleHighlightBorderColor: string= '#b3d8ff';
+
+const zoom = computed<number>(() => {
+    const decomposedTransform = canvasStore.state.decomposedTransform;
+    let appliedZoom: number = decomposedTransform.scaleX / devicePixelRatio;
+    return appliedZoom;
+});
+const svgBoundsPadding = 10;
+const svgPathStrokeWidth = computed<number>(() => {
+    return 2;
+});
+const svgHandleWidth = computed<number>(() => {
+    return 5;
+});
+const svgBoundsWidth = computed<number>(() => {
+    return viewWidth.value / devicePixelRatio;
+});
+const svgBoundsHeight = computed<number>(() => {
+    return viewHeight.value / devicePixelRatio;
+});
+
+const showEditHandles = computed<boolean>(() => {
+    return !isDrawingSelection.value && selectionAddShape.value !== 'lasso'
+});
+
+let transformedActiveSelectionPath = ref<SelectionPathPoint[]>([]);
+let activeSelectionPathPixelWidth = ref(0);
+let activeSelectionPathPixelHeight = ref(0);
+let transformedActiveSelectionPathDimensionsPosition = ref({ x: 0, y: 0 });
+watch([activeSelectionPath, viewDirty], () => {
+    transformedActiveSelectionPath.value = [];
+    let left = Infinity;
+    let right = -Infinity;
+    let top = Infinity;
+    let bottom = -Infinity;
+    let xfLeft = Infinity;
+    let xfRight = -Infinity;
+    let xfTop = Infinity;
+    let xfBottom = -Infinity;
+    for (const pathPoint of activeSelectionPath.value) {
+        if (pathPoint.x < left) left = pathPoint.x;
+        if (pathPoint.x > right) right = pathPoint.x;
+        if (pathPoint.y < top) top = pathPoint.y;
+        if (pathPoint.y > bottom) bottom = pathPoint.y;
+        const position = new DOMPoint(pathPoint.x, pathPoint.y).matrixTransform(transform.value);
+        if (position.x < xfLeft) xfLeft = position.x;
+        if (position.x > xfRight) xfRight = position.x;
+        if (position.y < xfTop) xfTop = position.y;
+        if (position.y > xfBottom) xfBottom = position.y;
+        let startHandle = position;
+        let endHandle = position;
+        if (pathPoint.type === 'bezierCurve') {
+            startHandle = new DOMPoint(pathPoint.shx, pathPoint.shy).matrixTransform(transform.value);
+            endHandle = new DOMPoint(pathPoint.ehx, pathPoint.ehy).matrixTransform(transform.value);
+        }
+        transformedActiveSelectionPath.value.push({
+            type: pathPoint.type,
+            x: position.x / devicePixelRatio,
+            y: position.y / devicePixelRatio,
+            shx: startHandle.x / devicePixelRatio,
+            shy: startHandle.y / devicePixelRatio,
+            ehx: endHandle.x / devicePixelRatio,
+            ehy: endHandle.y / devicePixelRatio
         });
-        const svgBoundsPadding = 10;
-        const svgPathStrokeWidth = computed<number>(() => {
-            return 2;
-        });
-        const svgHandleWidth = computed<number>(() => {
-            return 5;
-        });
-        const svgBoundsWidth = computed<number>(() => {
-            return viewWidth.value / devicePixelRatio;
-        });
-        const svgBoundsHeight = computed<number>(() => {
-            return viewHeight.value / devicePixelRatio;
-        });
-        
-        let transformedActiveSelectionPath = ref<SelectionPathPoint[]>([]);
-        let activeSelectionPathPixelWidth = ref(0);
-        let activeSelectionPathPixelHeight = ref(0);
-        let transformedActiveSelectionPathDimensionsPosition = ref({ x: 0, y: 0 });
-        watch([activeSelectionPath, viewDirty], () => {
-            transformedActiveSelectionPath.value = [];
-            let left = Infinity;
-            let right = -Infinity;
-            let top = Infinity;
-            let bottom = -Infinity;
-            let xfLeft = Infinity;
-            let xfRight = -Infinity;
-            let xfTop = Infinity;
-            let xfBottom = -Infinity;
-            for (const pathPoint of activeSelectionPath.value) {
-                if (pathPoint.x < left) left = pathPoint.x;
-                if (pathPoint.x > right) right = pathPoint.x;
-                if (pathPoint.y < top) top = pathPoint.y;
-                if (pathPoint.y > bottom) bottom = pathPoint.y;
-                const position = new DOMPoint(pathPoint.x, pathPoint.y).matrixTransform(transform.value);
-                if (position.x < xfLeft) xfLeft = position.x;
-                if (position.x > xfRight) xfRight = position.x;
-                if (position.y < xfTop) xfTop = position.y;
-                if (position.y > xfBottom) xfBottom = position.y;
-                let startHandle = position;
-                let endHandle = position;
-                if (pathPoint.type === 'bezierCurve') {
-                    startHandle = new DOMPoint(pathPoint.shx, pathPoint.shy).matrixTransform(transform.value);
-                    endHandle = new DOMPoint(pathPoint.ehx, pathPoint.ehy).matrixTransform(transform.value);
-                }
-                transformedActiveSelectionPath.value.push({
-                    type: pathPoint.type,
-                    x: position.x / devicePixelRatio,
-                    y: position.y / devicePixelRatio,
-                    shx: startHandle.x / devicePixelRatio,
-                    shy: startHandle.y / devicePixelRatio,
-                    ehx: endHandle.x / devicePixelRatio,
-                    ehy: endHandle.y / devicePixelRatio
-                });
-            }
-            transformedActiveSelectionPathDimensionsPosition.value = new DOMPoint(
-                (xfLeft + (xfRight - xfLeft) / 2) / devicePixelRatio,
-                ((xfBottom) / devicePixelRatio) + 10,
-            );
-            activeSelectionPathPixelWidth.value = right - left;
-            activeSelectionPathPixelHeight.value = bottom - top;
-        });
+    }
+    transformedActiveSelectionPathDimensionsPosition.value = new DOMPoint(
+        (xfLeft + (xfRight - xfLeft) / 2) / devicePixelRatio,
+        ((xfBottom) / devicePixelRatio) + 10,
+    );
+    activeSelectionPathPixelWidth.value = right - left;
+    activeSelectionPathPixelHeight.value = bottom - top;
+});
 
-        const activeSelectionPathEditorShape = computed<string>(() => {
-            return activeSelectionPath.value?.[0]?.editorShapeIntent ?? '';
-        });
+const activeSelectionPathEditorShape = computed<string>(() => {
+    return activeSelectionPath.value?.[0]?.editorShapeIntent ?? '';
+});
 
-        const svgPathDraw = computed<string>(() => {
-            const path = transformedActiveSelectionPath.value;
-            let draw = 'M' + path[0].x + ' ' + path[0].y;
-            for (let i = 1; i < path.length; i++) {
-                const point = path[i];
-                if (point.type === 'line') {
-                    draw += ' L ' + point.x + ' ' + point.y;
-                } else if (point.type === 'bezierCurve') {
-                    draw += ' C ' + point.shx + ' ' + point.shy +
-                        ', ' + point.ehx + ' ' + point.ehy +
-                        ', ' + point.x + ' ' + point.y;
-                }
-            }
-            if (activeSelectionPathEditorShape.value !== 'freePolygon') {
-                draw += ' z';
-            }
-            return draw;
-        });
+const svgPathDraw = computed<string>(() => {
+    const path = transformedActiveSelectionPath.value;
+    let draw = 'M' + path[0].x + ' ' + path[0].y;
+    for (let i = 1; i < path.length; i++) {
+        const point = path[i];
+        if (point.type === 'line') {
+            draw += ' L ' + point.x + ' ' + point.y;
+        } else if (point.type === 'bezierCurve') {
+            draw += ' C ' + point.shx + ' ' + point.shy +
+                ', ' + point.ehx + ' ' + point.ehy +
+                ', ' + point.x + ' ' + point.y;
+        }
+    }
+    if (activeSelectionPathEditorShape.value !== 'freePolygon') {
+        draw += ' z';
+    }
+    return draw;
+});
 
-        const activeSelectionPathDimensionsText = computed<string | undefined>(() => {
-            if (activeSelectionPathEditorShape.value === 'rectangle') {
-                const width = parseFloat(convertUnits(activeSelectionPathPixelWidth.value, 'px', measuringUnits.value, resolutionX.value, resolutionUnits.value).toFixed(2));
-                const height = parseFloat(convertUnits(activeSelectionPathPixelHeight.value, 'px', measuringUnits.value, resolutionY.value, resolutionUnits.value).toFixed(2));
-                return `${width}×${height} ${measuringUnits.value}`;
-            }
-        });
-
-        onMounted(() => {
-        });
-
-        onUnmounted(() => {
-        });
-
-        return {
-            isDrawingSelection,
-            activeSelectionPathEditorShape,
-
-            activeSelectionPathDimensionsText,
-            transformedActiveSelectionPathDimensionsPosition,
-            transformedActiveSelectionPath,
-
-            selectedLayerIds,
-            selectionContainer,
-
-            svgPathDraw,
-            svgPathStrokeWidth,
-            svgHandleWidth,
-            svgBoundsWidth,
-            svgBoundsHeight,
-
-            zoom,
-            dragHandleHighlightColor,
-            dragHandleHighlightBorderColor
-        };
+const activeSelectionPathDimensionsText = computed<string | undefined>(() => {
+    if (activeSelectionPathEditorShape.value === 'rectangle') {
+        const width = parseFloat(convertUnits(activeSelectionPathPixelWidth.value, 'px', measuringUnits.value, resolutionX.value, resolutionUnits.value).toFixed(2));
+        const height = parseFloat(convertUnits(activeSelectionPathPixelHeight.value, 'px', measuringUnits.value, resolutionY.value, resolutionUnits.value).toFixed(2));
+        return `${width} × ${height} ${measuringUnits.value}`;
     }
 });
+
 </script>

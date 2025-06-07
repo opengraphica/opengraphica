@@ -11,7 +11,7 @@ import workingFileStore, { getCanvasRenderingContext2DSettings, getLayerGlobalTr
 
 import type { WorkingFileLayerBlendingMode, WorkingFileRasterLayer } from '@/types';
 
-export type SelectionAddShape = 'rectangle' | 'ellipse' | 'freePolygon' | 'tonalArea';
+export type SelectionAddShape = 'rectangle' | 'ellipse' | 'freePolygon' | 'lasso' | 'tonalArea';
 export type SelectionCombineMode = 'add' | 'subtract' | 'intersect' | 'replace';
 
 interface PermanentStorageState {
@@ -46,7 +46,7 @@ export interface SelectionPathPointBase {
     type: 'move' | 'line' | 'bezierCurve';
     x: number;
     y: number;
-    editorShapeIntent?: 'rectangle' | 'ellipse' | 'freePolygon';
+    editorShapeIntent?: 'rectangle' | 'ellipse' | 'freePolygon' | 'lasso';
 }
 
 export interface SelectionPathPointMove extends SelectionPathPointBase {

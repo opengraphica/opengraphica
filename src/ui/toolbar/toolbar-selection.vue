@@ -12,6 +12,7 @@
                             'bi-square': selectionAddShape === 'rectangle',
                             'bi-circle': selectionAddShape === 'ellipse',
                             'bi-hexagon': selectionAddShape === 'freePolygon',
+                            'bi-lasso': selectionAddShape === 'lasso',
                             'bi-magic': selectionAddShape === 'tonalArea'
                         }" />
                     </template>
@@ -25,9 +26,12 @@
                         <el-option :label="$t('toolbar.selection.selectionShape.freePolygonShort')" value="freePolygon">
                             <span class="bi bi-hexagon mr-1" aria-hidden="true" /> {{ $t('toolbar.selection.selectionShape.freePolygon') }}
                         </el-option>
-                        <!-- <el-option label="Tonal Area" value="tonalArea">
+                        <el-option :label="$t('toolbar.selection.selectionShape.lasso')" value="lasso">
+                            <span class="bi bi-lasso mr-1" aria-hidden="true" /> {{ $t('toolbar.selection.selectionShape.lasso') }}
+                        </el-option>
+                        <el-option :label="$t('toolbar.selection.selectionShape.tonalArea')" value="tonalArea">
                             <span class="bi bi-magic mr-1" aria-hidden="true" /> {{ $t('toolbar.selection.selectionShape.tonalArea') }}
-                        </el-option> -->
+                        </el-option>
                     </el-select>
                 </el-input-group>
                 <el-input-group :prepend-tooltip="$t('toolbar.selection.selectionCombineMode.label')" class="ml-3">

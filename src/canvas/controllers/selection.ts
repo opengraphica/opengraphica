@@ -305,7 +305,7 @@ export default class SelectionController extends BaseMovementController {
                         staticHandle.shy = rightHandle.y + (-staticToDragBearing.y * parallelRadius * circularHandleOffset);
                         activeSelectionPath.value = [...activeSelectionPath.value];
                     }
-                    
+
                     // Modify free select handle placement
                     else {
                         const newDragHandlePosition = new DOMPoint(cursorX * devicePixelRatio, cursorY * devicePixelRatio).matrixTransform(transformInverse);
@@ -323,7 +323,7 @@ export default class SelectionController extends BaseMovementController {
                     }
                 }
                 else { // Create a shape
-                    isDrawingSelection.value = true;
+                    
                     
                     const decomposedTransform = canvasStore.get('decomposedTransform');
 
@@ -375,7 +375,7 @@ export default class SelectionController extends BaseMovementController {
                                     type: 'line',
                                     x: topLeft.x,
                                     y: topLeft.y
-                                }
+                                },
                             ];
                         }
                         
@@ -449,10 +449,39 @@ export default class SelectionController extends BaseMovementController {
                                     shy: leftTopHandleY,
                                     ehx: topLeftHandleX,
                                     ehy: topLeftHandleY
-                                }
+                                },
+                            ];
+                        }
+                    } else if (selectionAddShape.value === 'lasso') {
+                        const cursor = new DOMPoint(cursorX * devicePixelRatio, cursorY * devicePixelRatio).matrixTransform(transformInverse)
+                        if (!isDrawingSelection.value) {
+                            const start = new DOMPoint(startCursorX * devicePixelRatio, startCursorY * devicePixelRatio).matrixTransform(transformInverse)
+                            activeSelectionPath.value = [
+                                {
+                                    type: 'move',
+                                    editorShapeIntent: 'lasso',
+                                    x: start.x,
+                                    y: start.y,
+                                },
+                                {
+                                    type: 'line',
+                                    x: cursor.x,
+                                    y: cursor.y,
+                                },
+                            ];
+                        } else {
+                            activeSelectionPath.value = [
+                                ...activeSelectionPath.value,
+                                {
+                                    type: 'line',
+                                    x: cursor.x,
+                                    y: cursor.y,
+                                },
                             ];
                         }
                     }
+
+                    isDrawingSelection.value = true;
                 }
             } else {
                 // Track hover state over drag handles
@@ -475,8 +504,18 @@ export default class SelectionController extends BaseMovementController {
                 isDrawingSelection.value = false;
                 if (this.dragStartHandleIndex > -1 || this.dragStartActiveSelectionPath) {
 
+                    const editorShapeIntent = activeSelectionPath.value[0]?.editorShapeIntent;
+
+                    if (editorShapeIntent === 'lasso') {
+                        activeSelectionPath.value.push({
+                            type: 'line',
+                            x: activeSelectionPath.value[0].x,
+                            y: activeSelectionPath.value[0].y,
+                        });
+                    }
+
                     // Update active selection path in history
-                    if (activeSelectionPath.value[0]?.editorShapeIntent === 'freePolygon') {
+                    if (editorShapeIntent === 'freePolygon') {
                         let isFinished = false;
                         if (activeSelectionPath.value.length > 2) {
                             if (this.dragStartHandleIndex === activeSelectionPath.value.length - 1) {
@@ -515,6 +554,9 @@ export default class SelectionController extends BaseMovementController {
                         }
                     } else {
                         this.warnIfUnproductiveSelection();
+                        if (selectionAddShape.value === 'lasso') {
+                            this.simplifyPath();
+                        }
                         this.queueAsyncAction((newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) => {
                             return this.updateActiveSelection(newPath, oldPath);
                         }, [activeSelectionPath.value, this.dragStartActiveSelectionPath]);
@@ -720,6 +762,33 @@ export default class SelectionController extends BaseMovementController {
             dangerouslyUseHTMLString: true,
             duration: 10000,
         });
+    }
+
+    simplifyPath() {
+        const tolerance = 1;
+
+        if (activeSelectionPath.value.length > 1) {
+            var sqTolerance = tolerance * tolerance;
+            
+            let prevPoint = activeSelectionPath.value[0];
+            const newPoints: SelectionPathPoint[] = [prevPoint];
+            let point!: SelectionPathPoint;
+        
+            for (let i = 1, len = activeSelectionPath.value.length; i < len; i++) {
+                point = activeSelectionPath.value[i];
+        
+                const squareDistance = (
+                    Math.pow(point.x - prevPoint.x, 2)
+                    + Math.pow(point.y - prevPoint.y, 2)
+                );
+                
+                if (squareDistance > sqTolerance) {
+                    newPoints.push(point);
+                    prevPoint = point;
+                }
+            }
+            if (prevPoint !== point) newPoints.push(point);
+        }
     }
 
     protected handleCursorIcon() {
