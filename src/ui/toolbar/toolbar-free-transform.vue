@@ -25,7 +25,7 @@
                 </og-button>
                 <og-button v-model:pressed="metricsDockVisible" outline solid small toggle class="!ml-3"
                     @click="metricsDockLeft = 0; metricsDockTop = 0;">
-                    <span class="bi bi-magnet-fill mr-1" aria-hidden="true" />
+                    <span class="bi bi-clipboard-data-fill mr-1" aria-hidden="true" />
                     {{ t('toolbar.freeTransform.metrics.title') }}
                 </og-button>
                 <el-popover
@@ -48,7 +48,7 @@
                 >
                     <template #reference>
                         <og-button outline primary small class="!ml-3">
-                            <span class="bi bi-gear-fill mr-2" aria-hidden="true" /> {{ t('toolbar.freeTransform.actions.title') }}
+                            <span class="bi bi-gear-fill mr-1" aria-hidden="true" /> {{ t('toolbar.freeTransform.actions.title') }}
                         </og-button>
                     </template>
                     <el-menu class="el-menu--medium el-menu--medium-icons el-menu--borderless my-1" :default-active="actionActiveIndex" @select="onActionSelect($event)">
@@ -78,11 +78,12 @@
         <floating-dock v-if="metricsDockVisible" v-model:top="metricsDockTop" v-model:left="metricsDockLeft" :visible="floatingDocksVisible">
             <template v-if="selectedLayerIds.length > 0">
                 <el-form novalidate="novalidate" action="javascript:void(0)" style="max-width: 15rem;">
-                    <div class="my-3 flex">
+                    <div class="mb-3 flex">
                         <el-input-number
                             v-model="inputLeft" :aria-label="'X ' + t('toolbar.freeTransform.metrics.position')" size="small"
-                            class="el-input-group--plain grow-1" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputLeft($event)" @blur="onChangeDragResizeInput()">
-                            <template #prepend>X</template>
+                            class="el-input-group--plain grow-1" :suffix-text="measuringUnits" :blur-on-enter="true"
+                            @focus="onFocusAnyMetricInput()" @input="onInputLeft($event)" @blur="onChangeDragResizeInput()">
+                            <template #prepend><span class="w-3 text-center">X</span></template>
                             <template #append>
                                 <el-button size="small" class="!px-2" :aria-label="t('toolbar.freeTransform.metrics.resetPosition', { dimension: 'X' })" @click="onFocusAnyMetricInput(); onInputLeft(0); onChangeDragResizeInput();">
                                     <span class="bi bi-arrow-repeat" aria-hidden="true"></span>
@@ -91,8 +92,9 @@
                         </el-input-number>
                         <el-input-number
                             v-model="inputTop" :aria-label="'Y ' + t('toolbar.freeTransform.metrics.position')" size="small"
-                            class="el-input-group--plain grow-1 ml-5" :suffix-text="measuringUnits" :blur-on-enter="true" @focus="onFocusAnyMetricInput()" @input="onInputTop($event)" @blur="onChangeDragResizeInput()">
-                            <template #prepend>Y</template>
+                            class="el-input-group--plain grow-1 ml-5" :suffix-text="measuringUnits" :blur-on-enter="true"
+                            @focus="onFocusAnyMetricInput()" @input="onInputTop($event)" @blur="onChangeDragResizeInput()">
+                            <template #prepend><span class="w-3 text-center">Y</span></template>
                             <template #append>
                                 <el-button size="small" class="!px-2" :aria-label="t('toolbar.freeTransform.metrics.resetPosition', { dimension: 'Y' })" @click="onFocusAnyMetricInput(); onInputTop(0); onChangeDragResizeInput();">
                                     <span class="bi bi-arrow-repeat" aria-hidden="true"></span>
@@ -107,7 +109,7 @@
                             :suffix-text="measuringUnits" :blur-on-enter="true" :disabled="!isResizeEnabled && !isUnevenScalingEnabled"
                             @focus="onFocusAnyMetricInput()" @input="onInputWidth($event)" @blur="onChangeDragResizeInput()"
                         >
-                            <template #prepend>W</template>
+                            <template #prepend><span class="w-3 text-center">W</span></template>
                             <template #append>
                                 <el-button size="small" class="!px-2" :aria-label="t('toolbar.freeTransform.metrics.resetWidth')" @click="onResetWidth()">
                                     <span class="bi bi-arrow-repeat" aria-hidden="true"></span>
@@ -120,7 +122,7 @@
                             :suffix-text="measuringUnits" :blur-on-enter="true" :disabled="!isResizeEnabled && !isUnevenScalingEnabled"
                             @focus="onFocusAnyMetricInput()" @input="onInputHeight($event)" @blur="onChangeDragResizeInput()"
                         >
-                            <template #prepend>H</template>
+                            <template #prepend><span class="w-3 text-center">H</span></template>
                             <template #append>
                                 <el-button size="small" class="!px-2" :aria-label="t('toolbar.freeTransform.metrics.resetHeight')" @click="onResetHeight()">
                                     <span class="bi bi-arrow-repeat" aria-hidden="true"></span>
@@ -141,6 +143,30 @@
                                 </el-button>
                             </template>
                         </el-input-number>
+                    </div>
+                    <div class="flex justify-between mt-3">
+                        <el-button-group size="small">
+                            <el-button :title="t('toolbar.freeTransform.metrics.alignLeft')" class="!px-3" @click="alignSelectedLayersToCanvas('left')">
+                                <span class="bi bi-align-start" aria-hidden="true" />
+                            </el-button>
+                            <el-button :title="t('toolbar.freeTransform.metrics.alignCenter')" class="!px-3" @click="alignSelectedLayersToCanvas('horizontalCenter')">
+                                <span class="bi bi-align-center" aria-hidden="true" />
+                            </el-button>
+                            <el-button :title="t('toolbar.freeTransform.metrics.alignRight')" class="!px-3" @click="alignSelectedLayersToCanvas('right')">
+                                <span class="bi bi-align-end" aria-hidden="true" />
+                            </el-button>
+                        </el-button-group>
+                        <el-button-group size="small">
+                            <el-button :title="t('toolbar.freeTransform.metrics.alignTop')" class="!px-3" @click="alignSelectedLayersToCanvas('top')">
+                                <span class="bi bi-align-top" aria-hidden="true" />
+                            </el-button>
+                            <el-button :title="t('toolbar.freeTransform.metrics.alignMiddle')" class="!px-3" @click="alignSelectedLayersToCanvas('verticalCenter')">
+                                <span class="bi bi-align-middle" aria-hidden="true" />
+                            </el-button>
+                            <el-button :title="t('toolbar.freeTransform.metrics.alignBottom')" class="!px-3" @click="alignSelectedLayersToCanvas('bottom')">
+                                <span class="bi bi-align-bottom" aria-hidden="true" />
+                            </el-button>
+                        </el-button-group>
                     </div>
                 </el-form>
             </template>
@@ -168,7 +194,7 @@ import {
     applyTransform, trimEmptySpace, layerToImageBounds, isResizeEnabled, isUnevenScalingEnabled,
     snappingDockTop, snappingDockLeft, snappingDockVisible,
     metricsDockTop, metricsDockLeft, metricsDockVisible,
-    resetSelectedLayerWidths, resetSelectedLayerHeights,
+    resetSelectedLayerWidths, resetSelectedLayerHeights, alignSelectedLayersToCanvas,
 } from '@/canvas/store/free-transform-state';
 import { appliedSelectionMask, activeSelectionMask } from '@/canvas/store/selection-state';
 import historyStore from '@/store/history';

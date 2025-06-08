@@ -76,3 +76,8 @@ export function findPointListBounds(points: Array<DOMPoint | { x: number, y: num
         bottom,
     }
 }
+
+// True if two values are approximately equal, due to floating point rounding errors
+export function isEqualApprox(a, b, epsilon = 0.00001) {
+    return Math.abs(a - b) <= epsilon;
+}

@@ -2,7 +2,7 @@ import mitt from 'mitt';
 import { computed, ref } from 'vue';
 
 import historyStore from '@/store/history';
-import workingFileStore, { getSelectedLayers } from '@/store/working-file';
+import workingFileStore, { getSelectedLayers, getLayerGlobalTransform } from '@/store/working-file';
 
 import { ApplyLayerTransformAction } from '@/actions/apply-layer-transform';
 import { BundleAction } from '@/actions/bundle';
@@ -12,6 +12,7 @@ import { UpdateLayerAction } from '@/actions/update-layer';
 
 import { decomposeMatrix } from '@/lib/dom-matrix';
 import { isShiftKeyPressed } from '@/lib/keyboard';
+import { isEqualApprox } from '@/lib/math';
 
 import type { WorkingFileLayer, ColorModel } from '@/types';
 
@@ -127,6 +128,81 @@ freeTransformEmitter.on('setDimensions', (event?: { top?: number, left?: number,
     }
 });
 
+/*----------------------*\
+| Layer Canvas Alignment |
+\*----------------------*/
+
+function getLayerCornerBounds(layer: WorkingFileLayer) {
+    const globalTransform = getLayerGlobalTransform(layer);
+    const topLeft = new DOMPoint(0, 0).matrixTransform(globalTransform);
+    const topRight = new DOMPoint(layer.width, 0).matrixTransform(globalTransform);
+    const bottomLeft = new DOMPoint(0, layer.height).matrixTransform(globalTransform);
+    const bottomRight = new DOMPoint(layer.width, layer.height).matrixTransform(globalTransform);
+    return {
+        globalTransform,
+        left: Math.min(topLeft.x, topRight.x, bottomLeft.x, bottomRight.x),
+        right: Math.max(topLeft.x, topRight.x, bottomLeft.x, bottomRight.x),
+        top: Math.min(topLeft.y, topRight.y, bottomLeft.y, bottomRight.y),
+        bottom: Math.max(topLeft.y, topRight.y, bottomLeft.y, bottomRight.y),
+    }
+}
+
+function createLayerTransformAction(layer: WorkingFileLayer, globalTransform, x: number, y: number): UpdateLayerAction<any> {
+    const decomposedTransform = decomposeMatrix(globalTransform);
+    return new UpdateLayerAction({
+        id: layer.id,
+        transform: layer.transform
+            .rotate(-decomposedTransform.rotation * Math.RADIANS_TO_DEGREES)
+            .scale(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY)
+            .translate(x, y)
+            .scale(decomposedTransform.scaleX, decomposedTransform.scaleY)
+            .rotate(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES),
+    });
+}
+
+export async function alignSelectedLayersToCanvas(position: 'left' | 'right' | 'horizontalCenter' | 'top' | 'bottom' | 'verticalCenter') {
+    const actions: UpdateLayerAction<any>[] = [];
+    for (const layer of selectedLayers.value) {
+        const bounds = getLayerCornerBounds(layer);
+        let isRunAction = false;
+        let x = 0;
+        let y = 0;
+        if (position === 'left') {
+            isRunAction = !isEqualApprox(bounds.left, 0);
+            x = -bounds.left;
+        } else if (position === 'right') {
+            isRunAction = !isEqualApprox(bounds.right, workingFileStore.get('width'));
+            x = workingFileStore.get('width') - bounds.right;
+        } else if (position === 'horizontalCenter') {
+            isRunAction = !isEqualApprox((bounds.left + bounds.right) / 2, workingFileStore.get('width') / 2);
+            x = ((workingFileStore.get('width') - (bounds.right - bounds.left)) / 2) - bounds.left;
+        } else if (position === 'top') {
+            isRunAction = !isEqualApprox(bounds.top, 0);
+            y = -bounds.top;
+        } else if (position === 'bottom') {
+            isRunAction = !isEqualApprox(bounds.bottom, workingFileStore.get('height'));
+            y = workingFileStore.get('height') - bounds.bottom;
+        } else if (position === 'verticalCenter') {
+            isRunAction = !isEqualApprox((bounds.top + bounds.bottom) / 2, workingFileStore.get('height') / 2);
+            y = ((workingFileStore.get('height') - (bounds.bottom - bounds.top)) / 2) - bounds.top;
+        }
+        if (isRunAction) {
+            actions.push(
+                createLayerTransformAction(layer, bounds.globalTransform, x, y)
+            );
+        }
+    }
+    if (actions.length > 0) {
+        await historyStore.dispatch('runAction', {
+            action: new BundleAction('alignLayers', 'action.freeTransformTranslate', actions),
+        });
+    }
+}
+
+/*----------------------*\
+| Reset Layer Dimensions |
+\*----------------------*/
+
 export async function resetSelectedLayerWidths() {
     if (!isResizeEnabled.value) return;
 
@@ -149,7 +225,6 @@ export async function resetSelectedLayerWidths() {
     if (actions.length > 0) {
         await historyStore.dispatch('runAction', {
             action: new BundleAction('resetLayerWidths', 'action.freeTransformScale', actions),
-            blockInteraction: true,
         });
     }
 }
@@ -176,10 +251,13 @@ export async function resetSelectedLayerHeights() {
     if (actions.length > 0) {
         await historyStore.dispatch('runAction', {
             action: new BundleAction('resetLayerHeights', 'action.freeTransformScale', actions),
-            blockInteraction: true,
         });
     }
 }
+
+/*-------*\
+| Actions |
+\*-------*/
 
 export async function applyTransform() {
     try {

@@ -1222,6 +1222,12 @@
             },
             "metrics": {
                 "title": "Metrics",
+                "alignLeft": "Align Left",
+                "alignRight": "Alight Right",
+                "alignCenter": "Align Center",
+                "alignTop": "Align Top",
+                "alignBottom": "Align Bottom",
+                "alignMiddle": "Align Middle",
                 "position": "Position",
                 "resetPosition": "Reset {dimension} Position",
                 "width": "Width",

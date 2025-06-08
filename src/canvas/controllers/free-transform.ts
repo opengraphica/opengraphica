@@ -215,6 +215,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
     async onPointerUp(e: PointerEvent): Promise<void> {
         super.onPointerUp(e);
+        if (isInput(e.target)) return;
         if (e.isPrimary) {
             this.onTransformEnd();    
         }
@@ -437,7 +438,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             event?.trigger != 'do' ||
             [
                 'applyLayerTransform', 'trimLayerEmptySpace', 'setLayerBoundsToWorkingFileBounds',
-                'convertLayersToCollage', 'resetLayerWidths', 'resetLayerHeights'
+                'convertLayersToCollage', 'resetLayerWidths', 'resetLayerHeights', 'alignLayers'
             ].includes(event?.action.id)
         ) {
             isBoundsIndeterminate.value = true;
@@ -498,6 +499,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 textDocument,
             });
         }
+
     }
 
     private determineDragRotateType(viewTransformPoint: DOMPoint, transformBoundsPoint: DOMPoint, viewDecomposedTransform: DecomposedMatrix) {
