@@ -658,15 +658,20 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             });
             let snapPointIndex = 0;
             let snapPoint: SnapPointGroup;
+            let snapLineXLayerPointIndex: number = 0;
             for (snapPointIndex = 0; snapPointIndex < this.snapXPoints.length; snapPointIndex++) {
                 snapPoint = this.snapXPoints[snapPointIndex];
                 const checkPoint = checkPoints[checkPointIndex];
+                if (snapLineX.value.length > 0 && snapPoint.value !== snapLineX.value[0]) {
+                    break;
+                }
                 if (Math.abs(snapPoint.value - checkPoint.x) <= this.snapSensitivity) {
                     if (snapLineX.value.length === 0) {
                         snapXOffset = snapPoint.value - checkPoint.x;
                         for (let pointY of snapPoint.points) {
                             snapLineX.value.push(snapPoint.value, pointY);
                         }
+                        snapLineXLayerPointIndex = snapLineX.value.length;
                     }
                     snapLineX.value.push(snapPoint.value, checkPoint.y);
                     checkPointIndex++;
@@ -688,14 +693,17 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             for (snapPointIndex = 0; snapPointIndex < this.snapYPoints.length; snapPointIndex++) {
                 snapPoint = this.snapYPoints[snapPointIndex];
                 const checkPoint = checkPoints[checkPointIndex];
+                if (snapLineY.value.length > 0 && snapPoint.value !== snapLineY.value[1]) {
+                    break;
+                }
                 if (Math.abs(snapPoint.value - checkPoint.y) <= this.snapSensitivity) {
                     if (snapLineY.value.length === 0) {
                         snapYOffset = snapPoint.value - checkPoint.y;
-                        for (let pointY of snapPoint.points) {
-                            snapLineY.value.push(snapPoint.value, pointY);
+                        for (let pointX of snapPoint.points) {
+                            snapLineY.value.push(pointX, snapPoint.value);
                         }
                     }
-                    snapLineY.value.push(snapPoint.value, checkPoint.x);
+                    snapLineY.value.push(checkPoint.x + snapXOffset, snapPoint.value);
                     checkPointIndex++;
                     snapPointIndex--;
                 } else if (checkPoint.y < snapPoint.value + this.snapSensitivity) {
@@ -705,6 +713,9 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 if (checkPointIndex > checkPoints.length - 1) {
                     break;
                 }
+            }
+            for (; snapLineXLayerPointIndex < snapLineX.value.length; snapLineXLayerPointIndex += 2) {
+                snapLineX.value[snapLineXLayerPointIndex + 1] += snapYOffset;
             }
 
             if (snapXOffset !== 0 || snapYOffset !== 0) {
@@ -828,8 +839,10 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             let { shouldScaleDuringResize } = transformOptions.value;
             width.value = Math.max(1, width.value);
             height.value = Math.max(1, height.value);
-            previewXSnap.value = [];
-            previewYSnap.value = [];
+            if (previewXSnap.value.length > 0) previewXSnap.value = [];
+            if (previewYSnap.value.length > 0) previewYSnap.value = [];
+            if (snapLineX.value.length > 0) snapLineX.value = [];
+            if (snapLineY.value.length > 0) snapLineY.value = [];
 
             const isTranslate = left.value != this.transformStartDimensions.left || top.value != this.transformStartDimensions.top;
             const isScale = width.value != this.transformStartDimensions.width || height.value != this.transformStartDimensions.height;

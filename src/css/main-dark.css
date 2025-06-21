@@ -10768,6 +10768,41 @@ body.og-full-page .opengraphica {
   transform: rotate(270deg) translateY(-50%);
   transform-origin: left center;
 }
+.opengraphica .og-free-transform-snapping-guides {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.opengraphica .og-free-transform-snapping-guides .og-free-transform-snapping-guide-horizontal,
+.opengraphica .og-free-transform-snapping-guides .og-free-transform-snapping-guide-vertical {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  background: var(--og-snap-line-color);
+  width: 1px;
+  height: 1px;
+  outline: 1px solid white;
+}
+.opengraphica .og-free-transform-snapping-guides .og-free-transform-snapping-guide-point {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 4px;
+}
+.opengraphica .og-free-transform-snapping-guides .og-free-transform-snapping-guide-point:before {
+  content: "";
+  position: absolute;
+  left: -50%;
+  top: -50%;
+  bottom: 50%;
+  right: 50%;
+  display: block;
+  background: var(--og-snap-line-color);
+  border-radius: 100%;
+}
 .opengraphica .og-selection {
   position: absolute;
   top: 0;
