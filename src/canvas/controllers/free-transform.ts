@@ -1,9 +1,12 @@
 import { nextTick, watch, WatchStopHandle } from 'vue';
 import BaseCanvasMovementController from './base-movement';
 import {
-    isBoundsIndeterminate, layerPickMode, useRotationSnapping, freeTransformEmitter, top, left, width, height, rotation,
-    transformOriginX, transformOriginY, dimensionLockRatio, previewXSnap, previewYSnap, dragHandleHighlight, rotateHandleHighlight, selectedLayers,
+    isBoundsIndeterminate, layerPickMode, rotationSnappingDegrees, freeTransformEmitter,
+    top, left, width, height, rotation, transformOriginX, transformOriginY, dimensionLockRatio,
+    previewXSnap, previewYSnap, dragHandleHighlight, rotateHandleHighlight, selectedLayers,
     applyTransform, isResizeEnabled, isUnevenScalingEnabled, transformOptions,
+    useSnapping, useCanvasEdgeSnapping, useLayerEdgeSnapping, useLayerCenterSnapping,
+    snapLineX, snapLineY,
 } from '../store/free-transform-state';
 import {
     appliedSelectionMask, appliedSelectionMaskCanvasOffset, activeSelectionMask, activeSelectionMaskCanvasOffset
@@ -12,7 +15,10 @@ import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import preferencesStore from '@/store/preferences';
-import workingFileStore, { getCanvasRenderingContext2DSettings, getLayerById } from '@/store/working-file';
+import workingFileStore, {
+    getAllSizableLayerBoundingPoints, getLayerBoundingPoints, getCanvasRenderingContext2DSettings,
+    getLayerById, visibleLayerIds,
+} from '@/store/working-file';
 
 import { DecomposedMatrix, decomposeMatrix } from '@/lib/dom-matrix';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
@@ -63,6 +69,11 @@ interface TransformStartLayerData {
     textDocument?: WorkingFileTextLayer['data'];
 }
 
+interface SnapPointGroup {
+    value: number;
+    points: Int32Array;
+}
+
 type PointerProcessStep = 'start' | 'move' | 'end' | null;
 
 export default class CanvasFreeTransformController extends BaseCanvasMovementController {
@@ -82,6 +93,14 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
     private setBoundsDebounceHandle: number | undefined;
     private selectedLayerIdsWatchStop: WatchStopHandle | null = null;
+    private snapOptionsWatchStop: WatchStopHandle | null = null;
+    private visibleLayersWatchStop: WatchStopHandle | null = null;
+
+    private layerSnapCache = new Map<number, Int32Array>();
+    private snapPointsNeedToBeCalculated = true;
+    private snapXPoints: SnapPointGroup[] = [];
+    private snapYPoints: SnapPointGroup[] = [];
+    private snapSensitivity: number = 0;
 
     onEnter(): void {
         super.onEnter();
@@ -101,8 +120,17 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 }
             }
             selectedLayers.value = newSelectedLayers;
+            this.snapPointsNeedToBeCalculated = true;
             this.setBoundsFromSelectedLayers();
         }, { immediate: true });
+
+        this.snapOptionsWatchStop = watch(() => [useLayerEdgeSnapping.value, useLayerCenterSnapping.value, useCanvasEdgeSnapping.value], () => {
+            this.snapPointsNeedToBeCalculated = true;
+        });
+
+        this.visibleLayersWatchStop = watch(() => visibleLayerIds.value, () => {
+            this.calculateSnapCache();
+        }, { deep: true });
 
         this.onCancelCurrentAction = this.onCancelCurrentAction.bind(this);
         this.onCommitCurrentAction = this.onCommitCurrentAction.bind(this);
@@ -118,6 +146,8 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         freeTransformEmitter.on('previewRotationChange', this.onPreviewRotationChange);
         freeTransformEmitter.on('previewDragResizeChange', this.onPreviewDragResizeChange);
         freeTransformEmitter.on('commitTransforms', this.onCommitTransforms);
+
+        this.calculateSnapCache();
 
         // Tutorial message
         if (!editorStore.state.tutorialFlags.freeTransformToolIntroduction) {
@@ -154,10 +184,10 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     }
 
     onLeave(): void {
-        if (this.selectedLayerIdsWatchStop) {
-            this.selectedLayerIdsWatchStop();
-            this.selectedLayerIdsWatchStop = null;
-        }
+        this.selectedLayerIdsWatchStop?.();
+        this.selectedLayerIdsWatchStop = null;
+        this.snapOptionsWatchStop?.();
+        this.snapOptionsWatchStop = null;
         appEmitter.off('editor.tool.cancelCurrentAction', this.onCancelCurrentAction);
         appEmitter.off('editor.tool.commitCurrentAction', this.onCommitCurrentAction);
         appEmitter.off('editor.history.step', this.onHistoryStep);
@@ -269,6 +299,12 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                     this.determineDragRotateType(viewTransformPoint, transformBoundsPoint, viewDecomposedTransform);
                 }
             }
+
+            const devicePixelRatio = window.devicePixelRatio || 1;
+            const decomposedCanvasTransform = canvasStore.get('decomposedTransform');
+            this.snapSensitivity = preferencesStore.get('snapSensitivity') / decomposedCanvasTransform.scaleX * devicePixelRatio;
+            
+            this.calculateSnapPoints();
         });
     }
 
@@ -292,7 +328,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
             if (shouldSnapRotationDegrees) {
                 const targetRotation = this.transformStartDimensions.rotation + rotationDelta;
-                const roundedTargetRotation = Math.round(targetRotation / (Math.PI / 18)) * (Math.PI / 18);
+                let roundedTargetRotation = Math.round(targetRotation / (rotationSnappingDegrees.value * Math.DEGREES_TO_RADIANS)) * (rotationSnappingDegrees.value * Math.DEGREES_TO_RADIANS);
                 rotationDelta -= targetRotation - roundedTargetRotation;
             }
 
@@ -339,8 +375,8 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             let width = this.transformStartDimensions.width;
             let height = this.transformStartDimensions.height;
             if (isDragAll) {
-                top = this.transformStartDimensions.top + dy;
                 left = this.transformStartDimensions.left + dx;
+                top = this.transformStartDimensions.top + dy;
             }
             if (isDragTop || isDragLeft) {
                 left = this.transformStartDimensions.left;
@@ -375,12 +411,11 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 height = 1;
             }
 
-            this.previewDragResizeChange({
-                top,
-                left,
-                width,
-                height,
-            }, shouldScaleDuringResize);
+            this.previewDragResizeChange(
+                { top, left, width, height },
+                shouldScaleDuringResize,
+                true,
+            );
             
         }
 
@@ -434,12 +469,14 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     }
 
     private onHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
+        if (!event) return;
         if (
-            event?.trigger != 'do' ||
+            event.trigger != 'do' ||
             [
                 'applyLayerTransform', 'trimLayerEmptySpace', 'setLayerBoundsToWorkingFileBounds',
-                'convertLayersToCollage', 'resetLayerWidths', 'resetLayerHeights', 'alignLayers'
-            ].includes(event?.action.id)
+                'convertLayersToCollage', 'resetLayerWidths', 'resetLayerHeights', 'alignLayers',
+                'stretchLayerToWorkingFileBounds'
+            ].includes(event.action.id)
         ) {
             isBoundsIndeterminate.value = true;
             this.setBoundsFromSelectedLayers();
@@ -560,7 +597,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         }
     }
 
-    private previewDragResizeChange(newTransform: DragResizeTransformInfo, shouldScaleDuringResize?: boolean) {
+    private previewDragResizeChange(newTransform: DragResizeTransformInfo, shouldScaleDuringResize?: boolean, enableSnapping?: boolean) {
         if (shouldScaleDuringResize == null) {
             shouldScaleDuringResize = transformOptions.value.shouldScaleDuringResize;
         }
@@ -584,13 +621,109 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             .translateSelf(transformOriginXPoint, transformOriginYPoint)
         );
 
+        let boundsLeft = newTransform.left + decomposedEndDimensions.translateX - decomposedStartDimensions.translateX;
+        let boundsTop = newTransform.top + decomposedEndDimensions.translateY - decomposedStartDimensions.translateY;
+        let boundsWidth = newTransform.width;
+        let boundsHeight = newTransform.height;
+        
+        // Apply snapping
+        snapLineX.value = [];
+        snapLineY.value = [];
+        let snapXOffset = 0;
+        let snapYOffset = 0;
+        if (enableSnapping && this.transformDragType === DRAG_TYPE_ALL && useSnapping.value && (useCanvasEdgeSnapping.value || useLayerCenterSnapping.value || useLayerEdgeSnapping.value)) {
+            const boundingBoxTransform = new DOMMatrix()
+                .translateSelf(boundsLeft + boundsWidth / 2, boundsTop + boundsHeight / 2)
+                .rotateSelf(rotation.value * Math.RADIANS_TO_DEGREES)
+                .translateSelf(- boundsWidth / 2, - boundsHeight / 2);
+            let checkPoints: DOMPoint[] = [];
+            let p0 = new DOMPoint(0, 0).matrixTransform(boundingBoxTransform);
+            let p1 = new DOMPoint(newTransform.width, 0).matrixTransform(boundingBoxTransform);
+            let p2 = new DOMPoint(0, newTransform.height).matrixTransform(boundingBoxTransform);
+            let p3 = new DOMPoint(newTransform.width, newTransform.height).matrixTransform(boundingBoxTransform);
+            if (useCanvasEdgeSnapping.value || useLayerEdgeSnapping.value) {
+                checkPoints.push(p0, p1, p2, p3);
+            }
+            if (useLayerCenterSnapping.value) {
+                checkPoints.push(new DOMPoint(
+                    (p0.x + p1.x + p2.x + p3.x) / 4,
+                    (p0.y + p1.y + p2.y + p3.y) / 4,
+                ));
+            }
+
+            // Determine X-axis snapping points
+            let checkPointIndex: number = 0;
+            checkPoints.sort((a, b) => {
+                return a.x < b.x ? -1 : 1;
+            });
+            let snapPointIndex = 0;
+            let snapPoint: SnapPointGroup;
+            for (snapPointIndex = 0; snapPointIndex < this.snapXPoints.length; snapPointIndex++) {
+                snapPoint = this.snapXPoints[snapPointIndex];
+                const checkPoint = checkPoints[checkPointIndex];
+                if (Math.abs(snapPoint.value - checkPoint.x) <= this.snapSensitivity) {
+                    if (snapLineX.value.length === 0) {
+                        snapXOffset = snapPoint.value - checkPoint.x;
+                        for (let pointY of snapPoint.points) {
+                            snapLineX.value.push(snapPoint.value, pointY);
+                        }
+                    }
+                    snapLineX.value.push(snapPoint.value, checkPoint.y);
+                    checkPointIndex++;
+                    snapPointIndex--;
+                } else if (checkPoint.x < snapPoint.value + this.snapSensitivity) {
+                    checkPointIndex++;
+                    snapPointIndex--;
+                }
+                if (checkPointIndex > checkPoints.length - 1) {
+                    break;
+                }
+            }
+
+            // Determine Y-axis snapping points
+            checkPointIndex = 0;
+            checkPoints.sort((a, b) => {
+                return a.y < b.y ? -1 : 1;
+            });
+            for (snapPointIndex = 0; snapPointIndex < this.snapYPoints.length; snapPointIndex++) {
+                snapPoint = this.snapYPoints[snapPointIndex];
+                const checkPoint = checkPoints[checkPointIndex];
+                if (Math.abs(snapPoint.value - checkPoint.y) <= this.snapSensitivity) {
+                    if (snapLineY.value.length === 0) {
+                        snapYOffset = snapPoint.value - checkPoint.y;
+                        for (let pointY of snapPoint.points) {
+                            snapLineY.value.push(snapPoint.value, pointY);
+                        }
+                    }
+                    snapLineY.value.push(snapPoint.value, checkPoint.x);
+                    checkPointIndex++;
+                    snapPointIndex--;
+                } else if (checkPoint.y < snapPoint.value + this.snapSensitivity) {
+                    checkPointIndex++;
+                    snapPointIndex--;
+                }
+                if (checkPointIndex > checkPoints.length - 1) {
+                    break;
+                }
+            }
+
+            if (snapXOffset !== 0 || snapYOffset !== 0) {
+                const newTopLeft = new DOMPoint(boundsLeft, boundsTop).matrixTransform(
+                    new DOMMatrix().translate(snapXOffset, snapYOffset)
+                );
+                boundsLeft = newTopLeft.x;
+                boundsTop = newTopLeft.y;
+            }
+        }
+
         // Apply the transform offset to the layer dragging bounds overlay
         freeTransformEmitter.emit('setDimensions', {
-            left: newTransform.left + decomposedEndDimensions.translateX - decomposedStartDimensions.translateX,
-            top: newTransform.top + decomposedEndDimensions.translateY - decomposedStartDimensions.translateY,
+            left: boundsLeft,
+            top: boundsTop,
             width: newTransform.width,
             height: newTransform.height
         });
+
         // Apply the transform offset to each layer
         for (const [i, layer] of selectedLayers.value.entries()) {
             const decomposedTransform = decomposeMatrix(this.transformStartLayerData[i].transform);
@@ -676,8 +809,8 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             transform
                 .rotateSelf(-(decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES)
                 .translateSelf(
-                    (newTransform.left + transformEndOriginX) - (this.transformStartDimensions.left + transformStartOriginX),
-                    (newTransform.top + transformEndOriginY) - (this.transformStartDimensions.top + transformStartOriginY)
+                    (newTransform.left + snapXOffset + transformEndOriginX) - (this.transformStartDimensions.left + transformStartOriginX),
+                    (newTransform.top + snapYOffset + transformEndOriginY) - (this.transformStartDimensions.top + transformStartOriginY)
                 )
                 .rotateSelf((decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES)
             if (shouldScaleDuringResize) {
@@ -733,6 +866,12 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                         ...(isTranslate ? ['action.freeTransformTranslate'] : [])
                     ][0], updateLayerActions)
                 });
+
+                // Update cache of snapping points
+                for (const layer of selectedLayers.value.values()) {
+                    if (layer.type === 'gradient') continue;
+                    this.calculateSnapCacheForLayerId(layer.id);
+                }
             }
         } catch (error) {
             console.error('[src/canvas/controllers/free-transform.ts] Error while committing transform action. ', error);
@@ -932,6 +1071,99 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 });
             }
         }
+    }
+
+    private calculateSnapCache() {
+        // TODO - Not sure if this can get super expensive when there's a lot of layers.
+        this.layerSnapCache.clear();
+        for (const [layerId, boundingPoints] of getAllSizableLayerBoundingPoints()) {
+            const snapPoints = new Int32Array([
+                Math.round(boundingPoints[0].x), Math.round(boundingPoints[0].y),
+                Math.round(boundingPoints[1].x), Math.round(boundingPoints[1].y),
+                Math.round(boundingPoints[2].x), Math.round(boundingPoints[2].y),
+                Math.round(boundingPoints[3].x), Math.round(boundingPoints[3].y),
+                Math.round((boundingPoints[0].x + boundingPoints[1].x + boundingPoints[2].x + boundingPoints[3].x) / 4),
+                Math.round((boundingPoints[0].y + boundingPoints[1].y + boundingPoints[2].y + boundingPoints[3].y) / 4),
+            ]);
+            this.layerSnapCache.set(layerId, snapPoints);
+        }
+        this.snapPointsNeedToBeCalculated = true;
+    }
+
+    private calculateSnapCacheForLayerId(layerId: number) {
+        const boundingPoints = getLayerBoundingPoints(layerId);
+        const snapPoints = new Int32Array([
+            Math.round(boundingPoints[0].x), Math.round(boundingPoints[0].y),
+            Math.round(boundingPoints[1].x), Math.round(boundingPoints[1].y),
+            Math.round(boundingPoints[2].x), Math.round(boundingPoints[2].y),
+            Math.round(boundingPoints[3].x), Math.round(boundingPoints[3].y),
+            Math.round((boundingPoints[0].x + boundingPoints[1].x + boundingPoints[2].x + boundingPoints[3].x) / 4),
+            Math.round((boundingPoints[0].y + boundingPoints[1].y + boundingPoints[2].y + boundingPoints[3].y) / 4),
+        ]);
+        this.layerSnapCache.set(layerId, snapPoints);
+        this.snapPointsNeedToBeCalculated = true;
+    }
+
+    private calculateSnapPoints() {
+        if (!this.snapPointsNeedToBeCalculated || !useSnapping.value || (
+            !useLayerEdgeSnapping.value && !useLayerCenterSnapping.value && !useCanvasEdgeSnapping.value
+        )) return;
+
+        const xMap: Record<number, number[]> = {};
+        const yMap: Record<number, number[]> = {};
+
+        let pointStartI = (useSnapping.value && useLayerEdgeSnapping.value) ? 0 : 8;
+        let pointEndI = (useSnapping.value && useLayerCenterSnapping.value) ? 10 : (
+            (useSnapping.value && useLayerEdgeSnapping.value) ? 8 : 0
+        );
+
+        const selectedLayerIds = new Set(workingFileStore.get('selectedLayerIds'));
+
+        for (const [layerId, points] of this.layerSnapCache.entries()) {
+            if (!visibleLayerIds.value.has(layerId) || selectedLayerIds.has(layerId)) continue;
+
+            for (let i = pointStartI; i < pointEndI; i += 2) {
+                const x = points[i];
+                const y = points[i + 1];
+    
+                (xMap[x] ??= []).push(y);
+                (yMap[y] ??= []).push(x);
+            }
+        }
+
+        if (useSnapping.value && useCanvasEdgeSnapping.value) {
+            const width = workingFileStore.get('width');
+            const height = workingFileStore.get('height');
+            (xMap[0] ??= []).push(0);
+            (yMap[0] ??= []).push(0);
+            (xMap[width] ??= []).push(0);
+            (yMap[0] ??= []).push(width);
+            (xMap[0] ??= []).push(height);
+            (yMap[height] ??= []).push(0);
+            (xMap[width] ??= []).push(height);
+            (yMap[height] ??= []).push(width);
+        }
+
+        this.snapXPoints = [];
+        for (const xStr in xMap) {
+            this.snapXPoints.push({
+                value: +xStr,
+                points: Int32Array.from(xMap[xStr])
+            });
+        }
+
+        this.snapYPoints = [];
+        for (const yStr in yMap) {
+            this.snapYPoints.push({
+                value: +yStr,
+                points: Int32Array.from(yMap[yStr])
+            });
+        }
+
+        this.snapXPoints.sort((a, b) => a.value - b.value);
+        this.snapYPoints.sort((a, b) => a.value - b.value);
+
+        this.snapPointsNeedToBeCalculated = false;
     }
 
     protected handleCursorIcon() {

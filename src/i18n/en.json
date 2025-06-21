@@ -35,7 +35,8 @@
         "reorderLayers": "Reorder Layer(s)",
         "reorderLayerFilters": "Reorder Effect(s)",
         "selectLayers": "Select Layer(s)",
-        "setLayerBoundsToWorkingFileBounds": "Layer Bounds to Canvas Size",
+        "setLayerBoundsToWorkingFileBounds": "Expand With Empty Space",
+        "stretchLayerToWorkingFileBounds": "Stretch to Canvas Size",
         "textTransformResize": "Resize Text Layer",
         "textTransformTranslate": "Move Text Layer",
         "toggleLayerVisibilityOn": "Toggle Layer Visibility On",
@@ -1218,7 +1219,12 @@
             },
             "snapping": {
                 "title": "Snapping",
-                "rotationSnap": "Rotation Snap"
+                "enableSnapping": "Enable Snapping",
+                "rotationSnap": "Rotation",
+                "rotationSnapDegrees": "Degrees",
+                "canvasEdges": "Canvas Edges",
+                "layerEdges": "Layer Edges",
+                "layerCenter": "Layer Center"
             },
             "metrics": {
                 "title": "Metrics",
@@ -1241,7 +1247,8 @@
             "actions": {
                 "title": "Actions",
                 "applyTransform": "Apply Transform",
-                "expandToImageSize": "Layer Bounds to Canvas Size",
+                "stretchToImageSize": "Stretch To Canvas Size",
+                "expandToImageSize": "Expand With Empty Space",
                 "trimEmptySpace": "Trim Empty Space"
             }
         },

@@ -1,10 +1,12 @@
 import mitt from 'mitt';
 import { computed, ref } from 'vue';
 
+import { PerformantStore } from '@/store/performant-store';
 import historyStore from '@/store/history';
 import workingFileStore, { getSelectedLayers, getLayerGlobalTransform } from '@/store/working-file';
 
 import { ApplyLayerTransformAction } from '@/actions/apply-layer-transform';
+import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { SetLayerBoundsToWorkingFileBoundsAction } from '@/actions/set-layer-bounds-to-working-file-bounds';
 import { TrimLayerEmptySpaceAction } from '@/actions/trim-layer-empty-space';
@@ -16,9 +18,40 @@ import { isEqualApprox } from '@/lib/math';
 
 import type { WorkingFileLayer, ColorModel } from '@/types';
 
+interface PermanentStorageState {
+    useSnapping: boolean;
+    useRotationSnapping: boolean;
+    rotationSnappingDegrees: number;
+    useCanvasEdgeSnapping: boolean;
+    useLayerEdgeSnapping: boolean;
+    useLayerCenterSnapping: boolean;
+}
+
+const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentStorageState }>({
+    name: 'eraseBrushStateStore',
+    state: {
+        useSnapping: true,
+        useRotationSnapping: false,
+        rotationSnappingDegrees: 15,
+        useCanvasEdgeSnapping: false,
+        useLayerEdgeSnapping: false,
+        useLayerCenterSnapping: false,
+    },
+    restore: [
+        'useSnapping', 'useRotationSnapping', 'rotationSnappingDegrees', 'useCanvasEdgeSnapping',
+        'useLayerEdgeSnapping', 'useLayerCenterSnapping',
+    ],
+});
+
+export const useSnapping = permanentStorage.getWritableRef('useSnapping');
+export const useRotationSnapping = permanentStorage.getWritableRef('useRotationSnapping');
+export const rotationSnappingDegrees = permanentStorage.getWritableRef('rotationSnappingDegrees');
+export const useCanvasEdgeSnapping = permanentStorage.getWritableRef('useCanvasEdgeSnapping');
+export const useLayerEdgeSnapping = permanentStorage.getWritableRef('useLayerEdgeSnapping');
+export const useLayerCenterSnapping = permanentStorage.getWritableRef('useLayerCenterSnapping');
+
 export const isBoundsIndeterminate = ref<boolean>(false);
 export const layerPickMode = ref<'current' | 'auto'>('auto');
-export const useRotationSnapping = ref<boolean>(false);
 export const top = ref<number>(0);
 export const left = ref<number>(0);
 export const width = ref<number>(200);
@@ -32,6 +65,9 @@ export const dragHandleHighlight = ref<number | null>(null);
 export const rotateHandleHighlight = ref<boolean>(false);
 export const dimensionLockRatio = ref<number | null>(null);
 export const selectedLayers = ref<WorkingFileLayer<ColorModel>[]>([]);
+
+export const snapLineX = ref<number[]>([]);
+export const snapLineY = ref<number[]>([]);
 
 export const freeTransformEmitter = mitt();
 
@@ -50,10 +86,10 @@ export const transformOptions = computed(() => {
     let shouldShowUnevenScalingHandles = new Set<boolean>(); // Enables the edge handles with apply uneven scaling
     let shouldMaintainAspectRatio = new Set<boolean>(); // The scale must be applied evenly to layer's width/height
     let shouldScaleDuringResize = new Set<boolean>(); // The scale will be applied to the layer's DOMMatrix, otherwise width/height are changed
-    let shouldSnapRotationDegrees: boolean = useRotationSnapping.value;
+    let shouldSnapRotationDegrees: boolean = useSnapping.value && useRotationSnapping.value;
     if (isShiftKeyPressed.value === true) {
         shouldMaintainAspectRatio.add(false);
-        shouldSnapRotationDegrees = !useRotationSnapping.value;
+        shouldSnapRotationDegrees = !(useSnapping.value && useRotationSnapping.value);
     }
     if (selectedLayers.value.length === 1) {
         if (selectedLayers.value.find(layer => layer.type === 'text')) {
@@ -300,7 +336,28 @@ export async function layerToImageBounds() {
             blockInteraction: true,
         });
     } catch (error) {
-        console.error('[src/canvas/store/free-transform-state.ts] Error occurred during trim empty space.', error);
+        console.error('[src/canvas/store/free-transform-state.ts] Error occurred during expand empty space.', error);
+    }
+}
+
+export async function stretchToImageBounds() {
+    try {
+        const actions: BaseAction[] = [];
+        for (const layer of selectedLayers.value) {
+            const globalTransform = getLayerGlobalTransform(layer, { excludeSelf: true });
+            actions.push(new UpdateLayerAction({
+                id: layer.id,
+                transform: new DOMMatrix()
+                    .scaleSelf(layer.width / workingFileStore.get('width'), layer.height / workingFileStore.get('height'))
+                    .multiplySelf(globalTransform.inverse())
+            }));
+        }
+        await historyStore.dispatch('runAction', {
+            action: new BundleAction('stretchLayerToWorkingFileBounds', 'action.stretchLayerToWorkingFileBounds', actions),
+            blockInteraction: true,
+        });
+    } catch (error) {
+        console.error('[src/canvas/store/free-transform-state.ts] Error occurred during stretch to image bounds.', error);
     }
 }
 

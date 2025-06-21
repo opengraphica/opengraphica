@@ -56,6 +56,10 @@
                             <i class="bi bi-check-circle-fill"></i>
                             <span v-t="'toolbar.freeTransform.actions.applyTransform'"></span>
                         </el-menu-item>
+                        <el-menu-item index="stretchToImageSize">
+                            <i class="bi bi-arrows-angle-expand"></i>
+                            <span v-t="'toolbar.freeTransform.actions.stretchToImageSize'"></span>
+                        </el-menu-item>
                         <el-menu-item index="expandToImageSize">
                             <i class="bi bi-fullscreen"></i>
                             <span v-t="'toolbar.freeTransform.actions.expandToImageSize'"></span>
@@ -70,8 +74,34 @@
         </div>
         <floating-dock v-if="snappingDockVisible" v-model:top="snappingDockTop" v-model:left="snappingDockLeft" :visible="floatingDocksVisible">
             <el-form novalidate="novalidate" action="javascript:void(0)">
+                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="t('toolbar.freeTransform.snapping.enableSnapping')">
+                    <el-switch v-model="useSnapping" />
+                </el-form-item>
                 <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="t('toolbar.freeTransform.snapping.rotationSnap')">
-                    <el-switch v-model="useRotationSnapping" />
+                    <el-switch v-model="useRotationSnapping" :disabled="!useSnapping" />
+                </el-form-item>
+                <el-form-item v-if="useRotationSnapping" class="el-form-item--menu-item el-form-item--has-content-right mb-1">
+                    <template #label>
+                        <div class="pl-4">{{ t('toolbar.freeTransform.snapping.rotationSnapDegrees') }}</div>
+                    </template>
+                    <el-select v-model="rotationSnappingDegrees" size="small" style="width: 4rem" :disabled="!useSnapping">
+                        <el-option label="5°" :value="5" />
+                        <el-option label="10°" :value="10" />
+                        <el-option label="15°" :value="15" />
+                        <el-option label="20°" :value="20" />
+                        <el-option label="30°" :value="30" />
+                        <el-option label="45°" :value="45" />
+                        <el-option label="90°" :value="90" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="t('toolbar.freeTransform.snapping.canvasEdges')">
+                    <el-switch v-model="useCanvasEdgeSnapping" :disabled="!useSnapping" />
+                </el-form-item>
+                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="t('toolbar.freeTransform.snapping.layerEdges')">
+                    <el-switch v-model="useLayerEdgeSnapping" :disabled="!useSnapping" />
+                </el-form-item>
+                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="t('toolbar.freeTransform.snapping.layerCenter')">
+                    <el-switch v-model="useLayerCenterSnapping" :disabled="!useSnapping" />
                 </el-form-item>
             </el-form>
         </floating-dock>
@@ -190,9 +220,11 @@ import { ref, computed, onMounted, onUnmounted, toRefs, watch, nextTick } from '
 import { useI18n } from '@/i18n';
 
 import {
-    freeTransformEmitter, layerPickMode, useRotationSnapping, top, left, width, height, rotation,
+    freeTransformEmitter, layerPickMode, top, left, width, height, rotation,
+    useSnapping, useRotationSnapping, rotationSnappingDegrees,
+    useCanvasEdgeSnapping, useLayerEdgeSnapping, useLayerCenterSnapping,
     applyTransform, trimEmptySpace, layerToImageBounds, isResizeEnabled, isUnevenScalingEnabled,
-    snappingDockTop, snappingDockLeft, snappingDockVisible,
+    stretchToImageBounds, snappingDockTop, snappingDockLeft, snappingDockVisible,
     metricsDockTop, metricsDockLeft, metricsDockVisible,
     resetSelectedLayerWidths, resetSelectedLayerHeights, alignSelectedLayersToCanvas,
 } from '@/canvas/store/free-transform-state';
@@ -419,6 +451,8 @@ function onChangeDragResizeInput() {
 async function onActionSelect(action: string) {
     if (action === 'applyTransform') {
         await applyTransform();
+    } else if (action === 'stretchToImageSize') {
+        await stretchToImageBounds();
     } else if (action === 'expandToImageSize') {
         await layerToImageBounds();
     } else if (action === 'trimEmptySpace') {

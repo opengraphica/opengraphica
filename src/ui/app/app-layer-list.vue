@@ -147,7 +147,6 @@
         v-model:visible="showLayerSettingsMenu"
         placement="bottom-end"
         :reference="showLayerSettingsReference"
-        @hidden="showLayerSettingsMenuFor = null"
     >
         <el-menu class="el-menu--medium el-menu--borderless" :default-active="layerSettingsActiveIndex" @select="onLayerSettingsSelect($event)">
             <el-menu-item index="rename">
@@ -282,10 +281,6 @@ watch(() => props.scrollTop, () => {
     }
 });
 
-watch(() => showLayerSettingsMenuFor.value, (value) => {
-    showLayerSettingsMenu.value = value != null;
-});
-
 if (!props.isRoot) {
     watch(() => ({
         id: draggingLayerId.value,
@@ -341,6 +336,7 @@ async function onLayerSettingsSelect(action: string) {
             action: new DeleteLayersAction([layer.id])
         });
     }
+    showLayerSettingsMenu.value = false;
     showLayerSettingsMenuFor.value = null;
     layerSettingsActiveIndex.value = ' ';
     await nextTick();
@@ -529,6 +525,8 @@ function onToggleLayerSettings(event: MouseEvent, layer: WorkingFileAnyLayer<Col
     } else {
         showLayerSettingsMenuFor.value = layer.id;
     }
+    showLayerSettingsMenu.value = false;
+    nextTick(() => { showLayerSettingsMenu.value = showLayerSettingsMenuFor.value != null });
 }
 
 function onToggleLayerVisibility(layer: WorkingFileAnyLayer<ColorModel>) {

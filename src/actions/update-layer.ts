@@ -13,13 +13,14 @@ import {
 } from '@/store/image';
 import { reserveStoredSvg, unreserveStoredSvg } from '@/store/svg';
 import { reserveStoredVideo, unreserveStoredVideo } from '@/store/video';
-import workingFileStore, { getLayerById, regenerateLayerThumbnail, getCanvasRenderingContext2DSettings } from '@/store/working-file';
+import workingFileStore, { getLayerById, regenerateLayerThumbnail, getCanvasRenderingContext2DSettings, visibleLayerIds } from '@/store/working-file';
 import { updateWorkingFileLayer } from '@/store/data/working-file-database';
 
 import type {
     ColorModel, WorkingFileAnyLayer,
     UpdateAnyLayerOptions, UpdateGradientLayerOptions, UpdateRasterLayerOptions, UpdateVectorLayerOptions,
-    UpdateVideoLayerOptions, WorkingFileRasterLayer, WorkingFileLayerRasterTileUpdate, WorkingFileVectorLayer
+    UpdateVideoLayerOptions, WorkingFileRasterLayer, WorkingFileLayerRasterTileUpdate, WorkingFileVectorLayer,
+    WorkingFileVideoLayer,
 } from '@/types';
 
 export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorModel>> extends BaseAction {
@@ -200,6 +201,15 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
             }
         }
 
+        // Keep track of all layer visibility
+        if (this.updateLayerOptions.visible != null) {
+            if (this.updateLayerOptions.visible === true) {
+                visibleLayerIds.value.add(layer.id);
+            } else {
+                visibleLayerIds.value.delete(layer.id);
+            }
+        }
+
         if (hasChangedLayerType) {
             appEmitter.emit('app.workingFile.layerAttached', layer);
         }
@@ -258,6 +268,16 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                     layer.data.tileUpdateId = uuidv4();
                 }
             }
+
+            // Keep track of all layer visibility
+            if (this.previousProps.visible != null) {
+                if (this.previousProps.visible === true) {
+                    visibleLayerIds.value.add(layer.id);
+                } else {
+                    visibleLayerIds.value.delete(layer.id);
+                }
+            }
+
             regenerateLayerThumbnail(layer);
             updateBakedImageForLayer(layer);
         }
@@ -310,6 +330,16 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                         vectorUpdateLayerOptions?.data?.sourceUuid !== (layer as WorkingFileVectorLayer<ColorModel>)?.data?.sourceUuid
                     ) {
                         unreserveStoredImage(vectorUpdateLayerOptions.data.sourceUuid, `${layer.id}`);
+                    }
+                }
+                // For video layer, if the video source id was changed, free the new one.
+                if (this.updateLayerType === 'video') {
+                    const videoUpdateLayerOptions = (this.updateLayerOptions as UpdateVideoLayerOptions<ColorModel>);
+                    if (
+                        videoUpdateLayerOptions?.data?.sourceUuid &&
+                        videoUpdateLayerOptions?.data?.sourceUuid !== (layer as WorkingFileVideoLayer<ColorModel>)?.data?.sourceUuid
+                    ) {
+                        unreserveStoredImage(videoUpdateLayerOptions.data.sourceUuid, `${layer.id}`);
                     }
                 }
             }

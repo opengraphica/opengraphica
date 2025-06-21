@@ -98,6 +98,7 @@ void main() {
     //     oklabToRgb((rgbToOklab(srcColor.rgb) * srcAlpha + (rgbToOklab(dstColor.rgb) * dstColor.a) * (1.0 - srcAlpha)) / alpha), alpha
     // );
 
+    // Linear Variant
     gl_FragColor = vec4(
         ((srcColor.rgb) * srcAlpha + ((dstColor.rgb) * dstColor.a) * (1.0 - srcAlpha)) / alpha, alpha
     );

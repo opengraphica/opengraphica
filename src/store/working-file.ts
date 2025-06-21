@@ -1,3 +1,4 @@
+import { ref } from 'vue';
 import { PerformantStore } from './performant-store';
 import appEmitter from '@/lib/emitter';
 import { deleteStoredImage } from '@/store/image';
@@ -7,7 +8,7 @@ import type {
     WorkingFileLayer, WorkingFileAnyLayer, WorkingFileGroupLayer, WorkingFileTimeline, WorkingFileLayerMask
 } from '@/types';
 
-interface WorkingFileState {
+export interface WorkingFileState {
     activeTimelineId: number | null;
     background: {
         visible: boolean;
@@ -35,7 +36,7 @@ interface WorkingFileState {
     width: number; // Always pixels
 }
 
-interface WorkingFileStore {
+export interface WorkingFileStore {
     dispatch: {};
     state: WorkingFileState;
 }
@@ -71,14 +72,21 @@ const store = new PerformantStore<WorkingFileStore>({
     },
     nonReactive: ['fileHandle']
 });
+export default store;
 
-function calculateLayerOrder(parent?: WorkingFileLayer<ColorModel>[], order: number = 0): number {
+export const visibleLayerIds = ref(new Set<number>());
+
+export function calculateLayerOrder(parent?: WorkingFileLayer<ColorModel>[], order: number = 0): number {
     let isStart = false;
     if (!parent) {
         parent = store.get('layers');
+        visibleLayerIds.value.clear();
         isStart = true;
     }
     for (const layer of parent) {
+        if (layer.visible) {
+            visibleLayerIds.value.add(layer.id);
+        }
         appEmitter.emit('app.workingFile.layerReordered', { layer: layer as never, order });
         order++;
         if (layer.type === 'group') {
@@ -91,25 +99,25 @@ function calculateLayerOrder(parent?: WorkingFileLayer<ColorModel>[], order: num
     return order;
 }
 
-function getCanvasColorSpace(): 'srgb' | 'display-p3' {
+export function getCanvasColorSpace(): 'srgb' | 'display-p3' {
     if (store.state.colorSpace === 'Display P3') {
         return 'display-p3';
     }
     return 'srgb';
 }
 
-function getCanvasRenderingContext2DSettings(): CanvasRenderingContext2DSettings {
+export function getCanvasRenderingContext2DSettings(): CanvasRenderingContext2DSettings {
     return {
         alpha: true,
         colorSpace: getCanvasColorSpace()
     }
 }
 
-function getWebGLContextAttributes(): WebGLContextAttributes {
+export function getWebGLContextAttributes(): WebGLContextAttributes {
     return {};
 }
 
-function getLayerById<T extends WorkingFileAnyLayer<ColorModel>>(id: number, parent?: WorkingFileLayer<ColorModel>[]): T | null {
+export function getLayerById<T extends WorkingFileAnyLayer<ColorModel>>(id: number, parent?: WorkingFileLayer<ColorModel>[]): T | null {
     if (parent == null) {
         parent = store.get('layers');
     }
@@ -126,7 +134,7 @@ function getLayerById<T extends WorkingFileAnyLayer<ColorModel>>(id: number, par
     return null;
 }
 
-function getLayerGlobalTransform(layerOrId: WorkingFileLayer<ColorModel> | number, options?: { excludeSelf?: boolean }): DOMMatrix {
+export function getLayerGlobalTransform(layerOrId: WorkingFileLayer<ColorModel> | number, options?: { excludeSelf?: boolean }): DOMMatrix {
     let layer: WorkingFileLayer<ColorModel> | null = null;
     if (typeof layerOrId === 'number') {
         layer = getLayerById(layerOrId);
@@ -146,7 +154,7 @@ function getLayerGlobalTransform(layerOrId: WorkingFileLayer<ColorModel> | numbe
 }
 
 /** Returns 4 points for each corner of the layer bounding box, transformed so they are relative to the document */
-function getLayerBoundingPoints(layerOrId: WorkingFileLayer<ColorModel> | number): DOMPoint[] {
+export function getLayerBoundingPoints(layerOrId: WorkingFileLayer<ColorModel> | number): DOMPoint[] {
     let layer: WorkingFileLayer<ColorModel> | null = null;
     if (typeof layerOrId === 'number') {
         layer = getLayerById(layerOrId);
@@ -173,7 +181,23 @@ function getLayerBoundingPoints(layerOrId: WorkingFileLayer<ColorModel> | number
     ];
 }
 
-function getGroupLayerById(id: number, parent?: WorkingFileLayer<ColorModel>[]): WorkingFileGroupLayer<ColorModel> | null {
+export function getAllSizableLayerBoundingPoints(parent?: WorkingFileGroupLayer<ColorModel>) {
+    let boundingPoints = new Map<number, DOMPoint[]>();
+    const childLayers = parent?.layers ?? store.get('layers');
+    for (const layer of childLayers) {
+        if (layer.type === 'gradient') continue;
+        boundingPoints.set(layer.id, getLayerBoundingPoints(layer));
+        if (layer.type === 'group') {
+            for (const [layerId, transform] of getAllSizableLayerBoundingPoints(layer as WorkingFileGroupLayer)) {
+                boundingPoints.set(layerId, transform);
+            }
+        }
+    }
+    return boundingPoints;
+}
+
+
+export function getGroupLayerById(id: number, parent?: WorkingFileLayer<ColorModel>[]): WorkingFileGroupLayer<ColorModel> | null {
     if (parent == null) {
         parent = store.get('layers');
     }
@@ -184,7 +208,7 @@ function getGroupLayerById(id: number, parent?: WorkingFileLayer<ColorModel>[]):
     return null;
 }
 
-function getLayersByType<T extends WorkingFileLayer<ColorModel>>(type: string, parent?: WorkingFileLayer<ColorModel>[]): T[] {
+export function getLayersByType<T extends WorkingFileLayer<ColorModel>>(type: string, parent?: WorkingFileLayer<ColorModel>[]): T[] {
     if (parent == null) {
         parent = store.get('layers');
     }
@@ -203,7 +227,7 @@ function getLayersByType<T extends WorkingFileLayer<ColorModel>>(type: string, p
     return layers as T[];
 }
 
-function getSelectedLayers<T = WorkingFileAnyLayer<ColorModel>>(providedSelectedLayerIds?: number[]): T[] {
+export function getSelectedLayers<T = WorkingFileAnyLayer<ColorModel>>(providedSelectedLayerIds?: number[]): T[] {
     const selectedLayers: WorkingFileAnyLayer<ColorModel>[] = [];
     const selectedLayerIds = providedSelectedLayerIds ?? store.get('selectedLayerIds');
     if (selectedLayerIds.length > 0) {
@@ -217,7 +241,7 @@ function getSelectedLayers<T = WorkingFileAnyLayer<ColorModel>>(providedSelected
     return selectedLayers as never;
 }
 
-function getTimelineById(id: number): WorkingFileTimeline | null {
+export function getTimelineById(id: number): WorkingFileTimeline | null {
     const timelines = store.get('timelines');
     for (let timeline of timelines) {
         if (timeline.id === id) {
@@ -227,7 +251,7 @@ function getTimelineById(id: number): WorkingFileTimeline | null {
     return null;
 }
 
-function ensureUniqueLayerSiblingName(layerId: number | null | undefined, name: string): string {
+export function ensureUniqueLayerSiblingName(layerId: number | null | undefined, name: string): string {
     if (layerId != null) {
         let siblings: WorkingFileLayer<ColorModel>[] = [];
         const referenceLayer = getLayerById(layerId);
@@ -258,7 +282,7 @@ function ensureUniqueLayerSiblingName(layerId: number | null | undefined, name: 
     return name;
 }
 
-function regenerateLayerThumbnail(layer: WorkingFileAnyLayer<ColorModel>) {
+export function regenerateLayerThumbnail(layer: WorkingFileAnyLayer<ColorModel>) {
     let parent: WorkingFileAnyLayer<ColorModel> | null = layer;
     while (parent != null) {
         parent.thumbnailImageSrc = null;
@@ -289,7 +313,7 @@ function isMaskIdUsed(maskId: number, parentLayers?: WorkingFileLayer<ColorModel
     return false;
 }
 
-function discardMaskIfUnused(maskId?: number) {
+export function discardMaskIfUnused(maskId?: number) {
     if (maskId == null) return;
     if (!isMaskIdUsed(maskId)) {
         const masks = store.get('masks');
@@ -307,36 +331,14 @@ function discardMaskIfUnused(maskId?: number) {
     }
 }
 
-function discardAllUnusedMasks() {
+export function discardAllUnusedMasks() {
     const maskIds = Object.keys(store.get('masks')).map(key => parseInt(key));
     for (const maskId of maskIds) {
         discardMaskIfUnused(maskId);
     }
 }
 
-function isGroupLayer(layer: WorkingFileAnyLayer): layer is WorkingFileGroupLayer {
+export function isGroupLayer(layer: WorkingFileAnyLayer): layer is WorkingFileGroupLayer {
     return layer.type === 'group' && !!layer.layers;
 }
 
-export default store;
-
-export {
-    WorkingFileStore,
-    WorkingFileState,
-    calculateLayerOrder,
-    getCanvasColorSpace,
-    getCanvasRenderingContext2DSettings,
-    getWebGLContextAttributes,
-    getLayerById,
-    getLayerGlobalTransform,
-    getLayerBoundingPoints,
-    getLayersByType,
-    getGroupLayerById,
-    getSelectedLayers,
-    getTimelineById,
-    ensureUniqueLayerSiblingName,
-    regenerateLayerThumbnail,
-    discardMaskIfUnused,
-    discardAllUnusedMasks,
-    isGroupLayer,
-};
