@@ -35,6 +35,16 @@
                     "draw-gradient"
                 ]
             },
+            "shape": {
+                "controller": "draw-shape",
+                "toolbar": {
+                    "position": "auto",
+                    "target": "draw-shape"
+                },
+                "overlays": [
+                    "draw-shape"
+                ]
+            },
             "colorPicker": {
                 "controller": "draw-color-picker",
                 "toolbar": {

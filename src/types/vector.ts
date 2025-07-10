@@ -1,5 +1,100 @@
 import { ColorOrGradient, ColorModel } from './color';
 
+export enum VectorPathCommandType {
+    MOVE = 'M',
+    LINE = 'L',
+    HORIZONTAL_LINE = 'H',
+    VERTICAL_LINE = 'V',
+    CUBIC_BEZIER_CURVE = 'C',
+    SMOOTH_CUBIC_BEZIER_CURVE = 'S',
+    QUADRATIC_BEZIER_CURVE = 'Q',
+    SMOOTH_QUADRATIC_BEZIER_CURVE = 'T',
+    ELLIPTICAL_ARC = 'A',
+    CLOSE = 'Z',
+}
+
+export enum CompressedVectorPathCommandType {
+    MOVE = 0,
+    LINE = 1,
+    HORIZONTAL_LINE = 2,
+    VERTICAL_LINE = 3,
+    CUBIC_BEZIER_CURVE = 4,
+    SMOOTH_CUBIC_BEZIER_CURVE = 5,
+    QUADRATIC_BEZIER_CURVE = 6,
+    SMOOTH_QUADRATIC_BEZIER_CURVE = 7,
+    ELLIPTICAL_ARC = 8,
+    CLOSE = 9,
+}
+
+export interface VectorPathCommandMove {
+    type: VectorPathCommandType.MOVE,
+    x: number;
+    y: number;
+}
+
+export interface VectorPathCommandLine {
+    type: VectorPathCommandType.LINE,
+    x: number;
+    y: number;
+}
+
+export interface VectorPathCommandHorizontalLine {
+    type: VectorPathCommandType.HORIZONTAL_LINE,
+    x: number;
+}
+
+export interface VectorPathCommandVerticalLine {
+    type: VectorPathCommandType.VERTICAL_LINE,
+    y: number;
+}
+
+export interface VectorPathCommandCubicBezierCurve {
+    type: VectorPathCommandType.CUBIC_BEZIER_CURVE,
+    x: number;
+    y: number;
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+}
+
+export interface VectorPathCommandSmoothCubicBezierCurve {
+    type: VectorPathCommandType.SMOOTH_CUBIC_BEZIER_CURVE,
+    x: number;
+    y: number;
+    x2: number;
+    y2: number;
+}
+
+export interface VectorPathCommandQuadraticBezierCurve {
+    type: VectorPathCommandType.QUADRATIC_BEZIER_CURVE,
+    x: number;
+    y: number;
+    x1: number;
+    y1: number;
+}
+
+export interface VectorPathCommandSmoothQuadraticBezierCurve {
+    type: VectorPathCommandType.SMOOTH_QUADRATIC_BEZIER_CURVE,
+    x: number;
+    y: number;
+}
+
+export interface VectorPathCommandArc {
+    type: VectorPathCommandType.ELLIPTICAL_ARC,
+    rx: number;
+    ry: number;
+    xAxisRotation: number;
+    largeArcFlag: number;
+    sweepFlag: number;
+    x: number;
+    y: number;
+}
+
+export type VectorPathCommand = VectorPathCommandMove | VectorPathCommandLine | VectorPathCommandHorizontalLine
+    | VectorPathCommandCubicBezierCurve | VectorPathCommandSmoothCubicBezierCurve | VectorPathCommandQuadraticBezierCurve
+    | VectorPathCommandSmoothQuadraticBezierCurve | VectorPathCommandArc;
+
 export interface VectorRectangleShape<T extends ColorModel> {
     type: 'rectangle';
     height: number;
@@ -61,13 +156,10 @@ export interface VectorPolylineShape<T extends ColorModel> {
 export interface VectorPathShape<T extends ColorModel> {
     type: 'path';
     fill: ColorOrGradient<T>;
-    points: {
-        action: 'move' | 'line' | 'horizontalLine' | 'verticalLine' | 'curve' | 'smoothCurve' | 'quadraticBezierCurve' | 'smoothQuadraticBezierCurve' | 'ellipticalArc' | 'close';
-        x: number;
-        y: number;
-    }[];
+    commands: VectorPathCommand[];
     stroke: ColorOrGradient<T>;
     strokeWidth: number;
+    shapeHint?: string;
 }
 
 export type VectorShape<T extends ColorModel> = VectorRectangleShape<T> | VectorCircleShape<T> | VectorEllipseShape<T> | VectorLineShape<T> | VectorPolygonShape<T> | VectorPolylineShape<T> | VectorPathShape<T>;

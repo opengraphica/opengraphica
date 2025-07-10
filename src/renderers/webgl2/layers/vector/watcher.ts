@@ -5,12 +5,14 @@
 
 import { toRefs, watch, type WatchStopHandle } from 'vue';
 
-import { VectorLayerMeshController } from './mesh-controller';
-
+import type {
+    Webgl2RendererBackendPublic, MeshControllerInterface,
+} from '@/renderers/webgl2/backend';
 import type { RendererLayerWatcher, WorkingFileVectorLayer } from '@/types';
 
 export class VectorLayerWatcher implements RendererLayerWatcher<WorkingFileVectorLayer> {
-    meshController: VectorLayerMeshController | undefined;
+    rendererBackend!: Webgl2RendererBackendPublic;
+    meshController: MeshControllerInterface | undefined;
     stopWatchName: WatchStopHandle | undefined;
     stopWatchBlendingMode: WatchStopHandle | undefined;
     stopWatchVisible: WatchStopHandle | undefined;
@@ -19,10 +21,14 @@ export class VectorLayerWatcher implements RendererLayerWatcher<WorkingFileVecto
     stopWatchFilters: WatchStopHandle | undefined;
     stopWatchData: WatchStopHandle | undefined;
 
+    constructor(rendererBackend: Webgl2RendererBackendPublic) {
+        this.rendererBackend = rendererBackend;
+    }
+
     async attach(layer: WorkingFileVectorLayer) {
         const { blendingMode, data, drafts, filters, height, name, transform, visible, width } = toRefs(layer);
 
-        this.meshController = new VectorLayerMeshController();
+        this.meshController = await this.rendererBackend.createMeshController('vector');
         this.meshController.attach(layer.id);
 
         this.stopWatchBlendingMode = watch([blendingMode], ([blendingMode]) => {

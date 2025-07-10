@@ -3,7 +3,6 @@
  * @copyright (c) ViliusL
  * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
-import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 
 export interface ImageDataEmptyBounds {
     left: number;
@@ -20,6 +19,22 @@ export interface GetImageDataEmptyBoundsOptions {
 
 export interface CreateImageFromOptions {
     srcType?: 'objectUrl' | 'dataUrl';
+}
+
+// TODO - modify methods to pass in the color space.
+// This was moved out of the working-file store so it's not imported in web worker thread.
+export function getCanvasColorSpace(): 'srgb' | 'display-p3' {
+    // if (store.state.colorSpace === 'Display P3') {
+    //     return 'display-p3';
+    // }
+    return 'srgb';
+}
+
+export function getCanvasRenderingContext2DSettings(): CanvasRenderingContext2DSettings {
+    return {
+        alpha: true,
+        colorSpace: getCanvasColorSpace()
+    }
 }
 
 /**

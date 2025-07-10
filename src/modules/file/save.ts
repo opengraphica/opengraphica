@@ -14,9 +14,10 @@ import { getStoredVideoDataUrl } from '@/store/video';
 import type {
     FileSystemFileHandle, SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel, SerializedFileLayerMask,
     SerializedFileGradientLayer, SerializedFileGroupLayer, SerializedFileTextLayer, SerializedFileRasterLayer,
-    SerializedFileRasterSequenceLayer, SerializedFileVectorLayer, SerializedFileVideoLayer, WorkingFile, WorkingFileGradientLayer,
+    SerializedFileRasterSequenceLayer, SerializedFileVectorLayer, SerializedFileVectorPathLayer,
+    SerializedFileVideoLayer, WorkingFile, WorkingFileGradientLayer,
     WorkingFileGroupLayer, WorkingFileTextLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer,
-    WorkingFileVectorLayer, WorkingFileVideoLayer,
+    WorkingFileVectorLayer, WorkingFileVectorPathLayer, WorkingFileVideoLayer,
 } from '@/types';
 
 interface SaveImageAsOptions {
@@ -207,6 +208,13 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
                     )
                 }
             } as SerializedFileVectorLayer<ColorModel>;
+        }
+        else if (layer.type === 'vectorPath') {
+            serializedLayer = {
+                ...serializedLayer,
+                type: 'vectorPath',
+                data: (layer as WorkingFileVectorPathLayer<ColorModel>).data,
+            } as SerializedFileVectorPathLayer<ColorModel>;
         }
         else if (layer.type === 'video') {
             serializedLayer = {

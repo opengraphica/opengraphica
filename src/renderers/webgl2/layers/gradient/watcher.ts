@@ -4,11 +4,15 @@
  */
 
 import { toRefs, watch, type WatchStopHandle } from 'vue';
-import { GradientLayerMeshController } from './mesh-controller';
+
+import type {
+    Webgl2RendererBackendPublic, MeshControllerInterface,
+} from '@/renderers/webgl2/backend';
 import type { RendererLayerWatcher, WorkingFileGradientLayer } from '@/types';
 
 export class GradientLayerWatcher implements RendererLayerWatcher<WorkingFileGradientLayer> {
-    meshController: GradientLayerMeshController | undefined;
+    rendererBackend!: Webgl2RendererBackendPublic;
+    meshController: MeshControllerInterface | undefined;
     stopWatchName: WatchStopHandle | undefined;
     stopWatchBlendingMode: WatchStopHandle | undefined;
     stopWatchVisible: WatchStopHandle | undefined;
@@ -17,10 +21,14 @@ export class GradientLayerWatcher implements RendererLayerWatcher<WorkingFileGra
     stopWatchFilters: WatchStopHandle | undefined;
     stopWatchData: WatchStopHandle | undefined;
 
+    constructor(rendererBackend: Webgl2RendererBackendPublic) {
+        this.rendererBackend = rendererBackend;
+    }
+
     async attach(layer: WorkingFileGradientLayer) {
         const { blendingMode, data, drafts, filters, height, name, transform, visible, width } = toRefs(layer);
 
-        this.meshController = new GradientLayerMeshController();
+        this.meshController = await this.rendererBackend.createMeshController('gradient');
         this.meshController.attach(layer.id);
 
         this.stopWatchBlendingMode = watch([blendingMode], ([blendingMode]) => {

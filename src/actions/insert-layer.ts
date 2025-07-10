@@ -16,8 +16,8 @@ import appEmitter from '@/lib/emitter';
 import type {
     ColorModel, WorkingFileLayer,
     WorkingFileEmptyLayer, WorkingFileGradientLayer, WorkingFileGroupLayer, WorkingFileRasterLayer,
-    WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileVideoLayer, WorkingFileTextLayer,
-    WorkingFileAnyLayer, InsertAnyLayerOptions
+    WorkingFileRasterSequenceLayer, WorkingFileVectorLayer, WorkingFileVectorPathLayer, WorkingFileVideoLayer,
+    WorkingFileTextLayer, WorkingFileAnyLayer, InsertAnyLayerOptions
 } from '@/types';
 
 let layerInsertCounter: number = 1;
@@ -143,6 +143,13 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
                     if (newLayer.data.sourceUuid) {
                         reserveStoredSvg(newLayer.data.sourceUuid, `${layerId}`);
                     }
+                    break;
+                case 'vectorPath':
+                    newLayer = {
+                        ...sharedOptions,
+                        data: [],
+                        ...this.insertLayerOptions
+                    } as WorkingFileVectorPathLayer<ColorModel>;
                     break;
                 case 'video':
                     newLayer = {

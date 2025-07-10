@@ -49,6 +49,9 @@
                                         :plain="![activeToolGroup, activeMenuDrawerComponentName].includes(control.action?.target)"
                                         :circle="!control.expanded"
                                         :round="control.expanded"
+                                        :style="{
+                                            width: '2.5rem'
+                                        }"
                                         :class="{
                                             'og-menu-bar-button--hover-title': !control.expanded,
                                             'el-button--expanded-group': control.expanded,

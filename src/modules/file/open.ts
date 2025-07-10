@@ -31,10 +31,12 @@ import appEmitter from '@/lib/emitter';
 import type {
     ShowOpenFilePicker, FileSystemFileHandle,
     SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel,
-    InsertAnyLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions, InsertVectorLayerOptions, InsertVideoLayerOptions,
-    WorkingFileLayerMask, WorkingFileEmptyLayer, WorkingFileGradientLayer, WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer,
-    WorkingFileTextLayer, WorkingFileVectorLayer, WorkingFileVideoLayer, SerializedFileGradientLayer, SerializedFileGroupLayer,
-    SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileTextLayer, SerializedFileVectorLayer, SerializedFileVideoLayer
+    InsertAnyLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions, InsertVectorLayerOptions,
+    InsertVideoLayerOptions, WorkingFileLayerMask, WorkingFileEmptyLayer, WorkingFileGradientLayer,
+    WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileTextLayer,
+    WorkingFileVectorLayer, WorkingFileVectorPathLayer, WorkingFileVideoLayer, SerializedFileGradientLayer,
+    SerializedFileGroupLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileTextLayer,
+    SerializedFileVectorLayer, SerializedFileVectorPathLayer, SerializedFileVideoLayer
 } from '@/types';
 
 declare global {
@@ -728,6 +730,13 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
                 },
             } as WorkingFileVectorLayer<ColorModel>;
         }
+        else if (layer.type === 'vectorPath') {
+            parsedLayer = {
+                ...parsedLayer,
+                type: 'vectorPath',
+                data: (layer as SerializedFileVectorPathLayer<ColorModel>).data,
+            } as WorkingFileVectorPathLayer<ColorModel>;
+        }
         else if (layer.type === 'video') {
             const serializedLayer = layer as SerializedFileVideoLayer<ColorModel>;
             let video: HTMLVideoElement | undefined;
@@ -773,7 +782,7 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
                 type: 'text',
                 data: (layer as SerializedFileTextLayer<ColorModel>).data,
             } as WorkingFileTextLayer<ColorModel>;
-        } 
+        }
         insertLayerActions.push(
             new InsertLayerAction<InsertAnyLayerOptions<ColorModel>>(parsedLayer as InsertAnyLayerOptions<ColorModel>)
         );

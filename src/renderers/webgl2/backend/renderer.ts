@@ -45,7 +45,34 @@ export interface Webgl2RendererApplySelectionMaskToAlphaChannelOptions {
     invert?: boolean;
 }
 
-export class Webgl2RendererBackend {
+export type MeshControllerInterface = any & { dispose: () => void };
+
+export interface Webgl2RendererBackendPublic {
+    isOffscreen: boolean;
+    onRequestFrontendSvg?: (request: { sourceUuid: string, width: number, height: number }) => void;
+    onRequestFrontendTexture?: (sourceUuid: string) => void;
+    initialize(canvas: HTMLCanvasElement | OffscreenCanvas, imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number): Promise<void>;
+    resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number): Promise<void>;
+    enableImageBoundaryMask(enabled: boolean): Promise<void>;
+    setBackgroundColor(r: number, g: number, b: number, alpha: number): Promise<void>;
+    setMasks(masks: Record<number, WorkingFileLayerMask>): Promise<void>;
+    setSelectionMask(image?: ImageBitmap, offset?: { x: number, y: number }): Promise<void>;
+    setViewTransform(transform: Float64Array): Promise<void>;
+    setLayerOrder(layerOrder: WorkingFileLayer[]): Promise<void>;
+    queueCreateLayerPasses(): Promise<void>;
+    applySelectionMaskToAlphaChannel(layerId: number, options?: Webgl2RendererApplySelectionMaskToAlphaChannelOptions): Promise<RendererTextureTile[]>;
+    takeSnapshot(imageWidth: number, imageHeight: number, options?: Webgl2RendererBackendTakeSnapshotOptions): Promise<ImageBitmap>;
+    startBrushStroke(settings: RendererBrushStrokeSettings): Promise<void>;
+    moveBrushStroke(layerId: number, x: number, y: number, size: number, density: number, colorBlendingStrength: number, concentration: number): Promise<void>;
+    stopBrushStroke(layerId: number): Promise<RendererTextureTile[]>;
+    createBrushPreview(settings: RendererBrushStrokePreviewsettings): Promise<ImageBitmap>;
+    createMeshController(type: string): Promise<MeshControllerInterface>;
+    setDirty(): Promise<void>;
+    dispose(): Promise<void>;
+}
+
+export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
+    isOffscreen: boolean = false;
     dirty: boolean = false;
     rendererBusy: boolean = false; // Renderer is being used for other operations and shouldn't be used to draw right now
 
@@ -79,6 +106,17 @@ export class Webgl2RendererBackend {
 
     compositorBrushStrokes = new Map<number, number>();
 
+    async createMeshController(type: string) {
+        return {
+            gradient: (await import('@/renderers/webgl2/layers/gradient/mesh-controller')).GradientLayerMeshController,
+            raster: (await import('@/renderers/webgl2/layers/raster/mesh-controller')).RasterLayerMeshController,
+            rasterSequence: (await import('@/renderers/webgl2/layers/raster-sequence/mesh-controller')).RasterSequenceLayerMeshController,
+            text: (await import('@/renderers/webgl2/layers/text/mesh-controller')).TextLayerMeshController,
+            vector: (await import('@/renderers/webgl2/layers/vector/mesh-controller')).VectorLayerMeshController,
+            video: (await import('@/renderers/webgl2/layers/video/mesh-controller')).VideoLayerMeshController,
+        }[type]();
+    }
+
     async initialize(canvas: HTMLCanvasElement | OffscreenCanvas, imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number) {
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
@@ -91,7 +129,7 @@ export class Webgl2RendererBackend {
             powerPreference: 'high-performance',
         });
         this.renderer.outputColorSpace = SRGBColorSpace;
-        this.renderer.setSize(1, 1);
+        this.renderer.setSize(1, 1, false);
         this.viewport = new Vector4();
         this.maxTextureSize = this.renderer?.capabilities?.maxTextureSize ?? 2048;
 
@@ -127,7 +165,7 @@ export class Webgl2RendererBackend {
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
         if (this.renderer) {
-            this.renderer.setSize(viewWidth, viewHeight, true);
+            this.renderer.setSize(viewWidth, viewHeight, false);
             this.renderer.getViewport(this.viewport);
         }
         if (this.composer) {
@@ -152,19 +190,19 @@ export class Webgl2RendererBackend {
         this.dirty = true;
     }
 
-    enableImageBoundaryMask(enabled: boolean) {
+    async enableImageBoundaryMask(enabled: boolean) {
         if (!this.imageBoundaryMask) return;
         this.imageBoundaryMask.visible = enabled;
         this.dirty = true;
     }
 
-    setBackgroundColor(r: number, g: number, b: number, alpha: number) {
+    async setBackgroundColor(r: number, g: number, b: number, alpha: number) {
         if (!this.imageBackground) return;
         this.imageBackground.setColor(r, g, b, alpha);
         this.dirty = true;
     }
 
-    setMasks(masks: Record<number, WorkingFileLayerMask>) {
+    async setMasks(masks: Record<number, WorkingFileLayerMask>) {
         const maskIds = new Set(Object.keys(masks));
         const maskTextureIds = new Set(Object.keys(this.maskTextures));
 
@@ -201,12 +239,12 @@ export class Webgl2RendererBackend {
         return this.maskTextures[maskId];
     }
 
-    setSelectionMask(image?: ImageBitmap, offset?: { x: number, y: number }) {
+    async setSelectionMask(image?: ImageBitmap, offset?: { x: number, y: number }) {
         this.selectionMask.setImage(image, offset);
         this.dirty = true;
     }
 
-    setViewTransform(transform: Float64Array) {
+    async setViewTransform(transform: Float64Array) {
         this.viewTransform.set(
             transform[0], transform[1], transform[2], transform[3],
             transform[4], transform[5], transform[6], transform[7],
@@ -225,21 +263,23 @@ export class Webgl2RendererBackend {
         this.meshControllersById.delete(id);
     }
 
-    setLayerOrder(layerOrder: WorkingFileLayer[]) {
+    async setLayerOrder(layerOrder: WorkingFileLayer[]) {
         this.layerOrder = layerOrder;
         this.createLayerPasses();
     }
 
-    queueCreateLayerPasses() {
-        window.clearTimeout(this.queueCreateLayerPassesTimeoutHandle);
-        this.queueCreateLayerPassesTimeoutHandle = window.setTimeout(this.createLayerPasses.bind(this), 0);
+    async queueCreateLayerPasses() {
+        clearTimeout(this.queueCreateLayerPassesTimeoutHandle);
+        this.queueCreateLayerPassesTimeoutHandle = setTimeout(this.createLayerPasses.bind(this), 0);
     }
 
     createLayerPasses(composer?: EffectComposer, camera?: Camera, includeLayerIds?: Uint32Array) {
-        window.clearTimeout(this.queueCreateLayerPassesTimeoutHandle);
+        clearTimeout(this.queueCreateLayerPassesTimeoutHandle);
 
         composer = composer ?? this.composer;
         camera = camera ?? this.camera;
+
+        if (!composer) return;
 
         composer.disposeAllPasses();
     
@@ -506,7 +546,7 @@ export class Webgl2RendererBackend {
         );
     }
 
-    moveBrushStroke(
+    async moveBrushStroke(
         layerId: number,
         x: number,
         y: number,
@@ -536,7 +576,11 @@ export class Webgl2RendererBackend {
         return await this.compositor.createBrushPreview(settings);
     }
 
-    dispose() {
+    async setDirty() {
+        this.dirty = true;
+    }
+
+    async dispose() {
         this.composer?.dispose();
         this.imageBackground?.dispose();
         this.imageBoundaryMask?.dispose();

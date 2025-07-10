@@ -4,11 +4,15 @@
  */
 
 import { toRefs, watch, type WatchStopHandle } from 'vue';
-import { RasterLayerMeshController } from './mesh-controller';
+
+import type {
+    Webgl2RendererBackendPublic, MeshControllerInterface,
+} from '@/renderers/webgl2/backend';
 import type { RendererLayerWatcher, WorkingFileRasterLayer } from '@/types';
 
 export class RasterLayerWatcher implements RendererLayerWatcher<WorkingFileRasterLayer> {
-    meshController: RasterLayerMeshController | undefined;
+    rendererBackend!: Webgl2RendererBackendPublic;
+    meshController: MeshControllerInterface | undefined;
     stopWatchName: WatchStopHandle | undefined;
     stopWatchDrafts: WatchStopHandle | undefined;
     stopWatchBlendingMode: WatchStopHandle | undefined;
@@ -18,10 +22,14 @@ export class RasterLayerWatcher implements RendererLayerWatcher<WorkingFileRaste
     stopWatchFilters: WatchStopHandle | undefined;
     stopWatchData: WatchStopHandle | undefined;
 
+    constructor(rendererBackend: Webgl2RendererBackendPublic) {
+        this.rendererBackend = rendererBackend;
+    }
+
     async attach(layer: WorkingFileRasterLayer) {
         const { blendingMode, data, drafts, filters, height, name, transform, visible, width } = toRefs(layer);
 
-        this.meshController = new RasterLayerMeshController();
+        this.meshController = await this.rendererBackend.createMeshController('raster');
         this.meshController.attach(layer.id);
 
         this.stopWatchBlendingMode = watch([blendingMode], ([blendingMode]) => {

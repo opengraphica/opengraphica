@@ -2,7 +2,7 @@ import { markRaw, nextTick } from 'vue';
 
 import type { RendererFrontend } from '@/types';
 
-type RendererEngine = 'webgl2';
+type RendererEngine = 'webgl2' | 'webgl2-offscreen';
 
 let rendererFrontend: RendererFrontend | undefined = undefined;
 
@@ -15,9 +15,16 @@ export async function useRenderer(engine?: RendererEngine): Promise<RendererFron
             initializeRendererWaitCallbacks.push(resolve);
         });
     }
-    rendererFrontend = markRaw({
-        'webgl2': new (await import('@/renderers/webgl2/frontend')).Webgl2RenderFrontend(),
-    }[engine ?? 'webgl2']);
+    rendererFrontend = markRaw(await ({
+        'webgl2': async () => {
+            const { getWebgl2RendererBackend } = await import('@/renderers/webgl2/backend');
+            return new (await import('@/renderers/webgl2/frontend')).Webgl2RenderFrontend(getWebgl2RendererBackend())
+        },
+        'webgl2-offscreen': async () => {
+            const { Webgl2RendererBackendInterface } = await import('@/renderers/webgl2-offscreen/frontend/backend.interface');
+            return new (await import('@/renderers/webgl2/frontend')).Webgl2RenderFrontend(new Webgl2RendererBackendInterface())
+        },
+    }[engine])()) as RendererFrontend;
     if (initializeRendererWaitCallbacks.length > 0) {
         nextTick(() => {
             for (const callback of initializeRendererWaitCallbacks) {

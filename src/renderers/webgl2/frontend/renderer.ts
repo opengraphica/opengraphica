@@ -17,7 +17,7 @@ import { colorToHex, colorToRgba, getColorModelName } from '@/lib/color';
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
 import { VideoPlayer } from './video-player';
 
-import type { Webgl2RendererBackend } from '@/renderers/webgl2/backend';
+import type { Webgl2RendererBackend, Webgl2RendererBackendPublic } from '@/renderers/webgl2/backend';
 import type {
     RGBAColor,
     ClassType, RendererFrontend, RendererFrontendTakeSnapshotOptions,
@@ -27,7 +27,7 @@ import type {
 } from '@/types';
 
 export class Webgl2RenderFrontend implements RendererFrontend {
-    rendererBackend: Webgl2RendererBackend | undefined;
+    rendererBackend: Webgl2RendererBackendPublic;
     videoPlayer: VideoPlayer | undefined;
 
     stopWatchBackgroundColor: WatchStopHandle | undefined;
@@ -40,9 +40,11 @@ export class Webgl2RenderFrontend implements RendererFrontend {
     layerWatchersByType: Record<string, ClassType<RendererLayerWatcher>> = {};
     layerWatchersById: Map<number, RendererLayerWatcher> = new Map();
 
+    constructor(backend: Webgl2RendererBackendPublic) {
+        this.rendererBackend = backend;
+    }
+
     async initialize(canvas: HTMLCanvasElement | OffscreenCanvas) {
-        const { getWebgl2RendererBackend } = await import('@/renderers/webgl2/backend');
-        this.rendererBackend = getWebgl2RendererBackend();
         this.videoPlayer = new VideoPlayer();
 
         this.layerWatchersByType['gradient'] = (await import('@/renderers/webgl2/layers/gradient/watcher')).GradientLayerWatcher;
@@ -63,7 +65,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
             viewWidth.value,
             viewHeight.value,
         ] as const, async ([imageWidth, imageHeight, viewWidth, viewHeight]) => {
-            this.rendererBackend?.resize(
+            this.rendererBackend.resize(
                 imageWidth,
                 imageHeight,
                 viewWidth,
@@ -72,11 +74,11 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         });
 
         this.stopWatchMasks = watch(() => workingFileStore.state.masks, (masks) => {
-            this.rendererBackend?.setMasks(masks);
+            this.rendererBackend.setMasks(masks);
         }, { deep: true });
 
         this.stopWatchShowBoundary = watch(() => canvasStore.state.showAreaOutsideWorkingFile, (showAreaOutsideWorkingFile) => {
-            this.rendererBackend?.enableImageBoundaryMask(!showAreaOutsideWorkingFile);
+            this.rendererBackend.enableImageBoundaryMask(!showAreaOutsideWorkingFile);
         }, { immediate: true });
 
         this.stopWatchSelectionMask = watch([
@@ -90,12 +92,12 @@ export class Webgl2RenderFrontend implements RendererFrontend {
             const newSelectionMask = newActiveSelectionMask ?? newAppliedSelectionMask ?? newSelectedLayersSelectionMaskPreview;
             const newCanvasOffset = newActiveSelectionMask ? newActiveSelectionMaskCanvasOffset : (newAppliedSelectionMask ? newAppliedSelectionMaskCanvasOffset : newSelectedLayersSelectionMaskPreviewCanvasOffset);
             if (newSelectionMask) {
-                this.rendererBackend?.setSelectionMask(
+                this.rendererBackend.setSelectionMask(
                     await createImageBitmap(newSelectionMask, { imageOrientation: 'flipY' }),
                     { x: newCanvasOffset.x, y: newCanvasOffset.y },
                 );
             } else {
-                this.rendererBackend?.setSelectionMask(undefined);
+                this.rendererBackend.setSelectionMask(undefined);
             }
         });
 
@@ -105,14 +107,18 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         ] as const, ([color, visible]) => {
             let { r, g, b, alpha } = colorToRgba(color, getColorModelName(color));
             if (!visible) alpha = 0;
-            this.rendererBackend?.setBackgroundColor(r, g, b, alpha);
+            this.rendererBackend.setBackgroundColor(r, g, b, alpha);
         }, { immediate: true });
 
         this.onSvgRequest = this.onSvgRequest.bind(this);
-        messageBus.on('backend.requestFrontendSvg', this.onSvgRequest);
-
         this.onTextureRequest = this.onTextureRequest.bind(this);
-        messageBus.on('backend.requestFrontendTexture', this.onTextureRequest);
+        if (this.rendererBackend.isOffscreen) {
+            this.rendererBackend.onRequestFrontendSvg = this.onSvgRequest;
+            this.rendererBackend.onRequestFrontendTexture = this.onTextureRequest;
+        } else {
+            messageBus.on('backend.requestFrontendSvg', this.onSvgRequest);
+            messageBus.on('backend.requestFrontendTexture', this.onTextureRequest);
+        }
 
         this.onRegenerateThumbnail = this.onRegenerateThumbnail.bind(this);
         messageBus.on('layer.regenerateThumbnail', this.onRegenerateThumbnail);
@@ -141,44 +147,78 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         };
 
         let timelineCursor = 0;
-        const renderLoop = () => {
-            if (!this.rendererBackend) return;
-            const isViewDirty = canvasStore.get('viewDirty');
-            const isPlayingAnimation = canvasStore.get('playingAnimation');
+        const renderLoop = this.rendererBackend.isOffscreen
+            ? () => {
+                const isViewDirty = canvasStore.get('viewDirty');
+                const isPlayingAnimation = canvasStore.get('playingAnimation');
 
-            if (isViewDirty || viewDirtyTrail) {
-                viewDirtyTrail = false;
-                canvasStore.set('viewDirty', false);
-                const transform = canvasStore.get('transform');
-                this.rendererBackend?.setViewTransform(
-                    new Float64Array([
-                        transform.m11, transform.m21, transform.m31, transform.m41,
-                        transform.m12, transform.m22, transform.m32, transform.m42,
-                        transform.m13, transform.m23, transform.m33, transform.m43,
-                        transform.m14, transform.m24, transform.m34, transform.m44,
-                    ])
-                );
-                if (isViewDirty) {
-                    nextTick(setViewDirtyTrail);
+                if (isViewDirty || viewDirtyTrail) {
+                    viewDirtyTrail = false;
+                    canvasStore.set('viewDirty', false);
+                    const transform = canvasStore.get('transform');
+                    this.rendererBackend.setViewTransform(
+                        new Float64Array([
+                            transform.m11, transform.m21, transform.m31, transform.m41,
+                            transform.m12, transform.m22, transform.m32, transform.m42,
+                            transform.m13, transform.m23, transform.m33, transform.m43,
+                            transform.m14, transform.m24, transform.m34, transform.m44,
+                        ])
+                    );
+                    if (isViewDirty) {
+                        nextTick(setViewDirtyTrail);
+                    }
                 }
-            }
 
-            
-            if (isPlayingAnimation) {
-                this.rendererBackend.dirty = true;
-                const now = performance.now();
-                const { timelinePlayStartTime, timelineStart, timelineEnd } = editorStore.state;
-                const timelineRange = timelineEnd - timelineStart;
-                timelineCursor = ((now - timelinePlayStartTime) % timelineRange) + timelineStart;
-                editorStore.dispatch('setTimelineCursor', timelineCursor);
-            }
+                if (isPlayingAnimation) {
+                    this.rendererBackend.setDirty();
+                    const now = performance.now();
+                    const { timelinePlayStartTime, timelineStart, timelineEnd } = editorStore.state;
+                    const timelineRange = timelineEnd - timelineStart;
+                    timelineCursor = ((now - timelinePlayStartTime) % timelineRange) + timelineStart;
+                    editorStore.dispatch('setTimelineCursor', timelineCursor);
+                }
 
-            if (this.rendererBackend.dirty) {
+                // TODO - Remove this altogether? No longer used.
                 canvasStore.set('dirty', false);
-                this.rendererBackend.render(timelineCursor);
+
+                requestAnimationFrame(renderLoop);
             }
-            requestAnimationFrame(renderLoop);
-        };
+            : () => {
+                const isViewDirty = canvasStore.get('viewDirty');
+                const isPlayingAnimation = canvasStore.get('playingAnimation');
+
+                if (isViewDirty || viewDirtyTrail) {
+                    viewDirtyTrail = false;
+                    canvasStore.set('viewDirty', false);
+                    const transform = canvasStore.get('transform');
+                    this.rendererBackend.setViewTransform(
+                        new Float64Array([
+                            transform.m11, transform.m21, transform.m31, transform.m41,
+                            transform.m12, transform.m22, transform.m32, transform.m42,
+                            transform.m13, transform.m23, transform.m33, transform.m43,
+                            transform.m14, transform.m24, transform.m34, transform.m44,
+                        ])
+                    );
+                    if (isViewDirty) {
+                        nextTick(setViewDirtyTrail);
+                    }
+                }
+
+                if (isPlayingAnimation) {
+                    this.rendererBackend.setDirty();
+                    const now = performance.now();
+                    const { timelinePlayStartTime, timelineStart, timelineEnd } = editorStore.state;
+                    const timelineRange = timelineEnd - timelineStart;
+                    timelineCursor = ((now - timelinePlayStartTime) % timelineRange) + timelineStart;
+                    editorStore.dispatch('setTimelineCursor', timelineCursor);
+                }
+
+                if ((this.rendererBackend as Webgl2RendererBackend).dirty) {
+                    canvasStore.set('dirty', false);
+                    (this.rendererBackend as Webgl2RendererBackend).render(timelineCursor);
+                }
+                requestAnimationFrame(renderLoop);
+            };
         requestAnimationFrame(renderLoop);
     }
 
@@ -233,7 +273,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         if (!layer) return;
         const LayerWatcher = this.layerWatchersByType[layer.type];
         if (!LayerWatcher) return;
-        const layerWatcher = new LayerWatcher();
+        const layerWatcher = new LayerWatcher(this.rendererBackend);
         this.layerWatchersById.set(layer.id, layerWatcher);
         layerWatcher.attach(layer);
     }
@@ -266,7 +306,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
 
     onLayerOrderCalculated() {
         // TODO - only pass necessary data for each layer (id, type, blendingMode, layers).
-        this.rendererBackend?.setLayerOrder(
+        this.rendererBackend.setLayerOrder(
             workingFileStore.get('layers')
         );
     }
@@ -274,7 +314,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
     onEditorHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
         if (!event) return;
         if (event.action.id === 'updateLayerBlendingMode') {
-            this.rendererBackend?.queueCreateLayerPasses();
+            this.rendererBackend.queueCreateLayerPasses();
         }
     }
 
@@ -286,7 +326,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
     }
 
     async resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number) {
-        await this.rendererBackend?.resize(imageWidth, imageHeight, viewWidth, viewHeight);
+        await this.rendererBackend.resize(imageWidth, imageHeight, viewWidth, viewHeight);
     }
 
     async takeSnapshot(imageWidth: number, imageHeight: number, options?: RendererFrontendTakeSnapshotOptions): Promise<ImageBitmap> {
@@ -343,7 +383,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
     async startBrushStroke(
         settings: RendererBrushStrokeSettings,
     ) {
-        await this.rendererBackend?.startBrushStroke(settings)
+        await this.rendererBackend.startBrushStroke(settings)
     }
 
     async moveBrushStroke(
@@ -355,7 +395,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         colorBlendingStrength: number,
         concentration: number,
     ) {
-        await this.rendererBackend?.moveBrushStroke(
+        await this.rendererBackend.moveBrushStroke(
             layerId,
             x,
             y,
@@ -369,7 +409,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
     async stopBrushStroke(
         layerId: number,
     ): Promise<RendererTextureTile[]> {
-        return this.rendererBackend?.stopBrushStroke(
+        return this.rendererBackend.stopBrushStroke(
             layerId,
         ) ?? [];
     }
@@ -384,8 +424,8 @@ export class Webgl2RenderFrontend implements RendererFrontend {
     }
 
     async dispose() {
-        this.rendererBackend?.dispose();
-        this.rendererBackend = undefined;
+        this.rendererBackend.dispose();
+        (this.rendererBackend as unknown) = undefined;
         this.videoPlayer?.dispose();
         this.videoPlayer = undefined;
 

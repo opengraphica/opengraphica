@@ -20,6 +20,7 @@ interface TutorialFlags {
     deformBlurToolIntroduction?: boolean;
     drawToolIntroduction?: boolean;
     drawGradientToolIntroduction?: boolean;
+    drawShapeToolIntroduction?: boolean;
     effectToolIntroduction?: boolean;
     eraseToolIntroduction?: boolean;
     explainCanvasViewportControls?: boolean;

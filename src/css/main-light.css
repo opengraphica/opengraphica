@@ -8275,12 +8275,17 @@
   font-family: "OpenGraphicaIcons";
   font-style: normal;
   font-weight: 400;
-  src: url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.eot?1749253147455");
-  src: url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.eot?#iefix") format("embedded-opentype"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.woff2?1749253147455") format("woff2"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.woff?1749253147455") format("woff"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.ttf?1749253147455") format("truetype"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.svg?1749253147455#OpenGraphicaIcons") format("svg");
+  src: url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.eot?1751123543017");
+  src: url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.eot?#iefix") format("embedded-opentype"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.woff2?1751123543017") format("woff2"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.woff?1751123543017") format("woff"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.ttf?1751123543017") format("truetype"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.svg?1751123543017#OpenGraphicaIcons") format("svg");
 }
 .bi.bi-lasso::before {
   font-family: "OpenGraphicaIcons" !important;
   content: "";
+}
+
+.bi.bi-shapes::before {
+  font-family: "OpenGraphicaIcons" !important;
+  content: "";
 }
 
 @font-face {

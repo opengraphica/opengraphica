@@ -1,6 +1,6 @@
 import type { ColorModel, ColorModelName } from './color';
 import type { TextDocument } from './text';
-import type { VectorShape } from './vector';
+import type { VectorPathShape } from './vector';
 import type { MeasuringUnits, ResolutionUnits } from './metrics';
 import type {
     WorkingFileGradientLayer, WorkingFileLayerBlendingMode, WorkingFileLayerFilter, WorkingFileLayerType
@@ -86,6 +86,11 @@ export interface SerializedFileVectorLayer<T extends ColorModel = ColorModel> ex
     data: {
         sourceSvgSerialized?: string;
     }
+}
+
+export interface SerializedFileVectorPathLayer<T extends ColorModel = ColorModel> extends SerializedFileLayer<T> {
+    type: 'vectorPath';
+    data: VectorPathShape<ColorModel>;
 }
 
 export interface SerializedFileVideoLayer<T extends ColorModel = ColorModel> extends SerializedFileLayer<T> {

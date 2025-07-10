@@ -8,8 +8,10 @@ import { toRefs, watch, type WatchStopHandle } from 'vue';
 import { getLayerById } from '@/store/working-file';
 
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
-import { TextLayerMeshController } from './mesh-controller';
 
+import type {
+    Webgl2RendererBackendPublic, MeshControllerInterface,
+} from '@/renderers/webgl2/backend';
 import type { RendererLayerWatcher, WorkingFileTextLayer } from '@/types';
 
 messageBus.on('layer.text.notifySizeUpdate', (update) => {
@@ -21,7 +23,8 @@ messageBus.on('layer.text.notifySizeUpdate', (update) => {
 });
 
 export class TextLayerWatcher implements RendererLayerWatcher<WorkingFileTextLayer> {
-    meshController: TextLayerMeshController | undefined;
+    rendererBackend!: Webgl2RendererBackendPublic;
+    meshController: MeshControllerInterface | undefined;
     stopWatchName: WatchStopHandle | undefined;
     stopWatchBlendingMode: WatchStopHandle | undefined;
     stopWatchVisible: WatchStopHandle | undefined;
@@ -30,10 +33,14 @@ export class TextLayerWatcher implements RendererLayerWatcher<WorkingFileTextLay
     stopWatchFilters: WatchStopHandle | undefined;
     stopWatchData: WatchStopHandle | undefined;
 
+    constructor(rendererBackend: Webgl2RendererBackendPublic) {
+        this.rendererBackend = rendererBackend;
+    }
+
     async attach(layer: WorkingFileTextLayer) {
         const { blendingMode, data, drafts, filters, height, name, transform, visible, width } = toRefs(layer);
 
-        this.meshController = new TextLayerMeshController();
+        this.meshController = await this.rendererBackend.createMeshController('text');
         this.meshController.attach(layer.id);
 
         this.stopWatchBlendingMode = watch([blendingMode], ([blendingMode]) => {

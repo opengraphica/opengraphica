@@ -75,10 +75,8 @@ export default defineComponent({
 
         // Update canvas on browser window resize
         watch([viewportWidth, viewportHeight], ([newWidth, newHeight]) => {
-            const canvasElement = canvas.value;
-            if (canvasElement) {
-                canvasElement.width = newWidth;
-                canvasElement.height = newHeight;
+            if (rendererFrontend) {
+                rendererFrontend.resize(imageWidth.value, imageHeight.value, newWidth, newHeight);
             }
             canvasStore.set('viewDirty', true);
         });
@@ -108,7 +106,7 @@ export default defineComponent({
                 canvas.value.height = viewportHeight.value;
 
                 // Set up renderer
-                useRenderer('webgl2').then((frontend) => {
+                useRenderer('webgl2-offscreen').then((frontend) => {
                     rendererFrontend = frontend;
                     frontend.initialize(canvas.value!).then(() => {
                         loading.value = false;

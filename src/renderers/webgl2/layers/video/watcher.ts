@@ -4,11 +4,15 @@
  */
 
 import { toRefs, watch, type WatchStopHandle } from 'vue';
-import { VideoLayerMeshController } from './mesh-controller';
+
+import type {
+    Webgl2RendererBackendPublic, MeshControllerInterface,
+} from '@/renderers/webgl2/backend';
 import type { RendererLayerWatcher, WorkingFileVideoLayer } from '@/types';
 
 export class VideoLayerWatcher implements RendererLayerWatcher<WorkingFileVideoLayer> {
-    meshController: VideoLayerMeshController | undefined;
+    rendererBackend!: Webgl2RendererBackendPublic;
+    meshController: MeshControllerInterface | undefined;
     stopWatchName: WatchStopHandle | undefined;
     stopWatchBlendingMode: WatchStopHandle | undefined;
     stopWatchVisible: WatchStopHandle | undefined;
@@ -17,10 +21,14 @@ export class VideoLayerWatcher implements RendererLayerWatcher<WorkingFileVideoL
     stopWatchFilters: WatchStopHandle | undefined;
     stopWatchData: WatchStopHandle | undefined;
 
+    constructor(rendererBackend: Webgl2RendererBackendPublic) {
+        this.rendererBackend = rendererBackend;
+    }
+
     async attach(layer: WorkingFileVideoLayer) {
         const { blendingMode, data, drafts, filters, height, name, transform, visible, width } = toRefs(layer);
 
-        this.meshController = new VideoLayerMeshController();
+        this.meshController = await this.rendererBackend.createMeshController('video');
         this.meshController.attach(layer.id);
 
         this.stopWatchBlendingMode = watch([blendingMode], ([blendingMode]) => {

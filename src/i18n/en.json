@@ -594,7 +594,8 @@
             "name": "Draw",
             "tools": {
                 "brush": "Draw with art brushes",
-                "gradient": "Create gradients of color"
+                "gradient": "Create gradients of color",
+                "shape": "Create basic shapes"
             }
         },
         "effect": {
@@ -1192,6 +1193,16 @@
                 "presetSettings": "Preset Settings"
             }
         },
+        "drawShape": {
+            "shapeType": {
+                "label": "Shape",
+                "rectangle": "Rectangle",
+                "ellipse": "Ellipse"
+            },
+            "style": {
+                "label": "Style"
+            }
+        },
         "effect": {
             "edit": {
                 "noLayersSelected": "Please select one or more layers in the layers dock in order to edit their effects.",
@@ -1438,6 +1449,20 @@
                 ],
                 "touch": [
                     "Use one finger to touch and drag to place a gradient on the canvas."
+                ]
+            }
+        },
+        "drawShapeToolIntroduction": {
+            "title": "Shape Tool",
+            "introduction": [
+                "The shape tool lets you add various basic shapes, which can be converted into vector paths if more customization is needed."
+            ],
+            "body": {
+                "mouse": [
+                    "Click and drag to place a shape on the canvas."
+                ],
+                "touch": [
+                    "Use one finger to touch and drag to place a shape on the canvas."
                 ]
             }
         },
