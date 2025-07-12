@@ -94,6 +94,7 @@ export class GradientLayerMeshController implements Webgl2RendererMeshController
                         canvasFilters: this.filtersOverride ?? this.filters,
                     });
                     assignMaterialBlendingMode(this.material, this.blendingMode);
+                    backend.queueCreateLayerPasses();
                 } else if (this.data) {
                     await updateGradientMaterial(this.material, {
                         gradientData: this.data,

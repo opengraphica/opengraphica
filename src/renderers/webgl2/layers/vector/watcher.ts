@@ -13,6 +13,7 @@ import type { RendererLayerWatcher, WorkingFileVectorLayer } from '@/types';
 export class VectorLayerWatcher implements RendererLayerWatcher<WorkingFileVectorLayer> {
     rendererBackend!: Webgl2RendererBackendPublic;
     meshController: MeshControllerInterface | undefined;
+    order: number | undefined;
     stopWatchName: WatchStopHandle | undefined;
     stopWatchBlendingMode: WatchStopHandle | undefined;
     stopWatchVisible: WatchStopHandle | undefined;
@@ -30,6 +31,9 @@ export class VectorLayerWatcher implements RendererLayerWatcher<WorkingFileVecto
 
         this.meshController = await this.rendererBackend.createMeshController('vector');
         this.meshController.attach(layer.id);
+        if (this.order != undefined) {
+            this.meshController.reorder(this.order);
+        }
 
         this.stopWatchBlendingMode = watch([blendingMode], ([blendingMode]) => {
             this.meshController?.updateBlendingMode(blendingMode);
@@ -62,6 +66,7 @@ export class VectorLayerWatcher implements RendererLayerWatcher<WorkingFileVecto
     }
 
     async reorder(order: number) {
+        this.order = order;
         this.meshController?.reorder(order);
     }
 
@@ -76,6 +81,7 @@ export class VectorLayerWatcher implements RendererLayerWatcher<WorkingFileVecto
         this.stopWatchVisible?.();
 
         this.meshController = undefined;
+        this.order = undefined;
         this.stopWatchBlendingMode = undefined;
         this.stopWatchData = undefined;
         this.stopWatchFilters = undefined;

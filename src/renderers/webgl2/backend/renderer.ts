@@ -316,7 +316,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
                 ? this.meshControllersById.get(layer.id)
                 : undefined;
             if (meshController) {
-                if (!noRenderPassModes.has(layer.blendingMode)) {
+                if (!noRenderPassModes.has(meshController.blendingMode)) {
                     if (currentSceneIsUsed) {
                         passScenes.push(currentScene);
                         currentScene = new Scene();

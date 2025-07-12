@@ -85,6 +85,7 @@ export interface RendererLayerWatcher<T = WorkingFileLayer> {
 }
 
 export interface Webgl2RendererMeshController {
+    blendingMode: WorkingFileLayerBlendingMode;
     getTexture(wait?: boolean): Promise<Texture | null>;
     getTransform(): Matrix4;
     swapScene(scene: Scene): void;

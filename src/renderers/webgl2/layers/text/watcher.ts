@@ -25,6 +25,7 @@ messageBus.on('layer.text.notifySizeUpdate', (update) => {
 export class TextLayerWatcher implements RendererLayerWatcher<WorkingFileTextLayer> {
     rendererBackend!: Webgl2RendererBackendPublic;
     meshController: MeshControllerInterface | undefined;
+    order: number | undefined;
     stopWatchName: WatchStopHandle | undefined;
     stopWatchBlendingMode: WatchStopHandle | undefined;
     stopWatchVisible: WatchStopHandle | undefined;
@@ -42,6 +43,9 @@ export class TextLayerWatcher implements RendererLayerWatcher<WorkingFileTextLay
 
         this.meshController = await this.rendererBackend.createMeshController('text');
         this.meshController.attach(layer.id);
+        if (this.order != undefined) {
+            this.meshController.reorder(this.order);
+        }
 
         this.stopWatchBlendingMode = watch([blendingMode], ([blendingMode]) => {
             this.meshController?.updateBlendingMode(blendingMode);
@@ -74,6 +78,7 @@ export class TextLayerWatcher implements RendererLayerWatcher<WorkingFileTextLay
     }
 
     async reorder(order: number) {
+        this.order = order;
         this.meshController?.reorder(order);
     }
 
@@ -88,6 +93,7 @@ export class TextLayerWatcher implements RendererLayerWatcher<WorkingFileTextLay
         this.stopWatchVisible?.();
 
         this.meshController = undefined;
+        this.order = undefined;
         this.stopWatchBlendingMode = undefined;
         this.stopWatchData = undefined;
         this.stopWatchFilters = undefined;

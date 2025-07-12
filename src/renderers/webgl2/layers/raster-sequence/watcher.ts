@@ -13,6 +13,7 @@ import type { RendererLayerWatcher, WorkingFileRasterSequenceLayer } from '@/typ
 export class RasterSequenceLayerWatcher implements RendererLayerWatcher<WorkingFileRasterSequenceLayer> {
     rendererBackend!: Webgl2RendererBackendPublic;
     meshController: MeshControllerInterface | undefined;
+    order: number | undefined;
     stopWatchName: WatchStopHandle | undefined;
     stopWatchDrafts: WatchStopHandle | undefined;
     stopWatchBlendingMode: WatchStopHandle | undefined;
@@ -31,6 +32,9 @@ export class RasterSequenceLayerWatcher implements RendererLayerWatcher<WorkingF
 
         this.meshController = await this.rendererBackend.createMeshController('rasterSequence');
         this.meshController.attach(layer.id);
+        if (this.order != undefined) {
+            this.meshController.reorder(this.order);
+        }
 
         this.stopWatchBlendingMode = watch([blendingMode], ([blendingMode]) => {
             this.meshController?.updateBlendingMode(blendingMode);
@@ -63,6 +67,7 @@ export class RasterSequenceLayerWatcher implements RendererLayerWatcher<WorkingF
     }
 
     async reorder(order: number) {
+        this.order = order;
         this.meshController?.reorder(order);
     }
 
@@ -78,6 +83,7 @@ export class RasterSequenceLayerWatcher implements RendererLayerWatcher<WorkingF
         this.stopWatchVisible?.();
 
         this.meshController = undefined;
+        this.order = undefined;
         this.stopWatchBlendingMode = undefined;
         this.stopWatchData = undefined;
         this.stopWatchDrafts = undefined;
