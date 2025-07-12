@@ -66,7 +66,7 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
             this.sourceTextureCanvas.width = 256;
             this.sourceTextureCanvas.height = 256;
         }
-        this.sourceTextureCtx = this.sourceTextureCanvas.getContext('2d') || undefined;
+        this.sourceTextureCtx = (this.sourceTextureCanvas.getContext('2d') as CanvasRenderingContext2D) || undefined;
         if (this.sourceTextureCtx) {
             this.sourceTextureCtx.imageSmoothingEnabled = false;
         }

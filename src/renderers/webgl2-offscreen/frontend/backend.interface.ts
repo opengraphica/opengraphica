@@ -82,7 +82,7 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
                 type: BackendWorkerMessage.UPDATE_MESH_CONTROLLER,
                 methodName: this.prop,
                 id,
-                arguments: arguments,
+                arguments: [...arguments],
             });
 
             return (await messageReceived(BackendWorkerMessage.UPDATE_MESH_CONTROLLER_RESULT)).result;
@@ -90,7 +90,7 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
 
         const meshControllerInterfaceProxy = new Proxy(meshControllerInterface, {
             get(target, prop, receiver) {
-                if (prop === 'id' || prop === 'dispose') {
+                if (prop === 'id' || prop === 'dispose' || prop === 'then' || prop === 'catch') {
                     return Reflect.get(target, prop, receiver);
                 }
                 return forwardControllerMethod.bind({ prop });

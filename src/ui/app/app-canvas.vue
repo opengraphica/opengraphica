@@ -106,7 +106,7 @@ export default defineComponent({
                 canvas.value.height = viewportHeight.value;
 
                 // Set up renderer
-                useRenderer('webgl2-offscreen').then((frontend) => {
+                useRenderer(preferencesStore.state.renderer).then((frontend) => {
                     rendererFrontend = frontend;
                     frontend.initialize(canvas.value!).then(() => {
                         loading.value = false;

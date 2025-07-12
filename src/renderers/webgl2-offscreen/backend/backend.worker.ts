@@ -100,10 +100,17 @@ self.onmessage = ({ data }) => {
             break;
         case BackendWorkerMessage.APPLY_SELECTION_MASK_TO_ALPHA_CHANNEL:
             rendererBackend.applySelectionMaskToAlphaChannel(data.layerId, data.options).then((tiles) => {
+                const transferables = tiles.reduce((accumulator, item) => {
+                    accumulator.push(item.image);
+                    if (item.oldImage) {
+                        accumulator.push(item.oldImage);
+                    }
+                    return accumulator;
+                }, [] as Transferable[]);
                 self.postMessage({
                     type: BackendWorkerMessage.APPLY_SELECTION_MASK_TO_ALPHA_CHANNEL_RESULT,
                     tiles,
-                }, [tiles]);
+                }, transferables);
             }).catch(logError);
             break;
         case BackendWorkerMessage.TAKE_SNAPSHOT:
@@ -130,10 +137,17 @@ self.onmessage = ({ data }) => {
             break;
         case BackendWorkerMessage.STOP_BRUSH_STROKE:
             rendererBackend.stopBrushStroke(data.layerId).then((tiles) => {
+                const transferables = tiles.reduce((accumulator, item) => {
+                    accumulator.push(item.image);
+                    if (item.oldImage) {
+                        accumulator.push(item.oldImage);
+                    }
+                    return accumulator;
+                }, [] as Transferable[]);
                 self.postMessage({
                     type: BackendWorkerMessage.STOP_BRUSH_STROKE_RESULT,
                     tiles,
-                }, [tiles]);
+                }, transferables);
             }).catch(logError);
             break;
         case BackendWorkerMessage.CREATE_BRUSH_PREVIEW:
@@ -173,11 +187,21 @@ self.onmessage = ({ data }) => {
             });
             break;
         case BackendWorkerMessage.UPDATE_MESH_CONTROLLER:
-            const result = meshControllers.get(data.id).apply(data.methodName, data.arguments);
-            self.postMessage({
-                type: BackendWorkerMessage.UPDATE_MESH_CONTROLLER_RESULT,
-                result,
-            });
+            const meshController = meshControllers.get(data.id);
+            let result = meshController[data.methodName].apply(meshController, data.arguments);
+            if (result?.then) {
+                result.then((result) => {
+                    self.postMessage({
+                        type: BackendWorkerMessage.UPDATE_MESH_CONTROLLER_RESULT,
+                        result,
+                    });
+                });
+            } else {
+                self.postMessage({
+                    type: BackendWorkerMessage.UPDATE_MESH_CONTROLLER_RESULT,
+                    result,
+                });
+            }
             break;
         case BackendWorkerMessage.DISPOSE_MESH_CONTROLLER:
             meshControllers.get(data.id).dispose();

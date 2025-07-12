@@ -28,7 +28,7 @@ import type {
     RendererBrushStrokeSettings, RendererBrushStrokePreviewsettings, RendererTextureTile,
     Webgl2RendererCanvasFilter, Webgl2RendererMeshController, WorkingFileLayer,
     WorkingFileGroupLayer, WorkingFileLayerFilter, WorkingFileLayerMask,
-    RendererFrontendTakeSnapshotCropOptions,
+    RendererFrontendTakeSnapshotCropOptions, ClassType,
 } from '@/types';
 
 const noRenderPassModes = new Set(['normal', 'erase']);
@@ -72,7 +72,7 @@ export interface Webgl2RendererBackendPublic {
 }
 
 export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
-    isOffscreen: boolean = false;
+    isOffscreen: boolean = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
     dirty: boolean = false;
     rendererBusy: boolean = false; // Renderer is being used for other operations and shouldn't be used to draw right now
 
@@ -106,20 +106,26 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
 
     compositorBrushStrokes = new Map<number, number>();
 
+    meshControllersByType: Record<string, ClassType<Webgl2RendererMeshController>> = {};
+
     async createMeshController(type: string) {
-        return {
-            gradient: (await import('@/renderers/webgl2/layers/gradient/mesh-controller')).GradientLayerMeshController,
-            raster: (await import('@/renderers/webgl2/layers/raster/mesh-controller')).RasterLayerMeshController,
-            rasterSequence: (await import('@/renderers/webgl2/layers/raster-sequence/mesh-controller')).RasterSequenceLayerMeshController,
-            text: (await import('@/renderers/webgl2/layers/text/mesh-controller')).TextLayerMeshController,
-            vector: (await import('@/renderers/webgl2/layers/vector/mesh-controller')).VectorLayerMeshController,
-            video: (await import('@/renderers/webgl2/layers/video/mesh-controller')).VideoLayerMeshController,
-        }[type]();
+        return new this.meshControllersByType[type]();
     }
 
     async initialize(canvas: HTMLCanvasElement | OffscreenCanvas, imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number) {
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
+
+        if (!this.isOffscreen) {
+            this.meshControllersByType = {
+                gradient: (await import('@/renderers/webgl2/layers/gradient/mesh-controller')).GradientLayerMeshController,
+                raster: (await import('@/renderers/webgl2/layers/raster/mesh-controller')).RasterLayerMeshController,
+                rasterSequence: (await import('@/renderers/webgl2/layers/raster-sequence/mesh-controller')).RasterSequenceLayerMeshController,
+                text: (await import('@/renderers/webgl2/layers/text/mesh-controller')).TextLayerMeshController,
+                vector: (await import('@/renderers/webgl2/layers/vector/mesh-controller')).VectorLayerMeshController,
+                video: (await import('@/renderers/webgl2/layers/video/mesh-controller')).VideoLayerMeshController,
+            };
+        }
 
         this.renderer = new WebGLRenderer({
             alpha: true,

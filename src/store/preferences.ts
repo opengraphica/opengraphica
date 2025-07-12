@@ -56,7 +56,7 @@ interface PreferencesState {
     preferCanvasViewport: boolean;
 
     // Unused at the moment.
-    renderer: '2d' | 'webgl';
+    renderer: 'canvas2d' | 'webgl2' | 'webgl2-offscreen';
 
     // Shows tutorial notification popups.
     showTutorialNotifications: boolean;
@@ -111,7 +111,7 @@ const store = new PerformantStore<PreferencesStore>({
         pointerTapTimeout: 150,
         postProcessInterpolateImage: true,
         preferCanvasViewport: true,
-        renderer: 'webgl',
+        renderer: 'webgl2',
         showTutorialNotifications: true,
         showWelcomeScreenAtStart: true,
         snapSensitivity: 5,

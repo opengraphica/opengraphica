@@ -283,12 +283,12 @@
                                 <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.debugging.useMobileDebugger')">
                                     <el-switch v-model="useMobileDebugger" />
                                 </el-form-item>
-                                <!--el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.performance.renderer.label')">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.performance.renderer.label')">
                                     <el-select v-model="preferenceRenderer" size="small" style="width: 6rem;">
-                                        <el-option value="2d" :label="$t('dock.settings.prefs.performance.renderer.2d')" />
-                                        <el-option value="webgl" :label="$t('dock.settings.prefs.performance.renderer.webgl')" />
+                                        <el-option value="webgl2" :label="$t('dock.settings.prefs.performance.renderer.webgl2')" />
+                                        <el-option value="webgl2-offscreen" :label="$t('dock.settings.prefs.performance.renderer.webgl2Offscreen')" />
                                     </el-select>
-                                </el-form-item-->
+                                </el-form-item>
                                 <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.performance.optimizeLargeImage')">
                                     <el-switch v-model="preferenceOptimizeLargeImages" />
                                 </el-form-item>

@@ -13,6 +13,7 @@ import {
 
 import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
 import { colorToHex, colorToRgba, getColorModelName } from '@/lib/color';
+import { deepToRaw } from '@/lib/vue';
 
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
 import { VideoPlayer } from './video-player';
@@ -74,7 +75,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         });
 
         this.stopWatchMasks = watch(() => workingFileStore.state.masks, (masks) => {
-            this.rendererBackend.setMasks(masks);
+            this.rendererBackend.setMasks(deepToRaw(masks));
         }, { deep: true });
 
         this.stopWatchShowBoundary = watch(() => canvasStore.state.showAreaOutsideWorkingFile, (showAreaOutsideWorkingFile) => {
@@ -307,7 +308,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
     onLayerOrderCalculated() {
         // TODO - only pass necessary data for each layer (id, type, blendingMode, layers).
         this.rendererBackend.setLayerOrder(
-            workingFileStore.get('layers')
+            deepToRaw(workingFileStore.get('layers'))
         );
     }
 
@@ -345,7 +346,7 @@ export class Webgl2RenderFrontend implements RendererFrontend {
         return this.rendererBackend.takeSnapshot(imageWidth, imageHeight, {
             cameraTransform,
             layerIds,
-            filters: options?.filters,
+            filters: options?.filters ? deepToRaw(options.filters) : undefined,
             applySelectionMask: options?.applySelectionMask,
             disableScaleToSize: options?.disableScaleToSize,
         });

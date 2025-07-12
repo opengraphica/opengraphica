@@ -3,7 +3,7 @@
  * and passes it to the renderer.
  */
 
-import { toRefs, watch, type WatchStopHandle } from 'vue';
+import { toRaw, toRefs, watch, type WatchStopHandle } from 'vue';
 
 import type {
     Webgl2RendererBackendPublic, MeshControllerInterface,
@@ -35,10 +35,10 @@ export class GradientLayerWatcher implements RendererLayerWatcher<WorkingFileGra
             this.meshController?.updateBlendingMode(blendingMode);
         }, { immediate: true });
         this.stopWatchData = watch([data], () => {
-            this.meshController?.updateData(layer.data);
+            this.meshController?.updateData(toRaw(layer.data));
         }, { deep: true, immediate: true });
         this.stopWatchFilters = watch([filters], async ([filters]) => {
-            this.meshController?.updateFilters(filters);
+            this.meshController?.updateFilters(toRaw(filters));
         }, { deep: true, immediate: true });
         this.stopWatchName = watch([name], ([name]) => {
             this.meshController?.updateName(name);
