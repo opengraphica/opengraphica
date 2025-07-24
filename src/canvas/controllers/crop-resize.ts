@@ -1,4 +1,4 @@
-import { watch, type WatchHandle } from 'vue';
+import { markRaw, watch, type WatchHandle } from 'vue';
 import BaseCanvasMovementController from './base-movement';
 
 import {
@@ -13,8 +13,8 @@ import preferencesStore from '@/store/preferences';
 import workingFileStore from '@/store/working-file';
 
 import { DecomposedMatrix } from '@/lib/dom-matrix';
-import appEmitter from '@/lib/emitter';
-import { getImageDataFromImageBitmap } from '@/lib/image';
+
+import { createBitmapAnalyzer, getBitmapContrastLines, destroyBitmapAnalyzer } from '@/workers/bitmap-analyzer.interface';
 
 import { useRenderer } from '@/renderers';
 
@@ -29,6 +29,7 @@ const DRAG_TYPE_RIGHT = 8;
 export default class CanvasCropResizeController extends BaseCanvasMovementController {
 
     private renderer: RendererFrontend | undefined;
+    private bitmapAnalyzerUuid: string | undefined;
 
     private remToPx: number = 16;
     private cropTranslateStart: DOMPoint | null = null;
@@ -74,48 +75,29 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
             this.calculateSnapPoints();
         }, { immediate: true });
 
+        this.bitmapAnalyzerUuid = createBitmapAnalyzer();
+
         useRenderer().then(async (renderer) => {
-            this.renderer = renderer;
+            this.renderer = markRaw(renderer);
 
             await new Promise((resolve) => setTimeout(resolve, 500));
 
             const bitmap = await this.renderer.takeSnapshot(workingFileStore.get('width'), workingFileStore.get('height'));
-            const imageData = await getImageDataFromImageBitmap(bitmap);
-            this.calculateContrastSnapPoints(imageData);
+            const { verticalLines, horizontalLines } = await getBitmapContrastLines(this.bitmapAnalyzerUuid!, bitmap);
+            this.xAxisContrastSnap = verticalLines;
+            this.yAxisContrastSnap = horizontalLines;
+
             this.calculateSnapPoints();
         });
-    }
-
-    calculateSnapPoints() {
-        this.xAxisSnap = [];
-        this.yAxisSnap = [];
-        if (enableSnappingToCanvasEdges.value) {
-            this.xAxisSnap.push(0);
-            this.yAxisSnap.push(0);
-        }
-        if (enableSnappingToCanvasCenter.value) {
-            this.xAxisSnap.push(Math.floor(this.currentCanvasWidth / 2));
-            this.yAxisSnap.push(Math.floor(this.currentCanvasHeight / 2));
-        }
-        if (enableSnappingToCanvasEdges.value) {
-            this.xAxisSnap.push(this.currentCanvasWidth);
-            this.yAxisSnap.push(this.currentCanvasHeight);
-        }
-        if (enableSnappingToCanvasContrast.value) {
-            for (let i = 0; i < this.xAxisContrastSnap.length; i++) {
-                this.xAxisSnap.push(this.xAxisContrastSnap[i]);
-            }
-            for (let i = 0; i < this.yAxisContrastSnap.length; i++) {
-                this.yAxisSnap.push(this.yAxisContrastSnap[i]);
-            }
-            this.xAxisSnap.sort((a, b) => a < b ? -1 : 1);
-            this.yAxisSnap.sort((a, b) => a < b ? -1 : 1);
-        }
     }
 
     onLeave(): void {
         canvasStore.set('showAreaOutsideWorkingFile', false);
         this.unwatchEnableSnapping?.();
+        if (this.bitmapAnalyzerUuid) {
+            destroyBitmapAnalyzer(this.bitmapAnalyzerUuid);
+            this.bitmapAnalyzerUuid = undefined;
+        }
     }
 
     onMultiTouchDown() {
@@ -394,57 +376,31 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
         return null;
     }
 
-    getImageDataLuminance(data: Uint8ClampedArray, i: number) {
-        const r = data[i];
-        const g = data[i + 1];
-        const b = data[i + 2];
-        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    }
-
-    calculateContrastSnapPoints(imageData: ImageData) {
-        this.xAxisContrastSnap = [];
-        this.yAxisContrastSnap = [];
-
-        const { data, width, height } = imageData;
-        const horizontalContrast = new Float32Array(height - 1);
-        const verticalContrast = new Float32Array(width - 1);
-
-        for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
-                const i = (y * width + x) * 4;
-                const lum = this.getImageDataLuminance(data, i);
-            
-                // Check vertical contrast (compare with right neighbor)
-                if (x < width - 1) {
-                    const iRight = i + 4;
-                    const lumRight = this.getImageDataLuminance(data, iRight);
-                    verticalContrast[x] += Math.abs(lum - lumRight);
-                }
-            
-                // Check horizontal contrast (compare with bottom neighbor)
-                if (y < height - 1) {
-                    const iBelow = i + width * 4;
-                    const lumBelow = this.getImageDataLuminance(data, iBelow);
-                    horizontalContrast[y] += Math.abs(lum - lumBelow);
-                }
-            }
+    calculateSnapPoints() {
+        this.xAxisSnap = [];
+        this.yAxisSnap = [];
+        if (enableSnappingToCanvasEdges.value) {
+            this.xAxisSnap.push(0);
+            this.yAxisSnap.push(0);
         }
-
-        const horizontalContrastBreakpoint = height * 50;
-        const verticalContrastBreakpoint = width * 50;
-
-        for (let [i, contrast] of horizontalContrast.entries()) {
-            if (contrast > horizontalContrastBreakpoint) {
-                this.yAxisContrastSnap.push(i + 1);
-            }
+        if (enableSnappingToCanvasCenter.value) {
+            this.xAxisSnap.push(Math.floor(this.currentCanvasWidth / 2));
+            this.yAxisSnap.push(Math.floor(this.currentCanvasHeight / 2));
         }
-
-        for (let [i, contrast] of verticalContrast.entries()) {
-            if (contrast > verticalContrastBreakpoint) {
-                this.xAxisContrastSnap.push(i + 1);
-            }
+        if (enableSnappingToCanvasEdges.value) {
+            this.xAxisSnap.push(this.currentCanvasWidth);
+            this.yAxisSnap.push(this.currentCanvasHeight);
         }
-
+        if (enableSnappingToCanvasContrast.value) {
+            for (let i = 0; i < this.xAxisContrastSnap.length; i++) {
+                this.xAxisSnap.push(this.xAxisContrastSnap[i]);
+            }
+            for (let i = 0; i < this.yAxisContrastSnap.length; i++) {
+                this.yAxisSnap.push(this.yAxisContrastSnap[i]);
+            }
+            this.xAxisSnap.sort((a, b) => a < b ? -1 : 1);
+            this.yAxisSnap.sort((a, b) => a < b ? -1 : 1);
+        }
     }
 
 }
