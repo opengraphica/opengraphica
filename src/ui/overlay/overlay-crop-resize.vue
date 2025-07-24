@@ -71,8 +71,8 @@
                 </svg>
             </div>
         </div>
-        <div v-show="previewXSnap != null" class="og-snap-preview og-snap-preview-vertical" :style="{ left: (previewXSnap - (1/zoom/2)) + 'px', width: (1/zoom) + 'px', height: fileHeight + 'px' }"></div>
-        <div v-show="previewYSnap != null" class="og-snap-preview og-snap-preview-horizontal" :style="{ top: (previewYSnap - (1/zoom/2)) + 'px', height: (1/zoom) + 'px', width: fileWidth + 'px' }"></div>
+        <div v-show="previewXSnap != null" class="og-snap-preview og-snap-preview-vertical" :style="{ left: (previewXSnap - (2/zoom/2)) + 'px', width: (2/zoom) + 'px', height: fileHeight + 'px' }"></div>
+        <div v-show="previewYSnap != null" class="og-snap-preview og-snap-preview-horizontal" :style="{ top: (previewYSnap - (2/zoom/2)) + 'px', height: (2/zoom) + 'px', width: fileWidth + 'px' }"></div>
     </div>
 </template>
 

@@ -10574,8 +10574,9 @@ body.og-full-page .opengraphica {
   box-shadow: 0px 0px 0px 1px rgba(255, 255, 255, 0.5);
 }
 .opengraphica .og-snap-preview.og-snap-preview-vertical {
-  width: 0.0625rem;
+  width: 0.125rem;
   top: 0;
+  transform: translateX(-0.0625rem);
 }
 .opengraphica .og-snap-preview.og-snap-preview-vertical:before, .opengraphica .og-snap-preview.og-snap-preview-vertical:after {
   content: "";

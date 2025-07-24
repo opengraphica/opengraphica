@@ -1,16 +1,24 @@
 import { watch, type WatchHandle } from 'vue';
 import BaseCanvasMovementController from './base-movement';
+
 import {
     top, left, width, height, cropResizeEmitter,
-    enableSnapping, enableSnappingToCanvasCenter, enableSnappingToCanvasEdges, enableSnappingToSelectionCenter, enableSnappingToSelectionEdges,
+    enableSnapping, enableSnappingToCanvasCenter, enableSnappingToCanvasEdges,
+    enableSnappingToCanvasContrast, enableSnappingToSelectionCenter, enableSnappingToSelectionEdges,
     dragHandleHighlight, previewXSnap, previewYSnap, dimensionLockRatio
 } from '../store/crop-resize-state';
-import { DecomposedMatrix } from '@/lib/dom-matrix';
 import canvasStore from '@/store/canvas';
 import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset } from '@/canvas/store/selection-state';
 import preferencesStore from '@/store/preferences';
 import workingFileStore from '@/store/working-file';
+
+import { DecomposedMatrix } from '@/lib/dom-matrix';
 import appEmitter from '@/lib/emitter';
+import { getImageDataFromImageBitmap } from '@/lib/image';
+
+import { useRenderer } from '@/renderers';
+
+import type { RendererFrontend } from '@/types';
 
 const DRAG_TYPE_ALL = 0;
 const DRAG_TYPE_TOP = 1;
@@ -20,12 +28,16 @@ const DRAG_TYPE_RIGHT = 8;
 
 export default class CanvasCropResizeController extends BaseCanvasMovementController {
 
+    private renderer: RendererFrontend | undefined;
+
     private remToPx: number = 16;
     private cropTranslateStart: DOMPoint | null = null;
     private cropStartDimensions: { top: number, left: number, width: number, height: number } = { top: 0, left: 0, width: 0, height: 0};
     private cropDragType: number = 0;
     private xAxisSnap: number[] = [];
     private yAxisSnap: number[] = [];
+    private xAxisContrastSnap: number[] = [];
+    private yAxisContrastSnap: number[] = [];
     private snapSensitivity = 0;
 
     private currentCanvasWidth: number = 0;
@@ -43,6 +55,8 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
         canvasStore.set('showAreaOutsideWorkingFile', true);
         this.currentCanvasWidth = width.value;
         this.currentCanvasHeight = height.value;
+        this.xAxisContrastSnap = [];
+        this.yAxisContrastSnap = [];
 
         const selectionMask = activeSelectionMask.value ?? appliedSelectionMask.value;
         if (selectionMask) {
@@ -53,23 +67,50 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
         }
 
         this.unwatchEnableSnapping = watch(() => [
-            enableSnappingToCanvasCenter.value, enableSnappingToCanvasEdges.value
-        ], ([enableSnappingToCanvasCenter, enableSnappingToCanvasEdges]) => {
-            this.xAxisSnap = [];
-            this.yAxisSnap = [];
-            if (enableSnappingToCanvasEdges) {
-                this.xAxisSnap.push(0);
-                this.yAxisSnap.push(0);
-            }
-            if (enableSnappingToCanvasCenter) {
-                this.xAxisSnap.push(Math.floor(this.currentCanvasWidth / 2));
-                this.yAxisSnap.push(Math.floor(this.currentCanvasHeight / 2));
-            }
-            if (enableSnappingToCanvasEdges) {
-                this.xAxisSnap.push(this.currentCanvasWidth);
-                this.yAxisSnap.push(this.currentCanvasHeight);
-            }
+            enableSnappingToCanvasCenter.value,
+            enableSnappingToCanvasEdges.value,
+            enableSnappingToCanvasContrast.value,
+        ], () => {
+            this.calculateSnapPoints();
         }, { immediate: true });
+
+        useRenderer().then(async (renderer) => {
+            this.renderer = renderer;
+
+            await new Promise((resolve) => setTimeout(resolve, 500));
+
+            const bitmap = await this.renderer.takeSnapshot(workingFileStore.get('width'), workingFileStore.get('height'));
+            const imageData = await getImageDataFromImageBitmap(bitmap);
+            this.calculateContrastSnapPoints(imageData);
+            this.calculateSnapPoints();
+        });
+    }
+
+    calculateSnapPoints() {
+        this.xAxisSnap = [];
+        this.yAxisSnap = [];
+        if (enableSnappingToCanvasEdges.value) {
+            this.xAxisSnap.push(0);
+            this.yAxisSnap.push(0);
+        }
+        if (enableSnappingToCanvasCenter.value) {
+            this.xAxisSnap.push(Math.floor(this.currentCanvasWidth / 2));
+            this.yAxisSnap.push(Math.floor(this.currentCanvasHeight / 2));
+        }
+        if (enableSnappingToCanvasEdges.value) {
+            this.xAxisSnap.push(this.currentCanvasWidth);
+            this.yAxisSnap.push(this.currentCanvasHeight);
+        }
+        if (enableSnappingToCanvasContrast.value) {
+            for (let i = 0; i < this.xAxisContrastSnap.length; i++) {
+                this.xAxisSnap.push(this.xAxisContrastSnap[i]);
+            }
+            for (let i = 0; i < this.yAxisContrastSnap.length; i++) {
+                this.yAxisSnap.push(this.yAxisContrastSnap[i]);
+            }
+            this.xAxisSnap.sort((a, b) => a < b ? -1 : 1);
+            this.yAxisSnap.sort((a, b) => a < b ? -1 : 1);
+        }
     }
 
     onLeave(): void {
@@ -351,6 +392,59 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
             }
         }
         return null;
+    }
+
+    getImageDataLuminance(data: Uint8ClampedArray, i: number) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    }
+
+    calculateContrastSnapPoints(imageData: ImageData) {
+        this.xAxisContrastSnap = [];
+        this.yAxisContrastSnap = [];
+
+        const { data, width, height } = imageData;
+        const horizontalContrast = new Float32Array(height - 1);
+        const verticalContrast = new Float32Array(width - 1);
+
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                const i = (y * width + x) * 4;
+                const lum = this.getImageDataLuminance(data, i);
+            
+                // Check vertical contrast (compare with right neighbor)
+                if (x < width - 1) {
+                    const iRight = i + 4;
+                    const lumRight = this.getImageDataLuminance(data, iRight);
+                    verticalContrast[x] += Math.abs(lum - lumRight);
+                }
+            
+                // Check horizontal contrast (compare with bottom neighbor)
+                if (y < height - 1) {
+                    const iBelow = i + width * 4;
+                    const lumBelow = this.getImageDataLuminance(data, iBelow);
+                    horizontalContrast[y] += Math.abs(lum - lumBelow);
+                }
+            }
+        }
+
+        const horizontalContrastBreakpoint = height * 50;
+        const verticalContrastBreakpoint = width * 50;
+
+        for (let [i, contrast] of horizontalContrast.entries()) {
+            if (contrast > horizontalContrastBreakpoint) {
+                this.yAxisContrastSnap.push(i + 1);
+            }
+        }
+
+        for (let [i, contrast] of verticalContrast.entries()) {
+            if (contrast > verticalContrastBreakpoint) {
+                this.xAxisContrastSnap.push(i + 1);
+            }
+        }
+
     }
 
 }

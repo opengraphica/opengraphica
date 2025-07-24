@@ -4,6 +4,7 @@ import { ref } from 'vue';
 export const enableSnapping = ref<boolean>(true);
 export const enableSnappingToCanvasCenter = ref<boolean>(true);
 export const enableSnappingToCanvasEdges = ref<boolean>(true);
+export const enableSnappingToCanvasContrast = ref<boolean>(true);
 export const enableSnappingToSelectionCenter = ref<boolean>(true);
 export const enableSnappingToSelectionEdges = ref<boolean>(true);
 export const top = ref<number>(0);

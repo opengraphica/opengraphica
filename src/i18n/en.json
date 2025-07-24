@@ -1095,6 +1095,7 @@
                 "cropArea": "Crop Area",
                 "snapToCenter": "Snap to Center",
                 "snapToEdges": "Snap to Edges",
+                "snapToContrast": "Snap to Contrast",
                 "snapAtCenter": "Snap at Center",
                 "snapAtEdges": "Snap at Edges"
             }

@@ -103,6 +103,9 @@
                                 <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="$t('toolbar.cropResize.snapping.snapToEdges')">
                                     <el-switch v-model="enableSnappingToCanvasEdges" :disabled="!enableSnapping" />
                                 </el-form-item>
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="$t('toolbar.cropResize.snapping.snapToContrast')">
+                                    <el-switch v-model="enableSnappingToCanvasContrast" :disabled="!enableSnapping" />
+                                </el-form-item>
                             </div>
                             <p class="el-form-item el-form-item--menu-item !my-2">{{ $t('toolbar.cropResize.snapping.cropArea') }}:</p>
                             <div class="pl-2">
@@ -142,7 +145,8 @@ import workingFileStore, { WorkingFileState } from '@/store/working-file';
 import {
     top as cropTop, left as cropLeft, width as cropWidth, height as cropHeight,
     enableSnapping, enableSnappingToCanvasCenter, enableSnappingToCanvasEdges,
-    enableSnappingToSelectionCenter, enableSnappingToSelectionEdges, dimensionLockRatio
+    enableSnappingToCanvasContrast, enableSnappingToSelectionCenter,
+    enableSnappingToSelectionEdges, dimensionLockRatio
 } from '@/canvas/store/crop-resize-state';
 
 import { BaseAction } from '@/actions/base';
