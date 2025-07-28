@@ -31,6 +31,12 @@ import type { Camera, WebGLRenderer } from 'three';
 import type { SelectionMask } from '../selection-mask';
 import type { RendererBrushStrokeSettings, RendererTextureTile, WorkingFileLayerBlendingMode } from '@/types';
 
+let useHalfFloatColorBufferFallback: boolean = false;
+
+export function tryHalfFloatColorBuffers() {
+    useHalfFloatColorBufferFallback = true;
+}
+
 export class BrushStroke {
     originalViewport!: Vector4;
     renderer!: WebGLRenderer;
@@ -653,13 +659,12 @@ export class BrushStroke {
     createBrushColorRenderTargets() {
         if (!this.brushColorRenderTarget1) {
             this.brushColorRenderTarget1 = new WebGLRenderTarget(8, 8, {
-                type: FloatType,
+                type: useHalfFloatColorBufferFallback ? HalfFloatType : FloatType,
                 minFilter: NearestFilter,
                 magFilter: NearestFilter,
                 wrapS: ClampToEdgeWrapping,
                 wrapT: ClampToEdgeWrapping,
                 format: RGBAFormat,
-                internalFormat: this.texture.internalFormat,
                 depthBuffer: false,
                 colorSpace: LinearSRGBColorSpace,
                 stencilBuffer: false,
@@ -668,13 +673,12 @@ export class BrushStroke {
         }
         if (!this.brushColorRenderTarget2) {
             this.brushColorRenderTarget2 = new WebGLRenderTarget(8, 8, {
-                type: FloatType,
+                type: useHalfFloatColorBufferFallback ? HalfFloatType : FloatType,
                 minFilter: NearestFilter,
                 magFilter: NearestFilter,
                 wrapS: ClampToEdgeWrapping,
                 wrapT: ClampToEdgeWrapping,
                 format: RGBAFormat,
-                internalFormat: this.texture.internalFormat,
                 depthBuffer: false,
                 colorSpace: LinearSRGBColorSpace,
                 stencilBuffer: false,
@@ -700,7 +704,7 @@ export class BrushStroke {
             wrapS: ClampToEdgeWrapping,
             wrapT: ClampToEdgeWrapping,
             format: RGBAFormat,
-            internalFormat: this.texture.internalFormat,
+            internalFormat: this.isHalfFloat ? undefined : this.texture.internalFormat,
             depthBuffer: false,
             colorSpace: LinearSRGBColorSpace,
             stencilBuffer: false,

@@ -3,7 +3,7 @@ import { Matrix4 } from 'three/src/math/Matrix4';
 import { Vector4 } from 'three/src/math/Vector4';
 import { WebGLRenderTarget } from 'three/src/renderers/WebGLRenderTarget';
 
-import { BrushStroke } from './brush-stroke';
+import { BrushStroke, tryHalfFloatColorBuffers } from './brush-stroke';
 
 import type { RendererBrushStrokePreviewsettings } from '@/types';
 import type { WebGLRenderer } from 'three';
@@ -19,6 +19,9 @@ export class BrushPreview {
     t0!: number; t1!: number; t2!: number; t3!: number;
     lut!: Float32Array;
     length!: number;
+
+    // Check if the preview actually renders something first - for iOS
+    isSanityCheckRan: boolean = false;
 
     constructor(renderer: WebGLRenderer) {
         this.renderer = renderer;
@@ -118,8 +121,7 @@ export class BrushPreview {
         return aT + (bT - aT) * ratio;
     }
 
-    async generate(originalViewport: Vector4, settings: RendererBrushStrokePreviewsettings): Promise<ImageBitmap> {
-
+    async generatePixelBuffer(originalViewport: Vector4, settings: RendererBrushStrokePreviewsettings): Promise<Uint8Array> {
         const brushStroke = new BrushStroke(
             this.renderer,
             undefined,
@@ -183,6 +185,38 @@ export class BrushPreview {
         await this.renderer.readRenderTargetPixelsAsync(this.renderTarget, 0, 0, this.renderTarget.width, this.renderTarget.height, buffer);
 
         brushStroke.dispose();
+
+        return buffer;
+    }
+
+    async generate(originalViewport: Vector4, settings: RendererBrushStrokePreviewsettings): Promise<ImageBitmap> {
+
+        // Unfortunately iOS breaks in strange ways depending on the frame buffer type used.
+        // If there's an invisible output, switches up the renderer a bit.
+        if (!this.isSanityCheckRan) {
+            this.isSanityCheckRan = true;
+            const sanityBuffer = await this.generatePixelBuffer(originalViewport, {
+                color: new Float16Array([1, 0, 0, 1]),
+                size: 1000,
+                hardness: 1,
+                colorBlendingPersistence: 1,
+                colorBlendingStrength: 0,
+                pressureMinColorBlendingStrength: 0,
+                density: 1,
+                pressureMinDensity: 1,
+                concentration: 1,
+                pressureMinConcentration: 1,
+                pressureMinSize: 1000,
+                jitter: 0,
+                spacing: 0.01,
+                pressureTaper: 0,
+            });
+            if (sanityBuffer[4] === 0) {
+                tryHalfFloatColorBuffers();
+            }
+        }
+
+        const buffer = await this.generatePixelBuffer(originalViewport, settings);
 
         return await createImageBitmap(
             new ImageData(new Uint8ClampedArray(buffer), this.renderTarget.width, this.renderTarget.height),

@@ -144,7 +144,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         }
 
         this.isQueueingInput = false;
-        const hasPressure = (e.pointerType === 'pen' || e.pointerType === 'touch') && e.pressure !== 0.5 && e.pressure !== 1.0;
+        const hasPressure = (e.pointerType === 'pen' || e.pointerType === 'touch') && e.pressure !== 0.0 && e.pressure !== 0.5 && e.pressure !== 1.0;
         if (this.drawingPointerId == null && e.isPrimary && e.button === 0) {
             if (showBrushDrawer.value) {
                 showBrushDrawer.value = false;
@@ -176,7 +176,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             this.drawingPointerId = null;
             this.drawingBrushStroke = null;
         } else if (this.touches.length === 1) {
-            const hasPressure = this.touches[0].down.pressure !== 0.5 && this.touches[0].down.pressure !== 1.0;
+            const hasPressure = this.touches[0].down.pressure !== 0.0 && this.touches[0].down.pressure !== 0.5 && this.touches[0].down.pressure !== 1.0;
             this.drawingPointerId = this.touches[0].id;
             this.drawingUsePressure = hasPressure;
             this.drawStart(this.touches[0].down);
