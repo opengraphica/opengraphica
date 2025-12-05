@@ -27,7 +27,7 @@ import type {
     RendererLayerWatcher, RendererTextureTile, WorkingFileAnyLayer
 } from '@/types';
 
-export class Webgl2RenderFrontend implements RendererFrontend {
+export class Webgl2RendererFrontend implements RendererFrontend {
     rendererBackend: Webgl2RendererBackendPublic;
     videoPlayer: VideoPlayer | undefined;
 

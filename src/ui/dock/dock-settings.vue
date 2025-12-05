@@ -287,6 +287,7 @@
                                     <el-select v-model="preferenceRenderer" size="small" style="width: 6rem;">
                                         <el-option value="webgl2" :label="$t('dock.settings.prefs.performance.renderer.webgl2')" />
                                         <el-option value="webgl2-offscreen" :label="$t('dock.settings.prefs.performance.renderer.webgl2Offscreen')" />
+                                        <el-option value="wgpu-wasm" :label="$t('dock.settings.prefs.performance.renderer.wgpuWasm')" />
                                     </el-select>
                                 </el-form-item>
                                 <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.performance.optimizeLargeImage')">

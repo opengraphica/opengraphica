@@ -58,6 +58,17 @@ Afterwards, the "mount" method tells OpenGraphica where it should be placed in t
     
     `npm install`
 
+### Web Assembly Builds
+
+Rust is used to create some web assembly code.
+
+In the root folder of the project, run:
+
+```
+cargo build
+ln -s ../../../../rust/renderer_wgpu_wasm/pkg src/renderers/wgpu-wasm/backend/build
+```
+
 ### Development Server
 
 Start the development server with this command:

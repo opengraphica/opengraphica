@@ -252,7 +252,8 @@
                         "label": "Renderer",
                         "2d": "Canvas 2D",
                         "webgl2": "WebGL2",
-                        "webgl2Offscreen": "WebGL2 Offscreen"
+                        "webgl2Offscreen": "WebGL2 Offscreen",
+                        "wgpuWasm": "WebGPU + WASM"
                     },
                     "optimizeLargeImage": "Optimize for Large Image",
                     "highQualityScaling": "High Quality Scaling",

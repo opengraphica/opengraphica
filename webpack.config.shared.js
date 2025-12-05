@@ -12,6 +12,9 @@ module.exports = function setupConfig(config) {
 
     return {
         context: path.join(__dirname, './'),
+        experiments: {
+            syncWebAssembly: true,
+        },
         module: {
             rules: [
                 {
@@ -37,6 +40,10 @@ module.exports = function setupConfig(config) {
                     },
                     include: /node_modules/,
                     type: 'javascript/auto'
+                },
+                {
+                    test: /\.wasm$/,
+                    type: 'asset/resource',
                 },
                 {
                     test: /\.css$/i,

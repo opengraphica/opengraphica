@@ -1,0 +1,3 @@
+[workspace]
+members = ["rust/renderer_wgpu_wasm"]
+resolver = "3"
