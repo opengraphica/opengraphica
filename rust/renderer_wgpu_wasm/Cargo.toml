@@ -7,8 +7,10 @@ edition = "2024"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+bytemuck = "1.24.0"
 console_error_panic_hook = "0.1.7"
 env_logger = "0.10"
+glam = "0.30.9"
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4.56"
 wgpu = { version = "27.0.1", features = ["webgl"] }

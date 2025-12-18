@@ -239,6 +239,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "glam"
+version = "0.30.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bd47b05dddf0005d850e5644cae7f2b14ac3df487979dbfff3b56f20b1a6ae46"
+
+[[package]]
 name = "glow"
 version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -694,8 +700,10 @@ checksum = "19b30a45b0cd0bcca8037f3d0dc3421eaf95327a17cad11964fb8179b4fc4832"
 name = "renderer_wgpu_wasm"
 version = "0.1.0"
 dependencies = [
+ "bytemuck",
  "console_error_panic_hook",
  "env_logger",
+ "glam",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",

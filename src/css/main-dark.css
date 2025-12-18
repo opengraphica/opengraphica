@@ -8862,7 +8862,7 @@ body.og-full-page .opengraphica {
   left: auto;
   right: 0;
   bottom: 0;
-  width: calc(var(--el-slider-button-half-size) * 2);
+  width: var(--el-slider-button-half-size);
 }
 .opengraphica .og-color-picker-gradient .og-color-picker-gradient__opacity .el-slider__runway {
   background: rgba(0, 0, 0, 0) linear-gradient(to right, rgba(0, 0, 0, 0) 0%, var(--og-color-pick-opaque) 100%) repeat scroll 0% 0%;

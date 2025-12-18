@@ -92,3 +92,18 @@ export interface Webgl2RendererMeshController {
     overrideFilters(filters?: Webgl2RendererCanvasFilter[]): Promise<void>;
     overrideVisibility(visible?: boolean): void;
 }
+
+export interface WgpuWasmRendererMeshController {
+    blendingMode: WorkingFileLayerBlendingMode;
+    overrideFilters(filters?: Webgl2RendererCanvasFilter[]): Promise<void>;
+    overrideVisibility(visible?: boolean): void;
+}
+
+export enum WasmRendererMeshControllerType {
+    GRADIENT = 0,
+    RASTER = 1,
+    RASTER_SEQUENCE = 2,
+    TEXT = 3,
+    VECTOR = 4,
+    VIDEO = 5,
+}

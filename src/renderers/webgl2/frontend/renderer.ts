@@ -148,78 +148,61 @@ export class Webgl2RendererFrontend implements RendererFrontend {
         };
 
         let timelineCursor = 0;
-        const renderLoop = this.rendererBackend.isOffscreen
+        const setRendererDirty = this.rendererBackend.isOffscreen
             ? () => {
-                const isViewDirty = canvasStore.get('viewDirty');
-                const isPlayingAnimation = canvasStore.get('playingAnimation');
-
-                if (isViewDirty || viewDirtyTrail) {
-                    viewDirtyTrail = false;
-                    canvasStore.set('viewDirty', false);
-                    const transform = canvasStore.get('transform');
-                    this.rendererBackend.setViewTransform(
-                        new Float64Array([
-                            transform.m11, transform.m21, transform.m31, transform.m41,
-                            transform.m12, transform.m22, transform.m32, transform.m42,
-                            transform.m13, transform.m23, transform.m33, transform.m43,
-                            transform.m14, transform.m24, transform.m34, transform.m44,
-                        ])
-                    );
-                    if (isViewDirty) {
-                        nextTick(setViewDirtyTrail);
-                    }
-                }
-
-                if (isPlayingAnimation) {
-                    this.rendererBackend.setDirty();
-                    const now = performance.now();
-                    const { timelinePlayStartTime, timelineStart, timelineEnd } = editorStore.state;
-                    const timelineRange = timelineEnd - timelineStart;
-                    timelineCursor = ((now - timelinePlayStartTime) % timelineRange) + timelineStart;
-                    editorStore.dispatch('setTimelineCursor', timelineCursor);
-                }
-
                 // TODO - Remove this altogether? No longer used.
-                canvasStore.set('dirty', false);
-
-                requestAnimationFrame(renderLoop);
+                canvasStore.set('dirty', false)
             }
             : () => {
-                const isViewDirty = canvasStore.get('viewDirty');
-                const isPlayingAnimation = canvasStore.get('playingAnimation');
-
-                if (isViewDirty || viewDirtyTrail) {
-                    viewDirtyTrail = false;
-                    canvasStore.set('viewDirty', false);
-                    const transform = canvasStore.get('transform');
-                    this.rendererBackend.setViewTransform(
-                        new Float64Array([
-                            transform.m11, transform.m21, transform.m31, transform.m41,
-                            transform.m12, transform.m22, transform.m32, transform.m42,
-                            transform.m13, transform.m23, transform.m33, transform.m43,
-                            transform.m14, transform.m24, transform.m34, transform.m44,
-                        ])
-                    );
-                    if (isViewDirty) {
-                        nextTick(setViewDirtyTrail);
-                    }
-                }
-
-                if (isPlayingAnimation) {
-                    this.rendererBackend.setDirty();
-                    const now = performance.now();
-                    const { timelinePlayStartTime, timelineStart, timelineEnd } = editorStore.state;
-                    const timelineRange = timelineEnd - timelineStart;
-                    timelineCursor = ((now - timelinePlayStartTime) % timelineRange) + timelineStart;
-                    editorStore.dispatch('setTimelineCursor', timelineCursor);
-                }
-
                 if ((this.rendererBackend as Webgl2RendererBackend).dirty) {
                     canvasStore.set('dirty', false);
                     (this.rendererBackend as Webgl2RendererBackend).render(timelineCursor);
                 }
-                requestAnimationFrame(renderLoop);
             };
+        
+        let viewTransform = new Float64Array([
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1,
+        ]);
+
+        const renderLoop = () => {
+            const isViewDirty = canvasStore.get('viewDirty');
+            const isPlayingAnimation = canvasStore.get('playingAnimation');
+
+            if (isViewDirty || viewDirtyTrail) {
+                viewDirtyTrail = false;
+                canvasStore.set('viewDirty', false);
+                const transform = canvasStore.get('transform');
+                viewTransform[0] = transform.m11; viewTransform[1] = transform.m21;
+                viewTransform[2] = transform.m31; viewTransform[3] = transform.m41;
+                viewTransform[4] = transform.m12; viewTransform[5] = transform.m22;
+                viewTransform[6] = transform.m32; viewTransform[7] = transform.m42;
+                viewTransform[8] = transform.m13; viewTransform[9] = transform.m23;
+                viewTransform[10] = transform.m33; viewTransform[11] = transform.m43;
+                viewTransform[12] = transform.m14; viewTransform[13] = transform.m24;
+                viewTransform[14] = transform.m34; viewTransform[15] = transform.m44;
+                this.rendererBackend.setViewTransform(viewTransform);
+                if (isViewDirty) {
+                    nextTick(setViewDirtyTrail);
+                }
+            }
+
+            if (isPlayingAnimation) {
+                this.rendererBackend.setDirty();
+                const now = performance.now();
+                const { timelinePlayStartTime, timelineStart, timelineEnd } = editorStore.state;
+                const timelineRange = timelineEnd - timelineStart;
+                timelineCursor = ((now - timelinePlayStartTime) % timelineRange) + timelineStart;
+                editorStore.dispatch('setTimelineCursor', timelineCursor);
+            }
+
+            setRendererDirty();
+
+            requestAnimationFrame(renderLoop);
+        };
+
         requestAnimationFrame(renderLoop);
     }
 

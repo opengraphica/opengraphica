@@ -4,6 +4,7 @@ export * from './color';
 export * from './drawable';
 export * from './file-system-access';
 export * from './filter';
+export * from './image';
 export * from './keyboard-map';
 export * from './metrics';
 export * from './renderer';

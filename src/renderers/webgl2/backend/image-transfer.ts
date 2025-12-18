@@ -70,7 +70,7 @@ export async function requestFrontendSvg(
             if (!options) return;
             const { sourceUuid, bitmap } = options;
             if (sourceUuid === requestSourceUuid) {
-                messageBus.off('frontend.replyFrontendTexture', handleResponse);
+                messageBus.off('frontend.replyFrontendSvg', handleResponse);
                 resolve(createTexture(bitmap));
             }
         }

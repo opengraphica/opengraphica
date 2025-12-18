@@ -102,7 +102,7 @@
             left: auto;
             right: 0;
             bottom: 0;
-            width: calc(var(--el-slider-button-half-size) * 2);
+            width: var(--el-slider-button-half-size);
         }
 
         .el-slider__runway {
