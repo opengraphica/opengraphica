@@ -4,6 +4,7 @@ use glam::Mat4;
 use std::panic;
 use std::cell::{ Cell, RefCell };
 use std::collections::HashMap;
+use std::vec::Vec;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::future_to_promise;
 use wasm_bindgen_futures::{ spawn_local, JsFuture };
@@ -18,7 +19,7 @@ use layers::base::mesh_controller::{ MeshControllerType };
 use layers::raster::mesh_controller::{ RasterMeshController };
 mod geometry;
 mod state;
-use state::RendererState;
+use state::{ Drawable, LayerPassStep, RendererState };
 mod uniform;
 
 thread_local! {
@@ -107,6 +108,7 @@ pub fn initialize(
         );
 
         let mesh_controllers = HashMap::new();
+        let layer_passes = Vec::new();
 
         RENDERER_STATE.with(|s| *s.borrow_mut() = Some(
             RendererState {
@@ -118,6 +120,7 @@ pub fn initialize(
                 quad_vertex_buffer,
                 image_background,
                 mesh_controllers,
+                layer_passes,
             }
         ));
 
@@ -187,8 +190,8 @@ pub fn set_view_transform(
     assert!(transform.len() == 16);
 
     RENDERER_STATE.with(|s| {
-        let renderer_state = s.borrow();
-        let renderer_state = renderer_state.as_ref().unwrap();
+        let mut renderer_state = s.borrow_mut();
+        let renderer_state = renderer_state.as_mut().unwrap();
 
         let queue = &renderer_state.queue;
 
@@ -198,6 +201,11 @@ pub fn set_view_transform(
 
         let image_background = &renderer_state.image_background;
         image_background.set_transform(queue, &view_matrix);
+
+        let mesh_controllers = &mut renderer_state.mesh_controllers;
+        for mesh_controller in mesh_controllers.values_mut() {
+            mesh_controller.set_view_transform(&view_matrix);
+        }
     });
 }
 
@@ -231,8 +239,8 @@ pub fn render() {
 
 fn debug_render() {
     RENDERER_STATE.with(|s| {
-        let renderer_state = s.borrow();
-        let renderer_state = renderer_state.as_ref().unwrap();
+        let mut renderer_state = s.borrow_mut();
+        let renderer_state = renderer_state.as_mut().unwrap();
 
         let surface = &renderer_state.surface;
         let device = &renderer_state.device;
@@ -240,6 +248,9 @@ fn debug_render() {
         
         let quad_vertex_buffer = &renderer_state.quad_vertex_buffer;
         let image_background = &renderer_state.image_background;
+
+        let mesh_controllers = &mut renderer_state.mesh_controllers;
+        let layer_passes = &renderer_state.layer_passes;
 
         let frame = surface
             .get_current_texture()
@@ -277,11 +288,14 @@ fn debug_render() {
             pass.set_vertex_buffer(0, quad_vertex_buffer.slice(..));
 
             image_background.draw(&mut pass);
-            // pass.set_pipeline(&image_background.pipeline);
-            // pass.set_bind_group(0, &image_background.bind_group, &[]);
-            // pass.set_vertex_buffer(0, image_background.vertex_buffer.slice(..));
-            // pass.draw(0..6, 0..1);
-        } // _rpass drops here and ends the pass
+
+            for layer_pass in layer_passes {
+                let mesh_controller = mesh_controllers.get_mut(&layer_pass.mesh_controller_id).expect("Mesh controller missing");
+                // TODO - instead of a draw function, store pipeline and other state in LayerPassStep?
+                mesh_controller.draw(queue, &mut pass);
+            }
+
+        } // pass drops here and ends the pass
 
         // Submit the commands
         queue.submit(Some(encoder.finish()));
@@ -298,10 +312,11 @@ pub fn add_mesh_controller(id: u32, controllerType: u8) {
         let mut renderer_state = s.borrow_mut();
         let renderer_state = renderer_state.as_mut().unwrap();
 
+        let device = &renderer_state.device;
         let mesh_controllers = &mut renderer_state.mesh_controllers;
 
         let mesh_controller_option = match MeshControllerType::try_from(controllerType).expect("Invalid controller type") {
-            MeshControllerType::Raster => Some(RasterMeshController::new()),
+            MeshControllerType::Raster => Some(RasterMeshController::new(device)),
             _ => None,
         };
 
@@ -382,7 +397,16 @@ pub fn update_mesh_controller_source_image_data(
 
 #[wasm_bindgen]
 pub fn reorder_mesh_controller(id: u32, order: u32) {
+    RENDERER_STATE.with(|s| {
+        let mut renderer_state = s.borrow_mut();
+        let renderer_state = renderer_state.as_mut().unwrap();
 
+        let mesh_controllers = &mut renderer_state.mesh_controllers;
+
+        if let Some(mesh_controller) = mesh_controllers.get_mut(&id) {
+            mesh_controller.set_order(order);
+        }
+    });
 }
 
 #[wasm_bindgen]
@@ -402,5 +426,23 @@ pub fn remove_mesh_controller(id: u32) {
 pub fn create_layer_passes() {
     SCHEDULED_CREATE_LAYER_PASSES.with(|f| f.set(false));
 
-    
+    RENDERER_STATE.with(|s| {
+        let mut renderer_state = s.borrow_mut();
+        let renderer_state = renderer_state.as_mut().unwrap();
+
+        let mesh_controllers = &mut renderer_state.mesh_controllers;
+        let mut layer_passes = Vec::<LayerPassStep>::with_capacity(mesh_controllers.len());
+
+        for (id, mesh_controller) in mesh_controllers.iter() {
+            layer_passes.push(LayerPassStep {
+                mesh_controller_id: id.clone(),
+                order: mesh_controller.get_order(),
+            });
+        }
+        layer_passes.sort_by_key(|k| k.order);
+
+        // TODO - determine when to render buffer swap
+
+        renderer_state.layer_passes = layer_passes;
+    });
 }

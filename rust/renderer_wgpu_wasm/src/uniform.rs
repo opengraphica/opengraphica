@@ -10,6 +10,13 @@ pub struct BackgroundImageUniform {
 
 #[repr(C)]
 #[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
+pub struct RasterLayerUniform {
+    pub size: [f32; 2],
+    pub _padding: [f32; 2],
+}
+
+#[repr(C)]
+#[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct TransformUniform {
     pub matrix: [[f32; 4]; 4],
 }

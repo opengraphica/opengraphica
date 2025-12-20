@@ -9,8 +9,11 @@ import {
     selectedLayersSelectionMaskPreviewCanvasOffset,
 } from '@/canvas/store/selection-state';
 
+import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
 import { colorToHex, colorToRgba, getColorModelName } from '@/lib/color';
 import { deepToRaw } from '@/lib/vue';
+
+import { messageBus } from '@/renderers/wgpu-wasm/backend/message-bus';
 
 import type { WgpuWasmRendererBackend, WgpuWasmRendererBackendPublic } from '@/renderers/wgpu-wasm/backend';
 import type {
@@ -43,9 +46,14 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
         const { viewWidth, viewHeight } = toRefs(canvasStore.state);
         const { width: imageWidth, height: imageHeight } = toRefs(workingFileStore.state);
 
-        await this.rendererBackend.initialize(canvas, imageWidth.value, imageHeight.value, viewWidth.value, viewHeight.value);
+        // this.layerWatchersByType['gradient'] = (await import('@/renderers/wgpu-wasm/layers/gradient/watcher')).GradientLayerWatcher;
+        this.layerWatchersByType['raster'] = (await import('@/renderers/wgpu-wasm/layers/raster/watcher')).RasterLayerWatcher;
+        // this.layerWatchersByType['rasterSequence'] = (await import('@/renderers/wgpu-wasm/layers/raster-sequence/watcher')).RasterSequenceLayerWatcher;
+        // this.layerWatchersByType['text'] = (await import('@/renderers/wgpu-wasm/layers/text/watcher')).TextLayerWatcher;
+        // this.layerWatchersByType['vector'] = (await import('@/renderers/wgpu-wasm/layers/vector/watcher')).VectorLayerWatcher;
+        // this.layerWatchersByType['video'] = (await import('@/renderers/wgpu-wasm/layers/video/watcher')).VideoLayerWatcher;
 
-        // TODO - layers, etc
+        await this.rendererBackend.initialize(canvas, imageWidth.value, imageHeight.value, viewWidth.value, viewHeight.value);
 
         this.stopWatchSize = watch(() => [
             imageWidth.value,
@@ -98,7 +106,37 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
             this.rendererBackend.setBackgroundColor(r, g, b, alpha);
         }, { immediate: true });
 
-        // TODO - message bus
+        this.onSvgRequest = this.onSvgRequest.bind(this);
+        this.onTextureRequest = this.onTextureRequest.bind(this);
+        if (this.rendererBackend.isOffscreen) {
+            this.rendererBackend.onRequestFrontendSvg = this.onSvgRequest;
+            this.rendererBackend.onRequestFrontendTexture = this.onTextureRequest;
+        } else {
+            messageBus.on('backend.requestFrontendSvg', this.onSvgRequest);
+            messageBus.on('backend.requestFrontendTexture', this.onTextureRequest);
+        }
+
+        this.onRegenerateThumbnail = this.onRegenerateThumbnail.bind(this);
+        messageBus.on('layer.regenerateThumbnail', this.onRegenerateThumbnail);
+
+        this.onLayerAttached = this.onLayerAttached.bind(this);
+        appEmitter.on('app.workingFile.layerAttached', this.onLayerAttached);
+
+        this.onLayerReordered = this.onLayerReordered.bind(this);
+        appEmitter.on('app.workingFile.layerReordered', this.onLayerReordered);
+
+        this.onLayerDetached = this.onLayerDetached.bind(this);
+        appEmitter.on('app.workingFile.layerDetached', this.onLayerDetached);
+
+        this.onDetachAllLayers = this.onDetachAllLayers.bind(this);
+        appEmitter.on('app.workingFile.detachAllLayers', this.onDetachAllLayers);
+
+        this.onLayerOrderCalculated = this.onLayerOrderCalculated.bind(this);
+        appEmitter.on('app.workingFile.layerOrderCalculated', this.onLayerOrderCalculated);
+
+        this.onEditorHistoryStep = this.onEditorHistoryStep.bind(this);
+        appEmitter.on('editor.history.step', this.onEditorHistoryStep);
+
 
         let viewDirtyTrail = false;
         const setViewDirtyTrail = () => {
@@ -201,5 +239,69 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
         (this.rendererBackend as unknown) = undefined;
 
         // TODO
+    }
+
+
+    async onSvgRequest(request?: { sourceUuid: string, width: number, height: number }) {
+    }
+
+    async onTextureRequest(sourceUuid?: string) {
+        
+    }
+
+    onRegenerateThumbnail(event?: number) {
+        if (event == null) return;
+        const layer = getLayerById(event);
+        if (!layer) return;
+        regenerateLayerThumbnail(layer);
+    }
+
+    onLayerAttached(layer?: WorkingFileAnyLayer) {
+        if (!layer) return;
+        const LayerWatcher = this.layerWatchersByType[layer.type];
+        if (!LayerWatcher) return;
+        const layerWatcher = new LayerWatcher(this.rendererBackend);
+        this.layerWatchersById.set(layer.id, layerWatcher);
+        layerWatcher.attach(layer);
+    }
+
+    onLayerReordered(options?: { layer: WorkingFileAnyLayer, order: number }) {
+        if (!options) return;
+        const { layer, order } = options;
+        if (!layer || order == null) return;
+        const existingLayerWatcher = this.layerWatchersById.get(layer.id);
+        if (!existingLayerWatcher) return;
+        existingLayerWatcher.reorder(order);
+    }
+
+    onLayerDetached(layer?: WorkingFileAnyLayer) {
+        if (!layer) return;
+        const existingLayerWatcher = this.layerWatchersById.get(layer.id);
+        if (!existingLayerWatcher) return;
+        existingLayerWatcher.detach();
+        this.layerWatchersById.delete(layer.id);
+    }
+
+    onDetachAllLayers() {
+        for (const key of this.layerWatchersById.keys()) {
+            const layerWatcher = this.layerWatchersById.get(key);
+            if (!layerWatcher) continue;
+            layerWatcher.detach();
+        }
+        this.layerWatchersById.clear();
+    }
+
+    onLayerOrderCalculated() {
+        // TODO - only pass necessary data for each layer (id, type, blendingMode, layers).
+        this.rendererBackend.setLayerOrder(
+            deepToRaw(workingFileStore.get('layers'))
+        );
+    }
+
+    onEditorHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
+        if (!event) return;
+        if (event.action.id === 'updateLayerBlendingMode') {
+            this.rendererBackend.queueCreateLayerPasses();
+        }
     }
 }

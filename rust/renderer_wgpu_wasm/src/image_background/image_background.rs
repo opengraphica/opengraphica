@@ -3,6 +3,7 @@ use wgpu::util::DeviceExt;
 
 use crate::geometry::{ Vertex };
 use crate::uniform::{ BackgroundImageUniform, TransformUniform };
+use crate::state::{ Drawable };
 
 pub struct ImageBackground {
     pub transform_buffer: wgpu::Buffer,
@@ -175,8 +176,10 @@ impl ImageBackground {
             bytemuck::bytes_of(&self.properties_uniform)
         );
     }
+}
 
-    pub fn draw(&self, pass: &mut wgpu::RenderPass) {
+impl Drawable for ImageBackground {
+    fn draw(&self, pass: &mut wgpu::RenderPass) {
         pass.set_pipeline(&self.pipeline);
         pass.set_bind_group(0, &self.transform_bind_group, &[]);
         pass.set_bind_group(1, &self.properties_bind_group, &[]);

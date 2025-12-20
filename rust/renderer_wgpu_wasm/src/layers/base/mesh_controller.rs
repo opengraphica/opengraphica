@@ -2,9 +2,17 @@ use std::convert::TryFrom;
 
 pub trait MeshController {
     fn set_name(&mut self, name: &str);
+    fn get_name(&self) -> &str;
     fn set_size(&mut self, width: u32, height: u32);
+    fn get_width(&self) -> u32;
+    fn get_height(&self) -> u32;
     fn set_transform(&mut self, transform: &[f32]);
+    fn set_view_transform(&mut self, view_transform: &glam::Mat4);
     fn set_visible(&mut self, visible: bool);
+    fn get_visible(&self) -> bool;
+    fn set_order(&mut self, order: u32);
+    fn get_order(&self) -> u32;
+    fn draw(&mut self, queue: &wgpu::Queue, pass: &mut wgpu::RenderPass);
 }
 
 #[repr(u8)]
