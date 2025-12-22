@@ -15,7 +15,7 @@ use wgpu::web_sys::js_sys;
 
 mod image_background;
 mod layers;
-use layers::base::mesh_controller::{ MeshControllerType };
+use layers::base::mesh_controller::{ MeshController, MeshControllerType };
 use layers::raster::mesh_controller::{ RasterMeshController };
 mod geometry;
 mod state;
@@ -92,9 +92,10 @@ pub fn initialize(
         };
         surface.configure(&device, &config);
 
-        let canvas_view_scale = Mat4::from_scale(glam::vec3(2.0 / view_width as f32, -2.0 / view_height as f32, 1.0));
-        let canvas_view_translate = Mat4::from_translation(glam::vec3(-1.0, 1.0, 0.0));
-        let canvas_view_matrix = canvas_view_translate * canvas_view_scale;
+        let projection_scale = Mat4::from_scale(glam::vec3(2.0 / view_width as f32, -2.0 / view_height as f32, 1.0));
+        let projection_translate = Mat4::from_translation(glam::vec3(-1.0, 1.0, 0.0));
+        let projection_matrix = projection_translate * projection_scale;
+        let view_matrix = Mat4::IDENTITY;
 
         let quad_vertices = geometry::rectangle_vertices(1, 1);
         let quad_vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
@@ -116,7 +117,8 @@ pub fn initialize(
                 device,
                 queue,
                 config,
-                canvas_view_matrix,
+                projection_matrix,
+                view_matrix,
                 quad_vertex_buffer,
                 image_background,
                 mesh_controllers,
@@ -152,8 +154,8 @@ pub fn resize(
 
         let canvas_view_scale = Mat4::from_scale(glam::vec3(2.0 / view_width as f32, -2.0 / view_height as f32, 1.0));
         let canvas_view_translate = Mat4::from_translation(glam::vec3(-1.0, 1.0, 0.0));
-        let canvas_view_matrix = canvas_view_translate * canvas_view_scale;
-        renderer_state.canvas_view_matrix = canvas_view_matrix;
+        let projection_matrix = canvas_view_translate * canvas_view_scale;
+        renderer_state.projection_matrix = projection_matrix;
 
         let image_background = &mut renderer_state.image_background;
 
@@ -195,9 +197,10 @@ pub fn set_view_transform(
 
         let queue = &renderer_state.queue;
 
-        let canvas_view_matrix = &renderer_state.canvas_view_matrix;
+        let projection_matrix = &renderer_state.projection_matrix;
         let view_transform_matrix = Mat4::from_cols_array(transform.try_into().unwrap());
-        let view_matrix = canvas_view_matrix * view_transform_matrix;
+        let view_matrix = projection_matrix * view_transform_matrix;
+        renderer_state.view_matrix = view_matrix;
 
         let image_background = &renderer_state.image_background;
         image_background.set_transform(queue, &view_matrix);
@@ -320,7 +323,8 @@ pub fn add_mesh_controller(id: u32, controllerType: u8) {
             _ => None,
         };
 
-        if let Some(mesh_controller) = mesh_controller_option {
+        if let Some(mut mesh_controller) = mesh_controller_option {
+            mesh_controller.set_view_transform(&renderer_state.view_matrix);
             mesh_controllers.insert(id, Box::new(mesh_controller));
         }
 
@@ -365,7 +369,7 @@ pub fn update_mesh_controller_transform(id: u32, transform: &[f32]) {
         let mesh_controllers = &mut renderer_state.mesh_controllers;
 
         if let Some(mesh_controller) = mesh_controllers.get_mut(&id) {
-            mesh_controller.set_transform(transform);
+            mesh_controller.set_model_transform(transform);
         }
     });
 }
@@ -390,9 +394,20 @@ pub fn update_mesh_controller_source_image_data(
     width: u32,
     height: u32,
     format: u8,
-    buffer: &[u8]
+    buffer: &[u8],
 ) {
+    RENDERER_STATE.with(|s| {
+        let mut renderer_state = s.borrow_mut();
+        let renderer_state = renderer_state.as_mut().unwrap();
 
+        let device = &renderer_state.device;
+        let queue = &renderer_state.queue;
+        let mesh_controllers = &mut renderer_state.mesh_controllers;
+
+        if let Some(mesh_controller) = mesh_controllers.get_mut(&id) {
+            mesh_controller.set_source_image_data(device, queue, width, height, format, buffer);
+        }
+    });
 }
 
 #[wasm_bindgen]

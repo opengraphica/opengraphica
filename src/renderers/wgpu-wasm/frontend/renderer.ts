@@ -2,6 +2,7 @@ import { nextTick, toRefs, watch, type WatchStopHandle } from 'vue';
 
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
+import { getStoredImageCanvas } from '@/store/image';
 import workingFileStore, { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
 import {
     activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask,
@@ -11,10 +12,12 @@ import {
 
 import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
 import { colorToHex, colorToRgba, getColorModelName } from '@/lib/color';
+import { getImageDataFromCanvas } from '@/lib/image';
 import { deepToRaw } from '@/lib/vue';
 
 import { messageBus } from '@/renderers/wgpu-wasm/backend/message-bus';
 
+import { WasmImageFormat } from '@/types';
 import type { WgpuWasmRendererBackend, WgpuWasmRendererBackendPublic } from '@/renderers/wgpu-wasm/backend';
 import type {
     RGBAColor,
@@ -246,7 +249,27 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
     }
 
     async onTextureRequest(sourceUuid?: string) {
-        
+        if (!sourceUuid) return;
+
+        const storedImageCanvas = await getStoredImageCanvas(sourceUuid);
+        if (!storedImageCanvas) {
+            messageBus.emit('frontend.replyFrontendTexture', {
+                sourceUuid,
+                imageData: undefined,
+            });
+            return;
+        }
+
+        const imageData = getImageDataFromCanvas(storedImageCanvas);
+        messageBus.emit('frontend.replyFrontendTexture', {
+            sourceUuid,
+            imageData: {
+                width: imageData.width,
+                height: imageData.height,
+                format: WasmImageFormat.RGBA8_SRGB,
+                buffer: new Uint8Array(imageData.data),
+            },
+        });
     }
 
     onRegenerateThumbnail(event?: number) {

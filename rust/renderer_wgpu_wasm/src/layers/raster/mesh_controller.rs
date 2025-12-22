@@ -19,7 +19,11 @@ pub struct RasterMeshController {
     pub transform_bind_group: wgpu::BindGroup,
     pub properties_uniform: RasterLayerUniform,
     pub properties_buffer: wgpu::Buffer,
+    pub properties_bind_group_layout: wgpu::BindGroupLayout,
     pub properties_bind_group: wgpu::BindGroup,
+    pub source_texture: wgpu::Texture,
+    pub source_texture_view: wgpu::TextureView,
+    pub source_texture_sampler: wgpu::Sampler,
     pub pipeline: wgpu::RenderPipeline,
 
     draw_flags: RasterDrawFlag,
@@ -27,7 +31,7 @@ pub struct RasterMeshController {
     name: String,
     width: u32,
     height: u32,
-    transform: glam::Mat4,
+    model_transform: glam::Mat4,
     view_transform: glam::Mat4,
     visible: bool,
     order: u32,
@@ -56,16 +60,16 @@ impl MeshController for RasterMeshController {
         self.height
     }
 
-    fn set_transform(&mut self, transform: &[f32]) {
-        self.transform = glam::Mat4::from_cols_array(transform.try_into().expect("Transform must be of length 16"));
+    fn set_model_transform(&mut self, model_transform: &[f32]) {
+        self.model_transform = glam::Mat4::from_cols_array(model_transform.try_into().expect("Transform must be of length 16"));
         // wgpu::web_sys::console::log_1(&format!("{:?}", self.transform).into());
-        self.transform_uniform = (self.view_transform * self.transform).into();
+        self.transform_uniform = (self.view_transform * self.model_transform).into();
         self.draw_flags |= RasterDrawFlag::TRANSFORM_CHANGED;
     }
 
     fn set_view_transform(&mut self, view_transform: &glam::Mat4) {
         self.view_transform = view_transform.clone();
-        self.transform_uniform = (self.view_transform * self.transform).into();
+        self.transform_uniform = (self.view_transform * self.model_transform).into();
         self.draw_flags |= RasterDrawFlag::TRANSFORM_CHANGED;
     }
 
@@ -83,7 +87,68 @@ impl MeshController for RasterMeshController {
         self.order
     }
 
-    fn draw(&mut self, queue: &wgpu::Queue, pass: &mut wgpu::RenderPass) {
+    fn set_source_image_data(
+        &mut self,
+        device: &wgpu::Device, queue: &wgpu::Queue,
+        width: u32, height: u32, format: u8, buffer: &[u8]
+    ) {
+        wgpu::web_sys::console::log_1(&format!("Set image data {:?} {:?}", width, height).into());
+        let source_texture = device.create_texture(&wgpu::TextureDescriptor {
+            label: Some("Raster Layer Source Texture"),
+            size: wgpu::Extent3d {
+                width,
+                height,
+                depth_or_array_layers: 1,
+            },
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            format: wgpu::TextureFormat::Rgba8UnormSrgb, // TODO - read from format param
+            usage: wgpu::TextureUsages::TEXTURE_BINDING
+                | wgpu::TextureUsages::COPY_DST,
+            view_formats: &[],
+        });
+
+        let source_texture_view = source_texture.create_view(&wgpu::TextureViewDescriptor::default());
+
+        queue.write_texture(
+            wgpu::TexelCopyTextureInfo {
+                texture: &source_texture,
+                mip_level: 0,
+                origin: wgpu::Origin3d::ZERO,
+                aspect: wgpu::TextureAspect::All,
+            },
+            buffer,
+            wgpu::TexelCopyBufferLayout {
+                offset: 0,
+                bytes_per_row: Some(4 * width),
+                rows_per_image: Some(height),
+            },
+            wgpu::Extent3d {
+                width,
+                height,
+                depth_or_array_layers: 1,
+            },
+        );
+
+        let properties_bind_group = Self::create_properties_bind_group(
+            device,
+            &self.properties_buffer,
+            &self.properties_bind_group_layout,
+            &source_texture_view,
+            &self.source_texture_sampler
+        );
+
+        self.source_texture = source_texture;
+        self.source_texture_view = source_texture_view;
+        self.properties_bind_group = properties_bind_group;
+    }
+
+    fn draw(
+        &mut self,
+        queue: &wgpu::Queue,
+        pass: &mut wgpu::RenderPass,
+    ) {
 
         if self.draw_flags.contains(RasterDrawFlag::SIZE_CHANGED) {
             queue.write_buffer(
@@ -111,6 +176,35 @@ impl MeshController for RasterMeshController {
 impl RasterMeshController {
     pub fn new(device: &wgpu::Device) -> RasterMeshController {
         let shader = device.create_shader_module(wgpu::include_wgsl!("raster_layer_shader.wgsl"));
+
+        let source_texture = device.create_texture(&wgpu::TextureDescriptor {
+            label: Some("Raster Layer Source Texture"),
+            size: wgpu::Extent3d {
+                width: 2,
+                height: 2,
+                depth_or_array_layers: 1,
+            },
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            format: wgpu::TextureFormat::Rgba8UnormSrgb,
+            usage: wgpu::TextureUsages::TEXTURE_BINDING
+                | wgpu::TextureUsages::COPY_DST,
+            view_formats: &[],
+        });
+
+        let source_texture_view = source_texture.create_view(&wgpu::TextureViewDescriptor::default());
+
+        let source_texture_sampler = device.create_sampler(&wgpu::SamplerDescriptor {
+            label: Some("Raster Layer Source Texture Sampler"),
+            address_mode_u: wgpu::AddressMode::ClampToEdge,
+            address_mode_v: wgpu::AddressMode::ClampToEdge,
+            address_mode_w: wgpu::AddressMode::ClampToEdge,
+            mag_filter: wgpu::FilterMode::Linear,
+            min_filter: wgpu::FilterMode::Linear,
+            mipmap_filter: wgpu::FilterMode::Nearest,
+            ..Default::default()
+        });
 
         let transform_uniform = TransformUniform {
             matrix: [
@@ -166,7 +260,7 @@ impl RasterMeshController {
         });
 
         let properties_bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-            label: Some("Raster Layer Bind Group Layout"),
+            label: Some("Raster Layer Properties Bind Group Layout"),
             entries: &[
                 wgpu::BindGroupLayoutEntry {
                     binding: 0,
@@ -178,19 +272,32 @@ impl RasterMeshController {
                     },
                     count: None,
                 },
-            ],
-        });
-
-        let properties_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
-            label: Some("Raster Layer Bind Group"),
-            layout: &properties_bind_group_layout,
-            entries: &[
-                wgpu::BindGroupEntry {
-                    binding: 0,
-                    resource: properties_buffer.as_entire_binding(),
+                wgpu::BindGroupLayoutEntry {
+                    binding: 1,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Texture {
+                        multisampled: false,
+                        view_dimension: wgpu::TextureViewDimension::D2,
+                        sample_type: wgpu::TextureSampleType::Float { filterable: true },
+                    },
+                    count: None,
+                },
+                wgpu::BindGroupLayoutEntry {
+                    binding: 2,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
+                    count: None,
                 },
             ],
         });
+
+        let properties_bind_group = Self::create_properties_bind_group(
+            device,
+            &properties_buffer,
+            &properties_bind_group_layout,
+            &source_texture_view,
+            &source_texture_sampler
+        );
 
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: Some("Raster Layer Pipeline Layout"),
@@ -230,7 +337,11 @@ impl RasterMeshController {
             transform_bind_group,
             properties_uniform,
             properties_buffer,
+            properties_bind_group_layout,
             properties_bind_group,
+            source_texture,
+            source_texture_view,
+            source_texture_sampler,
             pipeline,
 
             draw_flags: RasterDrawFlag::empty(),
@@ -238,10 +349,37 @@ impl RasterMeshController {
             name: "".to_string(),
             width: 1,
             height: 1,
-            transform: glam::Mat4::IDENTITY,
+            model_transform: glam::Mat4::IDENTITY,
             view_transform: glam::Mat4::IDENTITY,
             visible: true,
             order: 0,
         }
+    }
+
+    fn create_properties_bind_group(
+        device: &wgpu::Device,
+        properties_buffer: &wgpu::Buffer,
+        properties_bind_group_layout: &wgpu::BindGroupLayout,
+        source_texture_view: &wgpu::TextureView,
+        source_texture_sampler: &wgpu::Sampler,
+    ) -> wgpu::BindGroup {
+        device.create_bind_group(&wgpu::BindGroupDescriptor {
+            label: Some("Raster Layer Properties Bind Group"),
+            layout: properties_bind_group_layout,
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: properties_buffer.as_entire_binding(),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::TextureView(&source_texture_view),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 2,
+                    resource: wgpu::BindingResource::Sampler(&source_texture_sampler),
+                },
+            ],
+        })
     }
 }
