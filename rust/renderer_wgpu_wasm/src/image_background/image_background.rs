@@ -3,7 +3,6 @@ use wgpu::util::DeviceExt;
 
 use crate::geometry::{ Vertex };
 use crate::uniform::{ BackgroundImageUniform, TransformUniform };
-use crate::state::{ Drawable };
 
 pub struct ImageBackground {
     pub transform_buffer: wgpu::Buffer,
@@ -12,6 +11,7 @@ pub struct ImageBackground {
     pub properties_buffer: wgpu::Buffer,
     pub properties_bind_group: wgpu::BindGroup,
     pub pipeline: wgpu::RenderPipeline,
+    pub stencil_pipeline: wgpu::RenderPipeline,
 }
 
 impl ImageBackground {
@@ -125,10 +125,68 @@ impl ImageBackground {
                 compilation_options: Default::default(),
             }),
             primitive: wgpu::PrimitiveState::default(),
-            depth_stencil: None,
+            depth_stencil: Some(wgpu::DepthStencilState {
+                format: wgpu::TextureFormat::Depth24PlusStencil8,
+                depth_write_enabled: false,
+                depth_compare: wgpu::CompareFunction::Always,
+                stencil: wgpu::StencilState {
+                    front: wgpu::StencilFaceState {
+                        compare: wgpu::CompareFunction::Equal,
+                        fail_op: wgpu::StencilOperation::Keep,
+                        depth_fail_op: wgpu::StencilOperation::Keep,
+                        pass_op: wgpu::StencilOperation::Keep,
+                    },
+                    back: wgpu::StencilFaceState::IGNORE,
+                    read_mask: 0xFF,
+                    write_mask: 0x00,
+                },
+                bias: wgpu::DepthBiasState::default(),
+            }),
             multisample: wgpu::MultisampleState::default(),
             multiview: None,
-            cache: None, // TODO
+            cache: None,
+        });
+
+        let stencil_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+            label: Some("Image Background Stencil Write Pipeline"),
+            layout: Some(&pipeline_layout),
+            vertex: wgpu::VertexState {
+                module: &shader,
+                entry_point: Some("vs_main"),
+                buffers: &[Vertex::layout()],
+                compilation_options: Default::default(),
+            },
+            fragment: Some(wgpu::FragmentState {
+                module: &shader,
+                entry_point: Some("fs_main"),
+                targets: &[Some(wgpu::ColorTargetState {
+                    format: wgpu::TextureFormat::Rgba8UnormSrgb,
+                    blend: None,
+                    write_mask: wgpu::ColorWrites::empty(),
+                })],
+                compilation_options: Default::default(),
+            }),
+            primitive: wgpu::PrimitiveState::default(),
+            depth_stencil: Some(wgpu::DepthStencilState {
+                format: wgpu::TextureFormat::Depth24PlusStencil8,
+                depth_write_enabled: false,
+                depth_compare: wgpu::CompareFunction::Always,
+                stencil: wgpu::StencilState {
+                    front: wgpu::StencilFaceState {
+                        compare: wgpu::CompareFunction::Always,
+                        fail_op: wgpu::StencilOperation::Keep,
+                        depth_fail_op: wgpu::StencilOperation::Keep,
+                        pass_op: wgpu::StencilOperation::Replace,
+                    },
+                    back: wgpu::StencilFaceState::IGNORE,
+                    read_mask: 0xFF,
+                    write_mask: 0xFF,
+                },
+                bias: wgpu::DepthBiasState::default(),
+            }),
+            multisample: wgpu::MultisampleState::default(),
+            multiview: None,
+            cache: None,
         });
 
         Self {
@@ -138,6 +196,7 @@ impl ImageBackground {
             properties_buffer,
             properties_bind_group,
             pipeline,
+            stencil_pipeline,
         }
     }
 
@@ -176,11 +235,18 @@ impl ImageBackground {
             bytemuck::bytes_of(&self.properties_uniform)
         );
     }
-}
 
-impl Drawable for ImageBackground {
-    fn draw(&self, pass: &mut wgpu::RenderPass) {
+    pub fn draw(&self, pass: &mut wgpu::RenderPass) {
         pass.set_pipeline(&self.pipeline);
+        pass.set_stencil_reference(1);
+        pass.set_bind_group(0, &self.transform_bind_group, &[]);
+        pass.set_bind_group(1, &self.properties_bind_group, &[]);
+        pass.draw(0..6, 0..1);
+    }
+
+    pub fn draw_to_stencil(&self, pass: &mut wgpu::RenderPass) {
+        pass.set_pipeline(&self.stencil_pipeline);
+        pass.set_stencil_reference(1);
         pass.set_bind_group(0, &self.transform_bind_group, &[]);
         pass.set_bind_group(1, &self.properties_bind_group, &[]);
         pass.draw(0..6, 0..1);

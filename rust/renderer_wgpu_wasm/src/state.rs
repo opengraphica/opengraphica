@@ -17,6 +17,9 @@ pub struct RendererState {
     pub projection_matrix: glam::Mat4,
     pub view_matrix: glam::Mat4,
     pub quad_vertex_buffer: wgpu::Buffer,
+    pub depth_stencil_texture: wgpu::Texture,
+    pub depth_stencil_view: wgpu::TextureView,
+    pub image_boundary_mask_enabled: bool,
     pub image_background: crate::image_background::ImageBackground,
     pub mesh_controllers: std::collections::HashMap<u32, Box<
         dyn crate::layers::base::mesh_controller::MeshController

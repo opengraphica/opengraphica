@@ -169,6 +169,7 @@ impl MeshController for RasterMeshController {
         pass.set_pipeline(&self.pipeline);
         pass.set_bind_group(0, &self.transform_bind_group, &[]);
         pass.set_bind_group(1, &self.properties_bind_group, &[]);
+        pass.set_stencil_reference(1);
         pass.draw(0..6, 0..1);
     }
 }
@@ -325,7 +326,23 @@ impl RasterMeshController {
                 compilation_options: Default::default(),
             }),
             primitive: wgpu::PrimitiveState::default(),
-            depth_stencil: None,
+            depth_stencil: Some(wgpu::DepthStencilState {
+                format: wgpu::TextureFormat::Depth24PlusStencil8,
+                depth_write_enabled: false,
+                depth_compare: wgpu::CompareFunction::Always,
+                stencil: wgpu::StencilState {
+                    front: wgpu::StencilFaceState {
+                        compare: wgpu::CompareFunction::Equal,
+                        fail_op: wgpu::StencilOperation::Keep,
+                        depth_fail_op: wgpu::StencilOperation::Keep,
+                        pass_op: wgpu::StencilOperation::Keep,
+                    },
+                    back: wgpu::StencilFaceState::IGNORE,
+                    read_mask: 0xFF,
+                    write_mask: 0x00,
+                },
+                bias: wgpu::DepthBiasState::default(),
+            }),
             multisample: wgpu::MultisampleState::default(),
             multiview: None,
             cache: None, // TODO

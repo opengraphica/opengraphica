@@ -35,11 +35,11 @@ pub fn rectangle_vertices(width: u32, height: u32) -> [Vertex; 6] {
 
     [
         Vertex { position: [x,  y], uv: [0.0, 0.0] },
-        Vertex { position: [x2, y], uv: [1.0, 0.0] },
         Vertex { position: [x2, y2], uv: [1.0, 1.0] },
+        Vertex { position: [x2, y], uv: [1.0, 0.0] },
 
         Vertex { position: [x,  y], uv: [0.0, 0.0] },
-        Vertex { position: [x2, y2], uv: [1.0, 1.0] },
         Vertex { position: [x,  y2], uv: [0.0, 1.0] },
+        Vertex { position: [x2, y2], uv: [1.0, 1.0] },
     ]
 }

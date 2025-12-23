@@ -3,6 +3,7 @@ import wasmLoadModule, {
     set_view_transform as wasmSetViewTransform,
     render as wasmRender,
     resize as wasmResize,
+    enable_image_boundary_mask as wasmEnableImageBoundaryMask,
     set_background_color as wasmSetBackgroundColor,
     add_mesh_controller as wasmAddMeshController,
     update_mesh_controller_name as wasmUpdateMeshControllerName,
@@ -97,7 +98,7 @@ export class WgpuWasmRendererBackend implements WgpuWasmRendererBackendPublic {
         this.dirty = true;
     }
     async enableImageBoundaryMask(enabled: boolean) {
-
+        wasmEnableImageBoundaryMask(enabled);
     }
     async setBackgroundColor(r: number, g: number, b: number, alpha: number) {
         wasmSetBackgroundColor(r, g, b, alpha);

@@ -79,10 +79,18 @@ pub fn initialize(
             )
             .await
             .map_err(|e| JsValue::from_str(&format!("request_device failed: {:?}", e)))?;
+        
+        let surface_capabilities = surface.get_capabilities(&adapter);
+
+        let surface_format = surface_capabilities.formats
+            .iter()
+            .copied()
+            .find(|f| f.is_srgb())
+            .unwrap_or(surface_capabilities.formats[0]);
 
         let config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
-            format: wgpu::TextureFormat::Rgba8UnormSrgb,
+            format: surface_format,
             width: view_width,
             height: view_height,
             present_mode: wgpu::PresentMode::Fifo,
@@ -104,6 +112,22 @@ pub fn initialize(
             usage: wgpu::BufferUsages::VERTEX,
         });
 
+        let depth_stencil_texture = device.create_texture(&wgpu::TextureDescriptor {
+            label: Some("Depth Stencil Texture"),
+            size: wgpu::Extent3d {
+                width: view_width,
+                height: view_height,
+                depth_or_array_layers: 1,
+            },
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            format: wgpu::TextureFormat::Depth24PlusStencil8,
+            usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
+            view_formats: &[],
+        });
+        let depth_stencil_view = depth_stencil_texture.create_view(&Default::default());
+
         let image_background = crate::image_background::ImageBackground::new(
             &device, image_width, image_height
         );
@@ -120,6 +144,9 @@ pub fn initialize(
                 projection_matrix,
                 view_matrix,
                 quad_vertex_buffer,
+                depth_stencil_texture,
+                depth_stencil_view,
+                image_boundary_mask_enabled: false,
                 image_background,
                 mesh_controllers,
                 layer_passes,
@@ -163,7 +190,34 @@ pub fn resize(
         config.height = view_height;
         surface.configure(&device, &config);
 
+        let depth_stencil_texture = device.create_texture(&wgpu::TextureDescriptor {
+            label: Some("Depth Stencil Texture"),
+            size: wgpu::Extent3d {
+                width: view_width,
+                height: view_height,
+                depth_or_array_layers: 1,
+            },
+            mip_level_count: 1,
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            format: wgpu::TextureFormat::Depth24PlusStencil8,
+            usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
+            view_formats: &[],
+        });
+        let depth_stencil_view = depth_stencil_texture.create_view(&Default::default());
+        renderer_state.depth_stencil_view = depth_stencil_view;
+
         image_background.resize(queue, image_width, image_height);
+    });
+}
+
+#[wasm_bindgen]
+pub fn enable_image_boundary_mask(enabled: bool) {
+    RENDERER_STATE.with(|s| {
+        let mut renderer_state = s.borrow_mut();
+        let renderer_state = renderer_state.as_mut().unwrap();
+
+        renderer_state.image_boundary_mask_enabled = enabled;
     });
 }
 
@@ -249,7 +303,9 @@ fn debug_render() {
         let device = &renderer_state.device;
         let queue = &renderer_state.queue;
         
+        let depth_stencil_view = &renderer_state.depth_stencil_view;
         let quad_vertex_buffer = &renderer_state.quad_vertex_buffer;
+        let image_boundary_mask_enabled = renderer_state.image_boundary_mask_enabled;
         let image_background = &renderer_state.image_background;
 
         let mesh_controllers = &mut renderer_state.mesh_controllers;
@@ -283,13 +339,28 @@ fn debug_render() {
                     },
                     depth_slice: None,
                 })],
-                depth_stencil_attachment: None,
+                depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
+                    view: &depth_stencil_view,
+                    depth_ops: Some(wgpu::Operations {
+                        load: wgpu::LoadOp::Load,
+                        store: wgpu::StoreOp::Store,
+                    }),
+                    stencil_ops: Some(wgpu::Operations {
+                        load: if image_boundary_mask_enabled {
+                            wgpu::LoadOp::Clear(0)
+                        } else {
+                            wgpu::LoadOp::Clear(1)
+                        },
+                        store: wgpu::StoreOp::Store,
+                    }),
+                }),
                 occlusion_query_set: None,
                 timestamp_writes: None,
             });
 
             pass.set_vertex_buffer(0, quad_vertex_buffer.slice(..));
 
+            image_background.draw_to_stencil(&mut pass);
             image_background.draw(&mut pass);
 
             for layer_pass in layer_passes {
