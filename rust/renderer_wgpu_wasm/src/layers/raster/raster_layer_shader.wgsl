@@ -6,8 +6,7 @@ struct Transform {
 var<uniform> u_transform: Transform;
 
 struct Properties {
-    size: vec2<f32>,
-    _padding: vec2<f32>,
+    tile_offset_scale: vec4<f32>,
 };
 
 @group(1) @binding(0)
@@ -33,16 +32,8 @@ struct VertexOutput {
 fn vs_main(input: VertexInput) -> VertexOutput {
     var out: VertexOutput;
 
-    let pos = vec4<f32>(input.position, 0.0, 1.0);
-
-    let scale = mat4x4<f32>(
-        vec4<f32>(u_properties.size.x, 0.0, 0.0, 0.0),
-        vec4<f32>(0.0, u_properties.size.y, 0.0, 0.0),
-        vec4<f32>(0.0, 0.0, 1.0, 0.0),
-        vec4<f32>(0.0, 0.0, 0.0, 1.0),
-    );
-
-    out.position = u_transform.matrix * scale * pos;
+    let pixel_pos = input.position * u_properties.tile_offset_scale.zw + u_properties.tile_offset_scale.xy;
+    out.position = u_transform.matrix * vec4<f32>(pixel_pos, 0.0, 1.0);
     out.uv = input.uv;
 
     return out;

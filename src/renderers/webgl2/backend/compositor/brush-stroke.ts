@@ -268,26 +268,26 @@ export class BrushStroke {
     }
 
     populateColor() {
-        this.mesh.material = this.sampleBrushColorMaterial;
-        this.sampleBrushColorMaterial.uniforms.previousColorMap.value = this.brushColorRenderTarget1.texture;
-        this.sampleBrushColorMaterial.uniforms.tileOffsetAndSize.value.x = 0;
-        this.sampleBrushColorMaterial.uniforms.tileOffsetAndSize.value.y = 0;
-        this.sampleBrushColorMaterial.uniforms.tileOffsetAndSize.value.z = 1;
-        this.sampleBrushColorMaterial.uniforms.tileOffsetAndSize.value.w = 1;
-        this.sampleBrushColorMaterial.uniforms.brushColor.value.setW(1);
-        this.sampleBrushColorMaterial.uniforms.brushBlendingPersistenceBearingConcentration.value.x = 0;
-        this.sampleBrushColorMaterial.uniforms.brushBlendingPersistenceBearingConcentration.value.y = 1;
-        this.sampleBrushColorMaterial.uniforms.brushBlendingPersistenceBearingConcentration.value.z = 0;
-        this.sampleBrushColorMaterial.uniformsNeedUpdate = true;
-        this.renderer.setViewport(0, 0, 1, 1);
-        this.renderer.setRenderTarget(this.brushColorRenderTarget2);
-        this.renderer.clearColor();
-        // this.renderer.render(this.scene, this.camera);
-        this.renderer.setRenderTarget(null);
-        this.renderer.setViewport(this.originalViewport);
+        // this.mesh.material = this.sampleBrushColorMaterial;
+        // this.sampleBrushColorMaterial.uniforms.previousColorMap.value = this.brushColorRenderTarget1.texture;
+        // this.sampleBrushColorMaterial.uniforms.tileOffsetAndSize.value.x = 0;
+        // this.sampleBrushColorMaterial.uniforms.tileOffsetAndSize.value.y = 0;
+        // this.sampleBrushColorMaterial.uniforms.tileOffsetAndSize.value.z = 1;
+        // this.sampleBrushColorMaterial.uniforms.tileOffsetAndSize.value.w = 1;
+        // this.sampleBrushColorMaterial.uniforms.brushColor.value.setW(1);
+        // this.sampleBrushColorMaterial.uniforms.brushBlendingPersistenceBearingConcentration.value.x = 0;
+        // this.sampleBrushColorMaterial.uniforms.brushBlendingPersistenceBearingConcentration.value.y = 1;
+        // this.sampleBrushColorMaterial.uniforms.brushBlendingPersistenceBearingConcentration.value.z = 0;
+        // this.sampleBrushColorMaterial.uniformsNeedUpdate = true;
+        // this.renderer.setViewport(0, 0, 1, 1);
+        // this.renderer.setRenderTarget(this.brushColorRenderTarget2);
+        // this.renderer.clearColor();
+        // // this.renderer.render(this.scene, this.camera);
+        // this.renderer.setRenderTarget(null);
+        // this.renderer.setViewport(this.originalViewport);
 
-        this.sampleBrushColorMaterial.uniforms.brushBlendingPersistenceBearingConcentration.value.y = Math.max(0.001, (1.0 - this.brushColorBlendingPersistence) * 0.01);
-        this.sampleBrushColorMaterial.uniformsNeedUpdate = true;
+        // this.sampleBrushColorMaterial.uniforms.brushBlendingPersistenceBearingConcentration.value.y = Math.max(0.001, (1.0 - this.brushColorBlendingPersistence) * 0.01);
+        // this.sampleBrushColorMaterial.uniformsNeedUpdate = true;
     }
 
     move(

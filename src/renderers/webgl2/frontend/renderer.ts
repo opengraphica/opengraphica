@@ -22,7 +22,7 @@ import type { Webgl2RendererBackend, Webgl2RendererBackendPublic } from '@/rende
 import type {
     RGBAColor,
     ClassType, RendererFrontend, RendererFrontendTakeSnapshotOptions,
-    RendererBrushStrokeSettings, RendererBrushStrokePreviewsettings,
+    RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings,
     RendererFrontendApplySelectionMaskToAlphaChannelOptions,
     RendererLayerWatcher, RendererTextureTile, WorkingFileAnyLayer
 } from '@/types';
@@ -399,7 +399,7 @@ export class Webgl2RendererFrontend implements RendererFrontend {
     }
 
     async createBrushPreview(
-        settings: RendererBrushStrokePreviewsettings,
+        settings: RendererBrushStrokePreviewSettings,
     ): Promise<ImageBitmap> {
         if (!this.rendererBackend) {
             await this.waitForRendererInitialized();

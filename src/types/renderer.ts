@@ -47,7 +47,7 @@ export interface RendererBrushStrokeSettingsCommon {
     colorBlendingPersistence: number;
 }
 
-export interface RendererBrushStrokePreviewsettings extends RendererBrushStrokeSettingsCommon {
+export interface RendererBrushStrokePreviewSettings extends RendererBrushStrokeSettingsCommon {
     colorBlendingStrength: number;
     pressureMinColorBlendingStrength: number;
     density: number;
@@ -74,7 +74,7 @@ export interface RendererFrontend {
     startBrushStroke(settings: RendererBrushStrokeSettings): Promise<void>;
     moveBrushStroke(layerId: number, x: number, y: number, size: number, density: number, colorBlendingStrength: number, concentration: number): Promise<void>;
     stopBrushStroke(layerId: number): Promise<RendererTextureTile[]>;
-    createBrushPreview(settings: RendererBrushStrokePreviewsettings): Promise<ImageBitmap>;
+    createBrushPreview(settings: RendererBrushStrokePreviewSettings): Promise<ImageBitmap>;
     dispose(): Promise<void>;
 }
 

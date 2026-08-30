@@ -185,6 +185,7 @@ onMounted(async () => {
     appEmitter.on('editor.history.stopBlocking', hideHistoryNotification);
     window.addEventListener('touchmove', onTouchMoveWindow);
     window.addEventListener('touchend', onTouchEndWindow);
+    window.addEventListener('pointercancel', onPointerUpWindow);
     window.addEventListener('pointerup', onPointerUpWindow);
     window.addEventListener('pointermove', onPointerMoveWindow);
 
@@ -204,6 +205,7 @@ onUnmounted(() => {
     appEmitter.off('editor.history.stopBlocking', hideHistoryNotification);
     window.removeEventListener('touchmove', onTouchMoveWindow);
     window.removeEventListener('touchend', onTouchEndWindow);
+    window.removeEventListener('pointercancel', onPointerUpWindow);
     window.removeEventListener('pointerup', onPointerUpWindow);
     window.removeEventListener('pointermove', onPointerMoveWindow);
 });

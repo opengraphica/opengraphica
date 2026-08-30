@@ -8,7 +8,7 @@ import type {
     Webgl2RendererBackendTakeSnapshotOptions, MeshControllerInterface,
 } from '@/renderers/webgl2/backend';
 import type {
-    RendererBrushStrokeSettings, RendererBrushStrokePreviewsettings, RendererTextureTile,
+    RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings, RendererTextureTile,
     WorkingFileLayer, WorkingFileLayerMask,
 } from '@/types';
 
@@ -253,7 +253,7 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
         return (await this.messageReceived(BackendWorkerMessage.STOP_BRUSH_STROKE_RESULT)).tiles;
     }
 
-    async createBrushPreview(settings: RendererBrushStrokePreviewsettings): Promise<ImageBitmap> {
+    async createBrushPreview(settings: RendererBrushStrokePreviewSettings): Promise<ImageBitmap> {
         this.backendWorker.postMessage({
             type: BackendWorkerMessage.CREATE_BRUSH_PREVIEW,
             settings,

@@ -5,7 +5,7 @@ import { WebGLRenderTarget } from 'three/src/renderers/WebGLRenderTarget';
 
 import { BrushStroke, tryHalfFloatColorBuffers } from './brush-stroke';
 
-import type { RendererBrushStrokePreviewsettings } from '@/types';
+import type { RendererBrushStrokePreviewSettings } from '@/types';
 import type { WebGLRenderer } from 'three';
 
 export class BrushPreview {
@@ -121,7 +121,7 @@ export class BrushPreview {
         return aT + (bT - aT) * ratio;
     }
 
-    async generatePixelBuffer(originalViewport: Vector4, settings: RendererBrushStrokePreviewsettings): Promise<Uint8Array> {
+    async generatePixelBuffer(originalViewport: Vector4, settings: RendererBrushStrokePreviewSettings): Promise<Uint8Array> {
         const brushStroke = new BrushStroke(
             this.renderer,
             undefined,
@@ -152,6 +152,7 @@ export class BrushPreview {
         let density: number;
         let colorBlendingStrength: number;
         let concentration: number;
+
         while (distance < this.length) {
             t = this.getTAtLength(distance);
             
@@ -189,7 +190,7 @@ export class BrushPreview {
         return buffer;
     }
 
-    async generate(originalViewport: Vector4, settings: RendererBrushStrokePreviewsettings): Promise<ImageBitmap> {
+    async generate(originalViewport: Vector4, settings: RendererBrushStrokePreviewSettings): Promise<ImageBitmap> {
 
         // Unfortunately iOS breaks in strange ways depending on the frame buffer type used.
         // If there's an invisible output, switches up the renderer a bit.

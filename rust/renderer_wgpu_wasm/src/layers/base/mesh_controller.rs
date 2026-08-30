@@ -16,6 +16,7 @@ pub trait MeshController {
         &mut self,
         device: &wgpu::Device,
         queue: &wgpu::Queue,
+        mipmap_generator: &crate::mipmap_generator::MipmapGenerator,
         width: u32,
         height: u32,
         format: u8,

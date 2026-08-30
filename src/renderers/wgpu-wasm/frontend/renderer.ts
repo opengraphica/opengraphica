@@ -22,7 +22,7 @@ import type { WgpuWasmRendererBackend, WgpuWasmRendererBackendPublic } from '@/r
 import type {
     RGBAColor,
     ClassType, RendererFrontend, RendererFrontendTakeSnapshotOptions,
-    RendererBrushStrokeSettings, RendererBrushStrokePreviewsettings,
+    RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings,
     RendererFrontendApplySelectionMaskToAlphaChannelOptions,
     RendererLayerWatcher, RendererTextureTile, WorkingFileAnyLayer
 } from '@/types';
@@ -214,7 +214,26 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
     }
 
     async takeSnapshot(imageWidth: number, imageHeight: number, options?: RendererFrontendTakeSnapshotOptions): Promise<ImageBitmap> {
-        return new ImageBitmap();
+        if (!this.rendererBackend) throw Error('Renderer backend not initialized.');
+        const cameraTransform = options?.cameraTransform
+            ? new Float32Array([
+                options.cameraTransform.m11, options.cameraTransform.m21, options.cameraTransform.m31, options.cameraTransform.m41,
+                options.cameraTransform.m12, options.cameraTransform.m22, options.cameraTransform.m32, options.cameraTransform.m42,
+                options.cameraTransform.m13, options.cameraTransform.m23, options.cameraTransform.m33, options.cameraTransform.m43,
+                options.cameraTransform.m14, options.cameraTransform.m24, options.cameraTransform.m34, options.cameraTransform.m44,
+            ])
+            : undefined;
+        const layerIds = options?.layerIds
+            ? new Uint32Array(options.layerIds)
+            : undefined;
+        return await this.rendererBackend.takeSnapshot(imageWidth, imageHeight, {
+            cameraTransform,
+            layerIds,
+            filters: options?.filters,
+            applySelectionMask: options?.applySelectionMask,
+            // invertSelectionMask: options?.invertSelectionMask,
+            disableScaleToSize: options?.disableScaleToSize,
+        });
     }
 
     async pickColor(canvasX: number, canvasY: number): Promise<RGBAColor> {
@@ -233,8 +252,8 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
         return [];
     }
 
-    async createBrushPreview(settings: RendererBrushStrokePreviewsettings): Promise<ImageBitmap> {
-        return new ImageBitmap();
+    async createBrushPreview(settings: RendererBrushStrokePreviewSettings): Promise<ImageBitmap> {
+        return this.rendererBackend.createBrushPreview(settings);
     }
 
     async dispose() {
@@ -315,9 +334,9 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
     }
 
     onLayerOrderCalculated() {
-        // TODO - only pass necessary data for each layer (id, type, blendingMode, layers).
+        // TODO - not sure if passing the layers here is necessary.
         this.rendererBackend.setLayerOrder(
-            deepToRaw(workingFileStore.get('layers'))
+            []
         );
     }
 

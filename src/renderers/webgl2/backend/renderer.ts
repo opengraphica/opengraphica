@@ -25,7 +25,7 @@ import { createCanvasFiltersFromLayerConfig } from '@/renderers/webgl2/layers/ba
 
 import type { Camera, Texture } from 'three';
 import type {
-    RendererBrushStrokeSettings, RendererBrushStrokePreviewsettings, RendererTextureTile,
+    RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings, RendererTextureTile,
     Webgl2RendererCanvasFilter, Webgl2RendererMeshController, WorkingFileLayer,
     WorkingFileGroupLayer, WorkingFileLayerFilter, WorkingFileLayerMask,
     RendererFrontendTakeSnapshotCropOptions, ClassType,
@@ -65,7 +65,7 @@ export interface Webgl2RendererBackendPublic {
     startBrushStroke(settings: RendererBrushStrokeSettings): Promise<void>;
     moveBrushStroke(layerId: number, x: number, y: number, size: number, density: number, colorBlendingStrength: number, concentration: number): Promise<void>;
     stopBrushStroke(layerId: number): Promise<RendererTextureTile[]>;
-    createBrushPreview(settings: RendererBrushStrokePreviewsettings): Promise<ImageBitmap>;
+    createBrushPreview(settings: RendererBrushStrokePreviewSettings): Promise<ImageBitmap>;
     createMeshController(type: string): Promise<MeshControllerInterface>;
     setDirty(): Promise<void>;
     dispose(): Promise<void>;
@@ -577,7 +577,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
     }
 
     async createBrushPreview(
-        settings: RendererBrushStrokePreviewsettings,
+        settings: RendererBrushStrokePreviewSettings,
     ): Promise<ImageBitmap> {
         return await this.compositor.createBrushPreview(settings);
     }

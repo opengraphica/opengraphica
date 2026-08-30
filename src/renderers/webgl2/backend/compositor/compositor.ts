@@ -7,7 +7,7 @@ import { BrushStroke } from './brush-stroke';
 
 import type { WebGLRenderer } from 'three';
 import type { SelectionMask } from '../selection-mask';
-import type { RendererBrushStrokeSettings, RendererBrushStrokePreviewsettings, RendererTextureTile } from '@/types';
+import type { RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings, RendererTextureTile } from '@/types';
 
 export class Compositor {
     renderer!: WebGLRenderer;
@@ -73,7 +73,7 @@ export class Compositor {
     }
 
     async createBrushPreview(
-        settings: RendererBrushStrokePreviewsettings,
+        settings: RendererBrushStrokePreviewSettings,
     ): Promise<ImageBitmap> {
         return await this.brushPreview.generate(
             this.originalViewport, settings,

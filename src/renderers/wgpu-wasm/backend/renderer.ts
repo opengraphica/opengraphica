@@ -1,10 +1,13 @@
 import wasmLoadModule, {
     initialize as wasmInitializeRenderer,
-    set_view_transform as wasmSetViewTransform,
     render as wasmRender,
     resize as wasmResize,
     enable_image_boundary_mask as wasmEnableImageBoundaryMask,
     set_background_color as wasmSetBackgroundColor,
+    set_view_transform as wasmSetViewTransform,
+    set_layer_order as wasmSetLayerOrder,
+    take_snapshot as wasmTakeSnapshot,
+    create_brush_preview as wasmCreateBrushPreview,
     add_mesh_controller as wasmAddMeshController,
     update_mesh_controller_name as wasmUpdateMeshControllerName,
     update_mesh_controller_size as wasmUpdateMeshControllerSize,
@@ -18,7 +21,7 @@ import wasmLoadModule, {
 import { messageBus } from './message-bus';
 
 import type {
-    RendererBrushStrokeSettings, RendererBrushStrokePreviewsettings, RendererTextureTile,
+    RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings, RendererTextureTile,
     Webgl2RendererCanvasFilter, WgpuWasmRendererMeshController, WorkingFileLayer,
     WorkingFileGroupLayer, WorkingFileLayerFilter, WorkingFileLayerMask,
     RendererFrontendTakeSnapshotCropOptions, ClassType,
@@ -57,7 +60,7 @@ export interface WgpuWasmRendererBackendPublic {
     startBrushStroke(settings: RendererBrushStrokeSettings): Promise<void>;
     moveBrushStroke(layerId: number, x: number, y: number, size: number, density: number, colorBlendingStrength: number, concentration: number): Promise<void>;
     stopBrushStroke(layerId: number): Promise<RendererTextureTile[]>;
-    createBrushPreview(settings: RendererBrushStrokePreviewsettings): Promise<ImageBitmap>;
+    createBrushPreview(settings: RendererBrushStrokePreviewSettings): Promise<ImageBitmap>;
     createMeshController(type: string): Promise<MeshControllerInterface>;
     setDirty(): Promise<void>;
     dispose(): Promise<void>;
@@ -114,7 +117,7 @@ export class WgpuWasmRendererBackend implements WgpuWasmRendererBackendPublic {
         this.dirty = true;
     }
     async setLayerOrder(layerOrder: WorkingFileLayer[]) {
-
+        wasmSetLayerOrder();
     }
     async queueCreateLayerPasses() {
 
@@ -123,7 +126,24 @@ export class WgpuWasmRendererBackend implements WgpuWasmRendererBackendPublic {
         return [];
     }
     async takeSnapshot(imageWidth: number, imageHeight: number, options?: WgpuWasmRendererBackendTakeSnapshotOptions): Promise<ImageBitmap> {
-        return new ImageBitmap();
+        let dirtyInterval = setInterval(() => {
+            this.dirty = true;
+        }, 16);
+        let wasmImageData: WasmImageData = await wasmTakeSnapshot(
+            imageWidth,
+            imageHeight,
+            options?.cameraTransform,
+            options?.layerIds,
+            options?.filters,
+            options?.applySelectionMask,
+            options?.disableScaleToSize,
+        );
+        clearInterval(dirtyInterval);
+        return createImageBitmap(new ImageData(
+            new Uint8ClampedArray(wasmImageData.buffer),
+            wasmImageData.width,
+            wasmImageData.height,
+        ));
     }
     async startBrushStroke(settings: RendererBrushStrokeSettings) {
 
@@ -134,8 +154,32 @@ export class WgpuWasmRendererBackend implements WgpuWasmRendererBackendPublic {
     async stopBrushStroke(layerId: number): Promise<RendererTextureTile[]> {
         return [];
     }
-    async createBrushPreview(settings: RendererBrushStrokePreviewsettings): Promise<ImageBitmap> {
-        return new ImageBitmap();
+    async createBrushPreview(settings: RendererBrushStrokePreviewSettings): Promise<ImageBitmap> {
+        let dirtyInterval = setInterval(() => {
+            this.dirty = true;
+        }, 16);
+        let wasmImageData: WasmImageData = await wasmCreateBrushPreview(
+            new Float32Array([settings.color[0], settings.color[1], settings.color[2], settings.color[3]]),
+            settings.size,
+            settings.hardness,
+            settings.colorBlendingPersistence,
+            settings.colorBlendingStrength,
+            settings.pressureMinColorBlendingStrength,
+            settings.density,
+            settings.pressureMinDensity,
+            settings.concentration,
+            settings.pressureMinConcentration,
+            settings.pressureMinSize,
+            settings.jitter,
+            settings.spacing,
+            settings.pressureTaper,
+        );
+        clearInterval(dirtyInterval);
+        return createImageBitmap(new ImageData(
+            new Uint8ClampedArray(wasmImageData.buffer),
+            wasmImageData.width,
+            wasmImageData.height,
+        ));
     }
     async createMeshController(type: string): Promise<MeshControllerInterface> {
         return new this.meshControllersByType[type]();
