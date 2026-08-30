@@ -2,6 +2,7 @@ use std::fmt;
 use crate::compositor::pipeline_helpers::{
     create_uniform_buffer,
     create_pipeline,
+    create_brush_stroke_transform_uniform_buffer,
     make_brush_stroke_bind_group_layout,
     make_copy_tile_bind_group_layout,
     make_sample_color_bind_group_layout,
@@ -51,11 +52,15 @@ pub struct BrushStroke<'a> {
     layer_transform: glam::Mat4,
     layer_transform_inverse: glam::Mat4,
 
-    brush_stroke_uniform_buffer: wgpu::Buffer,
+    // brush_stroke_uniform_buffer: wgpu::Buffer,
+    brush_stroke_transform_uniform_index: usize, // +1 for each time a new uniform is created in the command encoder queue
+    brush_stroke_transform_uniform_buffer: wgpu::Buffer,
+    brush_stroke_transform_uniform_stride: usize,
     brush_stroke_bind_group_layout: wgpu::BindGroupLayout,
     brush_stroke_pipeline: wgpu::RenderPipeline,
     copy_tile_uniform_buffer: wgpu::Buffer,
     copy_tile_bind_group_layout: wgpu::BindGroupLayout,
+    copy_tile_uniforms: CopyTileUniform,
     copy_tile_pipeline: wgpu::RenderPipeline,
     destination_pipeline: wgpu::RenderPipeline,
     sample_color_uniform_index: usize, // +1 for each time a new uniform is created in the command encoder queue
@@ -85,7 +90,9 @@ pub struct BrushStroke<'a> {
 
     destination_texture_render_targets: Vec<Option<RenderTarget>>,
     brush_stroke_render_targets: Vec<Option<RenderTarget>>,
+    brush_stroke_bind_groups: Vec<Option<(wgpu::BindGroup, wgpu::BindGroup)>>,
     brush_blend_render_target_stack: Vec<RenderTarget>,
+    copy_brush_blend_tile_bind_group_stack: Vec<wgpu::BindGroup>,
     output_render_target_stack: Vec<RenderTarget>,
 }
 
@@ -101,10 +108,12 @@ impl<'a> BrushStroke<'a> {
     pub fn new(
         adapter: &wgpu::Adapter,
         device: &wgpu::Device,
+        queue: &wgpu::Queue,
         selection_mask: Option<f32>, // TODO - placeholder
         texture: &'a wgpu::TextureView,
         texture_width: u32,
         texture_height: u32,
+        tile_size_override: Option<u32>,
         layer_transform: glam::Mat4,
         settings: RendererBrushStrokeSettings,
     ) -> Result<Self, Box<dyn std::error::Error>> {
@@ -116,18 +125,21 @@ impl<'a> BrushStroke<'a> {
 
         let layer_transform_inverse = layer_transform.inverse();
 
-        let min_tile_size = 256_u32.max(texture_width.max(texture_height) / 8);
-        let approximate_tile_count =
-            ((settings.size * settings.size).sqrt() / 1024.0).ceil().max(1.0);
-        let estimated_tile_size =
-            ((settings.size * settings.size) / approximate_tile_count)
-                .sqrt()
-                .floor()
-                .max(min_tile_size as f32)
-                .min(8192.0);
+        let tile_size = if let Some(tile_size) = tile_size_override {
+            tile_size
+        } else {
+            let min_tile_size = 256_u32.max(texture_width.max(texture_height) / 8);
+            let approximate_tile_count =
+                ((settings.size * settings.size).sqrt() / 1024.0).ceil().max(1.0);
+            let estimated_tile_size =
+                ((settings.size * settings.size) / approximate_tile_count)
+                    .sqrt()
+                    .floor()
+                    .max(min_tile_size as f32)
+                    .min(8192.0);
+            (estimated_tile_size as u32).max(1).next_power_of_two()
+        };
         
-        let tile_size = (estimated_tile_size as u32).max(1).next_power_of_two();
-
         let x_tile_count = texture_width.div_ceil(tile_size);
         let y_tile_count = texture_height.div_ceil(tile_size);
         let tile_count = (x_tile_count * y_tile_count) as usize;
@@ -165,12 +177,14 @@ impl<'a> BrushStroke<'a> {
             "Brush Color 2",
         );
 
-        let brush_stroke_uniform_buffer = create_uniform_buffer::<BrushStrokeUniform>(
-            &device,
-            "Brush Stroke Uniform Buffer",
-        );
         let brush_stroke_bind_group_layout =
             make_brush_stroke_bind_group_layout(&device);
+        let brush_stroke_transform_uniform_stride =
+            (std::mem::size_of::<BrushStrokeUniform>() + alignment - 1) & !(alignment - 1);
+        let brush_stroke_transform_uniform_buffer_size =
+            brush_stroke_transform_uniform_stride * settings.max_move_count as usize * tile_count as usize;
+        let brush_stroke_transform_uniform_buffer =
+            create_brush_stroke_transform_uniform_buffer(&device, brush_stroke_transform_uniform_buffer_size as u64);
         let brush_stroke_pipeline = create_pipeline(
             &device,
             &brush_stroke_bind_group_layout,
@@ -185,6 +199,14 @@ impl<'a> BrushStroke<'a> {
         );
         let copy_tile_bind_group_layout =
             make_copy_tile_bind_group_layout(&device);
+        let copy_tile_uniforms = CopyTileUniform {
+            tile_offset_and_size: [0.0, 0.0, 1.0, 1.0],
+        };
+        queue.write_buffer(
+            &copy_tile_uniform_buffer,
+            0,
+            bytemuck::bytes_of(&copy_tile_uniforms),
+        );
         let copy_tile_pipeline = create_pipeline(
             &device,
             &copy_tile_bind_group_layout,
@@ -202,7 +224,8 @@ impl<'a> BrushStroke<'a> {
 
         let sample_color_bind_group_layout =
             make_sample_color_bind_group_layout(&device);
-        let sample_color_uniform_stride = (std::mem::size_of::<SampleBrushColorUniform>() + alignment - 1) & !(alignment - 1);
+        let sample_color_uniform_stride =
+            (std::mem::size_of::<SampleBrushColorUniform>() + alignment - 1) & !(alignment - 1);
         let sample_color_uniform_buffer_size = sample_color_uniform_stride * settings.max_move_count as usize;
         let sample_color_uniform_buffer =
             create_sample_color_uniform_buffer(&device, sample_color_uniform_buffer_size as u64);
@@ -262,11 +285,15 @@ impl<'a> BrushStroke<'a> {
                 layer_transform,
                 layer_transform_inverse,
 
-                brush_stroke_uniform_buffer,
+                // brush_stroke_uniform_buffer,
+                brush_stroke_transform_uniform_index: 0,
+                brush_stroke_transform_uniform_buffer,
+                brush_stroke_transform_uniform_stride,
                 brush_stroke_bind_group_layout,
                 brush_stroke_pipeline,
                 copy_tile_uniform_buffer,
                 copy_tile_bind_group_layout,
+                copy_tile_uniforms,
                 copy_tile_pipeline,
                 destination_pipeline,
                 sample_color_uniform_index: 0,
@@ -298,7 +325,10 @@ impl<'a> BrushStroke<'a> {
                     (0..tile_count).map(|_| None).collect(),
                 brush_stroke_render_targets:
                     (0..tile_count).map(|_| None).collect(),
+                brush_stroke_bind_groups:
+                    (0..tile_count).map(|_| None).collect(),
                 brush_blend_render_target_stack: vec![],
+                copy_brush_blend_tile_bind_group_stack: vec![],
                 output_render_target_stack: vec![],
                 
             }
@@ -471,6 +501,7 @@ impl<'a> BrushStroke<'a> {
                     0.0,
                     1.0,
                 );
+                pass.set_scissor_rect(0, 0, 8, 8);
 
                 pass.draw(0..6, 0..1);
             }
@@ -515,12 +546,22 @@ impl<'a> BrushStroke<'a> {
                     tile_width,
                     tile_height,
                 );
+                let brush_blend_render_target_index =
+                    self.create_brush_blend_render_target(
+                        adapter,
+                        device,
+                        tile_width,
+                        tile_height,
+                    );
                 let brush_stroke_render_target_option = &self.brush_stroke_render_targets[brush_stroke_render_target_index];
+                let brush_blend_render_target = &self.brush_blend_render_target_stack[brush_blend_render_target_index];
+                let brush_stroke_bind_groups_option = &self.brush_stroke_bind_groups[brush_stroke_render_target_index];
 
                 /*
                  * Render one of the tiles for self brush stroke.
                  */
-                if let Some(brush_stroke_render_target) = brush_stroke_render_target_option {
+                if let Some(brush_stroke_render_target) = brush_stroke_render_target_option
+                    && let Some(brush_stroke_bind_groups) = brush_stroke_bind_groups_option {
 
                     let brush_tile_offset_x =
                         (tile_x as f32 - brush_left) / brush_size;
@@ -565,165 +606,130 @@ impl<'a> BrushStroke<'a> {
                             1.0,
                         ));
                     
-                    let brush_stroke_uniforms = BrushStrokeUniform {
+                    let brush_stroke_transform_uniforms = BrushStrokeUniform {
                         tile_offset_and_size: [0.0, 0.0, 1.0, 1.0],
                         brush_transform: brush_transform.to_cols_array_2d(),
                         brush_hardness_and_padding: [brush_hardness, 0.0, 0.0, 0.0],
                     };
 
+                    let brush_stroke_transform_uniform_offset =
+                        self.brush_stroke_transform_uniform_index * self.brush_stroke_transform_uniform_stride;
+                    self.brush_stroke_transform_uniform_index += 1;
                     queue.write_buffer(
-                        &self.brush_stroke_uniform_buffer,
-                        0,
-                        bytemuck::bytes_of(&brush_stroke_uniforms),
+                        &self.brush_stroke_transform_uniform_buffer,
+                        brush_stroke_transform_uniform_offset as u64,
+                        bytemuck::bytes_of(&brush_stroke_transform_uniforms),
                     );
 
-                    let active_brush_color_render_target =
+                    let brush_stroke_bind_group =
                         if active_brush_color_render_target_number == 1 {
-                            &self.brush_color_render_target_1
+                            &brush_stroke_bind_groups.0
                         } else {
-                            &self.brush_color_render_target_2
+                            &brush_stroke_bind_groups.1
                         };
 
-                    // let brush_stroke_bind_group = create_brush_stroke_bind_group(
-                    //     device,
-                    //     &self.brush_stroke_bind_group_layout,
-                    //     &brush_stroke_render_target.view,
-                    //     &active_brush_color_render_target.view,
-                    //     &brush_stroke_uniforms,
-                    //     &self.texture_sampler,
-                    // );
+                    {
+                        let color_attachment =
+                            wgpu::RenderPassColorAttachment {
+                                view: &brush_blend_render_target.view,
+                                depth_slice: None,
+                                resolve_target: None,
+                                ops: wgpu::Operations {
+                                    load: wgpu::LoadOp::Clear(
+                                        wgpu::Color::TRANSPARENT,
+                                    ),
+                                    store: wgpu::StoreOp::Store,
+                                },
+                            };
 
-                //     let brush_blend_render_target_index =
-                //         self.create_brush_blend_render_target(
-                //             adapter,
-                //             device,
-                //             tile_width,
-                //             tile_height,
-                //         );
-                //     let brush_blend_render_target = &self.brush_blend_render_target_stack[brush_blend_render_target_index];
+                        let mut pass = encoder.begin_render_pass(
+                            &wgpu::RenderPassDescriptor {
+                                label: Some("Render Brush Blend Tile"),
+                                color_attachments: &[Some(
+                                    color_attachment,
+                                )],
+                                depth_stencil_attachment: None,
+                                occlusion_query_set: None,
+                                timestamp_writes: None,
+                                multiview_mask: None,
+                            },
+                        );
 
-                //     {
-                //         let color_attachment =
-                //             wgpu::RenderPassColorAttachment {
-                //                 view: &brush_blend_render_target.view,
-                //                 depth_slice: None,
-                //                 resolve_target: None,
-                //                 ops: wgpu::Operations {
-                //                     load: wgpu::LoadOp::Clear(
-                //                         wgpu::Color::TRANSPARENT,
-                //                     ),
-                //                     store: wgpu::StoreOp::Store,
-                //                 },
-                //             };
+                        pass.set_pipeline(&self.brush_stroke_pipeline);
+                        pass.set_bind_group(0, brush_stroke_bind_group, &[brush_stroke_transform_uniform_offset as u32]);
+                        pass.set_vertex_buffer(
+                            0,
+                            quad_vertex_buffer.slice(..),
+                        );
 
-                //         let mut pass = encoder.begin_render_pass(
-                //             &wgpu::RenderPassDescriptor {
-                //                 label: Some("Render Brush Blend Tile"),
-                //                 color_attachments: &[Some(
-                //                     color_attachment,
-                //                 )],
-                //                 depth_stencil_attachment: None,
-                //                 occlusion_query_set: None,
-                //                 timestamp_writes: None,
-                //                 multiview_mask: None,
-                //             },
-                //         );
+                        pass.set_viewport(
+                            0.0,
+                            0.0,
+                            tile_width as f32,
+                            tile_height as f32,
+                            0.0,
+                            1.0,
+                        );
+                        pass.set_scissor_rect(0, 0, tile_width, tile_height);
 
-                //         pass.set_pipeline(&self.brush_stroke_pipeline);
-                //         pass.set_bind_group(0, &brush_stroke_bind_group, &[]);
-                //         pass.set_vertex_buffer(
-                //             0,
-                //             quad_vertex_buffer.slice(..),
-                //         );
+                        pass.draw(0..6, 0..1);
+                    }
 
-                //         pass.set_viewport(
-                //             0.0,
-                //             0.0,
-                //             tile_width as f32,
-                //             tile_height as f32,
-                //             0.0,
-                //             1.0,
-                //         );
-
-                //         pass.draw(0..6, 0..1);
-                //     }
-
-                //     /*
-                //      * Copy the temporary brush stroke result into the persistent
-                //      * brush render target for self tile.
-                //      */
-                //     let copy_uniforms = CopyTileUniform {
-                //         tile_offset_and_size: [0.0, 0.0, 1.0, 1.0],
-                //     };
-
-                //     queue.write_buffer(
-                //         &self.copy_tile_uniform_buffer,
-                //         0,
-                //         bytemuck::bytes_of(&copy_uniforms),
-                //     );
-
-                //     let copy_bind_group = create_copy_tile_bind_group(
-                //         device,
-                //         &self.copy_tile_bind_group_layout,
-                //         &brush_blend_render_target.view,
-                //         &copy_uniforms,
-                //         &self.texture_sampler,
-                //     );
-
-                //     let mut brush_stroke_render_target_option = &self.brush_stroke_render_targets[brush_stroke_render_target_index];
+                    let mut brush_stroke_render_target_option = &self.brush_stroke_render_targets[brush_stroke_render_target_index];
+                    let copy_tile_bind_group = &self.copy_brush_blend_tile_bind_group_stack[brush_blend_render_target_index];
                     
-                //     if let Some(brush_stroke_render_target) = brush_stroke_render_target_option {
-                //         let color_attachment =
-                //             wgpu::RenderPassColorAttachment {
-                //                 view: &brush_stroke_render_target.view,
-                //                 depth_slice: None,
-                //                 resolve_target: None,
-                //                 ops: wgpu::Operations {
-                //                     load: wgpu::LoadOp::Clear(
-                //                         wgpu::Color::TRANSPARENT,
-                //                     ),
-                //                     store: wgpu::StoreOp::Store,
-                //                 },
-                //             };
+                    if let Some(brush_stroke_render_target) = brush_stroke_render_target_option {
+                        let color_attachment =
+                            wgpu::RenderPassColorAttachment {
+                                view: &brush_stroke_render_target.view,
+                                depth_slice: None,
+                                resolve_target: None,
+                                ops: wgpu::Operations {
+                                    load: wgpu::LoadOp::Clear(
+                                        wgpu::Color::TRANSPARENT,
+                                    ),
+                                    store: wgpu::StoreOp::Store,
+                                },
+                            };
 
-                //         let mut pass = encoder.begin_render_pass(
-                //             &wgpu::RenderPassDescriptor {
-                //                 label: Some("Copy Brush Tile"),
-                //                 color_attachments: &[Some(
-                //                     color_attachment,
-                //                 )],
-                //                 depth_stencil_attachment: None,
-                //                 occlusion_query_set: None,
-                //                 timestamp_writes: None,
-                //                 multiview_mask: None,
-                //             },
-                //         );
+                        let mut pass = encoder.begin_render_pass(
+                            &wgpu::RenderPassDescriptor {
+                                label: Some("Copy Brush Tile"),
+                                color_attachments: &[Some(
+                                    color_attachment,
+                                )],
+                                depth_stencil_attachment: None,
+                                occlusion_query_set: None,
+                                timestamp_writes: None,
+                                multiview_mask: None,
+                            },
+                        );
 
-                //         pass.set_pipeline(&self.copy_tile_pipeline);
-                //         pass.set_bind_group(0, &copy_bind_group, &[]);
-                //         pass.set_vertex_buffer(
-                //             0,
-                //             quad_vertex_buffer.slice(..),
-                //         );
+                        pass.set_pipeline(&self.copy_tile_pipeline);
+                        pass.set_bind_group(0, copy_tile_bind_group, &[]);
+                        pass.set_vertex_buffer(
+                            0,
+                            quad_vertex_buffer.slice(..),
+                        );
 
-                //         pass.set_viewport(
-                //             0.0,
-                //             0.0,
-                //             tile_width as f32,
-                //             tile_height as f32,
-                //             0.0,
-                //             1.0,
-                //         );
+                        pass.set_viewport(
+                            0.0,
+                            0.0,
+                            tile_width as f32,
+                            tile_height as f32,
+                            0.0,
+                            1.0,
+                        );
+                        pass.set_scissor_rect(0, 0, tile_width, tile_height);
 
-                //         pass.draw(0..6, 0..1);
-                //     }
+                        pass.draw(0..6, 0..1);
+                    }
 
+                    let tile_index =
+                        (yi * self.x_tile_count + xi) as usize;
+                    self.all_dirty_tiles[tile_index] = 1;
+                    self.composite_dirty_tiles[tile_index] = 1;
                 }
-
-                let tile_index =
-                    (yi * self.x_tile_count + xi) as usize;
-                self.all_dirty_tiles[tile_index] = 1;
-                self.composite_dirty_tiles[tile_index] = 1;
             }
         }
 
@@ -853,6 +859,7 @@ impl<'a> BrushStroke<'a> {
                         0.0,
                         1.0,
                     );
+                    pass.set_scissor_rect(0, 0, tile_width, tile_height);
 
                     pass.draw(0..6, 0..1);
                 }
@@ -890,6 +897,22 @@ impl<'a> BrushStroke<'a> {
 
             }
         }
+
+        // This is added to fix a sporadic bug in mobile firefox/chrome where the pixels rendered
+        // on the last tile are sometimes not fully copied over. It's basically a noop.
+        if self.output_render_target_stack.len() > 0 {
+            self.output_render_target_stack[0].clear(
+                device,
+                queue,
+                encoder,
+                wgpu::Color {
+                    r: 0.0,
+                    g: 0.0,
+                    b: 0.0,
+                    a: 0.0,
+                },
+            );
+        }
     }
 
     // fn collect_tiles()
@@ -910,15 +933,39 @@ impl<'a> BrushStroke<'a> {
             } else {
                 wgpu::TextureFormat::Rgba8Unorm
             };
-            self.brush_stroke_render_targets[tile_index] = Some(
-                RenderTarget::new(
-                    device,
-                    tile_width,
-                    tile_height,
-                    texture_format,
-                    "Brush Stroke Render Target"
-                )
+            let brush_stroke_render_target = RenderTarget::new(
+                device,
+                tile_width,
+                tile_height,
+                texture_format,
+                "Brush Stroke Render Target"
             );
+
+            if (self.brush_stroke_bind_groups[tile_index].is_none()) {
+                self.brush_stroke_bind_groups[tile_index] = Some(
+                    (
+                        create_brush_stroke_bind_group(
+                            device,
+                            &self.brush_stroke_transform_uniform_buffer,
+                            &self.brush_stroke_bind_group_layout,
+                            &brush_stroke_render_target.view,
+                            &self.brush_color_render_target_1.view,
+                            &self.texture_sampler,
+                        ),
+                        create_brush_stroke_bind_group(
+                            device,
+                            &self.brush_stroke_transform_uniform_buffer,
+                            &self.brush_stroke_bind_group_layout,
+                            &brush_stroke_render_target.view,
+                            &self.brush_color_render_target_2.view,
+                            &self.texture_sampler,
+                        ),
+                    )
+                );
+            }
+
+            self.brush_stroke_render_targets[tile_index] = Some(brush_stroke_render_target);
+
         }
         return tile_index;
     }
@@ -947,6 +994,14 @@ impl<'a> BrushStroke<'a> {
             texture_format,
             "Brush Blend Render Target"
         );
+        let copy_tile_bind_group = create_copy_tile_bind_group(
+            device,
+            &self.copy_tile_bind_group_layout,
+            &render_target.view,
+            &self.copy_tile_uniforms,
+            &self.texture_sampler,
+        );
+        self.copy_brush_blend_tile_bind_group_stack.push(copy_tile_bind_group);
         self.brush_blend_render_target_stack.push(render_target);
         self.brush_blend_render_target_stack.len() - 1
     }
@@ -1038,6 +1093,7 @@ impl<'a> BrushStroke<'a> {
                     0.0,
                     1.0,
                 );
+                pass.set_scissor_rect(0, 0, tile_width, tile_height);
 
                 pass.draw(0..6, 0..1);
             }

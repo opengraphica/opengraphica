@@ -90,14 +90,11 @@ impl RenderTarget {
         &self,
         device: &wgpu::Device,
         queue: &wgpu::Queue,
+        mut encoder: &mut wgpu::CommandEncoder,
         color: wgpu::Color,
     ) {
-        let mut encoder = device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
-            label: Some("Render Target Clear Encoder"),
-        });
-
         {
-            let _ = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+            let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("Clear Render Target"),
                 color_attachments: &[Some(wgpu::RenderPassColorAttachment {
                     view: &self.view,
@@ -113,8 +110,16 @@ impl RenderTarget {
                 occlusion_query_set: None,
                 multiview_mask: None,
             });
-        }
 
-        queue.submit(std::iter::once(encoder.finish()));
+            pass.set_viewport(
+                0.0,
+                0.0,
+                self.width as f32,
+                self.height as f32,
+                0.0,
+                1.0,
+            );
+            pass.set_scissor_rect(0, 0, self.width, self.height);
+        }
     }
 }

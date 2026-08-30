@@ -117,7 +117,18 @@ pub fn make_brush_stroke_bind_group_layout(
             bind_group_texture_entry(0),
             bind_group_texture_entry(1),
             bind_group_sampler_entry(2),
-            bind_group_uniform_entry(3),
+            wgpu::BindGroupLayoutEntry {
+                binding: 3,
+                visibility: wgpu::ShaderStages::FRAGMENT,
+                ty: wgpu::BindingType::Buffer {
+                    ty: wgpu::BufferBindingType::Uniform,
+                    has_dynamic_offset: true,
+                    min_binding_size: std::num::NonZeroU64::new(
+                        std::mem::size_of::<BrushStrokeUniform>() as u64
+                    ),
+                },
+                count: None,
+            },
         ],
     })
 }
@@ -221,23 +232,26 @@ pub fn create_brush_compositor_bind_group(
     )
 }
 
+pub fn create_brush_stroke_transform_uniform_buffer(
+    device: &wgpu::Device,
+    buffer_size: u64,
+) -> wgpu::Buffer {
+    device.create_buffer(&wgpu::BufferDescriptor {
+        label: Some("Brush Stroke Uniform Buffer"),
+        size: buffer_size,
+        usage: wgpu::BufferUsages::UNIFORM | wgpu::BufferUsages::COPY_DST,
+        mapped_at_creation: false,
+    })
+}
+
 pub fn create_brush_stroke_bind_group(
     device: &wgpu::Device,
+    transform_uniform_buffer: &wgpu::Buffer,
     brush_stroke_bind_group_layout: &wgpu::BindGroupLayout,
     stroke_texture: &wgpu::TextureView,
     color_texture: &wgpu::TextureView,
-    uniforms: &BrushStrokeUniform,
     sampler: &wgpu::Sampler,
 ) -> wgpu::BindGroup {
-    let uniform_buffer = device.create_buffer_init(
-        &wgpu::util::BufferInitDescriptor {
-            label: Some("Brush Stroke Uniform Buffer"),
-            contents: bytemuck::bytes_of(uniforms),
-            usage: wgpu::BufferUsages::UNIFORM
-                | wgpu::BufferUsages::COPY_DST,
-        },
-    );
-
     device.create_bind_group(
         &wgpu::BindGroupDescriptor {
             label: Some("Brush Stroke Bind Group"),
@@ -261,7 +275,15 @@ pub fn create_brush_stroke_bind_group(
                 },
                 wgpu::BindGroupEntry {
                     binding: 3,
-                    resource: uniform_buffer.as_entire_binding(),
+                    resource: wgpu::BindingResource::Buffer(
+                        wgpu::BufferBinding {
+                            buffer: &transform_uniform_buffer,
+                            offset: 0,
+                            size: std::num::NonZeroU64::new(
+                                std::mem::size_of::<BrushStrokeUniform>() as u64
+                            ),
+                        },
+                    ),
                 },
             ],
         },
@@ -340,8 +362,6 @@ pub fn create_sample_color_bind_group(
                     ),
                 },
                 wgpu::BindGroupEntry {
-                    // Required by the current layout. If unused by
-                    // the shader, remove this binding from the layout.
                     binding: 1,
                     resource: wgpu::BindingResource::TextureView(
                         sample_texture,
@@ -351,7 +371,7 @@ pub fn create_sample_color_bind_group(
                     binding: 2,
                     resource: wgpu::BindingResource::Sampler(sampler),
                 },
-                 wgpu::BindGroupEntry {
+                wgpu::BindGroupEntry {
                     binding: 3,
                     resource: wgpu::BindingResource::Buffer(
                         wgpu::BufferBinding {

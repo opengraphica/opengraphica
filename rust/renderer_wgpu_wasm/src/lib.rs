@@ -245,6 +245,8 @@ pub fn resize(
             renderer_state.depth_stencil_view = depth_stencil_view;
 
             image_background.resize(queue, image_width, image_height);
+        } else {
+            console::warn_1(&"renderer_wgpu_wasm.resize() aborted due to busy render state.".into());
         }
     });
 }
@@ -256,6 +258,8 @@ pub fn enable_image_boundary_mask(enabled: bool) {
             let renderer_state = renderer_state.as_mut().unwrap();
 
             renderer_state.image_boundary_mask_enabled = enabled;
+        } else {
+            console::warn_1(&"renderer_wgpu_wasm.enable_image_boundary_mask() aborted due to busy render state.".into());
         }
     });
 }
@@ -275,6 +279,8 @@ pub fn set_background_color(
             let image_background = &mut renderer_state.image_background;
         
             image_background.set_color(queue, r, g, b, alpha);
+        } else {
+            console::warn_1(&"renderer_wgpu_wasm.set_background_color() aborted due to busy render state.".into());
         }
     });
 }
@@ -309,6 +315,8 @@ pub fn set_view_transform(
             renderer_state.view_matrix = view_matrix;
 
             apply_view_matrix(renderer_state, view_matrix);
+        } else {
+            console::warn_1(&"renderer_wgpu_wasm.set_view_transform() aborted due to busy render state.".into());
         }
     });
 }
@@ -677,6 +685,8 @@ pub fn render() {
             render_main(renderer_state, &view, None);
 
             renderer_state.queue.present(frame);
+        } else {
+            console::warn_1(&"renderer_wgpu_wasm.render() aborted due to busy render state.".into());
         }
     });
 }
@@ -779,6 +789,8 @@ pub fn add_mesh_controller(id: u32, controller_type: u8) {
             }
 
             queue_create_layer_passes();
+        } else {
+            console::warn_1(&"renderer_wgpu_wasm.add_mesh_controller() aborted due to busy render state.".into());
         }
     });
 }
@@ -794,6 +806,8 @@ pub fn update_mesh_controller_name(id: u32, name: &str) {
             if let Some(mesh_controller) = mesh_controllers.get_mut(&id) {
                 mesh_controller.set_name(name);
             }
+        } else {
+            console::warn_1(&"renderer_wgpu_wasm.update_mesh_controller_name() aborted due to busy render state.".into());
         }
     });
 }
@@ -809,6 +823,8 @@ pub fn update_mesh_controller_size(id: u32, width: u32, height: u32) {
             if let Some(mesh_controller) = mesh_controllers.get_mut(&id) {
                 mesh_controller.set_size(width, height);
             }
+        } else {
+            console::warn_1(&"renderer_wgpu_wasm.update_mesh_controller_size() aborted due to busy render state.".into());
         }
     });
 }
@@ -824,6 +840,8 @@ pub fn update_mesh_controller_transform(id: u32, transform: &[f32]) {
             if let Some(mesh_controller) = mesh_controllers.get_mut(&id) {
                 mesh_controller.set_model_transform(transform);
             }
+        } else {
+            console::warn_1(&"renderer_wgpu_wasm.update_mesh_controller_transform() aborted due to busy render state.".into());
         }
     });
 }
@@ -839,6 +857,8 @@ pub fn update_mesh_controller_visible(id: u32, visible: bool) {
             if let Some(mesh_controller) = mesh_controllers.get_mut(&id) {
                 mesh_controller.set_visible(visible);
             }
+        } else {
+            console::warn_1(&"renderer_wgpu_wasm.update_mesh_controller_visible() aborted due to busy render state.".into());
         }
     });
 }
@@ -863,6 +883,8 @@ pub fn update_mesh_controller_source_image_data(
             if let Some(mesh_controller) = mesh_controllers.get_mut(&id) {
                 mesh_controller.set_source_image_data(device, queue, mipmap_generator, width, height, format, buffer);
             }
+        } else {
+            console::warn_1(&"renderer_wgpu_wasm.update_mesh_controller_source_image_data() aborted due to busy render state.".into());
         }
     });
 }
@@ -878,6 +900,8 @@ pub fn reorder_mesh_controller(id: u32, order: u32) {
             if let Some(mesh_controller) = mesh_controllers.get_mut(&id) {
                 mesh_controller.set_order(order);
             }
+        } else {
+            console::warn_1(&"renderer_wgpu_wasm.reorder_mesh_controller() aborted due to busy render state.".into());
         }
     });
 }
@@ -893,6 +917,8 @@ pub fn remove_mesh_controller(id: u32) {
             mesh_controllers.remove(&id);
 
             queue_create_layer_passes();
+        } else {
+            console::warn_1(&"renderer_wgpu_wasm.remove_mesh_controller() aborted due to busy render state.".into());
         }
     });
 }
@@ -918,6 +944,8 @@ pub fn create_layer_passes() {
             // TODO - determine when to render buffer swap
 
             renderer_state.layer_passes = layer_passes;
+        } else {
+            console::warn_1(&"renderer_wgpu_wasm.create_layer_passes() aborted due to busy render state.".into());
         }
     });
 }

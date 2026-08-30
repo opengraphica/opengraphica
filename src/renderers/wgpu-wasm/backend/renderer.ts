@@ -66,6 +66,9 @@ export interface WgpuWasmRendererBackendPublic {
     dispose(): Promise<void>;
 }
 
+type AsyncCallback<T> = () => T | PromiseLike<T>;
+
+
 export class WgpuWasmRendererBackend implements WgpuWasmRendererBackendPublic {
     isOffscreen = false;
     dirty = false;
@@ -74,6 +77,33 @@ export class WgpuWasmRendererBackend implements WgpuWasmRendererBackendPublic {
     beforeRenderCallbacks: Array<(timelineCursor: number) => void> = [];
 
     meshControllersByType: Record<string, ClassType<WgpuWasmRendererMeshController>> = {};
+
+    wasmCallQueue: Promise<void> = Promise.resolve();
+
+    async queueWasmCall<T>(callback: AsyncCallback<T>): Promise<T> {
+        let resolveResult!: (value: T | PromiseLike<T>) => void;
+        let rejectResult!: (reason?: unknown) => void;
+
+        const result = new Promise<T>((resolve, reject) => {
+            resolveResult = resolve;
+            rejectResult = reject;
+        });
+
+        this.wasmCallQueue = this.wasmCallQueue
+            .catch(() => {
+                // A failed callback must not prevent later callbacks from running.
+            })
+            .then(async () => {
+                try {
+                    const value = await callback();
+                    resolveResult(value);
+                } catch (error) {
+                    rejectResult(error);
+                }
+            });
+
+        return result;
+    }
 
     async initialize(canvas: HTMLCanvasElement | OffscreenCanvas, imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number) {
         try {
@@ -90,7 +120,7 @@ export class WgpuWasmRendererBackend implements WgpuWasmRendererBackendPublic {
                 };
             }
 
-            await wasmInitializeRenderer(canvas, imageWidth, imageHeight, viewWidth, viewHeight);
+            await this.queueWasmCall(() => wasmInitializeRenderer(canvas, imageWidth, imageHeight, viewWidth, viewHeight));
         } catch (error) {
             console.error(error);
             throw error;
@@ -129,7 +159,7 @@ export class WgpuWasmRendererBackend implements WgpuWasmRendererBackendPublic {
         let dirtyInterval = setInterval(() => {
             this.dirty = true;
         }, 16);
-        let wasmImageData: WasmImageData = await wasmTakeSnapshot(
+        let wasmImageData: WasmImageData = await this.queueWasmCall(() => wasmTakeSnapshot(
             imageWidth,
             imageHeight,
             options?.cameraTransform,
@@ -137,7 +167,7 @@ export class WgpuWasmRendererBackend implements WgpuWasmRendererBackendPublic {
             options?.filters,
             options?.applySelectionMask,
             options?.disableScaleToSize,
-        );
+        ));
         clearInterval(dirtyInterval);
         return createImageBitmap(new ImageData(
             new Uint8ClampedArray(wasmImageData.buffer),
@@ -158,7 +188,7 @@ export class WgpuWasmRendererBackend implements WgpuWasmRendererBackendPublic {
         let dirtyInterval = setInterval(() => {
             this.dirty = true;
         }, 16);
-        let wasmImageData: WasmImageData = await wasmCreateBrushPreview(
+        let wasmImageData: WasmImageData = await this.queueWasmCall(() => wasmCreateBrushPreview(
             new Float32Array([settings.color[0], settings.color[1], settings.color[2], settings.color[3]]),
             settings.size,
             settings.hardness,
@@ -173,7 +203,7 @@ export class WgpuWasmRendererBackend implements WgpuWasmRendererBackendPublic {
             settings.jitter,
             settings.spacing,
             settings.pressureTaper,
-        );
+        ));
         clearInterval(dirtyInterval);
         return createImageBitmap(new ImageData(
             new Uint8ClampedArray(wasmImageData.buffer),
@@ -198,6 +228,9 @@ export class WgpuWasmRendererBackend implements WgpuWasmRendererBackendPublic {
             callback(timelineCursor);
         }
 
+        // This specifically isn't run through queueWasmCall because
+        // some methods that read the canvas pixels need to trigger a
+        // render in order to fetch them.
         wasmRender();
 
         this.dirty = false;

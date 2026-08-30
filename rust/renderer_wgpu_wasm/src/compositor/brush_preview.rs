@@ -182,6 +182,7 @@ impl BrushPreview {
         self.render_target.clear(
             device,
             queue,
+            &mut encoder,
             wgpu::Color {
                 r: 0.0,
                 g: 0.0,
@@ -193,10 +194,12 @@ impl BrushPreview {
         let brush_stroke_result = BrushStroke::new(
             adapter,
             device,
+            queue,
             None, // Selection mask
             &self.render_target.view,
             self.render_target.width,
             self.render_target.height,
+            Some(256),
             glam::Mat4::IDENTITY,
             RendererBrushStrokeSettings {
                 max_move_count: 256,
@@ -224,7 +227,6 @@ impl BrushPreview {
         let mut color_blending_strength: f32;
         let mut concentration: f32;
 
-        let start = performance_now();
         while distance < self.length {
 
             t = self.get_t_at_length(distance);
@@ -265,12 +267,6 @@ impl BrushPreview {
             distance += step;
         }
 
-        let end = performance_now();
-        wgpu::web_sys::console::log_1(&format!(
-            "stamp: {} ms",
-            end - start,
-        ).into());
-
         brush_stroke.composite(
             adapter,
             device,
@@ -287,13 +283,6 @@ impl BrushPreview {
             wgpu::TextureFormat::Rgba16Float => 8,
             format => panic!("Unsupported readback format: {format:?}"),
         };
-
-        // wgpu::web_sys::console::log_1(
-        //     &wasm_bindgen::JsValue::from_str(&format!(
-        //         "bytes per pixel {:?}",
-        //         bytes_per_pixel
-        //     )),
-        // );
 
         let unpadded_bytes_per_row = width * bytes_per_pixel;
 
@@ -343,6 +332,9 @@ impl BrushPreview {
                 "Failed to map buffer: {e:?}"
             ))) as Box<dyn std::error::Error>
         });
+
+        assert!(padded_bytes_per_row % wgpu::COPY_BYTES_PER_ROW_ALIGNMENT == 0);
+        assert!(padded_bytes_per_row >= unpadded_bytes_per_row);
 
         let pixels = {
             let data = slice.get_mapped_range()

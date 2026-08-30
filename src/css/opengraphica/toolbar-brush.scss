@@ -100,6 +100,11 @@
         bottom: 0;
         display: flex;
         justify-content: center;
+
+        > canvas {
+            max-width: 100%;
+            object-fit: contain;
+        }
     }
 
     .og-brush-editor {

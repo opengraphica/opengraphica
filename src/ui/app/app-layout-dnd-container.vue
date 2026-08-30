@@ -133,6 +133,8 @@ const isHistoryNotificationCompleted = ref<boolean>(false);
 const isHighlightHistoryNotification = ref<boolean>(false);
 const currentHistoryStepActionDescription = ref<string>('');
 
+let footerHeightCalculateTimeoutHandle: number | undefined = undefined;
+
 const { cursor, viewWidth, viewHeight } = toRefs(canvasStore.state);
 
 const activeToolbar = computed<string | null>(() => {
@@ -295,10 +297,17 @@ function onResizeLayout() {
 }
 
 function calculateFooterHeight () {
-    if (dndContainerElement.value && footerToolbarComponent?.value?.$el) {
+    if (dndContainerElement.value && footerToolbarComponent.value?.$el) {
         const dndContainerRect = dndContainerElement.value.getBoundingClientRect();
         const toolbarRect = footerToolbarComponent.value.$el.getBoundingClientRect();
         footerHeight.value = dndContainerRect.y + dndContainerRect.height - toolbarRect.y;
+
+        if (toolbarRect.height === 0) {
+            clearTimeout(footerHeightCalculateTimeoutHandle);
+            footerHeightCalculateTimeoutHandle = setTimeout(calculateFooterHeight, 50);
+        } else {
+            calculateDndArea();
+        }
         return;
     }
 
