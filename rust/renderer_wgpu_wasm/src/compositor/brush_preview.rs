@@ -345,7 +345,8 @@ impl BrushPreview {
         });
 
         let pixels = {
-            let data = slice.get_mapped_range();
+            let data = slice.get_mapped_range()
+                .map_err(|e| format!("failed to get mapped buffer range: {e:?}"))?;;
 
             let mut pixels = Vec::with_capacity((width * height * bytes_per_pixel) as usize);
             for y in 0..height as usize {

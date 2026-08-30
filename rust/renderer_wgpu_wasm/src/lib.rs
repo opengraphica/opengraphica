@@ -50,9 +50,9 @@ pub fn initialize(
         let instance_descriptor = wgpu::InstanceDescriptor {
             backends: wgpu::Backends::GL,
             // backends: wgpu::Backends::BROWSER_WEBGPU,
-            ..wgpu::InstanceDescriptor::default()
+            ..wgpu::InstanceDescriptor::new_without_display_handle()
         };
-        let instance = wgpu::Instance::new(&instance_descriptor);
+        let instance = wgpu::Instance::new(instance_descriptor);
 
         let surface_target: wgpu::SurfaceTarget = if canvas.is_instance_of::<HtmlCanvasElement>() {
             wgpu::SurfaceTarget::Canvas(canvas.dyn_into::<HtmlCanvasElement>().unwrap())
@@ -71,6 +71,7 @@ pub fn initialize(
                 power_preference: wgpu::PowerPreference::HighPerformance,
                 compatible_surface: Some(&surface),
                 force_fallback_adapter: false,
+                apply_limit_buckets: false,
             })
             .await
             .map_err(|e| JsValue::from_str(&format!("request_adapter failed: {:?}", e)))?;
@@ -109,6 +110,7 @@ pub fn initialize(
         let config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
             format: surface_format,
+            color_space: wgpu::SurfaceColorSpace::Srgb,
             width: view_width_limited,
             height: view_height_limited,
             present_mode: wgpu::PresentMode::Fifo,
@@ -483,7 +485,8 @@ pub fn take_snapshot(
                 wasm_bindgen::JsValue::from_str(&format!("Failed to map buffer: {:?}", e))
             })?;
 
-            let data = slice.get_mapped_range();
+            let data = slice.get_mapped_range()
+                .map_err(|e| format!("failed to get mapped buffer range: {e:?}"))?;;
 
             let mut pixels = Vec::with_capacity((snapshot_width * snapshot_height * 4) as usize);
             for y in 0..snapshot_height as usize {
@@ -642,17 +645,38 @@ pub fn render() {
         if let Ok(mut renderer_state) = s.try_borrow_mut() {
             let renderer_state = renderer_state.as_mut().unwrap();
 
+            let device = &renderer_state.device;
             let surface = &renderer_state.surface;
+            let config = &renderer_state.config;
 
-            let frame = surface
-                .get_current_texture()
-                .expect("Failed to acquire next swap chain texture");
+            let frame = match surface.get_current_texture() {
+                wgpu::CurrentSurfaceTexture::Success(texture) => texture,
+
+                wgpu::CurrentSurfaceTexture::Suboptimal(texture) => {
+                    surface.configure(device, config);
+                    texture
+                }
+
+                wgpu::CurrentSurfaceTexture::Timeout | wgpu::CurrentSurfaceTexture::Occluded => {
+                    // Try again on the next frame.
+                    return;
+                }
+
+                wgpu::CurrentSurfaceTexture::Outdated | wgpu::CurrentSurfaceTexture::Lost => {
+                    surface.configure(device, config);
+                    return;
+                }
+
+                wgpu::CurrentSurfaceTexture::Validation => {
+                    panic!("Surface texture acquisition failed validation");
+                }
+            };
 
             let view = frame.texture.create_view(&wgpu::TextureViewDescriptor::default());
 
             render_main(renderer_state, &view, None);
 
-            frame.present();
+            renderer_state.queue.present(frame);
         }
     });
 }
@@ -662,7 +686,6 @@ fn render_main(
     color_view: &wgpu::TextureView,
     override_depth_stencil_view: Option<&wgpu::TextureView>,
 ) {
-    let surface = &renderer_state.surface;
     let device = &renderer_state.device;
     let queue = &renderer_state.queue;
     
@@ -716,6 +739,7 @@ fn render_main(
             }),
             occlusion_query_set: None,
             timestamp_writes: None,
+            multiview_mask: None,
         });
 
         pass.set_vertex_buffer(0, quad_vertex_buffer.slice(..));

@@ -29,8 +29,8 @@ pub fn create_pipeline(
     let pipeline_layout = device.create_pipeline_layout(
         &wgpu::PipelineLayoutDescriptor {
             label: Some(&format!("{label} Layout")),
-            bind_group_layouts: &[layout],
-            push_constant_ranges: &[],
+            bind_group_layouts: &[Some(layout)],
+            immediate_size: 0,
         },
     );
 
@@ -42,7 +42,7 @@ pub fn create_pipeline(
             module: &shader_module,
             entry_point: Some("vs_main"),
             compilation_options: Default::default(),
-            buffers: &[Vertex::layout()],
+            buffers: &[Some(Vertex::layout())],
         },
 
         fragment: Some(wgpu::FragmentState {
@@ -63,7 +63,7 @@ pub fn create_pipeline(
 
         depth_stencil: None,
         multisample: wgpu::MultisampleState::default(),
-        multiview: None,
+        multiview_mask: None,
         cache: None,
     })
 }

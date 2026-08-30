@@ -145,7 +145,7 @@ impl<'a> BrushStroke<'a> {
             address_mode_w: wgpu::AddressMode::ClampToEdge,
             mag_filter: wgpu::FilterMode::Nearest,
             min_filter: wgpu::FilterMode::Nearest,
-            mipmap_filter: wgpu::FilterMode::Nearest,
+            mipmap_filter: wgpu::MipmapFilterMode::Nearest,
             ..Default::default()
         });
 
@@ -452,6 +452,7 @@ impl<'a> BrushStroke<'a> {
                         depth_stencil_attachment: None,
                         occlusion_query_set: None,
                         timestamp_writes: None,
+                        multiview_mask: None,
                     },
                 );
 
@@ -624,6 +625,7 @@ impl<'a> BrushStroke<'a> {
                 //                 depth_stencil_attachment: None,
                 //                 occlusion_query_set: None,
                 //                 timestamp_writes: None,
+                //                 multiview_mask: None,
                 //             },
                 //         );
 
@@ -693,6 +695,7 @@ impl<'a> BrushStroke<'a> {
                 //                 depth_stencil_attachment: None,
                 //                 occlusion_query_set: None,
                 //                 timestamp_writes: None,
+                //                 multiview_mask: None,
                 //             },
                 //         );
 
@@ -831,6 +834,7 @@ impl<'a> BrushStroke<'a> {
                             depth_stencil_attachment: None,
                             occlusion_query_set: None,
                             timestamp_writes: None,
+                            multiview_mask: None,
                         },
                     );
 
@@ -1015,6 +1019,7 @@ impl<'a> BrushStroke<'a> {
                         depth_stencil_attachment: None,
                         occlusion_query_set: None,
                         timestamp_writes: None,
+                        multiview_mask: None,
                     },
                 );
 
