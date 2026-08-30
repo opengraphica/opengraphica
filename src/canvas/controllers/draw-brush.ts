@@ -306,7 +306,6 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
 
     onPointerMove(e: PointerEvent): void {
         super.onPointerMove(e);
-        const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
 
         if (e.pointerType === 'pen' || !editorStore.state.isPenUser) {
             cursorHoverPosition.value = new DOMPoint(

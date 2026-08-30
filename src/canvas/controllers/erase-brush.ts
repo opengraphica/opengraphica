@@ -43,6 +43,8 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
     private erasingUsePressure: boolean = false;
     private erasingOnLayers: WorkingFileAnyLayer[] = [];
     private erasingBrushStroke: BrushStroke | null = null;
+    private isQueueingInput: boolean = false;
+    private queuedBrushStrokePoints: Array<BrushStrokePoint> = []; 
 
     private eraseLoopDeltaAccumulator: number = 0;
     private eraseLoopLastRunTimestamp: number = 0;
@@ -140,29 +142,31 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
             ).matrixTransform(canvasStore.state.transform.inverse());
         }
 
+        this.isQueueingInput = false;
         const hasPressure = (e.pointerType === 'pen' || e.pointerType === 'touch') && e.pressure !== 0.5 && e.pressure !== 1.0;
-        if (
-            this.erasingPointerId == null && e.isPrimary && e.button === 0 &&
-            (
-                e.pointerType === 'pen' ||
-                (e.pointerType === 'touch' && hasPressure) ||
-                (!editorStore.state.isPenUser && e.pointerType === 'mouse')
-            )
-        ) {
+        if (this.erasingPointerId == null && e.isPrimary && e.button === 0) {
             if (showBrushDrawer.value) {
                 showBrushDrawer.value = false;
                 return;
             }
 
-            this.erasingPointerId = e.pointerId;
-            this.eraseStart(e);
+            if (
+                e.pointerType === 'pen' ||
+                (!editorStore.state.isPenUser && e.pointerType === 'mouse')
+            ) {
+                this.erasingPointerId = e.pointerId;
+                this.erasingUsePressure = hasPressure;
+                this.eraseStart(e);
+            } else if (e.pointerType === 'touch') {
+                this.isQueueingInput = true;
+                this.queuedBrushStrokePoints = [];
+            }
         }
     }
 
     onMultiTouchDown() {
         super.onMultiTouchDown();
-        const hasPressure = this.touches[0].down.pressure !== 0.5 && this.touches[0].down.pressure !== 1.0;
-        if (this.erasingPointerId != null || hasPressure) return;
+        if (this.erasingPointerId != null) return;
         if (showBrushDrawer.value) {
             showBrushDrawer.value = false;
             return;
@@ -171,9 +175,18 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
             this.erasingPointerId = null;
             this.erasingBrushStroke = null;
         } else if (this.touches.length === 1) {
+            const hasPressure = this.touches[0].down.pressure !== 0.5 && this.touches[0].down.pressure !== 1.0;
             this.erasingPointerId = this.touches[0].id;
             this.erasingUsePressure = false;
             this.eraseStart(this.touches[0].down);
+
+            for (const point of this.queuedBrushStrokePoints) {
+                this.erasingBrushStroke?.addPoint(point);
+            }
+        }
+        if (this.isQueueingInput) {
+            this.isQueueingInput = false;
+            this.queuedBrushStrokePoints = [];
         }
     }
 
@@ -250,7 +263,6 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
 
     onPointerMove(e: PointerEvent): void {
         super.onPointerMove(e);
-        const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
 
         if (e.pointerType === 'pen' || !editorStore.state.isPenUser) {
             cursorHoverPosition.value = new DOMPoint(
@@ -259,9 +271,9 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
             ).matrixTransform(canvasStore.state.transform.inverse());
         }
 
-        const now = performance.now();
         if (
             this.erasingPointerId === e.pointerId
+            || this.isQueueingInput
         ) {
             const transformedPoint = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
@@ -274,7 +286,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
             );
             const density = this.calculateDensity(pressure, size);
 
-            this.erasingBrushStroke?.addPoint({
+            const point: BrushStrokePoint = {
                 x: transformedPoint.x,
                 y: transformedPoint.y,
                 density,
@@ -284,7 +296,13 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                 tiltX: e.tiltX,
                 tiltY: e.tiltY,
                 twist: e.twist,
-            });
+            };
+
+            if (this.isQueueingInput) {
+                this.queuedBrushStrokePoints.push(point);
+            } else {
+                this.erasingBrushStroke?.addPoint(point);
+            }
             this.eraseLoopLastPointerMoveTimestamp = performance.now();
         }
     }
