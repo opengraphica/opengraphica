@@ -29,7 +29,7 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
     plane: InstanceType<typeof Mesh> | undefined;
     planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
     scene: InstanceType<typeof Scene> | undefined;
-    sourceTexture: InstanceType<typeof Texture> | undefined;
+    sourceTexture: InstanceType<typeof Texture<any>> | undefined;
     sourceTextureCanvas: InstanceType<typeof HTMLCanvasElement | typeof OffscreenCanvas> | undefined;
     sourceTextureCtx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | undefined;
 

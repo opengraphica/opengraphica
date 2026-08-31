@@ -33,7 +33,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
     planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
     scene: InstanceType<typeof Scene> | undefined;
     sourceSvg: Blob | undefined;
-    sourceTexture: InstanceType<typeof Texture> | undefined;
+    sourceTexture: InstanceType<typeof Texture<any>> | undefined;
 
     id: number = -1;
     blendingMode: WorkingFileLayerBlendingMode = 'normal';

@@ -3,7 +3,7 @@ import { Float32BufferAttribute } from 'three/src/core/BufferAttribute';
 import { OrthographicCamera } from 'three/src/cameras/OrthographicCamera';
 import { Mesh } from 'three/src/objects/Mesh';
 
-import type { Material, Renderer } from 'three';
+import type { Material, WebGLRenderer } from 'three';
 
 class Pass {
 
@@ -60,7 +60,7 @@ class FullScreenQuad {
 		this._mesh.geometry.dispose();
 	}
 
-	render(renderer: Renderer) {
+	render(renderer: WebGLRenderer) {
 		renderer.render(this._mesh, _camera);
 	}
 

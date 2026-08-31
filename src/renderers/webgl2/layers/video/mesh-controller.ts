@@ -29,7 +29,7 @@ export class VideoLayerMeshController implements Webgl2RendererMeshController {
     scene: InstanceType<typeof Scene> | undefined;
     sourceCanvas: HTMLCanvasElement | OffscreenCanvas | undefined;
     sourceCanvasContext: ImageBitmapRenderingContext | undefined;
-    sourceTexture: InstanceType<typeof Texture> | undefined;
+    sourceTexture: InstanceType<typeof Texture<any>> | undefined;
 
     id: number = -1;
     blendingMode: WorkingFileLayerBlendingMode = 'normal';

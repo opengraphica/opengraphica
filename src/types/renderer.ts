@@ -87,7 +87,7 @@ export interface RendererLayerWatcher<T = WorkingFileLayer> {
 
 export interface Webgl2RendererMeshController {
     blendingMode: WorkingFileLayerBlendingMode;
-    getTexture(wait?: boolean): Promise<Texture | null>;
+    getTexture(wait?: boolean): Promise<Texture<ImageBitmap> | null>;
     getTransform(): Matrix4;
     swapScene(scene: Scene): void;
     overrideFilters(filters?: Webgl2RendererCanvasFilter[]): Promise<void>;

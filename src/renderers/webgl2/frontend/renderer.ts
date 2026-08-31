@@ -314,7 +314,7 @@ export class Webgl2RendererFrontend implements RendererFrontend {
     }
 
     async getMaxTextureSize(): Promise<number> {
-        return await this.rendererBackend.getMaxTextureSize();
+        return await this.rendererBackend?.getMaxTextureSize() ?? Infinity;
     }
 
     async takeSnapshot(imageWidth: number, imageHeight: number, options?: RendererFrontendTakeSnapshotOptions): Promise<ImageBitmap> {

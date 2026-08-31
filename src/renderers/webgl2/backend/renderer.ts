@@ -3,6 +3,7 @@ import {
     SRGBColorSpace, RepeatWrapping, RGBAFormat, UnsignedByteType,
 } from 'three/src/constants';
 import { OrthographicCamera } from 'three/src/cameras/OrthographicCamera';
+import { Object3D } from 'three/src/core/Object3D';
 import { Matrix4 } from 'three/src/math/Matrix4';
 import { Scene } from 'three/src/scenes/Scene';
 import { Vector3 } from 'three/src/math/Vector3';
@@ -135,6 +136,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
             preserveDrawingBuffer: false,
             powerPreference: 'high-performance',
         });
+        // this.renderer.extensions.get('EXT_float_blend');
         this.renderer.outputColorSpace = SRGBColorSpace;
         this.renderer.setSize(1, 1, false);
         this.viewport = new Vector4();
@@ -145,6 +147,16 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
 
         this.camera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 10000);
         this.camera.matrixAutoUpdate = false;
+        // Override the brain dead changes made in r183
+        this.camera.updateMatrixWorld = function(force) {
+            Object3D.prototype.updateMatrixWorld.call(this, force);
+            this.matrixWorldInverse.copy(this.matrixWorld).invert();
+        };
+        // Override the brain dead changes made in r183
+        this.camera.updateWorldMatrix = function(updateParents, updateChildren, force = false) {
+            Object3D.prototype.updateWorldMatrix.call(this, updateParents, updateChildren, force);
+            this.matrixWorldInverse.copy(this.matrixWorld).invert();
+        };
 
         this.selectionMask = new SelectionMask();
 
@@ -198,7 +210,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
     }
 
     async getMaxTextureSize(): Promise<number> {
-        return this.renderer.capabilities.maxTextureSize;
+        return this.renderer?.capabilities?.maxTextureSize ?? Infinity;
     }
 
     async enableImageBoundaryMask(enabled: boolean) {

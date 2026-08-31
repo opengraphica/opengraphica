@@ -40,7 +40,7 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
     letterMeshCache: LetterMeshCache | undefined;
     material: InstanceType<typeof ShaderMaterial> | undefined;
     scene: InstanceType<typeof Scene> | undefined;
-    sourceTexture: InstanceType<typeof Texture> | undefined;
+    sourceTexture: InstanceType<typeof Texture<any>> | undefined;
     textGroup: InstanceType<typeof Object3D> | undefined;
 
     id: number = -1;

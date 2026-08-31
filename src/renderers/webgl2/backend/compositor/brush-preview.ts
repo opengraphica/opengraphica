@@ -6,11 +6,11 @@ import { WebGLRenderTarget } from 'three/src/renderers/WebGLRenderTarget';
 import { BrushStroke, tryHalfFloatColorBuffers } from './brush-stroke';
 
 import type { RendererBrushStrokePreviewSettings } from '@/types';
-import type { WebGLRenderer } from 'three';
+import type { Texture, WebGLRenderer } from 'three';
 
 export class BrushPreview {
     renderer: WebGLRenderer;
-    renderTarget!: WebGLRenderTarget;
+    renderTarget!: WebGLRenderTarget<Texture<ImageBitmap>>;
 
     p0x = 10; p0y = 32;
     p1x = 64; p1y = 32 + 48;

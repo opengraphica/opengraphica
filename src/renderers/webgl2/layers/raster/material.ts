@@ -16,7 +16,7 @@ export enum ColorSpaceConversion {
 }
 
 export interface RasterMaterialUpdateParams {
-    srcTexture?: Texture;
+    srcTexture?: Texture<any>;
     colorSpaceConversion?: ColorSpaceConversion;
     canvasFilters?: Webgl2RendererCanvasFilter[];
 }

@@ -33,8 +33,8 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
         useSnapping: true,
         useRotationSnapping: false,
         rotationSnappingDegrees: 15,
-        useCanvasEdgeSnapping: false,
-        useLayerEdgeSnapping: false,
+        useCanvasEdgeSnapping: true,
+        useLayerEdgeSnapping: true,
         useLayerCenterSnapping: false,
     },
     restore: [

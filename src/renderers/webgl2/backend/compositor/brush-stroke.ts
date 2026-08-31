@@ -41,7 +41,7 @@ export class BrushStroke {
     originalViewport!: Vector4;
     renderer!: WebGLRenderer;
     selectionMask: SelectionMask | undefined;
-    texture!: Texture;
+    texture!: Texture<ImageBitmap>;
     layerTransform!: Matrix4;
     layerTransformInverse!: Matrix4;
 
@@ -97,7 +97,7 @@ export class BrushStroke {
         renderer: WebGLRenderer,
         selectionMask: SelectionMask | undefined,
         originalViewport: Vector4,
-        texture: Texture,
+        texture: Texture<ImageBitmap>,
         layerTransform: Matrix4,
         settings: RendererBrushStrokeSettings,
     ) {
@@ -649,7 +649,7 @@ export class BrushStroke {
             format: RGBAFormat,
             internalFormat: this.texture.internalFormat,
             depthBuffer: false,
-            colorSpace: this.texture.colorSpace,
+            colorSpace: this.texture.colorSpace as never,
             stencilBuffer: false,
         });
         this.outputRenderTargetStack.push(renderTarget);

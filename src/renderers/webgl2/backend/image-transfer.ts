@@ -54,7 +54,7 @@ export async function requestFrontendBitmap(requestSourceUuid?: string): Promise
     return promise;
 }
 
-export async function requestFrontendTexture(requestSourceUuid?: string): Promise<Texture | undefined> {
+export async function requestFrontendTexture(requestSourceUuid?: string): Promise<Texture<any> | undefined> {
     const bitmap = await requestFrontendBitmap(requestSourceUuid);
     return createTexture(bitmap);
 }

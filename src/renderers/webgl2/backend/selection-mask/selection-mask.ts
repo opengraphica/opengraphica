@@ -132,7 +132,7 @@ export class SelectionMask {
         this.selectionMaskMaterial.needsUpdate = true;
     }
 
-    getTexture(): Texture | undefined {
+    getTexture(): Texture<ImageBitmap> | undefined {
         return this.selectionMaskMaterial.uniforms.selectedMaskMap.value;
     }
 
@@ -149,7 +149,7 @@ export class SelectionMask {
     }
 
     async applyToTextureAlphaChannel(
-        texture: Texture,
+        texture: Texture<ImageBitmap>,
         maskTransform: Matrix4,
         renderer: WebGLRenderer,
         originalViewport: Vector4,
@@ -354,7 +354,7 @@ export class SelectionMask {
                     format: RGBAFormat,
                     internalFormat,
                     depthBuffer: false,
-                    colorSpace,
+                    colorSpace: colorSpace as never,
                     stencilBuffer: false,
                 });
             }

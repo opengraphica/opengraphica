@@ -27,7 +27,7 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
     plane: InstanceType<typeof Mesh> | undefined;
     planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
     scene: InstanceType<typeof Scene> | undefined;
-    sourceTexture: InstanceType<typeof Texture> | undefined;
+    sourceTexture: InstanceType<typeof Texture<any>> | undefined;
 
     id: number = -1;
     blendingMode: WorkingFileLayerBlendingMode = 'normal';

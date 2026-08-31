@@ -1,4 +1,4 @@
-import { Clock } from 'three/src/core/Clock';
+import { Timer } from 'three/src/core/Timer';
 import { Vector2 } from 'three/src/math/Vector2';
 import { WebGLRenderTarget } from 'three/src/renderers/WebGLRenderTarget';
 import { CopyShader } from './copy-shader';
@@ -21,7 +21,7 @@ class EffectComposer {
     public writeBuffer: WebGLRenderTarget;
     public readBuffer: WebGLRenderTarget;
     public renderToScreen: boolean;
-    public clock: Clock;
+    public timer: Timer;
     public passes: Pass[];
     public copyPass: ShaderPass;
 
@@ -74,7 +74,7 @@ class EffectComposer {
 
         this.copyPass = new ShaderPass(CopyShader);
 
-        this.clock = new Clock();
+        this.timer = new Timer();
 
     }
 
@@ -120,7 +120,7 @@ class EffectComposer {
     render(deltaTime?: number) {
         // deltaTime value is in seconds
         if (deltaTime === undefined) {
-            deltaTime = this.clock.getDelta();
+            deltaTime = this.timer.getDelta();
         }
 
         const currentRenderTarget = this.renderer.getRenderTarget();

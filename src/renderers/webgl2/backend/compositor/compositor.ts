@@ -29,7 +29,7 @@ export class Compositor {
     }
 
     startBrushStroke(
-        texture: Texture,
+        texture: Texture<ImageBitmap>,
         layerTransform: Matrix4,
         settings: RendererBrushStrokeSettings,
     ): number {
