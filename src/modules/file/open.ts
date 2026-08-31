@@ -6,6 +6,9 @@
 
 import { nextTick, type Ref } from 'vue';
 
+import { useRenderer } from '@/renderers';
+import { t } from '@/i18n';
+
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import { createStoredImage } from '@/store/image';
@@ -27,6 +30,8 @@ import { InsertLayerAction } from '@/actions/insert-layer';
 import { knownFileExtensions } from '@/lib/regex';
 import { createBlobFromDataUri } from '@/lib/binary';
 import appEmitter from '@/lib/emitter';
+import { resizeImage } from '@/lib/image';
+import { limitMaxDimension } from '@/lib/math';
 
 import type {
     ShowOpenFilePicker, FileSystemFileHandle,
@@ -417,17 +422,33 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
         fileName
     };
 
+    const maxTextureSize = await (await useRenderer()).getMaxTextureSize();
+    let hasResizedDueToMaxTextureConstraints = false;
+
     const settledReaderPromises = await Promise.allSettled(readerPromises);
     for (let readerSettle of settledReaderPromises) {
         if (readerSettle.status === 'fulfilled') {
             isAnyLayerLoaded = true;
             if (readerSettle.value.type === 'image') {
-                const image = readerSettle.value.result;
-                if (image.width > largestWidth) {
-                    largestWidth = image.width;
+                let image: HTMLImageElement | HTMLCanvasElement = readerSettle.value.result;
+                let originalWidth = image.width;
+                let originalHeight = image.height;
+
+                let transform = new DOMMatrix();
+                if (originalWidth > maxTextureSize || originalHeight > maxTextureSize) {
+                    const { width: textureWidth, height: textureHeight } = limitMaxDimension(
+                        originalWidth, originalHeight, maxTextureSize,
+                    );
+                    image = await resizeImage(image, textureWidth, textureHeight);
+                    transform.multiplySelf(new DOMMatrix().scale(originalWidth / textureWidth, originalHeight / textureHeight));
+                    hasResizedDueToMaxTextureConstraints = true;
                 }
-                if (image.height > largestHeight) {
-                    largestHeight = image.height;
+
+                if (originalWidth > largestWidth) {
+                    largestWidth = originalWidth;
+                }
+                if (originalHeight > largestHeight) {
+                    largestHeight = originalHeight;
                 }
                 insertLayerActions.push(
                     new InsertLayerAction<InsertRasterLayerOptions<ColorModel>>({
@@ -435,6 +456,7 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                         name: readerSettle.value.file.name,
                         width: image.width,
                         height: image.height,
+                        transform,
                         data: {
                             sourceUuid: await createStoredImage(image),
                         }
@@ -444,20 +466,36 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
             else if (readerSettle.value.type === 'imageSequence') {
                 const results = readerSettle.value.result;
                 const firstImage = results[0].image;
-                if (firstImage.width > largestWidth) {
-                    largestWidth = firstImage.width;
+                let originalWidth = firstImage.width;
+                let originalHeight = firstImage.height;
+
+                let transform = new DOMMatrix();
+                const { width: textureWidth, height: textureHeight } = limitMaxDimension(
+                    originalWidth, originalHeight, maxTextureSize,
+                );
+                if (originalWidth > maxTextureSize || originalHeight > maxTextureSize) {
+                    transform.multiplySelf(new DOMMatrix().scale(originalWidth / textureWidth, originalHeight / textureHeight));
+                    hasResizedDueToMaxTextureConstraints = true;
                 }
-                if (firstImage.height > largestHeight) {
-                    largestHeight = firstImage.height;
+
+                if (originalWidth > largestWidth) {
+                    largestWidth = originalWidth;
+                }
+                if (originalHeight > largestHeight) {
+                    largestHeight = originalHeight;
                 }
                 let timeIterator = 0;
                 const sequence: WorkingFileRasterSequenceLayer<ColorModel>['data']['sequence'] = [];
                 for (let result of results) {
+                    let frameImage: HTMLImageElement | HTMLCanvasElement = result.image;
+                    if (originalWidth > maxTextureSize || originalHeight > maxTextureSize) {
+                        frameImage = await resizeImage(frameImage, textureWidth, textureHeight);
+                    }
                     sequence.push({
                         start: timeIterator,
                         end: timeIterator + result.duration,
                         image: {
-                            sourceUuid: await createStoredImage(result.image),
+                            sourceUuid: await createStoredImage(frameImage),
                         },
                         thumbnailImageSrc: null
                     });
@@ -469,6 +507,7 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                         name: readerSettle.value.file.name,
                         width: firstImage.width,
                         height: firstImage.height,
+                        transform,
                         data: {
                             currentFrame: sequence[0].image,
                             sequence
@@ -572,7 +611,15 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                 databaseSize: Infinity
             });
         }
-        (window as any).workingFileStore = await (await import('@/store/working-file')).default;
+
+        if (hasResizedDueToMaxTextureConstraints) {
+            appEmitter.emit('app.notify', {
+                type: 'info',
+                title: t('module.fileOpenNotification.maxTextureSizeLimited.title'),
+                message: t('module.fileOpenNotification.maxTextureSizeLimited.message'),
+                duration: 8000,
+            });
+        }
     } else {
         if (files.length > 1) {
             throw new Error('None of the files selected could be loaded.');

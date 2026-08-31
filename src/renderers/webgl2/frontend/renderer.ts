@@ -313,6 +313,10 @@ export class Webgl2RendererFrontend implements RendererFrontend {
         await this.rendererBackend.resize(imageWidth, imageHeight, viewWidth, viewHeight);
     }
 
+    async getMaxTextureSize(): Promise<number> {
+        return await this.rendererBackend.getMaxTextureSize();
+    }
+
     async takeSnapshot(imageWidth: number, imageHeight: number, options?: RendererFrontendTakeSnapshotOptions): Promise<ImageBitmap> {
         if (!this.rendererBackend) throw Error('Renderer backend not initialized.');
         const cameraTransform = options?.cameraTransform

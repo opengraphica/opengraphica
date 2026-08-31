@@ -4,7 +4,8 @@ import BaseCanvasMovementController from './base-movement';
 
 import { BrushStroke, type BrushStrokePoint } from '@/lib/brush-stroke';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
-import { createImageFromBlob, createEmptyCanvas } from '@/lib/image';
+import { createEmptyCanvas } from '@/lib/image';
+import { limitMaxDimension } from '@/lib/math';
 import { t, tm, rt } from '@/i18n';
 
 import canvasStore from '@/store/canvas';
@@ -41,6 +42,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
     private isPreviewingSizeUnwatch: WatchStopHandle | null = null;
 
     private renderer: RendererFrontend | null = null;
+    private maxTextureSize: number = Infinity;
 
     private drawingPointerId: number | null = null;
     private drawingUsePressure: boolean = false;
@@ -62,6 +64,9 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
 
         useRenderer().then((renderer) => {
             this.renderer = renderer;
+            this.renderer.getMaxTextureSize().then((maxTextureSize) => {
+                this.maxTextureSize = maxTextureSize;
+            })
         });
 
         this.selectedLayerIdsUnwatch = watch(() => workingFileStore.state.selectedLayerIds, (newIds, oldIds) => {
@@ -215,6 +220,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         await historyStore.dispatch('reserve', { token: startDrawReserveToken });
 
         const { width, height } = workingFileStore.state;
+        const { width: textureWidth, height: textureHeight } = limitMaxDimension(width, height, this.maxTextureSize);
         let selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster' || layer.type === 'empty');
         let layerActions: BaseAction[] = [];
 
@@ -223,10 +229,11 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             layerActions.push(new InsertLayerAction<InsertRasterLayerOptions>({
                 type: 'raster',
                 name: ensureUniqueLayerSiblingName(workingFileStore.state.layers[0]?.id, t('toolbar.drawBrush.newBrushLayerName')),
-                width,
-                height,
+                width: textureWidth,
+                height: textureHeight,
+                transform: new DOMMatrix().scaleSelf(width / textureWidth, height / textureHeight),
                 data: {
-                    sourceUuid: await createStoredImage(createEmptyCanvas(width, height)),
+                    sourceUuid: await createStoredImage(createEmptyCanvas(textureWidth, textureHeight)),
                 },
             }));
         }
@@ -239,10 +246,11 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                     new UpdateLayerAction<UpdateRasterLayerOptions>({
                         id: selectedLayer.id,
                         type: 'raster',
-                        width,
-                        height,
+                        width: textureWidth,
+                        height: textureHeight,
+                        transform: new DOMMatrix().scaleSelf(width / textureWidth, height / textureHeight),
                         data: {
-                            sourceUuid: await createStoredImage(createEmptyCanvas(width, height)),
+                            sourceUuid: await createStoredImage(createEmptyCanvas(textureWidth, textureHeight)),
                         },
                     })
                 );

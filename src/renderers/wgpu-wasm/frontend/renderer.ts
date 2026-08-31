@@ -209,6 +209,10 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
         await this.rendererBackend.resize(imageWidth, imageHeight, viewWidth, viewHeight);
     }
 
+    async getMaxTextureSize(): Promise<number> {
+        return Infinity;
+    }
+
     async applySelectionMaskToAlphaChannel(layerId: number, options?: RendererFrontendApplySelectionMaskToAlphaChannelOptions): Promise<RendererTextureTile[]> {
         return [];
     }

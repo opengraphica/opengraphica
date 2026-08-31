@@ -145,6 +145,13 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
         await this.messageReceived(BackendWorkerMessage.RESIZE_RESULT);
     }
 
+    async getMaxTextureSize(): Promise<number> {
+        this.backendWorker.postMessage({
+            type: BackendWorkerMessage.GET_MAX_TEXTURE_SIZE,
+        })
+        return (await this.messageReceived(BackendWorkerMessage.GET_MAX_TEXTURE_SIZE_RESULT)).maxTextureSize;
+    }
+
     async enableImageBoundaryMask(enabled: boolean) {
         this.backendWorker.postMessage({
             type: BackendWorkerMessage.ENABLE_IMAGE_BOUNDARY_MASK,

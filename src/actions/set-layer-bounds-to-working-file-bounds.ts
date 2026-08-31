@@ -1,10 +1,12 @@
 
 import { BaseAction } from './base';
+import { limitMaxDimension } from '@/lib/math';
 import canvasStore from '@/store/canvas';
 import { createStoredImage, prepareStoredImageForEditing, prepareStoredImageForArchival } from '@/store/image';
 import workingFileStore, { getLayerById, getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { ApplyLayerTransformAction } from './apply-layer-transform';
 import { UpdateLayerAction } from './update-layer';
+import { useRenderer } from '@/renderers';
 
 export class SetLayerBoundsToWorkingFileBoundsAction extends BaseAction {
 
@@ -28,6 +30,8 @@ export class SetLayerBoundsToWorkingFileBoundsAction extends BaseAction {
         this.applyLayerTransformAction = new ApplyLayerTransformAction(this.layerId);
         await this.applyLayerTransformAction.do();
 
+        const maxTextureSize = await (await useRenderer()).getMaxTextureSize();
+
         const layerCanvas = await prepareStoredImageForEditing(layer.data.sourceUuid);
         if (!layerCanvas) throw new Error('[src/actions/set-layer-bounds-to-working-file-bounds.ts] Unable to edit existing layer image.');
         
@@ -36,12 +40,14 @@ export class SetLayerBoundsToWorkingFileBoundsAction extends BaseAction {
         const transform = layer.transform;
 
         const workingCanvas = document.createElement('canvas');
-        workingCanvas.width = newWidth;
-        workingCanvas.height = newHeight;
+        const { width: textureWidth, height: textureHeight } = limitMaxDimension(newWidth, newHeight, maxTextureSize);
+        workingCanvas.width = textureWidth;
+        workingCanvas.height = textureHeight;
         const workingCanvasCtx = workingCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
         if (!workingCanvasCtx) throw new Error('[src/actions/set-layer-bounds-to-working-file-bounds.ts] Unable to create a new canvas for transform.');
         workingCanvasCtx.save();
         workingCanvasCtx.globalCompositeOperation = 'copy';
+        workingCanvasCtx.scale(textureWidth / newWidth, textureHeight / newHeight);
         workingCanvasCtx.transform(transform.a, transform.b, transform.c, transform.d, transform.e, transform.f);
         workingCanvasCtx.drawImage(layerCanvas, 0, 0);
         workingCanvasCtx.restore();
@@ -50,9 +56,9 @@ export class SetLayerBoundsToWorkingFileBoundsAction extends BaseAction {
 
         this.updateLayerAction = new UpdateLayerAction({
             id: this.layerId,
-            width: newWidth,
-            height: newHeight,
-            transform: new DOMMatrix(),
+            width: textureWidth,
+            height: textureHeight,
+            transform: new DOMMatrix().scaleSelf(newWidth / textureWidth, newHeight / textureHeight),
             data: {
                 sourceUuid: await createStoredImage(workingCanvas)
             }

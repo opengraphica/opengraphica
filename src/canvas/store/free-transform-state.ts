@@ -348,7 +348,7 @@ export async function stretchToImageBounds() {
             actions.push(new UpdateLayerAction({
                 id: layer.id,
                 transform: new DOMMatrix()
-                    .scaleSelf(layer.width / workingFileStore.get('width'), layer.height / workingFileStore.get('height'))
+                    .scaleSelf(workingFileStore.get('width') / layer.width, workingFileStore.get('height') / layer.height)
                     .multiplySelf(globalTransform.inverse())
             }));
         }

@@ -434,3 +434,13 @@ export function cloneCanvas(canvas: HTMLCanvasElement): HTMLCanvasElement {
     ctx.drawImage(canvas, 0, 0);
     return newCanvas;
 }
+
+export async function resizeImage(imageCanvas: HTMLCanvasElement | HTMLImageElement, newWidth: number, newHeight: number): Promise<HTMLCanvasElement> {
+    let imageResizeCanvas = document.createElement('canvas');
+    imageResizeCanvas.width = newWidth;
+    imageResizeCanvas.height = newHeight;
+    const Pica = (await import('@/lib/pica')).default;
+    const pica = new Pica();
+    await pica.resize(imageCanvas, imageResizeCanvas, { alpha: true });
+    return imageResizeCanvas;
+}

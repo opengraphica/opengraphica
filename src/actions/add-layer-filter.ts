@@ -1,6 +1,8 @@
 import { BaseAction } from './base';
 
 import { generateImageHash } from '@/lib/hash';
+import { resizeImage } from '@/lib/image';
+import { limitMaxDimension } from '@/lib/math';
 
 import canvasStore from '@/store/canvas';
 import { createStoredImage, getStoredImageOrCanvas, reserveStoredImage, unreserveStoredImage } from '@/store/image';
@@ -10,6 +12,7 @@ import {
     activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask,
     appliedSelectionMaskCanvasOffset, resampleSelectionMaskInLayerBounds,
 } from '@/canvas/store/selection-state';
+import { useRenderer } from '@/renderers';
 
 import { updateBakedImageForLayer } from './baking';
 
@@ -42,23 +45,31 @@ export class AddLayerFilterAction extends BaseAction {
             throw new Error('Aborted - Layer with specified id not found.');
         }
 
+        const maxTextureSize = await (await useRenderer()).getMaxTextureSize();
+
         let layerFilter = { ...this.layerFilter };
 
         if (this.createdMaskImageUuid || (this.selectionMask && this.selectionMaskCanvasOffset)) {
+            const { width: textureWidth, height: textureHeight } =
+                limitMaxDimension(layer.width, layer.height, maxTextureSize);
             if (!this.createdMaskImageUuid) {
-                this.createdMaskImageUuid = await createStoredImage(
-                    await resampleSelectionMaskInLayerBounds(
-                        this.selectionMask!,
-                        this.selectionMaskCanvasOffset,
-                        new DOMPoint(layer.width, layer.height),
-                        getLayerGlobalTransform(layer.id),
-                    )
+                let selectionMaskImage = await resampleSelectionMaskInLayerBounds(
+                    this.selectionMask!,
+                    this.selectionMaskCanvasOffset,
+                    new DOMPoint(layer.width, layer.height),
+                    getLayerGlobalTransform(layer.id),
                 );
+                if (layer.width > maxTextureSize || layer.height > maxTextureSize) {
+                    // TODO - selection mask doesn't support scaling
+                    selectionMaskImage = await resizeImage(selectionMaskImage, textureWidth, textureHeight);
+                }
+                this.createdMaskImageUuid = await createStoredImage(selectionMaskImage);
                 this.selectionMask = null;
                 reserveStoredImage(this.createdMaskImageUuid, `${this.layerId}`);
             }
             const storedMaskImage = getStoredImageOrCanvas(this.createdMaskImageUuid);
             if (storedMaskImage) {
+                // TODO - selection mask doesn't support scaling
                 const mask: WorkingFileLayerMask = {
                     sourceUuid: this.createdMaskImageUuid,
                     offset: new DOMPoint(0, 0),

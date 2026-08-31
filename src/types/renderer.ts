@@ -68,6 +68,7 @@ export interface RendererBrushStrokeSettings extends RendererBrushStrokeSettings
 export interface RendererFrontend {
     initialize(canvas: HTMLCanvasElement | OffscreenCanvas): Promise<void>;
     resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number): Promise<void>;
+    getMaxTextureSize(): Promise<number>;
     applySelectionMaskToAlphaChannel(layerId: number, options?: RendererFrontendApplySelectionMaskToAlphaChannelOptions): Promise<RendererTextureTile[]>;
     takeSnapshot(imageWidth: number, imageHeight: number, options?: RendererFrontendTakeSnapshotOptions): Promise<ImageBitmap>;
     pickColor(canvasX: number, canvasY: number): Promise<RGBAColor>;

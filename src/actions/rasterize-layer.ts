@@ -4,7 +4,10 @@ import { DeleteLayerFilterAction } from './delete-layer-filter';
 import { SelectLayersAction } from './select-layers';
 import { UpdateLayerAction } from './update-layer';
 
-import { createImageFromBlob } from '@/lib/image';
+import { useRenderer } from '@/renderers';
+
+import { createImageFromBlob, createCanvasFromImage, createImageBlobFromCanvas, resizeImage } from '@/lib/image';
+import { limitMaxDimension } from '@/lib/math';
 
 import { createStoredImage } from '@/store/image';
 import workingFileStore, { getLayerById } from '@/store/working-file';
@@ -33,10 +36,12 @@ export class RasterizeLayerAction extends BaseAction {
             throw new Error('[src/actions/rasterize-layer.ts] Layer with specified id not found.');
         }
 
+        const maxTextureSize = await (await useRenderer()).getMaxTextureSize();
+
         const selectLayersAction = new SelectLayersAction([this.layerId]);
         await selectLayersAction.do();
 
-        const { blob } = await exportAsImage({
+        let { blob } = await exportAsImage({
             fileType: 'png',
             toBlob: true,
             layerSelection: 'selected',
@@ -52,6 +57,15 @@ export class RasterizeLayerAction extends BaseAction {
         }
         this.actions.push(selectLayersAction);
 
+        let newTransform = layer.transform;
+        if (workingFileStore.get('width') > maxTextureSize || workingFileStore.get('height') > maxTextureSize) {
+            const { width, height } = limitMaxDimension(workingFileStore.get('width'), workingFileStore.get('height'), maxTextureSize);
+            blob = await createImageBlobFromCanvas(
+                await resizeImage(await createImageFromBlob(blob), width, height)
+            );
+            newTransform = layer.transform.multiply(new DOMMatrix().scale(workingFileStore.get('width') / width, workingFileStore.get('height') / height));
+        }
+
         const filterCount = layer.filters.length;
         for (let i = 0; i < filterCount; i++) {
             const deleteLayerFilterAction = new DeleteLayerFilterAction(this.layerId, 0);
@@ -62,6 +76,7 @@ export class RasterizeLayerAction extends BaseAction {
         const updateLayerAction = new UpdateLayerAction<UpdateRasterLayerOptions>({
             id: this.layerId,
             type: 'raster',
+            transform: newTransform,
             data: {
                 sourceUuid: await createStoredImage(await createImageFromBlob(blob)),
             },

@@ -49,6 +49,14 @@ self.onmessage = ({ data }) => {
                 });
             }).catch(logError);
             break;
+        case BackendWorkerMessage.GET_MAX_TEXTURE_SIZE:
+            rendererBackend.getMaxTextureSize().then((maxTextureSize) => {
+                self.postMessage({
+                    type: BackendWorkerMessage.GET_MAX_TEXTURE_SIZE_RESULT,
+                    maxTextureSize,
+                });
+            });
+            break;
         case BackendWorkerMessage.ENABLE_IMAGE_BOUNDARY_MASK:
             rendererBackend.enableImageBoundaryMask(data.enabled).then(() => {
                 self.postMessage({

@@ -30,6 +30,7 @@
  */
 
 import { defineComponent, ref, watch, onMounted, onUnmounted, nextTick } from 'vue';
+import { useRenderer } from '@/renderers';
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton from 'element-plus/lib/components/button/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
@@ -89,13 +90,14 @@ export default defineComponent({
 
         async function requestStream() {
             stopStream();
+            const maxTextureSize = await (await useRenderer()).getMaxTextureSize();
             try {
                 stream.value = await navigator.mediaDevices.getUserMedia({
                     audio: false,
                     video: {
                         facingMode: facingMode.value,
-                        width: { ideal: 1920 },
-                        height: { ideal: 1920 } 
+                        width: { ideal: Math.min(maxTextureSize, 1920) },
+                        height: { ideal: Math.min(maxTextureSize, 1920) } 
                     }
                 });
                 tracks.value = stream.value.getTracks();

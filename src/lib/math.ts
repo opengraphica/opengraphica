@@ -81,3 +81,15 @@ export function findPointListBounds(points: Array<DOMPoint | { x: number, y: num
 export function isEqualApprox(a, b, epsilon = 0.00001) {
     return Math.abs(a - b) <= epsilon;
 }
+
+export function limitMaxDimension(originalWidth: number, originalHeight: number, max: number) {
+    if (originalWidth > originalHeight) {
+        let width = Math.min(max, originalWidth);
+        let height = Math.floor(width * (originalHeight / originalWidth));
+        return { width, height };
+    } else {
+        let height = Math.min(max, originalHeight);
+        let width = Math.floor(height * (originalWidth / originalHeight));
+        return { width, height };
+    }
+}

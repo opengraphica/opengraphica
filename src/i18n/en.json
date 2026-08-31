@@ -585,6 +585,34 @@
             "name": "Sharpen"
         }
     },
+    "lib": {
+        "fontNotify": {
+            "title": "Loading Fonts",
+            "pleaseWait": "Please wait, these fonts are being loaded:"
+        },
+        "tutorial": {
+            "notification": {
+                "gotIt": "Got It",
+                "dontShowTips": "Don't Show Tips"
+            }
+        }
+    },
+    "measurement": {
+        "percent": "Percent",
+        "percentage": "Percentage",
+        "pixels": "Pixels",
+        "millimeters": "Millimeters",
+        "centimeters": "Centimeters",
+        "inches": "Inches",
+        "pixelsPerInch": "Pixels/Inch",
+        "pixelsPerMillimeter": "Pixels/Millimeter",
+        "pixelsPerCentimeter": "Pixels/Centimeter"
+    },
+    "menuBar": {
+        "toolsHeading": "Tools",
+        "expandToolGroup": "Expand",
+        "collapseToolGroup": "Collapse"
+    },
     "menuBarToolGroup": {
         "deform": {
             "name": "Deform",
@@ -644,34 +672,6 @@
             }
         }
     },
-    "lib": {
-        "fontNotify": {
-            "title": "Loading Fonts",
-            "pleaseWait": "Please wait, these fonts are being loaded:"
-        },
-        "tutorial": {
-            "notification": {
-                "gotIt": "Got It",
-                "dontShowTips": "Don't Show Tips"
-            }
-        }
-    },
-    "measurement": {
-        "percent": "Percent",
-        "percentage": "Percentage",
-        "pixels": "Pixels",
-        "millimeters": "Millimeters",
-        "centimeters": "Centimeters",
-        "inches": "Inches",
-        "pixelsPerInch": "Pixels/Inch",
-        "pixelsPerMillimeter": "Pixels/Millimeter",
-        "pixelsPerCentimeter": "Pixels/Centimeter"
-    },
-    "menuBar": {
-        "toolsHeading": "Tools",
-        "expandToolGroup": "Expand",
-        "collapseToolGroup": "Collapse"
-    },
     "module": {
         "designSystem": {
             "title": "Design System"
@@ -706,6 +706,12 @@
             "resolution": "Resolution",
             "colorProfile": "Color Profile",
             "scaleFactor": "Scale Factor"
+        },
+        "fileOpenNotification": {
+            "maxTextureSizeLimited": {
+                "title": "Max Dimensions Encountered",
+                "message": "An image you opened is larger than the maximum size your browser supports. It was scaled down."
+            }
         },
         "fileOpenConfirm": {
             "title": "Are you sure?",

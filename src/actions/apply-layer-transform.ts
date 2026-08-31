@@ -4,11 +4,12 @@ import canvasStore from '@/store/canvas';
 import { createStoredImage, prepareStoredImageForEditing, prepareStoredImageForArchival } from '@/store/image';
 import { getLayerById, getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { updateWorkingFileLayer } from '@/store/data/working-file-database';
-import { getImageDataEmptyBounds, getImageDataFromCanvas } from '@/lib/image';
+import { getImageDataEmptyBounds, getImageDataFromCanvas, resizeImage } from '@/lib/image';
 import { decomposeMatrix } from '@/lib/dom-matrix';
-import { findPointListBounds } from '@/lib/math';
+import { findPointListBounds, limitMaxDimension } from '@/lib/math';
 import { UpdateLayerAction } from './update-layer';
 import { TrimLayerEmptySpaceAction } from './trim-layer-empty-space';
+import { useRenderer } from '@/renderers';
 
 export class ApplyLayerTransformAction extends BaseAction {
 
@@ -32,6 +33,8 @@ export class ApplyLayerTransformAction extends BaseAction {
         if (!layerCanvas) throw new Error('[src/actions/apply-layer-transform.ts] Unable to edit existing layer image.');
         let emptyBounds = getImageDataEmptyBounds(getImageDataFromCanvas(layerCanvas));
 
+        const maxTextureSize = await (await useRenderer()).getMaxTextureSize();
+
         // Draw rotated crop on new canvas
         const afterEmptyCropBounds = findPointListBounds([
             new DOMPoint(emptyBounds.left, emptyBounds.top).matrixTransform(layer.transform),
@@ -39,31 +42,34 @@ export class ApplyLayerTransformAction extends BaseAction {
             new DOMPoint(emptyBounds.left, emptyBounds.bottom).matrixTransform(layer.transform),
             new DOMPoint(emptyBounds.right, emptyBounds.bottom).matrixTransform(layer.transform),
         ]);
-        let newWidth = Math.ceil(afterEmptyCropBounds.right - afterEmptyCropBounds.left);
-        let newHeight = Math.ceil(afterEmptyCropBounds.bottom - afterEmptyCropBounds.top);
+        const originalTextureWidth = Math.ceil(afterEmptyCropBounds.right - afterEmptyCropBounds.left);
+        const originalTextureHeight = Math.ceil(afterEmptyCropBounds.bottom - afterEmptyCropBounds.top);
+        let { width: textureWidth, height: textureHeight } = limitMaxDimension(
+            originalTextureWidth,
+            originalTextureHeight,
+            maxTextureSize,
+        )
 
-        if (newWidth < 1 || newHeight < 1) return;
+        if (textureWidth < 1 || textureHeight < 1) return;
 
         const croppedTransform = new DOMMatrix().translateSelf(-afterEmptyCropBounds.left, -afterEmptyCropBounds.top).multiplySelf(layer.transform);
         const decomposedCroppedTransform = decomposeMatrix(croppedTransform);
 
         let imageResizeCanvas: HTMLCanvasElement | null = null;
         if (decomposedCroppedTransform.scaleX !== 1 || decomposedCroppedTransform.scaleY !== 1) {
-            imageResizeCanvas = document.createElement('canvas');
-            imageResizeCanvas.width = Math.round(layer.width * decomposedCroppedTransform.scaleX);
-            imageResizeCanvas.height = Math.round(layer.height * decomposedCroppedTransform.scaleY);
-            const Pica = (await import('@/lib/pica')).default;
-            const pica = new Pica();
-            await pica.resize(layerCanvas, imageResizeCanvas, { alpha: true });
+            const scaledWidth = Math.round(layer.width * decomposedCroppedTransform.scaleX);
+            const scaledHeight = Math.round(layer.height * decomposedCroppedTransform.scaleY);
+            imageResizeCanvas = await resizeImage(layerCanvas, scaledWidth, scaledHeight);
         }
 
         let workingCanvas = document.createElement('canvas');
-        workingCanvas.width = newWidth;
-        workingCanvas.height = newHeight;
+        workingCanvas.width = textureWidth;
+        workingCanvas.height = textureHeight;
         let workingCanvasCtx = workingCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
         if (!workingCanvasCtx) throw new Error('[src/actions/apply-layer-transform.ts] Unable to create a new canvas for transform.');
         workingCanvasCtx.save();
         workingCanvasCtx.globalCompositeOperation = 'copy';
+        workingCanvasCtx.scale(textureWidth / originalTextureWidth, textureHeight / originalTextureHeight);
         workingCanvasCtx.transform(croppedTransform.a, croppedTransform.b, croppedTransform.c, croppedTransform.d, croppedTransform.e, croppedTransform.f);
         if (imageResizeCanvas) {
             workingCanvasCtx.scale(1 / decomposedCroppedTransform.scaleX, 1 / decomposedCroppedTransform.scaleY);
@@ -72,15 +78,18 @@ export class ApplyLayerTransformAction extends BaseAction {
         workingCanvasCtx.restore();
         let newLayerTransform = new DOMMatrix().translateSelf(
             afterEmptyCropBounds.left,
-            afterEmptyCropBounds.top
+            afterEmptyCropBounds.top,
+        ).scaleSelf(
+            originalTextureWidth / textureWidth,
+            originalTextureHeight / textureHeight,
         );
 
         prepareStoredImageForArchival(layer.data.sourceUuid);
 
         this.updateLayerAction = new UpdateLayerAction({
             id: this.layerId,
-            width: newWidth,
-            height: newHeight,
+            width: textureWidth,
+            height: textureHeight,
             transform: newLayerTransform,
             data: {
                 sourceUuid: await createStoredImage(workingCanvas)

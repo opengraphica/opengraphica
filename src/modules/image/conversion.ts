@@ -1,8 +1,10 @@
+import { useRenderer } from '@/renderers';
+
 import workingFileStore, { WorkingFileState, getLayersByType } from '@/store/working-file';
 import historyStore from '@/store/history';
 import editorStore, { updateRasterSequenceLayerWithTimeline } from '@/store/editor';
 
-import { findPointListBounds } from '@/lib/math';
+import { findPointListBounds, limitMaxDimension } from '@/lib/math';
 
 import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
@@ -23,12 +25,24 @@ export async function convertLayersToImageSequence(options: ConvertLayersToImage
 
     // TODO - base on selected layers
 
+    const maxTextureSize = await (await useRenderer()).getMaxTextureSize();
+
+    let { width: textureWidth, height: textureHeight } = limitMaxDimension(
+        workingFileStore.get('width'),
+        workingFileStore.get('height'),
+        maxTextureSize,
+    )
+
     const combineLayers = getLayersByType<WorkingFileRasterLayer<ColorModel>>('raster');
     const rasterSequenceLayer: InsertRasterSequenceLayerOptions<ColorModel> = {
         type: 'rasterSequence',
-        height: workingFileStore.get('height'),
+        height: textureHeight,
         name: 'New Image Sequence',
-        width: workingFileStore.get('width'),
+        width: textureWidth,
+        transform: new DOMMatrix().scaleSelf(
+            workingFileStore.get('width') / textureWidth,
+            workingFileStore.get('height') / textureHeight,
+        ),
         data: {
             sequence: []
         }

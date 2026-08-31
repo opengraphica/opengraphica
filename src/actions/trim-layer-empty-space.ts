@@ -4,8 +4,9 @@ import canvasStore from '@/store/canvas';
 import { createStoredImage, prepareStoredImageForEditing, prepareStoredImageForArchival } from '@/store/image';
 import { getLayerById, getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { getImageDataEmptyBounds, getImageDataFromCanvas } from '@/lib/image';
-import { findPointListBounds } from '@/lib/math';
+import { findPointListBounds, limitMaxDimension } from '@/lib/math';
 import { UpdateLayerAction } from './update-layer';
+// import { useRenderer } from '@/renderers';
 
 export class TrimLayerEmptySpaceAction extends BaseAction {
 

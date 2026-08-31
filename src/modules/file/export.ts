@@ -17,6 +17,7 @@ import historyStore from '@/store/history';
 
 import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
 import { generateImageBlobHash } from '@/lib/hash';
+import { limitMaxDimension } from '@/lib/math';
 import { knownFileExtensions } from '@/lib/regex';
 
 import { InsertLayerAction } from '@/actions/insert-layer';
@@ -77,17 +78,28 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                 return;
             }
 
+            const renderer = await useRenderer();
+
             let canvas = document.createElement('canvas');
-            canvas.width = workingFileStore.get('width');
-            canvas.height = workingFileStore.get('height');
+            const { width, height } = workingFileStore.state;
+            canvas.width = width;
+            canvas.height = height;
+
+            if (options.toNewLayer) {
+                const maxTextureSize = await renderer.getMaxTextureSize();
+                const { width: textureWidth, height: textureHeight } = limitMaxDimension(width, height, maxTextureSize);
+                canvas.width = textureWidth;
+                canvas.height = textureHeight;
+            }
+
             if (!['image/gif'].includes(mimeType)) {
-                const renderer = await useRenderer();
-                const snapshotBitmap = await renderer.takeSnapshot(canvas.width, canvas.height, {
+                const snapshotBitmap = await renderer.takeSnapshot(width, height, {
                     cameraTransform: options.cameraTransform,
                     layerIds: options.layerSelection === 'selected' ? workingFileStore.state.selectedLayerIds : undefined,
                     applySelectionMask: options.applySelectionMask && (activeSelectionMask.value != null || appliedSelectionMask.value != null),
                 });
                 const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
+                ctx.scale(canvas.width / width, canvas.height / height);
                 ctx.drawImage(snapshotBitmap, 0, 0);
                 snapshotBitmap.close();
             }
@@ -99,6 +111,7 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                         name: ensureUniqueLayerSiblingName(workingFileStore.state.layers[0]?.id, 'Flattened Image'),
                         width: canvas.width,
                         height: canvas.height,
+                        transform: new DOMMatrix().scaleSelf(width / canvas.width, height / canvas.height),
                         data: {
                             sourceUuid: await createStoredImage(canvas),
                         }

@@ -53,6 +53,7 @@ export interface Webgl2RendererBackendPublic {
     onRequestFrontendTexture?: (sourceUuid: string) => void;
     initialize(canvas: HTMLCanvasElement | OffscreenCanvas, imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number): Promise<void>;
     resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number): Promise<void>;
+    getMaxTextureSize(): Promise<number>;
     enableImageBoundaryMask(enabled: boolean): Promise<void>;
     setBackgroundColor(r: number, g: number, b: number, alpha: number): Promise<void>;
     setMasks(masks: Record<number, WorkingFileLayerMask>): Promise<void>;
@@ -194,6 +195,10 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
             this.imageBoundaryMask.resize(imageWidth, imageHeight);
         }
         this.dirty = true;
+    }
+
+    async getMaxTextureSize(): Promise<number> {
+        return this.renderer.capabilities.maxTextureSize;
     }
 
     async enableImageBoundaryMask(enabled: boolean) {
