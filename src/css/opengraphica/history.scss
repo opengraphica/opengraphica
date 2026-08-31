@@ -41,8 +41,9 @@
     position: absolute;
     left: #{"max(1rem, var(--og-sidebar-left-width, 1rem))"};
     right: #{"max(1rem, var(--og-sidebar-right-width, 1rem))"};
-    bottom: var(--og-footer-height);
-    padding: 0 0 1rem 0;
+    top: var(--og-header-height);
+    padding: 1rem 0 0 0;
+    pointer-events: none;
 }
 .og-history-notification {
     border-radius: 1rem;

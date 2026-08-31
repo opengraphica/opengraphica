@@ -88,6 +88,7 @@ export const colorPaletteDockVisible = ref<boolean>(false);
 export const sizeDockTop = ref(0);
 export const sizeDockLeft = ref(0);
 export const sizeDockVisible = ref<boolean>(false);
+export const isPreviewingSize = ref<boolean>(false);
 
 export const smoothingDockTop = ref(0);
 export const smoothingDockLeft = ref(0);

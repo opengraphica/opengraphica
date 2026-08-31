@@ -15,6 +15,7 @@
     &:before, &:after {
         content: '';
         display: block !important;
+        position: absolute;
         box-sizing: border-box;
         background: url("../images/transparency-bg.png");
         border: 0.125rem solid var(--el-input-bg-color, var(--el-fill-color-blank));

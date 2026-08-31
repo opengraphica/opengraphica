@@ -5,7 +5,8 @@ import { getLayerById, getLayerGlobalTransform } from '@/store/working-file';
 import { PerformantStore } from '@/store/performant-store';
 
 import type {
-    CalculatedTextPlacement, TextDocumentSelectionState, TextDocument, TextDocumentSpanMeta, WorkingFileTextLayer
+    CalculatedTextPlacement, RGBAColor,
+    TextDocumentSelectionState, TextDocument, TextDocumentSpanMeta, WorkingFileTextLayer
 } from '@/types';
 
 type RecordWithNull<T> = {
@@ -39,6 +40,8 @@ export const editingLayerCssTransform = computed<string>(() => {
 export const editingTextLayer = ref<WorkingFileTextLayer | null>(null);
 
 interface PermanentStorageState {
+    fillColorPalette: RGBAColor[];
+    fillColorPaletteIndex: number;
     lineAlignment: TextDocument['lineAlignment'],
     lineDirection: TextDocument['lineDirection'],
     wrapDirection: TextDocument['wrapDirection'],
@@ -48,6 +51,33 @@ interface PermanentStorageState {
 const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentStorageState }>({
     name: 'textStateStore',
     state: {
+        fillColorPalette: [
+            {
+                is: 'color',
+                r: 0,
+                g: 0,
+                b: 0,
+                alpha: 1,
+                style: '#000000'
+            },
+            {
+                is: 'color',
+                r: 1,
+                g: 1,
+                b: 1,
+                alpha: 1,
+                style: '#ffffff'
+            },
+            {
+                is: 'color',
+                r: 1,
+                g: 0,
+                b: 0,
+                alpha: 1,
+                style: '#ff0000'
+            },
+        ],
+        fillColorPaletteIndex: 0,
         lineAlignment: 'start',
         lineDirection: 'ltr',
         wrapDirection: 'ttb',
@@ -55,6 +85,9 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
     },
     restore: ['lineAlignment', 'lineDirection', 'wrapDirection', 'wrapAt'],
 });
+
+export const fillColorPalette = permanentStorage.getDeepWritableRef('fillColorPalette');
+export const fillColorPaletteIndex = permanentStorage.getWritableRef('fillColorPaletteIndex');
 
 export const toolbarTextDefaults = reactive({
     lineAlignment: permanentStorage.getWritableRef('lineAlignment'),
@@ -69,3 +102,7 @@ if (['ltr', 'rtl'].includes(toolbarTextDefaults.lineDirection) && !['ttb', 'btt'
 if (['ttb', 'btt'].includes(toolbarTextDefaults.lineDirection) && !['ltr', 'rtl'].includes(toolbarTextDefaults.wrapDirection)) {
     toolbarTextDefaults.wrapDirection = 'rtl';
 }
+
+export const fillColorPaletteDockTop = ref(0);
+export const fillColorPaletteDockLeft = ref(0);
+export const fillColorPaletteDockVisible = ref<boolean>(false);

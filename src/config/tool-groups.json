@@ -139,6 +139,16 @@
                 "overlays": [
                     "free-transform"
                 ]
+            },
+            "layerCrop": {
+                "controller": "layer-crop",
+                "toolbar": {
+                    "position": "auto",
+                    "target": "layer-crop"
+                },
+                "overlays": [
+                    "layer-crop"
+                ]
             }
         }
     },

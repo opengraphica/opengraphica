@@ -633,7 +633,8 @@
         "transform": {
             "name": "Move / Transform",
             "tools": {
-                "freeTransform": "Move, scale, rotate layers, and manage layer boundaries"
+                "freeTransform": "Move, scale, rotate layers",
+                "layerCrop": "Crop the selected layer"
             }
         },
         "view": {
@@ -1300,7 +1301,9 @@
             "strikethrough": "Strikethrough",
             "underline": "Underline",
             "fill": "Fill",
+            "fillColor": "Fill Color",
             "fillTooltip": "Color that shows inside the edges of the letter(s)",
+            "paletteCount": "Palette Count",
             "alignment": {
                 "title": "Alignment",
                 "boundary": "Boundary",

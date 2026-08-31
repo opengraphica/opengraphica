@@ -19,7 +19,7 @@ import { textMetaDefaults } from '@/lib/text-common';
 import { calculateTextPlacement } from '@/lib/text-render';
 
 import canvasStore from '@/store/canvas';
-import { cssViewTransform } from '@/store/editor';
+import editorStore, { cssViewTransform } from '@/store/editor';
 import historyStore from '@/store/history';
 import preferencesStore from '@/store/preferences';
 import workingFileStore, { getLayerById, getLayerGlobalTransform, getLayersByType, getSelectedLayers, ensureUniqueLayerSiblingName } from '@/store/working-file';
@@ -48,6 +48,7 @@ const CLEARED_EDITOR_TEXTAREA_LENGTH = 2;
 export default class CanvasTextController extends BaseCanvasMovementController {
 
     private dragStartPickLayer: number | null = null;
+    private lastDragStartPickLayer: number | null = null;
     private dragStartPosition: DOMPoint | null = null;
     private dragStartDragType: number | null = null;
     private transformIsDragging: boolean = false;
@@ -69,10 +70,11 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     private editorTextareaQueueSaveTimeoutHandle: number | undefined = undefined;
     private editorTextareaSelectWordTimestamp: number = 0;
 
-    private isKeydownEventSupported: boolean = false;
-
     private layerEditors: Map<number, { documentEditor: TextDocumentEditor, documentSelection: TextDocumentSelection }> = new Map();
     private isHoveringLayerHorizontal: boolean = true;
+    private justFocusedLayerVirtualKeyboardTransform: DOMMatrix | null = null;
+    private justFocusedLayerVirtualKeyboardDndAreaHeight: number = window.innerHeight;
+    private enterWindowInnerHeight: number = window.innerHeight;
 
     private selectedLayerIdsUnwatch: WatchStopHandle | null = null;
     private editingTextDocumentSelectionUnwatch: WatchStopHandle | null = null;
@@ -84,6 +86,8 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         super.onEnter();
 
         this.createEditorTextarea();
+
+        this.enterWindowInnerHeight = window.innerHeight;
 
         // Create text editor instances for currently selected layers.
         this.selectedLayerIdsUnwatch = watch(() => workingFileStore.state.selectedLayerIds, (newIds, oldIds) => {
@@ -225,6 +229,8 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         this.editingTextLayerIdUnwatch?.();
         this.editingTextLayerDimensionsUnwatch?.();
         this.editingTextLayerDirectionUnwatch?.();
+        
+        this.lastDragStartPickLayer = null;
     }
 
     private async onHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
@@ -725,6 +731,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         this.editingLayerHeightStart = null;
         this.isCreatingLayer = false;
         this.createdLayerId = null;
+        this.justFocusedLayerVirtualKeyboardTransform = null;
 
         if (this.dragStartPickLayer != null || dragHandleHighlight.value != null) {
 
@@ -736,6 +743,13 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 this.editingLayerWidthStart = editingTextLayer.value.width;
                 this.editingLayerHeightStart = editingTextLayer.value.height;
             } else {
+                if (dragStartPickLayer != null && dragStartPickLayer !== this.lastDragStartPickLayer) {
+                    this.justFocusedLayerVirtualKeyboardTransform = this.calculateVirtualKeyboardJumpTransform(new DOMPoint(
+                        pointer.down.pageX,
+                        pointer.down.pageY
+                    ));
+                    this.justFocusedLayerVirtualKeyboardDndAreaHeight = canvasStore.get('dndAreaHeight');
+                }
                 // Pointer manipulates text selection.
                 // Wait and then assign focus, because the browser immediately focuses on clicked element.
                 setTimeout(() => {
@@ -759,6 +773,11 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             }
         } else {
             this.isCreatingLayer = true;
+            this.justFocusedLayerVirtualKeyboardTransform = this.calculateVirtualKeyboardJumpTransform(new DOMPoint(
+                pointer.down.pageX,
+                pointer.down.pageY
+            ));
+            this.justFocusedLayerVirtualKeyboardDndAreaHeight = canvasStore.get('dndAreaHeight');
         }
     }
 
@@ -920,12 +939,26 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             }
         }
 
+        if (this.justFocusedLayerVirtualKeyboardTransform && editorStore.get('isTouchUser')) {
+            const justFocusedLayerVirtualKeyboardTransform = this.justFocusedLayerVirtualKeyboardTransform;
+            setTimeout(() => {
+                if (window.innerHeight < this.enterWindowInnerHeight) {
+                    canvasStore.set('transform', justFocusedLayerVirtualKeyboardTransform);
+                    canvasStore.set('viewDirty', true);
+                }
+            }, 500);
+        }
+
+        if (this.dragStartPickLayer != null) {
+            this.lastDragStartPickLayer = this.dragStartPickLayer;
+        }
         this.isCreatingLayer = false;
         this.createdLayerId = null;
         this.dragStartPickLayer = null;
         this.dragStartPosition = null;
         this.dragStartDragType = null;
         this.transformIsDragging = false;
+        this.justFocusedLayerVirtualKeyboardTransform = null;
     }
 
     private onCursorHover(pointer: PointerEvent) {
@@ -1310,6 +1343,13 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             transformBoundsPoint: transformBoundsPoint ?? new DOMPoint(),
             viewDecomposedTransform
         };
+    }
+
+    private calculateVirtualKeyboardJumpTransform(pointerDown: DOMPoint) {
+        return new DOMMatrix().translate(
+            0,
+            Math.min(0, (this.enterWindowInnerHeight * devicePixelRatio / 4) - pointerDown.y * devicePixelRatio),
+        ).multiply(canvasStore.state.transform);
     }
 
     protected handleCursorIcon() {

@@ -17,21 +17,33 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, PropType, onMounted, nextTick } from 'vue';
+import { defineComponent, type PropType } from 'vue';
 
 import appEmitter from '@/lib/emitter';
+
+import type { RGBAColor } from '@/types';
 
 export default defineComponent({
     name: 'ElInputColor',
     props: {
         modelValue: {
-            type: Object
-        }
+            type: Object as PropType<RGBAColor>,
+            required: true,
+        },
+        isCustomPicker: {
+            type: Boolean,
+            default: false,
+        },
     },
-    emits: ['update:modelValue', 'input', 'change'],
+    emits: ['update:modelValue', 'pick', 'input', 'change'],
     setup(props, { emit }) {
 
         function onPickColor() {
+            if (props.isCustomPicker) {
+                emit('pick');
+                return;
+            }
+
             appEmitter.emit('app.dialogs.openFromDock', {
                 name: 'color-picker',
                 props: {

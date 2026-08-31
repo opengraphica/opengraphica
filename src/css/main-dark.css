@@ -9698,6 +9698,7 @@ body.og-full-page .opengraphica {
 .opengraphica .og-gradient-input:before, .opengraphica .og-gradient-input:after {
   content: "";
   display: block !important;
+  position: absolute;
   box-sizing: border-box;
   background: url("../images/transparency-bg.png");
   border: 0.125rem solid var(--el-input-bg-color, var(--el-fill-color-blank));
@@ -9833,8 +9834,9 @@ body.og-full-page .opengraphica {
   position: absolute;
   left: max(1rem, var(--og-sidebar-left-width, 1rem));
   right: max(1rem, var(--og-sidebar-right-width, 1rem));
-  bottom: var(--og-footer-height);
-  padding: 0 0 1rem 0;
+  top: var(--og-header-height);
+  padding: 1rem 0 0 0;
+  pointer-events: none;
 }
 .opengraphica .og-history-notification {
   border-radius: 1rem;
@@ -9943,6 +9945,7 @@ body.og-full-page .opengraphica {
 }
 .opengraphica .og-layer-list .og-layer.is-background {
   border-top: 1px solid var(--el-border-color);
+  background: transparent;
   border-radius: 0 0 0.875rem 0.875rem;
 }
 .opengraphica .og-layer-list .og-layer.is-background > .og-layer-main {

@@ -94,6 +94,13 @@
                     "type": "tool",
                     "target": "freeTransform"
                 }
+            },
+            {
+                "icon": "bi bi-crop",
+                "action": {
+                    "type": "tool",
+                    "target": "layerCrop"
+                }
             }
         ]
     },

@@ -30,8 +30,6 @@ export function useViewportCommon(options: ViewportCommonOptions) {
         const margin: number = (event && event.margin) || 48;
         if (canvasArea.value && mainElement) {
             const devicePixelRatio = window.devicePixelRatio || 1;
-            const canvasAreaRect = canvasArea.value.getBoundingClientRect();
-            const mainRect = mainElement.value.getBoundingClientRect();
             const imageWidth = workingFileStore.get('width');
             const imageHeight = workingFileStore.get('height');
             let scaledWidth = imageWidth;

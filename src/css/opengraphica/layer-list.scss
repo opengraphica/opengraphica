@@ -76,6 +76,7 @@
 
         &.is-background {
             border-top: 1px solid var(--el-border-color);
+            background: transparent;
             border-radius: 0 0 0.875rem 0.875rem;
 
             > .og-layer-main {

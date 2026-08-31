@@ -290,7 +290,7 @@ export default defineComponent({
 
         function onTouchStartWindowTouchTest(e: Event) {
             window.removeEventListener('touchstart', onTouchStartWindowTouchTest);
-            editorStore.set('isTouchUser', true);
+            editorStore.set('isTouchUser', !!window.matchMedia?.('(pointer:coarse)')?.matches);
         }
 
         function onPointerDownWindowPenTest(e: PointerEvent) {

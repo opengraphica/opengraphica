@@ -14,11 +14,11 @@ import historyStore, { createHistoryReserveToken, historyReserveQueueFree, histo
 import preferencesStore from '@/store/preferences';
 import workingFileStore, { getSelectedLayers, getLayerById, ensureUniqueLayerSiblingName } from '@/store/working-file';
 import {
-    cursorHoverPosition, brushShape, brushSmoothing, brushSpacing, brushColor,
+    cursorHoverPosition, brushSmoothing, brushSpacing, brushColor,
     brushSize, brushJitter, brushPressureMinDensity, brushDensity, showBrushDrawer,
     brushPressureMinSize, brushPressureTaper, brushConcentration, brushPressureMinConcentration,
     brushColorBlendingStrength, brushPressureMinColorBlendingStrength,
-    brushColorBlendingPersistence, brushHardness,
+    brushColorBlendingPersistence, brushHardness, isPreviewingSize,
 } from '../store/draw-brush-state';
 
 import type { BaseAction } from '@/actions/base';
@@ -38,6 +38,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
     private brushSizeUnwatch: WatchStopHandle | null = null;
     private selectedLayerIdsUnwatch: WatchStopHandle | null = null;
     private pointerPenMaxPressureMarginUnwatch: WatchStopHandle | null = null;
+    private isPreviewingSizeUnwatch: WatchStopHandle | null = null;
 
     private renderer: RendererFrontend | null = null;
 
@@ -83,6 +84,20 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             this.pointerPenMaxPressureMargin = pointerPenMaxPressureMargin;
         }, { immediate: true });
 
+        this.isPreviewingSizeUnwatch = watch(() => isPreviewingSize.value, () => {
+            if (isPreviewingSize.value) {
+                cursorHoverPosition.value = new DOMPoint(
+                    canvasStore.get('dndAreaLeft') + canvasStore.get('dndAreaWidth') / 2,
+                    canvasStore.get('dndAreaTop') + canvasStore.get('dndAreaHeight') / 2,
+                ).matrixTransform(canvasStore.state.transform.inverse());
+            } else {
+                cursorHoverPosition.value = new DOMPoint(
+                    -100000000000,
+                    -100000000000
+                )
+            }
+        });
+
         cursorHoverPosition.value = new DOMPoint(
             -100000000000,
             -100000000000
@@ -112,11 +127,13 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         showBrushDrawer.value = false;
 
         this.brushSizeUnwatch?.();
-        this.pointerPenMaxPressureMarginUnwatch?.();
         this.brushSizeUnwatch = null;
+        this.pointerPenMaxPressureMarginUnwatch?.();
+        this.pointerPenMaxPressureMarginUnwatch = null;
         this.selectedLayerIdsUnwatch?.();
         this.selectedLayerIdsUnwatch = null;
-        this.pointerPenMaxPressureMarginUnwatch = null;
+        this.isPreviewingSizeUnwatch?.();
+        this.isPreviewingSizeUnwatch = null;
 
         for (const layer of getSelectedLayers()) {
             if (layer.type === 'raster') {
@@ -136,11 +153,12 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
     onPointerDown(e: PointerEvent) {
         super.onPointerDown(e);
 
-        if (e.pointerType === 'pen' || !editorStore.state.isPenUser) {
+        if ((e.pointerType === 'pen' || !editorStore.state.isPenUser)) {
             cursorHoverPosition.value = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
                 this.lastCursorY * devicePixelRatio
             ).matrixTransform(canvasStore.state.transform.inverse());
+            isPreviewingSize.value = false;
         }
 
         this.isQueueingInput = false;
@@ -307,7 +325,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
     onPointerMove(e: PointerEvent): void {
         super.onPointerMove(e);
 
-        if (e.pointerType === 'pen' || !editorStore.state.isPenUser) {
+        if ((e.pointerType === 'pen' || !editorStore.state.isPenUser) && !isPreviewingSize.value) {
             cursorHoverPosition.value = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
                 this.lastCursorY * devicePixelRatio

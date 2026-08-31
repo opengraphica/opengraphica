@@ -10,13 +10,26 @@
                     role="button"
                     tabindex="0"
                     class="og-gradient-input og-gradient-input--small"
+                    style="align-items: center; justify-content: center;"
                     aria-haspopup="dialog"
                     :aria-expanded="showBrushDrawer"
                     :aria-controls="showBrushDrawer ? ('toolbar-draw-brush-select-brush-drawer-' + uuid) : undefined"
                     @click="onClickBrushSelect()"
                     @keydown="onKeydownBrushSelect($event)"
                 >
-                    <img class="og-gradient-input__image" :src="selectedBrushPreviewImage" aria-hidden="true">
+                    <div
+                        class="og-gradient-input__image"
+                        :style="{
+                            position: 'static',
+                            background: brushColor.style,
+                            maskImage: `url(${selectedBrushPreviewImage})`,
+                            maskRepeat: 'no-repeat',
+                            maskPosition: 'center',
+                            maskSize: '5.625rem 1.625rem',
+                            width: '5.625rem',
+                            height: '1.625rem',
+                        }"
+                    />
                 </div>
                 <og-button v-model:pressed="colorPaletteDockVisible" outline solid small toggle class="!ml-3"
                     @click="colorPaletteDockLeft = 0; colorPaletteDockTop = 0;">
@@ -66,6 +79,7 @@
                                     v-model.lazy="colorPaletteCount"
                                     size="small"
                                     :min="1" :max="19" :step="1"
+                                    @keydown.enter="showColorPaletteSettings = false"
                                 />
                             </el-form-item>
                         </el-form>
@@ -83,6 +97,8 @@
                 :step="0.01"
                 :format-tooltip="formatBrushSizeTooltip"
                 class="!w-50 !max-w-full"
+                @input="onInputScaledBrushSize"
+                @change="onChangeScaledBrushSize"
             />
         </floating-dock>
         <floating-dock v-if="smoothingDockVisible" v-model:top="smoothingDockTop" v-model:left="smoothingDockLeft" :visible="floatingDocksVisible">
@@ -120,10 +136,10 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { t } from '@/i18n';
 
 import {
-    brushSize, brushSmoothing, colorPalette, colorPaletteIndex, showBrushDrawer,
+    brushColor, brushSize, brushSmoothing, colorPalette, colorPaletteIndex, showBrushDrawer,
     selectedBrush, selectedBrushPreview, generateSelectedBrushPreview,
     colorPaletteDockVisible, colorPaletteDockTop, colorPaletteDockLeft,
-    sizeDockVisible, sizeDockTop, sizeDockLeft,
+    sizeDockVisible, sizeDockTop, sizeDockLeft, isPreviewingSize,
     smoothingDockVisible, smoothingDockTop, smoothingDockLeft,
 } from '@/canvas/store/draw-brush-state';
 
@@ -289,6 +305,14 @@ function formatBrushSizeTooltip() {
     const value = brushSize.value;
     const percentage = (value - minBrushSize.value) / (maxBrushSize.value - minBrushSize.value);
     return `${(100 * percentage).toFixed(0)}% - ${value}px`;
+}
+
+function onInputScaledBrushSize() {
+    isPreviewingSize.value = true;
+}
+
+function onChangeScaledBrushSize() {
+    isPreviewingSize.value = false;
 }
 
 /*---------------*\

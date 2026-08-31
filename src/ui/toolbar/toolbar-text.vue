@@ -49,7 +49,12 @@
                     <template #prepend>
                         <span class="text-xs" v-t="'toolbar.text.fill'">Fill</span>
                     </template>
-                    <el-input-color v-model="fillColor" :aria-label="$t('toolbar.text.fill')"></el-input-color>
+                    <el-input-color
+                        v-model="fillColor"
+                        is-custom-picker
+                        :aria-label="$t('toolbar.text.fill')"
+                        @pick="fillColorPaletteDockVisible = !fillColorPaletteDockVisible"
+                    />
                 </el-input-group>
                 <!-- Alignment -->
                 <el-popover
@@ -132,11 +137,56 @@
                 </el-popover>
             </el-horizontal-scrollbar-arrows>
         </div>
+        <floating-dock
+            v-if="fillColorPaletteDockVisible"
+            v-model:top="fillColorPaletteDockTop"
+            v-model:left="fillColorPaletteDockLeft"
+            :visible="floatingDocksVisible"
+        >
+            <div class="flex flex-wrap gap-2 max-w-105">
+                <og-button
+                    v-for="(palette, colorIndex) of fillColorPaletteItems"
+                    solid icon small toggle="active"
+                    :pressed="colorIndex === fillColorPaletteIndex"
+                    :aria-label="t('toolbar.text.fillColor')"
+                    class="og-button--color-swatch"
+                    :style="{
+                        '--og-button-swatch-background': palette.color.style,
+                        '--og-button-swatch-color': palette.isLight ? '#000000' : '#ffffff',
+                    }"
+                    @click="onClickFillColorPalette($event, colorIndex)"
+                >
+                    <i class="bi bi-palette-fill" aria-hidden="true" />
+                </og-button>
+                <og-button ref="showFillColorPaletteSettingsButton" :aria-label="t('button.settings')" small slim @click="onEditFillPaletteSettings()">
+                    <span class="bi bi-gear-fill" aria-hidden="true" />
+                </og-button>
+                <og-popover
+                    v-model:visible="showFillColorPaletteSettings"
+                    placement="top" arrow :offset="16"
+                    :reference="showFillColorPaletteSettingsButton?.$el"
+                >
+                    <div class="og-popover__content">
+                        <el-form action="javascript:void(0)" label-position="top">
+                            <el-form-item :label="$t('toolbar.text.paletteCount')" class="!m-0 !p-0 !max-w-30">
+                                <el-input-number
+                                    v-model.lazy="fillColorPaletteCount"
+                                    size="small"
+                                    :min="1" :max="19" :step="1"
+                                    @keydown.enter="showFillColorPaletteSettings = false"
+                                />
+                            </el-form-item>
+                        </el-form>
+                    </div>
+                </og-popover>
+            </div>
+        </floating-dock>
     </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
+<script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted, toRefs, watch, nextTick } from 'vue';
+import { useI18n } from '@/i18n';
 
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
@@ -148,201 +198,296 @@ import ElPopover from '@/ui/el/el-popover.vue';
 import { ElRadioButton, ElRadioGroup } from 'element-plus/lib/components/radio/index';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 
+import OgButton from '@/ui/element/button.vue';
+import OgPopover from '@/ui/element/popover.vue';
+import FloatingDock from '@/ui/dock/floating-dock.vue';
+
 import defaultFontFamilies from '@/config/default-font-families.json';
 
+import { colorToHsla } from '@/lib/color';
+import appEmitter from '@/lib/emitter';
 import { textMetaDefaults } from '@/lib/text-common';
 
-import { editingTextLayer, textToolbarEmitter, toolbarTextMeta, toolbarTextDefaults } from '@/canvas/store/text-state';
+import {
+    fillColorPalette, fillColorPaletteIndex,
+    fillColorPaletteDockLeft, fillColorPaletteDockTop, fillColorPaletteDockVisible,
+    editingTextLayer, textToolbarEmitter, toolbarTextMeta, toolbarTextDefaults,
+} from '@/canvas/store/text-state';
 
 import type { RGBAColor, TextDocument } from '@/types';
 
-export default defineComponent({
-    name: 'ToolbarText',
-    components: {
-        ElButton,
-        ElButtonGroup,
-        ElForm,
-        ElFormItem,
-        ElHorizontalScrollbarArrows,
-        ElInputColor,
-        ElInputGroup,
-        ElInputNumber,
-        ElOption,
-        ElPopover,
-        ElRadioButton,
-        ElRadioGroup,
-        ElSelect
+const { t } = useI18n();
+
+const emit = defineEmits(['close']);
+
+/*------------*\
+| Toolbar Swap |
+\*------------*/
+
+const floatingDocksVisible = ref<boolean>(true);
+
+onMounted(() => {
+    appEmitter.on('editor.tool.toolbarSwapping', onToolbarSwap);
+});
+
+onUnmounted(() => {
+    appEmitter.off('editor.tool.toolbarSwapping', onToolbarSwap);
+});
+
+function onToolbarSwap() {
+    floatingDocksVisible.value = false;
+}
+
+/*-----------*\
+| Font Family |
+\*-----------*/
+
+const family = computed<string>({
+    set(value) {
+        toolbarTextMeta.family = value;
+        textToolbarEmitter.emit('toolbarMetaChanged', {
+            name: 'family',
+            value,
+        });
     },
-    props: {
-        
+    get() {
+        return toolbarTextMeta.family ?? textMetaDefaults.family;
+    }
+});
+const familyList = ref<string[]>(
+    defaultFontFamilies.filter((family) => !family.isFallback).map((family) => family.family)
+);
+
+/*---------*\
+| Font Size |
+\*---------*/
+
+const size = computed<number>({
+    set(value) {
+        toolbarTextMeta.size = value;
+        textToolbarEmitter.emit('toolbarMetaChanged', {
+            name: 'size',
+            value,
+        });
     },
-    emits: [
-        'close'
-    ],
-    setup() {
+    get() {
+        return parseFloat((toolbarTextMeta.size ?? textMetaDefaults.size).toFixed(2));
+    }
+});
 
-        const family = computed<string>({
-            set(value) {
-                toolbarTextMeta.family = value;
-                textToolbarEmitter.emit('toolbarMetaChanged', {
-                    name: 'family',
-                    value,
-                });
-            },
-            get() {
-                return toolbarTextMeta.family ?? textMetaDefaults.family;
-            }
+/*------------*\
+| Text Styling |
+\*------------*/
+
+const bold = computed<boolean>({
+    set(value) {
+        toolbarTextMeta.bold = value;
+        textToolbarEmitter.emit('toolbarMetaChanged', {
+            name: 'bold',
+            value,
         });
-        const familyList = ref<string[]>(
-            defaultFontFamilies.filter((family) => !family.isFallback).map((family) => family.family)
-        );
+    },
+    get() {
+        return toolbarTextMeta.bold ?? textMetaDefaults.bold;
+    }
+});
 
-        const size = computed<number>({
-            set(value) {
-                toolbarTextMeta.size = value;
-                textToolbarEmitter.emit('toolbarMetaChanged', {
-                    name: 'size',
-                    value,
-                });
-            },
-            get() {
-                return parseFloat((toolbarTextMeta.size ?? textMetaDefaults.size).toFixed(2));
-            }
+const oblique = computed<boolean>({
+    set(value) {
+        toolbarTextMeta.oblique = value;
+        textToolbarEmitter.emit('toolbarMetaChanged', {
+            name: 'oblique',
+            value,
         });
+    },
+    get() {
+        return toolbarTextMeta.oblique ?? textMetaDefaults.oblique;
+    }
+});
 
-        const bold = computed<boolean>({
-            set(value) {
-                toolbarTextMeta.bold = value;
-                textToolbarEmitter.emit('toolbarMetaChanged', {
-                    name: 'bold',
-                    value,
-                });
-            },
-            get() {
-                return toolbarTextMeta.bold ?? textMetaDefaults.bold;
-            }
+const strikethrough = computed<number | null>({
+    set(value) {
+        toolbarTextMeta.strikethrough = value;
+        textToolbarEmitter.emit('toolbarMetaChanged', {
+            name: 'strikethrough',
+            value,
         });
+    },
+    get() {
+        return toolbarTextMeta.strikethrough ?? textMetaDefaults.strikethrough;
+    }
+});
 
-        const oblique = computed<boolean>({
-            set(value) {
-                toolbarTextMeta.oblique = value;
-                textToolbarEmitter.emit('toolbarMetaChanged', {
-                    name: 'oblique',
-                    value,
-                });
-            },
-            get() {
-                return toolbarTextMeta.oblique ?? textMetaDefaults.oblique;
-            }
+const underline = computed<number | null>({
+    set(value) {
+        toolbarTextMeta.underline = value;
+        textToolbarEmitter.emit('toolbarMetaChanged', {
+            name: 'underline',
+            value,
         });
+    },
+    get() {
+        return toolbarTextMeta.underline ?? textMetaDefaults.underline;
+    }
+});
 
-        const strikethrough = computed<number | null>({
-            set(value) {
-                toolbarTextMeta.strikethrough = value;
-                textToolbarEmitter.emit('toolbarMetaChanged', {
-                    name: 'strikethrough',
-                    value,
-                });
-            },
-            get() {
-                return toolbarTextMeta.strikethrough ?? textMetaDefaults.strikethrough;
-            }
+/*----------*\
+| Fill Color |
+\*----------*/
+
+const fillColor = computed<RGBAColor>({
+    set(value) {
+        toolbarTextMeta.fillColor = value;
+        textToolbarEmitter.emit('toolbarMetaChanged', {
+            name: 'fillColor',
+            value,
         });
+    },
+    get() {
+        return (toolbarTextMeta.fillColor ?? {
+            is: 'color',
+            style: '#000000',
+            r: 0, g: 0, b: 0, alpha: 1,
+        }) as RGBAColor;
+    }
+});
+watch(() => fillColor.value, (newFillColor) => {
+    let palleteIndex = -1;
+    for (let [index, color] of fillColorPalette.value.entries()) {
+        if (
+            color.r === newFillColor.r
+            && color.g === newFillColor.g
+            && color.b === newFillColor.b
+            && color.alpha === newFillColor.alpha
+        ) {
+            palleteIndex = index;
+            break;
+        }
+    }
+    fillColorPaletteIndex.value = palleteIndex;
+});
 
-        const underline = computed<number | null>({
-            set(value) {
-                toolbarTextMeta.underline = value;
-                textToolbarEmitter.emit('toolbarMetaChanged', {
-                    name: 'underline',
-                    value,
-                });
-            },
-            get() {
-                return toolbarTextMeta.underline ?? textMetaDefaults.underline;
-            }
-        });
+interface ColorPaletteItem {
+    isLight: boolean;
+    color: RGBAColor;
+}
 
-        const fillColor = computed<RGBAColor>({
-            set(value) {
-                toolbarTextMeta.fillColor = value;
-                textToolbarEmitter.emit('toolbarMetaChanged', {
-                    name: 'fillColor',
-                    value,
-                });
-            },
-            get() {
-                return (toolbarTextMeta.fillColor ?? {
+const showFillColorPaletteSettingsButton = ref<typeof OgButton>();
+const showFillColorPaletteSettings = ref<boolean>(false);
+
+const fillColorPaletteCount = computed<number>({
+    get() {
+        return fillColorPalette.value.length;
+    },
+    set(count) {
+        count = Math.round(count);
+        if (isNaN(count)) return;
+        if (fillColorPaletteIndex.value >= count) {
+            fillColorPaletteIndex.value = 0;
+        }
+        if (fillColorPalette.value.length > count) {
+            fillColorPalette.value = fillColorPalette.value.slice(0, count);
+        } else if (fillColorPalette.value.length < count) {
+            for (let i = fillColorPalette.value.length; i < count; i++) {
+                fillColorPalette.value.push({
                     is: 'color',
-                    style: '#000000',
-                    r: 0, g: 0, b: 0, alpha: 1,
-                }) as RGBAColor;
-            }
-        });
-
-        const boundary = computed<TextDocument['boundary']>({
-            set(value) {
-                textToolbarEmitter.emit('toolbarDocumentChanged', {
-                    name: 'boundary',
-                    value,
+                    r: 0,
+                    g: 0,
+                    b: 0,
+                    alpha: 1,
+                    style: '#000000'
                 });
-            },
-            get() {
-                return editingTextLayer.value?.data.boundary ?? 'dynamic';
             }
-        });
+        }
+    }
+});
 
-        const lineDirection = computed<TextDocument['lineDirection']>({
-            set(value) {
-                textToolbarEmitter.emit('toolbarDocumentChanged', {
-                    name: 'lineDirection',
-                    value,
-                });
-                toolbarTextDefaults.lineDirection = value;
-                if (['ltr', 'rtl'].includes(value) && !['ttb', 'btt'].includes(wrapDirection.value)) {
-                    textToolbarEmitter.emit('toolbarDocumentChanged', {
-                        name: 'wrapDirection',
-                        value: 'ttb',
-                    });
-                    toolbarTextDefaults.wrapDirection = 'ttb';
-                } else if (['ttb', 'btt'].includes(value) && !['ltr', 'rtl'].includes(wrapDirection.value)) {
-                    textToolbarEmitter.emit('toolbarDocumentChanged', {
-                        name: 'wrapDirection',
-                        value: 'rtl',
-                    });
-                    toolbarTextDefaults.wrapDirection = 'rtl';
-                }
-            },
-            get() {
-                return editingTextLayer.value?.data?.lineDirection ?? 'ltr';
-            }
-        });
-
-        const wrapDirection = computed<TextDocument['wrapDirection']>({
-            set(value) {
-                textToolbarEmitter.emit('toolbarDocumentChanged', {
-                    name: 'wrapDirection',
-                    value,
-                });
-                toolbarTextDefaults.wrapDirection = value;
-            },
-            get() {
-                return editingTextLayer.value?.data.wrapDirection ?? 'ltr';
-            }
-        });
-
+const fillColorPaletteItems = computed<ColorPaletteItem[]>(() => {
+    return fillColorPalette.value.map((color) => {
         return {
-            family,
-            familyList,
-            size,
-            bold,
-            oblique,
-            strikethrough,
-            underline,
-            fillColor,
-            boundary,
-            lineDirection,
-            wrapDirection,
-        };
+            isLight: colorToHsla(color, 'rgba').l > 0.6,
+            color,
+        }
+    });
+});
+
+function onClickFillColorPalette(e: MouseEvent, index: number) {
+    if (index === fillColorPaletteIndex.value) {
+        e.preventDefault();
+        appEmitter.emit('app.dialogs.openFromDock', {
+            name: 'color-picker',
+            props: {
+                color: fillColorPalette.value[index],
+            },
+            onClose: (event?: any) => {
+                if (event?.color) {
+                    fillColorPalette.value[index] = event.color;
+                    fillColor.value = event.color;
+                }
+            }
+        });
+    } else {
+        fillColorPaletteIndex.value = index;
+        fillColor.value = fillColorPalette.value[index];
+    }
+}
+
+function onEditFillPaletteSettings() {
+    showFillColorPaletteSettings.value = !showFillColorPaletteSettings.value;
+}
+
+/*--------------*\
+| Text Alignment |
+\*--------------*/
+
+const boundary = computed<TextDocument['boundary']>({
+    set(value) {
+        textToolbarEmitter.emit('toolbarDocumentChanged', {
+            name: 'boundary',
+            value,
+        });
+    },
+    get() {
+        return editingTextLayer.value?.data.boundary ?? 'dynamic';
+    }
+});
+
+const lineDirection = computed<TextDocument['lineDirection']>({
+    set(value) {
+        textToolbarEmitter.emit('toolbarDocumentChanged', {
+            name: 'lineDirection',
+            value,
+        });
+        toolbarTextDefaults.lineDirection = value;
+        if (['ltr', 'rtl'].includes(value) && !['ttb', 'btt'].includes(wrapDirection.value)) {
+            textToolbarEmitter.emit('toolbarDocumentChanged', {
+                name: 'wrapDirection',
+                value: 'ttb',
+            });
+            toolbarTextDefaults.wrapDirection = 'ttb';
+        } else if (['ttb', 'btt'].includes(value) && !['ltr', 'rtl'].includes(wrapDirection.value)) {
+            textToolbarEmitter.emit('toolbarDocumentChanged', {
+                name: 'wrapDirection',
+                value: 'rtl',
+            });
+            toolbarTextDefaults.wrapDirection = 'rtl';
+        }
+    },
+    get() {
+        return editingTextLayer.value?.data?.lineDirection ?? 'ltr';
+    }
+});
+
+const wrapDirection = computed<TextDocument['wrapDirection']>({
+    set(value) {
+        textToolbarEmitter.emit('toolbarDocumentChanged', {
+            name: 'wrapDirection',
+            value,
+        });
+        toolbarTextDefaults.wrapDirection = value;
+    },
+    get() {
+        return editingTextLayer.value?.data.wrapDirection ?? 'ltr';
     }
 });
 </script>
