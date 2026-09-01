@@ -30,7 +30,6 @@
         "reorderLayers": "Reorder Katman(s)",
         "reorderLayerFilters": "Reorder Etkisi (s)",
         "selectLayers": "Katman(s) seçin",
-        "setLayerBoundsToWorkingFileBounds": "Katman Görüntü Boyutu",
         "toggleLayerVisibilityOn": "Toggle Katman Viability Onda",
         "toggleLayerVisibilityOff": "Toggle Katman Viability Off",
         "trimLayerEmptySpace": "Trim Katman Boş Uzay",
@@ -114,7 +113,8 @@
                 "title": "Kurulum Başarısız",
                 "message": "OpenGraphica, tarayıcınızda bulunmayan bazı temel web işlevlerine dayanmaktadır. Please update your web browser, or switch to a modern one like Chrome, Firefox, Safari, or Edge."
             }
-        }
+        },
+        "updateRequired": {}
     },
     "brushCategory": {
         "simple": {
@@ -488,6 +488,12 @@
             "param": {
                 "mix": "Mix"
             }
+        },
+        "chromaKey": {
+            "param": {}
+        },
+        "whiteBalance": {
+            "param": {}
         }
     },
     "layerFilterGroup": {
@@ -947,6 +953,10 @@
                     "example": "Renkleri doğru tutarken bir görüntüyü aydınlatın veya karanlıklayın."
                 }
             }
+        },
+        "designSystem": {},
+        "fileOpenNotification": {
+            "maxTextureSizeLimited": {}
         }
     },
     "moduleGroup": {
@@ -1020,7 +1030,8 @@
                 },
                 "copy": {
                     "name": "Seçilmiş Katmanlar",
-                    "description": "Şu anda seçilen tabakaları klip odasına kopyalayın."
+                    "description": "Şu anda seçilen tabakaları klip odasına kopyalayın.",
+                    "noSelectedLayers": {}
                 },
                 "copyAll": {
                     "name": "Tüm Katmanları kopyalayın",
@@ -1116,8 +1127,7 @@
                 "current": "Şimdiki akım"
             },
             "snapping": {
-                "title": "Snapping",
-                "rotationSnap": "Rotation Snap"
+                "title": "Snapping"
             },
             "metrics": {
                 "title": "Metriks",
@@ -1131,7 +1141,6 @@
             "actions": {
                 "title": "Eylemler",
                 "applyTransform": "Uygulama Dönüştürü",
-                "expandToImageSize": "Katman Görüntü Boyutu",
                 "trimEmptySpace": "Trim Boş Uzay"
             }
         },
@@ -1152,6 +1161,9 @@
                 "add": "Add",
                 "subtract": "Subtract",
                 "intersect": "Intersect"
+            },
+            "notification": {
+                "unproductiveSelection": {}
             }
         },
         "text": {
@@ -1163,7 +1175,12 @@
             "underline": "Underline",
             "fill": "Doldurun",
             "fillTooltip": "Mektupların kenarlarında gösteren renkler (s)",
-            "newTextLayerName": "Yeni Text"
+            "newTextLayerName": "Yeni Text",
+            "alignment": {
+                "boundaryOption": {},
+                "lineDirectionOption": {},
+                "wrapDirectionOption": {}
+            }
         },
         "zoom": {
             "zoomOut": "Zoom Out Off",
@@ -1174,9 +1191,18 @@
             "flip": "Flip"
         },
         "drawBrush": {
-            "brushColor": "Fırça Renkleri",
             "brushSize": "Boyut Boyutu",
-            "newBrushLayerName": "Yeni Paint"
+            "newBrushLayerName": "Yeni Paint",
+            "brushDialog": {
+                "noBrushCategorySelected": {},
+                "noBrushesInCategory": {},
+                "editorTab": {
+                    "blending": {},
+                    "shape": {},
+                    "strokePath": {},
+                    "pressure": {}
+                }
+            }
         },
         "effect": {
             "edit": {
@@ -1186,7 +1212,10 @@
             }
         },
         "eraseBrush": {
-            "brushSize": "Boyut Boyutu"
+            "brushSize": "Boyut Boyutu",
+            "notification": {
+                "noSelectedLayers": {}
+            }
         },
         "deformBlur": {
             "brushSize": "Boyut Boyutu"
@@ -1223,6 +1252,10 @@
                 "presets": "Presets",
                 "presetSettings": "Preset Ayarlar"
             }
+        },
+        "drawShape": {
+            "shapeType": {},
+            "style": {}
         }
     },
     "toolGroup": {
@@ -1454,6 +1487,19 @@
                     "Tuval üzerinde bir gradient yerleştirmek için bir parmağı kullanın."
                 ]
             }
+        },
+        "drawShapeToolIntroduction": {
+            "introduction": [
+                null
+            ],
+            "body": {
+                "mouse": [
+                    null
+                ],
+                "touch": [
+                    null
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -1495,5 +1541,35 @@
         "color": "Renkli Renk",
         "lightness": "Işık",
         "luminance": "Luminance"
+    },
+    "defaultBrush": {},
+    "defaultBrushCategory": {},
+    "menuBarToolGroup": {
+        "deform": {
+            "tools": {}
+        },
+        "draw": {
+            "tools": {}
+        },
+        "effect": {
+            "tools": {}
+        },
+        "erase": {
+            "tools": {}
+        },
+        "layers": {},
+        "selection": {
+            "tools": {}
+        },
+        "settings": {},
+        "text": {
+            "tools": {}
+        },
+        "transform": {
+            "tools": {}
+        },
+        "view": {
+            "tools": {}
+        }
     }
 }

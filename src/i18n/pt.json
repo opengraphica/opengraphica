@@ -30,7 +30,6 @@
         "reorderLayers": "Reordenar camada(s)",
         "reorderLayerFilters": "Reordenar o efeito (s)",
         "selectLayers": "Selecione Camadas (s)",
-        "setLayerBoundsToWorkingFileBounds": "Libras de camada para o tamanho da imagem",
         "toggleLayerVisibilityOn": "Alternar a visibilidade da camada Sobre",
         "toggleLayerVisibilityOff": "Alternar a visibilidade da camada",
         "trimLayerEmptySpace": "Trim camada vazio espaço",
@@ -114,7 +113,8 @@
                 "title": "Instalação Falhada",
                 "message": "OpenGraphica depende de algumas funcionalidades básicas da web que não existem no seu navegador. Por favor, atualize seu navegador da Web ou mude para um moderno como Chrome, Firefox, Safari ou Edge."
             }
-        }
+        },
+        "updateRequired": {}
     },
     "brushCategory": {
         "simple": {
@@ -488,6 +488,12 @@
             "param": {
                 "mix": "Mistura"
             }
+        },
+        "chromaKey": {
+            "param": {}
+        },
+        "whiteBalance": {
+            "param": {}
         }
     },
     "layerFilterGroup": {
@@ -947,6 +953,10 @@
                     "example": "Aclarar ou escurecer uma imagem mantendo as cores verdadeiras."
                 }
             }
+        },
+        "designSystem": {},
+        "fileOpenNotification": {
+            "maxTextureSizeLimited": {}
         }
     },
     "moduleGroup": {
@@ -1020,7 +1030,8 @@
                 },
                 "copy": {
                     "name": "Copiar camadas selecionadas",
-                    "description": "Copie as camadas selecionadas atualmente para a área de transferência."
+                    "description": "Copie as camadas selecionadas atualmente para a área de transferência.",
+                    "noSelectedLayers": {}
                 },
                 "copyAll": {
                     "name": "Copiar todas as camadas",
@@ -1116,8 +1127,7 @@
                 "current": "Corrente"
             },
             "snapping": {
-                "title": "Snapping",
-                "rotationSnap": "Snap de rotação"
+                "title": "Snapping"
             },
             "metrics": {
                 "title": "Metrics",
@@ -1131,7 +1141,6 @@
             "actions": {
                 "title": "Acções",
                 "applyTransform": "Aplicar Transformação",
-                "expandToImageSize": "Libras de camada para o tamanho da imagem",
                 "trimEmptySpace": "Trim Empty Space"
             }
         },
@@ -1152,6 +1161,9 @@
                 "add": "Adicionar",
                 "subtract": "Substância",
                 "intersect": "Interseto"
+            },
+            "notification": {
+                "unproductiveSelection": {}
             }
         },
         "text": {
@@ -1163,7 +1175,12 @@
             "underline": "Sublinha",
             "fill": "Preenchimento",
             "fillTooltip": "Cor que mostra dentro das bordas da(s) letra(s)",
-            "newTextLayerName": "Novo texto"
+            "newTextLayerName": "Novo texto",
+            "alignment": {
+                "boundaryOption": {},
+                "lineDirectionOption": {},
+                "wrapDirectionOption": {}
+            }
         },
         "zoom": {
             "zoomOut": "Zoom",
@@ -1174,9 +1191,18 @@
             "flip": "Flip"
         },
         "drawBrush": {
-            "brushColor": "Cor da escova",
             "brushSize": "Tamanho",
-            "newBrushLayerName": "Nova pintura"
+            "newBrushLayerName": "Nova pintura",
+            "brushDialog": {
+                "noBrushCategorySelected": {},
+                "noBrushesInCategory": {},
+                "editorTab": {
+                    "blending": {},
+                    "shape": {},
+                    "strokePath": {},
+                    "pressure": {}
+                }
+            }
         },
         "effect": {
             "edit": {
@@ -1186,7 +1212,10 @@
             }
         },
         "eraseBrush": {
-            "brushSize": "Tamanho"
+            "brushSize": "Tamanho",
+            "notification": {
+                "noSelectedLayers": {}
+            }
         },
         "deformBlur": {
             "brushSize": "Tamanho"
@@ -1223,6 +1252,10 @@
                 "presets": "Prestações",
                 "presetSettings": "Definir configurações"
             }
+        },
+        "drawShape": {
+            "shapeType": {},
+            "style": {}
         }
     },
     "toolGroup": {
@@ -1454,6 +1487,19 @@
                     "Use um dedo para tocar e arrastar para colocar um gradiente na tela."
                 ]
             }
+        },
+        "drawShapeToolIntroduction": {
+            "introduction": [
+                null
+            ],
+            "body": {
+                "mouse": [
+                    null
+                ],
+                "touch": [
+                    null
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -1495,5 +1541,35 @@
         "color": "Cor",
         "lightness": "Luz",
         "luminance": "Luminância"
+    },
+    "defaultBrush": {},
+    "defaultBrushCategory": {},
+    "menuBarToolGroup": {
+        "deform": {
+            "tools": {}
+        },
+        "draw": {
+            "tools": {}
+        },
+        "effect": {
+            "tools": {}
+        },
+        "erase": {
+            "tools": {}
+        },
+        "layers": {},
+        "selection": {
+            "tools": {}
+        },
+        "settings": {},
+        "text": {
+            "tools": {}
+        },
+        "transform": {
+            "tools": {}
+        },
+        "view": {
+            "tools": {}
+        }
     }
 }

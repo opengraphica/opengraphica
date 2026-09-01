@@ -30,7 +30,6 @@
         "reorderLayers": "Reorder परतें (s)",
         "reorderLayerFilters": "Reorder Effect(s)",
         "selectLayers": "चुनें परत(s)",
-        "setLayerBoundsToWorkingFileBounds": "लेयर बाउंड्स टू इमेज साइज",
         "toggleLayerVisibilityOn": "टॉगल परत दृश्यता पर",
         "toggleLayerVisibilityOff": "Toggle परत दृश्यता बंद",
         "trimLayerEmptySpace": "ट्रिम परत खाली अंतरिक्ष",
@@ -114,7 +113,8 @@
                 "title": "सेटअप विफल",
                 "message": "OpenGraphica कुछ बुनियादी वेब कार्यक्षमता पर निर्भर करता है जो आपके ब्राउज़र में मौजूद नहीं है। कृपया अपने वेब ब्राउज़र को अपडेट करें, या क्रोम, फ़ायरफ़ॉक्स, सफारी या एज जैसे आधुनिक एक पर स्विच करें।."
             }
-        }
+        },
+        "updateRequired": {}
     },
     "brushCategory": {
         "simple": {
@@ -488,6 +488,12 @@
             "param": {
                 "mix": "मिक्स"
             }
+        },
+        "chromaKey": {
+            "param": {}
+        },
+        "whiteBalance": {
+            "param": {}
         }
     },
     "layerFilterGroup": {
@@ -947,6 +953,10 @@
                     "example": "रंग को सच रखते हुए एक छवि को हल्का करना या अंधेरा करना।."
                 }
             }
+        },
+        "designSystem": {},
+        "fileOpenNotification": {
+            "maxTextureSizeLimited": {}
         }
     },
     "moduleGroup": {
@@ -1020,7 +1030,8 @@
                 },
                 "copy": {
                     "name": "चयनित परतों की प्रतिलिपि",
-                    "description": "वर्तमान में चयनित परतों को क्लिपबोर्ड पर कॉपी करें।."
+                    "description": "वर्तमान में चयनित परतों को क्लिपबोर्ड पर कॉपी करें।.",
+                    "noSelectedLayers": {}
                 },
                 "copyAll": {
                     "name": "सभी परतों की प्रतिलिपि बनाएँ",
@@ -1116,8 +1127,7 @@
                 "current": "वर्तमान"
             },
             "snapping": {
-                "title": "स्नैप करना",
-                "rotationSnap": "रोटेशन स्नैप"
+                "title": "स्नैप करना"
             },
             "metrics": {
                 "title": "मीट्रिक",
@@ -1131,7 +1141,6 @@
             "actions": {
                 "title": "कार्य",
                 "applyTransform": "बदलना",
-                "expandToImageSize": "लेयर बाउंड्स टू इमेज साइज",
                 "trimEmptySpace": "ट्रिम खाली स्पेस"
             }
         },
@@ -1152,6 +1161,9 @@
                 "add": "जोड़ें",
                 "subtract": "घटाना",
                 "intersect": "अंतर"
+            },
+            "notification": {
+                "unproductiveSelection": {}
             }
         },
         "text": {
@@ -1163,7 +1175,12 @@
             "underline": "अंडरलाइन",
             "fill": "भरना",
             "fillTooltip": "रंग जो अक्षरों के किनारों के अंदर दिखाता है",
-            "newTextLayerName": "नया पाठ"
+            "newTextLayerName": "नया पाठ",
+            "alignment": {
+                "boundaryOption": {},
+                "lineDirectionOption": {},
+                "wrapDirectionOption": {}
+            }
         },
         "zoom": {
             "zoomOut": "ज़ूम आउट",
@@ -1174,9 +1191,18 @@
             "flip": "फ्लिप"
         },
         "drawBrush": {
-            "brushColor": "ब्रश रंग",
             "brushSize": "आकार",
-            "newBrushLayerName": "नई पेंट"
+            "newBrushLayerName": "नई पेंट",
+            "brushDialog": {
+                "noBrushCategorySelected": {},
+                "noBrushesInCategory": {},
+                "editorTab": {
+                    "blending": {},
+                    "shape": {},
+                    "strokePath": {},
+                    "pressure": {}
+                }
+            }
         },
         "effect": {
             "edit": {
@@ -1186,7 +1212,10 @@
             }
         },
         "eraseBrush": {
-            "brushSize": "आकार"
+            "brushSize": "आकार",
+            "notification": {
+                "noSelectedLayers": {}
+            }
         },
         "deformBlur": {
             "brushSize": "आकार"
@@ -1223,6 +1252,10 @@
                 "presets": "प्रीसेट",
                 "presetSettings": "प्रीसेट सेटिंग"
             }
+        },
+        "drawShape": {
+            "shapeType": {},
+            "style": {}
         }
     },
     "toolGroup": {
@@ -1454,6 +1487,19 @@
                     "कैनवास पर एक ढाल लगाने के लिए एक उंगली का प्रयोग करें और खींचें।."
                 ]
             }
+        },
+        "drawShapeToolIntroduction": {
+            "introduction": [
+                null
+            ],
+            "body": {
+                "mouse": [
+                    null
+                ],
+                "touch": [
+                    null
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -1495,5 +1541,35 @@
         "color": "रंग",
         "lightness": "प्रकाश",
         "luminance": "चमक"
+    },
+    "defaultBrush": {},
+    "defaultBrushCategory": {},
+    "menuBarToolGroup": {
+        "deform": {
+            "tools": {}
+        },
+        "draw": {
+            "tools": {}
+        },
+        "effect": {
+            "tools": {}
+        },
+        "erase": {
+            "tools": {}
+        },
+        "layers": {},
+        "selection": {
+            "tools": {}
+        },
+        "settings": {},
+        "text": {
+            "tools": {}
+        },
+        "transform": {
+            "tools": {}
+        },
+        "view": {
+            "tools": {}
+        }
     }
 }

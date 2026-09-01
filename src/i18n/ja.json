@@ -30,7 +30,6 @@
         "reorderLayers": "注文層(s)",
         "reorderLayerFilters": "注文効果(s)",
         "selectLayers": "レイヤーを選択します",
-        "setLayerBoundsToWorkingFileBounds": "イメージのサイズへの層の傷",
         "toggleLayerVisibilityOn": "レイヤーの可視性を切り替える お問い合わせ",
         "toggleLayerVisibilityOff": "層の可視性を離れてトグルして下さい",
         "trimLayerEmptySpace": "トリムレイヤー空のスペース",
@@ -114,7 +113,8 @@
                 "title": "セットアップ失敗",
                 "message": "OpenGraphicaは、ブラウザに存在しない基本的なWeb機能に依存しています。 お使いのブラウザを更新するか、Chrome、Firefox、Safari、Edgeなどのモダンなブラウザに切り替えてください."
             }
-        }
+        },
+        "updateRequired": {}
     },
     "brushCategory": {
         "simple": {
@@ -488,6 +488,12 @@
             "param": {
                 "mix": "ミックス"
             }
+        },
+        "chromaKey": {
+            "param": {}
+        },
+        "whiteBalance": {
+            "param": {}
         }
     },
     "layerFilterGroup": {
@@ -947,6 +953,10 @@
                     "example": "色を真に保ちながらイメージを明るくしたり暗くしたりします."
                 }
             }
+        },
+        "designSystem": {},
+        "fileOpenNotification": {
+            "maxTextureSizeLimited": {}
         }
     },
     "moduleGroup": {
@@ -1020,7 +1030,8 @@
                 },
                 "copy": {
                     "name": "選択したレイヤーのコピー",
-                    "description": "選択したレイヤーをクリップボードにコピーします."
+                    "description": "選択したレイヤーをクリップボードにコピーします.",
+                    "noSelectedLayers": {}
                 },
                 "copyAll": {
                     "name": "すべてのレイヤーをコピーする",
@@ -1116,8 +1127,7 @@
                 "current": "現在の位置:"
             },
             "snapping": {
-                "title": "スナップ",
-                "rotationSnap": "回転スナップ"
+                "title": "スナップ"
             },
             "metrics": {
                 "title": "メトリック",
@@ -1131,7 +1141,6 @@
             "actions": {
                 "title": "アクション",
                 "applyTransform": "変換を適用",
-                "expandToImageSize": "イメージのサイズへの層の傷",
                 "trimEmptySpace": "トリム空のスペース"
             }
         },
@@ -1152,6 +1161,9 @@
                 "add": "追加する",
                 "subtract": "サブトラクト",
                 "intersect": "インターセクト"
+            },
+            "notification": {
+                "unproductiveSelection": {}
             }
         },
         "text": {
@@ -1163,7 +1175,12 @@
             "underline": "サイトマップ",
             "fill": "お問い合わせ",
             "fillTooltip": "手紙の端に表示する色",
-            "newTextLayerName": "新しいテキスト"
+            "newTextLayerName": "新しいテキスト",
+            "alignment": {
+                "boundaryOption": {},
+                "lineDirectionOption": {},
+                "wrapDirectionOption": {}
+            }
         },
         "zoom": {
             "zoomOut": "ズームアウト",
@@ -1174,9 +1191,18 @@
             "flip": "フリップ"
         },
         "drawBrush": {
-            "brushColor": "ブラシ色",
             "brushSize": "サイズ:",
-            "newBrushLayerName": "新しいペンキ"
+            "newBrushLayerName": "新しいペンキ",
+            "brushDialog": {
+                "noBrushCategorySelected": {},
+                "noBrushesInCategory": {},
+                "editorTab": {
+                    "blending": {},
+                    "shape": {},
+                    "strokePath": {},
+                    "pressure": {}
+                }
+            }
         },
         "effect": {
             "edit": {
@@ -1186,7 +1212,10 @@
             }
         },
         "eraseBrush": {
-            "brushSize": "サイズ:"
+            "brushSize": "サイズ:",
+            "notification": {
+                "noSelectedLayers": {}
+            }
         },
         "deformBlur": {
             "brushSize": "サイズ:"
@@ -1223,6 +1252,10 @@
                 "presets": "プリセット",
                 "presetSettings": "プリセット設定"
             }
+        },
+        "drawShape": {
+            "shapeType": {},
+            "style": {}
         }
     },
     "toolGroup": {
@@ -1454,6 +1487,19 @@
                     "1本の指を使ってキャンバスにグラデーションを配置します."
                 ]
             }
+        },
+        "drawShapeToolIntroduction": {
+            "introduction": [
+                null
+            ],
+            "body": {
+                "mouse": [
+                    null
+                ],
+                "touch": [
+                    null
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -1495,5 +1541,35 @@
         "color": "カラー",
         "lightness": "ライトネス",
         "luminance": "ルミナンス"
+    },
+    "defaultBrush": {},
+    "defaultBrushCategory": {},
+    "menuBarToolGroup": {
+        "deform": {
+            "tools": {}
+        },
+        "draw": {
+            "tools": {}
+        },
+        "effect": {
+            "tools": {}
+        },
+        "erase": {
+            "tools": {}
+        },
+        "layers": {},
+        "selection": {
+            "tools": {}
+        },
+        "settings": {},
+        "text": {
+            "tools": {}
+        },
+        "transform": {
+            "tools": {}
+        },
+        "view": {
+            "tools": {}
+        }
     }
 }

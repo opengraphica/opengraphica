@@ -30,7 +30,6 @@
         "reorderLayers": "Reorder Layer(s)",
         "reorderLayerFilters": "Reorder Effect(s)",
         "selectLayers": "Выберите слой(ы)",
-        "setLayerBoundsToWorkingFileBounds": "Лайерные границы для размера изображения",
         "toggleLayerVisibilityOn": "Видимость слоя Toggle На",
         "toggleLayerVisibilityOff": "Отключить видимость слоя",
         "trimLayerEmptySpace": "Пустое пространство Trim Layer",
@@ -114,7 +113,8 @@
                 "title": "Настройка провалилась",
                 "message": "OpenGraphica опирается на некоторые основные веб-функции, которых нет в вашем браузере. Пожалуйста, обновите свой веб-браузер или переключитесь на современный, такой как Chrome, Firefox, Safari или Edge."
             }
-        }
+        },
+        "updateRequired": {}
     },
     "brushCategory": {
         "simple": {
@@ -488,6 +488,12 @@
             "param": {
                 "mix": "Смешивать"
             }
+        },
+        "chromaKey": {
+            "param": {}
+        },
+        "whiteBalance": {
+            "param": {}
         }
     },
     "layerFilterGroup": {
@@ -947,6 +953,10 @@
                     "example": "Осветление или затемнение изображения при сохранении истинных цветов."
                 }
             }
+        },
+        "designSystem": {},
+        "fileOpenNotification": {
+            "maxTextureSizeLimited": {}
         }
     },
     "moduleGroup": {
@@ -1020,7 +1030,8 @@
                 },
                 "copy": {
                     "name": "Копия выбранных слоев",
-                    "description": "Копируйте выбранные в настоящее время слои в буфер обмена."
+                    "description": "Копируйте выбранные в настоящее время слои в буфер обмена.",
+                    "noSelectedLayers": {}
                 },
                 "copyAll": {
                     "name": "Копировать все слои",
@@ -1116,8 +1127,7 @@
                 "current": "Текущий"
             },
             "snapping": {
-                "title": "Похищение",
-                "rotationSnap": "Ротационный снэп"
+                "title": "Похищение"
             },
             "metrics": {
                 "title": "Метрики",
@@ -1131,7 +1141,6 @@
             "actions": {
                 "title": "Меры",
                 "applyTransform": "Apply Трансформация",
-                "expandToImageSize": "Лайерные границы для размера изображения",
                 "trimEmptySpace": "Пустое пустое пространство"
             }
         },
@@ -1152,6 +1161,9 @@
                 "add": "Добавить",
                 "subtract": "Вычитать",
                 "intersect": "Пересекаться"
+            },
+            "notification": {
+                "unproductiveSelection": {}
             }
         },
         "text": {
@@ -1163,7 +1175,12 @@
             "underline": "Подчеркнуть",
             "fill": "Заполнять",
             "fillTooltip": "Цвет, который отображается внутри краев буквы ( букв)",
-            "newTextLayerName": "Новый текст"
+            "newTextLayerName": "Новый текст",
+            "alignment": {
+                "boundaryOption": {},
+                "lineDirectionOption": {},
+                "wrapDirectionOption": {}
+            }
         },
         "zoom": {
             "zoomOut": "Издательство: Zoom Out",
@@ -1174,9 +1191,18 @@
             "flip": "Флип"
         },
         "drawBrush": {
-            "brushColor": "Цвет кисти",
             "brushSize": "Размер",
-            "newBrushLayerName": "Новая краска"
+            "newBrushLayerName": "Новая краска",
+            "brushDialog": {
+                "noBrushCategorySelected": {},
+                "noBrushesInCategory": {},
+                "editorTab": {
+                    "blending": {},
+                    "shape": {},
+                    "strokePath": {},
+                    "pressure": {}
+                }
+            }
         },
         "effect": {
             "edit": {
@@ -1186,7 +1212,10 @@
             }
         },
         "eraseBrush": {
-            "brushSize": "Размер"
+            "brushSize": "Размер",
+            "notification": {
+                "noSelectedLayers": {}
+            }
         },
         "deformBlur": {
             "brushSize": "Размер"
@@ -1223,6 +1252,10 @@
                 "presets": "Предустановки",
                 "presetSettings": "Предустановленные настройки"
             }
+        },
+        "drawShape": {
+            "shapeType": {},
+            "style": {}
         }
     },
     "toolGroup": {
@@ -1454,6 +1487,19 @@
                     "Используйте один палец, чтобы коснуться и перетащить, чтобы разместить градиент на холсте."
                 ]
             }
+        },
+        "drawShapeToolIntroduction": {
+            "introduction": [
+                null
+            ],
+            "body": {
+                "mouse": [
+                    null
+                ],
+                "touch": [
+                    null
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -1495,5 +1541,35 @@
         "color": "Цвет",
         "lightness": "Легкость",
         "luminance": "Яркость"
+    },
+    "defaultBrush": {},
+    "defaultBrushCategory": {},
+    "menuBarToolGroup": {
+        "deform": {
+            "tools": {}
+        },
+        "draw": {
+            "tools": {}
+        },
+        "effect": {
+            "tools": {}
+        },
+        "erase": {
+            "tools": {}
+        },
+        "layers": {},
+        "selection": {
+            "tools": {}
+        },
+        "settings": {},
+        "text": {
+            "tools": {}
+        },
+        "transform": {
+            "tools": {}
+        },
+        "view": {
+            "tools": {}
+        }
     }
 }

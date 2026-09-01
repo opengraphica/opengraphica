@@ -30,7 +30,6 @@
         "reorderLayers": "重排图层",
         "reorderLayerFilters": "重排效果",
         "selectLayers": "选择层",
-        "setLayerBoundsToWorkingFileBounds": "图层边界到图像大小",
         "toggleLayerVisibilityOn": "切换图层可见度 打开",
         "toggleLayerVisibilityOff": "切换可见层",
         "trimLayerEmptySpace": "调整层空格",
@@ -114,7 +113,8 @@
                 "title": "设置失败",
                 "message": "OpenGraphica依赖于一些在浏览器中不存在的基本网页功能. 请更新您的网页浏览器, 或切换到像 Chrome, Firefox, Safari, 或 Edge 这样的现代浏览器 ."
             }
-        }
+        },
+        "updateRequired": {}
     },
     "brushCategory": {
         "simple": {
@@ -488,6 +488,12 @@
             "param": {
                 "mix": "混合"
             }
+        },
+        "chromaKey": {
+            "param": {}
+        },
+        "whiteBalance": {
+            "param": {}
         }
     },
     "layerFilterGroup": {
@@ -945,6 +951,10 @@
                     "example": "点亮或暗化图像同时保持颜色真实性."
                 }
             }
+        },
+        "designSystem": {},
+        "fileOpenNotification": {
+            "maxTextureSizeLimited": {}
         }
     },
     "moduleGroup": {
@@ -1018,7 +1028,8 @@
                 },
                 "copy": {
                     "name": "复制所选图层",
-                    "description": "将当前选中的地层复制到剪贴板 ."
+                    "description": "将当前选中的地层复制到剪贴板 .",
+                    "noSelectedLayers": {}
                 },
                 "copyAll": {
                     "name": "复制所有图层",
@@ -1114,8 +1125,7 @@
                 "current": "当前"
             },
             "snapping": {
-                "title": "抓取",
-                "rotationSnap": "旋转同步"
+                "title": "抓取"
             },
             "metrics": {
                 "title": "计量",
@@ -1129,7 +1139,6 @@
             "actions": {
                 "title": "行动",
                 "applyTransform": "应用变形",
-                "expandToImageSize": "图层边界到图像大小",
                 "trimEmptySpace": "缩放空格"
             }
         },
@@ -1150,6 +1159,9 @@
                 "add": "添加",
                 "subtract": "减法",
                 "intersect": "交叉"
+            },
+            "notification": {
+                "unproductiveSelection": {}
             }
         },
         "text": {
@@ -1161,7 +1173,12 @@
             "underline": "下划线",
             "fill": "填充",
             "fillTooltip": "显示字母边缘内的颜色",
-            "newTextLayerName": "新建文本"
+            "newTextLayerName": "新建文本",
+            "alignment": {
+                "boundaryOption": {},
+                "lineDirectionOption": {},
+                "wrapDirectionOption": {}
+            }
         },
         "zoom": {
             "zoomOut": "缩小",
@@ -1172,9 +1189,18 @@
             "flip": "翻转"
         },
         "drawBrush": {
-            "brushColor": "笔刷颜色",
             "brushSize": "大小",
-            "newBrushLayerName": "新画"
+            "newBrushLayerName": "新画",
+            "brushDialog": {
+                "noBrushCategorySelected": {},
+                "noBrushesInCategory": {},
+                "editorTab": {
+                    "blending": {},
+                    "shape": {},
+                    "strokePath": {},
+                    "pressure": {}
+                }
+            }
         },
         "effect": {
             "edit": {
@@ -1184,7 +1210,10 @@
             }
         },
         "eraseBrush": {
-            "brushSize": "大小"
+            "brushSize": "大小",
+            "notification": {
+                "noSelectedLayers": {}
+            }
         },
         "deformBlur": {
             "brushSize": "大小"
@@ -1221,6 +1250,10 @@
                 "presets": "预设",
                 "presetSettings": "预设设置"
             }
+        },
+        "drawShape": {
+            "shapeType": {},
+            "style": {}
         }
     },
     "toolGroup": {
@@ -1452,6 +1485,19 @@
                     "用一根手指来触摸和拖动,在画布上放置一个梯度."
                 ]
             }
+        },
+        "drawShapeToolIntroduction": {
+            "introduction": [
+                null
+            ],
+            "body": {
+                "mouse": [
+                    null
+                ],
+                "touch": [
+                    null
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -1493,5 +1539,35 @@
         "color": "颜色",
         "lightness": "光度",
         "luminance": "光辉"
+    },
+    "defaultBrush": {},
+    "defaultBrushCategory": {},
+    "menuBarToolGroup": {
+        "deform": {
+            "tools": {}
+        },
+        "draw": {
+            "tools": {}
+        },
+        "effect": {
+            "tools": {}
+        },
+        "erase": {
+            "tools": {}
+        },
+        "layers": {},
+        "selection": {
+            "tools": {}
+        },
+        "settings": {},
+        "text": {
+            "tools": {}
+        },
+        "transform": {
+            "tools": {}
+        },
+        "view": {
+            "tools": {}
+        }
     }
 }

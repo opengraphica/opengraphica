@@ -30,7 +30,6 @@
         "reorderLayers": "주문 층 (s)",
         "reorderLayerFilters": "주문 효력 (s)",
         "selectLayers": "레이어 선택(s)",
-        "setLayerBoundsToWorkingFileBounds": "Layer Bounds로 이미지 크기",
         "toggleLayerVisibilityOn": "연락처 으로",
         "toggleLayerVisibilityOff": "연락처 세부 사항",
         "trimLayerEmptySpace": "손질 층 빈 공간",
@@ -114,7 +113,8 @@
                 "title": "설정 실패",
                 "message": "OpenGraphica는 브라우저에 존재하지 않는 몇 가지 기본 웹 기능에 의존합니다. 웹 브라우저를 업데이트하거나 Chrome, Firefox, Safari 또는 Edge와 같은 현대 버전으로 전환하십시오."
             }
-        }
+        },
+        "updateRequired": {}
     },
     "brushCategory": {
         "simple": {
@@ -488,6 +488,12 @@
             "param": {
                 "mix": "·"
             }
+        },
+        "chromaKey": {
+            "param": {}
+        },
+        "whiteBalance": {
+            "param": {}
         }
     },
     "layerFilterGroup": {
@@ -947,6 +953,10 @@
                     "example": "색상을 true 유지하면서 이미지를 밝히거나 어둡게합니다."
                 }
             }
+        },
+        "designSystem": {},
+        "fileOpenNotification": {
+            "maxTextureSizeLimited": {}
         }
     },
     "moduleGroup": {
@@ -1020,7 +1030,8 @@
                 },
                 "copy": {
                     "name": "선택된 층 복사",
-                    "description": "현재 선택된 레이어를 클립보드에 복사합니다."
+                    "description": "현재 선택된 레이어를 클립보드에 복사합니다.",
+                    "noSelectedLayers": {}
                 },
                 "copyAll": {
                     "name": "모든 레이어 복사",
@@ -1116,8 +1127,7 @@
                 "current": "현재 위치"
             },
             "snapping": {
-                "title": "기타 제품",
-                "rotationSnap": "회전 스냅"
+                "title": "기타 제품"
             },
             "metrics": {
                 "title": "미터",
@@ -1131,7 +1141,6 @@
             "actions": {
                 "title": "팟캐스트",
                 "applyTransform": "Transform 적용",
-                "expandToImageSize": "Layer Bounds로 이미지 크기",
                 "trimEmptySpace": "트림 빈 공간"
             }
         },
@@ -1152,6 +1161,9 @@
                 "add": "기타 제품",
                 "subtract": "기타 제품",
                 "intersect": "회사연혁"
+            },
+            "notification": {
+                "unproductiveSelection": {}
             }
         },
         "text": {
@@ -1163,7 +1175,12 @@
             "underline": "이름 *",
             "fill": "제품정보",
             "fillTooltip": "편지의 가장자리 안쪽에 보여주는 색깔 (s)",
-            "newTextLayerName": "새로운 텍스트"
+            "newTextLayerName": "새로운 텍스트",
+            "alignment": {
+                "boundaryOption": {},
+                "lineDirectionOption": {},
+                "wrapDirectionOption": {}
+            }
         },
         "zoom": {
             "zoomOut": "줌 아웃",
@@ -1174,9 +1191,18 @@
             "flip": "팟캐스트"
         },
         "drawBrush": {
-            "brushColor": "솔 색깔",
             "brushSize": "크기 (mm)",
-            "newBrushLayerName": "새로운 페인트"
+            "newBrushLayerName": "새로운 페인트",
+            "brushDialog": {
+                "noBrushCategorySelected": {},
+                "noBrushesInCategory": {},
+                "editorTab": {
+                    "blending": {},
+                    "shape": {},
+                    "strokePath": {},
+                    "pressure": {}
+                }
+            }
         },
         "effect": {
             "edit": {
@@ -1186,7 +1212,10 @@
             }
         },
         "eraseBrush": {
-            "brushSize": "크기 (mm)"
+            "brushSize": "크기 (mm)",
+            "notification": {
+                "noSelectedLayers": {}
+            }
         },
         "deformBlur": {
             "brushSize": "크기 (mm)"
@@ -1223,6 +1252,10 @@
                 "presets": "기타 제품",
                 "presetSettings": "Preset 설정"
             }
+        },
+        "drawShape": {
+            "shapeType": {},
+            "style": {}
         }
     },
     "toolGroup": {
@@ -1454,6 +1487,19 @@
                     "한 손가락을 터치하고 캔버스에 그라디언트를 배치합니다."
                 ]
             }
+        },
+        "drawShapeToolIntroduction": {
+            "introduction": [
+                null
+            ],
+            "body": {
+                "mouse": [
+                    null
+                ],
+                "touch": [
+                    null
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -1495,5 +1541,35 @@
         "color": "색깔: 백색",
         "lightness": "밝기",
         "luminance": "운영 정보"
+    },
+    "defaultBrush": {},
+    "defaultBrushCategory": {},
+    "menuBarToolGroup": {
+        "deform": {
+            "tools": {}
+        },
+        "draw": {
+            "tools": {}
+        },
+        "effect": {
+            "tools": {}
+        },
+        "erase": {
+            "tools": {}
+        },
+        "layers": {},
+        "selection": {
+            "tools": {}
+        },
+        "settings": {},
+        "text": {
+            "tools": {}
+        },
+        "transform": {
+            "tools": {}
+        },
+        "view": {
+            "tools": {}
+        }
     }
 }
