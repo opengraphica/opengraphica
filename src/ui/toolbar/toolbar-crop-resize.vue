@@ -3,24 +3,24 @@
         <div class="py-2 pl-el-scrollbar-arrow-size text-nowrap text-ellipsis">
             <div class="block my-2 text-ellipsis">
                 <i class="bi bi-crop" aria-hidden="true" />
-                {{ $t('toolbar.cropResize.title') }}
+                {{ t('toolbar.cropResize.title') }}
             </div>
         </div>
         <div class="py-2 pl-3 pr-el-scrollbar-arrow-size text-nowrap">
-            <el-button plain link type="primary" class="!px-4 !mr-2" :aria-label="$t('button.cancel')" @click="onCancel">
+            <el-button plain link type="primary" class="!px-4 !mr-2" :aria-label="t('button.cancel')" @click="onCancel">
                 <template v-if="isMobileView">
                     <i class="bi bi-x"></i>
                 </template>
                 <template v-else>
-                    {{ $t('button.cancel') }}
+                    {{ t('button.cancel') }}
                 </template>
             </el-button>
-            <el-button :aria-label="$t('button.done')" plain type="primary" class="!ml-0" @click="onDone">
+            <el-button :aria-label="t('button.done')" plain type="primary" class="!ml-0" @click="onDone">
                 <template v-if="isMobileView">
                     <i class="bi bi-check"></i>
                 </template>
                 <template v-else>
-                    {{ $t('button.done') }}
+                    {{ t('button.done') }}
                 </template>
             </el-button>
         </div>
@@ -36,34 +36,34 @@
                         <el-radio-button label="resample">Resample</el-radio-button>
                     </el-radio-group>
                 </el-form-item>
-                <el-form-item :label="$t('toolbar.cropResize.size')" class="ml-6 el-form-item--small-label">
+                <el-form-item :label="t('toolbar.cropResize.size')" class="ml-6 el-form-item--small-label">
                     <el-button-group class="el-button-group--flex">
-                        <el-input-number v-model="resizeInputWidth" :aria-label="$t('toolbar.cropResize.width')" size="small" class="grow-1" style="width: 5rem" @input="onInputResizeWidth" />
-                        <el-button size="small" :aria-label="$t('toolbar.cropResize.linkWidthHeight')" class="px-3" :disabled="mode === 'resample'" @click="isDimensionRatioLock = !isDimensionRatioLock">
+                        <el-input-number v-model="resizeInputWidth" :aria-label="t('toolbar.cropResize.width')" size="small" class="grow-1" style="width: 5rem" @input="onInputResizeWidth" />
+                        <el-button size="small" :aria-label="t('toolbar.cropResize.linkWidthHeight')" class="px-3" :disabled="mode === 'resample'" @click="isDimensionRatioLock = !isDimensionRatioLock">
                             <i :class="['bi', isDimensionRatioLock ? 'bi-lock-fill' : 'bi-unlock-fill']" aria-hidden="true" />
                         </el-button>
-                        <el-input-number v-model="resizeInputHeight" :aria-label="$t('toolbar.cropResize.height')" size="small" class="grow-1" style="width: 5rem" @input="onInputResizeHeight" />
-                        <el-select v-model="measuringUnits" :aria-label="$t('toolbar.cropResize.dimensionUnits')" size="small" style="width: 3.75rem">
+                        <el-input-number v-model="resizeInputHeight" :aria-label="t('toolbar.cropResize.height')" size="small" class="grow-1" style="width: 5rem" @input="onInputResizeHeight" />
+                        <el-select v-model="measuringUnits" :aria-label="t('toolbar.cropResize.dimensionUnits')" size="small" style="width: 3.75rem">
                             <el-option
                                 v-for="option in dimensionUnitOptions"
                                 :key="option.value"
                                 :label="option.value"
                                 :value="option.value">
-                                {{ $t(option.label) }}
+                                {{ t(option.label) }}
                             </el-option>
                         </el-select>
                     </el-button-group>
                 </el-form-item>
-                <el-form-item :label="$t('toolbar.cropResize.resolution')" class="ml-6 el-form-item--small-label">
+                <el-form-item :label="t('toolbar.cropResize.resolution')" class="ml-6 el-form-item--small-label">
                     <el-button-group class="el-button-group--flex">
-                        <el-input-number v-model="resolution" :aria-label="$t('toolbar.cropResize.resolution')" style="width: 4rem" size="small" @change="onChangeResolution()" />
-                        <el-select v-model="resolutionUnits" :aria-label="$t('toolbar.cropResize.resolutionUnits')" style="width: 5rem" size="small" @change="onChangeResolutionUnits()">
+                        <el-input-number v-model="resolution" :aria-label="t('toolbar.cropResize.resolution')" style="width: 4rem" size="small" @change="onChangeResolution()" />
+                        <el-select v-model="resolutionUnits" :aria-label="t('toolbar.cropResize.resolutionUnits')" style="width: 5rem" size="small" @change="onChangeResolutionUnits()">
                             <el-option
                                 v-for="option in resolutionUnitOptions"
                                 :key="option.value"
                                 :label="option.value"
                                 :value="option.value">
-                                {{ $t(option.label) }}
+                                {{ t(option.label) }}
                             </el-option>
                         </el-select>
                     </el-button-group>
@@ -86,33 +86,35 @@
                     }">
                     <template #reference>
                         <el-button size="small" class="!ml-6">
-                            <span class="bi bi-magnet-fill mr-2" aria-hidden="true" /> {{ $t('toolbar.freeTransform.snapping.title') }}
+                            <span class="bi bi-magnet-fill mr-2" aria-hidden="true" /> {{ t('toolbar.freeTransform.snapping.title') }}
                         </el-button>
                     </template>
-                    <h2 class="og-dock-title" v-t="'toolbar.cropResize.snapping.title'" />
+                    <h2 class="og-dock-title">
+                        {{ t('toolbar.cropResize.snapping.title') }}
+                    </h2>
                     <el-form novalidate="novalidate" action="javascript:void(0)">
-                        <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="$t('toolbar.cropResize.snapping.enable')">
+                        <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="t('toolbar.cropResize.snapping.enable')">
                             <el-switch v-model="enableSnapping" />
                         </el-form-item>
                         <div :class="enableSnapping ? '' : 'opacity-50'">
-                            <p class="el-form-item el-form-item--menu-item !my-2">{{ $t('toolbar.cropResize.snapping.currentCanvas') }}:</p>
+                            <p class="el-form-item el-form-item--menu-item !my-2">{{ t('toolbar.cropResize.snapping.currentCanvas') }}:</p>
                             <div class="pl-2">
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="$t('toolbar.cropResize.snapping.snapToCenter')">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="t('toolbar.cropResize.snapping.snapToCenter')">
                                     <el-switch v-model="enableSnappingToCanvasCenter" :disabled="!enableSnapping" />
                                 </el-form-item>
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="$t('toolbar.cropResize.snapping.snapToEdges')">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="t('toolbar.cropResize.snapping.snapToEdges')">
                                     <el-switch v-model="enableSnappingToCanvasEdges" :disabled="!enableSnapping" />
                                 </el-form-item>
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="$t('toolbar.cropResize.snapping.snapToContrast')">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="t('toolbar.cropResize.snapping.snapToContrast')">
                                     <el-switch v-model="enableSnappingToCanvasContrast" :disabled="!enableSnapping" />
                                 </el-form-item>
                             </div>
-                            <p class="el-form-item el-form-item--menu-item !my-2">{{ $t('toolbar.cropResize.snapping.cropArea') }}:</p>
+                            <p class="el-form-item el-form-item--menu-item !my-2">{{ t('toolbar.cropResize.snapping.cropArea') }}:</p>
                             <div class="pl-2">
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="$t('toolbar.cropResize.snapping.snapAtCenter')">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="t('toolbar.cropResize.snapping.snapAtCenter')">
                                     <el-switch v-model="enableSnappingToSelectionCenter" :disabled="!enableSnapping" />
                                 </el-form-item>
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="$t('toolbar.cropResize.snapping.snapAtEdges')">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="t('toolbar.cropResize.snapping.snapAtEdges')">
                                     <el-switch v-model="enableSnappingToSelectionEdges" :disabled="!enableSnapping" />
                                 </el-form-item>
                             </div>
@@ -125,7 +127,8 @@
 </template>
 
 <script setup lang="ts">
-import { defineComponent, ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
+import { ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
+import { useI18n } from '@/i18n';
 
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
 import ElDivider from 'element-plus/lib/components/divider/index';
@@ -163,6 +166,8 @@ import type {
     WorkingFileTextLayer, TextDocument,
 } from '@/types';
 import { decomposeMatrix } from '@/lib/dom-matrix';
+
+const { t } = useI18n();
 
 const emit = defineEmits(['close']);
 

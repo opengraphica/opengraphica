@@ -15,6 +15,7 @@ async function loadLanguage(language: string) {
 }
 
 const i18n = createI18n({
+    legacy: false,
     locale: 'en',
     fallbackLocale: 'en',
     fallbackWarn: false,
@@ -38,7 +39,7 @@ export async function setEditorLanguage(language: string) {
     if (language !== 'en') {
         i18n.global.setLocaleMessage(language, await loadLanguage(language));
     }
-    i18n.global.locale = language as typeof i18n.global.locale;
+    i18n.global.locale.value = language as never;
 }
 
 export const { t, tm, rt } = i18n.global;

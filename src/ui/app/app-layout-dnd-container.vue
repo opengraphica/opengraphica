@@ -80,8 +80,12 @@
                         aria-hidden="true"
                     />
                     <div>
-                        <h2 v-t="`app.historyNotification.title.${historyNotificationActionTrigger}.${isHistoryNotificationCompleted ? 'complete' : 'inProgress'}`" />
-                        <p v-t="currentHistoryStepActionDescription" />
+                        <h2>
+                            {{ t(`app.historyNotification.title.${historyNotificationActionTrigger}.${isHistoryNotificationCompleted ? 'complete' : 'inProgress'}`) }}
+                        </h2>
+                        <p>
+                            {{ t(currentHistoryStepActionDescription) }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -103,6 +107,7 @@ import { DndLayout } from '@/types';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import preferencesStore from '@/store/preferences';
+import { t } from '@/i18n';
 
 defineOptions({
     name: 'AppLayoutDndContainer',

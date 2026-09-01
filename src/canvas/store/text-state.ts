@@ -83,11 +83,13 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
         wrapDirection: 'ttb',
         wrapAt: 'wordThenLetter',
     },
-    restore: ['lineAlignment', 'lineDirection', 'wrapDirection', 'wrapAt'],
+    restore: ['fillColorPalette', 'fillColorPaletteIndex', 'lineAlignment', 'lineDirection', 'wrapDirection', 'wrapAt'],
 });
 
 export const fillColorPalette = permanentStorage.getDeepWritableRef('fillColorPalette');
 export const fillColorPaletteIndex = permanentStorage.getWritableRef('fillColorPaletteIndex');
+
+toolbarTextMeta.fillColor = fillColorPalette.value[fillColorPaletteIndex.value];
 
 export const toolbarTextDefaults = reactive({
     lineAlignment: permanentStorage.getWritableRef('lineAlignment'),

@@ -142,8 +142,8 @@
         <template v-if="isDialog">
             <el-divider class="mt-0" />
             <div class="mt-4 pb-5 text-right">
-                <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
-                <el-button @click="onConfirmSelection">{{ $t('button.ok') }}</el-button>
+                <el-button @click="onCancel">{{ t('button.cancel') }}</el-button>
+                <el-button @click="onConfirmSelection">{{ t('button.ok') }}</el-button>
             </div>
         </template>
     </div>

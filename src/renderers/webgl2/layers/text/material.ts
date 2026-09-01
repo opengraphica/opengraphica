@@ -2,7 +2,7 @@ import { BackSide } from 'three/src/constants';
 import { ShaderMaterial } from 'three/src/materials/ShaderMaterial';
 import { Vector4 } from 'three/src/math/Vector4';
 
-import { hexToColor } from '@/lib/color';
+import { hexToColor, srgbaToLinearSrgba } from '@/lib/color';
 
 import textMaterialVertexShaderSetup from './shader/setup.vert';
 import textMaterialVertexShaderMain from './shader/main.vert';
@@ -50,7 +50,7 @@ export async function createTextMaterial(params: TextMaterialUpdateParams) {
     material.uniforms.dstTexture = {
         value: undefined,
     };
-    const color = hexToColor(params.fill ?? '#000000', 'rgba');
+    const color = srgbaToLinearSrgba(hexToColor(params.fill ?? '#000000', 'rgba'));
     material.uniforms.fill = {
         value: new Vector4(color.r, color.g, color.b, color.alpha),
     };
@@ -61,7 +61,7 @@ export async function createTextMaterial(params: TextMaterialUpdateParams) {
 
 export async function updateTextMaterial(material: ShaderMaterial, params: TextMaterialUpdateParams) {
     if (params.fill) {
-        const color = hexToColor(params.fill ?? '#000000', 'rgba');
+        const color = srgbaToLinearSrgba(hexToColor(params.fill ?? '#000000', 'rgba'));
         material.uniforms.fill.value = new Vector4(color.r, color.g, color.b, color.alpha);
     }
     material.needsUpdate = true;

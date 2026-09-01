@@ -1,15 +1,17 @@
 <template>
     <div class="flex container items-center justify-center mx-auto">
         <div v-if="editingLayers.length > 0 && !showStopDrawer" class="og-toolbar-edit-confirm">
-            {{ $t('toolbar.drawGradient.editingGradient') }}
+            {{ t('toolbar.drawGradient.editingGradient') }}
             <el-button plain size="small" class="!ml-3" @click="onDoneEditing()">
-                <span class="bi bi-check-circle-fill mr-2" aria-hidden="true" /> {{ $t('button.done') }}
+                <span class="bi bi-check-circle-fill mr-2" aria-hidden="true" /> {{ t('button.done') }}
             </el-button>
         </div>
         <div class="og-toolbar-overlay" :class="{ 'is-active': editingLayers.length > 0 }">
             <div class="og-toolbar-tool-selector">
                 <span class="bi bi-shadows my-1" aria-hidden="true"></span>
-                <span class="og-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
+                <span class="og-toolbar-tool-selector__description">
+                    {{ t('toolbar.general.settings') }}
+                </span>
             </div>
             <el-horizontal-scrollbar-arrows>
                 <el-input-group :prepend-tooltip="t('toolbar.drawShape.shapeType.label')">

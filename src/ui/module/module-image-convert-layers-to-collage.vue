@@ -18,7 +18,7 @@
                 >
                     <el-button plain class="og-mode-select-button" @click="selectType(collageTypeOption.type)">
                         <img :src="collageTypeOption.icon" aria-hidden="true" />
-                        <span class="og-mode_select-button__title">{{ $t(collageTypeOption.title) }}</span>
+                        <span class="og-mode_select-button__title">{{ t(collageTypeOption.title) }}</span>
                     </el-button>
                 </el-col>
             </el-row>
@@ -28,7 +28,7 @@
                 <el-form-item
                     v-for="param in selectedParams"
                     :key="param.name"
-                    :label="$t(`module.imageConvertLayersToCollage.params.${selectedType}.${param.name}`)"
+                    :label="t(`module.imageConvertLayersToCollage.params.${selectedType}.${param.name}`)"
                 >
                     <template v-if="param.options">
                         <el-select
@@ -37,7 +37,7 @@
                             <el-option
                                 v-for="option of param.options"
                                 :key="option.key"
-                                :label="$t(`module.imageConvertLayersToCollage.params.${selectedType}.${param.name}Option.${option.key}`)"
+                                :label="t(`module.imageConvertLayersToCollage.params.${selectedType}.${param.name}Option.${option.key}`)"
                                 :value="option.value"
                             >
                             </el-option>
@@ -50,20 +50,25 @@
                         />
                     </template>
                 </el-form-item>
-                <el-form-item :label="$t(`module.imageConvertLayersToCollage.params.shared.reverseLayerOrder`)">
+                <el-form-item :label="t(`module.imageConvertLayersToCollage.params.shared.reverseLayerOrder`)">
                     <el-switch v-model="formData.params.reverseLayerOrder" />
                 </el-form-item>
             </el-form-item-group>
         </template>
         <div class="text-right mt-4">
-            <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
-            <el-button v-if="step === 'editParams'" type="primary" native-type="submit">{{ $t('button.apply') }}</el-button>
+            <el-button @click="onCancel">{{ t('button.cancel') }}</el-button>
+            <el-button v-if="step === 'editParams'" type="primary" native-type="submit">{{ t('button.apply') }}</el-button>
         </div>
     </el-form>
 </template>
-
 <script lang="ts">
-import { computed, defineComponent, ref, reactive } from 'vue';
+export default {
+    inheritAttrs: false,
+};
+</script>
+<script setup lang="ts">
+import { computed, ref, reactive } from 'vue';
+import { useI18n } from '@/i18n';
 import ElButton from 'element-plus/lib/components/button/index';
 import ElSwitch from 'element-plus/lib/components/switch/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
@@ -73,121 +78,89 @@ import ElRow from 'element-plus/lib/components/row/index';
 import ElCol from 'element-plus/lib/components/col/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
-import workingFileStore from '@/store/working-file';
 import { notifyInjector, unexpectedErrorMessage, validationSubmissionErrorMessage } from '@/lib/notify';
-import { Rules, RuleItem } from 'async-validator';
+import { Rules } from 'async-validator';
 import { collageTypeCallbacks, convertLayersToCollage, type CollageTypeCallbackParam } from '@/modules/image/conversion';
 import { camelCaseToKebabCase } from '@/lib/string';
 
-export default defineComponent({
-    name: 'ModuleImageConvertLayersToCollage',
-    inheritAttrs: false,
-    directives: {
-        loading: ElLoading.directive
-    },
-    components: {
-        ElButton,
-        ElSwitch,
-        ElForm,
-        ElFormItem,
-        ElFormItemGroup,
-        ElInputNumber,
-        ElRow,
-        ElCol,
-        ElSelect,
-        ElOption,
-    },
-    emits: [
-        'update:title',
-        'update:dialogSize',
-        'close'
-    ],
-    setup(props, { emit }) {
-        emit('update:title', 'module.imageConvertLayersToCollage.title');
-        emit('update:dialogSize', 'medium-large');
+const { t } = useI18n();
+const vLoading = ElLoading.directive;
 
-        const step = ref('selectType');
-        const selectedType = ref('');
-        const selectedParams = ref<CollageTypeCallbackParam[]>([]);
+const emit = defineEmits([
+    'update:title',
+    'update:dialogSize',
+    'close'
+]);
 
-        const $notify = notifyInjector('$notify');
-        const form = ref<typeof ElForm>();
-        const loading = ref<boolean>(false);
-       
-        const formData = reactive<{ params: Record<string, any> }>({
-            params: {
-                reverseLayerOrder: false,
-            }
-        });
-        const formValidationRules: Rules = {};
+emit('update:title', 'module.imageConvertLayersToCollage.title');
+emit('update:dialogSize', 'medium-large');
 
-        const collageTypeOptions = computed(() => {
-            return collageTypeCallbacks.map((definition) => ({
-                type: definition.type,
-                title: 'module.imageConvertLayersToCollage.collageType.' + definition.type,
-                icon: `images/module/image/convert-layers-to-collage/${camelCaseToKebabCase(definition.type)}.svg`
-            }));
-        });
+const step = ref('selectType');
+const selectedType = ref('');
+const selectedParams = ref<CollageTypeCallbackParam[]>([]);
 
-        function selectType(type: string) {
-            selectedType.value = type;
-            const typeDefinition = collageTypeCallbacks.find((definition) => definition.type === type);
-            selectedParams.value = typeDefinition?.params ?? [];
-            for (const param of selectedParams.value) {
-                if (param.default !== undefined) {
-                    formData.params[param.name] = param.default;
-                }
-            }
-            step.value = 'editParams';
-        }
+const $notify = notifyInjector('$notify');
+const form = ref<typeof ElForm>();
+const loading = ref<boolean>(false);
 
-        function onCancel() {
-            emit('close');
-        }
-
-        async function onApply() {
-            if (!form.value) {
-                return;
-            }
-            try {
-                await form.value.validate();
-                loading.value = true;
-                try {
-                    await convertLayersToCollage({
-                        type: selectedType.value,
-                        params: formData.params,
-                    });
-                } catch (error: any) {
-                    $notify({
-                        type: 'error',
-                        dangerouslyUseHTMLString: true,
-                        message: unexpectedErrorMessage
-                    });
-                }
-                emit('close');
-                loading.value = false;
-            } catch (error: any) {
-                $notify({
-                    type: 'error',
-                    dangerouslyUseHTMLString: true,
-                    message: validationSubmissionErrorMessage
-                });
-            }
-        }
-        
-        return {
-            form,
-            loading,
-            formData,
-            formValidationRules,
-            step,
-            selectedType,
-            selectedParams,
-            collageTypeOptions,
-            selectType,
-            onCancel,
-            onApply
-        };
+const formData = reactive<{ params: Record<string, any> }>({
+    params: {
+        reverseLayerOrder: false,
     }
 });
+const formValidationRules: Rules = {};
+
+const collageTypeOptions = computed(() => {
+    return collageTypeCallbacks.map((definition) => ({
+        type: definition.type,
+        title: 'module.imageConvertLayersToCollage.collageType.' + definition.type,
+        icon: `images/module/image/convert-layers-to-collage/${camelCaseToKebabCase(definition.type)}.svg`
+    }));
+});
+
+function selectType(type: string) {
+    selectedType.value = type;
+    const typeDefinition = collageTypeCallbacks.find((definition) => definition.type === type);
+    selectedParams.value = typeDefinition?.params ?? [];
+    for (const param of selectedParams.value) {
+        if (param.default !== undefined) {
+            formData.params[param.name] = param.default;
+        }
+    }
+    step.value = 'editParams';
+}
+
+function onCancel() {
+    emit('close');
+}
+
+async function onApply() {
+    if (!form.value) {
+        return;
+    }
+    try {
+        await form.value.validate();
+        loading.value = true;
+        try {
+            await convertLayersToCollage({
+                type: selectedType.value,
+                params: formData.params,
+            });
+        } catch (error: any) {
+            $notify({
+                type: 'error',
+                dangerouslyUseHTMLString: true,
+                message: unexpectedErrorMessage
+            });
+        }
+        emit('close');
+        loading.value = false;
+    } catch (error: any) {
+        $notify({
+            type: 'error',
+            dangerouslyUseHTMLString: true,
+            message: validationSubmissionErrorMessage
+        });
+    }
+}
 </script>

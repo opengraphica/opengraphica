@@ -136,7 +136,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
             preserveDrawingBuffer: false,
             powerPreference: 'high-performance',
         });
-        // this.renderer.extensions.get('EXT_float_blend');
+        this.renderer.extensions.get('EXT_float_blend');
         this.renderer.outputColorSpace = SRGBColorSpace;
         this.renderer.setSize(1, 1, false);
         this.viewport = new Vector4();
@@ -428,6 +428,8 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         imageHeight: number,
         options?: Webgl2RendererBackendTakeSnapshotOptions
     ): Promise<ImageBitmap> {
+        imageWidth = Math.floor(imageWidth);
+        imageHeight = Math.floor(imageHeight);
 
         let filtersOverride: Webgl2RendererCanvasFilter[] | undefined;
         if (options?.filters) {

@@ -6,58 +6,46 @@
         :class="{ 'mt-0': paragraphIndex === 0 }"
     />
     <div class="text-right">
-        <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
-        <el-button type="danger" @click="onDiscard">{{ $t('button.discardChanges') }}</el-button>
+        <el-button @click="onCancel">{{ t('button.cancel') }}</el-button>
+        <el-button type="danger" @click="onDiscard">{{ t('button.discardChanges') }}</el-button>
     </div>
 </template>
-
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
+export default {
+    inheritAttrs: false,
+};
+</script>
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useI18n } from '@/i18n';
 import ElButton from 'element-plus/lib/components/button/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import { runModule } from '@/modules';
 
-import { t, tm, rt } from '@/i18n';
+const { t, tm, rt } = useI18n();
+const vLoading = ElLoading.directive;
 
-export default defineComponent({
-    name: 'ModuleFileOpenConfirm',
-    inheritAttrs: false,
-    directives: {
-        loading: ElLoading.directive
-    },
-    components: {
-        ElButton,
-    },
-    emits: [
-        'update:title',
-        'close'
-    ],
-    setup(props, { emit }) {
-        emit('update:title', 'module.fileOpenConfirm.title');
+const emit = defineEmits([
+    'update:title',
+    'close'
+]);
 
-        const warningParagraphs = computed(() => {
-            return (tm('module.fileOpenConfirm.warning') as string[]).map((message) => {
-                return rt(message, {
-                    insertPhoto: '<strong class="font-bold">' + t('moduleGroup.file.modules.insertPhoto.name') + '</strong>',
-                }); 
-            });
-        });
+emit('update:title', 'module.fileOpenConfirm.title');
 
-        function onCancel() {
-            emit('close');
-        }
-
-        async function onDiscard() {
-            await runModule('file', 'open', { fileDiscardConfirmed: true });
-            emit('close', { disableCloseTransition: true });
-        }
-
-        return {
-            warningParagraphs,
-
-            onCancel,
-            onDiscard,
-        };
-    }
+const warningParagraphs = computed(() => {
+    return (tm('module.fileOpenConfirm.warning') as string[]).map((message) => {
+        return rt(message, {
+            insertPhoto: '<strong class="font-bold">' + t('moduleGroup.file.modules.insertPhoto.name') + '</strong>',
+        }); 
+    });
 });
+
+function onCancel() {
+    emit('close');
+}
+
+async function onDiscard() {
+    await runModule('file', 'open', { fileDiscardConfirmed: true });
+    emit('close', { disableCloseTransition: true });
+}
 </script>

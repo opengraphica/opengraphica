@@ -1,6 +1,8 @@
 <template>
     <div class="og-dnd-drop-overlay">
-        <div class="og-dnd-drop-overlay__center" v-t="'app.dndDropOverlay.addImage'" />
+        <div class="og-dnd-drop-overlay__center">
+            {{ t('app.dndDropOverlay.addImage') }}
+        </div>
         <div class="og-dnd-drop-corner-top-left">
             <svg viewBox="0 0 100 100">
                 <path d="M1.5 1.5 L98.5 1.5 L98.5 25 L25 25 L25 98.5 L1.5 98.5 Z"
@@ -32,13 +34,9 @@
     </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { useI18n } from '@/i18n';
 
-export default defineComponent({
-    name: 'AppDndDropOverlay',
-    setup(props, options) {
+const { t } = useI18n();
 
-    }
-});
 </script>

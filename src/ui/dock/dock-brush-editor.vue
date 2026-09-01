@@ -1,6 +1,8 @@
 <template>
     <template v-if="!isDialog">
-        <h2 class="og-toolbar-drawer__title" v-t="'toolbar.drawBrush.brushDialog.title'" />
+        <h2 class="og-toolbar-drawer__title">
+            {{ t('toolbar.drawBrush.brushDialog.title') }}
+        </h2>
         <div class="og-toolbar-drawer__close">
             <el-button
                 v-if="view === 'edit'"

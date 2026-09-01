@@ -10,19 +10,24 @@
         hide-required-asterisk
         @submit="onSave">
         <el-form-item-group>
-            <el-form-item :label="$t('module.imageConvertLayersToImageSequence.frameDelay')" prop="frameDelay">
+            <el-form-item :label="t('module.imageConvertLayersToImageSequence.frameDelay')" prop="frameDelay">
                 <el-input-number v-model="formData.frameDelay" :min="0.001" suffix-text="ms"></el-input-number>
             </el-form-item>
         </el-form-item-group>
         <div class="text-right">
-            <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
-            <el-button type="primary" native-type="submit">{{ $t('button.convert') }}</el-button>
+            <el-button @click="onCancel">{{ t('button.cancel') }}</el-button>
+            <el-button type="primary" native-type="submit">{{ t('button.convert') }}</el-button>
         </div>
     </el-form>
 </template>
-
 <script lang="ts">
-import { defineComponent, ref, reactive, watch, nextTick } from 'vue';
+export default {
+    inheritAttrs: false,
+};
+</script>
+<script setup lang="ts">
+import { ref, reactive, watch, nextTick } from 'vue';
+import { useI18n } from '@/i18n';
 import ElButton from 'element-plus/lib/components/button/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElFormItemGroup from '@/ui/el/el-form-item-group.vue';
@@ -34,76 +39,55 @@ import { Rules, RuleItem } from 'async-validator';
 import { convertLayersToImageSequence } from '@/modules/image/conversion';
 import { knownFileExtensions } from '@/lib/regex';
 
-export default defineComponent({
-    name: 'ModuleImageConvertLayersToImageSequence',
-    inheritAttrs: false,
-    directives: {
-        loading: ElLoading.directive
-    },
-    components: {
-        ElButton,
-        ElForm,
-        ElFormItem,
-        ElFormItemGroup,
-        ElInputNumber
-    },
-    emits: [
-        'update:title',
-        'close'
-    ],
-    setup(props, { emit }) {
-        emit('update:title', 'module.imageConvertLayersToImageSequence.title');
+const { t } = useI18n();
+const vLoading = ElLoading.directive;
 
-        const $notify = notifyInjector('$notify');
-        const form = ref<typeof ElForm>();
-        const loading = ref<boolean>(false);
-       
-        const formData = reactive({
-            frameDelay: 20
-        });
-        const formValidationRules: Rules = {};
+const emit = defineEmits([
+    'update:title',
+    'close'
+]);
 
-        function onCancel() {
-            emit('close');
-        }
+emit('update:title', 'module.imageConvertLayersToImageSequence.title');
 
-        async function onSave() {
-            if (!form.value) {
-                return;
-            }
-            try {
-                await form.value.validate();
-                loading.value = true;
-                try {
-                    await convertLayersToImageSequence({
-                        frameDelay: formData.frameDelay,
-                    });
-                } catch (error: any) {
-                    $notify({
-                        type: 'error',
-                        dangerouslyUseHTMLString: true,
-                        message: unexpectedErrorMessage
-                    });
-                }
-                emit('close');
-                loading.value = false;
-            } catch (error: any) {
-                $notify({
-                    type: 'error',
-                    dangerouslyUseHTMLString: true,
-                    message: validationSubmissionErrorMessage
-                });
-            }
-        }
-        
-        return {
-            form,
-            loading,
-            formData,
-            formValidationRules,
-            onCancel,
-            onSave
-        };
-    }
+const $notify = notifyInjector('$notify');
+const form = ref<typeof ElForm>();
+const loading = ref<boolean>(false);
+
+const formData = reactive({
+    frameDelay: 20
 });
+const formValidationRules: Rules = {};
+
+function onCancel() {
+    emit('close');
+}
+
+async function onSave() {
+    if (!form.value) {
+        return;
+    }
+    try {
+        await form.value.validate();
+        loading.value = true;
+        try {
+            await convertLayersToImageSequence({
+                frameDelay: formData.frameDelay,
+            });
+        } catch (error: any) {
+            $notify({
+                type: 'error',
+                dangerouslyUseHTMLString: true,
+                message: unexpectedErrorMessage
+            });
+        }
+        emit('close');
+        loading.value = false;
+    } catch (error: any) {
+        $notify({
+            type: 'error',
+            dangerouslyUseHTMLString: true,
+            message: validationSubmissionErrorMessage
+        });
+    }
+}
 </script>

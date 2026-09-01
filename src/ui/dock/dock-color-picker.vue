@@ -9,27 +9,28 @@
                 <div class="og-color-picker-preview__color" :style="{ '--preview-color': workingColor.style }" />
                 <el-input
                     v-model.lazy="hexCode" style="width: 7rem"
-                    :aria-label="$t('dock.colorPicker.hexCode')"
-                    :placeholder="$t('dock.colorPicker.hexCode')"
+                    :aria-label="t('dock.colorPicker.hexCode')"
+                    :placeholder="t('dock.colorPicker.hexCode')"
                     @change="onChangeHexCode"
                 />
             </div>
-            <el-button :title="$t('dock.colorPicker.pickColorFromImage')" class="!ml-3" @click="onPickColorFromImage">
+            <el-button :title="t('dock.colorPicker.pickColorFromImage')" class="!ml-3" @click="onPickColorFromImage">
                 <span class="bi bi-eyedropper" aria-hidden="true" />
             </el-button>
         </div>
         <template v-if="isDialog">
             <el-divider />
             <div class="px-5 mt-4 pb-5 text-right">
-                <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
-                <el-button @click="onConfirmSelection">{{ $t('button.ok') }}</el-button>
+                <el-button @click="onCancel">{{ t('button.cancel') }}</el-button>
+                <el-button @click="onConfirmSelection">{{ t('button.ok') }}</el-button>
             </div>
         </template>
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { defineComponent, nextTick, onMounted, onUnmounted, ref, toRef, watch, PropType } from 'vue';
+import { useI18n } from '@/i18n';
 
 import ElButton from 'element-plus/lib/components/button/index';
 import ElDivider from 'element-plus/lib/components/divider/index';
@@ -53,137 +54,111 @@ import { pickedColor, drawColorPickerEmitter } from '@/canvas/store/draw-color-p
 
 import type { ColorModel, ColorModelName, RGBAColor } from '@/types';
 
-export default defineComponent({
-    name: 'DockColorPicker',
-    directives: {
-        loading: ElLoading.directive
+const { t } = useI18n();
+const vLoading = ElLoading.directive;
+
+const props = defineProps({
+    color: {
+        type: Object as PropType<ColorModel>,
+        default: { is: 'color', r: 0, g: 0, b: 0, alpha: 1, style: '#000000' }
     },
-    components: {
-        AppColorPickerGradient,
-        ElButton,
-        ElDivider,
-        ElInput,
-        ElScrollbar,
-        ElTooltip
-    },
-    props: {
-        color: {
-            type: Object as PropType<ColorModel>,
-            default: { is: 'color', r: 0, g: 0, b: 0, alpha: 1, style: '#000000' }
-        },
-        isDialog: {
-            type: Boolean,
-            default: false
-        }
-    },
-    emits: [
-        'hide',
-        'show',
-        'close',
-        'update:title',
-        'update:loading',
-    ],
-    setup(props, { emit }) {
-        emit('update:title', 'dock.colorPicker.title');
-        emit('update:loading', true);
-
-        const workingColor = ref<RGBAColor>({ is: 'color', r: 0, g: 0, b: 0, alpha: 1, style: '#000000' });
-        let outputColorModelName: ColorModelName = 'rgba';
-
-        const pickerGradientLoading = ref<boolean>(true);
-
-        const hexCode = ref<string>();
-        const colorName = ref<string>('\u00A0');
-        const isFadeInColorName = ref<boolean>(false);
-
-        let colorNamerWorkerUuid: string | null = null;
-
-        watch(() => pickerGradientLoading.value, (pickerGradientLoading, wasPickerGradientLoading) => {
-            if (wasPickerGradientLoading && !pickerGradientLoading) {
-                emit('update:loading', false);
-            }
-        }, { immediate: true });
-
-        watch([toRef(props, 'color')], ([inputColor]) => {
-            outputColorModelName = getColorModelName(inputColor);
-            workingColor.value = colorToRgba(inputColor, outputColorModelName, inputColor.conversionSpace);
-        }, { immediate: true });
-
-        const nameColor = throttle(async function (hexColor: string) {
-            if (colorNamerWorkerUuid) {
-                colorName.value = await getColorName(colorNamerWorkerUuid, hexColor);
-            } else if (colorNamer) {
-                colorName.value = colorNamer(hexColor, { pick: ['ntc'] }).ntc[0]?.name;
-            }
-        }, 50);
-
-        watch([workingColor], () => {
-            hexCode.value = colorToHex(workingColor.value, 'rgba');
-            nameColor(hexCode.value);
-        }, { immediate: true });
-
-        onMounted(async () => {
-            if (await isWorkerSupported()) {
-                colorNamerWorkerUuid = createColorNamer();
-            }
-        });
-
-        onUnmounted(() => {
-            if (colorNamerWorkerUuid) {
-                destroyColorNamer(colorNamerWorkerUuid);
-            }
-        });
-
-        function onChangeHexCode(newHexCode: string) {
-            workingColor.value = hexToColor(newHexCode, 'rgba');
-        }
-
-        function onPickColorFromImage() {
-            emit('hide');
-            editorStore.dispatch('setActiveTool', { group: 'draw', tool: 'colorPicker' });
-
-            function onColorPickerClose() {
-                pickedColorUnwatch();
-                drawColorPickerEmitter.off('close', onColorPickerClose);
-                emit('show');
-            }
-
-            const pickedColorUnwatch = watch(() => pickedColor.value, (pickedColor) => {
-                pickedColorUnwatch();
-                drawColorPickerEmitter.off('close', onColorPickerClose);
-                if (pickedColor) {
-                    workingColor.value = { ...pickedColor };
-                }
-                nextTick(() => {
-                    emit('show');
-                });
-            });
-
-            drawColorPickerEmitter.on('close', onColorPickerClose);
-        }
-
-        function onCancel() {
-            emit('close');
-        }
-
-        function onConfirmSelection() {
-            emit('close', { color: JSON.parse(JSON.stringify(workingColor.value)) });
-        }
-
-        return {
-            pickerGradientLoading,
-
-            workingColor,
-            hexCode,
-            colorName,
-
-            isFadeInColorName,
-
-            onChangeHexCode,
-            onPickColorFromImage,
-            onCancel,
-            onConfirmSelection
-        };
+    isDialog: {
+        type: Boolean,
+        default: false
     }
 });
+
+const emit = defineEmits([
+    'hide',
+    'show',
+    'close',
+    'update:title',
+    'update:loading',
+]);
+
+emit('update:title', 'dock.colorPicker.title');
+emit('update:loading', true);
+
+const workingColor = ref<RGBAColor>({ is: 'color', r: 0, g: 0, b: 0, alpha: 1, style: '#000000' });
+let outputColorModelName: ColorModelName = 'rgba';
+
+const pickerGradientLoading = ref<boolean>(true);
+
+const hexCode = ref<string>();
+const colorName = ref<string>('\u00A0');
+const isFadeInColorName = ref<boolean>(false);
+
+let colorNamerWorkerUuid: string | null = null;
+
+watch(() => pickerGradientLoading.value, (pickerGradientLoading, wasPickerGradientLoading) => {
+    if (wasPickerGradientLoading && !pickerGradientLoading) {
+        emit('update:loading', false);
+    }
+}, { immediate: true });
+
+watch([toRef(props, 'color')], ([inputColor]) => {
+    outputColorModelName = getColorModelName(inputColor);
+    workingColor.value = colorToRgba(inputColor, outputColorModelName, inputColor.conversionSpace);
+}, { immediate: true });
+
+const nameColor = throttle(async function (hexColor: string) {
+    if (colorNamerWorkerUuid) {
+        colorName.value = await getColorName(colorNamerWorkerUuid, hexColor);
+    } else if (colorNamer) {
+        colorName.value = colorNamer(hexColor, { pick: ['ntc'] }).ntc[0]?.name;
+    }
+}, 50);
+
+watch([workingColor], () => {
+    hexCode.value = colorToHex(workingColor.value, 'rgba');
+    nameColor(hexCode.value);
+}, { immediate: true });
+
+onMounted(async () => {
+    if (await isWorkerSupported()) {
+        colorNamerWorkerUuid = createColorNamer();
+    }
+});
+
+onUnmounted(() => {
+    if (colorNamerWorkerUuid) {
+        destroyColorNamer(colorNamerWorkerUuid);
+    }
+});
+
+function onChangeHexCode(newHexCode: string) {
+    workingColor.value = hexToColor(newHexCode, 'rgba');
+}
+
+function onPickColorFromImage() {
+    emit('hide');
+    editorStore.dispatch('setActiveTool', { group: 'draw', tool: 'colorPicker' });
+
+    function onColorPickerClose() {
+        pickedColorUnwatch();
+        drawColorPickerEmitter.off('close', onColorPickerClose);
+        emit('show');
+    }
+
+    const pickedColorUnwatch = watch(() => pickedColor.value, (pickedColor) => {
+        pickedColorUnwatch();
+        drawColorPickerEmitter.off('close', onColorPickerClose);
+        if (pickedColor) {
+            workingColor.value = { ...pickedColor };
+        }
+        nextTick(() => {
+            emit('show');
+        });
+    });
+
+    drawColorPickerEmitter.on('close', onColorPickerClose);
+}
+
+function onCancel() {
+    emit('close');
+}
+
+function onConfirmSelection() {
+    emit('close', { color: JSON.parse(JSON.stringify(workingColor.value)) });
+}
 </script>

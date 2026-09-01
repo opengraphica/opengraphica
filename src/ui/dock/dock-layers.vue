@@ -1,14 +1,14 @@
 <template>
     <div class="og-dock-header">
         <div class="flex items-center justify-center">
-            <strong class="has-text-color-regular mr-3">{{ $t('dock.layers.add') }}:</strong>
+            <strong class="has-text-color-regular mr-3">{{ t('dock.layers.add') }}:</strong>
             <el-button link type="primary" class="px-0" @click="onAddLayer">
                 <span class="bi bi-file-earmark-plus mr-1" aria-hidden="true"></span>
-                {{ $t('dock.layers.layer') }}
+                {{ t('dock.layers.layer') }}
             </el-button>
             <!--el-button link type="primary" class="px-0" @click="onAddGroup">
                 <span class="bi bi-folder-plus el-text-alignment-fix--above mr-1" aria-hidden="true"></span>
-                {{ $t('dock.layers.group') }}
+                {{ t('dock.layers.group') }}
             </el-button-->
         </div>
     </div>
@@ -26,7 +26,7 @@
             <template v-else>
                 <el-alert
                     type="info"
-                    :title="$t('dock.layers.noLayers')"
+                    :title="t('dock.layers.noLayers')"
                     show-icon
                     :closable="false"
                     class="justify-center">
@@ -44,9 +44,11 @@
                             <div class="og-layer-thumbnail">
                                 <div class="og-layer-thumbnail-custom-img" :style="{ background: backgroundStyle }" />
                             </div>
-                            <span class="og-layer-name" v-t="'dock.layers.background'" />
+                            <span class="og-layer-name">
+                                {{ t('dock.layers.background') }}
+                            </span>
                         </span>
-                        <el-button link type="primary" class="!px-2 !mr-2" :aria-label="$t('dock.layers.toggleBackgroundVisibility')" @click="isBackgroundVisible = !isBackgroundVisible">
+                        <el-button link type="primary" class="!px-2 !mr-2" :aria-label="t('dock.layers.toggleBackgroundVisibility')" @click="isBackgroundVisible = !isBackgroundVisible">
                             <i class="bi" :class="{ 'bi-eye-fill': isBackgroundVisible, 'bi-eye-slash': !isBackgroundVisible }" aria-hidden="true"></i>
                         </el-button>
                     </span>
@@ -55,14 +57,17 @@
         </el-scrollbar>
     </div>
 </template>
-
 <script lang="ts">
-import { defineComponent, ref, computed, watch, toRef, toRefs, onMounted, nextTick, reactive } from 'vue';
+export default {
+    inheritAttrs: false,
+};
+</script>
+<script setup lang="ts">
+import { ref, computed, toRefs, onMounted } from 'vue';
+import { useI18n } from '@/i18n';
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton from 'element-plus/lib/components/button/index';
-import ElLoading from 'element-plus/lib/components/loading/index';
 import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
-import ElTooltip from 'element-plus/lib/components/tooltip/index';
 import AppLayerList from '@/ui/app/app-layer-list.vue';
 import canvasStore from '@/store/canvas';
 import historyStore from '@/store/history';
@@ -72,137 +77,111 @@ import { InsertLayerAction } from '@/actions/insert-layer';
 import { InsertEmptyLayerOptions, InsertGroupLayerOptions, ColorModel } from '@/types';
 import appEmitter from '@/lib/emitter';
 
+const { t } = useI18n();
+
+const props = defineProps({
+    isDialog: {
+        type: Boolean,
+        default: false,
+    }
+});
+
+const emit = defineEmits([
+    'close',
+    'update:title',
+]);
+
+const tooltipShowDelay = preferencesStore.state.tooltipShowDelay;
 const activeTab = ref<string>('file');
 
-export default defineComponent({
-    name: 'DockSettings',
-    inheritAttrs: false,
-    directives: {
-        loading: ElLoading.directive
-    },
-    components: {
-        AppLayerList,
-        ElAlert,
-        ElButton,
-        ElScrollbar,
-        ElTooltip
-    },
-    props: {
-        isDialog: {
-            type: Boolean,
-            default: false
-        }
-    },
-    emits: [
-        'close',
-        'update:title'
-    ],
-    setup(props, { emit }) {
-        emit('update:title', 'dock.layers.title');
+emit('update:title', 'dock.layers.title');
 
-        const { layers } = toRefs(workingFileStore.state);
-        const scrollbar = ref<typeof ElScrollbar>(null as unknown as typeof ElScrollbar);
-        const scrollContainerHeight = ref<number>(0);
-        const scrollTop = ref<number>(0);
-        const isHoveringBackground = ref<boolean>(false);
-        
-        let scrollbarWrap = document.createElement('div');
+const { layers } = toRefs(workingFileStore.state);
+const scrollbar = ref<typeof ElScrollbar>(null as unknown as typeof ElScrollbar);
+const scrollContainerHeight = ref<number>(0);
+const scrollTop = ref<number>(0);
+const isHoveringBackground = ref<boolean>(false);
 
-        const backgroundStyle = computed<string>(() => {
-            return workingFileStore.state.background.color.style;
+let scrollbarWrap = document.createElement('div');
+
+const backgroundStyle = computed<string>(() => {
+    return workingFileStore.state.background.color.style;
+});
+
+const isBackgroundVisible = computed<boolean>({
+    get() {
+        return workingFileStore.state.background.visible;
+    },
+    set(visible) {
+        const background = workingFileStore.state.background;
+        background.visible = visible;
+        workingFileStore.set('background', background);
+        canvasStore.set('dirty', true);
+    }
+});
+
+onMounted(() => {
+    scrollbarWrap = scrollbar.value.$el.querySelector('.el-scrollbar__wrap');
+});
+
+async function onAddLayerOrGroup(type: 'Layer' | 'Group') {
+    let selectedLayerIds = workingFileStore.get('selectedLayerIds')
+    if (selectedLayerIds.length === 0) {
+        selectedLayerIds = [-1];
+    }
+    for (let layerId of selectedLayerIds) {
+        const referenceLayer = getLayerById(layerId);
+        const isReferenceLayerGroup = referenceLayer?.type === 'group' && referenceLayer?.expanded;
+        await historyStore.dispatch('runAction', {
+            action: new InsertLayerAction<InsertEmptyLayerOptions<ColorModel> | InsertGroupLayerOptions<ColorModel>>({
+                type: type === 'Layer' ? 'empty' : 'group',
+                groupId: isReferenceLayerGroup ? layerId : referenceLayer?.groupId,
+                name: ensureUniqueLayerSiblingName(isReferenceLayerGroup ? referenceLayer.layers[0]?.id : layerId, 'New ' + type)
+            }, referenceLayer && !isReferenceLayerGroup ? 'above' : 'top', referenceLayer && !isReferenceLayerGroup ? layerId : undefined)
         });
+    }
+}
 
-        const isBackgroundVisible = computed<boolean>({
-            get() {
-                return workingFileStore.state.background.visible;
-            },
-            set(visible) {
+async function onAddLayer() {
+    await onAddLayerOrGroup('Layer');
+}
+
+async function onAddGroup() {
+    await onAddLayerOrGroup('Group');
+}
+
+function onChangeBackgroundColor() {
+    appEmitter.emit('app.dialogs.openFromDock', {
+        name: 'color-picker',
+        props: {
+            color: workingFileStore.state.background.color
+        },
+        onClose: (event?: any) => {
+            if (event?.color) {
                 const background = workingFileStore.state.background;
-                background.visible = visible;
+                background.color = event.color;
                 workingFileStore.set('background', background);
                 canvasStore.set('dirty', true);
             }
-        });
-        
-        onMounted(() => {
-            scrollbarWrap = scrollbar.value.$el.querySelector('.el-scrollbar__wrap');
-        });
-
-        async function onAddLayerOrGroup(type: 'Layer' | 'Group') {
-            let selectedLayerIds = workingFileStore.get('selectedLayerIds')
-            if (selectedLayerIds.length === 0) {
-                selectedLayerIds = [-1];
-            }
-            for (let layerId of selectedLayerIds) {
-                const referenceLayer = getLayerById(layerId);
-                const isReferenceLayerGroup = referenceLayer?.type === 'group' && referenceLayer?.expanded;
-                await historyStore.dispatch('runAction', {
-                    action: new InsertLayerAction<InsertEmptyLayerOptions<ColorModel> | InsertGroupLayerOptions<ColorModel>>({
-                        type: type === 'Layer' ? 'empty' : 'group',
-                        groupId: isReferenceLayerGroup ? layerId : referenceLayer?.groupId,
-                        name: ensureUniqueLayerSiblingName(isReferenceLayerGroup ? referenceLayer.layers[0]?.id : layerId, 'New ' + type)
-                    }, referenceLayer && !isReferenceLayerGroup ? 'above' : 'top', referenceLayer && !isReferenceLayerGroup ? layerId : undefined)
-                });
-            }
         }
+    });
+}
 
-        async function onAddLayer() {
-            await onAddLayerOrGroup('Layer');
-        }
+function onScrollLayerList() {
+    scrollTop.value = scrollbarWrap.scrollTop;
+    scrollContainerHeight.value = scrollbarWrap.clientHeight;
+}
 
-        async function onAddGroup() {
-            await onAddLayerOrGroup('Group');
-        }
-
-        function onChangeBackgroundColor() {
-            appEmitter.emit('app.dialogs.openFromDock', {
-                name: 'color-picker',
-                props: {
-                    color: workingFileStore.state.background.color
-                },
-                onClose: (event?: any) => {
-                    if (event?.color) {
-                        const background = workingFileStore.state.background;
-                        background.color = event.color;
-                        workingFileStore.set('background', background);
-                        canvasStore.set('dirty', true);
-                    }
-                }
-            });
-        }
-
-        function onScrollLayerList() {
-            scrollTop.value = scrollbarWrap.scrollTop;
-            scrollContainerHeight.value = scrollbarWrap.clientHeight;
-        }
-        
-        function onScrollByAmount(amount: number) {
-            let newScrollTop = scrollbarWrap.scrollTop + amount;
-            if (newScrollTop < 0) {
-                newScrollTop = 0;
-            }
-            if (newScrollTop > scrollbarWrap.scrollHeight - scrollbarWrap.clientHeight) {
-                newScrollTop = scrollbarWrap.scrollHeight - scrollbarWrap.clientHeight;
-            }
-            scrollbarWrap.scrollTop = newScrollTop;
-            scrollTop.value = newScrollTop;
-        }
-
-        return {
-            layers,
-            scrollbar,
-            scrollContainerHeight,
-            scrollTop,
-            tooltipShowDelay: preferencesStore.state.tooltipShowDelay,
-            isBackgroundVisible,
-            isHoveringBackground,
-            backgroundStyle,
-            onAddLayer,
-            onAddGroup,
-            onChangeBackgroundColor,
-            onScrollLayerList,
-            onScrollByAmount
-        };
+function onScrollByAmount(amount: number) {
+    let newScrollTop = scrollbarWrap.scrollTop + amount;
+    if (newScrollTop < 0) {
+        newScrollTop = 0;
     }
-});
+    if (newScrollTop > scrollbarWrap.scrollHeight - scrollbarWrap.clientHeight) {
+        newScrollTop = scrollbarWrap.scrollHeight - scrollbarWrap.clientHeight;
+    }
+    scrollbarWrap.scrollTop = newScrollTop;
+    scrollTop.value = newScrollTop;
+}
+
 </script>

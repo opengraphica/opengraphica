@@ -3,7 +3,9 @@
         <div class="og-toolbar-overlay">
             <div class="og-toolbar-tool-selector">
                 <span class="bi bi-eraser my-1" aria-hidden="true"></span>
-                <span class="og-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
+                <span class="og-toolbar-tool-selector__description">
+                    {{ t('toolbar.general.settings') }}
+                </span>
             </div>
             <el-horizontal-scrollbar-arrows>
                 <div
@@ -36,7 +38,9 @@
             </el-horizontal-scrollbar-arrows>
         </div>
         <floating-dock v-if="opacityDockVisible" v-model:top="opacityDockTop" v-model:left="opacityDockLeft" :visible="floatingDocksVisible">
-            <label for="toolbar-draw-brush-opacity-slider" v-t="'toolbar.eraseBrush.brushOpacity'" class="mr-4" />
+            <label for="toolbar-draw-brush-opacity-slider" class="mr-4">
+                {{ t('toolbar.eraseBrush.brushOpacity') }}
+            </label>
             <el-slider
                 id="toolbar-draw-brush-opacity-slider"
                 v-model="scaledBrushOpacity"
@@ -48,7 +52,9 @@
             />
         </floating-dock>
         <floating-dock v-if="sizeDockVisible" v-model:top="sizeDockTop" v-model:left="sizeDockLeft" :visible="floatingDocksVisible">
-            <label for="toolbar-draw-brush-size-slider" v-t="'toolbar.eraseBrush.brushSize'" class="mr-4" />
+            <label for="toolbar-draw-brush-size-slider" class="mr-4">
+                {{ t('toolbar.eraseBrush.brushSize') }}
+            </label>
             <el-slider
                 id="toolbar-draw-brush-size-slider"
                 v-model="scaledBrushSize"
@@ -60,7 +66,9 @@
             />
         </floating-dock>
         <floating-dock v-if="smoothingDockVisible" v-model:top="smoothingDockTop" v-model:left="smoothingDockLeft" :visible="floatingDocksVisible">
-            <label for="toolbar-draw-brush-smoothing-slider" v-t="'toolbar.drawBrush.brushSmoothing'" class="mr-4" />
+            <label for="toolbar-draw-brush-smoothing-slider" class="mr-4">
+                {{ t('toolbar.drawBrush.brushSmoothing') }}
+            </label>
             <el-slider
                 id="toolbar-draw-brush-smoothing-slider"
                 v-model="scaledBrushSmoothing"

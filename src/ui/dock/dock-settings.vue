@@ -4,7 +4,7 @@
             <template #label>
                 <div class="leading-5">
                     <i class="bi bi-archive leading-[1.375] block text-center text-lg !mt-1"></i>
-                    <div class="!mb-3" v-t="'dock.settings.file.tabTitle'"></div>
+                    <div class="!mb-3">{{ t('dock.settings.file.tabTitle') }}</div>
                 </div>
             </template>
             <template v-if="visitedTabs['file'] === true">
@@ -12,40 +12,40 @@
                     <el-menu class="el-menu--medium el-menu--borderless el-menu--inactivated !mb-1" @select="onMenuSelect('file', $event)">
                         <el-menu-item v-if="showRestoreImage" index="restore">
                             <i class="bi bi-recycle"></i>
-                            <span v-t="'dock.settings.file.menu.restore'"></span>
+                            <span>{{ t('dock.settings.file.menu.restore') }}</span>
                         </el-menu-item>
                         <el-menu-item index="new">
                             <i class="bi bi-file-earmark-plus"></i>
-                            <span v-t="'dock.settings.file.menu.new'"></span>
+                            <span>{{ t('dock.settings.file.menu.new') }}</span>
                         </el-menu-item>
                         <el-menu-item index="open">
                             <i class="bi bi-folder2-open"></i>
-                            <span v-t="'dock.settings.file.menu.open'"></span>
+                            <span>{{ t('dock.settings.file.menu.open') }}</span>
                         </el-menu-item>
                         <template v-if="vendorCustomSaveCallback">
                             <el-menu-item index="save">
                                 <i class="bi bi-download"></i>
-                                <span v-t="'dock.settings.file.menu.save'"></span>
+                                <span>{{ t('dock.settings.file.menu.save') }}</span>
                             </el-menu-item>
                         </template>
                         <template v-else>
                             <el-menu-item index="export">
                                 <i class="bi bi-box-arrow-up"></i>
-                                <span v-t="'dock.settings.file.menu.export'"></span>
+                                <span>{{ t('dock.settings.file.menu.export') }}</span>
                             </el-menu-item>
                             <el-menu-item index="saveAs">
                                 <i class="bi bi-download"></i>
-                                <span v-t="'dock.settings.file.menu.saveAs'"></span>
+                                <span>{{ t('dock.settings.file.menu.saveAs') }}</span>
                             </el-menu-item>
                         </template>
                         <el-divider />
                         <el-menu-item index="insertPhoto">
                             <i class="bi bi-plus-circle"></i>
-                            <span v-t="'dock.settings.file.menu.insertPhoto'"></span>
+                            <span>{{ t('dock.settings.file.menu.insertPhoto') }}</span>
                         </el-menu-item>
                         <el-menu-item index="takePhoto">
                             <i class="bi bi-camera"></i>
-                            <span v-t="'dock.settings.file.menu.takePhoto'"></span>
+                            <span>{{ t('dock.settings.file.menu.takePhoto') }}</span>
                         </el-menu-item>
                     </el-menu>
                 </el-scrollbar>
@@ -55,7 +55,7 @@
             <template #label>
                 <div class="leading-5">
                     <i class="bi bi-image leading-[1.375] block text-center text-lg !mt-1"></i>
-                    <div class="!mb-3" v-t="'dock.settings.image.tabTitle'"></div>
+                    <div class="!mb-3">{{ t('dock.settings.image.tabTitle') }}</div>
                 </div>
             </template>
             <template v-if="visitedTabs['image'] === true">
@@ -63,41 +63,41 @@
                     <el-menu class="el-menu--medium el-menu--borderless el-menu--inactivated !mb-1" @select="onMenuSelect('image', $event)">
                         <el-menu-item index="cropResize">
                             <i class="bi bi-crop"></i>
-                            <span v-t="'dock.settings.image.menu.cropResize'"></span>
+                            <span>{{ t('dock.settings.image.menu.cropResize') }}</span>
                         </el-menu-item>
                         <el-divider />
                         <el-menu-item index="cut">
                             <i class="bi bi-scissors"></i>
-                            <span v-t="'dock.settings.image.menu.cut'"></span>
+                            <span>{{ t('dock.settings.image.menu.cut') }}</span>
                         </el-menu-item>
                         <el-menu-item index="copy">
                             <i class="bi bi-files"></i>
-                            <span v-t="'dock.settings.image.menu.copy'"></span>
+                            <span>{{ t('dock.settings.image.menu.copy') }}</span>
                         </el-menu-item>
                         <el-menu-item index="copyAll">
                             <i class="bi bi-files"></i>
-                            <span v-t="'dock.settings.image.menu.copyAllLayers'"></span>
+                            <span>{{ t('dock.settings.image.menu.copyAllLayers') }}</span>
                         </el-menu-item>
                         <el-menu-item index="paste">
                             <i class="bi bi-clipboard"></i>
-                            <span v-t="'dock.settings.image.menu.paste'"></span>
+                            <span>{{ t('dock.settings.image.menu.paste') }}</span>
                         </el-menu-item>
                         <el-collapse class="el-collapse--menu-item my-1">
                             <el-collapse-item v-el-collapse-item-smart-scroll>
                                 <template v-slot:title>
-                                    {{ $t('dock.settings.image.menu.convertLayers.groupTitle') }}
+                                    {{ t('dock.settings.image.menu.convertLayers.groupTitle') }}
                                 </template>
                                 <el-menu-item index="convertLayersToCollage">
                                     <i class="bi bi-arrow-return-right"></i>
-                                    <span v-t="'dock.settings.image.menu.convertLayers.toCollage'"></span>
+                                    <span>{{ t('dock.settings.image.menu.convertLayers.toCollage') }}</span>
                                 </el-menu-item>
                                 <el-menu-item index="convertLayersToImageSequence">
                                     <i class="bi bi-arrow-return-right"></i>
-                                    <span v-t="'dock.settings.image.menu.convertLayers.toImageSequence'"></span>
+                                    <span>{{ t('dock.settings.image.menu.convertLayers.toImageSequence') }}</span>
                                 </el-menu-item>
                                 <el-menu-item index="convertLayersFlatten">
                                     <i class="bi bi-arrow-return-right"></i>
-                                    <span v-t="'dock.settings.image.menu.convertLayers.flatten'"></span>
+                                    <span>{{ t('dock.settings.image.menu.convertLayers.flatten') }}</span>
                                 </el-menu-item>
                             </el-collapse-item>
                         </el-collapse>
@@ -109,43 +109,45 @@
             <template #label>
                 <div class="leading-5">
                     <i class="bi bi-display leading-[1.375] block text-center text-lg !mt-1"></i>
-                    <div class="!mb-3" v-t="'dock.settings.view.tabTitle'"></div>
+                    <div class="!mb-3">{{ t('dock.settings.view.tabTitle') }}</div>
                 </div>
             </template>
             <template v-if="visitedTabs['view'] === true">
                 <el-scrollbar>
                     <el-form novalidate="novalidate" action="javascript:void(0)" class="!mb-1 !mt-1">
-                        <el-form-item class="el-form-item--menu-item" :label="$t('dock.settings.view.zoom')">
+                        <el-form-item class="el-form-item--menu-item" :label="t('dock.settings.view.zoom')">
                             <el-button-group class="el-button-group--flex">
-                                <el-button size="small" plain :aria-label="$t('dock.settings.view.zoomOut')" :title="$t('dock.settings.view.zoomOut')" @click="isZoomLevelTouched = true; zoomLevel *= 1/1.25">
+                                <el-button size="small" plain :aria-label="t('dock.settings.view.zoomOut')" :title="t('dock.settings.view.zoomOut')" @click="isZoomLevelTouched = true; zoomLevel *= 1/1.25">
                                     <i class="bi bi-zoom-out" aria-hidden="true" />
                                 </el-button>
                                 <el-input-number v-model.lazy="zoomLevel" suffix-text="%" size="small" class="el-input--text-center" style="width: 5rem" @input="isZoomLevelTouched = true" />
-                                <el-button size="small" plain :aria-label="$t('dock.settings.view.zoomIn')" :title="$t('dock.settings.view.zoomIn')" @click="isZoomLevelTouched = true; zoomLevel *= 1.25;">
+                                <el-button size="small" plain :aria-label="t('dock.settings.view.zoomIn')" :title="t('dock.settings.view.zoomIn')" @click="isZoomLevelTouched = true; zoomLevel *= 1.25;">
                                     <i class="bi bi-zoom-in" aria-hidden="true" />
                                 </el-button>
                             </el-button-group>
                         </el-form-item>
-                        <el-form-item class="el-form-item--menu-item" :label="$t('dock.settings.view.rotate')">
+                        <el-form-item class="el-form-item--menu-item" :label="t('dock.settings.view.rotate')">
                             <el-button-group class="el-button-group--flex">
-                                <el-button size="small" plain :aria-label="$t('dock.settings.view.rotateCounterClockwise')" :title="$t('dock.settings.view.rotateCounterClockwise')" @click="isRotationAngleTouched = true; rotationAngle -= 15">
+                                <el-button size="small" plain :aria-label="t('dock.settings.view.rotateCounterClockwise')" :title="t('dock.settings.view.rotateCounterClockwise')" @click="isRotationAngleTouched = true; rotationAngle -= 15">
                                     <i class="bi bi-arrow-counterclockwise" aria-hidden="true" />
                                 </el-button>
                                 <el-input-number v-model.lazy="rotationAngle" suffix-text="°" size="small" class="el-input--text-center" style="width: 5rem" @input="isRotationAngleTouched = true" />
-                                <el-button size="small" plain :aria-label="$t('dock.settings.view.rotateClockwise')" :title="$t('dock.settings.view.rotateClockwise')" @click="isRotationAngleTouched = true; rotationAngle += 15">
+                                <el-button size="small" plain :aria-label="t('dock.settings.view.rotateClockwise')" :title="t('dock.settings.view.rotateClockwise')" @click="isRotationAngleTouched = true; rotationAngle += 15">
                                     <i class="bi bi-arrow-clockwise" aria-hidden="true" />
                                 </el-button>
                             </el-button-group>
                         </el-form-item>
-                        <el-form-item class="el-form-item--menu-item" :label="$t('dock.settings.view.reset')">
+                        <el-form-item class="el-form-item--menu-item" :label="t('dock.settings.view.reset')">
                             <el-button-group>
-                                <el-button size="small" plain @click="onResetViewFit" v-t="'dock.settings.view.fit'" />
+                                <el-button size="small" plain @click="onResetViewFit">
+                                    {{ t('dock.settings.view.fit') }}
+                                </el-button>
                                 <el-button size="small" plain @click="onResetViewZoom">1:1</el-button>
                                 <el-button size="small" plain @click="onResetViewRotation">0°</el-button>
                             </el-button-group>
                         </el-form-item>
                         <el-divider class="!my-2" />
-                        <el-form-item class="el-form-item--menu-item" :label="$t('dock.settings.view.touchRotate.label')">
+                        <el-form-item class="el-form-item--menu-item" :label="t('dock.settings.view.touchRotate.label')">
                             <el-radio-group
                                 v-model="touchRotationPreference"
                                 size="small">
@@ -153,19 +155,19 @@
                                     v-for="option in touchRotationOptions"
                                     :key="option.value"
                                     :label="option.value">
-                                    {{ $t(option.label) }}
+                                    {{ t(option.label) }}
                                 </el-radio-button>
                             </el-radio-group>
                         </el-form-item>
                         <el-divider class="!my-2" />
-                        <el-form-item class="el-form-item--menu-item" :label="$t('dock.settings.view.window')">
+                        <el-form-item class="el-form-item--menu-item" :label="t('dock.settings.view.window')">
                             <el-button v-if="isFullscreen" size="small" plain @click="onExitFullscreen()">
                                 <i class="bi bi-fullscreen-exit mr-2" aria-hidden="true" />
-                                {{ $t('dock.settings.view.exitFullscreen') }}
+                                {{ t('dock.settings.view.exitFullscreen') }}
                             </el-button>
                             <el-button v-else size="small" plain @click="onEnterFullscreen()">
                                 <i class="bi bi-fullscreen mr-2" aria-hidden="true" />
-                                {{ $t('dock.settings.view.enterFullscreen') }}
+                                {{ t('dock.settings.view.enterFullscreen') }}
                             </el-button>
                         </el-form-item>
                     </el-form>
@@ -176,7 +178,7 @@
             <template #label>
                 <div class="leading-5">
                     <i class="bi bi-clock-history leading-[1.375] block text-center text-lg !mt-1"></i>
-                    <div class="!mb-3" v-t="'dock.settings.history.tabTitle'"></div>
+                    <div class="!mb-3">{{ t('dock.settings.history.tabTitle') }}</div>
                 </div>
             </template>
             <template v-if="visitedTabs['history'] === true">
@@ -184,17 +186,17 @@
                     <div class="flex justify-center px-4 pt-2">
                         <el-button-group>
                             <el-button size="small" :disabled="!canUndo" round plain aria-label="Undo" @click="onHistoryUndo()">
-                                <i class="bi bi-arrow-90deg-left mr-1" aria-hidden="true" /> {{ $t('dock.settings.history.undo') }}
+                                <i class="bi bi-arrow-90deg-left mr-1" aria-hidden="true" /> {{ t('dock.settings.history.undo') }}
                             </el-button>
                             <el-button size="small" :disabled="!canRedo" round plain aria-label="Redo" @click="onHistoryRedo()">
-                                <i class="bi bi-arrow-90deg-right mr-1" aria-hidden="true" /> {{ $t('dock.settings.history.redo') }}
+                                <i class="bi bi-arrow-90deg-right mr-1" aria-hidden="true" /> {{ t('dock.settings.history.redo') }}
                             </el-button>
                         </el-button-group>
                     </div>
                     <div v-if="historyActionStack.length === 0" class="px-4 py-3">
                         <el-alert
                             type="info"
-                            :title="$t('dock.settings.history.noHistory')"
+                            :title="t('dock.settings.history.noHistory')"
                             show-icon
                             :closable="false">
                         </el-alert>
@@ -205,7 +207,7 @@
                             class="!pb-1"
                             type="primary">
                             <el-link type="primary" href="javascript:void(0)" @click="onGoHistory(0)">
-                                [{{ $t('dock.settings.history.baseImage') }}]
+                                [{{ t('dock.settings.history.baseImage') }}]
                             </el-link>
                         </el-timeline-item>
                         <el-timeline-item
@@ -213,7 +215,9 @@
                             :key="action.id + '_' + index"
                             :type="historyActionStackIndex > index ? 'primary' : undefined"
                             class="!pb-1">
-                            <el-link type="primary" href="javascript:void(0)" @click="onGoHistory(index + 1)" v-t="action.description" />
+                            <el-link type="primary" href="javascript:void(0)" @click="onGoHistory(index + 1)">
+                                {{ t(action.description) }}
+                            </el-link>
                         </el-timeline-item>
                     </el-timeline>
                 </el-scrollbar>
@@ -223,14 +227,14 @@
             <template #label>
                 <div class="leading-5">
                     <i class="bi bi-toggle-on leading-[1.375] block text-center text-lg !mt-1"></i>
-                    <div class="!mb-3" v-t="'dock.settings.prefs.tabTitle'"></div>
+                    <div class="!mb-3">{{ t('dock.settings.prefs.tabTitle') }}</div>
                 </div>
             </template>
             <template v-if="visitedTabs['prefs'] === true">
                 <el-scrollbar>
                     <el-form novalidate="novalidate" action="javascript:void(0)">
                         <!-- Prefs: Theme -->
-                        <el-form-item class="el-form-item--menu-item" :label="$t('dock.settings.prefs.theme')">
+                        <el-form-item class="el-form-item--menu-item" :label="t('dock.settings.prefs.theme')">
                             <el-radio-group
                                 v-model="activeTheme"
                                 :disabled="!!loadingThemeName"
@@ -240,15 +244,15 @@
                                     v-loading="option.value === loadingThemeName"
                                     :key="option.value"
                                     :label="option.value">
-                                    {{ $t(option.label) }}
+                                    {{ t(option.label) }}
                                 </el-radio-button>
                             </el-radio-group>
                         </el-form-item>
                         <!-- Prefs: Language -->
-                        <el-form-item class="el-form-item--menu-item !mb-1 el-form-item--has-content-right" :label="$t('dock.settings.prefs.language')">
+                        <el-form-item class="el-form-item--menu-item !mb-1 el-form-item--has-content-right" :label="t('dock.settings.prefs.language')">
                             <el-select v-model="languageOverride" size="small" style="width: 6rem;">
                                 <el-option-group>
-                                    <el-option value="" :label="'[' + $t('dock.settings.prefs.default') + ']'" />
+                                    <el-option value="" :label="'[' + t('dock.settings.prefs.default') + ']'" />
                                 </el-option-group>
                                 <el-option-group>
                                     <el-option
@@ -262,55 +266,55 @@
                         </el-form-item>
                         <el-collapse class="el-collapse--menu-item">
                             <!-- Prefs: Editor -->
-                            <el-collapse-item v-el-collapse-item-smart-scroll :title="$t('dock.settings.prefs.editor.groupTitle')">
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.editor.menuBarPosition')">
+                            <el-collapse-item v-el-collapse-item-smart-scroll :title="t('dock.settings.prefs.editor.groupTitle')">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.editor.menuBarPosition')">
                                     <el-select v-model="preferenceMenuBarPosition" size="small" style="width: 6rem;">
-                                        <el-option value="top" :label="$t('option.top')" />
-                                        <el-option value="bottom" :label="$t('option.bottom')" />
-                                        <el-option value="left" :label="$t('option.left')" />
-                                        <el-option value="right" :label="$t('option.right')" />
+                                        <el-option value="top" :label="t('option.top')" />
+                                        <el-option value="bottom" :label="t('option.bottom')" />
+                                        <el-option value="left" :label="t('option.left')" />
+                                        <el-option value="right" :label="t('option.right')" />
                                     </el-select>
                                 </el-form-item>
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.editor.showWelcomeScreen')">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.editor.showWelcomeScreen')">
                                     <el-switch v-model="showWelcomeScreenAtStart" />
                                 </el-form-item>
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.editor.showTips')">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.editor.showTips')">
                                     <el-switch v-model="showTutorialNotifications" />
                                 </el-form-item>
                             </el-collapse-item>
                             <!-- Prefs: Debugging -->
-                            <el-collapse-item v-el-collapse-item-smart-scroll :title="$t('dock.settings.prefs.debugging.groupTitle')">
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.debugging.useMobileDebugger')">
+                            <el-collapse-item v-el-collapse-item-smart-scroll :title="t('dock.settings.prefs.debugging.groupTitle')">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.debugging.useMobileDebugger')">
                                     <el-switch v-model="useMobileDebugger" />
                                 </el-form-item>
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.performance.renderer.label')">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.performance.renderer.label')">
                                     <el-select v-model="preferenceRenderer" size="small" style="width: 6rem;">
-                                        <el-option value="webgl2" :label="$t('dock.settings.prefs.performance.renderer.webgl2')" />
-                                        <el-option value="webgl2-offscreen" :label="$t('dock.settings.prefs.performance.renderer.webgl2Offscreen')" />
-                                        <el-option value="wgpu-wasm" :label="$t('dock.settings.prefs.performance.renderer.wgpuWasm')" />
+                                        <el-option value="webgl2" :label="t('dock.settings.prefs.performance.renderer.webgl2')" />
+                                        <el-option value="webgl2-offscreen" :label="t('dock.settings.prefs.performance.renderer.webgl2Offscreen')" />
+                                        <el-option value="wgpu-wasm" :label="t('dock.settings.prefs.performance.renderer.wgpuWasm')" />
                                     </el-select>
                                 </el-form-item>
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.performance.optimizeLargeImage')">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.performance.optimizeLargeImage')">
                                     <el-switch v-model="preferenceOptimizeLargeImages" />
                                 </el-form-item>
-                                <el-form-item v-if="preferenceOptimizeLargeImages" class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.performance.fixAdjacentLayerSeams')">
+                                <el-form-item v-if="preferenceOptimizeLargeImages" class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.performance.fixAdjacentLayerSeams')">
                                     <el-switch v-model="performanceFixLayerSeams" />
                                 </el-form-item>
-                                <el-form-item v-if="!preferenceOptimizeLargeImages" class="el-form-item--menu-item el-form-item--has-content-right" :label="$t('dock.settings.prefs.performance.highQualityScaling')">
+                                <el-form-item v-if="!preferenceOptimizeLargeImages" class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.performance.highQualityScaling')">
                                     <el-switch v-model="preferenceHighQualityScaling" />
                                 </el-form-item>
                             </el-collapse-item>
                             <!-- Prefs: Help -->
-                            <el-collapse-item v-el-collapse-item-smart-scroll :title="$t('dock.settings.prefs.help.groupTitle')">
+                            <el-collapse-item v-el-collapse-item-smart-scroll :title="t('dock.settings.prefs.help.groupTitle')">
                                 <div class="el-form-item el-form-item--menu-item">
                                     <el-link href="https://github.com/opengraphica/opengraphica/issues/" type="primary" target="_blank">
-                                        <span v-t="'dock.settings.prefs.help.reportIssue'"></span>
+                                        <span>{{ t('dock.settings.prefs.help.reportIssue') }}</span>
                                         <i class="bi bi-box-arrow-up-right ml-2"></i>
                                     </el-link>
                                 </div>
                                 <div class="el-form-item el-form-item--menu-item">
                                     <el-link href="javascript:void(0)" type="primary" @click="onClickShowDesignSystem()">
-                                        <span v-t="'dock.settings.prefs.help.designSystem'"></span>
+                                        <span>{{ t('dock.settings.prefs.help.designSystem') }}</span>
                                         <i class="bi bi-box-arrow-up-right ml-2"></i>
                                     </el-link>
                                 </div>
@@ -318,7 +322,9 @@
                         </el-collapse>
                         <!-- Prefs: Reset -->
                         <div class="px-5 pt-4 pb-4">
-                            <el-button size="small" class="w-full" @click="onClickResetSettings" v-t="'dock.settings.prefs.editor.resetSettings'" />
+                            <el-button size="small" class="w-full" @click="onClickResetSettings">
+                                {{ t('dock.settings.prefs.editor.resetSettings') }}
+                            </el-button>
                         </div>
                     </el-form>
                 </el-scrollbar>
@@ -326,9 +332,15 @@
         </el-tab-pane>
     </el-tabs>
 </template>
-
 <script lang="ts">
+export default {
+    inheritAttrs: false,
+};
+</script>
+<script setup lang="ts">
 import { defineComponent, ref, computed, toRefs, nextTick, onMounted, onUnmounted, watch } from 'vue';
+import { useI18n } from '@/i18n';
+
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
 import ElCollapse, { ElCollapseItem } from 'element-plus/lib/components/collapse/index';
@@ -345,7 +357,7 @@ import ElSwitch from 'element-plus/lib/components/switch/index';
 import ElTabs, { ElTabPane } from 'element-plus/lib/components/tabs/index';
 import ElTimeline, { ElTimelineItem } from 'element-plus/lib/components/timeline/index';
 
-import elCollapseItemSmartScrollDirective from '@/directives/el-collapse-item-smart-scroll';
+import vElCollapseItemSmartScroll from '@/directives/el-collapse-item-smart-scroll';
 
 import languages from '@/config/languages.json';
 import { setEditorLanguage } from '@/i18n';
@@ -360,457 +372,378 @@ import { throttle } from '@/lib/timing';
 import { runModule } from '@/modules';
 import '@/format/title-case';
 
-const activeTab = ref<string>('file');
+const { t } = useI18n();
+const vLoading = ElLoading.directive;
 
-export default defineComponent({
-    name: 'DockSettings',
-    inheritAttrs: false,
-    directives: {
-        'el-collapse-item-smart-scroll': elCollapseItemSmartScrollDirective,
-        loading: ElLoading.directive
-    },
-    components: {
-        ElAlert,
-        ElButton,
-        ElButtonGroup,
-        ElCollapse,
-        ElCollapseItem,
-        ElDivider,
-        ElForm,
-        ElFormItem,
-        ElInputNumber,
-        ElLink,
-        ElMenu,
-        ElMenuItem,
-        ElOption,
-        ElOptionGroup,
-        ElRadioButton,
-        ElRadioGroup,
-        ElScrollbar,
-        ElSelect,
-        ElSwitch,
-        ElTabs,
-        ElTabPane,
-        ElTimeline,
-        ElTimelineItem
-    },
-    props: {
-        isDialog: {
-            type: Boolean,
-            default: false
-        }
-    },
-    emits: [
-        'close',
-        'update:title'
-    ],
-    setup(props, { emit }) {
-        emit('update:title', 'dock.settings.title');
-        const $notify = notifyInjector('$notify');
-        const loading = ref<boolean>(false);
-        const { actionStackIndex: historyActionStackIndex, canRedo, canUndo } = toRefs(historyStore.state);
-
-        const visitedTabs = ref<{ [key: string]: boolean }>({});
-
-        watch([activeTab], ([newActiveTab]) => {
-            visitedTabs.value[newActiveTab] = true;
-        }, { immediate: true });
-
-        // File operations
-        const { vendorCustomSaveCallback } = toRefs(preferencesStore.state);
-        const showRestoreImage = ref(false);
-        watch(() => editorStore.state.showBackupRestore, (showBackupRestore) => {
-            if (!showBackupRestore) {
-                showRestoreImage.value = false;
-            }
-        });
-
-        // View zoom/pan/rotate
-        const zoomLevel = ref<number>(100);
-        const isZoomLevelTouched = ref<boolean>(false);
-        const rotationAngle = ref<number>(0);
-        const isRotationAngleTouched = ref<boolean>(false);
-
-        watch(() => canvasStore.state.decomposedTransform, throttle((decomposedTransform) => {
-            zoomLevel.value = Math.round(decomposedTransform.scaleX * 100);
-            rotationAngle.value = Math.round(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES);
-        }, 100), { immediate: true });
-
-        watch([zoomLevel], ([zoomLevel]) => {
-            if (isZoomLevelTouched.value) {
-                canvasStore.dispatch('setTransformScale', zoomLevel / 100);
-                isZoomLevelTouched.value = false;
-            }
-        });
-        watch([rotationAngle], ([rotationAngle]) => {
-            if (isRotationAngleTouched.value) {
-                canvasStore.dispatch('setTransformRotation', rotationAngle * Math.DEGREES_TO_RADIANS);
-                isRotationAngleTouched.value = false;
-            }
-        });
-
-        const touchRotationPreference = computed<'on' | 'off' | 'snap'>({
-            get() {
-                return preferencesStore.state.touchRotation;
-            },
-            set(newTouchRotation) {
-                preferencesStore.set('touchRotation', newTouchRotation);
-            }
-        });
-        const touchRotationOptions = [
-            { value: 'on', label: 'dock.settings.view.touchRotate.on' },
-            { value: 'snap', label: 'dock.settings.view.touchRotate.snap' },
-            { value: 'off', label: 'dock.settings.view.touchRotate.off' }
-        ];
-        function onResetViewFit() {
-            appEmitter.emit('app.canvas.resetTransform');
-        }
-        function onResetViewRotation() {
-            canvasStore.dispatch('setTransformRotation', 0);
-        }
-        function onResetViewZoom() {
-            canvasStore.dispatch('setTransformScale', 1);
-        }
-
-        // Handle Fullscreen
-        const isFullscreen = ref<boolean>(false);
-        function onFullscreenChange() {
-            if (document.fullscreenElement) {
-                isFullscreen.value = true;
-            } else {
-                isFullscreen.value = false;
-            }
-        }
-        onMounted(() => {
-            document.addEventListener('fullscreenchange', onFullscreenChange, false);
-
-            (async () => {
-                if (editorStore.get('showBackupRestore')) {
-                    try {
-                        showRestoreImage.value = await hasWorkingFile();
-                    } catch (error) { /* Ignore */ }
-                }
-            })();
-        });
-        onUnmounted(() => {
-            document.removeEventListener('fullscreenchange', onFullscreenChange, false);
-        });
-        async function onEnterFullscreen() {
-            await document.body.requestFullscreen({
-                navigationUI: 'hide'
-            });
-            isFullscreen.value = true;
-        }
-        function onExitFullscreen() {
-            document.exitFullscreen();
-            isFullscreen.value = false;
-        }
-
-        // History
-        const historyActionStack = computed<HistoryState['actionStack']>(() => {
-            return historyStore.state.actionStack;
-        });
-        async function onHistoryUndo() {
-            if (!editorStore.get('waiting')) {
-                try {
-                    await historyStore.dispatch('undo');
-                } catch (error: any) {
-                    $notify({
-                        type: 'error',
-                        title: 'Undo Error',
-                        message: error
-                    });
-                }
-            }
-        }
-        async function onHistoryRedo() {
-            if (!editorStore.get('waiting')) {
-                try {
-                    await historyStore.dispatch('redo');
-                } catch (error: any) {
-                    $notify({
-                        type: 'error',
-                        title: 'Redo Error',
-                        message: error
-                    });
-                }
-            }
-        }
-        async function onGoHistory(index: number) {
-            if (!editorStore.get('waiting')) {
-                try {
-                    const actionStackIndex = historyStore.get('actionStackIndex');
-                    if (index > actionStackIndex) {
-                        const count = Math.abs(index - actionStackIndex);
-                        for (let i = 0; i < count; i++) {
-                            await historyStore.dispatch('redo');
-                        }
-                    } else if (index < actionStackIndex) {
-                        const count = Math.abs(index - actionStackIndex);
-                        for (let i = 0; i < count; i++) {
-                            await historyStore.dispatch('undo');
-                        }
-                    }
-                } catch (error: any) {
-                    $notify({
-                        type: 'error',
-                        dangerouslyUseHTMLString: true,
-                        message: unexpectedErrorMessage
-                    });
-                }
-            }
-        }
-
-        // Theme handling
-        const themeOptions = computed<{ value: string, label: string }[]>(() => {
-            return Object.keys(editorStore.state.themes).map((themeName) => {
-                return { value: themeName, label: 'theme.' + themeName };
-            });
-        });
-        const loadingThemeName = computed<string | null>(() => {
-            return editorStore.state.loadingThemeName;
-        });
-        const activeTheme = computed<string>({
-            get() {
-                return (editorStore.state.activeTheme || {}).name || '';
-            },
-            set(newTheme) {
-                editorStore.dispatch('setActiveTheme', newTheme);
-            }
-        });
-
-        // Preferences
-        const languageOptions: Array<{ value: string | null, label: string }>
-            = languages.map((language) => ({ value: language.code, label: language.description }));
-        const languageOverride = computed<string>({
-            get() {
-                return preferencesStore.state.languageOverride;
-            },
-            set(value) {
-                preferencesStore.set('languageOverride', value);
-                setEditorLanguage(value);
-            }
-        });
-        const preferenceRenderer = computed<PreferencesState['renderer']>({
-            get() {
-                return preferencesStore.state.renderer;
-            },
-            set(value) {
-                preferencesStore.set('renderer', value);
-                window.location.reload();
-            }
-        });
-        const preferenceOptimizeLargeImages = computed<boolean>({
-            get() {
-                return preferencesStore.state.preferCanvasViewport;
-            },
-            set(value) {
-                preferencesStore.set('preferCanvasViewport', value);
-                preferencesStore.set('useCanvasViewport', value);
-                canvasStore.set('viewDirty', true);
-            }
-        });
-        const performanceFixLayerSeams = computed<boolean>({
-            get() {
-                return preferencesStore.state.enableMultiLayerBuffer;
-            },
-            set(value) {
-                preferencesStore.set('enableMultiLayerBuffer', value);
-                canvasStore.set('viewDirty', true);
-            }
-        });
-        const preferenceHighQualityScaling = computed<boolean>({
-            get() {
-                return preferencesStore.state.postProcessInterpolateImage;
-            },
-            set(value) {
-                preferencesStore.set('postProcessInterpolateImage', value);
-            }
-        });
-        const preferenceMenuBarPosition = computed<'left' | 'right' | 'top' | 'bottom'>({
-            get() {
-                return preferencesStore.state.menuBarPosition;
-            },
-            async set(value) {
-                preferencesStore.set('menuBarPosition', value);
-                emit('close');
-                await nextTick();
-                appEmitter.emit('app.canvas.resetTransform');
-            }
-        });
-        const showTutorialNotifications = computed<boolean>({
-            get() {
-                return preferencesStore.state.showTutorialNotifications;
-            },
-            set(value) {
-                preferencesStore.set('showTutorialNotifications', value);
-            }
-        });
-        const showWelcomeScreenAtStart = computed<boolean>({
-            get() {
-                return preferencesStore.state.showWelcomeScreenAtStart;
-            },
-            set(value) {
-                preferencesStore.set('showWelcomeScreenAtStart', value);
-            }
-        });
-        function onClickShowDesignSystem() {
-            runModule('developer', 'designSystem');
-        }
-        function onClickResetSettings() {
-            for (let key in localStorage) {
-                if (key.startsWith('openGraphica')) {
-                    try {
-                        localStorage.removeItem(key);
-                    } catch (error) {}
-                }
-            }
-            window.location.reload();
-        }
-        const useMobileDebugger = computed<boolean>({
-            get() {
-                return preferencesStore.state.useMobileDebugger;
-            },
-            set(value) {
-                preferencesStore.set('useMobileDebugger', value);
-            }
-        });
-
-        // Menu selection
-        async function onMenuSelect(group: string, index: string) {
-            loading.value = true;
-            await nextTick();
-            try {
-                switch (group) {
-                    case 'file':
-                        switch (index) {
-                            case 'restore':
-                                await runModule('file', 'restoreBackup');
-                                editorStore.set('showBackupRestore', false);
-                                break;
-                            case 'new':
-                                await runModule('file', 'new');
-                                editorStore.set('showBackupRestore', false);
-                                break;
-                            case 'open':
-                                await runModule('file', 'open');
-                                editorStore.set('showBackupRestore', false);
-                                break;
-                            case 'export':
-                                await runModule('file', 'export');
-                                break;
-                            case 'save':
-                                if (vendorCustomSaveCallback.value) {
-                                    vendorCustomSaveCallback.value();
-                                }
-                                break;
-                            case 'saveAs':
-                                await runModule('file', 'saveAs');
-                                break;
-                            case 'insertPhoto':
-                                await runModule('file', 'insertPhoto');
-                                editorStore.set('showBackupRestore', false);
-                                break;
-                            case 'takePhoto':
-                                await runModule('file', 'takePhoto');
-                                editorStore.set('showBackupRestore', false);
-                                break;
-                        }
-                        break;
-                    case 'image':
-                        switch (index) {
-                            case 'cropResize':
-                                await editorStore.dispatch('setActiveTool', {
-                                    group: 'image',
-                                    tool: 'cropResize'
-                                });
-                                break;
-                            case 'cut':
-                                await runModule('image', 'cut');
-                                break;
-                            case 'copy':
-                                await runModule('image', 'copy');
-                                break;
-                            case 'copyAll':
-                                await runModule('image', 'copyAll');
-                                break;
-                            case 'paste':
-                                await runModule('image', 'paste');
-                                break;
-                            case 'convertLayersToCollage':
-                                await runModule('image', 'convertLayersToCollage');
-                                break;
-                            case 'convertLayersToImageSequence':
-                                await runModule('image', 'convertLayersToImageSequence');
-                                break;
-                            case 'convertLayersFlatten':
-                                await runModule('image', 'convertLayersFlatten');
-                                break;
-                        }
-                        break;
-                }
-            } catch (error: any) {
-                console.error(error);
-                $notify({
-                    type: 'error',
-                    title: 'An Error Occurred',
-                    message: error.toString()
-                });
-            }
-            loading.value = false;
-            setTimeout(() => {
-                emit('close');
-            }, 100);
-        }
-
-        return {
-            activeTab,
-            visitedTabs,
-            loading,
-
-            vendorCustomSaveCallback,
-            showRestoreImage,
-
-            rotationAngle,
-            isRotationAngleTouched,
-            zoomLevel,
-            isZoomLevelTouched,
-            touchRotationPreference,
-            touchRotationOptions,
-            onResetViewFit,
-            onResetViewRotation,
-            onResetViewZoom,
-
-            isFullscreen,
-            onEnterFullscreen,
-            onExitFullscreen,
-
-            historyActionStack,
-            historyActionStackIndex,
-            canUndo,
-            canRedo,
-            onHistoryUndo,
-            onHistoryRedo,
-            onGoHistory,
-            themeOptions,
-            loadingThemeName,
-            activeTheme,
-
-            languageOptions,
-            languageOverride,
-            preferenceRenderer,
-            preferenceOptimizeLargeImages,
-            performanceFixLayerSeams,
-            preferenceHighQualityScaling,
-            preferenceMenuBarPosition,
-            showTutorialNotifications,
-            showWelcomeScreenAtStart,
-            onClickShowDesignSystem,
-            onClickResetSettings,
-            useMobileDebugger,
-
-            onMenuSelect,
-        };
+const props = defineProps({
+    isDialog: {
+        type: Boolean,
+        default: false
     }
 });
+
+const emit = defineEmits([
+    'close',
+    'update:title',
+]);
+
+const activeTab = ref<string>('file');
+
+emit('update:title', 'dock.settings.title');
+const $notify = notifyInjector('$notify');
+const loading = ref<boolean>(false);
+const { actionStackIndex: historyActionStackIndex, canRedo, canUndo } = toRefs(historyStore.state);
+
+const visitedTabs = ref<{ [key: string]: boolean }>({});
+
+watch([activeTab], ([newActiveTab]) => {
+    visitedTabs.value[newActiveTab] = true;
+}, { immediate: true });
+
+// File operations
+const { vendorCustomSaveCallback } = toRefs(preferencesStore.state);
+const showRestoreImage = ref(false);
+watch(() => editorStore.state.showBackupRestore, (showBackupRestore) => {
+    if (!showBackupRestore) {
+        showRestoreImage.value = false;
+    }
+});
+
+// View zoom/pan/rotate
+const zoomLevel = ref<number>(100);
+const isZoomLevelTouched = ref<boolean>(false);
+const rotationAngle = ref<number>(0);
+const isRotationAngleTouched = ref<boolean>(false);
+
+watch(() => canvasStore.state.decomposedTransform, throttle((decomposedTransform) => {
+    zoomLevel.value = Math.round(decomposedTransform.scaleX * 100);
+    rotationAngle.value = Math.round(decomposedTransform.rotation * Math.RADIANS_TO_DEGREES);
+}, 100), { immediate: true });
+
+watch([zoomLevel], ([zoomLevel]) => {
+    if (isZoomLevelTouched.value) {
+        canvasStore.dispatch('setTransformScale', zoomLevel / 100);
+        isZoomLevelTouched.value = false;
+    }
+});
+watch([rotationAngle], ([rotationAngle]) => {
+    if (isRotationAngleTouched.value) {
+        canvasStore.dispatch('setTransformRotation', rotationAngle * Math.DEGREES_TO_RADIANS);
+        isRotationAngleTouched.value = false;
+    }
+});
+
+const touchRotationPreference = computed<'on' | 'off' | 'snap'>({
+    get() {
+        return preferencesStore.state.touchRotation;
+    },
+    set(newTouchRotation) {
+        preferencesStore.set('touchRotation', newTouchRotation);
+    }
+});
+const touchRotationOptions = [
+    { value: 'on', label: 'dock.settings.view.touchRotate.on' },
+    { value: 'snap', label: 'dock.settings.view.touchRotate.snap' },
+    { value: 'off', label: 'dock.settings.view.touchRotate.off' }
+];
+function onResetViewFit() {
+    appEmitter.emit('app.canvas.resetTransform');
+}
+function onResetViewRotation() {
+    canvasStore.dispatch('setTransformRotation', 0);
+}
+function onResetViewZoom() {
+    canvasStore.dispatch('setTransformScale', 1);
+}
+
+// Handle Fullscreen
+const isFullscreen = ref<boolean>(false);
+function onFullscreenChange() {
+    if (document.fullscreenElement) {
+        isFullscreen.value = true;
+    } else {
+        isFullscreen.value = false;
+    }
+}
+onMounted(() => {
+    document.addEventListener('fullscreenchange', onFullscreenChange, false);
+
+    (async () => {
+        if (editorStore.get('showBackupRestore')) {
+            try {
+                showRestoreImage.value = await hasWorkingFile();
+            } catch (error) { /* Ignore */ }
+        }
+    })();
+});
+onUnmounted(() => {
+    document.removeEventListener('fullscreenchange', onFullscreenChange, false);
+});
+async function onEnterFullscreen() {
+    await document.body.requestFullscreen({
+        navigationUI: 'hide'
+    });
+    isFullscreen.value = true;
+}
+function onExitFullscreen() {
+    document.exitFullscreen();
+    isFullscreen.value = false;
+}
+
+// History
+const historyActionStack = computed<HistoryState['actionStack']>(() => {
+    return historyStore.state.actionStack;
+});
+async function onHistoryUndo() {
+    if (!editorStore.get('waiting')) {
+        try {
+            await historyStore.dispatch('undo');
+        } catch (error: any) {
+            $notify({
+                type: 'error',
+                title: 'Undo Error',
+                message: error
+            });
+        }
+    }
+}
+async function onHistoryRedo() {
+    if (!editorStore.get('waiting')) {
+        try {
+            await historyStore.dispatch('redo');
+        } catch (error: any) {
+            $notify({
+                type: 'error',
+                title: 'Redo Error',
+                message: error
+            });
+        }
+    }
+}
+async function onGoHistory(index: number) {
+    if (!editorStore.get('waiting')) {
+        try {
+            const actionStackIndex = historyStore.get('actionStackIndex');
+            if (index > actionStackIndex) {
+                const count = Math.abs(index - actionStackIndex);
+                for (let i = 0; i < count; i++) {
+                    await historyStore.dispatch('redo');
+                }
+            } else if (index < actionStackIndex) {
+                const count = Math.abs(index - actionStackIndex);
+                for (let i = 0; i < count; i++) {
+                    await historyStore.dispatch('undo');
+                }
+            }
+        } catch (error: any) {
+            $notify({
+                type: 'error',
+                dangerouslyUseHTMLString: true,
+                message: unexpectedErrorMessage
+            });
+        }
+    }
+}
+
+// Theme handling
+const themeOptions = computed<{ value: string, label: string }[]>(() => {
+    return Object.keys(editorStore.state.themes).map((themeName) => {
+        return { value: themeName, label: 'theme.' + themeName };
+    });
+});
+const loadingThemeName = computed<string | null>(() => {
+    return editorStore.state.loadingThemeName;
+});
+const activeTheme = computed<string>({
+    get() {
+        return (editorStore.state.activeTheme || {}).name || '';
+    },
+    set(newTheme) {
+        editorStore.dispatch('setActiveTheme', newTheme);
+    }
+});
+
+// Preferences
+const languageOptions: Array<{ value: string | null, label: string }>
+    = languages.map((language) => ({ value: language.code, label: language.description }));
+const languageOverride = computed<string>({
+    get() {
+        return preferencesStore.state.languageOverride;
+    },
+    set(value) {
+        preferencesStore.set('languageOverride', value);
+        setEditorLanguage(value);
+    }
+});
+const preferenceRenderer = computed<PreferencesState['renderer']>({
+    get() {
+        return preferencesStore.state.renderer;
+    },
+    set(value) {
+        preferencesStore.set('renderer', value);
+        window.location.reload();
+    }
+});
+const preferenceOptimizeLargeImages = computed<boolean>({
+    get() {
+        return preferencesStore.state.preferCanvasViewport;
+    },
+    set(value) {
+        preferencesStore.set('preferCanvasViewport', value);
+        preferencesStore.set('useCanvasViewport', value);
+        canvasStore.set('viewDirty', true);
+    }
+});
+const performanceFixLayerSeams = computed<boolean>({
+    get() {
+        return preferencesStore.state.enableMultiLayerBuffer;
+    },
+    set(value) {
+        preferencesStore.set('enableMultiLayerBuffer', value);
+        canvasStore.set('viewDirty', true);
+    }
+});
+const preferenceHighQualityScaling = computed<boolean>({
+    get() {
+        return preferencesStore.state.postProcessInterpolateImage;
+    },
+    set(value) {
+        preferencesStore.set('postProcessInterpolateImage', value);
+    }
+});
+const preferenceMenuBarPosition = computed<'left' | 'right' | 'top' | 'bottom'>({
+    get() {
+        return preferencesStore.state.menuBarPosition;
+    },
+    async set(value) {
+        preferencesStore.set('menuBarPosition', value);
+        emit('close');
+        await nextTick();
+        appEmitter.emit('app.canvas.resetTransform');
+    }
+});
+const showTutorialNotifications = computed<boolean>({
+    get() {
+        return preferencesStore.state.showTutorialNotifications;
+    },
+    set(value) {
+        preferencesStore.set('showTutorialNotifications', value);
+    }
+});
+const showWelcomeScreenAtStart = computed<boolean>({
+    get() {
+        return preferencesStore.state.showWelcomeScreenAtStart;
+    },
+    set(value) {
+        preferencesStore.set('showWelcomeScreenAtStart', value);
+    }
+});
+function onClickShowDesignSystem() {
+    runModule('developer', 'designSystem');
+}
+function onClickResetSettings() {
+    for (let key in localStorage) {
+        if (key.startsWith('openGraphica')) {
+            try {
+                localStorage.removeItem(key);
+            } catch (error) {}
+        }
+    }
+    window.location.reload();
+}
+const useMobileDebugger = computed<boolean>({
+    get() {
+        return preferencesStore.state.useMobileDebugger;
+    },
+    set(value) {
+        preferencesStore.set('useMobileDebugger', value);
+    }
+});
+
+// Menu selection
+async function onMenuSelect(group: string, index: string) {
+    loading.value = true;
+    await nextTick();
+    try {
+        switch (group) {
+            case 'file':
+                switch (index) {
+                    case 'restore':
+                        await runModule('file', 'restoreBackup');
+                        editorStore.set('showBackupRestore', false);
+                        break;
+                    case 'new':
+                        await runModule('file', 'new');
+                        editorStore.set('showBackupRestore', false);
+                        break;
+                    case 'open':
+                        await runModule('file', 'open');
+                        editorStore.set('showBackupRestore', false);
+                        break;
+                    case 'export':
+                        await runModule('file', 'export');
+                        break;
+                    case 'save':
+                        if (vendorCustomSaveCallback.value) {
+                            vendorCustomSaveCallback.value();
+                        }
+                        break;
+                    case 'saveAs':
+                        await runModule('file', 'saveAs');
+                        break;
+                    case 'insertPhoto':
+                        await runModule('file', 'insertPhoto');
+                        editorStore.set('showBackupRestore', false);
+                        break;
+                    case 'takePhoto':
+                        await runModule('file', 'takePhoto');
+                        editorStore.set('showBackupRestore', false);
+                        break;
+                }
+                break;
+            case 'image':
+                switch (index) {
+                    case 'cropResize':
+                        await editorStore.dispatch('setActiveTool', {
+                            group: 'image',
+                            tool: 'cropResize'
+                        });
+                        break;
+                    case 'cut':
+                        await runModule('image', 'cut');
+                        break;
+                    case 'copy':
+                        await runModule('image', 'copy');
+                        break;
+                    case 'copyAll':
+                        await runModule('image', 'copyAll');
+                        break;
+                    case 'paste':
+                        await runModule('image', 'paste');
+                        break;
+                    case 'convertLayersToCollage':
+                        await runModule('image', 'convertLayersToCollage');
+                        break;
+                    case 'convertLayersToImageSequence':
+                        await runModule('image', 'convertLayersToImageSequence');
+                        break;
+                    case 'convertLayersFlatten':
+                        await runModule('image', 'convertLayersFlatten');
+                        break;
+                }
+                break;
+        }
+    } catch (error: any) {
+        console.error(error);
+        $notify({
+            type: 'error',
+            title: 'An Error Occurred',
+            message: error.toString()
+        });
+    }
+    loading.value = false;
+    setTimeout(() => {
+        emit('close');
+    }, 100);
+}
 </script>

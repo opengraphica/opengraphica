@@ -2,38 +2,42 @@
     <div v-loading="loading">
         <el-alert
             v-if="hasCameraError"
-            :title="$t('module.fileTakePhoto.noCameraError.title')"
+            :title="t('module.fileTakePhoto.noCameraError.title')"
             type="warning"
             show-icon
             :closable="false">
-            {{ $t('module.fileTakePhoto.noCameraError.message') }}
+            {{ t('module.fileTakePhoto.noCameraError.message') }}
         </el-alert>
         <template v-else>
-            <el-select v-model="facingMode" class="mx-0 mt-0 mb-2 w-full" :placeholder="$t('module.fileTakePhoto.selectCamera.placeholder')">
-                <el-option key="user" value="user" :label="$t('module.fileTakePhoto.selectCamera.user')" />
-                <el-option key="environment" value="environment" :label="$t('module.fileTakePhoto.selectCamera.environment')" />
+            <el-select v-model="facingMode" class="mx-0 mt-0 mb-2 w-full" :placeholder="t('module.fileTakePhoto.selectCamera.placeholder')">
+                <el-option key="user" value="user" :label="t('module.fileTakePhoto.selectCamera.user')" />
+                <el-option key="environment" value="environment" :label="t('module.fileTakePhoto.selectCamera.environment')" />
             </el-select>
             <video ref="video" autoplay="true" class="w-full"></video>
             <div class="text-right mt-4">
-                <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
-                <el-button type="primary" @click="onTake">{{ $t('button.take') }}</el-button>
+                <el-button @click="onCancel">{{ t('button.cancel') }}</el-button>
+                <el-button type="primary" @click="onTake">{{ t('button.take') }}</el-button>
             </div>
         </template>
     </div>
 </template>
-
 <script lang="ts">
+export default {
+    inheritAttrs: false,
+};
+</script>
+<script setup lang="ts">
 /**
  * Parts of this file were adapted from miniPaint
  * @copyright (c) ViliusL
  * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
 
-import { defineComponent, ref, watch, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue';
+import { useI18n } from '@/i18n';
 import { useRenderer } from '@/renderers';
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton from 'element-plus/lib/components/button/index';
-import ElLoading from 'element-plus/lib/components/loading/index';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import historyStore from '@/store/history';
 import { createStoredImage } from '@/store/image';
@@ -43,146 +47,126 @@ import { BundleAction } from '@/actions/bundle';
 import { InsertLayerAction } from '@/actions/insert-layer';
 import { UpdateFileAction } from '@/actions/update-file';
 
+const { t } = useI18n();
+
 let webcamPhotoCount: number = 1;
 
-export default defineComponent({
-    name: 'ModuleFileTakePhoto',
-    inheritAttrs: false,
-    directives: {
-        loading: ElLoading.directive
-    },
-    components: {
-        ElAlert,
-        ElButton,
-        ElOption,
-        ElSelect
-    },
-    emits: [
-        'update:title',
-        'close'
-    ],
-    setup(props, { emit }) {
-        emit('update:title', 'module.fileTakePhoto.title');
+const emit = defineEmits([
+    'update:title',
+    'close'
+]);
 
-        const $notify = notifyInjector('$notify');
-        const loading = ref<boolean>(true);
-        const video = ref<HTMLVideoElement>();
-        const stream = ref<MediaStream | null>(null);
-        const tracks = ref<MediaStreamTrack[]>();
-        const activeTrack = ref<MediaStreamTrack | null>(null);
-        const hasCameraError = ref<boolean>(false);
-        const facingMode = ref<string>('environment');
-        let videoElement: HTMLVideoElement;
 
-        watch([facingMode], () => {
-            requestStream();
-        });
+emit('update:title', 'module.fileTakePhoto.title');
 
-        onMounted(async () => {
-            videoElement = video.value as HTMLVideoElement;
-            await requestStream();
-            loading.value = false;
-        });
+const $notify = notifyInjector('$notify');
+const loading = ref<boolean>(true);
+const video = ref<HTMLVideoElement>();
+const stream = ref<MediaStream | null>(null);
+const tracks = ref<MediaStreamTrack[]>();
+const activeTrack = ref<MediaStreamTrack | null>(null);
+const hasCameraError = ref<boolean>(false);
+const facingMode = ref<string>('environment');
+let videoElement: HTMLVideoElement;
 
-        onUnmounted(() => {
-            stopStream();
-        });
-
-        async function requestStream() {
-            stopStream();
-            const maxTextureSize = await (await useRenderer()).getMaxTextureSize();
-            try {
-                stream.value = await navigator.mediaDevices.getUserMedia({
-                    audio: false,
-                    video: {
-                        facingMode: facingMode.value,
-                        width: { ideal: Math.min(maxTextureSize, 1920) },
-                        height: { ideal: Math.min(maxTextureSize, 1920) } 
-                    }
-                });
-                tracks.value = stream.value.getTracks();
-                activeTrack.value = tracks.value[0];
-                videoElement.srcObject = stream.value;
-            } catch (error: any) {
-                hasCameraError.value = true;
-            }
-        }
-
-        async function stopStream() {
-            if (activeTrack.value != null){
-                activeTrack.value.stop();
-            }
-            videoElement.pause();
-            videoElement.src = '';
-            videoElement.load();
-        }
-
-        function onCancel() {
-            emit('close');
-        }
-
-        async function onTake() {
-            videoElement.pause();
-            loading.value = true;
-            await nextTick();
-            try {
-                const width = videoElement.videoWidth;
-                const height = videoElement.videoHeight;
-                const tmpCanvas = document.createElement('canvas');
-                const tmpCanvasCtx = tmpCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
-                if (tmpCanvasCtx) {
-                    tmpCanvas.width = width;
-                    tmpCanvas.height = height;
-                    tmpCanvasCtx.drawImage(videoElement, 0, 0);
-                    let image = new Image;
-                    await new Promise<void>((resolve, reject) => {
-                        image.onload = () => {
-                            resolve();
-                        };
-                        image.onerror = () => {
-                            reject();
-                        }
-                        image.src = tmpCanvas.toDataURL('image/png');
-                    });
-                    await historyStore.dispatch('runAction', {
-                        action: new BundleAction('fileTakePhoto', 'action.fileTakePhoto', [
-                            ...(workingFileStore.get('layers').length === 0 ? [
-                                new UpdateFileAction({
-                                    width,
-                                    height
-                                })
-                            ] : []),
-                            new InsertLayerAction({
-                                type: 'raster',
-                                name: 'Webcam #' + (webcamPhotoCount++),
-                                width,
-                                height,
-                                data: {
-                                    sourceUuid: await createStoredImage(image),
-                                }
-                            })
-                        ])
-                    });
-                }
-            } catch(error) {
-                $notify({
-                    type: 'error',
-                    title: 'Error Occurred',
-                    message: unexpectedErrorMessage
-                });
-            }
-            loading.value = false;
-            emit('close');
-        }
-        
-        return {
-            hasCameraError,
-            loading,
-            video,
-            facingMode,
-            onCancel,
-            onTake
-        };
-    }
+watch([facingMode], () => {
+    requestStream();
 });
+
+onMounted(async () => {
+    videoElement = video.value as HTMLVideoElement;
+    await requestStream();
+    loading.value = false;
+});
+
+onUnmounted(() => {
+    stopStream();
+});
+
+async function requestStream() {
+    stopStream();
+    const maxTextureSize = await (await useRenderer()).getMaxTextureSize();
+    try {
+        stream.value = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: {
+                facingMode: facingMode.value,
+                width: { ideal: Math.min(maxTextureSize, 1920) },
+                height: { ideal: Math.min(maxTextureSize, 1920) } 
+            }
+        });
+        tracks.value = stream.value.getTracks();
+        activeTrack.value = tracks.value[0];
+        videoElement.srcObject = stream.value;
+    } catch (error: any) {
+        hasCameraError.value = true;
+    }
+}
+
+async function stopStream() {
+    if (activeTrack.value != null){
+        activeTrack.value.stop();
+    }
+    videoElement.pause();
+    videoElement.src = '';
+    videoElement.load();
+}
+
+function onCancel() {
+    emit('close');
+}
+
+async function onTake() {
+    videoElement.pause();
+    loading.value = true;
+    await nextTick();
+    try {
+        const width = videoElement.videoWidth;
+        const height = videoElement.videoHeight;
+        const tmpCanvas = document.createElement('canvas');
+        const tmpCanvasCtx = tmpCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
+        if (tmpCanvasCtx) {
+            tmpCanvas.width = width;
+            tmpCanvas.height = height;
+            tmpCanvasCtx.drawImage(videoElement, 0, 0);
+            let image = new Image;
+            await new Promise<void>((resolve, reject) => {
+                image.onload = () => {
+                    resolve();
+                };
+                image.onerror = () => {
+                    reject();
+                }
+                image.src = tmpCanvas.toDataURL('image/png');
+            });
+            await historyStore.dispatch('runAction', {
+                action: new BundleAction('fileTakePhoto', 'action.fileTakePhoto', [
+                    ...(workingFileStore.get('layers').length === 0 ? [
+                        new UpdateFileAction({
+                            width,
+                            height
+                        })
+                    ] : []),
+                    new InsertLayerAction({
+                        type: 'raster',
+                        name: 'Webcam #' + (webcamPhotoCount++),
+                        width,
+                        height,
+                        data: {
+                            sourceUuid: await createStoredImage(image),
+                        }
+                    })
+                ])
+            });
+        }
+    } catch(error) {
+        $notify({
+            type: 'error',
+            title: 'Error Occurred',
+            message: unexpectedErrorMessage
+        });
+    }
+    loading.value = false;
+    emit('close');
+}
 </script>

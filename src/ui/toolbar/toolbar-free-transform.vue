@@ -3,7 +3,9 @@
         <div class="og-toolbar-overlay">
             <div class="og-toolbar-tool-selector">
                 <span class="bi bi-cursor my-1" aria-hidden="true"></span>
-                <span class="og-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
+                <span class="og-toolbar-tool-selector__description">
+                    {{ t('toolbar.general.settings') }}
+                </span>
             </div>
             <el-horizontal-scrollbar-arrows>
                 <el-button v-if="hasSelection" size="small" @click="onClickClearSelection">
@@ -54,19 +56,19 @@
                     <el-menu class="el-menu--medium el-menu--medium-icons el-menu--borderless my-1" :default-active="actionActiveIndex" @select="onActionSelect($event)">
                         <el-menu-item index="applyTransform">
                             <i class="bi bi-check-circle-fill"></i>
-                            <span v-t="'toolbar.freeTransform.actions.applyTransform'"></span>
+                            <span>{{ t('toolbar.freeTransform.actions.applyTransform') }}</span>
                         </el-menu-item>
                         <el-menu-item index="stretchToImageSize">
                             <i class="bi bi-arrows-angle-expand"></i>
-                            <span v-t="'toolbar.freeTransform.actions.stretchToImageSize'"></span>
+                            <span>{{ t('toolbar.freeTransform.actions.stretchToImageSize') }}</span>
                         </el-menu-item>
                         <el-menu-item index="expandToImageSize">
                             <i class="bi bi-fullscreen"></i>
-                            <span v-t="'toolbar.freeTransform.actions.expandToImageSize'"></span>
+                            <span>{{ t('toolbar.freeTransform.actions.expandToImageSize') }}</span>
                         </el-menu-item>
                         <el-menu-item index="trimEmptySpace">
                             <i class="bi bi-scissors"></i>
-                            <span v-t="'toolbar.freeTransform.actions.trimEmptySpace'"></span>
+                            <span>{{ t('toolbar.freeTransform.actions.trimEmptySpace') }}</span>
                         </el-menu-item>
                     </el-menu>
                 </el-popover>

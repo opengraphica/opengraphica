@@ -3,11 +3,15 @@
         <div class="og-toolbar-overlay">
             <div class="og-toolbar-tool-selector">
                 <span class="bi bi-droplet my-1" aria-hidden="true"></span>
-                <span class="og-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
+                <span class="og-toolbar-tool-selector__description">
+                    {{ t('toolbar.general.settings') }}
+                </span>
             </div>
             <el-horizontal-scrollbar-arrows>
                 <div class="flex items-center px-3">
-                    <label for="toolbar-deform-blur-size-slider" v-t="'toolbar.deformBlur.brushSize'" class="mr-3" />
+                    <label for="toolbar-deform-blur-size-slider" class="mr-3">
+                        {{ t('toolbar.deformBlur.brushSize') }}
+                    </label>
                     <el-slider
                         id="toolbar-deform-blur-size-slider"
                         v-model="selectionBrushSize"
@@ -23,78 +27,39 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { computed, defineComponent, ref } from 'vue';
+import { useI18n } from '@/i18n';
 import { brushSize } from '@/canvas/store/deform-blur-state';
 
-import ElAlert from 'element-plus/lib/components/alert/index';
-import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
-import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.vue';
-import ElInput from 'element-plus/lib/components/input/index';
-import ElInputGroup from '@/ui/el/el-input-group.vue';
-import ElInputNumber from '@/ui/el/el-input-number.vue';
-import ElPopover from '@/ui/el/el-popover.vue';
-import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSlider from 'element-plus/lib/components/slider/index';
-import ElTooltip from 'element-plus/lib/components/tooltip/index';
 
-export default defineComponent({
-    name: 'ToolbarDeformBlur',
-    components: {
-        ElAlert,
-        ElButton,
-        ElButtonGroup,
-        ElForm,
-        ElFormItem,
-        ElHorizontalScrollbarArrows,
-        ElInput,
-        ElInputGroup,
-        ElInputNumber,
-        ElOption,
-        ElPopover,
-        ElSelect,
-        ElSlider,
-        ElTooltip,
+const { t } = useI18n();
+
+const emit = defineEmits(['close']);
+
+/*----------*\
+| Brush Size |
+\*----------*/
+
+const minBrushSize = ref(1);
+const maxBrushSize = ref(1000);
+
+const selectionBrushSize = computed<number>({
+    set(value) {
+        const easingValue = value * value;
+        brushSize.value = Math.round(minBrushSize.value + easingValue * (maxBrushSize.value - minBrushSize.value));
     },
-    props: {
-        
-    },
-    emits: [
-        'close'
-    ],
-    setup(props, { emit }) {
-
-        /*----------*\
-        | Brush Size |
-        \*----------*/
-
-        const minBrushSize = ref(1);
-        const maxBrushSize = ref(1000);
-
-        const selectionBrushSize = computed<number>({
-            set(value) {
-                const easingValue = value * value;
-                brushSize.value = Math.round(minBrushSize.value + easingValue * (maxBrushSize.value - minBrushSize.value));
-            },
-            get() {
-                const scaledBrushSize = (brushSize.value - minBrushSize.value) / (maxBrushSize.value - minBrushSize.value);
-                return Math.sqrt(scaledBrushSize);
-            }
-        });
-
-        function formatBrushSizeTooltip() {
-            const value = brushSize.value;
-            const percentage = (value - minBrushSize.value) / (maxBrushSize.value - minBrushSize.value);
-            return `${(100 * percentage).toFixed(0)}% - ${value}px`;
-        }
-
-        return {
-            selectionBrushSize,
-            minBrushSize,
-            maxBrushSize,
-            formatBrushSizeTooltip,
-        };
+    get() {
+        const scaledBrushSize = (brushSize.value - minBrushSize.value) / (maxBrushSize.value - minBrushSize.value);
+        return Math.sqrt(scaledBrushSize);
     }
 });
+
+function formatBrushSizeTooltip() {
+    const value = brushSize.value;
+    const percentage = (value - minBrushSize.value) / (maxBrushSize.value - minBrushSize.value);
+    return `${(100 * percentage).toFixed(0)}% - ${value}px`;
+}
 </script>

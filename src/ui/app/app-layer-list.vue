@@ -44,19 +44,19 @@
                         </span>
                         <span v-if="layer.type === 'group'" class="og-layer-group-arrow bi" :class="{ 'bi-chevron-right': !layer.expanded, 'bi-chevron-down': layer.expanded }" aria-hidden="true"></span>
                     </span>
-                    <el-button link type="primary" class="!px-2 !my-1" :aria-label="$t('app.layerList.toggleLayerVisibility')" @click="onToggleLayerVisibility(layer)">
+                    <el-button link type="primary" class="!px-2 !my-1" :aria-label="t('app.layerList.toggleLayerVisibility')" @click="onToggleLayerVisibility(layer)">
                         <i class="bi" :class="{ 'bi-eye-fill': layer.visible, 'bi-eye-slash': !layer.visible }" aria-hidden="true"></i>
                     </el-button>
-                    <el-button link type="primary" class="!px-2 !mr-2 !my-1 !ml-0" :aria-label="$t('app.layerList.layerSettings')" @click="onToggleLayerSettings($event, layer)">
+                    <el-button link type="primary" class="!px-2 !mr-2 !my-1 !ml-0" :aria-label="t('app.layerList.layerSettings')" @click="onToggleLayerSettings($event, layer)">
                         <i class="bi bi-three-dots-vertical" aria-hidden="true"></i>
                     </el-button>
                 </span>
                 <!-- Raster Sequence Frames -->
                 <span v-if="layer.type === 'rasterSequence'" role="group" class="og-layer-attributes og-layer-frames">
                     <span class="og-layer-attributes__title">
-                        <i class="bi bi-arrow-return-right" aria-hidden="true"></i> {{ $t('app.layerList.frames') }}
-                        <el-button v-if="!playingAnimation" link type="primary" class="p-0 ml-1" style="min-height: 0" :aria-label="$t('app.layerList.playAnimation')" @click="onPlayRasterSequence(layer)"><i class="bi bi-play" aria-hidden="true"></i></el-button>
-                        <el-button v-else link type="primary" class="p-0 ml-1" style="min-height: 0" :aria-label="$t('app.layerList.stopAnimation')" @click="onStopRasterSequence()"><i class="bi bi-stop" aria-hidden="true"></i></el-button>
+                        <i class="bi bi-arrow-return-right" aria-hidden="true"></i> {{ t('app.layerList.frames') }}
+                        <el-button v-if="!playingAnimation" link type="primary" class="p-0 ml-1" style="min-height: 0" :aria-label="t('app.layerList.playAnimation')" @click="onPlayRasterSequence(layer)"><i class="bi bi-play" aria-hidden="true"></i></el-button>
+                        <el-button v-else link type="primary" class="p-0 ml-1" style="min-height: 0" :aria-label="t('app.layerList.stopAnimation')" @click="onStopRasterSequence()"><i class="bi bi-stop" aria-hidden="true"></i></el-button>
                     </span>
                     <div class="flex">
                         <el-scrollbar>
@@ -66,7 +66,7 @@
                                 </li>
                             </ul>
                         </el-scrollbar>
-                        <el-button :aria-label="$t('app.layerList.editFrames')" class="grow-0 rounded-s-none px-2 py-0 mb-2">
+                        <el-button :aria-label="t('app.layerList.editFrames')" class="grow-0 rounded-s-none px-2 py-0 mb-2">
                             <i class="bi bi-pencil-square" aria-hidden="true"></i>
                         </el-button>
                     </div>
@@ -76,12 +76,12 @@
                     <span class="og-layer-attributes__title">
                         <span class="flex flex-row">
                             <i class="bi bi-arrow-return-right mr-1" aria-hidden="true"></i>
-                            {{ $t('app.layerList.effects') }}
+                            {{ t('app.layerList.effects') }}
                             <transition name="og-transition-fade">
                                 <img v-if="layer.isBaking" src="../../assets/images/loading-spinner.svg" class="self-center ml-3 mr-1" style="width: 1rem" />
                             </transition>
                             <!-- <transition name="og-transition-fade">
-                                <span v-if="layer.isBaking" v-t="'app.layerList.recalculatingEffect'" class="has-color-primary" />
+                                <span v-if="layer.isBaking" class="has-color-primary">{{ t('app.layerList.recalculatingEffect') }}</span>
                             </transition> -->
                             <el-button link type="primary" class="!ml-auto !mr-1" style="min-height: 0" @click="rasterizeLayer(layer)">
                                 <span class="bi bi-sign-merge-left mr-1" aria-hidden="true" />
@@ -93,18 +93,18 @@
                         <li v-for="(filter, filterIndex) of layer.filters" :key="filterIndex">
                             <el-button link :type="filter.disabled ? undefined : 'primary'" @click="onEditLayerFilter(layer, filterIndex)">
                                 <i class="bi bi-pencil-square mr-1" aria-hidden="true"></i>
-                                <span v-t="`layerFilter.${filter.name}.name`"></span>
+                                <span>{{ t(`layerFilter.${filter.name}.name`) }}</span>
                             </el-button>
                             <el-button
                                 link type="primary" class="!px-2 !my-0 !ml-0"
-                                :disabled="filterIndex === 0" :aria-label="$t('app.layerList.moveEffectUp')"
+                                :disabled="filterIndex === 0" :aria-label="t('app.layerList.moveEffectUp')"
                                 @click="onMoveLayerFilterUp(layer, filterIndex)"
                             >
                                 <i class="bi bi-chevron-up" aria-hidden="true"></i>
                             </el-button>
                             <el-button
                                 link type="primary" class="!px-2 !my-0 !ml-0"
-                                :disabled="filterIndex === layer.filters.length - 1" :aria-label="$t('app.layerList.moveEffectDown')"
+                                :disabled="filterIndex === layer.filters.length - 1" :aria-label="t('app.layerList.moveEffectDown')"
                                 @click="onMoveLayerFilterDown(layer, filterIndex)"
                             >
                                 <i class="bi bi-chevron-down" aria-hidden="true"></i>
@@ -117,7 +117,7 @@
                     <el-alert
                         v-if="layer.layers && layer.expanded && layer.layers.length === 0"
                         type="info"
-                        :title="$t('app.layerList.emptyGroup')"
+                        :title="t('app.layerList.emptyGroup')"
                         show-icon
                         :closable="false"
                         class="justify-center">
@@ -151,23 +151,23 @@
         <el-menu class="el-menu--medium el-menu--borderless" :default-active="layerSettingsActiveIndex" @select="onLayerSettingsSelect($event)">
             <el-menu-item index="rename">
                 <i class="bi bi-alphabet"></i>
-                <span v-t="'app.layerList.rename'"></span>
+                <span>{{ t('app.layerList.rename') }}</span>
             </el-menu-item>
             <el-menu-item index="blendingMode">
                 <i class="bi bi-images"></i>
-                <span v-t="'app.layerList.blendingMode'"></span>
+                <span>{{ t('app.layerList.blendingMode') }}</span>
             </el-menu-item>
             <el-menu-item index="effect">
                 <i class="bi bi-stars"></i>
-                <span v-t="'app.layerList.addEffect'"></span>
+                <span>{{ t('app.layerList.addEffect') }}</span>
             </el-menu-item>
             <el-menu-item index="duplicate">
                 <i class="bi bi-copy"></i>
-                <span v-t="'app.layerList.duplicate'"></span>
+                <span>{{ t('app.layerList.duplicate') }}</span>
             </el-menu-item>
             <el-menu-item index="delete">
                 <i class="bi bi-trash"></i>
-                <span v-t="'app.layerList.delete'"></span>
+                <span>{{ t('app.layerList.delete') }}</span>
             </el-menu-item>
         </el-menu>
     </og-popover>

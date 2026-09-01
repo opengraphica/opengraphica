@@ -9749,6 +9749,7 @@ body.og-full-page .opengraphica {
   outline: none;
   flex-grow: 1;
   flex-shrink: 1;
+  align-items: center;
   cursor: pointer;
 }
 .opengraphica .og-gradient-preset .og-gradient-preset__activate:focus-visible {
@@ -9761,6 +9762,7 @@ body.og-full-page .opengraphica {
   text-overflow: ellipsis;
   overflow: hidden;
   text-align: left;
+  white-space: nowrap;
 }
 .opengraphica .og-gradient-preset .og-gradient-preset__activate .og-gradient_preset__color-stops {
   display: block;

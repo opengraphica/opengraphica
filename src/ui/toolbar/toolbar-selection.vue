@@ -3,7 +3,9 @@
         <div class="og-toolbar-overlay">
             <div class="og-toolbar-tool-selector">
                 <span class="bi bi-bounding-box my-1" aria-hidden="true"></span>
-                <span class="og-toolbar-tool-selector__description" v-t="'toolbar.general.settings'" />
+                <span class="og-toolbar-tool-selector__description">
+                    {{ t('toolbar.general.settings') }}
+                </span>
             </div>
             <el-horizontal-scrollbar-arrows>
                 <el-input-group :prepend-tooltip="t('toolbar.selection.selectionShape.label')">

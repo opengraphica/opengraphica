@@ -20,7 +20,7 @@
                     'px-3': actionGroupSectionName !== 'tools' && direction === 'vertical',
                 }]"
             >
-                <span v-if="actionGroupSectionName === 'tools'" class="og-menu-section__title">{{ $t('menuBar.toolsHeading') }}</span>
+                <span v-if="actionGroupSectionName === 'tools'" class="og-menu-section__title">{{ t('menuBar.toolsHeading') }}</span>
                 <component
                     v-if="displayMode === 'all' || actionGroupSectionName === 'tools'"
                     :is="actionGroupSectionName === 'tools' ? (direction === 'vertical' ? ElScrollbar : ElHorizontalScrollbarArrows) : 'v-fragment'"
@@ -44,7 +44,7 @@
                                 <template #reference>
                                     <el-button
                                         ref="toolGroupButtons"
-                                        :aria-label="$t(`menuBarToolGroup.${control.id}.name`)"
+                                        :aria-label="t(`menuBarToolGroup.${control.id}.name`)"
                                         :type="[activeToolGroup, activeMenuDrawerComponentName].includes(control.action?.target) ? 'primary' : undefined"
                                         :plain="![activeToolGroup, activeMenuDrawerComponentName].includes(control.action?.target)"
                                         :circle="!control.expanded"
@@ -67,14 +67,16 @@
                                         @keydown="onKeyDownControlButton($event, control)"
                                     >
                                         <span class="el-icon" :class="getControlIcon(control)" aria-hidden="true" />
-                                        <span v-if="control.expanded" class="ml-2">{{ $t(`menuBarToolGroup.${control.id}.name`) }}</span>
+                                        <span v-if="control.expanded" class="ml-2">{{ t(`menuBarToolGroup.${control.id}.name`) }}</span>
                                         <el-tag v-if="control.expanded" type="info" class="ml-2 el-tag--mini">Ctrl + K</el-tag>
                                     </el-button>
                                 </template>
                                 <template v-if="control.showDock">
-                                    <div v-if="control.displayTitle" class="og-dock-title" v-t="control.displayTitle" />
+                                    <div v-if="control.displayTitle" class="og-dock-title">
+                                        {{ t(control.displayTitle) }}
+                                    </div>
                                     <dynamically-loaded-dock
-                                        :name="control.action.target" :key="'dock-' + control.action.target"
+                                        :name="control.action?.target" :key="'dock-' + control.action?.target"
                                         @update:title="control.displayTitle = $event"
                                         @close="control.popoverVisible = false"
                                     />
@@ -92,7 +94,7 @@
                     'px-3': direction === 'vertical',
                 }"
             >
-                <el-button circle round class="el-button--no-hover" :aria-label="$t('dock.settings.history.undo')" @click="onClickUndo">
+                <el-button circle round class="el-button--no-hover" :aria-label="t('dock.settings.history.undo')" @click="onClickUndo">
                     <span class="el-icon bi bi-arrow-counterclockwise" aria-hidden="true" />
                 </el-button>
             </div>
@@ -117,7 +119,7 @@
                 <button
                     v-for="control in activeToolGroupControls"
                     :key="control.icon"
-                    :aria-label="$t(`menuBarToolGroup.${activeToolGroup}.tools.${control.action.target}`)"
+                    :aria-label="t(`menuBarToolGroup.${activeToolGroup}.tools.${control.action?.target}`)"
                     :class="{
                         'og-menu-bar__tool-group-expand__control--active': control.action?.target == activeTool
                     }"
@@ -134,7 +136,7 @@
             </div>
             <button
                 class="og-menu-bar__tool-group-expand__toggle-button"
-                :aria-label="isActiveToolGroupExpanded ? $t('menuBar.collapseToolGroup') : $t('menuBar.expandToolGroup')"
+                :aria-label="isActiveToolGroupExpanded ? t('menuBar.collapseToolGroup') : t('menuBar.expandToolGroup')"
                 @click="isActiveToolGroupExpanded = !isActiveToolGroupExpanded"
             >
                 <span
@@ -156,21 +158,21 @@
             :style="toolPreviewPopoverStyles"
         >
             <div class="og-popover__content">
-                <strong class="block font-bold mb-1">{{ $t(`menuBarToolGroup.${toolPreviewPopoverGroupDefinition.id}.name`) }}</strong>
-                <ol v-if="toolPreviewPopoverGroupDefinition.controls" class="og-list--unstyled">
+                <strong class="block font-bold mb-1">{{ t(`menuBarToolGroup.${toolPreviewPopoverGroupDefinition?.id}.name`) }}</strong>
+                <ol v-if="toolPreviewPopoverGroupDefinition?.controls" class="og-list--unstyled">
                     <li
                         v-for="subControl of toolPreviewPopoverGroupDefinition.controls"
                         class="flex my-1"
                         :key="subControl.icon"
                     >
                         <span class="shrink-0 grow-0 w-4 mr-2" :class="subControl.icon" aria-hidden="true" />
-                        {{ $t(`menuBarToolGroup.${toolPreviewPopoverGroupDefinition.id}.tools.${subControl.action.target}`) }}
+                        {{ t(`menuBarToolGroup.${toolPreviewPopoverGroupDefinition.id}.tools.${subControl.action?.target}`) }}
                     </li>
                 </ol>
                 <ol v-else class="og-list--unstyled">
                     <li class="flex">
-                        <span class="shrink-0 grow-0 w-4 mr-2" :class="toolPreviewPopoverGroupDefinition.icon" aria-hidden="true" />
-                        {{ $t(`menuBarToolGroup.${toolPreviewPopoverGroupDefinition.id}.tools.${toolPreviewPopoverGroupDefinition.id}`) }}
+                        <span class="shrink-0 grow-0 w-4 mr-2" :class="toolPreviewPopoverGroupDefinition?.icon" aria-hidden="true" />
+                        {{ t(`menuBarToolGroup.${toolPreviewPopoverGroupDefinition?.id}.tools.${toolPreviewPopoverGroupDefinition?.id}`) }}
                     </li>
                 </ol>
             </div>
@@ -180,6 +182,7 @@
 
 <script setup lang="ts">
 import { computed, defineAsyncComponent, nextTick, onMounted, onUnmounted, ref, toRefs, watch, type PropType } from 'vue';
+import { useI18n } from '@/i18n';
 import { flip, offset, useFloating } from '@floating-ui/vue';
 
 import ElButton from 'element-plus/lib/components/button/index';
@@ -198,6 +201,8 @@ import editorStore from '@/store/editor';
 import preferencesStore from '@/store/preferences';
 
 import type { MenuBarToolGroupButton, DndLayoutMenuBar } from '@/types';
+
+const { t } = useI18n();
 
 /*-----*\
 | Props |

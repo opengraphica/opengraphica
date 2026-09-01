@@ -13,7 +13,7 @@
         >
             <el-form-item-aligned-groups>
                 <el-form-item-group>
-                    <el-form-item :label="$t('module.renameLayer.layerName')">
+                    <el-form-item :label="t('module.renameLayer.layerName')">
                         <el-input
                             ref="layerNameInput"
                             v-model="formData.layerName"
@@ -25,16 +25,21 @@
             <div class="text-right">
                 <el-divider />
                 <div class="text-right">
-                    <el-button @click="onCancel">{{ $t('button.cancel') }}</el-button>
-                    <el-button type="primary" @click="onConfirm">{{ $t('button.apply') }}</el-button>
+                    <el-button @click="onCancel">{{ t('button.cancel') }}</el-button>
+                    <el-button type="primary" @click="onConfirm">{{ t('button.apply') }}</el-button>
                 </div>
             </div>
         </el-form>
     </div>
 </template>
-
 <script lang="ts">
+export default {
+    inheritAttrs: false,
+};
+</script>
+<script setup lang="ts">
 import { defineComponent, ref, computed, onMounted, nextTick, reactive, watch, WatchStopHandle } from 'vue';
+import { useI18n } from '@/i18n';
 import { Rules } from 'async-validator';
 import ElAutoGrid from '@/ui/el/el-auto-grid.vue';
 import ElButton from 'element-plus/lib/components/button/index';
@@ -52,121 +57,92 @@ import { getLayerById } from '@/store/working-file';
 import { UpdateLayerAction } from '@/actions/update-layer';
 import { BundleAction } from '@/actions/bundle';
 
-export default defineComponent({
-    name: 'ModuleRenameLayer',
-    inheritAttrs: false,
-    directives: {
-        loading: ElLoading.directive,
+const { t } = useI18n();
+const vLoading = ElLoading.directive;
+
+const props = defineProps({
+    isDialog: {
+        type: Boolean,
+        default: false
     },
-    components: {
-        ElAutoGrid,
-        ElButton,
-        ElCol,
-        ElDivider,
-        ElForm,
-        ElFormItem,
-        ElFormItemGroup,
-        ElFormItemAlignedGroups,
-        ElInput,
-        ElRow,
+    dialogOpened: {
+        type: Boolean,
+        default: false
     },
-    emits: [
-        'update:title',
-        'update:dialogSize',
-        'close',
-    ],
-    props: {
-        isDialog: {
-            type: Boolean,
-            default: false
-        },
-        dialogOpened: {
-            type: Boolean,
-            default: false
-        },
-        layerId: {
-            type: Number,
-            required: true
-        },
+    layerId: {
+        type: Number,
+        required: true
     },
-    setup(props, { emit }) {
-        emit('update:title', 'module.renameLayer.title');
-        emit('update:dialogSize', 'medium');
+});
 
-        const hasError = ref(false);
-        const loading = ref(false);
+const emit = defineEmits([
+    'update:title',
+    'update:dialogSize',
+    'close',
+]);
 
-        const layerNameInput = ref<typeof ElInput>();
+emit('update:title', 'module.renameLayer.title');
+emit('update:dialogSize', 'medium');
 
-        const formData = reactive<{ layerName: string }>({
-            layerName: '',
-        });
-        const formValidationRules = ref<Rules>({});
+const hasError = ref(false);
+const loading = ref(false);
 
-        onMounted(async () => {
-            nextTick(async () => {
-                if (props.isDialog) {
-                    let stopWatch: WatchStopHandle;
-                    stopWatch = watch(() => props.dialogOpened, (dialogOpened) => {
-                        if (dialogOpened) {
-                            stopWatch?.();
-                            initialSetup();
-                        }
-                    }, { immediate: true });
-                } else {
+const layerNameInput = ref<typeof ElInput>();
+
+const formData = reactive<{ layerName: string }>({
+    layerName: '',
+});
+const formValidationRules = ref<Rules>({});
+
+onMounted(async () => {
+    nextTick(async () => {
+        if (props.isDialog) {
+            let stopWatch: WatchStopHandle;
+            stopWatch = watch(() => props.dialogOpened, (dialogOpened) => {
+                if (dialogOpened) {
+                    stopWatch?.();
                     initialSetup();
                 }
-            });
-        });
-
-        async function initialSetup() {
-            try {
-                const layer = getLayerById(props.layerId);
-                if (layer) {
-                    formData.layerName = layer.name;
-                }
-                try {
-                    if (layerNameInput.value) {
-                        const input = layerNameInput.value.ref as unknown as HTMLInputElement;
-                        input?.focus();
-                        setTimeout(() => {
-                            input?.select();
-                        }, 0);
-                    }
-                } catch (error) { /* Ignore */ }
-            } catch (error) {
-                console.error('[src/ui/module-rename-layer.vue] Error during initial setup. ', error);
-            }
+            }, { immediate: true });
+        } else {
+            initialSetup();
         }
-        function onCancel() {
-            emit('close');
-        }
-
-        async function onConfirm() {
-            await historyStore.dispatch('runAction', {
-                action: new BundleAction('renameLayer', 'action.renameLayer', [
-                    new UpdateLayerAction({
-                        id: props.layerId,
-                        name: formData.layerName,
-                    })
-                ])
-            });
-
-            emit('close');
-        }
-        
-        return {
-            hasError,
-            loading,
-
-            layerNameInput,
-
-            formData,
-            formValidationRules,
-
-            onCancel,
-            onConfirm
-        };
-    }
+    });
 });
+
+async function initialSetup() {
+    try {
+        const layer = getLayerById(props.layerId);
+        if (layer) {
+            formData.layerName = layer.name;
+        }
+        try {
+            if (layerNameInput.value) {
+                const input = layerNameInput.value.ref as unknown as HTMLInputElement;
+                input?.focus();
+                setTimeout(() => {
+                    input?.select();
+                }, 0);
+            }
+        } catch (error) { /* Ignore */ }
+    } catch (error) {
+        console.error('[src/ui/module-rename-layer.vue] Error during initial setup. ', error);
+    }
+}
+function onCancel() {
+    emit('close');
+}
+
+async function onConfirm() {
+    await historyStore.dispatch('runAction', {
+        action: new BundleAction('renameLayer', 'action.renameLayer', [
+            new UpdateLayerAction({
+                id: props.layerId,
+                name: formData.layerName,
+            })
+        ])
+    });
+
+    emit('close');
+}
 </script>

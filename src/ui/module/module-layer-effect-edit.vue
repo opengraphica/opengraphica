@@ -19,7 +19,7 @@
         </div>
         <el-divider />
         <div class="flex flex-row items-center justify-between">
-            <h2 v-t="currentFilterTitle" class="text-lg m-0" />
+            <h2 class="text-lg m-0">{{ t(currentFilterTitle) }}</h2>
             <div class="flex flex-row items-center shrink-1">
                 <el-switch
                     v-model="currentFilterEnabled"
@@ -28,7 +28,7 @@
                 />
                 <el-button link type="danger" class="el-text-alignment-fix--below" @click="onDelete">
                     <span class="bi bi-trash mr-1 el-text-alignment-fix--above" aria-hidden="true" />
-                    <span v-t="'module.layerEffectEdit.deleteEffect'" />
+                    <span>{{ t('module.layerEffectEdit.deleteEffect') }}</span>
                 </el-button>
             </div>
         </div>
