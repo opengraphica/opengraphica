@@ -11,7 +11,8 @@ varying vec2 vUv;
 varying mat4 vInverseModelViewMatrix;
 
 void main() {
-    vec2 unselectedUv = vec2(vUv.x * viewportWidth / 4.0, vUv.y * viewportHeight / 4.0);
+    // vec2 unselectedUv = vec2(vUv.x * viewportWidth / 4.0, vUv.y * viewportHeight / 4.0);
+    vec2 unselectedUv = vec2(fract(vUv.x * (viewportWidth / 4.0)), fract(vUv.y * (viewportHeight / 4.0)));
     vec4 unselectedColor = texture2D(unselectedMaskMap, unselectedUv);
 
     vec4 clipSpacePos = vec4(vUv * 2.0 - 1.0, 0.0, 1.0);

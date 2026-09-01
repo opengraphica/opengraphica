@@ -51,12 +51,18 @@ export class SelectionMask {
     async initialize(camera: Camera, scene: Scene, viewWidth: number, viewHeight: number) {
         this.scene = scene;
 
-        const selectionMaskUnselectedPatternTexture = new DataTexture(selectionMaskPatternPixels, 4, 4);
+        const selectionMaskUnselectedPatternTexture = new DataTexture(
+            selectionMaskPatternPixels, 4, 4, RGBAFormat, UnsignedByteType,
+        );
 
         if (selectionMaskUnselectedPatternTexture) {
             selectionMaskUnselectedPatternTexture.wrapS = RepeatWrapping;
             selectionMaskUnselectedPatternTexture.wrapT = RepeatWrapping;
             selectionMaskUnselectedPatternTexture.colorSpace = SRGBColorSpace;
+            selectionMaskUnselectedPatternTexture.magFilter = LinearFilter;
+            selectionMaskUnselectedPatternTexture.minFilter = LinearFilter;
+            selectionMaskUnselectedPatternTexture.generateMipmaps = false;
+            selectionMaskUnselectedPatternTexture.needsUpdate = true;
         }
         const selectionMaskGeometry = new PlaneGeometry(2, 2); //viewportWidth.value, viewportHeight.value);
         this.selectionMaskMaterial = new ShaderMaterial({
