@@ -56,7 +56,10 @@
         "updateDrawGradientLayerStops": "Update Gradient (Color stops)",
         "updateDeformBlurLayer": "Blur Layer",
         "updateLayerBlendingMode": "تغيير أسلوب البيع",
-        "updateLayerFilterMask": "Update Layer Effect Mask"
+        "updateLayerFilterMask": "Update Layer Effect Mask",
+        "setLayerBoundsToWorkingFileBounds": "توسيع مع الفضاء فارغ",
+        "stretchLayerToWorkingFileBounds": "Sretch to Canvas Size",
+        "updateTextLayerProperties": "Update Text Layer Properties"
     },
     "app": {
         "colorPickerGradient": {
@@ -114,7 +117,10 @@
                 "message": "(افتح (غرافيكا يعتمد على بعض الوظائف الأساسية على الإنترنت التي لا وجود لها في جهازك من فضلك قم بتحديث موقعك أو التحول إلى شخص عصري مثل (كروم) أو (فايرفوكس) أو (سافاري) أو (إدج)."
             }
         },
-        "updateRequired": {}
+        "updateRequired": {
+            "title": "آخر المعلومات المطلوبة",
+            "message": "وحاول رئيس التحرير جلب ملف لم يعد متاحا. يرجى إعادة تنشيط الصفحة لمواصلة. أخلوا مخبأك إذا واصلتم رؤية هذه الرسالة إستخدمي خيار \"الموقع الأخير\" في القائمة لتكملي ما تركتيه."
+        }
     },
     "brushCategory": {
         "simple": {
@@ -152,7 +158,10 @@
         "pickColor": "المخلول",
         "delete": "تحذف",
         "discardChanges": "التغييرات في النفايات",
-        "reverse": "العكس"
+        "reverse": "العكس",
+        "back": "العودة",
+        "editBrush": "Edit Brush",
+        "moreInfo": "مزيد من المعلومات"
     },
     "canvas": {
         "toolbar": {
@@ -244,7 +253,10 @@
                     "renderer": {
                         "label": "Renderer",
                         "2d": "2D",
-                        "webgl": "WebGL"
+                        "webgl": "WebGL",
+                        "webgl2": "WebGL2",
+                        "webgl2Offscreen": "WebGL2 Offscreen",
+                        "wgpuWasm": "WebGPU +WAM"
                     },
                     "optimizeLargeImage": "Optimize for Large Image",
                     "highQualityScaling": "ارتفاع الجودة",
@@ -263,7 +275,8 @@
                 },
                 "help": {
                     "groupTitle": "النجدة",
-                    "reportIssue": "Report an Issue"
+                    "reportIssue": "Report an Issue",
+                    "designSystem": "نظام التصميم"
                 }
             }
         }
@@ -490,10 +503,22 @@
             }
         },
         "chromaKey": {
-            "param": {}
+            "param": {
+                "eraseColor": "Erase Color",
+                "threshold": "Erase Threshold",
+                "softness": "الطفولة",
+                "spillSuppression": "قمع الحلق",
+                "hueWeight": "Weight",
+                "chromaWeight": "Chroma Weight",
+                "lightnessWeight": "خفيف الوزن"
+            },
+            "name": "Chroma Key"
         },
         "whiteBalance": {
-            "param": {}
+            "param": {
+                "white": "اللون المحايد"
+            },
+            "name": "الرصيد الأبيض"
         }
     },
     "layerFilterGroup": {
@@ -687,7 +712,9 @@
         "inches": "Inches",
         "pixelsPerInch": "Pixels/Inch",
         "pixelsPerMillimeter": "Pixels/Milmeter",
-        "pixelsPerCentimeter": "Pixels/Centimeter"
+        "pixelsPerCentimeter": "Pixels/Centimeter",
+        "percent": "النسبة المئوية",
+        "percentage": "النسبة المئوية"
     },
     "menuBar": {
         "toolsHeading": "الأدوات",
@@ -954,9 +981,14 @@
                 }
             }
         },
-        "designSystem": {},
+        "designSystem": {
+            "title": "نظام التصميم"
+        },
         "fileOpenNotification": {
-            "maxTextureSizeLimited": {}
+            "maxTextureSizeLimited": {
+                "title": "Max Dimensions Encountered",
+                "message": "الصورة التي فتحتها أكبر من الحجم الأقصى الذي تدعمه تم تخفيضه."
+            }
         }
     },
     "moduleGroup": {
@@ -1031,7 +1063,10 @@
                 "copy": {
                     "name": "نسخة مقتبسة",
                     "description": "عُلم الطبقات المُختارة حالياً إلى اللوحة.",
-                    "noSelectedLayers": {}
+                    "noSelectedLayers": {
+                        "title": "No Layers Selected",
+                        "message": "يرجى اختيار طبقة واحدة على الأقل لنسخ."
+                    }
                 },
                 "copyAll": {
                     "name": "(عُلم)",
@@ -1112,7 +1147,14 @@
             "resolutionUnits": "وحدات القرار",
             "snapping": {
                 "title": "Snapping",
-                "enable": "التمكين"
+                "enable": "التمكين",
+                "currentCanvas": "Canvas الحالية",
+                "cropArea": "منطقة المحاصيل",
+                "snapToCenter": "Snap to Center",
+                "snapToEdges": "Snap to Edges",
+                "snapToContrast": "Snap to Contrast",
+                "snapAtCenter": "Snap at Center",
+                "snapAtEdges": "Snap at Edges"
             }
         },
         "draw": {
@@ -1127,7 +1169,13 @@
                 "current": "الحالي"
             },
             "snapping": {
-                "title": "Snapping"
+                "title": "Snapping",
+                "enableSnapping": "التمكين",
+                "rotationSnap": "التناوب",
+                "rotationSnapDegrees": "الدرجات",
+                "canvasEdges": "Canvas Edges",
+                "layerEdges": "Layer Edges",
+                "layerCenter": "مركز لاير"
             },
             "metrics": {
                 "title": "مقاييس",
@@ -1136,12 +1184,23 @@
                 "height": "مرتفع",
                 "rotation": "التناوب",
                 "resetRotation": "التناوب",
-                "noLayers": "لم يتم اختيار طبقة (طبقات)."
+                "noLayers": "لم يتم اختيار طبقة (طبقات).",
+                "alignLeft": "اليسرى",
+                "alignRight": "Alight Right",
+                "alignCenter": "Align Center",
+                "alignTop": "Align Top",
+                "alignBottom": "Align Bottom",
+                "alignMiddle": "الشرق الأوسط",
+                "resetPosition": "Reset {dimension} المنصب",
+                "resetWidth": "Reset Width",
+                "resetHeight": "Reset Height"
             },
             "actions": {
                 "title": "الإجراءات",
                 "applyTransform": "Transform",
-                "trimEmptySpace": "الفضاء الخارجي"
+                "trimEmptySpace": "الفضاء الخارجي",
+                "stretchToImageSize": "Stretch to Canvas Size",
+                "expandToImageSize": "توسيع مع الفضاء فارغ"
             }
         },
         "general": {
@@ -1154,7 +1213,8 @@
                 "ellipse": "Ellipse",
                 "freePolygon": "Polygon",
                 "freePolygonShort": "الحرة",
-                "tonalArea": "منطقة طنجة"
+                "tonalArea": "منطقة طنجة",
+                "lasso": "لاسو"
             },
             "selectionCombineMode": {
                 "label": "Selection Combine Mode",
@@ -1163,7 +1223,10 @@
                 "intersect": "التداخل"
             },
             "notification": {
-                "unproductiveSelection": {}
+                "unproductiveSelection": {
+                    "title": "No Layers Selected",
+                    "message": "< لقد خلقت قناع اختيار على قمة الصورة يرجى اختيار طبقة واحدة على الأقل من الصور في الطبقات المرفوعة"
+                }
             }
         },
         "text": {
@@ -1177,10 +1240,29 @@
             "fillTooltip": "Color that shows inside the edges of the letter(s)",
             "newTextLayerName": "النص الجديد",
             "alignment": {
-                "boundaryOption": {},
-                "lineDirectionOption": {},
-                "wrapDirectionOption": {}
-            }
+                "boundaryOption": {
+                    "dynamic": "الديناميكية",
+                    "box": "الإطار"
+                },
+                "lineDirectionOption": {
+                    "ltr": "اليسار إلى اليمين",
+                    "rtl": "الحق في التحول",
+                    "ttb": "من القمة إلى القمة",
+                    "btt": "من القاعدة إلى القمة"
+                },
+                "wrapDirectionOption": {
+                    "ltr": "اليسار إلى اليمين",
+                    "rtl": "الحق في التحول",
+                    "ttb": "من القمة إلى القمة",
+                    "btt": "من القاعدة إلى القمة"
+                },
+                "title": "الإلغاء",
+                "boundary": "Boundary",
+                "lineDirection": "النص",
+                "wrapDirection": "Wrap"
+            },
+            "fillColor": "سائل",
+            "paletteCount": "Palette count"
         },
         "zoom": {
             "zoomOut": "زوم",
@@ -1194,15 +1276,60 @@
             "brushSize": "الحجم",
             "newBrushLayerName": "الطلاء الجديد",
             "brushDialog": {
-                "noBrushCategorySelected": {},
-                "noBrushesInCategory": {},
+                "noBrushCategorySelected": {
+                    "title": "No Category Selected",
+                    "message": "الرجاء اختيار فئة فرشاة."
+                },
+                "noBrushesInCategory": {
+                    "title": "لا بروشيات",
+                    "message": "هذه الفئة ليس بها فرش اصنعوا بعض!"
+                },
                 "editorTab": {
-                    "blending": {},
-                    "shape": {},
-                    "strokePath": {},
-                    "pressure": {}
-                }
-            }
+                    "blending": {
+                        "title": "Blending",
+                        "density": "الكثافة",
+                        "densityDescription": "مدى شفافية كل طوابع الفرشاة، على أساس ضغط القلم. ويستخدم النطاق عندما يتفاوت ضغط القلم.",
+                        "pressureMinDensity": "الكثافة",
+                        "pressureMaxDensity": "(ماكس كثافة)",
+                        "colorBlendingStrength": "Color Blending Strength",
+                        "pressureMinColorBlendingStrength": "Min Strength",
+                        "pressureMaxColorBlendingStrength": "ماكس سترينج",
+                        "colorBlendingStrengthDescription": "كم من اللون تحت الفرشاة سيلتقط بينما يرسم ويستخدم النطاق عندما يتفاوت ضغط القلم.",
+                        "colorBlendingPersistence": "مقاومة الكولور",
+                        "colorBlendingPersistenceDescription": "كم من الوقت يبقى اللون على الفرشاة بينما يسحب الجلطة.",
+                        "concentration": "التركيز",
+                        "concentrationDescription": "القيم المنخفضة تحفيز الغفران مع الماء، وقيم عالية اللون المركز بالكامل. هذا الوضع ليس له تأثير عندما يعتمد على ألوان غامضة ويستخدم النطاق عندما يتفاوت ضغط القلم.",
+                        "pressureMinConcentration": "التركيز المصغر",
+                        "pressureMaxConcentration": "تركيز ماكس"
+                    },
+                    "shape": {
+                        "title": "Shape",
+                        "hardness": "القوة",
+                        "hardnessDescription": "وستكون للقيم الدنيا حواف خفية ناعمة، وقيم أعلى حواف حادة.",
+                        "angle": "أنغل",
+                        "angleDescription": "تناوب شكل الفرشاة."
+                    },
+                    "strokePath": {
+                        "title": "Stroke Path",
+                        "spacing": "Spacing",
+                        "spacingDescription": "المسافة بين كل طوابع الفرشاة مقارنة بحجم الفرشاة كُن حذراً مع قيم منخفضة جداً، حيث يمكن أن يُلقي الأداء على أحجام فرش أكبر.",
+                        "jitter": "Jitter",
+                        "jitterDescription": "نادراً ما يغير موقف شكل الفرشاة."
+                    },
+                    "pressure": {
+                        "title": "الضغط",
+                        "pressureTaper": "Taper",
+                        "pressureTaperDescription": "القيم العليا ستضع خطوط نحيفة في ضغط أقل من قلم يجعل من الأسهل التحكم بالأقلام مع حساسية غير مستقرة عند الضغطات المنخفضة.",
+                        "pressureMinSize": "الحد الأدنى للحجم",
+                        "pressureMinSizeDescription": "The size of the brush at 0% pen pressure, relative to the currently selected brush size."
+                    }
+                },
+                "title": "Select Brush",
+                "close": "اغلق الديولوجيا"
+            },
+            "brushColor": "Color",
+            "paletteCount": "Palette count",
+            "brushSmoothing": "التموين"
         },
         "effect": {
             "edit": {
@@ -1214,8 +1341,13 @@
         "eraseBrush": {
             "brushSize": "الحجم",
             "notification": {
-                "noSelectedLayers": {}
-            }
+                "noSelectedLayers": {
+                    "title": "No Layers Selected",
+                    "message": "يرجى اختيار طبقة واحدة على الأقل من الصور في رصيف الطبقات. بعض أنواع الطبقات لا يمكن محوها."
+                }
+            },
+            "brushOpacity": "Opacity",
+            "brushSmoothing": "التموين"
         },
         "deformBlur": {
             "brushSize": "الحجم"
@@ -1254,8 +1386,14 @@
             }
         },
         "drawShape": {
-            "shapeType": {},
-            "style": {}
+            "shapeType": {
+                "label": "Shape",
+                "rectangle": "Rectangle",
+                "ellipse": "Ellipse"
+            },
+            "style": {
+                "label": "Style"
+            }
         }
     },
     "toolGroup": {
@@ -1490,16 +1628,17 @@
         },
         "drawShapeToolIntroduction": {
             "introduction": [
-                null
+                "أداة الشكل تسمح لك بإضافة مختلف الأشكال الأساسية التي يمكن تحويلها إلى مسارات ناقلات إذا كانت هناك حاجة لمزيد من التكييف."
             ],
             "body": {
                 "mouse": [
-                    null
+                    "اضغطي و اسحبي لوضع شكل على الشموع."
                 ],
                 "touch": [
-                    null
+                    "إستخدم إصبع واحد ليلمس و يسحب ليضع شكلاً على الشموع."
                 ]
-            }
+            },
+            "title": "Shape Tool"
         }
     },
     "gradientPreset": {
@@ -1542,34 +1681,74 @@
         "lightness": "النور",
         "luminance": "اللوم"
     },
-    "defaultBrush": {},
-    "defaultBrushCategory": {},
+    "defaultBrush": {
+        "default": "التقصير",
+        "simpleAirBrush": "Simple Air Brush",
+        "simplePaintBrush": "بسيطة الطلاء",
+        "simplePen": "بسيطة",
+        "simpleWaterColor": "مليئ ماء بسيط"
+    },
+    "defaultBrushCategory": {
+        "custom": "العرف",
+        "simple": "بسيطة"
+    },
     "menuBarToolGroup": {
         "deform": {
-            "tools": {}
+            "tools": {
+                "blur": "مناطق محددة من الصورة"
+            },
+            "name": "الشكل"
         },
         "draw": {
-            "tools": {}
+            "tools": {
+                "brush": "رسم مع فرش الفن",
+                "gradient": "خريجي اللون",
+                "shape": "إيجاد الأشكال الأساسية"
+            },
+            "name": "Draw"
         },
         "effect": {
-            "tools": {}
+            "tools": {
+                "effect": "التلاعب بألوان الطبقات وإضافات الرش"
+            },
+            "name": "الأثر"
         },
         "erase": {
-            "tools": {}
+            "tools": {
+                "brush": "Erase areas of the image with brush wounds"
+            },
+            "name": "Erase"
         },
-        "layers": {},
+        "layers": {
+            "name": "Layers"
+        },
         "selection": {
-            "tools": {}
+            "tools": {
+                "selection": "مناطق عينة مختارة من الصورة لتحريرها أو قطعها أو نسخها أو حذفها"
+            },
+            "name": "الاختيار"
         },
-        "settings": {},
+        "settings": {
+            "name": "الإجراءات"
+        },
         "text": {
-            "tools": {}
+            "tools": {
+                "text": "الطبقة الراقية والمحررة"
+            },
+            "name": "النص"
         },
         "transform": {
-            "tools": {}
+            "tools": {
+                "freeTransform": "التحرك، المقياس، الطبقات الدوارة",
+                "layerCrop": "اكسر الطبقة المختارة"
+            },
+            "name": "النقل/التحول"
         },
         "view": {
-            "tools": {}
+            "tools": {
+                "zoom": "تكبير داخل وخارج، مقلاة، أو تناوب وجهة نظرك للصورة"
+            },
+            "name": "Canvas Viewport"
         }
     }
 }

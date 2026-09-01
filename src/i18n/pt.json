@@ -56,7 +56,10 @@
         "updateDrawGradientLayerStops": "Atualizar Gradiente (Paradas de cores)",
         "updateDeformBlurLayer": "Camada de Blur",
         "updateLayerBlendingMode": "Alterar modo de mistura",
-        "updateLayerFilterMask": "Máscara de efeito de camada de atualização"
+        "updateLayerFilterMask": "Máscara de efeito de camada de atualização",
+        "setLayerBoundsToWorkingFileBounds": "Expanda com espaço vazio",
+        "stretchLayerToWorkingFileBounds": "Stretch to Canvas Size",
+        "updateTextLayerProperties": "Atualizar Propriedades da camada de texto"
     },
     "app": {
         "colorPickerGradient": {
@@ -114,7 +117,10 @@
                 "message": "OpenGraphica depende de algumas funcionalidades básicas da web que não existem no seu navegador. Por favor, atualize seu navegador da Web ou mude para um moderno como Chrome, Firefox, Safari ou Edge."
             }
         },
-        "updateRequired": {}
+        "updateRequired": {
+            "title": "Atualização exigida",
+            "message": "O editor tentou buscar um arquivo que não está mais disponível. Por favor, atualize a página para continuar. Limpe o cache do seu navegador se continuar a ver esta mensagem. Use a opção \"Restore Last Image\" no menu para continuar onde você saiu."
+        }
     },
     "brushCategory": {
         "simple": {
@@ -152,7 +158,10 @@
         "pickColor": "Escolha a cor",
         "delete": "Excluir",
         "discardChanges": "Descarte Alterações",
-        "reverse": "Reversão"
+        "reverse": "Reversão",
+        "back": "Voltar",
+        "editBrush": "Editar Pincel",
+        "moreInfo": "Mais informações"
     },
     "canvas": {
         "toolbar": {
@@ -244,7 +253,10 @@
                     "renderer": {
                         "label": "Renderização",
                         "2d": "Tela 2D",
-                        "webgl": "WebGL"
+                        "webgl": "WebGL",
+                        "webgl2": "WebGL2",
+                        "webgl2Offscreen": "Offscreen WebGL2",
+                        "wgpuWasm": "WebGPU + WASM"
                     },
                     "optimizeLargeImage": "Otimizar para imagem grande",
                     "highQualityScaling": "Escalada de alta qualidade",
@@ -263,7 +275,8 @@
                 },
                 "help": {
                     "groupTitle": "Ajuda",
-                    "reportIssue": "Relatar uma questão"
+                    "reportIssue": "Relatar uma questão",
+                    "designSystem": "Sistema de Design"
                 }
             }
         }
@@ -490,10 +503,22 @@
             }
         },
         "chromaKey": {
-            "param": {}
+            "param": {
+                "eraseColor": "Cor de borracha",
+                "threshold": "Retenção de Apagar",
+                "softness": "Suavidade",
+                "spillSuppression": "Supressão de espiral",
+                "hueWeight": "Peso do Hue",
+                "chromaWeight": "Peso do aroma",
+                "lightnessWeight": "Peso da luz"
+            },
+            "name": "Chave de cromo"
         },
         "whiteBalance": {
-            "param": {}
+            "param": {
+                "white": "Cor Neutral"
+            },
+            "name": "Balanço branco"
         }
     },
     "layerFilterGroup": {
@@ -687,7 +712,9 @@
         "inches": "Polegadas",
         "pixelsPerInch": "Pixels / Polegada",
         "pixelsPerMillimeter": "Pixels/Millimeter",
-        "pixelsPerCentimeter": "Pixels/Centimeter"
+        "pixelsPerCentimeter": "Pixels/Centimeter",
+        "percent": "Percentagem",
+        "percentage": "Percentagem"
     },
     "menuBar": {
         "toolsHeading": "Ferramentas",
@@ -954,9 +981,14 @@
                 }
             }
         },
-        "designSystem": {},
+        "designSystem": {
+            "title": "Sistema de Design"
+        },
         "fileOpenNotification": {
-            "maxTextureSizeLimited": {}
+            "maxTextureSizeLimited": {
+                "title": "Dimensões máximas contabilizadas",
+                "message": "Uma imagem que você abriu é maior do que o tamanho máximo que seu navegador suporta. Foi reduzido."
+            }
         }
     },
     "moduleGroup": {
@@ -1031,7 +1063,10 @@
                 "copy": {
                     "name": "Copiar camadas selecionadas",
                     "description": "Copie as camadas selecionadas atualmente para a área de transferência.",
-                    "noSelectedLayers": {}
+                    "noSelectedLayers": {
+                        "title": "Sem camadas selecionadas",
+                        "message": "Por favor, selecione pelo menos uma camada para copiar."
+                    }
                 },
                 "copyAll": {
                     "name": "Copiar todas as camadas",
@@ -1112,7 +1147,14 @@
             "resolutionUnits": "Unidades de resolução",
             "snapping": {
                 "title": "Snapping",
-                "enable": "Ativar Snapping"
+                "enable": "Ativar Snapping",
+                "currentCanvas": "Atual Canvas",
+                "cropArea": "Área de cultivo",
+                "snapToCenter": "Snap para o centro",
+                "snapToEdges": "Snap para bordas",
+                "snapToContrast": "Snap to Contraste",
+                "snapAtCenter": "Snap no centro",
+                "snapAtEdges": "Snap em bordas"
             }
         },
         "draw": {
@@ -1127,7 +1169,13 @@
                 "current": "Corrente"
             },
             "snapping": {
-                "title": "Snapping"
+                "title": "Snapping",
+                "enableSnapping": "Ativar Snapping",
+                "rotationSnap": "Rotação",
+                "rotationSnapDegrees": "Graus",
+                "canvasEdges": "Bordas de lona",
+                "layerEdges": "Bordas de camada",
+                "layerCenter": "Centro de camadas"
             },
             "metrics": {
                 "title": "Metrics",
@@ -1136,12 +1184,23 @@
                 "height": "Altura",
                 "rotation": "Rotação",
                 "resetRotation": "Repor a rotação",
-                "noLayers": "Nenhuma camada(s) selecionada."
+                "noLayers": "Nenhuma camada(s) selecionada.",
+                "alignLeft": "Esquerda alinhada",
+                "alignRight": "Direita de luz",
+                "alignCenter": "Centro de Alinhamento",
+                "alignTop": "Top de alinhamento",
+                "alignBottom": "Parte inferior alinhada",
+                "alignMiddle": "Alinhamento Médio",
+                "resetPosition": "Redefinir {dimension} Posição",
+                "resetWidth": "Repor Width",
+                "resetHeight": "Repor altura"
             },
             "actions": {
                 "title": "Acções",
                 "applyTransform": "Aplicar Transformação",
-                "trimEmptySpace": "Trim Empty Space"
+                "trimEmptySpace": "Trim Empty Space",
+                "stretchToImageSize": "Stretch para o tamanho da tela",
+                "expandToImageSize": "Expanda com espaço vazio"
             }
         },
         "general": {
@@ -1154,7 +1213,8 @@
                 "ellipse": "Ellipse",
                 "freePolygon": "Polígono livre",
                 "freePolygonShort": "Poliéster livre",
-                "tonalArea": "Área tonal"
+                "tonalArea": "Área tonal",
+                "lasso": "Laços"
             },
             "selectionCombineMode": {
                 "label": "Modo de combinação de seleção",
@@ -1163,7 +1223,10 @@
                 "intersect": "Interseto"
             },
             "notification": {
-                "unproductiveSelection": {}
+                "unproductiveSelection": {
+                    "title": "Sem camadas selecionadas",
+                    "message": "<p> Você criou uma máscara de seleção em cima da imagem.</p><p> Por favor, selecione pelo menos uma camada de imagem na doca de camadas.</p>"
+                }
             }
         },
         "text": {
@@ -1177,10 +1240,29 @@
             "fillTooltip": "Cor que mostra dentro das bordas da(s) letra(s)",
             "newTextLayerName": "Novo texto",
             "alignment": {
-                "boundaryOption": {},
-                "lineDirectionOption": {},
-                "wrapDirectionOption": {}
-            }
+                "boundaryOption": {
+                    "dynamic": "Dinâmico",
+                    "box": "Caixa"
+                },
+                "lineDirectionOption": {
+                    "ltr": "Esquerda para direita",
+                    "rtl": "Direito à esquerda",
+                    "ttb": "Topo para baixo",
+                    "btt": "Parte de baixo para cima"
+                },
+                "wrapDirectionOption": {
+                    "ltr": "Esquerda para direita",
+                    "rtl": "Direito à esquerda",
+                    "ttb": "Topo para baixo",
+                    "btt": "Parte de baixo para cima"
+                },
+                "title": "Alinhamento",
+                "boundary": "Boundary",
+                "lineDirection": "Direção de Texto",
+                "wrapDirection": "Wrap"
+            },
+            "fillColor": "Cor de enchimento",
+            "paletteCount": "Contagem de paleta"
         },
         "zoom": {
             "zoomOut": "Zoom",
@@ -1194,15 +1276,60 @@
             "brushSize": "Tamanho",
             "newBrushLayerName": "Nova pintura",
             "brushDialog": {
-                "noBrushCategorySelected": {},
-                "noBrushesInCategory": {},
+                "noBrushCategorySelected": {
+                    "title": "Nenhuma categoria selecionada",
+                    "message": "Por favor, selecione uma categoria de escova."
+                },
+                "noBrushesInCategory": {
+                    "title": "Sem escovas",
+                    "message": "Esta categoria não tem escovas. Criar alguns!"
+                },
                 "editorTab": {
-                    "blending": {},
-                    "shape": {},
-                    "strokePath": {},
-                    "pressure": {}
-                }
-            }
+                    "blending": {
+                        "title": "Misturando",
+                        "density": "Densidade",
+                        "densityDescription": "Como transparente cada selo da escova será, com base na pressão da caneta. O intervalo é usado quando varia a pressão da caneta.",
+                        "pressureMinDensity": "Densidade mínima",
+                        "pressureMaxDensity": "Densidade máxima",
+                        "colorBlendingStrength": "Cor de mistura força",
+                        "pressureMinColorBlendingStrength": "Minha força",
+                        "pressureMaxColorBlendingStrength": "Força máxima",
+                        "colorBlendingStrengthDescription": "Quanto da cor por baixo da escova será pego durante o desenho. O intervalo é usado quando varia a pressão da caneta.",
+                        "colorBlendingPersistence": "Persistência de mistura de cores",
+                        "colorBlendingPersistenceDescription": "Quanto tempo a cor pegada permanece na escova enquanto arrasta o curso.",
+                        "concentration": "Concentração",
+                        "concentrationDescription": "Valores mais baixos simulam a diluição da escova com água e valores elevados de cor concentrada plena. Esta configuração não tem efeito ao desenhar em cima de cores totalmente opacas. O intervalo é usado quando varia a pressão da caneta.",
+                        "pressureMinConcentration": "Min Concentração",
+                        "pressureMaxConcentration": "Concentração máxima"
+                    },
+                    "shape": {
+                        "title": "Forma",
+                        "hardness": "Dureza",
+                        "hardnessDescription": "Os valores mais baixos terão bordas desbotadas macias e maiores valores bordas afiadas.",
+                        "angle": "Ângulo",
+                        "angleDescription": "Roda a forma da escova."
+                    },
+                    "strokePath": {
+                        "title": "Caminho de Stroke",
+                        "spacing": "Espaços",
+                        "spacingDescription": "A distância entre cada selo da escova, em relação ao tamanho da escova. Tenha cuidado com valores extremamente baixos, pois pode armazenar o desempenho em tamanhos de escova maiores.",
+                        "jitter": "Jitter",
+                        "jitterDescription": "Aleatoriamente muda a posição da forma da escova."
+                    },
+                    "pressure": {
+                        "title": "Pressão",
+                        "pressureTaper": "Tapete",
+                        "pressureTaperDescription": "Os valores mais elevados desenharão linhas mais skinnier em pressões de caneta mais baixas. Torna mais fácil controlar canetas com sensibilidade instável em pressões mais baixas.",
+                        "pressureMinSize": "Tamanho mínimo",
+                        "pressureMinSizeDescription": "O tamanho da escova na pressão de caneta de 0%, em relação ao tamanho de escova selecionado atualmente."
+                    }
+                },
+                "title": "Selecione a escova",
+                "close": "Fechar Diálogo"
+            },
+            "brushColor": "Cor",
+            "paletteCount": "Contagem de paleta",
+            "brushSmoothing": "Suavização"
         },
         "effect": {
             "edit": {
@@ -1214,8 +1341,13 @@
         "eraseBrush": {
             "brushSize": "Tamanho",
             "notification": {
-                "noSelectedLayers": {}
-            }
+                "noSelectedLayers": {
+                    "title": "Sem camadas selecionadas",
+                    "message": "Por favor, selecione pelo menos uma camada de imagem na doca de camadas. Certos tipos de camada não podem ser apagados."
+                }
+            },
+            "brushOpacity": "Opacidade",
+            "brushSmoothing": "Suavização"
         },
         "deformBlur": {
             "brushSize": "Tamanho"
@@ -1254,8 +1386,14 @@
             }
         },
         "drawShape": {
-            "shapeType": {},
-            "style": {}
+            "shapeType": {
+                "label": "Forma",
+                "rectangle": "Retângulo",
+                "ellipse": "Ellipse"
+            },
+            "style": {
+                "label": "Estilo"
+            }
         }
     },
     "toolGroup": {
@@ -1490,16 +1628,17 @@
         },
         "drawShapeToolIntroduction": {
             "introduction": [
-                null
+                "A ferramenta de forma permite adicionar várias formas básicas, que podem ser convertidas em caminhos vetoriais se mais personalização for necessária."
             ],
             "body": {
                 "mouse": [
-                    null
+                    "Clique e arraste para colocar uma forma na tela."
                 ],
                 "touch": [
-                    null
+                    "Use um dedo para tocar e arrastar para colocar uma forma na tela."
                 ]
-            }
+            },
+            "title": "Ferramenta de forma"
         }
     },
     "gradientPreset": {
@@ -1542,34 +1681,74 @@
         "lightness": "Luz",
         "luminance": "Luminância"
     },
-    "defaultBrush": {},
-    "defaultBrushCategory": {},
+    "defaultBrush": {
+        "default": "Padrão",
+        "simpleAirBrush": "Escova de ar simples",
+        "simplePaintBrush": "Pincel de pintura simples",
+        "simplePen": "Pena simples",
+        "simpleWaterColor": "Cor da água simples"
+    },
+    "defaultBrushCategory": {
+        "custom": "Personalizado",
+        "simple": "Simples"
+    },
     "menuBarToolGroup": {
         "deform": {
-            "tools": {}
+            "tools": {
+                "blur": "Borrar áreas específicas da imagem"
+            },
+            "name": "Deformação"
         },
         "draw": {
-            "tools": {}
+            "tools": {
+                "brush": "Desenho com pincéis de arte",
+                "gradient": "Criar gradientes de cor",
+                "shape": "Criar formas básicas"
+            },
+            "name": "Desenho"
         },
         "effect": {
-            "tools": {}
+            "tools": {
+                "effect": "Manipular cores de camada e adicionar efeitos de filtro"
+            },
+            "name": "Efeito"
         },
         "erase": {
-            "tools": {}
+            "tools": {
+                "brush": "Apagar áreas da imagem com pinceladas"
+            },
+            "name": "Apagar"
         },
-        "layers": {},
+        "layers": {
+            "name": "Camadas"
+        },
         "selection": {
-            "tools": {}
+            "tools": {
+                "selection": "Selecione áreas específicas da imagem para editar, cortar, copiar ou excluir"
+            },
+            "name": "Seleção"
         },
-        "settings": {},
+        "settings": {
+            "name": "Acções"
+        },
         "text": {
-            "tools": {}
+            "tools": {
+                "text": "Inserir e editar camadas de texto"
+            },
+            "name": "Texto"
         },
         "transform": {
-            "tools": {}
+            "tools": {
+                "freeTransform": "Mover, escalar, girar camadas",
+                "layerCrop": "Cortar a camada selecionada"
+            },
+            "name": "Mover / Transformar"
         },
         "view": {
-            "tools": {}
+            "tools": {
+                "zoom": "Zoom dentro e fora, pan, ou girar sua visão da imagem"
+            },
+            "name": "Vista de lona"
         }
     }
 }

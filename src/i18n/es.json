@@ -56,7 +56,10 @@
         "updateDrawGradientLayerStops": "Actualizar Gradient (Color Stops)",
         "updateDeformBlurLayer": "Blur Layer",
         "updateLayerBlendingMode": "Cambio Modo de amortiguación",
-        "updateLayerFilterMask": "Máscara de efecto de capa de actualización"
+        "updateLayerFilterMask": "Máscara de efecto de capa de actualización",
+        "setLayerBoundsToWorkingFileBounds": "Ampliar con espacio vacío",
+        "stretchLayerToWorkingFileBounds": "Stretch to Canvas Tamaño",
+        "updateTextLayerProperties": "Actualizar propiedades de capa de texto"
     },
     "app": {
         "colorPickerGradient": {
@@ -114,7 +117,10 @@
                 "message": "OpenGraphica confía en alguna funcionalidad web básica que no existe en su navegador. Por favor, actualice su navegador web, o cambie a uno moderno como Chrome, Firefox, Safari, o Edge."
             }
         },
-        "updateRequired": {}
+        "updateRequired": {
+            "title": "Actualización requerida",
+            "message": "El editor trató de buscar un archivo que ya no está disponible. Por favor, refresque la página para continuar. Limpia el caché de tu navegador si sigues viendo este mensaje. Utilice la opción \"Restore Last Image\" en el menú para continuar donde se fue."
+        }
     },
     "brushCategory": {
         "simple": {
@@ -152,7 +158,10 @@
         "pickColor": "Elija color",
         "delete": "Suprimir",
         "discardChanges": "Cambios de disco",
-        "reverse": "Inversión"
+        "reverse": "Inversión",
+        "back": "Atrás",
+        "editBrush": "Editar el cepillo",
+        "moreInfo": "Más información"
     },
     "canvas": {
         "toolbar": {
@@ -244,7 +253,10 @@
                     "renderer": {
                         "label": "Renderer",
                         "2d": "Canvas 2D",
-                        "webgl": "WebGL"
+                        "webgl": "WebGL",
+                        "webgl2": "WebGL2",
+                        "webgl2Offscreen": "WebGL2 Offscreen",
+                        "wgpuWasm": "WebGPU + WASM"
                     },
                     "optimizeLargeImage": "Optimize for Large Image",
                     "highQualityScaling": "Escalada de alta calidad",
@@ -263,7 +275,8 @@
                 },
                 "help": {
                     "groupTitle": "Ayuda",
-                    "reportIssue": "Reportar un problema"
+                    "reportIssue": "Reportar un problema",
+                    "designSystem": "Sistema de diseño"
                 }
             }
         }
@@ -490,10 +503,22 @@
             }
         },
         "chromaKey": {
-            "param": {}
+            "param": {
+                "eraseColor": "Color de borrar",
+                "threshold": "Borrar Umbral",
+                "softness": "Suavidad",
+                "spillSuppression": "Spill Suppression",
+                "hueWeight": "Peso de Hue",
+                "chromaWeight": "Peso de croma",
+                "lightnessWeight": "Luz Peso"
+            },
+            "name": "Chroma Key"
         },
         "whiteBalance": {
-            "param": {}
+            "param": {
+                "white": "Color neutro"
+            },
+            "name": "Balanza blanca"
         }
     },
     "layerFilterGroup": {
@@ -687,7 +712,9 @@
         "inches": "Pulgadas",
         "pixelsPerInch": "Pixels/Inch",
         "pixelsPerMillimeter": "Pixels/Millimeter",
-        "pixelsPerCentimeter": "Pixels/Centimeter"
+        "pixelsPerCentimeter": "Pixels/Centimeter",
+        "percent": "Porcentaje",
+        "percentage": "Porcentaje"
     },
     "menuBar": {
         "toolsHeading": "Herramientas",
@@ -954,9 +981,14 @@
                 }
             }
         },
-        "designSystem": {},
+        "designSystem": {
+            "title": "Sistema de diseño"
+        },
         "fileOpenNotification": {
-            "maxTextureSizeLimited": {}
+            "maxTextureSizeLimited": {
+                "title": "Max Dimensiones Contadas",
+                "message": "Una imagen que abrió es mayor que el tamaño máximo que soporta su navegador. Fue reducido."
+            }
         }
     },
     "moduleGroup": {
@@ -1031,7 +1063,10 @@
                 "copy": {
                     "name": "Copia de capas seleccionadas",
                     "description": "Copie las capas seleccionadas actualmente en el portapapeles.",
-                    "noSelectedLayers": {}
+                    "noSelectedLayers": {
+                        "title": "No hay capas seleccionadas",
+                        "message": "Por favor seleccione al menos una capa para copiar."
+                    }
                 },
                 "copyAll": {
                     "name": "Copiar todas las capas",
@@ -1112,7 +1147,14 @@
             "resolutionUnits": "Dependencias de Resolución",
             "snapping": {
                 "title": "Snapping",
-                "enable": "Activar el ajuste"
+                "enable": "Activar el ajuste",
+                "currentCanvas": "Canvas actuales",
+                "cropArea": "Zona de cultivo",
+                "snapToCenter": "Snap to Center",
+                "snapToEdges": "Acercarse a Edges",
+                "snapToContrast": "Ajustar al contraste",
+                "snapAtCenter": "Snap at Center",
+                "snapAtEdges": "Encaje en Edges"
             }
         },
         "draw": {
@@ -1127,7 +1169,13 @@
                 "current": "Corriente"
             },
             "snapping": {
-                "title": "Snapping"
+                "title": "Snapping",
+                "enableSnapping": "Activar el ajuste",
+                "rotationSnap": "Rotación",
+                "rotationSnapDegrees": "Grados",
+                "canvasEdges": "Canvas Edges",
+                "layerEdges": "Layer Edges",
+                "layerCenter": "Layer Center"
             },
             "metrics": {
                 "title": "Metrices",
@@ -1136,12 +1184,23 @@
                 "height": "Altura",
                 "rotation": "Rotación",
                 "resetRotation": "Reiniciar la rotación",
-                "noLayers": "No hay capas seleccionadas."
+                "noLayers": "No hay capas seleccionadas.",
+                "alignLeft": "Align Left",
+                "alignRight": "Alight Right",
+                "alignCenter": "Align Center",
+                "alignTop": "Align Top",
+                "alignBottom": "Align Bottom",
+                "alignMiddle": "Align Middle",
+                "resetPosition": "Reset {dimension} Posición",
+                "resetWidth": "Reset Width",
+                "resetHeight": "Reiniciar la altura"
             },
             "actions": {
                 "title": "Acciones",
                 "applyTransform": "Apply Transform",
-                "trimEmptySpace": "Trim Empty Space"
+                "trimEmptySpace": "Trim Empty Space",
+                "stretchToImageSize": "Estréguese a lienzo tamaño",
+                "expandToImageSize": "Ampliar con espacio vacío"
             }
         },
         "general": {
@@ -1154,7 +1213,8 @@
                 "ellipse": "Ellipse",
                 "freePolygon": "Poligono libre",
                 "freePolygonShort": "Polio Libre",
-                "tonalArea": "Zona tonal"
+                "tonalArea": "Zona tonal",
+                "lasso": "Lasso"
             },
             "selectionCombineMode": {
                 "label": "Modo combinado de selección",
@@ -1163,7 +1223,10 @@
                 "intersect": "Intersect"
             },
             "notification": {
-                "unproductiveSelection": {}
+                "unproductiveSelection": {
+                    "title": "No hay capas seleccionadas",
+                    "message": "Identificado Usted ha creado una máscara de selección en la parte superior de la imagen. Por favor seleccione al menos una capa de imagen en el muelle de capas"
+                }
             }
         },
         "text": {
@@ -1177,10 +1240,29 @@
             "fillTooltip": "Color que muestra dentro de los bordes de las letras",
             "newTextLayerName": "Nuevo texto",
             "alignment": {
-                "boundaryOption": {},
-                "lineDirectionOption": {},
-                "wrapDirectionOption": {}
-            }
+                "boundaryOption": {
+                    "dynamic": "Dinámica dinámica",
+                    "box": "Recuadro"
+                },
+                "lineDirectionOption": {
+                    "ltr": "Izquierda a derecha",
+                    "rtl": "Derecho a izquierdo",
+                    "ttb": "Arriba a abajo",
+                    "btt": "Tema a punto"
+                },
+                "wrapDirectionOption": {
+                    "ltr": "Izquierda a derecha",
+                    "rtl": "Derecho a izquierdo",
+                    "ttb": "Arriba a abajo",
+                    "btt": "Tema a punto"
+                },
+                "title": "Alineación",
+                "boundary": "Boundary",
+                "lineDirection": "Dirección de texto",
+                "wrapDirection": "Wrap"
+            },
+            "fillColor": "Color de relleno",
+            "paletteCount": "Palette Count"
         },
         "zoom": {
             "zoomOut": "Zoom Out",
@@ -1194,15 +1276,60 @@
             "brushSize": "Tamaño",
             "newBrushLayerName": "Pintura nueva",
             "brushDialog": {
-                "noBrushCategorySelected": {},
-                "noBrushesInCategory": {},
+                "noBrushCategorySelected": {
+                    "title": "No Categoría Seleccionada",
+                    "message": "Seleccione una categoría de pincel."
+                },
+                "noBrushesInCategory": {
+                    "title": "No Brujas",
+                    "message": "Esta categoría no tiene cepillos. ¡Crea un poco!"
+                },
                 "editorTab": {
-                    "blending": {},
-                    "shape": {},
-                    "strokePath": {},
-                    "pressure": {}
-                }
-            }
+                    "blending": {
+                        "title": "Blending",
+                        "density": "Densidad",
+                        "densityDescription": "Cuán transparente será cada sello del pincel, basado en la presión del bolígrafo. El rango se utiliza cuando la presión de la pluma varía.",
+                        "pressureMinDensity": "Min Density",
+                        "pressureMaxDensity": "Max Density",
+                        "colorBlendingStrength": "Color Blending fuerza",
+                        "pressureMinColorBlendingStrength": "Fuerza mínima",
+                        "pressureMaxColorBlendingStrength": "Max Strength",
+                        "colorBlendingStrengthDescription": "Cuanto del color debajo del pincel se recogerá mientras se dibuja. El rango se utiliza cuando la presión de la pluma varía.",
+                        "colorBlendingPersistence": "Persistencia de color Blending",
+                        "colorBlendingPersistenceDescription": "Cuánto tiempo el color recogido permanece en el pincel mientras arrastra el trazo.",
+                        "concentration": "Concentración",
+                        "concentrationDescription": "Los valores inferiores simulan la dilución del cepillo con agua, y los valores altos de color concentrado. Este ajuste no tiene efecto al dibujar sobre colores totalmente opacos. El rango se utiliza cuando la presión de la pluma varía.",
+                        "pressureMinConcentration": "Concentración minera",
+                        "pressureMaxConcentration": "Max Concentration"
+                    },
+                    "shape": {
+                        "title": "Forma",
+                        "hardness": "Hardness",
+                        "hardnessDescription": "Los valores inferiores tendrán bordes descoloridos suaves, y valores más altos bordes afilados.",
+                        "angle": "Angle",
+                        "angleDescription": "Rota la forma del cepillo."
+                    },
+                    "strokePath": {
+                        "title": "Stroke Path",
+                        "spacing": "Spacing",
+                        "spacingDescription": "La distancia entre cada sello del pincel, relativa al tamaño del pincel. Tenga cuidado con valores extremadamente bajos, ya que puede el rendimiento del tanque en tamaños de pincel más grandes.",
+                        "jitter": "Jitter",
+                        "jitterDescription": "Aleatoriamente cambia la posición de la forma del cepillo."
+                    },
+                    "pressure": {
+                        "title": "Presión",
+                        "pressureTaper": "Taper",
+                        "pressureTaperDescription": "Los valores más altos dibujarán líneas más delgadas a presión de plumas más bajas. Hace más fácil controlar los bolígrafos con sensibilidad inestable a bajas presiones.",
+                        "pressureMinSize": "Tamaño mínimo",
+                        "pressureMinSizeDescription": "El tamaño del cepillo a 0% presión de la pluma, en relación con el tamaño del cepillo seleccionado actualmente."
+                    }
+                },
+                "title": "Seleccione el cepillo",
+                "close": "Diálogo cercano"
+            },
+            "brushColor": "Color",
+            "paletteCount": "Palette Count",
+            "brushSmoothing": "Momento"
         },
         "effect": {
             "edit": {
@@ -1214,8 +1341,13 @@
         "eraseBrush": {
             "brushSize": "Tamaño",
             "notification": {
-                "noSelectedLayers": {}
-            }
+                "noSelectedLayers": {
+                    "title": "No hay capas seleccionadas",
+                    "message": "Por favor seleccione al menos una capa de imagen en el muelle de capas. Ciertos tipos de capas no se pueden borrar."
+                }
+            },
+            "brushOpacity": "Opacity",
+            "brushSmoothing": "Momento"
         },
         "deformBlur": {
             "brushSize": "Tamaño"
@@ -1254,8 +1386,14 @@
             }
         },
         "drawShape": {
-            "shapeType": {},
-            "style": {}
+            "shapeType": {
+                "label": "Forma",
+                "rectangle": "Rectángulo",
+                "ellipse": "Ellipse"
+            },
+            "style": {
+                "label": "Estilo"
+            }
         }
     },
     "toolGroup": {
@@ -1490,16 +1628,17 @@
         },
         "drawShapeToolIntroduction": {
             "introduction": [
-                null
+                "La herramienta forma le permite añadir varias formas básicas, que pueden convertirse en caminos vectoriales si se necesita más personalización."
             ],
             "body": {
                 "mouse": [
-                    null
+                    "Haga clic y arrastre para colocar una forma en el lienzo."
                 ],
                 "touch": [
-                    null
+                    "Usa un dedo para tocar y arrastrar para poner una forma en el lienzo."
                 ]
-            }
+            },
+            "title": "Herramienta de forma"
         }
     },
     "gradientPreset": {
@@ -1542,34 +1681,74 @@
         "lightness": "Luz",
         "luminance": "Luminance"
     },
-    "defaultBrush": {},
-    "defaultBrushCategory": {},
+    "defaultBrush": {
+        "default": "Default",
+        "simpleAirBrush": "Cepillo de aire simple",
+        "simplePaintBrush": "Pincel de pintura simple",
+        "simplePen": "Pluma simple",
+        "simpleWaterColor": "Color de agua simple"
+    },
+    "defaultBrushCategory": {
+        "custom": "Aduanas",
+        "simple": "Simple"
+    },
     "menuBarToolGroup": {
         "deform": {
-            "tools": {}
+            "tools": {
+                "blur": "Borrar áreas específicas de la imagen"
+            },
+            "name": "Deforme"
         },
         "draw": {
-            "tools": {}
+            "tools": {
+                "brush": "Dibujar con pinceles de arte",
+                "gradient": "Crear gradientes de color",
+                "shape": "Crear formas básicas"
+            },
+            "name": "Dibujo"
         },
         "effect": {
-            "tools": {}
+            "tools": {
+                "effect": "Manipular los colores de capa y añadir efectos de filtro"
+            },
+            "name": "Efecto"
         },
         "erase": {
-            "tools": {}
+            "tools": {
+                "brush": "Borrar áreas de la imagen con pinceladas"
+            },
+            "name": "Borrar"
         },
-        "layers": {},
+        "layers": {
+            "name": "Capas"
+        },
         "selection": {
-            "tools": {}
+            "tools": {
+                "selection": "Seleccione áreas de espectro de la imagen para editar, cortar, copiar o eliminar"
+            },
+            "name": "Selección"
         },
-        "settings": {},
+        "settings": {
+            "name": "Acciones"
+        },
         "text": {
-            "tools": {}
+            "tools": {
+                "text": "Insertar y editar capas de texto"
+            },
+            "name": "Texto"
         },
         "transform": {
-            "tools": {}
+            "tools": {
+                "freeTransform": "Mover, escalar, rotar capas",
+                "layerCrop": "Culpar la capa seleccionada"
+            },
+            "name": "Mover / Transformar"
         },
         "view": {
-            "tools": {}
+            "tools": {
+                "zoom": "Zoom dentro y fuera, pan, o girar la vista de la imagen"
+            },
+            "name": "Canvas Viewport"
         }
     }
 }

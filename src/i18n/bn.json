@@ -56,7 +56,10 @@
         "updateDrawGradientLayerStops": "গ্রেডিয়েন্ট নির্বাচন ( selectionসেকেন্ড)",
         "updateDeformBlurLayer": "Bluer স্তর",
         "updateLayerBlendingMode": "ব্লেন্ডিং মোড পরিবর্তন করুন",
-        "updateLayerFilterMask": "এফেক্ট মাস্ক আপডেট করো"
+        "updateLayerFilterMask": "এফেক্ট মাস্ক আপডেট করো",
+        "setLayerBoundsToWorkingFileBounds": "ফাঁকা স্থান অনুযায়ী প্রদর্শন",
+        "stretchLayerToWorkingFileBounds": "ক্যানভাসের আকার বৃদ্ধি করো",
+        "updateTextLayerProperties": "লেখার স্তর আপডেট করো"
     },
     "app": {
         "colorPickerGradient": {
@@ -114,7 +117,10 @@
                 "message": "আপনার ব্রাউজারের মধ্যে কোন মৌলিক ওয়েব দক্ষতা নেই এমন কিছু বিষয়ে ওপেনগ্রাফিকা বিশ্বাস করে। দয়া করে আপনার ওয়েব ব্রাউজার আপডেট করুন, অথবা আপনার ওয়েব ব্রাউজারকে আধুনিক ভাবে পরিবর্তন করুন যেমন ক্রোম, ফায়ারফক্স,ফারি অথবা এজ।."
             }
         },
-        "updateRequired": {}
+        "updateRequired": {
+            "title": "আপডেট আবশ্যক",
+            "message": "সম্পাদক একটি ফাইল নিয়ে যাওয়ার চেষ্টা করেছে যা এখন আর পাওয়া যাচ্ছে না। অনুগ্রহ করে পুনরায় লোড করার উদ্দেশ্যে পৃষ্ঠা নির্বাচন করুন। এই বার্তাটি দেখার জন্য ব্রাউজারের ক্যাশে মুছে ফেলুন । মেনুর মধ্যে সংরক্ষণ না করা হলে \"পুনরুদ্ধার\" বিকল্পটি ব্যবহার করুন।."
+        }
     },
     "brushCategory": {
         "simple": {
@@ -152,7 +158,10 @@
         "pickColor": "লিংকের রং",
         "delete": "মুছে ফেলুন",
         "discardChanges": "পরিবর্তন বর্জন করা হবে",
-        "reverse": "বিপরীত"
+        "reverse": "বিপরীত",
+        "back": "পূর্ববর্তী",
+        "editBrush": "নিরবতা সম্পাদনা করুন",
+        "moreInfo": "অতিরিক্ত তথ্য"
     },
     "canvas": {
         "toolbar": {
@@ -244,7 +253,10 @@
                     "renderer": {
                         "label": "স্পিনার",
                         "2d": "ক্যানভাস দ্বিমাত্রিক",
-                        "webgl": "ওয়েব ইন্সপেক্টর"
+                        "webgl": "ওয়েব ইন্সপেক্টর",
+                        "webgl2": "ওয়েব ইন্সপেক্টর2",
+                        "webgl2Offscreen": "ওয়েব ব্রাউজার",
+                        "wgpuWasm": "WebGPU +M"
                     },
                     "optimizeLargeImage": "বড় ছবির জন্য কোয়েরি",
                     "highQualityScaling": "উচ্চ গুণমানের হার",
@@ -263,7 +275,8 @@
                 },
                 "help": {
                     "groupTitle": "সাহায্য",
-                    "reportIssue": "একটি ইস্যু প্রতিবেদন"
+                    "reportIssue": "একটি ইস্যু প্রতিবেদন",
+                    "designSystem": "সিস্টেমName"
                 }
             }
         }
@@ -490,10 +503,22 @@
             }
         },
         "chromaKey": {
-            "param": {}
+            "param": {
+                "eraseColor": "রঙ মুছে ফেলুন",
+                "threshold": "মুছে ফেলো",
+                "softness": "সফট",
+                "spillSuppression": "সংযোগ বিচ্ছিন্ন",
+                "hueWeight": "হিউ‌ট",
+                "chromaWeight": "ক্রোমাওয়েস্ট",
+                "lightnessWeight": "আলো"
+            },
+            "name": "ক্রোমা কী"
         },
         "whiteBalance": {
-            "param": {}
+            "param": {
+                "white": "রং"
+            },
+            "name": "সাদা রংয়ের ভারসাম্য"
         }
     },
     "layerFilterGroup": {
@@ -687,7 +712,9 @@
         "inches": "ইঞ্চি",
         "pixelsPerInch": "হেডারের মধ্যে পিক্সেল",
         "pixelsPerMillimeter": "পিক্সেল/মিওয়াল",
-        "pixelsPerCentimeter": "অনুচ্ছেদ"
+        "pixelsPerCentimeter": "অনুচ্ছেদ",
+        "percent": "শতাংশ",
+        "percentage": "শতাংশ [%]"
     },
     "menuBar": {
         "toolsHeading": "সরঞ্জাম",
@@ -952,9 +979,14 @@
                 }
             }
         },
-        "designSystem": {},
+        "designSystem": {
+            "title": "সিস্টেমName"
+        },
         "fileOpenNotification": {
-            "maxTextureSizeLimited": {}
+            "maxTextureSizeLimited": {
+                "title": "সর্বাধিক দিকমাত্রা",
+                "message": "আপনার ব্যবহৃত অনুসন্ধানের মাপের সর্বোচ্চ মাপে প্রদর্শিত ছবি। এটা নষ্ট হয়ে গেছে।."
+            }
         }
     },
     "moduleGroup": {
@@ -1029,7 +1061,10 @@
                 "copy": {
                     "name": "নির্বাচিত স্তর কপি করুন",
                     "description": "নির্বাচিত অংশ ক্লিপবোর্ডে কপি করা হবে.",
-                    "noSelectedLayers": {}
+                    "noSelectedLayers": {
+                        "title": "কোনো স্তর নির্ধারিত হয়নি",
+                        "message": "অনুগ্রহ করে অন্তত একটি স্তর বেছে নিন ।."
+                    }
                 },
                 "copyAll": {
                     "name": "সকল স্তর কপি করুন",
@@ -1110,7 +1145,14 @@
             "resolutionUnits": "রেজোলিউশন",
             "snapping": {
                 "title": "উজ্জ্বল",
-                "enable": "Sylink মোড সক্রিয় করো"
+                "enable": "Sylink মোড সক্রিয় করো",
+                "currentCanvas": "বর্তমান ক্যানভাস",
+                "cropArea": "ছাঁটাই ক্ষেত্র",
+                "snapToCenter": "কেন্দ্রস্থিত",
+                "snapToEdges": "প্রান্তের স্ন্যাপ-শট",
+                "snapToContrast": "বৈপরিত্যের সাথে সংযোগ স্থাপন করুন",
+                "snapAtCenter": "কেন্দ্রস্থিত কেন্দ্রস্থিত",
+                "snapAtEdges": "৫ম গ্রুপের লিঙ্ক"
             }
         },
         "draw": {
@@ -1125,7 +1167,13 @@
                 "current": "বর্তমান"
             },
             "snapping": {
-                "title": "উজ্জ্বল"
+                "title": "উজ্জ্বল",
+                "enableSnapping": "Sylink মোড সক্রিয় করো",
+                "rotationSnap": "আবর্তন",
+                "rotationSnapDegrees": "ডিগ্রি",
+                "canvasEdges": "ক্যানভাস",
+                "layerEdges": "স্তর",
+                "layerCenter": "স্তর কেন্দ্র"
             },
             "metrics": {
                 "title": "মেট্রিক",
@@ -1134,12 +1182,22 @@
                 "height": "উচ্চতা",
                 "rotation": "আবর্তন",
                 "resetRotation": "আবর্তন পুনরায় নির্ধারণ",
-                "noLayers": "কোনো স্তর নেই ।."
+                "noLayers": "কোনো স্তর নেই ।.",
+                "alignLeft": "বাম দিকে",
+                "alignRight": "ডানদিকে",
+                "alignCenter": "এলজে কেন্দ্রস্থিত",
+                "alignTop": "বিপরীত",
+                "alignBottom": "নদীমুখ",
+                "alignMiddle": "মধ্য প্রাচ্য",
+                "resetWidth": "প্রস্থ পুনরায় নির্ধারণ করুন",
+                "resetHeight": "পুনরায় নির্ধারণ"
             },
             "actions": {
                 "title": "কাজ",
                 "applyTransform": "রূপান্তর করুন",
-                "trimEmptySpace": "ট্রিম ফাঁকা স্থান"
+                "trimEmptySpace": "ট্রিম ফাঁকা স্থান",
+                "stretchToImageSize": "ক্যানভাসের আকার বৃদ্ধি করো",
+                "expandToImageSize": "ফাঁকা স্থান অনুযায়ী প্রদর্শন"
             }
         },
         "general": {
@@ -1152,7 +1210,8 @@
                 "ellipse": "উপবৃত্ত",
                 "freePolygon": "একটি বহুভুজ",
                 "freePolygonShort": "মুক্ত পলিক",
-                "tonalArea": "অঞ্চল"
+                "tonalArea": "অঞ্চল",
+                "lasso": "লাসসো"
             },
             "selectionCombineMode": {
                 "label": "নির্বাচনের মোড",
@@ -1161,7 +1220,10 @@
                 "intersect": "ছেদ করে"
             },
             "notification": {
-                "unproductiveSelection": {}
+                "unproductiveSelection": {
+                    "title": "কোনো স্তর নির্ধারিত হয়নি",
+                    "message": "<name> আপনি উপরের ছবিটির ওপর একটি নির্বাচন মাস্ক তৈরি করেছেন। http://p. অনুগ্রহ করে অন্তত একটি ছবি নির্বাচন করুন।slot type"
+                }
             }
         },
         "text": {
@@ -1175,10 +1237,29 @@
             "fillTooltip": "অক্ষরের প্রান্তে প্রদর্শিত রং",
             "newTextLayerName": "নতুন টেক্সট",
             "alignment": {
-                "boundaryOption": {},
-                "lineDirectionOption": {},
-                "wrapDirectionOption": {}
-            }
+                "boundaryOption": {
+                    "dynamic": "ডাইনামিক",
+                    "box": "বাক্স"
+                },
+                "lineDirectionOption": {
+                    "ltr": "বাঁদিক থেকে ডানদিকে",
+                    "rtl": "ডান থেকে বামে",
+                    "ttb": "উপর থেকে নীচে",
+                    "btt": "নীচে থেকে উপরে"
+                },
+                "wrapDirectionOption": {
+                    "ltr": "বাঁদিক থেকে ডানদিকে",
+                    "rtl": "ডান থেকে বামে",
+                    "ttb": "উপর থেকে নীচে",
+                    "btt": "নীচে থেকে উপরে"
+                },
+                "title": "অ্যালাইনমেন্ট",
+                "boundary": "সীমানা",
+                "lineDirection": "টেক্সটের দিশা",
+                "wrapDirection": "গুটানো"
+            },
+            "fillColor": "পূরণ করতে ব্যবহৃত রং",
+            "paletteCount": "প্যালেটের গণনা"
         },
         "zoom": {
             "zoomOut": "ছোট করে প্রদর্শন",
@@ -1192,15 +1273,60 @@
             "brushSize": "মাপ",
             "newBrushLayerName": "নতুন রং",
             "brushDialog": {
-                "noBrushCategorySelected": {},
-                "noBrushesInCategory": {},
+                "noBrushCategorySelected": {
+                    "title": "কোন শ্রেণী নেই",
+                    "message": "অনুগ্রহ করে একটি ব্রাশ শ্রেণী নির্বাচন করুন ।."
+                },
+                "noBrushesInCategory": {
+                    "title": "নোয়াসের",
+                    "message": "এই ক্যাটেগরী নেই। তৈরি হও!"
+                },
                 "editorTab": {
-                    "blending": {},
-                    "shape": {},
-                    "strokePath": {},
-                    "pressure": {}
-                }
-            }
+                    "blending": {
+                        "title": "ব্লেন্ডিং",
+                        "density": "বর্ণালী সংরক্ষণ করো",
+                        "densityDescription": "কলমের চাপ ভিত্তিক প্রত্যেক ব্রাশ কত স্বচ্ছ হবে। ( ১ করি.",
+                        "pressureMinDensity": "মিক্স",
+                        "pressureMaxDensity": "সর্বোচ্চ বৃদ্ধি",
+                        "colorBlendingStrength": "রঙের উজ্জ্বলতার ক্ষমতা",
+                        "pressureMinColorBlendingStrength": "মিন শক্তি",
+                        "pressureMaxColorBlendingStrength": "সর্বোচ্চ ক্ষমতা",
+                        "colorBlendingStrengthDescription": "রঙগুলো আঁকার সময় পর্দার নিচে কতগুলো রং বেছে নেওয়া হবে। ( ১ করি.",
+                        "colorBlendingPersistence": "রং বিন্যাস বেছে নিন",
+                        "colorBlendingPersistenceDescription": "আঘাত হানার সময় যে রঙ তুলে ধরা হয়েছে, তা কতদিন ধরে খোলা থাকে।.",
+                        "concentration": "নম্বর:% 1",
+                        "concentrationDescription": "স্বচ্ছতার মান হ্রাসকারী রেখাচিত্রের রং নির্বাচন করে, এবং গাঢ় রঙের মান। পূর্ণতার রঙের ওপর দিয়ে পটভূমির ছবি আঁকা হলে এই মান প্রয়োগ করা হবে না। ( ১ করি.",
+                        "pressureMinConcentration": "নম্বর:% 1",
+                        "pressureMaxConcentration": "সর্বোচ্চ নম্বর"
+                    },
+                    "shape": {
+                        "title": "আকার",
+                        "hardness": "কঠিন",
+                        "hardnessDescription": "নিম্ন মান হ্রাস করলে রঙের মান নরম হবে, এবং এর মান উন্নত হবে।.",
+                        "angle": "কোণ",
+                        "angleDescription": "ব্রাশের আকার বাড়াও."
+                    },
+                    "strokePath": {
+                        "title": "Drive পাথ",
+                        "spacing": "মধ্যবর্তী স্থান",
+                        "spacingDescription": "গর্তের মধ্যে দূরত্ব খুব কম মূল্যের ব্যাপারে সতর্ক থাকুন, যেহেতু এটা বড় আকার অনুযায়ী ট্যাংকের কাজ করতে পারে।.",
+                        "jitter": "মালিক",
+                        "jitterDescription": "এলোমেলোভাবে ব্রাশের মাত্রা পাল্টে যায়।."
+                    },
+                    "pressure": {
+                        "title": "বায়ু",
+                        "pressureTaper": "টপার",
+                        "pressureTaperDescription": "উচ্চ মূল্য নিম্ন কলম চাপের মধ্যে ত্বকের রেখা আঁকা হবে। কলমকে কম চাপ দিয়ে নিয়ন্ত্রণ করা সহজ করে ।.",
+                        "pressureMinSize": "সর্বনিম্ন মাপ",
+                        "pressureMinSizeDescription": "0%% Completতে সামঞ্জস্যের মাত্রা, বর্তমানে নির্বাচিত ব্রাশের মাপ।."
+                    }
+                },
+                "title": "কিছুই বাছাই করবে না",
+                "close": "ডায়লগ বন্ধ করুন"
+            },
+            "brushColor": "রঙ",
+            "paletteCount": "প্যালেটের গণনা",
+            "brushSmoothing": "স্মুদিং"
         },
         "effect": {
             "edit": {
@@ -1212,8 +1338,13 @@
         "eraseBrush": {
             "brushSize": "মাপ",
             "notification": {
-                "noSelectedLayers": {}
-            }
+                "noSelectedLayers": {
+                    "title": "কোনো স্তর নির্ধারিত হয়নি",
+                    "message": "অনুগ্রহ করে অন্তত একটি চিত্রের স্তর নির্বাচন করুন। কিছু স্তর মুছে ফেলা যাবে না।."
+                }
+            },
+            "brushOpacity": "স্বচ্ছতা",
+            "brushSmoothing": "স্মুদিং"
         },
         "deformBlur": {
             "brushSize": "মাপ"
@@ -1252,8 +1383,14 @@
             }
         },
         "drawShape": {
-            "shapeType": {},
-            "style": {}
+            "shapeType": {
+                "label": "আকার",
+                "rectangle": "চতুষ্কোণ",
+                "ellipse": "উপবৃত্ত"
+            },
+            "style": {
+                "label": "ধরন"
+            }
         }
     },
     "toolGroup": {
@@ -1488,16 +1625,17 @@
         },
         "drawShapeToolIntroduction": {
             "introduction": [
-                null
+                "আকার টুল আপনাকে বিভিন্ন মৌলিক আকারকে যোগ করতে দেয়, যা অনেক বেশী স্বনির্ধারিতকরণ প্রয়োজন হলে ভেক্টর পথে রূপান্তরিত হতে পারে।."
             ],
             "body": {
                 "mouse": [
-                    null
+                    "ক্যানভাসের উপর আকার পরিবর্তনের জন্য ক্লিক করুন।."
                 ],
                 "touch": [
-                    null
+                    "ক্যানভাসের উপর আকৃতি তৈরী করতে একটি আঙুল ব্যবহার করুন।."
                 ]
-            }
+            },
+            "title": "আকার পরিবর্তনের টুল"
         }
     },
     "gradientPreset": {
@@ -1540,34 +1678,74 @@
         "lightness": "হালকাতা",
         "luminance": "ফন্ট কপি করো"
     },
-    "defaultBrush": {},
-    "defaultBrushCategory": {},
+    "defaultBrush": {
+        "default": "ডিফল্ট",
+        "simpleAirBrush": "সহজ বায়ু সেনা ঘাঁটি",
+        "simplePaintBrush": "সহজ রংয়ের রেখা",
+        "simplePen": "সহজ পেন",
+        "simpleWaterColor": "সহজ ওয়াটার রং"
+    },
+    "defaultBrushCategory": {
+        "custom": "স্বনির্ধারিত",
+        "simple": "সাধারণ"
+    },
     "menuBarToolGroup": {
         "deform": {
-            "tools": {}
+            "tools": {
+                "blur": "ছবির নির্দিষ্ট অংশ"
+            },
+            "name": "ডিফর্ম"
         },
         "draw": {
-            "tools": {}
+            "tools": {
+                "brush": "আর্ট ব্রাশের সঙ্গে আঁকো",
+                "gradient": "রং",
+                "shape": "মৌলিক আকৃতি তৈরি করুন"
+            },
+            "name": "অঙ্কন"
         },
         "effect": {
-            "tools": {}
+            "tools": {
+                "effect": "রঙ নিয়ন্ত্রণের ক্ষেত্রে স্তর পরিবর্তন করুন ও ফিল্টারের সামগ্রী যোগ করুন"
+            },
+            "name": "ইফেক্ট"
         },
         "erase": {
-            "tools": {}
+            "tools": {
+                "brush": "ব্রাশের মাধ্যমে ছবিটি মুছে ফেলা"
+            },
+            "name": "মুছে ফেলুন"
         },
-        "layers": {},
+        "layers": {
+            "name": "স্তর"
+        },
         "selection": {
-            "tools": {}
+            "tools": {
+                "selection": "ছবি সম্পাদনার, কাট, কপি অথবা অপসারণ করার জন্য বিন্যাস নির্বাচন করুন"
+            },
+            "name": "নির্বাচন"
         },
-        "settings": {},
+        "settings": {
+            "name": "কাজ"
+        },
         "text": {
-            "tools": {}
+            "tools": {
+                "text": "টেক্সট সম্পাদন এবং সম্পাদনা করুন"
+            },
+            "name": "টেক্সট"
         },
         "transform": {
-            "tools": {}
+            "tools": {
+                "freeTransform": "চাল, মাত্রা, আবর্তিত",
+                "layerCrop": "নির্বাচিত স্তর কাট করুন"
+            },
+            "name": "/ করছিলাম"
         },
         "view": {
-            "tools": {}
+            "tools": {
+                "zoom": "ছবি ছোট/বড় করে প্রদর্শন, প্যান, অথবা আবর্তন করুন"
+            },
+            "name": "ক্যানভাস সংরক্ষণ করো"
         }
     }
 }

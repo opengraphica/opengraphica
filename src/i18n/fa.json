@@ -56,7 +56,10 @@
         "updateDrawGradientLayerStops": "Update Gradient (Color Stops)",
         "updateDeformBlurLayer": "لایه Blur Layer",
         "updateLayerBlendingMode": "تغییر حالت Blending Mode",
-        "updateLayerFilterMask": "دانلود بازی Layer Effect Mask"
+        "updateLayerFilterMask": "دانلود بازی Layer Effect Mask",
+        "setLayerBoundsToWorkingFileBounds": "گسترش با فضای خالی",
+        "stretchLayerToWorkingFileBounds": "کشش به اندازه بوم",
+        "updateTextLayerProperties": "به روز رسانی Text Layer Properties"
     },
     "app": {
         "colorPickerGradient": {
@@ -114,7 +117,10 @@
                 "message": "OpenGraphica متکی بر برخی از قابلیت های وب پایه است که در مرورگر شما وجود ندارد. لطفا مرورگر وب خود را به روز کنید یا به یک مدرن مانند Chrome، فایرفاکس، Safari یا Edge تبدیل کنید."
             }
         },
-        "updateRequired": {}
+        "updateRequired": {
+            "title": "به روز رسانی ضروری",
+            "message": "سردبیر سعی کرد یک فایل را که دیگر در دسترس نیست، تهیه کند. لطفا صفحه را برای ادامه باز کنید. حافظه مرورگر خود را روشن کنید اگر این پیام را مشاهده کنید. از گزینه “Restore Last Image” در منوی استفاده کنید تا به جایی که رفته اید ادامه دهید."
+        }
     },
     "brushCategory": {
         "simple": {
@@ -152,7 +158,10 @@
         "pickColor": "انتخاب رنگ",
         "delete": "حذف",
         "discardChanges": "تغییرات کارت",
-        "reverse": "معکوس"
+        "reverse": "معکوس",
+        "back": "بازگشت",
+        "editBrush": "Edit Brush",
+        "moreInfo": "اطلاعات بیشتر"
     },
     "canvas": {
         "toolbar": {
@@ -244,7 +253,10 @@
                     "renderer": {
                         "label": "Renderer",
                         "2d": "بوم 2D",
-                        "webgl": "WebGL"
+                        "webgl": "WebGL",
+                        "webgl2": "WebGL2",
+                        "webgl2Offscreen": "WebGL2 Offscreen",
+                        "wgpuWasm": "WebGPU + WASM"
                     },
                     "optimizeLargeImage": "بهینه سازی برای تصویر بزرگ",
                     "highQualityScaling": "High Quality Scaling",
@@ -263,7 +275,8 @@
                 },
                 "help": {
                     "groupTitle": "کمک به کمک",
-                    "reportIssue": "گزارش یک مسئله"
+                    "reportIssue": "گزارش یک مسئله",
+                    "designSystem": "سیستم طراحی سیستم"
                 }
             }
         }
@@ -490,10 +503,22 @@
             }
         },
         "chromaKey": {
-            "param": {}
+            "param": {
+                "eraseColor": "رنگ Erase Color",
+                "threshold": "Erase Threshold",
+                "softness": "Softness",
+                "spillSuppression": "دانلود بازی Spill Suppression",
+                "hueWeight": "وزن Hue",
+                "chromaWeight": "وزن Chroma",
+                "lightnessWeight": "وزن روشنایی"
+            },
+            "name": "Chroma Key"
         },
         "whiteBalance": {
-            "param": {}
+            "param": {
+                "white": "رنگ های خنثی"
+            },
+            "name": "تعادل سفید"
         }
     },
     "layerFilterGroup": {
@@ -687,7 +712,9 @@
         "inches": "Inches",
         "pixelsPerInch": "Pixels / Inch",
         "pixelsPerMillimeter": "Pixels/Millimeter",
-        "pixelsPerCentimeter": "Pixels / Centimeter"
+        "pixelsPerCentimeter": "Pixels / Centimeter",
+        "percent": "درصد",
+        "percentage": "درصد"
     },
     "menuBar": {
         "toolsHeading": "ابزار",
@@ -952,9 +979,14 @@
                 }
             }
         },
-        "designSystem": {},
+        "designSystem": {
+            "title": "سیستم طراحی سیستم"
+        },
         "fileOpenNotification": {
-            "maxTextureSizeLimited": {}
+            "maxTextureSizeLimited": {
+                "title": "Max Dimensions Encountered",
+                "message": "تصویری که باز کردید بزرگتر از حداکثر اندازه ای است که مرورگر شما از آن پشتیبانی می کند. پایین آمد."
+            }
         }
     },
     "moduleGroup": {
@@ -1029,7 +1061,10 @@
                 "copy": {
                     "name": "لایه های انتخاب شده کپی رایت",
                     "description": "لایه های انتخاب شده در حال حاضر را به تخته کپی کنید.",
-                    "noSelectedLayers": {}
+                    "noSelectedLayers": {
+                        "title": "هیچ لایه ای انتخاب نشده",
+                        "message": "لطفا حداقل یک لایه را برای کپی کردن انتخاب کنید."
+                    }
                 },
                 "copyAll": {
                     "name": "کپی تمام لایه ها",
@@ -1110,7 +1145,14 @@
             "resolutionUnits": "واحد های قطعنامه",
             "snapping": {
                 "title": "Snapping",
-                "enable": "قابلیت Snapping"
+                "enable": "قابلیت Snapping",
+                "currentCanvas": "دانلود بازی Current Canvas",
+                "cropArea": "منطقه Crop",
+                "snapToCenter": "Snap to Center",
+                "snapToEdges": "Snap to Edges",
+                "snapToContrast": "Snap برای کنتراست",
+                "snapAtCenter": "اسنپ در مرکز",
+                "snapAtEdges": "Snap at Edges"
             }
         },
         "draw": {
@@ -1125,7 +1167,13 @@
                 "current": "جریان فعلی"
             },
             "snapping": {
-                "title": "Snapping"
+                "title": "Snapping",
+                "enableSnapping": "قابلیت Snapping",
+                "rotationSnap": "تنظیمات",
+                "rotationSnapDegrees": "درجه",
+                "canvasEdges": "بوم Edges",
+                "layerEdges": "Layer Edges",
+                "layerCenter": "Layer Center"
             },
             "metrics": {
                 "title": "متریک ها",
@@ -1134,12 +1182,22 @@
                 "height": "ارتفاع بلندی ارتفاع",
                 "rotation": "تنظیمات",
                 "resetRotation": "Redirect",
-                "noLayers": "هیچ لایه ای انتخاب نشد."
+                "noLayers": "هیچ لایه ای انتخاب نشد.",
+                "alignLeft": "چپ",
+                "alignRight": "چراغ راست",
+                "alignCenter": "مرکز Align Center",
+                "alignTop": "رده بالا",
+                "alignBottom": "پایین",
+                "alignMiddle": "خاورمیانه",
+                "resetWidth": "Reset",
+                "resetHeight": "تنظیم ارتفاع"
             },
             "actions": {
                 "title": "اقدامات",
                 "applyTransform": "استفاده از Transform",
-                "trimEmptySpace": "فضای خالی"
+                "trimEmptySpace": "فضای خالی",
+                "stretchToImageSize": "کشش به اندازه بوم",
+                "expandToImageSize": "گسترش با فضای خالی"
             }
         },
         "general": {
@@ -1152,7 +1210,8 @@
                 "ellipse": "Ellipse",
                 "freePolygon": "دانلود رایگان Polygon",
                 "freePolygonShort": "Free Poly",
-                "tonalArea": "منطقه داخلی"
+                "tonalArea": "منطقه داخلی",
+                "lasso": "Lasso"
             },
             "selectionCombineMode": {
                 "label": "انتخاب Mode",
@@ -1161,7 +1220,10 @@
                 "intersect": "تداخل"
             },
             "notification": {
-                "unproductiveSelection": {}
+                "unproductiveSelection": {
+                    "title": "هیچ لایه ای انتخاب نشده",
+                    "message": "<p> شما یک ماسک انتخاب در بالای تصویر ایجاد کرده اید.</p><p> لطفا حداقل یک لایه تصویر را در لایه ها انتخاب کنید.</p>"
+                }
             }
         },
         "text": {
@@ -1175,10 +1237,29 @@
             "fillTooltip": "رنگی که در لبه های نامه (ها) نشان می دهد",
             "newTextLayerName": "متن جدید",
             "alignment": {
-                "boundaryOption": {},
-                "lineDirectionOption": {},
-                "wrapDirectionOption": {}
-            }
+                "boundaryOption": {
+                    "dynamic": "دینامیک",
+                    "box": "جعبه"
+                },
+                "lineDirectionOption": {
+                    "ltr": "چپ به راست",
+                    "rtl": "راست به چپ",
+                    "ttb": "بالا به پایین",
+                    "btt": "پایین به بالا"
+                },
+                "wrapDirectionOption": {
+                    "ltr": "چپ به راست",
+                    "rtl": "راست به چپ",
+                    "ttb": "بالا به پایین",
+                    "btt": "پایین به بالا"
+                },
+                "title": "بخشش",
+                "boundary": "Boundary",
+                "lineDirection": "Text Direction",
+                "wrapDirection": "بسته بندی"
+            },
+            "fillColor": "رنگ پر رنگ",
+            "paletteCount": "پالت شمارش"
         },
         "zoom": {
             "zoomOut": "برگرفته از:",
@@ -1192,15 +1273,60 @@
             "brushSize": "اندازه",
             "newBrushLayerName": "رنگ جدید",
             "brushDialog": {
-                "noBrushCategorySelected": {},
-                "noBrushesInCategory": {},
+                "noBrushCategorySelected": {
+                    "title": "رده شماره انتخاب شده",
+                    "message": "لطفا یک دسته قلم را انتخاب کنید."
+                },
+                "noBrushesInCategory": {
+                    "title": "No Brushes",
+                    "message": "این دسته هیچ برسی ندارد. برخی را بسازید!"
+                },
                 "editorTab": {
-                    "blending": {},
-                    "shape": {},
-                    "strokePath": {},
-                    "pressure": {}
-                }
-            }
+                    "blending": {
+                        "title": "Blending",
+                        "density": "چگالی",
+                        "densityDescription": "چگونه هر تمبر از قلم بر اساس فشار قلم شفاف خواهد بود. محدوده زمانی استفاده می شود که فشار قلم مختلف.",
+                        "pressureMinDensity": "مینیاتور",
+                        "pressureMaxDensity": "Max Max",
+                        "colorBlendingStrength": "ترکیب قدرت",
+                        "pressureMinColorBlendingStrength": "مینی قدرت",
+                        "pressureMaxColorBlendingStrength": "مکس قدرت",
+                        "colorBlendingStrengthDescription": "چقدر از رنگ زیر برس هنگام نقاشی برداشته می شود. محدوده زمانی استفاده می شود که فشار قلم مختلف.",
+                        "colorBlendingPersistence": "ترکیب رنگ با اصرار",
+                        "colorBlendingPersistenceDescription": "چه مدت رنگ برداشت شده بر روی قلم باقی می ماند در حالی که حرکت را می کشد.",
+                        "concentration": "تمرکز",
+                        "concentrationDescription": "مقادیر پایین تر شبیه سازی برس با آب و مقادیر بالا رنگ متمرکز کامل است. این تنظیم هیچ تاثیری در بالای رنگ های کاملا مبهم ندارد. محدوده زمانی استفاده می شود که فشار قلم مختلف.",
+                        "pressureMinConcentration": "مینی غلظت",
+                        "pressureMaxConcentration": "مکس تمرکز"
+                    },
+                    "shape": {
+                        "title": "شکل Shape",
+                        "hardness": "سختی Hard",
+                        "hardnessDescription": "مقادیر پایین لبه های نرم و مقادیر بالاتر لبه های تیز دارند.",
+                        "angle": "زاویه",
+                        "angleDescription": "شکل قلم را بچرخاند."
+                    },
+                    "strokePath": {
+                        "title": "راه هدایت",
+                        "spacing": "Spacing",
+                        "spacingDescription": "فاصله بین هر تمبر برس، نسبت به اندازه برس. با ارزش های بسیار پایین دقت کنید، زیرا می تواند عملکرد را بر روی اندازه های بزرگتر قلم مو ذخیره کند.",
+                        "jitter": "دانلود موسیقی متن فیلم Theitter",
+                        "jitterDescription": "به طور تصادفی موقعیت شکل قلم را تغییر می دهد."
+                    },
+                    "pressure": {
+                        "title": "فشار",
+                        "pressureTaper": "Taper",
+                        "pressureTaperDescription": "ارزش های بالاتر خطوط پوست را در فشار قلم پایین تر جذب می کنند. کنترل قلم با حساسیت ناپایدار در فشارهای پایین تر را آسان تر می کند.",
+                        "pressureMinSize": "حداقل اندازه",
+                        "pressureMinSizeDescription": "اندازه قلم در فشار قلم 0٪، نسبت به اندازه قلم در حال حاضر انتخاب شده است."
+                    }
+                },
+                "title": "گزینه Brush",
+                "close": "نزدیک Dialog"
+            },
+            "brushColor": "رنگ رنگی",
+            "paletteCount": "پالت شمارش",
+            "brushSmoothing": "صاف کردن"
         },
         "effect": {
             "edit": {
@@ -1212,8 +1338,13 @@
         "eraseBrush": {
             "brushSize": "اندازه",
             "notification": {
-                "noSelectedLayers": {}
-            }
+                "noSelectedLayers": {
+                    "title": "هیچ لایه ای انتخاب نشده",
+                    "message": "لطفا حداقل یک لایه تصویر را در لوله لایه انتخاب کنید. انواع لایه های خاص را نمی توان پاک کرد."
+                }
+            },
+            "brushOpacity": "Opacity",
+            "brushSmoothing": "صاف کردن"
         },
         "deformBlur": {
             "brushSize": "اندازه"
@@ -1252,8 +1383,14 @@
             }
         },
         "drawShape": {
-            "shapeType": {},
-            "style": {}
+            "shapeType": {
+                "label": "شکل Shape",
+                "rectangle": "درگیری",
+                "ellipse": "Ellipse"
+            },
+            "style": {
+                "label": "سبک Style"
+            }
         }
     },
     "toolGroup": {
@@ -1488,16 +1625,17 @@
         },
         "drawShapeToolIntroduction": {
             "introduction": [
-                null
+                "ابزار شکل به شما اجازه می دهد شکل های پایه مختلف را اضافه کنید، که می تواند در صورت نیاز به سفارشی سازی بیشتر به مسیر بردار تبدیل شود."
             ],
             "body": {
                 "mouse": [
-                    null
+                    "کلیک کنید و بکشید تا یک شکل را روی بوم قرار دهید."
                 ],
                 "touch": [
-                    null
+                    "از یک انگشت برای لمس و کشیدن برای قرار دادن یک شکل بر روی بوم استفاده کنید."
                 ]
-            }
+            },
+            "title": "ابزار Shape Tool"
         }
     },
     "gradientPreset": {
@@ -1540,34 +1678,74 @@
         "lightness": "نور",
         "luminance": "Luminance"
     },
-    "defaultBrush": {},
-    "defaultBrushCategory": {},
+    "defaultBrush": {
+        "default": "شکست",
+        "simpleAirBrush": "ساده Air Brush",
+        "simplePaintBrush": "Simple Paint Brush",
+        "simplePen": "ساده Pen",
+        "simpleWaterColor": "رنگ آب ساده"
+    },
+    "defaultBrushCategory": {
+        "custom": "سفارشی",
+        "simple": "ساده"
+    },
     "menuBarToolGroup": {
         "deform": {
-            "tools": {}
+            "tools": {
+                "blur": "مناطق خاص Blur از تصویر"
+            },
+            "name": "Deform"
         },
         "draw": {
-            "tools": {}
+            "tools": {
+                "brush": "طراحی با برس های هنری",
+                "gradient": "ایجاد گرادیان رنگ",
+                "shape": "ایجاد شکل های پایه"
+            },
+            "name": "Draw"
         },
         "effect": {
-            "tools": {}
+            "tools": {
+                "effect": "رنگ های لایه Manipulate و اضافه کردن اثرات فیلتر"
+            },
+            "name": "اثر"
         },
         "erase": {
-            "tools": {}
+            "tools": {
+                "brush": "مناطق Erase از تصویر با حرکت برس"
+            },
+            "name": "Erase"
         },
-        "layers": {},
+        "layers": {
+            "name": "لایه ها"
+        },
         "selection": {
-            "tools": {}
+            "tools": {
+                "selection": "انتخاب مناطق ipifc تصویر برای ویرایش، برش، کپی یا حذف"
+            },
+            "name": "انتخاب"
         },
-        "settings": {},
+        "settings": {
+            "name": "اقدامات"
+        },
         "text": {
-            "tools": {}
+            "tools": {
+                "text": "اضافه کردن و ویرایش لایه های متنی"
+            },
+            "name": "متن"
         },
         "transform": {
-            "tools": {}
+            "tools": {
+                "freeTransform": "حرکت، مقیاس، لایه های چرخش",
+                "layerCrop": "لایه انتخاب شده"
+            },
+            "name": "حرکت / Transform"
         },
         "view": {
-            "tools": {}
+            "tools": {
+                "zoom": "زوم در داخل و خارج، پان یا چرخش دیدگاه شما از تصویر"
+            },
+            "name": "معرفی بازی Canvas Viewport"
         }
     }
 }

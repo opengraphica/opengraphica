@@ -56,7 +56,10 @@
         "updateDrawGradientLayerStops": "अद्यतन ग्रेडिएंट (रंग स्टॉप)",
         "updateDeformBlurLayer": "ब्लूर लेयर",
         "updateLayerBlendingMode": "ब्लेंडिंग मोड बदलें",
-        "updateLayerFilterMask": "अद्यतन परत प्रभाव मास्क"
+        "updateLayerFilterMask": "अद्यतन परत प्रभाव मास्क",
+        "setLayerBoundsToWorkingFileBounds": "खाली स्थान के साथ विस्तार",
+        "stretchLayerToWorkingFileBounds": "कैनवास आकार में खिंचाव",
+        "updateTextLayerProperties": "पाठ परत गुण अद्यतन"
     },
     "app": {
         "colorPickerGradient": {
@@ -114,7 +117,10 @@
                 "message": "OpenGraphica कुछ बुनियादी वेब कार्यक्षमता पर निर्भर करता है जो आपके ब्राउज़र में मौजूद नहीं है। कृपया अपने वेब ब्राउज़र को अपडेट करें, या क्रोम, फ़ायरफ़ॉक्स, सफारी या एज जैसे आधुनिक एक पर स्विच करें।."
             }
         },
-        "updateRequired": {}
+        "updateRequired": {
+            "title": "अद्यतन आवश्यक",
+            "message": "संपादक ने एक फ़ाइल प्राप्त करने की कोशिश की जो अब उपलब्ध नहीं है। कृपया पृष्ठ को जारी रखने के लिए ताज़ा करें। यदि आप इस संदेश को देख रहे हैं तो अपने ब्राउज़र के कैश को साफ़ करें। मेनू में \"रीस्टोर लास्ट इमेज\" विकल्प का उपयोग जारी रखने के लिए जहां आपने छोड़ दिया था।."
+        }
     },
     "brushCategory": {
         "simple": {
@@ -152,7 +158,10 @@
         "pickColor": "रंग चुनें",
         "delete": "डिलीट",
         "discardChanges": "डिस्कर्ड परिवर्तन",
-        "reverse": "रिवर्स"
+        "reverse": "रिवर्स",
+        "back": "वापस",
+        "editBrush": "ब्रश संपादित करें",
+        "moreInfo": "अधिक जानकारी"
     },
     "canvas": {
         "toolbar": {
@@ -244,7 +253,10 @@
                     "renderer": {
                         "label": "रेंडर",
                         "2d": "कैनवास 2D",
-                        "webgl": "वेब"
+                        "webgl": "वेब",
+                        "webgl2": "WebGL2",
+                        "webgl2Offscreen": "WebGL2 Offscreen",
+                        "wgpuWasm": "WebGPU + WASM"
                     },
                     "optimizeLargeImage": "बड़ी छवि के लिए ऑप्टिमाइज़",
                     "highQualityScaling": "उच्च गुणवत्ता Scaling",
@@ -263,7 +275,8 @@
                 },
                 "help": {
                     "groupTitle": "सहायता",
-                    "reportIssue": "एक मुद्दे की रिपोर्ट करें"
+                    "reportIssue": "एक मुद्दे की रिपोर्ट करें",
+                    "designSystem": "डिजाइन प्रणाली"
                 }
             }
         }
@@ -490,10 +503,22 @@
             }
         },
         "chromaKey": {
-            "param": {}
+            "param": {
+                "eraseColor": "रंग",
+                "threshold": "एरेस थ्रेसहोल्ड",
+                "softness": "कोमलता",
+                "spillSuppression": "स्पिल दमन",
+                "hueWeight": "वजन",
+                "chromaWeight": "Chroma वजन",
+                "lightnessWeight": "हल्के वजन"
+            },
+            "name": "क्रोमा कुंजी"
         },
         "whiteBalance": {
-            "param": {}
+            "param": {
+                "white": "तटस्थ रंग"
+            },
+            "name": "श्वेत संतुलन"
         }
     },
     "layerFilterGroup": {
@@ -687,7 +712,9 @@
         "inches": "इंच",
         "pixelsPerInch": "पिक्सेल / इंच",
         "pixelsPerMillimeter": "पिक्सेल / मिलीमीटर",
-        "pixelsPerCentimeter": "पिक्सेल / सेन्टमीटर"
+        "pixelsPerCentimeter": "पिक्सेल / सेन्टमीटर",
+        "percent": "प्रतिशत",
+        "percentage": "प्रतिशतता"
     },
     "menuBar": {
         "toolsHeading": "उपकरण",
@@ -954,9 +981,14 @@
                 }
             }
         },
-        "designSystem": {},
+        "designSystem": {
+            "title": "डिजाइन प्रणाली"
+        },
         "fileOpenNotification": {
-            "maxTextureSizeLimited": {}
+            "maxTextureSizeLimited": {
+                "title": "मैक्स आयाम Encountered",
+                "message": "आपके द्वारा खोली गई एक छवि अधिकतम आकार आपके ब्राउज़र समर्थन से अधिक है। यह नीचे बढ़ाया गया था।."
+            }
         }
     },
     "moduleGroup": {
@@ -1031,7 +1063,10 @@
                 "copy": {
                     "name": "चयनित परतों की प्रतिलिपि",
                     "description": "वर्तमान में चयनित परतों को क्लिपबोर्ड पर कॉपी करें।.",
-                    "noSelectedLayers": {}
+                    "noSelectedLayers": {
+                        "title": "चयनित कोई परतें नहीं",
+                        "message": "कृपया कॉपी करने के लिए कम से कम एक परत का चयन करें।."
+                    }
                 },
                 "copyAll": {
                     "name": "सभी परतों की प्रतिलिपि बनाएँ",
@@ -1112,7 +1147,14 @@
             "resolutionUnits": "संकल्प इकाई",
             "snapping": {
                 "title": "स्नैप करना",
-                "enable": "स्नैपिंग सक्षम करें"
+                "enable": "स्नैपिंग सक्षम करें",
+                "currentCanvas": "वर्तमान कैनवास",
+                "cropArea": "फसल क्षेत्र",
+                "snapToCenter": "स्नैप टू सेंटर",
+                "snapToEdges": "स्नैप टू एज",
+                "snapToContrast": "स्नैप टू कंट्रास्ट",
+                "snapAtCenter": "केंद्र पर स्नैप",
+                "snapAtEdges": "एज पर स्नैप"
             }
         },
         "draw": {
@@ -1127,7 +1169,13 @@
                 "current": "वर्तमान"
             },
             "snapping": {
-                "title": "स्नैप करना"
+                "title": "स्नैप करना",
+                "enableSnapping": "स्नैपिंग सक्षम करें",
+                "rotationSnap": "रोटेशन",
+                "rotationSnapDegrees": "डिग्री",
+                "canvasEdges": "कैनवास एज",
+                "layerEdges": "लेयर एज",
+                "layerCenter": "लेयर सेंटर"
             },
             "metrics": {
                 "title": "मीट्रिक",
@@ -1136,12 +1184,23 @@
                 "height": "ऊंचाई",
                 "rotation": "रोटेशन",
                 "resetRotation": "रोटेशन रीसेट करें",
-                "noLayers": "चयनित कोई परत नहीं।."
+                "noLayers": "चयनित कोई परत नहीं।.",
+                "alignLeft": "बाएं",
+                "alignRight": "Alight right",
+                "alignCenter": "संरेखित केंद्र",
+                "alignTop": "शीर्ष",
+                "alignBottom": "नीचे",
+                "alignMiddle": "मध्य",
+                "resetPosition": "{dimension} स्थिति",
+                "resetWidth": "चौड़ाई रीसेट करें",
+                "resetHeight": "ऊंचाई रीसेट करें"
             },
             "actions": {
                 "title": "कार्य",
                 "applyTransform": "बदलना",
-                "trimEmptySpace": "ट्रिम खाली स्पेस"
+                "trimEmptySpace": "ट्रिम खाली स्पेस",
+                "stretchToImageSize": "कैनवास आकार के लिए खिंचाव",
+                "expandToImageSize": "खाली स्थान के साथ विस्तार"
             }
         },
         "general": {
@@ -1154,7 +1213,8 @@
                 "ellipse": "Ellipse",
                 "freePolygon": "फ्री बहुभुज",
                 "freePolygonShort": "फ्री पाली",
-                "tonalArea": "टोनल एरिया"
+                "tonalArea": "टोनल एरिया",
+                "lasso": "लासो"
             },
             "selectionCombineMode": {
                 "label": "चयन संयोजन मोड",
@@ -1163,7 +1223,10 @@
                 "intersect": "अंतर"
             },
             "notification": {
-                "unproductiveSelection": {}
+                "unproductiveSelection": {
+                    "title": "चयनित कोई परतें नहीं",
+                    "message": "<p> आपने छवि के शीर्ष पर एक चयन मुखौटा बनाया है।</p><p> कृपया परतों डॉक में कम से कम एक छवि परत चुनें।</p>"
+                }
             }
         },
         "text": {
@@ -1177,10 +1240,29 @@
             "fillTooltip": "रंग जो अक्षरों के किनारों के अंदर दिखाता है",
             "newTextLayerName": "नया पाठ",
             "alignment": {
-                "boundaryOption": {},
-                "lineDirectionOption": {},
-                "wrapDirectionOption": {}
-            }
+                "boundaryOption": {
+                    "dynamic": "गतिशील",
+                    "box": "बॉक्स"
+                },
+                "lineDirectionOption": {
+                    "ltr": "बाएं से दाएं",
+                    "rtl": "दाएं से बाएं",
+                    "ttb": "टॉप-टू-बॉटम",
+                    "btt": "नीचे से शीर्ष"
+                },
+                "wrapDirectionOption": {
+                    "ltr": "बाएं से दाएं",
+                    "rtl": "दाएं से बाएं",
+                    "ttb": "टॉप-टू-बॉटम",
+                    "btt": "नीचे से शीर्ष"
+                },
+                "title": "संरेखण",
+                "boundary": "सीमा",
+                "lineDirection": "पाठ निर्देश",
+                "wrapDirection": "लपेटें"
+            },
+            "fillColor": "रंग भरें",
+            "paletteCount": "पैलेट गणना"
         },
         "zoom": {
             "zoomOut": "ज़ूम आउट",
@@ -1194,15 +1276,60 @@
             "brushSize": "आकार",
             "newBrushLayerName": "नई पेंट",
             "brushDialog": {
-                "noBrushCategorySelected": {},
-                "noBrushesInCategory": {},
+                "noBrushCategorySelected": {
+                    "title": "कोई श्रेणी चयनित नहीं",
+                    "message": "कृपया ब्रश श्रेणी का चयन करें।."
+                },
+                "noBrushesInCategory": {
+                    "title": "ब्रश नहीं",
+                    "message": "इस श्रेणी में कोई ब्रश नहीं है। कुछ बनाएँ!"
+                },
                 "editorTab": {
-                    "blending": {},
-                    "shape": {},
-                    "strokePath": {},
-                    "pressure": {}
-                }
-            }
+                    "blending": {
+                        "title": "मिश्रण",
+                        "density": "घनत्व",
+                        "densityDescription": "पेन के दबाव के आधार पर ब्रश के प्रत्येक टिकट को पारदर्शी कैसे किया जाएगा। रेंज का उपयोग पेन दबाव में भिन्न होने पर किया जाता है।.",
+                        "pressureMinDensity": "न्यूनतम घनत्व",
+                        "pressureMaxDensity": "अधिकतम घनत्व",
+                        "colorBlendingStrength": "रंग मिश्रण शक्ति",
+                        "pressureMinColorBlendingStrength": "न्यूनतम शक्ति",
+                        "pressureMaxColorBlendingStrength": "अधिकतम शक्ति",
+                        "colorBlendingStrengthDescription": "ब्रश के नीचे का कितना रंग ड्राइंग के दौरान उठाया जाएगा। रेंज का उपयोग पेन दबाव में भिन्न होने पर किया जाता है।.",
+                        "colorBlendingPersistence": "रंग सम्मिश्रण स्थायित्व",
+                        "colorBlendingPersistenceDescription": "जब तक स्ट्रोक को खींचते समय पिक अप रंग ब्रश पर रहता है।.",
+                        "concentration": "एकाग्रता",
+                        "concentrationDescription": "कम मान पानी के साथ ब्रश कमजोर पड़ने का अनुकरण करते हैं, और उच्च मूल्य पूर्ण केंद्रित रंग। यह सेटिंग पूरी तरह से अपारदर्शी रंगों के शीर्ष पर ड्राइंग जब कोई प्रभाव पड़ता है। रेंज का उपयोग पेन दबाव में भिन्न होने पर किया जाता है।.",
+                        "pressureMinConcentration": "न्यूनतम एकाग्रता",
+                        "pressureMaxConcentration": "अधिकतम एकाग्रता"
+                    },
+                    "shape": {
+                        "title": "आकार",
+                        "hardness": "कठोरता",
+                        "hardnessDescription": "निचले मूल्यों में नरम फीका किनारों और उच्च मूल्यों वाले तेज किनारों होंगे।.",
+                        "angle": "कोण",
+                        "angleDescription": "ब्रश आकार को घुमाएं।."
+                    },
+                    "strokePath": {
+                        "title": "स्ट्रोक पथ",
+                        "spacing": "रिक्ति",
+                        "spacingDescription": "ब्रश के प्रत्येक टिकट के बीच की दूरी ब्रश के आकार के सापेक्ष होती है। बेहद कम मानों से सावधान रहें, क्योंकि यह बड़े ब्रश आकार पर टैंक प्रदर्शन कर सकता है।.",
+                        "jitter": "जेटर",
+                        "jitterDescription": "यादृच्छिक रूप से ब्रश आकार की स्थिति को बदल देता है।."
+                    },
+                    "pressure": {
+                        "title": "दबाव",
+                        "pressureTaper": "पतला",
+                        "pressureTaperDescription": "उच्च मूल्य कम पेन दबाव पर स्किनी लाइनों को आकर्षित करेगा। कम दबाव में अस्थिर संवेदनशीलता के साथ पेन को नियंत्रित करना आसान बनाता है।.",
+                        "pressureMinSize": "न्यूनतम आकार",
+                        "pressureMinSizeDescription": "ब्रश का आकार 0% पेन दबाव पर, वर्तमान में चयनित ब्रश आकार के सापेक्ष।."
+                    }
+                },
+                "title": "ब्रश चुनें",
+                "close": "क्लोज़ अप"
+            },
+            "brushColor": "रंग",
+            "paletteCount": "पैलेट गणना",
+            "brushSmoothing": "चिकनाई"
         },
         "effect": {
             "edit": {
@@ -1214,8 +1341,13 @@
         "eraseBrush": {
             "brushSize": "आकार",
             "notification": {
-                "noSelectedLayers": {}
-            }
+                "noSelectedLayers": {
+                    "title": "चयनित कोई परतें नहीं",
+                    "message": "कृपया परतों डॉक में कम से कम एक छवि परत का चयन करें। कुछ परत प्रकारों को मिटा नहीं जा सकता है।."
+                }
+            },
+            "brushOpacity": "Opacity",
+            "brushSmoothing": "चिकनाई"
         },
         "deformBlur": {
             "brushSize": "आकार"
@@ -1254,8 +1386,14 @@
             }
         },
         "drawShape": {
-            "shapeType": {},
-            "style": {}
+            "shapeType": {
+                "label": "आकार",
+                "rectangle": "आयत",
+                "ellipse": "Ellipse"
+            },
+            "style": {
+                "label": "शैली"
+            }
         }
     },
     "toolGroup": {
@@ -1490,16 +1628,17 @@
         },
         "drawShapeToolIntroduction": {
             "introduction": [
-                null
+                "आकृति उपकरण आपको विभिन्न बुनियादी आकृतियों को जोड़ने देता है, जिसे अधिक अनुकूलन की आवश्यकता होने पर वेक्टर पथ में परिवर्तित किया जा सकता है।."
             ],
             "body": {
                 "mouse": [
-                    null
+                    "क्लिक करें और कैनवास पर एक आकार रखने के लिए खींचें।."
                 ],
                 "touch": [
-                    null
+                    "एक उंगली को छूने और कैनवास पर एक आकार रखने के लिए खींचें।."
                 ]
-            }
+            },
+            "title": "आकार उपकरण"
         }
     },
     "gradientPreset": {
@@ -1542,34 +1681,74 @@
         "lightness": "प्रकाश",
         "luminance": "चमक"
     },
-    "defaultBrush": {},
-    "defaultBrushCategory": {},
+    "defaultBrush": {
+        "default": "डिफ़ॉल्ट",
+        "simpleAirBrush": "सरल एयर ब्रश",
+        "simplePaintBrush": "सरल पेंट ब्रश",
+        "simplePen": "सरल पेन",
+        "simpleWaterColor": "सरल जल रंग"
+    },
+    "defaultBrushCategory": {
+        "custom": "कस्टम",
+        "simple": "सरल"
+    },
     "menuBarToolGroup": {
         "deform": {
-            "tools": {}
+            "tools": {
+                "blur": "छवि के ब्लूर विशिष्ट क्षेत्र"
+            },
+            "name": "विकृत"
         },
         "draw": {
-            "tools": {}
+            "tools": {
+                "brush": "कला ब्रश के साथ ड्रॉ",
+                "gradient": "रंग की ढाल बनाएँ",
+                "shape": "मूल आकार बनाएं"
+            },
+            "name": "ड्रा"
         },
         "effect": {
-            "tools": {}
+            "tools": {
+                "effect": "परत रंग हेरफेर और फिल्टर प्रभाव जोड़ने"
+            },
+            "name": "प्रभाव"
         },
         "erase": {
-            "tools": {}
+            "tools": {
+                "brush": "ब्रश स्ट्रोक के साथ छवि के क्षेत्र"
+            },
+            "name": "एरेस"
         },
-        "layers": {},
+        "layers": {
+            "name": "परत"
+        },
         "selection": {
-            "tools": {}
+            "tools": {
+                "selection": "संपादित करने, काटने, प्रतिलिपि करने या हटाने के लिए छवि के specifc क्षेत्रों का चयन करें"
+            },
+            "name": "चयन"
         },
-        "settings": {},
+        "settings": {
+            "name": "कार्य"
+        },
         "text": {
-            "tools": {}
+            "tools": {
+                "text": "पाठ परतों को सम्मिलित और संपादित करें"
+            },
+            "name": "पाठ"
         },
         "transform": {
-            "tools": {}
+            "tools": {
+                "freeTransform": "ले जाएँ, पैमाने, बारी बारी बारी परतें",
+                "layerCrop": "चयनित परत फसल"
+            },
+            "name": "मूव / ट्रांसफॉर्म"
         },
         "view": {
-            "tools": {}
+            "tools": {
+                "zoom": "ज़ूम इन और आउट, पैन, या छवि के अपने दृश्य को घुमाएं"
+            },
+            "name": "कैनवास Viewport"
         }
     }
 }

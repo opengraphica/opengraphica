@@ -56,7 +56,10 @@
         "updateDrawGradientLayerStops": "Обновление Gradient (Color Stops)",
         "updateDeformBlurLayer": "Голубой слой",
         "updateLayerBlendingMode": "Изменить режим сгибания",
-        "updateLayerFilterMask": "Обновление маски эффекта слоя"
+        "updateLayerFilterMask": "Обновление маски эффекта слоя",
+        "setLayerBoundsToWorkingFileBounds": "Расширение пустого пространства",
+        "stretchLayerToWorkingFileBounds": "Размеры Canvas Size",
+        "updateTextLayerProperties": "Обновление свойств текстового уровня"
     },
     "app": {
         "colorPickerGradient": {
@@ -114,7 +117,10 @@
                 "message": "OpenGraphica опирается на некоторые основные веб-функции, которых нет в вашем браузере. Пожалуйста, обновите свой веб-браузер или переключитесь на современный, такой как Chrome, Firefox, Safari или Edge."
             }
         },
-        "updateRequired": {}
+        "updateRequired": {
+            "title": "Требуется обновление",
+            "message": "Редактор попытался получить файл, который больше не доступен. Пожалуйста, обновите страницу, чтобы продолжить. Очистите кэш вашего браузера, если вы продолжаете видеть это сообщение. Используйте опцию «Восстановить последнее изображение» в меню, чтобы продолжить там, где вы остановились."
+        }
     },
     "brushCategory": {
         "simple": {
@@ -152,7 +158,10 @@
         "pickColor": "Выберите цвет",
         "delete": "Исключить",
         "discardChanges": "Откажитесь от изменений",
-        "reverse": "Обратный"
+        "reverse": "Обратный",
+        "back": "Назад",
+        "editBrush": "Редактировать Brush",
+        "moreInfo": "Больше информации"
     },
     "canvas": {
         "toolbar": {
@@ -244,7 +253,10 @@
                     "renderer": {
                         "label": "Рендер",
                         "2d": "Canvas 2D",
-                        "webgl": "WebGL"
+                        "webgl": "WebGL",
+                        "webgl2": "WebGL2",
+                        "webgl2Offscreen": "WebGL2 Offscreen",
+                        "wgpuWasm": "WebGPU + WASM"
                     },
                     "optimizeLargeImage": "Оптимизация для большого изображения",
                     "highQualityScaling": "Высокое качество масштабирования",
@@ -263,7 +275,8 @@
                 },
                 "help": {
                     "groupTitle": "Помощь",
-                    "reportIssue": "Сообщить о проблеме"
+                    "reportIssue": "Сообщить о проблеме",
+                    "designSystem": "Система проектирования"
                 }
             }
         }
@@ -490,10 +503,22 @@
             }
         },
         "chromaKey": {
-            "param": {}
+            "param": {
+                "eraseColor": "Стирать цвет",
+                "threshold": "Стирать порог",
+                "softness": "Мягкость",
+                "spillSuppression": "Подавление Spill",
+                "hueWeight": "Хуэ вес",
+                "chromaWeight": "Хрома вес",
+                "lightnessWeight": "Легкость вес"
+            },
+            "name": "Ключ хрома"
         },
         "whiteBalance": {
-            "param": {}
+            "param": {
+                "white": "Нейтральный цвет"
+            },
+            "name": "Баланс белого"
         }
     },
     "layerFilterGroup": {
@@ -687,7 +712,9 @@
         "inches": "Дюймы",
         "pixelsPerInch": "Pixels/Inch",
         "pixelsPerMillimeter": "Пиксели / Миллиметр",
-        "pixelsPerCentimeter": "Пиксели / Сентиметр"
+        "pixelsPerCentimeter": "Пиксели / Сентиметр",
+        "percent": "%",
+        "percentage": "Доля"
     },
     "menuBar": {
         "toolsHeading": "Инструменты",
@@ -954,9 +981,14 @@
                 }
             }
         },
-        "designSystem": {},
+        "designSystem": {
+            "title": "Система проектирования"
+        },
         "fileOpenNotification": {
-            "maxTextureSizeLimited": {}
+            "maxTextureSizeLimited": {
+                "title": "Max Dimensions скачать",
+                "message": "Открытое вами изображение больше, чем максимальный размер, поддерживаемый вашим браузером. Он был уменьшен."
+            }
         }
     },
     "moduleGroup": {
@@ -1031,7 +1063,10 @@
                 "copy": {
                     "name": "Копия выбранных слоев",
                     "description": "Копируйте выбранные в настоящее время слои в буфер обмена.",
-                    "noSelectedLayers": {}
+                    "noSelectedLayers": {
+                        "title": "Нет выбранных слоев",
+                        "message": "Пожалуйста, выберите хотя бы один слой для копирования."
+                    }
                 },
                 "copyAll": {
                     "name": "Копировать все слои",
@@ -1112,7 +1147,14 @@
             "resolutionUnits": "Единицы решения",
             "snapping": {
                 "title": "Похищение",
-                "enable": "Включить Snapping"
+                "enable": "Включить Snapping",
+                "currentCanvas": "Текущий холст",
+                "cropArea": "Сельскохозяйственная зона",
+                "snapToCenter": "Snap в Центр",
+                "snapToEdges": "Скриншоты к Edges",
+                "snapToContrast": "Snap для контраста",
+                "snapAtCenter": "Snap в центре",
+                "snapAtEdges": "Снэп в Эджес"
             }
         },
         "draw": {
@@ -1127,7 +1169,13 @@
                 "current": "Текущий"
             },
             "snapping": {
-                "title": "Похищение"
+                "title": "Похищение",
+                "enableSnapping": "Включить Snapping",
+                "rotationSnap": "Вращение",
+                "rotationSnapDegrees": "Степени",
+                "canvasEdges": "Канвасовые выступы",
+                "layerEdges": "Слоистые выступы",
+                "layerCenter": "Слойный центр"
             },
             "metrics": {
                 "title": "Метрики",
@@ -1136,12 +1184,23 @@
                 "height": "Высота",
                 "rotation": "Вращение",
                 "resetRotation": "Вращение сброса",
-                "noLayers": "Выбранный(ые) слой(ы)."
+                "noLayers": "Выбранный(ые) слой(ы).",
+                "alignLeft": "Левый поворот",
+                "alignRight": "Правильное освещение",
+                "alignCenter": "Центр выравнивания",
+                "alignTop": "Выравнивать верх",
+                "alignBottom": "Выровнять дно",
+                "alignMiddle": "Выравнивать середину",
+                "resetPosition": "Сброс {dimension} Позиция",
+                "resetWidth": "Перезагрузить Width",
+                "resetHeight": "Сброс высоты"
             },
             "actions": {
                 "title": "Меры",
                 "applyTransform": "Apply Трансформация",
-                "trimEmptySpace": "Пустое пустое пространство"
+                "trimEmptySpace": "Пустое пустое пространство",
+                "stretchToImageSize": "Растяжка до размера холста",
+                "expandToImageSize": "Расширение пустого пространства"
             }
         },
         "general": {
@@ -1154,7 +1213,8 @@
                 "ellipse": "Эллипс",
                 "freePolygon": "Бесплатный полигон",
                 "freePolygonShort": "Свободный поли",
-                "tonalArea": "Тональная область"
+                "tonalArea": "Тональная область",
+                "lasso": "Лассо"
             },
             "selectionCombineMode": {
                 "label": "Выбор комбинированного режима",
@@ -1163,7 +1223,10 @@
                 "intersect": "Пересекаться"
             },
             "notification": {
-                "unproductiveSelection": {}
+                "unproductiveSelection": {
+                    "title": "Нет выбранных слоев",
+                    "message": "<p> Вы создали маску выбора поверх изображения.</p><p> Пожалуйста, выберите хотя бы один слой изображения в доке слоев.</p>"
+                }
             }
         },
         "text": {
@@ -1177,10 +1240,29 @@
             "fillTooltip": "Цвет, который отображается внутри краев буквы ( букв)",
             "newTextLayerName": "Новый текст",
             "alignment": {
-                "boundaryOption": {},
-                "lineDirectionOption": {},
-                "wrapDirectionOption": {}
-            }
+                "boundaryOption": {
+                    "dynamic": "Динамический",
+                    "box": "Коробка"
+                },
+                "lineDirectionOption": {
+                    "ltr": "Слева направо",
+                    "rtl": "Справа налево",
+                    "ttb": "Сверху-вниз",
+                    "btt": "Снизу вверх"
+                },
+                "wrapDirectionOption": {
+                    "ltr": "Слева направо",
+                    "rtl": "Справа налево",
+                    "ttb": "Сверху-вниз",
+                    "btt": "Снизу вверх"
+                },
+                "title": "Выравнивание",
+                "boundary": "Граница",
+                "lineDirection": "Направление текста",
+                "wrapDirection": "Завернуть"
+            },
+            "fillColor": "Наполнить цвет",
+            "paletteCount": "Палетт Граф"
         },
         "zoom": {
             "zoomOut": "Издательство: Zoom Out",
@@ -1194,15 +1276,60 @@
             "brushSize": "Размер",
             "newBrushLayerName": "Новая краска",
             "brushDialog": {
-                "noBrushCategorySelected": {},
-                "noBrushesInCategory": {},
+                "noBrushCategorySelected": {
+                    "title": "Категория не выбрана",
+                    "message": "Пожалуйста, выберите категорию кисти."
+                },
+                "noBrushesInCategory": {
+                    "title": "Никаких брусков",
+                    "message": "У этой категории нет кистей. Создайте некоторые!"
+                },
                 "editorTab": {
-                    "blending": {},
-                    "shape": {},
-                    "strokePath": {},
-                    "pressure": {}
-                }
-            }
+                    "blending": {
+                        "title": "Смешивание",
+                        "density": "Плотность",
+                        "densityDescription": "Насколько прозрачной будет каждая штамп кисти, исходя из давления пера. Диапазон используется при изменении давления ручки.",
+                        "pressureMinDensity": "Мин-плотность",
+                        "pressureMaxDensity": "Макс Плотность",
+                        "colorBlendingStrength": "Сила цветового смещения",
+                        "pressureMinColorBlendingStrength": "Мин Сила",
+                        "pressureMaxColorBlendingStrength": "Макс Сила",
+                        "colorBlendingStrengthDescription": "Сколько цвета под кистью будет подхвачено во время рисования. Диапазон используется при изменении давления ручки.",
+                        "colorBlendingPersistence": "Цветовая стойкость",
+                        "colorBlendingPersistenceDescription": "Как долго поднятый цвет остается на кисти при перетаскивании удара.",
+                        "concentration": "Концентрация",
+                        "concentrationDescription": "Более низкие значения имитируют разбавление щетки водой, а высокие значения полностью концентрированного цвета. Эта настройка не имеет никакого эффекта при рисовании поверх полностью непрозрачных цветов. Диапазон используется при изменении давления ручки.",
+                        "pressureMinConcentration": "Мин концентрация",
+                        "pressureMaxConcentration": "Максовская концентрация"
+                    },
+                    "shape": {
+                        "title": "Форма",
+                        "hardness": "Твердость",
+                        "hardnessDescription": "Более низкие значения будут иметь мягкие выцветшие края и более высокие значения острых краев.",
+                        "angle": "Угол",
+                        "angleDescription": "Вращает форму кисти."
+                    },
+                    "strokePath": {
+                        "title": "Инсультный путь",
+                        "spacing": "Пространство",
+                        "spacingDescription": "Расстояние между каждым штампом кисти относительно размера кисти. Будьте осторожны с чрезвычайно низкими значениями, так как он может работать на больших размерах щетки.",
+                        "jitter": "Джиттер",
+                        "jitterDescription": "Случайно смещается положение щетки формы."
+                    },
+                    "pressure": {
+                        "title": "Давление",
+                        "pressureTaper": "Тапочка",
+                        "pressureTaperDescription": "Более высокие значения будут рисовать более тонкие линии при более низком давлении пера. Упрощает управление ручками с нестабильной чувствительностью при более низких давлениях.",
+                        "pressureMinSize": "Минимальный размер",
+                        "pressureMinSizeDescription": "Размер кисти при давлении пера 0% относительно выбранного в настоящее время размера кисти."
+                    }
+                },
+                "title": "Выберите Brush",
+                "close": "Близкий диалог"
+            },
+            "brushColor": "Цвет",
+            "paletteCount": "Палетт Граф",
+            "brushSmoothing": "Гладкий"
         },
         "effect": {
             "edit": {
@@ -1214,8 +1341,13 @@
         "eraseBrush": {
             "brushSize": "Размер",
             "notification": {
-                "noSelectedLayers": {}
-            }
+                "noSelectedLayers": {
+                    "title": "Нет выбранных слоев",
+                    "message": "Пожалуйста, выберите хотя бы один слой изображения в доке слоев. Некоторые типы слоев не могут быть стерты."
+                }
+            },
+            "brushOpacity": "Открытость",
+            "brushSmoothing": "Гладкий"
         },
         "deformBlur": {
             "brushSize": "Размер"
@@ -1254,8 +1386,14 @@
             }
         },
         "drawShape": {
-            "shapeType": {},
-            "style": {}
+            "shapeType": {
+                "label": "Форма",
+                "rectangle": "Прямоугольник",
+                "ellipse": "Эллипс"
+            },
+            "style": {
+                "label": "Стиль"
+            }
         }
     },
     "toolGroup": {
@@ -1490,16 +1628,17 @@
         },
         "drawShapeToolIntroduction": {
             "introduction": [
-                null
+                "Инструмент формы позволяет добавлять различные основные формы, которые могут быть преобразованы в векторные пути, если требуется дополнительная настройка."
             ],
             "body": {
                 "mouse": [
-                    null
+                    "Нажмите и перетащите, чтобы поместить форму на холст."
                 ],
                 "touch": [
-                    null
+                    "Используйте один палец, чтобы коснуться и перетащить, чтобы поместить форму на холст."
                 ]
-            }
+            },
+            "title": "Инструмент формы"
         }
     },
     "gradientPreset": {
@@ -1542,34 +1681,74 @@
         "lightness": "Легкость",
         "luminance": "Яркость"
     },
-    "defaultBrush": {},
-    "defaultBrushCategory": {},
+    "defaultBrush": {
+        "default": "По умолчанию",
+        "simpleAirBrush": "Простая воздушная кисть",
+        "simplePaintBrush": "Простая краска кисть",
+        "simplePen": "Простая ручка",
+        "simpleWaterColor": "Простой цвет воды"
+    },
+    "defaultBrushCategory": {
+        "custom": "Обычай",
+        "simple": "Простой"
+    },
     "menuBarToolGroup": {
         "deform": {
-            "tools": {}
+            "tools": {
+                "blur": "Размыть определенные области изображения"
+            },
+            "name": "Деформация"
         },
         "draw": {
-            "tools": {}
+            "tools": {
+                "brush": "Рисуем художественными кистями",
+                "gradient": "Создание градиентов цвета",
+                "shape": "Создание базовых форм"
+            },
+            "name": "Рисовать"
         },
         "effect": {
-            "tools": {}
+            "tools": {
+                "effect": "Манипулируйте цветами слоев и добавляйте эффекты фильтра"
+            },
+            "name": "Эффект"
         },
         "erase": {
-            "tools": {}
+            "tools": {
+                "brush": "Стирать участки изображения мазками кисти"
+            },
+            "name": "Стирать"
         },
-        "layers": {},
+        "layers": {
+            "name": "Слои"
+        },
         "selection": {
-            "tools": {}
+            "tools": {
+                "selection": "Выберите конкретные области изображения для редактирования, вырезания, копирования или удаления"
+            },
+            "name": "Выбор"
         },
-        "settings": {},
+        "settings": {
+            "name": "Меры"
+        },
         "text": {
-            "tools": {}
+            "tools": {
+                "text": "Вставить и отредактировать текстовые слои"
+            },
+            "name": "Текст"
         },
         "transform": {
-            "tools": {}
+            "tools": {
+                "freeTransform": "Двигайтесь, масштабируйте, вращайте слои",
+                "layerCrop": "Вырезать выбранный слой"
+            },
+            "name": "Трансформация / Transform"
         },
         "view": {
-            "tools": {}
+            "tools": {
+                "zoom": "Зум внутри и снаружи, панорамирование или поворот изображения"
+            },
+            "name": "Canvas Viewport"
         }
     }
 }
