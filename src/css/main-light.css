@@ -9905,7 +9905,7 @@ body.og-full-page .opengraphica {
   position: relative;
   background-color: var(--og-layout-menu-bar-background-color);
   background-image: linear-gradient(var(--og-layer-list-background-color-active), var(--og-layer-list-background-color-active));
-  box-shadow: 0.1875rem 0 0 var(--og-layer-list-thumbnail-border-color-active) inset;
+  box-shadow: 0.375rem 0 0 var(--og-layer-list-thumbnail-border-color-active) inset;
 }
 .opengraphica .og-layer-list .og-layer.is-dnd-hover,
 .opengraphica .og-layer-list .og-layer .og-layer.is-dnd-hover {

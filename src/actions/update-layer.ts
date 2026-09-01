@@ -13,7 +13,7 @@ import {
 } from '@/store/image';
 import { reserveStoredSvg, unreserveStoredSvg } from '@/store/svg';
 import { reserveStoredVideo, unreserveStoredVideo } from '@/store/video';
-import workingFileStore, { getLayerById, regenerateLayerThumbnail, getCanvasRenderingContext2DSettings, visibleLayerIds } from '@/store/working-file';
+import workingFileStore, { calculateLayerOrder, getLayerById, regenerateLayerThumbnail, getCanvasRenderingContext2DSettings, visibleLayerIds } from '@/store/working-file';
 import { updateWorkingFileLayer } from '@/store/data/working-file-database';
 
 import type {
@@ -212,6 +212,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
 
         if (hasChangedLayerType) {
             appEmitter.emit('app.workingFile.layerAttached', layer);
+            calculateLayerOrder();
         }
 
         appEmitter.emit('app.workingFile.layerUpdated', layer);
