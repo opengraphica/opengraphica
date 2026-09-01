@@ -1488,7 +1488,7 @@
         }
     },
     "tutorialTip": {
-        "drawToolIntroduction": {
+        "drawBrushToolIntroduction": {
             "title": "绘制工具",
             "introduction": [
                 "绘图工具允许您创建行和形状."

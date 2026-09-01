@@ -19,6 +19,8 @@ import { UpdateLayerAction } from '@/actions/update-layer';
 
 import { transferRendererTilesToRasterLayerUpdates, useRenderer } from '@/renderers';
 
+import type { ExportAsImageOptions } from '../file/export';
+
 import type {
     ColorModel, UpdateAnyLayerOptions,
     WorkingFileAnyLayer,
@@ -33,7 +35,7 @@ export async function copySelectedLayers() {
             message: t('moduleGroup.image.modules.copy.noSelectedLayers.message'),
             duration: 5000,
         });
-        return;   
+        return;
     }
 
     // Delete the cloned images from previous clipboard buffer layers.
@@ -59,18 +61,21 @@ export async function copySelectedLayers() {
 
     editorStore.set('clipboardBufferLayers', clipboardBufferLayers);
     const selectionMask = activeSelectionMask.value ?? appliedSelectionMask.value;
-    const selectionMaskCanvasOffset = activeSelectionMask.value ? activeSelectionMaskCanvasOffset.value : appliedSelectionMaskCanvasOffset.value;
+    const selectionMaskCanvasOffset = activeSelectionMask.value
+        ? activeSelectionMaskCanvasOffset.value : appliedSelectionMaskCanvasOffset.value;
     editorStore.set('clipboardBufferSelectionMask', selectionMask);
     editorStore.set('clipboardBufferSelectionMaskCanvasOffset', new DOMPoint(selectionMaskCanvasOffset.x, selectionMaskCanvasOffset.y));
     try {
         const { exportAsImage } = await import(/* webpackChunkName: 'module-file-export' */ '../file/export');
-        const exportResults = await exportAsImage({
+        const exportOptions: ExportAsImageOptions = {
             fileType: 'png',
             layerSelection: 'selected',
             applySelectionMask: true,
             toClipboard: true,
-            generateImageHash: true
-        });
+            generateImageHash: true,
+            autoCrop: true,
+        };
+        const exportResults = await exportAsImage(exportOptions);
         editorStore.set('hasClipboardUpdateSupport', true);
         editorStore.set('clipboardBufferImageHash', exportResults.generatedImageHash);
     } catch (error) {

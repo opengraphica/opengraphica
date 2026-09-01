@@ -1491,7 +1491,7 @@
         }
     },
     "tutorialTip": {
-        "drawToolIntroduction": {
+        "drawBrushToolIntroduction": {
             "title": "Werkzeug der Zeichnung",
             "introduction": [
                 "Mit dem Ziehwerkzeug können Sie Linien und Formen erstellen."

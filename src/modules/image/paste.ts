@@ -1,13 +1,19 @@
 import cloneDeep from 'lodash/cloneDeep';
-import { generateImageBlobHash } from '@/lib/hash';
+
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import { getStoredImageOrCanvas, createStoredImage } from '@/store/image';
 import workingFileStore, { ensureUniqueLayerSiblingName } from '@/store/working-file';
 import { BundleAction } from '@/actions/bundle';
+
 import { InsertLayerAction } from '@/actions/insert-layer';
+import { TrimLayerEmptySpaceAction } from '@/actions/trim-layer-empty-space';
+
 import { blitSpecifiedSelectionMask } from '@/canvas/store/selection-state';
-import { createImageFromCanvas } from '@/lib/image';
+
+import appEmitter from '@/lib/emitter';
+import { generateImageBlobHash } from '@/lib/hash';
+
 import type { ColorModel, WorkingFileRasterLayer } from '@/types';
 
 export async function promptClipboardReadPermission(): Promise<boolean> {
@@ -32,7 +38,7 @@ export async function pasteFromEditorCopyBuffer() {
         action: new BundleAction(
             'pasteLayers',
             'action.pasteLayers',
-            await Promise.all(editorStore.state.clipboardBufferLayers.map(async (layer) => {
+            (await Promise.all(editorStore.state.clipboardBufferLayers.map(async (layer) => {
                 delete (layer as any).id;
                 const firstLayer = workingFileStore.state.layers[0];
                 layer.name = ensureUniqueLayerSiblingName(positionAfterLayer ?? firstLayer ? firstLayer.id : undefined, layer.name);
@@ -56,42 +62,69 @@ export async function pasteFromEditorCopyBuffer() {
                         }
                     }
                 }
-                return new InsertLayerAction(cloneDeep(layer), positionAfterLayer == null ? 'top' : 'above', positionAfterLayer);
-            }))
+                return [
+                    new InsertLayerAction(cloneDeep(layer), positionAfterLayer == null ? 'top' : 'above', positionAfterLayer),
+                    new TrimLayerEmptySpaceAction(-1),
+                ];
+            }))).flat()
         )
     });
 }
 
-export async function paste() {
-    if (await promptClipboardReadPermission() && navigator.clipboard?.read) {
-        const clipboardContents = await navigator.clipboard.read();
-        for (const item of clipboardContents) {
-            let blob: Blob | undefined;
-            if (item.types.includes('image/png')) {
-                blob = await item.getType('image/png');
-            }
-            let isUseFile: boolean = true;
-            if (blob) {
-                const pastedImageHash = await generateImageBlobHash(blob);
-                isUseFile = editorStore.state.clipboardBufferImageHash !== pastedImageHash;
-            } else {
-                isUseFile = false;
-            }
+export interface ImagePasteModuleProperties {
+    files?: File[];
+}
 
-            if (isUseFile && blob) {
-                const { openFromFileList } = await import(/* webpackChunkName: 'module-file-open' */ '@/modules/file/open');
-                await openFromFileList({
-                        files: [
-                        new File([blob], 'image.png')
-                    ],
-                    dialogOptions: { insert: true },
-                });
-            } else {
-                const { pasteFromEditorCopyBuffer } = await import('@/modules/image/paste');
-                await pasteFromEditorCopyBuffer();
+let isPastingImage: boolean = false;
+export async function paste(options?: ImagePasteModuleProperties) {
+    let files: File[] = options?.files ?? [];
+
+    if (files.length === 0) {
+        if (await promptClipboardReadPermission() && navigator.clipboard?.read) {
+            const clipboardContents = await navigator.clipboard.read();
+            for (const item of clipboardContents) {
+                if (item.types.includes('image/png')) {
+                    let blob = await item.getType('image/png');
+                    files.push(new File([blob], 'clipboard.png'));
+                }
+            }
+        } else {
+            await pasteFromEditorCopyBuffer();
+        }
+    }
+
+    if (files.length > 0) {
+        appEmitter.emit('app.wait.startBlocking', { id: 'documentPasteImage', label: 'app.wait.loadingImage' });
+        isPastingImage = true;
+
+        for (let file of files) {
+            try {
+                let isUseFile: boolean = true;
+                if (editorStore.state.hasClipboardUpdateSupport) {
+                    if (file) {
+                        const pastedImageHash = await generateImageBlobHash(file);
+                        console.log('pasted hash ', pastedImageHash);
+                        isUseFile = editorStore.state.clipboardBufferImageHash !== pastedImageHash;
+                    } else {
+                        isUseFile = false;
+                    }
+                } else {
+                    isUseFile = file.lastModified > editorStore.state.clipboardBufferUpdateTimestamp;
+                }
+
+                if (isUseFile) {
+                    const { openFromFileList } = await import(/* webpackChunkName: 'module-file-open' */ '@/modules/file/open');
+                    await openFromFileList({ files: [file], dialogOptions: { insert: true } });
+                } else {
+                    await pasteFromEditorCopyBuffer();
+                }
+            } catch (error) {
+                console.error('[src/modules/image/paste.ts]', error);
             }
         }
-    } else {
-        await pasteFromEditorCopyBuffer();
+
+        isPastingImage = false;
+        appEmitter.emit('app.wait.stopBlocking', { id: 'documentPasteImage' });
+        appEmitter.emit('app.workingFile.notifyImageLoadedFromClipboard');
     }
 }

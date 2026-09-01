@@ -1491,7 +1491,7 @@
         }
     },
     "tutorialTip": {
-        "drawToolIntroduction": {
+        "drawBrushToolIntroduction": {
             "title": "Strumento di disegno",
             "introduction": [
                 "Lo strumento di disegno consente di creare linee e forme."

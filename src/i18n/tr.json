@@ -1491,7 +1491,7 @@
         }
     },
     "tutorialTip": {
-        "drawToolIntroduction": {
+        "drawBrushToolIntroduction": {
             "title": "Draw Tool",
             "introduction": [
                 "Çizim aracı hatları ve şekilleri oluşturmanıza olanak tanır."

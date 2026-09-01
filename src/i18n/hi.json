@@ -1491,7 +1491,7 @@
         }
     },
     "tutorialTip": {
-        "drawToolIntroduction": {
+        "drawBrushToolIntroduction": {
             "title": "उपकरण",
             "introduction": [
                 "ड्रॉ टूल आपको लाइनों और आकारों को बनाने देता है।."

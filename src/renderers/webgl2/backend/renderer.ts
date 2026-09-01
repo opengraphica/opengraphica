@@ -482,7 +482,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
             const selectionMaskWasVisible = !!(this.selectionMask?.visible);
             if (this.selectionMask) {
                 if (options?.applySelectionMask) {
-                    this.selectionMask.visible = true;    
+                    this.selectionMask.visible = true;
                     this.selectionMask.setCamera(snapshotCamera);
                     this.selectionMask.useClipping(true);
                 } else {

@@ -4,9 +4,9 @@ import canvasStore from '@/store/canvas';
 import { createStoredImage, prepareStoredImageForEditing, prepareStoredImageForArchival } from '@/store/image';
 import { getLayerById, getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { getImageDataEmptyBounds, getImageDataFromCanvas } from '@/lib/image';
-import { findPointListBounds, limitMaxDimension } from '@/lib/math';
+import { findPointListBounds } from '@/lib/math';
+import { InsertLayerAction } from './insert-layer';
 import { UpdateLayerAction } from './update-layer';
-// import { useRenderer } from '@/renderers';
 
 export class TrimLayerEmptySpaceAction extends BaseAction {
 
@@ -16,10 +16,20 @@ export class TrimLayerEmptySpaceAction extends BaseAction {
     constructor(layerId: number) {
         super('trimLayerEmptySpace', 'action.trimLayerEmptySpace');
         this.layerId = layerId;
-	}
+    }
 
-	public async do() {
+    public async do() {
         super.do();
+
+        if (this.layerId == -1) {
+            if (!this.previousAction) {
+                throw new Error('[src/actions/trim-layer-empty-bounds.ts] Layer ID not specified and previous action not provided.');
+            } else if (this.previousAction instanceof InsertLayerAction) {
+                this.layerId = this.previousAction.insertedLayerId;
+            } else {
+                throw new Error('[src/actions/trim-layer-empty-bounds.ts] Layer ID not specified and cannot derive from previous action.');
+            }
+        }
 
         const layer = getLayerById(this.layerId);
         if (!layer) throw new Error('[src/actions/trim-layer-empty-bounds.ts] Layer with specified id not found.');
@@ -68,9 +78,9 @@ export class TrimLayerEmptySpaceAction extends BaseAction {
         await this.updateLayerAction.do();
 
         canvasStore.set('dirty', true);
-	}
+    }
 
-	public async undo() {
+    public async undo() {
         super.undo();
 
         if (this.updateLayerAction) {
@@ -79,7 +89,7 @@ export class TrimLayerEmptySpaceAction extends BaseAction {
         }
 
         canvasStore.set('dirty', true);
-	}
+    }
 
     public free() {
         super.free();

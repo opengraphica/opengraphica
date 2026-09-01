@@ -173,37 +173,20 @@ async function onDocumentPaste(e: ClipboardEvent) {
     if (!isPastingImage) {
         if (e.clipboardData) {
             const items = e.clipboardData.items;
+            const files: File[] = [];
             if (items) {
                 for (let i = 0; i < items.length; i++) {
                     const item = items[i];
                     if (item.type.indexOf("image") !== -1) {
                         const file = item.getAsFile();
                         if (file) {
-                            appEmitter.emit('app.wait.startBlocking', { id: 'documentPasteImage', label: 'app.wait.loadingImage' });
-                            isPastingImage = true;
-
-                            let isUseFile: boolean = true;
-                            if (editorStore.state.hasClipboardUpdateSupport) {
-                                const pastedImageHash = await generateImageBlobHash(file);
-                                isUseFile = editorStore.state.clipboardBufferImageHash !== pastedImageHash;
-                            } else {
-                                isUseFile = file.lastModified > editorStore.state.clipboardBufferUpdateTimestamp;
-                            }
-
-                            if (isUseFile) {
-                                const { openFromFileList } = await import(/* webpackChunkName: 'module-file-open' */ '@/modules/file/open');
-                                await openFromFileList({ files: [file], dialogOptions: { insert: true } });
-                            } else {
-                                const { pasteFromEditorCopyBuffer } = await import('@/modules/image/paste');
-                                await pasteFromEditorCopyBuffer();
-                            }
-
-                            isPastingImage = false;
-                            appEmitter.emit('app.wait.stopBlocking', { id: 'documentPasteImage' });
-                            appEmitter.emit('app.workingFile.notifyImageLoadedFromClipboard');
+                            files.push(file);
                         }
                     }
                 }
+            }
+            if (files.length > 0) {
+                runModule('image', 'paste', { files });
                 e.preventDefault();
             }
         }

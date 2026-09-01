@@ -109,14 +109,14 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         )
 
         // Tutorial message
-        if (!editorStore.state.tutorialFlags.drawToolIntroduction) {
+        if (!editorStore.state.tutorialFlags.drawBrushToolIntroduction) {
             waitForNoOverlays().then(() => {
-                let message = (tm('tutorialTip.drawToolIntroduction.introduction') as string[]).map((message) => {
+                let message = (tm('tutorialTip.drawBrushToolIntroduction.introduction') as string[]).map((message) => {
                     return `<p class="mb-3">${rt(message)}</p>`;
                 }).join('');
                 scheduleTutorialNotification({
-                    flag: 'drawToolIntroduction',
-                    title: t('tutorialTip.drawToolIntroduction.title'),
+                    flag: 'drawBrushToolIntroduction',
+                    title: t('tutorialTip.drawBrushToolIntroduction.title'),
                     message: {
                         touch: message,
                         mouse: message
@@ -147,8 +147,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         }
 
         // Tutorial Message
-        if (!editorStore.state.tutorialFlags.drawToolIntroduction) {
-            dismissTutorialNotification('drawToolIntroduction');
+        if (!editorStore.state.tutorialFlags.drawBrushToolIntroduction) {
+            dismissTutorialNotification('drawBrushToolIntroduction');
         }
 
         // Block UI changes until history actions have completed

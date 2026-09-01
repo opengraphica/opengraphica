@@ -17,7 +17,8 @@ import historyStore from '@/store/history';
 
 import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
 import { generateImageBlobHash } from '@/lib/hash';
-import { limitMaxDimension } from '@/lib/math';
+import { getImageDataEmptyBounds, getImageDataFromCanvas } from '@/lib/image';
+import { findPointListBounds, limitMaxDimension } from '@/lib/math';
 import { knownFileExtensions } from '@/lib/regex';
 
 import { InsertLayerAction } from '@/actions/insert-layer';
@@ -36,18 +37,19 @@ declare class ClipboardItem {
 }
 
 export interface ExportAsImageOptions {
-    fileName?: string,
-    fileType: 'png' | 'jpg' | 'webp' | 'gif' | 'bmp' | 'tiff',
-    layerSelection?: 'all' | 'selected',
-    cameraTransform?: DOMMatrix,
-    applySelectionMask?: boolean,
-    quality?: number,
-    toClipboard?: boolean,
-    toBlob?: boolean,
-    toFileHandle?: FileSystemFileHandle | null,
-    toNewLayer?: boolean,
-    dithering?: string,
-    generateImageHash?: boolean
+    fileName?: string;
+    fileType: 'png' | 'jpg' | 'webp' | 'gif' | 'bmp' | 'tiff';
+    layerSelection?: 'all' | 'selected';
+    cameraTransform?: DOMMatrix;
+    applySelectionMask?: boolean;
+    quality?: number;
+    toClipboard?: boolean;
+    toBlob?: boolean;
+    toFileHandle?: FileSystemFileHandle | null;
+    toNewLayer?: boolean;
+    autoCrop?: boolean;
+    dithering?: string;
+    generateImageHash?: boolean;
 }
 
 export interface ExportAsImageResults {
@@ -104,6 +106,28 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                 snapshotBitmap.close();
             }
 
+            autoCropProcess:
+            if (options.autoCrop) {
+                const emptyBounds = getImageDataEmptyBounds(getImageDataFromCanvas(canvas));
+                const emptyCropBounds = findPointListBounds([
+                    new DOMPoint(emptyBounds.left, emptyBounds.top),
+                    new DOMPoint(emptyBounds.right, emptyBounds.top),
+                    new DOMPoint(emptyBounds.left, emptyBounds.bottom),
+                    new DOMPoint(emptyBounds.right, emptyBounds.bottom),
+                ]);
+                const workingCanvas = document.createElement('canvas');
+                workingCanvas.width = Math.ceil(emptyCropBounds.right - emptyCropBounds.left);
+                workingCanvas.height = Math.ceil(emptyCropBounds.bottom - emptyCropBounds.top);
+                const workingCanvasCtx = workingCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
+                if (!workingCanvasCtx) break autoCropProcess;
+                workingCanvasCtx.save();
+                workingCanvasCtx.globalCompositeOperation = 'copy';
+                workingCanvasCtx.translate(-emptyCropBounds.left, -emptyCropBounds.top);
+                workingCanvasCtx.drawImage(canvas, 0, 0);
+                workingCanvasCtx.restore();
+                canvas = workingCanvas;
+            }
+
             if (options.toNewLayer) {
                 historyStore.dispatch('runAction', {
                     action: new InsertLayerAction({
@@ -128,6 +152,7 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                                 if (options.generateImageHash) {
                                     try {
                                         results.generatedImageHash = await generateImageBlobHash(blob);
+                                        console.log('generated hash ', results.generatedImageHash);
                                     } catch (error) {
                                         // Ignore hash generation
                                     }

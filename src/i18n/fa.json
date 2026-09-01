@@ -1488,7 +1488,7 @@
         }
     },
     "tutorialTip": {
-        "drawToolIntroduction": {
+        "drawBrushToolIntroduction": {
             "title": "ابزار Draw Tool",
             "introduction": [
                 "ابزار قرعه کشی به شما اجازه می دهد خطوط و اشکال ایجاد کنید."

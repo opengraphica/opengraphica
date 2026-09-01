@@ -1444,16 +1444,16 @@
                 "The blur tool will blur the portion of current layer you draw on."
             ]
         },
-        "drawToolIntroduction": {
-            "title": "Draw Tool",
+        "drawBrushToolIntroduction": {
+            "title": "Brush Tool",
             "introduction": [
-                "The draw tool lets you create lines and shapes."
+                "The brush tool lets you create a painting with different brushes. It is best used with a pressure-sensitive stylus."
             ]
         },
         "drawGradientToolIntroduction": {
             "title": "Gradient Tool",
             "introduction": [
-                "The gradient tool lets you add gradient layers. You can control the visible bounds of this tool by combining it with the selection tool or the erase tool."
+                "The gradient tool lets you add gradient layers."
             ],
             "body": {
                 "mouse": [

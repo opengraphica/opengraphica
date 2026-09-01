@@ -4,7 +4,8 @@ type HashAlgorithm = 'SHA-1' | 'SHA-256' | 'SHA-384' | 'SHA-512';
 type HashEncoding = 'base64' | 'hex';
 
 let temporaryCanvas: HTMLCanvasElement;
-let imageComparisonResolution: number = 20;
+let imageComparisonResolution: number = 32;
+let imageComparisonDctSize: number = 8;
 
 export async function generateArrayBufferHash(
     arrayBuffer: ArrayBuffer,
@@ -28,26 +29,106 @@ export async function generateImageBlobHash(blob: Blob): Promise<string> {
     return generateImageHash(image);
 }
 
+function hammingDistance(a: bigint, b: bigint): number {
+    let value = a ^ b;
+    let distance = 0;
+
+    while (value !== 0n) {
+        distance++;
+        value &= value - 1n;
+    }
+
+    return distance;
+}
+
+function median(values: number[]): number {
+    const sorted = [...values].sort((a, b) => a - b);
+    return sorted[Math.floor(sorted.length / 2)];
+}
+
+
+function dctCoefficient(
+    pixels: Float64Array,
+    width: number,
+    u: number,
+    v: number
+): number {
+    let sum = 0;
+    for (let y = 0; y < width; y++) {
+        for (let x = 0; x < width; x++) {
+        const pixel = pixels[y * width + x];
+        sum +=
+            pixel *
+            Math.cos(((2 * x + 1) * u * Math.PI) / (2 * width)) *
+            Math.cos(((2 * y + 1) * v * Math.PI) / (2 * width));
+        }
+    }
+    return sum;
+}
+
 export async function generateImageHash(image: HTMLCanvasElement | HTMLImageElement | ImageBitmap): Promise<string> {
-    let hash = '';
-    if (!temporaryCanvas) {
-        temporaryCanvas = document.createElement('canvas');
+    const canvas = document.createElement('canvas');
+    canvas.width = imageComparisonResolution;
+    canvas.height = imageComparisonResolution;
+
+    const ctx = canvas.getContext('2d', { colorSpace: 'srgb' });
+    if (!ctx) return '';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, imageComparisonResolution, imageComparisonResolution);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    const sourceWidth = image.width;
+    const sourceHeight = image.height;
+    const scale = Math.min(
+        imageComparisonResolution / sourceWidth,
+        imageComparisonResolution / sourceHeight
+    );
+    const width = sourceWidth * scale;
+    const height = sourceHeight * scale;
+    const x = (imageComparisonResolution - width) / 2;
+    const y = (imageComparisonResolution - height) / 2;
+
+    ctx.drawImage(image, x, y, width, height);
+    const imageData = ctx.getImageData(
+        0,
+        0,
+        imageComparisonResolution,
+        imageComparisonResolution
+    ).data;
+
+    const grayscale = new Float64Array(imageComparisonResolution * imageComparisonResolution);
+    for (let i = 0, pixel = 0; i < imageData.length; i += 4, pixel++) {
+        const red = imageData[i];
+        const green = imageData[i + 1];
+        const blue = imageData[i + 2];
+
+        // Perceptual luminance.
+        grayscale[pixel] = 0.299 * red + 0.587 * green + 0.114 * blue;
     }
-    temporaryCanvas.width = imageComparisonResolution;
-    temporaryCanvas.height = imageComparisonResolution / image.width * image.height;
-    const ctx = temporaryCanvas.getContext('2d');
-    if (ctx) {
-        ctx.clearRect(0, 0, temporaryCanvas.width, temporaryCanvas.height);
-        ctx.scale(imageComparisonResolution / image.width, imageComparisonResolution / image.width);
-        ctx.drawImage(image, 0, 0);
-        const buffer = await crypto.subtle.digest('SHA-1', ctx.getImageData(0, 0, temporaryCanvas.width, temporaryCanvas.height).data);
-        const typedArray = new Uint8Array(buffer)
-        hash = temporaryCanvas.width + 'x' + temporaryCanvas.height + 'x' + Array.prototype.map.call(
-            typedArray,
-            (x: number) => ('00' + x.toString(16)).slice(-2)
-        ).join('');
+
+    const coefficients: number[] = [];
+    for (let v = 0; v < imageComparisonDctSize; v++) {
+        for (let u = 0; u < imageComparisonDctSize; u++) {
+            if (u === 0 && v === 0) {
+                continue;
+            }
+            coefficients.push(
+                dctCoefficient(grayscale, imageComparisonResolution, u, v)
+            );
+        }
     }
-    return hash;
+
+    const threshold = median(coefficients);
+    let hash = 0n;
+    for (const coefficient of coefficients) {
+        hash <<= 1n;
+        if (coefficient > threshold) {
+            hash |= 1n;
+        }
+    }
+
+    return `${sourceWidth}${sourceHeight}${hash}`;
 }
 
 /**

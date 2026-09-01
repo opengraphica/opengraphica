@@ -1488,7 +1488,7 @@
         }
     },
     "tutorialTip": {
-        "drawToolIntroduction": {
+        "drawBrushToolIntroduction": {
             "title": "সরঞ্জাম আঁকো",
             "introduction": [
                 "আকৃতি তৈরি করতে এবং আপনাকে আকৃতি তৈরি করতে দেয়।."

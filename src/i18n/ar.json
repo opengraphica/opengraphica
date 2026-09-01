@@ -1491,7 +1491,7 @@
         }
     },
     "tutorialTip": {
-        "drawToolIntroduction": {
+        "drawBrushToolIntroduction": {
             "title": "Draw Tool",
             "introduction": [
                 "أداة الرسم تسمح لك بصنع خطوط و أشكال."

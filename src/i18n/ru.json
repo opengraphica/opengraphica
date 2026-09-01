@@ -1491,7 +1491,7 @@
         }
     },
     "tutorialTip": {
-        "drawToolIntroduction": {
+        "drawBrushToolIntroduction": {
             "title": "Инструмент рисования",
             "introduction": [
                 "Инструмент рисования позволяет создавать линии и формы."
