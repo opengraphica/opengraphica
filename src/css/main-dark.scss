@@ -104,7 +104,7 @@
     --el-text-color-primary: #ffffff;
     --el-text-color-regular: #eeeeee;
     --el-text-color-secondary: #cccccc;
-    --el-text-color-placeholder: #dddddd;
+    --el-text-color-placeholder: #b1b1b1;
 
     .el-button--primary {
         --el-button-bg-color: var(--el-color-primary);
@@ -120,6 +120,10 @@
             --el-fill-color-blank: #23374b;
             --el-button-border-color: #175987;
         }
+    }
+
+    .el-table {
+        --el-table-current-row-bg-color: var(--el-color-primary-light-1);
     }
 
     color: var(--el-color-black);

@@ -181,7 +181,6 @@ import OgPopover from '@/ui/element/popover.vue';
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton from 'element-plus/lib/components/button/index';
 import ElMenu, { ElMenuItem } from 'element-plus/lib/components/menu/index';
-import ElPopover from 'element-plus/lib/components/popover/index';
 import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
 import AppLayerListThumbnail from '@/ui/app/app-layer-list-thumbnail.vue';
 import AppLayerFrameThumbnail from '@/ui/app/app-layer-frame-thumbnail.vue';

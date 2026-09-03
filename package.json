@@ -26,6 +26,7 @@
         "element-plus": "2.2.28",
         "eruda": "3.0.1",
         "expr-eval": "2.0.2",
+        "fflate": "^0.8.3",
         "file-saver": "2.0.5",
         "gifken": "2.1.1",
         "libgif": "0.0.3",
@@ -37,7 +38,8 @@
         "unplugin-element-plus": "0.2.0",
         "uuid": "8.3.2",
         "vue": "3.5.13",
-        "vue-i18n": "11.4.10"
+        "vue-i18n": "11.4.10",
+        "webdav": "5.10.0"
     },
     "devDependencies": {
         "@tailwindcss/postcss": "4.0.17",

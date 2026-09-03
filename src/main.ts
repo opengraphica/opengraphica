@@ -2,7 +2,9 @@ import { createApp, type App } from 'vue';
 import '@/polyfill';
 import OpenGraphicaApp from '@/ui/app/app.vue';
 import appEmitter from '@/lib/emitter';
+import preferencesStore from '@/store/preferences';
 import { registerApp } from '@/composables/app-plugin';
+import { createWebdavClient } from '@/composables/webdav-client';
 
 declare global {
     interface Window {
@@ -20,6 +22,7 @@ export interface OpenGraphica extends App<Element> {
 }
 
 const app: OpenGraphica = createApp(OpenGraphicaApp) as OpenGraphica;
+app.use(createWebdavClient({ preferencesStore }));
 registerApp(app);
 
 // Expose events
@@ -39,16 +42,21 @@ Promise.all([
     import('@/store/canvas'),
     import('@/store/editor'),
     import('@/store/history'),
-    import('@/store/preferences'),
     import('@/store/working-file'),
 ]).then((results) => {
+    const [
+        canvasStore,
+        editorStore,
+        historyStore,
+        workingFileStore
+    ] = results;
     (app as any).store = {
-        canvas: results[0].default,
-        editor: results[1].default,
-        history: results[2].default,
-        preferences: results[3].default,
-        workingFile: results[4].default,
-    }
+        canvas: canvasStore,
+        editor: editorStore,
+        history: historyStore,
+        preferences: preferencesStore,
+        workingFile: workingFileStore,
+    };
 });
 
 // Register global Vue component at runtime

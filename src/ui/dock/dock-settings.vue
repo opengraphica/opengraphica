@@ -232,7 +232,7 @@
             </template>
             <template v-if="visitedTabs['prefs'] === true">
                 <el-scrollbar>
-                    <el-form novalidate="novalidate" action="javascript:void(0)">
+                    <el-form novalidate="novalidate" autocomplete="off" action="javascript:void(0)">
                         <!-- Prefs: Theme -->
                         <el-form-item class="el-form-item--menu-item" :label="t('dock.settings.prefs.theme')">
                             <el-radio-group
@@ -280,6 +280,22 @@
                                 </el-form-item>
                                 <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.editor.showTips')">
                                     <el-switch v-model="showTutorialNotifications" />
+                                </el-form-item>
+                            </el-collapse-item>
+                            <!-- Prefs: WebDAV Storage -->
+                            <el-collapse-item v-el-collapse-item-smart-scroll :title="t('dock.settings.prefs.webdavStorage.groupTitle')">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.webdavStorage.shareUrl')">
+                                    <el-input v-model="preferenceWebdavShareUrl" size="small" :placeholder="t('dock.settings.prefs.webdavStorage.shareUrlPlaceholder')"
+                                        @blur="updatePreferenceWebdavShareUrl" @keydown.enter="updatePreferenceWebdavShareUrl"
+                                    />
+                                </el-form-item>
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.webdavStorage.username')">
+                                    <el-input v-model="preferenceWebdavUsername" size="small" autocomplete="off" @blur="updatePreferenceWebdavUsername" @keydown.enter="updatePreferenceWebdavUsername" />
+                                </el-form-item>
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.webdavStorage.password')">
+                                    <el-input v-model="preferenceWebdavPassword" autocomplete="off" size="small" class="el-input--password"
+                                        @copy.prevent @cut.prevent @blur="updatePreferenceWebdavPassword" @keydown.enter="updatePreferenceWebdavPassword"
+                                    />
                                 </el-form-item>
                             </el-collapse-item>
                             <!-- Prefs: Debugging -->
@@ -338,7 +354,7 @@ export default {
 };
 </script>
 <script setup lang="ts">
-import { defineComponent, ref, computed, toRefs, nextTick, onMounted, onUnmounted, watch } from 'vue';
+import { ref, computed, toRefs, nextTick, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from '@/i18n';
 
 import ElAlert from 'element-plus/lib/components/alert/index';
@@ -346,6 +362,7 @@ import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/inde
 import ElCollapse, { ElCollapseItem } from 'element-plus/lib/components/collapse/index';
 import ElDivider from 'element-plus/lib/components/divider/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
+import ElInput from 'element-plus/lib/components/input/index';
 import ElInputNumber from '@/ui/el/el-input-number.vue';
 import ElLink from 'element-plus/lib/components/link/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
@@ -622,6 +639,18 @@ const preferenceMenuBarPosition = computed<'left' | 'right' | 'top' | 'bottom'>(
         appEmitter.emit('app.canvas.resetTransform');
     }
 });
+const preferenceWebdavShareUrl = ref<string>(preferencesStore.get('webdavShareUrl'));
+function updatePreferenceWebdavShareUrl() {
+    preferencesStore.set('webdavShareUrl', preferenceWebdavShareUrl.value.trim());
+}
+const preferenceWebdavUsername = ref<string>(preferencesStore.get('webdavUsername'));
+function updatePreferenceWebdavUsername() {
+    preferencesStore.set('webdavUsername', preferenceWebdavUsername.value.trim());
+}
+const preferenceWebdavPassword = ref<string>(preferencesStore.get('webdavPassword'));
+function updatePreferenceWebdavPassword() {
+    preferencesStore.set('webdavPassword', preferenceWebdavPassword.value.trim());
+}
 const showTutorialNotifications = computed<boolean>({
     get() {
         return preferencesStore.state.showTutorialNotifications;

@@ -20,15 +20,40 @@
             "open": {
                 "action": {
                     "type": "function",
+                    "target": "file/open.openChooseSource"
+                },
+                "cancelable": true
+            },
+            "openFileDialog": {
+                "action": {
+                    "type": "function",
                     "target": "file/open.openFromFileDialog"
                 },
                 "preload": true,
                 "cancelable": true
             },
+            "openFileList": {
+                "action": {
+                    "type": "function",
+                    "target": "file/open.openFromFileList"
+                }
+            },
             "openConfirm": {
                 "action": {
                     "type": "ui",
                     "target": "file-open-confirm"
+                }
+            },
+            "openWebdavExplorer": {
+                "action": {
+                    "type": "ui",
+                    "target": "file-open-webdav-explorer"
+                }
+            },
+            "saveWebdavExplorer": {
+                "action": {
+                    "type": "ui",
+                    "target": "file-save-webdav-explorer"
                 }
             },
             "export": {
@@ -46,7 +71,7 @@
             "insertPhoto": {
                 "action": {
                     "type": "function",
-                    "target": "file/open.insertFromFileDialog"
+                    "target": "file/open.insertChooseSource"
                 },
                 "cancelable": true
             },

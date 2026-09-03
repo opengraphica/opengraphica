@@ -8480,7 +8480,7 @@ body.og-full-page .opengraphica {
   transition: transform 0.25s;
   cursor: pointer;
 }
-.opengraphica .og-button:hover {
+.opengraphica .og-button:hover:not(:disabled) {
   background-color: var(--og-button-hover-background);
   color: var(--og-button-hover-color);
   border-color: var(--og-button-hover-background);
@@ -8491,6 +8491,10 @@ body.og-full-page .opengraphica {
 .opengraphica .og-button:focus-visible {
   outline: 0.125rem solid var(--og-button-focus-outline-color);
   outline-offset: 0.0625rem;
+}
+.opengraphica .og-button:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 .opengraphica .og-button__label {
   display: inline-flex;
@@ -8507,7 +8511,7 @@ body.og-full-page .opengraphica {
   border-color: var(--og-button-background);
   color: var(--og-button-color);
 }
-.opengraphica .og-button--solid:hover {
+.opengraphica .og-button--solid:hover:not(:disabled) {
   background-color: var(--og-button-hover-background);
   border-color: var(--og-button-hover-background);
   color: var(--og-button-hover-color);
@@ -9909,7 +9913,11 @@ body.og-full-page .opengraphica {
 }
 .opengraphica .og-layer-list .og-layer.is-dnd-hover,
 .opengraphica .og-layer-list .og-layer .og-layer.is-dnd-hover {
-  box-shadow: 0 0 0 4px inset var(--og-layer-list-background-color-hover);
+  box-shadow: 0 0 0 0.25rem inset var(--og-layer-list-background-color-hover);
+}
+.opengraphica .og-layer-list .og-layer.is-dnd-hover.is-active,
+.opengraphica .og-layer-list .og-layer .og-layer.is-dnd-hover.is-active {
+  box-shadow: 0.375rem 0 0 var(--og-layer-list-thumbnail-border-color-active) inset;
 }
 .opengraphica .og-layer-list .og-layer.is-dnd-placeholder,
 .opengraphica .og-layer-list .og-layer .og-layer.is-dnd-placeholder {
@@ -28203,6 +28211,12 @@ body.og-full-page .opengraphica {
   --el-transition-duration-fast: 0.1s;
   --el-switch-button-size: 1rem;
 }
+@font-face {
+  .opengraphica {
+    font-family: text-security-disc;
+    src: url("../fonts/TextSecurityDisc/TextSecurityDisc-Regular.woff");
+  }
+}
 .opengraphica .el-text-alignment-fix--sm--above {
   margin-top: 0.05em;
 }
@@ -28688,6 +28702,10 @@ body.og-full-page .opengraphica {
 .opengraphica .el-input--small.el-input-group .el-color-picker {
   height: 2.125rem;
   line-height: 2.125rem;
+}
+.opengraphica .el-input--password {
+  -webkit-text-security: disc;
+  font-family: text-security-disc;
 }
 .opengraphica .el-input-group .el-color-picker .el-color-picker__trigger {
   border-radius: 0;

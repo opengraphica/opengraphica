@@ -84,6 +84,15 @@ interface PreferencesState {
 
     // Used to implement a custom save button without modifying this codebase.
     vendorCustomSaveCallback: (() => void) | null;
+
+    // Password for WebDAV share (basic auth)
+    webdavPassword: string;
+
+    // URL of a WebDAV share to use, example: https://webdav.example.com/marie123
+    webdavShareUrl: string;
+
+    // Username for WebDAV share (basic auth)
+    webdavUsername: string;
 }
 
 interface PreferencesStore {
@@ -121,6 +130,9 @@ const store = new PerformantStore<PreferencesStore>({
         useCanvasViewport: true,
         useMobileDebugger: false,
         vendorCustomSaveCallback: null,
+        webdavPassword: '',
+        webdavShareUrl: '',
+        webdavUsername: '',
     },
     restore: [
         'dockPosition',
@@ -140,6 +152,9 @@ const store = new PerformantStore<PreferencesStore>({
         'tooltipShowDelay',
         'touchRotation',
         'useMobileDebugger',
+        'webdavPassword',
+        'webdavShareUrl',
+        'webdavUsername',
     ],
 });
 

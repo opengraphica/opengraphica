@@ -81,7 +81,7 @@
         transition: transform 0.25s;
         cursor: pointer;
 
-        &:hover {
+        &:hover:not(:disabled) {
             background-color: var(--og-button-hover-background);
             color: var(--og-button-hover-color);
             border-color: var(--og-button-hover-background);
@@ -94,6 +94,11 @@
         &:focus-visible {
             outline: 0.125rem solid var(--og-button-focus-outline-color);
             outline-offset: 0.0625rem;
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: default;
         }
     }
 
@@ -115,7 +120,7 @@
         border-color: var(--og-button-background);
         color: var(--og-button-color);
 
-        &:hover {
+        &:hover:not(:disabled) {
             background-color: var(--og-button-hover-background);
             border-color: var(--og-button-hover-background);
             color: var(--og-button-hover-color);

@@ -103,7 +103,6 @@ export async function paste(options?: ImagePasteModuleProperties) {
                 if (editorStore.state.hasClipboardUpdateSupport) {
                     if (file) {
                         const pastedImageHash = await generateImageBlobHash(file);
-                        console.log('pasted hash ', pastedImageHash);
                         isUseFile = editorStore.state.clipboardBufferImageHash !== pastedImageHash;
                     } else {
                         isUseFile = false;

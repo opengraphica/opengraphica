@@ -4,6 +4,7 @@
         class="og-button"
         :class="classList"
         :aria-pressed="props.toggle ? pressed : undefined"
+        :disabled="disabled"
         @click="onClick($event)"
     >
         <span class="og-button__label">
@@ -16,6 +17,10 @@ import { computed, onMounted, onUnmounted, ref, watch, type PropType, type Watch
 
 const props = defineProps({
     danger: {
+        type: Boolean,
+        default: false,
+    },
+    disabled: {
         type: Boolean,
         default: false,
     },

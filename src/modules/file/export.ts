@@ -152,7 +152,6 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                                 if (options.generateImageHash) {
                                     try {
                                         results.generatedImageHash = await generateImageBlobHash(blob);
-                                        console.log('generated hash ', results.generatedImageHash);
                                     } catch (error) {
                                         // Ignore hash generation
                                     }
@@ -171,7 +170,9 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
             } else if (mimeType === 'image/gif') {
                 convertCanvasToGifBlob(canvas, options).then((blob) => {
                     if (blob) {
-                        if (options.toFileHandle) {
+                        if (options.toBlob) {
+                            results.blob = blob;
+                        } else if (options.toFileHandle) {
                             save(blob, options.toFileHandle);
                         } else {
                             saveAs(blob, fileName);

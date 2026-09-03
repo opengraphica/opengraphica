@@ -8,7 +8,7 @@
         :rules="formValidationRules"
         novalidate="novalidate"
         hide-required-asterisk
-        @submit="onCreate">
+        @submit="onExport">
         <template v-if="canSaveBackDirectly">
             <el-alert
                 type="info"
@@ -88,8 +88,10 @@ export default {
 };
 </script>
 <script setup lang="ts">
-import { defineComponent, ref, reactive, computed, watch, nextTick } from 'vue';
+import { ref, reactive, computed } from 'vue';
+import { Rules } from 'async-validator';
 import { useI18n } from '@/i18n';
+
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton from 'element-plus/lib/components/button/index';
 import ElCol from 'element-plus/lib/components/col/index';
@@ -102,14 +104,21 @@ import ElRow from 'element-plus/lib/components/row/index';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSlider from 'element-plus/lib/components/slider/index';
 import ElSwitch from 'element-plus/lib/components/switch/index';
+
 import workingFileStore from '@/store/working-file';
+
+import { runModule } from '@/modules';
+import { useWebdavClient } from '@/composables/webdav-client';
+
 import { notifyInjector, unexpectedErrorMessage, validationSubmissionErrorMessage } from '@/lib/notify';
-import { Rules, RuleItem } from 'async-validator';
-import { exportAsImage, ExportAsImageOptions, isfileFormatSupported } from '@/modules/file/export';
 import { knownFileExtensions } from '@/lib/regex';
+
+import { exportAsImage, ExportAsImageOptions, isfileFormatSupported } from '@/modules/file/export';
+
 
 const { t } = useI18n();
 const vLoading = ElLoading.directive;
+const { connected: isWebdavClientConnected } = useWebdavClient();
 
 const emit = defineEmits([
     'update:title',
@@ -185,7 +194,7 @@ function onCancel() {
     emit('close');
 }
 
-async function onCreate() {
+async function onExport() {
     if (!form.value) {
         return;
     }
@@ -205,7 +214,13 @@ async function onCreate() {
                 workingFileStore.set('fileName', formData.workingFile.fileName.replace(knownFileExtensions, ''));
                 exportOptions.fileName = formData.workingFile.fileName;
             }
-            await exportAsImage(exportOptions);
+            if (isWebdavClientConnected.value) {
+                runModule('file', 'saveWebdavExplorer', {
+                    exportOptions,
+                });
+            } else {
+                await exportAsImage(exportOptions);
+            }
         } catch (error: any) {
             $notify({
                 type: 'error',

@@ -23,7 +23,6 @@ import ElLoading from 'element-plus/lib/components/loading/index';
 import { runModule } from '@/modules';
 
 const { t, tm, rt } = useI18n();
-const vLoading = ElLoading.directive;
 
 const emit = defineEmits([
     'update:title',

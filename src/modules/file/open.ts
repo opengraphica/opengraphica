@@ -27,6 +27,8 @@ import { UpdateFileAction } from '@/actions/update-file';
 import { CreateFileAction } from '@/actions/create-file';
 import { InsertLayerAction } from '@/actions/insert-layer';
 
+import { useWebdavClient } from '@/composables/webdav-client';
+
 import { knownFileExtensions } from '@/lib/regex';
 import { createBlobFromDataUri } from '@/lib/binary';
 import appEmitter from '@/lib/emitter';
@@ -60,13 +62,23 @@ interface FileListOpenOptions {
     dialogOptions?: FileDialogOpenOptions;
 }
 
-export async function openFromFileDialog(options: FileDialogOpenOptions = {}): Promise<void> {
-
-    if (!options.insert && !options?.fileDiscardConfirmed && historyStore.get('hasUnsavedChanges')) {
+export async function openChooseSource(options: FileDialogOpenOptions = {}) {
+    if (!options?.fileDiscardConfirmed && historyStore.get('hasUnsavedChanges')) {
         const { runModule } = await import('@/modules');
         runModule('file', 'openConfirm');
         return;
     }
+
+    const { connected: isWebdavClientConnected } = useWebdavClient();
+    if (isWebdavClientConnected.value) {
+        const { runModule } = await import('@/modules');
+        runModule('file', 'openWebdavExplorer');
+    } else {
+        openFromFileDialog({});
+    }
+}
+
+export async function openFromFileDialog(options: FileDialogOpenOptions = {}): Promise<void> {
 
     // We're working with new APIs
     if (window.isSecureContext && window.showOpenFilePicker) {
@@ -197,12 +209,17 @@ export async function openFromTemporaryStorage() {
     appEmitter.emit('app.canvas.resetTransform');
 }
 
-export async function insertFromFileDialog(options: FileDialogOpenOptions = {}) {
-    return openFromFileDialog({
-        ...options,
-        insert: true,
-        accept: 'image/*'
-    });
+export async function insertChooseSource(options: FileDialogOpenOptions = {}) {
+    const { connected: isWebdavClientConnected } = useWebdavClient();
+    if (isWebdavClientConnected.value) {
+        const { runModule } = await import('@/modules');
+        runModule('file', 'openWebdavExplorer', { insert: true });
+    } else {
+        return openFromFileDialog({
+            ...options,
+            insert: true,
+        });
+    }
 }
 
 export async function openFromFileList({ files, dialogOptions }: FileListOpenOptions = {}) {

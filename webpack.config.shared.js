@@ -93,7 +93,8 @@ module.exports = function setupConfig(config) {
             ],
             alias: {
                 '@': path.resolve(__dirname, 'src/'),
-                'vue-i18n': 'vue-i18n/dist/vue-i18n.esm-bundler.js'
+                'vue-i18n': 'vue-i18n/dist/vue-i18n.esm-bundler.js',
+                'webdav/web': path.resolve(__dirname, 'node_modules/webdav/dist/web/index.js')
             },
             extensions: ['.js', '.mjs', '.ts', '.vue', '.json']
         },
@@ -269,6 +270,10 @@ module.exports = function setupConfig(config) {
                         test: /[\\/]node_modules[\\/](expr-eval)[\\/]/,
                         name: 'expr-eval'
                     },
+                    fflate: {
+                        test: /[\\/]node_modules[\\/](fflate)[\\/]/,
+                        name: 'fflate'
+                    },
                     floatingUi: {
                         test: /[\\/]node_modules[\\/](@floating-ui)[\\/]/,
                         name: 'floating-ui'
@@ -368,6 +373,10 @@ module.exports = function setupConfig(config) {
                     vueI18n: {
                         test: /[\\/]node_modules[\\/]vue-i18n[\\/]/,
                         name: 'vue-i18n'
+                    },
+                    webdav: {
+                        test: /[\\/]node_modules[\\/]webdav[\\/]/,
+                        name: 'webdav'
                     }
                 }
             }

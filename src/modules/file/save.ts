@@ -7,9 +7,12 @@ import canvasStore from '@/store/canvas';
 import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 import { writeWorkingFile } from '@/store/data/working-file-database';
 import { saveAs } from 'file-saver';
+
 import { getStoredImageOrCanvas } from '@/store/image';
 import { getStoredSvgDataUrl } from '@/store/svg';
 import { getStoredVideoDataUrl } from '@/store/video';
+
+import { createArrayBufferFromBlob } from '@/lib/binary';
 
 import type {
     FileSystemFileHandle, SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel, SerializedFileLayerMask,
@@ -24,6 +27,15 @@ interface SaveImageAsOptions {
     fileName?: string;
 }
 
+export function addFileExtension(fileName: string | undefined, extension?: string) {
+    return (fileName || 'image').replace(/(\.(json|png|jpg|jpeg|webp|gif|bmp|tif|tiff))$/ig, '') + (extension ? '.' + extension : '');
+}
+
+export async function createSaveArrayBuffer(): Promise<ArrayBuffer> {
+    const serializedFile = serializeWorkingFile();
+    return createArrayBufferFromBlob(new Blob([JSON.stringify(serializedFile, null, "\t")], { type: 'text/plain' }));
+}
+
 export async function saveImage(fileHandle: FileSystemFileHandle) {
     const serializedFile = serializeWorkingFile();
     const writable = await fileHandle.createWritable();
@@ -33,7 +45,7 @@ export async function saveImage(fileHandle: FileSystemFileHandle) {
 
 export async function saveImageAs(options: SaveImageAsOptions = {}) {
     const serializedFile = serializeWorkingFile();
-    const fileName = (options.fileName || 'image').replace(/(\.(json|png|jpg|jpeg|webp|gif|bmp|tif|tiff))$/ig, '') + '.json';
+    const fileName = addFileExtension(options.fileName, 'json');
     saveAs(new Blob([JSON.stringify(serializedFile, null, "\t")], { type: 'text/plain' }), fileName);
 }
 

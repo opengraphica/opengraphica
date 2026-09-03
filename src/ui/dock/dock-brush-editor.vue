@@ -379,24 +379,15 @@
 import { computed, nextTick, onMounted, ref, watch, type PropType } from 'vue';
 import { useI18n } from '@/i18n';
 
-import vPointer from '@/directives/pointer';
-
-import { generateCssGradient, sampleGradient } from '@/lib/gradient';
-
 import {
     brushEditorTab, brushesByCategory, getBrushById, addCustomBrush, generateBrushPreview
 } from '@/canvas/store/brush-library-state';
 
 import ElAlert from 'element-plus/lib/components/alert/index';
-import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
+import ElButton from 'element-plus/lib/components/button/index';
 import ElDivider from 'element-plus/lib/components/divider/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
-import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.vue';
-import ElInputColor from '@/ui/el/el-input-color.vue';
-import ElInputGroup from '@/ui/el/el-input-group.vue';
 import ElInputNumber from '@/ui/el/el-input-number.vue';
-import ElMenu, { ElMenuItem } from 'element-plus/lib/components/menu/index';
-import ElPopover from '@/ui/el/el-popover.vue';
 import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
 import ElSlider from 'element-plus/lib/components/slider/index';
 import ElTabs, { ElTabPane } from 'element-plus/lib/components/tabs/index';

@@ -2,20 +2,20 @@
     <el-form
         ref="form"
         v-loading="loading"
-        action="javascript:void(0)"
+        action="#"
         label-position="left"
         :model="formData.workingFile"
         :rules="formValidationRules"
         novalidate="novalidate"
         hide-required-asterisk
-        @submit="onSave">
+        @submit.prevent="onSave">
         <template v-if="canSaveBackDirectly">
             <el-alert
                 type="info"
                 :title="t('module.fileSaveAs.saveBackIntroduction', { fileName: fileHandle?.name })"
                 show-icon
                 :closable="false"
-                class="mb-4">
+                class="mb-4!">
             </el-alert>
             <el-form-item :label="t('module.fileSaveAs.saveBackQuestion')">
                 <el-switch v-model="formData.workingFile.saveBackDirectly" :active-text="t('button.yes')" :inactive-text="t('button.no')" />
@@ -27,7 +27,7 @@
                 :title="t('module.fileSaveAs.exportDisclaimer')"
                 show-icon
                 :closable="false"
-                class="mb-4">
+                class="mb-4!">
             </el-alert>
         </template>
         <transition name="og-transition-scale-down">
@@ -49,8 +49,10 @@ export default {
 };
 </script>
 <script setup lang="ts">
-import { ref, reactive, computed, watch, nextTick } from 'vue';
+import { ref, reactive } from 'vue';
 import { useI18n } from '@/i18n';
+import { Rules } from 'async-validator';
+
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton from 'element-plus/lib/components/button/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
@@ -58,14 +60,20 @@ import ElFormItemGroup from '@/ui/el/el-form-item-group.vue';
 import ElInput from 'element-plus/lib/components/input/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import ElSwitch from 'element-plus/lib/components/switch/index';
+
 import workingFileStore from '@/store/working-file';
-import { notifyInjector, unexpectedErrorMessage, validationSubmissionErrorMessage } from '@/lib/notify';
-import { Rules, RuleItem } from 'async-validator';
+
+import { useWebdavClient } from '@/composables/webdav-client';
+
+import { runModule } from '@/modules';
 import { saveImage, saveImageAs } from '@/modules/file/save';
+
+import { notifyInjector, unexpectedErrorMessage, validationSubmissionErrorMessage } from '@/lib/notify';
 import { knownFileExtensions } from '@/lib/regex';
 
 const { t } = useI18n();
 const vLoading = ElLoading.directive;
+const { connected: isWebdavClientConnected } = useWebdavClient();
 
 const emit = defineEmits([
     'update:title',
@@ -105,12 +113,24 @@ async function onSave() {
         loading.value = true;
         try {
             if (formData.workingFile.saveBackDirectly && fileHandle) {
-                await saveImage(fileHandle);
+                if (isWebdavClientConnected.value) {
+                    runModule('file', 'saveWebdavExplorer', {
+                        fileHandle,
+                    });
+                } else {
+                    await saveImage(fileHandle);
+                }
             } else {
                 workingFileStore.set('fileName', formData.workingFile.fileName.replace(knownFileExtensions, ''));
-                await saveImageAs({
-                    fileName: formData.workingFile.fileName,
-                });
+                if (isWebdavClientConnected.value) {
+                    runModule('file', 'saveWebdavExplorer', {
+                        fileName: formData.workingFile.fileName,
+                    });
+                } else {
+                    await saveImageAs({
+                        fileName: formData.workingFile.fileName,
+                    });
+                }
             }
         } catch (error: any) {
             $notify({

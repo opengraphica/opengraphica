@@ -266,6 +266,13 @@
                     "showTips": "Show Tips",
                     "resetSettings": "Reset Settings"
                 },
+                "webdavStorage": {
+                    "groupTitle": "WebDAV Storage",
+                    "shareUrl": "Share URL",
+                    "shareUrlPlaceholder": "https://webdav.example.com/sharename",
+                    "username": "Username",
+                    "password": "Password"
+                },
                 "debugging": {
                     "groupTitle": "Debugging",
                     "useMobileDebugger": "Load Mobile Debugger"
@@ -720,6 +727,36 @@
                 "Do you wish to continue to open a new file and discard all of your changes?"
             ]
         },
+        "fileOpenWebdavExplorer": {
+            "openTitle": "Open File",
+            "insertTitle": "Insert a Photo",
+            "chooseLocalFile": "Choose a File on Your Computer",
+            "webdavRootBreadcrumb": "WebDAV Storage",
+            "backFolder": "Back",
+            "forwardFolder": "Forward",
+            "emptyFolder": "Empty Folder",
+            "folderLoadError": "A network error occurred when loading this folder. Please make sure your device has internet connectivity, and try again later.",
+            "fileDownloadError": {
+                "title": "Network Error",
+                "message": "An error occurred when downloading the file from the WebDAV server. Please try again later."
+            }
+        },
+        "fileSaveWebdavExplorer": {
+            "title": "Choose Save Location",
+            "orDivider": "or",
+            "saveToWebdav": "Save to Network Storage",
+            "saveLocalFile": "Save to Your Computer",
+            "createFolder": "Create Folder",
+            "folderName": "Folder Name",
+            "fileSaveError": {
+                "title": "Network Error",
+                "message": "An error occurred when uploading the file to the WebDAV server. Please try again later."
+            },
+            "folderCreateError": {
+                "title": "Network Error",
+                "message": "An error occurred when creating the folder."
+            }
+        },
         "fileSaveAs": {
             "title": "Save Image As",
             "saveBackIntroduction": "You have opened a file named {fileName}.",
@@ -963,6 +1000,22 @@
                     "name": "Open Image",
                     "description": "Open an image or project file in a new workspace."
                 },
+                "openConfirm": {
+                    "name": "Confirm Discard Changes",
+                    "description": "Saved changes will be lost."
+                },
+                "openFileDialog": {
+                    "name": "Open Image",
+                    "description": "Open an image for your filesystem."
+                },
+                "openFileList": {
+                    "name": "Open Image",
+                    "description": "Open an image directly."
+                },
+                "openWebdavExplorer": {
+                    "name": "Open Image",
+                    "description": "Open an image from your computer or network storage."
+                },
                 "quickLoad": {
                     "name": "Quick Load",
                     "description": "Load the file saved by quick save."
@@ -978,6 +1031,10 @@
                 "saveAs": {
                     "name": "Save Image As",
                     "description": "Saves the image in a project format that can be re-opened by OpenGraphica without losing any information."
+                },
+                "saveWebdavExplorer": {
+                    "name": "Save Image",
+                    "description": "Save an image to your computer or network storage."
                 },
                 "takePhoto": {
                     "name": "Take a Photo",
