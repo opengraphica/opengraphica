@@ -264,7 +264,7 @@
                                 </el-option-group>
                             </el-select>
                         </el-form-item>
-                        <el-collapse class="el-collapse--menu-item">
+                        <el-collapse class="el-collapse--menu-item" @change="onPrefsCollapseChange">
                             <!-- Prefs: Editor -->
                             <el-collapse-item v-el-collapse-item-smart-scroll :title="t('dock.settings.prefs.editor.groupTitle')">
                                 <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.editor.menuBarPosition')">
@@ -283,20 +283,25 @@
                                 </el-form-item>
                             </el-collapse-item>
                             <!-- Prefs: WebDAV Storage -->
-                            <el-collapse-item v-el-collapse-item-smart-scroll :title="t('dock.settings.prefs.webdavStorage.groupTitle')">
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.webdavStorage.shareUrl')">
-                                    <el-input v-model="preferenceWebdavShareUrl" size="small" :placeholder="t('dock.settings.prefs.webdavStorage.shareUrlPlaceholder')"
-                                        @blur="updatePreferenceWebdavShareUrl" @keydown.enter="updatePreferenceWebdavShareUrl"
-                                    />
-                                </el-form-item>
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.webdavStorage.username')">
-                                    <el-input v-model="preferenceWebdavUsername" size="small" autocomplete="off" @blur="updatePreferenceWebdavUsername" @keydown.enter="updatePreferenceWebdavUsername" />
-                                </el-form-item>
-                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.webdavStorage.password')">
-                                    <el-input v-model="preferenceWebdavPassword" autocomplete="off" size="small" class="el-input--password"
-                                        @copy.prevent @cut.prevent @blur="updatePreferenceWebdavPassword" @keydown.enter="updatePreferenceWebdavPassword"
-                                    />
-                                </el-form-item>
+                            <el-collapse-item
+                                v-el-collapse-item-smart-scroll
+                                :title="t('dock.settings.prefs.webdavStorage.groupTitle')"
+                            >
+                                <el-form-item-group ref="webdavStorageGroup" class="px-4!">
+                                    <el-form-item :label="t('dock.settings.prefs.webdavStorage.shareUrl')">
+                                        <el-input v-model="preferenceWebdavShareUrl" :placeholder="t('dock.settings.prefs.webdavStorage.shareUrlPlaceholder')"
+                                            @blur="updatePreferenceWebdavShareUrl" @keydown.enter="updatePreferenceWebdavShareUrl"
+                                        />
+                                    </el-form-item>
+                                    <el-form-item :label="t('dock.settings.prefs.webdavStorage.username')">
+                                        <el-input v-model="preferenceWebdavUsername" autocomplete="off" @blur="updatePreferenceWebdavUsername" @keydown.enter="updatePreferenceWebdavUsername" />
+                                    </el-form-item>
+                                    <el-form-item :label="t('dock.settings.prefs.webdavStorage.password')">
+                                        <el-input v-model="preferenceWebdavPassword" autocomplete="off" class="el-input--password"
+                                            @copy.prevent @cut.prevent @blur="updatePreferenceWebdavPassword" @keydown.enter="updatePreferenceWebdavPassword"
+                                        />
+                                    </el-form-item>
+                                </el-form-item-group>
                             </el-collapse-item>
                             <!-- Prefs: Debugging -->
                             <el-collapse-item v-el-collapse-item-smart-scroll :title="t('dock.settings.prefs.debugging.groupTitle')">
@@ -362,6 +367,7 @@ import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/inde
 import ElCollapse, { ElCollapseItem } from 'element-plus/lib/components/collapse/index';
 import ElDivider from 'element-plus/lib/components/divider/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
+import ElFormItemGroup from '@/ui/el/el-form-item-group.vue';
 import ElInput from 'element-plus/lib/components/input/index';
 import ElInputNumber from '@/ui/el/el-input-number.vue';
 import ElLink from 'element-plus/lib/components/link/index';
@@ -592,6 +598,9 @@ const languageOverride = computed<string>({
         setEditorLanguage(value);
     }
 });
+function onPrefsCollapseChange() {
+    webdavStorageGroup.value?.calculateLabelMinWidth();
+}
 const preferenceRenderer = computed<PreferencesState['renderer']>({
     get() {
         return preferencesStore.state.renderer;
@@ -639,6 +648,7 @@ const preferenceMenuBarPosition = computed<'left' | 'right' | 'top' | 'bottom'>(
         appEmitter.emit('app.canvas.resetTransform');
     }
 });
+const webdavStorageGroup = ref<InstanceType<typeof ElFormItemGroup>>();
 const preferenceWebdavShareUrl = ref<string>(preferencesStore.get('webdavShareUrl'));
 function updatePreferenceWebdavShareUrl() {
     preferencesStore.set('webdavShareUrl', preferenceWebdavShareUrl.value.trim());

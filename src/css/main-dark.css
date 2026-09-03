@@ -8292,6 +8292,10 @@
   font-family: Roboto;
   src: url("fonts/Roboto-Light.ttf");
 }
+@font-face {
+  font-family: TextSecurityDisc;
+  src: url("./fonts/TextSecurityDisc-Regular.woff");
+}
 :root {
   --og-border-radius: 0.5rem;
   --og-dnd-drop-overlay-z-index: 800000;
@@ -28263,12 +28267,6 @@ body.og-full-page .opengraphica {
   --el-text-color-placeholder: #b1b1b1;
   color: var(--el-color-black);
 }
-@font-face {
-  .opengraphica {
-    font-family: text-security-disc;
-    src: url("../fonts/TextSecurityDisc/TextSecurityDisc-Regular.woff");
-  }
-}
 .opengraphica .el-text-alignment-fix--sm--above {
   margin-top: 0.05em;
 }
@@ -28757,7 +28755,7 @@ body.og-full-page .opengraphica {
 }
 .opengraphica .el-input--password {
   -webkit-text-security: disc;
-  font-family: text-security-disc;
+  font-family: TextSecurityDisc;
 }
 .opengraphica .el-input-group .el-color-picker .el-color-picker__trigger {
   border-radius: 0;

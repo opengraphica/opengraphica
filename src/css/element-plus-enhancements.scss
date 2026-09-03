@@ -1,8 +1,4 @@
 @mixin element-plus-enhancements {
-    @font-face{
-        font-family: text-security-disc;
-        src: url("../fonts/TextSecurityDisc/TextSecurityDisc-Regular.woff");
-    }
 
     --el-transition-duration-fast: 0.1s;
 
@@ -614,7 +610,7 @@
     }
     .el-input--password {
         -webkit-text-security: disc;
-        font-family: text-security-disc;
+        font-family: TextSecurityDisc;
     }
     .el-input-group {
         .el-color-picker .el-color-picker__trigger {
