@@ -83,6 +83,7 @@ import OgButton from '@/ui/element/button.vue';
 import { useWebdavClient } from '@/composables/webdav-client';
 
 import appEmitter from '@/lib/emitter';
+import { getMimeTypeForExtension } from '@/lib/file';
 
 import { runModule } from '@/modules';
 
@@ -209,14 +210,16 @@ async function onCurrentFileChange(file: FileStat | null) {
         isLoadingFolder.value = true;
         try {
             const fileContents: ArrayBuffer = await webdavClient.getFileContents(file.filename, { format: 'binary' });
+            let mimeType = file.mime || getMimeTypeForExtension(file.filename.split('.').pop() ?? '');
             await runModule('file', 'openFileList', {
-                files: [new File([new Blob([fileContents], { type: file.mime ?? 'application/octet-binary' })], file.basename)],
+                files: [new File([new Blob([fileContents], { type: mimeType })], file.basename, { type: mimeType })],
                 dialogOptions: {
                     insert: props.insert,
                 },
             });
             emit('close');
-        } catch {
+        } catch (error) {
+            console.error('[@/ui/module/module-file-open-webdav-explorer.vue]', error);
             appEmitter.emit('app.notify', {
                 type: 'error',
                 title: t('module.fileOpenWebdavExplorer.fileDownloadError.title'),

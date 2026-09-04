@@ -29,12 +29,18 @@ export function createWebdavClient(options: CreateWebdavClientOptions): WebdavCl
     let connected = ref<boolean>(false);
 
     watch(() => ([
-        preferencesStore.state.webdavShareUrl,
+        preferencesStore.state.enableWebdavServer,
+        preferencesStore.state.webdavServerUrl,
         preferencesStore.state.webdavUsername,
         preferencesStore.state.webdavPassword,
-    ]), async ([webdavShareUrl, webdavUsername, webdavPassword]) => {
+    ] as const), async ([enableWebdavServer, webdavServerUrl, webdavUsername, webdavPassword]) => {
+        if (!enableWebdavServer) {
+            connected.value = false;
+            client = null;
+            return;
+        }
         try {
-            new URL(webdavShareUrl);
+            new URL(webdavServerUrl);
         } catch {
             return;
         }
@@ -51,7 +57,7 @@ export function createWebdavClient(options: CreateWebdavClientOptions): WebdavCl
         let connectUuid = currentConnectUuid;
         const { createClient } = await import('webdav/web');
         if (currentConnectUuid !== connectUuid) return;
-        client = createClient(webdavShareUrl, webdavUsername ? {
+        client = createClient(webdavServerUrl, webdavUsername ? {
             username: webdavUsername,
             password: webdavPassword,
         } : undefined);

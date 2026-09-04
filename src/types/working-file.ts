@@ -30,6 +30,7 @@ export interface DrawWorkingFileOptions {
     };
 }
 
+// WARNING: When updating these types, ensure you also update the validation in file parsers.
 export type WorkingFileLayerBlendingMode
     = 'normal' | 'dissolve' | 'colorErase' | 'erase' | 'merge' | 'split'
     | 'lightenOnly' | 'lumaLightenOnly' | 'screen' | 'dodge' | 'linearDodge' | 'addition'
@@ -38,6 +39,7 @@ export type WorkingFileLayerBlendingMode
     | 'difference' | 'exclusion' | 'subtract' | 'grainExtract' | 'grainMerge' | 'divide'
     | 'hue' | 'chroma' | 'color' | 'lightness' | 'luminance';
 
+// WARNING: When updating these types, ensure you also update the validation in file parsers.
 export type WorkingFileLayerType = 'empty' | 'gradient' | 'group' | 'raster' | 'rasterSequence' | 'vector' | 'vectorPath' | 'video' | 'text';
 
 export interface WorkingFileLayerFilter<T extends ColorModel = ColorModel> {
@@ -147,7 +149,7 @@ export interface WorkingFileLayer<T extends ColorModel = ColorModel> {
     id: number;
     isBaking?: boolean;
     name: string;
-    opacity: 1;
+    opacity: number;
     thumbnailImageSrc: string | null;
     transform: DOMMatrix;
     type: WorkingFileLayerType;
@@ -163,6 +165,7 @@ export interface WorkingFileGradientColorStop<T extends ColorModel = ColorModel>
     offset: number;
     color: T;
 }
+// WARNING: When updating these types, ensure you also update the validation in file parsers.
 export type WorkingFileGradientColorSpace = 'oklab' | 'srgb' | 'linearSrgb';
 export type WorkingFileGradientFillType = 'linear' | 'radial';
 export type WorkingFileGradientSpreadMethod = 'pad' | 'repeat' | 'reflect' | 'truncate';

@@ -292,7 +292,7 @@ async function saveLocalFile() {
         await saveImage(props.fileHandle as never);
     } else if (props.exportOptions) {
         await exportAsImage(props.exportOptions);
-    } else if (props.fileName) {
+    } else if (props.fileName != null) {
         await saveImageAs({
             fileName: props.fileName,
         });
@@ -317,7 +317,7 @@ async function saveNetworkFile() {
             }
             fileArrayBuffer = await createArrayBufferFromBlob(blob);
         } else {
-            fileName = addFileExtension(networkFormData.fileName, 'json');
+            fileName = addFileExtension(networkFormData.fileName, 'ora');
             fileArrayBuffer = await createSaveArrayBuffer()
         }
         await webdavClient.putFileContents(

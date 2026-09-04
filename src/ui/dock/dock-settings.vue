@@ -285,18 +285,21 @@
                             <!-- Prefs: WebDAV Storage -->
                             <el-collapse-item
                                 v-el-collapse-item-smart-scroll
-                                :title="t('dock.settings.prefs.webdavStorage.groupTitle')"
+                                :title="t('dock.settings.prefs.networkStorage.groupTitle')"
                             >
-                                <el-form-item-group ref="webdavStorageGroup" class="px-4!">
-                                    <el-form-item :label="t('dock.settings.prefs.webdavStorage.shareUrl')">
-                                        <el-input v-model="preferenceWebdavShareUrl" :placeholder="t('dock.settings.prefs.webdavStorage.shareUrlPlaceholder')"
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.networkStorage.enableWebdavServer')">
+                                    <el-switch v-model="preferenceEnableWebdav" />
+                                </el-form-item>
+                                <el-form-item-group v-if="preferenceEnableWebdav" ref="webdavStorageGroup" class="px-4!">
+                                    <el-form-item :label="t('dock.settings.prefs.networkStorage.webdavServerUrl')">
+                                        <el-input v-model="preferenceWebdavShareUrl" :placeholder="t('dock.settings.prefs.networkStorage.webdavServerUrlPlaceholder')"
                                             @blur="updatePreferenceWebdavShareUrl" @keydown.enter="updatePreferenceWebdavShareUrl"
                                         />
                                     </el-form-item>
-                                    <el-form-item :label="t('dock.settings.prefs.webdavStorage.username')">
+                                    <el-form-item :label="t('dock.settings.prefs.networkStorage.webdavUsername')">
                                         <el-input v-model="preferenceWebdavUsername" autocomplete="off" @blur="updatePreferenceWebdavUsername" @keydown.enter="updatePreferenceWebdavUsername" />
                                     </el-form-item>
-                                    <el-form-item :label="t('dock.settings.prefs.webdavStorage.password')">
+                                    <el-form-item :label="t('dock.settings.prefs.networkStorage.webdavPassword')">
                                         <el-input v-model="preferenceWebdavPassword" autocomplete="off" class="el-input--password"
                                             @copy.prevent @cut.prevent @blur="updatePreferenceWebdavPassword" @keydown.enter="updatePreferenceWebdavPassword"
                                         />
@@ -648,10 +651,18 @@ const preferenceMenuBarPosition = computed<'left' | 'right' | 'top' | 'bottom'>(
         appEmitter.emit('app.canvas.resetTransform');
     }
 });
+const preferenceEnableWebdav = computed<boolean>({
+    get() {
+        return preferencesStore.state.enableWebdavServer;
+    },
+    set(value) {
+        preferencesStore.set('enableWebdavServer', value);
+    }
+})
 const webdavStorageGroup = ref<InstanceType<typeof ElFormItemGroup>>();
-const preferenceWebdavShareUrl = ref<string>(preferencesStore.get('webdavShareUrl'));
+const preferenceWebdavShareUrl = ref<string>(preferencesStore.get('webdavServerUrl'));
 function updatePreferenceWebdavShareUrl() {
-    preferencesStore.set('webdavShareUrl', preferenceWebdavShareUrl.value.trim());
+    preferencesStore.set('webdavServerUrl', preferenceWebdavShareUrl.value.trim());
 }
 const preferenceWebdavUsername = ref<string>(preferencesStore.get('webdavUsername'));
 function updatePreferenceWebdavUsername() {

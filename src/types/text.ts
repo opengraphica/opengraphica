@@ -2,8 +2,11 @@ import { ColorModel } from './color';
 
 import type { Glyph } from '@/lib/opentype.js';
 
+// WARNING: When updating these types, ensure you also update the validation in file parsers.
+export type TextBoundary = 'dynamic' | 'box';
 export type TextDirection = 'ltr' | 'rtl' | 'ttb' | 'btt';
 export type TextLineAlignment = 'start' | 'center' | 'end';
+export type TextWrapAt = 'word' | 'wordThenLetter';
 
 export interface CalculatedTextPlacement {
     lines: RenderTextLineInfo[];
@@ -66,11 +69,11 @@ export interface TextDocumentSelectionState {
 }
 
 export interface TextDocument<T extends ColorModel = ColorModel> {
-    boundary: 'dynamic' | 'box';
+    boundary: TextBoundary;
     lineAlignment: TextLineAlignment;
     lineDirection: TextDirection;
     wrapDirection: TextDirection;
-    wrapAt: 'word' | 'wordThenLetter';
+    wrapAt: TextWrapAt;
     lines: TextDocumentLine<T>[];
 }
 

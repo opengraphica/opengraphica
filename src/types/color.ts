@@ -1,3 +1,4 @@
+// WARNING: When updating these types, ensure you also update the validation in file parsers.
 export type ColorModelName = 'rgba' | 'cmyka' | 'hsla' | 'hsva' | 'laba' | 'lcha';
 export type ColorConversionSpace = 'srgb' | 'oklab';
 
@@ -51,6 +52,16 @@ export interface LCHAColor extends GenericColor {
 }
 
 export type ColorModel = RGBAColor | CMYKAColor | HSLAColor | HSVAColor | LABAColor | LCHAColor;
+
+type ColorModelNameMap = {
+    rgba: RGBAColor;
+    cmyka: CMYKAColor;
+    hsla: HSLAColor;
+    hsva: HSVAColor;
+    laba: LABAColor;
+    lcha: LCHAColor;
+};
+export type ColorModelNameToModel<T extends ColorModelName> = ColorModelNameMap[T];
 
 export interface GradientStop<T extends ColorModel> {
     percent: number;

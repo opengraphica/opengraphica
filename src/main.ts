@@ -51,11 +51,11 @@ Promise.all([
         workingFileStore
     ] = results;
     (app as any).store = {
-        canvas: canvasStore,
-        editor: editorStore,
-        history: historyStore,
+        canvas: canvasStore.default,
+        editor: editorStore.default,
+        history: historyStore.default,
         preferences: preferencesStore,
-        workingFile: workingFileStore,
+        workingFile: workingFileStore.default,
     };
 });
 

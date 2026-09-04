@@ -26,7 +26,7 @@
         "element-plus": "2.2.28",
         "eruda": "3.0.1",
         "expr-eval": "2.0.2",
-        "fflate": "^0.8.3",
+        "fflate": "0.8.3",
         "file-saver": "2.0.5",
         "gifken": "2.1.1",
         "libgif": "0.0.3",

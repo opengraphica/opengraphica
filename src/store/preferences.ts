@@ -15,6 +15,9 @@ interface PreferencesState {
     // Was used for canvas renderer to fix seams between images next to each other; currently unused.
     enableMultiLayerBuffer: boolean;
 
+    // Allows the user to open and save files to a WebDAV file server. See webdav* preferences.
+    enableWebdavServer: boolean;
+
     // Maximum number of history events before discarding.
     historyStatesMax: number;
 
@@ -89,7 +92,7 @@ interface PreferencesState {
     webdavPassword: string;
 
     // URL of a WebDAV share to use, example: https://webdav.example.com/marie123
-    webdavShareUrl: string;
+    webdavServerUrl: string;
 
     // Username for WebDAV share (basic auth)
     webdavUsername: string;
@@ -107,6 +110,7 @@ const store = new PerformantStore<PreferencesStore>({
         dockPosition: 'right',
         dragStartRadius: 5,
         enableMultiLayerBuffer: false,
+        enableWebdavServer: false,
         historyStatesMax: 50,
         imageSmoothingZoomRatio: 1.25,
         keyboardMapConfig: [],
@@ -131,13 +135,14 @@ const store = new PerformantStore<PreferencesStore>({
         useMobileDebugger: false,
         vendorCustomSaveCallback: null,
         webdavPassword: '',
-        webdavShareUrl: '',
+        webdavServerUrl: '',
         webdavUsername: '',
     },
     restore: [
         'dockPosition',
         'dragStartRadius',
         'historyStatesMax',
+        'enableWebdavServer',
         'languageOverride',
         'menuBarPosition',
         'multiTouchDownTimeout',
@@ -153,7 +158,7 @@ const store = new PerformantStore<PreferencesStore>({
         'touchRotation',
         'useMobileDebugger',
         'webdavPassword',
-        'webdavShareUrl',
+        'webdavServerUrl',
         'webdavUsername',
     ],
 });

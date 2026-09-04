@@ -39,7 +39,7 @@ export interface SerializedFileLayer<T extends ColorModel = ColorModel> {
     height: number;
     id: number;
     name: string;
-    opacity: 1;
+    opacity: number;
     transform: [number, number, number, number, number, number];
     type: WorkingFileLayerType;
     visible: boolean;

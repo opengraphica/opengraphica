@@ -266,12 +266,13 @@
                     "showTips": "Show Tips",
                     "resetSettings": "Reset Settings"
                 },
-                "webdavStorage": {
-                    "groupTitle": "WebDAV Storage",
-                    "shareUrl": "Share URL",
-                    "shareUrlPlaceholder": "https://webdav.example.com/sharename",
-                    "username": "Username",
-                    "password": "Password"
+                "networkStorage": {
+                    "groupTitle": "Network Storage",
+                    "enableWebdavServer": "Enable WebDAV Server",
+                    "webdavServerUrl": "Server URL",
+                    "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename",
+                    "webdavUsername": "Username",
+                    "webdavPassword": "Password"
                 },
                 "debugging": {
                     "groupTitle": "Debugging",

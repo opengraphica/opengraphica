@@ -43,6 +43,7 @@ export interface ExportAsImageOptions {
     cameraTransform?: DOMMatrix;
     applySelectionMask?: boolean;
     quality?: number;
+    toCanvas?: boolean;
     toClipboard?: boolean;
     toBlob?: boolean;
     toFileHandle?: FileSystemFileHandle | null;
@@ -54,6 +55,7 @@ export interface ExportAsImageOptions {
 
 export interface ExportAsImageResults {
     blob?: Blob;
+    canvas?: HTMLCanvasElement;
     generatedImageHash: string;
 }
 
@@ -128,7 +130,10 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                 canvas = workingCanvas;
             }
 
-            if (options.toNewLayer) {
+            if (options.toCanvas) {
+                results.canvas = canvas;
+                resolve(results);
+            } else if (options.toNewLayer) {
                 historyStore.dispatch('runAction', {
                     action: new InsertLayerAction({
                         type: 'raster',
@@ -141,8 +146,7 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                         }
                     })
                 })
-            }
-            else if (options.toClipboard) {
+            } else if (options.toClipboard) {
                 if (await promptClipboardWritePermission()) {
                     canvas.toBlob(async (blob) => {
                         if (blob) {
