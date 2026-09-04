@@ -277,7 +277,8 @@
                     "groupTitle": "Aiuto",
                     "reportIssue": "Segnala un problema",
                     "designSystem": "Sistema di progettazione"
-                }
+                },
+                "networkStorage": {}
             }
         }
     },
@@ -989,6 +990,13 @@
                 "title": "Dimensioni Max Incontro",
                 "message": "Un'immagine che hai aperto è più grande della dimensione massima che il tuo browser supporta. E' stato ridimensionato."
             }
+        },
+        "fileOpenWebdavExplorer": {
+            "fileDownloadError": {}
+        },
+        "fileSaveWebdavExplorer": {
+            "fileSaveError": {},
+            "folderCreateError": {}
         }
     },
     "moduleGroup": {
@@ -1031,7 +1039,12 @@
                 "restoreBackup": {
                     "name": "Ripristinare il backup Immagine",
                     "description": "Caricare il file di backup salvato automaticamente durante la modifica."
-                }
+                },
+                "openConfirm": {},
+                "openFileDialog": {},
+                "openFileList": {},
+                "openWebdavExplorer": {},
+                "saveWebdavExplorer": {}
             }
         },
         "history": {
@@ -1492,9 +1505,8 @@
     },
     "tutorialTip": {
         "drawBrushToolIntroduction": {
-            "title": "Strumento di disegno",
             "introduction": [
-                "Lo strumento di disegno consente di creare linee e forme."
+                null
             ]
         },
         "explainCanvasViewportControls": {
@@ -1615,7 +1627,7 @@
         "drawGradientToolIntroduction": {
             "title": "Strumento gradiente",
             "introduction": [
-                "Lo strumento di gradiente consente di aggiungere strati di gradiente. È possibile controllare i limiti visibili di questo strumento combinandolo con lo strumento di selezione o lo strumento di cancellazione."
+                null
             ],
             "body": {
                 "mouse": [

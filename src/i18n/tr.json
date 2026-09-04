@@ -277,7 +277,8 @@
                     "groupTitle": "Yardım",
                     "reportIssue": "Rapor an Issue",
                     "designSystem": "Tasarım Sistemi"
-                }
+                },
+                "networkStorage": {}
             }
         }
     },
@@ -989,6 +990,13 @@
                 "title": "Max",
                 "message": "Açtığınız bir görüntü, tarayıcı desteklerinizin maksimum büyüklüğünden daha büyük. ölçeklendi."
             }
+        },
+        "fileOpenWebdavExplorer": {
+            "fileDownloadError": {}
+        },
+        "fileSaveWebdavExplorer": {
+            "fileSaveError": {},
+            "folderCreateError": {}
         }
     },
     "moduleGroup": {
@@ -1031,7 +1039,12 @@
                 "restoreBackup": {
                     "name": "Geri yükleme Backup Backup Image Image Image",
                     "description": "Kira dosyasını düzenleme sırasında otomatik olarak kurtarın."
-                }
+                },
+                "openConfirm": {},
+                "openFileDialog": {},
+                "openFileList": {},
+                "openWebdavExplorer": {},
+                "saveWebdavExplorer": {}
             }
         },
         "history": {
@@ -1492,9 +1505,8 @@
     },
     "tutorialTip": {
         "drawBrushToolIntroduction": {
-            "title": "Draw Tool",
             "introduction": [
-                "Çizim aracı hatları ve şekilleri oluşturmanıza olanak tanır."
+                null
             ]
         },
         "explainCanvasViewportControls": {
@@ -1615,7 +1627,7 @@
         "drawGradientToolIntroduction": {
             "title": "Gradient Tool",
             "introduction": [
-                "Gradient aracı, gradient katmanları eklemenizi sağlar. Bu aracın görünür sınırlarını seçim aracı veya silinmiş araçla birleştirerek kontrol edebilirsiniz."
+                null
             ],
             "body": {
                 "mouse": [

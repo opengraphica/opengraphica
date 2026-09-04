@@ -277,7 +277,8 @@
                     "groupTitle": "সাহায্য",
                     "reportIssue": "একটি ইস্যু প্রতিবেদন",
                     "designSystem": "সিস্টেমName"
-                }
+                },
+                "networkStorage": {}
             }
         }
     },
@@ -987,6 +988,13 @@
                 "title": "সর্বাধিক দিকমাত্রা",
                 "message": "আপনার ব্যবহৃত অনুসন্ধানের মাপের সর্বোচ্চ মাপে প্রদর্শিত ছবি। এটা নষ্ট হয়ে গেছে।."
             }
+        },
+        "fileOpenWebdavExplorer": {
+            "fileDownloadError": {}
+        },
+        "fileSaveWebdavExplorer": {
+            "fileSaveError": {},
+            "folderCreateError": {}
         }
     },
     "moduleGroup": {
@@ -1029,7 +1037,12 @@
                 "restoreBackup": {
                     "name": "ব্যাক-আপ পুনরুদ্ধার করুন ছবি",
                     "description": "সম্পাদন করার সময় ব্যাক-আপ ফাইল লোড করা হবে ।."
-                }
+                },
+                "openConfirm": {},
+                "openFileDialog": {},
+                "openFileList": {},
+                "openWebdavExplorer": {},
+                "saveWebdavExplorer": {}
             }
         },
         "history": {
@@ -1489,9 +1502,8 @@
     },
     "tutorialTip": {
         "drawBrushToolIntroduction": {
-            "title": "সরঞ্জাম আঁকো",
             "introduction": [
-                "আকৃতি তৈরি করতে এবং আপনাকে আকৃতি তৈরি করতে দেয়।."
+                null
             ]
         },
         "explainCanvasViewportControls": {
@@ -1612,7 +1624,7 @@
         "drawGradientToolIntroduction": {
             "title": "গ্রেডিয়েন্ট",
             "introduction": [
-                "গ্রেডিয়েন্ট টুল নির্বাচিত টুল- টিপ সহযোগে এই সরঞ্জামের সর্বোচ্চ মাপ নিয়ন্ত্রণ করা যাবে।."
+                null
             ],
             "body": {
                 "mouse": [

@@ -277,7 +277,8 @@
                     "groupTitle": "کمک به کمک",
                     "reportIssue": "گزارش یک مسئله",
                     "designSystem": "سیستم طراحی سیستم"
-                }
+                },
+                "networkStorage": {}
             }
         }
     },
@@ -987,6 +988,13 @@
                 "title": "Max Dimensions Encountered",
                 "message": "تصویری که باز کردید بزرگتر از حداکثر اندازه ای است که مرورگر شما از آن پشتیبانی می کند. پایین آمد."
             }
+        },
+        "fileOpenWebdavExplorer": {
+            "fileDownloadError": {}
+        },
+        "fileSaveWebdavExplorer": {
+            "fileSaveError": {},
+            "folderCreateError": {}
         }
     },
     "moduleGroup": {
@@ -1029,7 +1037,12 @@
                 "restoreBackup": {
                     "name": "بازیابی پشتیبان تصویر تصویر",
                     "description": "فایل پشتیبان را به طور خودکار در طول ویرایش ذخیره کنید."
-                }
+                },
+                "openConfirm": {},
+                "openFileDialog": {},
+                "openFileList": {},
+                "openWebdavExplorer": {},
+                "saveWebdavExplorer": {}
             }
         },
         "history": {
@@ -1489,9 +1502,8 @@
     },
     "tutorialTip": {
         "drawBrushToolIntroduction": {
-            "title": "ابزار Draw Tool",
             "introduction": [
-                "ابزار قرعه کشی به شما اجازه می دهد خطوط و اشکال ایجاد کنید."
+                null
             ]
         },
         "explainCanvasViewportControls": {
@@ -1612,7 +1624,7 @@
         "drawGradientToolIntroduction": {
             "title": "ابزار Gradient Tool",
             "introduction": [
-                "ابزار گرادیان به شما اجازه می دهد لایه های گرادیان را اضافه کنید. شما می توانید مرزهای قابل مشاهده این ابزار را با ترکیب آن با ابزار انتخاب یا ابزار پاک کنترل کنید."
+                null
             ],
             "body": {
                 "mouse": [

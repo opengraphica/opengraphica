@@ -277,7 +277,8 @@
                     "groupTitle": "Ayuda",
                     "reportIssue": "Reportar un problema",
                     "designSystem": "Sistema de diseño"
-                }
+                },
+                "networkStorage": {}
             }
         }
     },
@@ -989,6 +990,13 @@
                 "title": "Max Dimensiones Contadas",
                 "message": "Una imagen que abrió es mayor que el tamaño máximo que soporta su navegador. Fue reducido."
             }
+        },
+        "fileOpenWebdavExplorer": {
+            "fileDownloadError": {}
+        },
+        "fileSaveWebdavExplorer": {
+            "fileSaveError": {},
+            "folderCreateError": {}
         }
     },
     "moduleGroup": {
@@ -1031,7 +1039,12 @@
                 "restoreBackup": {
                     "name": "Restore Backup Imagen",
                     "description": "Cargue el archivo de copia de seguridad guardado automáticamente durante la edición."
-                }
+                },
+                "openConfirm": {},
+                "openFileDialog": {},
+                "openFileList": {},
+                "openWebdavExplorer": {},
+                "saveWebdavExplorer": {}
             }
         },
         "history": {
@@ -1492,9 +1505,8 @@
     },
     "tutorialTip": {
         "drawBrushToolIntroduction": {
-            "title": "Herramienta de dibujo",
             "introduction": [
-                "La herramienta de dibujo le permite crear líneas y formas."
+                null
             ]
         },
         "explainCanvasViewportControls": {
@@ -1615,7 +1627,7 @@
         "drawGradientToolIntroduction": {
             "title": "Herramienta de ingredientes",
             "introduction": [
-                "La herramienta gradiente le permite añadir capas gradientes. Usted puede controlar los límites visibles de esta herramienta combinando con la herramienta de selección o la herramienta borrada."
+                null
             ],
             "body": {
                 "mouse": [

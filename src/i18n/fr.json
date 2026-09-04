@@ -277,7 +277,8 @@
                     "groupTitle": "Aide",
                     "reportIssue": "Signaler un problème",
                     "designSystem": "Système de conception"
-                }
+                },
+                "networkStorage": {}
             }
         }
     },
@@ -989,6 +990,13 @@
                 "title": "Dimensions maximales rencontrées",
                 "message": "Une image que vous avez ouverte est plus grande que la taille maximale prise en charge par votre navigateur. Il a été réduit."
             }
+        },
+        "fileOpenWebdavExplorer": {
+            "fileDownloadError": {}
+        },
+        "fileSaveWebdavExplorer": {
+            "fileSaveError": {},
+            "folderCreateError": {}
         }
     },
     "moduleGroup": {
@@ -1031,7 +1039,12 @@
                 "restoreBackup": {
                     "name": "Restaurer la sauvegarde Image",
                     "description": "Chargez le fichier de sauvegarde enregistré automatiquement lors de l'édition."
-                }
+                },
+                "openConfirm": {},
+                "openFileDialog": {},
+                "openFileList": {},
+                "openWebdavExplorer": {},
+                "saveWebdavExplorer": {}
             }
         },
         "history": {
@@ -1492,9 +1505,8 @@
     },
     "tutorialTip": {
         "drawBrushToolIntroduction": {
-            "title": "Outil de dessin",
             "introduction": [
-                "L'outil de dessin vous permet de créer des lignes et des formes."
+                null
             ]
         },
         "explainCanvasViewportControls": {
@@ -1615,7 +1627,7 @@
         "drawGradientToolIntroduction": {
             "title": "Outil de graduation",
             "introduction": [
-                "L'outil dégradé vous permet d'ajouter des calques dégradés. Vous pouvez contrôler les limites visibles de cet outil en le combinant avec l'outil de sélection ou l'outil d'effacement."
+                null
             ],
             "body": {
                 "mouse": [

@@ -277,7 +277,8 @@
                     "groupTitle": "지원하다",
                     "reportIssue": "자주 묻는 질문",
                     "designSystem": "설계시스템"
-                }
+                },
+                "networkStorage": {}
             }
         }
     },
@@ -989,6 +990,13 @@
                 "title": "최대 차원 Encountered",
                 "message": "오픈한 이미지는 브라우저가 지원되는 최대 크기보다 크다. 그것은 축소되었습니다."
             }
+        },
+        "fileOpenWebdavExplorer": {
+            "fileDownloadError": {}
+        },
+        "fileSaveWebdavExplorer": {
+            "fileSaveError": {},
+            "folderCreateError": {}
         }
     },
     "moduleGroup": {
@@ -1031,7 +1039,12 @@
                 "restoreBackup": {
                     "name": "백업 복구 (주)",
                     "description": "백업 파일을 편집 중 자동으로 저장합니다."
-                }
+                },
+                "openConfirm": {},
+                "openFileDialog": {},
+                "openFileList": {},
+                "openWebdavExplorer": {},
+                "saveWebdavExplorer": {}
             }
         },
         "history": {
@@ -1492,9 +1505,8 @@
     },
     "tutorialTip": {
         "drawBrushToolIntroduction": {
-            "title": "Draw 공구",
             "introduction": [
-                "그리기 도구는 줄과 모양을 만들 수 있습니다."
+                null
             ]
         },
         "explainCanvasViewportControls": {
@@ -1615,7 +1627,7 @@
         "drawGradientToolIntroduction": {
             "title": "Gradient 공구",
             "introduction": [
-                "Gradient 도구는 gradient 레이어를 추가 할 수 있습니다. 선택 도구 또는 지우기 도구와 결합하여이 도구의 눈에 보이는 경계를 제어 할 수 있습니다."
+                null
             ],
             "body": {
                 "mouse": [

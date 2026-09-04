@@ -277,7 +277,8 @@
                     "groupTitle": "帮助",
                     "reportIssue": "报告一个问题",
                     "designSystem": "设计系统"
-                }
+                },
+                "networkStorage": {}
             }
         }
     },
@@ -987,6 +988,13 @@
                 "title": "遇到的最大尺寸",
                 "message": "您打开的图像大于浏览器支持的最大大小 。 规模缩小了."
             }
+        },
+        "fileOpenWebdavExplorer": {
+            "fileDownloadError": {}
+        },
+        "fileSaveWebdavExplorer": {
+            "fileSaveError": {},
+            "folderCreateError": {}
         }
     },
     "moduleGroup": {
@@ -1029,7 +1037,12 @@
                 "restoreBackup": {
                     "name": "恢复备份 图像",
                     "description": "装入编辑时自动保存的备份文件 ."
-                }
+                },
+                "openConfirm": {},
+                "openFileDialog": {},
+                "openFileList": {},
+                "openWebdavExplorer": {},
+                "saveWebdavExplorer": {}
             }
         },
         "history": {
@@ -1489,9 +1502,8 @@
     },
     "tutorialTip": {
         "drawBrushToolIntroduction": {
-            "title": "绘制工具",
             "introduction": [
-                "绘图工具允许您创建行和形状."
+                null
             ]
         },
         "explainCanvasViewportControls": {
@@ -1612,7 +1624,7 @@
         "drawGradientToolIntroduction": {
             "title": "渐变工具",
             "introduction": [
-                "梯度工具允许您添加梯度层。 您可以通过结合选择工具或擦除工具来控制此工具的可见界限."
+                null
             ],
             "body": {
                 "mouse": [

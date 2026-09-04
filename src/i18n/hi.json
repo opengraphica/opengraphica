@@ -277,7 +277,8 @@
                     "groupTitle": "सहायता",
                     "reportIssue": "एक मुद्दे की रिपोर्ट करें",
                     "designSystem": "डिजाइन प्रणाली"
-                }
+                },
+                "networkStorage": {}
             }
         }
     },
@@ -989,6 +990,13 @@
                 "title": "मैक्स आयाम Encountered",
                 "message": "आपके द्वारा खोली गई एक छवि अधिकतम आकार आपके ब्राउज़र समर्थन से अधिक है। यह नीचे बढ़ाया गया था।."
             }
+        },
+        "fileOpenWebdavExplorer": {
+            "fileDownloadError": {}
+        },
+        "fileSaveWebdavExplorer": {
+            "fileSaveError": {},
+            "folderCreateError": {}
         }
     },
     "moduleGroup": {
@@ -1031,7 +1039,12 @@
                 "restoreBackup": {
                     "name": "बैकअप पुनर्स्थापित करें छवि",
                     "description": "संपादन के दौरान स्वचालित रूप से सहेजी गई बैकअप फ़ाइल को लोड करें।."
-                }
+                },
+                "openConfirm": {},
+                "openFileDialog": {},
+                "openFileList": {},
+                "openWebdavExplorer": {},
+                "saveWebdavExplorer": {}
             }
         },
         "history": {
@@ -1492,9 +1505,8 @@
     },
     "tutorialTip": {
         "drawBrushToolIntroduction": {
-            "title": "उपकरण",
             "introduction": [
-                "ड्रॉ टूल आपको लाइनों और आकारों को बनाने देता है।."
+                null
             ]
         },
         "explainCanvasViewportControls": {
@@ -1615,7 +1627,7 @@
         "drawGradientToolIntroduction": {
             "title": "ढाल उपकरण",
             "introduction": [
-                "ढाल उपकरण आपको ढाल परतों को जोड़ने देता है। आप चयन उपकरण या मिटा उपकरण के साथ संयोजन करके इस उपकरण की दृश्य सीमाओं को नियंत्रित कर सकते हैं।."
+                null
             ],
             "body": {
                 "mouse": [
