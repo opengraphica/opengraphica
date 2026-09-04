@@ -278,7 +278,14 @@
                     "reportIssue": "گزارش یک مسئله",
                     "designSystem": "سیستم طراحی سیستم"
                 },
-                "networkStorage": {}
+                "networkStorage": {
+                    "groupTitle": "Network Storage",
+                    "enableWebdavServer": "قابلیت WebDAV سرور",
+                    "webdavServerUrl": "سرور URL",
+                    "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename",
+                    "webdavUsername": "Username",
+                    "webdavPassword": "Password"
+                }
             }
         }
     },
@@ -990,11 +997,34 @@
             }
         },
         "fileOpenWebdavExplorer": {
-            "fileDownloadError": {}
+            "fileDownloadError": {
+                "title": "خطای شبکه",
+                "message": "یک خطا زمانی رخ داد که فایل را از سرور WebDAV دانلود کنید. لطفا دوباره امتحان کنید."
+            },
+            "openTitle": "Open File",
+            "insertTitle": "اضافه کردن یک عکس",
+            "chooseLocalFile": "یک فایل در کامپیوتر خود انتخاب کنید",
+            "webdavRootBreadcrumb": "WebDAV ذخیره سازی",
+            "backFolder": "بازگشت",
+            "forwardFolder": "به جلو",
+            "emptyFolder": "سایه خالی",
+            "folderLoadError": "یک خطای شبکه در هنگام بارگیری این پوشه رخ داد. لطفا مطمئن شوید که دستگاه شما دارای اتصال اینترنتی است و دوباره سعی کنید."
         },
         "fileSaveWebdavExplorer": {
-            "fileSaveError": {},
-            "folderCreateError": {}
+            "fileSaveError": {
+                "title": "خطای شبکه",
+                "message": "یک خطا زمانی رخ داد که فایل را به سرور WebDAV آپلود کرد. لطفا دوباره امتحان کنید."
+            },
+            "folderCreateError": {
+                "title": "خطای شبکه",
+                "message": "یک خطا در هنگام ایجاد پوشه رخ داد."
+            },
+            "title": "گزینه Save Location را انتخاب کنید",
+            "orDivider": "یا",
+            "saveToWebdav": "ذخیره سازی شبکه",
+            "saveLocalFile": "ذخیره کامپیوتر شما",
+            "createFolder": "ایجاد Folder",
+            "folderName": "نام پوشه"
         }
     },
     "moduleGroup": {
@@ -1038,11 +1068,26 @@
                     "name": "بازیابی پشتیبان تصویر تصویر",
                     "description": "فایل پشتیبان را به طور خودکار در طول ویرایش ذخیره کنید."
                 },
-                "openConfirm": {},
-                "openFileDialog": {},
-                "openFileList": {},
-                "openWebdavExplorer": {},
-                "saveWebdavExplorer": {}
+                "openConfirm": {
+                    "name": "تغییرات Discard",
+                    "description": "تغییرات ذخیره شده از دست خواهند رفت."
+                },
+                "openFileDialog": {
+                    "name": "تصویر باز",
+                    "description": "یک تصویر را برای سیستم فایل خود باز کنید."
+                },
+                "openFileList": {
+                    "name": "تصویر باز",
+                    "description": "یک تصویر را به طور مستقیم باز کنید."
+                },
+                "openWebdavExplorer": {
+                    "name": "تصویر باز",
+                    "description": "یک تصویر را از کامپیوتر یا ذخیره سازی شبکه خود باز کنید."
+                },
+                "saveWebdavExplorer": {
+                    "name": "Save Image",
+                    "description": "یک تصویر را به کامپیوتر یا ذخیره سازی شبکه خود ذخیره کنید."
+                }
             }
         },
         "history": {
@@ -1503,8 +1548,9 @@
     "tutorialTip": {
         "drawBrushToolIntroduction": {
             "introduction": [
-                null
-            ]
+                "ابزار قلم به شما اجازه می دهد یک نقاشی با برس های مختلف ایجاد کنید. بهتر است از آن با یک سوزن حساس به فشار استفاده شود."
+            ],
+            "title": "ابزار Brush Tool"
         },
         "explainCanvasViewportControls": {
             "title": "حرکت بوم",
@@ -1624,7 +1670,7 @@
         "drawGradientToolIntroduction": {
             "title": "ابزار Gradient Tool",
             "introduction": [
-                null
+                "ابزار گرادیان به شما اجازه می دهد لایه های گرادیان را اضافه کنید."
             ],
             "body": {
                 "mouse": [

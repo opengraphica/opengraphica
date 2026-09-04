@@ -278,7 +278,14 @@
                     "reportIssue": "Relatar uma questão",
                     "designSystem": "Sistema de Design"
                 },
-                "networkStorage": {}
+                "networkStorage": {
+                    "groupTitle": "Armazenamento de rede",
+                    "enableWebdavServer": "Habilitar WebDAV Servidor",
+                    "webdavServerUrl": "URL do servidor",
+                    "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename",
+                    "webdavUsername": "Nome de utilizador",
+                    "webdavPassword": "Senha"
+                }
             }
         }
     },
@@ -992,11 +999,34 @@
             }
         },
         "fileOpenWebdavExplorer": {
-            "fileDownloadError": {}
+            "fileDownloadError": {
+                "title": "Erro de rede",
+                "message": "Um erro ocorreu ao baixar o arquivo do servidor WebDAV. Tente novamente mais tarde."
+            },
+            "openTitle": "Abrir arquivo",
+            "insertTitle": "Insira uma foto",
+            "chooseLocalFile": "Escolha um arquivo no seu computador",
+            "webdavRootBreadcrumb": "WebDAV Armazenamento",
+            "backFolder": "Voltar",
+            "forwardFolder": "Em frente",
+            "emptyFolder": "Folder vazio",
+            "folderLoadError": "Um erro de rede ocorreu ao carregar esta pasta. Por favor, certifique-se de que seu dispositivo tem conectividade com a Internet e tente novamente mais tarde."
         },
         "fileSaveWebdavExplorer": {
-            "fileSaveError": {},
-            "folderCreateError": {}
+            "fileSaveError": {
+                "title": "Erro de rede",
+                "message": "Um erro ocorreu ao carregar o arquivo para o servidor WebDAV. Tente novamente mais tarde."
+            },
+            "folderCreateError": {
+                "title": "Erro de rede",
+                "message": "Um erro ocorreu ao criar a pasta."
+            },
+            "title": "Escolha Salvar localização",
+            "orDivider": "ou",
+            "saveToWebdav": "Salvar no armazenamento de rede",
+            "saveLocalFile": "Salvar no seu computador",
+            "createFolder": "Criar pasta",
+            "folderName": "Nome da pasta"
         }
     },
     "moduleGroup": {
@@ -1040,11 +1070,26 @@
                     "name": "Restaurar backup Imagem",
                     "description": "Carregar o arquivo de backup salvo automaticamente durante a edição."
                 },
-                "openConfirm": {},
-                "openFileDialog": {},
-                "openFileList": {},
-                "openWebdavExplorer": {},
-                "saveWebdavExplorer": {}
+                "openConfirm": {
+                    "name": "Confirmar alterações de descarte",
+                    "description": "As mudanças salvas serão perdidas."
+                },
+                "openFileDialog": {
+                    "name": "Abrir imagem",
+                    "description": "Abra uma imagem para o seu sistema de arquivos."
+                },
+                "openFileList": {
+                    "name": "Abrir imagem",
+                    "description": "Abra uma imagem diretamente."
+                },
+                "openWebdavExplorer": {
+                    "name": "Abrir imagem",
+                    "description": "Abra uma imagem do seu computador ou armazenamento de rede."
+                },
+                "saveWebdavExplorer": {
+                    "name": "Salvar imagem",
+                    "description": "Salve uma imagem no seu computador ou armazenamento de rede."
+                }
             }
         },
         "history": {
@@ -1506,8 +1551,9 @@
     "tutorialTip": {
         "drawBrushToolIntroduction": {
             "introduction": [
-                null
-            ]
+                "A ferramenta escova permite criar uma pintura com diferentes pincéis. É melhor usado com um estilo sensível à pressão."
+            ],
+            "title": "Ferramenta de escova"
         },
         "explainCanvasViewportControls": {
             "title": "Movendo a tela",
@@ -1627,7 +1673,7 @@
         "drawGradientToolIntroduction": {
             "title": "Ferramenta gradual",
             "introduction": [
-                null
+                "A ferramenta de gradiente permite adicionar camadas gradientes."
             ],
             "body": {
                 "mouse": [

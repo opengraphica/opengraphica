@@ -278,7 +278,14 @@
                 },
                 "language": "用語集",
                 "default": "デフォルト",
-                "networkStorage": {}
+                "networkStorage": {
+                    "groupTitle": "ネットワークストレージ",
+                    "enableWebdavServer": "WebDAVを有効にする サーバー",
+                    "webdavServerUrl": "サーバー URL",
+                    "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename",
+                    "webdavUsername": "ユーザ名",
+                    "webdavPassword": "パスワード"
+                }
             }
         }
     },
@@ -992,11 +999,34 @@
             }
         },
         "fileOpenWebdavExplorer": {
-            "fileDownloadError": {}
+            "fileDownloadError": {
+                "title": "ネットワークエラー",
+                "message": "WebDAVサーバからファイルをダウンロードするとエラーが発生しました。 もう一度お試しください."
+            },
+            "openTitle": "ファイルを開く",
+            "insertTitle": "写真をインサートする",
+            "chooseLocalFile": "コンピュータ上のファイルを選択してください",
+            "webdavRootBreadcrumb": "サイトマップ ストレージ",
+            "backFolder": "バックナンバー",
+            "forwardFolder": "ミッション",
+            "emptyFolder": "空のフォルダ",
+            "folderLoadError": "このフォルダをロードするとネットワークエラーが発生しました。 お使いのデバイスがインターネットに接続されていることを確認し、後でもう一度お試しください."
         },
         "fileSaveWebdavExplorer": {
-            "fileSaveError": {},
-            "folderCreateError": {}
+            "fileSaveError": {
+                "title": "ネットワークエラー",
+                "message": "ファイルをWebDAVサーバにアップロードする際にエラーが発生しました。 もう一度お試しください."
+            },
+            "folderCreateError": {
+                "title": "ネットワークエラー",
+                "message": "フォルダを作成するときにエラーが発生しました."
+            },
+            "title": "保存場所を選択",
+            "orDivider": "または",
+            "saveToWebdav": "ネットワークストレージに保存",
+            "saveLocalFile": "コンピュータに保存",
+            "createFolder": "フォルダを作成する",
+            "folderName": "フォルダ名"
         }
     },
     "moduleGroup": {
@@ -1040,11 +1070,26 @@
                     "name": "バックアップを復元する サイトマップ",
                     "description": "編集時に自動的に保存されたバックアップファイルを読み込みます."
                 },
-                "openConfirm": {},
-                "openFileDialog": {},
-                "openFileList": {},
-                "openWebdavExplorer": {},
-                "saveWebdavExplorer": {}
+                "openConfirm": {
+                    "name": "破棄変更の確認",
+                    "description": "保存された変更は失われます."
+                },
+                "openFileDialog": {
+                    "name": "開いたイメージ",
+                    "description": "ファイルシステム用の画像を開きます."
+                },
+                "openFileList": {
+                    "name": "開いたイメージ",
+                    "description": "直接画像を開きます."
+                },
+                "openWebdavExplorer": {
+                    "name": "開いたイメージ",
+                    "description": "コンピュータやネットワークストレージから画像を開きます."
+                },
+                "saveWebdavExplorer": {
+                    "name": "イメージを保存",
+                    "description": "コンピュータやネットワークストレージに画像を保存します."
+                }
             }
         },
         "history": {
@@ -1506,8 +1551,9 @@
     "tutorialTip": {
         "drawBrushToolIntroduction": {
             "introduction": [
-                null
-            ]
+                "ブラシ用具は別のブラシが付いている絵画を作成できます。 圧力に敏感なスタイラスで最適です."
+            ],
+            "title": "ブラシツール"
         },
         "explainCanvasViewportControls": {
             "title": "キャンバスの移動",
@@ -1627,7 +1673,7 @@
         "drawGradientToolIntroduction": {
             "title": "グラデーションツール",
             "introduction": [
-                null
+                "グラデーションツールを使用すると、グラデーションレイヤーを追加できます."
             ],
             "body": {
                 "mouse": [

@@ -278,7 +278,14 @@
                     "reportIssue": "Eine Ausgabe melden",
                     "designSystem": "Design System"
                 },
-                "networkStorage": {}
+                "networkStorage": {
+                    "groupTitle": "Netzwerkspeicher",
+                    "enableWebdavServer": "WebDAV aktivieren Server",
+                    "webdavServerUrl": "Server URL",
+                    "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename",
+                    "webdavUsername": "Benutzername",
+                    "webdavPassword": "Passwort vergessen"
+                }
             }
         }
     },
@@ -992,11 +999,34 @@
             }
         },
         "fileOpenWebdavExplorer": {
-            "fileDownloadError": {}
+            "fileDownloadError": {
+                "title": "Netzwerkfehler",
+                "message": "Beim Herunterladen der Datei vom WebDAV-Server trat ein Fehler auf. Bitte versuchen Sie es später wieder."
+            },
+            "openTitle": "Datei öffnen",
+            "insertTitle": "Ein Foto einfügen",
+            "chooseLocalFile": "Wählen Sie eine Datei auf Ihrem Computer",
+            "webdavRootBreadcrumb": "WebDAV Lagerung",
+            "backFolder": "Zurück",
+            "forwardFolder": "Vorwärts",
+            "emptyFolder": "Leerer Ordner",
+            "folderLoadError": "Beim Laden dieses Ordners trat ein Netzwerkfehler auf. Bitte stellen Sie sicher, dass Ihr Gerät Internet-Konnektivität hat, und versuchen Sie es später wieder."
         },
         "fileSaveWebdavExplorer": {
-            "fileSaveError": {},
-            "folderCreateError": {}
+            "fileSaveError": {
+                "title": "Netzwerkfehler",
+                "message": "Beim Hochladen der Datei auf den WebDAV-Server trat ein Fehler auf. Bitte versuchen Sie es später wieder."
+            },
+            "folderCreateError": {
+                "title": "Netzwerkfehler",
+                "message": "Beim Erstellen des Ordners trat ein Fehler auf."
+            },
+            "title": "Wählen Sie den Standort",
+            "orDivider": "oder",
+            "saveToWebdav": "Speichern von Netzwerkspeichern",
+            "saveLocalFile": "Speichern Sie Ihren Computer",
+            "createFolder": "Ordner erstellen",
+            "folderName": "Ordnername"
         }
     },
     "moduleGroup": {
@@ -1040,11 +1070,26 @@
                     "name": "Restore Backup Bild",
                     "description": "Laden Sie die bei der Bearbeitung automatisch gespeicherte Sicherungsdatei."
                 },
-                "openConfirm": {},
-                "openFileDialog": {},
-                "openFileList": {},
-                "openWebdavExplorer": {},
-                "saveWebdavExplorer": {}
+                "openConfirm": {
+                    "name": "Bestätigen Sie Discard-Änderungen",
+                    "description": "Gespeicherte Änderungen werden verloren gehen."
+                },
+                "openFileDialog": {
+                    "name": "Bild öffnen",
+                    "description": "Öffne ein Bild für dein Dateisystem."
+                },
+                "openFileList": {
+                    "name": "Bild öffnen",
+                    "description": "Öffne ein Bild direkt."
+                },
+                "openWebdavExplorer": {
+                    "name": "Bild öffnen",
+                    "description": "Öffnen Sie ein Bild von Ihrem Computer oder Netzwerkspeicher."
+                },
+                "saveWebdavExplorer": {
+                    "name": "Bild vergrößern",
+                    "description": "Speichern Sie ein Bild auf Ihrem Computer oder Netzwerkspeicher."
+                }
             }
         },
         "history": {
@@ -1506,8 +1551,9 @@
     "tutorialTip": {
         "drawBrushToolIntroduction": {
             "introduction": [
-                null
-            ]
+                "Mit dem Pinselwerkzeug erstellen Sie ein Gemälde mit unterschiedlichen Pinseln. Es wird am besten mit einem druckempfindlichen Stylus verwendet."
+            ],
+            "title": "Brush Tool"
         },
         "explainCanvasViewportControls": {
             "title": "Bewegen der Leinwand",
@@ -1627,7 +1673,7 @@
         "drawGradientToolIntroduction": {
             "title": "Gradientenwerkzeug",
             "introduction": [
-                null
+                "Mit dem Gradientenwerkzeug können Sie Gradientenschichten hinzufügen."
             ],
             "body": {
                 "mouse": [

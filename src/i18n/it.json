@@ -278,7 +278,14 @@
                     "reportIssue": "Segnala un problema",
                     "designSystem": "Sistema di progettazione"
                 },
-                "networkStorage": {}
+                "networkStorage": {
+                    "groupTitle": "Stoccaggio di rete",
+                    "enableWebdavServer": "Attiva WebDAV Server",
+                    "webdavServerUrl": "URL del server",
+                    "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename",
+                    "webdavUsername": "Nome utente",
+                    "webdavPassword": "Password"
+                }
             }
         }
     },
@@ -992,11 +999,34 @@
             }
         },
         "fileOpenWebdavExplorer": {
-            "fileDownloadError": {}
+            "fileDownloadError": {
+                "title": "Errore di rete",
+                "message": "Si è verificato un errore durante il download del file dal server WebDAV. Riprova più tardi."
+            },
+            "openTitle": "Apri il file",
+            "insertTitle": "Inserisci una foto",
+            "chooseLocalFile": "Scegli un file sul tuo computer",
+            "webdavRootBreadcrumb": "WebDAV Stoccaggio",
+            "backFolder": "Indietro",
+            "forwardFolder": "Avanti",
+            "emptyFolder": "Cartella vuota",
+            "folderLoadError": "Un errore di rete si è verificato quando si carica questa cartella. Si prega di assicurarsi che il dispositivo ha connettività internet, e riprovare più tardi."
         },
         "fileSaveWebdavExplorer": {
-            "fileSaveError": {},
-            "folderCreateError": {}
+            "fileSaveError": {
+                "title": "Errore di rete",
+                "message": "Si è verificato un errore durante il caricamento del file sul server WebDAV. Riprova più tardi."
+            },
+            "folderCreateError": {
+                "title": "Errore di rete",
+                "message": "Si è verificato un errore durante la creazione della cartella."
+            },
+            "title": "Scegli Salva posizione",
+            "orDivider": "o",
+            "saveToWebdav": "Salva per lo storage di rete",
+            "saveLocalFile": "Salva nel tuo computer",
+            "createFolder": "Crea cartella",
+            "folderName": "Nome della cartella"
         }
     },
     "moduleGroup": {
@@ -1040,11 +1070,26 @@
                     "name": "Ripristinare il backup Immagine",
                     "description": "Caricare il file di backup salvato automaticamente durante la modifica."
                 },
-                "openConfirm": {},
-                "openFileDialog": {},
-                "openFileList": {},
-                "openWebdavExplorer": {},
-                "saveWebdavExplorer": {}
+                "openConfirm": {
+                    "name": "Confermare le modifiche della scheda",
+                    "description": "I cambiamenti salvati saranno persi."
+                },
+                "openFileDialog": {
+                    "name": "Immagine aperta",
+                    "description": "Aprire un'immagine per il filesystem."
+                },
+                "openFileList": {
+                    "name": "Immagine aperta",
+                    "description": "Aprire un'immagine direttamente."
+                },
+                "openWebdavExplorer": {
+                    "name": "Immagine aperta",
+                    "description": "Aprire un'immagine dal computer o dall'archiviazione di rete."
+                },
+                "saveWebdavExplorer": {
+                    "name": "Salva immagine",
+                    "description": "Salvare un'immagine sul computer o sull'archiviazione di rete."
+                }
             }
         },
         "history": {
@@ -1506,8 +1551,9 @@
     "tutorialTip": {
         "drawBrushToolIntroduction": {
             "introduction": [
-                null
-            ]
+                "Lo strumento pennello consente di creare un dipinto con spazzole diverse. È meglio usato con uno stilo sensibile alla pressione."
+            ],
+            "title": "Strumento di spazzola"
         },
         "explainCanvasViewportControls": {
             "title": "Trasferire la tela",
@@ -1627,7 +1673,7 @@
         "drawGradientToolIntroduction": {
             "title": "Strumento gradiente",
             "introduction": [
-                null
+                "Lo strumento di gradiente consente di aggiungere strati di gradiente."
             ],
             "body": {
                 "mouse": [

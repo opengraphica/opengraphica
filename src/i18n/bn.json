@@ -278,7 +278,14 @@
                     "reportIssue": "একটি ইস্যু প্রতিবেদন",
                     "designSystem": "সিস্টেমName"
                 },
-                "networkStorage": {}
+                "networkStorage": {
+                    "groupTitle": "নেটওয়ার্ক স্টোরেজ",
+                    "enableWebdavServer": "WebDAV সমর্থন সার্ভার",
+                    "webdavServerUrl": "সার্ভারের URL",
+                    "webdavServerUrlPlaceholder": "এইচ. এস. টি. আর. এল..... example.com",
+                    "webdavUsername": "ব্যবহারকারীর নাম",
+                    "webdavPassword": "পাসওয়ার্ড"
+                }
             }
         }
     },
@@ -990,11 +997,34 @@
             }
         },
         "fileOpenWebdavExplorer": {
-            "fileDownloadError": {}
+            "fileDownloadError": {
+                "title": "নেটওয়ার্ক সংক্রান্ত ত্রুটি",
+                "message": "WebDAV সার্ভার থেকে ফাইল ডাউনলোড করার সময় সমস্যা দেখা দিয়েছে। অনুগ্রহ করে পুনরায় প্রচেষ্টা করুন।."
+            },
+            "openTitle": "ফাইল খুলুন",
+            "insertTitle": "একটি ছবি সন্নিবেশ করুন",
+            "chooseLocalFile": "আপনার কম্পিউটারের মধ্যে ফাইল নির্বাচন করুন",
+            "webdavRootBreadcrumb": "WebDAV সংগ্রহস্থল",
+            "backFolder": "পূর্ববর্তী",
+            "forwardFolder": "ফরওয়ার্ড",
+            "emptyFolder": "খালি ফোল্ডার",
+            "folderLoadError": "এই ফোল্ডার লোড করার সময় নেটওয়ার্ক সংক্রান্ত সমস্যা দেখা দিয়েছে। দয়া করে নিশ্চিত করুন যে আপনার ডিভাইস ইন্টারনেট সংযোগ আছে কিনা এবং পরে আবার চেষ্টা করুন।."
         },
         "fileSaveWebdavExplorer": {
-            "fileSaveError": {},
-            "folderCreateError": {}
+            "fileSaveError": {
+                "title": "নেটওয়ার্ক সংক্রান্ত ত্রুটি",
+                "message": "WebDAV সার্ভারে আপলোড করার সময় একটি সমস্যা দেখা দিয়েছে। অনুগ্রহ করে পুনরায় প্রচেষ্টা করুন।."
+            },
+            "folderCreateError": {
+                "title": "নেটওয়ার্ক সংক্রান্ত ত্রুটি",
+                "message": "ফোল্ডার খোলার সময় সমস্যা দেখা দিয়েছে।."
+            },
+            "title": "অবস্থান সংরক্ষণ করুন",
+            "orDivider": "অথবা",
+            "saveToWebdav": "নেটওয়ার্ক সংরক্ষণ করুন",
+            "saveLocalFile": "কম্পিউটারকে সংরক্ষণ করুন",
+            "createFolder": "ফোল্ডার তৈরি করুন",
+            "folderName": "ফোল্ডারের নাম"
         }
     },
     "moduleGroup": {
@@ -1038,11 +1068,26 @@
                     "name": "ব্যাক-আপ পুনরুদ্ধার করুন ছবি",
                     "description": "সম্পাদন করার সময় ব্যাক-আপ ফাইল লোড করা হবে ।."
                 },
-                "openConfirm": {},
-                "openFileDialog": {},
-                "openFileList": {},
-                "openWebdavExplorer": {},
-                "saveWebdavExplorer": {}
+                "openConfirm": {
+                    "name": "পরিবর্তন বর্জন করুন",
+                    "description": "পরিবর্তন সংরক্ষণ করা হবে।."
+                },
+                "openFileDialog": {
+                    "name": "চিত্র লোড করা হোক",
+                    "description": "আপনার ফাইল-সিস্টেমের জন্য একটি ছবি খুলুন।."
+                },
+                "openFileList": {
+                    "name": "চিত্র লোড করা হোক",
+                    "description": "সরাসরি ছবিটি খুলুন।."
+                },
+                "openWebdavExplorer": {
+                    "name": "চিত্র লোড করা হোক",
+                    "description": "আপনার কম্পিউটার থেকে ছবি খুলুন অথবা নেটওয়ার্ক সঞ্চয় করুন।."
+                },
+                "saveWebdavExplorer": {
+                    "name": "ছবি সংরক্ষণ করুন",
+                    "description": "আপনার কম্পিউটার অথবা নেটওয়ার্ক সংরক্ষণ করুন."
+                }
             }
         },
         "history": {
@@ -1503,8 +1548,9 @@
     "tutorialTip": {
         "drawBrushToolIntroduction": {
             "introduction": [
-                null
-            ]
+                "ব্রাশ টুলগুলো আপনাকে ভিন্ন ব্রাশ দিয়ে পেইন্টিং করতে দেয়। এটা ব্যবহার করা যায় চাপ প্রয়োগের মাধ্যমে।."
+            ],
+            "title": "ব্রুকস টুল"
         },
         "explainCanvasViewportControls": {
             "title": "বিশ্ব নিরীক্ষা",
@@ -1624,7 +1670,7 @@
         "drawGradientToolIntroduction": {
             "title": "গ্রেডিয়েন্ট",
             "introduction": [
-                null
+                "গ্রেডিয়েন্ট টুল."
             ],
             "body": {
                 "mouse": [

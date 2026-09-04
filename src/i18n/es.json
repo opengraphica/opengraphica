@@ -278,7 +278,14 @@
                     "reportIssue": "Reportar un problema",
                     "designSystem": "Sistema de diseño"
                 },
-                "networkStorage": {}
+                "networkStorage": {
+                    "groupTitle": "Almacenamiento de redes",
+                    "enableWebdavServer": "Activar WebDAV Servidor",
+                    "webdavServerUrl": "URL del servidor",
+                    "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename",
+                    "webdavUsername": "Nombre de usuario",
+                    "webdavPassword": "Contraseña"
+                }
             }
         }
     },
@@ -992,11 +999,34 @@
             }
         },
         "fileOpenWebdavExplorer": {
-            "fileDownloadError": {}
+            "fileDownloadError": {
+                "title": "Error de red",
+                "message": "Se produjo un error al descargar el archivo del servidor WebDAV. Por favor, intente de nuevo más tarde."
+            },
+            "openTitle": "Archivo abierto",
+            "insertTitle": "Insertar una foto",
+            "chooseLocalFile": "Elija un archivo en su computadora",
+            "webdavRootBreadcrumb": "WebDAV Almacenamiento",
+            "backFolder": "Atrás",
+            "forwardFolder": "Adelante",
+            "emptyFolder": "Empty Folder",
+            "folderLoadError": "Se produjo un error de red cuando se carga esta carpeta. Por favor, asegúrese de que su dispositivo tiene conectividad a Internet, e inténtelo de nuevo más tarde."
         },
         "fileSaveWebdavExplorer": {
-            "fileSaveError": {},
-            "folderCreateError": {}
+            "fileSaveError": {
+                "title": "Error de red",
+                "message": "Se produjo un error al subir el archivo al servidor WebDAV. Por favor, intente de nuevo más tarde."
+            },
+            "folderCreateError": {
+                "title": "Error de red",
+                "message": "Se produjo un error al crear la carpeta."
+            },
+            "title": "Elija Guardar ubicación",
+            "orDivider": "o",
+            "saveToWebdav": "Guardar en red",
+            "saveLocalFile": "Guardar a su computadora",
+            "createFolder": "Crear carpeta",
+            "folderName": "Nombre de carpeta"
         }
     },
     "moduleGroup": {
@@ -1040,11 +1070,26 @@
                     "name": "Restore Backup Imagen",
                     "description": "Cargue el archivo de copia de seguridad guardado automáticamente durante la edición."
                 },
-                "openConfirm": {},
-                "openFileDialog": {},
-                "openFileList": {},
-                "openWebdavExplorer": {},
-                "saveWebdavExplorer": {}
+                "openConfirm": {
+                    "name": "Confirme cambios de disco",
+                    "description": "Se perderán los cambios guardados."
+                },
+                "openFileDialog": {
+                    "name": "Imagen abierta",
+                    "description": "Abra una imagen para su sistema de archivos."
+                },
+                "openFileList": {
+                    "name": "Imagen abierta",
+                    "description": "Abra una imagen directamente."
+                },
+                "openWebdavExplorer": {
+                    "name": "Imagen abierta",
+                    "description": "Abra una imagen de su ordenador o almacenamiento de red."
+                },
+                "saveWebdavExplorer": {
+                    "name": "Guardar imagen",
+                    "description": "Guarde una imagen en su ordenador o almacenamiento de red."
+                }
             }
         },
         "history": {
@@ -1506,8 +1551,9 @@
     "tutorialTip": {
         "drawBrushToolIntroduction": {
             "introduction": [
-                null
-            ]
+                "La herramienta de pincel te permite crear una pintura con diferentes pinceles. Es mejor utilizado con un estilo sensible a la presión."
+            ],
+            "title": "Brush Tool"
         },
         "explainCanvasViewportControls": {
             "title": "Moving the Canvas",
@@ -1627,7 +1673,7 @@
         "drawGradientToolIntroduction": {
             "title": "Herramienta de ingredientes",
             "introduction": [
-                null
+                "La herramienta gradiente le permite añadir capas gradientes."
             ],
             "body": {
                 "mouse": [

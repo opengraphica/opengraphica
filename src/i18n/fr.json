@@ -278,7 +278,14 @@
                     "reportIssue": "Signaler un problème",
                     "designSystem": "Système de conception"
                 },
-                "networkStorage": {}
+                "networkStorage": {
+                    "groupTitle": "Stockage réseau",
+                    "enableWebdavServer": "Activer WebDAV Serveur",
+                    "webdavServerUrl": "URL du serveur",
+                    "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename",
+                    "webdavUsername": "Nom d'utilisateur",
+                    "webdavPassword": "Mot de passe"
+                }
             }
         }
     },
@@ -992,11 +999,34 @@
             }
         },
         "fileOpenWebdavExplorer": {
-            "fileDownloadError": {}
+            "fileDownloadError": {
+                "title": "Erreur réseau",
+                "message": "Une erreur s'est produite lors du téléchargement du fichier depuis le serveur WebDAV. Veuillez réessayer plus tard."
+            },
+            "openTitle": "Ouvrir un fichier",
+            "insertTitle": "Insérer une photo",
+            "chooseLocalFile": "Choisissez un fichier sur votre ordinateur",
+            "webdavRootBreadcrumb": "WebDAV Stockage",
+            "backFolder": "Précédent",
+            "forwardFolder": "Suivant",
+            "emptyFolder": "Dossier vide",
+            "folderLoadError": "Une erreur réseau s'est produite lors du chargement de ce dossier. Assurez-vous que votre appareil a une connectivité Internet, et essayez à nouveau plus tard."
         },
         "fileSaveWebdavExplorer": {
-            "fileSaveError": {},
-            "folderCreateError": {}
+            "fileSaveError": {
+                "title": "Erreur réseau",
+                "message": "Une erreur s'est produite lors du téléchargement du fichier sur le serveur WebDAV. Veuillez réessayer plus tard."
+            },
+            "folderCreateError": {
+                "title": "Erreur réseau",
+                "message": "Une erreur s'est produite lors de la création du dossier."
+            },
+            "title": "Choisissez Enregistrer l'emplacement",
+            "orDivider": "ou",
+            "saveToWebdav": "Enregistrer dans le stockage réseau",
+            "saveLocalFile": "Enregistrer sur votre ordinateur",
+            "createFolder": "Créer un dossier",
+            "folderName": "Nom du dossier"
         }
     },
     "moduleGroup": {
@@ -1040,11 +1070,26 @@
                     "name": "Restaurer la sauvegarde Image",
                     "description": "Chargez le fichier de sauvegarde enregistré automatiquement lors de l'édition."
                 },
-                "openConfirm": {},
-                "openFileDialog": {},
-                "openFileList": {},
-                "openWebdavExplorer": {},
-                "saveWebdavExplorer": {}
+                "openConfirm": {
+                    "name": "Confirmer l'annulation des modifications",
+                    "description": "Les modifications enregistrées seront perdues."
+                },
+                "openFileDialog": {
+                    "name": "Ouvrir l'image",
+                    "description": "Ouvrez une image pour votre système de fichiers."
+                },
+                "openFileList": {
+                    "name": "Ouvrir l'image",
+                    "description": "Ouvrez une image directement."
+                },
+                "openWebdavExplorer": {
+                    "name": "Ouvrir l'image",
+                    "description": "Ouvrez une image depuis votre ordinateur ou votre stockage réseau."
+                },
+                "saveWebdavExplorer": {
+                    "name": "Enregistrer l'image",
+                    "description": "Enregistrez une image sur votre ordinateur ou votre réseau de stockage."
+                }
             }
         },
         "history": {
@@ -1506,8 +1551,9 @@
     "tutorialTip": {
         "drawBrushToolIntroduction": {
             "introduction": [
-                null
-            ]
+                "L'outil brosse vous permet de créer une peinture avec différents pinceaux. Il est mieux utilisé avec un stylet sensible à la pression."
+            ],
+            "title": "Outil de brosse"
         },
         "explainCanvasViewportControls": {
             "title": "Déplacement de la toile",
@@ -1627,7 +1673,7 @@
         "drawGradientToolIntroduction": {
             "title": "Outil de graduation",
             "introduction": [
-                null
+                "L'outil dégradé vous permet d'ajouter des calques dégradés."
             ],
             "body": {
                 "mouse": [

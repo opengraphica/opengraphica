@@ -278,7 +278,14 @@
                     "reportIssue": "Report an Issue",
                     "designSystem": "نظام التصميم"
                 },
-                "networkStorage": {}
+                "networkStorage": {
+                    "groupTitle": "تخزين الشبكة",
+                    "enableWebdavServer": "Enable WebDAV سيرفر",
+                    "webdavServerUrl": "Server URL",
+                    "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename",
+                    "webdavUsername": "المستعمل",
+                    "webdavPassword": "كلمة السر"
+                }
             }
         }
     },
@@ -992,11 +999,34 @@
             }
         },
         "fileOpenWebdavExplorer": {
-            "fileDownloadError": {}
+            "fileDownloadError": {
+                "title": "الشبكة",
+                "message": "وحدث خطأ عند تحميل الملف من خادم الشبكة. حاول مرة أخرى لاحقاً."
+            },
+            "openTitle": "فتحة",
+            "insertTitle": "Insert a Photo",
+            "chooseLocalFile": "اختر ملف في حاسوبك",
+            "webdavRootBreadcrumb": "WebDAV التخزين",
+            "backFolder": "العودة",
+            "forwardFolder": "إلى الأمام",
+            "emptyFolder": "فارغة",
+            "folderLoadError": "حدث خطأ في الشبكة عند تحميل هذا الملف من فضلك تأكد من أن جهازك لديه القدرة على الاتصال بالإنترنت وحاول مرة أخرى في وقت لاحق."
         },
         "fileSaveWebdavExplorer": {
-            "fileSaveError": {},
-            "folderCreateError": {}
+            "fileSaveError": {
+                "title": "الشبكة",
+                "message": "وحدث خطأ عند تحميل الملف على خادم الشبكة. حاول مرة أخرى لاحقاً."
+            },
+            "folderCreateError": {
+                "title": "الشبكة",
+                "message": "حدث خطأ عند إنشاء الملف."
+            },
+            "title": "اختيار الموقع",
+            "orDivider": "أو",
+            "saveToWebdav": "توفير تخزين الشبكة",
+            "saveLocalFile": "أنقذ حاسوبك",
+            "createFolder": "Create Folder",
+            "folderName": "اسم الجندي"
         }
     },
     "moduleGroup": {
@@ -1040,11 +1070,26 @@
                     "name": "إعادة الدعم الصورة",
                     "description": "ضعي الملف الإحتياطي انقذ تلقائياً أثناء التحرير."
                 },
-                "openConfirm": {},
-                "openFileDialog": {},
-                "openFileList": {},
-                "openWebdavExplorer": {},
-                "saveWebdavExplorer": {}
+                "openConfirm": {
+                    "name": "التغييرات في التصنيف",
+                    "description": "التغييرات المنقذة ستضيع."
+                },
+                "openFileDialog": {
+                    "name": "الصورة المفتوحة",
+                    "description": "افتحي صورة لملفاتك."
+                },
+                "openFileList": {
+                    "name": "الصورة المفتوحة",
+                    "description": "افتح صورة مباشرة."
+                },
+                "openWebdavExplorer": {
+                    "name": "الصورة المفتوحة",
+                    "description": "افتح صورة من حاسوبك أو مخزن الشبكة."
+                },
+                "saveWebdavExplorer": {
+                    "name": "إنقاذ التصوير",
+                    "description": "احفظي صورة لجهازك أو مخزن الشبكة."
+                }
             }
         },
         "history": {
@@ -1506,8 +1551,9 @@
     "tutorialTip": {
         "drawBrushToolIntroduction": {
             "introduction": [
-                null
-            ]
+                "أداة الفرشاة تسمح لك بصنع لوحة مع فرشات مختلفة هو أفضل يُستعملُ مَع a stylus حساس للضغطِ."
+            ],
+            "title": "Brush Tool"
         },
         "explainCanvasViewportControls": {
             "title": "ننتقل إلى كانفاس",
@@ -1627,7 +1673,7 @@
         "drawGradientToolIntroduction": {
             "title": "الخادمة",
             "introduction": [
-                null
+                "أداة التدرج تجعلك تضيف طبقات التدرج."
             ],
             "body": {
                 "mouse": [

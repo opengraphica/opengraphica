@@ -278,7 +278,14 @@
                     "reportIssue": "Rapor an Issue",
                     "designSystem": "Tasarım Sistemi"
                 },
-                "networkStorage": {}
+                "networkStorage": {
+                    "groupTitle": "Network Storage Network",
+                    "enableWebdavServer": "Enable WebDAV Server Server Server",
+                    "webdavServerUrl": "Server URL",
+                    "webdavServerUrlPlaceholder": "https://webdav.ör.com/sharename",
+                    "webdavUsername": "Username",
+                    "webdavPassword": "Şifre"
+                }
             }
         }
     },
@@ -992,11 +999,34 @@
             }
         },
         "fileOpenWebdavExplorer": {
-            "fileDownloadError": {}
+            "fileDownloadError": {
+                "title": "Ağ Hatası",
+                "message": "WebDAV sunucusundan dosyayı indirdiğinizde bir hata oluştu. Lütfen daha sonra tekrar deneyin."
+            },
+            "openTitle": "Open File",
+            "insertTitle": "Bir Fotoğraf Ekle",
+            "chooseLocalFile": "Bilgisayarınızda Bir Dosya seçin",
+            "webdavRootBreadcrumb": "WebDAV Depolama",
+            "backFolder": "Geri dön",
+            "forwardFolder": "İleri",
+            "emptyFolder": "Boş Kater",
+            "folderLoadError": "Bir ağ hatası bu klasörü yüklemede gerçekleşti. Lütfen cihazınızın internet bağlantısı olduğundan emin olun ve daha sonra deneyin."
         },
         "fileSaveWebdavExplorer": {
-            "fileSaveError": {},
-            "folderCreateError": {}
+            "fileSaveError": {
+                "title": "Ağ Hatası",
+                "message": "Dosyayı WebDAV sunucusuna yüklerken bir hata meydana geldi. Lütfen daha sonra tekrar deneyin."
+            },
+            "folderCreateError": {
+                "title": "Ağ Hatası",
+                "message": "Bir hata, klasörü oluştururken gerçekleşti."
+            },
+            "title": "Kaydet Konum",
+            "orDivider": "veya",
+            "saveToWebdav": "Network Storage'a Kaydet",
+            "saveLocalFile": "Bilgisayarınıza Kaydet",
+            "createFolder": "Create Folder",
+            "folderName": "Kater Name"
         }
     },
     "moduleGroup": {
@@ -1040,11 +1070,26 @@
                     "name": "Geri yükleme Backup Backup Image Image Image",
                     "description": "Kira dosyasını düzenleme sırasında otomatik olarak kurtarın."
                 },
-                "openConfirm": {},
-                "openFileDialog": {},
-                "openFileList": {},
-                "openWebdavExplorer": {},
-                "saveWebdavExplorer": {}
+                "openConfirm": {
+                    "name": "Onaysız Kart Değişiklikleri",
+                    "description": "Kurtarılan değişiklikler kaybedilecektir."
+                },
+                "openFileDialog": {
+                    "name": "Open Image",
+                    "description": "Dosya sisteminiz için bir görüntü açın."
+                },
+                "openFileList": {
+                    "name": "Open Image",
+                    "description": "Bir görüntü doğrudan açın."
+                },
+                "openWebdavExplorer": {
+                    "name": "Open Image",
+                    "description": "Bilgisayar veya ağ depolamanızdan bir görüntü açın."
+                },
+                "saveWebdavExplorer": {
+                    "name": "Save Image",
+                    "description": "Bilgisayarınıza veya ağ depolamanıza bir görüntü kaydedin."
+                }
             }
         },
         "history": {
@@ -1506,8 +1551,9 @@
     "tutorialTip": {
         "drawBrushToolIntroduction": {
             "introduction": [
-                null
-            ]
+                "Fırça aracı farklı fırçalarla bir resim oluşturmanıza izin verir. Baskıya duyarlı bir stylus ile en iyi kullanılır."
+            ],
+            "title": "Fırça Tool"
         },
         "explainCanvasViewportControls": {
             "title": "Blood'u hareket ettirin",
@@ -1627,7 +1673,7 @@
         "drawGradientToolIntroduction": {
             "title": "Gradient Tool",
             "introduction": [
-                null
+                "Gradient aracı, gradient katmanları eklemenizi sağlar."
             ],
             "body": {
                 "mouse": [

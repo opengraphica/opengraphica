@@ -278,7 +278,14 @@
                     "reportIssue": "एक मुद्दे की रिपोर्ट करें",
                     "designSystem": "डिजाइन प्रणाली"
                 },
-                "networkStorage": {}
+                "networkStorage": {
+                    "groupTitle": "नेटवर्क संग्रहण",
+                    "enableWebdavServer": "सक्षम WebDAV सर्वर",
+                    "webdavServerUrl": "सर्वर यूआरएल",
+                    "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename",
+                    "webdavUsername": "उपयोगकर्ता नाम",
+                    "webdavPassword": "पासवर्ड"
+                }
             }
         }
     },
@@ -992,11 +999,34 @@
             }
         },
         "fileOpenWebdavExplorer": {
-            "fileDownloadError": {}
+            "fileDownloadError": {
+                "title": "नेटवर्क त्रुटि",
+                "message": "WebDAV सर्वर से फ़ाइल डाउनलोड करते समय त्रुटि हुई। बाद में फिर से प्रयास करें।."
+            },
+            "openTitle": "ओपन फाइल",
+            "insertTitle": "फोटो डालें",
+            "chooseLocalFile": "अपने कंप्यूटर पर एक फ़ाइल चुनें",
+            "webdavRootBreadcrumb": "WebDAV भंडारण",
+            "backFolder": "वापस",
+            "forwardFolder": "आगे",
+            "emptyFolder": "खाली फ़ोल्डर",
+            "folderLoadError": "इस फ़ोल्डर को लोड करते समय एक नेटवर्क त्रुटि हुई। कृपया सुनिश्चित करें कि आपका डिवाइस इंटरनेट कनेक्टिविटी है, और बाद में फिर से प्रयास करें।."
         },
         "fileSaveWebdavExplorer": {
-            "fileSaveError": {},
-            "folderCreateError": {}
+            "fileSaveError": {
+                "title": "नेटवर्क त्रुटि",
+                "message": "फ़ाइल को WebDAV सर्वर पर अपलोड करते समय त्रुटि हुई। बाद में फिर से प्रयास करें।."
+            },
+            "folderCreateError": {
+                "title": "नेटवर्क त्रुटि",
+                "message": "फ़ोल्डर बनाते समय त्रुटि हुई।."
+            },
+            "title": "सेव स्थान चुनें",
+            "orDivider": "या",
+            "saveToWebdav": "नेटवर्क संग्रहण के लिए सहेजें",
+            "saveLocalFile": "अपने कंप्यूटर को सहेजें",
+            "createFolder": "फ़ोल्डर बनाएं",
+            "folderName": "फ़ोल्डर का नाम"
         }
     },
     "moduleGroup": {
@@ -1040,11 +1070,26 @@
                     "name": "बैकअप पुनर्स्थापित करें छवि",
                     "description": "संपादन के दौरान स्वचालित रूप से सहेजी गई बैकअप फ़ाइल को लोड करें।."
                 },
-                "openConfirm": {},
-                "openFileDialog": {},
-                "openFileList": {},
-                "openWebdavExplorer": {},
-                "saveWebdavExplorer": {}
+                "openConfirm": {
+                    "name": "डिस्कर्ड परिवर्तन की पुष्टि करें",
+                    "description": "सहेजा गया परिवर्तन खो दिया जाएगा।."
+                },
+                "openFileDialog": {
+                    "name": "ओपन इमेज",
+                    "description": "अपने फ़ाइल सिस्टम के लिए एक छवि खोलें।."
+                },
+                "openFileList": {
+                    "name": "ओपन इमेज",
+                    "description": "सीधे एक छवि खोलें।."
+                },
+                "openWebdavExplorer": {
+                    "name": "ओपन इमेज",
+                    "description": "अपने कंप्यूटर या नेटवर्क स्टोरेज से एक छवि खोलें।."
+                },
+                "saveWebdavExplorer": {
+                    "name": "छवि सहेजें",
+                    "description": "अपने कंप्यूटर या नेटवर्क स्टोरेज में एक छवि सेव करें।."
+                }
             }
         },
         "history": {
@@ -1506,8 +1551,9 @@
     "tutorialTip": {
         "drawBrushToolIntroduction": {
             "introduction": [
-                null
-            ]
+                "ब्रश टूल आपको विभिन्न ब्रशों के साथ एक पेंटिंग बनाने देता है। यह सबसे अच्छा एक दबाव संवेदनशील स्टाइलस के साथ प्रयोग किया जाता है।."
+            ],
+            "title": "ब्रश टूल"
         },
         "explainCanvasViewportControls": {
             "title": "कैनवास चल रहा है",
@@ -1627,7 +1673,7 @@
         "drawGradientToolIntroduction": {
             "title": "ढाल उपकरण",
             "introduction": [
-                null
+                "ढाल उपकरण आपको ढाल परतों को जोड़ने देता है।."
             ],
             "body": {
                 "mouse": [

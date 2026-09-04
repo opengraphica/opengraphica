@@ -278,7 +278,14 @@
                     "reportIssue": "Сообщить о проблеме",
                     "designSystem": "Система проектирования"
                 },
-                "networkStorage": {}
+                "networkStorage": {
+                    "groupTitle": "Сетевое хранение",
+                    "enableWebdavServer": "Включить WebDAV сервер",
+                    "webdavServerUrl": "URL сервера",
+                    "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename",
+                    "webdavUsername": "Имя пользователя",
+                    "webdavPassword": "Пароль"
+                }
             }
         }
     },
@@ -992,11 +999,34 @@
             }
         },
         "fileOpenWebdavExplorer": {
-            "fileDownloadError": {}
+            "fileDownloadError": {
+                "title": "Ошибка сети",
+                "message": "Ошибка произошла при загрузке файла с сервера WebDAV. Пожалуйста, попробуйте еще раз позже."
+            },
+            "openTitle": "Открытый файл",
+            "insertTitle": "Вставить фотографию",
+            "chooseLocalFile": "Выберите файл на вашем компьютере",
+            "webdavRootBreadcrumb": "WebDAV хранение",
+            "backFolder": "Назад",
+            "forwardFolder": "Вперед",
+            "emptyFolder": "Пустая папка",
+            "folderLoadError": "При загрузке этой папки произошла сетевая ошибка. Убедитесь, что ваше устройство подключено к Интернету, и попробуйте позже."
         },
         "fileSaveWebdavExplorer": {
-            "fileSaveError": {},
-            "folderCreateError": {}
+            "fileSaveError": {
+                "title": "Ошибка сети",
+                "message": "Ошибка произошла при загрузке файла на сервер WebDAV. Пожалуйста, попробуйте еще раз позже."
+            },
+            "folderCreateError": {
+                "title": "Ошибка сети",
+                "message": "Ошибка произошла при создании папки."
+            },
+            "title": "Выберите Save Location",
+            "orDivider": "или",
+            "saveToWebdav": "Сохранить в сетевом хранилище",
+            "saveLocalFile": "Экономьте на своем компьютере",
+            "createFolder": "Создать папку",
+            "folderName": "Имя папки"
         }
     },
     "moduleGroup": {
@@ -1040,11 +1070,26 @@
                     "name": "Восстановить резервное копирование Изображение",
                     "description": "Загрузите резервный файл, сохраненный автоматически во время редактирования."
                 },
-                "openConfirm": {},
-                "openFileDialog": {},
-                "openFileList": {},
-                "openWebdavExplorer": {},
-                "saveWebdavExplorer": {}
+                "openConfirm": {
+                    "name": "Подтвердить изменения в Discard",
+                    "description": "Спасенные изменения будут потеряны."
+                },
+                "openFileDialog": {
+                    "name": "Открытое изображение",
+                    "description": "Откройте изображение для вашей файловой системы."
+                },
+                "openFileList": {
+                    "name": "Открытое изображение",
+                    "description": "Откройте изображение напрямую."
+                },
+                "openWebdavExplorer": {
+                    "name": "Открытое изображение",
+                    "description": "Откройте изображение с вашего компьютера или сетевого хранилища."
+                },
+                "saveWebdavExplorer": {
+                    "name": "Сохранить изображение",
+                    "description": "Сохраните изображение на вашем компьютере или сетевом хранилище."
+                }
             }
         },
         "history": {
@@ -1506,8 +1551,9 @@
     "tutorialTip": {
         "drawBrushToolIntroduction": {
             "introduction": [
-                null
-            ]
+                "Инструмент кисти позволяет создавать картину с различными кистями. Лучше всего использовать с чувствительным к давлению стилусом."
+            ],
+            "title": "Brush Tool"
         },
         "explainCanvasViewportControls": {
             "title": "Перемещение холста",
@@ -1627,7 +1673,7 @@
         "drawGradientToolIntroduction": {
             "title": "Градиентный инструмент",
             "introduction": [
-                null
+                "Инструмент градиента позволяет добавлять градиентные слои."
             ],
             "body": {
                 "mouse": [

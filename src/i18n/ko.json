@@ -278,7 +278,14 @@
                     "reportIssue": "자주 묻는 질문",
                     "designSystem": "설계시스템"
                 },
-                "networkStorage": {}
+                "networkStorage": {
+                    "groupTitle": "네트워크 스토리지",
+                    "enableWebdavServer": "웹DAV 사용 계정 관리",
+                    "webdavServerUrl": "서버 URL",
+                    "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename",
+                    "webdavUsername": "사용자 이름",
+                    "webdavPassword": "비밀번호"
+                }
             }
         }
     },
@@ -992,11 +999,34 @@
             }
         },
         "fileOpenWebdavExplorer": {
-            "fileDownloadError": {}
+            "fileDownloadError": {
+                "title": "네트워크 오류",
+                "message": "WebDAV 서버에서 파일을 다운로드 할 때 오류가 발생했습니다. 나중에 다시 시도하십시오."
+            },
+            "openTitle": "파일 열기",
+            "insertTitle": "사진 삽입",
+            "chooseLocalFile": "컴퓨터에서 파일 선택",
+            "webdavRootBreadcrumb": "웹DAV 제품 정보",
+            "backFolder": "이름 *",
+            "forwardFolder": "제품정보",
+            "emptyFolder": "빈 폴더",
+            "folderLoadError": "이 폴더를 로딩할 때 네트워크 오류가 발생했습니다. 기기가 인터넷 연결을 가지고 있는지 확인하고 나중에 시도하십시오."
         },
         "fileSaveWebdavExplorer": {
-            "fileSaveError": {},
-            "folderCreateError": {}
+            "fileSaveError": {
+                "title": "네트워크 오류",
+                "message": "WebDAV 서버에 파일을 업로드 할 때 오류가 발생했습니다. 나중에 다시 시도하십시오."
+            },
+            "folderCreateError": {
+                "title": "네트워크 오류",
+                "message": "오류는 폴더를 만들 때 발생했습니다."
+            },
+            "title": "자주 묻는 질문",
+            "orDivider": "또는",
+            "saveToWebdav": "Network Storage에 저장",
+            "saveLocalFile": "당신의 컴퓨터에 저장",
+            "createFolder": "폴더 만들기",
+            "folderName": "폴더 이름"
         }
     },
     "moduleGroup": {
@@ -1040,11 +1070,26 @@
                     "name": "백업 복구 (주)",
                     "description": "백업 파일을 편집 중 자동으로 저장합니다."
                 },
-                "openConfirm": {},
-                "openFileDialog": {},
-                "openFileList": {},
-                "openWebdavExplorer": {},
-                "saveWebdavExplorer": {}
+                "openConfirm": {
+                    "name": "Discard 변경 확인",
+                    "description": "저장된 변경은 손실됩니다."
+                },
+                "openFileDialog": {
+                    "name": "본문 바로가기",
+                    "description": "파일시스템의 이미지를 엽니다."
+                },
+                "openFileList": {
+                    "name": "본문 바로가기",
+                    "description": "직접 이미지를 엽니 다."
+                },
+                "openWebdavExplorer": {
+                    "name": "본문 바로가기",
+                    "description": "컴퓨터 또는 네트워크 스토리지에서 이미지를 엽니다."
+                },
+                "saveWebdavExplorer": {
+                    "name": "이미지 저장",
+                    "description": "컴퓨터 또는 네트워크 스토리지에 이미지를 저장합니다."
+                }
             }
         },
         "history": {
@@ -1506,8 +1551,9 @@
     "tutorialTip": {
         "drawBrushToolIntroduction": {
             "introduction": [
-                null
-            ]
+                "브러시 도구는 다른 브러시로 그림을 만들 수 있습니다. 그것은 압력 과민한 stylus로 제일 사용됩니다."
+            ],
+            "title": "솔 공구"
         },
         "explainCanvasViewportControls": {
             "title": "캔버스 이동",
@@ -1627,7 +1673,7 @@
         "drawGradientToolIntroduction": {
             "title": "Gradient 공구",
             "introduction": [
-                null
+                "Gradient 도구는 gradient 레이어를 추가 할 수 있습니다."
             ],
             "body": {
                 "mouse": [

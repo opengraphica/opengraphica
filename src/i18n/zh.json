@@ -278,7 +278,14 @@
                     "reportIssue": "报告一个问题",
                     "designSystem": "设计系统"
                 },
-                "networkStorage": {}
+                "networkStorage": {
+                    "groupTitle": "网络存储",
+                    "enableWebdavServer": "启用 WebDAV 服务器",
+                    "webdavServerUrl": "服务器 URL",
+                    "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename (中文(简体) )",
+                    "webdavUsername": "用户名",
+                    "webdavPassword": "密码"
+                }
             }
         }
     },
@@ -990,11 +997,34 @@
             }
         },
         "fileOpenWebdavExplorer": {
-            "fileDownloadError": {}
+            "fileDownloadError": {
+                "title": "网络错误",
+                "message": "从 WebDAV 服务器下载文件时发生错误 。 请稍候再试."
+            },
+            "openTitle": "打开文件",
+            "insertTitle": "插入图片",
+            "chooseLocalFile": "在您的计算机上选择一个文件",
+            "webdavRootBreadcrumb": "网络数据交换 储存",
+            "backFolder": "回来",
+            "forwardFolder": "前进",
+            "emptyFolder": "空文件夹",
+            "folderLoadError": "装入此文件夹时发生网络错误 。 请确保您的设备有互联网连接, 稍后再试一次 ."
         },
         "fileSaveWebdavExplorer": {
-            "fileSaveError": {},
-            "folderCreateError": {}
+            "fileSaveError": {
+                "title": "网络错误",
+                "message": "上传文件到 WebDAV 服务器时发生错误 。 请稍候再试."
+            },
+            "folderCreateError": {
+                "title": "网络错误",
+                "message": "创建文件夹时发生错误 ."
+            },
+            "title": "选择保存位置",
+            "orDivider": "或",
+            "saveToWebdav": "保存到网络存储",
+            "saveLocalFile": "保存到您的计算机",
+            "createFolder": "创建文件夹",
+            "folderName": "文件夹名称"
         }
     },
     "moduleGroup": {
@@ -1038,11 +1068,26 @@
                     "name": "恢复备份 图像",
                     "description": "装入编辑时自动保存的备份文件 ."
                 },
-                "openConfirm": {},
-                "openFileDialog": {},
-                "openFileList": {},
-                "openWebdavExplorer": {},
-                "saveWebdavExplorer": {}
+                "openConfirm": {
+                    "name": "确认丢弃更改",
+                    "description": "已保存的更改将丢失 ."
+                },
+                "openFileDialog": {
+                    "name": "打开图像",
+                    "description": "为您的文件系统打开图像 ."
+                },
+                "openFileList": {
+                    "name": "打开图像",
+                    "description": "直接打开图像 ."
+                },
+                "openWebdavExplorer": {
+                    "name": "打开图像",
+                    "description": "从您的计算机或网络存储打开图像 ."
+                },
+                "saveWebdavExplorer": {
+                    "name": "保存图像",
+                    "description": "保存图像到您的计算机或网络存储中 ."
+                }
             }
         },
         "history": {
@@ -1503,8 +1548,9 @@
     "tutorialTip": {
         "drawBrushToolIntroduction": {
             "introduction": [
-                null
-            ]
+                "刷子工具可以让你用不同的刷子创作一幅画. 最好用一种对压力敏感的型号."
+            ],
+            "title": "刷新工具"
         },
         "explainCanvasViewportControls": {
             "title": "移动相机",
@@ -1624,7 +1670,7 @@
         "drawGradientToolIntroduction": {
             "title": "渐变工具",
             "introduction": [
-                null
+                "梯度工具允许您添加梯度层."
             ],
             "body": {
                 "mouse": [
