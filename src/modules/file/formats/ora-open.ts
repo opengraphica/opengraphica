@@ -283,6 +283,8 @@ async function parseLayersToActions(
                 sequence,
             };
         } else if (type === 'text') {
+            const width = parseFloat(layerNode.getAttribute('og:width') ?? '');
+            const height = parseFloat(layerNode.getAttribute('og:height') ?? '');
             const boundary = validateTextBoundary(layerNode.getAttribute('og:text-boundary') ?? '');
             const lineAlignment = validateTextLineAlignment(layerNode.getAttribute('og:text-line-alignment') ?? '');
             const lineDirection = validateTextDirection(layerNode.getAttribute('og:text-line-direction') ?? '');
@@ -333,6 +335,10 @@ async function parseLayersToActions(
                 wrapAt,
                 lines,
             };
+            if (!isNaN(width) && !isNaN(height)) {
+                parsedLayer.width = width;
+                parsedLayer.height = height;
+            }
         } else if (type === 'vector') {
             if (!archive[src]) continue;
             let sourceUuid = await createStoredSvg(

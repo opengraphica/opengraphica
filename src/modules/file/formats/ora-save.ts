@@ -145,11 +145,6 @@ async function generateLayer(
         layerNode.appendChild(filtersNode);
     }
     
-    // groupId: number | null;
-    // height: number;
-    // id: number;
-    // width: number;
-
     if (layer.type === 'empty') {
         const layerDataFilename = `layer${layer.id}.svg`;
         layerNode.setAttribute('src', 'data/' + layerDataFilename);
@@ -239,6 +234,8 @@ async function generateLayer(
             }
         }
     } else if (layer.type === 'text') {
+        layerNode.setAttribute('og:width', serializeFloat(layer.width));
+        layerNode.setAttribute('og:height', serializeFloat(layer.height));
         layerNode.setAttribute('og:text-boundary', layer.data.boundary);
         layerNode.setAttribute('og:text-line-alignment', layer.data.lineAlignment);
         layerNode.setAttribute('og:text-line-direction', layer.data.lineDirection);
