@@ -17,7 +17,7 @@ import historyStore from '@/store/history';
 
 import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
 import { generateImageBlobHash } from '@/lib/hash';
-import { getImageDataEmptyBounds, getImageDataFromCanvas } from '@/lib/image';
+import { getImageDataEmptyBounds, getImageDataFromCanvas, resizeImage } from '@/lib/image';
 import { findPointListBounds, limitMaxDimension } from '@/lib/math';
 import { knownFileExtensions } from '@/lib/regex';
 
@@ -43,6 +43,7 @@ export interface ExportAsImageOptions {
     cameraTransform?: DOMMatrix;
     applySelectionMask?: boolean;
     quality?: number;
+    maxFileSize?: number;
     toCanvas?: boolean;
     toClipboard?: boolean;
     toBlob?: boolean;
@@ -187,20 +188,19 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                     }
                 });
             } else {
-                canvas.toBlob((blob) => {
-                    if (blob) {
-                        if (options.toBlob) {
-                            results.blob = blob;
-                        } else if (options.toFileHandle) {
-                            save(blob, options.toFileHandle);
-                        } else {
-                            saveAs(blob, fileName);
-                        }
-                        resolve(results);
+                const blob = await toBlobWithMaxFileSize(canvas, options.maxFileSize ?? Infinity, mimeType, options.quality);
+                if (blob) {
+                    if (options.toBlob) {
+                        results.blob = blob;
+                    } else if (options.toFileHandle) {
+                        save(blob, options.toFileHandle);
                     } else {
-                        reject(new Error('Image blob was not created.'));
+                        saveAs(blob, fileName);
                     }
-                }, mimeType, options.quality);
+                    resolve(results);
+                } else {
+                    reject(new Error('Image blob was not created.'));
+                }
             }
         } catch (error) {
             console.error('[src/modules/file/export.ts]', error);
@@ -208,6 +208,48 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
         }
     });
 }
+
+async function toBlobWithMaxFileSize(
+    canvas: HTMLCanvasElement,
+    fileSize: number,
+    mimeType: string,
+    quality: number | undefined,
+): Promise<Blob | null> {
+    const getBlob = (c: HTMLCanvasElement) =>
+        new Promise<Blob | null>(resolve => c.toBlob(resolve, mimeType, quality));
+
+    const initialBlob = await getBlob(canvas);
+    if (!initialBlob) return null;
+    if (initialBlob.size <= fileSize) {
+        return initialBlob;
+    }
+
+    let low = 0.05;
+    let high = 1.0;
+    let bestBlob = initialBlob;
+    for (let i = 0; i < 6; i++) {
+        const mid = (low + high) / 2;
+        const targetWidth = Math.max(1, Math.round(canvas.width * mid));
+        const targetHeight = Math.max(1, Math.round(canvas.height * mid));
+
+        const resizedCanvas = await resizeImage(canvas, targetWidth, targetHeight);
+        const blob = await getBlob(resizedCanvas);
+        if (!blob) continue;
+
+        if (blob.size < fileSize) {
+            bestBlob = blob;
+            if (blob.size >= fileSize * 0.9) {
+                break;
+            }
+            low = mid;
+        } else {
+            high = mid;
+        }
+    }
+
+    return bestBlob;
+}
+
 
 async function save(blob: Blob, fileHandle: FileSystemFileHandle) {
     const writable = await fileHandle.createWritable();

@@ -136,6 +136,7 @@
         "done": "Done",
         "editBrush": "Edit Brush",
         "editEffects": "Edit Effects",
+        "enable": "Enable",
         "export": "Export",
         "moreInfo": "More Info",
         "no": "No",
@@ -693,6 +694,7 @@
             "layers": "Layers",
             "quality": "Quality",
             "dithering": "Dithering",
+            "maxFileSize": "Max File Size",
             "ditheringOption": {
                 "none": "None",
                 "atkinson": "Atkinson",

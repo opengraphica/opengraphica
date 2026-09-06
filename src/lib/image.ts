@@ -439,8 +439,14 @@ export async function resizeImage(imageCanvas: HTMLCanvasElement | HTMLImageElem
     let imageResizeCanvas = document.createElement('canvas');
     imageResizeCanvas.width = newWidth;
     imageResizeCanvas.height = newHeight;
-    const Pica = (await import('@/lib/pica')).default;
-    const pica = new Pica();
-    await pica.resize(imageCanvas, imageResizeCanvas, { alpha: true });
+    if (imageCanvas.width > 4096 || imageCanvas.height > 4096) {
+        const ctx = imageResizeCanvas.getContext('2d');
+        ctx?.scale(newWidth / imageCanvas.width, newHeight / imageCanvas.height);
+        ctx?.drawImage(imageCanvas, 0, 0);
+    } else {
+        const Pica = (await import('@/lib/pica')).default;
+        const pica = new Pica();
+        await pica.resize(imageCanvas, imageResizeCanvas, { alpha: true });
+    }
     return imageResizeCanvas;
 }

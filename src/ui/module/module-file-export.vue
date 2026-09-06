@@ -56,7 +56,7 @@
                             <el-slider v-model="formData.workingFile.quality" :show-tooltip="false"></el-slider>
                         </el-col>
                         <el-col :span="10">
-                            <el-input-number v-model="formData.workingFile.quality" :min="0" :max="100" :precision="0" class="el-input--text-right">
+                            <el-input-number v-model="formData.workingFile.quality" :min="0" :max="100000" :precision="0" class="el-input--text-right">
                                 <template v-slot:append>%</template>
                             </el-input-number>
                         </el-col>
@@ -73,6 +73,20 @@
                             :value="option.value">
                         </el-option>
                     </el-select>
+                </el-form-item>
+            </transition>
+            <transition name="og-transition-scale-down">
+                <el-form-item v-if="showMaxFileSizeSetting" :label="t('module.fileExport.maxFileSize')" prop="maxFileSize">
+                    <el-row class="flex! flex-nowrap!">
+                        <el-col class="basis-0! grow-0! shrink-0! flex items-center px-2">
+                            <el-switch v-model="formData.workingFile.enableMaxFileSize" :active-text="t('button.enable')" />
+                        </el-col>
+                        <el-col class="basis-0! grow-1!">
+                            <el-input-number v-model="formData.workingFile.maxFileSize" :min="0" :max="100" :precision="2" class="el-input--text-right">
+                                <template v-slot:append>MB</template>
+                            </el-input-number>
+                        </el-col>
+                    </el-row>
                 </el-form-item>
             </transition>
         </el-form-item-group>
@@ -105,6 +119,7 @@ import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSlider from 'element-plus/lib/components/slider/index';
 import ElSwitch from 'element-plus/lib/components/switch/index';
 
+import preferencesStore from '@/store/preferences';
 import workingFileStore from '@/store/working-file';
 
 import { runModule } from '@/modules';
@@ -165,6 +180,10 @@ const showDitheringSetting = computed<boolean>(() => {
     return ['gif'].includes(formData.workingFile.fileType);
 });
 
+const showMaxFileSizeSetting = computed<boolean>(() => {
+    return ['jpg', 'png', 'webp', 'bmp'].includes(formData.workingFile.fileType);
+});
+
 const formData = reactive({
     workingFile: {
         saveBackDirectly: false,
@@ -172,7 +191,9 @@ const formData = reactive({
         fileType: 'png' as 'png' | 'jpg' | 'webp' | 'gif' | 'bmp' | 'tiff',
         layerSelection: 'all' as 'all' | 'selected',
         quality: 100,
-        dithering: ''
+        dithering: '',
+        enableMaxFileSize: preferencesStore.get('exportEnableMaxFileSize'),
+        maxFileSize: preferencesStore.get('exportDefaultMaxFileSize'),
     }
 });
 const formValidationRules: Rules = {};
@@ -206,8 +227,16 @@ async function onExport() {
                 fileType: formData.workingFile.fileType,
                 layerSelection: formData.workingFile.layerSelection,
                 quality: formData.workingFile.quality / 100,
-                dithering: formData.workingFile.dithering
+                dithering: formData.workingFile.dithering,
             };
+            if (
+                formData.workingFile.enableMaxFileSize
+                && showMaxFileSizeSetting.value
+            ) {
+                exportOptions.maxFileSize = Math.max(0.1, formData.workingFile.maxFileSize) * 1e+6;
+            }
+            preferencesStore.set('exportEnableMaxFileSize', formData.workingFile.enableMaxFileSize);
+            preferencesStore.set('exportDefaultMaxFileSize', formData.workingFile.maxFileSize);
             if (formData.workingFile.saveBackDirectly) {
                 exportOptions.toFileHandle = fileHandle;
             } else {

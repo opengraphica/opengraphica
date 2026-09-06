@@ -28532,7 +28532,7 @@ body.og-full-page .opengraphica {
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-color-picker > .el-color-picker__trigger,
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-input-group > *:last-child,
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-row > .el-col:last-child > .el-input-group > *:last-child,
-.opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-row > .el-col:last-child > .el-input:last-child > .el-input__wrapper,
+.opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-row > .el-col:last-child > .el-input:last-child > .el-input__wrapper:last-child,
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-select > .select-trigger > .el-input > .el-input__wrapper,
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-input-group > .el-input-group__append > .el-select > .select-trigger > .el-input > .el-input__wrapper,
 .opengraphica .el-form-item-group .el-form-item:last-child .el-form-item__content > .el-switch,
