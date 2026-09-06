@@ -1,97 +1,99 @@
 <template>
-    <og-button primary outline solid class="w-full" @click="saveLocalFile">
-        {{ t('module.fileSaveWebdavExplorer.saveLocalFile') }}
-    </og-button>
-    <el-divider>
-        {{ t('module.fileSaveWebdavExplorer.orDivider') }}
-    </el-divider>
-    <div class="flex items-center mb-1">
-        <div class="shrink-0 grow-0">
-            <og-button small primary :disabled="currentFolderPath == '/'" icon @click="goBackFolder">
-                <span class="sr-only">{{ t('module.fileOpenWebdavExplorer.backFolder') }}</span>
-                <span class="bi bi-arrow-left" aria-hidden="true" />
-            </og-button>
-            <og-button small primary :disabled="forwardStack.length == 0" icon @click="goForwardFolder">
-                <span class="sr-only">{{ t('module.fileOpenWebdavExplorer.forwardFolder') }}</span>
-                <span class="bi bi-arrow-right" aria-hidden="true" />
-            </og-button>
-        </div>
-        <el-breadcrumb separator="/" class="grow-1 ml-2!">
-            <el-breadcrumb-item>
-                <a href="#" @click.prevent="openFolder('/')">
-                    <span class="sr-only">{{ t('module.fileOpenWebdavExplorer.webdavRootBreadcrumb') }}</span>
-                    <span class="bi bi-hdd-network" aria-hidden="true" />
-                </a>
-            </el-breadcrumb-item>
-            <el-breadcrumb-item
-                v-for="(folderName, pathIndex) of currentFolderPathSplit"
-                :key="pathIndex + '_' + folderName"
-            >
-                <a href="#" @click.prevent="openFolder('/' + currentFolderPathSplit.slice(0, pathIndex + 1).join('/'))">
-                    {{ folderName }}
-                </a>
-            </el-breadcrumb-item>
-            <el-breadcrumb-item />
-        </el-breadcrumb>
-    </div>
-    <el-form @submit.prevent="saveNetworkFile">
-        <div
-            v-if="isLoadingFolder"
-            v-loading="true"
-            class="w-full h-[30dvh] box-content border border-(--el-border-color) rounded-md overflow-hidden"
-        />
-        <el-alert
-            v-else-if="isFolderLoadError"
-            type="error"
-            show-icon
-            :closable="false"
-            :title="t('module.fileOpenWebdavExplorer.folderLoadError')"
-        />
-        <el-scrollbar v-else class="border border-(--el-border-color) rounded-md">
-            <div class="h-[30dvh]">
-                <el-table
-                    ref="webdavTableRef"
-                    :data="currentFolderFiles"
-                    highlight-current-row
-                    :row-class-name="() => 'cursor-pointer'"
-                    @current-change="onCurrentFileChange"
-                >
-                    <template #empty>
-                        {{ t('module.fileOpenWebdavExplorer.emptyFolder') }}
-                    </template>
-                    <el-table-column width="28">
-                        <template #header>
-                            <span class="bi bi-folder2-open" aria-hidden="true" />
-                        </template>
-                        <template #default="scope">
-                            <span :class="getFileIcon(scope.row)" aria-hidden="true" />
-                        </template>
-                    </el-table-column>
-                    <el-table-column property="basename" label="Filename" sortable>
-                        <template #default="scope">
-                            <span :class="{ 'opacity-50': scope.row.type !== 'directory' }">{{ scope.row.basename }}</span>
-                        </template>
-                    </el-table-column>
-                </el-table>
+    <div v-loading="isSaving">
+        <og-button primary outline solid class="w-full" @click="saveLocalFile">
+            {{ t('module.fileSaveWebdavExplorer.saveLocalFile') }}
+        </og-button>
+        <el-divider>
+            {{ t('module.fileSaveWebdavExplorer.orDivider') }}
+        </el-divider>
+        <div class="flex items-center mb-1">
+            <div class="shrink-0 grow-0">
+                <og-button small primary :disabled="currentFolderPath == '/'" icon @click="goBackFolder">
+                    <span class="sr-only">{{ t('module.fileOpenWebdavExplorer.backFolder') }}</span>
+                    <span class="bi bi-arrow-left" aria-hidden="true" />
+                </og-button>
+                <og-button small primary :disabled="forwardStack.length == 0" icon @click="goForwardFolder">
+                    <span class="sr-only">{{ t('module.fileOpenWebdavExplorer.forwardFolder') }}</span>
+                    <span class="bi bi-arrow-right" aria-hidden="true" />
+                </og-button>
             </div>
-        </el-scrollbar>
-        <div class="flex items-center gap-1">
-            <el-form-item-group class="grow-1 my-2!">
-                <el-form-item :label="t('module.fileSaveAs.fileName')" prop="fileName">
-                    <el-input v-model="networkFormData.fileName" clearable></el-input>
-                </el-form-item>
-            </el-form-item-group>
-            <og-button ref="createFolderButton" primary icon class="shrink-0 grow-0" @click.prevent="createFolder">
-                <span class="sr-only">{{ t('module.fileSaveWebdavExplorer.createFolder') }}</span>
-                <span class="bi bi-folder-plus" aria-hidden="true" />
-            </og-button>
+            <el-breadcrumb separator="/" class="grow-1 ml-2!">
+                <el-breadcrumb-item>
+                    <a href="#" @click.prevent="openFolder('/')">
+                        <span class="sr-only">{{ t('module.fileOpenWebdavExplorer.webdavRootBreadcrumb') }}</span>
+                        <span class="bi bi-hdd-network" aria-hidden="true" />
+                    </a>
+                </el-breadcrumb-item>
+                <el-breadcrumb-item
+                    v-for="(folderName, pathIndex) of currentFolderPathSplit"
+                    :key="pathIndex + '_' + folderName"
+                >
+                    <a href="#" @click.prevent="openFolder('/' + currentFolderPathSplit.slice(0, pathIndex + 1).join('/'))">
+                        {{ folderName }}
+                    </a>
+                </el-breadcrumb-item>
+                <el-breadcrumb-item />
+            </el-breadcrumb>
         </div>
-        <div class="flex gap-4 mt-2!">
-            <og-button type="submit" primary outline solid class="w-full">
-                {{ t('module.fileSaveWebdavExplorer.saveToWebdav') }}
-            </og-button>
-        </div>
-    </el-form>
+        <el-form @submit.prevent="saveNetworkFile">
+            <div
+                v-if="isLoadingFolder"
+                v-loading="true"
+                class="w-full h-[30dvh] box-content border border-(--el-border-color) rounded-md overflow-hidden"
+            />
+            <el-alert
+                v-else-if="isFolderLoadError"
+                type="error"
+                show-icon
+                :closable="false"
+                :title="t('module.fileOpenWebdavExplorer.folderLoadError')"
+            />
+            <el-scrollbar v-else class="border border-(--el-border-color) rounded-md">
+                <div class="h-[30dvh]">
+                    <el-table
+                        ref="webdavTableRef"
+                        :data="currentFolderFiles"
+                        highlight-current-row
+                        :row-class-name="() => 'cursor-pointer'"
+                        @current-change="onCurrentFileChange"
+                    >
+                        <template #empty>
+                            {{ t('module.fileOpenWebdavExplorer.emptyFolder') }}
+                        </template>
+                        <el-table-column width="28">
+                            <template #header>
+                                <span class="bi bi-folder2-open" aria-hidden="true" />
+                            </template>
+                            <template #default="scope">
+                                <span :class="getFileIcon(scope.row)" aria-hidden="true" />
+                            </template>
+                        </el-table-column>
+                        <el-table-column property="basename" label="Filename" sortable>
+                            <template #default="scope">
+                                <span :class="{ 'opacity-50': scope.row.type !== 'directory' }">{{ scope.row.basename }}</span>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+            </el-scrollbar>
+            <div class="flex items-center gap-1">
+                <el-form-item-group class="grow-1 my-2!">
+                    <el-form-item :label="t('module.fileSaveAs.fileName')" prop="fileName">
+                        <el-input v-model="networkFormData.fileName" clearable></el-input>
+                    </el-form-item>
+                </el-form-item-group>
+                <og-button ref="createFolderButton" primary icon class="shrink-0 grow-0" @click.prevent="createFolder">
+                    <span class="sr-only">{{ t('module.fileSaveWebdavExplorer.createFolder') }}</span>
+                    <span class="bi bi-folder-plus" aria-hidden="true" />
+                </og-button>
+            </div>
+            <div class="flex gap-4 mt-2!">
+                <og-button type="submit" primary outline solid class="w-full">
+                    {{ t('module.fileSaveWebdavExplorer.saveToWebdav') }}
+                </og-button>
+            </div>
+        </el-form>
+    </div>
     <el-dialog
         v-model="showCreateFolderDialog"
         :title="t('module.fileSaveWebdavExplorer.createFolder')"
@@ -174,6 +176,7 @@ emit('update:title', 'module.fileSaveWebdavExplorer.title');
 const webdavTableRef = ref<InstanceType<typeof ElTable>>();
 
 const isLoadingFolder = ref<boolean>(false);
+const isSaving = ref<boolean>(false);
 const currentFolderPath = ref<string>('/');
 const currentFolderFiles = ref<FileStat[]>([]);
 const isFolderLoadError = ref<boolean>(false);
@@ -189,7 +192,7 @@ const currentFolderPathSplit = computed(() => {
     return currentFolderPath.value.split('/').filter(value => value.trim().length > 0);
 });
 
-onMounted(async () => {
+onMounted(() => {
     openFolder('/');
 });
 
@@ -288,20 +291,33 @@ async function submitCreateFolder() {
 }
 
 async function saveLocalFile() {
-    if (props.fileHandle) {
-        await saveImage(props.fileHandle as never);
-    } else if (props.exportOptions) {
-        await exportAsImage(props.exportOptions);
-    } else if (props.fileName != null) {
-        await saveImageAs({
-            fileName: props.fileName,
+    isSaving.value = true;
+    try {
+        if (props.fileHandle) {
+            await saveImage(props.fileHandle as never);
+        } else if (props.exportOptions) {
+            await exportAsImage(props.exportOptions);
+        } else if (props.fileName != null) {
+            await saveImageAs({
+                fileName: props.fileName,
+            });
+        }
+    } catch (error) {
+        console.error('[src/ui/module/module-file-save-webdav-explorer.vue]', error);
+        appEmitter.emit('app.notify', {
+            type: 'error',
+            title: t('module.fileSaveWebdavExplorer.fileSaveError.title'),
+            message: t('module.fileSaveWebdavExplorer.fileSaveError.message'),
+            duration: 5000,
         });
+    } finally {
+        isSaving.value = false;
+        emit('close');
     }
-    emit('close');
 }
 
 async function saveNetworkFile() {
-    isLoadingFolder.value = true;
+    isSaving.value = true;
     try {
         let fileName: string = '';
         let fileArrayBuffer: ArrayBuffer | undefined;
@@ -326,7 +342,8 @@ async function saveNetworkFile() {
             { overwrite: true },
         );
         emit('close');
-    } catch {
+    } catch (error) {
+        console.error('[src/ui/module/module-file-save-webdav-explorer.vue]', error);
         appEmitter.emit('app.notify', {
             type: 'error',
             title: t('module.fileSaveWebdavExplorer.fileSaveError.title'),
@@ -334,7 +351,7 @@ async function saveNetworkFile() {
             duration: 5000,
         });
     } finally {
-        isLoadingFolder.value = false;
+        isSaving.value = false;
     }
 }
 
