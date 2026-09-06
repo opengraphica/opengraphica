@@ -80,6 +80,9 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
         showShapeDrawer.value = false;
         this.selectedLayerIdsUnwatch?.();
+        this.selectedLayerIdsUnwatch = null;
+
+        appEmitter.off('editor.history.step', this.onHistoryStep);
 
         // Tutorial Message
         if (!editorStore.state.tutorialFlags.drawGradientToolIntroduction) {

@@ -2,6 +2,7 @@ import { nextTick, watch, type WatchStopHandle } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 
 import { BundleAction } from '@/actions/bundle';
+import { ClearSelectionAction } from '@/actions/clear-selection';
 import { InsertLayerAction } from '@/actions/insert-layer';
 import { SelectLayersAction } from '@/actions/select-layers';
 import { UpdateLayerAction } from '@/actions/update-layer';
@@ -24,6 +25,7 @@ import historyStore from '@/store/history';
 import preferencesStore from '@/store/preferences';
 import workingFileStore, { getLayerById, getLayerGlobalTransform, getLayersByType, getSelectedLayers, ensureUniqueLayerSiblingName } from '@/store/working-file';
 
+import { appliedSelectionMask, activeSelectionMask } from '../store/selection-state';
 import {
     textToolbarEmitter, isEditorTextareaFocused, editingTextLayerId, editingTextLayer,
     editingRenderTextPlacement, editingTextDocumentSelection,
@@ -211,6 +213,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         this.onFontsLoaded = this.onFontsLoaded.bind(this);
         this.onHistoryStep = this.onHistoryStep.bind(this);
         appEmitter.on('editor.tool.fontsLoaded', this.onFontsLoaded);
+        appEmitter.on('editor.tool.selectAll', this.onSelectAll);
         appEmitter.on('editor.history.step', this.onHistoryStep);
         
     }
@@ -220,15 +223,23 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         editingTextLayerId.value = null;
         editingTextDocumentSelection.value = null;
 
+        this.selectedLayerIdsUnwatch?.();
+        this.selectedLayerIdsUnwatch = null;
+        this.editingTextDocumentSelectionUnwatch?.();
+        this.editingTextDocumentSelectionUnwatch = null;
+        this.editingTextLayerIdUnwatch?.();
+        this.editingTextLayerIdUnwatch = null;
+        this.editingTextLayerDimensionsUnwatch?.();
+        this.editingTextLayerDimensionsUnwatch = null;
+        this.editingTextLayerDirectionUnwatch?.();
+        this.editingTextLayerDirectionUnwatch = null;
+
         textToolbarEmitter.off('toolbarMetaChanged', this.onToolbarMetaChanged);
         textToolbarEmitter.off('toolbarDocumentChanged', this.onToolbarDocumentChanged);
-        appEmitter.off('editor.tool.fontsLoaded', this.onFontsLoaded);
 
-        this.selectedLayerIdsUnwatch?.();
-        this.editingTextDocumentSelectionUnwatch?.();
-        this.editingTextLayerIdUnwatch?.();
-        this.editingTextLayerDimensionsUnwatch?.();
-        this.editingTextLayerDirectionUnwatch?.();
+        appEmitter.off('editor.tool.fontsLoaded', this.onFontsLoaded);
+        appEmitter.off('editor.tool.selectAll', this.onSelectAll);
+        appEmitter.off('editor.history.step', this.onHistoryStep);
         
         this.lastDragStartPickLayer = null;
     }
@@ -250,6 +261,16 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             if (event?.action.id === 'moduleCropResize') {
                 this.updateToolbarMetaFromActiveSelection();
             }
+        }
+    }
+
+    private onSelectAll() {
+        if (isEditorTextareaFocused.value) {
+            // Let the textarea handle it.
+        } else if (activeSelectionMask.value || appliedSelectionMask.value) {
+            historyStore.dispatch('runAction', {
+                action: new ClearSelectionAction()
+            });
         }
     }
 
@@ -1272,6 +1293,13 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                             cursor.character = lastGlyphOnLine.documentCharacterIndex + lastGlyphOnLine.documentCharacterCount;
                         }
                         break findHorizontalCursor;
+                    } else if (layerTransformPoint.y > wrapMax) {
+                        const line = textPlacement.lines[textPlacement.lines.length - 1];
+                        if (!line) break;
+                        const lastGlyphOnLine = line.glyphs[line.glyphs.length - 1];
+                        if (!lastGlyphOnLine) break;
+                        cursor.character = lastGlyphOnLine.documentCharacterIndex + lastGlyphOnLine.documentCharacterCount;
+                        cursor.line = textPlacement.lines.length - 1;
                     }
                 }
             } else { // Vertical
@@ -1307,6 +1335,13 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                             cursor.character = lastGlyphOnLine.documentCharacterIndex + lastGlyphOnLine.documentCharacterCount;
                         }
                         break findVerticalCursor;
+                    } else if (layerTransformPoint.x > right) {
+                        const line = textPlacement.lines[textPlacement.lines.length - 1];
+                        if (!line) break;
+                        const lastGlyphOnLine = line.glyphs[line.glyphs.length - 1];
+                        if (!lastGlyphOnLine) break;
+                        cursor.character = lastGlyphOnLine.documentCharacterIndex + lastGlyphOnLine.documentCharacterCount;
+                        cursor.line = textPlacement.lines.length - 1;
                     }
                 }
             }

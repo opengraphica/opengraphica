@@ -238,7 +238,6 @@ import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.vue';
-import ElInput from 'element-plus/lib/components/input/index';
 import ElInputGroup from '@/ui/el/el-input-group.vue';
 import ElInputNumber from '@/ui/el/el-input-number.vue';
 import ElMenu, { ElMenuItem } from 'element-plus/lib/components/menu/index';

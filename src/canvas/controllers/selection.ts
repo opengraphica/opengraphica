@@ -69,13 +69,16 @@ export default class SelectionController extends BaseMovementController {
         this.queueApplyActiveSelection = this.queueApplyActiveSelection.bind(this);
         this.queueClearSelection = this.queueClearSelection.bind(this);
         this.queueUpdateSelectionCombineMode = this.queueUpdateSelectionCombineMode.bind(this);
-        appEmitter.on('editor.tool.commitCurrentAction', this.queueApplyActiveSelection);
         this.deleteSelectionHandler = this.queueDeleteSelection.bind(this);
+
+        appEmitter.on('editor.tool.commitCurrentAction', this.queueApplyActiveSelection);
         appEmitter.on('editor.tool.delete', this.deleteSelectionHandler);
         appEmitter.on('editor.tool.selectAll', this.queueClearSelection);
+
         selectionEmitter.on('applyActiveSelection', this.queueApplyActiveSelection);
         selectionEmitter.on('clearSelection', this.queueClearSelection);
         selectionEmitter.on('updateSelectionCombineMode', this.queueUpdateSelectionCombineMode);
+
         this.selectedLayerUnwatch = watch([toRefs(workingFileStore.state).selectedLayerIds], async () => {
             // await previewSelectedLayersSelectionMask();
             canvasStore.set('viewDirty', true);
@@ -121,12 +124,14 @@ export default class SelectionController extends BaseMovementController {
             appEmitter.off('editor.tool.delete', this.deleteSelectionHandler);
         }
         appEmitter.off('editor.tool.selectAll', this.queueClearSelection);
+        
         selectionEmitter.off('applyActiveSelection', this.queueApplyActiveSelection);
         selectionEmitter.off('clearSelection', this.queueClearSelection);
         selectionEmitter.off('updateSelectionCombineMode', this.queueUpdateSelectionCombineMode);
-        if (this.selectedLayerUnwatch) {
-            this.selectedLayerUnwatch();
-        }
+
+        this.selectedLayerUnwatch?.()
+        this.selectedLayerUnwatch = null;
+
         discardSelectedLayersSelectionMask();
         canvasStore.set('viewDirty', true);
 

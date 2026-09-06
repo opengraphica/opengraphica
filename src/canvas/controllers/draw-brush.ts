@@ -3,9 +3,10 @@ import { nextTick, watch, WatchStopHandle } from 'vue';
 import BaseCanvasMovementController from './base-movement';
 
 import { BrushStroke, type BrushStrokePoint } from '@/lib/brush-stroke';
-import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
+import appEmitter from '@/lib/emitter';
 import { createEmptyCanvas } from '@/lib/image';
 import { limitMaxDimension } from '@/lib/math';
+import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import { t, tm, rt } from '@/i18n';
 
 import canvasStore from '@/store/canvas';
@@ -14,6 +15,8 @@ import { createStoredImage, prepareStoredImageForArchival, prepareStoredImageFor
 import historyStore, { createHistoryReserveToken, historyReserveQueueFree, historyBlockInteractionUntilComplete } from '@/store/history';
 import preferencesStore from '@/store/preferences';
 import workingFileStore, { getSelectedLayers, getLayerById, ensureUniqueLayerSiblingName } from '@/store/working-file';
+
+import { appliedSelectionMask, activeSelectionMask } from '../store/selection-state';
 import {
     cursorHoverPosition, brushSmoothing, brushSpacing, brushColor,
     brushSize, brushJitter, brushPressureMinDensity, brushDensity, showBrushDrawer,
@@ -24,6 +27,7 @@ import {
 
 import type { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
+import { ClearSelectionAction } from '@/actions/clear-selection';
 import { InsertLayerAction } from '@/actions/insert-layer';
 import { UpdateLayerAction } from '@/actions/update-layer';
 
@@ -103,10 +107,12 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             }
         });
 
+        appEmitter.on('editor.tool.selectAll', this.onSelectAll);
+
         cursorHoverPosition.value = new DOMPoint(
             -100000000000,
             -100000000000
-        )
+        );
 
         // Tutorial message
         if (!editorStore.state.tutorialFlags.drawBrushToolIntroduction) {
@@ -139,6 +145,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         this.selectedLayerIdsUnwatch = null;
         this.isPreviewingSizeUnwatch?.();
         this.isPreviewingSizeUnwatch = null;
+
+        appEmitter.off('editor.tool.selectAll', this.onSelectAll);
 
         for (const layer of getSelectedLayers()) {
             if (layer.type === 'raster') {
@@ -511,6 +519,14 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             } else {
                 await historyStore.dispatch('unreserve', { token: updateLayerReserveToken });
             }
+        }
+    }
+
+    private onSelectAll() {
+        if (activeSelectionMask.value || appliedSelectionMask.value) {
+            historyStore.dispatch('runAction', {
+                action: new ClearSelectionAction()
+            });
         }
     }
 

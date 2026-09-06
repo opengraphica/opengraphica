@@ -16,8 +16,11 @@ import editorStore from '@/store/editor';
 import historyStore, { historyBlockInteractionUntilComplete } from '@/store/history';
 import workingFileStore, { getSelectedLayers, getLayerGlobalTransform, ensureUniqueLayerSiblingName } from '@/store/working-file';
 
+import { appliedSelectionMask, activeSelectionMask } from '../store/selection-state';
+
 import { type BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
+import { ClearSelectionAction } from '@/actions/clear-selection';
 import { InsertLayerAction } from '@/actions/insert-layer';
 import { UpdateLayerAction } from '@/actions/update-layer';
 
@@ -61,6 +64,7 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
 
         this.onHistoryStep = this.onHistoryStep.bind(this);
         appEmitter.on('editor.history.step', this.onHistoryStep);
+        appEmitter.on('editor.tool.selectAll', this.onSelectAll);
 
         // Tutorial message
         if (!editorStore.state.tutorialFlags.drawGradientToolIntroduction) {
@@ -89,6 +93,10 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
 
         showStopDrawer.value = false;
         this.selectedLayerIdsUnwatch?.();
+        this.selectedLayerIdsUnwatch = null;
+
+        appEmitter.off('editor.history.step', this.onHistoryStep);
+        appEmitter.off('editor.tool.selectAll', this.onSelectAll);
 
         // Tutorial Message
         if (!editorStore.state.tutorialFlags.drawGradientToolIntroduction) {
@@ -333,6 +341,14 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
             'updateDrawGradientLayerStops',
         ].includes(event?.action.id as string)) {
             this.updateToolbarFromEditingLayers();
+        }
+    }
+
+    private onSelectAll() {
+        if (activeSelectionMask.value || appliedSelectionMask.value) {
+            historyStore.dispatch('runAction', {
+                action: new ClearSelectionAction()
+            });
         }
     }
 

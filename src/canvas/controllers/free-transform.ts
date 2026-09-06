@@ -139,9 +139,12 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         this.onPreviewRotationChange = this.onPreviewRotationChange.bind(this);
         this.onPreviewDragResizeChange = this.onPreviewDragResizeChange.bind(this);
         this.onCommitTransforms = this.onCommitTransforms.bind(this);
+
         appEmitter.on('editor.tool.cancelCurrentAction', this.onCancelCurrentAction);
         appEmitter.on('editor.tool.commitCurrentAction', this.onCommitCurrentAction);
+        appEmitter.on('editor.tool.selectAll', this.onSelectAll);
         appEmitter.on('editor.history.step', this.onHistoryStep);
+
         freeTransformEmitter.on('storeTransformStart', this.onStoreTransformStart);
         freeTransformEmitter.on('previewRotationChange', this.onPreviewRotationChange);
         freeTransformEmitter.on('previewDragResizeChange', this.onPreviewDragResizeChange);
@@ -188,9 +191,14 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         this.selectedLayerIdsWatchStop = null;
         this.snapOptionsWatchStop?.();
         this.snapOptionsWatchStop = null;
+        this.visibleLayersWatchStop?.();
+        this.visibleLayersWatchStop = null;
+
         appEmitter.off('editor.tool.cancelCurrentAction', this.onCancelCurrentAction);
         appEmitter.off('editor.tool.commitCurrentAction', this.onCommitCurrentAction);
+        appEmitter.off('editor.tool.selectAll', this.onSelectAll);
         appEmitter.off('editor.history.step', this.onHistoryStep);
+        
         freeTransformEmitter.off('storeTransformStart', this.onStoreTransformStart);
         freeTransformEmitter.off('previewRotationChange', this.onPreviewRotationChange);
         freeTransformEmitter.off('previewDragResizeChange', this.onPreviewDragResizeChange);
@@ -468,14 +476,22 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         }
     }
 
+    private onSelectAll() {
+        if (activeSelectionMask.value || appliedSelectionMask.value) {
+            historyStore.dispatch('runAction', {
+                action: new ClearSelectionAction()
+            });
+        }
+    }
+
     private onHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
         if (!event) return;
         if (
             event.trigger != 'do' ||
             [
-                'applyLayerTransform', 'trimLayerEmptySpace', 'setLayerBoundsToWorkingFileBounds',
-                'convertLayersToCollage', 'resetLayerWidths', 'resetLayerHeights', 'alignLayers',
-                'stretchLayerToWorkingFileBounds'
+                'alignLayers', 'applyLayerTransform', 'clearSelection', 'convertLayersToCollage',
+                'resetLayerWidths', 'resetLayerHeights', 'setLayerBoundsToWorkingFileBounds',
+                'stretchLayerToWorkingFileBounds', 'trimLayerEmptySpace',
             ].includes(event.action.id)
         ) {
             isBoundsIndeterminate.value = true;

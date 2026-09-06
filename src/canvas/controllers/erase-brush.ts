@@ -13,6 +13,8 @@ import preferencesStore from '@/store/preferences';
 import { prepareStoredImageForArchival, prepareStoredImageForEditing } from '@/store/image';
 import historyStore, { createHistoryReserveToken, historyReserveQueueFree, historyBlockInteractionUntilComplete } from '@/store/history';
 import workingFileStore, { getSelectedLayers, getLayerById } from '@/store/working-file';
+
+import { appliedSelectionMask, activeSelectionMask } from '../store/selection-state';
 import {
     showBrushDrawer,
     cursorHoverPosition, brushShape, brushSpacing, brushSize, brushOpacity,
@@ -22,6 +24,7 @@ import {
 
 import type { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
+import { ClearSelectionAction } from '@/actions/clear-selection';
 import { UpdateLayerAction } from '@/actions/update-layer';
 
 import { useRenderer, transferRendererTilesToRasterLayerUpdates } from '@/renderers';
@@ -79,6 +82,8 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
         this.pointerPenMaxPressureMarginUnwatch = watch(() => preferencesStore.state.pointerPenMaxPressureMargin, (pointerPenMaxPressureMargin) => {
             this.pointerPenMaxPressureMargin = pointerPenMaxPressureMargin;
         }, { immediate: true });
+
+        appEmitter.on('editor.tool.selectAll', this.onSelectAll);
         
         cursorHoverPosition.value = new DOMPoint(
             -100000000000,
@@ -115,6 +120,8 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
         this.selectedLayerIdsUnwatch = null;
         this.pointerPenMaxPressureMarginUnwatch?.();
         this.pointerPenMaxPressureMarginUnwatch = null;
+
+        appEmitter.off('editor.tool.selectAll', this.onSelectAll);
 
         for (const layer of getSelectedLayers()) {
             if (layer.type === 'raster') {
@@ -198,7 +205,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                 message: t('toolbar.eraseBrush.notification.noSelectedLayers.message'),
                 duration: 5000,
             });
-            return;   
+            return;
         }
 
         await nextTick();
@@ -442,6 +449,14 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                 await historyStore.dispatch('unreserve', { token: updateLayerReserveToken });
             }
 
+        }
+    }
+
+    private onSelectAll() {
+        if (activeSelectionMask.value || appliedSelectionMask.value) {
+            historyStore.dispatch('runAction', {
+                action: new ClearSelectionAction()
+            });
         }
     }
 

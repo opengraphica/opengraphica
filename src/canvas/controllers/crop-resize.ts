@@ -43,7 +43,7 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
 
     private currentCanvasWidth: number = 0;
     private currentCanvasHeight: number = 0;
-    private unwatchEnableSnapping: WatchHandle | undefined = undefined;
+    private enableSnappingUnwatch: WatchHandle | null = null;
 
     onEnter(): void {
         super.onEnter();
@@ -67,7 +67,7 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
             height.value = selectionMask.height;
         }
 
-        this.unwatchEnableSnapping = watch(() => [
+        this.enableSnappingUnwatch = watch(() => [
             enableSnappingToCanvasCenter.value,
             enableSnappingToCanvasEdges.value,
             enableSnappingToCanvasContrast.value,
@@ -93,7 +93,10 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
 
     onLeave(): void {
         canvasStore.set('showAreaOutsideWorkingFile', false);
-        this.unwatchEnableSnapping?.();
+
+        this.enableSnappingUnwatch?.();
+        this.enableSnappingUnwatch = null;
+
         if (this.bitmapAnalyzerUuid) {
             destroyBitmapAnalyzer(this.bitmapAnalyzerUuid);
             this.bitmapAnalyzerUuid = undefined;

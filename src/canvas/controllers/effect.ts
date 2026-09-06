@@ -1,10 +1,8 @@
-import { watch, WatchStopHandle } from 'vue';
-import { isCtrlOrMetaKeyPressed } from '@/lib/keyboard';
-import { PointerTracker } from './base';
 import BaseCanvasMovementController from './base-movement';
 
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
+import appEmitter from '@/lib/emitter';
 import { isInput } from '@/lib/events';
 
 import canvasStore from '@/store/canvas';
@@ -12,6 +10,9 @@ import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 
+import { appliedSelectionMask, activeSelectionMask } from '../store/selection-state';
+
+import { ClearSelectionAction } from '@/actions/clear-selection';
 import { SelectLayersAction } from '@/actions/select-layers';
 
 import { t, tm, rt } from '@/i18n';
@@ -26,6 +27,8 @@ export default class EffectController extends BaseCanvasMovementController {
     onEnter(): void {
         super.onEnter();
         
+        appEmitter.on('editor.tool.selectAll', this.onSelectAll);
+
         // Tutorial message
         if (!editorStore.state.tutorialFlags.effectToolIntroduction) {
             waitForNoOverlays().then(() => {
@@ -46,6 +49,8 @@ export default class EffectController extends BaseCanvasMovementController {
 
     onLeave(): void {
         super.onLeave();
+
+        appEmitter.off('editor.tool.selectAll', this.onSelectAll);
 
         // Tutorial Message
         if (!editorStore.state.tutorialFlags.effectToolIntroduction) {
@@ -79,6 +84,14 @@ export default class EffectController extends BaseCanvasMovementController {
             await historyStore.dispatch('runAction', {
                 action: new SelectLayersAction([pickLayerId]),
                 mergeWithHistory: 'selectLayers',
+            });
+        }
+    }
+
+    private onSelectAll() {
+        if (activeSelectionMask.value || appliedSelectionMask.value) {
+            historyStore.dispatch('runAction', {
+                action: new ClearSelectionAction()
             });
         }
     }
