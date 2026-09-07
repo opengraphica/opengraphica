@@ -25,7 +25,8 @@ export const brushPreviews = reactive<{ [key: string]: HTMLCanvasElement }>({});
 export const brushEditorTab = ref<string>('shape');
 
 function createBrushDefaults(brushDefinition: Partial<BrushDefinition>) {
-    brushDefinition.shape = brushDefinition.shape ?? 'M 1,0.5 A 0.5,0.5 0 0 1 0.5,1 0.5,0.5 0 0 1 0,0.5 0.5,0.5 0 0 1 0.5,0 0.5,0.5 0 0 1 1,0.5 Z';
+    brushDefinition.shape = brushDefinition.shape ?? 'circle';
+    brushDefinition.pixelSnap = brushDefinition.pixelSnap ?? false;
     brushDefinition.hardness = brushDefinition.hardness ?? 1;
     brushDefinition.spacing = brushDefinition.spacing ?? 0.05;
     brushDefinition.jitter = brushDefinition.jitter ?? 0;
@@ -54,7 +55,7 @@ export const brushesByCategory = computed(() => {
             }
         }
     }
-    for (brushDefinition of defaultBrushDefinitions.brushes) {
+    for (brushDefinition of defaultBrushDefinitions.brushes as BrushDefinition[]) {
         if (brushDefinition.hidden) continue;
         createBrushDefaults(brushDefinition);
         for (let categoryId of brushDefinition.categories) {
@@ -108,7 +109,7 @@ export function getBrushById(id: string): BrushDefinition | undefined {
             return brushDefinition as BrushDefinition;
         }
     }
-    for (brushDefinition of defaultBrushDefinitions.brushes) {
+    for (brushDefinition of defaultBrushDefinitions.brushes as BrushDefinition[]) {
         if (brushDefinition.id === id) {
             createBrushDefaults(brushDefinition);
             return brushDefinition as BrushDefinition;
@@ -128,6 +129,8 @@ export async function generateBrushPreview(id: string) {
     brushPreviewsGenerating.set(id, true);
     const bitmap = await renderer.createBrushPreview({
         color: new Float16Array([0, 0, 0, 1]),
+        shape: brush.shape,
+        pixelSnap: brush.pixelSnap,
         size: 16,
         hardness: brush.hardness,
         colorBlendingPersistence: brush.colorBlendingPersistence,

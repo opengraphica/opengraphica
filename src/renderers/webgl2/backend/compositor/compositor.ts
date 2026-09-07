@@ -50,13 +50,14 @@ export class Compositor {
         x: number,
         y: number,
         size: number,
+        angle: number,
         density: number,
         colorBlendingStrength: number,
         concentration: number,
     ) {
         const brushStroke = this.brushStrokes.get(index);
         if (!brushStroke) return;
-        brushStroke.move(x, y, size, density, colorBlendingStrength, concentration);
+        brushStroke.move(x, y, size, angle, density, colorBlendingStrength, concentration);
     }
 
     async stopBrushStroke(

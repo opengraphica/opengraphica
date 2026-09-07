@@ -1,6 +1,6 @@
 import type { Matrix4, Scene, Texture } from 'three';
 import type {
-    RGBAColor,
+    RGBAColor, BrushDefinition,
     WorkingFileLayer, WorkingFileLayerBlendingMode, WorkingFileLayerFilter, Webgl2RendererCanvasFilter
 } from '@/types';
 
@@ -42,12 +42,14 @@ export interface RendererTextureTile {
 
 export interface RendererBrushStrokeSettingsCommon {
     color: Float16Array;
+    shape: BrushDefinition['shape'],
     size: number;
     hardness: number;
     colorBlendingPersistence: number;
 }
 
 export interface RendererBrushStrokePreviewSettings extends RendererBrushStrokeSettingsCommon {
+    pixelSnap: boolean;
     colorBlendingStrength: number;
     pressureMinColorBlendingStrength: number;
     density: number;
@@ -73,7 +75,7 @@ export interface RendererFrontend {
     takeSnapshot(imageWidth: number, imageHeight: number, options?: RendererFrontendTakeSnapshotOptions): Promise<ImageBitmap>;
     pickColor(canvasX: number, canvasY: number): Promise<RGBAColor>;
     startBrushStroke(settings: RendererBrushStrokeSettings): Promise<void>;
-    moveBrushStroke(layerId: number, x: number, y: number, size: number, density: number, colorBlendingStrength: number, concentration: number): Promise<void>;
+    moveBrushStroke(layerId: number, x: number, y: number, size: number, angle: number, density: number, colorBlendingStrength: number, concentration: number): Promise<void>;
     stopBrushStroke(layerId: number): Promise<RendererTextureTile[]>;
     createBrushPreview(settings: RendererBrushStrokePreviewSettings): Promise<ImageBitmap>;
     dispose(): Promise<void>;

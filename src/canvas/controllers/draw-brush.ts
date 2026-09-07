@@ -6,6 +6,7 @@ import { BrushStroke, type BrushStrokePoint } from '@/lib/brush-stroke';
 import appEmitter from '@/lib/emitter';
 import { createEmptyCanvas } from '@/lib/image';
 import { limitMaxDimension } from '@/lib/math';
+import { AsyncCallbackQueue } from '@/lib/timing';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import { t, tm, rt } from '@/i18n';
 
@@ -18,11 +19,13 @@ import workingFileStore, { getSelectedLayers, getLayerById, ensureUniqueLayerSib
 
 import { appliedSelectionMask, activeSelectionMask } from '../store/selection-state';
 import {
-    cursorHoverPosition, brushSmoothing, brushSpacing, brushColor,
-    brushSize, brushJitter, brushPressureMinDensity, brushDensity, showBrushDrawer,
+    cursorHoverPosition, cursorHoverAngle,
+    brushSmoothing, brushSpacing, brushColor, brushShape, brushPixelSnap,
+    brushSize, brushAngle, brushJitter, brushPressureMinDensity, brushDensity, showBrushDrawer,
     brushPressureMinSize, brushPressureTaper, brushConcentration, brushPressureMinConcentration,
     brushColorBlendingStrength, brushPressureMinColorBlendingStrength,
     brushColorBlendingPersistence, brushHardness, isPreviewingSize,
+    applyPixelSnapping,
 } from '../store/draw-brush-state';
 
 import type { BaseAction } from '@/actions/base';
@@ -33,13 +36,17 @@ import { UpdateLayerAction } from '@/actions/update-layer';
 
 import { useRenderer, transferRendererTilesToRasterLayerUpdates } from '@/renderers';
 
-import type { InsertRasterLayerOptions, RendererFrontend, RendererTextureTile, UpdateRasterLayerOptions, WorkingFileAnyLayer } from '@/types';
+import type {
+    InsertRasterLayerOptions, RendererFrontend, RendererTextureTile,
+    UpdateRasterLayerOptions, WorkingFileAnyLayer,
+} from '@/types';
 
 
 const devicePixelRatio = window.devicePixelRatio || 1;
 
 export default class CanvasDrawBrushController extends BaseCanvasMovementController {
 
+    private canvasViewDirtyUnwatch: WatchStopHandle | null = null;
     private brushSizeUnwatch: WatchStopHandle | null = null;
     private selectedLayerIdsUnwatch: WatchStopHandle | null = null;
     private pointerPenMaxPressureMarginUnwatch: WatchStopHandle | null = null;
@@ -53,7 +60,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
     private drawingOnLayers: WorkingFileAnyLayer[] = [];
     private drawingBrushStroke: BrushStroke | null = null;
     private isQueueingInput: boolean = false;
-    private queuedBrushStrokePoints: Array<BrushStrokePoint> = []; 
+    private queuedBrushStrokePoints: Array<BrushStrokePoint> = [];
+    private actionQueue: AsyncCallbackQueue = new AsyncCallbackQueue();
     
     private drawLoopDeltaAccumulator: number = 0;
     private drawLoopLastRunTimestamp: number = 0;
@@ -71,6 +79,17 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             this.renderer.getMaxTextureSize().then((maxTextureSize) => {
                 this.maxTextureSize = maxTextureSize;
             })
+        });
+
+        this.canvasViewDirtyUnwatch = watch(() => canvasStore.state.viewDirty, () => {
+            if (isPreviewingSize.value) return;
+            if (brushPixelSnap.value) {
+                cursorHoverPosition.value = new DOMPoint(
+                    this.lastCursorX * devicePixelRatio,
+                    this.lastCursorY * devicePixelRatio
+                ).matrixTransform(canvasStore.state.transform.inverse());
+                applyPixelSnapping(cursorHoverPosition.value);
+            }
         });
 
         this.selectedLayerIdsUnwatch = watch(() => workingFileStore.state.selectedLayerIds, (newIds, oldIds) => {
@@ -99,11 +118,12 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                     canvasStore.get('dndAreaLeft') + canvasStore.get('dndAreaWidth') / 2,
                     canvasStore.get('dndAreaTop') + canvasStore.get('dndAreaHeight') / 2,
                 ).matrixTransform(canvasStore.state.transform.inverse());
+                applyPixelSnapping(cursorHoverPosition.value);
             } else {
                 cursorHoverPosition.value = new DOMPoint(
                     -100000000000,
                     -100000000000
-                )
+                );
             }
         });
 
@@ -113,6 +133,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             -100000000000,
             -100000000000
         );
+        cursorHoverAngle.value = 0;
 
         // Tutorial message
         if (!editorStore.state.tutorialFlags.drawBrushToolIntroduction) {
@@ -137,6 +158,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
 
         showBrushDrawer.value = false;
 
+        this.canvasViewDirtyUnwatch?.();
+        this.canvasViewDirtyUnwatch = null;
         this.brushSizeUnwatch?.();
         this.brushSizeUnwatch = null;
         this.pointerPenMaxPressureMarginUnwatch?.();
@@ -171,6 +194,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 this.lastCursorX * devicePixelRatio,
                 this.lastCursorY * devicePixelRatio
             ).matrixTransform(canvasStore.state.transform.inverse());
+            applyPixelSnapping(cursorHoverPosition.value);
+            cursorHoverAngle.value = brushAngle.value + e.twist;
             isPreviewingSize.value = false;
         }
 
@@ -267,75 +292,82 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             }
         }
 
-        // Finalize layer creation / conversion actions.
-        if (layerActions.length > 0) {
-            await historyStore.dispatch('runAction', {
-                action: new BundleAction('createDrawLayer', 'action.createDrawLayer', layerActions),
-                reserveToken: startDrawReserveToken,
-            });
-        } else {
-            await historyStore.dispatch('unreserve', { token: startDrawReserveToken });
-        }
-
-        await nextTick();
-
-        // Start a brush stroke for each of the selected layers
-        selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster');
-        this.drawingOnLayers = selectedLayers as WorkingFileAnyLayer[];
-
-        for (const layer of this.drawingOnLayers) {
-            await this.renderer?.startBrushStroke({
-                layerId: layer.id,
-                size: brushSize.value,
-                color: new Float16Array([brushColor.value.r, brushColor.value.g, brushColor.value.b, brushColor.value.alpha]),
-                hardness: brushHardness.value,
-                colorBlendingPersistence: brushColorBlendingPersistence.value,
-            });
-        }
-
-        // Populate first drawing point
-        const transformedPoint = new DOMPoint(
-            this.lastCursorX * devicePixelRatio,
-            this.lastCursorY * devicePixelRatio
-        ).matrixTransform(canvasStore.state.transform.inverse())
-        const pressure = this.drawingUsePressure ? Math.min(1, (e.pressure) / (1 - this.pointerPenMaxPressureMargin)) : 1;
-        const size = brushSize.value * (
-            brushPressureMinSize.value + (1 - brushPressureMinSize.value) * Math.pow(pressure, brushPressureTaper.value)
-        );
-        const density = this.calculateDensity(pressure, size);
-        const colorBlendingStrength = brushPressureMinColorBlendingStrength.value + (brushColorBlendingStrength.value - brushPressureMinColorBlendingStrength.value) * (1 - pressure);
-        const concentration = brushPressureMinConcentration.value + (brushConcentration.value - brushPressureMinConcentration.value) * pressure;
-        this.drawingBrushStroke = new BrushStroke(
-            brushSmoothing.value,
-            brushSpacing.value,
-            brushJitter.value,
-            {
-                x: transformedPoint.x,
-                y: transformedPoint.y,
-                density,
-                colorBlendingStrength,
-                concentration,
-                size,
-                tiltX: 0,
-                tiltY: 0,
-                twist: 0,
+        this.actionQueue.push(async () => {
+            // Finalize layer creation / conversion actions.
+            if (layerActions.length > 0) {
+                await historyStore.dispatch('runAction', {
+                    action: new BundleAction('createDrawLayer', 'action.createDrawLayer', layerActions),
+                    reserveToken: startDrawReserveToken,
+                });
+            } else {
+                await historyStore.dispatch('unreserve', { token: startDrawReserveToken });
             }
-        );
 
-        // Draw first point
-        for (const layer of this.drawingOnLayers) {
-            this.renderer?.moveBrushStroke(
-                layer.id,
-                transformedPoint.x,
-                transformedPoint.y,
-                size,
-                density,
-                colorBlendingStrength,
-                concentration,
+            await nextTick();
+
+            // Start a brush stroke for each of the selected layers
+            selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster');
+            this.drawingOnLayers = selectedLayers as WorkingFileAnyLayer[];
+
+            for (const layer of this.drawingOnLayers) {
+                await this.renderer?.startBrushStroke({
+                    layerId: layer.id,
+                    shape: brushShape.value,
+                    size: brushSize.value,
+                    color: new Float16Array([brushColor.value.r, brushColor.value.g, brushColor.value.b, brushColor.value.alpha]),
+                    hardness: brushHardness.value,
+                    colorBlendingPersistence: brushColorBlendingPersistence.value,
+                });
+            }
+
+            // Populate first drawing point
+            const transformedPoint = new DOMPoint(
+                this.lastCursorX * devicePixelRatio,
+                this.lastCursorY * devicePixelRatio
+            ).matrixTransform(canvasStore.state.transform.inverse());
+            applyPixelSnapping(transformedPoint);
+
+            const pressure = this.drawingUsePressure ? Math.min(1, (e.pressure) / (1 - this.pointerPenMaxPressureMargin)) : 1;
+            const size = brushSize.value * (
+                brushPressureMinSize.value + (1 - brushPressureMinSize.value) * Math.pow(pressure, brushPressureTaper.value)
             );
-        }
+            const density = this.calculateDensity(pressure, size);
+            const colorBlendingStrength = brushPressureMinColorBlendingStrength.value + (brushColorBlendingStrength.value - brushPressureMinColorBlendingStrength.value) * (1 - pressure);
+            const concentration = brushPressureMinConcentration.value + (brushConcentration.value - brushPressureMinConcentration.value) * pressure;
+            this.drawingBrushStroke = new BrushStroke(
+                brushSmoothing.value,
+                brushSpacing.value,
+                brushPixelSnap.value,
+                brushJitter.value,
+                {
+                    x: transformedPoint.x,
+                    y: transformedPoint.y,
+                    density,
+                    colorBlendingStrength,
+                    concentration,
+                    size,
+                    tiltX: 0,
+                    tiltY: 0,
+                    twist: e.twist,
+                }
+            );
 
-        window.requestAnimationFrame(this.drawLoop);
+            // Draw first point
+            for (const layer of this.drawingOnLayers) {
+                this.renderer?.moveBrushStroke(
+                    layer.id,
+                    transformedPoint.x,
+                    transformedPoint.y,
+                    size,
+                    brushAngle.value + -canvasStore.state.decomposedTransform.rotation + (e.twist ?? 0),
+                    density,
+                    colorBlendingStrength,
+                    concentration,
+                );
+            }
+
+            window.requestAnimationFrame(this.drawLoop);
+        });
     }
 
     onPointerMove(e: PointerEvent): void {
@@ -346,6 +378,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 this.lastCursorX * devicePixelRatio,
                 this.lastCursorY * devicePixelRatio
             ).matrixTransform(canvasStore.state.transform.inverse());
+            applyPixelSnapping(cursorHoverPosition.value);
+            cursorHoverAngle.value = brushAngle.value + e.twist;
         }
 
         if (
@@ -356,7 +390,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                 this.lastCursorX * devicePixelRatio,
                 this.lastCursorY * devicePixelRatio
             ).matrixTransform(canvasStore.state.transform.inverse());
-
+            applyPixelSnapping(transformedPoint);
+            
             const pressure = this.drawingUsePressure ? Math.min(1, (e.pressure) / (1 - this.pointerPenMaxPressureMargin)) : 1;
             const size = brushSize.value * (
                 brushPressureMinSize.value + (1 - brushPressureMinSize.value) * Math.pow(pressure, brushPressureTaper.value)
@@ -402,6 +437,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                     point.x,
                     point.y,
                     point.size,
+                    brushAngle.value + -canvasStore.state.decomposedTransform.rotation + point.twist,
                     point.density,
                     point.colorBlendingStrength,
                     point.concentration,
@@ -438,33 +474,44 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         if (this.drawingPointerId === e.pointerId) {
             this.drawingPointerId = null;
 
+            const renderer = this.renderer;
+
+            await this.actionQueue.wait();
+
+            const drawingBrushStroke = this.drawingBrushStroke;
+            this.drawingBrushStroke = null;
+            let drawingOnLayers = this.drawingOnLayers.slice();
+            this.drawingOnLayers = [];
+
             const collectedTiles: Array<Promise<Array<RendererTextureTile>>> = [];
 
-            if (this.drawingBrushStroke && this.renderer) {
-                this.drawingBrushStroke.finalizeLine();
+            if (drawingBrushStroke && renderer) {
+                drawingBrushStroke.finalizeLine();
                 let point: BrushStrokePoint | undefined;
-                while (this.drawingBrushStroke.hasCollectedPoints()) {
-                    point = this.drawingBrushStroke.retrieveCatmullRomSegmentPoint();
+                while (drawingBrushStroke.hasCollectedPoints()) {
+                    point = drawingBrushStroke.retrieveCatmullRomSegmentPoint();
                     if (!point) continue;
-                    for (const layer of this.drawingOnLayers) {
-                        this.renderer.moveBrushStroke(
+                    for (const layer of drawingOnLayers) {
+                        renderer.moveBrushStroke(
                             layer.id,
                             point.x,
                             point.y,
                             point.size,
+                            brushAngle.value + -canvasStore.state.decomposedTransform.rotation + point.twist,
                             point.density,
                             point.colorBlendingStrength,
                             point.concentration,
                         );
                     }
                 }
-                while (point = this.drawingBrushStroke.retrieveFinalPoints()) {
-                    for (const layer of this.drawingOnLayers) {
-                        this.renderer.moveBrushStroke(
+                while (point = drawingBrushStroke.retrieveFinalPoints()) {
+                    for (const layer of drawingOnLayers) {
+                        renderer.moveBrushStroke(
                             layer.id,
                             point.x,
                             point.y,
                             point.size,
+                            brushAngle.value + -canvasStore.state.decomposedTransform.rotation + point.twist,
                             point.density,
                             point.colorBlendingStrength,
                             point.concentration,
@@ -472,18 +519,14 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
                     }
                 }
 
-                for (const layer of this.drawingOnLayers) {
+                for (const layer of drawingOnLayers) {
                     collectedTiles.push(
-                        this.renderer.stopBrushStroke(
+                        renderer.stopBrushStroke(
                             layer.id,
                         )
                     );
                 }
             }
-
-            const drawingOnLayers = this.drawingOnLayers.slice();
-            this.drawingBrushStroke = null;
-            this.drawingOnLayers = [];
 
             const updateLayerReserveToken = createHistoryReserveToken();
 
@@ -495,19 +538,18 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
 
             for (const [layerIndex, layer] of drawingOnLayers.entries()) {
                 if (layer.type === 'raster') {
-
-                    layerActions.push(
-                        new UpdateLayerAction<UpdateRasterLayerOptions>({
-                            id: layer.id,
-                            data: {
-                                tileUpdates: await transferRendererTilesToRasterLayerUpdates(
-                                    await collectedTiles[layerIndex],
-                                ),
-                                alreadyRendererd: true,
-                            }
-                        })
-                    );
-
+                    const tiles = await collectedTiles[layerIndex];
+                    if (tiles) {
+                        layerActions.push(
+                            new UpdateLayerAction<UpdateRasterLayerOptions>({
+                                id: layer.id,
+                                data: {
+                                    tileUpdates: await transferRendererTilesToRasterLayerUpdates(tiles),
+                                    alreadyRendererd: true,
+                                }
+                            })
+                        );
+                    }
                 }
             }
 

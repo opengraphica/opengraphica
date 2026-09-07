@@ -52,6 +52,7 @@ export function throttle<T = (...args: any) => void>(func: T, wait: number, opti
 export class AsyncCallbackQueue {
     private queue: Array<() => Promise<void>> = [];
     private isCallbacksRunning: boolean = false;
+    private waitResolvers: Array<() => void> = [];
 
     public push(callback: () => Promise<void>) {
         this.queue.push(callback);
@@ -62,16 +63,38 @@ export class AsyncCallbackQueue {
 
     private async runCallbacks() {
         this.isCallbacksRunning = true;
-        while (this.queue.length > 0) {
-            const callback = this.queue.shift();
-            if (callback) {
-                try {
-                    await callback();
-                } catch (error) {
-                    console.error('[src/lib/timing.ts] Error running async callback cue callback. ', error);
+        try {
+            while (this.queue.length > 0) {
+                const callback = this.queue.shift();
+                if (callback) {
+                    try {
+                        await callback();
+                    } catch (error) {
+                        console.error('[src/lib/timing.ts] Error running async callback cue callback. ', error);
+                    }
                 }
             }
+        } finally {
+            this.isCallbacksRunning = false;
+
+            const resolvers = this.waitResolvers;
+            this.waitResolvers = [];
+
+            for (const resolve of resolvers) {
+                resolve();
+            }
         }
-        this.isCallbacksRunning = false;
+    }
+
+     public wait(): Promise<void> {
+        if (!this.isCallbacksRunning && this.queue.length === 0) {
+            return Promise.resolve();
+        }
+        return new Promise<void>((resolve) => {
+            this.waitResolvers.push(resolve);
+            if (!this.isCallbacksRunning) {
+                void this.runCallbacks();
+            }
+        });
     }
 }

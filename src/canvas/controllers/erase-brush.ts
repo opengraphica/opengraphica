@@ -16,10 +16,12 @@ import workingFileStore, { getSelectedLayers, getLayerById } from '@/store/worki
 
 import { appliedSelectionMask, activeSelectionMask } from '../store/selection-state';
 import {
-    showBrushDrawer,
-    cursorHoverPosition, brushShape, brushSpacing, brushSize, brushOpacity,
-    brushHardness, brushPressureMinSize, brushPressureTaper,
-    brushDensity, brushPressureMinDensity, brushSmoothing, brushJitter,
+    showBrushDrawer, isPreviewingSize,
+    cursorHoverPosition, cursorHoverAngle,
+    brushShape, brushSpacing, brushSize, brushOpacity,
+    brushPixelSnap, brushHardness, brushPressureMinSize, brushPressureTaper,
+    brushAngle, brushDensity, brushPressureMinDensity, brushSmoothing, brushJitter,
+    applyPixelSnapping,
 } from '../store/erase-brush-state';
 
 import type { BaseAction } from '@/actions/base';
@@ -35,9 +37,11 @@ const devicePixelRatio = window.devicePixelRatio || 1;
 
 export default class CanvasEraseController extends BaseCanvasMovementController {
 
+    private canvasViewDirtyUnwatch: WatchStopHandle | null = null;
     private brushSizeUnwatch: WatchStopHandle | null = null;
     private selectedLayerIdsUnwatch: WatchStopHandle | null = null;
     private pointerPenMaxPressureMarginUnwatch: WatchStopHandle | null = null;
+    private isPreviewingSizeUnwatch: WatchStopHandle | null = null;
 
     private renderer: RendererFrontend | null = null;
 
@@ -63,6 +67,17 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
             this.renderer = renderer;
         });
 
+        this.canvasViewDirtyUnwatch = watch(() => canvasStore.state.viewDirty, () => {
+            if (isPreviewingSize.value) return;
+            if (brushPixelSnap.value) {
+                cursorHoverPosition.value = new DOMPoint(
+                    this.lastCursorX * devicePixelRatio,
+                    this.lastCursorY * devicePixelRatio
+                ).matrixTransform(canvasStore.state.transform.inverse());
+                applyPixelSnapping(cursorHoverPosition.value);
+            }
+        });
+
         this.selectedLayerIdsUnwatch = watch(() => workingFileStore.state.selectedLayerIds, (newIds, oldIds) => {
             const unusedOldIds = oldIds?.filter(id => newIds.indexOf(id) === -1) ?? [];
             for (const layerId of unusedOldIds) {
@@ -83,12 +98,28 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
             this.pointerPenMaxPressureMargin = pointerPenMaxPressureMargin;
         }, { immediate: true });
 
+        this.isPreviewingSizeUnwatch = watch(() => isPreviewingSize.value, () => {
+            if (isPreviewingSize.value) {
+                cursorHoverPosition.value = new DOMPoint(
+                    canvasStore.get('dndAreaLeft') + canvasStore.get('dndAreaWidth') / 2,
+                    canvasStore.get('dndAreaTop') + canvasStore.get('dndAreaHeight') / 2,
+                ).matrixTransform(canvasStore.state.transform.inverse());
+                applyPixelSnapping(cursorHoverPosition.value);
+            } else {
+                cursorHoverPosition.value = new DOMPoint(
+                    -100000000000,
+                    -100000000000
+                );
+            }
+        });
+
         appEmitter.on('editor.tool.selectAll', this.onSelectAll);
         
         cursorHoverPosition.value = new DOMPoint(
             -100000000000,
             -100000000000
-        )
+        );
+        cursorHoverAngle.value = 0;
 
         // Tutorial message
         if (!editorStore.state.tutorialFlags.eraseToolIntroduction) {
@@ -114,12 +145,16 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
 
         showBrushDrawer.value = false;
 
+        this.canvasViewDirtyUnwatch?.();
+        this.canvasViewDirtyUnwatch = null;
         this.brushSizeUnwatch?.();
         this.brushSizeUnwatch = null;
         this.selectedLayerIdsUnwatch?.();
         this.selectedLayerIdsUnwatch = null;
         this.pointerPenMaxPressureMarginUnwatch?.();
         this.pointerPenMaxPressureMarginUnwatch = null;
+        this.isPreviewingSizeUnwatch?.();
+        this.isPreviewingSizeUnwatch = null;
 
         appEmitter.off('editor.tool.selectAll', this.onSelectAll);
 
@@ -146,6 +181,9 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                 this.lastCursorX * devicePixelRatio,
                 this.lastCursorY * devicePixelRatio
             ).matrixTransform(canvasStore.state.transform.inverse());
+            applyPixelSnapping(cursorHoverPosition.value);
+            cursorHoverAngle.value = brushAngle.value + e.twist;
+            isPreviewingSize.value = false;
         }
 
         this.isQueueingInput = false;
@@ -217,6 +255,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
             await this.renderer?.startBrushStroke({
                 layerId: layer.id,
                 blendingMode: 'erase',
+                shape: brushShape.value,
                 size: brushSize.value,
                 color: new Float16Array([1, 1, 1, brushOpacity.value]),
                 hardness: brushHardness.value,
@@ -237,6 +276,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
         this.erasingBrushStroke = new BrushStroke(
             brushSmoothing.value,
             brushSpacing.value,
+            brushPixelSnap.value,
             brushJitter.value,
             {
                 x: transformedPoint.x,
@@ -247,7 +287,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                 size,
                 tiltX: 0,
                 tiltY: 0,
-                twist: 0,
+                twist: e.twist,
             }
         );
 
@@ -258,6 +298,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                 transformedPoint.x,
                 transformedPoint.y,
                 size,
+                brushAngle.value + -canvasStore.state.decomposedTransform.rotation + (e.twist ?? 0),
                 density,
                 0,
                 1,
@@ -270,11 +311,13 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
     onPointerMove(e: PointerEvent): void {
         super.onPointerMove(e);
 
-        if (e.pointerType === 'pen' || !editorStore.state.isPenUser) {
+        if ((e.pointerType === 'pen' || !editorStore.state.isPenUser) && !isPreviewingSize.value) {
             cursorHoverPosition.value = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
                 this.lastCursorY * devicePixelRatio
             ).matrixTransform(canvasStore.state.transform.inverse());
+            applyPixelSnapping(cursorHoverPosition.value);
+            cursorHoverAngle.value = brushAngle.value + e.twist;
         }
 
         if (
@@ -331,6 +374,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                     point.x,
                     point.y,
                     point.size,
+                    brushAngle.value + -canvasStore.state.decomposedTransform.rotation + point.twist,
                     point.density,
                     point.colorBlendingStrength,
                     point.concentration,
@@ -381,6 +425,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                             point.x,
                             point.y,
                             point.size,
+                            brushAngle.value + -canvasStore.state.decomposedTransform.rotation + point.twist,
                             point.density,
                             point.colorBlendingStrength,
                             point.concentration,
@@ -394,6 +439,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                             point.x,
                             point.y,
                             point.size,
+                            brushAngle.value + -canvasStore.state.decomposedTransform.rotation + point.twist,
                             point.density,
                             point.colorBlendingStrength,
                             point.concentration,

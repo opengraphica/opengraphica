@@ -7,7 +7,7 @@
             'is-ignore-transform': overlayGroup.isIgnoreTransform,
         }"
         :style="{
-            'mix-blend-mode': overlayGroup.blendMode,
+            'mix-blend-mode': overlayGroup.blendMode as never,
             'transform': overlayGroup.isIgnoreTransform ? undefined : cssViewTransform,
         }"
     >
@@ -51,7 +51,7 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const ignoreTransformWith: string[] = [
-            'canvas-border', 'draw-brush', 'effect', 'selection',
+            'canvas-border', 'draw-brush', 'effect', 'erase-brush', 'selection',
         ];
         const blendModes: Record<string, string> = {
             'text-selection': 'difference',

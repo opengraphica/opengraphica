@@ -5,9 +5,12 @@ import {
     getBrushById, brushPreviews, generateBrushPreview
 } from '../store/brush-library-state';
 
+import type { BrushDefinition } from '@/types';
+
 export const showBrushDrawer = ref<boolean>(false);
 
-export const brushShape = ref<string>('');
+export const brushShape = ref<BrushDefinition['shape']>('circle');
+export const brushPixelSnap = ref<boolean>(false);
 export const brushHardness = ref<number>(1);
 export const brushSpacing = ref<number>(0.05);
 export const brushJitter = ref<number>(0);
@@ -18,6 +21,7 @@ export const brushPressureMinDensity = ref<number>(1);
 export const brushAngle = ref<number>(0);
 
 export const cursorHoverPosition = ref<DOMPoint>(new DOMPoint());
+export const cursorHoverAngle = ref<number>(0);
 
 interface PermanentStorageState {
     brushSize: number;
@@ -49,6 +53,7 @@ export const opacityDockVisible = ref<boolean>(false);
 export const sizeDockTop = ref(0);
 export const sizeDockLeft = ref(0);
 export const sizeDockVisible = ref<boolean>(false);
+export const isPreviewingSize = ref<boolean>(false);
 
 export const smoothingDockTop = ref(0);
 export const smoothingDockLeft = ref(0);
@@ -60,11 +65,20 @@ export const selectedBrushPreview = computed<HTMLCanvasElement | undefined>(() =
     return brushPreviews[selectedBrush.value];
 });
 
+export const brushShapePath = computed(() => {
+    switch (brushShape.value) {
+        case 'circle': return 'M 1,0.5 A 0.5,0.5 0 0 1 0.5,1 0.5,0.5 0 0 1 0,0.5 0.5,0.5 0 0 1 0.5,0 0.5,0.5 0 0 1 1,0.5 Z';
+        case 'square': return 'M 0,0 L 1,0 L 1,1 L 0,1 Z';
+        default: return 'M 1,0.5 A 0.5,0.5 0 0 1 0.5,1 0.5,0.5 0 0 1 0,0.5 0.5,0.5 0 0 1 0.5,0 0.5,0.5 0 0 1 1,0.5 Z';
+    }
+});
+
 watch(() => selectedBrush.value, (selectedBrush) => {
     const brushDefinition = getBrushById(selectedBrush);
     if (!brushDefinition) return;
     selectedBrushCategoryId.value = brushDefinition.categories[0];
     brushShape.value = brushDefinition.shape;
+    brushPixelSnap.value = brushDefinition.pixelSnap;
     brushHardness.value = brushDefinition.hardness ?? 1;
     brushPressureMinSize.value = brushDefinition.pressureMinSize ?? 1;
     brushPressureTaper.value = brushDefinition.pressureTaper ?? 0;
@@ -78,5 +92,17 @@ watch(() => selectedBrush.value, (selectedBrush) => {
 export function generateSelectedBrushPreview() {
     if (!brushPreviews[selectedBrush.value]) {
         generateBrushPreview(selectedBrush.value);
+    }
+}
+
+export function applyPixelSnapping(point: DOMPoint) {
+    if (brushPixelSnap.value) {
+        if (Math.round(brushSize.value) % 2 == 0) {
+            point.x = Math.round(point.x);
+            point.y = Math.round(point.y);
+        } else {
+            point.x = Math.round(point.x + 0.5) - 0.5;
+            point.y = Math.round(point.y + 0.5) - 0.5;
+        }
     }
 }

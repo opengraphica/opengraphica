@@ -58,7 +58,7 @@ export interface WgpuWasmRendererBackendPublic {
     applySelectionMaskToAlphaChannel(layerId: number, options?: WgpuWasmRendererApplySelectionMaskToAlphaChannelOptions): Promise<RendererTextureTile[]>;
     takeSnapshot(imageWidth: number, imageHeight: number, options?: WgpuWasmRendererBackendTakeSnapshotOptions): Promise<ImageBitmap>;
     startBrushStroke(settings: RendererBrushStrokeSettings): Promise<void>;
-    moveBrushStroke(layerId: number, x: number, y: number, size: number, density: number, colorBlendingStrength: number, concentration: number): Promise<void>;
+    moveBrushStroke(layerId: number, x: number, y: number, size: number, angle: number, density: number, colorBlendingStrength: number, concentration: number): Promise<void>;
     stopBrushStroke(layerId: number): Promise<RendererTextureTile[]>;
     createBrushPreview(settings: RendererBrushStrokePreviewSettings): Promise<ImageBitmap>;
     createMeshController(type: string): Promise<MeshControllerInterface>;
@@ -178,7 +178,7 @@ export class WgpuWasmRendererBackend implements WgpuWasmRendererBackendPublic {
     async startBrushStroke(settings: RendererBrushStrokeSettings) {
 
     }
-    async moveBrushStroke(layerId: number, x: number, y: number, size: number, density: number, colorBlendingStrength: number, concentration: number) {
+    async moveBrushStroke(layerId: number, x: number, y: number, size: number, angle: number, density: number, colorBlendingStrength: number, concentration: number) {
 
     }
     async stopBrushStroke(layerId: number): Promise<RendererTextureTile[]> {

@@ -23,7 +23,6 @@ import copyTileVertexShader from './shader/copy-tile.vert';
 import copyTileFragmentShader from './shader/copy-tile.frag';
 import sampleBrushColorVertexShader from './shader/sample-brush-color.vert';
 import sampleBrushColorFragmentShader from './shader/sample-brush-color.frag';
-// import spectralFragmentShader from './shader/spectral.frag';
 
 import { markRenderDirty, getWebgl2RendererBackend } from '..';
 
@@ -32,6 +31,11 @@ import type { SelectionMask } from '../selection-mask';
 import type { RendererBrushStrokeSettings, RendererTextureTile, WorkingFileLayerBlendingMode } from '@/types';
 
 let useHalfFloatColorBufferFallback: boolean = false;
+
+enum BrushShapeShaderConstant {
+    circle = 0,
+    square = 1,
+}
 
 export function tryHalfFloatColorBuffers() {
     useHalfFloatColorBufferFallback = true;
@@ -83,6 +87,7 @@ export class BrushStroke {
 
     // Reuse matrix and vector objects to prevent memory pressure while drawing.
     aabb = new Box2();
+    cullAabb = new Box2();
     copyTextureRegion = new Box2();
     copyTextureDestination = new Vector2();
     _m0 = new Matrix4();
@@ -137,6 +142,9 @@ export class BrushStroke {
         this.createBrushColorRenderTargets();
 
         this.brushMaterial = new ShaderMaterial({
+            defines: {
+                cBrushShape: BrushShapeShaderConstant[settings.shape] ?? 0,
+            },
             uniforms: {
                 brushStrokeMap: { value: undefined },
                 brushColorMap: { value: this.brushColorRenderTarget1.texture },
@@ -294,6 +302,7 @@ export class BrushStroke {
         x: number,
         y: number,
         size: number,
+        angle: number,
         density: number,
         colorBlendingStrength: number,
         concentration: number,
@@ -317,6 +326,19 @@ export class BrushStroke {
         aabb.min.y = Math.min(p0.y, p1.y, p2.y, p3.y);
         aabb.max.x = Math.max(p0.x, p1.x, p2.x, p3.x);
         aabb.max.y = Math.max(p0.y, p1.y, p2.y, p3.y);
+
+        const cullSize = brushSize * Math.SQRT2;
+        const cullLeft = x - cullSize / 2;
+        const cullTop = y - cullSize / 2;
+        const c0 = this._v30.set(cullLeft, cullTop, 0.0).applyMatrix4(this.layerTransformInverse);
+        const c1 = this._v31.set(cullLeft + cullSize, cullTop, 0.0).applyMatrix4(this.layerTransformInverse);
+        const c2 = this._v32.set(cullLeft, cullTop + cullSize, 0.0).applyMatrix4(this.layerTransformInverse);
+        const c3 = this._v33.set(cullLeft + cullSize, cullTop + cullSize, 0.0).applyMatrix4(this.layerTransformInverse);
+        const cullAabb = this.cullAabb;
+        cullAabb.min.x = Math.min(c0.x, c1.x, c2.x, c3.x);
+        cullAabb.min.y = Math.min(c0.y, c1.y, c2.y, c3.y);
+        cullAabb.max.x = Math.max(c0.x, c1.x, c2.x, c3.x);
+        cullAabb.max.y = Math.max(c0.y, c1.y, c2.y, c3.y);
 
         let xi = 0;
         let yi = 0;
@@ -351,13 +373,13 @@ export class BrushStroke {
             tileX = xi * this.tileSize;
             tileWidth = Math.min(this.tileSize, this.texture.image.width - tileX);
 
-            if (tileX + tileWidth < aabb.min.x || tileX > aabb.max.x) continue;
+            if (tileX + tileWidth < cullAabb.min.x || tileX > cullAabb.max.x) continue;
 
             for (yi = 0; yi < this.yTileCount; yi++) {
                 tileY = yi * this.tileSize;
                 tileHeight = Math.min(this.tileSize, this.texture.image.height - tileY);
 
-                if (tileY + tileHeight < aabb.min.y || tileY > aabb.max.y) continue;
+                if (tileY + tileHeight < cullAabb.min.y || tileY > cullAabb.max.y) continue;
 
                 count++;
 
@@ -404,6 +426,15 @@ export class BrushStroke {
                 this._v30.z = 1.0;
                 (this.brushMaterial.uniforms.brushTransform.value as Matrix4)
                     .identity()
+                    .multiply(
+                        this._m2.makeTranslation(0.5, 0.5, 0.0)
+                    )
+                    .multiply(
+                        this._m2.makeRotationZ(angle)
+                    )
+                    .multiply(
+                        this._m2.makeTranslation(-0.5, -0.5, 0.0)
+                    )
                     .multiply(tileTransformReset)
                     .multiply(
                         this.layerTransform

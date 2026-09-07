@@ -65,7 +65,7 @@ export interface Webgl2RendererBackendPublic {
     applySelectionMaskToAlphaChannel(layerId: number, options?: Webgl2RendererApplySelectionMaskToAlphaChannelOptions): Promise<RendererTextureTile[]>;
     takeSnapshot(imageWidth: number, imageHeight: number, options?: Webgl2RendererBackendTakeSnapshotOptions): Promise<ImageBitmap>;
     startBrushStroke(settings: RendererBrushStrokeSettings): Promise<void>;
-    moveBrushStroke(layerId: number, x: number, y: number, size: number, density: number, colorBlendingStrength: number, concentration: number): Promise<void>;
+    moveBrushStroke(layerId: number, x: number, y: number, size: number, angle: number, density: number, colorBlendingStrength: number, concentration: number): Promise<void>;
     stopBrushStroke(layerId: number): Promise<RendererTextureTile[]>;
     createBrushPreview(settings: RendererBrushStrokePreviewSettings): Promise<ImageBitmap>;
     createMeshController(type: string): Promise<MeshControllerInterface>;
@@ -576,6 +576,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         x: number,
         y: number,
         size: number,
+        angle: number,
         density: number,
         colorBlendingStrength: number,
         concentration: number,
@@ -583,7 +584,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         const brushStrokeId = this.compositorBrushStrokes.get(layerId);
         if (brushStrokeId == null) return;
 
-        this.compositor.moveBrushStroke(brushStrokeId, x, y, size, density, colorBlendingStrength, concentration);
+        this.compositor.moveBrushStroke(brushStrokeId, x, y, size, angle, density, colorBlendingStrength, concentration);
     }
 
     async stopBrushStroke(

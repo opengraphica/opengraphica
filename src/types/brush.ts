@@ -17,8 +17,11 @@ export interface BrushDefinition {
     // Hides the brush from the UI
     hidden?: boolean;
 
-    // SVG Path command that defines the brush shape
-    shape: string;
+    // The name of a shape our brush rendering engine understands
+    shape: 'circle' | 'square';
+
+    // Snap the pointer to individual pixels (canvas aligned)
+    pixelSnap: boolean;
 
     // Sharp edges at 1, fully soft edges at 0
     hardness: number;

@@ -121,7 +121,10 @@ export class BrushPreview {
         return aT + (bT - aT) * ratio;
     }
 
-    async generatePixelBuffer(originalViewport: Vector4, settings: RendererBrushStrokePreviewSettings): Promise<Uint8Array> {
+    async generatePixelBuffer(
+        originalViewport: Vector4,
+        settings: RendererBrushStrokePreviewSettings
+    ): Promise<Uint8Array> {
         const brushStroke = new BrushStroke(
             this.renderer,
             undefined,
@@ -131,6 +134,7 @@ export class BrushPreview {
             {
                 layerId: -1,
                 color: settings.color,
+                shape: settings.shape,
                 size: settings.size,
                 hardness: settings.hardness,
                 colorBlendingPersistence: settings.colorBlendingPersistence,
@@ -174,8 +178,17 @@ export class BrushPreview {
             y = this.cubicBezierY(t);
             x += ((Math.random() * 2) - 1) * settings.jitter * size;
             y += ((Math.random() * 2) - 1) * settings.jitter * size;
+            if (settings.pixelSnap) {
+                if (Math.round(settings.size) % 2 == 0) {
+                    x = Math.round(x);
+                    y = Math.round(y);
+                } else {
+                    x = Math.round(x + 0.5) - 0.5;
+                    y = Math.round(y + 0.5) - 0.5;
+                }
+            }
 
-            brushStroke.move(x, y, size, density, colorBlendingStrength, concentration);
+            brushStroke.move(x, y, size, 0, density, colorBlendingStrength, concentration);
 
             distance += step;
         }
@@ -199,6 +212,8 @@ export class BrushPreview {
             const sanityBuffer = await this.generatePixelBuffer(originalViewport, {
                 color: new Float16Array([1, 0, 0, 1]),
                 size: 1000,
+                pixelSnap: false,
+                shape: 'circle',
                 hardness: 1,
                 colorBlendingPersistence: 1,
                 colorBlendingStrength: 0,

@@ -2,7 +2,7 @@
     <div
         ref="drawerContainerEl"
         class="og-menu-drawers"
-        :hidden="menuDrawers.length === 0"
+        :hidden="isAllDialogsHidden || menuDrawers.length === 0"
         :class="{ 'is-fade-out': isAllDrawersClosing }"
         @animationend="onAnimationEndDrawers($event)"
         @click="onCloseAllDrawers($event)"
@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineComponent, defineAsyncComponent, ref, onMounted, onUnmounted } from 'vue';
+import { computed, defineAsyncComponent, ref, onMounted, onUnmounted } from 'vue';
 import { useI18n } from '@/i18n';
 import Dock from '@/ui/dock/dock.vue';
 import Module from '@/ui/module/module.vue';
@@ -77,6 +77,10 @@ const isAllDrawersClosing = ref<boolean>(false);
 
 let dialogIdCounter: number = 0;
 const menuDrawers = ref<MenuDrawerDefinition[]>([]);
+
+const isAllDialogsHidden = computed(() => {
+    return editorStore.state.isToolHidingDialogs;
+});
 
 onMounted(() => {
     appEmitter.on('app.menuDrawer.openFromDock', handleDockOpen);

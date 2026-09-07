@@ -805,7 +805,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     private onDragMove(pointer: PointerTracker) {
         const pageX = pointer.move?.pageX ?? 0;
         const pageY = pointer.move?.pageY ?? 0;
-        const { viewTransformPoint, transformBoundsPoint } = this.getTransformedCursorInfo(pageX, pageY);
+        const { viewTransformPoint } = this.getTransformedCursorInfo(pageX, pageY);
 
         // Creating new text layer
         if (this.isCreatingLayer) {
@@ -884,6 +884,16 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 }
                 if (dragHandle != null && dragHandle !== DRAG_TYPE_ALL && editingTextLayer.value.data.boundary !== 'box') {
                     editingTextLayer.value.data.boundary = 'box';
+                }
+
+                if (editingTextDocumentSelection.value) {
+                    const { start, end } = editingTextDocumentSelection.value;
+                    if (!(start.line == end.line && start.character == end.character)) {
+                        let isHorizontal = ['ltr', 'rtl'].includes(editingTextLayer.value.data.lineDirection);
+                        editingRenderTextPlacement.value = calculateTextPlacement(editingTextLayer.value.data, {
+                            wrapSize: isHorizontal ? editingTextLayer.value.width : editingTextLayer.value.height,
+                        });
+                    }
                 }
             } else if (this.dragStartPickLayer != null) { // Selecting text
                 const editors = this.layerEditors.get(editingTextLayerId.value);

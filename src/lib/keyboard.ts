@@ -6,10 +6,8 @@
 
 import defaultKeyboardMapConfig from '@/config/default-keyboard-map.json';
 import { ref } from 'vue';
-import editorStore from '@/store/editor';
 import appEmitter from '@/lib/emitter';
 import { isInput } from '@/lib/events';
-import { generateImageBlobHash } from '@/lib/hash';
 import { runModule } from '@/modules';
 import { KeyboardMapConfigCategory } from '@/types';
 import { t } from '@/i18n';

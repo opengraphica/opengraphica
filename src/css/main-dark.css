@@ -10327,6 +10327,8 @@ body.og-full-page .opengraphica {
   animation: og-menu-drawers-fade-out 0.15s ease-in;
 }
 .opengraphica .og-menu-drawer {
+  --og-menu-drawer-open-horizontal-reveal-padding: 3.5rem;
+  --og-menu-drawer-close-horizontal-offset: -2.5rem;
   display: flex;
   flex-direction: column;
   background: var(--og-menu-drawer-background-color);
@@ -10340,16 +10342,22 @@ body.og-full-page .opengraphica {
   animation-duration: 0.25s;
   animation-timing-function: ease-in;
 }
+@media screen and (max-width: 450px) {
+  .opengraphica .og-menu-drawer {
+    --og-menu-drawer-open-horizontal-reveal-padding: 0.5rem;
+    --og-menu-drawer-close-horizontal-offset: 1rem;
+  }
+}
 .opengraphica .og-menu-drawer.is-immediate {
   animation: none;
 }
 .opengraphica .og-menu-drawer.is-open-right {
   padding-left: 4rem;
-  right: 3.5rem;
+  right: var(--og-menu-drawer-open-horizontal-reveal-padding, 3.5rem);
   animation-name: og-menu-drawer-slide-right-open;
 }
 .opengraphica .og-menu-drawer.is-open-right .og-menu-drawer__close {
-  right: -2.5rem;
+  right: var(--og-menu-drawer-close-horizontal-offset, -2.5);
 }
 .opengraphica .og-menu-drawer.is-open-right.is-closing {
   animation-name: og-menu-drawer-slide-right-close;
@@ -10402,7 +10410,7 @@ body.og-full-page .opengraphica {
 }
 .opengraphica .og-menu-drawer__close {
   position: absolute;
-  top: 1.2rem;
+  top: 1rem;
   right: 1.2rem;
   color: var(--og-menu-drawer-close-icon-color);
 }

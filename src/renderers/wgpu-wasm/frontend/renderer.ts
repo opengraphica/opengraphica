@@ -248,7 +248,7 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
 
     }
 
-    async moveBrushStroke(layerId: number, x: number, y: number, size: number, density: number, colorBlendingStrength: number, concentration: number) {
+    async moveBrushStroke(layerId: number, x: number, y: number, size: number, angle: number, density: number, colorBlendingStrength: number, concentration: number) {
 
     }
 

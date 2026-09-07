@@ -125,6 +125,9 @@
 }
 
 .og-menu-drawer {
+    --og-menu-drawer-open-horizontal-reveal-padding: 3.5rem;
+    --og-menu-drawer-close-horizontal-offset: -2.5rem;
+
     display: flex;
     flex-direction: column;
     background: var(--og-menu-drawer-background-color);
@@ -138,17 +141,22 @@
     animation-duration: 0.25s;
     animation-timing-function: ease-in;
 
+    @media screen and (max-width: 450px) {
+        --og-menu-drawer-open-horizontal-reveal-padding: 0.5rem;
+        --og-menu-drawer-close-horizontal-offset: 1rem;
+    }
+
     &.is-immediate {
         animation: none;
     }
 
     &.is-open-right {
         padding-left: 4rem;
-        right: 3.5rem;
+        right: var(--og-menu-drawer-open-horizontal-reveal-padding, 3.5rem);
         animation-name: og-menu-drawer-slide-right-open;
 
         .og-menu-drawer__close {
-            right: -2.5rem;
+            right: var(--og-menu-drawer-close-horizontal-offset, -2.5);
         }
 
         &.is-closing {
@@ -211,7 +219,7 @@
 }
 .og-menu-drawer__close {
     position: absolute;
-    top: 1.2rem;
+    top: 1.0625rem;
     right: 1.2rem;
     color: var(--og-menu-drawer-close-icon-color);
 

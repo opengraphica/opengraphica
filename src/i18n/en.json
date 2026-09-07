@@ -163,6 +163,7 @@
         "simpleAirBrush": "Simple Air Brush",
         "simplePaintBrush": "Simple Paint Brush",
         "simplePen": "Simple Pen",
+        "simplePixelArt": "Simple Pixel Art",
         "simpleWaterColor": "Simple Water Color"
     },
     "defaultBrushCategory": {
@@ -1208,6 +1209,11 @@
                     },
                     "shape": {
                         "title": "Shape",
+                        "shape": "Shape",
+                        "shapes": {
+                            "circle": "Circle",
+                            "square": "Square"
+                        },
                         "hardness": "Hardness",
                         "hardnessDescription": "Lower values will have soft faded edges, and higher values sharp edges.",
                         "angle": "Angle",
@@ -1218,7 +1224,8 @@
                         "spacing": "Spacing",
                         "spacingDescription": "The distance between each stamp of the brush, relative to the brush size. Be careful with extremely low values, as it can tank performance on larger brush sizes.",
                         "jitter": "Jitter",
-                        "jitterDescription": "Randomly shifts the position of the brush shape."
+                        "jitterDescription": "Randomly shifts the position of the brush shape.",
+                        "pixelSnap": "Pixel Snap"
                     },
                     "pressure": {
                         "title": "Pressure",

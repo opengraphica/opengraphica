@@ -28,8 +28,8 @@
                             maskRepeat: 'no-repeat',
                             maskPosition: 'center',
                             maskSize: '5.625rem 1.625rem',
-                            width: '5.625rem',
-                            height: '1.625rem',
+                            width: '100%',
+                            height: '100%',
                         }"
                     />
                 </div>

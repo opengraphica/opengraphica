@@ -137,7 +137,7 @@ self.onmessage = ({ data }) => {
             }).catch(logError);
             break;
         case BackendWorkerMessage.MOVE_BRUSH_STROKE:
-            rendererBackend.moveBrushStroke(data.layerId, data.x, data.y, data.size, data.density, data.colorBlendingStrength, data.concentration).then(() => {
+            rendererBackend.moveBrushStroke(data.layerId, data.x, data.y, data.size, data.angle, data.density, data.colorBlendingStrength, data.concentration).then(() => {
                 self.postMessage({
                     type: BackendWorkerMessage.MOVE_BRUSH_STROKE_RESULT,
                 });

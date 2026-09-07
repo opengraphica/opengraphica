@@ -90,6 +90,15 @@
                         <el-form novalidate="novalidate" action="javascript:void(0)" label-position="top">
                             <el-form-item>
                                 <template #label>
+                                    {{ t('toolbar.drawBrush.brushDialog.editorTab.shape.shape') }}
+                                </template>
+                                <el-select v-model="editingBrush.shape">
+                                    <el-option value="circle" :label="t('toolbar.drawBrush.brushDialog.editorTab.shape.shapes.circle')" />
+                                    <el-option value="square" :label="t('toolbar.drawBrush.brushDialog.editorTab.shape.shapes.square')" />
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item>
+                                <template #label>
                                     {{ t('toolbar.drawBrush.brushDialog.editorTab.shape.hardness') }}
                                     <og-more-info-icon :message="t('toolbar.drawBrush.brushDialog.editorTab.shape.hardnessDescription')" />
                                 </template>
@@ -186,6 +195,12 @@
                                         />
                                     </div>
                                 </div>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-switch
+                                    v-model="editingBrush.pixelSnap"
+                                    :active-text="t('toolbar.drawBrush.brushDialog.editorTab.strokePath.pixelSnap')"
+                                />
                             </el-form-item>
                         </el-form>
                     </el-scrollbar>
@@ -389,13 +404,15 @@ import ElDivider from 'element-plus/lib/components/divider/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElInputNumber from '@/ui/el/el-input-number.vue';
 import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
+import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSlider from 'element-plus/lib/components/slider/index';
+import ElSwitch from 'element-plus/lib/components/switch/index';
 import ElTabs, { ElTabPane } from 'element-plus/lib/components/tabs/index';
 
 import OgCanvasContainer from '@/ui/element/canvas-container.vue';
 import OgMoreInfoIcon from '@/ui/element/more-info-icon.vue';
 
-import type { BrushDefinition, RGBAColor, WorkingFileGradientColorSpace, WorkingFileGradientColorStop } from '@/types';
+import type { BrushDefinition } from '@/types';
 
 const props = defineProps({
     selectedBrushId: {
@@ -475,6 +492,7 @@ function onClickEditBrush(brushId: string) {
         id: brush.id,
         name: brush.name,
         shape: brush.shape,
+        pixelSnap: brush.pixelSnap,
         hardness: brush.hardness * 100,
         spacing: Math.round(brush.spacing * 100),
         jitter: Math.round(brush.jitter * 100),
@@ -501,6 +519,7 @@ function applyBrushEdits() {
         id: editingBrush.value.id,
         name: editingBrush.value.name,
         shape: editingBrush.value.shape,
+        pixelSnap: editingBrush.value.pixelSnap,
         hardness: editingBrush.value.hardness / 100,
         spacing: editingBrush.value.spacing / 100,
         jitter: editingBrush.value.jitter / 100,

@@ -241,11 +241,11 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
         await this.messageReceived(BackendWorkerMessage.START_BRUSH_STROKE_RESULT);
     }
 
-    async moveBrushStroke(layerId: number, x: number, y: number, size: number, density: number, colorBlendingStrength: number, concentration: number) {
+    async moveBrushStroke(layerId: number, x: number, y: number, size: number, angle: number, density: number, colorBlendingStrength: number, concentration: number) {
         // TODO - transfer? avoid using memory somehow?
         this.backendWorker.postMessage({
             type: BackendWorkerMessage.MOVE_BRUSH_STROKE,
-            layerId, x, y, size, density, colorBlendingStrength, concentration,
+            layerId, x, y, size, angle, density, colorBlendingStrength, concentration,
         });
 
         await this.messageReceived(BackendWorkerMessage.MOVE_BRUSH_STROKE_RESULT);

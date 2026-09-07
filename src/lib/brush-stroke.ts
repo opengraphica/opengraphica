@@ -122,6 +122,7 @@ class BrushStrokeCatmullRomSegment {
 }
 
 export class BrushStroke {
+    pixelSnap!: boolean;
     smoothing!: number;
     spacing!: number;
     jitter!: number;
@@ -163,8 +164,9 @@ export class BrushStroke {
     retrieveLineLength: number = 0;
 
     constructor(
-        smoothing: number, spacing: number, jitter: number, startingPoint: BrushStrokePoint
+        smoothing: number, spacing: number, pixelSnap: boolean, jitter: number, startingPoint: BrushStrokePoint
     ) {
+        this.pixelSnap = pixelSnap;
         this.spacing = spacing;
         this.smoothing = smoothing;
         this.jitter = jitter;
@@ -247,6 +249,8 @@ export class BrushStroke {
     }
 
     addCollectedPoint(point: BrushStrokePoint) {
+        const lastCollectedPoint = this.collectedPoints[this.collectedPointsLength];
+        if (this.pixelSnap && point.x === lastCollectedPoint?.x && point.y === lastCollectedPoint?.y) return;
         if (this.collectedPoints.length > this.collectedPointsLength) {
             this.collectedPoints[this.collectedPointsLength] = point;
             this.collectedPointsLength++;
@@ -323,7 +327,7 @@ export class BrushStroke {
             const colorBlendingStrength = this.retrieveCatmullRomP1!.colorBlendingStrength * (1 - travelRatio) + this.retrieveCatmullRomP2!.colorBlendingStrength * travelRatio;
             const concentration = this.retrieveCatmullRomP1!.concentration * (1 - travelRatio) + this.retrieveCatmullRomP2!.concentration * travelRatio;
 
-            const stepDistance = Math.max(1, size * this.spacing);
+            const stepDistance = Math.max(this.pixelSnap ? 0 : 1, size * this.spacing);
             const bezierT = this.catmullRomSegment.getTAtLength(travel);
 
             const tt = this.catmullRomSegment.t1 + (this.catmullRomSegment.t2 - this.catmullRomSegment.t1) * bezierT;
@@ -361,7 +365,7 @@ export class BrushStroke {
             const density = this.retrieveCatmullRomP1!.density * (1 - travelRatio) + this.retrieveCatmullRomP2!.density * travelRatio;
             const colorBlendingStrength = this.retrieveCatmullRomP1!.colorBlendingStrength * (1 - travelRatio) + this.retrieveCatmullRomP2!.colorBlendingStrength * travelRatio;
             const concentration = this.retrieveCatmullRomP1!.concentration * (1 - travelRatio) + this.retrieveCatmullRomP2!.concentration * travelRatio;
-            const stepDistance = Math.max(1, size * this.spacing);
+            const stepDistance = Math.max(this.pixelSnap ? 0 : 1, size * this.spacing);
 
             if (travel <= this.retrieveLineLength) {
                 point = {
@@ -417,7 +421,7 @@ export class BrushStroke {
             const density = this.retrieveCatmullRomP1!.density * (1 - travelRatio) + this.retrieveCatmullRomP2!.density * travelRatio;
             const colorBlendingStrength = this.retrieveCatmullRomP1!.colorBlendingStrength * (1 - travelRatio) + this.retrieveCatmullRomP2!.colorBlendingStrength * travelRatio;
             const concentration = this.retrieveCatmullRomP1!.concentration * (1 - travelRatio) + this.retrieveCatmullRomP2!.concentration * travelRatio;
-            const stepDistance = Math.max(1, size * this.spacing);
+            const stepDistance = Math.max(this.pixelSnap ? 0 : 1, size * this.spacing);
 
             if (travel <= this.retrieveLineLength) {
                 point = {

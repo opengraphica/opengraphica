@@ -23,7 +23,7 @@
                 <span v-if="actionGroupSectionName === 'tools'" class="og-menu-section__title">{{ t('menuBar.toolsHeading') }}</span>
                 <component
                     v-if="displayMode === 'all' || actionGroupSectionName === 'tools'"
-                    :is="actionGroupSectionName === 'tools' ? (direction === 'vertical' ? ElScrollbar : ElHorizontalScrollbarArrows) : 'v-fragment'"
+                    :is="actionGroupSectionName === 'tools' ? (direction === 'vertical' ? ElScrollbar : ElHorizontalScrollbarArrows) : VFragment"
                     style="height: auto"
                     @scroll="onScrollTools"
                 >
@@ -191,6 +191,7 @@ import ElPopover from '@/ui/el/el-popover.vue';
 const ElScrollbar = defineAsyncComponent(() => import('element-plus/lib/components/scrollbar/index'));
 import ElTag from 'element-plus/lib/components/tag/index';
 import DynamicallyLoadedDock from '@/ui/dock/dock.vue';
+import VFragment from '@/ui/el/v-fragment.vue';
 
 import toolGroupsDefinition from '@/config/menu-bar-tool-groups.json';
 import appEmitter from '@/lib/emitter';

@@ -63,6 +63,8 @@
                 :step="0.01"
                 :format-tooltip="formatBrushSizeTooltip"
                 class="!w-50 !max-w-full"
+                @input="onInputScaledBrushSize"
+                @change="onChangeScaledBrushSize"
             />
         </floating-dock>
         <floating-dock v-if="smoothingDockVisible" v-model:top="smoothingDockTop" v-model:left="smoothingDockLeft" :visible="floatingDocksVisible">
@@ -104,7 +106,7 @@ import { t } from '@/i18n';
 import {
     brushOpacity, brushSize, brushSmoothing, showBrushDrawer,
     opacityDockVisible, opacityDockTop, opacityDockLeft,
-    sizeDockVisible, sizeDockTop, sizeDockLeft,
+    sizeDockVisible, sizeDockTop, sizeDockLeft, isPreviewingSize,
     smoothingDockVisible, smoothingDockTop, smoothingDockLeft,
     selectedBrush, selectedBrushPreview, generateSelectedBrushPreview,
 } from '@/canvas/store/erase-brush-state';
@@ -216,6 +218,14 @@ function formatBrushSizeTooltip() {
     const value = brushSize.value;
     const percentage = (value - minBrushSize.value) / (maxBrushSize.value - minBrushSize.value);
     return `${(100 * percentage).toFixed(0)}% - ${value}px`;
+}
+
+function onInputScaledBrushSize() {
+    isPreviewingSize.value = true;
+}
+
+function onChangeScaledBrushSize() {
+    isPreviewingSize.value = false;
 }
 
 /*---------------*\
