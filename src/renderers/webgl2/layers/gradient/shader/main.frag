@@ -68,6 +68,7 @@ vec4 materialMain(vec2 uv) {
     );
 #endif // cBlendColorSpace
 
+    color.a *= opacity;
     return color;
 }
 

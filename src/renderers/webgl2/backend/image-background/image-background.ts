@@ -43,6 +43,11 @@ export class ImageBackground {
         this.backgroundMesh.material = this.backgroundMaterial;
     }
 
+    setAlpha(alpha: number) {
+        if (!this.backgroundMaterial) return;
+        this.backgroundMaterial.opacity = alpha;
+    }
+
     swapScene(scene: Scene) {
         this.scene.remove(this.backgroundMesh);
         scene.add(this.backgroundMesh);

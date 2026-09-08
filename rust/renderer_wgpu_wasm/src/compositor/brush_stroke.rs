@@ -185,6 +185,10 @@ impl<'a> BrushStroke<'a> {
             brush_stroke_transform_uniform_stride * settings.max_move_count as usize * tile_count as usize;
         let brush_stroke_transform_uniform_buffer =
             create_brush_stroke_transform_uniform_buffer(&device, brush_stroke_transform_uniform_buffer_size as u64);
+        // TODO: pass brush shape as constant
+        // constants: &[
+        //    ("BRUSH_SHAPE", 0),
+        // ],
         let brush_stroke_pipeline = create_pipeline(
             &device,
             &brush_stroke_bind_group_layout,

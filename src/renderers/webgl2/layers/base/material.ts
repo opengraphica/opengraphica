@@ -116,7 +116,9 @@ export function createLayerShaderUniformsAndDefines(
         cLayerWidth: width,
         cLayerHeight: height,
     };
-    const uniforms: Record<string, IUniform> = {};
+    const uniforms: Record<string, IUniform> = {
+        opacity: { value: 1 },
+    };
     let textures: Texture[] = [];
     for (const [index, canvasFilter] of canvasFilters.entries()) {
         const editConfig = canvasFilter.getEditConfig();

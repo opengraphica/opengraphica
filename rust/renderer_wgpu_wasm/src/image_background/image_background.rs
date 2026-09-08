@@ -236,6 +236,21 @@ impl ImageBackground {
         );
     }
 
+    pub fn get_alpha(&self) -> f32 {
+        self.properties_uniform.color[3]
+    }
+
+    pub fn set_alpha(&mut self, queue: &wgpu::Queue, alpha: f32) {
+        let properties_uniform = &mut self.properties_uniform;
+        properties_uniform.color[3] = alpha;
+
+        queue.write_buffer(
+            &self.properties_buffer,
+            0,
+            bytemuck::bytes_of(&self.properties_uniform)
+        );
+    }
+
     pub fn draw(&self, pass: &mut wgpu::RenderPass) {
         pass.set_pipeline(&self.pipeline);
         pass.set_stencil_reference(1);

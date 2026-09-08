@@ -210,6 +210,7 @@ async function generateNextFilterPreview(previewCtx: ImageBitmapRenderingContext
     const layerPreviewBitmap = await renderer.takeSnapshot(selectedLayerWidth.value, selectedLayerHeight.value, {
         layerIds: [selectedLayer.value.id],
         filters: filtersWithPreview,
+        // disableBackground: true,  // TODO - renderer generates weird output
     });
 
     previewCtx.transferFromImageBitmap(layerPreviewBitmap);

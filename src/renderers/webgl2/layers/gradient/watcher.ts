@@ -16,6 +16,7 @@ export class GradientLayerWatcher implements RendererLayerWatcher<WorkingFileGra
     order: number | undefined = undefined;
     stopWatchName: WatchStopHandle | undefined;
     stopWatchBlendingMode: WatchStopHandle | undefined;
+    stopWatchOpacity: WatchStopHandle | undefined;
     stopWatchVisible: WatchStopHandle | undefined;
     stopWatchSize: WatchStopHandle | undefined;
     stopWatchTransform: WatchStopHandle | undefined;
@@ -27,7 +28,7 @@ export class GradientLayerWatcher implements RendererLayerWatcher<WorkingFileGra
     }
 
     async attach(layer: WorkingFileGradientLayer) {
-        const { blendingMode, data, drafts, filters, height, name, transform, visible, width } = toRefs(layer);
+        const { blendingMode, opacity, data, filters, height, name, transform, visible, width } = toRefs(layer);
 
         this.meshController = await this.rendererBackend.createMeshController('gradient');
         this.meshController.attach(layer.id);
@@ -38,6 +39,12 @@ export class GradientLayerWatcher implements RendererLayerWatcher<WorkingFileGra
         this.stopWatchBlendingMode = watch([blendingMode], ([blendingMode]) => {
             this.meshController?.updateBlendingMode(blendingMode);
         }, { immediate: true });
+        this.stopWatchOpacity = watch([opacity], ([opacity]) => {
+            this.meshController?.updateOpacity(opacity);
+        }, { immediate: true });
+        this.stopWatchData = watch([data], () => {
+            this.meshController?.updateData(toRaw(layer.data));
+        }, { deep: true, immediate: true });
         this.stopWatchData = watch([data], () => {
             this.meshController?.updateData(toRaw(layer.data));
         }, { deep: true, immediate: true });
@@ -73,6 +80,7 @@ export class GradientLayerWatcher implements RendererLayerWatcher<WorkingFileGra
     async detach() {
         this.meshController?.detach();
         this.stopWatchBlendingMode?.();
+        this.stopWatchOpacity?.();
         this.stopWatchData?.();
         this.stopWatchFilters?.();
         this.stopWatchName?.();
@@ -83,6 +91,7 @@ export class GradientLayerWatcher implements RendererLayerWatcher<WorkingFileGra
         this.meshController = undefined;
         this.order = undefined;
         this.stopWatchBlendingMode = undefined;
+        this.stopWatchOpacity = undefined;
         this.stopWatchData = undefined;
         this.stopWatchFilters = undefined;
         this.stopWatchName = undefined;

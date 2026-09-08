@@ -14,7 +14,7 @@ import gradientMaterialVertexShaderSetup from './shader/setup.vert';
 import gradientMaterialVertexShaderMain from './shader/main.vert';
 import gradientMaterialFragmentShaderSetup from './shader/setup.frag';
 import gradientMaterialFragmentShaderMain from './shader/main.frag';
-import { createLayerShader, createLayerShaderUniformsAndDefines } from '../base/material';
+import { createLayerShader } from '../base/material';
 
 import type { Matrix4 } from 'three';
 import type {
@@ -39,6 +39,7 @@ enum GradientSpreadMethod {
 }
 
 export interface GradientMaterialUpdateParams {
+    opacity?: number;
     gradientData: WorkingFileGradientLayer<RGBAColor>['data'];
     canvasWidth?: number;
     canvasHeight?: number;
@@ -71,7 +72,7 @@ function calculateGradientAverageBrightness(stops: WorkingFileGradientColorStop<
 }
 
 export async function createGradientMaterial(
-    { canvasFilters, canvasWidth, canvasHeight, gradientData, transform }: GradientMaterialUpdateParams
+    { opacity, canvasFilters, canvasWidth, canvasHeight, gradientData, transform }: GradientMaterialUpdateParams
 ) {
     const uuid = uuidv4();
 
@@ -139,6 +140,9 @@ export async function createGradientMaterial(
     }
 
     material.uniforms.dstTexture = { value: undefined };
+    material.uniforms.opacity = {
+        value: opacity ?? 1,
+    };
 
     material.userData.uuid = uuid;
     material.userData.transform = transform;
@@ -149,7 +153,7 @@ export async function createGradientMaterial(
 
 export async function updateGradientMaterial(
     material: ShaderMaterial,
-    { gradientData, canvasWidth, canvasHeight, transform }: GradientMaterialUpdateParams
+    { opacity, gradientData, canvasWidth, canvasHeight, transform }: GradientMaterialUpdateParams
 ) {
     const cCanvasWidth = canvasWidth;
     const cCanvasHeight = canvasHeight;
@@ -194,6 +198,9 @@ export async function updateGradientMaterial(
     }
     if (hasTransformChanged || focusTransformed.x !== material.uniforms.focus.value.x || focusTransformed.y !== material.uniforms.focus.value.y) {
         material.uniforms.focus.value = new Vector2(focusTransformed.x, focusTransformed.y);
+    }
+    if (opacity != null && material.uniforms.opacity.value !== opacity) {
+        material.uniforms.opacity.value = opacity;
     }
     material.userData.blendColorSpace = gradientData.blendColorSpace;
     material.userData.stopsHash = newStopsHash;

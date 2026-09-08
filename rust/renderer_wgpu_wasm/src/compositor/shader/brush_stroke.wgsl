@@ -43,6 +43,21 @@ fn circle_falloff(radius: f32, hardness: f32) -> f32 {
     return mix(1.0, 0.0, s);
 }
 
+fn square(
+    uv: vec2<f32>,
+    center: vec2<f32>,
+    radius: f32,
+    hardness: f32
+) {
+    let delta: vec2<f32> = abs(uv - center);
+    let dist = max(delta.x, delta.y);
+    let squareDist: f32 = max(delta.x, delta.y) / max(radius, 1e-5);
+    return circle_falloff(
+        clamp(squareDist, 0.0, 1.0),
+        hardness
+    ) * step(dist, radius);
+}
+
 fn circle(
     uv: vec2<f32>,
     center: vec2<f32>,

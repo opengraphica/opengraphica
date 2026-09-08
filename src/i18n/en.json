@@ -57,6 +57,7 @@
         "updateLayerBlendingMode": "Change Blending Mode",
         "updateLayerFilterParams": "Update Layer Effect",
         "updateLayerFilterMask": "Update Layer Effect Mask",
+        "updateLayerOpacity": "Change Opacity",
         "updateSelectionCombineMode": "Update Selection Combine Mode",
         "updateTextLayerProperties": "Update Text Layer Properties",
         "waitingOnQueueFree": "Waiting for Work to Complete"
@@ -90,7 +91,9 @@
             "layerSettings": "Layer Settings",
             "rename": "Rename",
             "blendingMode": "Blending",
+            "opacity": "Opacity",
             "addEffect": "Add Effect",
+            "rasterize": "Rasterize",
             "duplicate": "Duplicate",
             "delete": "Delete",
             "frames": "Frames",
@@ -102,7 +105,17 @@
             "rasterizeEffects": "Merge All",
             "recalculatingEffect": "Processing...",
             "moveEffectUp": "Move Effect Up",
-            "moveEffectDown": "Move Effect Down"
+            "moveEffectDown": "Move Effect Down",
+            "iconTitle": {
+                "gradient": "Gradient Layer",
+                "group": "Group Layer",
+                "empty": "Empty Layer",
+                "raster": "Raster Layer",
+                "rasterSequence": "Raster Sequence Layer",
+                "text": "Text Layer",
+                "vector": "Vector Layer",
+                "video": "Video Layer"
+            }
         },
         "renderer": {
             "initializeFailed": {
@@ -1342,6 +1355,10 @@
         },
         "general": {
             "settings": "Settings"
+        },
+        "layerOpacity": {
+            "title": "Opacity",
+            "opacity": "Opacity"
         },
         "selection": {
             "selectionShape": {

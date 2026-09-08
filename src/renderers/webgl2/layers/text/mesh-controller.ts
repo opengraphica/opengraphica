@@ -2,30 +2,20 @@
  * This file constructs the necessary assets to render a text layer.
  * It can run in the main thread or a worker.
  */
-import { mergeGeometries } from '@/renderers/webgl2/geometries/buffer-geometry-utils';
-import { ImagePlaneGeometry } from '@/renderers/webgl2/geometries/image-plane-geometry';
 
-import { BackSide } from 'three/src/constants';
 import { Matrix4 } from 'three/src/math/Matrix4';
-import { MeshBasicMaterial } from 'three/src/materials/MeshBasicMaterial';
 import { Mesh } from 'three/src/objects/Mesh';
 import { Object3D } from 'three/src/core/Object3D';
-import { Path } from 'three/src/extras/core/Path';
-import { Shape } from 'three/src/extras/core/Shape';
-import { ShapeGeometry } from 'three/src/geometries/ShapeGeometry';
 import { Texture } from 'three/src/textures/Texture';
-import { Vector2 } from 'three/src/math/Vector2';
-import { Vector3 } from 'three/src/math/Vector3';
 
-import { Clipper, PolyType, ClipType, Paths, PathPoint, PolyFillType, PolyTree } from '@/lib/clipper';
 import { textMetaDefaults } from '@/lib/text-common';
 import { getUnloadedFontFamilies, loadFontFamilies, calculateTextPlacement } from '@/lib/text-render';
 
-import { getWebgl2RendererBackend, markRenderDirty, requestFrontendTexture } from '@/renderers/webgl2/backend';
+import { getWebgl2RendererBackend, markRenderDirty } from '@/renderers/webgl2/backend';
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
 import { createCanvasFiltersFromLayerConfig } from '../base/material';
 import { assignMaterialBlendingMode } from '../base/blending-mode';
-import { createTextMaterial, disposeTextMaterial, updateTextMaterial } from './material';
+import { createTextMaterial, updateTextMaterial, disposeTextMaterial } from './material';
 import { LetterMeshCache } from './letter-mesh-cache';
 
 import type { Scene, ShaderMaterial } from 'three';
@@ -33,7 +23,6 @@ import type {
     Webgl2RendererCanvasFilter, Webgl2RendererMeshController,
     WorkingFileLayerBlendingMode, WorkingFileTextLayer, WorkingFileLayerFilter
 } from '@/types';
-import type { Glyph } from '@/lib/opentype';
 
 export class TextLayerMeshController implements Webgl2RendererMeshController {
     
@@ -45,6 +34,7 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
 
     id: number = -1;
     blendingMode: WorkingFileLayerBlendingMode = 'normal';
+    opacity: number = 1;
     data: WorkingFileTextLayer['data'] | undefined = undefined;
     filters: Webgl2RendererCanvasFilter[] = [];
     filtersOverride: Webgl2RendererCanvasFilter[] | undefined = undefined;
@@ -100,11 +90,15 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
                 if (!this.material || updateType === 'destroyAndCreate') {
                     this.material = await createTextMaterial({
                         canvasFilters: this.filtersOverride ?? this.filters,
+                        opacity: this.opacity,
                     });
                     assignMaterialBlendingMode(this.material, this.blendingMode);
                     this.letterMeshCache?.setMaterial(this.material);
                 } else {
-                    console.warn('[src/renderers/webgl2/layers/text/mesh-controller.ts] Currently no use case for material updates in controller.');
+                    await updateTextMaterial(this.material, {
+                        opacity: this.opacity,
+                    });
+                    this.letterMeshCache?.updateFromMaterial(this.material);
                 }
                 this.materialUpdates.pop();
                 if (this.materialUpdates.length < 1) {
@@ -119,6 +113,13 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
         if (blendingMode !== this.blendingMode) {
             this.blendingMode = blendingMode;
             this.scheduleMaterialUpdate('destroyAndCreate');
+        }
+    }
+
+    updateOpacity(opacity: number) {
+        if (opacity !== this.opacity) {
+            this.opacity = opacity;
+            this.scheduleMaterialUpdate('update');
         }
     }
 

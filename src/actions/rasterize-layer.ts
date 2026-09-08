@@ -6,11 +6,11 @@ import { UpdateLayerAction } from './update-layer';
 
 import { useRenderer } from '@/renderers';
 
-import { createImageFromBlob, createCanvasFromImage, createImageBlobFromCanvas, resizeImage } from '@/lib/image';
+import { createImageFromBlob, createImageBlobFromCanvas, resizeImage } from '@/lib/image';
 import { limitMaxDimension } from '@/lib/math';
 
 import { createStoredImage } from '@/store/image';
-import workingFileStore, { getLayerById } from '@/store/working-file';
+import workingFileStore, { calculateLayerOrder, getLayerById } from '@/store/working-file';
 
 import { exportAsImage } from '@/modules/file/export';
 
@@ -26,9 +26,9 @@ export class RasterizeLayerAction extends BaseAction {
     constructor(layerId: number) {
         super('rasterizeLayer', 'action.rasterizeLayer');
         this.layerId = layerId;
-	}
+    }
 
-	public async do() {
+    public async do() {
         super.do();
 
         const layer = getLayerById(this.layerId);
@@ -49,6 +49,7 @@ export class RasterizeLayerAction extends BaseAction {
                 workingFileStore.get('width') / layer.width,
                 workingFileStore.get('height') / layer.height,
             ).multiply(layer.transform.inverse()),
+            disableBackground: true,
         });
 
         if (!blob) {
@@ -84,9 +85,10 @@ export class RasterizeLayerAction extends BaseAction {
         await updateLayerAction.do();
         this.actions.push(updateLayerAction);
 
-	}
+        calculateLayerOrder();
+    }
 
-	public async undo() {
+    public async undo() {
         super.undo();
 
         for (let i = this.actions.length - 1; i >= 0; i--) {
@@ -97,8 +99,11 @@ export class RasterizeLayerAction extends BaseAction {
             const action = this.actions[i];
             action.free();
         }
+
         this.actions = [];
-	}
+
+        calculateLayerOrder();
+    }
 
     public free() {
         super.free();

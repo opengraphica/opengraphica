@@ -34,6 +34,7 @@ export default defineComponent({
         'toolbar-effect': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-effect' */ `@/ui/toolbar/toolbar-effect.vue`)),
         'toolbar-erase-brush': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-erase-brush' */ `@/ui/toolbar/toolbar-erase-brush.vue`)),
         'toolbar-free-transform': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-free-transform' */ `@/ui/toolbar/toolbar-free-transform.vue`)),
+        'toolbar-layer-opacity': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-layer-opacity' */ `@/ui/toolbar/toolbar-layer-opacity.vue`)),
         'toolbar-selection': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-selection' */ `@/ui/toolbar/toolbar-selection.vue`)),
         'toolbar-text': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-text' */ `@/ui/toolbar/toolbar-text.vue`)),
         'toolbar-zoom': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-zoom' */ `@/ui/toolbar/toolbar-zoom.vue`))

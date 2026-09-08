@@ -373,6 +373,7 @@ pub fn take_snapshot(
     filters: Option<Vec<JsValue>>,
     apply_selection_mask: Option<bool>,
     disable_scale_to_size: Option<bool>,
+    disable_background: Option<bool>,
 ) -> js_sys::Promise {
     future_to_promise(async move {
         let bytes_per_pixel = 4;
@@ -432,6 +433,17 @@ pub fn take_snapshot(
                     )
                 );
 
+                let mut previous_image_alpha: f32 = 1.0;
+                let is_disable_background: bool = disable_background.unwrap_or(false);
+                {
+                    let queue = &mut renderer_state.queue;
+                    let image_background = &mut renderer_state.image_background;
+                    previous_image_alpha = image_background.get_alpha();
+                    if (is_disable_background) {
+                        image_background.set_alpha(queue, 0.0);
+                    }
+                }
+
                 render_main(
                     renderer_state,
                     &render_target_view,
@@ -442,6 +454,12 @@ pub fn take_snapshot(
                     renderer_state,
                     renderer_state.view_matrix,
                 );
+
+                if (is_disable_background) {
+                    let queue = &mut renderer_state.queue;
+                    let image_background = &mut renderer_state.image_background;
+                    image_background.set_alpha(queue, previous_image_alpha);
+                }
 
                 let device = &renderer_state.device;
                 let queue = &renderer_state.queue;

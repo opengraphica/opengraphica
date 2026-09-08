@@ -58,7 +58,10 @@ export default defineComponent({
                 }
 
                 const renderer = await useRenderer();
-                const thumbnailBitmap = await renderer.takeSnapshot(thumbnailWidth, thumbnailHeight, { layerIds: [props.layer.id] });
+                const thumbnailBitmap = await renderer.takeSnapshot(thumbnailWidth, thumbnailHeight, {
+                    layerIds: [props.layer.id],
+                    // disableBackground: true, // TODO - renderer generates weird output
+                });
                 if (thumbnailCanvas.width !== thumbnailBitmap.width || thumbnailCanvas.height !== thumbnailBitmap.height) {
                     thumbnailCanvas.width = thumbnailBitmap.width;
                     thumbnailCanvas.height = thumbnailBitmap.height;

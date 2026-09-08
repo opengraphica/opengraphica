@@ -92,6 +92,23 @@ export class LetterMeshCache {
         }
     }
 
+    updateFromMaterial(material: ShaderMaterial) {
+        if (!this.material) return;
+
+        for (const materialGroup of this.geometryMaterialGroups.values()) {
+            if (!materialGroup.material) continue;
+            for (const uniformName in materialGroup.material.uniforms) {
+                const uniform = materialGroup.material.uniforms[uniformName];
+                const newUniform = material.uniforms[uniformName];
+                if (!newUniform?.value) continue;
+                if (typeof uniform.value === 'number') {
+                    uniform.value = newUniform.value;
+                }
+            }
+            materialGroup.material.needsUpdate = true;
+        }
+    }
+
     createGlyphGeometryKey(
         glyph: Glyph,
         fontName: string,

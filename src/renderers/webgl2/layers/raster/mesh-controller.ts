@@ -31,6 +31,7 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
 
     id: number = -1;
     blendingMode: WorkingFileLayerBlendingMode = 'normal';
+    opacity: number = 1;
     filters: Webgl2RendererCanvasFilter[] = [];
     filtersOverride: Webgl2RendererCanvasFilter[] | undefined = undefined;
     sourceUuid: string | undefined;
@@ -84,11 +85,13 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
                     this.material = await createRasterMaterial({
                         srcTexture: this.sourceTexture,
                         canvasFilters: this.filtersOverride ?? this.filters,
+                        opacity: this.opacity,
                     });
                     assignMaterialBlendingMode(this.material, this.blendingMode);
                 } else {
                     await updateRasterMaterial(this.material, {
                         srcTexture: this.sourceTexture,
+                        opacity: this.opacity,
                     })
                 }
                 this.plane && (this.plane.material = this.material);
@@ -105,6 +108,13 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
         if (blendingMode !== this.blendingMode) {
             this.blendingMode = blendingMode;
             this.scheduleMaterialUpdate('destroyAndCreate');
+        }
+    }
+
+    updateOpacity(opacity: number) {
+        if (opacity !== this.opacity) {
+            this.opacity = opacity;
+            this.scheduleMaterialUpdate('update');
         }
     }
 

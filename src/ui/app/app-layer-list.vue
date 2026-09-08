@@ -39,7 +39,7 @@
                         @mouseleave="onMouseLeaveDndHandle(layer)">
                         <app-layer-list-thumbnail :layer="layer" />
                         <span class="og-layer-name">
-                            <span class="bi mr-1" :class="getIconClass(layer)" aria-hidden="true" />
+                            <span class="bi mr-1" :class="getIconClass(layer)" :title="getIconTitle(layer)" aria-hidden="true" />
                             {{ layer.name }}
                         </span>
                         <span v-if="layer.type === 'group'" class="og-layer-group-arrow bi" :class="{ 'bi-chevron-right': !layer.expanded, 'bi-chevron-down': layer.expanded }" aria-hidden="true"></span>
@@ -148,7 +148,11 @@
         placement="bottom-end"
         :reference="showLayerSettingsReference"
     >
-        <el-menu class="el-menu--medium el-menu--borderless" :default-active="layerSettingsActiveIndex" @select="onLayerSettingsSelect($event)">
+        <el-menu
+            class="el-menu--medium el-menu--borderless"
+            :default-active="layerSettingsActiveIndex"
+            @select="onLayerSettingsSelect($event)"
+        >
             <el-menu-item index="rename">
                 <i class="bi bi-alphabet"></i>
                 <span>{{ t('app.layerList.rename') }}</span>
@@ -157,9 +161,17 @@
                 <i class="bi bi-images"></i>
                 <span>{{ t('app.layerList.blendingMode') }}</span>
             </el-menu-item>
+            <el-menu-item index="opacity">
+                <i class="bi bi-droplet-half"></i>
+                <span>{{ t('app.layerList.opacity') }}</span>
+            </el-menu-item>
             <el-menu-item index="effect">
                 <i class="bi bi-stars"></i>
                 <span>{{ t('app.layerList.addEffect') }}</span>
+            </el-menu-item>
+            <el-menu-item v-if="isLayerSettingsRasterizeEnabled" index="rasterize">
+                <i class="bi bi-grid-3x3"></i>
+                <span>{{ t('app.layerList.rasterize') }}</span>
             </el-menu-item>
             <el-menu-item index="duplicate">
                 <i class="bi bi-copy"></i>
@@ -190,18 +202,18 @@ import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import workingFileStore, { getLayerById, isGroupLayer } from '@/store/working-file';
+import { editingLayerIds as layerOpacityEditingLayerIds } from '@/canvas/store/layer-opacity-state';
 
-import appEmitter from '@/lib/emitter';
 import { runModule } from '@/modules';
 
 import { BundleAction } from '@/actions/bundle';
 import { DeleteLayersAction } from '@/actions/delete-layers';
 import { DuplicateLayerAction } from '@/actions/duplicate-layer';
-import { SelectLayersAction } from '@/actions/select-layers';
-import { UpdateLayerAction } from '@/actions/update-layer';
 import { RasterizeLayerAction } from '@/actions/rasterize-layer';
 import { ReorderLayersAction } from '@/actions/reorder-layers';
 import { ReorderLayerFiltersAction } from '@/actions/reorder-layer-filters';
+import { SelectLayersAction } from '@/actions/select-layers';
+import { UpdateLayerAction } from '@/actions/update-layer';
 
 import type { WorkingFileAnyLayer, WorkingFileGroupLayer, ColorModel, WorkingFileRasterSequenceLayer } from '@/types';
 
@@ -266,6 +278,13 @@ const reversedLayers = computed<WorkingFileAnyLayer<ColorModel>[]>(() => {
     return reverseLayerList(props.layers);
 });
 
+const isLayerSettingsRasterizeEnabled = computed<boolean>(() => {
+    const layer = getLayerById(showLayerSettingsMenuFor.value ?? -1);
+    if (!layer) return false;
+    if (['gradient', 'text', 'vector', 'video'].includes(layer.type)) return true;
+    return false;
+});
+
 watch(() => props.layers.length, async (newLength, oldLength) => {
     if (newLength != oldLength) {
         layerSettingsVisibility.value = new Array(newLength).fill(false);
@@ -308,6 +327,10 @@ function getIconClass(layer: WorkingFileAnyLayer) {
     return 'bi-question';
 }
 
+function getIconTitle(layer: WorkingFileAnyLayer) {
+    return t('app.layerList.iconTitle.' + layer.type);
+}
+
 function reverseLayerList(layerList: WorkingFileAnyLayer<ColorModel>[]): WorkingFileAnyLayer<ColorModel>[] {
     const newLayersList: WorkingFileAnyLayer[] = [];
     for (let i = layerList.length - 1; i >= 0; i--) {
@@ -324,8 +347,19 @@ async function onLayerSettingsSelect(action: string) {
         runModule('layer', 'rename', { layerId: layer.id, });
     } else if (action === 'blendingMode') {
         runModule('layer', 'blendingMode', { layerId: layer.id });
+    } else if (action === 'opacity') {
+        if (selectedLayerIds.value.includes(layer.id)) {
+            layerOpacityEditingLayerIds.value = selectedLayerIds.value.slice();
+        } else {
+            layerOpacityEditingLayerIds.value = [layer.id];
+        }
+        editorStore.dispatch('setActiveTool', { group: 'layer', tool: 'opacity' });
     } else if (action === 'effect') {
         runModule('layer', 'layerEffectBrowser', { layerId: layer.id });
+    } else if (action === 'rasterize') {
+        historyStore.dispatch('runAction', {
+            action: new RasterizeLayerAction(layer.id)
+        });
     } else if (action === 'duplicate') {
         historyStore.dispatch('runAction', {
             action: new DuplicateLayerAction(layer.id)

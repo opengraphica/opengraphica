@@ -19,6 +19,7 @@ export interface RasterMaterialUpdateParams {
     srcTexture?: Texture<any>;
     colorSpaceConversion?: ColorSpaceConversion;
     canvasFilters?: Webgl2RendererCanvasFilter[];
+    opacity?: number;
 }
 
 export async function createRasterMaterial(params: RasterMaterialUpdateParams) {
@@ -56,6 +57,9 @@ export async function createRasterMaterial(params: RasterMaterialUpdateParams) {
     material.uniforms.dstTexture = {
         value: undefined,
     };
+    material.uniforms.opacity = {
+        value: params.opacity ?? 1,
+    };
     material.needsUpdate = true;
 
     return material;
@@ -69,6 +73,9 @@ export async function updateRasterMaterial(material: ShaderMaterial, params: Ras
     if (material.uniforms.srcTexture.value !== params.srcTexture) {
         material.uniforms.srcTexture.value?.dispose(); // Prevent GPU memory leak. If it's still needed, THREE will re-upload.
         material.uniforms.srcTexture.value = params.srcTexture;
+    }
+    if (params.opacity != null && material.uniforms.opacity.value !== params.opacity) {
+        material.uniforms.opacity.value = params.opacity;
     }
     material.needsUpdate = true;
 }

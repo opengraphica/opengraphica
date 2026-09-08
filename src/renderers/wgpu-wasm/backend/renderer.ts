@@ -40,6 +40,7 @@ export interface WgpuWasmRendererBackendTakeSnapshotOptions {
     filters?: WorkingFileLayerFilter[];
     applySelectionMask?: boolean;
     disableScaleToSize?: boolean;
+    disableBackground?: boolean;
 }
 
 export interface WgpuWasmRendererBackendPublic {
@@ -167,6 +168,7 @@ export class WgpuWasmRendererBackend implements WgpuWasmRendererBackendPublic {
             options?.filters,
             options?.applySelectionMask,
             options?.disableScaleToSize,
+            options?.disableBackground,
         ));
         clearInterval(dirtyInterval);
         return createImageBitmap(new ImageData(

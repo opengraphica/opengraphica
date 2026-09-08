@@ -237,6 +237,7 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
             applySelectionMask: options?.applySelectionMask,
             // invertSelectionMask: options?.invertSelectionMask,
             disableScaleToSize: options?.disableScaleToSize,
+            disableBackground: options?.disableBackground,
         });
     }
 

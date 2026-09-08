@@ -7,7 +7,7 @@
             </div>
         </div>
         <div class="py-2 pl-3 pr-el-scrollbar-arrow-size text-nowrap">
-            <el-button plain link type="primary" class="!px-4 !mr-2" :aria-label="t('button.cancel')" @click="onCancel">
+            <el-button plain link type="primary" class="px-4! mr-2!" :aria-label="t('button.cancel')" @click="onCancel">
                 <template v-if="isMobileView">
                     <i class="bi bi-x"></i>
                 </template>
@@ -15,7 +15,7 @@
                     {{ t('button.cancel') }}
                 </template>
             </el-button>
-            <el-button :aria-label="t('button.done')" plain type="primary" class="!ml-0" @click="onDone">
+            <el-button :aria-label="t('button.done')" plain type="primary" class="ml-0!" @click="onDone">
                 <template v-if="isMobileView">
                     <i class="bi bi-check"></i>
                 </template>
@@ -131,11 +131,9 @@ import { ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
 import { useI18n } from '@/i18n';
 
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
-import ElDivider from 'element-plus/lib/components/divider/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.vue';
 import ElInputNumber from '@/ui/el/el-input-number.vue';
-import ElLoading from 'element-plus/lib/components/loading/index';
 import ElPopover from 'element-plus/lib/components/popover/index';
 import { ElRadioButton, ElRadioGroup } from 'element-plus/lib/components/radio/index';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';

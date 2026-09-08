@@ -17,6 +17,7 @@ export class RasterLayerWatcher implements RendererLayerWatcher<WorkingFileRaste
     stopWatchName: WatchStopHandle | undefined;
     stopWatchDrafts: WatchStopHandle | undefined;
     stopWatchBlendingMode: WatchStopHandle | undefined;
+    stopWatchOpacity: WatchStopHandle | undefined;
     stopWatchVisible: WatchStopHandle | undefined;
     stopWatchSize: WatchStopHandle | undefined;
     stopWatchTransform: WatchStopHandle | undefined;
@@ -28,7 +29,7 @@ export class RasterLayerWatcher implements RendererLayerWatcher<WorkingFileRaste
     }
 
     async attach(layer: WorkingFileRasterLayer) {
-        const { blendingMode, data, drafts, filters, height, name, transform, visible, width } = toRefs(layer);
+        const { blendingMode, opacity, data, drafts, filters, height, name, transform, visible, width } = toRefs(layer);
 
         this.meshController = await this.rendererBackend.createMeshController('raster');
         this.meshController.attach(layer.id);
@@ -38,6 +39,9 @@ export class RasterLayerWatcher implements RendererLayerWatcher<WorkingFileRaste
 
         this.stopWatchBlendingMode = watch([blendingMode], ([blendingMode]) => {
             this.meshController?.updateBlendingMode(blendingMode);
+        }, { immediate: true });
+        this.stopWatchOpacity = watch([opacity], ([opacity]) => {
+            this.meshController?.updateOpacity(opacity);
         }, { immediate: true });
         this.stopWatchData = watch([data], () => {
             this.meshController?.updateData(toRaw(layer.data));
@@ -77,6 +81,7 @@ export class RasterLayerWatcher implements RendererLayerWatcher<WorkingFileRaste
     async detach() {
         this.meshController?.detach();
         this.stopWatchBlendingMode?.();
+        this.stopWatchOpacity?.();
         this.stopWatchData?.();
         this.stopWatchDrafts?.();
         this.stopWatchFilters?.();
@@ -88,6 +93,7 @@ export class RasterLayerWatcher implements RendererLayerWatcher<WorkingFileRaste
         this.meshController = undefined;
         this.order = undefined;
         this.stopWatchBlendingMode = undefined;
+        this.stopWatchOpacity = undefined;
         this.stopWatchData = undefined;
         this.stopWatchDrafts = undefined;
         this.stopWatchFilters = undefined;

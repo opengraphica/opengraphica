@@ -51,6 +51,7 @@ export interface ExportAsImageOptions {
     toNewLayer?: boolean;
     autoCrop?: boolean;
     dithering?: string;
+    disableBackground?: boolean;
     generateImageHash?: boolean;
 }
 
@@ -102,6 +103,7 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                     cameraTransform: options.cameraTransform,
                     layerIds: options.layerSelection === 'selected' ? workingFileStore.state.selectedLayerIds : undefined,
                     applySelectionMask: options.applySelectionMask && (activeSelectionMask.value != null || appliedSelectionMask.value != null),
+                    disableBackground: options.disableBackground,
                 });
                 const ctx = canvas.getContext('2d', getCanvasRenderingContext2DSettings()) as CanvasRenderingContext2D;
                 ctx.scale(canvas.width / width, canvas.height / height);

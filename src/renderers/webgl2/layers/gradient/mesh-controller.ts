@@ -37,6 +37,7 @@ export class GradientLayerMeshController implements Webgl2RendererMeshController
 
     id: number = -1;
     blendingMode: WorkingFileLayerBlendingMode = 'normal';
+    opacity: number = 1;
     data: WorkingFileGradientLayer<RGBAColor>['data'] | undefined = undefined;
     filters: Webgl2RendererCanvasFilter[] = [];
     filtersOverride: Webgl2RendererCanvasFilter[] | undefined = undefined;
@@ -87,6 +88,7 @@ export class GradientLayerMeshController implements Webgl2RendererMeshController
                 }
                 if (!this.material || updateType === 'destroyAndCreate') {
                     this.material = await createGradientMaterial({
+                        opacity: this.opacity,
                         gradientData: this.data!,
                         canvasWidth: backend.imageWidth,
                         canvasHeight: backend.imageHeight,
@@ -97,6 +99,7 @@ export class GradientLayerMeshController implements Webgl2RendererMeshController
                     backend.queueCreateLayerPasses();
                 } else if (this.data) {
                     await updateGradientMaterial(this.material, {
+                        opacity: this.opacity,
                         gradientData: this.data,
                         canvasWidth: backend.imageWidth,
                         canvasHeight: backend.imageHeight,
@@ -117,6 +120,13 @@ export class GradientLayerMeshController implements Webgl2RendererMeshController
         if (blendingMode !== this.blendingMode) {
             this.blendingMode = blendingMode;
             this.scheduleMaterialUpdate('destroyAndCreate');
+        }
+    }
+
+    updateOpacity(opacity: number) {
+        if (opacity !== this.opacity) {
+            this.opacity = opacity;
+            this.scheduleMaterialUpdate('update');
         }
     }
 

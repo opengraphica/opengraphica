@@ -336,6 +336,7 @@ export class Webgl2RendererFrontend implements RendererFrontend {
             filters: options?.filters ? deepToRaw(options.filters) : undefined,
             applySelectionMask: options?.applySelectionMask,
             disableScaleToSize: options?.disableScaleToSize,
+            disableBackground: options?.disableBackground,
         });
     }
 

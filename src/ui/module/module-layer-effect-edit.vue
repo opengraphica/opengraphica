@@ -469,6 +469,7 @@ async function initialSetup() {
                 const layerBitmap = await renderer.takeSnapshot(workingFileStore.state.width, workingFileStore.state.height, {
                     layerIds: [selectedLayer.id],
                     filters: [],
+                    // disableBackground: true, // TODO - renderer generates weird output
                 });
                 beforeCanvasCtx.drawImage(layerBitmap, 0, 0);
                 layerBitmap.close();

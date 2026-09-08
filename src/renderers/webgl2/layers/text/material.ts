@@ -15,6 +15,7 @@ import type { Webgl2RendererCanvasFilter } from '@/types';
 export interface TextMaterialUpdateParams {
     canvasFilters?: Webgl2RendererCanvasFilter[];
     fill?: string;
+    opacity?: number;
     width?: number;
     height?: number;
 }
@@ -50,6 +51,9 @@ export async function createTextMaterial(params: TextMaterialUpdateParams) {
     material.uniforms.dstTexture = {
         value: undefined,
     };
+    material.uniforms.opacity = {
+        value: params.opacity ?? 1,
+    };
     const color = srgbaToLinearSrgba(hexToColor(params.fill ?? '#000000', 'rgba'));
     material.uniforms.fill = {
         value: new Vector4(color.r, color.g, color.b, color.alpha),
@@ -63,6 +67,9 @@ export async function updateTextMaterial(material: ShaderMaterial, params: TextM
     if (params.fill) {
         const color = srgbaToLinearSrgba(hexToColor(params.fill ?? '#000000', 'rgba'));
         material.uniforms.fill.value = new Vector4(color.r, color.g, color.b, color.alpha);
+    }
+    if (params.opacity != null && material.uniforms.opacity.value !== params.opacity) {
+        material.uniforms.opacity.value = params.opacity;
     }
     material.needsUpdate = true;
 }

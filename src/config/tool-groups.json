@@ -99,6 +99,19 @@
             }
         }
     },
+    "layer": {
+        "tools": {
+            "opacity": {
+                "controller": "layer-opacity",
+                "toolbar": {
+                    "exclusive": true,
+                    "position": "top",
+                    "target": "layer-opacity"
+                },
+                "hideDialogs": true
+            }
+        }
+    },
     "selection": {
         "tools": {
             "selection": {

@@ -29,6 +29,8 @@ export interface RendererFrontendTakeSnapshotOptions {
     invertSelectionMask?: boolean;
     /** Crops the final image, after all of the other transforms are applied. */
     disableScaleToSize?: boolean;
+    /** Makes the background color invisible. */
+    disableBackground?: boolean;
 }
 
 export interface RendererTextureTile {

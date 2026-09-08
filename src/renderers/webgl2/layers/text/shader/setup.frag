@@ -1,3 +1,4 @@
+uniform float opacity;
 uniform sampler2D dstTexture;
 
 varying vec2 vUv;

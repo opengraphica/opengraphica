@@ -40,6 +40,7 @@ export interface Webgl2RendererBackendTakeSnapshotOptions {
     filters?: WorkingFileLayerFilter[];
     applySelectionMask?: boolean;
     disableScaleToSize?: boolean;
+    disableBackground?: boolean;
 }
 
 export interface Webgl2RendererApplySelectionMaskToAlphaChannelOptions {
@@ -495,6 +496,12 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
                 this.imageBoundaryMask.visible = false;
             }
 
+            const imageBackgroundPreviousAlpha = this.imageBackground.backgroundMaterial.opacity;
+
+            if (options?.disableBackground) {
+                this.imageBackground.setAlpha(0);
+            }
+
             if (options?.layerIds) {
                 for (const layerId of options.layerIds) {
                     const meshController = this.meshControllersById.get(layerId);
@@ -519,6 +526,10 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
             }
             if (imageBoundaryMaskWasVisible && this.imageBoundaryMask) {
                 this.imageBoundaryMask.visible = true;
+            }
+
+            if (options?.disableBackground) {
+                this.imageBackground.setAlpha(imageBackgroundPreviousAlpha);
             }
 
             if (options?.layerIds) {
