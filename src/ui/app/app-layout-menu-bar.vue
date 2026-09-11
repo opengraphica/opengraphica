@@ -323,15 +323,17 @@ const toolPreviewPopoverReference = computed<HTMLButtonElement | undefined>(() =
 
 watch(() => activeToolGroup.value, () => {
     if (!actionGroups.value) return;
-    activeToolGroupButton.value = (toolGroupButtons.value.find((button) => {
+    setTimeout(() => {
+        activeToolGroupButton.value = (toolGroupButtons.value.find((button) => {
         const buttonElement = button.ref as unknown as HTMLButtonElement;
-        return buttonElement?.getAttribute('data-group-target') === activeToolGroup.value;
-    })?.ref) as never;
-    showToolGroupExpandButton.value = activeToolGroupControls.value.length > 1;
-    toolGroupExpandOffsetTop.value = undefined;
-    toolGroupExpandOffsetLeft.value = undefined;
-    isActiveToolGroupExpanded.value = false;
-    repositionToolGroupExpand();
+            return buttonElement?.getAttribute('data-group-target') === activeToolGroup.value;
+        })?.ref) as never;
+        showToolGroupExpandButton.value = activeToolGroupControls.value.length > 1;
+        toolGroupExpandOffsetTop.value = undefined;
+        toolGroupExpandOffsetLeft.value = undefined;
+        isActiveToolGroupExpanded.value = false;
+        repositionToolGroupExpand();
+    }, 0);
 }, { immediate: true });
 
 watch([viewportWidth], () => {
@@ -654,8 +656,8 @@ async function onPressControlButton(openTarget: 'popover' | 'modal', button: num
             } else if (control.action.type === 'tool') {
                 if (button === 0 && activeToolGroup.value && activeTool.value !== control.action.target) {
                     editorStore.dispatch('setActiveTool', { group: activeToolGroup.value, tool: control.action.target });
-                    isActiveToolGroupExpanded.value = false;
                 }
+                isActiveToolGroupExpanded.value = false;
             } else if (control.action.type === 'dock') {
                 if (openTarget === 'popover') {
                     if (!pointerDownShowDock) {

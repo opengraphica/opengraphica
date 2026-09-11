@@ -661,7 +661,8 @@
         "erase": {
             "name": "Erase",
             "tools": {
-                "brush": "Erase areas of the image with brush strokes"
+                "brush": "Erase with brush strokes",
+                "bucketFill": "Erase areas with similar color"
             }
         },
         "layers": {
@@ -1321,6 +1322,19 @@
                 }
             }
         },
+        "eraseBucketFill": {
+            "opacity": "Opacity",
+            "strength": "Strength",
+            "feather": "Feather",
+            "settings": "Settings",
+            "antialias": "Antialias",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "No Layers Selected",
+                    "message": "Please select at least one image layer in the layers dock. Certain layer types can't be erased."
+                }
+            }
+        },
         "freeTransform": {
             "clearSelection": "Clear Selection",
             "pickLayer": {
@@ -1595,6 +1609,20 @@
             "introduction": [
                 "The effect tool allows to add layer effects that can adjust colors and do all sorts of other useful operations to the entire layer. Effects can be stacked and removed at any time."
             ]
+        },
+        "eraseBucketFillToolIntroduction": {
+            "title": "Erase Bucket Fill",
+            "introduction": [
+                "Erase areas of the image that have a similar color."
+            ],
+            "body": {
+                "mouse": [
+                    "Click on an area to erase. While holding the mouse down, you can drag to the left or right to adjust how much of the area is erased."
+                ],
+                "touch": [
+                    "Tap on an area to erase. While holding down, you can drag to the left or right to adjust how much of the area is erased."
+                ]
+            }
         },
         "eraseToolIntroduction": {
             "title": "Erase Tool",

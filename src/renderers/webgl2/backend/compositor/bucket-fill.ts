@@ -1,6 +1,7 @@
 import { ClampToEdgeWrapping, RGBAFormat, LinearSRGBColorSpace, SRGBColorSpace, HalfFloatType, FloatType, UnsignedByteType, NearestFilter } from 'three/src/constants';
 import { Box2 } from 'three/src/math/Box2';
 import { DataTexture } from 'three/src/textures/DataTexture';
+import { Matrix4 } from 'three/src/math/Matrix4';
 import { Mesh } from 'three/src/objects/Mesh';
 import { OrthographicCamera } from 'three/src/cameras/OrthographicCamera';
 import { PlaneGeometry } from 'three/src/geometries/PlaneGeometry';
@@ -11,6 +12,9 @@ import { Vector2 } from 'three/src/math/Vector2';
 import { Vector4 } from 'three/src/math/Vector4';
 import { WebGLRenderTarget } from 'three/src/renderers/WebGLRenderTarget';
 
+import { LayerBlendingMode } from '@/renderers/webgl2/layers/base/blending-mode';
+
+import blendingModesSetupFragmentShader from '@/renderers/webgl2/layers/base/shader/blending-modes.setup.frag';
 import bucketFillCompositorVertexShader from './shader/bucket-fill-compositor.vert';
 import bucketFillCompositorFragmentShader from './shader/bucket-fill-compositor.frag';
 import bucketFillInitVertexShader from './shader/bucket-fill-init.vert';
@@ -26,7 +30,7 @@ import { limitMaxDimension } from '@/lib/math';
 
 import type { Camera, WebGLRenderer } from 'three';
 import type { SelectionMask } from '../selection-mask';
-import type { RendererTextureTile, Webgl2RendererMeshController } from '@/types';
+import type { RendererTextureTile, Webgl2RendererMeshController, WorkingFileLayerBlendingMode } from '@/types';
 
 export class BucketFill {
     renderer!: WebGLRenderer;
@@ -41,6 +45,7 @@ export class BucketFill {
     color!: Vector4;
     feather!: number;
     antialias!: boolean;
+    blendingMode: WorkingFileLayerBlendingMode = 'normal';
 
     isHalfFloat!: boolean;
 
@@ -55,6 +60,10 @@ export class BucketFill {
     copyTileMaterial!: ShaderMaterial;
     compositorMaterial!: ShaderMaterial;
 
+    _m0 = new Matrix4();
+    _m1 = new Matrix4();
+    _m2 = new Matrix4();
+
     constructor(
         renderer: WebGLRenderer,
         selectionMask: SelectionMask | undefined,
@@ -65,6 +74,7 @@ export class BucketFill {
         color: Vector4,
         feather: number,
         antialias: boolean,
+        blendingMode: WorkingFileLayerBlendingMode,
     ) {
         this.renderer = renderer;
         this.selectionMask = selectionMask;
@@ -75,6 +85,7 @@ export class BucketFill {
         this.color = color;
         this.feather = feather;
         this.antialias = antialias;
+        this.blendingMode = blendingMode;
 
         const { width: heightmapWidth, height: heightmapHeight } = limitMaxDimension(texture.width, texture.height, 2048);
         this.heightmapWidth = heightmapWidth;
@@ -97,15 +108,22 @@ export class BucketFill {
             premultipliedAlpha: true,
         });
 
+        const selectionMaskTexture = this.selectionMask?.getTexture();
         this.compositorMaterial = new ShaderMaterial({
+            defines: {
+                cLayerBlendingMode: LayerBlendingMode[this.blendingMode],
+                cSelectionMaskEnabled: selectionMaskTexture ? 1 : 0,
+            },
             uniforms: {
                 dstMap: { value: texture },
                 fillMap: { value: undefined },
+                selectionMaskMap: { value: selectionMaskTexture },
                 fillColor: { value: color },
                 strengthFeatherAntialias: { value: new Vector4(0.5, feather, antialias ? 1 : 0, 0) },
+                selectionMaskTransform: { value: new Matrix4() },
             },
             vertexShader: bucketFillCompositorVertexShader,
-            fragmentShader: bucketFillCompositorFragmentShader,
+            fragmentShader: blendingModesSetupFragmentShader + '\n' + bucketFillCompositorFragmentShader,
             depthTest: false,
             depthWrite: false,
             transparent: true,
@@ -165,12 +183,68 @@ export class BucketFill {
         this.generateHeightmapOnCpu();
 
         this.compositorMaterial.uniforms.fillMap.value = this.renderTarget1.texture;
+        this.createSelectionMaskTransform(0, 0, texture.width, texture.height);
 
         this.meshController.setDraftTexture(this.previewTextureRenderTarget.texture);
 
         // Reset
         this.renderer.setRenderTarget(null);
         this.renderer.setViewport(this.originalViewport);
+    }
+
+    createSelectionMaskTransform(tileX: number, tileY: number, tileWidth: number, tileHeight: number) {
+        if (!this.selectionMask) return;
+
+        const selectionMaskTexture = this.selectionMask.getTexture();
+        if (!selectionMaskTexture) return;
+
+        const selectionMaskWidth = selectionMaskTexture.image.width;
+        const selectionMaskHeight = selectionMaskTexture.image.height;
+        const selectionMaskOffset = this.selectionMask.getOffset();
+
+        const selectionMaskTileOffsetX = (tileX - selectionMaskOffset[0]) / selectionMaskWidth;
+        const selectionMaskTileOffsetY = (tileY - selectionMaskOffset[1]) / selectionMaskHeight;
+        const selectionMaskTileScaleX = (tileWidth / selectionMaskWidth);
+        const selectionMaskTileScaleY = (tileHeight / selectionMaskHeight);
+
+        const tileTransformReset = this._m0.identity()
+            .multiply(
+                this._m1.makeTranslation(
+                    -selectionMaskOffset[0] / selectionMaskWidth,
+                    1.0 + (selectionMaskOffset[1] / selectionMaskHeight),
+                    0.0
+                )
+            )
+            .multiply(
+                this._m1.makeScale(
+                    1.0 / selectionMaskWidth,
+                    -1.0 / selectionMaskHeight,
+                    1.0,
+                )
+            );
+        const tileTransformResetInverse = this._m1.copy(tileTransformReset).invert();
+
+        (this.compositorMaterial.uniforms.selectionMaskTransform.value as Matrix4)
+            .identity()
+            .multiply(tileTransformReset)
+            .multiply(
+                this.meshController.getTransform()
+            )
+            .multiply(tileTransformResetInverse)
+            .multiply(
+                this._m2.makeTranslation(
+                    selectionMaskTileOffsetX,
+                    1.0 - selectionMaskTileOffsetY - selectionMaskTileScaleY,
+                    1.0,
+                )
+            )
+            .multiply(
+                this._m2.makeScale(
+                    selectionMaskTileScaleX,
+                    selectionMaskTileScaleY,
+                    1.0,
+                )
+            );
     }
 
     generateHeightmapOnCpu() {

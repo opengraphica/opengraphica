@@ -88,6 +88,13 @@
                 "overlays": [
                     "erase-brush"
                 ]
+            },
+            "bucketFill": {
+                "controller": "erase-bucket-fill",
+                "toolbar": {
+                    "position": "auto",
+                    "target": "erase-bucket-fill"
+                }
             }
         }
     },

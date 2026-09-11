@@ -23,6 +23,7 @@ interface TutorialFlags {
     drawGradientToolIntroduction?: boolean;
     drawShapeToolIntroduction?: boolean;
     effectToolIntroduction?: boolean;
+    eraseBucketFillToolIntroduction?: boolean;
     eraseToolIntroduction?: boolean;
     explainCanvasViewportControls?: boolean;
     freeTransformToolIntroduction?: boolean;

@@ -645,6 +645,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
             new Vector4(settings.color[0], settings.color[1], settings.color[2], settings.color[3]),
             settings.feather,
             settings.antialias,
+            settings.blendingMode ?? 'normal'
         );
     }
 

@@ -9,7 +9,10 @@ import { BucketFill } from './bucket-fill';
 
 import type { WebGLRenderer } from 'three';
 import type { SelectionMask } from '../selection-mask';
-import type { RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings, RendererTextureTile, Webgl2RendererMeshController } from '@/types';
+import type {
+    RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings, RendererTextureTile,
+    Webgl2RendererMeshController, WorkingFileLayerBlendingMode,
+} from '@/types';
 
 export class Compositor {
     renderer!: WebGLRenderer;
@@ -92,6 +95,7 @@ export class Compositor {
         color: Vector4,
         feather: number,
         antialias: boolean,
+        blendingMode: WorkingFileLayerBlendingMode,
     ) {
         for (const bucketFill of this.bucketFills) {
             bucketFill.dispose();
@@ -108,6 +112,7 @@ export class Compositor {
                 color,
                 feather,
                 antialias,
+                blendingMode,
             ));
         }
     }

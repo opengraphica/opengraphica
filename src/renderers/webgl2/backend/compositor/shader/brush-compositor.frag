@@ -88,7 +88,7 @@ void main() {
 #if cLayerBlendingMode == BLENDING_MODE_ERASE
     float alpha = max(dstColor.a - srcAlpha, 0.0);
     gl_FragColor = vec4(
-        (dstColor.rgb * dstColor.a) / alpha, alpha
+        dstColor.rgb, alpha
     );
 #else
     float alpha = srcAlpha + dstColor.a * (1.0 - srcAlpha);

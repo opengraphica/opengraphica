@@ -56,6 +56,13 @@
                     "type": "tool",
                     "target": "brush"
                 }
+            },
+            {
+                "icon": "bi bi-bucket",
+                "action": {
+                    "type": "tool",
+                    "target": "bucketFill"
+                }
             }
         ]
     },

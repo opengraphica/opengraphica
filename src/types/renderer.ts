@@ -75,6 +75,7 @@ export interface RendererBucketFillSettings {
     position: Float16Array; // x, y
     feather: number;
     antialias: boolean;
+    blendingMode?: WorkingFileLayerBlendingMode;
 }
 
 export interface RendererFrontend {

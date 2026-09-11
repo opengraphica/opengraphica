@@ -12,7 +12,7 @@ import editorStore from '@/store/editor';
 import historyStore, { createHistoryReserveToken, historyBlockInteractionUntilComplete, historyReserveQueueFree } from '@/store/history';
 import { createStoredImage } from '@/store/image';
 import workingFileStore, { getSelectedLayers, ensureUniqueLayerSiblingName } from '@/store/working-file';
-import { strength, feather, antialias, colorPalette, colorPaletteIndex } from '../store/draw-bucket-fill-state';
+import { strength, feather, antialias, opacity } from '../store/erase-bucket-fill-state';
 import { appliedSelectionMask, activeSelectionMask } from '../store/selection-state';
 
 import { useRenderer, transferRendererTilesToRasterLayerUpdates } from '@/renderers';
@@ -52,19 +52,19 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
         appEmitter.on('editor.tool.selectAll', this.onSelectAll);
 
         // Tutorial message
-        if (!editorStore.state.tutorialFlags.drawBucketFillToolIntroduction) {
+        if (!editorStore.state.tutorialFlags.eraseBucketFillToolIntroduction) {
             waitForNoOverlays().then(() => {
-                let message = (tm('tutorialTip.drawBucketFillToolIntroduction.introduction') as string[]).map((message) => {
+                let message = (tm('tutorialTip.eraseBucketFillToolIntroduction.introduction') as string[]).map((message) => {
                     return `<p class="mb-3!">${rt(message)}</p>`;
                 }).join('');
                 scheduleTutorialNotification({
-                    flag: 'drawBucketFillToolIntroduction',
-                    title: t('tutorialTip.drawBucketFillToolIntroduction.title'),
+                    flag: 'eraseBucketFillToolIntroduction',
+                    title: t('tutorialTip.eraseBucketFillToolIntroduction.title'),
                     message: {
-                        touch: message + (tm('tutorialTip.drawBucketFillToolIntroduction.body.touch') as string[]).map((message) => {
+                        touch: message + (tm('tutorialTip.eraseBucketFillToolIntroduction.body.touch') as string[]).map((message) => {
                             return `<p class="mb-3!">${rt(message)}</p>`
                         }).join(''),
-                        mouse: message + (tm('tutorialTip.drawBucketFillToolIntroduction.body.mouse') as string[]).map((message) => {
+                        mouse: message + (tm('tutorialTip.eraseBucketFillToolIntroduction.body.mouse') as string[]).map((message) => {
                             return `<p class="mb-3!">${rt(message)}</p>`
                         }).join(''),
                     }
@@ -79,8 +79,8 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
         appEmitter.off('editor.tool.selectAll', this.onSelectAll);
 
         // Tutorial Message
-        if (!editorStore.state.tutorialFlags.drawBucketFillToolIntroduction) {
-            dismissTutorialNotification('drawBucketFillToolIntroduction');
+        if (!editorStore.state.tutorialFlags.eraseBucketFillToolIntroduction) {
+            dismissTutorialNotification('eraseBucketFillToolIntroduction');
         }
 
         // Block UI changes until history actions have completed
@@ -118,81 +118,29 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
     private async bucketFillStart() {
         if (!this.renderer) return;
 
-        let { viewTransformPoint } = this.getTransformedCursorInfo();
-
-        const startBucketFillReserveToken = createHistoryReserveToken();
-        await historyStore.dispatch('reserve', { token: startBucketFillReserveToken });
-
-        const { width, height } = workingFileStore.state;
-        const { width: textureWidth, height: textureHeight } = limitMaxDimension(width, height, this.maxTextureSize);
-        let selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster' || layer.type === 'empty');
-        let layerActions: BaseAction[] = [];
-
-        // Insert raster layer if none selected
-        let insertLayerAction: InsertLayerAction<InsertRasterLayerOptions> | undefined;
+        let selectedLayers = getSelectedLayers().filter((layer) => layer.type === 'raster');
         if (selectedLayers.length === 0) {
-            insertLayerAction = new InsertLayerAction<InsertRasterLayerOptions>({
-                type: 'raster',
-                name: ensureUniqueLayerSiblingName(workingFileStore.state.layers[0]?.id, t('toolbar.drawBrush.newBrushLayerName')),
-                width: textureWidth,
-                height: textureHeight,
-                transform: new DOMMatrix().scaleSelf(width / textureWidth, height / textureHeight),
-                data: {
-                    sourceUuid: await createStoredImage(createEmptyCanvas(textureWidth, textureHeight)),
-                },
+            appEmitter.emit('app.notify', {
+                type: 'info',
+                title: t('toolbar.eraseBucketFill.notification.noSelectedLayers.title'),
+                message: t('toolbar.eraseBucketFill.notification.noSelectedLayers.message'),
+                duration: 5000,
             });
-            layerActions.push(insertLayerAction);
-        }
-
-        // Convert any empty layers to raster layers
-        for (let i = selectedLayers.length - 1; i >= 0; i--) {
-            const selectedLayer = selectedLayers[i];
-            if (selectedLayer.type === 'empty') {
-                layerActions.push(
-                    new UpdateLayerAction<UpdateRasterLayerOptions>({
-                        id: selectedLayer.id,
-                        type: 'raster',
-                        width: textureWidth,
-                        height: textureHeight,
-                        transform: new DOMMatrix().scaleSelf(width / textureWidth, height / textureHeight),
-                        data: {
-                            sourceUuid: await createStoredImage(createEmptyCanvas(textureWidth, textureHeight)),
-                        },
-                    })
-                );
-            } else if (selectedLayer.type !== 'raster') {
-                selectedLayers.splice(i, 1);
-            }
-        }
-
-        // Initialize bucket fill strength gradient
-        try {
-            if (layerActions.length > 0) {
-                await historyStore.dispatch('runAction', {
-                    action: new BundleAction('createDrawLayer', 'action.createDrawLayer', layerActions),
-                    reserveToken: startBucketFillReserveToken,
-                });
-            } else {
-                await historyStore.dispatch('unreserve', { token: startBucketFillReserveToken });
-            }
-            
-            this.fillingLayerIds = selectedLayers.map((layer) => layer.id);
-            if (insertLayerAction && !this.fillingLayerIds.includes(insertLayerAction.insertedLayerId)) {
-                this.fillingLayerIds.push(insertLayerAction.insertedLayerId);
-            }
-
-            const currentColor = colorPalette.value[colorPaletteIndex.value];
-            await this.renderer.createBucketFill({
-                layerIds: this.fillingLayerIds,
-                color: new Float16Array([currentColor.r, currentColor.g, currentColor.b, currentColor.alpha]),
-                position: new Float16Array([viewTransformPoint.x, viewTransformPoint.y]),
-                feather: feather.value,
-                antialias: antialias.value,
-            });
-        } catch {
-            await historyStore.dispatch('unreserve', { token: startBucketFillReserveToken });
             return;
         }
+
+        let { viewTransformPoint } = this.getTransformedCursorInfo();
+
+        this.fillingLayerIds = selectedLayers.map((layer) => layer.id);
+
+        await this.renderer.createBucketFill({
+            layerIds: this.fillingLayerIds,
+            color: new Float16Array([0, 0, 0, opacity.value]),
+            position: new Float16Array([viewTransformPoint.x, viewTransformPoint.y]),
+            feather: feather.value,
+            antialias: antialias.value,
+            blendingMode: 'erase',
+        });
 
         this.pointerDownPreviewStrength = strength.value;
         const primaryPointer = this.pointers.find((pointer) => pointer.primary);
@@ -269,7 +217,7 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
 
             if (layerActions.length > 0) {
                 await historyStore.dispatch('runAction', {
-                    action: new BundleAction('updateDrawLayer', 'action.updateDrawLayer', layerActions),
+                    action: new BundleAction('updateEraseLayer', 'action.updateEraseLayer', layerActions),
                     reserveToken: updateLayerReserveToken,
                 });
             } else {
