@@ -1,4 +1,4 @@
-import { LinearFilter, ClampToEdgeWrapping, RGBAFormat, LinearSRGBColorSpace, SRGBColorSpace, HalfFloatType, FloatType, UnsignedByteType, NearestFilter } from 'three/src/constants';
+import { ClampToEdgeWrapping, RGBAFormat, LinearSRGBColorSpace, SRGBColorSpace, HalfFloatType, FloatType, UnsignedByteType, NearestFilter } from 'three/src/constants';
 import { Box2 } from 'three/src/math/Box2';
 import { Matrix4 } from 'three/src/math/Matrix4';
 import { Mesh } from 'three/src/objects/Mesh';

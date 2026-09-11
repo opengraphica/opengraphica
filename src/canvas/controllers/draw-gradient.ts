@@ -14,7 +14,7 @@ import { t, tm, rt } from '@/i18n';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore, { historyBlockInteractionUntilComplete } from '@/store/history';
-import workingFileStore, { getSelectedLayers, getLayerGlobalTransform, ensureUniqueLayerSiblingName } from '@/store/working-file';
+import workingFileStore, { getSelectedLayers, getLayerGlobalTransform, ensureUniqueLayerSiblingName, getLayerById } from '@/store/working-file';
 
 import { appliedSelectionMask, activeSelectionMask } from '../store/selection-state';
 
@@ -70,17 +70,17 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
         if (!editorStore.state.tutorialFlags.drawGradientToolIntroduction) {
             waitForNoOverlays().then(() => {
                 let message = (tm('tutorialTip.drawGradientToolIntroduction.introduction') as string[]).map((message) => {
-                    return `<p class="mb-3">${rt(message)}</p>`;
+                    return `<p class="mb-3!">${rt(message)}</p>`;
                 }).join('');
                 scheduleTutorialNotification({
                     flag: 'drawGradientToolIntroduction',
                     title: t('tutorialTip.drawGradientToolIntroduction.title'),
                     message: {
                         touch: message + (tm('tutorialTip.drawGradientToolIntroduction.body.touch') as string[]).map((message) => {
-                            return `<p class="mb-3">${rt(message)}</p>`
+                            return `<p class="mb-3!">${rt(message)}</p>`
                         }).join(''),
                         mouse: message + (tm('tutorialTip.drawGradientToolIntroduction.body.mouse') as string[]).map((message) => {
-                            return `<p class="mb-3">${rt(message)}</p>`
+                            return `<p class="mb-3!">${rt(message)}</p>`
                         }).join(''),
                     }
                 });
@@ -337,8 +337,17 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
 
     private onHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
         if ([
+            'rasterizeLayer',
+        ].includes(event?.action.id as string)) {
+            for (const [layerIndex, layer] of editingLayers.value.reverse().entries()) {
+                if (layer.type !== 'gradient') {
+                    editingLayers.value.splice(layerIndex, 1);
+                }
+            }
+        }
+        if ([
             'updateDrawGradientLayerFillType', 'updateDrawGradientLayerBlendColorSpace', 'updateDrawGradientLayerSpreadMethod',
-            'updateDrawGradientLayerStops',
+            'updateDrawGradientLayerStops', ,
         ].includes(event?.action.id as string)) {
             this.updateToolbarFromEditingLayers();
         }

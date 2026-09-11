@@ -88,10 +88,10 @@ export default class SelectionController extends BaseMovementController {
         if (!editorStore.state.tutorialFlags.selectionToolIntroduction) {
             waitForNoOverlays().then(() => {
                 let messageStart = (tm('tutorialTip.selectionToolIntroduction.introduction') as string[]).map((message) => {
-                    return `<p class="mb-3">${rt(message)}</p>`;
+                    return `<p class="mb-3!">${rt(message)}</p>`;
                 }).join('');
                 let messageEnd = (tm('tutorialTip.selectionToolIntroduction.body.end') as string[]).map((message) => {
-                    return `<p class="mb-3">${rt(message, {
+                    return `<p class="mb-3!">${rt(message, {
                         selectionShape: `<strong class="font-bold"><span class="bi bi-square"></span> ${t('tutorialTip.selectionToolIntroduction.bodyTitle.selectionShape')}</strong>`,
                         selectionCombineMode: `<strong class="font-bold"><span class="bi bi-plus-circle-dotted"></span> ${t('tutorialTip.selectionToolIntroduction.bodyTitle.selectionCombineMode')}</strong>`
                     })}</p>`;
@@ -101,12 +101,12 @@ export default class SelectionController extends BaseMovementController {
                     title: t('tutorialTip.selectionToolIntroduction.title'),
                     message: {
                         touch: messageStart + (tm('tutorialTip.selectionToolIntroduction.body.touch') as string[]).map((message) => {
-                            return `<p class="mb-3">${rt(message, {
+                            return `<p class="mb-3!">${rt(message, {
                                 createSelection: `<strong class="font-bold"><span class="bi bi-bounding-box"></span> ${t('tutorialTip.selectionToolIntroduction.bodyTitle.createSelection')}</strong>`,
                             })}</p>`
                         }).join('') + messageEnd,
                         mouse: messageStart + (tm('tutorialTip.selectionToolIntroduction.body.mouse') as string[]).map((message) => {
-                            return `<p class="mb-3">${rt(message, {
+                            return `<p class="mb-3!">${rt(message, {
                                 createSelection: `<strong class="font-bold"><span class="bi bi-bounding-box"></span> ${t('tutorialTip.selectionToolIntroduction.bodyTitle.createSelection')}</strong>`,
                                 leftClick: `<em>${t('tutorialTip.selectionToolIntroduction.bodyTitle.leftClick')}</em>`,
                             })}</p>`

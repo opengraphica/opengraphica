@@ -33,17 +33,23 @@
                         }"
                     />
                 </div>
-                <og-button v-model:pressed="colorPaletteDockVisible" outline solid small toggle class="!ml-3"
+                <og-button v-model:pressed="colorPaletteDockVisible" outline solid small toggle class="ml-3!"
                     @click="colorPaletteDockLeft = 0; colorPaletteDockTop = 0;">
                     <i class="bi bi-palette-fill mr-1" aria-hidden="true" />
                     {{ t('toolbar.drawBrush.brushColor') }}
+                    <div
+                        :style="{
+                            'background': colorPaletteItems[colorPaletteIndex]?.color?.style,
+                        }"
+                        class="w-4 h-4 rounded-sm ml-2"
+                    />
                 </og-button>
-                <og-button v-model:pressed="sizeDockVisible" outline solid small toggle class="!ml-3"
+                <og-button v-model:pressed="sizeDockVisible" outline solid small toggle class="ml-3!"
                     @click="sizeDockLeft = 0; sizeDockTop = 0;">
                     <i class="bi bi-plus-circle mr-1" aria-hidden="true" />
                     {{ t('toolbar.drawBrush.brushSize') }}
                 </og-button>
-                <og-button v-model:pressed="smoothingDockVisible" outline solid small toggle class="!ml-3 !mr-3"
+                <og-button v-model:pressed="smoothingDockVisible" outline solid small toggle class="ml-3! !mr-3"
                     @click="smoothingDockLeft = 0; smoothingDockTop = 0;">
                     <i class="bi bi-disc mr-1" aria-hidden="true" />
                     {{ t('toolbar.drawBrush.brushSmoothing') }}
@@ -90,7 +96,7 @@
             </div>
         </floating-dock>
         <floating-dock v-if="sizeDockVisible" v-model:top="sizeDockTop" v-model:left="sizeDockLeft" :visible="floatingDocksVisible">
-            <label for="toolbar-draw-brush-size-slider" class="mr-4">
+            <label for="toolbar-draw-brush-size-slider" class="text-sm mr-4">
                 {{ t('toolbar.drawBrush.brushSize') }}
             </label>
             <el-slider
@@ -106,7 +112,7 @@
             />
         </floating-dock>
         <floating-dock v-if="smoothingDockVisible" v-model:top="smoothingDockTop" v-model:left="smoothingDockLeft" :visible="floatingDocksVisible">
-            <label for="toolbar-draw-brush-smoothing-slider" class="mr-4">
+            <label for="toolbar-draw-brush-smoothing-slider" class="text-sm mr-4">
                 {{ t('toolbar.drawBrush.brushSmoothing') }}
             </label>
             <el-slider

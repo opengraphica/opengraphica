@@ -79,7 +79,7 @@ onUnmounted(() => {
 
     if (!editorStore.state.tutorialFlags.explainCanvasViewportControls) {
         let message = (tm('tutorialTip.explainCanvasViewportControls.introduction') as string[]).map((message) => {
-            return `<p class="mb-3">${rt(message, {
+            return `<p class="mb-3!">${rt(message, {
                 anyTool: `<strong class="font-bold">${t('tutorialTip.explainCanvasViewportControls.anyTool')}</strong>`
             })}</p>`;
         }).join('');
@@ -88,13 +88,13 @@ onUnmounted(() => {
             title: t('tutorialTip.explainCanvasViewportControls.title'),
             message: {
                 touch: message + (tm('tutorialTip.explainCanvasViewportControls.body.touch') as string[]).map((message) => {
-                    return `<p class="mb-3">${rt(message, {
+                    return `<p class="mb-3!">${rt(message, {
                         zooming: `<strong class="font-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.zooming')}</strong>`,
                         panning: `<strong class="font-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.panning')}</strong>`,
                     })}</p>`
                 }).join(''),
                 mouse: message + (tm('tutorialTip.explainCanvasViewportControls.body.mouse') as string[]).map((message) => {
-                    return `<p class="mb-3">${rt(message, {
+                    return `<p class="mb-3!">${rt(message, {
                         zooming: `<strong class="font-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.zooming')}</strong>`,
                         panning: `<strong class="font-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.explainCanvasViewportControls.bodyTitle.panning')}</strong>`,
                         mouseWheel: `<em>${t('tutorialTip.explainCanvasViewportControls.bodyTitle.mouseWheel')}</em>`,

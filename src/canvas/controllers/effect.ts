@@ -33,7 +33,7 @@ export default class EffectController extends BaseCanvasMovementController {
         if (!editorStore.state.tutorialFlags.effectToolIntroduction) {
             waitForNoOverlays().then(() => {
                 let message = (tm('tutorialTip.effectToolIntroduction.introduction') as string[]).map((message) => {
-                    return `<p class="mb-3">${rt(message)}</p>`;
+                    return `<p class="mb-3!">${rt(message)}</p>`;
                 }).join('');
                 scheduleTutorialNotification({
                     flag: 'effectToolIntroduction',

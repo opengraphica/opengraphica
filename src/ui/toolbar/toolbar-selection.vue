@@ -56,7 +56,7 @@
                         </el-option>
                     </el-select>
                 </el-input-group>
-                <el-button-group class="!flex !ml-3">
+                <el-button-group class="!flex ml-3!">
                     <el-button size="small" :disabled="!canClearSelection" @click="onClickClear">
                         <span class="bi bi-x-circle-fill mr-2" aria-hidden="true" /> {{ t('button.clear') }}
                     </el-button>

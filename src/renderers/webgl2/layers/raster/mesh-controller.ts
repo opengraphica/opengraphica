@@ -28,6 +28,7 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
     planeGeometry: InstanceType<typeof ImagePlaneGeometry> | undefined;
     scene: InstanceType<typeof Scene> | undefined;
     sourceTexture: InstanceType<typeof Texture<any>> | undefined;
+    draftTexture: InstanceType<typeof Texture<any>> | undefined;
 
     id: number = -1;
     blendingMode: WorkingFileLayerBlendingMode = 'normal';
@@ -83,14 +84,14 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
                 }
                 if (!this.material || updateType === 'destroyAndCreate') {
                     this.material = await createRasterMaterial({
-                        srcTexture: this.sourceTexture,
+                        srcTexture: this.draftTexture ?? this.sourceTexture,
                         canvasFilters: this.filtersOverride ?? this.filters,
                         opacity: this.opacity,
                     });
                     assignMaterialBlendingMode(this.material, this.blendingMode);
                 } else {
                     await updateRasterMaterial(this.material, {
-                        srcTexture: this.sourceTexture,
+                        srcTexture: this.draftTexture ?? this.sourceTexture,
                         opacity: this.opacity,
                     })
                 }
@@ -227,6 +228,18 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
 
     getTransform() {
         return this.plane?.matrix ?? new Matrix4();
+    }
+
+    setDraftTexture(texture?: Texture<any>) {
+        if (texture !== this.draftTexture) {
+            this.draftTexture?.dispose();
+            this.draftTexture = undefined;
+            if (texture) {
+                texture.userData.isDraft = true;
+                this.draftTexture = texture;
+            }
+            this.scheduleMaterialUpdate('update');
+        }
     }
     
     swapScene(scene: Scene) {

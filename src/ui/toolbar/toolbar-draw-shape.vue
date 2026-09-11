@@ -2,7 +2,7 @@
     <div class="flex container items-center justify-center mx-auto">
         <div v-if="editingLayers.length > 0 && !showStopDrawer" class="og-toolbar-edit-confirm">
             {{ t('toolbar.drawGradient.editingGradient') }}
-            <el-button plain size="small" class="!ml-3" @click="onDoneEditing()">
+            <el-button plain size="small" class="ml-3!" @click="onDoneEditing()">
                 <span class="bi bi-check-circle-fill mr-2" aria-hidden="true" /> {{ t('button.done') }}
             </el-button>
         </div>
@@ -30,7 +30,7 @@
                         </el-option>
                     </el-select>
                 </el-input-group>
-                <og-button v-model:pressed="styleDockVisible" outline solid small toggle class="!ml-3"
+                <og-button v-model:pressed="styleDockVisible" outline solid small toggle class="ml-3!"
                     @click="styleDockLeft = 0; styleDockTop = 0;">
                     <i class="bi bi-palette-fill mr-1" aria-hidden="true" />
                     {{ t('toolbar.drawShape.style.label') }}

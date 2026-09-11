@@ -187,6 +187,10 @@ export class GradientLayerMeshController implements Webgl2RendererMeshController
     getTransform() {
         return this.plane?.matrix ?? new Matrix4();
     }
+
+    setDraftTexture(texture?: Texture<any>) {
+        // TODO
+    }
     
     swapScene(scene: Scene) {
         if (!this.plane) return;

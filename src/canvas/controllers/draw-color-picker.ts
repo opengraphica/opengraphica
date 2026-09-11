@@ -1,22 +1,16 @@
 import { nextTick } from 'vue';
 import BaseCanvasMovementController from './base-movement';
 
-import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
-import { generateColorStyle } from '@/lib/color';
 import { DecomposedMatrix } from '@/lib/dom-matrix';
 
 import canvasStore from '@/store/canvas';
-import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
-import workingFileStore from '@/store/working-file';
 import { drawColorPickerEmitter, pickedColor } from '@/canvas/store/draw-color-picker-state';
 
 import { useRenderer } from '@/renderers';
 
-import type { DrawWorkingFileOptions, RGBAColor, RendererFrontend } from '@/types';
+import type { RendererFrontend } from '@/types';
 
-const devicePixelRatio = window.devicePixelRatio || 1;
-
-export default class CanvasDrawBrushController extends BaseCanvasMovementController {
+export default class CanvasDrawColorPickerController extends BaseCanvasMovementController {
 
     private isPickingColor = false;
 

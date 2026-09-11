@@ -245,6 +245,10 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
         return this.plane?.matrix ?? new Matrix4();
     }
     
+    setDraftTexture(texture?: Texture<any>) {
+        // TODO
+    }
+
     swapScene(scene: Scene) {
         if (!this.plane) return;
         this.scene?.remove(this.plane);

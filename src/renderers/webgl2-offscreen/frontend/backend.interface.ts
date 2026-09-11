@@ -10,6 +10,7 @@ import type {
 import type {
     RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings, RendererTextureTile,
     WorkingFileLayer, WorkingFileLayerMask,
+    RendererBucketFillSettings,
 } from '@/types';
 
 export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPublic {
@@ -267,6 +268,33 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
         });
 
         return (await this.messageReceived(BackendWorkerMessage.CREATE_BRUSH_PREVIEW_RESULT)).bitmap;
+    }
+
+    async createBucketFill(settings: RendererBucketFillSettings): Promise<void> {
+        this.backendWorker.postMessage({
+            type: BackendWorkerMessage.CREATE_BUCKET_FILL,
+            settings,
+        })
+
+        return (await this.messageReceived(BackendWorkerMessage.CREATE_BUCKET_FILL_RESULT));
+    }
+
+    async previewBucketFill(strength: number): Promise<void> {
+        this.backendWorker.postMessage({
+            type: BackendWorkerMessage.PREVIEW_BUCKET_FILL,
+            strength,
+        })
+
+        return (await this.messageReceived(BackendWorkerMessage.PREVIEW_BUCKET_FILL_RESULT));
+    }
+
+    async applyBucketFill(strength: number): Promise<RendererTextureTile[]> {
+        this.backendWorker.postMessage({
+            type: BackendWorkerMessage.APPLY_BUCKET_FILL,
+            strength,
+        })
+
+        return (await this.messageReceived(BackendWorkerMessage.APPLY_BUCKET_FILL_RESULT));
     }
 
     async setDirty() {

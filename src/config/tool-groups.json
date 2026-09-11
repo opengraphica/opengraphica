@@ -25,6 +25,22 @@
                     "draw-brush"
                 ]
             },
+            "bucketFill": {
+                "controller": "draw-bucket-fill",
+                "toolbar": {
+                    "position": "auto",
+                    "target": "draw-bucket-fill"
+                }
+            },
+            "colorPicker": {
+                "controller": "draw-color-picker",
+                "toolbar": {
+                    "exclusive": true,
+                    "position": "top",
+                    "target": "draw-color-picker"
+                },
+                "hideDialogs": true
+            },
             "gradient": {
                 "controller": "draw-gradient",
                 "toolbar": {
@@ -44,15 +60,6 @@
                 "overlays": [
                     "draw-shape"
                 ]
-            },
-            "colorPicker": {
-                "controller": "draw-color-picker",
-                "toolbar": {
-                    "exclusive": true,
-                    "position": "top",
-                    "target": "draw-color-picker"
-                },
-                "hideDialogs": true
             }
         }
     },

@@ -132,7 +132,7 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
     //     if (!editorStore.state.tutorialFlags.deformBlurToolIntroduction) {
     //         waitForNoOverlays().then(() => {
     //             let message = (tm('tutorialTip.deformBlurToolIntroduction.introduction') as string[]).map((message) => {
-    //                 return `<p class="mb-3">${rt(message)}</p>`;
+    //                 return `<p class="mb-3!">${rt(message)}</p>`;
     //             }).join('');
     //             scheduleTutorialNotification({
     //                 flag: 'deformBlurToolIntroduction',

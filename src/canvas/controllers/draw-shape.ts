@@ -57,17 +57,17 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         if (!editorStore.state.tutorialFlags.drawShapeToolIntroduction) {
             waitForNoOverlays().then(() => {
                 let message = (tm('tutorialTip.drawShapeToolIntroduction.introduction') as string[]).map((message) => {
-                    return `<p class="mb-3">${rt(message)}</p>`;
+                    return `<p class="mb-3!">${rt(message)}</p>`;
                 }).join('');
                 scheduleTutorialNotification({
                     flag: 'drawShapeToolIntroduction',
                     title: t('tutorialTip.drawShapeToolIntroduction.title'),
                     message: {
                         touch: message + (tm('tutorialTip.drawShapeToolIntroduction.body.touch') as string[]).map((message) => {
-                            return `<p class="mb-3">${rt(message)}</p>`
+                            return `<p class="mb-3!">${rt(message)}</p>`
                         }).join(''),
                         mouse: message + (tm('tutorialTip.drawShapeToolIntroduction.body.mouse') as string[]).map((message) => {
-                            return `<p class="mb-3">${rt(message)}</p>`
+                            return `<p class="mb-3!">${rt(message)}</p>`
                         }).join(''),
                     }
                 });

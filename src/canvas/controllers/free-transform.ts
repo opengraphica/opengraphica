@@ -156,7 +156,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         if (!editorStore.state.tutorialFlags.freeTransformToolIntroduction) {
             waitForNoOverlays().then(() => {
                 let message = (tm('tutorialTip.freeTransformToolIntroduction.introduction') as string[]).map((message) => {
-                    return `<p class="mb-3">${rt(message, {
+                    return `<p class="mb-3!">${rt(message, {
                         autoMode: `<strong class="font-bold">${t('tutorialTip.freeTransformToolIntroduction.autoMode')}</strong>`
                     })}</p>`;
                 }).join('');
@@ -165,7 +165,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                     title: t('tutorialTip.freeTransformToolIntroduction.title'),
                     message: {
                         touch: message + (tm('tutorialTip.freeTransformToolIntroduction.body.touch') as string[]).map((message) => {
-                            return `<p class="mb-3">${rt(message, {
+                            return `<p class="mb-3!">${rt(message, {
                                 selection: `<strong class="font-bold"><span class="bi bi-cursor"></span> ${t('tutorialTip.freeTransformToolIntroduction.bodyTitle.selection')}</strong>`,
                                 moving: `<strong class="font-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.freeTransformToolIntroduction.bodyTitle.moving')}</strong>`,
                                 resizing: `<strong class="font-bold"><span class="bi bi-bounding-box"></span> ${t('tutorialTip.freeTransformToolIntroduction.bodyTitle.resizing')}</strong>`,
@@ -173,7 +173,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                             })}</p>`
                         }).join(''),
                         mouse: message + (tm('tutorialTip.freeTransformToolIntroduction.body.mouse') as string[]).map((message) => {
-                            return `<p class="mb-3">${rt(message, {
+                            return `<p class="mb-3!">${rt(message, {
                                 selection: `<strong class="font-bold"><span class="bi bi-cursor"></span> ${t('tutorialTip.freeTransformToolIntroduction.bodyTitle.selection')}</strong>`,
                                 moving: `<strong class="font-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.freeTransformToolIntroduction.bodyTitle.moving')}</strong>`,
                                 resizing: `<strong class="font-bold"><span class="bi bi-bounding-box"></span> ${t('tutorialTip.freeTransformToolIntroduction.bodyTitle.resizing')}</strong>`,

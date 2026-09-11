@@ -24,20 +24,20 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         if (!editorStore.state.tutorialFlags.zoomToolIntroduction) {
             waitForNoOverlays().then(() => {
                 let message = (tm('tutorialTip.zoomToolIntroduction.introduction') as string[]).map((message) => {
-                    return `<p class="mb-3">${rt(message)}</p>`;
+                    return `<p class="mb-3!">${rt(message)}</p>`;
                 }).join('');
                 scheduleTutorialNotification({
                     flag: 'zoomToolIntroduction',
                     title: t('tutorialTip.zoomToolIntroduction.title'),
                     message: {
                         touch: message + (tm('tutorialTip.zoomToolIntroduction.body.touch') as string[]).map((message) => {
-                            return `<p class="mb-3">${rt(message, {
+                            return `<p class="mb-3!">${rt(message, {
                                 zooming: `<strong class="font-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.zoomToolIntroduction.bodyTitle.zooming')}</strong>`,
                                 panning: `<strong class="font-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.zoomToolIntroduction.bodyTitle.panning')}</strong>`,
                             })}</p>`
                         }).join(''),
                         mouse: message + (tm('tutorialTip.zoomToolIntroduction.body.mouse') as string[]).map((message) => {
-                            return `<p class="mb-3">${rt(message, {
+                            return `<p class="mb-3!">${rt(message, {
                                 zooming: `<strong class="font-bold"><span class="bi bi-zoom-in"></span> ${t('tutorialTip.zoomToolIntroduction.bodyTitle.zooming')}</strong>`,
                                 panning: `<strong class="font-bold"><span class="bi bi-arrows-move"></span> ${t('tutorialTip.zoomToolIntroduction.bodyTitle.panning')}</strong>`,
                                 leftClick: `<em>${t('tutorialTip.zoomToolIntroduction.bodyTitle.leftClick')}</em>`,

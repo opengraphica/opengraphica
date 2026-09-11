@@ -6,6 +6,7 @@ import { OrthographicCamera } from 'three/src/cameras/OrthographicCamera';
 import { Object3D } from 'three/src/core/Object3D';
 import { Matrix4 } from 'three/src/math/Matrix4';
 import { Scene } from 'three/src/scenes/Scene';
+import { Vector2 } from 'three/src/math/Vector2';
 import { Vector3 } from 'three/src/math/Vector3';
 import { Vector4 } from 'three/src/math/Vector4';
 import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer';
@@ -30,6 +31,7 @@ import type {
     Webgl2RendererCanvasFilter, Webgl2RendererMeshController, WorkingFileLayer,
     WorkingFileGroupLayer, WorkingFileLayerFilter, WorkingFileLayerMask,
     RendererFrontendTakeSnapshotCropOptions, ClassType,
+    RendererBucketFillSettings,
 } from '@/types';
 
 const noRenderPassModes = new Set(['normal', 'erase']);
@@ -69,6 +71,9 @@ export interface Webgl2RendererBackendPublic {
     moveBrushStroke(layerId: number, x: number, y: number, size: number, angle: number, density: number, colorBlendingStrength: number, concentration: number): Promise<void>;
     stopBrushStroke(layerId: number): Promise<RendererTextureTile[]>;
     createBrushPreview(settings: RendererBrushStrokePreviewSettings): Promise<ImageBitmap>;
+    createBucketFill(settings: RendererBucketFillSettings): Promise<void>;
+    previewBucketFill(strength: number): Promise<void>;
+    applyBucketFill(strength: number): Promise<RendererTextureTile[]>;
     createMeshController(type: string): Promise<MeshControllerInterface>;
     setDirty(): Promise<void>;
     dispose(): Promise<void>;
@@ -611,6 +616,44 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         settings: RendererBrushStrokePreviewSettings,
     ): Promise<ImageBitmap> {
         return await this.compositor.createBrushPreview(settings);
+    }
+
+    async createBucketFill(settings: RendererBucketFillSettings): Promise<void> {
+        const meshControllers: Webgl2RendererMeshController[] = [];
+        const textures: Texture<ImageBitmap>[] = [];
+        const positions: Vector2[] = [];
+        for (const layerId of settings.layerIds) {
+            const meshController = this.meshControllersById.get(layerId);
+            if (!meshController) continue;
+            const texture = await meshController.getTexture(true);
+            if (!texture) continue;
+            meshControllers.push(meshController);
+            textures.push(texture);
+            const layerSpacePoint = new Vector3(settings.position[0], settings.position[1], 0)
+                .applyMatrix4(meshController.getTransform().clone().invert());
+            positions.push(
+                new Vector2(
+                    layerSpacePoint.x / texture.width,
+                    layerSpacePoint.y / texture.height,
+                )
+            );
+        }
+        await this.compositor.createBucketFill(
+            meshControllers,
+            textures,
+            positions,
+            new Vector4(settings.color[0], settings.color[1], settings.color[2], settings.color[3]),
+            settings.feather,
+            settings.antialias,
+        );
+    }
+
+    async previewBucketFill(strength: number): Promise<void> {
+        await this.compositor.previewBucketFill(strength);
+    }
+
+    async applyBucketFill(strength: number): Promise<RendererTextureTile[]> {
+        return await this.compositor.applyBucketFill(strength);
     }
 
     async setDirty() {

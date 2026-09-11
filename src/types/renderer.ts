@@ -69,6 +69,14 @@ export interface RendererBrushStrokeSettings extends RendererBrushStrokeSettings
     blendingMode?: WorkingFileLayerBlendingMode;
 }
 
+export interface RendererBucketFillSettings {
+    layerIds: number[];
+    color: Float16Array; // r, g, b, a
+    position: Float16Array; // x, y
+    feather: number;
+    antialias: boolean;
+}
+
 export interface RendererFrontend {
     initialize(canvas: HTMLCanvasElement | OffscreenCanvas): Promise<void>;
     resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number): Promise<void>;
@@ -80,6 +88,9 @@ export interface RendererFrontend {
     moveBrushStroke(layerId: number, x: number, y: number, size: number, angle: number, density: number, colorBlendingStrength: number, concentration: number): Promise<void>;
     stopBrushStroke(layerId: number): Promise<RendererTextureTile[]>;
     createBrushPreview(settings: RendererBrushStrokePreviewSettings): Promise<ImageBitmap>;
+    createBucketFill(settings: RendererBucketFillSettings);
+    previewBucketFill(strength: number);
+    applyBucketFill(strength: number): Promise<RendererTextureTile[]>;
     dispose(): Promise<void>;
 }
 
@@ -93,6 +104,7 @@ export interface Webgl2RendererMeshController {
     blendingMode: WorkingFileLayerBlendingMode;
     getTexture(wait?: boolean): Promise<Texture<ImageBitmap> | null>;
     getTransform(): Matrix4;
+    setDraftTexture(texture?: Texture<any>);
     swapScene(scene: Scene): void;
     overrideFilters(filters?: Webgl2RendererCanvasFilter[]): Promise<void>;
     overrideVisibility(visible?: boolean): void;

@@ -647,6 +647,7 @@
             "name": "Draw",
             "tools": {
                 "brush": "Draw with art brushes",
+                "bucketFill": "Fill areas with color",
                 "gradient": "Create gradients of color",
                 "shape": "Create basic shapes"
             }
@@ -1250,6 +1251,15 @@
                 }
             }
         },
+        "drawBucketFill": {
+            "title": "Bucket Fill",
+            "brushColor": "Color",
+            "paletteCount": "Palette Count",
+            "strength": "Strength",
+            "feather": "Feather",
+            "settings": "Settings",
+            "antialias": "Antialias"
+        },
         "drawColorPicker": {
             "title": "Color Picker"
         },
@@ -1446,6 +1456,10 @@
                     "name": "Brush",
                     "description": "Draw on layers as if you are using a paint brush."
                 },
+                "bucketFill": {
+                    "name": "Bucket Fill",
+                    "description": "Fill in areas of similar color."
+                },
                 "gradient": {
                     "name": "Gradient",
                     "description": "Create smooth transitions between colors."
@@ -1533,6 +1547,20 @@
             "introduction": [
                 "The brush tool lets you create a painting with different brushes. It is best used with a pressure-sensitive stylus."
             ]
+        },
+        "drawBucketFillToolIntroduction": {
+            "title": "Bucket Fill",
+            "introduction": [
+                "The bucket fill tool lets you fill in areas of similar color with a color of your choice."
+            ],
+            "body": {
+                "mouse": [
+                    "Click on an area to fill. While holding the mouse down, you can drag to the left or right to adjust how much of the area is filled."
+                ],
+                "touch": [
+                    "Tap on an area to fill. While holding down, you can drag to the left or right to adjust how much of the area is filled."
+                ]
+            }
         },
         "drawGradientToolIntroduction": {
             "title": "Gradient Tool",

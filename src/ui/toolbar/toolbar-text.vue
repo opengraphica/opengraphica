@@ -76,7 +76,7 @@
                         ]
                     }">
                     <template #reference>
-                        <el-button size="small" class="!ml-3">
+                        <el-button size="small" class="ml-3!">
                             <span class="bi bi-aspect-ratio mr-2" aria-hidden="true" /> {{ t('toolbar.text.alignment.title') }}
                         </el-button>
                     </template>

@@ -24,7 +24,8 @@ import type {
     ClassType, RendererFrontend, RendererFrontendTakeSnapshotOptions,
     RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings,
     RendererFrontendApplySelectionMaskToAlphaChannelOptions,
-    RendererLayerWatcher, RendererTextureTile, WorkingFileAnyLayer
+    RendererLayerWatcher, RendererTextureTile, WorkingFileAnyLayer,
+    RendererBucketFillSettings,
 } from '@/types';
 
 export class Webgl2RendererFrontend implements RendererFrontend {
@@ -412,6 +413,18 @@ export class Webgl2RendererFrontend implements RendererFrontend {
             await this.waitForRendererInitialized();
         }
         return await this.rendererBackend!.createBrushPreview(settings);
+    }
+
+    async createBucketFill(settings: RendererBucketFillSettings) {
+        return this.rendererBackend?.createBucketFill(settings);
+    }
+
+    async previewBucketFill(strength: number) {
+        return this.rendererBackend?.previewBucketFill(strength);
+    }
+
+    async applyBucketFill(strength: number): Promise<RendererTextureTile[]> {
+        return this.rendererBackend?.applyBucketFill(strength);
     }
 
     async dispose() {

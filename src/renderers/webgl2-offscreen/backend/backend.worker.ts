@@ -166,6 +166,35 @@ self.onmessage = ({ data }) => {
                 }, [bitmap]);
             }).catch(logError);
             break;
+        case BackendWorkerMessage.CREATE_BUCKET_FILL:
+            rendererBackend.createBucketFill(data.settings).then(() => {
+                self.postMessage({
+                    type: BackendWorkerMessage.CREATE_BUCKET_FILL_RESULT,
+                })
+            }).catch(logError);
+            break;
+        case BackendWorkerMessage.PREVIEW_BUCKET_FILL:
+            rendererBackend.previewBucketFill(data.strength).then(() => {
+                self.postMessage({
+                    type: BackendWorkerMessage.PREVIEW_BUCKET_FILL_RESULT,
+                })
+            }).catch(logError);
+            break;
+        case BackendWorkerMessage.APPLY_BUCKET_FILL:
+            rendererBackend.applyBucketFill(data.strength).then((tiles) => {
+                const transferables = tiles.reduce((accumulator, item) => {
+                    accumulator.push(item.image);
+                    if (item.oldImage) {
+                        accumulator.push(item.oldImage);
+                    }
+                    return accumulator;
+                }, [] as Transferable[]);
+                self.postMessage({
+                    type: BackendWorkerMessage.APPLY_BUCKET_FILL_RESULT,
+                    tiles,
+                }, transferables);
+            }).catch(logError);
+            break;
         case BackendWorkerMessage.SET_DIRTY:
             rendererBackend.setDirty();
             break;

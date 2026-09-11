@@ -21,6 +21,13 @@
                 }
             },
             {
+                "icon": "bi bi-paint-bucket",
+                "action": {
+                    "type": "tool",
+                    "target": "bucketFill"
+                }
+            },
+            {
                 "icon": "bi bi-shadows",
                 "action": {
                     "type": "tool",

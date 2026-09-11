@@ -17,6 +17,7 @@ export enum ColorSpaceConversion {
 
 export interface RasterMaterialUpdateParams {
     srcTexture?: Texture<any>;
+    draftTexture?: Texture<any>;
     colorSpaceConversion?: ColorSpaceConversion;
     canvasFilters?: Webgl2RendererCanvasFilter[];
     opacity?: number;
@@ -65,13 +66,18 @@ export async function createRasterMaterial(params: RasterMaterialUpdateParams) {
     return material;
 }
 
-export async function updateRasterMaterial(material: ShaderMaterial, params: RasterMaterialUpdateParams) {
+export async function updateRasterMaterial(
+    material: ShaderMaterial,
+    params: RasterMaterialUpdateParams
+) {
     const colorSpaceConversion = params.colorSpaceConversion ?? 0;
     if (colorSpaceConversion !== material.defines.cColorSpaceConversion) {
         material.defines.cColorSpaceConversion = colorSpaceConversion;
     }
     if (material.uniforms.srcTexture.value !== params.srcTexture) {
-        material.uniforms.srcTexture.value?.dispose(); // Prevent GPU memory leak. If it's still needed, THREE will re-upload.
+        if (!params.srcTexture?.userData.isDraft) {
+            material.uniforms.srcTexture.value?.dispose(); // Prevent GPU memory leak. If it's still needed, THREE will re-upload.
+        }
         material.uniforms.srcTexture.value = params.srcTexture;
     }
     if (params.opacity != null && material.uniforms.opacity.value !== params.opacity) {

@@ -23,7 +23,7 @@ import type {
     RGBAColor,
     ClassType, RendererFrontend, RendererFrontendTakeSnapshotOptions,
     RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings,
-    RendererFrontendApplySelectionMaskToAlphaChannelOptions,
+    RendererFrontendApplySelectionMaskToAlphaChannelOptions, RendererBucketFillSettings,
     RendererLayerWatcher, RendererTextureTile, WorkingFileAnyLayer
 } from '@/types';
 
@@ -259,6 +259,18 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
 
     async createBrushPreview(settings: RendererBrushStrokePreviewSettings): Promise<ImageBitmap> {
         return this.rendererBackend.createBrushPreview(settings);
+    }
+
+    async createBucketFill(settings: RendererBucketFillSettings) {
+
+    }
+
+    async previewBucketFill(strength: number) {
+
+    }
+
+    async applyBucketFill(strength: number): Promise<RendererTextureTile[]> {
+        return [];
     }
 
     async dispose() {

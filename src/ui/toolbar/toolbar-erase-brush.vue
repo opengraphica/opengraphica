@@ -20,17 +20,17 @@
                 >
                     <img class="og-gradient-input__image" :src="selectedBrushPreviewImage" aria-hidden="true">
                 </div>
-                <og-button v-model:pressed="opacityDockVisible" outline solid small toggle class="!ml-3"
+                <og-button v-model:pressed="opacityDockVisible" outline solid small toggle class="ml-3!"
                     @click="opacityDockLeft = 0; opacityDockTop = 0;">
                     <i class="bi bi-transparency mr-1" aria-hidden="true" />
                     {{ t('toolbar.eraseBrush.brushOpacity') }}
                 </og-button>
-                <og-button v-model:pressed="sizeDockVisible" outline solid small toggle class="!ml-3"
+                <og-button v-model:pressed="sizeDockVisible" outline solid small toggle class="ml-3!"
                     @click="sizeDockLeft = 0; sizeDockTop = 0;">
                     <i class="bi bi-plus-circle mr-1" aria-hidden="true" />
                     {{ t('toolbar.eraseBrush.brushSize') }}
                 </og-button>
-                <og-button v-model:pressed="smoothingDockVisible" outline solid small toggle class="!ml-3 !mr-3"
+                <og-button v-model:pressed="smoothingDockVisible" outline solid small toggle class="ml-3! !mr-3"
                     @click="smoothingDockLeft = 0; smoothingDockTop = 0;">
                     <i class="bi bi-disc mr-1" aria-hidden="true" />
                     {{ t('toolbar.eraseBrush.brushSmoothing') }}
@@ -38,7 +38,7 @@
             </el-horizontal-scrollbar-arrows>
         </div>
         <floating-dock v-if="opacityDockVisible" v-model:top="opacityDockTop" v-model:left="opacityDockLeft" :visible="floatingDocksVisible">
-            <label for="toolbar-draw-brush-opacity-slider" class="mr-4">
+            <label for="toolbar-draw-brush-opacity-slider" class="text-sm mr-4">
                 {{ t('toolbar.eraseBrush.brushOpacity') }}
             </label>
             <el-slider
@@ -52,7 +52,7 @@
             />
         </floating-dock>
         <floating-dock v-if="sizeDockVisible" v-model:top="sizeDockTop" v-model:left="sizeDockLeft" :visible="floatingDocksVisible">
-            <label for="toolbar-draw-brush-size-slider" class="mr-4">
+            <label for="toolbar-draw-brush-size-slider" class="text-sm mr-4">
                 {{ t('toolbar.eraseBrush.brushSize') }}
             </label>
             <el-slider
@@ -68,7 +68,7 @@
             />
         </floating-dock>
         <floating-dock v-if="smoothingDockVisible" v-model:top="smoothingDockTop" v-model:left="smoothingDockLeft" :visible="floatingDocksVisible">
-            <label for="toolbar-draw-brush-smoothing-slider" class="mr-4">
+            <label for="toolbar-draw-brush-smoothing-slider" class="text-sm mr-4">
                 {{ t('toolbar.drawBrush.brushSmoothing') }}
             </label>
             <el-slider

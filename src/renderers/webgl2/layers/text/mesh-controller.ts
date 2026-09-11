@@ -248,6 +248,10 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
     getTransform() {
         return this.textGroup?.matrix ?? new Matrix4();
     }
+
+    setDraftTexture(texture?: Texture<any>) {
+        // TODO
+    }
     
     swapScene(scene: Scene) {
         if (!this.textGroup) return;

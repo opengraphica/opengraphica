@@ -125,7 +125,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
         if (!editorStore.state.tutorialFlags.eraseToolIntroduction) {
             waitForNoOverlays().then(() => {
                 let message = (tm('tutorialTip.eraseToolIntroduction.introduction') as string[]).map((message) => {
-                    return `<p class="mb-3">${rt(message)}</p>`;
+                    return `<p class="mb-3!">${rt(message)}</p>`;
                 }).join('');
                 scheduleTutorialNotification({
                     flag: 'eraseToolIntroduction',

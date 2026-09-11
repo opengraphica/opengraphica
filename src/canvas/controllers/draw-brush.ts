@@ -139,7 +139,7 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         if (!editorStore.state.tutorialFlags.drawBrushToolIntroduction) {
             waitForNoOverlays().then(() => {
                 let message = (tm('tutorialTip.drawBrushToolIntroduction.introduction') as string[]).map((message) => {
-                    return `<p class="mb-3">${rt(message)}</p>`;
+                    return `<p class="mb-3!">${rt(message)}</p>`;
                 }).join('');
                 scheduleTutorialNotification({
                     flag: 'drawBrushToolIntroduction',
@@ -295,10 +295,14 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
         this.actionQueue.push(async () => {
             // Finalize layer creation / conversion actions.
             if (layerActions.length > 0) {
-                await historyStore.dispatch('runAction', {
-                    action: new BundleAction('createDrawLayer', 'action.createDrawLayer', layerActions),
-                    reserveToken: startDrawReserveToken,
-                });
+                try {
+                    await historyStore.dispatch('runAction', {
+                        action: new BundleAction('createDrawLayer', 'action.createDrawLayer', layerActions),
+                        reserveToken: startDrawReserveToken,
+                    });
+                } catch {
+                    await historyStore.dispatch('unreserve', { token: startDrawReserveToken });
+                }
             } else {
                 await historyStore.dispatch('unreserve', { token: startDrawReserveToken });
             }

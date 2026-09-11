@@ -56,7 +56,7 @@ const props = defineProps({
     },
     reference: {
         type: Object as PropType<HTMLElement | undefined>,
-        required: true,
+        default: undefined,
     },
     visible: {
         type: Boolean,

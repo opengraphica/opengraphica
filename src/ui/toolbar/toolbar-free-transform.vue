@@ -20,12 +20,12 @@
                         <el-option :label="t('toolbar.freeTransform.pickLayer.current')" value="current" />
                     </el-select>
                 </el-input-group>
-                <og-button v-model:pressed="snappingDockVisible" outline solid small toggle class="!ml-3"
+                <og-button v-model:pressed="snappingDockVisible" outline solid small toggle class="ml-3!"
                     @click="snappingDockLeft = 0; snappingDockTop = 0;">
                     <span class="bi bi-magnet-fill mr-1" aria-hidden="true" />
                     {{ t('toolbar.freeTransform.snapping.title') }}
                 </og-button>
-                <og-button v-model:pressed="metricsDockVisible" outline solid small toggle class="!ml-3"
+                <og-button v-model:pressed="metricsDockVisible" outline solid small toggle class="ml-3!"
                     @click="metricsDockLeft = 0; metricsDockTop = 0;">
                     <span class="bi bi-clipboard-data-fill mr-1" aria-hidden="true" />
                     {{ t('toolbar.freeTransform.metrics.title') }}
@@ -49,7 +49,7 @@
                     }"
                 >
                     <template #reference>
-                        <og-button outline primary small class="!ml-3">
+                        <og-button outline primary small class="ml-3!">
                             <span class="bi bi-gear-fill mr-1" aria-hidden="true" /> {{ t('toolbar.freeTransform.actions.title') }}
                         </og-button>
                     </template>
