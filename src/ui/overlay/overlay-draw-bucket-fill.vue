@@ -17,28 +17,11 @@
                 </template>
             </svg>
         </div>
-        <div ref="drawBrushContainer" class="og-canvas-overlay-draw-brush" dir="ltr">
-            <svg
-                width="2"
-                height="2"
-                viewBox="-.5 -.5 2 2"
-                :style="{
-                    transform: `rotate(${cursorHoverAngle}rad) scale(${brushSize * zoom},${brushSize * zoom})`,
-                    position: 'absolute',
-                    left: transformedCursorHoverX - 1 + 'px',
-                    top: transformedCursorHoverY - 1 + 'px'
-                }"
-                xmlns="http://www.w3.org/2000/svg">
-                <path :d="brushShape" stroke="#333333" :stroke-width="drawPreviewStrokeWidth / brushSize" fill="transparent"/>
-                <path :d="brushShape" stroke="white" :stroke-width="drawPreviewStrokeWidth / brushSize * .8" stroke-dasharray="2%" fill="transparent"/>
-            </svg>
-        </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch, toRefs } from 'vue';
-import { brushShape, brushSize, cursorHoverPosition, cursorHoverAngle } from '@/canvas/store/deform-blur-state';
 
 import { Clipper, PolyType, ClipType, Paths, PolyFillType } from '@/lib/clipper';
 import { findPointListBounds } from '@/lib/math';
@@ -79,9 +62,6 @@ const svgPathStrokeDashArray = computed<number>(() => {
     return Math.max(svgPathStrokeWidth.value * 4, Math.round(appliedZoom));
 });
 
-const drawPreviewStrokeWidth = computed<number>(() => {
-    return 1.25 / zoom.value;
-});
 
 watch(() => workingFileStore.state.selectedLayerIds, () => {
     const layers = getSelectedLayers();
@@ -126,13 +106,5 @@ watch([selectedLayerBounds, selectedLayerBoundaryPoints, viewDirty], () => {
         }
     }
     selectedLayerSvgPaths.value = svgPaths;
-});
-
-watch([cursorHoverPosition], () => {
-    const point = cursorHoverPosition.value.matrixTransform(
-        new DOMMatrix().scale(1 / devicePixelRatio).multiply(transform.value)
-    );
-    transformedCursorHoverX.value = point.x;
-    transformedCursorHoverY.value = point.y;
 });
 </script>

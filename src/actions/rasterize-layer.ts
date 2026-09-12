@@ -41,6 +41,8 @@ export class RasterizeLayerAction extends BaseAction {
         const selectLayersAction = new SelectLayersAction([this.layerId]);
         await selectLayersAction.do();
 
+        // TODO - if this can be modified to render at layer width/height in the first place it
+        // would save some memory and CPU time.
         let { blob } = await exportAsImage({
             fileType: 'png',
             toBlob: true,
@@ -59,13 +61,11 @@ export class RasterizeLayerAction extends BaseAction {
         this.actions.push(selectLayersAction);
 
         let newTransform = layer.transform;
-        if (workingFileStore.get('width') > maxTextureSize || workingFileStore.get('height') > maxTextureSize) {
-            const { width, height } = limitMaxDimension(workingFileStore.get('width'), workingFileStore.get('height'), maxTextureSize);
-            blob = await createImageBlobFromCanvas(
-                await resizeImage(await createImageFromBlob(blob), width, height)
-            );
-            newTransform = layer.transform.multiply(new DOMMatrix().scale(workingFileStore.get('width') / width, workingFileStore.get('height') / height));
-        }
+        const { width, height } = limitMaxDimension(layer.width, layer.height, maxTextureSize);
+        blob = await createImageBlobFromCanvas(
+            await resizeImage(await createImageFromBlob(blob), width, height)
+        );
+        newTransform = layer.transform.multiply(new DOMMatrix().scale(layer.width / width, layer.height / height));
 
         const filterCount = layer.filters.length;
         for (let i = 0; i < filterCount; i++) {

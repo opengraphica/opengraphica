@@ -376,13 +376,7 @@ export class BucketFill {
                 );
 
                 const t = Math.max(0, Math.min(1, (rgbDistance - 0.0) / (tolerance - 0.0)));
-                // const smoothStepResult = t * t * (3 - 2 * t);
 
-                // const similarity = Math.max(
-                //     0.0001,
-                //     1.0 - smoothStepResult,
-                // );
-                const SIMILARITY_EXPONENTIAL_STRENGTH = 6.0;
                 const similarity = Math.max(
                     0.0001,
                     Math.exp(-SIMILARITY_EXPONENTIAL_STRENGTH * t),
@@ -431,13 +425,7 @@ export class BucketFill {
                 );
 
                 const t = Math.max(0, Math.min(1, (rgbDistance - 0.0) / (tolerance - 0.0)));
-                // const smoothStepResult = t * t * (3 - 2 * t);
 
-                // const similarity = Math.max(
-                //     0.0001,
-                //     1.0 - smoothStepResult,
-                // );
-                const SIMILARITY_EXPONENTIAL_STRENGTH = 6.0;
                 const similarity = Math.max(
                     0.0001,
                     Math.exp(-SIMILARITY_EXPONENTIAL_STRENGTH * t),
@@ -486,14 +474,7 @@ export class BucketFill {
                 );
 
                 const t = Math.max(0, Math.min(1, (rgbDistance - 0.0) / (tolerance - 0.0)));
-                // const smoothStepResult = t * t * (3 - 2 * t);
 
-                // const similarity = Math.max(
-                //     0.0001,
-                //     1.0 - smoothStepResult,
-                // );
-
-                const SIMILARITY_EXPONENTIAL_STRENGTH = 6.0;
                 const similarity = Math.max(
                     0.0001,
                     Math.exp(-SIMILARITY_EXPONENTIAL_STRENGTH * t),
@@ -542,14 +523,7 @@ export class BucketFill {
                 );
 
                 const t = Math.max(0, Math.min(1, (rgbDistance - 0.0) / (tolerance - 0.0)));
-                // const smoothStepResult = t * t * (3 - 2 * t);
 
-                // const similarity = Math.max(
-                //     0.0001,
-                //     1.0 - smoothStepResult,
-                // );
-
-                const SIMILARITY_EXPONENTIAL_STRENGTH = 6.0;
                 const similarity = Math.max(
                     0.0001,
                     Math.exp(-SIMILARITY_EXPONENTIAL_STRENGTH * t),

@@ -30,7 +30,10 @@
                 "toolbar": {
                     "position": "auto",
                     "target": "draw-bucket-fill"
-                }
+                },
+                "overlays": [
+                    "draw-bucket-fill"
+                ]
             },
             "colorPicker": {
                 "controller": "draw-color-picker",

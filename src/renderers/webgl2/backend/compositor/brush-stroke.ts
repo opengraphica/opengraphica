@@ -85,7 +85,6 @@ export class BrushStroke {
     compositeDirtyTiles!: Uint8Array;
 
     // TODO - share this across multiple brush strokes?
-    referenceTextureRenderTargets: Array<WebGLRenderTarget | undefined> = [];
     destinationTextureRenderTargets: Array<WebGLRenderTarget | undefined> = [];
     brushStrokeRenderTargets: Array<WebGLRenderTarget | undefined> = [];
     brushBlendRenderTargetStack: Array<WebGLRenderTarget> = [];
@@ -147,7 +146,6 @@ export class BrushStroke {
         const tileCount = this.xTileCount * this.yTileCount;
         this.allDirtyTiles = new Uint8Array(tileCount);
         this.compositeDirtyTiles = new Uint8Array(tileCount);
-        this.referenceTextureRenderTargets = new Array(tileCount);
         this.destinationTextureRenderTargets = new Array(tileCount);
         this.brushStrokeRenderTargets = new Array(tileCount);
 
@@ -214,6 +212,7 @@ export class BrushStroke {
                 refMap: { value: undefined },
                 selectionMaskMap: { value: selectionMaskTexture },
                 dstOffsetAndSize: { value: new Vector4() },
+                refOffsetAndSize: { value: new Vector4() },
                 brushAlphaConcentration: { value: new Vector2(this.brushColor[3], 0) },
                 selectionMaskTransform: { value: new Matrix4() },
             },
@@ -547,6 +546,10 @@ export class BrushStroke {
         let brushRenderTarget: WebGLRenderTarget;
         let referenceTextureRenderTarget: WebGLRenderTarget | undefined;
 
+        if (this.drawMode === RendererBrushStrokeDrawMode.BLUR) {
+            referenceTextureRenderTarget = this.gaussianBlurRenderTarget;
+        }
+
         let xi: number;
         let yi: number;
         let tileX: number;
@@ -563,15 +566,6 @@ export class BrushStroke {
             tileY = yi * this.tileSize;
             tileWidth = Math.min(this.tileSize, this.texture.image.width - tileX);
             tileHeight = Math.min(this.tileSize, this.texture.image.height - tileY);
-
-            if (this.drawMode === RendererBrushStrokeDrawMode.BLUR) {
-                referenceTextureRenderTarget = this.createReferenceTextureRenderTarget(
-                    xi,
-                    yi,
-                    tileWidth,
-                    tileHeight,
-                )
-            }
 
             destinationRenderTarget = this.createDestinationTextureRenderTarget(
                 xi,
@@ -595,6 +589,10 @@ export class BrushStroke {
             this.compositorMaterial.uniforms.dstOffsetAndSize.value.y = 0;
             this.compositorMaterial.uniforms.dstOffsetAndSize.value.z = 1;
             this.compositorMaterial.uniforms.dstOffsetAndSize.value.w = 1;
+            this.compositorMaterial.uniforms.refOffsetAndSize.value.x = tileX / this.texture.width;
+            this.compositorMaterial.uniforms.refOffsetAndSize.value.y = tileY / this.texture.height;
+            this.compositorMaterial.uniforms.refOffsetAndSize.value.z = tileWidth / this.texture.width;
+            this.compositorMaterial.uniforms.refOffsetAndSize.value.w = tileHeight / this.texture.height;
             this.compositorMaterial.uniforms.srcMap.value = brushRenderTarget.texture;
             this.compositorMaterial.uniforms.refMap.value = referenceTextureRenderTarget?.texture;
             this.compositorMaterial.uniforms.brushAlphaConcentration.value.y = this.brushMinConcentration;
@@ -813,47 +811,6 @@ export class BrushStroke {
             generateMipmaps: false,
         });
         this.brushBlendRenderTargetStack.push(renderTarget);
-        return renderTarget;
-    }
-
-    createReferenceTextureRenderTarget(
-        xi: number,
-        yi: number,
-        tileWidth: number,
-        tileHeight: number,
-    ): WebGLRenderTarget {
-        const tileIndex = yi * this.xTileCount + xi;
-        let renderTarget = this.referenceTextureRenderTargets[tileIndex];
-        if (!renderTarget) {
-            renderTarget = new WebGLRenderTarget(tileWidth, tileHeight, {
-                type: UnsignedByteType,
-                minFilter: NearestFilter,
-                magFilter: NearestFilter,
-                wrapS: ClampToEdgeWrapping,
-                wrapT: ClampToEdgeWrapping,
-                format: RGBAFormat,
-                internalFormat: this.texture.internalFormat,
-                depthBuffer: false,
-                colorSpace: SRGBColorSpace,
-                stencilBuffer: false,
-                generateMipmaps: false,
-            });
-            this.referenceTextureRenderTargets[tileIndex] = renderTarget;
-
-            this.mesh.material = this.copyTileMaterial;
-            if (this.drawMode === RendererBrushStrokeDrawMode.BLUR) {
-                this.copyTileMaterial.uniforms.map.value = this.gaussianBlurRenderTarget?.texture;
-            }
-            this.copyTileMaterial.uniforms.tileOffsetAndSize.value.x = (xi * this.tileSize) / this.texture.image.width;
-            this.copyTileMaterial.uniforms.tileOffsetAndSize.value.y = (yi * this.tileSize) / this.texture.image.height;
-            this.copyTileMaterial.uniforms.tileOffsetAndSize.value.z = tileWidth / this.texture.image.width;
-            this.copyTileMaterial.uniforms.tileOffsetAndSize.value.w = tileHeight / this.texture.image.height;
-            this.copyTileMaterial.uniformsNeedUpdate = true;
-
-            this.renderer.setViewport(0, 0, tileWidth, tileHeight);
-            this.renderer.setRenderTarget(renderTarget);
-            this.renderer.render(this.scene, this.camera);
-        }
         return renderTarget;
     }
 

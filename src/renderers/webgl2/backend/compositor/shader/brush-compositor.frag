@@ -16,6 +16,7 @@ uniform sampler2D dstMap;
 uniform sampler2D refMap;
 uniform sampler2D selectionMaskMap;
 uniform vec4 dstOffsetAndSize;
+uniform vec4 refOffsetAndSize;
 uniform vec2 brushAlphaConcentration;
 uniform mat4 selectionMaskTransform;
 
@@ -92,10 +93,12 @@ void main() {
 
 #if cBrushDrawMode == DRAW_MODE_BLUR
 
+    vec2 refUv = vec2(refOffsetAndSize.x, 1.0 - refOffsetAndSize.y - refOffsetAndSize.w) + vUv * refOffsetAndSize.zw;
+
     float blurAmount = srcColor.a * brushAlphaConcentration.x * selectionMaskMultiplier;
     blurAmount = clamp(blurAmount, 0.0, 1.0);
 
-    vec4 blurredColor = texture2D(refMap, dstUv);
+    vec4 blurredColor = texture2D(refMap, refUv);
 
     gl_FragColor = mix(dstColor, blurredColor, blurAmount);
 
