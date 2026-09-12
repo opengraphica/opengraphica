@@ -1,8 +1,6 @@
 import BaseCanvasMovementController from './base-movement';
 
 import appEmitter from '@/lib/emitter';
-import { createEmptyCanvas } from '@/lib/image';
-import { limitMaxDimension } from '@/lib/math';
 import { DecomposedMatrix } from '@/lib/dom-matrix';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import { t, tm, rt } from '@/i18n';
@@ -10,8 +8,7 @@ import { t, tm, rt } from '@/i18n';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore, { createHistoryReserveToken, historyBlockInteractionUntilComplete, historyReserveQueueFree } from '@/store/history';
-import { createStoredImage } from '@/store/image';
-import workingFileStore, { getSelectedLayers, ensureUniqueLayerSiblingName } from '@/store/working-file';
+import { getSelectedLayers } from '@/store/working-file';
 import { strength, feather, antialias, opacity } from '../store/erase-bucket-fill-state';
 import { appliedSelectionMask, activeSelectionMask } from '../store/selection-state';
 
@@ -20,33 +17,27 @@ import { useRenderer, transferRendererTilesToRasterLayerUpdates } from '@/render
 import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { ClearSelectionAction } from '@/actions/clear-selection';
-import { InsertLayerAction } from '@/actions/insert-layer';
 import { UpdateLayerAction } from '@/actions/update-layer';
 
 import type {
-    InsertRasterLayerOptions, UpdateRasterLayerOptions,
-    RendererFrontend,
+    UpdateRasterLayerOptions, RendererFrontend,
 } from '@/types';
 
 const devicePixelRatio = window.devicePixelRatio || 1;
 
-export default class CanvasDrawBucketFillController extends BaseCanvasMovementController {
+export default class CanvasEraseBucketFillController extends BaseCanvasMovementController {
 
     private isPreviewingFill = false;
     private pointerDownPreviewStrength = 0.5;
     private fillingLayerIds: number[] = [];
 
     private renderer: RendererFrontend | undefined;
-    private maxTextureSize: number = Infinity;
 
     onEnter(): void {
         super.onEnter();
 
         useRenderer().then((renderer) => {
             this.renderer = renderer;
-            this.renderer.getMaxTextureSize().then((maxTextureSize) => {
-                this.maxTextureSize = maxTextureSize;
-            })
         });
 
         appEmitter.on('editor.tool.selectAll', this.onSelectAll);

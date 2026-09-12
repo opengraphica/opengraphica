@@ -40,7 +40,7 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
     name: 'drawBrushStateStore',
     state: {
         brushSize: 100,
-        brushSmoothing: 0.45078125, // 25%,
+        brushSmoothing: 0.45078125, // 25%
         colorPalette: [
             {
                 is: 'color',

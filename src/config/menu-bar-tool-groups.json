@@ -1,10 +1,19 @@
 {
     "deform": {
-        "icon": "bi bi-droplet-half",
+        "icon": "bi bi-droplet-fill",
         "action": {
             "type": "toolGroup",
             "target": "deform"
-        }
+        },
+        "controls": [
+            {
+                "icon": "bi bi-droplet-fill",
+                "action": {
+                    "type": "tool",
+                    "target": "blur"
+                }
+            }
+        ]
     },
     "draw": {
         "icon": "bi bi-pencil-fill",

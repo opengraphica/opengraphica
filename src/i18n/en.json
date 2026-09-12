@@ -44,6 +44,7 @@
         "trimLayerEmptySpace": "Trim Layer Empty Space",
         "typeInTextLayer": "Type in Text Layer",
         "updateActiveSelection": "Update Active Selection",
+        "updateBlurLayer": "Blur Layer",
         "updateDrawLayer": "Draw on Layer",
         "updateDrawGradientLayerBlendColorSpace": "Update Gradient (Color Space)",
         "updateDrawGradientLayerFillType": "Update Gradient (Fill Type)",
@@ -1185,7 +1186,16 @@
             }
         },
         "deformBlur": {
-            "brushSize": "Size"
+            "brushOpacity": "Opacity",
+            "brushSize": "Size",
+            "brushStrength": "Strength",
+            "brushHardness": "Hardness",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "No Layers Selected",
+                    "message": "Please select at least one image layer in the layers dock. Certain layer types can't be blurred."
+                }
+            }
         },
         "drawBrush": {
             "brushColor": "Color",

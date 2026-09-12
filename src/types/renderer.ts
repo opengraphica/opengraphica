@@ -42,6 +42,11 @@ export interface RendererTextureTile {
     image: ImageBitmap;
 }
 
+export enum RendererBrushStrokeDrawMode {
+    NORMAL = 0,
+    BLUR = 1,
+}
+
 export interface RendererBrushStrokeSettingsCommon {
     color: Float16Array;
     shape: BrushDefinition['shape'],
@@ -67,6 +72,7 @@ export interface RendererBrushStrokePreviewSettings extends RendererBrushStrokeS
 export interface RendererBrushStrokeSettings extends RendererBrushStrokeSettingsCommon {
     layerId: number;
     blendingMode?: WorkingFileLayerBlendingMode;
+    drawMode?: RendererBrushStrokeDrawMode;
 }
 
 export interface RendererBucketFillSettings {

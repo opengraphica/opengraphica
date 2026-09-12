@@ -189,11 +189,9 @@ fn fs_main(input: FragmentInput) -> FragmentOutput {
         normal_numerator / max(normal_alpha, EPSILON);
 
     // Erase compositing
-    let erase_alpha =
-        max(dst_color.a - src_alpha, 0.0);
+    let erase_alpha = max(dst_color.a - src_alpha, 0.0);
 
-    let erase_rgb =
-        (dst_color.rgb * dst_color.a) / max(erase_alpha, EPSILON);
+    let erase_rgb = dst_color.rgb;
     
     let erase_visible = step(EPSILON, erase_alpha);
 
@@ -207,8 +205,7 @@ fn fs_main(input: FragmentInput) -> FragmentOutput {
         normal_alpha
     );
 
-    let is_erase =
-        uniforms.blending_mode == BLENDING_MODE_ERASE;
+    let is_erase = uniforms.blending_mode == BLENDING_MODE_ERASE;
 
     let result = select(
         normal_result, // false

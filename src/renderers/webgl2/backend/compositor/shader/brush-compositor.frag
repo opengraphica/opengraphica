@@ -4,10 +4,16 @@
 // vec3 outRgb = src.rgb * src.a + dst.rgb * (1.0 - src.a);
 // float outAlpha = src.a + dst.a * (1.0 - src.a);
 
+#define DRAW_MODE_NORMAL 0
+#define DRAW_MODE_BLUR 1
+
+const int MAX_BLUR_RADIUS = 64;
+
 varying vec2 vUv;
 
 uniform sampler2D srcMap;
 uniform sampler2D dstMap;
+uniform sampler2D refMap;
 uniform sampler2D selectionMaskMap;
 uniform vec4 dstOffsetAndSize;
 uniform vec2 brushAlphaConcentration;
@@ -82,8 +88,20 @@ void main() {
 #endif
 
     vec4 srcColor = srgbToLinearSrgb(texture2D(srcMap, vUv));
-    float srcAlpha = srcColor.a * brushAlphaConcentration.x * selectionMaskMultiplier;
     vec4 dstColor = texture2D(dstMap, dstUv);
+
+#if cBrushDrawMode == DRAW_MODE_BLUR
+
+    float blurAmount = srcColor.a * brushAlphaConcentration.x * selectionMaskMultiplier;
+    blurAmount = clamp(blurAmount, 0.0, 1.0);
+
+    vec4 blurredColor = texture2D(refMap, dstUv);
+
+    gl_FragColor = mix(dstColor, blurredColor, blurAmount);
+
+#elif cBrushDrawMode == DRAW_MODE_NORMAL
+
+    float srcAlpha = srcColor.a * brushAlphaConcentration.x * selectionMaskMultiplier;
 
 #if cLayerBlendingMode == BLENDING_MODE_ERASE
     float alpha = max(dstColor.a - srcAlpha, 0.0);
@@ -102,5 +120,7 @@ void main() {
     gl_FragColor = vec4(
         ((srcColor.rgb) * srcAlpha + ((dstColor.rgb) * dstColor.a) * (1.0 - srcAlpha)) / alpha, alpha
     );
+#endif
+
 #endif
 }
