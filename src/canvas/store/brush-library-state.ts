@@ -22,9 +22,10 @@ const customBrushes = permanentStorage.getDeepWritableRef('customBrushes');
 
 export const brushPreviews = reactive<{ [key: string]: HTMLCanvasElement }>({});
 
-export const brushEditorTab = ref<string>('shape');
+export const brushEditorTab = ref<string>('general');
 
-function createBrushDefaults(brushDefinition: Partial<BrushDefinition>) {
+export function createBrushDefaults(brushDefinition: WithRequiredProperty<Partial<BrushDefinition>, 'id'>): BrushDefinition {
+    brushDefinition.categories = brushDefinition.categories ?? [];
     brushDefinition.shape = brushDefinition.shape ?? 'circle';
     brushDefinition.pixelSnap = brushDefinition.pixelSnap ?? false;
     brushDefinition.hardness = brushDefinition.hardness ?? 1;
@@ -40,6 +41,7 @@ function createBrushDefaults(brushDefinition: Partial<BrushDefinition>) {
     brushDefinition.colorBlendingPersistence = brushDefinition.colorBlendingPersistence ?? 0;
     brushDefinition.concentration = brushDefinition.concentration ?? 1;
     brushDefinition.pressureMinConcentration = brushDefinition.pressureMinConcentration ?? 1;
+    return brushDefinition as BrushDefinition;
 }
 
 export const brushesByCategory = computed(() => {
@@ -93,9 +95,15 @@ export function addCustomBrush(brushDefinition: BrushDefinition) {
     }
 }
 
-export function getBrushById(id: string): BrushDefinition | undefined {
+export function deleteCustomBrush(brushId: string) {
+    const customBrushIndex = customBrushes.value.findIndex((customBrush) => customBrush.id === brushId);
+    customBrushes.value.splice(customBrushIndex, 1);
+}
+
+export function getBrushById(id?: string): BrushDefinition | undefined {
+    if (id == null) return undefined;
     if (id === 'default') {
-        const defaultBrush: Partial<BrushDefinition> = {
+        const defaultBrush: WithRequiredProperty<Partial<BrushDefinition>, 'id'> = {
             id: 'default',
             categories: ['simple'],
         };

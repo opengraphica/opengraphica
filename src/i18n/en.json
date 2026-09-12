@@ -686,11 +686,11 @@
             "name": "Erase",
             "tools": {
                 "brush": {
-                    "title": "Brush",
+                    "title": "Erase Brush",
                     "description": "Erase with brush strokes"
                 },
                 "bucketFill": {
-                    "title": "Bucket Fill",
+                    "title": "Erase Bucket Fill",
                     "description": "Erase areas with similar color"
                 }
             }
@@ -1314,6 +1314,13 @@
                         "pressureTaperDescription": "Higher values will draw skinnier lines at lower pen pressures. Makes it easier to control pens with unstable sensitivity at lower pressures.",
                         "pressureMinSize": "Minimum Size",
                         "pressureMinSizeDescription": "The size of the brush at 0% pen pressure, relative to the currently selected brush size."
+                    },
+                    "general": {
+                        "title": "General",
+                        "name": "Brush Name",
+                        "resetDefault": "Reset to Default",
+                        "delete": "Delete Brush",
+                        "addCustomBrush": "Add Custom Brush"
                     }
                 }
             }

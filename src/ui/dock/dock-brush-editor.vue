@@ -4,19 +4,20 @@
             {{ t('toolbar.drawBrush.brushDialog.title') }}
         </h2>
         <div class="og-toolbar-drawer__close">
-            <el-button
+            <og-button
                 v-if="view === 'edit'"
-                plain
+                outline
                 @click="onBack()"
             >
                 <span class="bi bi-chevron-left mr-2" aria-hidden="true" /> <span>{{ t('button.back') }}</span>
-            </el-button>
-            <el-button
-                plain
+            </og-button>
+            <og-button
+                outline primary
+                class="ml-3!"
                 @click="onDone()"
             >
                 <span class="bi bi-check-circle-fill mr-2" aria-hidden="true" /> <span>{{ t('button.done') }}</span>
-            </el-button>
+            </og-button>
         </div>
     </template>
     <div class="og-dock-content og-toolbar-draw-brush-select-brush-drawer">
@@ -79,11 +80,40 @@
                             {{ t('toolbar.drawBrush.brushDialog.noBrushCategorySelected.message') }}
                         </el-alert>
                     </template>
+                    <og-button
+                        v-if="selectedBrushCategoryId === 'custom'"
+                        outline primary
+                        class="w-full mt-4!"
+                        @click="createCustomBrush()"
+                    >
+                        <span class="bi bi-plus-circle mr-2" aria-hidden="true" />
+                        <span>{{ t('toolbar.drawBrush.brushDialog.editorTab.general.addCustomBrush') }}</span>
+                    </og-button>
                 </el-scrollbar>
             </div>
         </div>
         <div v-else-if="view === 'edit'" class="og-brush-editor">
             <el-tabs v-model="brushEditorTab" tab-position="left">
+                <el-tab-pane name="general" :label="t('toolbar.drawBrush.brushDialog.editorTab.general.title')">
+                    <el-scrollbar>
+                        <h3>{{ t('toolbar.drawBrush.brushDialog.editorTab.general.title') }}</h3>
+                        <el-form novalidate="novalidate" action="javascript:void(0)" label-position="top">
+                            <el-form-item>
+                                <template #label>
+                                    {{ t('toolbar.drawBrush.brushDialog.editorTab.general.name') }}
+                                </template>
+                                <el-input v-if="selectedBrushCategoryId === 'custom'" v-model="editingBrush.name" />
+                                <el-input v-else :modelValue="t(`defaultBrush.${editingBrush.id}`)" disabled />
+                            </el-form-item>
+                            <og-button v-if="selectedBrushCategoryId === 'custom'" outline solid danger @click="resetBrush">
+                                {{ t('toolbar.drawBrush.brushDialog.editorTab.general.delete') }}
+                            </og-button>
+                            <og-button v-else="selectedBrushCategoryId" outline solid danger @click="resetBrush">
+                                {{ t('toolbar.drawBrush.brushDialog.editorTab.general.resetDefault') }}
+                            </og-button>
+                        </el-form>
+                    </el-scrollbar>
+                </el-tab-pane>
                 <el-tab-pane name="shape" :label="t('toolbar.drawBrush.brushDialog.editorTab.shape.title')">
                     <el-scrollbar>
                         <h3>{{ t('toolbar.drawBrush.brushDialog.editorTab.shape.title') }}</h3>
@@ -383,25 +413,29 @@
         <template v-if="isDialog">
             <el-divider class="mt-0" />
             <div class="mt-4 pb-5 text-right">
-                <el-button @click="onCancel">{{ t('button.cancel') }}</el-button>
-                <el-button @click="onConfirmSelection">{{ t('button.ok') }}</el-button>
+                <og-button outline @click="onCancel">{{ t('button.cancel') }}</og-button>
+                <og-button outline primary @click="onConfirmSelection">{{ t('button.ok') }}</og-button>
             </div>
         </template>
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch, type PropType } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { useI18n } from '@/i18n';
+import { v4 as uuidv4 } from 'uuid';
 
 import {
-    brushEditorTab, brushesByCategory, getBrushById, addCustomBrush, generateBrushPreview
+    brushEditorTab, brushesByCategory, getBrushById,
+    addCustomBrush, deleteCustomBrush, generateBrushPreview,
+    createBrushDefaults,
 } from '@/canvas/store/brush-library-state';
 
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton from 'element-plus/lib/components/button/index';
 import ElDivider from 'element-plus/lib/components/divider/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
+import ElInput from 'element-plus/lib/components/input/index';
 import ElInputNumber from '@/ui/el/el-input-number.vue';
 import ElScrollbar from 'element-plus/lib/components/scrollbar/index';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
@@ -409,6 +443,7 @@ import ElSlider from 'element-plus/lib/components/slider/index';
 import ElSwitch from 'element-plus/lib/components/switch/index';
 import ElTabs, { ElTabPane } from 'element-plus/lib/components/tabs/index';
 
+import OgButton from '@/ui/element/button.vue';
 import OgCanvasContainer from '@/ui/element/canvas-container.vue';
 import OgMoreInfoIcon from '@/ui/element/more-info-icon.vue';
 
@@ -513,6 +548,17 @@ function onClickEditBrush(brushId: string) {
     view.value = 'edit';
 }
 
+function createCustomBrush() {
+    const brushDefinition: BrushDefinition = createBrushDefaults({
+        id: uuidv4(),
+        name: 'New Custom Brush',
+        categories: ['custom'],
+    });
+    addCustomBrush(brushDefinition);
+    onClickEditBrush(brushDefinition.id);
+    brushEditorTab.value = 'general';
+}
+
 function applyBrushEdits() {
     const brushDefinition: BrushDefinition = {
         categories: editingBrush.value.categories,
@@ -551,6 +597,27 @@ const editingBrush = ref<BrushDefinition & {
     colorBlendingStrengthRange: number[];
     concentrationRange: number[];
 }>({} as never);
+
+/*-------------------*\
+| Reset Editing Brush |
+\*-------------------*/
+
+function resetBrush() {
+    const selectedBrushId = selectedBrush.value?.id;
+    view.value = 'select';
+    if (selectedBrushId != null) {
+        deleteCustomBrush(selectedBrushId);
+    }
+    
+    if (!getBrushById(selectedBrushId)) {
+        emit('update:selectedBrushId', 'default');
+        nextTick(() => {
+            emit('update:selectedBrushId', brushesByCategory.value[0].brushes[0].id);
+        });
+    } else if (selectedBrushId != null) {
+        generateBrushPreview(selectedBrushId);
+    }
+}
 
 /*---------------*\
 | Dialog Controls |

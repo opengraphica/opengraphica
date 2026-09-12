@@ -8507,7 +8507,7 @@ body.og-full-page .opengraphica {
 .opengraphica .og-button--outline {
   border-color: var(--og-button-border-color);
 }
-.opengraphica .og-button--outline:hover {
+.opengraphica .og-button--outline:hover:not(:disabled) {
   border-color: var(--og-button-hover-border-color);
 }
 .opengraphica .og-button--solid {
@@ -8523,7 +8523,7 @@ body.og-full-page .opengraphica {
 .opengraphica .og-button--solid.og-button--outline {
   border-color: var(--og-button-border-color);
 }
-.opengraphica .og-button--solid.og-button--outline:hover {
+.opengraphica .og-button--solid.og-button--outline:hover:not(:disabled) {
   border-color: var(--og-button-hover-border-color);
 }
 .opengraphica .og-button--pressed {
@@ -8532,7 +8532,7 @@ body.og-full-page .opengraphica {
 .opengraphica .og-button--pressed, .opengraphica .og-button--pressed.og-button--solid, .opengraphica .og-button--pressed.og-button--outline {
   color: var(--og-button-pressed-color);
 }
-.opengraphica .og-button--pressed:hover, .opengraphica .og-button--pressed.og-button--solid:hover, .opengraphica .og-button--pressed.og-button--outline:hover {
+.opengraphica .og-button--pressed:hover:not(:disabled), .opengraphica .og-button--pressed.og-button--solid:hover:not(:disabled), .opengraphica .og-button--pressed.og-button--outline:hover:not(:disabled) {
   color: var(--og-button-pressed-color);
 }
 .opengraphica .og-button--pressed::before {
@@ -8662,7 +8662,7 @@ body.og-full-page .opengraphica {
 .opengraphica .og-button-group > .og-button:focus {
   z-index: 1;
 }
-.opengraphica .og-button-group > .og-button:hover {
+.opengraphica .og-button-group > .og-button:hover:not(:disabled) {
   z-index: 2;
 }
 .opengraphica .og-button-group > .og-button + .og-button {
@@ -11296,9 +11296,6 @@ body.og-full-page .opengraphica {
   top: 0.7rem;
   right: 0.7rem;
   cursor: pointer;
-}
-.opengraphica .og-toolbar .og-toolbar-drawer .og-toolbar-drawer__close:hover {
-  color: var(--el-color-primary);
 }
 .opengraphica .og-toolbar .og-toolbar-drawer > .og-dock-content {
   display: flex;
