@@ -10,6 +10,16 @@
                 "overlays": [
                     "deform-blur"
                 ]
+            },
+            "sharpen": {
+                "controller": "deform-sharpen",
+                "toolbar": {
+                    "position": "auto",
+                    "target": "deform-sharpen"
+                },
+                "overlays": [
+                    "deform-sharpen"
+                ]
             }
         }
     },

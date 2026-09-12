@@ -60,6 +60,7 @@
         "updateLayerFilterMask": "Update Layer Effect Mask",
         "updateLayerOpacity": "Change Opacity",
         "updateSelectionCombineMode": "Update Selection Combine Mode",
+        "updateSharpenLayer": "Sharpen Layer",
         "updateTextLayerProperties": "Update Text Layer Properties",
         "waitingOnQueueFree": "Waiting for Work to Complete"
     },
@@ -641,29 +642,57 @@
         "deform": {
             "name": "Deform",
             "tools": {
-                "blur": "Blur specific areas of the image"
+                "blur": {
+                    "title": "Blur",
+                    "description": "Blur areas of the image"
+                },
+                "sharpen": {
+                    "title": "Sharpen",
+                    "description": "Sharpen areas of the image"
+                }
             }
         },
         "draw": {
             "name": "Draw",
             "tools": {
-                "brush": "Draw with art brushes",
-                "bucketFill": "Fill areas with color",
-                "gradient": "Create gradients of color",
-                "shape": "Create basic shapes"
+                "brush": {
+                    "title": "Brush",
+                    "description": "Draw with art brushes"
+                },
+                "bucketFill": {
+                    "title": "Bucket Fill",
+                    "description": "Fill areas with color"
+                },
+                "gradient": {
+                    "title": "Gradient",
+                    "description": "Create gradients of color"
+                },
+                "shape": {
+                    "title": "Shape",
+                    "description": "Create basic shapes"
+                }
             }
         },
         "effect": {
             "name": "Effect",
             "tools": {
-                "effect": "Manipulate layer colors and add filter effects"
+                "effect": {
+                    "title": "Effect",
+                    "description": "Manipulate layer colors and add filter effects"
+                }
             }
         },
         "erase": {
             "name": "Erase",
             "tools": {
-                "brush": "Erase with brush strokes",
-                "bucketFill": "Erase areas with similar color"
+                "brush": {
+                    "title": "Brush",
+                    "description": "Erase with brush strokes"
+                },
+                "bucketFill": {
+                    "title": "Bucket Fill",
+                    "description": "Erase areas with similar color"
+                }
             }
         },
         "layers": {
@@ -672,7 +701,10 @@
         "selection": {
             "name": "Selection",
             "tools": {
-                "selection": "Select specifc areas of the image to edit, cut, copy, or delete"
+                "selection": {
+                    "title": "Selection",
+                    "description": "Select specifc areas of the image to edit, cut, copy, or delete"
+                }
             }
         },
         "settings": {
@@ -681,20 +713,32 @@
         "text": {
             "name": "Text",
             "tools": {
-                "text": "Insert and edit text layers"
+                "text": {
+                    "title": "Text",
+                    "description": "Insert and edit text layers"
+                }
             }
         },
         "transform": {
             "name": "Move / Transform",
             "tools": {
-                "freeTransform": "Move, scale, rotate layers",
-                "layerCrop": "Crop the selected layer"
+                "freeTransform": {
+                    "title": "Free Transform",
+                    "description": "Move, scale, rotate layers"
+                },
+                "layerCrop": {
+                    "title": "Layer Crop",
+                    "description": "Crop the selected layer"
+                }
             }
         },
         "view": {
             "name": "Canvas Viewport",
             "tools": {
-                "zoom": "Zoom in and out, pan, or rotate your view of the image"
+                "zoom": {
+                    "title": "Zoom / Pan",
+                    "description": "Zoom in and out, pan, or rotate your view of the image"
+                }
             }
         }
     },
@@ -1197,6 +1241,18 @@
                 }
             }
         },
+        "deformSharpen": {
+            "brushOpacity": "Opacity",
+            "brushSize": "Size",
+            "brushStrength": "Strength",
+            "brushHardness": "Hardness",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "No Layers Selected",
+                    "message": "Please select at least one image layer in the layers dock. Certain layer types can't be sharpened."
+                }
+            }
+        },
         "drawBrush": {
             "brushColor": "Color",
             "paletteCount": "Palette Count",
@@ -1564,6 +1620,12 @@
             "title": "Blur Tool",
             "introduction": [
                 "The blur tool will blur the portion of current layer you draw on."
+            ]
+        },
+        "deformSharpenToolIntroduction": {
+            "title": "Sharpen Tool",
+            "introduction": [
+                "The sharpen tool will sharpen areas of the current layer you draw on."
             ]
         },
         "drawBrushToolIntroduction": {

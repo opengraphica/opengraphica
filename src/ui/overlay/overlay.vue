@@ -29,6 +29,7 @@ export default defineComponent({
         'overlay-canvas-border': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-canvas-border' */ `@/ui/overlay/overlay-canvas-border.vue`)),
         'overlay-crop-resize': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-crop-resize' */ `@/ui/overlay/overlay-crop-resize.vue`)),
         'overlay-deform-blur': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-deform-blur' */ `@/ui/overlay/overlay-deform-blur.vue`)),
+        'overlay-deform-sharpen': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-deform-sharpen' */ `@/ui/overlay/overlay-deform-sharpen.vue`)),
         'overlay-draw-brush': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-draw-brush' */ `@/ui/overlay/overlay-draw-brush.vue`)),
         'overlay-draw-bucket-fill': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-draw-bucket-fill' */ `@/ui/overlay/overlay-draw-bucket-fill.vue`)),
         'overlay-draw-gradient': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-draw-gradient' */ `@/ui/overlay/overlay-draw-gradient.vue`)),
@@ -50,9 +51,9 @@ export default defineComponent({
             default: '',
         }
     },
-    setup(props, { emit }) {
+    setup() {
         const ignoreTransformWith: string[] = [
-            'canvas-border', 'deform-blur', 'draw-brush', 'draw-bucket-fill',
+            'canvas-border', 'deform-blur', 'deform-sharpen', 'draw-brush', 'draw-bucket-fill',
             'effect', 'erase-brush', 'selection',
         ];
         const blendModes: Record<string, string> = {

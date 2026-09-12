@@ -12,6 +12,13 @@
                     "type": "tool",
                     "target": "blur"
                 }
+            },
+            {
+                "icon": "bi bi-triangle-half",
+                "action": {
+                    "type": "tool",
+                    "target": "sharpen"
+                }
             }
         ]
     },

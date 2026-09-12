@@ -6,6 +6,7 @@
 
 #define DRAW_MODE_NORMAL 0
 #define DRAW_MODE_BLUR 1
+#define DRAW_MODE_SHARPEN 2
 
 const int MAX_BLUR_RADIUS = 64;
 
@@ -101,6 +102,17 @@ void main() {
     vec4 blurredColor = texture2D(refMap, refUv);
 
     gl_FragColor = mix(dstColor, blurredColor, blurAmount);
+
+#elif cBrushDrawMode == DRAW_MODE_SHARPEN
+
+    vec2 refUv = vec2(refOffsetAndSize.x, 1.0 - refOffsetAndSize.y - refOffsetAndSize.w) + vUv * refOffsetAndSize.zw;
+
+    float sharpenAmount = srcColor.a * brushAlphaConcentration.x * selectionMaskMultiplier;
+    sharpenAmount = clamp(sharpenAmount, 0.0, 1.0);
+
+    vec4 sharpenedColor = texture2D(refMap, refUv);
+
+    gl_FragColor = mix(dstColor, sharpenedColor, sharpenAmount);
 
 #elif cBrushDrawMode == DRAW_MODE_NORMAL
 

@@ -45,6 +45,7 @@ export interface RendererTextureTile {
 export enum RendererBrushStrokeDrawMode {
     NORMAL = 0,
     BLUR = 1,
+    SHARPEN = 2,
 }
 
 export interface RendererBrushStrokeSettingsCommon {

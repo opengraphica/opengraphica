@@ -76,7 +76,8 @@
                                         {{ t(control.displayTitle) }}
                                     </div>
                                     <dynamically-loaded-dock
-                                        :name="control.action?.target" :key="'dock-' + control.action?.target"
+                                        :name="control.action?.target"
+                                        :key="'dock-' + control.action?.target"
                                         @update:title="control.displayTitle = $event"
                                         @close="control.popoverVisible = false"
                                     />
@@ -119,10 +120,11 @@
                 <button
                     v-for="control in activeToolGroupControls"
                     :key="control.icon"
-                    :aria-label="t(`menuBarToolGroup.${activeToolGroup}.tools.${control.action?.target}`)"
+                    :aria-label="t(`menuBarToolGroup.${activeToolGroup}.tools.${control.action?.target}.description`)"
                     :class="{
                         'og-menu-bar__tool-group-expand__control--active': control.action?.target == activeTool
                     }"
+                    :title="t(`menuBarToolGroup.${activeToolGroup}.tools.${control.action?.target}.title`)"
                     @touchstart="onTouchStartControlButton($event, control)"
                     @touchend="onTouchEndControlButton($event, control)"
                     @mousedown="onMouseDownControlButton($event, control)"
@@ -166,13 +168,13 @@
                         :key="subControl.icon"
                     >
                         <span class="shrink-0 grow-0 w-4 mr-2" :class="subControl.icon" aria-hidden="true" />
-                        {{ t(`menuBarToolGroup.${toolPreviewPopoverGroupDefinition.id}.tools.${subControl.action?.target}`) }}
+                        {{ t(`menuBarToolGroup.${toolPreviewPopoverGroupDefinition.id}.tools.${subControl.action?.target}.description`) }}
                     </li>
                 </ol>
                 <ol v-else class="og-list--unstyled">
                     <li class="flex">
                         <span class="shrink-0 grow-0 w-4 mr-2" :class="toolPreviewPopoverGroupDefinition?.icon" aria-hidden="true" />
-                        {{ t(`menuBarToolGroup.${toolPreviewPopoverGroupDefinition?.id}.tools.${toolPreviewPopoverGroupDefinition?.id}`) }}
+                        {{ t(`menuBarToolGroup.${toolPreviewPopoverGroupDefinition?.id}.tools.${toolPreviewPopoverGroupDefinition?.id}.description`) }}
                     </li>
                 </ol>
             </div>
