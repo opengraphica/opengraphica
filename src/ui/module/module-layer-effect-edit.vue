@@ -733,7 +733,8 @@ const updatePreview = throttle(function () {
 
 async function onCreateSelectionMask() {
     const selectionMask = activeSelectionMask.value || appliedSelectionMask.value;
-    const selectionMaskCanvasOffset = activeSelectionMaskCanvasOffset.value || appliedSelectionMaskCanvasOffset.value;
+    const selectionMaskCanvasOffset = selectionMask === activeSelectionMask.value
+        ? activeSelectionMaskCanvasOffset.value : appliedSelectionMaskCanvasOffset.value;
     const activeLayer = layer.value;
     if (afterEffectCanvas.value && selectionMask && activeLayer) {
         cleanupThreejs();

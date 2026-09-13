@@ -63,6 +63,9 @@ interface AppEmitterEvents {
     };
     'app.workingFile.notifyImageLoadedFromClipboard': undefined;
     'app.workingFile.notifyImageLoadedFromDragAndDrop': undefined;
+    'editor.history.beforeStep': {
+        trigger: 'do' | 'undo' | 'redo';
+    },
     'editor.history.startBlocking': {
         trigger: 'do' | 'undo' | 'redo';
         actions: Array<{

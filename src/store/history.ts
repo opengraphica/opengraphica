@@ -182,6 +182,14 @@ async function dispatchRunAction({ action, mergeWithHistory, replaceHistory, res
     }
 
     try {
+        appEmitter.emit('editor.history.beforeStep', {
+            trigger: 'do',
+        });
+    } catch (error) {
+        console.warn('[src/store/history.ts] Error running beforeStep ', error);
+    }
+
+    try {
         // Wait for reserved actions to complete
         let actionReserveQueue = store.get('actionReserveQueue');
         while (actionReserveQueue.length > 0) {
@@ -325,6 +333,15 @@ async function dispatchRunAction({ action, mergeWithHistory, replaceHistory, res
 
 async function dispatchUndo(set: PerformantStore<HistoryStore>['directSet']) {
     if (store.get('canUndo')) {
+
+        try {
+            appEmitter.emit('editor.history.beforeStep', {
+                trigger: 'undo',
+            });
+        } catch (error) {
+            console.warn('[src/store/history.ts] Error running beforeStep ', error);
+        }
+
         const actionStack = store.get('actionStack');
         let actionStackIndex = store.get('actionStackIndex');
 
@@ -367,6 +384,15 @@ async function dispatchUndo(set: PerformantStore<HistoryStore>['directSet']) {
 
 async function dispatchRedo(set: PerformantStore<HistoryStore>['directSet']) {
     if (store.get('canRedo')) {
+
+        try {
+            appEmitter.emit('editor.history.beforeStep', {
+                trigger: 'redo',
+            });
+        } catch (error) {
+            console.warn('[src/store/history.ts] Error running beforeStep ', error);
+        }
+
         const actionStack = store.get('actionStack');
         let actionStackIndex = store.get('actionStackIndex');
 

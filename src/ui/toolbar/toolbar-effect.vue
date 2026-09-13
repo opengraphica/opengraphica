@@ -354,17 +354,25 @@ const floatingDocksVisible = ref<boolean>(true);
 
 onMounted(() => {
     appEmitter.on('editor.tool.toolbarSwapping', onToolbarSwap);
+    appEmitter.on('editor.history.beforeStep', onHistoryBeforeStep);
     appEmitter.on('editor.history.step', onHistoryStep);
 });
 
 onUnmounted(() => {
     appEmitter.off('editor.tool.toolbarSwapping', onToolbarSwap);
+    appEmitter.off('editor.history.beforeStep', onHistoryBeforeStep);
     appEmitter.off('editor.history.step', onHistoryStep);
     effectSettingsDockVisible.value = false;
 });
 
 function onToolbarSwap() {
     floatingDocksVisible.value = false;
+}
+
+function onHistoryBeforeStep(event?: AppEmitterEvents['editor.history.beforeStep']) {
+    if (event?.trigger === 'undo' || event?.trigger === 'redo') {
+        onCancel();
+    }
 }
 
 function onHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
@@ -509,7 +517,8 @@ const isMaskApplied = computed<boolean>(() => {
 
 async function onCreateSelectionMask() {
     const selectionMask = activeSelectionMask.value || appliedSelectionMask.value;
-    const selectionMaskCanvasOffset = activeSelectionMaskCanvasOffset.value || appliedSelectionMaskCanvasOffset.value;
+    const selectionMaskCanvasOffset = selectionMask === activeSelectionMask.value
+        ? activeSelectionMaskCanvasOffset.value : appliedSelectionMaskCanvasOffset.value;
     const activeLayer = editingLayer.value;
     if (selectionMask && activeLayer && editingFilter.value) {
         const masks = workingFileStore.get('masks');
