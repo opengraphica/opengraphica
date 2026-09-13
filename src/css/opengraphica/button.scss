@@ -105,6 +105,7 @@
     .og-button__label {
         display: inline-flex;
         position: relative;
+        white-space: nowrap;
     }
 
     .og-button--outline {

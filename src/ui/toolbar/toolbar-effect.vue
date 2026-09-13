@@ -107,13 +107,20 @@
         <floating-dock v-if="effectSettingsDockVisible" v-model:top="effectSettingsDockTop" v-model:left="effectSettingsDockLeft" :visible="floatingDocksVisible">
             <div class="w-1 h-8">
                 <div class="absolute right-4 gap-2 flex flex-row items-center justify-end w-full">
-                    <og-button small v-if="isSelectionMaskAvailable" @click="onCreateSelectionMask">
-                        <span class="bi bi-mask mr-1" aria-hidden="true" />
-                        {{ t('module.layerEffectEdit.useActiveSelectionMask') }}
+                    <span v-if="isMobileView && (isSelectionMaskAvailable || isMaskApplied)" class="text-sm">
+                        Mask:
+                    </span>
+                    <og-button v-if="isSelectionMaskAvailable" @click="onCreateSelectionMask" small :icon="isMobileView">
+                        <span class="bi bi-mask" :class="{ 'mr-1': !isMobileView }" aria-hidden="true" />
+                        <span :class="{ 'sr-only': isMobileView }">
+                            {{ t('module.layerEffectEdit.useActiveSelectionMask') }}
+                        </span>
                     </og-button>
-                    <og-button small v-if="isMaskApplied" @click="onClearMask">
-                        <span class="bi bi-x-circle mr-1" aria-hidden="true" />
-                        {{ t('module.layerEffectEdit.clearSelectionMask') }}
+                    <og-button v-if="isMaskApplied" @click="onClearMask" small :icon="isMobileView">
+                        <span class="bi bi-x-circle" :class="{ 'mr-1': !isMobileView }" aria-hidden="true" />
+                        <span :class="{ 'sr-only': isMobileView }">
+                            {{ t('module.layerEffectEdit.clearSelectionMask') }}
+                        </span>
                     </og-button>
                     <og-button solid outline small @click="onCancel">
                         {{ t('button.cancel') }}
@@ -124,7 +131,7 @@
                 </div>
             </div>
             <el-divider class="my-2!" />
-            <div class="flex flex-row items-center justify-between">
+            <div class="flex flex-row items-center justify-between flex-wrap">
                 <h2 class="text-md my-0 mr-4">{{ t(currentFilterTitle) }}</h2>
                 <div class="flex flex-row items-center shrink-1">
                     <el-switch
@@ -270,7 +277,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, toRefs, watch } from 'vue';
 import { Rules } from 'async-validator';
 
 import ElAlert from 'element-plus/lib/components/alert/index';
@@ -299,6 +306,7 @@ import { UpdateLayerFilterDisabledAction } from '@/actions/update-layer-filter-d
 import { UpdateLayerFilterMaskAction } from '@/actions/update-layer-filter-mask';
 import { UpdateLayerFilterParamsAction } from '@/actions/update-layer-filter-params';
 
+import canvasStore from '@/store/canvas';
 import historyStore from '@/store/history';
 import { createStoredImage, deleteStoredImage, getStoredImageOrCanvas } from '@/store/image';
 import workingFileStore, { getLayerById, getLayerGlobalTransform, getSelectedLayers } from '@/store/working-file';
@@ -331,6 +339,8 @@ import type {
 } from '@/types';
 import { t } from '@/i18n';
 
+const devicePixelRatio = window.devicePixelRatio || 1;
+
 const $notify = notifyInjector('$notify');
 let renderer: RendererFrontend;
 
@@ -344,6 +354,26 @@ onMounted(() => {
     useRenderer().then((frontend) => {
         renderer = frontend;
     });
+});
+
+/*-------------*\
+| Mobile Screen |
+\*-------------*/
+
+const isMobileView = ref<boolean>(false);
+const { viewWidth: viewportWidth } = toRefs(canvasStore.state);
+
+function toggleMobileView() {
+    isMobileView.value = (viewportWidth.value / devicePixelRatio) < 600;
+    console.log(viewportWidth.value);
+}
+
+watch([viewportWidth], () => {
+    toggleMobileView();
+});
+
+onMounted(() => {
+    toggleMobileView();
 });
 
 /*------------*\

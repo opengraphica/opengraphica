@@ -8503,6 +8503,7 @@ body.og-full-page .opengraphica {
 .opengraphica .og-button__label {
   display: inline-flex;
   position: relative;
+  white-space: nowrap;
 }
 .opengraphica .og-button--outline {
   border-color: var(--og-button-border-color);
