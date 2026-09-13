@@ -126,6 +126,7 @@
                         v-if="layer.layers && layer.expanded && layer.layers.length > 0"
                         :layers="layer.layers" :depth="depth + 1"
                         @dragging-layer="onChildDraggingLayer"
+                        @close="emit('close')"
                     />
                 </template>
             </li>
@@ -242,6 +243,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits([
+    'close',
     'scroll-by',
     'dragging-layer'
 ]);
@@ -597,6 +599,7 @@ async function onEditLayerFilter(layer: WorkingFileAnyLayer<ColorModel>, filterI
             effectEmitter.emit('editFilter', { layerId: layer.id, filterIndex });
         }, { once: true });
     }
+    emit('close');
 }
 
 function onMoveLayerFilterUp(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {

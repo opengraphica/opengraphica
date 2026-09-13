@@ -85,6 +85,10 @@ onMounted(() => {
     editorStore.set('floatingDockRects', rects);
     nextTick(placeAtBottomCenter);
     nextTick(limitDragBounds);
+    setTimeout(() => {
+        calculateBoundingBox();
+        limitDragBounds();
+    }, 0);
 });
 
 onUnmounted(() => {

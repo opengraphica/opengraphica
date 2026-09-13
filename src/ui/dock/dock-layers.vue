@@ -21,6 +21,7 @@
                     :scroll-container-height="scrollContainerHeight"
                     :scroll-top="scrollTop"
                     @scroll-by="onScrollByAmount($event)"
+                    @close="emit('close')"
                 />
             </template>
             <template v-else>
