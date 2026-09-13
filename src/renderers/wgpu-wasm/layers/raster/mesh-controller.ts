@@ -20,8 +20,8 @@ export class RasterLayerMeshController implements WgpuWasmRendererMeshController
     
     id: number = -1;
     blendingMode: WorkingFileLayerBlendingMode = 'normal';
-    filters: Webgl2RendererCanvasFilter[] = [];
-    filtersOverride: Webgl2RendererCanvasFilter[] | undefined = undefined;
+    filters: Array<Webgl2RendererCanvasFilter | null> = [];
+    filtersOverride: Array<Webgl2RendererCanvasFilter | null> | undefined = undefined;
     sourceUuid: string | undefined;
     tileUpdateId: string | undefined;
     visible: boolean = true;
@@ -166,7 +166,7 @@ export class RasterLayerMeshController implements WgpuWasmRendererMeshController
         backend.reorderMeshController(this.id, order);
     }
 
-    async overrideFilters(filters?: Webgl2RendererCanvasFilter[]) {
+    async overrideFilters(filters?: Array<Webgl2RendererCanvasFilter | null>) {
         this.filtersOverride = filters;
         await this.scheduleMaterialUpdate('destroyAndCreate');
     }

@@ -43,7 +43,7 @@ export interface GradientMaterialUpdateParams {
     gradientData: WorkingFileGradientLayer<RGBAColor>['data'];
     canvasWidth?: number;
     canvasHeight?: number;
-    canvasFilters?: Webgl2RendererCanvasFilter[];
+    canvasFilters?: Array<Webgl2RendererCanvasFilter | null>;
     transform: Matrix4;
 }
 

@@ -13,7 +13,7 @@ import { createLayerShader } from '../base/material';
 import type { Webgl2RendererCanvasFilter } from '@/types';
 
 export interface TextMaterialUpdateParams {
-    canvasFilters?: Webgl2RendererCanvasFilter[];
+    canvasFilters?: Array<Webgl2RendererCanvasFilter | null>;
     fill?: string;
     opacity?: number;
     width?: number;

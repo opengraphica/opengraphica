@@ -19,7 +19,7 @@ export interface RasterMaterialUpdateParams {
     srcTexture?: Texture<any>;
     draftTexture?: Texture<any>;
     colorSpaceConversion?: ColorSpaceConversion;
-    canvasFilters?: Webgl2RendererCanvasFilter[];
+    canvasFilters?: Array<Webgl2RendererCanvasFilter | null>;
     opacity?: number;
 }
 

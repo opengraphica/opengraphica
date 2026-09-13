@@ -94,6 +94,8 @@ export interface CanvasFilter<T extends Object = Record<string, unknown>> {
     params: T;
     overrideParams?: T;
     maskId?: number;
+    disabled?: boolean;
+    overrideDisabled?: boolean;
     getEditConfig(): CanvasFilterEditConfig;
 }
 

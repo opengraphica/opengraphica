@@ -38,15 +38,16 @@ export async function createCanvasFilter(name: string): Promise<Webgl2RendererCa
 
 export async function createCanvasFiltersFromLayerConfig(
     filterConfigs: WorkingFileLayerFilter[],
-): Promise<Webgl2RendererCanvasFilter[]> {
-    const canvasFilters: Webgl2RendererCanvasFilter[] = [];
+): Promise<Array<Webgl2RendererCanvasFilter | null>> {
+    const canvasFilters: Array<Webgl2RendererCanvasFilter | null> = [];
     for (const filterConfig of filterConfigs) {
-        if (!filterConfig.disabled) {
-            const canvasFilter = await createCanvasFilter(filterConfig.name);
-            canvasFilter.maskId = filterConfig.maskId;
-            canvasFilter.params = filterConfig.params ?? {};
-            canvasFilters.push(canvasFilter);
+        const canvasFilter = await createCanvasFilter(filterConfig.name);
+        canvasFilter.maskId = filterConfig.maskId;
+        canvasFilter.params = filterConfig.params ?? {};
+        if (filterConfig.disabled) {
+            canvasFilter.disabled = true;
         }
+        canvasFilters.push(canvasFilter);
     }
     return canvasFilters;
 }
@@ -110,7 +111,7 @@ export interface CreateLayerShaderUniformsAndDefinesResult {
 export function createLayerShaderUniformsAndDefines(
     width: number,
     height: number,
-    canvasFilters: Webgl2RendererCanvasFilter[],
+    canvasFilters: Array<Webgl2RendererCanvasFilter | null>,
 ): CreateLayerShaderUniformsAndDefinesResult {
     const defines: Record<string, unknown> = {
         cLayerWidth: width,
@@ -121,6 +122,7 @@ export function createLayerShaderUniformsAndDefines(
     };
     let textures: Texture[] = [];
     for (const [index, canvasFilter] of canvasFilters.entries()) {
+        if (canvasFilter == null || (canvasFilter.overrideDisabled ?? canvasFilter.disabled) === true) continue;
         const editConfig = canvasFilter.getEditConfig();
         const computedParamNames: string[] = [];
         const paramsList = canvasFilter.overrideParams ?? canvasFilter.params;
@@ -184,7 +186,7 @@ export interface CreateLayerShaderOptions {
     fragmentShaderSetup: string;
     vertexShaderMain: string;
     vertexShaderSetup: string;
-    canvasFilters: Webgl2RendererCanvasFilter[],
+    canvasFilters: Array<Webgl2RendererCanvasFilter | null>,
     width: number;
     height: number;
 }
@@ -223,6 +225,7 @@ export async function createLayerShader(
 
     let hasMaskTextures = false;
     for (const [index, canvasFilter] of canvasFilters.entries()) {
+        if (canvasFilter == null || (canvasFilter.overrideDisabled ?? canvasFilter.disabled) === true) continue;
         const editConfig = canvasFilter.getEditConfig();
         let filterVertexShader = '';
         let filterFragmentShader = canvasFilter.fragmentShader;

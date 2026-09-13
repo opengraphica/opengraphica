@@ -115,14 +115,14 @@ export interface Webgl2RendererMeshController {
     getTransform(): Matrix4;
     setDraftTexture(texture?: Texture<any>);
     swapScene(scene: Scene): void;
-    overrideFilters(filters?: Webgl2RendererCanvasFilter[]): Promise<void>;
+    overrideFilters(filters?: Array<Webgl2RendererCanvasFilter | null>): Promise<void>;
     overrideFilterParams(filterIndex: number, params?: Record<string, any> | null);
     overrideVisibility(visible?: boolean): void;
 }
 
 export interface WgpuWasmRendererMeshController {
     blendingMode: WorkingFileLayerBlendingMode;
-    overrideFilters(filters?: Webgl2RendererCanvasFilter[]): Promise<void>;
+    overrideFilters(filters?: Array<Webgl2RendererCanvasFilter | null>): Promise<void>;
     overrideVisibility(visible?: boolean): void;
 }
 

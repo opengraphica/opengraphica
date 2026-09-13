@@ -13,8 +13,8 @@ interface CreateFiltersOptions {
     createDisabled?: boolean;
 }
 
-export async function createFiltersFromLayerConfig(filterConfigs: WorkingFileLayerFilter[], options: CreateFiltersOptions = {}): Promise<Webgl2RendererCanvasFilter[]> {
-    const canvasFilters: Webgl2RendererCanvasFilter[] = [];
+export async function createFiltersFromLayerConfig(filterConfigs: WorkingFileLayerFilter[], options: CreateFiltersOptions = {}): Promise<Array<Webgl2RendererCanvasFilter | null>> {
+    const canvasFilters: Array<Webgl2RendererCanvasFilter | null> = [];
     for (const filterConfig of filterConfigs) {
         if (!filterConfig.disabled || options.createDisabled) {
             const canvasFilter = new (await getCanvasFilterClass(filterConfig.name))();

@@ -444,7 +444,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         imageWidth = Math.floor(imageWidth);
         imageHeight = Math.floor(imageHeight);
 
-        let filtersOverride: Webgl2RendererCanvasFilter[] | undefined;
+        let filtersOverride: Array<Webgl2RendererCanvasFilter | null> | undefined;
         if (options?.filters) {
             filtersOverride = await createCanvasFiltersFromLayerConfig(options.filters);
         }

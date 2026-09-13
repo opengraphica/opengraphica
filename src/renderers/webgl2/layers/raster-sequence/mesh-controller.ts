@@ -39,8 +39,8 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
     blendingMode: WorkingFileLayerBlendingMode = 'normal';
     opacity: number = 1;
     data: WorkingFileRasterSequenceLayer['data'] | undefined = undefined;
-    filters: Webgl2RendererCanvasFilter[] = [];
-    filtersOverride: Webgl2RendererCanvasFilter[] | undefined = undefined;
+    filters: Array<Webgl2RendererCanvasFilter | null> = [];
+    filtersOverride: Array<Webgl2RendererCanvasFilter | null> | undefined = undefined;
     sourceUuid: string | undefined;
     tileUpdateId: string | undefined;
     visible: boolean = true;
@@ -257,16 +257,16 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
         this.scene = scene;
     }
 
-    async overrideFilters(filters?: Webgl2RendererCanvasFilter[]) {
+    async overrideFilters(filters?: Array<Webgl2RendererCanvasFilter | null>) {
         this.filtersOverride = filters;
         await this.scheduleMaterialUpdate('destroyAndCreate');
     }
 
     overrideFilterParams(filterIndex: number, params?: Record<string, any> | null) {
         if (params === null) {
-            this.filtersOverride = this.filters?.filter((_, otherIndex) => {
-                return filterIndex !== otherIndex;
-            })
+            this.filtersOverride = this.filters?.map((filter, otherIndex) => {
+                return filterIndex === otherIndex ? null : filter;
+            });
             this.scheduleMaterialUpdate('destroyAndCreate');
             return;
         } else if (this.filtersOverride) {
@@ -274,7 +274,20 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
             this.scheduleMaterialUpdate('destroyAndCreate');
         }
 
-        this.filters[filterIndex].overrideParams = params;
+        let needsDestroyAndCreate = false;
+
+        if (this.filters[filterIndex]) {
+            if (params != null) {
+                this.filters[filterIndex].overrideParams = params;
+                this.filters[filterIndex].overrideDisabled = false;
+            } else if (params === undefined) {
+                if (this.filters[filterIndex].overrideDisabled != null) {
+                    needsDestroyAndCreate = true;
+                }
+                delete this.filters[filterIndex].overrideParams;
+                delete this.filters[filterIndex].overrideDisabled;
+            }
+        }
 
         if (!this.material) return;
 
@@ -287,7 +300,6 @@ export class RasterSequenceLayerMeshController implements Webgl2RendererMeshCont
         );
         this.overrideFilterParamTextures = textures;
 
-        let needsDestroyAndCreate = false;
         for (const defineName in defines) {
             if (this.material.defines[defineName] !== defines[defineName]) {
                 this.material.defines[defineName] = defines[defineName];
