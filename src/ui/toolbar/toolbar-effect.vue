@@ -365,7 +365,6 @@ const { viewWidth: viewportWidth } = toRefs(canvasStore.state);
 
 function toggleMobileView() {
     isMobileView.value = (viewportWidth.value / devicePixelRatio) < 600;
-    console.log(viewportWidth.value);
 }
 
 watch([viewportWidth], () => {
