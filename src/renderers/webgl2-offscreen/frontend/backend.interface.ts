@@ -207,6 +207,16 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
         await this.messageReceived(BackendWorkerMessage.SET_LAYER_ORDER_RESULT);
     }
 
+    async overrideLayerFilterParams(layerId: number, filterIndex: number, params?: Record<string, any> | null) {
+        this.backendWorker.postMessage({
+            type: BackendWorkerMessage.OVERRIDE_LAYER_FILTER_PARAMS,
+            layerId,
+            filterIndex,
+            params,
+        });
+        await this.messageReceived(BackendWorkerMessage.OVERRIDE_LAYER_FILTER_PARAMS_RESULT);
+    }
+
     async queueCreateLayerPasses() {
         this.backendWorker.postMessage({
             type: BackendWorkerMessage.QUEUE_CREATE_LAYER_PASSES,

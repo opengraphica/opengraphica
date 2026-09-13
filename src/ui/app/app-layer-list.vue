@@ -203,6 +203,7 @@ import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import workingFileStore, { getLayerById, isGroupLayer } from '@/store/working-file';
 import { editingLayerIds as layerOpacityEditingLayerIds } from '@/canvas/store/layer-opacity-state';
+import { effectEmitter, isToolbarVisible as isEffectToolbarVisible } from '@/canvas/store/effect-state';
 
 import { runModule } from '@/modules';
 
@@ -307,12 +308,6 @@ if (!props.isRoot) {
         emit('dragging-layer', draggingProps);
     });
 }
-
-onMounted(() => {
-});
-
-onUnmounted(() => {
-});
 
 function getIconClass(layer: WorkingFileAnyLayer) {
     switch (layer.type) {
@@ -593,11 +588,15 @@ function onStopRasterSequence() {
     canvasStore.set('playingAnimation', false);
 }
 
-function onEditLayerFilter(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
-    runModule('layer', 'layerEffectEdit', {
-        layerId: layer.id,
-        filterIndex
-    });
+async function onEditLayerFilter(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
+    await editorStore.dispatch('setActiveTool', { group: 'effect', tool: 'effect' });
+    if (isEffectToolbarVisible.value) {
+        effectEmitter.emit('editFilter', { layerId: layer.id, filterIndex });
+    } else {
+        watch(() => isEffectToolbarVisible.value, () => {
+            effectEmitter.emit('editFilter', { layerId: layer.id, filterIndex });
+        }, { once: true });
+    }
 }
 
 function onMoveLayerFilterUp(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {

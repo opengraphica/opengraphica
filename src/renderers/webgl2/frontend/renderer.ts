@@ -370,6 +370,10 @@ export class Webgl2RendererFrontend implements RendererFrontend {
         return color;
     }
 
+    async overrideLayerFilterParams(layerId: number, filterIndex: number, params?: Record<string, any> | null) {
+        await this.rendererBackend.overrideLayerFilterParams(layerId, filterIndex, params ? deepToRaw(params) : params);
+    }
+
     async startBrushStroke(
         settings: RendererBrushStrokeSettings,
     ) {

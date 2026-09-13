@@ -11319,6 +11319,7 @@ body.og-full-page .opengraphica {
   text-overflow: ellipsis;
   vertical-align: top;
   white-space: nowrap;
+  margin-bottom: 0.25rem;
 }
 .opengraphica .og-brush-selector {
   display: flex;
@@ -28285,7 +28286,7 @@ body.og-full-page .opengraphica {
   --el-color-info-light-8: #2d3340;
   --el-color-info-light-9: #2d3340;
   --el-color-success: #2ad43d;
-  --el-color-warning: #eba62c;
+  --el-color-warning: #ba811e;
   --el-color-danger: #ff5562;
   --el-color-info: #8f9198;
   --el-color-success-light: mix(--el-color-white, --el-color-success, 80%);

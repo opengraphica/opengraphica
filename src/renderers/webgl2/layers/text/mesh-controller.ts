@@ -13,7 +13,7 @@ import { getUnloadedFontFamilies, loadFontFamilies, calculateTextPlacement } fro
 
 import { getWebgl2RendererBackend, markRenderDirty } from '@/renderers/webgl2/backend';
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
-import { createCanvasFiltersFromLayerConfig } from '../base/material';
+import { createCanvasFiltersFromLayerConfig, createLayerShaderUniformsAndDefines } from '../base/material';
 import { assignMaterialBlendingMode } from '../base/blending-mode';
 import { createTextMaterial, updateTextMaterial, disposeTextMaterial } from './material';
 import { LetterMeshCache } from './letter-mesh-cache';
@@ -47,6 +47,7 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
     materialUpdates: Array<'destroyAndCreate' | 'update'> = [];
     regenerateThumbnailTimeoutHandle: number | undefined;
     waitingToLoadFontFamilies: string[] = [];
+    overrideFilterParamTextures: Texture<any>[] = [];
     
     letterMeshes: InstanceType<typeof Mesh>[] = [];
 
@@ -79,6 +80,8 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
             this.materialUpdates.unshift(type);
         }
         if (this.materialUpdates.length === 1) {
+            this.disposeOverrideFilterParamTextures();
+
             while (this.materialUpdates.length > 0) {
                 const updateType = this.materialUpdates[this.materialUpdates.length - 1];
                 if (!updateType) break;
@@ -263,6 +266,57 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
     async overrideFilters(filters?: Webgl2RendererCanvasFilter[]) {
         this.filtersOverride = filters;
         await this.scheduleMaterialUpdate('destroyAndCreate');
+    }
+
+    overrideFilterParams(filterIndex: number, params?: Record<string, any> | null) {
+        if (params === null) {
+            this.filtersOverride = this.filters?.filter((_, otherIndex) => {
+                return filterIndex !== otherIndex;
+            })
+            this.scheduleMaterialUpdate('destroyAndCreate');
+            return;
+        } else if (this.filtersOverride) {
+            this.filtersOverride = undefined;
+            this.scheduleMaterialUpdate('destroyAndCreate');
+        }
+
+        this.filters[filterIndex].overrideParams = params;
+
+        if (!this.material) return;
+
+        this.disposeOverrideFilterParamTextures();
+
+        const { defines, uniforms, textures } = createLayerShaderUniformsAndDefines(
+            this.sourceTexture?.width ?? 1,
+            this.sourceTexture?.height ?? 1,
+            this.filters,
+        );
+        this.overrideFilterParamTextures = textures;
+
+        let needsDestroyAndCreate = false;
+        for (const defineName in defines) {
+            if (this.material.defines[defineName] !== defines[defineName]) {
+                this.material.defines[defineName] = defines[defineName];
+                needsDestroyAndCreate = true;
+            }
+        }
+        for (const uniformName in uniforms) {
+            this.material.uniforms[uniformName] = uniforms[uniformName];
+        }
+        this.material.uniformsNeedUpdate = true;
+
+        if (needsDestroyAndCreate) {
+            this.scheduleMaterialUpdate('destroyAndCreate');
+        }
+
+        markRenderDirty();
+    }
+
+    disposeOverrideFilterParamTextures() {
+        for (const texture of this.overrideFilterParamTextures) {
+            texture.dispose();
+        }
+        this.overrideFilterParamTextures = [];
     }
 
     overrideVisibility(visible?: boolean) {

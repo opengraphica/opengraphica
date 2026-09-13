@@ -179,6 +179,14 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
 export async function openFromTemporaryStorage() {
     appEmitter.emit('app.workingFile.detachAllLayers');
     const workingFile = await readWorkingFile();
+    const maxMaskId = Object.keys(workingFile.masks).reduce((accumulator, value) => {
+        let maskId = parseInt(value);
+        if (maskId > accumulator) {
+            return maskId;
+        } else {
+            return accumulator;
+        }
+    }, -1) + 1;
     workingFileStore.set('background', workingFile.background);
     workingFileStore.set('colorModel', workingFile.colorModel);
     workingFileStore.set('colorSpace', workingFile.colorSpace);
@@ -187,7 +195,7 @@ export async function openFromTemporaryStorage() {
     workingFileStore.set('height', workingFile.height);
     workingFileStore.set('layerIdCounter', workingFile.layerIdCounter);
     workingFileStore.set('masks', workingFile.masks);
-    workingFileStore.set('maskIdCounter', workingFile.maskIdCounter);
+    workingFileStore.set('maskIdCounter', maxMaskId);
     workingFileStore.set('measuringUnits', workingFile.measuringUnits);
     workingFileStore.set('resolutionUnits', workingFile.resolutionUnits);
     workingFileStore.set('resolutionX', workingFile.resolutionX);

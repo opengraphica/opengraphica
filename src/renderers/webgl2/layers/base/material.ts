@@ -123,10 +123,16 @@ export function createLayerShaderUniformsAndDefines(
     for (const [index, canvasFilter] of canvasFilters.entries()) {
         const editConfig = canvasFilter.getEditConfig();
         const computedParamNames: string[] = [];
+        const paramsList = canvasFilter.overrideParams ?? canvasFilter.params;
         const paramValues: Record<string, unknown> = {};
         for (const editParamName in editConfig) {
-            let paramValue = canvasFilter.params[editParamName] ?? editConfig[editParamName].default;
-            paramValue = getLayerFilterParamUniformValue(editParamName, paramValue, editConfig, canvasFilter.params);
+            let paramValue = paramsList?.[editParamName] ?? editConfig[editParamName].default;
+            paramValue = getLayerFilterParamUniformValue(
+                editParamName,
+                paramValue,
+                editConfig,
+                paramsList,
+            );
             paramValues[editParamName] = paramValue;
             if (editConfig[editParamName].computedValue) {
                 computedParamNames.push(editParamName);
@@ -147,7 +153,7 @@ export function createLayerShaderUniformsAndDefines(
         }
         for (const editParamName of computedParamNames) {
             let paramValue = editConfig[editParamName].computedValue?.(paramValues, { layerWidth: width ?? 0, layerHeight: height ?? 0 });
-            paramValue = getLayerFilterParamUniformValue(editParamName, paramValue, editConfig, canvasFilter.params);
+            paramValue = getLayerFilterParamUniformValue(editParamName, paramValue, editConfig, paramsList);
             if (editConfig[editParamName].constant) {
                 const replaceDefineName = 'constant' + index + '_' + editParamName;
                 defines[replaceDefineName] = paramValue;

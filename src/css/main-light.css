@@ -11319,6 +11319,7 @@ body.og-full-page .opengraphica {
   text-overflow: ellipsis;
   vertical-align: top;
   white-space: nowrap;
+  margin-bottom: 0.25rem;
 }
 .opengraphica .og-brush-selector {
   display: flex;

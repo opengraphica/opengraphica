@@ -92,6 +92,7 @@ export interface RendererFrontend {
     applySelectionMaskToAlphaChannel(layerId: number, options?: RendererFrontendApplySelectionMaskToAlphaChannelOptions): Promise<RendererTextureTile[]>;
     takeSnapshot(imageWidth: number, imageHeight: number, options?: RendererFrontendTakeSnapshotOptions): Promise<ImageBitmap>;
     pickColor(canvasX: number, canvasY: number): Promise<RGBAColor>;
+    overrideLayerFilterParams(layerId: number, filterIndex: number, params?: Record<string, any> | null): Promise<void>;
     startBrushStroke(settings: RendererBrushStrokeSettings): Promise<void>;
     moveBrushStroke(layerId: number, x: number, y: number, size: number, angle: number, density: number, colorBlendingStrength: number, concentration: number): Promise<void>;
     stopBrushStroke(layerId: number): Promise<RendererTextureTile[]>;
@@ -115,6 +116,7 @@ export interface Webgl2RendererMeshController {
     setDraftTexture(texture?: Texture<any>);
     swapScene(scene: Scene): void;
     overrideFilters(filters?: Webgl2RendererCanvasFilter[]): Promise<void>;
+    overrideFilterParams(filterIndex: number, params?: Record<string, any> | null);
     overrideVisibility(visible?: boolean): void;
 }
 

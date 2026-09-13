@@ -245,6 +245,10 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
         return {} as RGBAColor;
     }
 
+    async overrideLayerFilterParams(layerId: number, filterIndex: number, params?: Record<string, any> | null) {
+        
+    }
+
     async startBrushStroke(settings: RendererBrushStrokeSettings) {
 
     }

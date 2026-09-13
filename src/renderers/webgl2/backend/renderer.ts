@@ -64,6 +64,7 @@ export interface Webgl2RendererBackendPublic {
     setSelectionMask(image?: ImageBitmap, offset?: { x: number, y: number }): Promise<void>;
     setViewTransform(transform: Float64Array): Promise<void>;
     setLayerOrder(layerOrder: WorkingFileLayer[]): Promise<void>;
+    overrideLayerFilterParams(layerId: number, filterIndex: number, params?: Record<string, any> | null): Promise<void>;
     queueCreateLayerPasses(): Promise<void>;
     applySelectionMaskToAlphaChannel(layerId: number, options?: Webgl2RendererApplySelectionMaskToAlphaChannelOptions): Promise<RendererTextureTile[]>;
     takeSnapshot(imageWidth: number, imageHeight: number, options?: Webgl2RendererBackendTakeSnapshotOptions): Promise<ImageBitmap>;
@@ -295,6 +296,12 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
     async setLayerOrder(layerOrder: WorkingFileLayer[]) {
         this.layerOrder = layerOrder;
         this.createLayerPasses();
+    }
+
+    async overrideLayerFilterParams(layerId: number, filterIndex: number, params?: Record<string, any> | null){
+        const meshController = this.meshControllersById.get(layerId);
+        if (!meshController) return;
+        meshController.overrideFilterParams(filterIndex, params);
     }
 
     async queueCreateLayerPasses() {

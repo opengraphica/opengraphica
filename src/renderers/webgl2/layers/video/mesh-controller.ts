@@ -11,7 +11,7 @@ import { Texture } from 'three/src/textures/Texture';
 
 import { getWebgl2RendererBackend, markRenderDirty, requestFrontendVideoFrame } from '@/renderers/webgl2/backend';
 import { messageBus, type MessageBusEvents } from '@/renderers/webgl2/backend/message-bus';
-import { createCanvasFiltersFromLayerConfig } from '../base/material';
+import { createCanvasFiltersFromLayerConfig, createLayerShaderUniformsAndDefines } from '../base/material';
 import { assignMaterialBlendingMode } from '../base/blending-mode';
 import { createRasterMaterial, disposeRasterMaterial, updateRasterMaterial } from '../raster/material';
 
@@ -45,6 +45,7 @@ export class VideoLayerMeshController implements Webgl2RendererMeshController {
 
     materialUpdates: Array<'destroyAndCreate' | 'update'> = [];
     regenerateThumbnailTimeoutHandle: number | undefined;
+    overrideFilterParamTextures: Texture<any>[] = [];
 
     attach(id: number) {
         this.id = id;
@@ -77,6 +78,8 @@ export class VideoLayerMeshController implements Webgl2RendererMeshController {
             this.materialUpdates.unshift(type);
         }
         if (this.materialUpdates.length === 1) {
+            this.disposeOverrideFilterParamTextures();
+
             while (this.materialUpdates.length > 0) {
                 const updateType = this.materialUpdates[this.materialUpdates.length - 1];
                 if (!updateType) break;
@@ -212,6 +215,57 @@ export class VideoLayerMeshController implements Webgl2RendererMeshController {
     async overrideFilters(filters?: Webgl2RendererCanvasFilter[]) {
         this.filtersOverride = filters;
         await this.scheduleMaterialUpdate('destroyAndCreate');
+    }
+
+    overrideFilterParams(filterIndex: number, params?: Record<string, any> | null) {
+        if (params === null) {
+            this.filtersOverride = this.filters?.filter((_, otherIndex) => {
+                return filterIndex !== otherIndex;
+            })
+            this.scheduleMaterialUpdate('destroyAndCreate');
+            return;
+        } else if (this.filtersOverride) {
+            this.filtersOverride = undefined;
+            this.scheduleMaterialUpdate('destroyAndCreate');
+        }
+
+        this.filters[filterIndex].overrideParams = params;
+
+        if (!this.material) return;
+
+        this.disposeOverrideFilterParamTextures();
+
+        const { defines, uniforms, textures } = createLayerShaderUniformsAndDefines(
+            this.sourceTexture?.width ?? 1,
+            this.sourceTexture?.height ?? 1,
+            this.filters,
+        );
+        this.overrideFilterParamTextures = textures;
+
+        let needsDestroyAndCreate = false;
+        for (const defineName in defines) {
+            if (this.material.defines[defineName] !== defines[defineName]) {
+                this.material.defines[defineName] = defines[defineName];
+                needsDestroyAndCreate = true;
+            }
+        }
+        for (const uniformName in uniforms) {
+            this.material.uniforms[uniformName] = uniforms[uniformName];
+        }
+        this.material.uniformsNeedUpdate = true;
+
+        if (needsDestroyAndCreate) {
+            this.scheduleMaterialUpdate('destroyAndCreate');
+        }
+
+        markRenderDirty();
+    }
+
+    disposeOverrideFilterParamTextures() {
+        for (const texture of this.overrideFilterParamTextures) {
+            texture.dispose();
+        }
+        this.overrideFilterParamTextures = [];
     }
 
     overrideVisibility(visible?: boolean) {

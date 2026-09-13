@@ -92,6 +92,7 @@ export interface CanvasFilterEditConfig {
 export interface CanvasFilter<T extends Object = Record<string, unknown>> {
     name: string;
     params: T;
+    overrideParams?: T;
     maskId?: number;
     getEditConfig(): CanvasFilterEditConfig;
 }

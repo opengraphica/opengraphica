@@ -2,7 +2,8 @@
     "compilerOptions": {
         "target": "esnext",
         "module": "esnext",
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
+        "resolvePackageJsonExports": false,
         "strict": true,
         "noEmit": false,
         "jsx": "preserve",
@@ -12,9 +13,8 @@
         "skipLibCheck": true,
         "lib": ["esnext", "dom", "webworker"],
         "types": ["bezier-js", "color-namer", "file-saver", "lodash", "offscreencanvas", "pica", "three", "uuid"],
-        "baseUrl": "./",
         "paths": {
-            "@/*": ["src/*"]
+            "@/*": ["./src/*"]
         },
         "noImplicitAny": false
     },

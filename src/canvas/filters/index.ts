@@ -1,18 +1,8 @@
 import { camelCaseToKebabCase } from "@/lib/string";
-import { Vector2 } from 'three/src/math/Vector2';
-import { Vector4 } from 'three/src/math/Vector4';
-import { CanvasTexture } from 'three/src/textures/CanvasTexture';
 import { Texture } from 'three/src/textures/Texture';
 
-import { generateGradientImage } from '@/lib/gradient';
-
-import workingFileStore from '@/store/working-file';
-import { getStoredImageOrCanvas } from "@/store/image";
-
-import { SRGBColorSpace, LinearFilter } from 'three/src/constants';
-
 import type { IUniform } from 'three/src/renderers/shaders/UniformsLib';
-import type { Webgl2RendererCanvasFilter, CanvasFilterLayerInfo, CanvasFilterEditConfig, WorkingFileLayerFilter, CanvasFilterEditConfigGradient } from '@/types';
+import type { Webgl2RendererCanvasFilter, WorkingFileLayerFilter } from '@/types';
 
 export async function getCanvasFilterClass(name: string): Promise<new (...args: any) => Webgl2RendererCanvasFilter> {
     const kebabCaseName = camelCaseToKebabCase(name);

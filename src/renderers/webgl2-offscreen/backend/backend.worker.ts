@@ -99,6 +99,13 @@ self.onmessage = ({ data }) => {
                 });
             }).catch(logError);
             break;
+        case BackendWorkerMessage.OVERRIDE_LAYER_FILTER_PARAMS:
+            rendererBackend.overrideLayerFilterParams(data.layerId, data.filterIndex, data.params).then(() => {
+                self.postMessage({
+                    type: BackendWorkerMessage.OVERRIDE_LAYER_FILTER_PARAMS_RESULT,
+                });
+            }).catch(logError);
+            break;
         case BackendWorkerMessage.QUEUE_CREATE_LAYER_PASSES:
             rendererBackend.queueCreateLayerPasses().then(() => {
                 self.postMessage({
