@@ -91,9 +91,14 @@ export interface VectorPathCommandArc {
     y: number;
 }
 
+export interface VectorPathCommandClose {
+    type: VectorPathCommandType.CLOSE,
+}
+
 export type VectorPathCommand = VectorPathCommandMove | VectorPathCommandLine | VectorPathCommandHorizontalLine
-    | VectorPathCommandCubicBezierCurve | VectorPathCommandSmoothCubicBezierCurve | VectorPathCommandQuadraticBezierCurve
-    | VectorPathCommandSmoothQuadraticBezierCurve | VectorPathCommandArc;
+    | VectorPathCommandVerticalLine | VectorPathCommandCubicBezierCurve | VectorPathCommandSmoothCubicBezierCurve
+    | VectorPathCommandQuadraticBezierCurve | VectorPathCommandSmoothQuadraticBezierCurve
+    | VectorPathCommandArc | VectorPathCommandClose;
 
 export interface VectorRectangleShape<T extends ColorModel> {
     type: 'rectangle';

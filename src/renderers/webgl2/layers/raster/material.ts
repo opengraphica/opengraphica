@@ -21,6 +21,7 @@ export interface RasterMaterialUpdateParams {
     colorSpaceConversion?: ColorSpaceConversion;
     canvasFilters?: Array<Webgl2RendererCanvasFilter | null>;
     opacity?: number;
+    premultiplyAlphaFix?: boolean; // Created for SVG rendering
 }
 
 export async function createRasterMaterial(params: RasterMaterialUpdateParams) {
@@ -49,9 +50,11 @@ export async function createRasterMaterial(params: RasterMaterialUpdateParams) {
         userData: {
             disposableTextures: shader.textures,
         },
+        premultipliedAlpha: params.premultiplyAlphaFix,
     });
 
     material.defines.cColorSpaceConversion = params.colorSpaceConversion ?? 0;
+    material.defines.cPremultiplyAlphaFix = params.premultiplyAlphaFix ? 1 : 0;
     material.uniforms.srcTexture = {
         value: params.srcTexture,
     };
@@ -73,6 +76,10 @@ export async function updateRasterMaterial(
     const colorSpaceConversion = params.colorSpaceConversion ?? 0;
     if (colorSpaceConversion !== material.defines.cColorSpaceConversion) {
         material.defines.cColorSpaceConversion = colorSpaceConversion;
+    }
+    const premultiplyAlphaFix = params.premultiplyAlphaFix ? 1 : 0;
+    if (premultiplyAlphaFix !== material.defines.cPremultiplyAlphaFix) {
+        material.defines.cPremultiplyAlphaFix = premultiplyAlphaFix;
     }
     if (material.uniforms.srcTexture.value !== params.srcTexture) {
         if (!params.srcTexture?.userData.isDraft) {

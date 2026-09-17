@@ -284,7 +284,7 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
         this.backendWorker.postMessage({
             type: BackendWorkerMessage.CREATE_BUCKET_FILL,
             settings,
-        })
+        });
 
         return (await this.messageReceived(BackendWorkerMessage.CREATE_BUCKET_FILL_RESULT));
     }
@@ -293,7 +293,7 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
         this.backendWorker.postMessage({
             type: BackendWorkerMessage.PREVIEW_BUCKET_FILL,
             strength,
-        })
+        });
 
         return (await this.messageReceived(BackendWorkerMessage.PREVIEW_BUCKET_FILL_RESULT));
     }
@@ -302,9 +302,20 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
         this.backendWorker.postMessage({
             type: BackendWorkerMessage.APPLY_BUCKET_FILL,
             strength,
-        })
+        });
 
         return (await this.messageReceived(BackendWorkerMessage.APPLY_BUCKET_FILL_RESULT));
+    }
+
+    async updateVectorLayerAttributes(layerId: number, nodeId: string, attributes: Record<string, string>) {
+        this.backendWorker.postMessage({
+            type: BackendWorkerMessage.UPDATE_VECTOR_LAYER_ATTRIBUTES,
+            layerId,
+            nodeId,
+            attributes,
+        });
+
+        return (await this.messageReceived(BackendWorkerMessage.UPDATE_VECTOR_LAYER_ATTRIBUTES_RESULT));
     }
 
     async setDirty() {

@@ -147,7 +147,7 @@ export default class SelectionController extends BaseMovementController {
         const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
         if (pointer && pointer.down.isPrimary && pointer.type !== 'touch' && pointer.down.button === 0) {
             const dragHandleIndex = this.getDragHandleIndexAtPagePoint(e.pageX, e.pageY);
-            if (pointer && dragHandleIndex === -1 && this.canAddPoint()) {
+            if (dragHandleIndex === -1 && this.canAddPoint()) {
                 this.addPoint(pointer);
             }
         }
@@ -608,7 +608,7 @@ export default class SelectionController extends BaseMovementController {
         const transformInverse = transform.inverse();
         const cursor = new DOMPoint(x * devicePixelRatio, y * devicePixelRatio).matrixTransform(transformInverse);
 
-        const dragHandleRadius = isTouch ? this.dragHandleRadiusTouch : this.dragHandleRadius ;
+        const dragHandleRadius = isTouch ? this.dragHandleRadiusTouch : this.dragHandleRadius;
 
         for (const [pathPointIndex, pathPoint] of activeSelectionPath.value.entries()) {
             if (

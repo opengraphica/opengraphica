@@ -26,6 +26,18 @@
         }
     }
 
+    @keyframes og-selection-handle-selected {
+        0% {
+            stroke: rgba(5, 11, 63, 0.9);
+        }
+        50% {
+            stroke: rgba(70, 70, 255, 0.6);
+        }
+        100% {
+            stroke: rgba(5, 11, 63, 0.9);
+        }
+    }
+
     svg {
         position: absolute;
         transform-origin: top left;
@@ -34,9 +46,14 @@
             animation: og-selection-path 1s linear infinite;
         }
 
-        rect, ellipse {
+        rect, ellipse, circle {
             fill: white;
             animation: og-selection-handle 2s linear infinite;
+            
+            &.og-selection-handle--selected {
+                animation: og-selection-handle-selected 2s linear infinite;
+                fill: rgb(53, 190, 224);
+            }
         }
     }
 }

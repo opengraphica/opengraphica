@@ -277,6 +277,10 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
         return [];
     }
 
+    async updateVectorLayerAttributes(layerId: number, nodeId: string, attributes: Record<string, string>) {
+
+    }
+
     async dispose() {
         this.rendererBackend.dispose();
         (this.rendererBackend as unknown) = undefined;

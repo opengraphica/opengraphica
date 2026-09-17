@@ -163,6 +163,7 @@ async function readStoredLayersRecursive(metaLayers: DatabaseMetaLayer[], workin
                 const image = new Image();
                 image.src = serializedVectorLayer.data.sourceSvgSerialized;
                 vectorLayer.data.sourceUuid = await createStoredSvg(image);
+                delete serializedVectorLayer.data.sourceSvgSerialized;
             }
         } else if (layerResult.type === 'video') {
             const videoLayer = layerResult as WorkingFileVideoLayer;

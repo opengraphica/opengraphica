@@ -161,8 +161,6 @@ export class SelectionMask {
         originalViewport: Vector4,
         invert: boolean = false,
     ): Promise<RendererTextureTile[]> {
-        console.time('mask');
-
         const maskTransformInverse = maskTransform.clone().invert();
 
         const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -330,7 +328,6 @@ export class SelectionMask {
         renderer.setViewport(originalViewport);
 
         await new Promise((resolve) => setTimeout(resolve, 0));
-        console.timeEnd('mask');
 
         return tileBitmaps;
     }

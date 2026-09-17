@@ -226,7 +226,9 @@ export interface WorkingFileRasterSequenceLayer<T extends ColorModel = ColorMode
 export interface WorkingFileVectorLayer<T extends ColorModel = ColorModel> extends WorkingFileLayer<T> {
     type: 'vector';
     data: {
-        sourceUuid?: string;
+        sourceDocument?: Document; // SVG XML Document
+        sourceDocumentSerialized?: string; // Temporary XML document serialization for passing to renderer
+        sourceUuid?: string; // SVG Image Reference
     }
 }
 

@@ -1,3 +1,4 @@
+import { markRaw } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 
 // Map of uuid to image store data
@@ -51,6 +52,31 @@ export function getStoredSvgDataUrl(uuid?: string): string | null {
     return storedSvg?.sourceDataUrl ?? null;
 }
 
+/**
+ * Converts a SVG image into an XML document.
+ */
+export async function getStoredSvgDocument(uuid?: string): Promise<Document> {
+    const storedSvg = svgUuidMap.get(uuid);
+    let xmlString = '';
+    if (storedSvg?.sourceDataUrl) {
+        xmlString = atob(storedSvg.sourceDataUrl.split('base64,')[1] ?? '');
+    } else if (storedSvg?.sourceImage) {
+        const result = await fetch(storedSvg.sourceImage.src);
+        xmlString = await result.text();
+    }
+    if (xmlString.length === 0) {
+        xmlString = '<svg xmlns="http://www.w3.org/2000/svg"></svg>';
+    }
+    const parser = new DOMParser();
+    const document = parser.parseFromString(xmlString, 'image/svg+xml');
+    const elements = document.querySelectorAll('a,circle,clipPath,ellipse,g,image,line,linearGradient,marker,mask,path,pattern,polygon,polyline,radialGradient,rect,style,text,use,view');
+    for (const element of Array.from(elements)) {
+        if (!element.getAttribute('data-ogr-id')) {
+            element.setAttribute('data-ogr-id', uuidv4());
+        }
+    }
+    return markRaw(document);
+}
 
 /**
  * Releases the stored svg from memory, and from the database.

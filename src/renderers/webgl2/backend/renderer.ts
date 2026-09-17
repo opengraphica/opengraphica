@@ -75,6 +75,7 @@ export interface Webgl2RendererBackendPublic {
     createBucketFill(settings: RendererBucketFillSettings): Promise<void>;
     previewBucketFill(strength: number): Promise<void>;
     applyBucketFill(strength: number): Promise<RendererTextureTile[]>;
+    updateVectorLayerAttributes(layerId: number, nodeId: string, attributes: Record<string, string>): Promise<void>;
     createMeshController(type: string): Promise<MeshControllerInterface>;
     setDirty(): Promise<void>;
     dispose(): Promise<void>;
@@ -154,12 +155,12 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
 
         this.camera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 10000);
         this.camera.matrixAutoUpdate = false;
-        // Override the brain dead changes made in r183
+        // Override the changes made in r183
         this.camera.updateMatrixWorld = function(force) {
             Object3D.prototype.updateMatrixWorld.call(this, force);
             this.matrixWorldInverse.copy(this.matrixWorld).invert();
         };
-        // Override the brain dead changes made in r183
+        // Override the changes made in r183
         this.camera.updateWorldMatrix = function(updateParents, updateChildren, force = false) {
             Object3D.prototype.updateWorldMatrix.call(this, updateParents, updateChildren, force);
             this.matrixWorldInverse.copy(this.matrixWorld).invert();
@@ -662,6 +663,12 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
 
     async applyBucketFill(strength: number): Promise<RendererTextureTile[]> {
         return await this.compositor.applyBucketFill(strength);
+    }
+
+    async updateVectorLayerAttributes(layerId: number, nodeId: string, attributes: Record<string, string>) {
+        const meshController = this.meshControllersById.get(layerId);
+        if (!meshController) return;
+        await meshController.updateVectorLayerAttributes?.(nodeId, attributes);
     }
 
     async setDirty() {

@@ -202,6 +202,17 @@ self.onmessage = ({ data }) => {
                 }, transferables);
             }).catch(logError);
             break;
+        case BackendWorkerMessage.UPDATE_VECTOR_LAYER_ATTRIBUTES:
+            rendererBackend.updateVectorLayerAttributes(
+                data.layerId,
+                data.nodeId,
+                data.attributes,
+            ).then(() => {
+                self.postMessage({
+                    type: BackendWorkerMessage.UPDATE_VECTOR_LAYER_ATTRIBUTES_RESULT,
+                })
+            }).catch(logError);
+            break;
         case BackendWorkerMessage.SET_DIRTY:
             rendererBackend.setDirty();
             break;

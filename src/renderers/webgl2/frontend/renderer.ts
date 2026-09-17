@@ -229,6 +229,7 @@ export class Webgl2RendererFrontend implements RendererFrontend {
                 resizeHeight: height,
                 resizeQuality: 'high',
                 imageOrientation: 'flipY',
+                premultiplyAlpha: 'premultiply',
             });
         }
         messageBus.emit('frontend.replyFrontendSvg', {
@@ -429,6 +430,10 @@ export class Webgl2RendererFrontend implements RendererFrontend {
 
     async applyBucketFill(strength: number): Promise<RendererTextureTile[]> {
         return this.rendererBackend?.applyBucketFill(strength);
+    }
+
+    async updateVectorLayerAttributes(layerId: number, nodeId: string, attributes: Record<string, string>) {
+        return this.rendererBackend?.updateVectorLayerAttributes(layerId, nodeId, deepToRaw(attributes));
     }
 
     async dispose() {

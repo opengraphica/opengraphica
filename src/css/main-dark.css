@@ -10897,6 +10897,17 @@ body.og-full-page .opengraphica {
     stroke: rgba(200, 200, 235, 0.9);
   }
 }
+@keyframes og-selection-handle-selected {
+  0% {
+    stroke: rgba(5, 11, 63, 0.9);
+  }
+  50% {
+    stroke: rgba(70, 70, 255, 0.6);
+  }
+  100% {
+    stroke: rgba(5, 11, 63, 0.9);
+  }
+}
 .opengraphica .og-selection svg {
   position: absolute;
   transform-origin: top left;
@@ -10904,9 +10915,13 @@ body.og-full-page .opengraphica {
 .opengraphica .og-selection svg path {
   animation: og-selection-path 1s linear infinite;
 }
-.opengraphica .og-selection svg rect, .opengraphica .og-selection svg ellipse {
+.opengraphica .og-selection svg rect, .opengraphica .og-selection svg ellipse, .opengraphica .og-selection svg circle {
   fill: white;
   animation: og-selection-handle 2s linear infinite;
+}
+.opengraphica .og-selection svg rect.og-selection-handle--selected, .opengraphica .og-selection svg ellipse.og-selection-handle--selected, .opengraphica .og-selection svg circle.og-selection-handle--selected {
+  animation: og-selection-handle-selected 2s linear infinite;
+  fill: #35bee0;
 }
 .opengraphica .og-text-editor {
   display: block;

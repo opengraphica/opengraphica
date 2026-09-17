@@ -1,12 +1,15 @@
 /**
- * This file constructs the necessary assets to render a raster layer.
+ * This file constructs the necessary assets to render a vector layer.
  * It can run in the main thread or a worker.
  */
-
+import { DoubleSide } from 'three/src/constants';
+import { Group } from 'three/src/objects/Group';
 import { ImagePlaneGeometry } from '@/renderers/webgl2/geometries/image-plane-geometry';
 import { Matrix4 } from 'three/src/math/Matrix4';
 import { Mesh } from 'three/src/objects/Mesh';
+import { MeshBasicMaterial } from 'three/src/materials/MeshBasicMaterial';
 import { Quaternion } from 'three/src/math/Quaternion';
+import { ShapeGeometry } from 'three/src/geometries/ShapeGeometry';
 import { Texture } from 'three/src/textures/Texture';
 import { Vector3 } from 'three/src/math/Vector3';
 
@@ -17,6 +20,7 @@ import { messageBus } from '@/renderers/webgl2/backend/message-bus';
 import { createCanvasFiltersFromLayerConfig, createLayerShaderUniformsAndDefines } from '../base/material';
 import { assignMaterialBlendingMode } from '../base/blending-mode';
 import { createRasterMaterial, disposeRasterMaterial, updateRasterMaterial } from '../raster/material';
+import { SVGLoader } from './svg-loader';
 
 import type { Scene, ShaderMaterial } from 'three';
 import type {
@@ -34,6 +38,11 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
     scene: InstanceType<typeof Scene> | undefined;
     sourceSvg: Blob | undefined;
     sourceTexture: InstanceType<typeof Texture<any>> | undefined;
+    sourceDocument: XMLDocument | undefined;
+    shapeGroup: InstanceType<typeof Group> | undefined;
+
+    domParser: DOMParser;
+    svgLoader: SVGLoader;
 
     id: number = -1;
     blendingMode: WorkingFileLayerBlendingMode = 'normal';
@@ -53,10 +62,14 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
     materialUpdates: Array<'destroyAndCreate' | 'update'> = [];
     regenerateThumbnailTimeoutHandle: number | undefined;
     overrideFilterParamTextures: Texture<any>[] = [];
+    svgMeshesById: Record<string, Mesh[]> = {};
 
     handleResize: (() => void);
 
     constructor() {
+        this.domParser = new DOMParser();
+        this.svgLoader = new SVGLoader();
+
         this.handleResize = throttle(() => {
             this.generateSvgTexture();
         }, 500);
@@ -106,12 +119,14 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
                         srcTexture: this.sourceTexture,
                         canvasFilters: this.filtersOverride ?? this.filters,
                         opacity: this.opacity,
+                        premultiplyAlphaFix: true,
                     });
                     assignMaterialBlendingMode(this.material, this.blendingMode);
                 } else {
                     await updateRasterMaterial(this.material, {
                         srcTexture: this.sourceTexture,
                         opacity: this.opacity,
+                        premultiplyAlphaFix: true,
                     })
                 }
                 this.plane && (this.plane.material = this.material);
@@ -140,7 +155,21 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
 
     async updateData(data: WorkingFileVectorLayer['data']) {
         this.sourceUuid = data.sourceUuid;
-        this.generateSvgTexture();
+        if (data.sourceDocument) {
+            this.generateSvgMeshes(data.sourceDocument);
+        } else if (data.sourceDocumentSerialized) {
+            const sourceDocument = this.domParser.parseFromString(data.sourceDocumentSerialized, 'image/svg+xml');
+            this.generateSvgMeshes(sourceDocument);
+        } else {
+            if (this.shapeGroup) {
+                this.scene?.remove(this.shapeGroup);
+                if (this.plane) {
+                    this.scene?.add(this.plane);
+                }
+                this.disposeSvgMeshes();
+            }
+            this.generateSvgTexture();
+        }
     }
 
     async updateFilters(filters: WorkingFileLayerFilter[]) {
@@ -162,6 +191,16 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         if (this.plane) {
             this.plane.geometry = this.planeGeometry;
         }
+        if (this.shapeGroup?.userData?.svgDocument && this.plane) {
+            const viewBox = this.svgLoader.getViewBox(this.shapeGroup.userData.svgDocument);
+            const width = viewBox.max.x - viewBox.min.x;
+            const height = viewBox.max.y - viewBox.min.y;
+            this.shapeGroup.matrix = this.plane.matrix.clone().multiply(
+                new Matrix4().makeScale(this.width / width, this.height / height, 0.0)
+            ).multiply(
+                new Matrix4().makeTranslation(viewBox.min.x, viewBox.min.y, 0.0)
+            );
+        }
         this.handleResize?.();
     }
 
@@ -172,6 +211,16 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             transform[8], transform[9], transform[10], transform[11], 
             transform[12], transform[13], transform[14], transform[15],
         );
+        if (this.shapeGroup && this.plane) {
+            const viewBox = this.svgLoader.getViewBox(this.shapeGroup.userData.svgDocument);
+            const width = viewBox.max.x - viewBox.min.x;
+            const height = viewBox.max.y - viewBox.min.y;
+            this.shapeGroup.matrix = this.plane.matrix.clone().multiply(
+                new Matrix4().makeScale(this.width / width, this.height / height, 0.0)
+            ).multiply(
+                new Matrix4().makeTranslation(viewBox.min.x, viewBox.min.y, 0.0)
+            );
+        }
         markRenderDirty();
         this.handleResize?.();
     }
@@ -186,7 +235,10 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
     }
 
     async generateSvgTexture() {
+        if (this.shapeGroup) return;
         if (this.sourceUuid && this.plane) {
+            this.disposeSvgMeshes();
+
             let scale = new Vector3();
             this.plane.matrix.decompose(new Vector3(), new Quaternion(), scale);
             const scaledWidth = scale.x * this.width;
@@ -196,7 +248,6 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
                 && Math.abs(scaledHeight - this.lastResizeScaledHeight) <= epsilon) {
                 return;
             }
-
             this.lastResizeScaledWidth = scaledWidth;
             this.lastResizeScaledHeight = scaledHeight;
 
@@ -213,6 +264,131 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         }
     }
 
+    async generateSvgMeshes(svgDocument: Document) {
+        if (!(svgDocument instanceof XMLDocument)) return;
+        this.sourceDocument = svgDocument;
+        this.disposeSvgMeshes();
+        if (this.width && this.height) {
+            svgDocument.documentElement.setAttribute('width', `${this.width}`);
+            svgDocument.documentElement.setAttribute('height', `${this.height}`);
+        }
+        const { paths } = this.svgLoader.parse(svgDocument);
+
+        this.shapeGroup = new Group();
+        this.shapeGroup.userData.svgDocument = svgDocument;
+        this.shapeGroup.matrixAutoUpdate = false;
+        if (this.plane) {
+            const viewBox = this.svgLoader.getViewBox(this.shapeGroup.userData.svgDocument);
+            const width = viewBox.max.x - viewBox.min.x;
+            const height = viewBox.max.y - viewBox.min.y;
+            this.shapeGroup.matrix = this.plane.matrix.clone().multiply(
+                new Matrix4().makeScale(this.width / width, this.height / height, 0.0)
+            ).multiply(
+                new Matrix4().makeTranslation(viewBox.min.x, viewBox.min.y, 0.0)
+            );
+        }
+
+        for (const path of paths) {
+            const id = (path.userData.node as Element)?.getAttribute('data-ogr-id');
+            id && (this.svgMeshesById[id] = []);
+            const material = new MeshBasicMaterial({
+                color: path.color,
+                side: DoubleSide,
+                depthWrite: false,
+            });
+            const shapes = path.toShapes();
+            for (const shape of shapes) {
+                const geometry = new ShapeGeometry(shape);
+                const mesh = new Mesh(geometry, material);
+                id && this.svgMeshesById[id].push(mesh);
+                this.shapeGroup.add(mesh);
+            }
+        }
+        if (this.plane) {
+            this.scene?.remove(this.plane);
+        }
+        this.scene?.add(this.shapeGroup);
+    }
+
+    async updateVectorLayerAttributes(nodeId: string, attributes: Record<string, string>) {
+        if (!this.sourceDocument || !this.shapeGroup) return;
+        let node = this.sourceDocument.querySelector(`[data-ogr-id="${nodeId}"]`);
+        if (!node) return;
+        const meshes = this.svgMeshesById[nodeId];
+
+
+        // TODO - may need to restore exact render order.
+
+
+        if (meshes) {
+            for (const mesh of meshes) {
+                mesh.geometry?.dispose();
+                (mesh.material as any)?.dispose();
+                this.shapeGroup.remove(mesh);
+            }
+        }
+        
+        let currentChildNode: Element | null = null;
+        while (node.parentElement) {
+            const clonedNode = node.cloneNode() as Element;
+            for (const attributeName in attributes) {
+                clonedNode.setAttribute(attributeName, attributes[attributeName]);
+            }
+            if (currentChildNode) {
+                clonedNode.append(currentChildNode)
+            }
+            currentChildNode = clonedNode;
+            node = node?.parentElement;
+        }
+        if (!currentChildNode) return;
+
+        // TODO - Reference parse document should be cached from generateSvgMeshes method,
+        //        also it's missing the styles and defs.
+
+        // TODO - Creating xml document doesn't work inside webworker.
+        var newDoc = window.document.implementation.createDocument(null, 'svg');
+        for (const attribute of Array.from(this.sourceDocument.documentElement.attributes)) {
+            newDoc.documentElement.setAttribute(attribute.name, attribute.value);
+        }
+        newDoc.documentElement.append(currentChildNode);
+
+        const { paths } = this.svgLoader.parse(newDoc);
+        const path = paths[0];
+        if (!path) return;
+
+        const material = new MeshBasicMaterial({
+            color: path.color,
+            side: DoubleSide,
+            depthWrite: false,
+        });
+        const shapes = path.toShapes();
+        this.svgMeshesById[nodeId] = [];
+        for (const shape of shapes) {
+            const geometry = new ShapeGeometry(shape);
+            const mesh = new Mesh(geometry, material);
+            this.svgMeshesById[nodeId].push(mesh);
+            this.shapeGroup.add(mesh);
+        }
+
+        markRenderDirty();
+    }
+
+    disposeSvgMeshes() {
+        if (this.shapeGroup) {
+            this.scene?.remove(this.shapeGroup);
+            for (const child of this.shapeGroup.children) {
+                if (child instanceof Mesh) {
+                    child.geometry?.dispose();
+                    child.geometry = undefined;
+                    child.material?.dispose();
+                    child.material = undefined;
+                }
+            }
+            this.shapeGroup = undefined;
+        }
+        this.svgMeshesById = {};
+    }
+ 
     reorder(order: number) {
         if (this.plane) {
             this.plane.renderOrder = order + 0.1;
@@ -234,7 +410,12 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
     swapScene(scene: Scene) {
         if (!this.plane) return;
         this.scene?.remove(this.plane);
-        scene.add(this.plane);
+        if (this.shapeGroup) {
+            this.scene?.remove(this.shapeGroup);
+            scene.add(this.shapeGroup);
+        } else {
+            scene.add(this.plane);
+        }
         this.scene = scene;
     }
 
@@ -328,6 +509,8 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
 
         this.plane && this.scene?.remove(this.plane);
         this.plane = undefined;
+
+        this.disposeSvgMeshes();
 
         if (this.material) {
             disposeRasterMaterial(this.material);

@@ -318,7 +318,7 @@ function getIconClass(layer: WorkingFileAnyLayer) {
         case 'raster': return 'bi-image';
         case 'rasterSequence': return 'bi-images';
         case 'text': return 'bi-textarea-t';
-        case 'vector': return 'bi-bezier2';
+        case 'vector': return 'bi-shapes';
         case 'video': return 'bi-film';
     }
     return 'bi-question';

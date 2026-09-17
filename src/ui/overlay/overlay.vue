@@ -53,7 +53,8 @@ export default defineComponent({
     },
     setup() {
         const ignoreTransformWith: string[] = [
-            'canvas-border', 'deform-blur', 'deform-sharpen', 'draw-brush', 'draw-bucket-fill',
+            'canvas-border', 'deform-blur', 'deform-sharpen',
+            'draw-brush', 'draw-bucket-fill', 'draw-shape',
             'effect', 'erase-brush', 'selection',
         ];
         const blendModes: Record<string, string> = {
