@@ -12,29 +12,29 @@ class Pass {
     public clear: boolean;
     public renderToScreen: boolean;
 
-	constructor() {
+    constructor() {
 
-		// if set to true, the pass is processed by the composer
-		this.enabled = true;
+        // if set to true, the pass is processed by the composer
+        this.enabled = true;
 
-		// if set to true, the pass indicates to swap read and write buffer after rendering
-		this.needsSwap = true;
+        // if set to true, the pass indicates to swap read and write buffer after rendering
+        this.needsSwap = true;
 
-		// if set to true, the pass clears its buffer before rendering
-		this.clear = false;
+        // if set to true, the pass clears its buffer before rendering
+        this.clear = false;
 
-		// if set to true, the result of the pass is rendered to screen. This is set automatically by EffectComposer.
-		this.renderToScreen = false;
+        // if set to true, the result of the pass is rendered to screen. This is set automatically by EffectComposer.
+        this.renderToScreen = false;
 
-	}
+    }
 
-	setSize(width: number, height: number) {}
+    setSize(width: number, height: number) {}
 
-	render(renderer: any, writeBuffer?: any, readBuffer?: any, deltaTime?: any, maskActive?: any) {
-		console.error('[src/renderers/webgl2/backend/postprocessing/pass.ts] .render() must be implemented in derived pass.');
-	}
+    render(renderer: any, writeBuffer?: any, readBuffer?: any, deltaTime?: any, maskActive?: any) {
+        console.error('[src/renderers/webgl2/backend/postprocessing/pass.ts] .render() must be implemented in derived pass.');
+    }
 
-	dispose() {}
+    dispose() {}
 
 }
 
@@ -52,25 +52,25 @@ class FullScreenQuad {
 
     private _mesh: Mesh;
 
-	constructor(material: Material) {
-		this._mesh = new Mesh(_geometry, material);
-	}
+    constructor(material: Material) {
+        this._mesh = new Mesh(_geometry, material);
+    }
 
-	dispose() {
-		this._mesh.geometry.dispose();
-	}
+    dispose() {
+        this._mesh.geometry.dispose();
+    }
 
-	render(renderer: WebGLRenderer) {
-		renderer.render(this._mesh, _camera);
-	}
+    render(renderer: WebGLRenderer) {
+        renderer.render(this._mesh, _camera);
+    }
 
-	get material() {
-		return this._mesh.material;
-	}
+    get material() {
+        return this._mesh.material;
+    }
 
-	set material(value) {
-		this._mesh.material = value;
-	}
+    set material(value) {
+        this._mesh.material = value;
+    }
 
 }
 

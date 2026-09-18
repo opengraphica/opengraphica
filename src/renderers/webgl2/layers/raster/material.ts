@@ -50,7 +50,7 @@ export async function createRasterMaterial(params: RasterMaterialUpdateParams) {
         userData: {
             disposableTextures: shader.textures,
         },
-        premultipliedAlpha: params.premultiplyAlphaFix,
+        premultipliedAlpha: params.premultiplyAlphaFix ?? false,
     });
 
     material.defines.cColorSpaceConversion = params.colorSpaceConversion ?? 0;

@@ -112,8 +112,9 @@ export default defineComponent({
                         loading.value = false;
                         appEmitter.emit('app.canvas.ready');
                         calculateCssViewTransform();
-                    }).catch(() => {
+                    }).catch((error) => {
                         loading.value = false;
+                        console.error(error);
                         appEmitter.emit('app.notify', {
                             title: t('app.renderer.initializeFailed.title'),
                             message: t('app.renderer.initializeFailed.message'),

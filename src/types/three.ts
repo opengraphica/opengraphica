@@ -4,4 +4,8 @@ declare module 'three' {
     export interface WebGLRenderer {
         context: WebGLRenderingContext | WebGL2RenderingContext;
     }
+
+    export interface WebGLCapabilitiesParameters {
+        desynchronized?: boolean;
+    }
 }

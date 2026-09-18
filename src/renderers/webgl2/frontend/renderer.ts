@@ -176,14 +176,23 @@ export class Webgl2RendererFrontend implements RendererFrontend {
                 viewDirtyTrail = false;
                 canvasStore.set('viewDirty', false);
                 const transform = canvasStore.get('transform');
-                viewTransform[0] = transform.m11; viewTransform[1] = transform.m21;
-                viewTransform[2] = transform.m31; viewTransform[3] = transform.m41;
-                viewTransform[4] = transform.m12; viewTransform[5] = transform.m22;
-                viewTransform[6] = transform.m32; viewTransform[7] = transform.m42;
-                viewTransform[8] = transform.m13; viewTransform[9] = transform.m23;
-                viewTransform[10] = transform.m33; viewTransform[11] = transform.m43;
-                viewTransform[12] = transform.m14; viewTransform[13] = transform.m24;
-                viewTransform[14] = transform.m34; viewTransform[15] = transform.m44;
+                if (this.rendererBackend.isOffscreen) {
+                    viewTransform = new Float64Array([
+                        transform.m11, transform.m21, transform.m31, transform.m41,
+                        transform.m12, transform.m22, transform.m32, transform.m42,
+                        transform.m13, transform.m23, transform.m33, transform.m43,
+                        transform.m14, transform.m24, transform.m34, transform.m44,
+                    ]);
+                } else {
+                    viewTransform[0] = transform.m11; viewTransform[1] = transform.m21;
+                    viewTransform[2] = transform.m31; viewTransform[3] = transform.m41;
+                    viewTransform[4] = transform.m12; viewTransform[5] = transform.m22;
+                    viewTransform[6] = transform.m32; viewTransform[7] = transform.m42;
+                    viewTransform[8] = transform.m13; viewTransform[9] = transform.m23;
+                    viewTransform[10] = transform.m33; viewTransform[11] = transform.m43;
+                    viewTransform[12] = transform.m14; viewTransform[13] = transform.m24;
+                    viewTransform[14] = transform.m34; viewTransform[15] = transform.m44;
+                }
                 this.rendererBackend.setViewTransform(viewTransform);
                 if (isViewDirty) {
                     nextTick(setViewDirtyTrail);

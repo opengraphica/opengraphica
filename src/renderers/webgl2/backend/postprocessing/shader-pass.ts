@@ -32,7 +32,7 @@ class ShaderPass extends Pass {
                 defines: Object.assign({}, (shader as ShaderMaterial).defines),
                 uniforms: this.uniforms,
                 vertexShader: shader.vertexShader,
-                fragmentShader: shader.fragmentShader
+                fragmentShader: shader.fragmentShader,
             });
         }
 

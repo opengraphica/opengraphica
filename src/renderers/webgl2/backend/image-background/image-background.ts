@@ -1,5 +1,5 @@
 import { Color } from 'three/src/math/Color';
-import { DoubleSide } from 'three/src/constants';
+import { BackSide } from 'three/src/constants';
 import { Mesh } from 'three/src/objects/Mesh';
 import { MeshBasicMaterial } from 'three/src/materials/MeshBasicMaterial';
 import { PlaneGeometry } from 'three/src/geometries/PlaneGeometry';
@@ -13,7 +13,7 @@ export class ImageBackground {
 
     async initialize(scene: Scene, imageWidth: number, imageHeight: number) {
         this.backgroundGeometry = new PlaneGeometry(imageWidth, imageHeight);
-        this.backgroundMaterial = new MeshBasicMaterial({ color: 0xffffff, transparent: true, side: DoubleSide });
+        this.backgroundMaterial = new MeshBasicMaterial({ color: 0xffffff, transparent: true, side: BackSide });
         this.backgroundMesh = new Mesh(this.backgroundGeometry, this.backgroundMaterial);
         this.backgroundMesh.position.x = imageWidth / 2;
         this.backgroundMesh.position.y = imageHeight / 2;
@@ -38,7 +38,7 @@ export class ImageBackground {
             color,
             opacity: alpha,
             transparent: true,
-            side: DoubleSide
+            side: BackSide
         });
         this.backgroundMesh.material = this.backgroundMaterial;
     }

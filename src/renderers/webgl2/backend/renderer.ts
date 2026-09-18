@@ -16,6 +16,7 @@ import { EffectComposer } from './postprocessing/effect-composer';
 import { GammaCorrectionShader } from './postprocessing/gamma-correction-shader';
 import { RenderPass } from './postprocessing/render-pass';
 import { ShaderPass } from './postprocessing/shader-pass';
+import { OutputPass } from './postprocessing/output-pass';
 
 import { Compositor } from './compositor';
 import { ImageBackground } from './image-background';
@@ -24,6 +25,8 @@ import { requestFrontendTexture } from './image-transfer';
 import { SelectionMask } from './selection-mask';
 import { messageBus } from './message-bus';
 import { createCanvasFiltersFromLayerConfig } from '@/renderers/webgl2/layers/base/material';
+
+import { installWebGLCommandLogger } from '@/renderers/common/debug';
 
 import type { Camera, Texture } from 'three';
 import type {
@@ -137,12 +140,15 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
             };
         }
 
+        // installWebGLCommandLogger(canvas);
+
         this.renderer = new WebGLRenderer({
             alpha: true,
             canvas,
             premultipliedAlpha: false, // KEEP THIS FALSE - It gives the most flexibility for renderer reuse.
             preserveDrawingBuffer: false,
             powerPreference: 'high-performance',
+            desynchronized: true,
         });
         this.renderer.extensions.get('EXT_float_blend');
         this.renderer.outputColorSpace = SRGBColorSpace;
@@ -321,17 +327,15 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         composer.disposeAllPasses();
     
         let passScenes: Array<Scene> = [];
-    
-        if (this.imageBackground) {
-            const backgroundScene = new Scene();
-            backgroundScene.background = null;
-            this.imageBackground.swapScene(backgroundScene);
-            passScenes.push(backgroundScene);
-        }
-    
+
         let currentScene = new Scene();
         currentScene.background = null;
         let currentSceneIsUsed = false;
+
+        if (this.imageBackground) {
+            this.imageBackground.swapScene(currentScene);
+            currentSceneIsUsed = true;
+        }
 
         const stack: Array<WorkingFileLayer> = [
             { type: 'group', layers: this.layerOrder } as WorkingFileGroupLayer,
@@ -359,17 +363,18 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
                 currentSceneIsUsed = true;
             }
         }
+
         if (currentSceneIsUsed) {
             passScenes.push(currentScene);
         }
     
-        if (this.selectionMask) {
+        if (this.selectionMask && passScenes.length > 0) {
             this.selectionMask.swapScene(passScenes[passScenes.length - 1]);
         }
-        if (this.imageBoundaryMask) {
+        if (this.imageBoundaryMask && passScenes.length > 0) {
             this.imageBoundaryMask.swapScene(passScenes[passScenes.length - 1]);
         }
-    
+
         let isFirstPass = true;
         for (const scene of passScenes) {
             const renderPass = new RenderPass(scene, camera);
@@ -377,8 +382,9 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
             if (isFirstPass) isFirstPass = false;
             composer.addPass(renderPass);
         }
-    
-        composer.addPass(new ShaderPass(GammaCorrectionShader));
+
+        composer.addPass(new OutputPass());
+        // composer.addPass(new ShaderPass(GammaCorrectionShader));
         composer.renderTarget1.samples = 4;
         composer.renderTarget2.samples = 4;
         this.dirty = true;
@@ -462,7 +468,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
                     t[2], t[6], t[10], t[14],
                     t[3], t[7], t[11], t[15],
                 )
-            )
+            );
         }
         if (!options?.disableScaleToSize) {
             snapshotCamera.projectionMatrix.scale(
