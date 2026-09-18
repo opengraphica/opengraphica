@@ -195,6 +195,7 @@ onMounted(async () => {
     window.addEventListener('pointercancel', onPointerUpWindow);
     window.addEventListener('pointerup', onPointerUpWindow);
     window.addEventListener('pointermove', onPointerMoveWindow);
+    document.addEventListener('visibilitychange', onVisibilityChange);
 
     nextTick(() => {
         calculateDndArea();
@@ -215,6 +216,7 @@ onUnmounted(() => {
     window.removeEventListener('pointercancel', onPointerUpWindow);
     window.removeEventListener('pointerup', onPointerUpWindow);
     window.removeEventListener('pointermove', onPointerMoveWindow);
+    document.removeEventListener('visibilitychange', onVisibilityChange);
 });
 
 function calculateDndArea() {
@@ -293,6 +295,10 @@ function onWheelMain(e: WheelEvent) {
         editorStore.get('toolCanvasController').onWheel(e);
     }
 };
+
+function onVisibilityChange() {
+    editorStore.get('toolCanvasController').onVisibilityChange();
+}
 
 function onResizeLayout() {
     sidebarLeftWidth.value = sidebarLeftElement.value?.clientWidth || 0;

@@ -1,6 +1,6 @@
 export function installWebGLCommandLogger(canvas, options = {}) {
     const {
-        log = console.log,
+        log = console?.log,
         includeArguments = true,
         includeReturns = false,
     } = options as any;

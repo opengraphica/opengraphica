@@ -124,6 +124,13 @@ export default class CanvasZoomController extends BaseCanvasMovementController {
         this.zoomCanvas(-3);
     }
 
+    onVisibilityChange(): void {
+        super.onVisibilityChange();
+        if (document.hidden) {
+            this.isDragging = false;
+        }
+    }
+
     protected handleCursorIcon() {
         let newIcon = super.handleCursorIcon();
         if (!newIcon) {

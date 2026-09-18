@@ -207,6 +207,13 @@ export default class BaseCanvasController {
         // Override
     }
 
+    onVisibilityChange() {
+        if (document.hidden) {
+            this.purgeTouches();
+            this.pointers = [];
+        }
+    }
+
     private purgeTouches() {
         if (!this.multiTouchDownTimeoutHandle) {
             const actualTouches = this.pointers.filter((pointer) => pointer.type === 'touch');

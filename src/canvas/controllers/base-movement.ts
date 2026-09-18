@@ -175,6 +175,13 @@ export default class BaseCanvasMovementController extends BaseCanvasController {
         e.preventDefault();
     }
 
+    onVisibilityChange(): void {
+        super.onVisibilityChange();
+        if (document.hidden) {
+            this.moveTranslateStart = null;
+        }
+    }
+
     protected normalizeWheel(event: WheelEvent | any) {
         let pixelStep = 10;
         let lineHeight = 40;

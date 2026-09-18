@@ -1,6 +1,7 @@
 use glam::{ Mat4 };
 use wgpu::util::DeviceExt;
 
+use crate::MSAA_SAMPLE_COUNT;
 use crate::geometry::{ Vertex };
 use crate::uniform::{ BackgroundImageUniform, TransformUniform };
 
@@ -142,7 +143,11 @@ impl ImageBackground {
                 },
                 bias: wgpu::DepthBiasState::default(),
             }),
-            multisample: wgpu::MultisampleState::default(),
+            multisample: wgpu::MultisampleState {
+                count: MSAA_SAMPLE_COUNT,
+                mask: !0,
+                alpha_to_coverage_enabled: false,
+            },
             multiview_mask: None,
             cache: None,
         });
@@ -184,7 +189,11 @@ impl ImageBackground {
                 },
                 bias: wgpu::DepthBiasState::default(),
             }),
-            multisample: wgpu::MultisampleState::default(),
+            multisample: wgpu::MultisampleState {
+                count: MSAA_SAMPLE_COUNT,
+                mask: !0,
+                alpha_to_coverage_enabled: false,
+            },
             multiview_mask: None,
             cache: None,
         });

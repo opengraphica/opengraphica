@@ -13,9 +13,7 @@ import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer';
 import { WebGLRenderTarget } from 'three/src/renderers/WebGLRenderTarget';
 
 import { EffectComposer } from './postprocessing/effect-composer';
-import { GammaCorrectionShader } from './postprocessing/gamma-correction-shader';
 import { RenderPass } from './postprocessing/render-pass';
-import { ShaderPass } from './postprocessing/shader-pass';
 import { OutputPass } from './postprocessing/output-pass';
 
 import { Compositor } from './compositor';
@@ -25,8 +23,6 @@ import { requestFrontendTexture } from './image-transfer';
 import { SelectionMask } from './selection-mask';
 import { messageBus } from './message-bus';
 import { createCanvasFiltersFromLayerConfig } from '@/renderers/webgl2/layers/base/material';
-
-import { installWebGLCommandLogger } from '@/renderers/common/debug';
 
 import type { Camera, Texture } from 'three';
 import type {
@@ -103,6 +99,8 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
     snapshotComposer?: EffectComposer;
     snapshotRenderer?: WebGLRenderer;
 
+    msaaSamples: number = 0;
+    maxMsaaSamples: number = 0;
     maxTextureSize: number = 2048;
     viewTransform: Matrix4 = new Matrix4();
     imageWidth: number = 1;
@@ -140,21 +138,22 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
             };
         }
 
-        // installWebGLCommandLogger(canvas);
-
         this.renderer = new WebGLRenderer({
             alpha: true,
             canvas,
             premultipliedAlpha: false, // KEEP THIS FALSE - It gives the most flexibility for renderer reuse.
             preserveDrawingBuffer: false,
             powerPreference: 'high-performance',
-            desynchronized: true,
+            antialias: false,
         });
+        const gl = this.renderer.getContext();
         this.renderer.extensions.get('EXT_float_blend');
         this.renderer.outputColorSpace = SRGBColorSpace;
         this.renderer.setSize(1, 1, false);
         this.viewport = new Vector4();
         this.maxTextureSize = this.renderer?.capabilities?.maxTextureSize ?? 2048;
+        this.msaaSamples = this.getRecommendedMsaa(gl);
+        this.maxMsaaSamples = gl instanceof WebGL2RenderingContext ? gl.getParameter(gl.MAX_SAMPLES) : 0;
 
         this.scene = new Scene();
         this.scene.background = null;
@@ -316,7 +315,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         this.queueCreateLayerPassesTimeoutHandle = setTimeout(this.createLayerPasses.bind(this), 0);
     }
 
-    createLayerPasses(composer?: EffectComposer, camera?: Camera, includeLayerIds?: Uint32Array) {
+    createLayerPasses(composer?: EffectComposer, camera?: Camera, includeLayerIds?: Uint32Array, highQuality?: boolean) {
         clearTimeout(this.queueCreateLayerPassesTimeoutHandle);
 
         composer = composer ?? this.composer;
@@ -383,10 +382,11 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
             composer.addPass(renderPass);
         }
 
+        const msaaSamples = highQuality ? Math.min(this.maxMsaaSamples, 4) : this.msaaSamples;
+
         composer.addPass(new OutputPass());
-        // composer.addPass(new ShaderPass(GammaCorrectionShader));
-        composer.renderTarget1.samples = 4;
-        composer.renderTarget2.samples = 4;
+        composer.renderTarget1.samples = msaaSamples;
+        composer.renderTarget2.samples = msaaSamples;
         this.dirty = true;
     }
 
@@ -679,6 +679,45 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
 
     async setDirty() {
         this.dirty = true;
+    }
+
+    getRecommendedMsaa(gl?: WebGLRenderingContext | WebGL2RenderingContext): number {
+        if (!gl || !window.navigator) return 0;
+        
+        const isMobileUA = (
+            navigator.userAgentData?.mobile === true
+            || /Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent)
+        );
+
+        const hasCoarsePointer = matchMedia("(pointer: coarse)").matches;
+        const hasTouch = navigator.maxTouchPoints > 0;
+
+        const screenWidth = Math.max(
+            screen.width || 0,
+            screen.height || 0
+        );
+
+        const isMobileLike = isMobileUA || (hasCoarsePointer && hasTouch && screenWidth < 1400);
+
+        const memoryGB = navigator.deviceMemory || 0;
+        const cores = navigator.hardwareConcurrency || 0;
+
+        const lowEnd = (memoryGB <= 4) || (cores <= 4);
+
+        let requestedSamples: number;
+
+        if (isMobileLike) {
+            requestedSamples = lowEnd ? 0 : 2;
+        } else {
+            requestedSamples = 4;
+        }
+
+        if (gl) {
+            const maxSamples = gl instanceof WebGL2RenderingContext ? gl.getParameter(gl.MAX_SAMPLES) : 0;
+            requestedSamples = Math.min(requestedSamples, maxSamples);
+        }
+
+        return requestedSamples;
     }
 
     async dispose() {

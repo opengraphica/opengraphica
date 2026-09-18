@@ -1,6 +1,7 @@
 use bytemuck::{ Pod };
 use wgpu::util::DeviceExt;
 
+use crate::MSAA_SAMPLE_COUNT;
 use crate::geometry::{ Vertex };
 use crate::uniform::{ BrushCompositorUniform, BrushStrokeUniform, CopyTileUniform, SampleBrushColorUniform };
 
@@ -62,7 +63,11 @@ pub fn create_pipeline(
         },
 
         depth_stencil: None,
-        multisample: wgpu::MultisampleState::default(),
+        multisample: wgpu::MultisampleState {
+            count: MSAA_SAMPLE_COUNT,
+            mask: !0,
+            alpha_to_coverage_enabled: false,
+        },
         multiview_mask: None,
         cache: None,
     })

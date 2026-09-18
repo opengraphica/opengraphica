@@ -36,6 +36,8 @@ thread_local! {
     static RENDERER_STATE: RefCell<Option<RendererState>> = RefCell::new(None);
 }
 
+pub const MSAA_SAMPLE_COUNT: u32 = 4;
+
 #[wasm_bindgen]
 pub fn initialize(
     canvas: JsValue,
@@ -132,6 +134,22 @@ pub fn initialize(
             usage: wgpu::BufferUsages::VERTEX,
         });
 
+        let msaa_texture = device.create_texture(&wgpu::TextureDescriptor {
+            label: Some("MSAA Color Texture"),
+            size: wgpu::Extent3d {
+                width: view_width_limited,
+                height: view_height_limited,
+                depth_or_array_layers: 1,
+            },
+            mip_level_count: 1,
+            sample_count: MSAA_SAMPLE_COUNT,
+            dimension: wgpu::TextureDimension::D2,
+            format: surface_format,
+            usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
+            view_formats: &[],
+        });
+        let msaa_view = msaa_texture.create_view(&Default::default());
+
         let depth_stencil_texture = device.create_texture(&wgpu::TextureDescriptor {
             label: Some("Depth Stencil Texture"),
             size: wgpu::Extent3d {
@@ -140,7 +158,7 @@ pub fn initialize(
                 depth_or_array_layers: 1,
             },
             mip_level_count: 1,
-            sample_count: 1,
+            sample_count: MSAA_SAMPLE_COUNT,
             dimension: wgpu::TextureDimension::D2,
             format: wgpu::TextureFormat::Depth24PlusStencil8,
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
@@ -168,6 +186,8 @@ pub fn initialize(
                 projection_matrix,
                 view_matrix,
                 quad_vertex_buffer,
+                msaa_texture,
+                msaa_view,
                 depth_stencil_texture,
                 depth_stencil_view,
                 image_width,
@@ -227,6 +247,23 @@ pub fn resize(
             config.height = ((requested_height * scale).floor() as u32).max(1);
             surface.configure(&device, &config);
 
+            let msaa_texture = device.create_texture(&wgpu::TextureDescriptor {
+                label: Some("MSAA Color Texture"),
+                size: wgpu::Extent3d {
+                    width: config.width,
+                    height: config.height,
+                    depth_or_array_layers: 1,
+                },
+                mip_level_count: 1,
+                sample_count: MSAA_SAMPLE_COUNT,
+                dimension: wgpu::TextureDimension::D2,
+                format: renderer_state.msaa_texture.format(),
+                usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
+                view_formats: &[],
+            });
+            let msaa_view = msaa_texture.create_view(&Default::default());
+            renderer_state.msaa_view = msaa_view;
+
             let depth_stencil_texture = device.create_texture(&wgpu::TextureDescriptor {
                 label: Some("Depth Stencil Texture"),
                 size: wgpu::Extent3d {
@@ -235,7 +272,7 @@ pub fn resize(
                     depth_or_array_layers: 1,
                 },
                 mip_level_count: 1,
-                sample_count: 1,
+                sample_count: MSAA_SAMPLE_COUNT,
                 dimension: wgpu::TextureDimension::D2,
                 format: wgpu::TextureFormat::Depth24PlusStencil8,
                 usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
@@ -403,6 +440,22 @@ pub fn take_snapshot(
                     view_formats: &[],
                 });
 
+                let msaa_texture = renderer_state.device.create_texture(&wgpu::TextureDescriptor {
+                    label: Some("MSAA Color Texture"),
+                    size: wgpu::Extent3d {
+                        width: snapshot_width,
+                        height: snapshot_height,
+                        depth_or_array_layers: 1,
+                    },
+                    mip_level_count: 1,
+                    sample_count: MSAA_SAMPLE_COUNT,
+                    dimension: wgpu::TextureDimension::D2,
+                    format: wgpu::TextureFormat::Rgba8UnormSrgb,
+                    usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
+                    view_formats: &[],
+                });
+                let msaa_view = msaa_texture.create_view(&Default::default());
+
                 let depth_stencil_texture = renderer_state.device.create_texture(&wgpu::TextureDescriptor {
                     label: Some("Depth Stencil Texture"),
                     size: wgpu::Extent3d {
@@ -411,7 +464,7 @@ pub fn take_snapshot(
                         depth_or_array_layers: 1,
                     },
                     mip_level_count: 1,
-                    sample_count: 1,
+                    sample_count: MSAA_SAMPLE_COUNT,
                     dimension: wgpu::TextureDimension::D2,
                     format: wgpu::TextureFormat::Depth24PlusStencil8,
                     usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
@@ -447,6 +500,7 @@ pub fn take_snapshot(
                 render_main(
                     renderer_state,
                     &render_target_view,
+                    Some(&msaa_view),
                     Some(&depth_stencil_view),
                 );
 
@@ -700,7 +754,7 @@ pub fn render() {
 
             let view = frame.texture.create_view(&wgpu::TextureViewDescriptor::default());
 
-            render_main(renderer_state, &view, None);
+            render_main(renderer_state, &view, None, None);
 
             renderer_state.queue.present(frame);
         } else {
@@ -711,17 +765,25 @@ pub fn render() {
 
 fn render_main(
     renderer_state: &mut RendererState,
-    color_view: &wgpu::TextureView,
+    resolve_view: &wgpu::TextureView,
+    override_color_view: Option<&wgpu::TextureView>,
     override_depth_stencil_view: Option<&wgpu::TextureView>,
 ) {
     let device = &renderer_state.device;
     let queue = &renderer_state.queue;
     
+    let color_view = if let Some(view) = override_color_view {
+        view
+    } else {
+        &renderer_state.msaa_view
+    };
+
     let depth_stencil_view = if let Some(view) = override_depth_stencil_view {
         view
     } else {
         &renderer_state.depth_stencil_view
     };
+
     let quad_vertex_buffer = &renderer_state.quad_vertex_buffer;
     let image_boundary_mask_enabled = renderer_state.image_boundary_mask_enabled;
     let image_background = &renderer_state.image_background;
@@ -738,7 +800,7 @@ fn render_main(
             label: Some("Clear RenderPass"),
             color_attachments: &[Some(wgpu::RenderPassColorAttachment {
                 view: &color_view,
-                resolve_target: None,
+                resolve_target: Some(resolve_view),
                 ops: wgpu::Operations {
                     load: wgpu::LoadOp::Clear(wgpu::Color {
                         r: 0.0,

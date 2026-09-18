@@ -176,6 +176,8 @@ pub struct RendererState {
     pub image_height: u32,
     pub image_boundary_mask_enabled: bool,
     pub mipmap_generator: crate::mipmap_generator::MipmapGenerator,
+    pub msaa_texture: wgpu::Texture,
+    pub msaa_view: wgpu::TextureView,
     pub compositor: Rc<RefCell<crate::compositor::Compositor>>,
     pub image_background: crate::image_background::ImageBackground,
     pub mesh_controllers: std::collections::HashMap<u32, Box<
