@@ -127,7 +127,7 @@ const createEditControlPoints = throttle(() => {
                             y: xfPoint.y,
                             xProp: 'x',
                             yProp: 'y',
-                        })
+                        });
                     }
                     editControlPointNodeParsedAttributes.value.push({
                         transform, points,
@@ -146,7 +146,7 @@ const createEditControlPoints = throttle(() => {
                             y: xfPoint.y,
                             xProp: 'x',
                             yProp: 'y',
-                        })
+                        });
                     }
                     editControlPointNodeParsedAttributes.value.push({
                         transform, points,
@@ -287,10 +287,20 @@ const createEditControlPoints = throttle(() => {
                                     xProp: 'x',
                                     yProp: 'y',
                                 });
+                                point.x = command.x1;
+                                point.y = command.y1;
+                                xfPoint = point.matrixTransform(nodeXf);
+                                controlPoints.push({
+                                    layerIndex,
+                                    nodeIndex,
+                                    pathIndex: commandIndex,
+                                    attachToIndex,
+                                    x: xfPoint.x,
+                                    y: xfPoint.y,
+                                    xProp: 'x1',
+                                    yProp: 'y1',
+                                });
                                 if (previousCommand) {
-                                    point.x = command.x1;
-                                    point.y = command.y1;
-                                    xfPoint = point.matrixTransform(nodeXf);
                                     controlPoints.push({
                                         layerIndex,
                                         nodeIndex,

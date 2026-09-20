@@ -63,6 +63,7 @@ import { normalizedDirectionVector2d } from '@/lib/math';
 import type { WorkingFileGradientLayer } from '@/types';
 
 interface SelectedGradientLayerPositions {
+    id: number;
     start: DOMPoint;
     end: DOMPoint;
     focus: DOMPoint;
@@ -92,6 +93,7 @@ export default defineComponent({
                 const top = Math.min(start.y, end.y);
                 const rangeLineDirection = normalizedDirectionVector2d(start.x, start.y, end.x, end.y);
                 positions.push({
+                    id: layer.id,
                     start,
                     end,
                     focus: new DOMPoint(layer.data.focus.x, layer.data.focus.y).matrixTransform(globalTransform),

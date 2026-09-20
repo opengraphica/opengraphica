@@ -17,7 +17,7 @@ import { ShapeUtils } from 'three/src/extras/ShapeUtils';
 import { Vector2 } from 'three/src/math/Vector2';
 import { Vector3 } from 'three/src/math/Vector3';
 
-import type { LoadingManager, Texture } from 'three';
+import type { LoadingManager, SvgShapePath, Texture } from 'three';
 
 const COLOR_SPACE_SVG = SRGBColorSpace;
 
@@ -100,7 +100,7 @@ class SVGLoader extends Loader {
      * @return {{paths:Array<ShapePath>,xml:string}} An object holding an array of shape paths and the
      * SVG XML document.
      */
-    parse( xml: Document ): { paths: Array<ShapePath> } {
+    parse( xml: Document ): { paths: Array<SvgShapePath> } {
 
         const scope = this;
 
@@ -118,7 +118,7 @@ class SVGLoader extends Loader {
 
             let isDefsNode = false;
 
-            let path: ShapePath | null = null;
+            let path: SvgShapePath | null = null;
 
             switch ( node.nodeName ) {
 
@@ -252,8 +252,7 @@ class SVGLoader extends Loader {
 
         function parsePathNode( node ) {
 
-            const path = new ShapePath();
-            path.userData.id = node.getAttribute('data-ogr-id');
+            const path = new ShapePath() as SvgShapePath;
 
             const point = new Vector2();
             const control = new Vector2();
@@ -828,8 +827,7 @@ class SVGLoader extends Loader {
             // https://spencermortensen.com/articles/bezier-circle/
             const bci = 1 - 0.551915024494;
 
-            const path = new ShapePath();
-            path.userData.id = node.getAttribute('data-ogr-id');
+            const path = new ShapePath() as SvgShapePath;
 
             // top left
             path.moveTo( x + rx, y );
@@ -914,8 +912,7 @@ class SVGLoader extends Loader {
 
             const regex = /([+-]?\d*\.?\d+(?:e[+-]?\d+)?)(?:,|\s)([+-]?\d*\.?\d+(?:e[+-]?\d+)?)/g;
 
-            const path = new ShapePath();
-            path.userData.id = node.getAttribute('data-ogr-id');
+            const path = new ShapePath() as SvgShapePath;
 
             let index = 0;
 
@@ -950,8 +947,7 @@ class SVGLoader extends Loader {
 
             const regex = /([+-]?\d*\.?\d+(?:e[+-]?\d+)?)(?:,|\s)([+-]?\d*\.?\d+(?:e[+-]?\d+)?)/g;
 
-            const path = new ShapePath();
-            path.userData.id = node.getAttribute('data-ogr-id');
+            const path = new ShapePath() as SvgShapePath;
 
             let index = 0;
 
@@ -972,8 +968,7 @@ class SVGLoader extends Loader {
             const subpath = new Path();
             subpath.absarc( x, y, r, 0, Math.PI * 2 );
 
-            const path = new ShapePath();
-            path.userData.id = node.getAttribute('data-ogr-id');
+            const path = new ShapePath() as SvgShapePath;
             path.subPaths.push( subpath );
 
             return path;
@@ -990,8 +985,7 @@ class SVGLoader extends Loader {
             const subpath = new Path();
             subpath.absellipse( x, y, rx, ry, 0, Math.PI * 2 );
 
-            const path = new ShapePath();
-            path.userData.id = node.getAttribute('data-ogr-id');
+            const path = new ShapePath() as SvgShapePath;
             path.subPaths.push( subpath );
 
             return path;
@@ -1005,8 +999,7 @@ class SVGLoader extends Loader {
             const x2 = parseFloatWithUnits( node.getAttribute( 'x2' ) || 0 );
             const y2 = parseFloatWithUnits( node.getAttribute( 'y2' ) || 0 );
 
-            const path = new ShapePath();
-            path.userData.id = node.getAttribute('data-ogr-id');
+            const path = new ShapePath() as SvgShapePath;
             path.moveTo( x1, y1 );
             path.lineTo( x2, y2 );
             path.currentPath!.autoClose = false;
@@ -2084,7 +2077,7 @@ class SVGLoader extends Loader {
 
         //
 
-        const paths: ShapePath[] = [];
+        const paths: SvgShapePath[] = [];
         const stylesheets = {};
         const gradients = {};
 
@@ -2222,7 +2215,7 @@ class SVGLoader extends Loader {
      *
      * @param {number} [width=1] - The stroke width.
      * @param {string} [color='#000'] - The stroke color, as  returned by {@link Color#getStyle}.
-     * @param {'round'|'bevel'|'miter'|'miter-limit'} [lineJoin='miter'] - The line join style.
+     * @param {'round'|'bevel'|'miter'|'miter-clip'} [lineJoin='miter'] - The line join style.
      * @param {'round'|'square'|'butt'} [lineCap='butt'] - The line cap style.
      * @param {number} [miterLimit=4] - Maximum join length, in multiples of the `width` parameter (join is truncated if it exceeds that distance).
      * @return {Object} The style object.

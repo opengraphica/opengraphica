@@ -219,7 +219,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
 
             if (pointer && (pointer.type !== 'touch' || this.multiTouchDownCount === 1) && pointer.down.button === 0 && pointer.isDragging) {
-                if (this.selectedAttachedEditControlPointIndices.length > 0) {
+                if (this.draggingEditControlPointIndices.length > 0) {
                     this.dragEditControlPointMove(pointer);
                 } else {
                     // TODO - creating shape?
@@ -295,7 +295,11 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 Math.abs(cursor.y - pathPoint.y) < dragHandleRadius * devicePixelRatio / decomposedTransform.scaleY
             ) {
                 const isAttached = pathPoint.attachToIndex != null;
-                if (pathPointIndex === excludeIndex || (!currentIsAttached && isAttached)) {
+                if (
+                    pathPointIndex === excludeIndex
+                    || (!currentIsAttached && isAttached)
+                    || (isAttached && !selectedEditControlPointIndices.value.includes(pathPoint.attachToIndex!))
+                ) {
                     continue;
                 } else {
                     const distance = pointDistance2d(cursor.x, cursor.y, pathPoint.x, pathPoint.y);

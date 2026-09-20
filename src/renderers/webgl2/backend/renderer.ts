@@ -196,18 +196,20 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
     async resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number) {
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
+        const viewWidthInteger = Math.round(viewWidth);
+        const viewHeightInteger = Math.round(viewHeight);
         if (this.renderer) {
-            this.renderer.setSize(viewWidth, viewHeight, false);
+            this.renderer.setSize(viewWidthInteger, viewHeightInteger, false);
             this.renderer.getViewport(this.viewport);
         }
         if (this.composer) {
-            this.composer.setSize(viewWidth, viewHeight);
+            this.composer.setSize(viewWidthInteger, viewHeightInteger);
         }
         if (this.camera) {
             this.camera.left = 0;
-            this.camera.right = viewWidth;
+            this.camera.right = viewWidthInteger;
             this.camera.top = 0;
-            this.camera.bottom = viewHeight;
+            this.camera.bottom = viewHeightInteger;
             this.camera.updateProjectionMatrix();
         }
         if (this.compositor) {

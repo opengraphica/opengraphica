@@ -282,6 +282,10 @@ module.exports = function setupConfig(config) {
                         test: /[\\/]node_modules[\\/]gifken[\\/]/,
                         name: 'gifken'
                     },
+                    meshline: {
+                        test: /[\\/]node_modules[\\/]meshline[\\/]/,
+                        name: 'meshline'
+                    },
                     opengraphicaActions: {
                         test: /[\\/]src[\\/]actions[\\/]/,
                         name: 'actions'
