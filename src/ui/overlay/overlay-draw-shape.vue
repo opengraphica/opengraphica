@@ -7,28 +7,26 @@
                 :height="svgBoundsHeight"
                 xmlns="http://www.w3.org/2000/svg">
                 <template v-for="(point, i) in selectedEditControlAttachPoints" :key="i + '_' + point.x + '_' + point.y">
-                    <template v-if="point.attachToIndex != null && selectedEditControlPointIndices.includes(point.attachToIndex)">
-                        <line
-                            :x1="editControlPoints[point.attachToIndex].tx!"
-                            :x2="point.tx!"
-                            :y1="editControlPoints[point.attachToIndex].ty!"
-                            :y2="point.ty!"
-                            :style="{
-                                stroke: 'white', 
-                                strokeWidth: svgHandleWidth,
-                            }"
-                        />
-                        <line
-                            :x1="editControlPoints[point.attachToIndex].tx!"
-                            :x2="point.tx!"
-                            :y1="editControlPoints[point.attachToIndex].ty!"
-                            :y2="point.ty!"
-                            :style="{
-                                stroke: '#333333', 
-                                strokeWidth: svgHandleWidth * 0.5,
-                            }"
-                        />
-                    </template>
+                    <line
+                        :x1="editControlPoints[point.attachToIndex!].tx!"
+                        :x2="point.tx!"
+                        :y1="editControlPoints[point.attachToIndex!].ty!"
+                        :y2="point.ty!"
+                        :style="{
+                            stroke: 'white', 
+                            strokeWidth: svgHandleWidth,
+                        }"
+                    />
+                    <line
+                        :x1="editControlPoints[point.attachToIndex!].tx!"
+                        :x2="point.tx!"
+                        :y1="editControlPoints[point.attachToIndex!].ty!"
+                        :y2="point.ty!"
+                        :style="{
+                            stroke: '#333333', 
+                            strokeWidth: svgHandleWidth * 0.5,
+                        }"
+                    />
                 </template>
                 <template v-for="(point, i) in editControlPoints" :key="i + '_' + point.x + '_' + point.y">
                     <template v-if="point.attachToIndex == null">
@@ -49,18 +47,20 @@
                             :class="{ 'og-selection-handle--selected': selectedEditControlPointIndices.includes(i) }"
                         />
                     </template>
-                    <template v-else-if="selectedEditControlPointIndices.includes(point.attachToIndex)">
+                    <template v-else-if="selectedEditControlAttachPointIndices.includes(i)">
                         <circle
                             :cx="point.tx!"
                             :cy="point.ty!"
                             :r="svgHandleWidth * 1.6"
                             :stroke-width="0"
+                            :class="{ 'og-selection-handle--selected': selectedEditControlPointIndices.includes(i) }"
                         />
                         <circle
                             :cx="point.tx!"
                             :cy="point.ty!"
                             :r="svgHandleWidth * 1.2"
                             :stroke-width="svgHandleWidth * .3"
+                            :class="{ 'og-selection-handle--selected': selectedEditControlPointIndices.includes(i) }"
                         />
                     </template>
                 </template>
@@ -75,7 +75,11 @@ import { ref, computed, watch, onMounted, onUnmounted, toRefs } from 'vue';
 import canvasStore from '@/store/canvas';
 import workingFileStore, { getSelectedLayers, getLayerGlobalTransform } from '@/store/working-file';
 
-import { EditControlPoint, editControlPoints, editControlPointsDirty, selectedEditControlPointIndices } from '@/canvas/store/draw-shape-state';
+import {
+    type EditControlPoint,
+    editControlPoints, editControlPointsDirty,
+    selectedEditControlPointIndices, selectedEditControlAttachPointIndices,
+} from '@/canvas/store/draw-shape-state';
 
 defineOptions({
     name: 'CanvasOverlayDrawShape',
@@ -109,13 +113,7 @@ onUnmounted(() => {
 });
 
 const selectedEditControlAttachPoints = computed(() => {
-    const points: EditControlPoint[] = [];
-    for (const point of editControlPoints.value) {
-        if (point.attachToIndex != null && selectedEditControlPointIndices.value.includes(point.attachToIndex)) {
-            points.push(point);
-        }
-    }
-    return points;
+    return selectedEditControlAttachPointIndices.value.map((index) => editControlPoints.value[index]);
 });
 
 watch([editControlPoints, viewDirty, editControlPointsDirty], () => {

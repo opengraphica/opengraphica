@@ -65,6 +65,7 @@ export function createPathStrokeShapes(
         let outsidePoints: Vector2[] | null = null;
         let outsideIsRight = false;
 
+        curveLoop:
         for (let i = lastInstructionIndex; i < pathSize; i++) {
             const curveIndex = ((i % pathSize) + pathSize) % pathSize;
             const instruction = path.curves[curveIndex];
@@ -169,8 +170,12 @@ export function createPathStrokeShapes(
 
                 switch (instruction.type) {
                     case 'LineCurve': {
-                        insidePoints.push(instruction.v2.clone().add(currentDirection.clone().rotateAround(new Vector2(), inside90Rotation).multiplyScalar(halfWidth)));
-                        outsidePoints.push(instruction.v2.clone().add(currentDirection.clone().rotateAround(new Vector2(), outside90Rotation).multiplyScalar(halfWidth)));
+                        if (!isEqualApprox(instruction.v1, instruction.v2)) {
+                            insidePoints.push(instruction.v2.clone().add(currentDirection.clone().rotateAround(new Vector2(), inside90Rotation).multiplyScalar(halfWidth)));
+                            outsidePoints.push(instruction.v2.clone().add(currentDirection.clone().rotateAround(new Vector2(), outside90Rotation).multiplyScalar(halfWidth)));
+                        } else {
+                            continue curveLoop;
+                        }
                         break;
                     }
                     case 'QuadraticBezierCurve': case 'CubicBezierCurve': {
@@ -832,26 +837,40 @@ function findPathDirectionAt(path: Path, pathIndex: number, isStart: boolean, cl
             isStart = false;
         }
     }
-    const curve = path.curves[pathIndex];
-    if (!curve) return new Vector2();
 
-    let p0: Vector2;
-    let p1: Vector2;
-    switch (curve.type) {
-        case 'LineCurve':
-            p0 = curve.getPointAt(0);
-            p1 = curve.getPointAt(1);
-        default:
-            if (isStart) {
-                p0 = curve.getPointAt(0);
-                p1 = curve.getPointAt(epsilon);
-            } else {
-                p0 = curve.getPointAt(1 - epsilon);
-                p1 = curve.getPointAt(1);
-            }
+    let p0!: Vector2;
+    let p1!: Vector2;
+    let loopCount = 0;
+    while (loopCount < 4) {
+        const curve = path.curves[pathIndex];
+        switch (curve.type) {
+            case 'LineCurve':
+                if (isEqualApprox(curve.v1, curve.v2, epsilon / 2)) {
+                    p0 = curve.v1;
+                    p1 = curve.v2;
+                } else {
+                    p0 = curve.getPointAt(0);
+                    p1 = curve.getPointAt(1);
+                }
+                break;
+            default:
+                if (isStart) {
+                    p0 = curve.getPointAt(0);
+                    p1 = curve.getPointAt(epsilon);
+                } else {
+                    p0 = curve.getPointAt(1 - epsilon);
+                    p1 = curve.getPointAt(1);
+                }
+        }
+        if (!isEqualApprox(p0, p1, epsilon / 2)) {
+            break;
+        }
+        pathIndex--;
+        pathIndex = ((pathIndex % curveLength) + curveLength) % curveLength;
+        loopCount++;
     }
 
-    if (isEqualApprox(p0, p1)) {
+    if (isEqualApprox(p0, p1, epsilon / 2)) {
         return new Vector2();
     } else {
         return directionTo(

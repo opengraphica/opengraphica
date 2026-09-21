@@ -720,6 +720,10 @@
         &.left {
             left: calc(var(--og-sidebar-left-width, .5rem) + .5rem);
         }
+
+        .el-notification__content {
+            text-align: left;
+        }
     }
 
     .el-popover {

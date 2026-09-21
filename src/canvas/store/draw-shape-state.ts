@@ -2,6 +2,7 @@ import { computed, ref, watch } from 'vue';
 
 import { PerformantStore } from '@/store/performant-store';
 
+import { pointDistance2d } from '@/lib/math';
 import {
     parseRectNodeAttributes, parsePolygonNodeAttributes, parsePolylineNodeAttributes,
     parseCircleNodeAttributes, parseEllipseNodeAttributes, parseLineNodeAttributes,
@@ -71,8 +72,8 @@ export interface EditControlPoint {
     sy?: number; // Starting point for drag
     tx?: number; // Transformed for view
     ty?: number; // Transformed for view
-    xProp: 'x' | 'x1' | 'x2';
-    yProp: 'y' | 'y1' | 'y2';
+    xProp?: 'x' | 'x1' | 'x2' | 'cx' | 'rx' | 'width';
+    yProp?: 'y' | 'y1' | 'y2' | 'cy' | 'ry' | 'height';
 }
 
 export const editControlPoints = ref<EditControlPoint[]>([]);
@@ -81,11 +82,13 @@ export const editControlPointNodes = ref<Element[]>([]);
 export const editControlPointNodeParsedAttributes = ref<Record<string, any>>([]);
 export const hoveringEditControlPointIndices = ref<number[]>([]);
 export const selectedEditControlPointIndices = ref<number[]>([]);
+export const selectedEditControlAttachPointIndices = ref<number[]>([]); // Attach points that reference selectedEditControlPointIndices
 
 const createEditControlPoints = throttle(() => {
     const controlPoints: EditControlPoint[] = [];
     hoveringEditControlPointIndices.value = [];
     selectedEditControlPointIndices.value = [];
+    selectedEditControlAttachPointIndices.value = [];
     editControlPointNodes.value = [];
     editControlPointNodeParsedAttributes.value = [];
     let nodeIndex = 0;
@@ -97,7 +100,7 @@ const createEditControlPoints = throttle(() => {
             layer.width / viewBox.width, layer.height / viewBox.height, 1.0,
         ).translateSelf(
             viewBox.x, viewBox.y, 0.0,
-        )
+        );
         const nodes = Array.from(
             layer.data.sourceDocument.querySelectorAll('rect,polygon,polyline,circle,ellipse,line,path')
         );
@@ -108,10 +111,32 @@ const createEditControlPoints = throttle(() => {
             editControlPointNodes.value.push(node);
             switch (node.nodeName) {
                 case 'rect': {
-                    const { x, y, w, h } = parseRectNodeAttributes(node);
-                    // TODO
+                    const { x, y, width, height } = parseRectNodeAttributes(node);
+                    const point = new DOMPoint(x, y);
+                    let xfPoint = point.matrixTransform(nodeXf);
+                    controlPoints.push({
+                        layerIndex,
+                        nodeIndex,
+                        pathIndex: 0,
+                        x: xfPoint.x,
+                        y: xfPoint.y,
+                        xProp: 'x',
+                        yProp: 'y',
+                    });
+                    point.x = x + width;
+                    point.y = y + height;
+                    xfPoint = point.matrixTransform(nodeXf);
+                    controlPoints.push({
+                        layerIndex,
+                        nodeIndex,
+                        pathIndex: 1,
+                        x: xfPoint.x,
+                        y: xfPoint.y,
+                        xProp: 'width',
+                        yProp: 'height',
+                    });
                     editControlPointNodeParsedAttributes.value.push({
-                        transform, x, y, w, h,
+                        transform, x, y, width, height,
                     });
                     break;
                 }
@@ -154,24 +179,101 @@ const createEditControlPoints = throttle(() => {
                     break;
                 }
                 case 'circle': {
-                    const { x, y, r } = parseCircleNodeAttributes(node);
-                    // TODO
+                    const { cx, cy, r } = parseCircleNodeAttributes(node);
+                    const point = new DOMPoint(cx, cy);
+                    let xfPoint = point.matrixTransform(nodeXf);
+                    controlPoints.push({
+                        layerIndex,
+                        nodeIndex,
+                        pathIndex: 0,
+                        x: xfPoint.x,
+                        y: xfPoint.y,
+                        xProp: 'cx',
+                        yProp: 'cy',
+                    });
+                    point.y = cy - r;
+                    xfPoint = point.matrixTransform(nodeXf);
+                    controlPoints.push({
+                        layerIndex,
+                        nodeIndex,
+                        pathIndex: 1,
+                        attachToIndex: controlPoints.length - 1,
+                        x: xfPoint.x,
+                        y: xfPoint.y,
+                        yProp: 'ry',
+                    });
                     editControlPointNodeParsedAttributes.value.push({
-                        transform, x, y, r,
+                        transform, cx, cy, r,
                     });
                     break;
                 }
                 case 'ellipse': {
-                    const { x, y, rx, ry } = parseEllipseNodeAttributes(node);
-                    // TODO
+                    const { cx, cy, rx, ry } = parseEllipseNodeAttributes(node);
+                    const point = new DOMPoint(cx, cy);
+                    let xfPoint = point.matrixTransform(nodeXf);
+                    controlPoints.push({
+                        layerIndex,
+                        nodeIndex,
+                        pathIndex: 0,
+                        x: xfPoint.x,
+                        y: xfPoint.y,
+                        xProp: 'cx',
+                        yProp: 'cy',
+                    });
+                    point.x = cx;
+                    point.y = cy - ry;
+                    xfPoint = point.matrixTransform(nodeXf);
+                    controlPoints.push({
+                        layerIndex,
+                        nodeIndex,
+                        pathIndex: 1,
+                        attachToIndex: controlPoints.length - 1,
+                        x: xfPoint.x,
+                        y: xfPoint.y,
+                        yProp: 'ry',
+                    });
+                    point.x = cx - rx;
+                    point.y = cy;
+                    xfPoint = point.matrixTransform(nodeXf);
+                    controlPoints.push({
+                        layerIndex,
+                        nodeIndex,
+                        pathIndex: 2,
+                        attachToIndex: controlPoints.length - 2,
+                        x: xfPoint.x,
+                        y: xfPoint.y,
+                        xProp: 'rx',
+                    });
                     editControlPointNodeParsedAttributes.value.push({
-                        transform, x, y, rx, ry,
+                        transform, cx, cy, rx, ry,
                     });
                     break;
                 }
                 case 'line': {
                     const { x1, y1, x2, y2 } = parseLineNodeAttributes(node);
-                    // TODO
+                    const point = new DOMPoint(x1, y1);
+                    let xfPoint = point.matrixTransform(nodeXf);
+                    controlPoints.push({
+                        layerIndex,
+                        nodeIndex,
+                        pathIndex: 0,
+                        x: xfPoint.x,
+                        y: xfPoint.y,
+                        xProp: 'x1',
+                        yProp: 'y1',
+                    });
+                    point.x = x2;
+                    point.y = y2;
+                    xfPoint = point.matrixTransform(nodeXf);
+                    controlPoints.push({
+                        layerIndex,
+                        nodeIndex,
+                        pathIndex: 1,
+                        x: xfPoint.x,
+                        y: xfPoint.y,
+                        xProp: 'x2',
+                        yProp: 'y2',
+                    });
                     editControlPointNodeParsedAttributes.value.push({
                         transform, x1, y1, x2, y2,
                     });
@@ -398,21 +500,113 @@ export function renderControlPointAttributeEdits(
 
         switch (node.nodeName) {
             case 'rect': {
+                let x = parseFloat(originalAttributes.x);
+                let y = parseFloat(originalAttributes.y);
+                let width = parseFloat(originalAttributes.width);
+                let height = parseFloat(originalAttributes.height);
+                for (const pointIndex of editGroup.editControlPointIndices) {
+                    const point = editControlPoints.value[pointIndex];
+                    if (editGroup.editControlPointIndices.includes(pointIndex)) {
+                        if (point.xProp === 'x' && point.yProp === 'y') {
+                            x = point.x;
+                            y = point.y;
+                        } else if (point.xProp === 'width' && point.yProp === 'height') {
+                            width = point.x - x;
+                            height = point.y - y;
+                        }
+                    }
+                }
+                scrapPoint.x = x;
+                scrapPoint.y = y;
+                let xfPoint = scrapPoint.matrixTransform(nodeXf);
+                attributes.x = `${xfPoint.x}`;
+                attributes.y = `${xfPoint.y}`;
+                scrapPoint.x = width + (originalAttributes.x - x);
+                scrapPoint.y = height + (originalAttributes.y - y);
+                xfPoint = scrapPoint.matrixTransform(nodeXf);
+                attributes.width = `${xfPoint.x}`;
+                attributes.height = `${xfPoint.y}`;
                 break;
             }
-            case 'polygon': {
-                break;
-            }
-            case 'polyline': {
+            case 'polygon': case 'polyline': {
+                let newPoints: DOMPoint[] = [...originalAttributes.points];
+                for (const pointIndex of editGroup.editControlPointIndices) {
+                    const point = editControlPoints.value[pointIndex];
+                    scrapPoint.x = point.x;
+                    scrapPoint.y = point.y;
+                    const xfPoint = scrapPoint.matrixTransform(nodeXf);
+                    if (point.layerIndex !== editGroup.layerIndex || point.nodeIndex !== editGroup.nodeIndex) continue;
+                    if (editGroup.editControlPointIndices.includes(pointIndex)) {
+                        newPoints[point.pathIndex].x = xfPoint.x;
+                        newPoints[point.pathIndex].y = xfPoint.y;
+                    }
+                }
+                let points = '';
+                for (const point of newPoints) {
+                    points += ' ' + point.x + ','  + point.y;
+                }
+                attributes.points = points.trim();
                 break;
             }
             case 'circle': {
+                for (const pointIndex of editGroup.editControlPointIndices) {
+                    const point = editControlPoints.value[pointIndex];
+                    if (editGroup.editControlPointIndices.includes(pointIndex)) {
+                        if (point.xProp === 'rx' || point.yProp === 'ry') {
+                            const attachPoint = editControlPoints.value[point.attachToIndex!];
+                            scrapPoint.x = point.x;
+                            scrapPoint.y = point.y;
+                            const xfPoint1 = scrapPoint.matrixTransform(nodeXf);
+                            scrapPoint.x = attachPoint.x;
+                            scrapPoint.y = attachPoint.y;
+                            const xfPoint2 = scrapPoint.matrixTransform(nodeXf);
+                            attributes.r = `${pointDistance2d(xfPoint1.x, xfPoint1.y, xfPoint2.x, xfPoint2.y)}`;
+                        } else {
+                            scrapPoint.x = point.x;
+                            scrapPoint.y = point.y;
+                            const xfPoint = scrapPoint.matrixTransform(nodeXf);
+                            attributes[point.xProp as never] = `${xfPoint.x}`;
+                            attributes[point.yProp as never] = `${xfPoint.y}`;
+                        }
+                    }
+                }
                 break;
             }
             case 'ellipse': {
+                for (const pointIndex of editGroup.editControlPointIndices) {
+                    const point = editControlPoints.value[pointIndex];
+                    if (editGroup.editControlPointIndices.includes(pointIndex)) {
+                        if (point.xProp === 'rx' || point.yProp === 'ry') {
+                            const attachPoint = editControlPoints.value[point.attachToIndex!];
+                            scrapPoint.x = point.x;
+                            scrapPoint.y = point.y;
+                            const xfPoint1 = scrapPoint.matrixTransform(nodeXf);
+                            scrapPoint.x = attachPoint.x;
+                            scrapPoint.y = attachPoint.y;
+                            const xfPoint2 = scrapPoint.matrixTransform(nodeXf);
+                            attributes[point.xProp! ?? point.yProp!] = `${pointDistance2d(xfPoint1.x, xfPoint1.y, xfPoint2.x, xfPoint2.y)}`;
+                        } else {
+                            scrapPoint.x = point.x;
+                            scrapPoint.y = point.y;
+                            const xfPoint = scrapPoint.matrixTransform(nodeXf);
+                            attributes[point.xProp as never] = `${xfPoint.x}`;
+                            attributes[point.yProp as never] = `${xfPoint.y}`;
+                        }
+                    }
+                }
                 break;
             }
             case 'line': {
+                for (const pointIndex of editGroup.editControlPointIndices) {
+                    const point = editControlPoints.value[pointIndex];
+                    scrapPoint.x = point.x;
+                    scrapPoint.y = point.y;
+                    const xfPoint = scrapPoint.matrixTransform(nodeXf);
+                    if (editGroup.editControlPointIndices.includes(pointIndex)) {
+                        attributes[point.xProp as never] = `${xfPoint.x}`;
+                        attributes[point.yProp as never] = `${xfPoint.y}`;
+                    }
+                }
                 break;
             }
             case 'path': {
@@ -425,8 +619,8 @@ export function renderControlPointAttributeEdits(
                     if (point.layerIndex !== editGroup.layerIndex || point.nodeIndex !== editGroup.nodeIndex) continue;
                     if (editGroup.editControlPointIndices.includes(pointIndex)) {
                         const command: VectorPathCommand = { ...newCommands[point.pathIndex] };
-                        command[point.xProp] = xfPoint.x;
-                        command[point.yProp] = xfPoint.y;
+                        command[point.xProp!] = xfPoint.x;
+                        command[point.yProp!] = xfPoint.y;
                         newCommands[point.pathIndex] = command;
                     }
                 }

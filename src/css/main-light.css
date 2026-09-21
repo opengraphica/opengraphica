@@ -28847,6 +28847,9 @@ body.og-full-page .opengraphica {
 .opengraphica .el-notification.left {
   left: calc(var(--og-sidebar-left-width, .5rem) + .5rem);
 }
+.opengraphica .el-notification .el-notification__content {
+  text-align: left;
+}
 .opengraphica .el-popover {
   --el-popover-border-radius: 0.875rem;
 }

@@ -3,13 +3,15 @@ import { nextTick, watch, WatchStopHandle } from 'vue';
 import type { PointerTracker } from './base';
 import BaseCanvasMovementController from './base-movement';
 import {
-    editControlPoints, editControlPointsDirty, hoveringEditControlPointIndices, selectedEditControlPointIndices,
-    editControlPointNodes, renderControlPointAttributeEdits,
+    editControlPoints, editControlPointsDirty, hoveringEditControlPointIndices,
+    selectedEditControlPointIndices, selectedEditControlAttachPointIndices,
+    editControlPointNodes, renderControlPointAttributeEdits, editControlPointNodeParsedAttributes,
     editingLayers, hasVisibleToolbarOverlay, showShapeDrawer,
 } from '@/canvas/store/draw-shape-state';
 
 import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
 import { isEqualApprox, pointDistance2d } from '@/lib/math';
+import { getViewBox } from '@/lib/svg';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import { t, tm, rt } from '@/i18n';
 
@@ -17,7 +19,7 @@ import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore, { historyBlockInteractionUntilComplete } from '@/store/history';
 import { getStoredSvgDocument } from '@/store/svg';
-import workingFileStore, { getSelectedLayers, getLayerGlobalTransform, ensureUniqueLayerSiblingName } from '@/store/working-file';
+import workingFileStore, { getSelectedLayers, getLayerGlobalTransform, ensureUniqueLayerSiblingName, getLayerById } from '@/store/working-file';
 
 import { useRenderer } from '@/renderers';
 
@@ -89,10 +91,16 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                     title: t('tutorialTip.drawShapeToolIntroduction.title'),
                     message: {
                         touch: message + (tm('tutorialTip.drawShapeToolIntroduction.body.touch') as string[]).map((message) => {
-                            return `<p class="mb-3!">${rt(message)}</p>`
+                            return `<p class="mb-3!">${rt(message, {
+                                add: `<strong class="font-bold"><span class="bi bi-plus-circle"></span> ${t('tutorialTip.drawShapeToolIntroduction.bodyTitle.add')}</strong>`,
+                                edit: `<strong class="font-bold"><span class="bi bi-pencil-square"></span> ${t('tutorialTip.drawShapeToolIntroduction.bodyTitle.edit')}</strong>`,
+                            })}</p>`
                         }).join(''),
                         mouse: message + (tm('tutorialTip.drawShapeToolIntroduction.body.mouse') as string[]).map((message) => {
-                            return `<p class="mb-3!">${rt(message)}</p>`
+                            return `<p class="mb-3!">${rt(message, {
+                                add: `<strong class="font-bold"><span class="bi bi-plus-circle"></span> ${t('tutorialTip.drawShapeToolIntroduction.bodyTitle.add')}</strong>`,
+                                edit: `<strong class="font-bold"><span class="bi bi-pencil-square"></span> ${t('tutorialTip.drawShapeToolIntroduction.bodyTitle.edit')}</strong>`,
+                            })}</p>`
                         }).join(''),
                     }
                 });
@@ -187,18 +195,40 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         ({ viewTransformPoint: this.dragStartPoint } = this.getTransformedCursorInfo());
 
         this.selectedAttachedEditControlPointIndices = [];
+        const selectedEditControlAttachPointIndicesSet = new Set<number>();
+
+        const referencedControlPointIndices = new Set<number>();
+        for (const selectedIndex of selectedEditControlPointIndices.value) {
+            const point = editControlPoints.value[selectedIndex];
+            if (point.attachToIndex != null) {
+                referencedControlPointIndices.add(point.attachToIndex);
+            }
+        }
+
         // This loops under the assumption attached indices always follow what they're attached to
-        for (let i = selectedEditControlPointIndices.value[0] + 1; i < editControlPoints.value.length; i++) {
+        const firstCheckIndex = Math.min(
+            editControlPoints.value[selectedEditControlPointIndices.value[0]].attachToIndex ?? Infinity,
+            selectedEditControlPointIndices.value[0]
+        );
+        for (let i = firstCheckIndex + 1; i < editControlPoints.value.length; i++) {
+            const point = editControlPoints.value[i];
             for (let selectedIndex of selectedEditControlPointIndices.value) {
                 if (
-                    editControlPoints.value[i].attachToIndex === selectedIndex
+                    point.attachToIndex === selectedIndex
                     && i !== selectedIndex
                 ) {
                     this.selectedAttachedEditControlPointIndices.push(i);
+                    selectedEditControlAttachPointIndicesSet.add(i);
                     break;
                 }
             }
+            if (point.attachToIndex != null && referencedControlPointIndices.has(point.attachToIndex)) {
+                selectedEditControlAttachPointIndicesSet.add(i);
+            }
         }
+
+        selectedEditControlAttachPointIndices.value = Array.from(selectedEditControlAttachPointIndicesSet);
+
         this.draggingEditControlPointIndices = selectedEditControlPointIndices.value.slice();
         for (let pointIndex of this.selectedAttachedEditControlPointIndices) {
             this.draggingEditControlPointIndices.push(pointIndex);
@@ -243,8 +273,43 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
         for (const pointIndex of this.draggingEditControlPointIndices) {
             const point = editControlPoints.value[pointIndex];
-            point.x = point.sx! + (viewTransformPoint.x - this.dragStartPoint.x);
-            point.y = point.sy! + (viewTransformPoint.y - this.dragStartPoint.y);
+
+            if ((point.xProp && point.yProp) || !selectedEditControlPointIndices.value.includes(pointIndex)) {
+                point.x = point.sx! + (viewTransformPoint.x - this.dragStartPoint.x);
+                point.y = point.sy! + (viewTransformPoint.y - this.dragStartPoint.y);
+            } else {
+                const layer = editingLayers.value[point.layerIndex];
+                const viewBox = getViewBox(layer.data.sourceDocument);
+                const viewBoxXf = layer.transform.scale(
+                    layer.width / viewBox.width, layer.height / viewBox.height, 1.0,
+                ).translateSelf(
+                    viewBox.x, viewBox.y, 0.0,
+                );
+
+                const { transform } = editControlPointNodeParsedAttributes.value[point.nodeIndex];
+                const nodeXf = viewBoxXf.multiply(transform);
+                const inverseNodeXf = nodeXf.inverse();
+
+                const referencePointXf = new DOMPoint(
+                    point.sx!,
+                    point.sy!
+                ).matrixTransform(inverseNodeXf);
+                const newPointXf = new DOMPoint(
+                    point.sx! + (viewTransformPoint.x - this.dragStartPoint.x),
+                    point.sy! + (viewTransformPoint.y - this.dragStartPoint.y),
+                ).matrixTransform(inverseNodeXf);
+
+                if (!point.xProp) {
+                    newPointXf.x = referencePointXf.x;
+                }
+                if (!point.yProp) {
+                    newPointXf.y = referencePointXf.y;
+                }
+
+                const newPoint = newPointXf.matrixTransform(nodeXf);
+                point.x = newPoint.x;
+                point.y = newPoint.y;
+            }
         }
 
         editControlPointsDirty.value = true;
@@ -260,12 +325,6 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
         this.drawEnd(e);
     }
-
-    // private drawPreview() {
-
-    //     canvasStore.set('dirty', true);
-    // }
-
     private async drawEnd(e: PointerEvent) {
         const pointer = this.pointers.filter((pointer) => pointer.id === this.drawingPointerId)[0];
 
@@ -298,7 +357,10 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 if (
                     pathPointIndex === excludeIndex
                     || (!currentIsAttached && isAttached)
-                    || (isAttached && !selectedEditControlPointIndices.value.includes(pathPoint.attachToIndex!))
+                    || (
+                        isAttached
+                        && !selectedEditControlAttachPointIndices.value.includes(pathPointIndex)
+                    )
                 ) {
                     continue;
                 } else {

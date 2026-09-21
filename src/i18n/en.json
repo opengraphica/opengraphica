@@ -1672,15 +1672,21 @@
         "drawShapeToolIntroduction": {
             "title": "Shape Tool",
             "introduction": [
-                "The shape tool lets you add various basic shapes, which can be converted into vector paths if more customization is needed."
+                "The shape tool lets you add various basic shapes and vector paths."
             ],
             "body": {
                 "mouse": [
-                    "Click and drag to place a shape on the canvas."
+                    "{add} - Click and drag to place a shape on the canvas.",
+                    "{edit} - Click on a shape's control points and drag them to edit the shape after it has been added."
                 ],
                 "touch": [
-                    "Use one finger to touch and drag to place a shape on the canvas."
+                    "{add} - Use one finger to touch and drag to place a shape on the canvas.",
+                    "{edit} - Tap a shape's control points and drag them to edit the shape after it has been added."
                 ]
+            },
+            "bodyTitle": {
+                "add": "Add",
+                "edit": "Edit"
             }
         },
         "effectToolIntroduction": {

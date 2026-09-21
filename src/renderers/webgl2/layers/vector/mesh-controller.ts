@@ -320,10 +320,14 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         const renderOrder = this.plane?.renderOrder ?? this.shapeGroup?.renderOrder ?? 0;
         
         let currentChildNode: Element | null = null;
+        let isTargetAttributeNode = true;
         while (node.parentElement) {
             const clonedNode = node.cloneNode() as Element;
-            for (const attributeName in attributes) {
-                clonedNode.setAttribute(attributeName, attributes[attributeName]);
+            if (isTargetAttributeNode) {
+                for (const attributeName in attributes) {
+                    clonedNode.setAttribute(attributeName, attributes[attributeName]);
+                }
+                isTargetAttributeNode = false;
             }
             if (currentChildNode) {
                 clonedNode.append(currentChildNode)
@@ -377,7 +381,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             }
         }
         createStroke:
-        if (path.userData.style.stroke != 'none' && path.userData.style.strokeWidth > 0) {
+        if (path.userData.style.stroke && path.userData.style.stroke != 'none' && path.userData.style.strokeWidth > 0) {
             const shapes = createPathStrokeShapes(path, {
                 lineCap: path.userData.style.strokeLineCap,
                 lineJoin: path.userData.style.strokeLineJoin,

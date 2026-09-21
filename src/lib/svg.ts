@@ -351,7 +351,7 @@ function parseTransformString(text: string, transform: DOMMatrix) {
                         let cx = 0;
                         let cy = 0;
                         // Angle
-                        angle = array[0] * Math.PI / 180;
+                        angle = array[0];
                         if (array.length >= 3) {
                             // Center x, y
                             cx = array[1];
@@ -437,15 +437,14 @@ export function parseCommonNodeAttributes(node: Element, options?: ParseNodeGlob
 export function parseRectNodeAttributes(node: Element, options?: ParseNodeGlobalOptions) {
     const { defaultDPI, defaultUnit } = getDefaultParseNodeGlobalOptions(options);
 
-    const transform = parseNodeTransform(node, options);
     const x = parseFloatWithUnits(node.getAttribute('x') || '0', defaultUnit, defaultDPI);
     const y = parseFloatWithUnits(node.getAttribute('y') || '0', defaultUnit, defaultDPI);
     const rx = parseFloatWithUnits(node.getAttribute('rx') || node.getAttribute( 'ry' ) || '0', defaultUnit, defaultDPI);
     const ry = parseFloatWithUnits(node.getAttribute('ry') || node.getAttribute( 'rx' ) || '0', defaultUnit, defaultDPI);
-    const w = parseFloatWithUnits(node.getAttribute('width') || '0', defaultUnit, defaultDPI);
-    const h = parseFloatWithUnits(node.getAttribute('height') || '0', defaultUnit, defaultDPI);
+    const width = parseFloatWithUnits(node.getAttribute('width') || '0', defaultUnit, defaultDPI);
+    const height = parseFloatWithUnits(node.getAttribute('height') || '0', defaultUnit, defaultDPI);
 
-    return { x, y, rx, ry, w, h };
+    return { x, y, rx, ry, width, height };
 }
 
 export function parsePolygonNodeAttributes(node: Element, options?: ParseNodeGlobalOptions) {
@@ -493,22 +492,22 @@ export function parsePolylineNodeAttributes(node: Element, options?: ParseNodeGl
 export function parseCircleNodeAttributes(node: Element, options?: ParseNodeGlobalOptions) {
     const { defaultDPI, defaultUnit } = getDefaultParseNodeGlobalOptions(options);
 
-    const x = parseFloatWithUnits(node.getAttribute('cx') || '0', defaultUnit, defaultDPI);
-    const y = parseFloatWithUnits(node.getAttribute('cy') || '0', defaultUnit, defaultDPI);
+    const cx = parseFloatWithUnits(node.getAttribute('cx') || '0', defaultUnit, defaultDPI);
+    const cy = parseFloatWithUnits(node.getAttribute('cy') || '0', defaultUnit, defaultDPI);
     const r = parseFloatWithUnits(node.getAttribute('r') || '0', defaultUnit, defaultDPI);
 
-    return { x, y, r };
+    return { cx, cy, r };
 }
 
 export function parseEllipseNodeAttributes(node: Element, options?: ParseNodeGlobalOptions) {
     const { defaultDPI, defaultUnit } = getDefaultParseNodeGlobalOptions(options);
 
-    const x = parseFloatWithUnits(node.getAttribute('cx') || '0', defaultUnit, defaultDPI);
-    const y = parseFloatWithUnits(node.getAttribute('cy') || '0', defaultUnit, defaultDPI);
+    const cx = parseFloatWithUnits(node.getAttribute('cx') || '0', defaultUnit, defaultDPI);
+    const cy = parseFloatWithUnits(node.getAttribute('cy') || '0', defaultUnit, defaultDPI);
     const rx = parseFloatWithUnits(node.getAttribute('rx') || '0', defaultUnit, defaultDPI);
     const ry = parseFloatWithUnits(node.getAttribute('ry') || '0', defaultUnit, defaultDPI);
 
-    return { x, y, rx, ry };
+    return { cx, cy, rx, ry };
 }
 
 export function parseLineNodeAttributes(node: Element, options?: ParseNodeGlobalOptions) {
