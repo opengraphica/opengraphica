@@ -30,20 +30,15 @@ import { InsertLayerAction } from '@/actions/insert-layer';
 import { useWebdavClient } from '@/composables/webdav-client';
 
 import { knownFileExtensions } from '@/lib/regex';
-import { createBlobFromDataUri } from '@/lib/binary';
 import appEmitter from '@/lib/emitter';
 import { resizeImage } from '@/lib/image';
 import { limitMaxDimension } from '@/lib/math';
 
 import type {
     ShowOpenFilePicker, FileSystemFileHandle,
-    SerializedFile, SerializedFileLayer, WorkingFileLayer, ColorModel,
-    InsertAnyLayerOptions, InsertRasterLayerOptions, InsertRasterSequenceLayerOptions, InsertVectorLayerOptions,
-    InsertVideoLayerOptions, WorkingFileLayerMask, WorkingFileEmptyLayer, WorkingFileGradientLayer,
-    WorkingFileGroupLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileTextLayer,
-    WorkingFileVectorLayer, WorkingFileVectorPathLayer, WorkingFileVideoLayer, SerializedFileGradientLayer,
-    SerializedFileGroupLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer, SerializedFileTextLayer,
-    SerializedFileVectorLayer, SerializedFileVectorPathLayer, SerializedFileVideoLayer
+    ColorModel,
+    InsertRasterLayerOptions, InsertRasterSequenceLayerOptions, InsertVectorLayerOptions,
+    InsertVideoLayerOptions, WorkingFileRasterSequenceLayer,
 } from '@/types';
 
 declare global {
@@ -614,7 +609,7 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
                         height: image.height,
                         data: {
                             sourceUuid: await createStoredSvg(image),
-                        }
+                        },
                     })
                 );
             }

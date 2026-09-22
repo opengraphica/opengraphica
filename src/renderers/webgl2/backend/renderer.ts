@@ -74,7 +74,7 @@ export interface Webgl2RendererBackendPublic {
     createBucketFill(settings: RendererBucketFillSettings): Promise<void>;
     previewBucketFill(strength: number): Promise<void>;
     applyBucketFill(strength: number): Promise<RendererTextureTile[]>;
-    updateVectorLayerAttributes(layerId: number, nodeId: string, attributes: Record<string, string>): Promise<void>;
+    updateVectorLayerAttributes(layerId: number, nodeId: string, attributes: Record<string, string | null>): Promise<void>;
     createMeshController(type: string): Promise<MeshControllerInterface>;
     setDirty(): Promise<void>;
     dispose(): Promise<void>;
@@ -673,7 +673,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         return await this.compositor.applyBucketFill(strength);
     }
 
-    async updateVectorLayerAttributes(layerId: number, nodeId: string, attributes: Record<string, string>) {
+    async updateVectorLayerAttributes(layerId: number, nodeId: string, attributes: Record<string, string | null>) {
         const meshController = this.meshControllersById.get(layerId);
         if (!meshController) return;
         await meshController.updateVectorLayerAttributes?.(nodeId, attributes);

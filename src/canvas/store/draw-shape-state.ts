@@ -1,4 +1,5 @@
 import { computed, ref, watch } from 'vue';
+import mitt from 'mitt';
 
 import { PerformantStore } from '@/store/performant-store';
 
@@ -14,52 +15,76 @@ import { throttle } from '@/lib/timing';
 
 import { type RendererFrontend, type VectorPathCommand, VectorPathCommandType, type RGBAColor, type WorkingFileVectorLayer } from '@/types';
 
+export const drawShapeToolbarEmitter = mitt();
+
 export const editingLayers = ref<WorkingFileVectorLayer[]>([]);
 export const showShapeDrawer = ref(false);
 
-export const styleDockVisible = ref(false);
-export const styleDockLeft = ref(0);
-export const styleDockTop = ref(0);
+export const fillStyleDockVisible = ref(false);
+export const fillStyleDockLeft = ref(0);
+export const fillStyleDockTop = ref(0);
+
+export const strokeStyleDockVisible = ref(false);
+export const strokeStyleDockLeft = ref(0);
+export const strokeStyleDockTop = ref(0);
 
 export const hasVisibleToolbarOverlay = computed(() => {
     return showShapeDrawer.value;
 });
 
 interface PermanentStorageState {
+    colorPalette: RGBAColor[];
+    fillColorPaletteIndex: number;
     selectedShapeType: string;
-    strokeColor: RGBAColor;
+    strokeColorPaletteIndex: number;
     strokeWidth: number;
-    fillColor: RGBAColor;
 }
 
 const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentStorageState }>({
     name: 'drawShapeStateStore',
     state: {
+        colorPalette: [
+            {
+                is: 'color',
+                r: 0,
+                g: 0,
+                b: 0,
+                alpha: 1,
+                style: '#000000'
+            },
+            {
+                is: 'color',
+                r: 1,
+                g: 1,
+                b: 1,
+                alpha: 1,
+                style: '#ffffff'
+            },
+            {
+                is: 'color',
+                r: 1,
+                g: 0,
+                b: 0,
+                alpha: 1,
+                style: '#ff0000'
+            },
+        ],
+        fillColorPaletteIndex: 0,
         selectedShapeType: 'rectangle',
-        strokeColor: {
-            is: 'color',
-            r: 0,
-            g: 0,
-            b: 0,
-            alpha: 1,
-            style: '#000000'
-        },
+        strokeColorPaletteIndex: 0,
         strokeWidth: 0,
-        fillColor: {
-            is: 'color',
-            r: 0,
-            g: 0,
-            b: 0,
-            alpha: 1,
-            style: '#000000'
-        },
     },
-    restore: ['selectedShapeType', 'strokeColor', 'fillColor'],
+    restore: ['colorPalette', 'fillColorPaletteIndex', 'selectedShapeType', 'strokeColorPaletteIndex', 'strokeWidth'],
 });
 
+export const colorPalette = permanentStorage.getDeepWritableRef('colorPalette');
+export const fillColorPaletteIndex = permanentStorage.getWritableRef('fillColorPaletteIndex');
 export const selectedShapeType = permanentStorage.getWritableRef('selectedShapeType');
-export const strokeColor = permanentStorage.getWritableRef('strokeColor');
-export const fillColor = permanentStorage.getWritableRef('fillColor');
+export const strokeColorPaletteIndex = permanentStorage.getWritableRef('strokeColorPaletteIndex');
+export const strokeWidth = permanentStorage.getWritableRef('strokeWidth');
+
+export const fillColor = ref<RGBAColor>(colorPalette.value[fillColorPaletteIndex.value]);
+export const strokeColor = ref<RGBAColor>(colorPalette.value[strokeColorPaletteIndex.value]);
 
 export interface EditControlPoint {
     layerIndex: number; // Index in editingLayers
@@ -86,9 +111,9 @@ export const selectedEditControlAttachPointIndices = ref<number[]>([]); // Attac
 
 const createEditControlPoints = throttle(() => {
     const controlPoints: EditControlPoint[] = [];
+    const previousControlPoints: EditControlPoint[] = [...editControlPoints.value];
+
     hoveringEditControlPointIndices.value = [];
-    selectedEditControlPointIndices.value = [];
-    selectedEditControlAttachPointIndices.value = [];
     editControlPointNodes.value = [];
     editControlPointNodeParsedAttributes.value = [];
     let nodeIndex = 0;
@@ -105,7 +130,7 @@ const createEditControlPoints = throttle(() => {
             layer.data.sourceDocument.querySelectorAll('rect,polygon,polyline,circle,ellipse,line,path')
         );
         for (const node of nodes) {
-            const { transform } = parseCommonNodeAttributes(node);
+            const { transform, fill, stroke } = parseCommonNodeAttributes(node);
             const nodeXf = viewBoxXf.multiply(transform);
 
             editControlPointNodes.value.push(node);
@@ -136,7 +161,7 @@ const createEditControlPoints = throttle(() => {
                         yProp: 'height',
                     });
                     editControlPointNodeParsedAttributes.value.push({
-                        transform, x, y, width, height,
+                        transform, fill, stroke, x, y, width, height,
                     });
                     break;
                 }
@@ -155,7 +180,7 @@ const createEditControlPoints = throttle(() => {
                         });
                     }
                     editControlPointNodeParsedAttributes.value.push({
-                        transform, points,
+                        transform, fill, stroke, points,
                     });
                     break;
                 }
@@ -174,7 +199,7 @@ const createEditControlPoints = throttle(() => {
                         });
                     }
                     editControlPointNodeParsedAttributes.value.push({
-                        transform, points,
+                        transform, fill, stroke, points,
                     });
                     break;
                 }
@@ -203,7 +228,7 @@ const createEditControlPoints = throttle(() => {
                         yProp: 'ry',
                     });
                     editControlPointNodeParsedAttributes.value.push({
-                        transform, cx, cy, r,
+                        transform, fill, stroke, cx, cy, r,
                     });
                     break;
                 }
@@ -245,7 +270,7 @@ const createEditControlPoints = throttle(() => {
                         xProp: 'rx',
                     });
                     editControlPointNodeParsedAttributes.value.push({
-                        transform, cx, cy, rx, ry,
+                        transform, fill, stroke, cx, cy, rx, ry,
                     });
                     break;
                 }
@@ -275,7 +300,7 @@ const createEditControlPoints = throttle(() => {
                         yProp: 'y2',
                     });
                     editControlPointNodeParsedAttributes.value.push({
-                        transform, x1, y1, x2, y2,
+                        transform, fill, stroke, x1, y1, x2, y2,
                     });
                     break;
                 }
@@ -421,18 +446,40 @@ const createEditControlPoints = throttle(() => {
                         previousAttachToIndex = attachToIndex;
                     }
                     editControlPointNodeParsedAttributes.value.push({
-                        transform, d,
+                        transform, fill, stroke, d,
                     });
                     break;
                 }
                 default: {
                     editControlPointNodeParsedAttributes.value.push({
-                        transform,
+                        transform, fill, stroke,
                     });
                 }
             }
             nodeIndex = editControlPointNodes.value.length;
         }
+    }
+
+    let hasControlPointsChanged = false;
+    if (controlPoints.length !== previousControlPoints.length) {
+        hasControlPointsChanged = true;
+    } else {
+        for (const [pointIndex, point1] of controlPoints.entries()) {
+            const point2 = previousControlPoints[pointIndex];
+            if (
+                point1.layerIndex !== point2.layerIndex
+                || point1.nodeIndex !== point2.nodeIndex
+                || point1.pathIndex !== point2.pathIndex
+            ) {
+                hasControlPointsChanged = true;
+                break;
+            }
+        }
+    }
+
+    if (hasControlPointsChanged) {
+        selectedEditControlPointIndices.value = [];
+        selectedEditControlAttachPointIndices.value = [];
     }
 
     editControlPoints.value = controlPoints;
@@ -446,7 +493,7 @@ interface ControlPointAttributeEditGroup {
     editControlPointIndices: number[]
 }
 
-interface ControlPointAttributeEdit {
+export interface ControlPointAttributeEdit {
     layerId: number;
     nodeId: string;
     attributes: Record<string, string>;
@@ -455,7 +502,7 @@ interface ControlPointAttributeEdit {
 export function renderControlPointAttributeEdits(
     editControlPointIndices: number[],
     renderer: RendererFrontend,
-) {
+): ControlPointAttributeEdit[] {
     const editGroups: ControlPointAttributeEditGroup[] = [];
     const edits: ControlPointAttributeEdit[] = [];
     const scrapPoint = new DOMPoint();
@@ -635,11 +682,17 @@ export function renderControlPointAttributeEdits(
             }
         }
 
+        edits.push({
+            layerId,
+            nodeId,
+            attributes,
+        });
+
         renderer.updateVectorLayerAttributes(
             layerId,
             nodeId,
             attributes,
-        )
+        );
     }
 
     return edits;

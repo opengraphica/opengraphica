@@ -67,6 +67,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
     regenerateThumbnailTimeoutHandle: number | undefined;
     overrideFilterParamTextures: Texture<any>[] = [];
     svgMeshesById: Record<string, Array<Mesh>> = {};
+    isPendingGenerateSvgTexture: boolean = false;
 
     handleResize: (() => void);
 
@@ -158,21 +159,25 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
     }
 
     async updateData(data: WorkingFileVectorLayer['data']) {
-        this.sourceUuid = data.sourceUuid;
+        if (this.sourceUuid != data.sourceUuid) {
+            this.sourceUuid = data.sourceUuid;
+            this.isPendingGenerateSvgTexture = true;
+        }
         if (data.sourceDocument) {
             this.generateSvgMeshes(data.sourceDocument);
         } else if (data.sourceDocumentSerialized) {
             const sourceDocument = this.domParser.parseFromString(data.sourceDocumentSerialized, 'image/svg+xml');
             this.generateSvgMeshes(sourceDocument);
         } else {
-            if (this.shapeGroup) {
-                this.scene?.remove(this.shapeGroup);
+            const shapeGroup = this.shapeGroup;
+            this.shapeGroup = undefined;
+            await this.generateSvgTexture();
+            if (shapeGroup && !this.shapeGroup) {
+                this.scene?.remove(shapeGroup);
                 if (this.plane) {
                     this.scene?.add(this.plane);
                 }
-                this.disposeSvgMeshes();
             }
-            this.generateSvgTexture();
         }
     }
 
@@ -241,15 +246,19 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
     async generateSvgTexture() {
         if (this.shapeGroup) return;
         if (this.sourceUuid && this.plane) {
-            this.disposeSvgMeshes();
-
             let scale = new Vector3();
             this.plane.matrix.decompose(new Vector3(), new Quaternion(), scale);
             const scaledWidth = scale.x * this.width;
             const scaledHeight = scale.y * this.height;
             if (
-                Math.abs(scaledWidth - this.lastResizeScaledWidth) <= epsilon
-                && Math.abs(scaledHeight - this.lastResizeScaledHeight) <= epsilon) {
+                scaledWidth <= 0
+                || scaledHeight <= 0
+                || (
+                    !this.isPendingGenerateSvgTexture
+                    && Math.abs(scaledWidth - this.lastResizeScaledWidth) <= epsilon
+                    && Math.abs(scaledHeight - this.lastResizeScaledHeight) <= epsilon
+                )
+            ) {
                 return;
             }
             this.lastResizeScaledWidth = scaledWidth;
@@ -262,6 +271,11 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             this.sourceTexture = sourceTexture;
 
             this.scheduleMaterialUpdate('update');
+            this.isPendingGenerateSvgTexture = false;
+
+            if (!this.shapeGroup) {
+                this.disposeSvgMeshes();
+            }
         } else {
             this.disposeSourceTexture();
             this.scheduleMaterialUpdate('update');
@@ -304,7 +318,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         this.scene?.add(this.shapeGroup);
     }
 
-    async updateVectorLayerAttributes(nodeId: string, attributes: Record<string, string>) {
+    async updateVectorLayerAttributes(nodeId: string, attributes: Record<string, string | null>) {
         if (!this.sourceDocument || !this.shapeGroup) return;
         let node = this.sourceDocument.querySelector(`[data-ogr-id="${nodeId}"]`);
         if (!node) return;
@@ -325,7 +339,12 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             const clonedNode = node.cloneNode() as Element;
             if (isTargetAttributeNode) {
                 for (const attributeName in attributes) {
-                    clonedNode.setAttribute(attributeName, attributes[attributeName]);
+                    const value = attributes[attributeName];
+                    if (value != null) {
+                        clonedNode.setAttribute(attributeName, value);
+                    } else {
+                        clonedNode.removeAttribute(attributeName);
+                    }
                 }
                 isTargetAttributeNode = false;
             }
@@ -370,6 +389,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
                 color: path.color,
                 side: BackSide,
                 depthWrite: false,
+                opacity: path.userData.style.fillOpacity ?? 1,
                 transparent: true,
             });
             for (const shape of shapes) {
@@ -396,6 +416,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
                 color: path.userData.style.stroke,
                 side: BackSide,
                 depthWrite: false,
+                opacity: path.userData.style.strokeOpacity ?? 1,
                 transparent: true,
             });
             for (const shape of shapes) {

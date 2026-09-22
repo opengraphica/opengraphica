@@ -3,12 +3,16 @@ import { nextTick, watch, WatchStopHandle } from 'vue';
 import type { PointerTracker } from './base';
 import BaseCanvasMovementController from './base-movement';
 import {
+    drawShapeToolbarEmitter,
+    fillColor, strokeColor,
     editControlPoints, editControlPointsDirty, hoveringEditControlPointIndices,
     selectedEditControlPointIndices, selectedEditControlAttachPointIndices,
     editControlPointNodes, renderControlPointAttributeEdits, editControlPointNodeParsedAttributes,
     editingLayers, hasVisibleToolbarOverlay, showShapeDrawer,
+    type ControlPointAttributeEdit,
 } from '@/canvas/store/draw-shape-state';
 
+import { hexToColor } from '@/lib/color';
 import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
 import { isEqualApprox, pointDistance2d } from '@/lib/math';
 import { getViewBox } from '@/lib/svg';
@@ -21,10 +25,13 @@ import historyStore, { historyBlockInteractionUntilComplete } from '@/store/hist
 import { getStoredSvgDocument } from '@/store/svg';
 import workingFileStore, { getSelectedLayers, getLayerGlobalTransform, ensureUniqueLayerSiblingName, getLayerById } from '@/store/working-file';
 
+import { BundleAction } from '@/actions/bundle';
+import { UpdateVectorLayerAttributesAction } from '@/actions/update-vector-layer-attributes';
+
 import { useRenderer } from '@/renderers';
 
 import type {
-    RendererFrontend,
+    RendererFrontend, RGBAColor,
     WorkingFileVectorLayer, WorkingFileAnyLayer
 } from '@/types';
 
@@ -44,10 +51,9 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
     private dragHandleRadiusTouch: number = 10;
     private dragStartPoint: DOMPoint = new DOMPoint();
     private draggingEditControlPointIndices: number[] = [];
+    private pendingControlPointEdits: ControlPointAttributeEdit[] = [];
 
     // private editingLayersStartData: Array<WorkingFileVectorLayer['data']> | null = null;
-    // private editingControlPoint: keyof Pick<WorkingFileVectorLayer['data'], 'start' | 'end' | 'focus'> | null = null;
-    // private hoveringControlPoint: keyof Pick<WorkingFileVectorLayer['data'], 'start' | 'end' | 'focus'> | null = null;
 
     private drawingPointerId: number | null = null;
 
@@ -76,6 +82,11 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             editingLayers.value = this.selectedLayers.slice();
             this.updateToolbarFromEditingLayers();
         }, { immediate: true });
+
+        this.onFillColorChanged = this.onFillColorChanged.bind(this);
+        drawShapeToolbarEmitter.on('fillColorChanged', this.onFillColorChanged);
+        this.onStrokeColorChanged = this.onStrokeColorChanged.bind(this);
+        drawShapeToolbarEmitter.on('strokeColorChanged', this.onStrokeColorChanged);
 
         this.onHistoryStep = this.onHistoryStep.bind(this);
         appEmitter.on('editor.history.step', this.onHistoryStep);
@@ -121,6 +132,9 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         this.selectedLayerIdsUnwatch?.();
         this.selectedLayerIdsUnwatch = null;
 
+        drawShapeToolbarEmitter.off('fillColorChanged', this.onFillColorChanged);
+        drawShapeToolbarEmitter.off('strokeColorChanged', this.onStrokeColorChanged);
+
         appEmitter.off('editor.history.step', this.onHistoryStep);
 
         // Tutorial Message
@@ -144,6 +158,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         if (pointer && pointer.down.isPrimary && pointer.type !== 'touch' && pointer.down.button === 0) {
             const editControlPointIndices = this.getEditControlPointIndicesAtPagePoint(e.pageX, e.pageY);
             if (editControlPointIndices.length === 0) {
+                selectedEditControlPointIndices.value = [];
                 if (this.drawingPointerId == null) {
                     this.drawingPointerId = e.pointerId;
                     this.drawShapeStart(pointer)
@@ -160,6 +175,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         if (this.touches.length === 1) {
             const editControlPointIndices = this.getEditControlPointIndicesAtPagePoint(this.touches[0].down.pageX, this.touches[0].down.pageY);
             if (editControlPointIndices.length === 0) {
+                selectedEditControlPointIndices.value = [];
                 if (this.drawingPointerId == null) {
                     this.drawingPointerId = this.touches[0].down.pointerId;
                     this.drawShapeStart(this.touches[0])
@@ -239,6 +255,39 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             point.sx = point.x;
             point.sy = point.y;
         }
+
+        const nodeIndices = selectedEditControlPointIndices.value.map((selectedIndex) => {
+            const point = editControlPoints.value[selectedIndex];
+            return point.nodeIndex;
+        })
+
+        let averageFillColor: RGBAColor | null = null;
+        let averageStrokeColor: RGBAColor | null = null;
+        for (const nodeIndex of nodeIndices) {
+            let { fill, stroke } = editControlPointNodeParsedAttributes.value[nodeIndex];
+            fill = fill ?? '#00000000';
+            stroke = stroke ?? '#00000000';
+            if (averageFillColor?.style !== fill) {
+                if (averageFillColor) {
+                    averageFillColor = hexToColor('#000000', 'rgba');
+                } else {
+                    averageFillColor = hexToColor(fill, 'rgba');
+                }
+            }
+            if (averageStrokeColor?.style !== stroke) {
+                if (averageStrokeColor) {
+                    averageStrokeColor = hexToColor('#000000', 'rgba');
+                } else {
+                    averageStrokeColor = hexToColor(stroke, 'rgba');
+                }
+            }
+        }
+        if (averageFillColor != null) {
+            fillColor.value = averageFillColor;
+        }
+        if (averageStrokeColor != null) {
+            strokeColor.value = averageStrokeColor;
+        }
     }
 
     onPointerMove(e: PointerEvent): void {
@@ -314,7 +363,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
         editControlPointsDirty.value = true;
 
-        renderControlPointAttributeEdits(
+        this.pendingControlPointEdits = renderControlPointAttributeEdits(
             this.draggingEditControlPointIndices,
             this.renderer,
         );
@@ -323,8 +372,20 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
     async onPointerUpBeforePurge(e: PointerEvent): Promise<void> {
         super.onPointerUpBeforePurge(e);
 
-        this.drawEnd(e);
+        if (this.pointers.length == 1) {
+            const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
+
+            if (this.draggingEditControlPointIndices.length > 0 && pointer.isDragging) {
+                this.dragEditControlPointEnd();
+            } else {
+                this.drawEnd(e);
+            }
+
+            this.draggingEditControlPointIndices = [];
+        }
+
     }
+
     private async drawEnd(e: PointerEvent) {
         const pointer = this.pointers.filter((pointer) => pointer.id === this.drawingPointerId)[0];
 
@@ -332,6 +393,28 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         // this.editingControlPoint = null;
         this.drawingPointerId = null;
         this.hasCreatedLayer = false;
+    }
+
+    protected dragEditControlPointEnd() {
+        if (this.pendingControlPointEdits.length === 0) return;
+        const actions: UpdateVectorLayerAttributesAction[] = [];
+
+        for (const edit of this.pendingControlPointEdits) {
+            actions.push(new UpdateVectorLayerAttributesAction(
+                edit.layerId,
+                edit.nodeId,
+                { ...edit.attributes },
+                true,
+            ));
+        }
+
+        historyStore.dispatch('runAction', {
+            action: new BundleAction(
+                'moveVectorLayerControlPoints',
+                'action.moveVectorLayerControlPoints',
+                actions,
+            )
+        });
     }
 
     private getEditControlPointIndicesAtPagePoint(x: number, y: number, excludeIndex?: number, isHover?: boolean) {
@@ -380,6 +463,85 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             }
         }
         return currentIndices;
+    }
+
+    private getSelectedEditControlPointLayerNodeMap() {
+        const layerNodeMap = new Map<number, Set<string>>();
+        for (const index of selectedEditControlPointIndices.value) {
+            const point = editControlPoints.value[index];
+            const layerId = editingLayers.value[point.layerIndex]?.id;
+            if (layerId == null) continue;
+            if (!layerNodeMap.has(layerId)) {
+                layerNodeMap.set(layerId, new Set());
+            }
+            const nodeId = editControlPointNodes.value[point.nodeIndex].getAttribute('data-ogr-id');
+            if (nodeId == null) continue;
+            layerNodeMap.get(layerId)?.add(nodeId);
+        }
+        return layerNodeMap;
+    }
+
+    private async onFillColorChanged(color?: RGBAColor) {
+        if (!color) return;
+        if (selectedEditControlPointIndices.value.length > 0) {
+            const layerNodeMap = this.getSelectedEditControlPointLayerNodeMap();
+
+            const actions: UpdateVectorLayerAttributesAction[] = [];
+            for (const [layerId, nodeIdSet] of layerNodeMap.entries()) {
+                for (const nodeId of Array.from(nodeIdSet)) {
+                    console.log({
+                            fill: color.alpha > 0 ? color.style.slice(0, 7) : 'none',
+                            'fill-opacity': `${color.alpha}`,
+                        });
+
+                    actions.push(new UpdateVectorLayerAttributesAction(
+                        layerId,
+                        nodeId,
+                        {
+                            fill: color.alpha > 0 ? color.style.slice(0, 7) : 'none',
+                            'fill-opacity': `${color.alpha}`,
+                        },
+                    ));
+                }
+            }
+
+            await historyStore.dispatch('runAction', {
+                action: new BundleAction(
+                    'updateShapeFillColor',
+                    'action.updateShapeFillColor',
+                    actions,
+                )
+            });
+        }
+    }
+
+    private async onStrokeColorChanged(color?: RGBAColor) {
+        if (!color) return;
+        if (selectedEditControlPointIndices.value.length > 0) {
+            const layerNodeMap = this.getSelectedEditControlPointLayerNodeMap();
+
+            const actions: UpdateVectorLayerAttributesAction[] = [];
+            for (const [layerId, nodeIdSet] of layerNodeMap.entries()) {
+                for (const nodeId of Array.from(nodeIdSet)) {
+                    actions.push(new UpdateVectorLayerAttributesAction(
+                        layerId,
+                        nodeId,
+                        {
+                            stroke: color.alpha > 0 ? color.style.slice(0, 7) : null,
+                            'stroke-opacity': `${color.alpha}`,
+                        },
+                    ));
+                }
+            }
+
+            await historyStore.dispatch('runAction', {
+                action: new BundleAction(
+                    'updateShapeFillColor',
+                    'action.updateShapeFillColor',
+                    actions,
+                )
+            });
+        }
     }
 
     private onHistoryStep(event?: AppEmitterEvents['editor.history.step']) {

@@ -52,6 +52,22 @@ export function getStoredSvgDataUrl(uuid?: string): string | null {
     return storedSvg?.sourceDataUrl ?? null;
 }
 
+function ancestralTagNameSelector(node: Element) {
+    const selectors: string[] = [];
+    let current: Element | null = node;
+    while (current) {
+        const parent = current.parentElement;
+        const index = parent
+            ? Array.prototype.indexOf.call(parent.children, current) + 1
+            : 1;
+        selectors.unshift(
+            `${CSS.escape(current.localName)}:nth-child(${index})`
+        );
+        current = parent;
+    }
+    return selectors.join(" > ");
+}
+
 /**
  * Converts a SVG image into an XML document.
  */
@@ -72,7 +88,7 @@ export async function getStoredSvgDocument(uuid?: string): Promise<Document> {
     const elements = document.querySelectorAll('a,circle,clipPath,ellipse,g,image,line,linearGradient,marker,mask,path,pattern,polygon,polyline,radialGradient,rect,style,text,use,view');
     for (const element of Array.from(elements)) {
         if (!element.getAttribute('data-ogr-id')) {
-            element.setAttribute('data-ogr-id', uuidv4());
+            element.setAttribute('data-ogr-id', ancestralTagNameSelector(element));
         }
     }
     return markRaw(document);

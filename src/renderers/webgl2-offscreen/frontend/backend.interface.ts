@@ -307,7 +307,7 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
         return (await this.messageReceived(BackendWorkerMessage.APPLY_BUCKET_FILL_RESULT));
     }
 
-    async updateVectorLayerAttributes(layerId: number, nodeId: string, attributes: Record<string, string>) {
+    async updateVectorLayerAttributes(layerId: number, nodeId: string, attributes: Record<string, string | null>) {
         this.backendWorker.postMessage({
             type: BackendWorkerMessage.UPDATE_VECTOR_LAYER_ATTRIBUTES,
             layerId,

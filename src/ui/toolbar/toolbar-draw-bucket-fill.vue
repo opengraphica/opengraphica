@@ -14,11 +14,16 @@
                         <i class="bi bi-palette-fill mr-1" aria-hidden="true" />
                         {{ t('toolbar.drawBucketFill.brushColor') }}
                         <div
-                            :style="{
-                                'background': colorPaletteItems[colorPaletteIndex]?.color?.style,
-                            }"
-                            class="w-4 h-4 rounded-sm ml-2"
-                        />
+                            style="background-image: url('../images/transparency-bg.png')"
+                            class="rounded-sm ml-2"
+                        >
+                            <div
+                                :style="{
+                                    'background': colorPaletteItems[colorPaletteIndex]?.color?.style,
+                                }"
+                                class="w-4 h-4 rounded-sm"
+                            />
+                        </div>
                     </div>
                 </og-button>
                 <og-button v-model:pressed="strengthDockVisible" outline solid small toggle

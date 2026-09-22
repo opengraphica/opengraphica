@@ -4,6 +4,8 @@
  * @license MIT https://github.com/mrdoob/three.js/blob/dev/LICENSE
  */
 
+import { componentToHex } from '@/lib/color';
+
 import { VectorPathCommandType, type VectorPathCommand } from '@/types';
 
 const units = ['mm', 'cm', 'in', 'pt', 'pc', 'px'];
@@ -54,6 +56,23 @@ const unitConversion = {
         'px': 1,
     },
 };
+
+function cssColorToHex(colorName): string | null {
+    const el = document.createElement("span");
+    el.style.color = colorName;
+    document.body.appendChild(el);
+
+    const rgb = getComputedStyle(el).color;
+    el.remove();
+
+    const values = rgb.match(/\d+(?:\.\d+)?/g)?.map(Number);
+    if (!values) return null;
+
+    return "#" + values
+        .slice(0, 3)
+        .map(value => Math.round(value).toString(16).padStart(2, "0"))
+        .join("");
+}
 
 /**
  * @copyright (c) 2013 Peter-Paul van Gemerden <mail@ppvg.nl>
@@ -431,7 +450,27 @@ function parseNodeTransform(node: Element, options?: ParseNodeGlobalOptions) {
 
 export function parseCommonNodeAttributes(node: Element, options?: ParseNodeGlobalOptions) {
     const transform = parseNodeTransform(node, options);
-    return { transform };
+    let fill: string | null = node.getAttribute('fill') ?? '#000';
+    const fillOpacity = parseFloat(node.getAttribute('fill-opacity') ?? '1');
+    if (fill === 'none') {
+        fill = null;
+    } else if (!fill?.startsWith('#')) {
+        fill = cssColorToHex(fill);
+    }
+    if (fill != null && fillOpacity < 1) {
+        fill += componentToHex(Math.round(fillOpacity * 255));
+    }
+    let stroke = node.getAttribute('stroke') ?? null;
+    const strokeOpacity = parseFloat(node.getAttribute('stroke-opacity') ?? '1');
+    if (stroke === 'none') {
+        stroke = null;
+    } else if (!stroke?.startsWith('#')) {
+        stroke = cssColorToHex(stroke);
+    }
+    if (stroke != null && strokeOpacity < 1) {
+        stroke += componentToHex(Math.round(strokeOpacity * 255));
+    }
+    return { transform, fill, stroke };
 }
 
 export function parseRectNodeAttributes(node: Element, options?: ParseNodeGlobalOptions) {

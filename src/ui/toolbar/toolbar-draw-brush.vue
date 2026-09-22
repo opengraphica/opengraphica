@@ -38,11 +38,16 @@
                     <i class="bi bi-palette-fill mr-1" aria-hidden="true" />
                     {{ t('toolbar.drawBrush.brushColor') }}
                     <div
-                        :style="{
-                            'background': colorPaletteItems[colorPaletteIndex]?.color?.style,
-                        }"
-                        class="w-4 h-4 rounded-sm ml-2"
-                    />
+                        style="background-image: url('../images/transparency-bg.png')"
+                        class="rounded-sm ml-2"
+                    >
+                        <div
+                            :style="{
+                                'background': colorPaletteItems[colorPaletteIndex]?.color?.style,
+                            }"
+                            class="w-4 h-4 rounded-sm"
+                        />
+                    </div>
                 </og-button>
                 <og-button v-model:pressed="sizeDockVisible" outline solid small toggle class="ml-3!"
                     @click="sizeDockLeft = 0; sizeDockTop = 0;">

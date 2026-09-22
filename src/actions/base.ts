@@ -21,17 +21,17 @@ export class BaseAction {
     }
 
     constructor(actionId: string, actionDescription: string) {
-		this.id = actionId;
-		this.description = actionDescription;
-	}
-	public async do() {
-		this.done = true;
-	}
-	public async undo() {
-		this.done = false;
-	}
-	public free() {
-		// Override if need to run tasks to free memory when action is discarded from history
-	}
+        this.id = actionId;
+        this.description = actionDescription;
+    }
+    public async do() {
+        this.done = true;
+    }
+    public async undo() {
+        this.done = false;
+    }
+    public free() {
+        // Override if need to run tasks to free memory when action is discarded from history
+    }
     
 }

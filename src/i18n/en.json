@@ -26,6 +26,7 @@
         "freeTransformTranslate": "Free Transform (Move)",
         "insertLayer": "Insert Layer",
         "moduleCropResize": "Crop and Resize",
+        "moveVectorLayerControlPoints": "Move Vector Layer Control Points",
         "openFile": "Open File",
         "pasteLayers": "Paste Layer(s)",
         "placeholder": "Placeholder",
@@ -60,8 +61,11 @@
         "updateLayerFilterMask": "Update Layer Effect Mask",
         "updateLayerOpacity": "Change Opacity",
         "updateSelectionCombineMode": "Update Selection Combine Mode",
+        "updateShapeFillColor": "Update Shape Fill Color",
+        "updateShapeStrokeColor": "Update Shape Stroke Color",
         "updateSharpenLayer": "Sharpen Layer",
         "updateTextLayerProperties": "Update Text Layer Properties",
+        "updateVectorLayerAttributes": "Update Vector Layer",
         "waitingOnQueueFree": "Waiting for Work to Complete"
     },
     "app": {
@@ -1373,8 +1377,11 @@
                 "rectangle": "Rectangle",
                 "ellipse": "Ellipse"
             },
-            "style": {
-                "label": "Style"
+            "fillStyle": {
+                "label": "Fill"
+            },
+            "strokeStyle": {
+                "label": "Stroke"
             }
         },
         "effect": {

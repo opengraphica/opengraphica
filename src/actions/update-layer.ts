@@ -43,9 +43,9 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
         super('updateLayer', 'action.updateLayer');
         this.updateLayerOptions = updateLayerOptions;
         this.explicitPreviousProps = explicitPreviousProps as never;
-	}
+    }
 
-	public async do() {
+    public async do() {
         super.do();
 
         let requiresBaking: boolean = false;
@@ -227,9 +227,9 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
         updateWorkingFileLayer(layer);
 
         this.isFirstRun = false;
-	}
+    }
 
-	public async undo() {
+    public async undo() {
         super.undo();
 
         const layers = workingFileStore.get('layers');
@@ -287,7 +287,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
 
         // Update the working file backup
         if (layer) updateWorkingFileLayer(layer);
-	}
+    }
 
     public free() {
         super.free();
