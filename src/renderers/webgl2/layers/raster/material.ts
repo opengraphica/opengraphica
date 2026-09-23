@@ -38,6 +38,7 @@ export async function createRasterMaterial(params: RasterMaterialUpdateParams) {
     const material = new ShaderMaterial({
         transparent: true,
         depthTest: false,
+        depthWrite: false,
         vertexShader: shader.vertexShader,
         fragmentShader: shader.fragmentShader,
         side: FrontSide,

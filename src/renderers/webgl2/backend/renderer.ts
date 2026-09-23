@@ -24,6 +24,8 @@ import { SelectionMask } from './selection-mask';
 import { messageBus } from './message-bus';
 import { createCanvasFiltersFromLayerConfig } from '@/renderers/webgl2/layers/base/material';
 
+import { srgbChannelToLinearSrgbChannel, linearSrgbChannelToSrgbChannel } from '@/lib/color';
+
 import type { Camera, Texture } from 'three';
 import type {
     RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings, RendererTextureTile,
@@ -149,12 +151,21 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         const gl = this.renderer.getContext();
         this.renderer.extensions.get('EXT_float_blend');
         this.renderer.outputColorSpace = SRGBColorSpace;
+        this.renderer.sortObjects = true;
         this.renderer.setSize(1, 1, false);
+        this.renderer.setTransparentSort((a, b) => {
+             if ( a.renderOrder !== b.renderOrder ) {
+                return a.renderOrder - b.renderOrder;
+            } else if ( a.z !== b.z ) {
+                return b.z - a.z;
+            } else {
+                return a.id - b.id;
+            }
+        });
         this.viewport = new Vector4();
         this.maxTextureSize = this.renderer?.capabilities?.maxTextureSize ?? 2048;
         this.msaaSamples = this.getRecommendedMsaa(gl);
         this.maxMsaaSamples = gl instanceof WebGL2RenderingContext ? gl.getParameter(gl.MAX_SAMPLES) : 0;
-
         this.scene = new Scene();
         this.scene.background = null;
 
@@ -520,7 +531,9 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
             const imageBackgroundPreviousAlpha = this.imageBackground.backgroundMaterial.opacity;
 
             if (options?.disableBackground) {
-                this.imageBackground.setAlpha(0);
+                this.imageBackground.hide();
+            } else {
+                this.imageBackground.disableTransparencyGrid();
             }
 
             if (options?.layerIds) {
@@ -550,7 +563,9 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
             }
 
             if (options?.disableBackground) {
-                this.imageBackground.setAlpha(imageBackgroundPreviousAlpha);
+                this.imageBackground.show();
+            } else {
+                this.imageBackground.enableTransparencyGrid();
             }
 
             if (options?.layerIds) {
@@ -574,6 +589,31 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
 
         const buffer = new Uint8Array(imageWidth * imageHeight * 4);
         await this.renderer.readRenderTargetPixelsAsync(snapshotRenderTarget, 0, 0, imageWidth, imageHeight, buffer);
+
+        const MAX_CPU_PREMULTIPLIED_ALPHA_FIX_SIZE = 4096;
+        if (
+            (
+                options?.disableBackground
+                || this.imageBackground.getAlpha() < 1
+            )
+            && imageWidth < MAX_CPU_PREMULTIPLIED_ALPHA_FIX_SIZE
+            && imageHeight < MAX_CPU_PREMULTIPLIED_ALPHA_FIX_SIZE
+        ) {
+            for (let i = 0; i < buffer.length; i += 4) {
+                const alpha = buffer[i + 3] / 255;
+                if (alpha > 0) {
+                    buffer[i] = Math.min(255, Math.round(
+                        linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i] / 255) / alpha) * 255
+                    ));
+                    buffer[i + 1] = Math.min(255, Math.round(
+                        linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i + 1] / 255) / alpha) * 255
+                    ));
+                    buffer[i + 2] = Math.min(255, Math.round(
+                        linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i + 2] / 255) / alpha) * 255
+                    ));
+                }
+            }
+        }
 
         const bitmap = await createImageBitmap(
             new ImageData(new Uint8ClampedArray(buffer), imageWidth, imageHeight),

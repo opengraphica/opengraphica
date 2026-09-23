@@ -45,7 +45,6 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
     private hasCreatedLayer: boolean = false;
     private selectedLayers: WorkingFileVectorLayer[] = [];
-    private selectedAttachedEditControlPointIndices: number[] = [];
     
     private dragHandleRadius: number = 6;
     private dragHandleRadiusTouch: number = 10;
@@ -159,6 +158,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             const editControlPointIndices = this.getEditControlPointIndicesAtPagePoint(e.pageX, e.pageY);
             if (editControlPointIndices.length === 0) {
                 selectedEditControlPointIndices.value = [];
+                selectedEditControlAttachPointIndices.value = [];
                 if (this.drawingPointerId == null) {
                     this.drawingPointerId = e.pointerId;
                     this.drawShapeStart(pointer)
@@ -176,6 +176,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             const editControlPointIndices = this.getEditControlPointIndicesAtPagePoint(this.touches[0].down.pageX, this.touches[0].down.pageY);
             if (editControlPointIndices.length === 0) {
                 selectedEditControlPointIndices.value = [];
+                selectedEditControlAttachPointIndices.value = [];
                 if (this.drawingPointerId == null) {
                     this.drawingPointerId = this.touches[0].down.pointerId;
                     this.drawShapeStart(this.touches[0])
@@ -210,7 +211,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
     protected dragEditControlPointStart(e: PointerTracker) {
         ({ viewTransformPoint: this.dragStartPoint } = this.getTransformedCursorInfo());
 
-        this.selectedAttachedEditControlPointIndices = [];
+        const selectedAttachedEditControlPointIndices: number[] = [];
         const selectedEditControlAttachPointIndicesSet = new Set<number>();
 
         const referencedControlPointIndices = new Set<number>();
@@ -233,7 +234,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                     point.attachToIndex === selectedIndex
                     && i !== selectedIndex
                 ) {
-                    this.selectedAttachedEditControlPointIndices.push(i);
+                    selectedAttachedEditControlPointIndices.push(i);
                     selectedEditControlAttachPointIndicesSet.add(i);
                     break;
                 }
@@ -246,7 +247,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         selectedEditControlAttachPointIndices.value = Array.from(selectedEditControlAttachPointIndicesSet);
 
         this.draggingEditControlPointIndices = selectedEditControlPointIndices.value.slice();
-        for (let pointIndex of this.selectedAttachedEditControlPointIndices) {
+        for (let pointIndex of selectedAttachedEditControlPointIndices) {
             this.draggingEditControlPointIndices.push(pointIndex);
         }
 
@@ -489,11 +490,6 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             const actions: UpdateVectorLayerAttributesAction[] = [];
             for (const [layerId, nodeIdSet] of layerNodeMap.entries()) {
                 for (const nodeId of Array.from(nodeIdSet)) {
-                    console.log({
-                            fill: color.alpha > 0 ? color.style.slice(0, 7) : 'none',
-                            'fill-opacity': `${color.alpha}`,
-                        });
-
                     actions.push(new UpdateVectorLayerAttributesAction(
                         layerId,
                         nodeId,

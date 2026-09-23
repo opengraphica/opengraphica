@@ -55,7 +55,6 @@ export function drawWorkingFileToCanvas2d(canvas: HTMLCanvasElement, ctx: Canvas
     
     ctx.imageSmoothingEnabled = decomposedTransform.scaleX / window.devicePixelRatio < imageSmoothingZoomRatio;
 
-    (window as any).averageTimeStart = ((performance.now() - now) * 0.1) + (((window as any).averageTimeStart || 0) * 0.9);
     now = performance.now();
 
     // Draw the image background and frame
@@ -77,7 +76,6 @@ export function drawWorkingFileToCanvas2d(canvas: HTMLCanvasElement, ctx: Canvas
         options.selectionTest.resultPixelTest = imgData.data.slice(0, 4);
     }
 
-    (window as any).averageTimeCanvas = ((performance.now() - now) * 0.1) + (((window as any).averageTimeCanvas || 0) * 0.9);
     now = performance.now();
 
     // Clip the canvas
@@ -86,7 +84,6 @@ export function drawWorkingFileToCanvas2d(canvas: HTMLCanvasElement, ctx: Canvas
     ctx.rect(0, 0, imageWidth, imageHeight);
     ctx.clip();
 
-    (window as any).averageTimeClip = ((performance.now() - now) * 0.1) + (((window as any).averageTimeClip || 0) * 0.9);
     now = performance.now();
 
     // Draw layers
@@ -99,7 +96,6 @@ export function drawWorkingFileToCanvas2d(canvas: HTMLCanvasElement, ctx: Canvas
         }
     }
 
-    (window as any).averageTimeLayers = ((performance.now() - now) * 0.1) + (((window as any).averageTimeLayers || 0) * 0.9);
     now = performance.now();
 
     // If last layer was raster, draw the buffer.
@@ -113,8 +109,5 @@ export function drawWorkingFileToCanvas2d(canvas: HTMLCanvasElement, ctx: Canvas
     // Unclip the canvas
     ctx.restore();
 
-    (window as any).averageTimeRestore = ((performance.now() - now) * 0.1) + (((window as any).averageTimeRestore || 0) * 0.9);
     now = performance.now();
-
-    (window as any).averageTime = ((performance.now() - now) * 0.1) + (((window as any).averageTime || 0) * 0.9)
 }

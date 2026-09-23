@@ -128,7 +128,6 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
                     sequence: parsedSequence
                 }
             } as WorkingFileRasterSequenceLayer<ColorModel>;
-            (window as any).parsedLayer = parsedLayer;
         }
         else if (layer.type === 'vector') {
             const serializedLayer = layer as SerializedFileVectorLayer<ColorModel>;

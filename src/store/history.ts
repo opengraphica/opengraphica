@@ -82,8 +82,6 @@ const store = new PerformantStore<HistoryStore>({
     }
 });
 
-(window as any).historyStore = store;
-
 async function dispatchFree({ databaseSize, memorySize }: HistoryDispatch['free'], set: PerformantStore<HistoryStore>['directSet']) {
     let actionStack = store.get('actionStack');
     let actionStackIndex = store.get('actionStackIndex');

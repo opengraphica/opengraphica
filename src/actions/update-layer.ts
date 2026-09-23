@@ -76,9 +76,15 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                     const oldSourceUuid = layer.data.sourceUuid ?? '';
                     if (newSourceUuid && newSourceUuid !== oldSourceUuid) {
                         layer.data.sourceUuid = newSourceUuid;
-                        this.oldRasterSourceImageId = oldSourceUuid;
-                        reserveStoredImage(newSourceUuid, `${layer.id}`);
+                        if (this.updateLayerType === 'raster') {
+                            this.oldRasterSourceImageId = oldSourceUuid;
+                            reserveStoredImage(newSourceUuid, `${layer.id}`);
+                        }
                         requiresBaking = true;
+                    }
+                    if (this.updateLayerType === 'vector') {
+                        this.oldVectorSourceSvgId = oldSourceUuid;
+                        reserveStoredSvg(newSourceUuid, `${layer.id}`);
                     }
 
                     updateSourceImageWithChunks:
@@ -267,6 +273,10 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                     prepareStoredImageForArchival(layer.data.sourceUuid);
                     layer.data.tileUpdates = [...this.oldRasterTileUpdates];
                     layer.data.tileUpdateId = uuidv4();
+                }
+            } else if (layer.type === 'vector') {
+                if (this.oldVectorSourceSvgId != null && this.oldVectorSourceSvgId !== layer.data.sourceUuid) {
+                    layer.data.sourceUuid = this.oldVectorSourceSvgId;
                 }
             }
 
