@@ -441,6 +441,10 @@ export class Webgl2RendererFrontend implements RendererFrontend {
         return this.rendererBackend?.applyBucketFill(strength);
     }
 
+    async addVectorLayerElement(layerId: number, tagName: string, attributes: Record<string, string>) {
+        return this.rendererBackend?.addVectorLayerElement(layerId, tagName, attributes);
+    }
+
     async updateVectorLayerAttributes(layerId: number, nodeId: string, attributes: Record<string, string | null>) {
         return this.rendererBackend?.updateVectorLayerAttributes(layerId, nodeId, deepToRaw(attributes));
     }

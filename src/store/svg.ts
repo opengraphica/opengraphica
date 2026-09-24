@@ -1,6 +1,8 @@
 import { markRaw } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 
+import { generateSvgElementIds } from '@/lib/svg';
+
 // Map of uuid to image store data
 
 interface StoredSvg {
@@ -52,22 +54,6 @@ export function getStoredSvgDataUrl(uuid?: string): string | null {
     return storedSvg?.sourceDataUrl ?? null;
 }
 
-function ancestralTagNameSelector(node: Element) {
-    const selectors: string[] = [];
-    let current: Element | null = node;
-    while (current) {
-        const parent = current.parentElement;
-        const index = parent
-            ? Array.prototype.indexOf.call(parent.children, current) + 1
-            : 1;
-        selectors.unshift(
-            `${CSS.escape(current.localName)}:nth-child(${index})`
-        );
-        current = parent;
-    }
-    return selectors.join(" > ");
-}
-
 /**
  * Converts a SVG image into an XML document.
  */
@@ -85,12 +71,7 @@ export async function getStoredSvgDocument(uuid?: string): Promise<Document> {
     }
     const parser = new DOMParser();
     const document = parser.parseFromString(xmlString, 'image/svg+xml');
-    const elements = document.querySelectorAll('a,circle,clipPath,ellipse,g,image,line,linearGradient,marker,mask,path,pattern,polygon,polyline,radialGradient,rect,style,text,use,view');
-    for (const element of Array.from(elements)) {
-        if (!element.getAttribute('data-ogr-id')) {
-            element.setAttribute('data-ogr-id', ancestralTagNameSelector(element));
-        }
-    }
+    generateSvgElementIds(document);
     return markRaw(document);
 }
 

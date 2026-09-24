@@ -202,6 +202,17 @@ self.onmessage = ({ data }) => {
                 }, transferables);
             }).catch(logError);
             break;
+        case BackendWorkerMessage.ADD_VECTOR_LAYER_ELEMENT:
+            rendererBackend.addVectorLayerElement(
+                data.layerId,
+                data.tagName,
+                data.attributes,
+            ).then(() => {
+                self.postMessage({
+                    type: BackendWorkerMessage.ADD_VECTOR_LAYER_ELEMENT_RESULT,
+                })
+            }).catch(logError);
+            break;
         case BackendWorkerMessage.UPDATE_VECTOR_LAYER_ATTRIBUTES:
             rendererBackend.updateVectorLayerAttributes(
                 data.layerId,

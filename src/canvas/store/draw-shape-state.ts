@@ -83,8 +83,22 @@ export const selectedShapeType = permanentStorage.getWritableRef('selectedShapeT
 export const strokeColorPaletteIndex = permanentStorage.getWritableRef('strokeColorPaletteIndex');
 export const strokeWidth = permanentStorage.getWritableRef('strokeWidth');
 
-export const fillColor = ref<RGBAColor>(colorPalette.value[fillColorPaletteIndex.value]);
-export const strokeColor = ref<RGBAColor>(colorPalette.value[strokeColorPaletteIndex.value]);
+export const fillColor = ref<RGBAColor>(colorPalette.value[fillColorPaletteIndex.value] ?? {
+    is: 'color',
+    r: 0,
+    g: 0,
+    b: 0,
+    alpha: 1,
+    style: '#000000'
+});
+export const strokeColor = ref<RGBAColor>(colorPalette.value[strokeColorPaletteIndex.value]?? {
+    is: 'color',
+    r: 0,
+    g: 0,
+    b: 0,
+    alpha: 0,
+    style: '#00000000'
+});
 
 export interface EditControlPoint {
     layerIndex: number; // Index in editingLayers
@@ -537,20 +551,40 @@ export function renderControlPointAttributeEdits(
         const originalAttributes = editControlPointNodeParsedAttributes.value[editGroup.nodeIndex];
 
         const viewBox = getViewBox(layer.data.sourceDocument);
-        const nodeXf = layer.transform.scale(
+        const inverseViewXf = layer.transform.scale(
             layer.width / viewBox.width, layer.height / viewBox.height, 1.0,
         ).translateSelf(
             viewBox.x, viewBox.y, 0.0,
-        ).multiplySelf(
+        )
+        const inverseNodeXf = inverseViewXf.multiply(
             originalAttributes.transform
-        ).invertSelf();
+        )
+        const nodeXf = inverseNodeXf.inverse();
 
         switch (node.nodeName) {
             case 'rect': {
-                let x = parseFloat(originalAttributes.x);
-                let y = parseFloat(originalAttributes.y);
-                let width = parseFloat(originalAttributes.width);
-                let height = parseFloat(originalAttributes.height);
+                const originalPosition = new DOMPoint(
+                    parseFloat(originalAttributes.x),
+                    parseFloat(originalAttributes.y),
+                ).matrixTransform(inverseNodeXf);
+
+                // Screen space
+                let x = originalPosition.x;
+                let y = originalPosition.y;
+
+                const originalBottomRightPosition = new DOMPoint(
+                    parseFloat(originalAttributes.x) + parseFloat(originalAttributes.width),
+                    parseFloat(originalAttributes.y) + parseFloat(originalAttributes.height),
+                ).matrixTransform(inverseNodeXf);
+                const originalDimensions = new DOMPoint(
+                    originalBottomRightPosition.x - originalPosition.x,
+                    originalBottomRightPosition.y - originalPosition.y,
+                );
+
+                // Screen space
+                let width = originalDimensions.x;
+                let height = originalDimensions.y;
+
                 for (const pointIndex of editGroup.editControlPointIndices) {
                     const point = editControlPoints.value[pointIndex];
                     if (editGroup.editControlPointIndices.includes(pointIndex)) {
@@ -563,16 +597,21 @@ export function renderControlPointAttributeEdits(
                         }
                     }
                 }
+
                 scrapPoint.x = x;
                 scrapPoint.y = y;
-                let xfPoint = scrapPoint.matrixTransform(nodeXf);
-                attributes.x = `${xfPoint.x}`;
-                attributes.y = `${xfPoint.y}`;
-                scrapPoint.x = width + (originalAttributes.x - x);
-                scrapPoint.y = height + (originalAttributes.y - y);
-                xfPoint = scrapPoint.matrixTransform(nodeXf);
-                attributes.width = `${xfPoint.x}`;
-                attributes.height = `${xfPoint.y}`;
+                const topLeftXfPoint = scrapPoint.matrixTransform(nodeXf);
+                attributes.x = `${topLeftXfPoint.x}`;
+                attributes.y = `${topLeftXfPoint.y}`;
+
+                scrapPoint.x = originalPosition.x + width;
+                scrapPoint.y = originalPosition.y + height;
+                const bottomRightXfPoint = scrapPoint.matrixTransform(nodeXf);
+                
+                originalPosition.x + (x - originalPosition.x) +  width + (originalPosition.x - x);
+                scrapPoint.y = height + (originalPosition.y - y);
+                attributes.width = `${bottomRightXfPoint.x - topLeftXfPoint.x}`;
+                attributes.height = `${bottomRightXfPoint.y - topLeftXfPoint.y}`;
                 break;
             }
             case 'polygon': case 'polyline': {

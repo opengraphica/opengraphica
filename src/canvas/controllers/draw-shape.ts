@@ -1,10 +1,10 @@
 import { nextTick, watch, WatchStopHandle } from 'vue';
 
-import type { PointerTracker } from './base';
+import { type PointerTracker } from './base';
 import BaseCanvasMovementController from './base-movement';
 import {
     drawShapeToolbarEmitter,
-    fillColor, strokeColor,
+    fillColor, strokeColor, selectedShapeType,
     editControlPoints, editControlPointsDirty, hoveringEditControlPointIndices,
     selectedEditControlPointIndices, selectedEditControlAttachPointIndices,
     editControlPointNodes, renderControlPointAttributeEdits, editControlPointNodeParsedAttributes,
@@ -15,27 +15,40 @@ import {
 import { hexToColor } from '@/lib/color';
 import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
 import { isEqualApprox, pointDistance2d } from '@/lib/math';
-import { getViewBox } from '@/lib/svg';
+import { getViewBox, generateSvgElementIds, parseNodeTransform } from '@/lib/svg';
+import { AsyncCallbackQueue } from '@/lib/timing';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import { t, tm, rt } from '@/i18n';
 
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
-import historyStore, { historyBlockInteractionUntilComplete } from '@/store/history';
-import { getStoredSvgDocument } from '@/store/svg';
+import historyStore, {
+    createHistoryReserveToken, historyBlockInteractionUntilComplete,
+} from '@/store/history';
+import { createStoredSvg, getStoredSvgDocument } from '@/store/svg';
 import workingFileStore, { getSelectedLayers, getLayerGlobalTransform, ensureUniqueLayerSiblingName, getLayerById } from '@/store/working-file';
 
+import type { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
+import { InsertLayerAction } from '@/actions/insert-layer';
+import { UpdateLayerAction } from '@/actions/update-layer';
 import { UpdateVectorLayerAttributesAction } from '@/actions/update-vector-layer-attributes';
 
 import { useRenderer } from '@/renderers';
 
 import type {
     RendererFrontend, RGBAColor,
-    WorkingFileVectorLayer, WorkingFileAnyLayer
+    WorkingFileVectorLayer, WorkingFileAnyLayer,
+    InsertVectorLayerOptions, UpdateVectorLayerOptions,
 } from '@/types';
 
 const devicePixelRatio = window.devicePixelRatio || 1;
+
+interface DrawingShape {
+    layer: WorkingFileVectorLayer;
+    nodeXf: DOMMatrix;
+    element: Element;
+}
 
 export default class CanvasDrawShapetController extends BaseCanvasMovementController {
 
@@ -52,9 +65,12 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
     private draggingEditControlPointIndices: number[] = [];
     private pendingControlPointEdits: ControlPointAttributeEdit[] = [];
 
+    private drawingPointerId: number | null = null;
+    private drawingShapes: DrawingShape[] = [];
+    private actionQueue: AsyncCallbackQueue = new AsyncCallbackQueue();
+
     // private editingLayersStartData: Array<WorkingFileVectorLayer['data']> | null = null;
 
-    private drawingPointerId: number | null = null;
 
     onEnter(): void {
         super.onEnter();
@@ -159,10 +175,11 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             if (editControlPointIndices.length === 0) {
                 selectedEditControlPointIndices.value = [];
                 selectedEditControlAttachPointIndices.value = [];
-                if (this.drawingPointerId == null) {
-                    this.drawingPointerId = e.pointerId;
-                    this.drawShapeStart(pointer)
-                }
+                ({ viewTransformPoint: this.dragStartPoint } = this.getTransformedCursorInfo());
+                // if (this.drawingPointerId == null) {
+                //     this.drawingPointerId = e.pointerId;
+                //     this.drawShapeStart(pointer)
+                // }
             } else {
                 selectedEditControlPointIndices.value = editControlPointIndices;
                 this.dragEditControlPointStart(pointer);
@@ -177,10 +194,11 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             if (editControlPointIndices.length === 0) {
                 selectedEditControlPointIndices.value = [];
                 selectedEditControlAttachPointIndices.value = [];
-                if (this.drawingPointerId == null) {
-                    this.drawingPointerId = this.touches[0].down.pointerId;
-                    this.drawShapeStart(this.touches[0])
-                }
+                ({ viewTransformPoint: this.dragStartPoint } = this.getTransformedCursorInfo());
+                // if (this.drawingPointerId == null) {
+                //     this.drawingPointerId = this.touches[0].down.pointerId;
+                //     this.drawShapeStart(this.touches[0])
+                // }
             } else {
                 selectedEditControlPointIndices.value = editControlPointIndices;
                 this.dragEditControlPointStart(this.touches[0]);
@@ -189,23 +207,164 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
     }
 
     protected async drawShapeStart(e: PointerTracker) {
-        if (this.drawingPointerId == null) return;
-        const pointer = this.pointers.filter((pointer) => pointer.id === this.drawingPointerId)[0];
-        if (!pointer) return;
+        if (
+            this.drawingPointerId == null
+            || (fillColor.value.alpha <= 0 && strokeColor.value.alpha <= 0)
+        ) return;
 
-        const { viewTransformPoint: start } = this.getTransformedCursorInfo();
+        const startDrawReserveToken = createHistoryReserveToken();
+        await historyStore.dispatch('reserve', { token: startDrawReserveToken });
+
+        const { width, height } = workingFileStore.state;
         let selectedLayers = getSelectedLayers().filter(layer => layer.type === 'vector' || layer.type === 'empty');
+        let layerActions: BaseAction[] = [];
 
-        await nextTick();
+        const newSvgString = `<svg width="${Math.round(width)}" height="${Math.round(height)}" xmlns="http://www.w3.org/2000/svg"></svg>`;
 
-        selectedLayers = getSelectedLayers().filter(layer => layer.type === 'vector');
-        if (selectedLayers.length > 0) {
-            editingLayers.value = [selectedLayers[0] as WorkingFileVectorLayer];
-        } else {
-            editingLayers.value = [];
+        // Insert raster layer if none selected
+        if (selectedLayers.length === 0) {
+            const svgDocument = new DOMParser().parseFromString(newSvgString, 'image/svg+xml');
+            layerActions.push(new InsertLayerAction<InsertVectorLayerOptions>({
+                type: 'vector',
+                name: ensureUniqueLayerSiblingName(
+                    workingFileStore.state.layers[0]?.id, t('toolbar.drawShape.newVectorLayerName')
+                ),
+                width,
+                height,
+                transform: new DOMMatrix(),
+                data: {
+                    sourceUuid: await createStoredSvg((() => {
+                        const image = new Image();
+                        image.src = URL.createObjectURL(new Blob([newSvgString], { type: 'image/svg+xml' }));
+                        return image;
+                    })()),
+                    sourceDocument: svgDocument,
+                }
+            }));
         }
 
-        this.updateToolbarFromEditingLayers();
+        // Convert any empty layers to vector layers
+        for (let i = selectedLayers.length - 1; i >= 0; i--) {
+            const selectedLayer = selectedLayers[i];
+            if (selectedLayer.type === 'empty') {
+                const svgDocument = new DOMParser().parseFromString(newSvgString, 'image/svg+xml');
+                layerActions.push(
+                    new UpdateLayerAction<UpdateVectorLayerOptions>({
+                        id: selectedLayer.id,
+                        type: 'vector',
+                        width,
+                        height,
+                        transform: new DOMMatrix(),
+                        data: {
+                            sourceUuid: await createStoredSvg((() => {
+                                const image = new Image();
+                                image.src = URL.createObjectURL(new Blob([newSvgString], { type: 'image/svg+xml' }));
+                                return image;
+                            })()),
+                            sourceDocument: svgDocument,
+                        },
+                    })
+                );
+            } else if (selectedLayer.type !== 'vector') {
+                selectedLayers.splice(i, 1);
+            }
+        }
+
+        this.actionQueue.push(async () => {
+            // Finalize layer creation / conversion actions.
+            if (layerActions.length > 0) {
+                try {
+                    await historyStore.dispatch('runAction', {
+                        action: new BundleAction('createShapeLayer', 'action.createShapeLayer', layerActions),
+                        reserveToken: startDrawReserveToken,
+                    });
+                } catch {
+                    await historyStore.dispatch('unreserve', { token: startDrawReserveToken });
+                }
+            } else {
+                await historyStore.dispatch('unreserve', { token: startDrawReserveToken });
+            }
+
+            await nextTick();
+
+            const { viewTransformPoint } = this.getTransformedCursorInfo();
+
+            // Start a vector shape on each of the selected layers
+            selectedLayers = getSelectedLayers().filter(layer => layer.type === 'vector');
+            const drawingOnLayers = selectedLayers as WorkingFileVectorLayer[];
+            this.drawingShapes = [];
+
+            for (const layer of drawingOnLayers) {
+                const layerDocument = await getStoredSvgDocument(layer.data.sourceUuid);
+
+                let element: Element | null = null;
+                const tagName = {
+                    rectangle: 'rect',
+                    ellipse: 'ellipse',
+                }[selectedShapeType.value] ?? '';
+                if (tagName) {
+                    element = layerDocument.createElement(tagName);
+                }
+                if (!element) continue;
+
+                const viewBox = getViewBox(layer.data.sourceDocument);
+                const transform  = parseNodeTransform(layerDocument.documentElement);
+                const nodeXf = layer.transform.scale(
+                    layer.width / viewBox.width, layer.height / viewBox.height, 1.0,
+                ).translateSelf(
+                    viewBox.x, viewBox.y, 0.0,
+                ).multiplySelf(
+                    transform,
+                ).invertSelf();
+
+                switch (tagName) {
+                    case 'rect':
+                        const position1 = new DOMPoint(
+                            this.dragStartPoint.x,
+                            this.dragStartPoint.y,
+                        ).matrixTransform(nodeXf);
+                        const position2 = new DOMPoint(
+                            viewTransformPoint.x,
+                            viewTransformPoint.y,
+                        ).matrixTransform(nodeXf);
+                        const x = Math.min(position1.x, position2.x);
+                        const y = Math.min(position1.y, position2.y);
+                        element.setAttribute('x', `${x}`);
+                        element.setAttribute('y', `${y}`);
+                        element.setAttribute('width', `${Math.max(position1.x, position2.x) - x}`);
+                        element.setAttribute('height', `${Math.max(position1.y, position2.y) - y}`);
+                        break;
+                }
+                element.setAttribute('fill', fillColor.value.alpha > 0 ? fillColor.value.style.slice(0, 7) : 'none');
+                element.setAttribute('fill-opacity', `${fillColor.value.alpha}`);
+                if (strokeColor.value.alpha > 0) {
+                    element.setAttribute('stroke', strokeColor.value.style.slice(0, 7));
+                    element.setAttribute('stroke-opacity', `${strokeColor.value.alpha}`);
+                    element.setAttribute('stroke-width', '1'); // TODO
+                }
+
+                layerDocument.documentElement.append(element);
+                generateSvgElementIds(layerDocument);
+
+                this.drawingShapes.push({
+                    layer,
+                    nodeXf,
+                    element,
+                });
+
+                const attributes: Record<string, string> = {};
+                for (const attribute of Array.from(element.attributes)) {
+                    attributes[attribute.name] = attribute.value;
+                }
+                this.renderer?.addVectorLayerElement(
+                    layer.id,
+                    tagName,
+                    attributes,
+                );
+            }
+
+        });
+
     }
 
     protected dragEditControlPointStart(e: PointerTracker) {
@@ -302,7 +461,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 if (this.draggingEditControlPointIndices.length > 0) {
                     this.dragEditControlPointMove(pointer);
                 } else {
-                    // TODO - creating shape?
+                    this.drawShapeMove(pointer);
                 }
             } else {
                 if (editControlPoints.value.length > 0) {
@@ -314,6 +473,58 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
             this.handleCursorIcon();
         }
+    }
+
+    protected async drawShapeMove(e: PointerTracker) {
+
+        if (this.drawingPointerId == null) {
+            this.drawingPointerId = e.down.pointerId;
+            await this.drawShapeStart(e);
+        }
+
+        if (!this.actionQueue.isIdle()) {
+            return;
+        }
+
+        const { viewTransformPoint } = this.getTransformedCursorInfo();
+
+        for (const drawingShape of this.drawingShapes) {
+            const { layer, nodeXf, element } = drawingShape;
+            const nodeId = element.getAttribute('data-ogr-id');
+            if (nodeId == null) continue;
+
+            const attributes: Record<string, string> = {};
+
+            switch (element.tagName) {
+                case 'rect':
+                    const position1 = new DOMPoint(
+                        this.dragStartPoint.x,
+                        this.dragStartPoint.y,
+                    ).matrixTransform(nodeXf);
+                    const position2 = new DOMPoint(
+                        viewTransformPoint.x,
+                        viewTransformPoint.y,
+                    ).matrixTransform(nodeXf);
+                    const x = Math.min(position1.x, position2.x);
+                    const y = Math.min(position1.y, position2.y);
+                    attributes.x = `${x}`;
+                    attributes.y = `${y}`;
+                    attributes.width = `${Math.max(position1.x, position2.x) - x}`;
+                    attributes.height = `${Math.max(position1.y, position2.y) - y}`;
+                    element.setAttribute('x', attributes.x);
+                    element.setAttribute('y', attributes.y);
+                    element.setAttribute('width', attributes.width);
+                    element.setAttribute('height', attributes.height);
+                    break;
+            }
+            
+            this.renderer?.updateVectorLayerAttributes(
+                layer.id,
+                nodeId,
+                attributes,
+            );
+        }
+
     }
 
     protected dragEditControlPointMove(e: PointerTracker) {
@@ -376,10 +587,12 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         if (this.pointers.length == 1) {
             const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
 
-            if (this.draggingEditControlPointIndices.length > 0 && pointer.isDragging) {
-                this.dragEditControlPointEnd();
-            } else {
-                this.drawEnd(e);
+            if (pointer.isDragging) {
+                if (this.draggingEditControlPointIndices.length > 0) {
+                    this.dragEditControlPointEnd();
+                } else {
+                    this.drawEnd(e);
+                }
             }
 
             this.draggingEditControlPointIndices = [];

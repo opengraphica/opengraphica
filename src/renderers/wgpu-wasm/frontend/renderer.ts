@@ -277,6 +277,10 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
         return [];
     }
 
+    async addVectorLayerElement(layerId: number, tagName: string, attributes: Record<string, string | null>) {
+
+    }
+
     async updateVectorLayerAttributes(layerId: number, nodeId: string, attributes: Record<string, string | null>) {
 
     }

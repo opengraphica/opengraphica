@@ -86,7 +86,7 @@ export class AsyncCallbackQueue {
         }
     }
 
-     public wait(): Promise<void> {
+    public wait(): Promise<void> {
         if (!this.isCallbacksRunning && this.queue.length === 0) {
             return Promise.resolve();
         }
@@ -96,5 +96,9 @@ export class AsyncCallbackQueue {
                 void this.runCallbacks();
             }
         });
+    }
+
+    public isIdle() {
+        return !this.isCallbacksRunning && this.queue.length === 0;
     }
 }

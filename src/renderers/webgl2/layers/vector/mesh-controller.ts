@@ -19,6 +19,7 @@ import { Vector4 } from 'three/src/math/Vector4';
 
 import { createPathStrokeShapes } from './svg-stroke-path';
 
+import { generateSvgElementIds } from '@/lib/svg';
 import { throttle } from '@/lib/timing';
 
 import { getWebgl2RendererBackend, markRenderDirty, requestFrontendSvg } from '@/renderers/webgl2/backend';
@@ -320,6 +321,35 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         }
         
         this.scene?.add(this.shapeGroup);
+    }
+
+    async addVectorLayerElement(tagName: string, attributes: Record<string, string>) {
+        if (!this.sourceDocument || !this.shapeGroup) return;
+        const renderOrder = this.plane?.renderOrder ?? this.shapeGroup?.renderOrder ?? 0;
+
+        // TODO - Creating xml document doesn't work inside webworker.
+        var newDoc = window.document.implementation.createDocument(null, 'svg');
+        for (const attribute of Array.from(this.sourceDocument.documentElement.attributes)) {
+            newDoc.documentElement.setAttribute(attribute.name, attribute.value);
+        }
+        const element: Element = newDoc.createElement(tagName);
+        for (const attributeName in attributes) {
+            element.setAttribute(attributeName, attributes[attributeName]);
+        }
+        newDoc.documentElement.append(element);
+
+        const clonedElement = element.cloneNode() as Element;
+        this.sourceDocument.documentElement.append(clonedElement);
+        generateSvgElementIds(this.sourceDocument);
+        element.setAttribute('data-ogr-id', clonedElement.getAttribute('data-ogr-id') ?? '');
+
+        const { paths } = this.svgLoader.parse(newDoc);
+        const path = paths[0];
+        if (!path) return;
+
+        this.createPathShapes(path, renderOrder);
+
+        markRenderDirty();
     }
 
     async updateVectorLayerAttributes(nodeId: string, attributes: Record<string, string | null>) {

@@ -20,27 +20,30 @@ void main() {
 
     mat2 screenFromUv = inverse(uvFromScreen);
 
-    // Screen-space directions corresponding to increasing U and V.
     vec2 screenAxisU = normalize(screenFromUv[0]);
     vec2 screenAxisV = normalize(screenFromUv[1]);
-
-    vec2 screenOrigin =
-        gl_FragCoord.xy -
-        screenFromUv * vUv;
-
-    vec2 offsetFromOrigin =
-        gl_FragCoord.xy - screenOrigin;
+    vec2 screenOffset = screenFromUv * vUv;
 
     vec2 gridPixelPosition = vec2(
-        dot(offsetFromOrigin, screenAxisU),
-        dot(offsetFromOrigin, screenAxisV)
+        dot(screenOffset, screenAxisU),
+        dot(screenOffset, screenAxisV)
     );
 
     vec2 gridUv = gridPixelPosition / transparencyTileSize;
+    vec2 wrappedGridUv = fract(gridUv);
+    vec2 gridUvDx = dFdx(wrappedGridUv);
+    vec2 gridUvDy = dFdy(wrappedGridUv);
+
+    vec3 transparencyGridColor = textureGrad(
+        transparencyGridMap,
+        wrappedGridUv,
+        gridUvDx,
+        gridUvDy
+    ).rgb;
 
     gl_FragColor = vec4(
         (
-            (texture2D(transparencyGridMap, gridUv).rgb * (1.0 - color.a))
+            (transparencyGridColor * (1.0 - color.a))
             + (color.rgb * color.a)
         ) * step(EPSILON, opacity),
         opacity

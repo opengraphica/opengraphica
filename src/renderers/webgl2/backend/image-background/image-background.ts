@@ -170,9 +170,9 @@ export function createTransparencyGridTexture(
         UnsignedByteType
     );
 
+    texture.generateMipmaps = false;
     texture.wrapS = RepeatWrapping;
     texture.wrapT = RepeatWrapping;
-
     texture.magFilter = NearestFilter;
     texture.minFilter = NearestFilter;
 

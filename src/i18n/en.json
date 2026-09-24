@@ -12,6 +12,7 @@
         "createDrawGradientLayer": "Create Gradient Layer",
         "createNewFile": "New File",
         "createNewLayersFromSelection": "Create Layers From Selection",
+        "createShapeLayer": "Create Shape Layer",
         "createTextLayer": "Create Text Layer",
         "cutLayers": "Cut Layer(s)",
         "deleteLayers": "Delete Layer(s)",
@@ -1372,6 +1373,7 @@
             }
         },
         "drawShape": {
+            "newVectorLayerName": "New Shape",
             "shapeType": {
                 "label": "Shape",
                 "rectangle": "Rectangle",

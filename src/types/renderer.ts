@@ -100,6 +100,7 @@ export interface RendererFrontend {
     createBucketFill(settings: RendererBucketFillSettings);
     previewBucketFill(strength: number);
     applyBucketFill(strength: number): Promise<RendererTextureTile[]>;
+    addVectorLayerElement(layerId: number, tagName: string, attributes: Record<string, string>): Promise<void>;
     updateVectorLayerAttributes(layerId: number, nodeId: string, attributes: Record<string, string | null>): Promise<void>;
     dispose(): Promise<void>;
 }
@@ -120,6 +121,7 @@ export interface Webgl2RendererMeshController {
     overrideFilterParams(filterIndex: number, params?: Record<string, any> | null);
     overrideVisibility(visible?: boolean): void;
     updateVectorLayerAttributes?: (nodeId: string, attributes: Record<string, string | null>) => Promise<void>;
+    addVectorLayerElement?: (tagName: string, attributes: Record<string, string>) => Promise<void>;
 }
 
 export interface WgpuWasmRendererMeshController {

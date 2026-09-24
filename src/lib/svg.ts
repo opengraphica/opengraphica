@@ -422,7 +422,7 @@ function parseTransformString(text: string, transform: DOMMatrix) {
     return transform;
 }
 
-function parseNodeTransform(node: Element, options?: ParseNodeGlobalOptions) {
+export function parseNodeTransform(node: Element, options?: ParseNodeGlobalOptions) {
     const { defaultDPI, defaultUnit } = getDefaultParseNodeGlobalOptions(options);
 
     let transform = new DOMMatrix();
@@ -1103,4 +1103,27 @@ export function getViewBox(xml?: Document): DOMRect {
         ([minX, minY, maxX, maxY] = viewBoxSplit.map(str => parseFloat(str)));
     }
     return new DOMRect(minX, minY, maxX - minX, maxY - minY);
+}
+
+export function ancestralTagNameSelector(node: Element) {
+    const selectors: string[] = [];
+    let current: Element | null = node;
+    while (current) {
+        const parent = current.parentElement;
+        const index = parent
+            ? Array.prototype.indexOf.call(parent.children, current) + 1
+            : 1;
+        selectors.unshift(
+            `${CSS.escape(current.localName)}:nth-child(${index})`
+        );
+        current = parent;
+    }
+    return selectors.join(">");
+}
+
+export async function generateSvgElementIds(document: Document) {
+    const elements = document.querySelectorAll('a,circle,clipPath,ellipse,g,image,line,linearGradient,marker,mask,path,pattern,polygon,polyline,radialGradient,rect,style,text,use,view');
+    for (const element of Array.from(elements)) {
+        element.setAttribute('data-ogr-id', ancestralTagNameSelector(element));
+    }
 }
