@@ -448,10 +448,24 @@ export function parseNodeTransform(node: Element, options?: ParseNodeGlobalOptio
     return transform;
 }
 
+function getInheritedAttribute(node: Element | null, attributeName: string): string | null {
+    while (node != null) {
+        const attributeValue = node.getAttribute(attributeName);
+        if (attributeValue != null) {
+            return attributeValue;
+        }
+        node = node.parentElement;
+    }
+    return null;
+}
+
 export function parseCommonNodeAttributes(node: Element, options?: ParseNodeGlobalOptions) {
+    const { defaultDPI, defaultUnit } = getDefaultParseNodeGlobalOptions(options);
+
     const transform = parseNodeTransform(node, options);
-    let fill: string | null = node.getAttribute('fill') ?? '#000';
-    const fillOpacity = parseFloat(node.getAttribute('fill-opacity') ?? '1');
+
+    let fill: string | null = getInheritedAttribute(node, 'fill') ?? '#000';
+    const fillOpacity = parseFloat(getInheritedAttribute(node, 'fill-opacity') ?? '1');
     if (fill === 'none') {
         fill = null;
     } else if (!fill?.startsWith('#')) {
@@ -460,8 +474,9 @@ export function parseCommonNodeAttributes(node: Element, options?: ParseNodeGlob
     if (fill != null && fillOpacity < 1) {
         fill += componentToHex(Math.round(fillOpacity * 255));
     }
-    let stroke = node.getAttribute('stroke') ?? null;
-    const strokeOpacity = parseFloat(node.getAttribute('stroke-opacity') ?? '1');
+
+    let stroke = getInheritedAttribute(node, 'stroke') ?? null;
+    const strokeOpacity = parseFloat(getInheritedAttribute(node, 'stroke-opacity') ?? '1');
     if (stroke === 'none') {
         stroke = null;
     } else if (!stroke?.startsWith('#')) {
@@ -470,7 +485,14 @@ export function parseCommonNodeAttributes(node: Element, options?: ParseNodeGlob
     if (stroke != null && strokeOpacity < 1) {
         stroke += componentToHex(Math.round(strokeOpacity * 255));
     }
-    return { transform, fill, stroke };
+
+    let strokeWidth = parseFloatWithUnits(
+        getInheritedAttribute(node, 'stroke-width') ?? '1',
+        defaultUnit,
+        defaultDPI,
+    );
+
+    return { transform, fill, stroke, strokeWidth };
 }
 
 export function parseRectNodeAttributes(node: Element, options?: ParseNodeGlobalOptions) {

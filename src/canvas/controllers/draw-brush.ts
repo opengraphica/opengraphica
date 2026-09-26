@@ -533,36 +533,39 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
             }
 
             const updateLayerReserveToken = createHistoryReserveToken();
-
             await historyReserveQueueFree();
-
             await historyStore.dispatch('reserve', { token: updateLayerReserveToken });
 
-            const layerActions: BaseAction[] = [];
+            try {
+                const layerActions: BaseAction[] = [];
 
-            for (const [layerIndex, layer] of drawingOnLayers.entries()) {
-                if (layer.type === 'raster') {
-                    const tiles = await collectedTiles[layerIndex];
-                    if (tiles) {
-                        layerActions.push(
-                            new UpdateLayerAction<UpdateRasterLayerOptions>({
-                                id: layer.id,
-                                data: {
-                                    tileUpdates: await transferRendererTilesToRasterLayerUpdates(tiles),
-                                    alreadyRendererd: true,
-                                }
-                            })
-                        );
+                for (const [layerIndex, layer] of drawingOnLayers.entries()) {
+                    if (layer.type === 'raster') {
+                        const tiles = await collectedTiles[layerIndex];
+                        if (tiles) {
+                            layerActions.push(
+                                new UpdateLayerAction<UpdateRasterLayerOptions>({
+                                    id: layer.id,
+                                    data: {
+                                        tileUpdates: await transferRendererTilesToRasterLayerUpdates(tiles),
+                                        alreadyRendererd: true,
+                                    }
+                                })
+                            );
+                        }
                     }
                 }
-            }
 
-            if (layerActions.length > 0) {
-                await historyStore.dispatch('runAction', {
-                    action: new BundleAction('updateDrawLayer', 'action.updateDrawLayer', layerActions),
-                    reserveToken: updateLayerReserveToken,
-                });
-            } else {
+                if (layerActions.length > 0) {
+                    await historyStore.dispatch('runAction', {
+                        action: new BundleAction('updateDrawLayer', 'action.updateDrawLayer', layerActions),
+                        reserveToken: updateLayerReserveToken,
+                    });
+                } else {
+                    await historyStore.dispatch('unreserve', { token: updateLayerReserveToken });
+                }
+            } catch (error) {
+                console.error('[src/canvas/controllers/draw-brush.ts] Error when creating draw layer updates ', error);
                 await historyStore.dispatch('unreserve', { token: updateLayerReserveToken });
             }
         }

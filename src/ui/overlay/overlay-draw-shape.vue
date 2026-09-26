@@ -9,8 +9,8 @@
                 <template v-for="(point, i) in selectedEditControlAttachPoints" :key="i + '_' + point.x + '_' + point.y">
                     <line
                         :x1="editControlPoints[point.attachToIndex!].tx!"
-                        :x2="point.tx!"
                         :y1="editControlPoints[point.attachToIndex!].ty!"
+                        :x2="point.tx!"
                         :y2="point.ty!"
                         :style="{
                             stroke: 'white', 
@@ -19,14 +19,38 @@
                     />
                     <line
                         :x1="editControlPoints[point.attachToIndex!].tx!"
-                        :x2="point.tx!"
                         :y1="editControlPoints[point.attachToIndex!].ty!"
+                        :x2="point.tx!"
                         :y2="point.ty!"
                         :style="{
                             stroke: '#333333', 
                             strokeWidth: svgHandleWidth * 0.5,
                         }"
                     />
+                </template>
+                <template v-if="isExtendingPaths">
+                    <template v-for="(point, i) of selectedEditControlPoints" :key="i + '_' + point.x + '_' + point.y">
+                        <line
+                            :x1="point.tx!"
+                            :y1="point.ty!"
+                            :x2="transformedCursorHoverX"
+                            :y2="transformedCursorHoverY"
+                            :style="{
+                                stroke: 'white', 
+                                strokeWidth: svgHandleWidth,
+                            }"
+                        />
+                        <line
+                            :x1="point.tx!"
+                            :y1="point.ty!"
+                            :x2="transformedCursorHoverX"
+                            :y2="transformedCursorHoverY"
+                            :style="{
+                                stroke: '#333333', 
+                                strokeWidth: svgHandleWidth * 0.5,
+                            }"
+                        />
+                    </template>
                 </template>
                 <template v-for="(point, i) in editControlPoints" :key="i + '_' + point.x + '_' + point.y">
                     <template v-if="point.attachToIndex == null">
@@ -45,6 +69,15 @@
                             :height="svgHandleWidth * 2"
                             :stroke-width="svgHandleWidth * .3"
                             :class="{ 'og-selection-handle--selected': selectedEditControlPointIndices.includes(i) }"
+                        />
+                        <rect
+                            v-if="point.isLast"
+                            :x="point.tx! - (svgHandleWidth * 0.5)"
+                            :y="point.ty! - (svgHandleWidth * 0.5)"
+                            :width="svgHandleWidth * 1"
+                            :height="svgHandleWidth * 1"
+                            :stroke-width="0"
+                            style="fill: black"
                         />
                     </template>
                     <template v-else-if="selectedEditControlAttachPointIndices.includes(i)">
@@ -70,13 +103,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted, toRefs } from 'vue';
+import { computed, onMounted, onUnmounted, ref, toRefs, watch, } from 'vue';
 
 import canvasStore from '@/store/canvas';
-import workingFileStore, { getSelectedLayers, getLayerGlobalTransform } from '@/store/working-file';
+import workingFileStore from '@/store/working-file';
 
 import {
-    type EditControlPoint,
+    cursorHoverPosition, isExtendingPaths,
     editControlPoints, editControlPointsDirty,
     selectedEditControlPointIndices, selectedEditControlAttachPointIndices,
 } from '@/canvas/store/draw-shape-state';
@@ -86,6 +119,9 @@ defineOptions({
 });
 
 const { transform, viewWidth, viewHeight, viewDirty } = toRefs(canvasStore.state);
+
+const transformedCursorHoverX = ref(0);
+const transformedCursorHoverY = ref(0);
 
 const devicePixelRatio = window.devicePixelRatio || 1;
 
@@ -106,10 +142,8 @@ const svgBoundsHeight = computed<number>(() => {
     return viewHeight.value / devicePixelRatio;
 });
 
-onMounted(() => {
-});
-
-onUnmounted(() => {
+const selectedEditControlPoints = computed(() => {
+    return selectedEditControlPointIndices.value.map((index) => editControlPoints.value[index]);
 });
 
 const selectedEditControlAttachPoints = computed(() => {
@@ -123,5 +157,13 @@ watch([editControlPoints, viewDirty, editControlPointsDirty], () => {
         point.tx = position.x / devicePixelRatio;
         point.ty = position.y / devicePixelRatio;
     }
+});
+
+watch([cursorHoverPosition], () => {
+    const point = cursorHoverPosition.value.matrixTransform(
+        new DOMMatrix().scale(1 / devicePixelRatio).multiply(transform.value)
+    );
+    transformedCursorHoverX.value = point.x;
+    transformedCursorHoverY.value = point.y;
 });
 </script>

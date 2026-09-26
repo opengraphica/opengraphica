@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="512"
+   height="512"
+   fill="currentColor"
+   class="bi bi-circle"
+   viewBox="0 0 512 512"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="ellipse.svg"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="2.3378906"
+     inkscape:cx="255.78613"
+     inkscape:cy="256"
+     inkscape:window-width="2560"
+     inkscape:window-height="1494"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <path
+     style="baseline-shift:baseline;display:inline;overflow:visible;vector-effect:none;fill:#000000;enable-background:accumulate;stop-color:#000000;stop-opacity:1;opacity:1"
+     d="m 256.05469,64.783203 c -69.09102,0 -131.92658,19.986221 -178.298831,53.326177 -46.372252,33.33995 -76.646484,81.01223 -76.646484,134.46484 0,53.45261 30.274232,101.12684 76.646484,134.4668 46.372251,33.33995 109.207811,53.32617 178.298831,53.32617 69.09102,0 131.92657,-19.98622 178.29883,-53.32617 46.37225,-33.33996 76.64453,-81.01419 76.64453,-134.4668 0,-53.45261 -30.27228,-101.12489 -76.64453,-134.46484 C 387.98126,84.769424 325.14571,64.783203 256.05469,64.783203 Z m 0,32 c 62.87409,0 119.51068,18.470127 159.61914,47.306637 40.10845,28.83651 63.32422,67.05891 63.32422,108.48438 0,41.42547 -23.21577,79.64786 -63.32422,108.48437 -40.10846,28.83651 -96.74505,47.3086 -159.61914,47.3086 -62.87409,0 -119.51069,-18.47209 -159.619143,-47.3086 -40.108455,-28.83651 -63.326172,-67.0589 -63.326172,-108.48437 0,-41.42547 23.217717,-79.64787 63.326172,-108.48438 C 136.544,115.25333 193.1806,96.783203 256.05469,96.783203 Z"
+     id="path2" />
+</svg>

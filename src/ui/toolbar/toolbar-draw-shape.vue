@@ -1,12 +1,12 @@
 <template>
     <div class="flex container items-center justify-center mx-auto">
-        <div v-if="editingLayers.length > 0 && !showStopDrawer" class="og-toolbar-edit-confirm">
-            {{ t('toolbar.drawGradient.editingGradient') }}
+        <div v-if="isExtendingPaths" class="og-toolbar-edit-confirm">
+            {{ t('toolbar.drawShape.editingShape') }}
             <el-button plain size="small" class="ml-3!" @click="onDoneEditing()">
                 <span class="bi bi-check-circle-fill mr-2" aria-hidden="true" /> {{ t('button.done') }}
             </el-button>
         </div>
-        <div class="og-toolbar-overlay" :class="{ 'is-active': editingLayers.length > 0 }">
+        <div class="og-toolbar-overlay" :class="{ 'is-active': isExtendingPaths }">
             <div class="og-toolbar-tool-selector">
                 <span class="bi bi-shadows my-1" aria-hidden="true"></span>
                 <span class="og-toolbar-tool-selector__description">
@@ -19,15 +19,40 @@
                     <template #prepend>
                         <span class="bi" aria-hidden="true" :class="{
                             'bi-square': selectedShapeType === 'rectangle',
-                            'bi-circle': selectedShapeType === 'ellipse',
+                            'bi-circle': selectedShapeType === 'circle',
+                            'bi-ellipse': selectedShapeType === 'ellipse',
+                            'bi-line-shape': selectedShapeType === 'line',
+                            'bi-polyline': selectedShapeType === 'polyline',
+                            'bi-hexagon': selectedShapeType === 'polygon',
+                            'bi-bezier': selectedShapeType === 'path',
                         }" />
                     </template>
-                    <el-select :aria-label="t('toolbar.drawShape.shapeType.label')" v-model="selectedShapeType" size="small" style="width: 6rem">
+                    <el-select
+                        :aria-label="t('toolbar.drawShape.shapeType.label')"
+                        v-model="selectedShapeType"
+                        size="small" style="width: 6rem"
+                        @change="onChangeSelectedShapeType"
+                    >
                         <el-option :label="t('toolbar.drawShape.shapeType.rectangle')" value="rectangle">
                             <span class="bi bi-square mr-1" aria-hidden="true" /> {{ t('toolbar.drawShape.shapeType.rectangle') }}
                         </el-option>
+                        <el-option :label="t('toolbar.drawShape.shapeType.circle')" value="circle">
+                            <span class="bi bi-circle mr-1" aria-hidden="true" /> {{ t('toolbar.drawShape.shapeType.circle') }}
+                        </el-option>
                         <el-option :label="t('toolbar.drawShape.shapeType.ellipse')" value="ellipse">
-                            <span class="bi bi-circle mr-1" aria-hidden="true" /> {{ t('toolbar.drawShape.shapeType.ellipse') }}
+                            <span class="bi bi-ellipse mr-1" aria-hidden="true" /> {{ t('toolbar.drawShape.shapeType.ellipse') }}
+                        </el-option>
+                        <el-option :label="t('toolbar.drawShape.shapeType.line')" value="line">
+                            <span class="bi bi-line-shape mr-1" aria-hidden="true" /> {{ t('toolbar.drawShape.shapeType.line') }}
+                        </el-option>
+                        <el-option :label="t('toolbar.drawShape.shapeType.polyline')" value="polyline">
+                            <span class="bi bi-polyline mr-1" aria-hidden="true" /> {{ t('toolbar.drawShape.shapeType.polyline') }}
+                        </el-option>
+                        <el-option :label="t('toolbar.drawShape.shapeType.polygon')" value="polygon">
+                            <span class="bi bi-hexagon mr-1" aria-hidden="true" /> {{ t('toolbar.drawShape.shapeType.polygon') }}
+                        </el-option>
+                        <el-option :label="t('toolbar.drawShape.shapeType.path')" value="path">
+                            <span class="bi bi-bezier mr-1" aria-hidden="true" /> {{ t('toolbar.drawShape.shapeType.path') }}
                         </el-option>
                     </el-select>
                 </el-input-group>
@@ -115,71 +140,78 @@
             <label for="toolbar-draw-brush-size-slider" class="text-sm mr-4">
                 {{ t('toolbar.drawShape.strokeStyle.label') }}
             </label>
-            <div class="flex flex-wrap gap-2 max-w-105">
-                <og-button
-                    v-for="(palette, colorIndex) of strokeColorPaletteItems"
-                    solid icon small toggle="active"
-                    :pressed="colorIndex === strokeColorPaletteIndex"
-                    :aria-label="t('toolbar.drawBrush.brushColor')"
-                    class="og-button--color-swatch"
-                    :style="{
-                        '--og-button-swatch-background': palette.color.style,
-                        '--og-button-swatch-color': palette.isLight ? '#000000' : '#ffffff',
-                    }"
-                    @click="onClickStrokeColorPalette($event, colorIndex)"
-                >
-                    <i class="bi bi-palette-fill" aria-hidden="true" />
-                </og-button>
-                <og-button ref="strokeShowColorPaletteSettingsButton" :aria-label="t('button.settings')" small slim @click="onEditStrokePaletteSettings()">
-                    <span class="bi bi-gear-fill" aria-hidden="true" />
-                </og-button>
-                <og-popover
-                    v-model:visible="strokeShowColorPaletteSettings"
-                    placement="top" arrow :offset="16"
-                    :reference="strokeShowColorPaletteSettingsButton?.$el"
-                >
-                    <div class="og-popover__content">
-                        <el-form action="javascript:void(0)" label-position="top">
-                            <el-form-item :label="t('toolbar.drawBrush.paletteCount')" class="!m-0 !p-0 !max-w-30">
-                                <el-input-number
-                                    v-model.lazy="colorPaletteCount"
-                                    size="small"
-                                    :min="1" :max="19" :step="1"
-                                    @keydown.enter="strokeShowColorPaletteSettings = false"
-                                />
-                            </el-form-item>
-                        </el-form>
-                    </div>
-                </og-popover>
+            <div class="flex flex-col gap-2">
+                <div class="flex flex-wrap gap-2 max-w-105">
+                    <og-button
+                        v-for="(palette, colorIndex) of strokeColorPaletteItems"
+                        solid icon small toggle="active"
+                        :pressed="colorIndex === strokeColorPaletteIndex"
+                        :aria-label="t('toolbar.drawBrush.brushColor')"
+                        class="og-button--color-swatch"
+                        :style="{
+                            '--og-button-swatch-background': palette.color.style,
+                            '--og-button-swatch-color': palette.isLight ? '#000000' : '#ffffff',
+                        }"
+                        @click="onClickStrokeColorPalette($event, colorIndex)"
+                    >
+                        <i class="bi bi-palette-fill" aria-hidden="true" />
+                    </og-button>
+                    <og-button ref="strokeShowColorPaletteSettingsButton" :aria-label="t('button.settings')" small slim @click="onEditStrokePaletteSettings()">
+                        <span class="bi bi-gear-fill" aria-hidden="true" />
+                    </og-button>
+                    <og-popover
+                        v-model:visible="strokeShowColorPaletteSettings"
+                        placement="top" arrow :offset="16"
+                        :reference="strokeShowColorPaletteSettingsButton?.$el"
+                    >
+                        <div class="og-popover__content">
+                            <el-form action="javascript:void(0)" label-position="top">
+                                <el-form-item :label="t('toolbar.drawBrush.paletteCount')" class="!m-0 !p-0 !max-w-30">
+                                    <el-input-number
+                                        v-model.lazy="colorPaletteCount"
+                                        size="small"
+                                        :min="1" :max="19" :step="1"
+                                        @keydown.enter="strokeShowColorPaletteSettings = false"
+                                    />
+                                </el-form-item>
+                            </el-form>
+                        </div>
+                    </og-popover>
+                </div>
+                <div class="flex items-center">
+                    <label for="toolbar-draw-shape-stroke-width-slider" class="text-sm mr-4">
+                        {{ t('toolbar.drawShape.strokeStyle.width') }}
+                    </label>
+                    <el-slider
+                        id="toolbar-draw-shape-stroke-width-slider"
+                        v-model="scaledStrokeWidth"
+                        :min="0"
+                        :max="1"
+                        :step="0.01"
+                        :format-tooltip="formatStrokeWidthTooltip"
+                        class="!w-30 !max-w-full"
+                        @input="onInputStrokeWidth"
+                        @change="onChangeStrokeWidth"
+                    />
+                </div>
             </div>
         </floating-dock>
     </div>
 </template>
 
 <script setup lang="ts">
-import { v4 as uuidv4 } from 'uuid';
-import { ref, computed, onMounted, onUnmounted, toRefs, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted,  watch } from 'vue';
 import { useI18n } from '@/i18n';
 
-import { BundleAction } from '@/actions/bundle';
-import { UpdateLayerAction } from '@/actions/update-layer';
-
 import {
-    activeColorStops, blendColorSpace, editingLayers, fillType, showStopDrawer, spreadMethod,
-} from '@/canvas/store/draw-gradient-state';
-
-import {
-    colorPalette,
-    fillColorPaletteIndex, fillColor,
-    strokeColorPaletteIndex, strokeColor,
+    isExtendingPaths,
+    selectedEditControlPointIndices, selectedEditControlAttachPointIndices,
+    colorPalette, fillColorPaletteIndex, fillColor,
+    strokeColorPaletteIndex, strokeColor, strokeWidth,
     drawShapeToolbarEmitter, selectedShapeType,
     fillStyleDockVisible, fillStyleDockLeft, fillStyleDockTop,
     strokeStyleDockVisible, strokeStyleDockLeft, strokeStyleDockTop,
 } from '@/canvas/store/draw-shape-state';
-
-import { appliedSelectionMask, activeSelectionMask } from '@/canvas/store/selection-state';
-import historyStore from '@/store/history';
-import workingFileStore from '@/store/working-file';
 
 import ElButton from 'element-plus/lib/components/button/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
@@ -187,6 +219,7 @@ import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.
 import ElInputGroup from '@/ui/el/el-input-group.vue';
 import ElInputNumber from '@/ui/el/el-input-number.vue';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
+import ElSlider from 'element-plus/lib/components/slider/index';
 
 import OgButton from '@/ui/element/button.vue';
 import OgPopover from '@/ui/element/popover.vue';
@@ -194,7 +227,7 @@ import FloatingDock from '@/ui/dock/floating-dock.vue';
 
 import appEmitter from '@/lib/emitter';
 import { colorToHsla } from '@/lib/color';
-import { UpdateGradientLayerOptions, RGBAColor } from '@/types';
+import type { RGBAColor } from '@/types';
 
 defineOptions({
     name:'ToolbarDrawShape',
@@ -202,15 +235,7 @@ defineOptions({
 
 const emit = defineEmits(['close']);
 
-const { selectedLayerIds } = toRefs(workingFileStore.state);
-
 const { t } = useI18n();
-
-const uuid = uuidv4();
-
-const hasSelection = computed<boolean>(() => {
-    return !(appliedSelectionMask.value == null && activeSelectionMask.value == null);
-});
 
 /*------------*\
 | Toolbar Swap |
@@ -228,6 +253,14 @@ onUnmounted(() => {
 
 function onToolbarSwap() {
     floatingDocksVisible.value = false;
+}
+
+/*-------------------*\
+| Selected Shape Type |
+\*-------------------*/
+
+function onChangeSelectedShapeType() {
+    isExtendingPaths.value = false;
 }
 
 /*-------------*\
@@ -407,76 +440,36 @@ function onEditStrokePaletteSettings() {
     strokeShowColorPaletteSettings.value = !strokeShowColorPaletteSettings.value;
 }
 
-/*-----------------------------------*\
-| Editing Dropdowns / History Updates |
-\*-----------------------------------*/
+/*------------*\
+| Stroke Width |
+\*------------*/
 
-function onChangeFillType() {
-    if (editingLayers.value.length === 0) return;
-    const updateLayerActions: UpdateLayerAction<UpdateGradientLayerOptions>[] = [];
-    for (const layer of editingLayers.value) {
-        updateLayerActions.push(new UpdateLayerAction({
-            id: layer.id,
-            data: {
-                ...JSON.parse(JSON.stringify(layer.data)),
-                fillType: fillType.value,
-            }
-        }));
+const minStrokeWidth = ref(0);
+const maxStrokeWidth = ref(100);
+
+const scaledStrokeWidth = computed<number>({
+    set(value) {
+        const easingValue = value * value;
+        strokeWidth.value = Math.round(minStrokeWidth.value + easingValue * (maxStrokeWidth.value - minStrokeWidth.value));
+    },
+    get() {
+        const scaledBrushSize = (strokeWidth.value - minStrokeWidth.value) / (maxStrokeWidth.value - minStrokeWidth.value);
+        return Math.sqrt(scaledBrushSize);
     }
-    historyStore.dispatch('runAction', {
-        action: new BundleAction('updateDrawGradientLayerFillType', 'action.updateDrawGradientLayerFillType', updateLayerActions),
-    });
+});
+
+function formatStrokeWidthTooltip() {
+    const value = strokeWidth.value;
+    const percentage = (value - minStrokeWidth.value) / (maxStrokeWidth.value - minStrokeWidth.value);
+    return `${(100 * percentage).toFixed(0)}% - ${value}px`;
 }
 
-function onChangeBlendColorSpace() {
-    if (editingLayers.value.length === 0) return;
-    const updateLayerActions: UpdateLayerAction<UpdateGradientLayerOptions>[] = [];
-    for (const layer of editingLayers.value) {
-        updateLayerActions.push(new UpdateLayerAction({
-            id: layer.id,
-            data: {
-                ...JSON.parse(JSON.stringify(layer.data)),
-                blendColorSpace: blendColorSpace.value,
-            }
-        }));
-    }
-    historyStore.dispatch('runAction', {
-        action: new BundleAction('updateDrawGradientLayerBlendColorSpace', 'action.updateDrawGradientLayerBlendColorSpace', updateLayerActions),
-    });
+function onInputStrokeWidth() {
+    drawShapeToolbarEmitter.emit('strokeWidthPreview', strokeWidth.value);
 }
 
-function onChangeSpreadMethod() {
-    if (editingLayers.value.length === 0) return;
-    const updateLayerActions: UpdateLayerAction<UpdateGradientLayerOptions>[] = [];
-    for (const layer of editingLayers.value) {
-        updateLayerActions.push(new UpdateLayerAction({
-            id: layer.id,
-            data: {
-                ...JSON.parse(JSON.stringify(layer.data)),
-                spreadMethod: spreadMethod.value,
-            }
-        }));
-    }
-    historyStore.dispatch('runAction', {
-        action: new BundleAction('updateDrawGradientLayerSpreadMethod', 'action.updateDrawGradientLayerSpreadMethod', updateLayerActions),
-    });
-}
-
-function onChangeActiveColorStops() {
-    if (editingLayers.value.length === 0) return;
-    const updateLayerActions: UpdateLayerAction<UpdateGradientLayerOptions>[] = [];
-    for (const layer of editingLayers.value) {
-        updateLayerActions.push(new UpdateLayerAction({
-            id: layer.id,
-            data: {
-                ...JSON.parse(JSON.stringify(layer.data)),
-                stops: JSON.parse(JSON.stringify(activeColorStops.value)),
-            }
-        }));
-    }
-    historyStore.dispatch('runAction', {
-        action: new BundleAction('updateDrawGradientLayerStops', 'action.updateDrawGradientLayerStops', updateLayerActions),
-    });
+function onChangeStrokeWidth() {
+    drawShapeToolbarEmitter.emit('strokeWidthChanged', strokeWidth.value);
 }
 
 /*-----------------------*\
@@ -484,6 +477,8 @@ function onChangeActiveColorStops() {
 \*-----------------------*/
 
 function onDoneEditing() {
-    editingLayers.value = [];
+    isExtendingPaths.value = false;
+    selectedEditControlPointIndices.value = [];
+    selectedEditControlAttachPointIndices.value = [];
 }
 </script>

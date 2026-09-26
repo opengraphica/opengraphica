@@ -38,6 +38,11 @@ import type {
 
 const epsilon = 0.000001;
 
+interface QueuedAddVectorLayerElement {
+    tagName: string;
+    attributes: Record<string, string>;
+}
+
 export class VectorLayerMeshController implements Webgl2RendererMeshController {
     
     material: InstanceType<typeof ShaderMaterial> | undefined;
@@ -72,6 +77,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
     overrideFilterParamTextures: Texture<any>[] = [];
     svgMeshesById: Record<string, Array<Mesh>> = {};
     isPendingGenerateSvgTexture: boolean = false;
+    queuedAddVectorLayerElements: QueuedAddVectorLayerElement[] = [];
 
     handleResize: (() => void);
 
@@ -321,10 +327,24 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         }
         
         this.scene?.add(this.shapeGroup);
+
+        if (this.queuedAddVectorLayerElements.length > 0) {
+            const queuedAddVectorLayerElements = this.queuedAddVectorLayerElements.slice();
+            this.queuedAddVectorLayerElements = [];
+            for (const { tagName, attributes } of queuedAddVectorLayerElements) {
+                await this.addVectorLayerElement(tagName, attributes);
+            }
+        }
     }
 
     async addVectorLayerElement(tagName: string, attributes: Record<string, string>) {
-        if (!this.sourceDocument || !this.shapeGroup) return;
+        if (!this.sourceDocument || !this.shapeGroup) {
+            this.queuedAddVectorLayerElements.push({
+                tagName,
+                attributes,
+            });
+            return
+        };
         const renderOrder = this.plane?.renderOrder ?? this.shapeGroup?.renderOrder ?? 0;
 
         // TODO - Creating xml document doesn't work inside webworker.
@@ -421,24 +441,22 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             if (shapes.length === 0) break createFill;
 
             const color = new Color(path.color);
-            // const material = new MeshBasicMaterial({
-            //     transparent: true,
-            //     depthTest: false,
-            //     depthWrite: false,
-            //     color: path.color,
-            //     side: BackSide,
-            //     opacity: path.userData.style.fillOpacity ?? 1,
-            // });
             const material = await createVectorMaterial({
                 color: new Vector4(color.r, color.g, color.b, path.userData.style.fillOpacity ?? 1),
             });
+            if (!this.shapeGroup) return;
 
             for (const shape of shapes) {
                 const geometry = new ShapeGeometry(shape);
                 const mesh = new Mesh(geometry, material);
                 mesh.renderOrder = renderOrder;
-                id && this.svgMeshesById[id].push(mesh);
-                this.shapeGroup.add(mesh);
+                if (id && this.svgMeshesById[id]) {
+                    this.svgMeshesById[id].push(mesh);
+                    this.shapeGroup.add(mesh);
+                } else {
+                    geometry.dispose();
+                    material.dispose();
+                }
             }
         }
         createStroke:
@@ -455,24 +473,22 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             if (shapes.length === 0) break createStroke;
 
             const color = new Color(path.userData.style.stroke);
-            // const material = new MeshBasicMaterial({
-            //     transparent: true,
-            //     depthTest: false,
-            //     depthWrite: false,
-            //     color: path.userData.style.stroke,
-            //     side: BackSide,
-            //     opacity: path.userData.style.strokeOpacity ?? 1,
-            // });
             const material = await createVectorMaterial({
                 color: new Vector4(color.r, color.g, color.b, path.userData.style.strokeOpacity ?? 1),
             });
+            if (!this.shapeGroup) return;
 
             for (const shape of shapes) {
                 const geometry = new ShapeGeometry(shape);
                 const mesh = new Mesh(geometry, material);
                 mesh.renderOrder = renderOrder;
-                id && this.svgMeshesById[id].push(mesh);
-                this.shapeGroup.add(mesh);
+                if (id && this.svgMeshesById[id]) {
+                    id && this.svgMeshesById[id]?.push(mesh);
+                    this.shapeGroup.add(mesh);
+                } else {
+                    geometry.dispose();
+                    material.dispose();
+                }
             }
         }
     }

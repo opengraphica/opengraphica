@@ -168,6 +168,9 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                         reserveStoredSvg(newSourceUuid, `${layer.id}`);
                         requiresBaking = true;
                     }
+                    if ((this.explicitPreviousProps as any)?.data?.sourceDocument) {
+                        layer.data.sourceDocument = layer.data.sourceDocument;
+                    }
                 }
                 else if (layer.type === 'video') {
                     if (!layer.data) {
@@ -252,7 +255,9 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                     }
                 }
             }
-            if (layer.type === 'raster') {
+            if (layer.type === 'empty') {
+                delete (layer as any).data;
+            } else if (layer.type === 'raster') {
                 if (this.oldRasterSourceImageId != null && this.oldRasterSourceImageId !== layer.data.sourceUuid) {
                     layer.data.sourceUuid = this.oldRasterSourceImageId;
                 }
@@ -277,6 +282,9 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
             } else if (layer.type === 'vector') {
                 if (this.oldVectorSourceSvgId != null && this.oldVectorSourceSvgId !== layer.data.sourceUuid) {
                     layer.data.sourceUuid = this.oldVectorSourceSvgId;
+                }
+                if ((this.explicitPreviousProps as any)?.data?.sourceDocument) {
+                    layer.data.sourceDocument = (this.explicitPreviousProps as any)?.data?.sourceDocument;
                 }
             }
 

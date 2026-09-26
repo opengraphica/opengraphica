@@ -12,6 +12,7 @@
         "createDrawGradientLayer": "Create Gradient Layer",
         "createNewFile": "New File",
         "createNewLayersFromSelection": "Create Layers From Selection",
+        "createShape": "Create Shape",
         "createShapeLayer": "Create Shape Layer",
         "createTextLayer": "Create Text Layer",
         "cutLayers": "Cut Layer(s)",
@@ -64,6 +65,7 @@
         "updateSelectionCombineMode": "Update Selection Combine Mode",
         "updateShapeFillColor": "Update Shape Fill Color",
         "updateShapeStrokeColor": "Update Shape Stroke Color",
+        "updateShapeStrokeWidth": "Update Shape Stroke Width",
         "updateSharpenLayer": "Sharpen Layer",
         "updateTextLayerProperties": "Update Text Layer Properties",
         "updateVectorLayerAttributes": "Update Vector Layer",
@@ -1374,16 +1376,32 @@
         },
         "drawShape": {
             "newVectorLayerName": "New Shape",
+            "editingShape": "Editing Shape",
             "shapeType": {
                 "label": "Shape",
                 "rectangle": "Rectangle",
-                "ellipse": "Ellipse"
+                "circle": "Circle",
+                "ellipse": "Ellipse",
+                "line": "Line",
+                "polyline": "Polyline",
+                "polygon": "Polygon",
+                "path": "Path"
             },
             "fillStyle": {
                 "label": "Fill"
             },
             "strokeStyle": {
-                "label": "Stroke"
+                "label": "Stroke",
+                "width": "Width"
+            },
+            "notification": {
+                "uselessClick": {
+                    "title": "Drawing Shapes",
+                    "message": {
+                        "touch": "Touch and drag your finger on an empty area to add new shapes.",
+                        "mouse": "Click and drag on an empty area to add new shapes."
+                    }
+                }
             }
         },
         "effect": {

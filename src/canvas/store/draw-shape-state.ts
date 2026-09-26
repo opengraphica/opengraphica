@@ -17,6 +17,8 @@ import { type RendererFrontend, type VectorPathCommand, VectorPathCommandType, t
 
 export const drawShapeToolbarEmitter = mitt();
 
+export const cursorHoverPosition = ref<DOMPoint>(new DOMPoint());
+
 export const editingLayers = ref<WorkingFileVectorLayer[]>([]);
 export const showShapeDrawer = ref(false);
 
@@ -35,6 +37,7 @@ export const hasVisibleToolbarOverlay = computed(() => {
 interface PermanentStorageState {
     colorPalette: RGBAColor[];
     fillColorPaletteIndex: number;
+    pixelSnap: boolean;
     selectedShapeType: string;
     strokeColorPaletteIndex: number;
     strokeWidth: number;
@@ -70,15 +73,20 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
             },
         ],
         fillColorPaletteIndex: 0,
+        pixelSnap: true,
         selectedShapeType: 'rectangle',
         strokeColorPaletteIndex: 0,
         strokeWidth: 0,
     },
-    restore: ['colorPalette', 'fillColorPaletteIndex', 'selectedShapeType', 'strokeColorPaletteIndex', 'strokeWidth'],
+    restore: [
+        'colorPalette', 'fillColorPaletteIndex', 'pixelSnap',
+        'selectedShapeType', 'strokeColorPaletteIndex', 'strokeWidth',
+    ],
 });
 
 export const colorPalette = permanentStorage.getDeepWritableRef('colorPalette');
 export const fillColorPaletteIndex = permanentStorage.getWritableRef('fillColorPaletteIndex');
+export const pixelSnap = permanentStorage.getWritableRef('pixelSnap');
 export const selectedShapeType = permanentStorage.getWritableRef('selectedShapeType');
 export const strokeColorPaletteIndex = permanentStorage.getWritableRef('strokeColorPaletteIndex');
 export const strokeWidth = permanentStorage.getWritableRef('strokeWidth');
@@ -105,6 +113,7 @@ export interface EditControlPoint {
     nodeIndex: number; // Indes of the editable node in the ordered query list.
     pathIndex: number; // Index in path command list
     attachToIndex?: number;
+    isLast?: boolean;
     x: number;
     y: number;
     sx?: number; // Starting point for drag
@@ -122,6 +131,7 @@ export const editControlPointNodeParsedAttributes = ref<Record<string, any>>([])
 export const hoveringEditControlPointIndices = ref<number[]>([]);
 export const selectedEditControlPointIndices = ref<number[]>([]);
 export const selectedEditControlAttachPointIndices = ref<number[]>([]); // Attach points that reference selectedEditControlPointIndices
+export const isExtendingPaths = ref<boolean>(false);
 
 const createEditControlPoints = throttle(() => {
     const controlPoints: EditControlPoint[] = [];
@@ -144,7 +154,7 @@ const createEditControlPoints = throttle(() => {
             layer.data.sourceDocument.querySelectorAll('rect,polygon,polyline,circle,ellipse,line,path')
         );
         for (const node of nodes) {
-            const { transform, fill, stroke } = parseCommonNodeAttributes(node);
+            const { transform, fill, stroke, strokeWidth } = parseCommonNodeAttributes(node);
             const nodeXf = viewBoxXf.multiply(transform);
 
             editControlPointNodes.value.push(node);
@@ -175,7 +185,7 @@ const createEditControlPoints = throttle(() => {
                         yProp: 'height',
                     });
                     editControlPointNodeParsedAttributes.value.push({
-                        transform, fill, stroke, x, y, width, height,
+                        transform, fill, stroke, strokeWidth, x, y, width, height,
                     });
                     break;
                 }
@@ -191,10 +201,11 @@ const createEditControlPoints = throttle(() => {
                             y: xfPoint.y,
                             xProp: 'x',
                             yProp: 'y',
+                            isLast: pointIndex === points.length - 1,
                         });
                     }
                     editControlPointNodeParsedAttributes.value.push({
-                        transform, fill, stroke, points,
+                        transform, fill, stroke, strokeWidth, points,
                     });
                     break;
                 }
@@ -210,10 +221,11 @@ const createEditControlPoints = throttle(() => {
                             y: xfPoint.y,
                             xProp: 'x',
                             yProp: 'y',
+                            isLast: pointIndex === points.length - 1,
                         });
                     }
                     editControlPointNodeParsedAttributes.value.push({
-                        transform, fill, stroke, points,
+                        transform, fill, stroke, strokeWidth, points,
                     });
                     break;
                 }
@@ -242,7 +254,7 @@ const createEditControlPoints = throttle(() => {
                         yProp: 'ry',
                     });
                     editControlPointNodeParsedAttributes.value.push({
-                        transform, fill, stroke, cx, cy, r,
+                        transform, fill, stroke, strokeWidth, cx, cy, r,
                     });
                     break;
                 }
@@ -284,7 +296,7 @@ const createEditControlPoints = throttle(() => {
                         xProp: 'rx',
                     });
                     editControlPointNodeParsedAttributes.value.push({
-                        transform, fill, stroke, cx, cy, rx, ry,
+                        transform, fill, stroke, strokeWidth, cx, cy, rx, ry,
                     });
                     break;
                 }
@@ -314,7 +326,7 @@ const createEditControlPoints = throttle(() => {
                         yProp: 'y2',
                     });
                     editControlPointNodeParsedAttributes.value.push({
-                        transform, fill, stroke, x1, y1, x2, y2,
+                        transform, fill, stroke, strokeWidth, x1, y1, x2, y2,
                     });
                     break;
                 }
@@ -460,13 +472,13 @@ const createEditControlPoints = throttle(() => {
                         previousAttachToIndex = attachToIndex;
                     }
                     editControlPointNodeParsedAttributes.value.push({
-                        transform, fill, stroke, d,
+                        transform, fill, stroke, strokeWidth, d,
                     });
                     break;
                 }
                 default: {
                     editControlPointNodeParsedAttributes.value.push({
-                        transform, fill, stroke,
+                        transform, fill, stroke, strokeWidth,
                     });
                 }
             }
