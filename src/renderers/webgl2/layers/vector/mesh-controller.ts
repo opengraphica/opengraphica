@@ -17,6 +17,8 @@ import { Vector2 } from 'three/src/math/Vector2';
 import { Vector3 } from 'three/src/math/Vector3';
 import { Vector4 } from 'three/src/math/Vector4';
 
+import { v4 as uuidv4 } from 'uuid';
+
 import { createPathStrokeShapes } from './svg-stroke-path';
 
 import { generateSvgElementIds } from '@/lib/svg';
@@ -27,7 +29,7 @@ import { messageBus } from '@/renderers/webgl2/backend/message-bus';
 import { createCanvasFiltersFromLayerConfig, createLayerShaderUniformsAndDefines } from '../base/material';
 import { assignMaterialBlendingMode } from '../base/blending-mode';
 import { createRasterMaterial, disposeRasterMaterial, updateRasterMaterial } from '../raster/material';
-import { createVectorMaterial, disposeVectorrMaterial, updateVectorMaterial } from './material';
+import { createVectorMaterial, disposeVectorMaterial, updateVectorMaterial } from './material';
 import { SVGLoader } from './svg-loader';
 
 import type { Scene, ShaderMaterial, SvgShapePath } from 'three';
@@ -78,6 +80,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
     svgMeshesById: Record<string, Array<Mesh>> = {};
     isPendingGenerateSvgTexture: boolean = false;
     queuedAddVectorLayerElements: QueuedAddVectorLayerElement[] = [];
+    generateSvgMeshesUuid: string = '';
 
     handleResize: (() => void);
 
@@ -174,7 +177,9 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             this.isPendingGenerateSvgTexture = true;
         }
         if (data.sourceDocument) {
-            this.generateSvgMeshes(data.sourceDocument);
+            if (data.sourceDocument !== this.sourceDocument) {
+                this.generateSvgMeshes(data.sourceDocument);
+            }
         } else if (data.sourceDocumentSerialized) {
             const sourceDocument = this.domParser.parseFromString(data.sourceDocumentSerialized, 'image/svg+xml');
             this.generateSvgMeshes(sourceDocument);
@@ -292,10 +297,15 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         }
     }
 
-    async generateSvgMeshes(svgDocument: Document) {
+    generateSvgMeshes(svgDocument: Document) {
+
         if (!(svgDocument instanceof XMLDocument)) return;
         this.sourceDocument = svgDocument;
         this.disposeSvgMeshes();
+
+        const generateUuid = uuidv4();
+        this.generateSvgMeshesUuid = generateUuid;
+
         if (this.width && this.height) {
             svgDocument.documentElement.setAttribute('width', `${this.width}`);
             svgDocument.documentElement.setAttribute('height', `${this.height}`);
@@ -320,7 +330,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         }
 
         for (const path of paths) {
-            this.createPathShapes(path, renderOrder);
+            this.createPathShapes(path, renderOrder, generateUuid);
         }
         if (this.plane) {
             this.scene?.remove(this.plane);
@@ -331,19 +341,22 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         if (this.queuedAddVectorLayerElements.length > 0) {
             const queuedAddVectorLayerElements = this.queuedAddVectorLayerElements.slice();
             this.queuedAddVectorLayerElements = [];
+            let promiseChain = Promise.resolve();
             for (const { tagName, attributes } of queuedAddVectorLayerElements) {
-                await this.addVectorLayerElement(tagName, attributes);
+                promiseChain = promiseChain.then(() =>
+                    this.addVectorLayerElement(tagName, attributes, generateUuid)
+                );
             }
         }
     }
 
-    async addVectorLayerElement(tagName: string, attributes: Record<string, string>) {
+    addVectorLayerElement(tagName: string, attributes: Record<string, string>, generateUuid?: string): Promise<void> {
         if (!this.sourceDocument || !this.shapeGroup) {
             this.queuedAddVectorLayerElements.push({
                 tagName,
                 attributes,
             });
-            return
+            return Promise.resolve();
         };
         const renderOrder = this.plane?.renderOrder ?? this.shapeGroup?.renderOrder ?? 0;
 
@@ -365,11 +378,13 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
 
         const { paths } = this.svgLoader.parse(newDoc);
         const path = paths[0];
-        if (!path) return;
+        if (!path) return Promise.resolve();
 
-        this.createPathShapes(path, renderOrder);
+        this.createPathShapes(path, renderOrder, generateUuid);
 
         markRenderDirty();
+
+        return Promise.resolve();
     }
 
     async updateVectorLayerAttributes(nodeId: string, attributes: Record<string, string | null>) {
@@ -429,7 +444,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         markRenderDirty();
     }
 
-    async createPathShapes(path: SvgShapePath, renderOrder: number) {
+    createPathShapes(path: SvgShapePath, renderOrder: number, generateUuid?: string) {
         if (!this.shapeGroup) return;
         const node = path.userData.node as Element;
         const id = node?.getAttribute('data-ogr-id');
@@ -441,23 +456,33 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             if (shapes.length === 0) break createFill;
 
             const color = new Color(path.color);
-            const material = await createVectorMaterial({
-                color: new Vector4(color.r, color.g, color.b, path.userData.style.fillOpacity ?? 1),
-            });
-            if (!this.shapeGroup) return;
 
+            const meshes: Mesh[] = [];
             for (const shape of shapes) {
-                const geometry = new ShapeGeometry(shape);
-                const mesh = new Mesh(geometry, material);
+                const geometry = new ShapeGeometry(shape, 32);
+                const mesh = new Mesh(geometry, undefined);
                 mesh.renderOrder = renderOrder;
                 if (id && this.svgMeshesById[id]) {
                     this.svgMeshesById[id].push(mesh);
                     this.shapeGroup.add(mesh);
+                    meshes.push(mesh);
                 } else {
                     geometry.dispose();
-                    material.dispose();
                 }
             }
+
+            createVectorMaterial({
+                color: new Vector4(color.r, color.g, color.b, path.userData.style.fillOpacity ?? 1),
+            }).then((material) => {
+                if (generateUuid != null && this.generateSvgMeshesUuid !== generateUuid) {
+                    material.dispose();
+                } else {
+                    for (const mesh of meshes) {
+                        mesh.material = material;
+                    }
+                }
+                markRenderDirty();
+            });
         }
         createStroke:
         if (path.userData.style.stroke && path.userData.style.stroke != 'none' && path.userData.style.strokeWidth > 0) {
@@ -473,23 +498,34 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             if (shapes.length === 0) break createStroke;
 
             const color = new Color(path.userData.style.stroke);
-            const material = await createVectorMaterial({
-                color: new Vector4(color.r, color.g, color.b, path.userData.style.strokeOpacity ?? 1),
-            });
             if (!this.shapeGroup) return;
 
+            const meshes: Mesh[] = [];
             for (const shape of shapes) {
                 const geometry = new ShapeGeometry(shape);
-                const mesh = new Mesh(geometry, material);
+                const mesh = new Mesh(geometry, undefined);
                 mesh.renderOrder = renderOrder;
                 if (id && this.svgMeshesById[id]) {
-                    id && this.svgMeshesById[id]?.push(mesh);
+                    this.svgMeshesById[id]?.push(mesh);
                     this.shapeGroup.add(mesh);
+                    meshes.push(mesh);
                 } else {
                     geometry.dispose();
-                    material.dispose();
                 }
             }
+
+            createVectorMaterial({
+                color: new Vector4(color.r, color.g, color.b, path.userData.style.strokeOpacity ?? 1),
+            }).then((material) => {
+                if (generateUuid != null && this.generateSvgMeshesUuid !== generateUuid) {
+                    material.dispose();
+                } else {
+                    for (const mesh of meshes) {
+                        mesh.material = material;
+                    }
+                }
+                markRenderDirty();
+            });
         }
     }
 
@@ -500,7 +536,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
                 if (child instanceof Mesh) {
                     child.geometry?.dispose();
                     child.geometry = undefined;
-                    disposeVectorrMaterial(child.material);
+                    disposeVectorMaterial(child.material);
                     child.material = undefined;
                 }
             }

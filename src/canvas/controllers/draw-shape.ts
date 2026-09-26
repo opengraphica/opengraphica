@@ -3,7 +3,7 @@ import { nextTick, watch, WatchStopHandle } from 'vue';
 import { type PointerTracker } from './base';
 import BaseCanvasMovementController from './base-movement';
 import {
-    cursorHoverPosition,
+    cursorHoverPosition, previewInvisibleStrokeStart,
     drawShapeToolbarEmitter, pixelSnap, isExtendingPaths,
     fillColor, strokeColor, strokeWidth, selectedShapeType,
     editControlPoints, editControlPointsDirty, hoveringEditControlPointIndices,
@@ -16,7 +16,7 @@ import {
 import { hexToColor } from '@/lib/color';
 import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
 import { isEqualApprox, pointDistance2d } from '@/lib/math';
-import { getViewBox, generateSvgElementIds, parseNodeTransform } from '@/lib/svg';
+import { getViewBox, generateSvgElementIds, parseNodeTransform, serializeVectorPathCommands } from '@/lib/svg';
 import { AsyncCallbackQueue } from '@/lib/timing';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import { t, tm, rt } from '@/i18n';
@@ -37,10 +37,12 @@ import { UpdateVectorLayerAttributesAction } from '@/actions/update-vector-layer
 
 import { useRenderer } from '@/renderers';
 
-import type {
-    RendererFrontend, RGBAColor,
-    WorkingFileVectorLayer, WorkingFileAnyLayer,
-    InsertVectorLayerOptions, UpdateVectorLayerOptions,
+import {
+    type RendererFrontend, type RGBAColor,
+    type WorkingFileVectorLayer,
+    type InsertVectorLayerOptions, type UpdateVectorLayerOptions,
+    type VectorPathCommand,
+    VectorPathCommandType,
 } from '@/types';
 
 const EPSILON = 1e-6;
@@ -94,9 +96,10 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         this.createEditingLayersFromSelectedLayers = this.createEditingLayersFromSelectedLayers.bind(this);
         this.selectedLayerIdsUnwatch = watch(
             () => workingFileStore.state.selectedLayerIds,
-            this.createEditingLayersFromSelectedLayers,
-            { immediate: true }
+            this.createEditingLayersFromSelectedLayers
         );
+        editingLayers.value = [];
+        this.createEditingLayersFromSelectedLayers(workingFileStore.state.selectedLayerIds);
 
         this.onFillColorChanged = this.onFillColorChanged.bind(this);
         drawShapeToolbarEmitter.on('fillColorChanged', this.onFillColorChanged);
@@ -111,6 +114,10 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         appEmitter.on('editor.history.step', this.onHistoryStep);
         this.onCancelCurrentAction = this.onCancelCurrentAction.bind(this);
         appEmitter.on('editor.tool.cancelCurrentAction', this.onCancelCurrentAction);
+        this.onCommitCurrentAction = this.onCommitCurrentAction.bind(this);
+        appEmitter.on('editor.tool.commitCurrentAction', this.onCommitCurrentAction);
+        this.onDelete = this.onDelete.bind(this);
+        appEmitter.on('editor.tool.delete', this.onDelete);
 
         cursorHoverPosition.value = new DOMPoint(
             -100000000000,
@@ -165,6 +172,8 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
         appEmitter.off('editor.history.step', this.onHistoryStep);
         appEmitter.off('editor.tool.cancelCurrentAction', this.onCancelCurrentAction);
+        appEmitter.off('editor.tool.commitCurrentAction', this.onCommitCurrentAction);
+        appEmitter.off('editor.tool.delete', this.onDelete);
 
         // Tutorial Message
         if (!editorStore.state.tutorialFlags.drawGradientToolIntroduction) {
@@ -177,6 +186,8 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
     onPointerDown(e: PointerEvent) {
         super.onPointerDown(e);
+
+        previewInvisibleStrokeStart.value = null;
 
         if (hasVisibleToolbarOverlay.value) {
             showShapeDrawer.value = false;
@@ -234,10 +245,27 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
     }
 
     protected async drawShapeStart(e: PointerTracker) {
-        if (
-            this.drawingPointerId == null
-            || (fillColor.value.alpha <= 0 && strokeColor.value.alpha <= 0)
-        ) return;
+        if (this.drawingPointerId == null) return;
+        const isInvisibleFill = fillColor.value.alpha <= 0;
+        const isInvisibleStroke = strokeColor.value.alpha <= 0 || strokeWidth.value <= 0;
+        if (isInvisibleFill && isInvisibleStroke) {
+            appEmitter.emit('app.notify', {
+                type: 'info',
+                title: t('toolbar.drawShape.notification.invisibleShape.title'),
+                message: t('toolbar.drawShape.notification.invisibleShape.message'),
+                duration: 8000,
+            });
+            return;
+        }
+        if (selectedShapeType.value === 'line' && isInvisibleStroke) {
+            appEmitter.emit('app.notify', {
+                type: 'info',
+                title: t('toolbar.drawShape.notification.invisibleLine.title'),
+                message: t('toolbar.drawShape.notification.invisibleLine.message'),
+                duration: 8000,
+            });
+            return;
+        }
 
         this.uselessClickCount = 0;
 
@@ -488,6 +516,12 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                             position2.y = Math.round(position2.y);
                         }
                         element.setAttribute('points', `${position1.x},${position1.y} ${position2.x},${position2.y}`);
+                        if (isInvisibleStroke) {
+                            previewInvisibleStrokeStart.value = new DOMPoint(
+                                this.dragStartPoint.x,
+                                this.dragStartPoint.y,
+                            );
+                        }
                         break;
                     }
                     case 'polygon': {
@@ -506,6 +540,12 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                             position2.y = Math.round(position2.y);
                         }
                         element.setAttribute('points', `${position1.x},${position1.y} ${position2.x},${position2.y}`);
+                        if (isInvisibleStroke) {
+                            previewInvisibleStrokeStart.value = new DOMPoint(
+                                this.dragStartPoint.x,
+                                this.dragStartPoint.y,
+                            );
+                        }
                         break;
                     }
                 }
@@ -971,7 +1011,13 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         for (const pointIndex of this.draggingEditControlPointIndices) {
             const point = editControlPoints.value[pointIndex];
 
-            if ((point.xProp && point.yProp) || !selectedEditControlPointIndices.value.includes(pointIndex)) {
+            if (
+                (
+                    (point.xProp && point.yProp)
+                    || !selectedEditControlPointIndices.value.includes(pointIndex)
+                )
+                && !(point.minPointIndex != null || point.maxPointIndex != null)
+            ) {
                 point.x = point.sx! + (viewTransformPoint.x - this.dragStartPoint.x);
                 point.y = point.sy! + (viewTransformPoint.y - this.dragStartPoint.y);
             } else {
@@ -1001,6 +1047,30 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 }
                 if (!point.yProp) {
                     newPointXf.y = referencePointXf.y;
+                }
+
+                if (point.minPointIndex != null) {
+                    const minPoint = editControlPoints.value[point.minPointIndex];
+                    if (minPoint) {
+                        const minPointXf = new DOMPoint(
+                            minPoint.x,
+                            minPoint.y,
+                        ).matrixTransform(inverseNodeXf);
+                        newPointXf.x = Math.max(newPointXf.x, minPointXf.x + 1);
+                        newPointXf.y = Math.max(newPointXf.y, minPointXf.y + 1);
+                    }
+                }
+
+                if (point.maxPointIndex != null) {
+                    const maxPoint = editControlPoints.value[point.maxPointIndex];
+                    if (maxPoint) {
+                        const maxPointXf = new DOMPoint(
+                            maxPoint.x,
+                            maxPoint.y,
+                        ).matrixTransform(inverseNodeXf);
+                        newPointXf.x = Math.min(newPointXf.x, maxPointXf.x - 1);
+                        newPointXf.y = Math.min(newPointXf.y, maxPointXf.y - 1);
+                    }
                 }
 
                 const newPoint = newPointXf.matrixTransform(nodeXf);
@@ -1049,7 +1119,8 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
     }
 
     private async drawShapeEnd(e: PointerEvent) {
-        
+        previewInvisibleStrokeStart.value = null;
+
         if (this.drawingShapes.length > 0) {
             await this.actionQueue.wait();
 
@@ -1072,6 +1143,14 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                     generateSvgElementIds(newLayerDocument);
                     const svgString = serializer.serializeToString(newLayerDocument).replace(/xmlns=""/g, '');
 
+                    const elementId = element.getAttribute('data-ogr-id');
+                    if (elementId) {
+                    if (!layer.data.pendingSourceDocumentUpdateNodeIds) {
+                            layer.data.pendingSourceDocumentUpdateNodeIds = [];
+                        }
+                        layer.data.pendingSourceDocumentUpdateNodeIds.push(elementId);
+                    }
+
                     const image = await new Promise<HTMLImageElement>((resolve) => {
                         const image = new Image();
                         image.onload = () => {
@@ -1093,7 +1172,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                     ));
                 }
 
-                // Intentionally placed here - reference createEditingLayersFromSelectedLayers() calls.
+                // Intentionally placed here - reference createEditingLayersFromSelectedLayers() call in history step.
                 this.drawingPointerId = null;
 
                 await historyStore.dispatch('runAction', {
@@ -1355,14 +1434,19 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         if (
             event.action.id === 'createShape'
             || (event.action.id === 'createShapeLayer' && event.trigger !== 'do')
+            || event.action.id === 'deleteVectorLayerShape'
         ) {
             this.createEditingLayersFromSelectedLayers(workingFileStore.state.selectedLayerIds, workingFileStore.state.selectedLayerIds);
+        }
+        if (event.trigger !== 'do') {
+            isExtendingPaths.value = false;
         }
     }
 
     private onCancelCurrentAction() {
         if (this.drawingPointerId != null) {
             // TODO
+            previewInvisibleStrokeStart.value = null;
         } else if (this.extendPathPointerId != null) {
             for (const { layerId, tagName, nodeId, pathStart } of this.extendPathInfo) {
                 const attributes: Record<string, string> = {};
@@ -1389,6 +1473,239 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             selectedEditControlPointIndices.value = [];
             selectedEditControlAttachPointIndices.value = [];
             isExtendingPaths.value = false;
+        }
+    }
+
+    private onCommitCurrentAction() {
+        if (this.drawingPointerId != null) {
+            // NOOP
+        } else if (this.extendPathPointerId != null) {
+            // NOOP
+        } else if (selectedEditControlPointIndices.value.length > 0) {
+            selectedEditControlPointIndices.value = [];
+            selectedEditControlAttachPointIndices.value = [];
+            isExtendingPaths.value = false;
+        }
+    }
+
+    private async onDelete() {
+        const deleteShapeMap = new Map<number, Set<string>>();
+        const deletePathMap = new Map<number, Map<string, Set<number>>>();
+        const originalPathAttributes = new Map<number, Map<string, Record<string, any>>>();
+        const serializer = new XMLSerializer();
+
+        if (selectedEditControlPointIndices.value.length > 0) {
+
+            const selectedIndices = selectedEditControlPointIndices.value;
+            selectedEditControlPointIndices.value = [];
+            selectedEditControlAttachPointIndices.value = [];
+            isExtendingPaths.value = false;
+
+            const deleteReserveToken = createHistoryReserveToken();
+            await historyReserveQueueFree();
+            await historyStore.dispatch('reserve', { token: deleteReserveToken });
+
+            try {
+
+                for (const pointIndex of selectedIndices) {
+                    const point = editControlPoints.value[pointIndex];
+                    if (point.attachToIndex != null) continue;
+
+                    const node = editControlPointNodes.value[point.nodeIndex];
+                    const nodeId = node.getAttribute('data-ogr-id');
+                    if (!nodeId) continue;
+
+                    if (['rect', 'circle', 'ellipse', 'line'].includes(node.tagName)) {
+                        const deleteShapes = deleteShapeMap.get(point.layerIndex) ?? new Set<string>();
+                        deleteShapes.add(nodeId);
+                        deleteShapeMap.set(point.layerIndex, deleteShapes);
+
+                        const deletePathShapes = deletePathMap.get(point.layerIndex);
+                        deletePathShapes?.delete(nodeId);
+                    } else {
+                        const deleteShapes = deleteShapeMap.get(point.layerIndex);
+                        if (deleteShapes?.has(nodeId)) continue;
+
+                        const deletePathShapes = deletePathMap.get(point.layerIndex) ?? new Map<string, Set<number>>();
+                        const deletePathIndices = deletePathShapes.get(nodeId) ?? new Set<number>();
+                        deletePathIndices.add(point.pathIndex);
+                        deletePathShapes.set(nodeId, deletePathIndices);
+                        deletePathMap.set(point.layerIndex, deletePathShapes);
+
+                        const originalPathAttributeNodes = originalPathAttributes.get(point.layerIndex) ?? new Map<string, Record<string, string>>();
+                        if (!originalPathAttributeNodes.has(nodeId)) {
+                            if (node.tagName === 'polyline' || node.tagName === 'polygon') {
+                                originalPathAttributeNodes.set(nodeId, {
+                                    points: editControlPointNodeParsedAttributes.value[point.nodeIndex].points,
+                                });
+                            } else if (node.tagName === 'path') {
+                                originalPathAttributeNodes.set(nodeId, {
+                                    d: editControlPointNodeParsedAttributes.value[point.nodeIndex].d,
+                                });
+                            }
+                            originalPathAttributes.set(point.layerIndex, originalPathAttributeNodes);
+                        }
+                    }
+
+                }
+
+                const actions: BaseAction[] = [];
+
+                // Delete the points/commands in a path
+                for (const [layerIndex, pathIndexMap] of deletePathMap.entries()) {
+                    const layer = editingLayers.value[layerIndex];
+                    if (!layer) continue;
+
+                    const layerDocument = await getStoredSvgDocument(layer.data.sourceUuid);
+                    const newLayerDocument = layerDocument.cloneNode(true) as Document;
+
+                    const originalAttributesByLayer = originalPathAttributes.get(layerIndex);
+
+                    for (const [nodeId, indices] of pathIndexMap.entries()) {
+                        const originalAttributes = originalAttributesByLayer?.get(nodeId);
+                        if (!originalAttributes) continue;
+                        const pathIndices = Array.from(indices).sort().reverse();
+
+                        if (originalAttributes.points) {
+                            const points: DOMPoint[] = originalAttributes.points.slice();
+                            for (const pathIndex of pathIndices) {
+                                points.splice(pathIndex, 1);
+                            }
+                            if (points.length < 2) {
+                                const deleteShapes = deleteShapeMap.get(layerIndex) ?? new Set<string>();
+                                deleteShapes.add(nodeId);
+                                deleteShapeMap.set(layerIndex, deleteShapes);
+                                continue;
+                            }
+                            const node = newLayerDocument.querySelector(`[data-ogr-id="${nodeId}"]`);
+                            if (!node) continue;
+                            node.setAttribute('points', points.map((point) => `${point.x},${point.y}`).join(' '));
+                        } else if (originalAttributes.d) {
+                            const commands: VectorPathCommand[] = originalAttributes.d.slice();
+                            for (const pathIndex of pathIndices) {
+                                const [removedCommand] = commands.splice(pathIndex, 1);
+                                if (removedCommand?.type === VectorPathCommandType.MOVE) {
+                                    const nextCommand = commands[pathIndex];
+                                    if (nextCommand) {
+                                        let point = new DOMPoint();
+                                        switch (nextCommand.type) {
+                                            case VectorPathCommandType.CUBIC_BEZIER_CURVE:
+                                            case VectorPathCommandType.ELLIPTICAL_ARC:
+                                            case VectorPathCommandType.LINE:
+                                            case VectorPathCommandType.MOVE:
+                                            case VectorPathCommandType.QUADRATIC_BEZIER_CURVE:
+                                            case VectorPathCommandType.SMOOTH_CUBIC_BEZIER_CURVE:
+                                            case VectorPathCommandType.SMOOTH_QUADRATIC_BEZIER_CURVE:
+                                                point = new DOMPoint(nextCommand.x, nextCommand.y);
+                                                break;
+                                            case VectorPathCommandType.HORIZONTAL_LINE:
+                                                point = new DOMPoint(nextCommand.x, removedCommand.y);
+                                                break;
+                                            case VectorPathCommandType.VERTICAL_LINE:
+                                                point = new DOMPoint(removedCommand.x, nextCommand.y);
+                                                break;
+                                        }
+                                        commands.splice(pathIndex, 1, {
+                                            type: VectorPathCommandType.MOVE,
+                                            x: point.x,
+                                            y: point.y,
+                                        });
+                                    }
+                                }
+                            }
+                            if (
+                                commands.length < 1
+                                || (
+                                    commands.length === 1
+                                    && (
+                                        commands[0].type === VectorPathCommandType.MOVE
+                                        || commands[0].type === VectorPathCommandType.CLOSE
+                                    )
+                                )
+                            ) {
+                                const deleteShapes = deleteShapeMap.get(layerIndex) ?? new Set<string>();
+                                deleteShapes.add(nodeId);
+                                deleteShapeMap.set(layerIndex, deleteShapes);
+                                continue;
+                            }
+                            const node = newLayerDocument.querySelector(`[data-ogr-id="${nodeId}"]`);
+                            if (!node) continue;
+                            node.setAttribute('d', serializeVectorPathCommands(commands));
+                        }
+                    }
+
+                    const svgString = serializer.serializeToString(newLayerDocument).replace(/xmlns=""/g, '');
+
+                    const image = await new Promise<HTMLImageElement>((resolve) => {
+                        const image = new Image();
+                        image.onload = () => {
+                            resolve(image);
+                        };
+                        image.onerror = () => {
+                            resolve(image);
+                        }
+                        image.src = URL.createObjectURL(new Blob([svgString], { type: 'image/svg+xml' }));
+                    });
+
+                    actions.push(new UpdateLayerAction<UpdateVectorLayerOptions>(
+                        {
+                            id: layer.id,
+                            data: {
+                                sourceUuid: await createStoredSvg(image),
+                            },
+                        },
+                    ));
+                }
+
+                // Delete an entire shape
+                for (const [layerIndex, nodeIds] of deleteShapeMap.entries()) {
+                    const layer = editingLayers.value[layerIndex];
+                    if (!layer) continue;
+
+                    const layerDocument = await getStoredSvgDocument(layer.data.sourceUuid);
+                    const newLayerDocument = layerDocument.cloneNode(true) as Document;
+
+                    for (const nodeId of Array.from(nodeIds)) {
+                        newLayerDocument.querySelector(`[data-ogr-id="${nodeId}"]`)?.remove();
+                    }
+                    generateSvgElementIds(newLayerDocument);
+
+                    const svgString = serializer.serializeToString(newLayerDocument).replace(/xmlns=""/g, '');
+
+                    const image = await new Promise<HTMLImageElement>((resolve) => {
+                        const image = new Image();
+                        image.onload = () => {
+                            resolve(image);
+                        };
+                        image.onerror = () => {
+                            resolve(image);
+                        }
+                        image.src = URL.createObjectURL(new Blob([svgString], { type: 'image/svg+xml' }));
+                    });
+
+                    actions.push(new UpdateLayerAction<UpdateVectorLayerOptions>(
+                        {
+                            id: layer.id,
+                            data: {
+                                sourceUuid: await createStoredSvg(image),
+                            },
+                        },
+                    ));
+                }
+
+                if (actions.length > 0) {
+                    await historyStore.dispatch('runAction', {
+                        action: new BundleAction('deleteVectorLayerShape', 'action.deleteVectorLayerShape', actions),
+                        reserveToken: deleteReserveToken,
+                    });
+                } else {
+                    await historyStore.dispatch('unreserve', { token: deleteReserveToken });
+                }
+            } catch (error) {
+                console.error('[src/canvas/controllers/draw-shape.ts] Error when deleting shapes ', error);
+                await historyStore.dispatch('unreserve', { token: deleteReserveToken });
+            }
+
         }
     }
 
@@ -1481,6 +1798,25 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
     private createEditingLayersFromSelectedLayers(newIds: number[], oldIds?: number[]) {
         if (this.drawingPointerId != null) return;
+
+        let hasSelectedLayerListChanged = false;
+        if (newIds.length !== oldIds?.length) {
+            hasSelectedLayerListChanged = true;
+        } else {
+            for (let i = 0; i < newIds.length; i++) {
+                if (newIds[i] !== oldIds[i]) {
+                    hasSelectedLayerListChanged = true;
+                    break;
+                }
+            }
+        }
+
+        if (hasSelectedLayerListChanged) {
+            selectedEditControlPointIndices.value = [];
+            selectedEditControlAttachPointIndices.value = [];
+            isExtendingPaths.value = false;
+        }
+
         getSelectedLayers<WorkingFileVectorLayer>(oldIds).filter(
             layer => layer.type === 'vector'
         ).forEach((layer) => {
@@ -1492,6 +1828,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         );
         for (const layer of this.selectedLayers) {
             getStoredSvgDocument(layer.data.sourceUuid).then((document) => {
+                layer.data.pendingSourceDocumentUpdateNodeIds = [];
                 layer.data.sourceDocument = document;
             });
         }

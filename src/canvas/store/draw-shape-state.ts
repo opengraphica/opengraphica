@@ -52,6 +52,14 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
                 r: 0,
                 g: 0,
                 b: 0,
+                alpha: 0,
+                style: '#00000000'
+            },
+            {
+                is: 'color',
+                r: 0,
+                g: 0,
+                b: 0,
                 alpha: 1,
                 style: '#000000'
             },
@@ -72,7 +80,7 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
                 style: '#ff0000'
             },
         ],
-        fillColorPaletteIndex: 0,
+        fillColorPaletteIndex: 1,
         pixelSnap: true,
         selectedShapeType: 'rectangle',
         strokeColorPaletteIndex: 0,
@@ -113,6 +121,8 @@ export interface EditControlPoint {
     nodeIndex: number; // Indes of the editable node in the ordered query list.
     pathIndex: number; // Index in path command list
     attachToIndex?: number;
+    minPointIndex?: number; // This point can't go below the x/y values of the point at this index.
+    maxPointIndex?: number; // This point can't go above the x/y values of the point at this index.
     isLast?: boolean;
     x: number;
     y: number;
@@ -132,8 +142,9 @@ export const hoveringEditControlPointIndices = ref<number[]>([]);
 export const selectedEditControlPointIndices = ref<number[]>([]);
 export const selectedEditControlAttachPointIndices = ref<number[]>([]); // Attach points that reference selectedEditControlPointIndices
 export const isExtendingPaths = ref<boolean>(false);
+export const previewInvisibleStrokeStart = ref<DOMPoint | null>(null);
 
-const createEditControlPoints = throttle(() => {
+export const createEditControlPoints = throttle(() => {
     const controlPoints: EditControlPoint[] = [];
     const previousControlPoints: EditControlPoint[] = [...editControlPoints.value];
 
@@ -156,6 +167,10 @@ const createEditControlPoints = throttle(() => {
         for (const node of nodes) {
             const { transform, fill, stroke, strokeWidth } = parseCommonNodeAttributes(node);
             const nodeXf = viewBoxXf.multiply(transform);
+            const nodeId = node.getAttribute('data-ogr-id');
+            if (nodeId && layer.data.pendingSourceDocumentUpdateNodeIds?.includes(nodeId)) {
+                continue;
+            }
 
             editControlPointNodes.value.push(node);
             switch (node.nodeName) {
@@ -171,6 +186,7 @@ const createEditControlPoints = throttle(() => {
                         y: xfPoint.y,
                         xProp: 'x',
                         yProp: 'y',
+                        maxPointIndex: controlPoints.length + 1,
                     });
                     point.x = x + width;
                     point.y = y + height;
@@ -183,6 +199,7 @@ const createEditControlPoints = throttle(() => {
                         y: xfPoint.y,
                         xProp: 'width',
                         yProp: 'height',
+                        minPointIndex: controlPoints.length - 1,
                     });
                     editControlPointNodeParsedAttributes.value.push({
                         transform, fill, stroke, strokeWidth, x, y, width, height,
@@ -510,8 +527,7 @@ const createEditControlPoints = throttle(() => {
 
     editControlPoints.value = controlPoints;
 }, 100);
-
-watch(() => editingLayers.value, createEditControlPoints, { deep: true });
+watch(() => editingLayers.value, createEditControlPoints, { deep: true, flush: 'post' });
 
 interface ControlPointAttributeEditGroup {
     layerIndex: number;

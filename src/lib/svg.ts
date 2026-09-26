@@ -466,7 +466,7 @@ export function parseCommonNodeAttributes(node: Element, options?: ParseNodeGlob
 
     let fill: string | null = getInheritedAttribute(node, 'fill') ?? '#000';
     const fillOpacity = parseFloat(getInheritedAttribute(node, 'fill-opacity') ?? '1');
-    if (fill === 'none') {
+    if (fill === 'none' || fill == null) {
         fill = null;
     } else if (!fill?.startsWith('#')) {
         fill = cssColorToHex(fill);
@@ -477,7 +477,7 @@ export function parseCommonNodeAttributes(node: Element, options?: ParseNodeGlob
 
     let stroke = getInheritedAttribute(node, 'stroke') ?? null;
     const strokeOpacity = parseFloat(getInheritedAttribute(node, 'stroke-opacity') ?? '1');
-    if (stroke === 'none') {
+    if (stroke === 'none' || stroke == null) {
         stroke = null;
     } else if (!stroke?.startsWith('#')) {
         stroke = cssColorToHex(stroke);
@@ -1112,6 +1112,14 @@ export function serializeVectorPathCommand(current: VectorPathCommand, previous?
             return (previous?.type === VectorPathCommandType.VERTICAL_LINE ? '' : 'V ')
                 + current.y;
     }
+}
+
+export function serializeVectorPathCommands(commands: VectorPathCommand[]) {
+    let d = '';
+    for (let i = 0; i < commands.length; i++) {
+        d += ' ' + serializeVectorPathCommand(commands[i], commands[i - 1]);
+    }
+    return d.trim();
 }
 
 export function getViewBox(xml?: Document): DOMRect {

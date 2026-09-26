@@ -2,7 +2,7 @@
     <div ref="overlay" class="og-canvas-overlay is-full-canvas-area">
         <div ref="selectionContainer" class="og-selection">
             <svg
-                v-if="editControlPoints.length > 0"
+                v-if="editControlPoints.length > 0 || previewInvisibleStrokeStart != null"
                 :width="svgBoundsWidth"
                 :height="svgBoundsHeight"
                 xmlns="http://www.w3.org/2000/svg">
@@ -28,7 +28,29 @@
                         }"
                     />
                 </template>
-                <template v-if="isExtendingPaths">
+                <template v-if="previewInvisibleStrokeStart != null">
+                    <line
+                        :x1="transformedPreviewInvisibleStrokeStartX"
+                        :y1="transformedPreviewInvisibleStrokeStartY"
+                        :x2="transformedCursorHoverX"
+                        :y2="transformedCursorHoverY"
+                        :style="{
+                            stroke: 'white', 
+                            strokeWidth: svgHandleWidth,
+                        }"
+                    />
+                    <line
+                        :x1="transformedPreviewInvisibleStrokeStartX"
+                        :y1="transformedPreviewInvisibleStrokeStartY"
+                        :x2="transformedCursorHoverX"
+                        :y2="transformedCursorHoverY"
+                        :style="{
+                            stroke: '#333333', 
+                            strokeWidth: svgHandleWidth * 0.5,
+                        }"
+                    />
+                </template>
+                <template v-if="isExtendingPaths && hoveringEditControlPointIndices.length === 0">
                     <template v-for="(point, i) of selectedEditControlPoints" :key="i + '_' + point.x + '_' + point.y">
                         <line
                             :x1="point.tx!"
@@ -103,14 +125,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, toRefs, watch, } from 'vue';
+import { computed, ref, toRefs, watch } from 'vue';
 
 import canvasStore from '@/store/canvas';
 import workingFileStore from '@/store/working-file';
 
 import {
-    cursorHoverPosition, isExtendingPaths,
+    cursorHoverPosition, isExtendingPaths, previewInvisibleStrokeStart,
     editControlPoints, editControlPointsDirty,
+    hoveringEditControlPointIndices,
     selectedEditControlPointIndices, selectedEditControlAttachPointIndices,
 } from '@/canvas/store/draw-shape-state';
 
@@ -122,6 +145,8 @@ const { transform, viewWidth, viewHeight, viewDirty } = toRefs(canvasStore.state
 
 const transformedCursorHoverX = ref(0);
 const transformedCursorHoverY = ref(0);
+const transformedPreviewInvisibleStrokeStartX = ref(0);
+const transformedPreviewInvisibleStrokeStartY = ref(0);
 
 const devicePixelRatio = window.devicePixelRatio || 1;
 
@@ -143,7 +168,9 @@ const svgBoundsHeight = computed<number>(() => {
 });
 
 const selectedEditControlPoints = computed(() => {
-    return selectedEditControlPointIndices.value.map((index) => editControlPoints.value[index]);
+    return selectedEditControlPointIndices.value.map(
+        (index) => editControlPoints.value[index]
+    ).filter((point) => point.attachToIndex == null);
 });
 
 const selectedEditControlAttachPoints = computed(() => {
@@ -165,5 +192,15 @@ watch([cursorHoverPosition], () => {
     );
     transformedCursorHoverX.value = point.x;
     transformedCursorHoverY.value = point.y;
+
+});
+
+watch([previewInvisibleStrokeStart], () => {
+    if (!previewInvisibleStrokeStart.value) return;
+    const point = previewInvisibleStrokeStart.value.matrixTransform(
+        new DOMMatrix().scale(1 / devicePixelRatio).multiply(transform.value)
+    );
+    transformedPreviewInvisibleStrokeStartX.value = point.x;
+    transformedPreviewInvisibleStrokeStartY.value = point.y;
 });
 </script>

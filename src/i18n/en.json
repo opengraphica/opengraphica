@@ -19,6 +19,7 @@
         "deleteLayers": "Delete Layer(s)",
         "deleteLayerFilter": "Delete Effect",
         "deleteLayerSelectionArea": "Delete Selection",
+        "deleteVectorLayerShape": "Delete Shape",
         "disableLayerFilter": "Disable Layer Effect",
         "duplicateLayer": "Duplicate Layer",
         "enableLayerFilter": "Enable Layer Effect",
@@ -1376,7 +1377,7 @@
         },
         "drawShape": {
             "newVectorLayerName": "New Shape",
-            "editingShape": "Editing Shape",
+            "extendingShape": "Extending Shape",
             "shapeType": {
                 "label": "Shape",
                 "rectangle": "Rectangle",
@@ -1395,6 +1396,14 @@
                 "width": "Width"
             },
             "notification": {
+                "invisibleShape": {
+                    "title": "Creating Invisible Shape",
+                    "message": "Both your current fill and stroke color are fully transparent. A new shape will not be created."
+                },
+                "invisibleLine": {
+                    "title": "Creating Invisible Line",
+                    "message": "The current stroke color must not be fully transparent, and the stroke width must be greater than 0."
+                },
                 "uselessClick": {
                     "title": "Drawing Shapes",
                     "message": {

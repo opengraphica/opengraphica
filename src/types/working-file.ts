@@ -229,6 +229,7 @@ export interface WorkingFileVectorLayer<T extends ColorModel = ColorModel> exten
         sourceDocument?: Document; // SVG XML Document
         sourceDocumentSerialized?: string; // Temporary XML document serialization for passing to renderer
         sourceUuid?: string; // SVG Image Reference
+        pendingSourceDocumentUpdateNodeIds?: string[];
     }
 }
 

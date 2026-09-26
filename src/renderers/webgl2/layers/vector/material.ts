@@ -70,7 +70,8 @@ export async function updateVectorMaterial(
     material.needsUpdate = true;
 }
 
-export async function disposeVectorrMaterial(material: ShaderMaterial) {
+export async function disposeVectorMaterial(material: ShaderMaterial) {
+    if (!material) return;
     for (const texture of material.userData.disposableTextures ?? []) {
         texture.dispose();
     }

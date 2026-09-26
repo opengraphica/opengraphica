@@ -1,8 +1,8 @@
 <template>
     <div class="flex container items-center justify-center mx-auto">
         <div v-if="isExtendingPaths" class="og-toolbar-edit-confirm">
-            {{ t('toolbar.drawShape.editingShape') }}
-            <el-button plain size="small" class="ml-3!" @click="onDoneEditing()">
+            {{ t('toolbar.drawShape.extendingShape') }}
+            <el-button plain size="small" class="ml-3!" @click="onDoneExtending()">
                 <span class="bi bi-check-circle-fill mr-2" aria-hidden="true" /> {{ t('button.done') }}
             </el-button>
         </div>
@@ -106,11 +106,11 @@
                     class="og-button--color-swatch"
                     :style="{
                         '--og-button-swatch-background': palette.color.style,
-                        '--og-button-swatch-color': palette.isLight ? '#000000' : '#ffffff',
+                        '--og-button-swatch-color': palette.isLight || palette.color.alpha === 0 ? '#000000' : '#ffffff',
                     }"
                     @click="onClickFillColorPalette($event, colorIndex)"
                 >
-                    <i class="bi bi-palette-fill" aria-hidden="true" />
+                    <i :class="palette.color.alpha === 0 ? 'bi bi-ban' : 'bi bi-palette-fill'" aria-hidden="true" />
                 </og-button>
                 <og-button ref="fillShowColorPaletteSettingsButton" :aria-label="t('button.settings')" small slim @click="onEditFillPaletteSettings()">
                     <span class="bi bi-gear-fill" aria-hidden="true" />
@@ -150,11 +150,11 @@
                         class="og-button--color-swatch"
                         :style="{
                             '--og-button-swatch-background': palette.color.style,
-                            '--og-button-swatch-color': palette.isLight ? '#000000' : '#ffffff',
+                            '--og-button-swatch-color': palette.isLight || palette.color.alpha === 0 ? '#000000' : '#ffffff',
                         }"
                         @click="onClickStrokeColorPalette($event, colorIndex)"
                     >
-                        <i class="bi bi-palette-fill" aria-hidden="true" />
+                        <i :class="palette.color.alpha === 0 ? 'bi bi-ban' : 'bi bi-palette-fill'" aria-hidden="true" />
                     </og-button>
                     <og-button ref="strokeShowColorPaletteSettingsButton" :aria-label="t('button.settings')" small slim @click="onEditStrokePaletteSettings()">
                         <span class="bi bi-gear-fill" aria-hidden="true" />
@@ -476,7 +476,7 @@ function onChangeStrokeWidth() {
 | Finished Editing Button |
 \*-----------------------*/
 
-function onDoneEditing() {
+function onDoneExtending() {
     isExtendingPaths.value = false;
     selectedEditControlPointIndices.value = [];
     selectedEditControlAttachPointIndices.value = [];
