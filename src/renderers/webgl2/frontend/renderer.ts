@@ -25,7 +25,7 @@ import type {
     RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings,
     RendererFrontendApplySelectionMaskToAlphaChannelOptions,
     RendererLayerWatcher, RendererTextureTile, WorkingFileAnyLayer,
-    RendererBucketFillSettings,
+    RendererBucketFillSettings, RendererPickedVectorLayerElement,
 } from '@/types';
 
 export class Webgl2RendererFrontend implements RendererFrontend {
@@ -447,6 +447,10 @@ export class Webgl2RendererFrontend implements RendererFrontend {
 
     async updateVectorLayerAttributes(layerId: number, nodeId: string, attributes: Record<string, string | null>) {
         return this.rendererBackend?.updateVectorLayerAttributes(layerId, nodeId, deepToRaw(attributes));
+    }
+
+    async pickVectorLayerElement(layerId: number, x: number, y: number): Promise<RendererPickedVectorLayerElement[]> {
+        return this.rendererBackend?.pickVectorLayerElement(layerId, x, y);
     }
 
     async dispose() {

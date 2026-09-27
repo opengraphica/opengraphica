@@ -85,6 +85,11 @@ export interface RendererBucketFillSettings {
     blendingMode?: WorkingFileLayerBlendingMode;
 }
 
+export interface RendererPickedVectorLayerElement {
+    id: string;
+    area: 'fill' | 'stroke';
+}
+
 export interface RendererFrontend {
     initialize(canvas: HTMLCanvasElement | OffscreenCanvas): Promise<void>;
     resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number): Promise<void>;
@@ -102,6 +107,7 @@ export interface RendererFrontend {
     applyBucketFill(strength: number): Promise<RendererTextureTile[]>;
     addVectorLayerElement(layerId: number, tagName: string, attributes: Record<string, string>): Promise<void>;
     updateVectorLayerAttributes(layerId: number, nodeId: string, attributes: Record<string, string | null>): Promise<void>;
+    pickVectorLayerElement(layerId: number, x: number, y: number): Promise<RendererPickedVectorLayerElement[]>;
     dispose(): Promise<void>;
 }
 
@@ -122,6 +128,7 @@ export interface Webgl2RendererMeshController {
     overrideVisibility(visible?: boolean): void;
     updateVectorLayerAttributes?: (nodeId: string, attributes: Record<string, string | null>) => Promise<void>;
     addVectorLayerElement?: (tagName: string, attributes: Record<string, string>) => Promise<void>;
+    pickVectorLayerElement?: (x: number, y: number) => Promise<RendererPickedVectorLayerElement[]>;
 }
 
 export interface WgpuWasmRendererMeshController {

@@ -11,6 +11,7 @@ import { Matrix4 } from 'three/src/math/Matrix4';
 import { Mesh } from 'three/src/objects/Mesh';
 import { MeshBasicMaterial } from 'three/src/materials/MeshBasicMaterial';
 import { Quaternion } from 'three/src/math/Quaternion';
+import { Raycaster } from 'three/src/core/Raycaster';
 import { ShapeGeometry } from 'three/src/geometries/ShapeGeometry';
 import { Texture } from 'three/src/textures/Texture';
 import { Vector2 } from 'three/src/math/Vector2';
@@ -35,7 +36,8 @@ import { SVGLoader } from './svg-loader';
 import type { Scene, ShaderMaterial, SvgShapePath } from 'three';
 import type {
     Webgl2RendererCanvasFilter, Webgl2RendererMeshController,
-    WorkingFileLayerBlendingMode, WorkingFileVectorLayer, WorkingFileLayerFilter
+    WorkingFileLayerBlendingMode, WorkingFileVectorLayer, WorkingFileLayerFilter,
+    RendererPickedVectorLayerElement,
 } from '@/types';
 
 const epsilon = 0.000001;
@@ -55,6 +57,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
     sourceTexture: InstanceType<typeof Texture<any>> | undefined;
     sourceDocument: XMLDocument | undefined;
     shapeGroup: InstanceType<typeof Group> | undefined;
+    createdShapeGroups: InstanceType<typeof Group>[] = [];
 
     domParser: DOMParser;
     svgLoader: SVGLoader;
@@ -77,10 +80,9 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
     materialUpdates: Array<'destroyAndCreate' | 'update'> = [];
     regenerateThumbnailTimeoutHandle: number | undefined;
     overrideFilterParamTextures: Texture<any>[] = [];
-    svgMeshesById: Record<string, Array<Mesh>> = {};
     isPendingGenerateSvgTexture: boolean = false;
     queuedAddVectorLayerElements: QueuedAddVectorLayerElement[] = [];
-    generateSvgMeshesUuid: string = '';
+    generateSvgMeshesUuid: string | null = null;
 
     handleResize: (() => void);
 
@@ -186,7 +188,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         } else {
             const shapeGroup = this.shapeGroup;
             this.shapeGroup = undefined;
-            await this.generateSvgTexture();
+            await this.generateSvgTexture(shapeGroup);
             if (shapeGroup && !this.shapeGroup) {
                 this.scene?.remove(shapeGroup);
                 if (this.plane) {
@@ -258,9 +260,11 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         }
     }
 
-    async generateSvgTexture() {
+    async generateSvgTexture(oldShapeGroup?: Group) {
         if (this.shapeGroup) return;
         if (this.sourceUuid && this.plane) {
+            const generateSvgMeshesUuid = this.generateSvgMeshesUuid;
+
             let scale = new Vector3();
             this.plane.matrix.decompose(new Vector3(), new Quaternion(), scale);
             const scaledWidth = scale.x * this.width;
@@ -288,9 +292,10 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             this.scheduleMaterialUpdate('update');
             this.isPendingGenerateSvgTexture = false;
 
-            if (!this.shapeGroup) {
-                this.disposeSvgMeshes();
+            if (generateSvgMeshesUuid === this.generateSvgMeshesUuid) {
+                this.generateSvgMeshesUuid = null;
             }
+            this.disposeSvgMeshes();
         } else {
             this.disposeSourceTexture();
             this.scheduleMaterialUpdate('update');
@@ -298,13 +303,12 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
     }
 
     generateSvgMeshes(svgDocument: Document) {
-
         if (!(svgDocument instanceof XMLDocument)) return;
         this.sourceDocument = svgDocument;
-        this.disposeSvgMeshes();
 
         const generateUuid = uuidv4();
         this.generateSvgMeshesUuid = generateUuid;
+        this.disposeSvgMeshes();
 
         if (this.width && this.height) {
             svgDocument.documentElement.setAttribute('width', `${this.width}`);
@@ -316,8 +320,12 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
 
         this.shapeGroup = new Group();
         this.shapeGroup.renderOrder = renderOrder;
+        this.shapeGroup.userData.generateUuid = generateUuid;
         this.shapeGroup.userData.svgDocument = svgDocument;
+        this.shapeGroup.userData.scene = this.scene;
+        this.shapeGroup.userData.svgMeshesById = {};
         this.shapeGroup.matrixAutoUpdate = false;
+        this.createdShapeGroups.push(this.shapeGroup);
         if (this.plane) {
             const viewBox = this.svgLoader.getViewBox(this.shapeGroup.userData.svgDocument);
             const width = viewBox.max.x - viewBox.min.x;
@@ -391,7 +399,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         if (!this.sourceDocument || !this.shapeGroup) return;
         let node = this.sourceDocument.querySelector(`[data-ogr-id="${nodeId}"]`);
         if (!node) return;
-        const meshes = this.svgMeshesById[nodeId];
+        const meshes = this.shapeGroup.userData.svgMeshesById[nodeId];
         if (meshes) {
             for (const mesh of meshes) {
                 mesh.geometry?.dispose();
@@ -444,12 +452,54 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         markRenderDirty();
     }
 
+    async pickVectorLayerElement(x: number, y: number): Promise<RendererPickedVectorLayerElement[]> {
+        if (!this.shapeGroup) {
+            await new Promise<void>((resolve) => {
+                const intervalHandle = setInterval(() => {
+                    if (this.shapeGroup) {
+                        clearTimeout(timeoutHandle);
+                        resolve();
+                    }
+                });
+                const timeoutHandle = setTimeout(() => {
+                    clearInterval(intervalHandle);
+                    resolve();
+                }, 500);
+            });
+        }
+
+        const elements: RendererPickedVectorLayerElement[] = [];
+
+        const raycaster = new Raycaster();
+        const rayOrigin = new Vector3(x, y, -1);
+        const rayDirection = new Vector3(0, 0, 1).normalize();
+        raycaster.set(rayOrigin, rayDirection);
+
+        const intersections = raycaster.intersectObjects(this.shapeGroup?.children ?? [], true, []);
+
+        intersections.sort((a, b) => {
+            if (a.object.renderOrder !== b.object.renderOrder) {
+                return a.object.renderOrder - b.object.renderOrder;
+            }
+            return 0;
+        })
+
+        for (const intersection of intersections) {
+            elements.push({
+                id: intersection.object.userData.id,
+                area: intersection.object.userData.area,
+            });
+        }
+
+        return elements;
+    }
+
     createPathShapes(path: SvgShapePath, renderOrder: number, generateUuid?: string) {
         if (!this.shapeGroup) return;
         const node = path.userData.node as Element;
         const id = node?.getAttribute('data-ogr-id');
         const nodeName = node?.nodeName ?? 'path';
-        id && (this.svgMeshesById[id] = []);
+        id && (this.shapeGroup.userData.svgMeshesById[id] = []);
         createFill:
         if (path.userData.style.fill !== 'none') {
             const shapes = path.toShapes();
@@ -462,8 +512,12 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
                 const geometry = new ShapeGeometry(shape, 32);
                 const mesh = new Mesh(geometry, undefined);
                 mesh.renderOrder = renderOrder;
-                if (id && this.svgMeshesById[id]) {
-                    this.svgMeshesById[id].push(mesh);
+                mesh.matrixWorldAutoUpdate = false;
+                mesh.matrixWorld = new Matrix4();
+                if (id && this.shapeGroup.userData.svgMeshesById[id]) {
+                    mesh.userData.id = id;
+                    mesh.userData.area = 'fill';
+                    this.shapeGroup.userData.svgMeshesById[id].push(mesh);
                     this.shapeGroup.add(mesh);
                     meshes.push(mesh);
                 } else {
@@ -505,8 +559,12 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
                 const geometry = new ShapeGeometry(shape);
                 const mesh = new Mesh(geometry, undefined);
                 mesh.renderOrder = renderOrder;
-                if (id && this.svgMeshesById[id]) {
-                    this.svgMeshesById[id]?.push(mesh);
+                mesh.matrixWorldAutoUpdate = false;
+                mesh.matrixWorld = new Matrix4();
+                if (id && this.shapeGroup.userData.svgMeshesById[id]) {
+                    mesh.userData.id = id;
+                    mesh.userData.area = 'stroke';
+                    this.shapeGroup.userData.svgMeshesById[id]?.push(mesh);
                     this.shapeGroup.add(mesh);
                     meshes.push(mesh);
                 } else {
@@ -530,19 +588,22 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
     }
 
     disposeSvgMeshes() {
-        if (this.shapeGroup) {
-            this.scene?.remove(this.shapeGroup);
-            for (const child of this.shapeGroup.children) {
-                if (child instanceof Mesh) {
-                    child.geometry?.dispose();
-                    child.geometry = undefined;
-                    disposeVectorMaterial(child.material);
-                    child.material = undefined;
+        for (let i = this.createdShapeGroups.length - 1; i >= 0; i--) {
+            const shapeGroup = this.createdShapeGroups[i];
+            if (this.generateSvgMeshesUuid !== shapeGroup.userData.generateUuid) {
+                shapeGroup.userData.scene?.remove(shapeGroup);
+                for (const child of shapeGroup.children) {
+                    if (child instanceof Mesh) {
+                        child.geometry?.dispose();
+                        child.geometry = undefined;
+                        disposeVectorMaterial(child.material);
+                        child.material = undefined;
+                    }
                 }
+                this.createdShapeGroups.splice(i, 1);
+                shapeGroup.userData.svgMeshesById = {};
             }
-            this.shapeGroup = undefined;
         }
-        this.svgMeshesById = {};
     }
  
     reorder(order: number) {
@@ -551,8 +612,8 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         }
         if (this.shapeGroup) {
             this.shapeGroup.renderOrder = order + 0.1;
-            for (const id of Object.keys(this.svgMeshesById)) {
-                for (const mesh of this.svgMeshesById[id]) {
+            for (const id of Object.keys(this.shapeGroup.userData.svgMeshesById)) {
+                for (const mesh of this.shapeGroup.userData.svgMeshesById[id]) {
                     mesh.renderOrder = order + 0.1;
                 }
             }
@@ -577,6 +638,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         if (this.shapeGroup) {
             this.scene?.remove(this.shapeGroup);
             scene.add(this.shapeGroup);
+            this.shapeGroup.userData.scene = scene;
         } else {
             scene.add(this.plane);
         }
@@ -667,6 +729,8 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         backend.removeMeshController(this.id);
 
         messageBus.off('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
+        
+        this.generateSvgMeshesUuid = null;
 
         this.planeGeometry?.dispose();
         this.planeGeometry = undefined;

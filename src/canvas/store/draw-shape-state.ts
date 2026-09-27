@@ -141,12 +141,20 @@ export const editControlPointNodeParsedAttributes = ref<Record<string, any>>([])
 export const hoveringEditControlPointIndices = ref<number[]>([]);
 export const selectedEditControlPointIndices = ref<number[]>([]);
 export const selectedEditControlAttachPointIndices = ref<number[]>([]); // Attach points that reference selectedEditControlPointIndices
+export const selectedShapes = ref<Array<[number, string]>>([]); // [layerId, nodeId]
 export const isExtendingPaths = ref<boolean>(false);
 export const previewInvisibleStrokeStart = ref<DOMPoint | null>(null);
 
+let previousEditControlPoints: EditControlPoint[] = [];
+
 export const createEditControlPoints = throttle(() => {
     const controlPoints: EditControlPoint[] = [];
-    const previousControlPoints: EditControlPoint[] = [...editControlPoints.value];
+
+    // Only set previous control points if there are old control points,
+    // Otherwise, when switching to the color picker selection gets wiped out.
+    if (editControlPoints.value.length > 0) {
+        previousEditControlPoints = [...editControlPoints.value];
+    }
 
     hoveringEditControlPointIndices.value = [];
     editControlPointNodes.value = [];
@@ -504,18 +512,22 @@ export const createEditControlPoints = throttle(() => {
     }
 
     let hasControlPointsChanged = false;
-    if (controlPoints.length !== previousControlPoints.length) {
-        hasControlPointsChanged = true;
-    } else {
-        for (const [pointIndex, point1] of controlPoints.entries()) {
-            const point2 = previousControlPoints[pointIndex];
-            if (
-                point1.layerIndex !== point2.layerIndex
-                || point1.nodeIndex !== point2.nodeIndex
-                || point1.pathIndex !== point2.pathIndex
-            ) {
-                hasControlPointsChanged = true;
-                break;
+    // Only detect changes if new control points,
+    // Otherwise, when switching to color picker selection is wiped out.
+    if (controlPoints.length > 0) {
+        if (controlPoints.length !== previousEditControlPoints.length) {
+            hasControlPointsChanged = true;
+        } else {
+            for (const [pointIndex, point1] of controlPoints.entries()) {
+                const point2 = previousEditControlPoints[pointIndex];
+                if (
+                    point1.layerIndex !== point2.layerIndex
+                    || point1.nodeIndex !== point2.nodeIndex
+                    || point1.pathIndex !== point2.pathIndex
+                ) {
+                    hasControlPointsChanged = true;
+                    break;
+                }
             }
         }
     }

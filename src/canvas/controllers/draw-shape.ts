@@ -8,6 +8,7 @@ import {
     fillColor, strokeColor, strokeWidth, selectedShapeType,
     editControlPoints, editControlPointsDirty, hoveringEditControlPointIndices,
     selectedEditControlPointIndices, selectedEditControlAttachPointIndices,
+    selectedShapes,
     editControlPointNodes, renderControlPointAttributeEdits, editControlPointNodeParsedAttributes,
     editingLayers, hasVisibleToolbarOverlay, showShapeDrawer,
     type ControlPointAttributeEdit,
@@ -72,6 +73,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
     
     private dragHandleRadius: number = 6;
     private dragHandleRadiusTouch: number = 10;
+    private dragControlPointPointerId: number | null = null;
     private dragStartPoint: DOMPoint = new DOMPoint();
     private draggingEditControlPointIndices: number[] = [];
     private pendingControlPointEdits: ControlPointAttributeEdit[] = [];
@@ -99,6 +101,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             this.createEditingLayersFromSelectedLayers
         );
         editingLayers.value = [];
+        // Force re-generation of control points on tool entry. Not doing this causes major bugs.
         this.createEditingLayersFromSelectedLayers(workingFileStore.state.selectedLayerIds);
 
         this.onFillColorChanged = this.onFillColorChanged.bind(this);
@@ -121,7 +124,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
         cursorHoverPosition.value = new DOMPoint(
             -100000000000,
-            -100000000000
+            -100000000000,
         );
 
         // Tutorial message
@@ -176,8 +179,8 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         appEmitter.off('editor.tool.delete', this.onDelete);
 
         // Tutorial Message
-        if (!editorStore.state.tutorialFlags.drawGradientToolIntroduction) {
-            dismissTutorialNotification('drawGradientToolIntroduction');
+        if (!editorStore.state.tutorialFlags.drawShapeToolIntroduction) {
+            dismissTutorialNotification('drawShapeToolIntroduction');
         }
 
         // Block UI changes until history actions have completed
@@ -194,7 +197,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             return;
         }
 
-        if ((e.pointerType === 'pen' || !editorStore.state.isPenUser)) {
+        if ((e.pointerType === 'pen' || (e.pointerType === 'mouse' && !editorStore.state.isPenUser))) {
             cursorHoverPosition.value = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
                 this.lastCursorY * devicePixelRatio
@@ -203,44 +206,35 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
         const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
         if (pointer && pointer.down.isPrimary && pointer.type !== 'touch' && pointer.down.button === 0) {
-            const editControlPointIndices = this.getEditControlPointIndicesAtPagePoint(e.pageX, e.pageY);
-            if (editControlPointIndices.length === 0) {
-                if (this.isReadyForPathExtension()) {
-                    isExtendingPaths.value = true;
-                    this.extendPathStart(pointer);
-                } else {
-                    isExtendingPaths.value = false;
-                    selectedEditControlPointIndices.value = [];
-                    selectedEditControlAttachPointIndices.value = [];
-                    ({ viewTransformPoint: this.dragStartPoint } = this.getTransformedCursorInfo());
-                }
-            } else {
-                selectedEditControlPointIndices.value = editControlPointIndices;
-                isExtendingPaths.value = this.isReadyForPathExtension();
-                this.dragEditControlPointStart(pointer);
-            }
+            this.onPointerOrTouchDown(pointer);
         }
     }
 
     onMultiTouchDown() {
         super.onMultiTouchDown();
         if (this.touches.length === 1) {
-            const editControlPointIndices = this.getEditControlPointIndicesAtPagePoint(this.touches[0].down.pageX, this.touches[0].down.pageY);
-            if (editControlPointIndices.length === 0) {
-                if (this.isReadyForPathExtension()) {
-                    isExtendingPaths.value = true;
-                    this.extendPathStart(this.touches[0]);
-                } else {
-                    isExtendingPaths.value = false;
-                    selectedEditControlPointIndices.value = [];
-                    selectedEditControlAttachPointIndices.value = [];
-                    ({ viewTransformPoint: this.dragStartPoint } = this.getTransformedCursorInfo());
-                }
-            } else {
-                selectedEditControlPointIndices.value = editControlPointIndices;
-                isExtendingPaths.value = this.isReadyForPathExtension();
-                this.dragEditControlPointStart(this.touches[0]);
+            if (this.touches[0].down.isPrimary && this.touches[0].down.button === 0) {
+                this.onPointerOrTouchDown(this.touches[0]);
             }
+        }
+    }
+
+    onPointerOrTouchDown(pointer: PointerTracker) {
+        const editControlPointIndices = this.getEditControlPointIndicesAtPagePoint(pointer.down.pageX, pointer.down.pageY);
+        if (editControlPointIndices.length === 0) {
+            if (this.isReadyForPathExtension()) {
+                isExtendingPaths.value = true;
+                this.extendPathStart(pointer);
+            } else {
+                isExtendingPaths.value = false;
+                selectedEditControlPointIndices.value = [];
+                selectedEditControlAttachPointIndices.value = [];
+                ({ viewTransformPoint: this.dragStartPoint } = this.getTransformedCursorInfo());
+            }
+        } else {
+            selectedEditControlPointIndices.value = editControlPointIndices;
+            isExtendingPaths.value = this.isReadyForPathExtension();
+            this.dragEditControlPointStart(pointer);
         }
     }
 
@@ -648,6 +642,8 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
     }
 
     protected dragEditControlPointStart(e: PointerTracker) {
+        this.dragControlPointPointerId = e.down.pointerId;
+         
         ({ viewTransformPoint: this.dragStartPoint } = this.getTransformedCursorInfo());
 
         this.uselessClickCount = 0;
@@ -746,7 +742,12 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
     onPointerMove(e: PointerEvent): void {
         super.onPointerMove(e);
 
-        if (e.pointerType === 'pen' || !editorStore.state.isPenUser) {
+        if (e.pointerType === 'touch' && this.multiTouchDownCount !== 1) {
+            cursorHoverPosition.value = new DOMPoint(
+                -100000000000,
+                -100000000000,
+            );
+        } else if (e.pointerType === 'pen' || !editorStore.state.isPenUser) {
             cursorHoverPosition.value = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
                 this.lastCursorY * devicePixelRatio
@@ -754,14 +755,14 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         }
 
         if (
-            e.isPrimary
+            e.isPrimary && (e.type !== 'touch' || this.multiTouchDownCount === 1)
         ) {
             const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
 
             if (pointer && (pointer.type !== 'touch' || this.multiTouchDownCount === 1) && pointer.down.button === 0 && pointer.isDragging) {
-                if (this.draggingEditControlPointIndices.length > 0) {
+                if (this.dragControlPointPointerId != null && this.draggingEditControlPointIndices.length > 0) {
                     this.dragEditControlPointMove(pointer);
-                } else if (isExtendingPaths.value) {
+                } else if (this.extendPathPointerId != null) {
                     this.extendPathMove(pointer);
                 } else {
                     this.drawShapeMove(pointer);
@@ -1089,21 +1090,59 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
     async onPointerUpBeforePurge(e: PointerEvent): Promise<void> {
         super.onPointerUpBeforePurge(e);
+        const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
+        if (pointer == null || pointer.type === 'touch') return;
+        this.onPointerOrTouchEnd(pointer);
+    }
 
-        if (this.extendPathPointerId != null && this.extendPathPointerId == e.pointerId && isExtendingPaths.value) {
-            this.extendPathEnd(e);
-        } else if (this.drawingPointerId != null && this.drawingPointerId == e.pointerId) {
-            this.drawShapeEnd(e);
-        } else if (this.pointers.length == 1 && this.draggingEditControlPointIndices.length) {
-            const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
+    onMultiTouchUp(): void {
+        super.onMultiTouchUp();
+        if (this.multiTouchDownCount != 1) return;
+        const pointer = this.multiTouchDownTouches[0];
+        this.onPointerOrTouchEnd(pointer);
 
-            if (pointer.isDragging) {
+        cursorHoverPosition.value = new DOMPoint(
+            -100000000000,
+            -100000000000,
+        );
+    }
+
+    onPointerOrTouchEnd(e: PointerTracker) {
+        if (this.extendPathPointerId != null && this.extendPathPointerId == e.down.pointerId && isExtendingPaths.value) {
+            this.extendPathEnd();
+        } else if (this.drawingPointerId != null && this.drawingPointerId == e.down.pointerId) {
+            this.drawShapeEnd();
+        } else if (this.dragControlPointPointerId != null && this.draggingEditControlPointIndices.length > 0) {
+            if (e.isDragging) {
                 this.dragEditControlPointEnd();
             }
-
+            this.dragControlPointPointerId = null;
             this.draggingEditControlPointIndices = [];
-        } else if (this.pointers.length === 1 && e.isPrimary && e.button === 0) {
-            this.uselessClickCount++;
+        } else if (this.pointers.length === 1 && e.down.isPrimary && e.down.button === 0) {
+            const beforeSelection = selectedShapes.value.slice();
+
+            if (!e.isDragging) {
+                this.selectShapes(e);
+            }
+
+            let hasShapeSelectionChanged = false;
+            if (beforeSelection.length !== selectedShapes.value.length) {
+                hasShapeSelectionChanged = true;
+            } else {
+                for (let i = 0; i < selectedShapes.value.length; i++) {
+                    if (
+                        beforeSelection[i][0] !== selectedShapes.value[i][0]
+                        || beforeSelection[i][1] !== selectedShapes.value[i][1]
+                    ) {
+                        hasShapeSelectionChanged = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!hasShapeSelectionChanged) {
+                this.uselessClickCount++;
+            }
         }
 
         if (this.pointers.length === 1 && this.uselessClickCount >= 3) {
@@ -1115,10 +1154,9 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 duration: 5000,
             });
         }
-
     }
 
-    private async drawShapeEnd(e: PointerEvent) {
+    private async drawShapeEnd() {
         previewInvisibleStrokeStart.value = null;
 
         if (this.drawingShapes.length > 0) {
@@ -1182,7 +1220,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 });
 
                 const tagName = this.drawingShapes[0]?.element.tagName;
-                this.selectExtendPathNodes(tagName, this.drawingShapes);
+                this.selectExtendPathNodes(tagName, this.drawingShapes.slice());
 
             } catch (error) {
                 console.error('[src/canvas/controllers/draw-shape.ts] Error when creating shape layer updates ', error);
@@ -1194,7 +1232,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         this.drawingShapes = [];
     }
 
-    private async extendPathEnd(e: PointerEvent) {
+    private async extendPathEnd() {
         const { viewTransformPoint } = this.getTransformedCursorInfo();
 
         const actions: UpdateVectorLayerAttributesAction[] = [];
@@ -1237,7 +1275,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             )
         });
 
-        this.selectExtendPathNodes(tagName, undefined, this.extendPathInfo);
+        this.selectExtendPathNodes(tagName, undefined, this.extendPathInfo.slice());
 
         this.extendPathInfo = [];
     }
@@ -1262,6 +1300,21 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 actions,
             )
         });
+    }
+
+    private async selectShapes(e: PointerTracker) {
+        const { viewTransformPoint } = this.getTransformedCursorInfo();
+
+        selectedShapes.value = [];
+
+        if (!this.renderer) return;
+
+        for (const layer of editingLayers.value) {
+            const elements = await this.renderer.pickVectorLayerElement(layer.id, viewTransformPoint.x, viewTransformPoint.y);
+            if (elements.length > 0) {
+                selectedShapes.value.push([layer.id, elements[0].id]);
+            }
+        }
     }
 
     private getEditControlPointIndicesAtPagePoint(x: number, y: number, excludeIndex?: number, isHover?: boolean) {
@@ -1435,6 +1488,8 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             event.action.id === 'createShape'
             || (event.action.id === 'createShapeLayer' && event.trigger !== 'do')
             || event.action.id === 'deleteVectorLayerShape'
+            || event.action.id === 'updateDrawLayer'
+            || event.action.id === 'updateEraseLayer'
         ) {
             this.createEditingLayersFromSelectedLayers(workingFileStore.state.selectedLayerIds, workingFileStore.state.selectedLayerIds);
         }
@@ -1739,11 +1794,16 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
     private selectExtendPathNodes(
         tagName: string,
         drawingShapes: DrawingShape[] = [],
-        extendPathInfo: ExtendPathInfo[] = []
+        extendPathInfo: ExtendPathInfo[] = [],
     ) {
         if (['polyline', 'polygon', 'path'].includes(tagName)) {
-            const unwatch = watch(() => editControlPoints.value, () => {
+            const unwatch = watch(() => editControlPoints.value, selectExtendedControlPoints);
+            const timeoutHandle = window.setTimeout(selectExtendedControlPoints, 100);
+            function selectExtendedControlPoints() {
                 unwatch();
+                window.clearTimeout(timeoutHandle);
+
+                let isExtendingPathsContinue: boolean | null = extendPathInfo.length > 0 ? false : null;
 
                 const greatestIndices = new Map<string, { pointIndex: number, pathIndex: number }>();
 
@@ -1790,10 +1850,14 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                     selectedEditControlPointIndices.value.push(pointIndex);
                 }
                 if (selectedEditControlPointIndices.value.length > 0) {
-                    isExtendingPaths.value = true;
+                    isExtendingPathsContinue = true;
                 }
-            });
+                if (isExtendingPathsContinue != null) {
+                    isExtendingPaths.value = isExtendingPathsContinue;
+                }
+            }
         }
+
     }
 
     private createEditingLayersFromSelectedLayers(newIds: number[], oldIds?: number[]) {
@@ -1812,8 +1876,10 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         }
 
         if (hasSelectedLayerListChanged) {
-            selectedEditControlPointIndices.value = [];
-            selectedEditControlAttachPointIndices.value = [];
+            if (!['colorPicker', 'opacity'].includes(editorStore.state.activeToolPrevious!)) {
+                selectedEditControlPointIndices.value = [];
+                selectedEditControlAttachPointIndices.value = [];
+            }
             isExtendingPaths.value = false;
         }
 

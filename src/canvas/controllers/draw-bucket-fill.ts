@@ -11,7 +11,8 @@ import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore, { createHistoryReserveToken, historyBlockInteractionUntilComplete, historyReserveQueueFree } from '@/store/history';
 import { createStoredImage } from '@/store/image';
-import workingFileStore, { getSelectedLayers, ensureUniqueLayerSiblingName } from '@/store/working-file';
+import { getStoredSvgDocument } from '@/store/svg';
+import workingFileStore, { getSelectedLayers, ensureUniqueLayerSiblingName, getLayerById } from '@/store/working-file';
 import { strength, feather, antialias, colorPalette, colorPaletteIndex } from '../store/draw-bucket-fill-state';
 import { appliedSelectionMask, activeSelectionMask } from '../store/selection-state';
 
@@ -22,10 +23,12 @@ import { BundleAction } from '@/actions/bundle';
 import { ClearSelectionAction } from '@/actions/clear-selection';
 import { InsertLayerAction } from '@/actions/insert-layer';
 import { UpdateLayerAction } from '@/actions/update-layer';
+import { UpdateVectorLayerAttributesAction } from '@/actions/update-vector-layer-attributes';
 
 import type {
     InsertRasterLayerOptions, UpdateRasterLayerOptions,
     RendererFrontend,
+    WorkingFileVectorLayer,
 } from '@/types';
 
 const devicePixelRatio = window.devicePixelRatio || 1;
@@ -34,7 +37,8 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
 
     private isPreviewingFill = false;
     private pointerDownPreviewStrength = 0.5;
-    private fillingLayerIds: number[] = [];
+    private fillingRasterLayerIds: number[] = [];
+    private fillingVectorLayerShapes: Array<[number, string, Record<string, string>]> = []; // [layerId, nodeId, attributes]
 
     private renderer: RendererFrontend | undefined;
     private maxTextureSize: number = Infinity;
@@ -125,7 +129,7 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
 
         const { width, height } = workingFileStore.state;
         const { width: textureWidth, height: textureHeight } = limitMaxDimension(width, height, this.maxTextureSize);
-        let selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster' || layer.type === 'empty');
+        let selectedLayers = getSelectedLayers().filter(layer => layer.type === 'raster' || layer.type === 'vector' || layer.type === 'empty');
         let layerActions: BaseAction[] = [];
 
         // Insert raster layer if none selected
@@ -160,7 +164,7 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
                         },
                     })
                 );
-            } else if (selectedLayer.type !== 'raster') {
+            } else if (!['raster', 'vector'].includes(selectedLayer.type)) {
                 selectedLayers.splice(i, 1);
             }
         }
@@ -175,20 +179,44 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
             } else {
                 await historyStore.dispatch('unreserve', { token: startBucketFillReserveToken });
             }
-            
-            this.fillingLayerIds = selectedLayers.map((layer) => layer.id);
-            if (insertLayerAction && !this.fillingLayerIds.includes(insertLayerAction.insertedLayerId)) {
-                this.fillingLayerIds.push(insertLayerAction.insertedLayerId);
-            }
 
             const currentColor = colorPalette.value[colorPaletteIndex.value];
-            await this.renderer.createBucketFill({
-                layerIds: this.fillingLayerIds,
-                color: new Float16Array([currentColor.r, currentColor.g, currentColor.b, currentColor.alpha]),
-                position: new Float16Array([viewTransformPoint.x, viewTransformPoint.y]),
-                feather: feather.value,
-                antialias: antialias.value,
-            });
+
+            this.fillingVectorLayerShapes = [];
+            const vectorLayerIds = selectedLayers.filter((layer) => layer.type === 'vector').map((layer) => layer.id);
+            for (const layerId of vectorLayerIds) {
+                const layer = getLayerById<WorkingFileVectorLayer>(layerId);
+                if (!layer) continue;
+                const svgDocument = await getStoredSvgDocument(layer.data.sourceUuid);
+                if (!svgDocument) continue;
+                layer.data.sourceDocument = svgDocument;
+                const element = (await this.renderer?.pickVectorLayerElement(layerId, viewTransformPoint.x, viewTransformPoint.y))?.[0];
+                if (!element) continue;
+                const attributes: Record<string, string> = {};
+                if (element.area === 'fill') {
+                    attributes['fill'] = currentColor.alpha > 0 ? currentColor.style.slice(0, 7) : 'none';
+                    attributes['fill-opacity'] = `${currentColor.alpha}`;
+                } else if (element.area === 'stroke') {
+                    attributes['stroke'] = currentColor.style.slice(0, 7);
+                    attributes['stroke-opacity'] = `${currentColor.alpha}`;
+                }
+                this.renderer?.updateVectorLayerAttributes(layerId, element.id, attributes)
+                this.fillingVectorLayerShapes.push([layerId, element.id, attributes]);
+            }
+            
+            this.fillingRasterLayerIds = selectedLayers.filter((layer) => layer.type === 'raster').map((layer) => layer.id);
+            if (insertLayerAction && !this.fillingRasterLayerIds.includes(insertLayerAction.insertedLayerId)) {
+                this.fillingRasterLayerIds.push(insertLayerAction.insertedLayerId);
+            }
+            if (this.fillingRasterLayerIds.length > 0) {
+                await this.renderer.createBucketFill({
+                    layerIds: this.fillingRasterLayerIds,
+                    color: new Float16Array([currentColor.r, currentColor.g, currentColor.b, currentColor.alpha]),
+                    position: new Float16Array([viewTransformPoint.x, viewTransformPoint.y]),
+                    feather: feather.value,
+                    antialias: antialias.value,
+                });
+            }
         } catch {
             await historyStore.dispatch('unreserve', { token: startBucketFillReserveToken });
             return;
@@ -198,7 +226,9 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
         const primaryPointer = this.pointers.find((pointer) => pointer.primary);
         if (primaryPointer) {
             this.isPreviewingFill = true;
-            this.renderer?.previewBucketFill(strength.value);
+            if (this.fillingRasterLayerIds.length > 0) {
+                this.renderer?.previewBucketFill(strength.value);
+            }
         } else {
             this.applyBucketFill();
         }
@@ -216,7 +246,9 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
         const offset = (primaryPointer.move?.pageX ?? 0) - primaryPointer.down.pageX;
         strength.value = Math.max(0.0001, Math.min(0.9999, this.pointerDownPreviewStrength + (offset / slideWidth)));
 
-        this.renderer?.previewBucketFill(strength.value);
+        if (this.fillingRasterLayerIds.length > 0) {
+            this.renderer?.previewBucketFill(strength.value);
+        }
     }
 
     private bucketFillEnd() {
@@ -249,22 +281,33 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
         await historyStore.dispatch('reserve', { token: updateLayerReserveToken });
 
         try {
-            const renderTiles = await this.renderer.applyBucketFill(strength.value);
-            strength.value = this.pointerDownPreviewStrength;
             const layerActions: BaseAction[] = [];
 
-            for (const [renderTileIndex] of renderTiles.entries()) {
-                const layerId = this.fillingLayerIds[renderTileIndex];
-                if (layerId == null) continue;
-                layerActions.push(
-                    new UpdateLayerAction<UpdateRasterLayerOptions>({
-                        id: layerId,
-                        data: {
-                            tileUpdates: await transferRendererTilesToRasterLayerUpdates([renderTiles[renderTileIndex]]),
-                            alreadyRendererd: true,
-                        }
-                    })
-                );
+            if (this.fillingVectorLayerShapes.length > 0) {
+                for (const [layerId, nodeId, attributes] of this.fillingVectorLayerShapes) {
+                    layerActions.push(
+                        new UpdateVectorLayerAttributesAction(layerId, nodeId, attributes, true)
+                    );
+                }
+            }
+
+            if (this.fillingRasterLayerIds.length > 0) {
+                const renderTiles = await this.renderer.applyBucketFill(strength.value);
+                strength.value = this.pointerDownPreviewStrength;
+
+                for (const [renderTileIndex] of renderTiles.entries()) {
+                    const layerId = this.fillingRasterLayerIds[renderTileIndex];
+                    if (layerId == null) continue;
+                    layerActions.push(
+                        new UpdateLayerAction<UpdateRasterLayerOptions>({
+                            id: layerId,
+                            data: {
+                                tileUpdates: await transferRendererTilesToRasterLayerUpdates([renderTiles[renderTileIndex]]),
+                                alreadyRendererd: true,
+                            }
+                        })
+                    );
+                }
             }
 
             if (layerActions.length > 0) {
@@ -272,6 +315,12 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
                     action: new BundleAction('updateDrawLayer', 'action.updateDrawLayer', layerActions),
                     reserveToken: updateLayerReserveToken,
                 });
+
+                for (const [layerId] of this.fillingVectorLayerShapes) {
+                    const layer = getLayerById<WorkingFileVectorLayer>(layerId);
+                    if (!layer) continue;
+                    delete layer.data.sourceDocument;
+                }
             } else {
                 await historyStore.dispatch('unreserve', { token: updateLayerReserveToken });
             }

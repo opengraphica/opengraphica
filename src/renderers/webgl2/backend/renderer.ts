@@ -32,7 +32,7 @@ import type {
     Webgl2RendererCanvasFilter, Webgl2RendererMeshController, WorkingFileLayer,
     WorkingFileGroupLayer, WorkingFileLayerFilter, WorkingFileLayerMask,
     RendererFrontendTakeSnapshotCropOptions, ClassType,
-    RendererBucketFillSettings,
+    RendererBucketFillSettings,RendererPickedVectorLayerElement,
 } from '@/types';
 
 const noRenderPassModes = new Set(['normal', 'erase']);
@@ -78,6 +78,7 @@ export interface Webgl2RendererBackendPublic {
     applyBucketFill(strength: number): Promise<RendererTextureTile[]>;
     addVectorLayerElement(layerId: number, tagName: string, attributes: Record<string, string>): Promise<void>;
     updateVectorLayerAttributes(layerId: number, nodeId: string, attributes: Record<string, string | null>): Promise<void>;
+    pickVectorLayerElement(layerId: number, x: number, y: number): Promise<RendererPickedVectorLayerElement[]>;
     createMeshController(type: string): Promise<MeshControllerInterface>;
     setDirty(): Promise<void>;
     dispose(): Promise<void>;
@@ -155,7 +156,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         this.renderer.sortObjects = true;
         this.renderer.setSize(1, 1, false);
         this.renderer.setTransparentSort((a, b) => {
-             if ( a.renderOrder !== b.renderOrder ) {
+            if ( a.renderOrder !== b.renderOrder ) {
                 return a.renderOrder - b.renderOrder;
             } else if ( a.z !== b.z ) {
                 return b.z - a.z;
@@ -724,6 +725,12 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         const meshController = this.meshControllersById.get(layerId);
         if (!meshController) return;
         await meshController.updateVectorLayerAttributes?.(nodeId, attributes);
+    }
+
+    async pickVectorLayerElement(layerId: number, x: number, y: number): Promise<RendererPickedVectorLayerElement[]> {
+        const meshController = this.meshControllersById.get(layerId);
+        if (!meshController) return [];
+        return meshController.pickVectorLayerElement?.(x, y) ?? [];
     }
 
     async setDirty() {

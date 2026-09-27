@@ -10,7 +10,7 @@ import type {
 import type {
     RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings, RendererTextureTile,
     WorkingFileLayer, WorkingFileLayerMask,
-    RendererBucketFillSettings,
+    RendererBucketFillSettings, RendererPickedVectorLayerElement,
 } from '@/types';
 
 export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPublic {
@@ -327,6 +327,17 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
         });
 
         return (await this.messageReceived(BackendWorkerMessage.UPDATE_VECTOR_LAYER_ATTRIBUTES_RESULT));
+    }
+
+    async pickVectorLayerElement(layerId: number, x: number, y: number): Promise<RendererPickedVectorLayerElement[]> {
+        this.backendWorker.postMessage({
+            type: BackendWorkerMessage.PICK_VECTOR_LAYER_ELEMENT,
+            layerId,
+            x,
+            y,
+        });
+
+        return (await this.messageReceived(BackendWorkerMessage.PICK_VECTOR_LAYER_ELEMENT_RESULT)).elements;
     }
 
     async setDirty() {

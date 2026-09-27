@@ -448,7 +448,7 @@ export function parseNodeTransform(node: Element, options?: ParseNodeGlobalOptio
     return transform;
 }
 
-function getInheritedAttribute(node: Element | null, attributeName: string): string | null {
+export function getInheritedAttribute(node: Element | null, attributeName: string): string | null {
     while (node != null) {
         const attributeValue = node.getAttribute(attributeName);
         if (attributeValue != null) {

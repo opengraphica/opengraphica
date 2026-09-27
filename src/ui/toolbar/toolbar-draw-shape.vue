@@ -321,10 +321,15 @@ const fillColorPaletteItems = computed<ColorPaletteItem[]>(() => {
 watch(() => fillColor.value, (newFillColor) => {
     const currentPalette = colorPalette.value[fillColorPaletteIndex.value];
     if (currentPalette
-        && currentPalette.r === newFillColor.r
-        && currentPalette.g === newFillColor.g
-        && currentPalette.b === newFillColor.b
-        && currentPalette.alpha === newFillColor.alpha
+        && (
+            currentPalette.style === newFillColor.style
+            || (
+                currentPalette.r === newFillColor.r
+                && currentPalette.g === newFillColor.g
+                && currentPalette.b === newFillColor.b
+                && currentPalette.alpha === newFillColor.alpha
+            )
+        )
     ) {
         return;
     }
@@ -332,10 +337,13 @@ watch(() => fillColor.value, (newFillColor) => {
     let palleteIndex = -1;
     for (let [index, color] of colorPalette.value.entries()) {
         if (
-            color.r === newFillColor.r
-            && color.g === newFillColor.g
-            && color.b === newFillColor.b
-            && color.alpha === newFillColor.alpha
+            color.style === newFillColor.style
+            || (
+                color.r === newFillColor.r
+                && color.g === newFillColor.g
+                && color.b === newFillColor.b
+                && color.alpha === newFillColor.alpha
+            )
         ) {
             palleteIndex = index;
             break;
@@ -390,10 +398,15 @@ const strokeColorPaletteItems = computed<ColorPaletteItem[]>(() => {
 watch(() => strokeColor.value, (newStrokeColor) => {
     const currentPalette = colorPalette.value[strokeColorPaletteIndex.value];
     if (currentPalette
-        && currentPalette.r === newStrokeColor.r
-        && currentPalette.g === newStrokeColor.g
-        && currentPalette.b === newStrokeColor.b
-        && currentPalette.alpha === newStrokeColor.alpha
+        && (
+            currentPalette.style === newStrokeColor.style
+            || (
+                currentPalette.r === newStrokeColor.r
+                && currentPalette.g === newStrokeColor.g
+                && currentPalette.b === newStrokeColor.b
+                && currentPalette.alpha === newStrokeColor.alpha
+            )
+        )
     ) {
         return;
     }
@@ -401,10 +414,13 @@ watch(() => strokeColor.value, (newStrokeColor) => {
     let palleteIndex = -1;
     for (let [index, color] of colorPalette.value.entries()) {
         if (
-            color.r === newStrokeColor.r
-            && color.g === newStrokeColor.g
-            && color.b === newStrokeColor.b
-            && color.alpha === newStrokeColor.alpha
+            color.style === newStrokeColor.style
+            || (
+                color.r === newStrokeColor.r
+                && color.g === newStrokeColor.g
+                && color.b === newStrokeColor.b
+                && color.alpha === newStrokeColor.alpha
+            )
         ) {
             palleteIndex = index;
             break;

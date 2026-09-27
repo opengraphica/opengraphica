@@ -42,6 +42,7 @@ export default class BaseCanvasController {
     protected pointers: PointerTracker[] = [];
     protected touches: PointerTracker[] = []; // Populated at onMultiTouchDown(), once the multi-touch tap timeout extinquishes.
     protected multiTouchDownCount: number = 0;
+    protected multiTouchDownTouches: PointerTracker[] = [];
     
     private multiTouchDownTimeoutHandle: number | undefined;
     private multiTouchTapTimeoutHandle: number | undefined;
@@ -75,6 +76,7 @@ export default class BaseCanvasController {
      */
     onMultiTouchDown(): void {
         this.multiTouchDownCount = this.touches.length;
+        this.multiTouchDownTouches = this.touches.slice();
         const touches: PointerTracker[] = [...this.touches];
         clearTimeout(this.multiTouchTapTimeoutHandle);
         this.multiTouchTapTimeoutHandle = window.setTimeout(() => {
@@ -231,6 +233,7 @@ export default class BaseCanvasController {
             }
             if (this.multiTouchDownCount > 0 && this.touches.length === 0) {
                 this.onMultiTouchUp();
+                this.multiTouchDownTouches = []; // <- Must occur after the callback for information purposes.
                 this.multiTouchDownCount = 0; // <- Must occur after the callback for information purposes.
             }
         }

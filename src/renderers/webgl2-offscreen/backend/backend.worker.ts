@@ -224,6 +224,18 @@ self.onmessage = ({ data }) => {
                 })
             }).catch(logError);
             break;
+        case BackendWorkerMessage.PICK_VECTOR_LAYER_ELEMENT:
+            rendererBackend.updateVectorLayerAttributes(
+                data.layerId,
+                data.xx,
+                data.y,
+            ).then((elements) => {
+                self.postMessage({
+                    type: BackendWorkerMessage.PICK_VECTOR_LAYER_ELEMENT_RESULT,
+                    elements,
+                })
+            }).catch(logError);
+            break;
         case BackendWorkerMessage.SET_DIRTY:
             rendererBackend.setDirty();
             break;

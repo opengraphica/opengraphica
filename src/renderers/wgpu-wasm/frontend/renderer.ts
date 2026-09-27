@@ -24,7 +24,8 @@ import type {
     ClassType, RendererFrontend, RendererFrontendTakeSnapshotOptions,
     RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings,
     RendererFrontendApplySelectionMaskToAlphaChannelOptions, RendererBucketFillSettings,
-    RendererLayerWatcher, RendererTextureTile, WorkingFileAnyLayer
+    RendererLayerWatcher, RendererTextureTile, WorkingFileAnyLayer,
+    RendererPickedVectorLayerElement,
 } from '@/types';
 
 export class WgpuWasmRendererFrontend implements RendererFrontend {
@@ -283,6 +284,10 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
 
     async updateVectorLayerAttributes(layerId: number, nodeId: string, attributes: Record<string, string | null>) {
 
+    }
+
+    async pickVectorLayerElement(layerId: number, x: number, y: number): Promise<RendererPickedVectorLayerElement[]> {
+        return [];
     }
 
     async dispose() {
