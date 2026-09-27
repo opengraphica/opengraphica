@@ -67,7 +67,7 @@ export async function getStoredSvgDocument(uuid?: string): Promise<Document> {
         xmlString = await result.text();
     }
     if (xmlString.length === 0) {
-        xmlString = '<svg xmlns="http://www.w3.org/2000/svg"></svg>';
+        xmlString = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"></svg>';
     }
     const parser = new DOMParser();
     const document = parser.parseFromString(xmlString, 'image/svg+xml');

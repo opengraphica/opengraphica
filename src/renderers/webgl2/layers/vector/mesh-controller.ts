@@ -219,12 +219,12 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         }
         if (this.shapeGroup?.userData?.svgDocument && this.plane) {
             const viewBox = this.svgLoader.getViewBox(this.shapeGroup.userData.svgDocument);
-            const width = viewBox.max.x - viewBox.min.x;
-            const height = viewBox.max.y - viewBox.min.y;
+            const width = viewBox.max.x;
+            const height = viewBox.max.y;
             this.shapeGroup.matrix = this.plane.matrix.clone().multiply(
                 new Matrix4().makeScale(this.width / width, this.height / height, 0.0)
             ).multiply(
-                new Matrix4().makeTranslation(viewBox.min.x, viewBox.min.y, 0.0)
+                new Matrix4().makeTranslation(-viewBox.min.x, -viewBox.min.y, 0.0)
             );
         }
         this.handleResize?.();
@@ -237,15 +237,17 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             transform[8], transform[9], transform[10], transform[11], 
             transform[12], transform[13], transform[14], transform[15],
         );
-        if (this.shapeGroup && this.plane) {
-            const viewBox = this.svgLoader.getViewBox(this.shapeGroup.userData.svgDocument);
-            const width = viewBox.max.x - viewBox.min.x;
-            const height = viewBox.max.y - viewBox.min.y;
-            this.shapeGroup.matrix = this.plane.matrix.clone().multiply(
-                new Matrix4().makeScale(this.width / width, this.height / height, 0.0)
-            ).multiply(
-                new Matrix4().makeTranslation(viewBox.min.x, viewBox.min.y, 0.0)
-            );
+        if (this.plane) {
+            for (const shapeGroup of this.createdShapeGroups) {
+                const viewBox = this.svgLoader.getViewBox(shapeGroup.userData.svgDocument);
+                const width = viewBox.max.x;
+                const height = viewBox.max.y;
+                shapeGroup.matrix = this.plane.matrix.clone().multiply(
+                    new Matrix4().makeScale(this.width / width, this.height / height, 1.0)
+                ).multiply(
+                    new Matrix4().makeTranslation(-viewBox.min.x, -viewBox.min.y, 0.0)
+                );
+            }
         }
         markRenderDirty();
         this.handleResize?.();
@@ -328,17 +330,17 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         this.createdShapeGroups.push(this.shapeGroup);
         if (this.plane) {
             const viewBox = this.svgLoader.getViewBox(this.shapeGroup.userData.svgDocument);
-            const width = viewBox.max.x - viewBox.min.x;
-            const height = viewBox.max.y - viewBox.min.y;
+            const width = viewBox.max.x;
+            const height = viewBox.max.y;
             this.shapeGroup.matrix = this.plane.matrix.clone().multiply(
-                new Matrix4().makeScale(this.width / width, this.height / height, 0.0)
+                new Matrix4().makeScale(this.width / width, this.height / height, 1.0)
             ).multiply(
-                new Matrix4().makeTranslation(viewBox.min.x, viewBox.min.y, 0.0)
+                new Matrix4().makeTranslation(-viewBox.min.x, -viewBox.min.y, 0.0)
             );
         }
 
-        for (const path of paths) {
-            this.createPathShapes(path, renderOrder, generateUuid);
+        for (const [pathIndex, path] of paths.entries()) {
+            this.createPathShapes(path, renderOrder + (0.00001 * pathIndex), generateUuid);
         }
         if (this.plane) {
             this.scene?.remove(this.plane);
@@ -366,7 +368,17 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             });
             return Promise.resolve();
         };
-        const renderOrder = this.plane?.renderOrder ?? this.shapeGroup?.renderOrder ?? 0;
+
+        let originalSuborder = 0;
+        const lastNode = this.sourceDocument.querySelectorAll(`[data-ogr-id]`).item(-1);
+        if (lastNode) {
+            const mesh = this.shapeGroup.userData.svgMeshesById[lastNode.getAttribute('data-ogr-id')!][0];
+            if (mesh) {
+                originalSuborder = ((mesh.renderOrder * 10) - Math.floor(mesh.renderOrder * 10)) / 10;
+            }
+        }
+
+        const renderOrder = (this.plane?.renderOrder ?? this.shapeGroup?.renderOrder ?? 0) + originalSuborder;
 
         // TODO - Creating xml document doesn't work inside webworker.
         var newDoc = window.document.implementation.createDocument(null, 'svg');
@@ -399,16 +411,21 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         if (!this.sourceDocument || !this.shapeGroup) return;
         let node = this.sourceDocument.querySelector(`[data-ogr-id="${nodeId}"]`);
         if (!node) return;
+
         const meshes = this.shapeGroup.userData.svgMeshesById[nodeId];
+        let originalSuborder = 0;
         if (meshes) {
             for (const mesh of meshes) {
+                if (originalSuborder === 0) {
+                    originalSuborder = ((mesh.renderOrder * 10) - Math.floor(mesh.renderOrder * 10)) / 10;
+                }
                 mesh.geometry?.dispose();
                 (mesh.material as any)?.dispose();
                 this.shapeGroup.remove(mesh);
             }
         }
 
-        const renderOrder = this.plane?.renderOrder ?? this.shapeGroup?.renderOrder ?? 0;
+        const renderOrder = (this.plane?.renderOrder ?? this.shapeGroup?.renderOrder ?? 0) + originalSuborder;
         
         let currentChildNode: Element | null = null;
         let isTargetAttributeNode = true;
@@ -479,7 +496,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
 
         intersections.sort((a, b) => {
             if (a.object.renderOrder !== b.object.renderOrder) {
-                return a.object.renderOrder - b.object.renderOrder;
+                return b.object.renderOrder - a.object.renderOrder;
             }
             return 0;
         })
@@ -512,8 +529,6 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
                 const geometry = new ShapeGeometry(shape, 32);
                 const mesh = new Mesh(geometry, undefined);
                 mesh.renderOrder = renderOrder;
-                mesh.matrixWorldAutoUpdate = false;
-                mesh.matrixWorld = new Matrix4();
                 if (id && this.shapeGroup.userData.svgMeshesById[id]) {
                     mesh.userData.id = id;
                     mesh.userData.area = 'fill';
@@ -558,9 +573,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             for (const shape of shapes) {
                 const geometry = new ShapeGeometry(shape);
                 const mesh = new Mesh(geometry, undefined);
-                mesh.renderOrder = renderOrder;
-                mesh.matrixWorldAutoUpdate = false;
-                mesh.matrixWorld = new Matrix4();
+                mesh.renderOrder = renderOrder + 0.000001;
                 if (id && this.shapeGroup.userData.svgMeshesById[id]) {
                     mesh.userData.id = id;
                     mesh.userData.area = 'stroke';
@@ -614,7 +627,8 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             this.shapeGroup.renderOrder = order + 0.1;
             for (const id of Object.keys(this.shapeGroup.userData.svgMeshesById)) {
                 for (const mesh of this.shapeGroup.userData.svgMeshesById[id]) {
-                    mesh.renderOrder = order + 0.1;
+                    const originalSuborder = ((mesh.renderOrder * 10) - Math.floor(mesh.renderOrder * 10)) / 10;
+                    mesh.renderOrder = order + 0.1 + originalSuborder;
                 }
             }
         }

@@ -8,7 +8,7 @@
         </div>
         <div class="og-toolbar-overlay" :class="{ 'is-active': isExtendingPaths }">
             <div class="og-toolbar-tool-selector">
-                <span class="bi bi-shadows my-1" aria-hidden="true"></span>
+                <span class="bi bi-shapes my-1" aria-hidden="true"></span>
                 <span class="og-toolbar-tool-selector__description">
                     {{ t('toolbar.general.settings') }}
                 </span>
@@ -51,9 +51,9 @@
                         <el-option :label="t('toolbar.drawShape.shapeType.polygon')" value="polygon">
                             <span class="bi bi-hexagon mr-1" aria-hidden="true" /> {{ t('toolbar.drawShape.shapeType.polygon') }}
                         </el-option>
-                        <el-option :label="t('toolbar.drawShape.shapeType.path')" value="path">
+                        <!--el-option :label="t('toolbar.drawShape.shapeType.path')" value="path">
                             <span class="bi bi-bezier mr-1" aria-hidden="true" /> {{ t('toolbar.drawShape.shapeType.path') }}
-                        </el-option>
+                        </el-option-->
                     </el-select>
                 </el-input-group>
                 <!-- Style -->

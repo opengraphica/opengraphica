@@ -2,7 +2,7 @@
     <div class="flex container items-center justify-center mx-auto">
         <div class="og-toolbar-overlay">
             <div class="og-toolbar-tool-selector">
-                <span class="bi bi-paint-bucket my-1" aria-hidden="true"></span>
+                <span class="bi bi-bucket my-1" aria-hidden="true"></span>
                 <span class="og-toolbar-tool-selector__description">
                     {{ t('toolbar.general.settings') }}
                 </span>

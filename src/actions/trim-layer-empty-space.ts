@@ -1,12 +1,18 @@
 
 import { BaseAction } from './base';
+
 import canvasStore from '@/store/canvas';
 import { createStoredImage, prepareStoredImageForEditing, prepareStoredImageForArchival } from '@/store/image';
+import { createStoredSvg, getStoredSvgDocument } from '@/store/svg';
 import { getLayerById, getCanvasRenderingContext2DSettings } from '@/store/working-file';
+
 import { getImageDataEmptyBounds, getImageDataFromCanvas } from '@/lib/image';
-import { findPointListBounds } from '@/lib/math';
+import { findPointListBounds, findRectListBounds } from '@/lib/math';
+import { calculateShapeAabb, getViewBox, parseNodeTransform, parseCommonNodeAttributes } from '@/lib/svg';
+
 import { InsertLayerAction } from './insert-layer';
 import { UpdateLayerAction } from './update-layer';
+// import { UpdateVectorLayerAttributesAction } from './update-vector-layer-attributes';
 
 export class TrimLayerEmptySpaceAction extends BaseAction {
 
@@ -23,59 +29,119 @@ export class TrimLayerEmptySpaceAction extends BaseAction {
 
         if (this.layerId == -1) {
             if (!this.previousAction) {
-                throw new Error('[src/actions/trim-layer-empty-bounds.ts] Layer ID not specified and previous action not provided.');
+                throw new Error('[src/actions/trim-layer-empty-space.ts] Layer ID not specified and previous action not provided.');
             } else if (this.previousAction instanceof InsertLayerAction) {
                 this.layerId = this.previousAction.insertedLayerId;
             } else {
-                throw new Error('[src/actions/trim-layer-empty-bounds.ts] Layer ID not specified and cannot derive from previous action.');
+                throw new Error('[src/actions/trim-layer-empty-space.ts] Layer ID not specified and cannot derive from previous action.');
             }
         }
 
         const layer = getLayerById(this.layerId);
-        if (!layer) throw new Error('[src/actions/trim-layer-empty-bounds.ts] Layer with specified id not found.');
-        if (layer.type !== 'raster') return;
+        if (!layer) throw new Error('[src/actions/trim-layer-empty-space.ts] Layer with specified id not found.');
 
-        const layerCanvas = await prepareStoredImageForEditing(layer.data.sourceUuid);
-        if (!layerCanvas) throw new Error('[src/actions/trim-layer-empty-bounds.ts] Unable to edit existing layer image.');
-        const emptyBounds = getImageDataEmptyBounds(getImageDataFromCanvas(layerCanvas));
-        const emptyCropBounds = findPointListBounds([
-            new DOMPoint(emptyBounds.left, emptyBounds.top),
-            new DOMPoint(emptyBounds.right, emptyBounds.top),
-            new DOMPoint(emptyBounds.left, emptyBounds.bottom),
-            new DOMPoint(emptyBounds.right, emptyBounds.bottom),
-        ]);
-        const newWidth = Math.ceil(emptyCropBounds.right - emptyCropBounds.left);
-        const newHeight = Math.ceil(emptyCropBounds.bottom - emptyCropBounds.top);
+        if (layer.type === 'raster') {
+            const layerCanvas = await prepareStoredImageForEditing(layer.data.sourceUuid);
+            if (!layerCanvas) throw new Error('[src/actions/trim-layer-empty-space.ts] Unable to edit existing layer image.');
+            const emptyBounds = getImageDataEmptyBounds(getImageDataFromCanvas(layerCanvas));
+            const emptyCropBounds = findPointListBounds([
+                new DOMPoint(emptyBounds.left, emptyBounds.top),
+                new DOMPoint(emptyBounds.right, emptyBounds.top),
+                new DOMPoint(emptyBounds.left, emptyBounds.bottom),
+                new DOMPoint(emptyBounds.right, emptyBounds.bottom),
+            ]);
+            const newWidth = Math.ceil(emptyCropBounds.right - emptyCropBounds.left);
+            const newHeight = Math.ceil(emptyCropBounds.bottom - emptyCropBounds.top);
 
-        if (newWidth < 1 || newHeight < 1) return;
+            if (newWidth < 1 || newHeight < 1) return;
 
-        const workingCanvas = document.createElement('canvas');
-        workingCanvas.width = newWidth;
-        workingCanvas.height = newHeight;
-        const workingCanvasCtx = workingCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
-        if (!workingCanvasCtx) throw new Error('[src/actions/trim-layer-empty-bounds.ts] Unable to create a new canvas for transform.');
-        workingCanvasCtx.save();
-        workingCanvasCtx.globalCompositeOperation = 'copy';
-        workingCanvasCtx.translate(-emptyCropBounds.left, -emptyCropBounds.top);
-        workingCanvasCtx.drawImage(layerCanvas, 0, 0);
-        workingCanvasCtx.restore();
-        const newLayerTransform = new DOMMatrix().multiplySelf(layer.transform).translateSelf(
-            emptyBounds.left,
-            emptyBounds.top
-        );
+            const workingCanvas = document.createElement('canvas');
+            workingCanvas.width = newWidth;
+            workingCanvas.height = newHeight;
+            const workingCanvasCtx = workingCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
+            if (!workingCanvasCtx) throw new Error('[src/actions/trim-layer-empty-space.ts] Unable to create a new canvas for transform.');
+            workingCanvasCtx.save();
+            workingCanvasCtx.globalCompositeOperation = 'copy';
+            workingCanvasCtx.translate(-emptyCropBounds.left, -emptyCropBounds.top);
+            workingCanvasCtx.drawImage(layerCanvas, 0, 0);
+            workingCanvasCtx.restore();
+            const newLayerTransform = new DOMMatrix().multiplySelf(layer.transform).translateSelf(
+                emptyBounds.left,
+                emptyBounds.top,
+            );
 
-        prepareStoredImageForArchival(layer.data.sourceUuid);
+            prepareStoredImageForArchival(layer.data.sourceUuid);
 
-        this.updateLayerAction = new UpdateLayerAction({
-            id: this.layerId,
-            width: newWidth,
-            height: newHeight,
-            transform: newLayerTransform,
-            data: {
-                sourceUuid: await createStoredImage(workingCanvas)
-            }
-        });
-        await this.updateLayerAction.do();
+            this.updateLayerAction = new UpdateLayerAction({
+                id: this.layerId,
+                width: newWidth,
+                height: newHeight,
+                transform: newLayerTransform,
+                data: {
+                    sourceUuid: await createStoredImage(workingCanvas)
+                }
+            });
+            await this.updateLayerAction.do();
+
+        } else if (layer.type === 'vector') {
+            const svgDocument = await getStoredSvgDocument(layer.data.sourceUuid);
+            if (!svgDocument) return;
+
+            const viewBox = getViewBox(svgDocument);
+
+            const rects = Array.from(svgDocument.querySelectorAll('[data-ogr-id]'))
+                .map((node) => {
+                    const { transform, stroke, strokeWidth } = parseCommonNodeAttributes(node);
+                    const aabb = calculateShapeAabb(node, transform);
+                    if (aabb && stroke != null && strokeWidth > 0) {
+                        const halfWidth = Math.ceil(strokeWidth / 2);
+                        aabb.x -= halfWidth;
+                        aabb.y -= halfWidth;
+                        aabb.width += halfWidth * 2;
+                        aabb.height += halfWidth * 2;
+                    }
+                    return aabb;
+                })
+                .filter((aabb) => aabb != null);
+            const bounds = findRectListBounds(rects, true);
+
+            const currentViewBoxOffset = new DOMPoint(
+                bounds.left - viewBox.left,
+                bounds.top - viewBox.top,
+            );
+
+            const newLayerTransform = new DOMMatrix().multiplySelf(layer.transform).translateSelf(
+                currentViewBoxOffset.x,
+                currentViewBoxOffset.y,
+            );
+
+            svgDocument.documentElement.setAttribute('viewBox', `${bounds.left} ${bounds.top} ${bounds.width} ${bounds.height}`);
+
+            const serializer = new XMLSerializer();
+            const svgString = serializer.serializeToString(svgDocument).replace(/xmlns=""/g, '');
+
+            const image = await new Promise<HTMLImageElement>((resolve) => {
+                const image = new Image();
+                image.onload = () => {
+                    resolve(image);
+                };
+                image.onerror = () => {
+                    resolve(image);
+                }
+                image.src = URL.createObjectURL(new Blob([svgString], { type: 'image/svg+xml' }));
+            });
+
+            this.updateLayerAction = new UpdateLayerAction({
+                id: this.layerId,
+                width: bounds.width,
+                height: bounds.height,
+                transform: newLayerTransform,
+                data: {
+                    sourceUuid: await createStoredSvg(image),
+                },
+            });
+            await this.updateLayerAction.do();
+        }
 
         canvasStore.set('dirty', true);
     }

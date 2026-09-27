@@ -167,7 +167,7 @@ export const createEditControlPoints = throttle(() => {
         const viewBoxXf = layer.transform.scale(
             layer.width / viewBox.width, layer.height / viewBox.height, 1.0,
         ).translateSelf(
-            viewBox.x, viewBox.y, 0.0,
+            -viewBox.x, -viewBox.y, 0.0,
         );
         const nodes = Array.from(
             layer.data.sourceDocument.querySelectorAll('rect,polygon,polyline,circle,ellipse,line,path')
@@ -594,7 +594,7 @@ export function renderControlPointAttributeEdits(
         const inverseViewXf = layer.transform.scale(
             layer.width / viewBox.width, layer.height / viewBox.height, 1.0,
         ).translateSelf(
-            viewBox.x, viewBox.y, 0.0,
+            -viewBox.x, -viewBox.y, 0.0,
         )
         const inverseNodeXf = inverseViewXf.multiply(
             originalAttributes.transform

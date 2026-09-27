@@ -1127,12 +1127,12 @@ export function getViewBox(xml?: Document): DOMRect {
     const viewBoxSplit = (xml.documentElement.getAttribute('viewBox') ?? '').trim().split(/\s+/);
     let minX = 0;
     let minY = 0;
-    let maxX = parseFloat(xml.documentElement.getAttribute('width') ?? '0');
-    let maxY = parseFloat(xml.documentElement.getAttribute('height') ?? '0');
+    let width = parseFloat(xml.documentElement.getAttribute('width') ?? '0');
+    let height = parseFloat(xml.documentElement.getAttribute('height') ?? '0');
     if (viewBoxSplit.length === 4) {
-        ([minX, minY, maxX, maxY] = viewBoxSplit.map(str => parseFloat(str)));
+        ([minX, minY, width, height] = viewBoxSplit.map(str => parseFloat(str)));
     }
-    return new DOMRect(minX, minY, maxX - minX, maxY - minY);
+    return new DOMRect(minX, minY, width, height);
 }
 
 export function ancestralTagNameSelector(node: Element) {
@@ -1155,5 +1155,121 @@ export async function generateSvgElementIds(document: Document) {
     const elements = document.querySelectorAll('a,circle,clipPath,ellipse,g,image,line,linearGradient,marker,mask,path,pattern,polygon,polyline,radialGradient,rect,style,text,use,view');
     for (const element of Array.from(elements)) {
         element.setAttribute('data-ogr-id', ancestralTagNameSelector(element));
+    }
+}
+
+export function calculateShapeAabb(node: Element, transform: DOMMatrix): DOMRect | null {
+    switch (node.tagName) {
+        case 'rect': {
+            const x = parseFloat(node.getAttribute('x') ?? '0');
+            const y = parseFloat(node.getAttribute('y') ?? '0');
+            const width = parseFloat(node.getAttribute('width') ?? '1');
+            const height = parseFloat(node.getAttribute('height') ?? '1');
+            const topLeft = new DOMPoint(x, y).matrixTransform(transform);
+            const topRight = new DOMPoint(x + width, y).matrixTransform(transform);
+            const bottomLeft = new DOMPoint(x, y + height).matrixTransform(transform);
+            const bottomRight = new DOMPoint(x + width, y + height).matrixTransform(transform);
+            const top = Math.min(topLeft.y, topRight.y, bottomLeft.y, bottomRight.y);
+            const bottom = Math.max(topLeft.y, topRight.y, bottomLeft.y, bottomRight.y);
+            const left = Math.min(topLeft.x, topRight.x, bottomLeft.x, bottomRight.x);
+            const right = Math.max(topLeft.x, topRight.x, bottomLeft.x, bottomRight.x);
+            return new DOMRect(left, top, right - left, bottom - top);
+        }
+        case 'circle': {
+            const cx = parseFloat(node.getAttribute('cx') ?? '0');
+            const cy = parseFloat(node.getAttribute('cy') ?? '0');
+            const r = parseFloat(node.getAttribute('r') ?? '1');
+            const center = new DOMPoint(cx, cy).matrixTransform(transform);
+            const top = center.y - r;
+            const bottom = center.y + r;
+            const left = center.x - r;
+            const right = center.x + r;
+            return new DOMRect(left, top, right - left, bottom - top);
+        }
+        case 'ellipse': {
+            const cx = parseFloat(node.getAttribute('cx') ?? '0');
+            const cy = parseFloat(node.getAttribute('cy') ?? '0');
+            const rx = parseFloat(node.getAttribute('rx') ?? '1');
+            const ry = parseFloat(node.getAttribute('ry') ?? '1');
+            const center = new DOMPoint(cx, cy).matrixTransform(transform);
+            const xAxis = new DOMPoint(rx, 0, 0, 0).matrixTransform(transform);
+            const yAxis = new DOMPoint(0, ry, 0, 0).matrixTransform(transform);
+            const halfWidth = Math.hypot(xAxis.x, yAxis.x);
+            const halfHeight = Math.hypot(xAxis.y, yAxis.y);
+            return new DOMRect(
+                center.x - halfWidth,
+                center.y - halfHeight,
+                halfWidth * 2,
+                halfHeight * 2,
+            );
+        }
+        case 'line': {
+            const x1 = parseFloat(node.getAttribute('x1') ?? '0');
+            const y1 = parseFloat(node.getAttribute('y1') ?? '0');
+            const x2 = parseFloat(node.getAttribute('x2') ?? '0');
+            const y2 = parseFloat(node.getAttribute('y2') ?? '0');
+            const p1 = new DOMPoint(x1, y1).matrixTransform(transform);
+            const p2 = new DOMPoint(x2, y2).matrixTransform(transform);
+            const top = Math.min(p1.y, p2.y);
+            const bottom = Math.max(p1.y, p2.y);
+            const left = Math.min(p1.x, p2.x);
+            const right = Math.max(p1.x, p2.x);
+            return new DOMRect(left, top, right - left, bottom - top);
+        }
+        case 'polyline': case 'polygon': {
+            let top = Infinity;
+            let bottom = -Infinity;
+            let left = Infinity;
+            let right = -Infinity;
+            const points = parsePolygonNodeAttributes(node).points;
+            let scrapPoint = new DOMPoint();
+            for (const point of points) {
+                scrapPoint.x = point.x;
+                scrapPoint.y = point.y;
+                scrapPoint = scrapPoint.matrixTransform(transform);
+                if (scrapPoint.y < top) top = scrapPoint.y;
+                if (scrapPoint.y > bottom) bottom = scrapPoint.y;
+                if (scrapPoint.x < left) left = scrapPoint.x;
+                if (scrapPoint.x > right) right = scrapPoint.x;
+            }
+            return new DOMRect(left, top, right - left, bottom - top);
+        }
+        case 'path': {
+            // TODO - this is simplified and inaccurate.
+            let top = Infinity;
+            let bottom = -Infinity;
+            let left = Infinity;
+            let right = -Infinity;
+            const d = parsePathNodeAttributes(node).d;
+            const scrapPoint = new DOMPoint();
+            let xfPoint = new DOMPoint();
+            for (const command of d) {
+                switch (command.type) {
+                    case VectorPathCommandType.CUBIC_BEZIER_CURVE:
+                    case VectorPathCommandType.ELLIPTICAL_ARC:
+                    case VectorPathCommandType.LINE:
+                    case VectorPathCommandType.MOVE:
+                    case VectorPathCommandType.QUADRATIC_BEZIER_CURVE:
+                    case VectorPathCommandType.SMOOTH_CUBIC_BEZIER_CURVE:
+                    case VectorPathCommandType.SMOOTH_QUADRATIC_BEZIER_CURVE:
+                        scrapPoint.x = command.x;
+                        scrapPoint.y = command.y;
+                        break;
+                    case VectorPathCommandType.HORIZONTAL_LINE:
+                        scrapPoint.x = command.x;
+                        break;
+                    case VectorPathCommandType.VERTICAL_LINE:
+                        scrapPoint.y = command.y;
+                        break;
+                }
+                xfPoint = scrapPoint.matrixTransform(transform);
+                if (xfPoint.y < top) top = xfPoint.y;
+                if (xfPoint.y > bottom) bottom = xfPoint.y;
+                if (xfPoint.x < left) left = xfPoint.x;
+                if (xfPoint.x > right) right = xfPoint.x;
+            }
+            return new DOMRect(left, top, right - left, bottom - top);
+        }
+        default: return null;
     }
 }

@@ -341,8 +341,19 @@ async function parseLayersToActions(
             }
         } else if (type === 'vector') {
             if (!archive[src]) continue;
+            let svgBytes = archive[src];
+            const svgString = new TextDecoder().decode(archive[src]);
+            if (!svgString.includes('preserveAspectRatio="none"')) {
+                const xmlParser = new DOMParser();
+                const svgDocument = xmlParser.parseFromString(svgString, 'text/xml');
+                const svgElement = svgDocument.querySelector('svg');
+                svgElement?.setAttribute('preserveAspectRatio', 'none');
+                const xmlSerializer = new XMLSerializer();
+                const modifiedSvgString = xmlSerializer.serializeToString(svgDocument);
+                svgBytes = new TextEncoder().encode(modifiedSvgString) as Uint8Array<ArrayBuffer>;
+            }
             let sourceUuid = await createStoredSvg(
-                await createImageFromBlob(new Blob([archive[src]], { type: 'image/svg+xml' }))
+                await createImageFromBlob(new Blob([svgBytes], { type: 'image/svg+xml' }))
                     .catch(() => new Image())
             ).catch(() => undefined);
             const sourceImage = getStoredSvgImage(sourceUuid);

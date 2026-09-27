@@ -28,11 +28,12 @@ import historyStore, {
     createHistoryReserveToken, historyBlockInteractionUntilComplete, historyReserveQueueFree,
 } from '@/store/history';
 import { createStoredSvg, getStoredSvgDocument } from '@/store/svg';
-import workingFileStore, { getSelectedLayers, getLayerGlobalTransform, ensureUniqueLayerSiblingName, getLayerById } from '@/store/working-file';
+import workingFileStore, { getSelectedLayers, ensureUniqueLayerSiblingName } from '@/store/working-file';
 
 import type { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { InsertLayerAction } from '@/actions/insert-layer';
+import { TrimLayerEmptySpaceAction } from '@/actions/trim-layer-empty-space';
 import { UpdateLayerAction } from '@/actions/update-layer';
 import { UpdateVectorLayerAttributesAction } from '@/actions/update-vector-layer-attributes';
 
@@ -87,9 +88,12 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
     private extendPathInfo: ExtendPathInfo[] = [];
 
     private uselessClickCount: number = 0;
+    private hasUncroppedChanges: boolean = false;
 
     onEnter(): void {
         super.onEnter();
+
+        this.hasUncroppedChanges = false;
 
         useRenderer().then((renderer) => {
             this.renderer = renderer;
@@ -157,6 +161,28 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
     onLeave(): void {
         super.onLeave();
+
+        if (this.hasUncroppedChanges) {
+            this.hasUncroppedChanges = false;
+            const actions: BaseAction[] = [];
+            for (const layer of editingLayers.value) {
+                if (layer.type !== 'vector') continue;
+                actions.push(new TrimLayerEmptySpaceAction(layer.id));
+            }
+            if (actions.length > 0) {
+                historyStore.dispatch('runAction', {
+                    action: new BundleAction('trimLayerEmptySpace', 'action.trimLayerEmptySpace', actions),
+                    mergeWithHistory: [
+                        'createShapeLayer',
+                        'createShape',
+                        'moveVectorLayerControlPoints',
+                        'updateShapeFillColor',
+                        'updateShapeStrokeWidth',
+                        'deleteVectorLayerShape',
+                    ],
+                })
+            }
+        }
 
         for (const layer of getSelectedLayers<WorkingFileVectorLayer>(workingFileStore.state.selectedLayerIds)) {
             if (layer.type === 'vector') {
@@ -270,7 +296,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         let selectedLayers = getSelectedLayers().filter(layer => layer.type === 'vector' || layer.type === 'empty');
         let layerActions: BaseAction[] = [];
 
-        const newSvgString = `<svg width="${Math.round(width)}" height="${Math.round(height)}" xmlns="http://www.w3.org/2000/svg"></svg>`;
+        const newSvgString = `<svg width="${Math.round(width)}" height="${Math.round(height)}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"></svg>`;
 
         // Insert vector layer if none selected
         if (selectedLayers.length === 0) {
@@ -337,6 +363,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                         action: new BundleAction('createShapeLayer', 'action.createShapeLayer', layerActions),
                         reserveToken: startDrawReserveToken,
                     });
+                    this.hasUncroppedChanges = true;
                     this.drawingJustCreatedShapeLayer = true;
                 } catch {
                     await historyStore.dispatch('unreserve', { token: startDrawReserveToken });
@@ -380,7 +407,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 const nodeXf = layer.transform.scale(
                     layer.width / viewBox.width, layer.height / viewBox.height, 1.0,
                 ).translateSelf(
-                    viewBox.x, viewBox.y, 0.0,
+                    -viewBox.x, -viewBox.y, 0.0,
                 ).multiplySelf(
                     transform,
                 ).invertSelf();
@@ -602,7 +629,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             const nodeXf = layer.transform.scale(
                 layer.width / viewBox.width, layer.height / viewBox.height, 1.0,
             ).translateSelf(
-                viewBox.x, viewBox.y, 0.0,
+                -viewBox.x, -viewBox.y, 0.0,
             ).multiplySelf(
                 transform,
             ).invertSelf();
@@ -1027,7 +1054,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 const viewBoxXf = layer.transform.scale(
                     layer.width / viewBox.width, layer.height / viewBox.height, 1.0,
                 ).translateSelf(
-                    viewBox.x, viewBox.y, 0.0,
+                    -viewBox.x, -viewBox.y, 0.0,
                 );
 
                 const { transform } = editControlPointNodeParsedAttributes.value[point.nodeIndex];
@@ -1218,6 +1245,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                     reserveToken: updateLayerReserveToken,
                     mergeWithHistory: this.drawingJustCreatedShapeLayer ? ['createShapeLayer'] : undefined,
                 });
+                this.hasUncroppedChanges = true;
 
                 const tagName = this.drawingShapes[0]?.element.tagName;
                 this.selectExtendPathNodes(tagName, this.drawingShapes.slice());
@@ -1274,6 +1302,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 actions,
             )
         });
+        this.hasUncroppedChanges = true;
 
         this.selectExtendPathNodes(tagName, undefined, this.extendPathInfo.slice());
 
@@ -1300,6 +1329,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 actions,
             )
         });
+        this.hasUncroppedChanges = true;
     }
 
     private async selectShapes(e: PointerTracker) {
@@ -1479,6 +1509,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                     actions,
                 )
             });
+            this.hasUncroppedChanges = true;
         }
     }
 
@@ -1490,6 +1521,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             || event.action.id === 'deleteVectorLayerShape'
             || event.action.id === 'updateDrawLayer'
             || event.action.id === 'updateEraseLayer'
+            || event.action.id === 'trimLayerEmptySpace'
         ) {
             this.createEditingLayersFromSelectedLayers(workingFileStore.state.selectedLayerIds, workingFileStore.state.selectedLayerIds);
         }
@@ -1753,6 +1785,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                         action: new BundleAction('deleteVectorLayerShape', 'action.deleteVectorLayerShape', actions),
                         reserveToken: deleteReserveToken,
                     });
+                    this.hasUncroppedChanges = true;
                 } else {
                     await historyStore.dispatch('unreserve', { token: deleteReserveToken });
                 }

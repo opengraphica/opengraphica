@@ -77,6 +77,35 @@ export function findPointListBounds(points: Array<DOMPoint | { x: number, y: num
     }
 }
 
+export function findRectListBounds(rects: Array<DOMRect>, rounded?: boolean) {
+    let left = Infinity;
+    let right = -Infinity;
+    let top = Infinity;
+    let bottom = -Infinity;
+
+    for (const rect of rects) {
+        if (rect.left < left) left = rect.left;
+        if (rect.right > right) right = rect.right;
+        if (rect.top < top) top = rect.top;
+        if (rect.bottom > bottom) bottom = rect.bottom;
+    }
+
+    let width = right - left;
+    let height = bottom - top;
+    if (rounded) {
+        width = Math.ceil(right - left);
+        height = Math.ceil(bottom - top);
+        left = Math.floor(left);
+        top = Math.floor(top);
+    }
+    return new DOMRect(
+        left,
+        top,
+        width,
+        height,
+    );
+}
+
 // True if two values are approximately equal, due to floating point rounding errors
 export function isEqualApprox(a, b, epsilon = 0.00001) {
     return Math.abs(a - b) <= epsilon;
