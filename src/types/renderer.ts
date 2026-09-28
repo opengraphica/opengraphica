@@ -108,6 +108,7 @@ export interface RendererFrontend {
     addVectorLayerElement(layerId: number, tagName: string, attributes: Record<string, string>): Promise<void>;
     updateVectorLayerAttributes(layerId: number, nodeId: string, attributes: Record<string, string | null>): Promise<void>;
     pickVectorLayerElement(layerId: number, x: number, y: number): Promise<RendererPickedVectorLayerElement[]>;
+    waitForRasterReadiness(layerId: number): Promise<void>;
     dispose(): Promise<void>;
 }
 
@@ -129,6 +130,7 @@ export interface Webgl2RendererMeshController {
     updateVectorLayerAttributes?: (nodeId: string, attributes: Record<string, string | null>) => Promise<void>;
     addVectorLayerElement?: (tagName: string, attributes: Record<string, string>) => Promise<void>;
     pickVectorLayerElement?: (x: number, y: number) => Promise<RendererPickedVectorLayerElement[]>;
+    waitForRasterReadiness?: () => Promise<void>;
 }
 
 export interface WgpuWasmRendererMeshController {

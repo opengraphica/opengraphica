@@ -453,6 +453,10 @@ export class Webgl2RendererFrontend implements RendererFrontend {
         return this.rendererBackend?.pickVectorLayerElement(layerId, x, y);
     }
 
+    async waitForRasterReadiness(layerId: number) {
+        return this.rendererBackend?.waitForRasterReadiness(layerId);
+    }
+
     async dispose() {
         this.rendererBackend.dispose();
         (this.rendererBackend as unknown) = undefined;

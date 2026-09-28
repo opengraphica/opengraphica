@@ -290,6 +290,10 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
         return [];
     }
 
+    async waitForRasterReadiness(layerId: number) {
+        
+    }
+
     async dispose() {
         this.rendererBackend.dispose();
         (this.rendererBackend as unknown) = undefined;

@@ -370,7 +370,8 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         };
 
         let originalSuborder = 0;
-        const lastNode = this.sourceDocument.querySelectorAll(`[data-ogr-id]`).item(-1);
+        const allNodes = this.sourceDocument.querySelectorAll(`[data-ogr-id]`);
+        const lastNode = allNodes[allNodes.length - 1];
         if (lastNode) {
             const mesh = this.shapeGroup.userData.svgMeshesById[lastNode.getAttribute('data-ogr-id')!][0];
             if (mesh) {
@@ -378,7 +379,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             }
         }
 
-        const renderOrder = (this.plane?.renderOrder ?? this.shapeGroup?.renderOrder ?? 0) + originalSuborder;
+        const renderOrder = (this.plane?.renderOrder ?? this.shapeGroup?.renderOrder ?? 0) + originalSuborder + 0.00001;
 
         // TODO - Creating xml document doesn't work inside webworker.
         var newDoc = window.document.implementation.createDocument(null, 'svg');
@@ -477,7 +478,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
                         clearTimeout(timeoutHandle);
                         resolve();
                     }
-                });
+                }, 50);
                 const timeoutHandle = setTimeout(() => {
                     clearInterval(intervalHandle);
                     resolve();
@@ -518,11 +519,16 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         const nodeName = node?.nodeName ?? 'path';
         id && (this.shapeGroup.userData.svgMeshesById[id] = []);
         createFill:
-        if (path.userData.style.fill !== 'none') {
+        if (true) {
             const shapes = path.toShapes();
             if (shapes.length === 0) break createFill;
 
             const color = new Color(path.color);
+
+            const visible = (
+                path.userData.style.fill !== 'none'
+                && (path.userData.style.fillOpacity ?? 1) > 0
+            );
 
             const meshes: Mesh[] = [];
             for (const shape of shapes) {
@@ -532,6 +538,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
                 if (id && this.shapeGroup.userData.svgMeshesById[id]) {
                     mesh.userData.id = id;
                     mesh.userData.area = 'fill';
+                    mesh.visible = visible;
                     this.shapeGroup.userData.svgMeshesById[id].push(mesh);
                     this.shapeGroup.add(mesh);
                     meshes.push(mesh);
@@ -632,6 +639,22 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
                 }
             }
         }
+    }
+
+    async waitForRasterReadiness() {
+        if (this.plane && !this.shapeGroup && this.sourceTexture) return;
+        await new Promise<void>((resolve) => {
+            const intervalHandle = setInterval(() => {
+                if (this.plane && !this.shapeGroup && this.sourceTexture) {
+                    clearTimeout(timeoutHandle);
+                    resolve();
+                }
+            }, 50);
+            const timeoutHandle = setTimeout(() => {
+                clearInterval(intervalHandle);
+                resolve();
+            }, 500);
+        });
     }
 
     getTexture() {

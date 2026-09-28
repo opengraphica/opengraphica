@@ -27,6 +27,16 @@ import type {
 } from '@/types';
 
 export async function copySelectedLayers() {
+    let isDefaultPrevented: boolean = false;
+    const preventDefault = () => {
+        isDefaultPrevented = true;
+    };
+    appEmitter.emit('editor.tool.copySelectedLayers', {
+        preventDefault,
+    });
+
+    if (isDefaultPrevented) return;
+
     let selectedLayers = getSelectedLayers();
     if (selectedLayers.length === 0) {
         appEmitter.emit('app.notify', {
@@ -86,6 +96,16 @@ export async function copySelectedLayers() {
 }
 
 export async function cutSelectedLayers() {
+    let isDefaultPrevented: boolean = false;
+    const preventDefault = () => {
+        isDefaultPrevented = true;
+    };
+    appEmitter.emit('editor.tool.cutSelectedLayers', {
+        preventDefault,
+    });
+
+    if (isDefaultPrevented) return;
+
     await copySelectedLayers();
     if (activeSelectionMask.value != null || appliedSelectionMask.value != null) {
         const updateLayerActions: UpdateLayerAction<UpdateAnyLayerOptions<ColorModel>>[] = [];

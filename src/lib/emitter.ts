@@ -82,11 +82,21 @@ interface AppEmitterEvents {
         }
     };
     'editor.tool.cancelCurrentAction': undefined;
+    'editor.tool.copySelectedLayers': {
+        preventDefault: () => void;
+    };
     'editor.tool.commitCurrentAction': undefined;
+    'editor.tool.cutSelectedLayers': {
+        preventDefault: () => void;
+    };
     'editor.tool.delete': undefined;
     'editor.tool.fontsLoaded': undefined;
-    'editor.tool.toolbarSwapping': undefined;
+    'editor.tool.paste': {
+        preventDefault: () => void;
+        files: File[];
+    };
     'editor.tool.selectAll': undefined;
+    'editor.tool.toolbarSwapping': undefined;
     'renderer.pass.readBufferTextureUpdate': Texture;
     'store.setPreference': {
         key: string;

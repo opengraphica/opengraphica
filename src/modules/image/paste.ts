@@ -73,13 +73,25 @@ export async function pasteFromEditorCopyBuffer() {
 
 export interface ImagePasteModuleProperties {
     files?: File[];
+    isDocumentPaste?: boolean;
 }
 
 let isPastingImage: boolean = false;
 export async function paste(options?: ImagePasteModuleProperties) {
     let files: File[] = options?.files ?? [];
 
-    if (files.length === 0) {
+    let isDefaultPrevented: boolean = false;
+    const preventDefault = () => {
+        isDefaultPrevented = true;
+    };
+    appEmitter.emit('editor.tool.paste', {
+        preventDefault,
+        files,
+    });
+
+    if (isDefaultPrevented) return;
+
+    if (files.length === 0 && !options?.isDocumentPaste) {
         if (await promptClipboardReadPermission() && navigator.clipboard?.read) {
             const clipboardContents = await navigator.clipboard.read();
             for (const item of clipboardContents) {

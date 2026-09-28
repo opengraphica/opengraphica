@@ -32,14 +32,24 @@ export class RasterizeLayerAction extends BaseAction {
         super.do();
 
         const layer = getLayerById(this.layerId);
+
         if (!layer) {
             throw new Error('[src/actions/rasterize-layer.ts] Layer with specified id not found.');
         }
 
-        const maxTextureSize = await (await useRenderer()).getMaxTextureSize();
+        const renderer = await useRenderer();
+        const maxTextureSize = await renderer.getMaxTextureSize();
 
         const selectLayersAction = new SelectLayersAction([this.layerId]);
         await selectLayersAction.do();
+
+        if (
+            layer.type === 'vector'
+        ) {
+            delete layer.data.sourceDocument;
+            delete layer.data.sourceDocumentSerialized;
+            await renderer.waitForRasterReadiness(layer.id);
+        }
 
         // TODO - if this can be modified to render at layer width/height in the first place it
         // would save some memory and CPU time.

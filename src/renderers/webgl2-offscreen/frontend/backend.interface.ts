@@ -340,6 +340,15 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
         return (await this.messageReceived(BackendWorkerMessage.PICK_VECTOR_LAYER_ELEMENT_RESULT)).elements;
     }
 
+    async waitForRasterReadiness(layerId: number) {
+        this.backendWorker.postMessage({
+            type: BackendWorkerMessage.WAIT_FOR_RASTER_READINESS,
+            layerId,
+        });
+
+        return (await this.messageReceived(BackendWorkerMessage.WAIT_FOR_RASTER_READINESS_RESULT)).elements;
+    }
+
     async setDirty() {
         this.backendWorker.postMessage({
             type: BackendWorkerMessage.SET_DIRTY,

@@ -79,6 +79,7 @@ export interface Webgl2RendererBackendPublic {
     addVectorLayerElement(layerId: number, tagName: string, attributes: Record<string, string>): Promise<void>;
     updateVectorLayerAttributes(layerId: number, nodeId: string, attributes: Record<string, string | null>): Promise<void>;
     pickVectorLayerElement(layerId: number, x: number, y: number): Promise<RendererPickedVectorLayerElement[]>;
+    waitForRasterReadiness(layerId: number): Promise<void>;
     createMeshController(type: string): Promise<MeshControllerInterface>;
     setDirty(): Promise<void>;
     dispose(): Promise<void>;
@@ -731,6 +732,12 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         const meshController = this.meshControllersById.get(layerId);
         if (!meshController) return [];
         return meshController.pickVectorLayerElement?.(x, y) ?? [];
+    }
+
+    async waitForRasterReadiness(layerId) {
+        const meshController = this.meshControllersById.get(layerId);
+        if (!meshController) return;
+        await meshController.waitForRasterReadiness?.();
     }
 
     async setDirty() {

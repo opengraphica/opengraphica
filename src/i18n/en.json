@@ -32,6 +32,7 @@
         "moveVectorLayerControlPoints": "Move Vector Layer Control Points",
         "openFile": "Open File",
         "pasteLayers": "Paste Layer(s)",
+        "pasteShapes": "Paste Shape(s)",
         "placeholder": "Placeholder",
         "pleaseWait": "Please Wait...",
         "rasterizeLayer": "Rasterize Layer",

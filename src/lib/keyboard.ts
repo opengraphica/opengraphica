@@ -164,31 +164,29 @@ function onWindowBlur() {
     isAnyModifierKeyPressed.value = false;
 }
 
-let isPastingImage: boolean = false;
 async function onDocumentPaste(e: ClipboardEvent) {
     if (isInput(e.target)) return;
 
-    if (!isPastingImage) {
-        if (e.clipboardData) {
-            const items = e.clipboardData.items;
-            const files: File[] = [];
-            if (items) {
-                for (let i = 0; i < items.length; i++) {
-                    const item = items[i];
-                    if (item.type.indexOf("image") !== -1) {
-                        const file = item.getAsFile();
-                        if (file) {
-                            files.push(file);
-                        }
+    if (e.clipboardData) {
+        const items = e.clipboardData.items;
+        const files: File[] = [];
+        if (items) {
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                if (item.type.indexOf("image") !== -1) {
+                    const file = item.getAsFile();
+                    if (file) {
+                        files.push(file);
                     }
                 }
             }
-            if (files.length > 0) {
-                runModule('image', 'paste', { files });
-                e.preventDefault();
-            }
         }
+        runModule('image', 'paste', { files, isDocumentPaste: true });
+    } else {
+        runModule('image', 'paste', { files: [], isDocumentPaste: true });
     }
+
+    e.preventDefault();
 } 
 
 window.addEventListener('blur', onWindowBlur, true);

@@ -64,6 +64,12 @@ interface ExtendPathInfo {
     pathStart: string;
 }
 
+interface CopiedShape {
+    tagName: string;
+    attributes: Record<string, string>;
+    transform: DOMMatrix;
+}
+
 export default class CanvasDrawShapetController extends BaseCanvasMovementController {
 
     private selectedLayerIdsUnwatch: WatchStopHandle | null = null;
@@ -89,6 +95,9 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
     private uselessClickCount: number = 0;
     private hasUncroppedChanges: boolean = false;
+
+    private copiedShapes: CopiedShape[] = [];
+    private currentCopiedShapesPasteCount: number = 0;
 
     onEnter(): void {
         super.onEnter();
@@ -125,6 +134,12 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         appEmitter.on('editor.tool.commitCurrentAction', this.onCommitCurrentAction);
         this.onDelete = this.onDelete.bind(this);
         appEmitter.on('editor.tool.delete', this.onDelete);
+        this.onCopy = this.onCopy.bind(this);
+        appEmitter.on('editor.tool.copySelectedLayers', this.onCopy);
+        this.onCut = this.onCut.bind(this);
+        appEmitter.on('editor.tool.cutSelectedLayers', this.onCut);
+        this.onPaste = this.onPaste.bind(this);
+        appEmitter.on('editor.tool.paste', this.onPaste);
 
         cursorHoverPosition.value = new DOMPoint(
             -100000000000,
@@ -162,27 +177,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
     onLeave(): void {
         super.onLeave();
 
-        if (this.hasUncroppedChanges) {
-            this.hasUncroppedChanges = false;
-            const actions: BaseAction[] = [];
-            for (const layer of editingLayers.value) {
-                if (layer.type !== 'vector') continue;
-                actions.push(new TrimLayerEmptySpaceAction(layer.id));
-            }
-            if (actions.length > 0) {
-                historyStore.dispatch('runAction', {
-                    action: new BundleAction('trimLayerEmptySpace', 'action.trimLayerEmptySpace', actions),
-                    mergeWithHistory: [
-                        'createShapeLayer',
-                        'createShape',
-                        'moveVectorLayerControlPoints',
-                        'updateShapeFillColor',
-                        'updateShapeStrokeWidth',
-                        'deleteVectorLayerShape',
-                    ],
-                })
-            }
-        }
+        this.autoCrop();
 
         for (const layer of getSelectedLayers<WorkingFileVectorLayer>(workingFileStore.state.selectedLayerIds)) {
             if (layer.type === 'vector') {
@@ -203,6 +198,9 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         appEmitter.off('editor.tool.cancelCurrentAction', this.onCancelCurrentAction);
         appEmitter.off('editor.tool.commitCurrentAction', this.onCommitCurrentAction);
         appEmitter.off('editor.tool.delete', this.onDelete);
+        appEmitter.off('editor.tool.copySelectedLayers', this.onCopy);
+        appEmitter.off('editor.tool.cutSelectedLayers', this.onCut);
+        appEmitter.off('editor.tool.paste', this.onPaste);
 
         // Tutorial Message
         if (!editorStore.state.tutorialFlags.drawShapeToolIntroduction) {
@@ -1522,6 +1520,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             || event.action.id === 'updateDrawLayer'
             || event.action.id === 'updateEraseLayer'
             || event.action.id === 'trimLayerEmptySpace'
+            || event.action.id === 'pasteShapes'
         ) {
             this.createEditingLayersFromSelectedLayers(workingFileStore.state.selectedLayerIds, workingFileStore.state.selectedLayerIds);
         }
@@ -1575,7 +1574,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         }
     }
 
-    private async onDelete() {
+    private async onDelete(shapesOnly?: boolean) {
         const deleteShapeMap = new Map<number, Set<string>>();
         const deletePathMap = new Map<number, Map<string, Set<number>>>();
         const originalPathAttributes = new Map<number, Map<string, Record<string, any>>>();
@@ -1602,7 +1601,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                     const nodeId = node.getAttribute('data-ogr-id');
                     if (!nodeId) continue;
 
-                    if (['rect', 'circle', 'ellipse', 'line'].includes(node.tagName)) {
+                    if (shapesOnly || ['rect', 'circle', 'ellipse', 'line'].includes(node.tagName)) {
                         const deleteShapes = deleteShapeMap.get(point.layerIndex) ?? new Set<string>();
                         deleteShapes.add(nodeId);
                         deleteShapeMap.set(point.layerIndex, deleteShapes);
@@ -1797,6 +1796,162 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         }
     }
 
+    private async onCopy(event?: AppEmitterEvents['editor.tool.copySelectedLayers']) {
+        if (!event) return;
+        if (selectedEditControlPointIndices.value.length > 0) {
+            event.preventDefault();
+
+            this.copiedShapes = [];
+            this.currentCopiedShapesPasteCount = 0;
+
+            const copyShapeMap = new Map<number, Set<number>>();
+            const selectedIndices = selectedEditControlPointIndices.value;
+            for (const pointIndex of selectedIndices) {
+                const point = editControlPoints.value[pointIndex];
+                if (point.attachToIndex != null) continue;
+
+                const copyShapes = copyShapeMap.get(point.layerIndex) ?? new Set<number>();
+                copyShapes.add(point.nodeIndex);
+                copyShapeMap.set(point.layerIndex, copyShapes);
+            }
+
+            for (const [layerIndex, nodeIndices] of copyShapeMap.entries()) {
+                const layer = editingLayers.value[layerIndex];
+                if (!layer) continue;
+
+                const svgDocument = layer.data.sourceDocument ?? await getStoredSvgDocument(layer.data.sourceUuid);
+                const svgTransform = parseNodeTransform(svgDocument.documentElement);
+
+                for (const nodeIndex of Array.from(nodeIndices)) {
+                    const node = editControlPointNodes.value[nodeIndex];
+                    const { transform: nodeTransform } = editControlPointNodeParsedAttributes.value[nodeIndex];
+
+                    const attributes: Record<string, string> = {};
+                    for (const attribute of Array.from(node.attributes)) {
+                        attributes[attribute.name] = attribute.value;
+                    }
+
+                    this.copiedShapes.push({
+                        tagName: node.tagName,
+                        attributes,
+                        transform: svgTransform.inverse().multiply(nodeTransform),
+                    });
+                }
+            }
+        }
+    }
+
+    private async onCut(event?: AppEmitterEvents['editor.tool.cutSelectedLayers']) {
+        if (!event) return;
+        if (selectedEditControlPointIndices.value.length > 0) {
+            event.preventDefault();
+            this.onCopy(event);
+            this.onDelete(true);
+            this.currentCopiedShapesPasteCount = -1;
+        }
+    }
+
+    private async onPaste(event?: AppEmitterEvents['editor.tool.paste']) {
+        if (!event) return;
+
+        if (this.copiedShapes.length > 0) {
+            event.preventDefault();
+            this.currentCopiedShapesPasteCount++;
+            if (this.currentCopiedShapesPasteCount >= 6) this.currentCopiedShapesPasteCount = 1;
+
+            const zoom = canvasStore.state.decomposedTransform.scaleX;
+            const newLayerOffset = Math.max(10,
+                Math.round(((1 / (zoom || 0.00001)) * (window.innerHeight / 20)) / 10) * 10
+            ) * this.currentCopiedShapesPasteCount;
+
+            const serializer = new XMLSerializer();
+
+            const layerActions: BaseAction[] = [];
+
+            for (const layer of editingLayers.value) {
+                const layerDocument = await getStoredSvgDocument(layer.data.sourceUuid);
+                const svgTransform = parseNodeTransform(layerDocument.documentElement);
+
+                const newLayerDocument = layerDocument.cloneNode(true) as Document;
+
+                for (const { tagName, attributes, transform } of this.copiedShapes) {
+                    const newTransform = new DOMMatrix()
+                        .translateSelf(newLayerOffset, newLayerOffset)
+                        .multiply(transform).multiply(svgTransform);
+
+                    const element = newLayerDocument.createElement(tagName);
+                    for (const attributeName in attributes) {
+                        element.setAttribute(attributeName, attributes[attributeName]);
+                    }
+                    element.setAttribute('transform', `matrix(${newTransform.a} ${newTransform.b} ${newTransform.c} ${newTransform.d} ${newTransform.e} ${newTransform.f})`);
+                    newLayerDocument.documentElement.append(element);
+
+                    const elementId = element.getAttribute('data-ogr-id');
+                    if (elementId) {
+                    if (!layer.data.pendingSourceDocumentUpdateNodeIds) {
+                            layer.data.pendingSourceDocumentUpdateNodeIds = [];
+                        }
+                        layer.data.pendingSourceDocumentUpdateNodeIds.push(elementId);
+                    }
+                }
+
+                generateSvgElementIds(newLayerDocument);
+                const svgString = serializer.serializeToString(newLayerDocument).replace(/xmlns=""/g, '');
+
+                const image = await new Promise<HTMLImageElement>((resolve) => {
+                    const image = new Image();
+                    image.onload = () => {
+                        resolve(image);
+                    };
+                    image.onerror = () => {
+                        resolve(image);
+                    }
+                    image.src = URL.createObjectURL(new Blob([svgString], { type: 'image/svg+xml' }));
+                });
+
+                layerActions.push(new UpdateLayerAction<UpdateVectorLayerOptions>(
+                    {
+                        id: layer.id,
+                        data: {
+                            sourceUuid: await createStoredSvg(image),
+                        },
+                    },
+                ));
+            }
+
+            await historyStore.dispatch('runAction', {
+                action: new BundleAction('pasteShapes', 'action.pasteShapes', layerActions),
+            });
+            this.hasUncroppedChanges = true;
+        }
+
+    }
+
+    private async autoCrop() {
+        if (this.hasUncroppedChanges) {
+            this.hasUncroppedChanges = false;
+            const actions: BaseAction[] = [];
+            for (const layer of editingLayers.value) {
+                if (layer.type !== 'vector') continue;
+                actions.push(new TrimLayerEmptySpaceAction(layer.id));
+            }
+            if (actions.length > 0) {
+                await historyStore.dispatch('runAction', {
+                    action: new BundleAction('trimLayerEmptySpace', 'action.trimLayerEmptySpace', actions),
+                    // This seems to cause bugs with inconsistent positioning after undo, maybe it's a race condition
+                    // mergeWithHistory: [
+                    //     'createShapeLayer',
+                    //     'createShape',
+                    //     'moveVectorLayerControlPoints',
+                    //     'updateShapeFillColor',
+                    //     'updateShapeStrokeWidth',
+                    //     'deleteVectorLayerShape',
+                    // ],
+                })
+            }
+        }
+    }
+
     private isReadyForPathExtension(): boolean {
         let tagName: string | null = null;
         let maxPathIndices = new Map<string, number>();
@@ -1893,7 +2048,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
     }
 
-    private createEditingLayersFromSelectedLayers(newIds: number[], oldIds?: number[]) {
+    private async createEditingLayersFromSelectedLayers(newIds: number[], oldIds?: number[]) {
         if (this.drawingPointerId != null) return;
 
         let hasSelectedLayerListChanged = false;
@@ -1909,6 +2064,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         }
 
         if (hasSelectedLayerListChanged) {
+            await this.autoCrop();
             if (!['colorPicker', 'opacity'].includes(editorStore.state.activeToolPrevious!)) {
                 selectedEditControlPointIndices.value = [];
                 selectedEditControlAttachPointIndices.value = [];

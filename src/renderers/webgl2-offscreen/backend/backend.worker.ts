@@ -227,12 +227,21 @@ self.onmessage = ({ data }) => {
         case BackendWorkerMessage.PICK_VECTOR_LAYER_ELEMENT:
             rendererBackend.updateVectorLayerAttributes(
                 data.layerId,
-                data.xx,
+                data.x,
                 data.y,
             ).then((elements) => {
                 self.postMessage({
                     type: BackendWorkerMessage.PICK_VECTOR_LAYER_ELEMENT_RESULT,
                     elements,
+                })
+            }).catch(logError);
+            break;
+        case BackendWorkerMessage.WAIT_FOR_RASTER_READINESS:
+            rendererBackend.waitForRasterReadiness(
+                data.layerId,
+            ).then((elements) => {
+                self.postMessage({
+                    type: BackendWorkerMessage.WAIT_FOR_RASTER_READINESS_RESULT,
                 })
             }).catch(logError);
             break;
