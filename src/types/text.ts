@@ -10,6 +10,7 @@ export type TextWrapAt = 'word' | 'wordThenLetter';
 
 export interface CalculatedTextPlacement {
     lines: RenderTextLineInfo[];
+    wrappedLines: TextDocumentLine[];
     longestLineSize: number;
     lineDirection: TextDirection;
     lineDirectionSize: number;

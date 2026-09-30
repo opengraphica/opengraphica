@@ -18,6 +18,9 @@ interface PreferencesState {
     // Allows the user to open and save files to a WebDAV file server. See webdav* preferences.
     enableWebdavServer: boolean;
 
+    // The default file type selection that shows in the export dialog.
+    exportDefaultFileType: 'png' | 'jpg' | 'webp' | 'gif' | 'bmp' | 'tiff' | 'svg';
+
     // The default max file size that shows in the export dialog (in megabytes).
     exportDefaultMaxFileSize: number;
 
@@ -117,6 +120,7 @@ const store = new PerformantStore<PreferencesStore>({
         dragStartRadius: 5,
         enableMultiLayerBuffer: false,
         enableWebdavServer: false,
+        exportDefaultFileType: 'png',
         exportDefaultMaxFileSize: 10,
         exportEnableMaxFileSize: false,
         historyStatesMax: 50,
@@ -151,8 +155,9 @@ const store = new PerformantStore<PreferencesStore>({
         'dragStartRadius',
         'historyStatesMax',
         'enableWebdavServer',
-        'exportEnableMaxFileSize',
+        'exportDefaultFileType',
         'exportDefaultMaxFileSize',
+        'exportEnableMaxFileSize',
         'languageOverride',
         'menuBarPosition',
         'multiTouchDownTimeout',

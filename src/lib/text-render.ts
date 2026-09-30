@@ -198,18 +198,12 @@ export interface CalculateTextPlacementOptions {
     wrapSize?: number;
 }
 
-export function calculateTextPlacement(document: TextDocument, options: CalculateTextPlacementOptions = {}): CalculatedTextPlacement {
+export function calculateTextWraps(document: TextDocument, options: CalculateTextPlacementOptions = {}) {
     let { wrapSize } = options;
     wrapSize = wrapSize ?? 0;
     let isHorizontal = ['ltr', 'rtl'].includes(document.lineDirection);
-
-    // Determine line wrapping based on boundary box.
     let documentLines = document.lines;
-    const isEmptyDocument = documentLines.length === 1 && documentLines[0].spans.length === 1 && documentLines[0].spans[0].text === '';
-    if (isEmptyDocument) {
-        documentLines = JSON.parse(JSON.stringify(documentLines));
-        documentLines[0].spans[0].text = ' ';
-    }
+
     let wrappedLines = documentLines;
     let originalLineIndices: number[] = [];
     if (document.boundary === 'box') {
@@ -374,6 +368,26 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
             }
         }
     }
+
+    return {
+        wrappedLines,
+        originalLineIndices,
+    }
+}
+
+export function calculateTextPlacement(document: TextDocument, options: CalculateTextPlacementOptions = {}): CalculatedTextPlacement {
+    let { wrapSize } = options;
+    wrapSize = wrapSize ?? 0;
+    let isHorizontal = ['ltr', 'rtl'].includes(document.lineDirection);
+
+    // Determine line wrapping based on boundary box.
+    let documentLines = document.lines;
+    const isEmptyDocument = documentLines.length === 1 && documentLines[0].spans.length === 1 && documentLines[0].spans[0].text === '';
+    if (isEmptyDocument) {
+        documentLines = JSON.parse(JSON.stringify(documentLines));
+        documentLines[0].spans[0].text = ' ';
+    }
+    let { wrappedLines, originalLineIndices } = calculateTextWraps(document, options);
 
     const linesToDraw: RenderTextLineInfo[] = [];
     let longestLineSize = 0;
@@ -586,6 +600,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
 
     return {
         lines: linesToDraw,
+        wrappedLines,
         longestLineSize,
         lineDirection: document.lineDirection,
         lineDirectionSize,

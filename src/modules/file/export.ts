@@ -38,7 +38,7 @@ declare class ClipboardItem {
 
 export interface ExportAsImageOptions {
     fileName?: string;
-    fileType: 'png' | 'jpg' | 'webp' | 'gif' | 'bmp' | 'tiff';
+    fileType: 'png' | 'jpg' | 'webp' | 'gif' | 'bmp' | 'tiff' | 'svg';
     layerSelection?: 'all' | 'selected';
     cameraTransform?: DOMMatrix;
     applySelectionMask?: boolean;
@@ -67,7 +67,8 @@ const extensionToMimeType: { [key: string]: string } = {
     webp: 'image/webp',
     gif: 'image/gif',
     bmp: 'image/bmp',
-    tiff: 'image/tiff'
+    tiff: 'image/tiff',
+    svg: 'image/svg+xml',
 };
 
 export async function exportAsImage(options: ExportAsImageOptions): Promise<ExportAsImageResults> {
@@ -189,6 +190,23 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                         reject(new Error('Image blob was not created.'));
                     }
                 });
+            } else if (mimeType === 'image/svg+xml') {
+                const { serializeWorkingFile } = await import('@/modules/file/formats/svg-save');
+                const blob = await serializeWorkingFile({
+                    layerSelection: options.layerSelection,
+                });
+                if (blob) {
+                    if (options.toBlob) {
+                        results.blob = blob;
+                    } else if (options.toFileHandle) {
+                        save(blob, options.toFileHandle);
+                    } else {
+                        saveAs(blob, fileName);
+                    }
+                    resolve(results);
+                } else {
+                    reject(new Error('Image blob was not created.'));
+                }
             } else {
                 const blob = await toBlobWithMaxFileSize(canvas, options.maxFileSize ?? Infinity, mimeType, options.quality);
                 if (blob) {
@@ -261,6 +279,7 @@ async function save(blob: Blob, fileHandle: FileSystemFileHandle) {
 
 export function isfileFormatSupported(extensionOrMimeType: string) {
     const mimeType = extensionToMimeType[extensionOrMimeType] || extensionOrMimeType;
+    if (mimeType === 'image/svg+xml') return true;
     const canvas = document.createElement('canvas');
     canvas.width = 1;
     canvas.height = 1;

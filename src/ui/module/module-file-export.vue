@@ -15,7 +15,7 @@
                 :title="t('module.fileExport.saveBackIntroduction', { fileName: fileHandle?.name })"
                 show-icon
                 :closable="false"
-                class="mb-4">
+                class="mb-4!">
             </el-alert>
             <el-form-item :label="t('module.fileExport.saveBackQuestion')">
                 <el-switch v-model="formData.workingFile.saveBackDirectly" :active-text="t('button.yes')" :inactive-text="t('button.no')" />
@@ -90,6 +90,14 @@
                 </el-form-item>
             </transition>
         </el-form-item-group>
+        <el-alert
+            v-if="formData.workingFile.fileType === 'svg'"
+            type="warning"
+            :title="t('module.fileExport.svgDisclaimer')"
+            show-icon
+            :closable="false"
+            class="mb-4!">
+        </el-alert>
         <div class="text-right">
             <el-button @click="onCancel">{{ t('button.cancel') }}</el-button>
             <el-button type="primary" native-type="submit">{{ t('button.export') }}</el-button>
@@ -151,12 +159,13 @@ const layerSelectionOptions = [
     { value: 'selected', label: 'Selected' },
 ];
 const fileTypeOptions = [
-    { value: 'png', label: 'PNG' },
-    { value: 'jpg', label: 'JPG' },
-    { value: 'webp', label: 'WEBP' },
-    { value: 'gif', label: 'GIF' },
     { value: 'bmp', label: 'BMP' },
-    { value: 'tiff', label: 'TIFF' }
+    { value: 'gif', label: 'GIF' },
+    { value: 'jpg', label: 'JPG' },
+    { value: 'png', label: 'PNG' },
+    { value: 'svg', label: 'SVG' },
+    { value: 'tiff', label: 'TIFF' },
+    { value: 'webp', label: 'WEBP' },
 ].filter((option) => {
     return isfileFormatSupported(option.value);
 });
@@ -188,7 +197,7 @@ const formData = reactive({
     workingFile: {
         saveBackDirectly: false,
         fileName: workingFileStore.get('fileName'),
-        fileType: 'png' as 'png' | 'jpg' | 'webp' | 'gif' | 'bmp' | 'tiff',
+        fileType: preferencesStore.get('exportDefaultFileType'),
         layerSelection: 'all' as 'all' | 'selected',
         quality: 100,
         dithering: '',
@@ -235,6 +244,7 @@ async function onExport() {
             ) {
                 exportOptions.maxFileSize = Math.max(0.1, formData.workingFile.maxFileSize) * 1e+6;
             }
+            preferencesStore.set('exportDefaultFileType', formData.workingFile.fileType);
             preferencesStore.set('exportEnableMaxFileSize', formData.workingFile.enableMaxFileSize);
             preferencesStore.set('exportDefaultMaxFileSize', formData.workingFile.maxFileSize);
             if (formData.workingFile.saveBackDirectly) {

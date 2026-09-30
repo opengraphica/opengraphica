@@ -1947,7 +1947,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                     //     'updateShapeStrokeWidth',
                     //     'deleteVectorLayerShape',
                     // ],
-                })
+                });
             }
         }
     }
