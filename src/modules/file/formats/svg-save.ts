@@ -309,6 +309,18 @@ export async function serializeWorkingFile(options?: SerializeWorkingFileOptions
     const parser = new DOMParser();
     const svgDocument = parser.parseFromString(emptySvgString, 'image/svg+xml');
 
+    const backgroundColor = workingFileStore.state.background.color;
+    if (workingFileStore.state.background.visible && backgroundColor.alpha > 0) {
+        const rect = svgDocument.createElementNS(SVG_NS, 'rect');
+        rect.setAttribute('x', '0');
+        rect.setAttribute('y', '0');
+        rect.setAttribute('width', `${width}`);
+        rect.setAttribute('height', `${height}`);
+        rect.setAttribute('fill', backgroundColor.style.slice(0, 7));
+        rect.setAttribute('fill-opacity', `${backgroundColor.alpha}`);
+        svgDocument.documentElement.append(rect);
+    }
+
     for (const layer of workingFileStore.get('layers')) {
         await generateLayer(
             svgDocument,
