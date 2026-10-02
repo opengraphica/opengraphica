@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent, onErrorCaptured, onMounted, ref, toRef, watch } from 'vue';
-import { checkUpdates } from '@/check-updates';
+import { checkWebUpdates } from '@/check-updates';
 import { isAppPreloading } from '@/composables/app-preload-blocker';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import editorStore from '@/store/editor';
@@ -64,7 +64,7 @@ export default defineComponent({
         });
 
         onErrorCaptured((error) => {
-            checkUpdates();
+            checkWebUpdates();
             console.error(error);
         });
 

@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import moduleGroupConfig from '@/config/module-groups.json';
 import { ModuleGroupDefinition, ModuleDefinition } from '@/types';
 import appEmitter from '@/lib/emitter';
-import { checkUpdates } from '@/check-updates';
+import { checkWebUpdates } from '@/check-updates';
 
 interface RunModuleOptions {
     hideWaitAnimation?: boolean;
@@ -58,7 +58,7 @@ async function runModuleByDefinition(module: ModuleDefinition, moduleProperties?
             try {
                 importedModule = (await import(/* webpackChunkName: 'module-[request]' */ `./${moduleGroup}/${moduleName}`));
             } catch (error) {
-                checkUpdates();
+                checkWebUpdates();
             }
             const moduleRunId = 'runModule_' + moduleGroup + '_' + moduleName;
             const cancelable = module.cancelable || false;

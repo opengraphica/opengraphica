@@ -34,6 +34,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, nextTick, ref, provide, onMounted, onUnmounted, watch } from 'vue';
+import { v4 as uuidv4 } from 'uuid';
 
 import AppCanvas from '@/ui/app/app-canvas.vue';
 import AppDialogs from '@/ui/app/app-dialogs.vue';
@@ -51,7 +52,7 @@ import ResizeObserver from 'resize-observer-polyfill';
 
 import appEmitter from '@/lib/emitter';
 import { initializeI18n, t, tm, rt } from '@/i18n';
-import { getModuleDefinition, preloadModules } from '@/modules';
+import { runModule, getModuleDefinition, preloadModules } from '@/modules';
 import { useAppPreloadBlocker } from '@/composables/app-preload-blocker';
 
 import '@/css/tailwind.css';
@@ -106,6 +107,31 @@ export default defineComponent({
                 erudaDebuggerInstance?.destroy();
             }
         }, { immediate: true });
+
+        watch(() => editorStore.state.availableLiveUpdateBuild, (availableLiveUpdateBuild, oldAvailableLiveUpdateBuild) => {
+            if (availableLiveUpdateBuild && !oldAvailableLiveUpdateBuild) {
+                const buttonUuid = uuidv4();
+                appEmitter.emit('app.notify', {
+                    type: 'info',
+                    title: t('dock.settings.prefs.update.updateAvailableTitle'),
+                    message: t('dock.settings.prefs.update.updateAvailableMessage') + `<div class="flex justify-between flex-wrap mt-4">
+                        <a id="${buttonUuid + '-cancel'}" class="el-button el-button is-link px-0" style="--el-button-border-color: transparent; --el-button-hover-border-color: transparent; --el-button-text-color: var(--el-color-primary)">${t('button.dontUpdate')}</a>
+                        <a id="${buttonUuid + '-install'}" class="el-button el-button el-button--primary ml-3">${t('button.updateApp')}</a>
+                    </div>`,
+                    duration: 0,
+                    dangerouslyUseHTMLString: true,
+                    onCreated(handle) {
+                        document.getElementById(buttonUuid + '-cancel')?.addEventListener('click', () => {
+                            handle.close();
+                        });
+                        document.getElementById(buttonUuid + '-install')?.addEventListener('click', () => {
+                            handle.close();
+                            runModule('app', 'update');
+                        });
+                    },
+                })
+            }
+        });
 
         onMounted(() => {
             isMounted.value = true;

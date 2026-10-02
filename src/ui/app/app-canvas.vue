@@ -110,6 +110,7 @@ export default defineComponent({
                     rendererFrontend = frontend;
                     frontend.initialize(canvas.value!).then(() => {
                         loading.value = false;
+                        canvasStore.set('ready', true);
                         appEmitter.emit('app.canvas.ready');
                         calculateCssViewTransform();
                         appEmitter.emit('app.canvas.resetTransform');

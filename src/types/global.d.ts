@@ -13,7 +13,7 @@ declare global {
     }
 
     interface CapacitorGlobal {
-        isNativePlatform: boolean;
+        isNativePlatform: () => boolean;
     }
 
     var Capacitor: CapacitorGlobal | undefined;

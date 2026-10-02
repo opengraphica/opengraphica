@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent, onErrorCaptured } from 'vue';
-import { checkUpdates } from '@/check-updates';
+import { checkWebUpdates } from '@/check-updates';
 import ElLoading from 'element-plus/lib/components/loading/index';
 
 export default defineComponent({
@@ -75,7 +75,7 @@ export default defineComponent({
     setup(props, { emit }) {
 
         onErrorCaptured((error) => {
-            checkUpdates();
+            checkWebUpdates();
             console.error(error);
         });
 

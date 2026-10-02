@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 export async function shareImage() {
-    if (window.Capacitor?.isNativePlatform) {
+    if (window.Capacitor?.isNativePlatform()) {
         const { exportAsImage } = await import('./export');
         const { Share } = await import('@capacitor/share');
         const { Directory, Filesystem } = await import('@capacitor/filesystem');

@@ -14,6 +14,12 @@ const config: CapacitorConfig = {
     },
 
     plugins: {
+        CapacitorShareTarget: {
+            appGroupId: "group.com.opengraphica.app",
+        },
+        CapacitorUpdater: {
+            autoUpdate: 'off',
+        },
         SystemBars: {
             insetsHandling: 'css',
             style: 'DEFAULT',

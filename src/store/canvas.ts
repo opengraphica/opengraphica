@@ -24,6 +24,7 @@ interface CanvasState {
     isDisplayingNonRasterLayer: boolean;
     playingAnimation: boolean;
     preventPostProcess: boolean;
+    ready: boolean;
     renderer: '2d' | 'webgl'; // The active renderer. See preferences store for preferred renderer.
     selectionMaskCanvas: HTMLCanvasElement;
     showAreaOutsideWorkingFile: boolean;
@@ -72,6 +73,7 @@ const store = new PerformantStore<CanvasStore>({
         isDisplayingNonRasterLayer: false,
         playingAnimation: false,
         preventPostProcess: false,
+        ready: false,
         renderer: '2d',
         selectionMaskCanvas: dummyCanvas,
         showAreaOutsideWorkingFile: false,

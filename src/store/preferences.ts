@@ -3,6 +3,16 @@ import { PerformantStore } from './performant-store';
 import appEmitter from '@/lib/emitter';
 
 interface PreferencesState {
+    // The URL to check to get a list of available frontend builds for the native mobile app.
+    appUpdateBuildListUrl: string;
+
+    // The generated Ed25519 public key associated with the update server's private key,
+    // to ensure there is no MITM attack when downloading updates.
+    appUpdateSigningEd25519PublicKey: string;
+
+    // Whether or not to check for frontend build updates for the native mobile app.
+    checkForAppUpdates: boolean;
+
     // Viewport-applied screen width, where docks will be hidden if the window is smaller.
     dockHideBreakpoint: number;
 
@@ -115,6 +125,9 @@ interface PreferencesStore {
 const store = new PerformantStore<PreferencesStore>({
     name: 'preferencesStore',
     state: {
+        appUpdateBuildListUrl: 'https://app.opengraphica.com/app/updates/updates.json',
+        appUpdateSigningEd25519PublicKey: '-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAE2zR3zD+u8EEeGVVSE+80QQrdzTiOiBCDmM+fxygJM4=\n-----END PUBLIC KEY-----\n',
+        checkForAppUpdates: false,
         dockHideBreakpoint: 1000,
         dockPosition: 'right',
         dragStartRadius: 5,
@@ -151,6 +164,7 @@ const store = new PerformantStore<PreferencesStore>({
         webdavUsername: '',
     },
     restore: [
+        'checkForAppUpdates',
         'dockPosition',
         'dragStartRadius',
         'historyStatesMax',
@@ -183,7 +197,7 @@ appEmitter.on('store.setPreference', (event) => {
     if (Object.keys(store.state).includes(event.key)) {
         store.set(event.key as keyof PreferencesState, event.value);
     }
-})
+});
 
 export default store;
 

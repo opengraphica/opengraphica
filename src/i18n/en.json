@@ -158,6 +158,7 @@
         "delete": "Delete",
         "discardChanges": "Discard Changes",
         "done": "Done",
+        "dontUpdate": "Don't Update",
         "editBrush": "Edit Brush",
         "editEffects": "Edit Effects",
         "enable": "Enable",
@@ -173,6 +174,7 @@
         "settings": "Settings",
         "take": "Take",
         "takePhoto": "Take Photo",
+        "updateApp": "Update App",
         "yes": "Yes"
     },
     "canvas": {
@@ -309,6 +311,12 @@
                     "groupTitle": "Help",
                     "reportIssue": "Report an Issue",
                     "designSystem": "Design System"
+                },
+                "update": {
+                    "groupTitle": "Update",
+                    "checkForUpdates": "Check For Updates",
+                    "updateAvailableTitle": "Update Available",
+                    "updateAvailableMessage": "An update for OpenGraphica is available. Would you like to install it?"
                 }
             }
         }
@@ -753,6 +761,15 @@
         }
     },
     "module": {
+        "appUpdate": {
+            "title": "Update",
+            "notificationTitle": "Downloading Update",
+            "notificationMessage": "Please keep the app open and visible on screen while we download the update.",
+            "notificationReadyTitle": "Update is Ready",
+            "notificationReadyMessage": "The update will be installed when you switch to another app.",
+            "notificationErrorTitle": "Update Error",
+            "notificationErrorMessage": "An error occurred while downloading the update. Please try again later."
+        },
         "designSystem": {
             "title": "Design System"
         },
@@ -1057,6 +1074,20 @@
         }
     },
     "moduleGroup": {
+        "app": {
+            "name": "App",
+            "description": "App management",
+            "modules": {
+                "clearShareCache": {
+                    "name": "Clear Share Cache",
+                    "description": "Remove old shared image files."
+                },
+                "update": {
+                    "name": "Update App",
+                    "description": "Update the app to receive new functionality."
+                }
+            }
+        },
         "file": {
             "name": "File Management",
             "description": "Load and save images to your device.",

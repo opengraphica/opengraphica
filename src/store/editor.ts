@@ -1,13 +1,23 @@
 import { ref } from 'vue';
-import { checkUpdates } from '@/check-updates';
+import packageJson from "../../package.json";
+
+import { checkWebUpdates } from '@/check-updates';
+
 import { PerformantStore } from './performant-store';
+
 import BaseCanvasController from '@/canvas/controllers/base';
 import BaseCanvasMovementController from '@/canvas/controllers/base-movement';
 import toolGroupsConfig from '@/config/tool-groups.json';
-import { ToolGroupDefinition, WorkingFileLayer, WorkingFileAnyLayer, WorkingFileGroupLayer, WorkingFileRasterSequenceLayer, ColorModel } from '@/types';
+
 import { loadStylesheet } from '@/lib/stylesheet';
 import canvasStore from './canvas';
 import workingFileStore from './working-file';
+
+import type {
+    LiveUpdateBuildInfo,
+    ToolGroupDefinition, WorkingFileLayer, WorkingFileAnyLayer,
+    WorkingFileGroupLayer, WorkingFileRasterSequenceLayer, ColorModel,
+} from '@/types';
 
 interface EditorDeferredTask {
     name: string,
@@ -56,6 +66,8 @@ interface EditorState {
     activeToolbarPosition: 'top' | 'bottom';
     activeToolOverlays: string[];
     activeToolRestore: string | null;
+    availableLiveUpdateBuild: LiveUpdateBuildInfo | null;
+    bundleVersion: string;
     clipboardBufferImageHash: string | null;
     clipboardBufferLayers: WorkingFileAnyLayer<ColorModel>[];
     clipboardBufferSelectionMask: HTMLImageElement | null;
@@ -125,6 +137,8 @@ const store = new PerformantStore<EditorStore>({
         activeToolbarPosition: 'top',
         activeToolOverlays: [],
         activeToolRestore: null,
+        availableLiveUpdateBuild: null,
+        bundleVersion: packageJson.version,
         clipboardBufferImageHash: null,
         clipboardBufferLayers: [],
         clipboardBufferSelectionMask: null,
@@ -228,7 +242,7 @@ const store = new PerformantStore<EditorStore>({
                     const CanvasControllerGenericClass: typeof BaseCanvasController = (
                         await import(/* webpackChunkName: 'canvas-controller-[request]' */ `../canvas/controllers/${controllerName}.ts`)
                             .catch((error) => {
-                                checkUpdates()
+                                checkWebUpdates()
                                 console.error(error);
                             })
                     ).default;

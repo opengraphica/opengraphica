@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import { v4 as uuidv4 } from 'uuid';
-import { checkUpdates } from '@/check-updates';
+import { checkWebUpdates } from '@/check-updates';
 import { defineComponent, defineAsyncComponent, computed, onErrorCaptured } from 'vue';
 import editorStore from '@/store/editor';
 
@@ -112,7 +112,7 @@ export default defineComponent({
         });
 
         onErrorCaptured((error) => {
-            checkUpdates();
+            checkWebUpdates();
             console.error(error);
         });
 

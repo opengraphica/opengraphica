@@ -37,6 +37,22 @@ app.theme = async (themes: { [themeName: string]: string }): Promise<OpenGraphic
     return app;
 };
 
+// Notify the app updater that the build is good.
+if (window.Capacitor?.isNativePlatform()) {
+    async function notifyUpdaterAppReady() {
+        appEmitter.off('app.canvas.ready', notifyUpdaterAppReady);
+        const { CapacitorUpdater } = await import('@capgo/capacitor-updater');
+        CapacitorUpdater.notifyAppReady();
+        const { SplashScreen } = await import('@capacitor/splash-screen');
+        SplashScreen.hide();
+        const { checkAppUpdates } = await import('@/check-updates');
+        checkAppUpdates();
+        const { runModule } = await import('@/modules');
+        runModule('app', 'clearShareCache');
+    }
+    appEmitter.on('app.canvas.ready', notifyUpdaterAppReady);
+}
+
 // Expose store for debugging
 Promise.all([
     import('@/store/canvas'),

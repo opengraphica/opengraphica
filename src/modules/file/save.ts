@@ -37,7 +37,7 @@ export async function saveImageAs(options: SaveImageAsOptions = {}) {
     const { serializeWorkingFile } = await import('@/modules/file/formats/ora-save');
     const blob = await serializeWorkingFile();
     const fileName = addFileExtension(options.fileName, 'ora');
-    if (window.Capacitor?.isNativePlatform) {
+    if (window.Capacitor?.isNativePlatform()) {
         const { Directory, Filesystem } = await import('@capacitor/filesystem');
         const { default: writeBlob } = await import('capacitor-blob-writer');
         if (!await Filesystem.checkPermissions()) {

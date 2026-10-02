@@ -1,4 +1,20 @@
 {
+    "app": {
+        "modules": {
+            "clearShareCache": {
+                "action": {
+                    "type": "function",
+                    "target": "app/cache.clearShareCache"
+                }
+            },
+            "update": {
+                "action": {
+                    "type": "function",
+                    "target": "app/update.updateApp"
+                }
+            }
+        }
+    },
     "developer": {
         "modules": {
             "designSystem": {

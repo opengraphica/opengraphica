@@ -6,6 +6,7 @@ export * from './file-system-access';
 export * from './filter';
 export * from './image';
 export * from './keyboard-map';
+export * from './live-update';
 export * from './metrics';
 export * from './renderer';
 export * from './serialized-file';

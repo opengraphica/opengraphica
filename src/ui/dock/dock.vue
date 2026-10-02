@@ -29,7 +29,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, defineAsyncComponent, onErrorCaptured, ref, watch } from 'vue';
-import { checkUpdates } from '@/check-updates';
+import { checkWebUpdates } from '@/check-updates';
 import preferencesStore from '@/store/preferences'
 import ElLoading from 'element-plus/lib/components/loading/index';
 
@@ -83,7 +83,7 @@ export default defineComponent({
         const componentLoadingState = ref('pending');
 
         onErrorCaptured((error) => {
-            checkUpdates();
+            checkWebUpdates();
             console.error(error);
         });
 

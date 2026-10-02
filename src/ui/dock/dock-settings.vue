@@ -347,6 +347,12 @@
                                     </el-link>
                                 </div>
                             </el-collapse-item>
+                            <!-- Prefs: Update -->
+                            <el-collapse-item v-if="canUpdateApp" v-el-collapse-item-smart-scroll :title="t('dock.settings.prefs.update.groupTitle')">
+                                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right" :label="t('dock.settings.prefs.update.checkForUpdates')">
+                                    <el-switch v-model="preferenceCheckForAppUpdates" />
+                                </el-form-item>
+                            </el-collapse-item>
                         </el-collapse>
                         <!-- Prefs: Reset -->
                         <div class="px-5 pt-4 pb-4">
@@ -367,7 +373,8 @@ export default {
 </script>
 <script setup lang="ts">
 import { ref, computed, toRefs, nextTick, onMounted, onUnmounted, watch } from 'vue';
-import { useI18n } from '@/i18n';
+import { useI18n, setEditorLanguage } from '@/i18n';
+import { v4 as uuidv4 } from 'uuid';
 
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
@@ -390,7 +397,6 @@ import ElTimeline, { ElTimelineItem } from 'element-plus/lib/components/timeline
 import vElCollapseItemSmartScroll from '@/directives/el-collapse-item-smart-scroll';
 
 import languages from '@/config/languages.json';
-import { setEditorLanguage } from '@/i18n';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore, { HistoryState } from '@/store/history';
@@ -439,10 +445,10 @@ watch(() => editorStore.state.showBackupRestore, (showBackupRestore) => {
     }
 });
 
-const canShare = ref<boolean>(!!window.Capacitor?.isNativePlatform);
+const canShare = ref<boolean>(!!window.Capacitor?.isNativePlatform());
 onMounted(() => { // Check if PNG sharing is possible on web.
     if (
-        window.Capacitor?.isNativePlatform || !window.isSecureContext
+        window.Capacitor?.isNativePlatform() || !window.isSecureContext
         || !navigator.share || !navigator.canShare
     ) {
         return;
@@ -609,7 +615,7 @@ const activeTheme = computed<string>({
     }
 });
 
-// Preferences
+// Preferences - General
 const languageOptions: Array<{ value: string | null, label: string }>
     = languages.map((language) => ({ value: language.code, label: language.description }));
 const languageOverride = computed<string>({
@@ -624,6 +630,57 @@ const languageOverride = computed<string>({
 function onPrefsCollapseChange() {
     webdavStorageGroup.value?.calculateLabelMinWidth();
 }
+// Preferences - Editor
+const preferenceMenuBarPosition = computed<'left' | 'right' | 'top' | 'bottom'>({
+    get() {
+        return preferencesStore.state.menuBarPosition;
+    },
+    async set(value) {
+        preferencesStore.set('menuBarPosition', value);
+        emit('close');
+        await nextTick();
+        appEmitter.emit('app.canvas.resetTransform');
+    }
+});
+const showTutorialNotifications = computed<boolean>({
+    get() {
+        return preferencesStore.state.showTutorialNotifications;
+    },
+    set(value) {
+        preferencesStore.set('showTutorialNotifications', value);
+    }
+});
+const showWelcomeScreenAtStart = computed<boolean>({
+    get() {
+        return preferencesStore.state.showWelcomeScreenAtStart;
+    },
+    set(value) {
+        preferencesStore.set('showWelcomeScreenAtStart', value);
+    }
+});
+// Preferences - Network Storage
+const preferenceEnableWebdav = computed<boolean>({
+    get() {
+        return preferencesStore.state.enableWebdavServer;
+    },
+    set(value) {
+        preferencesStore.set('enableWebdavServer', value);
+    }
+});
+const webdavStorageGroup = ref<InstanceType<typeof ElFormItemGroup>>();
+const preferenceWebdavShareUrl = ref<string>(preferencesStore.get('webdavServerUrl'));
+function updatePreferenceWebdavShareUrl() {
+    preferencesStore.set('webdavServerUrl', preferenceWebdavShareUrl.value.trim());
+}
+const preferenceWebdavUsername = ref<string>(preferencesStore.get('webdavUsername'));
+function updatePreferenceWebdavUsername() {
+    preferencesStore.set('webdavUsername', preferenceWebdavUsername.value.trim());
+}
+const preferenceWebdavPassword = ref<string>(preferencesStore.get('webdavPassword'));
+function updatePreferenceWebdavPassword() {
+    preferencesStore.set('webdavPassword', preferenceWebdavPassword.value.trim());
+}
+// Preferences - Debugging
 const preferenceRenderer = computed<PreferencesState['renderer']>({
     get() {
         return preferencesStore.state.renderer;
@@ -660,54 +717,17 @@ const preferenceHighQualityScaling = computed<boolean>({
         preferencesStore.set('postProcessInterpolateImage', value);
     }
 });
-const preferenceMenuBarPosition = computed<'left' | 'right' | 'top' | 'bottom'>({
+// Preferences - Update
+const canUpdateApp = ref<boolean>(!!window.Capacitor?.isNativePlatform());
+const preferenceCheckForAppUpdates = computed<boolean>({
     get() {
-        return preferencesStore.state.menuBarPosition;
-    },
-    async set(value) {
-        preferencesStore.set('menuBarPosition', value);
-        emit('close');
-        await nextTick();
-        appEmitter.emit('app.canvas.resetTransform');
-    }
-});
-const preferenceEnableWebdav = computed<boolean>({
-    get() {
-        return preferencesStore.state.enableWebdavServer;
+        return preferencesStore.state.checkForAppUpdates;
     },
     set(value) {
-        preferencesStore.set('enableWebdavServer', value);
-    }
-})
-const webdavStorageGroup = ref<InstanceType<typeof ElFormItemGroup>>();
-const preferenceWebdavShareUrl = ref<string>(preferencesStore.get('webdavServerUrl'));
-function updatePreferenceWebdavShareUrl() {
-    preferencesStore.set('webdavServerUrl', preferenceWebdavShareUrl.value.trim());
-}
-const preferenceWebdavUsername = ref<string>(preferencesStore.get('webdavUsername'));
-function updatePreferenceWebdavUsername() {
-    preferencesStore.set('webdavUsername', preferenceWebdavUsername.value.trim());
-}
-const preferenceWebdavPassword = ref<string>(preferencesStore.get('webdavPassword'));
-function updatePreferenceWebdavPassword() {
-    preferencesStore.set('webdavPassword', preferenceWebdavPassword.value.trim());
-}
-const showTutorialNotifications = computed<boolean>({
-    get() {
-        return preferencesStore.state.showTutorialNotifications;
-    },
-    set(value) {
-        preferencesStore.set('showTutorialNotifications', value);
+        preferencesStore.set('checkForAppUpdates', value);
     }
 });
-const showWelcomeScreenAtStart = computed<boolean>({
-    get() {
-        return preferencesStore.state.showWelcomeScreenAtStart;
-    },
-    set(value) {
-        preferencesStore.set('showWelcomeScreenAtStart', value);
-    }
-});
+// Preferences - Help
 function onClickShowDesignSystem() {
     runModule('developer', 'designSystem');
 }

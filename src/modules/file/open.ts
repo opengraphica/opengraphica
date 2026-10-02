@@ -4,11 +4,12 @@
  * @license MIT https://github.com/viliusle/miniPaint/blob/master/MIT-LICENSE.txt
  */
 
-import { nextTick, type Ref } from 'vue';
+import { nextTick, watch, type Ref } from 'vue';
 
 import { useRenderer } from '@/renderers';
 import { t } from '@/i18n';
 
+import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import { createStoredImage } from '@/store/image';
@@ -228,6 +229,14 @@ export async function insertChooseSource(options: FileDialogOpenOptions = {}) {
 export async function openFromFileList({ files, dialogOptions }: FileListOpenOptions = {}) {
     if (!files) return;
     if (!dialogOptions) dialogOptions = {};
+
+    if (!canvasStore.get('ready')) {
+        await new Promise<void>((resolve) => {
+            watch(() => canvasStore.state.ready, () => {
+                resolve();
+            }, { once: true });
+        });
+    }
 
     type FileReadType = 'json' | 'media' | 'ora';
     type FileReadResolve =
@@ -695,4 +704,36 @@ export async function openFromFileList({ files, dialogOptions }: FileListOpenOpt
             throw new Error(loadErrorMessages[0] + '');
         }
     }
+}
+
+if (window.Capacitor?.isNativePlatform()) {
+    import('@capgo/capacitor-share-target').then(({ CapacitorShareTarget }) => {
+        CapacitorShareTarget.addListener('shareReceived', async (event) => {
+            const { Capacitor } = await import('@capacitor/core');
+            appEmitter.emit('app.menuDrawer.closeAll');
+
+            if (event.files) {
+                const files: File[] = [];
+                for (const sharedFile of event.files) {
+                    const fetchUri = Capacitor.isNativePlatform()
+                        ? Capacitor.convertFileSrc(sharedFile.uri)
+                        : sharedFile.uri;
+                    const response = await fetch(fetchUri);
+                    if (!response.ok) {
+                        continue;
+                    }
+                    const blob = await response.blob();
+                    files.push(new File([blob], sharedFile.name, { type: sharedFile.mimeType }));
+                }
+                if (files.length > 0) {
+                    openFromFileList({
+                        files,
+                        dialogOptions: {
+                            insert: true,
+                        },
+                    });
+                }
+            }
+        });
+    });
 }

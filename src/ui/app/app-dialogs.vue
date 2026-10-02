@@ -54,7 +54,7 @@
 <script setup lang="ts">
 import { computed, defineAsyncComponent, ref, onErrorCaptured, onMounted, onUnmounted } from 'vue';
 import { useI18n } from '@/i18n';
-import { checkUpdates } from '@/check-updates';
+import { checkWebUpdates } from '@/check-updates';
 import Dock from '@/ui/dock/dock.vue';
 import Module from '@/ui/module/module.vue';
 import editorStore from '@/store/editor';
@@ -109,7 +109,7 @@ onUnmounted(() => {
 });
 
 onErrorCaptured((error) => {
-    checkUpdates();
+    checkWebUpdates();
     console.error(error);
 });
 
