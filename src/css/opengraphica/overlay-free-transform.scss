@@ -172,13 +172,13 @@
     }
 }
 
-.og-free-transform-snapping-guides {
+.og-tool-overlay-snapping-guides {
     position: absolute;
     top: 0;
     left: 0;
 
-    .og-free-transform-snapping-guide-horizontal,
-    .og-free-transform-snapping-guide-vertical {
+    .og-tool-overlay-snapping-guide-horizontal,
+    .og-tool-overlay-snapping-guide-vertical {
         position: absolute;
         top: 0;
         left: 0;
@@ -189,7 +189,7 @@
         outline: 1px solid white;
     }
 
-    .og-free-transform-snapping-guide-point {
+    .og-tool-overlay-snapping-guide-point {
         position: absolute;
         display: block;
         top: 0;

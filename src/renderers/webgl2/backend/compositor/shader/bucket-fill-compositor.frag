@@ -9,6 +9,22 @@ uniform mat4 selectionMaskTransform;
 
 const float FEATHER_EPSILON = 1e-6;
 
+float srgbChannelToLinearSrgbChannel(float value) {
+    float calculatedValue = 0.0;
+    calculatedValue += step(value, 0.04045) * value / 12.92;
+    calculatedValue += step(0.04045, value) * pow((value + 0.055) / 1.055, 2.4);
+    return calculatedValue;
+}
+
+vec4 srgbToLinearSrgb(vec4 srgb) {
+    return vec4(
+        srgbChannelToLinearSrgbChannel(srgb.r),
+        srgbChannelToLinearSrgbChannel(srgb.g),
+        srgbChannelToLinearSrgbChannel(srgb.b),
+        srgb.a
+    );
+}
+
 void main() {
 
 #if cSelectionMaskEnabled == 1
@@ -57,7 +73,7 @@ void main() {
 #else
     float alpha = fillAlpha + dstColor.a * (1.0 - fillAlpha);
     gl_FragColor = vec4(
-        ((fillColor.rgb) * fillAlpha + ((dstColor.rgb) * dstColor.a) * (1.0 - fillAlpha)) / alpha, alpha
+        ((srgbToLinearSrgb(fillColor).rgb) * fillAlpha + ((dstColor.rgb) * dstColor.a) * (1.0 - fillAlpha)) / alpha, alpha
     );
 #endif
 }

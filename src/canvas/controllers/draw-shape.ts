@@ -9,6 +9,7 @@ import {
     editControlPoints, editControlPointsDirty, hoveringEditControlPointIndices,
     selectedEditControlPointIndices, selectedEditControlAttachPointIndices,
     selectedShapes,
+    snapLineX, snapLineY, useSnapping, useCanvasEdgeSnapping, useControlPointSnapping,
     editControlPointNodes, renderControlPointAttributeEdits, editControlPointNodeParsedAttributes,
     editingLayers, hasVisibleToolbarOverlay, showShapeDrawer,
     type ControlPointAttributeEdit,
@@ -27,8 +28,9 @@ import editorStore from '@/store/editor';
 import historyStore, {
     createHistoryReserveToken, historyBlockInteractionUntilComplete, historyReserveQueueFree,
 } from '@/store/history';
+import preferencesStore from '@/store/preferences';
 import { createStoredSvg, getStoredSvgDocument } from '@/store/svg';
-import workingFileStore, { getSelectedLayers, ensureUniqueLayerSiblingName } from '@/store/working-file';
+import workingFileStore, { getSelectedLayers, ensureUniqueLayerSiblingName, visibleLayerIds } from '@/store/working-file';
 
 import type { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
@@ -70,6 +72,11 @@ interface CopiedShape {
     transform: DOMMatrix;
 }
 
+interface SnapPointGroup {
+    value: number;
+    points: Int32Array;
+}
+
 export default class CanvasDrawShapetController extends BaseCanvasMovementController {
 
     private selectedLayerIdsUnwatch: WatchStopHandle | null = null;
@@ -98,6 +105,11 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
     private copiedShapes: CopiedShape[] = [];
     private currentCopiedShapesPasteCount: number = 0;
+
+    private snapPointsNeedToBeCalculated: boolean = true;
+    private snapXPoints: SnapPointGroup[] = [];
+    private snapYPoints: SnapPointGroup[] = [];
+    private snapSensitivity: number = 0;
 
     onEnter(): void {
         super.onEnter();
@@ -673,7 +685,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
         this.uselessClickCount = 0;
 
-        const selectedAttachedEditControlPointIndices: number[] = [];
+        let selectedAttachedEditControlPointIndices: number[] = [];
         const selectedEditControlAttachPointIndicesSet = new Set<number>();
 
         const referencedControlPointIndices = new Set<number>();
@@ -684,11 +696,11 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             }
         }
 
-        // This loops under the assumption attached indices always follow what they're attached to
         const firstCheckIndex = Math.min(
             editControlPoints.value[selectedEditControlPointIndices.value[0]].attachToIndex ?? Infinity,
             selectedEditControlPointIndices.value[0]
         );
+        // This loops under the assumption attached indices always follow what they're attached to
         for (let i = firstCheckIndex + 1; i < editControlPoints.value.length; i++) {
             const point = editControlPoints.value[i];
             for (let selectedIndex of selectedEditControlPointIndices.value) {
@@ -718,6 +730,9 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             point.sx = point.x;
             point.sy = point.y;
         }
+
+        this.snapSensitivity = preferencesStore.get('snapSensitivity') / canvasStore.state.decomposedTransform.scaleX * devicePixelRatio;
+        this.calculateSnapPoints();
 
         const nodeIndices = selectedEditControlPointIndices.value.map((selectedIndex) => {
             const point = editControlPoints.value[selectedIndex];
@@ -1103,6 +1118,97 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 point.x = newPoint.x;
                 point.y = newPoint.y;
             }
+
+        }
+
+        // Apply snapping
+        snapLineX.value = [];
+        snapLineY.value = [];
+        let snapXOffset = 0;
+        let snapYOffset = 0;
+        if (useSnapping.value && (useCanvasEdgeSnapping.value || useControlPointSnapping.value)) {
+            let checkPoints: DOMPoint[] = this.draggingEditControlPointIndices.map((pointIndex) => {
+                const point = editControlPoints.value[pointIndex];
+                return new DOMPoint(point.x, point.y);
+            });
+
+            // Determine X-axis snapping points
+            let checkPointIndex: number = 0;
+            checkPoints.sort((a, b) => {
+                return a.x < b.x ? -1 : 1;
+            });
+            let snapPointIndex = 0;
+            let snapPoint: SnapPointGroup;
+            let snapLineXLayerPointIndex: number = 0;
+            for (snapPointIndex = 0; snapPointIndex < this.snapXPoints.length; snapPointIndex++) {
+                snapPoint = this.snapXPoints[snapPointIndex];
+                const checkPoint = checkPoints[checkPointIndex];
+                if (snapLineX.value.length > 0 && snapPoint.value !== snapLineX.value[0]) {
+                    break;
+                }
+                if (Math.abs(snapPoint.value - checkPoint.x) <= this.snapSensitivity) {
+                    if (snapLineX.value.length === 0) {
+                        snapXOffset = snapPoint.value - checkPoint.x;
+                        for (let pointY of snapPoint.points) {
+                            snapLineX.value.push(snapPoint.value, pointY);
+                        }
+                        snapLineXLayerPointIndex = snapLineX.value.length;
+                    }
+                    snapLineX.value.push(snapPoint.value, checkPoint.y);
+                    checkPointIndex++;
+                    snapPointIndex--;
+                } else if (checkPoint.x < snapPoint.value + this.snapSensitivity) {
+                    checkPointIndex++;
+                    snapPointIndex--;
+                }
+                if (checkPointIndex > checkPoints.length - 1) {
+                    break;
+                }
+            }
+
+            // Determine Y-axis snapping points
+            checkPointIndex = 0;
+            checkPoints.sort((a, b) => {
+                return a.y < b.y ? -1 : 1;
+            });
+            for (snapPointIndex = 0; snapPointIndex < this.snapYPoints.length; snapPointIndex++) {
+                snapPoint = this.snapYPoints[snapPointIndex];
+                const checkPoint = checkPoints[checkPointIndex];
+                if (snapLineY.value.length > 0 && snapPoint.value !== snapLineY.value[1]) {
+                    break;
+                }
+                if (Math.abs(snapPoint.value - checkPoint.y) <= this.snapSensitivity) {
+                    if (snapLineY.value.length === 0) {
+                        snapYOffset = snapPoint.value - checkPoint.y;
+                        for (let pointX of snapPoint.points) {
+                            snapLineY.value.push(pointX, snapPoint.value);
+                        }
+                    }
+                    snapLineY.value.push(checkPoint.x + snapXOffset, snapPoint.value);
+                    checkPointIndex++;
+                    snapPointIndex--;
+                } else if (checkPoint.y < snapPoint.value + this.snapSensitivity) {
+                    checkPointIndex++;
+                    snapPointIndex--;
+                }
+                if (checkPointIndex > checkPoints.length - 1) {
+                    break;
+                }
+            }
+            for (; snapLineXLayerPointIndex < snapLineX.value.length; snapLineXLayerPointIndex += 2) {
+                snapLineX.value[snapLineXLayerPointIndex + 1] += snapYOffset;
+            }
+
+            if (snapXOffset !== 0 || snapYOffset !== 0) {
+                this.draggingEditControlPointIndices.forEach((pointIndex) => {
+                    const point = editControlPoints.value[pointIndex];
+                    const pointXf = new DOMPoint(point.x, point.y).matrixTransform(
+                        new DOMMatrix().translate(snapXOffset, snapYOffset)
+                    );
+                    point.x = pointXf.x;
+                    point.y = pointXf.y;
+                });
+            }
         }
 
         editControlPointsDirty.value = true;
@@ -1311,6 +1417,9 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         if (this.pendingControlPointEdits.length === 0) return;
         const actions: UpdateVectorLayerAttributesAction[] = [];
 
+        if (snapLineX.value.length > 0) snapLineX.value = [];
+        if (snapLineY.value.length > 0) snapLineY.value = [];
+
         for (const edit of this.pendingControlPointEdits) {
             actions.push(new UpdateVectorLayerAttributesAction(
                 edit.layerId,
@@ -1359,6 +1468,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         let currentIsAttached = true;
         let currentIndices: number[] = [];
 
+        let selectedNodeIndex: number | null = null;
         for (const [pathPointIndex, pathPoint] of editControlPoints.value.entries()) {
             if (
                 Math.abs(cursor.x - pathPoint.x) < dragHandleRadius * devicePixelRatio / decomposedTransform.scaleX &&
@@ -1380,6 +1490,10 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                         if (!isEqualApprox(distance, currentDistance, 0.00001)) {
                             currentIndices.length = 0;
                             currentDistance = distance;
+                        }
+                        if (pathPoint.nodeIndex != selectedNodeIndex) {
+                            selectedNodeIndex = pathPoint.nodeIndex;
+                            currentIndices.length = 0;
                         }
                         currentIndices.push(pathPointIndex);
                         currentIsAttached = isAttached;
@@ -1533,6 +1647,8 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         if (this.drawingPointerId != null) {
             // TODO
             previewInvisibleStrokeStart.value = null;
+        } else if (this.draggingEditControlPointIndices.length > 0) {
+            // TODO
         } else if (this.extendPathPointerId != null) {
             for (const { layerId, tagName, nodeId, pathStart } of this.extendPathInfo) {
                 const attributes: Record<string, string> = {};
@@ -1950,6 +2066,64 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 });
             }
         }
+    }
+
+    private calculateSnapPoints() {
+        if (!useSnapping.value || (
+            !useControlPointSnapping.value && !useCanvasEdgeSnapping.value
+        )) return;
+
+        const xMap: Record<number, number[]> = {};
+        const yMap: Record<number, number[]> = {};
+
+        for (const [pointIndex, point] of editControlPoints.value.entries()) {
+            if (point.attachToIndex != null) continue;
+            const layer = editingLayers.value[point.layerIndex];
+            if (
+                !visibleLayerIds.value.has(layer.id)
+                || this.draggingEditControlPointIndices.includes(pointIndex)
+            ) continue;
+
+            const x = point.x;
+            const y = point.y;
+
+            (xMap[x] ??= []).push(y);
+            (yMap[y] ??= []).push(x);
+        }
+        
+        if (useSnapping.value && useCanvasEdgeSnapping.value) {
+            const width = workingFileStore.get('width');
+            const height = workingFileStore.get('height');
+            (xMap[0] ??= []).push(0);
+            (yMap[0] ??= []).push(0);
+            (xMap[width] ??= []).push(0);
+            (yMap[0] ??= []).push(width);
+            (xMap[0] ??= []).push(height);
+            (yMap[height] ??= []).push(0);
+            (xMap[width] ??= []).push(height);
+            (yMap[height] ??= []).push(width);
+        }
+
+        this.snapXPoints = [];
+        for (const xStr in xMap) {
+            this.snapXPoints.push({
+                value: +xStr,
+                points: Int32Array.from(xMap[xStr])
+            });
+        }
+
+        this.snapYPoints = [];
+        for (const yStr in yMap) {
+            this.snapYPoints.push({
+                value: +yStr,
+                points: Int32Array.from(yMap[yStr])
+            });
+        }
+
+        this.snapXPoints.sort((a, b) => a.value - b.value);
+        this.snapYPoints.sort((a, b) => a.value - b.value);
+
+        this.snapPointsNeedToBeCalculated = false;
     }
 
     private isReadyForPathExtension(): boolean {

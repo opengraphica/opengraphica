@@ -762,15 +762,15 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
 
         const isMobileLike = isMobileUA || (hasCoarsePointer && hasTouch && screenWidth < 1400);
 
-        const memoryGB = navigator.deviceMemory || 0;
-        const cores = navigator.hardwareConcurrency || 0;
+        // const memoryGB = navigator.deviceMemory || 0;
+        // const cores = navigator.hardwareConcurrency || 0;
 
-        const lowEnd = (memoryGB <= 4) || (cores <= 4);
+        // const lowEnd = (memoryGB <= 4) || (cores <= 4);
 
         let requestedSamples: number;
 
         if (isMobileLike) {
-            requestedSamples = lowEnd ? 0 : 2;
+            requestedSamples = 2;
         } else {
             requestedSamples = 4;
         }

@@ -1397,6 +1397,12 @@
                 "label": "Stroke",
                 "width": "Width"
             },
+            "snapping": {
+                "title": "Snapping",
+                "enableSnapping": "Enable Snapping",
+                "canvasEdges": "Canvas Edges",
+                "controlPoint": "Control Point"
+            },
             "notification": {
                 "invisibleShape": {
                     "title": "Creating Invisible Shape",

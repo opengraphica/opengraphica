@@ -12,7 +12,11 @@
         }"
     >
         <template v-for="overlayName in overlayGroup.overlays" :key="overlayName">
-            <component :is="'overlay-' + overlayName" :data-overlay-name="overlayName" />
+            <component
+                :is="'overlay-' + overlayName"
+                :data-overlay-name="overlayName"
+                :css-view-transform="cssViewTransform"
+            />
         </template>
     </div>
 </template>

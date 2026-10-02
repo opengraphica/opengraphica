@@ -77,10 +77,10 @@
                 </svg>
             </div>
         </div>
-        <div class="og-free-transform-snapping-guides">
+        <div class="og-tool-overlay-snapping-guides">
             <div
                 v-if="snapLineX.length > 0"
-                class="og-free-transform-snapping-guide-vertical"
+                class="og-tool-overlay-snapping-guide-vertical"
                 :style="{
                     transform: `translate(${snapLineX[0] - (1.0 / zoom)}px, ${snapLineXMinY}px)`,
                     height: (snapLineXMaxY - snapLineXMinY) + 'px',
@@ -90,7 +90,7 @@
             />
             <div
                 v-for="i in (snapLineX.length / 2)"
-                class="og-free-transform-snapping-guide-point"
+                class="og-tool-overlay-snapping-guide-point"
                 :style="{
                     transform: `translate(${snapLineX[(i-1)*2]}px, ${snapLineX[((i-1)*2)+1]}px)`,
                     width: (6.0 / zoom) + 'px',
@@ -99,7 +99,7 @@
             />
             <div
                 v-if="snapLineY.length > 0"
-                class="og-free-transform-snapping-guide-horizontal"
+                class="og-tool-overlay-snapping-guide-horizontal"
                 :style="{
                     transform: `translate(${snapLineYMinX}px, ${snapLineY[1] - (1.0 / zoom)}px)`,
                     width: (snapLineYMaxX - snapLineYMinX) + 'px',
@@ -109,7 +109,7 @@
             />
             <div
                 v-for="i in (snapLineY.length / 2)"
-                class="og-free-transform-snapping-guide-point"
+                class="og-tool-overlay-snapping-guide-point"
                 :style="{
                     transform: `translate(${snapLineY[(i-1)*2]}px, ${snapLineY[((i-1)*2)+1]}px)`,
                     width: (6.0 / zoom) + 'px',

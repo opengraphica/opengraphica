@@ -30,6 +30,10 @@ export const strokeStyleDockVisible = ref(false);
 export const strokeStyleDockLeft = ref(0);
 export const strokeStyleDockTop = ref(0);
 
+export const snappingDockVisible = ref(false);
+export const snappingDockLeft = ref(0);
+export const snappingDockTop = ref(0);
+
 export const hasVisibleToolbarOverlay = computed(() => {
     return showShapeDrawer.value;
 });
@@ -41,6 +45,9 @@ interface PermanentStorageState {
     selectedShapeType: string;
     strokeColorPaletteIndex: number;
     strokeWidth: number;
+    useCanvasEdgeSnapping: boolean;
+    useControlPointSnapping: boolean;
+    useSnapping: boolean;
 }
 
 const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentStorageState }>({
@@ -85,10 +92,14 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
         selectedShapeType: 'rectangle',
         strokeColorPaletteIndex: 0,
         strokeWidth: 0,
+        useCanvasEdgeSnapping: true,
+        useControlPointSnapping: true,
+        useSnapping: true,
     },
     restore: [
         'colorPalette', 'fillColorPaletteIndex', 'pixelSnap',
         'selectedShapeType', 'strokeColorPaletteIndex', 'strokeWidth',
+        'useCanvasEdgeSnapping', 'useControlPointSnapping', 'useSnapping',
     ],
 });
 
@@ -98,6 +109,9 @@ export const pixelSnap = permanentStorage.getWritableRef('pixelSnap');
 export const selectedShapeType = permanentStorage.getWritableRef('selectedShapeType');
 export const strokeColorPaletteIndex = permanentStorage.getWritableRef('strokeColorPaletteIndex');
 export const strokeWidth = permanentStorage.getWritableRef('strokeWidth');
+export const useCanvasEdgeSnapping = permanentStorage.getWritableRef('useCanvasEdgeSnapping');
+export const useControlPointSnapping = permanentStorage.getWritableRef('useControlPointSnapping');
+export const useSnapping = permanentStorage.getWritableRef('useSnapping');
 
 export const fillColor = ref<RGBAColor>(colorPalette.value[fillColorPaletteIndex.value] ?? {
     is: 'color',
@@ -115,6 +129,9 @@ export const strokeColor = ref<RGBAColor>(colorPalette.value[strokeColorPaletteI
     alpha: 0,
     style: '#00000000'
 });
+
+export const snapLineX = ref<number[]>([]);
+export const snapLineY = ref<number[]>([]);
 
 export interface EditControlPoint {
     layerIndex: number; // Index in editingLayers

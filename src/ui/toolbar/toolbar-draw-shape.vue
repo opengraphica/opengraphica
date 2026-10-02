@@ -90,6 +90,12 @@
                         </div>
                     </og-button>
                 </div>
+                <!-- Snapping -->
+                <og-button v-model:pressed="snappingDockVisible" outline solid small toggle class="ml-3!"
+                    @click="snappingDockLeft = 0; snappingDockTop = 0;">
+                    <span class="bi bi-magnet-fill mr-1" aria-hidden="true" />
+                    {{ t('toolbar.drawShape.snapping.title') }}
+                </og-button>
             </el-horizontal-scrollbar-arrows>
         </div>
         <!-- Fill Style Dock -->
@@ -196,6 +202,20 @@
                 </div>
             </div>
         </floating-dock>
+        <!-- Snapping Dock -->
+        <floating-dock v-if="snappingDockVisible" v-model:top="snappingDockTop" v-model:left="snappingDockLeft" :visible="floatingDocksVisible">
+            <el-form novalidate="novalidate" action="javascript:void(0)">
+                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="t('toolbar.drawShape.snapping.enableSnapping')">
+                    <el-switch v-model="useSnapping" />
+                </el-form-item>
+                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="t('toolbar.drawShape.snapping.canvasEdges')">
+                    <el-switch v-model="useCanvasEdgeSnapping" :disabled="!useSnapping" />
+                </el-form-item>
+                <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="t('toolbar.drawShape.snapping.controlPoint')">
+                    <el-switch v-model="useControlPointSnapping" :disabled="!useSnapping" />
+                </el-form-item>
+            </el-form>
+        </floating-dock>
     </div>
 </template>
 
@@ -209,8 +229,10 @@ import {
     colorPalette, fillColorPaletteIndex, fillColor,
     strokeColorPaletteIndex, strokeColor, strokeWidth,
     drawShapeToolbarEmitter, selectedShapeType,
+    useSnapping, useControlPointSnapping, useCanvasEdgeSnapping,
     fillStyleDockVisible, fillStyleDockLeft, fillStyleDockTop,
     strokeStyleDockVisible, strokeStyleDockLeft, strokeStyleDockTop,
+    snappingDockVisible, snappingDockLeft, snappingDockTop,
 } from '@/canvas/store/draw-shape-state';
 
 import ElButton from 'element-plus/lib/components/button/index';
@@ -220,6 +242,7 @@ import ElInputGroup from '@/ui/el/el-input-group.vue';
 import ElInputNumber from '@/ui/el/el-input-number.vue';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSlider from 'element-plus/lib/components/slider/index';
+import ElSwitch from 'element-plus/lib/components/switch/index';
 
 import OgButton from '@/ui/element/button.vue';
 import OgPopover from '@/ui/element/popover.vue';

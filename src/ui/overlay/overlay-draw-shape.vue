@@ -1,6 +1,6 @@
 <template>
     <div ref="overlay" class="og-canvas-overlay is-full-canvas-area">
-        <div ref="selectionContainer" class="og-selection">
+        <div class="og-selection">
             <svg
                 v-if="editControlPoints.length > 0 || previewInvisibleStrokeStart != null"
                 :width="svgBoundsWidth"
@@ -121,6 +121,46 @@
                 </template>
             </svg>
         </div>
+        <div class="og-tool-overlay-snapping-guides" :style="{ transform: cssViewTransform }">
+            <div
+                v-if="snapLineX.length > 0"
+                class="og-tool-overlay-snapping-guide-vertical"
+                :style="{
+                    transform: `translate(${snapLineX[0] - (1.0 / zoom)}px, ${snapLineXMinY}px)`,
+                    height: (snapLineXMaxY - snapLineXMinY) + 'px',
+                    width: (2.0 / zoom) + 'px',
+                    outlineWidth: (2.0 / zoom) + 'px',
+                }"
+            />
+            <div
+                v-for="i in (snapLineX.length / 2)"
+                class="og-tool-overlay-snapping-guide-point"
+                :style="{
+                    transform: `translate(${snapLineX[(i-1)*2]}px, ${snapLineX[((i-1)*2)+1]}px)`,
+                    width: (6.0 / zoom) + 'px',
+                    height: (6.0 / zoom) + 'px',
+                }"
+            />
+            <div
+                v-if="snapLineY.length > 0"
+                class="og-tool-overlay-snapping-guide-horizontal"
+                :style="{
+                    transform: `translate(${snapLineYMinX}px, ${snapLineY[1] - (1.0 / zoom)}px)`,
+                    width: (snapLineYMaxX - snapLineYMinX) + 'px',
+                    height: (2.0 / zoom) + 'px',
+                    outlineWidth: (2.0 / zoom) + 'px',
+                }"
+            />
+            <div
+                v-for="i in (snapLineY.length / 2)"
+                class="og-tool-overlay-snapping-guide-point"
+                :style="{
+                    transform: `translate(${snapLineY[(i-1)*2]}px, ${snapLineY[((i-1)*2)+1]}px)`,
+                    width: (6.0 / zoom) + 'px',
+                    height: (6.0 / zoom) + 'px',
+                }"
+            />
+        </div>
     </div>
 </template>
 
@@ -135,13 +175,25 @@ import {
     editControlPoints, editControlPointsDirty,
     hoveringEditControlPointIndices,
     selectedEditControlPointIndices, selectedEditControlAttachPointIndices,
+    snapLineX, snapLineY,
 } from '@/canvas/store/draw-shape-state';
 
 defineOptions({
     name: 'CanvasOverlayDrawShape',
 });
 
+const props = defineProps({
+    cssViewTransform: {
+        type: String,
+        default: 'matrix(1, 0, 0, 1, 0, 0)',
+    },
+})
+
 const { transform, viewWidth, viewHeight, viewDirty } = toRefs(canvasStore.state);
+
+/*----------------*\
+| General Viewport |
+\*----------------*/
 
 const transformedCursorHoverX = ref(0);
 const transformedCursorHoverY = ref(0);
@@ -166,6 +218,10 @@ const svgBoundsWidth = computed<number>(() => {
 const svgBoundsHeight = computed<number>(() => {
     return viewHeight.value / devicePixelRatio;
 });
+
+/*--------------*\
+| Control Points |
+\*--------------*/
 
 const selectedEditControlPoints = computed(() => {
     return selectedEditControlPointIndices.value.map(
@@ -202,5 +258,37 @@ watch([previewInvisibleStrokeStart], () => {
     );
     transformedPreviewInvisibleStrokeStartX.value = point.x;
     transformedPreviewInvisibleStrokeStartY.value = point.y;
+});
+
+/*--------*\
+| Snapping |
+\*--------*/
+
+const snapLineXMinY = computed(() => {
+    if (snapLineX.value.length == 0) return 0;
+    return snapLineX.value.reduce((previousValue, currentValue, currentIndex) => {
+        return currentIndex % 2 === 0 ? previousValue : Math.min(previousValue, currentValue);
+    }, Infinity);
+});
+
+const snapLineXMaxY = computed(() => {
+    if (snapLineX.value.length == 0) return 0;
+    return snapLineX.value.reduce((previousValue, currentValue, currentIndex) => {
+        return currentIndex % 2 === 0 ? previousValue : Math.max(previousValue, currentValue);
+    }, -Infinity);
+});
+
+const snapLineYMinX = computed(() => {
+    if (snapLineY.value.length == 0) return 0;
+    return snapLineY.value.reduce((previousValue, currentValue, currentIndex) => {
+        return currentIndex % 2 === 1 ? previousValue : Math.min(previousValue, currentValue);
+    }, Infinity);
+});
+
+const snapLineYMaxX = computed(() => {
+    if (snapLineY.value.length == 0) return 0;
+    return snapLineY.value.reduce((previousValue, currentValue, currentIndex) => {
+        return currentIndex % 2 === 1 ? previousValue : Math.max(previousValue, currentValue);
+    }, -Infinity);
 });
 </script>
