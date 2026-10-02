@@ -81,6 +81,12 @@
                     "target": "file-take-photo"
                 }
             },
+            "shareImage": {
+                "action": {
+                    "type": "function",
+                    "target": "file/share.shareImage"
+                }
+            },
             "quickSave": {
                 "action": {
                     "type": "function",

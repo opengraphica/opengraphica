@@ -271,13 +271,13 @@ async function toBlobWithMaxFileSize(
 async function save(blob: Blob, fileName: string, fileHandle?: FileSystemFileHandle | null) {
     if (window.Capacitor?.isNativePlatform) {
         const { Directory, Filesystem } = await import('@capacitor/filesystem');
+        const { default: writeBlob } = await import('capacitor-blob-writer');
         if (!await Filesystem.checkPermissions()) {
             await Filesystem.requestPermissions();
         }
-        const base64File = await createDataUriFromBlob(blob, true);
-        await Filesystem.writeFile({
+        await writeBlob({
             path: fileName,
-            data: base64File,
+            blob,
             directory: Directory.Documents,
             recursive: true,
         });

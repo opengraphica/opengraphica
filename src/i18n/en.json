@@ -221,7 +221,8 @@
                     "save": "Save",
                     "saveAs": "Save As",
                     "insertPhoto": "Insert a Photo",
-                    "takePhoto": "Take a Photo"
+                    "takePhoto": "Take a Photo",
+                    "shareImage": "Share Image"
                 }
             },
             "image": {
@@ -1115,6 +1116,10 @@
                 "takePhoto": {
                     "name": "Take a Photo",
                     "description": "Take a photo from your camera and webcam and insert it into the image."
+                },
+                "shareImage": {
+                    "name": "Share Image",
+                    "description": "Share the current image you're editing with other people."
                 }
             }
         },

@@ -47,6 +47,10 @@
                             <i class="bi bi-camera"></i>
                             <span>{{ t('dock.settings.file.menu.takePhoto') }}</span>
                         </el-menu-item>
+                        <el-menu-item v-if="canShare" index="shareImage">
+                            <i class="bi bi-share"></i>
+                            <span>{{ t('dock.settings.file.menu.shareImage') }}</span>
+                        </el-menu-item>
                     </el-menu>
                 </el-scrollbar>
             </template>
@@ -435,6 +439,22 @@ watch(() => editorStore.state.showBackupRestore, (showBackupRestore) => {
     }
 });
 
+const canShare = ref<boolean>(!!window.Capacitor?.isNativePlatform);
+onMounted(() => { // Check if PNG sharing is possible on web.
+    if (
+        window.Capacitor?.isNativePlatform || !window.isSecureContext
+        || !navigator.share || !navigator.canShare
+    ) {
+        return;
+    }
+    const testFile = new File(
+        [new Uint8Array([137, 80, 78, 71])],
+        "test.png",
+        { type: "image/png" },
+    );
+    canShare.value = navigator.canShare({ files: [testFile] });
+});
+
 // View zoom/pan/rotate
 const zoomLevel = ref<number>(100);
 const isZoomLevelTouched = ref<boolean>(false);
@@ -748,6 +768,9 @@ async function onMenuSelect(group: string, index: string) {
                     case 'takePhoto':
                         await runModule('file', 'takePhoto');
                         editorStore.set('showBackupRestore', false);
+                        break;
+                    case 'shareImage':
+                        await runModule('file', 'shareImage');
                         break;
                 }
                 break;
