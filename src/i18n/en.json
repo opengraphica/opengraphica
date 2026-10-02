@@ -759,6 +759,7 @@
             "title": "Export Image",
             "saveBackIntroduction": "You have opened a file named {fileName}.",
             "saveBackQuestion": "Save back to the original file?",
+            "nativeSaveToast": "Image was exported to the Documents folder.",
             "svgDisclaimer": "Layer effects, blend modes, and other features may not display correctly in SVG files.",
             "fileName": "File Name",
             "fileType": "File Type",
@@ -835,6 +836,7 @@
             "title": "Save Image As",
             "saveBackIntroduction": "You have opened a file named {fileName}.",
             "saveBackQuestion": "Save back to the original file?",
+            "nativeSaveToast": "Image was saved to the Documents folder.",
             "exportDisclaimer": "If you wish to share or view the image in other programs, use \"Export\" instead.",
             "fileName": "File Name"
         },

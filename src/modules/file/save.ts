@@ -1,8 +1,11 @@
+import { saveAs } from 'file-saver';
+ import { t } from '@/i18n';
+
 import workingFileStore from '@/store/working-file';
 import { writeWorkingFile } from '@/store/data/working-file-database';
-import { saveAs } from 'file-saver';
 
-import { createArrayBufferFromBlob } from '@/lib/binary';
+import { createArrayBufferFromBlob, createDataUriFromBlob } from '@/lib/binary';
+import appEmitter from '@/lib/emitter';
 
 import type {
     FileSystemFileHandle, ColorModel, WorkingFile
@@ -34,7 +37,26 @@ export async function saveImageAs(options: SaveImageAsOptions = {}) {
     const { serializeWorkingFile } = await import('@/modules/file/formats/ora-save');
     const blob = await serializeWorkingFile();
     const fileName = addFileExtension(options.fileName, 'ora');
-    saveAs(blob, fileName);
+    if (window.Capacitor?.isNativePlatform) {
+        const { Directory, Filesystem } = await import('@capacitor/filesystem');
+        if (!await Filesystem.checkPermissions()) {
+            await Filesystem.requestPermissions();
+        }
+        const base64File = await createDataUriFromBlob(blob, true);
+        await Filesystem.writeFile({
+            path: fileName,
+            data: base64File,
+            directory: Directory.Documents,
+            recursive: true,
+        });
+        appEmitter.emit('app.notify', {
+            type: 'info',
+            message: t('module.fileSaveAs.nativeSaveToast'),
+            duration: 5000,
+        });
+    } else {
+        saveAs(blob, fileName);
+    }
 }
 
 export async function saveWorkingFileToTemporaryStorage() {

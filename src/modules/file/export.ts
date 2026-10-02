@@ -6,6 +6,8 @@
 
  import { saveAs } from 'file-saver';
 
+ import { t } from '@/i18n';
+
 import workingFileStore, {
     getCanvasRenderingContext2DSettings,
     getLayersByType,
@@ -15,7 +17,9 @@ import editorStore from '@/store/editor';
 import { createStoredImage } from '@/store/image';
 import historyStore from '@/store/history';
 
+import { createDataUriFromBlob } from '@/lib/binary';
 import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
+import appEmitter from '@/lib/emitter';
 import { generateImageBlobHash } from '@/lib/hash';
 import { getImageDataEmptyBounds, getImageDataFromCanvas, resizeImage } from '@/lib/image';
 import { findPointListBounds, limitMaxDimension } from '@/lib/math';
@@ -180,10 +184,8 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                     if (blob) {
                         if (options.toBlob) {
                             results.blob = blob;
-                        } else if (options.toFileHandle) {
-                            save(blob, options.toFileHandle);
                         } else {
-                            saveAs(blob, fileName);
+                            save(blob, fileName, options.toFileHandle);
                         }
                         resolve(results);
                     } else {
@@ -198,10 +200,8 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                 if (blob) {
                     if (options.toBlob) {
                         results.blob = blob;
-                    } else if (options.toFileHandle) {
-                        save(blob, options.toFileHandle);
                     } else {
-                        saveAs(blob, fileName);
+                        save(blob, fileName, options.toFileHandle);
                     }
                     resolve(results);
                 } else {
@@ -212,10 +212,8 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
                 if (blob) {
                     if (options.toBlob) {
                         results.blob = blob;
-                    } else if (options.toFileHandle) {
-                        save(blob, options.toFileHandle);
                     } else {
-                        saveAs(blob, fileName);
+                        save(blob, fileName, options.toFileHandle);
                     }
                     resolve(results);
                 } else {
@@ -270,11 +268,31 @@ async function toBlobWithMaxFileSize(
     return bestBlob;
 }
 
-
-async function save(blob: Blob, fileHandle: FileSystemFileHandle) {
-    const writable = await fileHandle.createWritable();
-    await writable.write(blob);
-    await writable.close();
+async function save(blob: Blob, fileName: string, fileHandle?: FileSystemFileHandle | null) {
+    if (window.Capacitor?.isNativePlatform) {
+        const { Directory, Filesystem } = await import('@capacitor/filesystem');
+        if (!await Filesystem.checkPermissions()) {
+            await Filesystem.requestPermissions();
+        }
+        const base64File = await createDataUriFromBlob(blob, true);
+        await Filesystem.writeFile({
+            path: fileName,
+            data: base64File,
+            directory: Directory.Documents,
+            recursive: true,
+        });
+        appEmitter.emit('app.notify', {
+            type: 'info',
+            message: t('module.fileExport.nativeSaveToast'),
+            duration: 5000,
+        });
+    } else if (fileHandle) {
+        const writable = await fileHandle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+    } else {
+        saveAs(blob, fileName);
+    }
 }
 
 export function isfileFormatSupported(extensionOrMimeType: string) {

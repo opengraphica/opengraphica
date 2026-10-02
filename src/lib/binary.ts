@@ -33,3 +33,19 @@ export function createBlobFromDataUri(dataUri: string): Blob {
     }
     return new Blob([array], { type: mime });
 }
+
+export function createDataUriFromBlob(blob: Blob, dataOnly?: boolean): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(reader.error);
+        reader.onloadend = () => {
+            const dataUrl = reader.result as string;
+            if (dataOnly) {
+                resolve(dataUrl.substring(dataUrl.indexOf(',') + 1));
+            } else {
+                resolve(dataUrl);
+            }
+        };
+        reader.readAsDataURL(blob);
+    });
+}

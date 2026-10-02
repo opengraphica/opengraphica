@@ -11,6 +11,12 @@ declare global {
         deviceMemory?: number;
         userAgentData?: NavigatorUAData;
     }
+
+    interface CapacitorGlobal {
+        isNativePlatform: boolean;
+    }
+
+    var Capacitor: CapacitorGlobal | undefined;
 }
 
 export {};

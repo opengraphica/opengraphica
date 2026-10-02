@@ -112,6 +112,7 @@ export default defineComponent({
                         loading.value = false;
                         appEmitter.emit('app.canvas.ready');
                         calculateCssViewTransform();
+                        appEmitter.emit('app.canvas.resetTransform');
                     }).catch((error) => {
                         loading.value = false;
                         console.error(error);

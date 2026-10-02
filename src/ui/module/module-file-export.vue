@@ -209,7 +209,7 @@ const formValidationRules: Rules = {};
 
 const fileHandle = workingFileStore.get('fileHandle');
 let canSaveBackDirectly: boolean = false;
-if (fileHandle) {
+if (fileHandle && !window.Capacitor?.isNativePlatform) {
     for (const fileTypeOption of fileTypeOptions) {
         if (fileHandle.name.endsWith(fileTypeOption.value)) {
             canSaveBackDirectly = true;
