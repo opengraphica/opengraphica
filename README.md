@@ -63,8 +63,9 @@ Rust is used to create some web assembly code.
 In the root folder of the project, run:
 
 ```
-cargo build
 ln -s ../../../../rust/renderer_wgpu_wasm/pkg src/renderers/wgpu-wasm/backend/build
+cd rust/renderer_wgpu_wasm
+wasm-pack build --target web
 ```
 
 ### Development Server
