@@ -17,6 +17,13 @@ declare global {
     }
 
     var Capacitor: CapacitorGlobal | undefined;
+
+    interface ElectronGlobal {
+        version: string;
+        quit: () => void;
+    }
+
+    var Electron: ElectronGlobal | undefined;
 }
 
 export {};

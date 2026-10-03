@@ -426,6 +426,19 @@ function toggleMobileView() {
 
 function toggleMobileViewImmediate() {
     displayMode.value = viewportWidth.value / (window.devicePixelRatio || 1) > preferencesStore.state.dockHideBreakpoint ? 'tools' : 'all';
+    for (const actionGroupName in actionGroups.value) {
+        const actionGroupSection = actionGroups.value[actionGroupName];
+        for (const control of actionGroupSection) {
+            control.showDock = false;
+            control.expanded = false;
+            control.popoverVisible = false;
+        }
+    }
+    activeControlDock = null;
+    pendingActiveControlCall = null;
+    toolGroupExpandOffsetTop.value = undefined;
+    toolGroupExpandOffsetLeft.value = undefined;
+    isActiveToolGroupExpanded.value = false;
 }
 
 function createActionGroups(forceDisplayMode?: string): { [key: string]: MenuBarToolGroupButton[] } {

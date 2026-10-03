@@ -224,7 +224,8 @@
                     "saveAs": "Save As",
                     "insertPhoto": "Insert a Photo",
                     "takePhoto": "Take a Photo",
-                    "shareImage": "Share Image"
+                    "shareImage": "Share Image",
+                    "quit": "Quit"
                 }
             },
             "image": {

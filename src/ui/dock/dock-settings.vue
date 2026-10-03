@@ -51,6 +51,13 @@
                             <i class="bi bi-share"></i>
                             <span>{{ t('dock.settings.file.menu.shareImage') }}</span>
                         </el-menu-item>
+                        <template v-if="canQuit">
+                            <el-divider />
+                            <el-menu-item index="quit">
+                                <i class="bi bi-escape"></i>
+                                <span>{{ t('dock.settings.file.menu.quit') }}</span>
+                            </el-menu-item>
+                        </template>
                     </el-menu>
                 </el-scrollbar>
             </template>
@@ -461,6 +468,8 @@ onMounted(() => { // Check if PNG sharing is possible on web.
     canShare.value = navigator.canShare({ files: [testFile] });
 });
 
+const canQuit = ref<boolean>(!!window.Electron);
+
 // View zoom/pan/rotate
 const zoomLevel = ref<number>(100);
 const isZoomLevelTouched = ref<boolean>(false);
@@ -791,6 +800,9 @@ async function onMenuSelect(group: string, index: string) {
                         break;
                     case 'shareImage':
                         await runModule('file', 'shareImage');
+                        break;
+                    case 'quit':
+                        window.Electron?.quit();
                         break;
                 }
                 break;
