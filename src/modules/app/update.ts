@@ -137,8 +137,6 @@ function pemToArrayBuffer(pem: string) {
         .replace('-----BEGIN PUBLIC KEY-----', '')
         .replace('-----END PUBLIC KEY-----', '')
         .replace(/\s/g, '');
-    console.log(base64);
-
     return base64ToUint8Array(base64).buffer;
 }
 

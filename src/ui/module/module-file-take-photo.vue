@@ -8,7 +8,7 @@
             :closable="false">
             {{ t('module.fileTakePhoto.noCameraError.message') }}
         </el-alert>
-        <template v-else>
+        <template v-else-if="isUsingWebcam">
             <el-select v-model="facingMode" class="mx-0 mt-0 mb-2 w-full" :placeholder="t('module.fileTakePhoto.selectCamera.placeholder')">
                 <el-option key="user" value="user" :label="t('module.fileTakePhoto.selectCamera.user')" />
                 <el-option key="environment" value="environment" :label="t('module.fileTakePhoto.selectCamera.environment')" />
@@ -17,6 +17,14 @@
             <div class="text-right mt-4">
                 <el-button @click="onCancel">{{ t('button.cancel') }}</el-button>
                 <el-button type="primary" @click="onTake">{{ t('button.take') }}</el-button>
+            </div>
+        </template>
+        <template v-else>
+            <div class="el-progress-bar my-4!">
+                <div class="el-progress-bar__outer" style="height: 6px;">
+                    <div class="el-progress-bar__inner el-progress-bar__inner--indeterminate" style="width: 50%; animation-duration: 3s;">
+                    </div>
+                </div>
             </div>
         </template>
     </div>
@@ -60,6 +68,7 @@ const emit = defineEmits([
 emit('update:title', 'module.fileTakePhoto.title');
 
 const $notify = notifyInjector('$notify');
+const isUsingWebcam = ref<boolean>(!window.Capacitor?.isNativePlatform());
 const loading = ref<boolean>(true);
 const video = ref<HTMLVideoElement>();
 const stream = ref<MediaStream | null>(null);
@@ -67,7 +76,7 @@ const tracks = ref<MediaStreamTrack[]>();
 const activeTrack = ref<MediaStreamTrack | null>(null);
 const hasCameraError = ref<boolean>(false);
 const facingMode = ref<string>('environment');
-let videoElement: HTMLVideoElement;
+let videoElement: HTMLVideoElement | undefined;
 
 watch([facingMode], () => {
     requestStream();
@@ -84,22 +93,27 @@ onUnmounted(() => {
 });
 
 async function requestStream() {
-    stopStream();
-    const maxTextureSize = await (await useRenderer()).getMaxTextureSize();
-    try {
-        stream.value = await navigator.mediaDevices.getUserMedia({
-            audio: false,
-            video: {
-                facingMode: facingMode.value,
-                width: { ideal: Math.min(maxTextureSize, 1920) },
-                height: { ideal: Math.min(maxTextureSize, 1920) } 
-            }
-        });
-        tracks.value = stream.value.getTracks();
-        activeTrack.value = tracks.value[0];
-        videoElement.srcObject = stream.value;
-    } catch (error: any) {
-        hasCameraError.value = true;
+    if (window.Capacitor?.isNativePlatform()) {
+        await onTake();
+    } else {
+        stopStream();
+        const maxTextureSize = await (await useRenderer()).getMaxTextureSize();
+        try {
+            if (!videoElement) throw new Error('Missing video element');
+            stream.value = await navigator.mediaDevices.getUserMedia({
+                audio: false,
+                video: {
+                    facingMode: facingMode.value,
+                    width: { ideal: Math.min(maxTextureSize, 1920) },
+                    height: { ideal: Math.min(maxTextureSize, 1920) } 
+                }
+            });
+            tracks.value = stream.value.getTracks();
+            activeTrack.value = tracks.value[0];
+            videoElement.srcObject = stream.value;
+        } catch (error: any) {
+            hasCameraError.value = true;
+        }
     }
 }
 
@@ -107,9 +121,11 @@ async function stopStream() {
     if (activeTrack.value != null){
         activeTrack.value.stop();
     }
-    videoElement.pause();
-    videoElement.src = '';
-    videoElement.load();
+    if (videoElement) {
+        videoElement.pause();
+        videoElement.src = '';
+        videoElement.load();
+    }
 }
 
 function onCancel() {
@@ -117,18 +133,18 @@ function onCancel() {
 }
 
 async function onTake() {
-    videoElement.pause();
     loading.value = true;
-    await nextTick();
-    try {
-        const width = videoElement.videoWidth;
-        const height = videoElement.videoHeight;
-        const tmpCanvas = document.createElement('canvas');
-        const tmpCanvasCtx = tmpCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
-        if (tmpCanvasCtx) {
-            tmpCanvas.width = width;
-            tmpCanvas.height = height;
-            tmpCanvasCtx.drawImage(videoElement, 0, 0);
+    if (window.Capacitor?.isNativePlatform()) {
+        try {
+            const { Camera } = await import('@capacitor/camera');
+            const result = await Camera.takePhoto({
+                quality: 100,
+                includeMetadata: true,
+            });
+            if (!result.webPath) {
+                throw new Error('Missing webPath');
+            }
+            const [height, width] = (result.metadata?.resolution?.split('x') ?? []).map((s) => parseInt(s ?? '1'));
             let image = new Image;
             await new Promise<void>((resolve, reject) => {
                 image.onload = () => {
@@ -137,7 +153,7 @@ async function onTake() {
                 image.onerror = () => {
                     reject();
                 }
-                image.src = tmpCanvas.toDataURL('image/png');
+                image.src = result.webPath!;
             });
             await historyStore.dispatch('runAction', {
                 action: new BundleAction('fileTakePhoto', 'action.fileTakePhoto', [
@@ -149,7 +165,7 @@ async function onTake() {
                     ] : []),
                     new InsertLayerAction({
                         type: 'raster',
-                        name: 'Webcam #' + (webcamPhotoCount++),
+                        name: 'Photo #' + (webcamPhotoCount++),
                         width,
                         height,
                         data: {
@@ -158,13 +174,65 @@ async function onTake() {
                     })
                 ])
             });
+        } catch (error: any) {
+            if (!error?.message.includes('canceled')) {
+                $notify({
+                    type: 'error',
+                    title: 'Error Occurred',
+                    message: unexpectedErrorMessage
+                });
+            }
         }
-    } catch(error) {
-        $notify({
-            type: 'error',
-            title: 'Error Occurred',
-            message: unexpectedErrorMessage
-        });
+    } else {
+        videoElement?.pause();
+        await nextTick();
+        try {
+            if (!videoElement) throw new Error('Missing video element.');
+            const width = videoElement.videoWidth;
+            const height = videoElement.videoHeight;
+            const tmpCanvas = document.createElement('canvas');
+            const tmpCanvasCtx = tmpCanvas.getContext('2d', getCanvasRenderingContext2DSettings());
+            if (tmpCanvasCtx) {
+                tmpCanvas.width = width;
+                tmpCanvas.height = height;
+                tmpCanvasCtx.drawImage(videoElement, 0, 0);
+                let image = new Image;
+                await new Promise<void>((resolve, reject) => {
+                    image.onload = () => {
+                        resolve();
+                    };
+                    image.onerror = () => {
+                        reject();
+                    }
+                    image.src = tmpCanvas.toDataURL('image/png');
+                });
+                await historyStore.dispatch('runAction', {
+                    action: new BundleAction('fileTakePhoto', 'action.fileTakePhoto', [
+                        ...(workingFileStore.get('layers').length === 0 ? [
+                            new UpdateFileAction({
+                                width,
+                                height
+                            })
+                        ] : []),
+                        new InsertLayerAction({
+                            type: 'raster',
+                            name: 'Webcam #' + (webcamPhotoCount++),
+                            width,
+                            height,
+                            data: {
+                                sourceUuid: await createStoredImage(image),
+                            }
+                        })
+                    ])
+                });
+            }
+        } catch(error) {
+            $notify({
+                type: 'error',
+                title: 'Error Occurred',
+                message: unexpectedErrorMessage
+            });
+        }
     }
     loading.value = false;
     emit('close');
