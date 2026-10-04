@@ -59,7 +59,19 @@
         "updateLayerFilterMask": "Maschera per effetti di livello",
         "setLayerBoundsToWorkingFileBounds": "Espandi con spazio vuoto",
         "stretchLayerToWorkingFileBounds": "Tagliare a tela",
-        "updateTextLayerProperties": "Aggiornare le proprietà del livello di testo"
+        "updateTextLayerProperties": "Aggiornare le proprietà del livello di testo",
+        "createShape": "Crea la forma",
+        "createShapeLayer": "Crea il livello di forma",
+        "deleteVectorLayerShape": "Elimina la forma",
+        "moveVectorLayerControlPoints": "Spostare i punti di controllo del livello vettoriale",
+        "pasteShapes": "Forma della pasta(i)",
+        "updateBlurLayer": "Layer Blur",
+        "updateLayerOpacity": "Cambiare l'opzione",
+        "updateShapeFillColor": "Colore di riempimento della forma di aggiornamento",
+        "updateShapeStrokeColor": "Forma dell'aggiornamento colore",
+        "updateShapeStrokeWidth": "Forma di aggiornamento Stroke Width",
+        "updateSharpenLayer": "Layer di Sharpen",
+        "updateVectorLayerAttributes": "Aggiornamento Vector Layer"
     },
     "app": {
         "colorPickerGradient": {
@@ -102,7 +114,19 @@
             "moveEffectDown": "Spostare l'effetto",
             "blendingMode": "Miscela",
             "duplicate": "Duplicare",
-            "rasterizeEffects": "Unire tutti"
+            "rasterizeEffects": "Unire tutti",
+            "opacity": "Possibilità",
+            "rasterize": "Rasterizzare",
+            "iconTitle": {
+                "gradient": "Livello di livello",
+                "group": "Livello di gruppo",
+                "empty": "Livello vuoto",
+                "raster": "Raster Layer",
+                "rasterSequence": "Layer di sequenza raster",
+                "text": "Livello di testo",
+                "vector": "Vector Layer",
+                "video": "Video Layer"
+            }
         },
         "wait": {
             "applyLayerTransform": "Applicare la trasformazione del livello",
@@ -161,7 +185,10 @@
         "reverse": "Indietro",
         "back": "Indietro",
         "editBrush": "Modifica della spazzola",
-        "moreInfo": "Maggiori informazioni"
+        "moreInfo": "Maggiori informazioni",
+        "dontUpdate": "Non aggiornare",
+        "enable": "Abilitare",
+        "updateApp": "Aggiornamento App"
     },
     "canvas": {
         "toolbar": {
@@ -197,7 +224,9 @@
                     "saveAs": "Salvare come",
                     "insertPhoto": "Inserisci una foto",
                     "takePhoto": "Prendere una foto",
-                    "restore": "Ripristina ultima immagine"
+                    "restore": "Ripristina ultima immagine",
+                    "shareImage": "Condividi immagine",
+                    "quit": "Smettila"
                 }
             },
             "image": {
@@ -255,8 +284,8 @@
                         "2d": "Tela 2D",
                         "webgl": "WebGL",
                         "webgl2": "WebGL2",
-                        "webgl2Offscreen": "WebGL2 Offscreen",
-                        "wgpuWasm": "WebGPU + WASM"
+                        "webgl2Offscreen": "[STABLE] WebGL2 Offscreen",
+                        "wgpuWasm": "[STABLE] WebGPU + WASM"
                     },
                     "optimizeLargeImage": "Ottimizzazione per grande immagine",
                     "highQualityScaling": "Scala di alta qualità",
@@ -285,6 +314,12 @@
                     "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename",
                     "webdavUsername": "Nome utente",
                     "webdavPassword": "Password"
+                },
+                "update": {
+                    "groupTitle": "Aggiornamento",
+                    "checkForUpdates": "Controllare gli aggiornamenti",
+                    "updateAvailableTitle": "Aggiornamento disponibile",
+                    "updateAvailableMessage": "È disponibile un aggiornamento per OpenGraphica. Vuoi installarlo?"
                 }
             }
         }
@@ -749,7 +784,10 @@
                 "falseFloydSteinbergSerpentine": "Falso Floyd Steinberg (serpentine)",
                 "stucki": "Stucki",
                 "stuckiSerpentine": "Stucki (serpentine)"
-            }
+            },
+            "nativeSaveToast": "L'immagine è stata esportata nella cartella Documenti.",
+            "svgDisclaimer": "Effetti di livello, modalità di miscela e altre funzionalità potrebbero non essere visualizzate correttamente nei file SVG.",
+            "maxFileSize": "Dimensione massima del file"
         },
         "fileNew": {
             "title": "Nuova immagine",
@@ -766,7 +804,8 @@
             "saveBackIntroduction": "Hai aperto un file di nome {fileName}.",
             "saveBackQuestion": "Salvare il file originale?",
             "exportDisclaimer": "Se si desidera condividere o visualizzare l'immagine in altri programmi, utilizzare \"Esporta\" invece.",
-            "fileName": "Nome del file"
+            "fileName": "Nome del file",
+            "nativeSaveToast": "L'immagine è stata salvata nella cartella Documenti."
         },
         "fileTakePhoto": {
             "title": "Prendere la foto",
@@ -1027,6 +1066,15 @@
             "saveLocalFile": "Salva nel tuo computer",
             "createFolder": "Crea cartella",
             "folderName": "Nome della cartella"
+        },
+        "appUpdate": {
+            "title": "Aggiornamento",
+            "notificationTitle": "Scarica Aggiornamento",
+            "notificationMessage": "Si prega di mantenere l'applicazione aperta e visibile sullo schermo durante il download dell'aggiornamento.",
+            "notificationReadyTitle": "Aggiornamento è pronto",
+            "notificationReadyMessage": "L'aggiornamento verrà installato quando si passa a un'altra app.",
+            "notificationErrorTitle": "Errore di aggiornamento",
+            "notificationErrorMessage": "Si è verificato un errore durante il download dell'aggiornamento. Riprova più tardi."
         }
     },
     "moduleGroup": {
@@ -1089,6 +1137,10 @@
                 "saveWebdavExplorer": {
                     "name": "Salva immagine",
                     "description": "Salvare un'immagine sul computer o sull'archiviazione di rete."
+                },
+                "shareImage": {
+                    "name": "Condividi immagine",
+                    "description": "Condividi l'immagine corrente che stai modificando con altre persone."
                 }
             }
         },
@@ -1179,6 +1231,20 @@
                 "welcome": {
                     "name": "Benvenuto",
                     "description": "Inizia a lavorare su un'immagine."
+                }
+            }
+        },
+        "app": {
+            "name": "App",
+            "description": "Gestione delle applicazioni",
+            "modules": {
+                "clearShareCache": {
+                    "name": "Cancellare Condividere Cache",
+                    "description": "Rimuovere vecchi file di immagine condivisi."
+                },
+                "update": {
+                    "name": "Aggiornamento App",
+                    "description": "Aggiorna l'app per ricevere nuove funzionalità."
                 }
             }
         }
@@ -1365,14 +1431,20 @@
                         "hardness": "Durezza",
                         "hardnessDescription": "Valori inferiori avranno bordi sbiaditi morbidi e bordi taglienti di valori superiori.",
                         "angle": "Angolo",
-                        "angleDescription": "Ruota la forma del pennello."
+                        "angleDescription": "Ruota la forma del pennello.",
+                        "shape": "Forma",
+                        "shapes": {
+                            "circle": "Circolo",
+                            "square": "Piazza"
+                        }
                     },
                     "strokePath": {
                         "title": "Sentiero del cavallo",
                         "spacing": "Spaziatura",
                         "spacingDescription": "La distanza tra ogni timbro del pennello, rispetto alla dimensione del pennello. Fare attenzione con valori estremamente bassi, in quanto può serbatoio prestazioni su dimensioni spazzola più grandi.",
                         "jitter": "Jitter",
-                        "jitterDescription": "Raramente sposta la posizione della forma del pennello."
+                        "jitterDescription": "Raramente sposta la posizione della forma del pennello.",
+                        "pixelSnap": "Pixel"
                     },
                     "pressure": {
                         "title": "Pressione",
@@ -1380,6 +1452,13 @@
                         "pressureTaperDescription": "I valori più elevati disegnano linee più skinnier a pressioni della penna più bassa. Rende più facile controllare le penne con sensibilità instabile a pressioni inferiori.",
                         "pressureMinSize": "Dimensione minima",
                         "pressureMinSizeDescription": "La dimensione del pennello a 0% pressione della penna, rispetto alla dimensione del pennello attualmente selezionata."
+                    },
+                    "general": {
+                        "title": "Generale",
+                        "name": "Nome del pennello",
+                        "resetDefault": "Ripristino di default",
+                        "delete": "Eliminare la spazzola",
+                        "addCustomBrush": "Aggiungere Pennello personalizzato"
                     }
                 },
                 "title": "Seleziona la spazzola",
@@ -1408,7 +1487,16 @@
             "brushSmoothing": "Smoothing"
         },
         "deformBlur": {
-            "brushSize": "Dimensione"
+            "brushSize": "Dimensione",
+            "brushOpacity": "Possibilità",
+            "brushStrength": "Forza",
+            "brushHardness": "Durezza",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "Nessun livello selezionato",
+                    "message": "Si prega di selezionare almeno uno strato di immagine nel bacino strati. Alcuni tipi di strato non possono essere offuscati."
+                }
+            }
         },
         "drawColorPicker": {
             "title": "Picker di colore"
@@ -1447,11 +1535,86 @@
             "shapeType": {
                 "label": "Forma",
                 "rectangle": "Rettangolo",
-                "ellipse": "Ellipse"
+                "ellipse": "Ellipse",
+                "circle": "Circolo",
+                "line": "Linea",
+                "polyline": "Polimero",
+                "polygon": "Poligono",
+                "path": "Sentiero"
             },
             "style": {
                 "label": "Stile"
+            },
+            "newVectorLayerName": "Nuova forma",
+            "extendingShape": "Forma di attesa",
+            "fillStyle": {
+                "label": "Riempi"
+            },
+            "strokeStyle": {
+                "label": "Stroke",
+                "width": "Larghezza"
+            },
+            "snapping": {
+                "title": "Snapping",
+                "enableSnapping": "Attivare Snapping",
+                "canvasEdges": "Bordi di tela",
+                "controlPoint": "Punto di controllo"
+            },
+            "notification": {
+                "invisibleShape": {
+                    "title": "Creare la forma invisibile",
+                    "message": "Sia il colore di riempimento che di ictus corrente sono completamente trasparenti. Non verrà creata una nuova forma."
+                },
+                "invisibleLine": {
+                    "title": "Creazione di linea invisibile",
+                    "message": "Il colore del tratto corrente non deve essere completamente trasparente, e la larghezza del tratto deve essere maggiore di 0."
+                },
+                "uselessClick": {
+                    "title": "Forma di disegno",
+                    "message": {
+                        "touch": "Toccare e trascinare il dito su una zona vuota per aggiungere nuove forme.",
+                        "mouse": "Fare clic e trascinare su un'area vuota per aggiungere nuove forme."
+                    }
+                }
             }
+        },
+        "deformSharpen": {
+            "brushOpacity": "Possibilità",
+            "brushSize": "Dimensione",
+            "brushStrength": "Forza",
+            "brushHardness": "Durezza",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "Nessun livello selezionato",
+                    "message": "Si prega di selezionare almeno uno strato di immagine nel bacino strati. Alcuni tipi di strato non possono essere affilati."
+                }
+            }
+        },
+        "drawBucketFill": {
+            "title": "Fibbia di riempimento",
+            "brushColor": "Colore",
+            "paletteCount": "Conte di Palette",
+            "strength": "Forza",
+            "feather": "Piuma",
+            "settings": "Impostazioni impostazioni",
+            "antialias": "Antialias"
+        },
+        "eraseBucketFill": {
+            "opacity": "Possibilità",
+            "strength": "Forza",
+            "feather": "Piuma",
+            "settings": "Impostazioni impostazioni",
+            "antialias": "Antialias",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "Nessun livello selezionato",
+                    "message": "Si prega di selezionare almeno uno strato di immagine nel bacino strati. Alcuni tipi di strato non possono essere cancellati."
+                }
+            }
+        },
+        "layerOpacity": {
+            "title": "Possibilità",
+            "opacity": "Possibilità"
         }
     },
     "toolGroup": {
@@ -1466,6 +1629,10 @@
                 "gradient": {
                     "name": "Gradiente",
                     "description": "Crea transizioni lisce tra colori."
+                },
+                "bucketFill": {
+                    "name": "Fibbia di riempimento",
+                    "description": "Riempire in aree di colore simile."
                 }
             }
         },
@@ -1686,17 +1853,57 @@
         },
         "drawShapeToolIntroduction": {
             "introduction": [
-                "Lo strumento di forma consente di aggiungere varie forme di base, che possono essere convertiti in percorsi vettoriali se è necessaria una maggiore personalizzazione."
+                "Lo strumento forma consente di aggiungere varie forme di base e percorsi vettoriali."
             ],
             "body": {
                 "mouse": [
-                    "Fare clic e trascinare per posizionare una forma sulla tela."
+                    "{add} - Fare clic e trascinare per posizionare una forma sulla tela.",
+                    "{edit} - Fai clic sui punti di controllo di una forma e trascinali per modificare la forma dopo che è stato aggiunto."
                 ],
                 "touch": [
-                    "Utilizzare un dito per toccare e trascinare per posizionare una forma sulla tela."
+                    "{add} - Utilizzare un dito per toccare e trascinare per posizionare una forma sulla tela.",
+                    "{edit} - Toccare i punti di controllo di una forma e trascinarli per modificare la forma dopo che è stato aggiunto."
                 ]
             },
-            "title": "Strumento di forma"
+            "title": "Strumento di forma",
+            "bodyTitle": {
+                "add": "Aggiungi",
+                "edit": "Modifica"
+            }
+        },
+        "deformSharpenToolIntroduction": {
+            "title": "Strumento di Sharpen",
+            "introduction": [
+                "Lo strumento di affilare affilare aree dello strato corrente che si disegna su."
+            ]
+        },
+        "drawBucketFillToolIntroduction": {
+            "title": "Fibbia di riempimento",
+            "introduction": [
+                "Lo strumento di riempimento del secchio consente di riempire in aree di colore simile con un colore di vostra scelta."
+            ],
+            "body": {
+                "mouse": [
+                    "Fare clic su un'area per riempire. Mentre si tiene il mouse giù, è possibile trascinare a sinistra o a destra per regolare la quantità della zona è riempita."
+                ],
+                "touch": [
+                    "Toccare un'area per riempire. Mentre si tiene premuto, si può trascinare a sinistra o a destra per regolare la quantità della zona è riempita."
+                ]
+            }
+        },
+        "eraseBucketFillToolIntroduction": {
+            "title": "Cancellare il riempimento della fibbia",
+            "introduction": [
+                "Cancellare le aree dell'immagine che hanno un colore simile."
+            ],
+            "body": {
+                "mouse": [
+                    "Fare clic su un'area per cancellare. Mentre si tiene il mouse giù, è possibile trascinare a sinistra o a destra per regolare la quantità della zona è cancellata."
+                ],
+                "touch": [
+                    "Toccare un'area per cancellare. Mentre si tiene premuto, si può trascinare a sinistra o a destra per regolare la quantità della zona è cancellata."
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -1744,7 +1951,8 @@
         "simpleAirBrush": "Spazzola d'aria semplice",
         "simplePaintBrush": "Spazzola di vernice semplice",
         "simplePen": "Penna semplice",
-        "simpleWaterColor": "Colore dell'acqua semplice"
+        "simpleWaterColor": "Colore dell'acqua semplice",
+        "simplePixelArt": "Pixel semplice Arte"
     },
     "defaultBrushCategory": {
         "custom": "Personale",
@@ -1753,27 +1961,57 @@
     "menuBarToolGroup": {
         "deform": {
             "tools": {
-                "blur": "Sfoca aree specifiche dell'immagine"
+                "blur": {
+                    "title": "Blu",
+                    "description": "Blur zone dell'immagine"
+                },
+                "sharpen": {
+                    "title": "Sharpen",
+                    "description": "Affilare le aree dell'immagine"
+                }
             },
             "name": "Deformità"
         },
         "draw": {
             "tools": {
-                "brush": "Disegno con spazzole d'arte",
-                "gradient": "Crea pendenze di colore",
-                "shape": "Crea forme di base"
+                "brush": {
+                    "title": "Spazzola",
+                    "description": "Disegno con spazzole d'arte"
+                },
+                "gradient": {
+                    "title": "Gradiente",
+                    "description": "Crea pendenze di colore"
+                },
+                "shape": {
+                    "title": "Forma",
+                    "description": "Crea forme di base"
+                },
+                "bucketFill": {
+                    "title": "Fibbia di riempimento",
+                    "description": "Riempi le aree con il colore"
+                }
             },
             "name": "Disegno"
         },
         "effect": {
             "tools": {
-                "effect": "Manipolare i colori dello strato e aggiungere gli effetti del filtro"
+                "effect": {
+                    "title": "Effetto",
+                    "description": "Manipolare i colori dello strato e aggiungere gli effetti del filtro"
+                }
             },
             "name": "Effetto"
         },
         "erase": {
             "tools": {
-                "brush": "Cancellare le aree dell'immagine con pennellate"
+                "brush": {
+                    "title": "Pennello di cancellazione",
+                    "description": "Cancellare con pennellate"
+                },
+                "bucketFill": {
+                    "title": "Cancellare il riempimento della fibbia",
+                    "description": "Zone di cancellazione con colore simile"
+                }
             },
             "name": "Cancellazione"
         },
@@ -1782,7 +2020,10 @@
         },
         "selection": {
             "tools": {
-                "selection": "Selezionare le aree specifc dell'immagine per modificare, tagliare, copiare o eliminare"
+                "selection": {
+                    "title": "Selezione",
+                    "description": "Selezionare le aree specifc dell'immagine per modificare, tagliare, copiare o eliminare"
+                }
             },
             "name": "Selezione"
         },
@@ -1791,20 +2032,32 @@
         },
         "text": {
             "tools": {
-                "text": "Inserire e modificare gli strati di testo"
+                "text": {
+                    "title": "Testo",
+                    "description": "Inserire e modificare gli strati di testo"
+                }
             },
             "name": "Testo"
         },
         "transform": {
             "tools": {
-                "freeTransform": "Sposta, scala, ruota strati",
-                "layerCrop": "Ritaglia lo strato selezionato"
+                "freeTransform": {
+                    "title": "Trasformazione libera",
+                    "description": "Sposta, scala, ruota strati"
+                },
+                "layerCrop": {
+                    "title": "Layer Crop",
+                    "description": "Ritaglia lo strato selezionato"
+                }
             },
             "name": "Spostare / trasformare"
         },
         "view": {
             "tools": {
-                "zoom": "Zoom dentro e fuori, pan, o ruotare la vista dell'immagine"
+                "zoom": {
+                    "title": "Zoom / Pan",
+                    "description": "Zoom dentro e fuori, pan, o ruotare la vista dell'immagine"
+                }
             },
             "name": "Vista su tela"
         }

@@ -59,7 +59,19 @@
         "updateLayerFilterMask": "層効果マスクの更新",
         "setLayerBoundsToWorkingFileBounds": "空のスペースによって拡大して下さい",
         "stretchLayerToWorkingFileBounds": "キャンバスのサイズへのストレッチ",
-        "updateTextLayerProperties": "テキストレイヤーのプロパティを更新する"
+        "updateTextLayerProperties": "テキストレイヤーのプロパティを更新する",
+        "createShape": "形状を作成する",
+        "createShapeLayer": "形状レイヤーを作成する",
+        "deleteVectorLayerShape": "形状の削除",
+        "moveVectorLayerControlPoints": "ベクトルレイヤーコントロールポイントの移動",
+        "pasteShapes": "ペースト形状(s)",
+        "updateBlurLayer": "Blurの層",
+        "updateLayerOpacity": "不透明度の変更",
+        "updateShapeFillColor": "更新の形は色を満たします",
+        "updateShapeStrokeColor": "更新の形の打撃色",
+        "updateShapeStrokeWidth": "更新の形の打撃の幅",
+        "updateSharpenLayer": "鋭い層",
+        "updateVectorLayerAttributes": "ベクトル層の更新"
     },
     "app": {
         "colorPickerGradient": {
@@ -102,7 +114,19 @@
             "moveEffectDown": "効果を下に移動する",
             "blendingMode": "ブレンド",
             "duplicate": "重複する",
-            "rasterizeEffects": "マージ すべて"
+            "rasterizeEffects": "マージ すべて",
+            "opacity": "オパシティ",
+            "rasterize": "ラスタライズ",
+            "iconTitle": {
+                "gradient": "勾配層",
+                "group": "グループ層",
+                "empty": "空の層",
+                "raster": "ラスター層",
+                "rasterSequence": "ラスターシーケンスレイヤー",
+                "text": "テキストレイヤー",
+                "vector": "ベクトル層",
+                "video": "ビデオ層"
+            }
         },
         "wait": {
             "applyLayerTransform": "レイヤー変換を適用",
@@ -161,7 +185,10 @@
         "reverse": "バックアップ",
         "back": "バックナンバー",
         "editBrush": "編集ブラシ",
-        "moreInfo": "詳細情報"
+        "moreInfo": "詳細情報",
+        "dontUpdate": "更新しないでください",
+        "enable": "アクセス",
+        "updateApp": "更新アプリ"
     },
     "canvas": {
         "toolbar": {
@@ -197,7 +224,9 @@
                     "saveAs": "保存 として",
                     "insertPhoto": "写真をインサートする",
                     "takePhoto": "写真を撮る",
-                    "restore": "最後の画像を復元する"
+                    "restore": "最後の画像を復元する",
+                    "shareImage": "シェアイメージ",
+                    "quit": "ログイン"
                 }
             },
             "image": {
@@ -254,7 +283,7 @@
                         "webgl": "サイトマップ",
                         "webgl2": "ウェブGL2",
                         "webgl2Offscreen": "WebGL2 オフスクリーン",
-                        "wgpuWasm": "ウェブGPU + WASM"
+                        "wgpuWasm": "WebGPU + WASMの使い方"
                     },
                     "optimizeLargeImage": "大きいイメージのための最大限活用",
                     "highQualityScaling": "高品質のスケーリング",
@@ -285,6 +314,12 @@
                     "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename",
                     "webdavUsername": "ユーザ名",
                     "webdavPassword": "パスワード"
+                },
+                "update": {
+                    "groupTitle": "ニュース",
+                    "checkForUpdates": "アップデートの確認",
+                    "updateAvailableTitle": "利用できる更新",
+                    "updateAvailableMessage": "OpenGraphica のアップデートが利用可能です。 インストールしたいですか?"
                 }
             }
         }
@@ -749,7 +784,10 @@
                 "falseFloydSteinbergSerpentine": "False Floyd Steinberg(蛇口)",
                 "stucki": "スキャッキ",
                 "stuckiSerpentine": "スタッキー(蛇口)"
-            }
+            },
+            "nativeSaveToast": "ドキュメントフォルダに画像をエクスポートしました.",
+            "svgDisclaimer": "レイヤーエフェクト、ブレンドモード、その他の機能はSVGファイルでは正しく表示されない場合があります.",
+            "maxFileSize": "最高のファイル サイズ"
         },
         "fileNew": {
             "title": "新しい画像",
@@ -766,7 +804,8 @@
             "saveBackIntroduction": "{fileName}という名前のファイルを開きます.",
             "saveBackQuestion": "元のファイルに保存しますか?",
             "exportDisclaimer": "他のプログラムで画像を共有したり表示したりしたい場合、代わりに「エクスポート」を使用してください.",
-            "fileName": "ファイル名"
+            "fileName": "ファイル名",
+            "nativeSaveToast": "ドキュメントフォルダに保存されたイメージです."
         },
         "fileTakePhoto": {
             "title": "写真を撮る",
@@ -1027,6 +1066,15 @@
             "saveLocalFile": "コンピュータに保存",
             "createFolder": "フォルダを作成する",
             "folderName": "フォルダ名"
+        },
+        "appUpdate": {
+            "title": "ニュース",
+            "notificationTitle": "ダウンロード更新",
+            "notificationMessage": "アップデートをダウンロードしながら、画面上でアプリを開いたり表示したりしてください.",
+            "notificationReadyTitle": "更新は準備です",
+            "notificationReadyMessage": "別のアプリに切り替えるとアップデートがインストールされます.",
+            "notificationErrorTitle": "エラーの更新",
+            "notificationErrorMessage": "アップデートのダウンロード中にエラーが発生しました。 もう一度お試しください."
         }
     },
     "moduleGroup": {
@@ -1089,6 +1137,10 @@
                 "saveWebdavExplorer": {
                     "name": "イメージを保存",
                     "description": "コンピュータやネットワークストレージに画像を保存します."
+                },
+                "shareImage": {
+                    "name": "シェアイメージ",
+                    "description": "他の人と編集している現在のイメージを共有します."
                 }
             }
         },
@@ -1179,6 +1231,20 @@
                 "welcome": {
                     "name": "お問い合わせ",
                     "description": "画像処理を開始."
+                }
+            }
+        },
+        "app": {
+            "name": "アプリ",
+            "description": "アプリ管理",
+            "modules": {
+                "clearShareCache": {
+                    "name": "明確な共有キャッシュ",
+                    "description": "古い共有画像ファイルを削除します."
+                },
+                "update": {
+                    "name": "更新アプリ",
+                    "description": "アプリを更新して、新しい機能を受信します."
                 }
             }
         }
@@ -1365,14 +1431,20 @@
                         "hardness": "フリガナ",
                         "hardnessDescription": "値が下がると柔らかさのエッジが広がり、シャープなエッジが高まります.",
                         "angle": "アングル",
-                        "angleDescription": "ブラシ形状を回転させます."
+                        "angleDescription": "ブラシ形状を回転させます.",
+                        "shape": "形状:",
+                        "shapes": {
+                            "circle": "サークル",
+                            "square": "スクエア"
+                        }
                     },
                     "strokePath": {
                         "title": "ストロークパス",
                         "spacing": "スライディング",
                         "spacingDescription": "ブラシのサイズに相対的なブラシの各スタンプ間の間隔。 大きいブラシのサイズで性能をタンクできるので、非常に低い値に注意して下さい.",
                         "jitter": "ジッタ",
-                        "jitterDescription": "ブラシ形状の位置をランダムにシフトします."
+                        "jitterDescription": "ブラシ形状の位置をランダムにシフトします.",
+                        "pixelSnap": "ピクセルスナップ"
                     },
                     "pressure": {
                         "title": "プレッシャー",
@@ -1380,6 +1452,13 @@
                         "pressureTaperDescription": "より高い値は、より低いペン圧力で皮膚線を描画します。 圧力を下げて、不安定な感度でペンをコントロールしやすくなります.",
                         "pressureMinSize": "最小サイズ",
                         "pressureMinSizeDescription": "ブラシのサイズは0%のペンの圧力で、現在の選択されたブラシのサイズに相対的です."
+                    },
+                    "general": {
+                        "title": "インフォメーション",
+                        "name": "ブラシの名前",
+                        "resetDefault": "デフォルトへのリセット",
+                        "delete": "ブラシの削除",
+                        "addCustomBrush": "カスタムブラシを追加"
                     }
                 },
                 "title": "ブラシの選択",
@@ -1408,7 +1487,16 @@
             "brushSmoothing": "スムース"
         },
         "deformBlur": {
-            "brushSize": "サイズ:"
+            "brushSize": "サイズ:",
+            "brushOpacity": "オパシティ",
+            "brushStrength": "強み",
+            "brushHardness": "フリガナ",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "選択された層無し",
+                    "message": "レイヤードックで少なくとも1つのイメージレイヤーを選択します。 特定のレイヤータイプは、ぼやけません."
+                }
+            }
         },
         "drawColorPicker": {
             "title": "カラーピッカー"
@@ -1447,11 +1535,86 @@
             "shapeType": {
                 "label": "形状:",
                 "rectangle": "長方形",
-                "ellipse": "エリス"
+                "ellipse": "エリス",
+                "circle": "サークル",
+                "line": "ライン",
+                "polyline": "ポリライン",
+                "polygon": "ポリゴン",
+                "path": "パス"
             },
             "style": {
                 "label": "スタイル"
+            },
+            "newVectorLayerName": "新しい形",
+            "extendingShape": "形状を拡張する",
+            "fillStyle": {
+                "label": "お問い合わせ"
+            },
+            "strokeStyle": {
+                "label": "ストローク",
+                "width": "フリガナ"
+            },
+            "snapping": {
+                "title": "スナップ",
+                "enableSnapping": "スナップを有効にする",
+                "canvasEdges": "キャンバスエッジ",
+                "controlPoint": "制御ポイント"
+            },
+            "notification": {
+                "invisibleShape": {
+                    "title": "見えない形を作成する",
+                    "message": "現在の塗りつぶしとストローク色の両方が完全に透明です。 新しい形状は作成されません."
+                },
+                "invisibleLine": {
+                    "title": "見えないラインを作る",
+                    "message": "現在のストロークの色は完全に透明でなければならず、ストローク幅は0以上でなければなりません."
+                },
+                "uselessClick": {
+                    "title": "デッサンの形",
+                    "message": {
+                        "touch": "空の領域に指をタッチしてドラッグして、新しい形状を追加します.",
+                        "mouse": "空の領域をクリックしてドラッグして新しい形状を追加します."
+                    }
+                }
             }
+        },
+        "deformSharpen": {
+            "brushOpacity": "オパシティ",
+            "brushSize": "サイズ:",
+            "brushStrength": "強み",
+            "brushHardness": "フリガナ",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "選択された層無し",
+                    "message": "レイヤードックで少なくとも1つのイメージレイヤーを選択します。 特定の層タイプは鋭くすることはできません."
+                }
+            }
+        },
+        "drawBucketFill": {
+            "title": "バケツの盛り土",
+            "brushColor": "カラー",
+            "paletteCount": "パレットカウント",
+            "strength": "強み",
+            "feather": "フェザー",
+            "settings": "コンテンツ",
+            "antialias": "アンチエイリア"
+        },
+        "eraseBucketFill": {
+            "opacity": "オパシティ",
+            "strength": "強み",
+            "feather": "フェザー",
+            "settings": "コンテンツ",
+            "antialias": "アンチエイリア",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "選択された層無し",
+                    "message": "レイヤードックで少なくとも1つのイメージレイヤーを選択します。 特定のレイヤータイプは消去できません."
+                }
+            }
+        },
+        "layerOpacity": {
+            "title": "オパシティ",
+            "opacity": "オパシティ"
         }
     },
     "toolGroup": {
@@ -1466,6 +1629,10 @@
                 "gradient": {
                     "name": "グラデーション",
                     "description": "色間のスムーズな移行を作成します."
+                },
+                "bucketFill": {
+                    "name": "バケツの盛り土",
+                    "description": "同様の色の領域に記入します."
                 }
             }
         },
@@ -1686,17 +1853,57 @@
         },
         "drawShapeToolIntroduction": {
             "introduction": [
-                "シェイプツールは、よりカスタマイズが必要な場合は、ベクターパスに変換できる様々な基本的な形状を追加することができます."
+                "形状ツールでは、様々な基本的な形状やベクトルパスを追加できます."
             ],
             "body": {
                 "mouse": [
-                    "キャンバスに形状を置くためにクリックしてドラッグします."
+                    "{add} - クリックしてキャンバスに形状を置くためにドラッグします.",
+                    "{edit} - 形状のコントロールポイントをクリックし、追加後に形状を編集するためにそれらをドラッグします."
                 ],
                 "touch": [
-                    "1本の指で触ってドラッグしてキャンバスに形状を配置します."
+                    "{add} - 1本の指を使用して、キャンバスに形状を配置します.",
+                    "{edit} - 形状の制御ポイントをタップし、追加後に形状を編集するためにそれらをドラッグします."
                 ]
             },
-            "title": "形状ツール"
+            "title": "形状ツール",
+            "bodyTitle": {
+                "add": "追加する",
+                "edit": "編集"
+            }
+        },
+        "deformSharpenToolIntroduction": {
+            "title": "鋭い用具",
+            "introduction": [
+                "鋭いツールは、描画する現在のレイヤーの領域をシャープにします."
+            ]
+        },
+        "drawBucketFillToolIntroduction": {
+            "title": "バケツの盛り土",
+            "introduction": [
+                "バケット充填ツールは、お好みの色で同様の色の領域を埋めることができます."
+            ],
+            "body": {
+                "mouse": [
+                    "エリアをクリックして記入します。 マウスを押したままにすると、左右にドラッグして領域の量をどれだけ調整できます."
+                ],
+                "touch": [
+                    "エリアをタップして記入します。 ダウンしている間は、左または右にドラッグして、領域のどのくらいが満たされているかを調整することができます."
+                ]
+            }
+        },
+        "eraseBucketFillToolIntroduction": {
+            "title": "消去のバケツの盛り土",
+            "introduction": [
+                "類似色の画像の消去領域."
+            ],
+            "body": {
+                "mouse": [
+                    "エリアをクリックして消去します。 マウスを押しながら、左右にドラッグして、領域の削除量を調整できます."
+                ],
+                "touch": [
+                    "エリアをタップして消去します。 ダウンしている間、領域の削除量を調整するために、左右にドラッグできます."
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -1744,7 +1951,8 @@
         "simpleAirBrush": "シンプルな空気ブラシ",
         "simplePaintBrush": "簡単なペンキのブラシ",
         "simplePen": "シンプルなペン",
-        "simpleWaterColor": "単純水色"
+        "simpleWaterColor": "単純水色",
+        "simplePixelArt": "シンプルなピクセル アートアート"
     },
     "defaultBrushCategory": {
         "custom": "カスタム",
@@ -1753,27 +1961,57 @@
     "menuBarToolGroup": {
         "deform": {
             "tools": {
-                "blur": "画像のBlur固有の領域"
+                "blur": {
+                    "title": "ログイン",
+                    "description": "画像のブルーエリア"
+                },
+                "sharpen": {
+                    "title": "シャープン",
+                    "description": "画像のシャープな領域"
+                }
             },
             "name": "デフォーム"
         },
         "draw": {
             "tools": {
-                "brush": "アートブラシで描く",
-                "gradient": "色のグラデーションを作成する",
-                "shape": "基本的な形状を作成する"
+                "brush": {
+                    "title": "ブラシ",
+                    "description": "アートブラシで描く"
+                },
+                "gradient": {
+                    "title": "グラデーション",
+                    "description": "色のグラデーションを作成する"
+                },
+                "shape": {
+                    "title": "形状:",
+                    "description": "基本的な形状を作成する"
+                },
+                "bucketFill": {
+                    "title": "バケツの盛り土",
+                    "description": "色を塗りつぶして下さい"
+                }
             },
             "name": "ドロー"
         },
         "effect": {
             "tools": {
-                "effect": "層色を操作し、フィルター効果を加えて下さい"
+                "effect": {
+                    "title": "エフェクト",
+                    "description": "層色を操作し、フィルター効果を加えて下さい"
+                }
             },
             "name": "エフェクト"
         },
         "erase": {
             "tools": {
-                "brush": "ブラシストロークで画像の消去領域"
+                "brush": {
+                    "title": "消去ブラシ",
+                    "description": "ブラシストロークで消去"
+                },
+                "bucketFill": {
+                    "title": "消去のバケツの盛り土",
+                    "description": "類似色の消去領域"
+                }
             },
             "name": "リリース"
         },
@@ -1782,7 +2020,10 @@
         },
         "selection": {
             "tools": {
-                "selection": "編集、カット、コピー、削除する画像のspecifc領域を選択します"
+                "selection": {
+                    "title": "セレクション",
+                    "description": "編集、カット、コピー、削除する画像のspecifc領域を選択します"
+                }
             },
             "name": "セレクション"
         },
@@ -1791,20 +2032,32 @@
         },
         "text": {
             "tools": {
-                "text": "テキストレイヤーのインサートと編集"
+                "text": {
+                    "title": "テキスト",
+                    "description": "テキストレイヤーのインサートと編集"
+                }
             },
             "name": "テキスト"
         },
         "transform": {
             "tools": {
-                "freeTransform": "移動、スケール、回転層",
-                "layerCrop": "選択したレイヤーをクロップ"
+                "freeTransform": {
+                    "title": "フリートランスフォーム",
+                    "description": "移動、スケール、回転層"
+                },
+                "layerCrop": {
+                    "title": "層の穀物",
+                    "description": "選択したレイヤーをクロップ"
+                }
             },
             "name": "移動/変換"
         },
         "view": {
             "tools": {
-                "zoom": "ズームインおよびアウト、パン、または画像の表示を回転させる"
+                "zoom": {
+                    "title": "ズームレンズ/パン",
+                    "description": "ズームインおよびアウト、パン、または画像の表示を回転させる"
+                }
             },
             "name": "キャンバスビューポート"
         }

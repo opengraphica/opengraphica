@@ -59,7 +59,19 @@
         "updateLayerFilterMask": "Update Katman Etkisi Maske",
         "setLayerBoundsToWorkingFileBounds": "Boş Uzay ile Genişleme",
         "stretchLayerToWorkingFileBounds": "Kırklık Kanlı",
-        "updateTextLayerProperties": "Update Text Katman Özellikler"
+        "updateTextLayerProperties": "Update Text Katman Özellikler",
+        "createShape": "Create Shape Form",
+        "createShapeLayer": "Create Shape Katman",
+        "deleteVectorLayerShape": "Delete Şekil",
+        "moveVectorLayerControlPoints": "Move Vector Katman Kontrolü Noktaları",
+        "pasteShapes": "Paste Shape(s)",
+        "updateBlurLayer": "Blur Katmanı",
+        "updateLayerOpacity": "Opakity",
+        "updateShapeFillColor": "Update Shape Fill Color",
+        "updateShapeStrokeColor": "Update Shape Stro Color",
+        "updateShapeStrokeWidth": "Update Shape Stro Genişlik",
+        "updateSharpenLayer": "Sharpen Katman",
+        "updateVectorLayerAttributes": "Update Vector Katmanı"
     },
     "app": {
         "colorPickerGradient": {
@@ -102,7 +114,19 @@
             "moveEffectDown": "Move Etkisi Down",
             "blendingMode": "Ölmek",
             "duplicate": "Duplicate",
-            "rasterizeEffects": "Merge All"
+            "rasterizeEffects": "Merge All",
+            "opacity": "Opakity",
+            "rasterize": "Rasterize",
+            "iconTitle": {
+                "gradient": "Gradient Katman",
+                "group": "Grup Katmanı",
+                "empty": "Boş Katman",
+                "raster": "Raster Katman",
+                "rasterSequence": "Raster Sequence Katman",
+                "text": "Text Katman",
+                "vector": "Vector Katmanı",
+                "video": "Video Katmanı"
+            }
         },
         "wait": {
             "applyLayerTransform": "Katmanı Uygulayın",
@@ -161,7 +185,10 @@
         "reverse": "Ters",
         "back": "Geri dön",
         "editBrush": "Edit",
-        "moreInfo": "Daha Fazla Bilgi"
+        "moreInfo": "Daha Fazla Bilgi",
+        "dontUpdate": "Güncelleme",
+        "enable": "Enable",
+        "updateApp": "Update App"
     },
     "canvas": {
         "toolbar": {
@@ -197,7 +224,9 @@
                     "saveAs": "Kaydet As Save As Kaydet",
                     "insertPhoto": "Bir Fotoğraf Ekle",
                     "takePhoto": "Bir Fotoğraflar Alın",
-                    "restore": "Restore Last Image"
+                    "restore": "Restore Last Image",
+                    "shareImage": "Share Image",
+                    "quit": "Oldukça haklı"
                 }
             },
             "image": {
@@ -255,8 +284,8 @@
                         "2d": "2D",
                         "webgl": "WebGL",
                         "webgl2": "WebGL2",
-                        "webgl2Offscreen": "WebGL2 Offscreen",
-                        "wgpuWasm": "WebGPU + WASM"
+                        "webgl2Offscreen": "[UNSTABLE] WebGL2 Offscreen",
+                        "wgpuWasm": "[UNSTABLE] WebGPU + WASM"
                     },
                     "optimizeLargeImage": "Büyük Image için optimize",
                     "highQualityScaling": "Yüksek kaliteli Scaling",
@@ -285,6 +314,12 @@
                     "webdavServerUrlPlaceholder": "https://webdav.ör.com/sharename",
                     "webdavUsername": "Username",
                     "webdavPassword": "Şifre"
+                },
+                "update": {
+                    "groupTitle": "Update",
+                    "checkForUpdates": "Updates için kontrol",
+                    "updateAvailableTitle": "Güncelleme kullanılabilir Güncelleme",
+                    "updateAvailableMessage": "OpenGraphica için bir güncelleme mevcuttur. Onu yüklemek ister misiniz?"
                 }
             }
         }
@@ -749,7 +784,10 @@
                 "falseFloydSteinbergSerpentine": "Yanlış Floyd Steinberg (serpentine)",
                 "stucki": "Stucki",
                 "stuckiSerpentine": "Stucki (serpentine)"
-            }
+            },
+            "nativeSaveToast": "Görüntü Belge klasörüne ihraç edildi.",
+            "svgDisclaimer": "Katman etkileri, karışım modları ve diğer özellikler SVG dosyalarında doğru şekilde göstermeyebilir.",
+            "maxFileSize": "Max Dosya Boyutu"
         },
         "fileNew": {
             "title": "New Image",
@@ -766,7 +804,8 @@
             "saveBackIntroduction": "{fileName} adında bir dosya açtınız.",
             "saveBackQuestion": "Orijinal dosyaya geri dön?",
             "exportDisclaimer": "Diğer programlarda görüntüyü paylaşmak veya görüntülemek istiyorsanız, bunun yerine \"Export\" kullanın.",
-            "fileName": "Dosya Adı"
+            "fileName": "Dosya Adı",
+            "nativeSaveToast": "Görüntü Belge klasörüne kurtarıldı."
         },
         "fileTakePhoto": {
             "title": "Fotoğraflar alın",
@@ -1027,6 +1066,15 @@
             "saveLocalFile": "Bilgisayarınıza Kaydet",
             "createFolder": "Create Folder",
             "folderName": "Kater Name"
+        },
+        "appUpdate": {
+            "title": "Update",
+            "notificationTitle": "Downloading Update",
+            "notificationMessage": "Lütfen güncellemeyi indirirken uygulama açık ve görünür tutun.",
+            "notificationReadyTitle": "Update is ready",
+            "notificationReadyMessage": "Güncelleme başka bir uygulamaya geçiş yaptığınızda kurulacaktır.",
+            "notificationErrorTitle": "Update Error Update",
+            "notificationErrorMessage": "Güncellemeyi indirmek için bir hata oluştu. Lütfen daha sonra tekrar deneyin."
         }
     },
     "moduleGroup": {
@@ -1089,6 +1137,10 @@
                 "saveWebdavExplorer": {
                     "name": "Save Image",
                     "description": "Bilgisayarınıza veya ağ depolamanıza bir görüntü kaydedin."
+                },
+                "shareImage": {
+                    "name": "Share Image",
+                    "description": "Diğer insanlarla düzenlemediğiniz mevcut imajı paylaşın."
                 }
             }
         },
@@ -1179,6 +1231,20 @@
                 "welcome": {
                     "name": "Hoşgeldiniz Welcome Welcome Hoşgeldiniz",
                     "description": "Bir görüntü üzerinde çalışmaya başlayın."
+                }
+            }
+        },
+        "app": {
+            "name": "App",
+            "description": "App management",
+            "modules": {
+                "clearShareCache": {
+                    "name": "Clear Share Cache",
+                    "description": "Eski paylaşılan görüntü dosyalarını çıkarın."
+                },
+                "update": {
+                    "name": "Update App",
+                    "description": "Uygulamayı yeni işlevsellik almak için güncelleyin."
                 }
             }
         }
@@ -1365,14 +1431,20 @@
                         "hardness": "Hardness",
                         "hardnessDescription": "Alt değerler yumuşak kenarlar olacak ve daha yüksek değerler keskin kenarlar.",
                         "angle": "Yüz",
-                        "angleDescription": "Fırça şeklini taşır."
+                        "angleDescription": "Fırça şeklini taşır.",
+                        "shape": "Şekil",
+                        "shapes": {
+                            "circle": "Circle",
+                            "square": "Square"
+                        }
                     },
                     "strokePath": {
                         "title": "Path",
                         "spacing": "Spacing",
                         "spacingDescription": "Fırçanın her pulu arasındaki mesafe, fırça büyüklüğüne göre. Son derece düşük değerlere dikkat edin, daha büyük fırça boyutlarda tank performansı olabilir.",
                         "jitter": "Jitter",
-                        "jitterDescription": "Rastgele olarak fırça şeklinin konumunu değiştirir."
+                        "jitterDescription": "Rastgele olarak fırça şeklinin konumunu değiştirir.",
+                        "pixelSnap": "Pixel Snap"
                     },
                     "pressure": {
                         "title": "Basınç",
@@ -1380,6 +1452,13 @@
                         "pressureTaperDescription": "Yüksek değerler daha düşük kalem baskılarında deri çizgileri çizecektir. Kalemleri daha düşük basınçlarda dengesiz hassasiyetle kontrol etmeyi kolaylaştırır.",
                         "pressureMinSize": "Minimum Boyut",
                         "pressureMinSizeDescription": "Şu anda seçilen fırça büyüklüğüne göre fırçanın% 0 pen basıncının büyüklüğü."
+                    },
+                    "general": {
+                        "title": "General",
+                        "name": "Logo Adı",
+                        "resetDefault": "Varsayılan olarak",
+                        "delete": "Delete",
+                        "addCustomBrush": "Ekle Özel fırça ekle"
                     }
                 },
                 "title": "Fırça Seç",
@@ -1408,7 +1487,16 @@
             "brushSmoothing": "Direnmek"
         },
         "deformBlur": {
-            "brushSize": "Boyut Boyutu"
+            "brushSize": "Boyut Boyutu",
+            "brushOpacity": "Opakity",
+            "brushStrength": "Güçlü",
+            "brushHardness": "Hardness",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "Hiçbir Katman Seçilmedi",
+                    "message": "Lütfen katmanların iskelesinde en az bir görüntü katmanı seçin. Bazı katman türleri bulanık olamaz."
+                }
+            }
         },
         "drawColorPicker": {
             "title": "Renk Picker"
@@ -1447,11 +1535,86 @@
             "shapeType": {
                 "label": "Şekil",
                 "rectangle": "Rect",
-                "ellipse": "Ellipse"
+                "ellipse": "Ellipse",
+                "circle": "Circle",
+                "line": "Line",
+                "polyline": "Polyline",
+                "polygon": "Polygon",
+                "path": "Yol Yolu"
             },
             "style": {
                 "label": "Style"
+            },
+            "newVectorLayerName": "Yeni Şekil",
+            "extendingShape": "Genişleme şekli",
+            "fillStyle": {
+                "label": "Doldurun"
+            },
+            "strokeStyle": {
+                "label": "0.00",
+                "width": "Genişlik genişliği Genişlik genişliği"
+            },
+            "snapping": {
+                "title": "Snapping",
+                "enableSnapping": "Enable Snapping",
+                "canvasEdges": "Blood Edges",
+                "controlPoint": "Kontrol noktası"
+            },
+            "notification": {
+                "invisibleShape": {
+                    "title": "Görünmez Şekil Oluşturma",
+                    "message": "Mevcut doldurma ve vuruş renginiz tamamen şeffaf. Yeni bir şekil yaratılmayacaktır."
+                },
+                "invisibleLine": {
+                    "title": "Invisible Line",
+                    "message": "Mevcut vuruş rengi tamamen şeffaf olmamalıdır ve vuruş genişliği 0'dan daha büyük olmalıdır."
+                },
+                "uselessClick": {
+                    "title": "Çizim Şekilleri",
+                    "message": {
+                        "touch": "Dokunuzu yeni şekiller eklemek için boş bir alanda sürükleyin.",
+                        "mouse": "Yeni şekiller eklemek için boş bir alana tıklayın ve sürükleyin."
+                    }
+                }
             }
+        },
+        "deformSharpen": {
+            "brushOpacity": "Opakity",
+            "brushSize": "Boyut Boyutu",
+            "brushStrength": "Güçlü",
+            "brushHardness": "Hardness",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "Hiçbir Katman Seçilmedi",
+                    "message": "Lütfen katmanların iskelesinde en az bir görüntü katmanı seçin. Bazı katman türleri keskinleştirilemez."
+                }
+            }
+        },
+        "drawBucketFill": {
+            "title": "Shell",
+            "brushColor": "Renkli Renk",
+            "paletteCount": "Sat",
+            "strength": "Güçlü",
+            "feather": "Tüy",
+            "settings": "Ayarlar",
+            "antialias": "Antialias"
+        },
+        "eraseBucketFill": {
+            "opacity": "Opakity",
+            "strength": "Güçlü",
+            "feather": "Tüy",
+            "settings": "Ayarlar",
+            "antialias": "Antialias",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "Hiçbir Katman Seçilmedi",
+                    "message": "Lütfen katmanların iskelesinde en az bir görüntü katmanı seçin. Bazı katman türleri silinemez."
+                }
+            }
+        },
+        "layerOpacity": {
+            "title": "Opakity",
+            "opacity": "Opakity"
         }
     },
     "toolGroup": {
@@ -1466,6 +1629,10 @@
                 "gradient": {
                     "name": "Gradient",
                     "description": "Renkler arasında düzgün geçişler oluşturun."
+                },
+                "bucketFill": {
+                    "name": "Shell",
+                    "description": "Benzer renk alanlarında doldurun."
                 }
             }
         },
@@ -1686,17 +1853,57 @@
         },
         "drawShapeToolIntroduction": {
             "introduction": [
-                "Şekil aracı, daha fazla özelleştirme gerekliyse vektör yollarına dönüştürülebilecek çeşitli temel şekiller eklemenizi sağlar."
+                "Şekil aracı çeşitli temel şekilleri ve vektör yollarını eklemenizi sağlar."
             ],
             "body": {
                 "mouse": [
-                    "Tuval üzerinde bir şekil yerleştirmek için tıklayın ve sürükleyin."
+                    "{add} - tuval üzerinde bir şekil yerleştirmek için tıklayın.",
+                    "{edit} - Bir şeklin kontrol noktalarına tıklayın ve eklendikten sonra şekli düzenlemek için onları sürükleyin."
                 ],
                 "touch": [
-                    "Bir parmağı dokun ve tuval üzerinde bir şekil yerine getirmek için kullanın."
+                    "{add} - Bir parmağı dokunup tuval üzerinde bir şekil koymak için kullanın.",
+                    "{edit} - Bir şeklin kontrol noktalarına dokun ve ekledikten sonra şekli düzenlemelerini sürükleyin."
                 ]
             },
-            "title": "Şekil Tool Tool"
+            "title": "Şekil Tool Tool",
+            "bodyTitle": {
+                "add": "Add",
+                "edit": "Edit"
+            }
+        },
+        "deformSharpenToolIntroduction": {
+            "title": "Sharpen Tool",
+            "introduction": [
+                "Keskinen aracı, çizdiğiniz şu anki katmanın keskin bölgeleri olacaktır."
+            ]
+        },
+        "drawBucketFillToolIntroduction": {
+            "title": "Shell",
+            "introduction": [
+                "Kova dolum aracı, seçiminizin rengi ile benzer renkte doldurmanızı sağlar."
+            ],
+            "body": {
+                "mouse": [
+                    "Doldurmak için bir alana tıklayın. Mouse'ı tutarken, bölgenin ne kadarının dolu olduğunu ayarlamak için sol veya sağa sürüklenebilirsiniz."
+                ],
+                "touch": [
+                    "Doldurmak için bir alana dokunun. Devam ederken, bölgenin ne kadar dolu olduğunu ayarlamak için sol veya sağa sürüklenebilirsiniz."
+                ]
+            }
+        },
+        "eraseBucketFillToolIntroduction": {
+            "title": "Erase Shell",
+            "introduction": [
+                "Benzer bir renge sahip olan görüntünün zamanı."
+            ],
+            "body": {
+                "mouse": [
+                    "Takip etmek için bir alana tıklayın. Mouse'ı tutarken, bölgenin ne kadar silindiğini ayarlamak için sol veya sağa sürükleyebilirsiniz."
+                ],
+                "touch": [
+                    "Bir alana dokunun. Aşağı tutarken, bölgenin ne kadar silindiğini ayarlamanız için sol veya sağa sürüklenebilirsiniz."
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -1744,7 +1951,8 @@
         "simpleAirBrush": "Basit Hava Fırça",
         "simplePaintBrush": "Basit Paint Fırça",
         "simplePen": "Basit Kalem",
-        "simpleWaterColor": "Basit Su Renkleri"
+        "simpleWaterColor": "Basit Su Renkleri",
+        "simplePixelArt": "Basit Pixel Sanat Sanatı"
     },
     "defaultBrushCategory": {
         "custom": "Özel",
@@ -1753,27 +1961,57 @@
     "menuBarToolGroup": {
         "deform": {
             "tools": {
-                "blur": "Blur specific fields of the image"
+                "blur": {
+                    "title": "Blur",
+                    "description": "Blur alanları görüntünün"
+                },
+                "sharpen": {
+                    "title": "Sharpen",
+                    "description": "Sharpen'in görüntü alanları"
+                }
             },
             "name": "Deform"
         },
         "draw": {
             "tools": {
-                "brush": "Sanat fırçaları ile çizin",
-                "gradient": "Renk gradients of color",
-                "shape": "Temel şekiller oluşturun"
+                "brush": {
+                    "title": "Fırça",
+                    "description": "Sanat fırçaları ile çizin"
+                },
+                "gradient": {
+                    "title": "Gradient",
+                    "description": "Renk gradients of color"
+                },
+                "shape": {
+                    "title": "Şekil",
+                    "description": "Temel şekiller oluşturun"
+                },
+                "bucketFill": {
+                    "title": "Shell",
+                    "description": "Renk ile alanları doldurun"
+                }
             },
             "name": "Çizim"
         },
         "effect": {
             "tools": {
-                "effect": "Manipulate tabaka renkleri ve filtre efektleri ekleyin"
+                "effect": {
+                    "title": "Etkisi",
+                    "description": "Manipulate tabaka renkleri ve filtre efektleri ekleyin"
+                }
             },
             "name": "Etkisi"
         },
         "erase": {
             "tools": {
-                "brush": "Görüntünün yüzey alanları fırça vuruşları ile"
+                "brush": {
+                    "title": "Erase",
+                    "description": "Fırça ile Erase"
+                },
+                "bucketFill": {
+                    "title": "Erase Shell",
+                    "description": "Benzer renklerle Erase alanları"
+                }
             },
             "name": "Erase"
         },
@@ -1782,7 +2020,10 @@
         },
         "selection": {
             "tools": {
-                "selection": "Uygulamanın spektral, kes, kopya veya silinme alanlarını seçin"
+                "selection": {
+                    "title": "Seçme",
+                    "description": "Uygulamanın spektral, kes, kopya veya silinme alanlarını seçin"
+                }
             },
             "name": "Seçme"
         },
@@ -1791,20 +2032,32 @@
         },
         "text": {
             "tools": {
-                "text": "Ekle ve metin katmanları düzenler"
+                "text": {
+                    "title": "Text",
+                    "description": "Ekle ve metin katmanları düzenler"
+                }
             },
             "name": "Text"
         },
         "transform": {
             "tools": {
-                "freeTransform": "Move, ölçek, döndürme katmanları",
-                "layerCrop": "Seçilmiş tabaka"
+                "freeTransform": {
+                    "title": "Ücretsiz Dönüşüm",
+                    "description": "Move, ölçek, döndürme katmanları"
+                },
+                "layerCrop": {
+                    "title": "Katman",
+                    "description": "Seçilmiş tabaka"
+                }
             },
             "name": "Move / Dönüşüm"
         },
         "view": {
             "tools": {
-                "zoom": "Içinde ve dışarıda, pan veya görüntünüzü döndürür"
+                "zoom": {
+                    "title": "Zoom / Pan",
+                    "description": "Içinde ve dışarıda, pan veya görüntünüzü döndürür"
+                }
             },
             "name": "Blood Viewport"
         }

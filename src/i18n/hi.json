@@ -59,7 +59,19 @@
         "updateLayerFilterMask": "अद्यतन परत प्रभाव मास्क",
         "setLayerBoundsToWorkingFileBounds": "खाली स्थान के साथ विस्तार",
         "stretchLayerToWorkingFileBounds": "कैनवास आकार में खिंचाव",
-        "updateTextLayerProperties": "पाठ परत गुण अद्यतन"
+        "updateTextLayerProperties": "पाठ परत गुण अद्यतन",
+        "createShape": "आकार बनाएँ",
+        "createShapeLayer": "आकार परत",
+        "deleteVectorLayerShape": "आकार हटाएं",
+        "moveVectorLayerControlPoints": "वेक्टर परत नियंत्रण बिंदु",
+        "pasteShapes": "पेस्ट आकार (s)",
+        "updateBlurLayer": "ब्लूर लेयर",
+        "updateLayerOpacity": "अस्थिरता",
+        "updateShapeFillColor": "अद्यतन आकार रंग भरें",
+        "updateShapeStrokeColor": "अद्यतन आकार स्ट्रोक रंग",
+        "updateShapeStrokeWidth": "अद्यतन आकार स्ट्रोक चौड़ाई",
+        "updateSharpenLayer": "तीव्र स्तर",
+        "updateVectorLayerAttributes": "अद्यतन वेक्टर परत"
     },
     "app": {
         "colorPickerGradient": {
@@ -102,7 +114,19 @@
             "moveEffectDown": "प्रभाव नीचे ले जाएँ",
             "blendingMode": "मिश्रण",
             "duplicate": "डुप्लिकेट",
-            "rasterizeEffects": "मर्ज ऑल"
+            "rasterizeEffects": "मर्ज ऑल",
+            "opacity": "Opacity",
+            "rasterize": "Rasterize",
+            "iconTitle": {
+                "gradient": "ढाल परत",
+                "group": "ग्रुप लेयर",
+                "empty": "खाली परत",
+                "raster": "रास्टर लेयर",
+                "rasterSequence": "रास्टर अनुक्रम परत",
+                "text": "टेक्स्ट लेयर",
+                "vector": "वेक्टर परत",
+                "video": "वीडियो लेयर"
+            }
         },
         "wait": {
             "applyLayerTransform": "लेयर ट्रांसफॉर्म लागू करना",
@@ -161,7 +185,10 @@
         "reverse": "रिवर्स",
         "back": "वापस",
         "editBrush": "ब्रश संपादित करें",
-        "moreInfo": "अधिक जानकारी"
+        "moreInfo": "अधिक जानकारी",
+        "dontUpdate": "अद्यतन मत करो",
+        "enable": "सक्षम",
+        "updateApp": "ऐप अपडेट करें"
     },
     "canvas": {
         "toolbar": {
@@ -197,7 +224,9 @@
                     "saveAs": "सहेजें",
                     "insertPhoto": "फोटो डालें",
                     "takePhoto": "फोटो",
-                    "restore": "पिछली छवि को पुनर्स्थापित करें"
+                    "restore": "पिछली छवि को पुनर्स्थापित करें",
+                    "shareImage": "शेयर छवि",
+                    "quit": "उद्धरण"
                 }
             },
             "image": {
@@ -255,8 +284,8 @@
                         "2d": "कैनवास 2D",
                         "webgl": "वेब",
                         "webgl2": "WebGL2",
-                        "webgl2Offscreen": "WebGL2 Offscreen",
-                        "wgpuWasm": "WebGPU + WASM"
+                        "webgl2Offscreen": "[UNSTABLE] WebGL2 ऑफस्क्रीन",
+                        "wgpuWasm": "[unstable] WebGPU + WASM"
                     },
                     "optimizeLargeImage": "बड़ी छवि के लिए ऑप्टिमाइज़",
                     "highQualityScaling": "उच्च गुणवत्ता Scaling",
@@ -285,6 +314,12 @@
                     "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename",
                     "webdavUsername": "उपयोगकर्ता नाम",
                     "webdavPassword": "पासवर्ड"
+                },
+                "update": {
+                    "groupTitle": "अपडेट",
+                    "checkForUpdates": "अद्यतन की जाँच करें",
+                    "updateAvailableTitle": "अद्यतन उपलब्ध",
+                    "updateAvailableMessage": "OpenGraphica के लिए अद्यतन उपलब्ध है। क्या आप इसे स्थापित करना चाहते हैं?"
                 }
             }
         }
@@ -749,7 +784,10 @@
                 "falseFloydSteinbergSerpentine": "False Floyd Steinberg (serpentine)",
                 "stucki": "स्टुकी",
                 "stuckiSerpentine": "Stucki (serpentine)"
-            }
+            },
+            "nativeSaveToast": "छवि को दस्तावेज़ फ़ोल्डर में निर्यात किया गया था।.",
+            "svgDisclaimer": "परत प्रभाव, मिश्रण मोड, और अन्य विशेषताएं SVG फ़ाइलों में सही ढंग से प्रदर्शित नहीं हो सकती हैं।.",
+            "maxFileSize": "मैक्स फाइल साइज"
         },
         "fileNew": {
             "title": "नई छवि",
@@ -766,7 +804,8 @@
             "saveBackIntroduction": "आपने {fileName} नामक एक फ़ाइल खोला है।.",
             "saveBackQuestion": "मूल फ़ाइल में वापस सहेजें?",
             "exportDisclaimer": "यदि आप अन्य कार्यक्रमों में छवि साझा करना चाहते हैं, तो इसके बजाय \"Export\" का उपयोग करें।.",
-            "fileName": "फाईल का नाम"
+            "fileName": "फाईल का नाम",
+            "nativeSaveToast": "छवि को दस्तावेज़ फ़ोल्डर में सहेजा गया था।."
         },
         "fileTakePhoto": {
             "title": "फोटो",
@@ -1027,6 +1066,15 @@
             "saveLocalFile": "अपने कंप्यूटर को सहेजें",
             "createFolder": "फ़ोल्डर बनाएं",
             "folderName": "फ़ोल्डर का नाम"
+        },
+        "appUpdate": {
+            "title": "अपडेट",
+            "notificationTitle": "डाउनलोड करना अद्यतन",
+            "notificationMessage": "जब हम अपडेट डाउनलोड करते हैं तो कृपया ऐप को खुला रखें और स्क्रीन पर दिखाई दें।.",
+            "notificationReadyTitle": "अद्यतन तैयार है",
+            "notificationReadyMessage": "जब आप किसी अन्य ऐप में स्विच करते हैं तो अद्यतन स्थापित किया जाएगा।.",
+            "notificationErrorTitle": "अपडेट त्रुटि",
+            "notificationErrorMessage": "अद्यतन डाउनलोड करते समय त्रुटि हुई। बाद में फिर से प्रयास करें।."
         }
     },
     "moduleGroup": {
@@ -1089,6 +1137,10 @@
                 "saveWebdavExplorer": {
                     "name": "छवि सहेजें",
                     "description": "अपने कंप्यूटर या नेटवर्क स्टोरेज में एक छवि सेव करें।."
+                },
+                "shareImage": {
+                    "name": "शेयर छवि",
+                    "description": "वर्तमान छवि आप अन्य लोगों के साथ संपादन कर रहे हैं साझा करें।."
                 }
             }
         },
@@ -1179,6 +1231,20 @@
                 "welcome": {
                     "name": "स्वागत",
                     "description": "एक छवि पर काम करना शुरू करें।."
+                }
+            }
+        },
+        "app": {
+            "name": "ऐप",
+            "description": "ऐप प्रबंधन",
+            "modules": {
+                "clearShareCache": {
+                    "name": "शेयर कैश साफ़ करें",
+                    "description": "पुराने साझा छवि फ़ाइलों को निकालें।."
+                },
+                "update": {
+                    "name": "ऐप अपडेट करें",
+                    "description": "एप्लिकेशन को नई कार्यक्षमता प्राप्त करने के लिए अद्यतन करें।."
                 }
             }
         }
@@ -1365,14 +1431,20 @@
                         "hardness": "कठोरता",
                         "hardnessDescription": "निचले मूल्यों में नरम फीका किनारों और उच्च मूल्यों वाले तेज किनारों होंगे।.",
                         "angle": "कोण",
-                        "angleDescription": "ब्रश आकार को घुमाएं।."
+                        "angleDescription": "ब्रश आकार को घुमाएं।.",
+                        "shape": "आकार",
+                        "shapes": {
+                            "circle": "सर्कल",
+                            "square": "स्क्वायर"
+                        }
                     },
                     "strokePath": {
                         "title": "स्ट्रोक पथ",
                         "spacing": "रिक्ति",
                         "spacingDescription": "ब्रश के प्रत्येक टिकट के बीच की दूरी ब्रश के आकार के सापेक्ष होती है। बेहद कम मानों से सावधान रहें, क्योंकि यह बड़े ब्रश आकार पर टैंक प्रदर्शन कर सकता है।.",
                         "jitter": "जेटर",
-                        "jitterDescription": "यादृच्छिक रूप से ब्रश आकार की स्थिति को बदल देता है।."
+                        "jitterDescription": "यादृच्छिक रूप से ब्रश आकार की स्थिति को बदल देता है।.",
+                        "pixelSnap": "पिक्सेल स्नैप"
                     },
                     "pressure": {
                         "title": "दबाव",
@@ -1380,6 +1452,13 @@
                         "pressureTaperDescription": "उच्च मूल्य कम पेन दबाव पर स्किनी लाइनों को आकर्षित करेगा। कम दबाव में अस्थिर संवेदनशीलता के साथ पेन को नियंत्रित करना आसान बनाता है।.",
                         "pressureMinSize": "न्यूनतम आकार",
                         "pressureMinSizeDescription": "ब्रश का आकार 0% पेन दबाव पर, वर्तमान में चयनित ब्रश आकार के सापेक्ष।."
+                    },
+                    "general": {
+                        "title": "जनरल",
+                        "name": "ब्रश नाम",
+                        "resetDefault": "डिफ़ॉल्ट के लिए रीसेट करें",
+                        "delete": "ब्रश हटाएं",
+                        "addCustomBrush": "कस्टम ब्रश जोड़ें"
                     }
                 },
                 "title": "ब्रश चुनें",
@@ -1408,7 +1487,16 @@
             "brushSmoothing": "चिकनाई"
         },
         "deformBlur": {
-            "brushSize": "आकार"
+            "brushSize": "आकार",
+            "brushOpacity": "Opacity",
+            "brushStrength": "शक्ति",
+            "brushHardness": "कठोरता",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "चयनित कोई परतें नहीं",
+                    "message": "कृपया परतों डॉक में कम से कम एक छवि परत का चयन करें। कुछ परत प्रकारों को धुंधला नहीं किया जा सकता है।."
+                }
+            }
         },
         "drawColorPicker": {
             "title": "रंग पिकर"
@@ -1447,11 +1535,86 @@
             "shapeType": {
                 "label": "आकार",
                 "rectangle": "आयत",
-                "ellipse": "Ellipse"
+                "ellipse": "Ellipse",
+                "circle": "सर्कल",
+                "line": "लाइन",
+                "polyline": "पॉलीलाइन",
+                "polygon": "बहुभुज",
+                "path": "पथ"
             },
             "style": {
                 "label": "शैली"
+            },
+            "newVectorLayerName": "नया आकार",
+            "extendingShape": "आकार बढ़ाना",
+            "fillStyle": {
+                "label": "भरना"
+            },
+            "strokeStyle": {
+                "label": "स्ट्रोक",
+                "width": "चौड़ाई"
+            },
+            "snapping": {
+                "title": "स्नैप करना",
+                "enableSnapping": "स्नैपिंग सक्षम करें",
+                "canvasEdges": "कैनवास एज",
+                "controlPoint": "नियंत्रण बिंदु"
+            },
+            "notification": {
+                "invisibleShape": {
+                    "title": "अदृश्य आकार बनाना",
+                    "message": "आपके वर्तमान भरण और स्ट्रोक रंग दोनों पूरी तरह पारदर्शी हैं। एक नया आकार बनाया नहीं जाएगा।."
+                },
+                "invisibleLine": {
+                    "title": "अदृश्य रेखा बनाना",
+                    "message": "वर्तमान स्ट्रोक रंग पूरी तरह पारदर्शी नहीं होना चाहिए, और स्ट्रोक चौड़ाई 0 से अधिक होना चाहिए।."
+                },
+                "uselessClick": {
+                    "title": "ड्राइंग आकार",
+                    "message": {
+                        "touch": "नई आकृतियों को जोड़ने के लिए अपनी उंगली को खाली क्षेत्र में स्पर्श करें और खींचें।.",
+                        "mouse": "नए आकार जोड़ने के लिए खाली क्षेत्र पर क्लिक करें और खींचें।."
+                    }
+                }
             }
+        },
+        "deformSharpen": {
+            "brushOpacity": "Opacity",
+            "brushSize": "आकार",
+            "brushStrength": "शक्ति",
+            "brushHardness": "कठोरता",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "चयनित कोई परतें नहीं",
+                    "message": "कृपया परतों डॉक में कम से कम एक छवि परत का चयन करें। कुछ परत प्रकारों को तेज नहीं किया जा सकता है।."
+                }
+            }
+        },
+        "drawBucketFill": {
+            "title": "बाल्टी भरें",
+            "brushColor": "रंग",
+            "paletteCount": "पैलेट गणना",
+            "strength": "शक्ति",
+            "feather": "पंख",
+            "settings": "सेटिंग",
+            "antialias": "अंटारिया"
+        },
+        "eraseBucketFill": {
+            "opacity": "Opacity",
+            "strength": "शक्ति",
+            "feather": "पंख",
+            "settings": "सेटिंग",
+            "antialias": "अंटारिया",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "चयनित कोई परतें नहीं",
+                    "message": "कृपया परतों डॉक में कम से कम एक छवि परत का चयन करें। कुछ परत प्रकारों को मिटा नहीं जा सकता है।."
+                }
+            }
+        },
+        "layerOpacity": {
+            "title": "Opacity",
+            "opacity": "Opacity"
         }
     },
     "toolGroup": {
@@ -1466,6 +1629,10 @@
                 "gradient": {
                     "name": "ग्रेडियेंट",
                     "description": "रंगों के बीच चिकनी संक्रमण बनाएँ।."
+                },
+                "bucketFill": {
+                    "name": "बाल्टी भरें",
+                    "description": "इसी तरह के रंग के क्षेत्रों में भरें।."
                 }
             }
         },
@@ -1686,17 +1853,57 @@
         },
         "drawShapeToolIntroduction": {
             "introduction": [
-                "आकृति उपकरण आपको विभिन्न बुनियादी आकृतियों को जोड़ने देता है, जिसे अधिक अनुकूलन की आवश्यकता होने पर वेक्टर पथ में परिवर्तित किया जा सकता है।."
+                "आकार उपकरण आपको विभिन्न बुनियादी आकार और वेक्टर पथ जोड़ने देता है।."
             ],
             "body": {
                 "mouse": [
-                    "क्लिक करें और कैनवास पर एक आकार रखने के लिए खींचें।."
+                    "{add} - कैनवास पर एक आकार रखने के लिए क्लिक करें और खींचें।.",
+                    "{edit} - एक आकार के नियंत्रण बिंदु पर क्लिक करें और जोड़ा गया है के बाद उन्हें आकार संपादित करने के लिए खींचें।."
                 ],
                 "touch": [
-                    "एक उंगली को छूने और कैनवास पर एक आकार रखने के लिए खींचें।."
+                    "{add} - कैनवास पर एक आकार रखने के लिए एक उंगली का प्रयोग करें।.",
+                    "{edit} - एक आकार के नियंत्रण बिंदुओं को टैप करें और जोड़ा जाने के बाद उन्हें आकार संपादित करने के लिए खींचें।."
                 ]
             },
-            "title": "आकार उपकरण"
+            "title": "आकार उपकरण",
+            "bodyTitle": {
+                "add": "जोड़ें",
+                "edit": "संपादित करें"
+            }
+        },
+        "deformSharpenToolIntroduction": {
+            "title": "Sharpen उपकरण",
+            "introduction": [
+                "तेज उपकरण वर्तमान परत के क्षेत्रों को तेज करेगा जो आप आकर्षित करते हैं।."
+            ]
+        },
+        "drawBucketFillToolIntroduction": {
+            "title": "बाल्टी भरें",
+            "introduction": [
+                "बाल्टी भरने वाला उपकरण आपको अपनी पसंद के रंग के साथ समान रंग के क्षेत्रों में भरने देता है।."
+            ],
+            "body": {
+                "mouse": [
+                    "भरने के लिए किसी क्षेत्र पर क्लिक करें। जबकि माउस को नीचे रखते हुए, आप समायोजित करने के लिए बाएं या दाएं को खींच सकते हैं कि क्षेत्र कितने भरा हुआ है।."
+                ],
+                "touch": [
+                    "भरने के लिए किसी क्षेत्र पर टैप करें। जबकि नीचे पकड़ते हुए, आप समायोजित करने के लिए बाएं या दाएं को खींच सकते हैं कि क्षेत्र कितने भरा हुआ है।."
+                ]
+            }
+        },
+        "eraseBucketFillToolIntroduction": {
+            "title": "एरेस बाल्टी भरें",
+            "introduction": [
+                "उस छवि के क्षेत्रों को मिटाना जिसमें समान रंग होता है।."
+            ],
+            "body": {
+                "mouse": [
+                    "मिटाने के लिए किसी क्षेत्र पर क्लिक करें। जबकि माउस को नीचे रखते हुए, आप इस बात को समायोजित करने के लिए बाईं ओर या दाईं ओर खींच सकते हैं कि किस क्षेत्र को मिटा दिया गया है।."
+                ],
+                "touch": [
+                    "किसी क्षेत्र को मिटाने के लिए टैप करें। जबकि नीचे पकड़ते हुए, आप इस बात को समायोजित करने के लिए बाईं ओर या दाईं ओर खींच सकते हैं कि कितने क्षेत्र को मिटा दिया गया है।."
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -1744,7 +1951,8 @@
         "simpleAirBrush": "सरल एयर ब्रश",
         "simplePaintBrush": "सरल पेंट ब्रश",
         "simplePen": "सरल पेन",
-        "simpleWaterColor": "सरल जल रंग"
+        "simpleWaterColor": "सरल जल रंग",
+        "simplePixelArt": "सरल पिक्सेल कला"
     },
     "defaultBrushCategory": {
         "custom": "कस्टम",
@@ -1753,27 +1961,57 @@
     "menuBarToolGroup": {
         "deform": {
             "tools": {
-                "blur": "छवि के ब्लूर विशिष्ट क्षेत्र"
+                "blur": {
+                    "title": "ब्लर",
+                    "description": "छवि के ब्लूर क्षेत्र"
+                },
+                "sharpen": {
+                    "title": "Sharpen",
+                    "description": "छवि के क्षेत्रों को तेज करें"
+                }
             },
             "name": "विकृत"
         },
         "draw": {
             "tools": {
-                "brush": "कला ब्रश के साथ ड्रॉ",
-                "gradient": "रंग की ढाल बनाएँ",
-                "shape": "मूल आकार बनाएं"
+                "brush": {
+                    "title": "ब्रश",
+                    "description": "कला ब्रश के साथ ड्रॉ"
+                },
+                "gradient": {
+                    "title": "ग्रेडियेंट",
+                    "description": "रंग की ढाल बनाएँ"
+                },
+                "shape": {
+                    "title": "आकार",
+                    "description": "मूल आकार बनाएं"
+                },
+                "bucketFill": {
+                    "title": "बाल्टी भरें",
+                    "description": "रंग के साथ क्षेत्रों को भरें"
+                }
             },
             "name": "ड्रा"
         },
         "effect": {
             "tools": {
-                "effect": "परत रंग हेरफेर और फिल्टर प्रभाव जोड़ने"
+                "effect": {
+                    "title": "प्रभाव",
+                    "description": "परत रंग हेरफेर और फिल्टर प्रभाव जोड़ने"
+                }
             },
             "name": "प्रभाव"
         },
         "erase": {
             "tools": {
-                "brush": "ब्रश स्ट्रोक के साथ छवि के क्षेत्र"
+                "brush": {
+                    "title": "एरेस ब्रश",
+                    "description": "ब्रश स्ट्रोक के साथ एरेस"
+                },
+                "bucketFill": {
+                    "title": "एरेस बाल्टी भरें",
+                    "description": "समान रंग के साथ मिटा क्षेत्र"
+                }
             },
             "name": "एरेस"
         },
@@ -1782,7 +2020,10 @@
         },
         "selection": {
             "tools": {
-                "selection": "संपादित करने, काटने, प्रतिलिपि करने या हटाने के लिए छवि के specifc क्षेत्रों का चयन करें"
+                "selection": {
+                    "title": "चयन",
+                    "description": "संपादित करने, काटने, प्रतिलिपि करने या हटाने के लिए छवि के specifc क्षेत्रों का चयन करें"
+                }
             },
             "name": "चयन"
         },
@@ -1791,20 +2032,32 @@
         },
         "text": {
             "tools": {
-                "text": "पाठ परतों को सम्मिलित और संपादित करें"
+                "text": {
+                    "title": "पाठ",
+                    "description": "पाठ परतों को सम्मिलित और संपादित करें"
+                }
             },
             "name": "पाठ"
         },
         "transform": {
             "tools": {
-                "freeTransform": "ले जाएँ, पैमाने, बारी बारी बारी परतें",
-                "layerCrop": "चयनित परत फसल"
+                "freeTransform": {
+                    "title": "फ्री ट्रांसफॉर्म",
+                    "description": "ले जाएँ, पैमाने, बारी बारी बारी परतें"
+                },
+                "layerCrop": {
+                    "title": "परत फसल",
+                    "description": "चयनित परत फसल"
+                }
             },
             "name": "मूव / ट्रांसफॉर्म"
         },
         "view": {
             "tools": {
-                "zoom": "ज़ूम इन और आउट, पैन, या छवि के अपने दृश्य को घुमाएं"
+                "zoom": {
+                    "title": "ज़ूम / पैन",
+                    "description": "ज़ूम इन और आउट, पैन, या छवि के अपने दृश्य को घुमाएं"
+                }
             },
             "name": "कैनवास Viewport"
         }

@@ -59,7 +59,19 @@
         "updateLayerFilterMask": "更新图层效果遮盖",
         "setLayerBoundsToWorkingFileBounds": "以空格展开",
         "stretchLayerToWorkingFileBounds": "伸展到帆布大小",
-        "updateTextLayerProperties": "更新文本层属性"
+        "updateTextLayerProperties": "更新文本层属性",
+        "createShape": "创建形状",
+        "createShapeLayer": "创建形状图层",
+        "deleteVectorLayerShape": "删除形状",
+        "moveVectorLayerControlPoints": "移动矢量层控制点",
+        "pasteShapes": "粘贴形状",
+        "updateBlurLayer": "模糊层",
+        "updateLayerOpacity": "改变不透明度",
+        "updateShapeFillColor": "更新形状填充颜色",
+        "updateShapeStrokeColor": "更新形状弦颜色",
+        "updateShapeStrokeWidth": "更新形状弦宽",
+        "updateSharpenLayer": "锐化层",
+        "updateVectorLayerAttributes": "更新矢量层"
     },
     "app": {
         "colorPickerGradient": {
@@ -102,7 +114,19 @@
             "moveEffectDown": "向下移动效果",
             "blendingMode": "组合",
             "duplicate": "复制",
-            "rasterizeEffects": "全部合并"
+            "rasterizeEffects": "全部合并",
+            "opacity": "不透明度",
+            "rasterize": "稀释",
+            "iconTitle": {
+                "gradient": "渐变层",
+                "group": "组层",
+                "empty": "空层",
+                "raster": "光滑层",
+                "rasterSequence": "鼠标序列图层",
+                "text": "文本层",
+                "vector": "矢量层",
+                "video": "视频层"
+            }
         },
         "wait": {
             "applyLayerTransform": "应用图层变换",
@@ -161,7 +185,10 @@
         "reverse": "反转",
         "back": "回来",
         "editBrush": "编辑笔刷",
-        "moreInfo": "更多信息"
+        "moreInfo": "更多信息",
+        "dontUpdate": "不要更新",
+        "enable": "启用",
+        "updateApp": "更新 App"
     },
     "canvas": {
         "toolbar": {
@@ -197,7 +224,9 @@
                     "saveAs": "另存为",
                     "insertPhoto": "插入相片",
                     "takePhoto": "照张相",
-                    "restore": "恢复上一个图像"
+                    "restore": "恢复上一个图像",
+                    "shareImage": "共享图像",
+                    "quit": "退出"
                 }
             },
             "image": {
@@ -255,8 +284,8 @@
                         "2d": "二维相机",
                         "webgl": "网络GL",
                         "webgl2": "网络GL2",
-                        "webgl2Offscreen": "WebGL2 显示屏外",
-                        "wgpuWasm": "网络GPU + WASM"
+                        "webgl2Offscreen": "[失效] WebGL2 屏幕外",
+                        "wgpuWasm": "[不 网络GPU + 瓦斯"
                     },
                     "optimizeLargeImage": "大图像优化",
                     "highQualityScaling": "高质量放大",
@@ -285,6 +314,12 @@
                     "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename (中文(简体) )",
                     "webdavUsername": "用户名",
                     "webdavPassword": "密码"
+                },
+                "update": {
+                    "groupTitle": "更新",
+                    "checkForUpdates": "检查更新",
+                    "updateAvailableTitle": "更新可用",
+                    "updateAvailableMessage": "OpenGraphica的更新版本可供查阅. 你想安装它吗?"
                 }
             }
         }
@@ -748,7 +783,10 @@
                 "falseFloydSteinbergSerpentine": "False Floyd Steinberg (蛇门) (蛇门花花)",
                 "stucki": "斯图克",
                 "stuckiSerpentine": "Stucki (蛇门)"
-            }
+            },
+            "nativeSaveToast": "图像被导出到文档文件夹 .",
+            "svgDisclaimer": "层效应,混合模式,以及其他特性可能无法在SVG文件中正确显示.",
+            "maxFileSize": "最大文件大小"
         },
         "fileNew": {
             "title": "新图像",
@@ -764,7 +802,8 @@
             "title": "另存图像为",
             "saveBackQuestion": "保存到原始文件吗 ?",
             "exportDisclaimer": "如果您想在其他程序中共享或查看图像,请使用\"Export\"代替.",
-            "fileName": "文件名称"
+            "fileName": "文件名称",
+            "nativeSaveToast": "图像被保存到文档文件夹 ."
         },
         "fileTakePhoto": {
             "title": "拍摄照片",
@@ -1025,6 +1064,15 @@
             "saveLocalFile": "保存到您的计算机",
             "createFolder": "创建文件夹",
             "folderName": "文件夹名称"
+        },
+        "appUpdate": {
+            "title": "更新",
+            "notificationTitle": "下载更新",
+            "notificationMessage": "下载更新时请保持应用程序在屏幕上的开放和可见.",
+            "notificationReadyTitle": "更新已就绪",
+            "notificationReadyMessage": "当您切换到另一个应用程序时, 更新将被安装 .",
+            "notificationErrorTitle": "更新错误",
+            "notificationErrorMessage": "下载更新时发生错误 。 请稍候再试."
         }
     },
     "moduleGroup": {
@@ -1087,6 +1135,10 @@
                 "saveWebdavExplorer": {
                     "name": "保存图像",
                     "description": "保存图像到您的计算机或网络存储中 ."
+                },
+                "shareImage": {
+                    "name": "共享图像",
+                    "description": "与其他人分享您正在编辑的当前图像 ."
                 }
             }
         },
@@ -1177,6 +1229,20 @@
                 "welcome": {
                     "name": "欢迎",
                     "description": "开始研究一个图像."
+                }
+            }
+        },
+        "app": {
+            "name": "应用",
+            "description": "应用管理",
+            "modules": {
+                "clearShareCache": {
+                    "name": "清除共享缓存",
+                    "description": "删除旧的共享图像文件 ."
+                },
+                "update": {
+                    "name": "更新 App",
+                    "description": "更新应用程序以接收新功能 ."
                 }
             }
         }
@@ -1362,14 +1428,20 @@
                         "hardness": "硬度",
                         "hardnessDescription": "较低的值会有柔软的淡出边缘,较高的值会有锐利的边缘.",
                         "angle": "角度",
-                        "angleDescription": "旋转刷子形状."
+                        "angleDescription": "旋转刷子形状.",
+                        "shape": "形状",
+                        "shapes": {
+                            "circle": "圆形",
+                            "square": "方块"
+                        }
                     },
                     "strokePath": {
                         "title": "中键路径",
                         "spacing": "间距",
                         "spacingDescription": "刷子的每个印章之间的距离,相对于刷子大小. 注意极低的值,因为它可以在更大的刷子尺寸上装箱性能.",
                         "jitter": "抖动",
-                        "jitterDescription": "随机移动刷子形状的位置."
+                        "jitterDescription": "随机移动刷子形状的位置.",
+                        "pixelSnap": "像素坐标"
                     },
                     "pressure": {
                         "title": "压力",
@@ -1377,6 +1449,13 @@
                         "pressureTaperDescription": "在笔压较低时,较高的数值将绘制更光线。 使得在低压下控制不稳定敏感度的笔更容易.",
                         "pressureMinSize": "最小尺寸",
                         "pressureMinSizeDescription": "相对于目前选中的刷子大小, 笔压为0% 的刷子大小 ."
+                    },
+                    "general": {
+                        "title": "常规",
+                        "name": "刷子名称",
+                        "resetDefault": "重置为默认",
+                        "delete": "删除笔刷",
+                        "addCustomBrush": "添加自定义笔刷"
                     }
                 },
                 "title": "选择笔刷",
@@ -1405,7 +1484,16 @@
             "brushSmoothing": "滑动"
         },
         "deformBlur": {
-            "brushSize": "大小"
+            "brushSize": "大小",
+            "brushOpacity": "不透明度",
+            "brushStrength": "强度",
+            "brushHardness": "硬度",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "未选择图层",
+                    "message": "请在层对接处至少选择一个图像层 。 某些层型不能模糊."
+                }
+            }
         },
         "drawColorPicker": {
             "title": "颜色拾取器"
@@ -1444,11 +1532,86 @@
             "shapeType": {
                 "label": "形状",
                 "rectangle": "矩形",
-                "ellipse": "椭圆"
+                "ellipse": "椭圆",
+                "circle": "圆形",
+                "line": "行线",
+                "polyline": "复线",
+                "polygon": "多边形",
+                "path": "路径"
             },
             "style": {
                 "label": "样式"
+            },
+            "newVectorLayerName": "新形状",
+            "extendingShape": "扩展形状",
+            "fillStyle": {
+                "label": "填充"
+            },
+            "strokeStyle": {
+                "label": "键",
+                "width": "宽度"
+            },
+            "snapping": {
+                "title": "抓图",
+                "enableSnapping": "启用抓取",
+                "canvasEdges": "帆布边缘",
+                "controlPoint": "控制点"
+            },
+            "notification": {
+                "invisibleShape": {
+                    "title": "创建无形形状",
+                    "message": "您目前的填充和中风颜色都完全透明。 将不创建新形状 ."
+                },
+                "invisibleLine": {
+                    "title": "创建隐形线",
+                    "message": "当前中风颜色不能完全透明,中风宽度必须大于0."
+                },
+                "uselessClick": {
+                    "title": "绘制形状",
+                    "message": {
+                        "touch": "触摸并拖动手指到空区域来添加新的形状.",
+                        "mouse": "单击并拖动空区域添加新形状."
+                    }
+                }
             }
+        },
+        "deformSharpen": {
+            "brushOpacity": "不透明度",
+            "brushSize": "大小",
+            "brushStrength": "强度",
+            "brushHardness": "硬度",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "未选择图层",
+                    "message": "请在层对接处至少选择一个图像层 。 某些层型不能磨磨."
+                }
+            }
+        },
+        "drawBucketFill": {
+            "title": "装填桶",
+            "brushColor": "颜色",
+            "paletteCount": "调色板计数",
+            "strength": "强度",
+            "feather": "羽毛",
+            "settings": "设置",
+            "antialias": "反异形"
+        },
+        "eraseBucketFill": {
+            "opacity": "不透明度",
+            "strength": "强度",
+            "feather": "羽毛",
+            "settings": "设置",
+            "antialias": "反异形",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "未选择图层",
+                    "message": "请在层对接处至少选择一个图像层 。 某些层型不能被抹去."
+                }
+            }
+        },
+        "layerOpacity": {
+            "title": "不透明度",
+            "opacity": "不透明度"
         }
     },
     "toolGroup": {
@@ -1463,6 +1626,10 @@
                 "gradient": {
                     "name": "渐变",
                     "description": "创建颜色之间的平滑转换 ."
+                },
+                "bucketFill": {
+                    "name": "装填桶",
+                    "description": "填充类似颜色的区域."
                 }
             }
         },
@@ -1683,17 +1850,57 @@
         },
         "drawShapeToolIntroduction": {
             "introduction": [
-                "形状工具允许您添加各种基本形状,如果需要更多的定制,这些形状可以转换成矢量路径."
+                "形状工具允许您添加各种基本形状和矢量路径."
             ],
             "body": {
                 "mouse": [
-                    "单击并拖动将形状放置在画布上 ."
+                    null,
+                    null
                 ],
                 "touch": [
-                    "用一根手指来触摸和拖动,在画布上放置一个形状."
+                    null,
+                    null
                 ]
             },
-            "title": "形状工具"
+            "title": "形状工具",
+            "bodyTitle": {
+                "add": "添加",
+                "edit": "编辑"
+            }
+        },
+        "deformSharpenToolIntroduction": {
+            "title": "锐化工具",
+            "introduction": [
+                "磨合工具将磨合您当前图层的区域 ."
+            ]
+        },
+        "drawBucketFillToolIntroduction": {
+            "title": "装填桶",
+            "introduction": [
+                "桶填充工具允许您用您选择的颜色填充类似颜色的区域 ."
+            ],
+            "body": {
+                "mouse": [
+                    "单击要填充的区域。 在按住鼠标时,可以向左或右拖动以调整填充区域的数量."
+                ],
+                "touch": [
+                    "点击一个区域来填充。 在按住时,可以向左或右拖动,以调整填充多少区域."
+                ]
+            }
+        },
+        "eraseBucketFillToolIntroduction": {
+            "title": "擦除桶装",
+            "introduction": [
+                "擦除图像中颜色相似的区域."
+            ],
+            "body": {
+                "mouse": [
+                    "单击要删除的区域。 在按住鼠标时,可以向左或右拖动以调整该区被擦除的多少."
+                ],
+                "touch": [
+                    "进入一个区域以清除。 在按住时,可以拖动到左或右,以调整被擦除的面积."
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -1741,7 +1948,8 @@
         "simpleAirBrush": "简单的空气刷",
         "simplePaintBrush": "简单画笔",
         "simplePen": "简单的笔",
-        "simpleWaterColor": "简单的水颜色"
+        "simpleWaterColor": "简单的水颜色",
+        "simplePixelArt": "简单的像素 艺术"
     },
     "defaultBrushCategory": {
         "custom": "自定义",
@@ -1750,27 +1958,57 @@
     "menuBarToolGroup": {
         "deform": {
             "tools": {
-                "blur": "模糊图像的特定区域"
+                "blur": {
+                    "title": "模糊",
+                    "description": "图像模糊区域"
+                },
+                "sharpen": {
+                    "title": "锐化",
+                    "description": "图像的锐化区域"
+                }
             },
             "name": "变形"
         },
         "draw": {
             "tools": {
-                "brush": "用画笔画画",
-                "gradient": "创建颜色的渐变",
-                "shape": "创建基本形状"
+                "brush": {
+                    "title": "笔刷",
+                    "description": "用画笔画画"
+                },
+                "gradient": {
+                    "title": "渐变",
+                    "description": "创建颜色的渐变"
+                },
+                "shape": {
+                    "title": "形状",
+                    "description": "创建基本形状"
+                },
+                "bucketFill": {
+                    "title": "装填桶",
+                    "description": "用颜色填充区域"
+                }
             },
             "name": "绘制"
         },
         "effect": {
             "tools": {
-                "effect": "操纵图层颜色并添加过滤效果"
+                "effect": {
+                    "title": "效果",
+                    "description": "操纵图层颜色并添加过滤效果"
+                }
             },
             "name": "效果"
         },
         "erase": {
             "tools": {
-                "brush": "用笔划擦除图像区域"
+                "brush": {
+                    "title": "擦除笔刷",
+                    "description": "用笔划擦掉"
+                },
+                "bucketFill": {
+                    "title": "擦除桶装",
+                    "description": "擦除颜色相似的区域"
+                }
             },
             "name": "擦除"
         },
@@ -1779,7 +2017,10 @@
         },
         "selection": {
             "tools": {
-                "selection": "选择图像的指定区域以编辑、剪切、复制或删除"
+                "selection": {
+                    "title": "选择",
+                    "description": "选择图像的指定区域以编辑、剪切、复制或删除"
+                }
             },
             "name": "选择"
         },
@@ -1788,20 +2029,32 @@
         },
         "text": {
             "tools": {
-                "text": "插入和编辑文本层"
+                "text": {
+                    "title": "文本",
+                    "description": "插入和编辑文本层"
+                }
             },
             "name": "文本"
         },
         "transform": {
             "tools": {
-                "freeTransform": "移动、缩放、旋转层",
-                "layerCrop": "裁剪选中的图层"
+                "freeTransform": {
+                    "title": "自由变形",
+                    "description": "移动、缩放、旋转层"
+                },
+                "layerCrop": {
+                    "title": "层裁剪",
+                    "description": "裁剪选中的图层"
+                }
             },
             "name": "移动/ 变形"
         },
         "view": {
             "tools": {
-                "zoom": "缩放、 平板或旋转图像视图"
+                "zoom": {
+                    "title": "缩放/ 泛",
+                    "description": "缩放、 平板或旋转图像视图"
+                }
             },
             "name": "Canvas 视图端口"
         }

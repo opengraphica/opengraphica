@@ -59,7 +59,19 @@
         "updateLayerFilterMask": "دانلود بازی Layer Effect Mask",
         "setLayerBoundsToWorkingFileBounds": "گسترش با فضای خالی",
         "stretchLayerToWorkingFileBounds": "کشش به اندازه بوم",
-        "updateTextLayerProperties": "به روز رسانی Text Layer Properties"
+        "updateTextLayerProperties": "به روز رسانی Text Layer Properties",
+        "createShape": "ایجاد شکل",
+        "createShapeLayer": "Create Layer",
+        "deleteVectorLayerShape": "دانلود فیلم Leave Shape",
+        "moveVectorLayerControlPoints": "نقاط کنترل لایه Move Vector Layer Control Points",
+        "pasteShapes": "Paste Shape (s)",
+        "updateBlurLayer": "لایه Blur Layer",
+        "updateLayerOpacity": "تغییر Opacity",
+        "updateShapeFillColor": "دانلود بازی Shape Fill Color",
+        "updateShapeStrokeColor": "به روز رسانی Shape Stroke Color",
+        "updateShapeStrokeWidth": "به روز رسانی Shape Stroke عرض",
+        "updateSharpenLayer": "لایه شارپ",
+        "updateVectorLayerAttributes": "به روز رسانی Layer"
     },
     "app": {
         "colorPickerGradient": {
@@ -102,7 +114,19 @@
             "moveEffectDown": "حرکت اثر Down",
             "blendingMode": "Blending",
             "duplicate": "تکراری",
-            "rasterizeEffects": "دانلود آهنگ Merge All"
+            "rasterizeEffects": "دانلود آهنگ Merge All",
+            "opacity": "Opacity",
+            "rasterize": "Rasterize",
+            "iconTitle": {
+                "gradient": "لایه Gradient Layer",
+                "group": "گروه Layer",
+                "empty": "لایه خالی",
+                "raster": "لایه Raster Layer",
+                "rasterSequence": "Raster Sequence Layer",
+                "text": "Layer",
+                "vector": "لایه بردار Layer",
+                "video": "لایه ویدئو Layer"
+            }
         },
         "wait": {
             "applyLayerTransform": "استفاده از Layer Transform",
@@ -161,7 +185,10 @@
         "reverse": "معکوس",
         "back": "بازگشت",
         "editBrush": "Edit Brush",
-        "moreInfo": "اطلاعات بیشتر"
+        "moreInfo": "اطلاعات بیشتر",
+        "dontUpdate": "به روز رسانی نکنید",
+        "enable": "گزینه Enable",
+        "updateApp": "Update App"
     },
     "canvas": {
         "toolbar": {
@@ -197,7 +224,9 @@
                     "saveAs": "صرفه جویی در",
                     "insertPhoto": "وارد کردن یک عکس",
                     "takePhoto": "یک عکس بگیرید",
-                    "restore": "آخرین تصویر"
+                    "restore": "آخرین تصویر",
+                    "shareImage": "Share Image",
+                    "quit": "استعفا"
                 }
             },
             "image": {
@@ -255,7 +284,7 @@
                         "2d": "بوم 2D",
                         "webgl": "WebGL",
                         "webgl2": "WebGL2",
-                        "webgl2Offscreen": "WebGL2 Offscreen",
+                        "webgl2Offscreen": "[UNSTABLE] WebGL2 Offscreen",
                         "wgpuWasm": "WebGPU + WASM"
                     },
                     "optimizeLargeImage": "بهینه سازی برای تصویر بزرگ",
@@ -285,6 +314,12 @@
                     "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename",
                     "webdavUsername": "Username",
                     "webdavPassword": "Password"
+                },
+                "update": {
+                    "groupTitle": "Update",
+                    "checkForUpdates": "بررسی برای Updates",
+                    "updateAvailableTitle": "Update",
+                    "updateAvailableMessage": "به روز رسانی OpenGraphica در دسترس است. دوست دارید آن را نصب کنید؟?"
                 }
             }
         }
@@ -748,7 +783,10 @@
                 "falseFloydSteinbergSerpentine": "False Floyd Steinberg (serpentine)",
                 "stucki": "Stucki",
                 "stuckiSerpentine": "Stucki (serpentine)"
-            }
+            },
+            "nativeSaveToast": "تصویر به پوشه اسناد صادر شد.",
+            "svgDisclaimer": "اثرات لایه، حالت های مخلوط و سایر ویژگی ها ممکن است به درستی در فایل های SVG نمایش داده نشود.",
+            "maxFileSize": "Max File"
         },
         "fileNew": {
             "title": "تصویر جدید",
@@ -764,7 +802,8 @@
             "title": "Save Image",
             "saveBackQuestion": "بازگشت به فایل اصلی?",
             "exportDisclaimer": "اگر می خواهید تصویر را در برنامه های دیگر به اشتراک بگذارید یا مشاهده کنید، به جای آن از “Export” استفاده کنید.",
-            "fileName": "نام فایل"
+            "fileName": "نام فایل",
+            "nativeSaveToast": "تصویر در پوشه اسناد ذخیره شده است."
         },
         "fileTakePhoto": {
             "title": "عکس بگیرید",
@@ -1025,6 +1064,15 @@
             "saveLocalFile": "ذخیره کامپیوتر شما",
             "createFolder": "ایجاد Folder",
             "folderName": "نام پوشه"
+        },
+        "appUpdate": {
+            "title": "Update",
+            "notificationTitle": "دانلود بازی Update",
+            "notificationMessage": "لطفا برنامه را باز و قابل مشاهده بر روی صفحه نمایش در حالی که ما به روز رسانی دانلود کنید.",
+            "notificationReadyTitle": "به روز رسانی آماده",
+            "notificationReadyMessage": "به روز رسانی زمانی نصب خواهد شد که شما به یک برنامه دیگر تغییر دهید.",
+            "notificationErrorTitle": "خطای به روز رسانی",
+            "notificationErrorMessage": "یک خطا در هنگام دانلود به روز رسانی رخ داد. لطفا دوباره امتحان کنید."
         }
     },
     "moduleGroup": {
@@ -1087,6 +1135,10 @@
                 "saveWebdavExplorer": {
                     "name": "Save Image",
                     "description": "یک تصویر را به کامپیوتر یا ذخیره سازی شبکه خود ذخیره کنید."
+                },
+                "shareImage": {
+                    "name": "Share Image",
+                    "description": "تصویر فعلی را که با دیگران ویرایش می کنید به اشتراک بگذارید."
                 }
             }
         },
@@ -1177,6 +1229,20 @@
                 "welcome": {
                     "name": "خوش آمدید خوش آمدید",
                     "description": "شروع به کار بر روی یک تصویر کنید."
+                }
+            }
+        },
+        "app": {
+            "name": "App",
+            "description": "App Management",
+            "modules": {
+                "clearShareCache": {
+                    "name": "دانلود بازی Clear Share",
+                    "description": "فایل های تصویر مشترک قدیمی را حذف کنید."
+                },
+                "update": {
+                    "name": "Update App",
+                    "description": "برنامه را برای دریافت قابلیت های جدید به روز کنید."
                 }
             }
         }
@@ -1362,14 +1428,20 @@
                         "hardness": "سختی Hard",
                         "hardnessDescription": "مقادیر پایین لبه های نرم و مقادیر بالاتر لبه های تیز دارند.",
                         "angle": "زاویه",
-                        "angleDescription": "شکل قلم را بچرخاند."
+                        "angleDescription": "شکل قلم را بچرخاند.",
+                        "shape": "شکل Shape",
+                        "shapes": {
+                            "circle": "Circle",
+                            "square": "Square"
+                        }
                     },
                     "strokePath": {
                         "title": "راه هدایت",
                         "spacing": "Spacing",
                         "spacingDescription": "فاصله بین هر تمبر برس، نسبت به اندازه برس. با ارزش های بسیار پایین دقت کنید، زیرا می تواند عملکرد را بر روی اندازه های بزرگتر قلم مو ذخیره کند.",
                         "jitter": "دانلود موسیقی متن فیلم Theitter",
-                        "jitterDescription": "به طور تصادفی موقعیت شکل قلم را تغییر می دهد."
+                        "jitterDescription": "به طور تصادفی موقعیت شکل قلم را تغییر می دهد.",
+                        "pixelSnap": "Pixel"
                     },
                     "pressure": {
                         "title": "فشار",
@@ -1377,6 +1449,13 @@
                         "pressureTaperDescription": "ارزش های بالاتر خطوط پوست را در فشار قلم پایین تر جذب می کنند. کنترل قلم با حساسیت ناپایدار در فشارهای پایین تر را آسان تر می کند.",
                         "pressureMinSize": "حداقل اندازه",
                         "pressureMinSizeDescription": "اندازه قلم در فشار قلم 0٪، نسبت به اندازه قلم در حال حاضر انتخاب شده است."
+                    },
+                    "general": {
+                        "title": "ژنرال عمومی",
+                        "name": "نام : Brush Name",
+                        "resetDefault": "تنظیم مجدد برای شکست",
+                        "delete": "حذف قلم",
+                        "addCustomBrush": "Add Custom Brush"
                     }
                 },
                 "title": "گزینه Brush",
@@ -1405,7 +1484,16 @@
             "brushSmoothing": "صاف کردن"
         },
         "deformBlur": {
-            "brushSize": "اندازه"
+            "brushSize": "اندازه",
+            "brushOpacity": "Opacity",
+            "brushStrength": "قدرت",
+            "brushHardness": "سختی Hard",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "هیچ لایه ای انتخاب نشده",
+                    "message": "لطفا حداقل یک لایه تصویر را در لوله لایه انتخاب کنید. انواع لایه های خاص نمی توانند تار شوند."
+                }
+            }
         },
         "drawColorPicker": {
             "title": "Color Picker"
@@ -1444,11 +1532,86 @@
             "shapeType": {
                 "label": "شکل Shape",
                 "rectangle": "درگیری",
-                "ellipse": "Ellipse"
+                "ellipse": "Ellipse",
+                "circle": "Circle",
+                "line": "خط",
+                "polyline": "Polyline",
+                "polygon": "Polygon",
+                "path": "مسیر راه"
             },
             "style": {
                 "label": "سبک Style"
+            },
+            "newVectorLayerName": "New Shape",
+            "extendingShape": "گسترش شکل",
+            "fillStyle": {
+                "label": "پر کردن"
+            },
+            "strokeStyle": {
+                "label": "سکته مغزی",
+                "width": "عرض"
+            },
+            "snapping": {
+                "title": "Snapping",
+                "enableSnapping": "قابلیت Snapping",
+                "canvasEdges": "بوم Edges",
+                "controlPoint": "کنترل Point"
+            },
+            "notification": {
+                "invisibleShape": {
+                    "title": "ایجاد شکل نامرئی",
+                    "message": "هر دو رنگ پر و سکته شما کاملا شفاف هستند. شکل جدیدی ایجاد نخواهد شد."
+                },
+                "invisibleLine": {
+                    "title": "ایجاد خط نامرئی",
+                    "message": "رنگ حرکتی فعلی نباید کاملا شفاف باشد و عرض سکته باید بیشتر از 0 باشد."
+                },
+                "uselessClick": {
+                    "title": "سازنده : Shapes",
+                    "message": {
+                        "touch": "لمس کنید و انگشت خود را بر روی یک منطقه خالی بکشید تا شکل های جدید اضافه کنید.",
+                        "mouse": "روی یک منطقه خالی کلیک کنید تا شکل های جدید اضافه کنید."
+                    }
+                }
             }
+        },
+        "deformSharpen": {
+            "brushOpacity": "Opacity",
+            "brushSize": "اندازه",
+            "brushStrength": "قدرت",
+            "brushHardness": "سختی Hard",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "هیچ لایه ای انتخاب نشده",
+                    "message": "لطفا حداقل یک لایه تصویر را در لوله لایه انتخاب کنید. انواع لایه های خاص را نمی توان تیز کرد."
+                }
+            }
+        },
+        "drawBucketFill": {
+            "title": "سطل پر",
+            "brushColor": "رنگ رنگی",
+            "paletteCount": "پالت شمارش",
+            "strength": "قدرت",
+            "feather": "دانلود آهنگ Britney",
+            "settings": "تنظیمات",
+            "antialias": "Antialias"
+        },
+        "eraseBucketFill": {
+            "opacity": "Opacity",
+            "strength": "قدرت",
+            "feather": "دانلود آهنگ Britney",
+            "settings": "تنظیمات",
+            "antialias": "Antialias",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "هیچ لایه ای انتخاب نشده",
+                    "message": "لطفا حداقل یک لایه تصویر را در لوله لایه انتخاب کنید. انواع لایه های خاص را نمی توان پاک کرد."
+                }
+            }
+        },
+        "layerOpacity": {
+            "title": "Opacity",
+            "opacity": "Opacity"
         }
     },
     "toolGroup": {
@@ -1463,6 +1626,10 @@
                 "gradient": {
                     "name": "Gradient",
                     "description": "ایجاد انتقال صاف بین رنگ ها."
+                },
+                "bucketFill": {
+                    "name": "سطل پر",
+                    "description": "در مناطق رنگی مشابه پر کنید."
                 }
             }
         },
@@ -1683,17 +1850,57 @@
         },
         "drawShapeToolIntroduction": {
             "introduction": [
-                "ابزار شکل به شما اجازه می دهد شکل های پایه مختلف را اضافه کنید، که می تواند در صورت نیاز به سفارشی سازی بیشتر به مسیر بردار تبدیل شود."
+                "ابزار شکل به شما اجازه می دهد تا شکل های پایه مختلف و مسیرهای بردار را اضافه کنید."
             ],
             "body": {
                 "mouse": [
-                    "کلیک کنید و بکشید تا یک شکل را روی بوم قرار دهید."
+                    null,
+                    null
                 ],
                 "touch": [
-                    "از یک انگشت برای لمس و کشیدن برای قرار دادن یک شکل بر روی بوم استفاده کنید."
+                    null,
+                    null
                 ]
             },
-            "title": "ابزار Shape Tool"
+            "title": "ابزار Shape Tool",
+            "bodyTitle": {
+                "add": "Add",
+                "edit": "ویرایش Edit"
+            }
+        },
+        "deformSharpenToolIntroduction": {
+            "title": "ابزار شارپ",
+            "introduction": [
+                "ابزار تیز کردن زمینه های لایه فعلی که شما بر روی آن قرار می دهید را تیز می کند."
+            ]
+        },
+        "drawBucketFillToolIntroduction": {
+            "title": "سطل پر",
+            "introduction": [
+                "ابزار پر کردن سطل به شما اجازه می دهد تا مناطق رنگی مشابه را با رنگ انتخابی خود پر کنید."
+            ],
+            "body": {
+                "mouse": [
+                    "روی یک منطقه کلیک کنید تا پر شود. در حالی که نگه داشتن ماوس، شما می توانید به سمت چپ یا راست بکشید تا تنظیم کنید که چقدر از منطقه پر شده است."
+                ],
+                "touch": [
+                    "روی یک منطقه ضربه بزنید تا پر شود. در حالی که پایین نگه دارید، می توانید به سمت چپ یا راست بکشید تا تنظیم کنید که چقدر از منطقه پر شده است."
+                ]
+            }
+        },
+        "eraseBucketFillToolIntroduction": {
+            "title": "دانلود بازی Erase Fill",
+            "introduction": [
+                "مناطق Erase از تصویر که رنگ مشابهی دارند."
+            ],
+            "body": {
+                "mouse": [
+                    "روی یک منطقه کلیک کنید تا پاک شود. در حالی که نگه داشتن ماوس، شما می توانید به سمت چپ یا راست بکشید تا تنظیم کنید که چقدر از منطقه پاک شده است."
+                ],
+                "touch": [
+                    "روی یک منطقه ضربه بزنید تا پاک شود. در حالی که پایین نگه دارید، می توانید به سمت چپ یا راست بکشید تا تنظیم کنید که چقدر از منطقه پاک شده است."
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -1741,7 +1948,8 @@
         "simpleAirBrush": "ساده Air Brush",
         "simplePaintBrush": "Simple Paint Brush",
         "simplePen": "ساده Pen",
-        "simpleWaterColor": "رنگ آب ساده"
+        "simpleWaterColor": "رنگ آب ساده",
+        "simplePixelArt": "ساده Pixel هنر هنر هنر"
     },
     "defaultBrushCategory": {
         "custom": "سفارشی",
@@ -1750,27 +1958,57 @@
     "menuBarToolGroup": {
         "deform": {
             "tools": {
-                "blur": "مناطق خاص Blur از تصویر"
+                "blur": {
+                    "title": "Blur",
+                    "description": "مناطق Blur از تصویر"
+                },
+                "sharpen": {
+                    "title": "شارپ",
+                    "description": "مناطق شارپ از تصویر"
+                }
             },
             "name": "Deform"
         },
         "draw": {
             "tools": {
-                "brush": "طراحی با برس های هنری",
-                "gradient": "ایجاد گرادیان رنگ",
-                "shape": "ایجاد شکل های پایه"
+                "brush": {
+                    "title": "مسواک",
+                    "description": "طراحی با برس های هنری"
+                },
+                "gradient": {
+                    "title": "Gradient",
+                    "description": "ایجاد گرادیان رنگ"
+                },
+                "shape": {
+                    "title": "شکل Shape",
+                    "description": "ایجاد شکل های پایه"
+                },
+                "bucketFill": {
+                    "title": "سطل پر",
+                    "description": "پر کردن مناطق با رنگ"
+                }
             },
             "name": "Draw"
         },
         "effect": {
             "tools": {
-                "effect": "رنگ های لایه Manipulate و اضافه کردن اثرات فیلتر"
+                "effect": {
+                    "title": "اثر",
+                    "description": "رنگ های لایه Manipulate و اضافه کردن اثرات فیلتر"
+                }
             },
             "name": "اثر"
         },
         "erase": {
             "tools": {
-                "brush": "مناطق Erase از تصویر با حرکت برس"
+                "brush": {
+                    "title": "Erase Brush",
+                    "description": "Erase با حرکت برس"
+                },
+                "bucketFill": {
+                    "title": "دانلود بازی Erase Fill",
+                    "description": "مناطق Erase با رنگ های مشابه"
+                }
             },
             "name": "Erase"
         },
@@ -1779,7 +2017,10 @@
         },
         "selection": {
             "tools": {
-                "selection": "انتخاب مناطق ipifc تصویر برای ویرایش، برش، کپی یا حذف"
+                "selection": {
+                    "title": "انتخاب",
+                    "description": "انتخاب مناطق ipifc تصویر برای ویرایش، برش، کپی یا حذف"
+                }
             },
             "name": "انتخاب"
         },
@@ -1788,20 +2029,32 @@
         },
         "text": {
             "tools": {
-                "text": "اضافه کردن و ویرایش لایه های متنی"
+                "text": {
+                    "title": "متن",
+                    "description": "اضافه کردن و ویرایش لایه های متنی"
+                }
             },
             "name": "متن"
         },
         "transform": {
             "tools": {
-                "freeTransform": "حرکت، مقیاس، لایه های چرخش",
-                "layerCrop": "لایه انتخاب شده"
+                "freeTransform": {
+                    "title": "Free Transform",
+                    "description": "حرکت، مقیاس، لایه های چرخش"
+                },
+                "layerCrop": {
+                    "title": "لایه Crop",
+                    "description": "لایه انتخاب شده"
+                }
             },
             "name": "حرکت / Transform"
         },
         "view": {
             "tools": {
-                "zoom": "زوم در داخل و خارج، پان یا چرخش دیدگاه شما از تصویر"
+                "zoom": {
+                    "title": "زوم / Pan",
+                    "description": "زوم در داخل و خارج، پان یا چرخش دیدگاه شما از تصویر"
+                }
             },
             "name": "معرفی بازی Canvas Viewport"
         }

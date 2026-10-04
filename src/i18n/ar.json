@@ -59,7 +59,19 @@
         "updateLayerFilterMask": "Update Layer Effect Mask",
         "setLayerBoundsToWorkingFileBounds": "توسيع مع الفضاء فارغ",
         "stretchLayerToWorkingFileBounds": "Sretch to Canvas Size",
-        "updateTextLayerProperties": "Update Text Layer Properties"
+        "updateTextLayerProperties": "Update Text Layer Properties",
+        "createShape": "Create Shape",
+        "createShapeLayer": "Create Shape Layer",
+        "deleteVectorLayerShape": "تحذف العبارة",
+        "moveVectorLayerControlPoints": "نقل نقاط مراقبة ناقلات الطائرات",
+        "pasteShapes": "Paste Shape(s)",
+        "updateBlurLayer": "Blur Layer",
+        "updateLayerOpacity": "التغيير",
+        "updateShapeFillColor": "Update Shape Fill Color",
+        "updateShapeStrokeColor": "Update Shape Stroke Color",
+        "updateShapeStrokeWidth": "Update Shape Stroke Width",
+        "updateSharpenLayer": "شاربن لاير",
+        "updateVectorLayerAttributes": "Update Vector Layer"
     },
     "app": {
         "colorPickerGradient": {
@@ -102,7 +114,19 @@
             "moveEffectDown": "تحرك",
             "blendingMode": "Blending",
             "duplicate": "ازدواج",
-            "rasterizeEffects": "Merge All"
+            "rasterizeEffects": "Merge All",
+            "opacity": "Opacity",
+            "rasterize": "Rasterize",
+            "iconTitle": {
+                "gradient": "Gradient Layer",
+                "group": "Group Layer",
+                "empty": "Empty Layer",
+                "raster": "Raster Layer",
+                "rasterSequence": "Raster Sequence Layer",
+                "text": "الرسالة",
+                "vector": "Vector Layer",
+                "video": "Video Layer"
+            }
         },
         "wait": {
             "applyLayerTransform": "Applying Layer Transform",
@@ -161,7 +185,10 @@
         "reverse": "العكس",
         "back": "العودة",
         "editBrush": "Edit Brush",
-        "moreInfo": "مزيد من المعلومات"
+        "moreInfo": "مزيد من المعلومات",
+        "dontUpdate": "لا تستكمل",
+        "enable": "التمكين",
+        "updateApp": "Update App"
     },
     "canvas": {
         "toolbar": {
@@ -197,7 +224,9 @@
                     "saveAs": "أنقذني",
                     "insertPhoto": "Insert a Photo",
                     "takePhoto": "خذ الصورة",
-                    "restore": "استعادة آخر صورة"
+                    "restore": "استعادة آخر صورة",
+                    "shareImage": "صورة الحصة",
+                    "quit": "Quit"
                 }
             },
             "image": {
@@ -255,8 +284,8 @@
                         "2d": "2D",
                         "webgl": "WebGL",
                         "webgl2": "WebGL2",
-                        "webgl2Offscreen": "WebGL2 Offscreen",
-                        "wgpuWasm": "WebGPU +WAM"
+                        "webgl2Offscreen": "[القابلية]",
+                        "wgpuWasm": "[القابلية لل]"
                     },
                     "optimizeLargeImage": "Optimize for Large Image",
                     "highQualityScaling": "ارتفاع الجودة",
@@ -285,6 +314,12 @@
                     "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename",
                     "webdavUsername": "المستعمل",
                     "webdavPassword": "كلمة السر"
+                },
+                "update": {
+                    "groupTitle": "آخر",
+                    "checkForUpdates": "التحقق من المستجدات",
+                    "updateAvailableTitle": "آخر المعلومات المتاحة",
+                    "updateAvailableMessage": "ويمكن الاطلاع على آخر المستجدات المتعلقة بشركة \" OpenGraphica \" . هل تود تركيبه؟?"
                 }
             }
         }
@@ -749,7 +784,10 @@
                 "falseFloydSteinbergSerpentine": "False Floyd Steinberg (serpentine)",
                 "stucki": "Stucki",
                 "stuckiSerpentine": "ستوكي (سريبين)"
-            }
+            },
+            "nativeSaveToast": "تم تصدير الصورة إلى ملف الوثائق.",
+            "svgDisclaimer": "آثار لاير، وطرق المزلاج، وغيرها من السمات قد لا تظهر بشكل صحيح في ملفات SVG.",
+            "maxFileSize": "(ماكس فيل)"
         },
         "fileNew": {
             "title": "الصورة الجديدة",
@@ -766,7 +804,8 @@
             "saveBackIntroduction": "لقد فتحت ملفاً اسمه {fileName}.",
             "saveBackQuestion": "أحتفظ بالملف الأصلي؟?",
             "exportDisclaimer": "إذا كنت ترغب في مشاركة أو مشاهدة الصورة في البرامج الأخرى، استخدام \"الإرسال\" بدلا من ذلك.",
-            "fileName": "اسم الملف"
+            "fileName": "اسم الملف",
+            "nativeSaveToast": "تم حفظ الصورة إلى ملف الوثائق."
         },
         "fileTakePhoto": {
             "title": "خذ الصورة",
@@ -1027,6 +1066,15 @@
             "saveLocalFile": "أنقذ حاسوبك",
             "createFolder": "Create Folder",
             "folderName": "اسم الجندي"
+        },
+        "appUpdate": {
+            "title": "آخر",
+            "notificationTitle": "تحديث",
+            "notificationMessage": "يرجى إبقاء التطبيق مفتوحا ومرئيا على الشاشة بينما نحن تحميل تحديث.",
+            "notificationReadyTitle": "التحديث جاهز",
+            "notificationReadyMessage": "سيتم تركيب التحديث عندما تتحول إلى تطبيق آخر.",
+            "notificationErrorTitle": "Update Error",
+            "notificationErrorMessage": "حدث خطأ أثناء تحميل التحديث حاول مرة أخرى لاحقاً."
         }
     },
     "moduleGroup": {
@@ -1089,6 +1137,10 @@
                 "saveWebdavExplorer": {
                     "name": "إنقاذ التصوير",
                     "description": "احفظي صورة لجهازك أو مخزن الشبكة."
+                },
+                "shareImage": {
+                    "name": "صورة الحصة",
+                    "description": "شارك الصورة الحالية التي تحررها مع أشخاص آخرين."
                 }
             }
         },
@@ -1179,6 +1231,20 @@
                 "welcome": {
                     "name": "مرحباً",
                     "description": "بدء العمل على صورة."
+                }
+            }
+        },
+        "app": {
+            "name": "App",
+            "description": "إدارة التطبيقات",
+            "modules": {
+                "clearShareCache": {
+                    "name": "شارة واضحة",
+                    "description": "إزالة ملفات الصور المشتركة القديمة."
+                },
+                "update": {
+                    "name": "Update App",
+                    "description": "تحديث التطبيق للحصول على وظيفة جديدة."
                 }
             }
         }
@@ -1365,14 +1431,20 @@
                         "hardness": "القوة",
                         "hardnessDescription": "وستكون للقيم الدنيا حواف خفية ناعمة، وقيم أعلى حواف حادة.",
                         "angle": "أنغل",
-                        "angleDescription": "تناوب شكل الفرشاة."
+                        "angleDescription": "تناوب شكل الفرشاة.",
+                        "shape": "Shape",
+                        "shapes": {
+                            "circle": "الدائرة",
+                            "square": "Square"
+                        }
                     },
                     "strokePath": {
                         "title": "Stroke Path",
                         "spacing": "Spacing",
                         "spacingDescription": "المسافة بين كل طوابع الفرشاة مقارنة بحجم الفرشاة كُن حذراً مع قيم منخفضة جداً، حيث يمكن أن يُلقي الأداء على أحجام فرش أكبر.",
                         "jitter": "Jitter",
-                        "jitterDescription": "نادراً ما يغير موقف شكل الفرشاة."
+                        "jitterDescription": "نادراً ما يغير موقف شكل الفرشاة.",
+                        "pixelSnap": "Pixel Snap"
                     },
                     "pressure": {
                         "title": "الضغط",
@@ -1380,6 +1452,13 @@
                         "pressureTaperDescription": "القيم العليا ستضع خطوط نحيفة في ضغط أقل من قلم يجعل من الأسهل التحكم بالأقلام مع حساسية غير مستقرة عند الضغطات المنخفضة.",
                         "pressureMinSize": "الحد الأدنى للحجم",
                         "pressureMinSizeDescription": "The size of the brush at 0% pen pressure, relative to the currently selected brush size."
+                    },
+                    "general": {
+                        "title": "معلومات عامة",
+                        "name": "اسم بروش",
+                        "resetDefault": "Reset to Default",
+                        "delete": "Delete Brush",
+                        "addCustomBrush": "Add Custom Brush"
                     }
                 },
                 "title": "Select Brush",
@@ -1408,7 +1487,16 @@
             "brushSmoothing": "التموين"
         },
         "deformBlur": {
-            "brushSize": "الحجم"
+            "brushSize": "الحجم",
+            "brushOpacity": "Opacity",
+            "brushStrength": "القوة",
+            "brushHardness": "القوة",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "No Layers Selected",
+                    "message": "يرجى اختيار طبقة واحدة على الأقل من الصور في رصيف الطبقات. بعض أنواع الطبقات لا يمكن أن تكون مشوشة."
+                }
+            }
         },
         "drawColorPicker": {
             "title": "Color Becker"
@@ -1447,11 +1535,86 @@
             "shapeType": {
                 "label": "Shape",
                 "rectangle": "Rectangle",
-                "ellipse": "Ellipse"
+                "ellipse": "Ellipse",
+                "circle": "الدائرة",
+                "line": "الخط",
+                "polyline": "Polyline",
+                "polygon": "Polygon",
+                "path": "Path"
             },
             "style": {
                 "label": "Style"
+            },
+            "newVectorLayerName": "New Shape",
+            "extendingShape": "Extending Shape",
+            "fillStyle": {
+                "label": "Fill"
+            },
+            "strokeStyle": {
+                "label": "Stroke",
+                "width": "Width"
+            },
+            "snapping": {
+                "title": "Snapping",
+                "enableSnapping": "التمكين",
+                "canvasEdges": "Canvas Edges",
+                "controlPoint": "نقطة المراقبة"
+            },
+            "notification": {
+                "invisibleShape": {
+                    "title": "Creating Invisible Shape",
+                    "message": "كل من ملئك الحالي و لون السكتة الدماغية شفاف بالكامل لن يتم إيجاد شكل جديد."
+                },
+                "invisibleLine": {
+                    "title": "Creating Invisible Line",
+                    "message": "لا يجب أن يكون لون السكتة الدماغية الحالي شفافاً تماماً، ويجب أن يكون عرض السكتة الدماغية أكبر من صفر."
+                },
+                "uselessClick": {
+                    "title": "يرسمون شاربز",
+                    "message": {
+                        "touch": "المس وسحب إصبعك على منطقة خالية لإضافة أشكال جديدة.",
+                        "mouse": "اضغطي واسحبي في منطقة فارغة لإضافة أشكال جديدة."
+                    }
+                }
             }
+        },
+        "deformSharpen": {
+            "brushOpacity": "Opacity",
+            "brushSize": "الحجم",
+            "brushStrength": "القوة",
+            "brushHardness": "القوة",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "No Layers Selected",
+                    "message": "يرجى اختيار طبقة واحدة على الأقل من الصور في رصيف الطبقات. بعض أنواع الطبقات لا يمكن شحذها."
+                }
+            }
+        },
+        "drawBucketFill": {
+            "title": "Bucket Fill",
+            "brushColor": "Color",
+            "paletteCount": "Palette count",
+            "strength": "القوة",
+            "feather": "ريش",
+            "settings": "التركيبات",
+            "antialias": "Antialias"
+        },
+        "eraseBucketFill": {
+            "opacity": "Opacity",
+            "strength": "القوة",
+            "feather": "ريش",
+            "settings": "التركيبات",
+            "antialias": "Antialias",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "No Layers Selected",
+                    "message": "يرجى اختيار طبقة واحدة على الأقل من الصور في رصيف الطبقات. بعض أنواع الطبقات لا يمكن محوها."
+                }
+            }
+        },
+        "layerOpacity": {
+            "title": "Opacity",
+            "opacity": "Opacity"
         }
     },
     "toolGroup": {
@@ -1466,6 +1629,10 @@
                 "gradient": {
                     "name": "العيادة",
                     "description": "خلق تحولات سلسة بين الألوان."
+                },
+                "bucketFill": {
+                    "name": "Bucket Fill",
+                    "description": "ملئ في المناطق ذات اللون المماثل."
                 }
             }
         },
@@ -1686,17 +1853,57 @@
         },
         "drawShapeToolIntroduction": {
             "introduction": [
-                "أداة الشكل تسمح لك بإضافة مختلف الأشكال الأساسية التي يمكن تحويلها إلى مسارات ناقلات إذا كانت هناك حاجة لمزيد من التكييف."
+                "أداة الشكل تسمح لك بإضافة مختلف الأشكال الأساسية ومسارات النواقل."
             ],
             "body": {
                 "mouse": [
-                    "اضغطي و اسحبي لوضع شكل على الشموع."
+                    "{add} - Click and drag to place a shape on the canvas.",
+                    null
                 ],
                 "touch": [
-                    "إستخدم إصبع واحد ليلمس و يسحب ليضع شكلاً على الشموع."
+                    "{add} - Use one finger to touch and drag to place a shape on the canvas.",
+                    "{edit} - Tap a shape's control points and drag them to edit the shape after it has been added."
                 ]
             },
-            "title": "Shape Tool"
+            "title": "Shape Tool",
+            "bodyTitle": {
+                "add": "مضافا إليها",
+                "edit": "Edit"
+            }
+        },
+        "deformSharpenToolIntroduction": {
+            "title": "شاربن تول",
+            "introduction": [
+                "الأداة الحادّة سَتُشدّدُ مناطقَ الطبعةِ الحاليةِ التي تَعتمدُ عليها."
+            ]
+        },
+        "drawBucketFillToolIntroduction": {
+            "title": "Bucket Fill",
+            "introduction": [
+                "الدلو يملأ أداةً تسمح لك بملء المناطق ذات اللون المماثل مع لون من اختيارك."
+            ],
+            "body": {
+                "mouse": [
+                    "اضغطي على منطقة لتملأها بينما تحتجز الفأر، يمكنك أن تسحب إلى اليسار أو إلى اليمين لتعدّل مقدار المنطقة المليئة."
+                ],
+                "touch": [
+                    "قفزة على منطقة لتملأها بينما تصمد، يمكنك أن تسحب إلى اليسار أو إلى اليمين لتعدّل كم من المنطقة ممتلئة."
+                ]
+            }
+        },
+        "eraseBucketFillToolIntroduction": {
+            "title": "Erase Bucket Fill",
+            "introduction": [
+                "امسحوا مواقع الصورة التي لها لون مماثل."
+            ],
+            "body": {
+                "mouse": [
+                    "اضغط على منطقة لتمسحها بينما تحتجز الفأر، يمكنك أن تسحب لليسار أو يميناً لتكييف مقدار المنطقة الممحوة."
+                ],
+                "touch": [
+                    "قفزة على منطقة لمحوها بينما تصمد، يمكنك أن تسحب إلى اليسار أو إلى اليمين لتعدل كم من المنطقة تم محوها."
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -1744,7 +1951,8 @@
         "simpleAirBrush": "Simple Air Brush",
         "simplePaintBrush": "بسيطة الطلاء",
         "simplePen": "بسيطة",
-        "simpleWaterColor": "مليئ ماء بسيط"
+        "simpleWaterColor": "مليئ ماء بسيط",
+        "simplePixelArt": "بسيطة الفن"
     },
     "defaultBrushCategory": {
         "custom": "العرف",
@@ -1753,27 +1961,57 @@
     "menuBarToolGroup": {
         "deform": {
             "tools": {
-                "blur": "مناطق محددة من الصورة"
+                "blur": {
+                    "title": "Blur",
+                    "description": "المناطق القطبية من الصورة"
+                },
+                "sharpen": {
+                    "title": "شاربن",
+                    "description": "Sharpen areas of the image"
+                }
             },
             "name": "الشكل"
         },
         "draw": {
             "tools": {
-                "brush": "رسم مع فرش الفن",
-                "gradient": "خريجي اللون",
-                "shape": "إيجاد الأشكال الأساسية"
+                "brush": {
+                    "title": "Brush",
+                    "description": "رسم مع فرش الفن"
+                },
+                "gradient": {
+                    "title": "العيادة",
+                    "description": "خريجي اللون"
+                },
+                "shape": {
+                    "title": "Shape",
+                    "description": "إيجاد الأشكال الأساسية"
+                },
+                "bucketFill": {
+                    "title": "Bucket Fill",
+                    "description": "ملء المناطق ذات اللون"
+                }
             },
             "name": "Draw"
         },
         "effect": {
             "tools": {
-                "effect": "التلاعب بألوان الطبقات وإضافات الرش"
+                "effect": {
+                    "title": "الأثر",
+                    "description": "التلاعب بألوان الطبقات وإضافات الرش"
+                }
             },
             "name": "الأثر"
         },
         "erase": {
             "tools": {
-                "brush": "Erase areas of the image with brush wounds"
+                "brush": {
+                    "title": "Erase Brush",
+                    "description": "الغضب مع ضربات الفرشاة"
+                },
+                "bucketFill": {
+                    "title": "Erase Bucket Fill",
+                    "description": "مناطق الإشعال ذات اللون المماثل"
+                }
             },
             "name": "Erase"
         },
@@ -1782,7 +2020,10 @@
         },
         "selection": {
             "tools": {
-                "selection": "مناطق عينة مختارة من الصورة لتحريرها أو قطعها أو نسخها أو حذفها"
+                "selection": {
+                    "title": "الاختيار",
+                    "description": "مناطق عينة مختارة من الصورة لتحريرها أو قطعها أو نسخها أو حذفها"
+                }
             },
             "name": "الاختيار"
         },
@@ -1791,20 +2032,32 @@
         },
         "text": {
             "tools": {
-                "text": "الطبقة الراقية والمحررة"
+                "text": {
+                    "title": "النص",
+                    "description": "الطبقة الراقية والمحررة"
+                }
             },
             "name": "النص"
         },
         "transform": {
             "tools": {
-                "freeTransform": "التحرك، المقياس، الطبقات الدوارة",
-                "layerCrop": "اكسر الطبقة المختارة"
+                "freeTransform": {
+                    "title": "Free Transform",
+                    "description": "التحرك، المقياس، الطبقات الدوارة"
+                },
+                "layerCrop": {
+                    "title": "Layer Crop",
+                    "description": "اكسر الطبقة المختارة"
+                }
             },
             "name": "النقل/التحول"
         },
         "view": {
             "tools": {
-                "zoom": "تكبير داخل وخارج، مقلاة، أو تناوب وجهة نظرك للصورة"
+                "zoom": {
+                    "title": "زوم/بان",
+                    "description": "تكبير داخل وخارج، مقلاة، أو تناوب وجهة نظرك للصورة"
+                }
             },
             "name": "Canvas Viewport"
         }

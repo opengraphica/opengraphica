@@ -59,7 +59,19 @@
         "updateLayerFilterMask": "Ebeneneffektmaske aktualisieren",
         "setLayerBoundsToWorkingFileBounds": "Erweitern mit Leerraum",
         "stretchLayerToWorkingFileBounds": "Stretch auf Leinwand Größe",
-        "updateTextLayerProperties": "Eigenschaften der Textebene"
+        "updateTextLayerProperties": "Eigenschaften der Textebene",
+        "createShape": "Gestalt erstellen",
+        "createShapeLayer": "Gestalt Layer erstellen",
+        "deleteVectorLayerShape": "Löschen von Form",
+        "moveVectorLayerControlPoints": "Vector Layer Control Points verschieben",
+        "pasteShapes": "Paste Form(en)",
+        "updateBlurLayer": "Blu-ray-Ebene",
+        "updateLayerOpacity": "Opazität ändern",
+        "updateShapeFillColor": "Aktualisieren Sie die Form füllen Farbe",
+        "updateShapeStrokeColor": "Aktualisieren Sie die Form Stroke Farbe",
+        "updateShapeStrokeWidth": "Aktualisieren von Stroke Width",
+        "updateSharpenLayer": "Scharpenschicht",
+        "updateVectorLayerAttributes": "Update Vector Layer"
     },
     "app": {
         "colorPickerGradient": {
@@ -102,7 +114,19 @@
             "moveEffectDown": "Bewegung nach unten",
             "blendingMode": "Mischen",
             "duplicate": "Duplikat",
-            "rasterizeEffects": "Alles versammeln"
+            "rasterizeEffects": "Alles versammeln",
+            "opacity": "Opazität",
+            "rasterize": "Rastermaß",
+            "iconTitle": {
+                "gradient": "Gradientenebene",
+                "group": "Gruppe Ebene",
+                "empty": "Leere Ebene",
+                "raster": "Das ist die erste",
+                "rasterSequence": "Rastersequenzebene",
+                "text": "Textebene",
+                "vector": "Vector Layer",
+                "video": "Video-Ebene"
+            }
         },
         "wait": {
             "applyLayerTransform": "Ebenentransformieren anwenden",
@@ -161,7 +185,10 @@
         "reverse": "Reverse",
         "back": "Zurück",
         "editBrush": "Brush bearbeiten",
-        "moreInfo": "Mehr Info"
+        "moreInfo": "Mehr Info",
+        "dontUpdate": "Nicht aktualisieren",
+        "enable": "Ermöglichen",
+        "updateApp": "Update App"
     },
     "canvas": {
         "toolbar": {
@@ -197,7 +224,9 @@
                     "saveAs": "Speichern als",
                     "insertPhoto": "Ein Foto einfügen",
                     "takePhoto": "Ein Foto machen",
-                    "restore": "Letztes Bild wiederherstellen"
+                    "restore": "Letztes Bild wiederherstellen",
+                    "shareImage": "Bild vergrößern",
+                    "quit": "Quitten"
                 }
             },
             "image": {
@@ -255,8 +284,8 @@
                         "2d": "Kunsthandwerk 2D",
                         "webgl": "WebGL",
                         "webgl2": "WebGL2",
-                        "webgl2Offscreen": "WebGL2 Offscreen",
-                        "wgpuWasm": "WebGPU + WASM"
+                        "webgl2Offscreen": "(UNSTABLE) WebGL2 Offscreen",
+                        "wgpuWasm": "(UNSTABLE) WebGPU + WASM"
                     },
                     "optimizeLargeImage": "Optimieren Sie für großes Bild",
                     "highQualityScaling": "Hohe Qualität Skalierung",
@@ -285,6 +314,12 @@
                     "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename",
                     "webdavUsername": "Benutzername",
                     "webdavPassword": "Passwort vergessen"
+                },
+                "update": {
+                    "groupTitle": "Aktualisierung",
+                    "checkForUpdates": "Überprüfen Sie Updates",
+                    "updateAvailableTitle": "Update verfügbar",
+                    "updateAvailableMessage": "Ein Update für OpenGraphica ist verfügbar. Möchten Sie es installieren?"
                 }
             }
         }
@@ -749,7 +784,10 @@
                 "falseFloydSteinbergSerpentine": "False Floyd Steinberg (serpentine)",
                 "stucki": "Stucke",
                 "stuckiSerpentine": "Stucki (Serpentin)"
-            }
+            },
+            "nativeSaveToast": "Das Bild wurde in den Ordner Dokumente exportiert.",
+            "svgDisclaimer": "Layer-Effekte, Mix-Modi und andere Funktionen können nicht korrekt in SVG-Dateien angezeigt werden.",
+            "maxFileSize": "Max File Größe"
         },
         "fileNew": {
             "title": "Neues Bild",
@@ -766,7 +804,8 @@
             "saveBackIntroduction": "Sie haben eine Datei namens {fileName} geöffnet.",
             "saveBackQuestion": "Zurück in die Originaldatei speichern?",
             "exportDisclaimer": "Wenn Sie das Bild in anderen Programmen teilen oder anzeigen möchten, verwenden Sie stattdessen \"Export\".",
-            "fileName": "Dateiname"
+            "fileName": "Dateiname",
+            "nativeSaveToast": "Das Bild wurde im Ordner Dokumente gespeichert."
         },
         "fileTakePhoto": {
             "title": "Foto machen",
@@ -1027,6 +1066,15 @@
             "saveLocalFile": "Speichern Sie Ihren Computer",
             "createFolder": "Ordner erstellen",
             "folderName": "Ordnername"
+        },
+        "appUpdate": {
+            "title": "Aktualisierung",
+            "notificationTitle": "Update herunterladen",
+            "notificationMessage": "Bitte halten Sie die App offen und sichtbar auf dem Bildschirm, während wir das Update herunterladen.",
+            "notificationReadyTitle": "Update ist bereit",
+            "notificationReadyMessage": "Das Update wird installiert, wenn Sie auf eine andere App wechseln.",
+            "notificationErrorTitle": "Update Fehler",
+            "notificationErrorMessage": "Beim Download des Updates wurde ein Fehler aufgetreten. Bitte versuchen Sie es später wieder."
         }
     },
     "moduleGroup": {
@@ -1089,6 +1137,10 @@
                 "saveWebdavExplorer": {
                     "name": "Bild vergrößern",
                     "description": "Speichern Sie ein Bild auf Ihrem Computer oder Netzwerkspeicher."
+                },
+                "shareImage": {
+                    "name": "Bild vergrößern",
+                    "description": "Teilen Sie das aktuelle Bild, das Sie mit anderen Leuten bearbeiten."
                 }
             }
         },
@@ -1179,6 +1231,20 @@
                 "welcome": {
                     "name": "Willkommen",
                     "description": "Arbeiten Sie an einem Bild."
+                }
+            }
+        },
+        "app": {
+            "name": "Anwendung",
+            "description": "App-Management",
+            "modules": {
+                "clearShareCache": {
+                    "name": "Klare Teile Cache",
+                    "description": "Entfernen Sie alte geteilte Bilddateien."
+                },
+                "update": {
+                    "name": "Update App",
+                    "description": "Aktualisieren Sie die App, um neue Funktionalität zu erhalten."
                 }
             }
         }
@@ -1365,14 +1431,20 @@
                         "hardness": "Härte",
                         "hardnessDescription": "Niedrigere Werte haben weiche verblassene Kanten und höhere Werte scharfe Kanten.",
                         "angle": "Winkel",
-                        "angleDescription": "Dreht die Bürstenform."
+                        "angleDescription": "Dreht die Bürstenform.",
+                        "shape": "Form",
+                        "shapes": {
+                            "circle": "Kreis",
+                            "square": "Platz"
+                        }
                     },
                     "strokePath": {
                         "title": "Wegweiser",
                         "spacing": "Spaziergänge",
                         "spacingDescription": "Der Abstand zwischen jedem Stempel der Bürste, bezogen auf die Bürstgröße. Seien Sie vorsichtig mit extrem niedrigen Werten, da es Tankleistung auf größeren Bürstengrößen.",
                         "jitter": "Jitter",
-                        "jitterDescription": "Zufällig verschiebt die Position der Bürstenform."
+                        "jitterDescription": "Zufällig verschiebt die Position der Bürstenform.",
+                        "pixelSnap": "Bild vergrößern"
                     },
                     "pressure": {
                         "title": "Druck",
@@ -1380,6 +1452,13 @@
                         "pressureTaperDescription": "Höhere Werte ziehen Skinnierlinien bei niedrigeren Federdrücken. Es erleichtert die Kontrolle von Stiften mit instabiler Empfindlichkeit bei niedrigeren Drücken.",
                         "pressureMinSize": "Mindestgröße",
                         "pressureMinSizeDescription": "Die Größe der Bürste bei 0 % Federdruck, bezogen auf die aktuell gewählte Bürstengröße."
+                    },
+                    "general": {
+                        "title": "Allgemeines",
+                        "name": "Brush Name",
+                        "resetDefault": "Zurück zum Standard",
+                        "delete": "Löschen von Brush",
+                        "addCustomBrush": "Fügen Sie benutzerdefinierte Brush"
                     }
                 },
                 "title": "Wählen Sie Brush",
@@ -1408,7 +1487,16 @@
             "brushSmoothing": "Beruhigend"
         },
         "deformBlur": {
-            "brushSize": "Größe"
+            "brushSize": "Größe",
+            "brushOpacity": "Opazität",
+            "brushStrength": "Stärke",
+            "brushHardness": "Härte",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "Keine Ebenen ausgewählt",
+                    "message": "Bitte wählen Sie mindestens eine Bildschicht im Layer-Dock aus. Bestimmte Schichttypen können nicht verwischt werden."
+                }
+            }
         },
         "drawColorPicker": {
             "title": "Farbe Picker"
@@ -1447,11 +1535,86 @@
             "shapeType": {
                 "label": "Form",
                 "rectangle": "Rechteck",
-                "ellipse": "Ellipsen"
+                "ellipse": "Ellipsen",
+                "circle": "Kreis",
+                "line": "Linie",
+                "polyline": "Polylin",
+                "polygon": "Polygon",
+                "path": "Pfad"
             },
             "style": {
                 "label": "Stil"
+            },
+            "newVectorLayerName": "Neue Form",
+            "extendingShape": "Form erweitern",
+            "fillStyle": {
+                "label": "Füllung"
+            },
+            "strokeStyle": {
+                "label": "Strenge",
+                "width": "Breite"
+            },
+            "snapping": {
+                "title": "Schnappen",
+                "enableSnapping": "Aktivieren Sie Snapping",
+                "canvasEdges": "Kunst und Kunst",
+                "controlPoint": "Kontrollpunkt"
+            },
+            "notification": {
+                "invisibleShape": {
+                    "title": "Unsichtbare Form schaffen",
+                    "message": "Sowohl Ihre aktuelle Füll- als auch Schlaganfallfarbe sind voll transparent. Eine neue Form wird nicht geschaffen."
+                },
+                "invisibleLine": {
+                    "title": "Invisible Line erstellen",
+                    "message": "Die aktuelle Hubfarbe darf nicht vollständig transparent sein und die Hubbreite muss größer als 0 sein."
+                },
+                "uselessClick": {
+                    "title": "Zeichnungsformen",
+                    "message": {
+                        "touch": "Ziehen Sie Ihren Finger auf einen leeren Bereich, um neue Formen hinzuzufügen.",
+                        "mouse": "Klicken Sie auf einen leeren Bereich, um neue Formen hinzuzufügen."
+                    }
+                }
             }
+        },
+        "deformSharpen": {
+            "brushOpacity": "Opazität",
+            "brushSize": "Größe",
+            "brushStrength": "Stärke",
+            "brushHardness": "Härte",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "Keine Ebenen ausgewählt",
+                    "message": "Bitte wählen Sie mindestens eine Bildschicht im Layer-Dock aus. Bestimmte Schichttypen können nicht scharf gemacht werden."
+                }
+            }
+        },
+        "drawBucketFill": {
+            "title": "Schnallenfüller",
+            "brushColor": "Farbe",
+            "paletteCount": "Palettenzähler",
+            "strength": "Stärke",
+            "feather": "Federn",
+            "settings": "Einstellungen",
+            "antialias": "Antialias"
+        },
+        "eraseBucketFill": {
+            "opacity": "Opazität",
+            "strength": "Stärke",
+            "feather": "Federn",
+            "settings": "Einstellungen",
+            "antialias": "Antialias",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "Keine Ebenen ausgewählt",
+                    "message": "Bitte wählen Sie mindestens eine Bildschicht im Layer-Dock aus. Bestimmte Schichttypen können nicht gelöscht werden."
+                }
+            }
+        },
+        "layerOpacity": {
+            "title": "Opazität",
+            "opacity": "Opazität"
         }
     },
     "toolGroup": {
@@ -1466,6 +1629,10 @@
                 "gradient": {
                     "name": "Gradienten",
                     "description": "Erstellen Sie glatte Übergänge zwischen Farben."
+                },
+                "bucketFill": {
+                    "name": "Schnallenfüller",
+                    "description": "Füllen Sie Bereiche ähnlicher Farbe."
                 }
             }
         },
@@ -1686,17 +1853,57 @@
         },
         "drawShapeToolIntroduction": {
             "introduction": [
-                "Mit dem Formwerkzeug können Sie verschiedene Grundformen hinzufügen, die bei Bedarf in Vektorpfade umgewandelt werden können."
+                "Mit dem Formwerkzeug können Sie verschiedene Grundformen und Vektorpfade hinzufügen."
             ],
             "body": {
                 "mouse": [
-                    "Klicken Sie und ziehen Sie, um eine Form auf der Leinwand zu platzieren."
+                    "{add} - Klicken Sie und ziehen Sie, um eine Form auf der Leinwand zu platzieren.",
+                    "{edit} - Klicken Sie auf die Kontrollpunkte einer Form und ziehen Sie sie, um die Form zu bearbeiten, nachdem es hinzugefügt wurde."
                 ],
                 "touch": [
-                    "Verwenden Sie einen Finger zu berühren und zu ziehen, um eine Form auf der Leinwand zu platzieren."
+                    "{add} - Verwenden Sie einen Finger zu berühren und zu ziehen, um eine Form auf der Leinwand zu platzieren.",
+                    "{edit} - Tippen Sie auf die Kontrollpunkte einer Form und ziehen Sie sie, um die Form zu bearbeiten, nachdem es hinzugefügt wurde."
                 ]
             },
-            "title": "Formwerkzeug"
+            "title": "Formwerkzeug",
+            "bodyTitle": {
+                "add": "Hinzufügen",
+                "edit": "Bearbeiten"
+            }
+        },
+        "deformSharpenToolIntroduction": {
+            "title": "Werkzeug für Schleifen",
+            "introduction": [
+                "Das scharfe Werkzeug wird Bereiche der aktuellen Schicht schärfen, auf die Sie zeichnen."
+            ]
+        },
+        "drawBucketFillToolIntroduction": {
+            "title": "Schnallenfüller",
+            "introduction": [
+                "Mit dem Eimerfüllwerkzeug können Sie Bereiche ähnlicher Farbe mit einer Farbe Ihrer Wahl füllen."
+            ],
+            "body": {
+                "mouse": [
+                    "Klicken Sie auf einen Bereich, um zu füllen. Während Sie die Maus nach unten halten, können Sie nach links oder rechts ziehen, um einzustellen, wie viel der Bereich gefüllt ist."
+                ],
+                "touch": [
+                    "Tippen Sie auf einen Bereich, um zu füllen. Während des Niederhaltens können Sie nach links oder rechts ziehen, um zu justieren, wie viel der Bereich gefüllt ist."
+                ]
+            }
+        },
+        "eraseBucketFillToolIntroduction": {
+            "title": "Löschen Sie Bucket Fill",
+            "introduction": [
+                "Löschen Sie Bereiche des Bildes, die eine ähnliche Farbe haben."
+            ],
+            "body": {
+                "mouse": [
+                    "Klicken Sie auf einen Bereich, um zu löschen. Während Sie die Maus nach unten halten, können Sie nach links oder rechts ziehen, um einzustellen, wie viel von der Fläche gelöscht wird."
+                ],
+                "touch": [
+                    "Tippen Sie auf einen Bereich, um zu löschen. Während des Niederhaltens können Sie nach links oder rechts ziehen, um zu justieren, wie viel der Bereich gelöscht wird."
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -1744,7 +1951,8 @@
         "simpleAirBrush": "Einfache Air Brush",
         "simplePaintBrush": "Einfache Farbbürste",
         "simplePen": "Einfacher Stift",
-        "simpleWaterColor": "Einfache Wasserfarbe"
+        "simpleWaterColor": "Einfache Wasserfarbe",
+        "simplePixelArt": "Einfaches Pixel Art"
     },
     "defaultBrushCategory": {
         "custom": "Zoll",
@@ -1753,27 +1961,57 @@
     "menuBarToolGroup": {
         "deform": {
             "tools": {
-                "blur": "Verschwimmen spezifische Bereiche des Bildes"
+                "blur": {
+                    "title": "Blähungen",
+                    "description": "Schwache Bereiche des Bildes"
+                },
+                "sharpen": {
+                    "title": "Garnelen",
+                    "description": "Schärfenbereiche des Bildes"
+                }
             },
             "name": "Deformieren"
         },
         "draw": {
             "tools": {
-                "brush": "Zeichnen mit Kunstbürsten",
-                "gradient": "Gradienten der Farbe erstellen",
-                "shape": "Grundformen erstellen"
+                "brush": {
+                    "title": "Bürste",
+                    "description": "Zeichnen mit Kunstbürsten"
+                },
+                "gradient": {
+                    "title": "Gradienten",
+                    "description": "Gradienten der Farbe erstellen"
+                },
+                "shape": {
+                    "title": "Form",
+                    "description": "Grundformen erstellen"
+                },
+                "bucketFill": {
+                    "title": "Schnallenfüller",
+                    "description": "Füllbereiche mit Farbe"
+                }
             },
             "name": "Zeichnung"
         },
         "effect": {
             "tools": {
-                "effect": "Manipulate Schichtfarben und Filtereffekte hinzufügen"
+                "effect": {
+                    "title": "Wirkung",
+                    "description": "Manipulate Schichtfarben und Filtereffekte hinzufügen"
+                }
             },
             "name": "Wirkung"
         },
         "erase": {
             "tools": {
-                "brush": "Löschen Sie Bereiche des Bildes mit Pinselstrichen"
+                "brush": {
+                    "title": "Erase Brush",
+                    "description": "Löschen mit Pinselstrichen"
+                },
+                "bucketFill": {
+                    "title": "Löschen Sie Bucket Fill",
+                    "description": "Löschen von Flächen mit ähnlicher Farbe"
+                }
             },
             "name": "Erase"
         },
@@ -1782,7 +2020,10 @@
         },
         "selection": {
             "tools": {
-                "selection": "Wählen Sie bestimmte Bereiche des Bildes aus, um zu bearbeiten, zu schneiden, zu kopieren oder zu löschen"
+                "selection": {
+                    "title": "Auswahl",
+                    "description": "Wählen Sie bestimmte Bereiche des Bildes aus, um zu bearbeiten, zu schneiden, zu kopieren oder zu löschen"
+                }
             },
             "name": "Auswahl"
         },
@@ -1791,20 +2032,32 @@
         },
         "text": {
             "tools": {
-                "text": "Textschichten einfügen und bearbeiten"
+                "text": {
+                    "title": "Text",
+                    "description": "Textschichten einfügen und bearbeiten"
+                }
             },
             "name": "Text"
         },
         "transform": {
             "tools": {
-                "freeTransform": "Bewegung, Skala, rotieren Schichten",
-                "layerCrop": "Die ausgewählte Schicht abschneiden"
+                "freeTransform": {
+                    "title": "Free Transform",
+                    "description": "Bewegung, Skala, rotieren Schichten"
+                },
+                "layerCrop": {
+                    "title": "Ebene Crop",
+                    "description": "Die ausgewählte Schicht abschneiden"
+                }
             },
             "name": "Bewegung / Transform"
         },
         "view": {
             "tools": {
-                "zoom": "Zoomen Sie ein und aus, Pfanne, oder drehen Sie Ihre Ansicht des Bildes"
+                "zoom": {
+                    "title": "Zoom / Pan",
+                    "description": "Zoomen Sie ein und aus, Pfanne, oder drehen Sie Ihre Ansicht des Bildes"
+                }
             },
             "name": "Leinwand und wand"
         }

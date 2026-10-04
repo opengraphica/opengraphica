@@ -59,7 +59,19 @@
         "updateLayerFilterMask": "업데이트 레이어 효과 마스크",
         "setLayerBoundsToWorkingFileBounds": "빈 공간으로 확장",
         "stretchLayerToWorkingFileBounds": "화포 크기에 뻗기",
-        "updateTextLayerProperties": "Text Layer 속성 업데이트"
+        "updateTextLayerProperties": "Text Layer 속성 업데이트",
+        "createShape": "연락처",
+        "createShapeLayer": "창조 모양 층",
+        "deleteVectorLayerShape": "연락처",
+        "moveVectorLayerControlPoints": "벡터 레이어 컨트롤 포인트 이동",
+        "pasteShapes": "풀 모양 (s)",
+        "updateBlurLayer": "Blur 층",
+        "updateLayerOpacity": "변화 Opacity",
+        "updateShapeFillColor": "업데이트 모양 필 색상",
+        "updateShapeStrokeColor": "업데이트 모양 치기 색깔",
+        "updateShapeStrokeWidth": "업데이트 모양 치기 폭",
+        "updateSharpenLayer": "Sharpen 층",
+        "updateVectorLayerAttributes": "벡터 레이어 업데이트"
     },
     "app": {
         "colorPickerGradient": {
@@ -102,7 +114,19 @@
             "moveEffectDown": "아래로 이동 효력",
             "blendingMode": "회사 소개",
             "duplicate": "기타 제품",
-            "rasterizeEffects": "모든 것"
+            "rasterizeEffects": "모든 것",
+            "opacity": "오파시티",
+            "rasterize": "연락처",
+            "iconTitle": {
+                "gradient": "연락처",
+                "group": "그룹 층",
+                "empty": "빈 층",
+                "raster": "Raster 층",
+                "rasterSequence": "Raster 순서 층",
+                "text": "텍스트 층",
+                "vector": "벡터 층",
+                "video": "영상 층"
+            }
         },
         "wait": {
             "applyLayerTransform": "층 Transform 적용",
@@ -161,7 +185,10 @@
         "reverse": "이름 *",
         "back": "이름 *",
         "editBrush": "브러쉬",
-        "moreInfo": "더 알아보기"
+        "moreInfo": "더 알아보기",
+        "dontUpdate": "업데이트",
+        "enable": "이름 *",
+        "updateApp": "앱 업데이트"
     },
     "canvas": {
         "toolbar": {
@@ -197,7 +224,9 @@
                     "saveAs": "구매하기",
                     "insertPhoto": "사진 삽입",
                     "takePhoto": "사진 찍기",
-                    "restore": "최근 이미지"
+                    "restore": "최근 이미지",
+                    "shareImage": "공유 이미지",
+                    "quit": "뚱 베어"
                 }
             },
             "image": {
@@ -255,8 +284,8 @@
                         "2d": "캔버스 2D",
                         "webgl": "웹GL",
                         "webgl2": "웹GL2",
-                        "webgl2Offscreen": "WebGL2 화면",
-                        "wgpuWasm": "웹GPU + WASM"
+                        "webgl2Offscreen": "[UNSTABLE] WebGL2 스크린",
+                        "wgpuWasm": "[기타] WebGPU + WASM"
                     },
                     "optimizeLargeImage": "큰 이미지에 최적화",
                     "highQualityScaling": "높은 품질 Scaling",
@@ -285,6 +314,12 @@
                     "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename",
                     "webdavUsername": "사용자 이름",
                     "webdavPassword": "비밀번호"
+                },
+                "update": {
+                    "groupTitle": "(주)",
+                    "checkForUpdates": "자주 묻는 질문",
+                    "updateAvailableTitle": "자주 묻는 질문",
+                    "updateAvailableMessage": "OpenGraphica에 대한 업데이트가 가능합니다. 설치하시겠습니까?"
                 }
             }
         }
@@ -749,7 +784,10 @@
                 "falseFloydSteinbergSerpentine": "False Floyd Steinberg (스펜틴)",
                 "stucki": "뚱 베어",
                 "stuckiSerpentine": "Stucki (스펜틴)"
-            }
+            },
+            "nativeSaveToast": "이미지는 문서 폴더에 수출되었습니다.",
+            "svgDisclaimer": "레이어 효과, 혼합 모드 및 다른 기능은 SVG 파일에서 올바르게 표시 할 수 없습니다.",
+            "maxFileSize": "최대 파일 크기"
         },
         "fileNew": {
             "title": "새로운 이미지",
@@ -766,7 +804,8 @@
             "saveBackIntroduction": "{fileName}라는 파일을 열었습니다.",
             "saveBackQuestion": "원래 파일로 다시 저장?",
             "exportDisclaimer": "다른 프로그램에서 이미지를 공유하거나 볼 경우 대신 \"Export\"를 사용하십시오.",
-            "fileName": "파일 이름"
+            "fileName": "파일 이름",
+            "nativeSaveToast": "이미지는 문서 폴더에 저장되었습니다."
         },
         "fileTakePhoto": {
             "title": "본문 바로가기",
@@ -1027,6 +1066,15 @@
             "saveLocalFile": "당신의 컴퓨터에 저장",
             "createFolder": "폴더 만들기",
             "folderName": "폴더 이름"
+        },
+        "appUpdate": {
+            "title": "(주)",
+            "notificationTitle": "다운로드 Update",
+            "notificationMessage": "앱을 열고 화면에 볼 수 있으므로 업데이트 다운로드하십시오.",
+            "notificationReadyTitle": "업데이트는 준비",
+            "notificationReadyMessage": "업데이트는 다른 앱으로 전환 할 때 설치됩니다.",
+            "notificationErrorTitle": "업데이트 오류",
+            "notificationErrorMessage": "오류는 업데이트 다운로드 중에 발생했습니다. 나중에 다시 시도하십시오."
         }
     },
     "moduleGroup": {
@@ -1089,6 +1137,10 @@
                 "saveWebdavExplorer": {
                     "name": "이미지 저장",
                     "description": "컴퓨터 또는 네트워크 스토리지에 이미지를 저장합니다."
+                },
+                "shareImage": {
+                    "name": "공유 이미지",
+                    "description": "현재 이미지를 다른 사람들과 편집합니다."
                 }
             }
         },
@@ -1179,6 +1231,20 @@
                 "welcome": {
                     "name": "제품 정보",
                     "description": "이미지에서 작업 시작."
+                }
+            }
+        },
+        "app": {
+            "name": "앱 다운로드",
+            "description": "앱 관리",
+            "modules": {
+                "clearShareCache": {
+                    "name": "Cache를 공유",
+                    "description": "오래된 공유된 이미지 파일을 제거합니다."
+                },
+                "update": {
+                    "name": "앱 업데이트",
+                    "description": "앱을 업데이트하여 새로운 기능을 받으세요."
                 }
             }
         }
@@ -1365,14 +1431,20 @@
                         "hardness": "경도",
                         "hardnessDescription": "낮은 가치는 연약한 퇴색한 가장자리 및 더 높은 가치 예리한 가장자리가 있을 것입니다.",
                         "angle": "주요 특징",
-                        "angleDescription": "솔 모양을 자전하십시오."
+                        "angleDescription": "솔 모양을 자전하십시오.",
+                        "shape": "제품 정보",
+                        "shapes": {
+                            "circle": "한국어",
+                            "square": "팟캐스트"
+                        }
                     },
                     "strokePath": {
                         "title": "치기 경로",
                         "spacing": "관련 상품",
                         "spacingDescription": "솔의 각 우표 사이 거리, 솔 크기에 관계되는. 더 큰 솔 크기에 탱크 성과 할 수 있기 때문에 극단적으로 낮은 가치로 주의하십시오.",
                         "jitter": "주 메뉴",
-                        "jitterDescription": "무작위로 솔 모양의 위치를 이동합니다."
+                        "jitterDescription": "무작위로 솔 모양의 위치를 이동합니다.",
+                        "pixelSnap": "화소 스냅"
                     },
                     "pressure": {
                         "title": "압력",
@@ -1380,6 +1452,13 @@
                         "pressureTaperDescription": "더 높은 가치는 더 낮은 펜 압력에 skinnier 선을 그립니다. 저압에서 불안정한 감도를 가진 펜을 통제하는 것이 더 쉽습니다.",
                         "pressureMinSize": "최소 크기",
                         "pressureMinSizeDescription": "현재 선정된 솔 크기와 상대적인 0% 펜 압력에 솔의 크기."
+                    },
+                    "general": {
+                        "title": "주요사업",
+                        "name": "솔 이름",
+                        "resetDefault": "기본값으로 재설정",
+                        "delete": "브러시 삭제",
+                        "addCustomBrush": "사용자 정의 브러시 추가"
                     }
                 },
                 "title": "선택 브러쉬",
@@ -1408,7 +1487,16 @@
             "brushSmoothing": "관련 제품"
         },
         "deformBlur": {
-            "brushSize": "크기 (mm)"
+            "brushSize": "크기 (mm)",
+            "brushOpacity": "오파시티",
+            "brushStrength": "제품정보",
+            "brushHardness": "경도",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "선택 없음",
+                    "message": "레이어 도크에서 적어도 하나의 이미지 레이어를 선택하십시오. 특정 층 유형은 흐를 수 없습니다."
+                }
+            }
         },
         "drawColorPicker": {
             "title": "색깔 피커"
@@ -1447,11 +1535,86 @@
             "shapeType": {
                 "label": "제품 정보",
                 "rectangle": "관련 상품",
-                "ellipse": "엘립스"
+                "ellipse": "엘립스",
+                "circle": "한국어",
+                "line": "제품정보",
+                "polyline": "연락처",
+                "polygon": "폴리곤",
+                "path": "오시는길"
             },
             "style": {
                 "label": "(주)"
+            },
+            "newVectorLayerName": "새로운 모양",
+            "extendingShape": "확장 모양",
+            "fillStyle": {
+                "label": "제품정보"
+            },
+            "strokeStyle": {
+                "label": "기타 제품",
+                "width": "제품 정보"
+            },
+            "snapping": {
+                "title": "다운로드",
+                "enableSnapping": "사용 약관",
+                "canvasEdges": "캔버스 가장자리",
+                "controlPoint": "통제 점"
+            },
+            "notification": {
+                "invisibleShape": {
+                    "title": "Invisible 모양 만들기",
+                    "message": "당신의 현재 충분한 양 및 치기 색깔은 완전히 투명한 입니다. 새로운 모양이 생성되지 않습니다."
+                },
+                "invisibleLine": {
+                    "title": "보이지 않는 선을 창조하십시오",
+                    "message": "현재 치기 색깔은 완전히 투명하지 않아야 하고, 치기 폭은 0 보다는 더 중대해야 합니다."
+                },
+                "uselessClick": {
+                    "title": "그림 모양",
+                    "message": {
+                        "touch": "터치하고 새로운 모양을 추가 할 빈 영역에 손가락을 드래그.",
+                        "mouse": "새로운 모양을 추가하려면 빈 영역에 클릭하고 드래그하십시오."
+                    }
+                }
             }
+        },
+        "deformSharpen": {
+            "brushOpacity": "오파시티",
+            "brushSize": "크기 (mm)",
+            "brushStrength": "제품정보",
+            "brushHardness": "경도",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "선택 없음",
+                    "message": "레이어 도크에서 적어도 하나의 이미지 레이어를 선택하십시오. 특정 층 유형은 날카롭게 할 수 없습니다."
+                }
+            }
+        },
+        "drawBucketFill": {
+            "title": "버켓 필",
+            "brushColor": "색깔: 백색",
+            "paletteCount": "Palette 조사",
+            "strength": "제품정보",
+            "feather": "뚱 베어",
+            "settings": "지원하다",
+            "antialias": "연락처"
+        },
+        "eraseBucketFill": {
+            "opacity": "오파시티",
+            "strength": "제품정보",
+            "feather": "뚱 베어",
+            "settings": "지원하다",
+            "antialias": "연락처",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "선택 없음",
+                    "message": "레이어 도크에서 적어도 하나의 이미지 레이어를 선택하십시오. 특정 층 유형은 지워질 수 없습니다."
+                }
+            }
+        },
+        "layerOpacity": {
+            "title": "오파시티",
+            "opacity": "오파시티"
         }
     },
     "toolGroup": {
@@ -1466,6 +1629,10 @@
                 "gradient": {
                     "name": "사이트맵",
                     "description": "색상 사이의 부드러운 전환을 만듭니다."
+                },
+                "bucketFill": {
+                    "name": "버켓 필",
+                    "description": "유사한 색깔의 지역에서 채우십시오."
                 }
             }
         },
@@ -1686,17 +1853,57 @@
         },
         "drawShapeToolIntroduction": {
             "introduction": [
-                "모양 공구는 더 주문화가 필요하다면 벡터 경로로 변환 할 수있는 다양한 기본 모양을 추가 할 수 있습니다."
+                "모양 도구는 다양한 기본 모양과 벡터 경로를 추가 할 수 있습니다."
             ],
             "body": {
                 "mouse": [
-                    "캔버스에 모양을 놓고 드래그하십시오."
+                    "{add} - 캔버스에 모양을 놓고 드래그하십시오.",
+                    "{edit} - 모양의 제어 지점을 클릭하고 모양을 편집하여 추가되었습니다."
                 ],
                 "touch": [
-                    "한 손가락을 터치하고 캔버스에 모양을 드래그하십시오."
+                    "{add} - 터치 한 손가락을 사용하여 캔버스에 모양을 배치합니다.",
+                    "{edit} - 모양의 컨트롤 포인트를 탭하고 모양을 편집하여 추가되었습니다."
                 ]
             },
-            "title": "모양 공구"
+            "title": "모양 공구",
+            "bodyTitle": {
+                "add": "기타 제품",
+                "edit": "제품정보"
+            }
+        },
+        "deformSharpenToolIntroduction": {
+            "title": "Sharpen 공구",
+            "introduction": [
+                "날카로운 공구는 당신이 끌리는 현재 층의 지역을 날카롭게 할 것입니다."
+            ]
+        },
+        "drawBucketFillToolIntroduction": {
+            "title": "버켓 필",
+            "introduction": [
+                "물통 충전물 공구는 당신이 당신의 선택의 색깔과 유사한 색깔의 지역에 채우게 합니다."
+            ],
+            "body": {
+                "mouse": [
+                    "자주 묻는 질문 마우스를 내려 놓으면 왼쪽 또는 오른쪽으로 드래그하여 지역이 얼마나 많이 채울 수 있습니다."
+                ],
+                "touch": [
+                    "채우기 영역에 탭합니다. 아래로 유지하면서, 당신은 왼쪽 또는 오른쪽으로 드래그하여 얼마나 많은 영역을 채울 수 있습니다."
+                ]
+            }
+        },
+        "eraseBucketFillToolIntroduction": {
+            "title": "Erase 버킷 필",
+            "introduction": [
+                "비슷한 색상을 가진 이미지의 Erase 지역."
+            ],
+            "body": {
+                "mouse": [
+                    "지우기 마우스를 잡고, 당신은 왼쪽 또는 오른쪽으로 드래그하여 얼마나 많은 영역을 지우는 것을 조정할 수 있습니다."
+                ],
+                "touch": [
+                    "지역을 지우기. 아래로 유지하면서, 당신은 왼쪽 또는 오른쪽으로 드래그 할 수 있습니다 얼마나 많은 지역은 지워."
+                ]
+            }
         }
     },
     "gradientPreset": {
@@ -1744,7 +1951,8 @@
         "simpleAirBrush": "간단한 공기 솔",
         "simplePaintBrush": "간단한 페인트 솔",
         "simplePen": "간단한 펜",
-        "simpleWaterColor": "간단한 물 색깔"
+        "simpleWaterColor": "간단한 물 색깔",
+        "simplePixelArt": "간단한 화소 (주)"
     },
     "defaultBrushCategory": {
         "custom": "제품 정보",
@@ -1753,27 +1961,57 @@
     "menuBarToolGroup": {
         "deform": {
             "tools": {
-                "blur": "이미지의 Blur 특정 영역"
+                "blur": {
+                    "title": "뚱 베어",
+                    "description": "이미지의 Blur 영역"
+                },
+                "sharpen": {
+                    "title": "스낵 바",
+                    "description": "이미지의 Sharpen 지역"
+                }
             },
             "name": "제품정보"
         },
         "draw": {
             "tools": {
-                "brush": "예술 솔로 끌기",
-                "gradient": "색상의 gradients 만들기",
-                "shape": "기본 모양 만들기"
+                "brush": {
+                    "title": "제품정보",
+                    "description": "예술 솔로 끌기"
+                },
+                "gradient": {
+                    "title": "사이트맵",
+                    "description": "색상의 gradients 만들기"
+                },
+                "shape": {
+                    "title": "제품 정보",
+                    "description": "기본 모양 만들기"
+                },
+                "bucketFill": {
+                    "title": "버켓 필",
+                    "description": "색상을 가진 충분한 지역"
+                }
             },
             "name": "드로잉"
         },
         "effect": {
             "tools": {
-                "effect": "Manipulate 층 색상 및 필터 효과를 추가"
+                "effect": {
+                    "title": "제품 정보",
+                    "description": "Manipulate 층 색상 및 필터 효과를 추가"
+                }
             },
             "name": "제품 정보"
         },
         "erase": {
             "tools": {
-                "brush": "솔 치기를 가진 이미지의 Erase 지역"
+                "brush": {
+                    "title": "Erase 브러쉬",
+                    "description": "솔 치기를 가진 Erase"
+                },
+                "bucketFill": {
+                    "title": "Erase 버킷 필",
+                    "description": "유사한 색깔을 가진 Erase 지역"
+                }
             },
             "name": "언어 선택"
         },
@@ -1782,7 +2020,10 @@
         },
         "selection": {
             "tools": {
-                "selection": "이미지의 specifc 영역을 편집, 잘라, 복사, 또는 삭제"
+                "selection": {
+                    "title": "- 연혁",
+                    "description": "이미지의 specifc 영역을 편집, 잘라, 복사, 또는 삭제"
+                }
             },
             "name": "- 연혁"
         },
@@ -1791,20 +2032,32 @@
         },
         "text": {
             "tools": {
-                "text": "삽입 및 편집 텍스트 층"
+                "text": {
+                    "title": "이름 *",
+                    "description": "삽입 및 편집 텍스트 층"
+                }
             },
             "name": "이름 *"
         },
         "transform": {
             "tools": {
-                "freeTransform": "이동, 가늠자, 자전 층",
-                "layerCrop": "선택된 층을 자르기"
+                "freeTransform": {
+                    "title": "무료 Transform",
+                    "description": "이동, 가늠자, 자전 층"
+                },
+                "layerCrop": {
+                    "title": "층 크롭",
+                    "description": "선택된 층을 자르기"
+                }
             },
             "name": "이동/변환"
         },
         "view": {
             "tools": {
-                "zoom": "줌 및 밖으로, 팬, 또는 이미지를 회전"
+                "zoom": {
+                    "title": "줌 / 팬",
+                    "description": "줌 및 밖으로, 팬, 또는 이미지를 회전"
+                }
             },
             "name": "캔버스 Viewport"
         }
