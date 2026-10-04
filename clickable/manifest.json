@@ -1,6 +1,6 @@
 {
     "name": "app.opengraphica.com",
-    "description": "A image editor for creating raster and vector graphics on mobile, desktop, or the web.",
+    "description": "An image editor for creating raster and vector graphics on mobile, desktop, or the web.",
     "architecture": "$ENV{CLICK_ARCH}",
     "title": "OpenGraphica",
     "hooks": {

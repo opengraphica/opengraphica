@@ -378,8 +378,16 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
 
     async onPointerUpBeforePurge(e: PointerEvent): Promise<void> {
         super.onPointerUpBeforePurge(e);
-
+        const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
+        if (pointer == null || pointer.type === 'touch') return;
         this.blurEnd(e);
+    }
+
+    onMultiTouchUp(): void {
+        super.onMultiTouchUp();
+        if (this.multiTouchDownCount != 1) return;
+        const pointer = this.multiTouchDownTouches[0];
+        this.blurEnd(pointer.up ?? pointer.down);
     }
 
     private async blurEnd(e: PointerEvent) {

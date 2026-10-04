@@ -210,17 +210,17 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         }
     }
 
-    onMultiTouchDown() {
-        super.onMultiTouchDown();
-        if (this.touches.length === 1) {
-            this.onTransformStart();
-        }
-    }
-
     onPointerDown(e: PointerEvent): void {
         super.onPointerDown(e);
         if (isInput(e.target)) return;
         if (e.isPrimary && ['mouse', 'pen'].includes(e.pointerType) && e.button === 0) {
+            this.onTransformStart();
+        }
+    }
+
+    onMultiTouchDown() {
+        super.onMultiTouchDown();
+        if (this.touches.length === 1) {
             this.onTransformStart();
         }
     }
@@ -251,12 +251,20 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         this.handleCursorIcon();
     }
 
-    async onPointerUp(e: PointerEvent): Promise<void> {
-        super.onPointerUp(e);
+    async onPointerUpBeforePurge(e: PointerEvent): Promise<void> {
+        super.onPointerUpBeforePurge(e);
         if (isInput(e.target)) return;
+        const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
+        if (pointer == null || pointer.type === 'touch') return;
         if (e.isPrimary) {
-            this.onTransformEnd();    
+            this.onTransformEnd();
         }
+    }
+
+    onMultiTouchUp(): void {
+        super.onMultiTouchUp();
+        if (this.multiTouchDownCount != 1) return;
+        this.onTransformEnd();
     }
 
     async onTransformStart() {

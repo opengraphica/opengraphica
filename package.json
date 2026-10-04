@@ -1,6 +1,6 @@
 {
     "name": "opengraphica",
-    "version": "0.0.2",
+    "version": "0.0.3-alpha.1",
     "author": "OpenGraphica devs",
     "license": "MIT",
     "description": "A image editor for creating raster and vector graphics on mobile, desktop, or the web.",
