@@ -1,6 +1,6 @@
 {
     "name": "opengraphica",
-    "version": "0.0.2-alpha.1",
+    "version": "0.0.2",
     "author": "OpenGraphica devs",
     "license": "MIT",
     "description": "A image editor for creating raster and vector graphics on mobile, desktop, or the web.",
@@ -16,6 +16,7 @@
         "dev:electron": "electron .",
         "dev:web": "webpack serve --config ./webpack.config.dev.js",
         "build": "npm run build:website",
+        "build:android": "npm run build && npx cap sync android",
         "build:css": "node ./src/css/build.js",
         "build:clickable": "npm run build:website && clickable build --arch all",
         "build:library": "webpack --mode=production --config ./webpack.config.library.js",
