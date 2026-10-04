@@ -104,6 +104,7 @@
 
     .og-button__label {
         display: inline-flex;
+        align-items: center;
         position: relative;
         white-space: nowrap;
     }
@@ -310,22 +311,22 @@
             }
         }
         > .og-button:first-child {
-            border-start-start-radius: var(--og-button-border-radius);
-            border-end-start-radius: var(--og-button-border-radius);
-            border-start-end-radius: 0;
-            border-end-end-radius: 0;
+            border-top-left-radius: var(--og-button-border-radius);
+            border-bottom-left-radius: var(--og-button-border-radius);
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
         }
         > .og-button:last-child {
-            border-start-start-radius: 0;
-            border-end-start-radius: 0;
-            border-start-end-radius: var(--og-button-border-radius);
-            border-end-end-radius: var(--og-button-border-radius);
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            border-top-right-radius: var(--og-button-border-radius);
+            border-bottom-right-radius: var(--og-button-border-radius);
         }
         > .og-button:only-child {
-            border-start-start-radius: var(--og-button-border-radius);
-            border-end-start-radius: var(--og-button-border-radius);
-            border-start-end-radius: var(--og-button-border-radius);
-            border-end-end-radius: var(--og-button-border-radius);
+            border-top-left-radius: var(--og-button-border-radius);
+            border-bottom-left-radius: var(--og-button-border-radius);
+            border-top-right-radius: var(--og-button-border-radius);
+            border-bottom-right-radius: var(--og-button-border-radius);
         }
     }
 }

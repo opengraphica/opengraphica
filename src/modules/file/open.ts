@@ -77,19 +77,40 @@ export async function openChooseSource(options: FileDialogOpenOptions = {}) {
 export async function openFromFileDialog(options: FileDialogOpenOptions = {}): Promise<void> {
 
     // We're working with new APIs
-    if (window.isSecureContext && window.showOpenFilePicker) {
-        const fileHandles = await window.showOpenFilePicker({
-            types: [
-                {
-                    description: 'Images / Videos',
-                    accept: {
-                        'text/plain': ['.json'],
-                        'image/*': [],
-                        'video/*': []
+    let isTryOldApi = true;
+    tryShowOpenFilePicker:
+    if (
+        window.isSecureContext
+        && window.showOpenFilePicker
+        && window.location.protocol !== 'file:'
+    ) {
+        isTryOldApi = false;
+        const showTimestamp = window.performance.now();
+        let fileHandles: FileSystemFileHandle[];
+        try {
+            fileHandles = await window.showOpenFilePicker({
+                types: [
+                    {
+                        description: 'Images / Videos',
+                        accept: {
+                            'text/plain': ['.json'],
+                            'image/*': [],
+                            'video/*': []
+                        }
                     }
-                }
-            ]
-        });
+                ]
+            }) as never;
+        } catch (error: any) {
+            if (
+                error?.message.includes('The user aborted a request')
+                && window.performance.now() - showTimestamp < 250
+            ) {
+                isTryOldApi = true;
+                break tryShowOpenFilePicker;
+            } else {
+                throw error;
+            }
+        }
         const files: File[] = [];
         let firstFileHandle: FileSystemFileHandle | null = null;
         for (const fileHandle of fileHandles) {
@@ -109,7 +130,7 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
     }
 
     // Peasant old Javascript manual labor.
-    else {
+    if (isTryOldApi) {
         // This container and the file input is purposely left in the dom after creation in order to avoid
         // several bugs revolving around the fact that browsers give you no information if file selection is canceled.
         let temporaryFileInputContainer = document.getElementById('og-tmp-file-input-container') as HTMLDivElement;

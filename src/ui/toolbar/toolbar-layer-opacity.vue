@@ -97,7 +97,7 @@ onUnmounted(() => {
 });
 
 function toggleMobileView() {
-    isMobileView.value = viewportWidth.value < 500;
+    isMobileView.value = (viewportWidth.value / (window.devicePixelRatio || 1)) < 500;
 }
 
 function onClose() {

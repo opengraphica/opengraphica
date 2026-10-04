@@ -34,6 +34,21 @@ module.exports = function setupConfig(config) {
                     }
                 },
                 {
+                    test: /\.js$/,
+                    exclude: (file) => {
+                        if (/node_modules/.test(file)) {
+                            return !/node_modules[/\\]three/.test(file);
+                        }
+                        return false;
+                    },
+                    use: {
+                        loader: 'babel-loader',
+                        options: {
+                            // Your babel options or config file reference
+                        },
+                    }
+                },
+                {
                     test: /\.mjs$/,
                     resolve: {
                         fullySpecified: false
@@ -66,15 +81,16 @@ module.exports = function setupConfig(config) {
                 },
                 {
                     test: /\.(cur|woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
-                    use: [
-                        {
-                            loader: 'file-loader',
-                            options: {
-                                name: '[name].[ext]',
-                                outputPath: 'fonts/'
-                            }
-                        }
-                    ]
+                    type: 'asset/inline',
+                    // use: [
+                    //     {
+                    //         loader: 'file-loader',
+                    //         options: {
+                    //             name: '[name].[ext]',
+                    //             outputPath: 'fonts/'
+                    //         }
+                    //     }
+                    // ]
                 }
             ]
         },

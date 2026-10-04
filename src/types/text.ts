@@ -52,14 +52,16 @@ export interface RenderTextGlyphInfo {
     fontDescender: number;
 }
 
-export interface FontFamilyFetchDefinition  {
+export interface FontFamilyFetchDefinitionVariant {
+    name: string;
+    file: string;
+}
+
+export interface FontFamilyFetchDefinition {
     family: string;
     subsets: string[];
     variants: {
-        [key: string]: {
-            name: string;
-            file: string;
-        };
+        [key: string]: FontFamilyFetchDefinitionVariant;
     };
 }
 

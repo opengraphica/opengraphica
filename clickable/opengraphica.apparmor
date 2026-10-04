@@ -1,4 +1,10 @@
 {
-    "template": "unconfined",
+    "policy_groups": [
+        "camera",
+        "networking",
+        "content_exchange",
+        "content_exchange_source",
+        "webview"
+    ],
     "policy_version": "$ENV{APPARMOR_POLICY}"
 }

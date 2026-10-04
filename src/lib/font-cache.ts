@@ -1,7 +1,8 @@
 import { parse, type Font } from './opentype';
 import defaultFontFamilies from '@/config/default-font-families.json';
+import googleWebfonts from '@/config/google-webfonts.json';
 
-import type { FontFamilyFetchDefinition } from '@/types';
+import type { FontFamilyFetchDefinition, FontFamilyFetchDefinitionVariant } from '@/types';
 
 export interface CreateFontCacheOptions {
     fetchBaseUrl?: string;
@@ -96,9 +97,25 @@ export class FontCache {
     }
 
     private async getFontFamilyDefinition(family: string): Promise<FontFamilyFetchDefinition> {
-        const definition = defaultFontFamilies.find((familyDef) => familyDef.family === family);
+        let definition = defaultFontFamilies.find((familyDef) => familyDef.family === family) as FontFamilyFetchDefinition | undefined;
+        if (!definition || window.location.protocol === 'file:') {
+            const googleDefinition = googleWebfonts.items.find((familyDef) => familyDef.family === family);
+            if (googleDefinition) {
+                definition = {
+                    family: googleDefinition.family,
+                    subsets: googleDefinition.subsets,
+                    variants: (googleDefinition.variants as string[]).reduce((accumulator, variantKey) => {
+                        accumulator[variantKey] = {
+                            name: '',
+                            file: googleDefinition.files[variantKey],
+                        }
+                        return accumulator;
+                    }, {} as { [key: string]: FontFamilyFetchDefinitionVariant }),
+                };
+            }
+        }
         if (definition) {
-            return definition as unknown as FontFamilyFetchDefinition;
+            return definition;
         }
         throw new Error('Definition not found.');
     }

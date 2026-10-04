@@ -8517,6 +8517,7 @@ body.og-full-page .opengraphica {
 }
 .opengraphica .og-button__label {
   display: inline-flex;
+  align-items: center;
   position: relative;
   white-space: nowrap;
 }
@@ -8685,22 +8686,22 @@ body.og-full-page .opengraphica {
   margin-inline-start: -0.0625rem;
 }
 .opengraphica .og-button-group > .og-button:first-child {
-  border-start-start-radius: var(--og-button-border-radius);
-  border-end-start-radius: var(--og-button-border-radius);
-  border-start-end-radius: 0;
-  border-end-end-radius: 0;
+  border-top-left-radius: var(--og-button-border-radius);
+  border-bottom-left-radius: var(--og-button-border-radius);
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
 .opengraphica .og-button-group > .og-button:last-child {
-  border-start-start-radius: 0;
-  border-end-start-radius: 0;
-  border-start-end-radius: var(--og-button-border-radius);
-  border-end-end-radius: var(--og-button-border-radius);
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: var(--og-button-border-radius);
+  border-bottom-right-radius: var(--og-button-border-radius);
 }
 .opengraphica .og-button-group > .og-button:only-child {
-  border-start-start-radius: var(--og-button-border-radius);
-  border-end-start-radius: var(--og-button-border-radius);
-  border-start-end-radius: var(--og-button-border-radius);
-  border-end-end-radius: var(--og-button-border-radius);
+  border-top-left-radius: var(--og-button-border-radius);
+  border-bottom-left-radius: var(--og-button-border-radius);
+  border-top-right-radius: var(--og-button-border-radius);
+  border-bottom-right-radius: var(--og-button-border-radius);
 }
 .opengraphica .og-canvas, .opengraphica .og-post-process-canvas {
   display: block;
@@ -11016,21 +11017,21 @@ body.og-full-page .opengraphica {
 }
 .opengraphica .og-popover__arrow + .og-popover__content,
 .opengraphica .og-popover__content:first-child {
-  border-start-start-radius: 0.875rem;
-  border-start-end-radius: 0.875rem;
+  border-top-left-radius: 0.875rem;
+  border-top-right-radius: 0.875rem;
 }
 .opengraphica .og-popover__content:last-child {
-  border-end-start-radius: 0.875rem;
-  border-end-end-radius: 0.875rem;
+  border-bottom-left-radius: 0.875rem;
+  border-bottom-right-radius: 0.875rem;
 }
 .opengraphica .og-popover > .og-popover__arrow + .el-menu > .el-menu-item:first-child,
 .opengraphica .og-popover > .el-menu:first-child > .el-menu-item:first-child {
-  border-start-start-radius: 0.875rem;
-  border-start-end-radius: 0.875rem;
+  border-top-left-radius: 0.875rem;
+  border-top-right-radius: 0.875rem;
 }
 .opengraphica .og-popover > .el-menu:last-child > .el-menu-item:last-child {
-  border-end-start-radius: 0.875rem;
-  border-end-end-radius: 0.875rem;
+  border-bottom-left-radius: 0.875rem;
+  border-bottom-right-radius: 0.875rem;
 }
 .opengraphica .og-select {
   --og-select-border-radius: 0.5rem;

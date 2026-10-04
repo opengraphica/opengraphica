@@ -1,0 +1,15 @@
+clickable_minimum_required: "8.0.0"
+framework: "ubuntu-touch-24.04-1.x"
+builder: custom
+
+
+build:
+  - mkdir -p "${INSTALL_DIR}/www"
+  - cp -a "${ROOT}/clickable/manifest.json" \
+      "${INSTALL_DIR}/manifest.json"
+  - cp -a "${ROOT}/clickable/opengraphica.apparmor" \
+      "${INSTALL_DIR}/opengraphica.apparmor"
+  - cp -a "${ROOT}/clickable/opengraphica.desktop" \
+      "${INSTALL_DIR}/opengraphica.desktop"
+  - cp -a "${ROOT}/www/." \
+      "${INSTALL_DIR}/www/"

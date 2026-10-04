@@ -2,8 +2,8 @@
 Version=1.0
 Type=Application
 Terminal=false
-Exec=./opengraphica.wrapper %U
-Icon=./resources/icon.png
+Exec=webapp-container --app-id="app.opengraphica.com" --local-content-can-access-remote-urls $@ www/index.html
+Icon=./www/android-chrome-512x512.png
 Name=OpenGraphica
 X-Ubuntu-Touch=true
 X-Ubuntu-Splash-Color=#FFFFFF
