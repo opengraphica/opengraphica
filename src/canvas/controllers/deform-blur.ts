@@ -155,6 +155,8 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
     onPointerDown(e: PointerEvent) {
         super.onPointerDown(e);
 
+        if (!canvasStore.get('ready')) return;
+
         if (e.pointerType === 'pen' || !editorStore.state.isPenUser) {
             cursorHoverPosition.value = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
@@ -184,6 +186,9 @@ export default class CanvasDeformBlurController extends BaseCanvasMovementContro
 
     onMultiTouchDown() {
         super.onMultiTouchDown();
+
+        if (!canvasStore.get('ready')) return;
+
         if (this.blurringPointerId != null) return;
         if (this.touches.length > 1 && !this.blurringUsePressure) {
             this.blurringPointerId = null;

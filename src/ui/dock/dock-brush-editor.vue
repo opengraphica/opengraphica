@@ -7,20 +7,23 @@
             <og-button
                 v-if="view === 'edit'"
                 outline
+                class="px-3! xs:px-5!"
                 @click="onBack()"
             >
-                <span class="bi bi-chevron-left mr-2" aria-hidden="true" /> <span>{{ t('button.back') }}</span>
+                <span class="bi bi-chevron-left xs:mr-2" aria-hidden="true" />
+                <span class="hidden xs:inline">{{ t('button.back') }}</span>
             </og-button>
             <og-button
                 outline primary
-                class="ml-3!"
+                class="ml-3! px-3! xs:px-5!"
                 @click="onDone()"
             >
-                <span class="bi bi-check-circle-fill mr-2" aria-hidden="true" /> <span>{{ t('button.done') }}</span>
+                <span class="bi bi-check-circle-fill xs:mr-2" aria-hidden="true" />
+                <span class="hidden xs:inline">{{ t('button.done') }}</span>
             </og-button>
         </div>
     </template>
-    <div class="og-dock-content og-toolbar-draw-brush-select-brush-drawer">
+    <div class="og-dock-content og-toolbar-draw-brush-select-brush-drawer shrink-1! overflow-hidden!">
         <div ref="brushSelectorView" v-if="view === 'select'" class="og-brush-selector">
             <nav class="og-brush-selector__categories">
                 <el-scrollbar>
@@ -32,7 +35,7 @@
                         }"
                         @click="selectedBrushCategoryId = brushCategory.id"
                     >
-                        <span :class="brushCategory.icon" aria-hidden="true" />
+                        <span :class="brushCategory.icon" class="hidden xs:inline" aria-hidden="true" />
                         {{ t('defaultBrushCategory.' + brushCategory.id) }}
                     </button>
                 </el-scrollbar>
@@ -86,14 +89,16 @@
                         class="w-full mt-4!"
                         @click="createCustomBrush()"
                     >
-                        <span class="bi bi-plus-circle mr-2" aria-hidden="true" />
-                        <span>{{ t('toolbar.drawBrush.brushDialog.editorTab.general.addCustomBrush') }}</span>
+                        <div class="whitespace-normal">
+                            <span class="bi bi-plus-circle mr-2" aria-hidden="true" />
+                            <span>{{ t('toolbar.drawBrush.brushDialog.editorTab.general.addCustomBrush') }}</span>
+                        </div>
                     </og-button>
                 </el-scrollbar>
             </div>
         </div>
         <div v-else-if="view === 'edit'" class="og-brush-editor">
-            <el-tabs v-model="brushEditorTab" tab-position="left">
+            <el-tabs v-model="brushEditorTab" :tab-position="isMobileView ? 'top' : 'left'" class="max-w-full">
                 <el-tab-pane name="general" :label="t('toolbar.drawBrush.brushDialog.editorTab.general.title')">
                     <el-scrollbar>
                         <h3>{{ t('toolbar.drawBrush.brushDialog.editorTab.general.title') }}</h3>
@@ -421,10 +426,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, toRefs, watch } from 'vue';
 import { useI18n } from '@/i18n';
 import { v4 as uuidv4 } from 'uuid';
 
+import canvasStore from '@/store/canvas';
 import {
     brushEditorTab, brushesByCategory, getBrushById,
     addCustomBrush, deleteCustomBrush, generateBrushPreview,
@@ -480,6 +486,17 @@ const { t } = useI18n();
 \*--------------*/
 
 const view = ref<'select' | 'edit'>('select');
+
+const isMobileView = ref<boolean>(false);
+const { viewWidth: viewportWidth } = toRefs(canvasStore.state);
+
+function toggleMobileView() {
+    isMobileView.value = (viewportWidth.value / (window.devicePixelRatio || 1)) < 500;
+}
+
+watch([viewportWidth], () => {
+    toggleMobileView();
+}, { immediate: true });
 
 /*--------------*\
 | Selected Brush |

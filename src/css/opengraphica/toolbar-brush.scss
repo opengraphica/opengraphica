@@ -19,6 +19,7 @@
         display: flex;
         flex-direction: row;
         flex-grow: 1;
+        overflow: hidden;
     }
 
     .og-brush-selector__categories {
@@ -88,8 +89,13 @@
 
     .og-brush-selector__brush-preview-name {
         display: block;
+        position: absolute;
         padding: 0 0.5rem;
         color: var(--og-toolbar-brush-preview-name-color);
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: 100%;
     }
 
     .og-brush-selector__brush-preview-image {
@@ -111,17 +117,28 @@
         display: flex;
         flex-direction: row;
         flex-grow: 1;
+        overflow: hidden;
 
         .el-tabs {
             flex-grow: 1;
+
+            @media screen and (max-width: 500px) {
+                display: flex;
+                flex-direction: column;
+            }
         }
 
         .el-tabs__content {
             padding-left: 1rem;
+            height: 100%;
 
             h3 {
                 font-size: 1.25rem;
                 margin-bottom: 1rem;
+            }
+
+            .el-tab-pane {
+                height: 100%;
             }
         }
 

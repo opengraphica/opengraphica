@@ -3,7 +3,7 @@
     "version": "0.0.2-alpha.1",
     "author": "OpenGraphica devs",
     "license": "MIT",
-    "description": "A mobile and web friendly image editor - create both raster and vector graphics.",
+    "description": "A image editor for creating raster and vector graphics on mobile, desktop, or the web.",
     "private": false,
     "main": "electron/main.js",
     "repository": {
@@ -17,7 +17,7 @@
         "dev:web": "webpack serve --config ./webpack.config.dev.js",
         "build": "npm run build:website",
         "build:css": "node ./src/css/build.js",
-        "build:clickable": "clickable build --arch all",
+        "build:clickable": "npm run build:website && clickable build --arch all",
         "build:library": "webpack --mode=production --config ./webpack.config.library.js",
         "build:webfont": "node ./scripts/webfont.js",
         "build:website": "webpack --mode=production --config ./webpack.config.website.js",

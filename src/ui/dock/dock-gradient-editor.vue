@@ -94,7 +94,7 @@
                         @change="onChangeEditingStopOffset()"
                     ></el-input-number>
                 </el-input-group>
-                <el-button-group class="flex ml-3">
+                <el-button-group class="flex! ml-3! flex-nowrap!">
                     <el-button plain size="small" @click="onDeleteEditingStop()">
                         <span class="bi bi-trash mr-2" aria-hidden="true" /> {{ t('button.delete') }}
                     </el-button>

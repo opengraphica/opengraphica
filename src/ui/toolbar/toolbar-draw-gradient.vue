@@ -69,11 +69,12 @@
             </h2>
             <el-button
                 plain
-                class="og-toolbar-drawer__close"
+                class="og-toolbar-drawer__close px-3! xs:px-5!"
                 :aria-label="t('toolbar.drawGradient.stopDialog.close')"
                 @click="showStopDrawer = false"
             >
-                <span class="bi bi-check-circle-fill mr-2" aria-hidden="true" /> <span>{{ t('button.done') }}</span>
+                <span class="bi bi-check-circle-fill xs:mr-2" aria-hidden="true" />
+                <span class="hidden xs:inline">{{ t('button.done') }}</span>
             </el-button>
             <dock-gradient-editor v-model:gradient="editingColorStops" :blend-color-space="blendColorSpace" @stops-edited="hasEditedColorStops = true" />
         </div>

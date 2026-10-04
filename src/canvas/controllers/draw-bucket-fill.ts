@@ -93,7 +93,20 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
 
     onPointerDown(e: PointerEvent) {
         super.onPointerDown(e);
+
+        if (!canvasStore.get('ready')) return;
+
         if (e.isPrimary && ['mouse', 'pen'].includes(e.pointerType) && e.button === 0) {
+            this.bucketFillStart();
+        }
+    }
+
+    onMultiTouchDown() {
+        super.onMultiTouchDown();
+
+        if (!canvasStore.get('ready')) return;
+
+        if (this.touches.length === 1) {
             this.bucketFillStart();
         }
     }
@@ -102,13 +115,6 @@ export default class CanvasDrawBucketFillController extends BaseCanvasMovementCo
         super.onPointerMove(e);
         if (e.isPrimary) {
             this.bucketFillMove();
-        }
-    }
-
-    onMultiTouchDown() {
-        super.onMultiTouchDown();
-        if (this.touches.length === 1) {
-            this.bucketFillStart();
         }
     }
 

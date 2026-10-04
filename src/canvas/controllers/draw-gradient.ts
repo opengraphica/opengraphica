@@ -110,6 +110,8 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
     onPointerDown(e: PointerEvent) {
         super.onPointerDown(e);
 
+        if (!canvasStore.get('ready')) return;
+
         if (hasVisibleToolbarOverlay.value) {
             showStopDrawer.value = false;
             return;
@@ -136,6 +138,9 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
 
     onMultiTouchDown() {
         super.onMultiTouchDown();
+
+        if (!canvasStore.get('ready')) return;
+
         if (this.touches.length === 1) {
             this.drawingPointerId = this.touches[0].id;
             this.drawStart();

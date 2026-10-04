@@ -176,6 +176,8 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
     onPointerDown(e: PointerEvent) {
         super.onPointerDown(e);
 
+        if (!canvasStore.get('ready')) return;
+
         if (e.pointerType === 'pen' || !editorStore.state.isPenUser) {
             cursorHoverPosition.value = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
@@ -210,6 +212,9 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
 
     onMultiTouchDown() {
         super.onMultiTouchDown();
+
+        if (!canvasStore.get('ready')) return;
+
         if (this.erasingPointerId != null) return;
         if (showBrushDrawer.value) {
             showBrushDrawer.value = false;

@@ -11357,6 +11357,7 @@ body.og-full-page .opengraphica {
   display: flex;
   flex-direction: row;
   flex-grow: 1;
+  overflow: hidden;
 }
 .opengraphica .og-brush-selector__categories {
   display: flex;
@@ -11415,8 +11416,13 @@ body.og-full-page .opengraphica {
 }
 .opengraphica .og-brush-selector__brush-preview-name {
   display: block;
+  position: absolute;
   padding: 0 0.5rem;
   color: var(--og-toolbar-brush-preview-name-color);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 100%;
 }
 .opengraphica .og-brush-selector__brush-preview-image {
   position: absolute;
@@ -11435,16 +11441,27 @@ body.og-full-page .opengraphica {
   display: flex;
   flex-direction: row;
   flex-grow: 1;
+  overflow: hidden;
 }
 .opengraphica .og-brush-editor .el-tabs {
   flex-grow: 1;
 }
+@media screen and (max-width: 500px) {
+  .opengraphica .og-brush-editor .el-tabs {
+    display: flex;
+    flex-direction: column;
+  }
+}
 .opengraphica .og-brush-editor .el-tabs__content {
   padding-left: 1rem;
+  height: 100%;
 }
 .opengraphica .og-brush-editor .el-tabs__content h3 {
   font-size: 1.25rem;
   margin-bottom: 1rem;
+}
+.opengraphica .og-brush-editor .el-tabs__content .el-tab-pane {
+  height: 100%;
 }
 .opengraphica .og-brush-editor .el-form-item__label {
   min-height: 0 !important;

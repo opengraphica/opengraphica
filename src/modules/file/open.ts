@@ -194,6 +194,15 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
 };
 
 export async function openFromTemporaryStorage() {
+
+    if (!canvasStore.get('ready')) {
+        await new Promise<void>((resolve) => {
+            watch(() => canvasStore.state.ready, () => {
+                resolve();
+            }, { once: true });
+        });
+    }
+
     appEmitter.emit('app.workingFile.detachAllLayers');
     const workingFile = await readWorkingFile();
     const maxMaskId = Object.keys(workingFile.masks).reduce((accumulator, value) => {

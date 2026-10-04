@@ -48,7 +48,7 @@
                                 v-for="layer of selectedLayers"
                                 :key="layer.id"
                             >
-                                <h3 class="m-0">
+                                <h3 class="m-0 whitespace-nowrap! overflow-hidden!">
                                     <i class="bi bi-layers mr-1" aria-hidden="true"></i>
                                     <span class="og-toolbar--effect__edit-layer-name">
                                         {{ t(layer.name) }}
@@ -431,33 +431,40 @@ async function onEditLayerFilter(layer: WorkingFileAnyLayer<ColorModel>, filterI
     isEditEffectPopoverVisible.value = false;
     effectSettingsDockVisible.value = false;
 
-    await nextTick();
+    if (window.innerWidth < 500) {
+        runModule('layer', 'layerEffectEdit', {
+            layerId: layer.id,
+            filterIndex
+        });
+    } else {
+        await nextTick();
 
-    generatedMaskId.value = undefined;
-    removedMaskId.value = undefined;
-    editingLayer.value = layer;
-    editingFilter.value = layer.filters[filterIndex];
-    editingFilterIndex.value = filterIndex;
-    editingFilterEnabled.value = !editingFilter.value.disabled;
-    editingFilterRendererClass.value = new (await getCanvasFilterClass(editingFilter.value.name))();
-    editingFilterConfig.value = editingFilterRendererClass.value.getEditConfig();
+        generatedMaskId.value = undefined;
+        removedMaskId.value = undefined;
+        editingLayer.value = layer;
+        editingFilter.value = layer.filters[filterIndex];
+        editingFilterIndex.value = filterIndex;
+        editingFilterEnabled.value = !editingFilter.value.disabled;
+        editingFilterRendererClass.value = new (await getCanvasFilterClass(editingFilter.value.name))();
+        editingFilterConfig.value = editingFilterRendererClass.value.getEditConfig();
 
-    for (const paramName in editingFilterParams) {
-        if (editingFilterParams.hasOwnProperty(paramName)) {
-            delete editingFilterParams[paramName];
+        for (const paramName in editingFilterParams) {
+            if (editingFilterParams.hasOwnProperty(paramName)) {
+                delete editingFilterParams[paramName];
+            }
         }
-    }
-    
-    for (const paramName in editingFilterConfig.value) {
-        const paramConfig = editingFilterConfig.value[paramName];
-        editingFilterParams[paramName] = editingFilter.value.params[paramName] ?? paramConfig.default;
-    }
+        
+        for (const paramName in editingFilterConfig.value) {
+            const paramConfig = editingFilterConfig.value[paramName];
+            editingFilterParams[paramName] = editingFilter.value.params[paramName] ?? paramConfig.default;
+        }
 
-    if (!effectSettingsDockVisible.value) {
-        effectSettingsDockTop.value = 0;
-        effectSettingsDockLeft.value = 0;
+        if (!effectSettingsDockVisible.value) {
+            effectSettingsDockTop.value = 0;
+            effectSettingsDockLeft.value = 0;
+        }
+        effectSettingsDockVisible.value = true;
     }
-    effectSettingsDockVisible.value = true;
 }
 
 function onMoveLayerFilterUp(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {

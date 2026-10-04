@@ -189,6 +189,8 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
     onPointerDown(e: PointerEvent) {
         super.onPointerDown(e);
 
+        if (!canvasStore.get('ready')) return;
+
         if ((e.pointerType === 'pen' || !editorStore.state.isPenUser)) {
             cursorHoverPosition.value = new DOMPoint(
                 this.lastCursorX * devicePixelRatio,
@@ -223,6 +225,9 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
 
     onMultiTouchDown() {
         super.onMultiTouchDown();
+
+        if (!canvasStore.get('ready')) return;
+
         if (this.drawingPointerId != null) return;
         if (showBrushDrawer.value) {
             showBrushDrawer.value = false;

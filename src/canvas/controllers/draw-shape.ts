@@ -226,6 +226,8 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
     onPointerDown(e: PointerEvent) {
         super.onPointerDown(e);
 
+        if (!canvasStore.get('ready')) return;
+
         previewInvisibleStrokeStart.value = null;
 
         if (hasVisibleToolbarOverlay.value) {
@@ -248,6 +250,9 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
     onMultiTouchDown() {
         super.onMultiTouchDown();
+
+        if (!canvasStore.get('ready')) return;
+
         if (this.touches.length === 1) {
             if (this.touches[0].down.isPrimary && this.touches[0].down.button === 0) {
                 this.onPointerOrTouchDown(this.touches[0]);
