@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Exec=./opengraphica.wrapper %U
+Icon=./resources/icon.png
+Name=OpenGraphica
+X-Ubuntu-Touch=true
+X-Ubuntu-Splash-Color=#FFFFFF

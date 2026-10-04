@@ -15,6 +15,10 @@ OpenGraphica may be integrated into existing web applications which require a ph
 To build OpenGraphica as a website: install [Node.js](https://nodejs.org/en/), clone this repository, then run these Node.js commands in the repository folder:
 ```
 npm install
+ln -s ../../../../rust/renderer_wgpu_wasm/pkg src/renderers/wgpu-wasm/backend/build
+cd rust/renderer_wgpu_wasm
+wasm-pack build --target web
+cd ../..
 npm run build:website
 ```
 Production-ready files will output in the `www` folder. You may view the index.html in this folder as an example of how to instantiate the app if you wish to tweak it.

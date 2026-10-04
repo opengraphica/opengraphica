@@ -17,6 +17,7 @@
         "dev:web": "webpack serve --config ./webpack.config.dev.js",
         "build": "npm run build:website",
         "build:css": "node ./src/css/build.js",
+        "build:clickable": "npx electron-builder --linux --arm64 --dir -c.directories.output=clickable/build && cp www/android-chrome-512x512.png clickable/build/linux-arm64-unpacked/resources/icon.png && (cd clickable && clickable build --arch arm64)",
         "build:library": "webpack --mode=production --config ./webpack.config.library.js",
         "build:webfont": "node ./scripts/webfont.js",
         "build:website": "webpack --mode=production --config ./webpack.config.website.js",

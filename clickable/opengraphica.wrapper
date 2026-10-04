@@ -1,0 +1,17 @@
+#!/bin/bash
+
+export GDK_BACKEND=wayland
+export PATH=$PWD/bin:$PATH
+APP_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+
+wsf=$HOME/.cache/lomiri/windowstatestorage.sqlite
+if [ -f "$wsf" ]; then
+    sqlite3 "$wsf" "delete from state where windowId like 'app.opengraphica.com';"
+fi
+
+exec "$APP_DIR/opengraphica" \
+    --no-sandbox \
+    --ozone-platform=wayland \
+    --ignore-gpu-blocklist \
+    --use-angle=swiftshader \
+    "$@"

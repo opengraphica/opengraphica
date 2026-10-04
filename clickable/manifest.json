@@ -1,0 +1,15 @@
+{
+    "name": "app.opengraphica.com",
+    "description": "A mobile and web friendly image editor - create both raster and vector graphics.",
+    "architecture": "$ENV{CLICK_ARCH}",
+    "title": "OpenGraphica",
+    "hooks": {
+        "code": {
+            "apparmor": "opengraphica.apparmor",
+            "desktop": "opengraphica.desktop"
+        }
+    },
+    "version": "0.0.1",
+    "maintainer": "OpenGraphica <opengraphica@gmail.com>",
+    "framework": "$ENV{CLICK_FRAMEWORK}"
+}
