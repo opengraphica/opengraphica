@@ -108,10 +108,16 @@ export class TrimLayerEmptySpaceAction extends BaseAction {
                 bounds.top - viewBox.top,
             );
 
-            const newLayerTransform = new DOMMatrix().multiplySelf(layer.transform).translateSelf(
-                currentViewBoxOffset.x,
-                currentViewBoxOffset.y,
-            );
+            const newLayerTransform = new DOMMatrix()
+                .multiplySelf(
+                    layer.transform,
+                ).scaleSelf(
+                    layer.width / viewBox.width,
+                    layer.height / viewBox.height,
+                ).translateSelf(
+                    currentViewBoxOffset.x,
+                    currentViewBoxOffset.y,
+                );
 
             svgDocument.documentElement.setAttribute('viewBox', `${bounds.left} ${bounds.top} ${bounds.width} ${bounds.height}`);
 

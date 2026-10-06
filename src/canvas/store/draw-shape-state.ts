@@ -151,6 +151,8 @@ export const transformOriginY = ref<number>(0.5);
 export const transformDragHandleHighlight = ref<number | null>(null);
 export const transformRotateHandleHighlight = ref<boolean>(false);
 
+export const isTransformBoundsTransparent = ref<boolean>(false);
+
 export const transformOptions = computed(() => {
     let canTranslate: boolean = true;
     let canScale: boolean = true;

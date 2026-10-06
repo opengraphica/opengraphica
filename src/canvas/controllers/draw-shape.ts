@@ -13,7 +13,7 @@ import {
     transformBoundsTop, transformBoundsLeft, transformBoundsWidth, transformBoundsHeight,
     transformBoundsRotation, transformOriginX, transformOriginY,
     transformDragHandleHighlight, transformRotateHandleHighlight, transformOptions,
-    rotationSnappingDegrees,
+    isTransformBoundsTransparent, rotationSnappingDegrees,
     editControlPointNodes, renderControlPointAttributeEdits, editControlPointNodeParsedAttributes,
     editingLayers, hasVisibleToolbarOverlay, showShapeDrawer,
     type ControlPointAttributeEdit,
@@ -1123,7 +1123,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             if (!layerDocument) continue;
 
             const viewBox = getViewBox(layer.data.sourceDocument);
-            const transform  = parseNodeTransform(layerDocument.documentElement);
+            const transform  = parseNodeTransform(node);
             const nodeXf = layer.transform.scale(
                 layer.width / viewBox.width, layer.height / viewBox.height, 1.0,
             ).translateSelf(
@@ -1772,10 +1772,9 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         // Figure out which resize/rotate handles were clicked on, or if clicked in empty space just to drag
         this.determineDragRotateType(viewTransformPoint, transformBoundsPoint, viewDecomposedTransform);
 
-        // TODO - snapping?
-        // const decomposedCanvasTransform = canvasStore.get('decomposedTransform');
-        // this.snapSensitivity = preferencesStore.get('snapSensitivity') / decomposedCanvasTransform.scaleX * devicePixelRatio;
-        // this.calculateTransformShapeSnapPoints();
+        const decomposedCanvasTransform = canvasStore.get('decomposedTransform');
+        this.snapSensitivity = preferencesStore.get('snapSensitivity') / decomposedCanvasTransform.scaleX * devicePixelRatio;
+        this.calculateTransformShapeSnapPoints();
     }
 
     private async transformShapesMove(e: PointerTracker) {
@@ -2326,6 +2325,15 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         return transformDragType;
     }
 
+    private calculateTransformShapeSnapPoints() {
+        // TODO
+
+        this.snapXPoints = [];
+        this.snapYPoints = [];
+
+        this.snapPointsNeedToBeCalculated = false;
+    }
+
     /*------------------*\
     |                    |
     |   Event Handling   |
@@ -2334,12 +2342,13 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
     private async onFillColorChanged(color?: RGBAColor) {
         if (!color) return;
-        if (selectedEditControlPointIndices.value.length > 0) {
+        if (selectedEditControlPointIndices.value.length > 0 || selectedShapes.value.length > 0) {
             const layerNodeMap = this.getSelectedEditControlPointLayerNodeMap();
 
             const actions: UpdateVectorLayerAttributesAction[] = [];
-            for (const [layerId, nodeIdSet] of layerNodeMap.entries()) {
-                for (const nodeId of Array.from(nodeIdSet)) {
+
+            if (selectedShapes.value.length > 0) {
+                for (const [layerId, nodeId] of selectedShapes.value) {
                     actions.push(new UpdateVectorLayerAttributesAction(
                         layerId,
                         nodeId,
@@ -2348,6 +2357,19 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                             'fill-opacity': `${color.alpha}`,
                         },
                     ));
+                }
+            } else {
+                for (const [layerId, nodeIdSet] of layerNodeMap.entries()) {
+                    for (const nodeId of Array.from(nodeIdSet)) {
+                        actions.push(new UpdateVectorLayerAttributesAction(
+                            layerId,
+                            nodeId,
+                            {
+                                fill: color.alpha > 0 ? color.style.slice(0, 7) : 'none',
+                                'fill-opacity': `${color.alpha}`,
+                            },
+                        ));
+                    }
                 }
             }
 
@@ -2363,12 +2385,13 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
     private async onStrokeColorChanged(color?: RGBAColor) {
         if (!color) return;
-        if (selectedEditControlPointIndices.value.length > 0) {
+        if (selectedEditControlPointIndices.value.length > 0 || selectedShapes.value.length > 0) {
             const layerNodeMap = this.getSelectedEditControlPointLayerNodeMap();
 
             const actions: UpdateVectorLayerAttributesAction[] = [];
-            for (const [layerId, nodeIdSet] of layerNodeMap.entries()) {
-                for (const nodeId of Array.from(nodeIdSet)) {
+
+            if (selectedShapes.value.length > 0) {
+                for (const [layerId, nodeId] of selectedShapes.value) {
                     actions.push(new UpdateVectorLayerAttributesAction(
                         layerId,
                         nodeId,
@@ -2377,6 +2400,19 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                             'stroke-opacity': `${color.alpha}`,
                         },
                     ));
+                }
+            } else {
+                for (const [layerId, nodeIdSet] of layerNodeMap.entries()) {
+                    for (const nodeId of Array.from(nodeIdSet)) {
+                        actions.push(new UpdateVectorLayerAttributesAction(
+                            layerId,
+                            nodeId,
+                            {
+                                stroke: color.alpha > 0 ? color.style.slice(0, 7) : null,
+                                'stroke-opacity': `${color.alpha}`,
+                            },
+                        ));
+                    }
                 }
             }
 
@@ -2387,21 +2423,33 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                     actions,
                 )
             });
+            this.setTransformBoundsFromSelectedShapesImmediate();
         }
     }
 
     private onStrokeWidthPreview(newStrokeWidth?: number) {
         if (newStrokeWidth == null) return;
-        if (selectedEditControlPointIndices.value.length > 0) {
+        if (selectedEditControlPointIndices.value.length > 0 || selectedShapes.value.length > 0) {
+            isTransformBoundsTransparent.value = true;
             const layerNodeMap = this.getSelectedEditControlPointLayerNodeMap();
 
-            for (const [layerId, nodeIdSet] of layerNodeMap.entries()) {
-                for (const nodeId of Array.from(nodeIdSet)) {
+            if (selectedShapes.value.length > 0) {
+                for (const [layerId, nodeId] of selectedShapes.value) {
                     this.renderer?.updateVectorLayerAttributes(
                         layerId,
                         nodeId,
                         { 'stroke-width': `${newStrokeWidth}` },
-                    )
+                    );
+                }
+            } else {
+                for (const [layerId, nodeIdSet] of layerNodeMap.entries()) {
+                    for (const nodeId of Array.from(nodeIdSet)) {
+                        this.renderer?.updateVectorLayerAttributes(
+                            layerId,
+                            nodeId,
+                            { 'stroke-width': `${newStrokeWidth}` },
+                        );
+                    }
                 }
             }
         }
@@ -2409,17 +2457,29 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
     private async onStrokeWidthChanged(newStrokeWidth?: number) {
         if (newStrokeWidth == null) return;
-        if (selectedEditControlPointIndices.value.length > 0) {
+        if (selectedEditControlPointIndices.value.length > 0 || selectedShapes.value.length > 0) {
+            isTransformBoundsTransparent.value = false;
             const layerNodeMap = this.getSelectedEditControlPointLayerNodeMap();
 
             const actions: UpdateVectorLayerAttributesAction[] = [];
-            for (const [layerId, nodeIdSet] of layerNodeMap.entries()) {
-                for (const nodeId of Array.from(nodeIdSet)) {
+
+            if (selectedShapes.value.length > 0) {
+                for (const [layerId, nodeId] of selectedShapes.value) {
                     actions.push(new UpdateVectorLayerAttributesAction(
                         layerId,
                         nodeId,
                         { 'stroke-width': `${newStrokeWidth}` },
                     ));
+                }
+            } else {
+                for (const [layerId, nodeIdSet] of layerNodeMap.entries()) {
+                    for (const nodeId of Array.from(nodeIdSet)) {
+                        actions.push(new UpdateVectorLayerAttributesAction(
+                            layerId,
+                            nodeId,
+                            { 'stroke-width': `${newStrokeWidth}` },
+                        ));
+                    }
                 }
             }
 
@@ -2430,6 +2490,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                     actions,
                 )
             });
+            this.setTransformBoundsFromSelectedShapesImmediate();
             this.hasUncroppedChanges = true;
         }
     }

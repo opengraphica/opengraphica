@@ -3,7 +3,10 @@
         <div
             v-show="selectedShapes.length > 0"
             class="absolute!"
-            :style="{ transform: cssViewTransform }"
+            :style="{
+                transform: cssViewTransform,
+                opacity: isTransformBoundsTransparent ? 0.5 : 1
+            }"
         >
             <div ref="freeTransform"
                 class="og-free-transform"
@@ -262,6 +265,7 @@ import {
     selectedShapes, transformDragHandleHighlight, transformRotateHandleHighlight,
     transformBoundsTop, transformBoundsLeft, transformBoundsWidth, transformBoundsHeight,
     transformBoundsRotation, transformOriginX, transformOriginY,
+    isTransformBoundsTransparent,
 } from '@/canvas/store/draw-shape-state';
 
 defineOptions({
