@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { markRaw } from 'vue';
+import { markRaw, readonly } from 'vue';
 import { BaseAction } from './base';
 import { updateBakedImageForLayer } from './baking';
 
@@ -224,7 +224,10 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
             calculateLayerOrder();
         }
 
-        appEmitter.emit('app.workingFile.layerUpdated', layer);
+        appEmitter.emit('app.workingFile.layerUpdated', {
+            layer,
+            props: readonly(this.updateLayerOptions),
+        });
         regenerateLayerThumbnail(layer);
         if (requiresBaking) {
             updateBakedImageForLayer(layer);
@@ -297,6 +300,10 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                 }
             }
 
+            appEmitter.emit('app.workingFile.layerUpdated', {
+                layer,
+                props: readonly(this.explicitPreviousProps ?? this.previousProps),
+            });
             regenerateLayerThumbnail(layer);
             updateBakedImageForLayer(layer);
         }

@@ -1,3 +1,4 @@
+import type { DeepReadonly } from 'vue';
 import mitt, { type Handler } from 'mitt';
 
 import type { NotificationProps, NotificationHandle } from 'element-plus/lib/components/notification/src/notification.d';
@@ -54,7 +55,10 @@ interface AppEmitterEvents {
     };
     'app.workingFile.detachAllLayers': undefined;
     'app.workingFile.layerAttached': WorkingFileAnyLayer;
-    'app.workingFile.layerUpdated': WorkingFileAnyLayer;
+    'app.workingFile.layerUpdated': {
+        layer: WorkingFileAnyLayer;
+        props: DeepReadonly<Partial<WorkingFileAnyLayer>>;
+    };
     'app.workingFile.layerDetached': WorkingFileAnyLayer;
     'app.workingFile.layerOrderCalculated': undefined;
     'app.workingFile.layerReordered': {

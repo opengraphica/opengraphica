@@ -349,7 +349,19 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
 
         if (this.imageBackground) {
             this.imageBackground.swapScene(currentScene);
+
             currentSceneIsUsed = true;
+            for (const topLevelLayer of this.layerOrder) {
+                if (topLevelLayer.blendingMode === 'erase') {
+                    currentSceneIsUsed = false;
+                    break;
+                }
+            }
+            if (!currentSceneIsUsed) {
+                passScenes.push(currentScene);
+                currentScene = new Scene();
+                currentScene.background = null;
+            }
         }
 
         const stack: Array<WorkingFileLayer> = [

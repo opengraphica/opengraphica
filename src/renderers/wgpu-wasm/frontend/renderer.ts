@@ -135,6 +135,9 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
         this.onDetachAllLayers = this.onDetachAllLayers.bind(this);
         appEmitter.on('app.workingFile.detachAllLayers', this.onDetachAllLayers);
 
+        this.onLayerUpdated = this.onLayerUpdated.bind(this);
+        appEmitter.on('app.workingFile.layerUpdated', this.onLayerUpdated);
+
         this.onLayerOrderCalculated = this.onLayerOrderCalculated.bind(this);
         appEmitter.on('app.workingFile.layerOrderCalculated', this.onLayerOrderCalculated);
 
@@ -369,6 +372,15 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
             layerWatcher.detach();
         }
         this.layerWatchersById.clear();
+    }
+
+    onLayerUpdated(event?: AppEmitterEvents['app.workingFile.layerUpdated']) {
+        if (event?.props.blendingMode) {
+            // TODO - not sure if passing the layers here is necessary.
+            this.rendererBackend.setLayerOrder(
+                []
+            );
+        }
     }
 
     onLayerOrderCalculated() {

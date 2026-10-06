@@ -137,6 +137,9 @@ export class Webgl2RendererFrontend implements RendererFrontend {
         this.onDetachAllLayers = this.onDetachAllLayers.bind(this);
         appEmitter.on('app.workingFile.detachAllLayers', this.onDetachAllLayers);
 
+        this.onLayerUpdated = this.onLayerUpdated.bind(this);
+        appEmitter.on('app.workingFile.layerUpdated', this.onLayerUpdated);
+
         this.onLayerOrderCalculated = this.onLayerOrderCalculated.bind(this);
         appEmitter.on('app.workingFile.layerOrderCalculated', this.onLayerOrderCalculated);
 
@@ -297,6 +300,15 @@ export class Webgl2RendererFrontend implements RendererFrontend {
             layerWatcher.detach();
         }
         this.layerWatchersById.clear();
+    }
+
+    onLayerUpdated(event?: AppEmitterEvents['app.workingFile.layerUpdated']) {
+        if (event?.props.blendingMode) {
+            // TODO - only pass necessary data for each layer (id, type, blendingMode, layers).
+            this.rendererBackend.setLayerOrder(
+                deepToRaw(workingFileStore.get('layers'))
+            );
+        }
     }
 
     onLayerOrderCalculated() {
@@ -476,7 +488,9 @@ export class Webgl2RendererFrontend implements RendererFrontend {
         appEmitter.off('app.workingFile.layerAttached', this.onLayerAttached);
         appEmitter.off('app.workingFile.layerReordered', this.onLayerReordered);
         appEmitter.off('app.workingFile.layerDetached', this.onLayerDetached);
+        appEmitter.off('app.workingFile.layerUpdated', this.onLayerUpdated);
         appEmitter.off('app.workingFile.detachAllLayers', this.onDetachAllLayers);
+
         appEmitter.off('app.workingFile.layerOrderCalculated', this.onLayerOrderCalculated);
         appEmitter.off('editor.history.step', this.onEditorHistoryStep);
 

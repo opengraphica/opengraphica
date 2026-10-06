@@ -2509,7 +2509,10 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         ) {
             this.createEditingLayersFromSelectedLayers(workingFileStore.state.selectedLayerIds, workingFileStore.state.selectedLayerIds);
         }
-        if (event.action.id === 'deleteVectorLayerShape') {
+        if (
+            event.action.id === 'deleteVectorLayerShape'
+            || event.action.id === 'pasteShapes'
+        ) {
             selectedShapes.value = [];
         }
         if (event.trigger !== 'do') {
@@ -2806,21 +2809,34 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
     private async onCopy(event?: AppEmitterEvents['editor.tool.copySelectedLayers']) {
         if (!event) return;
-        if (selectedEditControlPointIndices.value.length > 0) {
+        if (selectedEditControlPointIndices.value.length > 0 || selectedShapes.value.length > 0) {
             event.preventDefault();
 
             this.copiedShapes = [];
             this.currentCopiedShapesPasteCount = 0;
 
             const copyShapeMap = new Map<number, Set<number>>();
-            const selectedIndices = selectedEditControlPointIndices.value;
-            for (const pointIndex of selectedIndices) {
-                const point = editControlPoints.value[pointIndex];
-                if (point.attachToIndex != null) continue;
 
-                const copyShapes = copyShapeMap.get(point.layerIndex) ?? new Set<number>();
-                copyShapes.add(point.nodeIndex);
-                copyShapeMap.set(point.layerIndex, copyShapes);
+            if (selectedShapes.value.length > 0) {
+                for (const [layerId, shapeId] of selectedShapes.value) {
+                    const layerIndex = editingLayers.value.findIndex((layer) => layer.id === layerId);
+                    const nodeIndex = editControlPointNodes.value.findIndex((node) => node.getAttribute('data-ogr-id') === shapeId);
+                    if (layerIndex < 0 || nodeIndex < 0) continue;
+
+                    const copyShapes = copyShapeMap.get(layerIndex) ?? new Set<number>();
+                    copyShapes.add(nodeIndex);
+                    copyShapeMap.set(layerIndex, copyShapes);
+                }
+            } else {
+                const selectedIndices = selectedEditControlPointIndices.value;
+                for (const pointIndex of selectedIndices) {
+                    const point = editControlPoints.value[pointIndex];
+                    if (point.attachToIndex != null) continue;
+
+                    const copyShapes = copyShapeMap.get(point.layerIndex) ?? new Set<number>();
+                    copyShapes.add(point.nodeIndex);
+                    copyShapeMap.set(point.layerIndex, copyShapes);
+                }
             }
 
             for (const [layerIndex, nodeIndices] of copyShapeMap.entries()) {
@@ -2851,7 +2867,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
 
     private async onCut(event?: AppEmitterEvents['editor.tool.cutSelectedLayers']) {
         if (!event) return;
-        if (selectedEditControlPointIndices.value.length > 0) {
+        if (selectedEditControlPointIndices.value.length > 0 || selectedShapes.value.length > 0) {
             event.preventDefault();
             this.onCopy(event);
             this.onDelete(true);
