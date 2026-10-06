@@ -36,7 +36,7 @@ export default defineComponent({
             return workingFileStore.state.width > workingFileStore.state.height;
         });
 
-        const thumbnailImageSrc = ref<string>('data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==');
+        const thumbnailImageSrc = ref<string>(props.layer.thumbnailImageSrc ?? 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==');
         let thumbnailCanvas = document.createElement('canvas');
         let thumbnailCanvasCtx = thumbnailCanvas.getContext('bitmaprenderer', getCanvasRenderingContext2DSettings());
 
@@ -58,6 +58,11 @@ export default defineComponent({
                 }
 
                 const renderer = await useRenderer();
+                if (props.layer.type === 'gradient') {
+                    await new Promise((resolve) => {
+                        setTimeout(resolve, 0);
+                    });
+                }
                 const thumbnailBitmap = await renderer.takeSnapshot(thumbnailWidth, thumbnailHeight, {
                     layerIds: [props.layer.id],
                     // disableBackground: true, // TODO - renderer generates weird output

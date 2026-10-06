@@ -223,6 +223,7 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
 
     async takeSnapshot(imageWidth: number, imageHeight: number, options?: RendererFrontendTakeSnapshotOptions): Promise<ImageBitmap> {
         if (!this.rendererBackend) throw Error('Renderer backend not initialized.');
+
         const cameraTransform = options?.cameraTransform
             ? new Float32Array([
                 options.cameraTransform.m11, options.cameraTransform.m21, options.cameraTransform.m31, options.cameraTransform.m41,
@@ -234,6 +235,7 @@ export class WgpuWasmRendererFrontend implements RendererFrontend {
         const layerIds = options?.layerIds
             ? new Uint32Array(options.layerIds)
             : undefined;
+
         return await this.rendererBackend.takeSnapshot(imageWidth, imageHeight, {
             cameraTransform,
             layerIds,

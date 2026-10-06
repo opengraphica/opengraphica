@@ -28,6 +28,8 @@ import type {
     RendererBucketFillSettings, RendererPickedVectorLayerElement,
 } from '@/types';
 
+type AsyncCallback<T> = () => T | PromiseLike<T>;
+
 export class Webgl2RendererFrontend implements RendererFrontend {
     rendererBackend: Webgl2RendererBackendPublic;
     videoPlayer: VideoPlayer | undefined;
@@ -41,6 +43,41 @@ export class Webgl2RendererFrontend implements RendererFrontend {
 
     layerWatchersByType: Record<string, ClassType<RendererLayerWatcher>> = {};
     layerWatchersById: Map<number, RendererLayerWatcher> = new Map();
+
+    backendCallQueue: Promise<void> = Promise.resolve();
+
+    async queueBackendCall<T>(callback: AsyncCallback<T>): Promise<T> {
+        let resolveResult!: (value: T | PromiseLike<T>) => void;
+        let rejectResult!: (reason?: unknown) => void;
+
+        const result = new Promise<T>((resolve, reject) => {
+            resolveResult = resolve;
+            rejectResult = reject;
+        });
+
+        this.backendCallQueue = this.backendCallQueue
+            .catch(() => {
+                // A failed callback must not prevent later callbacks from running.
+            })
+            .then(async () => {
+                let isTimeoutRejected = false;
+                const timeoutHandle = setTimeout(() => {
+                    isTimeoutRejected = true;
+                    rejectResult(new Error('Renderer backend call took too long.'));
+                }, 5000);
+                try {
+                    const value = await callback();
+                    if (isTimeoutRejected) return;
+                    clearTimeout(timeoutHandle);
+                    resolveResult(value);
+                } catch (error) {
+                    clearTimeout(timeoutHandle);
+                    rejectResult(error);
+                }
+            });
+
+        return result;
+    }
 
     constructor(backend: Webgl2RendererBackendPublic) {
         this.rendererBackend = backend;
@@ -342,6 +379,7 @@ export class Webgl2RendererFrontend implements RendererFrontend {
 
     async takeSnapshot(imageWidth: number, imageHeight: number, options?: RendererFrontendTakeSnapshotOptions): Promise<ImageBitmap> {
         if (!this.rendererBackend) throw Error('Renderer backend not initialized.');
+
         const cameraTransform = options?.cameraTransform
             ? new Float64Array([
                 options.cameraTransform.m11, options.cameraTransform.m12, options.cameraTransform.m13, options.cameraTransform.m14,
@@ -353,14 +391,17 @@ export class Webgl2RendererFrontend implements RendererFrontend {
         const layerIds = options?.layerIds
             ? new Uint32Array(options.layerIds)
             : undefined;
-        return this.rendererBackend.takeSnapshot(imageWidth, imageHeight, {
+
+        const imageBitmap = await this.queueBackendCall(() => this.rendererBackend.takeSnapshot(imageWidth, imageHeight, {
             cameraTransform,
             layerIds,
             filters: options?.filters ? deepToRaw(options.filters) : undefined,
             applySelectionMask: options?.applySelectionMask,
             disableScaleToSize: options?.disableScaleToSize,
             disableBackground: options?.disableBackground,
-        });
+        }));
+
+        return await imageBitmap;
     }
 
     async pickColor(canvasX: number, canvasY: number): Promise<RGBAColor> {

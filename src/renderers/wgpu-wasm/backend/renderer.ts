@@ -157,6 +157,8 @@ export class WgpuWasmRendererBackend implements WgpuWasmRendererBackendPublic {
         return [];
     }
     async takeSnapshot(imageWidth: number, imageHeight: number, options?: WgpuWasmRendererBackendTakeSnapshotOptions): Promise<ImageBitmap> {
+        // The purpose of this interval is to force redraw while taking a snapshot, otherwise
+        // WebGL2 can't read back the pixels from the canvas.
         let dirtyInterval = setInterval(() => {
             this.dirty = true;
         }, 16);
