@@ -23,6 +23,7 @@
         "build:webfont": "node ./scripts/webfont.js",
         "build:website": "webpack --mode=production --config ./webpack.config.website.js",
         "build:website:inspect": "node --inspect webpack --config ./webpack.config.website.js --stats verbose",
+        "install:clickable": "clickable install --arch all",
         "serve": "npm run dev:web",
         "start": "npm run dev:web",
         "translate": "node ./scripts/translate.js"

@@ -146,9 +146,9 @@ export default class CanvasCropResizeController extends BaseCanvasMovementContro
 
             const isDragAll = this.cropDragType === DRAG_TYPE_ALL;
             let isDragLeft = Math.floor(this.cropDragType / DRAG_TYPE_LEFT) % 2 === 1;
-			let isDragRight = Math.floor(this.cropDragType / DRAG_TYPE_RIGHT) % 2 === 1;
-			let isDragTop = Math.floor(this.cropDragType / DRAG_TYPE_TOP) % 2 === 1;
-			let isDragBottom = Math.floor(this.cropDragType / DRAG_TYPE_BOTTOM) % 2 === 1;
+            let isDragRight = Math.floor(this.cropDragType / DRAG_TYPE_RIGHT) % 2 === 1;
+            let isDragTop = Math.floor(this.cropDragType / DRAG_TYPE_TOP) % 2 === 1;
+            let isDragBottom = Math.floor(this.cropDragType / DRAG_TYPE_BOTTOM) % 2 === 1;
 
             const dx = Math.round(cropTranslateMove.x - this.cropTranslateStart.x);
             const dy = Math.round(cropTranslateMove.y - this.cropTranslateStart.y);

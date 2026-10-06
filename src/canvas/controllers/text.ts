@@ -664,15 +664,6 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         return !handled;
     }
 
-    onMultiTouchTap(touches) {
-        if (touches.length === 1) {
-            if (this.dragStartPickLayer == null) {
-                this.onDragStart(touches[0]);
-                this.onDragEnd();
-            }
-        }
-    }
-
     onPointerDown(e: PointerEvent): void {
         super.onPointerDown(e);
         if (isInput(e.target)) return;
@@ -680,17 +671,33 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
             this.onDragStart(pointer);
         }
-        if (e.pointerType === 'touch') {
-            let { viewTransformPoint } = this.getTransformedCursorInfo(e.pageX, e.pageY);
-            const dragStartPickLayer = this.pickLayer(viewTransformPoint);
-            if (dragStartPickLayer != null && dragStartPickLayer === editingTextLayerId.value) {
-                const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
-                this.onDragStart(pointer);
-            }
-        }
         setTimeout(() => {
             this.handleCursorIcon();
         }, 0);
+    }
+
+    onMultiTouchDown() {
+        super.onMultiTouchDown();
+        if (this.touches.length === 1) {
+            if (this.dragStartPickLayer == null) {
+                const e = this.touches[0].down;
+                let { viewTransformPoint } = this.getTransformedCursorInfo(e.pageX, e.pageY);
+                const dragStartPickLayer = this.pickLayer(viewTransformPoint);
+                if (dragStartPickLayer != null && dragStartPickLayer === editingTextLayerId.value) {
+                    const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
+                    this.onDragStart(pointer);
+                }
+            }
+        }
+    }
+
+    onMultiTouchTap(touches) {
+        if (touches.length === 1) {
+            if (this.dragStartPickLayer == null) {
+                this.onDragStart(touches[0]);
+                this.onDragEnd(touches[0].up ?? touches[0].down);
+            }
+        }
     }
 
     onPointerDoubleTap(e: PointerEvent): void {
@@ -722,12 +729,21 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         this.handleCursorIcon();
     }
 
-    onPointerUp(e: PointerEvent): void {
-        super.onPointerUp(e);
+    onPointerUpBeforePurge(e: PointerEvent): void {
+        super.onPointerUpBeforePurge(e);
+        const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
+        if (pointer == null || pointer.type === 'touch') return;
         if (e.isPrimary) {
-            this.onDragEnd();    
+            this.onDragEnd(e);
         }
         this.handleCursorIcon();
+    }
+
+    onMultiTouchUp() {
+        super.onMultiTouchUp();
+        if (this.multiTouchDownCount != 1) return;
+        const pointer = this.multiTouchDownTouches[0];
+        this.onDragEnd(pointer.up ?? pointer.down);
     }
 
     private onDragStart(pointer: PointerTracker) {
@@ -777,7 +793,9 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                     // Focus active editor
                     if (dragStartPickLayer != null && !isEditorTextareaFocused.value) {
                         editingTextLayerId.value = dragStartPickLayer;
-                        this.editorTextarea?.focus();
+                        if (document.activeElement !== this.editorTextarea) {
+                            this.editorTextarea?.focus();
+                        }
                     }
 
                     // Don't continue if double click already executed.
@@ -907,7 +925,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         }
     }
 
-    private onDragEnd() {
+    private onDragEnd(e: PointerEvent) {
         if (this.isCreatingLayer) {
             const createdLayerId = this.createdLayerId;
             // User never dragged their mouse and just clicked; create new text layer
@@ -933,10 +951,10 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                     this.editorTextarea?.focus();
                 }, 1);
             }
-        } else {
+        } else if (this.transformIsDragging) {
             // Commit drag handle resize transforms to history.
             if (
-                this.transformIsDragging && editingTextLayerId.value != null && editingTextLayer.value && this.editingLayerTransformStart && this.editingLayerWidthStart != null && this.editingLayerHeightStart != null &&
+                editingTextLayerId.value != null && editingTextLayer.value && this.editingLayerTransformStart && this.editingLayerWidthStart != null && this.editingLayerHeightStart != null &&
                 (editingTextLayer.value.transform !== this.editingLayerTransformStart || editingTextLayer.value.width !== this.editingLayerWidthStart || editingTextLayer.value.height !== this.editingLayerHeightStart)
             ) {
                 const isResize = editingTextLayer.value.width !== this.editingLayerWidthStart || editingTextLayer.value.height !== this.editingLayerHeightStart;

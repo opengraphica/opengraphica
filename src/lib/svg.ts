@@ -317,6 +317,7 @@ function getReflection(a: number, b: number) {
 interface ParseNodeGlobalOptions {
     defaultDPI: number;
     defaultUnit: 'mm'|'cm'|'in'|'pt'|'pc'|'px';
+    disableAttributeInheritance?: boolean;
 }
 
 function getDefaultParseNodeGlobalOptions(options?: ParseNodeGlobalOptions) {
@@ -442,7 +443,11 @@ export function parseNodeTransform(node: Element, options?: ParseNodeGlobalOptio
 
         transform.preMultiplySelf(currentTransform);
 
-        currentNode = currentNode.parentElement;
+        if (options?.disableAttributeInheritance) {
+            break;
+        } else {
+            currentNode = currentNode.parentElement;
+        }
     }
 
     return transform;
@@ -1158,7 +1163,8 @@ export async function generateSvgElementIds(document: Document) {
     }
 }
 
-export function calculateShapeAabb(node: Element, transform: DOMMatrix): DOMRect | null {
+export function calculateShapeAabb(node: Element, transform: DOMMatrix, strokeWidth: number = 0): DOMRect | null {
+    const halfStrokeWidth = strokeWidth / 2;
     switch (node.tagName) {
         case 'rect': {
             const x = parseFloat(node.getAttribute('x') ?? '0');
@@ -1173,7 +1179,7 @@ export function calculateShapeAabb(node: Element, transform: DOMMatrix): DOMRect
             const bottom = Math.max(topLeft.y, topRight.y, bottomLeft.y, bottomRight.y);
             const left = Math.min(topLeft.x, topRight.x, bottomLeft.x, bottomRight.x);
             const right = Math.max(topLeft.x, topRight.x, bottomLeft.x, bottomRight.x);
-            return new DOMRect(left, top, right - left, bottom - top);
+            return new DOMRect(left - halfStrokeWidth, top - halfStrokeWidth, right - left + strokeWidth, bottom - top + strokeWidth);
         }
         case 'circle': {
             const cx = parseFloat(node.getAttribute('cx') ?? '0');
@@ -1184,7 +1190,7 @@ export function calculateShapeAabb(node: Element, transform: DOMMatrix): DOMRect
             const bottom = center.y + r;
             const left = center.x - r;
             const right = center.x + r;
-            return new DOMRect(left, top, right - left, bottom - top);
+            return new DOMRect(left - halfStrokeWidth, top - halfStrokeWidth, right - left + strokeWidth, bottom - top + strokeWidth);
         }
         case 'ellipse': {
             const cx = parseFloat(node.getAttribute('cx') ?? '0');
@@ -1197,10 +1203,10 @@ export function calculateShapeAabb(node: Element, transform: DOMMatrix): DOMRect
             const halfWidth = Math.hypot(xAxis.x, yAxis.x);
             const halfHeight = Math.hypot(xAxis.y, yAxis.y);
             return new DOMRect(
-                center.x - halfWidth,
-                center.y - halfHeight,
-                halfWidth * 2,
-                halfHeight * 2,
+                center.x - halfWidth - halfStrokeWidth,
+                center.y - halfHeight - halfStrokeWidth,
+                halfWidth * 2 + strokeWidth,
+                halfHeight * 2 + strokeWidth,
             );
         }
         case 'line': {
@@ -1214,7 +1220,7 @@ export function calculateShapeAabb(node: Element, transform: DOMMatrix): DOMRect
             const bottom = Math.max(p1.y, p2.y);
             const left = Math.min(p1.x, p2.x);
             const right = Math.max(p1.x, p2.x);
-            return new DOMRect(left, top, right - left, bottom - top);
+            return new DOMRect(left - halfStrokeWidth, top - halfStrokeWidth, right - left + strokeWidth, bottom - top + strokeWidth);
         }
         case 'polyline': case 'polygon': {
             let top = Infinity;
@@ -1232,7 +1238,7 @@ export function calculateShapeAabb(node: Element, transform: DOMMatrix): DOMRect
                 if (scrapPoint.x < left) left = scrapPoint.x;
                 if (scrapPoint.x > right) right = scrapPoint.x;
             }
-            return new DOMRect(left, top, right - left, bottom - top);
+            return new DOMRect(left - halfStrokeWidth, top - halfStrokeWidth, right - left + strokeWidth, bottom - top + strokeWidth);
         }
         case 'path': {
             // TODO - this is simplified and inaccurate.
@@ -1268,7 +1274,7 @@ export function calculateShapeAabb(node: Element, transform: DOMMatrix): DOMRect
                 if (xfPoint.x < left) left = xfPoint.x;
                 if (xfPoint.x > right) right = xfPoint.x;
             }
-            return new DOMRect(left, top, right - left, bottom - top);
+            return new DOMRect(left - halfStrokeWidth, top - halfStrokeWidth, right - left + strokeWidth, bottom - top + strokeWidth);
         }
         default: return null;
     }

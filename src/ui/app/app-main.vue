@@ -316,7 +316,10 @@ export default defineComponent({
 
         function onTouchStartWindowTouchTest(e: Event) {
             window.removeEventListener('touchstart', onTouchStartWindowTouchTest);
-            editorStore.set('isTouchUser', !!window.matchMedia?.('(pointer:coarse)')?.matches);
+            editorStore.set('isTouchUser', (
+                !!window.matchMedia?.('(pointer:coarse)')?.matches
+                || window.location.protocol === 'file:' // Only current known use case for this is Ubuntu Touch
+            ));
         }
 
         function onPointerDownWindowPenTest(e: PointerEvent) {

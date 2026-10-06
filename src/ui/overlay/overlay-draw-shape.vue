@@ -1,6 +1,88 @@
 <template>
     <div ref="overlay" class="og-canvas-overlay is-full-canvas-area">
-        <div class="og-selection">
+        <div
+            v-show="selectedShapes.length > 0"
+            class="absolute!"
+            :style="{ transform: cssViewTransform }"
+        >
+            <div ref="freeTransform"
+                class="og-free-transform"
+                :style="{
+                    width: transformOverlayWidth + 'px',
+                    height: transformOverlayHeight + 'px',
+                    transform: transformOverlayTransform,
+                    transformOrigin: transformOverlayTransformOrigin,
+                }"
+            >
+                <div class="og-free-transform-bounds" :style="{
+                    outlineWidth: (0.35/zoom) + 'rem'
+                }"></div>
+                <div class="og-free-transform-handle-rotate" :style="{ transform: 'scale(' + (1/zoom) + ')', top: (-2 / zoom) + 'rem' }">
+                    <div class="og-free-transform-handle-rotate-line"></div>
+                    <svg viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="45" fill="white" :stroke="transformRotateHandleHighlight === true ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
+                        <circle cx="50" cy="50" r="25" :fill="transformRotateHandleHighlight === true ? dragHandleHighlightBorderColor : '#ccc'" />
+                    </svg>
+                </div>
+                <div v-show="!hideVerticalSideHandles" class="og-free-transform-handle-top" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+                    <svg viewBox="0 0 100 100">
+                        <path d="M10 10 L90 10 L90 90 L10 90 Z"
+                            :fill="transformDragHandleHighlight === DRAG_TYPE_TOP ? dragHandleHighlightColor : 'white'"
+                            :stroke="transformDragHandleHighlight === DRAG_TYPE_TOP ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
+                    </svg>
+                </div>
+                <div v-show="!hideHorizontalSideHandles" class="og-free-transform-handle-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+                    <svg viewBox="0 0 100 100">
+                        <path d="M10 10 L90 10 L90 90 L10 90 Z"
+                            :fill="transformDragHandleHighlight === DRAG_TYPE_LEFT ? dragHandleHighlightColor : 'white'"
+                            :stroke="transformDragHandleHighlight === DRAG_TYPE_LEFT ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
+                    </svg>
+                </div>
+                <div v-show="!hideVerticalSideHandles" class="og-free-transform-handle-bottom" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+                    <svg viewBox="0 0 100 100">
+                        <path d="M10 10 L90 10 L90 90 L10 90 Z"
+                            :fill="transformDragHandleHighlight === DRAG_TYPE_BOTTOM ? dragHandleHighlightColor : 'white'"
+                            :stroke="transformDragHandleHighlight === DRAG_TYPE_BOTTOM ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
+                    </svg>
+                </div>
+                <div v-show="!hideHorizontalSideHandles" class="og-free-transform-handle-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+                    <svg viewBox="0 0 100 100">
+                        <path d="M10 10 L90 10 L90 90 L10 90 Z"
+                            :fill="transformDragHandleHighlight === DRAG_TYPE_RIGHT ? dragHandleHighlightColor : 'white'"
+                            :stroke="transformDragHandleHighlight === DRAG_TYPE_RIGHT ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
+                    </svg>
+                </div>
+                <div class="og-free-transform-handle-top-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+                    <svg viewBox="0 0 100 100">
+                        <path d="M10 10 L90 10 L90 90 L10 90 Z"
+                            :fill="transformDragHandleHighlight === (DRAG_TYPE_TOP | DRAG_TYPE_LEFT) ? dragHandleHighlightColor : 'white'"
+                            :stroke="transformDragHandleHighlight === (DRAG_TYPE_TOP | DRAG_TYPE_LEFT) ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
+                    </svg>
+                </div>
+                <div class="og-free-transform-handle-top-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+                    <svg viewBox="0 0 100 100">
+                        <path d="M10 10 L90 10 L90 90 L10 90 Z"
+                            :fill="transformDragHandleHighlight === (DRAG_TYPE_TOP | DRAG_TYPE_RIGHT) ? dragHandleHighlightColor : 'white'"
+                            :stroke="transformDragHandleHighlight === (DRAG_TYPE_TOP | DRAG_TYPE_RIGHT) ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
+                    </svg>
+                </div>
+                <div class="og-free-transform-handle-bottom-left" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+                    <svg viewBox="0 0 100 100">
+                        <path d="M10 10 L90 10 L90 90 L10 90 Z"
+                            :fill="transformDragHandleHighlight === (DRAG_TYPE_BOTTOM | DRAG_TYPE_LEFT) ? dragHandleHighlightColor : 'white'"
+                            :stroke="transformDragHandleHighlight === (DRAG_TYPE_BOTTOM | DRAG_TYPE_LEFT) ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
+                    </svg>
+                </div>
+                <div class="og-free-transform-handle-bottom-right" :style="{ transform: 'scale(' + (1/zoom) + ')' }">
+                    <svg viewBox="0 0 100 100">
+                        <path d="M10 10 L90 10 L90 90 L10 90 Z"
+                            :fill="transformDragHandleHighlight === (DRAG_TYPE_BOTTOM | DRAG_TYPE_RIGHT) ? dragHandleHighlightColor : 'white'"
+                            :stroke="transformDragHandleHighlight === (DRAG_TYPE_BOTTOM | DRAG_TYPE_RIGHT) ? dragHandleHighlightBorderColor : '#ccc'" stroke-width="10" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div v-show="selectedShapes.length === 0" class="og-selection">
             <svg
                 v-if="editControlPoints.length > 0 || previewInvisibleStrokeStart != null"
                 :width="svgBoundsWidth"
@@ -165,17 +247,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRefs, watch } from 'vue';
+import { computed, onMounted, onUnmounted, ref, toRefs, watch } from 'vue';
 
 import canvasStore from '@/store/canvas';
 import workingFileStore from '@/store/working-file';
 
 import {
+    drawShapeToolbarEmitter,
     cursorHoverPosition, isExtendingPaths, previewInvisibleStrokeStart,
     editControlPoints, editControlPointsDirty,
     hoveringEditControlPointIndices,
     selectedEditControlPointIndices, selectedEditControlAttachPointIndices,
     snapLineX, snapLineY,
+    selectedShapes, transformDragHandleHighlight, transformRotateHandleHighlight,
+    transformBoundsTop, transformBoundsLeft, transformBoundsWidth, transformBoundsHeight,
+    transformBoundsRotation, transformOriginX, transformOriginY,
 } from '@/canvas/store/draw-shape-state';
 
 defineOptions({
@@ -291,4 +377,67 @@ const snapLineYMaxX = computed(() => {
         return currentIndex % 2 === 1 ? previousValue : Math.max(previousValue, currentValue);
     }, -Infinity);
 });
+
+/*---------------*\
+| Shape Transform |
+\*---------------*/
+
+const freeTransform = ref<HTMLDivElement>(null as any);
+
+const DRAG_TYPE_TOP = 1;
+const DRAG_TYPE_BOTTOM = 2;
+const DRAG_TYPE_LEFT = 4;
+const DRAG_TYPE_RIGHT = 8;
+
+const transformOverlayWidth = ref<number>(0);
+const transformOverlayHeight = ref<number>(0);
+const transformOverlayTransform = ref<string>('');
+const transformOverlayTransformOrigin = ref<string>('0% 0%');
+
+const hideVerticalSideHandles = ref<boolean>(false);
+const hideHorizontalSideHandles = ref<boolean>(false);
+
+const dragHandleHighlightColor: string = '#ecf5ff';
+const dragHandleHighlightBorderColor: string= '#b3d8ff';
+
+onMounted(() => {
+    drawShapeToolbarEmitter.on('setTransformDimensions', setTransformDimensions);
+    setTransformDimensions({
+        top: transformBoundsTop.value,
+        left: transformBoundsLeft.value,
+        width: transformBoundsWidth.value,
+        height: transformBoundsHeight.value,
+        rotation: transformBoundsRotation.value,
+        transformOriginX: transformOriginX.value,
+        transformOriginY: transformOriginY.value
+    });
+});
+
+onUnmounted(() => {
+    drawShapeToolbarEmitter.off('setTransformDimensions', setTransformDimensions);
+});
+
+function setTransformDimensions(event?: { top?: number, left?: number, width?: number, height?: number, rotation?: number, transformOriginX?: number, transformOriginY?: number }) {
+    if (event) {
+        transformOverlayTransformOrigin.value = `${transformOriginY.value * 100}% ${transformOriginX.value * 100}%`;
+        freeTransform.value.style.transformOrigin = transformOverlayTransformOrigin.value;
+        const overlayTransformMatrix =
+            new DOMMatrix()
+            .translateSelf(event.left ?? transformBoundsLeft.value, event.top ?? transformBoundsTop.value)
+            .rotateSelf((event.rotation ?? transformBoundsRotation.value) * Math.RADIANS_TO_DEGREES);
+        transformOverlayTransform.value = `matrix(${overlayTransformMatrix.a},${overlayTransformMatrix.b},${overlayTransformMatrix.c},${overlayTransformMatrix.d},${overlayTransformMatrix.e},${overlayTransformMatrix.f})`;
+        freeTransform.value.style.transform = transformOverlayTransform.value;
+        if (event.width != null) {
+            transformOverlayWidth.value = event.width;
+            freeTransform.value.style.width = transformOverlayWidth + 'px';
+        }
+        if (event.height != null) {
+            transformOverlayHeight.value = event.height;
+            freeTransform.value.style.height = transformOverlayHeight + 'px';
+        }
+        hideVerticalSideHandles.value = transformBoundsWidth.value < 36;
+        hideHorizontalSideHandles.value = transformBoundsHeight.value < 36;
+    }
+}
+
 </script>

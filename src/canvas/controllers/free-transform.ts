@@ -941,7 +941,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         return {
             viewTransformPoint,
             transformBoundsPoint,
-            viewDecomposedTransform
+            viewDecomposedTransform,
         };
     }
 

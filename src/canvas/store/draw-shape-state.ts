@@ -3,6 +3,7 @@ import mitt from 'mitt';
 
 import { PerformantStore } from '@/store/performant-store';
 
+import { isShiftKeyPressed } from '@/lib/keyboard';
 import { pointDistance2d } from '@/lib/math';
 import {
     parseRectNodeAttributes, parsePolygonNodeAttributes, parsePolylineNodeAttributes,
@@ -48,6 +49,8 @@ interface PermanentStorageState {
     useCanvasEdgeSnapping: boolean;
     useControlPointSnapping: boolean;
     useSnapping: boolean;
+    useRotationSnapping: boolean;
+    rotationSnappingDegrees: number;
 }
 
 const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentStorageState }>({
@@ -89,28 +92,32 @@ const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentSto
         ],
         fillColorPaletteIndex: 1,
         pixelSnap: true,
+        rotationSnappingDegrees: 15,
         selectedShapeType: 'rectangle',
         strokeColorPaletteIndex: 0,
         strokeWidth: 0,
         useCanvasEdgeSnapping: true,
         useControlPointSnapping: true,
+        useRotationSnapping: false,
         useSnapping: true,
     },
     restore: [
-        'colorPalette', 'fillColorPaletteIndex', 'pixelSnap',
+        'colorPalette', 'fillColorPaletteIndex', 'pixelSnap', 'rotationSnappingDegrees',
         'selectedShapeType', 'strokeColorPaletteIndex', 'strokeWidth',
-        'useCanvasEdgeSnapping', 'useControlPointSnapping', 'useSnapping',
+        'useCanvasEdgeSnapping', 'useControlPointSnapping', 'useRotationSnapping', 'useSnapping',
     ],
 });
 
 export const colorPalette = permanentStorage.getDeepWritableRef('colorPalette');
 export const fillColorPaletteIndex = permanentStorage.getWritableRef('fillColorPaletteIndex');
 export const pixelSnap = permanentStorage.getWritableRef('pixelSnap');
+export const rotationSnappingDegrees = permanentStorage.getWritableRef('rotationSnappingDegrees');
 export const selectedShapeType = permanentStorage.getWritableRef('selectedShapeType');
 export const strokeColorPaletteIndex = permanentStorage.getWritableRef('strokeColorPaletteIndex');
 export const strokeWidth = permanentStorage.getWritableRef('strokeWidth');
 export const useCanvasEdgeSnapping = permanentStorage.getWritableRef('useCanvasEdgeSnapping');
 export const useControlPointSnapping = permanentStorage.getWritableRef('useControlPointSnapping');
+export const useRotationSnapping = permanentStorage.getWritableRef('useRotationSnapping');
 export const useSnapping = permanentStorage.getWritableRef('useSnapping');
 
 export const fillColor = ref<RGBAColor>(colorPalette.value[fillColorPaletteIndex.value] ?? {
@@ -132,6 +139,83 @@ export const strokeColor = ref<RGBAColor>(colorPalette.value[strokeColorPaletteI
 
 export const snapLineX = ref<number[]>([]);
 export const snapLineY = ref<number[]>([]);
+
+export const transformBoundsTop = ref<number>(0);
+export const transformBoundsLeft = ref<number>(0);
+export const transformBoundsWidth = ref<number>(200);
+export const transformBoundsHeight = ref<number>(200);
+export const transformBoundsRotation = ref<number>(0);
+export const transformOriginX = ref<number>(0.5);
+export const transformOriginY = ref<number>(0.5);
+
+export const transformDragHandleHighlight = ref<number | null>(null);
+export const transformRotateHandleHighlight = ref<boolean>(false);
+
+export const transformOptions = computed(() => {
+    let canTranslate: boolean = true;
+    let canScale: boolean = true;
+    let canRotate: boolean = true;
+    let shouldShowUnevenScalingHandles = new Set<boolean>(); // Enables the edge handles with apply uneven scaling
+    let shouldMaintainAspectRatio = new Set<boolean>(); // The scale must be applied evenly to layer's width/height
+    let shouldScaleDuringResize = new Set<boolean>(); // The scale will be applied to the layer's DOMMatrix, otherwise width/height are changed
+    let shouldSnapRotationDegrees: boolean = useSnapping.value && useRotationSnapping.value;
+    if (isShiftKeyPressed.value === true) {
+        shouldMaintainAspectRatio.add(false);
+        shouldSnapRotationDegrees = !(useSnapping.value && useRotationSnapping.value);
+    }
+    if (shouldShowUnevenScalingHandles.size === 0) {
+        shouldShowUnevenScalingHandles.add(true);
+    }
+    if (shouldMaintainAspectRatio.size === 0) {
+        shouldMaintainAspectRatio.add(true);
+    }
+    if (shouldScaleDuringResize.size === 0) {
+        shouldScaleDuringResize.add(true);
+    }
+
+    if (shouldShowUnevenScalingHandles.size > 1) {
+        canScale = false;
+    }
+    if (shouldMaintainAspectRatio.size > 1) {
+        canScale = false;
+    }
+    if (shouldScaleDuringResize.size > 1) {
+        canScale = false;
+    }
+    return {
+        canTranslate, canScale, canRotate,
+        shouldShowUnevenScalingHandles: shouldShowUnevenScalingHandles.values().next().value ?? false,
+        shouldMaintainAspectRatio: shouldMaintainAspectRatio.values().next().value ?? false,
+        shouldScaleDuringResize: shouldScaleDuringResize.values().next().value ?? false,
+        shouldSnapRotationDegrees,
+    };
+});
+
+drawShapeToolbarEmitter.on('setTransformDimensions', (event?: { top?: number, left?: number, width?: number, height?: number, rotation?: number, transformOriginX?: number, transformOriginY?: number }) => {
+    if (event) {
+        if (event.transformOriginX != null) {
+            transformOriginX.value = event.transformOriginX;
+        }
+        if (event.transformOriginY != null) {
+            transformOriginY.value = event.transformOriginY;
+        }
+        if (event.rotation != null) {
+            transformBoundsRotation.value = event.rotation;
+        }
+        if (event.left != null) {
+            transformBoundsLeft.value = event.left;
+        }
+        if (event.top != null) {
+            transformBoundsTop.value = event.top;
+        }
+        if (event.width != null) {
+            transformBoundsWidth.value = event.width;
+        }
+        if (event.height != null) {
+            transformBoundsHeight.value = event.height;
+        }
+    }
+});
 
 export interface EditControlPoint {
     layerIndex: number; // Index in editingLayers
