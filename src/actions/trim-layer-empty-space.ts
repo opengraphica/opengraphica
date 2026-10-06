@@ -6,6 +6,7 @@ import { createStoredImage, prepareStoredImageForEditing, prepareStoredImageForA
 import { createStoredSvg, getStoredSvgDocument } from '@/store/svg';
 import { getLayerById, getCanvasRenderingContext2DSettings } from '@/store/working-file';
 
+import { decomposeMatrix } from '@/lib/dom-matrix';
 import { getImageDataEmptyBounds, getImageDataFromCanvas } from '@/lib/image';
 import { findPointListBounds, findRectListBounds } from '@/lib/math';
 import { calculateShapeAabb, getViewBox, parseNodeTransform, parseCommonNodeAttributes } from '@/lib/svg';
@@ -92,15 +93,12 @@ export class TrimLayerEmptySpaceAction extends BaseAction {
             const rects = Array.from(svgDocument.querySelectorAll('[data-ogr-id]'))
                 .map((node) => {
                     const { transform, stroke, strokeWidth } = parseCommonNodeAttributes(node);
-                    const aabb = calculateShapeAabb(node, transform);
-                    if (aabb && stroke != null && strokeWidth > 0) {
-                        const halfWidth = Math.ceil(strokeWidth / 2);
-                        aabb.x -= halfWidth;
-                        aabb.y -= halfWidth;
-                        aabb.width += halfWidth * 2;
-                        aabb.height += halfWidth * 2;
-                    }
-                    return aabb;
+                    const decomposedTransform = decomposeMatrix(transform);
+                    return calculateShapeAabb(
+                        node,
+                        transform,
+                        stroke != null ? strokeWidth * Math.max(decomposedTransform.scaleX, decomposedTransform.scaleY) : 0
+                    );
                 })
                 .filter((aabb) => aabb != null);
             const bounds = findRectListBounds(rects, true);

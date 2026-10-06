@@ -99,9 +99,11 @@ interface TransformShapeInfo extends DragResizeTransformShapeInfo {
     handleToRotationOrigin: number;
 }
 
-interface TransformShapeStartLayerData {
+interface TransformShapeLayerData {
+    shapeBounds: DOMRect;
     shapeTransform: DOMMatrix;
-    screenTransform: DOMMatrix;
+    parentTransform: DOMMatrix;
+    newShapeTransform: DOMMatrix;
 }
 
 export default class CanvasDrawShapetController extends BaseCanvasMovementController {
@@ -143,10 +145,11 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
     private isTransformShapesDragging: boolean = false;
     private transformShapeTranslateStart: DOMPoint | null = null;
     private transformShapeStartDimensions: TransformShapeInfo = { top: 0, left: 0, width: 0, height: 0, rotation: 0, handleToRotationOrigin: 0 };
-    private transformShapeStartLayerData: TransformShapeStartLayerData[] = [];
+    private transformShapeLayerData: TransformShapeLayerData[] = [];
     private transformShapeIsRotating: boolean = false;
     private transformShapeIsDragging: boolean = false;
     private transformShapeDragType: number = 0;
+    private setTransformBoundsDebounceHandle: number | undefined = undefined;
 
     /*---------------------*\
     |                       |
@@ -1888,6 +1891,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
     }
 
     private async transformShapesEnd() {
+        this.commitTransforms();
         this.isTransformShapesDragging = false;
         this.transformShapeTranslateStart = null;
     }
@@ -1900,20 +1904,28 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             transformOriginX: transformOriginX.value,
             transformOriginY: transformOriginY.value
         });
-        // for (const [i, layer] of selectedLayers.value.entries()) {
-        //     const layerTransformOriginX = left.value + (transformOriginX.value * width.value);
-        //     const layerTransformOriginY = top.value + (transformOriginY.value * height.value);
-        //     const layerTransformOrigin = new DOMPoint(layerTransformOriginX, layerTransformOriginY).matrixTransform(this.transformStartLayerData[i].transform.inverse());
-        //     const decomposedTransform = decomposeMatrix(this.transformStartLayerData[i].transform);
-        //     const transform =
-        //         DOMMatrix.fromMatrix(this.transformStartLayerData[i].transform)
-        //         .translateSelf(layerTransformOrigin.x, layerTransformOrigin.y)
-        //         .scaleSelf(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY)
-        //         .rotateSelf(rotationDelta * Math.RADIANS_TO_DEGREES)
-        //         .scaleSelf(decomposedTransform.scaleX, decomposedTransform.scaleY)
-        //         .translateSelf(-layerTransformOrigin.x, -layerTransformOrigin.y);
-        //     layer.transform = transform;
-        // }
+        for (const [i, [layerId, shapeId]] of selectedShapes.value.entries()) {
+            const layerTransformOriginX = transformBoundsLeft.value + (transformOriginX.value * transformBoundsWidth.value);
+            const layerTransformOriginY = transformBoundsTop.value + (transformOriginY.value * transformBoundsHeight.value);
+
+            const { parentTransform, shapeTransform } = this.transformShapeLayerData[i];
+            const screenTransform = parentTransform.multiply(shapeTransform);
+            const layerTransformOrigin = new DOMPoint(layerTransformOriginX, layerTransformOriginY).matrixTransform(screenTransform.inverse());
+            const decomposedTransform = decomposeMatrix(screenTransform);
+            const newScreenTransform =
+                DOMMatrix.fromMatrix(screenTransform)
+                .translateSelf(layerTransformOrigin.x, layerTransformOrigin.y)
+                .scaleSelf(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY)
+                .rotateSelf(rotationDelta * Math.RADIANS_TO_DEGREES)
+                .scaleSelf(decomposedTransform.scaleX, decomposedTransform.scaleY)
+                .translateSelf(-layerTransformOrigin.x, -layerTransformOrigin.y);
+            
+            this.transformShapeLayerData[i].newShapeTransform = parentTransform.inverse().multiply(newScreenTransform);
+            const { a, b, c, d, e, f } = this.transformShapeLayerData[i].newShapeTransform;
+            this.renderer?.updateVectorLayerAttributes(layerId, shapeId, {
+                transform: `matrix(${a}, ${b}, ${c}, ${d}, ${e}, ${f})`,
+            });
+        }
     }
 
     private previewTransformShapeDragResizeChange(newTransform: DragResizeTransformShapeInfo, shouldScaleDuringResize?: boolean, enableSnapping?: boolean) {
@@ -2055,102 +2067,95 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         });
 
         // Apply the transform offset to each layer
-        // for (const [i, layer] of selectedLayers.value.entries()) {
-        //     const decomposedTransform = decomposeMatrix(this.transformStartLayerData[i].transform);
-        //     let transform = DOMMatrix.fromMatrix(this.transformStartLayerData[i].transform)
-        //     let rotationOffset = 0;
-        //     let transformStartOriginX = 0;
-        //     let transformStartOriginY = 0;
-        //     let transformEndOriginX = 0;
-        //     let transformEndOriginY = 0;
-        //     if (layer.type === 'gradient') {
-        //         const startHandle = (layer as WorkingFileGradientLayer).data.start;
-        //         const endHandle = (layer as WorkingFileGradientLayer).data.end;
-        //         const handleSize = pointDistance2d(startHandle.x, startHandle.y, endHandle.x, endHandle.y);
-        //         rotationOffset = clockwiseAngle2d(startHandle.x, startHandle.y, endHandle.x, endHandle.y);
-        //         let startOrigin: DOMPoint;
-        //         let endOrigin: DOMPoint;
-        //         const startScale = decomposedTransform.scaleX;
-        //         const endScaleX = (decomposedTransform.scaleX * newTransform.width / this.transformStartDimensions.width);
-        //         const endScaleY = (decomposedTransform.scaleY * newTransform.height / this.transformStartDimensions.height);
-        //         switch ((layer as WorkingFileGradientLayer).data.fillType) {
-        //             case 'radial':
-        //                 startOrigin = new DOMPoint().matrixTransform(
-        //                     new DOMMatrix()
-        //                         .rotate((decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES)
-        //                         .translate(-startHandle.x * startScale, -startHandle.y * startScale)
-        //                         .rotate((rotationOffset) * Math.RADIANS_TO_DEGREES)
-        //                         .translate(handleSize * startScale, handleSize * startScale)
-        //                         .rotate((decomposedTransform.rotation + rotationOffset) * Math.RADIANS_TO_DEGREES)
-        //                 );
-        //                 endOrigin = new DOMPoint().matrixTransform(
-        //                     new DOMMatrix()
-        //                         .rotate((decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES)
-        //                         .translate(-startHandle.x * endScaleX, -startHandle.y * endScaleY)
-        //                         .rotate((rotationOffset) * Math.RADIANS_TO_DEGREES)
-        //                         .translate(handleSize * endScaleX, handleSize * endScaleY)
-        //                         .rotate((decomposedTransform.rotation + rotationOffset) * Math.RADIANS_TO_DEGREES)
-        //                 );
-        //                 transformStartOriginX = startOrigin.x;
-        //                 transformStartOriginY = startOrigin.y;
-        //                 transformEndOriginX = endOrigin.x;
-        //                 transformEndOriginY = endOrigin.y;
-        //                 break;
-        //             case 'linear':
-        //                 startOrigin = new DOMPoint().matrixTransform(
-        //                     new DOMMatrix()
-        //                         .rotate((decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES)
-        //                         .translate(-startHandle.x * startScale, -startHandle.y * startScale)
-        //                         .rotate((rotationOffset) * Math.RADIANS_TO_DEGREES)
-        //                         .translate(0 * startScale, handleSize * startScale)
-        //                         .rotate((decomposedTransform.rotation + rotationOffset) * Math.RADIANS_TO_DEGREES)
-        //                 );
-        //                 endOrigin = new DOMPoint().matrixTransform(
-        //                     new DOMMatrix()
-        //                         .rotate((decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES)
-        //                         .translate(-startHandle.x * endScaleX, -startHandle.y * endScaleY)
-        //                         .rotate((rotationOffset) * Math.RADIANS_TO_DEGREES)
-        //                         .translate(0 * endScaleX, handleSize * endScaleY)
-        //                         .rotate((decomposedTransform.rotation + rotationOffset) * Math.RADIANS_TO_DEGREES)
-        //                 );
-        //                 transformStartOriginX = startOrigin.x;
-        //                 transformStartOriginY = startOrigin.y;
-        //                 transformEndOriginX = endOrigin.x;
-        //                 transformEndOriginY = endOrigin.y;
-        //                 break;
-        //         }
-        //     } else if (layer.type === 'text') {
-        //         const textDocument = (layer as WorkingFileTextLayer).data;
-        //         const currentScaleRatio = (
-        //             (textDocument.lines?.[0].spans?.[0].meta.size ?? textMetaDefaults.size) /
-        //             this.transformStartLayerData[i].baseFontSize
-        //         );
-        //         const newScaleRatio = decomposedTransform.scaleX * newTransform.width / this.transformStartDimensions.width;
-        //         for (const line of textDocument.lines) {
-        //             for (const span of line.spans) {
-        //                 const newFontSize = ((span.meta.size ?? textMetaDefaults.size) / currentScaleRatio) * newScaleRatio;
-        //                 span.meta.size = newFontSize;
-        //             }
-        //         }
-        //     }
-        //     if (shouldScaleDuringResize) {
-        //         transform.scaleSelf(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY);
-        //     }
-        //     transform
-        //         .rotateSelf(-(decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES)
-        //         .translateSelf(
-        //             (newTransform.left + snapXOffset + transformEndOriginX) - (this.transformStartDimensions.left + transformStartOriginX),
-        //             (newTransform.top + snapYOffset + transformEndOriginY) - (this.transformStartDimensions.top + transformStartOriginY)
-        //         )
-        //         .rotateSelf((decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES)
-        //     if (shouldScaleDuringResize) {
-        //         transform.scaleSelf(
-        //             decomposedTransform.scaleX * newTransform.width / this.transformStartDimensions.width,
-        //             decomposedTransform.scaleY * newTransform.height / this.transformStartDimensions.height
-        //         )
-        //     }
-        //     layer.transform = transform;
-        // }
+        for (const [i, [layerId, shapeId]] of selectedShapes.value.entries()) {
+
+            const { parentTransform, shapeTransform, shapeBounds } = this.transformShapeLayerData[i];
+            const screenTransform = parentTransform.multiply(shapeTransform);
+            const decomposedTransform = decomposeMatrix(screenTransform);
+            let newScreenTransform = DOMMatrix.fromMatrix(screenTransform);
+            let transformStartOriginX = 0;
+            let transformStartOriginY = 0;
+            let transformEndOriginX = 0;
+            let transformEndOriginY = 0;
+            if (shouldScaleDuringResize) {
+                newScreenTransform.translateSelf(shapeBounds.left, shapeBounds.top);
+                newScreenTransform.scaleSelf(1 / decomposedTransform.scaleX, 1 / decomposedTransform.scaleY);
+            }
+            newScreenTransform
+                .rotateSelf(-(decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES)
+                .translateSelf(
+                    (newTransform.left + snapXOffset + transformEndOriginX) - (this.transformShapeStartDimensions.left + transformStartOriginX),
+                    (newTransform.top + snapYOffset + transformEndOriginY) - (this.transformShapeStartDimensions.top + transformStartOriginY),
+                )
+                .rotateSelf((decomposedTransform.rotation) * Math.RADIANS_TO_DEGREES)
+            if (shouldScaleDuringResize) {
+                newScreenTransform.scaleSelf(
+                    decomposedTransform.scaleX * newTransform.width / this.transformShapeStartDimensions.width,
+                    decomposedTransform.scaleY * newTransform.height / this.transformShapeStartDimensions.height
+                );
+                newScreenTransform.translateSelf(-shapeBounds.left, -shapeBounds.top);
+            }
+            this.transformShapeLayerData[i].newShapeTransform = parentTransform.inverse().multiply(newScreenTransform);
+            const { a, b, c, d, e, f } = this.transformShapeLayerData[i].newShapeTransform;
+            this.renderer?.updateVectorLayerAttributes(layerId, shapeId, {
+                transform: `matrix(${a}, ${b}, ${c}, ${d}, ${e}, ${f})`,
+            });
+        }
+    }
+
+    private async commitTransforms() {
+        try {
+            if (snapLineX.value.length > 0) snapLineX.value = [];
+            if (snapLineY.value.length > 0) snapLineY.value = [];
+
+            const isTranslate = transformBoundsLeft.value != this.transformShapeStartDimensions.left || transformBoundsTop.value != this.transformShapeStartDimensions.top;
+            const isScale = transformBoundsWidth.value != this.transformShapeStartDimensions.width || transformBoundsHeight.value != this.transformShapeStartDimensions.height;
+            const isRotate = transformBoundsRotation.value != this.transformShapeStartDimensions.rotation;
+
+            if (isTranslate || isScale || isRotate) {
+                const updateActions: UpdateVectorLayerAttributesAction[] = [];
+                for (const [i, [layerId, shapeId]] of selectedShapes.value.entries()) {
+                    if (!this.transformShapeLayerData[i]) continue;
+
+                    const { a, b, c, d, e, f } = this.transformShapeLayerData[i].newShapeTransform;
+                    updateActions.push(
+                        new UpdateVectorLayerAttributesAction(layerId, shapeId, {
+                            transform: `matrix(${a}, ${b}, ${c}, ${d}, ${e}, ${f})`,
+                        })
+                    );
+                }
+
+                if (updateActions.length > 0) {
+                    await historyStore.dispatch('runAction', {
+                        action: new BundleAction('freeTransform', [
+                            ...(isRotate ? ['action.freeTransformRotate'] : []),
+                            ...(isScale ? ['action.freeTransformScale'] : []),
+                            ...(isTranslate ? ['action.freeTransformTranslate'] : [])
+                        ][0], updateActions)
+                    });
+                    this.hasUncroppedChanges = true;
+                }
+            }
+
+        } catch (error) {
+            console.error('[src/canvas/controllers/draw-shape.ts] Error while committing transform action. ', error);
+        }
+        this.transformShapeTranslateStart = null;
+        this.transformShapeLayerData = [];
+        this.transformShapeStartDimensions = { top: 0, left: 0, width: 0, height: 0, rotation: 0, handleToRotationOrigin: 0 };
+        this.transformShapeIsRotating = false;
+        this.transformShapeIsDragging = false;
+    }
+
+    private setTransformBoundsFromSelectedShapes() {
+        clearTimeout(this.setTransformBoundsDebounceHandle);
+        const setBoundsDebounceHandle = window.setTimeout(async () => {
+            await nextTick();
+            if (setBoundsDebounceHandle === this.setTransformBoundsDebounceHandle) {
+                this.setTransformBoundsFromSelectedShapesImmediate();
+            }
+        }, 100);
+        this.setTransformBoundsDebounceHandle = setBoundsDebounceHandle;
     }
 
     private async setTransformBoundsFromSelectedShapesImmediate() {
@@ -2208,20 +2213,23 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             rotation: transformBoundsRotation.value,
             handleToRotationOrigin: 0
         };
-        this.transformShapeStartLayerData = [];
+        this.transformShapeLayerData = [];
 
         for (let [layerId, nodeId] of selectedShapes.value) {
             const layer = getLayerById<WorkingFileVectorLayer>(layerId);
             const layerDocument = layer?.data.sourceDocument;
             const shapeNode = layerDocument?.querySelector(`[data-ogr-id="${nodeId}"]`);
 
+            let shapeBounds: DOMRect | null | undefined;
             let shapeTransform: DOMMatrix | undefined;
-            let screenTransform: DOMMatrix | undefined;
+            let parentTransform: DOMMatrix | undefined;
             if (layer && shapeNode) {
-                shapeTransform = parseNodeTransform(shapeNode, { defaultDPI: 90, defaultUnit: 'px', disableAttributeInheritance: true });
-                const nodeInheritedTransform = parseNodeTransform(shapeNode);
+                const { stroke, strokeWidth } = parseCommonNodeAttributes(shapeNode);
+                shapeBounds = calculateShapeAabb(shapeNode, new DOMMatrix(), stroke ? strokeWidth : 0);
+                shapeTransform = parseNodeTransform(shapeNode, { defaultDPI: 90, defaultUnit: 'px', attributeInheritance: 'disable' });
+                const nodeInheritedTransform = parseNodeTransform(shapeNode, { defaultDPI: 90, defaultUnit: 'px', attributeInheritance: 'inheritedOnly' });
                 const viewBox = getViewBox(layer.data.sourceDocument);
-                screenTransform = layer.transform.scale(
+                parentTransform = layer.transform.scale(
                     layer.width / viewBox.width, layer.height / viewBox.height, 1.0,
                 ).translateSelf(
                     -viewBox.x, -viewBox.y, 0.0,
@@ -2230,9 +2238,11 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 );
             }
 
-            this.transformShapeStartLayerData.push({
+            this.transformShapeLayerData.push({
+                shapeBounds: shapeBounds ?? new DOMRect(),
                 shapeTransform: shapeTransform ?? new DOMMatrix(),
-                screenTransform: screenTransform ?? new DOMMatrix(),
+                parentTransform: parentTransform ?? new DOMMatrix(),
+                newShapeTransform: shapeTransform ?? new DOMMatrix(),
             });
         }
 
@@ -2434,10 +2444,21 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             || event.action.id === 'updateEraseLayer'
             || event.action.id === 'trimLayerEmptySpace'
             || event.action.id === 'pasteShapes'
+            || event.action.id === 'freeTransform'
         ) {
             this.createEditingLayersFromSelectedLayers(workingFileStore.state.selectedLayerIds, workingFileStore.state.selectedLayerIds);
         }
+        if (event.action.id === 'deleteVectorLayerShape') {
+            selectedShapes.value = [];
+        }
         if (event.trigger !== 'do') {
+            if (event.action.id === 'freeTransform') {
+                nextTick(() => {
+                    this.setTransformBoundsFromSelectedShapesImmediate();
+                })
+            } else {
+                selectedShapes.value = [];
+            }
             isExtendingPaths.value = false;
         }
     }
@@ -2497,7 +2518,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         const originalPathAttributes = new Map<number, Map<string, Record<string, any>>>();
         const serializer = new XMLSerializer();
 
-        if (selectedEditControlPointIndices.value.length > 0) {
+        if (selectedEditControlPointIndices.value.length > 0 || selectedShapes.value.length > 0) {
 
             const selectedIndices = selectedEditControlPointIndices.value;
             selectedEditControlPointIndices.value = [];
@@ -2509,7 +2530,6 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             await historyStore.dispatch('reserve', { token: deleteReserveToken });
 
             try {
-
                 for (const pointIndex of selectedIndices) {
                     const point = editControlPoints.value[pointIndex];
                     if (point.attachToIndex != null) continue;
@@ -2550,6 +2570,16 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                         }
                     }
 
+                }
+
+                for (const [layerId, shapeId] of selectedShapes.value) {
+                    const layerIndex = editingLayers.value.findIndex((layer) => layer.id === layerId);
+                    const deleteShapes = deleteShapeMap.get(layerIndex) ?? new Set<string>();
+                    deleteShapes.add(shapeId);
+                    deleteShapeMap.set(layerIndex, deleteShapes);
+
+                    const deletePathShapes = deletePathMap.get(layerIndex);
+                    deletePathShapes?.delete(shapeId);
                 }
 
                 const actions: BaseAction[] = [];

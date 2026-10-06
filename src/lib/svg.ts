@@ -317,7 +317,7 @@ function getReflection(a: number, b: number) {
 interface ParseNodeGlobalOptions {
     defaultDPI: number;
     defaultUnit: 'mm'|'cm'|'in'|'pt'|'pc'|'px';
-    disableAttributeInheritance?: boolean;
+    attributeInheritance?: 'disable' | 'enable' | 'inheritedOnly';
 }
 
 function getDefaultParseNodeGlobalOptions(options?: ParseNodeGlobalOptions) {
@@ -437,13 +437,13 @@ export function parseNodeTransform(node: Element, options?: ParseNodeGlobalOptio
             currentTransform.translateSelf(tx, ty);
         }
 
-        if (currentNode.hasAttribute('transform')) {
+        if (currentNode.hasAttribute('transform') && (options?.attributeInheritance !== 'inheritedOnly' || node != currentNode)) {
             parseTransformString(currentNode.getAttribute('transform')!, currentTransform);
         }
 
         transform.preMultiplySelf(currentTransform);
 
-        if (options?.disableAttributeInheritance) {
+        if (options?.attributeInheritance === 'disable') {
             break;
         } else {
             currentNode = currentNode.parentElement;
