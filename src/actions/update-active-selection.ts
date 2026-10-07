@@ -1,8 +1,12 @@
 
 import { BaseAction } from './base';
-import { activeSelectionPath, previewActiveSelectionMask, selectionCombineMode, SelectionPathPoint, SelectionCombineMode } from '@/canvas/store/selection-state';
+import {
+    activeSelectionPath, previewActiveSelectionMask, selectionCombineMode, SelectionCombineMode,
+} from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
+
+import type { VectorPathCommand } from '@/types';
 
 interface UpdateActiveSelectionOptions {
     updatePreview?: boolean;
@@ -10,12 +14,12 @@ interface UpdateActiveSelectionOptions {
 
 export class UpdateActiveSelectionAction extends BaseAction {
 
-    private newActiveSelectionPath: Array<SelectionPathPoint> = [];
-    private oldActiveSelectionPath: Array<SelectionPathPoint> = [];
+    private newActiveSelectionPath: Array<VectorPathCommand> = [];
+    private oldActiveSelectionPath: Array<VectorPathCommand> = [];
     private oldSelectionCombineMode: SelectionCombineMode | null = null;
     private updatePreview: boolean = true;
 
-    constructor(newActiveSelectionPath: Array<SelectionPathPoint>, oldActiveSelectionPath?: Array<SelectionPathPoint>, options?: UpdateActiveSelectionOptions) {
+    constructor(newActiveSelectionPath: Array<VectorPathCommand>, oldActiveSelectionPath?: Array<VectorPathCommand>, options?: UpdateActiveSelectionOptions) {
         super('updateActiveSelection', 'action.updateActiveSelection');
         this.newActiveSelectionPath = newActiveSelectionPath;
         if (oldActiveSelectionPath) {

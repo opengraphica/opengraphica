@@ -2,8 +2,7 @@ import BaseMovementController from './base-movement';
 import { ref, watch, toRefs, WatchStopHandle } from 'vue';
 import {
     isDrawingSelection, selectionAddShape, activeSelectionPath, selectionCombineMode, selectionEmitter,
-    SelectionPathPoint, activeSelectionMask, appliedSelectionMask, previewSelectedLayersSelectionMask, discardSelectedLayersSelectionMask,
-    type SelectionPathPointBezierCurve,
+    activeSelectionMask, appliedSelectionMask, previewSelectedLayersSelectionMask, discardSelectedLayersSelectionMask,
 } from '../store/selection-state';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
@@ -21,17 +20,18 @@ import { UpdateSelectionCombineModeAction } from '@/actions/update-selection-com
 import { t, tm, rt } from '@/i18n';
 
 import type { PointerTracker } from './base';
+import { VectorPathCommandType, type AnyVectorPathCommand, type VectorPathCommand, type VectorPathCommandCubicBezierCurve } from '@/types';
 
 export default class SelectionController extends BaseMovementController {
     private asyncActionStack: Array<{ callback: (...args: any[]) => Promise<any>, args?: any[] }> = [];
     private currentAsyncAction: ({ callback: (...args: any[]) => Promise<any>, args?: any[] }) | undefined = undefined;
-    private dragStartActiveSelectionPath: Array<SelectionPathPoint> | undefined = undefined;
+    private dragStartActiveSelectionPath: Array<VectorPathCommand> | undefined = undefined;
     private dragStartActiveSelectionPathIsClosed: boolean = false;
     private dragStartHandleIndex: number = -1;
     private dragStartRectangleOriginToLeftDirection: { x: number, y: number } | null = null; 
     private dragStartRectangleOriginToRightDirection: { x: number, y: number } | null = null;
     private dragStartEllipsePerpendicularRadius: number | null = null;
-    private freePathStartActiveSelectionPath: Array<SelectionPathPoint> | undefined = undefined;
+    private freePathStartActiveSelectionPath: Array<VectorPathCommand> | undefined = undefined;
     private selectedLayerUnwatch: WatchStopHandle | null = null;
 
     private hoveringActiveSelectionPathIndex: number = -1;
@@ -184,18 +184,18 @@ export default class SelectionController extends BaseMovementController {
             const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
             if (pointer && (pointer.type !== 'touch' || this.multiTouchDownCount === 1) && pointer.down.button === 0 && pointer.isDragging) {
 
-                const editorShapeIntent = activeSelectionPath.value[0]?.editorShapeIntent;
+                const editorSelectionShapeIntent = activeSelectionPath.value[0]?.editorSelectionShapeIntent;
 
                 // Create selection path or find drag handle
                 if (!this.dragStartActiveSelectionPath && this.dragStartHandleIndex == -1) {
-                    if (editorShapeIntent !== 'lasso') {
+                    if (editorSelectionShapeIntent !== 'lasso') {
                         this.dragStartHandleIndex = this.getDragHandleIndexAtPagePoint(pointer.down.pageX, pointer.down.pageY);
                     }
                     this.dragStartActiveSelectionPathIsClosed = this.isActiveSelectionPathClosed();
                     if (this.dragStartHandleIndex === -1) {
                         this.dragStartActiveSelectionPath = [];
                         if (activeSelectionPath.value.length > 0) {
-                            this.queueAsyncAction((activeSelectionPathOverride: Array<SelectionPathPoint>) => {
+                            this.queueAsyncAction((activeSelectionPathOverride: Array<VectorPathCommand>) => {
                                 return this.applyActiveSelection(activeSelectionPathOverride, { doNotClearActiveSelection: true });
                             }, [[...activeSelectionPath.value]]);
                         }
@@ -219,36 +219,36 @@ export default class SelectionController extends BaseMovementController {
                 ) {
 
                     // Resize rectangle
-                    if (editorShapeIntent === 'rectangle') {
-                        const dragHandle = activeSelectionPath.value[this.dragStartHandleIndex];
+                    if (editorSelectionShapeIntent === 'rectangle') {
+                        const dragHandle: AnyVectorPathCommand = activeSelectionPath.value[this.dragStartHandleIndex];
                         let staticHandleIndex = this.dragStartHandleIndex + 2;
                         if (staticHandleIndex > activeSelectionPath.value.length - 1) staticHandleIndex -= 4;
-                        const staticHandle = activeSelectionPath.value[staticHandleIndex];
+                        const staticHandle: AnyVectorPathCommand = activeSelectionPath.value[staticHandleIndex];
                         let leftHandleIndex = this.dragStartHandleIndex - 1;
                         if (leftHandleIndex < 1) leftHandleIndex += 4;
-                        const leftHandle = activeSelectionPath.value[leftHandleIndex];
+                        const leftHandle: AnyVectorPathCommand = activeSelectionPath.value[leftHandleIndex];
                         let rightHandleIndex = this.dragStartHandleIndex + 1;
                         if (rightHandleIndex > activeSelectionPath.value.length - 1) rightHandleIndex -= 4;
-                        const rightHandle = activeSelectionPath.value[rightHandleIndex];
+                        const rightHandle: AnyVectorPathCommand = activeSelectionPath.value[rightHandleIndex];
                         if (!this.dragStartRectangleOriginToLeftDirection) {
                             this.dragStartRectangleOriginToLeftDirection = normalizedDirectionVector2d(
-                                staticHandle.x, staticHandle.y, leftHandle.x, leftHandle.y
+                                staticHandle.x!, staticHandle.y!, leftHandle.x!, leftHandle.y!
                             );
                         }
                         if (!this.dragStartRectangleOriginToRightDirection) {
                             this.dragStartRectangleOriginToRightDirection = normalizedDirectionVector2d(
-                                staticHandle.x, staticHandle.y, rightHandle.x, rightHandle.y
+                                staticHandle.x!, staticHandle.y!, rightHandle.x!, rightHandle.y!
                             );
                         }
                         const newDragHandlePosition = new DOMPoint(cursorX * devicePixelRatio, cursorY * devicePixelRatio).matrixTransform(transformInverse);
                         newDragHandlePosition.x = Math.round(newDragHandlePosition.x);
                         newDragHandlePosition.y = Math.round(newDragHandlePosition.y);
                         const leftIntersection = lineIntersectsLine2d(
-                            staticHandle.x, staticHandle.y, staticHandle.x + this.dragStartRectangleOriginToLeftDirection.x, staticHandle.y + this.dragStartRectangleOriginToLeftDirection.y,
+                            staticHandle.x!, staticHandle.y!, staticHandle.x! + this.dragStartRectangleOriginToLeftDirection.x, staticHandle.y! + this.dragStartRectangleOriginToLeftDirection.y,
                             newDragHandlePosition.x, newDragHandlePosition.y, newDragHandlePosition.x + this.dragStartRectangleOriginToRightDirection.x, newDragHandlePosition.y + this.dragStartRectangleOriginToRightDirection.y
                         );
                         const rightIntersection = lineIntersectsLine2d(
-                            staticHandle.x, staticHandle.y, staticHandle.x + this.dragStartRectangleOriginToRightDirection.x, staticHandle.y + this.dragStartRectangleOriginToRightDirection.y,
+                            staticHandle.x!, staticHandle.y!, staticHandle.x! + this.dragStartRectangleOriginToRightDirection.x, staticHandle.y! + this.dragStartRectangleOriginToRightDirection.y,
                             newDragHandlePosition.x, newDragHandlePosition.y, newDragHandlePosition.x + this.dragStartRectangleOriginToLeftDirection.x, newDragHandlePosition.y + this.dragStartRectangleOriginToLeftDirection.y
                         );
                         if (leftIntersection != null && rightIntersection != null) {
@@ -258,24 +258,24 @@ export default class SelectionController extends BaseMovementController {
                             leftHandle.y = Math.round(leftIntersection.y);
                             rightHandle.x = Math.round(rightIntersection.x);
                             rightHandle.y = Math.round(rightIntersection.y);
-                            activeSelectionPath.value[0].x = activeSelectionPath.value[4].x;
-                            activeSelectionPath.value[0].y = activeSelectionPath.value[4].y;
+                            (activeSelectionPath.value[0] as AnyVectorPathCommand).x = (activeSelectionPath.value[4] as AnyVectorPathCommand).x!;
+                            (activeSelectionPath.value[0] as AnyVectorPathCommand).y = (activeSelectionPath.value[4] as AnyVectorPathCommand).y!;
                             activeSelectionPath.value = [...activeSelectionPath.value];
                         }
                     }
 
                     // Resize ellipse
-                    else if (editorShapeIntent === 'ellipse') {
-                        const dragHandle = activeSelectionPath.value[this.dragStartHandleIndex] as SelectionPathPointBezierCurve;
+                    else if (editorSelectionShapeIntent === 'ellipse') {
+                        const dragHandle = activeSelectionPath.value[this.dragStartHandleIndex] as VectorPathCommandCubicBezierCurve;
                         let staticHandleIndex = this.dragStartHandleIndex + 2;
                         if (staticHandleIndex > activeSelectionPath.value.length - 1) staticHandleIndex -= 4;
-                        const staticHandle = activeSelectionPath.value[staticHandleIndex] as SelectionPathPointBezierCurve;
+                        const staticHandle = activeSelectionPath.value[staticHandleIndex] as VectorPathCommandCubicBezierCurve;
                         let leftHandleIndex = this.dragStartHandleIndex - 1;
                         if (leftHandleIndex < 1) leftHandleIndex += 4;
-                        const leftHandle = activeSelectionPath.value[leftHandleIndex] as SelectionPathPointBezierCurve;
+                        const leftHandle = activeSelectionPath.value[leftHandleIndex] as VectorPathCommandCubicBezierCurve;
                         let rightHandleIndex = this.dragStartHandleIndex + 1;
                         if (rightHandleIndex > activeSelectionPath.value.length - 1) rightHandleIndex -= 4;
-                        const rightHandle = activeSelectionPath.value[rightHandleIndex] as SelectionPathPointBezierCurve;
+                        const rightHandle = activeSelectionPath.value[rightHandleIndex] as VectorPathCommandCubicBezierCurve;
                         if (this.dragStartEllipsePerpendicularRadius == null) {
                             const oldMiddlePoint = { x: (dragHandle.x + staticHandle.x) / 2, y: (dragHandle.y + staticHandle.y) / 2 };
                             this.dragStartEllipsePerpendicularRadius = pointDistance2d(oldMiddlePoint.x, oldMiddlePoint.y, leftHandle.x, leftHandle.y);
@@ -292,44 +292,44 @@ export default class SelectionController extends BaseMovementController {
                         leftHandle.y = middlePoint.y + (middleToLeftBearing.y * this.dragStartEllipsePerpendicularRadius);
                         rightHandle.x = middlePoint.x + (middleToRightBearing.x * this.dragStartEllipsePerpendicularRadius);
                         rightHandle.y = middlePoint.y + (middleToRightBearing.y * this.dragStartEllipsePerpendicularRadius);
-                        activeSelectionPath.value[0].x = activeSelectionPath.value[4].x;
-                        activeSelectionPath.value[0].y = activeSelectionPath.value[4].y;
+                        (activeSelectionPath.value[0] as VectorPathCommandCubicBezierCurve).x = (activeSelectionPath.value[4] as VectorPathCommandCubicBezierCurve).x;
+                        (activeSelectionPath.value[0] as VectorPathCommandCubicBezierCurve).y = (activeSelectionPath.value[4] as VectorPathCommandCubicBezierCurve).y;
                         const circularHandleOffset = 0.552284749831;
                         // Handles around static point
-                        staticHandle.ehx = staticHandle.x + (middleToRightBearing.x * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
-                        staticHandle.ehy = staticHandle.y + (middleToRightBearing.y * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
-                        leftHandle.shx = staticHandle.x + (middleToLeftBearing.x * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
-                        leftHandle.shy = staticHandle.y + (middleToLeftBearing.y * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
+                        staticHandle.x2 = staticHandle.x + (middleToRightBearing.x * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
+                        staticHandle.y2 = staticHandle.y + (middleToRightBearing.y * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
+                        leftHandle.x1 = staticHandle.x + (middleToLeftBearing.x * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
+                        leftHandle.y1 = staticHandle.y + (middleToLeftBearing.y * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
                         // Handles around drag point
-                        dragHandle.ehx = dragHandle.x + (middleToLeftBearing.x * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
-                        dragHandle.ehy = dragHandle.y + (middleToLeftBearing.y * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
-                        rightHandle.shx = dragHandle.x + (middleToRightBearing.x * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
-                        rightHandle.shy = dragHandle.y + (middleToRightBearing.y * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
+                        dragHandle.x2 = dragHandle.x + (middleToLeftBearing.x * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
+                        dragHandle.y2 = dragHandle.y + (middleToLeftBearing.y * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
+                        rightHandle.x1 = dragHandle.x + (middleToRightBearing.x * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
+                        rightHandle.y1 = dragHandle.y + (middleToRightBearing.y * this.dragStartEllipsePerpendicularRadius * circularHandleOffset);
                         // Handles around left point
-                        leftHandle.ehx = leftHandle.x + (-staticToDragBearing.x * parallelRadius * circularHandleOffset);
-                        leftHandle.ehy = leftHandle.y + (-staticToDragBearing.y * parallelRadius * circularHandleOffset);
-                        dragHandle.shx = leftHandle.x + (staticToDragBearing.x * parallelRadius * circularHandleOffset);
-                        dragHandle.shy = leftHandle.y + (staticToDragBearing.y * parallelRadius * circularHandleOffset);
+                        leftHandle.x2 = leftHandle.x + (-staticToDragBearing.x * parallelRadius * circularHandleOffset);
+                        leftHandle.y2 = leftHandle.y + (-staticToDragBearing.y * parallelRadius * circularHandleOffset);
+                        dragHandle.x1 = leftHandle.x + (staticToDragBearing.x * parallelRadius * circularHandleOffset);
+                        dragHandle.y1 = leftHandle.y + (staticToDragBearing.y * parallelRadius * circularHandleOffset);
                         // Handles around right point
-                        rightHandle.ehx = rightHandle.x + (staticToDragBearing.x * parallelRadius * circularHandleOffset);
-                        rightHandle.ehy = rightHandle.y + (staticToDragBearing.y * parallelRadius * circularHandleOffset);
-                        staticHandle.shx = rightHandle.x + (-staticToDragBearing.x * parallelRadius * circularHandleOffset);
-                        staticHandle.shy = rightHandle.y + (-staticToDragBearing.y * parallelRadius * circularHandleOffset);
+                        rightHandle.x2 = rightHandle.x + (staticToDragBearing.x * parallelRadius * circularHandleOffset);
+                        rightHandle.y2 = rightHandle.y + (staticToDragBearing.y * parallelRadius * circularHandleOffset);
+                        staticHandle.x1 = rightHandle.x + (-staticToDragBearing.x * parallelRadius * circularHandleOffset);
+                        staticHandle.y1 = rightHandle.y + (-staticToDragBearing.y * parallelRadius * circularHandleOffset);
                         activeSelectionPath.value = [...activeSelectionPath.value];
                     }
 
                     // Modify free select handle placement
-                    else if (editorShapeIntent === 'freePolygon') {
+                    else if (editorSelectionShapeIntent === 'freePolygon') {
                         const newDragHandlePosition = new DOMPoint(cursorX * devicePixelRatio, cursorY * devicePixelRatio).matrixTransform(transformInverse);
-                        const dragHandle = activeSelectionPath.value[this.dragStartHandleIndex];
+                        const dragHandle: AnyVectorPathCommand = activeSelectionPath.value[this.dragStartHandleIndex];
                         dragHandle.x = newDragHandlePosition.x;
                         dragHandle.y = newDragHandlePosition.y;
                         if (this.dragStartHandleIndex === 0 && this.dragStartActiveSelectionPathIsClosed) {
-                            activeSelectionPath.value[activeSelectionPath.value.length - 1].x = newDragHandlePosition.x;
-                            activeSelectionPath.value[activeSelectionPath.value.length - 1].y = newDragHandlePosition.y;
+                            (activeSelectionPath.value[activeSelectionPath.value.length - 1] as AnyVectorPathCommand).x = newDragHandlePosition.x;
+                            (activeSelectionPath.value[activeSelectionPath.value.length - 1] as AnyVectorPathCommand).y = newDragHandlePosition.y;
                         } else if (this.dragStartHandleIndex === activeSelectionPath.value.length - 1 && this.dragStartActiveSelectionPathIsClosed) {
-                            activeSelectionPath.value[0].x = newDragHandlePosition.x;
-                            activeSelectionPath.value[0].y = newDragHandlePosition.y;
+                            (activeSelectionPath.value[0] as AnyVectorPathCommand).x = newDragHandlePosition.x;
+                            (activeSelectionPath.value[0] as AnyVectorPathCommand).y = newDragHandlePosition.y;
                         }
                         activeSelectionPath.value = [...activeSelectionPath.value];
                     }
@@ -362,28 +362,28 @@ export default class SelectionController extends BaseMovementController {
                         if (selectionAddShape.value === 'rectangle') {
                             activeSelectionPath.value = [
                                 {
-                                    type: 'move',
-                                    editorShapeIntent: 'rectangle',
+                                    type: VectorPathCommandType.MOVE,
+                                    editorSelectionShapeIntent: 'rectangle',
                                     x: topLeft.x,
                                     y: topLeft.y
                                 },
                                 {
-                                    type: 'line',
+                                    type: VectorPathCommandType.LINE,
                                     x: topRight.x,
                                     y: topRight.y
                                 },
                                 {
-                                    type: 'line',
+                                    type: VectorPathCommandType.LINE,
                                     x: bottomRight.x,
                                     y: bottomRight.y
                                 },
                                 {
-                                    type: 'line',
+                                    type: VectorPathCommandType.LINE,
                                     x: bottomLeft.x,
                                     y: bottomLeft.y
                                 },
                                 {
-                                    type: 'line',
+                                    type: VectorPathCommandType.LINE,
                                     x: topLeft.x,
                                     y: topLeft.y
                                 },
@@ -420,46 +420,46 @@ export default class SelectionController extends BaseMovementController {
                             const rightBottomHandleY = rightY + ((bottomRight.y - rightY) * circularHandleOffset);
                             activeSelectionPath.value = [
                                 {
-                                    type: 'move',
-                                    editorShapeIntent: 'ellipse',
+                                    type: VectorPathCommandType.MOVE,
+                                    editorSelectionShapeIntent: 'ellipse',
                                     x: topX,
                                     y: topY
                                 },
                                 {
-                                    type: 'bezierCurve',
+                                    type: VectorPathCommandType.CUBIC_BEZIER_CURVE,
                                     x: rightX,
                                     y: rightY,
-                                    shx: topRightHandleX,
-                                    shy: topRightHandleY,
-                                    ehx: rightTopHandleX,
-                                    ehy: rightTopHandleY
+                                    x1: topRightHandleX,
+                                    y1: topRightHandleY,
+                                    x2: rightTopHandleX,
+                                    y2: rightTopHandleY
                                 },
                                 {
-                                    type: 'bezierCurve',
+                                    type: VectorPathCommandType.CUBIC_BEZIER_CURVE,
                                     x: bottomX,
                                     y: bottomY,
-                                    shx: rightBottomHandleX,
-                                    shy: rightBottomHandleY,
-                                    ehx: bottomRightHandleX,
-                                    ehy: bottomRightHandleY
+                                    x1: rightBottomHandleX,
+                                    y1: rightBottomHandleY,
+                                    x2: bottomRightHandleX,
+                                    y2: bottomRightHandleY
                                 },
                                 {
-                                    type: 'bezierCurve',
+                                    type: VectorPathCommandType.CUBIC_BEZIER_CURVE,
                                     x: leftX,
                                     y: leftY,
-                                    shx: bottomLeftHandleX,
-                                    shy: bottomLeftHandleY,
-                                    ehx: leftBottomHandleX,
-                                    ehy: leftBottomHandleY
+                                    x1: bottomLeftHandleX,
+                                    y1: bottomLeftHandleY,
+                                    x2: leftBottomHandleX,
+                                    y2: leftBottomHandleY
                                 },
                                 {
-                                    type: 'bezierCurve',
+                                    type: VectorPathCommandType.CUBIC_BEZIER_CURVE,
                                     x: topX,
                                     y: topY,
-                                    shx: leftTopHandleX,
-                                    shy: leftTopHandleY,
-                                    ehx: topLeftHandleX,
-                                    ehy: topLeftHandleY
+                                    x1: leftTopHandleX,
+                                    y1: leftTopHandleY,
+                                    x2: topLeftHandleX,
+                                    y2: topLeftHandleY
                                 },
                             ];
                         }
@@ -469,13 +469,13 @@ export default class SelectionController extends BaseMovementController {
                             const start = new DOMPoint(startCursorX * devicePixelRatio, startCursorY * devicePixelRatio).matrixTransform(transformInverse)
                             activeSelectionPath.value = [
                                 {
-                                    type: 'move',
-                                    editorShapeIntent: 'lasso',
+                                    type: VectorPathCommandType.MOVE,
+                                    editorSelectionShapeIntent: 'lasso',
                                     x: start.x,
                                     y: start.y,
                                 },
                                 {
-                                    type: 'line',
+                                    type: VectorPathCommandType.LINE,
                                     x: cursor.x,
                                     y: cursor.y,
                                 },
@@ -484,7 +484,7 @@ export default class SelectionController extends BaseMovementController {
                             activeSelectionPath.value = [
                                 ...activeSelectionPath.value,
                                 {
-                                    type: 'line',
+                                    type: VectorPathCommandType.LINE,
                                     x: cursor.x,
                                     y: cursor.y,
                                 },
@@ -515,33 +515,33 @@ export default class SelectionController extends BaseMovementController {
                 isDrawingSelection.value = false;
                 if (this.dragStartHandleIndex > -1 || this.dragStartActiveSelectionPath) {
 
-                    const editorShapeIntent = activeSelectionPath.value[0]?.editorShapeIntent;
+                    const editorSelectionShapeIntent = activeSelectionPath.value[0]?.editorSelectionShapeIntent;
 
-                    if (editorShapeIntent === 'lasso') {
+                    if (editorSelectionShapeIntent === 'lasso') {
                         activeSelectionPath.value.push({
-                            type: 'line',
-                            x: activeSelectionPath.value[0].x,
-                            y: activeSelectionPath.value[0].y,
+                            type: VectorPathCommandType.LINE,
+                            x: (activeSelectionPath.value[0] as AnyVectorPathCommand).x!,
+                            y: (activeSelectionPath.value[0] as AnyVectorPathCommand).y!,
                         });
                     }
 
                     // Update active selection path in history
-                    if (editorShapeIntent === 'freePolygon') {
+                    if (editorSelectionShapeIntent === 'freePolygon') {
                         let isFinished = false;
                         if (activeSelectionPath.value.length > 2) {
                             if (this.dragStartHandleIndex === activeSelectionPath.value.length - 1) {
                                 const dragHandleIndex = this.getDragHandleIndexAtPagePoint(pointer.up?.pageX ?? pointer.down.pageX, pointer.up?.pageY ?? pointer.down.pageX, activeSelectionPath.value.length - 1);
                                 if (dragHandleIndex === 0) {
-                                    activeSelectionPath.value[activeSelectionPath.value.length - 1].x = activeSelectionPath.value[0].x;
-                                    activeSelectionPath.value[activeSelectionPath.value.length - 1].y = activeSelectionPath.value[0].y;
+                                    (activeSelectionPath.value[activeSelectionPath.value.length - 1] as AnyVectorPathCommand).x = (activeSelectionPath.value[0] as AnyVectorPathCommand).x;
+                                    (activeSelectionPath.value[activeSelectionPath.value.length - 1] as AnyVectorPathCommand).y = (activeSelectionPath.value[0] as AnyVectorPathCommand).y;
                                     activeSelectionPath.value = [...activeSelectionPath.value];
                                     isFinished = true;
                                 }
                             } else if (this.dragStartHandleIndex === 0) {
                                 const dragHandleIndex = this.getDragHandleIndexAtPagePoint(pointer.up?.pageX ?? pointer.down.pageX, pointer.up?.pageY ?? pointer.down.pageX, 0);
                                 if (dragHandleIndex === activeSelectionPath.value.length - 1) {
-                                    activeSelectionPath.value[0].x = activeSelectionPath.value[activeSelectionPath.value.length - 1].x;
-                                    activeSelectionPath.value[0].y = activeSelectionPath.value[activeSelectionPath.value.length - 1].y;
+                                    (activeSelectionPath.value[0] as AnyVectorPathCommand).x = (activeSelectionPath.value[activeSelectionPath.value.length - 1] as AnyVectorPathCommand).x;
+                                    (activeSelectionPath.value[0] as AnyVectorPathCommand).y = (activeSelectionPath.value[activeSelectionPath.value.length - 1] as AnyVectorPathCommand).y;
                                     activeSelectionPath.value = [...activeSelectionPath.value];
                                     isFinished = true;
                                 }
@@ -554,12 +554,12 @@ export default class SelectionController extends BaseMovementController {
                             }
                         }
                         if (isFinished) {
-                            this.queueAsyncAction((newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) => {
+                            this.queueAsyncAction((newPath: Array<VectorPathCommand>, oldPath?: Array<VectorPathCommand>) => {
                                 return this.updateActiveSelectionContinuousFinish(newPath, oldPath);
                             }, [activeSelectionPath.value, this.dragStartActiveSelectionPath]);
                             this.freePathStartActiveSelectionPath = undefined;
                         } else {
-                            this.queueAsyncAction((newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) => {
+                            this.queueAsyncAction((newPath: Array<VectorPathCommand>, oldPath?: Array<VectorPathCommand>) => {
                                 return this.updateActiveSelectionContinuous(newPath, oldPath);
                             }, [activeSelectionPath.value, this.freePathStartActiveSelectionPath ?? []]);
                         }
@@ -568,7 +568,7 @@ export default class SelectionController extends BaseMovementController {
                         if (selectionAddShape.value === 'lasso') {
                             this.simplifyPath();
                         }
-                        this.queueAsyncAction((newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) => {
+                        this.queueAsyncAction((newPath: Array<VectorPathCommand>, oldPath?: Array<VectorPathCommand>) => {
                             return this.updateActiveSelection(newPath, oldPath);
                         }, [activeSelectionPath.value, this.dragStartActiveSelectionPath]);
                     }
@@ -581,14 +581,14 @@ export default class SelectionController extends BaseMovementController {
             } else {
                 // Close free select path
                 const dragHandleIndex = this.getDragHandleIndexAtPagePoint(pointer.down.pageX, pointer.down.pageY);
-                if (activeSelectionPath.value.length > 2 && activeSelectionPath.value[0]?.editorShapeIntent === 'freePolygon' && dragHandleIndex === 0) {
+                if (activeSelectionPath.value.length > 2 && activeSelectionPath.value[0]?.editorSelectionShapeIntent === 'freePolygon' && dragHandleIndex === 0) {
                     this.warnIfUnproductiveSelection();
                     activeSelectionPath.value.push({
-                        type: 'line',
-                        x: activeSelectionPath.value[0].x,
-                        y: activeSelectionPath.value[0].y,
+                        type: VectorPathCommandType.LINE,
+                        x: (activeSelectionPath.value[0] as AnyVectorPathCommand).x!,
+                        y: (activeSelectionPath.value[0] as AnyVectorPathCommand).y!,
                     })
-                    this.queueAsyncAction((newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) => {
+                    this.queueAsyncAction((newPath: Array<VectorPathCommand>, oldPath?: Array<VectorPathCommand>) => {
                         return this.updateActiveSelectionContinuousFinish(newPath, oldPath);
                     }, [activeSelectionPath.value, this.freePathStartActiveSelectionPath ?? []]);
                     this.freePathStartActiveSelectionPath = undefined;
@@ -610,20 +610,20 @@ export default class SelectionController extends BaseMovementController {
 
         const dragHandleRadius = isTouch ? this.dragHandleRadiusTouch : this.dragHandleRadius;
 
-        for (const [pathPointIndex, pathPoint] of activeSelectionPath.value.entries()) {
+        for (const [pathCommandIndex, pathCommand] of activeSelectionPath.value.entries()) {
             if (
-                (pathPoint.type === 'move' && pathPoint.editorShapeIntent === 'freePolygon') ||
-                pathPoint.type === 'line' ||
-                pathPoint.type === 'bezierCurve'
+                (pathCommand.type === VectorPathCommandType.MOVE && pathCommand.editorSelectionShapeIntent === 'freePolygon') ||
+                pathCommand.type === VectorPathCommandType.LINE ||
+                pathCommand.type === VectorPathCommandType.CUBIC_BEZIER_CURVE
             ) {
                 if (
-                    Math.abs(cursor.x - pathPoint.x) < dragHandleRadius * devicePixelRatio / decomposedTransform.scaleX &&
-                    Math.abs(cursor.y - pathPoint.y) < dragHandleRadius * devicePixelRatio / decomposedTransform.scaleY
+                    Math.abs(cursor.x - pathCommand.x) < dragHandleRadius * devicePixelRatio / decomposedTransform.scaleX &&
+                    Math.abs(cursor.y - pathCommand.y) < dragHandleRadius * devicePixelRatio / decomposedTransform.scaleY
                 ) {
-                    if (pathPointIndex === excludeIndex) {
+                    if (pathCommandIndex === excludeIndex) {
                         continue;
                     } else {
-                        pointIndex = pathPointIndex;
+                        pointIndex = pathCommandIndex;
                         break;
                     }
                 }
@@ -637,12 +637,12 @@ export default class SelectionController extends BaseMovementController {
             activeSelectionPath.value.length > 0 &&
             (
                 // Active path is a different shape
-                (activeSelectionPath.value[0]?.editorShapeIntent !== 'freePolygon') ||
+                (activeSelectionPath.value[0]?.editorSelectionShapeIntent !== 'freePolygon') ||
                 // Active path is an already closed path
                 this.isActiveSelectionPathClosed()
             )
         ) {
-            this.queueAsyncAction((activeSelectionPathOverride: Array<SelectionPathPoint>) => {
+            this.queueAsyncAction((activeSelectionPathOverride: Array<VectorPathCommand>) => {
                 return this.applyActiveSelection(activeSelectionPathOverride);
             }, [JSON.parse(JSON.stringify(activeSelectionPath.value))]);
             this.freePathStartActiveSelectionPath = [];
@@ -655,31 +655,33 @@ export default class SelectionController extends BaseMovementController {
         if (activeSelectionPath.value.length < 1) {
             activeSelectionPath.value = [
                 {
-                    type: 'move',
-                    editorShapeIntent: 'freePolygon',
+                    type: VectorPathCommandType.MOVE,
+                    editorSelectionShapeIntent: 'freePolygon',
                     x: cursor.x,
                     y: cursor.y,
                 }
             ];
         } else {
             activeSelectionPath.value.push({
-                type: 'line',
+                type: VectorPathCommandType.LINE,
                 x: cursor.x,
                 y: cursor.y,
             });
         }
 
-        this.queueAsyncAction((newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) => {
+        this.queueAsyncAction((newPath: Array<VectorPathCommand>, oldPath?: Array<VectorPathCommand>) => {
             return this.updateActiveSelectionContinuous(newPath, oldPath);
         }, [activeSelectionPath.value, this.freePathStartActiveSelectionPath ?? []]);
     }
 
     private isActiveSelectionPathClosed() {
-        if (activeSelectionPath.value[0]?.editorShapeIntent === 'freePolygon') {
+        if (activeSelectionPath.value[0]?.editorSelectionShapeIntent === 'freePolygon') {
             return (
-                activeSelectionPath.value.length > 2 &&
-                activeSelectionPath.value[activeSelectionPath.value.length - 1].x === activeSelectionPath.value[0].x &&
-                activeSelectionPath.value[activeSelectionPath.value.length - 1].y === activeSelectionPath.value[0].y
+                activeSelectionPath.value.length > 2
+                && (activeSelectionPath.value[activeSelectionPath.value.length - 1] as AnyVectorPathCommand).x
+                    === (activeSelectionPath.value[0] as AnyVectorPathCommand).x
+                && (activeSelectionPath.value[activeSelectionPath.value.length - 1] as AnyVectorPathCommand).y
+                    === (activeSelectionPath.value[0] as AnyVectorPathCommand).y
             );
         }
         return true;
@@ -689,25 +691,25 @@ export default class SelectionController extends BaseMovementController {
         return selectionAddShape.value === 'freePolygon';
     }
 
-    async applyActiveSelection(activeSelectionPathOverride: Array<SelectionPathPoint> = activeSelectionPath.value, options?: any) {
+    async applyActiveSelection(activeSelectionPathOverride: Array<VectorPathCommand> = activeSelectionPath.value, options?: any) {
         await historyStore.dispatch('runAction', {
             action: new ApplyActiveSelectionAction(activeSelectionPathOverride, options)
         });
     }
 
     async queueApplyActiveSelection() {
-        this.queueAsyncAction((activeSelectionPathOverride: Array<SelectionPathPoint>) => {
+        this.queueAsyncAction((activeSelectionPathOverride: Array<VectorPathCommand>) => {
             return this.applyActiveSelection(activeSelectionPathOverride);
         }, [[...activeSelectionPath.value]]);
     }
 
-    async updateActiveSelection(newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) {
+    async updateActiveSelection(newPath: Array<VectorPathCommand>, oldPath?: Array<VectorPathCommand>) {
         await historyStore.dispatch('runAction', {
             action: new UpdateActiveSelectionAction(newPath, oldPath)
         });
     }
 
-    async updateActiveSelectionContinuous(newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) {
+    async updateActiveSelectionContinuous(newPath: Array<VectorPathCommand>, oldPath?: Array<VectorPathCommand>) {
         await historyStore.dispatch('runAction', {
             action: new BundleAction('createFreeSelectPath', 'action.updateActiveSelection', [
                 new UpdateActiveSelectionAction(newPath, oldPath, { updatePreview: false })
@@ -716,7 +718,7 @@ export default class SelectionController extends BaseMovementController {
         });
     }
 
-    async updateActiveSelectionContinuousFinish(newPath: Array<SelectionPathPoint>, oldPath?: Array<SelectionPathPoint>) {
+    async updateActiveSelectionContinuousFinish(newPath: Array<VectorPathCommand>, oldPath?: Array<VectorPathCommand>) {
         await historyStore.dispatch('runAction', {
             action: new BundleAction('finishFreeSelectPath', 'action.updateActiveSelection', [
                 new UpdateActiveSelectionAction(newPath, oldPath, { updatePreview: true })
@@ -782,35 +784,35 @@ export default class SelectionController extends BaseMovementController {
             var sqTolerance = tolerance * tolerance;
             
             let prevPoint = activeSelectionPath.value[0];
-            const newPoints: SelectionPathPoint[] = [prevPoint];
-            let point!: SelectionPathPoint;
+            const newCommands: VectorPathCommand[] = [prevPoint];
+            let command!: VectorPathCommand;
         
             for (let i = 1, len = activeSelectionPath.value.length; i < len; i++) {
-                point = activeSelectionPath.value[i];
+                command = activeSelectionPath.value[i];
         
                 const squareDistance = (
-                    Math.pow(point.x - prevPoint.x, 2)
-                    + Math.pow(point.y - prevPoint.y, 2)
+                    Math.pow((command as AnyVectorPathCommand).x! - (prevPoint as AnyVectorPathCommand).x!, 2)
+                    + Math.pow((command as AnyVectorPathCommand).y! - (prevPoint as AnyVectorPathCommand).y!, 2)
                 );
                 
                 if (squareDistance > sqTolerance) {
-                    newPoints.push(point);
-                    prevPoint = point;
+                    newCommands.push(command);
+                    prevPoint = command;
                 }
             }
-            if (prevPoint !== point) newPoints.push(point);
+            if (prevPoint !== command) newCommands.push(command);
         }
     }
 
     protected handleCursorIcon() {
         let newIcon = super.handleCursorIcon();
         if (!newIcon) {
-            const editorShapeIntent = activeSelectionPath.value[0]?.editorShapeIntent;
-            if (this.hoveringActiveSelectionPathIndex > -1 && editorShapeIntent !== 'lasso') {
+            const editorSelectionShapeIntent = activeSelectionPath.value[0]?.editorSelectionShapeIntent;
+            if (this.hoveringActiveSelectionPathIndex > -1 && editorSelectionShapeIntent !== 'lasso') {
                 if (
                     this.hoveringActiveSelectionPathIndex === 0 &&
                     activeSelectionPath.value.length > 2 &&
-                    editorShapeIntent === 'freePolygon' &&
+                    editorSelectionShapeIntent === 'freePolygon' &&
                     !this.isActiveSelectionPathClosed()
                 ) {
                     newIcon = 'pointer';

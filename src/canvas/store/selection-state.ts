@@ -1,15 +1,15 @@
 import mitt from 'mitt';
-import { ref, reactive } from 'vue';
+import { ref } from 'vue';
 
 import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
 import { createImageFromCanvas, createEmptyCanvasWith2dContext } from '@/lib/image';
 
 import canvasStore from '@/store/canvas';
-import { getStoredImageOrCanvas } from '@/store/image';
 import { PerformantStore } from '@/store/performant-store';
-import workingFileStore, { getCanvasRenderingContext2DSettings, getLayerGlobalTransform } from '@/store/working-file';
+import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 
-import type { WorkingFileLayerBlendingMode, WorkingFileRasterLayer } from '@/types';
+import { VectorPathCommandType } from '@/types/vector';
+import type { AnyVectorPathCommand, VectorPathCommand } from '@/types';
 
 export type SelectionAddShape = 'rectangle' | 'ellipse' | 'freePolygon' | 'lasso' | 'tonalArea';
 export type SelectionCombineMode = 'add' | 'subtract' | 'intersect' | 'replace';
@@ -42,86 +42,71 @@ export const selectedLayersSelectionMaskPreview = ref<InstanceType<typeof Image>
 export const selectedLayersSelectionMaskPreviewCanvasOffset = ref<DOMPoint>(new DOMPoint());
 export const selectionMaskDrawMargin = ref<number>(1);
 
-export interface SelectionPathPointBase {
-    type: 'move' | 'line' | 'bezierCurve';
-    x: number;
-    y: number;
-    editorShapeIntent?: 'rectangle' | 'ellipse' | 'freePolygon' | 'lasso';
-}
-
-export interface SelectionPathPointMove extends SelectionPathPointBase {
-    type: 'move';
-}
-
-export interface SelectionPathPointLine extends SelectionPathPointBase {
-    type: 'line';
-}
-
-export interface SelectionPathPointBezierCurve extends SelectionPathPointBase {
-    type: 'bezierCurve';
-    shx: number; // Point for bezier curve starting handle, x axis
-    shy: number; // Point for bezier curve starting handle, y axis
-    ehx: number; // Point for bezier curve ending handle, x axis
-    ehy: number; // Point for bezier curve ending handle, y axis
-}
-
-export type SelectionPathPoint = SelectionPathPointMove | SelectionPathPointLine | SelectionPathPointBezierCurve;
-
-export const activeSelectionPath = ref<Array<SelectionPathPoint>>([]);
+export const activeSelectionPath = ref<Array<VectorPathCommand>>([]);
 
 export const selectionEmitter = mitt();
 
 export interface SelectionBounds { left: number; right: number; top: number; bottom: number; };
 
-export function getActiveSelectionBounds(activeSelectionPathOverride: Array<SelectionPathPoint> = activeSelectionPath.value): SelectionBounds {
+export function getActiveSelectionBounds(activeSelectionPathOverride: Array<AnyVectorPathCommand> = activeSelectionPath.value): SelectionBounds {
     let left = Infinity;
     let right = -Infinity;
     let top = Infinity;
     let bottom = -Infinity;
-    for (const point of activeSelectionPathOverride) {
-        if (point.x < left) {
-            left = point.x;
+    for (const command of activeSelectionPathOverride) {
+        if (command.x != null) {
+            if (command.x < left) {
+                left = command.x;
+            }
+            if (command.x > right) {
+                right = command.x;
+            }
         }
-        if (point.x > right) {
-            right = point.x;
+        if (command.y != null) {
+            if (command.y < top) {
+                top = command.y;
+            }
+            if (command.y > bottom) {
+                bottom = command.y;
+            }
         }
-        if (point.y < top) {
-            top = point.y;
+        if (command.x1 != null) {
+            if (command.x1 < left) {
+                left = command.x1;
+            }
+            if (command.x1 > right) {
+                right = command.x1;
+            }
         }
-        if (point.y > bottom) {
-            bottom = point.y;
+        if (command.y1 != null) {
+            if (command.y1 < top) {
+                top = command.y1;
+            }
+            if (command.y1 > bottom) {
+                bottom = command.y1;
+            }
         }
-        if (point.type === 'bezierCurve') {
-            if (point.shx < left) {
-                left = point.shx;
+        if (command.x2 != null) {
+            if (command.x2 < left) {
+                left = command.x2;
             }
-            if (point.shx > right) {
-                right = point.shx;
+            if (command.x2 > right) {
+                right = command.x2;
             }
-            if (point.shy < top) {
-                top = point.shy;
+        }
+        if (command.y2 != null) {
+            if (command.y2 < top) {
+                top = command.y2;
             }
-            if (point.shy > bottom) {
-                bottom = point.shy;
-            }
-            if (point.ehx < left) {
-                left = point.ehx;
-            }
-            if (point.ehx > right) {
-                right = point.ehx;
-            }
-            if (point.ehy < top) {
-                top = point.ehy;
-            }
-            if (point.ehy > bottom) {
-                bottom = point.ehy;
+            if (command.y2 > bottom) {
+                bottom = command.y2;
             }
         }
     }
     return { left, right, top, bottom };
 }
 
-export async function previewActiveSelectionMask(activeSelectionPathOverride: Array<SelectionPathPoint> = activeSelectionPath.value) {
+export async function previewActiveSelectionMask(activeSelectionPathOverride: Array<VectorPathCommand> = activeSelectionPath.value) {
     let drawMargin: number = selectionMaskDrawMargin.value;
     if (activeSelectionPathOverride.length > 0) {
         const activeSelectionBounds = getActiveSelectionBounds(activeSelectionPathOverride);
@@ -215,7 +200,7 @@ export function discardActiveSelectionMask() {
     activeSelectionMaskCanvasOffset.value.y = 0;
 }
 
-export async function createActiveSelectionMask(activeSelectionBounds: SelectionBounds, activeSelectionPathOverride: Array<SelectionPathPoint> = activeSelectionPath.value): Promise<HTMLCanvasElement> {
+export async function createActiveSelectionMask(activeSelectionBounds: SelectionBounds, activeSelectionPathOverride: Array<VectorPathCommand> = activeSelectionPath.value): Promise<HTMLCanvasElement> {
     let drawMargin: number = selectionMaskDrawMargin.value;
 
     if (appliedSelectionMask.value != null) {
@@ -260,19 +245,19 @@ export async function createActiveSelectionMask(activeSelectionBounds: Selection
         ctx.globalCompositeOperation = 'destination-in';
     }
     ctx.beginPath();
-    for (const point of activeSelectionPathOverride) {
-        if (point.type === 'move') {
-            ctx.moveTo(point.x - activeSelectionBounds.left + drawMargin, point.y - activeSelectionBounds.top + drawMargin);
-        } else if (point.type === 'line') {
-            ctx.lineTo(point.x - activeSelectionBounds.left + drawMargin, point.y - activeSelectionBounds.top + drawMargin);
-        } else if (point.type === 'bezierCurve') {
+    for (const command of activeSelectionPathOverride) {
+        if (command.type === VectorPathCommandType.MOVE) {
+            ctx.moveTo(command.x - activeSelectionBounds.left + drawMargin, command.y - activeSelectionBounds.top + drawMargin);
+        } else if (command.type === VectorPathCommandType.LINE) {
+            ctx.lineTo(command.x - activeSelectionBounds.left + drawMargin, command.y - activeSelectionBounds.top + drawMargin);
+        } else if (command.type === VectorPathCommandType.CUBIC_BEZIER_CURVE) {
             ctx.bezierCurveTo(
-                point.shx - activeSelectionBounds.left + drawMargin,
-                point.shy - activeSelectionBounds.top + drawMargin,
-                point.ehx - activeSelectionBounds.left + drawMargin,
-                point.ehy - activeSelectionBounds.top + drawMargin,
-                point.x - activeSelectionBounds.left + drawMargin,
-                point.y - activeSelectionBounds.top + drawMargin
+                command.x1 - activeSelectionBounds.left + drawMargin,
+                command.y1 - activeSelectionBounds.top + drawMargin,
+                command.x2 - activeSelectionBounds.left + drawMargin,
+                command.y2 - activeSelectionBounds.top + drawMargin,
+                command.x - activeSelectionBounds.left + drawMargin,
+                command.y - activeSelectionBounds.top + drawMargin
             );
         }
     }

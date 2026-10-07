@@ -70,20 +70,14 @@
 </template>
 
 <script setup lang="ts">
-import { defineComponent, defineAsyncComponent, ref, computed, onMounted, toRefs, watch, nextTick } from 'vue';
+import { computed } from 'vue';
 
 import { useI18n } from '@/i18n';
 
-import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
-import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.vue';
 import ElInputGroup from '@/ui/el/el-input-group.vue';
-import ElInputNumber from '@/ui/el/el-input-number.vue';
-import ElPopover from '@/ui/el/el-popover.vue';
-import { ElRadioGroup, ElRadioButton } from 'element-plus/lib/components/radio/index';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
-import ElTooltip from 'element-plus/lib/components/tooltip/index';
 
 import { appliedSelectionMask, selectionAddShape, selectionCombineMode, selectionEmitter, activeSelectionPath } from '@/canvas/store/selection-state';
 

@@ -26,29 +26,33 @@ export enum CompressedVectorPathCommandType {
     CLOSE = 9,
 }
 
-export interface VectorPathCommandMove {
+export interface VectorPathCommandCommon {
+    editorSelectionShapeIntent?: 'rectangle' | 'ellipse' | 'freePolygon' | 'lasso';
+}
+
+export interface VectorPathCommandMove extends VectorPathCommandCommon {
     type: VectorPathCommandType.MOVE,
     x: number;
     y: number;
 }
 
-export interface VectorPathCommandLine {
+export interface VectorPathCommandLine extends VectorPathCommandCommon {
     type: VectorPathCommandType.LINE,
     x: number;
     y: number;
 }
 
-export interface VectorPathCommandHorizontalLine {
+export interface VectorPathCommandHorizontalLine extends VectorPathCommandCommon {
     type: VectorPathCommandType.HORIZONTAL_LINE,
     x: number;
 }
 
-export interface VectorPathCommandVerticalLine {
+export interface VectorPathCommandVerticalLine extends VectorPathCommandCommon {
     type: VectorPathCommandType.VERTICAL_LINE,
     y: number;
 }
 
-export interface VectorPathCommandCubicBezierCurve {
+export interface VectorPathCommandCubicBezierCurve extends VectorPathCommandCommon {
     type: VectorPathCommandType.CUBIC_BEZIER_CURVE,
     x: number;
     y: number;
@@ -58,7 +62,7 @@ export interface VectorPathCommandCubicBezierCurve {
     y2: number;
 }
 
-export interface VectorPathCommandSmoothCubicBezierCurve {
+export interface VectorPathCommandSmoothCubicBezierCurve extends VectorPathCommandCommon {
     type: VectorPathCommandType.SMOOTH_CUBIC_BEZIER_CURVE,
     x: number;
     y: number;
@@ -66,7 +70,7 @@ export interface VectorPathCommandSmoothCubicBezierCurve {
     y2: number;
 }
 
-export interface VectorPathCommandQuadraticBezierCurve {
+export interface VectorPathCommandQuadraticBezierCurve extends VectorPathCommandCommon {
     type: VectorPathCommandType.QUADRATIC_BEZIER_CURVE,
     x: number;
     y: number;
@@ -74,13 +78,13 @@ export interface VectorPathCommandQuadraticBezierCurve {
     y1: number;
 }
 
-export interface VectorPathCommandSmoothQuadraticBezierCurve {
+export interface VectorPathCommandSmoothQuadraticBezierCurve extends VectorPathCommandCommon {
     type: VectorPathCommandType.SMOOTH_QUADRATIC_BEZIER_CURVE,
     x: number;
     y: number;
 }
 
-export interface VectorPathCommandArc {
+export interface VectorPathCommandArc extends VectorPathCommandCommon {
     type: VectorPathCommandType.ELLIPTICAL_ARC,
     rx: number;
     ry: number;
@@ -91,7 +95,7 @@ export interface VectorPathCommandArc {
     y: number;
 }
 
-export interface VectorPathCommandClose {
+export interface VectorPathCommandClose extends VectorPathCommandCommon {
     type: VectorPathCommandType.CLOSE,
 }
 
@@ -99,6 +103,21 @@ export type VectorPathCommand = VectorPathCommandMove | VectorPathCommandLine | 
     | VectorPathCommandVerticalLine | VectorPathCommandCubicBezierCurve | VectorPathCommandSmoothCubicBezierCurve
     | VectorPathCommandQuadraticBezierCurve | VectorPathCommandSmoothQuadraticBezierCurve
     | VectorPathCommandArc | VectorPathCommandClose;
+
+export interface AnyVectorPathCommand extends VectorPathCommandCommon {
+    type: VectorPathCommandType,
+    x?: number;
+    y?: number;
+    x1?: number;
+    y1?: number;
+    x2?: number;
+    y2?: number;
+    rx?: number;
+    ry?: number;
+    xAxisRotation?: number;
+    largeArcFlag?: number;
+    sweepFlag?: number;
+}
 
 export interface VectorRectangleShape<T extends ColorModel> {
     type: 'rectangle';

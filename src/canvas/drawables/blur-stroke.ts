@@ -1,4 +1,3 @@
-import { Bezier } from 'bezier-js';
 import type { Drawable, DrawableDrawInfo, DrawableOptions, DrawableUpdateOptions } from '@/types';
 
 export interface BlurStrokePoint {
@@ -74,7 +73,7 @@ export default class BlurStroke implements Drawable<BlurStrokeData> {
     private points: BlurStrokePoint[] = [];
     private radius: number = 1;
     private smoothing: number = 1;
-    private pointBeziers: { forward: Bezier[], backward: Bezier[] }[] = [];
+    // private pointBeziers: { forward: Bezier[], backward: Bezier[] }[] = [];
 
     private destinationCanvas: HTMLCanvasElement | ImageBitmap | undefined;
     private destinationCanvasTransform: DOMMatrix | undefined;
@@ -96,7 +95,7 @@ export default class BlurStroke implements Drawable<BlurStrokeData> {
         let bottom = -Infinity;
 
         let startPointIndex = (refresh ? 0 : Math.max(0, this.points.length - 3 - this.smoothing));
-        this.pointBeziers = this.pointBeziers.slice(0, startPointIndex);
+        // this.pointBeziers = this.pointBeziers.slice(0, startPointIndex);
 
         for (let i = startPointIndex; i < this.points.length; i++) {
             const { x, y, size } = this.points[i];

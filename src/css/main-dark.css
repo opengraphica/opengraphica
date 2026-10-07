@@ -28256,7 +28256,7 @@ body.og-full-page .opengraphica {
   --og-overlay-background-color: rgba(31, 37, 45, 0.8);
   --og-snap-line-color: #66b1ff;
   --og-layer-list-background-color-hover: rgba(64, 158, 255, 0.1);
-  --og-layer-list-background-color-active: rgba(64, 158, 255, 0.05);
+  --og-layer-list-background-color-active: rgba(64, 158, 255, 0.075);
   --og-layer-list-background-color-drag: #66b1ff;
   --og-layer-list-border-color: #0e1014;
   --og-layer-list-thumbnail-border-color: #0e1014;

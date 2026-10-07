@@ -62,21 +62,21 @@
                 </template>
                 <template v-if="showEditHandles">
                     <template v-for="(point, i) in transformedActiveSelectionPath" :key="i + '_' + point.x + '_' + point.y">
-                        <template v-if="point.type === 'line'">
-                            <rect :x="point.x - (svgHandleWidth * 1.4)" :y="point.y - (svgHandleWidth * 1.4)" :width="svgHandleWidth * 2.8" :height="svgHandleWidth * 2.8" :stroke-width="0" />
-                            <rect :x="point.x - (svgHandleWidth)" :y="point.y - (svgHandleWidth)" :width="svgHandleWidth * 2" :height="svgHandleWidth * 2" :stroke-width="svgHandleWidth * .3" />
+                        <template v-if="point.type === VectorPathCommandType.LINE">
+                            <rect :x="point.x! - (svgHandleWidth * 1.4)" :y="point.y! - (svgHandleWidth * 1.4)" :width="svgHandleWidth * 2.8" :height="svgHandleWidth * 2.8" :stroke-width="0" />
+                            <rect :x="point.x! - (svgHandleWidth)" :y="point.y! - (svgHandleWidth)" :width="svgHandleWidth * 2" :height="svgHandleWidth * 2" :stroke-width="svgHandleWidth * .3" />
                         </template>
-                        <template v-else-if="point.type === 'bezierCurve'">
-                            <rect :x="point.x - (svgHandleWidth * 1.4)" :y="point.y - (svgHandleWidth * 1.4)" :width="svgHandleWidth * 2.8" :height="svgHandleWidth * 2.8" :stroke-width="0" />
-                            <rect :x="point.x - (svgHandleWidth)" :y="point.y - (svgHandleWidth)" :width="svgHandleWidth * 2" :height="svgHandleWidth * 2" :stroke-width="svgHandleWidth * .3" />
+                        <template v-else-if="point.type === VectorPathCommandType.CUBIC_BEZIER_CURVE">
+                            <rect :x="point.x! - (svgHandleWidth * 1.4)" :y="point.y! - (svgHandleWidth * 1.4)" :width="svgHandleWidth * 2.8" :height="svgHandleWidth * 2.8" :stroke-width="0" />
+                            <rect :x="point.x! - (svgHandleWidth)" :y="point.y! - (svgHandleWidth)" :width="svgHandleWidth * 2" :height="svgHandleWidth * 2" :stroke-width="svgHandleWidth * .3" />
                             <!-- <ellipse :cx="point.x" :cy="point.y" :rx="svgHandleWidth * 1.45" :ry="svgHandleWidth * 1.45" :stroke-width="0" />
                             <ellipse :cx="point.x" :cy="point.y" :rx="svgHandleWidth" :ry="svgHandleWidth" :stroke-width="svgHandleWidth * .4" /> -->
                             <!-- <ellipse :cx="point.shx" :cy="point.shy" :rx="svgHandleWidth" :ry="svgHandleWidth" stroke="#ff0000" :stroke-width="svgHandleWidth * .5" />
                             <ellipse :cx="point.ehx" :cy="point.ehy" :rx="svgHandleWidth" :ry="svgHandleWidth" stroke="#ff0000" :stroke-width="svgHandleWidth * .5" /> -->
                         </template>
-                        <template v-else-if="point.type === 'move' && activeSelectionPathEditorShape === 'freePolygon'">
-                            <rect :x="point.x - (svgHandleWidth * 1.4)" :y="point.y - (svgHandleWidth * 1.4)" :width="svgHandleWidth * 2.8" :height="svgHandleWidth * 2.8" :stroke-width="0" />
-                            <rect :x="point.x - (svgHandleWidth)" :y="point.y - (svgHandleWidth)" :width="svgHandleWidth * 2" :height="svgHandleWidth * 2" :stroke-width="svgHandleWidth * .3" />
+                        <template v-else-if="point.type === VectorPathCommandType.MOVE && activeSelectionPathEditorShape === 'freePolygon'">
+                            <rect :x="point.x! - (svgHandleWidth * 1.4)" :y="point.y! - (svgHandleWidth * 1.4)" :width="svgHandleWidth * 2.8" :height="svgHandleWidth * 2.8" :stroke-width="0" />
+                            <rect :x="point.x! - (svgHandleWidth)" :y="point.y! - (svgHandleWidth)" :width="svgHandleWidth * 2" :height="svgHandleWidth * 2" :stroke-width="svgHandleWidth * .3" />
                         </template>
                     </template>
                 </template>
@@ -90,9 +90,12 @@ import { ref, computed, watch, toRefs } from 'vue';
 
 import { convertUnits } from '@/lib/metrics';
 
-import { isDrawingSelection, activeSelectionPath, selectionAddShape, type SelectionPathPoint } from '@/canvas/store/selection-state';
+import { isDrawingSelection, activeSelectionPath, selectionAddShape } from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
 import workingFileStore from '@/store/working-file';
+
+import { VectorPathCommandType } from '@/types/vector';
+import type { AnyVectorPathCommand, VectorPathCommand } from '@/types';
 
 defineOptions({
     name: 'CanvasOverlaySelection'
@@ -127,10 +130,10 @@ const svgBoundsHeight = computed<number>(() => {
 });
 
 const showEditHandles = computed<boolean>(() => {
-    return !isDrawingSelection.value && activeSelectionPath.value[0].editorShapeIntent !== 'lasso'
+    return !isDrawingSelection.value && activeSelectionPath.value[0].editorSelectionShapeIntent !== 'lasso'
 });
 
-let transformedActiveSelectionPath = ref<SelectionPathPoint[]>([]);
+let transformedActiveSelectionPath = ref<AnyVectorPathCommand[]>([]);
 let activeSelectionPathPixelWidth = ref(0);
 let activeSelectionPathPixelHeight = ref(0);
 let transformedActiveSelectionPathDimensionsPosition = ref({ x: 0, y: 0 });
@@ -144,30 +147,30 @@ watch([activeSelectionPath, viewDirty], () => {
     let xfRight = -Infinity;
     let xfTop = Infinity;
     let xfBottom = -Infinity;
-    for (const pathPoint of activeSelectionPath.value) {
-        if (pathPoint.x < left) left = pathPoint.x;
-        if (pathPoint.x > right) right = pathPoint.x;
-        if (pathPoint.y < top) top = pathPoint.y;
-        if (pathPoint.y > bottom) bottom = pathPoint.y;
-        const position = new DOMPoint(pathPoint.x, pathPoint.y).matrixTransform(transform.value);
+    for (const pathCommand of activeSelectionPath.value as Array<AnyVectorPathCommand>) {
+        if (pathCommand.x! < left) left = pathCommand.x!;
+        if (pathCommand.x! > right) right = pathCommand.x!;
+        if (pathCommand.y! < top) top = pathCommand.y!;
+        if (pathCommand.y! > bottom) bottom = pathCommand.y!;
+        const position = new DOMPoint(pathCommand.x, pathCommand.y).matrixTransform(transform.value);
         if (position.x < xfLeft) xfLeft = position.x;
         if (position.x > xfRight) xfRight = position.x;
         if (position.y < xfTop) xfTop = position.y;
         if (position.y > xfBottom) xfBottom = position.y;
         let startHandle = position;
         let endHandle = position;
-        if (pathPoint.type === 'bezierCurve') {
-            startHandle = new DOMPoint(pathPoint.shx, pathPoint.shy).matrixTransform(transform.value);
-            endHandle = new DOMPoint(pathPoint.ehx, pathPoint.ehy).matrixTransform(transform.value);
+        if (pathCommand.type === VectorPathCommandType.CUBIC_BEZIER_CURVE) {
+            startHandle = new DOMPoint(pathCommand.x1, pathCommand.y1).matrixTransform(transform.value);
+            endHandle = new DOMPoint(pathCommand.x2, pathCommand.y2).matrixTransform(transform.value);
         }
         transformedActiveSelectionPath.value.push({
-            type: pathPoint.type,
+            type: pathCommand.type,
             x: position.x / devicePixelRatio,
             y: position.y / devicePixelRatio,
-            shx: startHandle.x / devicePixelRatio,
-            shy: startHandle.y / devicePixelRatio,
-            ehx: endHandle.x / devicePixelRatio,
-            ehy: endHandle.y / devicePixelRatio
+            x1: startHandle.x / devicePixelRatio,
+            y1: startHandle.y / devicePixelRatio,
+            x2: endHandle.x / devicePixelRatio,
+            y2: endHandle.y / devicePixelRatio
         });
     }
     transformedActiveSelectionPathDimensionsPosition.value = new DOMPoint(
@@ -179,20 +182,20 @@ watch([activeSelectionPath, viewDirty], () => {
 });
 
 const activeSelectionPathEditorShape = computed<string>(() => {
-    return activeSelectionPath.value?.[0]?.editorShapeIntent ?? '';
+    return activeSelectionPath.value?.[0]?.editorSelectionShapeIntent ?? '';
 });
 
 const svgPathDraw = computed<string>(() => {
     const path = transformedActiveSelectionPath.value;
     let draw = 'M' + path[0].x + ' ' + path[0].y;
     for (let i = 1; i < path.length; i++) {
-        const point = path[i];
-        if (point.type === 'line') {
-            draw += ' L ' + point.x + ' ' + point.y;
-        } else if (point.type === 'bezierCurve') {
-            draw += ' C ' + point.shx + ' ' + point.shy +
-                ', ' + point.ehx + ' ' + point.ehy +
-                ', ' + point.x + ' ' + point.y;
+        const command = path[i];
+        if (command.type === VectorPathCommandType.LINE) {
+            draw += ' L ' + command.x + ' ' + command.y;
+        } else if (command.type === VectorPathCommandType.CUBIC_BEZIER_CURVE) {
+            draw += ' C ' + command.x1 + ' ' + command.y1 +
+                ', ' + command.x2 + ' ' + command.y2 +
+                ', ' + command.x + ' ' + command.y;
         }
     }
     if (activeSelectionPathEditorShape.value !== 'freePolygon') {

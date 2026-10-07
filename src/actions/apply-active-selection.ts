@@ -4,17 +4,19 @@ import imageDatabase from '@/store/data/image-history-database';
 import {
     activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset,
     selectionMaskDrawMargin, activeSelectionPath, createActiveSelectionMask, getActiveSelectionBounds,
-    previewActiveSelectionMask, selectionCombineMode, SelectionPathPoint, SelectionCombineMode
+    previewActiveSelectionMask, selectionCombineMode, SelectionCombineMode
 } from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import { createImageFromBlob } from '@/lib/image';
 
+import { VectorPathCommand } from '@/types';
+
 export class ApplyActiveSelectionAction extends BaseAction {
 
     private doNotClearActiveSelection: boolean = false;
 
-    private activeSelectionPath: Array<SelectionPathPoint> = [];
+    private activeSelectionPath: Array<VectorPathCommand> = [];
     private drawMargin: number = 0;
     private newMaskOffset: DOMPoint = new DOMPoint();
     private newMaskDatabaseId: string | null = null;
@@ -25,14 +27,14 @@ export class ApplyActiveSelectionAction extends BaseAction {
     private oldMaskDatabaseSizeEstimate: number = 0;
     private oldSelectionCombineMode: SelectionCombineMode | null = null;
 
-    constructor(activeSelectionPathOverride: Array<SelectionPathPoint> = activeSelectionPath.value, options: { doNotClearActiveSelection?: boolean } = {}) {
+    constructor(activeSelectionPathOverride: Array<VectorPathCommand> = activeSelectionPath.value, options: { doNotClearActiveSelection?: boolean } = {}) {
         super('applyActiveSelection', 'action.applyActiveSelection');
         this.activeSelectionPath = activeSelectionPathOverride;
         this.drawMargin = selectionMaskDrawMargin.value;
         this.doNotClearActiveSelection = options.doNotClearActiveSelection || false;
-	}
+    }
 
-	public async do() {
+    public async do() {
         super.do();
 
         try {
@@ -122,21 +124,21 @@ export class ApplyActiveSelectionAction extends BaseAction {
         }
 
         canvasStore.set('viewDirty', true);
-	}
+    }
 
-	public async undo() {
+    public async undo() {
         super.undo();
 
         // Restore old mask blob
         let oldMaskImage: InstanceType<typeof Image> | null = null;
         let oldMaskBlob: Blob | null = null;
-		if (this.oldMaskDatabaseId != null) {
-			try {
-				oldMaskBlob = await imageDatabase.get(this.oldMaskDatabaseId) as Blob;
-			} catch (error) {
-				throw new Error('Aborted - Failed to retrieve image from store');
-			}
-		}
+        if (this.oldMaskDatabaseId != null) {
+            try {
+                oldMaskBlob = await imageDatabase.get(this.oldMaskDatabaseId) as Blob;
+            } catch (error) {
+                throw new Error('Aborted - Failed to retrieve image from store');
+            }
+        }
         if (oldMaskBlob) {
             oldMaskImage = await createImageFromBlob(oldMaskBlob);
         }
@@ -160,7 +162,7 @@ export class ApplyActiveSelectionAction extends BaseAction {
         await previewActiveSelectionMask();
 
         canvasStore.set('viewDirty', true);
-	}
+    }
 
     public free() {
         super.free();

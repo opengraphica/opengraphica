@@ -3,15 +3,17 @@ import { BaseAction } from './base';
 import imageDatabase from '@/store/data/image-history-database';
 import {
     activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset,
-    activeSelectionPath, previewActiveSelectionMask, selectionCombineMode, SelectionPathPoint, SelectionCombineMode
+    activeSelectionPath, previewActiveSelectionMask, selectionCombineMode, SelectionCombineMode
 } from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import { createImageFromBlob } from '@/lib/image';
 
+import type { VectorPathCommand } from '@/types';
+
 export class ClearSelectionAction extends BaseAction {
 
-    private oldActiveSelectionPath: Array<SelectionPathPoint> = [];
+    private oldActiveSelectionPath: Array<VectorPathCommand> = [];
     
     private oldAppliedMaskOffset: DOMPoint = new DOMPoint();
     private oldAppliedMaskDatabaseId: string | null = null;
