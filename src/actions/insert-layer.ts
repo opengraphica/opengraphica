@@ -41,8 +41,8 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
         if (insertAroundLayerId != null) {
             this.insertAroundLayerId = insertAroundLayerId;
         }
-	}
-	public async do() {
+    }
+    public async do() {
         super.do();
 
         let layerId = -1;
@@ -234,9 +234,9 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
             layers: workingFileStore.get('layers')
         });
         updateWorkingFileLayer(this.insertedLayer);
-	}
+    }
 
-	public async undo() {
+    public async undo() {
         super.undo();
 
         if (this.selectLayersAction) {
@@ -279,7 +279,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
             layers: workingFileStore.get('layers')
         });
         deleteWorkingFileLayer(oldInsertedLayerId);
-	}
+    }
 
     public free() {
         super.free();

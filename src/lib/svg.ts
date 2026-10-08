@@ -1163,7 +1163,9 @@ export async function generateSvgElementIds(document: Document) {
     }
 }
 
-export function calculateShapeAabb(node: Element, transform: DOMMatrix, strokeWidth: number = 0): DOMRect | null {
+export function calculateShapeAabb(node: Element, transform: DOMMatrix, strokeWidth: number = 0, scaleX: number = 1, scaleY: number = 1): DOMRect | null {
+    const scale = Math.max(scaleX, scaleY);
+    strokeWidth *= scale;
     const halfStrokeWidth = strokeWidth / 2;
     switch (node.tagName) {
         case 'rect': {
@@ -1186,17 +1188,17 @@ export function calculateShapeAabb(node: Element, transform: DOMMatrix, strokeWi
             const cy = parseFloat(node.getAttribute('cy') ?? '0');
             const r = parseFloat(node.getAttribute('r') ?? '1');
             const center = new DOMPoint(cx, cy).matrixTransform(transform);
-            const top = center.y - r;
-            const bottom = center.y + r;
-            const left = center.x - r;
-            const right = center.x + r;
+            const top = center.y - r * scaleY;
+            const bottom = center.y + r * scaleY;
+            const left = center.x - r * scaleX;
+            const right = center.x + r * scaleX;
             return new DOMRect(left - halfStrokeWidth, top - halfStrokeWidth, right - left + strokeWidth, bottom - top + strokeWidth);
         }
         case 'ellipse': {
             const cx = parseFloat(node.getAttribute('cx') ?? '0');
             const cy = parseFloat(node.getAttribute('cy') ?? '0');
-            const rx = parseFloat(node.getAttribute('rx') ?? '1');
-            const ry = parseFloat(node.getAttribute('ry') ?? '1');
+            const rx = parseFloat(node.getAttribute('rx') ?? '1') * scaleX;
+            const ry = parseFloat(node.getAttribute('ry') ?? '1') * scaleY;
             const center = new DOMPoint(cx, cy).matrixTransform(transform);
             const xAxis = new DOMPoint(rx, 0, 0, 0).matrixTransform(transform);
             const yAxis = new DOMPoint(0, ry, 0, 0).matrixTransform(transform);

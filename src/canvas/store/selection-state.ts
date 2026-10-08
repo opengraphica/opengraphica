@@ -42,6 +42,7 @@ export const selectedLayersSelectionMaskPreview = ref<InstanceType<typeof Image>
 export const selectedLayersSelectionMaskPreviewCanvasOffset = ref<DOMPoint>(new DOMPoint());
 export const selectionMaskDrawMargin = ref<number>(1);
 
+export const appliedSelectionPaths = ref<Array<VectorPathCommand[]>>([]);
 export const activeSelectionPath = ref<Array<VectorPathCommand>>([]);
 
 export const selectionEmitter = mitt();

@@ -19,9 +19,9 @@ export class DeleteLayerFilterAction extends BaseAction {
         super('deleteLayerFilter', 'action.deleteLayerFilter');
         this.layerId = layerId;
         this.filterIndex = filterIndex;
-	}
+    }
 
-	public async do() {
+    public async do() {
         super.do();
 
         const layers = workingFileStore.get('layers');
@@ -37,9 +37,9 @@ export class DeleteLayerFilterAction extends BaseAction {
         updateWorkingFileLayer(layer);
 
         canvasStore.set('dirty', true);
-	}
+    }
 
-	public async undo() {
+    public async undo() {
         super.undo();
 
         const layers = workingFileStore.get('layers');
@@ -58,7 +58,7 @@ export class DeleteLayerFilterAction extends BaseAction {
         updateWorkingFileLayer(layer);
 
         canvasStore.set('dirty', true);
-	}
+    }
 
     public free() {
         super.free();

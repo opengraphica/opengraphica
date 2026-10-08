@@ -12,13 +12,15 @@ Visit the [Wiki page on github](https://github.com/opengraphica/opengraphica/wik
 
 OpenGraphica may be integrated into existing web applications which require a photo editor.
 
-To build OpenGraphica as a website: install [Node.js](https://nodejs.org/en/), clone this repository, then run these Node.js commands in the repository folder:
+To build OpenGraphica as a website:
+1. Install [Node.js](https://nodejs.org/en/)
+2. Install [Rust](https://rust-lang.org/)
+3. Clone this repository
+
+Then run these Node Package Manager commands in the repository's folder:
 ```
 npm install
-ln -s ../../../../rust/renderer_wgpu_wasm/pkg src/renderers/wgpu-wasm/backend/build
-cd rust/renderer_wgpu_wasm
-wasm-pack build --target web
-cd ../..
+npm run build:wasm
 npm run build:website
 ```
 Production-ready files will output in the `www` folder. You may view the index.html in this folder as an example of how to instantiate the app if you wish to tweak it.
@@ -53,10 +55,14 @@ Afterwards, the "mount" method tells OpenGraphica where it should be placed in t
 
 **__By submitting a pull request for this project, you agree to license your contribution under the MIT license to this project.__**
 
+All commands assume you are operating in a Linux-like environment. If you're on Windows, inspect the commands in the package.json and run equivalent Windows commands.
+
 ### Development Workspace Setup
 
-1. Clone this repository and install [Node.js](https://nodejs.org/en/)
-2. Open a terminal in the repository directory, and run:
+1. Install [Node.js](https://nodejs.org/en/)
+2. Install [Rust](https://rust-lang.org/)
+3. Clone this repository
+4. Open a terminal in the repository directory, and run:
     
     `npm install`
 
@@ -64,13 +70,15 @@ Afterwards, the "mount" method tells OpenGraphica where it should be placed in t
 
 Rust is used to create some web assembly code.
 
+Web assembly builds are not committed to the source repository, so before you do anything, you need to build them.
+
 In the root folder of the project, run:
 
 ```
-ln -s ../../../../rust/renderer_wgpu_wasm/pkg src/renderers/wgpu-wasm/backend/build
-cd rust/renderer_wgpu_wasm
-wasm-pack build --target web
+npm run build:wasm
 ```
+
+This command will build the rust code as web assembly modules, then set up some symbolic links to the rust build pkg folders inside of various places in the `src` folder that contains the main application Javascript code.
 
 ### Development Server
 
@@ -92,14 +100,27 @@ Afterwards, you may have to refresh your dev server manually to see changes.
 
 ### Release Builds
 
-Build OpenGraphica as a standalone website:
+**Build OpenGraphica as a standalone website:**
 ```
 npm run build:website
 ```
 The result is stored in the `www` directory.
 
-Build OpenGraphica as a 3rd party library for consumption in 1st party applications (e.g. Angular/Vue):
+**Build OpenGraphica as a 3rd party library for consumption in 1st party applications (e.g. Angular/Vue):**
 ```
 npm run build:library
 ```
 The result is stored in the `dist` directory.
+
+**Build OpenGraphica as an Android app:**
+```
+npm run build:android
+npx cap open android
+```
+You must have Android Studio installed. This will prepare the project for Android Studio to take over and either build an `.apk` file or run it on a phone.
+
+**Build OpenGraphica as an Ubuntu Touch app:**
+```
+npm run build:clickable
+```
+The resulting `.click` is stored in the `build/all/app` folder.

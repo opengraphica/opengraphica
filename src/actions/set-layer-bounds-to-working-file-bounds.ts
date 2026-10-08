@@ -18,9 +18,9 @@ export class SetLayerBoundsToWorkingFileBoundsAction extends BaseAction {
     constructor(layerId: number) {
         super('setLayerBoundsToWorkingFileBounds', 'action.setLayerBoundsToWorkingFileBounds');
         this.layerId = layerId;
-	}
+    }
 
-	public async do() {
+    public async do() {
         super.do();
 
         const layer = getLayerById(this.layerId);
@@ -66,9 +66,9 @@ export class SetLayerBoundsToWorkingFileBoundsAction extends BaseAction {
         await this.updateLayerAction.do();
 
         canvasStore.set('dirty', true);
-	}
+    }
 
-	public async undo() {
+    public async undo() {
         super.undo();
 
         if (this.updateLayerAction) {
@@ -81,7 +81,7 @@ export class SetLayerBoundsToWorkingFileBoundsAction extends BaseAction {
         }
 
         canvasStore.set('dirty', true);
-	}
+    }
 
     public free() {
         super.free();

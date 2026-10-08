@@ -4,21 +4,18 @@ import {
     activeSelectionMask, appliedSelectionMask,
 } from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
-import { getStoredImageOrCanvas, createStoredImage } from '@/store/image';
-import workingFileStore, { getLayerById, getLayerGlobalTransform } from '@/store/working-file';
+import { getStoredImageOrCanvas } from '@/store/image';
+import workingFileStore, { getLayerById } from '@/store/working-file';
 import { updateWorkingFileLayer } from '@/store/data/working-file-database';
 
 import { ClearSelectionAction } from './clear-selection';
 import { UpdateLayerAction } from './update-layer';
-
-import { createCanvasFromImage } from '@/lib/image';
 
 import { transferRendererTilesToRasterLayerUpdates, useRenderer } from '@/renderers';
 
 import type {
     ColorModel, UpdateAnyLayerOptions, UpdateRasterLayerOptions,
     WorkingFileAnyLayer,
-    WorkingFileLayerRasterTileUpdate,
 } from '@/types';
 
 interface DeleteLayerSelectionAreaOptions {
@@ -38,9 +35,9 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
         this.layerIds = layerIds;
 
         this.clearSelection = (options?.clearSelection === false) ? false : true;
-	}
+    }
 
-	public async do() {
+    public async do() {
         super.do();
 
         this.freeEstimates.memory = 0;
@@ -58,6 +55,7 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
         this.updateLayerActions = [];
         for (const layer of layersToModify) {
             if (layer.type === 'raster') {
+
                 const sourceImage = getStoredImageOrCanvas(layer.data.sourceUuid);
                 if (sourceImage) {
                     const selectionMask = activeSelectionMask.value ?? appliedSelectionMask.value;
@@ -77,6 +75,9 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
                     this.freeEstimates.database += updateLayerAction.freeEstimates.database;
                     this.updateLayerActions.push(updateLayerAction);
                 }
+
+            } else if (layer.type === 'vector') {
+
             }
         }
 

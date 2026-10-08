@@ -20,8 +20,8 @@ export class ReorderLayerFiltersAction extends BaseAction {
         this.insertFilterIndices = insertFilterIndices;
         this.referenceFilterIndex = referenceFilterIndex;
         this.insertPosition = insertPosition;
-	}
-	public async do() {
+    }
+    public async do() {
         super.do();
 
         // Get layer object
@@ -54,9 +54,9 @@ export class ReorderLayerFiltersAction extends BaseAction {
         updateWorkingFileLayer(layer);
 
         canvasStore.set('dirty', true);
-	}
+    }
 
-	public async undo() {
+    public async undo() {
         super.undo();
 
         // Get layer object
@@ -97,7 +97,7 @@ export class ReorderLayerFiltersAction extends BaseAction {
         updateWorkingFileLayer(layer);
 
         canvasStore.set('dirty', true);
-	}
+    }
 
     public free() {
         super.free();

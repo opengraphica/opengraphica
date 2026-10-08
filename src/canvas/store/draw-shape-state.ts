@@ -879,3 +879,30 @@ export function renderControlPointAttributeEdits(
 
     return edits;
 }
+
+export function getSelectedLayerShapeMap() {
+    const shapeMap = new Map<number, Set<string>>(); // layerId -> Set<shapeId>
+    if (selectedShapes.value.length > 0) {
+        for (const [layerId, shapeId] of selectedShapes.value) {
+            const shapes = shapeMap.get(layerId) ?? new Set<string>();
+            shapes.add(shapeId);
+            shapeMap.set(layerId, shapes);
+        }
+    } else if (selectedEditControlPointIndices.value.length > 0) {
+        for (const pointIndex of selectedEditControlPointIndices.value) {
+            const point = editControlPoints.value[pointIndex];
+            if (point.attachToIndex != null) continue;
+
+            const layer = editingLayers.value[point.layerIndex];
+
+            const shape = editControlPointNodes.value[point.nodeIndex];
+            const shapeId = shape.getAttribute('data-ogr-id');
+            if (!shapeId) continue;
+
+            const shapes = shapeMap.get(layer.id) ?? new Set<string>();
+            shapes.add(shapeId);
+            shapeMap.set(layer.id, shapes);
+        }
+    }
+    return shapeMap;
+}

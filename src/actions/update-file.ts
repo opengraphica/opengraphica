@@ -12,8 +12,8 @@ export class UpdateFileAction extends BaseAction {
     constructor(updateFileOptions: Partial<WorkingFileState>) {
         super('updateFile', 'action.updateFile');
         this.updateFileOptions = updateFileOptions;
-	}
-	public async do() {
+    }
+    public async do() {
         super.do();
 
         for (let prop in this.updateFileOptions) {
@@ -28,9 +28,9 @@ export class UpdateFileAction extends BaseAction {
 
         // Update the working file backup
         updateWorkingFile(this.updateFileOptions);
-	}
+    }
 
-	public async undo() {
+    public async undo() {
         super.undo();
 
         for (let prop in this.previousState) {
@@ -44,7 +44,7 @@ export class UpdateFileAction extends BaseAction {
 
         // Update the working file backup
         updateWorkingFile(this.previousState);
-	}
+    }
 
     public free() {
         super.free();

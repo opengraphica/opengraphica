@@ -20,9 +20,9 @@ export class ApplyLayerTransformAction extends BaseAction {
     constructor(layerId: number) {
         super('applyLayerTransform', 'action.applyLayerTransform');
         this.layerId = layerId;
-	}
+    }
 
-	public async do() {
+    public async do() {
         super.do();
 
         const layer = getLayerById(this.layerId);
@@ -104,9 +104,9 @@ export class ApplyLayerTransformAction extends BaseAction {
         canvasStore.set('dirty', true);
 
         updateWorkingFileLayer(layer);
-	}
+    }
 
-	public async undo() {
+    public async undo() {
         super.undo();
 
         if (this.trimEmptySpaceAction) {
@@ -124,7 +124,7 @@ export class ApplyLayerTransformAction extends BaseAction {
         if (layer) {
             updateWorkingFileLayer(layer);
         }
-	}
+    }
 
     public free() {
         super.free();

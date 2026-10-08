@@ -1,0 +1,16 @@
+[package]
+name = "vector_process_wasm"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+bitflags = "2.10.0"
+bytemuck = "1.24.0"
+console_error_panic_hook = "0.1.7"
+env_logger = "0.10"
+kurbo = "0.13.1"
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4.56"

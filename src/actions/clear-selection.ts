@@ -2,7 +2,8 @@
 import { BaseAction } from './base';
 import imageDatabase from '@/store/data/image-history-database';
 import {
-    activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset,
+    activeSelectionMask, activeSelectionMaskCanvasOffset,
+    appliedSelectionPaths, appliedSelectionMask, appliedSelectionMaskCanvasOffset,
     activeSelectionPath, previewActiveSelectionMask, selectionCombineMode, SelectionCombineMode
 } from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
@@ -14,6 +15,7 @@ import type { VectorPathCommand } from '@/types';
 export class ClearSelectionAction extends BaseAction {
 
     private oldActiveSelectionPath: Array<VectorPathCommand> = [];
+    private oldAppliedSelectionPaths: Array<VectorPathCommand[]> = [];
     
     private oldAppliedMaskOffset: DOMPoint = new DOMPoint();
     private oldAppliedMaskDatabaseId: string | null = null;
@@ -22,9 +24,9 @@ export class ClearSelectionAction extends BaseAction {
 
     constructor() {
         super('clearSelection', 'action.clearSelection');
-	}
+    }
 
-	public async do() {
+    public async do() {
         super.do();
 
         // Store old mask in database, if applicable.
@@ -46,6 +48,7 @@ export class ClearSelectionAction extends BaseAction {
 
         this.oldSelectionCombineMode = selectionCombineMode.value;
         this.oldActiveSelectionPath = [...activeSelectionPath.value];
+        this.oldAppliedSelectionPaths = JSON.parse(JSON.stringify(appliedSelectionPaths.value));
 
         // Reset all selection-based refs.
         if (activeSelectionMask.value) {
@@ -63,25 +66,26 @@ export class ClearSelectionAction extends BaseAction {
         appliedSelectionMaskCanvasOffset.value.y = 0;
 
         activeSelectionPath.value = [];
+        appliedSelectionPaths.value = [];
 
         this.freeEstimates.database = this.oldAppliedMaskDatabaseSizeEstimate;
 
         canvasStore.set('viewDirty', true);
-	}
+    }
 
-	public async undo() {
+    public async undo() {
         super.undo();
 
         // Restore old mask blob
         let oldMaskImage: InstanceType<typeof Image> | null = null;
         let oldMaskBlob: Blob | null = null;
-		if (this.oldAppliedMaskDatabaseId != null) {
-			try {
-				oldMaskBlob = await imageDatabase.get(this.oldAppliedMaskDatabaseId) as Blob;
-			} catch (error) {
-				throw new Error('Aborted - Failed to retrieve image from store');
-			}
-		}
+        if (this.oldAppliedMaskDatabaseId != null) {
+            try {
+                oldMaskBlob = await imageDatabase.get(this.oldAppliedMaskDatabaseId) as Blob;
+            } catch (error) {
+                throw new Error('Aborted - Failed to retrieve image from store');
+            }
+        }
         if (oldMaskBlob) {
             oldMaskImage = await createImageFromBlob(oldMaskBlob);
         }
@@ -96,6 +100,7 @@ export class ClearSelectionAction extends BaseAction {
             selectionCombineMode.value = this.oldSelectionCombineMode;
         }
         activeSelectionPath.value = [...this.oldActiveSelectionPath];
+        appliedSelectionPaths.value = JSON.parse(JSON.stringify(this.oldAppliedSelectionPaths));
         if (activeSelectionPath.value.length > 0) {
             if (editorStore.get('activeToolGroup') !== 'selection') {
                 editorStore.dispatch('setActiveTool', { group: 'selection' });
@@ -105,7 +110,7 @@ export class ClearSelectionAction extends BaseAction {
         await previewActiveSelectionMask();
 
         canvasStore.set('viewDirty', true);
-	}
+    }
 
     public free() {
         super.free();

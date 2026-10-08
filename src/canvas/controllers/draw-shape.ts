@@ -2506,6 +2506,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             || event.action.id === 'trimLayerEmptySpace'
             || event.action.id === 'pasteShapes'
             || event.action.id === 'freeTransform'
+            || event.action.id === 'convertVectorShapesToPaths'
         ) {
             this.createEditingLayersFromSelectedLayers(workingFileStore.state.selectedLayerIds, workingFileStore.state.selectedLayerIds);
         }

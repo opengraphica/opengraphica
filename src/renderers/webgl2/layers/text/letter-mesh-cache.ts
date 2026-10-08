@@ -169,7 +169,7 @@ export class LetterMeshCache {
         for (const command of commands) {
             if (command.type === 'M' || command.type === 'Z') {
                 if (currentPath != null) {
-                    const points = currentPath.getPoints().map((vector) => ({ X: vector.x, Y: vector.y }));
+                    const points = currentPath.getPoints();
                     paths.push({
                         points,
                         clockwise: Clipper.Orientation(points),
@@ -192,7 +192,7 @@ export class LetterMeshCache {
             }
         }
         if (currentPath != null) {
-            const points = currentPath.getPoints().map((vector) => ({ X: vector.x, Y: vector.y }));
+            const points = currentPath.getPoints();
             paths.push({
                 points,
                 clockwise: Clipper.Orientation(points),
@@ -219,7 +219,7 @@ export class LetterMeshCache {
                     if (!Clipper.PointInPolygon(paths[i].points[pi], paths[j].points)) continue parentPathCheck;
                 }
                 paths[j].holes.push(
-                    new Path().setFromPoints(paths[i].points.map((point) => new Vector2(point.X, point.Y)))
+                    new Path().setFromPoints(paths[i].points.map((point) => new Vector2(point.x, point.y)))
                 );
                 paths.splice(i, 1);
                 break;
@@ -231,7 +231,7 @@ export class LetterMeshCache {
         for (const path of paths) {
             const shape = new Shape();
             shape.setFromPoints(
-                path.points.map((point) => new Vector2(point.X, point.Y))
+                path.points.map((point) => new Vector2(point.x, point.y))
             );
             for (const hole of path.holes) {
                 shape.holes.push(hole);

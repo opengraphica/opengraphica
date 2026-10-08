@@ -2,15 +2,19 @@
 import { BaseAction } from './base';
 import imageDatabase from '@/store/data/image-history-database';
 import {
-    activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset,
+    appliedSelectionPaths, activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset,
     selectionMaskDrawMargin, activeSelectionPath, createActiveSelectionMask, getActiveSelectionBounds,
     previewActiveSelectionMask, selectionCombineMode, SelectionCombineMode
 } from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
-import { createImageFromBlob } from '@/lib/image';
 
-import { VectorPathCommand } from '@/types';
+import { Clipper, PolyType, ClipType, Paths, PolyFillType } from '@/lib/clipper';
+import { createImageFromBlob } from '@/lib/image';
+import { pathToPolyline } from '@/lib/vector-process';
+
+import { VectorPathCommandType } from '@/types/vector';
+import type { VectorPathCommand } from '@/types';
 
 export class ApplyActiveSelectionAction extends BaseAction {
 
@@ -26,6 +30,7 @@ export class ApplyActiveSelectionAction extends BaseAction {
     private oldMaskDatabaseId: string | null = null;
     private oldMaskDatabaseSizeEstimate: number = 0;
     private oldSelectionCombineMode: SelectionCombineMode | null = null;
+    private oldAppliedSelectionPaths: Array<VectorPathCommand[]> = [];
 
     constructor(activeSelectionPathOverride: Array<VectorPathCommand> = activeSelectionPath.value, options: { doNotClearActiveSelection?: boolean } = {}) {
         super('applyActiveSelection', 'action.applyActiveSelection');
@@ -112,6 +117,39 @@ export class ApplyActiveSelectionAction extends BaseAction {
             activeSelectionMaskCanvasOffset.value.x = 0;
             activeSelectionMaskCanvasOffset.value.y = 0;
 
+            // Merge selection paths
+            this.oldAppliedSelectionPaths = JSON.parse(JSON.stringify(appliedSelectionPaths.value));
+            if (appliedSelectionPaths.value.length === 0) {
+                appliedSelectionPaths.value = [JSON.parse(JSON.stringify(activeSelectionPath.value))];
+            } else {
+                const clipper = new Clipper();
+                for (const path of appliedSelectionPaths.value) {
+                    const polyline = await pathToPolyline(path);
+                    clipper.AddPath(polyline, PolyType.ptSubject, true);
+                }
+                const clipPolyline = await pathToPolyline(activeSelectionPath.value);
+                clipper.AddPath(clipPolyline, PolyType.ptClip, true);
+                const solution: Paths = [];
+                let clipType = ClipType.ctUnion;
+                if (selectionCombineMode.value === 'subtract') {
+                    clipType = ClipType.ctDifference;
+                } else if (selectionCombineMode.value === 'intersect') {
+                    clipType = ClipType.ctIntersection;
+                }
+                clipper.Execute(clipType, solution, PolyFillType.pftEvenOdd, PolyFillType.pftEvenOdd);
+                appliedSelectionPaths.value = solution.map((paths) => {
+                    const commands: VectorPathCommand[] = [];
+                    for (const [pointIndex, point] of paths.entries()) {
+                        commands.push({
+                            type: pointIndex > 0 ? VectorPathCommandType.LINE : VectorPathCommandType.MOVE,
+                            x: point.x,
+                            y: point.y,
+                        });
+                    }
+                    return commands;
+                });
+            }
+
             if (!this.doNotClearActiveSelection) {
                 activeSelectionPath.value = [];
             } else {
@@ -148,6 +186,7 @@ export class ApplyActiveSelectionAction extends BaseAction {
         appliedSelectionMask.value = oldMaskImage;
         appliedSelectionMaskCanvasOffset.value.x = this.oldMaskOffset.x;
         appliedSelectionMaskCanvasOffset.value.y = this.oldMaskOffset.y;
+        appliedSelectionPaths.value = JSON.parse(JSON.stringify(this.oldAppliedSelectionPaths));
 
         if (this.oldSelectionCombineMode) {
             selectionCombineMode.value = this.oldSelectionCombineMode;

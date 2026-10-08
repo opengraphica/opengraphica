@@ -10,9 +10,9 @@ export class UpdateSelectionCombineModeAction extends BaseAction {
         super('updateSelectionCombineMode', 'action.updateSelectionCombineMode');
         this.newSelectionCombineMode = newSelectionCombineMode;
         this.oldSelectionCombineMode = oldSelectionCombineMode || selectionCombineMode.value;
-	}
+    }
 
-	public async do() {
+    public async do() {
         super.do();
 
         selectionCombineMode.value = this.newSelectionCombineMode;

@@ -34,9 +34,9 @@ export class AddLayerFilterAction extends BaseAction {
         this.layerFilter = layerFilter;
         this.selectionMask = activeSelectionMask.value ?? appliedSelectionMask.value;
         this.selectionMaskCanvasOffset = activeSelectionMask.value ? activeSelectionMaskCanvasOffset.value : appliedSelectionMaskCanvasOffset.value;
-	}
+    }
 
-	public async do() {
+    public async do() {
         super.do();
 
         const layers = workingFileStore.get('layers');
@@ -91,9 +91,9 @@ export class AddLayerFilterAction extends BaseAction {
         updateWorkingFileLayer(layer, false, workingFileStore.state);
 
         canvasStore.set('dirty', true);
-	}
+    }
 
-	public async undo() {
+    public async undo() {
         super.undo();
 
         const layers = workingFileStore.get('layers');
@@ -116,7 +116,7 @@ export class AddLayerFilterAction extends BaseAction {
         updateWorkingFileLayer(layer, false, workingFileStore.state);
 
         canvasStore.set('dirty', true);
-	}
+    }
 
     public free() {
         super.free();

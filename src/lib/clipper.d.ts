@@ -13,8 +13,8 @@ export var PI: number;
 export var PI2: number;
 
 export class IntPoint {
-    X: number;
-    Y: number;
+    x: number;
+    y: number;
     constructor();
     constructor(PointXY: IntPoint);
     constructor(x: number, y: number);
@@ -45,8 +45,8 @@ export class ExPolygon {
 }
 
 export interface PathPoint {
-    X: number;
-    Y: number;
+    x: number;
+    y: number;
 }
 export type Path = PathPoint[];
 export type Paths = Path[];

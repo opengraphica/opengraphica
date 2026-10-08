@@ -1442,6 +1442,10 @@
                 "canvasEdges": "Canvas Edges",
                 "controlPoint": "Control Point"
             },
+            "actions": {
+                "title": "Actions",
+                "convertToPath": "Convert Shape to Path"
+            },
             "notification": {
                 "invisibleShape": {
                     "title": "Creating Invisible Shape",

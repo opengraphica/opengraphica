@@ -29,9 +29,9 @@ export class UpdateActiveSelectionAction extends BaseAction {
         }
         this.updatePreview = options?.updatePreview === false ? false : true;
         this.oldSelectionCombineMode = selectionCombineMode.value;
-	}
+    }
 
-	public async do() {
+    public async do() {
         super.do();
 
         activeSelectionPath.value = JSON.parse(JSON.stringify(this.newActiveSelectionPath));

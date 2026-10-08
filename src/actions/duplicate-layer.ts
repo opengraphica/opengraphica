@@ -19,9 +19,9 @@ export class DuplicateLayerAction extends BaseAction {
     constructor(duplicateLayerId: number) {
         super('deleteLayers', 'action.duplicateLayer');
         this.duplicateLayerId = duplicateLayerId;
-	}
+    }
 
-	public async do() {
+    public async do() {
         super.do();
 
         this.insertLayerActions = [];
@@ -32,9 +32,9 @@ export class DuplicateLayerAction extends BaseAction {
         }
 
         await this.createInsertLayerActions(referenceLayer, 'above', this.duplicateLayerId);
-	}
+    }
 
-	public async undo() {
+    public async undo() {
         super.undo();
 
         if (this.insertLayerActions) {
@@ -44,7 +44,7 @@ export class DuplicateLayerAction extends BaseAction {
             }
             this.insertLayerActions = undefined;
         }
-	}
+    }
 
     public free() {
         super.free();

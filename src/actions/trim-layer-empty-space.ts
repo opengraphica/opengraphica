@@ -97,7 +97,11 @@ export class TrimLayerEmptySpaceAction extends BaseAction {
                     return calculateShapeAabb(
                         node,
                         transform,
-                        stroke != null ? strokeWidth * Math.max(decomposedTransform.scaleX, decomposedTransform.scaleY) : 0
+                        stroke != null ? strokeWidth : 0,
+                        Math.abs(decomposedTransform.scaleX * Math.cos(decomposedTransform.rotation))
+                            + Math.abs(decomposedTransform.scaleY * Math.sin(decomposedTransform.rotation)),
+                        Math.abs(decomposedTransform.scaleX * Math.sin(decomposedTransform.rotation))
+                            + Math.abs(decomposedTransform.scaleY * Math.cos(decomposedTransform.rotation)),
                     );
                 })
                 .filter((aabb) => aabb != null);

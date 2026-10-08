@@ -19,8 +19,8 @@ export class ReorderLayersAction extends BaseAction {
         this.insertLayerIds = insertLayerIds;
         this.referenceLayerId = referenceLayerId;
         this.insertPosition = insertPosition;
-	}
-	public async do() {
+    }
+    public async do() {
         super.do();
 
         // Map ids to layer objects
@@ -87,9 +87,9 @@ export class ReorderLayersAction extends BaseAction {
             }
         }
         updateWorkingFileLayer(referenceLayer);
-	}
+    }
 
-	public async undo() {
+    public async undo() {
         super.undo();
 
         // Map ids to layer objects
@@ -151,7 +151,7 @@ export class ReorderLayersAction extends BaseAction {
             }
         }
         updateWorkingFileLayer(referenceLayer);
-	}
+    }
 
     public free() {
         super.free();

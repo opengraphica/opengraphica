@@ -89,14 +89,14 @@ watch(() => workingFileStore.state.selectedLayerIds, () => {
     if (layers.length > 0) {
         const clipper = new Clipper();
         for (const [layerIndex, layer] of layers.entries()) {
-            const path = getLayerBoundingPoints(layer).map((point) => ({ X: point.x, Y: point.y }));
+            const path = getLayerBoundingPoints(layer);
             clipper.AddPath(path, layerIndex === 0 ? PolyType.ptSubject : PolyType.ptClip, true);
         }
         const solution: Paths = [];
         clipper.Execute(ClipType.ctUnion, solution, PolyFillType.pftEvenOdd, PolyFillType.pftEvenOdd);
 
         selectedLayerBoundaryPoints.value = solution.map((solutions) => {
-            return solutions.map(({ X, Y }) => new DOMPoint(X, Y));
+            return solutions.map(({ x, y }) => new DOMPoint(x, y));
         });
     } else {
         selectedLayerBoundaryPoints.value = [];

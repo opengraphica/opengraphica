@@ -34,9 +34,9 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
         if (options.selectNewLayers) {
             this.selectNewLayers = options.selectNewLayers;
         }
-	}
+    }
 
-	public async do() {
+    public async do() {
         super.do();
 
         this.freeEstimates.memory = 0;

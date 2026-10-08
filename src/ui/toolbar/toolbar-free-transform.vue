@@ -74,6 +74,7 @@
                 </el-popover>
             </el-horizontal-scrollbar-arrows>
         </div>
+        <!-- Snapping Dock -->
         <floating-dock v-if="snappingDockVisible" v-model:top="snappingDockTop" v-model:left="snappingDockLeft" :visible="floatingDocksVisible">
             <el-form novalidate="novalidate" action="javascript:void(0)">
                 <el-form-item class="el-form-item--menu-item el-form-item--has-content-right mb-1" :label="t('toolbar.freeTransform.snapping.enableSnapping')">
@@ -107,6 +108,7 @@
                 </el-form-item>
             </el-form>
         </floating-dock>
+        <!-- Metrics Dock -->
         <floating-dock v-if="metricsDockVisible" v-model:top="metricsDockTop" v-model:left="metricsDockLeft" :visible="floatingDocksVisible">
             <template v-if="selectedLayerIds.length > 0">
                 <el-form novalidate="novalidate" action="javascript:void(0)" style="max-width: 15rem;">
@@ -302,9 +304,6 @@ const resolutionY = ref<number>(workingFileStore.get('resolutionY'));
 const resolutionUnits = ref<WorkingFileState['resolutionUnits']>(workingFileStore.get('resolutionUnits'));
 const dimensionLockRatio = ref<number | null>(null);
 
-const actionActiveIndex = ref<string>('');
-const isActionPopoverVisible = ref<boolean>(false);
-
 let disableInputUpdate: boolean = false;
 
 // Left / X Position
@@ -448,6 +447,9 @@ function onChangeDragResizeInput() {
 /*-------*\
 | Actions |
 \*-------*/
+
+const actionActiveIndex = ref<string>('');
+const isActionPopoverVisible = ref<boolean>(false);
 
 async function onActionSelect(action: string) {
     if (action === 'applyTransform') {

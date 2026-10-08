@@ -4,7 +4,10 @@ import { BaseAction } from './base';
 import editorStore from '@/store/editor';
 import workingFileStore, { calculateLayerOrder, type WorkingFileState } from '@/store/working-file';
 import { writeWorkingFile, deleteWorkingFile } from '@/store/data/working-file-database';
-import { discardActiveSelectionMask, discardAppliedSelectionMask, activeSelectionPath } from '@/canvas/store/selection-state';
+import {
+    discardActiveSelectionMask, discardAppliedSelectionMask,
+    activeSelectionPath, appliedSelectionPaths,
+} from '@/canvas/store/selection-state';
 
 import appEmitter from '@/lib/emitter';
 
@@ -68,6 +71,7 @@ export class CreateFileAction extends BaseAction {
 
         discardAppliedSelectionMask();
         discardActiveSelectionMask();
+        appliedSelectionPaths.value = [];
         activeSelectionPath.value = [];
 
         calculateLayerOrder();
@@ -95,6 +99,7 @@ export class CreateFileAction extends BaseAction {
 
         discardAppliedSelectionMask();
         discardActiveSelectionMask();
+        appliedSelectionPaths.value = [];
         activeSelectionPath.value = [];
 
         calculateLayerOrder();

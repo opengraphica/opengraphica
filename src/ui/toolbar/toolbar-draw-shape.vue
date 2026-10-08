@@ -96,6 +96,37 @@
                     <span class="bi bi-magnet-fill mr-1" aria-hidden="true" />
                     {{ t('toolbar.drawShape.snapping.title') }}
                 </og-button>
+                <!-- Actions -->
+                <el-popover
+                    v-model:visible="isActionPopoverVisible"
+                    placement="top"
+                    popper-class="og-dock-popover"
+                    trigger="click"
+                    :width="250"
+                    :popper-options="{
+                        modifiers: [
+                            {
+                                name: 'computeStyles',
+                                options: {
+                                    adaptive: false,
+                                    enabled: false
+                                }
+                            }
+                        ]
+                    }"
+                >
+                    <template #reference>
+                        <og-button outline primary small class="ml-3!">
+                            <span class="bi bi-gear-fill mr-1" aria-hidden="true" /> {{ t('toolbar.drawShape.actions.title') }}
+                        </og-button>
+                    </template>
+                    <el-menu class="el-menu--medium el-menu--medium-icons el-menu--borderless my-1" :default-active="actionActiveIndex" @select="onActionSelect($event)">
+                        <el-menu-item index="convertToPath">
+                            <i class="bi bi-bezier2"></i>
+                            <span>{{ t('toolbar.drawShape.actions.convertToPath') }}</span>
+                        </el-menu-item>
+                    </el-menu>
+                </el-popover>
             </el-horizontal-scrollbar-arrows>
         </div>
         <!-- Fill Style Dock -->
@@ -220,11 +251,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted,  watch } from 'vue';
+import { computed, nextTick, ref, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from '@/i18n';
 
 import {
-    isExtendingPaths,
+    isExtendingPaths, selectedShapes, editControlPoints, getSelectedLayerShapeMap,
     selectedEditControlPointIndices, selectedEditControlAttachPointIndices,
     colorPalette, fillColorPaletteIndex, fillColor,
     strokeColorPaletteIndex, strokeColor, strokeWidth,
@@ -240,6 +271,8 @@ import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.vue';
 import ElInputGroup from '@/ui/el/el-input-group.vue';
 import ElInputNumber from '@/ui/el/el-input-number.vue';
+import ElMenu, { ElMenuItem } from 'element-plus/lib/components/menu/index';
+import ElPopover from '@/ui/el/el-popover.vue';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSlider from 'element-plus/lib/components/slider/index';
 import ElSwitch from 'element-plus/lib/components/switch/index';
@@ -248,8 +281,14 @@ import OgButton from '@/ui/element/button.vue';
 import OgPopover from '@/ui/element/popover.vue';
 import FloatingDock from '@/ui/dock/floating-dock.vue';
 
+import { ConvertVectorShapesToPathsAction } from '@/actions/convert-vector-shapes-to-paths';
+
 import appEmitter from '@/lib/emitter';
 import { colorToHsla } from '@/lib/color';
+
+import { BundleAction } from '@/actions/bundle';
+import historyStore from '@/store/history';
+
 import type { RGBAColor } from '@/types';
 
 defineOptions({
@@ -509,6 +548,37 @@ function onInputStrokeWidth() {
 
 function onChangeStrokeWidth() {
     drawShapeToolbarEmitter.emit('strokeWidthChanged', strokeWidth.value);
+}
+
+/*-------*\
+| Actions |
+\*-------*/
+
+const isActionPopoverVisible = ref<boolean>(false);
+const actionActiveIndex = ref<string>('');
+
+async function onActionSelect(action: string) {
+    if (action === 'convertToPath') {
+        const layerShapeMap = getSelectedLayerShapeMap();
+        const actions: ConvertVectorShapesToPathsAction[] = [];
+        for (const [layerId, shapeIds] of layerShapeMap.entries()) {
+            actions.push(
+                new ConvertVectorShapesToPathsAction(
+                    layerId,
+                    Array.from(shapeIds),
+                )
+            );
+        }
+        if (actions.length > 0) {
+            historyStore.dispatch('runAction', {
+                action: new BundleAction('convertVectorShapesToPaths', 'action.convertVectorShapesToPaths', actions),
+            });
+        }
+    }
+    actionActiveIndex.value = ' ';
+    await nextTick();
+    actionActiveIndex.value = '';
+    isActionPopoverVisible.value = false;
 }
 
 /*-----------------------*\

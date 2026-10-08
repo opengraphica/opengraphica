@@ -15,8 +15,8 @@ export class SelectLayersAction extends BaseAction {
         if (previousSelectedLayerIdsOverride) {
             this.previousSelectedLayerIdsOverride = previousSelectedLayerIdsOverride;
         }
-	}
-	public async do() {
+    }
+    public async do() {
         super.do();
 
         if (this.previousSelectedLayerIdsOverride) {
@@ -30,9 +30,9 @@ export class SelectLayersAction extends BaseAction {
 
         // Update the working file backup
         updateWorkingFile({ selectedLayerIds: workingFileStore.get('selectedLayerIds') });
-	}
+    }
 
-	public async undo() {
+    public async undo() {
         super.undo();
 
         workingFileStore.set('selectedLayerIds', [...this.previousSelectedLayerIds]);
@@ -41,7 +41,7 @@ export class SelectLayersAction extends BaseAction {
 
         // Update the working file backup
         updateWorkingFile({ selectedLayerIds: workingFileStore.get('selectedLayerIds') });
-	}
+    }
 
     public free() {
         super.free();

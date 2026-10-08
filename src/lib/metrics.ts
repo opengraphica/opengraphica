@@ -99,37 +99,37 @@ export class FontMetrics {
         this.pxSize = fontSize;
 
         // Preparing container
-		const line = document.createElement('div');
-		const body = document.body;
-		line.style.position = 'absolute';
-		line.style.whiteSpace = 'nowrap';
-		line.style.font = this.pxSize + 'px ' + fontFamily;
-		body.appendChild(line);
+        const line = document.createElement('div');
+        const body = document.body;
+        line.style.position = 'absolute';
+        line.style.whiteSpace = 'nowrap';
+        line.style.font = this.pxSize + 'px ' + fontFamily;
+        body.appendChild(line);
 
-		// Now we can measure width and height of the letter
-		const text = '——————————'; // 10 symbols to be more accurate with width
-		line.innerHTML = text;
-		this.testWidth = line.offsetWidth / text.length;
-		this.offsetHeight = line.offsetHeight;
+        // Now we can measure width and height of the letter
+        const text = '——————————'; // 10 symbols to be more accurate with width
+        line.innerHTML = text;
+        this.testWidth = line.offsetWidth / text.length;
+        this.offsetHeight = line.offsetHeight;
 
-		// Now creating 1px sized item that will be aligned to baseline
-		// to calculate baseline shift
-		const baseline = document.createElement('span');
-		baseline.style.display = 'inline-block';
-		baseline.style.overflow = 'hidden';
-		baseline.style.width = '1px';
-		baseline.style.height = '1px';
-		line.appendChild(baseline);
+        // Now creating 1px sized item that will be aligned to baseline
+        // to calculate baseline shift
+        const baseline = document.createElement('span');
+        baseline.style.display = 'inline-block';
+        baseline.style.overflow = 'hidden';
+        baseline.style.width = '1px';
+        baseline.style.height = '1px';
+        line.appendChild(baseline);
 
         // Baseline is important for positioning text on canvas
-		this.baseline = baseline.offsetTop + baseline.offsetHeight;
+        this.baseline = baseline.offsetTop + baseline.offsetHeight;
 
-		document.body.removeChild(line);
+        document.body.removeChild(line);
     }
 
     /**
-	 * Creates a canvas for kerning testing.
-	 */
+     * Creates a canvas for kerning testing.
+     */
     private getKerningTestCanvas(): { canvas: HTMLCanvasElement | null, ctx: CanvasRenderingContext2D | null } {
         if (!FontMetrics.kerningTestCanvas) {
             FontMetrics.kerningTestCanvas = document.createElement('canvas');
@@ -147,11 +147,11 @@ export class FontMetrics {
     }
 
     /**
-	 * Attempts to determine the height of a letter via pixel comparison
-	 * @param {string} letter - The letter to check
-	 * @param {string} [baseline] - Baseline position override
-	 */
-	public calculateLetterBounds(letter: string, baseline: 'alphabetic' | 'bottom' | 'hanging' | 'ideographic' | 'middle' | 'top') {
+     * Attempts to determine the height of a letter via pixel comparison
+     * @param {string} letter - The letter to check
+     * @param {string} [baseline] - Baseline position override
+     */
+    public calculateLetterBounds(letter: string, baseline: 'alphabetic' | 'bottom' | 'hanging' | 'ideographic' | 'middle' | 'top') {
         const { canvas, ctx } = this.getKerningTestCanvas();
         let start: number = 0;
         let end: number = 0;
@@ -186,21 +186,21 @@ export class FontMetrics {
             canvas.width = 10;
             canvas.height = 10;
         }
-		return {
-			top: start,
-			bottom: end,
-			height: end - start
-		}
-	}
+        return {
+            top: start,
+            bottom: end,
+            height: end - start
+        }
+    }
 
     /**
-	 * Calculate the kerning offset between two letters.
-	 * @param {string} letters - a two character string of the two letters to determine font kerning from. Returns the kerning offset that should be used to draw the 2nd letter. 
-	 * @param {object} flags - font style, such as bold or italic
-	 */
-	public getKerningOffset(letters: string, flags: { weight?: number, style?: string } = {}) {
-		let offset = this.kerningMap.get(letters);
-		if (offset == null) {
+     * Calculate the kerning offset between two letters.
+     * @param {string} letters - a two character string of the two letters to determine font kerning from. Returns the kerning offset that should be used to draw the 2nd letter. 
+     * @param {object} flags - font style, such as bold or italic
+     */
+    public getKerningOffset(letters: string, flags: { weight?: number, style?: string } = {}) {
+        let offset = this.kerningMap.get(letters);
+        if (offset == null) {
             const { ctx } = this.getKerningTestCanvas();
             if (ctx) {
                 ctx.font =
@@ -211,9 +211,9 @@ export class FontMetrics {
                 offset = ctx.measureText(letters).width - (ctx.measureText(letters[0]).width + ctx.measureText(letters[1]).width);
                 this.kerningMap.set(letters, offset);
             }
-		}
-		return offset;
-	}
+        }
+        return offset;
+    }
 }
 
 const fontMetricsMap = new Map<string, FontMetrics>();

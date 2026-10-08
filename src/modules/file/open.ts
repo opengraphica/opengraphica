@@ -20,7 +20,7 @@ import workingFileStore, {
     getCanvasRenderingContext2DSettings, calculateLayerOrder, discardAllUnusedMasks, type WorkingFileState
 } from '@/store/working-file';
 import { readWorkingFile } from '@/store/data/working-file-database';
-import { discardActiveSelectionMask, discardAppliedSelectionMask, activeSelectionPath } from '@/canvas/store/selection-state';
+import { discardActiveSelectionMask, discardAppliedSelectionMask, activeSelectionPath, appliedSelectionPaths } from '@/canvas/store/selection-state';
 
 import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
@@ -234,6 +234,7 @@ export async function openFromTemporaryStorage() {
     discardAppliedSelectionMask();
     discardAllUnusedMasks();
     calculateLayerOrder();
+    appliedSelectionPaths.value = [];
     activeSelectionPath.value = [];
     await historyStore.dispatch('free', {
         memorySize: Infinity,

@@ -16,9 +16,9 @@ export class UpdateLayerFilterMaskAction extends BaseAction {
         this.layerId = layerId;
         this.filterIndex = filterIndex;
         this.newMaskId = newMaskId;
-	}
+    }
 
-	public async do() {
+    public async do() {
         super.do();
 
         const layers = workingFileStore.get('layers');
@@ -41,9 +41,9 @@ export class UpdateLayerFilterMaskAction extends BaseAction {
         updateWorkingFileLayer(layer, false, workingFileStore.state);
 
         canvasStore.set('dirty', true);
-	}
+    }
 
-	public async undo() {
+    public async undo() {
         super.undo();
 
         const layers = workingFileStore.get('layers');
@@ -65,7 +65,7 @@ export class UpdateLayerFilterMaskAction extends BaseAction {
         updateWorkingFileLayer(layer, false, workingFileStore.state);
 
         canvasStore.set('dirty', true);
-	}
+    }
 
     public free() {
         super.free();

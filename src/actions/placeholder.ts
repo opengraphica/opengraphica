@@ -4,14 +4,14 @@ export class PlaceholderAction extends BaseAction {
 
     constructor() {
         super('placeholder', 'action.placeholder');
-	}
-	public async do() {
+    }
+    public async do() {
         super.do();
-	}
+    }
 
-	public async undo() {
+    public async undo() {
         super.undo();
-	}
+    }
 
     public free() {
         super.free();

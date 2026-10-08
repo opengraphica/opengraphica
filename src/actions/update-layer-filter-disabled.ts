@@ -16,9 +16,9 @@ export class UpdateLayerFilterDisabledAction extends BaseAction {
         this.layerId = layerId;
         this.filterIndex = filterIndex;
         this.newDisabled = isDisabled === true ? true : undefined;
-	}
+    }
 
-	public async do() {
+    public async do() {
         super.do();
 
         const layers = workingFileStore.get('layers');
@@ -43,9 +43,9 @@ export class UpdateLayerFilterDisabledAction extends BaseAction {
         updateWorkingFileLayer(layer);
 
         canvasStore.set('dirty', true);
-	}
+    }
 
-	public async undo() {
+    public async undo() {
         super.undo();
 
         const layers = workingFileStore.get('layers');
@@ -69,7 +69,7 @@ export class UpdateLayerFilterDisabledAction extends BaseAction {
         updateWorkingFileLayer(layer);
 
         canvasStore.set('dirty', true);
-	}
+    }
 
     public free() {
         super.free();

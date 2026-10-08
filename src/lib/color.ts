@@ -354,21 +354,21 @@ export function lchaToLaba(color: Partial<LCHAColor>): LABAColor {
 
 // Toe function for L_r
 function toe(x: number) {
-	const k1 = 0.206;
-	const k2 = 0.03;
-	const k3 = (1 + k1) / (1 + k2);
-	return 0.5 * (k3 * x - k1 + Math.sqrt((k3 * x - k1) * (k3 * x - k1) + 4 * k2 * k3 * x));
+    const k1 = 0.206;
+    const k2 = 0.03;
+    const k3 = (1 + k1) / (1 + k2);
+    return 0.5 * (k3 * x - k1 + Math.sqrt((k3 * x - k1) * (k3 * x - k1) + 4 * k2 * k3 * x));
 }
 // Inverse toe function for L_r
 function toeInv(x: number) {
-	const k1 = 0.206;
-	const k2 = 0.03;
-	const k3 = (1 + k1) / (1 + k2);
-	return (x * x + k1 * x) / (k3 * (x + k2));
+    const k1 = 0.206;
+    const k2 = 0.03;
+    const k3 = (1 + k1) / (1 + k2);
+    return (x * x + k1 * x) / (k3 * (x + k2));
 }
 function toST(cusp: LC): ST {
     const { l, c } = cusp;
-	return { s: c / l, t: c / (1 - l) };
+    return { s: c / l, t: c / (1 - l) };
 }
 // Finds the maximum saturation possible for a given hue that fits in sRGB
 // Saturation here is defined as S = C/L
@@ -431,15 +431,15 @@ function computeMaxSaturation(a: number, b: number): number {
 // Finds L_cusp and C_cusp for a given hue
 // a and b must be normalized so a^2 + b^2 == 1
 function findCusp(a: number, b: number): LC {
-	// First, find the maximum saturation (saturation S = C/L)
-	const sCusp = computeMaxSaturation(a, b);
+    // First, find the maximum saturation (saturation S = C/L)
+    const sCusp = computeMaxSaturation(a, b);
 
-	// Convert to linear sRGB to find the first point where at least one of r,g or b >= 1:
-	const rgbAtMmax = oklabToLinearSrgba({ l: 1, a: sCusp * a, b: sCusp * b });
-	const lCusp = Math.cbrt(1 / Math.max(Math.max(rgbAtMmax.r, rgbAtMmax.g), rgbAtMmax.b));
-	const cCusp = lCusp * sCusp;
+    // Convert to linear sRGB to find the first point where at least one of r,g or b >= 1:
+    const rgbAtMmax = oklabToLinearSrgba({ l: 1, a: sCusp * a, b: sCusp * b });
+    const lCusp = Math.cbrt(1 / Math.max(Math.max(rgbAtMmax.r, rgbAtMmax.g), rgbAtMmax.b));
+    const cCusp = lCusp * sCusp;
 
-	return { l: lCusp , c: cCusp };
+    return { l: lCusp , c: cCusp };
 }
 
 export function srgbChannelToLinearSrgbChannel(value: number): number {
@@ -461,99 +461,99 @@ export function linearSrgbChannelToSrgbChannel(value: number): number {
 export function okhsvToRgba(hsva: HSVAColor): RGBAColor {
     const { h, s, v, alpha, style } = hsva;
 
-	const a_ = Math.cos(2 * Math.PI * h);
-	const b_ = Math.sin(2 * Math.PI * h);
-	
-	const cusp: LC = findCusp(a_, b_);
-	const stMax = toST(cusp);
-	const sMax = stMax.s;
-	const tMax = stMax.t;
-	const s0 = 0.5;
-	const k = 1 - s0 / sMax;
+    const a_ = Math.cos(2 * Math.PI * h);
+    const b_ = Math.sin(2 * Math.PI * h);
+    
+    const cusp: LC = findCusp(a_, b_);
+    const stMax = toST(cusp);
+    const sMax = stMax.s;
+    const tMax = stMax.t;
+    const s0 = 0.5;
+    const k = 1 - s0 / sMax;
 
-	// first we compute L and V as if the gamut is a perfect triangle:
+    // first we compute L and V as if the gamut is a perfect triangle:
 
-	// L, C when v==1:
-	const lV = 1 - s * s0 / (s0 + tMax - tMax * k * s);
-	const cV = s * tMax * s0 / (s0 + tMax - tMax * k * s);
+    // L, C when v==1:
+    const lV = 1 - s * s0 / (s0 + tMax - tMax * k * s);
+    const cV = s * tMax * s0 / (s0 + tMax - tMax * k * s);
 
-	let L = v * lV;
-	let C = v * cV;
+    let L = v * lV;
+    let C = v * cV;
 
-	// then we compensate for both toe and the curved top part of the triangle:
-	const lVt = toeInv(lV);
-	const cVt = cV * lVt / lV;
+    // then we compensate for both toe and the curved top part of the triangle:
+    const lVt = toeInv(lV);
+    const cVt = cV * lVt / lV;
 
-	const L_new = toeInv(L);
-	C = C * L_new / L;
-	L = L_new;
+    const L_new = toeInv(L);
+    C = C * L_new / L;
+    L = L_new;
 
-	const rgbScale = oklabToLinearSrgba({ l: lVt, a: a_ * cVt, b: b_ * cVt });
-	const scale_L = Math.cbrt(1 / Math.max(Math.max(rgbScale.r, rgbScale.g), Math.max(rgbScale.b, 0)));
+    const rgbScale = oklabToLinearSrgba({ l: lVt, a: a_ * cVt, b: b_ * cVt });
+    const scale_L = Math.cbrt(1 / Math.max(Math.max(rgbScale.r, rgbScale.g), Math.max(rgbScale.b, 0)));
 
-	L = L * scale_L;
-	C = C * scale_L;
+    L = L * scale_L;
+    C = C * scale_L;
 
-	const rgb = oklabToLinearSrgba({ l: L, a: C * a_, b: C * b_ });
-	return {
+    const rgb = oklabToLinearSrgba({ l: L, a: C * a_, b: C * b_ });
+    return {
         is: 'color',
-		r: linearSrgbChannelToSrgbChannel(rgb.r) || 0,
-		g: linearSrgbChannelToSrgbChannel(rgb.g) || 0,
-		b: linearSrgbChannelToSrgbChannel(rgb.b) || 0,
+        r: linearSrgbChannelToSrgbChannel(rgb.r) || 0,
+        g: linearSrgbChannelToSrgbChannel(rgb.g) || 0,
+        b: linearSrgbChannelToSrgbChannel(rgb.b) || 0,
         alpha,
         style,
-	};
+    };
 }
 
 export function rgbaToOkhsv(rgba: RGBAColor): HSVAColor {
     const { r, g, b, alpha, style } = rgba;
 
-	const lab = linearSrgbaToOklab({
-		r: srgbChannelToLinearSrgbChannel(r),
-		g: srgbChannelToLinearSrgbChannel(g),
-		b: srgbChannelToLinearSrgbChannel(b),
+    const lab = linearSrgbaToOklab({
+        r: srgbChannelToLinearSrgbChannel(r),
+        g: srgbChannelToLinearSrgbChannel(g),
+        b: srgbChannelToLinearSrgbChannel(b),
         alpha,
-	});
+    });
 
-	let C = Math.sqrt(lab.a * lab.a + lab.b * lab.b);
-	const a_ = lab.a / C;
-	const b_ = lab.b / C;
+    let C = Math.sqrt(lab.a * lab.a + lab.b * lab.b);
+    const a_ = lab.a / C;
+    const b_ = lab.b / C;
 
-	let L = lab.l;
-	const h = 0.5 + 0.5 * Math.atan2(-lab.b, -lab.a) / Math.PI;
+    let L = lab.l;
+    const h = 0.5 + 0.5 * Math.atan2(-lab.b, -lab.a) / Math.PI;
 
-	const cusp = findCusp(a_, b_);
-	const stMax = toST(cusp);
-	const sMax = stMax.s;
-	const tMax = stMax.t;
-	const s0 = 0.5;
-	const k = 1 - s0 / sMax;
+    const cusp = findCusp(a_, b_);
+    const stMax = toST(cusp);
+    const sMax = stMax.s;
+    const tMax = stMax.t;
+    const s0 = 0.5;
+    const k = 1 - s0 / sMax;
 
-	// first we find L_v, C_v, L_vt and C_vt
+    // first we find L_v, C_v, L_vt and C_vt
 
-	const t = tMax / (C + L * tMax);
-	const lV = t * L;
-	const cV = t * C;
+    const t = tMax / (C + L * tMax);
+    const lV = t * L;
+    const cV = t * C;
 
-	const lVt = toeInv(lV);
-	const cVt = cV * lVt / lV;
+    const lVt = toeInv(lV);
+    const cVt = cV * lVt / lV;
 
-	// we can then use these to invert the step that compensates for the toe and the curved top part of the triangle:
-	const rgbScale = oklabToLinearSrgba({ l: lVt, a: a_ * cVt, b: b_ * cVt });
-	const scaleL = Math.cbrt(1 / Math.max(Math.max(rgbScale.r, rgbScale.g), Math.max(rgbScale.b, 0)));
+    // we can then use these to invert the step that compensates for the toe and the curved top part of the triangle:
+    const rgbScale = oklabToLinearSrgba({ l: lVt, a: a_ * cVt, b: b_ * cVt });
+    const scaleL = Math.cbrt(1 / Math.max(Math.max(rgbScale.r, rgbScale.g), Math.max(rgbScale.b, 0)));
 
-	L = L / scaleL;
-	C = C / scaleL;
+    L = L / scaleL;
+    C = C / scaleL;
 
-	C = C * toe(L) / L;
-	L = toe(L);
+    C = C * toe(L) / L;
+    L = toe(L);
 
-	// we can now compute v and s:
+    // we can now compute v and s:
 
-	const v = L / lV;
-	const s = (s0 + tMax) * cV / ((tMax * s0) + tMax * k * cV);
+    const v = L / lV;
+    const s = (s0 + tMax) * cV / ((tMax * s0) + tMax * k * cV);
 
-	return {
+    return {
         is: 'color',
         h: h || 0,
         s: s || 0,

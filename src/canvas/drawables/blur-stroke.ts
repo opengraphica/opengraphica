@@ -214,225 +214,225 @@ export default class BlurStroke implements Drawable<BlurStrokeData> {
      * @license MIT https://github.com/Quasimondo/QuasimondoJS/blob/master/blur/StackBlur.js
      */
     private stackBlur(srcImageData: ImageData, radius: number) {
-		const srcPixels = srcImageData.data,
-			srcWidth = srcImageData.width,
-			srcHeight = srcImageData.height,
-			srcLength = srcPixels.length,
-			dstImageData = new ImageData(
+        const srcPixels = srcImageData.data,
+            srcWidth = srcImageData.width,
+            srcHeight = srcImageData.height,
+            srcLength = srcPixels.length,
+            dstImageData = new ImageData(
                 new Uint8ClampedArray(srcImageData.data),
                 srcImageData.width,
                 srcImageData.height,
             ),
-			dstPixels = dstImageData.data;
+            dstPixels = dstImageData.data;
 
-		let x, y, i, p, yp, yi, yw,
-			rSum, gSum, bSum, aSum,
-			rOutSum, gOutSum, bOutSum, aOutSum,
-			rInSum, gInSum, bInSum, aInSum,
-			pr, pg, pb, pa, rbs,
-			div = radius + radius + 1,
-			w4 = srcWidth << 2,
-			widthMinus1 = srcWidth - 1,
-			heightMinus1 = srcHeight - 1,
-			radiusPlus1 = radius + 1,
-			sumFactor = radiusPlus1 * (radiusPlus1 + 1) / 2,
-			stackStart = createBlurStack(),
-			stack: BlurStack = stackStart,
-			stackIn: BlurStack, stackOut: BlurStack, stackEnd!: BlurStack,
-			mulSum = stackBlurMulTable[radius],
-			shgSum = stackBlurShgTable[radius];
+        let x, y, i, p, yp, yi, yw,
+            rSum, gSum, bSum, aSum,
+            rOutSum, gOutSum, bOutSum, aOutSum,
+            rInSum, gInSum, bInSum, aInSum,
+            pr, pg, pb, pa, rbs,
+            div = radius + radius + 1,
+            w4 = srcWidth << 2,
+            widthMinus1 = srcWidth - 1,
+            heightMinus1 = srcHeight - 1,
+            radiusPlus1 = radius + 1,
+            sumFactor = radiusPlus1 * (radiusPlus1 + 1) / 2,
+            stackStart = createBlurStack(),
+            stack: BlurStack = stackStart,
+            stackIn: BlurStack, stackOut: BlurStack, stackEnd!: BlurStack,
+            mulSum = stackBlurMulTable[radius],
+            shgSum = stackBlurShgTable[radius];
 
-		for (i = 1; i < div; i += 1) {
-			stack = (stack.next = createBlurStack());
-			if (i == radiusPlus1) {
-				stackEnd = stack;
-			}
-		}
+        for (i = 1; i < div; i += 1) {
+            stack = (stack.next = createBlurStack());
+            if (i == radiusPlus1) {
+                stackEnd = stack;
+            }
+        }
 
-		stack.next = stackStart;
-		yw = yi = 0;
+        stack.next = stackStart;
+        yw = yi = 0;
 
-		for (y = 0; y < srcHeight; y += 1) {
-			rInSum = gInSum = bInSum = aInSum = rSum = gSum = bSum = aSum = 0;
+        for (y = 0; y < srcHeight; y += 1) {
+            rInSum = gInSum = bInSum = aInSum = rSum = gSum = bSum = aSum = 0;
 
-			rOutSum = radiusPlus1 * (pr = dstPixels[yi]);
-			gOutSum = radiusPlus1 * (pg = dstPixels[yi + 1]);
-			bOutSum = radiusPlus1 * (pb = dstPixels[yi + 2]);
-			aOutSum = radiusPlus1 * (pa = dstPixels[yi + 3]);
+            rOutSum = radiusPlus1 * (pr = dstPixels[yi]);
+            gOutSum = radiusPlus1 * (pg = dstPixels[yi + 1]);
+            bOutSum = radiusPlus1 * (pb = dstPixels[yi + 2]);
+            aOutSum = radiusPlus1 * (pa = dstPixels[yi + 3]);
 
-			rSum += sumFactor * pr;
-			gSum += sumFactor * pg;
-			bSum += sumFactor * pb;
-			aSum += sumFactor * pa;
+            rSum += sumFactor * pr;
+            gSum += sumFactor * pg;
+            bSum += sumFactor * pb;
+            aSum += sumFactor * pa;
 
-			stack = stackStart;
+            stack = stackStart;
 
-			for (i = 0; i < radiusPlus1; i += 1) {
-				stack.r = pr;
-				stack.g = pg;
-				stack.b = pb;
-				stack.a = pa;
-				stack = stack.next;
-			}
+            for (i = 0; i < radiusPlus1; i += 1) {
+                stack.r = pr;
+                stack.g = pg;
+                stack.b = pb;
+                stack.a = pa;
+                stack = stack.next;
+            }
 
-			for (i = 1; i < radiusPlus1; i += 1) {
-				p = yi + ((widthMinus1 < i ? widthMinus1 : i) << 2);
-				rSum += (stack.r = (pr = dstPixels[p])) * (rbs = radiusPlus1 - i);
-				gSum += (stack.g = (pg = dstPixels[p + 1])) * rbs;
-				bSum += (stack.b = (pb = dstPixels[p + 2])) * rbs;
-				aSum += (stack.a = (pa = dstPixels[p + 3])) * rbs;
+            for (i = 1; i < radiusPlus1; i += 1) {
+                p = yi + ((widthMinus1 < i ? widthMinus1 : i) << 2);
+                rSum += (stack.r = (pr = dstPixels[p])) * (rbs = radiusPlus1 - i);
+                gSum += (stack.g = (pg = dstPixels[p + 1])) * rbs;
+                bSum += (stack.b = (pb = dstPixels[p + 2])) * rbs;
+                aSum += (stack.a = (pa = dstPixels[p + 3])) * rbs;
 
-				rInSum += pr;
-				gInSum += pg;
-				bInSum += pb;
-				aInSum += pa;
+                rInSum += pr;
+                gInSum += pg;
+                bInSum += pb;
+                aInSum += pa;
 
-				stack = stack.next;
-			}
+                stack = stack.next;
+            }
 
-			stackIn = stackStart;
-			stackOut = stackEnd;
+            stackIn = stackStart;
+            stackOut = stackEnd;
 
-			for (x = 0; x < srcWidth; x += 1) {
-				dstPixels[yi] = (rSum * mulSum) >> shgSum;
-				dstPixels[yi + 1] = (gSum * mulSum) >> shgSum;
-				dstPixels[yi + 2] = (bSum * mulSum) >> shgSum;
-				dstPixels[yi + 3] = (aSum * mulSum) >> shgSum;
+            for (x = 0; x < srcWidth; x += 1) {
+                dstPixels[yi] = (rSum * mulSum) >> shgSum;
+                dstPixels[yi + 1] = (gSum * mulSum) >> shgSum;
+                dstPixels[yi + 2] = (bSum * mulSum) >> shgSum;
+                dstPixels[yi + 3] = (aSum * mulSum) >> shgSum;
 
-				rSum -= rOutSum;
-				gSum -= gOutSum;
-				bSum -= bOutSum;
-				aSum -= aOutSum;
+                rSum -= rOutSum;
+                gSum -= gOutSum;
+                bSum -= bOutSum;
+                aSum -= aOutSum;
 
-				rOutSum -= stackIn.r;
-				gOutSum -= stackIn.g;
-				bOutSum -= stackIn.b;
-				aOutSum -= stackIn.a;
+                rOutSum -= stackIn.r;
+                gOutSum -= stackIn.g;
+                bOutSum -= stackIn.b;
+                aOutSum -= stackIn.a;
 
-				p = (yw + ((p = x + radius + 1) < widthMinus1 ? p : widthMinus1)) << 2;
+                p = (yw + ((p = x + radius + 1) < widthMinus1 ? p : widthMinus1)) << 2;
 
-				rInSum += (stackIn.r = dstPixels[p]);
-				gInSum += (stackIn.g = dstPixels[p + 1]);
-				bInSum += (stackIn.b = dstPixels[p + 2]);
-				aInSum += (stackIn.a = dstPixels[p + 3]);
+                rInSum += (stackIn.r = dstPixels[p]);
+                gInSum += (stackIn.g = dstPixels[p + 1]);
+                bInSum += (stackIn.b = dstPixels[p + 2]);
+                aInSum += (stackIn.a = dstPixels[p + 3]);
 
-				rSum += rInSum;
-				gSum += gInSum;
-				bSum += bInSum;
-				aSum += aInSum;
+                rSum += rInSum;
+                gSum += gInSum;
+                bSum += bInSum;
+                aSum += aInSum;
 
-				stackIn = stackIn.next;
+                stackIn = stackIn.next;
 
-				rOutSum += (pr = stackOut.r);
-				gOutSum += (pg = stackOut.g);
-				bOutSum += (pb = stackOut.b);
-				aOutSum += (pa = stackOut.a);
+                rOutSum += (pr = stackOut.r);
+                gOutSum += (pg = stackOut.g);
+                bOutSum += (pb = stackOut.b);
+                aOutSum += (pa = stackOut.a);
 
-				rInSum -= pr;
-				gInSum -= pg;
-				bInSum -= pb;
-				aInSum -= pa;
+                rInSum -= pr;
+                gInSum -= pg;
+                bInSum -= pb;
+                aInSum -= pa;
 
-				stackOut = stackOut.next;
+                stackOut = stackOut.next;
 
-				yi += 4;
-			}
+                yi += 4;
+            }
 
-			yw += srcWidth;
-		}
+            yw += srcWidth;
+        }
 
-		for (x = 0; x < srcWidth; x += 1) {
-			gInSum = bInSum = aInSum = rInSum = gSum = bSum = aSum = rSum = 0;
+        for (x = 0; x < srcWidth; x += 1) {
+            gInSum = bInSum = aInSum = rInSum = gSum = bSum = aSum = rSum = 0;
 
-			yi = x << 2;
-			rOutSum = radiusPlus1 * (pr = dstPixels[yi]);
-			gOutSum = radiusPlus1 * (pg = dstPixels[yi + 1]);
-			bOutSum = radiusPlus1 * (pb = dstPixels[yi + 2]);
-			aOutSum = radiusPlus1 * (pa = dstPixels[yi + 3]);
+            yi = x << 2;
+            rOutSum = radiusPlus1 * (pr = dstPixels[yi]);
+            gOutSum = radiusPlus1 * (pg = dstPixels[yi + 1]);
+            bOutSum = radiusPlus1 * (pb = dstPixels[yi + 2]);
+            aOutSum = radiusPlus1 * (pa = dstPixels[yi + 3]);
 
-			rSum += sumFactor * pr;
-			gSum += sumFactor * pg;
-			bSum += sumFactor * pb;
-			aSum += sumFactor * pa;
+            rSum += sumFactor * pr;
+            gSum += sumFactor * pg;
+            bSum += sumFactor * pb;
+            aSum += sumFactor * pa;
 
-			stack = stackStart;
+            stack = stackStart;
 
-			for (i = 0; i < radiusPlus1; i += 1) {
-				stack.r = pr;
-				stack.g = pg;
-				stack.b = pb;
-				stack.a = pa;
-				stack = stack.next;
-			}
+            for (i = 0; i < radiusPlus1; i += 1) {
+                stack.r = pr;
+                stack.g = pg;
+                stack.b = pb;
+                stack.a = pa;
+                stack = stack.next;
+            }
 
-			yp = srcWidth;
+            yp = srcWidth;
 
-			for (i = 1; i <= radius; i += 1) {
-				yi = (yp + x) << 2;
+            for (i = 1; i <= radius; i += 1) {
+                yi = (yp + x) << 2;
 
-				rSum += (stack.r = (pr = dstPixels[yi])) * (rbs = radiusPlus1 - i);
-				gSum += (stack.g = (pg = dstPixels[yi + 1])) * rbs;
-				bSum += (stack.b = (pb = dstPixels[yi + 2])) * rbs;
-				aSum += (stack.a = (pa = dstPixels[yi + 3])) * rbs;
+                rSum += (stack.r = (pr = dstPixels[yi])) * (rbs = radiusPlus1 - i);
+                gSum += (stack.g = (pg = dstPixels[yi + 1])) * rbs;
+                bSum += (stack.b = (pb = dstPixels[yi + 2])) * rbs;
+                aSum += (stack.a = (pa = dstPixels[yi + 3])) * rbs;
 
-				rInSum += pr;
-				gInSum += pg;
-				bInSum += pb;
-				aInSum += pa;
+                rInSum += pr;
+                gInSum += pg;
+                bInSum += pb;
+                aInSum += pa;
 
-				stack = stack.next;
+                stack = stack.next;
 
-				if (i < heightMinus1) {
-					yp += srcWidth;
-				}
-			}
+                if (i < heightMinus1) {
+                    yp += srcWidth;
+                }
+            }
 
-			yi = x;
-			stackIn = stackStart;
-			stackOut = stackEnd;
+            yi = x;
+            stackIn = stackStart;
+            stackOut = stackEnd;
 
-			for (y = 0; y < srcHeight; y += 1) {
-				p = yi << 2;
-				dstPixels[p] = (rSum * mulSum) >> shgSum;
-				dstPixels[p + 1] = (gSum * mulSum) >> shgSum;
-				dstPixels[p + 2] = (bSum * mulSum) >> shgSum;
-				dstPixels[p + 3] = (aSum * mulSum) >> shgSum;
+            for (y = 0; y < srcHeight; y += 1) {
+                p = yi << 2;
+                dstPixels[p] = (rSum * mulSum) >> shgSum;
+                dstPixels[p + 1] = (gSum * mulSum) >> shgSum;
+                dstPixels[p + 2] = (bSum * mulSum) >> shgSum;
+                dstPixels[p + 3] = (aSum * mulSum) >> shgSum;
 
-				rSum -= rOutSum;
-				gSum -= gOutSum;
-				bSum -= bOutSum;
-				aSum -= aOutSum;
+                rSum -= rOutSum;
+                gSum -= gOutSum;
+                bSum -= bOutSum;
+                aSum -= aOutSum;
 
-				rOutSum -= stackIn.r;
-				gOutSum -= stackIn.g;
-				bOutSum -= stackIn.b;
-				aOutSum -= stackIn.a;
+                rOutSum -= stackIn.r;
+                gOutSum -= stackIn.g;
+                bOutSum -= stackIn.b;
+                aOutSum -= stackIn.a;
 
-				p = (x + (((p = y + radiusPlus1) < heightMinus1 ? p : heightMinus1) * srcWidth)) << 2;
+                p = (x + (((p = y + radiusPlus1) < heightMinus1 ? p : heightMinus1) * srcWidth)) << 2;
 
-				rSum += (rInSum += (stackIn.r = dstPixels[p]));
-				gSum += (gInSum += (stackIn.g = dstPixels[p + 1]));
-				bSum += (bInSum += (stackIn.b = dstPixels[p + 2]));
-				aSum += (aInSum += (stackIn.a = dstPixels[p + 3]));
+                rSum += (rInSum += (stackIn.r = dstPixels[p]));
+                gSum += (gInSum += (stackIn.g = dstPixels[p + 1]));
+                bSum += (bInSum += (stackIn.b = dstPixels[p + 2]));
+                aSum += (aInSum += (stackIn.a = dstPixels[p + 3]));
 
-				stackIn = stackIn.next;
+                stackIn = stackIn.next;
 
-				rOutSum += (pr = stackOut.r);
-				gOutSum += (pg = stackOut.g);
-				bOutSum += (pb = stackOut.b);
-				aOutSum += (pa = stackOut.a);
+                rOutSum += (pr = stackOut.r);
+                gOutSum += (pg = stackOut.g);
+                bOutSum += (pb = stackOut.b);
+                aOutSum += (pa = stackOut.a);
 
-				rInSum -= pr;
-				gInSum -= pg;
-				bInSum -= pb;
-				aInSum -= pa;
+                rInSum -= pr;
+                gInSum -= pg;
+                bInSum -= pb;
+                aInSum -= pa;
 
-				stackOut = stackOut.next;
+                stackOut = stackOut.next;
 
-				yi += srcWidth;
-			}
-		}
+                yi += srcWidth;
+            }
+        }
 
-		return dstImageData;
-	}
+        return dstImageData;
+    }
 }

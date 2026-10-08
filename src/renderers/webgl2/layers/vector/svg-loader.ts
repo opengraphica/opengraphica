@@ -36,23 +36,23 @@ const COLOR_SPACE_SVG = SRGBColorSpace;
  *
  * for ( let i = 0; i < paths.length; i ++ ) {
  *
- * 	const path = paths[ i ];
- * 	const material = new THREE.MeshBasicMaterial( {
- * 		color: path.color,
- * 		side: THREE.DoubleSide,
- * 		depthWrite: false
- * 	} );
+ *     const path = paths[ i ];
+ *     const material = new THREE.MeshBasicMaterial( {
+ *         color: path.color,
+ *         side: THREE.DoubleSide,
+ *         depthWrite: false
+ *     } );
  *
- * 	const shapes = SVGLoader.createShapes( path );
+ *     const shapes = SVGLoader.createShapes( path );
  *
- * 	for ( let j = 0; j < shapes.length; j ++ ) {
+ *     for ( let j = 0; j < shapes.length; j ++ ) {
  *
- * 		const shape = shapes[ j ];
- * 		const geometry = new THREE.ShapeGeometry( shape );
- * 		const mesh = new THREE.Mesh( geometry, material );
- * 		group.add( mesh );
+ *         const shape = shapes[ j ];
+ *         const geometry = new THREE.ShapeGeometry( shape );
+ *         const mesh = new THREE.Mesh( geometry, material );
+ *         group.add( mesh );
  *
- * 	}
+ *     }
  *
  * }
  *

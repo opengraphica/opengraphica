@@ -16,9 +16,9 @@ export class UpdateLayerFilterParamsAction extends BaseAction {
         this.layerId = layerId;
         this.filterIndex = filterIndex;
         this.newParams = newParams;
-	}
+    }
 
-	public async do() {
+    public async do() {
         super.do();
 
         const layers = workingFileStore.get('layers');
@@ -40,9 +40,9 @@ export class UpdateLayerFilterParamsAction extends BaseAction {
         updateWorkingFileLayer(layer);
 
         canvasStore.set('dirty', true);
-	}
+    }
 
-	public async undo() {
+    public async undo() {
         super.undo();
 
         const layers = workingFileStore.get('layers');
@@ -63,7 +63,7 @@ export class UpdateLayerFilterParamsAction extends BaseAction {
         updateWorkingFileLayer(layer);
 
         canvasStore.set('dirty', true);
-	}
+    }
 
     public free() {
         super.free();

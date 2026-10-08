@@ -26,8 +26,8 @@ export class DeleteLayersAction extends BaseAction {
     constructor(layerIds: number[]) {
         super('deleteLayers', 'action.deleteLayers');
         this.deleteLayerIds = layerIds;
-	}
-	public async do() {
+    }
+    public async do() {
         super.do();
 
         // Reset selection
@@ -67,9 +67,9 @@ export class DeleteLayersAction extends BaseAction {
         for (const layerId of this.deleteLayerIds) {
             deleteWorkingFileLayer(layerId);
         }
-	}
+    }
 
-	public async undo() {
+    public async undo() {
         super.undo();
 
         const layers = workingFileStore.get('layers');
@@ -104,7 +104,7 @@ export class DeleteLayersAction extends BaseAction {
             const layer = getLayerById(layerId);
             if (layer) updateWorkingFileLayer(layer);
         }
-	}
+    }
 
     public free() {
         super.free();
