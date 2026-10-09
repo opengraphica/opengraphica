@@ -22,10 +22,12 @@ export class BundleAction extends BaseAction {
         for (i = 0; i < this.actions.length; i++) {
             try {
                 if (i > 0) {
-                    this.actions[i].previousAction = this.actions[i - 1];
+                    this.actions[i].previousActions = this.actions.slice(0, i);
+                } else {
+                    this.actions[i].previousActions = [];
                 }
                 await this.actions[i].do();
-                this.actions[i].previousAction = undefined;
+                this.actions[i].previousActions = [];
                 this.freeEstimates.memory += this.actions[i].freeEstimates.memory;
                 this.freeEstimates.database += this.actions[i].freeEstimates.database;
             } catch (e) {
@@ -38,6 +40,7 @@ export class BundleAction extends BaseAction {
             for (i--; i >= 0; i--) {
                 await this.actions[i].undo();
             }
+            console.error('[src/actions/bundle].ts', error);
             throw error;
         }
         canvasStore.set('dirty', true);

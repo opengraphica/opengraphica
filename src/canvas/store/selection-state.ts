@@ -457,3 +457,4 @@ export async function resampleSelectionMaskInLayerBounds(
     );
     return updateChunkImage;
 }
+

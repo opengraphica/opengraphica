@@ -8,7 +8,7 @@ export class BaseAction {
         memory: 0, // Estimate of how much memory will be freed when the free() method is called (in bytes)
         database: 0 // Estimate of how much database space will be freed when the free() method is called (in bytes)
     };
-    public previousAction: BaseAction | undefined;
+    public previousActions: BaseAction[] = [];
 
     public get isDone(): boolean {
         return this.done;

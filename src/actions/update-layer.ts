@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { markRaw, readonly } from 'vue';
+import { markRaw, nextTick, readonly } from 'vue';
 import { BaseAction } from './base';
 import { updateBakedImageForLayer } from './baking';
 
@@ -7,6 +7,7 @@ import { createEmptyCanvas } from '@/lib/image';
 import appEmitter from '@/lib/emitter';
 
 import canvasStore from '@/store/canvas';
+import editorStore from '@/store/editor';
 import {
     getStoredImageOrCanvas, createStoredImage, deleteStoredImage,
     prepareStoredImageForEditing, prepareStoredImageForArchival, reserveStoredImage, unreserveStoredImage
@@ -170,6 +171,13 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                     }
                     if ((this.explicitPreviousProps as any)?.data?.sourceDocument) {
                         layer.data.sourceDocument = layer.data.sourceDocument;
+                    } else if (editorStore.state.activeTool === 'shape') {
+                        if (layer.data.sourceDocument) {
+                            const sourceDocument = layer.data.sourceDocument;
+                            layer.data.sourceDocument = undefined;
+                            await nextTick();
+                            layer.data.sourceDocument = sourceDocument;
+                        }
                     }
                 }
                 else if (layer.type === 'video') {

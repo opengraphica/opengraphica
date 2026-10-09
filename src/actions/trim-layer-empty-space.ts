@@ -29,13 +29,17 @@ export class TrimLayerEmptySpaceAction extends BaseAction {
         super.do();
 
         if (this.layerId == -1) {
-            if (!this.previousAction) {
-                throw new Error('[src/actions/trim-layer-empty-space.ts] Layer ID not specified and previous action not provided.');
-            } else if (this.previousAction instanceof InsertLayerAction) {
-                this.layerId = this.previousAction.insertedLayerId;
-            } else {
-                throw new Error('[src/actions/trim-layer-empty-space.ts] Layer ID not specified and cannot derive from previous action.');
+            let insertLayerAction: InsertLayerAction<any> | undefined = undefined;
+            for (let i = this.previousActions.length - 1; i >= 0; i--) {
+                if (this.previousActions[i] instanceof InsertLayerAction) {
+                    insertLayerAction = this.previousActions[i] as InsertLayerAction<any>;
+                    break;
+                }
             }
+            if (!insertLayerAction) {
+                throw new Error('[src/actions/trim-layer-empty-space.ts] Layer ID not specified and previous action not found.');
+            }
+            this.layerId = insertLayerAction.insertedLayerId;
         }
 
         const layer = getLayerById(this.layerId);

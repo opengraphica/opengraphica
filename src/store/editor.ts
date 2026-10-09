@@ -17,7 +17,7 @@ import type {
     LiveUpdateBuildInfo,
     ToolGroupDefinition, WorkingFileLayer, WorkingFileAnyLayer,
     WorkingFileGroupLayer, WorkingFileRasterSequenceLayer, ColorModel,
-    VectorPathCommand,
+    VectorPathCommandMove, VectorPathCommandLine,
 } from '@/types';
 
 interface EditorDeferredTask {
@@ -73,7 +73,7 @@ interface EditorState {
     clipboardBufferLayers: WorkingFileAnyLayer<ColorModel>[];
     clipboardBufferSelectionMask: HTMLImageElement | null;
     clipboardBufferSelectionMaskCanvasOffset: DOMPoint;
-    clipboardBufferSelectionPaths: VectorPathCommand[][] | null;
+    clipboardBufferSelectionPaths: Array<Array<VectorPathCommandMove | VectorPathCommandLine>> | null;
     clipboardBufferUpdateTimestamp: number;
     hasClipboardUpdateSupport: boolean;
     floatingDocksContainer: HTMLElement | null;

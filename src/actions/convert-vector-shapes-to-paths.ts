@@ -1,3 +1,4 @@
+import { nextTick } from 'vue';
 import { BaseAction } from './base';
 
 import { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
@@ -10,7 +11,7 @@ import {
     parseLineNodeAttributes,
 } from '@/lib/svg';
 
-import { useRenderer } from '@/renderers';
+import { UpdateLayerAction } from './update-layer';
 
 import type { WorkingFileVectorLayer } from '@/types';
 
@@ -22,8 +23,7 @@ export class ConvertVectorShapesToPathsAction extends BaseAction {
     private layerId: number;
     private nodeIds: string[];
 
-    private oldImageSourceUuid: string | undefined;
-    private newImageSourceUuid: string | undefined;
+    private updateLayerAction: UpdateLayerAction<any> | undefined;
 
     constructor(
         layerId: number,
@@ -37,6 +37,11 @@ export class ConvertVectorShapesToPathsAction extends BaseAction {
     public async do() {
         super.do();
 
+        if (this.updateLayerAction) {
+            await this.updateLayerAction.do();
+            return;
+        }
+
         const layer = getLayerById<WorkingFileVectorLayer>(this.layerId);
         if (!layer) {
             throw new Error('Aborted - Layer with specified id not found.');
@@ -45,8 +50,7 @@ export class ConvertVectorShapesToPathsAction extends BaseAction {
             throw new Error('Aborted - Layer is not a vector layer.');
         }
 
-        this.oldImageSourceUuid = layer.data.sourceUuid;
-        const svgDocument = layer.data.sourceDocument ?? await getStoredSvgDocument(this.oldImageSourceUuid);
+        const svgDocument = layer.data.sourceDocument ?? await getStoredSvgDocument(layer.data.sourceUuid);
         if (!svgDocument) {
             throw new Error('Aborted - Vector layer is missing a SVG document.');
         }
@@ -149,66 +153,25 @@ export class ConvertVectorShapesToPathsAction extends BaseAction {
             image.src = url;
         });
 
-        this.newImageSourceUuid = await createStoredSvg(image);
-        layer.data.sourceUuid = this.newImageSourceUuid;
-        reserveStoredSvg(this.newImageSourceUuid, `${this.layerId}`);
-        if (layer.data.sourceDocument) {
-            layer.data.sourceDocument = undefined;
-            layer.data.sourceDocument = svgDocument;
-        }
-
-        // Update the working file backup
-        updateWorkingFileLayer(layer);
-
-        // This assumes the new and old SVGs are roughly the same size, just an estimate.
-        this.freeEstimates.memory = blob.size;
+        this.updateLayerAction = new UpdateLayerAction({
+            id: this.layerId,
+            data: {
+                sourceUuid: await createStoredSvg(image),
+            },
+        });
+        this.freeEstimates.memory = this.updateLayerAction.memoryEstimate;
+        this.freeEstimates.database = this.updateLayerAction.databaseEstimate;
     }
 
     public async undo() {
         super.undo();
 
-        const layer = getLayerById<WorkingFileVectorLayer>(this.layerId);
-        if (!layer) {
-            throw new Error('Aborted - Layer with specified id not found.');
-        }
-        if (layer.type !== 'vector') {
-            throw new Error('Aborted - Layer is not a vector layer.');
-        }
-
-        const svgDocument = layer.data.sourceDocument;
-        if (!svgDocument && this.oldImageSourceUuid == null) {
-            throw new Error('Aborted- Vector layer is missing a SVG document.');
-        }
-
-        if (this.oldImageSourceUuid) {
-            layer.data.sourceUuid = this.oldImageSourceUuid;
-        }
-        if (layer.data.sourceDocument) {
-            layer.data.sourceDocument = undefined;
-            layer.data.sourceDocument = svgDocument;
-        }
-
-        // Update the working file backup
-        updateWorkingFileLayer(layer);
+        await this.updateLayerAction?.undo();
     }
 
     public free() {
         super.free();
 
-        // This is in the undo history
-        if (this.isDone) {
-            if (this.oldImageSourceUuid != null && this.oldImageSourceUuid != this.newImageSourceUuid) {
-                unreserveStoredSvg(this.oldImageSourceUuid, `${this.layerId}`);
-            }
-        }
-        // This is in the redo history
-        if (!this.isDone) {
-            const layer = getLayerById<WorkingFileVectorLayer>(this.layerId);
-            if (layer) {
-                if (this.newImageSourceUuid && this.newImageSourceUuid !== layer.data.sourceUuid) {
-                    unreserveStoredSvg(this.newImageSourceUuid, `${this.layerId}`);
-                }
-            }
-        }
+        this.updateLayerAction?.free();
     }
 }

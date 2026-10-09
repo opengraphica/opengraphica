@@ -1,8 +1,10 @@
+import { nextTick } from 'vue';
 import { BaseAction } from './base';
 
 import {
     activeSelectionMask, appliedSelectionMask,
     activeSelectionPath, appliedSelectionPaths,
+    type SelectionCombineMode,
 } from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
 import { getStoredImageOrCanvas } from '@/store/image';
@@ -12,6 +14,7 @@ import { updateWorkingFileLayer } from '@/store/data/working-file-database';
 
 import { ApplyActiveSelectionAction } from './apply-active-selection';
 import { ClearSelectionAction } from './clear-selection';
+import { InsertLayerAction } from './insert-layer';
 import { UpdateLayerAction } from './update-layer';
 
 import { Clipper, PolyType, ClipType, Paths, PolyFillType } from '@/lib/clipper';
@@ -31,7 +34,7 @@ import { ConvertVectorShapesToPathsAction } from './convert-vector-shapes-to-pat
 import { VectorPathCommandType } from '@/types/vector';
 import type {
     UpdateRasterLayerOptions,
-    VectorPathCommand,
+    VectorPathCommand, VectorPathCommandMove, VectorPathCommandLine,
     WorkingFileAnyLayer,
 } from '@/types';
 
@@ -39,25 +42,48 @@ const SVG_SHAPES = ['rect', 'circle', 'ellipse', 'line', 'polyline', 'polygon', 
 
 interface DeleteLayerSelectionAreaOptions {
     clearSelection?: boolean;
+    appliedSelectionPaths?: Array<Array<VectorPathCommandMove | VectorPathCommandLine>>;
+    selectionCombineMode?: SelectionCombineMode;
 }
 
 export class DeleteLayerSelectionAreaAction extends BaseAction {
 
     private layerIds: number[];
     private clearSelection: boolean = false;
+    private appliedSelectionPaths: Array<Array<VectorPathCommandMove | VectorPathCommandLine>> | null = null;
+    private selectionCombineMode: SelectionCombineMode;
 
     private clearSelectionAction: ClearSelectionAction | null = null;
     private updateLayerActions: BaseAction[] = [];
 
-    constructor(layerIds: number[] = workingFileStore.state.selectedLayerIds, options?: DeleteLayerSelectionAreaOptions) {
+    constructor(
+        layerIds: number[] = workingFileStore.state.selectedLayerIds,
+        options?: DeleteLayerSelectionAreaOptions
+    ) {
         super('deleteLayerSelectionArea', 'action.deleteLayerSelectionArea');
         this.layerIds = layerIds;
-
+        
         this.clearSelection = (options?.clearSelection === false) ? false : true;
+        this.appliedSelectionPaths = options?.appliedSelectionPaths ?? null;
+        this.selectionCombineMode = options?.selectionCombineMode ?? 'subtract';
     }
 
     public async do() {
         super.do();
+
+        if (this.layerIds.length === 1 && this.layerIds[0] === -1) {
+            let insertLayerAction: InsertLayerAction<any> | undefined = undefined;
+            for (let i = this.previousActions.length - 1; i >= 0; i--) {
+                if (this.previousActions[i] instanceof InsertLayerAction) {
+                    insertLayerAction = this.previousActions[i] as InsertLayerAction<any>;
+                    break;
+                }
+            }
+            if (!insertLayerAction) {
+                throw new Error('[src/actions/delete-layer-selection-area.ts] Layer ID not specified and previous action not found.');
+            }
+            this.layerIds = [insertLayerAction.insertedLayerId];
+        }
 
         this.freeEstimates.memory = 0;
         this.freeEstimates.database = 0;
@@ -104,7 +130,7 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
                     continue;
                 }
 
-                if (activeSelectionPath.value.length > 0) {
+                if (!this.appliedSelectionPaths && activeSelectionPath.value.length > 0) {
                     const applyActiveSelectionAction = new ApplyActiveSelectionAction();
                     await applyActiveSelectionAction.do();
                     this.freeEstimates.memory += applyActiveSelectionAction.freeEstimates.memory;
@@ -113,7 +139,7 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
                 }
 
                 let appliedSelectionBoundsRects: DOMRect[] = [];
-                for (const path of appliedSelectionPaths.value) {
+                for (const path of (this.appliedSelectionPaths || appliedSelectionPaths.value)) {
                     const { left, right, top, bottom } = findPointListBounds(path);
                     appliedSelectionBoundsRects.push(
                         new DOMRect(left, top, right - left, bottom - top)
@@ -162,7 +188,7 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
                 this.freeEstimates.database += convertVectorShapesToPathsAction.freeEstimates.database;
                 this.updateLayerActions.push(convertVectorShapesToPathsAction);
 
-                const appliedSelectionPathCommand = appliedSelectionPaths.value.map((path) => {
+                const appliedSelectionPathCommand = (this.appliedSelectionPaths || appliedSelectionPaths.value).map((path) => {
                     return serializeVectorPathCommands(path, true);
                 }).join(' ');
 
@@ -198,11 +224,17 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
 
                     const clipper = new Clipper();
                     clipper.AddPath(polyline, PolyType.ptSubject, true);
-                    for (const path of appliedSelectionPaths.value) {
+                    for (const path of (this.appliedSelectionPaths || appliedSelectionPaths.value)) {
                         clipper.AddPath(path, PolyType.ptClip, true);
                     }
                     const solution: Paths = [];
-                    clipper.Execute(ClipType.ctDifference, solution, PolyFillType.pftEvenOdd, PolyFillType.pftEvenOdd);
+                    let clipType = ClipType.ctDifference;
+                    if (this.selectionCombineMode === 'add') {
+                        clipType = ClipType.ctUnion;
+                    } else if (this.selectionCombineMode === 'intersect') {
+                        clipType = ClipType.ctIntersection;
+                    }
+                    clipper.Execute(clipType, solution, PolyFillType.pftEvenOdd, PolyFillType.pftEvenOdd);
 
                     if (solution.length > 0) {
 
@@ -257,11 +289,6 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
                 this.freeEstimates.memory += updateLayerAction.freeEstimates.memory;
                 this.freeEstimates.database += updateLayerAction.freeEstimates.database;
                 this.updateLayerActions.push(updateLayerAction);
-
-                if (layer.data.sourceDocument) {
-                    layer.data.sourceDocument = undefined;
-                    layer.data.sourceDocument = svgDocument;
-                }
             }
         }
 

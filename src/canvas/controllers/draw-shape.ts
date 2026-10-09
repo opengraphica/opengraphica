@@ -18,6 +18,9 @@ import {
     editingLayers, hasVisibleToolbarOverlay, showShapeDrawer,
     type ControlPointAttributeEdit,
 } from '@/canvas/store/draw-shape-state';
+import {
+    activeSelectionPath, appliedSelectionPaths,
+} from '@/canvas/store/selection-state';
 
 import { hexToColor } from '@/lib/color';
 import { decomposeMatrix, type DecomposedMatrix } from '@/lib/dom-matrix';
@@ -2505,6 +2508,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             || event.action.id === 'updateEraseLayer'
             || event.action.id === 'trimLayerEmptySpace'
             || event.action.id === 'pasteShapes'
+            || event.action.id === 'pasteLayers'
             || event.action.id === 'freeTransform'
             || event.action.id === 'convertVectorShapesToPaths'
         ) {
@@ -2809,12 +2813,16 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
     }
 
     private async onCopy(event?: AppEmitterEvents['editor.tool.copySelectedLayers']) {
-        if (!event) return;
+        if (!event || activeSelectionPath.value.length > 0 || appliedSelectionPaths.value.length > 0) return;
         if (selectedEditControlPointIndices.value.length > 0 || selectedShapes.value.length > 0) {
             event.preventDefault();
 
             this.copiedShapes = [];
             this.currentCopiedShapesPasteCount = 0;
+            editorStore.set('clipboardBufferImageHash', null);
+            editorStore.set('clipboardBufferLayers', []);
+            editorStore.set('clipboardBufferSelectionMask', null);
+            editorStore.set('clipboardBufferSelectionPaths', null);
 
             const copyShapeMap = new Map<number, Set<number>>();
 
@@ -2867,7 +2875,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
     }
 
     private async onCut(event?: AppEmitterEvents['editor.tool.cutSelectedLayers']) {
-        if (!event) return;
+        if (!event || activeSelectionPath.value.length > 0 || appliedSelectionPaths.value.length > 0) return;
         if (selectedEditControlPointIndices.value.length > 0 || selectedShapes.value.length > 0) {
             event.preventDefault();
             this.onCopy(event);
@@ -2877,7 +2885,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
     }
 
     private async onPaste(event?: AppEmitterEvents['editor.tool.paste']) {
-        if (!event) return;
+        if (!event || editorStore.state.clipboardBufferSelectionPaths != null) return;
 
         if (this.copiedShapes.length > 0) {
             event.preventDefault();

@@ -5,8 +5,10 @@ import historyStore from '@/store/history';
 import { getStoredImageOrCanvas, createStoredImage } from '@/store/image';
 import { getStoredSvgDocument } from '@/store/svg';
 import workingFileStore, { ensureUniqueLayerSiblingName } from '@/store/working-file';
-import { BundleAction } from '@/actions/bundle';
 
+import { BaseAction } from '@/actions/base';
+import { BundleAction } from '@/actions/bundle';
+import { DeleteLayerSelectionAreaAction } from '@/actions/delete-layer-selection-area';
 import { InsertLayerAction } from '@/actions/insert-layer';
 import { TrimLayerEmptySpaceAction } from '@/actions/trim-layer-empty-space';
 
@@ -40,6 +42,7 @@ export async function pasteFromEditorCopyBuffer() {
             'pasteLayers',
             'action.pasteLayers',
             (await Promise.all(editorStore.state.clipboardBufferLayers.map(async (layer) => {
+                const actions: BaseAction[] = [];
                 delete (layer as any).id;
                 const firstLayer = workingFileStore.state.layers[0];
                 layer.name = ensureUniqueLayerSiblingName(positionAfterLayer ?? firstLayer ? firstLayer.id : undefined, layer.name);
@@ -63,19 +66,17 @@ export async function pasteFromEditorCopyBuffer() {
                         }
                     }
                 }
+                actions.push(new InsertLayerAction(cloneDeep(layer), positionAfterLayer == null ? 'top' : 'above', positionAfterLayer));
                 if (editorStore.state.clipboardBufferSelectionPaths != null) {
                     if (layer.type === 'vector') {
-                        const vectorLayer = layer as WorkingFileVectorLayer<ColorModel>;
-                        const svgDocument = await getStoredSvgDocument(vectorLayer.data.sourceUuid);
-                        if (svgDocument) {
-                            // TODO - apply clipboardBufferSelectionPaths to document
-                        }
+                        actions.push(new DeleteLayerSelectionAreaAction([-1], {
+                            selectionCombineMode: 'intersect',
+                            appliedSelectionPaths: editorStore.state.clipboardBufferSelectionPaths,
+                        }));
                     }
                 }
-                return [
-                    new InsertLayerAction(cloneDeep(layer), positionAfterLayer == null ? 'top' : 'above', positionAfterLayer),
-                    new TrimLayerEmptySpaceAction(-1),
-                ];
+                actions.push(new TrimLayerEmptySpaceAction(-1));
+                return actions;
             }))).flat()
         )
     });
