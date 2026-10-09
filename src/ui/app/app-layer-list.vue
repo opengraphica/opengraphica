@@ -180,7 +180,9 @@
             </el-menu-item>
             <el-menu-item index="delete">
                 <i class="bi bi-trash"></i>
-                <span>{{ t('app.layerList.delete') }}</span>
+                <span>{{ t(isLayerSettingsMenuLayerSelected && (activeSelectionMask || appliedSelectionMask)
+                    ? 'app.layerList.deleteSelection'
+                    : 'app.layerList.delete') }}</span>
             </el-menu-item>
         </el-menu>
     </og-popover>
@@ -205,11 +207,13 @@ import historyStore from '@/store/history';
 import workingFileStore, { getLayerById, isGroupLayer } from '@/store/working-file';
 import { editingLayerIds as layerOpacityEditingLayerIds } from '@/canvas/store/layer-opacity-state';
 import { effectEmitter, isToolbarVisible as isEffectToolbarVisible } from '@/canvas/store/effect-state';
+import { activeSelectionMask, appliedSelectionMask } from '@/canvas/store/selection-state';
 
 import { runModule } from '@/modules';
 
 import { BundleAction } from '@/actions/bundle';
 import { DeleteLayersAction } from '@/actions/delete-layers';
+import { DeleteLayerSelectionAreaAction } from '@/actions/delete-layer-selection-area';
 import { DuplicateLayerAction } from '@/actions/duplicate-layer';
 import { RasterizeLayerAction } from '@/actions/rasterize-layer';
 import { ReorderLayersAction } from '@/actions/reorder-layers';
@@ -272,6 +276,9 @@ const showLayerSettingsReference = ref<HTMLButtonElement>();
 const showLayerSettingsMenu = ref(false);
 const showLayerSettingsMenuFor = ref<number | null>(null);
 const layerSettingsActiveIndex = ref('');
+const isLayerSettingsMenuLayerSelected = computed(() => {
+    return selectedLayerIds.value.includes(showLayerSettingsMenuFor.value ?? -1);
+});
 
 const conditionalDragStartEventModifier: string = props.isRoot ? 'dragstart' : '';
 const { playingAnimation } = toRefs(canvasStore.state);
@@ -362,9 +369,15 @@ async function onLayerSettingsSelect(action: string) {
             action: new DuplicateLayerAction(layer.id)
         });
     } else if (action === 'delete') {
-        historyStore.dispatch('runAction', {
-            action: new DeleteLayersAction([layer.id])
-        });
+        if (selectedLayerIds.value.includes(layer.id) && (activeSelectionMask.value || appliedSelectionMask.value)) {
+            historyStore.dispatch('runAction', {
+                action: new DeleteLayerSelectionAreaAction([layer.id])
+            });
+        } else {
+            historyStore.dispatch('runAction', {
+                action: new DeleteLayersAction([layer.id])
+            });
+        }
     }
     showLayerSettingsMenu.value = false;
     showLayerSettingsMenuFor.value = null;

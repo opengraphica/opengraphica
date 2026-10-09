@@ -2,21 +2,40 @@ import { BaseAction } from './base';
 
 import {
     activeSelectionMask, appliedSelectionMask,
+    activeSelectionPath, appliedSelectionPaths,
 } from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
 import { getStoredImageOrCanvas } from '@/store/image';
+import { createStoredSvg, getStoredSvgDocument } from '@/store/svg';
 import workingFileStore, { getLayerById } from '@/store/working-file';
 import { updateWorkingFileLayer } from '@/store/data/working-file-database';
 
+import { ApplyActiveSelectionAction } from './apply-active-selection';
 import { ClearSelectionAction } from './clear-selection';
 import { UpdateLayerAction } from './update-layer';
 
+import { Clipper, PolyType, ClipType, Paths, PolyFillType } from '@/lib/clipper';
+import { decomposeMatrix } from '@/lib/dom-matrix';
+import { findPointListBounds, findRectListBounds } from '@/lib/math';
+import {
+    calculateShapeAabb, getViewBox, serializeVectorPathCommands,
+    parseCommonNodeAttributes, parseNodeTransform, parsePathNodeAttributes,
+    generateSvgElementIds,
+} from '@/lib/svg';
+import { pathContainsPath, pathToPolyline, polylineToSimplifiedPath } from '@/lib/vector-process';
+
 import { transferRendererTilesToRasterLayerUpdates, useRenderer } from '@/renderers';
 
+import { ConvertVectorShapesToPathsAction } from './convert-vector-shapes-to-paths';
+
+import { VectorPathCommandType } from '@/types/vector';
 import type {
-    ColorModel, UpdateAnyLayerOptions, UpdateRasterLayerOptions,
+    UpdateRasterLayerOptions,
+    VectorPathCommand,
     WorkingFileAnyLayer,
 } from '@/types';
+
+const SVG_SHAPES = ['rect', 'circle', 'ellipse', 'line', 'polyline', 'polygon', 'path'];
 
 interface DeleteLayerSelectionAreaOptions {
     clearSelection?: boolean;
@@ -28,7 +47,7 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
     private clearSelection: boolean = false;
 
     private clearSelectionAction: ClearSelectionAction | null = null;
-    private updateLayerActions: UpdateLayerAction<UpdateAnyLayerOptions<ColorModel>>[] = [];
+    private updateLayerActions: BaseAction[] = [];
 
     constructor(layerIds: number[] = workingFileStore.state.selectedLayerIds, options?: DeleteLayerSelectionAreaOptions) {
         super('deleteLayerSelectionArea', 'action.deleteLayerSelectionArea');
@@ -55,6 +74,7 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
         this.updateLayerActions = [];
         for (const layer of layersToModify) {
             if (layer.type === 'raster') {
+                // For a raster layer, just generate a new image
 
                 const sourceImage = getStoredImageOrCanvas(layer.data.sourceUuid);
                 if (sourceImage) {
@@ -77,7 +97,171 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
                 }
 
             } else if (layer.type === 'vector') {
+                // For a vector layer, clip shapes with boolean subtract operation
 
+                let svgDocument = layer.data.sourceDocument ?? await getStoredSvgDocument(layer.data.sourceUuid);
+                if (!svgDocument) {
+                    continue;
+                }
+
+                if (activeSelectionPath.value.length > 0) {
+                    const applyActiveSelectionAction = new ApplyActiveSelectionAction();
+                    await applyActiveSelectionAction.do();
+                    this.freeEstimates.memory += applyActiveSelectionAction.freeEstimates.memory;
+                    this.freeEstimates.database += applyActiveSelectionAction.freeEstimates.database;
+                    this.updateLayerActions.push(applyActiveSelectionAction);
+                }
+
+                let appliedSelectionBoundsRects: DOMRect[] = [];
+                for (const path of appliedSelectionPaths.value) {
+                    const { left, right, top, bottom } = findPointListBounds(path);
+                    appliedSelectionBoundsRects.push(
+                        new DOMRect(left, top, right - left, bottom - top)
+                    );
+                }
+                const appliedSelectionBounds = findRectListBounds(appliedSelectionBoundsRects);
+
+                const viewBox = getViewBox(svgDocument);
+                const viewboxXf = layer.transform.scale(
+                    layer.width / viewBox.width, layer.height / viewBox.height, 1.0,
+                ).translateSelf(
+                    -viewBox.x, -viewBox.y, 0.0,
+                );
+
+                // Identify shapes that might be impacted based on their bounding box, and convert them to paths.
+                let allShapes = Array.from(svgDocument.querySelectorAll('[data-ogr-id]'));
+                const clipSubjectShapeIds: string[] = [];
+                const clipSubjectShapeIndices: number[] = [];
+                for (const [shapeIndex, shape] of allShapes.entries()) {
+                    if (!SVG_SHAPES.includes(shape.tagName)) continue;
+                    
+                    const { transform, stroke, strokeWidth } = parseCommonNodeAttributes(shape);
+                    const nodeXf = viewboxXf.multiply(
+                        transform,
+                    );
+                    const { scaleX, scaleY } = decomposeMatrix(nodeXf);
+
+                    const shapeAabb = calculateShapeAabb(shape, nodeXf, stroke ? strokeWidth : 0, scaleX, scaleY);
+                    if (
+                        !shapeAabb
+                        || shapeAabb.left > appliedSelectionBounds.right
+                        || shapeAabb.right < appliedSelectionBounds.left
+                        || shapeAabb.bottom < appliedSelectionBounds.top
+                        || shapeAabb.top > appliedSelectionBounds.bottom
+                    ) {
+                        continue;
+                    }
+
+                    clipSubjectShapeIds.push(shape.getAttribute('data-ogr-id') ?? '');
+                    clipSubjectShapeIndices.push(shapeIndex);
+                }
+
+                const convertVectorShapesToPathsAction = new ConvertVectorShapesToPathsAction(layer.id, clipSubjectShapeIds);
+                await convertVectorShapesToPathsAction.do();
+                this.freeEstimates.memory += convertVectorShapesToPathsAction.freeEstimates.memory;
+                this.freeEstimates.database += convertVectorShapesToPathsAction.freeEstimates.database;
+                this.updateLayerActions.push(convertVectorShapesToPathsAction);
+
+                const appliedSelectionPathCommand = appliedSelectionPaths.value.map((path) => {
+                    return serializeVectorPathCommands(path, true);
+                }).join(' ');
+
+                // Convert shapes to polylines, intersect, convert back to simplified bezier curves.
+                const scrapPoint = new DOMPoint();
+                svgDocument = layer.data.sourceDocument ?? await getStoredSvgDocument(layer.data.sourceUuid);
+                allShapes = Array.from(svgDocument.querySelectorAll('[data-ogr-id]'));
+                for (const shapeIndex of clipSubjectShapeIndices) {
+                    const shape = allShapes[shapeIndex];
+                    if (shape?.tagName !== 'path') continue;
+
+                    const transform = parseNodeTransform(shape);
+                    const nodeXf = viewboxXf.multiply(
+                        transform,
+                    );
+                    const nodeXfInverse = nodeXf.inverse();
+
+                    const { d } = parsePathNodeAttributes(shape);
+
+                    const polyline = (await pathToPolyline(d)).filter((command) => {
+                        return (
+                            command.type === VectorPathCommandType.LINE
+                            || command.type === VectorPathCommandType.MOVE
+                        );
+                    }).map((command) => {
+                        scrapPoint.x = command.x;
+                        scrapPoint.y = command.y;
+                        const xfPoint = scrapPoint.matrixTransform(nodeXf);
+                        command.x = xfPoint.x;
+                        command.y = xfPoint.y;
+                        return command;
+                    });
+
+                    const clipper = new Clipper();
+                    clipper.AddPath(polyline, PolyType.ptSubject, true);
+                    for (const path of appliedSelectionPaths.value) {
+                        clipper.AddPath(path, PolyType.ptClip, true);
+                    }
+                    const solution: Paths = [];
+                    clipper.Execute(ClipType.ctDifference, solution, PolyFillType.pftEvenOdd, PolyFillType.pftEvenOdd);
+
+                    if (solution.length > 0) {
+
+                        const newPathCommandGroups: VectorPathCommand[][] = [];
+                        for (const paths of solution) {
+                            const newPathCommands: VectorPathCommand[] = [];
+                            for (const [pointIndex, point] of paths.entries()) {
+                                scrapPoint.x = point.x;
+                                scrapPoint.y = point.y;
+                                const xfPoint = scrapPoint.matrixTransform(nodeXfInverse);
+                                newPathCommands.push({
+                                    type: pointIndex > 0 ? VectorPathCommandType.LINE : VectorPathCommandType.MOVE,
+                                    x: xfPoint.x,
+                                    y: xfPoint.y,
+                                });
+                            }
+                            newPathCommandGroups.push(await polylineToSimplifiedPath(newPathCommands));
+                        }
+                        shape.setAttribute('d', newPathCommandGroups.map(
+                            (commandGroup) => serializeVectorPathCommands(commandGroup, true)
+                        ).join(' '));
+
+                    } else if (await pathContainsPath(appliedSelectionPathCommand, polyline)) {
+                        shape.remove();
+                    }
+
+                }
+
+                generateSvgElementIds(svgDocument);
+
+                const serializer = new XMLSerializer();
+                const svgText = serializer.serializeToString(svgDocument);
+                const blob = new Blob([svgText], {
+                    type: 'image/svg+xml',
+                });
+
+                const url = URL.createObjectURL(blob);
+                const image = new Image()
+                await new Promise((resolve) => {
+                    image.onload = resolve;
+                    image.onerror = resolve;
+                    image.src = url;
+                });
+
+                const updateLayerAction = new UpdateLayerAction({
+                    id: layer.id,
+                    data: {
+                        sourceUuid: await createStoredSvg(image)
+                    }
+                });
+                await updateLayerAction.do();
+                this.freeEstimates.memory += updateLayerAction.freeEstimates.memory;
+                this.freeEstimates.database += updateLayerAction.freeEstimates.database;
+                this.updateLayerActions.push(updateLayerAction);
+
+                if (layer.data.sourceDocument) {
+                    layer.data.sourceDocument = undefined;
+                    layer.data.sourceDocument = svgDocument;
+                }
             }
         }
 
@@ -113,7 +297,7 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
             this.freeEstimates.database += this.clearSelectionAction.freeEstimates.database;
         }
 
-        for (const updateLayerAction of this.updateLayerActions) {
+        for (const updateLayerAction of [...this.updateLayerActions].reverse()) {
             await updateLayerAction.undo();
             this.freeEstimates.memory += updateLayerAction.freeEstimates.memory;
             this.freeEstimates.database += updateLayerAction.freeEstimates.database;

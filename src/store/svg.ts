@@ -79,7 +79,7 @@ export async function getStoredSvgDocument(uuid?: string): Promise<Document> {
  * Releases the stored svg from memory, and from the database.
  * @param uuid - ID of the database entry for the svg
  */
-export async function deleteStoredSvg(uuid: string) {
+export async function deleteStoredSvg(uuid: string | undefined) {
     const storedSvg = svgUuidMap.get(uuid);
     if (!storedSvg) return;
     svgUuidMap.delete(uuid);

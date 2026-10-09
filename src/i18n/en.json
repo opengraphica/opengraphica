@@ -107,6 +107,7 @@
             "rasterize": "Rasterize",
             "duplicate": "Duplicate",
             "delete": "Delete",
+            "deleteSelection": "Delete Selection",
             "frames": "Frames",
             "playAnimation": "Play Animation",
             "stopAnimation": "Stop Animation",

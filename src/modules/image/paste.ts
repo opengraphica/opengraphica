@@ -3,6 +3,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import { getStoredImageOrCanvas, createStoredImage } from '@/store/image';
+import { getStoredSvgDocument } from '@/store/svg';
 import workingFileStore, { ensureUniqueLayerSiblingName } from '@/store/working-file';
 import { BundleAction } from '@/actions/bundle';
 
@@ -14,7 +15,7 @@ import { blitSpecifiedSelectionMask } from '@/canvas/store/selection-state';
 import appEmitter from '@/lib/emitter';
 import { generateImageBlobHash } from '@/lib/hash';
 
-import type { ColorModel, WorkingFileRasterLayer } from '@/types';
+import type { ColorModel, WorkingFileRasterLayer, WorkingFileVectorLayer } from '@/types';
 
 export async function promptClipboardReadPermission(): Promise<boolean> {
     try {
@@ -59,6 +60,15 @@ export async function pasteFromEditorCopyBuffer() {
                                     )
                                 ),
                             };
+                        }
+                    }
+                }
+                if (editorStore.state.clipboardBufferSelectionPaths != null) {
+                    if (layer.type === 'vector') {
+                        const vectorLayer = layer as WorkingFileVectorLayer<ColorModel>;
+                        const svgDocument = await getStoredSvgDocument(vectorLayer.data.sourceUuid);
+                        if (svgDocument) {
+                            // TODO - apply clipboardBufferSelectionPaths to document
                         }
                     }
                 }

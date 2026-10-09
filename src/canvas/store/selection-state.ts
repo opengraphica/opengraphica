@@ -8,8 +8,11 @@ import canvasStore from '@/store/canvas';
 import { PerformantStore } from '@/store/performant-store';
 import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 
+import { Clipper, PolyType, ClipType, Paths, PolyFillType } from '@/lib/clipper';
+import { pathToPolyline } from '@/lib/vector-process';
+
 import { VectorPathCommandType } from '@/types/vector';
-import type { AnyVectorPathCommand, VectorPathCommand } from '@/types';
+import type { AnyVectorPathCommand, VectorPathCommand, VectorPathCommandMove, VectorPathCommandLine } from '@/types';
 
 export type SelectionAddShape = 'rectangle' | 'ellipse' | 'freePolygon' | 'lasso' | 'tonalArea';
 export type SelectionCombineMode = 'add' | 'subtract' | 'intersect' | 'replace';
@@ -42,7 +45,7 @@ export const selectedLayersSelectionMaskPreview = ref<InstanceType<typeof Image>
 export const selectedLayersSelectionMaskPreviewCanvasOffset = ref<DOMPoint>(new DOMPoint());
 export const selectionMaskDrawMargin = ref<number>(1);
 
-export const appliedSelectionPaths = ref<Array<VectorPathCommand[]>>([]);
+export const appliedSelectionPaths = ref<Array<Array<VectorPathCommandMove | VectorPathCommandLine>>>([]);
 export const activeSelectionPath = ref<Array<VectorPathCommand>>([]);
 
 export const selectionEmitter = mitt();
@@ -266,6 +269,58 @@ export async function createActiveSelectionMask(activeSelectionBounds: Selection
     ctx.fill();
     ctx.globalCompositeOperation = 'source-over';
     return workingCanvas;
+}
+
+export async function createAppliedSelectionPaths(
+    activeSelectionPathOverride: VectorPathCommand[] = activeSelectionPath.value,
+    appliedSelectionPathsOverride: Array<Array<VectorPathCommandMove | VectorPathCommandLine>> = appliedSelectionPaths.value,
+    selectionCombineModeOverride: SelectionCombineMode = selectionCombineMode.value,
+): Promise<Array<Array<VectorPathCommandMove | VectorPathCommandLine>>> {
+    let appliedSelectionPaths: Array<Array<VectorPathCommandMove | VectorPathCommandLine>> = JSON.parse(JSON.stringify(appliedSelectionPathsOverride));
+    if (activeSelectionPathOverride.length === 0) return appliedSelectionPaths;
+    if (appliedSelectionPaths.length === 0 && selectionCombineModeOverride !== 'subtract') {
+        appliedSelectionPaths = [
+            await pathToPolyline(activeSelectionPathOverride)
+        ];
+    } else {
+        const clipper = new Clipper();
+        if (appliedSelectionPaths.length === 0 && selectionCombineModeOverride === 'subtract') {
+            const canvasWidth = workingFileStore.get('width');
+            const canvasHeight = workingFileStore.get('height');
+            clipper.AddPath(
+                [{ x: 0, y: 0 }, { x: canvasWidth, y: 0 }, { x: canvasWidth, y: canvasHeight }, { x: 0, y: canvasHeight }],
+                PolyType.ptSubject,
+                true
+            );
+        } else {
+            for (const path of appliedSelectionPaths) {
+                clipper.AddPath(path, PolyType.ptSubject, true);
+            }
+        }
+        const clipPolyline = await pathToPolyline(activeSelectionPathOverride);
+        clipper.AddPath(clipPolyline, PolyType.ptClip, true);
+        const solution: Paths = [];
+        let clipType = ClipType.ctUnion;
+        if (selectionCombineModeOverride === 'subtract') {
+            clipType = ClipType.ctDifference;
+        } else if (selectionCombineModeOverride === 'intersect') {
+            clipType = ClipType.ctIntersection;
+        }
+        clipper.Execute(clipType, solution, PolyFillType.pftEvenOdd, PolyFillType.pftEvenOdd);
+        appliedSelectionPaths = [];
+        for (const paths of solution) {
+            const commands: Array<VectorPathCommandMove | VectorPathCommandLine> = [];
+            for (const [pointIndex, point] of paths.entries()) {
+                commands.push({
+                    type: pointIndex > 0 ? VectorPathCommandType.LINE : VectorPathCommandType.MOVE,
+                    x: point.x,
+                    y: point.y,
+                });
+            }
+            appliedSelectionPaths.push(commands);
+        };
+    }
+    return appliedSelectionPaths;
 }
 
 interface SourceImageCropOptions {

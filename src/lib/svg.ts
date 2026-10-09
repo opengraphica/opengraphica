@@ -6,7 +6,10 @@
 
 import { componentToHex } from '@/lib/color';
 
-import { VectorPathCommandType, type VectorPathCommand } from '@/types';
+import { VectorPathCommandType } from '@/types/vector';
+import type {
+    VectorPathCommandCubicBezierCurve, VectorPathCommandQuadraticBezierCurve, VectorPathCommand
+} from '@/types';
 
 const units = ['mm', 'cm', 'in', 'pt', 'pc', 'px'];
 
@@ -617,9 +620,7 @@ function parseArcCommand(rx: number, ry: number, xAxisRotation: number, largeArc
     };
 }
 
-export function parsePathNodeAttributes(node: Element, options?: ParseNodeGlobalOptions) {
-    const { defaultDPI, defaultUnit } = getDefaultParseNodeGlobalOptions(options);
-
+export function parseVectorPathCommand(dAttr: string | null): VectorPathCommand[] {
     const point = new DOMPoint();
     const control = new DOMPoint();
 
@@ -627,11 +628,9 @@ export function parsePathNodeAttributes(node: Element, options?: ParseNodeGlobal
     let isFirstPoint = true;
     let doSetFirstPoint = false;
 
-    const dAttr = node.getAttribute('d');
-
     const d: VectorPathCommand[] = [];
 
-    if (dAttr == null || dAttr === '' || dAttr === 'none') return { d };
+    if (dAttr == null || dAttr === '' || dAttr === 'none') return d;
 
     const commands = dAttr.match(/[a-df-z][^a-df-z]*/ig) ?? [];
 
@@ -1080,6 +1079,16 @@ export function parsePathNodeAttributes(node: Element, options?: ParseNodeGlobal
         doSetFirstPoint = false;
     }
 
+    return d;
+}
+
+export function parsePathNodeAttributes(node: Element, options?: ParseNodeGlobalOptions) {
+    const { defaultDPI, defaultUnit } = getDefaultParseNodeGlobalOptions(options);
+
+    const dAttr = node.getAttribute('d');
+
+    const d = parseVectorPathCommand(dAttr);
+
     return { d };
 }
 
@@ -1119,10 +1128,13 @@ export function serializeVectorPathCommand(current: VectorPathCommand, previous?
     }
 }
 
-export function serializeVectorPathCommands(commands: VectorPathCommand[]) {
+export function serializeVectorPathCommands(commands: VectorPathCommand[], close?: boolean) {
     let d = '';
     for (let i = 0; i < commands.length; i++) {
         d += ' ' + serializeVectorPathCommand(commands[i], commands[i - 1]);
+    }
+    if (close && commands[commands.length -1].type !== VectorPathCommandType.CLOSE) {
+        d += ' Z';
     }
     return d.trim();
 }
@@ -1161,6 +1173,53 @@ export async function generateSvgElementIds(document: Document) {
     for (const element of Array.from(elements)) {
         element.setAttribute('data-ogr-id', ancestralTagNameSelector(element));
     }
+}
+
+function quadraticCoordinateBounds(v0: number, v1: number, v2: number) {
+    const ts = [0, 1];
+    const denominator = v0 - 2 * v1 + v2;
+    if (Math.abs(denominator) > 1e-12) {
+        const t = (v0 - v1) / denominator;
+        if (t > 0 && t < 1) ts.push(t);
+    }
+    const values = ts.map(t => {
+        const u = 1 - t;
+        return u * u * v0 + 2 * u * t * v1 + t * t * v2;
+    });
+    return [Math.min(...values), Math.max(...values)];
+}
+
+function cubicCoordinateBounds(v0: number, v1: number, v2: number, v3: number) {
+    const a = -v0 + 3 * v1 - 3 * v2 + v3;
+    const b =  2 * (v0 - 2 * v1 + v2);
+    const c = v1 - v0;
+
+    const ts = [0, 1];
+    const eps = 1e-12;
+
+    if (Math.abs(a) < eps) {
+        if (Math.abs(b) >= eps) {
+            const t = -c / b;
+            if (t > 0 && t < 1) ts.push(t);
+        }
+    } else {
+        const discriminant = b * b - 4 * a * c;
+        if (discriminant >= 0) {
+            const root = Math.sqrt(discriminant);
+            const t1 = (-b - root) / (2 * a);
+            const t2 = (-b + root) / (2 * a);
+            if (t1 > 0 && t1 < 1) ts.push(t1);
+            if (t2 > 0 && t2 < 1) ts.push(t2);
+        }
+    }
+    const values = ts.map(t => {
+        const u = 1 - t;
+        return Math.pow(u, 3) * v0
+            + 3 * Math.pow(u, 2) * t * v1
+            + 3 * u * Math.pow(t, 2) * v2
+            + Math.pow(t, 3) * v3;
+    });
+    return [Math.min(...values), Math.max(...values)];
 }
 
 export function calculateShapeAabb(node: Element, transform: DOMMatrix, strokeWidth: number = 0, scaleX: number = 1, scaleY: number = 1): DOMRect | null {
@@ -1243,38 +1302,96 @@ export function calculateShapeAabb(node: Element, transform: DOMMatrix, strokeWi
             return new DOMRect(left - halfStrokeWidth, top - halfStrokeWidth, right - left + strokeWidth, bottom - top + strokeWidth);
         }
         case 'path': {
-            // TODO - this is simplified and inaccurate.
             let top = Infinity;
             let bottom = -Infinity;
             let left = Infinity;
             let right = -Infinity;
             const d = parsePathNodeAttributes(node).d;
-            const scrapPoint = new DOMPoint();
+            const current = new DOMPoint();
+            const control = new DOMPoint();
+            let boundMin: DOMPoint | undefined;
+            let boundMax: DOMPoint | undefined;
             let xfPoint = new DOMPoint();
             for (const command of d) {
                 switch (command.type) {
-                    case VectorPathCommandType.CUBIC_BEZIER_CURVE:
                     case VectorPathCommandType.ELLIPTICAL_ARC:
                     case VectorPathCommandType.LINE:
                     case VectorPathCommandType.MOVE:
-                    case VectorPathCommandType.QUADRATIC_BEZIER_CURVE:
-                    case VectorPathCommandType.SMOOTH_CUBIC_BEZIER_CURVE:
-                    case VectorPathCommandType.SMOOTH_QUADRATIC_BEZIER_CURVE:
-                        scrapPoint.x = command.x;
-                        scrapPoint.y = command.y;
+                        current.x = command.x;
+                        current.y = command.y;
+                        control.x = command.x;
+                        control.y = command.y;
                         break;
+                    case VectorPathCommandType.QUADRATIC_BEZIER_CURVE:
+                    case VectorPathCommandType.SMOOTH_QUADRATIC_BEZIER_CURVE: {
+                        const [minX, maxX] = quadraticCoordinateBounds(
+                            current.x,
+                            (command as VectorPathCommandQuadraticBezierCurve).x1 ?? getReflection(current.x, control.x),
+                            command.x,
+                        );
+                        const [minY, maxY] = quadraticCoordinateBounds(
+                            current.y,
+                            (command as VectorPathCommandQuadraticBezierCurve).y1 ?? getReflection(current.y, control.y),
+                            command.y,
+                        );
+                        boundMin = new DOMPoint(minX, minY);
+                        boundMax = new DOMPoint(maxX, maxY);
+                        current.x = command.x;
+                        current.y = command.y;
+                        control.x = (command as VectorPathCommandQuadraticBezierCurve).x1 ?? getReflection(current.x, control.x);
+                        control.y = (command as VectorPathCommandQuadraticBezierCurve).y1 ?? getReflection(current.y, control.y);
+                        break;
+                    }
+                    case VectorPathCommandType.CUBIC_BEZIER_CURVE:
+                    case VectorPathCommandType.SMOOTH_CUBIC_BEZIER_CURVE: {
+                        const [minX, maxX] = cubicCoordinateBounds(
+                            current.x,
+                            (command as VectorPathCommandCubicBezierCurve).x1 ?? getReflection(current.x, control.x),
+                            command.x2,
+                            command.x,
+                        );
+                        const [minY, maxY] = cubicCoordinateBounds(
+                            current.y,
+                            (command as VectorPathCommandCubicBezierCurve).y1 ?? getReflection(current.y, control.y),
+                            command.y2,
+                            command.y,
+                        );
+                        boundMin = new DOMPoint(minX, minY);
+                        boundMax = new DOMPoint(maxX, maxY);
+                        current.x = command.x;
+                        current.y = command.y;
+                        control.x = command.x2;
+                        control.y = command.y2;
+                        break;
+                    }
                     case VectorPathCommandType.HORIZONTAL_LINE:
-                        scrapPoint.x = command.x;
+                        current.x = command.x;
                         break;
                     case VectorPathCommandType.VERTICAL_LINE:
-                        scrapPoint.y = command.y;
+                        current.y = command.y;
                         break;
                 }
-                xfPoint = scrapPoint.matrixTransform(transform);
+                xfPoint = current.matrixTransform(transform);
                 if (xfPoint.y < top) top = xfPoint.y;
                 if (xfPoint.y > bottom) bottom = xfPoint.y;
                 if (xfPoint.x < left) left = xfPoint.x;
                 if (xfPoint.x > right) right = xfPoint.x;
+                if (boundMin) {
+                    boundMin = boundMin.matrixTransform(transform);
+                    if (boundMin.y < top) top = boundMin.y;
+                    if (boundMin.y > bottom) bottom = boundMin.y;
+                    if (boundMin.x < left) left = boundMin.x;
+                    if (boundMin.x > right) right = boundMin.x;
+                    boundMin = undefined;
+                }
+                if (boundMax) {
+                    boundMax = boundMax.matrixTransform(transform);
+                    if (boundMax.y < top) top = boundMax.y;
+                    if (boundMax.y > bottom) bottom = boundMax.y;
+                    if (boundMax.x < left) left = boundMax.x;
+                    if (boundMax.x > right) right = boundMax.x;
+                    boundMax = undefined;
+                }
             }
             return new DOMRect(left - halfStrokeWidth, top - halfStrokeWidth, right - left + strokeWidth, bottom - top + strokeWidth);
         }

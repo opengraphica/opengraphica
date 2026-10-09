@@ -5,16 +5,22 @@ import { t } from '@/i18n';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import { createStoredImage, getStoredImageCanvas, deleteStoredImage } from '@/store/image';
+import { createStoredSvg, getStoredSvgImage, deleteStoredSvg } from '@/store/svg';
 import workingFileStore, { getSelectedLayers } from '@/store/working-file';
-import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset } from '@/canvas/store/selection-state';
+import {
+    activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset,
+    createAppliedSelectionPaths,
+} from '@/canvas/store/selection-state';
 
 import appEmitter from '@/lib/emitter';
 import { cloneCanvas } from '@/lib/image';
 import { unexpectedErrorMessage } from '@/lib/notify';
 
+import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { ClearSelectionAction } from '@/actions/clear-selection';
 import { DeleteLayersAction } from '@/actions/delete-layers';
+import { DeleteLayerSelectionAreaAction } from '@/actions/delete-layer-selection-area';
 import { UpdateLayerAction } from '@/actions/update-layer';
 
 import { transferRendererTilesToRasterLayerUpdates, useRenderer } from '@/renderers';
@@ -52,6 +58,8 @@ export async function copySelectedLayers() {
     for (const layer of editorStore.get('clipboardBufferLayers')) {
         if (layer.type === 'raster') {
             deleteStoredImage(layer.data.sourceUuid);
+        } else if (layer.type === 'vector') {
+            deleteStoredSvg(layer.data.sourceUuid);
         }
     }
 
@@ -65,6 +73,12 @@ export async function copySelectedLayers() {
                 const imageClone = cloneCanvas(storedImage);
                 layerCopy.data.sourceUuid = await createStoredImage(imageClone);
             }
+        } else if (layerCopy.type === 'vector') {
+            const storedImage = await getStoredSvgImage(layerCopy.data.sourceUuid);
+            if (storedImage) {
+                layerCopy.data.sourceUuid = await createStoredSvg(storedImage);
+                layerCopy.data.sourceDocument = undefined;
+            }
         }
         clipboardBufferLayers.push(layerCopy);
     }
@@ -75,6 +89,7 @@ export async function copySelectedLayers() {
         ? activeSelectionMaskCanvasOffset.value : appliedSelectionMaskCanvasOffset.value;
     editorStore.set('clipboardBufferSelectionMask', selectionMask);
     editorStore.set('clipboardBufferSelectionMaskCanvasOffset', new DOMPoint(selectionMaskCanvasOffset.x, selectionMaskCanvasOffset.y));
+    editorStore.set('clipboardBufferSelectionPaths', await createAppliedSelectionPaths());
     try {
         const { exportAsImage } = await import(/* webpackChunkName: 'module-file-export' */ '../file/export');
         const exportOptions: ExportAsImageOptions = {
@@ -108,7 +123,7 @@ export async function cutSelectedLayers() {
 
     await copySelectedLayers();
     if (activeSelectionMask.value != null || appliedSelectionMask.value != null) {
-        const updateLayerActions: UpdateLayerAction<UpdateAnyLayerOptions<ColorModel>>[] = [];
+        const updateLayerActions: BaseAction[] = [];
         const selectedLayers = getSelectedLayers();
         for (const layer of selectedLayers) {
             if (layer.type === 'raster') {
@@ -122,6 +137,10 @@ export async function cutSelectedLayers() {
                             alreadyRendererd: true,
                         }
                     })
+                );
+            } else if (layer.type === 'vector') {
+                updateLayerActions.push(
+                    new DeleteLayerSelectionAreaAction([layer.id])
                 );
             }
         }

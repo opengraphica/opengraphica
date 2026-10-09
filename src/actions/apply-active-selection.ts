@@ -4,16 +4,14 @@ import imageDatabase from '@/store/data/image-history-database';
 import {
     appliedSelectionPaths, activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset,
     selectionMaskDrawMargin, activeSelectionPath, createActiveSelectionMask, getActiveSelectionBounds,
-    previewActiveSelectionMask, selectionCombineMode, SelectionCombineMode
+    previewActiveSelectionMask, selectionCombineMode, SelectionCombineMode,
+    createAppliedSelectionPaths,
 } from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 
-import { Clipper, PolyType, ClipType, Paths, PolyFillType } from '@/lib/clipper';
 import { createImageFromBlob } from '@/lib/image';
-import { pathToPolyline } from '@/lib/vector-process';
 
-import { VectorPathCommandType } from '@/types/vector';
 import type { VectorPathCommand } from '@/types';
 
 export class ApplyActiveSelectionAction extends BaseAction {
@@ -119,36 +117,7 @@ export class ApplyActiveSelectionAction extends BaseAction {
 
             // Merge selection paths
             this.oldAppliedSelectionPaths = JSON.parse(JSON.stringify(appliedSelectionPaths.value));
-            if (appliedSelectionPaths.value.length === 0) {
-                appliedSelectionPaths.value = [JSON.parse(JSON.stringify(activeSelectionPath.value))];
-            } else {
-                const clipper = new Clipper();
-                for (const path of appliedSelectionPaths.value) {
-                    const polyline = await pathToPolyline(path);
-                    clipper.AddPath(polyline, PolyType.ptSubject, true);
-                }
-                const clipPolyline = await pathToPolyline(activeSelectionPath.value);
-                clipper.AddPath(clipPolyline, PolyType.ptClip, true);
-                const solution: Paths = [];
-                let clipType = ClipType.ctUnion;
-                if (selectionCombineMode.value === 'subtract') {
-                    clipType = ClipType.ctDifference;
-                } else if (selectionCombineMode.value === 'intersect') {
-                    clipType = ClipType.ctIntersection;
-                }
-                clipper.Execute(clipType, solution, PolyFillType.pftEvenOdd, PolyFillType.pftEvenOdd);
-                appliedSelectionPaths.value = solution.map((paths) => {
-                    const commands: VectorPathCommand[] = [];
-                    for (const [pointIndex, point] of paths.entries()) {
-                        commands.push({
-                            type: pointIndex > 0 ? VectorPathCommandType.LINE : VectorPathCommandType.MOVE,
-                            x: point.x,
-                            y: point.y,
-                        });
-                    }
-                    return commands;
-                });
-            }
+            appliedSelectionPaths.value = await createAppliedSelectionPaths(this.activeSelectionPath, appliedSelectionPaths.value)
 
             if (!this.doNotClearActiveSelection) {
                 activeSelectionPath.value = [];
