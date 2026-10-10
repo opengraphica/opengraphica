@@ -363,8 +363,6 @@ async function parseLayersToActions(
             };
             parsedLayer.width = sourceImage.width;
             parsedLayer.height = sourceImage.height;
-        } else if (type === 'vectorPath') {
-            // Unused
         } else if (type === 'video') {
             if (!archive[src]) continue;
             let sourceUuid = await createStoredVideo(
@@ -541,7 +539,7 @@ function validateResolutionUnits(resolutionUnits: string): ResolutionUnits {
 
 function validateWorkingFileLayerType(workingFileLayerType: string): WorkingFileLayerType {
     if ([
-        'empty', 'gradient', 'group', 'raster', 'rasterSequence', 'vector', 'vectorPath', 'video', 'text'
+        'empty', 'gradient', 'group', 'raster', 'rasterSequence', 'vector', 'video', 'text'
     ].includes(workingFileLayerType)) {
         return workingFileLayerType as WorkingFileLayerType;
     }

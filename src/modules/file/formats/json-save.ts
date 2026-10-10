@@ -18,11 +18,11 @@ import type {
     SerializedFile, SerializedFileLayerMask,
     SerializedFileLayer, SerializedFileGradientLayer,
     SerializedFileGroupLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer,
-    SerializedFileVectorLayer, SerializedFileVectorPathLayer, SerializedFileVideoLayer,
+    SerializedFileVectorLayer, SerializedFileVideoLayer,
     SerializedFileTextLayer,
     WorkingFileLayer, WorkingFileGradientLayer, WorkingFileGroupLayer,
     WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer,
-    WorkingFileVectorPathLayer, WorkingFileVideoLayer, WorkingFileTextLayer,
+    WorkingFileVideoLayer, WorkingFileTextLayer,
 } from '@/types';
 
 export function serializeWorkingFile(): SerializedFile<ColorModel> {
@@ -137,13 +137,6 @@ function serializeWorkingFileLayers(layers: WorkingFileLayer<ColorModel>[]): Ser
                     )
                 }
             } as SerializedFileVectorLayer<ColorModel>;
-        }
-        else if (layer.type === 'vectorPath') {
-            serializedLayer = {
-                ...serializedLayer,
-                type: 'vectorPath',
-                data: (layer as WorkingFileVectorPathLayer<ColorModel>).data,
-            } as SerializedFileVectorPathLayer<ColorModel>;
         }
         else if (layer.type === 'video') {
             serializedLayer = {

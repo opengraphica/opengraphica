@@ -194,7 +194,7 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
 
                 // Convert shapes to polylines, intersect, convert back to simplified bezier curves.
                 const scrapPoint = new DOMPoint();
-                svgDocument = layer.data.sourceDocument ?? await getStoredSvgDocument(layer.data.sourceUuid);
+                svgDocument = await getStoredSvgDocument(layer.data.sourceUuid);
                 allShapes = Array.from(svgDocument.querySelectorAll('[data-ogr-id]'));
                 for (const shapeIndex of clipSubjectShapeIndices) {
                     const shape = allShapes[shapeIndex];

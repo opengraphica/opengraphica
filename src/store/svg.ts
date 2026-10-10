@@ -115,3 +115,27 @@ export function unreserveStoredSvg(uuid: string, userId: string) {
     }
 }
 
+/**
+ * Creates a full deep copy of an existing stored SVG
+ * @param uuid - ID of the database entry for the svg
+ * @returns New ID of the copy
+ */
+export async function cloneStoredSvg(uuid?: string): Promise<string> {
+    const svgDocument = await getStoredSvgDocument(uuid);
+
+    const serializer = new XMLSerializer();
+    const svgText = serializer.serializeToString(svgDocument);
+    const blob = new Blob([svgText], {
+        type: 'image/svg+xml',
+    });
+
+    const url = URL.createObjectURL(blob);
+    const image = new Image()
+    await new Promise((resolve) => {
+        image.onload = resolve;
+        image.onerror = resolve;
+        image.src = url;
+    });
+
+    return await createStoredSvg(image);
+}

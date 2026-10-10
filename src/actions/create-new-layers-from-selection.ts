@@ -1,15 +1,32 @@
-import { BaseAction } from './base';
-import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset, selectionMaskDrawMargin } from '@/canvas/store/selection-state';
+import cloneDeep from 'lodash/cloneDeep';
+
+import {
+    activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset,
+    createAppliedSelectionPaths,
+} from '@/canvas/store/selection-state';
 import canvasStore from '@/store/canvas';
 import { createStoredImage } from '@/store/image';
-import workingFileStore, { getCanvasRenderingContext2DSettings, getSelectedLayers, ensureUniqueLayerSiblingName, getLayerById } from '@/store/working-file';
+import { cloneStoredSvg } from '@/store/svg';
+import workingFileStore, {
+    getCanvasRenderingContext2DSettings, getSelectedLayers, ensureUniqueLayerSiblingName, getLayerById,
+} from '@/store/working-file';
 import { updateWorkingFile, updateWorkingFileLayer, deleteWorkingFileLayer } from '@/store/data/working-file-database';
-import { createImageFromCanvas, getImageDataFromImage, getImageDataEmptyBounds } from '@/lib/image';
+
+import { getImageDataFromImage, getImageDataEmptyBounds } from '@/lib/image';
+
+import { BaseAction } from './base';
 import { ClearSelectionAction } from './clear-selection';
+import { DeleteLayerSelectionAreaAction } from './delete-layer-selection-area';
 import { InsertLayerAction } from './insert-layer';
 import { SelectLayersAction } from './select-layers';
+
 import renderers from '@/canvas/renderers';
-import { WorkingFileLayer, ColorModel, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, InsertRasterLayerOptions } from '@/types';
+
+import {
+    ColorModel, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, InsertRasterLayerOptions,
+    InsertVectorLayerOptions,
+    VectorPathCommandMove, VectorPathCommandLine,
+} from '@/types';
 
 interface CreateNewLayersFromSelectionOptions {
     clearSelection?: boolean;
@@ -21,8 +38,11 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
     private selectNewLayers: 'replace' | 'combine' | 'none' = 'none';
     private clearSelection: boolean = false;
 
+    private appliedSelectionPaths: Array<Array<VectorPathCommandMove | VectorPathCommandLine>> = [];
     private clearSelectionAction: ClearSelectionAction | null = null;
     private insertLayerActions: InsertLayerAction<any>[] = [];
+    private insertVectorLayerIndices: Set<number> = new Set();
+    private deleteSelectionAreaActions: DeleteLayerSelectionAreaAction[] = [];
     private selectLayersAction: SelectLayersAction | null = null;
     private insertedLayerIds: number[] = [];
 
@@ -54,6 +74,7 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
             }
             const selectionOffset: DOMPoint = (selectionMask === activeSelectionMask.value ? activeSelectionMaskCanvasOffset.value : appliedSelectionMaskCanvasOffset.value);
             const selectionBounds = getImageDataEmptyBounds(getImageDataFromImage(selectionMask));
+
             const workingCanvas = document.createElement('canvas');
             workingCanvas.width = selectionBounds.right - selectionBounds.left;
             workingCanvas.height = selectionBounds.bottom - selectionBounds.top;
@@ -99,6 +120,23 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
                             }
                         })
                     );
+                } else if (layer.type === 'vector') {
+                    if (this.appliedSelectionPaths.length === 0) {
+                        this.appliedSelectionPaths = await createAppliedSelectionPaths();
+                    }
+                    this.insertLayerActions.push(
+                        new InsertLayerAction<InsertVectorLayerOptions<ColorModel>>({
+                            type: 'vector',
+                            name: ensureUniqueLayerSiblingName(layer.id, layer.name + ' - Selection Copy'),
+                            width: layer.width,
+                            height: layer.height,
+                            transform: new DOMMatrix().multiply(layer.transform),
+                            data: {
+                                sourceUuid: await cloneStoredSvg(layer.data.sourceUuid),
+                            }
+                        })
+                    );
+                    this.insertVectorLayerIndices.add(this.insertLayerActions.length - 1);
                 }
             }
         }
@@ -121,6 +159,23 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
             this.insertedLayerIds.push(insertLayerAction.insertedLayerId);
             this.freeEstimates.memory += insertLayerAction.freeEstimates.memory;
             this.freeEstimates.database += insertLayerAction.freeEstimates.database;
+        }
+
+        if (this.insertVectorLayerIndices.size > 0 && this.deleteSelectionAreaActions.length === 0) {
+            for (const index of Array.from(this.insertVectorLayerIndices)) {
+                this.deleteSelectionAreaActions.push(new DeleteLayerSelectionAreaAction(
+                    [this.insertedLayerIds[index]],
+                    {
+                        selectionCombineMode: 'intersect',
+                        appliedSelectionPaths: this.appliedSelectionPaths,
+                    },
+                ));
+            }
+        }
+        for (const deleteSelectionAreaAction of this.deleteSelectionAreaActions) {
+            await deleteSelectionAreaAction.do();
+            this.freeEstimates.memory += deleteSelectionAreaAction.freeEstimates.memory;
+            this.freeEstimates.database += deleteSelectionAreaAction.freeEstimates.database;
         }
 
         if (this.selectNewLayers !== 'none') {
@@ -157,6 +212,12 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
 
         this.freeEstimates.memory = 0;
         this.freeEstimates.database = 0;
+
+        for (const deleteSelectionAreaAction of this.deleteSelectionAreaActions.slice().reverse()) {
+            await deleteSelectionAreaAction.undo();
+            this.freeEstimates.memory += deleteSelectionAreaAction.freeEstimates.memory;
+            this.freeEstimates.database += deleteSelectionAreaAction.freeEstimates.database;
+        }
 
         for (const insertLayerAction of this.insertLayerActions.slice().reverse()) {
             await insertLayerAction.undo();

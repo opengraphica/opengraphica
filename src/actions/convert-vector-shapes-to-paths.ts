@@ -159,6 +159,7 @@ export class ConvertVectorShapesToPathsAction extends BaseAction {
                 sourceUuid: await createStoredSvg(image),
             },
         });
+        await this.updateLayerAction.do();
         this.freeEstimates.memory = this.updateLayerAction.memoryEstimate;
         this.freeEstimates.database = this.updateLayerAction.databaseEstimate;
     }

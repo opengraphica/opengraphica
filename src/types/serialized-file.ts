@@ -88,11 +88,6 @@ export interface SerializedFileVectorLayer<T extends ColorModel = ColorModel> ex
     }
 }
 
-export interface SerializedFileVectorPathLayer<T extends ColorModel = ColorModel> extends SerializedFileLayer<T> {
-    type: 'vectorPath';
-    data: VectorPathShape<ColorModel>;
-}
-
 export interface SerializedFileVideoLayer<T extends ColorModel = ColorModel> extends SerializedFileLayer<T> {
     type: 'video';
     data: {

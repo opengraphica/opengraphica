@@ -288,8 +288,6 @@ async function generateLayer(
                 })
             );
         }
-    } else if (layer.type === 'vectorPath') {
-        // Unused
     } else if (layer.type === 'video') {
         const storedVideo = await getStoredVideo(layer.data.sourceUuid);
         if (storedVideo) {

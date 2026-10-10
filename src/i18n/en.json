@@ -8,6 +8,7 @@
         "clearSelection": "Clear Selection",
         "convertLayersToCollage": "Convert Layers to Collage",
         "convertLayersToImageSequence": "Convert Layers to Image Sequence",
+        "convertVectorShapesToPaths": "Convert Shape to Path",
         "createDrawLayer": "Create Draw Layer",
         "createDrawGradientLayer": "Create Gradient Layer",
         "createNewFile": "New File",

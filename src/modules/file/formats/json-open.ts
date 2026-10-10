@@ -12,12 +12,12 @@ import type {
     ColorModel, InsertAnyLayerOptions,
     SerializedFile, SerializedFileLayer, SerializedFileGradientLayer,
     SerializedFileGroupLayer, SerializedFileRasterLayer, SerializedFileRasterSequenceLayer,
-    SerializedFileVectorLayer, SerializedFileVectorPathLayer, SerializedFileVideoLayer,
+    SerializedFileVectorLayer, SerializedFileVideoLayer,
     SerializedFileTextLayer,
     WorkingFileLayer, WorkingFileLayerMask,
     WorkingFileEmptyLayer, WorkingFileGradientLayer, WorkingFileGroupLayer,
     WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer,
-    WorkingFileVectorPathLayer, WorkingFileVideoLayer, WorkingFileTextLayer,
+    WorkingFileVideoLayer, WorkingFileTextLayer,
 } from '@/types';
 
 export async function parseSerializedFileToActions(
@@ -153,13 +153,6 @@ async function parseLayersToActions(layers: SerializedFileLayer<ColorModel>[]): 
                     sourceUuid: image ? await createStoredSvg(image) : undefined,
                 },
             } as WorkingFileVectorLayer<ColorModel>;
-        }
-        else if (layer.type === 'vectorPath') {
-            parsedLayer = {
-                ...parsedLayer,
-                type: 'vectorPath',
-                data: (layer as SerializedFileVectorPathLayer<ColorModel>).data,
-            } as WorkingFileVectorPathLayer<ColorModel>;
         }
         else if (layer.type === 'video') {
             const serializedLayer = layer as SerializedFileVideoLayer<ColorModel>;

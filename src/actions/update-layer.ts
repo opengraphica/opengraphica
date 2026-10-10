@@ -12,7 +12,7 @@ import {
     getStoredImageOrCanvas, createStoredImage, deleteStoredImage,
     prepareStoredImageForEditing, prepareStoredImageForArchival, reserveStoredImage, unreserveStoredImage
 } from '@/store/image';
-import { reserveStoredSvg, unreserveStoredSvg } from '@/store/svg';
+import { getStoredSvgDocument, reserveStoredSvg, unreserveStoredSvg } from '@/store/svg';
 import { reserveStoredVideo, unreserveStoredVideo } from '@/store/video';
 import workingFileStore, { calculateLayerOrder, getLayerById, regenerateLayerThumbnail, getCanvasRenderingContext2DSettings, visibleLayerIds } from '@/store/working-file';
 import { updateWorkingFileLayer } from '@/store/data/working-file-database';
@@ -172,7 +172,7 @@ export class UpdateLayerAction<LayerOptions extends UpdateAnyLayerOptions<ColorM
                     if ((this.explicitPreviousProps as any)?.data?.sourceDocument) {
                         layer.data.sourceDocument = layer.data.sourceDocument;
                     } else if (editorStore.state.activeTool === 'shape') {
-                        if (layer.data.sourceDocument) {
+                        if (newSourceUuid && newSourceUuid !== oldSourceUuid && layer.data.sourceDocument) {
                             const sourceDocument = layer.data.sourceDocument;
                             layer.data.sourceDocument = undefined;
                             await nextTick();
