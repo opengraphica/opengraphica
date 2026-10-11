@@ -657,6 +657,14 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         });
     }
 
+    getLayerWidth() {
+        return this.width;
+    }
+
+    getLayerHeight() {
+        return this.height;
+    }
+
     getTexture() {
         return Promise.resolve(this.sourceTexture ?? null);
     }

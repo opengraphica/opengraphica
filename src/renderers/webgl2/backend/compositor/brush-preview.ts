@@ -1,5 +1,6 @@
 import { ClampToEdgeWrapping, RGBAFormat, SRGBColorSpace, NearestFilter } from 'three/src/constants';
 import { Matrix4 } from 'three/src/math/Matrix4';
+import { Vector2 } from 'three/src/math/Vector2';
 import { Vector4 } from 'three/src/math/Vector4';
 import { WebGLRenderTarget } from 'three/src/renderers/WebGLRenderTarget';
 
@@ -130,6 +131,7 @@ export class BrushPreview {
             undefined,
             originalViewport,
             this.renderTarget.texture,
+            new Vector2(this.renderTarget.texture.width, this.renderTarget.texture.height),
             new Matrix4(),
             {
                 layerId: -1,

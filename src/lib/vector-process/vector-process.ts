@@ -9,6 +9,7 @@ import wasmLoadModule, {
 } from './build/vector_process_wasm';
 
 import { Clipper, PolyType, ClipType, Paths, PolyFillType } from '@/lib/clipper';
+import { clockwiseAngle2d, isEqualApprox } from '@/lib/math';
 import { serializeVectorPathCommands, parseVectorPathCommand } from '@/lib/svg';
 
 import { type BrushDefinition, type VectorPathCommand, type VectorPathCommandMove, type VectorPathCommandLine, VectorPathCommandType } from '@/types';
@@ -21,18 +22,29 @@ async function waitForWasmReady() {
     }
 }
 
-export async function pathToPolyline(
+export async function pathToPolylines(
     path: string | VectorPathCommand[],
-): Promise<Array<VectorPathCommandMove | VectorPathCommandLine>> {
+): Promise<Array<Array<VectorPathCommandMove | VectorPathCommandLine>>> {
     await waitForWasmReady();
 
     const pathCommand = typeof path === 'string' ? path : serializeVectorPathCommands(path);
 
     const polylineCommand = wasmPathToPolyline(pathCommand);
 
-    const polyline = parseVectorPathCommand(polylineCommand) as Array<VectorPathCommandMove | VectorPathCommandLine>;
-
-    return polyline;
+    const polylines: Array<Array<VectorPathCommandMove | VectorPathCommandLine>> = [];
+    let currentPolyline: Array<VectorPathCommandMove | VectorPathCommandLine> = [];
+    for (const command of parseVectorPathCommand(polylineCommand)) {
+        if (command.type !== VectorPathCommandType.CLOSE) {
+            currentPolyline.push(command as VectorPathCommandMove | VectorPathCommandLine);
+        } else {
+            polylines.push(currentPolyline);
+            currentPolyline = [];
+        }
+    }
+    if (currentPolyline.length > 0) {
+        polylines.push(currentPolyline);
+    }
+    return polylines;
 }
 
 export async function polylineToSimplifiedPath(
@@ -73,8 +85,8 @@ export async function createPathBrushStroke(
     await waitForWasmReady();
 
     const index = brushStrokeIterator++;
-    const polyline = await pathToPolyline(path);
-    brushStrokes[index] = [polyline];
+    const polylines = await pathToPolylines(path);
+    brushStrokes[index] = polylines;
 
     return index;
 }
@@ -83,12 +95,14 @@ export async function movePathBrushStroke(
     strokeIndex: number,
     path: string,
 ): Promise<void> {
+    const clipPolylines = await pathToPolylines(path);
     const clipper = new Clipper();
     for (const path of brushStrokes[strokeIndex]) {
         clipper.AddPath(path, PolyType.ptSubject, true);
     }
-    const clipPolyline = await pathToPolyline(path);
-    clipper.AddPath(clipPolyline, PolyType.ptClip, true);
+    for (const clipPolyline of clipPolylines) {
+        clipper.AddPath(clipPolyline, PolyType.ptClip, true);
+    }
     const solution: Paths = [];
     clipper.Execute(ClipType.ctUnion, solution, PolyFillType.pftEvenOdd, PolyFillType.pftEvenOdd);
     brushStrokes[strokeIndex] = solution;
@@ -113,7 +127,7 @@ export async function stopPathBrushStroke(
     return paths;
 }
 
-export function createBrushShapePath(
+export function createBrushShapePathCap(
     cx: number,
     cy: number,
     shape: BrushDefinition['shape'],
@@ -137,15 +151,143 @@ export function createBrushShapePath(
         }
         return d;
     } else if (shape === 'square') {
-        // TODO - rotation
-        let r = size / 2;
+        const r = size / 2;
+        const cos = Math.cos(rotation);
+        const sin = Math.sin(rotation);
+        const points = [
+            [-r, -r],
+            [ r, -r],
+            [ r,  r],
+            [-r,  r],
+            [-r,  -r],
+        ].map(([x, y]) => [
+            cx + x * cos - y * sin,
+            cy + x * sin + y * cos,
+        ]);
         return [
-            `M ${cx - r},${cy - r}`,
-            `L ${cx + r},${cy - r}`,
-            `L ${cx + r},${cy + r}`,
-            `L ${cx - r},${cy + r}`,
+            `M ${points[0][0]},${points[0][1]}`,
+            ...points.slice(1).map(([x, y]) => `L ${x},${y}`),
             'Z',
         ].join(' ');
     }
+    return '';
+}
+
+type Point = { x: number; y: number };
+
+function quarterArc(
+    x: number,
+    y: number,
+    radius: number,
+    startAngle: number,
+    k: number,
+): string {
+    const endAngle = startAngle + Math.PI / 2;
+    const controlDistance = k * radius;
+
+    const startX = x + radius * Math.cos(startAngle);
+    const startY = y + radius * Math.sin(startAngle);
+    const endX = x + radius * Math.cos(endAngle);
+    const endY = y + radius * Math.sin(endAngle);
+
+    const control1X = startX - controlDistance * Math.sin(startAngle);
+    const control1Y = startY + controlDistance * Math.cos(startAngle);
+    const control2X = endX + controlDistance * Math.sin(endAngle);
+    const control2Y = endY - controlDistance * Math.cos(endAngle);
+
+    return `C ${control1X},${control1Y} ${control2X},${control2Y} ${endX},${endY}`;
+};
+
+function getSquareCorners(x: number, y: number, squareSize: number, angle: number): Point[] {
+    const half = squareSize / 2;
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+
+    return [
+        [-half, -half],
+        [half, -half],
+        [half, half],
+        [-half, half],
+    ].map(([localX, localY]) => ({
+        x: x + localX * cos - localY * sin,
+        y: y + localX * sin + localY * cos,
+    }));
+};
+
+function cross(o: Point, a: Point, b: Point) {
+    return (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
+}
+
+export function createBrushShapePathLine(
+    cx: number,
+    cy: number,
+    prevCx: number,
+    prevCy: number,
+    prevPrevCx: number,
+    prevPrevCy: number,
+    shape: BrushDefinition['shape'],
+    size: number,
+    prevSize: number,
+    rotation: number,
+    prevRotation: number,
+): string {
+    const pathAngle = clockwiseAngle2d(cx, cy, prevCx, prevCy);
+    const prevPathAngle = (isEqualApprox(prevCx, prevPrevCx) && isEqualApprox(prevCy, prevPrevCy))
+        ? pathAngle
+        : clockwiseAngle2d(prevCx, prevCy, prevPrevCx, prevPrevCy);
+
+    if (shape === 'circle') {
+        const k = 0.5522847498307936;
+
+        const r1 = size / 2;
+        const r2 = prevSize / 2;
+
+        const path = [
+            `M ${cx - r1 * Math.cos(pathAngle)},${cy - r1 * Math.sin(pathAngle)}`,
+            quarterArc(cx, cy, r1, pathAngle + Math.PI, k),
+            `L ${prevCx + r2 * Math.sin(prevPathAngle)},${prevCy - r2 * Math.cos(prevPathAngle)}`,
+            quarterArc(prevCx, prevCy, r2, prevPathAngle - Math.PI / 2, k),
+            quarterArc(prevCx, prevCy, r2, prevPathAngle, k),
+            `L ${cx - r1 * Math.sin(pathAngle)},${cy + r1 * Math.cos(pathAngle)}`,
+            quarterArc(cx, cy, r1, pathAngle + Math.PI / 2, k),
+            'Z',
+        ].join(' ');
+
+        return path;
+    } else if (shape === 'square') {
+
+        const points = [
+            ...getSquareCorners(cx, cy, size, rotation),
+            ...getSquareCorners(prevCx, prevCy, prevSize, prevRotation),
+        ].sort((a, b) => a.x - b.x || a.y - b.y);
+
+        const lower: Point[] = [];
+        for (const point of points) {
+            while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], point) <= 0) {
+                lower.pop();
+            }
+            lower.push(point);
+        }
+
+        const upper: Point[] = [];
+        for (const point of [...points].reverse()) {
+            while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], point) <= 0) {
+                upper.pop();
+            }
+            upper.push(point);
+        }
+
+        const hull = [...lower.slice(0, -1), ...upper.slice(0, -1)];
+
+        const path = [
+            `M ${hull[0].x},${hull[0].y}`,
+            ...hull.slice(1).map(({ x, y }) => `L ${x},${y}`),
+            `L ${hull[0].x},${hull[0].y}`,
+            'Z',
+        ].join(' ');
+
+        return path;
+    }
+
     return '';
 }

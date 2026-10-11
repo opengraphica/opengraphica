@@ -37,6 +37,7 @@ export class Compositor {
 
     startBrushStroke(
         texture: Texture<ImageBitmap>,
+        layerSize: Vector2,
         layerTransform: Matrix4,
         settings: RendererBrushStrokeSettings,
     ): number {
@@ -46,6 +47,7 @@ export class Compositor {
             this.selectionMask,
             this.originalViewport,
             texture,
+            layerSize,
             layerTransform,
             settings,
         ));

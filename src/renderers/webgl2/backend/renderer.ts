@@ -652,6 +652,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         this.compositorBrushStrokes.set(settings.layerId,
             this.compositor.startBrushStroke(
                 texture,
+                new Vector2(meshController.getLayerWidth(), meshController.getLayerHeight()),
                 transform,
                 settings,
             )

@@ -53,6 +53,7 @@ export class BrushStroke {
     renderer!: WebGLRenderer;
     selectionMask: SelectionMask | undefined;
     texture!: Texture<ImageBitmap>;
+    layerSize!: Vector2;
     layerTransform!: Matrix4;
     layerTransformInverse!: Matrix4;
 
@@ -116,6 +117,7 @@ export class BrushStroke {
         selectionMask: SelectionMask | undefined,
         originalViewport: Vector4,
         texture: Texture<ImageBitmap>,
+        layerSize: Vector2,
         layerTransform: Matrix4,
         settings: RendererBrushStrokeSettings,
     ) {
@@ -123,6 +125,7 @@ export class BrushStroke {
         this.selectionMask = selectionMask;
         this.originalViewport = originalViewport;
         this.texture = texture;
+        this.layerSize = layerSize;
         this.layerTransform = layerTransform;
         this.layerTransformInverse = layerTransform.clone().invert();
         this.blendingMode = settings.blendingMode ?? this.blendingMode;
@@ -406,20 +409,38 @@ export class BrushStroke {
         colorBlendingStrength: number,
         concentration: number,
     ) {
-        let bearing = Math.atan2(this.y - y, (x - this.x));
+        let bearing = Math.atan2(this.y - y, x - this.x);
         if (bearing < 0) bearing += 2 * Math.PI;
         this.x = x;
         this.y = y;
         this.brushMinConcentration = Math.min(this.brushMinConcentration, concentration);
+
+        const textureScale = new Vector3(
+            this.texture.width / this.layerSize.x,
+            this.texture.height / this.layerSize.y,
+            1.0,
+        );
 
         const brushSize = size;
         const brushLeft = x - brushSize / 2;
         const brushTop = y - brushSize / 2;
 
         const p0 = this._v30.set(brushLeft, brushTop, 0.0).applyMatrix4(this.layerTransformInverse);
+        p0.x *= textureScale.x;
+        p0.y *= textureScale.y;
+
         const p1 = this._v31.set(brushLeft + brushSize, brushTop, 0.0).applyMatrix4(this.layerTransformInverse);
+        p1.x *= textureScale.x;
+        p1.y *= textureScale.y;
+
         const p2 = this._v32.set(brushLeft, brushTop + brushSize, 0.0).applyMatrix4(this.layerTransformInverse);
+        p2.x *= textureScale.x;
+        p2.y *= textureScale.y;
+
         const p3 = this._v33.set(brushLeft + brushSize, brushTop + brushSize, 0.0).applyMatrix4(this.layerTransformInverse);
+        p3.x *= textureScale.x;
+        p3.y *= textureScale.y;
+
         const aabb = this.aabb;
         aabb.min.x = Math.min(p0.x, p1.x, p2.x, p3.x);
         aabb.min.y = Math.min(p0.y, p1.y, p2.y, p3.y);
@@ -429,10 +450,23 @@ export class BrushStroke {
         const cullSize = brushSize * Math.SQRT2;
         const cullLeft = x - cullSize / 2;
         const cullTop = y - cullSize / 2;
+
         const c0 = this._v30.set(cullLeft, cullTop, 0.0).applyMatrix4(this.layerTransformInverse);
+        c0.x *= textureScale.x;
+        c0.y *= textureScale.y;
+
         const c1 = this._v31.set(cullLeft + cullSize, cullTop, 0.0).applyMatrix4(this.layerTransformInverse);
+        c1.x *= textureScale.x;
+        c1.y *= textureScale.y;
+
         const c2 = this._v32.set(cullLeft, cullTop + cullSize, 0.0).applyMatrix4(this.layerTransformInverse);
+        c2.x *= textureScale.x;
+        c2.y *= textureScale.y;
+
         const c3 = this._v33.set(cullLeft + cullSize, cullTop + cullSize, 0.0).applyMatrix4(this.layerTransformInverse);
+        c3.x *= textureScale.x;
+        c3.y *= textureScale.y;
+
         const cullAabb = this.cullAabb;
         cullAabb.min.x = Math.min(c0.x, c1.x, c2.x, c3.x);
         cullAabb.min.y = Math.min(c0.y, c1.y, c2.y, c3.y);
@@ -447,8 +481,12 @@ export class BrushStroke {
         let tileHeight = 0;
         let brushRenderTarget: WebGLRenderTarget;
 
-        // Find the average color under the brush stamp
-        const activeBrushColorRenderTarget = this.inactiveBrushColorRenderTarget == this.brushColorRenderTarget1 ? this.brushColorRenderTarget2 : this.brushColorRenderTarget1;
+        // Find the average color under the brush stamp.
+        const activeBrushColorRenderTarget =
+            this.inactiveBrushColorRenderTarget === this.brushColorRenderTarget1
+                ? this.brushColorRenderTarget2
+                : this.brushColorRenderTarget1;
+
         this.mesh.material = this.sampleBrushColorMaterial;
         this.sampleBrushColorMaterial.uniforms.previousColorMap.value = this.inactiveBrushColorRenderTarget.texture;
         this.sampleBrushColorMaterial.uniforms.tileOffsetAndSize.value.x = aabb.min.x / this.texture.image.width;
@@ -464,10 +502,13 @@ export class BrushStroke {
         this.renderer.setRenderTarget(activeBrushColorRenderTarget);
         this.renderer.clearColor();
         this.renderer.render(this.scene, this.camera);
-        this.inactiveBrushColorRenderTarget = (this.inactiveBrushColorRenderTarget == this.brushColorRenderTarget1) ? this.brushColorRenderTarget2 : this.brushColorRenderTarget1;
 
-        // Loop through each tile and render tiles affected by the brush stamp
-        let count = 0;
+        this.inactiveBrushColorRenderTarget =
+            this.inactiveBrushColorRenderTarget === this.brushColorRenderTarget1
+                ? this.brushColorRenderTarget2
+                : this.brushColorRenderTarget1;
+
+        // Loop through each tile and render tiles affected by the brush stamp.
         for (xi = 0; xi < this.xTileCount; xi++) {
             tileX = xi * this.tileSize;
             tileWidth = Math.min(this.tileSize, this.texture.image.width - tileX);
@@ -480,8 +521,6 @@ export class BrushStroke {
 
                 if (tileY + tileHeight < cullAabb.min.y || tileY > cullAabb.max.y) continue;
 
-                count++;
-
                 brushRenderTarget = this.createBrushTextureRenderTarget(
                     xi,
                     yi,
@@ -492,10 +531,15 @@ export class BrushStroke {
                 // Set up brush material
                 this.mesh.material = this.brushMaterial;
 
-                const brushTileOffsetX = (tileX - brushLeft) / brushSize;
-                const brushTileOffsetY = (tileY - brushTop) / brushSize;
-                const brushTileScaleX = (tileWidth / brushSize);
-                const brushTileScaleY = (tileHeight / brushSize);
+                const tileLeftInLayer = tileX / textureScale.x;
+                const tileTopInLayer = tileY / textureScale.y;
+                const tileWidthInLayer = tileWidth / textureScale.x;
+                const tileHeightInLayer = tileHeight / textureScale.y;
+
+                const brushTileOffsetX = (tileLeftInLayer - brushLeft) / brushSize;
+                const brushTileOffsetY = (tileTopInLayer - brushTop) / brushSize;
+                const brushTileScaleX = tileWidthInLayer / brushSize;
+                const brushTileScaleY = tileHeightInLayer / brushSize;
 
                 this.brushMaterial.uniforms.brushStrokeMap.value = brushRenderTarget.texture;
                 this.brushMaterial.uniforms.brushColorMap.value = activeBrushColorRenderTarget.texture;
@@ -504,9 +548,12 @@ export class BrushStroke {
                 this.brushMaterial.uniforms.tileOffsetAndSize.value.z = 1;
                 this.brushMaterial.uniforms.tileOffsetAndSize.value.w = 1;
 
-                this._v30.x = -brushLeft / brushSize;
-                this._v30.y = 1.0 + (brushTop / brushSize);
-                this._v30.z = 0.0;
+                this._v30.set(
+                    -brushLeft / brushSize,
+                    1.0 + brushTop / brushSize,
+                    0.0,
+                );
+
                 const tileTransformReset = this._m0.identity()
                     .multiply(
                         this._m1.makeTranslation(this._v30)
@@ -516,50 +563,44 @@ export class BrushStroke {
                             1.0 / brushSize,
                             -1.0 / brushSize,
                             1.0,
-                        )
+                        ),
                     );
+
                 const tileTransformResetInverse = this._m1.copy(tileTransformReset).invert();
 
-                this._v30.x = brushTileOffsetX;
-                this._v30.y = 1.0 - brushTileOffsetY - brushTileScaleY;
-                this._v30.z = 1.0;
+                this._v30.set(
+                    brushTileOffsetX,
+                    1.0 - brushTileOffsetY - brushTileScaleY,
+                    1.0,
+                );
+
                 (this.brushMaterial.uniforms.brushTransform.value as Matrix4)
                     .identity()
-                    .multiply(
-                        this._m2.makeTranslation(0.5, 0.5, 0.0)
-                    )
-                    .multiply(
-                        this._m2.makeRotationZ(angle)
-                    )
-                    .multiply(
-                        this._m2.makeTranslation(-0.5, -0.5, 0.0)
-                    )
+                    .multiply(this._m2.makeTranslation(0.5, 0.5, 0.0))
+                    .multiply(this._m2.makeRotationZ(angle))
+                    .multiply(this._m2.makeTranslation(-0.5, -0.5, 0.0))
                     .multiply(tileTransformReset)
-                    .multiply(
-                        this.layerTransform
-                    )
+                    .multiply(this.layerTransform)
                     .multiply(tileTransformResetInverse)
-                    .multiply(
-                        this._m2.makeTranslation(this._v30)
-                    )
+                    .multiply(this._m2.makeTranslation(this._v30))
                     .multiply(
                         this._m2.makeScale(
                             brushTileScaleX,
                             brushTileScaleY,
                             1.0,
-                        )
+                        ),
                     );
 
                 this.brushMaterial.uniformsNeedUpdate = true;
-                
-                // Render brush tile
+
+                // Render the brush tile.
                 const brushBlendRenderTarget = this.createBrushBlendRenderTarget(tileWidth, tileHeight);
                 this.renderer.setViewport(0, 0, tileWidth, tileHeight);
                 this.renderer.setRenderTarget(brushBlendRenderTarget);
                 this.renderer.clearColor();
                 this.renderer.render(this.scene, this.camera);
-                
-                // Copy brush render result back to the brush render target
+
+                // Copy the brush render result back to the brush render target.
                 this.mesh.material = this.copyTileMaterial;
                 this.copyTileMaterial.uniforms.map.value = brushBlendRenderTarget.texture;
                 this.copyTileMaterial.uniforms.tileOffsetAndSize.value.x = 0;
@@ -580,6 +621,7 @@ export class BrushStroke {
         this.renderer.setViewport(this.originalViewport);
         markRenderDirty();
     }
+
 
     composite() {
         let destinationRenderTarget: WebGLRenderTarget;

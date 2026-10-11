@@ -9,7 +9,7 @@ import { PerformantStore } from '@/store/performant-store';
 import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 
 import { Clipper, PolyType, ClipType, Paths, PolyFillType } from '@/lib/clipper';
-import { pathToPolyline } from '@/lib/vector-process';
+import { pathToPolylines } from '@/lib/vector-process';
 
 import { VectorPathCommandType } from '@/types/vector';
 import type { AnyVectorPathCommand, VectorPathCommand, VectorPathCommandMove, VectorPathCommandLine } from '@/types';
@@ -279,9 +279,7 @@ export async function createAppliedSelectionPaths(
     let appliedSelectionPaths: Array<Array<VectorPathCommandMove | VectorPathCommandLine>> = JSON.parse(JSON.stringify(appliedSelectionPathsOverride));
     if (activeSelectionPathOverride.length === 0) return appliedSelectionPaths;
     if (appliedSelectionPaths.length === 0 && selectionCombineModeOverride !== 'subtract') {
-        appliedSelectionPaths = [
-            await pathToPolyline(activeSelectionPathOverride)
-        ];
+        appliedSelectionPaths = await pathToPolylines(activeSelectionPathOverride);
     } else {
         const clipper = new Clipper();
         if (appliedSelectionPaths.length === 0 && selectionCombineModeOverride === 'subtract') {
@@ -297,8 +295,10 @@ export async function createAppliedSelectionPaths(
                 clipper.AddPath(path, PolyType.ptSubject, true);
             }
         }
-        const clipPolyline = await pathToPolyline(activeSelectionPathOverride);
-        clipper.AddPath(clipPolyline, PolyType.ptClip, true);
+        const clipPolylines = await pathToPolylines(activeSelectionPathOverride);
+        for (const clipPolyline of clipPolylines) {
+            clipper.AddPath(clipPolyline, PolyType.ptClip, true);
+        }
         const solution: Paths = [];
         let clipType = ClipType.ctUnion;
         if (selectionCombineModeOverride === 'subtract') {

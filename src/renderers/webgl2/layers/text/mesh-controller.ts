@@ -244,6 +244,14 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
         this.letterMeshCache?.reorder(order);
     }
 
+    getLayerWidth() {
+        return this.width;
+    }
+
+    getLayerHeight() {
+        return this.height;
+    }
+
     getTexture() {
         return Promise.resolve(this.sourceTexture ?? null);
     }

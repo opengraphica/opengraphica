@@ -35,10 +35,12 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
     opacity: number = 1;
     filters: Array<Webgl2RendererCanvasFilter | null> = [];
     filtersOverride: Array<Webgl2RendererCanvasFilter | null> | undefined = undefined;
+    height: number = 0;
     sourceUuid: string | undefined;
     tileUpdateId: string | undefined;
     visible: boolean = true;
     visibleOverride: boolean | undefined = undefined;
+    width: number = 0;
 
     materialUpdates: Array<'destroyAndCreate' | 'update'> = [];
     regenerateThumbnailTimeoutHandle: number | undefined;
@@ -186,6 +188,8 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
     }
 
     updateSize(width: number, height: number) {
+        this.width = width;
+        this.height = height;
         this.planeGeometry?.dispose();
         this.planeGeometry = new ImagePlaneGeometry(width, height);
         if (this.plane) {
@@ -217,6 +221,14 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
         if (this.plane) {
             this.plane.renderOrder = order + 0.1;
         }
+    }
+
+    getLayerWidth() {
+        return this.width;
+    }
+
+    getLayerHeight() {
+        return this.height;
     }
 
     getTexture(wait?: boolean) {

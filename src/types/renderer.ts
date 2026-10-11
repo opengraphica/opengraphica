@@ -120,6 +120,8 @@ export interface RendererLayerWatcher<T = WorkingFileLayer> {
 
 export interface Webgl2RendererMeshController {
     blendingMode: WorkingFileLayerBlendingMode;
+    getLayerWidth(): number;
+    getLayerHeight(): number;
     getTexture(wait?: boolean): Promise<Texture<ImageBitmap> | null>;
     getTransform(): Matrix4;
     setDraftTexture(texture?: Texture<any>);

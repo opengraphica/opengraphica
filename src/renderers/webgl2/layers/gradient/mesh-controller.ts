@@ -40,9 +40,11 @@ export class GradientLayerMeshController implements Webgl2RendererMeshController
     data: WorkingFileGradientLayer<RGBAColor>['data'] | undefined = undefined;
     filters: Array<Webgl2RendererCanvasFilter | null> = [];
     filtersOverride: Array<Webgl2RendererCanvasFilter | null> | undefined = undefined;
+    height: number = 0;
     transform: Matrix4 = new Matrix4();
     visible: boolean = true;
     visibleOverride: boolean | undefined = undefined;
+    width: number = 0;
 
     materialUpdates: Array<'destroyAndCreate' | 'update'> = [];
     regenerateThumbnailTimeoutHandle: number | undefined;
@@ -149,6 +151,8 @@ export class GradientLayerMeshController implements Webgl2RendererMeshController
     }
 
     updateSize(width: number, height: number) {
+        this.width = width;
+        this.height = height;
         this.planeGeometry?.dispose();
         this.planeGeometry = new ImagePlaneGeometry(width, height);
         if (this.plane) {
@@ -180,6 +184,14 @@ export class GradientLayerMeshController implements Webgl2RendererMeshController
         if (this.plane) {
             this.plane.renderOrder = order + 0.1;
         }
+    }
+
+    getLayerWidth() {
+        return this.width;
+    }
+
+    getLayerHeight() {
+        return this.height;
     }
 
     getTexture() {

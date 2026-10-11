@@ -24,7 +24,7 @@ import {
     parseCommonNodeAttributes, parseNodeTransform, parsePathNodeAttributes,
     generateSvgElementIds,
 } from '@/lib/svg';
-import { pathContainsPath, pathToPolyline, polylineToSimplifiedPath } from '@/lib/vector-process';
+import { pathContainsPath, pathToPolylines, polylineToSimplifiedPath } from '@/lib/vector-process';
 
 import { transferRendererTilesToRasterLayerUpdates, useRenderer } from '@/renderers';
 
@@ -207,22 +207,20 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
 
                     const { d } = parsePathNodeAttributes(shape);
 
-                    const polyline = (await pathToPolyline(d)).filter((command) => {
-                        return (
-                            command.type === VectorPathCommandType.LINE
-                            || command.type === VectorPathCommandType.MOVE
-                        );
-                    }).map((command) => {
-                        scrapPoint.x = command.x;
-                        scrapPoint.y = command.y;
-                        const xfPoint = scrapPoint.matrixTransform(nodeXf);
-                        command.x = xfPoint.x;
-                        command.y = xfPoint.y;
-                        return command;
-                    });
+                    const polylines = await pathToPolylines(d);
 
                     const clipper = new Clipper();
-                    clipper.AddPath(polyline, PolyType.ptSubject, true);
+                    for (const polyline of polylines) {
+                        for (const command of polyline) {
+                            scrapPoint.x = command.x;
+                            scrapPoint.y = command.y;
+                            const xfPoint = scrapPoint.matrixTransform(nodeXf);
+                            command.x = xfPoint.x;
+                            command.y = xfPoint.y;
+                        }
+                        clipper.AddPath(polyline, PolyType.ptSubject, true);
+                    }
+
                     for (const path of (this.appliedSelectionPaths || appliedSelectionPaths.value)) {
                         clipper.AddPath(path, PolyType.ptClip, true);
                     }
@@ -256,8 +254,14 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
                             (commandGroup) => serializeVectorPathCommands(commandGroup, true)
                         ).join(' '));
 
-                    } else if (await pathContainsPath(appliedSelectionPathCommand, polyline)) {
-                        shape.remove();
+                    } else {
+                        let polylinesCommand = '';
+                        for (const polyline of polylines) {
+                            polylinesCommand += serializeVectorPathCommands(polyline, true);
+                        }
+                        if (await pathContainsPath(appliedSelectionPathCommand, polylinesCommand)) {
+                            shape.remove();
+                        }
                     }
 
                 }

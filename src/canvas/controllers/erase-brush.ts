@@ -5,8 +5,9 @@ import { t, tm, rt } from '@/i18n';
 
 import { BrushStroke, type BrushStrokePoint } from '@/lib/brush-stroke';
 import appEmitter from '@/lib/emitter';
+import { isEqualApprox } from '@/lib/math';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
-import { createPathBrushStroke, movePathBrushStroke, stopPathBrushStroke, createBrushShapePath } from '@/lib/vector-process';
+import { createPathBrushStroke, movePathBrushStroke, stopPathBrushStroke, createBrushShapePathCap, createBrushShapePathLine } from '@/lib/vector-process';
 
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
@@ -55,7 +56,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
     private erasingOnLayers: WorkingFileAnyLayer[] = [];
     private erasingBrushStroke: BrushStroke | null = null;
     private isQueueingInput: boolean = false;
-    private queuedBrushStrokePoints: Array<BrushStrokePoint> = []; 
+    private queuedBrushStrokePoints: Array<BrushStrokePoint> = [];
 
     private eraseLoopDeltaAccumulator: number = 0;
     private eraseLoopLastRunTimestamp: number = 0;
@@ -274,7 +275,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                 shape: brushShape.value,
                 size: brushSize.value,
                 color: new Float16Array([1, 1, 1, brushOpacity.value]),
-                hardness: brushHardness.value,
+                hardness: layer.type === 'vector' ? 1 : brushHardness.value,
                 colorBlendingPersistence: 0,
             });
         }
@@ -282,8 +283,8 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
         // Populate first erasing point
         const transformedPoint = new DOMPoint(
             this.lastCursorX * devicePixelRatio,
-            this.lastCursorY * devicePixelRatio
-        ).matrixTransform(canvasStore.state.transform.inverse())
+            this.lastCursorY * devicePixelRatio,
+        ).matrixTransform(canvasStore.state.transform.inverse());
         const pressure = this.erasingUsePressure ? Math.min(1, (e.pressure) / (1 - this.pointerPenMaxPressureMargin)) : 1;
         const size = brushSize.value * (
             brushPressureMinSize.value + (1 - brushPressureMinSize.value) * Math.pow(pressure, brushPressureTaper.value)
@@ -315,14 +316,14 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                 transformedPoint.y,
                 size,
                 brushAngle.value + -canvasStore.state.decomposedTransform.rotation + (e.twist ?? 0),
-                density,
+                layer.type === 'vector' ? 1 : density,
                 0,
                 1,
             );
         }
         if (this.selectionHasVectorLayers) {
             this.vectorPathBrushStrokeIndex = await createPathBrushStroke(
-                createBrushShapePath(
+                createBrushShapePathCap(
                     transformedPoint.x,
                     transformedPoint.y,
                     brushShape.value,
@@ -402,22 +403,36 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                     point.y,
                     point.size,
                     brushAngle.value + -canvasStore.state.decomposedTransform.rotation + point.twist,
-                    point.density,
+                    layer.type === 'vector' ? 1 : point.density,
                     point.colorBlendingStrength,
                     point.concentration,
                 );
             }
             if (this.selectionHasVectorLayers) {
-                movePathBrushStroke(
-                    this.vectorPathBrushStrokeIndex,
-                    createBrushShapePath(
-                        point.x,
-                        point.y,
-                        brushShape.value,
-                        point.size,
-                        brushAngle.value + -canvasStore.state.decomposedTransform.rotation + point.twist,
-                    )
-                );
+                const prevPoint = this.erasingBrushStroke.previousRetrievedPoint1;
+                if (
+                    !isEqualApprox(point.x, prevPoint.x)
+                    || !isEqualApprox(point.y, prevPoint.y)
+                    || !isEqualApprox(point.size, prevPoint.size)
+                    || !isEqualApprox(point.twist, prevPoint.twist)
+                ) {
+                    movePathBrushStroke(
+                        this.vectorPathBrushStrokeIndex,
+                        createBrushShapePathLine(
+                            point.x,
+                            point.y,
+                            prevPoint.x,
+                            prevPoint.y,
+                            this.erasingBrushStroke.previousRetrievedPoint2.x,
+                            this.erasingBrushStroke.previousRetrievedPoint2.y,
+                            brushShape.value,
+                            point.size,
+                            prevPoint.size,
+                            brushAngle.value + -canvasStore.state.decomposedTransform.rotation + point.twist,
+                            brushAngle.value + -canvasStore.state.decomposedTransform.rotation + prevPoint.twist,
+                        )
+                    );
+                }
             }
 
             if (count > 60) break;
@@ -463,7 +478,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
 
             if (this.erasingBrushStroke && this.renderer) {
                 this.erasingBrushStroke.finalizeLine();
-                let point: BrushStrokePoint | undefined;
+                let point: BrushStrokePoint | undefined = undefined;
                 while (this.erasingBrushStroke.hasCollectedPoints()) {
                     point = this.erasingBrushStroke.retrieveCatmullRomSegmentPoint();
                     if (!point) continue;
@@ -474,20 +489,26 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                             point.y,
                             point.size,
                             brushAngle.value + -canvasStore.state.decomposedTransform.rotation + point.twist,
-                            point.density,
+                            layer.type === 'vector' ? 1 : point.density,
                             point.colorBlendingStrength,
                             point.concentration,
                         );
                     }
                     if (this.selectionHasVectorLayers) {
-                        movePathBrushStroke(
+                        await movePathBrushStroke(
                             this.vectorPathBrushStrokeIndex,
-                            createBrushShapePath(
+                            createBrushShapePathLine(
                                 point.x,
                                 point.y,
+                                this.erasingBrushStroke.previousRetrievedPoint1.x,
+                                this.erasingBrushStroke.previousRetrievedPoint1.y,
+                                this.erasingBrushStroke.previousRetrievedPoint2.x,
+                                this.erasingBrushStroke.previousRetrievedPoint2.y,
                                 brushShape.value,
                                 point.size,
+                                this.erasingBrushStroke.previousRetrievedPoint1.size,
                                 brushAngle.value + -canvasStore.state.decomposedTransform.rotation + point.twist,
+                                brushAngle.value + -canvasStore.state.decomposedTransform.rotation + this.erasingBrushStroke.previousRetrievedPoint1.twist,
                             )
                         );
                     }
@@ -500,23 +521,42 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                             point.y,
                             point.size,
                             brushAngle.value + -canvasStore.state.decomposedTransform.rotation + point.twist,
-                            point.density,
+                            layer.type === 'vector' ? 1 : point.density,
                             point.colorBlendingStrength,
                             point.concentration,
                         );
                     }
                     if (this.selectionHasVectorLayers) {
-                        movePathBrushStroke(
+                        await movePathBrushStroke(
                             this.vectorPathBrushStrokeIndex,
-                            createBrushShapePath(
+                            createBrushShapePathLine(
                                 point.x,
                                 point.y,
+                                this.erasingBrushStroke.previousRetrievedPoint1.x,
+                                this.erasingBrushStroke.previousRetrievedPoint1.y,
+                                this.erasingBrushStroke.previousRetrievedPoint2.x,
+                                this.erasingBrushStroke.previousRetrievedPoint2.y,
                                 brushShape.value,
                                 point.size,
+                                this.erasingBrushStroke.previousRetrievedPoint1.size,
                                 brushAngle.value + -canvasStore.state.decomposedTransform.rotation + point.twist,
+                                brushAngle.value + -canvasStore.state.decomposedTransform.rotation + this.erasingBrushStroke.previousRetrievedPoint1.twist,
                             )
                         );
                     }
+                }
+                if (this.erasingBrushStroke.lastCollectedPoint1) {
+                    const point = this.erasingBrushStroke.lastCollectedPoint1;
+                    await movePathBrushStroke(
+                        this.vectorPathBrushStrokeIndex,
+                        createBrushShapePathCap(
+                            point.x,
+                            point.y,
+                            brushShape.value,
+                            point.size,
+                            brushAngle.value + -canvasStore.state.decomposedTransform.rotation + point.twist,
+                        )
+                    );
                 }
 
                 for (const layer of this.erasingOnLayers) {

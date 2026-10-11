@@ -163,6 +163,10 @@ export class BrushStroke {
     retrieveCatmullRomTravel: number = 0;
     retrieveLineLength: number = 0;
 
+    previousRetrievedPoint1: BrushStrokePoint;
+    previousRetrievedPoint2: BrushStrokePoint;
+    lastRetrievedPoint: BrushStrokePoint;
+
     constructor(
         smoothing: number, spacing: number, pixelSnap: boolean, jitter: number, startingPoint: BrushStrokePoint
     ) {
@@ -193,6 +197,10 @@ export class BrushStroke {
         this.lastCollectedPoint1 = startingPoint;
         this.lastCollectedPoint2 = startingPoint;
         this.lastCollectedPoint3 = startingPoint;
+
+        this.previousRetrievedPoint1 = startingPoint;
+        this.previousRetrievedPoint2 = startingPoint;
+        this.lastRetrievedPoint = startingPoint;
     }
 
     addPoint(point: BrushStrokePoint) {
@@ -355,6 +363,11 @@ export class BrushStroke {
                 this.retrieveCatmullRomTravel -= this.catmullRomSegment.length;
             }
 
+            if (point) {
+                this.previousRetrievedPoint2 = this.previousRetrievedPoint1;
+                this.previousRetrievedPoint1 = this.lastRetrievedPoint;
+                this.lastRetrievedPoint = point;
+            }
             return point;
         }
         else if (isRetrievingLine) {
@@ -387,6 +400,12 @@ export class BrushStroke {
                 this.retrieveCatmullRomP2 = undefined;
                 this.retrieveCatmullRomTravel -= this.retrieveLineLength;
 
+            }
+
+            if (point) {
+                this.previousRetrievedPoint2 = this.previousRetrievedPoint1;
+                this.previousRetrievedPoint1 = this.lastRetrievedPoint;
+                this.lastRetrievedPoint = point;
             }
             return point;
         }
@@ -463,6 +482,12 @@ export class BrushStroke {
             };
             point.x += ((Math.random() * 2) - 1) * this.jitter * this.size;
             point.y += ((Math.random() * 2) - 1) * this.jitter * this.size;
+        }
+
+        if (point) {
+            this.previousRetrievedPoint2 = this.previousRetrievedPoint1;
+            this.previousRetrievedPoint1 = this.lastRetrievedPoint;
+            this.lastRetrievedPoint = point;
         }
         return point;
     }
