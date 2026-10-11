@@ -86,6 +86,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     private transformDragType: number = 0;
     private transformIsDragging: boolean = false;
     private transformIsRotating: boolean = false;
+    private transformJustCreatedLayer: boolean = false;
     private isPointerDragging: boolean = false;
     private actionQueue: AsyncCallbackQueue = new AsyncCallbackQueue();
 
@@ -278,6 +279,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                     await historyStore.dispatch('runAction', {
                         action: new CreateNewLayersFromSelectionAction({ clearSelection: true, selectNewLayers: 'replace' })
                     });
+                    this.transformJustCreatedLayer = true;
                 } else {
                     await historyStore.dispatch('runAction', {
                         action: new ClearSelectionAction()
@@ -311,7 +313,9 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                         mergeWithHistory: 'selectLayers',
                     });
                     await nextTick();
-                    this.setBoundsFromSelectedLayersImmediate();
+                    if (!this.transformJustCreatedLayer) {
+                        this.setBoundsFromSelectedLayersImmediate();
+                    }
                     this.determineDragRotateType(viewTransformPoint, transformBoundsPoint, viewDecomposedTransform);
                 }
             }
@@ -457,6 +461,10 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                 } catch (error) { /* Ignore */ }
                 this.transformStartPickLayer = null;
             }
+            if (this.transformJustCreatedLayer) {
+                this.setBoundsFromSelectedLayersImmediate();
+            }
+            this.transformJustCreatedLayer = false;
             this.previewRotation = null;
             dragHandleHighlight.value = null;
             this.handleCursorIcon();
@@ -1035,6 +1043,8 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
     private setBoundsFromSelectedLayersImmediate() {
         isBoundsIndeterminate.value = false;
+
+        if (this.transformIsRotating) return;
 
         // If there's a current selection mask, match the bounds to the selection mask.
         const selectionMask: HTMLImageElement | null = activeSelectionMask.value || appliedSelectionMask.value;

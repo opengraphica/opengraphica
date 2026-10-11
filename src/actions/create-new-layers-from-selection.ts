@@ -19,6 +19,7 @@ import { ClearSelectionAction } from './clear-selection';
 import { DeleteLayerSelectionAreaAction } from './delete-layer-selection-area';
 import { InsertLayerAction } from './insert-layer';
 import { SelectLayersAction } from './select-layers';
+import { TrimLayerEmptySpaceAction } from './trim-layer-empty-space';
 
 import renderers from '@/canvas/renderers';
 
@@ -43,6 +44,7 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
     private insertLayerActions: InsertLayerAction<any>[] = [];
     private insertVectorLayerIndices: Set<number> = new Set();
     private deleteSelectionAreaActions: DeleteLayerSelectionAreaAction[] = [];
+    private trimLayerEmptySpaceActions: TrimLayerEmptySpaceAction[] = [];
     private selectLayersAction: SelectLayersAction | null = null;
     private insertedLayerIds: number[] = [];
 
@@ -87,6 +89,7 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
             // Create new layer for each of the selected layers.
             for (let layer of selectedLayers) {
                 if (['raster', 'rasterSequence'].includes(layer.type)) {
+
                     ctx.globalCompositeOperation = 'source-over';
                     ctx.clearRect(0, 0, workingCanvas.width, workingCanvas.height);
                     ctx.save();
@@ -120,7 +123,9 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
                             }
                         })
                     );
+
                 } else if (layer.type === 'vector') {
+
                     if (this.appliedSelectionPaths.length === 0) {
                         this.appliedSelectionPaths = await createAppliedSelectionPaths();
                     }
@@ -137,6 +142,7 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
                         })
                     );
                     this.insertVectorLayerIndices.add(this.insertLayerActions.length - 1);
+
                 }
             }
         }
@@ -163,19 +169,28 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
 
         if (this.insertVectorLayerIndices.size > 0 && this.deleteSelectionAreaActions.length === 0) {
             for (const index of Array.from(this.insertVectorLayerIndices)) {
+                const layerId = this.insertedLayerIds[index];
                 this.deleteSelectionAreaActions.push(new DeleteLayerSelectionAreaAction(
-                    [this.insertedLayerIds[index]],
+                    [layerId],
                     {
                         selectionCombineMode: 'intersect',
                         appliedSelectionPaths: this.appliedSelectionPaths,
                     },
                 ));
+                this.trimLayerEmptySpaceActions.push(
+                    new TrimLayerEmptySpaceAction(layerId)
+                );
             }
         }
         for (const deleteSelectionAreaAction of this.deleteSelectionAreaActions) {
             await deleteSelectionAreaAction.do();
             this.freeEstimates.memory += deleteSelectionAreaAction.freeEstimates.memory;
             this.freeEstimates.database += deleteSelectionAreaAction.freeEstimates.database;
+        }
+        for (const trimLayerEmptySpaceAction of this.trimLayerEmptySpaceActions) {
+            await trimLayerEmptySpaceAction.do();
+            this.freeEstimates.memory += trimLayerEmptySpaceAction.freeEstimates.memory;
+            this.freeEstimates.database += trimLayerEmptySpaceAction.freeEstimates.database;
         }
 
         if (this.selectNewLayers !== 'none') {
@@ -212,6 +227,12 @@ export class CreateNewLayersFromSelectionAction extends BaseAction {
 
         this.freeEstimates.memory = 0;
         this.freeEstimates.database = 0;
+
+        for (const trimLayerEmptySpaceAction of this.trimLayerEmptySpaceActions.slice().reverse()) {
+            await trimLayerEmptySpaceAction.undo();
+            this.freeEstimates.memory += trimLayerEmptySpaceAction.freeEstimates.memory;
+            this.freeEstimates.database += trimLayerEmptySpaceAction.freeEstimates.database;
+        }
 
         for (const deleteSelectionAreaAction of this.deleteSelectionAreaActions.slice().reverse()) {
             await deleteSelectionAreaAction.undo();
