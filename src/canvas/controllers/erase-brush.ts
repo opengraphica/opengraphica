@@ -1,11 +1,12 @@
 import { nextTick, watch, WatchStopHandle } from 'vue';
 
 import BaseCanvasMovementController from './base-movement';
+import { t, tm, rt } from '@/i18n';
 
 import { BrushStroke, type BrushStrokePoint } from '@/lib/brush-stroke';
 import appEmitter from '@/lib/emitter';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
-import { t, tm, rt } from '@/i18n';
+import { createPathBrushStroke, movePathBrushStroke, stopPathBrushStroke, createBrushShapePath } from '@/lib/vector-process';
 
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
@@ -27,11 +28,15 @@ import {
 import type { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { ClearSelectionAction } from '@/actions/clear-selection';
+import { DeleteLayerSelectionAreaAction } from '@/actions/delete-layer-selection-area';
 import { UpdateLayerAction } from '@/actions/update-layer';
 
 import { useRenderer, transferRendererTilesToRasterLayerUpdates } from '@/renderers';
 
-import type { RendererFrontend, RendererTextureTile, UpdateRasterLayerOptions, WorkingFileAnyLayer } from '@/types';
+import type {
+    RendererFrontend, RendererTextureTile, UpdateRasterLayerOptions,
+    VectorPathCommandMove, VectorPathCommandLine, WorkingFileAnyLayer,
+} from '@/types';
 
 const devicePixelRatio = window.devicePixelRatio || 1;
 
@@ -57,6 +62,9 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
     private eraseLoopLastPointerMoveTimestamp: number = 0;
 
     private pointerPenMaxPressureMargin: number = 0;
+
+    private selectionHasVectorLayers: boolean = false;
+    private vectorPathBrushStrokeIndex: number = -1;
 
     onEnter(): void {
         super.onEnter();
@@ -86,10 +94,13 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                     prepareStoredImageForArchival(layer.data.sourceUuid);
                 }
             }
+            this.selectionHasVectorLayers = false;
             for (const layerId of newIds) {
                 const layer = getLayerById(layerId);
                 if (layer?.type === 'raster') {
                     prepareStoredImageForEditing(layer.data.sourceUuid);
+                } else if (layer?.type === 'vector') {
+                    this.selectionHasVectorLayers = true;
                 }
             }
         }, { immediate: true });
@@ -240,7 +251,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
     }
 
     protected async eraseStart(e: PointerEvent) {
-        let selectedLayers = getSelectedLayers().filter((layer) => layer.type === 'raster');
+        let selectedLayers = getSelectedLayers().filter((layer) => layer.type === 'raster' || layer.type === 'vector');
         if (selectedLayers.length === 0) {
             appEmitter.emit('app.notify', {
                 type: 'info',
@@ -307,6 +318,17 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                 density,
                 0,
                 1,
+            );
+        }
+        if (this.selectionHasVectorLayers) {
+            this.vectorPathBrushStrokeIndex = await createPathBrushStroke(
+                createBrushShapePath(
+                    transformedPoint.x,
+                    transformedPoint.y,
+                    brushShape.value,
+                    size,
+                    e.twist,
+                )
             );
         }
 
@@ -385,6 +407,18 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                     point.concentration,
                 );
             }
+            if (this.selectionHasVectorLayers) {
+                movePathBrushStroke(
+                    this.vectorPathBrushStrokeIndex,
+                    createBrushShapePath(
+                        point.x,
+                        point.y,
+                        brushShape.value,
+                        point.size,
+                        brushAngle.value + -canvasStore.state.decomposedTransform.rotation + point.twist,
+                    )
+                );
+            }
 
             if (count > 60) break;
         }
@@ -425,6 +459,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
             this.erasingPointerId = null;
 
             const collectedTiles: Array<Promise<Array<RendererTextureTile>>> = [];
+            let vectorClipPath: Array<Array<VectorPathCommandMove | VectorPathCommandLine>> = [];
 
             if (this.erasingBrushStroke && this.renderer) {
                 this.erasingBrushStroke.finalizeLine();
@@ -444,6 +479,18 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                             point.concentration,
                         );
                     }
+                    if (this.selectionHasVectorLayers) {
+                        movePathBrushStroke(
+                            this.vectorPathBrushStrokeIndex,
+                            createBrushShapePath(
+                                point.x,
+                                point.y,
+                                brushShape.value,
+                                point.size,
+                                brushAngle.value + -canvasStore.state.decomposedTransform.rotation + point.twist,
+                            )
+                        );
+                    }
                 }
                 while (point = this.erasingBrushStroke.retrieveFinalPoints()) {
                     for (const layer of this.erasingOnLayers) {
@@ -458,6 +505,18 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                             point.concentration,
                         );
                     }
+                    if (this.selectionHasVectorLayers) {
+                        movePathBrushStroke(
+                            this.vectorPathBrushStrokeIndex,
+                            createBrushShapePath(
+                                point.x,
+                                point.y,
+                                brushShape.value,
+                                point.size,
+                                brushAngle.value + -canvasStore.state.decomposedTransform.rotation + point.twist,
+                            )
+                        );
+                    }
                 }
 
                 for (const layer of this.erasingOnLayers) {
@@ -466,6 +525,9 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                             layer.id,
                         )
                     );
+                }
+                if (this.selectionHasVectorLayers) {
+                    vectorClipPath = await stopPathBrushStroke(this.vectorPathBrushStrokeIndex);
                 }
             }
 
@@ -495,6 +557,18 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                             }
                         })
                     );
+
+                } else if (layer.type === 'vector') {
+
+                    layerActions.push(
+                        new DeleteLayerSelectionAreaAction(
+                            [layer.id],
+                            {
+                                appliedSelectionPaths: vectorClipPath,
+                                clearSelection: false,
+                            },
+                        )
+                    )
 
                 }
             }
