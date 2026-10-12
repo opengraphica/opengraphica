@@ -30,6 +30,7 @@ import type { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { ClearSelectionAction } from '@/actions/clear-selection';
 import { DeleteLayerSelectionAreaAction } from '@/actions/delete-layer-selection-area';
+import { TrimLayerEmptySpaceAction } from '@/actions/trim-layer-empty-space';
 import { UpdateLayerAction } from '@/actions/update-layer';
 
 import { useRenderer, transferRendererTilesToRasterLayerUpdates } from '@/renderers';
@@ -66,9 +67,12 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
 
     private selectionHasVectorLayers: boolean = false;
     private vectorPathBrushStrokeIndex: number = -1;
+    private layerIdsNeedTrim: Set<number> = new Set();
 
     onEnter(): void {
         super.onEnter();
+
+        this.layerIdsNeedTrim.clear();
 
         this.eraseLoop = this.eraseLoop.bind(this);
         
@@ -174,6 +178,19 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
             if (layer.type === 'raster') {
                 prepareStoredImageForArchival(layer.data.sourceUuid);
             }
+        }
+
+        if (this.layerIdsNeedTrim.size > 0) {
+            const trimActions: TrimLayerEmptySpaceAction[] = [];
+            for (const layerId of this.layerIdsNeedTrim) {
+                trimActions.push(
+                    new TrimLayerEmptySpaceAction(layerId)
+                );
+            }
+            historyStore.dispatch('runAction', {
+                action: new BundleAction('trimLayerEmptySpace', 'action.trimLayerEmptySpace', trimActions)
+            });
+            this.layerIdsNeedTrim.clear();
         }
 
         // Tutorial Message
@@ -608,7 +625,8 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                                 clearSelection: false,
                             },
                         )
-                    )
+                    );
+                    this.layerIdsNeedTrim.add(layer.id);
 
                 }
             }

@@ -46,6 +46,7 @@ export class TrimLayerEmptySpaceAction extends BaseAction {
         if (!layer) throw new Error('[src/actions/trim-layer-empty-space.ts] Layer with specified id not found.');
 
         if (layer.type === 'raster') {
+
             const layerCanvas = await prepareStoredImageForEditing(layer.data.sourceUuid);
             if (!layerCanvas) throw new Error('[src/actions/trim-layer-empty-space.ts] Unable to edit existing layer image.');
             const emptyBounds = getImageDataEmptyBounds(getImageDataFromCanvas(layerCanvas));
@@ -89,6 +90,7 @@ export class TrimLayerEmptySpaceAction extends BaseAction {
             await this.updateLayerAction.do();
 
         } else if (layer.type === 'vector') {
+
             const svgDocument = await getStoredSvgDocument(layer.data.sourceUuid);
             if (!svgDocument) return;
 
@@ -153,6 +155,7 @@ export class TrimLayerEmptySpaceAction extends BaseAction {
                 },
             });
             await this.updateLayerAction.do();
+
         }
 
         canvasStore.set('dirty', true);
