@@ -562,7 +562,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                         );
                     }
                 }
-                if (this.erasingBrushStroke.lastCollectedPoint1) {
+                if (this.selectionHasVectorLayers && this.erasingBrushStroke.lastCollectedPoint1) {
                     const point = this.erasingBrushStroke.lastCollectedPoint1;
                     await movePathBrushStroke(
                         this.vectorPathBrushStrokeIndex,
