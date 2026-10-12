@@ -135,7 +135,7 @@
                         }"
                     />
                 </template>
-                <template v-if="isExtendingPaths && hoveringEditControlPointIndices.length === 0">
+                <template v-if="isExtendingPaths && hoveringEditControlPointIndices.length === 0 && !isTouchUser">
                     <template v-for="(point, i) of selectedEditControlPoints" :key="i + '_' + point.x + '_' + point.y">
                         <line
                             :x1="point.tx!"
@@ -253,6 +253,7 @@
 import { computed, onMounted, onUnmounted, ref, toRefs, watch } from 'vue';
 
 import canvasStore from '@/store/canvas';
+import editorStore from '@/store/editor';
 import workingFileStore from '@/store/working-file';
 
 import {
@@ -291,6 +292,10 @@ const transformedPreviewInvisibleStrokeStartX = ref(0);
 const transformedPreviewInvisibleStrokeStartY = ref(0);
 
 const devicePixelRatio = window.devicePixelRatio || 1;
+
+const isTouchUser = computed<boolean>(() => {
+    return editorStore.state.isTouchUser;
+})
 
 const zoom = computed<number>(() => {
     const decomposedTransform = canvasStore.state.decomposedTransform;

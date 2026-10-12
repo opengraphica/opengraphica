@@ -449,6 +449,13 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         );
     }
 
+    async onPointerUpBeforePurge(e: PointerEvent): Promise<void> {
+        super.onPointerUpBeforePurge(e);
+        const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
+        if (pointer == null || pointer.type === 'touch') return;
+        this.onPointerOrTouchEnd(pointer);
+    }
+
     onPointerOrTouchEnd(e: PointerTracker) {
         const isJustDeselectedShapes = this.isJustDeselectedShapes;
         this.isJustDeselectedShapes = false;
@@ -465,7 +472,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             }
             this.dragControlPointPointerId = null;
             this.draggingEditControlPointIndices = [];
-        } else if (this.pointers.length === 1 && e.down.isPrimary && e.down.button === 0) {
+        } else if ((this.pointers.length === 1 && e.down.isPrimary && e.down.button === 0) || e.type === 'touch') {
             const beforeSelection = selectedShapes.value.slice();
 
             if (!e.isDragging && !isJustDeselectedShapes) {
@@ -501,13 +508,6 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
                 duration: 5000,
             });
         }
-    }
-
-    async onPointerUpBeforePurge(e: PointerEvent): Promise<void> {
-        super.onPointerUpBeforePurge(e);
-        const pointer = this.pointers.filter((pointer) => pointer.id === e.pointerId)[0];
-        if (pointer == null || pointer.type === 'touch') return;
-        this.onPointerOrTouchEnd(pointer);
     }
 
     onPointerDoubleTap(e: PointerEvent): void {
@@ -3145,11 +3145,8 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             //     if (point.yProp) {
             //         attributes[point.yProp] = originalAttributes[point.yProp] + rotatedOffset.y;
             //     }
-            //     console.log(originalAttributes);
                 
             //     this.renderer?.updateVectorLayerAttributes(layer.id, shapeId, attributes);
-
-            //     console.log(point);
 
             // }
 
