@@ -5,7 +5,7 @@ import { t } from '@/i18n';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import { createStoredImage, getStoredImageCanvas, deleteStoredImage } from '@/store/image';
-import { createStoredSvg, getStoredSvgImage, deleteStoredSvg } from '@/store/svg';
+import { cloneStoredSvg, getStoredSvgImage, deleteStoredSvg } from '@/store/svg';
 import workingFileStore, { getSelectedLayers } from '@/store/working-file';
 import {
     activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset,
@@ -74,9 +74,8 @@ export async function copySelectedLayers() {
                 layerCopy.data.sourceUuid = await createStoredImage(imageClone);
             }
         } else if (layerCopy.type === 'vector') {
-            const storedImage = await getStoredSvgImage(layerCopy.data.sourceUuid);
-            if (storedImage) {
-                layerCopy.data.sourceUuid = await createStoredSvg(storedImage);
+            if (layerCopy.data.sourceUuid) {
+                layerCopy.data.sourceUuid = await cloneStoredSvg(layerCopy.data.sourceUuid);
                 layerCopy.data.sourceDocument = undefined;
             }
         }

@@ -276,7 +276,9 @@ export async function createAppliedSelectionPaths(
     appliedSelectionPathsOverride: Array<Array<VectorPathCommandMove | VectorPathCommandLine>> = appliedSelectionPaths.value,
     selectionCombineModeOverride: SelectionCombineMode = selectionCombineMode.value,
 ): Promise<Array<Array<VectorPathCommandMove | VectorPathCommandLine>>> {
-    let appliedSelectionPaths: Array<Array<VectorPathCommandMove | VectorPathCommandLine>> = JSON.parse(JSON.stringify(appliedSelectionPathsOverride));
+    let appliedSelectionPaths: Array<Array<VectorPathCommandMove | VectorPathCommandLine>> = JSON.parse(JSON.stringify(
+        appliedSelectionPathsOverride ?? []
+    ));
     if (activeSelectionPathOverride.length === 0) return appliedSelectionPaths;
     if (appliedSelectionPaths.length === 0 && selectionCombineModeOverride !== 'subtract') {
         appliedSelectionPaths = await pathToPolylines(activeSelectionPathOverride);

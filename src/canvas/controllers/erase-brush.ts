@@ -291,7 +291,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                 blendingMode: 'erase',
                 shape: brushShape.value,
                 size: brushSize.value,
-                color: new Float16Array([1, 1, 1, brushOpacity.value]),
+                color: new Float16Array([1, 1, 1, layer.type === 'vector' ? 1 : brushOpacity.value]),
                 hardness: layer.type === 'vector' ? 1 : brushHardness.value,
                 colorBlendingPersistence: 0,
             });

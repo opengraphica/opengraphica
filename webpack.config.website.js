@@ -46,6 +46,9 @@ module.exports = setupConfig({
             type: 'var'
         }
     },
+    optimization: {
+        minimize: false,
+    },
     plugins: [
         new BuildInfoPlugin({
             outputDir : path.resolve(__dirname, 'www'),
