@@ -155,6 +155,7 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
 
                 // Identify shapes that might be impacted based on their bounding box, and convert them to paths.
                 let allShapes = Array.from(svgDocument.querySelectorAll('[data-ogr-id]'));
+                let hasUnconvertedSubjectPathShapes: boolean = false;
                 const clipSubjectShapeIds: string[] = [];
                 const clipSubjectShapeIndices: number[] = [];
                 for (const [shapeIndex, shape] of allShapes.entries()) {
@@ -177,15 +178,20 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
                         continue;
                     }
 
+                    if (shape.tagName !== 'path') {
+                        hasUnconvertedSubjectPathShapes = true;
+                    }
                     clipSubjectShapeIds.push(shape.getAttribute('data-ogr-id') ?? '');
                     clipSubjectShapeIndices.push(shapeIndex);
                 }
 
-                const convertVectorShapesToPathsAction = new ConvertVectorShapesToPathsAction(layer.id, clipSubjectShapeIds);
-                await convertVectorShapesToPathsAction.do();
-                this.freeEstimates.memory += convertVectorShapesToPathsAction.freeEstimates.memory;
-                this.freeEstimates.database += convertVectorShapesToPathsAction.freeEstimates.database;
-                this.updateLayerActions.push(convertVectorShapesToPathsAction);
+                if (hasUnconvertedSubjectPathShapes) {
+                    const convertVectorShapesToPathsAction = new ConvertVectorShapesToPathsAction(layer.id, clipSubjectShapeIds);
+                    await convertVectorShapesToPathsAction.do();
+                    this.freeEstimates.memory += convertVectorShapesToPathsAction.freeEstimates.memory;
+                    this.freeEstimates.database += convertVectorShapesToPathsAction.freeEstimates.database;
+                    this.updateLayerActions.push(convertVectorShapesToPathsAction);
+                }
 
                 const appliedSelectionPathCommand = (this.appliedSelectionPaths || appliedSelectionPaths.value).map((path) => {
                     return serializeVectorPathCommands(path, true);

@@ -85,6 +85,10 @@ interface AppEmitterEvents {
             description: string;
         }
     };
+    'editor.tool.arrowDown': undefined;
+    'editor.tool.arrowLeft': undefined;
+    'editor.tool.arrowRight': undefined;
+    'editor.tool.arrowUp': undefined;
     'editor.tool.cancelCurrentAction': undefined;
     'editor.tool.copySelectedLayers': {
         preventDefault: () => void;

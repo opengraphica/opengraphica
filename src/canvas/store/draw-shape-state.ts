@@ -14,7 +14,10 @@ import {
 } from '@/lib/svg';
 import { throttle } from '@/lib/timing';
 
-import { type RendererFrontend, type VectorPathCommand, VectorPathCommandType, type RGBAColor, type WorkingFileVectorLayer } from '@/types';
+import { VectorPathCommandType } from '@/types/vector';
+import type {
+    RendererFrontend, VectorPathCommand, RGBAColor, WorkingFileVectorLayer
+} from '@/types';
 
 export const drawShapeToolbarEmitter = mitt();
 

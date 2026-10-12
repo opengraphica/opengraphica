@@ -21,14 +21,15 @@ import workingFileStore, {
 } from '@/store/working-file';
 
 import { DecomposedMatrix, decomposeMatrix } from '@/lib/dom-matrix';
-import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 import { drawWorkingFileToCanvas2d } from '@/lib/canvas';
 import { getImageDataFromImage, getImageDataEmptyBounds } from '@/lib/image';
 import { isInput } from '@/lib/events';
 import appEmitter, { AppEmitterEvents } from '@/lib/emitter';
+import { isShiftKeyPressed } from '@/lib/keyboard';
 import { clockwiseAngle2d, pointDistance2d } from '@/lib/math';
 import { AsyncCallbackQueue } from '@/lib/timing';
 import { textMetaDefaults } from '@/lib/text-common';
+import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
 
 import { CreateNewLayersFromSelectionAction } from '@/actions/create-new-layers-from-selection';
 import { ClearSelectionAction } from '@/actions/clear-selection';
@@ -103,6 +104,8 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     private snapYPoints: SnapPointGroup[] = [];
     private snapSensitivity: number = 0;
 
+    private lastArrowMoveTime: number = 0;
+
     onEnter(): void {
         super.onEnter();
         this.remToPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
@@ -133,6 +136,10 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             this.calculateSnapCache();
         }, { deep: true });
 
+        this.onArrowDown = this.onArrowDown.bind(this);
+        this.onArrowLeft = this.onArrowLeft.bind(this);
+        this.onArrowRight = this.onArrowRight.bind(this);
+        this.onArrowUp = this.onArrowUp.bind(this);
         this.onCancelCurrentAction = this.onCancelCurrentAction.bind(this);
         this.onCommitCurrentAction = this.onCommitCurrentAction.bind(this);
         this.onHistoryStep = this.onHistoryStep.bind(this);
@@ -141,6 +148,10 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         this.onPreviewDragResizeChange = this.onPreviewDragResizeChange.bind(this);
         this.onCommitTransforms = this.onCommitTransforms.bind(this);
 
+        appEmitter.on('editor.tool.arrowDown', this.onArrowDown);
+        appEmitter.on('editor.tool.arrowLeft', this.onArrowLeft);
+        appEmitter.on('editor.tool.arrowRight', this.onArrowRight);
+        appEmitter.on('editor.tool.arrowUp', this.onArrowUp);
         appEmitter.on('editor.tool.cancelCurrentAction', this.onCancelCurrentAction);
         appEmitter.on('editor.tool.commitCurrentAction', this.onCommitCurrentAction);
         appEmitter.on('editor.tool.selectAll', this.onSelectAll);
@@ -195,6 +206,10 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         this.visibleLayersWatchStop?.();
         this.visibleLayersWatchStop = null;
 
+        appEmitter.off('editor.tool.arrowDown', this.onArrowDown);
+        appEmitter.off('editor.tool.arrowLeft', this.onArrowLeft);
+        appEmitter.off('editor.tool.arrowRight', this.onArrowRight);
+        appEmitter.off('editor.tool.arrowUp', this.onArrowUp);
         appEmitter.off('editor.tool.cancelCurrentAction', this.onCancelCurrentAction);
         appEmitter.off('editor.tool.commitCurrentAction', this.onCommitCurrentAction);
         appEmitter.off('editor.tool.selectAll', this.onSelectAll);
@@ -471,6 +486,62 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         });
     }
 
+    private onArrowDown() {
+        this.onArrowMove(0, 1, isShiftKeyPressed.value);
+    }
+
+    private onArrowLeft() {
+        this.onArrowMove(-1, 0, isShiftKeyPressed.value);
+    }
+
+    private onArrowRight() {
+        this.onArrowMove(1, 0, isShiftKeyPressed.value);
+    }
+
+    private onArrowUp() {
+        this.onArrowMove(0, -1, isShiftKeyPressed.value);
+    }
+
+    private async onArrowMove(x: number, y: number, isLargeMovement: boolean) {
+        if (selectedLayers.value.length === 0) return;
+
+        const decomposedTransform = canvasStore.state.decomposedTransform;
+        const scale = Math.max(1, 1 / decomposedTransform.scaleX);
+        const tx = x * Math.max(isLargeMovement ? 10 : 1, Math.round(scale * (isLargeMovement ? 10 : 1)));
+        const ty = y * Math.max(isLargeMovement ? 10 : 1, Math.round(scale * (isLargeMovement ? 10 : 1)));
+        const viewRotation = canvasStore.state.decomposedTransform.rotation;
+
+        const rotatedOffset = new DOMMatrix()
+            .rotateSelf(-viewRotation * Math.RADIANS_TO_DEGREES)
+            .transformPoint(new DOMPoint(tx, ty));
+
+        const updateLayerActions: UpdateLayerAction<any>[] = [];
+        for (const layer of selectedLayers.value) {
+            const newTransform = new DOMMatrix()
+                .translateSelf(rotatedOffset.x, rotatedOffset.y)
+                .multiply(layer.transform);
+            newTransform.e = Math.round(newTransform.e);
+            newTransform.f = Math.round(newTransform.f);
+            updateLayerActions.push(
+                new UpdateLayerAction({
+                    id: layer.id,
+                    transform: newTransform,
+                }, {
+                    transform: new DOMMatrix().multiplySelf(layer.transform),
+                })
+            );
+        }
+
+        await historyStore.dispatch('runAction', {
+            action: new BundleAction('freeTransform', 'action.freeTransformTranslate', updateLayerActions),
+            mergeWithHistory: (window.performance.now() - this.lastArrowMoveTime) < 1000 ? ['freeTransform'] : undefined,
+        });
+
+        this.lastArrowMoveTime = window.performance.now();
+
+        this.setBoundsFromSelectedLayersImmediate();
+    }
+
     private onCancelCurrentAction() {
         if (this.transformStartDimensions) {
             if (this.transformIsRotating) {
@@ -503,7 +574,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     private onHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
         if (!event) return;
         if (
-            event.trigger != 'do' ||
+            event.trigger !== 'do' ||
             [
                 'alignLayers', 'applyLayerTransform', 'clearSelection', 'convertLayersToCollage',
                 'resetLayerWidths', 'resetLayerHeights', 'setLayerBoundsToWorkingFileBounds',
@@ -512,6 +583,9 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         ) {
             isBoundsIndeterminate.value = true;
             this.setBoundsFromSelectedLayers();
+        }
+        if (event.trigger !== 'do') {
+            this.lastArrowMoveTime = 0;
         }
     }
 

@@ -257,6 +257,9 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         this.visible = visible;
         let oldVisibility = this.plane?.visible;
         this.plane && (this.plane.visible = this.visibleOverride ?? this.visible);
+        for (const shapeGroup of this.createdShapeGroups) {
+            shapeGroup.visible = this.visibleOverride ?? this.visible;
+        }
         if (this.plane?.visible !== oldVisibility) {
             markRenderDirty();
         }
@@ -327,6 +330,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
         this.shapeGroup.userData.scene = this.scene;
         this.shapeGroup.userData.svgMeshesById = {};
         this.shapeGroup.matrixAutoUpdate = false;
+        this.shapeGroup.visible = this.visibleOverride ?? this.visible;
         this.createdShapeGroups.push(this.shapeGroup);
         if (this.plane) {
             const viewBox = this.svgLoader.getViewBox(this.shapeGroup.userData.svgDocument);
@@ -548,7 +552,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             }
 
             createVectorMaterial({
-                color: new Vector4(color.r, color.g, color.b, path.userData.style.fillOpacity ?? 1),
+                color: new Vector4(color.r, color.g, color.b, (path.userData.style.fillOpacity ?? 1) * this.opacity),
             }).then((material) => {
                 if (generateUuid != null && this.generateSvgMeshesUuid !== generateUuid) {
                     material.dispose();
@@ -593,7 +597,7 @@ export class VectorLayerMeshController implements Webgl2RendererMeshController {
             }
 
             createVectorMaterial({
-                color: new Vector4(color.r, color.g, color.b, path.userData.style.strokeOpacity ?? 1),
+                color: new Vector4(color.r, color.g, color.b, (path.userData.style.strokeOpacity ?? 1) * this.opacity),
             }).then((material) => {
                 if (generateUuid != null && this.generateSvgMeshesUuid !== generateUuid) {
                     material.dispose();

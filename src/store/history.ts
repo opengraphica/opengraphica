@@ -158,7 +158,10 @@ async function dispatchUnreserve({ token }: HistoryDispatch['unreserve'], set: P
     }
 }
 
-async function dispatchRunAction({ action, mergeWithHistory, replaceHistory, reserveToken, blockInteraction }: HistoryDispatch['runAction'], set: PerformantStore<HistoryStore>['directSet']) {
+async function dispatchRunAction(
+    { action, mergeWithHistory, replaceHistory, reserveToken, blockInteraction }: HistoryDispatch['runAction'],
+    set: PerformantStore<HistoryStore>['directSet'],
+) {
 
     let actionRunStatus: { status: string, reason?: any } = { status: 'completed' };
     let resolveActiveAction = (value: void) => {};

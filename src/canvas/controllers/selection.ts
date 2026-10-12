@@ -119,6 +119,7 @@ export default class SelectionController extends BaseMovementController {
 
     onLeave(): void {
         super.onLeave();
+
         appEmitter.off('editor.tool.commitCurrentAction', this.queueApplyActiveSelection);
         if (this.deleteSelectionHandler) {
             appEmitter.off('editor.tool.delete', this.deleteSelectionHandler);

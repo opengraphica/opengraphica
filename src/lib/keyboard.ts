@@ -90,6 +90,22 @@ async function onDocumentKeyDown(e: KeyboardEvent) {
     } else if (e.key === 'Delete') {
         if (isInput(e.target)) return;
         appEmitter.emit('editor.tool.delete');
+    } else if (e.key === 'ArrowDown') {
+        if (isInput(e.target)) return;
+        e.preventDefault();
+        appEmitter.emit('editor.tool.arrowDown');
+    } else if (e.key === 'ArrowLeft') {
+        if (isInput(e.target)) return;
+        e.preventDefault();
+        appEmitter.emit('editor.tool.arrowLeft');
+    } else if (e.key === 'ArrowRight') {
+        if (isInput(e.target)) return;
+        e.preventDefault();
+        appEmitter.emit('editor.tool.arrowRight');
+    } else if (e.key === 'ArrowUp') {
+        if (isInput(e.target)) return;
+        e.preventDefault();
+        appEmitter.emit('editor.tool.arrowUp');
     } else if (isAnyModifierKeyPressed.value === true) {
         if (isInput(e.target)) return;
         const shortcuts = shortcutKeyMap.get(e.key.toLowerCase());

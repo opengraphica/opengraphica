@@ -1092,6 +1092,19 @@ export function parsePathNodeAttributes(node: Element, options?: ParseNodeGlobal
     return { d };
 }
 
+export function parseAnyShapeAttributes(node: Element, options?: ParseNodeGlobalOptions): Record<string, any> {
+    switch (node.tagName) {
+        case 'rect': return parseRectNodeAttributes(node, options);
+        case 'polygon': return parsePolygonNodeAttributes(node, options);
+        case 'polyline': return parsePolylineNodeAttributes(node, options);
+        case 'circle': return parseCircleNodeAttributes(node, options);
+        case 'ellipse': return parseEllipseNodeAttributes(node, options);
+        case 'line': return parseLineNodeAttributes(node, options);
+        case 'path': return parsePathNodeAttributes(node, options);
+    }
+    return {};
+}
+
 export function serializeVectorPathCommand(current: VectorPathCommand, previous?: VectorPathCommand) {
     switch (current.type) {
         case VectorPathCommandType.CLOSE:

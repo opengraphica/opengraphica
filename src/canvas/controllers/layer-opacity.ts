@@ -1,6 +1,8 @@
 import { watch, type WatchHandle } from 'vue';
 import BaseCanvasMovementController from './base-movement';
 
+import appEmitter from '@/lib/emitter';
+
 import canvasStore from '@/store/canvas';
 import historyStore from '@/store/history';
 import workingFileStore, { getLayerById } from '@/store/working-file';
@@ -25,6 +27,11 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
 
         this.onCancel = this.onCancel.bind(this);
         this.onDone = this.onDone.bind(this);
+        this.onToolCancel = this.onToolCancel.bind(this);
+        this.onToolDone = this.onToolDone.bind(this);
+
+        appEmitter.on('editor.tool.cancelCurrentAction', this.onToolCancel);
+        appEmitter.on('editor.tool.commitCurrentAction', this.onToolDone);
 
         layerOpacityEmitter.on('cancel', this.onCancel);
         layerOpacityEmitter.on('done', this.onDone);
@@ -56,11 +63,22 @@ export default class CanvasDrawBrushController extends BaseCanvasMovementControl
     onLeave(): void {
         super.onLeave();
 
+        appEmitter.off('editor.tool.cancelCurrentAction', this.onToolCancel);
+        appEmitter.off('editor.tool.commitCurrentAction', this.onToolDone);
+
         layerOpacityEmitter.off('cancel', this.onCancel);
         layerOpacityEmitter.off('done', this.onDone);
 
         this.previewOpacityUnwatch?.();
         this.previewOpacityUnwatch = null;
+    }
+
+    onToolCancel() {
+        layerOpacityEmitter.emit('cancel');
+    }
+
+    onToolDone() {
+        layerOpacityEmitter.emit('done');
     }
 
     onCancel() {

@@ -3,9 +3,6 @@ import wasmLoadModule, {
     path_contains_path as wasmPathContainsPath,
     path_to_polyline as wasmPathToPolyline,
     simplify_path as wasmSimplifyPath,
-    create_brush_stroke as wasmCreateBrushStroke,
-    move_brush_stroke as wasmMoveBrushStroke,
-    stop_brush_stroke as wasmStopBrushStroke,
 } from './build/vector_process_wasm';
 
 import { Clipper, PolyType, ClipType, Paths, PolyFillType } from '@/lib/clipper';
