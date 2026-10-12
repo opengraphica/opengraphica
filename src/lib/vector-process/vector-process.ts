@@ -5,57 +5,131 @@ import wasmLoadModule, {
     simplify_path as wasmSimplifyPath,
 } from './build/vector_process_wasm';
 
+import { Path } from 'three/src/extras/core/Path';
+
 import { Clipper, PolyType, ClipType, Paths, PolyFillType } from '@/lib/clipper';
-import { clockwiseAngle2d, isEqualApprox } from '@/lib/math';
+import { clockwiseAngle2d, findPointListBounds, isEqualApprox } from '@/lib/math';
 import { serializeVectorPathCommands, parseVectorPathCommand } from '@/lib/svg';
 
-import { type BrushDefinition, type VectorPathCommand, type VectorPathCommandMove, type VectorPathCommandLine, VectorPathCommandType } from '@/types';
+import { VectorPathCommandType } from '@/types/vector';
+import type {
+    BrushDefinition, VectorPathCommand, VectorPathCommandMove, VectorPathCommandLine,
+} from '@/types';
 
 let isWasmModuleLoaded = false;
+let isWasmModuleLoadError = false;
+
 async function waitForWasmReady() {
-    if (!isWasmModuleLoaded) {
-        await wasmLoadModule();
-        isWasmModuleLoaded = true;
+    if (!isWasmModuleLoaded && !isWasmModuleLoadError) {
+        try {
+            await wasmLoadModule();
+            isWasmModuleLoaded = true;
+        } catch {
+            isWasmModuleLoadError = true;
+        }
     }
 }
 
 export async function pathToPolylines(
-    path: string | VectorPathCommand[],
+    pathCommands: string | VectorPathCommand[],
 ): Promise<Array<Array<VectorPathCommandMove | VectorPathCommandLine>>> {
-    await waitForWasmReady();
+    waitForWasmReady();
 
-    const pathCommand = typeof path === 'string' ? path : serializeVectorPathCommands(path);
+    if (isWasmModuleLoaded) {
 
-    const polylineCommand = wasmPathToPolyline(pathCommand);
+        const polylineCommand = wasmPathToPolyline(
+            typeof pathCommands === 'string' ? pathCommands : serializeVectorPathCommands(pathCommands)
+        );
 
-    const polylines: Array<Array<VectorPathCommandMove | VectorPathCommandLine>> = [];
-    let currentPolyline: Array<VectorPathCommandMove | VectorPathCommandLine> = [];
-    for (const command of parseVectorPathCommand(polylineCommand)) {
-        if (command.type !== VectorPathCommandType.CLOSE) {
-            currentPolyline.push(command as VectorPathCommandMove | VectorPathCommandLine);
-        } else {
-            polylines.push(currentPolyline);
-            currentPolyline = [];
+        const polylines: Array<Array<VectorPathCommandMove | VectorPathCommandLine>> = [];
+        let currentPolyline: Array<VectorPathCommandMove | VectorPathCommandLine> = [];
+        for (const command of parseVectorPathCommand(polylineCommand)) {
+            if (command.type !== VectorPathCommandType.CLOSE) {
+                currentPolyline.push(command as VectorPathCommandMove | VectorPathCommandLine);
+            } else {
+                polylines.push(currentPolyline);
+                currentPolyline = [];
+            }
         }
+        if (currentPolyline.length > 0) {
+            polylines.push(currentPolyline);
+        }
+        return polylines;
+
+    } else {
+
+        const commands = typeof pathCommands === 'string' ? parseVectorPathCommand(pathCommands) : pathCommands;
+
+        const paths: Path[] = [];
+        let path = new Path();
+        for (const command of commands) {
+            switch (command.type) {
+                case VectorPathCommandType.CLOSE:
+                    if (path.curves.length > 0) {
+                        paths.push(path);
+                        path = new Path();
+                    }
+                    break;
+                case VectorPathCommandType.CUBIC_BEZIER_CURVE:
+                    path.bezierCurveTo(command.x1, command.y1, command.x2, command.y2, command.x, command.y);
+                    break;
+                case VectorPathCommandType.LINE:
+                    path.lineTo(command.x, command.y);
+                    break;
+                case VectorPathCommandType.QUADRATIC_BEZIER_CURVE:
+                    path.quadraticCurveTo(command.x1, command.y1, command.x, command.y);
+                    break;
+                case VectorPathCommandType.MOVE:
+                    if (path.curves.length > 0) {
+                        paths.push(path);
+                        path = new Path();
+                    }
+                    path.moveTo(command.x, command.y);
+                    break;
+            }
+        }
+        if (path.curves.length > 0) {
+            paths.push(path);
+        }
+
+        const polylines: Array<Array<VectorPathCommandMove | VectorPathCommandLine>> = [];
+        let currentPolyline: Array<VectorPathCommandMove | VectorPathCommandLine> = [];
+        for (const path of paths) {
+            if (currentPolyline.length > 0) {
+                polylines.push(currentPolyline);
+                currentPolyline = [];
+            }
+            for (const point of path.getPoints()) {
+                currentPolyline.push({
+                    type: currentPolyline.length === 0 ? VectorPathCommandType.MOVE : VectorPathCommandType.LINE,
+                    x: point.x,
+                    y: point.y,
+                });
+            }
+        }
+        if (currentPolyline.length > 0) {
+            polylines.push(currentPolyline);
+        }
+        return polylines;
+
     }
-    if (currentPolyline.length > 0) {
-        polylines.push(currentPolyline);
-    }
-    return polylines;
 }
 
 export async function polylineToSimplifiedPath(
     polyline: VectorPathCommand[],
 ): Promise<VectorPathCommand[]> {
-    await waitForWasmReady();
+    waitForWasmReady();
+    if (isWasmModuleLoaded) {
+        const polylineCommand = serializeVectorPathCommands(polyline);
 
-    const polylineCommand = serializeVectorPathCommands(polyline);
+        const pathCommand = wasmSimplifyPath(polylineCommand);
 
-    const pathCommand = wasmSimplifyPath(polylineCommand);
-
-    const path = parseVectorPathCommand(pathCommand);
-
-    return path;
+        const path = parseVectorPathCommand(pathCommand);
+        
+        return path;
+    } else {
+        return polyline;
+    }
 }
 
 /**
@@ -65,12 +139,36 @@ export async function pathContainsPath(
     a: string | VectorPathCommand[],
     b: string | VectorPathCommand[],
 ): Promise<boolean> {
-    await waitForWasmReady();
+    waitForWasmReady()
 
-    return wasmPathContainsPath(
-        typeof a === 'string' ? a : serializeVectorPathCommands(a),
-        typeof b === 'string' ? b : serializeVectorPathCommands(b),
-    );
+    if (isWasmModuleLoaded) {
+       return wasmPathContainsPath(
+            typeof a === 'string' ? a : serializeVectorPathCommands(a),
+            typeof b === 'string' ? b : serializeVectorPathCommands(b),
+        );
+    } else {
+
+        const aPaths = await pathToPolylines(typeof a === 'string' ? parseVectorPathCommand(a) : a);
+        const bPaths = await pathToPolylines(typeof b === 'string' ? parseVectorPathCommand(b) : b);
+
+        for (const aPath of aPaths) {
+            const aBounds = findPointListBounds(aPath);
+            for (const bPath of bPaths) {
+                const bBounds = findPointListBounds(bPath);
+                if (!(
+                    bBounds.left > aBounds.right
+                    || bBounds.right < aBounds.left
+                    || bBounds.top > aBounds.bottom
+                    || bBounds.bottom < aBounds.top
+                )) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+
+    }
 }
 
 let brushStrokeIterator: number = 0;
