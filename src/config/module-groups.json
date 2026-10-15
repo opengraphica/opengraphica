@@ -182,6 +182,30 @@
                     "type": "function",
                     "target": "image/paste.paste"
                 }
+            },
+            "flipLayersX": {
+                "action": {
+                    "type": "function",
+                    "target": "image/transform.flipLayersX"
+                }
+            },
+            "flipLayersY": {
+                "action": {
+                    "type": "function",
+                    "target": "image/transform.flipLayersY"
+                }
+            },
+            "rotateLayersClockwise": {
+                "action": {
+                    "type": "function",
+                    "target": "image/transform.rotateLayersClockwise"
+                }
+            },
+            "rotateLayersCounterclockwise": {
+                "action": {
+                    "type": "function",
+                    "target": "image/transform.rotateLayersCounterclockwise"
+                }
             }
         }
     },

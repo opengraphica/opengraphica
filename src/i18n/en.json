@@ -25,6 +25,8 @@
         "duplicateLayer": "Duplicate Layer",
         "enableLayerFilter": "Enable Layer Effect",
         "fileTakePhoto": "Take a Photo",
+        "flipLayerX": "Flip Layer X",
+        "flipLayerY": "Flip Layer Y",
         "freeTransformRotate": "Free Transform (Rotate)",
         "freeTransformScale": "Free Transform (Resize)",
         "freeTransformTranslate": "Free Transform (Move)",
@@ -235,7 +237,7 @@
                 "menu": {
                     "cropResize": "Crop and Resize",
                     "convertLayers": {
-                        "groupTitle": "Convert Layers...",
+                        "groupTitle": "Convert All Layers...",
                         "toCollage": "To Collage",
                         "toImageSequence": "To Image Sequence",
                         "flatten": "Flatten To New Layer"
@@ -243,7 +245,14 @@
                     "cut": "Cut",
                     "copy": "Copy",
                     "copyAllLayers": "Copy All Layers",
-                    "paste": "Paste"
+                    "paste": "Paste",
+                    "transformLayers": {
+                        "groupTitle": "Transform Layer...",
+                        "flipX": "Flip X",
+                        "flipY": "Flip Y",
+                        "rotateClockwise": "Rotate 90° Clockwise",
+                        "rotateCounterclockwise": "Rotate 90° Counterclockwise"
+                    }
                 }
             },
             "view": {
@@ -908,6 +917,12 @@
             "title": "Convert Layers to Image Sequence",
             "frameDelay": "Frame Delay"
         },
+        "imageTransform": {
+            "noLayersSelected": {
+                "title": "No Layers Selected",
+                "message": "Select at least one layer in the layers dock to transform."
+            }
+        },
         "layerBlendingMode": {
             "title": "Change Blending Mode",
             "blendingMode": "Blending Mode",
@@ -1206,6 +1221,22 @@
                 "paste": {
                     "name": "Paste",
                     "description": "Insert images on to the canvas from the clipboard."
+                },
+                "flipLayersX": {
+                    "name": "Flip X",
+                    "description": "Flip selected layers on the image's x axis."
+                },
+                "flipLayersY": {
+                    "name": "Flip Y",
+                    "description": "Flip selected layers on the image's y axis."
+                },
+                "rotateLayersClockwise": {
+                    "name": "Rotate 90° Clockwise",
+                    "description": "Rotate selected layers 90° clockwise."
+                },
+                "rotateLayersCounterclockwise": {
+                    "name": "Rotate 90° Counterclockwise",
+                    "description": "Rotate selected layers 90° counterclockwise."
                 }
             }
         },

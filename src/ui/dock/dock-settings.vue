@@ -93,7 +93,30 @@
                             <i class="bi bi-clipboard"></i>
                             <span>{{ t('dock.settings.image.menu.paste') }}</span>
                         </el-menu-item>
-                        <el-collapse class="el-collapse--menu-item my-1">
+                        <el-collapse class="el-collapse--menu-item mt-1">
+                            <el-collapse-item v-el-collapse-item-smart-scroll>
+                                <template v-slot:title>
+                                    {{ t('dock.settings.image.menu.transformLayers.groupTitle') }}
+                                </template>
+                                <el-menu-item index="flipLayersX">
+                                    <i class="bi bi-arrow-return-right"></i>
+                                    <span>{{ t('dock.settings.image.menu.transformLayers.flipX') }}</span>
+                                </el-menu-item>
+                                <el-menu-item index="flipLayersY">
+                                    <i class="bi bi-arrow-return-right"></i>
+                                    <span>{{ t('dock.settings.image.menu.transformLayers.flipY') }}</span>
+                                </el-menu-item>
+                                <el-menu-item index="rotateLayersClockwise">
+                                    <i class="bi bi-arrow-return-right"></i>
+                                    <span>{{ t('dock.settings.image.menu.transformLayers.rotateClockwise') }}</span>
+                                </el-menu-item>
+                                <el-menu-item index="rotateLayersCounterclockwise">
+                                    <i class="bi bi-arrow-return-right"></i>
+                                    <span>{{ t('dock.settings.image.menu.transformLayers.rotateCounterclockwise') }}</span>
+                                </el-menu-item>
+                            </el-collapse-item>
+                        </el-collapse>
+                        <el-collapse class="el-collapse--menu-item mb-1">
                             <el-collapse-item v-el-collapse-item-smart-scroll>
                                 <template v-slot:title>
                                     {{ t('dock.settings.image.menu.convertLayers.groupTitle') }}
@@ -825,6 +848,18 @@ async function onMenuSelect(group: string, index: string) {
                         break;
                     case 'paste':
                         await runModule('image', 'paste');
+                        break;
+                    case 'flipLayersX':
+                        await runModule('image', 'flipLayersX');
+                        break;
+                    case 'flipLayersY':
+                        await runModule('image', 'flipLayersY');
+                        break;
+                    case 'rotateLayersClockwise':
+                        await runModule('image', 'rotateLayersClockwise');
+                        break;
+                    case 'rotateLayersCounterclockwise':
+                        await runModule('image', 'rotateLayersCounterclockwise');
                         break;
                     case 'convertLayersToCollage':
                         await runModule('image', 'convertLayersToCollage');
