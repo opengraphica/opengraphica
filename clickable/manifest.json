@@ -9,7 +9,7 @@
             "desktop": "opengraphica.desktop"
         }
     },
-    "version": "0.0.3",
+    "version": "0.0.4",
     "maintainer": "OpenGraphica <opengraphica@gmail.com>",
     "framework": "$ENV{CLICK_FRAMEWORK}"
 }
