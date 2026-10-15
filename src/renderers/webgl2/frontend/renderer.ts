@@ -267,9 +267,9 @@ export class Webgl2RendererFrontend implements RendererFrontend {
         });
     }
 
-    async onSvgRequest(request?: { sourceUuid: string, width: number, height: number }) {
+    async onSvgRequest(request?: { sourceUuid: string, requestId: number, width: number, height: number }) {
         if (!request) return;
-        const { sourceUuid, width, height } = request;
+        const { sourceUuid, requestId, width, height } = request;
         let bitmap: ImageBitmap | undefined;
         const sourceImage = getStoredSvgImage(sourceUuid);
         if (sourceImage) {
@@ -283,14 +283,17 @@ export class Webgl2RendererFrontend implements RendererFrontend {
         }
         messageBus.emit('frontend.replyFrontendSvg', {
             sourceUuid,
+            requestId,
             bitmap,
         });
     }
 
-    async onTextureRequest(sourceUuid?: string) {
-        if (!sourceUuid) return;
+    async onTextureRequest(request?: { sourceUuid: string, requestId: number }) {
+        if (!request) return;
+        const { sourceUuid, requestId } = request;
         messageBus.emit('frontend.replyFrontendTexture', {
             sourceUuid,
+            requestId,
             bitmap: await getStoredImageAsBitmap(sourceUuid, {
                 imageOrientation: 'flipY',
             }) ?? undefined,

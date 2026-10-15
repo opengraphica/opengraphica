@@ -99,19 +99,19 @@
                                     {{ t('dock.settings.image.menu.transformLayers.groupTitle') }}
                                 </template>
                                 <el-menu-item index="flipLayersX">
-                                    <i class="bi bi-arrow-return-right"></i>
+                                    <i class="bi bi-arrows-collapse-vertical"></i>
                                     <span>{{ t('dock.settings.image.menu.transformLayers.flipX') }}</span>
                                 </el-menu-item>
                                 <el-menu-item index="flipLayersY">
-                                    <i class="bi bi-arrow-return-right"></i>
+                                    <i class="bi bi-arrows-collapse"></i>
                                     <span>{{ t('dock.settings.image.menu.transformLayers.flipY') }}</span>
                                 </el-menu-item>
                                 <el-menu-item index="rotateLayersClockwise">
-                                    <i class="bi bi-arrow-return-right"></i>
+                                    <i class="bi bi-arrow-clockwise"></i>
                                     <span>{{ t('dock.settings.image.menu.transformLayers.rotateClockwise') }}</span>
                                 </el-menu-item>
                                 <el-menu-item index="rotateLayersCounterclockwise">
-                                    <i class="bi bi-arrow-return-right"></i>
+                                    <i class="bi bi-arrow-counterclockwise"></i>
                                     <span>{{ t('dock.settings.image.menu.transformLayers.rotateCounterclockwise') }}</span>
                                 </el-menu-item>
                             </el-collapse-item>

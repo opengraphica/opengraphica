@@ -130,7 +130,7 @@ export async function cloneStoredSvg(uuid?: string): Promise<string> {
     });
 
     const url = URL.createObjectURL(blob);
-    const image = new Image()
+    const image = new Image();
     await new Promise((resolve) => {
         image.onload = resolve;
         image.onerror = resolve;

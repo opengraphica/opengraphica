@@ -644,7 +644,7 @@ export function parseVectorPathCommand(dAttr: string | null): VectorPathCommand[
             isFirstPoint = false;
         }
 
-        let numbers;
+        let numbers: any[];
 
         switch (type) {
             case 'M':
@@ -945,19 +945,22 @@ export function parseVectorPathCommand(dAttr: string | null): VectorPathCommand[
             case 'c':
                 numbers = parseFloats(data);
                 for (let j = 0, jl = numbers.length; j < jl; j += 6) {
+                    const x = point.x + numbers[j + 4];
+                    const y = point.y + numbers[j + 5];
+
                     d.push({
                         type: VectorPathCommandType.CUBIC_BEZIER_CURVE,
-                        x1: numbers[j + 0],
-                        y1: numbers[j + 1],
-                        x2: numbers[j + 2],
-                        y2: numbers[j + 3],
-                        x: numbers[j + 4],
-                        y: numbers[j + 5],
+                        x1: point.x + numbers[j + 0],
+                        y1: point.y + numbers[j + 1],
+                        x2: point.x + numbers[j + 2],
+                        y2: point.y + numbers[j + 3],
+                        x,
+                        y,
                     });
                     control.x = point.x + numbers[j + 2];
                     control.y = point.y + numbers[j + 3];
-                    point.x += numbers[j + 4];
-                    point.y += numbers[j + 5];
+                    point.x = x;
+                    point.y = y;
 
                     if (j === 0 && doSetFirstPoint === true) {
                         firstPoint.x = point.x;
@@ -969,19 +972,22 @@ export function parseVectorPathCommand(dAttr: string | null): VectorPathCommand[
             case 's':
                 numbers = parseFloats(data);
                 for (let j = 0, jl = numbers.length; j < jl; j += 4) {
+                    const x = point.x + numbers[j + 2];
+                    const y = point.y + numbers[j + 3];
+
                     d.push({
                         type: VectorPathCommandType.CUBIC_BEZIER_CURVE,
                         x1: getReflection(point.x, control.x),
                         y1: getReflection(point.y, control.y),
-                        x2: numbers[j + 0],
-                        y2: numbers[j + 1],
-                        x: numbers[j + 2],
-                        y: numbers[j + 3],
+                        x2: point.x + numbers[j + 0],
+                        y2: point.y + numbers[j + 1],
+                        x,
+                        y,
                     });
                     control.x = point.x + numbers[j + 0];
                     control.y = point.y + numbers[j + 1];
-                    point.x += numbers[j + 2];
-                    point.y += numbers[j + 3];
+                    point.x = x;
+                    point.y = y;
 
                     if (j === 0 && doSetFirstPoint === true) {
                         firstPoint.x = point.x;
@@ -993,17 +999,20 @@ export function parseVectorPathCommand(dAttr: string | null): VectorPathCommand[
             case 'q':
                 numbers = parseFloats(data);
                 for (let j = 0, jl = numbers.length; j < jl; j += 4) {
+                    const x = point.x + numbers[j + 2];
+                    const y = point.y + numbers[j + 3];
+
                     d.push({
                         type: VectorPathCommandType.QUADRATIC_BEZIER_CURVE,
-                        x1: numbers[j + 0],
-                        y1: numbers[j + 1],
-                        x: numbers[j + 2],
-                        y: numbers[j + 3],
+                        x1: point.x + numbers[j + 0],
+                        y1: point.y + numbers[j + 1],
+                        x,
+                        y,
                     });
                     control.x = point.x + numbers[j + 0];
                     control.y = point.y + numbers[j + 1];
-                    point.x += numbers[j + 2];
-                    point.y += numbers[j + 3];
+                    point.x = x;
+                    point.y = y;
 
                     if (j === 0 && doSetFirstPoint === true) {
                         firstPoint.x = point.x;
@@ -1015,19 +1024,21 @@ export function parseVectorPathCommand(dAttr: string | null): VectorPathCommand[
             case 't':
                 numbers = parseFloats(data);
                 for (let j = 0, jl = numbers.length; j < jl; j += 2) {
+                    const x = point.x + numbers[j + 0];
+                    const y = point.y + numbers[j + 1];
                     const rx = getReflection(point.x, control.x);
                     const ry = getReflection(point.y, control.y);
                     d.push({
                         type: VectorPathCommandType.QUADRATIC_BEZIER_CURVE,
                         x1: rx,
                         y1: ry,
-                        x: numbers[j + 0],
-                        y: numbers[j + 1],
+                        x,
+                        y,
                     });
                     control.x = rx;
                     control.y = ry;
-                    point.x = point.x + numbers[j + 0];
-                    point.y = point.y + numbers[j + 1];
+                    point.x = x;
+                    point.y = y;
 
                     if (j === 0 && doSetFirstPoint === true) {
                         firstPoint.x = point.x;
@@ -1050,7 +1061,13 @@ export function parseVectorPathCommand(dAttr: string | null): VectorPathCommand[
                     control.y = point.y;
                     d.push(
                         parseArcCommand(
-                            numbers[j], numbers[j + 1], numbers[j + 2], numbers[j + 3], numbers[j + 4], start, point
+                            numbers[j],
+                            numbers[j + 1],
+                            numbers[j + 2],
+                            numbers[j + 3],
+                            numbers[j + 4],
+                            start,
+                            point,
                         )
                     );
 

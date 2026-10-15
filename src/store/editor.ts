@@ -171,7 +171,7 @@ const store = new PerformantStore<EditorStore>({
         waiting: false,
     },
     readOnly: ['activeTheme', 'activeTool', 'activeToolGroup', 'themes', 'timelineCursor'],
-    restore: ['activeToolGroupRestore', 'activeToolRestore', 'isTouchUser', 'lastActiveThemeName', 'tutorialFlags'],
+    restore: ['activeToolGroupRestore', 'activeToolRestore', 'isTouchUser', 'lastActiveThemeName', 'toolGroupLastActivatedTool', 'tutorialFlags'],
     async onDispatch(actionName: string, value: any, set) {
         switch (actionName) {
             case 'addTutorialFlag':

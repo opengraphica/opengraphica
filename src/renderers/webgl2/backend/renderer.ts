@@ -54,8 +54,8 @@ export type MeshControllerInterface = any & { dispose: () => void };
 
 export interface Webgl2RendererBackendPublic {
     isOffscreen: boolean;
-    onRequestFrontendSvg?: (request: { sourceUuid: string, width: number, height: number }) => void;
-    onRequestFrontendTexture?: (sourceUuid: string) => void;
+    onRequestFrontendSvg?: (request: { sourceUuid: string, requestId: number, width: number, height: number }) => void;
+    onRequestFrontendTexture?: (request: { sourceUuid: string, requestId: number }) => void;
     initialize(canvas: HTMLCanvasElement | OffscreenCanvas, imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number): Promise<void>;
     resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number): Promise<void>;
     getMaxTextureSize(): Promise<number>;

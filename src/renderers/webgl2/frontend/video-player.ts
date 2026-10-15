@@ -6,6 +6,7 @@ interface VideoContext {
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,
     sourceUuid: string,
+    requestId: number,
     video: HTMLVideoElement,
     callbackHandle: number | undefined,
 }
@@ -32,6 +33,7 @@ function handleVideoFrameCallback(this: VideoContext, now?: DOMHighResTimeStamp,
 function sendBitmap(this: VideoContext, bitmap: ImageBitmap) {
     messageBus.emit('frontend.replyFrontendVideoFrame', {
         sourceUuid: this.sourceUuid,
+        requestId: this.requestId,
         bitmap,
     })
 }
@@ -44,8 +46,9 @@ export class VideoPlayer {
         messageBus.on('backend.requestFrontendVideoFrame', this.requestFrontendVideoFrame);
     }
 
-    requestFrontendVideoFrame(sourceUuid?: string) {
-        if (!sourceUuid) return;
+    requestFrontendVideoFrame(request?: { sourceUuid: string, requestId: number }) {
+        if (!request) return;
+        const { sourceUuid, requestId } = request;
         try {
             const video = getStoredVideo(sourceUuid);
             if (!video) throw new Error();
@@ -60,11 +63,13 @@ export class VideoPlayer {
                     canvas,
                     context,
                     sourceUuid,
+                    requestId,
                     video,
                     callbackHandle: undefined,
                 }
                 this.videoContexts.set(sourceUuid, videoContext);
             }
+            videoContext.requestId = requestId;
             if (videoContext.callbackHandle) {
                 videoContext.video.cancelVideoFrameCallback(videoContext.callbackHandle);
             }
@@ -72,6 +77,7 @@ export class VideoPlayer {
         } catch (error) {
             messageBus.emit('frontend.replyFrontendVideoFrame', {
                 sourceUuid,
+                requestId,
                 bitmap: undefined,
             });
         }

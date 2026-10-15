@@ -2562,6 +2562,10 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             || event.action.id === 'pasteLayers'
             || event.action.id === 'freeTransform'
             || event.action.id === 'convertVectorShapesToPaths'
+            || event.action.id === 'flipLayerX'
+            || event.action.id === 'flipLayerY'
+            || event.action.id === 'rotateLayerClockwise'
+            || event.action.id === 'rotateLayerCounterclockwise'
         ) {
             this.createEditingLayersFromSelectedLayers(workingFileStore.state.selectedLayerIds, workingFileStore.state.selectedLayerIds);
         }
@@ -2571,11 +2575,23 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
         ) {
             selectedShapes.value = [];
         }
+        if (
+            event.action.id === 'flipLayerX'
+            || event.action.id === 'flipLayerY'
+            || event.action.id === 'rotateLayerClockwise'
+            || event.action.id === 'rotateLayerCounterclockwise'
+        ) {
+            nextTick(() => {
+                this.setTransformBoundsFromSelectedShapesImmediate();
+            });
+        }
         if (event.trigger !== 'do') {
-            if (event.action.id === 'freeTransform') {
+            if (
+                event.action.id === 'freeTransform'
+            ) {
                 nextTick(() => {
                     this.setTransformBoundsFromSelectedShapesImmediate();
-                })
+                });
             } else {
                 selectedShapes.value = [];
             }

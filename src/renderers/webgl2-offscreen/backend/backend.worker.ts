@@ -258,12 +258,14 @@ self.onmessage = ({ data }) => {
         case BackendWorkerMessage.REQUEST_FRONTEND_SVG_RESULT:
             messageBus.emit('frontend.replyFrontendSvg', {
                 sourceUuid: data.sourceUuid,
+                requestId: data.requestId,
                 bitmap: data.bitmap,
             });
             break;
         case BackendWorkerMessage.REQUEST_FRONTEND_TEXTURE_RESULT:
             messageBus.emit('frontend.replyFrontendTexture', {
                 sourceUuid: data.sourceUuid,
+                requestId: data.requestId,
                 bitmap: data.bitmap,
             });
             break;
@@ -307,10 +309,10 @@ messageBus.on('backend.requestFrontendSvg', (request) => {
     });
 });
 
-messageBus.on('backend.requestFrontendTexture', (sourceUuid) => {
+messageBus.on('backend.requestFrontendTexture', (request) => {
     self.postMessage({
         type: BackendWorkerMessage.REQUEST_FRONTEND_TEXTURE,
-        sourceUuid,
+        request,
     });
 });
 

@@ -161,7 +161,8 @@ const layerSelectionOptions = [
 const fileTypeOptions = [
     { value: 'bmp', label: 'BMP' },
     { value: 'gif', label: 'GIF' },
-    { value: 'jpg', label: 'JPG' },
+    { value: 'jpg', label: 'JPEG' },
+    { value: 'jxl', label: 'JPEG XL' },
     { value: 'png', label: 'PNG' },
     { value: 'svg', label: 'SVG' },
     { value: 'tiff', label: 'TIFF' },
@@ -182,7 +183,7 @@ const ditheringOptions = [
 ];
 
 const showQualitySetting = computed<boolean>(() => {
-    return ['jpg', 'gif', 'webp'].includes(formData.workingFile.fileType);
+    return ['jpg', 'jxl', 'gif', 'webp'].includes(formData.workingFile.fileType);
 });
 
 const showDitheringSetting = computed<boolean>(() => {
@@ -190,7 +191,7 @@ const showDitheringSetting = computed<boolean>(() => {
 });
 
 const showMaxFileSizeSetting = computed<boolean>(() => {
-    return ['jpg', 'png', 'webp', 'bmp'].includes(formData.workingFile.fileType);
+    return ['jpg', 'jxl', 'png', 'webp', 'bmp'].includes(formData.workingFile.fileType);
 });
 
 const formData = reactive({

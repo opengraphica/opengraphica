@@ -25,8 +25,8 @@
         "duplicateLayer": "Duplicate Layer",
         "enableLayerFilter": "Enable Layer Effect",
         "fileTakePhoto": "Take a Photo",
-        "flipLayerX": "Flip Layer X",
-        "flipLayerY": "Flip Layer Y",
+        "flipLayerX": "Flip Layer Horizontal",
+        "flipLayerY": "Flip Layer Vertical",
         "freeTransformRotate": "Free Transform (Rotate)",
         "freeTransformScale": "Free Transform (Resize)",
         "freeTransformTranslate": "Free Transform (Move)",
@@ -42,6 +42,8 @@
         "renameLayer": "Rename Layer",
         "reorderLayers": "Reorder Layer(s)",
         "reorderLayerFilters": "Reorder Effect(s)",
+        "rotateLayerClockwise": "Rotate 90° Clockwise",
+        "rotateLayerCounterclockwise": "Rotate 90° Counterclockwise",
         "selectLayers": "Select Layer(s)",
         "setLayerBoundsToWorkingFileBounds": "Expand With Empty Space",
         "stretchLayerToWorkingFileBounds": "Stretch to Canvas Size",
@@ -248,8 +250,8 @@
                     "paste": "Paste",
                     "transformLayers": {
                         "groupTitle": "Transform Layer...",
-                        "flipX": "Flip X",
-                        "flipY": "Flip Y",
+                        "flipX": "Flip Horizontal",
+                        "flipY": "Flip Vertical",
                         "rotateClockwise": "Rotate 90° Clockwise",
                         "rotateCounterclockwise": "Rotate 90° Counterclockwise"
                     }

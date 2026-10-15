@@ -12,13 +12,15 @@ import {
     parseRectNodeAttributes, parsePolylineNodeAttributes, parsePolygonNodeAttributes,
     parseCircleNodeAttributes, parseEllipseNodeAttributes, parseLineNodeAttributes,
     parsePathNodeAttributes, parseNodeTransform,
+    serializeVectorPathCommands,
 } from '@/lib/svg';
 
 import { BundleAction } from '@/actions/bundle';
 import { UpdateLayerAction } from '@/actions/update-layer';
 
+import { VectorPathCommandType } from '@/types/vector';
 import type {
-    WorkingFileGradientLayer, WorkingFileRasterSequenceLayer, WorkingFileVectorLayer,
+    WorkingFileGradientLayer, WorkingFileRasterSequenceLayer,
 } from '@/types';
 
 function flipImageDataX(imageData: ImageData) {
@@ -42,6 +44,7 @@ function flipImageDataX(imageData: ImageData) {
             imageData.data[rightIndex + 3] = tmpA;
         }
     }
+    return imageData;
 }
 
 function flipGradientDataX(data: WorkingFileGradientLayer['data']): WorkingFileGradientLayer['data'] {
@@ -53,54 +56,94 @@ function flipGradientDataX(data: WorkingFileGradientLayer['data']): WorkingFileG
     return newData;
 }
 
-function flipVectorDataX(svgDocument: Document, width: number, height: number) {
+function flipVectorDataX(svgDocument: Document) {
     const shapes = svgDocument.querySelectorAll('[data-ogr-id]');
-    for (const shape of shapes) {
+    for (const shape of Array.from(shapes)) {
         const shapeTransform = parseNodeTransform(shape, { defaultDPI: 90, defaultUnit: 'px', attributeInheritance: 'disable' });
         const nodeInheritedTransform = parseNodeTransform(shape, { defaultDPI: 90, defaultUnit: 'px', attributeInheritance: 'inheritedOnly' });
         const viewBox = getViewBox(svgDocument);
-        const parentTransform = new DOMMatrix().scale(
-            width / viewBox.width, height / viewBox.height, 1.0,
-        ).translateSelf(
+        const parentTransform = new DOMMatrix().translateSelf(
             -viewBox.x, -viewBox.y, 0.0,
         ).multiplySelf(
             nodeInheritedTransform,
         );
+        const layerSpaceTransform = parentTransform.multiply(shapeTransform);
+        const layerSpaceTransformInverse = layerSpaceTransform.inverse();
+
+        const flipPoint = (point: DOMPoint) => {
+            let xfPoint = point.matrixTransform(layerSpaceTransform);
+            xfPoint.x = viewBox.width - xfPoint.x;
+            return xfPoint.matrixTransform(layerSpaceTransformInverse);
+        };
 
         switch (shape.tagName) {
-            case 'rect': {
-                const { x, y, width, height } = parseRectNodeAttributes(shape);
-                // TODO - change transform
-                break;
-            }
-            case 'circle': {
-                const { cx, cy, r } = parseCircleNodeAttributes(shape);
-                // TODO - change transform
-                break;
-            }
-            case 'ellipse': {
-                const { cx, cy, rx, ry } = parseEllipseNodeAttributes(shape);
-                // TODO - change transform
+            case 'rect': case 'circle': case 'ellipse': {
+                let cx = 0;
+                if (shape.tagName === 'rect') {
+                    const { x, width } = parseRectNodeAttributes(shape);
+                    cx = x + width / 2;
+                } else {
+                    ({ cx } = parseCircleNodeAttributes(shape));
+                }
+                const { a, b, c, d, e, f } = layerSpaceTransform;
+                const mirroredLayerTransform = new DOMMatrix([a, -b, -c, d,
+                    viewBox.width - e - 2 * a * cx,
+                    f + 2 * b * cx,
+                ]);
+                {
+                    const { a, b, c, d, e, f } = parentTransform.inverse()
+                        .multiply(mirroredLayerTransform);
+                    shape.setAttribute('transform', `matrix(${a}, ${b}, ${c}, ${d}, ${e}, ${f})`);
+                }
                 break;
             }
             case 'line': {
                 const { x1, y1, x2, y2 } = parseLineNodeAttributes(shape);
-                // TODO
+                const p1 = flipPoint(new DOMPoint(x1, y1));
+                const p2 = flipPoint(new DOMPoint(x2, y2));
+                shape.setAttribute('x1', `${p1.x}`);
+                shape.setAttribute('y1', `${p1.y}`);
+                shape.setAttribute('x2', `${p2.x}`);
+                shape.setAttribute('y2', `${p2.y}`);
                 break;
             }
-            case 'polyline': {
+            case 'polyline': case 'polygon': {
                 const { points } = parsePolylineNodeAttributes(shape);
-                // TODO
-                break;
-            }
-            case 'polygon': {
-                const { points } = parsePolygonNodeAttributes(shape);
-                // TODO
+                for (const point of points) {
+                    const xfPoint = flipPoint(point);
+                    point.x = xfPoint.x;
+                    point.y = xfPoint.y;
+                }
+                shape.setAttribute('points', points.map((point) => `${point.x},${point.y}`).join(' '));
                 break;
             }
             case 'path': {
                 const { d } = parsePathNodeAttributes(shape);
-                // TODO
+                for (const command of d) {
+                    if (command.type === VectorPathCommandType.MOVE || command.type === VectorPathCommandType.LINE) {
+                        const point = flipPoint(new DOMPoint(command.x, command.y));
+                        command.x = point.x;
+                        command.y = point.y;
+                    } else if (command.type === VectorPathCommandType.QUADRATIC_BEZIER_CURVE) {
+                        const point = flipPoint(new DOMPoint(command.x, command.y));
+                        const control1 = flipPoint(new DOMPoint(command.x1, command.y1));
+                        command.x = point.x;
+                        command.y = point.y;
+                        command.x1 = control1.x;
+                        command.y1 = control1.y;
+                    } else if (command.type === VectorPathCommandType.CUBIC_BEZIER_CURVE) {
+                        const point = flipPoint(new DOMPoint(command.x, command.y));
+                        const control1 = flipPoint(new DOMPoint(command.x1, command.y1));
+                        const control2 = flipPoint(new DOMPoint(command.x2, command.y2));
+                        command.x = point.x;
+                        command.y = point.y;
+                        command.x1 = control1.x;
+                        command.y1 = control1.y;
+                        command.x2 = control2.x;
+                        command.y2 = control2.y;
+                    }
+                }
+                shape.setAttribute('d', serializeVectorPathCommands(d));
                 break;
             }
         }
@@ -128,6 +171,7 @@ function flipImageDataY(imageData: ImageData) {
             imageData.data[bottomIndex + 3] = tmpA;
         }
     }
+    return imageData;
 }
 
 function flipGradientDataY(data: WorkingFileGradientLayer['data']): WorkingFileGradientLayer['data'] {
@@ -139,15 +183,259 @@ function flipGradientDataY(data: WorkingFileGradientLayer['data']): WorkingFileG
     return newData;
 }
 
-function flipVectorDataY(svgDocument: Document, width: number, height: number) {
-    
+function flipVectorDataY(svgDocument: Document) {
+    const shapes = svgDocument.querySelectorAll('[data-ogr-id]');
+    for (const shape of Array.from(shapes)) {
+        const shapeTransform = parseNodeTransform(shape, { defaultDPI: 90, defaultUnit: 'px', attributeInheritance: 'disable' });
+        const nodeInheritedTransform = parseNodeTransform(shape, { defaultDPI: 90, defaultUnit: 'px', attributeInheritance: 'inheritedOnly' });
+        const viewBox = getViewBox(svgDocument);
+        const parentTransform = new DOMMatrix().translateSelf(
+            -viewBox.x, -viewBox.y, 0.0,
+        ).multiplySelf(
+            nodeInheritedTransform,
+        );
+        const layerSpaceTransform = parentTransform.multiply(shapeTransform);
+        const layerSpaceTransformInverse = layerSpaceTransform.inverse();
+
+        const flipPoint = (point: DOMPoint) => {
+            let xfPoint = point.matrixTransform(layerSpaceTransform);
+            xfPoint.y = viewBox.height - xfPoint.y;
+            return xfPoint.matrixTransform(layerSpaceTransformInverse);
+        };
+
+        switch (shape.tagName) {
+            case 'rect': case 'circle': case 'ellipse': {
+                let cy = 0;
+                if (shape.tagName === 'rect') {
+                    const { y, height } = parseRectNodeAttributes(shape);
+                    cy = y + height / 2;
+                } else {
+                    ({ cy } = parseCircleNodeAttributes(shape));
+                }
+                const { a, b, c, d, e, f } = layerSpaceTransform;
+                const mirroredLayerTransform = new DOMMatrix([a, -b, -c, d,
+                    e + 2 * c * cy,
+                    viewBox.height - f - 2 * d * cy,
+                ]);
+                {
+                    const { a, b, c, d, e, f } = parentTransform.inverse()
+                        .multiply(mirroredLayerTransform);
+                    shape.setAttribute('transform', `matrix(${a}, ${b}, ${c}, ${d}, ${e}, ${f})`);
+                }
+                break;
+            }
+            case 'line': {
+                const { x1, y1, x2, y2 } = parseLineNodeAttributes(shape);
+                const p1 = flipPoint(new DOMPoint(x1, y1));
+                const p2 = flipPoint(new DOMPoint(x2, y2));
+                shape.setAttribute('x1', `${p1.x}`);
+                shape.setAttribute('y1', `${p1.y}`);
+                shape.setAttribute('x2', `${p2.x}`);
+                shape.setAttribute('y2', `${p2.y}`);
+                break;
+            }
+            case 'polyline': case 'polygon': {
+                const { points } = parsePolylineNodeAttributes(shape);
+                for (const point of points) {
+                    const xfPoint = flipPoint(point);
+                    point.x = xfPoint.x;
+                    point.y = xfPoint.y;
+                }
+                shape.setAttribute('points', points.map((point) => `${point.x},${point.y}`).join(' '));
+                break;
+            }
+            case 'path': {
+                const { d } = parsePathNodeAttributes(shape);
+                for (const command of d) {
+                    if (command.type === VectorPathCommandType.MOVE || command.type === VectorPathCommandType.LINE) {
+                        const point = flipPoint(new DOMPoint(command.x, command.y));
+                        command.x = point.x;
+                        command.y = point.y;
+                    } else if (command.type === VectorPathCommandType.QUADRATIC_BEZIER_CURVE) {
+                        const point = flipPoint(new DOMPoint(command.x, command.y));
+                        const control1 = flipPoint(new DOMPoint(command.x1, command.y1));
+                        command.x = point.x;
+                        command.y = point.y;
+                        command.x1 = control1.x;
+                        command.y1 = control1.y;
+                    } else if (command.type === VectorPathCommandType.CUBIC_BEZIER_CURVE) {
+                        const point = flipPoint(new DOMPoint(command.x, command.y));
+                        const control1 = flipPoint(new DOMPoint(command.x1, command.y1));
+                        const control2 = flipPoint(new DOMPoint(command.x2, command.y2));
+                        command.x = point.x;
+                        command.y = point.y;
+                        command.x1 = control1.x;
+                        command.y1 = control1.y;
+                        command.x2 = control2.x;
+                        command.y2 = control2.y;
+                    }
+                }
+                shape.setAttribute('d', serializeVectorPathCommands(d));
+                break;
+            }
+        }
+    }
+}
+
+function rotateImageData90Clockwise(imageData: ImageData) {
+    const width = imageData.width;
+    const height = imageData.height;
+    const rotatedData = new Uint8ClampedArray(imageData.data.length);
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            const srcIndex = (y * width + x) * 4;
+            const dstIndex = (x * height + (height - 1 - y)) * 4;
+            rotatedData[dstIndex] = imageData.data[srcIndex];
+            rotatedData[dstIndex + 1] = imageData.data[srcIndex + 1];
+            rotatedData[dstIndex + 2] = imageData.data[srcIndex + 2];
+            rotatedData[dstIndex + 3] = imageData.data[srcIndex + 3];
+        }
+    }
+    return new ImageData(rotatedData, height, width);
+}
+
+function rotateGradientData(data: WorkingFileGradientLayer['data'], rotateDegrees: number): WorkingFileGradientLayer['data'] {
+    const newData = JSON.parse(JSON.stringify(data)) as WorkingFileGradientLayer['data'];
+    const width = workingFileStore.state.width;
+    const height = workingFileStore.state.height;
+    const transform = new DOMMatrix()
+        .translate(width / 2, height / 2)
+        .rotate(0, 0, rotateDegrees)
+        .translate(-width / 2, -height / 2);
+    let scrapPoint = new DOMPoint(data.start.x, data.start.y).matrixTransform(transform);
+    newData.start = {
+        x: scrapPoint.x,
+        y: scrapPoint.y,
+    };
+    scrapPoint = new DOMPoint(data.end.x, data.end.y).matrixTransform(transform);
+    newData.end = {
+        x: scrapPoint.x,
+        y: scrapPoint.y,
+    };
+    scrapPoint = new DOMPoint(data.focus.x, data.focus.y).matrixTransform(transform);
+    newData.focus = {
+        x: scrapPoint.x,
+        y: scrapPoint.y,
+    };
+    return newData;
+}
+
+function rotateVectorData(svgDocument: Document, rotateDegrees: number) {
+    const shapes = svgDocument.querySelectorAll('[data-ogr-id]');
+    for (const shape of Array.from(shapes)) {
+        const shapeTransform = parseNodeTransform(shape, { defaultDPI: 90, defaultUnit: 'px', attributeInheritance: 'disable' });
+        const nodeInheritedTransform = parseNodeTransform(shape, { defaultDPI: 90, defaultUnit: 'px', attributeInheritance: 'inheritedOnly' });
+        const viewBox = getViewBox(svgDocument);
+        const parentTransform = new DOMMatrix().translateSelf(
+            -viewBox.x, -viewBox.y, 0.0,
+        ).multiplySelf(
+            nodeInheritedTransform,
+        );
+        const layerSpaceTransform = parentTransform.multiply(shapeTransform);
+        const layerSpaceTransformInverse = layerSpaceTransform.inverse();
+
+        const rotatePoint = (point: DOMPoint) => {
+            const xfPoint = point.matrixTransform(layerSpaceTransform);
+            const cx = viewBox.width / 2;
+            const cy = viewBox.height / 2;
+            const dx = xfPoint.x - cx;
+            const dy = xfPoint.y - cy;
+            const cos = Math.cos(rotateDegrees * Math.DEGREES_TO_RADIANS);
+            const sin = Math.sin(rotateDegrees * Math.DEGREES_TO_RADIANS);
+            xfPoint.x = cx + dx * cos - dy * sin;
+            xfPoint.y = cy + dx * sin + dy * cos;
+            return xfPoint.matrixTransform(layerSpaceTransformInverse);
+        };
+
+        switch (shape.tagName) {
+            case 'rect': case 'circle': case 'ellipse': {
+                const cx = viewBox.width / 2;
+                const cy = viewBox.height / 2;
+                const rotateInLayerSpace = new DOMMatrix()
+                    .translateSelf(cx, cy)
+                    .rotateSelf(rotateDegrees)
+                    .translateSelf(-cx, -cy);
+                const rotatedLayerTransform = rotateInLayerSpace.multiply(layerSpaceTransform);
+                const rotatedShapeTransform = parentTransform.inverse().multiply(rotatedLayerTransform);
+                const { a, b, c, d, e, f } = rotatedShapeTransform;
+                shape.setAttribute('transform', `matrix(${a}, ${b}, ${c}, ${d}, ${e}, ${f})`);
+                break;
+            }
+            case 'line': {
+                const { x1, y1, x2, y2 } = parseLineNodeAttributes(shape);
+                const p1 = rotatePoint(new DOMPoint(x1, y1));
+                const p2 = rotatePoint(new DOMPoint(x2, y2));
+                shape.setAttribute('x1', `${p1.x}`);
+                shape.setAttribute('y1', `${p1.y}`);
+                shape.setAttribute('x2', `${p2.x}`);
+                shape.setAttribute('y2', `${p2.y}`);
+                break;
+            }
+            case 'polyline': case 'polygon': {
+                const { points } = parsePolylineNodeAttributes(shape);
+                for (const point of points) {
+                    const xfPoint = rotatePoint(point);
+                    point.x = xfPoint.x;
+                    point.y = xfPoint.y;
+                }
+                shape.setAttribute('points', points.map((point) => `${point.x},${point.y}`).join(' '));
+                break;
+            }
+            case 'path': {
+                const { d } = parsePathNodeAttributes(shape);
+                for (const command of d) {
+                    if (command.type === VectorPathCommandType.MOVE || command.type === VectorPathCommandType.LINE) {
+                        const point = rotatePoint(new DOMPoint(command.x, command.y));
+                        command.x = point.x;
+                        command.y = point.y;
+                    } else if (command.type === VectorPathCommandType.QUADRATIC_BEZIER_CURVE) {
+                        const point = rotatePoint(new DOMPoint(command.x, command.y));
+                        const control1 = rotatePoint(new DOMPoint(command.x1, command.y1));
+                        command.x = point.x;
+                        command.y = point.y;
+                        command.x1 = control1.x;
+                        command.y1 = control1.y;
+                    } else if (command.type === VectorPathCommandType.CUBIC_BEZIER_CURVE) {
+                        const point = rotatePoint(new DOMPoint(command.x, command.y));
+                        const control1 = rotatePoint(new DOMPoint(command.x1, command.y1));
+                        const control2 = rotatePoint(new DOMPoint(command.x2, command.y2));
+                        command.x = point.x;
+                        command.y = point.y;
+                        command.x1 = control1.x;
+                        command.y1 = control1.y;
+                        command.x2 = control2.x;
+                        command.y2 = control2.y;
+                    }
+                }
+                shape.setAttribute('d', serializeVectorPathCommands(d));
+                break;
+            }
+        }
+    }
+}
+
+function rotateImageData90Counterclockwise(imageData: ImageData) {
+    const width = imageData.width;
+    const height = imageData.height;
+    const rotatedData = new Uint8ClampedArray(imageData.data.length);
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            const srcIndex = (y * width + x) * 4;
+            const dstIndex = ((width - 1 - x) * height + y) * 4;
+            rotatedData[dstIndex] = imageData.data[srcIndex];
+            rotatedData[dstIndex + 1] = imageData.data[srcIndex + 1];
+            rotatedData[dstIndex + 2] = imageData.data[srcIndex + 2];
+            rotatedData[dstIndex + 3] = imageData.data[srcIndex + 3];
+        }
+    }
+    return new ImageData(rotatedData, height, width);
 }
 
 async function transformLayersGeneral(
     actionId: string,
-    imageDataModifier: (imageData: ImageData) => void,
+    imageDataModifier: (imageData: ImageData) => ImageData,
     gradientModifier: (gradientData: WorkingFileGradientLayer['data']) => WorkingFileGradientLayer['data'],
-    vectorModifier: (svgDocument: Document, width: number, height: number) => void,
+    vectorModifier: (svgDocument: Document) => void,
 ) {
     const selectedLayers = getSelectedLayers();
     const updateActions: UpdateLayerAction<any>[] = [];
@@ -165,8 +453,8 @@ async function transformLayersGeneral(
         } else if (layer.type === 'raster') {
             const storedImage = await getStoredImageCanvas(layer.data.sourceUuid);
             if (!storedImage) continue;
-            const imageData = getImageDataFromCanvas(storedImage);
-            imageDataModifier(imageData);
+            let imageData = getImageDataFromCanvas(storedImage);
+            imageData = imageDataModifier(imageData);
             updateActions.push(
                 new UpdateLayerAction({
                     id: layer.id,
@@ -182,8 +470,8 @@ async function transformLayersGeneral(
             for (const [frameIndex, frame] of layer.data.sequence.entries()) {
                 const storedImage = await getStoredImageCanvas(frame.image.sourceUuid);
                 if (!storedImage) continue;
-                const imageData = getImageDataFromCanvas(storedImage);
-                imageDataModifier(imageData);
+                let imageData = getImageDataFromCanvas(storedImage);
+                imageData = imageDataModifier(imageData);
                 newSequence[frameIndex].image.sourceUuid = await createStoredImage(
                     await createImageFromImageData(imageData)
                 );
@@ -198,7 +486,7 @@ async function transformLayersGeneral(
             );
         } else if (layer.type === 'vector') {
             const svgDocument = layer.data.sourceDocument ?? await getStoredSvgDocument(layer.data.sourceUuid);
-            vectorModifier(svgDocument, layer.width, layer.height);
+            vectorModifier(svgDocument);
 
             const serializer = new XMLSerializer();
             const svgText = serializer.serializeToString(svgDocument);
@@ -207,7 +495,7 @@ async function transformLayersGeneral(
             });
 
             const url = URL.createObjectURL(blob);
-            const image = new Image()
+            const image = new Image();
             await new Promise((resolve) => {
                 image.onload = resolve;
                 image.onerror = resolve;
@@ -218,7 +506,7 @@ async function transformLayersGeneral(
                 new UpdateLayerAction({
                     id: layer.id,
                     data: {
-                        sequence: createStoredSvg(image),
+                        sourceUuid: await createStoredSvg(image),
                     },
                 })
             );
@@ -259,10 +547,20 @@ export async function flipLayersY() {
     );
 }
 
-export function rotateLayersClockwise() {
-
+export async function rotateLayersClockwise() {
+    await transformLayersGeneral(
+        'rotateLayerClockwise',
+        rotateImageData90Clockwise,
+        (data) => rotateGradientData(data, 90),
+        (svgDocument) => rotateVectorData(svgDocument, 90),
+    );
 }
 
-export function rotateLayersCounterclockwise() {
-
+export async function rotateLayersCounterclockwise() {
+    await transformLayersGeneral(
+        'rotateLayerCounterclockwise',
+        rotateImageData90Counterclockwise,
+        (data) => rotateGradientData(data, -90),
+        (svgDocument) => rotateVectorData(svgDocument, -90),
+    );
 }

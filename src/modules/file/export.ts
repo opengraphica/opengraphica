@@ -42,7 +42,7 @@ declare class ClipboardItem {
 
 export interface ExportAsImageOptions {
     fileName?: string;
-    fileType: 'png' | 'jpg' | 'webp' | 'gif' | 'bmp' | 'tiff' | 'svg';
+    fileType: 'png' | 'jpg' | 'jxl' | 'webp' | 'gif' | 'bmp' | 'tiff' | 'svg';
     layerSelection?: 'all' | 'selected';
     cameraTransform?: DOMMatrix;
     applySelectionMask?: boolean;
@@ -68,6 +68,7 @@ export interface ExportAsImageResults {
 const extensionToMimeType: { [key: string]: string } = {
     png: 'image/png',
     jpg: 'image/jpeg',
+    jxl: 'image/jxl',
     webp: 'image/webp',
     gif: 'image/gif',
     bmp: 'image/bmp',

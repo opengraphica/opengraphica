@@ -19,8 +19,8 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
     backendWorker!: Worker;
     messageReceivedCallbacks = new Map<BackendWorkerMessage, Array<(arg?: any) => void>>();
 
-    onRequestFrontendSvg!: (request: { sourceUuid: string, width: number, height: number }) => void;
-    onRequestFrontendTexture!: (sourceUuid: string) => void;
+    onRequestFrontendSvg!: (request: { sourceUuid: string, requestId: number, width: number, height: number }) => void;
+    onRequestFrontendTexture!: (request: { sourceUuid: string, requestId: number }) => void;
 
     constructor() {
         this.backendWorker = new Worker(
@@ -35,7 +35,7 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
                     this.onRequestFrontendSvg(data.request);
                     break;
                 case BackendWorkerMessage.REQUEST_FRONTEND_TEXTURE:
-                    this.onRequestFrontendTexture(data.sourceUuid);
+                    this.onRequestFrontendTexture(data.request);
                     break;
                 default:
                     const callbacks = this.messageReceivedCallbacks.get(data.type);
@@ -50,6 +50,7 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
             this.backendWorker.postMessage({
                 type: BackendWorkerMessage.REQUEST_FRONTEND_SVG_RESULT,
                 sourceUuid: request?.sourceUuid,
+                requestId: request?.requestId,
                 bitmap: request?.bitmap,
             });
         });
@@ -58,6 +59,7 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
             this.backendWorker.postMessage({
                 type: BackendWorkerMessage.REQUEST_FRONTEND_TEXTURE_RESULT,
                 sourceUuid: request?.sourceUuid,
+                requestId: request?.requestId,
                 bitmap: request?.bitmap,
             });
         });

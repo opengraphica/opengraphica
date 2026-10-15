@@ -139,7 +139,9 @@ export class VideoLayerMeshController implements Webgl2RendererMeshController {
         this.disposeSourceTexture();
         this.sourceTexture = new CanvasTexture(this.sourceCanvas);
         this.scheduleMaterialUpdate('update');
-        messageBus.emit('backend.requestFrontendVideoFrame', this.sourceUuid);
+        if (this.sourceUuid) {
+            messageBus.emit('backend.requestFrontendVideoFrame', { sourceUuid: this.sourceUuid, requestId: 0 });
+        }
     }
 
     async updateFilters(filters: WorkingFileLayerFilter[]) {

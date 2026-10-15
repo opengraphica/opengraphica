@@ -4,21 +4,31 @@ import type { Texture } from 'three';
 export interface MessageBusEvents {
     'backend.requestFrontendSvg': {
         sourceUuid: string;
+        requestId: number;
         width: number;
         height: number;
     };
-    'backend.requestFrontendTexture': string;
-    'backend.requestFrontendVideoFrame': string;
+    'backend.requestFrontendTexture': {
+        sourceUuid: string;
+        requestId: number;
+    };
+    'backend.requestFrontendVideoFrame': {
+        sourceUuid: string;
+        requestId: number;
+    };
     'frontend.replyFrontendSvg': {
         sourceUuid: string;
+        requestId: number;
         bitmap: ImageBitmap | undefined;
     };
     'frontend.replyFrontendTexture': {
         sourceUuid: string;
+        requestId: number;
         bitmap: ImageBitmap | undefined;
     };
     'frontend.replyFrontendVideoFrame': {
         sourceUuid: string;
+        requestId: number;
         bitmap: ImageBitmap | undefined;
     };
     'layer.regenerateThumbnail': number;

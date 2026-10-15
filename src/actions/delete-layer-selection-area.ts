@@ -281,7 +281,7 @@ export class DeleteLayerSelectionAreaAction extends BaseAction {
                 });
 
                 const url = URL.createObjectURL(blob);
-                const image = new Image()
+                const image = new Image();
                 await new Promise((resolve) => {
                     image.onload = resolve;
                     image.onerror = resolve;
