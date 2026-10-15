@@ -577,7 +577,8 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             event.trigger !== 'do' ||
             [
                 'alignLayers', 'applyLayerTransform', 'clearSelection', 'convertLayersToCollage',
-                'resetLayerWidths', 'resetLayerHeights', 'setLayerBoundsToWorkingFileBounds',
+                'resetLayerWidths', 'resetLayerHeights', 'rotateLayerClockwise',
+                'rotateLayerCounterclockwise', 'setLayerBoundsToWorkingFileBounds',
                 'stretchLayerToWorkingFileBounds', 'trimLayerEmptySpace',
             ].includes(event.action.id)
         ) {

@@ -15,11 +15,14 @@ import {
     serializeVectorPathCommands,
 } from '@/lib/svg';
 
+import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { UpdateLayerAction } from '@/actions/update-layer';
+import { TrimLayerEmptySpaceAction } from '@/actions/trim-layer-empty-space';
 
 import { VectorPathCommandType } from '@/types/vector';
 import type {
+    UpdateRasterLayerOptions, UpdateRasterSequenceLayerOptions,
     WorkingFileGradientLayer, WorkingFileRasterSequenceLayer,
 } from '@/types';
 
@@ -436,9 +439,10 @@ async function transformLayersGeneral(
     imageDataModifier: (imageData: ImageData) => ImageData,
     gradientModifier: (gradientData: WorkingFileGradientLayer['data']) => WorkingFileGradientLayer['data'],
     vectorModifier: (svgDocument: Document) => void,
+    isResizeExpected: boolean,
 ) {
     const selectedLayers = getSelectedLayers();
-    const updateActions: UpdateLayerAction<any>[] = [];
+    const updateActions: BaseAction[] = [];
     for (const layer of selectedLayers) {
         if (layer.type === 'gradient') {
             const newGradientData = gradientModifier(layer.data);
@@ -453,37 +457,73 @@ async function transformLayersGeneral(
         } else if (layer.type === 'raster') {
             const storedImage = await getStoredImageCanvas(layer.data.sourceUuid);
             if (!storedImage) continue;
+            let oldWidth = storedImage.width;
+            let oldHeight = storedImage.height;
             let imageData = getImageDataFromCanvas(storedImage);
             imageData = imageDataModifier(imageData);
-            updateActions.push(
-                new UpdateLayerAction({
-                    id: layer.id,
-                    data: {
-                        sourceUuid: await createStoredImage(
-                            await createImageFromImageData(imageData)
-                        ),
-                    },
-                })
-            );
+            const updateOptions: UpdateRasterLayerOptions = {
+                id: layer.id,
+                width: imageData.width,
+                height: imageData.height,
+                data: {
+                    sourceUuid: await createStoredImage(
+                        await createImageFromImageData(imageData)
+                    ),
+                },
+            }
+            if (imageData.width !== oldWidth || imageData.height !== oldHeight) {
+                const oldCenter = layer.transform.transformPoint(
+                    new DOMPoint(oldWidth / 2, oldHeight / 2)
+                );
+                const transform = new DOMMatrix([
+                    layer.transform.a,
+                    layer.transform.b,
+                    layer.transform.c,
+                    layer.transform.d,
+                    oldCenter.x - layer.transform.a * imageData.width / 2 - layer.transform.c * imageData.height / 2,
+                    oldCenter.y - layer.transform.b * imageData.width / 2 - layer.transform.d * imageData.height / 2,
+                ]);
+                updateOptions.transform = transform;
+            }
+            updateActions.push(new UpdateLayerAction(updateOptions));
         } else if (layer.type === 'rasterSequence') {
-            const newSequence = JSON.parse(JSON.stringify(layer.data.sequence)) as WorkingFileRasterSequenceLayer['data'];
+            const newSequence = JSON.parse(JSON.stringify(layer.data.sequence)) as WorkingFileRasterSequenceLayer['data']['sequence'];
+            let newWidth = layer.width;
+            let newHeight = layer.height;
             for (const [frameIndex, frame] of layer.data.sequence.entries()) {
                 const storedImage = await getStoredImageCanvas(frame.image.sourceUuid);
                 if (!storedImage) continue;
                 let imageData = getImageDataFromCanvas(storedImage);
                 imageData = imageDataModifier(imageData);
+                newWidth = imageData.width;
+                newHeight = imageData.height;
                 newSequence[frameIndex].image.sourceUuid = await createStoredImage(
                     await createImageFromImageData(imageData)
                 );
             }
-            updateActions.push(
-                new UpdateLayerAction({
-                    id: layer.id,
-                    data: {
-                        sequence: newSequence,
-                    },
-                })
-            );
+            const updateOptions: UpdateRasterSequenceLayerOptions = {
+                id: layer.id,
+                width: newWidth,
+                height: newHeight,
+                data: {
+                    sequence: newSequence,
+                },
+            };
+            if (newWidth !== layer.width || newHeight !== layer.height) {
+                const oldCenter = layer.transform.transformPoint(
+                    new DOMPoint(layer.width / 2, layer.height / 2)
+                );
+                const transform = new DOMMatrix([
+                    layer.transform.a,
+                    layer.transform.b,
+                    layer.transform.c,
+                    layer.transform.d,
+                    oldCenter.x - layer.transform.a * newWidth / 2 - layer.transform.c * newHeight / 2,
+                    oldCenter.y - layer.transform.b * newWidth / 2 - layer.transform.d * newHeight / 2,
+                ]);
+                updateOptions.transform = transform;
+            }
+            updateActions.push(new UpdateLayerAction(updateOptions));
         } else if (layer.type === 'vector') {
             const svgDocument = layer.data.sourceDocument ?? await getStoredSvgDocument(layer.data.sourceUuid);
             vectorModifier(svgDocument);
@@ -510,6 +550,9 @@ async function transformLayersGeneral(
                     },
                 })
             );
+            if (isResizeExpected) {
+                updateActions.push(new TrimLayerEmptySpaceAction(layer.id));
+            }
         } else if (layer.type === 'video') {
             // NOOP
         } else if (layer.type === 'text') {
@@ -535,6 +578,7 @@ export async function flipLayersX() {
         flipImageDataX,
         flipGradientDataX,
         flipVectorDataX,
+        false,
     );
 }
 
@@ -544,6 +588,7 @@ export async function flipLayersY() {
         flipImageDataY,
         flipGradientDataY,
         flipVectorDataY,
+        false,
     );
 }
 
@@ -553,6 +598,7 @@ export async function rotateLayersClockwise() {
         rotateImageData90Clockwise,
         (data) => rotateGradientData(data, 90),
         (svgDocument) => rotateVectorData(svgDocument, 90),
+        true,
     );
 }
 
@@ -562,5 +608,6 @@ export async function rotateLayersCounterclockwise() {
         rotateImageData90Counterclockwise,
         (data) => rotateGradientData(data, -90),
         (svgDocument) => rotateVectorData(svgDocument, -90),
+        true,
     );
 }
