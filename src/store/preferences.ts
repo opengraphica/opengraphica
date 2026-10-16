@@ -29,7 +29,7 @@ interface PreferencesState {
     enableWebdavServer: boolean;
 
     // The default file type selection that shows in the export dialog.
-    exportDefaultFileType: 'png' | 'jpg' | 'webp' | 'gif' | 'bmp' | 'tiff' | 'svg';
+    exportDefaultFileType: 'png' | 'jpg' | 'jxl' | 'webp' | 'gif' | 'bmp' | 'tiff' | 'svg';
 
     // The default max file size that shows in the export dialog (in megabytes).
     exportDefaultMaxFileSize: number;

@@ -16,6 +16,67 @@
         <noscript>This application does not work without Javascript. Please enable it to continue.</noscript>
         <div id="opengraphica"></div>
         <script>
+            const searchParams = new URLSearchParams(window.location.search);
+
+            // Setting the default language via URL search param.
+            // Example: https://opengraphica.com/?lang=ja
+            (async () => {
+                const defaultLanguage = searchParams.get('lang');
+                if (!defaultLanguage) return;
+                OpenGraphica.emit('store.setPreference', {
+                    key: 'languageOverride',
+                    value: defaultLanguage,
+                });
+            })();
+
+            // Configure vendor save callback via URL search param.
+            // Saving the image sends it to an external website via POST.
+            // Example: https://opengraphica.com/?saveTo=https://example.com/save-api/
+            (async () => {
+                const saveToUrl = searchParams.get('saveTo');
+                if (!saveToUrl) return;
+                function saveCallback({ blob }) {
+                    fetch(saveToUrl, {
+                        method: 'POST',
+                        body: blob,
+                    }).then(successCallback).catch(errorCallback);
+                }
+                function successCallback() {
+                    OpenGraphica.emit('app.notify', {
+                        type: 'info',
+                        title: 'Image Saved',
+                        message: 'Your image was saved back to the application that sent you to OpenGraphica. Please check there.',
+                        duration: 6000,
+                    });
+                }
+                function errorCallback(error) {
+                    console.error(error);
+                    OpenGraphica.emit('app.notify', {
+                        type: 'error',
+                        title: 'Save Error',
+                        message: 'An error occurred when saving the image back to the application that sent you to OpenGraphica. Please try again later.',
+                        duration: 6000,
+                    });
+                }
+                OpenGraphica.emit('store.setPreference', {
+                    key: 'vendorCustomSaveCallback',
+                    value: () => {
+                        OpenGraphica.emit('app.runModule', {
+                            action: {
+                                type: 'function',
+                                target: 'file/export.exportAsImage',
+                            },
+                            props: {
+                                fileType: 'png',
+                                toBlob: true,
+                            },
+                            onSuccess: saveCallback,
+                            onError: errorCallback,
+                        });
+                    },
+                });
+            })();
+
             OpenGraphica.mount('#opengraphica');
             OpenGraphica.theme({
                 light: './css/main-light.css',
@@ -26,22 +87,20 @@
                 // Loading external website's image via URL search param.
                 // Example: https://opengraphica.com/?image=https://example.com/image.png
                 (async () => {
-                    const searchParams = new URLSearchParams(window.location.search);
                     const imageUrl = searchParams.get('image');
-                    if (imageUrl) {
-                        const imageBlob = await (await fetch(imageUrl)).blob();
-                        OpenGraphica.emit('app.runModule', {
-                            action: {
-                                type: 'function',
-                                target: 'file/open.openFromFileList',
-                            },
-                            props: {
-                                files: [
-                                    new File([imageBlob], 'Image', { type: imageBlob.type }),
-                                ],
-                            },
-                        });
-                    }
+                    if (!imageUrl) return;
+                    const imageBlob = await (await fetch(imageUrl)).blob();
+                    OpenGraphica.emit('app.runModule', {
+                        action: {
+                            type: 'function',
+                            target: 'file/open.openFromFileList',
+                        },
+                        props: {
+                            files: [
+                                new File([imageBlob], 'Image', { type: imageBlob.type }),
+                            ],
+                        },
+                    });
                 })();
 
             });

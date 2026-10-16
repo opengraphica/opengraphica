@@ -85,9 +85,10 @@ async function runModuleByDefinition(module: ModuleDefinition, moduleProperties?
                     cancelable: module.cancelable || false
                 });
             }
-            let runModuleError;
+            let runModuleReturn: any;
+            let runModuleError: any;
             try {
-                await importedModule[methodName](moduleRunArgs);
+                runModuleReturn = await importedModule[methodName](moduleRunArgs);
             } catch (error: any) {
                 runModuleError = error;
             }
@@ -102,8 +103,9 @@ async function runModuleByDefinition(module: ModuleDefinition, moduleProperties?
             if (runModuleError) {
                 throw runModuleError;
             }
+            return runModuleReturn;
         } else {
-            throw new Error('Module function identifier was malformed.');        
+            throw new Error('Module function identifier was malformed.');
         }
     }
 }
