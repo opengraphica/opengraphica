@@ -21,6 +21,30 @@
                 light: './css/main-light.css',
                 dark: './css/main-dark.css'
             });
+            OpenGraphica.on('app.canvas.ready', () => {
+
+                // Loading external website's image via URL search param.
+                // Example: https://opengraphica.com/?image=https://example.com/image.png
+                (async () => {
+                    const searchParams = new URLSearchParams(window.location.search);
+                    const imageUrl = searchParams.get('image');
+                    if (imageUrl) {
+                        const imageBlob = await (await fetch(imageUrl)).blob();
+                        OpenGraphica.emit('app.runModule', {
+                            action: {
+                                type: 'function',
+                                target: 'file/open.openFromFileList',
+                            },
+                            props: {
+                                files: [
+                                    new File([imageBlob], 'Image', { type: imageBlob.type }),
+                                ],
+                            },
+                        });
+                    }
+                })();
+
+            });
         </script>
     </body>
 </html>
