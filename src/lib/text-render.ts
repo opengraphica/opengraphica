@@ -1,6 +1,8 @@
 import bidiFactory from 'bidi-js';
 import fontCache from './font-cache';
+
 import defaultFontFamilies from '@/config/default-font-families.json';
+
 import { getSubsets as getUnicodeSubsets } from './unicode';
 import { textMetaDefaults } from './text-common';
 
@@ -11,6 +13,12 @@ import type {
 import type { Font, Glyph } from '@/lib/opentype.js';
 
 const bidi = bidiFactory();
+
+function isAvailableFontFamily(family: string) {
+    return (
+        !!defaultFontFamilies.find((definition) => definition.family === family)
+    );
+}
 
 export function getUnloadedFontFamilies(document: TextDocument): string[] {
     const fontFamilies = new Set<string>();
@@ -59,17 +67,26 @@ export async function loadFontFamilies(unloadedFontFamilies: string[]): Promise<
     return hadUnloadedFont;
 }
 
-export function splitSpanByAvailableFonts(span: TextDocumentSpan, emptyCharacter: string | null = null): Array<[Font | null, TextDocumentSpan]> {
+export function splitSpanByAvailableFonts(
+    span: TextDocumentSpan,
+    emptyCharacter: string | null = null,
+): Array<[Font | null, TextDocumentSpan, boolean]> {
     const userSelectedFontFamily = fontCache.getFontFamily(span.meta.family ?? textMetaDefaults.family);
     const preferredVariant = span.meta.variant ?? textMetaDefaults.variant;
     const userSelectedFont = userSelectedFontFamily?.variants[preferredVariant] ?? null;
     const userSelectedFontSubsets = userSelectedFontFamily?.subsets ?? [];
-    const fontSplits: Array<[Font | null, TextDocumentSpan]> = [];
+    const fontSplits: Array<[
+        Font | null,
+        TextDocumentSpan,
+        boolean, // Is fallback font
+    ]> = [];
     let previousSelectedFont: Font | null = userSelectedFont;
+    let previousIsFallbackFont: boolean = false;
     let currentFontSplitText = '';
     for (const character of span.text) {
         const characterSubsets = getUnicodeSubsets(character, false);
         let selectedFont = userSelectedFont;
+        let isFallbackFont = false;
         let subsetExistsInUserSelectedFontSubsets = false;
         for (const checkSubset of characterSubsets) {
             if (userSelectedFontSubsets.includes(checkSubset)) {
@@ -82,25 +99,34 @@ export function splitSpanByAvailableFonts(span: TextDocumentSpan, emptyCharacter
                 const fallbackFontFamily = fontCache.getFallbackFontFamilyThatSatisfiesSubset(characterSubset);
                 if (fallbackFontFamily) {
                     selectedFont = fallbackFontFamily.variants[preferredVariant] ?? fallbackFontFamily.variants['regular'] ?? fallbackFontFamily.variants[0];
+                    isFallbackFont = true;
                     break;
                 }
             }
         }
         if (selectedFont != previousSelectedFont && currentFontSplitText.length > 0) {
-            fontSplits.push([previousSelectedFont, {
-                text: currentFontSplitText,
-                meta: span.meta,
-            }]);
+            fontSplits.push([
+                previousSelectedFont, {
+                    text: currentFontSplitText,
+                    meta: span.meta,
+                },
+                isFallbackFont,
+            ]);
             currentFontSplitText = '';
         }
         currentFontSplitText += character;
         previousSelectedFont = selectedFont;
+        previousIsFallbackFont = isFallbackFont;
     }
     if (currentFontSplitText.length > 0 || emptyCharacter != null) {
-        fontSplits.push([previousSelectedFont, {
-            text: currentFontSplitText.length > 0 ? currentFontSplitText : emptyCharacter as string,
-            meta: span.meta,
-        }]);
+        fontSplits.push([
+            previousSelectedFont,
+            {
+                text: currentFontSplitText.length > 0 ? currentFontSplitText : emptyCharacter as string,
+                meta: span.meta,
+            },
+            previousIsFallbackFont,
+        ]);
     }
     return fontSplits;
 }
@@ -211,6 +237,7 @@ export function calculateTextWraps(document: TextDocument, options: CalculateTex
         let currentLineSpans: TextDocumentSpan[] = [];
         let currentLineSize = 0;
         let lastUsedFont: Font | null = null;
+        let lastUsedFontIsFallback: boolean = false;
         for (const [lineIndex, line] of documentLines.entries()) {
             currentLineSpans = [];
             currentLineSize = 0;
@@ -218,17 +245,22 @@ export function calculateTextWraps(document: TextDocument, options: CalculateTex
             for (const fullSpan of line.spans) {
                 let spanFontSplits = splitSpanByAvailableFonts(fullSpan);
                 if (spanFontSplits.length === 0) {
-                    spanFontSplits = [[lastUsedFont, {
-                        text: ' ',
-                        meta: fullSpan.meta,
-                    }]];
+                    spanFontSplits = [[
+                        lastUsedFont,
+                        {
+                            text: ' ',
+                            meta: fullSpan.meta,
+                        },
+                        lastUsedFontIsFallback,
+                    ]];
                 }
-                for (const [font, span] of spanFontSplits) {
+                for (const [font, span, isFallbackFont] of spanFontSplits) {
 
                     if (!font) {
                         continue;
                     }
                     lastUsedFont = font;
+                    lastUsedFontIsFallback = isFallbackFont;
                     const unitsPerEm = font.unitsPerEm;
                     const size = span.meta.size ?? textMetaDefaults.size;
                     const glyphScale = size / unitsPerEm;
@@ -389,6 +421,19 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
     }
     let { wrappedLines, originalLineIndices } = calculateTextWraps(document, options);
 
+    if (wrappedLines.length === 1 && wrappedLines[0].spans.length === 1 && wrappedLines[0].spans[0].text.length === 0) {
+        wrappedLines = [
+            {
+                spans: [
+                    {
+                        text: ' ',
+                        meta: wrappedLines[0].spans[0].meta,
+                    },
+                ],
+            },
+        ];
+    }
+
     const linesToDraw: RenderTextLineInfo[] = [];
     let longestLineSize = 0;
 
@@ -429,7 +474,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
         // let workingFlippedRun: RenderTextGlyphInfo[] = [];
         for (const fullSpan of line.spans) {
             const spanFontSplits = splitSpanByAvailableFonts(fullSpan, isEmptyLine ? (isHorizontal ? '​' : ' ') : null);
-            for (const [font, span] of spanFontSplits) {
+            for (const [font, span, isFallbackFont] of spanFontSplits) {
 
                 // Abort if no font.
                 if (!font) {
@@ -514,6 +559,7 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                             fontSize: size,
                             fontAscender: font.ascender * glyphScale,
                             fontDescender: font.descender * glyphScale,
+                            isFallbackFont,
                             documentCharacterIndex: runningWrapCharacterIndex + bidiRunCharacterIndex + originalTextCharacterIndex,
                             documentCharacterCount,
                             bidiDirection,

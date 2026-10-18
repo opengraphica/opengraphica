@@ -57,6 +57,13 @@ self.onmessage = ({ data }) => {
                 });
             });
             break;
+        case BackendWorkerMessage.SET_FONT_FETCH_DEFINITIONS:
+            rendererBackend.setFontFetchDefinitions(data.definitions).then(() => {
+                self.postMessage({
+                    type: BackendWorkerMessage.SET_FONT_FETCH_DEFINITIONS_RESULT,
+                });
+            }).catch(logError);
+            break;
         case BackendWorkerMessage.ENABLE_IMAGE_BOUNDARY_MASK:
             rendererBackend.enableImageBoundaryMask(data.enabled).then(() => {
                 self.postMessage({

@@ -49,7 +49,7 @@ function serializeXmlAttributeValue(value: any) {
     } else if (typeof value === 'number') {
         return `{number}${value}`;
     } else if (typeof value === 'string') {
-        return `{string}${value};`
+        return `{string}${value}`;
     } else if (typeof value === 'object') {
         if (value.is === 'color') {
             return `{color}${colorToHex(value, getColorModelName(value))}`;
@@ -343,6 +343,25 @@ async function generateLayerStack() {
     for (const layer of workingFileStore.get('layers')) {
         const layerNode = await generateLayer(xmlDocument, layer as never, data);
         rootStack.prepend(layerNode);
+    }
+
+    const fontsNode = xmlDocument.createElement('og:fonts');
+    image.appendChild(fontsNode);
+    const remoteFonts = workingFileStore.get('remoteFonts');
+    for (const familyName in remoteFonts) {
+        const remoteFont = remoteFonts[familyName];
+        const remoteFontNode = xmlDocument.createElement('og:remote-font');
+        remoteFontNode.setAttribute('family', familyName);
+        remoteFontNode.setAttribute('subsets', remoteFont.subsets.join(','));
+        for (const variantKey in remoteFont.variants) {
+            const variant = remoteFont.variants[variantKey];
+            const variantNode = xmlDocument.createElement('og:font-variant');
+            variantNode.setAttribute('key', variantKey);
+            variantNode.setAttribute('name', variant.name);
+            variantNode.setAttribute('file', variant.file);
+            remoteFontNode.appendChild(variantNode);
+        }
+        fontsNode.appendChild(remoteFontNode);
     }
 
     const masks = workingFileStore.get('masks');

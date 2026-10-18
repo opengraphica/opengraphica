@@ -73,6 +73,7 @@ export async function saveWorkingFileToTemporaryStorage() {
         maskIdCounter: workingFileStore.get('maskIdCounter'),
         masks: workingFileStore.get('masks'),
         measuringUnits: workingFileStore.get('measuringUnits'),
+        remoteFonts: workingFileStore.get('remoteFonts'),
         resolutionUnits: workingFileStore.get('resolutionUnits'),
         resolutionX: workingFileStore.get('resolutionX'),
         resolutionY: workingFileStore.get('resolutionY'),

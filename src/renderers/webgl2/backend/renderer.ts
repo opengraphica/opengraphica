@@ -28,6 +28,7 @@ import { srgbChannelToLinearSrgbChannel, linearSrgbChannelToSrgbChannel } from '
 
 import type { Camera, Texture } from 'three';
 import type {
+    FontFamilyFetchDefinition,
     RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings, RendererTextureTile,
     Webgl2RendererCanvasFilter, Webgl2RendererMeshController, WorkingFileLayer,
     WorkingFileGroupLayer, WorkingFileLayerFilter, WorkingFileLayerMask,
@@ -59,6 +60,7 @@ export interface Webgl2RendererBackendPublic {
     initialize(canvas: HTMLCanvasElement | OffscreenCanvas, imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number): Promise<void>;
     resize(imageWidth: number, imageHeight: number, viewWidth: number, viewHeight: number): Promise<void>;
     getMaxTextureSize(): Promise<number>;
+    setFontFetchDefinitions(definitions: Record<string, FontFamilyFetchDefinition>): Promise<void>;
     enableImageBoundaryMask(enabled: boolean): Promise<void>;
     setBackgroundColor(r: number, g: number, b: number, alpha: number): Promise<void>;
     setMasks(masks: Record<number, WorkingFileLayerMask>): Promise<void>;
@@ -123,6 +125,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
     compositorBrushStrokes = new Map<number, number>();
 
     meshControllersByType: Record<string, ClassType<Webgl2RendererMeshController>> = {};
+    fontFetchDefinitions: Record<string, FontFamilyFetchDefinition> = {};
 
     async createMeshController(type: string) {
         return new this.meshControllersByType[type]();
@@ -240,6 +243,11 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
 
     async getMaxTextureSize(): Promise<number> {
         return this.renderer?.capabilities?.maxTextureSize ?? Infinity;
+    }
+
+    async setFontFetchDefinitions(definitions: Record<string, FontFamilyFetchDefinition>): Promise<void> {
+        this.fontFetchDefinitions = definitions;
+        messageBus.emit('backend.setFontFetchDefinitions', definitions);
     }
 
     async enableImageBoundaryMask(enabled: boolean) {

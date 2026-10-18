@@ -223,6 +223,7 @@ export async function openFromTemporaryStorage() {
     workingFileStore.set('masks', workingFile.masks);
     workingFileStore.set('maskIdCounter', maxMaskId);
     workingFileStore.set('measuringUnits', workingFile.measuringUnits);
+    workingFileStore.set('remoteFonts', workingFile.remoteFonts);
     workingFileStore.set('resolutionUnits', workingFile.resolutionUnits);
     workingFileStore.set('resolutionX', workingFile.resolutionX);
     workingFileStore.set('resolutionY', workingFile.resolutionY);

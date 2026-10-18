@@ -18,7 +18,7 @@ import { createStoredVideo, getStoredVideo } from '@/store/video';
 import workingFileStore, { type WorkingFileState } from '@/store/working-file';
 
 import type {
-    ColorModelName,
+    ColorModelName, FontFamilyFetchDefinition,
     MeasuringUnits, ResolutionUnits,
     InsertAnyLayerOptions,
     TextBoundary, TextDirection, TextLineAlignment, TextWrapAt,
@@ -462,6 +462,36 @@ export async function parseSerializedFileToActions(
     if (workingFileDefinition.width != null && isNaN(workingFileDefinition.width)) {
         workingFileDefinition.width = 818;
     }
+
+    const remoteFonts: Record<string, FontFamilyFetchDefinition> = {};
+    const fontsNode = Array.from(image.children).find((node) => node.tagName === 'og:fonts');
+    if (fontsNode) {
+        const remoteFontNodes = Array.from(fontsNode.getElementsByTagName('og:remote-font'));
+        for (const remoteFontNode of remoteFontNodes) {
+            const remoteFont: FontFamilyFetchDefinition = {
+                family: remoteFontNode.getAttribute('family') ?? '',
+                subsets: (remoteFontNode.getAttribute('subsets') ?? '').split(','),
+                variants: {},
+            };
+            const variantNodes = Array.from(remoteFontNode.getElementsByTagName('og:font-variant'));
+            for (const variantNode of variantNodes) {
+                const variantKey = variantNode.getAttribute('key');
+                const variantFile = variantNode.getAttribute('file');
+                if (!variantKey || !variantFile) continue;
+                remoteFont.variants[variantKey] = {
+                    name: variantNode.getAttribute('name') ?? '',
+                    file: variantFile,
+                };
+            }
+            remoteFonts[remoteFont.family] = remoteFont;
+        }
+    }
+    if (options?.insert) {
+        for (const familyName in workingFileStore.state.remoteFonts) {
+            remoteFonts[familyName] = workingFileStore.state.remoteFonts[familyName];
+        }
+    }
+    workingFileDefinition.remoteFonts = remoteFonts;
 
     if (!options?.insert) {
         const masks: Record<number, WorkingFileLayerMask> = {};

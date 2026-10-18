@@ -45,6 +45,7 @@ interface GlyphGroupInstance {
 interface StagedGlyph {
     glyph: Glyph;
     fontName: string;
+    isFallbackFont: boolean;
     line: number;
     character: number;
     x: number;
@@ -132,6 +133,7 @@ export class LetterMeshCache {
     addLetter(
         glyph: Glyph,
         fontName: string,
+        isFallbackFont: boolean,
         line: number,
         character: number,
         x: number,
@@ -142,6 +144,7 @@ export class LetterMeshCache {
         this.stagedGlyphs.set(line * 10000 + character, {
             glyph,
             fontName,
+            isFallbackFont,
             line,
             character,
             x,
@@ -335,10 +338,10 @@ export class LetterMeshCache {
     finalize() {
         // Add new glyphs
         for (const stagedGlyph of this.stagedGlyphs.values()) {
-            const { glyph, fontName, fill, x, y, fontSize, line, character } = stagedGlyph;
+            const { glyph, fontName, isFallbackFont, fill, x, y, fontSize, line, character } = stagedGlyph;
 
             const materialGroup = this.getGeometryMaterialGroup(fill);
-            const glyphGroup = this.getGlyphGroup(materialGroup, glyph, fontName);
+            const glyphGroup = this.getGlyphGroup(materialGroup, glyph, fontName + (isFallbackFont ? '_fallback' : ''));
             this.updateGlyphGroupInstance(glyphGroup.instances, x, y, fontSize, line, character);
         }
 

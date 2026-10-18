@@ -2,9 +2,11 @@ import { ref } from 'vue';
 import { PerformantStore } from './performant-store';
 import appEmitter from '@/lib/emitter';
 import { deleteStoredImage } from '@/store/image';
+import { updateWorkingFile } from '@/store/data/working-file-database';
 
 import type {
-    ColorModel, FileSystemFileHandle, MeasuringUnits, ResolutionUnits, ColorModelName,
+    ColorModel, MeasuringUnits, ResolutionUnits, ColorModelName,
+    FontFamilyFetchDefinition, FileSystemFileHandle,
     WorkingFileLayer, WorkingFileAnyLayer, WorkingFileGroupLayer, WorkingFileTimeline, WorkingFileLayerMask
 } from '@/types';
 
@@ -26,6 +28,7 @@ export interface WorkingFileState {
     maskIdCounter: number;
     masks: Record<number, WorkingFileLayerMask>,
     measuringUnits: MeasuringUnits;
+    remoteFonts: Record<string, FontFamilyFetchDefinition>;
     resolutionUnits: ResolutionUnits;
     resolutionX: number;
     resolutionY: number;
@@ -61,6 +64,7 @@ const store = new PerformantStore<WorkingFileStore>({
         maskIdCounter: 0,
         masks: {},
         measuringUnits: 'px',
+        remoteFonts: {},
         resolutionUnits: 'px/in',
         resolutionX: 300,
         resolutionY: 300,
@@ -342,3 +346,9 @@ export function isGroupLayer(layer: WorkingFileAnyLayer): layer is WorkingFileGr
     return layer.type === 'group' && !!layer.layers;
 }
 
+export function addRemoteFont(definition: FontFamilyFetchDefinition) {
+    const remoteFonts = store.get('remoteFonts');
+    remoteFonts[definition.family] = definition;
+    store.set('remoteFonts', remoteFonts);
+    updateWorkingFile({ remoteFonts });
+}

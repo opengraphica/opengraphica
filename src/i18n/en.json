@@ -153,6 +153,7 @@
         }
     },
     "button": {
+        "add": "Add",
         "addEffect": "Add Effect",
         "apply": "Apply",
         "back": "Back",
@@ -177,6 +178,7 @@
         "restoreLastImage": "Restore Last Image",
         "reverse": "Reverse",
         "save": "Save",
+        "selectFiles": "Select Files...",
         "settings": "Settings",
         "take": "Take",
         "takePhoto": "Take Photo",
@@ -787,6 +789,12 @@
         "designSystem": {
             "title": "Design System"
         },
+        "fileAddFont": {
+            "title": "Add Font",
+            "search": "Search",
+            "searchPlaceholder": "Search Google Fonts...",
+            "noFontsFound": "No fonts found with that search criteria."
+        },
         "fileExport": {
             "title": "Export Image",
             "saveBackIntroduction": "You have opened a file named {fileName}.",
@@ -1171,6 +1179,10 @@
                 "shareImage": {
                     "name": "Share Image",
                     "description": "Share the current image you're editing with other people."
+                },
+                "addFont": {
+                    "name": "Add Font",
+                    "description": "Add a font to the file."
                 }
             }
         },
@@ -1604,6 +1616,7 @@
         },
         "text": {
             "font": "Font",
+            "addFont": "[ Add Font... ]",
             "size": "Size",
             "bold": "Bold",
             "italic": "Italic",

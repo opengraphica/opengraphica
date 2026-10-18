@@ -3,6 +3,7 @@ import type { TextDocument } from './text';
 import type { VectorPathShape } from './vector';
 import type { MeasuringUnits, ResolutionUnits } from './metrics';
 import type { Camera, Scene, WebGLRenderer } from 'three';
+import type { FontFamilyFetchDefinition } from './text';
 
 export interface DrawWorkingFileLayerOptions {
     isEditorPreview?: boolean;
@@ -345,6 +346,7 @@ export interface WorkingFile<T extends ColorModel = ColorModel> {
     maskIdCounter: number;
     masks: Record<number, WorkingFileLayerMask>;
     measuringUnits: MeasuringUnits;
+    remoteFonts: Record<string, FontFamilyFetchDefinition>;
     resolutionUnits: ResolutionUnits;
     resolutionX: number;
     resolutionY: number;

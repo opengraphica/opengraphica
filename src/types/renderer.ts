@@ -1,6 +1,6 @@
 import type { Matrix4, Scene, Texture } from 'three';
 import type {
-    RGBAColor, BrushDefinition,
+    RGBAColor, BrushDefinition, FontFamilyFetchDefinition,
     WorkingFileLayer, WorkingFileLayerBlendingMode, WorkingFileLayerFilter, Webgl2RendererCanvasFilter
 } from '@/types';
 

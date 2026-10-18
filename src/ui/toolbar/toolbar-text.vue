@@ -13,8 +13,9 @@
                     <template #prepend>
                         <span class="text-xs">{{ t('toolbar.text.font') }}</span>
                     </template>
-                    <el-select :aria-label="t('toolbar.text.font')" v-model="family" size="small" style="width: 6rem">
+                    <el-select :aria-label="t('toolbar.text.font')" v-model="family" size="small" style="width: 6rem" @change="onChangeFontFamily">
                         <el-option v-for="family of familyList" :key="family" :label="family" :value="family"></el-option>
+                        <el-option :label="t('toolbar.text.addFont')" value="[addFont]"></el-option>
                     </el-select>
                 </el-input-group>
                 <!-- Text Size -->
@@ -187,7 +188,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, toRefs, watch, nextTick } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from '@/i18n';
 
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
@@ -210,6 +211,9 @@ import { colorToHsla } from '@/lib/color';
 import appEmitter from '@/lib/emitter';
 import { textMetaDefaults } from '@/lib/text-common';
 
+import { runModule } from '@/modules';
+
+import workingFileStore from '@/store/working-file';
 import {
     fillColorPalette, fillColorPaletteIndex,
     fillColorPaletteDockLeft, fillColorPaletteDockTop, fillColorPaletteDockVisible,
@@ -256,9 +260,24 @@ const family = computed<string>({
         return toolbarTextMeta.family ?? textMetaDefaults.family;
     }
 });
-const familyList = ref<string[]>(
-    defaultFontFamilies.filter((family) => !family.isFallback).map((family) => family.family)
-);
+const familyList = computed<string[]>(() => {
+    return [
+        ...defaultFontFamilies.filter((family) => !family.isFallback).map((family) => family.family),
+        ...Object.keys(workingFileStore.state.remoteFonts),
+    ].sort();
+});
+watch(() => familyList.value, (familyList) => {
+    if (!familyList.includes(family.value)) {
+        family.value = familyList[0];
+    }
+});
+
+function onChangeFontFamily(value: string) {
+    if (value === '[addFont]') {
+        family.value = familyList[0];
+        runModule('file', 'addFont');
+    }
+}
 
 /*---------*\
 | Font Size |

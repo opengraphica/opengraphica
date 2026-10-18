@@ -50,6 +50,7 @@ export class CreateFileAction extends BaseAction {
             layers: [],
             masks: this.createFileOptions.masks || {},
             measuringUnits: this.createFileOptions.measuringUnits || 'px',
+            remoteFonts: this.createFileOptions.remoteFonts ?? {},
             resolutionUnits: this.createFileOptions.resolutionUnits || 'px/in',
             resolutionX: this.createFileOptions.resolutionX || 300,
             resolutionY: this.createFileOptions.resolutionY || 300,

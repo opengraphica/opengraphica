@@ -50,11 +50,20 @@ export interface RenderTextGlyphInfo {
     fontSize: number;
     fontAscender: number;
     fontDescender: number;
+    isFallbackFont: boolean;
 }
 
 export interface FontFamilyFetchDefinitionVariant {
     name: string;
     file: string;
+}
+
+export interface GoogleFontFamilyDefinition {
+    category: string;
+    family: string;
+    files: Record<string, string>;
+    subsets: string[];
+    variants: string[];
 }
 
 export interface FontFamilyFetchDefinition {

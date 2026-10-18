@@ -33,6 +33,7 @@ export default defineComponent({
     },
     components: {
         'design-system': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-design-system' */ `@/ui/module/module-design-system.vue`)),
+        'file-add-font': defineAsyncComponent(() => import(/* webpackChunkName: 'module-file-add-font' */ `@/ui/module/module-file-add-font.vue`)),
         'file-export': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-export' */ `@/ui/module/module-file-export.vue`)),
         'file-new': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-new' */ `@/ui/module/module-file-new.vue`)),
         'file-open-confirm': defineAsyncComponent(() => import(/* webpackChunkName: 'module-ui-file-open-confirm' */ `@/ui/module/module-file-open-confirm.vue`)),

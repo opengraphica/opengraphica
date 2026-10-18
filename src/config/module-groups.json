@@ -120,6 +120,12 @@
                     "type": "function",
                     "target": "file/open.openFromTemporaryStorage"
                 }
+            },
+            "addFont": {
+                "action": {
+                    "type": "ui",
+                    "target": "file-add-font"
+                }
             }
         }
     },

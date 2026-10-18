@@ -11,7 +11,7 @@ import { Texture } from 'three/src/textures/Texture';
 import { textMetaDefaults } from '@/lib/text-common';
 import { getUnloadedFontFamilies, loadFontFamilies, calculateTextPlacement } from '@/lib/text-render';
 
-import { getWebgl2RendererBackend, markRenderDirty } from '@/renderers/webgl2/backend';
+import { getWebgl2RendererBackend, markRenderDirty, Webgl2RendererBackend } from '@/renderers/webgl2/backend';
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
 import { createCanvasFiltersFromLayerConfig, createLayerShaderUniformsAndDefines } from '../base/material';
 import { assignMaterialBlendingMode } from '../base/blending-mode';
@@ -20,12 +20,14 @@ import { LetterMeshCache } from './letter-mesh-cache';
 
 import type { Scene, ShaderMaterial } from 'three';
 import type {
+    FontFamilyFetchDefinition,
     Webgl2RendererCanvasFilter, Webgl2RendererMeshController,
     WorkingFileLayerBlendingMode, WorkingFileTextLayer, WorkingFileLayerFilter
 } from '@/types';
 
 export class TextLayerMeshController implements Webgl2RendererMeshController {
-    
+    backend: Webgl2RendererBackend | undefined;
+
     letterMeshCache: LetterMeshCache | undefined;
     material: InstanceType<typeof ShaderMaterial> | undefined;
     scene: InstanceType<typeof Scene> | undefined;
@@ -53,15 +55,17 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
 
     attach(id: number) {
         this.id = id;
-        const backend = getWebgl2RendererBackend();
-        backend.addMeshController(id, this);
-        this.scene = backend.scene;
+        this.backend = getWebgl2RendererBackend();
+        this.backend.addMeshController(id, this);
+        this.scene = this.backend.scene;
         this.textGroup = new Object3D();
         this.textGroup.matrixAutoUpdate = false;
         this.letterMeshCache = new LetterMeshCache(this.textGroup);
 
         this.readBufferTextureUpdate = this.readBufferTextureUpdate.bind(this);
         messageBus.on('renderer.pass.readBufferTextureUpdate', this.readBufferTextureUpdate);
+        this.setFontFetchDefinitions = this.setFontFetchDefinitions.bind(this);
+        messageBus.on('backend.setFontFetchDefinitions', this.setFontFetchDefinitions);
     }
 
     queueRegenerateThumbnail() {
@@ -128,9 +132,17 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
 
     async updateData(data: WorkingFileTextLayer['data']) {
         this.data = data;
-        this.waitingToLoadFontFamilies = getUnloadedFontFamilies(data);
+        this.waitingToLoadFontFamilies = getUnloadedFontFamilies(data).filter((familyName) => {
+            return !!this.backend?.fontFetchDefinitions[familyName];
+        });
         this.loadFontFamilies();
         this.regenerateFromData();
+    }
+
+    async setFontFetchDefinitions(definitions?: Record<string, FontFamilyFetchDefinition>) {
+        if (this.data) {
+            this.updateData(this.data);
+        }
     }
 
     regenerateFromData() {
@@ -164,10 +176,11 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
         if (isHorizontal) {
             for (const line of lines) {
                 const wrapOffsetLine = wrapSign > 0 ? 0 : -(line.heightAboveBaseline + line.heightBelowBaseline);
-                for (const { glyph, meta, advanceOffset, documentCharacterIndex, drawOffset, fontName, fontSize } of line.glyphs) {
+                for (const { glyph, meta, advanceOffset, documentCharacterIndex, drawOffset, fontName, fontSize, isFallbackFont } of line.glyphs) {
                     this.letterMeshCache?.addLetter(
                         glyph,
                         fontName,
+                        isFallbackFont,
                         line.documentLineIndex,
                         documentCharacterIndex,
                         line.lineStartOffset + drawOffset.x + advanceOffset,
@@ -180,10 +193,11 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
         } else {
             for (const line of lines) {
                 const wrapOffsetLine = wrapSign > 0 ? 0 : -line.largestCharacterWidth;
-                for (const { glyph, meta, advanceOffset, documentCharacterIndex, drawOffset, fontName, characterWidth, fontSize } of line.glyphs) {
+                for (const { glyph, meta, advanceOffset, documentCharacterIndex, drawOffset, fontName, characterWidth, fontSize, isFallbackFont } of line.glyphs) {
                     this.letterMeshCache?.addLetter(
                         glyph,
                         fontName,
+                        isFallbackFont,
                         line.documentLineIndex,
                         documentCharacterIndex,
                         wrapOffsetStart + wrapOffsetLine + (line.wrapOffset * wrapSign) + drawOffset.x + (line.largestCharacterWidth / 2.0) - (characterWidth / 2.0),

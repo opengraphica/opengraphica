@@ -1,5 +1,8 @@
 import { parse, type Font } from './opentype';
 import defaultFontFamilies from '@/config/default-font-families.json';
+
+// TODO - remove this import from this file (1.8MB in web worker)
+// Need to create a solution to load the default fonts when hosted on the file: protocol (Ubuntu Touch).
 import googleWebfonts from '@/config/google-webfonts.json';
 
 import type { FontFamilyFetchDefinition, FontFamilyFetchDefinitionVariant } from '@/types';

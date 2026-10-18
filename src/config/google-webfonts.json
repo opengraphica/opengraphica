@@ -402,23 +402,6 @@
       "menu": "https://fonts.gstatic.com/s/notosansjp/v56/-F6jfjtqLzI2JPCgQBnw7HFyzSD-AsregP8VFBEj35rS1g.ttf"
     },
     {
-      "family": "Material Icons",
-      "variants": [
-        "regular"
-      ],
-      "subsets": [
-        "latin"
-      ],
-      "version": "v145",
-      "lastModified": "2025-09-17",
-      "files": {
-        "regular": "https://fonts.gstatic.com/s/materialicons/v145/flUhRq6tzZclQEJ-Vdg-IuiaDsNZIhI8tIHh.ttf"
-      },
-      "category": "monospace",
-      "kind": "webfonts#webfont",
-      "menu": "https://fonts.gstatic.com/s/materialicons/v145/flUhRq6tzZclQEJ-Vdg-IuiaDvNYKBY.ttf"
-    },
-    {
       "family": "Roboto Condensed",
       "variants": [
         "100",
@@ -2193,23 +2176,6 @@
       "menu": "https://fonts.gstatic.com/s/karla/v33/qkBIXvYC6trAT55ZBi1ueQVIjQTD-JqaFUlP.ttf"
     },
     {
-      "family": "Material Icons Outlined",
-      "variants": [
-        "regular"
-      ],
-      "subsets": [
-        "latin"
-      ],
-      "version": "v110",
-      "lastModified": "2025-06-17",
-      "files": {
-        "regular": "https://fonts.gstatic.com/s/materialiconsoutlined/v110/gok-H7zzDkdnRel8-DQ6KAXJ69wP1tGnf4ZGhUcdl5GuI2Ze.otf"
-      },
-      "category": "monospace",
-      "kind": "webfonts#webfont",
-      "menu": "https://fonts.gstatic.com/s/materialiconsoutlined/v110/gok-H7zzDkdnRel8-DQ6KAXJ69wP1tGnf4ZGhXcanZM.otf"
-    },
-    {
       "family": "Share Tech",
       "variants": [
         "regular"
@@ -3777,23 +3743,6 @@
       "menu": "https://fonts.gstatic.com/s/dosis/v34/HhyJU5sn9vOmLxNkIwRSjTVNWLEJN7Ml3RMB.ttf"
     },
     {
-      "family": "Material Icons Round",
-      "variants": [
-        "regular"
-      ],
-      "subsets": [
-        "latin"
-      ],
-      "version": "v109",
-      "lastModified": "2025-06-17",
-      "files": {
-        "regular": "https://fonts.gstatic.com/s/materialiconsround/v109/LDItaoyNOAY6Uewc665JcIzCKsKc_M9flwmMq_fTTvg-.otf"
-      },
-      "category": "monospace",
-      "kind": "webfonts#webfont",
-      "menu": "https://fonts.gstatic.com/s/materialiconsround/v109/LDItaoyNOAY6Uewc665JcIzCKsKc_M9flzmLofU.otf"
-    },
-    {
       "family": "Caveat",
       "variants": [
         "regular",
@@ -4765,23 +4714,6 @@
       "menu": "https://fonts.gstatic.com/s/lobster/v32/neILzCirqoswsqX9zoSmNg.ttf"
     },
     {
-      "family": "Material Icons Sharp",
-      "variants": [
-        "regular"
-      ],
-      "subsets": [
-        "latin"
-      ],
-      "version": "v110",
-      "lastModified": "2025-06-17",
-      "files": {
-        "regular": "https://fonts.gstatic.com/s/materialiconssharp/v110/oPWQ_lt5nv4pWNJpghLP75WiFR4kLh3kvmvSImEyc0vd.otf"
-      },
-      "category": "monospace",
-      "kind": "webfonts#webfont",
-      "menu": "https://fonts.gstatic.com/s/materialiconssharp/v110/oPWQ_lt5nv4pWNJpghLP75WiFR4kLh3kvlvVKGM.otf"
-    },
-    {
       "family": "Arvo",
       "variants": [
         "regular",
@@ -5244,26 +5176,6 @@
       "category": "sans-serif",
       "kind": "webfonts#webfont",
       "menu": "https://fonts.gstatic.com/s/mplus1p/v33/e3tjeuShHdiFyPFzBRrY-TQA.ttf"
-    },
-    {
-      "family": "Material Icons Two Tone",
-      "variants": [
-        "regular"
-      ],
-      "subsets": [
-        "latin"
-      ],
-      "version": "v113",
-      "lastModified": "2025-06-17",
-      "files": {
-        "regular": "https://fonts.gstatic.com/s/materialiconstwotone/v113/hESh6WRmNCxEqUmNyh3JDeGxjVVyMg4tHGctNCu3NjDrH_77.otf"
-      },
-      "category": "monospace",
-      "kind": "webfonts#webfont",
-      "menu": "https://fonts.gstatic.com/s/materialiconstwotone/v113/hESh6WRmNCxEqUmNyh3JDeGxjVVyMg4tHGctNBuwPDI.otf",
-      "colorCapabilities": [
-        "COLRv0"
-      ]
     },
     {
       "family": "Bodoni Moda",

@@ -1,7 +1,9 @@
 import mitt, { type Handler } from 'mitt';
 import type { Texture } from 'three';
+import type { FontFamilyFetchDefinition } from '@/types';
 
 export interface MessageBusEvents {
+    'backend.setFontFetchDefinitions': Record<string, FontFamilyFetchDefinition>;
     'backend.requestFrontendSvg': {
         sourceUuid: string;
         requestId: number;

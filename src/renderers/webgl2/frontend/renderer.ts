@@ -1,10 +1,13 @@
 import { nextTick, toRefs, watch, type WatchStopHandle } from 'vue';
 
+import defaultFontFamilies from '@/config/default-font-families.json';
+
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
-import workingFileStore, { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
+import { getAllStoredFontsByName } from '@/store/font';
 import { getStoredImageAsBitmap } from '@/store/image';
 import { getStoredSvgImage } from '@/store/svg';
+import workingFileStore, { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
 import {
     activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask,
     appliedSelectionMaskCanvasOffset, selectedLayersSelectionMaskPreview,
@@ -20,7 +23,7 @@ import { VideoPlayer } from './video-player';
 
 import type { Webgl2RendererBackend, Webgl2RendererBackendPublic } from '@/renderers/webgl2/backend';
 import type {
-    RGBAColor,
+    RGBAColor, FontFamilyFetchDefinition,
     ClassType, RendererFrontend, RendererFrontendTakeSnapshotOptions,
     RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings,
     RendererFrontendApplySelectionMaskToAlphaChannelOptions,
@@ -35,6 +38,7 @@ export class Webgl2RendererFrontend implements RendererFrontend {
     videoPlayer: VideoPlayer | undefined;
 
     stopWatchBackgroundColor: WatchStopHandle | undefined;
+    stopWatchFontFetchDefinitions: WatchStopHandle | undefined;
     stopWatchMasks: WatchStopHandle | undefined;
     stopWatchShowBoundary: WatchStopHandle | undefined;
     stopWatchSize: WatchStopHandle | undefined;
@@ -111,6 +115,21 @@ export class Webgl2RendererFrontend implements RendererFrontend {
                 viewHeight,
             );
         });
+
+        this.stopWatchFontFetchDefinitions = watch(() => workingFileStore.state.remoteFonts, (remoteFonts) => {
+            const fontFetchDefinitions: Record<string, FontFamilyFetchDefinition> = {};
+            for (const fontDefinition of defaultFontFamilies) {
+                fontFetchDefinitions[fontDefinition.family] = fontDefinition as FontFamilyFetchDefinition;
+            }
+            for (const familyName in remoteFonts) {
+                fontFetchDefinitions[familyName] = remoteFonts[familyName];
+            }
+            const allStoredFonts = getAllStoredFontsByName();
+            for (const familyName in allStoredFonts) {
+                fontFetchDefinitions[familyName] = allStoredFonts[familyName];
+            }
+            this.rendererBackend.setFontFetchDefinitions(fontFetchDefinitions);
+        }, { immediate: true });
 
         this.stopWatchMasks = watch(() => workingFileStore.state.masks, (masks) => {
             this.rendererBackend.setMasks(deepToRaw(masks));
@@ -539,6 +558,7 @@ export class Webgl2RendererFrontend implements RendererFrontend {
         appEmitter.off('editor.history.step', this.onEditorHistoryStep);
 
         this.stopWatchBackgroundColor?.();
+        this.stopWatchFontFetchDefinitions?.();
         this.stopWatchMasks?.();
         this.stopWatchShowBoundary?.();
         this.stopWatchSelectionMask?.();

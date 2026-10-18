@@ -8,6 +8,7 @@ import type {
     Webgl2RendererBackendTakeSnapshotOptions, MeshControllerInterface,
 } from '@/renderers/webgl2/backend';
 import type {
+    FontFamilyFetchDefinition,
     RendererBrushStrokeSettings, RendererBrushStrokePreviewSettings, RendererTextureTile,
     WorkingFileLayer, WorkingFileLayerMask,
     RendererBucketFillSettings, RendererPickedVectorLayerElement,
@@ -151,8 +152,16 @@ export class Webgl2RendererBackendInterface implements Webgl2RendererBackendPubl
     async getMaxTextureSize(): Promise<number> {
         this.backendWorker.postMessage({
             type: BackendWorkerMessage.GET_MAX_TEXTURE_SIZE,
-        })
+        });
         return (await this.messageReceived(BackendWorkerMessage.GET_MAX_TEXTURE_SIZE_RESULT)).maxTextureSize;
+    }
+
+    async setFontFetchDefinitions(definitions: Record<string, FontFamilyFetchDefinition>): Promise<void> {
+        this.backendWorker.postMessage({
+            type: BackendWorkerMessage.SET_FONT_FETCH_DEFINITIONS,
+            definitions,
+        });
+        return (await this.messageReceived(BackendWorkerMessage.SET_FONT_FETCH_DEFINITIONS_RESULT));
     }
 
     async enableImageBoundaryMask(enabled: boolean) {
