@@ -793,7 +793,9 @@
             "title": "Add Font",
             "search": "Search",
             "searchPlaceholder": "Search Google Fonts...",
-            "noFontsFound": "No fonts found with that search criteria."
+            "offlineFontSearch": "Your device is offline. You need to connect to the internet to search for fonts. You can still browse for font files by using the \"Select Files...\" button below.",
+            "noFontsFound": "No fonts found with that search criteria.",
+            "uploadFontParseError": "An error occurred when parsing one or more of the fonts you selected."
         },
         "fileExport": {
             "title": "Export Image",
@@ -1616,7 +1618,7 @@
         },
         "text": {
             "font": "Font",
-            "addFont": "[ Add Font... ]",
+            "addFont": "Add Font...",
             "size": "Size",
             "bold": "Bold",
             "italic": "Italic",

@@ -6,6 +6,7 @@
 
 import * as fflate from 'fflate';
 
+import { allStoredFontsByFamily } from '@/store/font';
 import { getStoredImageCanvas } from '@/store/image';
 import { getStoredSvgImage } from '@/store/svg';
 import { getStoredVideo } from '@/store/video';
@@ -350,7 +351,7 @@ async function generateLayerStack() {
     const remoteFonts = workingFileStore.get('remoteFonts');
     for (const familyName in remoteFonts) {
         const remoteFont = remoteFonts[familyName];
-        const remoteFontNode = xmlDocument.createElement('og:remote-font');
+        const remoteFontNode = xmlDocument.createElement('og:remote-font-family');
         remoteFontNode.setAttribute('family', familyName);
         remoteFontNode.setAttribute('subsets', remoteFont.subsets.join(','));
         for (const variantKey in remoteFont.variants) {
@@ -362,6 +363,44 @@ async function generateLayerStack() {
             remoteFontNode.appendChild(variantNode);
         }
         fontsNode.appendChild(remoteFontNode);
+    }
+    let fontFileCounter = 0;
+    for (const familyName in allStoredFontsByFamily.value) {
+        const storedFontFamily = allStoredFontsByFamily.value[familyName];
+        const storedFontFamilyNode = xmlDocument.createElement('og:stored-font-family');
+        storedFontFamilyNode.setAttribute('family', familyName);
+        storedFontFamilyNode.setAttribute('subsets', storedFontFamily.subsets.join(','));
+        for (const variantKey in storedFontFamily.variants) {
+            const variant = storedFontFamily.variants[variantKey];
+            const variantNode = xmlDocument.createElement('og:font-variant');
+            variantNode.setAttribute('key', variantKey);
+            variantNode.setAttribute('name', variant.name);
+            storedFontFamilyNode.appendChild(variantNode);
+            const fontId = fontFileCounter++;
+            try {
+                const fontBlob = await (await fetch(variant.file)).blob();
+                let fileExtension = ((fontBlob as File)?.name ?? '').split('.').pop() ?? '';
+                if (!['otf', 'ttf', 'woff', 'woff2'].includes(fileExtension)) {
+                    fileExtension = 'ttf';
+                }
+                data.push(
+                    createArrayBufferFromBlob(fontBlob).then((arrayBuffer) => {
+                        const fontFilename = `font${fontId}.${fileExtension}`;
+                        variantNode.setAttribute('src', 'data/' + fontFilename);
+                        return [
+                            fontFilename,
+                            [
+                                new Uint8Array(arrayBuffer),
+                                { level: 0 },
+                            ],
+                        ];
+                    })
+                );
+            } catch (error) {
+
+            }
+        }
+        fontsNode.appendChild(storedFontFamilyNode);
     }
 
     const masks = workingFileStore.get('masks');

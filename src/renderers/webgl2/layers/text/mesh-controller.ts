@@ -9,7 +9,9 @@ import { Object3D } from 'three/src/core/Object3D';
 import { Texture } from 'three/src/textures/Texture';
 
 import { textMetaDefaults } from '@/lib/text-common';
-import { getUnloadedFontFamilies, loadFontFamilies, calculateTextPlacement } from '@/lib/text-render';
+import {
+    getUnloadedFontFamilies, loadFontFamilies, calculateTextPlacement,
+} from '@/lib/text-render';
 
 import { getWebgl2RendererBackend, markRenderDirty, Webgl2RendererBackend } from '@/renderers/webgl2/backend';
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
@@ -20,7 +22,6 @@ import { LetterMeshCache } from './letter-mesh-cache';
 
 import type { Scene, ShaderMaterial } from 'three';
 import type {
-    FontFamilyFetchDefinition,
     Webgl2RendererCanvasFilter, Webgl2RendererMeshController,
     WorkingFileLayerBlendingMode, WorkingFileTextLayer, WorkingFileLayerFilter
 } from '@/types';
@@ -139,7 +140,7 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
         this.regenerateFromData();
     }
 
-    async setFontFetchDefinitions(definitions?: Record<string, FontFamilyFetchDefinition>) {
+    async setFontFetchDefinitions() {
         if (this.data) {
             this.updateData(this.data);
         }

@@ -13,9 +13,15 @@
                     <template #prepend>
                         <span class="text-xs">{{ t('toolbar.text.font') }}</span>
                     </template>
-                    <el-select :aria-label="t('toolbar.text.font')" v-model="family" size="small" style="width: 6rem" @change="onChangeFontFamily">
-                        <el-option v-for="family of familyList" :key="family" :label="family" :value="family"></el-option>
-                        <el-option :label="t('toolbar.text.addFont')" value="[addFont]"></el-option>
+                    <el-select :aria-label="t('toolbar.text.font')" v-model="family" value-key="value" size="small" style="width: 6rem" @change="onChangeFontFamily">
+                        <el-option v-for="family of familyList" :key="family.value" :value="family.value">
+                            <span>{{ family.value }}</span>
+                            <span v-if="family.isOnline" :class="['bi', 'ml-2', family.isOnline ? 'bi-reception-4' : 'bi-file-earmark-font']" aria-hidden="true" />
+                        </el-option>
+                        <el-option value="[addFont]" class="border-t border-(--el-color-info)">
+                            <span class="bi bi-plus-circle mr-2" aria-hidden="true" />
+                            <span>{{ t('toolbar.text.addFont') }}</span>
+                        </el-option>
                     </el-select>
                 </el-input-group>
                 <!-- Text Size -->
@@ -213,6 +219,7 @@ import { textMetaDefaults } from '@/lib/text-common';
 
 import { runModule } from '@/modules';
 
+import { allStoredFontsByFamily } from '@/store/font';
 import workingFileStore from '@/store/working-file';
 import {
     fillColorPalette, fillColorPaletteIndex,
@@ -260,15 +267,25 @@ const family = computed<string>({
         return toolbarTextMeta.family ?? textMetaDefaults.family;
     }
 });
-const familyList = computed<string[]>(() => {
+const familyList = computed<Array<{ value: string, isOnline: boolean }>>(() => {
     return [
-        ...defaultFontFamilies.filter((family) => !family.isFallback).map((family) => family.family),
-        ...Object.keys(workingFileStore.state.remoteFonts),
-    ].sort();
+        ...defaultFontFamilies.filter((family) => !family.isFallback).map((family) => ({
+            value: family.family,
+            isOnline: false,
+        })),
+        ...Object.keys(workingFileStore.state.remoteFonts).map((family) => ({
+            value: family,
+            isOnline: true,
+        })),
+        ...Object.keys(allStoredFontsByFamily.value).map((family) => ({
+            value: family,
+            isOnline: false,
+        }))
+    ].sort((a, b) => a.value.localeCompare(b.value));
 });
 watch(() => familyList.value, (familyList) => {
-    if (!familyList.includes(family.value)) {
-        family.value = familyList[0];
+    if (!familyList.find((familyListItem) => familyListItem.value === family.value)) {
+        family.value = familyList[0].value;
     }
 });
 

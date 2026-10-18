@@ -1,8 +1,7 @@
 import { parse, type Font } from './opentype';
-import defaultFontFamilies from '@/config/default-font-families.json';
 
 // TODO - remove this import from this file (1.8MB in web worker)
-// Need to create a solution to load the default fonts when hosted on the file: protocol (Ubuntu Touch).
+// Need to create a solution to load the default fonts when hosted on the "file:" protocol (Ubuntu Touch).
 import googleWebfonts from '@/config/google-webfonts.json';
 
 import type { FontFamilyFetchDefinition, FontFamilyFetchDefinitionVariant } from '@/types';
@@ -22,9 +21,14 @@ export class FontCache {
     private fetchBaseUrl: string;
     private fontFamilyMap: Map<string, FontFamilyFontCache> = new Map();
     private fontFamilyLoadingPromiseMap: Map<string, Promise<void>> = new Map();
+    private fontFetchDefinitions: Record<string, FontFamilyFetchDefinition> = {};
     
     constructor(options?: CreateFontCacheOptions) {
         this.fetchBaseUrl = options?.fetchBaseUrl ?? '';
+    }
+
+    public setFontFetchDefinitions(definitions: Record<string, FontFamilyFetchDefinition>) {
+        this.fontFetchDefinitions = definitions;
     }
 
     public isFontFamilyLoaded(family: string): boolean {
@@ -42,7 +46,7 @@ export class FontCache {
     }
 
     public getFallbackFontFamilyThatSatisfiesSubset(subset: string): FontFamilyFontCache | null {
-        for (const [family, fontFamilyCache] of this.fontFamilyMap.entries()) {
+        for (const fontFamilyCache of this.fontFamilyMap.values()) {
             if (fontFamilyCache.subsets.includes(subset)) {
                 return fontFamilyCache;
             }
@@ -107,21 +111,30 @@ export class FontCache {
     }
 
     private async getFontFamilyDefinition(family: string): Promise<FontFamilyFetchDefinition> {
-        let definition = defaultFontFamilies.find((familyDef) => familyDef.family === family) as FontFamilyFetchDefinition | undefined;
-        if (!definition || window.location.protocol === 'file:') {
-            const googleDefinition = googleWebfonts.items.find((familyDef) => familyDef.family === family);
-            if (googleDefinition) {
-                definition = {
-                    family: googleDefinition.family,
-                    subsets: googleDefinition.subsets,
-                    variants: (googleDefinition.variants as string[]).reduce((accumulator, variantKey) => {
-                        accumulator[variantKey] = {
-                            name: '',
-                            file: googleDefinition.files[variantKey],
-                        }
-                        return accumulator;
-                    }, {} as { [key: string]: FontFamilyFetchDefinitionVariant }),
-                };
+        let definition = this.fontFetchDefinitions[family];
+        if (definition && window.location.protocol === 'file:') {
+            let isDefaultFont = false;
+            for (let variantKey in definition.variants) {
+                if (definition.variants[variantKey].file.startsWith('fonts/')) {
+                    isDefaultFont = true;
+                    break;
+                }
+            }
+            if (isDefaultFont) {
+                const googleDefinition = googleWebfonts.items.find((familyDef) => familyDef.family === family);
+                if (googleDefinition) {
+                    definition = {
+                        family: googleDefinition.family,
+                        subsets: googleDefinition.subsets,
+                        variants: (googleDefinition.variants as string[]).reduce((accumulator, variantKey) => {
+                            accumulator[variantKey] = {
+                                name: '',
+                                file: googleDefinition.files[variantKey],
+                            }
+                            return accumulator;
+                        }, {} as { [key: string]: FontFamilyFetchDefinitionVariant }),
+                    };
+                }
             }
         }
         if (definition) {

@@ -7,17 +7,16 @@ import { getSubsets as getUnicodeSubsets } from './unicode';
 import { textMetaDefaults } from './text-common';
 
 import type {
-    TextDocument, TextDocumentLine, TextDocumentSpan, TextDocumentSpanBidiRun, TextDocumentSpanMeta,
+    FontFamilyFetchDefinition,
+    TextDocument, TextDocumentLine, TextDocumentSpan, TextDocumentSpanBidiRun,
     RenderTextLineInfo, RenderTextGlyphInfo, CalculatedTextPlacement,
 } from '@/types';
 import type { Font, Glyph } from '@/lib/opentype.js';
 
 const bidi = bidiFactory();
 
-function isAvailableFontFamily(family: string) {
-    return (
-        !!defaultFontFamilies.find((definition) => definition.family === family)
-    );
+export function setFontFetchDefinitions(definitions: Record<string, FontFamilyFetchDefinition>) {
+    fontCache.setFontFetchDefinitions(definitions);
 }
 
 export function getUnloadedFontFamilies(document: TextDocument): string[] {

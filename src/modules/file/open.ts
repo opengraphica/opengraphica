@@ -12,6 +12,7 @@ import { t } from '@/i18n';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
+import { deleteAllStoredFonts, createStoredFont } from '@/store/font';
 import { createStoredImage } from '@/store/image';
 import { createStoredSvg } from '@/store/svg';
 import { createStoredVideo } from '@/store/video';
@@ -19,7 +20,7 @@ import preferencesStore from '@/store/preferences';
 import workingFileStore, {
     getCanvasRenderingContext2DSettings, calculateLayerOrder, discardAllUnusedMasks, type WorkingFileState
 } from '@/store/working-file';
-import { readWorkingFile } from '@/store/data/working-file-database';
+import { readWorkingFile, readStoredFonts } from '@/store/data/working-file-database';
 import { discardActiveSelectionMask, discardAppliedSelectionMask, activeSelectionPath, appliedSelectionPaths } from '@/canvas/store/selection-state';
 
 import { BaseAction } from '@/actions/base';
@@ -41,10 +42,6 @@ import type {
     InsertRasterLayerOptions, InsertRasterSequenceLayerOptions, InsertVectorLayerOptions,
     InsertVideoLayerOptions, WorkingFileRasterSequenceLayer,
 } from '@/types';
-
-declare global {
-    var showOpenFilePicker: ShowOpenFilePicker;
-}
 
 interface FileDialogOpenOptions {
     insert?: boolean; // False will create a new document, true inserts into current document.
@@ -204,6 +201,11 @@ export async function openFromTemporaryStorage() {
     }
 
     appEmitter.emit('app.workingFile.detachAllLayers');
+    await deleteAllStoredFonts(); // Delete from memory
+    const createFonts = await readStoredFonts(); // Read from database
+    for (const createFont of createFonts) {
+        await createStoredFont(createFont);
+    }
     const workingFile = await readWorkingFile();
     const maxMaskId = Object.keys(workingFile.masks).reduce((accumulator, value) => {
         let maskId = parseInt(value);

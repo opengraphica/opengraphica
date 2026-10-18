@@ -1,3 +1,5 @@
+import type { ShowOpenFilePicker } from './file-system-access';
+
 declare global {
     var __BUILD_GIT_COMMIT_ID__: string;
 
@@ -24,6 +26,8 @@ declare global {
     }
 
     var Electron: ElectronGlobal | undefined;
+    
+    var showOpenFilePicker: ShowOpenFilePicker | undefined;
 }
 
 export {};

@@ -4,7 +4,7 @@ import defaultFontFamilies from '@/config/default-font-families.json';
 
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
-import { getAllStoredFontsByName } from '@/store/font';
+import { allStoredFontsByFamily } from '@/store/font';
 import { getStoredImageAsBitmap } from '@/store/image';
 import { getStoredSvgImage } from '@/store/svg';
 import workingFileStore, { getLayerById, regenerateLayerThumbnail } from '@/store/working-file';
@@ -16,6 +16,7 @@ import {
 
 import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
 import { colorToHex, colorToRgba, getColorModelName } from '@/lib/color';
+import { setFontFetchDefinitions as setTextRendererFontFetchDefinitions } from '@/lib/text-render';
 import { deepToRaw } from '@/lib/vue';
 
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
@@ -116,7 +117,10 @@ export class Webgl2RendererFrontend implements RendererFrontend {
             );
         });
 
-        this.stopWatchFontFetchDefinitions = watch(() => workingFileStore.state.remoteFonts, (remoteFonts) => {
+        this.stopWatchFontFetchDefinitions = watch(() => [
+            workingFileStore.state.remoteFonts,
+            allStoredFontsByFamily.value,
+        ], ([remoteFonts, allStoredFonts]) => {
             const fontFetchDefinitions: Record<string, FontFamilyFetchDefinition> = {};
             for (const fontDefinition of defaultFontFamilies) {
                 fontFetchDefinitions[fontDefinition.family] = fontDefinition as FontFamilyFetchDefinition;
@@ -124,10 +128,10 @@ export class Webgl2RendererFrontend implements RendererFrontend {
             for (const familyName in remoteFonts) {
                 fontFetchDefinitions[familyName] = remoteFonts[familyName];
             }
-            const allStoredFonts = getAllStoredFontsByName();
             for (const familyName in allStoredFonts) {
                 fontFetchDefinitions[familyName] = allStoredFonts[familyName];
             }
+            setTextRendererFontFetchDefinitions(fontFetchDefinitions);
             this.rendererBackend.setFontFetchDefinitions(fontFetchDefinitions);
         }, { deep: true, immediate: true });
 

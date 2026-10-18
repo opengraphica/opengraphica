@@ -20,6 +20,16 @@
     },
     "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "android",
+        "clickable",
+        "dist",
+        "docs",
+        "electron",
+        "public",
+        "rust",
+        "scripts",
+        "target",
+        "www"
     ]
 }

@@ -12,6 +12,7 @@ import { hexToColor } from '@/lib/color';
 import { createImageFromBlob } from '@/lib/image';
 import { createVideoFromBlob } from '@/lib/video';
 
+import { createStoredFont, type CreateStoredFont } from '@/store/font';
 import { createStoredImage, getStoredImageOrCanvas } from '@/store/image';
 import { createStoredSvg, getStoredSvgImage } from '@/store/svg';
 import { createStoredVideo, getStoredVideo } from '@/store/video';
@@ -466,7 +467,7 @@ export async function parseSerializedFileToActions(
     const remoteFonts: Record<string, FontFamilyFetchDefinition> = {};
     const fontsNode = Array.from(image.children).find((node) => node.tagName === 'og:fonts');
     if (fontsNode) {
-        const remoteFontNodes = Array.from(fontsNode.getElementsByTagName('og:remote-font'));
+        const remoteFontNodes = Array.from(fontsNode.getElementsByTagName('og:remote-font-family'));
         for (const remoteFontNode of remoteFontNodes) {
             const remoteFont: FontFamilyFetchDefinition = {
                 family: remoteFontNode.getAttribute('family') ?? '',
@@ -484,6 +485,24 @@ export async function parseSerializedFileToActions(
                 };
             }
             remoteFonts[remoteFont.family] = remoteFont;
+        }
+
+        const storedFontNodes = Array.from(fontsNode.getElementsByTagName('og:stored-font-family'));
+        for (const storedFontNode of storedFontNodes) {
+            const storedFont: CreateStoredFont = {
+                family: storedFontNode.getAttribute('family') ?? '',
+                subsets: (storedFontNode.getAttribute('subsets') ?? '').split(','),
+                variants: {},
+            };
+            const variantNodes = Array.from(storedFontNode.getElementsByTagName('og:font-variant'));
+            for (const variantNode of variantNodes) {
+                const variantKey = variantNode.getAttribute('key');
+                const variantSrc = variantNode.getAttribute('src');
+                if (!variantKey || !variantSrc) continue;
+                if (!archive[variantSrc]) continue;
+                storedFont.variants[variantKey] = new Blob([archive[variantSrc]]);
+            }
+            await createStoredFont(storedFont);
         }
     }
     if (options?.insert) {

@@ -79,6 +79,7 @@ interface EditorState {
     floatingDocksContainer: HTMLElement | null;
     floatingDockRects: FloatingDockRect[];
     isActiveToolbarExclusive: boolean;
+    isOnline: boolean;
     isPenUser: boolean;
     isTaskRunning: boolean;
     isToolHidingDialogs: boolean;
@@ -151,6 +152,7 @@ const store = new PerformantStore<EditorStore>({
         floatingDocksContainer: null,
         floatingDockRects: [],
         isActiveToolbarExclusive: false,
+        isOnline: window.navigator.onLine ?? true,
         isPenUser: false,
         isTaskRunning: false,
         isToolHidingDialogs: false,
@@ -355,6 +357,9 @@ function updateRasterSequenceLayerWithTimeline(layer: WorkingFileRasterSequenceL
         }
     }
 }
+
+window.addEventListener('online', () => store.set('isOnline', true));
+window.addEventListener('offline', () => store.set('isOnline', false));
 
 export default store;
 

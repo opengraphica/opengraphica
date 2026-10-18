@@ -1,8 +1,11 @@
+import { computed, ref } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 
-import type { FontFamilyFetchDefinition, FontFamilyFetchDefinitionVariant } from '@/types';
+import { updateStoredFontFamily } from '@/store/data/working-file-database';
 
-interface CreateStoredFont {
+import type { FontFamilyFetchDefinition } from '@/types';
+
+export interface CreateStoredFont {
     family: string;
     subsets: string[];
     variants: {
@@ -10,7 +13,7 @@ interface CreateStoredFont {
     }
 }
 
-const fontUuidMap = new Map<string | undefined, FontFamilyFetchDefinition>();
+const fontUuidMap = ref<Map<string | undefined, FontFamilyFetchDefinition>>(new Map());
 const fontUserUuidMap = new Map<string, Set<string>>();
 
 export function generateFontVariantName(variant: string) {
@@ -43,20 +46,44 @@ export function generateFontVariantName(variant: string) {
  * @returns uuid that can be used to retrieve it later
  */
 export async function createStoredFont(storedFontBlobs: CreateStoredFont) {
-    const storedFont: FontFamilyFetchDefinition = {
-        family: storedFontBlobs.family,
-        subsets: storedFontBlobs.subsets.slice(),
-        variants: {},
+    let existingStoredFont: FontFamilyFetchDefinition | undefined;
+    let existingStoredFontUuid: string | undefined;
+    for (const [uuid, definition] of fontUuidMap.value) {
+        if (definition.family === storedFontBlobs.family) {
+            existingStoredFont = definition;
+            existingStoredFontUuid = uuid;
+            break;
+        }
     }
-    for (const variantKey in storedFontBlobs.variants) {
-        storedFont.variants[variantKey] = {
-            name: generateFontVariantName(variantKey),
-            file: URL.createObjectURL(storedFontBlobs.variants[variantKey]),
-        };
+    if (existingStoredFont && existingStoredFontUuid) {
+        for (const variantKey in storedFontBlobs.variants) {
+            if (existingStoredFont.variants[variantKey]) {
+                URL.revokeObjectURL(existingStoredFont.variants[variantKey].file);
+            }
+            existingStoredFont.variants[variantKey] = {
+                name: generateFontVariantName(variantKey),
+                file: URL.createObjectURL(storedFontBlobs.variants[variantKey]),
+            };
+        }
+        updateStoredFontFamily(existingStoredFont);
+        return existingStoredFontUuid;
+    } else {
+        const storedFont: FontFamilyFetchDefinition = {
+            family: storedFontBlobs.family,
+            subsets: storedFontBlobs.subsets.slice(),
+            variants: {},
+        }
+        for (const variantKey in storedFontBlobs.variants) {
+            storedFont.variants[variantKey] = {
+                name: generateFontVariantName(variantKey),
+                file: URL.createObjectURL(storedFontBlobs.variants[variantKey]),
+            };
+        }
+        const uuid = uuidv4();
+        fontUuidMap.value.set(uuid, storedFont);
+        updateStoredFontFamily(storedFont);
+        return uuid;
     }
-    const uuid = uuidv4();
-    fontUuidMap.set(uuid, storedFont);
-    return uuid;
 }
 
 /**
@@ -65,31 +92,43 @@ export async function createStoredFont(storedFontBlobs: CreateStoredFont) {
  * @returns The font definition, or null if somehow it doesn't exist
  */
 export function getStoredFont(uuid?: string): FontFamilyFetchDefinition | null {
-    return fontUuidMap.get(uuid) ?? null;
+    return fontUuidMap.value.get(uuid) ?? null;
 }
 
 /**
  * Retrieves all stored font definitions mapped by font family name as the key
  */
-export function getAllStoredFontsByName(): Record<string, FontFamilyFetchDefinition> {
-    const storedFontsByName: Record<string, FontFamilyFetchDefinition> = {};
-    for (const definition of fontUuidMap.values()) {
-        storedFontsByName[definition.family] = definition;
+export const allStoredFontsByFamily = computed(() => {
+    const storedFontsByFamily: Record<string, FontFamilyFetchDefinition> = {};
+    for (const definition of fontUuidMap.value.values()) {
+        storedFontsByFamily[definition.family] = definition;
     }
-    return storedFontsByName;
-}
+    return storedFontsByFamily;
+});
 
 /**
  * Releases the stored font from memory, and from the database.
  * @param uuid - ID of the database entry for the font
  */
- export async function deleteStoredFont(uuid?: string) {
-    const storedFont = fontUuidMap.get(uuid);
+export async function deleteStoredFont(uuid?: string) {
+    const storedFont = fontUuidMap.value.get(uuid);
     if (!storedFont) return;
-    fontUuidMap.delete(uuid);
+    fontUuidMap.value.delete(uuid);
     for (const variantKey in storedFont.variants) {
         URL.revokeObjectURL(storedFont.variants[variantKey].file);
     }
+}
+
+/**
+ * Releases all stored fonts from memory.
+ */
+export async function deleteAllStoredFonts() {
+    for (const storedFont of fontUuidMap.value.values()) {
+        for (const variantKey in storedFont.variants) {
+            URL.revokeObjectURL(storedFont.variants[variantKey].file);
+        }
+    }
+    fontUuidMap.value.clear();
 }
 
 /**

@@ -7,7 +7,7 @@ export as namespace opentype;
  ******************************************/
 
 export class Font {
-    names: FontNames;
+    names: FontNames & { windows?: FontNames, macintosh?: FontNames, unicode?: FontNames };
     unitsPerEm: number;
     ascender: number;
     descender: number;

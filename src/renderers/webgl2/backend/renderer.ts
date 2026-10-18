@@ -25,6 +25,7 @@ import { messageBus } from './message-bus';
 import { createCanvasFiltersFromLayerConfig } from '@/renderers/webgl2/layers/base/material';
 
 import { srgbChannelToLinearSrgbChannel, linearSrgbChannelToSrgbChannel } from '@/lib/color';
+import { setFontFetchDefinitions as setTextRendererFontFetchDefinitions } from '@/lib/text-render';
 
 import type { Camera, Texture } from 'three';
 import type {
@@ -247,6 +248,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
 
     async setFontFetchDefinitions(definitions: Record<string, FontFamilyFetchDefinition>): Promise<void> {
         this.fontFetchDefinitions = definitions;
+        setTextRendererFontFetchDefinitions(definitions);
         messageBus.emit('backend.setFontFetchDefinitions', definitions);
     }
 

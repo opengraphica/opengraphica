@@ -3,13 +3,16 @@ import { reactive, toRaw } from 'vue';
 import appEmitter from '@/lib/emitter';
 import { deepToRaw } from '@/lib/vue';
 
+import { allStoredFontsByFamily, type CreateStoredFont } from '@/store/font';
 import { prepareStoredImageForEditing, reserveStoredImage, createStoredImage } from '@/store/image';
 import { getStoredSvgDataUrl, createStoredSvg } from '@/store/svg';
-import { createImageBlobFromCanvas, createImageFromBlob } from '@/lib/image';
 import { getStoredVideoDataUrl, createStoredVideo } from '@/store/video';
 
+import { createImageBlobFromCanvas, createImageFromBlob } from '@/lib/image';
+
 import type {
-    ColorModel, WorkingFile, WorkingFileLayerMask, WorkingFileGroupLayer, WorkingFileLayer, WorkingFileAnyLayer,
+    ColorModel, FontFamilyFetchDefinition,
+    WorkingFile, WorkingFileLayerMask, WorkingFileGroupLayer, WorkingFileLayer, WorkingFileAnyLayer,
     WorkingFileGradientLayer, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer,
     WorkingFileVectorLayer, SerializedFileVectorLayer, WorkingFileVideoLayer, SerializedFileVideoLayer,
 } from '@/types';
@@ -26,6 +29,13 @@ interface DatabaseImage {
     id: string;
     data: any;
 }
+interface DatabaseFont {
+    id: string;
+    family: string;
+    subsets: string[];
+    variant: string;
+    data: any;
+}
 
 let database: IDBDatabase | null = null;
 let databaseInitPromise: Promise<void> | null = null;
@@ -37,7 +47,7 @@ export async function init() {
                 if (window.indexedDB) {
                     // Initialize database
                     await new Promise<void>((resolve, reject) => {
-                        let openRequest = window.indexedDB.open('workingFileStore', 1);
+                        let openRequest = window.indexedDB.open('workingFileStore', 2);
                         openRequest.onupgradeneeded = function(event) {
                             database = openRequest.result as IDBDatabase;
                             switch (event.oldVersion) {
@@ -46,6 +56,8 @@ export async function init() {
                                     database.createObjectStore('layers', { keyPath: 'id' });
                                     database.createObjectStore('images', { keyPath: 'id' });
                                     break;
+                                case 1:
+                                    database.createObjectStore('fonts', { keyPath: 'id' });
                             }
                         };
                         openRequest.onerror = () => {
@@ -114,6 +126,67 @@ async function readStoredImage(sourceUuid: string) {
     const image = await createImageFromBlob(imageBlob.data);
     const imageUuid = await createStoredImage(image);
     return imageUuid;
+}
+
+export async function readStoredFonts(): Promise<CreateStoredFont[]> {
+    await init();
+    if (!database) return [];
+    const transaction = (database as IDBDatabase).transaction('fonts', 'readonly');
+    const fontsStore = transaction.objectStore('fonts');
+    const getFontsRequest = fontsStore.getAll();
+    const fonts = await new Promise<DatabaseFont[]>((resolve, reject) => {
+        getFontsRequest.onsuccess = () => {
+            resolve(getFontsRequest.result);
+        };
+        getFontsRequest.onerror = reject;
+    });
+    const createFonts: CreateStoredFont[] = [];
+    for (const font of fonts) {
+        let createFont = createFonts.find((createdFont) => createdFont.family === font.family);
+        if (!createFont) {
+            createFont = {
+                family: font.family,
+                subsets: font.subsets,
+                variants: {},
+            };
+            createFonts.push(createFont);
+        }
+        createFont.variants[font.variant] = font.data;
+    }
+    return createFonts;
+}
+
+/** Stores a font family in the database */
+export async function updateStoredFontFamily(definition: FontFamilyFetchDefinition) {
+    await init();
+    if (!database) return;
+
+    const records = await Promise.allSettled(
+        Object.entries(definition.variants).map(async ([variantKey, variant]) => ({
+            id: `${definition.family}_${variantKey}`,
+            family: definition.family,
+            subsets: deepToRaw(definition.subsets),
+            variant: variantKey,
+            data: await (await fetch(variant.file)).blob(),
+        }))
+    );
+
+    const transaction = (database as IDBDatabase).transaction('fonts', 'readwrite');
+    const fontsStore = transaction.objectStore('fonts');
+    let requests: IDBRequest<IDBValidKey>[] = [];
+    for (const record of records) {
+        if (record.status === 'fulfilled') {
+            requests.push(fontsStore.put(record.value));
+        } else {
+            console.error('[src/store/data/working-file-database.ts] Error storing font.', record.reason);
+        }
+    }
+    await Promise.all(requests.map((request) => {
+        return new Promise((resolve, reject) => {
+            request.onsuccess = resolve;
+            request.onerror = reject;
+        });
+    }));
 }
 
 async function readStoredLayersRecursive(metaLayers: DatabaseMetaLayer[], workingFile: Partial<WorkingFile>): Promise<WorkingFileAnyLayer[]> {
@@ -200,7 +273,7 @@ export async function deleteWorkingFile() {
     if (!database) return;
 
     // Clear all the existing object stores
-    const transaction = database.transaction(['meta', 'layers', 'images'], 'readwrite');
+    const transaction = database.transaction(['meta', 'layers', 'images', 'fonts'], 'readwrite');
     const metaStore = transaction.objectStore('meta');
     let request = metaStore.clear();
     await new Promise((resolve) => {
@@ -215,6 +288,12 @@ export async function deleteWorkingFile() {
     });
     const imagesStore = transaction.objectStore('images');
     request = imagesStore.clear();
+    await new Promise((resolve) => {
+        request.onsuccess = resolve;
+        request.onerror = resolve;
+    });
+    const fontsStore = transaction.objectStore('fonts');
+    request = fontsStore.clear();
     await new Promise((resolve) => {
         request.onsuccess = resolve;
         request.onerror = resolve;
@@ -266,6 +345,10 @@ export async function writeWorkingFile(workingFile: WorkingFile<ColorModel>) {
 
         // Store each layer as a flat object in the layers store
         await storeLayersRecursive(workingFile.layers);
+
+        for (const familyName in allStoredFontsByFamily.value) {
+            await updateStoredFontFamily(allStoredFontsByFamily.value[familyName]);
+        }
     } catch (error) {
         await deleteWorkingFile();
         throw error;

@@ -6,3 +6,11 @@ export function camelCaseToKebabCase(str: string) {
             : letter;
     }).join('');
 }
+
+export function toTitleCase(str: string) {
+    return str
+        .toLocaleLowerCase()
+        .replace(/(^|[\s-])(\p{L})/gu, (_, separator, letter) =>
+            separator + letter.toLocaleUpperCase()
+        );
+}
