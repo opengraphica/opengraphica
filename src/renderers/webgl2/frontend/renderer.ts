@@ -129,7 +129,7 @@ export class Webgl2RendererFrontend implements RendererFrontend {
                 fontFetchDefinitions[familyName] = allStoredFonts[familyName];
             }
             this.rendererBackend.setFontFetchDefinitions(fontFetchDefinitions);
-        }, { immediate: true });
+        }, { deep: true, immediate: true });
 
         this.stopWatchMasks = watch(() => workingFileStore.state.masks, (masks) => {
             this.rendererBackend.setMasks(deepToRaw(masks));

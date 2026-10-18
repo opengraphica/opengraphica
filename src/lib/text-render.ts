@@ -519,14 +519,25 @@ export function calculateTextPlacement(document: TextDocument, options: Calculat
                     }
 
                     // Convert characters to glyphs
-                    const glyphs = isHorizontal
-                        ? font.stringToGlyphMapping(bidiRunText)
-                        : bidiRunText.split('').map((char, index) => {
+                    let glyphs: ReturnType<typeof font.stringToGlyphMapping>;
+                    try {
+                        glyphs = isHorizontal
+                            ? font.stringToGlyphMapping(bidiRunText)
+                            : bidiRunText.split('').map((char, index) => {
+                                return {
+                                    glyph: font.charToGlyph(char),
+                                    replaced: [index]
+                                };
+                            });
+                    } catch (error) {
+                        glyphs = bidiRunText.split('').map((char, index) => {
                             return {
                                 glyph: font.charToGlyph(char),
                                 replaced: [index]
                             };
                         });
+                    }
+
                     let originalTextCharacterIndex = bidiRun.isFlipped ? bidiRunText.length - 1 : 0;
                     for (const { glyph, replaced } of glyphs) {
                         const documentCharacterCount = replaced.length;

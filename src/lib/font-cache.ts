@@ -54,6 +54,13 @@ export class FontCache {
         if (this.fontFamilyMap.has(family)) {
             return this.fontFamilyMap.get(family)!;
         }
+        if (this.fontFamilyLoadingPromiseMap.has(family)) {
+            await this.fontFamilyLoadingPromiseMap.get(family);
+            const cache = this.fontFamilyMap.get(family);
+            if (cache) {
+                return cache;
+            }
+        }
         let resolveLoadingPromise = () => {};
         const loadingPromise = new Promise<void>((resolve) => { resolveLoadingPromise = resolve; });
         this.fontFamilyLoadingPromiseMap.set(family, loadingPromise);
