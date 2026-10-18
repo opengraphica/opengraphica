@@ -363,6 +363,7 @@ export class TextLayerMeshController implements Webgl2RendererMeshController {
         const hadUnloadedFont = await loadFontFamilies(this.waitingToLoadFontFamilies);
         if (hadUnloadedFont && this.data) {
             this.updateData(this.data);
+            messageBus.emit('layer.text.notifyFontLoaded');
         }
     }
 

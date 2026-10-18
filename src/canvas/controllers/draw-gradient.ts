@@ -21,6 +21,8 @@ import { appliedSelectionMask, activeSelectionMask } from '../store/selection-st
 import { type BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { ClearSelectionAction } from '@/actions/clear-selection';
+import { DeleteLayersAction } from '@/actions/delete-layers';
+import { DeleteLayerSelectionAreaAction } from '@/actions/delete-layer-selection-area';
 import { InsertLayerAction } from '@/actions/insert-layer';
 import { UpdateLayerAction } from '@/actions/update-layer';
 
@@ -64,6 +66,9 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
 
         this.onHistoryStep = this.onHistoryStep.bind(this);
         appEmitter.on('editor.history.step', this.onHistoryStep);
+        this.onDelete = this.onDelete.bind(this);
+        appEmitter.on('editor.tool.delete', this.onDelete);
+        this.onSelectAll = this.onSelectAll.bind(this);
         appEmitter.on('editor.tool.selectAll', this.onSelectAll);
 
         // Tutorial message
@@ -96,6 +101,7 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
         this.selectedLayerIdsUnwatch = null;
 
         appEmitter.off('editor.history.step', this.onHistoryStep);
+        appEmitter.off('editor.tool.delete', this.onDelete);
         appEmitter.off('editor.tool.selectAll', this.onSelectAll);
 
         // Tutorial Message
@@ -355,6 +361,19 @@ export default class CanvasDrawGradientController extends BaseCanvasMovementCont
             'updateDrawGradientLayerStops', ,
         ].includes(event?.action.id as string)) {
             this.updateToolbarFromEditingLayers();
+        }
+    }
+
+    private async onDelete() {
+        if (this.drawingPointerId != null) return;
+        if (activeSelectionMask.value || appliedSelectionMask.value) {
+            await historyStore.dispatch('runAction', {
+                action: new DeleteLayerSelectionAreaAction(workingFileStore.state.selectedLayerIds),
+            });
+        } else if (workingFileStore.state.selectedLayerIds.length > 0) {
+            await historyStore.dispatch('runAction', {
+                action: new DeleteLayersAction(workingFileStore.state.selectedLayerIds),
+            });
         }
     }
 

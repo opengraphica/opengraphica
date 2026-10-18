@@ -29,6 +29,7 @@ import {
 import type { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { ClearSelectionAction } from '@/actions/clear-selection';
+import { DeleteLayersAction } from '@/actions/delete-layers';
 import { DeleteLayerSelectionAreaAction } from '@/actions/delete-layer-selection-area';
 import { TrimLayerEmptySpaceAction } from '@/actions/trim-layer-empty-space';
 import { UpdateLayerAction } from '@/actions/update-layer';
@@ -129,6 +130,9 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
             }
         });
 
+        this.onDelete = this.onDelete.bind(this);
+        appEmitter.on('editor.tool.delete', this.onDelete);
+        this.onSelectAll = this.onSelectAll.bind(this);
         appEmitter.on('editor.tool.selectAll', this.onSelectAll);
         
         cursorHoverPosition.value = new DOMPoint(
@@ -172,6 +176,7 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
         this.isPreviewingSizeUnwatch?.();
         this.isPreviewingSizeUnwatch = null;
 
+        appEmitter.off('editor.tool.delete', this.onDelete);
         appEmitter.off('editor.tool.selectAll', this.onSelectAll);
 
         for (const layer of getSelectedLayers()) {
@@ -640,6 +645,19 @@ export default class CanvasEraseController extends BaseCanvasMovementController 
                 await historyStore.dispatch('unreserve', { token: updateLayerReserveToken });
             }
 
+        }
+    }
+
+    private async onDelete() {
+        if (this.erasingPointerId != null) return;
+        if (activeSelectionMask.value || appliedSelectionMask.value) {
+            await historyStore.dispatch('runAction', {
+                action: new DeleteLayerSelectionAreaAction(workingFileStore.state.selectedLayerIds),
+            });
+        } else if (workingFileStore.state.selectedLayerIds.length > 0) {
+            await historyStore.dispatch('runAction', {
+                action: new DeleteLayersAction(workingFileStore.state.selectedLayerIds),
+            });
         }
     }
 

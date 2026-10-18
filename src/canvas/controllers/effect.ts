@@ -8,11 +8,13 @@ import { isInput } from '@/lib/events';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
-import { getCanvasRenderingContext2DSettings } from '@/store/working-file';
+import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
 
 import { appliedSelectionMask, activeSelectionMask } from '../store/selection-state';
 
 import { ClearSelectionAction } from '@/actions/clear-selection';
+import { DeleteLayersAction } from '@/actions/delete-layers';
+import { DeleteLayerSelectionAreaAction } from '@/actions/delete-layer-selection-area';
 import { SelectLayersAction } from '@/actions/select-layers';
 
 import { t, tm, rt } from '@/i18n';
@@ -23,10 +25,12 @@ const devicePixelRatio = window.devicePixelRatio || 1;
 
 export default class EffectController extends BaseCanvasMovementController {
 
-
     onEnter(): void {
         super.onEnter();
         
+        this.onDelete = this.onDelete.bind(this);
+        appEmitter.on('editor.tool.delete', this.onDelete);
+        this.onSelectAll = this.onSelectAll.bind(this);
         appEmitter.on('editor.tool.selectAll', this.onSelectAll);
 
         // Tutorial message
@@ -50,6 +54,7 @@ export default class EffectController extends BaseCanvasMovementController {
     onLeave(): void {
         super.onLeave();
 
+        appEmitter.off('editor.tool.delete', this.onDelete);
         appEmitter.off('editor.tool.selectAll', this.onSelectAll);
 
         // Tutorial Message
@@ -84,6 +89,18 @@ export default class EffectController extends BaseCanvasMovementController {
             await historyStore.dispatch('runAction', {
                 action: new SelectLayersAction([pickLayerId]),
                 mergeWithHistory: 'selectLayers',
+            });
+        }
+    }
+
+    private async onDelete() {
+        if (activeSelectionMask.value || appliedSelectionMask.value) {
+            await historyStore.dispatch('runAction', {
+                action: new DeleteLayerSelectionAreaAction(workingFileStore.state.selectedLayerIds),
+            });
+        } else if (workingFileStore.state.selectedLayerIds.length > 0) {
+            await historyStore.dispatch('runAction', {
+                action: new DeleteLayersAction(workingFileStore.state.selectedLayerIds),
             });
         }
     }

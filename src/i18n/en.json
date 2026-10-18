@@ -932,7 +932,7 @@
         "imageTransform": {
             "noLayersSelected": {
                 "title": "No Layers Selected",
-                "message": "Select at least one layer in the layers dock to transform."
+                "message": "Select at least one layer in the layers dock to transform. Some layer types can't be transformed."
             }
         },
         "layerBlendingMode": {

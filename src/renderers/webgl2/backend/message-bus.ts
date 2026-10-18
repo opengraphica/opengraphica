@@ -34,6 +34,7 @@ export interface MessageBusEvents {
         bitmap: ImageBitmap | undefined;
     };
     'layer.regenerateThumbnail': number;
+    'layer.text.notifyFontLoaded': void;
     'layer.text.notifySizeUpdate': {
         id: number;
         width: number;

@@ -33,6 +33,8 @@ import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOve
 
 import { CreateNewLayersFromSelectionAction } from '@/actions/create-new-layers-from-selection';
 import { ClearSelectionAction } from '@/actions/clear-selection';
+import { DeleteLayersAction } from '@/actions/delete-layers';
+import { DeleteLayerSelectionAreaAction } from '@/actions/delete-layer-selection-area';
 import { SelectLayersAction } from '@/actions/select-layers';
 import { UpdateLayerAction } from '@/actions/update-layer';
 import { BundleAction } from '@/actions/bundle';
@@ -137,29 +139,31 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         }, { deep: true });
 
         this.onArrowDown = this.onArrowDown.bind(this);
-        this.onArrowLeft = this.onArrowLeft.bind(this);
-        this.onArrowRight = this.onArrowRight.bind(this);
-        this.onArrowUp = this.onArrowUp.bind(this);
-        this.onCancelCurrentAction = this.onCancelCurrentAction.bind(this);
-        this.onCommitCurrentAction = this.onCommitCurrentAction.bind(this);
-        this.onHistoryStep = this.onHistoryStep.bind(this);
-        this.onStoreTransformStart = this.onStoreTransformStart.bind(this);
-        this.onPreviewRotationChange = this.onPreviewRotationChange.bind(this);
-        this.onPreviewDragResizeChange = this.onPreviewDragResizeChange.bind(this);
-        this.onCommitTransforms = this.onCommitTransforms.bind(this);
-
         appEmitter.on('editor.tool.arrowDown', this.onArrowDown);
+        this.onArrowLeft = this.onArrowLeft.bind(this);
         appEmitter.on('editor.tool.arrowLeft', this.onArrowLeft);
+        this.onArrowRight = this.onArrowRight.bind(this);
         appEmitter.on('editor.tool.arrowRight', this.onArrowRight);
+        this.onArrowUp = this.onArrowUp.bind(this);
         appEmitter.on('editor.tool.arrowUp', this.onArrowUp);
+        this.onDelete = this.onDelete.bind(this);
+        appEmitter.on('editor.tool.delete', this.onDelete);
+        this.onCancelCurrentAction = this.onCancelCurrentAction.bind(this);
         appEmitter.on('editor.tool.cancelCurrentAction', this.onCancelCurrentAction);
+        this.onCommitCurrentAction = this.onCommitCurrentAction.bind(this);
         appEmitter.on('editor.tool.commitCurrentAction', this.onCommitCurrentAction);
+        this.onSelectAll = this.onSelectAll.bind(this);
         appEmitter.on('editor.tool.selectAll', this.onSelectAll);
+        this.onHistoryStep = this.onHistoryStep.bind(this);
         appEmitter.on('editor.history.step', this.onHistoryStep);
 
+        this.onStoreTransformStart = this.onStoreTransformStart.bind(this);
         freeTransformEmitter.on('storeTransformStart', this.onStoreTransformStart);
+        this.onPreviewRotationChange = this.onPreviewRotationChange.bind(this);
         freeTransformEmitter.on('previewRotationChange', this.onPreviewRotationChange);
+        this.onPreviewDragResizeChange = this.onPreviewDragResizeChange.bind(this);
         freeTransformEmitter.on('previewDragResizeChange', this.onPreviewDragResizeChange);
+        this.onCommitTransforms = this.onCommitTransforms.bind(this);
         freeTransformEmitter.on('commitTransforms', this.onCommitTransforms);
 
         this.calculateSnapCache();
@@ -212,6 +216,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         appEmitter.off('editor.tool.arrowUp', this.onArrowUp);
         appEmitter.off('editor.tool.cancelCurrentAction', this.onCancelCurrentAction);
         appEmitter.off('editor.tool.commitCurrentAction', this.onCommitCurrentAction);
+        appEmitter.off('editor.tool.delete', this.onDelete);
         appEmitter.off('editor.tool.selectAll', this.onSelectAll);
         appEmitter.off('editor.history.step', this.onHistoryStep);
         
@@ -540,6 +545,20 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         this.lastArrowMoveTime = window.performance.now();
 
         this.setBoundsFromSelectedLayersImmediate();
+    }
+
+    private async onDelete() {
+        if (this.transformTranslateStart) return;
+        if (activeSelectionMask.value || appliedSelectionMask.value) {
+            await historyStore.dispatch('runAction', {
+                action: new DeleteLayerSelectionAreaAction(workingFileStore.state.selectedLayerIds),
+            });
+            this.setBoundsFromSelectedLayers();
+        } else if (workingFileStore.state.selectedLayerIds.length > 0) {
+            await historyStore.dispatch('runAction', {
+                action: new DeleteLayersAction(workingFileStore.state.selectedLayerIds),
+            });
+        }
     }
 
     private onCancelCurrentAction() {

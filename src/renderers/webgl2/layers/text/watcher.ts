@@ -7,6 +7,7 @@ import { toRaw, toRefs, watch, type WatchStopHandle } from 'vue';
 
 import { getLayerById } from '@/store/working-file';
 
+import appEmitter from '@/lib/emitter';
 import { messageBus } from '@/renderers/webgl2/backend/message-bus';
 
 import type {
@@ -20,6 +21,10 @@ messageBus.on('layer.text.notifySizeUpdate', (update) => {
     if (!layer) return;
     layer.width = update.width;
     layer.height = update.height;
+});
+
+messageBus.on('layer.text.notifyFontLoaded', () => {
+    appEmitter.emit('editor.tool.fontsLoaded');
 });
 
 export class TextLayerWatcher implements RendererLayerWatcher<WorkingFileTextLayer> {

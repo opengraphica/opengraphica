@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { BundleAction } from '@/actions/bundle';
 import { ClearSelectionAction } from '@/actions/clear-selection';
+import { DeleteLayersAction } from '@/actions/delete-layers';
 import { InsertLayerAction } from '@/actions/insert-layer';
 import { SelectLayersAction } from '@/actions/select-layers';
 import { UpdateLayerAction } from '@/actions/update-layer';
@@ -210,10 +211,13 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         this.onToolbarDocumentChanged = this.onToolbarDocumentChanged.bind(this);
         textToolbarEmitter.on('toolbarDocumentChanged', this.onToolbarDocumentChanged);
 
+        this.onDelete = this.onDelete.bind(this);
+        appEmitter.on('editor.tool.delete', this.onDelete);
         this.onFontsLoaded = this.onFontsLoaded.bind(this);
-        this.onHistoryStep = this.onHistoryStep.bind(this);
         appEmitter.on('editor.tool.fontsLoaded', this.onFontsLoaded);
+        this.onSelectAll = this.onSelectAll.bind(this);
         appEmitter.on('editor.tool.selectAll', this.onSelectAll);
+        this.onHistoryStep = this.onHistoryStep.bind(this);
         appEmitter.on('editor.history.step', this.onHistoryStep);
         
     }
@@ -237,6 +241,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         textToolbarEmitter.off('toolbarMetaChanged', this.onToolbarMetaChanged);
         textToolbarEmitter.off('toolbarDocumentChanged', this.onToolbarDocumentChanged);
 
+        appEmitter.off('editor.tool.delete', this.onDelete);
         appEmitter.off('editor.tool.fontsLoaded', this.onFontsLoaded);
         appEmitter.off('editor.tool.selectAll', this.onSelectAll);
         appEmitter.off('editor.history.step', this.onHistoryStep);
@@ -269,9 +274,22 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             // Let the textarea handle it.
         } else if (activeSelectionMask.value || appliedSelectionMask.value) {
             historyStore.dispatch('runAction', {
-                action: new ClearSelectionAction()
+                action: new ClearSelectionAction(),
             });
         }
+    }
+
+    private async onDelete() {
+        if (isEditorTextareaFocused.value) return;
+        if (activeSelectionMask.value || appliedSelectionMask.value) {
+            await historyStore.dispatch('runAction', {
+                action: new ClearSelectionAction(),
+            });
+        }
+        if (workingFileStore.state.selectedLayerIds.length === 0) return;
+        await historyStore.dispatch('runAction', {
+            action: new DeleteLayersAction(workingFileStore.state.selectedLayerIds),
+        });
     }
 
     private onFontsLoaded() {

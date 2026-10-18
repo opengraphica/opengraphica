@@ -434,11 +434,22 @@ function rotateImageData90Counterclockwise(imageData: ImageData) {
     return new ImageData(rotatedData, height, width);
 }
 
+function rotateTransform(oldTransform: DOMMatrix, layerWidth: number, layerHeight: number, rotateDegrees: number): DOMMatrix {
+    const centerX = layerWidth / 2;
+    const centerY = layerHeight / 2;
+    const rotationAroundCenter = new DOMMatrix()
+        .translate(centerX, centerY)
+        .rotate(rotateDegrees)
+        .translate(-centerX, -centerY);
+    return oldTransform.multiply(rotationAroundCenter);
+}
+
 async function transformLayersGeneral(
     actionId: string,
     imageDataModifier: (imageData: ImageData) => ImageData,
     gradientModifier: (gradientData: WorkingFileGradientLayer['data']) => WorkingFileGradientLayer['data'],
     vectorModifier: (svgDocument: Document) => void,
+    transformModifier: ((transform: DOMMatrix, layerWidth: number, layerHeight: number) => DOMMatrix) | undefined,
     isResizeExpected: boolean,
 ) {
     const selectedLayers = getSelectedLayers();
@@ -554,9 +565,23 @@ async function transformLayersGeneral(
                 updateActions.push(new TrimLayerEmptySpaceAction(layer.id));
             }
         } else if (layer.type === 'video') {
-            // NOOP
+            if (transformModifier) {
+                updateActions.push(
+                    new UpdateLayerAction({
+                        id: layer.id,
+                        transform: transformModifier(layer.transform, layer.width, layer.height),
+                    })
+                )
+            }
         } else if (layer.type === 'text') {
-            // NOOP
+            if (transformModifier) {
+                updateActions.push(
+                    new UpdateLayerAction({
+                        id: layer.id,
+                        transform: transformModifier(layer.transform, layer.width, layer.height),
+                    })
+                )
+            }
         }
     }
     if (updateActions.length > 0) {
@@ -578,6 +603,7 @@ export async function flipLayersX() {
         flipImageDataX,
         flipGradientDataX,
         flipVectorDataX,
+        undefined,
         false,
     );
 }
@@ -588,6 +614,7 @@ export async function flipLayersY() {
         flipImageDataY,
         flipGradientDataY,
         flipVectorDataY,
+        undefined,
         false,
     );
 }
@@ -598,6 +625,7 @@ export async function rotateLayersClockwise() {
         rotateImageData90Clockwise,
         (data) => rotateGradientData(data, 90),
         (svgDocument) => rotateVectorData(svgDocument, 90),
+        (transform, width, height) => rotateTransform(transform, width, height, 90),
         true,
     );
 }
@@ -608,6 +636,7 @@ export async function rotateLayersCounterclockwise() {
         rotateImageData90Counterclockwise,
         (data) => rotateGradientData(data, -90),
         (svgDocument) => rotateVectorData(svgDocument, -90),
+        (transform, width, height) => rotateTransform(transform, width, height, -90),
         true,
     );
 }

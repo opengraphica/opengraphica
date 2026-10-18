@@ -1,5 +1,6 @@
 import BaseMovementController from './base-movement';
 import { ref, watch, toRefs, WatchStopHandle } from 'vue';
+
 import {
     isDrawingSelection, selectionAddShape, activeSelectionPath, selectionCombineMode, selectionEmitter,
     activeSelectionMask, appliedSelectionMask, previewSelectedLayersSelectionMask, discardSelectedLayersSelectionMask,
@@ -8,15 +9,19 @@ import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import workingFileStore, { getSelectedLayers } from '@/store/working-file';
+
 import appEmitter from '@/lib/emitter';
 import { normalizedDirectionVector2d, rotateDirectionVector2d, pointDistance2d, lineIntersectsLine2d } from '@/lib/math';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';
+
 import { ApplyActiveSelectionAction } from '@/actions/apply-active-selection';
 import { BundleAction } from '@/actions/bundle';
 import { ClearSelectionAction } from '@/actions/clear-selection';
+import { DeleteLayersAction } from '@/actions/delete-layers';
 import { DeleteLayerSelectionAreaAction } from '@/actions/delete-layer-selection-area';
 import { UpdateActiveSelectionAction } from '@/actions/update-active-selection';
 import { UpdateSelectionCombineModeAction } from '@/actions/update-selection-combine-mode';
+
 import { t, tm, rt } from '@/i18n';
 
 import type { PointerTracker } from './base';
@@ -67,16 +72,15 @@ export default class SelectionController extends BaseMovementController {
         super.onEnter();
 
         this.queueApplyActiveSelection = this.queueApplyActiveSelection.bind(this);
-        this.queueClearSelection = this.queueClearSelection.bind(this);
-        this.queueUpdateSelectionCombineMode = this.queueUpdateSelectionCombineMode.bind(this);
-        this.deleteSelectionHandler = this.queueDeleteSelection.bind(this);
-
         appEmitter.on('editor.tool.commitCurrentAction', this.queueApplyActiveSelection);
+        this.deleteSelectionHandler = this.queueDeleteSelection.bind(this);
         appEmitter.on('editor.tool.delete', this.deleteSelectionHandler);
+        this.queueClearSelection = this.queueClearSelection.bind(this);
         appEmitter.on('editor.tool.selectAll', this.queueClearSelection);
 
         selectionEmitter.on('applyActiveSelection', this.queueApplyActiveSelection);
         selectionEmitter.on('clearSelection', this.queueClearSelection);
+        this.queueUpdateSelectionCombineMode = this.queueUpdateSelectionCombineMode.bind(this);
         selectionEmitter.on('updateSelectionCombineMode', this.queueUpdateSelectionCombineMode);
 
         this.selectedLayerUnwatch = watch([toRefs(workingFileStore.state).selectedLayerIds], async () => {
@@ -747,6 +751,10 @@ export default class SelectionController extends BaseMovementController {
             await historyStore.dispatch('runAction', {
                 action: new DeleteLayerSelectionAreaAction(),
                 blockInteraction: size > 2048 * 2048,
+            });
+        } else if (workingFileStore.state.selectedLayerIds.length > 0) {
+            await historyStore.dispatch('runAction', {
+                action: new DeleteLayersAction(workingFileStore.state.selectedLayerIds),
             });
         }
     }

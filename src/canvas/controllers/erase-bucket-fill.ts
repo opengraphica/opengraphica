@@ -10,14 +10,17 @@ import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore, { createHistoryReserveToken, historyBlockInteractionUntilComplete, historyReserveQueueFree } from '@/store/history';
 import { createStoredSvg, getStoredSvgDocument } from '@/store/svg';
-import { getLayerById, getSelectedLayers } from '@/store/working-file';
+import workingFileStore, { getLayerById, getSelectedLayers } from '@/store/working-file';
 import { strength, feather, antialias, opacity } from '../store/erase-bucket-fill-state';
 import { appliedSelectionMask, activeSelectionMask } from '../store/selection-state';
+
 import { useRenderer, transferRendererTilesToRasterLayerUpdates } from '@/renderers';
 
 import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { ClearSelectionAction } from '@/actions/clear-selection';
+import { DeleteLayersAction } from '@/actions/delete-layers';
+import { DeleteLayerSelectionAreaAction } from '@/actions/delete-layer-selection-area';
 import { UpdateLayerAction } from '@/actions/update-layer';
 import { UpdateVectorLayerAttributesAction } from '@/actions/update-vector-layer-attributes';
 
@@ -44,6 +47,9 @@ export default class CanvasEraseBucketFillController extends BaseCanvasMovementC
             this.renderer = renderer;
         });
 
+        this.onDelete = this.onDelete.bind(this);
+        appEmitter.on('editor.tool.delete', this.onDelete);
+        this.onSelectAll = this.onSelectAll.bind(this);
         appEmitter.on('editor.tool.selectAll', this.onSelectAll);
 
         // Tutorial message
@@ -71,6 +77,7 @@ export default class CanvasEraseBucketFillController extends BaseCanvasMovementC
     onLeave(): void {
         super.onLeave();
 
+        appEmitter.off('editor.tool.delete', this.onDelete);
         appEmitter.off('editor.tool.selectAll', this.onSelectAll);
 
         // Tutorial Message
@@ -317,6 +324,19 @@ export default class CanvasEraseBucketFillController extends BaseCanvasMovementC
 
         } catch (error) {
             await historyStore.dispatch('unreserve', { token: updateLayerReserveToken });
+        }
+    }
+
+    private async onDelete() {
+        if (this.isPreviewingFill) return;
+        if (activeSelectionMask.value || appliedSelectionMask.value) {
+            await historyStore.dispatch('runAction', {
+                action: new DeleteLayerSelectionAreaAction(workingFileStore.state.selectedLayerIds),
+            });
+        } else if (workingFileStore.state.selectedLayerIds.length > 0) {
+            await historyStore.dispatch('runAction', {
+                action: new DeleteLayersAction(workingFileStore.state.selectedLayerIds),
+            });
         }
     }
 
