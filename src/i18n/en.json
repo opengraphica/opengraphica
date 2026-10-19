@@ -105,6 +105,7 @@
         "layerList": {
             "toggleLayerVisibility": "Toggle Layer Visibility",
             "layerSettings": "Layer Settings",
+            "edit": "Edit",
             "rename": "Rename",
             "blendingMode": "Blending",
             "opacity": "Opacity",

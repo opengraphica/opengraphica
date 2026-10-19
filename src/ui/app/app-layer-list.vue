@@ -154,12 +154,16 @@
             :default-active="layerSettingsActiveIndex"
             @select="onLayerSettingsSelect($event)"
         >
+            <el-menu-item v-if="isLayerSettingsEditEnabled" index="edit">
+                <i class="bi bi-pencil-square text-md"></i>
+                <span>{{ t('app.layerList.edit') }}</span>
+            </el-menu-item>
             <el-menu-item index="rename">
                 <i class="bi bi-alphabet"></i>
                 <span>{{ t('app.layerList.rename') }}</span>
             </el-menu-item>
             <el-menu-item index="blendingMode">
-                <i class="bi bi-images"></i>
+                <i class="bi bi-images text-md"></i>
                 <span>{{ t('app.layerList.blendingMode') }}</span>
             </el-menu-item>
             <el-menu-item index="opacity">
@@ -175,7 +179,7 @@
                 <span>{{ t('app.layerList.rasterize') }}</span>
             </el-menu-item>
             <el-menu-item index="duplicate">
-                <i class="bi bi-copy"></i>
+                <i class="bi bi-copy text-md"></i>
                 <span>{{ t('app.layerList.duplicate') }}</span>
             </el-menu-item>
             <el-menu-item index="delete">
@@ -288,6 +292,19 @@ const reversedLayers = computed<WorkingFileAnyLayer<ColorModel>[]>(() => {
     return reverseLayerList(props.layers);
 });
 
+const isLayerSettingsEditEnabled = computed<boolean>(() => {
+    const layer = getLayerById(showLayerSettingsMenuFor.value ?? -1);
+    if (!layer) return false;
+    if (
+        (layer.type === 'gradient' && editorStore.state.activeTool !== 'gradient')
+        || (layer.type === 'text' && editorStore.state.activeTool !== 'text')
+        || (layer.type === 'vector' && editorStore.state.activeTool !== 'shape')
+    ) {
+        return true;
+    }
+    return false;
+});
+
 const isLayerSettingsRasterizeEnabled = computed<boolean>(() => {
     const layer = getLayerById(showLayerSettingsMenuFor.value ?? -1);
     if (!layer) return false;
@@ -347,7 +364,21 @@ async function onLayerSettingsSelect(action: string) {
     const layer = getLayerById(showLayerSettingsMenuFor.value ?? -1);
     if (!layer) return;
 
-    if (action === 'rename') {
+    if (action === 'edit') {
+        if (layer.type === 'gradient') {
+            editorStore.dispatch('setActiveTool', { group: 'draw', tool: 'gradient' });
+        } else if (layer.type === 'text') {
+            editorStore.dispatch('setActiveTool', { group: 'text', tool: 'text' });
+        } else if (layer.type === 'vector') {
+            editorStore.dispatch('setActiveTool', { group: 'draw', tool: 'shape' });
+        }
+        if (!selectedLayerIds.value.includes(layer.id)) {
+            historyStore.dispatch('runAction', {
+                action: new SelectLayersAction([layer.id])
+            });
+        }
+        emit('close');
+    } else if (action === 'rename') {
         runModule('layer', 'rename', { layerId: layer.id, });
     } else if (action === 'blendingMode') {
         runModule('layer', 'blendingMode', { layerId: layer.id });
