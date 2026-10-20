@@ -3033,6 +3033,7 @@ export default class CanvasDrawShapetController extends BaseCanvasMovementContro
             this.hasUncroppedChanges = false;
             const actions: BaseAction[] = [];
             for (const layer of editingLayers.value) {
+                if (!workingFileStore.state.selectedLayerIds.includes(layer.id)) continue;
                 if (layer.type !== 'vector') continue;
                 actions.push(new TrimLayerEmptySpaceAction(layer.id));
             }

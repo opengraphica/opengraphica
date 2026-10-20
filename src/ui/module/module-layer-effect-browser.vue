@@ -31,17 +31,19 @@
                                     'height': previewImageHeight,
                                     'aspect-ratio': previewImageAspectRatio,
                                     'background-image': 'url(\'../images/transparency-bg.png\')',
-                                    'background-repeat': 'repeat'
+                                    'background-repeat': 'repeat',
+                                    'object-fit': 'cover',
                                 }"
                             >
                             <img
                                 v-else
-                                src="images/transparency-bg.png"
+                                :src="`images/module/layer/layer-effect-browser/thumbnail/${filter.kebabId}.png`"
                                 :style="{
                                     'width': '100%',
                                     'height': previewImageHeight,
                                     'aspect-ratio': previewImageAspectRatio,
                                 }"
+                                loading="lazy"
                             >
                         </div>
                         <div class="p-2 text-center">{{ t(filter.name) }}</div>
@@ -61,18 +63,26 @@ export default {
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
 import { useI18n } from '@/i18n';
+
 import layerFilterList from '@/config/layer-filters.json';
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElAutoGrid from '@/ui/el/el-auto-grid.vue';
 import ElCard from 'element-plus/lib/components/card/index';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import historyStore from '@/store/history';
+
 import workingFileStore, { getCanvasRenderingContext2DSettings, getLayerById, getSelectedLayers } from '@/store/working-file';
+
 import { createImageBlobFromCanvas } from '@/lib/image';
+import { camelCaseToKebabCase } from '@/lib/string';
+
 import { getCanvasFilterClass, buildCanvasFilterPreviewParams } from '@/canvas/filters';
+
 import { AddLayerFilterAction } from '@/actions/add-layer-filter';
 import { BundleAction } from '@/actions/bundle';
+
 import { runModule } from '@/modules';
+
 import { useRenderer } from '@/renderers';
 
 import type { WorkingFileLayerFilter, WorkingFileAnyLayer } from '@/types';
@@ -81,6 +91,7 @@ const vLoading = ElLoading.directive;
 
 interface LayerFilterTemplateModel {
     id: string;
+    kebabId: string;
     name: string;
 }
 
@@ -133,6 +144,7 @@ const categorizedFilters = computed<LayerFilterCategoryTemplateModel[]>(() => {
     for (const layerFilterName in layerFilterList) {
         const layerFilter = layerFilterList[layerFilterName as keyof typeof layerFilterList];
         if (!encounteredCategories.has(layerFilter.group)) {
+            console.log(camelCaseToKebabCase(layerFilter.name));
             categories.push({
                 name: `layerFilterGroup.${layerFilter.group}.name`,
                 filters: []
@@ -142,6 +154,7 @@ const categorizedFilters = computed<LayerFilterCategoryTemplateModel[]>(() => {
         const existingCategory = categories[encounteredCategories.get(layerFilter.group)];
         existingCategory.filters.push({
             id: layerFilterName,
+            kebabId: camelCaseToKebabCase(layerFilterName),
             name: layerFilter.name
         });
     }
@@ -156,7 +169,7 @@ onMounted(() => {
                 throw new Error('module.layerEffectBrowser.generationErrorNoLayer');
             }
 
-            const targetWidth = 200;
+            const targetWidth = 256;
             const targetHeight = targetWidth * (selectedLayerHeight.value / selectedLayerWidth.value);
 
             const previewCanvas = document.createElement('canvas');
@@ -171,10 +184,10 @@ onMounted(() => {
             loadingLayerFilterNames.value = Object.keys(layerFilterList);
 
             previewImageHeight.value = ((targetHeight / targetWidth) * 100) + '%';
-            previewImageAspectRatio.value = `${targetWidth} / ${targetHeight}`;
+            previewImageAspectRatio.value = `1 / 1`;
             filterPreviewThumbnails.value = newPreviewThumbnails;
 
-            generateNextFilterPreview(previewCtx);
+            generateNextFilterPreview(previewCtx, targetWidth, targetHeight);
         } catch (error) {
             console.error(error);
             emit('update:dialogSize', 'medium');
@@ -194,7 +207,7 @@ onUnmounted(() => {
     }
 });
 
-async function generateNextFilterPreview(previewCtx: ImageBitmapRenderingContext) {
+async function generateNextFilterPreview(previewCtx: ImageBitmapRenderingContext, targetWidth: number, targetHeight: number) {
     const layerFilterName = loadingLayerFilterNames.value.shift();
     if (!layerFilterName || !selectedLayer.value) return;
 
@@ -207,7 +220,7 @@ async function generateNextFilterPreview(previewCtx: ImageBitmapRenderingContext
             params: buildCanvasFilterPreviewParams(canvasFilter)
         }
     ]
-    const layerPreviewBitmap = await renderer.takeSnapshot(selectedLayerWidth.value, selectedLayerHeight.value, {
+    const layerPreviewBitmap = await renderer.takeSnapshot(targetWidth, targetHeight, {
         layerIds: [selectedLayer.value.id],
         filters: filtersWithPreview,
         // disableBackground: true,  // TODO - renderer generates weird output
@@ -219,7 +232,7 @@ async function generateNextFilterPreview(previewCtx: ImageBitmapRenderingContext
     filterPreviewThumbnails.value[layerFilterName] = URL.createObjectURL(imageBlob);
 
     setTimeout(() => {
-        generateNextFilterPreview(previewCtx);
+        generateNextFilterPreview(previewCtx, targetWidth, targetHeight);
     }, 0);
 }
 

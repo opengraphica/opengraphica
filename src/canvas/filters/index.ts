@@ -1,4 +1,4 @@
-import { camelCaseToKebabCase } from "@/lib/string";
+import { camelCaseToKebabCase } from '@/lib/string';
 import { Texture } from 'three/src/textures/Texture';
 
 import type { IUniform } from 'three/src/renderers/shaders/UniformsLib';
