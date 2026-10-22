@@ -1,18 +1,18 @@
 <template>
     <div ref="rootEl" class="el-horizontal-scrollbar-arrows">
         <el-button
-            link type="primary" class="grow-0 !rounded-none !px-2 !py-0"
+            link type="primary" class="grow-0 rounded-none! px-2! py-0! transform-none!"
             :aria-label="t('el.horizontalScrollbarArrows.scrollLeft')" :style="{ visibility: canScrollLeft ? '' : 'hidden' }"
             @click="onClickScrollLeft()">
             <span class="bi bi-chevron-left" aria-hidden="true" />
         </el-button>
         <el-scrollbar ref="scrollbar" @scroll="onScroll">
-            <div ref="scrollContentEl" class="flex items-center">
+            <div ref="scrollContentEl" class="flex items-center" :class="scrollContentClass">
                 <slot />
             </div>
         </el-scrollbar>
         <el-button
-            link type="primary" class="grow-0 !rounded-none !px-2 !py-0"
+            link type="primary" class="grow-0 rounded-none! px-2! py-0! transform-none!"
             :aria-label="t('el.horizontalScrollbarArrows.scrollRight')" :style="{ visibility: canScrollRight ? '' : 'hidden' }"
             @click="onClickScrollRight()">
             <span class="bi bi-chevron-right" aria-hidden="true" />
@@ -30,6 +30,13 @@ import { lerp } from '@/lib/math';
 import canvasStore from '@/store/canvas';
 
 const { t } = useI18n();
+
+const props = defineProps({
+    scrollContentClass: {
+        type: String,
+        default: '',
+    },
+})
 
 const emit = defineEmits([
     'scroll',
@@ -85,7 +92,7 @@ function getScrollLeftMin() {
 }
 
 function getScrollLeftMax() {
-    return scrollContentEl.value!.clientWidth - (scrollbar.value?.wrapRef?.clientWidth ?? 0);
+    return (scrollContentEl.value!.clientWidth - (scrollbar.value?.wrapRef?.clientWidth ?? 0)) - 1;
 }
 
 function getScrollViewWidth() {

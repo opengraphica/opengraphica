@@ -541,6 +541,21 @@
                 "rotate": "Rotate"
             }
         },
+        "filmGrain": {
+            "name": "Film Grain",
+            "param": {
+                "blendMode": "Blend Mode",
+                "blendModeOption": {
+                    "normal": "Normal",
+                    "subtract": "Subtract",
+                    "add": "Add"
+                },
+                "grainScale": "Grain Scale",
+                "grayscale": "Grayscale",
+                "intensity": "Intensity",
+                "seed": "Seed"
+            }
+        },
         "instagram1997": {
             "name": "1997",
             "param": {
@@ -637,6 +652,9 @@
         },
         "instagramFilter": {
             "name": "Instagram Filter"
+        },
+        "noise": {
+            "name": "Noise"
         },
         "photography": {
             "name": "Photography"

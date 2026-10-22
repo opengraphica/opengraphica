@@ -221,3 +221,9 @@ vec3 labToLch(in vec3 lab) {
         normalizeHue((atan(lab.z, lab.y) * 180.0) / PI)
     );
 }
+
+float pcgWhiteNoise(uint seed) {
+    uint x = seed * 747796405u + 2891336453u;
+    uint word = ((x >> ((x >> 28u) + 4u)) ^ x) * 277803737u;
+    return float(((word >> 22u) ^ word) >> 8u) * (1.0 / 16777216.0);
+}

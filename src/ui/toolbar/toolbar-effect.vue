@@ -162,7 +162,7 @@
                         <el-form-item v-if="!editConfigField.hidden" :label="t(`layerFilter.${editingFilter.name}.param.${paramName}`)">
                             <template v-if="editConfigField.type === 'percentage'">
                                 <el-row>
-                                    <el-col :span="20" :xs="18">
+                                    <el-col :span="19" :xs="18">
                                         <el-slider
                                             v-model="editingFilterParams[paramName] as number"
                                             :min="getEditConfigMin(editConfigField)"
@@ -171,7 +171,7 @@
                                             :show-tooltip="false"
                                         />
                                     </el-col>
-                                    <el-col :span="4" :xs="6">
+                                    <el-col :span="5" :xs="6">
                                         <el-input-number
                                             :modelValue="Math.floor((editingFilterParams[paramName] as number) * 100)"
                                             :min="getEditConfigMin(editConfigField) * 100"

@@ -67,5 +67,11 @@
     "instagramXpro2": {
         "name": "layerFilter.instagramXpro2.name",
         "group": "instagramFilter"
+    },
+
+    "filmGrain": {
+        "name": "layerFilter.filmGrain.name",
+        "group": "noise"
     }
+
 }

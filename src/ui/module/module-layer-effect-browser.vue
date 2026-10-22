@@ -7,19 +7,23 @@
         :title="t(filterGenerationErrorMessage)"
     />
     <template v-else>
-        <el-auto-grid item-width="8rem" :breakpoints="[{ maxWidth: 525, itemWidth: '6rem' }]">
-            <template v-for="category of categorizedFilters" :key="category.name">
-                <h3 class="mb-0 mt-2" style="grid-column: 1 / -1;">{{ t(category.name) }}</h3>
+        <template v-for="category of categorizedFilters" :key="category.name">
+            <h3 class="mb-0! mt-4! px-4!" style="grid-column: 1 / -1;">{{ t(category.name) }}</h3>
+            <el-horizontal-scrollbar-arrows
+                style="grid-column: 1 / -1;"
+                class="h-auto! -mx-4!"
+                scroll-content-class="gap-2! py-2 round-2!"
+            >
                 <template
                     v-for="filter of category.filters"
                     :key="filter.name"
                 >
                     <el-card
                         :body-style="{ padding: '0px' }"
-                        class="el-card--link"
+                        class="el-card--link w-32"
                         role="button"
                         tabindex="0"
-                        style="border-radius: 0.875rem; max-width: 15rem"
+                        style="border-radius: 0.875rem;"
                         @click="onSelectFilter(filter.id)"
                     >
                         <div style="max-height: 10rem; overflow: hidden;">
@@ -34,6 +38,7 @@
                                     'background-repeat': 'repeat',
                                     'object-fit': 'cover',
                                 }"
+                                @dragstart.prevent
                             >
                             <img
                                 v-else
@@ -49,8 +54,8 @@
                         <div class="p-2 text-center">{{ t(filter.name) }}</div>
                     </el-card>
                 </template>
-            </template>
-        </el-auto-grid>
+            </el-horizontal-scrollbar-arrows>
+        </template>
     </template>
 </template>
 
@@ -66,8 +71,8 @@ import { useI18n } from '@/i18n';
 
 import layerFilterList from '@/config/layer-filters.json';
 import ElAlert from 'element-plus/lib/components/alert/index';
-import ElAutoGrid from '@/ui/el/el-auto-grid.vue';
 import ElCard from 'element-plus/lib/components/card/index';
+import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.vue';
 import ElLoading from 'element-plus/lib/components/loading/index';
 import historyStore from '@/store/history';
 
@@ -134,17 +139,12 @@ const selectedLayerHeight = computed<number>(() => {
     return selectedLayer.value?.type === 'group' ? workingFileStore.state.height : selectedLayer.value?.height ?? 0;
 });
 
-const hasFilterPreviewThumbnails = computed<boolean>(() => {
-    return Object.keys(filterPreviewThumbnails.value).length > 0;
-});
-
 const categorizedFilters = computed<LayerFilterCategoryTemplateModel[]>(() => {
     const encounteredCategories = new Map();
     const categories: LayerFilterCategoryTemplateModel[] = [];
     for (const layerFilterName in layerFilterList) {
         const layerFilter = layerFilterList[layerFilterName as keyof typeof layerFilterList];
         if (!encounteredCategories.has(layerFilter.group)) {
-            console.log(camelCaseToKebabCase(layerFilter.name));
             categories.push({
                 name: `layerFilterGroup.${layerFilter.group}.name`,
                 filters: []
