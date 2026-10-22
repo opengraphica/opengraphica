@@ -226,7 +226,7 @@ export class InsertLayerAction<LayerOptions extends InsertAnyLayerOptions<ColorM
             layerIdCounter: workingFileStore.get('layerIdCounter'),
             layers: workingFileStore.get('layers')
         });
-        updateWorkingFileLayer(this.insertedLayer);
+        updateWorkingFileLayer(this.insertedLayer, false, workingFileStore.state);
     }
 
     public async undo() {

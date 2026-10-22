@@ -487,6 +487,21 @@
         "decreaseColorDepth": {
             "name": "Decrease Color Depth"
         },
+        "filmGrain": {
+            "name": "Film Grain",
+            "param": {
+                "blendMode": "Blend Mode",
+                "blendModeOption": {
+                    "normal": "Normal",
+                    "subtract": "Subtract",
+                    "add": "Add"
+                },
+                "grainScale": "Grain Scale",
+                "grayscale": "Grayscale",
+                "intensity": "Intensity",
+                "seed": "Seed"
+            }
+        },
         "gaussianBlur": {
             "name": "Gaussian Blur",
             "param": {
@@ -539,21 +554,6 @@
                     "linearRgb": "Linear RGB"
                 },
                 "rotate": "Rotate"
-            }
-        },
-        "filmGrain": {
-            "name": "Film Grain",
-            "param": {
-                "blendMode": "Blend Mode",
-                "blendModeOption": {
-                    "normal": "Normal",
-                    "subtract": "Subtract",
-                    "add": "Add"
-                },
-                "grainScale": "Grain Scale",
-                "grayscale": "Grayscale",
-                "intensity": "Intensity",
-                "seed": "Seed"
             }
         },
         "instagram1997": {
@@ -632,6 +632,14 @@
         },
         "sepia": {
             "name": "Sepia"
+        },
+        "spread": {
+            "name": "Spread",
+            "param": {
+                "horizontal": "Horizontal",
+                "vertical": "Vertical",
+                "seed": "Seed"
+            }
         },
         "whiteBalance": {
             "name": "White Balance",

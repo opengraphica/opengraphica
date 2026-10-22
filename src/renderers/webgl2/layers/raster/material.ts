@@ -87,6 +87,10 @@ export async function updateRasterMaterial(
             material.uniforms.srcTexture.value?.dispose(); // Prevent GPU memory leak. If it's still needed, THREE will re-upload.
         }
         material.uniforms.srcTexture.value = params.srcTexture;
+        if (params.srcTexture) {
+            material.defines.cLayerWidth = params.srcTexture?.width;
+            material.defines.cLayerHeight = params.srcTexture?.height;
+        }
     }
     if (params.opacity != null && material.uniforms.opacity.value !== params.opacity) {
         material.uniforms.opacity.value = params.opacity;

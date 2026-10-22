@@ -224,6 +224,7 @@ export async function createLayerShader(
     fragmentShader = 'vec4 materialMain(vec2 uv);\n' + fragmentShader;
 
     let hasMaskTextures = false;
+    let hasSampleBackbuffer = false;
     for (const [index, canvasFilter] of canvasFilters.entries()) {
         if (canvasFilter == null || (canvasFilter.overrideDisabled ?? canvasFilter.disabled) === true) continue;
         const editConfig = canvasFilter.getEditConfig();
@@ -253,12 +254,31 @@ export async function createLayerShader(
                 filterFragmentShader = filterFragmentShader.replace(/const int.*?;/g, '');
             }
             if (filterFragmentShader.includes('sampleBackbuffer(')) {
+                hasSampleBackbuffer = true;
                 filterFragmentShader = filterFragmentShader.replace(/sampleBackbuffer\(/g, `sampleBackbuffer${index}(`);
-                fragmentShader += `vec4 sampleBackbuffer${index}(vec2 uv) { return ${
-                    useFunctionNameStack.map(name => name + '(').join('')
-                }materialMain(uv)${
-                    useFunctionNameStack.map(_ => ')').join('')
-                }; }\n`;
+
+                fragmentShader += `vec4 sampleBackbuffer${index}(vec2 uv) {\n`
+                    + '    vec4 filterColorResult = materialMain(uv);\n';
+                if (hasMaskTextures) {
+                    fragmentShader += '    float filterMaskAlpha = 1.0;\n    vec4 filterColorBuffer = vec4(0.0, 0.0, 0.0, 0.0);\n';
+                }
+                for (const [functionIndex, functionName] of useFunctionNameStack.entries()) {
+                    const functionMaskTexture = uniforms[`filterMask${functionIndex}Map`];
+                    if (functionMaskTexture) {
+                        fragmentShader += `    filterColorBuffer = filterColorResult;\n    filterMaskAlpha = texture2D(filterMask${functionIndex}Map, uv).a;\n`;
+                    }
+                    fragmentShader += `    filterColorResult = ${functionName}(filterColorResult);\n`;
+                    if (functionMaskTexture) {
+                        fragmentShader += '    filterColorResult = vec4('
+                            +       'filterColorResult.r * filterMaskAlpha + filterColorBuffer.r * (1.0 - filterMaskAlpha),'
+                            +       'filterColorResult.g * filterMaskAlpha + filterColorBuffer.g * (1.0 - filterMaskAlpha),'
+                            +       'filterColorResult.b * filterMaskAlpha + filterColorBuffer.b * (1.0 - filterMaskAlpha),'
+                            +       'filterColorResult.a + filterColorBuffer.a * (1.0 - filterColorResult.a)'
+                            +   ');\n';
+                    }
+                }
+                fragmentShader += '    return filterColorResult;\n}\n\n';
+                fragmentShaderMainCalls = [];
             }
             filterFragmentShader = filterFragmentShader.replace(searchFunctionName + '(', useFunctionName + '(');
             if (maskTexture) {
@@ -311,18 +331,34 @@ export async function createLayerShader(
         vertexFilterCode += '    vec4 filterPositionResult = gl_Position;\n' + vertexShaderMainCalls.join('\n') + '\n    gl_Position = filterPositionResult;';
     }
     let fragmentFilterCode = '';
+    if (!hasSampleBackbuffer) {
+        fragmentFilterCode += '    gl_FragColor = materialMain(vUv);';
+    }
     if (fragmentShaderMainCalls.length > 0) {
         if (hasMaskTextures) {
-            fragmentFilterCode += 'float filterMaskAlpha = 1.0;\n    vec4 filterColorBuffer = vec4(0.0, 0.0, 0.0, 0.0);\n';
+            fragmentFilterCode += '    float filterMaskAlpha = 1.0;\n    vec4 filterColorBuffer = vec4(0.0, 0.0, 0.0, 0.0);\n';
         }
-        fragmentFilterCode += 'vec4 filterColorResult = gl_FragColor;\n' + fragmentShaderMainCalls.join('\n') + '\n    gl_FragColor = filterColorResult;';
+        fragmentFilterCode += '    vec4 filterColorResult = gl_FragColor;\n' + fragmentShaderMainCalls.join('\n') + '\n    gl_FragColor = filterColorResult;';
     }
     fragmentFilterCode += '\n' + blendingModesFragmentShaderMain + '\n';
+
+    let sampleLayerTextureSetup = 'vec4 sampleLayerTexture(sampler2D layerTexture, vec2 uv) {\n'
+        + '    return texture2D(layerTexture, uv);\n'
+        + '}\n';
+    if (hasSampleBackbuffer) {
+        sampleLayerTextureSetup = 'vec4 sampleLayerTexture(sampler2D layerTexture, vec2 uv) {\n'
+        + '    vec2 layerResolution = vec2(float(cLayerWidth), float(cLayerHeight));\n'
+        + '    vec2 uvDx = dFdx(vUv * layerResolution);\n'
+        + '    vec2 uvDy = dFdy(vUv * layerResolution);\n'
+        + '    float lod = floor(log2(max(max(length(uvDx), length(uvDy)), 1.0)) + 0.5);\n'
+        + '    return textureLod(layerTexture, uv, lod);\n'
+        + '}\n';
+    }
 
     vertexShader = vertexShaderSetup + '\n' + vertexShader
         + '\n' + vertexShaderMain.replace('//[INJECT_FILTERS_HERE]', vertexFilterCode);
     fragmentShader = commonUtilityFragmentShader + '\n' + blendingModesFragmentShaderSetup + '\n'
-        + fragmentShaderSetup + '\n' + fragmentShader
+        + fragmentShaderSetup + '\n' + sampleLayerTextureSetup + '\n' + fragmentShader
         + '\n' + fragmentShaderMain.replace('//[INJECT_FILTERS_HERE]', fragmentFilterCode);
 
     return {

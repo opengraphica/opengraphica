@@ -5,7 +5,5 @@ vec4 materialMain(vec2 uv) {
 }
 
 void main() {
-    gl_FragColor = materialMain(vUv);
-    
     //[INJECT_FILTERS_HERE]
 }

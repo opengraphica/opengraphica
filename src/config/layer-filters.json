@@ -72,6 +72,10 @@
     "filmGrain": {
         "name": "layerFilter.filmGrain.name",
         "group": "noise"
+    },
+    "spread": {
+        "name": "layerFilter.spread.name",
+        "group": "noise"
     }
 
 }

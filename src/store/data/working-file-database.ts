@@ -98,14 +98,14 @@ function convertWorkingFileLayersToMeta(layers: WorkingFileLayer[]): DatabaseMet
 }
 
 /** Stores all working file layers in the database */
-async function storeLayersRecursive(layers: WorkingFileLayer[]) {
+async function storeLayersRecursive(layers: WorkingFileLayer[], workingFile?: Partial<WorkingFile>) {
     const putRequests: Promise<Event | void>[] = [];
     for (const layer of layers) {
-        putRequests.push(updateWorkingFileLayer(layer, true));
+        putRequests.push(updateWorkingFileLayer(layer, true, workingFile));
 
         if (layer.type === 'group') {
             putRequests.push(
-                storeLayersRecursive((layer as WorkingFileGroupLayer).layers)
+                storeLayersRecursive((layer as WorkingFileGroupLayer).layers, workingFile)
             );
         }
     }
@@ -344,7 +344,7 @@ export async function writeWorkingFile(workingFile: WorkingFile<ColorModel>) {
         }
 
         // Store each layer as a flat object in the layers store
-        await storeLayersRecursive(workingFile.layers);
+        await storeLayersRecursive(workingFile.layers, workingFile);
 
         for (const familyName in allStoredFontsByFamily.value) {
             await updateStoredFontFamily(allStoredFontsByFamily.value[familyName]);
