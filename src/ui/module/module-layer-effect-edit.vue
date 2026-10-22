@@ -627,7 +627,7 @@ async function initializeThreejs(afterCanvas: HTMLCanvasElement) {
     previewMaterial = await createRasterMaterial({
         srcTexture: previewTexture,
         canvasFilters: await createFiltersFromLayerConfig([currentFilter.value]),
-        disableLayerTextureMipmaps: true,
+        useAutomaticLayerTextureMipmaps: true,
     });
     previewFilterTextures = previewMaterial.userData.disposableTextures;
 

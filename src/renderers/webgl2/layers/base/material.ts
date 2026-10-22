@@ -189,7 +189,7 @@ export interface CreateLayerShaderOptions {
     canvasFilters: Array<Webgl2RendererCanvasFilter | null>,
     width: number;
     height: number;
-    disableLayerTextureMipmaps?: boolean;
+    useAutomaticLayerTextureMipmaps?: boolean;
 }
 
 export interface CreateLayerShaderResult {
@@ -205,7 +205,7 @@ export async function createLayerShader(
 ): Promise<CreateLayerShaderResult> {
     const {
         fragmentShaderMain, fragmentShaderSetup, vertexShaderMain, vertexShaderSetup,
-        canvasFilters, width, height, disableLayerTextureMipmaps,
+        canvasFilters, width, height, useAutomaticLayerTextureMipmaps,
     } = options;
 
     let vertexShader = '';
@@ -346,9 +346,9 @@ export async function createLayerShader(
     let sampleLayerTextureSetup = 'vec4 sampleLayerTexture(sampler2D layerTexture, vec2 uv) {\n'
         + '    return texture2D(layerTexture, uv);\n'
         + '}\n';
-    if (disableLayerTextureMipmaps) {
+    if (useAutomaticLayerTextureMipmaps) {
         sampleLayerTextureSetup = 'vec4 sampleLayerTexture(sampler2D layerTexture, vec2 uv) {\n'
-        + '    return textureLod(layerTexture, uv, 0.0);\n'
+        + '    return texture2D(layerTexture, uv);\n'
         + '}\n';
     } else if (hasSampleBackbuffer) {
         sampleLayerTextureSetup = 'vec4 sampleLayerTexture(sampler2D layerTexture, vec2 uv) {\n'
