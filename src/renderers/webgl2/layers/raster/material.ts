@@ -22,6 +22,7 @@ export interface RasterMaterialUpdateParams {
     canvasFilters?: Array<Webgl2RendererCanvasFilter | null>;
     opacity?: number;
     premultiplyAlphaFix?: boolean; // Created for SVG rendering
+    disableLayerTextureMipmaps?: boolean;
 }
 
 export async function createRasterMaterial(params: RasterMaterialUpdateParams) {
@@ -33,6 +34,7 @@ export async function createRasterMaterial(params: RasterMaterialUpdateParams) {
         canvasFilters: params.canvasFilters ?? [],
         width: params?.srcTexture?.image.width ?? 1,
         height: params?.srcTexture?.image.height ?? 1,
+        disableLayerTextureMipmaps: params?.disableLayerTextureMipmaps,
     });
 
     const material = new ShaderMaterial({

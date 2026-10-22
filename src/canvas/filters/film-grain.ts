@@ -1,13 +1,17 @@
 import type { CanvasFilter, CanvasFilterEditConfig } from '@/types';
 
-export interface FilmGrainCanvasFilterParams {
-    intensity?: number;
-}
-
 export enum FilmGrainBlendMode {
     NORMAL = 0,
     SUBTRACT = 1,
     ADD = 2,
+}
+
+export interface FilmGrainCanvasFilterParams {
+    grayscale?: boolean;
+    intensity?: number;
+    grainScale?: number;
+    seed?: number;
+    blendMode?: FilmGrainBlendMode;
 }
 
 export default class FilmGrainCanvasFilter implements CanvasFilter<FilmGrainCanvasFilterParams> {

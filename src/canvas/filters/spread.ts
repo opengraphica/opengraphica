@@ -1,7 +1,9 @@
 import type { CanvasFilter, CanvasFilterEditConfig } from '@/types';
 
 export interface SpreadCanvasFilterParams {
-    intensity?: number;
+    horizontal?: number;
+    vertical?: number;
+    seed?: number;
 }
 
 export default class SpreadCanvasFilter implements CanvasFilter<SpreadCanvasFilterParams> {

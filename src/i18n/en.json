@@ -487,6 +487,18 @@
         "decreaseColorDepth": {
             "name": "Decrease Color Depth"
         },
+        "emboss": {
+            "name": "Emboss",
+            "param": {
+                "type": "Type",
+                "typeOption": {
+                    "blend": "Blend",
+                    "heightmap": "Heightmap"
+                },
+                "angle": "Angle",
+                "elevation": "Elevation"
+            }
+        },
         "filmGrain": {
             "name": "Film Grain",
             "param": {

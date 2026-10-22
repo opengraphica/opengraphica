@@ -69,6 +69,11 @@
         "group": "instagramFilter"
     },
 
+    "emboss": {
+        "name": "layerFilter.emboss.name",
+        "group": "distort"
+    },
+
     "filmGrain": {
         "name": "layerFilter.filmGrain.name",
         "group": "noise"

@@ -361,7 +361,8 @@ const isSelectionMaskAvailable = computed<boolean>(() => {
 
 watch([layer], async ([layer]) => {
     if (layer) {
-        canvasFilters.value = await createFiltersFromLayerConfig(layer?.filters ?? [], { createDisabled: true });
+        canvasFilters.value = (await createFiltersFromLayerConfig(layer?.filters ?? [], { createDisabled: true }))
+            .filter((canvasFilter) => canvasFilter != null);
     }
 }, { immediate: true });
 
@@ -625,7 +626,8 @@ async function initializeThreejs(afterCanvas: HTMLCanvasElement) {
 
     previewMaterial = await createRasterMaterial({
         srcTexture: previewTexture,
-        canvasFilters: await createFiltersFromLayerConfig([currentFilter.value])
+        canvasFilters: await createFiltersFromLayerConfig([currentFilter.value]),
+        disableLayerTextureMipmaps: true,
     });
     previewFilterTextures = previewMaterial.userData.disposableTextures;
 
