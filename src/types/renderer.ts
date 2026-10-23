@@ -133,6 +133,7 @@ export interface Webgl2RendererMeshController {
     addVectorLayerElement?: (tagName: string, attributes: Record<string, string>) => Promise<void>;
     pickVectorLayerElement?: (x: number, y: number) => Promise<RendererPickedVectorLayerElement[]>;
     waitForRasterReadiness?: () => Promise<void>;
+    renderHighQuality?: (isHighQuality: boolean) => void;
 }
 
 export interface WgpuWasmRendererMeshController {

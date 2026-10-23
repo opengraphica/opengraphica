@@ -69,6 +69,15 @@
         "group": "instagramFilter"
     },
 
+    "tiltShiftBlur": {
+        "name": "layerFilter.tiltShiftBlur.name",
+        "group": "blur"
+    },
+    "zoomBlur": {
+        "name": "layerFilter.zoomBlur.name",
+        "group": "blur"
+    },
+
     "emboss": {
         "name": "layerFilter.emboss.name",
         "group": "distort"

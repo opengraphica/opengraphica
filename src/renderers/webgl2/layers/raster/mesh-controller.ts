@@ -217,6 +217,15 @@ export class RasterLayerMeshController implements Webgl2RendererMeshController {
         }
     }
 
+    renderHighQuality(isHighQuality: boolean) {
+        if (!this.material) return;
+        const highQualityFlag = isHighQuality ? 1 : 0;
+        if (this.material.defines.cHighQualityRender !== highQualityFlag) {
+            this.material.defines.cHighQualityRender = highQualityFlag;
+            this.material.needsUpdate = true;
+        }
+    }
+
     reorder(order: number) {
         if (this.plane) {
             this.plane.renderOrder = order + 0.1;

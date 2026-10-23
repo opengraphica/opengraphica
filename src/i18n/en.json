@@ -653,6 +653,15 @@
                 "seed": "Seed"
             }
         },
+        "tiltShiftBlur": {
+            "name": "Tilt Shift Blur",
+            "param": {
+                "blurRadius": "Blur Radius",
+                "gradientRadius": "Gradient Radius",
+                "angle": "Angle",
+                "offset": "Offset"
+            }
+        },
         "whirlPinch": {
             "name": "Whirl & Pinch",
             "param": {
@@ -667,6 +676,14 @@
             "name": "White Balance",
             "param": {
                 "white": "Neutral Color"
+            }
+        },
+        "zoomBlur": {
+            "name": "Zoom Blur",
+            "param": {
+                "strength": "Strength",
+                "centerX": "Center X",
+                "centerY": "Center Y"
             }
         }
     },

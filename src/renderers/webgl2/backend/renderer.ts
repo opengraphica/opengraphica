@@ -524,6 +524,8 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
             stencilBuffer: false,
         });
 
+        let isHighQuality = imageWidth > 80 || imageHeight > 80;
+
         this.rendererBusy = true;
 
         try {
@@ -568,6 +570,15 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
                     if (filtersOverride) {
                         await meshController?.overrideFilters(filtersOverride);
                     }
+                    if (isHighQuality) {
+                        meshController?.renderHighQuality?.(true);
+                    }
+                }
+            } else {
+                if (isHighQuality) {
+                    for (const meshController of this.meshControllersById.values()) {
+                        meshController?.renderHighQuality?.(true);
+                    }
                 }
             }
 
@@ -599,6 +610,15 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
                     meshController?.overrideVisibility(undefined);
                     if (filtersOverride) {
                         meshController?.overrideFilters(undefined);
+                    }
+                    if (isHighQuality) {
+                        meshController?.renderHighQuality?.(false);
+                    }
+                }
+            } else {
+                if (isHighQuality) {
+                    for (const meshController of this.meshControllersById.values()) {
+                        meshController?.renderHighQuality?.(false);
                     }
                 }
             }

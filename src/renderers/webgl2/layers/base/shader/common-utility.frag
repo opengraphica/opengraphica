@@ -227,3 +227,7 @@ float pcgWhiteNoise(uint seed) {
     uint word = ((x >> ((x >> 28u) + 4u)) ^ x) * 277803737u;
     return float(((word >> 22u) ^ word) >> 8u) * (1.0 / 16777216.0);
 }
+
+float random(vec3 scale, float seed) {
+    return fract(sin(dot(gl_FragCoord.xyz + seed, scale)) * 43758.5453 + seed);
+}

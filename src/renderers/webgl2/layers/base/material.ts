@@ -213,6 +213,7 @@ export async function createLayerShader(
 
     const { uniforms, defines, textures } = createLayerShaderUniformsAndDefines(width, height, canvasFilters);
     defines.cLayerBlendingMode = 0;
+    defines.cHighQualityRender = 0;
 
     const rendererBackend = getWebgl2RendererBackend();
 
@@ -220,7 +221,7 @@ export async function createLayerShader(
     let fragmentShaderMainCalls: string[] = [];
 
     const alreadyIncludedFilters = new Set<string>();
-    const useFunctionNameStack: string[] = [];
+    const useFunctionNameStack: Array<[string, string | undefined]> = [];
 
     fragmentShader = 'vec4 materialMain(vec2 uv);\n' + fragmentShader;
 
@@ -241,16 +242,23 @@ export async function createLayerShader(
             };
         }
 
-        const searchFunctionName = 'process' + canvasFilter.name[0].toUpperCase() + canvasFilter.name.slice(1);
-        const useFunctionName = searchFunctionName + index;
-        if (filterVertexShader?.includes(searchFunctionName)) {
+        const searchProcessFunctionName = 'process' + canvasFilter.name[0].toUpperCase() + canvasFilter.name.slice(1);
+        const useProcessFunctionName = searchProcessFunctionName + index;
+        const searchBakeFunctionName = 'bake' + canvasFilter.name[0].toUpperCase() + canvasFilter.name.slice(1);
+        let useBakeFunctionName: string | undefined = searchBakeFunctionName + index;
+        if (filterVertexShader?.includes(searchProcessFunctionName)) {
             if (alreadyIncludedFilters.has(canvasFilter.name)) {
                 filterVertexShader = filterVertexShader.replace(/const int.*?;/g, '');
             }
-            filterVertexShader = filterVertexShader.replace(searchFunctionName + '(', useFunctionName + '(');
-            vertexShaderMainCalls.push('    filterPositionResult = ' + useFunctionName + '(filterPositionResult);');
+            filterVertexShader = filterVertexShader.replace(searchProcessFunctionName + '(', useProcessFunctionName + '(');
+            vertexShaderMainCalls.push('    filterPositionResult = ' + useProcessFunctionName + '(filterPositionResult);');
         }
-        if (filterFragmentShader?.includes(searchFunctionName)) {
+        if (filterFragmentShader?.includes(searchProcessFunctionName)) {
+            if (filterFragmentShader?.includes(searchBakeFunctionName)) {
+                filterFragmentShader = filterFragmentShader.replace(searchBakeFunctionName + '(', useBakeFunctionName + '(');
+            } else {
+                useBakeFunctionName = undefined;
+            }
             if (alreadyIncludedFilters.has(canvasFilter.name)) {
                 filterFragmentShader = filterFragmentShader.replace(/const int.*?;/g, '');
             }
@@ -263,12 +271,20 @@ export async function createLayerShader(
                 if (hasMaskTextures) {
                     fragmentShader += '    float filterMaskAlpha = 1.0;\n    vec4 filterColorBuffer = vec4(0.0, 0.0, 0.0, 0.0);\n';
                 }
-                for (const [functionIndex, functionName] of useFunctionNameStack.entries()) {
+                for (const [functionIndex, [processFunctionName, bakeFunctionName]] of useFunctionNameStack.entries()) {
                     const functionMaskTexture = uniforms[`filterMask${functionIndex}Map`];
                     if (functionMaskTexture) {
                         fragmentShader += `    filterColorBuffer = filterColorResult;\n    filterMaskAlpha = texture2D(filterMask${functionIndex}Map, uv).a;\n`;
                     }
-                    fragmentShader += `    filterColorResult = ${functionName}(filterColorResult, uv);\n`;
+                    if (bakeFunctionName) {
+                        fragmentShader += '    if (cHighQualityRender == 1) {\n'
+                            + `        filterColorResult = ${bakeFunctionName}(filterColorResult, uv);\n`
+                            + `    } else {\n`;
+                    }
+                    fragmentShader += `    filterColorResult = ${processFunctionName}(filterColorResult, uv);\n`;
+                    if (bakeFunctionName) {
+                        fragmentShader += '    }\n';
+                    }
                     if (functionMaskTexture) {
                         fragmentShader += '    filterColorResult = vec4('
                             +       'filterColorResult.r * filterMaskAlpha + filterColorBuffer.r * (1.0 - filterMaskAlpha),'
@@ -281,11 +297,19 @@ export async function createLayerShader(
                 fragmentShader += '    return filterColorResult;\n}\n\n';
                 fragmentShaderMainCalls = [];
             }
-            filterFragmentShader = filterFragmentShader.replace(searchFunctionName + '(', useFunctionName + '(');
+            filterFragmentShader = filterFragmentShader.replace(searchProcessFunctionName + '(', useProcessFunctionName + '(');
             if (maskTexture) {
                 fragmentShaderMainCalls.push(`    filterColorBuffer = filterColorResult;\n    filterMaskAlpha = texture2D(filterMask${index}Map, vUv).a;`);
             }
-            fragmentShaderMainCalls.push('    filterColorResult = ' + useFunctionName + '(filterColorResult, vUv);');
+            if (useBakeFunctionName) {
+                fragmentShaderMainCalls.push('    if (cHighQualityRender == 1) {\n'
+                    + `        filterColorResult = ${useBakeFunctionName}(filterColorResult, vUv);\n`
+                    + `    } else {\n`);
+            }
+            fragmentShaderMainCalls.push('    filterColorResult = ' + useProcessFunctionName + '(filterColorResult, vUv);');
+            if (useBakeFunctionName) {
+                fragmentShaderMainCalls.push('    }\n');
+            }
             if (maskTexture) {
                 fragmentShaderMainCalls.push(
                     '    filterColorResult = vec4('
@@ -324,7 +348,7 @@ export async function createLayerShader(
             fragmentShader += `uniform sampler2D filterMask${index}Map;\n`;
         }
         alreadyIncludedFilters.add(canvasFilter.name);
-        useFunctionNameStack.push(useFunctionName);
+        useFunctionNameStack.push([useProcessFunctionName, useBakeFunctionName]);
     }
 
     let vertexFilterCode = '';
@@ -332,7 +356,7 @@ export async function createLayerShader(
         vertexFilterCode += '    vec4 filterPositionResult = gl_Position;\n' + vertexShaderMainCalls.join('\n') + '\n    gl_Position = filterPositionResult;';
     }
     let fragmentFilterCode = '';
-    if (!hasSampleBackbuffer) {
+    if (!hasSampleBackbuffer || hasMaskTextures) {
         fragmentFilterCode += '    gl_FragColor = materialMain(vUv);';
     }
     if (fragmentShaderMainCalls.length > 0) {
