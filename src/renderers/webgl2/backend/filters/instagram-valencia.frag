@@ -1,6 +1,6 @@
 uniform float pMix;
 
-vec4 processInstagramValencia(vec4 color) {
+vec4 processInstagramValencia(vec4 color, vec2 uv) {
     vec3 rgb = linearSrgbToSrgb(color.rgb);
     vec3 newRgb = vec3(rgb.rgb);
 

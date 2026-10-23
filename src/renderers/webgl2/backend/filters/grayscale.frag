@@ -6,7 +6,7 @@ const int GrayscaleModeValue = 4;
 
 uniform float pMix;
 
-vec4 processGrayscale(vec4 color) {
+vec4 processGrayscale(vec4 color, vec2 uv) {
     float intensity = 0.0;
     vec3 rgb = linearSrgbToSrgb(color.rgb);
 

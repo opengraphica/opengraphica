@@ -3,7 +3,7 @@ const int ChromaModifyModeShift = 1;
 
 uniform float pChroma;
 
-vec4 processChroma(vec4 color) {
+vec4 processChroma(vec4 color, vec2 uv) {
     float chroma = 0.0;
     vec3 lab = rgbToOklab(color.rgb);
     vec3 lch = labToLch(lab);

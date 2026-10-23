@@ -5,7 +5,7 @@ const int GradientMapColorSpaceLinearRgb = 2;
 uniform float pMix;
 uniform sampler2D pGradient;
 
-vec4 processGradientMap(vec4 color) {
+vec4 processGradientMap(vec4 color, vec2 uv) {
 
     vec3 lch = labToLch(rgbToOklab(color.rgb));
 

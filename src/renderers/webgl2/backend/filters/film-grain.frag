@@ -6,9 +6,9 @@ uniform float pIntensity;
 uniform float pGrainScale;
 uniform float pSeed;
 
-vec4 processFilmGrain(vec4 color) {
+vec4 processFilmGrain(vec4 color, vec2 uv) {
     vec2 layerResolution = vec2(float(cLayerWidth), float(cLayerHeight));
-    vec2 pixel = min(floor(vUv * layerResolution), layerResolution - vec2(1.0));
+    vec2 pixel = min(floor(uv * layerResolution), layerResolution - vec2(1.0));
     
     float scale = max(pGrainScale, 0.001);
     uint baseSeed = uint(max(pSeed * 256.0, 0.0)) * 0xcb1ab31fu;

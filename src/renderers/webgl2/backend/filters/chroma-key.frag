@@ -6,7 +6,7 @@ uniform float pHueWeight;
 uniform float pChromaWeight;
 uniform float pLightnessWeight;
 
-vec4 processChromaKey(vec4 color) {
+vec4 processChromaKey(vec4 color, vec2 uv) {
     float threshold = pThreshold * 0.15;
     float softness = pSoftness * 0.15;
 

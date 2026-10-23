@@ -653,6 +653,16 @@
                 "seed": "Seed"
             }
         },
+        "whirlPinch": {
+            "name": "Whirl & Pinch",
+            "param": {
+                "whirl": "Whirl",
+                "pinch": "Pinch",
+                "radius": "Radius",
+                "centerX": "Center X",
+                "centerY": "Center Y"
+            }
+        },
         "whiteBalance": {
             "name": "White Balance",
             "param": {

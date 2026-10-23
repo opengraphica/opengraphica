@@ -1,6 +1,6 @@
 uniform float pMix;
 
-vec4 processInstagramToaster(vec4 color) {
+vec4 processInstagramToaster(vec4 color, vec2 uv) {
     vec3 rgb = linearSrgbToSrgb(color.rgb);
     vec3 newRgb = vec3(rgb.rgb);
 
@@ -9,7 +9,7 @@ vec4 processInstagramToaster(vec4 color) {
     float radius = 1.25;
     vec3 stop1 = vec3(0.50196, 0.30588, 0.05882);
     vec3 stop2 = vec3(0.23137, 0.0, 0.23137);
-    float interpolation = clamp(length(position + vUv) - (1.0 - radius), 0.0, 1.0);
+    float interpolation = clamp(length(position + uv) - (1.0 - radius), 0.0, 1.0);
     vec3 gradientColor = (interpolation * stop2) + (1.0 - interpolation) * stop1;
 
     // Screen blending mode

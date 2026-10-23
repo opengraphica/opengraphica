@@ -2,9 +2,9 @@ uniform float pHorizontal;
 uniform float pVertical;
 uniform float pSeed;
 
-vec4 processSpread(vec4 color) {
+vec4 processSpread(vec4 color, vec2 uv) {
     vec2 layerResolution = vec2(float(cLayerWidth), float(cLayerHeight));
-    vec2 pixel = min(floor(vUv * layerResolution), layerResolution - vec2(1.0));
+    vec2 pixel = min(floor(uv * layerResolution), layerResolution - vec2(1.0));
 
     float horizontal = floor(max((1.0 - cbrt(1.0 - pHorizontal)) * 512.0, 0.0));
     float vertical = floor(max((1.0 - cbrt(1.0 - pVertical)) * 512.0, 0.0));

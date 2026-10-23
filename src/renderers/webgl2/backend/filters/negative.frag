@@ -1,7 +1,7 @@
 const int NegativeInvertColorSpacePerceptualRgb = 0;
 const int NegativeInvertColorSpaceLinearRgb = 0;
 
-vec4 processNegative(vec4 color) {
+vec4 processNegative(vec4 color, vec2 uv) {
     vec3 rgb = color.rgb;
     if (cColorSpace == NegativeInvertColorSpacePerceptualRgb) {
         rgb = linearSrgbToSrgb(rgb);

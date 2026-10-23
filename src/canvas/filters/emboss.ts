@@ -35,7 +35,7 @@ export default class EmbossCanvasFilter implements CanvasFilter<EmbossCanvasFilt
             elevation: {
                 type: 'percentage',
                 default: 0.5,
-                preview: 0.5,
+                preview: 0.75,
                 min: 0,
                 max: 1,
             },

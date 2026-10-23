@@ -4,9 +4,9 @@ const int EmbossTypeHeightmap = 1;
 uniform float pAngle;
 uniform float pElevation;
 
-vec4 processEmboss(vec4 color) {
+vec4 processEmboss(vec4 color, vec2 uv) {
     vec2 layerResolution = vec2(float(cLayerWidth), float(cLayerHeight));
-    vec2 pixel = min(floor(vUv * layerResolution), layerResolution - vec2(1.0));
+    vec2 pixel = min(floor(uv * layerResolution), layerResolution - vec2(1.0));
 
     vec2 sourceUv = (pixel + vec2(0.5)) / layerResolution;
     vec2 texel = 1.0 * vec2(1.0) / layerResolution;

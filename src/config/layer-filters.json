@@ -73,6 +73,10 @@
         "name": "layerFilter.emboss.name",
         "group": "distort"
     },
+    "whirlPinch": {
+        "name": "layerFilter.whirlPinch.name",
+        "group": "distort"
+    },
 
     "filmGrain": {
         "name": "layerFilter.filmGrain.name",

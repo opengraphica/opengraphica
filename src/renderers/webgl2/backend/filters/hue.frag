@@ -4,7 +4,7 @@ const int HueColorSpaceLinearRgb = 2;
 
 uniform float pRotate;
 
-vec4 processHue(vec4 color) {
+vec4 processHue(vec4 color, vec2 uv) {
     vec3 rgb = color.rgb;
 
     if (cColorSpace == HueColorSpaceOklab) {

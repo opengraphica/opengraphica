@@ -268,7 +268,7 @@ export async function createLayerShader(
                     if (functionMaskTexture) {
                         fragmentShader += `    filterColorBuffer = filterColorResult;\n    filterMaskAlpha = texture2D(filterMask${functionIndex}Map, uv).a;\n`;
                     }
-                    fragmentShader += `    filterColorResult = ${functionName}(filterColorResult);\n`;
+                    fragmentShader += `    filterColorResult = ${functionName}(filterColorResult, uv);\n`;
                     if (functionMaskTexture) {
                         fragmentShader += '    filterColorResult = vec4('
                             +       'filterColorResult.r * filterMaskAlpha + filterColorBuffer.r * (1.0 - filterMaskAlpha),'
@@ -285,7 +285,7 @@ export async function createLayerShader(
             if (maskTexture) {
                 fragmentShaderMainCalls.push(`    filterColorBuffer = filterColorResult;\n    filterMaskAlpha = texture2D(filterMask${index}Map, vUv).a;`);
             }
-            fragmentShaderMainCalls.push('    filterColorResult = ' + useFunctionName + '(filterColorResult);');
+            fragmentShaderMainCalls.push('    filterColorResult = ' + useFunctionName + '(filterColorResult, vUv);');
             if (maskTexture) {
                 fragmentShaderMainCalls.push(
                     '    filterColorResult = vec4('

@@ -1,6 +1,6 @@
 uniform vec4 pWhite;
 
-vec4 processWhiteBalance(vec4 color) {
+vec4 processWhiteBalance(vec4 color, vec2 uv) {
     vec3 white = srgbToLinearSrgb(pWhite.rgb);
 
     float neutral = (0.22 * white.r) + (0.72 * white.g) + (0.06 * white.b);

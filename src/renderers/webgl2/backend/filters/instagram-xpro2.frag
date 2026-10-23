@@ -1,6 +1,6 @@
 uniform float pMix;
 
-vec4 processInstagramXpro2(vec4 color) {
+vec4 processInstagramXpro2(vec4 color, vec2 uv) {
     vec3 rgb = linearSrgbToSrgb(color.rgb);
     vec3 newRgb = vec3(rgb.rgb);
 
@@ -9,7 +9,7 @@ vec4 processInstagramXpro2(vec4 color) {
     float radius = 0.85;
     vec4 stop1 = vec4(0.90196, 0.90588, 0.87843, 1.0);
     vec4 stop2 = vec4(0.16862, 0.16470, 0.63137, 0.6);
-    float interpolation = clamp(length(position + vUv) - (1.0 - radius), 0.0, 1.0);
+    float interpolation = clamp(length(position + uv) - (1.0 - radius), 0.0, 1.0);
     vec4 gradientColor = (interpolation * stop2) + (1.0 - interpolation) * stop1;
     // newRgb.rgb = (gradientColor.rgb * gradientColor.a) + (rgb.rgb * (1.0 - gradientColor.a));
 

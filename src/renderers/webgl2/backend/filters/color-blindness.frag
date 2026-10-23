@@ -65,7 +65,7 @@ const mat3 ColorBlindnessVienotTritanRgbCvd = mat3(
 
 uniform float pSeverity;
 
-vec4 processColorBlindness(vec4 color) {
+vec4 processColorBlindness(vec4 color, vec2 uv) {
     vec3 rgb = color.rgb;
     vec3 rgbCvd = vec3(0.0);
 
