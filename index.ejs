@@ -14,7 +14,31 @@
     </head>
     <body class="og-full-page">
         <noscript>This application does not work without Javascript. Please enable it to continue.</noscript>
-        <div id="opengraphica"></div>
+        <div id="opengraphica">
+            <!-- SEO -->
+            <div style="width: 1px; height: 1px; overflow: hidden; opacity: 0.01">
+                <h1>OpenGraphica Image Editor</h1>
+                <p>
+                    OpenGraphica is a raster and vector image editor, similar to Photoshop, GIMP, Illustrator, Inkscape.
+                    It brings a complete "desktop"-like full image editing experience to mobile devices and the web,
+                    with a simple user interface that doesn't bombard you with hundreds of menu items.
+                </p>
+                <h2>Features</h2>
+                <ul>
+                    <li>Cropping / resizing / rotating / scaling</li>
+                    <li>Raster art brushes</li>
+                    <li>Bucket fill</li>
+                    <li>Create vector shapes and paths</li>
+                    <li>Create gradients</li>
+                    <li>Erase brush & Erase bucket</li>
+                    <li>Text tool</li>
+                    <li>Live "Effects" on layers, adjust colors and edit the adjustments later</li>
+                    <li>Selection tool - limit drawing / editing / effects to a selected area</li>
+                    <li>Save/Open from remote storage via WebDAV (you need to set up your own server)</li>
+                    <li>Export as PNG, JPEG, GIF, WEBP, BMP, TIFF, SVG</li>
+                </ul>
+            </div>
+        </div>
         <script>
             const searchParams = new URLSearchParams(window.location.search);
 
@@ -77,6 +101,7 @@
                 });
             })();
 
+            document.getElementById('opengraphica').innerHTML = '';
             OpenGraphica.mount('#opengraphica');
             OpenGraphica.theme({
                 light: './css/main-light.css',

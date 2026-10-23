@@ -582,7 +582,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
                 }
             }
 
-            this.createLayerPasses(this.snapshotComposer, snapshotCamera, options?.layerIds);
+            this.createLayerPasses(this.snapshotComposer, snapshotCamera, options?.layerIds, isHighQuality);
             this.snapshotComposer.renderToScreen = false;
 
             this.snapshotComposer.render();

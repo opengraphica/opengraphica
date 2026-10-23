@@ -19,7 +19,32 @@
         </div>
         <el-divider />
         <div class="flex flex-row items-center justify-between">
-            <h2 class="text-lg m-0">{{ t(currentFilterTitle) }}</h2>
+            <h2 class="text-lg m-0">
+                {{ t(currentFilterTitle) }}
+                <template v-if="te(currentFilterHelpText)">
+                    <og-button
+                        ref="moreInfoButton"
+                        type="button"
+                        icon
+                        :aria-label="t('button.moreInfo')"
+                        class="p-0! w-5! h-5! min-w-fit!"
+                        @click="showMoreInfoTooltip = !showMoreInfoTooltip"
+                    >
+                        <span class="bi bi-patch-question-fill" aria-hidden="true" />
+                    </og-button>
+                    <og-popover
+                        v-model:visible="showMoreInfoTooltip"
+                        placement="top" arrow :offset="16"
+                        :reference="moreInfoButton?.$el"
+                        style="z-index: 5000"
+                    >
+                        <span
+                            class="og-popover__content og-rich-text max-w-100 text-sm"
+                            v-html="micromark(t(currentFilterHelpText))"
+                        />
+                    </og-popover>
+                </template>
+            </h2>
             <div class="flex flex-row items-center shrink-1">
                 <el-switch
                     v-model="currentFilterEnabled"
@@ -177,6 +202,7 @@ export default {
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick, reactive, watch, WatchStopHandle } from 'vue';
 import { Rules } from 'async-validator';
+import { micromark } from 'micromark';
 
 import { Scene } from 'three/src/scenes/Scene';
 import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer';
@@ -201,6 +227,9 @@ import ElSlider from 'element-plus/lib/components/slider/index';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 import ElSwitch from 'element-plus/lib/components/switch/index';
 import ElRow from 'element-plus/lib/components/row/index';
+
+import OgButton from '@/ui/element/button.vue';
+import OgPopover from '@/ui/element/popover.vue';
 
 import { useI18n } from '@/i18n';
 
@@ -274,7 +303,7 @@ const emit = defineEmits([
 emit('update:title', 'module.layerEffectEdit.title');
 emit('update:dialogSize', 'medium-large');
 
-const { t } = useI18n();
+const { t, te } = useI18n();
 const $notify = notifyInjector('$notify');
 
 const isUseWebGlPreview = isWebGLAvailable();
@@ -286,6 +315,9 @@ const beforeEffectCanvas = ref<HTMLCanvasElement>();
 const beforeEffectCanvasCtx = ref<CanvasRenderingContext2D>();
 const afterEffectCanvas = ref<HTMLCanvasElement>();
 const afterEffectCanvasCtx = ref<CanvasRenderingContext2D | undefined>();
+
+const moreInfoButton = ref<typeof OgButton>();
+const showMoreInfoTooltip = ref<boolean>(false);
 
 const currentFilterEnabled = ref(true);
 const canvasFilters = ref<Webgl2RendererCanvasFilter[]>([]);
@@ -334,6 +366,10 @@ const currentFilterName = computed<string>(() => {
 
 const currentFilterTitle = computed<string>(() => {
     return `layerFilter.${currentFilterConfig.value?.name}.name`;
+});
+
+const currentFilterHelpText = computed<string>(() => {
+    return `layerFilter.${currentFilterConfig.value?.name}.help`;
 });
 
 const gradientBackgrounds = computed<Record<string, string>>(() => {

@@ -294,9 +294,9 @@ module.exports = function setupConfig(config) {
                         test: /[\\/]node_modules[\\/]gifken[\\/]/,
                         name: 'gifken'
                     },
-                    meshline: {
-                        test: /[\\/]node_modules[\\/]meshline[\\/]/,
-                        name: 'meshline'
+                    micromark: {
+                        test: /[\\/]node_modules[\\/]micromark[\\/]/,
+                        name: 'micromark'
                     },
                     opengraphicaActions: {
                         test: /[\\/]src[\\/]actions[\\/]/,

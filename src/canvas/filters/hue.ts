@@ -1,4 +1,4 @@
-import type { CanvasFilter, CanvasFilterEditConfig } from '@/types';
+import type { CanvasFilter, CanvasFilterEditConfig, RGBAColor } from '@/types';
 
 export enum HueColorSpace {
     OKLAB = 0,
@@ -9,6 +9,8 @@ export enum HueColorSpace {
 export interface HueCanvasFilterParams {
     colorSpace?: HueColorSpace;
     rotate?: number;
+    targetColor?: RGBAColor;
+    targetRange?: number[];
 }
 
 export default class HueCanvasFilter implements CanvasFilter<HueCanvasFilterParams> {
@@ -33,6 +35,16 @@ export default class HueCanvasFilter implements CanvasFilter<HueCanvasFilterPara
                 preview: 0.3,
                 min: -0.5,
                 max: 0.5,
+            },
+            targetColor: {
+                type: 'color',
+                default: { is: 'color', r: 0, g: 0, b: 0, alpha: 1, style: '#000000' },
+            },
+            targetRange: {
+                type: 'percentageRange',
+                default: [1, 1],
+                min: 0,
+                max: 1
             }
         } as CanvasFilterEditConfig;
     }

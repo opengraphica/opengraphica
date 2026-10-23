@@ -11666,6 +11666,35 @@ body.og-full-page .opengraphica {
   position: relative;
   left: -0.5em;
 }
+.opengraphica .og-rich-text strong {
+  font-weight: bold;
+}
+.opengraphica .og-rich-text p {
+  margin: 1rem 0;
+}
+.opengraphica .og-rich-text p:first-child {
+  margin-top: 0;
+}
+.opengraphica .og-rich-text p:last-child {
+  margin-bottom: 0;
+}
+.opengraphica .og-rich-text ul, .opengraphica .og-rich-text ol {
+  margin: 1rem 0;
+}
+.opengraphica .og-rich-text ul:first-child, .opengraphica .og-rich-text ol:first-child {
+  margin-top: 0;
+}
+.opengraphica .og-rich-text ul:last-child, .opengraphica .og-rich-text ol:last-child {
+  margin-bottom: 0;
+}
+.opengraphica .og-rich-text ul {
+  list-style: disc;
+  padding-left: 1rem;
+}
+.opengraphica .og-rich-text ol {
+  list-style: decimal;
+  padding-left: 1rem;
+}
 .opengraphica .og-wait {
   display: none;
 }

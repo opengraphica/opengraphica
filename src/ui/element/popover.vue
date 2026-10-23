@@ -11,7 +11,7 @@
                 ref="popover"
                 class="og-popover og-transition-fast"
                 :class="['og-popover--' + placement]"
-                :style="floatingStyles"
+                :style="{ ...floatingStyles, zIndex }"
             >
                 <div
                     v-if="props.arrow"
@@ -35,7 +35,7 @@
     </teleport>
 </template>
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { arrow, flip, offset, useFloating } from '@floating-ui/vue';
 
 import vPointer from '@/directives/pointer';
@@ -71,6 +71,7 @@ const emit = defineEmits<{
 
 const popover = ref<HTMLDivElement>();
 const floatingArrow = ref<HTMLDivElement>();
+const zIndex = ref<string | undefined>();
 
 const { floatingStyles, middlewareData, placement } = useFloating(
     computed(() => props.reference),
@@ -88,6 +89,21 @@ const { floatingStyles, middlewareData, placement } = useFloating(
         ],
     },
 );
+
+watch(() => props.visible, () => {
+    if (props.visible) {
+        if (props.reference?.closest) {
+            const zIndexParent = props.reference.closest('[style*="z-index"]') as HTMLElement;
+            if (zIndexParent) {
+                zIndex.value = (parseFloat(zIndexParent.style.zIndex) + 1000).toFixed(0);
+            } else {
+                zIndex.value = undefined;
+            }
+        }
+    } else {
+        zIndex.value = undefined;
+    }
+});
 
 function onPointerDownWindow(event: PointerEvent) {
     hideIfClickedOutsidePopover(event);

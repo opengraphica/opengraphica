@@ -15,13 +15,13 @@ export default class TiltShiftBlurCanvasFilter implements CanvasFilter<TiltShift
         return {
             blurRadius: {
                 type: 'percentage',
-                default: 0.15,
+                default: 0.20,
                 min: 0,
                 max: 1,
             },
             gradientRadius: {
                 type: 'percentage',
-                default: 0.85,
+                default: 0.5,
                 min: 0,
                 max: 1,
             },

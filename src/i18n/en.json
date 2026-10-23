@@ -421,6 +421,7 @@
     "layerFilter": {
         "brightness": {
             "name": "Brightness",
+            "help": "Changes the brightness of the image using one of 3 different modes:\n* **Adjust Gamma** - Similar to a camera's exposure setting.\n* **Black/White Shift** - Moves all colors towards pure black or white.\n* **Adjust Luminance** - Changes the perceptual lightness value in the Oklab color space.\n\nThe **Range** setting adjusts which light or dark values are affected, and the **Feather** setting works in combination with the **Range** to smooth out the transition.",
             "param": {
                 "mode": "Mode",
                 "modeOption": {
@@ -435,6 +436,7 @@
         },
         "chroma": {
             "name": "Chroma",
+            "help": "Changes how colorful the image is, also called \"saturation\" in some contexts.\n\n* **Adjust Chroma Contrast** - Pixels that are already a higher chroma are affected more than desaturated pixels.\n* **Evenly Adjust Chroma** - The chroma levels of all pixels are adjusted with the same amount.",
             "param": {
                 "chroma": "Chroma",
                 "mode": "Mode",
@@ -458,6 +460,7 @@
         },
         "colorBlindness": {
             "name": "Color Blindness",
+            "help": "Simulates what the image would look like to a color blind person.\n\n* **Brettel 1997** - More accurate simulation overall.\n* **Viénot 1999** - A simpler simulation that in some studies participants have preferred it for protanopia and deuteranopia.\n\n**Severity** adjusts how much the color blindness affects the image. Most color blind people are not 100% color blind, and sit somewhere in between.",
             "param": {
                 "method": "Simulation Method",
                 "methodOption": {
@@ -479,6 +482,7 @@
         },
         "contrast": {
             "name": "Contrast",
+            "help": "Makes bright and dark values either closer to or farther apart from each other, adjusted in perceptual color space.\n\n* **Contrast** - Higher increases contrast, lower decreases.\n* **Middle Gray** - Adjust the gray point around which contrast is calculated.",
             "param": {
                 "contrast": "Contrast",
                 "middleGray": "Middle Gray"
@@ -489,6 +493,7 @@
         },
         "emboss": {
             "name": "Emboss",
+            "help": "Simulates the 3D appearance of physical embossing, such as pressing a design into paper or metal.\n\n* **Angle** - Controls the direction of the light and shadow.\n* **Elevation** - Rases the height of the embossed area, increasing the strength of lights and shadows.",
             "param": {
                 "type": "Type",
                 "typeOption": {
@@ -501,6 +506,7 @@
         },
         "filmGrain": {
             "name": "Film Grain",
+            "help": "Simulates the look of underexposed film or zoomed in film with large grain sizes.\n\n* **Intensity** - Increases the visibility of the grain.\n* **Grain Scale** - Increases grain size relative to pixel size.\n* **Seed** - The random number used to generate the grain pattern.\n* **Blend Mode** - Determines how the grain is merged with the image. Normal mode is physically correct, the other modes are for artistic effect.",
             "param": {
                 "blendMode": "Blend Mode",
                 "blendModeOption": {
@@ -524,6 +530,7 @@
         },
         "gradientMap": {
             "name": "Gradient Map",
+            "help": "Swaps out all colors in the image with colors from a gradient you specify, based on the brightness of the original colors in the image.\n\nThe **Color Space** changes how intermediate values between the stops on the gradient are interpolated. **Oklab** is generally the most accurate option.",
             "param": {
                 "gradient": "Gradient",
                 "colorSpace": "Color Space",
@@ -537,6 +544,7 @@
         },
         "grayscale": {
             "name": "Grayscale",
+            "help": "Removes all color from the image, using one of many different formulas to calculate the brightness of the original colors.",
             "param": {
                 "mode": "Mode",
                 "modeOption": {
@@ -558,6 +566,7 @@
         },
         "hue": {
             "name": "Hue",
+            "help": "Rotates the hue of colors in the image, effectively changing the perceived color.\n\nThe **Color Space** is used to determine the brightness and saturation of the new color. **Oklab** is generally the most accurate option.\n\nThe **Target Color** can be used to selectively modify only one specific color in the image. The **Range** determines what colors similar to the **Target Color** are affected.",
             "param": {
                 "colorSpace": "Color Space",
                 "colorSpaceOption": {
@@ -565,7 +574,9 @@
                     "perceptualRgb": "Perceptual RGB",
                     "linearRgb": "Linear RGB"
                 },
-                "rotate": "Rotate"
+                "rotate": "Rotate",
+                "targetColor": "Target Color",
+                "targetRange": "Range"
             }
         },
         "instagram1997": {
@@ -622,8 +633,26 @@
                 "mix": "Mix"
             }
         },
+        "monteCarloBlur": {
+            "name": "Monte Carlo Blur",
+            "help": "Simulates the type of noisy blur you would see when taking a photograph in low light with a real camera.\n\n* **Iterations** - How many rays of light are computed per pixel.\n* **Size** - The radius of the blur.",
+            "param": {
+                "iterations": "Iterations",
+                "iterationsOption": {
+                    "1": "1",
+                    "2": "2",
+                    "4": "4",
+                    "8": "8",
+                    "16": "16",
+                    "32": "32",
+                    "64": "64"
+                },
+                "size": "Size"
+            }
+        },
         "negative": {
             "name": "Negative",
+            "help": "Invert specific color channels in the image, where high values become low values and vice versa.\n\nThe **Color Space** determines whether the invert occurs before or after gamma correction.",
             "param": {
                 "colorSpace": "Color Space",
                 "colorSpaceOption": {
@@ -647,6 +676,7 @@
         },
         "spread": {
             "name": "Spread",
+            "help": "Shifts the pixels horizontally or vertically in a random noise pattern.",
             "param": {
                 "horizontal": "Horizontal",
                 "vertical": "Vertical",
@@ -655,6 +685,7 @@
         },
         "tiltShiftBlur": {
             "name": "Tilt Shift Blur",
+            "help": "Simulates the effect of shallow depth of field at microscopic scales or a specialized camera tilt-shift lens.\n\n* **Blur Radius** - The maximum amount of blur applied to the blurred areas.\n* **Gradient Radius** - The size of the gradient from unblurred to blurred areas.\n* **Angle** - The rotation of the unblurred area.\n* **Offset** - The position of the unblurred area, offset from the center.",
             "param": {
                 "blurRadius": "Blur Radius",
                 "gradientRadius": "Gradient Radius",
@@ -664,6 +695,7 @@
         },
         "whirlPinch": {
             "name": "Whirl & Pinch",
+            "help": "Twists & pinches a circular area of the image.\n\n* **Whirl** - The rotation of the twist.\n* **Pinch** - The strength of pinching or expanding.\n* **Radius** - The radius of the circle which determines the affected area.",
             "param": {
                 "whirl": "Whirl",
                 "pinch": "Pinch",
@@ -674,12 +706,14 @@
         },
         "whiteBalance": {
             "name": "White Balance",
+            "help": "Adjust the image as if the specified **Neutral Color** is actually supposed to be white.\n\nCameras can shift colors towards teal or orange depending on the lighting conditions, not matching what you actually see in real life.",
             "param": {
                 "white": "Neutral Color"
             }
         },
         "zoomBlur": {
             "name": "Zoom Blur",
+            "help": "Simulates the blur from a photographic technique called a **zoom burst**.\n\nHigher **Strength** gives stronger blur, representing a slower shutter speed or longer exposure.",
             "param": {
                 "strength": "Strength",
                 "centerX": "Center X",
@@ -1580,6 +1614,7 @@
             }
         },
         "effect": {
+            "maskHeading": "Mask:",
             "edit": {
                 "noLayersSelected": "Please select one or more layers in the layers dock in order to edit their effects.",
                 "layerHasNoEffects": "This layer has no effects.",

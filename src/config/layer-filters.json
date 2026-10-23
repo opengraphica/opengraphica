@@ -69,6 +69,10 @@
         "group": "instagramFilter"
     },
 
+    "monteCarloBlur": {
+        "name": "layerFilter.monteCarloBlur.name",
+        "group": "blur"
+    },
     "tiltShiftBlur": {
         "name": "layerFilter.tiltShiftBlur.name",
         "group": "blur"

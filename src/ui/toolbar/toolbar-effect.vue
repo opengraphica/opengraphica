@@ -108,7 +108,7 @@
             <div class="w-1 h-8">
                 <div class="absolute right-4 gap-2 flex flex-row items-center justify-end w-full">
                     <span v-if="isMobileView && (isSelectionMaskAvailable || isMaskApplied)" class="text-sm">
-                        Mask:
+                        {{ t('toolbar.effect.maskHeading') }}
                     </span>
                     <og-button v-if="isSelectionMaskAvailable" @click="onCreateSelectionMask" small :icon="isMobileView">
                         <span class="bi bi-mask" :class="{ 'mr-1': !isMobileView }" aria-hidden="true" />
@@ -132,7 +132,31 @@
             </div>
             <el-divider class="my-2!" />
             <div class="flex flex-row items-center justify-between flex-wrap">
-                <h2 class="text-md my-0 mr-4">{{ t(currentFilterTitle) }}</h2>
+                <h2 class="text-md my-0 mr-4">
+                    {{ t(currentFilterTitle) }}
+                    <template v-if="te(currentFilterHelpText)">
+                        <og-button
+                            ref="moreInfoButton"
+                            type="button"
+                            icon
+                            :aria-label="t('button.moreInfo')"
+                            class="p-0! w-5! h-5! min-w-fit!"
+                            @click="showMoreInfoTooltip = !showMoreInfoTooltip"
+                        >
+                            <span class="bi bi-patch-question-fill" aria-hidden="true" />
+                        </og-button>
+                        <og-popover
+                            v-model:visible="showMoreInfoTooltip"
+                            placement="top" arrow :offset="16"
+                            :reference="moreInfoButton?.$el"
+                        >
+                            <span
+                                class="og-popover__content og-rich-text max-w-100 text-sm"
+                                v-html="micromark(t(currentFilterHelpText))"
+                            />
+                        </og-popover>
+                    </template>
+                </h2>
                 <div class="flex flex-row items-center shrink-1">
                     <el-switch
                         v-model="editingFilterEnabled"
@@ -279,6 +303,9 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref, toRefs, watch } from 'vue';
 import { Rules } from 'async-validator';
+import { micromark } from 'micromark';
+
+import { useI18n } from '@/i18n';
 
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton from 'element-plus/lib/components/button/index';
@@ -296,6 +323,7 @@ import ElSwitch from 'element-plus/lib/components/switch/index';
 import ElRow from 'element-plus/lib/components/row/index';
 
 import OgButton from '@/ui/element/button.vue';
+import OgPopover from '@/ui/element/popover.vue';
 import FloatingDock from '@/ui/dock/floating-dock.vue';
 
 import { BaseAction } from '@/actions/base';
@@ -337,9 +365,10 @@ import type {
     Webgl2RendererCanvasFilter,
     RendererFrontend,
 } from '@/types';
-import { t } from '@/i18n';
 
 const devicePixelRatio = window.devicePixelRatio || 1;
+
+const { t, te } = useI18n();
 
 const $notify = notifyInjector('$notify');
 let renderer: RendererFrontend;
@@ -509,8 +538,15 @@ const editingFilterRendererClass = ref<Webgl2RendererCanvasFilter>();
 const editingFilterConfig = ref<CanvasFilterEditConfig>();
 const editingFormValidationRules = ref<Rules>({});
 
+const moreInfoButton = ref<typeof OgButton>();
+const showMoreInfoTooltip = ref<boolean>(false);
+
 const currentFilterTitle = computed<string>(() => {
     return `layerFilter.${editingFilter.value?.name}.name`;
+});
+
+const currentFilterHelpText = computed<string>(() => {
+    return `layerFilter.${editingFilter.value?.name}.help`;
 });
 
 watch(() => editingFilter.value, () => {
