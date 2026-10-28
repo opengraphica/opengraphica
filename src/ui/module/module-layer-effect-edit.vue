@@ -36,7 +36,6 @@
                         v-model:visible="showMoreInfoTooltip"
                         placement="top" arrow :offset="16"
                         :reference="moreInfoButton?.$el"
-                        style="z-index: 5000"
                     >
                         <span
                             class="og-popover__content og-rich-text max-w-100 text-sm"

@@ -73,6 +73,10 @@
         "name": "layerFilter.monteCarloBlur.name",
         "group": "blur"
     },
+    "pixelize": {
+        "name": "layerFilter.pixelize.name",
+        "group": "blur"
+    },
     "tiltShiftBlur": {
         "name": "layerFilter.tiltShiftBlur.name",
         "group": "blur"

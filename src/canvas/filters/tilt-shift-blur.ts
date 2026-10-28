@@ -8,14 +8,14 @@ export interface TiltShiftBlurCanvasFilterParams {
 }
 
 export default class TiltShiftBlurCanvasFilter implements CanvasFilter<TiltShiftBlurCanvasFilterParams> {
-    public name = 'TiltShiftBlur';
+    public name = 'tiltShiftBlur';
     public params: TiltShiftBlurCanvasFilterParams = {};
 
     public getEditConfig() {
         return {
             blurRadius: {
                 type: 'percentage',
-                default: 0.20,
+                default: 0.10,
                 min: 0,
                 max: 1,
             },

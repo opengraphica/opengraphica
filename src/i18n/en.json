@@ -482,7 +482,7 @@
         },
         "contrast": {
             "name": "Contrast",
-            "help": "Makes bright and dark values either closer to or farther apart from each other, adjusted in perceptual color space.\n\n* **Contrast** - Higher increases contrast, lower decreases.\n* **Middle Gray** - Adjust the gray point around which contrast is calculated.",
+            "help": "Makes bright and dark values either closer to or farther apart from each other, adjusted in perceptual color space.\n\n* **Contrast** - Higher increases value separation, lower decreases.\n* **Middle Gray** - Adjust the gray point around which contrast is calculated.",
             "param": {
                 "contrast": "Contrast",
                 "middleGray": "Middle Gray"
@@ -663,6 +663,15 @@
                 "invertGreen": "Invert Green Channel",
                 "invertBlue": "Invert Blue Channel",
                 "invertValue": "Invert Value"
+            }
+        },
+        "pixelize": {
+            "name": "Pixelize",
+            "help": "Covers up image detail with large squares that look like a pixel grid.",
+            "param": {
+                "size": "Size",
+                "offsetX": "Offset X",
+                "offsetY": "Offset Y"
             }
         },
         "saturation": {
