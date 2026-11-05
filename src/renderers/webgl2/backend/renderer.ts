@@ -357,23 +357,6 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         currentScene.background = null;
         let currentSceneIsUsed = false;
 
-        // if (this.imageBackground) {
-        //     this.imageBackground.swapScene(currentScene);
-
-        //     currentSceneIsUsed = true;
-        //     for (const topLevelLayer of this.layerOrder) {
-        //         if (topLevelLayer.blendingMode === 'erase') {
-        //             currentSceneIsUsed = false;
-        //             break;
-        //         }
-        //     }
-        //     if (!currentSceneIsUsed) {
-        //         passScenes.push(currentScene);
-        //         currentScene = new Scene();
-        //         currentScene.background = null;
-        //     }
-        // }
-
         const stack: Array<WorkingFileLayer> = [
             { type: 'group', layers: this.layerOrder } as WorkingFileGroupLayer,
         ];
@@ -408,9 +391,6 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         if (this.selectionMask && passScenes.length > 0) {
             this.selectionMask.swapScene(passScenes[passScenes.length - 1]);
         }
-        if (this.imageBoundaryMask && passScenes.length > 0) {
-            this.imageBoundaryMask.swapScene(passScenes[passScenes.length - 1]);
-        }
 
         let isFirstPass = true;
         for (const scene of passScenes) {
@@ -422,7 +402,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
 
         const msaaSamples = highQuality ? Math.min(this.maxMsaaSamples, 4) : this.msaaSamples;
 
-        composer.addPass(new OutputPass(this.imageBackground));
+        composer.addPass(new OutputPass(this.imageBackground, this.imageBoundaryMask, camera));
         composer.renderTarget1.samples = msaaSamples;
         composer.renderTarget2.samples = msaaSamples;
         this.dirty = true;

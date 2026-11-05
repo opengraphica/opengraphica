@@ -1,4 +1,6 @@
-import { RepeatWrapping, RGBAFormat, UnsignedByteType, NearestFilter } from 'three/src/constants';
+import {
+    RepeatWrapping, RGBAFormat, UnsignedByteType, NearestFilter,
+} from 'three/src/constants';
 import { Color } from 'three/src/math/Color';
 import { DataTexture } from 'three/src/textures/DataTexture';
 import { BackSide } from 'three/src/constants';

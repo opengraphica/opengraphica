@@ -1,3 +1,5 @@
+import { Matrix4 } from 'three/src/math/Matrix4';
+import { Vector2 } from 'three/src/math/Vector2';
 import { Vector4 } from 'three/src/math/Vector4';
 
 /**
@@ -21,6 +23,7 @@ const OutputShader = {
     defines: {
 
         cTransparencyEnabled: 0,
+        cImageBoundaryEnabled: 1,
 
     },
 
@@ -31,6 +34,9 @@ const OutputShader = {
         backgroundColor: { value: null },
         transparencyGridMap: { value: null },
         backgroundTileSizeOpacityDimensions: { value: new Vector4(16, 1, 1, 1) },
+        imageDimensions: { value: new Vector2() },
+        backgroundInverseViewProjection: { value: new Matrix4() },
+        backgroundWorldToLocal: { value: new Matrix4() },
 
     },
 
@@ -60,6 +66,9 @@ const OutputShader = {
         uniform vec4 backgroundColor;
         uniform sampler2D transparencyGridMap;
         uniform vec4 backgroundTileSizeOpacityDimensions;
+        uniform vec2 imageDimensions;
+        uniform mat4 backgroundInverseViewProjection;
+        uniform mat4 backgroundWorldToLocal;
 
         #include <tonemapping_pars_fragment>
         #include <colorspace_pars_fragment>
@@ -109,9 +118,8 @@ const OutputShader = {
             vec4 background = vec4(0.0);
             float backgroundOpacity = backgroundTileSizeOpacityDimensions.y;
             #if cTransparencyEnabled == 1
-                vec2 backgroundDimensions = backgroundTileSizeOpacityDimensions.zw;
-                vec2 uvPerScreenX = vec2(1.0 / backgroundDimensions.x, 0.0);
-                vec2 uvPerScreenY = vec2(0.0, 1.0 / backgroundDimensions.y);
+                vec2 uvPerScreenX = vec2(1.0 / imageDimensions.x, 0.0);
+                vec2 uvPerScreenY = vec2(0.0, 1.0 / imageDimensions.y);
 
                 mat2 uvFromScreen = mat2(
                     uvPerScreenX,
@@ -135,8 +143,8 @@ const OutputShader = {
 
                 vec2 gridUv = gridPixelPosition / backgroundTileSizeOpacityDimensions.x;
                 vec2 wrappedGridUv = fract(gridUv);
-                vec2 gridUvDx = vec2(1.0 / backgroundDimensions.x, 0.0);
-                vec2 gridUvDy = vec2(0.0, 1.0 / backgroundDimensions.y);
+                vec2 gridUvDx = vec2(1.0 / imageDimensions.x, 0.0);
+                vec2 gridUvDy = vec2(0.0, 1.0 / imageDimensions.y);
 
                 vec3 transparencyGridColor = texture2D(transparencyGridMap, wrappedGridUv).rgb;
 
@@ -154,12 +162,33 @@ const OutputShader = {
                 );
             #endif
 
-            float backgroundMergeAlpha = gl_FragColor.a + background.a * (1.0 - gl_FragColor.a);
-            vec3 backgroundMergeColor =
-                gl_FragColor.rgb * gl_FragColor.a +
-                background.rgb * background.a * (1.0 - gl_FragColor.a);
+            gl_FragColor = vec4(
+                gl_FragColor.rgb + background.rgb * (1.0 - gl_FragColor.a), 
+                gl_FragColor.a + background.a * (1.0 - gl_FragColor.a)
+            );
 
-            gl_FragColor = vec4(backgroundMergeColor / max(backgroundMergeAlpha, 1e-8), backgroundMergeAlpha);
+            // image boundary clipping
+
+            #if cImageBoundaryEnabled == 1
+                vec2 backgroundDimensions = backgroundTileSizeOpacityDimensions.zw;
+                vec2 ndc = vUv * 2.0 - 1.0;
+                vec4 nearH = backgroundInverseViewProjection * vec4(ndc, -1.0, 1.0);
+                vec4 farH = backgroundInverseViewProjection * vec4(ndc, 1.0, 1.0);
+                vec3 rayOrigin = nearH.xyz / nearH.w;
+                vec3 rayDir = farH.xyz / farH.w - rayOrigin;
+                vec3 localOrigin = (backgroundWorldToLocal * vec4(rayOrigin, 1.0)).xyz;
+                vec3 localDir = (backgroundWorldToLocal * vec4(rayDir, 0.0)).xyz;
+                float t = -localOrigin.z / localDir.z;
+                vec2 hit = (localOrigin + t * localDir).xy;
+
+                float mask =
+                    step(0.0, t) *
+                    step(0.0, hit.x) *
+                    step(hit.x, backgroundDimensions.x) *
+                    step(0.0, hit.y) *
+                    step(hit.y, backgroundDimensions.y);
+                gl_FragColor.a *= mask;
+            #endif
 
             // color space
 

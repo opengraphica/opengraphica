@@ -1,7 +1,4 @@
 import {
-    ColorManagement,
-    RawShaderMaterial,
-    UniformsUtils,
     LinearToneMapping,
     ReinhardToneMapping,
     CineonToneMapping,
@@ -10,10 +7,17 @@ import {
     NeutralToneMapping,
     CustomToneMapping,
     SRGBTransfer,
-} from 'three';
+} from 'three/src/constants';
+import { ColorManagement } from 'three/src/math/ColorManagement';
+import { RawShaderMaterial } from 'three/src/materials/RawShaderMaterial';
+import { UniformsUtils } from 'three/src/renderers/shaders/UniformsUtils';
+import { Matrix4 } from 'three/src/math/Matrix4';
+
 import { Pass, FullScreenQuad } from './pass';
 import { OutputShader } from './output-shader';
 import type { ImageBackground } from '../image-background';
+import type { ImageBoundaryMask } from '../image-boundary-mask';
+import type { Camera } from 'three';
 
 /**
  * This pass is responsible for including tone mapping and color space conversion
@@ -38,6 +42,8 @@ class OutputPass extends Pass {
     uniforms!: any;
     material!: any;
     imageBackground: ImageBackground;
+    imageBoundaryMask: ImageBoundaryMask;
+    camera: Camera;
     _fsQuad!: any;
     _outputColorSpace!: any;
     _toneMapping!: any;
@@ -45,11 +51,13 @@ class OutputPass extends Pass {
     /**
      * Constructs a new output pass.
      */
-    constructor(imageBackground: ImageBackground) {
+    constructor(imageBackground: ImageBackground, imageBoundaryMask: ImageBoundaryMask, camera: Camera) {
 
         super();
 
         this.imageBackground = imageBackground;
+        this.imageBoundaryMask = imageBoundaryMask;
+        this.camera = camera;
 
         /**
          * This flag indicates that this is an output pass.
@@ -100,20 +108,31 @@ class OutputPass extends Pass {
      * @param {boolean} maskActive - Whether masking is active or not.
      */
     render( renderer, writeBuffer, readBuffer/*, deltaTime, maskActive */ ) {
+        const viewProjection = new Matrix4().multiplyMatrices(this.camera.projectionMatrix, this.camera.matrixWorldInverse);
 
         this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
         this.uniforms[ 'toneMappingExposure' ].value = renderer.toneMappingExposure;
         this.uniforms[ 'backgroundColor' ].value = this.imageBackground.backgroundMaterial.uniforms.color.value;
         this.uniforms[ 'transparencyGridMap' ].value = this.imageBackground.backgroundMaterial.uniforms.transparencyGridMap.value;
         this.uniforms[ 'backgroundTileSizeOpacityDimensions' ].value.y = this.imageBackground.backgroundMaterial.uniforms.opacity.value;
-        this.uniforms[ 'backgroundTileSizeOpacityDimensions' ].value.z = readBuffer.texture.width;
-        this.uniforms[ 'backgroundTileSizeOpacityDimensions' ].value.w = readBuffer.texture.height;
+        this.uniforms[ 'backgroundTileSizeOpacityDimensions' ].value.z = this.imageBackground.backgroundGeometry.parameters.width;
+        this.uniforms[ 'backgroundTileSizeOpacityDimensions' ].value.w = this.imageBackground.backgroundGeometry.parameters.height;
+        this.uniforms[ 'imageDimensions' ].value.x = readBuffer.texture.width;
+        this.uniforms[ 'imageDimensions' ].value.y = readBuffer.texture.height;
+        this.uniforms[ 'backgroundInverseViewProjection' ].value.copy(viewProjection).invert();
+        this.uniforms[ 'backgroundWorldToLocal' ].value.copy(this.imageBackground.backgroundMesh.matrixWorld).invert();
 
         const cTransparencyEnabled = this.imageBackground.backgroundMaterial.defines.cTransparencyEnabled;
+        const cImageBoundaryEnabled = this.imageBoundaryMask.imageBoundaryMesh?.visible ? 1 : 0;
 
         // rebuild defines if required
 
-        if ( this._outputColorSpace !== renderer.outputColorSpace || this._toneMapping !== renderer.toneMapping || cTransparencyEnabled !== this.material.defines.cTransparencyEnabled ) {
+        if (
+            this._outputColorSpace !== renderer.outputColorSpace
+            || this._toneMapping !== renderer.toneMapping
+            || cTransparencyEnabled !== this.material.defines.cTransparencyEnabled
+            || cImageBoundaryEnabled !== this.material.defines.cImageBoundaryEnabled
+        ) {
 
             this._outputColorSpace = renderer.outputColorSpace;
             this._toneMapping = renderer.toneMapping;
@@ -123,6 +142,7 @@ class OutputPass extends Pass {
             if ( ColorManagement.getTransfer( this._outputColorSpace ) === SRGBTransfer ) this.material.defines.SRGB_TRANSFER = '';
 
             this.material.defines.cTransparencyEnabled = cTransparencyEnabled;
+            this.material.defines.cImageBoundaryEnabled = cImageBoundaryEnabled;
             if ( this._toneMapping === LinearToneMapping ) this.material.defines.LINEAR_TONE_MAPPING = '';
             else if ( this._toneMapping === ReinhardToneMapping ) this.material.defines.REINHARD_TONE_MAPPING = '';
             else if ( this._toneMapping === CineonToneMapping ) this.material.defines.CINEON_TONE_MAPPING = '';
