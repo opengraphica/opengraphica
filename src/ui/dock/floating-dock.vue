@@ -4,7 +4,8 @@
             ref="dockElement"
             class="og-floating-dock"
             :class="{
-                'og-floating-dock--visible': props.visible
+                'og-floating-dock--visible': props.visible,
+                'og-floating-dock--mobile-fullscreen': props.mobileFullscreen,
             }"
             :style="{
                 transform: `translate(${left}px, ${top}px)`,
@@ -37,6 +38,8 @@ import vPointer from '@/directives/pointer';
 import canvasStore from '@/store/canvas';
 import editorStore, { type FloatingDockRect } from '@/store/editor';
 
+const mobileBreakpoint = 550;
+
 type RectPosition = Omit<FloatingDockRect, 'id' | 'width' | 'height' | 'order'>;
 
 const props = defineProps({
@@ -51,6 +54,10 @@ const props = defineProps({
     visible: {
         type: Boolean,
         default: true,
+    },
+    mobileFullscreen: {
+        type: Boolean,
+        default: false,
     }
 });
 
@@ -99,6 +106,7 @@ onUnmounted(() => {
 });
 
 watch(() => [props.top, props.left], (newProps, oldProps) => {
+    if (props.mobileFullscreen && window.innerWidth < mobileBreakpoint) return;
     if (newProps[0] !== oldProps?.[0] || newProps[1] !== oldProps?.[1]) {
         top.value = props.top;
         left.value = props.left;
@@ -106,6 +114,7 @@ watch(() => [props.top, props.left], (newProps, oldProps) => {
 }, { immediate: true });
 
 watch([dndAreaLeft, dndAreaTop, dndAreaWidth, dndAreaHeight], () => {
+    if (props.mobileFullscreen && window.innerWidth < mobileBreakpoint) return;
     calculateBoundingBox();
     nextTick(limitDragBounds);
 }, { immediate: true });
@@ -122,6 +131,7 @@ watch(() => editorStore.state.floatingDockRects.length, (newLength, oldLength) =
 
 function placeAtBottomCenter() {
     if (props.left !== 0 || props.top !== 0) return;
+    if (props.mobileFullscreen && window.innerWidth < mobileBreakpoint) return;
 
     const rects = editorStore.get('floatingDockRects');
     const dndTop = dndAreaTop.value / devicePixelRatio;
@@ -196,6 +206,7 @@ function placeAtBottomCenter() {
 
 function calculateBoundingBox() {
     if (!dockElement.value) return;
+    if (props.mobileFullscreen && window.innerWidth < mobileBreakpoint) return;
     boundingBox = dockElement.value.getBoundingClientRect();
     floatingDockRect.left = left.value;
     floatingDockRect.top = top.value;
@@ -204,6 +215,8 @@ function calculateBoundingBox() {
 }
 
 function limitDragBounds() {
+    if (props.mobileFullscreen && window.innerWidth < mobileBreakpoint) return;
+
     const dndTop = dndAreaTop.value / devicePixelRatio;
     const dndLeft = dndAreaLeft.value / devicePixelRatio;
     const dndWidth = dndAreaWidth.value / devicePixelRatio;

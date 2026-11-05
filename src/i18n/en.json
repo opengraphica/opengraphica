@@ -437,7 +437,7 @@
         },
         "chroma": {
             "name": "Chroma",
-            "help": "Changes how colorful the image is, also called \"saturation\" in some contexts.\n\n* **Adjust Chroma Contrast** - Pixels that are already a higher chroma are affected more than desaturated pixels.\n* **Evenly Adjust Chroma** - The chroma levels of all pixels are adjusted with the same amount.",
+            "help": "Changes how colorful the image is, similar to \"saturation\" in some contexts.\n\n* **Adjust Chroma Contrast** - Pixels that are already a higher chroma are affected more than lower chroma pixels.\n* **Evenly Adjust Chroma** - The chroma levels of all pixels are adjusted with the same amount.",
             "param": {
                 "chroma": "Chroma",
                 "mode": "Mode",
@@ -1066,7 +1066,7 @@
                     "example": "Removing a green screen background from an image."
                 },
                 "erase": {
-                    "description": "Erases the bottom layer where the top layer is opaque.",
+                    "description": "Erases the bottom layers where the top layer is opaque.",
                     "example": "Removing unwanted objects in a photo by erasing those areas."
                 },
                 "merge": {
@@ -1386,6 +1386,10 @@
                 "layerEffectBrowser": {
                     "name": "Effect Browser",
                     "description": "Adds image effects to the currently selected layer(s) or layer group(s)."
+                },
+                "layerEffectEdit": {
+                    "name": "Edit Effect",
+                    "description": "Edit an effect"
                 }
             }
         },

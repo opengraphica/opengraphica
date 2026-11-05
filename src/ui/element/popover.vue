@@ -36,7 +36,7 @@
 </template>
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { arrow, flip, offset, useFloating } from '@floating-ui/vue';
+import { arrow, flip, offset, shift, useFloating } from '@floating-ui/vue';
 
 import vPointer from '@/directives/pointer';
 
@@ -85,7 +85,14 @@ const { floatingStyles, middlewareData, placement } = useFloating(
             offset(props.offset != null ? props.offset : (props.arrow ? 6 : 0)),
             flip({
                 fallbackAxisSideDirection: 'end',
+                fallbackPlacements: [
+                    'bottom-start', 'bottom', 'bottom-end',
+                    'top-start', 'top', 'top-end',
+                    'left-start', 'left', 'left-end',
+                    'right-start', 'right', 'right-end',
+                ]
             }),
+            shift(),
         ],
     },
 );

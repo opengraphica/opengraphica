@@ -499,13 +499,11 @@ async function initialSetup() {
                 if (!beforeCanvasCtx) {
                     throw new Error('module.layerEffectBrowser.generationErrorGeneral');
                 }
-                beforeCanvasCtx.setTransform(selectedLayer.transform.scale(layerWidth / targetWidth, layerHeight / targetHeight).invertSelf());
-
                 const renderer = await useRenderer();
-                const layerBitmap = await renderer.takeSnapshot(workingFileStore.state.width, workingFileStore.state.height, {
+                const layerBitmap = await renderer.takeSnapshot(targetWidth, targetHeight, {
                     layerIds: [selectedLayer.id],
                     filters: [],
-                    // disableBackground: true, // TODO - renderer generates weird output
+                    disableBackground: true,
                 });
                 beforeCanvasCtx.drawImage(layerBitmap, 0, 0);
                 layerBitmap.close();

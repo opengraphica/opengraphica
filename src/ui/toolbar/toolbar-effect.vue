@@ -104,7 +104,13 @@
                 </el-popover>
             </el-horizontal-scrollbar-arrows>
         </div>
-        <floating-dock v-if="effectSettingsDockVisible" v-model:top="effectSettingsDockTop" v-model:left="effectSettingsDockLeft" :visible="floatingDocksVisible">
+        <floating-dock
+            v-if="effectSettingsDockVisible"
+            v-model:top="effectSettingsDockTop"
+            v-model:left="effectSettingsDockLeft"
+            :visible="floatingDocksVisible"
+            mobile-fullscreen
+        >
             <div class="w-1 h-8">
                 <div class="absolute right-4 gap-2 flex flex-row items-center justify-end w-full">
                     <span v-if="isMobileView && (isSelectionMaskAvailable || isMaskApplied)" class="text-sm">
@@ -151,7 +157,7 @@
                             :reference="moreInfoButton?.$el"
                         >
                             <span
-                                class="og-popover__content og-rich-text max-w-100 text-sm"
+                                class="og-popover__content og-rich-text max-w-70 md:max-w-100 text-sm"
                                 v-html="micromark(t(currentFilterHelpText))"
                             />
                         </og-popover>
@@ -460,40 +466,33 @@ async function onEditLayerFilter(layer: WorkingFileAnyLayer<ColorModel>, filterI
     isEditEffectPopoverVisible.value = false;
     effectSettingsDockVisible.value = false;
 
-    if (window.innerWidth < 500) {
-        runModule('layer', 'layerEffectEdit', {
-            layerId: layer.id,
-            filterIndex
-        });
-    } else {
-        await nextTick();
+    await nextTick();
 
-        generatedMaskId.value = undefined;
-        removedMaskId.value = undefined;
-        editingLayer.value = layer;
-        editingFilter.value = layer.filters[filterIndex];
-        editingFilterIndex.value = filterIndex;
-        editingFilterEnabled.value = !editingFilter.value.disabled;
-        editingFilterRendererClass.value = new (await getCanvasFilterClass(editingFilter.value.name))();
-        editingFilterConfig.value = editingFilterRendererClass.value.getEditConfig();
+    generatedMaskId.value = undefined;
+    removedMaskId.value = undefined;
+    editingLayer.value = layer;
+    editingFilter.value = layer.filters[filterIndex];
+    editingFilterIndex.value = filterIndex;
+    editingFilterEnabled.value = !editingFilter.value.disabled;
+    editingFilterRendererClass.value = new (await getCanvasFilterClass(editingFilter.value.name))();
+    editingFilterConfig.value = editingFilterRendererClass.value.getEditConfig();
 
-        for (const paramName in editingFilterParams) {
-            if (editingFilterParams.hasOwnProperty(paramName)) {
-                delete editingFilterParams[paramName];
-            }
+    for (const paramName in editingFilterParams) {
+        if (editingFilterParams.hasOwnProperty(paramName)) {
+            delete editingFilterParams[paramName];
         }
-        
-        for (const paramName in editingFilterConfig.value) {
-            const paramConfig = editingFilterConfig.value[paramName];
-            editingFilterParams[paramName] = editingFilter.value.params[paramName] ?? paramConfig.default;
-        }
-
-        if (!effectSettingsDockVisible.value) {
-            effectSettingsDockTop.value = 0;
-            effectSettingsDockLeft.value = 0;
-        }
-        effectSettingsDockVisible.value = true;
     }
+    
+    for (const paramName in editingFilterConfig.value) {
+        const paramConfig = editingFilterConfig.value[paramName];
+        editingFilterParams[paramName] = editingFilter.value.params[paramName] ?? paramConfig.default;
+    }
+
+    if (!effectSettingsDockVisible.value) {
+        effectSettingsDockTop.value = 0;
+        effectSettingsDockLeft.value = 0;
+    }
+    effectSettingsDockVisible.value = true;
 }
 
 function onMoveLayerFilterUp(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {

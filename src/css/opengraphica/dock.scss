@@ -63,6 +63,14 @@
     height: 0;
     z-index: 5; // Must be greater than main
 
+    @media screen and (max-width: 550px) {
+        &:has(.og-floating-dock--mobile-fullscreen.og-floating-dock--visible) {
+            top: auto;
+            bottom: 0;
+            z-index: 12;
+        }
+    }
+
     .og-floating-dock {
         position: absolute;
         top: 0;
@@ -77,6 +85,28 @@
 
         &.og-floating-dock--visible {
             opacity: 1;
+
+            @media screen and (max-width: 550px) {
+                &.og-floating-dock--mobile-fullscreen {
+                    top: auto;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    border-radius: var(--og-border-radius-big) var(--og-border-radius-big) 0 0;
+                    transform: none !important;
+                    max-width: none !important;
+                    box-shadow: 0 -10px 15px -3px rgb(0 0 0 / 0.2), 0 -4px 6px -4px rgb(0 0 0 / 0.2);
+
+                    .og-floating-dock__grip {
+                        display: none;
+                    }
+
+                    .og-floating-dock__content {
+                        padding: 0.5rem 1rem 1.5rem 1rem;
+                        width: 100%;
+                    }
+                }
+            }
         }
     }
 

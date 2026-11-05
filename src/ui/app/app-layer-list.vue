@@ -635,20 +635,13 @@ function onStopRasterSequence() {
 }
 
 async function onEditLayerFilter(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
-    if (window.innerWidth < 500) {
-        runModule('layer', 'layerEffectEdit', {
-            layerId: layer.id,
-            filterIndex
-        });
+    await editorStore.dispatch('setActiveTool', { group: 'effect', tool: 'effect' });
+    if (isEffectToolbarVisible.value) {
+        effectEmitter.emit('editFilter', { layerId: layer.id, filterIndex });
     } else {
-        await editorStore.dispatch('setActiveTool', { group: 'effect', tool: 'effect' });
-        if (isEffectToolbarVisible.value) {
+        watch(() => isEffectToolbarVisible.value, () => {
             effectEmitter.emit('editFilter', { layerId: layer.id, filterIndex });
-        } else {
-            watch(() => isEffectToolbarVisible.value, () => {
-                effectEmitter.emit('editFilter', { layerId: layer.id, filterIndex });
-            }, { once: true });
-        }
+        }, { once: true });
     }
     emit('close');
 }

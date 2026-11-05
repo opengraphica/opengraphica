@@ -93,7 +93,8 @@ export async function exportAsImage(options: ExportAsImageOptions): Promise<Expo
             const renderer = await useRenderer();
 
             let canvas = document.createElement('canvas');
-            const { width, height } = workingFileStore.state;
+            const { width: fullWidth, height: fullHeight } = workingFileStore.state;
+            const { width, height } = limitMaxDimension(fullWidth, fullHeight, await renderer.getMaxTextureSize());
             canvas.width = width;
             canvas.height = height;
 
