@@ -1051,6 +1051,7 @@
             "layerTop": "Top Layer",
             "layerBottom": "Bottom Layer",
             "imageResult": "Result",
+            "exampleUsage": "Example Usage:",
             "blendingModeSummary": {
                 "normal": {
                     "description": "The top layer covers the bottom based on its opacity.",
@@ -1069,8 +1070,8 @@
                     "example": "Removing unwanted objects in a photo by erasing those areas."
                 },
                 "merge": {
-                    "description": "The top layer covers the bottom based on its opacity, but overlaping opacity that could add to be fully opaque are opaque.",
-                    "example": "Cutting a selected area from a photo and pasting it on a new layer, and you want the semi-transparent edges to disappear."
+                    "description": "The top layer covers the bottom based on its opacity, but it merges transparent edges together when the opacity values can add up to be opaque. Merging only works on top of a transparent background.",
+                    "example": "Cutting a selected area from a photo and pasting it in the same location on a new layer."
                 },
                 "lightenOnly": {
                     "description": "Keeps the lighter color in each R,G,B channel of the top and bottom layers.",
@@ -1166,7 +1167,7 @@
                 },
                 "divide": {
                     "description": "Divides the brightness of the top layer by the bottom.",
-                    "example": "Lightening an image dramatically, creating a glowing or ethereal effect. Can be used for exposure correction."
+                    "example": "Lighting up an image dramatically, creating a glowing or ethereal effect. Can be used for exposure correction."
                 },
                 "hue": {
                     "description": "Uses the hue of the top layer while preserving the chroma and lightness of the bottom layer.",
@@ -1182,11 +1183,11 @@
                 },
                 "lightness": {
                     "description": "Uses the lightness of the top layer while preserving the hue and chroma of the bottom layer.",
-                    "example": "Lightening or darkening an image while keeping the colors true."
+                    "example": "Lighting or darkening an image while keeping the original colors."
                 },
                 "luminance": {
                     "description": "Divides upper layer luminance by lower layer, then multiplies the result to the lower layer.",
-                    "example": "Lightening or darkening an image while keeping the colors true."
+                    "example": "Lighting or darkening an image while keeping the original colors."
                 }
             }
         },

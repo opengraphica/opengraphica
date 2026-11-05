@@ -114,20 +114,27 @@
                         </el-radio-group>
                     </el-scrollbar>
                 </div>
-                <div class="grow-1 pl-4">
+                <div class="flex flex-col justify-between grow-1 pl-4">
+                    <div>
+                        <p>{{ t(`module.layerBlendingMode.blendingModeSummary.${formData.blendingMode}.description`) }}</p>
+                        <p class="mt-4">
+                            <strong class="font-bold">{{ t('module.layerBlendingMode.exampleUsage') }}</strong><br>
+                            {{ t(`module.layerBlendingMode.blendingModeSummary.${formData.blendingMode}.example`) }}
+                        </p>
+                    </div>
                     <div class="flex flex-row items-center justify-center">
+                        <img :src="previewImages.top" class="og-module-layer-blending-mode__image-preview" :alt="t('module.layerBlendingMode.layerTop')" width="256" height="256">
+                        <span class="bi bi-plus text-3xl" />
+                        <img :src="previewImages.bottom" class="og-module-layer-blending-mode__image-preview" :alt="t('module.layerBlendingMode.layerBottom')" width="256" height="256">
+                        <span class="bi bi-arrow-right-short text-3xl" />
+                        <img :src="previewImages.result" class="og-module-layer-blending-mode__image-preview" :alt="t('module.layerBlendingMode.result')" width="256" height="256">
                         <div class="flex shrink-1 flex-col items-center">
-                            <img :src="previewImages.top" class="og-module-layer-blending-mode__image-preview" :alt="t('module.layerBlendingMode.layerTop')" width="256" height="256">
                             <div>
-                                <span class="bi bi-plus text-3xl" />
                             </div>
-                            <img :src="previewImages.bottom" class="og-module-layer-blending-mode__image-preview" :alt="t('module.layerBlendingMode.layerBottom')" width="256" height="256">
                         </div>
                         <div class="shrink-0 px-2">
-                            <span class="bi bi-arrow-right-short text-3xl" />
                         </div>
                         <div class="flex shrink-1 flex-col">
-                            <img :src="previewImages.result" class="og-module-layer-blending-mode__image-preview" :alt="t('module.layerBlendingMode.result')" width="256" height="256">
                         </div>
                     </div>
                 </div>

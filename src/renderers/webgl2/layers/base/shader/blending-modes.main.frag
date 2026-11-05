@@ -13,8 +13,12 @@
     gl_FragColor.rgb = blendTexture.rgb;
     gl_FragColor.a = clamp(blendTexture.a - (eraseFactor * gl_FragColor.a), 0.0, 1.0);
 #elif cLayerBlendingMode == BLENDING_MODE_MERGE
-    // TODO
-    gl_FragColor = vec4(1.0, 0.0, 0.0, blendTexture.a);
+    float topAlpha = gl_FragColor.a + blendTexture.a * (1.0 - gl_FragColor.a);
+    vec3 topPremultipliedColor =
+        gl_FragColor.rgb * gl_FragColor.a + blendTexture.rgb * (1.0 - gl_FragColor.a);
+    float topAlphaMask = step(0.99, gl_FragColor.a + blendTexture.a);
+    gl_FragColor.rgb = mix(gl_FragColor.rgb, topPremultipliedColor / max(topAlpha, 1e-6), topAlphaMask);
+    gl_FragColor.a = mix(gl_FragColor.a, 1.0, topAlphaMask);
 #elif cLayerBlendingMode == BLENDING_MODE_LIGHTEN_ONLY
     gl_FragColor.r = max(gl_FragColor.r, blendTexture.r);
     gl_FragColor.g = max(gl_FragColor.g, blendTexture.g);
