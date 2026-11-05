@@ -520,7 +520,6 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
             magFilter: LinearFilter,
             format: RGBAFormat,
             depthBuffer: false,
-            colorSpace: SRGBColorSpace,
             stencilBuffer: false,
         });
 
@@ -631,29 +630,31 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         this.rendererBusy = false;
 
         const buffer = new Uint8Array(imageWidth * imageHeight * 4);
-        await this.renderer.readRenderTargetPixelsAsync(snapshotRenderTarget, 0, 0, imageWidth, imageHeight, buffer);
+        if (this.snapshotComposer) {
+            await this.renderer.readRenderTargetPixelsAsync(this.snapshotComposer.readBuffer, 0, 0, imageWidth, imageHeight, buffer);
 
-        const MAX_CPU_PREMULTIPLIED_ALPHA_FIX_SIZE = 4096;
-        if (
-            (
-                options?.disableBackground
-                || this.imageBackground.getAlpha() < 1
-            )
-            && imageWidth < MAX_CPU_PREMULTIPLIED_ALPHA_FIX_SIZE
-            && imageHeight < MAX_CPU_PREMULTIPLIED_ALPHA_FIX_SIZE
-        ) {
-            for (let i = 0; i < buffer.length; i += 4) {
-                const alpha = buffer[i + 3] / 255;
-                if (alpha > 0) {
-                    buffer[i] = Math.min(255, Math.round(
-                        linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i] / 255) / alpha) * 255
-                    ));
-                    buffer[i + 1] = Math.min(255, Math.round(
-                        linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i + 1] / 255) / alpha) * 255
-                    ));
-                    buffer[i + 2] = Math.min(255, Math.round(
-                        linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i + 2] / 255) / alpha) * 255
-                    ));
+            const MAX_CPU_PREMULTIPLIED_ALPHA_FIX_SIZE = 4096;
+            if (
+                (
+                    options?.disableBackground
+                    || this.imageBackground.getAlpha() < 1
+                )
+                && imageWidth < MAX_CPU_PREMULTIPLIED_ALPHA_FIX_SIZE
+                && imageHeight < MAX_CPU_PREMULTIPLIED_ALPHA_FIX_SIZE
+            ) {
+                for (let i = 0; i < buffer.length; i += 4) {
+                    const alpha = buffer[i + 3] / 255;
+                    if (alpha > 0) {
+                        buffer[i] = Math.min(255, Math.round(
+                            linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i] / 255) / alpha) * 255
+                        ));
+                        buffer[i + 1] = Math.min(255, Math.round(
+                            linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i + 1] / 255) / alpha) * 255
+                        ));
+                        buffer[i + 2] = Math.min(255, Math.round(
+                            linearSrgbChannelToSrgbChannel(srgbChannelToLinearSrgbChannel(buffer[i + 2] / 255) / alpha) * 255
+                        ));
+                    }
                 }
             }
         }
