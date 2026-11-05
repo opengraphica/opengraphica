@@ -12,6 +12,9 @@
     float eraseFactor = hueDelta * (1.0 - lightnessDelta) * (1.0 - chromaDelta);
     gl_FragColor.rgb = blendTexture.rgb;
     gl_FragColor.a = clamp(blendTexture.a - (eraseFactor * gl_FragColor.a), 0.0, 1.0);
+#elif cLayerBlendingMode == BLENDING_MODE_MERGE
+    // TODO
+    gl_FragColor = vec4(1.0, 0.0, 0.0, blendTexture.a);
 #elif cLayerBlendingMode == BLENDING_MODE_LIGHTEN_ONLY
     gl_FragColor.r = max(gl_FragColor.r, blendTexture.r);
     gl_FragColor.g = max(gl_FragColor.g, blendTexture.g);

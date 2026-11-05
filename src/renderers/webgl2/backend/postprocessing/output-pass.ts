@@ -9,10 +9,11 @@ import {
     ACESFilmicToneMapping,
     NeutralToneMapping,
     CustomToneMapping,
-    SRGBTransfer
+    SRGBTransfer,
 } from 'three';
 import { Pass, FullScreenQuad } from './pass';
 import { OutputShader } from './output-shader';
+import type { ImageBackground } from '../image-background';
 
 /**
  * This pass is responsible for including tone mapping and color space conversion
@@ -33,8 +34,10 @@ import { OutputShader } from './output-shader';
 class OutputPass extends Pass {
 
     isOutputPass!: boolean;
+    defines!: any;
     uniforms!: any;
     material!: any;
+    imageBackground: ImageBackground;
     _fsQuad!: any;
     _outputColorSpace!: any;
     _toneMapping!: any;
@@ -42,9 +45,11 @@ class OutputPass extends Pass {
     /**
      * Constructs a new output pass.
      */
-    constructor() {
+    constructor(imageBackground: ImageBackground) {
 
         super();
+
+        this.imageBackground = imageBackground;
 
         /**
          * This flag indicates that this is an output pass.
@@ -98,10 +103,17 @@ class OutputPass extends Pass {
 
         this.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
         this.uniforms[ 'toneMappingExposure' ].value = renderer.toneMappingExposure;
+        this.uniforms[ 'backgroundColor' ].value = this.imageBackground.backgroundMaterial.uniforms.color.value;
+        this.uniforms[ 'transparencyGridMap' ].value = this.imageBackground.backgroundMaterial.uniforms.transparencyGridMap.value;
+        this.uniforms[ 'backgroundTileSizeOpacityDimensions' ].value.y = this.imageBackground.backgroundMaterial.uniforms.opacity.value;
+        this.uniforms[ 'backgroundTileSizeOpacityDimensions' ].value.z = readBuffer.texture.width;
+        this.uniforms[ 'backgroundTileSizeOpacityDimensions' ].value.w = readBuffer.texture.height;
+
+        const cTransparencyEnabled = this.imageBackground.backgroundMaterial.defines.cTransparencyEnabled;
 
         // rebuild defines if required
 
-        if ( this._outputColorSpace !== renderer.outputColorSpace || this._toneMapping !== renderer.toneMapping ) {
+        if ( this._outputColorSpace !== renderer.outputColorSpace || this._toneMapping !== renderer.toneMapping || cTransparencyEnabled !== this.material.defines.cTransparencyEnabled ) {
 
             this._outputColorSpace = renderer.outputColorSpace;
             this._toneMapping = renderer.toneMapping;
@@ -110,6 +122,7 @@ class OutputPass extends Pass {
 
             if ( ColorManagement.getTransfer( this._outputColorSpace ) === SRGBTransfer ) this.material.defines.SRGB_TRANSFER = '';
 
+            this.material.defines.cTransparencyEnabled = cTransparencyEnabled;
             if ( this._toneMapping === LinearToneMapping ) this.material.defines.LINEAR_TONE_MAPPING = '';
             else if ( this._toneMapping === ReinhardToneMapping ) this.material.defines.REINHARD_TONE_MAPPING = '';
             else if ( this._toneMapping === CineonToneMapping ) this.material.defines.CINEON_TONE_MAPPING = '';
@@ -121,8 +134,6 @@ class OutputPass extends Pass {
             this.material.needsUpdate = true;
 
         }
-
-        //
 
         if ( this.renderToScreen === true ) {
 

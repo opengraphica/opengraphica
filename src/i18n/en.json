@@ -388,6 +388,7 @@
         "dissolve": "Dissolve",
         "colorErase": "Color Erase",
         "erase": "Erase",
+        "merge": "Merge",
         "lightenOnly": "Lighten Only",
         "lumaLightenOnly": "Luma Lighten Only",
         "screen": "Screen",
@@ -1066,6 +1067,10 @@
                 "erase": {
                     "description": "Erases the bottom layer where the top layer is opaque.",
                     "example": "Removing unwanted objects in a photo by erasing those areas."
+                },
+                "merge": {
+                    "description": "The top layer covers the bottom based on its opacity, but overlaping opacity that could add to be fully opaque are opaque.",
+                    "example": "Cutting a selected area from a photo and pasting it on a new layer, and you want the semi-transparent edges to disappear."
                 },
                 "lightenOnly": {
                     "description": "Keeps the lighter color in each R,G,B channel of the top and bottom layers.",

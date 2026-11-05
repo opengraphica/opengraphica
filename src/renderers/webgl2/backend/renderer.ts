@@ -357,22 +357,22 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
         currentScene.background = null;
         let currentSceneIsUsed = false;
 
-        if (this.imageBackground) {
-            this.imageBackground.swapScene(currentScene);
+        // if (this.imageBackground) {
+        //     this.imageBackground.swapScene(currentScene);
 
-            currentSceneIsUsed = true;
-            for (const topLevelLayer of this.layerOrder) {
-                if (topLevelLayer.blendingMode === 'erase') {
-                    currentSceneIsUsed = false;
-                    break;
-                }
-            }
-            if (!currentSceneIsUsed) {
-                passScenes.push(currentScene);
-                currentScene = new Scene();
-                currentScene.background = null;
-            }
-        }
+        //     currentSceneIsUsed = true;
+        //     for (const topLevelLayer of this.layerOrder) {
+        //         if (topLevelLayer.blendingMode === 'erase') {
+        //             currentSceneIsUsed = false;
+        //             break;
+        //         }
+        //     }
+        //     if (!currentSceneIsUsed) {
+        //         passScenes.push(currentScene);
+        //         currentScene = new Scene();
+        //         currentScene.background = null;
+        //     }
+        // }
 
         const stack: Array<WorkingFileLayer> = [
             { type: 'group', layers: this.layerOrder } as WorkingFileGroupLayer,
@@ -422,7 +422,7 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
 
         const msaaSamples = highQuality ? Math.min(this.maxMsaaSamples, 4) : this.msaaSamples;
 
-        composer.addPass(new OutputPass());
+        composer.addPass(new OutputPass(this.imageBackground));
         composer.renderTarget1.samples = msaaSamples;
         composer.renderTarget2.samples = msaaSamples;
         this.dirty = true;
@@ -554,8 +554,6 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
             if (this.imageBoundaryMask) {
                 this.imageBoundaryMask.visible = false;
             }
-
-            const imageBackgroundPreviousAlpha = this.imageBackground.backgroundMaterial.opacity;
 
             if (options?.disableBackground) {
                 this.imageBackground.hide();

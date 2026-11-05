@@ -14,6 +14,11 @@
         "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
         "result": "../images/module/layer/blending-mode/blend-demo-result-erase.png"
     },
+    "merge": {
+        "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
+        "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",
+        "result": "../images/module/layer/blending-mode/blend-demo-result-normal.png"
+    },
     "lightenOnly": {
         "top": "../images/module/layer/blending-mode/blend-demo-foreground-flower.png",
         "bottom": "../images/module/layer/blending-mode/blend-demo-apple.png",

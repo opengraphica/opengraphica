@@ -24,6 +24,9 @@
                             <el-radio-button label="erase">
                                 {{ t('layerBlendingMode.erase') }}
                             </el-radio-button>
+                            <el-radio-button label="merge">
+                                {{ t('layerBlendingMode.merge') }}
+                            </el-radio-button>
                             <el-radio-button label="lightenOnly" class="el-radio-button--section-break">
                                 {{ t('layerBlendingMode.lightenOnly') }}
                             </el-radio-button>

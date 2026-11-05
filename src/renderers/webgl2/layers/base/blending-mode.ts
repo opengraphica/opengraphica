@@ -82,6 +82,14 @@ export function assignMaterialBlendingMode(material: ShaderMaterial, layerBlendi
             blendEquationAlpha = null;
             blendSrcAlpha = null;
             blendDstAlpha = null;
+        case 'merge':
+            blending = CustomBlending;
+            blendEquation = AddEquation;
+            blendSrc = SrcAlphaFactor;
+            blendDst = OneMinusSrcAlphaFactor;
+            blendEquationAlpha = AddEquation;
+            blendSrcAlpha = OneFactor;
+            blendDstAlpha = OneMinusSrcAlphaFactor;
     }
 
     material.blending = blending;
