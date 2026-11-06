@@ -102,6 +102,9 @@
                         </div>
                     </template>
                 </el-popover>
+                <og-button outline small class="ml-3!" @click="onClickMergeEffects">
+                    <span class="bi bi-sign-merge-left mr-2" aria-hidden="true" /> {{ t('button.mergeEffects') }}
+                </og-button>
             </el-horizontal-scrollbar-arrows>
         </div>
         <floating-dock
@@ -335,6 +338,7 @@ import FloatingDock from '@/ui/dock/floating-dock.vue';
 import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { DeleteLayerFilterAction } from '@/actions/delete-layer-filter';
+import { RasterizeLayerAction } from '@/actions/rasterize-layer';
 import { ReorderLayerFiltersAction } from '@/actions/reorder-layer-filters';
 import { UpdateLayerFilterDisabledAction } from '@/actions/update-layer-filter-disabled';
 import { UpdateLayerFilterMaskAction } from '@/actions/update-layer-filter-mask';
@@ -493,6 +497,22 @@ async function onEditLayerFilter(layer: WorkingFileAnyLayer<ColorModel>, filterI
         effectSettingsDockLeft.value = 0;
     }
     effectSettingsDockVisible.value = true;
+}
+
+function onClickMergeEffects() {
+    const actions: RasterizeLayerAction[] = [];
+    for (const layerId of workingFileStore.state.selectedLayerIds) {
+        const layer = getLayerById(layerId);
+        if ((layer?.filters.length ?? 0) > 0) {
+            actions.push(new RasterizeLayerAction(layerId));
+        }
+    }
+    if (actions.length > 0) {
+        historyStore.dispatch('runAction', {
+            action: new BundleAction('rasterizeLayer', 'action.mergeEffects', actions),
+            blockInteraction: true,
+        });
+    }
 }
 
 function onMoveLayerFilterUp(layer: WorkingFileAnyLayer<ColorModel>, filterIndex: number) {
@@ -749,7 +769,6 @@ function onDelete() {
         return;
     }
     if (editingLayer.value) {
-
         renderer.overrideLayerFilterParams(
             editingLayer.value.id,
             editingFilterIndex.value,

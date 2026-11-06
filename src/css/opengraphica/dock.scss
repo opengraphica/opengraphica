@@ -64,7 +64,7 @@
     z-index: 5; // Must be greater than main
 
     @media screen and (max-width: 550px) {
-        &:has(.og-floating-dock--mobile-fullscreen.og-floating-dock--visible) {
+        &.og-floating-docks--has-visible-mobile-fullscreen {
             top: auto;
             bottom: 0;
             z-index: 12;

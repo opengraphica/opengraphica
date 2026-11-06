@@ -52,6 +52,8 @@ export interface FloatingDockRect {
     width: number;
     height: number;
     order: number;
+    mobileFullscreen: boolean;
+    visible: boolean;
 }
 
 interface EditorState {

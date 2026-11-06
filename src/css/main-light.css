@@ -9173,7 +9173,7 @@ body.og-full-page .opengraphica {
   z-index: 5;
 }
 @media screen and (max-width: 550px) {
-  .opengraphica .og-floating-docks:has(.og-floating-dock--mobile-fullscreen.og-floating-dock--visible) {
+  .opengraphica .og-floating-docks.og-floating-docks--has-visible-mobile-fullscreen {
     top: auto;
     bottom: 0;
     z-index: 12;
@@ -10559,11 +10559,14 @@ body.og-full-page .opengraphica {
   width: 100%;
 }
 .opengraphica .og-module-layer-blending-mode__image-preview {
+  display: block;
   background: url("../images/module/layer/blending-mode/blend-demo-transparent.png");
   border-radius: 0.75rem;
   width: 100%;
   height: auto;
   max-width: 10rem;
+  flex-grow: 1;
+  flex-shrink: 1;
 }
 .opengraphica .og-crop {
   position: relative;

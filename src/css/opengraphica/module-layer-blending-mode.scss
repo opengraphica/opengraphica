@@ -1,7 +1,10 @@
 .og-module-layer-blending-mode__image-preview {
+    display: block;
     background: url("../images/module/layer/blending-mode/blend-demo-transparent.png");
     border-radius: 0.75rem;
     width: 100%;
     height: auto;
     max-width: 10rem;
+    flex-grow: 1;
+    flex-shrink: 1;
 }

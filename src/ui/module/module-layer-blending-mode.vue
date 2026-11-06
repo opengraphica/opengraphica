@@ -12,7 +12,7 @@
             @submit="onConfirm"
         >
             <div class="flex">
-                <div style="max-height: 35vh">
+                <div class="max-h-[60vh] md:max-h-[35vh] max-h-[60dvh] md:max-h-[35dvh]">
                     <el-scrollbar>
                         <el-radio-group ref="blendingModeRadioGroup" v-model="formData.blendingMode" class="el-radio-group--vertical pr-3">
                             <el-radio-button label="normal">
@@ -122,19 +122,17 @@
                             {{ t(`module.layerBlendingMode.blendingModeSummary.${formData.blendingMode}.example`) }}
                         </p>
                     </div>
-                    <div class="flex flex-row items-center justify-center">
-                        <img :src="previewImages.top" class="og-module-layer-blending-mode__image-preview" :alt="t('module.layerBlendingMode.layerTop')" width="256" height="256">
+                    <div class="flex flex-row items-center justify-center mt-4">
+                        <div class="block grow-1 shrink-1">
+                            <img :src="previewImages.top" class="og-module-layer-blending-mode__image-preview" :alt="t('module.layerBlendingMode.layerTop')" width="256" height="256">
+                        </div>
                         <span class="bi bi-plus text-3xl" />
-                        <img :src="previewImages.bottom" class="og-module-layer-blending-mode__image-preview" :alt="t('module.layerBlendingMode.layerBottom')" width="256" height="256">
+                        <div class="block grow-1 shrink-1">
+                            <img :src="previewImages.bottom" class="og-module-layer-blending-mode__image-preview" :alt="t('module.layerBlendingMode.layerBottom')" width="256" height="256">
+                        </div>
                         <span class="bi bi-arrow-right-short text-3xl" />
-                        <img :src="previewImages.result" class="og-module-layer-blending-mode__image-preview" :alt="t('module.layerBlendingMode.result')" width="256" height="256">
-                        <div class="flex shrink-1 flex-col items-center">
-                            <div>
-                            </div>
-                        </div>
-                        <div class="shrink-0 px-2">
-                        </div>
-                        <div class="flex shrink-1 flex-col">
+                        <div class="block grow-1 shrink-1">
+                            <img :src="previewImages.result" class="og-module-layer-blending-mode__image-preview" :alt="t('module.layerBlendingMode.result')" width="256" height="256">
                         </div>
                     </div>
                 </div>

@@ -38,7 +38,11 @@
                 @wheel="onWheelMain"
             >
             </main>
-            <div ref="floatingDocksContainer" class="og-floating-docks" />
+            <div
+                ref="floatingDocksContainer"
+                class="og-floating-docks"
+                :class="{ 'og-floating-docks--has-visible-mobile-fullscreen': hasVisibleMobileFullscreenFloatingDock }"
+            />
             <aside ref="sidebarRightElement" aria-label="Right Sidebar" class="og-sidebar-right">
                 <template v-if="showDock && !isActiveToolbarExclusive && config.dock && dockPosition === 'right'">
                     <app-layout-dock :config="config.dock" layout-placement="right" @resize="onResizeLayout" />
@@ -159,6 +163,9 @@ const isCanvasInteractable = computed<boolean>(() => {
 });
 const menuBarPosition = computed<string>(() => {
     return preferencesStore.state.menuBarPosition;
+});
+const hasVisibleMobileFullscreenFloatingDock = computed<boolean>(() => {
+    return !!editorStore.state.floatingDockRects.find((rect) => rect.visible && rect.mobileFullscreen);
 });
 
 let resizeDebounceHandle: number | undefined = undefined;

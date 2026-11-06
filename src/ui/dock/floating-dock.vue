@@ -40,7 +40,7 @@ import editorStore, { type FloatingDockRect } from '@/store/editor';
 
 const mobileBreakpoint = 550;
 
-type RectPosition = Omit<FloatingDockRect, 'id' | 'width' | 'height' | 'order'>;
+type RectPosition = Omit<FloatingDockRect, 'id' | 'width' | 'height' | 'order' | 'visible' | 'mobileFullscreen'>;
 
 const props = defineProps({
     top: {
@@ -83,7 +83,17 @@ const floatingDockRect: FloatingDockRect = reactive({
     width: 0,
     height: 0,
     order: 0,
+    visible: false,
+    mobileFullscreen: false,
 });
+
+watch(() => props.visible, (visible) => {
+    floatingDockRect.visible = visible;
+}, { immediate: true });
+
+watch(() => props.mobileFullscreen, (mobileFullscreen) => {
+    floatingDockRect.mobileFullscreen = mobileFullscreen;
+}, { immediate: true });
 
 onMounted(() => {
     calculateBoundingBox();

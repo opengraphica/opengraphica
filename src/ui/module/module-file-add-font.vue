@@ -67,7 +67,7 @@
                             </span>
                             <span class="flex flex-col grow-1">
                                 <span
-                                    class="flex items-end text-nowrap text-base h-6"
+                                    class="text-nowrap whitespace-nowrap text-base h-6"
                                     :style="{ 'font-family': 'Google Font Preview ' + googleFontItem.family + ', sans-serif' }"
                                 >The quick brown fox jumps over the lazy dog.</span>
                                 <span class="text-sm text-(--el-color-info)">{{ googleFontItem.family }}</span>
