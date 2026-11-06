@@ -86,6 +86,7 @@ export async function openFromFileDialog(options: FileDialogOpenOptions = {}): P
         let fileHandles: FileSystemFileHandle[];
         try {
             fileHandles = await window.showOpenFilePicker({
+                multiple: true,
                 types: [
                     {
                         description: 'Images / Videos',
