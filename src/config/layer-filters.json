@@ -86,6 +86,10 @@
         "group": "blur"
     },
 
+    "cylinderBend": {
+        "name": "layerFilter.cylinderBend.name",
+        "group": "distort"
+    },
     "emboss": {
         "name": "layerFilter.emboss.name",
         "group": "distort"

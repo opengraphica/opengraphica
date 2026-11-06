@@ -491,6 +491,15 @@
                 "middleGray": "Middle Gray"
             }
         },
+        "cylinderBend": {
+            "name": "Cylinder Bend",
+            "help": "Wraps the image around a 3D cylinder. Useful for scenarios like attaching paper signs to poles, etc.\n\n* **Rotation** - Rotates the cylinder around the x-axis. This can be combined with the layer's z-axis rotation to achieve any display angle.\n* **Perspective** - 0% is viewed from an infinite distance and 100% is very close.\n* **View Position** - Shifts the view point up or down, which changes the perspective.",
+            "param": {
+                "rotation": "Rotation",
+                "perspective": "Perspective",
+                "viewPosition": "View Position"
+            }
+        },
         "decreaseColorDepth": {
             "name": "Decrease Color Depth"
         },

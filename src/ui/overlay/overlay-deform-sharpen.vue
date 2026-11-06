@@ -37,10 +37,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, toRefs } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch, toRefs } from 'vue';
 import { brushShape, brushSize, cursorHoverPosition, cursorHoverAngle } from '@/canvas/store/deform-sharpen-state';
 
 import { Clipper, PolyType, ClipType, Paths, PolyFillType } from '@/lib/clipper';
+import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
 import { findPointListBounds } from '@/lib/math';
 
 import canvasStore from '@/store/canvas';
@@ -84,29 +85,7 @@ const drawPreviewStrokeWidth = computed<number>(() => {
 });
 
 watch(() => workingFileStore.state.selectedLayerIds, () => {
-    const layers = getSelectedLayers();
-    
-    if (layers.length > 0) {
-        const clipper = new Clipper();
-        for (const [layerIndex, layer] of layers.entries()) {
-            const path = getLayerBoundingPoints(layer);
-            clipper.AddPath(path, layerIndex === 0 ? PolyType.ptSubject : PolyType.ptClip, true);
-        }
-        const solution: Paths = [];
-        clipper.Execute(ClipType.ctUnion, solution, PolyFillType.pftEvenOdd, PolyFillType.pftEvenOdd);
-
-        selectedLayerBoundaryPoints.value = solution.map((solutions) => {
-            return solutions.map(({ x, y }) => new DOMPoint(x, y));
-        });
-    } else {
-        selectedLayerBoundaryPoints.value = [];
-    }
-    const bounds = findPointListBounds(selectedLayerBoundaryPoints.value.flat());
-    bounds.left -= 10;
-    bounds.right += 10;
-    bounds.top -= 10;
-    bounds.bottom += 10;
-    selectedLayerBounds.value = bounds;
+    calculateSelectedLayerBounds();
 }, { immediate: true });
 
 watch([selectedLayerBounds, selectedLayerBoundaryPoints, viewDirty], () => {
@@ -135,4 +114,49 @@ watch([cursorHoverPosition], () => {
     transformedCursorHoverX.value = point.x;
     transformedCursorHoverY.value = point.y;
 });
+
+onMounted(() => {
+    appEmitter.on('editor.history.step', onHistoryStep);
+});
+
+onUnmounted(() => {
+    appEmitter.off('editor.history.step', onHistoryStep);
+});
+
+function onHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
+    if (!event) return;
+    if (
+        event.action.id === 'freeTransform'
+        || event.action.id === 'rotateLayerClockwise'
+        || event.action.id === 'rotateLayerCounterclockwise'
+    ) {
+        calculateSelectedLayerBounds();
+    }
+}
+
+function calculateSelectedLayerBounds() {
+    const layers = getSelectedLayers();
+    
+    if (layers.length > 0) {
+        const clipper = new Clipper();
+        for (const [layerIndex, layer] of layers.entries()) {
+            const path = getLayerBoundingPoints(layer);
+            clipper.AddPath(path, layerIndex === 0 ? PolyType.ptSubject : PolyType.ptClip, true);
+        }
+        const solution: Paths = [];
+        clipper.Execute(ClipType.ctUnion, solution, PolyFillType.pftEvenOdd, PolyFillType.pftEvenOdd);
+
+        selectedLayerBoundaryPoints.value = solution.map((solutions) => {
+            return solutions.map(({ x, y }) => new DOMPoint(x, y));
+        });
+    } else {
+        selectedLayerBoundaryPoints.value = [];
+    }
+    const bounds = findPointListBounds(selectedLayerBoundaryPoints.value.flat());
+    bounds.left -= 10;
+    bounds.right += 10;
+    bounds.top -= 10;
+    bounds.bottom += 10;
+    selectedLayerBounds.value = bounds;
+}
 </script>

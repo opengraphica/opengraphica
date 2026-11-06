@@ -21,9 +21,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, toRefs } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch, toRefs } from 'vue';
 
 import { Clipper, PolyType, ClipType, Paths, PolyFillType } from '@/lib/clipper';
+import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
 import { findPointListBounds } from '@/lib/math';
 
 import canvasStore from '@/store/canvas';
@@ -64,6 +65,48 @@ const svgPathStrokeDashArray = computed<number>(() => {
 
 
 watch(() => workingFileStore.state.selectedLayerIds, () => {
+    calculateSelectedLayerBounds();
+}, { immediate: true });
+
+watch([selectedLayerBounds, selectedLayerBoundaryPoints, viewDirty], () => {
+    const svgPaths: string[] = [];
+    for (const path of selectedLayerBoundaryPoints.value) {
+        const transformedPoints = path.map((point) => {
+            return point.matrixTransform(new DOMMatrix().scale(1 / devicePixelRatio).multiply(transform.value));
+        });
+        if (transformedPoints.length > 1) {
+            let draw = 'M' + transformedPoints[0].x + ' ' + transformedPoints[0].y;
+            for (let i = 1; i < transformedPoints.length; i++) {
+                const point = transformedPoints[i];
+                draw += ' L ' + point.x + ' ' + point.y;
+            }
+            draw += ' z';
+            svgPaths.push(draw);
+        }
+    }
+    selectedLayerSvgPaths.value = svgPaths;
+});
+
+onMounted(() => {
+    appEmitter.on('editor.history.step', onHistoryStep);
+});
+
+onUnmounted(() => {
+    appEmitter.off('editor.history.step', onHistoryStep);
+});
+
+function onHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
+    if (!event) return;
+    if (
+        event.action.id === 'freeTransform'
+        || event.action.id === 'rotateLayerClockwise'
+        || event.action.id === 'rotateLayerCounterclockwise'
+    ) {
+        calculateSelectedLayerBounds();
+    }
+}
+
+function calculateSelectedLayerBounds() {
     const layers = getSelectedLayers();
     
     if (layers.length > 0) {
@@ -87,24 +130,5 @@ watch(() => workingFileStore.state.selectedLayerIds, () => {
     bounds.top -= 10;
     bounds.bottom += 10;
     selectedLayerBounds.value = bounds;
-}, { immediate: true });
-
-watch([selectedLayerBounds, selectedLayerBoundaryPoints, viewDirty], () => {
-    const svgPaths: string[] = [];
-    for (const path of selectedLayerBoundaryPoints.value) {
-        const transformedPoints = path.map((point) => {
-            return point.matrixTransform(new DOMMatrix().scale(1 / devicePixelRatio).multiply(transform.value));
-        });
-        if (transformedPoints.length > 1) {
-            let draw = 'M' + transformedPoints[0].x + ' ' + transformedPoints[0].y;
-            for (let i = 1; i < transformedPoints.length; i++) {
-                const point = transformedPoints[i];
-                draw += ' L ' + point.x + ' ' + point.y;
-            }
-            draw += ' z';
-            svgPaths.push(draw);
-        }
-    }
-    selectedLayerSvgPaths.value = svgPaths;
-});
+}
 </script>

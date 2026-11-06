@@ -430,7 +430,10 @@ onUnmounted(() => {
     appEmitter.off('editor.tool.toolbarSwapping', onToolbarSwap);
     appEmitter.off('editor.history.beforeStep', onHistoryBeforeStep);
     appEmitter.off('editor.history.step', onHistoryStep);
-    effectSettingsDockVisible.value = false;
+    if (effectSettingsDockVisible.value) {
+        onConfirm();
+        effectSettingsDockVisible.value = false;
+    }
 });
 
 function onToolbarSwap() {
