@@ -71,7 +71,11 @@
         "updateShapeStrokeColor": "Actualizar el color de la forma",
         "updateShapeStrokeWidth": "Actualización Shape Stroke Width",
         "updateSharpenLayer": "Sharpen Layer",
-        "updateVectorLayerAttributes": "Update Vector Layer"
+        "updateVectorLayerAttributes": "Update Vector Layer",
+        "convertVectorShapesToPaths": "Convertir Forma en Camino",
+        "flipLayerX": "Flip Layer Horizontal",
+        "flipLayerY": "Flip Layer Vertical",
+        "mergeEffects": "Efectos de fusión"
     },
     "app": {
         "colorPickerGradient": {
@@ -126,7 +130,8 @@
                 "text": "Capa de texto",
                 "vector": "Vector Layer",
                 "video": "Video capa"
-            }
+            },
+            "deleteSelection": "Eliminar la selección"
         },
         "wait": {
             "applyLayerTransform": "Transformación de capas",
@@ -188,7 +193,10 @@
         "moreInfo": "Más información",
         "dontUpdate": "No Actualice",
         "enable": "Habilitación",
-        "updateApp": "Actualizar la aplicación"
+        "updateApp": "Actualizar la aplicación",
+        "add": "Añadir",
+        "mergeEffects": "Efectos de fusión",
+        "selectFiles": "Seleccione archivos..."
     },
     "canvas": {
         "toolbar": {
@@ -234,7 +242,7 @@
                 "menu": {
                     "cropResize": "Cultivos y tamaño",
                     "convertLayers": {
-                        "groupTitle": "Convertir Capas...",
+                        "groupTitle": "Convertir All Layers...",
                         "toImageSequence": "A la secuencia de imágenes",
                         "flatten": "Aplanado a nueva capa",
                         "toCollage": "A Collage"
@@ -242,7 +250,12 @@
                     "cut": "Corte",
                     "copy": "Copiado",
                     "copyAllLayers": "Copiar todas las capas",
-                    "paste": "Pegado"
+                    "paste": "Pegado",
+                    "transformLayers": {
+                        "groupTitle": "Transform Layer...",
+                        "flipX": "Flip Horizontal",
+                        "flipY": "Flip Vertical"
+                    }
                 }
             },
             "view": {
@@ -377,7 +390,8 @@
                 "brightness": "Brillo",
                 "effectiveRange": "Rango",
                 "effectiveRangeFeather": "Feather"
-            }
+            },
+            "help": "Cambia el brillo de la imagen usando uno de 3 modos diferentes:\n* **Adjust Gamma** - Similar al entorno de exposición de una cámara.\n* **Black/White Shift** - mueve todos los colores hacia el blanco o negro puro.\n* **Adjust Luminance** - Cambia el valor de ligereza perceptual en el espacio color Oklab.\n\nEl ajuste **Range** ajusta los valores ligeros o oscuros, y el ajuste **Feather** funciona en combinación con el **Range** para suavizar la transición."
         },
         "chroma": {
             "name": "Chroma",
@@ -388,7 +402,8 @@
                     "multiply": "Contraste de croma ajustado",
                     "shift": "Ajustar uniformemente el croma"
                 }
-            }
+            },
+            "help": "Cambia lo colorida que es la imagen, similar a la \"saturación\" en algunos contextos.\n\n* **Contrato de croma ajustable** - Los píxeles que ya son un croma más alto se ven afectados más que los píxeles de croma más bajos.\n* **Evenly Adjust Chroma** - Los niveles de croma de todos los píxeles se ajustan con la misma cantidad."
         },
         "colorBlindness": {
             "name": "Ciego de color",
@@ -443,7 +458,8 @@
                     "value": "= max(R,G,B)"
                 },
                 "mix": "Mezcla"
-            }
+            },
+            "help": "Elimina todo color de la imagen, utilizando una de muchas fórmulas diferentes para calcular el brillo de los colores originales."
         },
         "hue": {
             "name": "Hue",
@@ -454,7 +470,9 @@
                     "perceptualRgb": "RGB perceptual",
                     "linearRgb": "Linear RGB"
                 },
-                "rotate": "Rotación"
+                "rotate": "Rotación",
+                "targetColor": "Color de destino",
+                "targetRange": "Rango"
             }
         },
         "negative": {
@@ -469,7 +487,8 @@
                 "invertGreen": "Invert Green Channel",
                 "invertBlue": "Invert Blue Channel",
                 "invertValue": "Valor de inversión"
-            }
+            },
+            "help": "Invierte canales de color específicos en la imagen, donde los valores altos se convierten en valores bajos y viceversa.\n\nEl ** Espacio Color** determina si el invertido ocurre antes o después de la corrección gamma."
         },
         "saturation": {
             "name": "Saturación",
@@ -490,12 +509,15 @@
                     "linearRgb": "Linear RGB"
                 },
                 "mix": "Mezcla"
-            }
+            },
+            "name": "Mapa de experiencia",
+            "help": "Saca todos los colores en la imagen con colores de un gradiente que especifique, basado en el brillo de los colores originales en la imagen.\n\nEl ** Espacio Color** cambia cómo se interpolan los valores intermedios entre las paradas del gradiente. **Oklab** es generalmente la opción más precisa."
         },
         "instagram1997": {
             "param": {
                 "mix": "Mezcla"
-            }
+            },
+            "name": "1997"
         },
         "instagramAden": {
             "name": "Aden",
@@ -561,7 +583,102 @@
             "param": {
                 "white": "Color neutro"
             },
-            "name": "Balanza blanca"
+            "name": "Balanza blanca",
+            "help": "Ajuste la imagen como si el especificado **Neutral Color** se supone que es blanco.\n\nLas cámaras pueden cambiar los colores hacia el teal o la naranja dependiendo de las condiciones de iluminación, sin igualar lo que realmente ves en la vida real."
+        },
+        "emboss": {
+            "name": "Emboss",
+            "help": "Simula la apariencia 3D de la encarnación física, como presionar un diseño en papel o metal.\n\n* **Angle** - Controla la dirección de la luz y la sombra.\n* **Elevación** - Aumenta la altura de la zona encarnada, aumentando la fuerza de las luces y sombras.",
+            "param": {
+                "type": "Tipo",
+                "typeOption": {
+                    "blend": "Blend",
+                    "heightmap": "Altura"
+                },
+                "angle": "Angle",
+                "elevation": "Elevation"
+            }
+        },
+        "filmGrain": {
+            "name": "Grado de película",
+            "help": "Simula el aspecto de la película subexpuesta o zoom en película con grandes tamaños de grano.\n\n* **Intensidad** - Aumenta la visibilidad del grano.\n* ** Escala de grano** - Aumenta el tamaño del grano en relación con el tamaño del píxel.\n* **Seed** - El número aleatorio utilizado para generar el patrón de grano.\n* **Blend Mode** - Determina cómo se fusiona el grano con la imagen. El modo normal es físicamente correcto, los otros modos son para efecto artístico.",
+            "param": {
+                "blendMode": "Modo Blend",
+                "blendModeOption": {
+                    "normal": "Normal",
+                    "subtract": "Subtract",
+                    "add": "Añadir"
+                },
+                "grainScale": "Escala de granos",
+                "grayscale": "Grayscale",
+                "intensity": "Intensidad",
+                "seed": "Semillas"
+            }
+        },
+        "monteCarloBlur": {
+            "name": "Monte Carlo Blur",
+            "help": "Simula el tipo de borrón ruidoso que vería al tomar una fotografía en baja luz con una cámara real.\n\n* **Iteraciones** - ¿Cuántos rayos de luz son computados por píxel.\nEl radio del borrón.",
+            "param": {
+                "iterations": "Iteraciones",
+                "iterationsOption": {
+                    "1": "1",
+                    "2": "2",
+                    "4": "4",
+                    "8": "8",
+                    "16": "16",
+                    "32": "32",
+                    "64": "64"
+                },
+                "size": "Tamaño"
+            }
+        },
+        "pixelize": {
+            "name": "Pixelize",
+            "help": "Cubre el detalle de imagen con grandes cuadrados que parecen una rejilla de píxel.",
+            "param": {
+                "size": "Tamaño",
+                "offsetX": "Offset X",
+                "offsetY": "Offset Y"
+            }
+        },
+        "spread": {
+            "name": "Spread",
+            "help": "Cambia los píxeles horizontal o verticalmente en un patrón de ruido aleatorio.",
+            "param": {
+                "horizontal": "Horizontal",
+                "vertical": "Vertical",
+                "seed": "Semillas"
+            }
+        },
+        "tiltShiftBlur": {
+            "name": "Tilt Shift Blur",
+            "help": "Simula el efecto de la profundidad poco profunda del campo a escalas microscópicas o una cámara especializada de inclinación de inclinación.\n\n* **Blur Radius** - La cantidad máxima de borrón aplicada a las áreas borrosas.\n* **Gradient Radius** - El tamaño del gradiente de áreas no azuladas a borrosas.\n* **Angle** - La rotación de la zona no azulada.\n* **Offset** - La posición de la zona virgen, offset del centro.",
+            "param": {
+                "blurRadius": "Blur Radius",
+                "gradientRadius": "Radius gradiente",
+                "angle": "Angle",
+                "offset": "Offset"
+            }
+        },
+        "whirlPinch": {
+            "name": "Whirl & Pinch",
+            "help": "Twists & pinches a circular area of the image.\n\nLa rotación del giro.\n* **Pinch** - La fuerza de pellizcar o expandir.\n* **Radius** - El radio del círculo que determina el área afectada.",
+            "param": {
+                "whirl": "Whirl",
+                "pinch": "Pinch",
+                "radius": "Radius",
+                "centerX": "Centro X",
+                "centerY": "Center Y"
+            }
+        },
+        "zoomBlur": {
+            "name": "Zoom Blur",
+            "help": "Simula el desdibujo de una técnica fotográfica llamada una explosión **zoom**.\n\nMás alto **La fuerza** da un borrón más fuerte, representando una velocidad de obturación más lenta o una exposición más larga.",
+            "param": {
+                "strength": "Fuerza",
+                "centerX": "Centro X",
+                "centerY": "Center Y"
+            }
         }
     },
     "layerFilterGroup": {
@@ -582,6 +699,9 @@
         },
         "sharpen": {
             "name": "Sharpen"
+        },
+        "noise": {
+            "name": "Noise"
         }
     },
     "layoutShortcutGroup": {
@@ -907,7 +1027,7 @@
                     "example": "Eliminación de un fondo de pantalla verde de una imagen."
                 },
                 "erase": {
-                    "description": "Borra la capa inferior donde la capa superior es opaca.",
+                    "description": "Borra las capas inferiores donde la capa superior es opaca.",
                     "example": "Eliminación de objetos no deseados en una foto borrando esas áreas."
                 },
                 "lightenOnly": {
@@ -1020,13 +1140,18 @@
                 },
                 "lightness": {
                     "description": "Utiliza la ligereza de la capa superior preservando el tono y el croma de la capa inferior.",
-                    "example": "Iluminar o o oscurecer una imagen manteniendo los colores verdaderos."
+                    "example": "Iluminar o o oscurecer una imagen manteniendo los colores originales."
                 },
                 "luminance": {
                     "description": "Divide la luminancia de capa superior por capa inferior, luego multiplica el resultado a la capa inferior.",
-                    "example": "Iluminar o o oscurecer una imagen manteniendo los colores verdaderos."
+                    "example": "Iluminar o o oscurecer una imagen manteniendo los colores originales."
+                },
+                "merge": {
+                    "description": "La capa superior cubre la parte inferior basada en su opacidad, pero fusiona los bordes transparentes juntos cuando los valores de opacidad pueden agregarse a ser opacos. Merging sólo funciona sobre un fondo transparente.",
+                    "example": "Cortar un área seleccionada de una foto y pegarlo en la misma ubicación en una nueva capa."
                 }
-            }
+            },
+            "exampleUsage": "Ejemplo de uso:"
         },
         "designSystem": {
             "title": "Sistema de diseño"
@@ -1075,6 +1200,20 @@
             "notificationReadyMessage": "La actualización se instalará cuando cambie a otra aplicación.",
             "notificationErrorTitle": "Actualizar el error",
             "notificationErrorMessage": "Se produjo un error al descargar la actualización. Por favor, intente de nuevo más tarde."
+        },
+        "fileAddFont": {
+            "title": "Agregar fuente",
+            "search": "Búsqueda",
+            "searchPlaceholder": "Buscar Google Fonts...",
+            "offlineFontSearch": "Tu dispositivo está fuera de línea. Necesita conectarse a Internet para buscar fuentes. Todavía puede buscar archivos de fuentes utilizando el botón \"Select Files...\" a continuación.",
+            "noFontsFound": "No hay fuentes encontradas con esos criterios de búsqueda.",
+            "uploadFontParseError": "Se produjo un error al analizar una o más de las fuentes seleccionadas."
+        },
+        "imageTransform": {
+            "noLayersSelected": {
+                "title": "No hay capas seleccionadas",
+                "message": "Seleccione al menos una capa en el muelle de capas para transformar. Algunos tipos de capas no se pueden transformar."
+            }
         }
     },
     "moduleGroup": {
@@ -1141,6 +1280,10 @@
                 "shareImage": {
                     "name": "Compartir imagen",
                     "description": "Comparte la imagen actual que estás editando con otras personas."
+                },
+                "addFont": {
+                    "name": "Agregar fuente",
+                    "description": "Añadir una fuente al archivo."
                 }
             }
         },
@@ -1193,7 +1336,17 @@
                 "convertLayersToCollage": {
                     "name": "Convertir Capas en Collage",
                     "description": "Convierte las capas seleccionadas en un collage de imagen. Hay muchos diseños de collage diferentes disponibles."
-                }
+                },
+                "flipLayersX": {
+                    "name": "Flip X",
+                    "description": "Las capas seleccionadas Flip en el eje x de la imagen."
+                },
+                "flipLayersY": {
+                    "name": "Flip Y",
+                    "description": "Las capas seleccionadas Flip en el eje y de la imagen."
+                },
+                "rotateLayersClockwise": {},
+                "rotateLayersCounterclockwise": {}
             }
         },
         "layer": {
@@ -1211,6 +1364,9 @@
                 "blendingMode": {
                     "name": "Modo de fusión de capa de cambio",
                     "description": "Cambiar el modo de mezcla de la capa activa."
+                },
+                "layerEffectEdit": {
+                    "description": "Editar un efecto"
                 }
             }
         },
@@ -1386,7 +1542,8 @@
                 "wrapDirection": "Wrap"
             },
             "fillColor": "Color de relleno",
-            "paletteCount": "Palette Count"
+            "paletteCount": "Palette Count",
+            "addFont": "Añadir Font..."
         },
         "zoom": {
             "zoomOut": "Zoom Out",
@@ -1473,7 +1630,8 @@
                 "noLayersSelected": "Por favor seleccione una o más capas en el muelle de capas para editar sus efectos.",
                 "layerHasNoEffects": "Esta capa no tiene efectos.",
                 "deleteEffect": "Eliminar el efecto"
-            }
+            },
+            "maskHeading": "Máscara:"
         },
         "eraseBrush": {
             "brushSize": "Tamaño",
@@ -1576,6 +1734,10 @@
                         "mouse": "Haga clic y arrastre en un área vacía para añadir nuevas formas."
                     }
                 }
+            },
+            "actions": {
+                "title": "Acciones",
+                "convertToPath": "Convertir Forma en Camino"
             }
         },
         "deformSharpen": {

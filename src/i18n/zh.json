@@ -71,7 +71,11 @@
         "updateShapeStrokeColor": "更新形状弦颜色",
         "updateShapeStrokeWidth": "更新形状弦宽",
         "updateSharpenLayer": "锐化层",
-        "updateVectorLayerAttributes": "更新矢量层"
+        "updateVectorLayerAttributes": "更新矢量层",
+        "convertVectorShapesToPaths": "将形状转换为路径",
+        "flipLayerX": "水平翻转图层",
+        "flipLayerY": "垂直翻转图层",
+        "mergeEffects": "合并效果"
     },
     "app": {
         "colorPickerGradient": {
@@ -126,7 +130,8 @@
                 "text": "文本层",
                 "vector": "矢量层",
                 "video": "视频层"
-            }
+            },
+            "deleteSelection": "删除选择"
         },
         "wait": {
             "applyLayerTransform": "应用图层变换",
@@ -188,7 +193,10 @@
         "moreInfo": "更多信息",
         "dontUpdate": "不要更新",
         "enable": "启用",
-        "updateApp": "更新 App"
+        "updateApp": "更新 App",
+        "add": "添加",
+        "mergeEffects": "合并效果",
+        "selectFiles": "选择文件..."
     },
     "canvas": {
         "toolbar": {
@@ -234,7 +242,7 @@
                 "menu": {
                     "cropResize": "作物和调整大小",
                     "convertLayers": {
-                        "groupTitle": "转换图层...",
+                        "groupTitle": "转换全部图层...",
                         "toImageSequence": "到图像序列",
                         "flatten": "平移到新层",
                         "toCollage": "到拼贴"
@@ -242,7 +250,12 @@
                     "cut": "剪切",
                     "copy": "复制",
                     "copyAllLayers": "复制所有图层",
-                    "paste": "粘贴"
+                    "paste": "粘贴",
+                    "transformLayers": {
+                        "groupTitle": "变换图层...",
+                        "flipX": "水平翻转",
+                        "flipY": "垂直翻转"
+                    }
                 }
             },
             "view": {
@@ -377,7 +390,8 @@
                 "brightness": "亮度",
                 "effectiveRange": "范围",
                 "effectiveRangeFeather": "羽毛"
-            }
+            },
+            "help": "使用三个不同模式之一改变图像的亮度 :\n* ** Adjust Gamma** - 类似于相机的曝光设定.\n* ** 黑色/ 白色 Shift ** - 所有颜色均向纯黑色或白色移动。\n* ** Just Luminance** - 改变奥克拉布色彩空间中的感光值.\n\n**Range**设定调整了哪些光值或暗值受到影响,**Feather**设定与**Range**组合工作,以平缓过渡."
         },
         "chroma": {
             "name": "克罗玛",
@@ -388,7 +402,8 @@
                     "multiply": "调整色相对比度",
                     "shift": "平衡调整色相"
                 }
-            }
+            },
+            "help": "改变图像的色彩,与某些上下文中的\"饱和\"相似.\n\n* ** Adjust Chroma Controlst** - 已经是较高染色体的像素受到的影响大于较低的染色体像素.\n* 《大会正式记录,第五十八届会议,补编第5号》(A/C.6/61/Rev.1)。 ** 甚至调整铬** - 所有像素的铬水平按相同数额调整."
         },
         "colorBlindness": {
             "name": "颜色盲度",
@@ -443,7 +458,8 @@
                     "value": "=最大值(R,G,B)"
                 },
                 "mix": "混合"
-            }
+            },
+            "help": "从图像中删除所有颜色,使用许多不同的公式之一计算原始颜色的亮度."
         },
         "hue": {
             "name": "色调",
@@ -454,7 +470,9 @@
                     "perceptualRgb": "概念 RGB",
                     "linearRgb": "线性 RGB"
                 },
-                "rotate": "旋转"
+                "rotate": "旋转",
+                "targetColor": "目标颜色",
+                "targetRange": "范围"
             }
         },
         "negative": {
@@ -469,7 +487,8 @@
                 "invertGreen": "倒转绿色频道",
                 "invertBlue": "倒转蓝色频道",
                 "invertValue": "倒转值"
-            }
+            },
+            "help": "反转图像中的特定颜色通道,其中高值变为低值,反之亦然.\n\n**Color Space**确定反转发生在伽玛校正之前还是之后."
         },
         "saturation": {
             "name": "饱和度",
@@ -490,12 +509,15 @@
                     "linearRgb": "线性 RGB"
                 },
                 "mix": "混合"
-            }
+            },
+            "name": "渐变地图",
+            "help": "根据图像中原有颜色的亮度,用您指定的梯度将图像中的所有颜色相换。\n\n**Color Space**改变梯度上各站之间的中间值如何插值。 ** Oklab** 通常是最准确的选择."
         },
         "instagram1997": {
             "param": {
                 "mix": "混合"
-            }
+            },
+            "name": "1997年统计"
         },
         "instagramAden": {
             "name": "亚丁",
@@ -561,7 +583,102 @@
             "param": {
                 "white": "中性颜色"
             },
-            "name": "白色余额"
+            "name": "白色余额",
+            "help": "将图像调整为指定的** Neutral Color** 实际应该是白色。\n\n相机可以根据照明条件将颜色转换为Teal或橙色,而不是与现实生活中实际看到的相匹配."
+        },
+        "emboss": {
+            "name": "浮雕",
+            "help": "模拟物理浮雕的3D外观,如将设计压入纸张或金属.\n\n***昂格尔** - 控制光和阴影的方向.\n***Elevation** — 揭开浮雕地区的高度,增加灯光和阴影的强度.",
+            "param": {
+                "type": "类型",
+                "typeOption": {
+                    "blend": "组合",
+                    "heightmap": "高度图"
+                },
+                "angle": "角度",
+                "elevation": "升迁"
+            }
+        },
+        "filmGrain": {
+            "name": "电影谷物",
+            "help": "模拟曝光度低的胶片或以大粒大小的胶片放大的外观.\n\n***强度**-提高谷物的能见度。\n* ** Grain Scale** - 相对于像素大小增加谷物大小.\n* **种子** - 用来生成谷物图案的随机数.\n* ** Blend Mode** - 确定谷物如何与图像合并。 正常模式在物理上是正确的,其他模式用于艺术效果.",
+            "param": {
+                "blendMode": "混合模式",
+                "blendModeOption": {
+                    "normal": "常规",
+                    "subtract": "减法",
+                    "add": "添加"
+                },
+                "grainScale": "谷物规模",
+                "grayscale": "灰度图",
+                "intensity": "强度",
+                "seed": "种子"
+            }
+        },
+        "monteCarloBlur": {
+            "name": "蒙特卡洛模糊",
+            "help": "模拟用真相机在低光下拍摄照片时会看到的噪音模糊类型。\n\n* ** 重复** - 每个像素计算出多少光线。\n***Size** - 模糊的半径.",
+            "param": {
+                "iterations": "迭代数",
+                "iterationsOption": {
+                    "1": "页:1",
+                    "2": "2个",
+                    "4": "页:1",
+                    "8": "第8条",
+                    "16": "第 16 条",
+                    "32": "第32条",
+                    "64": "64个"
+                },
+                "size": "大小"
+            }
+        },
+        "pixelize": {
+            "name": "像素化",
+            "help": "用像素网格外观的大型方块来覆盖图像细节.",
+            "param": {
+                "size": "大小",
+                "offsetX": "偏转 X",
+                "offsetY": "偏转 Y"
+            }
+        },
+        "spread": {
+            "name": "展开",
+            "help": "以随机噪声模式水平或垂直移动像素.",
+            "param": {
+                "horizontal": "水平",
+                "vertical": "垂直",
+                "seed": "种子"
+            }
+        },
+        "tiltShiftBlur": {
+            "name": "倾斜移动模糊",
+            "help": "模拟显微尺度或专用照相机倾斜转镜头的浅深场效应。\n\n* **Blur半径** - 模糊区域的最大模糊度。\n* ** 大半径** - 梯度的大小,从未模糊到模糊。\n* ** 昂格尔** -- -- 未爆炸区域的旋转。\n* ** Offset** - 位于无蓝地区的位置,由中央抵消.",
+            "param": {
+                "blurRadius": "模糊半径",
+                "gradientRadius": "渐变半径",
+                "angle": "角度",
+                "offset": "折换"
+            }
+        },
+        "whirlPinch": {
+            "name": "扭动和键",
+            "help": "切除图像的圆形区域( C) 。\n\n***胡适** - 扭矩的旋转.\n* ** 弹簧** - 挤或膨胀的强度。\n* ** Radius** - 决定受影响地区的圆形半径.",
+            "param": {
+                "whirl": "旋转",
+                "pinch": "键",
+                "radius": "半径",
+                "centerX": "中点 X",
+                "centerY": "中点 Y"
+            }
+        },
+        "zoomBlur": {
+            "name": "缩放模糊",
+            "help": "从一种叫做**zo爆**的摄影技术中模拟模糊.\n\n更高的**Strength**使模糊度更强,代表了更慢的百叶窗速度或更长的曝光时间.",
+            "param": {
+                "strength": "强度",
+                "centerX": "中点 X",
+                "centerY": "中点 Y"
+            }
         }
     },
     "layerFilterGroup": {
@@ -582,6 +699,9 @@
         },
         "sharpen": {
             "name": "锐化"
+        },
+        "noise": {
+            "name": "噪声"
         }
     },
     "layoutShortcutGroup": {
@@ -905,7 +1025,7 @@
                     "example": "从图像中删除绿色屏幕背景 ."
                 },
                 "erase": {
-                    "description": "擦除顶层不透明的底层.",
+                    "description": "清除顶层不透明的底层.",
                     "example": "通过去除那些区域去除照片中不想要的物品."
                 },
                 "lightenOnly": {
@@ -1002,7 +1122,7 @@
                 },
                 "divide": {
                     "description": "将顶层的亮度除以底.",
-                    "example": "大幅点亮一个图像,产生发光或电光效应. 可用于曝光矫正."
+                    "example": "大幅点亮一个图像, 产生发光或乙醚效应。 可用于曝光矫正."
                 },
                 "hue": {
                     "description": "在保留下层染色体和光度的同时使用顶层的色调.",
@@ -1018,13 +1138,18 @@
                 },
                 "lightness": {
                     "description": "使用顶层的光度,同时保留底层的hue和铬.",
-                    "example": "点亮或暗化图像同时保持颜色真实性."
+                    "example": "在保持原色的同时点亮或暗化图像."
                 },
                 "luminance": {
                     "description": "将上层光度除以下层,然后将结果乘以下层.",
-                    "example": "点亮或暗化图像同时保持颜色真实性."
+                    "example": "在保持原色的同时点亮或暗化图像."
+                },
+                "merge": {
+                    "description": "顶层根据它的不透明性覆盖底部,但当不透明值可以加起来不透明时,它会将透明边缘合并在一起. 合并只在透明背景上起作用.",
+                    "example": "从照片中剪切一个选定区域,并粘贴在同一位置上一个新的层."
                 }
-            }
+            },
+            "exampleUsage": "示例使用法:"
         },
         "designSystem": {
             "title": "设计系统"
@@ -1073,6 +1198,20 @@
             "notificationReadyMessage": "当您切换到另一个应用程序时, 更新将被安装 .",
             "notificationErrorTitle": "更新错误",
             "notificationErrorMessage": "下载更新时发生错误 。 请稍候再试."
+        },
+        "fileAddFont": {
+            "title": "添加字体",
+            "search": "搜索",
+            "searchPlaceholder": "搜索 Google 字体...",
+            "offlineFontSearch": "你的装置断线了 您需要连接到互联网来搜索字体 。 您可以使用下面的“ 选择文件... ” 按钮浏览字体文件 .",
+            "noFontsFound": "没有找到带有此搜索条件的字体 .",
+            "uploadFontParseError": "解析选中的一个或多个字体时发生错误 ."
+        },
+        "imageTransform": {
+            "noLayersSelected": {
+                "title": "未选择图层",
+                "message": "选择要转换的至少一层。 某些层类型是不能改变的."
+            }
         }
     },
     "moduleGroup": {
@@ -1139,6 +1278,10 @@
                 "shareImage": {
                     "name": "共享图像",
                     "description": "与其他人分享您正在编辑的当前图像 ."
+                },
+                "addFont": {
+                    "name": "添加字体",
+                    "description": "向文件添加字体 ."
                 }
             }
         },
@@ -1191,7 +1334,17 @@
                 "convertLayersToCollage": {
                     "name": "将图层转换为拼接",
                     "description": "将所选图层转换为图像拼接。 现有许多不同的拼接布局."
-                }
+                },
+                "flipLayersX": {
+                    "name": "翻转 X",
+                    "description": "在图像的 x 轴上翻转选中的图层 ."
+                },
+                "flipLayersY": {
+                    "name": "翻转 Y",
+                    "description": "在图像的 y 轴上翻转选中的层 ."
+                },
+                "rotateLayersClockwise": {},
+                "rotateLayersCounterclockwise": {}
             }
         },
         "layer": {
@@ -1209,6 +1362,9 @@
                 "blendingMode": {
                     "name": "更改层混合模式",
                     "description": "改变活动层的混合模式."
+                },
+                "layerEffectEdit": {
+                    "description": "编辑效果"
                 }
             }
         },
@@ -1383,7 +1539,8 @@
                 "wrapDirection": "环绕"
             },
             "fillColor": "填充颜色",
-            "paletteCount": "调色板计数"
+            "paletteCount": "调色板计数",
+            "addFont": "添加字体..."
         },
         "zoom": {
             "zoomOut": "缩小",
@@ -1470,7 +1627,8 @@
                 "noLayersSelected": "请在地层对接处选择一个或多个地层以编辑其效果 .",
                 "layerHasNoEffects": "这层没有影响.",
                 "deleteEffect": "删除效果"
-            }
+            },
+            "maskHeading": "遮罩 :"
         },
         "eraseBrush": {
             "brushSize": "大小",
@@ -1573,6 +1731,10 @@
                         "mouse": "单击并拖动空区域添加新形状."
                     }
                 }
+            },
+            "actions": {
+                "title": "行动",
+                "convertToPath": "将形状转换为路径"
             }
         },
         "deformSharpen": {

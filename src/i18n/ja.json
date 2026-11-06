@@ -71,7 +71,11 @@
         "updateShapeStrokeColor": "更新の形の打撃色",
         "updateShapeStrokeWidth": "更新の形の打撃の幅",
         "updateSharpenLayer": "鋭い層",
-        "updateVectorLayerAttributes": "ベクトル層の更新"
+        "updateVectorLayerAttributes": "ベクトル層の更新",
+        "convertVectorShapesToPaths": "形状をパスに変換する",
+        "flipLayerX": "フリップ層 横",
+        "flipLayerY": "フリップ層縦",
+        "mergeEffects": "マージ効果"
     },
     "app": {
         "colorPickerGradient": {
@@ -126,7 +130,8 @@
                 "text": "テキストレイヤー",
                 "vector": "ベクトル層",
                 "video": "ビデオ層"
-            }
+            },
+            "deleteSelection": "選択を削除"
         },
         "wait": {
             "applyLayerTransform": "レイヤー変換を適用",
@@ -188,7 +193,10 @@
         "moreInfo": "詳細情報",
         "dontUpdate": "更新しないでください",
         "enable": "アクセス",
-        "updateApp": "更新アプリ"
+        "updateApp": "更新アプリ",
+        "add": "追加する",
+        "mergeEffects": "マージ効果",
+        "selectFiles": "ファイルの選択..."
     },
     "canvas": {
         "toolbar": {
@@ -234,7 +242,7 @@
                 "menu": {
                     "cropResize": "クロップとリサイズ",
                     "convertLayers": {
-                        "groupTitle": "レイヤーを変換...",
+                        "groupTitle": "すべてのレイヤーを変換...",
                         "toImageSequence": "画像シーケンスへ",
                         "flatten": "新しい層に平らに",
                         "toCollage": "コラージュへ"
@@ -242,7 +250,12 @@
                     "cut": "カット",
                     "copy": "コピー",
                     "copyAllLayers": "すべてのレイヤーをコピーする",
-                    "paste": "ペースト"
+                    "paste": "ペースト",
+                    "transformLayers": {
+                        "groupTitle": "レイヤーを変換...",
+                        "flipX": "フリップ横",
+                        "flipY": "フリップ縦"
+                    }
                 }
             },
             "view": {
@@ -377,7 +390,8 @@
                 "brightness": "明るさ",
                 "effectiveRange": "レンジ",
                 "effectiveRangeFeather": "フェザー"
-            }
+            },
+            "help": "3つのモードの1つを使用して画像の明るさを変更します。\n* **カメラの露出設定と同様にGamma**を調節して下さい。\n***ブラック/ホワイトシフト** - 純粋な黒または白にすべての色を移動する。\n***Lumance**を調節して下さい-Oklab色のスペースのperceptual lightnessの価値を変えて下さい。\n\n**Range** の設定は、光や暗い値が影響を受け、**Feather** の設定は、**Range** と組み合わせて動作し、移行を円滑にします."
         },
         "chroma": {
             "name": "クロマ",
@@ -388,7 +402,8 @@
                     "multiply": "Chromaのコントラストを調節して下さい",
                     "shift": "クロマを均等に調節して下さい"
                 }
-            }
+            },
+            "help": "いくつかの文脈で「飽和」と似ている画像のカラフルを変更する。\n\n*** Chroma Contrast を調節します** - 既に高い chroma がより低い chroma ピクセル以上影響されるピクセル。\n* 必須 **Chroma** を常に調整 - すべてのピクセルの chroma レベルは同じ量で調整されます."
         },
         "colorBlindness": {
             "name": "色目隠し",
@@ -443,7 +458,8 @@
                     "value": "= 最高(R、G、B)"
                 },
                 "mix": "ミックス"
-            }
+            },
+            "help": "元の色の明るさを計算するために、多くの異なる式のいずれかを使用して、画像からすべての色を削除します."
         },
         "hue": {
             "name": "ログイン",
@@ -454,7 +470,9 @@
                     "perceptualRgb": "許容RGB",
                     "linearRgb": "リニアRGB"
                 },
-                "rotate": "回転率"
+                "rotate": "回転率",
+                "targetColor": "ターゲット色",
+                "targetRange": "レンジ"
             }
         },
         "negative": {
@@ -469,7 +487,8 @@
                 "invertGreen": "インバーター緑のチャネル",
                 "invertBlue": "青いチャネルを転換して下さい",
                 "invertValue": "価値を転換して下さい"
-            }
+            },
+            "help": "特定のカラーチャネルを画像に変換し、高い値が低値になり、その逆に逆転させます。\n\n**Color Space**は、ガンマ補正前後の反転が起こるかどうかを決定します."
         },
         "saturation": {
             "name": "飽和",
@@ -490,12 +509,15 @@
                     "linearRgb": "リニアRGB"
                 },
                 "mix": "ミックス"
-            }
+            },
+            "name": "グラデーションマップ",
+            "help": "画像の元の色の明るさに基づいて、指定したグラデーションから色ですべての色をスワッピングします。\n\n**Color Space** は、勾配の停止の中間値が補間される方法を変更します。 **Oklab**は、一般的に最も正確なオプションです."
         },
         "instagram1997": {
             "param": {
                 "mix": "ミックス"
-            }
+            },
+            "name": "1997年(平成9年)"
         },
         "instagramAden": {
             "name": "アデン",
@@ -561,7 +583,102 @@
             "param": {
                 "white": "中立色"
             },
-            "name": "白いバランス"
+            "name": "白いバランス",
+            "help": "指定された**Neutral Color**が実際に白くなるとイメージを調整します。\n\nカメラは、実際に実際の生活の中で見ているものに一致しない、照明条件に応じて、茶やオレンジ色に色をシフトすることができます."
+        },
+        "emboss": {
+            "name": "エンボス",
+            "help": "紙や金属にデザインをプレスするなど、物理的なエンボスの3D外観を模倣します。\n\n***アングル** - 光と影の方向を制御します。\n***Elevation** - 浮体部の高さを上げ、光と影の強さを高めます.",
+            "param": {
+                "type": "タイプ:",
+                "typeOption": {
+                    "blend": "ログイン",
+                    "heightmap": "ハイマップ"
+                },
+                "angle": "アングル",
+                "elevation": "関連する"
+            }
+        },
+        "filmGrain": {
+            "name": "フィルムグライン",
+            "help": "粒径が大きいフィルムで包まれたフィルムかズームレンズの一見を模倣して下さい。\n\n***強度** - 穀物の可視性を高めます。\n***Grain Scale** - ピクセルサイズに相対的な粒度を増加させます。\n***Seed** - 穀物パターンを生成するために使用される乱数。\n***Blend Mode** - 粒が画像と融合する方法を決定します。 通常のモードは物理的に正しい、他のモードは芸術的な効果のためです.",
+            "param": {
+                "blendMode": "ブレンドモード",
+                "blendModeOption": {
+                    "normal": "ノーマル",
+                    "subtract": "サブトラクト",
+                    "add": "追加する"
+                },
+                "grainScale": "穀物スケール",
+                "grayscale": "グレースケール",
+                "intensity": "インテンシティ",
+                "seed": "シード"
+            }
+        },
+        "monteCarloBlur": {
+            "name": "モンテカルロ・ブラザー",
+            "help": "本物のカメラで低光で写真を撮るときに見える騒々しいブラーの型を模倣します。\n\n* **Iterations** - ピクセルごとに光の光の何光が計算されるか。\n*** サイズ** - 毛穴の半径.",
+            "param": {
+                "iterations": "ツイート",
+                "iterationsOption": {
+                    "1": "1",
+                    "2": "2",
+                    "4": "3",
+                    "8": "8月8日",
+                    "16": "16 日",
+                    "32": "32 の",
+                    "64": "64 の 64"
+                },
+                "size": "サイズ:"
+            }
+        },
+        "pixelize": {
+            "name": "ピクセル化",
+            "help": "ピクセルグリッドのように見える大きな正方形の画像の詳細をカバーします.",
+            "param": {
+                "size": "サイズ:",
+                "offsetX": "オフセットX",
+                "offsetY": "オフセット Y"
+            }
+        },
+        "spread": {
+            "name": "スプレッド",
+            "help": "ピクセルを水平方向または垂直方向にランダムなノイズパターンでシフトします.",
+            "param": {
+                "horizontal": "水平方向",
+                "vertical": "プロフィール",
+                "seed": "シード"
+            }
+        },
+        "tiltShiftBlur": {
+            "name": "チルトシフトブラー",
+            "help": "微細スケールや特殊なカメラチルトシフトレンズでフィールドの浅い深さの効果を模倣します。\n\n***ブルーラディウス** - 漂白領域に適用されるブルルの最大量。\n***Gradient Radius** - グラデーションのサイズが不明確に、ぼやけた領域に。\n***アングル** - 未燃領域の回転。\n***Offset** - 中心からのオフセットの残骸区域の位置.",
+            "param": {
+                "blurRadius": "Blurの半径",
+                "gradientRadius": "勾配半径",
+                "angle": "アングル",
+                "offset": "オフセット"
+            }
+        },
+        "whirlPinch": {
+            "name": "ワール&ピンチ",
+            "help": "ツイスト&ピンチ画像の円形領域。\n\n* **ワール** - ねじれの回転。\n***ピンチ** - ピンチまたは拡大の強さ。\n***Radius** - 影響を受ける領域を決定する円の半径.",
+            "param": {
+                "whirl": "ログイン",
+                "pinch": "ピンチ",
+                "radius": "ラディウス",
+                "centerX": "センターX",
+                "centerY": "センター Y"
+            }
+        },
+        "zoomBlur": {
+            "name": "ズームブラー",
+            "help": "**ズームバースト**と呼ばれる写真技術からブラーを模倣します。\n\nHigher **Strength**は、より遅いシャッター速度またはより長い露出を表す、より強いブラーを与えます.",
+            "param": {
+                "strength": "強み",
+                "centerX": "センターX",
+                "centerY": "センター Y"
+            }
         }
     },
     "layerFilterGroup": {
@@ -582,6 +699,9 @@
         },
         "sharpen": {
             "name": "シャープン"
+        },
+        "noise": {
+            "name": "ノイズ"
         }
     },
     "layoutShortcutGroup": {
@@ -907,7 +1027,7 @@
                     "example": "画像から緑色の画面の背景を削除します."
                 },
                 "erase": {
-                    "description": "上層が不透明である下層を消去します.",
+                    "description": "上層が不透明である底層を消去します.",
                     "example": "これらの領域を消去することにより、写真内の不要なオブジェクトを除去します."
                 },
                 "lightenOnly": {
@@ -1004,7 +1124,7 @@
                 },
                 "divide": {
                     "description": "最下層の明るさを分割します.",
-                    "example": "画像を劇的に明るくし、輝きやエーテル効果を生み出します。 露出補正に使用できます."
+                    "example": "画像を劇的にアップし、輝きやエーテル効果を生み出します。 露出補正に使用できます."
                 },
                 "hue": {
                     "description": "最下の層のクロムそして明るさを維持している間上の層のhueを使用して下さい.",
@@ -1020,13 +1140,18 @@
                 },
                 "lightness": {
                     "description": "最下層の色合いと色彩を維持しながらトップ層の明るさを使用します.",
-                    "example": "色を真に保ちながらイメージを明るくしたり暗くしたりします."
+                    "example": "元の色を保ちながら、イメージを薄暗くする."
                 },
                 "luminance": {
                     "description": "層の低い層によって上部の層の輝度を分け、それからより低い層に結果をmultiplies.",
-                    "example": "色を真に保ちながらイメージを明るくしたり暗くしたりします."
+                    "example": "元の色を保ちながら、イメージを薄暗くする."
+                },
+                "merge": {
+                    "description": "上層は、その不透明度に基づいて底面をカバーしていますが、不透明度値が不透明になるまで追加できるときに一緒に透明なエッジを結合します。 透明な背景の上にのみ作業をマージします.",
+                    "example": "写真から選択した領域を切断し、新しいレイヤーの同じ場所に貼り付けます."
                 }
-            }
+            },
+            "exampleUsage": "使用法例:"
         },
         "designSystem": {
             "title": "デザインシステム"
@@ -1075,6 +1200,20 @@
             "notificationReadyMessage": "別のアプリに切り替えるとアップデートがインストールされます.",
             "notificationErrorTitle": "エラーの更新",
             "notificationErrorMessage": "アップデートのダウンロード中にエラーが発生しました。 もう一度お試しください."
+        },
+        "fileAddFont": {
+            "title": "フォントを追加",
+            "search": "インフォメーション",
+            "searchPlaceholder": "Googleフォントを検索...",
+            "offlineFontSearch": "デバイスはオフラインです。 インターネットに接続してフォントを検索する必要があります。 下の「ファイルの選択」ボタンを使ってフォントファイルを閲覧できます.",
+            "noFontsFound": "その検索条件で見つかったフォントはありません.",
+            "uploadFontParseError": "選択したフォントの1つ以上をパースする際にエラーが発生しました."
+        },
+        "imageTransform": {
+            "noLayersSelected": {
+                "title": "選択された層無し",
+                "message": "レイヤードックで1層以上選択して変換します。 レイヤー型は変換できません."
+            }
         }
     },
     "moduleGroup": {
@@ -1141,6 +1280,10 @@
                 "shareImage": {
                     "name": "シェアイメージ",
                     "description": "他の人と編集している現在のイメージを共有します."
+                },
+                "addFont": {
+                    "name": "フォントを追加",
+                    "description": "フォントをファイルに追加します."
                 }
             }
         },
@@ -1193,7 +1336,17 @@
                 "convertLayersToCollage": {
                     "name": "レイヤーをコラージュに変換する",
                     "description": "選択したレイヤーをイメージコラージュに変換します。 さまざまなコラージュのレイアウトがあります."
-                }
+                },
+                "flipLayersX": {
+                    "name": "フリップX",
+                    "description": "画像のx軸に選択したレイヤーをフリップします."
+                },
+                "flipLayersY": {
+                    "name": "フリップY",
+                    "description": "画像のy軸に選択したレイヤーをフリップします."
+                },
+                "rotateLayersClockwise": {},
+                "rotateLayersCounterclockwise": {}
             }
         },
         "layer": {
@@ -1211,6 +1364,9 @@
                 "blendingMode": {
                     "name": "レイヤーブレンドモードの変更",
                     "description": "アクティブレイヤーの混合モードを変更します."
+                },
+                "layerEffectEdit": {
+                    "description": "効果を編集する"
                 }
             }
         },
@@ -1386,7 +1542,8 @@
                 "wrapDirection": "ラップ"
             },
             "fillColor": "充填色",
-            "paletteCount": "パレットカウント"
+            "paletteCount": "パレットカウント",
+            "addFont": "フォントを追加..."
         },
         "zoom": {
             "zoomOut": "ズームアウト",
@@ -1473,7 +1630,8 @@
                 "noLayersSelected": "エフェクトを編集するために、レイヤードック内のレイヤーを1つ以上選択してください.",
                 "layerHasNoEffects": "このレイヤーは効果がありません.",
                 "deleteEffect": "効果の削除"
-            }
+            },
+            "maskHeading": "マスク:"
         },
         "eraseBrush": {
             "brushSize": "サイズ:",
@@ -1576,6 +1734,10 @@
                         "mouse": "空の領域をクリックしてドラッグして新しい形状を追加します."
                     }
                 }
+            },
+            "actions": {
+                "title": "アクション",
+                "convertToPath": "形状をパスに変換する"
             }
         },
         "deformSharpen": {

@@ -71,7 +71,11 @@
         "updateShapeStrokeColor": "به روز رسانی Shape Stroke Color",
         "updateShapeStrokeWidth": "به روز رسانی Shape Stroke عرض",
         "updateSharpenLayer": "لایه شارپ",
-        "updateVectorLayerAttributes": "به روز رسانی Layer"
+        "updateVectorLayerAttributes": "به روز رسانی Layer",
+        "convertVectorShapesToPaths": "تبدیل شکل به مسیر",
+        "flipLayerX": "Flip Layer افقی",
+        "flipLayerY": "Flip Layer Vertical",
+        "mergeEffects": "اثرات Merge Effects"
     },
     "app": {
         "colorPickerGradient": {
@@ -126,7 +130,8 @@
                 "text": "Layer",
                 "vector": "لایه بردار Layer",
                 "video": "لایه ویدئو Layer"
-            }
+            },
+            "deleteSelection": "انتخاب حذف"
         },
         "wait": {
             "applyLayerTransform": "استفاده از Layer Transform",
@@ -188,7 +193,10 @@
         "moreInfo": "اطلاعات بیشتر",
         "dontUpdate": "به روز رسانی نکنید",
         "enable": "گزینه Enable",
-        "updateApp": "Update App"
+        "updateApp": "Update App",
+        "add": "Add",
+        "mergeEffects": "اثرات Merge Effects",
+        "selectFiles": "گزینه Files ..."
     },
     "canvas": {
         "toolbar": {
@@ -234,7 +242,7 @@
                 "menu": {
                     "cropResize": "Crop و Resize",
                     "convertLayers": {
-                        "groupTitle": "لایه های تبدیل ...",
+                        "groupTitle": "تبدیل تمام لایه ها ...",
                         "toImageSequence": "تصویر Sequence",
                         "flatten": "تخت تا لایه جدید",
                         "toCollage": "برای Collage"
@@ -242,7 +250,12 @@
                     "cut": "Cut",
                     "copy": "کپی رایت",
                     "copyAllLayers": "کپی تمام لایه ها",
-                    "paste": "پاستور"
+                    "paste": "پاستور",
+                    "transformLayers": {
+                        "groupTitle": "تغییر لایه ...",
+                        "flipX": "Flip افقی",
+                        "flipY": "Flip Vertical"
+                    }
                 }
             },
             "view": {
@@ -377,7 +390,8 @@
                 "brightness": "روشنایی",
                 "effectiveRange": "محدوده",
                 "effectiveRangeFeather": "دانلود آهنگ Britney"
-            }
+            },
+            "help": "تغییر روشنایی تصویر با استفاده از یکی از 3 حالت مختلف:\n**Adjust گاما - شبیه به تنظیمات نوردهی دوربین.\n* تغییرات سیاه و سفید - همه رنگ ها را به سمت سیاه یا سفید خالص حرکت می دهد.\n*Adjust Luminance - تغییر مقدار نور ادراکی در فضای رنگی Oklab.\n\nتنظیمات * برد ** تنظیم می کند که مقادیر نور یا تاریکی تحت تاثیر قرار می گیرند و تنظیمات **Feather ** در ترکیب با * برد ** برای صاف کردن انتقال کار می کند."
         },
         "chroma": {
             "name": "کروموزوم",
@@ -388,7 +402,8 @@
                     "multiply": "تنظیم Chroma کنتراست",
                     "shift": "تنظیم کننده Chroma"
                 }
-            }
+            },
+            "help": "تغییراتی که تصویر چقدر رنگارنگ است، شبیه به \"saturation\" در برخی زمینه ها.\n\n*Adjust Chroma کنتراست * - پیکسل هایی که در حال حاضر رنگی بالاتر هستند، بیش از پیکسل های رنگی پایین تر تحت تاثیر قرار می گیرند.\n* * حتی تنظیم کننده های کروم - سطوح رنگی تمام پیکسل ها با همان مقدار تنظیم می شوند."
         },
         "colorBlindness": {
             "name": "نابینایی رنگی",
@@ -443,7 +458,8 @@
                     "value": "حداکثر (R,G,B)"
                 },
                 "mix": "مخلوط"
-            }
+            },
+            "help": "تمام رنگ ها را از تصویر حذف کنید، با استفاده از یکی از فرمول های مختلف برای محاسبه روشنایی رنگ های اصلی."
         },
         "hue": {
             "name": "Hue",
@@ -454,7 +470,9 @@
                     "perceptualRgb": "Perceptual RGB",
                     "linearRgb": "خطی RGB"
                 },
-                "rotate": "چرخش"
+                "rotate": "چرخش",
+                "targetColor": "رنگ هدف",
+                "targetRange": "محدوده"
             }
         },
         "negative": {
@@ -469,7 +487,8 @@
                 "invertGreen": "کانال سبز",
                 "invertBlue": "کانال آبی Invert Blue Channel",
                 "invertValue": "ارزش Invert Value"
-            }
+            },
+            "help": "کانال های رنگی خاص را در تصویر قرار دهید، جایی که مقادیر بالا به مقادیر پایین و برعکس تبدیل می شوند.\n\n*فضای رنگی ** تعیین می کند که آیا این invert قبل یا بعد از اصلاح گاما رخ می دهد."
         },
         "saturation": {
             "name": "Saturation",
@@ -490,12 +509,15 @@
                     "linearRgb": "خطی RGB"
                 },
                 "mix": "مخلوط"
-            }
+            },
+            "name": "نقشه Gradient",
+            "help": "تمام رنگ های موجود در تصویر را با رنگ هایی از شیبی که مشخص می کنید، بر اساس روشنایی رنگ های اصلی در تصویر.\n\n*فضای رنگی ** تغییر می دهد که چگونه ارزش های متوسط بین توقف ها در گرادیان تقسیم می شوند. * Oklab ** به طور کلی دقیق ترین گزینه است."
         },
         "instagram1997": {
             "param": {
                 "mix": "مخلوط"
-            }
+            },
+            "name": "1997"
         },
         "instagramAden": {
             "name": "Aden",
@@ -561,7 +583,102 @@
             "param": {
                 "white": "رنگ های خنثی"
             },
-            "name": "تعادل سفید"
+            "name": "تعادل سفید",
+            "help": "تصویر را طوری تنظیم کنید که انگار مشخص شده است ** رنگ ظاهری ** در واقع باید سفید باشد.\n\nدوربین ها می توانند رنگ ها را به سمت چای یا نارنجی با توجه به شرایط روشنایی تغییر دهند، نه اینکه آنچه را که در زندگی واقعی می بینید، تطبیق دهند."
+        },
+        "emboss": {
+            "name": "رئیس جمهور",
+            "help": "ظاهر 3D از تجسم فیزیکی، مانند فشار دادن یک طراحی به کاغذ یا فلز.\n\n*Angle ** کنترل جهت نور و سایه\n** افزایش ارتفاع - ارتفاع منطقه برجسته، افزایش قدرت نور و سایه.",
+            "param": {
+                "type": "نوع",
+                "typeOption": {
+                    "blend": "ترکیب Blend",
+                    "heightmap": "Highmap"
+                },
+                "angle": "زاویه",
+                "elevation": "Elevation"
+            }
+        },
+        "filmGrain": {
+            "name": "فیلم دانه ای",
+            "help": "نگاهی به فیلم های در حال توسعه یا زوم در فیلم با اندازه های بزرگ دانه.\n\n** افزایش دید دانه\n* مقیاس استخوان - افزایش اندازه دانه نسبت به اندازه پیکسل.\n** شماره تصادفی مورد استفاده برای تولید الگوی دانه\n*حالت درخشان - تعیین کنید که چگونه دانه با تصویر ادغام می شود. حالت عادی از نظر فیزیکی درست است، حالت های دیگر برای اثر هنری هستند.",
+            "param": {
+                "blendMode": "Blend Mode",
+                "blendModeOption": {
+                    "normal": "عادی",
+                    "subtract": "Subtract",
+                    "add": "Add"
+                },
+                "grainScale": "مقیاس دانه",
+                "grayscale": "Grayscale",
+                "intensity": "شدت",
+                "seed": "مشاهده"
+            }
+        },
+        "monteCarloBlur": {
+            "name": "مونت کارلو بلومr",
+            "help": "نوع تار پر سر و صدا را که هنگام عکاسی با نور کم با یک دوربین واقعی می بینید، ساده می کنید.\n\n** تکرارها - چند پرتو نور در هر پیکسل محاسبه می شود.\n*Size ** شعاع تار.",
+            "param": {
+                "iterations": "Iterations",
+                "iterationsOption": {
+                    "1": "1",
+                    "2": "2",
+                    "4": "4",
+                    "8": "8",
+                    "16": "16",
+                    "32": "32",
+                    "64": "64"
+                },
+                "size": "اندازه"
+            }
+        },
+        "pixelize": {
+            "name": "Pixelize",
+            "help": "جزئیات تصویر را با مربع های بزرگ پوشش می دهد که شبیه به یک شبکه پیکسل است.",
+            "param": {
+                "size": "اندازه",
+                "offsetX": "جبران X",
+                "offsetY": "جبران Y"
+            }
+        },
+        "spread": {
+            "name": "گسترش",
+            "help": "پیکسل ها را به صورت افقی یا عمودی در یک الگوی سر و صدا تصادفی تغییر دهید.",
+            "param": {
+                "horizontal": "افقی",
+                "vertical": "عمودی",
+                "seed": "مشاهده"
+            }
+        },
+        "tiltShiftBlur": {
+            "name": "Tilt Blur",
+            "help": "ساده سازی اثر عمق کم عمق میدان در مقیاس میکروسکوپی یا یک لنز سوئیچ دوربین تخصصی.\n\n**Blur Radius ** حداکثر مقدار مبهم اعمال شده در مناطق تار.\n*Gradient Radius ** اندازه گرادیان از مناطق نامشخص تا تار.\n*Angle ** چرخش منطقه unblurred.\n* Offset ** - موقعیت منطقه بدون درز، جبران از مرکز.",
+            "param": {
+                "blurRadius": "Blur Radius",
+                "gradientRadius": "Gradient Radius",
+                "angle": "زاویه",
+                "offset": "جبران خسارت"
+            }
+        },
+        "whirlPinch": {
+            "name": "Whirl & Pinch",
+            "help": "پیچ و تاب یک منطقه دایره ای از تصویر.\n\n*Whirl ** چرخش پیچ و خم\n**Pinch ** قدرت خارش یا گسترش\n*Radius ** شعاع دایره که منطقه آسیب دیده را تعیین می کند.",
+            "param": {
+                "whirl": "Whirl",
+                "pinch": "Pinch",
+                "radius": "شعاعی",
+                "centerX": "مرکز X",
+                "centerY": "مرکز Y"
+            }
+        },
+        "zoomBlur": {
+            "name": "Zoom Blur",
+            "help": "خم کردن تار از یک تکنیک عکاسی به نام a **zoom Blast **\n\nبالاتر **Strength ** باعث تار شدن قوی تر، نشان دادن سرعت شاتر کندتر یا نوردهی طولانی تر می شود.",
+            "param": {
+                "strength": "قدرت",
+                "centerX": "مرکز X",
+                "centerY": "مرکز Y"
+            }
         }
     },
     "layerFilterGroup": {
@@ -582,6 +699,9 @@
         },
         "sharpen": {
             "name": "شارپ"
+        },
+        "noise": {
+            "name": "سر و صدا"
         }
     },
     "layoutShortcutGroup": {
@@ -905,7 +1025,7 @@
                     "example": "حذف یک صفحه نمایش سبز از یک تصویر."
                 },
                 "erase": {
-                    "description": "لایه پایین را که در آن لایه بالا مبهم است، تنظیم می کند.",
+                    "description": "لایه های پایین را که در آن لایه بالا مبهم است، دور می کند.",
                     "example": "حذف اشیاء ناخواسته در یک عکس با دور زدن آن مناطق."
                 },
                 "lightenOnly": {
@@ -1018,13 +1138,18 @@
                 },
                 "lightness": {
                     "description": "استفاده از نور لایه بالا در حالی که حفظ رنگ و رنگ لایه پایین.",
-                    "example": "روشن کردن یا تاریک کردن یک تصویر در حالی که نگه داشتن رنگ ها درست است."
+                    "example": "نورپردازی یا تاریک کردن یک تصویر در هنگام نگه داشتن رنگ های اصلی."
                 },
                 "luminance": {
                     "description": "لایه بالا را با لایه پایین تقسیم می کند، سپس نتیجه را به لایه پایین تر تقسیم می کند.",
-                    "example": "روشن کردن یا تاریک کردن یک تصویر در حالی که نگه داشتن رنگ ها درست است."
+                    "example": "نورپردازی یا تاریک کردن یک تصویر در هنگام نگه داشتن رنگ های اصلی."
+                },
+                "merge": {
+                    "description": "لایه بالا پایین را بر اساس opacity خود پوشش می دهد، اما لبه های شفاف را با هم ادغام می کند، زمانی که ارزش های مبهم می توانند اضافه شوند تا مبهم باشند. ادغام تنها در بالای یک پس زمینه شفاف کار می کند.",
+                    "example": "برش یک منطقه انتخاب شده از یک عکس و گذشته آن در همان محل در یک لایه جدید."
                 }
-            }
+            },
+            "exampleUsage": "استفاده مثال:"
         },
         "designSystem": {
             "title": "سیستم طراحی سیستم"
@@ -1073,6 +1198,20 @@
             "notificationReadyMessage": "به روز رسانی زمانی نصب خواهد شد که شما به یک برنامه دیگر تغییر دهید.",
             "notificationErrorTitle": "خطای به روز رسانی",
             "notificationErrorMessage": "یک خطا در هنگام دانلود به روز رسانی رخ داد. لطفا دوباره امتحان کنید."
+        },
+        "fileAddFont": {
+            "title": "Add Font",
+            "search": "جستجو",
+            "searchPlaceholder": "جستجوی Google Fonts.",
+            "offlineFontSearch": "دستگاه شما آفلاین است. شما باید به اینترنت متصل شوید تا فونت ها را جستجو کنید. شما هنوز هم می توانید فایل های فونت را با استفاده از دکمه “Select Files ...” زیر مرور کنید.",
+            "noFontsFound": "هیچ فونتی با این معیار جستجو پیدا نشد.",
+            "uploadFontParseError": "یک خطا زمانی رخ داد که یک یا چند فونت را که انتخاب کرده اید، تجزیه کنید."
+        },
+        "imageTransform": {
+            "noLayersSelected": {
+                "title": "هیچ لایه ای انتخاب نشده",
+                "message": "حداقل یک لایه را در لوله لایه انتخاب کنید تا تبدیل شود. برخی از انواع لایه ها نمی توانند تغییر کنند."
+            }
         }
     },
     "moduleGroup": {
@@ -1139,6 +1278,10 @@
                 "shareImage": {
                     "name": "Share Image",
                     "description": "تصویر فعلی را که با دیگران ویرایش می کنید به اشتراک بگذارید."
+                },
+                "addFont": {
+                    "name": "Add Font",
+                    "description": "یک فونت را به فایل اضافه کنید."
                 }
             }
         },
@@ -1191,7 +1334,17 @@
                 "convertLayersToCollage": {
                     "name": "تبدیل لایه ها به Collage",
                     "description": "تبدیل لایه های انتخاب شده به یک کلاژ تصویر. طرح های کلی مختلفی در دسترس هستند."
-                }
+                },
+                "flipLayersX": {
+                    "name": "Flip X",
+                    "description": "لایه های انتخاب شده روی محور x تصویر."
+                },
+                "flipLayersY": {
+                    "name": "Flip Y",
+                    "description": "لایه های انتخاب شده روی محور Y تصویر."
+                },
+                "rotateLayersClockwise": {},
+                "rotateLayersCounterclockwise": {}
             }
         },
         "layer": {
@@ -1209,6 +1362,9 @@
                 "blendingMode": {
                     "name": "تغییر لایه Blending Mode",
                     "description": "تغییر حالت ترکیب لایه فعال."
+                },
+                "layerEffectEdit": {
+                    "description": "ویرایش یک اثر"
                 }
             }
         },
@@ -1383,7 +1539,8 @@
                 "wrapDirection": "بسته بندی"
             },
             "fillColor": "رنگ پر رنگ",
-            "paletteCount": "پالت شمارش"
+            "paletteCount": "پالت شمارش",
+            "addFont": "Add Font ..."
         },
         "zoom": {
             "zoomOut": "برگرفته از:",
@@ -1470,7 +1627,8 @@
                 "noLayersSelected": "لطفا یک یا چند لایه را در لوله انتخاب کنید تا اثرات آن را ویرایش کنید.",
                 "layerHasNoEffects": "این لایه هیچ اثری ندارد.",
                 "deleteEffect": "حذف اثر"
-            }
+            },
+            "maskHeading": "ماسک:"
         },
         "eraseBrush": {
             "brushSize": "اندازه",
@@ -1573,6 +1731,10 @@
                         "mouse": "روی یک منطقه خالی کلیک کنید تا شکل های جدید اضافه کنید."
                     }
                 }
+            },
+            "actions": {
+                "title": "اقدامات",
+                "convertToPath": "تبدیل شکل به مسیر"
             }
         },
         "deformSharpen": {

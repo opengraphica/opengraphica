@@ -71,7 +71,11 @@
         "updateShapeStrokeColor": "Update Shape Stroke Color",
         "updateShapeStrokeWidth": "Update Shape Stroke Width",
         "updateSharpenLayer": "شاربن لاير",
-        "updateVectorLayerAttributes": "Update Vector Layer"
+        "updateVectorLayerAttributes": "Update Vector Layer",
+        "convertVectorShapesToPaths": "Convert Shape to Path",
+        "flipLayerX": "Flip Layer Horizontal",
+        "flipLayerY": "Flip Layer Vertical",
+        "mergeEffects": "الآثار الكبيرة"
     },
     "app": {
         "colorPickerGradient": {
@@ -126,7 +130,8 @@
                 "text": "الرسالة",
                 "vector": "Vector Layer",
                 "video": "Video Layer"
-            }
+            },
+            "deleteSelection": "يحذف الاختيار"
         },
         "wait": {
             "applyLayerTransform": "Applying Layer Transform",
@@ -188,7 +193,10 @@
         "moreInfo": "مزيد من المعلومات",
         "dontUpdate": "لا تستكمل",
         "enable": "التمكين",
-        "updateApp": "Update App"
+        "updateApp": "Update App",
+        "add": "مضافا إليها",
+        "mergeEffects": "الآثار الكبيرة",
+        "selectFiles": "بيع الملفات..."
     },
     "canvas": {
         "toolbar": {
@@ -234,7 +242,7 @@
                 "menu": {
                     "cropResize": "Crop and Resize",
                     "convertLayers": {
-                        "groupTitle": "(المخادعون).",
+                        "groupTitle": "....",
                         "toImageSequence": "إلى معادلة الصور",
                         "flatten": "(فلاطين) إلى (نيو لاير)",
                         "toCollage": "To Collage"
@@ -242,7 +250,12 @@
                     "cut": "قطع",
                     "copy": "نسخ",
                     "copyAllLayers": "(عُلم)",
-                    "paste": "Paste"
+                    "paste": "Paste",
+                    "transformLayers": {
+                        "groupTitle": "(لاير).",
+                        "flipX": "Flip Horizontal",
+                        "flipY": "Flip Vertical"
+                    }
                 }
             },
             "view": {
@@ -377,7 +390,8 @@
                 "brightness": "الصدق",
                 "effectiveRange": "Range",
                 "effectiveRangeFeather": "ريش"
-            }
+            },
+            "help": "يغيّر إشراق الصورة باستخدام واحد من ثلاثة أساليب مختلفة:\n-مثلاً لجهاز كشف الكاميرا\n* ** Black/White Shift**\n* ** اللوم فقط** - يُغيّرُ قيمةَ النورَ الافتراضيةَ في مساحةِ أوكلاب لونِ.\n\nThe **Range** setting adjusts which light or dark values are affected, and the **Feather** setting works in combination with the **Range** to smooth out the transition."
         },
         "chroma": {
             "name": "Chroma",
@@ -388,7 +402,8 @@
                     "multiply": "Adjust Chroma Contrast",
                     "shift": "في نهاية المطاف"
                 }
-            }
+            },
+            "help": "يتغيّر كم الصورة ملوّنة، مشابهة لـ\"الإستمناء\" في بعض السياقات.\n\n* ** Adjust Chroma Contrast** - Pixels that are already a higher chroma are affected more than lower chroma pixels.\n♪ ** Evenly Adjust Chroma** - The chroma levels of all pixels are adjusted with the same amount."
         },
         "colorBlindness": {
             "name": "العمود",
@@ -443,7 +458,8 @@
                     "value": "= max(R,G,B)"
                 },
                 "mix": "Mix"
-            }
+            },
+            "help": "يزيل جميع الألوان من الصورة باستخدام واحدة من العديد من الصيغ المختلفة لحساب إشراق الألوان الأصلية."
         },
         "hue": {
             "name": "Hue",
@@ -454,7 +470,9 @@
                     "perceptualRgb": "المنظور الجنساني",
                     "linearRgb": "Linear RGB"
                 },
-                "rotate": "المعدل"
+                "rotate": "المعدل",
+                "targetColor": "العقيدة المستهدفة",
+                "targetRange": "Range"
             }
         },
         "negative": {
@@ -469,7 +487,8 @@
                 "invertGreen": "Invert Green Channel",
                 "invertBlue": "Invert Blue Channel",
                 "invertValue": "القيمة المعكوسة"
-            }
+            },
+            "help": "تجنب قنوات لون محددة في الصورة حيث تصبح القيم العالية منخفضة والعكس صحيح\n\nيُحدِّد \" الفضاء الكولوري \"** ما إذا كان اللافت يحدث قبل تصحيح غاما أو بعده."
         },
         "saturation": {
             "name": "الاضطرابات",
@@ -490,12 +509,15 @@
                     "linearRgb": "Linear RGB"
                 },
                 "mix": "Mix"
-            }
+            },
+            "name": "خريطة خطية",
+            "help": "تُغيّرُ كُلّ الألوانِ في الصورةِ مَع الألوانِ مِنْ a تَحدّدُ، مستند على إشراقِ الألوانِ الأصليةِ في الصورةِ.\n\nThe **Color Space** changes how medium values between the stops on the gradient are interpolated. ** Oklab** هو عموما الخيار الأكثر دقة."
         },
         "instagram1997": {
             "param": {
                 "mix": "Mix"
-            }
+            },
+            "name": "1997"
         },
         "instagramAden": {
             "name": "عدن",
@@ -561,7 +583,102 @@
             "param": {
                 "white": "اللون المحايد"
             },
-            "name": "الرصيد الأبيض"
+            "name": "الرصيد الأبيض",
+            "help": "عدل الصورة كما لو كان من المفترض أن يكون اللون المحايد** أبيض\n\nيمكن للكاميرات تحويل الألوان إلى التال أو البرتقال تبعاً لظروف الإضاءة، لا تطابق ما تراه في الحياة الحقيقية."
+        },
+        "emboss": {
+            "name": "Embos",
+            "help": "يقيس ظهور 3D للتخريب المادي، مثل الضغط على تصميم إلى ورق أو معدني.\n\n** يتحكم في اتجاه الضوء والظل.\n* ** الخلاص** - يرتفع طول المنطقة المزروعة، ويزيد من قوة الأضواء والظلال.",
+            "param": {
+                "type": "النوع",
+                "typeOption": {
+                    "blend": "Blend",
+                    "heightmap": "Heightmap"
+                },
+                "angle": "أنغل",
+                "elevation": "الارتفاع"
+            }
+        },
+        "filmGrain": {
+            "name": "الأفلام",
+            "help": "يُقَيّزُ النظرةَ مِنْ الأفلامِ المُفتَرَضِةِ أَو مُقَوَّزَة في الأفلامِ مَع أحجامِ كبيرةِ.\n\n* كثافة** - زيادة إبراز الحبوب.\n* ** Grain Scale** - Increases grain size relative to pixel size.\n* ** Seed** - The random number used to generate the grain pattern.\n- يحدد كيف يتم دمج الحبوب مع الصورة. الطريقة العادية صحيحة جسدياً، والطرائق الأخرى هي للتأثير الفني.",
+            "param": {
+                "blendMode": "Blend Mode",
+                "blendModeOption": {
+                    "normal": "المعيار",
+                    "subtract": "العقود من الباطن",
+                    "add": "مضافا إليها"
+                },
+                "grainScale": "Grain Scale",
+                "grayscale": "Grayscale",
+                "intensity": "الكثافة",
+                "seed": "Seed"
+            }
+        },
+        "monteCarloBlur": {
+            "name": "Monte Carlo Blur",
+            "help": "يُقلّصُ نوعَ الضبابِ المزعجِ أنت تَرى عندما تَأْخذُ a صورة في ضوءِ منخفضِ مَع a كاميرا حقيقية.\n\n* ** التعديلات** - كم عدد أشعة الضوء محسوبة لكل كيسل.\n* ** الحجم** - نطاق الضباب.",
+            "param": {
+                "iterations": "المطالعات",
+                "iterationsOption": {
+                    "1": "1",
+                    "2": "2",
+                    "4": "4",
+                    "8": "8",
+                    "16": "16",
+                    "32": "32",
+                    "64": "64"
+                },
+                "size": "الحجم"
+            }
+        },
+        "pixelize": {
+            "name": "Pixelize",
+            "help": "أجمع تفاصيل الصور مع مربعات كبيرة التي تبدو مثل شبكة بيكسل.",
+            "param": {
+                "size": "الحجم",
+                "offsetX": "Offset X",
+                "offsetY": "Offset Y"
+            }
+        },
+        "spread": {
+            "name": "Spread",
+            "help": "يَضِعُ الفطائرَ أفقياً أَو رأسياً في a نمط ضوضاء عشوائي.",
+            "param": {
+                "horizontal": "Horizontal",
+                "vertical": "كتابي",
+                "seed": "Seed"
+            }
+        },
+        "tiltShiftBlur": {
+            "name": "Tilt Shift Blur",
+            "help": "يقيس أثر العمق الضحل للميدان على مقياسات مجهرية أو عدسات كاميرا متخصصة من طراز \" تيت شيفت \" .\n\n* ** Blur Radius** - The maximum amount of blur applied to the blurred areas.\n* ** Radius المتطرف** - حجم التدرج من المناطق غير المشبوهة إلى المناطق غير المشبوهة.\nتناوب المنطقة غير المشبوهة\n* ** الموضوع** - موقف المنطقة غير المشبوهة، الذي قابله المركز.",
+            "param": {
+                "blurRadius": "Blur Radius",
+                "gradientRadius": "Gradient Radius",
+                "angle": "أنغل",
+                "offset": "Offset"
+            }
+        },
+        "whirlPinch": {
+            "name": "Whirl ' Pinch",
+            "help": "(تويست) يعلق مجالاً دائرياً من الصورة\n\nتناوب الملتوية\n* ** Pinch** - The strength of poching or expanding.\n* ** راديوس** - نطاق الدائرة التي تحدد المنطقة المتأثرة.",
+            "param": {
+                "whirl": "Whirl",
+                "pinch": "Pinch",
+                "radius": "Radius",
+                "centerX": "المركز العاشر",
+                "centerY": "المركز Y"
+            }
+        },
+        "zoomBlur": {
+            "name": "Zoom Blur",
+            "help": "يُقَيِّزُ الضبابَ مِنْ a تقنيةِ تصويريةِ تَدْعَى a ** زووم إنفجار**.\n\nارتفاع **Strength** يعطي ضبابية أقوى، مما يمثل سرعة مكوك أبطأ أو تعرضا أطول.",
+            "param": {
+                "strength": "القوة",
+                "centerX": "المركز العاشر",
+                "centerY": "المركز Y"
+            }
         }
     },
     "layerFilterGroup": {
@@ -582,6 +699,9 @@
         },
         "sharpen": {
             "name": "شاربن"
+        },
+        "noise": {
+            "name": "Noise"
         }
     },
     "layoutShortcutGroup": {
@@ -907,7 +1027,7 @@
                     "example": "إزالة خلفية الشاشة الخضراء من صورة."
                 },
                 "erase": {
-                    "description": "يمسح الطبقة السفلية حيث الطبقة العليا غامضة.",
+                    "description": "امسح الطبقة السفلية حيث الطبقة العلوية غامضة.",
                     "example": "إزالة الأجسام غير المرغوبة في صورة عن طريق محو تلك المناطق."
                 },
                 "lightenOnly": {
@@ -1004,7 +1124,7 @@
                 },
                 "divide": {
                     "description": "يقسم إشراق الطبقة العلوية إلى الأسفل.",
-                    "example": "تضيء صورة بشكل مُثير، تُحدث أثراً متوهجاً أو هُناك. يمكن استخدامه لتصويب التعرض."
+                    "example": "إضاءة صورة بشكل كبير، خلق تأثير متوهج أو هزلي. يمكن استخدامه لتصويب التعرض."
                 },
                 "hue": {
                     "description": "يستعمل كوخ الطبقة العليا بينما يحافظ على الكروما و خفة الطبقة السفلية.",
@@ -1020,13 +1140,18 @@
                 },
                 "lightness": {
                     "description": "يستخدم ضوء الطبقة العليا بينما يحافظ على كوخ وكروما الطبقة السفلية.",
-                    "example": "تضيء أو تظلم صورة بينما تحافظ على الألوان."
+                    "example": "الإضاءة أو الإغماء صورة بينما تحافظ على الألوان الأصلية."
                 },
                 "luminance": {
                     "description": "يقسم الطبقة العلوية على الطبقة السفلى ثم يضاعف النتيجة الى الطبقة السفلى.",
-                    "example": "تضيء أو تظلم صورة بينما تحافظ على الألوان."
+                    "example": "الإضاءة أو الإغماء صورة بينما تحافظ على الألوان الأصلية."
+                },
+                "merge": {
+                    "description": "الطبقة العلوية تغطي القاع استناداً إلى عدمه، لكنها تدمج الحواف الشفافة معاً عندما يمكن لقيم الاضطهاد أن تضيف إلى أن تكون غامضة. الدمج يعمل فقط على خلفية شفافة.",
+                    "example": "قطع منطقة منتقاة من صورة ومعالجتها في نفس الموقع على طبقة جديدة."
                 }
-            }
+            },
+            "exampleUsage": "المثال:"
         },
         "designSystem": {
             "title": "نظام التصميم"
@@ -1075,6 +1200,20 @@
             "notificationReadyMessage": "سيتم تركيب التحديث عندما تتحول إلى تطبيق آخر.",
             "notificationErrorTitle": "Update Error",
             "notificationErrorMessage": "حدث خطأ أثناء تحميل التحديث حاول مرة أخرى لاحقاً."
+        },
+        "fileAddFont": {
+            "title": "مضافا إليه",
+            "search": "البحث",
+            "searchPlaceholder": "ابحثوا عن فونتات جوجل.",
+            "offlineFontSearch": "جهازك غير متصل يجب أن تتصلي بالإنترنت للبحث عن ملصقات لا يزال بإمكانك أن تنظف الملفات عن طريق استخدام \"الملفات الاصطناعية\"... الزر أسفل.",
+            "noFontsFound": "لا يوجد أي أثر مع معايير البحث تلك.",
+            "uploadFontParseError": "حدث خطأ عندما قذفت واحدة أو أكثر من اللوحات التي اخترتها."
+        },
+        "imageTransform": {
+            "noLayersSelected": {
+                "title": "No Layers Selected",
+                "message": "اختيار طبقة واحدة على الأقل في رصيف الطبقات لتحويل. بعض أنواع الطبقات لا يمكن تحويلها."
+            }
         }
     },
     "moduleGroup": {
@@ -1141,6 +1280,10 @@
                 "shareImage": {
                     "name": "صورة الحصة",
                     "description": "شارك الصورة الحالية التي تحررها مع أشخاص آخرين."
+                },
+                "addFont": {
+                    "name": "مضافا إليه",
+                    "description": "أضف ملفاً."
                 }
             }
         },
@@ -1193,7 +1336,17 @@
                 "convertLayersToCollage": {
                     "name": "Convert Layers to Collage",
                     "description": "يُحوّلُ الطبقاتَ المُختارةَ إلى a تصادم صورِ. وهناك العديد من مخططات تجميع مختلفة متاحة."
-                }
+                },
+                "flipLayersX": {
+                    "name": "Flip X",
+                    "description": "اربط طبقات مختارة على محور الصور."
+                },
+                "flipLayersY": {
+                    "name": "Flip Y",
+                    "description": "اربط طبقات مختارة على محور الصورة."
+                },
+                "rotateLayersClockwise": {},
+                "rotateLayersCounterclockwise": {}
             }
         },
         "layer": {
@@ -1211,6 +1364,9 @@
                 "blendingMode": {
                     "name": "غيّر ليير بليند مودي",
                     "description": "غيّر أسلوب الدمج في الطبقات النشطة."
+                },
+                "layerEffectEdit": {
+                    "description": "يُحدث أثراً"
                 }
             }
         },
@@ -1386,7 +1542,8 @@
                 "wrapDirection": "Wrap"
             },
             "fillColor": "سائل",
-            "paletteCount": "Palette count"
+            "paletteCount": "Palette count",
+            "addFont": "أضف."
         },
         "zoom": {
             "zoomOut": "زوم",
@@ -1473,7 +1630,8 @@
                 "noLayersSelected": "يرجى اختيار طبقة أو أكثر في رصيف الطبقات من أجل تحرير آثارها.",
                 "layerHasNoEffects": "هذه الطبقة ليس لها تأثيرات.",
                 "deleteEffect": "يحذف الأثر"
-            }
+            },
+            "maskHeading": "ماسك:"
         },
         "eraseBrush": {
             "brushSize": "الحجم",
@@ -1576,6 +1734,10 @@
                         "mouse": "اضغطي واسحبي في منطقة فارغة لإضافة أشكال جديدة."
                     }
                 }
+            },
+            "actions": {
+                "title": "الإجراءات",
+                "convertToPath": "Convert Shape to Path"
             }
         },
         "deformSharpen": {

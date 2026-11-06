@@ -71,7 +71,11 @@
         "updateShapeStrokeColor": "Update Shape Stro Color",
         "updateShapeStrokeWidth": "Update Shape Stro Genişlik",
         "updateSharpenLayer": "Sharpen Katman",
-        "updateVectorLayerAttributes": "Update Vector Katmanı"
+        "updateVectorLayerAttributes": "Update Vector Katmanı",
+        "convertVectorShapesToPaths": "Path to Path",
+        "flipLayerX": "Flip Katmanı Yatay",
+        "flipLayerY": "Flip Katmanı Dikey",
+        "mergeEffects": "Merge Effects"
     },
     "app": {
         "colorPickerGradient": {
@@ -126,7 +130,8 @@
                 "text": "Text Katman",
                 "vector": "Vector Katmanı",
                 "video": "Video Katmanı"
-            }
+            },
+            "deleteSelection": "Delete Selection"
         },
         "wait": {
             "applyLayerTransform": "Katmanı Uygulayın",
@@ -188,7 +193,10 @@
         "moreInfo": "Daha Fazla Bilgi",
         "dontUpdate": "Güncelleme",
         "enable": "Enable",
-        "updateApp": "Update App"
+        "updateApp": "Update App",
+        "add": "Add",
+        "mergeEffects": "Merge Effects",
+        "selectFiles": "Dosyaları seçin..."
     },
     "canvas": {
         "toolbar": {
@@ -234,7 +242,7 @@
                 "menu": {
                     "cropResize": "Ek ve Resize",
                     "convertLayers": {
-                        "groupTitle": "Convert Katmanlar...",
+                        "groupTitle": "Tüm Katmanları Dönüştürün...",
                         "toImageSequence": "Image Sequence",
                         "flatten": "Flatten To New Katman",
                         "toCollage": "Collage"
@@ -242,7 +250,12 @@
                     "cut": "Cut",
                     "copy": "Kopya kopya",
                     "copyAllLayers": "Tüm Katmanları kopyalayın",
-                    "paste": "Paste"
+                    "paste": "Paste",
+                    "transformLayers": {
+                        "groupTitle": "Katmanı Dönüştürmek...",
+                        "flipX": "Flip",
+                        "flipY": "Flip"
+                    }
                 }
             },
             "view": {
@@ -377,7 +390,8 @@
                 "brightness": "Sarmal",
                 "effectiveRange": "Range",
                 "effectiveRangeFeather": "Tüy"
-            }
+            },
+            "help": "3 farklı moddan birini kullanarak görüntünün parlaklığını değiştirin:\n* **Adjust Gamma** - Bir kameranın maruz kalmasına benzer.\n* **Black/White Shift** - Tüm renkleri saf siyah veya beyaza doğru taşır.\n* **Adjust Luminance** - Oklab renk alanında algısal ışık değerini değiştirir.\n\n**Range **, ışığın veya karanlık değerlerin etkilenmesini sağlar ve **Feather **Range ** ile birlikte çalışır, geçişi düzgünleştirmek için."
         },
         "chroma": {
             "name": "Chroma",
@@ -388,7 +402,8 @@
                     "multiply": "Chroma Contrast",
                     "shift": "Hatta tamamen Chroma'yı Uyum"
                 }
-            }
+            },
+            "help": "Görüntünün ne kadar renkli olduğu, bazı bağlamlarda \"saturasyon\" gibi değişiklikler.\n\n* **Adjust Chroma Contrast** - Zaten daha yüksek bir chroma piksellerinden daha fazla etkileniyor.\n* * * ** Chroma** bile - Tüm piksellerin chroma seviyeleri aynı miktarda ayarlanabilir."
         },
         "colorBlindness": {
             "name": "Renk Körlüğü",
@@ -443,7 +458,8 @@
                     "value": "= max (R,G,B)"
                 },
                 "mix": "Mix"
-            }
+            },
+            "help": "Tüm rengini görüntüden çıkarın, orijinal renklerin parlaklığını hesaplamak için birçok farklı formülden birini kullanın."
         },
         "hue": {
             "name": "Hue",
@@ -454,7 +470,9 @@
                     "perceptualRgb": "Perceptual RGB",
                     "linearRgb": "Linear RGB"
                 },
-                "rotate": "Rotate"
+                "rotate": "Rotate",
+                "targetColor": "Hedef Renk Hedefi",
+                "targetRange": "Range"
             }
         },
         "negative": {
@@ -469,7 +487,8 @@
                 "invertGreen": "Invert Green Channel",
                 "invertBlue": "Invert Blue Channel",
                 "invertValue": "Invert Value"
-            }
+            },
+            "help": "Görüntüdeki belirli renk kanalları, yüksek değerlerin düşük değerler ve tersi haline geldiği.\n\n**Renk Uzayı**, kumar düzeltmeden önce veya sonrası gerçekleşmediğini belirler."
         },
         "saturation": {
             "name": "Saturation",
@@ -490,12 +509,15 @@
                     "linearRgb": "Linear RGB"
                 },
                 "mix": "Mix"
-            }
+            },
+            "name": "Gradient Map",
+            "help": "Resimdeki tüm renkler, resimdeki orijinal renklerin parlaklığına dayanarak belirttiğiniz bir gradient'ten geçer.\n\n**Renk Uzayı**, gradient'teki duraklar arasındaki orta değerlerin interpolated olduğunu değiştirir. **Oklab ** genellikle en doğru seçenektir."
         },
         "instagram1997": {
             "param": {
                 "mix": "Mix"
-            }
+            },
+            "name": "1997"
         },
         "instagramAden": {
             "name": "Aden",
@@ -561,7 +583,102 @@
             "param": {
                 "white": "Neutral Color"
             },
-            "name": "Beyaz Denge"
+            "name": "Beyaz Denge",
+            "help": "Belirtilen **Neutral Renk** olarak görüntüyü ayarlayın aslında beyaz olması gerekir.\n\nKameralar, aydınlatma koşullarına bağlı olarak renkler değiştirebilir, aslında gerçek hayatta gördüğünüz şeyleri eşleştiremez."
+        },
+        "emboss": {
+            "name": "Emboss",
+            "help": "Kağıt veya metale bir tasarım basmak gibi fiziksel embosların 3D görünümünü sağlar.\n\n* **Angle ** - Işık ve gölgenin yönünü kontrol eder.\n* **Elevation** - Embosssed bölgesinin yüksekliği, ışıkların ve gölgelerin gücünü artırmak.",
+            "param": {
+                "type": "Tipi",
+                "typeOption": {
+                    "blend": "Öpün",
+                    "heightmap": "Boymap"
+                },
+                "angle": "Yüz",
+                "elevation": "Seçim"
+            }
+        },
+        "filmGrain": {
+            "name": "Film",
+            "help": "Sunulan film veya filmdeki görünümünü büyük tahıl boyutları ile kısaltın.\n\n* **Intensity** - tahılın görünürlüğünü artırır.\n* **Grate Scale** - piksel büyüklüğüne göre tahıl boyutunu artırır.\n* **Seed** - tahıl kalıbı oluşturmak için kullanılan rastgele sayı.\n* **Blend Mode** - tahılın görüntü ile nasıl birleştiğini belirler. Normal mod fiziksel olarak doğrudur, diğer modlar sanatsal etki içindir.",
+            "param": {
+                "blendMode": "Mod",
+                "blendModeOption": {
+                    "normal": "Normal",
+                    "subtract": "Subtract",
+                    "add": "Add"
+                },
+                "grainScale": "Örnek",
+                "grayscale": "Grayscale",
+                "intensity": "Intensity",
+                "seed": "Tohum"
+            }
+        },
+        "monteCarloBlur": {
+            "name": "Monte Carlo Blur",
+            "help": "Gerçek bir kamera ile düşük ışıkta bir fotoğraf çekerken gürültülü bulanıklığı gösterir.\n\n* **Buerations ** - Işığın kaç ışınları piksel başına hesaplanır.\n* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *.",
+            "param": {
+                "iterations": "Iterations",
+                "iterationsOption": {
+                    "1": "1",
+                    "2": "2",
+                    "4": "4",
+                    "8": "8",
+                    "16": "16",
+                    "32": "32",
+                    "64": "64"
+                },
+                "size": "Boyut Boyutu"
+            }
+        },
+        "pixelize": {
+            "name": "Pixelize",
+            "help": "Bir piksel ızgara gibi görünen büyük kareler ile görüntü detayı kapatın.",
+            "param": {
+                "size": "Boyut Boyutu",
+                "offsetX": "Offset X",
+                "offsetY": "Offset Y"
+            }
+        },
+        "spread": {
+            "name": "Yay",
+            "help": "Pikselleri rastgele bir gürültü modelinde yatay veya dikey olarak değiştirir.",
+            "param": {
+                "horizontal": "Yatay",
+                "vertical": "Dikey",
+                "seed": "Tohum"
+            }
+        },
+        "tiltShiftBlur": {
+            "name": "Tilt Shift Blur",
+            "help": "Alanın mikroskobik ölçeklerdeki sığ derinliği veya özel bir kamera eğimli lensin etkisini sağlar.\n\n* **Blur Radius** - bulanık bölgelere uygulanan en yüksek miktar.\n* **Gradient Radius ** - gradient'in belirsiz alanları bulanıklaştırmak için büyüklüğü.\n* **Angle** - Unblurred bölgesinin dönüşü.\n* **Offset ** - Gerçek olmayan alanın pozisyonu, merkezden dengeleme.",
+            "param": {
+                "blurRadius": "Blur Radius",
+                "gradientRadius": "Gradient Radius",
+                "angle": "Yüz",
+                "offset": "Offset"
+            }
+        },
+        "whirlPinch": {
+            "name": "Whirl & Pinch",
+            "help": "Twists & pinches görüntünün dairesel bir alanı.\n\n* **Whirl ** - The rotasyon of the twist.\n* **Pinch ** - pinching veya genişleme gücü.\n* **Radius ** - Etkilenen alanı belirleyen çemberin yarın.",
+            "param": {
+                "whirl": "Whirl",
+                "pinch": "Pinch",
+                "radius": "Radius",
+                "centerX": "Merkez X",
+                "centerY": "Merkez Y"
+            }
+        },
+        "zoomBlur": {
+            "name": "Zoom Blur",
+            "help": "Bir fotoğraf tekniğinden gelen bulanıklığı bir **zoom patlama** olarak adlandırdı.\n\nYüksek **Strength ** daha güçlü bir bulanık verir, daha yavaş bir panjur hızını veya daha uzun maruziyeti temsil eder.",
+            "param": {
+                "strength": "Güçlü",
+                "centerX": "Merkez X",
+                "centerY": "Merkez Y"
+            }
         }
     },
     "layerFilterGroup": {
@@ -582,6 +699,9 @@
         },
         "sharpen": {
             "name": "Sharpen"
+        },
+        "noise": {
+            "name": "Gürültü"
         }
     },
     "layoutShortcutGroup": {
@@ -1004,7 +1124,7 @@
                 },
                 "divide": {
                     "description": "Üst kattaki üst tabakanın parlaklığını bölün.",
-                    "example": "Bir görüntüyü dramatik bir şekilde aydınlatın, bir ışıklandırma veya einal etki yaratmak. maruz kalma düzeltmesi için kullanılabilir."
+                    "example": "Bir görüntüyü dramatik bir şekilde aydınlatın, bir ışıltı veya einal etki yaratmak. maruz kalma düzeltmesi için kullanılabilir."
                 },
                 "hue": {
                     "description": "Alt tabakanın krom ve ışıklığını korurken üst tabakanın hue'sini kullanın.",
@@ -1020,13 +1140,18 @@
                 },
                 "lightness": {
                     "description": "Alt tabakanın hue ve chroma'sını korurken üst tabakanın ışığı kullanın.",
-                    "example": "Renkleri doğru tutarken bir görüntüyü aydınlatın veya karanlıklayın."
+                    "example": "Orijinal renkler tutarken bir görüntüyü aydınlatma veya karanlıklayın."
                 },
                 "luminance": {
                     "description": "Üst tabakayı alt tabaka tarafından aydınlatır, sonra daha düşük tabakaya sonucu çok temizler.",
-                    "example": "Renkleri doğru tutarken bir görüntüyü aydınlatın veya karanlıklayın."
+                    "example": "Orijinal renkler tutarken bir görüntüyü aydınlatma veya karanlıklayın."
+                },
+                "merge": {
+                    "description": "Üst tabaka, opaklıkına dayanan altı kapsar, ancak opaklık değerlerinin opak olarak ekleyebileceğinde şeffaf kenarlar birleştirir. Sadece şeffaf bir arka planın üstünde çalışır.",
+                    "example": "Bir fotoğraftan seçilmiş bir alanı kesmek ve yeni bir tabakada aynı yerde izlemek."
                 }
-            }
+            },
+            "exampleUsage": "Örnek Kullanım:"
         },
         "designSystem": {
             "title": "Tasarım Sistemi"
@@ -1075,6 +1200,20 @@
             "notificationReadyMessage": "Güncelleme başka bir uygulamaya geçiş yaptığınızda kurulacaktır.",
             "notificationErrorTitle": "Update Error Update",
             "notificationErrorMessage": "Güncellemeyi indirmek için bir hata oluştu. Lütfen daha sonra tekrar deneyin."
+        },
+        "fileAddFont": {
+            "title": "Add Font",
+            "search": "Arama",
+            "searchPlaceholder": "Google Fonts'ı arayın...",
+            "offlineFontSearch": "Cihazınız çevrimdışı. font aramak için internete bağlanmak zorundasınız. Aşağıdaki \"Seçen dosyaları\" butonunu kullanarak hala font dosyalarına göz atabilirsiniz.",
+            "noFontsFound": "Bu arama kriterleri ile bulamadık.",
+            "uploadFontParseError": "Bir hata, seçtiğiniz fontlardan birini veya daha fazlasını parlarken gerçekleşti."
+        },
+        "imageTransform": {
+            "noLayersSelected": {
+                "title": "Hiçbir Katman Seçilmedi",
+                "message": "Dönüştürmek için tabakalarda en az bir tabaka seçin. Bazı katman türleri dönüştürülemez."
+            }
         }
     },
     "moduleGroup": {
@@ -1141,6 +1280,10 @@
                 "shareImage": {
                     "name": "Share Image",
                     "description": "Diğer insanlarla düzenlemediğiniz mevcut imajı paylaşın."
+                },
+                "addFont": {
+                    "name": "Add Font",
+                    "description": "Dosyaya bir font ekleyin."
                 }
             }
         },
@@ -1193,7 +1336,17 @@
                 "convertLayersToCollage": {
                     "name": "Kompaj Katmanları Collage",
                     "description": "Seçilen tabakaları bir görüntü kolajına dönüştürür. Mevcut birçok farklı kollage düzeni vardır."
-                }
+                },
+                "flipLayersX": {
+                    "name": "Flip X",
+                    "description": "Flip, görüntünün x ekseninde seçilmiş katmanlar."
+                },
+                "flipLayersY": {
+                    "name": "Flip Y",
+                    "description": "Flip, görüntünün y ekseninde seçilmiş tabakalar."
+                },
+                "rotateLayersClockwise": {},
+                "rotateLayersCounterclockwise": {}
             }
         },
         "layer": {
@@ -1211,6 +1364,9 @@
                 "blendingMode": {
                     "name": "Değişim Katmanı Moding Mode",
                     "description": "Aktif tabakanın karışımını değiştirin."
+                },
+                "layerEffectEdit": {
+                    "description": "Bir etki"
                 }
             }
         },
@@ -1386,7 +1542,8 @@
                 "wrapDirection": "Roll"
             },
             "fillColor": "Renkleri doldurun",
-            "paletteCount": "Sat"
+            "paletteCount": "Sat",
+            "addFont": "Font ekleyin..."
         },
         "zoom": {
             "zoomOut": "Zoom Out Off",
@@ -1473,7 +1630,8 @@
                 "noLayersSelected": "Lütfen etkilerini düzenlemek için tabakalarda bir veya daha fazla tabaka seçin.",
                 "layerHasNoEffects": "Bu tabakanın hiçbir etkisi yoktur.",
                 "deleteEffect": "Delete etkisi"
-            }
+            },
+            "maskHeading": "Maske:"
         },
         "eraseBrush": {
             "brushSize": "Boyut Boyutu",
@@ -1576,6 +1734,10 @@
                         "mouse": "Yeni şekiller eklemek için boş bir alana tıklayın ve sürükleyin."
                     }
                 }
+            },
+            "actions": {
+                "title": "Eylemler",
+                "convertToPath": "Path to Path"
             }
         },
         "deformSharpen": {

@@ -71,7 +71,11 @@
         "updateShapeStrokeColor": "업데이트 모양 치기 색깔",
         "updateShapeStrokeWidth": "업데이트 모양 치기 폭",
         "updateSharpenLayer": "Sharpen 층",
-        "updateVectorLayerAttributes": "벡터 레이어 업데이트"
+        "updateVectorLayerAttributes": "벡터 레이어 업데이트",
+        "convertVectorShapesToPaths": "변환 모양으로 Path",
+        "flipLayerX": "플립 층 수평한",
+        "flipLayerY": "플립 층 수직",
+        "mergeEffects": "Merge 효과"
     },
     "app": {
         "colorPickerGradient": {
@@ -126,7 +130,8 @@
                 "text": "텍스트 층",
                 "vector": "벡터 층",
                 "video": "영상 층"
-            }
+            },
+            "deleteSelection": "자주 묻는 질문"
         },
         "wait": {
             "applyLayerTransform": "층 Transform 적용",
@@ -188,7 +193,10 @@
         "moreInfo": "더 알아보기",
         "dontUpdate": "업데이트",
         "enable": "이름 *",
-        "updateApp": "앱 업데이트"
+        "updateApp": "앱 업데이트",
+        "add": "기타 제품",
+        "mergeEffects": "Merge 효과",
+        "selectFiles": "파일 선택 ..."
     },
     "canvas": {
         "toolbar": {
@@ -234,7 +242,7 @@
                 "menu": {
                     "cropResize": "자르기 및 크기",
                     "convertLayers": {
-                        "groupTitle": "층 변환 ...",
+                        "groupTitle": "모든 레이어를 변환 ...",
                         "toImageSequence": "본문 바로가기",
                         "flatten": "평평한 에 새로운 층",
                         "toCollage": "콜라겐"
@@ -242,7 +250,12 @@
                     "cut": "사이트맵",
                     "copy": "관련 기사",
                     "copyAllLayers": "모든 레이어 복사",
-                    "paste": "이름 *"
+                    "paste": "이름 *",
+                    "transformLayers": {
+                        "groupTitle": "Transform 층 ...",
+                        "flipX": "플립 수평",
+                        "flipY": "플립 수직"
+                    }
                 }
             },
             "view": {
@@ -377,7 +390,8 @@
                 "brightness": "사이트맵",
                 "effectiveRange": "제품정보",
                 "effectiveRangeFeather": "뚱 베어"
-            }
+            },
+            "help": "3개의 다른 형태를 사용하여 이미지의 광도를 바꾸십시오:\n* **Adjust Gamma** - 카메라의 노출 설정과 유사합니다.\n***Black/White Shift** - 모든 색상을 순수한 검은 색 또는 흰색으로 이동합니다.\n* **Adjust Luminance** - Oklab 색상 공간의 영구 불빛 값을 변경합니다.\n\n**Range** 설정은 빛이나 어두운 값이 영향을 받으며 **Feather** 설정은 **Range**와 함께 작동합니다."
         },
         "chroma": {
             "name": "크롬",
@@ -388,7 +402,8 @@
                     "multiply": "Chroma Contrast를 조정하십시오",
                     "shift": "균등하게 Chroma를 조정하십시오"
                 }
-            }
+            },
+            "help": "이미지가 얼마나 다채로운지 변경, 일부 상황에 \"saturation\"과 유사합니다.\n\n* **Adjust Chroma Contrast ** - 이미 더 높은 크롬 인 픽셀은 더 낮은 크롬 픽셀보다 더 영향을 미칩니다.\n* 이름 **Evenly Chroma ** - 모든 픽셀의 크롬 수준은 동일한 금액으로 조정됩니다."
         },
         "colorBlindness": {
             "name": "색깔 맹목",
@@ -443,7 +458,8 @@
                     "value": "최대 = (R, G, B)"
                 },
                 "mix": "팟캐스트"
-            }
+            },
+            "help": "이미지에서 모든 색상을 제거하고 원본 색상의 밝기를 계산하기 위해 많은 다른 공식 중 하나를 사용하여."
         },
         "hue": {
             "name": "Hue 조명",
@@ -454,7 +470,9 @@
                     "perceptualRgb": "영원한 RGB",
                     "linearRgb": "선형 RGB"
                 },
-                "rotate": "제품정보"
+                "rotate": "제품정보",
+                "targetColor": "표적 색깔",
+                "targetRange": "제품정보"
             }
         },
         "negative": {
@@ -469,7 +487,8 @@
                 "invertGreen": "Invert 녹색 채널",
                 "invertBlue": "Invert 블루 채널",
                 "invertValue": "Invert 가치"
-            }
+            },
+            "help": "이미지의 특정 색상 채널을 Invert, 높은 값은 낮은 값과 vice versa.\n\n**Color Space**는 gamma 보정 전이나 이후의 인버젼이 발생한다는 것을 결정합니다."
         },
         "saturation": {
             "name": "관련 기사",
@@ -490,12 +509,15 @@
                     "linearRgb": "선형 RGB"
                 },
                 "mix": "·"
-            }
+            },
+            "name": "Gradient 지도",
+            "help": "이미지의 모든 색상을 Gradient에서 색상으로 교환하면 이미지의 원본 색상의 밝기를 기반으로합니다.\n\n**Color Space**는 그라디언트의 정지 사이의 중간값이 교차하는 방식입니다. **Oklab**는 일반적으로 가장 정확한 옵션입니다."
         },
         "instagram1997": {
             "param": {
                 "mix": "·"
-            }
+            },
+            "name": "1997년"
         },
         "instagramAden": {
             "name": "아이든",
@@ -561,7 +583,102 @@
             "param": {
                 "white": "중립 색깔"
             },
-            "name": "백색 균형"
+            "name": "백색 균형",
+            "help": "지정된 ** 중립 색상 **가 실제로 흰색이어야하면 이미지를 조정합니다.\n\n사진기는 당신이 실제로 진짜 생활에서 보는 무슨을 일치하지 않는 점화 상태에 따라서 teal 또는 오렌지에 색깔을 이동할 수 있습니다."
+        },
+        "emboss": {
+            "name": "돋을새김하는",
+            "help": "물리적 돋을새김의 3D 외관을 시뮬레이션, 종이 또는 금속으로 디자인을 눌러.\n\n***Angle** - 빛과 그림자의 방향을 제어합니다.\n* **Elevation** - 돋을새김한 지역의 고도를 올리고, 빛과 그림자의 힘을 증가시킵니다.",
+            "param": {
+                "type": "제품정보",
+                "typeOption": {
+                    "blend": "제품정보",
+                    "heightmap": "사이트맵"
+                },
+                "angle": "주요 특징",
+                "elevation": "관련 기사"
+            }
+        },
+        "filmGrain": {
+            "name": "필름 곡물",
+            "help": "필름의 모양을 시뮬레이션하거나 대형 곡물 크기로 필름에 줌.\n\n***Intensity** - 곡물의 가시성을 증가시킵니다.\n* **Grain Scale** - 픽셀 크기와 관련된 곡물 크기 증가.\n* **Seed** - 곡물 패턴을 생성하는 데 사용되는 임의 번호.\n***Blend Mode** - 입자가 이미지와 결합되는 방법을 결정합니다. 정상적인 형태는 물리적으로 정확합니다, 다른 형태는 예술적인 효력을 위해 입니다.",
+            "param": {
+                "blendMode": "혼합 형태",
+                "blendModeOption": {
+                    "normal": "·",
+                    "subtract": "기타 제품",
+                    "add": "기타 제품"
+                },
+                "grainScale": "곡물 가늠자",
+                "grayscale": "회색 가늠자",
+                "intensity": "관련 기사",
+                "seed": "제품정보"
+            }
+        },
+        "monteCarloBlur": {
+            "name": "몬테 카를로 블루",
+            "help": "진짜 카메라를 가진 낮은 빛에 사진을 찍을 때 보이지 않는 흐림의 유형을 시뮬레이션합니다.\n\n***Iterations** - 빛의 얼마나 많은 광선은 화소 당 지켜집니다.\n* ** 크기** - 흐르의 반경.",
+            "param": {
+                "iterations": "관련 기사",
+                "iterationsOption": {
+                    "1": "1명",
+                    "2": "2개",
+                    "4": "4개",
+                    "8": "8개",
+                    "16": "16개",
+                    "32": "32개",
+                    "64": "64개"
+                },
+                "size": "크기 (mm)"
+            }
+        },
+        "pixelize": {
+            "name": "회사연혁",
+            "help": "픽셀 그리드처럼 보이는 큰 광장과 이미지 세부 사항을 커버합니다.",
+            "param": {
+                "size": "크기 (mm)",
+                "offsetX": "상쇄 X",
+                "offsetY": "상쇄 Y"
+            }
+        },
+        "spread": {
+            "name": "뚱 베어",
+            "help": "무작위 잡음 패턴에서 수평 또는 수직으로 픽셀을 이동합니다.",
+            "param": {
+                "horizontal": "제품정보",
+                "vertical": "수직",
+                "seed": "제품정보"
+            }
+        },
+        "tiltShiftBlur": {
+            "name": "경사 교대 Blur",
+            "help": "Microscopic Scales 또는 전문 카메라 Tilt-shift 렌즈 분야에서 얕은 깊이의 효과를 시뮬레이션합니다.\n\n***Blur Radius** - blurred 영역에 적용된 blur의 최대 금액.\n* **Gradient Radius ** - blurred 지역에 불쾌한 크기의.\n***Angle** - 비둘기 영역의 교체.\n* ** Offset** - 중앙에서 상쇄되지 않은 영역의 위치.",
+            "param": {
+                "blurRadius": "Blur 반경",
+                "gradientRadius": "Gradient 반경",
+                "angle": "주요 특징",
+                "offset": "제품정보"
+            }
+        },
+        "whirlPinch": {
+            "name": "Whirl & 핀",
+            "help": "트위스트 및 핀치 이미지의 원형 영역.\n\n* ** Whirl** - 트위스트의 회전.\n* **Pinch** - 피칭 또는 확장의 힘.\n* **Radius** - 영향을받는 지역을 결정하는 원형의 반경.",
+            "param": {
+                "whirl": "사이트맵",
+                "pinch": "핀치",
+                "radius": "채용정보",
+                "centerX": "센터 X",
+                "centerY": "센터 Y"
+            }
+        },
+        "zoomBlur": {
+            "name": "줌블러",
+            "help": "**zoom 파열 **라는 사진 기술에서 흐르를 시뮬레이션합니다.\n\nHigher **Strength**는 더 느린 셔터 속도 또는 더 긴 노출을 나타내는 더 강한 흐림을 줍니다.",
+            "param": {
+                "strength": "제품정보",
+                "centerX": "센터 X",
+                "centerY": "센터 Y"
+            }
         }
     },
     "layerFilterGroup": {
@@ -582,6 +699,9 @@
         },
         "sharpen": {
             "name": "스낵 바"
+        },
+        "noise": {
+            "name": "지원하다"
         }
     },
     "layoutShortcutGroup": {
@@ -1020,13 +1140,18 @@
                 },
                 "lightness": {
                     "description": "아래 층의 hue와 크롬을 보존하면서 상단 층의 가벼움을 사용합니다.",
-                    "example": "색상을 true 유지하면서 이미지를 밝히거나 어둡게합니다."
+                    "example": "원색을 유지하면서 이미지를 점화하거나 어둡게합니다."
                 },
                 "luminance": {
                     "description": "더 낮은 층에 의해 위 층 발광성, 그 후에 더 낮은 층에 결과를 다룹니다.",
-                    "example": "색상을 true 유지하면서 이미지를 밝히거나 어둡게합니다."
+                    "example": "원색을 유지하면서 이미지를 점화하거나 어둡게합니다."
+                },
+                "merge": {
+                    "description": "상단 층은 그것의 불투명에 근거를 둔 바닥을 커버하지만, 불투명 값이 불투명 될 수 있을 때 함께 투명 가장자리를 병합합니다. 투명 배경의 상단에서만 작동합니다.",
+                    "example": "사진에서 선택한 영역을 잘라 새로운 층의 동일한 위치에 붙여 넣기."
                 }
-            }
+            },
+            "exampleUsage": "예 사용 :"
         },
         "designSystem": {
             "title": "설계시스템"
@@ -1075,6 +1200,20 @@
             "notificationReadyMessage": "업데이트는 다른 앱으로 전환 할 때 설치됩니다.",
             "notificationErrorTitle": "업데이트 오류",
             "notificationErrorMessage": "오류는 업데이트 다운로드 중에 발생했습니다. 나중에 다시 시도하십시오."
+        },
+        "fileAddFont": {
+            "title": "본문 바로가기",
+            "search": "제품정보",
+            "searchPlaceholder": "Google 글꼴 검색 ...",
+            "offlineFontSearch": "당신의 장치는 따로따로 입니다. 글꼴을 검색하려면 인터넷에 연결해야합니다. 아래 \"Select Files...\"버튼을 사용하여 글꼴 파일을 검색 할 수 있습니다.",
+            "noFontsFound": "해당 검색 기준에 포함된 글꼴이 없습니다.",
+            "uploadFontParseError": "선택된 글꼴 중 하나 이상의 파싱 할 때 오류가 발생했습니다."
+        },
+        "imageTransform": {
+            "noLayersSelected": {
+                "title": "선택 없음",
+                "message": "레이어 도크의 최소 1층을 선택하여 변환합니다. 몇몇 층 유형은 변형될 수 없습니다."
+            }
         }
     },
     "moduleGroup": {
@@ -1141,6 +1280,10 @@
                 "shareImage": {
                     "name": "공유 이미지",
                     "description": "현재 이미지를 다른 사람들과 편집합니다."
+                },
+                "addFont": {
+                    "name": "본문 바로가기",
+                    "description": "파일에 글꼴을 추가합니다."
                 }
             }
         },
@@ -1193,7 +1336,17 @@
                 "convertLayersToCollage": {
                     "name": "레이어를 콜리지로 변환",
                     "description": "선택한 레이어를 이미지 콜리지로 변환합니다. 많은 다른 collage 레이아웃이 있습니다."
-                }
+                },
+                "flipLayersX": {
+                    "name": "플립 X",
+                    "description": "이미지의 x 축에 플립 선택 레이어."
+                },
+                "flipLayersY": {
+                    "name": "플립 Y",
+                    "description": "이미지의 y 축선에 플립에 의하여 선정되는 층."
+                },
+                "rotateLayersClockwise": {},
+                "rotateLayersCounterclockwise": {}
             }
         },
         "layer": {
@@ -1211,6 +1364,9 @@
                 "blendingMode": {
                     "name": "변화 층 혼합 형태",
                     "description": "활성 층의 혼합 모드를 변경합니다."
+                },
+                "layerEffectEdit": {
+                    "description": "자주 묻는 질문"
                 }
             }
         },
@@ -1386,7 +1542,8 @@
                 "wrapDirection": "제품정보"
             },
             "fillColor": "채우는 색깔",
-            "paletteCount": "Palette 조사"
+            "paletteCount": "Palette 조사",
+            "addFont": "더 보기."
         },
         "zoom": {
             "zoomOut": "줌 아웃",
@@ -1473,7 +1630,8 @@
                 "noLayersSelected": "층 도크에 1 개 이상의 레이어를 선택하여 효과를 편집하십시오.",
                 "layerHasNoEffects": "이 층은 아무 효력도 없습니다.",
                 "deleteEffect": "삭제 효과"
-            }
+            },
+            "maskHeading": "마스크:"
         },
         "eraseBrush": {
             "brushSize": "크기 (mm)",
@@ -1576,6 +1734,10 @@
                         "mouse": "새로운 모양을 추가하려면 빈 영역에 클릭하고 드래그하십시오."
                     }
                 }
+            },
+            "actions": {
+                "title": "팟캐스트",
+                "convertToPath": "변환 모양으로 Path"
             }
         },
         "deformSharpen": {
