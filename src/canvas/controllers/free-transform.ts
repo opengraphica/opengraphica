@@ -288,6 +288,24 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
         this.onTransformEnd();
     }
 
+    onPointerDoubleTap(e: PointerEvent): void {
+        super.onPointerDoubleTap(e);
+        if (selectedLayers.value.length === 1) {
+            const { transformBoundsPoint, viewDecomposedTransform } = this.getTransformedCursorInfo();
+            let transformDragType = this.getTransformDragType(transformBoundsPoint, viewDecomposedTransform);
+            if (transformDragType != null) {
+                const layer = selectedLayers.value[0];
+                if (layer.type === 'gradient') {
+                    editorStore.dispatch('setActiveTool', { group: 'draw', tool: 'gradient' });
+                } else if (layer.type === 'text') {
+                    editorStore.dispatch('setActiveTool', { group: 'text', tool: 'text' });
+                } else if (layer.type === 'vector') {
+                    editorStore.dispatch('setActiveTool', { group: 'draw', tool: 'shape' });
+                }
+            }
+        }
+    }
+
     async onTransformStart() {
         this.actionQueue.push(async () => {
             this.isPointerDragging = false;

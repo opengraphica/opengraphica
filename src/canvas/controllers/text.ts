@@ -1,6 +1,7 @@
 import { nextTick, watch, type WatchStopHandle } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 
+import type { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { ClearSelectionAction } from '@/actions/clear-selection';
 import { DeleteLayersAction } from '@/actions/delete-layers';
@@ -224,6 +225,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
 
     onLeave(): void {
         this.destroyEditorTextarea();
+        this.deleteEmptyTextLayers();
         editingTextLayerId.value = null;
         editingTextDocumentSelection.value = null;
 
@@ -302,7 +304,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
         }
     }
 
-    private onToolbarDocumentChanged(event: any) {        
+    private onToolbarDocumentChanged(event: any) {
         if (!editingTextLayer.value) return;
         const { name, value } = event as { name: keyof TextDocument, value: any };
         editingTextLayer.value.data[name] = value as never;
@@ -1056,6 +1058,22 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     }
 
     private async createNewTextLayerAtPosition(position: DOMPoint, isDynamic = false) {
+        let deleteTextLayersAction: DeleteLayersAction | null = null;
+        if (workingFileStore.state.selectedLayerIds.length > 0) {
+            const layerIdsToDelete: number[] = [];
+            for (const layerId of workingFileStore.state.selectedLayerIds) {
+                const layer = getLayerById(layerId);
+                if (layer?.type !== 'text') continue;
+                if (layer.data.lines.length > 1) continue;
+                if (layer.data.lines[0]?.spans.length > 1) continue;
+                if (layer.data.lines[0]?.spans[0]?.text.length > 0) continue;
+                layerIdsToDelete.push(layerId);
+            }
+            if (layerIdsToDelete.length > 0) {
+                deleteTextLayersAction = new DeleteLayersAction(layerIdsToDelete);
+            }
+        }
+
         this.createdLayerId = -1;
         const lineDirection = toolbarTextDefaults.lineDirection;
         const isHorizontal = ['ltr', 'rtl'].includes(lineDirection);
@@ -1097,9 +1115,12 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             height: isDynamic || isHorizontal ? createNewTextLayerSize.value.y : 1,
             data: newTextDocument,
         });
-        const createTextLayerAction = new BundleAction('createTextLayer', 'action.createTextLayer', [insertLayerAction]);
+        const actions: BaseAction[] = [insertLayerAction];
+        if (deleteTextLayersAction) {
+            actions.unshift(deleteTextLayersAction);
+        }
         await historyStore.dispatch('runAction', {
-            action: createTextLayerAction,
+            action: new BundleAction('createTextLayer', 'action.createTextLayer', actions),
         });
         this.createdLayerId = insertLayerAction.insertedLayerId;
         const createdLayerId = this.createdLayerId;
@@ -1431,6 +1452,25 @@ export default class CanvasTextController extends BaseCanvasMovementController {
             0,
             Math.min(0, (this.enterWindowInnerHeight * devicePixelRatio / 4) - pointerDown.y * devicePixelRatio),
         ).multiply(canvasStore.state.transform);
+    }
+
+    private deleteEmptyTextLayers() {
+        const textLayers = getLayersByType<WorkingFileTextLayer>('text');
+        if (textLayers.length > 0) {
+            const layerIdsToDelete: number[] = [];
+            for (const layer of textLayers) {
+                if (layer?.type !== 'text') continue;
+                if (layer.data.lines.length > 1) continue;
+                if (layer.data.lines[0]?.spans.length > 1) continue;
+                if (layer.data.lines[0]?.spans[0]?.text.length > 0) continue;
+                layerIdsToDelete.push(layer.id);
+            }
+            if (layerIdsToDelete.length > 0) {
+                historyStore.dispatch('runAction', {
+                    action: new DeleteLayersAction(layerIdsToDelete)
+                });
+            }
+        }
     }
 
     protected handleCursorIcon() {
