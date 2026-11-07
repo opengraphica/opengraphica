@@ -15244,10 +15244,13 @@ var opentype = (() => {
     let mapping = [];
     let lastIndex = null;
     let replaced = [];
-    for (let i = 0; i < this.tokenizer.tokens.length; i++) {
-      const token = this.tokenizer.tokens[i];
+    let i = 0;
+    for (const token of this.tokenizer.tokens) {
       if (token.state.deleted) {
-        replaced.push(i);
+        for (let j = 0; j < token.char.length - 1; j++) {
+          replaced.push(i + j);
+        }
+        i += token.char.length;
         continue;
       }
       if (lastIndex != null) {
@@ -15260,7 +15263,10 @@ var opentype = (() => {
       }
       const index = token.activeState.value;
       lastIndex = Array.isArray(index) ? index[0] : index;
-      replaced.push(i);
+      for (let j = 0; j < token.char.length; j++) {
+        replaced.push(i + j);
+      }
+      i += token.char.length;
     }
     if (lastIndex != null) {
       mapping.push({
