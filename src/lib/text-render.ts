@@ -103,13 +103,14 @@ export function splitSpanByAvailableFonts(
                 }
             }
         }
-        if (selectedFont != previousSelectedFont && currentFontSplitText.length > 0) {
+        if ((selectedFont != previousSelectedFont || isFallbackFont != previousIsFallbackFont) && currentFontSplitText.length > 0) {
             fontSplits.push([
-                previousSelectedFont, {
+                previousSelectedFont,
+                {
                     text: currentFontSplitText,
                     meta: span.meta,
                 },
-                isFallbackFont,
+                previousIsFallbackFont,
             ]);
             currentFontSplitText = '';
         }
@@ -118,6 +119,11 @@ export function splitSpanByAvailableFonts(
         previousIsFallbackFont = isFallbackFont;
     }
     if (currentFontSplitText.length > 0 || emptyCharacter != null) {
+        if (emptyCharacter != null) {
+            if (previousSelectedFont?.charToGlyph(emptyCharacter).unicode == null) {
+                emptyCharacter = ' ';
+            }
+        }
         fontSplits.push([
             previousSelectedFont,
             {

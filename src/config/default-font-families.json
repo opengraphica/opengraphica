@@ -148,7 +148,7 @@
     },
     {
         "family": "Noto Sans CJK Japanese",
-        "isFallback": true,
+        "isFallback": false,
         "subsets": [
             "japanese"
         ],

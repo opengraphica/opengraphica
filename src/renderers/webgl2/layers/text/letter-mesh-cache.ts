@@ -32,6 +32,7 @@ interface GlyphGroup {
     glyph: Glyph;
     fontName: string;
     instances: GlyphGroupInstance[];
+    isFallback: boolean;
 }
 
 interface GlyphGroupInstance {
@@ -54,7 +55,7 @@ interface StagedGlyph {
     fill: string;
 }
 
-type MergedGeometryKey = Array<number | string>;
+type MergedGeometryKey = Array<number | string | boolean>;
 
 interface GeometryToMerge {
     geometry: BufferGeometry;
@@ -113,8 +114,9 @@ export class LetterMeshCache {
     createGlyphGeometryKey(
         glyph: Glyph,
         fontName: string,
+        isFallback: boolean,
     ) {
-        return fontName + ',' + glyph.unicodes.join(',');
+        return (isFallback ? 'fallback,' : '') + fontName + ',' + glyph.unicodes.join(',');
     }
 
     createGeometryMaterialGroupKey(
@@ -126,8 +128,9 @@ export class LetterMeshCache {
     createGlyphGroupKey(
         glyph: Glyph,
         fontName: string,
+        isFallback: boolean,
     ) {
-        return fontName + ',' + glyph.unicodes.join(',');
+        return (isFallback ? 'fallback,' : '') + fontName + ',' + glyph.unicodes.join(',');
     }
 
     addLetter(
@@ -157,6 +160,7 @@ export class LetterMeshCache {
     createLetterGeometry(
         glyph: Glyph,
         fontName: string,
+        isFallback: boolean,
     ) {
         const commands = glyph.getPath(0, 0, 1000, {}).commands;
         let currentPath: Path | null = null;
@@ -253,7 +257,7 @@ export class LetterMeshCache {
         }
         
         if (geometry) {
-            const geometryKey = this.createGlyphGeometryKey(glyph, fontName);
+            const geometryKey = this.createGlyphGeometryKey(glyph, fontName, isFallback);
             this.glyphGeometries.set(geometryKey, geometry);
         }
 
@@ -280,8 +284,9 @@ export class LetterMeshCache {
         materialGroup: GeometryMaterialGroup,
         glyph: Glyph,
         fontName: string,
+        isFallback: boolean,
     ) {
-        const glyphGroupInstanceKey = this.createGlyphGroupKey(glyph, fontName);
+        const glyphGroupInstanceKey = this.createGlyphGroupKey(glyph, fontName, isFallback);
         let glyphGroup = materialGroup.glyphGroups.get(glyphGroupInstanceKey);
         if (glyphGroup) return glyphGroup;
 
@@ -289,6 +294,7 @@ export class LetterMeshCache {
             glyph,
             fontName,
             instances: [],
+            isFallback,
         };
         materialGroup.glyphGroups.set(glyphGroupInstanceKey, glyphGroup);
         return glyphGroup;
@@ -341,30 +347,37 @@ export class LetterMeshCache {
             const { glyph, fontName, isFallbackFont, fill, x, y, fontSize, line, character } = stagedGlyph;
 
             const materialGroup = this.getGeometryMaterialGroup(fill);
-            const glyphGroup = this.getGlyphGroup(materialGroup, glyph, fontName + (isFallbackFont ? '_fallback' : ''));
+            const glyphGroup = this.getGlyphGroup(materialGroup, glyph, fontName, isFallbackFont);
             this.updateGlyphGroupInstance(glyphGroup.instances, x, y, fontSize, line, character);
         }
 
         // Re-generate geometries and remove old glyphs
         const discardedMaterialGroupKeys: string[] = [];
+        const usedStagedGlyphs = new Set<number>();
         for (const [materialGroupKey, materialGroup] of this.geometryMaterialGroups.entries()) {
             let isMaterialGroupUsed = false;
 
-            let mergedGeometryKey: Array<string | number> = [];
+            let mergedGeometryKey: MergedGeometryKey = [];
             let geometriesToMerge: GeometryToMerge[] = [];
 
             const discardedGlyphGroupKeys: string[] = [];
-            for (const [glyphGroupKey, glyphGroup] of materialGroup.glyphGroups.entries()) {
+            usedStagedGlyphs.clear();
+            const glyphGroupKeys = Array.from(materialGroup.glyphGroups.keys()).sort((a, b) => {
+                return (a.startsWith('fallback,') ? 1 : 0) - (b.startsWith('fallback,') ? 1 : 0);
+            });
+            for (const glyphGroupKey of glyphGroupKeys) {
+                const glyphGroup = materialGroup.glyphGroups.get(glyphGroupKey)!;
                 let isGlyphGroupUsed = false;
 
                 for (let i = glyphGroup.instances.length - 1; i >= 0; i--) {
                     const glyphInstance = glyphGroup.instances[i];
-                    const glyphGroupFontName = glyphGroup.fontName.replace(/_fallback$/, '');
-                    
+
+                    const stagedGlyphKey = glyphInstance.line * 10000 + glyphInstance.character;
+                    if (usedStagedGlyphs.has(stagedGlyphKey)) continue;
                     const expectedGlyph = this.stagedGlyphs.get(glyphInstance.line * 10000 + glyphInstance.character);
                     if (
                         expectedGlyph?.glyph !== glyphGroup.glyph
-                        || expectedGlyph?.fontName !== glyphGroupFontName
+                        || expectedGlyph?.fontName !== glyphGroup.fontName
                         || expectedGlyph?.fill !== materialGroup.fill
                     ) {
                         glyphGroup.instances.splice(i, 1);
@@ -373,18 +386,20 @@ export class LetterMeshCache {
 
                     // At this point we know we're using this glyph, so fetch its geometry and add it to
                     // the list of geometries for this specific material to be merged together.
+                    usedStagedGlyphs.add(stagedGlyphKey);
 
                     isMaterialGroupUsed = true;
                     isGlyphGroupUsed = true;
 
-                    const geometryKey = this.createGlyphGeometryKey(glyphGroup.glyph, glyphGroup.fontName);
+                    const geometryKey = this.createGlyphGeometryKey(glyphGroup.glyph, glyphGroup.fontName, glyphGroup.isFallback);
                     let geometry = this.glyphGeometries.get(geometryKey) ?? this.createLetterGeometry(
-                        glyphGroup.glyph, glyphGroup.fontName,
+                        glyphGroup.glyph, glyphGroup.fontName, glyphGroup.isFallback,
                     );
                     if (!geometry) continue;
 
                     mergedGeometryKey.push(glyphGroup.glyph.index);
                     mergedGeometryKey.push(glyphGroup.fontName);
+                    mergedGeometryKey.push(glyphGroup.isFallback);
                     mergedGeometryKey.push(glyphInstance.x);
                     mergedGeometryKey.push(glyphInstance.y);
                     mergedGeometryKey.push(glyphInstance.fontSize);
