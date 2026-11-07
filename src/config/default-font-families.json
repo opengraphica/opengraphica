@@ -1,5 +1,18 @@
 [
     {
+        "family": "Noto Emoji",
+        "isFallback": true,
+        "subsets": [
+            "emoji"
+        ],
+        "variants": {
+            "regular": {
+                "name": "Regular",
+                "file": "fonts/NotoEmoji/NotoEmoji-Regular.ttf"
+            }
+        }
+    },
+    {
         "family": "Noto Sans",
         "isFallback": false,
         "subsets": [

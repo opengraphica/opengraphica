@@ -359,11 +359,12 @@ export class LetterMeshCache {
 
                 for (let i = glyphGroup.instances.length - 1; i >= 0; i--) {
                     const glyphInstance = glyphGroup.instances[i];
-
+                    const glyphGroupFontName = glyphGroup.fontName.replace(/_fallback$/, '');
+                    
                     const expectedGlyph = this.stagedGlyphs.get(glyphInstance.line * 10000 + glyphInstance.character);
                     if (
                         expectedGlyph?.glyph !== glyphGroup.glyph
-                        || expectedGlyph?.fontName !== glyphGroup.fontName
+                        || expectedGlyph?.fontName !== glyphGroupFontName
                         || expectedGlyph?.fill !== materialGroup.fill
                     ) {
                         glyphGroup.instances.splice(i, 1);
