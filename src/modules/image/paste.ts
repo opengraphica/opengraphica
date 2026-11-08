@@ -12,7 +12,7 @@ import { DeleteLayerSelectionAreaAction } from '@/actions/delete-layer-selection
 import { InsertLayerAction } from '@/actions/insert-layer';
 import { TrimLayerEmptySpaceAction } from '@/actions/trim-layer-empty-space';
 
-import { blitSpecifiedSelectionMask } from '@/canvas/store/selection-state';
+import { blitSpecifiedSelectionMask } from '@/tools/store/selection-state';
 
 import appEmitter from '@/lib/emitter';
 import { generateImageBlobHash } from '@/lib/hash';

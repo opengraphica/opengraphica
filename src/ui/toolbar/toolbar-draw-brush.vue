@@ -158,7 +158,7 @@ import {
     colorPaletteDockVisible, colorPaletteDockTop, colorPaletteDockLeft,
     sizeDockVisible, sizeDockTop, sizeDockLeft, isPreviewingSize,
     smoothingDockVisible, smoothingDockTop, smoothingDockLeft,
-} from '@/canvas/store/draw-brush-state';
+} from '@/tools/store/draw-brush-state';
 
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.vue';

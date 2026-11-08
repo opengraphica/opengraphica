@@ -91,7 +91,7 @@ import { UpdateLayerAction } from '@/actions/update-layer';
 
 import {
     activeColorStops, blendColorSpace, editingLayers, fillType, showStopDrawer, spreadMethod,
-} from '@/canvas/store/draw-gradient-state';
+} from '@/tools/store/draw-gradient-state';
 import historyStore from '@/store/history';
 
 import ElButton from 'element-plus/lib/components/button/index';

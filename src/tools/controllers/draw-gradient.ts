@@ -5,7 +5,7 @@ import {
     cursorHoverPosition, positionHandleRadius, editingLayers,
     activeColorStops, blendColorSpace, fillType, spreadMethod,
     hasVisibleToolbarOverlay, showStopDrawer, radiusMultiplierTouch,
-} from '@/canvas/store/draw-gradient-state';
+} from '@/tools/store/draw-gradient-state';
 
 import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
 import { dismissTutorialNotification, scheduleTutorialNotification, waitForNoOverlays } from '@/lib/tutorial';

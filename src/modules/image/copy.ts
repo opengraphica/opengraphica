@@ -10,7 +10,7 @@ import workingFileStore, { getSelectedLayers } from '@/store/working-file';
 import {
     activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset,
     createAppliedSelectionPaths,
-} from '@/canvas/store/selection-state';
+} from '@/tools/store/selection-state';
 
 import appEmitter from '@/lib/emitter';
 import { cloneCanvas } from '@/lib/image';

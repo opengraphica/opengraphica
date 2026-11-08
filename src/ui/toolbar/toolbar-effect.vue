@@ -351,11 +351,11 @@ import workingFileStore, { getLayerById, getLayerGlobalTransform, getSelectedLay
 import {
     effectEmitter, isToolbarVisible,
     effectSettingsDockVisible, effectSettingsDockTop, effectSettingsDockLeft,
-} from '@/canvas/store/effect-state';
+} from '@/tools/store/effect-state';
 import {
     activeSelectionMask, appliedSelectionMask, activeSelectionMaskCanvasOffset,
     appliedSelectionMaskCanvasOffset, resampleSelectionMaskInLayerBounds,
-} from '@/canvas/store/selection-state';
+} from '@/tools/store/selection-state';
 
 import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
 import { generateCssGradient } from '@/lib/gradient';

@@ -82,7 +82,7 @@ import canvasStore from '@/store/canvas';
 import workingFileStore from '@/store/working-file';
 import {
     top, left, width, height, cropResizeEmitter, dragHandleHighlight, previewXSnap, previewYSnap
-} from '@/canvas/store/crop-resize-state';
+} from '@/tools/store/crop-resize-state';
 
 export default defineComponent({
     name: 'CanvasOverlayCropResize',

@@ -435,7 +435,7 @@ import {
     brushEditorTab, brushesByCategory, getBrushById,
     addCustomBrush, deleteCustomBrush, generateBrushPreview,
     createBrushDefaults,
-} from '@/canvas/store/brush-library-state';
+} from '@/tools/store/brush-library-state';
 
 import ElAlert from 'element-plus/lib/components/alert/index';
 import ElButton from 'element-plus/lib/components/button/index';

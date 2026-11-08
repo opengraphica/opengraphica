@@ -6,7 +6,7 @@ import {
     selectionMaskDrawMargin, activeSelectionPath, createActiveSelectionMask, getActiveSelectionBounds,
     previewActiveSelectionMask, selectionCombineMode, SelectionCombineMode,
     createAppliedSelectionPaths,
-} from '@/canvas/store/selection-state';
+} from '@/tools/store/selection-state';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 

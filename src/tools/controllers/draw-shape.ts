@@ -17,10 +17,10 @@ import {
     editControlPointNodes, renderControlPointAttributeEdits, editControlPointNodeParsedAttributes,
     editingLayers, hasVisibleToolbarOverlay, showShapeDrawer,
     type ControlPointAttributeEdit,
-} from '@/canvas/store/draw-shape-state';
+} from '@/tools/store/draw-shape-state';
 import {
     activeSelectionPath, appliedSelectionPaths,
-} from '@/canvas/store/selection-state';
+} from '@/tools/store/selection-state';
 
 import { hexToColor } from '@/lib/color';
 import { decomposeMatrix, type DecomposedMatrix } from '@/lib/dom-matrix';

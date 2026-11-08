@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import { ref, computed, toRefs, watch } from 'vue';
-import { brushShapePath, brushSize, cursorHoverPosition, cursorHoverAngle } from '@/canvas/store/erase-brush-state';
+import { brushShapePath, brushSize, cursorHoverPosition, cursorHoverAngle } from '@/tools/store/erase-brush-state';
 import canvasStore from '@/store/canvas';
 
 const devicePixelRatio = window.devicePixelRatio || 1;

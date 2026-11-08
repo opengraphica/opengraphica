@@ -2,7 +2,7 @@ import { watch } from 'vue';
 
 import editorStore from "@/store/editor";
 
-import { effectEmitter, isToolbarVisible as isEffectToolbarVisible } from '@/canvas/store/effect-state';
+import { effectEmitter, isToolbarVisible as isEffectToolbarVisible } from '@/tools/store/effect-state';
 
 interface EffectEditOptions {
     layerId: number;

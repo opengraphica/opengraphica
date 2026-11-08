@@ -54,7 +54,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed, watch, onMounted, onUnmounted, toRefs } from 'vue';
 
-import { colorStopHandleRadius, positionHandleRadius } from '@/canvas/store/draw-gradient-state';
+import { colorStopHandleRadius, positionHandleRadius } from '@/tools/store/draw-gradient-state';
 import canvasStore from '@/store/canvas';
 import workingFileStore, { getSelectedLayers, getLayerGlobalTransform } from '@/store/working-file';
 

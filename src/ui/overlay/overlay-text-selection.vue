@@ -26,7 +26,7 @@ import canvasStore from '@/store/canvas';
 import { getLayerById, getLayerGlobalTransform } from '@/store/working-file';
 import {
     editingTextLayerId, editingRenderTextPlacement, editingTextDocumentSelection
-} from '@/canvas/store/text-state';
+} from '@/tools/store/text-state';
 
 interface SelectionBoxPlacement {
     layerId: number | null;

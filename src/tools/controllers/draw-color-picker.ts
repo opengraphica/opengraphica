@@ -4,7 +4,7 @@ import BaseCanvasMovementController from './base-movement';
 import { DecomposedMatrix } from '@/lib/dom-matrix';
 
 import canvasStore from '@/store/canvas';
-import { drawColorPickerEmitter, pickedColor } from '@/canvas/store/draw-color-picker-state';
+import { drawColorPickerEmitter, pickedColor } from '@/tools/store/draw-color-picker-state';
 
 import { useRenderer } from '@/renderers';
 

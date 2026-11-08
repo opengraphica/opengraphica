@@ -109,7 +109,7 @@ import {
     sizeDockVisible, sizeDockTop, sizeDockLeft, isPreviewingSize,
     smoothingDockVisible, smoothingDockTop, smoothingDockLeft,
     selectedBrush, selectedBrushPreview, generateSelectedBrushPreview,
-} from '@/canvas/store/erase-brush-state';
+} from '@/tools/store/erase-brush-state';
 
 import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.vue';
 import ElSlider from 'element-plus/lib/components/slider/index';

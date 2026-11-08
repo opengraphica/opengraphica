@@ -132,7 +132,7 @@ import {
     strengthDockVisible, strengthDockTop, strengthDockLeft,
     featherDockVisible, featherDockTop, featherDockLeft,
     settingsDockVisible, settingsDockTop, settingsDockLeft,
-} from '@/canvas/store/draw-bucket-fill-state';
+} from '@/tools/store/draw-bucket-fill-state';
 
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';
 import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.vue';

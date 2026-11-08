@@ -38,7 +38,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, toRefs } from 'vue';
-import { brushShape, brushSize, cursorHoverPosition, cursorHoverAngle } from '@/canvas/store/deform-sharpen-state';
+import { brushShape, brushSize, cursorHoverPosition, cursorHoverAngle } from '@/tools/store/deform-sharpen-state';
 
 import { Clipper, PolyType, ClipType, Paths, PolyFillType } from '@/lib/clipper';
 import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';

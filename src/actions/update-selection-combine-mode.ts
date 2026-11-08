@@ -1,5 +1,5 @@
 import { BaseAction } from './base';
-import { selectionCombineMode, SelectionCombineMode } from '@/canvas/store/selection-state';
+import { selectionCombineMode, SelectionCombineMode } from '@/tools/store/selection-state';
 
 export class UpdateSelectionCombineModeAction extends BaseAction {
 

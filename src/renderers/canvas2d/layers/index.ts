@@ -2,14 +2,14 @@ import type { WorkingFileLayer, WorkingFileAnyLayer, WorkingFileGroupLayer, Work
 import { markRaw } from 'vue';
 import canvasStore from '@/store/canvas';
 
-import BaseLayerRenderer2d from './2d/base';
-import GradientLayerRenderer2d from './2d/gradient';
-import GroupLayerRenderer2d from './2d/group';
-import RasterLayerRenderer2d from './2d/raster';
-import RasterSequenceLayerRenderer2d from './2d/raster-sequence';
-import TextLayerRenderer2d from './2d/text';
-import VectorLayerRenderer2d from './2d/vector';
-import VideoLayerRenderer2d from './2d/video';
+import BaseLayerRenderer2d from './base';
+import GradientLayerRenderer2d from './gradient';
+import GroupLayerRenderer2d from './group';
+import RasterLayerRenderer2d from './raster';
+import RasterSequenceLayerRenderer2d from './raster-sequence';
+import TextLayerRenderer2d from './text';
+import VectorLayerRenderer2d from './vector';
+import VideoLayerRenderer2d from './video';
 
 type ClassOfInterface<I, Args extends any[] = any[]> = new(...args: Args) => I;
 

@@ -38,7 +38,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, toRefs } from 'vue';
-import { brushShapePath, brushSize, cursorHoverPosition, cursorHoverAngle } from '@/canvas/store/draw-brush-state';
+import { brushShapePath, brushSize, cursorHoverPosition, cursorHoverAngle } from '@/tools/store/draw-brush-state';
 
 import { Clipper, PolyType, ClipType, Paths, PolyFillType } from '@/lib/clipper';
 import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';

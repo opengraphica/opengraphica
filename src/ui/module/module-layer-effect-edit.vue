@@ -250,7 +250,7 @@ import { BundleAction } from '@/actions/bundle';
 import historyStore from '@/store/history';
 import { createStoredImage, deleteStoredImage, getStoredImageOrCanvas } from '@/store/image';
 import workingFileStore, { getCanvasRenderingContext2DSettings, getLayerById, getLayerGlobalTransform, discardMaskIfUnused } from '@/store/working-file';
-import { activeSelectionMask, appliedSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMaskCanvasOffset, resampleSelectionMaskInLayerBounds } from '@/canvas/store/selection-state';
+import { activeSelectionMask, appliedSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMaskCanvasOffset, resampleSelectionMaskInLayerBounds } from '@/tools/store/selection-state';
 
 import { createLayerShaderUniformsAndDefines } from '@/renderers/webgl2/layers/base/material';
 import { createRasterMaterial } from '@/renderers/webgl2/layers/raster/material';

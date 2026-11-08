@@ -4,13 +4,13 @@ import BaseLayerRenderer from './base';
 let layerRenderers: any;
 
 setTimeout(async () => {
-    layerRenderers = (await import('@/canvas/renderers')).default;
+    layerRenderers = (await import('@/renderers/canvas2d/layers')).default;
 }, 0);
 
 export default class GroupLayerRenderer extends BaseLayerRenderer {
     async onAttach() {
         if (!layerRenderers) {
-            layerRenderers = (await import('@/canvas/renderers')).default;
+            layerRenderers = (await import('@/renderers/canvas2d/layers')).default;
         }
     }
     onDraw(ctx: CanvasRenderingContext2D, layer: WorkingFileGroupLayer<ColorModel>, options: DrawWorkingFileLayerOptions = {}) {

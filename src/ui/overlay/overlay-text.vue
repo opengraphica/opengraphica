@@ -92,7 +92,7 @@ import workingFileStore, { getLayerById, getLayerGlobalTransform } from '@/store
 import {
     isEditorTextareaFocused, editingTextLayerId, editingRenderTextPlacement, editingTextDocumentSelection,
     dragHandleHighlight, overlaySelectionCursorPosition, overlaySelectionCursorSize, editingLayerCssTransform,
-} from '@/canvas/store/text-state';
+} from '@/tools/store/text-state';
 
 import type { CalculatedTextPlacement, RenderTextLineInfo, RenderTextGlyphInfo, WorkingFileTextLayer } from '@/types';
 

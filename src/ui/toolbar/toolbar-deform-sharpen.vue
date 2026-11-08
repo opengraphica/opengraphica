@@ -103,7 +103,7 @@ import {
     opacityDockTop, opacityDockLeft, opacityDockVisible,
     sizeDockTop, sizeDockLeft, sizeDockVisible,
     strengthDockTop, strengthDockLeft, strengthDockVisible,
-} from '@/canvas/store/deform-sharpen-state';
+} from '@/tools/store/deform-sharpen-state';
 
 import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.vue';
 import ElSlider from 'element-plus/lib/components/slider/index';

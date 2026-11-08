@@ -148,7 +148,7 @@ import {
     enableSnapping, enableSnappingToCanvasCenter, enableSnappingToCanvasEdges,
     enableSnappingToCanvasContrast, enableSnappingToSelectionCenter,
     enableSnappingToSelectionEdges, dimensionLockRatio
-} from '@/canvas/store/crop-resize-state';
+} from '@/tools/store/crop-resize-state';
 
 import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';

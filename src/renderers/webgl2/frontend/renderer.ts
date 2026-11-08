@@ -12,7 +12,7 @@ import {
     activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask,
     appliedSelectionMaskCanvasOffset, selectedLayersSelectionMaskPreview,
     selectedLayersSelectionMaskPreviewCanvasOffset,
-} from '@/canvas/store/selection-state';
+} from '@/tools/store/selection-state';
 
 import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';
 import { colorToHex, colorToRgba, getColorModelName } from '@/lib/color';

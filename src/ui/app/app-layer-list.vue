@@ -209,9 +209,9 @@ import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 import historyStore from '@/store/history';
 import workingFileStore, { getLayerById, isGroupLayer } from '@/store/working-file';
-import { editingLayerIds as layerOpacityEditingLayerIds } from '@/canvas/store/layer-opacity-state';
-import { effectEmitter, isToolbarVisible as isEffectToolbarVisible } from '@/canvas/store/effect-state';
-import { activeSelectionMask, appliedSelectionMask } from '@/canvas/store/selection-state';
+import { editingLayerIds as layerOpacityEditingLayerIds } from '@/tools/store/layer-opacity-state';
+import { effectEmitter, isToolbarVisible as isEffectToolbarVisible } from '@/tools/store/effect-state';
+import { activeSelectionMask, appliedSelectionMask } from '@/tools/store/selection-state';
 
 import { runModule } from '@/modules';
 

@@ -8,7 +8,7 @@ import {
     dragHandleHighlight, previewXSnap, previewYSnap, dimensionLockRatio
 } from '../store/crop-resize-state';
 import canvasStore from '@/store/canvas';
-import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset } from '@/canvas/store/selection-state';
+import { activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset } from '@/tools/store/selection-state';
 import preferencesStore from '@/store/preferences';
 import workingFileStore from '@/store/working-file';
 

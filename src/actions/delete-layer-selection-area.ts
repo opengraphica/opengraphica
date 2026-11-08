@@ -4,7 +4,7 @@ import {
     activeSelectionMask, appliedSelectionMask,
     activeSelectionPath, appliedSelectionPaths,
     type SelectionCombineMode,
-} from '@/canvas/store/selection-state';
+} from '@/tools/store/selection-state';
 import canvasStore from '@/store/canvas';
 import { getStoredImageOrCanvas } from '@/store/image';
 import { createStoredSvg, getStoredSvgDocument } from '@/store/svg';

@@ -90,7 +90,7 @@ import { ref, computed, watch, toRefs } from 'vue';
 
 import { convertUnits } from '@/lib/metrics';
 
-import { isDrawingSelection, activeSelectionPath, selectionAddShape } from '@/canvas/store/selection-state';
+import { isDrawingSelection, activeSelectionPath, selectionAddShape } from '@/tools/store/selection-state';
 import canvasStore from '@/store/canvas';
 import workingFileStore from '@/store/working-file';
 

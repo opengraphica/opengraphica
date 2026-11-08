@@ -2,7 +2,7 @@
 import { BaseAction } from './base';
 import {
     activeSelectionPath, previewActiveSelectionMask, selectionCombineMode, SelectionCombineMode,
-} from '@/canvas/store/selection-state';
+} from '@/tools/store/selection-state';
 import canvasStore from '@/store/canvas';
 import editorStore from '@/store/editor';
 

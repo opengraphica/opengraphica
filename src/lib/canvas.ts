@@ -2,7 +2,7 @@ import { DrawWorkingFileOptions } from '@/types';
 import canvasStore from '@/store/canvas';
 import preferencesStore from '@/store/preferences';
 import workingFileStore, { getCanvasRenderingContext2DSettings } from '@/store/working-file';
-import layerRenderers from '@/canvas/renderers';
+import layerRenderers from '@/renderers/canvas2d/layers';
 
 const imageSmoothingZoomRatio = preferencesStore.get('imageSmoothingZoomRatio');
 

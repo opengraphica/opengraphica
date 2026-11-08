@@ -2,13 +2,13 @@ import { DrawWorkingFileLayerOptions, WorkingFileTextLayer, WorkingFileLayerRend
 
 import BaseLayerRenderer from './base';
 
-import DrawableCanvas from '@/canvas/renderers/drawable/canvas';
+import DrawableCanvas from '@/renderers/canvas2d/drawable/canvas';
 
-import type { TextData } from '@/canvas/drawables/text';
+import type { TextData } from '@/renderers/canvas2d/drawable/drawables/text';
 import type { DrawableConstructor } from '@/types';
 
 let TextDrawable: DrawableConstructor | undefined = undefined;
-import('@/canvas/drawables/text').then(({ default: TextDrawableConstructor }) => {
+import('@/renderers/canvas2d/drawable/drawables/text').then(({ default: TextDrawableConstructor }) => {
     TextDrawable = TextDrawableConstructor;
 });
 

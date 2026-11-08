@@ -264,7 +264,7 @@ import {
     fillStyleDockVisible, fillStyleDockLeft, fillStyleDockTop,
     strokeStyleDockVisible, strokeStyleDockLeft, strokeStyleDockTop,
     snappingDockVisible, snappingDockLeft, snappingDockTop,
-} from '@/canvas/store/draw-shape-state';
+} from '@/tools/store/draw-shape-state';
 
 import ElButton from 'element-plus/lib/components/button/index';
 import ElForm, { ElFormItem } from 'element-plus/lib/components/form/index';

@@ -5,8 +5,8 @@ import { checkWebUpdates } from '@/check-updates';
 
 import { PerformantStore } from './performant-store';
 
-import BaseCanvasController from '@/canvas/controllers/base';
-import BaseCanvasMovementController from '@/canvas/controllers/base-movement';
+import BaseCanvasController from '@/tools/controllers/base';
+import BaseCanvasMovementController from '@/tools/controllers/base-movement';
 import toolGroupsConfig from '@/config/tool-groups.json';
 
 import { loadStylesheet } from '@/lib/stylesheet';
@@ -248,7 +248,7 @@ const store = new PerformantStore<EditorStore>({
                         controllerName = toolDefinition.controller;
                     }
                     const CanvasControllerGenericClass: typeof BaseCanvasController = (
-                        await import(/* webpackChunkName: 'canvas-controller-[request]' */ `../canvas/controllers/${controllerName}.ts`)
+                        await import(/* webpackChunkName: 'tool-controller-[request]' */ `../tools/controllers/${controllerName}.ts`)
                             .catch((error) => {
                                 checkWebUpdates()
                                 console.error(error);

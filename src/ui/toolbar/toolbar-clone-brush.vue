@@ -83,7 +83,7 @@ import {
     hardnessDockTop, hardnessDockLeft, hardnessDockVisible,
     opacityDockTop, opacityDockLeft, opacityDockVisible,
     sizeDockTop, sizeDockLeft, sizeDockVisible,
-} from '@/canvas/store/clone-brush-state';
+} from '@/tools/store/clone-brush-state';
 
 import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.vue';
 import ElSlider from 'element-plus/lib/components/slider/index';

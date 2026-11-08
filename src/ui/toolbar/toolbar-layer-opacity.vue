@@ -61,7 +61,7 @@ import ElInputNumber from '@/ui/el/el-input-number.vue';
 import ElSlider from 'element-plus/lib/components/slider/index';
 
 import canvasStore from '@/store/canvas';
-import { layerOpacityEmitter, previewOpacity } from '@/canvas/store/layer-opacity-state';
+import { layerOpacityEmitter, previewOpacity } from '@/tools/store/layer-opacity-state';
 
 const { t } = useI18n();
 

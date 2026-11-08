@@ -126,8 +126,8 @@ import {
     isBoundsIndeterminate, freeTransformEmitter, left, top, width, height, rotation,
     transformOriginX, transformOriginY, dragHandleHighlight, rotateHandleHighlight, selectedLayers,
     isResizeEnabled, isUnevenScalingEnabled, snapLineX, snapLineY,
-} from '@/canvas/store/free-transform-state';
-import { activeSelectionMask, appliedSelectionMask } from '@/canvas/store/selection-state';
+} from '@/tools/store/free-transform-state';
+import { activeSelectionMask, appliedSelectionMask } from '@/tools/store/selection-state';
 import canvasStore from '@/store/canvas';
 
 defineOptions({

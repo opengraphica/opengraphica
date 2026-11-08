@@ -11,7 +11,7 @@ import { updateWorkingFileLayer } from '@/store/data/working-file-database';
 import {
     activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask,
     appliedSelectionMaskCanvasOffset, resampleSelectionMaskInLayerBounds,
-} from '@/canvas/store/selection-state';
+} from '@/tools/store/selection-state';
 import { useRenderer } from '@/renderers';
 
 import { updateBakedImageForLayer } from './baking';

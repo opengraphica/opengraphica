@@ -79,7 +79,7 @@ import ElHorizontalScrollbarArrows from '@/ui/el/el-horizontal-scrollbar-arrows.
 import ElInputGroup from '@/ui/el/el-input-group.vue';
 import ElSelect, { ElOption } from 'element-plus/lib/components/select/index';
 
-import { appliedSelectionMask, selectionAddShape, selectionCombineMode, selectionEmitter, activeSelectionPath } from '@/canvas/store/selection-state';
+import { appliedSelectionMask, selectionAddShape, selectionCombineMode, selectionEmitter, activeSelectionPath } from '@/tools/store/selection-state';
 
 defineOptions({
     name: 'ToolbarSelection',

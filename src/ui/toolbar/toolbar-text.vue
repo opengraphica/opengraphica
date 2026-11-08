@@ -225,7 +225,7 @@ import {
     fillColorPalette, fillColorPaletteIndex,
     fillColorPaletteDockLeft, fillColorPaletteDockTop, fillColorPaletteDockVisible,
     editingTextLayer, textToolbarEmitter, toolbarTextMeta, toolbarTextDefaults,
-} from '@/canvas/store/text-state';
+} from '@/tools/store/text-state';
 
 import type { RGBAColor, TextDocument } from '@/types';
 

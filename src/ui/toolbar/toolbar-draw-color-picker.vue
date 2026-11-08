@@ -26,7 +26,7 @@ import { useI18n } from '@/i18n';
 import ElButton from 'element-plus/lib/components/button/index';
 
 import canvasStore from '@/store/canvas';
-import { drawColorPickerEmitter } from '@/canvas/store/draw-color-picker-state';
+import { drawColorPickerEmitter } from '@/tools/store/draw-color-picker-state';
 
 const { t } = useI18n();
 

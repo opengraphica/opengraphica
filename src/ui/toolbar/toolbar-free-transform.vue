@@ -231,8 +231,8 @@ import {
     stretchToImageBounds, snappingDockTop, snappingDockLeft, snappingDockVisible,
     metricsDockTop, metricsDockLeft, metricsDockVisible,
     resetSelectedLayerWidths, resetSelectedLayerHeights, alignSelectedLayersToCanvas,
-} from '@/canvas/store/free-transform-state';
-import { appliedSelectionMask, activeSelectionMask } from '@/canvas/store/selection-state';
+} from '@/tools/store/free-transform-state';
+import { appliedSelectionMask, activeSelectionMask } from '@/tools/store/selection-state';
 import historyStore from '@/store/history';
 import workingFileStore, { getSelectedLayers, WorkingFileState } from '@/store/working-file';
 

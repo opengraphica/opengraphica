@@ -267,7 +267,7 @@ import {
     transformBoundsTop, transformBoundsLeft, transformBoundsWidth, transformBoundsHeight,
     transformBoundsRotation, transformOriginX, transformOriginY,
     isTransformBoundsTransparent,
-} from '@/canvas/store/draw-shape-state';
+} from '@/tools/store/draw-shape-state';
 
 defineOptions({
     name: 'CanvasOverlayDrawShape',

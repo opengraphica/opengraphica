@@ -64,7 +64,7 @@ import { ref, computed, onMounted, onUnmounted, watch, toRefs } from 'vue';
 import {
     brushShape, brushSize, cursorHoverPosition, cursorHoverAngle,
     sourceX, sourceY, sourceDrawingOffsetX, sourceDrawingOffsetY, cursorIsHoveringSource,
-} from '@/canvas/store/clone-brush-state';
+} from '@/tools/store/clone-brush-state';
 
 import { Clipper, PolyType, ClipType, Paths, PolyFillType } from '@/lib/clipper';
 import appEmitter, { type AppEmitterEvents } from '@/lib/emitter';

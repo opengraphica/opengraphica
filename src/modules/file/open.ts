@@ -21,7 +21,7 @@ import workingFileStore, {
     getCanvasRenderingContext2DSettings, calculateLayerOrder, discardAllUnusedMasks, type WorkingFileState
 } from '@/store/working-file';
 import { readWorkingFile, readStoredFonts } from '@/store/data/working-file-database';
-import { discardActiveSelectionMask, discardAppliedSelectionMask, activeSelectionPath, appliedSelectionPaths } from '@/canvas/store/selection-state';
+import { discardActiveSelectionMask, discardAppliedSelectionMask, activeSelectionPath, appliedSelectionPaths } from '@/tools/store/selection-state';
 
 import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';

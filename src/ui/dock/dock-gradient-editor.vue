@@ -159,7 +159,7 @@ import { generateCssGradient, sampleGradient } from '@/lib/gradient';
 
 import {
     blendColorSpace, presets, type GradientPreset,
-} from '@/canvas/store/draw-gradient-state';
+} from '@/tools/store/draw-gradient-state';
 
 import ElButton, { ElButtonGroup } from 'element-plus/lib/components/button/index';
 import ElDivider from 'element-plus/lib/components/divider/index';

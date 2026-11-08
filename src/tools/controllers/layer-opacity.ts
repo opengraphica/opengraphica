@@ -9,7 +9,7 @@ import workingFileStore, { getLayerById } from '@/store/working-file';
 import {
     layerOpacityEmitter, previewOpacity,
     editingLayers, editingLayerIds, editingLayersRestoreOpacity,
-} from '@/canvas/store/layer-opacity-state';
+} from '@/tools/store/layer-opacity-state';
 
 import { BundleAction } from '@/actions/bundle';
 import { UpdateLayerAction } from '@/actions/update-layer';

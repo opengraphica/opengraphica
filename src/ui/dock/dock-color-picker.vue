@@ -50,7 +50,7 @@ import { createColorNamer, getColorName, destroyColorNamer } from '@/workers/col
 import colorNamer from 'color-namer';
 
 import editorStore from '@/store/editor';
-import { pickedColor, drawColorPickerEmitter } from '@/canvas/store/draw-color-picker-state';
+import { pickedColor, drawColorPickerEmitter } from '@/tools/store/draw-color-picker-state';
 
 import type { ColorModel, ColorModelName, RGBAColor } from '@/types';
 

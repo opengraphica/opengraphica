@@ -86,7 +86,7 @@ export default class DrawableCanvas {
         }
 
         if (!this.sync && !this.offscreenCanvasUuid) {
-            this.drawableClassMap = (await import('@/canvas/drawables')).default;
+            this.drawableClassMap = (await import('@/renderers/canvas2d/drawable/drawables')).default;
         }
 
         this.isInitialized = true;

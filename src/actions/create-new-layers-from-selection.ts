@@ -3,7 +3,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import {
     activeSelectionMask, activeSelectionMaskCanvasOffset, appliedSelectionMask, appliedSelectionMaskCanvasOffset,
     createAppliedSelectionPaths,
-} from '@/canvas/store/selection-state';
+} from '@/tools/store/selection-state';
 import canvasStore from '@/store/canvas';
 import { createStoredImage } from '@/store/image';
 import { cloneStoredSvg } from '@/store/svg';
@@ -21,7 +21,7 @@ import { InsertLayerAction } from './insert-layer';
 import { SelectLayersAction } from './select-layers';
 import { TrimLayerEmptySpaceAction } from './trim-layer-empty-space';
 
-import renderers from '@/canvas/renderers';
+import renderers from '@/renderers/canvas2d/layers';
 
 import {
     ColorModel, WorkingFileRasterLayer, WorkingFileRasterSequenceLayer, InsertRasterLayerOptions,

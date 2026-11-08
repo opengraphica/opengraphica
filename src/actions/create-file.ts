@@ -7,7 +7,7 @@ import { writeWorkingFile, deleteWorkingFile } from '@/store/data/working-file-d
 import {
     discardActiveSelectionMask, discardAppliedSelectionMask,
     activeSelectionPath, appliedSelectionPaths,
-} from '@/canvas/store/selection-state';
+} from '@/tools/store/selection-state';
 
 import appEmitter from '@/lib/emitter';
 

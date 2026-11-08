@@ -27,7 +27,7 @@ import { knownFileExtensions } from '@/lib/regex';
 
 import { InsertLayerAction } from '@/actions/insert-layer';
 
-import { activeSelectionMask, appliedSelectionMask } from '@/canvas/store/selection-state';
+import { activeSelectionMask, appliedSelectionMask } from '@/tools/store/selection-state';
 
 import { useRenderer } from '@/renderers';
 
