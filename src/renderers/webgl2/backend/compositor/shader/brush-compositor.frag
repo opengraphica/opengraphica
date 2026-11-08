@@ -7,6 +7,7 @@
 #define DRAW_MODE_NORMAL 0
 #define DRAW_MODE_BLUR 1
 #define DRAW_MODE_SHARPEN 2
+#define DRAW_MODE_CLONE 3
 
 const int MAX_BLUR_RADIUS = 64;
 
@@ -18,7 +19,7 @@ uniform sampler2D refMap;
 uniform sampler2D selectionMaskMap;
 uniform vec4 dstOffsetAndSize;
 uniform vec4 refOffsetAndSize;
-uniform vec2 brushAlphaConcentration;
+uniform vec4 brushAlphaConcentrationExtra;
 uniform mat4 selectionMaskTransform;
 
 float srgbChannelToLinearSrgbChannel(float value) {
@@ -28,12 +29,11 @@ float srgbChannelToLinearSrgbChannel(float value) {
     return calculatedValue;
 }
 
-vec4 srgbToLinearSrgb(vec4 srgb) {
-    return vec4(
+vec3 srgbToLinearSrgb(vec3 srgb) {
+    return vec3(
         srgbChannelToLinearSrgbChannel(srgb.r),
         srgbChannelToLinearSrgbChannel(srgb.g),
-        srgbChannelToLinearSrgbChannel(srgb.b),
-        srgb.a
+        srgbChannelToLinearSrgbChannel(srgb.b)
     );
 }
 
@@ -89,14 +89,14 @@ void main() {
     float selectionMaskMultiplier = 1.0;
 #endif
 
-    vec4 srcColor = srgbToLinearSrgb(texture2D(srcMap, vUv));
+    vec4 srcColor = texture2D(srcMap, vUv);
     vec4 dstColor = texture2D(dstMap, dstUv);
 
 #if cBrushDrawMode == DRAW_MODE_BLUR
 
     vec2 refUv = vec2(refOffsetAndSize.x, 1.0 - refOffsetAndSize.y - refOffsetAndSize.w) + vUv * refOffsetAndSize.zw;
 
-    float blurAmount = srcColor.a * brushAlphaConcentration.x * selectionMaskMultiplier;
+    float blurAmount = srcColor.a * brushAlphaConcentrationExtra.x * selectionMaskMultiplier;
     blurAmount = clamp(blurAmount, 0.0, 1.0);
 
     vec4 blurredColor = texture2D(refMap, refUv);
@@ -107,16 +107,29 @@ void main() {
 
     vec2 refUv = vec2(refOffsetAndSize.x, 1.0 - refOffsetAndSize.y - refOffsetAndSize.w) + vUv * refOffsetAndSize.zw;
 
-    float sharpenAmount = srcColor.a * brushAlphaConcentration.x * selectionMaskMultiplier;
+    float sharpenAmount = srcColor.a * brushAlphaConcentrationExtra.x * selectionMaskMultiplier;
     sharpenAmount = clamp(sharpenAmount, 0.0, 1.0);
 
     vec4 sharpenedColor = texture2D(refMap, refUv);
 
     gl_FragColor = mix(dstColor, sharpenedColor, sharpenAmount);
 
+#elif cBrushDrawMode == DRAW_MODE_CLONE
+
+    vec2 refUv = vec2(refOffsetAndSize.x, 1.0 - refOffsetAndSize.y - refOffsetAndSize.w) + vUv * refOffsetAndSize.zw;
+    refUv += brushAlphaConcentrationExtra.zw;
+
+    float cloneBlendAmount = srcColor.a * brushAlphaConcentrationExtra.x * selectionMaskMultiplier;
+    float edgeMask = step(0.0, refUv.x) * step(refUv.x, 1.0) * step(0.0, refUv.y) * step(refUv.y, 1.0);
+    cloneBlendAmount = clamp(cloneBlendAmount * edgeMask, 0.0, 1.0);
+
+    vec4 cloneColor = texture2D(refMap, refUv);
+
+    gl_FragColor = mix(dstColor, cloneColor, cloneBlendAmount);
+
 #elif cBrushDrawMode == DRAW_MODE_NORMAL
 
-    float srcAlpha = srcColor.a * brushAlphaConcentration.x * selectionMaskMultiplier;
+    float srcAlpha = srcColor.a * brushAlphaConcentrationExtra.x * selectionMaskMultiplier;
 
 #if cLayerBlendingMode == BLENDING_MODE_ERASE
     float alpha = max(dstColor.a - srcAlpha, 0.0);
@@ -128,12 +141,12 @@ void main() {
 
     // OKLab Variant
     // gl_FragColor = vec4(
-    //     oklabToRgb((rgbToOklab(srcColor.rgb) * srcAlpha + (rgbToOklab(dstColor.rgb) * dstColor.a) * (1.0 - srcAlpha)) / alpha), alpha
+    //     oklabToRgb((rgbToOklab(srgbToLinearSrgb(srcColor.rgb)) * srcAlpha + (rgbToOklab(dstColor.rgb) * dstColor.a) * (1.0 - srcAlpha)) / alpha), alpha
     // );
 
     // Linear Variant
     gl_FragColor = vec4(
-        ((srcColor.rgb) * srcAlpha + ((dstColor.rgb) * dstColor.a) * (1.0 - srcAlpha)) / alpha, alpha
+        (srgbToLinearSrgb(srcColor.rgb) * srcAlpha + ((dstColor.rgb) * dstColor.a) * (1.0 - srcAlpha)) / alpha, alpha
     );
 #endif
 

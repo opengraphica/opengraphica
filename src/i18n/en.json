@@ -56,6 +56,7 @@
         "typeInTextLayer": "Type in Text Layer",
         "updateActiveSelection": "Update Active Selection",
         "updateBlurLayer": "Blur Layer",
+        "updateCloneBrushLayer": "Clone Brush Layer",
         "updateDrawLayer": "Draw on Layer",
         "updateDrawGradientLayerBlendColorSpace": "Update Gradient (Color Space)",
         "updateDrawGradientLayerFillType": "Update Gradient (Fill Type)",
@@ -801,6 +802,10 @@
                     "title": "Blur",
                     "description": "Blur areas of the image"
                 },
+                "cloneBrush": {
+                    "title": "Clone Brush",
+                    "description": "Clone areas of the image"
+                },
                 "sharpen": {
                     "title": "Sharpen",
                     "description": "Sharpen areas of the image"
@@ -1436,6 +1441,17 @@
         "dark": "Dark"
     },
     "toolbar": {
+        "cloneBrush": {
+            "brushOpacity": "Opacity",
+            "brushSize": "Size",
+            "brushHardness": "Hardness",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "No Layers Selected",
+                    "message": "Please select at least one image layer in the layers dock. Certain layer types can't be used with the clone brush."
+                }
+            }
+        },
         "cropResize": {
             "title": "Crop and Resize",
             "linkWidthHeight": "Link Width/Height",
@@ -1891,6 +1907,20 @@
         }
     },
     "tutorialTip": {
+        "cloneBrushToolIntroduction": {
+            "title": "Clone Brush Tool",
+            "introduction": [
+                "The clone brush copies part of an image so you can paint that same area somewhere else. It is typically used to remove blemishes, unwanted objects, or fill in a damaged spot."
+            ],
+            "body": {
+                "mouse": [
+                    "The clone area displays as a circle with the clone stamp icon. You can drag it around or ctrl + click to set it to the current mouse position."
+                ],
+                "touch": [
+                    "The clone area displays as a circle with the clone stamp icon. You can drag it around."
+                ]
+            }
+        },
         "deformBlurToolIntroduction": {
             "title": "Blur Tool",
             "introduction": [
@@ -1910,7 +1940,7 @@
             ]
         },
         "drawBucketFillToolIntroduction": {
-            "title": "Bucket Fill",
+            "title": "Bucket Fill Tool",
             "introduction": [
                 "The bucket fill tool lets you fill in areas of similar color with a color of your choice."
             ],
@@ -1964,7 +1994,7 @@
             ]
         },
         "eraseBucketFillToolIntroduction": {
-            "title": "Erase Bucket Fill",
+            "title": "Erase Bucket Fill Tool",
             "introduction": [
                 "Erase areas of the image that have a similar color."
             ],

@@ -76,6 +76,7 @@ export class BrushStroke {
 
     x: number = 0;
     y: number = 0;
+    isFirstBrushMove: boolean = true;
 
     blendingMode: WorkingFileLayerBlendingMode = 'normal';
     brushSize!: number;
@@ -98,6 +99,7 @@ export class BrushStroke {
     inactiveBrushColorRenderTarget!: WebGLRenderTarget;
     gaussianBlurRenderTarget: WebGLRenderTarget | undefined;
     sharpenRenderTarget: WebGLRenderTarget | undefined;
+    cloneRenderTarget: WebGLRenderTarget | undefined;
 
     // Reuse matrix and vector objects to prevent memory pressure while drawing.
     aabb = new Box2();
@@ -220,7 +222,7 @@ export class BrushStroke {
                 selectionMaskMap: { value: selectionMaskTexture },
                 dstOffsetAndSize: { value: new Vector4() },
                 refOffsetAndSize: { value: new Vector4() },
-                brushAlphaConcentration: { value: new Vector2(this.brushColor[3], 0) },
+                brushAlphaConcentrationExtra: { value: new Vector4(this.brushColor[3], 0, 0, 0) },
                 selectionMaskTransform: { value: new Matrix4() },
             },
             vertexShader: brushCompositorVertexShader,
@@ -276,6 +278,20 @@ export class BrushStroke {
                 premultipliedAlpha: true,
             });
             this.sharpenRenderTarget = new WebGLRenderTarget(this.texture.width, this.texture.height, {
+                type: UnsignedByteType,
+                minFilter: NearestFilter,
+                magFilter: NearestFilter,
+                wrapS: ClampToEdgeWrapping,
+                wrapT: ClampToEdgeWrapping,
+                format: RGBAFormat,
+                internalFormat: this.texture.internalFormat,
+                depthBuffer: false,
+                colorSpace: SRGBColorSpace,
+                stencilBuffer: false,
+                generateMipmaps: false,
+            });
+        } else if (this.drawMode === RendererBrushStrokeDrawMode.CLONE) {
+            this.cloneRenderTarget = new WebGLRenderTarget(this.texture.width, this.texture.height, {
                 type: UnsignedByteType,
                 minFilter: NearestFilter,
                 magFilter: NearestFilter,
@@ -370,6 +386,23 @@ export class BrushStroke {
             this.mesh.material = this.sharpenMaterial;
             this.renderer.setViewport(0, 0, 1, 1);
             this.renderer.setRenderTarget(this.sharpenRenderTarget);
+            this.renderer.clearColor();
+            this.renderer.render(this.scene, this.camera);
+
+            // Reset
+            this.renderer.setRenderTarget(null);
+            this.renderer.setViewport(this.originalViewport);
+        }
+        if (this.cloneRenderTarget) {
+            this.mesh.material = this.copyTileMaterial;
+            this.copyTileMaterial.uniforms.map.value = this.texture;
+            this.copyTileMaterial.uniforms.tileOffsetAndSize.value.x = 0;
+            this.copyTileMaterial.uniforms.tileOffsetAndSize.value.y = 0;
+            this.copyTileMaterial.uniforms.tileOffsetAndSize.value.z = 1;
+            this.copyTileMaterial.uniforms.tileOffsetAndSize.value.w = 1;
+            this.copyTileMaterial.uniformsNeedUpdate = true;
+            this.renderer.setViewport(0, 0, 1, 1);
+            this.renderer.setRenderTarget(this.cloneRenderTarget);
             this.renderer.clearColor();
             this.renderer.render(this.scene, this.camera);
 
@@ -472,6 +505,21 @@ export class BrushStroke {
         cullAabb.min.y = Math.min(c0.y, c1.y, c2.y, c3.y);
         cullAabb.max.x = Math.max(c0.x, c1.x, c2.x, c3.x);
         cullAabb.max.y = Math.max(c0.y, c1.y, c2.y, c3.y);
+
+        if (this.isFirstBrushMove && this.drawMode == RendererBrushStrokeDrawMode.CLONE) {
+            const sourceX = this.brushColor[0];
+            const sourceY = this.brushColor[1];
+            const point = new Vector3(x, y, 0).applyMatrix4(
+                this.layerTransformInverse
+            );
+            const uvOffsetX = sourceX - (point.x / this.layerSize.x);
+            const uvOffsetY = (point.y / this.layerSize.y) - sourceY;
+
+            this.compositorMaterial.uniforms.brushAlphaConcentrationExtra.value.z = uvOffsetX;
+            this.compositorMaterial.uniforms.brushAlphaConcentrationExtra.value.w = uvOffsetY;
+            this.brushColor[0] = uvOffsetX;
+            this.brushColor[1] = uvOffsetY;
+        }
 
         let xi = 0;
         let yi = 0;
@@ -620,6 +668,7 @@ export class BrushStroke {
         this.renderer.setRenderTarget(null);
         this.renderer.setViewport(this.originalViewport);
         markRenderDirty();
+        this.isFirstBrushMove = false;
     }
 
 
@@ -632,6 +681,8 @@ export class BrushStroke {
             referenceTextureRenderTarget = this.gaussianBlurRenderTarget;
         } else if (this.drawMode === RendererBrushStrokeDrawMode.SHARPEN) {
             referenceTextureRenderTarget = this.sharpenRenderTarget;
+        } else if (this.drawMode === RendererBrushStrokeDrawMode.CLONE) {
+            referenceTextureRenderTarget = this.cloneRenderTarget;
         }
 
         let xi: number;
@@ -679,7 +730,7 @@ export class BrushStroke {
             this.compositorMaterial.uniforms.refOffsetAndSize.value.w = tileHeight / this.texture.height;
             this.compositorMaterial.uniforms.srcMap.value = brushRenderTarget.texture;
             this.compositorMaterial.uniforms.refMap.value = referenceTextureRenderTarget?.texture;
-            this.compositorMaterial.uniforms.brushAlphaConcentration.value.y = this.brushMinConcentration;
+            this.compositorMaterial.uniforms.brushAlphaConcentrationExtra.value.y = this.brushMinConcentration;
             this.createSelectionMaskTransform(tileX, tileY, tileWidth, tileHeight);
             this.compositorMaterial.uniformsNeedUpdate = true;
 

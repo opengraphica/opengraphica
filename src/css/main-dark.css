@@ -8275,32 +8275,37 @@
   font-family: "OpenGraphicaIcons";
   font-style: normal;
   font-weight: 400;
-  src: url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.eot?1790364549107");
-  src: url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.eot?#iefix") format("embedded-opentype"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.woff2?1790364549107") format("woff2"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.woff?1790364549107") format("woff"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.ttf?1790364549107") format("truetype"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.svg?1790364549107#OpenGraphicaIcons") format("svg");
+  src: url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.eot?1794079838348");
+  src: url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.eot?#iefix") format("embedded-opentype"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.woff2?1794079838348") format("woff2"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.woff?1794079838348") format("woff"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.ttf?1794079838348") format("truetype"), url("../fonts/OpenGraphicaIcons/OpenGraphicaIcons.svg?1794079838348#OpenGraphicaIcons") format("svg");
 }
-.bi.bi-ellipse::before {
+.bi.bi-clone-stamp::before {
   font-family: "OpenGraphicaIcons" !important;
   content: "";
 }
 
-.bi.bi-lasso::before {
+.bi.bi-ellipse::before {
   font-family: "OpenGraphicaIcons" !important;
   content: "";
 }
 
-.bi.bi-line-shape::before {
+.bi.bi-lasso::before {
   font-family: "OpenGraphicaIcons" !important;
   content: "";
 }
 
-.bi.bi-polyline::before {
+.bi.bi-line-shape::before {
   font-family: "OpenGraphicaIcons" !important;
   content: "";
 }
 
-.bi.bi-shapes::before {
+.bi.bi-polyline::before {
   font-family: "OpenGraphicaIcons" !important;
   content: "";
+}
+
+.bi.bi-shapes::before {
+  font-family: "OpenGraphicaIcons" !important;
+  content: "";
 }
 
 @font-face {

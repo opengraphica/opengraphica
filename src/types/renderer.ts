@@ -46,6 +46,7 @@ export enum RendererBrushStrokeDrawMode {
     NORMAL = 0,
     BLUR = 1,
     SHARPEN = 2,
+    CLONE = 3,
 }
 
 export interface RendererBrushStrokeSettingsCommon {

@@ -402,6 +402,9 @@ export class Webgl2RendererBackend implements Webgl2RendererBackendPublic {
 
         const msaaSamples = highQuality ? Math.min(this.maxMsaaSamples, 4) : this.msaaSamples;
 
+        if (composer.passes.length === 0) {
+            composer.addPass(new RenderPass(currentScene, camera));
+        }
         composer.addPass(new OutputPass(this.imageBackground, this.imageBoundaryMask, camera));
         composer.renderTarget1.samples = msaaSamples;
         composer.renderTarget2.samples = msaaSamples;

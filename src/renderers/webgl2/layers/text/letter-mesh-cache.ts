@@ -444,6 +444,9 @@ export class LetterMeshCache {
                     materialGroup.mergedGeometry = mergeGeometries(geometries) ?? undefined;
                     if (materialGroup.mergedGeometry) {
                         if (materialGroup.mergedMesh) {
+                            if (materialGroup.mergedMesh.geometry !== materialGroup.mergedGeometry) {
+                                materialGroup.mergedMesh.geometry.dispose();
+                            }
                             materialGroup.mergedMesh.geometry = materialGroup.mergedGeometry;
                         } else {
                             materialGroup.mergedMesh = new Mesh(materialGroup.mergedGeometry, materialGroup.material);

@@ -28,6 +28,7 @@ interface EditorDeferredTask {
 }
 
 interface TutorialFlags {
+    cloneBrushToolIntroduction?: boolean;
     deformBlurToolIntroduction?: boolean;
     deformSharpenToolIntroduction?: boolean;
     drawBrushToolIntroduction?: boolean;

@@ -25,6 +25,7 @@ export default defineComponent({
         loading: ElLoading.directive
     },
     components: {
+        'toolbar-clone-brush': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-clone-brush' */ `@/ui/toolbar/toolbar-clone-brush.vue`)),
         'toolbar-crop-resize': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-crop-resize' */ `@/ui/toolbar/toolbar-crop-resize.vue`)),
         'toolbar-deform-blur': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-deform-blur' */ `@/ui/toolbar/toolbar-deform-blur.vue`)),
         'toolbar-deform-sharpen': defineAsyncComponent(() => import(/* webpackChunkName: 'toolbar-deform-sharpen' */ `@/ui/toolbar/toolbar-deform-sharpen.vue`)),

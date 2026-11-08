@@ -19,6 +19,13 @@
                     "type": "tool",
                     "target": "sharpen"
                 }
+            },
+            {
+                "icon": "bi bi-clone-stamp",
+                "action": {
+                    "type": "tool",
+                    "target": "cloneBrush"
+                }
             }
         ]
     },

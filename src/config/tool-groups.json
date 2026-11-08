@@ -11,6 +11,16 @@
                     "deform-blur"
                 ]
             },
+            "cloneBrush": {
+                "controller": "clone-brush",
+                "toolbar": {
+                    "position": "auto",
+                    "target": "clone-brush"
+                },
+                "overlays": [
+                    "clone-brush"
+                ]
+            },
             "sharpen": {
                 "controller": "deform-sharpen",
                 "toolbar": {

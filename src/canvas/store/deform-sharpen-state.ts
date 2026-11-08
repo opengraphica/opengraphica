@@ -19,7 +19,7 @@ interface PermanentStorageState {
 }
 
 const permanentStorage = new PerformantStore<{ dispatch: {}, state: PermanentStorageState }>({
-    name: 'deformBlurStateStore',
+    name: 'deformSharpenStateStore',
     state: {
         brushDensity: 1,
         brushHardness: 0.5,

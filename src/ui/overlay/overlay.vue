@@ -30,6 +30,7 @@ import editorStore from '@/store/editor';
 export default defineComponent({
     name: 'AppCanvasOverlays',
     components: {
+        'overlay-clone-brush': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-clone-brush' */ `@/ui/overlay/overlay-clone-brush.vue`)),
         'overlay-canvas-border': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-canvas-border' */ `@/ui/overlay/overlay-canvas-border.vue`)),
         'overlay-crop-resize': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-crop-resize' */ `@/ui/overlay/overlay-crop-resize.vue`)),
         'overlay-deform-blur': defineAsyncComponent(() => import(/* webpackChunkName: 'canvas-overlay-deform-blur' */ `@/ui/overlay/overlay-deform-blur.vue`)),
@@ -57,7 +58,7 @@ export default defineComponent({
     },
     setup() {
         const ignoreTransformWith: string[] = [
-            'canvas-border', 'deform-blur', 'deform-sharpen',
+            'clone-brush', 'canvas-border', 'deform-blur', 'deform-sharpen',
             'draw-brush', 'draw-bucket-fill', 'draw-shape',
             'effect', 'erase-brush', 'selection',
         ];
