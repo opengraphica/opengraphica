@@ -779,6 +779,58 @@
         }
     },
     "mcp": {
+        "common": {
+            "errors": {
+                "required": "The property {propertyName} is required.",
+                "notNumber": "The property {propertyName} must be a number.",
+                "notString": "The property {propertyName} must be a string.",
+                "notInEnumList": "The property {propertyName} is not one of the accepted enum values."
+            }
+        },
+        "createCircleShape": {
+            "description": "Adds a SVG <circle> shape to the current selected layer, or to a new layer if the current selected layer isn't a vector layer. The new shape is drawn on top of all other shapes in the layer.",
+            "properties": {
+                "cx": "The the x position of the circle's center in pixels.",
+                "cy": "The the y position of the circle's center in pixels.",
+                "r": "The radius of the circle pixels."
+            }
+        },
+        "createEllipseShape": {
+            "description": "Adds a SVG <ellipse> shape to the current selected layer, or to a new layer if the current selected layer isn't a vector layer. The new shape is drawn on top of all other shapes in the layer.",
+            "properties": {
+                "cx": "The the x position of the ellipse's center in pixels.",
+                "cy": "The the y position of the ellipse's center in pixels.",
+                "rx": "The radius of the ellipse along the x axis in pixels.",
+                "ry": "The radius of the ellipse along the y axis in pixels."
+            }
+        },
+        "createLineShape": {
+            "description": "Adds a SVG <line> shape to the current selected layer, or to a new layer if the current selected layer isn't a vector layer. The new shape is drawn on top of all other shapes in the layer.",
+            "properties": {
+                "x1": "The the x position of the start of the line in pixels.",
+                "y1": "The the y position of the start of the line in pixels.",
+                "x2": "The the x position of the end of the line in pixels.",
+                "y2": "The the y position of the end of the line in pixels."
+            }
+        },
+        "createPathShape": {
+            "description": "Adds a SVG <path> shape to the current selected layer, or to a new layer if the current selected layer isn't a vector layer. The new shape is drawn on top of all other shapes in the layer.",
+            "properties": {
+                "d": "The list of SVG path commands. Follow the SVG spec. Example: \"M 10 80 Q 52.5 10, 95 80 T 180 80\""
+            }
+        },
+        "createPolygonShape": {
+            "description": "Adds a SVG <polygon> shape to the current selected layer, or to a new layer if the current selected layer isn't a vector layer. The new shape is drawn on top of all other shapes in the layer.",
+            "properties": {
+                "points": "The points which define the outer edge of the shape. Example: \"0,0 20,0 10,5\""
+            }
+        },
+        "createPolylineShape": {
+            "description": "Adds a SVG <polyline> shape to the current selected layer, or to a new layer if the current selected layer isn't a vector layer. The new shape is drawn on top of all other shapes in the layer.",
+            "properties": {
+                "points": "The points which define the connected lines. Example: \"0,0 20,0 10,5\""
+            }
+        },
         "createRectangleShape": {
             "description": "Adds a SVG <rect> shape to the current selected layer, or to a new layer if the current selected layer isn't a vector layer. The new shape is drawn on top of all other shapes in the layer.",
             "properties": {
@@ -787,10 +839,16 @@
                 "rx": "The x radius of the rectangle's corners in pixels.",
                 "ry": "The y radius of the rectangle's corners in pixels.",
                 "width": "The width of the rectangle in pixels.",
-                "height": "The height of the rectangle in pixels.",
-                "fill": "The fill color as a RGB 8-bit per channel hex. Example: \"#000000\"",
+                "height": "The height of the rectangle in pixels."
+            }
+        },
+        "createShapeCommon": {
+            "properties": {
+                "fill": "The fill color as a RGB 8-bit per channel hex. Omit for no fill. Example: \"#000000\"",
                 "fillOpacity": "The opacity of the fill color as a decimal number from 0 to 1.",
-                "stroke": "The stroke color as a RGB 8-bit per channel hex. Example: \"#000000\"",
+                "stroke": "The stroke color as a RGB 8-bit per channel hex. Omit for no stroke. Example: \"#000000\"",
+                "strokeLinecap": "How the ends of lines are rendered, as defined in the SVG spec.",
+                "strokeLinejoin": "How the corners of joined lines are rendered, as defined in the SVG spec.",
                 "strokeOpacity": "The opacity of the stroke color as a decimal number from 0 to 1.",
                 "strokeWidth": "The width of the stroke in pixels.",
                 "transform": "The transform attribute on the shape. Must be a SVG 2D matrix transform function. Example: \"matrix(1,0,0,1,0,0)\""
@@ -804,6 +862,9 @@
         "getEditorGuide": {
             "description": "Provides a natural language summary of how the OpenGraphica image editor works.",
             "summary": "OpenGraphica is a 2D mixed-media image editor. At its core, it can edit both raster images and vector shapes, and export to both raster and vector image formats.\n\nThe working file in OpenGraphica is a image document with one or more layers. It has a fixed rectangular resolution, defined in pixels. Other measuring units such as mm are supported in the UI for display purposes, but they are converted to pixels for editing by using the resolutionX and resolutionY settings. The working file image document has a coordinate system where +x is right, +y is down, and -z goes into the screen, away from the viewer.\n\nThe working file is composed of a stack of individual layers. All layers have a width/height defined in pixels, and a 3x3 2D transformation matrix which determines their position / rotation / scale. With an identity transformation matrix, a layer is drawn with its top-left corner aligned with the top-left of the working file.\n\nLayers have different types, which infer the type of image they contain:\n* **gradient** - A linear or radial gradient which covers the entirety of the working file.\n**raster** - An 8-bit per channel RGBA pixel-based image.\n* **rasterSequence** - An animation sequence using 8-bit per channel RGBA pixel-based images for each frame.\n* **text** - One or more paragraphs of rich text drawn horizontally or vertically.\n* **vector** - A SVG 1.x document.\n* **video** - A video using a web-supported codec.\n\nLayers are stacked from bottom to top, where the bottom layer is drawn first, and the top layer is drawn in front of all other layers. Layers are stored so that the first layer in the array is the bottom-most layer, but they are displayed to the end-user where the top-most layers list. Layers are composited by default with source over blending in linear RGB, and converted to sRGB after all compositing operations are completed."
+        },
+        "getShapeList": {
+            "description": "Returns a JSON definition that lists all shapes in any currently selected vector layers, in order from bottom to top. The shape IDs can change whenever a new shape is added, deleted, or reordered."
         }
     },
     "measurement": {

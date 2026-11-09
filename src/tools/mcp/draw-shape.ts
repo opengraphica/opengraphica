@@ -1,4 +1,5 @@
 import { t } from '@/i18n';
+import { registerTool } from './validation';
 import type { BaseAction } from '@/actions/base';
 import type { WorkingFileVectorLayer } from '@/types';
 
@@ -14,6 +15,7 @@ async function createShape(createShapeCallback: (svgDocument: Document) => Eleme
     const { BundleAction } = await import('@/actions/bundle');
     const { InsertLayerAction } = await import('@/actions/insert-layer');
     const { UpdateLayerAction } = await import('@/actions/update-layer');
+    const { TrimLayerEmptySpaceAction } = await import('@/actions/trim-layer-empty-space');
 
     const historyReserveToken = createHistoryReserveToken();
     await historyReserveQueueFree();
@@ -32,6 +34,7 @@ async function createShape(createShapeCallback: (svgDocument: Document) => Eleme
             generateSvgElementIds(svgDocument);
             createdShapeId = shape.getAttribute('data-ogr-id') ?? '';
             newSvgString = serializer.serializeToString(svgDocument).replace(/xmlns=""/g, '');
+            console.log(newSvgString);
             actions.push(
                 new InsertLayerAction({
                     type: 'vector',
@@ -49,7 +52,8 @@ async function createShape(createShapeCallback: (svgDocument: Document) => Eleme
                         sourceDocument: editorStore.state.activeTool === 'shape' ? svgDocument : undefined,
                     }
                 })
-            )
+            );
+            actions.push(new TrimLayerEmptySpaceAction(-1));
         } else {
             for (const layer of vectorLayers) {
                 let svgDocument = layer.data.sourceDocument ?? await getStoredSvgDocument(layer.data.sourceUuid);
@@ -70,6 +74,7 @@ async function createShape(createShapeCallback: (svgDocument: Document) => Eleme
                         }
                     })
                 );
+                actions.push(new TrimLayerEmptySpaceAction(layer.id));
             }
         }
         await historyStore.dispatch('runAction', {
@@ -85,7 +90,51 @@ async function createShape(createShapeCallback: (svgDocument: Document) => Eleme
     }
 }
 
-document.modelContext?.registerTool({
+const shapeCommonInputSchemaProperties = {
+    fill: { type: 'string', description: t('mcp.createShapeCommon.properties.fill') },
+    fillOpacity: { type: 'number', description: t('mcp.createShapeCommon.properties.fillOpacity'), default: 1 },
+    stroke: { type: 'string', description: t('mcp.createShapeCommon.properties.stroke') },
+    strokeLinecap: { type: 'string', enum: ['butt', 'round', 'square'], description: t('mcp.createShapeCommon.properties.strokeLinecap') },
+    strokeLinejoin: { type: 'string', enum: ['arcs', 'bevel', 'miter', 'miter-clip', 'round'], description: t('mcp.createShapeCommon.properties.strokeLinejoin') },
+    strokeOpacity: { type: 'number', description: t('mcp.createShapeCommon.properties.strokeOpacity'), default: 1 },
+    strokeWidth: { type: 'number', description: t('mcp.createShapeCommon.properties.strokeWidth') },
+    transform: { type: 'string', description: t('mcp.createShapeCommon.properties.transform') },
+} as const;
+
+function validateShapeCommonAttributes({ fill, stroke, transform }: Record<string, string | undefined>) {
+    if (fill && !svgColorHexRegex.test(fill)) {
+        throw new Error(t('mcp.createShapeCommon.errors.fill'));
+    }
+    if (stroke && !svgColorHexRegex.test(stroke)) {
+        throw new Error(t('mcp.createShapeCommon.errors.stroke'));
+    }
+    if (transform && !svgTransformMatrixRegex.test(transform)) {
+        throw new Error(t('mcp.createShapeCommon.errors.transform'));
+    }
+}
+
+function setShapeCommonAttributes(
+    shape: Element,
+    { fill, fillOpacity, stroke, strokeLinecap, strokeLinejoin, strokeOpacity, strokeWidth, transform }: {
+        fill?: string; fillOpacity?: number; stroke?: string; strokeLinecap?: string;
+        strokeLinejoin?: string; strokeOpacity?: number; strokeWidth?: number; transform?: string;
+    }
+) {
+    if (fill != null) {
+        shape.setAttribute('fill', fill);
+    } else {
+        shape.setAttribute('fill', 'none');
+    }
+    if (fillOpacity != null) shape.setAttribute('fill-opacity', `${fillOpacity}`);
+    if (stroke != null) shape.setAttribute('stroke', stroke);
+    if (strokeLinecap != null) shape.setAttribute('stroke-linecap', strokeLinecap);
+    if (strokeLinejoin != null) shape.setAttribute('stroke-linejoin', strokeLinejoin);
+    if (strokeOpacity != null) shape.setAttribute('stroke-opacity', `${strokeOpacity}`);
+    if (strokeWidth != null) shape.setAttribute('stroke-width', `${strokeWidth}`);
+    if (transform != null) shape.setAttribute('transform', transform);
+}
+
+registerTool({
     name: 'create-rectangle-shape',
     description: t('mcp.createRectangleShape.description'),
     inputSchema: {
@@ -97,25 +146,12 @@ document.modelContext?.registerTool({
             ry: { type: 'number', description: t('mcp.createRectangleShape.properties.ry') },
             width: { type: 'number', description: t('mcp.createRectangleShape.properties.width') },
             height: { type: 'number', description: t('mcp.createRectangleShape.properties.height') },
-            fill: { type: 'string', description: t('mcp.createRectangleShape.properties.fill') },
-            fillOpacity: { type: 'number', description: t('mcp.createRectangleShape.properties.fillOpacity'), default: 1 },
-            stroke: { type: 'string', description: t('mcp.createRectangleShape.properties.stroke') },
-            strokeOpacity: { type: 'number', description: t('mcp.createRectangleShape.properties.strokeOpacity'), default: 1 },
-            strokeWidth: { type: 'number', description: t('mcp.createRectangleShape.properties.strokeWidth') },
-            transform: { type: 'string', description: t('mcp.createRectangleShape.properties.transform') },
+            ...shapeCommonInputSchemaProperties,
         },
         required: ['x', 'y', 'width', 'height'],
     },
-    async execute({ x, y, rx, ry, width, height, fill, fillOpacity, stroke, strokeOpacity, strokeWidth, transform }) {
-        if (fill && !svgColorHexRegex.test(fill)) {
-            throw new Error(t('mcp.createRectangleShape.errors.fill'));
-        }
-        if (stroke && !svgColorHexRegex.test(stroke)) {
-            throw new Error(t('mcp.createRectangleShape.errors.stroke'));
-        }
-        if (transform && !svgTransformMatrixRegex.test(transform)) {
-            throw new Error(t('mcp.createRectangleShape.errors.transform'));
-        }
+    async execute({ x, y, rx, ry, width, height, fill, fillOpacity, stroke, strokeOpacity, strokeLinecap, strokeLinejoin, strokeWidth, transform }) {
+        validateShapeCommonAttributes({ fill, stroke, transform });
         return await createShape((svgDocument) => {
             const rect = svgDocument.createElement('rect');
             rect.setAttribute('x', `${x}`);
@@ -124,14 +160,219 @@ document.modelContext?.registerTool({
             rect.setAttribute('height', `${height}`);
             if (rx != null) rect.setAttribute('rx', `${rx}`);
             if (ry != null) rect.setAttribute('ry', `${ry}`);
-            if (fill != null) rect.setAttribute('fill', fill);
-            if (fillOpacity != null) rect.setAttribute('fill-opacity', `${fillOpacity}`);
-            if (stroke != null) rect.setAttribute('stroke', stroke);
-            if (strokeOpacity != null) rect.setAttribute('stroke-opacity', `${strokeOpacity}`);
-            if (strokeWidth != null) rect.setAttribute('stroke-width', `${strokeWidth}`);
-            if (transform != null) rect.setAttribute('transform', transform);
+            setShapeCommonAttributes(rect, { fill, fillOpacity, stroke, strokeLinecap, strokeLinejoin, strokeOpacity, strokeWidth, transform });
             svgDocument.documentElement.appendChild(rect);
             return rect;
         });
     }
 });
+
+registerTool({
+    name: 'create-circle-shape',
+    description: t('mcp.createCircleShape.description'),
+    inputSchema: {
+        type: 'object',
+        properties: {
+            cx: { type: 'number', description: t('mcp.createCircleShape.properties.cx') },
+            cy: { type: 'number', description: t('mcp.createCircleShape.properties.cy') },
+            r: { type: 'number', description: t('mcp.createCircleShape.properties.r') },
+            ...shapeCommonInputSchemaProperties,
+        },
+        required: ['cx', 'cy', 'r'],
+    },
+    async execute({ cx, cy, r, fill, fillOpacity, stroke, strokeLinecap, strokeLinejoin, strokeOpacity, strokeWidth, transform }) {
+        validateShapeCommonAttributes({ fill, stroke, transform });
+        return await createShape((svgDocument) => {
+            const circle = svgDocument.createElement('circle');
+            circle.setAttribute('cx', `${cx}`);
+            circle.setAttribute('cy', `${cy}`);
+            circle.setAttribute('r', `${r}`);
+            setShapeCommonAttributes(circle, { fill, fillOpacity, stroke, strokeLinecap, strokeLinejoin, strokeOpacity, strokeWidth, transform });
+            svgDocument.documentElement.appendChild(circle);
+            return circle;
+        });
+    }
+});
+
+registerTool({
+    name: 'create-ellipse-shape',
+    description: t('mcp.createEllipseShape.description'),
+    inputSchema: {
+        type: 'object',
+        properties: {
+            cx: { type: 'number', description: t('mcp.createEllipseShape.properties.cx') },
+            cy: { type: 'number', description: t('mcp.createEllipseShape.properties.cy') },
+            rx: { type: 'number', description: t('mcp.createEllipseShape.properties.rx') },
+            ry: { type: 'number', description: t('mcp.createEllipseShape.properties.ry') },
+            ...shapeCommonInputSchemaProperties,
+        },
+        required: ['cx', 'cy', 'rx', 'ry'],
+    },
+    async execute({ cx, cy, rx, ry, fill, fillOpacity, stroke, strokeLinecap, strokeLinejoin, strokeOpacity, strokeWidth, transform }) {
+        validateShapeCommonAttributes({ fill, stroke, transform });
+        return await createShape((svgDocument) => {
+            const ellipse = svgDocument.createElement('ellipse');
+            ellipse.setAttribute('cx', `${cx}`);
+            ellipse.setAttribute('cy', `${cy}`);
+            ellipse.setAttribute('rx', `${rx}`);
+            ellipse.setAttribute('ry', `${ry}`);
+            setShapeCommonAttributes(ellipse, { fill, fillOpacity, stroke, strokeLinecap, strokeLinejoin, strokeOpacity, strokeWidth, transform });
+            svgDocument.documentElement.appendChild(ellipse);
+            return ellipse;
+        });
+    }
+});
+
+registerTool({
+    name: 'create-line-shape',
+    description: t('mcp.createLineShape.description'),
+    inputSchema: {
+        type: 'object',
+        properties: {
+            x1: { type: 'number', description: t('mcp.createLineShape.properties.x1') },
+            y1: { type: 'number', description: t('mcp.createLineShape.properties.y1') },
+            x2: { type: 'number', description: t('mcp.createLineShape.properties.x2') },
+            y2: { type: 'number', description: t('mcp.createLineShape.properties.y2') },
+            ...shapeCommonInputSchemaProperties,
+        },
+        required: ['x1', 'y1', 'x2', 'y2'],
+    },
+    async execute({ x1, y1, x2, y2, fill, fillOpacity, stroke, strokeLinecap, strokeLinejoin, strokeOpacity, strokeWidth, transform }) {
+        validateShapeCommonAttributes({ fill, stroke, transform });
+        return await createShape((svgDocument) => {
+            const line = svgDocument.createElement('line');
+            line.setAttribute('x1', `${x1}`);
+            line.setAttribute('y1', `${y1}`);
+            line.setAttribute('x2', `${x2}`);
+            line.setAttribute('y2', `${y2}`);
+            setShapeCommonAttributes(line, { fill, fillOpacity, stroke, strokeLinecap, strokeLinejoin, strokeOpacity, strokeWidth, transform });
+            svgDocument.documentElement.appendChild(line);
+            return line;
+        });
+    }
+});
+
+registerTool({
+    name: 'create-polyline-shape',
+    description: t('mcp.createPolylineShape.description'),
+    inputSchema: {
+        type: 'object',
+        properties: {
+            points: { type: 'string', description: t('mcp.createPolylineShape.properties.points') },
+            ...shapeCommonInputSchemaProperties,
+        },
+        required: ['points'],
+    },
+    async execute({ points, fill, fillOpacity, stroke, strokeLinecap, strokeLinejoin, strokeOpacity, strokeWidth, transform }) {
+        validateShapeCommonAttributes({ fill, stroke, transform });
+        return await createShape((svgDocument) => {
+            const polyline = svgDocument.createElement('polyline');
+            polyline.setAttribute('points', points);
+            setShapeCommonAttributes(polyline, { fill, fillOpacity, stroke, strokeLinecap, strokeLinejoin, strokeOpacity, strokeWidth, transform });
+            svgDocument.documentElement.appendChild(polyline);
+            return polyline;
+        });
+    }
+});
+
+registerTool({
+    name: 'create-polygon-shape',
+    description: t('mcp.createPolygonShape.description'),
+    inputSchema: {
+        type: 'object',
+        properties: {
+            points: { type: 'string', description: t('mcp.createPolygonShape.properties.points') },
+            ...shapeCommonInputSchemaProperties,
+        },
+        required: ['points'],
+    },
+    async execute({ points, fill, fillOpacity, stroke, strokeLinecap, strokeLinejoin, strokeOpacity, strokeWidth, transform }) {
+        validateShapeCommonAttributes({ fill, stroke, transform });
+        return await createShape((svgDocument) => {
+            const polygon = svgDocument.createElement('polygon');
+            polygon.setAttribute('points', points);
+            setShapeCommonAttributes(polygon, { fill, fillOpacity, stroke, strokeLinecap, strokeLinejoin, strokeOpacity, strokeWidth, transform });
+            svgDocument.documentElement.appendChild(polygon);
+            return polygon;
+        });
+    }
+});
+
+registerTool({
+    name: 'create-path-shape',
+    description: t('mcp.createPathShape.description'),
+    inputSchema: {
+        type: 'object',
+        properties: {
+            d: { type: 'string', description: t('mcp.createPathShape.properties.d') },
+            ...shapeCommonInputSchemaProperties,
+        },
+        required: ['d'],
+    },
+    async execute({ d, fill, fillOpacity, stroke, strokeLinecap, strokeLinejoin, strokeOpacity, strokeWidth, transform }) {
+        validateShapeCommonAttributes({ fill, stroke, transform });
+        return await createShape((svgDocument) => {
+            const path = svgDocument.createElement('path');
+            path.setAttribute('d', d);
+            setShapeCommonAttributes(path, { fill, fillOpacity, stroke, strokeLinecap, strokeLinejoin, strokeOpacity, strokeWidth, transform });
+            svgDocument.documentElement.appendChild(path);
+            return path;
+        });
+    }
+});
+
+registerTool({
+    name: 'get-shape-list',
+    description: t('mcp.getShapeList.description'),
+    async execute() {
+        const { camelCaseToKebabCase } = await import('@/lib/string');
+        const { getDefaultParseNodeGlobalOptions, parseFloatWithUnits } = await import('@/lib/svg');
+        const { getStoredSvgDocument } = await import('@/store/svg');
+        const { selectedShapes } = await import('@/tools/store/draw-shape-state');
+        const { getSelectedLayers } = await import('@/store/working-file');
+
+        const stringAttributes = ['fill', 'stroke', 'strokeLinecap', 'strokeLinejoin', 'transform'];
+        const numberAttributes = ['x', 'y', 'cx', 'cy', 'rx', 'ry', 'r', 'width', 'height', 'fillOpacity', 'strokeOpacity', 'strokeWidth'];
+
+        const layerDefinitions: Array<{ layerId: number, shapes: Array<{ shapeId: string, tagName: string, attributes: Record<string, string | number>, selected: boolean }> }> = [];
+        const selectedVectorLayers = getSelectedLayers<WorkingFileVectorLayer>().filter((layer) => layer.type === 'vector');
+        for (const layer of selectedVectorLayers) {
+            const svgDocument = layer.data.sourceDocument ?? await getStoredSvgDocument(layer.data.sourceUuid);
+            const { defaultDPI, defaultUnit } = getDefaultParseNodeGlobalOptions({
+                defaultDPI: 90,
+                defaultUnit: 'px',
+            });
+            layerDefinitions.push({
+                layerId: layer.id,
+                shapes: Array.from(
+                    svgDocument.querySelectorAll('rect,polygon,polyline,circle,ellipse,line,path')
+                ).map((element) => {
+                    const shapeId = element.getAttribute('data-ogr-id') ?? '';
+                    return {
+                        shapeId,
+                        tagName: element.tagName.toLowerCase(),
+                        attributes: {
+                            ...stringAttributes.reduce((accumulator, attributeName) => {
+                                const value = element.getAttribute(camelCaseToKebabCase(attributeName));
+                                if (value != null && value !== 'none') {
+                                    accumulator[attributeName] = value;
+                                }
+                                return accumulator;
+                            }, {}),
+                            ...numberAttributes.reduce((accumulator, attributeName) => {
+                                const value = element.getAttribute(camelCaseToKebabCase(attributeName));
+                                if (value != null) {
+                                    accumulator[attributeName] = parseFloatWithUnits(value, defaultUnit, defaultDPI);
+                                }
+                                return accumulator;
+                            }, {}),
+                        },
+                        selected: !!selectedShapes.value.find(([layerId, otherShapeId]) => layerId === layer.id && shapeId === otherShapeId),
+                    };
+                })
+            })
+        }
+        return layerDefinitions;
+    }
+});
+

@@ -20,6 +20,7 @@ const i18n = createI18n({
     fallbackLocale: 'en',
     fallbackWarn: false,
     missingWarn: false,
+    warnHtmlMessage: false,
     messages: {
         en: i18nMessagesEn,
     }

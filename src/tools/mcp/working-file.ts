@@ -1,6 +1,7 @@
 import { t } from '@/i18n';
+import { registerTool } from './validation';
 
-document.modelContext?.registerTool({
+registerTool({
     name: 'get-editor-guide',
     description: t('mcp.getEditorGuide.description'),
     execute() {

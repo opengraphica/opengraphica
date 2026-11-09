@@ -279,7 +279,7 @@ function parseFloats(input: string, flags?: number[], stride?: number) {
 
 }
 
-function parseFloatWithUnits(
+export function parseFloatWithUnits(
     string: string | String,
     defaultUnit: 'mm'|'cm'|'in'|'pt'|'pc'|'px',
     defaultDPI: number,
@@ -323,7 +323,7 @@ interface ParseNodeGlobalOptions {
     attributeInheritance?: 'disable' | 'enable' | 'inheritedOnly';
 }
 
-function getDefaultParseNodeGlobalOptions(options?: ParseNodeGlobalOptions) {
+export function getDefaultParseNodeGlobalOptions(options?: ParseNodeGlobalOptions) {
     if (options) return options;
     return {
         defaultDPI: 90,
