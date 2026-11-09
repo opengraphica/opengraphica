@@ -220,6 +220,10 @@ export default defineComponent({
             showWelcomeScreen();
 
             appEmitter.emit('app.wait.stopBlocking', { id: 'appInitialLoad' });
+
+            if (document.modelContext) {
+                import('@/tools/mcp');
+            }
         }
 
         function showWelcomeScreen() {

@@ -778,6 +778,34 @@
             }
         }
     },
+    "mcp": {
+        "createRectangleShape": {
+            "description": "Adds a SVG <rect> shape to the current selected layer, or to a new layer if the current selected layer isn't a vector layer. The new shape is drawn on top of all other shapes in the layer.",
+            "properties": {
+                "x": "The the x position of the rectangle's left edge in pixels.",
+                "y": "The the y position of the rectangle's left edge in pixels.",
+                "rx": "The x radius of the rectangle's corners in pixels.",
+                "ry": "The y radius of the rectangle's corners in pixels.",
+                "width": "The width of the rectangle in pixels.",
+                "height": "The height of the rectangle in pixels.",
+                "fill": "The fill color as a RGB 8-bit per channel hex. Example: \"#000000\"",
+                "fillOpacity": "The opacity of the fill color as a decimal number from 0 to 1.",
+                "stroke": "The stroke color as a RGB 8-bit per channel hex. Example: \"#000000\"",
+                "strokeOpacity": "The opacity of the stroke color as a decimal number from 0 to 1.",
+                "strokeWidth": "The width of the stroke in pixels.",
+                "transform": "The transform attribute on the shape. Must be a SVG 2D matrix transform function. Example: \"matrix(1,0,0,1,0,0)\""
+            },
+            "errors": {
+                "fill": "Invalid fill syntax. Provide a RGBA 8-bit per channel hex. Example: \"#000000\"",
+                "stroke": "Invalid stroke syntax. Provide a RGBA 8-bit per channel hex. Example: \"#000000\"",
+                "transform": "Invalid transform syntax. Provide a SVG 2D matrix transform function. Example: \"matrix(1,0,0,1,0,0)\""
+            }
+        },
+        "getEditorGuide": {
+            "description": "Provides a natural language summary of how the OpenGraphica image editor works.",
+            "summary": "OpenGraphica is a 2D mixed-media image editor. At its core, it can edit both raster images and vector shapes, and export to both raster and vector image formats.\n\nThe working file in OpenGraphica is a image document with one or more layers. It has a fixed rectangular resolution, defined in pixels. Other measuring units such as mm are supported in the UI for display purposes, but they are converted to pixels for editing by using the resolutionX and resolutionY settings. The working file image document has a coordinate system where +x is right, +y is down, and -z goes into the screen, away from the viewer.\n\nThe working file is composed of a stack of individual layers. All layers have a width/height defined in pixels, and a 3x3 2D transformation matrix which determines their position / rotation / scale. With an identity transformation matrix, a layer is drawn with its top-left corner aligned with the top-left of the working file.\n\nLayers have different types, which infer the type of image they contain:\n* **gradient** - A linear or radial gradient which covers the entirety of the working file.\n**raster** - An 8-bit per channel RGBA pixel-based image.\n* **rasterSequence** - An animation sequence using 8-bit per channel RGBA pixel-based images for each frame.\n* **text** - One or more paragraphs of rich text drawn horizontally or vertically.\n* **vector** - A SVG 1.x document.\n* **video** - A video using a web-supported codec.\n\nLayers are stacked from bottom to top, where the bottom layer is drawn first, and the top layer is drawn in front of all other layers. Layers are stored so that the first layer in the array is the bottom-most layer, but they are displayed to the end-user where the top-most layers list. Layers are composited by default with source over blending in linear RGB, and converted to sRGB after all compositing operations are completed."
+        }
+    },
     "measurement": {
         "percent": "Percent",
         "percentage": "Percentage",

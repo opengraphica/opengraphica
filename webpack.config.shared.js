@@ -310,6 +310,10 @@ module.exports = function setupConfig(config) {
                         test: /[\\/]src[\\/]ui[\\/](el-form-item-group|el-form-item-aligned-groups)/,
                         name: 'og-element-form'
                     },
+                    opengraphicaToolsMcp: {
+                        test: /[\\/]src[\\/]tools[\\/]mcp[\\/]/,
+                        name: 'tools-mcp'
+                    },
                     opentype: {
                         test: /[\\/]node_modules[\\/](opentype)[\\/]/,
                         name: 'opentype'
