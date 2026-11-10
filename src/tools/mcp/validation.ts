@@ -28,7 +28,6 @@ export const registerTool: WebMCP.ModelContext['registerTool'] = (tool, options)
                         for (const itemValue of value) {
                             switch (itemType) {
                                 case 'number':
-                                    console.log(typeof itemValue);
                                     if (typeof itemValue !== 'number' || !Number.isFinite(itemValue) || isNaN(itemValue)) {
                                         throw new Error(t('mcp.common.error.notArrayNumber', { propertyName }));
                                     }

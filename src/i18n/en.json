@@ -899,6 +899,9 @@
                 "id": "The ID of the shape to delete. This can be retrieved from the get-shape-list tool."
             }
         },
+        "getAvailableFontList": {
+            "description": "List all font families that are available to use with text layers."
+        },
         "getEditorGuide": {
             "description": "Provides a natural language summary of how the OpenGraphica image editor works.",
             "summary": "OpenGraphica is a 2D mixed-media image editor. At its core, it can edit both raster images and vector shapes, and export to both raster and vector image formats.\n\nThe working file in OpenGraphica is a image document with one or more layers. It has a fixed rectangular resolution, defined in pixels. Other measuring units such as mm are supported in the UI for display purposes, but they are converted to pixels for editing by using the resolutionX and resolutionY settings. The working file image document has a coordinate system where +x is right, +y is down, and -z goes into the screen, away from the viewer.\n\nThe working file is composed of a stack of individual layers. All layers have a width/height defined in pixels, and a 3x3 2D transformation matrix which determines their position / rotation / scale. With an identity transformation matrix, a layer is drawn with its top-left corner aligned with the top-left of the working file.\n\nLayers have different types, which infer the type of image they contain:\n* **gradient** - A linear or radial gradient which covers the entirety of the working file.\n**raster** - An 8-bit per channel RGBA pixel-based image.\n* **rasterSequence** - An animation sequence using 8-bit per channel RGBA pixel-based images for each frame.\n* **text** - One or more paragraphs of rich text drawn horizontally or vertically.\n* **vector** - A SVG 1.x document.\n* **video** - A video using a web-supported codec.\n\nLayers are stacked from bottom to top, where the bottom layer is drawn first, and the top layer is drawn in front of all other layers. Layers are stored so that the first layer in the array is the bottom-most layer, but they are displayed to the end-user where the top-most layers list. Layers are composited by default with source over blending in linear RGB, and converted to sRGB after all compositing operations are completed."
@@ -921,6 +924,9 @@
                 "id": "The ID of the vector layer. This can be retrieved from the get-layer-list tool."
             }
         },
+        "getWorkingFileDimensions": {
+            "description": "Returns the width and height of the current working file in pixels. This which is the size of the overall image canvas that all layers sit on."
+        },
         "insertRasterLayer": {
             "description": "Inserts a 8-bit RGBA image as a new raster layer on the top of the layer stack.",
             "property": {
@@ -930,6 +936,17 @@
             },
             "response": {
                 "success": "Raster layer inserted."
+            }
+        },
+        "insertTextLayer": {
+            "description": "Inserts a text layer. The top/left is the draw origin, where the top is the ascent line of the font.",
+            "property": {
+                "text": "The text to insert",
+                "name": "The name of the new text layer.",
+                "transform": "An array of 6 numbers which represents the 2D transform matrix. With an identity transform, the layer is drawn with its top left-corner aligned with the top-left of the working file canvas. Example identity transform: [1, 0, 0, 1, 0, 1]",
+                "fontFamily": "The name of the font family to use. Call the get-available-font-list tool to get a list of names.",
+                "fontSize": "The font size.",
+                "fill": "The fill color as a RGB or RGBA 8-bit per channel hex. Example: \"#000000\" or \"#000000FF\""
             }
         },
         "reorderLayers": {

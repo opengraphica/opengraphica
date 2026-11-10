@@ -19,6 +19,20 @@ registerTool({
 });
 
 registerTool({
+    name: 'get-working-file-dimensions',
+    description: t('mcp.getWorkingFileDimensions.description'),
+    async execute() {
+        const { default: workingFileStore } = await import('@/store/working-file');
+        return {
+            structuredContent: {
+                width: workingFileStore.state.width,
+                height: workingFileStore.state.height,
+            }
+        }
+    }
+})
+
+registerTool({
     name: 'get-layer-list',
     description: t('mcp.getLayerList.description'),
     async execute() {

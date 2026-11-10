@@ -113,7 +113,7 @@ export default {
 </script>
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick, watch, WatchStopHandle, onUnmounted } from 'vue';
-import { parse as parseFont, type Font } from '@/lib/opentype';
+import { parse as parseFont } from '@/lib/opentype';
 import { useI18n } from '@/i18n';
 
 import defaultFontFamilies from '@/config/default-font-families.json';

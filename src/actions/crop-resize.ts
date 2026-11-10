@@ -35,7 +35,6 @@ async function generateResizeLayerActions(
             } else {
                 transform = new DOMMatrix().translateSelf(-cropLeft * widthRatio, -cropTop * heightRatio).scaleSelf(widthRatio, heightRatio).multiplySelf(layer.transform);
             }
-            console.log('transform', transform);
             actions.push(
                 new UpdateLayerAction<UpdateAnyLayerOptions<ColorModel>>({
                     id: layer.id,
