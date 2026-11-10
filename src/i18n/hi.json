@@ -21,7 +21,7 @@
         "freeTransformScale": "फ्री ट्रांसफॉर्मर (Resize)",
         "freeTransformTranslate": "फ्री ट्रांसफॉर्मर (Move)",
         "insertLayer": "परत डालें",
-        "moduleCropResize": "फसल और आकार",
+        "cropResize": "फसल और आकार",
         "openFile": "ओपन फाइल",
         "pasteLayers": "पेस्ट परत",
         "placeholder": "स्थानधारक",

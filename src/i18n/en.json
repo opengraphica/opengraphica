@@ -16,6 +16,7 @@
         "createShape": "Create Shape",
         "createShapeLayer": "Create Shape Layer",
         "createTextLayer": "Create Text Layer",
+        "cropResize": "Crop and Resize",
         "cutLayers": "Cut Layer(s)",
         "deleteLayers": "Delete Layer(s)",
         "deleteLayerFilter": "Delete Effect",
@@ -27,12 +28,12 @@
         "fileTakePhoto": "Take a Photo",
         "flipLayerX": "Flip Layer Horizontal",
         "flipLayerY": "Flip Layer Vertical",
+        "freeTransform": "Free Transform",
         "freeTransformRotate": "Free Transform (Rotate)",
         "freeTransformScale": "Free Transform (Resize)",
         "freeTransformTranslate": "Free Transform (Move)",
         "insertLayer": "Insert Layer",
         "mergeEffects": "Merge Effects",
-        "moduleCropResize": "Crop and Resize",
         "moveVectorLayerControlPoints": "Move Vector Layer Control Points",
         "openFile": "Open File",
         "pasteLayers": "Paste Layer(s)",
@@ -780,16 +781,25 @@
     },
     "mcp": {
         "common": {
-            "errors": {
+            "response": {
+                "deleteSuccess": "Delete success.",
+                "updateSuccess": "Update success."
+            },
+            "error": {
                 "required": "The property {propertyName} is required.",
+                "notArray": "The property {propertyName} must be an array.",
+                "notArrayNumber": "The property {propertyName} must have values that are numbers.",
+                "notArrayString": "The property {propertyName} must have values that are strings.",
                 "notNumber": "The property {propertyName} must be a number.",
                 "notString": "The property {propertyName} must be a string.",
-                "notInEnumList": "The property {propertyName} is not one of the accepted enum values."
+                "notInEnumList": "The property {propertyName} is not one of the accepted enum values.",
+                "layerNotFound": "The specified layer was not found.",
+                "2dTransformLength": "The transform array must have exactly 6 numbers."
             }
         },
         "createCircleShape": {
             "description": "Adds a SVG <circle> shape to the current selected layer, or to a new layer if the current selected layer isn't a vector layer. The new shape is drawn on top of all other shapes in the layer.",
-            "properties": {
+            "property": {
                 "cx": "The the x position of the circle's center in pixels.",
                 "cy": "The the y position of the circle's center in pixels.",
                 "r": "The radius of the circle pixels."
@@ -797,7 +807,7 @@
         },
         "createEllipseShape": {
             "description": "Adds a SVG <ellipse> shape to the current selected layer, or to a new layer if the current selected layer isn't a vector layer. The new shape is drawn on top of all other shapes in the layer.",
-            "properties": {
+            "property": {
                 "cx": "The the x position of the ellipse's center in pixels.",
                 "cy": "The the y position of the ellipse's center in pixels.",
                 "rx": "The radius of the ellipse along the x axis in pixels.",
@@ -806,7 +816,7 @@
         },
         "createLineShape": {
             "description": "Adds a SVG <line> shape to the current selected layer, or to a new layer if the current selected layer isn't a vector layer. The new shape is drawn on top of all other shapes in the layer.",
-            "properties": {
+            "property": {
                 "x1": "The the x position of the start of the line in pixels.",
                 "y1": "The the y position of the start of the line in pixels.",
                 "x2": "The the x position of the end of the line in pixels.",
@@ -815,25 +825,25 @@
         },
         "createPathShape": {
             "description": "Adds a SVG <path> shape to the current selected layer, or to a new layer if the current selected layer isn't a vector layer. The new shape is drawn on top of all other shapes in the layer.",
-            "properties": {
+            "property": {
                 "d": "The list of SVG path commands. Follow the SVG spec. Example: \"M 10 80 Q 52.5 10, 95 80 T 180 80\""
             }
         },
         "createPolygonShape": {
             "description": "Adds a SVG <polygon> shape to the current selected layer, or to a new layer if the current selected layer isn't a vector layer. The new shape is drawn on top of all other shapes in the layer.",
-            "properties": {
+            "property": {
                 "points": "The points which define the outer edge of the shape. Example: \"0,0 20,0 10,5\""
             }
         },
         "createPolylineShape": {
             "description": "Adds a SVG <polyline> shape to the current selected layer, or to a new layer if the current selected layer isn't a vector layer. The new shape is drawn on top of all other shapes in the layer.",
-            "properties": {
+            "property": {
                 "points": "The points which define the connected lines. Example: \"0,0 20,0 10,5\""
             }
         },
         "createRectangleShape": {
             "description": "Adds a SVG <rect> shape to the current selected layer, or to a new layer if the current selected layer isn't a vector layer. The new shape is drawn on top of all other shapes in the layer.",
-            "properties": {
+            "property": {
                 "x": "The the x position of the rectangle's left edge in pixels.",
                 "y": "The the y position of the rectangle's left edge in pixels.",
                 "rx": "The x radius of the rectangle's corners in pixels.",
@@ -843,7 +853,7 @@
             }
         },
         "createShapeCommon": {
-            "properties": {
+            "property": {
                 "fill": "The fill color as a RGB 8-bit per channel hex. Omit for no fill. Example: \"#000000\"",
                 "fillOpacity": "The opacity of the fill color as a decimal number from 0 to 1.",
                 "stroke": "The stroke color as a RGB 8-bit per channel hex. Omit for no stroke. Example: \"#000000\"",
@@ -853,18 +863,130 @@
                 "strokeWidth": "The width of the stroke in pixels.",
                 "transform": "The transform attribute on the shape. Must be a SVG 2D matrix transform function. Example: \"matrix(1,0,0,1,0,0)\""
             },
-            "errors": {
+            "error": {
                 "fill": "Invalid fill syntax. Provide a RGBA 8-bit per channel hex. Example: \"#000000\"",
                 "stroke": "Invalid stroke syntax. Provide a RGBA 8-bit per channel hex. Example: \"#000000\"",
                 "transform": "Invalid transform syntax. Provide a SVG 2D matrix transform function. Example: \"matrix(1,0,0,1,0,0)\""
+            }
+        },
+        "cropWorkingFile": {
+            "description": "Crops the entire image canvas in the working file (all layers). A negative crop can be used to increase the canvas size.",
+            "property": {
+                "left": "The left-most boundary of the cropped image in pixels. This can be negative.",
+                "top": "The top-most boundary of the cropped image in pixels. This can be negative.",
+                "width": "The new width of the cropped image in pixels. This can be larger than the original width.",
+                "height": "The new height of the cropped image in pixels. This can be larger than the original height."
+            },
+            "response": {
+                "success": "Crop success."
+            }
+        },
+        "deleteLayers": {
+            "description": "Deletes layers with the specified IDs.",
+            "property": {
+                "layerIds": "The IDs of the layers to delete. The layer IDs can be retrieved from the get-layer-list tool."
+            },
+            "error": {
+                "noIds": "Provide at least 1 layer ID."
+            },
+            "response": {
+                "success": "Layers deleted."
+            }
+        },
+        "deleteShape": {
+            "description": "Deletes a SVG shape from any selected vector layers.",
+            "property": {
+                "id": "The ID of the shape to delete. This can be retrieved from the get-shape-list tool."
             }
         },
         "getEditorGuide": {
             "description": "Provides a natural language summary of how the OpenGraphica image editor works.",
             "summary": "OpenGraphica is a 2D mixed-media image editor. At its core, it can edit both raster images and vector shapes, and export to both raster and vector image formats.\n\nThe working file in OpenGraphica is a image document with one or more layers. It has a fixed rectangular resolution, defined in pixels. Other measuring units such as mm are supported in the UI for display purposes, but they are converted to pixels for editing by using the resolutionX and resolutionY settings. The working file image document has a coordinate system where +x is right, +y is down, and -z goes into the screen, away from the viewer.\n\nThe working file is composed of a stack of individual layers. All layers have a width/height defined in pixels, and a 3x3 2D transformation matrix which determines their position / rotation / scale. With an identity transformation matrix, a layer is drawn with its top-left corner aligned with the top-left of the working file.\n\nLayers have different types, which infer the type of image they contain:\n* **gradient** - A linear or radial gradient which covers the entirety of the working file.\n**raster** - An 8-bit per channel RGBA pixel-based image.\n* **rasterSequence** - An animation sequence using 8-bit per channel RGBA pixel-based images for each frame.\n* **text** - One or more paragraphs of rich text drawn horizontally or vertically.\n* **vector** - A SVG 1.x document.\n* **video** - A video using a web-supported codec.\n\nLayers are stacked from bottom to top, where the bottom layer is drawn first, and the top layer is drawn in front of all other layers. Layers are stored so that the first layer in the array is the bottom-most layer, but they are displayed to the end-user where the top-most layers list. Layers are composited by default with source over blending in linear RGB, and converted to sRGB after all compositing operations are completed."
         },
+        "getLayerList": {
+            "description": "Returns a JSON summary definition of all layers in the working file, where layers are drawn in array order (last on top)."
+        },
+        "getRasterLayerImage": {
+            "description": "Returns the image data for the specified raster layer.",
+            "property": {
+                "id": "The ID of the raster layer. This can be retrieved from the get-layer-list tool."
+            }
+        },
         "getShapeList": {
             "description": "Returns a JSON definition that lists all shapes in any currently selected vector layers, in order from bottom to top. The shape IDs can change whenever a new shape is added, deleted, or reordered."
+        },
+        "getVectorLayerSvg": {
+            "description": "Returns the serialized SVG document associated with the specified vector layer.",
+            "property": {
+                "id": "The ID of the vector layer. This can be retrieved from the get-layer-list tool."
+            }
+        },
+        "insertRasterLayer": {
+            "description": "Inserts a 8-bit RGBA image as a new raster layer on the top of the layer stack.",
+            "property": {
+                "imageDataUri": "A base64 encoded image data URI. Media types image/png or image/jpeg are acceptable.",
+                "name": "The name of the new layer; usually the filename of the image.",
+                "transform": "An array of 6 numbers which represents the 2D transform matrix. Example identity transform: [1, 0, 0, 1, 0, 1]"
+            },
+            "response": {
+                "success": "Raster layer inserted."
+            }
+        },
+        "reorderLayers": {
+            "description": "Changes the order of layers",
+            "property": {
+                "insertLayerIds": "The IDs of layers to insert at the specified insertPosition in the layer stack. The layer IDs can be retrieved from the get-layer-list tool.",
+                "referenceLayerId": "The ID of the layer to insert around, based on the insertPosition property.",
+                "insertPosition": "The position to insert around the layer referenced by referenceLayerId. \"above\" or \"below\"."
+            },
+            "error": {
+                "noInsertIds": "Provide at least one ID in the insertLayerIds property"
+            },
+            "response": {
+                "success": "Layers reordered."
+            }
+        },
+        "resampleWorkingFile": {
+            "description": "Resamples the entire image canvas in the working file (all layers) at a different resolution. Also known as scaling the image size.",
+            "property": {
+                "width": "The new width of the resampled image in pixels.",
+                "height": "The new height of the resampled image in pixels. The aspect ratio of width to height must match the original image."
+            },
+            "response": {
+                "success": "Resample success."
+            }
+        },
+        "selectLayers": {
+            "description": "Sets which layers are currently selected in the editor by providing their IDs",
+            "property": {
+                "ids": "An array of layer IDs (number values)"
+            },
+            "error": {
+                "noIds": "You must provide at least one layer ID in the ids property."
+            },
+            "response": {
+                "success": "Layers selected successfully."
+            }
+        },
+        "setLayerTransform": {
+            "description": "Sets the currently selected layers' 3x3 2D transformation matrix which controls its position, rotation, and scale.",
+            "property": {
+                "transform": "An array of 6 numbers which represents the 2D transform matrix. Example identity transform: [1, 0, 0, 1, 0, 1]"
+            },
+            "response": {
+                "success": "Transform updated successfully."
+            }
+        },
+        "setShapeAttributes": {
+            "description": "Updates the SVG attributes of any vector shape in any currently selected vector layers: <rect>, <circle>, <ellipse>, <line>, <polyline>, <polygon>, or <path>.",
+            "property": {
+                "id": "The ID of the shape to update. This can be retrieved from the get-shape-list tool.",
+                "cx": "The x position of the center of a circle or ellipse in pixels.",
+                "cy": "The y position of the center of a circle or ellipse in pixels.",
+                "rx": "The x radius of a rectangle's corners or an ellipse's radius in pixels.",
+                "ry": "The y radius of a rectangle's corners or an ellipse's radius in pixels.",
+                "points": "The points which define the outer edge of a polyline or polygon shape. Example: \"0,0 20,0 10,5\""
+            }
         }
     },
     "measurement": {

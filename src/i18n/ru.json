@@ -21,7 +21,7 @@
         "freeTransformScale": "Свободная трансформация (размер)",
         "freeTransformTranslate": "Свободная трансформация (Move)",
         "insertLayer": "Включить слой",
-        "moduleCropResize": "Посадка и размер",
+        "cropResize": "Посадка и размер",
         "openFile": "Открытый файл",
         "pasteLayers": "Пастовый слой(ы)",
         "placeholder": "Владелец",

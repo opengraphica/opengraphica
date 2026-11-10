@@ -21,7 +21,7 @@
         "freeTransformScale": "Transformação livre (redimensionar)",
         "freeTransformTranslate": "Transformação livre (mover)",
         "insertLayer": "Inserir camada",
-        "moduleCropResize": "Cultivar e Redimensionar",
+        "cropResize": "Cultivar e Redimensionar",
         "openFile": "Abrir arquivo",
         "pasteLayers": "Camadas de pasta (s)",
         "placeholder": "Accionista local",

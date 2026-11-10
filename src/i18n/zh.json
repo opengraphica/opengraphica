@@ -21,7 +21,7 @@
         "freeTransformScale": "自由变形( 恢复)",
         "freeTransformTranslate": "自由变形( 移动)",
         "insertLayer": "插入图层",
-        "moduleCropResize": "作物和调整大小",
+        "cropResize": "作物和调整大小",
         "openFile": "打开文件",
         "pasteLayers": "粘贴图层",
         "placeholder": "占位符",

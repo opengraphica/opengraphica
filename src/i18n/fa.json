@@ -21,7 +21,7 @@
         "freeTransformScale": "Free Transform (Resize)",
         "freeTransformTranslate": "Free Transform (Move)",
         "insertLayer": "لایه Insert Layer",
-        "moduleCropResize": "Crop و Resize",
+        "cropResize": "Crop و Resize",
         "openFile": "Open File",
         "pasteLayers": "لایه Paste Layer (s)",
         "placeholder": "Placeholder",

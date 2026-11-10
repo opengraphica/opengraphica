@@ -279,223 +279,299 @@ export const createEditControlPoints = throttle(() => {
             layer.data.sourceDocument.querySelectorAll('rect,polygon,polyline,circle,ellipse,line,path')
         );
         for (const node of nodes) {
-            const { transform, fill, stroke, strokeWidth } = parseCommonNodeAttributes(node);
-            const nodeXf = viewBoxXf.multiply(transform);
-            const nodeId = node.getAttribute('data-ogr-id');
-            if (nodeId && layer.data.pendingSourceDocumentUpdateNodeIds?.includes(nodeId)) {
-                continue;
-            }
+            try {
+                const { transform, fill, stroke, strokeWidth } = parseCommonNodeAttributes(node);
+                const nodeXf = viewBoxXf.multiply(transform);
+                const nodeId = node.getAttribute('data-ogr-id');
+                if (nodeId && layer.data.pendingSourceDocumentUpdateNodeIds?.includes(nodeId)) {
+                    continue;
+                }
 
-            editControlPointNodes.value.push(node);
-            switch (node.nodeName) {
-                case 'rect': {
-                    const { x, y, width, height } = parseRectNodeAttributes(node);
-                    const point = new DOMPoint(x, y);
-                    let xfPoint = point.matrixTransform(nodeXf);
-                    controlPoints.push({
-                        layerIndex,
-                        nodeIndex,
-                        pathIndex: 0,
-                        x: xfPoint.x,
-                        y: xfPoint.y,
-                        xProp: 'x',
-                        yProp: 'y',
-                        maxPointIndex: controlPoints.length + 1,
-                    });
-                    point.x = x + width;
-                    point.y = y + height;
-                    xfPoint = point.matrixTransform(nodeXf);
-                    controlPoints.push({
-                        layerIndex,
-                        nodeIndex,
-                        pathIndex: 1,
-                        x: xfPoint.x,
-                        y: xfPoint.y,
-                        xProp: 'width',
-                        yProp: 'height',
-                        minPointIndex: controlPoints.length - 1,
-                    });
-                    editControlPointNodeParsedAttributes.value.push({
-                        transform, fill, stroke, strokeWidth, x, y, width, height,
-                    });
-                    break;
-                }
-                case 'polygon': {
-                    const { points } = parsePolygonNodeAttributes(node);
-                    for (const [pointIndex, point] of points.entries()) {
-                        const xfPoint = point.matrixTransform(nodeXf);
+                editControlPointNodes.value.push(node);
+                switch (node.nodeName) {
+                    case 'rect': {
+                        const { x, y, width, height } = parseRectNodeAttributes(node);
+                        const point = new DOMPoint(x, y);
+                        let xfPoint = point.matrixTransform(nodeXf);
                         controlPoints.push({
                             layerIndex,
                             nodeIndex,
-                            pathIndex: pointIndex,
+                            pathIndex: 0,
                             x: xfPoint.x,
                             y: xfPoint.y,
                             xProp: 'x',
                             yProp: 'y',
-                            isLast: pointIndex === points.length - 1,
+                            maxPointIndex: controlPoints.length + 1,
                         });
-                    }
-                    editControlPointNodeParsedAttributes.value.push({
-                        transform, fill, stroke, strokeWidth, points,
-                    });
-                    break;
-                }
-                case 'polyline': {
-                    const { points } = parsePolylineNodeAttributes(node);
-                    for (const [pointIndex, point] of points.entries()) {
-                        const xfPoint = point.matrixTransform(nodeXf);
+                        point.x = x + width;
+                        point.y = y + height;
+                        xfPoint = point.matrixTransform(nodeXf);
                         controlPoints.push({
                             layerIndex,
                             nodeIndex,
-                            pathIndex: pointIndex,
+                            pathIndex: 1,
                             x: xfPoint.x,
                             y: xfPoint.y,
-                            xProp: 'x',
-                            yProp: 'y',
-                            isLast: pointIndex === points.length - 1,
+                            xProp: 'width',
+                            yProp: 'height',
+                            minPointIndex: controlPoints.length - 1,
                         });
+                        editControlPointNodeParsedAttributes.value.push({
+                            transform, fill, stroke, strokeWidth, x, y, width, height,
+                        });
+                        break;
                     }
-                    editControlPointNodeParsedAttributes.value.push({
-                        transform, fill, stroke, strokeWidth, points,
-                    });
-                    break;
-                }
-                case 'circle': {
-                    const { cx, cy, r } = parseCircleNodeAttributes(node);
-                    const point = new DOMPoint(cx, cy);
-                    let xfPoint = point.matrixTransform(nodeXf);
-                    controlPoints.push({
-                        layerIndex,
-                        nodeIndex,
-                        pathIndex: 0,
-                        x: xfPoint.x,
-                        y: xfPoint.y,
-                        xProp: 'cx',
-                        yProp: 'cy',
-                    });
-                    point.y = cy - r;
-                    xfPoint = point.matrixTransform(nodeXf);
-                    controlPoints.push({
-                        layerIndex,
-                        nodeIndex,
-                        pathIndex: 1,
-                        attachToIndex: controlPoints.length - 1,
-                        x: xfPoint.x,
-                        y: xfPoint.y,
-                        yProp: 'ry',
-                    });
-                    editControlPointNodeParsedAttributes.value.push({
-                        transform, fill, stroke, strokeWidth, cx, cy, r,
-                    });
-                    break;
-                }
-                case 'ellipse': {
-                    const { cx, cy, rx, ry } = parseEllipseNodeAttributes(node);
-                    const point = new DOMPoint(cx, cy);
-                    let xfPoint = point.matrixTransform(nodeXf);
-                    controlPoints.push({
-                        layerIndex,
-                        nodeIndex,
-                        pathIndex: 0,
-                        x: xfPoint.x,
-                        y: xfPoint.y,
-                        xProp: 'cx',
-                        yProp: 'cy',
-                    });
-                    point.x = cx;
-                    point.y = cy - ry;
-                    xfPoint = point.matrixTransform(nodeXf);
-                    controlPoints.push({
-                        layerIndex,
-                        nodeIndex,
-                        pathIndex: 1,
-                        attachToIndex: controlPoints.length - 1,
-                        x: xfPoint.x,
-                        y: xfPoint.y,
-                        yProp: 'ry',
-                    });
-                    point.x = cx - rx;
-                    point.y = cy;
-                    xfPoint = point.matrixTransform(nodeXf);
-                    controlPoints.push({
-                        layerIndex,
-                        nodeIndex,
-                        pathIndex: 2,
-                        attachToIndex: controlPoints.length - 2,
-                        x: xfPoint.x,
-                        y: xfPoint.y,
-                        xProp: 'rx',
-                    });
-                    editControlPointNodeParsedAttributes.value.push({
-                        transform, fill, stroke, strokeWidth, cx, cy, rx, ry,
-                    });
-                    break;
-                }
-                case 'line': {
-                    const { x1, y1, x2, y2 } = parseLineNodeAttributes(node);
-                    const point = new DOMPoint(x1, y1);
-                    let xfPoint = point.matrixTransform(nodeXf);
-                    controlPoints.push({
-                        layerIndex,
-                        nodeIndex,
-                        pathIndex: 0,
-                        x: xfPoint.x,
-                        y: xfPoint.y,
-                        xProp: 'x1',
-                        yProp: 'y1',
-                    });
-                    point.x = x2;
-                    point.y = y2;
-                    xfPoint = point.matrixTransform(nodeXf);
-                    controlPoints.push({
-                        layerIndex,
-                        nodeIndex,
-                        pathIndex: 1,
-                        x: xfPoint.x,
-                        y: xfPoint.y,
-                        xProp: 'x2',
-                        yProp: 'y2',
-                    });
-                    editControlPointNodeParsedAttributes.value.push({
-                        transform, fill, stroke, strokeWidth, x1, y1, x2, y2,
-                    });
-                    break;
-                }
-                case 'path': {
-                    const { d } = parsePathNodeAttributes(node);
-                    const point = new DOMPoint();
-                    let previousCommand: VectorPathCommand | undefined;
-                    let previousAttachToIndex: number = -1;
-                    for (const [commandIndex, command] of d.entries()) {
-                        let attachToIndex: number = controlPoints.length;
-                        switch (command.type) {
-                            case VectorPathCommandType.CUBIC_BEZIER_CURVE: {
-                                point.x = command.x;
-                                point.y = command.y;
-                                let xfPoint = point.matrixTransform(nodeXf);
-                                controlPoints.push({
-                                    layerIndex,
-                                    nodeIndex,
-                                    pathIndex: commandIndex,
-                                    x: xfPoint.x,
-                                    y: xfPoint.y,
-                                    xProp: 'x',
-                                    yProp: 'y',
-                                });
-                                point.x = command.x2;
-                                point.y = command.y2;
-                                xfPoint = point.matrixTransform(nodeXf);
-                                controlPoints.push({
-                                    layerIndex,
-                                    nodeIndex,
-                                    pathIndex: commandIndex,
-                                    attachToIndex,
-                                    x: xfPoint.x,
-                                    y: xfPoint.y,
-                                    xProp: 'x2',
-                                    yProp: 'y2',
-                                });
-                                if (previousCommand) {
+                    case 'polygon': {
+                        const { points } = parsePolygonNodeAttributes(node);
+                        for (const [pointIndex, point] of points.entries()) {
+                            const xfPoint = point.matrixTransform(nodeXf);
+                            controlPoints.push({
+                                layerIndex,
+                                nodeIndex,
+                                pathIndex: pointIndex,
+                                x: xfPoint.x,
+                                y: xfPoint.y,
+                                xProp: 'x',
+                                yProp: 'y',
+                                isLast: pointIndex === points.length - 1,
+                            });
+                        }
+                        editControlPointNodeParsedAttributes.value.push({
+                            transform, fill, stroke, strokeWidth, points,
+                        });
+                        break;
+                    }
+                    case 'polyline': {
+                        const { points } = parsePolylineNodeAttributes(node);
+                        for (const [pointIndex, point] of points.entries()) {
+                            const xfPoint = point.matrixTransform(nodeXf);
+                            controlPoints.push({
+                                layerIndex,
+                                nodeIndex,
+                                pathIndex: pointIndex,
+                                x: xfPoint.x,
+                                y: xfPoint.y,
+                                xProp: 'x',
+                                yProp: 'y',
+                                isLast: pointIndex === points.length - 1,
+                            });
+                        }
+                        editControlPointNodeParsedAttributes.value.push({
+                            transform, fill, stroke, strokeWidth, points,
+                        });
+                        break;
+                    }
+                    case 'circle': {
+                        const { cx, cy, r } = parseCircleNodeAttributes(node);
+                        const point = new DOMPoint(cx, cy);
+                        let xfPoint = point.matrixTransform(nodeXf);
+                        controlPoints.push({
+                            layerIndex,
+                            nodeIndex,
+                            pathIndex: 0,
+                            x: xfPoint.x,
+                            y: xfPoint.y,
+                            xProp: 'cx',
+                            yProp: 'cy',
+                        });
+                        point.y = cy - r;
+                        xfPoint = point.matrixTransform(nodeXf);
+                        controlPoints.push({
+                            layerIndex,
+                            nodeIndex,
+                            pathIndex: 1,
+                            attachToIndex: controlPoints.length - 1,
+                            x: xfPoint.x,
+                            y: xfPoint.y,
+                            yProp: 'ry',
+                        });
+                        editControlPointNodeParsedAttributes.value.push({
+                            transform, fill, stroke, strokeWidth, cx, cy, r,
+                        });
+                        break;
+                    }
+                    case 'ellipse': {
+                        const { cx, cy, rx, ry } = parseEllipseNodeAttributes(node);
+                        const point = new DOMPoint(cx, cy);
+                        let xfPoint = point.matrixTransform(nodeXf);
+                        controlPoints.push({
+                            layerIndex,
+                            nodeIndex,
+                            pathIndex: 0,
+                            x: xfPoint.x,
+                            y: xfPoint.y,
+                            xProp: 'cx',
+                            yProp: 'cy',
+                        });
+                        point.x = cx;
+                        point.y = cy - ry;
+                        xfPoint = point.matrixTransform(nodeXf);
+                        controlPoints.push({
+                            layerIndex,
+                            nodeIndex,
+                            pathIndex: 1,
+                            attachToIndex: controlPoints.length - 1,
+                            x: xfPoint.x,
+                            y: xfPoint.y,
+                            yProp: 'ry',
+                        });
+                        point.x = cx - rx;
+                        point.y = cy;
+                        xfPoint = point.matrixTransform(nodeXf);
+                        controlPoints.push({
+                            layerIndex,
+                            nodeIndex,
+                            pathIndex: 2,
+                            attachToIndex: controlPoints.length - 2,
+                            x: xfPoint.x,
+                            y: xfPoint.y,
+                            xProp: 'rx',
+                        });
+                        editControlPointNodeParsedAttributes.value.push({
+                            transform, fill, stroke, strokeWidth, cx, cy, rx, ry,
+                        });
+                        break;
+                    }
+                    case 'line': {
+                        const { x1, y1, x2, y2 } = parseLineNodeAttributes(node);
+                        const point = new DOMPoint(x1, y1);
+                        let xfPoint = point.matrixTransform(nodeXf);
+                        controlPoints.push({
+                            layerIndex,
+                            nodeIndex,
+                            pathIndex: 0,
+                            x: xfPoint.x,
+                            y: xfPoint.y,
+                            xProp: 'x1',
+                            yProp: 'y1',
+                        });
+                        point.x = x2;
+                        point.y = y2;
+                        xfPoint = point.matrixTransform(nodeXf);
+                        controlPoints.push({
+                            layerIndex,
+                            nodeIndex,
+                            pathIndex: 1,
+                            x: xfPoint.x,
+                            y: xfPoint.y,
+                            xProp: 'x2',
+                            yProp: 'y2',
+                        });
+                        editControlPointNodeParsedAttributes.value.push({
+                            transform, fill, stroke, strokeWidth, x1, y1, x2, y2,
+                        });
+                        break;
+                    }
+                    case 'path': {
+                        const { d } = parsePathNodeAttributes(node);
+                        const point = new DOMPoint();
+                        let previousCommand: VectorPathCommand | undefined;
+                        let previousAttachToIndex: number = -1;
+                        for (const [commandIndex, command] of d.entries()) {
+                            let attachToIndex: number = controlPoints.length;
+                            switch (command.type) {
+                                case VectorPathCommandType.CUBIC_BEZIER_CURVE: {
+                                    point.x = command.x;
+                                    point.y = command.y;
+                                    let xfPoint = point.matrixTransform(nodeXf);
+                                    controlPoints.push({
+                                        layerIndex,
+                                        nodeIndex,
+                                        pathIndex: commandIndex,
+                                        x: xfPoint.x,
+                                        y: xfPoint.y,
+                                        xProp: 'x',
+                                        yProp: 'y',
+                                    });
+                                    point.x = command.x2;
+                                    point.y = command.y2;
+                                    xfPoint = point.matrixTransform(nodeXf);
+                                    controlPoints.push({
+                                        layerIndex,
+                                        nodeIndex,
+                                        pathIndex: commandIndex,
+                                        attachToIndex,
+                                        x: xfPoint.x,
+                                        y: xfPoint.y,
+                                        xProp: 'x2',
+                                        yProp: 'y2',
+                                    });
+                                    if (previousCommand) {
+                                        point.x = command.x1;
+                                        point.y = command.y1;
+                                        xfPoint = point.matrixTransform(nodeXf);
+                                        controlPoints.push({
+                                            layerIndex,
+                                            nodeIndex,
+                                            pathIndex: commandIndex,
+                                            attachToIndex: previousAttachToIndex,
+                                            x: xfPoint.x,
+                                            y: xfPoint.y,
+                                            xProp: 'x1',
+                                            yProp: 'y1',
+                                        });
+                                    }
+                                    break;
+                                }
+                                case VectorPathCommandType.ELLIPTICAL_ARC: {
+                                    point.x = command.x;
+                                    point.y = command.y;
+                                    const xfPoint = point.matrixTransform(nodeXf);
+                                    controlPoints.push({
+                                        layerIndex,
+                                        nodeIndex,
+                                        pathIndex: commandIndex,
+                                        x: xfPoint.x,
+                                        y: xfPoint.y,
+                                        xProp: 'x',
+                                        yProp: 'y',
+                                    });
+                                    // TODO - control arc
+                                    break;
+                                }
+                                case VectorPathCommandType.LINE: {
+                                    point.x = command.x;
+                                    point.y = command.y;
+                                    const xfPoint = point.matrixTransform(nodeXf);
+                                    controlPoints.push({
+                                        layerIndex,
+                                        nodeIndex,
+                                        pathIndex: commandIndex,
+                                        x: xfPoint.x,
+                                        y: xfPoint.y,
+                                        xProp: 'x',
+                                        yProp: 'y',
+                                    });
+                                    break;
+                                }
+                                case VectorPathCommandType.MOVE: {
+                                    point.x = command.x;
+                                    point.y = command.y;
+                                    const xfPoint = point.matrixTransform(nodeXf);
+                                    controlPoints.push({
+                                        layerIndex,
+                                        nodeIndex,
+                                        pathIndex: commandIndex,
+                                        x: xfPoint.x,
+                                        y: xfPoint.y,
+                                        xProp: 'x',
+                                        yProp: 'y',
+                                    });
+                                    break;
+                                }
+                                case VectorPathCommandType.QUADRATIC_BEZIER_CURVE: {
+                                    point.x = command.x;
+                                    point.y = command.y;
+                                    let xfPoint = point.matrixTransform(nodeXf);
+                                    controlPoints.push({
+                                        layerIndex,
+                                        nodeIndex,
+                                        pathIndex: commandIndex,
+                                        x: xfPoint.x,
+                                        y: xfPoint.y,
+                                        xProp: 'x',
+                                        yProp: 'y',
+                                    });
                                     point.x = command.x1;
                                     point.y = command.y1;
                                     xfPoint = point.matrixTransform(nodeXf);
@@ -503,117 +579,45 @@ export const createEditControlPoints = throttle(() => {
                                         layerIndex,
                                         nodeIndex,
                                         pathIndex: commandIndex,
-                                        attachToIndex: previousAttachToIndex,
+                                        attachToIndex,
                                         x: xfPoint.x,
                                         y: xfPoint.y,
                                         xProp: 'x1',
                                         yProp: 'y1',
                                     });
+                                    if (previousCommand) {
+                                        controlPoints.push({
+                                            layerIndex,
+                                            nodeIndex,
+                                            pathIndex: commandIndex,
+                                            attachToIndex: previousAttachToIndex,
+                                            x: xfPoint.x,
+                                            y: xfPoint.y,
+                                            xProp: 'x1',
+                                            yProp: 'y1',
+                                        });
+                                    }
+                                    break;
                                 }
-                                break;
                             }
-                            case VectorPathCommandType.ELLIPTICAL_ARC: {
-                                point.x = command.x;
-                                point.y = command.y;
-                                const xfPoint = point.matrixTransform(nodeXf);
-                                controlPoints.push({
-                                    layerIndex,
-                                    nodeIndex,
-                                    pathIndex: commandIndex,
-                                    x: xfPoint.x,
-                                    y: xfPoint.y,
-                                    xProp: 'x',
-                                    yProp: 'y',
-                                });
-                                // TODO - control arc
-                                break;
-                            }
-                            case VectorPathCommandType.LINE: {
-                                point.x = command.x;
-                                point.y = command.y;
-                                const xfPoint = point.matrixTransform(nodeXf);
-                                controlPoints.push({
-                                    layerIndex,
-                                    nodeIndex,
-                                    pathIndex: commandIndex,
-                                    x: xfPoint.x,
-                                    y: xfPoint.y,
-                                    xProp: 'x',
-                                    yProp: 'y',
-                                });
-                                break;
-                            }
-                            case VectorPathCommandType.MOVE: {
-                                point.x = command.x;
-                                point.y = command.y;
-                                const xfPoint = point.matrixTransform(nodeXf);
-                                controlPoints.push({
-                                    layerIndex,
-                                    nodeIndex,
-                                    pathIndex: commandIndex,
-                                    x: xfPoint.x,
-                                    y: xfPoint.y,
-                                    xProp: 'x',
-                                    yProp: 'y',
-                                });
-                                break;
-                            }
-                            case VectorPathCommandType.QUADRATIC_BEZIER_CURVE: {
-                                point.x = command.x;
-                                point.y = command.y;
-                                let xfPoint = point.matrixTransform(nodeXf);
-                                controlPoints.push({
-                                    layerIndex,
-                                    nodeIndex,
-                                    pathIndex: commandIndex,
-                                    x: xfPoint.x,
-                                    y: xfPoint.y,
-                                    xProp: 'x',
-                                    yProp: 'y',
-                                });
-                                point.x = command.x1;
-                                point.y = command.y1;
-                                xfPoint = point.matrixTransform(nodeXf);
-                                controlPoints.push({
-                                    layerIndex,
-                                    nodeIndex,
-                                    pathIndex: commandIndex,
-                                    attachToIndex,
-                                    x: xfPoint.x,
-                                    y: xfPoint.y,
-                                    xProp: 'x1',
-                                    yProp: 'y1',
-                                });
-                                if (previousCommand) {
-                                    controlPoints.push({
-                                        layerIndex,
-                                        nodeIndex,
-                                        pathIndex: commandIndex,
-                                        attachToIndex: previousAttachToIndex,
-                                        x: xfPoint.x,
-                                        y: xfPoint.y,
-                                        xProp: 'x1',
-                                        yProp: 'y1',
-                                    });
-                                }
-                                break;
-                            }
+                            previousCommand = command;
+                            previousAttachToIndex = attachToIndex;
                         }
-                        previousCommand = command;
-                        previousAttachToIndex = attachToIndex;
+                        editControlPointNodeParsedAttributes.value.push({
+                            transform, fill, stroke, strokeWidth, d,
+                        });
+                        break;
                     }
-                    editControlPointNodeParsedAttributes.value.push({
-                        transform, fill, stroke, strokeWidth, d,
-                    });
-                    break;
+                    default: {
+                        editControlPointNodeParsedAttributes.value.push({
+                            transform, fill, stroke, strokeWidth,
+                        });
+                    }
                 }
-                default: {
-                    editControlPointNodeParsedAttributes.value.push({
-                        transform, fill, stroke, strokeWidth,
-                    });
-                }
+                nodeIndex = editControlPointNodes.value.length;
+            } catch (error) {
+                console.warn('[src/tools/store/draw-shape-state.ts]', error);
             }
-            nodeIndex = editControlPointNodes.value.length;
         }
     }
 

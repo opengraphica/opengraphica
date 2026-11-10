@@ -21,7 +21,7 @@
         "freeTransformScale": "Trasformazione gratuita (ridimensiona)",
         "freeTransformTranslate": "Trasformazione libera (Mova)",
         "insertLayer": "Inserisci il livello",
-        "moduleCropResize": "Ridimensionare e ritagliare",
+        "cropResize": "Ridimensionare e ritagliare",
         "openFile": "Aprire il file",
         "pasteLayers": "Paste Layer(s)",
         "placeholder": "Portaoggetti",

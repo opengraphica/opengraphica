@@ -21,7 +21,7 @@
         "freeTransformScale": "フリートランスフォーム(リサイズ)",
         "freeTransformTranslate": "無料トランスフォーム(移動)",
         "insertLayer": "インサート層",
-        "moduleCropResize": "クロップとリサイズ",
+        "cropResize": "クロップとリサイズ",
         "openFile": "ファイルを開く",
         "pasteLayers": "ペーストレイヤー(s)",
         "placeholder": "プレースホルダー",

@@ -21,7 +21,7 @@
         "freeTransformScale": "Transformación libre (Resize)",
         "freeTransformTranslate": "Transformación gratuita (Move)",
         "insertLayer": "Insertar capas",
-        "moduleCropResize": "Cultivos y tamaño",
+        "cropResize": "Cultivos y tamaño",
         "openFile": "Archivo abierto",
         "pasteLayers": "Paste Layer(s)",
         "placeholder": "Titular",

@@ -153,6 +153,7 @@ import {
 import { BaseAction } from '@/actions/base';
 import { BundleAction } from '@/actions/bundle';
 import { ClearSelectionAction } from '@/actions/clear-selection';
+import { CropResizeAction } from '@/actions/crop-resize';
 import { UpdateFileAction } from '@/actions/update-file';
 import { UpdateLayerAction } from '@/actions/update-layer';
 
@@ -318,26 +319,25 @@ function onCancel() {
 async function onDone() {
     appEmitter.emit('app.wait.startBlocking', { id: 'toolCropResizeCalculating', label: 'canvas.toolbar.cropResize.waitLabel' });
     try {
-        const layers = workingFileStore.get('layers');
         const resizePxWidth = convertUnits(resizeInputWidth.value, measuringUnits.value, 'px', resolutionX.value, resolutionUnits.value);
         const resizePxHeight = convertUnits(resizeInputHeight.value, measuringUnits.value, 'px', resolutionY.value, resolutionUnits.value);
         const widthRatio = resizePxWidth / cropWidth.value;
         const heightRatio = resizePxHeight / cropHeight.value;
-        let layerUpdateActions: BaseAction[] = await generateResizeLayerActions(layers, widthRatio, heightRatio);
 
         await historyStore.dispatch('runAction', {
-            action: new BundleAction('moduleCropResize', 'action.moduleCropResize', [
-                ...layerUpdateActions,
-                new ClearSelectionAction(),
-                new UpdateFileAction({
-                    width: mode.value === 'crop' ? cropWidth.value : resizePxWidth,
-                    height: mode.value === 'crop' ? cropHeight.value : resizePxHeight,
-                    measuringUnits: measuringUnits.value,
-                    resolutionX: resolutionX.value,
-                    resolutionY: resolutionY.value,
-                    resolutionUnits: resolutionUnits.value
-                })
-            ])
+            action: new CropResizeAction(
+                mode.value,
+                mode.value === 'crop' ? cropWidth.value : resizePxWidth,
+                mode.value === 'crop' ? cropHeight.value : resizePxHeight,
+                cropLeft.value,
+                cropTop.value,
+                widthRatio,
+                heightRatio,
+                measuringUnits.value,
+                resolutionUnits.value,
+                resolutionX.value,
+                resolutionY.value,
+            )
         });
     } catch (error: any) {
         
@@ -345,73 +345,4 @@ async function onDone() {
     appEmitter.emit('app.wait.stopBlocking', { id: 'toolCropResizeCalculating' });
     emit('close');
 }
-
-async function generateResizeLayerActions(
-    layers: WorkingFileLayer<ColorModel>[],
-    widthRatio: number,
-    heightRatio: number,
-): Promise<BaseAction[]> {
-    let actions: BaseAction[] = [];
-    for (let layer of layers) {
-        if (layer.type === 'group') {
-            await generateResizeLayerActions((layer as WorkingFileGroupLayer<ColorModel>).layers, widthRatio, heightRatio);
-        } else if (layer.type === 'raster' || layer.type === 'rasterSequence' || layer.type === 'vector' || layer.type === 'gradient') {
-            let transform = layer.transform;
-            if (mode.value === 'crop') {
-                transform = new DOMMatrix().translateSelf(-cropLeft.value, -cropTop.value).multiplySelf(layer.transform);
-            } else {
-                transform = new DOMMatrix().translateSelf(-cropLeft.value * widthRatio, -cropTop.value * heightRatio).scaleSelf(widthRatio, heightRatio).multiplySelf(layer.transform);
-            }
-            actions.push(
-                new UpdateLayerAction<UpdateAnyLayerOptions<ColorModel>>({
-                    id: layer.id,
-                    transform
-                })
-            );
-        } else if (layer.type === 'text') {
-            let transform = layer.transform;
-            if (mode.value === 'crop') {
-                transform = new DOMMatrix().translateSelf(-cropLeft.value, -cropTop.value).multiplySelf(layer.transform);
-                actions.push(
-                    new UpdateLayerAction<UpdateTextLayerOptions<ColorModel>>({
-                        id: layer.id,
-                        transform,
-                    })
-                );
-            } else {
-                const decomposedTransform = decomposeMatrix(transform);
-                transform = new DOMMatrix()
-                    .translateSelf(-cropLeft.value * widthRatio, -cropTop.value * heightRatio)
-                    .translateSelf(
-                        -decomposedTransform.translateX + (decomposedTransform.translateX * widthRatio),
-                        -decomposedTransform.translateY + (decomposedTransform.translateY * heightRatio)
-                    )
-                    .multiplySelf(layer.transform)
-                const oldData = JSON.parse(JSON.stringify((layer as WorkingFileTextLayer).data)) as TextDocument;
-                const newData = JSON.parse(JSON.stringify((layer as WorkingFileTextLayer).data)) as TextDocument;
-                for (const line of newData.lines) {
-                    for (const span of line.spans) {
-                        span.meta.size = (span.meta.size ?? textMetaDefaults.size) * widthRatio;
-                    }
-                }
-                actions.push(
-                    new UpdateLayerAction<UpdateTextLayerOptions<ColorModel>>({
-                        id: layer.id,
-                        transform,
-                        width: layer.width * widthRatio,
-                        height: layer.height * heightRatio,
-                        data: newData,
-                    }, {
-                        transform: layer.transform,
-                        width: layer.width,
-                        height: layer.height,
-                        data: oldData,
-                    })
-                );
-            }
-        }
-    }
-    return actions;
-}
-
 </script>

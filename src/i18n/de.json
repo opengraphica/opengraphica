@@ -21,7 +21,7 @@
         "freeTransformScale": "Free Transform (Resize)",
         "freeTransformTranslate": "Free Transform (Move)",
         "insertLayer": "Ebene einfügen",
-        "moduleCropResize": "Korn und Größe",
+        "cropResize": "Korn und Größe",
         "openFile": "Datei öffnen",
         "pasteLayers": "Paste Layer(s)",
         "placeholder": "Platzhalter",

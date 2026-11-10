@@ -118,7 +118,7 @@ export class TrimLayerEmptySpaceAction extends BaseAction {
                 bounds.top - viewBox.top,
             );
 
-            const newLayerTransform = new DOMMatrix()
+            let newLayerTransform = new DOMMatrix()
                 .multiplySelf(
                     layer.transform,
                 ).scaleSelf(
@@ -128,6 +128,9 @@ export class TrimLayerEmptySpaceAction extends BaseAction {
                     currentViewBoxOffset.x,
                     currentViewBoxOffset.y,
                 );
+            if (newLayerTransform.toFloat64Array().some(Number.isNaN)) {
+                newLayerTransform = layer.transform;
+            }
 
             svgDocument.documentElement.setAttribute('viewBox', `${bounds.left} ${bounds.top} ${bounds.width} ${bounds.height}`);
 

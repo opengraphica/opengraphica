@@ -21,7 +21,7 @@
         "freeTransformScale": "التحول الحر (Resize)",
         "freeTransformTranslate": "Transform (Move)",
         "insertLayer": "Insert Layer",
-        "moduleCropResize": "Crop and Resize",
+        "cropResize": "Crop and Resize",
         "openFile": "فتحة",
         "pasteLayers": "Paste Layer(s)",
         "placeholder": "مالك المكان",

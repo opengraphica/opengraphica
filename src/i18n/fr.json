@@ -21,7 +21,7 @@
         "freeTransformScale": "Transformation libre (Redimensionner)",
         "freeTransformTranslate": "Transformation libre (déplacer)",
         "insertLayer": "Insérer un calque",
-        "moduleCropResize": "Culture et redimensionnement",
+        "cropResize": "Culture et redimensionnement",
         "openFile": "Ouvrir un fichier",
         "pasteLayers": "Coller les calques",
         "placeholder": "Titulaire",
