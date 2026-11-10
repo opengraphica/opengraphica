@@ -27,8 +27,8 @@
         "fileTakePhoto": "사진 찍기",
         "flipLayerX": "레이어 좌우 뒤집기",
         "flipLayerY": "레이어 상하 뒤집기",
-        "freeTransformRotate": "자유 변형 (회전)",
-        "freeTransformScale": "자유 변형 (크기 조절)",
+        "freeTransformRotate": "자유 변환 (회전)",
+        "freeTransformScale": "자유 변환 (크기 조절)",
         "freeTransformTranslate": "자유 변환 (이동)",
         "insertLayer": "레이어 삽입",
         "mergeEffects": "효과 병합",
@@ -55,15 +55,15 @@
         "trimLayerEmptySpace": "레이어 빈 공간 잘라내기",
         "typeInTextLayer": "텍스트 레이어에 입력",
         "updateActiveSelection": "활성 선택 업데이트",
-        "updateBlurLayer": "흐림 레이어",
-        "updateCloneBrushLayer": "복제 브러시 레이어",
+        "updateBlurLayer": "레이어 흐리게",
+        "updateCloneBrushLayer": "레이어에 복제 브러시 사용",
         "updateDrawLayer": "레이어에 그리기",
         "updateDrawGradientLayerBlendColorSpace": "그라데이션 업데이트 (색 공간)",
         "updateDrawGradientLayerFillType": "그라데이션 업데이트 (채우기 유형)",
         "updateDrawGradientLayerPosition": "그라데이션 업데이트 (위치)",
         "updateDrawGradientLayerSpreadMethod": "그라데이션 업데이트 (확산 방식)",
         "updateDrawGradientLayerStops": "그라데이션 업데이트 (색 정지점)",
-        "updateDeformBlurLayer": "흐림 레이어",
+        "updateDeformBlurLayer": "레이어 흐리게",
         "updateEraseLayer": "레이어에서 지우기",
         "updateFile": "파일 업데이트",
         "updateLayer": "레이어 업데이트",
@@ -139,7 +139,7 @@
         },
         "renderer": {
             "initializeFailed": {
-                "title": "설정 실패",
+                "title": "초기화 실패",
                 "message": "OpenGraphica는 이 브라우저에 없는 기본 웹 기능이 필요합니다. 웹 브라우저를 업데이트하거나 Chrome, Firefox, Safari, Edge 같은 최신 브라우저로 전환해 주세요."
             }
         },
@@ -176,11 +176,11 @@
         "mergeEffects": "효과 병합",
         "moreInfo": "자세한 정보",
         "no": "아니요",
-        "ok": "OK",
+        "ok": "확인",
         "openImage": "이미지 열기",
         "pickColor": "색상 선택",
         "restoreLastImage": "마지막 이미지 복원",
-        "reverse": "반대로",
+        "reverse": "반전",
         "save": "저장",
         "selectFiles": "파일 선택...",
         "settings": "설정",
@@ -431,7 +431,7 @@
                 "modeOption": {
                     "gamma": "감마 조정",
                     "shift": "흑백 이동",
-                    "luminance": "밝기 조정"
+                    "luminance": "휘도 조절"
                 },
                 "brightness": "밝기",
                 "effectiveRange": "범위",
@@ -453,7 +453,7 @@
         "chromaKey": {
             "name": "크로마 키",
             "param": {
-                "eraseColor": "색상 지우기",
+                "eraseColor": "지울 색상",
                 "threshold": "지우기 임계값",
                 "softness": "부드러움",
                 "spillSuppression": "스필 억제",
@@ -478,7 +478,7 @@
                     "tritan": "청색맹(트라이타노피아) / 청색약(트라이타노말리)",
                     "achroma": "전색약(아크로마토말리) / 전색맹(아크로마토시아)"
                 },
-                "severity": "심각도"
+                "severity": "정도"
             }
         },
         "colorCorrection": {
@@ -498,7 +498,7 @@
             "param": {
                 "rotation": "회전",
                 "perspective": "원근",
-                "viewPosition": "보기 위치"
+                "viewPosition": "시점 위치"
             }
         },
         "decreaseColorDepth": {
@@ -514,22 +514,22 @@
                     "heightmap": "높이 맵"
                 },
                 "angle": "각도",
-                "elevation": "고도"
+                "elevation": "높이"
             }
         },
         "filmGrain": {
-            "name": "필름 입자",
-            "help": "노출이 부족한 필름, 또는 그레인 크기가 큰 확대 필름의 모습을 시뮬레이션합니다.\n\n* **강도** - 그레인이 보이는 정도를 높입니다.\n* **그레인 배율** - 픽셀 크기 대비 그레인 크기를 키웁니다.\n* **시드** - 그레인 패턴을 생성하는 데 쓰는 난수입니다.\n* **혼합 모드** - 그레인을 이미지와 합치는 방식을 정합니다. 표준 모드는 물리적으로 정확하며, 다른 모드는 예술적 효과용입니다.",
+            "name": "필름 그레인",
+            "help": "노출이 부족한 필름, 또는 그레인 크기가 큰 확대 필름의 모습을 시뮬레이션합니다.\n\n* **강도** - 그레인이 보이는 정도를 높입니다.\n* **그레인 배율** - 픽셀 크기 대비 그레인 크기를 키웁니다.\n* **시드** - 그레인 패턴을 생성하는 데 쓰는 난수입니다.\n* **혼합 모드** - 그레인을 이미지와 합치는 방식을 정합니다. 일반 모드는 물리적으로 정확하며, 다른 모드는 예술적 효과용입니다.",
             "param": {
                 "blendMode": "혼합 모드",
                 "blendModeOption": {
                     "normal": "일반",
                     "subtract": "빼기",
-                    "add": "추가"
+                    "add": "더하기"
                 },
-                "grainScale": "가루 배율",
+                "grainScale": "그레인 배율",
                 "grayscale": "회색조",
-                "intensity": "세기",
+                "intensity": "강도",
                 "seed": "시드"
             }
         },
@@ -709,19 +709,19 @@
             "name": "틸트 시프트 흐림",
             "help": "현미경 규모의 얕은 피사계 심도, 또는 특수 카메라 틸트시프트 렌즈의 효과를 시뮬레이션합니다.\n\n* **흐림 반지름** - 흐린 영역에 적용하는 최대 흐림량입니다.\n* **그라데이션 반지름** - 흐리지 않은 영역에서 흐린 영역으로 이어지는 그라데이션의 크기입니다.\n* **각도** - 흐리지 않은 영역의 회전입니다.\n* **오프셋** - 중심에서 벗어난, 흐리지 않은 영역의 위치입니다.",
             "param": {
-                "blurRadius": "흐림 반경",
-                "gradientRadius": "그라데이션 반경",
+                "blurRadius": "흐림 반지름",
+                "gradientRadius": "그라데이션 반지름",
                 "angle": "각도",
                 "offset": "오프셋"
             }
         },
         "whirlPinch": {
-            "name": "소용돌이와 오므리기",
+            "name": "소용돌이와 핀치",
             "help": "이미지의 원형 영역을 비틀고 집어넣습니다.\n\n* **소용돌이** - 비틀림의 회전량입니다.\n* **핀치** - 집어넣거나 펼치는 강도입니다.\n* **반지름** - 영향 범위를 정하는 원의 반지름입니다.",
             "param": {
                 "whirl": "소용돌이",
-                "pinch": "오므리기",
-                "radius": "반경",
+                "pinch": "핀치",
+                "radius": "반지름",
                 "centerX": "가운데 X",
                 "centerY": "가운데 Y"
             }
@@ -781,10 +781,10 @@
     "mcp": {
         "common": {
             "errors": {
-                "required": "속성 {propertyName}은 필수입니다.",
-                "notNumber": "속성 {propertyName}은 숫자여야 합니다.",
-                "notString": "속성 {propertyName}은 문자열이어야 합니다.",
-                "notInEnumList": "속성 {propertyName}은 허용된 열거형 값이 아닙니다."
+                "required": "{propertyName} 속성은 필수입니다.",
+                "notNumber": "{propertyName} 속성은 숫자여야 합니다.",
+                "notString": "{propertyName} 속성은 문자열이어야 합니다.",
+                "notInEnumList": "{propertyName} 속성은 허용된 값 중 하나가 아닙니다."
             }
         },
         "createCircleShape": {
@@ -889,7 +889,7 @@
             "tools": {
                 "blur": {
                     "title": "흐림",
-                    "description": "이미지 영역에 흐림"
+                    "description": "이미지 영역을 흐리게 합니다"
                 },
                 "cloneBrush": {
                     "title": "복제 브러시",
@@ -927,7 +927,7 @@
             "tools": {
                 "effect": {
                     "title": "효과",
-                    "description": "레이어 색을 조정하고 필터 효과를 추가합니다"
+                    "description": "레이어 색을 조정하고 효과를 추가합니다"
                 }
             }
         },
@@ -939,7 +939,7 @@
                     "description": "브러시 획으로 지웁니다"
                 },
                 "bucketFill": {
-                    "title": "지우기 버킷 채우기",
+                    "title": "지우기 페인트통 채우기",
                     "description": "비슷한 색 영역을 지웁니다"
                 }
             }
@@ -1053,10 +1053,10 @@
             }
         },
         "fileOpenConfirm": {
-            "title": "확실하세요?",
+            "title": "계속하시겠습니까?",
             "warning": [
-                "You have made edits to your current file. If you open a new file now, these edits will be discarded. If you only wish to add new layers to this file, use the {insertPhoto} option.",
-                "Do you wish to continue to open a new file and discard all of your changes?"
+                "현재 파일을 편집했습니다. 지금 새 파일을 열면 편집 내용이 버려집니다. 이 파일에 새 레이어만 추가하려면 {insertPhoto} 옵션을 사용하세요.",
+                "변경 사항을 모두 버리고 새 파일을 여시겠습니까?"
             ]
         },
         "fileOpenWebdavExplorer": {
@@ -1153,8 +1153,8 @@
         "layerBlendingMode": {
             "title": "혼합 모드 변경",
             "blendingMode": "혼합 모드",
-            "layerTop": "맨 위 레이어",
-            "layerBottom": "맨 아래 레이어",
+            "layerTop": "위 레이어",
+            "layerBottom": "아래 레이어",
             "imageResult": "결과",
             "exampleUsage": "사용 예:",
             "blendingModeSummary": {
@@ -1301,7 +1301,7 @@
             "description": "레이어에 추가할 효과를 선택하세요. 효과는 대개 레이어 색을 조정하거나 흐림 같은 특수 패턴을 더합니다.",
             "loading": "미리 보기 생성 중...",
             "generationErrorGeneral": "선택한 레이어의 효과 미리보기를 만드는 동안 오류가 발생했습니다.",
-            "generationErrorUnsupportedType": "선택한 레이어에는 필터를 적용할 수 없습니다.",
+            "generationErrorUnsupportedType": "선택한 레이어에는 효과를 적용할 수 없습니다.",
             "generationErrorNoLayer": "효과를 추가하려면 레이어 독에서 레이어를 하나 이상 선택해 주세요."
         },
         "layerEffectEdit": {
@@ -1315,8 +1315,8 @@
             "deleting": "효과 삭제 중...",
             "useActiveSelectionMask": "선택을 마스크로 적용",
             "clearSelectionMask": "마스크 제거",
-            "deleteFilterError": "필터를 삭제하는 동안 오류가 발생했습니다. 이 메시지가 계속 보이면 버그로 신고해 주세요.",
-            "applyFilterError": "필터 변경을 적용하는 동안 오류가 발생했습니다. 이 메시지가 계속 보이면 버그로 신고해 주세요."
+            "deleteFilterError": "효과를 삭제하는 동안 오류가 발생했습니다. 이 메시지가 계속 보이면 버그로 신고해 주세요.",
+            "applyFilterError": "효과 변경을 적용하는 동안 오류가 발생했습니다. 이 메시지가 계속 보이면 버그로 신고해 주세요."
         },
         "renameLayer": {
             "title": "레이어 이름 변경",
@@ -1596,7 +1596,7 @@
                 "title": "브러시 선택",
                 "close": "대화 상자 닫기",
                 "noBrushCategorySelected": {
-                    "title": "선택된 카테고리 없음",
+                    "title": "선택된 범주 없음",
                     "message": "브러시 범주를 선택해 주세요."
                 },
                 "noBrushesInCategory": {
@@ -1608,18 +1608,18 @@
                         "title": "혼합",
                         "density": "밀도",
                         "densityDescription": "펜 압력에 따라 브러시 스탬프 각각의 투명도입니다. 펜 압력을 바꿀 때 이 범위가 사용됩니다.",
-                        "pressureMinDensity": "최소 농도",
-                        "pressureMaxDensity": "최대 농도",
+                        "pressureMinDensity": "최소 밀도",
+                        "pressureMaxDensity": "최대 밀도",
                         "colorBlendingStrength": "색 혼합 강도",
-                        "pressureMinColorBlendingStrength": "최소 세기",
-                        "pressureMaxColorBlendingStrength": "최대 세기",
+                        "pressureMinColorBlendingStrength": "최소 강도",
+                        "pressureMaxColorBlendingStrength": "최대 강도",
                         "colorBlendingStrengthDescription": "그리는 동안 브러시 아래의 색을 얼마나 묻혀 올지입니다. 펜 압력을 바꿀 때 이 범위가 사용됩니다.",
                         "colorBlendingPersistence": "색 혼합 지속",
                         "colorBlendingPersistenceDescription": "획을 끄는 동안 묻어 온 색이 브러시에 유지되는 시간입니다.",
-                        "concentration": "집중도",
+                        "concentration": "농도",
                         "concentrationDescription": "값이 낮으면 물로 희석한 브러시를, 값이 높으면 농축된 색을 시뮬레이션합니다. 완전히 불투명한 색 위에 그릴 때는 이 설정이 적용되지 않습니다. 펜 압력을 바꿀 때 이 범위가 사용됩니다.",
-                        "pressureMinConcentration": "최소 집중도",
-                        "pressureMaxConcentration": "최대 집중도"
+                        "pressureMinConcentration": "최소 농도",
+                        "pressureMaxConcentration": "최대 농도"
                     },
                     "shape": {
                         "title": "도형",
@@ -1634,7 +1634,7 @@
                         "angleDescription": "브러시 모양을 회전시킵니다."
                     },
                     "strokePath": {
-                        "title": "패스에 획",
+                        "title": "획 경로",
                         "spacing": "간격",
                         "spacingDescription": "브러시 크기 대비 스탬프 간격입니다. 값이 극단적으로 낮으면 큰 브러시에서 성능이 크게 떨어질 수 있으니 주의하세요.",
                         "jitter": "흔들림",
@@ -1686,10 +1686,10 @@
             },
             "spreadMethod": {
                 "label": "확산 방식",
-                "pad": "여백",
+                "pad": "끝색 채우기",
                 "repeat": "반복",
                 "reflect": "반사",
-                "truncate": "말줄임"
+                "truncate": "잘라내기"
             },
             "stopDialog": {
                 "title": "색상 정지점 편집",
@@ -1718,7 +1718,7 @@
             },
             "strokeStyle": {
                 "label": "획",
-                "width": "너비"
+                "width": "두께"
             },
             "snapping": {
                 "title": "스냅",
@@ -1797,7 +1797,7 @@
                 "layerCenter": "레이어 중심"
             },
             "metrics": {
-                "title": "지표",
+                "title": "치수",
                 "alignLeft": "왼쪽 정렬",
                 "alignRight": "오른쪽 정렬",
                 "alignCenter": "가운데 정렬",
@@ -1999,76 +1999,76 @@
         "cloneBrushToolIntroduction": {
             "title": "복제 브러시 도구",
             "introduction": [
-                "The clone brush copies part of an image so you can paint that same area somewhere else. It is typically used to remove blemishes, unwanted objects, or fill in a damaged spot."
+                "복제 브러시는 이미지의 일부를 복사해 다른 곳에 칠할 수 있습니다. 잡티나 원치 않는 물체를 지우거나, 손상된 부분을 메울 때 주로 씁니다."
             ],
             "body": {
                 "mouse": [
-                    "The clone area displays as a circle with the clone stamp icon. You can drag it around or ctrl + click to set it to the current mouse position."
+                    "복제 영역은 복제 스탬프 아이콘이 있는 원으로 표시됩니다. 끌어 옮기거나 Ctrl+클릭으로 현재 마우스 위치에 맞출 수 있습니다."
                 ],
                 "touch": [
-                    "The clone area displays as a circle with the clone stamp icon. You can drag it around."
+                    "복제 영역은 복제 스탬프 아이콘이 있는 원으로 표시됩니다. 끌어 옮길 수 있습니다."
                 ]
             }
         },
         "deformBlurToolIntroduction": {
             "title": "흐림 도구",
             "introduction": [
-                "The blur tool will blur the portion of current layer you draw on."
+                "흐림 도구는 현재 레이어에서 그린 부분을 흐리게 합니다."
             ]
         },
         "deformSharpenToolIntroduction": {
             "title": "선명하게 도구",
             "introduction": [
-                "The sharpen tool will sharpen areas of the current layer you draw on."
+                "선명 도구는 현재 레이어에서 그린 부분을 선명하게 합니다."
             ]
         },
         "drawBrushToolIntroduction": {
             "title": "브러시 도구",
             "introduction": [
-                "The brush tool lets you create a painting with different brushes. It is best used with a pressure-sensitive stylus."
+                "브러시 도구로 여러 브러시를 사용해 그릴 수 있습니다. 필압을 감지하는 스타일러스와 함께 쓸 때 가장 좋습니다."
             ]
         },
         "drawBucketFillToolIntroduction": {
-            "title": "버킷 채우기 도구",
+            "title": "페인트통 채우기 도구",
             "introduction": [
-                "The bucket fill tool lets you fill in areas of similar color with a color of your choice."
+                "페인트통 채우기 도구는 비슷한 색 영역을 원하는 색으로 채웁니다."
             ],
             "body": {
                 "mouse": [
-                    "Click on an area to fill. While holding the mouse down, you can drag to the left or right to adjust how much of the area is filled."
+                    "채울 영역을 클릭합니다. 마우스를 누른 채 좌우로 끌면 채워지는 범위를 조절할 수 있습니다."
                 ],
                 "touch": [
-                    "Tap on an area to fill. While holding down, you can drag to the left or right to adjust how much of the area is filled."
+                    "채울 영역을 탭합니다. 누른 채 좌우로 끌면 채워지는 범위를 조절할 수 있습니다."
                 ]
             }
         },
         "drawGradientToolIntroduction": {
             "title": "그라데이션 도구",
             "introduction": [
-                "The gradient tool lets you add gradient layers."
+                "그라데이션 도구로 그라데이션 레이어를 추가할 수 있습니다."
             ],
             "body": {
                 "mouse": [
-                    "Click and drag to place a gradient on the canvas."
+                    "클릭하고 끌어 캔버스에 그라데이션을 놓습니다."
                 ],
                 "touch": [
-                    "Use one finger to touch and drag to place a gradient on the canvas."
+                    "한 손가락으로 터치하고 끌어 캔버스에 그라데이션을 놓습니다."
                 ]
             }
         },
         "drawShapeToolIntroduction": {
             "title": "도형 도구",
             "introduction": [
-                "The shape tool lets you add various basic shapes and vector paths."
+                "도형 도구로 기본 도형과 벡터 패스를 추가할 수 있습니다."
             ],
             "body": {
                 "mouse": [
-                    "{add} - Click and drag to place a shape on the canvas.",
-                    "{edit} - Click on a shape's control points and drag them to edit the shape after it has been added."
+                    "{add} - 클릭하고 끌어 캔버스에 도형을 놓습니다.",
+                    "{edit} - 도형을 추가한 뒤 제어점을 클릭하고 끌어 도형을 편집합니다."
                 ],
                 "touch": [
-                    "{add} - Use one finger to touch and drag to place a shape on the canvas.",
-                    "{edit} - Tap a shape's control points and drag them to edit the shape after it has been added."
+                    "{add} - 한 손가락으로 터치하고 끌어 캔버스에 도형을 놓습니다.",
+                    "{edit} - 도형을 추가한 뒤 제어점을 탭하고 끌어 도형을 편집합니다."
                 ]
             },
             "bodyTitle": {
@@ -2079,49 +2079,49 @@
         "effectToolIntroduction": {
             "title": "효과 도구",
             "introduction": [
-                "The effect tool allows to add layer effects that can adjust colors and do all sorts of other useful operations to the entire layer. Effects can be stacked and removed at any time."
+                "효과 도구로 레이어 전체에 색 조정 등 여러 작업을 하는 효과를 추가할 수 있습니다. 효과는 겹쳐 쌓거나 언제든 제거할 수 있습니다."
             ]
         },
         "eraseBucketFillToolIntroduction": {
-            "title": "지우기 버킷 채우기 도구",
+            "title": "지우기 페인트통 채우기 도구",
             "introduction": [
-                "Erase areas of the image that have a similar color."
+                "비슷한 색 영역을 지웁니다."
             ],
             "body": {
                 "mouse": [
-                    "Click on an area to erase. While holding the mouse down, you can drag to the left or right to adjust how much of the area is erased."
+                    "지울 영역을 클릭합니다. 마우스를 누른 채 좌우로 끌면 지워지는 범위를 조절할 수 있습니다."
                 ],
                 "touch": [
-                    "Tap on an area to erase. While holding down, you can drag to the left or right to adjust how much of the area is erased."
+                    "지울 영역을 탭합니다. 누른 채 좌우로 끌면 지워지는 범위를 조절할 수 있습니다."
                 ]
             }
         },
         "eraseToolIntroduction": {
             "title": "지우기 도구",
             "introduction": [
-                "The erase tool allows you to remove parts of the layer, making them transparent."
+                "지우기 도구로 레이어의 일부를 제거해 투명하게 만들 수 있습니다."
             ]
         },
         "explainCanvasViewportControls": {
             "title": "캔버스 이동",
             "introduction": [
-                "No matter which tool is selected, you can control the canvas view.",
-                "When {anyTool} is selected:"
+                "어떤 도구가 선택되어 있든 캔버스 보기를 조절할 수 있습니다.",
+                "{anyTool} 선택 시:"
             ],
-            "anyTool": "아무 도구나",
+            "anyTool": "모든 도구",
             "body": {
                 "mouse": [
-                    "{zooming} - Use the {mouseWheel} to zoom in and out.",
-                    "{panning} - Click and drag with the {rightMouseButton} to move the canvas."
+                    "{zooming} - {mouseWheel}로 확대하거나 축소합니다.",
+                    "{panning} - {rightMouseButton}으로 클릭하고 끌어 캔버스를 이동합니다."
                 ],
                 "touch": [
-                    "{zooming} - Use two fingers and pinch to zoom in and out.",
-                    "{panning} - Use two fingers and slide them together to move the canvas."
+                    "{zooming} - 두 손가락으로 오므리거나 벌려 확대하거나 축소합니다.",
+                    "{panning} - 두 손가락을 함께 밀어 캔버스를 이동합니다."
                 ]
             },
             "bodyTitle": {
-                "zooming": "확대/축소 중",
-                "panning": "화면 이동 중",
+                "zooming": "확대/축소",
+                "panning": "화면 이동",
                 "mouseWheel": "마우스 휠",
                 "rightMouseButton": "오른쪽 마우스 버튼"
             }
@@ -2129,44 +2129,44 @@
         "freeTransformToolIntroduction": {
             "title": "자유 변환 도구",
             "introduction": [
-                "This tool moves, resizes, and rotates layers. A boundary box shows around the selected layer(s).",
-                "In {autoMode}:"
+                "이 도구는 레이어를 이동하고, 크기를 조절하고, 회전합니다. 선택한 레이어 주위에 경계 상자가 표시됩니다.",
+                "{autoMode}에서:"
             ],
             "autoMode": "자동 모드",
             "body": {
                 "mouse": [
-                    "{selection} - {leftClick} on a layer to select it.",
-                    "{moving} - {leftClick} on a layer and drag to move it.",
-                    "{resizing} - {leftClick} and drag resize handles."
+                    "{selection} - {leftClick}으로 레이어를 선택합니다.",
+                    "{moving} - {leftClick}으로 레이어를 끌어 이동합니다.",
+                    "{resizing} - {leftClick}으로 크기 조절 핸들을 끕니다."
                 ],
                 "touch": [
-                    "{selection} - Tap on a layer to select it.",
-                    "{moving} - Tap on a layer and drag to move it.",
-                    "{resizing} - Use one finger to drag resize handles."
+                    "{selection} - 레이어를 탭해 선택합니다.",
+                    "{moving} - 레이어를 탭하고 끌어 이동합니다.",
+                    "{resizing} - 한 손가락으로 크기 조절 핸들을 끕니다."
                 ]
             },
             "bodyTitle": {
                 "selection": "선택",
-                "moving": "이동 중",
-                "resizing": "크기 조정 중",
+                "moving": "이동",
+                "resizing": "크기 조절",
                 "leftClick": "왼쪽 클릭"
             }
         },
         "selectionToolIntroduction": {
             "title": "선택 도구",
             "introduction": [
-                "The selection tool allows you to select specific parts of the image to restrict what editing affects."
+                "선택 도구로 이미지의 특정 부분만 골라 편집이 적용되는 범위를 제한할 수 있습니다."
             ],
             "body": {
                 "mouse": [
-                    "{createSelection} - Click and drag with {leftClick} to create a selection."
+                    "{createSelection} - {leftClick}으로 클릭하고 끌어 선택 영역을 만듭니다."
                 ],
                 "touch": [
-                    "{createSelection} - Draw with one finger to create a selection."
+                    "{createSelection} - 한 손가락으로 그려 선택 영역을 만듭니다."
                 ],
                 "end": [
-                    "{selectionShape} - What shape is used to draw the selection.",
-                    "{selectionCombineMode} - How the current selection combines with the existing selection."
+                    "{selectionShape} - 선택 영역을 그릴 때 쓰는 모양입니다.",
+                    "{selectionCombineMode} - 현재 선택 영역을 기존 선택 영역과 합치는 방식입니다."
                 ]
             },
             "bodyTitle": {
@@ -2177,23 +2177,23 @@
             }
         },
         "zoomToolIntroduction": {
-            "title": "확대/팬 도구",
+            "title": "확대/축소 및 이동 도구",
             "introduction": [
-                "This tool lets you zoom in to the image, and move the view around."
+                "이 도구로 이미지를 확대하고 보기를 이동할 수 있습니다."
             ],
             "body": {
                 "mouse": [
-                    "{zooming} - {leftClick} to zoom in; {ctrlLeftClick} to zoom out.",
-                    "{panning} - Click and drag with the {leftMouseButton} to move the canvas."
+                    "{zooming} - {leftClick}하면 확대하고, {ctrlLeftClick}하면 축소합니다.",
+                    "{panning} - {leftMouseButton}으로 클릭하고 끌어 캔버스를 이동합니다."
                 ],
                 "touch": [
-                    "{zooming} - Tap with one finger to zoom in. Tap with two fingers to zoom out.",
-                    "{panning} - Tap and drag with one finger to move the canvas."
+                    "{zooming} - 한 손가락으로 탭하면 확대하고, 두 손가락으로 탭하면 축소합니다.",
+                    "{panning} - 한 손가락으로 탭하고 끌어 캔버스를 이동합니다."
                 ]
             },
             "bodyTitle": {
-                "zooming": "확대/축소 중",
-                "panning": "화면 이동 중",
+                "zooming": "확대/축소",
+                "panning": "화면 이동",
                 "leftClick": "왼쪽 클릭",
                 "ctrlLeftClick": "Ctrl + 왼쪽 클릭",
                 "leftMouseButton": "왼쪽 마우스 버튼"
