@@ -252,7 +252,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
     }
 
     private async onHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
-        if (['moduleCropResize', 'typeInTextLayer', 'updateTextLayerProperties'].includes(event?.action.id as string)) {
+        if (['cropResize', 'typeInTextLayer', 'updateTextLayerProperties'].includes(event?.action.id as string)) {
 
             // Update document editor with new document.
             if (editingTextLayerId.value != null) {
@@ -265,7 +265,7 @@ export default class CanvasTextController extends BaseCanvasMovementController {
                 }
             }
 
-            if (event?.action.id === 'moduleCropResize') {
+            if (event?.action.id === 'cropResize') {
                 this.updateToolbarMetaFromActiveSelection();
             }
         }

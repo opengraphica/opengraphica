@@ -34,7 +34,6 @@ async function createShape(createShapeCallback: (svgDocument: Document) => Eleme
             generateSvgElementIds(svgDocument);
             createdShapeId = shape.getAttribute('data-ogr-id') ?? '';
             newSvgString = serializer.serializeToString(svgDocument).replace(/xmlns=""/g, '');
-            console.log(newSvgString);
             actions.push(
                 new InsertLayerAction({
                     type: 'vector',
@@ -82,7 +81,9 @@ async function createShape(createShapeCallback: (svgDocument: Document) => Eleme
             reserveToken: historyReserveToken,
         });
         return {
-            createdShapeId,
+            structuredContent: {
+                createdShapeId,
+            },
         };
     } catch (error) {
         await historyStore.dispatch('unreserve', { token: historyReserveToken });
@@ -91,25 +92,25 @@ async function createShape(createShapeCallback: (svgDocument: Document) => Eleme
 }
 
 const shapeCommonInputSchemaProperties = {
-    fill: { type: 'string', description: t('mcp.createShapeCommon.properties.fill') },
-    fillOpacity: { type: 'number', description: t('mcp.createShapeCommon.properties.fillOpacity'), default: 1 },
-    stroke: { type: 'string', description: t('mcp.createShapeCommon.properties.stroke') },
-    strokeLinecap: { type: 'string', enum: ['butt', 'round', 'square'], description: t('mcp.createShapeCommon.properties.strokeLinecap') },
-    strokeLinejoin: { type: 'string', enum: ['arcs', 'bevel', 'miter', 'miter-clip', 'round'], description: t('mcp.createShapeCommon.properties.strokeLinejoin') },
-    strokeOpacity: { type: 'number', description: t('mcp.createShapeCommon.properties.strokeOpacity'), default: 1 },
-    strokeWidth: { type: 'number', description: t('mcp.createShapeCommon.properties.strokeWidth') },
-    transform: { type: 'string', description: t('mcp.createShapeCommon.properties.transform') },
+    fill: { type: 'string', description: t('mcp.createShapeCommon.property.fill') },
+    fillOpacity: { type: 'number', description: t('mcp.createShapeCommon.property.fillOpacity'), default: 1 },
+    stroke: { type: 'string', description: t('mcp.createShapeCommon.property.stroke') },
+    strokeLinecap: { type: 'string', enum: ['butt', 'round', 'square'], description: t('mcp.createShapeCommon.property.strokeLinecap') },
+    strokeLinejoin: { type: 'string', enum: ['arcs', 'bevel', 'miter', 'miter-clip', 'round'], description: t('mcp.createShapeCommon.property.strokeLinejoin') },
+    strokeOpacity: { type: 'number', description: t('mcp.createShapeCommon.property.strokeOpacity'), default: 1 },
+    strokeWidth: { type: 'number', description: t('mcp.createShapeCommon.property.strokeWidth') },
+    transform: { type: 'string', description: t('mcp.createShapeCommon.property.transform') },
 } as const;
 
 function validateShapeCommonAttributes({ fill, stroke, transform }: Record<string, string | undefined>) {
     if (fill && !svgColorHexRegex.test(fill)) {
-        throw new Error(t('mcp.createShapeCommon.errors.fill'));
+        throw new Error(t('mcp.createShapeCommon.error.fill'));
     }
     if (stroke && !svgColorHexRegex.test(stroke)) {
-        throw new Error(t('mcp.createShapeCommon.errors.stroke'));
+        throw new Error(t('mcp.createShapeCommon.error.stroke'));
     }
     if (transform && !svgTransformMatrixRegex.test(transform)) {
-        throw new Error(t('mcp.createShapeCommon.errors.transform'));
+        throw new Error(t('mcp.createShapeCommon.error.transform'));
     }
 }
 
@@ -140,12 +141,12 @@ registerTool({
     inputSchema: {
         type: 'object',
         properties: {
-            x: { type: 'number', description: t('mcp.createRectangleShape.properties.x') },
-            y: { type: 'number', description: t('mcp.createRectangleShape.properties.y') },
-            rx: { type: 'number', description: t('mcp.createRectangleShape.properties.rx') },
-            ry: { type: 'number', description: t('mcp.createRectangleShape.properties.ry') },
-            width: { type: 'number', description: t('mcp.createRectangleShape.properties.width') },
-            height: { type: 'number', description: t('mcp.createRectangleShape.properties.height') },
+            x: { type: 'number', description: t('mcp.createRectangleShape.property.x') },
+            y: { type: 'number', description: t('mcp.createRectangleShape.property.y') },
+            rx: { type: 'number', description: t('mcp.createRectangleShape.property.rx') },
+            ry: { type: 'number', description: t('mcp.createRectangleShape.property.ry') },
+            width: { type: 'number', description: t('mcp.createRectangleShape.property.width') },
+            height: { type: 'number', description: t('mcp.createRectangleShape.property.height') },
             ...shapeCommonInputSchemaProperties,
         },
         required: ['x', 'y', 'width', 'height'],
@@ -173,9 +174,9 @@ registerTool({
     inputSchema: {
         type: 'object',
         properties: {
-            cx: { type: 'number', description: t('mcp.createCircleShape.properties.cx') },
-            cy: { type: 'number', description: t('mcp.createCircleShape.properties.cy') },
-            r: { type: 'number', description: t('mcp.createCircleShape.properties.r') },
+            cx: { type: 'number', description: t('mcp.createCircleShape.property.cx') },
+            cy: { type: 'number', description: t('mcp.createCircleShape.property.cy') },
+            r: { type: 'number', description: t('mcp.createCircleShape.property.r') },
             ...shapeCommonInputSchemaProperties,
         },
         required: ['cx', 'cy', 'r'],
@@ -200,10 +201,10 @@ registerTool({
     inputSchema: {
         type: 'object',
         properties: {
-            cx: { type: 'number', description: t('mcp.createEllipseShape.properties.cx') },
-            cy: { type: 'number', description: t('mcp.createEllipseShape.properties.cy') },
-            rx: { type: 'number', description: t('mcp.createEllipseShape.properties.rx') },
-            ry: { type: 'number', description: t('mcp.createEllipseShape.properties.ry') },
+            cx: { type: 'number', description: t('mcp.createEllipseShape.property.cx') },
+            cy: { type: 'number', description: t('mcp.createEllipseShape.property.cy') },
+            rx: { type: 'number', description: t('mcp.createEllipseShape.property.rx') },
+            ry: { type: 'number', description: t('mcp.createEllipseShape.property.ry') },
             ...shapeCommonInputSchemaProperties,
         },
         required: ['cx', 'cy', 'rx', 'ry'],
@@ -229,10 +230,10 @@ registerTool({
     inputSchema: {
         type: 'object',
         properties: {
-            x1: { type: 'number', description: t('mcp.createLineShape.properties.x1') },
-            y1: { type: 'number', description: t('mcp.createLineShape.properties.y1') },
-            x2: { type: 'number', description: t('mcp.createLineShape.properties.x2') },
-            y2: { type: 'number', description: t('mcp.createLineShape.properties.y2') },
+            x1: { type: 'number', description: t('mcp.createLineShape.property.x1') },
+            y1: { type: 'number', description: t('mcp.createLineShape.property.y1') },
+            x2: { type: 'number', description: t('mcp.createLineShape.property.x2') },
+            y2: { type: 'number', description: t('mcp.createLineShape.property.y2') },
             ...shapeCommonInputSchemaProperties,
         },
         required: ['x1', 'y1', 'x2', 'y2'],
@@ -258,7 +259,7 @@ registerTool({
     inputSchema: {
         type: 'object',
         properties: {
-            points: { type: 'string', description: t('mcp.createPolylineShape.properties.points') },
+            points: { type: 'string', description: t('mcp.createPolylineShape.property.points') },
             ...shapeCommonInputSchemaProperties,
         },
         required: ['points'],
@@ -281,7 +282,7 @@ registerTool({
     inputSchema: {
         type: 'object',
         properties: {
-            points: { type: 'string', description: t('mcp.createPolygonShape.properties.points') },
+            points: { type: 'string', description: t('mcp.createPolygonShape.property.points') },
             ...shapeCommonInputSchemaProperties,
         },
         required: ['points'],
@@ -304,7 +305,7 @@ registerTool({
     inputSchema: {
         type: 'object',
         properties: {
-            d: { type: 'string', description: t('mcp.createPathShape.properties.d') },
+            d: { type: 'string', description: t('mcp.createPathShape.property.d') },
             ...shapeCommonInputSchemaProperties,
         },
         required: ['d'],
@@ -372,7 +373,158 @@ registerTool({
                 })
             })
         }
-        return layerDefinitions;
+        return {
+            structuredContent: {
+                shapesByLayer: layerDefinitions,
+            },
+        };
     }
 });
 
+registerTool({
+    name: 'set-shape-attributes',
+    description: t('mcp.setShapeAttributes.description'),
+    inputSchema: {
+        type: 'object',
+        properties: {
+            id: { type: 'string', description: t('mcp.setShapeAttributes.property.id') },
+            x: { type: 'number', description: t('mcp.createRectangleShape.property.x') },
+            y: { type: 'number', description: t('mcp.createRectangleShape.property.y') },
+            x1: { type: 'number', description: t('mcp.createLineShape.property.x1') },
+            y1: { type: 'number', description: t('mcp.createLineShape.property.y1') },
+            x2: { type: 'number', description: t('mcp.createLineShape.property.x2') },
+            y2: { type: 'number', description: t('mcp.createLineShape.property.y2') },
+            cx: { type: 'number', description: t('mcp.setShapeAttributes.property.cx') },
+            cy: { type: 'number', description: t('mcp.setShapeAttributes.property.cy') },
+            r: { type: 'number', description: t('mcp.createCircleShape.property.r') },
+            rx: { type: 'number', description: t('mcp.setShapeAttributes.property.rx') },
+            ry: { type: 'number', description: t('mcp.setShapeAttributes.property.ry') },
+            width: { type: 'number', description: t('mcp.createRectangleShape.property.width') },
+            height: { type: 'number', description: t('mcp.createRectangleShape.property.height') },
+            points: { type: 'string', description: t('mcp.setShapeAttributes.property.points') },
+            d: { type: 'string', description: t('mcp.createPathShape.property.d') },
+            ...shapeCommonInputSchemaProperties,
+        },
+        required: ['id'],
+    },
+    async execute(properties) {
+        const { default: historyStore, createHistoryReserveToken, historyReserveQueueFree } = await import('@/store/history');
+        const { getSelectedLayers } = await import('@/store/working-file');
+        const { BundleAction } = await import('@/actions/bundle');
+        const { TrimLayerEmptySpaceAction } = await import('@/actions/trim-layer-empty-space');
+        const { UpdateVectorLayerAttributesAction } = await import('@/actions/update-vector-layer-attributes');
+
+        const { fill, stroke, transform } = properties;
+        validateShapeCommonAttributes({ fill, stroke, transform });
+
+        const historyReserveToken = createHistoryReserveToken();
+        await historyReserveQueueFree();
+        await historyStore.dispatch('reserve', { token: historyReserveToken });
+
+        try {
+            const vectorLayers = getSelectedLayers<WorkingFileVectorLayer>().filter((layer) => layer.type === 'vector');
+            const actions: BaseAction[] = [];
+            for (const layer of vectorLayers) {
+                const attributes = Object.keys(properties).reduce((accumulator, attributeName) => {
+                    const value = properties[attributeName];
+                    if (attributeName !== 'id' && value != null) {
+                        accumulator[attributeName] = `${value}`;
+                    }
+                    return accumulator;
+                }, {} as Record<string, string>);
+                actions.push(
+                    new UpdateVectorLayerAttributesAction(layer.id, properties.id, attributes)
+                );
+                actions.push(new TrimLayerEmptySpaceAction(layer.id));
+            }
+            if (actions.length > 0) {
+                await historyStore.dispatch('runAction', {
+                    action: new BundleAction('updateVectorLayerAttributes', 'action.updateVectorLayerAttributes', actions),
+                    reserveToken: historyReserveToken,
+                });
+            } else {
+                await historyStore.dispatch('unreserve', { token: historyReserveToken });
+            }
+        } catch (error) {
+            await historyStore.dispatch('unreserve', { token: historyReserveToken });
+        }
+        return {
+            content: [
+                {
+                    type: 'text',
+                    text: t('mcp.common.response.updateSuccess'),
+                }
+            ],
+        };
+    }
+});
+
+registerTool({
+    name: 'delete-shape',
+    description: t('mcp.deleteShape.description'),
+    inputSchema: {
+        type: 'object',
+        properties: {
+            id: { type: 'string', description: t('mcp.deleteShape.property.id') },
+        },
+        required: ['id'],
+    },
+    async execute({ id }) {
+        const { default: editorStore } = await import('@/store/editor');
+        const { default: historyStore, createHistoryReserveToken, historyReserveQueueFree } = await import('@/store/history');
+        const { getSelectedLayers } = await import('@/store/working-file');
+        const { createStoredSvg, getStoredSvgDocument } = await import('@/store/svg');
+        const { generateSvgElementIds } = await import('@/lib/svg');
+        const { BundleAction } = await import('@/actions/bundle');
+        const { UpdateLayerAction } = await import('@/actions/update-layer');
+        const { TrimLayerEmptySpaceAction } = await import('@/actions/trim-layer-empty-space');
+
+        const historyReserveToken = createHistoryReserveToken();
+        await historyReserveQueueFree();
+        await historyStore.dispatch('reserve', { token: historyReserveToken });
+
+        try {
+            const serializer = new XMLSerializer();
+            const actions: BaseAction[] = [];
+            const vectorLayers = getSelectedLayers<WorkingFileVectorLayer>().filter((layer) => layer.type === 'vector');
+            for (const layer of vectorLayers) {
+                let svgDocument = layer.data.sourceDocument ?? await getStoredSvgDocument(layer.data.sourceUuid);
+                svgDocument.querySelector(`[data-ogr-id="${id}"]`)?.remove();
+                generateSvgElementIds(svgDocument);
+                const svgString = serializer.serializeToString(svgDocument).replace(/xmlns=""/g, '');
+                actions.push(
+                    new UpdateLayerAction({
+                        id: layer.id,
+                        data: {
+                            sourceUuid: await createStoredSvg((() => {
+                                const image = new Image();
+                                image.src = URL.createObjectURL(new Blob([svgString], { type: 'image/svg+xml' }));
+                                return image;
+                            })()),
+                            sourceDocument: editorStore.state.activeTool === 'shape' ? svgDocument : undefined,
+                        }
+                    })
+                );
+                actions.push(new TrimLayerEmptySpaceAction(layer.id));
+            }
+            if (actions.length > 0) {
+                await historyStore.dispatch('runAction', {
+                    action: new BundleAction('deleteVectorLayerShape', 'action.deleteVectorLayerShape', actions),
+                    reserveToken: historyReserveToken,
+                });
+            } else {
+                await historyStore.dispatch('unreserve', { token: historyReserveToken });
+            }
+        } catch (error) {
+            await historyStore.dispatch('unreserve', { token: historyReserveToken });
+        }
+        return {
+            content: [
+                {
+                    type: 'text',
+                    text: t('mcp.common.response.deleteSuccess'),
+                }
+            ],
+        };
+    }
+});

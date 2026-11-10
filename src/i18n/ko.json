@@ -21,7 +21,7 @@
         "freeTransformScale": "무료 트랜스폼 (Resize)",
         "freeTransformTranslate": "무료 트랜스폼 (Move)",
         "insertLayer": "삽입 층",
-        "moduleCropResize": "자르기 및 크기",
+        "cropResize": "자르기 및 크기",
         "openFile": "파일 열기",
         "pasteLayers": "풀 층 (s)",
         "placeholder": "회사연혁",

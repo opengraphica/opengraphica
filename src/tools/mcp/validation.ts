@@ -14,23 +14,43 @@ export const registerTool: WebMCP.ModelContext['registerTool'] = (tool, options)
                 const value = inputObject[propertyName];
                 if (value == null) {
                     if (required.includes(propertyName)) {
-                        throw new Error(t('mcp.common.errors.required', { propertyName }));
+                        throw new Error(t('mcp.common.error.required', { propertyName }));
                     }
                     continue;
                 }
                 const property = inputSchema.properties[propertyName];
                 switch (property?.type) {
+                    case 'array':
+                        if (Object.prototype.toString.call(value) !== '[object Array]') {
+                            throw new Error(t('mcp.common.error.notArray', { propertyName }));
+                        }
+                        const itemType = property.items?.type ?? 'any';
+                        for (const itemValue of value) {
+                            switch (itemType) {
+                                case 'number':
+                                    console.log(typeof itemValue);
+                                    if (typeof itemValue !== 'number' || !Number.isFinite(itemValue) || isNaN(itemValue)) {
+                                        throw new Error(t('mcp.common.error.notArrayNumber', { propertyName }));
+                                    }
+                                    break;
+                                case 'string':
+                                    if (typeof itemValue !== 'string') {
+                                        throw new Error(t('mcp.common.error.notArrayString', { propertyName }));
+                                    }
+                                    break;
+                            }
+                        }
+                        break;
                     case 'number':
                         if (typeof value !== 'number' || !Number.isFinite(value) || isNaN(value)) {
-                            throw new Error(t('mcp.common.errors.notNumber', { propertyName }));
+                            throw new Error(t('mcp.common.error.notNumber', { propertyName }));
                         }
                         break;
                     case 'string':
                         if (typeof value !== 'string') {
-                            throw new Error(t('mcp.common.errors.notString', { propertyName }));
+                            throw new Error(t('mcp.common.error.notString', { propertyName }));
                         } else if (property.enum && !property.enum.includes(value)) {
-                            console.log(property.enum);
-                            throw new Error(t('mcp.common.errors.notInEnumList', { propertyName }));
+                            throw new Error(t('mcp.common.error.notInEnumList', { propertyName }));
                         }
                         break;
                 }
@@ -38,5 +58,9 @@ export const registerTool: WebMCP.ModelContext['registerTool'] = (tool, options)
         }
         return originalExecute(inputObject, options);
     };
-    return document.modelContext?.registerTool(tool, options)!;
+    try {
+        return document.modelContext?.registerTool(tool, options)!;
+    } catch (error) {
+        return undefined as any;
+    }
 };

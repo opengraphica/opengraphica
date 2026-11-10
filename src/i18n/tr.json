@@ -21,7 +21,7 @@
         "freeTransformScale": "Ücretsiz Dönüşüm (Resize)",
         "freeTransformTranslate": "Ücretsiz Dönüşüm (Move)",
         "insertLayer": "Katman",
-        "moduleCropResize": "Ek ve Resize",
+        "cropResize": "Ek ve Resize",
         "openFile": "Open File",
         "pasteLayers": "Paste Katman(s)",
         "placeholder": "Placeholder",

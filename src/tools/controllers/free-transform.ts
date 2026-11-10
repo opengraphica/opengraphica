@@ -107,6 +107,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
     private snapSensitivity: number = 0;
 
     private lastArrowMoveTime: number = 0;
+    private lastDragMoveTime: number = 0;
 
     onEnter(): void {
         super.onEnter();
@@ -555,12 +556,12 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
             );
         }
 
+        const lastArrowMoveTime = this.lastArrowMoveTime;
+        this.lastArrowMoveTime = window.performance.now();
         await historyStore.dispatch('runAction', {
             action: new BundleAction('freeTransform', 'action.freeTransformTranslate', updateLayerActions),
-            mergeWithHistory: (window.performance.now() - this.lastArrowMoveTime) < 1000 ? ['freeTransform'] : undefined,
+            mergeWithHistory: (window.performance.now() - lastArrowMoveTime) < 1000 ? ['freeTransform'] : undefined,
         });
-
-        this.lastArrowMoveTime = window.performance.now();
 
         this.setBoundsFromSelectedLayersImmediate();
     }
@@ -610,20 +611,28 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
 
     private onHistoryStep(event?: AppEmitterEvents['editor.history.step']) {
         if (!event) return;
+        const now = window.performance.now();
         if (
-            event.trigger !== 'do' ||
-            [
+            event.trigger !== 'do'
+            || [
                 'alignLayers', 'applyLayerTransform', 'clearSelection', 'convertLayersToCollage',
+                'cropResize',
                 'resetLayerWidths', 'resetLayerHeights', 'rotateLayerClockwise',
                 'rotateLayerCounterclockwise', 'setLayerBoundsToWorkingFileBounds',
                 'stretchLayerToWorkingFileBounds', 'trimLayerEmptySpace',
             ].includes(event.action.id)
+            || (
+                event.action.id === 'freeTransform'
+                && now > this.lastArrowMoveTime + 500
+                && now > this.lastDragMoveTime + 500
+            )
         ) {
             isBoundsIndeterminate.value = true;
             this.setBoundsFromSelectedLayers();
         }
         if (event.trigger !== 'do') {
             this.lastArrowMoveTime = 0;
+            this.lastDragMoveTime = 0;
         }
     }
 
@@ -1016,6 +1025,7 @@ export default class CanvasFreeTransformController extends BaseCanvasMovementCon
                         new UpdateLayerAction(updateLayerOptions, revertLayerOptions)
                     );
                 }
+                this.lastDragMoveTime = window.performance.now();
                 await historyStore.dispatch('runAction', {
                     action: new BundleAction('freeTransform', [
                         ...(isRotate ? ['action.freeTransformRotate'] : []),
