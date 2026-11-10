@@ -1,86 +1,89 @@
 {
     "empty": "",
     "action": {
-        "addLayerFilter": "층에 효과 추가",
-        "addLayerFilterMultiple": "층 (s)에 효력을 추가하십시오",
-        "applyActiveSelection": "Active Selection 적용",
-        "applyLayerTransform": "레이어 Transform 적용",
-        "clearSelection": "자주 묻는 질문",
-        "convertLayersToImageSequence": "층을 이미지 속으로 변환",
-        "createDrawLayer": "Draw 레이어 만들기",
+        "addLayerFilter": "레이어에 효과 추가",
+        "addLayerFilterMultiple": "레이어에 효과 추가",
+        "applyActiveSelection": "활성 선택 적용",
+        "applyLayerTransform": "레이어 변환 적용",
+        "clearSelection": "선택 해제",
+        "convertLayersToCollage": "레이어를 콜라주로 변환",
+        "convertLayersToImageSequence": "레이어를 이미지 시퀀스로 변환",
+        "convertVectorShapesToPaths": "도형을 패스로 변환",
+        "createDrawLayer": "그리기 레이어 만들기",
+        "createDrawGradientLayer": "그라데이션 레이어 만들기",
         "createNewFile": "새 파일",
         "createNewLayersFromSelection": "선택에서 레이어 만들기",
-        "cutLayers": "컷 레이어(s)",
-        "deleteLayers": "레이어 삭제(s)",
-        "deleteLayerFilter": "삭제 효과",
-        "deleteLayerSelectionArea": "자주 묻는 질문",
-        "disableLayerFilter": "공급 능력",
-        "enableLayerFilter": "Enable 층 효력",
-        "fileTakePhoto": "사진 찍기",
-        "freeTransformRotate": "무료 트랜스폼 (Rotate)",
-        "freeTransformScale": "무료 트랜스폼 (Resize)",
-        "freeTransformTranslate": "무료 트랜스폼 (Move)",
-        "insertLayer": "삽입 층",
-        "cropResize": "자르기 및 크기",
-        "openFile": "파일 열기",
-        "pasteLayers": "풀 층 (s)",
-        "placeholder": "회사연혁",
-        "pleaseWait": "자세히보기.",
-        "renameLayer": "이름 층",
-        "reorderLayers": "주문 층 (s)",
-        "reorderLayerFilters": "주문 효력 (s)",
-        "selectLayers": "레이어 선택(s)",
-        "toggleLayerVisibilityOn": "연락처 으로",
-        "toggleLayerVisibilityOff": "연락처 세부 사항",
-        "trimLayerEmptySpace": "손질 층 빈 공간",
-        "updateActiveSelection": "업데이트 Active Selection",
-        "updateFile": "업데이트 파일",
-        "updateLayer": "업데이트 층",
-        "updateDrawLayer": "층에 끌기",
-        "updateLayerFilterParams": "레이어 효과 업데이트",
-        "updateSelectionCombineMode": "업데이트 선택 Combine 모드",
-        "convertLayersToCollage": "레이어를 콜리지로 변환",
-        "textTransformResize": "Resize 텍스트 레이어",
-        "textTransformTranslate": "이동 텍스트 층",
-        "updateEraseLayer": "층의 Erase",
+        "createShape": "도형 만들기",
+        "createShapeLayer": "도형 레이어 만들기",
         "createTextLayer": "텍스트 레이어 만들기",
-        "typeInTextLayer": "텍스트 레이어의 유형",
-        "waitingOnQueueFree": "업무 수행",
-        "createDrawGradientLayer": "Gradient 층 만들기",
-        "duplicateLayer": "중복 층",
-        "rasterizeLayer": "연락처",
-        "updateDrawGradientLayerBlendColorSpace": "Gradient 업데이트 (색상 공간)",
-        "updateDrawGradientLayerFillType": "Gradient 업데이트 (Fill Type)",
-        "updateDrawGradientLayerPosition": "Gradient 업데이트",
-        "updateDrawGradientLayerSpreadMethod": "Gradient 업데이트 (Spread 메서드)",
-        "updateDrawGradientLayerStops": "Gradient 업데이트 (컬러 스톱)",
-        "updateDeformBlurLayer": "Blur 층",
-        "updateLayerBlendingMode": "혼합 모드 변경",
-        "updateLayerFilterMask": "업데이트 레이어 효과 마스크",
+        "cropResize": "자르기 및 크기 조정",
+        "cutLayers": "레이어 잘라내기",
+        "deleteLayers": "레이어 삭제",
+        "deleteLayerFilter": "효과 삭제",
+        "deleteLayerSelectionArea": "선택 삭제",
+        "deleteVectorLayerShape": "도형 삭제",
+        "disableLayerFilter": "레이어 효과 사용 안 함",
+        "duplicateLayer": "레이어 복제",
+        "enableLayerFilter": "레이어 효과 사용",
+        "fileTakePhoto": "사진 찍기",
+        "flipLayerX": "레이어 좌우 뒤집기",
+        "flipLayerY": "레이어 상하 뒤집기",
+        "freeTransformRotate": "자유 변환 (회전)",
+        "freeTransformScale": "자유 변환 (크기 조절)",
+        "freeTransformTranslate": "자유 변환 (이동)",
+        "insertLayer": "레이어 삽입",
+        "mergeEffects": "효과 병합",
+        "moveVectorLayerControlPoints": "벡터 레이어 제어점 이동",
+        "openFile": "파일 열기",
+        "pasteLayers": "레이어 붙여넣기",
+        "pasteShapes": "도형 붙여넣기",
+        "placeholder": "자리 표시자",
+        "pleaseWait": "잠시 기다리세요...",
+        "rasterizeLayer": "레이어 래스터화",
+        "renameLayer": "레이어 이름 변경",
+        "reorderLayers": "레이어 순서 변경",
+        "reorderLayerFilters": "효과 순서 변경",
+        "rotateLayerClockwise": "시계 방향 90° 회전",
+        "rotateLayerCounterclockwise": "반시계 방향으로 90° 회전",
+        "selectLayers": "레이어 선택",
         "setLayerBoundsToWorkingFileBounds": "빈 공간으로 확장",
-        "stretchLayerToWorkingFileBounds": "화포 크기에 뻗기",
-        "updateTextLayerProperties": "Text Layer 속성 업데이트",
-        "createShape": "연락처",
-        "createShapeLayer": "창조 모양 층",
-        "deleteVectorLayerShape": "연락처",
-        "moveVectorLayerControlPoints": "벡터 레이어 컨트롤 포인트 이동",
-        "pasteShapes": "풀 모양 (s)",
-        "updateBlurLayer": "Blur 층",
-        "updateLayerOpacity": "변화 Opacity",
-        "updateShapeFillColor": "업데이트 모양 필 색상",
-        "updateShapeStrokeColor": "업데이트 모양 치기 색깔",
-        "updateShapeStrokeWidth": "업데이트 모양 치기 폭",
-        "updateSharpenLayer": "Sharpen 층",
+        "stretchLayerToWorkingFileBounds": "캔버스 크기로 늘리기",
+        "textTransformResize": "텍스트 레이어 크기 조정",
+        "textTransformTranslate": "텍스트 레이어 이동",
+        "toggleLayerVisibilityOn": "레이어 표시 켜기",
+        "toggleLayerVisibilityOff": "레이어 표시 끄기",
+        "trimLayerEmptySpace": "레이어 빈 공간 잘라내기",
+        "typeInTextLayer": "텍스트 레이어에 입력",
+        "updateActiveSelection": "활성 선택 업데이트",
+        "updateBlurLayer": "레이어 흐리게",
+        "updateCloneBrushLayer": "레이어에 복제 브러시 사용",
+        "updateDrawLayer": "레이어에 그리기",
+        "updateDrawGradientLayerBlendColorSpace": "그라데이션 업데이트 (색 공간)",
+        "updateDrawGradientLayerFillType": "그라데이션 업데이트 (채우기 유형)",
+        "updateDrawGradientLayerPosition": "그라데이션 업데이트 (위치)",
+        "updateDrawGradientLayerSpreadMethod": "그라데이션 업데이트 (확산 방식)",
+        "updateDrawGradientLayerStops": "그라데이션 업데이트 (색 정지점)",
+        "updateDeformBlurLayer": "레이어 흐리게",
+        "updateEraseLayer": "레이어에서 지우기",
+        "updateFile": "파일 업데이트",
+        "updateLayer": "레이어 업데이트",
+        "updateLayerBlendingMode": "혼합 모드 변경",
+        "updateLayerFilterParams": "레이어 효과 업데이트",
+        "updateLayerFilterMask": "레이어 효과 마스크 업데이트",
+        "updateLayerOpacity": "불투명도 변경",
+        "updateSelectionCombineMode": "선택 결합 모드 업데이트",
+        "updateShapeFillColor": "도형 채우기 색 업데이트",
+        "updateShapeStrokeColor": "도형 획 색 업데이트",
+        "updateShapeStrokeWidth": "도형 획 두께 업데이트",
+        "updateSharpenLayer": "레이어 선명하게",
+        "updateTextLayerProperties": "텍스트 레이어 속성 업데이트",
         "updateVectorLayerAttributes": "벡터 레이어 업데이트",
-        "convertVectorShapesToPaths": "변환 모양으로 Path",
-        "flipLayerX": "플립 층 수평한",
-        "flipLayerY": "플립 층 수직",
-        "mergeEffects": "Merge 효과"
+        "waitingOnQueueFree": "작업 완료 대기 중"
     },
     "app": {
         "colorPickerGradient": {
-            "hueSlider": "Hue 슬라이더",
-            "opacitySlider": "Opacity 슬라이더"
+            "hueSlider": "색조 슬라이더",
+            "opacitySlider": "불투명도 슬라이더"
         },
         "dndDropOverlay": {
             "addImage": "이미지 추가"
@@ -88,2140 +91,2113 @@
         "historyNotification": {
             "title": {
                 "do": {
-                    "inProgress": "실행 활동...",
-                    "complete": "지원하다"
+                    "inProgress": "액션 실행 중...",
+                    "complete": "완료"
                 },
                 "undo": {
-                    "inProgress": "한국어.",
-                    "complete": "취소 완료"
+                    "inProgress": "실행 취소...",
+                    "complete": "실행 취소 완료"
                 },
                 "redo": {
-                    "inProgress": "레드 ...",
-                    "complete": "Redo 완료"
+                    "inProgress": "다시 실행...",
+                    "complete": "다시 실행 완료"
                 }
             }
         },
         "layerList": {
-            "toggleLayerVisibility": "연락처",
-            "layerSettings": "층 설정",
-            "rename": "이름 *",
-            "addEffect": "추가 효과",
-            "delete": "기타 제품",
-            "frames": "제품정보",
-            "playAnimation": "애니메이션",
-            "stopAnimation": "공지사항",
-            "editFrames": "편집 프레임",
-            "emptyGroup": "그룹은 빈입니다.",
-            "effects": "제품정보",
-            "recalculatingEffect": "기타...",
-            "moveEffectUp": "이동 효과",
-            "moveEffectDown": "아래로 이동 효력",
-            "blendingMode": "회사 소개",
-            "duplicate": "기타 제품",
-            "rasterizeEffects": "모든 것",
-            "opacity": "오파시티",
-            "rasterize": "연락처",
+            "toggleLayerVisibility": "레이어 표시 전환",
+            "layerSettings": "레이어 설정",
+            "edit": "편집",
+            "rename": "이름 변경",
+            "blendingMode": "혼합",
+            "opacity": "불투명도",
+            "addEffect": "효과 추가",
+            "rasterize": "래스터화",
+            "duplicate": "복제",
+            "delete": "삭제",
+            "deleteSelection": "선택 삭제",
+            "frames": "프레임",
+            "playAnimation": "애니메이션 재생",
+            "stopAnimation": "애니메이션 정지",
+            "editFrames": "프레임 편집",
+            "emptyGroup": "그룹이 비어 있습니다.",
+            "effects": "효과",
+            "rasterizeEffects": "모두 병합",
+            "recalculatingEffect": "처리 중...",
+            "moveEffectUp": "효과 위로 이동",
+            "moveEffectDown": "효과 아래로 이동",
             "iconTitle": {
-                "gradient": "연락처",
-                "group": "그룹 층",
-                "empty": "빈 층",
-                "raster": "Raster 층",
-                "rasterSequence": "Raster 순서 층",
-                "text": "텍스트 층",
-                "vector": "벡터 층",
-                "video": "영상 층"
-            },
-            "deleteSelection": "자주 묻는 질문"
-        },
-        "wait": {
-            "applyLayerTransform": "층 Transform 적용",
-            "loadingImage": "회사연혁",
-            "pleaseWait": "오시는 길",
-            "trimLayerEmptySpace": "트리밍 빈 공간",
-            "cancel": "이름 *"
+                "gradient": "그라데이션 레이어",
+                "group": "레이어 그룹",
+                "empty": "빈 레이어",
+                "raster": "래스터 레이어",
+                "rasterSequence": "래스터 시퀀스 레이어",
+                "text": "텍스트 레이어",
+                "vector": "벡터 레이어",
+                "video": "비디오 레이어"
+            }
         },
         "renderer": {
             "initializeFailed": {
-                "title": "설정 실패",
-                "message": "OpenGraphica는 브라우저에 존재하지 않는 몇 가지 기본 웹 기능에 의존합니다. 웹 브라우저를 업데이트하거나 Chrome, Firefox, Safari 또는 Edge와 같은 현대 버전으로 전환하십시오."
+                "title": "초기화 실패",
+                "message": "OpenGraphica는 이 브라우저에 없는 기본 웹 기능이 필요합니다. 웹 브라우저를 업데이트하거나 Chrome, Firefox, Safari, Edge 같은 최신 브라우저로 전환해 주세요."
             }
         },
         "updateRequired": {
-            "title": "자주 묻는 질문",
-            "message": "편집기는 더 이상 사용할 수없는 파일들을 읽으려고. 자주 묻는 질문 이 메시지를 보시려면 브라우저의 캐시를 지우십시오. 메뉴의 \"Restore Last Image\" 옵션을 사용하여 왼쪽을 계속하십시오."
-        }
-    },
-    "brushCategory": {
-        "simple": {
-            "name": "간단한 솔",
-            "brushes": {
-                "circle": {
-                    "name": "한국어"
-                }
-            }
+            "title": "업데이트 필요",
+            "message": "편집기가 더 이상 없는 파일을 가져오려 했습니다. 계속하려면 페이지를 새로고침하세요. 이 메시지가 계속 보이면 브라우저 캐시를 지우세요. 중단한 위치에서 이어가려면 메뉴의 \"마지막 이미지 복원\"을 사용하세요."
         },
-        "shapes": {
-            "name": "연락처"
+        "wait": {
+            "applyLayerTransform": "레이어 변형 적용 중",
+            "loadingImage": "이미지 불러오는 중",
+            "pleaseWait": "잠시 기다리세요",
+            "trimLayerEmptySpace": "빈 공간 잘라내는 중",
+            "cancel": "취소"
         }
     },
     "button": {
-        "apply": "지원하다",
-        "cancel": "이름 *",
-        "clear": "뚱 베어",
-        "convert": "지원하다",
-        "create": "이름 *",
+        "add": "추가",
+        "addEffect": "효과 추가",
+        "apply": "적용",
+        "back": "뒤로",
+        "cancel": "취소",
+        "clear": "지우기",
+        "convert": "변환",
+        "create": "만들기",
         "createNewImage": "새 이미지 만들기",
-        "done": "한국어",
-        "export": "수출입",
-        "no": "없음",
-        "ok": "이름 *",
-        "openImage": "본문 바로가기",
-        "save": "제품 정보",
-        "settings": "계정 설정",
-        "take": "기타",
-        "takePhoto": "본문 바로가기",
-        "yes": "이름 *",
-        "addEffect": "추가 효과",
-        "editEffects": "편집 효과",
-        "restoreLastImage": "최근 이미지",
-        "pickColor": "색깔 선택",
-        "delete": "이름 *",
-        "discardChanges": "Discard 변경",
-        "reverse": "이름 *",
-        "back": "이름 *",
-        "editBrush": "브러쉬",
-        "moreInfo": "더 알아보기",
-        "dontUpdate": "업데이트",
-        "enable": "이름 *",
+        "delete": "삭제",
+        "discardChanges": "변경 사항 버리기",
+        "done": "완료",
+        "dontUpdate": "업데이트 안 함",
+        "editBrush": "브러시 편집",
+        "editEffects": "효과 편집",
+        "enable": "사용",
+        "export": "내보내기",
+        "mergeEffects": "효과 병합",
+        "moreInfo": "자세한 정보",
+        "no": "아니요",
+        "ok": "확인",
+        "openImage": "이미지 열기",
+        "pickColor": "색상 선택",
+        "restoreLastImage": "마지막 이미지 복원",
+        "reverse": "반전",
+        "save": "저장",
+        "selectFiles": "파일 선택...",
+        "settings": "설정",
+        "take": "촬영",
+        "takePhoto": "사진 촬영",
         "updateApp": "앱 업데이트",
-        "add": "기타 제품",
-        "mergeEffects": "Merge 효과",
-        "selectFiles": "파일 선택 ..."
+        "yes": "예"
     },
     "canvas": {
         "toolbar": {
             "cropResize": {
-                "waitLabel": "자르기 및 크기"
+                "waitLabel": "자르기 및 크기 조정"
             }
         }
     },
+    "defaultBrush": {
+        "default": "기본값",
+        "simpleAirBrush": "단순 에어브러시",
+        "simplePaintBrush": "단순 페인트 브러시",
+        "simplePen": "단순 펜",
+        "simplePixelArt": "단순 픽셀 아트",
+        "simpleWaterColor": "단순 수채화"
+    },
+    "defaultBrushCategory": {
+        "custom": "사용자 지정",
+        "simple": "단순"
+    },
     "dock": {
         "colorPicker": {
-            "title": "색깔 피커",
-            "pickColorFromImage": "색깔 선택",
-            "hexCode": "육 부호"
+            "title": "색상 선택기",
+            "pickColorFromImage": "이미지에서 색상 선택",
+            "hexCode": "16진 코드"
         },
         "layers": {
-            "title": "사이트맵",
-            "add": "기타 제품",
-            "layer": "제품정보",
+            "title": "레이어",
+            "add": "추가",
+            "layer": "레이어",
             "group": "그룹",
-            "background": "기타",
-            "toggleBackgroundVisibility": "회사소개 제품정보",
-            "noLayers": "층 없음."
+            "background": "배경",
+            "toggleBackgroundVisibility": "배경 표시 전환",
+            "noLayers": "아직 레이어가 없습니다."
         },
         "settings": {
-            "title": "팟캐스트",
+            "title": "동작",
             "file": {
-                "tabTitle": "파일 형식",
+                "tabTitle": "파일",
                 "menu": {
-                    "new": "- 한국어",
-                    "open": "기타",
-                    "export": "수출입",
-                    "save": "제품 정보",
-                    "saveAs": "구매하기",
+                    "restore": "마지막 이미지 복원",
+                    "new": "새로 만들기",
+                    "open": "열기",
+                    "export": "내보내기",
+                    "save": "저장",
+                    "saveAs": "다른 이름으로 저장",
                     "insertPhoto": "사진 삽입",
                     "takePhoto": "사진 찍기",
-                    "restore": "최근 이미지",
-                    "shareImage": "공유 이미지",
-                    "quit": "뚱 베어"
+                    "shareImage": "이미지 공유",
+                    "quit": "종료"
                 }
             },
             "image": {
-                "tabTitle": "(주)",
+                "tabTitle": "이미지",
                 "menu": {
-                    "cropResize": "자르기 및 크기",
+                    "cropResize": "자르기 및 크기 조정",
                     "convertLayers": {
-                        "groupTitle": "모든 레이어를 변환 ...",
-                        "toImageSequence": "본문 바로가기",
-                        "flatten": "평평한 에 새로운 층",
-                        "toCollage": "콜라겐"
+                        "groupTitle": "모든 레이어 변환...",
+                        "toCollage": "콜라주로",
+                        "toImageSequence": "이미지 시퀀스로",
+                        "flatten": "새 레이어로 합치기"
                     },
-                    "cut": "사이트맵",
-                    "copy": "관련 기사",
+                    "cut": "잘라내기",
+                    "copy": "복사",
                     "copyAllLayers": "모든 레이어 복사",
-                    "paste": "이름 *",
+                    "paste": "붙여넣기",
                     "transformLayers": {
-                        "groupTitle": "Transform 층 ...",
-                        "flipX": "플립 수평",
-                        "flipY": "플립 수직"
+                        "groupTitle": "레이어 변환...",
+                        "flipX": "좌우 뒤집기",
+                        "flipY": "상하 뒤집기",
+                        "rotateClockwise": "시계 방향 90° 회전",
+                        "rotateCounterclockwise": "반시계 방향으로 90° 회전"
                     }
                 }
             },
             "view": {
-                "tabTitle": "- 연혁",
-                "zoom": "주 메뉴",
-                "zoomOut": "줌 아웃",
-                "zoomIn": "줌 에",
-                "rotate": "제품정보",
-                "rotateCounterClockwise": "연락처",
-                "rotateClockwise": "연락처",
-                "reset": "지원하다",
-                "fit": "제품 정보",
+                "tabTitle": "보기",
+                "zoom": "확대/축소",
+                "zoomOut": "축소",
+                "zoomIn": "확대",
+                "rotate": "회전",
+                "rotateCounterClockwise": "반시계 방향 회전",
+                "rotateClockwise": "시계 방향 회전",
+                "reset": "초기화",
+                "fit": "화면에 맞춤",
                 "touchRotate": {
-                    "label": "접촉 Rotate",
-                    "on": "으로",
-                    "snap": "기본 정보",
-                    "off": "내 계정"
+                    "label": "터치 회전",
+                    "on": "켜기",
+                    "snap": "스냅",
+                    "off": "끄기"
                 },
-                "window": "창세기",
-                "enterFullscreen": "본문 바로가기",
-                "exitFullscreen": "Fullscreen 출구"
+                "window": "창",
+                "enterFullscreen": "전체 화면 시작",
+                "exitFullscreen": "전체 화면 종료"
             },
             "history": {
-                "tabTitle": "- 연혁",
-                "undo": "이름 *",
-                "redo": "레드오",
-                "noHistory": "아니 역사 Yet.",
-                "baseImage": "기본 이미지"
+                "tabTitle": "작업 내역",
+                "undo": "실행 취소",
+                "redo": "다시 실행",
+                "noHistory": "아직 작업 내역이 없습니다.",
+                "baseImage": "기준 이미지"
             },
             "prefs": {
-                "tabTitle": "뚱 베어",
-                "theme": "이름 *",
-                "language": "* 이름",
-                "default": "기본 정보",
+                "tabTitle": "환경설정",
+                "theme": "테마",
+                "language": "언어",
+                "default": "기본값",
                 "performance": {
-                    "groupTitle": "- 연혁",
+                    "groupTitle": "성능",
                     "renderer": {
-                        "label": "회사연혁",
+                        "label": "렌더러",
                         "2d": "캔버스 2D",
-                        "webgl": "웹GL",
-                        "webgl2": "웹GL2",
-                        "webgl2Offscreen": "[UNSTABLE] WebGL2 스크린",
-                        "wgpuWasm": "[기타] WebGPU + WASM"
+                        "webgl2": "WebGL2",
+                        "webgl2Offscreen": "[불안정] WebGL2 오프스크린",
+                        "wgpuWasm": "[불안정] WebGPU + WASM"
                     },
-                    "optimizeLargeImage": "큰 이미지에 최적화",
-                    "highQualityScaling": "높은 품질 Scaling",
-                    "fixAdjacentLayerSeams": "고침 Adjacent 층 솔기"
+                    "optimizeLargeImage": "큰 이미지용 최적화",
+                    "highQualityScaling": "고품질 스케일링",
+                    "fixAdjacentLayerSeams": "인접 레이어 이음새 수정"
                 },
                 "editor": {
-                    "groupTitle": "한국어",
-                    "menuBarPosition": "메뉴 바 위치",
-                    "showWelcomeScreen": "쇼 환영 화면",
-                    "showTips": "쇼 팁",
-                    "resetSettings": "재설정 설정"
-                },
-                "debugging": {
-                    "groupTitle": "관련 링크",
-                    "useMobileDebugger": "부하 모바일 Debugger"
-                },
-                "help": {
-                    "groupTitle": "지원하다",
-                    "reportIssue": "자주 묻는 질문",
-                    "designSystem": "설계시스템"
+                    "groupTitle": "편집기",
+                    "menuBarPosition": "메뉴 막대 위치",
+                    "showWelcomeScreen": "환영 화면 표시",
+                    "showTips": "팁 표시",
+                    "resetSettings": "설정 초기화"
                 },
                 "networkStorage": {
-                    "groupTitle": "네트워크 스토리지",
-                    "enableWebdavServer": "웹DAV 사용 계정 관리",
+                    "groupTitle": "네트워크 저장소",
+                    "enableWebdavServer": "WebDAV 서버 사용",
                     "webdavServerUrl": "서버 URL",
                     "webdavServerUrlPlaceholder": "https://webdav.example.com/sharename",
                     "webdavUsername": "사용자 이름",
                     "webdavPassword": "비밀번호"
                 },
+                "debugging": {
+                    "groupTitle": "디버깅",
+                    "useMobileDebugger": "모바일 디버거 불러오기"
+                },
+                "help": {
+                    "groupTitle": "도움말",
+                    "reportIssue": "문제 신고",
+                    "designSystem": "디자인 시스템"
+                },
                 "update": {
-                    "groupTitle": "(주)",
-                    "checkForUpdates": "자주 묻는 질문",
-                    "updateAvailableTitle": "자주 묻는 질문",
-                    "updateAvailableMessage": "OpenGraphica에 대한 업데이트가 가능합니다. 설치하시겠습니까?"
+                    "groupTitle": "업데이트",
+                    "checkForUpdates": "업데이트 확인",
+                    "updateAvailableTitle": "업데이트 있음",
+                    "updateAvailableMessage": "OpenGraphica 업데이트가 있습니다. 설치할까요?"
                 }
             }
         }
     },
     "el": {
         "horizontalScrollbarArrows": {
-            "scrollLeft": "스크롤 왼쪽",
-            "scrollRight": "공지사항"
+            "scrollLeft": "왼쪽 스크롤",
+            "scrollRight": "오른쪽 스크롤"
         }
+    },
+    "gradientPreset": {
+        "blackToTransparent": "검정을 투명으로",
+        "whiteToTransparent": "흰색을 투명으로",
+        "blackToWhite": "검정, 흰색"
     },
     "keyboardMap": {
         "file": {
-            "name": "파일 형식",
+            "name": "파일",
             "actions": {
                 "open": "파일 열기",
-                "export": "수출 파일",
-                "quickLoad": "빠른 부하",
+                "export": "파일 내보내기",
+                "quickLoad": "빠른 불러오기",
                 "quickSave": "빠른 저장"
             }
         },
         "image": {
-            "name": "(주)",
+            "name": "이미지",
             "actions": {
-                "cut": "사이트맵",
-                "copy": "관련 기사",
-                "paste": "이름 *",
-                "delete": "기타 제품"
+                "cut": "잘라내기",
+                "copy": "복사",
+                "paste": "붙여넣기",
+                "delete": "삭제"
             }
         },
         "history": {
-            "name": "편집 역사",
+            "name": "편집 작업 내역",
             "actions": {
-                "undo": "이름 *",
-                "redo": "레드오"
+                "undo": "실행 취소",
+                "redo": "다시 실행"
             }
         },
         "selection": {
-            "name": "제품정보",
+            "name": "선택",
             "actions": {
-                "selectAll": "모두 보기",
-                "deleteSelection": "자주 묻는 질문"
+                "selectAll": "모두 선택",
+                "deleteSelection": "선택 삭제"
             }
         }
     },
+    "layerBlendingMode": {
+        "normal": "일반",
+        "dissolve": "디졸브",
+        "colorErase": "색상 지우기",
+        "erase": "지우기",
+        "merge": "병합",
+        "lightenOnly": "밝게만",
+        "lumaLightenOnly": "루마 밝게만",
+        "screen": "스크린",
+        "dodge": "닷지",
+        "linearDodge": "선형 닷지",
+        "addition": "더하기",
+        "darkenOnly": "어둡게만",
+        "lumaDarkenOnly": "루마 어둡게만",
+        "multiply": "곱하기",
+        "burn": "번",
+        "linearBurn": "선형 번",
+        "overlay": "오버레이",
+        "softLight": "소프트 라이트",
+        "hardLight": "하드 라이트",
+        "vividLight": "비비드 라이트",
+        "pinLight": "핀 라이트",
+        "linearLight": "선형 라이트",
+        "hardMix": "하드 믹스",
+        "difference": "차이",
+        "exclusion": "제외",
+        "subtract": "빼기",
+        "grainExtract": "그레인 추출",
+        "grainMerge": "그레인 병합",
+        "divide": "나누기",
+        "hue": "색조",
+        "chroma": "크로마",
+        "color": "색상",
+        "lightness": "명도",
+        "luminance": "휘도"
+    },
     "layerFilter": {
         "brightness": {
-            "name": "사이트맵",
+            "name": "밝기",
+            "help": "다음 3가지 모드 중 하나로 이미지 밝기를 바꿉니다:\n* **감마 조절** - 카메라의 노출 설정과 비슷합니다.\n* **흑백 이동** - 모든 색을 순수한 검정 또는 흰색 쪽으로 옮깁니다.\n* **휘도 조절** - Oklab 색 공간의 지각 명도 값을 바꿉니다.\n\n**범위** 설정은 어떤 밝은 값 또는 어두운 값이 영향을 받는지를 조절하고, **페더** 설정은 **범위**와 함께 전환을 부드럽게 합니다.",
             "param": {
-                "mode": "주요 특징",
+                "mode": "모드",
                 "modeOption": {
-                    "gamma": "Gamma 조정",
-                    "shift": "검정/백색 교대",
-                    "luminance": "조정 Luminance"
+                    "gamma": "감마 조정",
+                    "shift": "흑백 이동",
+                    "luminance": "휘도 조절"
                 },
-                "brightness": "사이트맵",
-                "effectiveRange": "제품정보",
-                "effectiveRangeFeather": "뚱 베어"
-            },
-            "help": "3개의 다른 형태를 사용하여 이미지의 광도를 바꾸십시오:\n* **Adjust Gamma** - 카메라의 노출 설정과 유사합니다.\n***Black/White Shift** - 모든 색상을 순수한 검은 색 또는 흰색으로 이동합니다.\n* **Adjust Luminance** - Oklab 색상 공간의 영구 불빛 값을 변경합니다.\n\n**Range** 설정은 빛이나 어두운 값이 영향을 받으며 **Feather** 설정은 **Range**와 함께 작동합니다."
+                "brightness": "밝기",
+                "effectiveRange": "범위",
+                "effectiveRangeFeather": "페더"
+            }
         },
         "chroma": {
-            "name": "크롬",
+            "name": "크로마",
+            "help": "일부 맥락의 \"채도\"와 비슷하게, 이미지의 색 풍부함을 바꿉니다.\n\n* **크로마 대비 조절** - 이미 크로마가 더 높은 픽셀이 낮은 픽셀보다 더 크게 영향을 받습니다.\n* **크로마 균등 조절** - 모든 픽셀의 크로마를 같은 양만큼 조정합니다.",
             "param": {
-                "chroma": "크롬",
-                "mode": "주요 특징",
+                "chroma": "크로마",
+                "mode": "모드",
                 "modeOption": {
-                    "multiply": "Chroma Contrast를 조정하십시오",
-                    "shift": "균등하게 Chroma를 조정하십시오"
+                    "multiply": "크로마 대비 조정",
+                    "shift": "크로마 균등 조정"
                 }
-            },
-            "help": "이미지가 얼마나 다채로운지 변경, 일부 상황에 \"saturation\"과 유사합니다.\n\n* **Adjust Chroma Contrast ** - 이미 더 높은 크롬 인 픽셀은 더 낮은 크롬 픽셀보다 더 영향을 미칩니다.\n* 이름 **Evenly Chroma ** - 모든 픽셀의 크롬 수준은 동일한 금액으로 조정됩니다."
-        },
-        "colorBlindness": {
-            "name": "색깔 맹목",
-            "param": {
-                "method": "시뮬레이션 방법",
-                "methodOption": {
-                    "brettel": "Brettel 1997년"
-                },
-                "type": "Blindness 유형",
-                "typeOption": {
-                    "protan": "Protanopia / Protanomaly (빨간색)",
-                    "deuteran": "Deuteranopia / Deuteranomaly (그린 블린드)",
-                    "tritan": "Tritanopia / Tritanomaly (블루 블린드)",
-                    "achroma": "크롬/Achromatopsia (빨강/녹색/파란)"
-                },
-                "severity": "더 보기"
-            }
-        },
-        "colorCorrection": {
-            "name": "색깔 개정"
-        },
-        "contrast": {
-            "name": "한국어",
-            "param": {
-                "contrast": "한국어",
-                "middleGray": "중간 회색"
-            }
-        },
-        "decreaseColorDepth": {
-            "name": "색깔 깊이를 결정하십시오"
-        },
-        "gaussianBlur": {
-            "name": "Gaussian 블루",
-            "param": {
-                "size": "크기 (mm)",
-                "xIntensity": "X 강렬",
-                "yIntensity": "Y 강렬"
-            }
-        },
-        "grayscale": {
-            "name": "회색 가늠자",
-            "param": {
-                "mode": "주요 특징",
-                "modeOption": {
-                    "luminance": "운영 정보",
-                    "luma": "뚱 베어",
-                    "lightness": "가벼움 (HSL)",
-                    "average": "평균 (HSI 강렬)",
-                    "value": "가치 (HSV)"
-                },
-                "modeOptionDescription": {
-                    "value": "최대 = (R, G, B)"
-                },
-                "mix": "팟캐스트"
-            },
-            "help": "이미지에서 모든 색상을 제거하고 원본 색상의 밝기를 계산하기 위해 많은 다른 공식 중 하나를 사용하여."
-        },
-        "hue": {
-            "name": "Hue 조명",
-            "param": {
-                "colorSpace": "색깔 공간",
-                "colorSpaceOption": {
-                    "oklab": "오크랩",
-                    "perceptualRgb": "영원한 RGB",
-                    "linearRgb": "선형 RGB"
-                },
-                "rotate": "제품정보",
-                "targetColor": "표적 색깔",
-                "targetRange": "제품정보"
-            }
-        },
-        "negative": {
-            "name": "이름 *",
-            "param": {
-                "colorSpace": "색깔 공간",
-                "colorSpaceOption": {
-                    "perceptualRgb": "영원한 RGB",
-                    "linearRgb": "선형 RGB"
-                },
-                "invertRed": "Invert 빨간 채널",
-                "invertGreen": "Invert 녹색 채널",
-                "invertBlue": "Invert 블루 채널",
-                "invertValue": "Invert 가치"
-            },
-            "help": "이미지의 특정 색상 채널을 Invert, 높은 값은 낮은 값과 vice versa.\n\n**Color Space**는 gamma 보정 전이나 이후의 인버젼이 발생한다는 것을 결정합니다."
-        },
-        "saturation": {
-            "name": "관련 기사",
-            "param": {
-                "saturation": "관련 기사"
-            }
-        },
-        "sepia": {
-            "name": "인기 카테고리"
-        },
-        "gradientMap": {
-            "param": {
-                "gradient": "사이트맵",
-                "colorSpace": "색깔 공간",
-                "colorSpaceOption": {
-                    "oklab": "오크랩",
-                    "perceptualRgb": "영원한 RGB",
-                    "linearRgb": "선형 RGB"
-                },
-                "mix": "·"
-            },
-            "name": "Gradient 지도",
-            "help": "이미지의 모든 색상을 Gradient에서 색상으로 교환하면 이미지의 원본 색상의 밝기를 기반으로합니다.\n\n**Color Space**는 그라디언트의 정지 사이의 중간값이 교차하는 방식입니다. **Oklab**는 일반적으로 가장 정확한 옵션입니다."
-        },
-        "instagram1997": {
-            "param": {
-                "mix": "·"
-            },
-            "name": "1997년"
-        },
-        "instagramAden": {
-            "name": "아이든",
-            "param": {
-                "mix": "·"
-            }
-        },
-        "instagramClarendon": {
-            "name": "콜롬비아",
-            "param": {
-                "mix": "·"
-            }
-        },
-        "instagramGingham": {
-            "name": "스낵 바",
-            "param": {
-                "mix": "·"
-            }
-        },
-        "instagramInkwell": {
-            "name": "잉크웰",
-            "param": {
-                "mix": "·"
-            }
-        },
-        "instagramLofi": {
-            "name": "로그아웃",
-            "param": {
-                "mix": "·"
-            }
-        },
-        "instagramToaster": {
-            "name": "토스터",
-            "param": {
-                "mix": "·"
-            }
-        },
-        "instagramValencia": {
-            "name": "운영 정보",
-            "param": {
-                "mix": "·"
-            }
-        },
-        "instagramXpro2": {
-            "name": "사이트맵",
-            "param": {
-                "mix": "·"
             }
         },
         "chromaKey": {
+            "name": "크로마 키",
             "param": {
-                "eraseColor": "Erase 색깔",
-                "threshold": "관련 기사",
+                "eraseColor": "지울 색상",
+                "threshold": "지우기 임계값",
                 "softness": "부드러움",
-                "spillSuppression": "유출 억제",
-                "hueWeight": "Hue 무게",
-                "chromaWeight": "Chroma 무게",
-                "lightnessWeight": "경량"
-            },
-            "name": "Chroma 열쇠"
+                "spillSuppression": "스필 억제",
+                "hueWeight": "색조 가중치",
+                "chromaWeight": "크로마 가중치",
+                "lightnessWeight": "명도 가중치"
+            }
         },
-        "whiteBalance": {
+        "colorBlindness": {
+            "name": "색각 이상",
+            "help": "색각 이상인 사람에게 이미지가 어떻게 보이는지 시뮬레이션합니다.\n\n* **Brettel 1997** - 전반적으로 더 정확한 시뮬레이션입니다.\n* **Viénot 1999** - 더 단순한 시뮬레이션입니다. 일부 연구에서는 참가자가 적색맹(프로타노피아)과 녹색맹(듀테라노피아)에 이 방식을 선호했습니다.\n\n**정도**는 색각 이상이 이미지에 미치는 영향을 조절합니다. 색각 이상인 사람 대부분은 100% 색맹이 아니며, 그 사이 어딘가에 있습니다.",
             "param": {
-                "white": "중립 색깔"
-            },
-            "name": "백색 균형",
-            "help": "지정된 ** 중립 색상 **가 실제로 흰색이어야하면 이미지를 조정합니다.\n\n사진기는 당신이 실제로 진짜 생활에서 보는 무슨을 일치하지 않는 점화 상태에 따라서 teal 또는 오렌지에 색깔을 이동할 수 있습니다."
+                "method": "시뮬레이션 방식",
+                "methodOption": {
+                    "brettel": "Brettel 1997",
+                    "vienot": "Viénot 1999"
+                },
+                "type": "색각 유형",
+                "typeOption": {
+                    "protan": "적색맹(프로타노피아) / 적색약(프로타노말리)",
+                    "deuteran": "녹색맹(듀테라노피아) / 녹색약(듀테라노말리)",
+                    "tritan": "청색맹(트라이타노피아) / 청색약(트라이타노말리)",
+                    "achroma": "전색약(아크로마토말리) / 전색맹(아크로마토시아)"
+                },
+                "severity": "정도"
+            }
+        },
+        "colorCorrection": {
+            "name": "색상 보정"
+        },
+        "contrast": {
+            "name": "대비",
+            "help": "지각 색 공간에서 조정하여, 밝은 값과 어두운 값을 서로 더 가깝게 하거나 더 멀리 떨어뜨립니다.\n\n* **대비** - 높으면 값의 간격이 커지고, 낮으면 줄어듭니다.\n* **중간 회색** - 대비를 계산하는 기준 회색점을 조정합니다.",
+            "param": {
+                "contrast": "대비",
+                "middleGray": "중간 회색"
+            }
+        },
+        "cylinderBend": {
+            "name": "원통 휨",
+            "help": "이미지를 3D 원기둥에 두릅니다. 기둥에 종이 표지를 붙이는 경우 등에 유용합니다.\n\n* **회전** - 원기둥을 x축 중심으로 회전합니다. 레이어의 z축 회전과 함께 쓰면 어떤 표시 각도든 만들 수 있습니다.\n* **원근** - 0%는 무한히 먼 곳에서 본 것이고, 100%는 매우 가깝습니다.\n* **시점 위치** - 시점을 위나 아래로 옮겨 원근을 바꿉니다.",
+            "param": {
+                "rotation": "회전",
+                "perspective": "원근",
+                "viewPosition": "시점 위치"
+            }
+        },
+        "decreaseColorDepth": {
+            "name": "색 심도 낮추기"
         },
         "emboss": {
-            "name": "돋을새김하는",
-            "help": "물리적 돋을새김의 3D 외관을 시뮬레이션, 종이 또는 금속으로 디자인을 눌러.\n\n***Angle** - 빛과 그림자의 방향을 제어합니다.\n* **Elevation** - 돋을새김한 지역의 고도를 올리고, 빛과 그림자의 힘을 증가시킵니다.",
+            "name": "엠보스",
+            "help": "종이에 눌러 찍거나 금속에 양각하는 것처럼, 물리적 엠보싱의 입체감을 시뮬레이션합니다.\n\n* **각도** - 빛과 그림자의 방향을 조절합니다.\n* **높이** - 엠보스된 영역의 높이를 올려 빛과 그림자의 강도를 높입니다.",
             "param": {
-                "type": "제품정보",
+                "type": "유형",
                 "typeOption": {
-                    "blend": "제품정보",
-                    "heightmap": "사이트맵"
+                    "blend": "혼합",
+                    "heightmap": "높이 맵"
                 },
-                "angle": "주요 특징",
-                "elevation": "관련 기사"
+                "angle": "각도",
+                "elevation": "높이"
             }
         },
         "filmGrain": {
-            "name": "필름 곡물",
-            "help": "필름의 모양을 시뮬레이션하거나 대형 곡물 크기로 필름에 줌.\n\n***Intensity** - 곡물의 가시성을 증가시킵니다.\n* **Grain Scale** - 픽셀 크기와 관련된 곡물 크기 증가.\n* **Seed** - 곡물 패턴을 생성하는 데 사용되는 임의 번호.\n***Blend Mode** - 입자가 이미지와 결합되는 방법을 결정합니다. 정상적인 형태는 물리적으로 정확합니다, 다른 형태는 예술적인 효력을 위해 입니다.",
+            "name": "필름 그레인",
+            "help": "노출이 부족한 필름, 또는 그레인 크기가 큰 확대 필름의 모습을 시뮬레이션합니다.\n\n* **강도** - 그레인이 보이는 정도를 높입니다.\n* **그레인 배율** - 픽셀 크기 대비 그레인 크기를 키웁니다.\n* **시드** - 그레인 패턴을 생성하는 데 쓰는 난수입니다.\n* **혼합 모드** - 그레인을 이미지와 합치는 방식을 정합니다. 일반 모드는 물리적으로 정확하며, 다른 모드는 예술적 효과용입니다.",
             "param": {
-                "blendMode": "혼합 형태",
+                "blendMode": "혼합 모드",
                 "blendModeOption": {
-                    "normal": "·",
-                    "subtract": "기타 제품",
-                    "add": "기타 제품"
+                    "normal": "일반",
+                    "subtract": "빼기",
+                    "add": "더하기"
                 },
-                "grainScale": "곡물 가늠자",
-                "grayscale": "회색 가늠자",
-                "intensity": "관련 기사",
-                "seed": "제품정보"
+                "grainScale": "그레인 배율",
+                "grayscale": "회색조",
+                "intensity": "강도",
+                "seed": "시드"
+            }
+        },
+        "gaussianBlur": {
+            "name": "가우시안 흐림",
+            "param": {
+                "size": "크기",
+                "xIntensity": "X 강도",
+                "yIntensity": "Y 강도"
+            }
+        },
+        "gradientMap": {
+            "name": "그라데이션 맵",
+            "help": "이미지에서 원래 색의 밝기에 따라, 모든 색을 지정한 그라데이션의 색으로 바꿉니다.\n\n**색 공간**은 그라데이션 정지점 사이 중간값을 보간하는 방식을 바꿉니다. **Oklab**이 일반적으로 가장 정확한 옵션입니다.",
+            "param": {
+                "gradient": "그라데이션",
+                "colorSpace": "색 공간",
+                "colorSpaceOption": {
+                    "oklab": "Oklab",
+                    "perceptualRgb": "지각적 RGB",
+                    "linearRgb": "선형 RGB"
+                },
+                "mix": "혼합"
+            }
+        },
+        "grayscale": {
+            "name": "회색조",
+            "help": "원래 색의 밝기를 계산하는 여러 공식 중 하나를 사용해 이미지에서 모든 색을 제거합니다.",
+            "param": {
+                "mode": "모드",
+                "modeOption": {
+                    "luminance": "휘도",
+                    "luma": "루마",
+                    "lightness": "명도 (HSL)",
+                    "average": "평균 (HSI 강도)",
+                    "value": "명도 (HSV)"
+                },
+                "modeOptionDescription": {
+                    "luminance": "= (0.22 × R) + (0.72 × G) + (0.06 × B) 선형 RGB",
+                    "luma": "= (0.22 × R) + (0.72 × G) + (0.06 × B) 비선형 RGB",
+                    "lightness": "= ½ × (max(R,G,B) + min(R,G,B))",
+                    "average": "= (R + G + B) ÷ 3",
+                    "value": "= max(R,G,B)"
+                },
+                "mix": "혼합"
+            }
+        },
+        "hue": {
+            "name": "색조",
+            "help": "이미지 색의 색조를 회전해 지각되는 색을 바꿉니다.\n\n**색 공간**은 새 색의 밝기와 채도를 정하는 데 사용됩니다. **Oklab**이 일반적으로 가장 정확한 옵션입니다.\n\n**대상 색**으로 이미지의 특정 색 하나만 선택해 바꿀 수 있습니다. **범위**는 **대상 색**과 비슷한 어떤 색이 영향을 받는지를 정합니다.",
+            "param": {
+                "colorSpace": "색 공간",
+                "colorSpaceOption": {
+                    "oklab": "Oklab",
+                    "perceptualRgb": "지각적 RGB",
+                    "linearRgb": "선형 RGB"
+                },
+                "rotate": "회전",
+                "targetColor": "대상 색상",
+                "targetRange": "범위"
+            }
+        },
+        "instagram1997": {
+            "name": "1997",
+            "param": {
+                "mix": "혼합"
+            }
+        },
+        "instagramAden": {
+            "name": "Aden",
+            "param": {
+                "mix": "혼합"
+            }
+        },
+        "instagramClarendon": {
+            "name": "Clarendon",
+            "param": {
+                "mix": "혼합"
+            }
+        },
+        "instagramGingham": {
+            "name": "Gingham",
+            "param": {
+                "mix": "혼합"
+            }
+        },
+        "instagramInkwell": {
+            "name": "Inkwell",
+            "param": {
+                "mix": "혼합"
+            }
+        },
+        "instagramLofi": {
+            "name": "Lofi",
+            "param": {
+                "mix": "혼합"
+            }
+        },
+        "instagramToaster": {
+            "name": "Toaster",
+            "param": {
+                "mix": "혼합"
+            }
+        },
+        "instagramValencia": {
+            "name": "Valencia",
+            "param": {
+                "mix": "혼합"
+            }
+        },
+        "instagramXpro2": {
+            "name": "Xpro2",
+            "param": {
+                "mix": "혼합"
             }
         },
         "monteCarloBlur": {
-            "name": "몬테 카를로 블루",
-            "help": "진짜 카메라를 가진 낮은 빛에 사진을 찍을 때 보이지 않는 흐림의 유형을 시뮬레이션합니다.\n\n***Iterations** - 빛의 얼마나 많은 광선은 화소 당 지켜집니다.\n* ** 크기** - 흐르의 반경.",
+            "name": "몬테카를로 흐림",
+            "help": "저조도에서 실제 카메라로 사진을 찍을 때 보이는 노이즈성 흐림을 시뮬레이션합니다.\n\n* **반복** - 픽셀마다 계산하는 광선 수입니다.\n* **크기** - 흐림의 반지름입니다.",
             "param": {
-                "iterations": "관련 기사",
+                "iterations": "반복 횟수",
                 "iterationsOption": {
-                    "1": "1명",
-                    "2": "2개",
-                    "4": "4개",
-                    "8": "8개",
-                    "16": "16개",
-                    "32": "32개",
-                    "64": "64개"
+                    "1": "1",
+                    "2": "2",
+                    "4": "4",
+                    "8": "8",
+                    "16": "16",
+                    "32": "32",
+                    "64": "64"
                 },
-                "size": "크기 (mm)"
+                "size": "크기"
+            }
+        },
+        "negative": {
+            "name": "네거티브",
+            "help": "이미지의 특정 색 채널을 반전합니다. 높은 값은 낮은 값이 되고, 낮은 값은 높은 값이 됩니다.\n\n**색 공간**은 반전이 감마 보정 전에 일어나는지, 후에 일어나는지를 정합니다.",
+            "param": {
+                "colorSpace": "색 공간",
+                "colorSpaceOption": {
+                    "perceptualRgb": "지각적 RGB",
+                    "linearRgb": "선형 RGB"
+                },
+                "invertRed": "빨강 채널 반전",
+                "invertGreen": "녹색 채널 반전",
+                "invertBlue": "파랑 채널 반전",
+                "invertValue": "명도 반전"
             }
         },
         "pixelize": {
-            "name": "회사연혁",
-            "help": "픽셀 그리드처럼 보이는 큰 광장과 이미지 세부 사항을 커버합니다.",
+            "name": "픽셀화",
+            "help": "픽셀 격자처럼 보이는 큰 사각형으로 이미지 세부 묘사를 가립니다.",
             "param": {
-                "size": "크기 (mm)",
-                "offsetX": "상쇄 X",
-                "offsetY": "상쇄 Y"
+                "size": "크기",
+                "offsetX": "오프셋 X",
+                "offsetY": "오프셋 Y"
             }
         },
-        "spread": {
-            "name": "뚱 베어",
-            "help": "무작위 잡음 패턴에서 수평 또는 수직으로 픽셀을 이동합니다.",
+        "saturation": {
+            "name": "채도",
             "param": {
-                "horizontal": "제품정보",
+                "saturation": "채도"
+            }
+        },
+        "sepia": {
+            "name": "세피아"
+        },
+        "spread": {
+            "name": "확산",
+            "help": "픽셀을 무작위 노이즈 패턴으로 가로 또는 세로 이동합니다.",
+            "param": {
+                "horizontal": "수평",
                 "vertical": "수직",
-                "seed": "제품정보"
+                "seed": "시드"
             }
         },
         "tiltShiftBlur": {
-            "name": "경사 교대 Blur",
-            "help": "Microscopic Scales 또는 전문 카메라 Tilt-shift 렌즈 분야에서 얕은 깊이의 효과를 시뮬레이션합니다.\n\n***Blur Radius** - blurred 영역에 적용된 blur의 최대 금액.\n* **Gradient Radius ** - blurred 지역에 불쾌한 크기의.\n***Angle** - 비둘기 영역의 교체.\n* ** Offset** - 중앙에서 상쇄되지 않은 영역의 위치.",
+            "name": "틸트 시프트 흐림",
+            "help": "현미경 규모의 얕은 피사계 심도, 또는 특수 카메라 틸트시프트 렌즈의 효과를 시뮬레이션합니다.\n\n* **흐림 반지름** - 흐린 영역에 적용하는 최대 흐림량입니다.\n* **그라데이션 반지름** - 흐리지 않은 영역에서 흐린 영역으로 이어지는 그라데이션의 크기입니다.\n* **각도** - 흐리지 않은 영역의 회전입니다.\n* **오프셋** - 중심에서 벗어난, 흐리지 않은 영역의 위치입니다.",
             "param": {
-                "blurRadius": "Blur 반경",
-                "gradientRadius": "Gradient 반경",
-                "angle": "주요 특징",
-                "offset": "제품정보"
+                "blurRadius": "흐림 반지름",
+                "gradientRadius": "그라데이션 반지름",
+                "angle": "각도",
+                "offset": "오프셋"
             }
         },
         "whirlPinch": {
-            "name": "Whirl & 핀",
-            "help": "트위스트 및 핀치 이미지의 원형 영역.\n\n* ** Whirl** - 트위스트의 회전.\n* **Pinch** - 피칭 또는 확장의 힘.\n* **Radius** - 영향을받는 지역을 결정하는 원형의 반경.",
+            "name": "소용돌이와 핀치",
+            "help": "이미지의 원형 영역을 비틀고 집어넣습니다.\n\n* **소용돌이** - 비틀림의 회전량입니다.\n* **핀치** - 집어넣거나 펼치는 강도입니다.\n* **반지름** - 영향 범위를 정하는 원의 반지름입니다.",
             "param": {
-                "whirl": "사이트맵",
+                "whirl": "소용돌이",
                 "pinch": "핀치",
-                "radius": "채용정보",
-                "centerX": "센터 X",
-                "centerY": "센터 Y"
+                "radius": "반지름",
+                "centerX": "가운데 X",
+                "centerY": "가운데 Y"
+            }
+        },
+        "whiteBalance": {
+            "name": "화이트 밸런스",
+            "help": "지정한 **중립색**이 실제로는 흰색이어야 하는 것처럼 이미지를 조정합니다.\n\n카메라는 조명 조건에 따라 색을 청록 또는 주황 쪽으로 밀어, 실제로 보는 색과 달라질 수 있습니다.",
+            "param": {
+                "white": "중립 색상"
             }
         },
         "zoomBlur": {
-            "name": "줌블러",
-            "help": "**zoom 파열 **라는 사진 기술에서 흐르를 시뮬레이션합니다.\n\nHigher **Strength**는 더 느린 셔터 속도 또는 더 긴 노출을 나타내는 더 강한 흐림을 줍니다.",
+            "name": "확대 흐림",
+            "help": "**줌 버스트**라는 사진 기법의 흐림을 시뮬레이션합니다.\n\n**강도**가 높을수록 흐림이 강해지며, 더 느린 셔터 속도나 더 긴 노출을 나타냅니다.",
             "param": {
-                "strength": "제품정보",
-                "centerX": "센터 X",
-                "centerY": "센터 Y"
+                "strength": "강도",
+                "centerX": "가운데 X",
+                "centerY": "가운데 Y"
             }
         }
     },
     "layerFilterGroup": {
         "blur": {
-            "name": "뚱 베어"
+            "name": "흐림"
         },
         "color": {
-            "name": "색깔: 백색"
+            "name": "색상"
         },
         "distort": {
-            "name": "팟캐스트"
+            "name": "왜곡"
         },
         "instagramFilter": {
             "name": "Instagram 필터"
         },
+        "noise": {
+            "name": "노이즈"
+        },
         "photography": {
-            "name": "사진 갤러리"
+            "name": "사진"
         },
         "sharpen": {
-            "name": "스낵 바"
-        },
-        "noise": {
-            "name": "지원하다"
+            "name": "선명하게"
         }
     },
-    "layoutShortcutGroup": {
-        "color": {
-            "name": "색깔 선택",
-            "controls": {
-                "default": {
-                    "label": "색깔 선택"
-                }
+    "lib": {
+        "fontNotify": {
+            "title": "글꼴 불러오는 중",
+            "pleaseWait": "잠시 기다려 주세요. 이 글꼴을 불러오는 중입니다:"
+        },
+        "tutorial": {
+            "notification": {
+                "gotIt": "확인",
+                "dontShowTips": "팁 표시 안 함"
+            }
+        }
+    },
+    "mcp": {
+        "common": {
+            "errors": {
+                "required": "{propertyName} 속성은 필수입니다.",
+                "notNumber": "{propertyName} 속성은 숫자여야 합니다.",
+                "notString": "{propertyName} 속성은 문자열이어야 합니다.",
+                "notInEnumList": "{propertyName} 속성은 허용된 값 중 하나가 아닙니다."
             }
         },
+        "createCircleShape": {
+            "description": "현재 선택된 레이어에 SVG <circle> 도형을 추가합니다. 현재 선택된 레이어가 벡터 레이어가 아니면 새 레이어에 추가합니다. 새 도형은 레이어의 다른 모든 도형 위에 그려집니다.",
+            "properties": {
+                "cx": "원 중심의 x 위치(픽셀)입니다.",
+                "cy": "원 중심의 y 위치(픽셀)입니다.",
+                "r": "원의 반지름(픽셀)입니다."
+            }
+        },
+        "createEllipseShape": {
+            "description": "현재 선택된 레이어에 SVG <ellipse> 도형을 추가합니다. 현재 선택된 레이어가 벡터 레이어가 아니면 새 레이어에 추가합니다. 새 도형은 레이어의 다른 모든 도형 위에 그려집니다.",
+            "properties": {
+                "cx": "타원 중심의 x 위치(픽셀)입니다.",
+                "cy": "타원 중심의 y 위치(픽셀)입니다.",
+                "rx": "타원의 x축 반지름(픽셀)입니다.",
+                "ry": "타원의 y축 반지름(픽셀)입니다."
+            }
+        },
+        "createLineShape": {
+            "description": "현재 선택된 레이어에 SVG <line> 도형을 추가합니다. 현재 선택된 레이어가 벡터 레이어가 아니면 새 레이어에 추가합니다. 새 도형은 레이어의 다른 모든 도형 위에 그려집니다.",
+            "properties": {
+                "x1": "선 시작의 x 위치(픽셀)입니다.",
+                "y1": "선 시작의 y 위치(픽셀)입니다.",
+                "x2": "선 끝의 x 위치(픽셀)입니다.",
+                "y2": "선 끝의 y 위치(픽셀)입니다."
+            }
+        },
+        "createPathShape": {
+            "description": "현재 선택된 레이어에 SVG <path> 도형을 추가합니다. 현재 선택된 레이어가 벡터 레이어가 아니면 새 레이어에 추가합니다. 새 도형은 레이어의 다른 모든 도형 위에 그려집니다.",
+            "properties": {
+                "d": "SVG 경로 명령 목록입니다. SVG 명세를 따르세요. 예: \"M 10 80 Q 52.5 10, 95 80 T 180 80\""
+            }
+        },
+        "createPolygonShape": {
+            "description": "현재 선택된 레이어에 SVG <polygon> 도형을 추가합니다. 현재 선택된 레이어가 벡터 레이어가 아니면 새 레이어에 추가합니다. 새 도형은 레이어의 다른 모든 도형 위에 그려집니다.",
+            "properties": {
+                "points": "도형 바깥 가장자리를 정의하는 점입니다. 예: \"0,0 20,0 10,5\""
+            }
+        },
+        "createPolylineShape": {
+            "description": "현재 선택된 레이어에 SVG <polyline> 도형을 추가합니다. 현재 선택된 레이어가 벡터 레이어가 아니면 새 레이어에 추가합니다. 새 도형은 레이어의 다른 모든 도형 위에 그려집니다.",
+            "properties": {
+                "points": "연결된 선을 정의하는 점입니다. 예: \"0,0 20,0 10,5\""
+            }
+        },
+        "createRectangleShape": {
+            "description": "현재 선택된 레이어에 SVG <rect> 도형을 추가합니다. 현재 선택된 레이어가 벡터 레이어가 아니면 새 레이어에 추가합니다. 새 도형은 레이어의 다른 모든 도형 위에 그려집니다.",
+            "properties": {
+                "x": "사각형 왼쪽 가장자리의 x 위치(픽셀)입니다.",
+                "y": "사각형 왼쪽 가장자리의 y 위치(픽셀)입니다.",
+                "rx": "사각형 모서리의 x 반지름(픽셀)입니다.",
+                "ry": "사각형 모서리의 y 반지름(픽셀)입니다.",
+                "width": "사각형의 너비(픽셀)입니다.",
+                "height": "사각형의 높이(픽셀)입니다."
+            }
+        },
+        "createShapeCommon": {
+            "properties": {
+                "fill": "채우기 색입니다. 채널당 8비트 RGB 16진수입니다. 채우기가 없으면 생략하세요. 예: \"#000000\"",
+                "fillOpacity": "채우기 색의 불투명도입니다. 0에서 1 사이의 소수입니다.",
+                "stroke": "획 색입니다. 채널당 8비트 RGB 16진수입니다. 획이 없으면 생략하세요. 예: \"#000000\"",
+                "strokeLinecap": "SVG 명세에 정의된 선 끝 렌더링 방식입니다.",
+                "strokeLinejoin": "SVG 명세에 정의된, 이어진 선 모서리의 렌더링 방식입니다.",
+                "strokeOpacity": "획 색의 불투명도입니다. 0에서 1 사이의 소수입니다.",
+                "strokeWidth": "획의 두께(픽셀)입니다.",
+                "transform": "도형의 transform 속성입니다. SVG 2D matrix 변환 함수여야 합니다. 예: \"matrix(1,0,0,1,0,0)\""
+            },
+            "errors": {
+                "fill": "채우기 구문이 올바르지 않습니다. 채널당 8비트 RGBA 16진수를 입력하세요. 예: \"#000000\"",
+                "stroke": "획 구문이 올바르지 않습니다. 채널당 8비트 RGBA 16진수를 입력하세요. 예: \"#000000\"",
+                "transform": "변환 구문이 올바르지 않습니다. SVG 2D matrix 변환 함수를 입력하세요. 예: \"matrix(1,0,0,1,0,0)\""
+            }
+        },
+        "getEditorGuide": {
+            "description": "OpenGraphica 이미지 편집기가 동작하는 방식을 자연어로 요약합니다.",
+            "summary": "OpenGraphica는 2D 혼합 매체 이미지 편집기입니다. 기본적으로 래스터 이미지와 벡터 도형을 모두 편집할 수 있고, 래스터와 벡터 이미지 형식 모두로 내보낼 수 있습니다.\n\nOpenGraphica의 작업 파일은 레이어가 하나 이상인 이미지 문서입니다. 픽셀로 정의된 고정된 직사각형 해상도를 가집니다. mm 같은 다른 측정 단위는 표시 목적으로 UI에서 지원되지만, 편집할 때는 resolutionX와 resolutionY 설정으로 픽셀로 변환됩니다. 작업 파일 이미지 문서의 좌표계는 +x가 오른쪽, +y가 아래, -z가 화면 안쪽으로 들어가 보는 사람에게서 멀어지는 방향입니다.\n\n작업 파일은 개별 레이어를 쌓아 이루어집니다. 모든 레이어는 픽셀로 정의된 너비/높이와, 위치 / 회전 / 크기를 정하는 3x3 2D 변환 행렬을 가집니다. 항등 변환 행렬에서는 레이어의 왼쪽 위 모서리가 작업 파일의 왼쪽 위에 맞춰 그려집니다.\n\n레이어에는 포함된 이미지의 종류를 나타내는 여러 유형이 있습니다:\n* **그라데이션(gradient)** - 작업 파일 전체를 덮는 선형 또는 방사형 그라데이션입니다.\n* **래스터(raster)** - 채널당 8비트 RGBA 픽셀 기반 이미지입니다.\n* **래스터 시퀀스(rasterSequence)** - 각 프레임이 채널당 8비트 RGBA 픽셀 기반 이미지인 애니메이션 시퀀스입니다.\n* **텍스트(text)** - 가로 또는 세로로 그려지는 한 단락 이상의 서식 있는 텍스트입니다.\n* **벡터(vector)** - SVG 1.x 문서입니다.\n* **비디오(video)** - 웹에서 지원하는 코덱을 사용하는 비디오입니다.\n\n레이어는 아래에서 위로 쌓이며, 맨 아래 레이어가 먼저 그려지고 맨 위 레이어가 다른 모든 레이어 앞에 그려집니다. 레이어는 배열의 첫 항목이 맨 아래 레이어가 되도록 저장되지만, 최종 사용자에게는 맨 위 레이어가 목록 위에 오도록 표시됩니다. 레이어는 기본적으로 선형 RGB에서 소스 오버(source-over) 혼합으로 합성되고, 모든 합성 작업이 끝난 뒤 sRGB로 변환됩니다."
+        },
+        "getShapeList": {
+            "description": "현재 선택된 벡터 레이어의 모든 도형을 아래부터 위 순서로 나열하는 JSON 정의를 반환합니다. 도형을 추가하거나 삭제하거나 순서를 바꾸면 도형 ID가 바뀔 수 있습니다."
+        }
+    },
+    "measurement": {
+        "percent": "퍼센트",
+        "percentage": "백분율",
+        "pixels": "픽셀",
+        "millimeters": "밀리미터",
+        "centimeters": "센티미터",
+        "inches": "인치",
+        "pixelsPerInch": "픽셀/인치",
+        "pixelsPerMillimeter": "픽셀/밀리미터",
+        "pixelsPerCentimeter": "픽셀/센티미터"
+    },
+    "menuBar": {
+        "toolsHeading": "도구",
+        "expandToolGroup": "펼치기",
+        "collapseToolGroup": "접기"
+    },
+    "menuBarToolGroup": {
         "deform": {
-            "name": "제품정보",
-            "controls": {
-                "default": {
-                    "label": "제품정보",
-                    "description": [
-                        "Sharpen 또는 blur 이미지",
-                        "Bulge, 이미지의 pinch 지역",
-                        "이미지의 복제 영역"
-                    ]
+            "name": "변형",
+            "tools": {
+                "blur": {
+                    "title": "흐림",
+                    "description": "이미지 영역을 흐리게 합니다"
+                },
+                "cloneBrush": {
+                    "title": "복제 브러시",
+                    "description": "이미지 영역을 복제합니다"
+                },
+                "sharpen": {
+                    "title": "선명하게",
+                    "description": "이미지 영역을 선명하게 합니다"
                 }
             }
         },
         "draw": {
-            "name": "드로잉",
-            "controls": {
-                "default": {
-                    "label": "드로잉",
-                    "description": [
-                        "사용 예술 brushes",
-                        "모양 또는 gradients 만들기"
-                    ]
-                }
-            }
-        },
-        "effects": {
-            "name": "제품정보",
-            "controls": {
-                "default": {
-                    "label": "제품정보"
-                }
-            }
-        },
-        "erase": {
-            "name": "언어 선택",
-            "controls": {
-                "default": {
-                    "label": "언어 선택",
-                    "description": [
-                        "Draw tool의 효과를 제거"
-                    ]
-                }
-            }
-        },
-        "history": {
-            "name": "- 연혁",
-            "controls": {
-                "undo": {
-                    "label": "이름 *"
+            "name": "그리기",
+            "tools": {
+                "brush": {
+                    "title": "브러시",
+                    "description": "아트 브러시로 그리기"
                 },
-                "redo": {
-                    "label": "레드오"
-                }
-            }
-        },
-        "layers": {
-            "name": "사이트맵",
-            "controls": {
-                "default": {
-                    "label": "사이트맵",
-                    "description": []
-                }
-            }
-        },
-        "search": {
-            "name": "제품정보",
-            "controls": {
-                "default": {
-                    "label": "제품정보",
-                    "description": []
-                }
-            }
-        },
-        "selection": {
-            "name": "제품정보",
-            "controls": {
-                "default": {
-                    "label": "제품정보",
-                    "description": [
-                        "편집 영역 제한",
-                        "잘라, 복사, 특정 영역을 삭제"
-                    ]
-                }
-            }
-        },
-        "settings": {
-            "name": "팟캐스트",
-            "controls": {
-                "default": {
-                    "label": "팟캐스트",
-                    "description": []
-                }
-            }
-        },
-        "text": {
-            "name": "이름 *",
-            "controls": {
-                "default": {
-                    "label": "삽입 / 편집 텍스트",
-                    "description": [
-                        "삽입 텍스트 층",
-                        "기존 텍스트 레이어를 편집"
-                    ]
-                }
-            }
-        },
-        "transform": {
-            "name": "이동/변환",
-            "controls": {
-                "default": {
-                    "label": "이동/변환",
-                    "description": [
-                        "이동, 가늠자, 자전 층",
-                        "층 경계 관리"
-                    ]
-                }
-            }
-        },
-        "view": {
-            "name": "캔버스 Viewport",
-            "controls": {
-                "default": {
-                    "label": "줌 / 팬 뷰",
-                    "description": [
-                        "줌 및 밖으로",
-                        "팬 또는 시계"
-                    ]
+                "bucketFill": {
+                    "title": "페인트통 채우기",
+                    "description": "영역을 색상으로 채우기"
+                },
+                "gradient": {
+                    "title": "그라데이션",
+                    "description": "색 그라데이션을 만듭니다"
+                },
+                "shape": {
+                    "title": "도형",
+                    "description": "기본 도형 만들기"
                 }
             }
         },
         "effect": {
-            "name": "제품 정보",
-            "controls": {
-                "default": {
-                    "label": "제품 정보",
-                    "description": [
-                        "층 색깔을 격리하십시오",
-                        "Blurring 효력과 같은 층 필터를 추가하십시오"
-                    ]
+            "name": "효과",
+            "tools": {
+                "effect": {
+                    "title": "효과",
+                    "description": "레이어 색을 조정하고 효과를 추가합니다"
+                }
+            }
+        },
+        "erase": {
+            "name": "지우기",
+            "tools": {
+                "brush": {
+                    "title": "지우기 브러시",
+                    "description": "브러시 획으로 지웁니다"
+                },
+                "bucketFill": {
+                    "title": "지우기 페인트통 채우기",
+                    "description": "비슷한 색 영역을 지웁니다"
+                }
+            }
+        },
+        "layers": {
+            "name": "레이어"
+        },
+        "selection": {
+            "name": "선택",
+            "tools": {
+                "selection": {
+                    "title": "선택",
+                    "description": "편집, 잘라내기, 복사 또는 삭제할 이미지의 특정 영역을 선택합니다"
+                }
+            }
+        },
+        "settings": {
+            "name": "동작"
+        },
+        "text": {
+            "name": "텍스트",
+            "tools": {
+                "text": {
+                    "title": "텍스트",
+                    "description": "텍스트 레이어를 삽입하고 편집합니다"
+                }
+            }
+        },
+        "transform": {
+            "name": "이동 / 변환",
+            "tools": {
+                "freeTransform": {
+                    "title": "자유 변환",
+                    "description": "레이어 이동, 크기 조절, 회전"
+                },
+                "layerCrop": {
+                    "title": "레이어 자르기",
+                    "description": "선택한 레이어를 자릅니다"
+                }
+            }
+        },
+        "view": {
+            "name": "캔버스 뷰포트",
+            "tools": {
+                "zoom": {
+                    "title": "확대/축소 / 이동",
+                    "description": "이미지를 확대·축소하거나 이동하거나 보기를 회전합니다"
                 }
             }
         }
-    },
-    "lib": {
-        "tutorial": {
-            "notification": {
-                "gotIt": "뚱 베어",
-                "dontShowTips": "팁을 표시하지 마십시오"
-            }
-        },
-        "fontNotify": {
-            "title": "관련 상품",
-            "pleaseWait": "이 폰트는 다음과 같이로드됩니다"
-        }
-    },
-    "measurement": {
-        "pixels": "픽셀 수",
-        "millimeters": "밀리미터",
-        "centimeters": "센티미터",
-        "inches": "이름 *",
-        "pixelsPerInch": "화소/인치",
-        "pixelsPerMillimeter": "화소/밀리미터",
-        "pixelsPerCentimeter": "화소/미터",
-        "percent": "퍼센트",
-        "percentage": "관련 제품"
-    },
-    "menuBar": {
-        "toolsHeading": "제품정보",
-        "expandToolGroup": "지원하다",
-        "collapseToolGroup": "뚱 베어"
     },
     "module": {
-        "fileExport": {
-            "title": "수출 이미지",
-            "saveBackIntroduction": "{fileName}라는 파일을 열었습니다.",
-            "saveBackQuestion": "원래 파일로 다시 저장?",
-            "fileName": "파일 이름",
-            "fileType": "파일 형식",
-            "layers": "사이트맵",
-            "quality": "품질 관리",
-            "dithering": "더 보기",
-            "ditheringOption": {
-                "none": "이름 *",
-                "atkinson": "아킨슨",
-                "atkinsonSerpentine": "앗킨슨 (스펜틴)",
-                "floydSteinberg": "Floyd 스린버그",
-                "floydSteinbergSerpentine": "Floyd Steinberg (스펜틴)",
-                "falseFloydSteinberg": "프로모션",
-                "falseFloydSteinbergSerpentine": "False Floyd Steinberg (스펜틴)",
-                "stucki": "뚱 베어",
-                "stuckiSerpentine": "Stucki (스펜틴)"
-            },
-            "nativeSaveToast": "이미지는 문서 폴더에 수출되었습니다.",
-            "svgDisclaimer": "레이어 효과, 혼합 모드 및 다른 기능은 SVG 파일에서 올바르게 표시 할 수 없습니다.",
-            "maxFileSize": "최대 파일 크기"
-        },
-        "fileNew": {
-            "title": "새로운 이미지",
-            "preset": "기타 제품",
-            "presetPlaceholder": "선택 (선택 사항)",
-            "width": "폭 (mm)",
-            "height": "고도:",
-            "resolution": "제품 설명",
-            "colorProfile": "색깔 단면도",
-            "scaleFactor": "가늠자 요인"
-        },
-        "fileSaveAs": {
-            "title": "이미지 저장",
-            "saveBackIntroduction": "{fileName}라는 파일을 열었습니다.",
-            "saveBackQuestion": "원래 파일로 다시 저장?",
-            "exportDisclaimer": "다른 프로그램에서 이미지를 공유하거나 볼 경우 대신 \"Export\"를 사용하십시오.",
-            "fileName": "파일 이름",
-            "nativeSaveToast": "이미지는 문서 폴더에 저장되었습니다."
-        },
-        "fileTakePhoto": {
-            "title": "본문 바로가기",
-            "noCameraError": {
-                "title": "카메라 사용",
-                "message": "장치에는 카메라가 없거나 카메라에 액세스 할 수 없습니다."
-            },
-            "selectCamera": {
-                "placeholder": "카메라 선택",
-                "user": "Front (사용자)",
-                "environment": "후방 (환경)"
-            }
-        },
-        "imageConvertLayersToImageSequence": {
-            "title": "층을 이미지 속으로 변환",
-            "frameDelay": "프레임 지연"
-        },
-        "layerEffectBrowser": {
-            "title": "비밀번호",
-            "description": "층에 추가하는 효력을 선택하십시오. 효과는 일반적으로 층의 색상을 조작하거나 blurring 효과와 같은 특수 패턴을 추가합니다.",
-            "loading": "미리보기 생성 ...",
-            "generationErrorGeneral": "오류는 선택한 레이어에 대한 효과 미리보기를 생성 할 때 발생했습니다.",
-            "generationErrorUnsupportedType": "선택한 층은 필터가 적용 할 수 없습니다.",
-            "generationErrorNoLayer": "층 도크에 1 개 이상의 레이어를 선택하여 효과 추가하십시오."
-        },
-        "layerEffectEdit": {
-            "title": "편집 효과",
-            "description": "특정 층의 효과를 편집합니다.",
-            "loading": "미리보기 생성 ...",
-            "generalError": "뭔가 잘못되었습니다. 이 메시지를 보시려면이 버그로보고하십시오.",
-            "deleteEffect": "삭제 효과",
-            "enableToggle": "이름 *",
-            "resetField": "재설정 필드",
-            "deleting": "공급 업체.",
-            "deleteFilterError": "필터를 삭제하려고 하는 동안 오류가 발생했습니다. 이 메시지를 보시려면이 버그로보고하십시오.",
-            "applyFilterError": "오류는 필터 변경을 적용하려고하는 동안 발생했습니다. 이 메시지를 보시려면이 버그로보고하십시오.",
-            "useActiveSelectionMask": "선택 적용",
-            "clearSelectionMask": "마스크 제거"
-        },
-        "renameLayer": {
-            "title": "이름 층",
-            "layerName": "새로운 이름"
-        },
-        "imageConvertLayersToCollage": {
-            "title": "레이어를 콜리지로 변환",
-            "collageType": {
-                "verticalStack": "수직 더미",
-                "horizontalStack": "수평 스택",
-                "grid": "제품정보"
-            },
-            "params": {
-                "shared": {
-                    "reverseLayerOrder": "반전 층 순서"
-                },
-                "verticalStack": {
-                    "horizontalAlignment": "수평 정렬",
-                    "horizontalAlignmentOption": {
-                        "left": "왼쪽",
-                        "center": "- 연혁",
-                        "right": "지원하다"
-                    },
-                    "verticalMargin": "수직 마진"
-                },
-                "horizontalStack": {
-                    "verticalAlignment": "수직 정렬",
-                    "verticalAlignmentOption": {
-                        "top": "이름 *",
-                        "middle": "주요 특징",
-                        "bottom": "제품정보"
-                    },
-                    "horizontalMargin": "수평 마진"
-                }
-            }
-        },
-        "fileOpenConfirm": {
-            "title": "견적 요청?",
-            "warning": [
-                "현재 파일로 편집했습니다. 이제 새 파일을 열면, 이 편집은 삭제됩니다. 이 파일에 새 레이어를 추가하려면 {insertPhoto} 옵션을 사용하십시오.",
-                "새 파일을 열려면 계속 하시겠습니까?"
-            ]
-        },
-        "layerBlendingMode": {
-            "title": "혼합 모드 변경",
-            "blendingMode": "혼합 형태",
-            "layerTop": "상단 층",
-            "layerBottom": "밑바닥 층",
-            "imageResult": "제품정보",
-            "blendingModeSummary": {
-                "normal": {
-                    "description": "상단 층은 그것의 불투명에 근거를 둔 바닥을 포함합니다.",
-                    "example": "한 사진에서 사람을 잘라 다른 사진에 추가."
-                },
-                "dissolve": {
-                    "description": "임의의의는 디지털 잡음 효과를 창출하는 opacity를 기반으로 투명한 픽셀과 상단층의 픽셀을 대체합니다.",
-                    "example": "곡물 질감 만들기."
-                },
-                "colorErase": {
-                    "description": "더 낮은 층의 색상을 일치 상단 층에서 색상을 제거합니다.",
-                    "example": "이미지에서 녹색 화면 배경을 제거."
-                },
-                "erase": {
-                    "description": "상단 층이 불투명한 바닥 층을 제거한다.",
-                    "example": "사진의 원치 않는 개체를 제거하여 그 영역을 지우십시오."
-                },
-                "lightenOnly": {
-                    "description": "각 R, G의 B 수로 및 밑바닥 층에 있는 점화기 색깔을 지키십시오.",
-                    "example": "주변 지역을 어둡게하지 않고 객체에 글로우 효과를 추가합니다."
-                },
-                "lumaLightenOnly": {
-                    "description": "상단과 하단 레이어 사이의 영구 밝기를 비교하고 더 밝은 픽셀을 유지합니다.",
-                    "example": "검은 색과 흰색 사진의 특정 영역의 밝기를 향상시킵니다."
-                },
-                "screen": {
-                    "description": "상단 층의 밝기를 기반으로 바닥 층을 가집니다. 스크린 mimics는 계획되거나 층을 깔 때 빛 상호 작용합니다.",
-                    "example": "밤 장면이 더 밝게 나타납니다."
-                },
-                "dodge": {
-                    "description": "Significantly brightens 하이라이트와 그림자에 대한 세부 정보를 제공합니다. 어둠 속에서 \"도징\"의 영향을 미칩니다.",
-                    "example": "태양 flare 추가."
-                },
-                "linearDodge": {
-                    "description": "수직 SRGB 공간에 있는 정상과 바닥 층의 광도를 추가하십시오.",
-                    "example": "활기찬, 강렬한 조명 효과 만들기."
-                },
-                "addition": {
-                    "description": "선형 SRGB 공간의 상단과 하단 레이어의 밝기를 추가합니다.",
-                    "example": "활기찬, 강렬한 조명 효과 만들기."
-                },
-                "darkenOnly": {
-                    "description": "각 R, G의 B 수로 및 밑바닥 층에 있는 더 어두운 색깔을 지키십시오.",
-                    "example": "사진에 그림자를 희게합니다."
-                },
-                "lumaDarkenOnly": {
-                    "description": "상단과 하단 레이어 사이의 영구 어둠을 비교하고 더 어두운 픽셀을 유지합니다.",
-                    "example": "선택적으로 밝은 영역을 뚫는."
-                },
-                "multiply": {
-                    "description": "상단 층의 어둠을 기반으로 바닥 층을 어둠. 여러 사진 음이 어떻게 함께 층으로 나타낸다.",
-                    "example": "그림자 또는 밤 장면을 시뮬레이션처럼 더 어두운 이미지를 만듭니다."
-                },
-                "burn": {
-                    "description": "상단 층의 어둠에 대한 바닥 층 비례.",
-                    "example": "그림자에 깊이를 추가합니다."
-                },
-                "linearBurn": {
-                    "description": "위와 더 낮은 층의 화소를 추가하고, 가장 밝은 가능한 가치를 빼십시오.",
-                    "example": "극적인 그림자를 이미지로 추가합니다."
-                },
-                "overlay": {
-                    "description": "가닥과 스크린의 조합은, 빛 지역이 점화되고 어두운 지역은 더 어둡게 됩니다.",
-                    "example": "세부 사항을 잃지 않고 사진에 대비합니다."
-                },
-                "softLight": {
-                    "description": "Overlay와 유사한 이미지를 Brightens하지만 더 많은 gradual 전환. 연약한 빛은 확산된 점화를 가장합니다.",
-                    "example": "초상화에 부드러운 빛을 추가합니다."
-                },
-                "hardLight": {
-                    "description": "오버레이의 가혹한 버전, 밝은 지역은 훨씬 더 밝고 어두운 지역이 훨씬 더 어둡게됩니다.",
-                    "example": "극적으로 행동 장면에서 대비 증가."
-                },
-                "vividLight": {
-                    "description": "매우 강하게 대조를 증가시키고, 더 단단한 빛과 비교해.",
-                    "example": "대담한, 펀치 색상 및 대비를 가진 스타일링 사진."
-                },
-                "pinLight": {
-                    "description": "밝기를 기반으로 픽셀을 교체하고, 가장 밝고 어두운 픽셀을 유지하고, 중간에서 거리를 기반으로합니다.",
-                    "example": "빛과 어두운 사이 날카로운 대조를 가진 posterized 효력을 창조하십시오."
-                },
-                "linearLight": {
-                    "description": "밝고 밝고 짙은 밝고, 밝고, 밝고, 밝고, 짙은 밝고, 밝고, 밝고, 짙은 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 짙은 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고, 밝고.",
-                    "example": "인공 조명 또는 금속 표면을 강화."
-                },
-                "hardMix": {
-                    "description": "이미지가 1차 색상으로 줄어들고, 매우 안정된 모습을 만들어냅니다.",
-                    "example": "만화책 또는 스크린 인쇄 효과 만들기."
-                },
-                "difference": {
-                    "description": "레이어의 차이를 찾아, 검은 색이 차이 증가하는 색상 밝기는 더 다르다.",
-                    "example": "비슷한 콘텐츠를 가진 층 정렬. 두 개의 픽셀이 동일 할 때, 그들은 검은 색을 켭니다."
-                },
-                "exclusion": {
-                    "description": "더 적은 대조를 가진 다름의 변이, 어떤 미묘한 다름은 이미지를 압도 없이 강조될 필요가 있습니다.",
-                    "example": "선택할 수 있는 색상."
-                },
-                "subtract": {
-                    "description": "하단의 상단층의 밝기를 뺍니다. 결과는 검은 색 또는 검은 색 영역의 많은 것입니다.",
-                    "example": "높은 대조 어두운 지역을 창조하십시오."
-                },
-                "grainExtract": {
-                    "description": "층에서 영화 곡물을 추출, 또한 엠보싱 외관을 제공합니다.",
-                    "example": "필름 질감에서 곡물을 추출하여 다른 질감에 적용합니다."
-                },
-                "grainMerge": {
-                    "description": "상단 층에서 바닥에 곡물을 추가, 원래 층의 곡물 버전을 떠나.",
-                    "example": "영화 곡물을 빈티지 보기에 대한 디지털 이미지에 추가."
-                },
-                "divide": {
-                    "description": "상단층의 밝기를 바닥으로 나눕니다.",
-                    "example": "이미지를 극적으로 점화하고, 빛나는 또는 ethereal 효력을 창조하십시오. 노출 개정을 위해 사용될 수 있습니다."
-                },
-                "hue": {
-                    "description": "아래 층의 크롬과 가벼움을 보존하면서 상단 층의 턱을 사용합니다.",
-                    "example": "푸른 하늘을 보라색으로 바꾸고 밝기를 유지하면서."
-                },
-                "chroma": {
-                    "description": "상단층의 크롬(intensity of color)를 사용하여 바닥층의 턱과 가벼움을 보존합니다.",
-                    "example": "사진의 색상의 강도를 높일 수 있습니다."
-                },
-                "color": {
-                    "description": "밑바닥 층의 가벼움을 가진 최고 층의 hue와 크롬을 결합하십시오.",
-                    "example": "셰이딩 및 조명 intact를 유지하면서 객체를 재coloring."
-                },
-                "lightness": {
-                    "description": "아래 층의 hue와 크롬을 보존하면서 상단 층의 가벼움을 사용합니다.",
-                    "example": "원색을 유지하면서 이미지를 점화하거나 어둡게합니다."
-                },
-                "luminance": {
-                    "description": "더 낮은 층에 의해 위 층 발광성, 그 후에 더 낮은 층에 결과를 다룹니다.",
-                    "example": "원색을 유지하면서 이미지를 점화하거나 어둡게합니다."
-                },
-                "merge": {
-                    "description": "상단 층은 그것의 불투명에 근거를 둔 바닥을 커버하지만, 불투명 값이 불투명 될 수 있을 때 함께 투명 가장자리를 병합합니다. 투명 배경의 상단에서만 작동합니다.",
-                    "example": "사진에서 선택한 영역을 잘라 새로운 층의 동일한 위치에 붙여 넣기."
-                }
-            },
-            "exampleUsage": "예 사용 :"
+        "appUpdate": {
+            "title": "업데이트",
+            "notificationTitle": "업데이트 다운로드 중",
+            "notificationMessage": "업데이트를 다운로드하는 동안 앱을 화면에 열어 둔 채로 유지해 주세요.",
+            "notificationReadyTitle": "업데이트가 준비되었습니다",
+            "notificationReadyMessage": "다른 앱으로 전환하면 업데이트가 설치됩니다.",
+            "notificationErrorTitle": "업데이트 오류",
+            "notificationErrorMessage": "업데이트를 다운로드하는 동안 오류가 발생했습니다. 나중에 다시 시도해 주세요."
         },
         "designSystem": {
-            "title": "설계시스템"
+            "title": "디자인 시스템"
+        },
+        "fileAddFont": {
+            "title": "글꼴 추가",
+            "search": "검색",
+            "searchPlaceholder": "Google Fonts 검색...",
+            "offlineFontSearch": "기기가 오프라인입니다. 글꼴을 검색하려면 인터넷에 연결해야 합니다. 아래 \"파일 선택...\" 버튼으로 글꼴 파일은 계속 찾아볼 수 있습니다.",
+            "noFontsFound": "해당 검색 조건에 맞는 글꼴이 없습니다.",
+            "uploadFontParseError": "선택한 글꼴 중 하나 이상을 해석하는 동안 오류가 발생했습니다."
+        },
+        "fileExport": {
+            "title": "이미지 내보내기",
+            "saveBackIntroduction": "{fileName} 파일을 열었습니다.",
+            "saveBackQuestion": "원본 파일에 다시 저장할까요?",
+            "nativeSaveToast": "이미지를 문서 폴더로 내보냈습니다.",
+            "svgDisclaimer": "레이어 효과, 혼합 모드 및 그 밖의 기능은 SVG 파일에서 올바르게 표시되지 않을 수 있습니다.",
+            "fileName": "파일 이름",
+            "fileType": "파일 형식",
+            "layers": "레이어",
+            "quality": "품질",
+            "dithering": "디더링",
+            "maxFileSize": "최대 파일 크기",
+            "ditheringOption": {
+                "none": "없음",
+                "atkinson": "Atkinson",
+                "atkinsonSerpentine": "Atkinson (serpentine)",
+                "floydSteinberg": "Floyd Steinberg",
+                "floydSteinbergSerpentine": "Floyd Steinberg (serpentine)",
+                "falseFloydSteinberg": "False Floyd Steinberg",
+                "falseFloydSteinbergSerpentine": "False Floyd Steinberg (serpentine)",
+                "stucki": "Stucki",
+                "stuckiSerpentine": "Stucki (serpentine)"
+            }
+        },
+        "fileNew": {
+            "title": "새 이미지",
+            "preset": "프리셋",
+            "presetPlaceholder": "선택 (선택 사항)",
+            "width": "너비",
+            "height": "높이",
+            "resolution": "해상도",
+            "colorProfile": "색상 프로필",
+            "scaleFactor": "배율"
         },
         "fileOpenNotification": {
             "maxTextureSizeLimited": {
-                "title": "최대 차원 Encountered",
-                "message": "오픈한 이미지는 브라우저가 지원되는 최대 크기보다 크다. 그것은 축소되었습니다."
+                "title": "최대 치수에 도달함",
+                "message": "연 이미지가 브라우저가 지원하는 최대 크기보다 큽니다. 크기를 줄였습니다."
             }
         },
+        "fileOpenConfirm": {
+            "title": "계속하시겠습니까?",
+            "warning": [
+                "현재 파일을 편집했습니다. 지금 새 파일을 열면 편집 내용이 버려집니다. 이 파일에 새 레이어만 추가하려면 {insertPhoto} 옵션을 사용하세요.",
+                "변경 사항을 모두 버리고 새 파일을 여시겠습니까?"
+            ]
+        },
         "fileOpenWebdavExplorer": {
-            "fileDownloadError": {
-                "title": "네트워크 오류",
-                "message": "WebDAV 서버에서 파일을 다운로드 할 때 오류가 발생했습니다. 나중에 다시 시도하십시오."
-            },
             "openTitle": "파일 열기",
             "insertTitle": "사진 삽입",
             "chooseLocalFile": "컴퓨터에서 파일 선택",
-            "webdavRootBreadcrumb": "웹DAV 제품 정보",
-            "backFolder": "이름 *",
-            "forwardFolder": "제품정보",
+            "webdavRootBreadcrumb": "WebDAV 저장소",
+            "backFolder": "뒤로",
+            "forwardFolder": "앞으로",
             "emptyFolder": "빈 폴더",
-            "folderLoadError": "이 폴더를 로딩할 때 네트워크 오류가 발생했습니다. 기기가 인터넷 연결을 가지고 있는지 확인하고 나중에 시도하십시오."
+            "folderLoadError": "이 폴더를 불러오는 동안 네트워크 오류가 발생했습니다. 기기가 인터넷에 연결되어 있는지 확인한 뒤 나중에 다시 시도해 주세요.",
+            "fileDownloadError": {
+                "title": "네트워크 오류",
+                "message": "WebDAV 서버에서 파일을 다운로드하는 동안 오류가 발생했습니다. 나중에 다시 시도해 주세요."
+            }
         },
         "fileSaveWebdavExplorer": {
+            "title": "저장 위치 선택",
+            "orDivider": "또는",
+            "saveToWebdav": "네트워크 저장소에 저장",
+            "saveLocalFile": "컴퓨터에 저장",
+            "createFolder": "폴더 만들기",
+            "folderName": "폴더 이름",
             "fileSaveError": {
                 "title": "네트워크 오류",
-                "message": "WebDAV 서버에 파일을 업로드 할 때 오류가 발생했습니다. 나중에 다시 시도하십시오."
+                "message": "파일을 WebDAV 서버에 업로드하는 동안 오류가 발생했습니다. 나중에 다시 시도해 주세요."
             },
             "folderCreateError": {
                 "title": "네트워크 오류",
-                "message": "오류는 폴더를 만들 때 발생했습니다."
+                "message": "폴더를 만드는 동안 오류가 발생했습니다."
+            }
+        },
+        "fileSaveAs": {
+            "title": "이미지를 다른 이름으로 저장",
+            "saveBackIntroduction": "{fileName} 파일을 열었습니다.",
+            "saveBackQuestion": "원본 파일에 다시 저장할까요?",
+            "nativeSaveToast": "이미지를 문서 폴더에 저장했습니다.",
+            "exportDisclaimer": "다른 프로그램에서 이미지를 공유하거나 보려면 \"내보내기\"를 사용하세요.",
+            "fileName": "파일 이름"
+        },
+        "fileTakePhoto": {
+            "title": "사진 촬영",
+            "noCameraError": {
+                "title": "카메라 사용 불가",
+                "message": "기기에 카메라가 없거나 카메라 접근이 거부되었습니다."
             },
-            "title": "자주 묻는 질문",
-            "orDivider": "또는",
-            "saveToWebdav": "Network Storage에 저장",
-            "saveLocalFile": "당신의 컴퓨터에 저장",
-            "createFolder": "폴더 만들기",
-            "folderName": "폴더 이름"
+            "selectCamera": {
+                "placeholder": "카메라 선택",
+                "user": "전면 (사용자)",
+                "environment": "후면 (환경)"
+            }
         },
-        "appUpdate": {
-            "title": "(주)",
-            "notificationTitle": "다운로드 Update",
-            "notificationMessage": "앱을 열고 화면에 볼 수 있으므로 업데이트 다운로드하십시오.",
-            "notificationReadyTitle": "업데이트는 준비",
-            "notificationReadyMessage": "업데이트는 다른 앱으로 전환 할 때 설치됩니다.",
-            "notificationErrorTitle": "업데이트 오류",
-            "notificationErrorMessage": "오류는 업데이트 다운로드 중에 발생했습니다. 나중에 다시 시도하십시오."
+        "imageConvertLayersToCollage": {
+            "title": "레이어를 콜라주로 변환",
+            "collageType": {
+                "verticalStack": "세로 쌓기",
+                "horizontalStack": "가로 쌓기",
+                "grid": "격자"
+            },
+            "params": {
+                "shared": {
+                    "reverseLayerOrder": "레이어 순서 반전"
+                },
+                "verticalStack": {
+                    "horizontalAlignment": "가로 정렬",
+                    "horizontalAlignmentOption": {
+                        "left": "왼쪽",
+                        "center": "가운데",
+                        "right": "오른쪽"
+                    },
+                    "verticalMargin": "세로 여백"
+                },
+                "horizontalStack": {
+                    "verticalAlignment": "세로 정렬",
+                    "verticalAlignmentOption": {
+                        "top": "위",
+                        "middle": "중간",
+                        "bottom": "아래"
+                    },
+                    "horizontalMargin": "가로 여백"
+                }
+            }
         },
-        "fileAddFont": {
-            "title": "본문 바로가기",
-            "search": "제품정보",
-            "searchPlaceholder": "Google 글꼴 검색 ...",
-            "offlineFontSearch": "당신의 장치는 따로따로 입니다. 글꼴을 검색하려면 인터넷에 연결해야합니다. 아래 \"Select Files...\"버튼을 사용하여 글꼴 파일을 검색 할 수 있습니다.",
-            "noFontsFound": "해당 검색 기준에 포함된 글꼴이 없습니다.",
-            "uploadFontParseError": "선택된 글꼴 중 하나 이상의 파싱 할 때 오류가 발생했습니다."
+        "imageConvertLayersToImageSequence": {
+            "title": "레이어를 이미지 시퀀스로 변환",
+            "frameDelay": "프레임 지연"
         },
         "imageTransform": {
             "noLayersSelected": {
-                "title": "선택 없음",
-                "message": "레이어 도크의 최소 1층을 선택하여 변환합니다. 몇몇 층 유형은 변형될 수 없습니다."
+                "title": "선택된 레이어 없음",
+                "message": "변형하려면 레이어 독에서 레이어를 하나 이상 선택하세요. 일부 레이어 유형은 변형할 수 없습니다."
             }
+        },
+        "layerBlendingMode": {
+            "title": "혼합 모드 변경",
+            "blendingMode": "혼합 모드",
+            "layerTop": "위 레이어",
+            "layerBottom": "아래 레이어",
+            "imageResult": "결과",
+            "exampleUsage": "사용 예:",
+            "blendingModeSummary": {
+                "normal": {
+                    "description": "위 레이어가 불투명도에 따라 아래 레이어를 덮습니다.",
+                    "example": "한 사진에서 사람을 오려 다른 사진에 넣습니다."
+                },
+                "dissolve": {
+                    "description": "불투명도에 따라 위 레이어의 픽셀을 투명 픽셀로 무작위로 바꿔 디지털 노이즈 효과를 만듭니다.",
+                    "example": "입자 있는 질감을 만듭니다."
+                },
+                "colorErase": {
+                    "description": "아래 레이어의 색과 일치하는 색을 위 레이어에서 제거합니다.",
+                    "example": "이미지에서 그린 스크린 배경을 제거합니다."
+                },
+                "erase": {
+                    "description": "위 레이어가 불투명한 곳에서 아래 레이어를 지웁니다.",
+                    "example": "해당 영역을 지워 사진에서 원치 않는 물체를 제거합니다."
+                },
+                "merge": {
+                    "description": "위 레이어가 불투명도에 따라 아래 레이어를 덮되, 불투명도를 더하면 불투명이 될 수 있는 투명 가장자리는 서로 합칩니다. 합치기는 투명한 배경 위에서만 동작합니다.",
+                    "example": "사진에서 선택한 영역을 잘라 새 레이어의 같은 위치에 붙여 넣습니다."
+                },
+                "lightenOnly": {
+                    "description": "위 레이어와 아래 레이어의 각 R,G,B 채널에서 더 밝은 색을 유지합니다.",
+                    "example": "주변 영역은 어둡게 하지 않고 물체에 발광 효과를 더합니다."
+                },
+                "lumaLightenOnly": {
+                    "description": "위 레이어와 아래 레이어의 지각적 밝기를 비교해 더 밝은 픽셀을 남깁니다.",
+                    "example": "흑백 사진의 특정 영역 밝기를 높입니다."
+                },
+                "screen": {
+                    "description": "위 레이어의 밝기에 따라 아래 레이어를 밝게 합니다. 스크린은 빛이 투사되거나 겹칠 때의 상호작용을 모사합니다.",
+                    "example": "야경이 더 밝아 보이게 합니다."
+                },
+                "dodge": {
+                    "description": "하이라이트를 크게 밝히고 그림자의 세부 묘사를 드러냅니다. 암실 사진의 \"닷지\" 효과를 모사합니다.",
+                    "example": "태양광 플레어를 추가합니다."
+                },
+                "linearDodge": {
+                    "description": "지각 sRGB 공간에서 위 레이어와 아래 레이어의 밝기를 더합니다.",
+                    "example": "선명하고 강한 조명 효과를 만듭니다."
+                },
+                "addition": {
+                    "description": "선형 sRGB 공간에서 위 레이어와 아래 레이어의 밝기를 더합니다.",
+                    "example": "선명하고 강한 조명 효과를 만듭니다."
+                },
+                "darkenOnly": {
+                    "description": "위 레이어와 아래 레이어의 각 R,G,B 채널에서 더 어두운 색을 유지합니다.",
+                    "example": "사진의 그림자를 더 어둡게 합니다."
+                },
+                "lumaDarkenOnly": {
+                    "description": "위 레이어와 아래 레이어의 지각적 어둠을 비교해 더 어두운 픽셀을 남깁니다.",
+                    "example": "밝은 영역을 선택적으로 노출 부족 처리합니다."
+                },
+                "multiply": {
+                    "description": "위 레이어의 어두움에 따라 아래 레이어를 어둡게 합니다. 곱하기는 사진 네거티브 여러 장을 겹친 모습을 모사합니다.",
+                    "example": "그림자나 야경처럼 이미지를 더 어둡게 만듭니다."
+                },
+                "burn": {
+                    "description": "위 레이어의 어두움에 비례해 아래 레이어를 어둡게 합니다.",
+                    "example": "그림자에 깊이를 더합니다."
+                },
+                "linearBurn": {
+                    "description": "위 레이어와 아래 레이어의 픽셀을 더한 다음, 가능한 최대 밝기를 뺍니다.",
+                    "example": "이미지에 극적인 그림자 느낌을 더합니다."
+                },
+                "overlay": {
+                    "description": "곱하기와 스크린의 조합입니다. 밝은 영역은 더 밝아지고 어두운 영역은 더 어두워집니다.",
+                    "example": "세부 묘사를 잃지 않고 사진의 대비를 높입니다."
+                },
+                "softLight": {
+                    "description": "오버레이와 비슷하게 이미지를 밝히되 전환은 더 완만합니다. 소프트 라이트는 확산광을 시뮬레이션합니다.",
+                    "example": "인물 사진에 부드러운 빛을 더합니다."
+                },
+                "hardLight": {
+                    "description": "오버레이보다 거친 버전입니다. 밝은 영역은 훨씬 더 밝아지고 어두운 영역은 훨씬 더 어두워집니다.",
+                    "example": "액션 장면의 대비를 크게 높입니다."
+                },
+                "vividLight": {
+                    "description": "대비를 매우 강하게 높입니다. 하드 라이트보다 더 강합니다.",
+                    "example": "강렬한 색과 대비로 사진을 양식화합니다."
+                },
+                "pinLight": {
+                    "description": "밝기에 따라 픽셀을 바꿉니다. 중간 톤에서의 거리에 따라 가장 밝은 픽셀과 가장 어두운 픽셀을 남깁니다.",
+                    "example": "밝음과 어둠 사이 대비가 날카로운 포스터화 효과를 만듭니다."
+                },
+                "linearLight": {
+                    "description": "위 레이어에 따라 밝게 하거나 어둡게 하며, 대비를 선형으로 높입니다.",
+                    "example": "인공 조명을 시뮬레이션하거나 금속 표면을 강조합니다."
+                },
+                "hardMix": {
+                    "description": "이미지를 원색으로 줄여 강하게 양식화된 모습을 만듭니다.",
+                    "example": "만화 또는 스크린 인쇄 효과를 만듭니다."
+                },
+                "difference": {
+                    "description": "레이어 사이의 차이를 찾습니다. 검은색은 차이가 없음을 뜻하고, 색 밝기가 커질수록 차이가 큽니다.",
+                    "example": "내용이 비슷한 레이어를 맞춥니다. 두 픽셀이 같으면 검은색이 됩니다."
+                },
+                "exclusion": {
+                    "description": "대비가 더 낮은 차이 모드의 변형입니다. 이미지를 압도하지 않고 미세한 차이를 강조할 때 사용합니다.",
+                    "example": "색을 선택적으로 반전합니다."
+                },
+                "subtract": {
+                    "description": "아래 레이어에서 위 레이어의 밝기를 뺍니다. 결과에는 검은색이거나 거의 검은 영역이 많습니다.",
+                    "example": "대비가 높은 어두운 영역을 만듭니다."
+                },
+                "grainExtract": {
+                    "description": "레이어에서 필름 그레인을 추출하며, 엠보스된 모습도 만듭니다.",
+                    "example": "필름 질감에서 그레인을 추출해 다른 질감에 적용합니다."
+                },
+                "grainMerge": {
+                    "description": "위 레이어의 그레인을 아래 레이어에 더해, 원래 레이어의 입자 있는 버전을 남깁니다.",
+                    "example": "빈티지한 느낌을 위해 디지털 이미지에 필름 그레인을 더합니다."
+                },
+                "divide": {
+                    "description": "위 레이어의 밝기를 아래 레이어의 밝기로 나눕니다.",
+                    "example": "이미지를 극적으로 밝혀 빛나거나 몽환적인 효과를 만듭니다. 노출 보정에도 사용할 수 있습니다."
+                },
+                "hue": {
+                    "description": "아래 레이어의 크로마와 명도는 유지하고 위 레이어의 색조를 사용합니다.",
+                    "example": "밝기는 유지한 채 푸른 하늘을 보라색으로 바꿉니다."
+                },
+                "chroma": {
+                    "description": "아래 레이어의 색조와 명도는 유지하고 위 레이어의 크로마(색의 강도)를 사용합니다.",
+                    "example": "사진에서 색의 강도를 높이거나 낮춥니다."
+                },
+                "color": {
+                    "description": "위 레이어의 색조와 크로마를 아래 레이어의 명도와 결합합니다.",
+                    "example": "음영과 조명은 유지한 채 물체의 색을 바꿉니다."
+                },
+                "lightness": {
+                    "description": "아래 레이어의 색조와 크로마는 유지하고 위 레이어의 명도를 사용합니다.",
+                    "example": "원래 색은 유지한 채 이미지를 밝게 하거나 어둡게 합니다."
+                },
+                "luminance": {
+                    "description": "위 레이어의 휘도를 아래 레이어로 나눈 다음, 그 결과를 아래 레이어에 곱합니다.",
+                    "example": "원래 색은 유지한 채 이미지를 밝게 하거나 어둡게 합니다."
+                }
+            }
+        },
+        "layerEffectBrowser": {
+            "title": "효과 브라우저",
+            "description": "레이어에 추가할 효과를 선택하세요. 효과는 대개 레이어 색을 조정하거나 흐림 같은 특수 패턴을 더합니다.",
+            "loading": "미리 보기 생성 중...",
+            "generationErrorGeneral": "선택한 레이어의 효과 미리보기를 만드는 동안 오류가 발생했습니다.",
+            "generationErrorUnsupportedType": "선택한 레이어에는 효과를 적용할 수 없습니다.",
+            "generationErrorNoLayer": "효과를 추가하려면 레이어 독에서 레이어를 하나 이상 선택해 주세요."
+        },
+        "layerEffectEdit": {
+            "title": "효과 편집",
+            "description": "특정 레이어의 효과를 편집합니다.",
+            "loading": "미리 보기 생성 중...",
+            "generalError": "문제가 발생했습니다. 이 메시지가 계속 보이면 버그로 신고해 주세요.",
+            "deleteEffect": "효과 삭제",
+            "enableToggle": "사용",
+            "resetField": "필드 초기화",
+            "deleting": "효과 삭제 중...",
+            "useActiveSelectionMask": "선택을 마스크로 적용",
+            "clearSelectionMask": "마스크 제거",
+            "deleteFilterError": "효과를 삭제하는 동안 오류가 발생했습니다. 이 메시지가 계속 보이면 버그로 신고해 주세요.",
+            "applyFilterError": "효과 변경을 적용하는 동안 오류가 발생했습니다. 이 메시지가 계속 보이면 버그로 신고해 주세요."
+        },
+        "renameLayer": {
+            "title": "레이어 이름 변경",
+            "layerName": "새 이름"
         }
     },
     "moduleGroup": {
+        "app": {
+            "name": "앱",
+            "description": "앱 관리",
+            "modules": {
+                "clearShareCache": {
+                    "name": "공유 캐시 지우기",
+                    "description": "오래된 공유 이미지 파일을 제거합니다."
+                },
+                "update": {
+                    "name": "앱 업데이트",
+                    "description": "새 기능을 받으려면 앱을 업데이트하세요."
+                }
+            }
+        },
         "file": {
             "name": "파일 관리",
-            "description": "당신의 장치에 이미지를 적재하고 저장하십시오.",
+            "description": "기기에서 이미지를 불러오고 저장합니다.",
             "modules": {
                 "export": {
-                    "name": "수출 이미지",
-                    "description": "다른 편집기에 의해 열 수 있는 범용 형식으로 이미지를 저장합니다."
+                    "name": "이미지 내보내기",
+                    "description": "다른 편집기에서 열 수 있는 범용 형식으로 이미지를 저장합니다."
                 },
                 "insertPhoto": {
                     "name": "사진 삽입",
-                    "description": "현재 열린 이미지에 새로운 레이어로 사진을 추가합니다."
+                    "description": "현재 연 이미지에 사진을 새 레이어로 추가합니다."
                 },
                 "new": {
-                    "name": "새로운 이미지",
-                    "description": "지정된 크기로 새로운 이미지를 만듭니다."
+                    "name": "새 이미지",
+                    "description": "지정한 크기로 새 이미지를 만듭니다."
                 },
                 "open": {
-                    "name": "본문 바로가기",
-                    "description": "새로운 작업 공간에서 이미지 또는 프로젝트 파일을 엽니다."
+                    "name": "이미지 열기",
+                    "description": "새 작업 공간에서 이미지 또는 프로젝트 파일을 엽니다."
+                },
+                "openConfirm": {
+                    "name": "변경 내용 버리기 확인",
+                    "description": "저장한 변경 내용이 사라집니다."
+                },
+                "openFileDialog": {
+                    "name": "이미지 열기",
+                    "description": "파일 시스템에서 이미지를 엽니다."
+                },
+                "openFileList": {
+                    "name": "이미지 열기",
+                    "description": "이미지를 바로 엽니다."
+                },
+                "openWebdavExplorer": {
+                    "name": "이미지 열기",
+                    "description": "컴퓨터 또는 네트워크 저장소에서 이미지를 엽니다."
                 },
                 "quickLoad": {
-                    "name": "빠른 부하",
-                    "description": "빠른 저장에 의해 저장된 파일을로드합니다."
+                    "name": "빠른 불러오기",
+                    "description": "빠른 저장으로 저장한 파일을 불러옵니다."
                 },
                 "quickSave": {
                     "name": "빠른 저장",
-                    "description": "임시 저장에 현재 파일을 저장합니다."
-                },
-                "saveAs": {
-                    "name": "이미지 저장",
-                    "description": "모든 정보를 잃지 않고 OpenGraphica에 의해 다시 열 수 있는 프로젝트 형식으로 이미지를 저장합니다."
-                },
-                "takePhoto": {
-                    "name": "사진 찍기",
-                    "description": "카메라와 웹캠에서 사진을 찍고 이미지를 삽입합니다."
+                    "description": "현재 파일을 임시 저장소에 저장합니다."
                 },
                 "restoreBackup": {
-                    "name": "백업 복구 (주)",
-                    "description": "백업 파일을 편집 중 자동으로 저장합니다."
+                    "name": "백업 이미지 복원",
+                    "description": "편집 중 자동으로 저장된 백업 파일을 불러옵니다."
                 },
-                "openConfirm": {
-                    "name": "Discard 변경 확인",
-                    "description": "저장된 변경은 손실됩니다."
-                },
-                "openFileDialog": {
-                    "name": "본문 바로가기",
-                    "description": "파일시스템의 이미지를 엽니다."
-                },
-                "openFileList": {
-                    "name": "본문 바로가기",
-                    "description": "직접 이미지를 엽니 다."
-                },
-                "openWebdavExplorer": {
-                    "name": "본문 바로가기",
-                    "description": "컴퓨터 또는 네트워크 스토리지에서 이미지를 엽니다."
+                "saveAs": {
+                    "name": "이미지를 다른 이름으로 저장",
+                    "description": "정보를 잃지 않고 OpenGraphica에서 다시 열 수 있는 프로젝트 형식으로 이미지를 저장합니다."
                 },
                 "saveWebdavExplorer": {
                     "name": "이미지 저장",
-                    "description": "컴퓨터 또는 네트워크 스토리지에 이미지를 저장합니다."
+                    "description": "컴퓨터 또는 네트워크 저장소에 이미지를 저장합니다."
+                },
+                "takePhoto": {
+                    "name": "사진 찍기",
+                    "description": "카메라나 웹캠으로 사진을 찍어 이미지에 삽입합니다."
                 },
                 "shareImage": {
-                    "name": "공유 이미지",
-                    "description": "현재 이미지를 다른 사람들과 편집합니다."
+                    "name": "이미지 공유",
+                    "description": "편집 중인 현재 이미지를 다른 사람과 공유합니다."
                 },
                 "addFont": {
-                    "name": "본문 바로가기",
+                    "name": "글꼴 추가",
                     "description": "파일에 글꼴을 추가합니다."
                 }
             }
         },
         "history": {
-            "name": "편집 역사",
-            "description": "이미지 편집의 역사를 통해 움직이는 조작.",
+            "name": "편집 작업 내역",
+            "description": "이미지 편집 기록을 이동하는 작업입니다.",
             "modules": {
                 "redo": {
-                    "name": "역사 Redo",
-                    "description": "Redo 마지막 undone 활동."
+                    "name": "작업 내역 다시 실행",
+                    "description": "마지막으로 실행 취소한 작업을 다시 실행합니다."
                 },
                 "undo": {
-                    "name": "역사 Undo",
-                    "description": "마지막 동작을 하지 마십시오."
+                    "name": "작업 내역 실행 취소",
+                    "description": "마지막 작업을 실행 취소합니다."
                 }
             }
         },
         "image": {
             "name": "이미지 캔버스",
-            "description": "이미지 캔버스에 영향을 미치는 작업.",
+            "description": "이미지 캔버스에 영향을 주는 작업입니다.",
             "modules": {
+                "convertLayersToCollage": {
+                    "name": "레이어를 콜라주로 변환",
+                    "description": "선택한 레이어를 이미지 콜라주로 변환합니다. 사용할 수 있는 콜라주 레이아웃이 여러 가지입니다."
+                },
                 "convertLayersToImageSequence": {
-                    "name": "층을 이미지 속으로 변환",
-                    "description": "선택된 층을 이미지 순서 층 (animation)로 변환합니다."
+                    "name": "레이어를 이미지 시퀀스로 변환",
+                    "description": "선택한 레이어를 이미지 시퀀스 레이어(애니메이션)로 변환합니다."
                 },
                 "convertLayersFlatten": {
-                    "name": "층을 Flattened 이미지로 변환",
-                    "description": "단일 이미지 레이어에 모든 레이어를 병합하고 레이어 스택의 상단에 추가합니다."
+                    "name": "레이어를 병합 이미지로 변환",
+                    "description": "모든 레이어를 하나의 이미지 레이어로 병합해 레이어 스택 맨 위에 추가합니다."
                 },
                 "copy": {
-                    "name": "선택된 층 복사",
-                    "description": "현재 선택된 레이어를 클립보드에 복사합니다.",
+                    "name": "선택한 레이어 복사",
+                    "description": "현재 선택한 레이어를 클립보드에 복사합니다.",
                     "noSelectedLayers": {
-                        "title": "선택 없음",
-                        "message": "적어도 1개의 층을 복사하기 위하여 선택하십시오."
+                        "title": "선택된 레이어 없음",
+                        "message": "복사할 레이어를 하나 이상 선택해 주세요."
                     }
                 },
                 "copyAll": {
                     "name": "모든 레이어 복사",
-                    "description": "캔버스에 모든 레이어를 클립보드에 PNG 이미지로 복사합니다."
+                    "description": "캔버스의 모든 레이어를 PNG 이미지로 클립보드에 복사합니다."
                 },
                 "cut": {
-                    "name": "사이트맵",
-                    "description": "현재 선택된 레이어를 제거하고 클립보드에 복사합니다."
+                    "name": "잘라내기",
+                    "description": "현재 선택한 레이어를 제거하고 클립보드에 복사합니다."
                 },
                 "paste": {
-                    "name": "이름 *",
-                    "description": "클립보드에서 캔버스에 이미지를 삽입합니다."
-                },
-                "convertLayersToCollage": {
-                    "name": "레이어를 콜리지로 변환",
-                    "description": "선택한 레이어를 이미지 콜리지로 변환합니다. 많은 다른 collage 레이아웃이 있습니다."
+                    "name": "붙여넣기",
+                    "description": "클립보드의 이미지를 캔버스에 삽입합니다."
                 },
                 "flipLayersX": {
-                    "name": "플립 X",
-                    "description": "이미지의 x 축에 플립 선택 레이어."
+                    "name": "X 뒤집기",
+                    "description": "선택한 레이어를 이미지의 x축 기준으로 뒤집습니다."
                 },
                 "flipLayersY": {
-                    "name": "플립 Y",
-                    "description": "이미지의 y 축선에 플립에 의하여 선정되는 층."
+                    "name": "Y 뒤집기",
+                    "description": "선택한 레이어를 이미지의 y축 기준으로 뒤집습니다."
                 },
-                "rotateLayersClockwise": {},
-                "rotateLayersCounterclockwise": {}
+                "rotateLayersClockwise": {
+                    "name": "시계 방향 90° 회전",
+                    "description": "선택한 레이어를 시계 방향으로 90° 회전합니다."
+                },
+                "rotateLayersCounterclockwise": {
+                    "name": "반시계 방향으로 90° 회전",
+                    "description": "선택한 레이어를 반시계 방향으로 90° 회전합니다."
+                }
             }
         },
         "layer": {
-            "name": "사이트맵",
-            "description": "층에 영향을 미치는 작업.",
+            "name": "레이어",
+            "description": "레이어에 영향을 주는 작업입니다.",
             "modules": {
                 "rename": {
-                    "name": "이름 층",
-                    "description": "층의 이름을 변경합니다."
-                },
-                "layerEffectBrowser": {
-                    "name": "비밀번호",
-                    "description": "현재 선택된 층(s) 또는 층 그룹(s)에 이미지 효과를 추가합니다."
+                    "name": "레이어 이름 변경",
+                    "description": "레이어 이름을 변경합니다."
                 },
                 "blendingMode": {
-                    "name": "변화 층 혼합 형태",
-                    "description": "활성 층의 혼합 모드를 변경합니다."
+                    "name": "레이어 혼합 모드 변경",
+                    "description": "활성 레이어의 혼합 모드를 변경합니다."
+                },
+                "layerEffectBrowser": {
+                    "name": "효과 브라우저",
+                    "description": "현재 선택한 레이어 또는 레이어 그룹에 이미지 효과를 추가합니다."
                 },
                 "layerEffectEdit": {
-                    "description": "자주 묻는 질문"
+                    "name": "효과 편집",
+                    "description": "효과 편집"
                 }
             }
         },
         "tmp": {
-            "name": "임시 단위",
-            "description": "초기 개발 중에만 찌르는 모듈.",
+            "name": "임시 모듈",
+            "description": "초기 개발 중에만 유지되는 모듈입니다.",
             "modules": {
                 "notYetImplemented": {
-                    "name": "Yet 구현",
-                    "description": "경고 표시."
+                    "name": "아직 구현되지 않았습니다",
+                    "description": "경고를 표시합니다."
                 }
             }
         },
         "tutorial": {
-            "name": "다운로드",
-            "description": "OpenGraphica를 사용하는 방법을 알아보십시오.",
+            "name": "튜토리얼",
+            "description": "OpenGraphica 사용 방법을 알아봅니다.",
             "modules": {
                 "welcome": {
-                    "name": "제품 정보",
-                    "description": "이미지에서 작업 시작."
-                }
-            }
-        },
-        "app": {
-            "name": "앱 다운로드",
-            "description": "앱 관리",
-            "modules": {
-                "clearShareCache": {
-                    "name": "Cache를 공유",
-                    "description": "오래된 공유된 이미지 파일을 제거합니다."
-                },
-                "update": {
-                    "name": "앱 업데이트",
-                    "description": "앱을 업데이트하여 새로운 기능을 받으세요."
+                    "name": "환영합니다",
+                    "description": "이미지 작업을 시작합니다."
                 }
             }
         }
     },
     "option": {
-        "bottom": "제품정보",
+        "bottom": "아래",
         "left": "왼쪽",
-        "right": "지원하다",
-        "top": "이름 *"
+        "right": "오른쪽",
+        "top": "위"
     },
     "theme": {
-        "light": "제품 정보",
-        "dark": "한국어"
+        "light": "밝게",
+        "dark": "어둡게"
     },
     "toolbar": {
-        "cropResize": {
-            "title": "자르기 및 크기",
-            "linkWidthHeight": "연결 폭/높이",
-            "size": "크기 (mm)",
-            "width": "폭 (mm)",
-            "height": "고도:",
-            "dimensionUnits": "차원 단위",
-            "resolution": "제품 설명",
-            "resolutionUnits": "해결책 단위",
-            "snapping": {
-                "title": "기타 제품",
-                "enable": "사용 약관",
-                "currentCanvas": "현재 화포",
-                "cropArea": "Crop 지역",
-                "snapToCenter": "비밀번호",
-                "snapToEdges": "Edges에 스냅",
-                "snapToContrast": "Contrast에 스냅",
-                "snapAtCenter": "연락처",
-                "snapAtEdges": "Edge에서 스냅"
-            }
-        },
-        "draw": {
-            "brushColor": "솔 색깔",
-            "brushSize": "크기 (mm)"
-        },
-        "freeTransform": {
-            "clearSelection": "자주 묻는 질문",
-            "pickLayer": {
-                "label": "공급 업체",
-                "auto": "제품정보",
-                "current": "현재 위치"
-            },
-            "snapping": {
-                "title": "기타 제품",
-                "enableSnapping": "사용 약관",
-                "rotationSnap": "회전 속도",
-                "rotationSnapDegrees": "주요 특징",
-                "canvasEdges": "캔버스 가장자리",
-                "layerEdges": "층 가장자리",
-                "layerCenter": "층 센터"
-            },
-            "metrics": {
-                "title": "미터",
-                "position": "주요 특징",
-                "width": "폭 (mm)",
-                "height": "고도:",
-                "rotation": "회전 속도",
-                "resetRotation": "재설정 회전",
-                "noLayers": "선택된 층 없음.",
-                "alignLeft": "정렬 왼쪽",
-                "alignRight": "Alight 권리",
-                "alignCenter": "Align 센터",
-                "alignTop": "Align 상단",
-                "alignBottom": "Align 바닥",
-                "alignMiddle": "Align 중간",
-                "resetPosition": "재설정 {dimension} 주요 특징",
-                "resetWidth": "재설정 폭",
-                "resetHeight": "재설정 높이"
-            },
-            "actions": {
-                "title": "팟캐스트",
-                "applyTransform": "Transform 적용",
-                "trimEmptySpace": "트림 빈 공간",
-                "stretchToImageSize": "화포 크기에 뻗기",
-                "expandToImageSize": "빈 공간으로 확장"
-            }
-        },
-        "general": {
-            "settings": "계정 설정"
-        },
-        "selection": {
-            "selectionShape": {
-                "label": "선택 모양",
-                "rectangle": "연락처",
-                "ellipse": "엘립스",
-                "freePolygon": "무료 Polygon",
-                "freePolygonShort": "무료 폴리",
-                "tonalArea": "톤 지역",
-                "lasso": "스낵 바"
-            },
-            "selectionCombineMode": {
-                "label": "선택 Combine 형태",
-                "add": "기타 제품",
-                "subtract": "기타 제품",
-                "intersect": "회사연혁"
-            },
-            "notification": {
-                "unproductiveSelection": {
-                    "title": "선택 없음",
-                    "message": "<p> 이미지 상단의 선택 마스크를 만들었습니다.</p><p> 레이어 도크에서 적어도 하나의 이미지 레이어를 선택하십시오.</p>"
-                }
-            }
-        },
-        "text": {
-            "font": "이름 *",
-            "size": "크기 (mm)",
-            "bold": "지원하다",
-            "italic": "인기 카테고리",
-            "strikethrough": "스트라이크",
-            "underline": "이름 *",
-            "fill": "제품정보",
-            "fillTooltip": "편지의 가장자리 안쪽에 보여주는 색깔 (s)",
-            "newTextLayerName": "새로운 텍스트",
-            "alignment": {
-                "boundaryOption": {
-                    "dynamic": "·",
-                    "box": "제품 정보"
-                },
-                "lineDirectionOption": {
-                    "ltr": "왼쪽에 오른쪽",
-                    "rtl": "오시는 길",
-                    "ttb": "탑 투 - bottom",
-                    "btt": "하단 정보"
-                },
-                "wrapDirectionOption": {
-                    "ltr": "왼쪽에 오른쪽",
-                    "rtl": "오시는 길",
-                    "ttb": "탑 투 - bottom",
-                    "btt": "하단 정보"
-                },
-                "title": "제품정보",
-                "boundary": "한국어",
-                "lineDirection": "텍스트 방향",
-                "wrapDirection": "제품정보"
-            },
-            "fillColor": "채우는 색깔",
-            "paletteCount": "Palette 조사",
-            "addFont": "더 보기."
-        },
-        "zoom": {
-            "zoomOut": "줌 아웃",
-            "zoomIn": "줌 에",
-            "rotateCounterClockwise": "연락처",
-            "rotateClockwise": "연락처",
-            "fit": "제품 정보",
-            "flip": "팟캐스트"
-        },
-        "drawBrush": {
-            "brushSize": "크기 (mm)",
-            "newBrushLayerName": "새로운 페인트",
-            "brushDialog": {
-                "noBrushCategorySelected": {
-                    "title": "선택 없음",
-                    "message": "브러시 종류를 선택하십시오."
-                },
-                "noBrushesInCategory": {
-                    "title": "솔 없음",
-                    "message": "이 범주에는 브러시가 없습니다. 몇 가지 만들기!"
-                },
-                "editorTab": {
-                    "blending": {
-                        "title": "회사 소개",
-                        "density": "제품정보",
-                        "densityDescription": "솔의 투명한 각 우표는, 펜 압력에 기초를 두어 일 것입니다. 범위는 다양한 펜 압력을 사용할 때 사용됩니다.",
-                        "pressureMinDensity": "Min 조밀도",
-                        "pressureMaxDensity": "최대 밀도",
-                        "colorBlendingStrength": "색깔 혼합 힘",
-                        "pressureMinColorBlendingStrength": "공급 능력",
-                        "pressureMaxColorBlendingStrength": "최대 힘",
-                        "colorBlendingStrengthDescription": "색깔 underneath의 얼마나 솔은 그림 도중 픽업될 것입니다. 범위는 다양한 펜 압력을 사용할 때 사용됩니다.",
-                        "colorBlendingPersistence": "색깔 혼합 Persistence",
-                        "colorBlendingPersistenceDescription": "얼마나 픽업 색상은 스트로크를 드래그하면서 브러시에 남아 있습니다.",
-                        "concentration": "관련 기사",
-                        "concentrationDescription": "낮은 값은 물과 브러시 희석, 높은 값의 전체 농축 색상을 시뮬레이션합니다. 이 조정에는 완전히 불투명한 색깔의 정상에 그림 때 아무 효력도 없습니다. 범위는 다양한 펜 압력을 사용할 때 사용됩니다.",
-                        "pressureMinConcentration": "분 집중",
-                        "pressureMaxConcentration": "최대 농도"
-                    },
-                    "shape": {
-                        "title": "제품 정보",
-                        "hardness": "경도",
-                        "hardnessDescription": "낮은 가치는 연약한 퇴색한 가장자리 및 더 높은 가치 예리한 가장자리가 있을 것입니다.",
-                        "angle": "주요 특징",
-                        "angleDescription": "솔 모양을 자전하십시오.",
-                        "shape": "제품 정보",
-                        "shapes": {
-                            "circle": "한국어",
-                            "square": "팟캐스트"
-                        }
-                    },
-                    "strokePath": {
-                        "title": "치기 경로",
-                        "spacing": "관련 상품",
-                        "spacingDescription": "솔의 각 우표 사이 거리, 솔 크기에 관계되는. 더 큰 솔 크기에 탱크 성과 할 수 있기 때문에 극단적으로 낮은 가치로 주의하십시오.",
-                        "jitter": "주 메뉴",
-                        "jitterDescription": "무작위로 솔 모양의 위치를 이동합니다.",
-                        "pixelSnap": "화소 스냅"
-                    },
-                    "pressure": {
-                        "title": "압력",
-                        "pressureTaper": "기타 제품",
-                        "pressureTaperDescription": "더 높은 가치는 더 낮은 펜 압력에 skinnier 선을 그립니다. 저압에서 불안정한 감도를 가진 펜을 통제하는 것이 더 쉽습니다.",
-                        "pressureMinSize": "최소 크기",
-                        "pressureMinSizeDescription": "현재 선정된 솔 크기와 상대적인 0% 펜 압력에 솔의 크기."
-                    },
-                    "general": {
-                        "title": "주요사업",
-                        "name": "솔 이름",
-                        "resetDefault": "기본값으로 재설정",
-                        "delete": "브러시 삭제",
-                        "addCustomBrush": "사용자 정의 브러시 추가"
-                    }
-                },
-                "title": "선택 브러쉬",
-                "close": "닫기 Dialog"
-            },
-            "brushColor": "색깔: 백색",
-            "paletteCount": "Palette 조사",
-            "brushSmoothing": "관련 제품"
-        },
-        "effect": {
-            "edit": {
-                "noLayersSelected": "층 도크에 1 개 이상의 레이어를 선택하여 효과를 편집하십시오.",
-                "layerHasNoEffects": "이 층은 아무 효력도 없습니다.",
-                "deleteEffect": "삭제 효과"
-            },
-            "maskHeading": "마스크:"
-        },
-        "eraseBrush": {
-            "brushSize": "크기 (mm)",
-            "notification": {
-                "noSelectedLayers": {
-                    "title": "선택 없음",
-                    "message": "레이어 도크에서 적어도 하나의 이미지 레이어를 선택하십시오. 특정 층 유형은 지워질 수 없습니다."
-                }
-            },
-            "brushOpacity": "오파시티",
-            "brushSmoothing": "관련 제품"
-        },
-        "deformBlur": {
-            "brushSize": "크기 (mm)",
-            "brushOpacity": "오파시티",
-            "brushStrength": "제품정보",
+        "cloneBrush": {
+            "brushOpacity": "불투명도",
+            "brushSize": "크기",
             "brushHardness": "경도",
             "notification": {
                 "noSelectedLayers": {
-                    "title": "선택 없음",
-                    "message": "레이어 도크에서 적어도 하나의 이미지 레이어를 선택하십시오. 특정 층 유형은 흐를 수 없습니다."
+                    "title": "선택된 레이어 없음",
+                    "message": "레이어 독에서 이미지 레이어를 하나 이상 선택해 주세요. 일부 레이어 유형은 복제 브러시에 사용할 수 없습니다."
                 }
             }
         },
-        "drawColorPicker": {
-            "title": "색깔 피커"
-        },
-        "drawGradient": {
-            "editingGradient": "Gradient 편집",
-            "newGradientLayerName": "새로운 기온",
-            "blendColorSpace": {
-                "label": "색깔 공간",
-                "oklab": "오크랩",
-                "srgb": "사이트맵",
-                "linearSrgb": "선형 sRGB"
-            },
-            "fillType": {
-                "label": "충전 유형",
-                "linear": "제품정보",
-                "radial": "관련 기사"
-            },
-            "spreadMethod": {
-                "label": "스프레드 방법",
-                "pad": "기타",
-                "repeat": "기타 제품",
-                "reflect": "제품정보",
-                "truncate": "관련 기사"
-            },
-            "stopDialog": {
-                "title": "편집 색상 정지",
-                "close": "닫기 Dialog",
-                "stopColor": "색깔: 백색",
-                "stopOffset": "제품정보",
-                "presets": "기타 제품",
-                "presetSettings": "Preset 설정"
-            }
-        },
-        "drawShape": {
-            "shapeType": {
-                "label": "제품 정보",
-                "rectangle": "관련 상품",
-                "ellipse": "엘립스",
-                "circle": "한국어",
-                "line": "제품정보",
-                "polyline": "연락처",
-                "polygon": "폴리곤",
-                "path": "오시는길"
-            },
-            "style": {
-                "label": "(주)"
-            },
-            "newVectorLayerName": "새로운 모양",
-            "extendingShape": "확장 모양",
-            "fillStyle": {
-                "label": "제품정보"
-            },
-            "strokeStyle": {
-                "label": "기타 제품",
-                "width": "제품 정보"
-            },
+        "cropResize": {
+            "title": "자르기 및 크기 조정",
+            "linkWidthHeight": "너비/높이 연결",
+            "size": "크기",
+            "width": "너비",
+            "height": "높이",
+            "dimensionUnits": "치수 단위",
+            "resolution": "해상도",
+            "resolutionUnits": "해상도 단위",
             "snapping": {
-                "title": "다운로드",
-                "enableSnapping": "사용 약관",
-                "canvasEdges": "캔버스 가장자리",
-                "controlPoint": "통제 점"
-            },
+                "title": "스냅",
+                "enable": "스냅 사용",
+                "currentCanvas": "현재 캔버스",
+                "cropArea": "자르기 영역",
+                "snapToCenter": "중심에 스냅",
+                "snapToEdges": "가장자리에 스냅",
+                "snapToContrast": "대비에 스냅",
+                "snapAtCenter": "중심에서 스냅",
+                "snapAtEdges": "가장자리에서 스냅"
+            }
+        },
+        "deformBlur": {
+            "brushOpacity": "불투명도",
+            "brushSize": "크기",
+            "brushStrength": "강도",
+            "brushHardness": "경도",
             "notification": {
-                "invisibleShape": {
-                    "title": "Invisible 모양 만들기",
-                    "message": "당신의 현재 충분한 양 및 치기 색깔은 완전히 투명한 입니다. 새로운 모양이 생성되지 않습니다."
-                },
-                "invisibleLine": {
-                    "title": "보이지 않는 선을 창조하십시오",
-                    "message": "현재 치기 색깔은 완전히 투명하지 않아야 하고, 치기 폭은 0 보다는 더 중대해야 합니다."
-                },
-                "uselessClick": {
-                    "title": "그림 모양",
-                    "message": {
-                        "touch": "터치하고 새로운 모양을 추가 할 빈 영역에 손가락을 드래그.",
-                        "mouse": "새로운 모양을 추가하려면 빈 영역에 클릭하고 드래그하십시오."
-                    }
+                "noSelectedLayers": {
+                    "title": "선택된 레이어 없음",
+                    "message": "레이어 독에서 이미지 레이어를 하나 이상 선택해 주세요. 일부 레이어 유형은 흐리게 할 수 없습니다."
                 }
-            },
-            "actions": {
-                "title": "팟캐스트",
-                "convertToPath": "변환 모양으로 Path"
             }
         },
         "deformSharpen": {
-            "brushOpacity": "오파시티",
-            "brushSize": "크기 (mm)",
-            "brushStrength": "제품정보",
+            "brushOpacity": "불투명도",
+            "brushSize": "크기",
+            "brushStrength": "강도",
             "brushHardness": "경도",
             "notification": {
                 "noSelectedLayers": {
-                    "title": "선택 없음",
-                    "message": "레이어 도크에서 적어도 하나의 이미지 레이어를 선택하십시오. 특정 층 유형은 날카롭게 할 수 없습니다."
+                    "title": "선택된 레이어 없음",
+                    "message": "레이어 독에서 이미지 레이어를 하나 이상 선택해 주세요. 일부 레이어 유형은 선명하게 할 수 없습니다."
+                }
+            }
+        },
+        "drawBrush": {
+            "brushColor": "색상",
+            "paletteCount": "팔레트 개수",
+            "brushSize": "크기",
+            "brushSmoothing": "매끄러움",
+            "newBrushLayerName": "새 페인트",
+            "brushDialog": {
+                "title": "브러시 선택",
+                "close": "대화 상자 닫기",
+                "noBrushCategorySelected": {
+                    "title": "선택된 범주 없음",
+                    "message": "브러시 범주를 선택해 주세요."
+                },
+                "noBrushesInCategory": {
+                    "title": "브러시 없음",
+                    "message": "이 범주에는 브러시가 없습니다. 만들어 보세요!"
+                },
+                "editorTab": {
+                    "blending": {
+                        "title": "혼합",
+                        "density": "밀도",
+                        "densityDescription": "펜 압력에 따라 브러시 스탬프 각각의 투명도입니다. 펜 압력을 바꿀 때 이 범위가 사용됩니다.",
+                        "pressureMinDensity": "최소 밀도",
+                        "pressureMaxDensity": "최대 밀도",
+                        "colorBlendingStrength": "색 혼합 강도",
+                        "pressureMinColorBlendingStrength": "최소 강도",
+                        "pressureMaxColorBlendingStrength": "최대 강도",
+                        "colorBlendingStrengthDescription": "그리는 동안 브러시 아래의 색을 얼마나 묻혀 올지입니다. 펜 압력을 바꿀 때 이 범위가 사용됩니다.",
+                        "colorBlendingPersistence": "색 혼합 지속",
+                        "colorBlendingPersistenceDescription": "획을 끄는 동안 묻어 온 색이 브러시에 유지되는 시간입니다.",
+                        "concentration": "농도",
+                        "concentrationDescription": "값이 낮으면 물로 희석한 브러시를, 값이 높으면 농축된 색을 시뮬레이션합니다. 완전히 불투명한 색 위에 그릴 때는 이 설정이 적용되지 않습니다. 펜 압력을 바꿀 때 이 범위가 사용됩니다.",
+                        "pressureMinConcentration": "최소 농도",
+                        "pressureMaxConcentration": "최대 농도"
+                    },
+                    "shape": {
+                        "title": "도형",
+                        "shape": "도형",
+                        "shapes": {
+                            "circle": "원",
+                            "square": "정사각형"
+                        },
+                        "hardness": "경도",
+                        "hardnessDescription": "값이 낮으면 가장자리가 부드럽게 흐려지고, 값이 높으면 가장자리가 날카롭습니다.",
+                        "angle": "각도",
+                        "angleDescription": "브러시 모양을 회전시킵니다."
+                    },
+                    "strokePath": {
+                        "title": "획 경로",
+                        "spacing": "간격",
+                        "spacingDescription": "브러시 크기 대비 스탬프 간격입니다. 값이 극단적으로 낮으면 큰 브러시에서 성능이 크게 떨어질 수 있으니 주의하세요.",
+                        "jitter": "흔들림",
+                        "jitterDescription": "브러시 모양의 위치를 무작위로 옮깁니다.",
+                        "pixelSnap": "픽셀 스냅"
+                    },
+                    "pressure": {
+                        "title": "필압",
+                        "pressureTaper": "가늘어짐",
+                        "pressureTaperDescription": "값이 높을수록 낮은 펜 압력에서 더 가는 선을 그립니다. 낮은 압력에서 감도가 불안정한 펜을 제어하기 쉬워집니다.",
+                        "pressureMinSize": "최소 크기",
+                        "pressureMinSizeDescription": "펜 압력 0%일 때의 브러시 크기입니다. 현재 선택한 브러시 크기에 상대적입니다."
+                    },
+                    "general": {
+                        "title": "일반",
+                        "name": "브러시 이름",
+                        "resetDefault": "기본값으로 초기화",
+                        "delete": "브러시 삭제",
+                        "addCustomBrush": "사용자 지정 브러시 추가"
+                    }
                 }
             }
         },
         "drawBucketFill": {
-            "title": "버켓 필",
-            "brushColor": "색깔: 백색",
-            "paletteCount": "Palette 조사",
-            "strength": "제품정보",
-            "feather": "뚱 베어",
-            "settings": "지원하다",
-            "antialias": "연락처"
+            "title": "페인트통 채우기",
+            "brushColor": "색상",
+            "paletteCount": "팔레트 개수",
+            "strength": "강도",
+            "feather": "페더",
+            "settings": "설정",
+            "antialias": "안티앨리어스"
         },
-        "eraseBucketFill": {
-            "opacity": "오파시티",
-            "strength": "제품정보",
-            "feather": "뚱 베어",
-            "settings": "지원하다",
-            "antialias": "연락처",
+        "drawColorPicker": {
+            "title": "색상 선택기"
+        },
+        "drawGradient": {
+            "editingGradient": "그라데이션 편집",
+            "newGradientLayerName": "새 그라데이션",
+            "blendColorSpace": {
+                "label": "색 공간",
+                "oklab": "Oklab",
+                "srgb": "sRGB",
+                "linearSrgb": "선형 sRGB"
+            },
+            "fillType": {
+                "label": "채우기 유형",
+                "linear": "선형",
+                "radial": "방사형"
+            },
+            "spreadMethod": {
+                "label": "확산 방식",
+                "pad": "끝색 채우기",
+                "repeat": "반복",
+                "reflect": "반사",
+                "truncate": "잘라내기"
+            },
+            "stopDialog": {
+                "title": "색상 정지점 편집",
+                "close": "대화 상자 닫기",
+                "stopColor": "색상",
+                "stopOffset": "오프셋",
+                "presets": "프리셋",
+                "presetSettings": "프리셋 설정"
+            }
+        },
+        "drawShape": {
+            "newVectorLayerName": "새 도형",
+            "extendingShape": "도형 확장",
+            "shapeType": {
+                "label": "도형",
+                "rectangle": "직사각형",
+                "circle": "원",
+                "ellipse": "타원",
+                "line": "선",
+                "polyline": "폴리라인",
+                "polygon": "다각형",
+                "path": "패스"
+            },
+            "fillStyle": {
+                "label": "채우기"
+            },
+            "strokeStyle": {
+                "label": "획",
+                "width": "두께"
+            },
+            "snapping": {
+                "title": "스냅",
+                "enableSnapping": "스냅 사용",
+                "canvasEdges": "캔버스 가장자리",
+                "controlPoint": "제어점"
+            },
+            "actions": {
+                "title": "동작",
+                "convertToPath": "도형을 패스로 변환"
+            },
+            "notification": {
+                "invisibleShape": {
+                    "title": "보이지 않는 도형 만드는 중",
+                    "message": "현재 채우기 색과 획 색이 모두 완전히 투명합니다. 새 도형은 만들어지지 않습니다."
+                },
+                "invisibleLine": {
+                    "title": "보이지 않는 선 만드는 중",
+                    "message": "현재 획 색은 완전히 투명하면 안 되며, 획 두께는 0보다 커야 합니다."
+                },
+                "uselessClick": {
+                    "title": "도형 그리기",
+                    "message": {
+                        "touch": "빈 영역을 손가락으로 터치하고 끌어 새 도형을 추가합니다.",
+                        "mouse": "빈 영역을 클릭하고 끌어 새 도형을 추가합니다."
+                    }
+                }
+            }
+        },
+        "effect": {
+            "maskHeading": "마스크:",
+            "edit": {
+                "noLayersSelected": "효과를 편집하려면 레이어 독에서 레이어를 하나 이상 선택해 주세요.",
+                "layerHasNoEffects": "이 레이어에는 효과가 없습니다.",
+                "deleteEffect": "효과 삭제"
+            }
+        },
+        "eraseBrush": {
+            "brushOpacity": "불투명도",
+            "brushSize": "크기",
+            "brushSmoothing": "매끄러움",
             "notification": {
                 "noSelectedLayers": {
-                    "title": "선택 없음",
-                    "message": "레이어 도크에서 적어도 하나의 이미지 레이어를 선택하십시오. 특정 층 유형은 지워질 수 없습니다."
+                    "title": "선택된 레이어 없음",
+                    "message": "레이어 독에서 이미지 레이어를 하나 이상 선택해 주세요. 일부 레이어 유형은 지울 수 없습니다."
                 }
             }
+        },
+        "eraseBucketFill": {
+            "opacity": "불투명도",
+            "strength": "강도",
+            "feather": "페더",
+            "settings": "설정",
+            "antialias": "안티앨리어스",
+            "notification": {
+                "noSelectedLayers": {
+                    "title": "선택된 레이어 없음",
+                    "message": "레이어 독에서 이미지 레이어를 하나 이상 선택해 주세요. 일부 레이어 유형은 지울 수 없습니다."
+                }
+            }
+        },
+        "freeTransform": {
+            "clearSelection": "선택 해제",
+            "pickLayer": {
+                "label": "레이어 선택",
+                "auto": "자동",
+                "current": "현재"
+            },
+            "snapping": {
+                "title": "스냅",
+                "enableSnapping": "스냅 사용",
+                "rotationSnap": "회전",
+                "rotationSnapDegrees": "도",
+                "canvasEdges": "캔버스 가장자리",
+                "layerEdges": "레이어 가장자리",
+                "layerCenter": "레이어 중심"
+            },
+            "metrics": {
+                "title": "치수",
+                "alignLeft": "왼쪽 정렬",
+                "alignRight": "오른쪽 정렬",
+                "alignCenter": "가운데 정렬",
+                "alignTop": "위쪽 정렬",
+                "alignBottom": "아래 정렬",
+                "alignMiddle": "중간 정렬",
+                "position": "위치",
+                "resetPosition": "{dimension} 위치 재설정",
+                "width": "너비",
+                "resetWidth": "너비 초기화",
+                "height": "높이",
+                "resetHeight": "높이 초기화",
+                "rotation": "회전",
+                "resetRotation": "회전 초기화",
+                "noLayers": "선택된 레이어가 없습니다."
+            },
+            "actions": {
+                "title": "동작",
+                "applyTransform": "변환 적용",
+                "stretchToImageSize": "캔버스 크기로 늘리기",
+                "expandToImageSize": "빈 공간으로 확장",
+                "trimEmptySpace": "빈 공간 잘라내기"
+            }
+        },
+        "general": {
+            "settings": "설정"
         },
         "layerOpacity": {
-            "title": "오파시티",
-            "opacity": "오파시티"
-        }
-    },
-    "toolGroup": {
-        "draw": {
-            "name": "드로잉",
-            "description": "브러시, 연필, 펜 및 벡터 아트 도면 도구.",
-            "tools": {
-                "brush": {
-                    "name": "제품정보",
-                    "description": "페인트 브러시를 사용하는 경우 레이어에 그리기."
-                },
-                "gradient": {
-                    "name": "사이트맵",
-                    "description": "색상 사이의 부드러운 전환을 만듭니다."
-                },
-                "bucketFill": {
-                    "name": "버켓 필",
-                    "description": "유사한 색깔의 지역에서 채우십시오."
-                }
-            }
-        },
-        "image": {
-            "name": "(주)",
-            "description": "일반 이미지 해상도 조작.",
-            "tools": {
-                "cropResize": {
-                    "name": "자르기 및 크기",
-                    "description": "자르기, 크기, 변화 종횡비, 또는 이미지를 재 샘플."
-                }
-            }
+            "title": "불투명도",
+            "opacity": "불투명도"
         },
         "selection": {
-            "name": "제품정보",
-            "description": "활성 층 (s)의 영역을 선택, 층 (s)에 어떤 조작은 선택 내부에서만 발생합니다.",
-            "tools": {
-                "selection": {
-                    "name": "제품정보",
-                    "description": "대상 편집을 위한 이미지의 영역을 선택합니다."
+            "selectionShape": {
+                "label": "선택 도형",
+                "rectangle": "직사각형",
+                "ellipse": "타원",
+                "freePolygon": "자유 다각형",
+                "freePolygonShort": "자유 다각형",
+                "lasso": "올가미",
+                "tonalArea": "톤 영역"
+            },
+            "selectionCombineMode": {
+                "label": "선택 결합 모드",
+                "add": "추가",
+                "subtract": "빼기",
+                "intersect": "교차"
+            },
+            "notification": {
+                "unproductiveSelection": {
+                    "title": "선택된 레이어 없음",
+                    "message": "<p>이미지 위에 선택 마스크를 만들었습니다.</p><p>레이어 독에서 이미지 레이어를 하나 이상 선택해 주세요.</p>"
                 }
             }
         },
         "text": {
-            "name": "이름 *",
-            "description": "텍스트 레이어를 조작하기위한 도구.",
+            "font": "글꼴",
+            "addFont": "글꼴 추가...",
+            "size": "크기",
+            "bold": "굵게",
+            "italic": "기울임",
+            "strikethrough": "취소선",
+            "underline": "밑줄",
+            "fill": "채우기",
+            "fillColor": "채우기 색상",
+            "fillTooltip": "글자 가장자리 안쪽에 보이는 색",
+            "paletteCount": "팔레트 개수",
+            "alignment": {
+                "title": "정렬",
+                "boundary": "경계",
+                "boundaryOption": {
+                    "dynamic": "동적",
+                    "box": "상자"
+                },
+                "lineDirection": "텍스트 방향",
+                "lineDirectionOption": {
+                    "ltr": "왼쪽에서 오른쪽으로",
+                    "rtl": "오른쪽에서 왼쪽으로",
+                    "ttb": "위에서 아래로",
+                    "btt": "아래에서 위로"
+                },
+                "wrapDirection": "줄 바꿈",
+                "wrapDirectionOption": {
+                    "ltr": "왼쪽에서 오른쪽으로",
+                    "rtl": "오른쪽에서 왼쪽으로",
+                    "ttb": "위에서 아래로",
+                    "btt": "아래에서 위로"
+                }
+            },
+            "newTextLayerName": "새 텍스트"
+        },
+        "zoom": {
+            "zoomOut": "축소",
+            "zoomIn": "확대",
+            "rotateCounterClockwise": "반시계 방향 회전",
+            "rotateClockwise": "시계 방향 회전",
+            "fit": "화면에 맞춤",
+            "flip": "뒤집기"
+        }
+    },
+    "toolGroup": {
+        "deform": {
+            "name": "변형",
+            "description": "복제, 부풀리기, 흐림처럼 기존 이미지 데이터를 다루는 도구입니다.",
+            "tools": {
+                "blur": {
+                    "name": "흐림",
+                    "description": "그린 영역을 흐리게 하는 브러시입니다."
+                }
+            }
+        },
+        "draw": {
+            "name": "그리기",
+            "description": "브러시, 연필, 펜, 벡터 아트 그리기 도구입니다.",
+            "tools": {
+                "brush": {
+                    "name": "브러시",
+                    "description": "페인트 브러시로 그리듯 레이어 위에 그립니다."
+                },
+                "bucketFill": {
+                    "name": "페인트통 채우기",
+                    "description": "비슷한 색 영역을 채웁니다."
+                },
+                "gradient": {
+                    "name": "그라데이션",
+                    "description": "색 사이에 부드러운 전환을 만듭니다."
+                }
+            }
+        },
+        "effect": {
+            "name": "효과",
+            "description": "레이어 색을 조정하고 흐림 등 효과를 추가합니다.",
+            "tools": {
+                "brush": {
+                    "name": "효과",
+                    "description": "레이어의 효과를 관리합니다."
+                }
+            }
+        },
+        "erase": {
+            "name": "지우기",
+            "description": "지우는 브러시, 연필, 펜입니다.",
+            "tools": {
+                "brush": {
+                    "name": "지우기 브러시",
+                    "description": "래스터 레이어의 데이터를 지웁니다."
+                }
+            }
+        },
+        "image": {
+            "name": "이미지",
+            "description": "이미지 해상도를 전반적으로 조작합니다.",
+            "tools": {
+                "cropResize": {
+                    "name": "자르기 및 크기 조정",
+                    "description": "이미지를 자르거나 크기를 바꾸거나 종횡비를 변경하거나 리샘플링합니다."
+                }
+            }
+        },
+        "selection": {
+            "name": "선택",
+            "description": "활성 레이어의 영역을 선택합니다. 레이어 조작은 선택 안에서만 적용됩니다.",
+            "tools": {
+                "selection": {
+                    "name": "선택",
+                    "description": "부분 편집을 위해 이미지 영역을 선택합니다."
+                }
+            }
+        },
+        "text": {
+            "name": "텍스트",
+            "description": "텍스트 레이어를 다루는 도구입니다.",
             "tools": {
                 "text": {
-                    "name": "이름 *",
+                    "name": "텍스트",
                     "description": "텍스트 레이어를 만들고 편집합니다."
                 }
             }
         },
         "transform": {
-            "name": "관련 기사",
-            "description": "움직이는 공구, 회전, 층을 스케일링.",
+            "name": "변환",
+            "description": "레이어를 이동, 회전, 크기 조절하는 도구입니다.",
             "tools": {
                 "freeTransform": {
-                    "name": "무료 Transform",
-                    "description": "이동, 회전, 또는 선택된 층을 스케일링."
+                    "name": "자유 변환",
+                    "description": "선택한 레이어를 이동하거나 회전하거나 크기를 조절합니다."
                 }
             }
         },
         "view": {
-            "name": "Viewport 전시",
-            "description": "캔버스의 전망 표시를 제어하기위한 도구.",
+            "name": "뷰포트 표시",
+            "description": "캔버스 뷰포트 표시를 제어하는 도구입니다.",
             "tools": {
-                "name": "주 메뉴",
-                "description": "줌에서 캔버스를 제어하는 방법의 이미지를 볼 수 있습니다."
-            }
-        },
-        "effect": {
-            "name": "제품 정보",
-            "description": "층 색깔을 조정하고, blurring 및 다른 효력을 추가하십시오.",
-            "tools": {
-                "brush": {
-                    "name": "제품 정보",
-                    "description": "층의 효과 관리."
-                }
-            }
-        },
-        "erase": {
-            "name": "언어 선택",
-            "description": "솔, 연필, 펜, 그 지우기.",
-            "tools": {
-                "brush": {
-                    "name": "Erase 브러쉬",
-                    "description": "Raster 층의 데이터 삭제."
-                }
-            }
-        },
-        "deform": {
-            "name": "제품정보",
-            "description": "복제, bulging, blurring과 같은 기존 이미지 데이터를 조작하는 도구.",
-            "tools": {
-                "blur": {
-                    "name": "뚱 베어",
-                    "description": "Blurs 지역 그려지는 솔."
-                }
+                "name": "확대/축소",
+                "description": "캔버스를 확대·축소해 이미지가 보이는 범위를 조절합니다."
             }
         }
     },
     "tutorialTip": {
-        "drawBrushToolIntroduction": {
+        "cloneBrushToolIntroduction": {
+            "title": "복제 브러시 도구",
             "introduction": [
-                "브러시 도구는 다른 브러시로 그림을 만들 수 있습니다. 그것은 압력 과민한 stylus로 제일 사용됩니다."
+                "복제 브러시는 이미지의 일부를 복사해 다른 곳에 칠할 수 있습니다. 잡티나 원치 않는 물체를 지우거나, 손상된 부분을 메울 때 주로 씁니다."
             ],
-            "title": "솔 공구"
+            "body": {
+                "mouse": [
+                    "복제 영역은 복제 스탬프 아이콘이 있는 원으로 표시됩니다. 끌어 옮기거나 Ctrl+클릭으로 현재 마우스 위치에 맞출 수 있습니다."
+                ],
+                "touch": [
+                    "복제 영역은 복제 스탬프 아이콘이 있는 원으로 표시됩니다. 끌어 옮길 수 있습니다."
+                ]
+            }
+        },
+        "deformBlurToolIntroduction": {
+            "title": "흐림 도구",
+            "introduction": [
+                "흐림 도구는 현재 레이어에서 그린 부분을 흐리게 합니다."
+            ]
+        },
+        "deformSharpenToolIntroduction": {
+            "title": "선명하게 도구",
+            "introduction": [
+                "선명 도구는 현재 레이어에서 그린 부분을 선명하게 합니다."
+            ]
+        },
+        "drawBrushToolIntroduction": {
+            "title": "브러시 도구",
+            "introduction": [
+                "브러시 도구로 여러 브러시를 사용해 그릴 수 있습니다. 필압을 감지하는 스타일러스와 함께 쓸 때 가장 좋습니다."
+            ]
+        },
+        "drawBucketFillToolIntroduction": {
+            "title": "페인트통 채우기 도구",
+            "introduction": [
+                "페인트통 채우기 도구는 비슷한 색 영역을 원하는 색으로 채웁니다."
+            ],
+            "body": {
+                "mouse": [
+                    "채울 영역을 클릭합니다. 마우스를 누른 채 좌우로 끌면 채워지는 범위를 조절할 수 있습니다."
+                ],
+                "touch": [
+                    "채울 영역을 탭합니다. 누른 채 좌우로 끌면 채워지는 범위를 조절할 수 있습니다."
+                ]
+            }
+        },
+        "drawGradientToolIntroduction": {
+            "title": "그라데이션 도구",
+            "introduction": [
+                "그라데이션 도구로 그라데이션 레이어를 추가할 수 있습니다."
+            ],
+            "body": {
+                "mouse": [
+                    "클릭하고 끌어 캔버스에 그라데이션을 놓습니다."
+                ],
+                "touch": [
+                    "한 손가락으로 터치하고 끌어 캔버스에 그라데이션을 놓습니다."
+                ]
+            }
+        },
+        "drawShapeToolIntroduction": {
+            "title": "도형 도구",
+            "introduction": [
+                "도형 도구로 기본 도형과 벡터 패스를 추가할 수 있습니다."
+            ],
+            "body": {
+                "mouse": [
+                    "{add} - 클릭하고 끌어 캔버스에 도형을 놓습니다.",
+                    "{edit} - 도형을 추가한 뒤 제어점을 클릭하고 끌어 도형을 편집합니다."
+                ],
+                "touch": [
+                    "{add} - 한 손가락으로 터치하고 끌어 캔버스에 도형을 놓습니다.",
+                    "{edit} - 도형을 추가한 뒤 제어점을 탭하고 끌어 도형을 편집합니다."
+                ]
+            },
+            "bodyTitle": {
+                "add": "추가",
+                "edit": "편집"
+            }
+        },
+        "effectToolIntroduction": {
+            "title": "효과 도구",
+            "introduction": [
+                "효과 도구로 레이어 전체에 색 조정 등 여러 작업을 하는 효과를 추가할 수 있습니다. 효과는 겹쳐 쌓거나 언제든 제거할 수 있습니다."
+            ]
+        },
+        "eraseBucketFillToolIntroduction": {
+            "title": "지우기 페인트통 채우기 도구",
+            "introduction": [
+                "비슷한 색 영역을 지웁니다."
+            ],
+            "body": {
+                "mouse": [
+                    "지울 영역을 클릭합니다. 마우스를 누른 채 좌우로 끌면 지워지는 범위를 조절할 수 있습니다."
+                ],
+                "touch": [
+                    "지울 영역을 탭합니다. 누른 채 좌우로 끌면 지워지는 범위를 조절할 수 있습니다."
+                ]
+            }
+        },
+        "eraseToolIntroduction": {
+            "title": "지우기 도구",
+            "introduction": [
+                "지우기 도구로 레이어의 일부를 제거해 투명하게 만들 수 있습니다."
+            ]
         },
         "explainCanvasViewportControls": {
             "title": "캔버스 이동",
             "introduction": [
-                "어떤 도구가 선택되지 않습니다, 당신은 캔버스보기를 제어 할 수 있습니다.",
-                "{anyTool}이 선택된 경우:"
+                "어떤 도구가 선택되어 있든 캔버스 보기를 조절할 수 있습니다.",
+                "{anyTool} 선택 시:"
             ],
             "anyTool": "모든 도구",
             "body": {
                 "mouse": [
-                    "{zooming} - {mouseWheel}을 사용하여 확대하고 밖으로.",
-                    "{panning} - 캔버스를 이동하려면 {rightMouseButton}로 클릭하고 드래그하십시오."
+                    "{zooming} - {mouseWheel}로 확대하거나 축소합니다.",
+                    "{panning} - {rightMouseButton}으로 클릭하고 끌어 캔버스를 이동합니다."
                 ],
                 "touch": [
-                    "{zooming} - 2개의 손가락 및 꼬집음을 사용하여 줌 및 밖으로.",
-                    "{panning} - 두 개의 손가락을 사용하고 캔버스를 이동하기 위해 함께 슬라이드합니다."
+                    "{zooming} - 두 손가락으로 오므리거나 벌려 확대하거나 축소합니다.",
+                    "{panning} - 두 손가락을 함께 밀어 캔버스를 이동합니다."
                 ]
             },
             "bodyTitle": {
-                "zooming": "채용 정보",
-                "panning": "팟캐스트",
-                "mouseWheel": "쥐 바퀴",
-                "rightMouseButton": "마우스 오른쪽 버튼"
+                "zooming": "확대/축소",
+                "panning": "화면 이동",
+                "mouseWheel": "마우스 휠",
+                "rightMouseButton": "오른쪽 마우스 버튼"
             }
         },
         "freeTransformToolIntroduction": {
-            "title": "무료 Transform 도구",
+            "title": "자유 변환 도구",
             "introduction": [
-                "이 공구는, 크기를 이동하고, 층을 자전합니다. 경계 상자는 선택한 층 (s)의 주위에 보여줍니다.",
+                "이 도구는 레이어를 이동하고, 크기를 조절하고, 회전합니다. 선택한 레이어 주위에 경계 상자가 표시됩니다.",
                 "{autoMode}에서:"
             ],
             "autoMode": "자동 모드",
             "body": {
                 "mouse": [
-                    "{selection} - {leftClick} 레이어에서 선택.",
-                    "{moving} - 층에 {leftClick} 및 이동으로 드래그하십시오.",
-                    "{resizing} - {leftClick} 및 드래그 크기 핸들."
+                    "{selection} - {leftClick}으로 레이어를 선택합니다.",
+                    "{moving} - {leftClick}으로 레이어를 끌어 이동합니다.",
+                    "{resizing} - {leftClick}으로 크기 조절 핸들을 끕니다."
                 ],
                 "touch": [
-                    "{selection} - 레이어를 탭하여 선택합니다.",
-                    "{moving} - 층을 탭하고 이동하도록 드래그하십시오.",
-                    "{resizing} - 크기 손잡이를 드래그하기 위해 손가락을 사용합니다."
+                    "{selection} - 레이어를 탭해 선택합니다.",
+                    "{moving} - 레이어를 탭하고 끌어 이동합니다.",
+                    "{resizing} - 한 손가락으로 크기 조절 핸들을 끕니다."
                 ]
             },
             "bodyTitle": {
-                "selection": "제품정보",
-                "moving": "기타",
-                "resizing": "제품 설명",
+                "selection": "선택",
+                "moving": "이동",
+                "resizing": "크기 조절",
                 "leftClick": "왼쪽 클릭"
             }
         },
         "selectionToolIntroduction": {
             "title": "선택 도구",
             "introduction": [
-                "선택 도구는 이미지의 특정 부분을 선택하여 편집 영향을 제한 할 수 있습니다."
+                "선택 도구로 이미지의 특정 부분만 골라 편집이 적용되는 범위를 제한할 수 있습니다."
             ],
             "body": {
                 "mouse": [
-                    "{createSelection} - {leftClick}로 클릭하고 드래그하여 선택을 만듭니다."
+                    "{createSelection} - {leftClick}으로 클릭하고 끌어 선택 영역을 만듭니다."
                 ],
                 "touch": [
-                    "{createSelection} - 선택을 창조하기 위하여 1개의 손가락으로 끌기."
+                    "{createSelection} - 한 손가락으로 그려 선택 영역을 만듭니다."
                 ],
                 "end": [
-                    "{selectionShape} - 어떤 모양은 선택을 끌기 위하여 이용됩니다.",
-                    "{selectionCombineMode} - 현재 선택은 기존 선택과 결합하는 방법."
+                    "{selectionShape} - 선택 영역을 그릴 때 쓰는 모양입니다.",
+                    "{selectionCombineMode} - 현재 선택 영역을 기존 선택 영역과 합치는 방식입니다."
                 ]
             },
             "bodyTitle": {
-                "createSelection": "선택하기",
+                "createSelection": "선택 만들기",
                 "leftClick": "왼쪽 클릭",
-                "selectionShape": "선택 모양",
-                "selectionCombineMode": "선택 Combine 형태"
+                "selectionShape": "선택 도형",
+                "selectionCombineMode": "선택 결합 모드"
             }
         },
         "zoomToolIntroduction": {
-            "title": "Zoom/Pan 공구",
+            "title": "확대/축소 및 이동 도구",
             "introduction": [
-                "이 도구는 이미지를 줌으로써 주변을 움직입니다."
+                "이 도구로 이미지를 확대하고 보기를 이동할 수 있습니다."
             ],
             "body": {
                 "mouse": [
-                    "{zooming} - {leftClick} 안으로 급상승에; {ctrlLeftClick}는 밖으로 급상승합니다.",
-                    "{panning} - 캔버스를 이동하려면 {leftMouseButton}로 클릭하고 드래그하십시오."
+                    "{zooming} - {leftClick}하면 확대하고, {ctrlLeftClick}하면 축소합니다.",
+                    "{panning} - {leftMouseButton}으로 클릭하고 끌어 캔버스를 이동합니다."
                 ],
                 "touch": [
-                    "{zooming} - 안으로 급상승에 1개의 손가락을 가진 꼭지. 두 손가락으로 탭하여 확대합니다.",
-                    "{panning} - 캔버스를 이동 한 손가락으로 탭하고 드래그하십시오."
+                    "{zooming} - 한 손가락으로 탭하면 확대하고, 두 손가락으로 탭하면 축소합니다.",
+                    "{panning} - 한 손가락으로 탭하고 끌어 캔버스를 이동합니다."
                 ]
             },
             "bodyTitle": {
-                "zooming": "채용 정보",
-                "panning": "팟캐스트",
+                "zooming": "확대/축소",
+                "panning": "화면 이동",
                 "leftClick": "왼쪽 클릭",
                 "ctrlLeftClick": "Ctrl + 왼쪽 클릭",
                 "leftMouseButton": "왼쪽 마우스 버튼"
             }
-        },
-        "effectToolIntroduction": {
-            "title": "효력 공구",
-            "introduction": [
-                "효과 도구는 색상을 조정할 수있는 층 효과를 추가하고 다른 유용한 작업의 모든 종류를 전체 레이어로 할 수 있습니다. 효력은 어떤 시간에 겹쳐 쌓이고 제거될 수 있습니다."
-            ]
-        },
-        "eraseToolIntroduction": {
-            "title": "Erase 도구",
-            "introduction": [
-                "지우개 도구는 층의 부품을 제거 할 수 있으므로 투명하게 만듭니다."
-            ]
-        },
-        "deformBlurToolIntroduction": {
-            "title": "Blur 공구",
-            "introduction": [
-                "Blur 도구는 현재 레이어의 일부를 blur합니다."
-            ]
-        },
-        "drawGradientToolIntroduction": {
-            "title": "Gradient 공구",
-            "introduction": [
-                "Gradient 도구는 gradient 레이어를 추가 할 수 있습니다."
-            ],
-            "body": {
-                "mouse": [
-                    "캔버스에 gradient를 배치하고 드래그하십시오."
-                ],
-                "touch": [
-                    "한 손가락을 터치하고 캔버스에 그라디언트를 배치합니다."
-                ]
-            }
-        },
-        "drawShapeToolIntroduction": {
-            "introduction": [
-                "모양 도구는 다양한 기본 모양과 벡터 경로를 추가 할 수 있습니다."
-            ],
-            "body": {
-                "mouse": [
-                    "{add} - 캔버스에 모양을 놓고 드래그하십시오.",
-                    "{edit} - 모양의 제어 지점을 클릭하고 모양을 편집하여 추가되었습니다."
-                ],
-                "touch": [
-                    "{add} - 터치 한 손가락을 사용하여 캔버스에 모양을 배치합니다.",
-                    "{edit} - 모양의 컨트롤 포인트를 탭하고 모양을 편집하여 추가되었습니다."
-                ]
-            },
-            "title": "모양 공구",
-            "bodyTitle": {
-                "add": "기타 제품",
-                "edit": "제품정보"
-            }
-        },
-        "deformSharpenToolIntroduction": {
-            "title": "Sharpen 공구",
-            "introduction": [
-                "날카로운 공구는 당신이 끌리는 현재 층의 지역을 날카롭게 할 것입니다."
-            ]
-        },
-        "drawBucketFillToolIntroduction": {
-            "title": "버켓 필",
-            "introduction": [
-                "물통 충전물 공구는 당신이 당신의 선택의 색깔과 유사한 색깔의 지역에 채우게 합니다."
-            ],
-            "body": {
-                "mouse": [
-                    "자주 묻는 질문 마우스를 내려 놓으면 왼쪽 또는 오른쪽으로 드래그하여 지역이 얼마나 많이 채울 수 있습니다."
-                ],
-                "touch": [
-                    "채우기 영역에 탭합니다. 아래로 유지하면서, 당신은 왼쪽 또는 오른쪽으로 드래그하여 얼마나 많은 영역을 채울 수 있습니다."
-                ]
-            }
-        },
-        "eraseBucketFillToolIntroduction": {
-            "title": "Erase 버킷 필",
-            "introduction": [
-                "비슷한 색상을 가진 이미지의 Erase 지역."
-            ],
-            "body": {
-                "mouse": [
-                    "지우기 마우스를 잡고, 당신은 왼쪽 또는 오른쪽으로 드래그하여 얼마나 많은 영역을 지우는 것을 조정할 수 있습니다."
-                ],
-                "touch": [
-                    "지역을 지우기. 아래로 유지하면서, 당신은 왼쪽 또는 오른쪽으로 드래그 할 수 있습니다 얼마나 많은 지역은 지워."
-                ]
-            }
-        }
-    },
-    "gradientPreset": {
-        "blackToTransparent": "투명한 검정",
-        "whiteToTransparent": "투명한에 백색",
-        "blackToWhite": "검정, 백색"
-    },
-    "layerBlendingMode": {
-        "normal": "·",
-        "dissolve": "기타 제품",
-        "colorErase": "색깔 Erase",
-        "erase": "언어 선택",
-        "lightenOnly": "빛 만",
-        "lumaLightenOnly": "Luma 라이센 지원하다",
-        "screen": "제품정보",
-        "dodge": "닷지",
-        "linearDodge": "선형 Dodge",
-        "addition": "더 보기",
-        "darkenOnly": "어둠 만",
-        "lumaDarkenOnly": "루마 Darken 지원하다",
-        "multiply": "기타 제품",
-        "burn": "뚱 베어",
-        "linearBurn": "선형 화상",
-        "overlay": "오버레이",
-        "softLight": "연한 빛",
-        "hardLight": "단단한 빛",
-        "vividLight": "생생한 빛",
-        "pinLight": "핀 빛",
-        "linearLight": "선형 빛",
-        "hardMix": "하드 믹스",
-        "difference": "주요 특징",
-        "exclusion": "이름 *",
-        "subtract": "기타 제품",
-        "grainExtract": "곡물 추출물",
-        "grainMerge": "곡물 Merge",
-        "divide": "한국어",
-        "hue": "Hue 조명",
-        "chroma": "크롬",
-        "color": "색깔: 백색",
-        "lightness": "밝기",
-        "luminance": "운영 정보"
-    },
-    "defaultBrush": {
-        "default": "기본 정보",
-        "simpleAirBrush": "간단한 공기 솔",
-        "simplePaintBrush": "간단한 페인트 솔",
-        "simplePen": "간단한 펜",
-        "simpleWaterColor": "간단한 물 색깔",
-        "simplePixelArt": "간단한 화소 (주)"
-    },
-    "defaultBrushCategory": {
-        "custom": "제품 정보",
-        "simple": "지원하다"
-    },
-    "menuBarToolGroup": {
-        "deform": {
-            "tools": {
-                "blur": {
-                    "title": "뚱 베어",
-                    "description": "이미지의 Blur 영역"
-                },
-                "sharpen": {
-                    "title": "스낵 바",
-                    "description": "이미지의 Sharpen 지역"
-                }
-            },
-            "name": "제품정보"
-        },
-        "draw": {
-            "tools": {
-                "brush": {
-                    "title": "제품정보",
-                    "description": "예술 솔로 끌기"
-                },
-                "gradient": {
-                    "title": "사이트맵",
-                    "description": "색상의 gradients 만들기"
-                },
-                "shape": {
-                    "title": "제품 정보",
-                    "description": "기본 모양 만들기"
-                },
-                "bucketFill": {
-                    "title": "버켓 필",
-                    "description": "색상을 가진 충분한 지역"
-                }
-            },
-            "name": "드로잉"
-        },
-        "effect": {
-            "tools": {
-                "effect": {
-                    "title": "제품 정보",
-                    "description": "Manipulate 층 색상 및 필터 효과를 추가"
-                }
-            },
-            "name": "제품 정보"
-        },
-        "erase": {
-            "tools": {
-                "brush": {
-                    "title": "Erase 브러쉬",
-                    "description": "솔 치기를 가진 Erase"
-                },
-                "bucketFill": {
-                    "title": "Erase 버킷 필",
-                    "description": "유사한 색깔을 가진 Erase 지역"
-                }
-            },
-            "name": "언어 선택"
-        },
-        "layers": {
-            "name": "층계"
-        },
-        "selection": {
-            "tools": {
-                "selection": {
-                    "title": "- 연혁",
-                    "description": "이미지의 specifc 영역을 편집, 잘라, 복사, 또는 삭제"
-                }
-            },
-            "name": "- 연혁"
-        },
-        "settings": {
-            "name": "팟캐스트"
-        },
-        "text": {
-            "tools": {
-                "text": {
-                    "title": "이름 *",
-                    "description": "삽입 및 편집 텍스트 층"
-                }
-            },
-            "name": "이름 *"
-        },
-        "transform": {
-            "tools": {
-                "freeTransform": {
-                    "title": "무료 Transform",
-                    "description": "이동, 가늠자, 자전 층"
-                },
-                "layerCrop": {
-                    "title": "층 크롭",
-                    "description": "선택된 층을 자르기"
-                }
-            },
-            "name": "이동/변환"
-        },
-        "view": {
-            "tools": {
-                "zoom": {
-                    "title": "줌 / 팬",
-                    "description": "줌 및 밖으로, 팬, 또는 이미지를 회전"
-                }
-            },
-            "name": "캔버스 Viewport"
         }
     }
 }
